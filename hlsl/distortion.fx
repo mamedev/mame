@@ -212,7 +212,7 @@ float2 GetDistortedCoords(float2 centerCoord, float amount, float amountCube)
 		: 1.0f + r2 * (k + kcube * sqrt(r2));
 
    	// fit screen bounds
-	f /= 1.0f + amount * 0.25 + amountCube * 0.125f;
+	f /= 1.0f + amount * 0.25f + amountCube * 0.125f;
 
 	// apply cubic distortion factor
    	centerCoord *= f;
@@ -237,9 +237,9 @@ float2 GetCoords(float2 coord, float distortionAmount, float cubicDistortionAmou
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float distortionAmount = DistortionAmount;
-	float cubicDistortionAmount = CubicDistortionAmount > 0
-		? CubicDistortionAmount * 1.1  // cubic distortion need to be a little higher to compensate the quartic distortion
-		: CubicDistortionAmount * 1.2; // negativ values even more
+	float cubicDistortionAmount = CubicDistortionAmount > 0.0f
+		? CubicDistortionAmount * 1.1f  // cubic distortion need to be a little higher to compensate the quartic distortion
+		: CubicDistortionAmount * 1.2f; // negativ values even more
 
 	float2 TexelDims = 1.0f / TargetDims;
 

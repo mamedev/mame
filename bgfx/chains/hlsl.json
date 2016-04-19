@@ -9,11 +9,11 @@
 	// name (unused): This value should contain a suitable name for the screen chain. It is not read by MAME, though it is still suggested that it be put in any user-made chains.
 	// type: string
 	"name": "Classic D3D HLSL CRT Simulation",
-	
+
 	// author (unused): This value should contain a suitable name for this chain's author. Again, it is not read by MAME, but it is still advisable to have.
 	// type: string
 	"author": "Ryan Holtz & ImJezze",
-	
+
 	// sliders (optional): The list of sliders used by all of the entries in this chain. Can be omitted if no entries use any sliders.
 	"sliders": [
 		// type (required): The sliders's conceptual type. Is it a list of string selections? Is it a single floating-point value? Does it require RGB values, or XY values?
@@ -54,7 +54,7 @@
 		// 
 		// strings (optional): A list of strings to use with the "intenum" type, to select from a list of text options instead of simply numbers.
 		// value: An array of 2 or more entries, with one entry per possible slider setting from "min" to "max" inclusive.
-		
+
 		{ "type": "intenum", "name": "adjustments", "text": "Enable Adjustments", "default": 0, "max": 1, "min": 0, "step": 1, "scale": 1.0, "format": "%s", "screen": "any", "strings": [ "Off", "On" ] },
 
 		{ "type": "intenum", "name": "ntsc",            "text": "Enable NTSC",                           "default": 0,        "max": 1,        "min": 0,        "step": 1,   "scale": 1.0,       "format": "%s",    "screen": "any", "strings": [ "Off", "On" ] },
@@ -80,7 +80,7 @@
 		{ "type": "vec2", "name": "converge_red",          "text": "Red Convergence, ",   "default": [ 5, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
 		{ "type": "vec2", "name": "converge_green",        "text": "Green Convergence, ", "default": [ 0, 5 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
 		{ "type": "vec2", "name": "converge_blue",         "text": "Blue Convergence, ",  "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
-		
+
 		{ "type": "vec2", "name": "radial_converge_red",   "text": "Red Radial Convergence, ",   "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
 		{ "type": "vec2", "name": "radial_converge_green", "text": "Green Radial Convergence, ", "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
 		{ "type": "vec2", "name": "radial_converge_blue",  "text": "Blue Radial Convergence, ",  "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
@@ -96,22 +96,27 @@
 		{ "type": "float",   "name": "scanline_jitter_amount", "text": "Scanline Jitter Amount",     "default": 0,              "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",   "name": "scanline_height",        "text": "Individual Scanline Scale",  "default": 100,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",   "name": "scanline_variation",     "text": "Scanline Variation",         "default": 100,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+
 		{ "type": "float",   "name": "shadow_alpha",           "text": "Shadow Mask Amount",         "default": 20,             "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "vec2",    "name": "shadow_uv_count",        "text": "Shadow Mask Pixel Count ",   "default": [  12,  12 ],   "max": [ 128, 128 ],      "min": [ 1, 1 ],    "step": 1, "scale": 1.0,     "format": "%3f",   "screen": "crt" },
 		{ "type": "vec2",    "name": "shadow_uv_size",         "text": "Shadow Mask UV Size ",       "default": [ 500, 500 ],   "max": [ 1000, 1000 ],    "min": [ 0, 0 ],    "step": 1, "scale": 0.001,   "format": "%1.4f", "screen": "crt" },
 		{ "type": "vec2",    "name": "shadow_uv_offset",       "text": "Shadow Mask UV Offset ",     "default": [   0,   0 ],   "max": [ 1000, 1000 ],    "min": [ 0, 0 ],    "step": 1, "scale": 0.001,   "format": "%1.4f", "screen": "crt" },
+
 		{ "type": "float",   "name": "humbar_alpha",           "text": "Hum Bar Amount",             "default": 5,              "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float",   "name": "humbar_hertz_rate",      "text": "Hum Bar Frequency",          "default": 100,            "max": 10000,             "min": 0,           "step": 1, "scale": 0.00001, "format": "%1.7f", "screen": "crt" },
+
 		{ "type": "color",   "name": "floor",                  "text": "Signal Floor, ",             "default": [  5,  5,  5 ], "max": [ 100, 100, 100 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "color",   "name": "power",                  "text": "Signal Exponent, ",          "default": [ 80, 80, 80 ], "max": [ 400, 400, 400 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
-		
-		{ "type": "float", "name": "curvature",     "text": "Screen Curvature Amount", "default": 20, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "round_corner",  "text": "Rounded Corner Amount",   "default": 15, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "smooth_border", "text": "Smooth Border Amount",    "default": 5,  "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "vignetting",    "text": "Vignetting Amount",       "default": 20, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "reflection",    "text": "Reflection Amount",       "default": 15, "max": 200, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" }
+
+		{ "type": "float", "name": "distortion",       "text": "Screen Distortion Amount",       "default": 20, "max": 200, "min": -200, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "cubic_distortion", "text": "Screen Cubic Distortion Amount", "default": 0,  "max": 200, "min": -200, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "distort_corner",   "text": "Distorted Corner Amount",        "default": 20, "max": 200, "min": 0,    "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "round_corner",     "text": "Rounded Corner Amount",          "default": 15, "max": 200, "min": 0,    "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "smooth_border",    "text": "Smooth Border Amount",           "default": 5,  "max": 200, "min": 0,    "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "vignetting",       "text": "Vignetting Amount",              "default": 20, "max": 200, "min": 0,    "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "reflection",       "text": "Reflection Amount",              "default": 15, "max": 200, "min": 0,    "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" }
 	],
-	
+
 	// parameters (optional): A list of procedurally-generated parameters that can be bound to entry uniforms.
 	"parameters": [
 		// name (required): The internal name of the parameter that will be used when binding to an entry uniform.
@@ -128,11 +133,11 @@
 		// 
 		// limit (required by type "time"): The range of time across which to loop. 0.0 means run indefinitely.
 		// value: Any numeric value.
-		
+
 		{ "name": "jitter", "type": "frame", "period": 2 },
 		{ "name": "time",   "type": "time",  "limit": 0.0 }
 	],
-	
+
 	// targets (optional): A list of all render targets that will be used by the chain entries in this chain.
 	"targets": [
 		// name (required): The name of the target. Will be used to bind it as a texture and as an output in chain entries.
@@ -177,7 +182,7 @@
 			"doublebuffer": true
 		}
 	],
-	
+
 	// passes (required): The list of individual shaders to invoke, and any dynamic input parameters they need.
 	"passes": [
 		{
@@ -194,7 +199,7 @@
 				// clearcolor (optional): An array containing an RGBA quadruplet to which to clear the output target.
 				// value: An array of four numeric values of the range 0.0 to 1.0.
 				"clearcolor": [ 0.0, 0.0, 0.0, 0.0 ],
-				
+
 				// cleardepth (optional): A numeric value containing the depth value to which to clear the output target.
 				// value: Any numeric value.
 				"cleardepth": 1.0,
@@ -231,7 +236,7 @@
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "ntsc",        "value": 0 }
 			],
-			
+
 			// uniforms (optional): Non-sampler uniform bindings for this chain entry.
 			"uniforms": [
 				// uniform (required): The name of the uniform, as it is referenced in the shader source code itself.
@@ -247,7 +252,7 @@
 				// 
 				// value (optional): An array of numeric values that should be loaded into this uniform.
 				// values: Should be an array containing anywhere from 1-16 numeric values, corresponding to the size of the uniform's type.
-				
+
 				{ "uniform": "u_a_value",         "slider": "a_value" },
 				{ "uniform": "u_b_value",         "slider": "b_value" },
 				{ "uniform": "u_cc_value",        "slider": "cc_value" },
@@ -256,7 +261,7 @@
 				{ "uniform": "u_jitter_offset",   "slider": "jitter_offset" },
 				{ "uniform": "u_jitter_amount",   "parameter": "jitter" }
 			],
-			
+
 			// inputs (optional): A list of samplers used by this entry, and their corresponding bindings.
 			"input": [
 				// sampler (required): The name of the sampler, as it is referenced in the shader source code itself.
@@ -278,7 +283,7 @@
 				// default: true
 				{ "sampler": "s_tex", "texture": "screen" }
 			],
-			
+
 			// output (required): The target to use as the output for this pass. Can be one of the named targets in "targets", or "output" 
 			//                    or "previous" for one of two automatically-generated targets.
 			// value: Any valid ASCII string that names a target.
@@ -468,19 +473,23 @@
 		{	"effect": "hlsl/distortion",
 			"name": "Distortion Pass",
 			"disablewhen": [
-				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments",    "value": 0 },
-				{ "type": "slider", "condition": "equal", "combine": "and", "name": "curvature",     "value": 0.0 },
-				{ "type": "slider", "condition": "equal", "combine": "and", "name": "round_corner",  "value": 0.0 },
-				{ "type": "slider", "condition": "equal", "combine": "and", "name": "smooth_border", "value": 0.0 },
-				{ "type": "slider", "condition": "equal", "combine": "and", "name": "vignetting",    "value": 0.0 },
-				{ "type": "slider", "condition": "equal", "combine": "and", "name": "reflection",    "value": 0.0 }
+				{ "type": "slider", "condition": "equal", "combine": "or",  "name": "adjustments",      "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "distortion",       "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "cubic_distortion", "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "distort_corner",   "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "round_corner",     "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "smooth_border",    "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "vignetting",       "value": 0.0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "reflection",       "value": 0.0 }
 			],
 			"uniforms": [
-				{ "uniform": "u_curvature",     "slider": "curvature" },
-				{ "uniform": "u_round_corner",  "slider": "round_corner" },
-				{ "uniform": "u_smooth_border", "slider": "smooth_border" },
-				{ "uniform": "u_vignetting",    "slider": "vignetting" },
-				{ "uniform": "u_reflection",    "slider": "reflection" }
+				{ "uniform": "u_distortion",       "slider": "distortion" },
+				{ "uniform": "u_cubic_distortion", "slider": "cubic_distortion" },
+				{ "uniform": "u_distort_corner",   "slider": "distort_corner" },
+				{ "uniform": "u_round_corner",     "slider": "round_corner" },
+				{ "uniform": "u_smooth_border",    "slider": "smooth_border" },
+				{ "uniform": "u_vignetting",       "slider": "vignetting" },
+				{ "uniform": "u_reflection",       "slider": "reflection" }
 			],
 			"input": [
 				{ "sampler": "s_tex", "target": "internal" }

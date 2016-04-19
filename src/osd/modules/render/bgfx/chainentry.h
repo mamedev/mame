@@ -47,6 +47,7 @@ private:
 	void setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_width, uint16_t screen_height, uint32_t rotation_type, bool swap_xy, int32_t screen);
 	void setup_screensize_uniforms(texture_manager& textures, uint16_t screen_width, uint16_t screen_height, int32_t screen);
 	void setup_sourcesize_uniform(render_primitive* prim) const;
+	void setup_targetsize_uniform(int32_t screen) const;
 	void setup_rotationtype_uniform(uint32_t rotation_type) const;
 	void setup_swapxy_uniform(bool swap_xy) const;
 	void setup_quaddims_uniform(render_primitive* prim) const;

@@ -122,6 +122,20 @@ void bgfx_chain_entry::setup_sourcesize_uniform(render_primitive* prim) const
 	}
 }
 
+void bgfx_chain_entry::setup_targetsize_uniform(int32_t screen) const
+{
+	bgfx_uniform* target_dims = m_effect->uniform("u_target_dims");
+	if (target_dims != nullptr)
+	{
+		bgfx_target* output = m_targets.target(screen, m_output);
+		if (output != nullptr)
+		{
+			float values[2] = { float(output->width()), float(output->height()) };
+			target_dims->set(values, sizeof(float) * 2);
+		}
+	}
+}
+
 void bgfx_chain_entry::setup_rotationtype_uniform(uint32_t rotation_type) const
 {
 	bgfx_uniform* rotation_type_uniform = m_effect->uniform("u_rotation_type");
@@ -166,6 +180,7 @@ void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manag
 {
 	setup_screensize_uniforms(textures, screen_width, screen_height, screen);
 	setup_sourcesize_uniform(prim);
+	setup_targetsize_uniform(screen);
 	setup_rotationtype_uniform(rotation_type);
 	setup_swapxy_uniform(swap_xy);
 	setup_quaddims_uniform(prim);
