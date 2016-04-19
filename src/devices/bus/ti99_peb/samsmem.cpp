@@ -11,22 +11,26 @@
     addresses at 4000, 4002, ..., 401e, which correspond to memory locations
     0000-0fff, 1000-1fff, ..., f000-ffff.
 
-    Michael Zapf
+    According to a software distribution disk from the South West 99ers group,
+    the predecessor of this card was the Asgard Expanded Memory System (AEMS).
+    Although some documentation and software was available for it, it was never
+    built. Instead, a simpler memory card called the Asgard Memory System (AMS)
+    was built. The South West 99ers group built a better version of this card
+    called the Super AMS. Any documentation and software containing a reference
+    to the AEMS are applicable to either AMS or SAMS.
 
-    February 2012: Rewritten as class
+    Michael Zapf
 
 *****************************************************************************/
 
 #include "samsmem.h"
-#define RAMREGION "ram"
 
 #define SAMS_CRU_BASE 0x1e00
 
-#define VERBOSE 1
-#define LOG logerror
-
 sams_memory_expansion_device::sams_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_SAMSMEM, "SuperAMS memory expansion card", tag, owner, clock, "ti99_sams", __FILE__), m_ram(nullptr), m_map_mode(false), m_access_mapper(false)
+: ti_expansion_card_device(mconfig, TI99_SAMSMEM, "SuperAMS memory expansion card", tag, owner, clock, "ti99_sams", __FILE__),
+	m_ram(*this, RAM_TAG),
+	m_map_mode(false), m_access_mapper(false)
 {
 }
 
@@ -49,12 +53,12 @@ READ8Z_MEMBER(sams_memory_expansion_device::readz)
 		if (!m_map_mode)
 		{
 			// transparent mode
-			*value = m_ram[offset & 0xffff];
+			*value = m_ram->pointer()[offset & 0xffff];
 		}
 		else
 		{
 			base = (m_mapper[(offset & 0xf000)>>12] << 12);
-			*value = m_ram[base | (offset & 0x0fff)];
+			*value = m_ram->pointer()[base | (offset & 0x0fff)];
 		}
 	}
 }
@@ -73,12 +77,12 @@ WRITE8_MEMBER(sams_memory_expansion_device::write)
 		if (!m_map_mode)
 		{
 			// transparent mode
-			m_ram[offset & 0xffff] = data;
+			m_ram->pointer()[offset & 0xffff] = data;
 		}
 		else
 		{
 			base = (m_mapper[(offset & 0xf000)>>12] << 12);
-			m_ram[base | (offset & 0x0fff)] = data;
+			m_ram->pointer()[base | (offset & 0x0fff)] = data;
 		}
 	}
 }
@@ -97,37 +101,31 @@ WRITE8_MEMBER(sams_memory_expansion_device::cruwrite)
 {
 	if ((offset & 0xff00)==SAMS_CRU_BASE)
 	{
-		if (VERBOSE>7) LOG("cru address %04x = %02x\n", offset&0xffff, data);
-
 		if ((offset & 0x000e)==0) m_access_mapper = (data!=0);
 		if ((offset & 0x000e)==2) m_map_mode = (data!=0);
 	}
 }
 
+MACHINE_CONFIG_FRAGMENT( sams_mem )
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("1M")
+MACHINE_CONFIG_END
 
-ROM_START( sams_card )
-	ROM_REGION(0x100000, RAMREGION, 0)
-	ROM_FILL(0x0000, 0x100000, 0x00)
-ROM_END
+machine_config_constructor sams_memory_expansion_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( sams_mem );
+}
 
 void sams_memory_expansion_device::device_start()
 {
-	if (VERBOSE>5) LOG("SuperAMS: start\n");
-	m_ram = memregion(RAMREGION)->base();
 }
 
 void sams_memory_expansion_device::device_reset()
 {
-	if (VERBOSE>5) LOG("SuperAMS: reset\n");
 	// Resetting values
 	m_map_mode = false;
 	m_access_mapper = false;
 	for (auto & elem : m_mapper) elem = 0;
-}
-
-const rom_entry *sams_memory_expansion_device::device_rom_region() const
-{
-	return ROM_NAME( sams_card );
 }
 
 const device_type TI99_SAMSMEM = &device_creator<sams_memory_expansion_device>;

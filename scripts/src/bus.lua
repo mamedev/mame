@@ -2076,8 +2076,6 @@ if (BUSES["TI99X"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99x/mecmouse.cpp",
 		MAME_DIR .. "src/devices/bus/ti99x/mecmouse.h",
 		MAME_DIR .. "src/devices/bus/ti99x/ti99defs.h",
-		MAME_DIR .. "src/devices/bus/ti99x/videowrp.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/videowrp.h",
 	}
 end
 

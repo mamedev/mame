@@ -1,37 +1,97 @@
 // license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /****************************************************************************
-    SNUG Enhanced Video Processor Card (evpc)
-    based on v9938 (may also be equipped with v9958)
-    Can be used with TI-99/4A as an add-on card; internal VDP must be removed
+    SNUG Enhanced Video Processor Card (EVPC)
 
-    The SGCPU ("TI-99/4P") only runs with EVPC.
+    This is an expansion card with an own v9938 video processor on board.
+    Later releases (EVPC2) can also be equipped with a v9958.
+
+    The EVPC is intended to be used
+    1. with the TI-99/4A console
+    2. with the SGCPU
+
+    For option 1, the console-internal VDP (TMS9928A) must be removed. This,
+    however, raises a problem, because the video interrupt must now be send
+    from the EVPC in the Peripheral Expansion Box to the console, but there is
+    no line in the PEB cable for this purpose.
+
+    To solve this issue, a separate cable is led from the EVPC to the console
+    which delivers the video interrupt, and also the GROM clock which is also
+    lost due to the removal of the internal VDP.
+
+    The SGCPU requires this card, as it does not offer any video processor.
+    In this configuration, the video interrupt cable is not required.
+
+    Also, the SGCPU does not offer a socket for the sound chip of the TI
+    console, and accordingly, the EVPC also gives the sound chip a new home.
+    Thus we assume that in the TI console (option 1) the sound chip has
+    also been removed.
+
+    Important note: The DSR (firmware) of the EVPC expects a memory expansion
+    to be present; otherwise, the configuration (using CALL EVPC) will crash.
+    There is no warning if the 32K expansion is not present.
+
     Michael Zapf
-
-    October 2010: Rewritten as device
-    February 2012: Rewritten as class
-
-    FIXME: Locks up on startup when HFDC is present. This can be avoided
-    by using another controller (like bwg) or doing a soft reset.
 
 *****************************************************************************/
 
 #include "evpc.h"
 
 #define EVPC_CRU_BASE 0x1400
-#define VERBOSE 1
-#define LOG logerror
+
+#define TRACE_ADDRESS 0
+#define TRACE_CRU 0
+#define TRACE_MEM 0
 
 #define NOVRAM_SIZE 256
 
 snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI99_EVPC, "SNUG Enhanced Video Processor Card", tag, owner, clock, "ti99_evpc", __FILE__),
 	device_nvram_interface(mconfig, *this),
-	m_dsrrom(nullptr),
-	m_RAMEN(false),
 	m_dsr_page(0),
-	m_novram(nullptr)
+	m_inDsrArea(false),
+	m_novram_accessed(false),
+	m_palette_accessed(false),
+	m_RAMEN(false),
+	m_dsrrom(nullptr),
+	m_novram(nullptr),
+	m_video(*this, VDP_TAG),
+	m_sound(*this, TISOUNDCHIP_TAG)
 {
+}
+
+SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
+{
+	// Do not allow setaddress for the debugger. It will mess up the
+	// setaddress/memory access pairs when the CPU enters wait states.
+	if (space.debugger_access()) return;
+
+	if (TRACE_ADDRESS) logerror("set address %04x, %s\n", offset, (state==ASSERT_LINE)? "read" : "write");
+
+	m_address = offset;
+	bool reading = (state==ASSERT_LINE);
+	int offbase = (m_address & 0xfc01);
+
+	// Sound
+	m_sound_accessed = ((m_address & 0xff01)==0x8400) && !reading;
+
+	// Video space
+	// 8800 / 8802 / 8804 / 8806
+	// 8c00 / 8c02 / 8c04 / 8c06
+	//
+	// Bits 1000 1w00 0000 0xx0
+	// Mask 1111 1000 0000 0001
+	m_video_accessed = ((offbase==0x8800) && reading) || ((offbase==0x8c00) && !reading);
+
+	// Read a byte in evpc DSR space
+	// 0x4000 - 0x5eff   DSR (paged)
+	// 0x5f00 - 0x5fef   NOVRAM
+	// 0x5ff0 - 0x5fff   Palette
+	m_inDsrArea = ((m_address & 0xe000)==0x4000);
+	m_novram_accessed = ((m_address & 0xff00)==0x5f00);
+	m_palette_accessed = ((m_address & 0xfff0)==0x5ff0);
+
+	// Note that we check the selection in reverse order so that the overlap is avoided
 }
 
 //-------------------------------------------------
@@ -64,85 +124,80 @@ void snug_enhanced_video_device::nvram_write(emu_file &file)
 	file.write(m_novram.get(), NOVRAM_SIZE);
 }
 
-
 /*
-    Read a byte in evpc DSR space
+    Read a byte in evpc DSR space, NOVRAM, Palette, or video
     0x4000 - 0x5eff   DSR (paged)
     0x5f00 - 0x5fef   NOVRAM
-    0x5ff0 - 0x5fff   Palette
+    0x5ff0 - 0x5fff   Palette (5ff0, 5ff2, 5ff4, 5ff6)
 */
 READ8Z_MEMBER(snug_enhanced_video_device::readz)
 {
-	if (m_selected)
+	if (m_selected && m_inDsrArea)
 	{
-		if ((offset & m_select_mask)==m_select_value)
+		if (m_palette_accessed)
 		{
-			if ((offset & 0x1ff0)==0x1ff0)              // Palette control
+			switch (m_address & 0x000f)
 			{
-				switch (offset & 0x000f)
-				{
-				case 0:
-					/* Palette Read Address Register */
-					*value = m_palette.write_index;
-					break;
+			case 0:
+				// Palette Read Address Register
+				*value = m_palette.write_index;
+				break;
 
-				case 2:
-					/* Palette Read Color Value */
-					if (m_palette.read)
-					{
-						switch (m_palette.state)
-						{
-						case 0:
-							*value = m_palette.color[m_palette.read_index].red;
-							break;
-						case 1:
-							*value = m_palette.color[m_palette.read_index].green;
-							break;
-						case 2:
-							*value = m_palette.color[m_palette.read_index].blue;
-							break;
-						}
-						m_palette.state++;
-						if (m_palette.state == 3)
-						{
-							m_palette.state = 0;
-							m_palette.read_index++;
-						}
-					}
-					break;
-
-				case 4:
-					/* Palette Read Pixel Mask */
-					*value = m_palette.mask;
-					break;
-				case 6:
-					/* Palette Read Address Register for Color Value */
-					if (m_palette.read)
-						*value = 0;
-					else
-						*value = 3;
-					break;
-				}
-			}
-			else
-			{
-				if ((offset & 0x1f00)==0x1f00)
+			case 2:
+				// Palette Read Color Value
+				if (m_palette.read)
 				{
-					if (m_RAMEN)  // NOVRAM hides DSR
+					switch (m_palette.state)
 					{
-						*value = m_novram[offset & 0x00ff];
+					case 0:
+						*value = m_palette.color[m_palette.read_index].red;
+						break;
+					case 1:
+						*value = m_palette.color[m_palette.read_index].green;
+						break;
+					case 2:
+						*value = m_palette.color[m_palette.read_index].blue;
+						break;
 					}
-					else  // DSR
+					m_palette.state++;
+					if (m_palette.state == 3)
 					{
-						*value = m_dsrrom[(offset&0x1fff) | (m_dsr_page<<13)];
+						m_palette.state = 0;
+						m_palette.read_index++;
 					}
 				}
+				break;
+
+			case 4:
+				// Palette Read Pixel Mask
+				*value = m_palette.mask;
+				break;
+			case 6:
+				// Palette Read Address Register for Color Value
+				if (m_palette.read)
+					*value = 0;
 				else
-				{
-					*value = m_dsrrom[(offset&0x1fff) | (m_dsr_page<<13)];
-				}
+					*value = 3;
+				break;
 			}
+			return;
 		}
+
+		if (m_novram_accessed && m_RAMEN)
+		{
+			// NOVRAM
+			*value = m_novram[offset & 0x00ff];
+			return;
+		}
+
+		// DSR space
+		*value = m_dsrrom[(offset & 0x1fff) | (m_dsr_page<<13)];
+		return;
+	}
+
+	if (m_video_accessed)
+	{
+		*value = m_video->read(space, m_address>>1);
 	}
 }
 
@@ -150,82 +205,87 @@ READ8Z_MEMBER(snug_enhanced_video_device::readz)
     Write a byte in evpc DSR space
     0x4000 - 0x5eff   DSR (paged)
     0x5f00 - 0x5fef   NOVRAM
-    0x5ff0 - 0x5fff   Palette
+    0x5ff0 - 0x5fff   Palette (5ff8, 5ffa, 5ffc, 5ffe)
 */
 WRITE8_MEMBER(snug_enhanced_video_device::write)
 {
-	if (m_selected)
+	if (m_selected && m_inDsrArea)
 	{
-		if ((offset & m_select_mask)==m_select_value)
+		if (m_palette_accessed)
 		{
-			if ((offset & 0x1ff0)==0x1ff0)
+			// Palette
+			if (TRACE_MEM) logerror("palette write %04x <- %02x\n", offset&0xffff, data);
+			switch (m_address & 0x000f)
 			{
-				/* PALETTE */
-				if (VERBOSE>5) LOG("palette write %04x <- %02x\n", offset&0xffff, data);
-				switch (offset & 0x000f)
+			case 0x08:
+				// Palette Write Address Register
+				if (TRACE_MEM) logerror("EVPC palette address write (for write access)\n");
+				m_palette.write_index = data;
+				m_palette.state = 0;
+				m_palette.read = 0;
+				break;
+
+			case 0x0a:
+				// Palette Write Color Value
+				if (TRACE_MEM) logerror("EVPC palette color write\n");
+				if (!m_palette.read)
 				{
-				case 0x08:
-					/* Palette Write Address Register */
-					if (VERBOSE>5) LOG("EVPC palette address write (for write access)\n");
-					m_palette.write_index = data;
-					m_palette.state = 0;
-					m_palette.read = 0;
-					break;
-
-				case 0x0a:
-					/* Palette Write Color Value */
-					if (VERBOSE>5) LOG("EVPC palette color write\n");
-					if (!m_palette.read)
+					switch (m_palette.state)
 					{
-						switch (m_palette.state)
-						{
-						case 0:
-							m_palette.color[m_palette.write_index].red = data;
-							break;
-						case 1:
-							m_palette.color[m_palette.write_index].green = data;
-							break;
-						case 2:
-							m_palette.color[m_palette.write_index].blue = data;
-							break;
-						}
-						m_palette.state++;
-						if (m_palette.state == 3)
-						{
-							m_palette.state = 0;
-							m_palette.write_index++;
-						}
-						//evpc_palette.dirty = 1;
+					case 0:
+						m_palette.color[m_palette.write_index].red = data;
+						break;
+					case 1:
+						m_palette.color[m_palette.write_index].green = data;
+						break;
+					case 2:
+						m_palette.color[m_palette.write_index].blue = data;
+						break;
 					}
-					break;
-
-				case 0x0c:
-					/* Palette Write Pixel Mask */
-					if (VERBOSE>5) LOG("EVPC palette mask write\n");
-					m_palette.mask = data;
-					break;
-
-				case 0x0e:
-					/* Palette Write Address Register for Color Value */
-					if (VERBOSE>5) LOG("EVPC palette address write (for read access)\n");
-					m_palette.read_index = data;
-					m_palette.state = 0;
-					m_palette.read = 1;
-					break;
-				}
-			}
-			else
-			{
-				if ((offset & 0x1f00)==0x1f00)
-				{
-					if (m_RAMEN)
+					m_palette.state++;
+					if (m_palette.state == 3)
 					{
-						// NOVRAM
-						m_novram[offset & 0x00ff] = data;
+						m_palette.state = 0;
+						m_palette.write_index++;
 					}
+					//evpc_palette.dirty = 1;
 				}
+				break;
+
+			case 0x0c:
+				// Palette Write Pixel Mask
+				if (TRACE_MEM) logerror("EVPC palette mask write\n");
+				m_palette.mask = data;
+				break;
+
+			case 0x0e:
+				// Palette Write Address Register for Color Value
+				if (TRACE_MEM) logerror("EVPC palette address write (for read access)\n");
+				m_palette.read_index = data;
+				m_palette.state = 0;
+				m_palette.read = 1;
+				break;
+
 			}
+			return;
 		}
+
+		if (m_novram_accessed && m_RAMEN)
+		{
+			// NOVRAM
+			m_novram[offset & 0x00ff] = data;
+			return;
+		}
+	}
+
+	if (m_video_accessed)
+	{
+		m_video->write(space, m_address>>1, data);
+	}
+
+	if (m_sound_accessed)
+	{
+		m_sound->write(space, 0, data);
 	}
 }
 
@@ -273,7 +333,7 @@ WRITE8_MEMBER(snug_enhanced_video_device::cruwrite)
 		{
 		case 0:
 			m_selected = (data!=0);
-			if (VERBOSE>4) LOG("evpc: Map DSR = %d\n", m_selected);
+			if (TRACE_CRU) logerror("Map DSR = %d\n", m_selected);
 			break;
 
 		case 1:
@@ -309,15 +369,23 @@ WRITE8_MEMBER(snug_enhanced_video_device::cruwrite)
 	}
 }
 
+/*
+    READY line for the sound chip
+*/
+WRITE_LINE_MEMBER( snug_enhanced_video_device::ready_line )
+{
+	m_slot->set_ready(state);
+}
+
 void snug_enhanced_video_device::device_start()
 {
 	m_dsrrom = memregion(DSRROM)->base();
 	m_novram = std::make_unique<UINT8[]>(NOVRAM_SIZE);
+	m_console_conn = downcast<evpc_clock_connector*>(machine().device(EVPC_CONN_TAG));
 }
 
 void snug_enhanced_video_device::device_reset()
 {
-	if (VERBOSE>5) LOG("evpc: reset\n");
 	m_select_mask = 0x7e000;
 	m_select_value = 0x74000;
 	m_dsr_page = 0;
@@ -330,10 +398,35 @@ void snug_enhanced_video_device::device_stop()
 	m_novram = nullptr;
 }
 
+/*
+    This is the extra cable running from the EVPC card right into the TI console.
+    It delivers the VDP interrupt and the GROM clock.
+
+    For the SGCPU, the signal is delivered by the LCP line.
+*/
+WRITE_LINE_MEMBER( snug_enhanced_video_device::video_interrupt_in )
+{
+	if (m_console_conn != nullptr) m_console_conn->vclock_line(state);
+	else m_slot->lcp_line(state);
+}
+
 ROM_START( ti99_evpc )
 	ROM_REGION(0x10000, DSRROM, 0)
 	ROM_LOAD("evpcdsr.bin", 0, 0x10000, CRC(a062b75d) SHA1(6e8060f86e3bb9c36f244d88825e3fe237bfe9a9)) /* evpc DSR ROM */
 ROM_END
+
+MACHINE_CONFIG_FRAGMENT( ti99_evpc )
+	// video hardware
+	MCFG_V9938_ADD(VDP_TAG, SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(snug_enhanced_video_device, video_interrupt_in))
+	MCFG_V99X8_SCREEN_ADD_NTSC(SCREEN_TAG, VDP_TAG, XTAL_21_4772MHz)
+
+	// Sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
+	MCFG_SN76496_READY_HANDLER( WRITELINE(snug_enhanced_video_device, ready_line) )
+MACHINE_CONFIG_END
 
 /*
     Input ports for the EPVC
@@ -368,6 +461,11 @@ const rom_entry *snug_enhanced_video_device::device_rom_region() const
 ioport_constructor snug_enhanced_video_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(ti99_evpc);
+}
+
+machine_config_constructor snug_enhanced_video_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( ti99_evpc );
 }
 
 const device_type TI99_EVPC = &device_creator<snug_enhanced_video_device>;

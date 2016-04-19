@@ -220,7 +220,9 @@ peribox_device::peribox_device(const machine_config &mconfig, const char *tag, d
 : bus8z_device(mconfig, PERIBOX, "Peripheral expansion box", tag, owner, clock, "peribox", __FILE__),
 	m_console_inta(*this),
 	m_console_intb(*this),
-	m_datamux_ready(*this), m_inta_flag(0), m_intb_flag(0), m_ready_flag(0)
+	m_sgcpu_lcp(*this),
+	m_datamux_ready(*this),
+	m_inta_flag(0), m_intb_flag(0), m_lcp_flag(0), m_ready_flag(0)
 {
 	for (int i=2; i <= 8; i++) m_slot[i] = nullptr;
 	// The address prefix is actually created by the "Flex cable interface"
@@ -235,6 +237,7 @@ peribox_device::peribox_device(const machine_config &mconfig, device_type type, 
 : bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_console_inta(*this),
 	m_console_intb(*this),
+	m_sgcpu_lcp(*this),
 	m_datamux_ready(*this), m_inta_flag(0), m_intb_flag(0), m_ready_flag(0), m_address_prefix(0), m_msast(false), m_memen(false)
 {
 	for (int i=2; i <= 8; i++) m_slot[i] = nullptr;
@@ -378,6 +381,17 @@ void peribox_device::intb_join(int slot, int state)
 	m_console_intb((m_intb_flag != 0)? ASSERT_LINE : CLEAR_LINE);
 }
 
+void peribox_device::lcp_join(int slot, int state)
+{
+	if (TRACE_INT) logerror("%s: propagating LCP from slot %d to SGCPU: %d\n", tag(), slot, state);
+	if (state==ASSERT_LINE)
+		m_lcp_flag |= (1 << slot);
+	else
+		m_lcp_flag &= ~(1 << slot);
+
+	m_sgcpu_lcp((m_lcp_flag != 0)? ASSERT_LINE : CLEAR_LINE);
+}
+
 /*
     When any device pulls down READY, READY goes down.
 */
@@ -405,6 +419,7 @@ void peribox_device::device_start(void)
 	// Resolve the callback lines to the console
 	m_console_inta.resolve();
 	m_console_intb.resolve();
+	m_sgcpu_lcp.resolve();
 	m_datamux_ready.resolve();
 
 	if (TRACE_EMU)
@@ -421,6 +436,7 @@ void peribox_device::device_config_complete()
 {
 	m_inta_flag = 0;
 	m_intb_flag = 0;
+	m_lcp_flag = 0;
 	m_ready_flag = 0;
 }
 
@@ -719,6 +735,12 @@ WRITE_LINE_MEMBER( peribox_slot_device::set_intb )
 {
 	peribox_device *peb = static_cast<peribox_device*>(owner());
 	peb->intb_join(m_slotnumber, state);
+}
+
+WRITE_LINE_MEMBER( peribox_slot_device::lcp_line )
+{
+	peribox_device *peb = static_cast<peribox_device*>(owner());
+	peb->lcp_join(m_slotnumber, state);
 }
 
 WRITE_LINE_MEMBER( peribox_slot_device::set_ready )
