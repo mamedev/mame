@@ -291,7 +291,29 @@ MACHINE_CONFIG_END
 	ROM_LOAD32_WORD_BIOS( 14, "U83 -02 Cs 08DD", 0x0000000, 0x0100000, CRC(e4001f60) SHA1(5da34efb1ac0f7c84a48e09363d20cfecda4bcf1) ) \
 	ROM_SYSTEM_BIOS( 15, "bios15",   "Aristocrat MK6 Base (01.04.08, USA)" ) \
 	ROM_LOAD32_WORD_BIOS( 15, "base-01.04.08-u70-u20-left-cs-8509.bin", 0x0000000, 0x0200000, CRC(0dfcad10) SHA1(53798be000304aed38909f5fd8470a68bedd8229) ) /* from bubdul */ \
-	ROM_LOAD32_WORD_BIOS( 15, "base-01.04.08-u83-u10-right-cs-d74e.bin", 0x0000000, 0x0200000, CRC(95333304) SHA1(7afe49d6c5e4d6820f349778557daa88c5366a51) )
+	ROM_LOAD32_WORD_BIOS( 15, "base-01.04.08-u83-u10-right-cs-d74e.bin", 0x0000000, 0x0200000, CRC(95333304) SHA1(7afe49d6c5e4d6820f349778557daa88c5366a51) )\
+	ROM_SYSTEM_BIOS( 16, "bios15",   "Aristocrat MK6 Base (02061013)" ) \
+	ROM_LOAD32_WORD_BIOS( 16,"02061013 System 02 Left.bin", 0x0000000, 0x0100000, CRC(e70a7007) SHA1(0935f924866162d9c0fbdbb99391cbf730a04b76) ) \
+	ROM_LOAD32_WORD_BIOS( 16,"02061013 System 02 Right.bin", 0x0000000, 0x0100000, CRC(7a8619a5) SHA1(bd03ddb68817c1660b009e102ccf69e5b603b875) ) \
+	ROM_SYSTEM_BIOS( 17, "bios15",   "Aristocrat MK6 Base (03030708)" ) \
+	ROM_LOAD32_WORD_BIOS( 17,"03030708 System 03 SA LEFT.bin", 0x0000000, 0x0100000, CRC(4e5ad823) SHA1(77ab1c29c6172cfdcef776222a72b2b44114d4da) ) \
+	ROM_LOAD32_WORD_BIOS( 17,"03030708 System 03 SA RIGHT.bin", 0x0000000, 0x0100000, CRC(b4b3c6a5) SHA1(5747f98a6eaa5c24a23d1d76a28b33a3bfbbfd1f) ) \
+	ROM_SYSTEM_BIOS( 18, "bios15",   "Aristocrat MK6 Base (09011001)" ) \
+	ROM_LOAD32_WORD_BIOS( 18,"09011001_SYSTEM_09_EPROM_NSW_LEFT.BIN", 0x0000000, 0x0200000, CRC(229c2e63) SHA1(91fd2b1acb69efe073647e93db9f11042add2feb) ) \
+	ROM_LOAD32_WORD_BIOS( 18,"09011001_SYSTEM_09_EPROM_NSW_RIGHT.BIN", 0x0000000, 0x0200000, CRC(8a853f80) SHA1(9a75498f7b02c81a483b4e1c158f35f0ee4c0112) ) \
+	ROM_SYSTEM_BIOS( 19, "bios15",   "Aristocrat MK6 Base (11011501)" ) \
+	ROM_LOAD32_WORD_BIOS( 19,"11011501_SYSTEM_11_EPROM_NSW_2MB_M27V160_LEFT.bin", 0x0000000, 0x0200000, CRC(c5cc3461) SHA1(5b43c4cb6110a6ccf67cd0f3789253f6872b20c4) ) \
+	ROM_LOAD32_WORD_BIOS( 19,"11011501_SYSTEM_11_EPROM_NSW_2MB_M27V160_RIGHT.bin", 0x0000000, 0x0200000, CRC(de4c3aed) SHA1(21596a2edd20eb7de7a4ec8900a270b09c8f326f) ) \
+	ROM_SYSTEM_BIOS( 20, "bios15",   "Aristocrat MK6 Base (14011913)" ) \
+	ROM_LOAD32_WORD_BIOS( 20,"14011913 System 14 Eprom Left.bin", 0x0000000, 0x0200000, CRC(9a4cefdf) SHA1(6c15bc565ede8af19361d60ee1e6657a8055c92c) ) \
+	ROM_LOAD32_WORD_BIOS( 20,"14011913 System 14 Eprom Right.bin", 0x0000000, 0x0200000, CRC(01d13b89) SHA1(b1013366d0803dfbec5a5f90f6a5cea862de0513) ) \
+	ROM_SYSTEM_BIOS( 21, "bios15",   "Aristocrat MK6 Base (01.04.11)" ) \
+	ROM_LOAD32_WORD_BIOS( 21,"01.04.11 System U70.bin", 0x0000000, 0x0200000, CRC(787f2b07) SHA1(2548289e44f4b935346b759afb5383bdbac04c3e) ) \
+	ROM_LOAD32_WORD_BIOS( 21,"01.04.11 System U83.bin", 0x0000000, 0x0200000, CRC(2dae8ca0) SHA1(7a0fb38b4c1ac7195d15bdab6f0cfb16c78430f0) ) \
+	ROM_SYSTEM_BIOS( 22, "bios15",   "Aristocrat MK6 Set Chips (06.03.04)" ) \
+	ROM_LOAD32_WORD_BIOS( 22,"Set 06.03.04 U2.bin", 0x0000000, 0x0100000, CRC(6f5f5ef1) SHA1(70a43fba4de47ed8dcf38b25eafd5873f3428e72) ) \
+	ROM_LOAD32_WORD_BIOS( 22,"Set 06.03.04 U3.bin", 0x0000000, 0x0100000, CRC(7034f26b) SHA1(7be78f23bec38d05240cdfe1186ec0c8291f5a1c) ) 
+
 
 
 ROM_START( aristmk6 )
@@ -2271,9 +2293,16 @@ ROM_START( flamolus )
 	ROM_LOAD32_WORD("Flames of Olympus U73 1DCC4068.bin", 0x0000000, 0x0400000, CRC(aad37086) SHA1(76495ba46da0ae848ba290706be337c45afe6361) )
 	ROM_LOAD32_WORD("Flames of Olympus U85 09EFD2C9.bin", 0x0000000, 0x0400000, CRC(4fcd025d) SHA1(63aa8d0f5dd331e10c032cc5ac67516054db7c27) )
 	ROM_LOAD32_WORD("Flames of Olympus U86 1E2A1492.bin", 0x0000000, 0x0400000, CRC(f06f3d69) SHA1(83e1d2f72275de836e170c1c10905cb6da58b90a) )
-//	ROM_LOAD32_WORD("Set Chip 06.02.20 MK6.rar", 0x0000000, 0x00b121d, CRC(7dc71e5d) SHA1(37baae165df4cd11ad6e63f845cb76c51ab9f43a) )
 ROM_END
 
+ROM_START( flamolusa )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Flames of Olympus U72 09ECD2D8_alt.bin", 0x0000000, 0x0400000, CRC(b4581c28) SHA1(1daa0f1218dba6e6eb96b7925ea71be531ffa787) )
+	ROM_LOAD32_WORD("Flames of Olympus U73 1DCC4068.bin", 0x0000000, 0x0400000, CRC(aad37086) SHA1(76495ba46da0ae848ba290706be337c45afe6361) )
+	ROM_LOAD32_WORD("Flames of Olympus U85 09EFD2C9.bin", 0x0000000, 0x0400000, CRC(4fcd025d) SHA1(63aa8d0f5dd331e10c032cc5ac67516054db7c27) )
+	ROM_LOAD32_WORD("Flames of Olympus U86 1E2A1492.bin", 0x0000000, 0x0400000, CRC(f06f3d69) SHA1(83e1d2f72275de836e170c1c10905cb6da58b90a) )
+ROM_END
 
 
 ROM_START( foxred )
@@ -2856,10 +2885,47 @@ ROM_START( pwsp1 )
 ROM_END
 
 
+ROM_START( adonis6 )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("US_Adonis_U73.bin", 0x0000000, 0x0400000, CRC(eba9e84f) SHA1(bf746ea356627b1a558b4c8f8a2d8d5c54400a4a) )
+	ROM_LOAD32_WORD("US_Adonis_U86.bin", 0x0000000, 0x0400000, CRC(0eeb0ac3) SHA1(72b2b4711eb9d962bfb58fac1a5226ac81db67ea) )
+ROM_END
+
+
+
+ROM_START( starqst )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Star Quest  U73.bin", 0x0000000, 0x0400000, CRC(facf51b6) SHA1(73c13d507b65cd98ae43918c21b492a8499dd538) )
+	ROM_LOAD32_WORD("Star Quest  U86.bin", 0x0000000, 0x0400000, CRC(c21f4486) SHA1(5a6a532d73bf56f68f473bd56a7c3d9f0660d661) )
+ROM_END
+
+
+ROM_START( eaglst1 )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Eagle Strike U73.bin", 0x0000000, 0x0400000, CRC(94ff83d2) SHA1(54a02cdfb205a429d7458ecb51ba20083306011e) )
+	ROM_LOAD32_WORD("Eagle Strike U70.bin", 0x0000000, 0x0400000, CRC(b899e64b) SHA1(1f1d800df39de444b03ff4cc85bf4cf073f88423) )
+	ROM_LOAD32_WORD("Eagle Strike U71.bin", 0x0000000, 0x0400000, CRC(7311d99c) SHA1(802abed830ca3204ce50072ac69d0a3cae8f17e5) )
+	ROM_LOAD32_WORD("Eagle Strike U72.bin", 0x0000000, 0x0400000, CRC(4d96aef2) SHA1(40860ad6a0f82d79347b65b182f72dfbec23cd74) )
+ROM_END
 
 
 
 
+ROM_START( eaglst2 )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Eagle Strike.u86", 0x0000000, 0x0400000, CRC(71c8121b) SHA1(1a4534b8e43dbc173809b5a621d6796a7a8655cf) )
+	ROM_LOAD32_WORD("Eagle Strike.u83", 0x0000000, 0x0400000, CRC(d70198eb) SHA1(1e4c157deec921386623091b27180c9c53551f44) )
+	ROM_LOAD32_WORD("Eagle Strike.u84", 0x0000000, 0x0400000, CRC(664c3d45) SHA1(26ce8a7e88eddc94ecce5ada78654e6f30a985d6) )
+	ROM_LOAD32_WORD("Eagle Strike.u85", 0x0000000, 0x0400000, CRC(c7430ac8) SHA1(e6f7e523ef2c4aad584a08ce9c70e0e535d89890) )
+	ROM_LOAD32_WORD("Eagle Strike.u72", 0x0000000, 0x0400000, CRC(4d96aef2) SHA1(40860ad6a0f82d79347b65b182f72dfbec23cd74) )
+	ROM_LOAD32_WORD("Eagle Strike.u73", 0x0000000, 0x0400000, CRC(94ff83d2) SHA1(54a02cdfb205a429d7458ecb51ba20083306011e) )
+	ROM_LOAD32_WORD("Eagle Strike.u71", 0x0000000, 0x0400000, CRC(7311d99c) SHA1(802abed830ca3204ce50072ac69d0a3cae8f17e5) )
+	ROM_LOAD32_WORD("Eagle Strike.u70", 0x0000000, 0x0400000, CRC(b899e64b) SHA1(1f1d800df39de444b03ff4cc85bf4cf073f88423) )
+ROM_END
 
 
 
@@ -3051,7 +3117,8 @@ GAME( 200?, eggsrich,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, R
 GAME( 200?, efcashex,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Enchanted Forest Cash Express",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, flamoly,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Flame Of Olympus",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, flamoly2,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Flames Of Olympus 2",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, flamolus,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Flames Of Olympus USA",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, flamolus,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Flames Of Olympus USA (set 1)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, flamolusa,  flamolus,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Flames Of Olympus USA (set 2)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // one of these must be bad
 GAME( 200?, foxred,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Foxworthy Redneck",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, frogwld,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Frog Wild",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, gwnn,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Game With No Name",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -3102,6 +3169,14 @@ GAME( 200?, wingolus,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, R
 GAME( 200?, zorrous,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Zorro",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, bobdolu1,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Bob And Dolly",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, pwsp1,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Players World Super",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, adonis6, aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Adonis (USA)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+// marked as 'unfinished'
+GAME( 200?, starqst,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Star Quest",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, eaglst1,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Eagle Strike (set 1)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, eaglst2,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Eagle Strike (set 2)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+
 
 
 
@@ -3325,3 +3400,6 @@ Sweet Hearts II
 Venetian Nights             MK5 version is possibly rare
 Wicked Winnings             Only seen a Cash Express Hyperlink version so far, not to be confused with the more common 'Wicked Winnings II - Power Pay'
 */
+
+
+

@@ -1977,6 +1977,203 @@ ROM_END_REGIONS
 
 
 
+ROM_START( dolptra )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("Dolphin Treasure 90 U11.bin", 0x0000000, 0x0080000, CRC(8e391b67) SHA1(4b7a7295d3a96e26bf1958eb30af0b6582a5e5a6) )
+	ROM_LOAD32_WORD("Dolphin Treasure 90 U12.bin", 0x0000000, 0x0080000, CRC(1a1fbbcf) SHA1(6e3772dcccd9b5958bec3bfac9af22b2eabca32e) )
+	ROM_LOAD32_WORD("Dolphin Treasure 90 U7.bin", 0x0000000, 0x0080000, CRC(7463b5f6) SHA1(89e5cf8143d0b4ed54aa2c9bd8840f0aba19322e) )
+	ROM_LOAD32_WORD("Dolphin Treasure 90 U8.bin", 0x0000000, 0x0080000, CRC(195bec0f) SHA1(86bdc53e682476c2d90c5e51d4bccdc048d22e7f) )
+ROM_END_REGIONS
+
+
+
+
+ROM_START( penpay20 )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("Penguin Pays 20 lines U11.BIN", 0x0000000, 0x0080000, CRC(7dd73770) SHA1(14a2edf8cd33280464f979976486e1a9ae73cef5) )
+	ROM_LOAD32_WORD("Penguin Pays 20 lines U12.BIN", 0x0000000, 0x0080000, CRC(123cbe90) SHA1(b51b84f79e0822a1be71485bbad514ab9fa55622) )
+	ROM_LOAD32_WORD("Penguin Pays 20 lines U7.BIN", 0x0000000, 0x0080000, CRC(cb21de26) SHA1(5a730f08db4d91b18f0b5a1f489f1d982b08edcc) )
+	ROM_LOAD32_WORD("Penguin Pays 20 lines U8.BIN", 0x0000000, 0x0080000, CRC(aa95406b) SHA1(fbec024dd210757a79a5ea4def79f88fed971e71) )
+ROM_END_REGIONS
+
+
+
+ROM_START( penpaya )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("PPAYSEPROM_U11.bin", 0x0000000, 0x0080000, CRC(c0f20ef7) SHA1(4df3aa337a2d4dd8ef29f4839b003c96fe1df526) )
+	ROM_LOAD32_WORD("PPAYSEPROM_U12.bin", 0x0000000, 0x0080000, CRC(d2882682) SHA1(dd42edca8ef9d28dd5b16fe8132f8e0fb3c85979) )
+	ROM_LOAD32_WORD("PPAYSEPROM_U7.bin", 0x0000000, 0x0080000, CRC(f51c4e02) SHA1(fca30b3ce0d063966df1e878338596d050664695) )
+	ROM_LOAD32_WORD("PPAYSEPROM_U8.bin", 0x0000000, 0x0080000, CRC(23ea514d) SHA1(bcb83a8d768b078a03260a00fa09a4e2350c568c) )
+ROM_END_REGIONS
+
+
+ROM_START( adonishl )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("U11.bin", 0x0000000, 0x0080000, CRC(309b0b55) SHA1(669568031d305b29395345a26a5d004d83881433) )
+	ROM_LOAD32_WORD("U12.bin", 0x0000000, 0x0080000, CRC(8b675dff) SHA1(275579d21be51e6ca01be7c57018e142d1d40875) )
+	ROM_LOAD32_WORD("U13.bin", 0x0000000, 0x0080000, CRC(e005a7e8) SHA1(cbb313f5d1d04c5a441b3f92b7a90a281ddb4885) )
+	ROM_LOAD32_WORD("U7.bin", 0x0000000, 0x0080000, CRC(32149323) SHA1(abfc6a8518a39528db3700c2cb558e925ceeda6d) )
+	ROM_LOAD32_WORD("U8.bin", 0x0000000, 0x0080000, CRC(e9185e3c) SHA1(99609a152a55246d0f5377f943deec47e68fb9fc) )
+	ROM_LOAD32_WORD("U9.bin", 0x0000000, 0x0080000, CRC(c2e973e7) SHA1(e89bdaa56b0c3c7bd77c8141421f76be9ff2e71b) )
+ROM_END_REGIONS
+
+
+
+ROM_START( goldphm )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("Golden Pyramid  Hyper Max U10.bin", 0x0000000, 0x0080000, CRC(8491dbc4) SHA1(f0d4e470f0774a6aac168334390c116fd3d1075e) )
+	ROM_LOAD32_WORD("Golden Pyramid  Hyper Max U11.bin", 0x0000000, 0x0080000, CRC(6ae3872f) SHA1(f8c1b31e4ebd4833dcc2b7cfff25f6473ad78f4e) )
+	ROM_LOAD32_WORD("Golden Pyramid  Hyper Max U12.bin", 0x0000000, 0x0080000, CRC(65cea496) SHA1(4b827e2707c259717bf759e76dca1c96efada926) )
+	ROM_LOAD32_WORD("Golden Pyramid  Hyper Max U13.bin", 0x0000000, 0x0080000, CRC(1b77bbd0) SHA1(c93d2f844032631d9594d02fa6ac41e21025a8ea) )
+	ROM_LOAD32_WORD("Golden Pyramid  Hyper Max U14.bin", 0x0000000, 0x0080000, CRC(4fbccf72) SHA1(97d6bb400caf78cb673a324d48d2580f1bbb1acd) )
+	ROM_LOAD32_WORD("Golden Pyramid  Hyper Max U7.bin", 0x0000000, 0x0080000, CRC(4ac2a82e) SHA1(3fc50e97ad48c57e21a37fbb6142152c72055ad4) )
+	ROM_LOAD32_WORD("Golden Pyramid  Hyper Max U8.bin", 0x0000000, 0x0080000, CRC(abbbf1de) SHA1(5efd88213180846ad8347e017e5ccee5b80b95d0) )
+	ROM_LOAD32_WORD("Golden Pyramid  Hyper Max U9.bin", 0x0000000, 0x0080000, CRC(750150eb) SHA1(a9ffe0b0bb2ef83a696fa568b0264d27bc650120) )
+ROM_END_REGIONS
+
+
+
+
+ROM_START( petshopa )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("Pet Shop  U11.bin", 0x0000000, 0x007fffd, CRC(bfaa9216) SHA1(19f1c7de05ff7f5f9f370be00cf8f0635e966809) ) // wrong size!
+	ROM_LOAD32_WORD("Pet Shop  U12.bin", 0x0000000, 0x0080000, CRC(2cd12986) SHA1(b6b0bd6dd8c964498edc3763cb5c450795042a8d) )
+	ROM_LOAD32_WORD("Pet Shop  U7.bin", 0x0000000, 0x0080000, CRC(cf4a24fa) SHA1(b510de9199d16ba7319e1b692d7c6c09fcb735dc) )
+	ROM_LOAD32_WORD("Pet Shop  U8.bin", 0x0000000, 0x0080000, CRC(bb9f7519) SHA1(fa311f1ec74c3b52e2feed36d7b7dc6a12336abe) )
+ROM_END_REGIONS
+
+
+
+
+ROM_START( retsam20 )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("Return of The Samura  U11.bin", 0x0000000, 0x0080000, CRC(e662404b) SHA1(f0da3384c81d01ec17d24b2191d3a0b0eaf48d12) )
+	ROM_LOAD32_WORD("Return of The Samura  U7.bin", 0x0000000, 0x0080000, CRC(e60859a1) SHA1(0be0114a87a21b955dfe24d01547e2d93dcb4f2c) )
+ROM_END_REGIONS
+
+
+
+ROM_START( retsam5 )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("Return of The Samura 9 U11.bin", 0x0000000, 0x0080000, CRC(99f61822) SHA1(88a726a5c9cae3a7d3120cb9013ca4d38ef8c560) )
+	ROM_LOAD32_WORD("Return of The Samura 9 U7.bin", 0x0000000, 0x0080000, CRC(acb913c1) SHA1(eb008b2b3d06f769f1ea1c75b52334e468c5f13c) )
+ROM_END_REGIONS
+
+
+
+
+
+
+ROM_START( supbuk2 )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("Super Bucks 2 U11.bin", 0x0000000, 0x0080000, CRC(f1b51a61) SHA1(8e9fcb071f704122e13333094828a41974646792) )
+	ROM_LOAD32_WORD("Super Bucks 2 U12.bin", 0x0000000, 0x0080000, CRC(f9b65d2b) SHA1(f519fc284aaa08d3619e4d88e92e690320cf5432) )
+	ROM_LOAD32_WORD("Super Bucks 2 U7.bin", 0x0000000, 0x0080000, CRC(f025775d) SHA1(71a94f6f17fa7cdcd997b0117b8f4afe21606a69) )
+	ROM_LOAD32_WORD("Super bucks 2 U8.bin", 0x0000000, 0x0080000, CRC(03912f4e) SHA1(48bdcd2160e05261b7d834c53e1d483acaad098f) )
+ROM_END_REGIONS
+
+
+
+
+
+ROM_START( topbana )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("Top Banana U11.bin", 0x0000000, 0x007fffa, CRC(140a73bc) SHA1(3fd88797b6310f5849e901d032fbeb8a2d8604fb) )
+	ROM_LOAD32_WORD("Top Banana U7.bin", 0x0000000, 0x0080000, CRC(1f60241c) SHA1(3a6207d9c919319fc10b6de63bc030f8d335588e) )
+ROM_END_REGIONS
+
+
+
+ROM_START( wldamz1 )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("Wild Amazon  U11.bin", 0x0000000, 0x0080000, CRC(54b2a375) SHA1(635fde5c678b908fa58c0e04ba9b7a84fac1f7fe) )
+	ROM_LOAD32_WORD("Wild Amazon  U7.bin", 0x0000000, 0x0080000, CRC(bfa21358) SHA1(6b76656401b3dbbace8d4335951468b9885fc7f0) )
+	ROM_LOAD32_WORD("Wild Amazon  U8.bin", 0x0000000, 0x0080000, CRC(4e39f128) SHA1(91d3c6a9e5c30275c3f8967dde55214df097f2ba) )
+	ROM_LOAD32_WORD("Wild Amazon U12.bin", 0x0000000, 0x0080000, CRC(2cd12986) SHA1(b6b0bd6dd8c964498edc3763cb5c450795042a8d) )
+ROM_END_REGIONS
+
+
+
+ROM_START( wldamz3 )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("Wild Amazon U11.bin", 0x0000000, 0x0080000, CRC(2e24756a) SHA1(247db8316e7815be7524aefc43a5756fad84779a) )
+	ROM_LOAD32_WORD("Wild Amazon U7.bin", 0x0000000, 0x0080000, CRC(44576def) SHA1(3396460444ceb394c9c88e5fc37ccedcfc4b179c) )
+ROM_END_REGIONS
+
+
+
+
+ROM_START( wldthg )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("WILDTHING_U11.bin", 0x0000000, 0x0080000, CRC(61d22f2e) SHA1(b836e5afbd5bb14ae68e100a6042f1953ed57a21) )
+	ROM_LOAD32_WORD("WILDTHING_U12.bin", 0x0000000, 0x0080000, CRC(450a4f4f) SHA1(e59fb3260755a125c47ff6c1a042a48b0eace72d) )
+	ROM_LOAD32_WORD("WILDTHING_U7.bin", 0x0000000, 0x0080000, CRC(eb402ffb) SHA1(49ef6ca2503a6e785f62cb29e505e5c2ba019e37) )
+	ROM_LOAD32_WORD("WILDTHING_U8.bin", 0x0000000, 0x0080000, CRC(f21153b8) SHA1(24830b3939a8568b0d5b59d4fdbd2d9e7b46a6d7) )
+ROM_END_REGIONS
+
+
+
+ROM_START( cshcat )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("Cash Cat NZ_U11.bin", 0x0000000, 0x0080000, CRC(e60e8bd1) SHA1(ffaa7be8968047b9ee54a117d273a14cbca41028) )
+	ROM_LOAD32_WORD("Cash Cat NZ_U12.bin", 0x0000000, 0x0080000, CRC(f930fc07) SHA1(cb3fdbd5b87af7b14067f7999740470d3cf434df) )
+	ROM_LOAD32_WORD("Cash Cat NZ_U7.bin", 0x0000000, 0x0080000, CRC(de0f0202) SHA1(994f6c47b1e2e0e133853dc69b189752104486e4) )
+	ROM_LOAD32_WORD("Cash Cat NZ_U8.bin", 0x0000000, 0x0080000, CRC(37d41d35) SHA1(c959b787383d6f91d20e18f37a38a965407a9ff0) )
+ROM_END_REGIONS
+
+
+
+
+ROM_START( incanz )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("INCASUN NZ_U11.bin", 0x0000000, 0x0080000, CRC(2ff86b76) SHA1(c491ca19320bd3e15199b3ca1fcf36a70e386daa) )
+	ROM_LOAD32_WORD("INCASUN NZ_U12.bin", 0x0000000, 0x0080000, CRC(d91114c5) SHA1(fa88c70d81ff5e4df539b873803376e79eb6a479) )
+	ROM_LOAD32_WORD("INCASUN NZ_U13.bin", 0x0000000, 0x0080000, CRC(472f4097) SHA1(5ebe72b138cdc67989db17c82979eeddc60a081e) )
+	ROM_LOAD32_WORD("INCASUN NZ_U7.bin", 0x0000000, 0x0080000, CRC(1e7be5ca) SHA1(333b7665fab8f60fb60e9d3b44de96725763ca17) )
+	ROM_LOAD32_WORD("INCASUN NZ_U8.bin", 0x0000000, 0x0080000, CRC(3eb64fc9) SHA1(31f7d56443091da211c45dddb97375305c3cfeae) )
+	ROM_LOAD32_WORD("INCASUN NZ_U9.bin", 0x0000000, 0x0080000, CRC(6da340db) SHA1(4d7528aa27561185a7d53a0c44a4e95e40aadc26) )
+ROM_END_REGIONS
+
+
+
+ROM_START( loconz )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("Loco Loot NZ_U11.bin", 0x0000000, 0x0080000, CRC(93b0bde3) SHA1(06cb79482f8a94e1a504eead9cdf6da41cba1fb9) )
+	ROM_LOAD32_WORD("Loco Loot NZ_U12.bin", 0x0000000, 0x0080000, CRC(29f03505) SHA1(c173167f43cc2eef0e063118e03bc37a87188391) )
+	ROM_LOAD32_WORD("Loco Loot NZ_U7.bin", 0x0000000, 0x0080000, CRC(164dd049) SHA1(c99c56af72cb1eb69591cb8f7bacbd06bdb6494d) )
+	ROM_LOAD32_WORD("Loco Loot NZ_U8.bin", 0x0000000, 0x0080000, CRC(8cb449ce) SHA1(2372cf126c2c95d9637b0a761dfc7ea223f0aa54) )
+ROM_END_REGIONS
+
+
+
+
+ROM_START( mtreenz )
+	ARISTOCRAT_MK5_BIOS
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )	
+	ROM_LOAD32_WORD("MONEYTREE NZ_U11.bin", 0x0000000, 0x0080000, CRC(7a03e436) SHA1(016e6e36f7ca6f4c3b427cf98a1415ef6aa57225) )
+	ROM_LOAD32_WORD("MONEYTREE NZ_U12.bin", 0x0000000, 0x0080000, CRC(b11f51d0) SHA1(1579a24d470f418713334259368c7a4e35e8b5d3) )
+	ROM_LOAD32_WORD("MONEYTREE NZ_U13.bin", 0x0000000, 0x0080000, CRC(e1f23c3f) SHA1(fe74c219c738625257fb62806e271a60075aaa07) )
+	ROM_LOAD32_WORD("MONEYTREE NZ_U7.bin", 0x0000000, 0x0080000, CRC(982a0078) SHA1(163c15aebd2be623c0f2c7641360336399bc1f4f) )
+	ROM_LOAD32_WORD("MONEYTREE NZ_U8.bin", 0x0000000, 0x0080000, CRC(878b6419) SHA1(572d6a10cbf2b96e9afee4b3f32e9ad1ce7eabbb) )
+	ROM_LOAD32_WORD("MONEYTREE NZ_U9.bin", 0x0000000, 0x0080000, CRC(816fda3f) SHA1(d5eb7572a93e2a4681a2b1db7f302c5528f1c1c3) )
+ROM_END_REGIONS
+
 
 /*************************
 *      Game Drivers      *
@@ -2078,3 +2275,21 @@ GAME( 199?,rwarhl,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, 
 GAME( 199?, retrsam,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return Of The Samurai (0400549V)",                 MACHINE_FLAGS )
 GAME( 199?, unicornd,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming",                 MACHINE_FLAGS )
 
+GAME( 199?, dolptra,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (alt)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, penpay20,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Penguin Pays (20 Line)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, penpaya,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Penguin Pays (alt)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, adonishl,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis Hyperlink",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+GAME( 199?, goldphm,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramid  Hyper Max",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, petshopa,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, retsam20,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return of The Samura  20line",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, retsam5,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return of The Samura  5line",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, supbuk2,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Superbucks 2",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, topbana,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Top Banana",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, wldamz1,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (1 Line)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, wldamz3,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (3 Lines)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, wldthg,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Thing",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, cshcat,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Cat (NZ)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, incanz,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (NZ)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, loconz,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (NZ)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, mtreenz,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Tree (NZ)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
