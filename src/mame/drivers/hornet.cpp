@@ -1419,7 +1419,7 @@ ROM_START(sscope2)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(d4e69d7a) SHA1(1e29eecf4886e5e098a388dedd5f3901c2bb65e5) )
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     /* LAN Board DS2401 */
-	ROM_LOAD( "ds2401.8b", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
+	ROM_LOAD( "ds2401.8b", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a) ) // hand built
 
 	ROM_REGION(0x80, "lan_eeprom", 0)       /* LAN Board AT93C46 */
 	ROM_LOAD( "at93c46.16g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
