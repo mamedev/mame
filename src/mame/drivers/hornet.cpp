@@ -353,7 +353,8 @@ public:
 		m_analog1(*this, "ANALOG1"),
 		m_analog2(*this, "ANALOG2"),
 		m_user3_ptr(*this, "user3"),
-		m_user5_ptr(*this, "user5")
+		m_user5_ptr(*this, "user5"),
+		m_lan_ds2401(*this, "lan_serial_id")
 	{ }
 
 	// TODO: Needs verification on real hardware
@@ -377,6 +378,7 @@ public:
 	optional_ioport m_eepromout, m_analog1, m_analog2;
 	optional_region_ptr<UINT8> m_user3_ptr;
 	optional_region_ptr<UINT8> m_user5_ptr;
+	optional_device<ds2401_device> m_lan_ds2401;
 
 	emu_timer *m_sound_irq_timer;
 	UINT8 m_led_reg0;
@@ -413,6 +415,8 @@ public:
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
 	DECLARE_WRITE8_MEMBER(jamma_jvs_w);
+	DECLARE_READ8_MEMBER(comm_eeprom_r);
+	DECLARE_WRITE8_MEMBER(comm_eeprom_w);
 
 	DECLARE_DRIVER_INIT(hornet);
 	DECLARE_DRIVER_INIT(hornet_2board);
@@ -542,8 +546,6 @@ READ8_MEMBER(hornet_state::sysreg_r)
 			    0x01 = ADDO (ADC DO)
 			*/
 			r = 0xf0;
-			if (m_lan_eeprom)
-				r |= m_lan_eeprom->do_read() << 3;
 			r |= m_adc12138->do_r(space, 0) | (m_adc12138->eoc_r(space, 0) << 2);
 			break;
 
@@ -581,8 +583,6 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			    0x02 = LAMP1
 			    0x01 = LAMP0
 			*/
-			if (m_eepromout)
-				m_eepromout->write(data, 0xff);
 			osd_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -646,6 +646,20 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 }
 
 /*****************************************************************************/
+
+READ8_MEMBER(hornet_state::comm_eeprom_r)
+{
+	UINT8 r = 0;
+	r |= (m_lan_eeprom->do_read() & 1) << 1;
+	r |= m_lan_ds2401->read() & 1;
+	return r;
+}
+
+WRITE8_MEMBER(hornet_state::comm_eeprom_w)
+{
+	m_eepromout->write(data, 0xff);
+	m_lan_ds2401->write((data >> 4) & 1);
+}
 
 WRITE32_MEMBER(hornet_state::comm1_w)
 {
@@ -725,6 +739,7 @@ static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32, hornet_state )
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE8(sysreg_w, 0xffffffff)
 	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0xffffffff)  /* M48T58Y RTC/NVRAM */
 	AM_RANGE(0x7d030000, 0x7d03000f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
+	AM_RANGE(0x7d040004, 0x7d040007) AM_READWRITE8(comm_eeprom_r, comm_eeprom_w, 0xffffffff)
 	AM_RANGE(0x7d042000, 0x7d043fff) AM_RAM             /* COMM BOARD 0 */
 	AM_RANGE(0x7d044000, 0x7d044007) AM_READ(comm0_unk_r)
 	AM_RANGE(0x7d048000, 0x7d048003) AM_WRITE(comm1_w)
@@ -912,9 +927,9 @@ static INPUT_PORTS_START( sscope2 )
 
 	// LAN board EEPROM
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, di_write)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
 
@@ -1404,10 +1419,10 @@ ROM_START(sscope2)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(d4e69d7a) SHA1(1e29eecf4886e5e098a388dedd5f3901c2bb65e5) )
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     /* LAN Board DS2401 */
-	ROM_LOAD( "ds2401.8b", 0x000000, 0x000008, NO_DUMP )
+	ROM_LOAD( "ds2401.8b", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
 
 	ROM_REGION(0x80, "lan_eeprom", 0)       /* LAN Board AT93C46 */
-	ROM_LOAD( "at93c46.16g", 0x000000, 0x000080, NO_DUMP )
+	ROM_LOAD( "at93c46.16g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
 ROM_END
 
 ROM_START(gradius4)
