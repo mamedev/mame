@@ -2930,6 +2930,42 @@ ROM_START( eaglst2 )
 ROM_END
 
 
+ROM_START( kingnilea )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("King Of The Nile.003", 0x0000000, 0x0400000, CRC(ea5d2450) SHA1(fdcf6c532231e9abf3a1c035bdef9d0db7fcf148) )
+	ROM_LOAD32_WORD("King Of The Nile.001", 0x0000000, 0x0400000, CRC(9a90354d) SHA1(5c5b0822e6a842f85e2acca0e1c8bfe0c3f68496) )
+	ROM_LOAD32_WORD("King Of The Nile.002", 0x0000000, 0x0400000, CRC(524c786e) SHA1(7e40266be5496baefd74796ce66857aec2d21437) )
+	ROM_LOAD32_WORD("King Of The Nile.000", 0x0000000, 0x0400000, CRC(c3830908) SHA1(438fc339f8b71668e816b5909195cae4158f39c2) )
+ROM_END
+
+
+
+
+ROM_START( outbackja )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("20195211.000", 0x0000000, 0x0400000, CRC(16f70945) SHA1(0de1bd1371d5fb33bfe7f7c2a80a70412387dc5f) )
+	ROM_LOAD32_WORD("20195211.001", 0x0000000, 0x0400000, CRC(611f82b7) SHA1(84df7ec63d26a691acd2822b8d0803c827c89f37) )
+	ROM_LOAD32_WORD("20195211.007", 0x0000000, 0x0400000, CRC(3a0ea3ca) SHA1(88513130013b1b18772a5e538da9a8db3a54633e) )
+	ROM_LOAD32_WORD("20195211.005", 0x0000000, 0x0400000, CRC(23f1f50c) SHA1(40145b839c2b5fde5c0f20e08f46f5a859b6e20a) )
+	ROM_LOAD32_WORD("20195211.003", 0x0000000, 0x0400000, CRC(cdd28848) SHA1(0038bb422a1d650beaa0ffd63b7d6de1936a5e32) )
+	ROM_LOAD32_WORD("20195211.006", 0x0000000, 0x0400000, CRC(79ca67a1) SHA1(68bae23df71c768dc17631f6ccfc7a720c0959ee) )
+	ROM_LOAD32_WORD("20195211.004", 0x0000000, 0x0400000, CRC(0cd41b5d) SHA1(a7891da788fe88d2191b2f0686cb9ca2ecfeeb9c) )
+	ROM_LOAD32_WORD("20195211.002", 0x0000000, 0x0400000, CRC(a1853f27) SHA1(cd2bf8674555f6870f0689ca0adbca6890bc9b27) )
+ROM_END
+
+
+ROM_START( witgoldd )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Where's The Gold Demo.003", 0x0000000, 0x0400000, CRC(bd188f12) SHA1(53433d346f23bc826fc041f1631270f8380759b6) )
+	ROM_LOAD32_WORD("Where's The Gold Demo.001", 0x0000000, 0x0400000, CRC(57253567) SHA1(41e0b1b7247ff4f0f9c6b150aef23a5eb5984e30) )
+	ROM_LOAD32_WORD("Where's The Gold Demo.002", 0x0000000, 0x0400000, CRC(86a40a48) SHA1(e0ad565e56c698df0f631e42dcfda17dfa5c8017) )
+	ROM_LOAD32_WORD("Where's The Gold Demo.000", 0x0000000, 0x0400000, CRC(4e6fad4a) SHA1(a2efc21cf773f9cb291ea1607d1864ba333807e9) )
+ROM_END
+
+
 
 
 
@@ -3177,6 +3213,11 @@ GAME( 200?, adonis6, aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT
 GAME( 200?, starqst,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Star Quest",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, eaglst1,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Eagle Strike (set 1)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, eaglst2,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Eagle Strike (set 2)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+// different collection
+GAME( 200?, kingnilea,  kingnile,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "King of the Nile (set 2)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, outbackja,  outbackj,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Outback Jack (set 2)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, witgoldd,  witgold,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Where Is The Gold (Demo)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 
