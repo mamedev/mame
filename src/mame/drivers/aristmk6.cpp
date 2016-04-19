@@ -245,7 +245,42 @@ MACHINE_CONFIG_END
 	ROM_LOAD32_WORD_BIOS( 0, "15011025.u70", 0x0000002, 0x0200000, CRC(c02e14b0) SHA1(6bf98927813519dfe60e582dbe5be3ccd87f7c91) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1",   "Aristocrat MK6 Base (11011901, NSW/ACT)" ) \
 	ROM_LOAD32_WORD_BIOS( 1, "11011901.u83", 0x0000000, 0x0200000, CRC(73dcb11c) SHA1(69ae4f32a0c9141b2a82ff3935b0cd20333d2964) ) \
-	ROM_LOAD32_WORD_BIOS( 1, "11011901.u70", 0x0000002, 0x0200000, CRC(d3dd2210) SHA1(3548f8cc39859d3f44a55f6bae48966a2d48e0eb) )
+	ROM_LOAD32_WORD_BIOS( 1, "11011901.u70", 0x0000002, 0x0200000, CRC(d3dd2210) SHA1(3548f8cc39859d3f44a55f6bae48966a2d48e0eb) ) \
+	ROM_SYSTEM_BIOS( 2, "bios2",   "Aristocrat MK6 Base (19012801)" ) \
+	ROM_LOAD32_WORD_BIOS( 2, "19012801 System Left.bin", 0x0000000, 0x0200000, CRC(b03bd17c) SHA1(f281e80f6dda5b727ed71d2deebe3b0ff548773f) ) /* From Cactus Corral & Cashman Tonight & Heart of Begas & Moonlight Waltz */ \
+	ROM_LOAD32_WORD_BIOS( 2, "19012801 System Right.bin", 0x0000000, 0x0200000, CRC(5b20a96c) SHA1(5fd916b7cc2cdd51bf7dd212c1114f94dc9c7926) ) \
+	ROM_SYSTEM_BIOS( 3, "bios3",   "Aristocrat MK6 Base ('system 13')" ) \
+	ROM_LOAD32_WORD_BIOS( 3, "System 13 Eprom Set -2MB-M27V160 Left.bin", 0x0000000, 0x0200000, CRC(38e8f659) SHA1(88c6acba99b0aca023c6f4d27c061c231490e9e0) ) /* from Grizzly */ \
+	ROM_LOAD32_WORD_BIOS( 3, "System 13 Eprom Set -2MB-M27V160 Right.bin", 0x0000000, 0x0200000, CRC(e627dbfa) SHA1(4fedbe0975ceb7dc0ebebf18a7708d78984db9b7) ) \
+	ROM_SYSTEM_BIOS( 4, "bios4",   "Aristocrat MK6 Base (07010801)" ) \
+	ROM_LOAD32_WORD_BIOS( 4, "07010801_SYSTEM_EPROM_NSW_LEFT.BIN", 0x0000000, 0x0200000, CRC(8e92af68) SHA1(00d2bb655b7964a9652896741210ec534df0b0d2) ) /* From Jailbreak */ \
+	ROM_LOAD32_WORD_BIOS( 4, "07010801_SYSTEM_EPROM_NSW_RIGHT.BIN", 0x0000000, 0x0200000, CRC(8c148c11) SHA1(5ff3be18455b4f04675fec8d5b9d881295c65e23) ) \
+	ROM_SYSTEM_BIOS( 5, "bios5",   "Aristocrat MK6 Base ('system 21')" ) \
+	ROM_LOAD32_WORD_BIOS( 5, "NSWsystem21_left.bin", 0x0000000, 0x0200000, CRC(0d271470) SHA1(5cd4b604bfe2fd7e9a8d08e1c7c97f17ae068479) ) /* From Red Baron */ \
+	ROM_LOAD32_WORD_BIOS( 5, "NSWsystem21_right.bin", 0x0000000, 0x0200000, CRC(757618f2) SHA1(43f9a3e7d544979f8c6974945914d9e099b02abd) ) \
+	ROM_SYSTEM_BIOS( 6, "bios6",   "Aristocrat MK6 Base (24013001)" ) \
+	ROM_LOAD32_WORD_BIOS( 6, "24013001   Left.bin", 0x0000000, 0x0200000, CRC(06ae7e07) SHA1(39a45575b66906d73b519988d1001c99b05c5f34) ) /* From Wild Stalion */ \
+	ROM_LOAD32_WORD_BIOS( 6, "24013001   Right.bin", 0x0000000, 0x0200000, CRC(e97afedf) SHA1(10ca3b015afaff5d7812f0f5207b2535602136a5) ) \
+	ROM_SYSTEM_BIOS( 7, "bios7",   "Aristocrat MK6 Base (system 04)" ) \
+	ROM_LOAD32_WORD_BIOS( 7, "System 04 Eprom Set -1MB-M27V800 Left.bin", 0x0000000, 0x0100000, CRC(21182775) SHA1(7c5b7f5aba3babc85f512a8f7d4ebc0d83eb842a) ) /* from Diamonds Forever */ \
+	ROM_LOAD32_WORD_BIOS( 7, "System 04 Eprom Set -1MB-M27V800 Right.bin", 0x0000000, 0x0100000, CRC(3daefb7a) SHA1(411471713219f4bab5ccf5fe7a12a6c138c8c550) ) \
+	ROM_SYSTEM_BIOS( 8, "bios8",   "Aristocrat MK6 Base (05010601)" ) \
+	ROM_LOAD32_WORD_BIOS( 8, "05010601_SYSTEM_EPROM_NSW_LEFT.BIN", 0x0000000, 0x0100000, CRC(b3e6b4a0) SHA1(3bf398c9257579f8e51ce716d6ebfa74fa510273) ) /* From Thai Princess & Venetian Nights */ \
+	ROM_LOAD32_WORD_BIOS( 8, "05010601_SYSTEM_EPROM_NSW_RIGHT.BIN", 0x0000000, 0x0100000, CRC(c12eac11) SHA1(683b9ddc323865ace7dca37d13b55de6e42759a5) )	 \
+	ROM_SYSTEM_BIOS( 9, "bios9",   "Aristocrat MK6 Base (13012001)" ) \
+	ROM_LOAD32_WORD_BIOS( 9, "System 13012001_left.bin", 0x0000000, 0x0400000, CRC(d346773f) SHA1(baa9103478fd667eecd13064cfa051a06763c6ca) ) /* From Queen of the Nile */ \
+	ROM_LOAD32_WORD_BIOS( 9, "System 13012001_right.bin", 0x0000000, 0x0400000, CRC(4c8bfa18) SHA1(cac4932a5b19ed8c2798693ac387cc1a6f0201c7) ) \
+	ROM_SYSTEM_BIOS( 10, "bios10",   "Aristocrat MK6 Base (02010201)" ) \
+	ROM_LOAD32_WORD_BIOS( 10, "System 02010201 Eprom Set -1MB-M27V800 U70.bin", 0x0000000, 0x0100000, CRC(9b2db442) SHA1(d512398a2d9257bd385dc50d61c63cd1a47300ba) ) /* From Money Tree & From Go For Green */ \
+	ROM_LOAD32_WORD_BIOS( 10, "System 02010201 Eprom Set -1MB-M27V800 U71.bin", 0x0000000, 0x0100000, CRC(24d5614a) SHA1(fdcf3826dccc72b74b66379b1411cf211d5a1670) ) \
+	ROM_LOAD32_WORD_BIOS( 10, "System 02010201 Eprom Set -1MB-M27V800 U83.bin", 0x0000000, 0x0100000, CRC(5f64a20c) SHA1(397404ab6d2a1aa3c1fc77bb9421fef7079b65a5) ) \
+	ROM_LOAD32_WORD_BIOS( 10, "System 02010201 Eprom Set -1MB-M27V800 U84.bin", 0x0000000, 0x0100000, CRC(0920930f) SHA1(771b0f62442d1c75b1bb59ad82365b7ab8747173) ) \
+	ROM_SYSTEM_BIOS( 11, "bios11",   "Aristocrat MK6 Base (02010114)" ) \
+	ROM_LOAD32_WORD_BIOS( 11, "02010114 System Set 1MB M27V800  U70.bin", 0x0000000, 0x0100000, CRC(3ba4379f) SHA1(84367f12c4c9224d2ab9cae83ae8727de338408c) ) /* from 'Arabian Nights' */ \
+	ROM_LOAD32_WORD_BIOS( 11, "02010114 System Set 1MB M27V800  U71.bin", 0x0000000, 0x0100000, CRC(8f83c3dd) SHA1(a5f9d80b4b515b24299d0241e1665cfd9da8bab7) ) \
+	ROM_LOAD32_WORD_BIOS( 11, "02010114 System Set 1MB M27V800  U83.bin", 0x0000000, 0x0100000, CRC(945104d7) SHA1(e372d0cf889c72b5d001b26fe4a925a28486537f) ) \
+	ROM_LOAD32_WORD_BIOS( 11, "02010114 System Set 1MB M27V800  U84.bin", 0x0000000, 0x0100000, CRC(183e3836) SHA1(4c802d0cd010bc007acb3a83e37aaa29b2d13d87) )
+	
 
 ROM_START( aristmk6 )
 	ARISTMK6_BIOS
@@ -1543,6 +1578,405 @@ ROM_END
 
 
 
+ROM_START( 5draga )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("5dragons_U72.bin", 0x0000000, 0x0400000, CRC(e81d47fe) SHA1(f5730f9b5fa9a4492289ddcbc8e88d0a62771667) )
+	ROM_LOAD32_WORD("5dragons_U73.bin", 0x0000000, 0x0400000, CRC(23cfdacd) SHA1(7efda9cc67214f68d674f1110cfb38fd9bbc4548) )
+	ROM_LOAD32_WORD("5dragons_U85.bin", 0x0000000, 0x0400000, CRC(12803341) SHA1(4b640c3f270eaa77ce71e87f83e603083bcae489) )
+	ROM_LOAD32_WORD("5dragons_U86.bin", 0x0000000, 0x0400000, CRC(ac83a71b) SHA1(1d6a3617e882e86100b939d62db7a7e1f86d2178) )
+ROM_END
+
+
+
+
+ROM_START( 5koipp )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u71", 0x0000000, 0x0400000, CRC(460e7ddb) SHA1(e6326523fb7c1c44cd0f01cd43d59d86a72c0d1d) )
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(1a1140f2) SHA1(c097bcdcbd61edd15382f7becc32384780fb6e8e) )
+	ROM_LOAD32_WORD("Gam_Eprm.u73", 0x0000000, 0x0400000, CRC(13fbfa4d) SHA1(8a9ba4fcea44f1ababa9ee89e36c8cd63b935ac5) )
+	ROM_LOAD32_WORD("Gam_Eprm.u84", 0x0000000, 0x0400000, CRC(413063ce) SHA1(4e933e1c0e576b028c16ab6f4630ee61575a5850) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(2ce103f8) SHA1(eb457c0812f08e3a0b4450e44a80c5e13c131ea9) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(a245db85) SHA1(a03cf7978531edbc0ec1ba97e12fd59589caa90d) )
+ROM_END
+
+
+
+ROM_START( amzteml )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u71", 0x0000000, 0x0400000, CRC(8b6ef913) SHA1(7cc8688cb9c6096a81ad21cdc046db5bd0134356) )
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(ca0b23ac) SHA1(4514e691f5926608a1624a91751f50469e234ed4) )
+	ROM_LOAD32_WORD("Gam_Eprm.u73", 0x0000000, 0x0400000, CRC(b11fb5a0) SHA1(ebd78bcf1a06878c8a50fe078379f590ec6bc3e2) )
+	ROM_LOAD32_WORD("Gam_Eprm.u84", 0x0000000, 0x0400000, CRC(aa689460) SHA1(111130f65ad4bb235e8722befb41b947d7d47c4e) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(887449d7) SHA1(a1b00d8205f9eb45ad2b3ec73422bc06673d68e0) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(c001c1e7) SHA1(bf8958325f90d2a04a6c86075df664b29b7073ca) )
+ROM_END
+
+
+
+
+
+
+
+
+
+
+ROM_START( buffaloa )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("buffalo.u72", 0x0000000, 0x0400000, CRC(2a35e7df) SHA1(112ea1872bc3b8533e1339f8eb19ef9ea0740773) )
+	ROM_LOAD32_WORD("buffalo.u73", 0x0000000, 0x0400000, CRC(46061814) SHA1(9a149d1edabc4a7ab8e30df9a08390a320b9b472) )
+	ROM_LOAD32_WORD("buffalo.u85", 0x0000000, 0x0400000, CRC(8e5ac194) SHA1(5e7a84d5211cb4e797aa04f21220e72f9d4f4694) )
+	ROM_LOAD32_WORD("buffalo.u86", 0x0000000, 0x0400000, CRC(8bee03c5) SHA1(46b39fe0b18c09764e7c7ac44838eb80df536100) )
+ROM_END
+
+
+
+
+
+ROM_START( cactusco )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Cactus Corral U72.bin", 0x0000000, 0x0400000, CRC(90d72135) SHA1(fb4a4ad984ff1103e2e951919132f79cb7af9ec5) )
+	ROM_LOAD32_WORD("Cactus Corral U73.bin", 0x0000000, 0x0400000, CRC(b2f2149d) SHA1(8f53b168555bc255d3dc9fb94d2d6dd466b7f3e4) )
+	ROM_LOAD32_WORD("Cactus Corral U85.bin", 0x0000000, 0x0400000, CRC(e0130bf6) SHA1(84f7c2b5c10155ee92bcc02d6c3dca0acf55ed27) )
+	ROM_LOAD32_WORD("Cactus Corral U86.bin", 0x0000000, 0x0400000, CRC(bd7a64ed) SHA1(0047467954eabc718b5355e61f2756fd9e29aabc) )
+ROM_END
+
+
+
+ROM_START( callwlar )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Call Of The Wild U71.bin", 0x0000000, 0x0400000, CRC(ed7dc53a) SHA1(686326580fe1a58685341d82ae5697fd216b88b6) )
+	ROM_LOAD32_WORD("Call Of The Wild U72.bin", 0x0000000, 0x0400000, CRC(8ee4f3e7) SHA1(553487a4c2915e9621330d6a8cd621dd6b4e38d3) )
+	ROM_LOAD32_WORD("Call Of The Wild U73.bin", 0x0000000, 0x0400000, CRC(36231cad) SHA1(9230ef7bb8433c611754b4625a64bef3931aba0d) )
+	ROM_LOAD32_WORD("Call Of The Wild U84.bin", 0x0000000, 0x0400000, CRC(c6d27e00) SHA1(4f81922c0f3f82f48a8354d1a81283f06aaa9fb6) )
+	ROM_LOAD32_WORD("Call Of The Wild U85.bin", 0x0000000, 0x0400000, CRC(725dad93) SHA1(7228e3637331450667ed872e48a6693846a5b87a) )
+	ROM_LOAD32_WORD("Call Of The Wild U86.bin", 0x0000000, 0x0400000, CRC(80b28091) SHA1(c27f57c7bfe797463ddd203304d9be58918aa586) )
+ROM_END
+
+
+
+
+
+
+
+
+ROM_START( deepfrz )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u71", 0x0000000, 0x0400000, CRC(7fde4cb0) SHA1(6ecfdaab82d2b2f30e0d122dee08b7e0848e0cea) )
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(a024e1e0) SHA1(5d4d6ab51aef1668e05b9296c7204c0b24c5f473) )
+	ROM_LOAD32_WORD("Gam_Eprm.u73", 0x0000000, 0x0400000, CRC(de7c52eb) SHA1(6291a9f032c164d000a75b24a19dc9e8fb9184a1) )
+	ROM_LOAD32_WORD("Gam_Eprm.u84", 0x0000000, 0x0400000, CRC(9bc78342) SHA1(91f99679eda7d0b8bfcb8cc741bf5d9e9ed6c2d4) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(30040885) SHA1(0f0f4cc3cd7ee70c03099bdeec60313c16a21c70) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(82187e66) SHA1(bb8bb2c50ab722d0e8d7e2e0d6b4be095fa1d3b3) )
+ROM_END
+
+
+
+
+
+
+ROM_START( drmred )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("dream of the red chamber-U72.bin", 0x0000000, 0x0400000, CRC(5a4e369a) SHA1(f50424edae6e912ef6d40f2e2e769c2002349c0a) )
+	ROM_LOAD32_WORD("dream of the red chamber-U73.bin", 0x0000000, 0x0400000, CRC(a38db22b) SHA1(e83485525a46741a7d97c36341c529d9643f2dd9) )
+	ROM_LOAD32_WORD("dream of the red chamber-U85.bin", 0x0000000, 0x0400000, CRC(b2640b58) SHA1(79e8085ae36a2f03a7e57e21cccaeb4bbe122f8e) )
+	ROM_LOAD32_WORD("dream of the red chamber-U86.bin", 0x0000000, 0x0400000, CRC(69e4a089) SHA1(505de7f61ff74d73da32aaf105b1ff9d5083094a) )
+ROM_END
+
+
+
+
+
+ROM_START( encspela )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u71", 0x0000000, 0x0400000, CRC(7f91f73f) SHA1(5b70ffe30047d68bf521ee773ff3c323d1678e83) )
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(651cb916) SHA1(caae7e9122b51352eb0befbc422c20866caeb92c) )
+	ROM_LOAD32_WORD("Gam_Eprm.u73", 0x0000000, 0x0400000, CRC(969cf792) SHA1(0c44ed0ab3a5c11a171e7615ced9234bbbd9f2c9) )
+	ROM_LOAD32_WORD("Gam_Eprm.u84", 0x0000000, 0x0400000, CRC(5d351e99) SHA1(ad492bc56d804a298c05f67746f3e1664084a0f2) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(a6a4bcf2) SHA1(5ee43d090d7505db2be59064bb1fdbcf3b29b16b) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(1b65e345) SHA1(2eba34cbbdbf939bb2241c95e610ee4d97ef6258) )
+ROM_END
+
+
+
+
+ROM_START( fortath )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("u72.bin", 0x0000000, 0x0400000, CRC(90e481a0) SHA1(b73045e1f8602f17e6d0f9d9f5718c7e7cd0dd81) )
+	ROM_LOAD32_WORD("u73.bin", 0x0000000, 0x0400000, CRC(4f361938) SHA1(51c23d09ba7cc7c73559e10b023962e7eb7059ed) )
+	ROM_LOAD32_WORD("u85.bin", 0x0000000, 0x0400000, CRC(0b33c40b) SHA1(055ac1528a2008a4b481db201b95dabf8531d6e4) )
+	ROM_LOAD32_WORD("u86.bin", 0x0000000, 0x0400000, CRC(39274d5c) SHA1(ef01c3f010800ece44ccb50be7cf14af538e21fc) )
+ROM_END
+
+
+
+
+ROM_START( goldsam )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Golden Samuri U71.bin", 0x0000000, 0x0400000, CRC(b5d9eb6f) SHA1(c614073463e60cc3fe379b81215324fa9e150948) )
+	ROM_LOAD32_WORD("Golden Samuri U72.bin", 0x0000000, 0x0400000, CRC(33967413) SHA1(ceb6aa9937dc5087298dfad8f3b2edc5cc8dd8a1) )
+	ROM_LOAD32_WORD("Golden Samuri U73.bin", 0x0000000, 0x0400000, CRC(dc0c374b) SHA1(5e4b1800aa69863aa537aec72285e2ffaccf0aee) )
+	ROM_LOAD32_WORD("Golden Samuri U84.bin", 0x0000000, 0x0400000, CRC(7c9b075a) SHA1(9d0095d2219747610c060b99b612d3a1353ed561) )
+	ROM_LOAD32_WORD("Golden Samuri U85.bin", 0x0000000, 0x0400000, CRC(d1f22168) SHA1(a63e6856f73fc2642edd59b18282ad69e32b3310) )
+	ROM_LOAD32_WORD("Golden Samuri U86.bin", 0x0000000, 0x0400000, CRC(b888e6ab) SHA1(a3df344fa1a1419ef4f4225e808189d4acffdc86) )
+ROM_END
+
+
+
+
+
+
+
+ROM_START( inddrma )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Indian Dreaming U72", 0x0000000, 0x0400000, CRC(92c75004) SHA1(6baa35896dd51c17ab5818919616a217b8b2e4dd) )
+	ROM_LOAD32_WORD("Indian Dreaming U73", 0x0000000, 0x0400000, CRC(41279ab8) SHA1(3f275669036ef07d7a0b6ebb1ea58ca5fde963e0) )
+	ROM_LOAD32_WORD("Indian Dreaming U85", 0x0000000, 0x0400000, CRC(ec18c9ea) SHA1(e3150499e7ad4a2e63aa3c070089c8267eefa5af) )
+	ROM_LOAD32_WORD("Indian Dreaming U86", 0x0000000, 0x0400000, CRC(bea8f843) SHA1(e8f345c2ff5f751e64bb945827826e481d376377) )
+ROM_END
+
+
+
+
+
+
+ROM_START( luck88 )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u71", 0x0000000, 0x0400000, CRC(f0e88142) SHA1(52271aa7dbdc99cff2a8e5230210758f4534f3bd) )
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(e3d58454) SHA1(a6bfcdb0a047712e77957d2e472bb300a758f12b) )
+	ROM_LOAD32_WORD("Gam_Eprm.u73", 0x0000000, 0x0400000, CRC(94b7d07e) SHA1(c12cf2da50791262ef85d0a08e897f87185c359d) )
+	ROM_LOAD32_WORD("Gam_Eprm.u84", 0x0000000, 0x0400000, CRC(eb338e37) SHA1(d795d24c38e654695b8122262bcdd0641f720e58) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(6c08de75) SHA1(ffadb5181bd82239bf616c1773ccb10dc06549a5) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(ae09bfd7) SHA1(65f068e947a26b7b56db6b3a94691a50a002970d) )
+ROM_END
+
+
+
+
+
+ROM_START( milkin )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u71", 0x0000000, 0x0400000, CRC(a5c83ff6) SHA1(b5eb551ab93e57c4978243909893d872b0192e08) )
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(e855f155) SHA1(5a065eb205832781b9a565b9f87f7638d52a1a4b) )
+	ROM_LOAD32_WORD("Gam_Eprm.u73", 0x0000000, 0x0400000, CRC(a20e4928) SHA1(a8fb46a250fe11652c5ccd2253be9aff9e6cae8b) )
+	ROM_LOAD32_WORD("Gam_Eprm.u84", 0x0000000, 0x0400000, CRC(fc0a3315) SHA1(0871a0c6a87d0197d9dfd631006426b6522d61b8) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(00186fab) SHA1(7c84808ed6f20118a79eebe1730f2fa0ef989d97) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(eb66636c) SHA1(48216f1f72fc6714cc1876d71489bccaa1624b2e) )
+ROM_END
+
+
+
+
+ROM_START( moonwalt )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Moonlight Waltz U72.bin", 0x0000000, 0x0400000, CRC(80e26c8a) SHA1(5f8b01d18210d5997bbf7966d1bf4353dadc4f7d) )
+	ROM_LOAD32_WORD("Moonlight Waltz U73.bin", 0x0000000, 0x0400000, CRC(8272e787) SHA1(b0b44fa4af0fdd3f66bd117d748ed874379ed131) )
+	ROM_LOAD32_WORD("Moonlight Waltz U85.bin", 0x0000000, 0x0400000, CRC(44f56b6f) SHA1(7706301d9e40e6197aa509c972129b016d60bf34) )
+	ROM_LOAD32_WORD("Moonlight Waltz U86.bin", 0x0000000, 0x0400000, CRC(cb21b264) SHA1(ecc1804c0fd399019e3496ae6ea0a6ea125562f2) )
+ROM_END
+
+
+
+ROM_START( mchilli )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(85f98b61) SHA1(1ebd8caef5f163a75e185c3fa3c001517f676890) )
+	ROM_LOAD32_WORD("Gam_Eprm.u73", 0x0000000, 0x0400000, CRC(da883738) SHA1(74f5cdb7b388dec17a0e4d8a04c2107bd07c3ad7) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(ac11dab3) SHA1(3a201a5e239b10dcdd23aed3b0d724146f2fcf68) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(1f5207d7) SHA1(73c3742a94962a66df7af6eff660f90e7e22e344) )
+ROM_END
+
+
+
+
+ROM_START( pcfava )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Players Choice-Favourites U71.bin", 0x0000000, 0x0400000, CRC(116bb514) SHA1(cd3dcca730c8e9d3fe5b0c70638f3d81f8eb8f98) )
+	ROM_LOAD32_WORD("Players Choice-Favourites U72.bin", 0x0000000, 0x0400000, CRC(9b0fb8b6) SHA1(bd5a2734068e031ca7ab0f19749f28f84288125f) )
+	ROM_LOAD32_WORD("Players Choice-Favourites U73.bin", 0x0000000, 0x0400000, CRC(72db5268) SHA1(de7f3619162b27bab4825f801eb1a04cce8721a3) )
+	ROM_LOAD32_WORD("Players Choice-Favourites U84.bin", 0x0000000, 0x0400000, CRC(7944e972) SHA1(23d45a2e948a737d3186de5f0447ec7dd51ddc7b) )
+	ROM_LOAD32_WORD("Players Choice-Favourites U85.bin", 0x0000000, 0x0400000, CRC(385e8636) SHA1(5e4bf33f91481080c80264b915a11606b03f8686) )
+	ROM_LOAD32_WORD("Players Choice-Favourites U86.bin", 0x0000000, 0x0400000, CRC(f06d4fbb) SHA1(aad9c37da2ee9f7a5252267f39a9d1e8169a2472) )
+ROM_END
+
+
+
+ROM_START( pcmostw )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u71", 0x0000000, 0x0400000, CRC(6b67d71e) SHA1(902f832c79f160b22c02222eefa5ec31285b7610) )
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(d6f86683) SHA1(0e5ca980010bf40bba01d7222bc4d241b9d86667) )
+	ROM_LOAD32_WORD("Gam_Eprm.u73", 0x0000000, 0x0400000, CRC(a26a224e) SHA1(222e3b067f4bde826ae19276bb48136896cbd853) )
+	ROM_LOAD32_WORD("Gam_Eprm.u84", 0x0000000, 0x0400000, CRC(da762c17) SHA1(44c5bfee805d0ee8209e7b37161921d652b4d83b) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(214a647f) SHA1(51b250ecf49776ab9dfe80cb2efdc685109f0c19) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(7f460e25) SHA1(d97150221a3c0cac3b46d147ae96937a871ecdb3) )
+ROM_END
+
+
+ROM_START( pcnewz )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u70", 0x0000000, 0x0400000, CRC(1d67f455) SHA1(4247d21757522a69184d32434cfa191a026aff19) )
+	ROM_LOAD32_WORD("Gam_Eprm.u71", 0x0000000, 0x0400000, CRC(8df4d7da) SHA1(a798424a514201d954519ec0daf0a2b1cbc00082) )
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(db6e9523) SHA1(a4a272af4f5f29d2e612b52a011f9daf7c0b0cd3) )
+	ROM_LOAD32_WORD("Gam_Eprm.u73", 0x0000000, 0x0400000, CRC(6072d8d3) SHA1(37ce2a4213024b9ccd1859701c48e76e6c64e6ee) )
+	ROM_LOAD32_WORD("Gam_Eprm.u83", 0x0000000, 0x0400000, CRC(5709ba3a) SHA1(4fd85b97f434656b3bd0d26ba8573e3cd2c936ce) )
+	ROM_LOAD32_WORD("Gam_Eprm.u84", 0x0000000, 0x0400000, CRC(5927770a) SHA1(faaec01280a54775e85ae796a7d05170bece3c87) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(6208432e) SHA1(50006d010dd3d061fef8f4fd8fbbffea1b9b0f3d) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(bb839c90) SHA1(268008ffeeb867210664928a521051978c7770b3) )
+ROM_END
+
+
+
+
+
+ROM_START( rumbrel )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Rumble Reels L0.bin", 0x0000000, 0x0400000, CRC(06b37c77) SHA1(e4dad62667a1c1d4948abcd535332975148e952b) )
+	ROM_LOAD32_WORD("Rumble Reels L1.bin", 0x0000000, 0x0400000, CRC(739c4565) SHA1(bc2cd133dfbfe18916703eacc851f1757a06f345) )
+	ROM_LOAD32_WORD("Rumble Reels L2.bin", 0x0000000, 0x0400000, CRC(2f561bd0) SHA1(9c2f659ec5cdfd335d089389616dac57fbb655df) )
+	ROM_LOAD32_WORD("Rumble Reels L3.bin", 0x0000000, 0x0400000, CRC(6bf0442e) SHA1(c83ed68cd0680ebac359824defa51c1942db17f1) )
+	ROM_LOAD32_WORD("Rumble Reels L4.bin", 0x0000000, 0x0400000, CRC(3cd5171b) SHA1(fe6e17679f14ae0238c58dd5d801cb0dda3a434b) )
+	ROM_LOAD32_WORD("Rumble Reels R0.bin", 0x0000000, 0x0400000, CRC(cc48bb54) SHA1(6ed7a502deaff0e2fd6d0901d036fcbadf303859) )
+	ROM_LOAD32_WORD("Rumble Reels R1.bin", 0x0000000, 0x0400000, CRC(3af99e7b) SHA1(93e68056fee9b4f29a066bd6828ff320b7d3ffa4) )
+	ROM_LOAD32_WORD("Rumble Reels R2.bin", 0x0000000, 0x0400000, CRC(04b2f09d) SHA1(4090876cf8ef18ed8541f13684b076d7ac1d0d72) )
+	ROM_LOAD32_WORD("Rumble Reels R3.bin", 0x0000000, 0x0400000, CRC(a117e3ec) SHA1(119d7ac89ee4c2167b853d720eb87498cefab4b9) )
+	ROM_LOAD32_WORD("Rumble Reels R4.bin", 0x0000000, 0x0400000, CRC(2c5baf9f) SHA1(40fb5b22460b9a35ca8ebb8b0643e58665d8643f) )
+ROM_END
+
+
+
+
+ROM_START( shamnmg )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("shamans magic.u72", 0x0000000, 0x0400000, CRC(aab1dd80) SHA1(0e8fbc967c4d5c7d24f980afc78464052ca6d2a6) )
+	ROM_LOAD32_WORD("shamans magic.u73", 0x0000000, 0x0400000, CRC(f1e9d86d) SHA1(282961a897bbfec4ab778db207f3ef20c6f4c69d) )
+	ROM_LOAD32_WORD("shamans magic.u85", 0x0000000, 0x0400000, CRC(15bb6dd5) SHA1(96625e18b622d2a02f9a88d51ad90d5dac0289be) )
+	ROM_LOAD32_WORD("shamans magic.u86", 0x0000000, 0x0400000, CRC(9c29e10b) SHA1(9f77808162d038461f77075f0565c0a0d34a708a) )
+ROM_END
+
+
+
+
+
+ROM_START( skydncra )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Sky Dancer U71.bin", 0x0000000, 0x0400000, CRC(d30c3d6f) SHA1(581a198d98f00c1b7a432ab85b5f65760e364131) )
+	ROM_LOAD32_WORD("Sky Dancer U72.bin", 0x0000000, 0x0400000, CRC(12d02b67) SHA1(aed879daca62575def363872650d33b7af7d71bb) )
+	ROM_LOAD32_WORD("Sky Dancer U73.bin", 0x0000000, 0x0400000, CRC(f90fc640) SHA1(07b523839ac36b07d3dbc4d24e6d987c1f644095) )
+	ROM_LOAD32_WORD("Sky Dancer U84.bin", 0x0000000, 0x0400000, CRC(df6885af) SHA1(e3302defbc496c1b71da6be8ed49dd4d3556d7d4) )
+	ROM_LOAD32_WORD("Sky Dancer U85.bin", 0x0000000, 0x0400000, CRC(4a9a7c33) SHA1(e3243fa32b6736140992ad9fcf04a420bd417846) )
+	ROM_LOAD32_WORD("Sky Dancer U86.bin", 0x0000000, 0x0400000, CRC(81c0b79d) SHA1(ec84ded928637f8888d0caa935ab8d64c647a536) )
+ROM_END
+
+
+
+
+
+
+
+ROM_START( buckstop )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(de8c0100) SHA1(d27668584094c56f2840d87fc481ce03e7278dd8) )
+	ROM_LOAD32_WORD("Gam_Eprm.u74", 0x0000000, 0x0400000, CRC(0a55ae9d) SHA1(25cfc1c4ddb5a3c26fd024f0be166763739e84e4) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(d2a29b6b) SHA1(4bfc7a6ea5d1251f57bbea52b25353f696f7e63e) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(b21c6704) SHA1(2181f3491f020400dfa0b79864860fb002ee5a7f) )
+ROM_END
+
+
+
+
+
+ROM_START( tikitalk )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Tiki Talk U73.bin", 0x0000000, 0x0400000, CRC(983d8621) SHA1(92ad28c0a7a06035569700adb8c3449f92bb36b7) )
+	ROM_LOAD32_WORD("Tiki Talk U86.bin", 0x0000000, 0x0400000, CRC(772312e1) SHA1(5a5561d9ec70b56e558ad87ead0770ac9f18e9d1) )
+ROM_END
+
+
+
+
+
+
+
+
+
+ROM_START( werewild )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u71", 0x0000000, 0x0400000, CRC(cc1a8ecc) SHA1(857ec89411720e7d451c76dfe4821c721f84ad06) )
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(08e7d250) SHA1(e57a5da1fe9b1a2e0b775a881cf52f89a287b340) )
+	ROM_LOAD32_WORD("Gam_Eprm.u73", 0x0000000, 0x0400000, CRC(2d653677) SHA1(653de0cb045772c1fe533bfba6188b697b5d40bb) )
+	ROM_LOAD32_WORD("Gam_Eprm.u84", 0x0000000, 0x0400000, CRC(42cece50) SHA1(3da725f4711e2eddab3fbd1b365cd79049ccaefa) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(0f9af5cf) SHA1(da58075cbb9104b656c5ece827980ac42185bb6a) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(c8a6321d) SHA1(60278ac3b055d94e67da4041efa76d4b66431cc0) )
+ROM_END
+
+
+
+
+ROM_START( wldcatsa )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Wild Cats U72.bin", 0x0000000, 0x0400000, CRC(f0707ab9) SHA1(f30d77c53dfbc43e9468f2cb91529e44ce10c59e) )
+	ROM_LOAD32_WORD("Wild Cats U73.bin", 0x0000000, 0x0400000, CRC(0300f5ff) SHA1(52d640b676cd42dfab2c38108dd765c8e8092528) )
+	ROM_LOAD32_WORD("Wild Cats U85.bin", 0x0000000, 0x0400000, CRC(687c4bd6) SHA1(548de5a9887dfc58353b7a2861447bc9cd5f955e) )
+	ROM_LOAD32_WORD("Wild Cats U86.bin", 0x0000000, 0x0400000, CRC(f95e6ba6) SHA1(8d787d96d7b3cc3cde0be49a54701c2d3f70c659) )
+ROM_END
+
+
+
+
+ROM_START( wgorilla )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(e5a4e6f5) SHA1(f63fdc4771433f9953190b9cae4d7cbc4f6e374f) )
+	ROM_LOAD32_WORD("Gam_Eprm.u73", 0x0000000, 0x0400000, CRC(7588c213) SHA1(b1d0ec23b8c668ae40664329a5f6a45b24f6ef2f) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(28049860) SHA1(cace39a0121127ead7c8550153372283e1610a96) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(c8f15db2) SHA1(feaf68f442c96367db374772db57619ea5c01bca) )
+ROM_END
+
+
+
+
+ROM_START( bluetigr )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("Gam_Eprm.u72", 0x0000000, 0x0400000, CRC(f81af522) SHA1(5b7be10820f18ffa360726d20370faa1ecc1b3f8) )
+	ROM_LOAD32_WORD("Gam_Eprm.u73", 0x0000000, 0x0400000, CRC(bc2a4fb8) SHA1(74ba00873a4a00d0839d89bb2d9dbed5fc33bff7) )
+	ROM_LOAD32_WORD("Gam_Eprm.u85", 0x0000000, 0x0400000, CRC(e175ef6d) SHA1(13933044f905c0fde96ff05c6afdce189160a5e2) )
+	ROM_LOAD32_WORD("Gam_Eprm.u86", 0x0000000, 0x0400000, CRC(a31f97d8) SHA1(67ec087cbb8f733c0f0314b58b4884fe3cc3ad8c) )
+ROM_END
+
+
+
+
+
+
+
+
+
+
 
 GAME( 2000, aristmk6,  0,          aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Aristocrat MK6 System Software",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT)
 
@@ -1560,7 +1994,7 @@ GAME( 2003, thaiprin,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, R
 
 
 GAME( 200?, 100lions,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "100 Lions",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, 5dragons,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "5 Dragons",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, 5dragons,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "5 Dragons (Demo?)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, adustcm,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "African Dusk Mr Cashman",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, alchemya,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Alchemy",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, amzqnar,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Amazon Queen",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -1572,7 +2006,7 @@ GAME( 200?, birredar,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, R
 GAME( 200?, blkbrum,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Black Brumby",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, brazilar,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Brazil",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, bucanar,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Bucaneer",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, buffalar,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Buffalo",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, buffalar,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Buffalo (set 2)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, bushrngr,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Bush Ranger",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, calyking,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Calypso King",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, canary2,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Canary Riches 2",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -1636,7 +2070,7 @@ GAME( 200?, pharpor,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, RO
 GAME( 200?, phxfant,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Phoenix Fantasy",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, piratar,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Pirates",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, pcbydem,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Players Choice By Demand",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, pcfav,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Players Choice Favourites",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, pcfav,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Players Choice Favourites (set 1)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, pompeiar,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Pompei",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, prideaf,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Pride Of Africa",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, prophar,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Prophecy",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -1676,6 +2110,35 @@ GAME( 200?, wwaratah,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, R
 GAME( 200?, wwaysar,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Wild Ways",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, wwaysll,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Wizard Ways Lady Luck",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, zorrojp,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Zorro Jackpot",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, 5draga,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "5 Dragons",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, 5koipp,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "5 Koi Power Pay",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, amzteml,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Amazon Temple",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, buffaloa,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Buffalo",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, cactusco,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Cactus Corral",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, callwlar,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Call Of The Wild",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, deepfrz,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Deep Freeze",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, drmred,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Dream Of The Red Chamber",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, encspela,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Enchanted Spell",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, fortath,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Fortune of Athena",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, goldsam,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Golden Samurai",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, inddrma,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Indian Dreaming",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, luck88,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Lucky 88",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, milkin,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Milkin It",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, moonwalt,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Moonlight Waltz",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, mchilli,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "More Chilli",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, pcfava,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Players Choice Favourites (set 2)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, pcmostw,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Players Choice Most Wanted",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, pcnewz,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Players Choice New Zealand",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, rumbrel,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Rumble  Reels",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, shamnmg,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Shamans Magic",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, skydncra,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Sky Dancer",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, buckstop,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "The Buck Stops Here",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, tikitalk,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Tiki Talk",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, werewild,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Werewolf Wild",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, wldcatsa,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Wild Cats",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, wgorilla,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Wild Gorilla",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, bluetigr,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Blue Tiger\20259511",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
 
 
 /*
