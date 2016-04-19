@@ -1,0 +1,44 @@
+// license:GPL-2.0+
+// copyright-holders:The DOSBox Team
+
+/*              SuperEagle code               */
+/*  Copied from the Dosbox source code        */
+/*  Copyright (C) 2002-2007  The DOSBox Team  */
+/*  License: GNU-GPL                          */
+/*  Adapted by guest(r) on 16.4.2007          */    
+
+{
+	"name": "Super Eagle",
+	"author": "Shader version by The DOSBox Team",
+	"targets": [
+		{
+			"name": "scaled_out",
+			"mode": "guest",
+			"scale": 2,
+			"doublebuffer": true
+		},
+		{
+			"name": "internal",
+			"mode": "native",
+			"doublebuffer": true
+		}
+	],
+	"passes": [
+		{
+			"effect": "supereagle/supereagle",
+			"name": "Super Eagle pass",
+			"input": [
+				{ "sampler": "decal", "texture": "screen" },
+				{ "sampler": "LUT",   "texture": "bgfx/chains/hq2x.png", "bilinear": true }
+			],
+			"output": "scaled_out"
+		},
+		{	"effect": "hq2x/blit",
+			"name": "Final Blit",
+			"input": [
+				{ "sampler": "s_tex", "target": "scaled_out" }
+			],
+			"output": "output"
+		}
+	]
+}
