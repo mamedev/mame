@@ -92,6 +92,9 @@ public:
 	template<class _Object> static devcb_base &set_out_int_line_callback(device_t &device, _Object object) { return downcast<tms9928a_device &>(device).m_out_int_line_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_gromclk_callback(device_t &device, _Object object) { return downcast<tms9928a_device &>(device).m_out_gromclk_cb.set_callback(object); }
 
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
 	DECLARE_READ8_MEMBER( vram_read );
 	DECLARE_WRITE8_MEMBER( vram_write );
 	DECLARE_READ8_MEMBER( register_read );

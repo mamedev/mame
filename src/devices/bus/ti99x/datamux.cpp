@@ -125,17 +125,7 @@ void ti99_datamux_device::read_all(address_space& space, UINT16 addr, UINT8 *val
 		if ((addr & 0xf801)==0x8800)
 		{
 			// Forward to VDP unless we have an EVPC
-			if (m_video != nullptr)
-			{
-				if ((addr & 2) != 0)
-				{       // read VDP status
-					*value = m_video->register_read(space, 0);
-				}
-				else
-				{       // read VDP RAM
-					*value = m_video->vram_read(space, 0);
-				}
-			}
+			if (m_video != nullptr) *value = m_video->read(space, addr>>1); // A14 determines data or register read
 		}
 	}
 
@@ -174,17 +164,7 @@ void ti99_datamux_device::write_all(address_space& space, UINT16 addr, UINT8 val
 	if ((addr & 0xf801)==0x8800)
 	{
 		// Forward to VDP unless we have an EVPC
-		if (m_video != nullptr)
-		{
-			if ((addr & 2) != 0)
-			{   // write VDP address/register
-				m_video->register_write(space, 0, value);
-			}
-			else
-			{   // write VDP data
-				m_video->vram_write(space, 0, value);
-			}
-		}
+		if (m_video != nullptr) m_video->write(space, addr>>1, value);   // A14 determines data or register write
 	}
 
 	// PEB gets all accesses
