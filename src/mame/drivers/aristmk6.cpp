@@ -292,28 +292,30 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 15, "bios15",   "Aristocrat MK6 Base (01.04.08, USA)" ) \
 	ROM_LOAD32_WORD_BIOS( 15, "base-01.04.08-u70-u20-left-cs-8509.bin", 0x0000000, 0x0200000, CRC(0dfcad10) SHA1(53798be000304aed38909f5fd8470a68bedd8229) ) /* from bubdul */ \
 	ROM_LOAD32_WORD_BIOS( 15, "base-01.04.08-u83-u10-right-cs-d74e.bin", 0x0000000, 0x0200000, CRC(95333304) SHA1(7afe49d6c5e4d6820f349778557daa88c5366a51) )\
-	ROM_SYSTEM_BIOS( 16, "bios15",   "Aristocrat MK6 Base (02061013)" ) \
+	ROM_SYSTEM_BIOS( 16, "bios16",   "Aristocrat MK6 Base (02061013)" ) \
 	ROM_LOAD32_WORD_BIOS( 16,"02061013 System 02 Left.bin", 0x0000000, 0x0100000, CRC(e70a7007) SHA1(0935f924866162d9c0fbdbb99391cbf730a04b76) ) \
 	ROM_LOAD32_WORD_BIOS( 16,"02061013 System 02 Right.bin", 0x0000000, 0x0100000, CRC(7a8619a5) SHA1(bd03ddb68817c1660b009e102ccf69e5b603b875) ) \
-	ROM_SYSTEM_BIOS( 17, "bios15",   "Aristocrat MK6 Base (03030708)" ) \
+	ROM_SYSTEM_BIOS( 17, "bios17",   "Aristocrat MK6 Base (03030708)" ) \
 	ROM_LOAD32_WORD_BIOS( 17,"03030708 System 03 SA LEFT.bin", 0x0000000, 0x0100000, CRC(4e5ad823) SHA1(77ab1c29c6172cfdcef776222a72b2b44114d4da) ) \
 	ROM_LOAD32_WORD_BIOS( 17,"03030708 System 03 SA RIGHT.bin", 0x0000000, 0x0100000, CRC(b4b3c6a5) SHA1(5747f98a6eaa5c24a23d1d76a28b33a3bfbbfd1f) ) \
-	ROM_SYSTEM_BIOS( 18, "bios15",   "Aristocrat MK6 Base (09011001)" ) \
+	ROM_SYSTEM_BIOS( 18, "bios18",   "Aristocrat MK6 Base (09011001)" ) \
 	ROM_LOAD32_WORD_BIOS( 18,"09011001_SYSTEM_09_EPROM_NSW_LEFT.BIN", 0x0000000, 0x0200000, CRC(229c2e63) SHA1(91fd2b1acb69efe073647e93db9f11042add2feb) ) \
 	ROM_LOAD32_WORD_BIOS( 18,"09011001_SYSTEM_09_EPROM_NSW_RIGHT.BIN", 0x0000000, 0x0200000, CRC(8a853f80) SHA1(9a75498f7b02c81a483b4e1c158f35f0ee4c0112) ) \
-	ROM_SYSTEM_BIOS( 19, "bios15",   "Aristocrat MK6 Base (11011501)" ) \
+	ROM_SYSTEM_BIOS( 19, "bios19",   "Aristocrat MK6 Base (11011501)" ) \
 	ROM_LOAD32_WORD_BIOS( 19,"11011501_SYSTEM_11_EPROM_NSW_2MB_M27V160_LEFT.bin", 0x0000000, 0x0200000, CRC(c5cc3461) SHA1(5b43c4cb6110a6ccf67cd0f3789253f6872b20c4) ) \
 	ROM_LOAD32_WORD_BIOS( 19,"11011501_SYSTEM_11_EPROM_NSW_2MB_M27V160_RIGHT.bin", 0x0000000, 0x0200000, CRC(de4c3aed) SHA1(21596a2edd20eb7de7a4ec8900a270b09c8f326f) ) \
-	ROM_SYSTEM_BIOS( 20, "bios15",   "Aristocrat MK6 Base (14011913)" ) \
+	ROM_SYSTEM_BIOS( 20, "bios20",   "Aristocrat MK6 Base (14011913)" ) \
 	ROM_LOAD32_WORD_BIOS( 20,"14011913 System 14 Eprom Left.bin", 0x0000000, 0x0200000, CRC(9a4cefdf) SHA1(6c15bc565ede8af19361d60ee1e6657a8055c92c) ) \
 	ROM_LOAD32_WORD_BIOS( 20,"14011913 System 14 Eprom Right.bin", 0x0000000, 0x0200000, CRC(01d13b89) SHA1(b1013366d0803dfbec5a5f90f6a5cea862de0513) ) \
-	ROM_SYSTEM_BIOS( 21, "bios15",   "Aristocrat MK6 Base (01.04.11)" ) \
+	ROM_SYSTEM_BIOS( 21, "bios21",   "Aristocrat MK6 Base (01.04.11)" ) \
 	ROM_LOAD32_WORD_BIOS( 21,"01.04.11 System U70.bin", 0x0000000, 0x0200000, CRC(787f2b07) SHA1(2548289e44f4b935346b759afb5383bdbac04c3e) ) \
 	ROM_LOAD32_WORD_BIOS( 21,"01.04.11 System U83.bin", 0x0000000, 0x0200000, CRC(2dae8ca0) SHA1(7a0fb38b4c1ac7195d15bdab6f0cfb16c78430f0) ) \
-	ROM_SYSTEM_BIOS( 22, "bios15",   "Aristocrat MK6 Set Chips (06.03.04)" ) \
+	ROM_SYSTEM_BIOS( 22, "bios22",   "Aristocrat MK6 Set Chips (06.03.04)" ) \
 	ROM_LOAD32_WORD_BIOS( 22,"Set 06.03.04 U2.bin", 0x0000000, 0x0100000, CRC(6f5f5ef1) SHA1(70a43fba4de47ed8dcf38b25eafd5873f3428e72) ) \
-	ROM_LOAD32_WORD_BIOS( 22,"Set 06.03.04 U3.bin", 0x0000000, 0x0100000, CRC(7034f26b) SHA1(7be78f23bec38d05240cdfe1186ec0c8291f5a1c) ) 
-
+	ROM_LOAD32_WORD_BIOS( 22,"Set 06.03.04 U3.bin", 0x0000000, 0x0100000, CRC(7034f26b) SHA1(7be78f23bec38d05240cdfe1186ec0c8291f5a1c) ) \
+	ROM_SYSTEM_BIOS( 23, "bios23",   "Aristocrat MK6 (USA, set 3)" ) \
+	ROM_LOAD32_WORD_BIOS( 23,"US_system_U70.bin", 0x0000000, 0x0200000, CRC(0095e3f9) SHA1(d2e8786158b1ab0a614aab21cf1d14cbc04754af) ) \
+	ROM_LOAD32_WORD_BIOS( 23,"US_system_U83.bin", 0x0000000, 0x0200000, CRC(2c7f1ec3) SHA1(d03167f43ed6f9596080d91472695829378cef0a) )
 
 
 ROM_START( aristmk6 )
@@ -3090,7 +3092,7 @@ GAME( 200?, tikitalk,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, R
 GAME( 200?, werewild,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Werewolf Wild",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, wldcatsa,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Wild Cats",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, wgorilla,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Wild Gorilla",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, bluetigr,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Blue Tiger\20259511",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, bluetigr,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Blue Tiger (20259511)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, 50lionr,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "50 Lions Roaring Riches",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, beavbuk,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Beaver Bucks",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // sets below marked as 'USA'
