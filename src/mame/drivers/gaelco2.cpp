@@ -19,6 +19,11 @@
     Snow Board     | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
     Bang!          | 1998 | CG-1V 388 | 980921/1 | No
 
+	Notes:
+	touchgok:
+	sounds cut out sometimes, others are often missing (sound status reads as busy,
+	so no attempt made to play new sound) probably bug in devices\sound\gaelco.cpp ??
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -1517,7 +1522,7 @@ GAME( 1994, aligatorun,aligator,alighunt, alighunt, gaelco2_state, alighunt, ROT
 GAME( 1995, touchgo,  0,        touchgo,  touchgo,  gaelco2_state, touchgop, ROT0, "Gaelco", "Touch & Go (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1995, touchgon, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgop, ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1995, touchgoe, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgop, ROT0, "Gaelco", "Touch & Go (earlier revision)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1995, touchgok, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, touchgok, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
 
 GAME( 1995, wrally2,  0,        wrally2,  wrally2,  driver_device, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 
