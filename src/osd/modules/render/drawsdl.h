@@ -12,16 +12,16 @@
 
 #pragma once
 
-#ifndef __DRAWSDL2__
-#define __DRAWSDL2__
+#ifndef __DRAWSDL1__
+#define __DRAWSDL1__
 
 /* renderer_sdl2 is the information about SDL for the current screen */
-class renderer_sdl2 : public osd_renderer
+class renderer_sdl1 : public osd_renderer
 {
 public:
 
-	renderer_sdl2(osd_window *w, int extra_flags)
-		: osd_renderer(w, extra_flags)
+	renderer_sdl1(osd_window *w, int extra_flags)
+		: osd_renderer(w,  FLAG_NEEDS_OPENGL | extra_flags)
 		, m_sdl_renderer(nullptr)
 		, m_texture_id(nullptr)
 		, m_yuv_lookup(nullptr)
@@ -34,9 +34,9 @@ public:
 		, m_last_dim(0, 0)
 	{
 	}
-	virtual ~renderer_sdl2();
+	virtual ~renderer_sdl1();
 
-	static bool init(running_machine &machine);
+	static void init(running_machine &machine);
 	static void exit() { }
 
 	virtual int create() override;
@@ -83,4 +83,4 @@ struct sdl_scale_mode
 	void            (*yuv_blit)(const UINT16 *bitmap, UINT8 *ptr, const int pitch, const UINT32 *lookup, const int width, const int height);
 };
 
-#endif // __DRAWSDL2__
+#endif // __DRAWSDL1__

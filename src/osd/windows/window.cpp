@@ -30,6 +30,11 @@
 
 #include "winutil.h"
 
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#include <agile.h>
+using namespace Windows::UI::Core;
+#endif
+
 #include "modules/render/drawbgfx.h"
 #include "modules/render/drawnone.h"
 #include "modules/render/drawd3d.h"
@@ -214,11 +219,11 @@ bool windows_osd_interface::window_init()
 				error = renderer_gdi::init(machine());
 				break;
 			case VIDEO_MODE_BGFX:
-				error = renderer_bgfx::init(machine());
+				renderer_bgfx::init(machine());
 				break;
 #if (USE_OPENGL)
 			case VIDEO_MODE_OPENGL:
-				error = renderer_ogl::init(machine());
+				renderer_ogl::init(machine());
 				break;
 #endif
 			case VIDEO_MODE_SDL2ACCEL:
@@ -385,6 +390,8 @@ win_window_info::~win_window_info()
 
 POINT win_window_info::s_saved_cursor_pos = { -1, -1 };
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+
 void win_window_info::capture_pointer()
 {
 	RECT bounds;
@@ -418,6 +425,35 @@ void win_window_info::show_pointer()
 	while (ShowCursor(TRUE) < 1) {};
 	ShowCursor(FALSE);
 }
+
+#else
+
+CoreCursor^ win_window_info::s_cursor = nullptr;
+
+void win_window_info::capture_pointer()
+{
+	platform_window<Platform::Agile<CoreWindow^>>()->SetPointerCapture();
+}
+
+void win_window_info::release_pointer()
+{
+	platform_window<Platform::Agile<CoreWindow^>>()->ReleasePointerCapture();
+}
+
+void win_window_info::hide_pointer()
+{
+	auto window = platform_window<Platform::Agile<CoreWindow^>>();
+	win_window_info::s_cursor = window->PointerCursor;
+	window->PointerCursor = nullptr;
+}
+
+void win_window_info::show_pointer()
+{
+	auto window = platform_window<Platform::Agile<CoreWindow^>>();
+	window->PointerCursor = win_window_info::s_cursor;
+}
+
+#endif
 
 //============================================================
 //  winwindow_process_events_periodic

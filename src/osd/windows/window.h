@@ -143,6 +143,11 @@ private:
 	void set_fullscreen(int fullscreen);
 
 	static POINT        s_saved_cursor_pos;
+
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+	static Windows::UI::Core::CoreCursor^ s_cursor;
+#endif
+
 	running_machine &   m_machine;
 };
 

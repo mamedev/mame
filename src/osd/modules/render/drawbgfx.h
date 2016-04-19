@@ -33,7 +33,7 @@ public:
 	renderer_bgfx(osd_window *w);
 	virtual ~renderer_bgfx();
 
-	static bool init(running_machine &machine) { return false; }
+	static void init(running_machine &machine) { }
 	static void exit();
 
 	virtual int create() override;

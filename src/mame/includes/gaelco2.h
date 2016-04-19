@@ -50,6 +50,7 @@ public:
 	DECLARE_WRITE16_MEMBER(gaelco2_vram_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_palette_w);
 	DECLARE_DRIVER_INIT(touchgo);
+	DECLARE_DRIVER_INIT(touchgop);
 	DECLARE_DRIVER_INIT(snowboar);
 	DECLARE_DRIVER_INIT(alighunt);
 	DECLARE_DRIVER_INIT(maniacsqa);

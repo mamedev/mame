@@ -211,37 +211,23 @@ bool sdl_osd_interface::window_init()
 	sdlwindow_thread_id(nullptr, 0);
 
 	// initialize the drawers
-	if (video_config.mode == VIDEO_MODE_BGFX)
+
+	switch (video_config.mode)
 	{
-		if (renderer_bgfx::init(machine()))
-		{
+		case VIDEO_MODE_BGFX:
+			renderer_bgfx::init(machine());
+			break;
 #if (USE_OPENGL)
-			video_config.mode = VIDEO_MODE_OPENGL;
-		}
-	}
-	if (video_config.mode == VIDEO_MODE_OPENGL)
-	{
-		if (renderer_ogl::init(machine()))
-		{
-			video_config.mode = VIDEO_MODE_SOFT;
-#else
-			video_config.mode = VIDEO_MODE_SOFT;
+		case VIDEO_MODE_OPENGL:
+			renderer_ogl::init(machine());
+			break;
 #endif
-		}
-	}
-	if (video_config.mode == VIDEO_MODE_SDL2ACCEL)
-	{
-		if (renderer_sdl2::init(machine()))
-		{
-			video_config.mode = VIDEO_MODE_SOFT;
-	}
-	}
-	if (video_config.mode == VIDEO_MODE_SOFT)
-	{
-		if (renderer_sdl1::init(machine()))
-		{
-			return false;
-	}
+		case VIDEO_MODE_SDL2ACCEL:
+			renderer_sdl2::init(machine());
+			break;
+		case VIDEO_MODE_SOFT:
+			renderer_sdl1::init(machine());
+			break;
 	}
 
 	/* We may want to set a number of the hints SDL2 provides.
@@ -354,7 +340,7 @@ void sdl_osd_interface::window_exit()
 	switch(video_config.mode)
 	{
 		case VIDEO_MODE_SDL2ACCEL:
-			renderer_sdl2::exit();
+			renderer_sdl1::exit();
 			break;
 		case VIDEO_MODE_SOFT:
 			renderer_sdl1::exit();
@@ -914,7 +900,6 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	 *
 	 */
 	osd_printf_verbose("Enter sdl_info::create\n");
-
 	if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
 	{
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
