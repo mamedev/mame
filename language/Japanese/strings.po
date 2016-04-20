@@ -754,7 +754,7 @@ msgstr "チート"
 
 #: src/emu/ui/mainmenu.cpp:135
 msgid "Plugin Options"
-msgstr ""
+msgstr "プラグイン設定"
 
 #: src/emu/ui/mainmenu.cpp:139
 msgid "External DAT View"
@@ -892,15 +892,15 @@ msgstr "%s.txtをuiフォルダーに保存しました。"
 
 #: src/emu/ui/miscmenu.cpp:677
 msgid "Export list in XML format (like -listxml)"
-msgstr ""
+msgstr "XML形式でリストを出力（-listxml同様）"
 
 #: src/emu/ui/miscmenu.cpp:678
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr ""
+msgstr "XML形式でリストを出力（-listxml同様、デバイスを除く）"
 
 #: src/emu/ui/miscmenu.cpp:679
 msgid "Export list in TXT format (like -listfull)"
-msgstr ""
+msgstr "TXT形式でリストを出力（-listfull同様）"
 
 #: src/emu/ui/miscmenu.cpp:729 src/emu/ui/optsmenu.cpp:376
 msgid ""
@@ -918,7 +918,7 @@ msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:776
 msgid "Driver"
-msgstr ""
+msgstr "ドライバ"
 
 #: src/emu/ui/miscmenu.cpp:790
 msgid "Save machine configuration"
@@ -926,7 +926,7 @@ msgstr "マシン設定を保存する"
 
 #: src/emu/ui/miscmenu.cpp:806
 msgid "Configure machine:"
-msgstr ""
+msgstr "マシン設定"
 
 #: src/emu/ui/miscmenu.cpp:868 src/emu/ui/selsoft.cpp:109
 msgid " (default)"
@@ -1026,6 +1026,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"選択したマシンに必要な1つ以上のROMまたはCHDが不足しています。"
+"別のマシンを選択してください。\n"
+"\n"
+"進めるには、何かキーを押してください。"
 
 #: src/emu/ui/selgame.cpp:595 src/emu/ui/simpleselgame.cpp:265
 msgid "Configure Options"
@@ -1304,11 +1308,15 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"選択したソフトウェアに必要な1つ以上のファイルが不足しています。"
+"別のソフトウェアを選択してください。\n"
+"\n"
+"進めるには、何かキーを押してください。"
 
 #: src/emu/ui/selsoft.cpp:683
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s （ %3$d / %4$d ソフトウェアパッケージ ）"
 
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
