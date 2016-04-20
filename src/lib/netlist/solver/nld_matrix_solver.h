@@ -76,13 +76,14 @@ public:
 	typedef pvector_t<matrix_solver_t *> list_t;
 	typedef core_device_t::list_t dev_list_t;
 
-	enum eSolverType
+	enum eSortType
 	{
-		GAUSSIAN_ELIMINATION,
-		GAUSS_SEIDEL
+		NOSORT,
+		ASCENDING,
+		DESCENDING
 	};
 
-	matrix_solver_t(const eSolverType type, const solver_parameters_t *params);
+	matrix_solver_t(const eSortType sort, const solver_parameters_t *params);
 	virtual ~matrix_solver_t();
 
 	void setup(analog_net_t::list_t &nets) { vsetup(nets); }
@@ -107,7 +108,6 @@ public:
 
 	ATTR_COLD int get_net_idx(net_t *net);
 
-	eSolverType type() const { return m_type; }
 	plog_base<NL_DEBUG> &log() { return netlist().log(); }
 
 	virtual void log_stats();
@@ -165,7 +165,7 @@ private:
 
 	void update_inputs();
 
-	const eSolverType m_type;
+	const eSortType m_sort;
 };
 
 template <typename T>

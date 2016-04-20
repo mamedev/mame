@@ -224,7 +224,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 	UINT32 physofs, logofs;
 
 	/* allocate memory for the CD-ROM file */
-	file = new cdrom_file();
+	file = new (std::nothrow) cdrom_file();
 	if (file == nullptr)
 		return nullptr;
 
@@ -331,7 +331,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 		return nullptr;
 
 	/* allocate memory for the CD-ROM file */
-	file = new cdrom_file();
+	file = new (std::nothrow) cdrom_file();
 	if (file == nullptr)
 		return nullptr;
 
@@ -1222,7 +1222,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 	if (toc->numtrks > 0)
 		return CHDERR_NONE;
 
-	printf("toc->numtrks = %d?!\n", toc->numtrks);
+	printf("toc->numtrks = %u?!\n", toc->numtrks);
 
 	/* look for old-style metadata */
 	dynamic_buffer oldmetadata;

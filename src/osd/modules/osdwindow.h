@@ -112,12 +112,13 @@ public:
 	osd_window()
 	:
 #ifndef OSD_SDL
-		m_hwnd(0), m_dc(0), m_focus_hwnd(0), m_resize_state(0),
+		m_dc(0), m_resize_state(0),
 #endif
 		m_primlist(nullptr),
 		m_index(0),
 		m_main(nullptr),
-		m_prescale(1)
+		m_prescale(1),
+		m_platform_window(nullptr)
 		{}
 	virtual ~osd_window() { }
 
@@ -142,19 +143,30 @@ public:
 
 	virtual osd_monitor_info *monitor() const = 0;
 
-#ifdef OSD_SDL
-	virtual SDL_Window *sdl_window() = 0;
-#else
+	template <class TWindow>
+	TWindow platform_window() const { return static_cast<TWindow>(m_platform_window); }
+
+	void set_platform_window(void *window)
+	{
+		assert(window == nullptr || m_platform_window == nullptr);
+		m_platform_window = window;
+	}
+
+	// Clips the pointer to the bounds of this window
+	virtual void capture_pointer() = 0;
+
+	// Releases the pointer from a previously captured state
+	virtual void release_pointer() = 0;
+
+	virtual void show_pointer() = 0;
+	virtual void hide_pointer() = 0;
+
+#ifndef OSD_SDL
 	virtual bool win_has_menu() = 0;
 	// FIXME: cann we replace winwindow_video_window_monitor(NULL) with monitor() ?
 	virtual osd_monitor_info *winwindow_video_window_monitor(const osd_rect *proposed) = 0;
 
-	// window handle and info
-	HWND                    m_hwnd;
 	HDC                     m_dc;       // only used by GDI renderer!
-	// FIXME: this is the same as win_window_list->m_hwnd, i.e. first window.
-	// During modularization, this should be passed in differently
-	HWND                    m_focus_hwnd;
 
 	int                     m_resize_state;
 #endif
@@ -165,6 +177,8 @@ public:
 	osd_window              *m_main;
 protected:
 	int                     m_prescale;
+private:
+	void                    *m_platform_window;
 };
 
 class osd_renderer
@@ -197,6 +211,7 @@ public:
 	virtual int create() = 0;
 	virtual render_primitive_list *get_primitives() = 0;
 
+	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) { }
 	virtual std::vector<ui_menu_item> get_slider_list() { return m_sliders; }
 	virtual int draw(const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) { return 0; };

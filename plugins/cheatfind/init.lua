@@ -243,8 +243,8 @@ function cheatfind.startplugin()
 		matchsel = 1
 		menu_blocks = {}
 
-		table = cheat.getspaces()
-		for tag, list in pairs(table) do
+		local space_table = cheat.getspaces()
+		for tag, list in pairs(space_table) do
 			if list.program then
 				local ram = {}
 				for num, entry in pairs(list.program.map) do
@@ -257,8 +257,8 @@ function cheatfind.startplugin()
 				end
 			end
 		end
-		table = cheat.getram()
-		for tag, ram in pairs(table) do
+		space_table = cheat.getram()
+		for tag, ram in pairs(space_table) do
 			devtable[#devtable + 1] = { tag = tag, space = ram.dev, ram = {{ offset = 0, size = ram.size }} }
 		end
 	end
@@ -481,12 +481,16 @@ function cheatfind.startplugin()
 					if not _G.ce then
 						manager:machine():popmessage("Cheat engine not available")
 					else
-						ce.inject(cheat)
+						_G.ce.inject(cheat)
 					end
 				else
-
+					local filename = string.format("%s_%08x_cheat.json", emu.romname(), match.addr)
+					local json = require("json")
+					local file = io.open(filename, "w")
+					file:write(json.stringify(cheat))
+					file:close()
+					manager:machine():popmessage("Cheat written to " .. filename)
 				end
-
 			end
 		end
 		devsel = devcur

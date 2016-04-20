@@ -113,28 +113,26 @@ void ui_menu_file_manager::populate()
 	}
 
 	// cycle through all devices for this system
-	device_iterator iter(machine().root_device());
 	std::unordered_set<std::string> devtags;
-	for (device_t *dev = iter.first(); dev != nullptr; dev = iter.next())
+	for (device_t &dev : device_iterator(machine().root_device()))
 	{
 		bool tag_appended = false;
-		if (!devtags.insert(dev->tag()).second)
+		if (!devtags.insert(dev.tag()).second)
 			continue;
 
 		// check whether it owns an image interface
-		image_interface_iterator subiter(*dev);
-		if (subiter.count() > 0)
+		image_interface_iterator subiter(dev);
+		if (subiter.first() != nullptr)
 		{
 			// if so, cycle through all its image interfaces
-			image_interface_iterator subiterator(*dev);
-			for (device_image_interface *scan = subiterator.first(); scan != nullptr; scan = subiterator.next())
+			for (device_image_interface &scan : subiter)
 			{
-                if (!scan->user_loadable())
-                    continue;
-                
+				if (!scan.user_loadable())
+					continue;
+
 				// if it is a children device, and not something further down the device tree, we want it in the menu!
-				if (strcmp(scan->device().owner()->tag(), dev->tag()) == 0)
-					if (devtags.insert(scan->device().tag()).second)
+				if (strcmp(scan.device().owner()->tag(), dev.tag()) == 0)
+					if (devtags.insert(scan.device().tag()).second)
 					{
 						// check whether we already had some devices with the same owner: if not, output the owner tag!
 						if (!tag_appended)
@@ -142,18 +140,18 @@ void ui_menu_file_manager::populate()
 							if (first_entry)
 								first_entry = false;
 							else
-								item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
-							item_append(string_format("[root%s]", dev->tag()).c_str(), nullptr, 0, nullptr);
+								item_append(ui_menu_item_type::SEPARATOR);
+							item_append(string_format("[root%s]", dev.tag()).c_str(), nullptr, 0, nullptr);
 							tag_appended = true;
 						}
 						// finally, append the image interface to the menu
-						fill_image_line(scan, tmp_inst, tmp_name);
-						item_append(tmp_inst.c_str(), tmp_name.c_str(), 0, (void *)scan);
+						fill_image_line(&scan, tmp_inst, tmp_name);
+						item_append(tmp_inst.c_str(), tmp_name.c_str(), 0, (void *)&scan);
 					}
 			}
 		}
 	}
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	item_append("Reset",  nullptr, 0, (void *)1);
 
 	custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;

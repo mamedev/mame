@@ -300,7 +300,8 @@ class xbox_base_state; // forward declaration
 
 class ohci_function_device {
 public:
-	ohci_function_device(running_machine &machine, xbox_base_state *usb_bus_manager);
+	ohci_function_device();
+	virtual void initialize(running_machine &machine, xbox_base_state *usb_bus_manager);
 	virtual void execute_reset();
 	virtual void execute_connect() {};
 	virtual void execute_disconnect() {};
@@ -314,6 +315,8 @@ protected:
 	virtual int handle_synch_frame_request(int endpoint, USBSetupPacket *setup) { return 0; };
 	virtual void handle_status_stage(int endpoint) { return; };
 	virtual int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) { return 0; };
+	virtual int handle_interrupt_pid(int endpoint, int pid, UINT8 *buffer, int size) { return 0; };
+	virtual int handle_isochronous_pid(int endpoint, int pid, UINT8 *buffer, int size) { return 0; };
 
 	void add_device_descriptor(const USBStandardDeviceDescriptor &descriptor);
 	void add_configuration_descriptor(const USBStandardConfigurationDescriptor &descriptor);
@@ -352,17 +355,39 @@ protected:
 	usb_device_configuration *selected_configuration;
 };
 
-class ohci_game_controller_device : public ohci_function_device
+extern const device_type OHCI_GAME_CONTROLLER;
+
+class ohci_game_controller_device : public device_t, public ohci_function_device
 {
 public:
-	ohci_game_controller_device(running_machine &machine, xbox_base_state *usb_bus_manager);
+	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	void initialize(running_machine &machine, xbox_base_state *usb_bus_manager) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+	int handle_interrupt_pid(int endpoint, int pid, UINT8 *buffer, int size) override;
+
+protected:
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
 private:
 	static const USBStandardDeviceDescriptor devdesc;
 	static const USBStandardConfigurationDescriptor condesc;
 	static const USBStandardInterfaceDescriptor intdesc;
 	static const USBStandardEndpointDescriptor enddesc82;
 	static const USBStandardEndpointDescriptor enddesc02;
+	required_ioport m_ThumbstickLh; // left analog thumbstick horizontal movement
+	required_ioport m_ThumbstickLv; // left analog thumbstick vertical movement
+	required_ioport m_ThumbstickRh; // right analog thumbstick horizontal movement
+	required_ioport m_ThumbstickRv; // right analog thumbstick vertical movement
+	required_ioport m_DPad; // pressure sensitive directional pad
+	required_ioport m_TriggerL; // analog trigger
+	required_ioport m_TriggerR; // analog trigger
+	required_ioport m_Buttons; // digital buttons
+	required_ioport m_AGreen; // analog button
+	required_ioport m_BRed; // analog button
+	required_ioport m_XBlue; // analog button
+	required_ioport m_YYellow; // analog button
+	required_ioport m_Black; // analog button
+	required_ioport m_White; // analog button
 };
 
 class xbox_base_state : public driver_device

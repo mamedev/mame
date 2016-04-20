@@ -292,9 +292,8 @@ std::string video_manager::speed_text()
 
 	// display the number of partial updates as well
 	int partials = 0;
-	screen_device_iterator iter(machine().root_device());
-	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
-		partials += screen->partial_updates();
+	for (screen_device &screen : screen_device_iterator(machine().root_device()))
+		partials += screen.partial_updates();
 	if (partials > 1)
 		util::stream_format(str, "\n%d partial updates", partials);
 
@@ -345,14 +344,13 @@ void video_manager::save_active_screen_snapshots()
 	if (m_snap_native)
 	{
 		// write one snapshot per visible screen
-		screen_device_iterator iter(machine().root_device());
-		for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
-			if (machine().render().is_live(*screen))
+		for (screen_device &screen : screen_device_iterator(machine().root_device()))
+			if (machine().render().is_live(screen))
 			{
 				emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 				osd_file::error filerr = open_next(file, "png");
 				if (filerr == osd_file::error::NONE)
-					save_snapshot(screen, file);
+					save_snapshot(&screen, file);
 			}
 	}
 
@@ -699,14 +697,14 @@ bool video_manager::finish_screen_updates()
 	// finish updating the screens
 	screen_device_iterator iter(machine().root_device());
 
-	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
-		screen->update_partial(screen->visible_area().max_y);
+	for (screen_device &screen : iter)
+		screen.update_partial(screen.visible_area().max_y);
 
 	// now add the quads for all the screens
 	bool anything_changed = m_output_changed;
 	m_output_changed = false;
-	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
-		if (screen->update_quads())
+	for (screen_device &screen : iter)
+		if (screen.update_quads())
 			anything_changed = true;
 
 	// draw HUD from LUA callback (if any)
@@ -718,13 +716,13 @@ bool video_manager::finish_screen_updates()
 		record_frame();
 
 		// iterate over screens and update the burnin for the ones that care
-		for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
-			screen->update_burnin();
+		for (screen_device &screen : iter)
+			screen.update_burnin();
 	}
 
 	// draw any crosshairs
-	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
-		machine().crosshair().render(*screen);
+	for (screen_device &screen : iter)
+		machine().crosshair().render(screen);
 
 	return anything_changed;
 }
@@ -1008,10 +1006,9 @@ void video_manager::update_refresh_speed()
 			// find the screen with the shortest frame period (max refresh rate)
 			// note that we first check the token since this can get called before all screens are created
 			attoseconds_t min_frame_period = ATTOSECONDS_PER_SECOND;
-			screen_device_iterator iter(machine().root_device());
-			for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
+			for (screen_device &screen : screen_device_iterator(machine().root_device()))
 			{
-				attoseconds_t period = screen->frame_period().attoseconds();
+				attoseconds_t period = screen.frame_period().attoseconds();
 				if (period != 0)
 					min_frame_period = MIN(min_frame_period, period);
 			}
@@ -1202,19 +1199,18 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension)
 			//printf("check template: %s\n", snapdevname.c_str());
 
 			// verify that there is such a device for this system
-			image_interface_iterator iter(machine().root_device());
-			for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
+			for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 			{
 				// get the device name
-				std::string tempdevname(image->brief_instance_name());
+				std::string tempdevname(image.brief_instance_name());
 				//printf("check device: %s\n", tempdevname.c_str());
 
 				if (snapdevname.compare(tempdevname) == 0)
 				{
 					// verify that such a device has an image mounted
-					if (image->basename() != nullptr)
+					if (image.basename() != nullptr)
 					{
-						std::string filename(image->basename());
+						std::string filename(image.basename());
 
 						// strip extension
 						filename = filename.substr(0, filename.find_last_of('.'));

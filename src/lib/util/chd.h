@@ -522,6 +522,7 @@ private:
 			: m_osd(nullptr)
 			, m_compressor(nullptr)
 			, m_status(WS_READY)
+			, m_hunknum(0)
 			, m_data(nullptr)
 			, m_compressed(nullptr)
 			, m_complen(0)

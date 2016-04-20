@@ -2750,3 +2750,15 @@ if (MACHINES["GENPC"]~=null) then
 		MAME_DIR .. "src/devices/machine/genpc.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/gen_latch.h,MACHINES["GEN_LATCH] = true
+---------------------------------------------------
+
+if (MACHINES["GEN_LATCH"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/gen_latch.cpp",
+		MAME_DIR .. "src/devices/machine/gen_latch.h",
+	}
+end

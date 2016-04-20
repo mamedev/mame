@@ -35,7 +35,7 @@ debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_
 	register_window_class();
 
 	m_wnd = win_create_window_ex_utf8(DEBUG_WINDOW_STYLE_EX, "MAMEDebugWindow", title, DEBUG_WINDOW_STYLE,
-			0, 0, 100, 100, win_window_list->m_hwnd, create_standard_menubar(), GetModuleHandleUni(), this);
+			0, 0, 100, 100, win_window_list->platform_window<HWND>(), create_standard_menubar(), GetModuleHandleUni(), this);
 	if (m_wnd == NULL)
 		return;
 

@@ -200,7 +200,7 @@ render_primitive_list *renderer_d3d9::get_primitives()
 {
 	RECT client;
 
-	GetClientRectExceptMenu(window().m_hwnd, &client, window().fullscreen());
+	GetClientRectExceptMenu(window().platform_window<HWND>(), &client, window().fullscreen());
 	if (rect_width(&client) > 0 && rect_height(&client) > 0)
 	{
 		window().target()->set_bounds(rect_width(&client), rect_height(&client), window().pixel_aspect());
@@ -581,7 +581,7 @@ int renderer_d3d9::initialize()
 	}
 
 	// create the device immediately for the full screen case (defer for window mode)
-	if (window().fullscreen() && device_create(window().m_focus_hwnd))
+	if (window().fullscreen() && device_create(window().m_main->platform_window<HWND>()))
 	{
 		return false;
 	}
@@ -827,7 +827,7 @@ try_again:
 	m_presentation.BackBufferCount               = video_config.triplebuf ? 2 : 1;
 	m_presentation.MultiSampleType               = D3DMULTISAMPLE_NONE;
 	m_presentation.SwapEffect                    = D3DSWAPEFFECT_DISCARD;
-	m_presentation.hDeviceWindow                 = window().m_hwnd;
+	m_presentation.hDeviceWindow                 = window().platform_window<HWND>();
 	m_presentation.Windowed                      = !window().fullscreen() || window().win_has_menu();
 	m_presentation.EnableAutoDepthStencil        = FALSE;
 	m_presentation.AutoDepthStencilFormat        = D3DFMT_D16;
@@ -1200,7 +1200,7 @@ int renderer_d3d9::config_adapter_mode()
 		RECT client;
 
 		// bounds are from the window client rect
-		GetClientRectExceptMenu(window().m_hwnd, &client, window().fullscreen());
+		GetClientRectExceptMenu(window().platform_window<HWND>(), &client, window().fullscreen());
 		m_width = client.right - client.left;
 		m_height = client.bottom - client.top;
 
@@ -1363,7 +1363,7 @@ int renderer_d3d9::update_window_size()
 {
 	// get the current window bounds
 	RECT client;
-	GetClientRectExceptMenu(window().m_hwnd, &client, window().fullscreen());
+	GetClientRectExceptMenu(window().platform_window<HWND>(), &client, window().fullscreen());
 
 	// if we have a device and matching width/height, nothing to do
 	if (m_device != nullptr && rect_width(&client) == m_width && rect_height(&client) == m_height)
@@ -1381,7 +1381,7 @@ int renderer_d3d9::update_window_size()
 	// set the new bounds and create the device again
 	m_width = rect_width(&client);
 	m_height = rect_height(&client);
-	if (device_create(window().m_focus_hwnd))
+	if (window().m_main != nullptr && device_create(window().m_main->platform_window<HWND>()))
 		return FALSE;
 
 	// reset the resize state to normal, and indicate we made a change

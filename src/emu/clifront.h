@@ -14,7 +14,7 @@
 #define __CLIFRONT_H__
 
 #include "emu.h"
-#include "cliopts.h"
+#include "emuopts.h"
 
 // don't include osd_interface in header files
 class osd_interface;
@@ -29,7 +29,7 @@ class cli_frontend
 {
 public:
 	// construction/destruction
-	cli_frontend(cli_options &options, osd_interface &osd);
+	cli_frontend(emu_options &options, osd_interface &osd);
 	~cli_frontend();
 
 	// execute based on the incoming argc/argv
@@ -59,12 +59,12 @@ public:
 private:
 	// internal helpers
 	void execute_commands(const char *exename);
-	void display_help();
+	void display_help(const char *exename);
 	void display_suggestions(const char *gamename);
 	void output_single_softlist(FILE *out, software_list_device &swlist);
 
 	// internal state
-	cli_options &       m_options;
+	emu_options &       m_options;
 	osd_interface &     m_osd;
 	int                 m_result;
 };

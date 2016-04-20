@@ -59,7 +59,7 @@ bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat
 
 void target_manager::destroy_target(std::string name, uint32_t screen)
 {
-	std::string full_name = name + std::to_string(screen);
+	std::string full_name = (screen < 0) ? name : (name + std::to_string(screen));
 	if (m_targets[full_name] != nullptr)
 	{
 		delete m_targets[full_name];

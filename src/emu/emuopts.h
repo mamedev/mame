@@ -229,7 +229,7 @@ public:
 
 	// parsing wrappers
 	bool parse_command_line(int argc, char *argv[], std::string &error_string);
-	void parse_standard_inis(std::string &error_string);
+	void parse_standard_inis(std::string &error_string, const game_driver *driver = nullptr);
 	bool parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name = nullptr, const char *value = nullptr, const software_part *swpart = nullptr);
 
 	// core options

@@ -52,6 +52,7 @@ public:
 private:
 	std::string                 m_name;
 	bgfx::TextureFormat::Enum   m_format;
+	//bool						m_readback;
 
 	bgfx::FrameBufferHandle*    m_targets;
 	bgfx::TextureHandle*        m_textures;

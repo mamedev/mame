@@ -34,7 +34,7 @@ void ui_menu_plugin::populate()
 {
 	for (auto &curplugin : m_plugins)
 		item_append(curplugin.c_str(), 0, 0, (void *)curplugin.c_str());
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 }
 
 ui_menu_plugin::~ui_menu_plugin()
@@ -104,7 +104,7 @@ void ui_menu_plugin_opt::populate()
 
 		item_append(item.text.c_str(), item.subtext.c_str(), flags, (void *)i++);
 	}
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 }
 
 ui_menu_plugin_opt::~ui_menu_plugin_opt()

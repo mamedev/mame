@@ -18,7 +18,6 @@
 #define TMS9901_TAG     "tms9901"
 #define TIBOARD_TAG     "ti_board"
 #define DATAMUX_TAG     "datamux_16_8"
-#define VIDEO_SYSTEM_TAG "video"
 #define SCREEN_TAG      "screen"
 #define TISOUNDCHIP_TAG "soundchip"
 #define TISOUND_TAG     "tisound"
@@ -31,6 +30,8 @@
 #define HANDSET_TAG     "handset"
 #define JOYPORT_TAG     "joyport"
 #define VDP_TAG         "vdp"
+#define EVPC_CONN_TAG   "evpc_conn"
+
 #define DSRROM          "dsrrom"
 #define CONSOLEROM      "consolerom"
 
@@ -136,6 +137,42 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write16) =0;
 	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { };
 };
+
+/****************************************************************************
+    Connector from EVPC
+    We need this for the TI-99/4A console as well as for the SGCPU, so we have
+    to use callbacks
+****************************************************************************/
+class ti99_4x_state;
+
+class evpc_clock_connector;
+
+const device_type EVPC_CONN = &device_creator<evpc_clock_connector>;
+
+class evpc_clock_connector : public device_t
+{
+public:
+	evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, EVPC_CONN, "EVPC clock connector", tag, owner, clock, "ti99_evpc_clock", __FILE__),
+		m_vdpint(*this) { };
+
+	template<class _Object> static devcb_base &static_set_vdpint_callback(device_t &device, _Object object)
+	{
+		return downcast<evpc_clock_connector &>(device).m_vdpint.set_callback(object);
+	}
+
+	WRITE_LINE_MEMBER( vclock_line ) { m_vdpint(state); }
+	void device_start() override { m_vdpint.resolve();  }
+
+private:
+	// VDPINT line to the CPU
+	devcb_write_line m_vdpint;
+};
+
+
+#define MCFG_ADD_EVPC_CONNECTOR( _tag, _vdpint ) \
+	MCFG_DEVICE_ADD(_tag, EVPC_CONN, 0) \
+	devcb = &evpc_clock_connector::static_set_vdpint_callback( *device, DEVCB_##_vdpint );
 
 /****************************************************************************
     Constants

@@ -34,20 +34,20 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 	bool is_selected_driver = core_stricmp(gamedrv.name,options.system_name())==0;
 	// intialize slot devices - make sure that any required devices have been allocated
-	slot_interface_iterator slotiter(root_device());
-	for (device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
+	
+	for (device_slot_interface &slot : slot_interface_iterator(root_device()))
 	{
-		device_t &owner = slot->device();
+		device_t &owner = slot.device();
 		std::string selval;
 		bool isdefault = (options.priority(owner.tag()+1)==OPTION_PRIORITY_DEFAULT);
 		if (is_selected_driver && options.exists(owner.tag()+1))
 			selval = options.main_value(owner.tag()+1);
-		else if (slot->default_option() != nullptr)
-			selval.assign(slot->default_option());
+		else if (slot.default_option() != nullptr)
+			selval.assign(slot.default_option());
 
 		if (!selval.empty())
 		{
-			const device_slot_option *option = slot->option(selval.c_str());
+			const device_slot_option *option = slot.option(selval.c_str());
 
 			if (option && (isdefault || option->selectable()))
 			{
@@ -74,10 +74,9 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	driver_device::static_set_game(*m_root_device, gamedrv);
 
 	// then notify all devices that their configuration is complete
-	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-		if (!device->configured())
-			device->config_complete();
+	for (device_t &device : device_iterator(root_device()))
+		if (!device.configured())
+			device.config_complete();
 }
 
 
@@ -97,8 +96,7 @@ machine_config::~machine_config()
 
 screen_device *machine_config::first_screen() const
 {
-	screen_device_iterator iter(root_device());
-	return iter.first();
+	return screen_device_iterator(root_device()).first();
 }
 
 
@@ -235,9 +233,8 @@ device_t *machine_config::device_find(device_t *owner, const char *tag)
 void machine_config::remove_references(ATTR_UNUSED device_t &device)
 {
 	// iterate over all devices and remove any references
-	device_iterator iter(root_device());
-	for (device_t *scan = iter.first(); scan != nullptr; scan = iter.next())
-		scan->subdevices().m_tagmap.clear(); //remove(&device);
+	for (device_t &scan : device_iterator(root_device()))
+		scan.subdevices().m_tagmap.clear(); //remove(&device);
 }
 
 

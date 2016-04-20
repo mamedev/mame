@@ -134,18 +134,13 @@ void sdl_monitor_info::refresh()
 
 void sdl_osd_interface::update(bool skip_redraw)
 {
-	sdl_window_info *window;
-
-	if (m_watchdog != NULL)
-		m_watchdog->reset();
-
-	update_slider_list();
+	osd_common_t::update(skip_redraw);
 
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
-		for (window = sdl_window_list; window != NULL; window = window->m_next)
+		for (sdl_window_info *window = sdl_window_list; window != NULL; window = window->m_next)
 			window->update();
 //      profiler_mark(PROFILER_END);
 	}
@@ -319,6 +314,9 @@ static void check_osd_inputs(running_machine &machine)
 
 	if (machine.ui_input().pressed(IPT_OSD_7))
 		window->modify_prescale(1);
+
+	if (machine.ui_input().pressed(IPT_OSD_8))
+		window->renderer().record();
 }
 
 //============================================================

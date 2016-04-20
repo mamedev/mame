@@ -283,7 +283,7 @@ void ui_menu_file_create::populate()
 	}
 
 	// finish up the menu
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	item_append(_("Create"), nullptr, 0, ITEMREF_CREATE);
 
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -809,7 +809,7 @@ void ui_menu_select_format::populate()
 		const floppy_image_format_t *fmt = m_formats[i];
 
 		if (i && i == m_ext_match)
-			item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+			item_append(ui_menu_item_type::SEPARATOR);
 		item_append(fmt->description(), fmt->name(), 0, (void *)(FPTR)i);
 	}
 }

@@ -27,7 +27,9 @@ shadow_mask_usize       0.0 to 1.0      The size of one shadow mask tile in U/V 
 shadow_mask_vsize       0.0 to 1.0      The shadow mask textures always has a size of power-of-two.
 shadow_mask_voffset    -1.0 to 1.0      The offset of the shadow mask texture in U/V coordinates.
 shadow_mask_voffset    -1.0 to 1.0      An offset of 1.0 repressents one pixel on screen.
-curvature               0.0 to 1.0      Curvature amount of the screen.
+distortion             -1.0 to 1.0      Distortion amount of the screen.
+cubic_distortion       -1.0 to 1.0      Cubic Distortion amount of the screen.
+distort_corner          0.0 to 1.0      Distorted corners amount of the screen.
 round_corner            0.0 to 1.0      Rounded corners amount of the screen.
 smooth_border           0.0 to 1.0      Smooth borders amount of the screen.
 reflection              0.0 to 1.0      Refelection amount of the screen highlight.

@@ -3110,6 +3110,88 @@ static INPUT_PORTS_START( wofch )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pokonyan )
+	PORT_INCLUDE( cps1_3b )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 /*
 A Final Fight board with mismatched USA and Japan GFX proves that the columns
 of the 8x8 tilemap alternate between sides of the 16x16 tile resulting
@@ -5033,6 +5115,7 @@ ROM_START( ffightj1 )
 	ROM_LOAD( "s222b.1a",     0x0000, 0x0117, CRC(6d86b45e) SHA1(2b27646adaf1ca2f58e14754d6f7ef4fdca77fbe) )
 	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
 ROM_END
+
 
 /* B-Board 88622B-3 */
 ROM_START( ffightj2 )
@@ -11577,6 +11660,56 @@ ROM_START( ganbare )
 	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
+
+ROM_START( pokonyan )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "xmqq-12f.bin", 0x00000, 0x20000, CRC(196297bf) SHA1(4724c4ccb755d3d457f5224d4c4ea860664d3b10) )
+	ROM_LOAD16_BYTE( "xmqq-12h.bin", 0x00001, 0x20000, CRC(2d7ee2e9) SHA1(af9f8c346e36b4bd6284913129782187e242aa3f) )
+	ROM_LOAD16_BYTE( "xmqq-13f.bin", 0x40000, 0x20000, CRC(8f6abf26) SHA1(e9918abc5ca02c8b3f3b5b2410aedc350dc12ec2) )
+	ROM_LOAD16_BYTE( "xmqq-13h.bin", 0x40001, 0x20000, CRC(3fefe432) SHA1(42763c047fd976c9a8fec3a38f2b132b6e2e15a9) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROMX_LOAD( "xmqq-4b.bin",  0x000000, 0x20000, CRC(933ab76d) SHA1(a51536b0ad89e08356cbb500c60099bd2a192a76) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-4a.bin",  0x000001, 0x20000, CRC(b098e7a9) SHA1(c848ddc0e6559dac6ca23d29c12bc65ea19b7dc4) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-9b.bin",  0x000002, 0x20000, CRC(b66d62d4) SHA1(1be1b89aa24382b4a3d4585b22b83f35b2a27333) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-9a.bin",  0x000003, 0x20000, CRC(9c23e40b) SHA1(9b5de73c4c6679a53871a45743a60c7cdefc8aaa) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-5e.bin",  0x000004, 0x20000, CRC(63d06d6f) SHA1(364d81aafa4d97e8d709e13b481585f655924254) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-5c.bin",  0x000005, 0x20000, CRC(e2169bb5) SHA1(2ca3d6eeee27606af0b21c69491c3bfbe1f82ed6) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-8h.bin",  0x000006, 0x20000, CRC(113121f5) SHA1(d5b3c97e70c3f53d4d68ed56d98e84df59f42073) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-8f.bin",  0x000007, 0x20000, CRC(beb00e07) SHA1(ab0264cb98fe9d77c5acff86800273ed4bdf2e1f) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-5b.bin",  0x100000, 0x20000, BAD_DUMP CRC(1849760c) SHA1(81707c50ddab864bb45cf524ffba092b8b212310) , ROM_SKIP(7) ) // issues with one of the address lines
+	ROMX_LOAD( "xmqq-5a.bin",  0x100001, 0x20000, CRC(bd40215e) SHA1(7350e56ecef8e87cf5a4d4f50231fada6fc5356b) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-10b.bin", 0x100002, 0x20000, CRC(9fa773ef) SHA1(4f0cf813cfe7fbdf20403cfab81b1c01907eb62f) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-10a.bin", 0x100003, 0x20000, CRC(638d4bc7) SHA1(fca924ad53ad1d00dc2e70436fd22de81c08115f) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-7e.bin",  0x100004, 0x20000, CRC(72c45858) SHA1(e1ea89568077739b891c95f57c867c02f6c109ff) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-7c.bin",  0x100005, 0x20000, CRC(d91cda18) SHA1(ef40cb78484355be74d2a08fdd870b49263ab57d) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-9h.bin",  0x100006, 0x20000, CRC(3cd8594b) SHA1(a099428d0f0231f91881beee0bd6a80ba2c3d693) , ROM_SKIP(7) )
+	ROMX_LOAD( "xmqq-9f.bin",  0x100007, 0x20000, CRC(1ec10bed) SHA1(139563c41450591b5674d885e3260cb99b206e25) , ROM_SKIP(7) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "xmqq-13b.bin",   0x00000, 0x08000, CRC(4e8b81a8) SHA1(4a837345223c51d668ec7f4d7460871c00f71482) )
+	ROM_CONTINUE(            0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "xmqq-12c.bin",  0x00000, 0x20000, CRC(71ac69ad) SHA1(401fe0294c6b7bc79426ab1922e02a97415cd2ef) )
+	ROM_LOAD( "xmqq-13c.bin",  0x20000, 0x20000, CRC(71e29699) SHA1(8f19a925bbd47ef965c41af233359a1552c7f8b0) )
+
+	/*
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+	*/
+
+	/* not sure
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "unknown.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
+	*/
+ROM_END
+
 /* Home 'CPS Changer' Unit - For MESS */
 
 /* B-Board 91635B-2 */
@@ -12193,6 +12326,7 @@ GAME( 1995, megaman,     0,        cps1_12MHz, megaman,  cps_state,   cps1,     
 GAME( 1995, megamana,    megaman,  cps1_12MHz, megaman,  cps_state,   cps1,     ROT0,   "Capcom", "Mega Man: The Power Battle (CPS1, Asia 951006)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, rockmanj,    megaman,  cps1_12MHz, rockmanj, cps_state,   cps1,     ROT0,   "Capcom", "Rockman: The Power Battle (CPS1, Japan 950922)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ganbare,     0,        ganbare,    ganbare,  cps_state,   ganbare,  ROT0,   "Capcom", "Ganbare! Marine Kun (Japan 2K0411)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pokonyan,    0,        cps1_10MHz, pokonyan, cps_state,   cps1,     ROT0,   "Capcom", "Pokonyan (Japan 940322)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2002-10-24 was on the ROM labels, 940322 on the startup screen... take your pick
 
 /* Games released on CPS-1 hardware by Mitchell */
 
@@ -12201,7 +12335,7 @@ GAME( 1995, pang3r1,     pang3,    pang3,      pang3,    cps_state,   pang3,    
 GAME( 1995, pang3j,      pang3,    pang3,      pang3,    cps_state,   pang3,    ROT0,   "Mitchell", "Pang! 3: Kaitou Tachi no Karei na Gogo (Japan 950511)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pang3b,      pang3,    pang3,      pang3b,   cps_state,   pang3b,   ROT0,   "bootleg", "Pang! 3 (bootleg)", MACHINE_SUPPORTS_SAVE )    // 950511 - based on Euro version
 
-/* Home 'CPS Changer' Unit - For MESS */
+/* Home 'CPS Changer' Unit */
 
 CONS( 1994, wofch,  0, 0,     qsound,     wofch,      cps_state, wof,      "Capcom", "Tenchi wo Kurau II: Sekiheki no Tatakai (CPS Changer, Japan 921031)", MACHINE_SUPPORTS_SAVE )
 CONS( 1995, sfzch,  0, 0,     cps1_12MHz, sfzch,      cps_state, cps1,     "Capcom", "Street Fighter Zero (CPS Changer, Japan 951020)", MACHINE_SUPPORTS_SAVE )
@@ -12210,3 +12344,4 @@ CONS( 1995, sfach,  sfzch, 0, cps1_12MHz, sfzch,      cps_state, cps1,     "Capc
 CONS( 1995, sfzbch, sfzch, 0, cps1_12MHz, sfzch,      cps_state, cps1,     "Capcom", "Street Fighter Zero (CPS Changer, Brazil 950727)", MACHINE_SUPPORTS_SAVE )
 
 // Ken Sei Mogura: Street Fighter II - see kenseim.c
+

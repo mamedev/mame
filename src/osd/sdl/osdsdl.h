@@ -3,26 +3,9 @@
 #ifndef _osdsdl_h_
 #define _osdsdl_h_
 
-#include "watchdog.h"
-#include "clifront.h"
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
 #include "modules/font/font_module.h"
-
-//============================================================
-//  System dependent defines
-//============================================================
-
-
-#if defined(SDLMAME_WIN32)
-		#define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
-		#define SDLMAME_INIT_IN_WORKER_THREAD   (0)
-		#define SDL13_COMBINE_RESIZE (0) //(1) no longer needed
-#else
-	#define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
-	#define SDLMAME_INIT_IN_WORKER_THREAD   (0)
-	#define SDL13_COMBINE_RESIZE (0)
-#endif
 
 //============================================================
 //  Defines
@@ -169,8 +152,6 @@ private:
 	void extract_video_config();
 
 	sdl_options &m_options;
-
-	watchdog *m_watchdog;
 };
 
 //============================================================

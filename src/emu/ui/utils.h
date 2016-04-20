@@ -159,7 +159,7 @@ struct ui_software_info
 	std::string publisher;
 	UINT8 supported = 0;
 	std::string part;
-	const game_driver *driver;
+	const game_driver *driver = nullptr;
 	std::string listname;
 	std::string interface;
 	std::string instance;

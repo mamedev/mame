@@ -17,6 +17,7 @@
 
 #include "emu.h"
 #include "peribox.h"
+#include "machine/ram.h"
 
 extern const device_type TI99_SAMSMEM;
 
@@ -30,13 +31,15 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
+	machine_config_constructor device_mconfig_additions() const override;
+
 protected:
-	virtual void device_start(void) override;
-	virtual void device_reset(void) override;
-	virtual const rom_entry *device_rom_region(void) const override;
+	void device_start(void) override;
+	void device_reset(void) override;
 
 private:
-	UINT8*  m_ram;
+	// Console RAM
+	required_device<ram_device> m_ram;
 	int     m_mapper[16];
 	bool    m_map_mode;
 	bool    m_access_mapper;

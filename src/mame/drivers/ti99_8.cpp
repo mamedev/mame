@@ -182,7 +182,6 @@ Known Issues (MZ, 2010-11-07)
 #include "imagedev/cassette.h"
 
 #include "bus/ti99x/998board.h"
-#include "bus/ti99x/videowrp.h"
 #include "bus/ti99x/gromport.h"
 #include "bus/ti99x/joyport.h"
 

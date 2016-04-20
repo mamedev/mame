@@ -58,9 +58,8 @@ void ui_menu_image_info::populate()
 	item_append(machine().system().description, nullptr, MENU_FLAG_DISABLE, nullptr);
 	item_append("", nullptr, MENU_FLAG_DISABLE, nullptr);
 
-	image_interface_iterator iter(machine().root_device());
-	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
-			image_info(image);
+	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+		image_info(&image);
 }
 
 void ui_menu_image_info::handle()

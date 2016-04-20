@@ -23,13 +23,13 @@ public:
 	virtual void handle() override;
 
 private:
-	device_slot_option *slot_get_current_option(device_slot_interface *slot);
-	int slot_get_current_index(device_slot_interface *slot);
-	int slot_get_length(device_slot_interface *slot);
-	const char *slot_get_next(device_slot_interface *slot);
-	const char *slot_get_prev(device_slot_interface *slot);
-	const char *slot_get_option(device_slot_interface *slot, int index);
-	void set_slot_device(device_slot_interface *slot, const char *val);
+	device_slot_option *slot_get_current_option(device_slot_interface &slot);
+	int slot_get_current_index(device_slot_interface &slot);
+	int slot_get_length(device_slot_interface &slot);
+	const char *slot_get_next(device_slot_interface &slot);
+	const char *slot_get_prev(device_slot_interface &slot);
+	const char *slot_get_option(device_slot_interface &slot, int index);
+	void set_slot_device(device_slot_interface &slot, const char *val);
 };
 
 #endif  /* __UI_SLOTOPT_H__ */

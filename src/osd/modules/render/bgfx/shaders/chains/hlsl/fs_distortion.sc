@@ -11,12 +11,13 @@ $input v_color0, v_texcoord0
 // Autos
 uniform vec4 u_swap_xy;
 uniform vec4 u_screen_dims;
+uniform vec4 u_target_dims;
 uniform vec4 u_quad_dims;
-uniform vec4 u_rotation_type;
 
 // User-supplied
-uniform vec4 u_prepare_vector;
-uniform vec4 u_curvature;
+uniform vec4 u_distortion;
+uniform vec4 u_cubic_distortion;
+uniform vec4 u_distort_corner;
 uniform vec4 u_round_corner;
 uniform vec4 u_smooth_border;
 uniform vec4 u_vignetting;
@@ -72,36 +73,15 @@ float GetVignetteFactor(vec2 coord, float amount)
 float GetSpotAddend(vec2 coord, float amount)
 {
 	vec2 SpotCoord = coord;
-	
-	// hack for vector screen
-	if (u_prepare_vector.x > 0.0)
-	{
-		// upper right quadrant
-		vec2 spotOffset = vec2(-0.25, 0.25); // 0 degrees
-		if (u_rotation_type.x == 1.0)
-			spotOffset = vec2(-0.25, -0.25); // 90 degrees
-		if (u_rotation_type.x == 2.0)
-			spotOffset = vec2(0.25, -0.25); // 180 degrees
-		if (u_rotation_type.x == 3.0)
-			spotOffset = vec2(0.25, 0.25); // 270 degrees
-		
-		// normalized screen canvas ratio
-		vec2 CanvasRatio = ((u_swap_xy.x > 0.0) ? vec2(u_quad_dims.x / u_quad_dims.y, 1.0) : vec2(1.0, u_quad_dims.y / u_quad_dims.x));
-		
-		SpotCoord += spotOffset;
-		SpotCoord *= CanvasRatio;
-	}
-	else
-	{
-		// upper right quadrant
-		vec2 spotOffset = vec2(-0.25, 0.25);
 
-		// normalized screen canvas ratio
-		vec2 CanvasRatio = ((u_swap_xy.x > 0.0) ? vec2(1.0, u_quad_dims.x / u_quad_dims.y) : vec2(1.0, u_quad_dims.y / u_quad_dims.x));
-		
-		SpotCoord += spotOffset;
-		SpotCoord *= CanvasRatio;
-	}
+	// upper right quadrant
+	vec2 spotOffset = vec2(-0.25, 0.25);
+
+	// normalized screen canvas ratio
+	vec2 CanvasRatio = ((u_swap_xy.x > 0.0) ? vec2(1.0, u_quad_dims.x / u_quad_dims.y) : vec2(1.0, u_quad_dims.y / u_quad_dims.x));
+
+	SpotCoord += spotOffset;
+	SpotCoord *= CanvasRatio;
 
 	float SpotBlur = amount;
 
@@ -122,7 +102,7 @@ float GetRoundCornerFactor(vec2 coord, float radiusAmount, float smoothAmount)
 	// reduce smooth amount down to radius amount
 	smoothAmount = min(smoothAmount, radiusAmount);
 
-	vec2 quadDims = (u_prepare_vector.x > 0.0 && u_swap_xy.x > 0.0) ? u_quad_dims.yx : u_quad_dims.xy;
+	vec2 quadDims = (u_swap_xy.x > 0.0) ? u_quad_dims.yx : u_quad_dims.xy;
 
 	float range = min(quadDims.x, quadDims.y) * 0.5;
 	float radius = range * max(radiusAmount, 0.0025);
@@ -141,20 +121,20 @@ float GetRoundCornerFactor(vec2 coord, float radiusAmount, float smoothAmount)
 }
 
 // www.francois-tarlier.com/blog/cubic-lens-distortion-shader/
-vec2 GetDistortedCoords(vec2 centerCoord, float amount)
+vec2 GetDistortedCoords(vec2 centerCoord, float amount, float amountCube)
 {
 	// lens distortion coefficient
 	float k = amount;
 
 	// cubic distortion value
-	float kcube = amount * 2.0;
+	float kcube = amountCube;
 
 	// compute cubic distortion factor
 	float r2 = centerCoord.x * centerCoord.x + centerCoord.y * centerCoord.y;
 	float f = kcube == 0.0 ? 1.0 + r2 * k : 1.0 + r2 * (k + kcube * sqrt(r2));
 
    	// fit screen bounds
-	f /= 1.0 + amount * 0.5;
+	f /= 1.0 + amount * 0.25 + amountCube * 0.125;
 
 	// apply cubic distortion factor
    	centerCoord *= f;
@@ -162,13 +142,13 @@ vec2 GetDistortedCoords(vec2 centerCoord, float amount)
 	return centerCoord;
 }
 
-vec2 GetCoords(vec2 coord, float distortionAmount)
+vec2 GetCoords(vec2 coord, float distortionAmount, float cubicDistortionAmount)
 {
 	// center coordinates
 	coord -= 0.5;
 
 	// distort coordinates
-	coord = GetDistortedCoords(coord, distortionAmount);
+	coord = GetDistortedCoords(coord, distortionAmount, cubicDistortionAmount);
 
 	// un-center coordinates
 	coord += 0.5;
@@ -180,24 +160,36 @@ vec2 GetCoords(vec2 coord, float distortionAmount)
 
 void main()
 {
+	float distortionAmount = u_distortion.x;
+	float cubicDistortionAmount = u_cubic_distortion.x > 0.0
+		? u_cubic_distortion.x * 1.1  // cubic distortion need to be a little higher to compensate the quartic distortion
+		: u_cubic_distortion.x * 1.2; // negativ values even more
+
+	vec2 TexelDims = vec2(1.0 / u_target_dims.x, 1.0 / u_target_dims.y);
+
 	// Screen Curvature
-	vec2 BaseCoord = GetCoords(v_texcoord0, u_curvature.x * 0.25); // reduced amount
+	vec2 BaseCoord = GetCoords(v_texcoord0, distortionAmount, cubicDistortionAmount);
+
+	// Corner Curvature
+	vec2 CornerCoord = GetCoords(v_texcoord0, u_distort_corner.x, 0.0);
 
 	vec2 BaseCoordCentered = BaseCoord;
 	BaseCoordCentered -= 0.5;
+	vec2 CornerCoordCentered = CornerCoord;
+	CornerCoordCentered -= 0.5;
 
 	// Color
 	vec4 BaseColor = texture2D(s_tex, BaseCoord);
 
 	// Clamp
-	if (BaseCoord.x > 1.0 || BaseCoord.y > 1.0 || BaseCoord.x < 0.0 || BaseCoord.y < 0.0)
+	if (BaseCoord.x > 1.0 + TexelDims.x || BaseCoord.y > 1.0 + TexelDims.y || BaseCoord.x < 0.0 - TexelDims.x || BaseCoord.y < 0.0 - TexelDims.y)
 	{
 		gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
 	}
 	else
 	{
 		// Vignetting Simulation
-		vec2 VignetteCoord = BaseCoordCentered;
+		vec2 VignetteCoord = CornerCoordCentered;
 
 		float VignetteFactor = GetVignetteFactor(VignetteCoord, u_vignetting.x);
 		BaseColor.rgb *= VignetteFactor;
@@ -205,15 +197,15 @@ void main()
 		// Light Reflection Simulation
 		vec4 LightColor = vec4(1.0, 0.90, 0.80, 1.0); // color temperature 5.000 Kelvin
 
-		vec2 SpotCoord = BaseCoordCentered;
-		vec2 NoiseCoord = BaseCoordCentered;
+		vec2 SpotCoord = CornerCoordCentered;
+		vec2 NoiseCoord = CornerCoordCentered;
 
 		float SpotAddend = GetSpotAddend(SpotCoord, u_reflection.x);
 		float NoiseFactor = GetNoiseFactor(SpotAddend, rand(NoiseCoord));
 		BaseColor += SpotAddend * NoiseFactor * LightColor;
 
 		// Round Corners Simulation
-		vec2 RoundCornerCoord = BaseCoordCentered;
+		vec2 RoundCornerCoord = CornerCoordCentered;
 
 		float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, u_round_corner.x, u_smooth_border.x);
 		BaseColor.rgb *= roundCornerFactor;

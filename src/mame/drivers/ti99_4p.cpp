@@ -2,53 +2,126 @@
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
-    SNUG SGCPU (a.k.a. 99/4p) system
+    SNUG Second Generation CPU (SGCPU, aka TI-99/4P)
 
-    This system is a reimplementation of the old ti99/4a console.  It is known
-    both as the 99/4p ("peripheral box", since the system is a card to be
-    inserted in the peripheral box, instead of a self contained console), and
-    as the SGCPU ("Second Generation CPU", which was originally the name used
-    in TI documentation to refer to either (or both) TI99/5 and TI99/8
-    projects).
+    This system is known both as the TI-99/4P ("Peripheral box", since the
+    system is a card to be inserted in the peripheral box, instead of a
+    self-contained console), and as the SGCPU ("Second Generation CPU",
+    which was originally the name used in TI documentation to refer to either
+    (or both) TI-99/5 and TI-99/8 projects).
 
     The SGCPU was designed and built by the SNUG (System 99 Users Group),
     namely by Michael Becker for the hardware part and Harald Glaab for the
     software part.  It has no relationship with TI.
 
-    The card is architectured around a 16-bit bus (vs. an 8-bit bus in every
-    other TI99 system).  It includes 64kb of ROM, including a GPL interpreter,
-    an internal DSR ROM which contains system-specific code, part of the TI
-    extended Basic interpreter, and up to 1Mbyte of RAM.  It still includes a
-    16-bit to 8-bit multiplexer in order to support extension cards designed
-    for TI99/4a, but it can support 16-bit cards, too.  It does not include
-    GROMs, video or sound: instead, it relies on the HSGPL and EVPC cards to
-    do the job.
+    The card is a complete redesign of the original TI-99/4A mainboard to fit
+    on a peripheral card, thus replacing the console. It shows no original
+    circuits on its board; the concept is to cannibalize a TI-99/4A console,
+    moving its main circuits (TMS9900, TMS9901) into the sockets on this board.
 
-    IMPORTANT: The SGCPU card relies on a properly set up HSGPL flash memory
-    card; without, it will immediately lock up. It is impossible to set it up
-    from here (a bootstrap problem; you cannot start without the HSGPL).
-    The best chance is to start a ti99_4ev with a plugged-in HSGPL
-    and go through the setup process there. Copy the nvram files of the hsgpl into this
-    driver's nvram subdirectory. The contents will be directly usable for the SGCPU.
+    The sound chip is not plugged on the SGCPU but on the EVPC card which
+    provides the video processor for SGCPU card (see below).
+
+    The card offers a PC-style keyboard interface which adapts the keyboard
+    to the matrix organisation expected by the operating system of the TI.
+
+    All decoding and further features are implemented by a MACH chip, which
+    appears on many SNUG cards.
+
+    On the card, most circuits are directly accessed by a 16-bit data bus,
+    which ensures a significant speed-up compared to the original console. Only
+    when accessing external devices via the PEB, a databus multiplexer comes into
+    play which is implemented in the same way as the one in the original console,
+    also contained in the MACH.
+
+    The SGCPU offers a special connector at the back, containing the remaining
+    8 data bus lines; by this feature, expansion cards can be connected at
+    full 16 bit width. Only the HRD16 card (not yet emulated), which is a
+    RAMDisk card, actually uses it.
+
+    EPROM layout 64K
+    ----------------
+    The memory region is shifted by 4000 in the EPROM address space
+    According to the designers, this is caused by the next-to most significant
+    address line (2^14) being locked to 1. This is done to allow for smaller
+    24pin EPROM to be used.
+
+       Area        EPROM offset      Mapped at
+       ---------------------------------------
+       ROM0        4000   (0100)     0000
+       DSR         C000   (1100)     4000
+       ROM6A       6000   (0110)     6000
+       ROM6B       E000   (1110)     6000
+
+    System ROM
+    ----------
+    The GPL interpreter is located in the EPROM as ROM0 (see above). The
+    SGCPU does not contain any GROM, which contain the actual TI operating
+    system and the BASIC interpreter. The GROMs are replaced by the HSGPL card.
+
+    ==== CAUTION ====: This means that the HSGPL must be properly set up before
+    starting up the SGCPU. Otherwise, the emulation locks up immediately with a
+    BLACK SCREEN.
+
+    In the real environment, the HSGPL has usually been set up on delivery.
+    In MESS we have to create a suitable HSGPL memory content. Best practice
+    is to start the TI-99/4A console with EVPC support (driver ti99_4ev) with
+    a plugged-in HSGPL and to go through the setup process there.
+    Finally, the nvram files of the HSGPL must be copied into this driver's nvram
+    subdirectory. The contents will be directly usable for the SGCPU.
+
+    RAM: AEMS emulation
+    --------------------
+    The Asgard Expanded Memory System is a peripheral card whose successor
+    (Super AMS) is available in MESS. The AEMS card is emulated inside the MACH
+    chip of the SGCPU. For more information see samsmem.cpp.
+
+    The first four address lines are used to select one of 16 mapper values with
+    8 bits each. Instead of these first 4 lines, the 8 bits are prepended to
+    the remaining address, yielding a 20 bit address space.
+
+    The mapper values are mapped into the address space at 4000 by setting
+    CRU bit 1E00. Only the even addresses are used, so the first mapper byte is
+    at 4000, the second at 4002, the last one at 401E.
+
+    The mapping mode can be turned on and off by the CRU bit at address 1E02.
+    When turned off, the address is passed through to the RAM circuits.
+
+    Since the only RAM areas on the TI systems are at 2000-3FFF and A000-FFFF,
+    the typical usage is to use the AEMS as a 32K expansion in unmapped mode
+    (the remaining 32K of the address space is decoded earlier, and does not
+    affect the card), and to use it as paged memory in the 2000-3FFF and A000-FFFF
+    areas by setting the mapper appropriately. Mapper registers referring to
+    other memory areas have no effect.
+
+    Video and sound
+    ---------------
+    The SGCPU relies on the EVPC or EVPC2 card to provide video capabilities.
+    This card (rel.1) is emulated in MESS and is based on the v9938 video
+    display processor.
+    In order to route the VDP interrupt to the SGCPU card, the previously
+    unused LCP* line in the Peripheral Expansion Box is used.
+
+    The sound chip requires the video clock, and therefore it is moved from the
+    console to the EVPC card.
+
+    Joystick and cassette
+    ---------------------
+    The card features a 25-pin connector at the back which contains the lines
+    for the joysticks and one cassette input/output. An adapter must be built
+    to be able to use the common cables.
 
     Michael Zapf
-
-    February 2012: Rewritten as class
 
 *****************************************************************************/
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/wave.h"
-#include "sound/dac.h"
-#include "sound/sn76496.h"
 
 #include "machine/tms9901.h"
 #include "imagedev/cassette.h"
-
-#include "bus/ti99x/videowrp.h"
 #include "bus/ti99x/joyport.h"
-
 #include "bus/ti99_peb/peribox.h"
 
 #define TMS9901_TAG "tms9901"
@@ -57,6 +130,9 @@
 #define TRACE_ILLWRITE 0
 #define TRACE_READY 0
 #define TRACE_INT 0
+#define TRACE_ADDRESS 0
+#define TRACE_MEM 0
+#define TRACE_MUX 0
 
 class ti99_4p_state : public driver_device
 {
@@ -65,28 +141,28 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
 		m_tms9901(*this, TMS9901_TAG),
-		m_sound(*this, TISOUNDCHIP_TAG),
-		m_video(*this, VIDEO_SYSTEM_TAG),
 		m_cassette(*this, "cassette"),
 		m_peribox(*this, PERIBOX_TAG),
 		m_joyport(*this, JOYPORT_TAG)   { }
 
-	DECLARE_WRITE_LINE_MEMBER( console_ready );
-	DECLARE_WRITE_LINE_MEMBER( console_ready_dmux );
-
+	DECLARE_WRITE_LINE_MEMBER( ready_line );
 	DECLARE_WRITE_LINE_MEMBER( extint );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
 	DECLARE_READ8_MEMBER( interrupt_level );
+
+	DECLARE_SETOFFSET_MEMBER( setoffset );
 	DECLARE_READ16_MEMBER( memread );
 	DECLARE_WRITE16_MEMBER( memwrite );
+	DECLARE_WRITE_LINE_MEMBER( dbin_in );
 
 	DECLARE_READ16_MEMBER( samsmem_read );
 	DECLARE_WRITE16_MEMBER( samsmem_write );
 
 	DECLARE_WRITE8_MEMBER(external_operation);
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
+	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
-	void    clock_in(int clock);
+	void    datamux_clock_in(int clock);
 
 	// CRU (Communication Register Unit) handling
 	DECLARE_READ8_MEMBER( cruread );
@@ -103,27 +179,16 @@ public:
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(ti99_4p);
 
-	DECLARE_WRITE_LINE_MEMBER(set_tms9901_INT2_from_v9938);
+	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
 
 	required_device<tms9900_device>        m_cpu;
 	required_device<tms9901_device>        m_tms9901;
-	required_device<sn76496_base_device>    m_sound;
-	required_device<ti_exp_video_device>    m_video;
 	required_device<cassette_image_device> m_cassette;
 	required_device<peribox_device>        m_peribox;
 	required_device<joyport_device>        m_joyport;
 
 	// Pointer to ROM0
 	UINT16  *m_rom0;
-
-	// Pointer to DSR ROM
-	UINT16  *m_dsr;
-
-	// Pointer to ROM6, first bank
-	UINT16  *m_rom6a;
-
-	// Pointer to ROM6, second bank
-	UINT16  *m_rom6b;
 
 	// AMS RAM (1 Mib)
 	std::vector<UINT16> m_ram;
@@ -134,12 +199,14 @@ public:
 	// First joystick. 6 for TI-99/4A
 	int     m_firstjoy;
 
-	// READY line
-	int     m_ready_line, m_ready_line_dmux;
-
 private:
-	DECLARE_READ16_MEMBER( datamux_read );
-	DECLARE_WRITE16_MEMBER( datamux_write );
+
+	int decode_address(int address);
+	DECLARE_READ16_MEMBER( debugger_read );
+	DECLARE_WRITE16_MEMBER( debugger_write );
+
+	void ready_join();
+
 	void    set_keyboard_column(int number, int data);
 
 	int     m_keyboard_column;
@@ -163,12 +230,45 @@ private:
 	// TRUE when mapper registers are accessible
 	bool m_access_mapper;
 
+	// Value on address bus (after being set by setaddress)
+	int m_addr_buf;
+
+	// Address decoding result
+	int m_decode;
+
+	// Ready state of the databus multiplexer
+	bool m_muxready;
+
+	// Incoming Ready level
+	line_state m_sysready;
+
+	// Saves a pointer to the address space
+	address_space* m_spacep;
+
+	// Internal DSR mapped in
+	bool m_internal_dsr_active;
+
+	// Mapper visible in 4000 area
+	bool m_mapper_active;
+
+	// ROM6 visible in 6000
+	bool m_rom6_active;
+
+	// Upper bank of ROM6 selected
+	bool m_rom6_upper;
+
+	// State of the DBIN line
+	line_state m_dbin;
+
 	UINT8   m_lowbyte;
 	UINT8   m_highbyte;
 	UINT8   m_latch;
 
 	// Mapper registers
 	UINT8 m_mapper[16];
+
+	// Pointer to EPROM
+	UINT16 *m_rom;
 
 	// Latch for 9901 INT2, INT1 lines
 	int     m_9901_int;
@@ -178,8 +278,16 @@ private:
 
 };
 
+enum
+{
+	ROM0BASE = 0x4000,
+	DSRBASE = 0xc000,
+	ROM6LBASE = 0x6000,
+	ROM6UBASE = 0xe000
+};
+
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4p_state)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE( memread, memwrite )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE( memread, memwrite ) AM_SETOFFSET( setoffset )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4p_state)
@@ -267,224 +375,307 @@ static INPUT_PORTS_START(ti99_4p)
 
 INPUT_PORTS_END
 
+enum
+{
+	SGCPU_NONE = 0,
+	SGCPU_SYSROM,
+	SGCPU_RAM,
+	SGCPU_INTDSR,
+	SGCPU_MAPPER,
+	SGCPU_ROM6,
+	SGCPU_PADRAM,
+	SGCPU_PEB
+};
+
+int ti99_4p_state::decode_address(int address)
+{
+	int dec = SGCPU_NONE;
+	switch (address & 0xe000)
+	{
+	case 0x0000:
+		dec = SGCPU_SYSROM;
+		break;
+	case 0x2000:
+	case 0xa000:
+	case 0xc000:
+	case 0xe000:
+		dec = SGCPU_RAM;
+		break;
+	case 0x4000:
+		if (m_internal_dsr_active) dec = SGCPU_INTDSR;
+		else if (m_mapper_active) dec = SGCPU_MAPPER;
+		break;
+	case 0x6000:
+		if (m_rom6_active) dec = SGCPU_ROM6;
+		break;
+	case 0x8000:
+		if ((m_addr_buf & 0x1c00)==0x0000) dec = SGCPU_PADRAM;
+		break;
+
+	default:
+		break;
+	}
+	return dec;
+}
+
 /*
-    Memory access
+    Called when the memory access starts by setting the address bus. From that
+    point on, we suspend the CPU until all operations are done.
 */
+SETOFFSET_MEMBER( ti99_4p_state::setoffset )
+{
+	m_addr_buf = offset << 1;
+	m_waitcount = 0;
+
+	if (TRACE_ADDRESS) logerror("set address %04x\n", m_addr_buf);
+
+	m_decode = SGCPU_NONE;
+	m_muxready = true;
+	m_spacep = &space;
+
+	m_decode = decode_address(m_addr_buf);
+
+	if (m_decode == SGCPU_NONE)
+	{
+		// not found - pass on to PEB, 8 bit access with wait states as in TI-99/4A console
+		// PEB gets remaining accesses
+		// HSGPL, EVPC, other devices
+		m_decode = SGCPU_PEB;
+		m_waitcount = 5;
+		m_muxready = false;
+		m_peribox->memen_in(ASSERT_LINE);
+		m_peribox->setaddress_dbin(space, m_addr_buf+1, m_dbin);
+	}
+
+	ready_join();
+}
+
 READ16_MEMBER( ti99_4p_state::memread )
 {
-	int addroff = offset << 1;
-	if (m_rom0 == nullptr) return 0;   // premature access
+	int address = 0;
+	UINT8 hbyte = 0;
 
-	UINT16 zone = addroff & 0xe000;
 	UINT16 value = 0;
 
-	if (zone==0x0000)
+	int addr_off8k = m_addr_buf & 0x1fff;
+
+	// If we use the debugger, decode the address now (normally done in setaddress)
+	if (space.debugger_access())
 	{
-		// ROM0
-		value = m_rom0[(addroff & 0x1fff)>>1];
-		return value;
-	}
-	if (zone==0x2000 || zone==0xa000 || zone==0xc000 || zone==0xe000)
-	{
-		value = samsmem_read(space, offset, mem_mask);
-		return value;
+		m_addr_buf = offset << 1;
+		m_decode = decode_address(m_addr_buf);
 	}
 
-	if (zone==0x4000)
+	switch (m_decode)
 	{
-		if (m_internal_dsr)
-		{
-			value = m_dsr[(addroff & 0x1fff)>>1];
-			return value;
-		}
-		else
-		{
-			if (m_access_mapper && ((addroff & 0xffe0)==0x4000))
-			{
-				value = m_mapper[offset & 0x000f]<<8;
-				return value;
-			}
-		}
+	case SGCPU_SYSROM:
+		value = m_rom[(ROM0BASE | addr_off8k) >> 1];
+		break;
+
+	case SGCPU_RAM:
+		// Memory read. The AEMS emulation has two address areas: The memory is at locations
+		// 0x2000-0x3fff and 0xa000-0xffff, and the mapper area is at 0x4000-0x401e
+		// (only even addresses).
+		if (m_map_mode)
+			address = (m_mapper[(m_addr_buf & 0xf000)>>12] << 12) | (m_addr_buf & 0x0fff);
+		else // transparent mode
+			address = m_addr_buf;
+
+		value = m_ram[address>>1];
+		break;
+
+	case SGCPU_INTDSR:
+		value = m_rom[(DSRBASE | addr_off8k)>>1];
+		break;
+
+	case SGCPU_MAPPER:
+		value = (m_mapper[m_addr_buf & 0x000f]<<8) & 0xff00;
+		break;
+
+	case SGCPU_ROM6:
+		value = m_rom[((m_rom6_upper? ROM6UBASE : ROM6LBASE) | addr_off8k)>>1];
+		break;
+	case SGCPU_PADRAM:
+		// Scratch pad RAM (16 bit)
+		// 8000 ... 83ff (1K, 4 times the size of the internal RAM of the TI-99/4A)
+		value = m_scratchpad[(m_addr_buf & 0x03ff)>>1];
+		break;
+
+	case SGCPU_PEB:
+		if (space.debugger_access()) return debugger_read(space, offset);
+		// The byte from the odd address has already been read into the latch
+		// Reading the even address now
+		m_peribox->readz(space, m_addr_buf, &hbyte);
+		m_peribox->memen_in(CLEAR_LINE);
+		if (TRACE_MEM) logerror("Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
+		value = (hbyte<<8) | m_latch;
 	}
 
-	if (zone==0x6000 && m_internal_rom6)
-	{
-		if (m_rom6_bank==0)
-			value = m_rom6a[(addroff & 0x1fff)>>1];
-		else
-			value = m_rom6b[(addroff & 0x1fff)>>1];
-
-		return value;
-	}
-
-	// Scratch pad RAM and sound
-	// speech is in peribox
-	// groms are in hsgpl in peribox
-	if (zone==0x8000)
-	{
-		if ((addroff & 0xfff0)==0x8400) // cannot read from sound
-		{
-			value = 0;
-			return value;
-		}
-		if ((addroff & 0xfc00)==0x8000)
-		{
-			value = m_scratchpad[(addroff & 0x03ff)>>1];
-			return value;
-		}
-		// Video: 8800, 8802
-		if ((addroff & 0xfffd)==0x8800)
-		{
-			value = m_video->read16(space, offset, mem_mask);
-			return value;
-		}
-	}
-
-	// If we are here, check the peribox via the datamux
-	// catch-all for unmapped zones
-	value = datamux_read(space, offset, mem_mask);
 	return value;
 }
 
+
 WRITE16_MEMBER( ti99_4p_state::memwrite )
 {
-//  m_cpu->adjust_icount(-4);
+	int address = 0;
 
-	int addroff = offset << 1;
-	UINT16 zone = addroff & 0xe000;
-
-	if (zone==0x0000)
+	// If we use the debugger, decode the address now (normally done in setaddress)
+	if (space.debugger_access())
 	{
-		// ROM0
-		if (TRACE_ILLWRITE) logerror("Ignoring ROM write access at %04x\n", addroff);
-		return;
+		m_addr_buf = offset << 1;
+		m_decode = decode_address(m_addr_buf);
 	}
 
-	if (zone==0x2000 || zone==0xa000 || zone==0xc000 || zone==0xe000)
+	switch (m_decode)
 	{
-		samsmem_write(space, offset, data, mem_mask);
-		return;
-	}
+	case SGCPU_SYSROM:
+		if (TRACE_ILLWRITE) logerror("Ignoring ROM write access at %04x\n", m_addr_buf);
+		break;
 
-	if (zone==0x4000)
-	{
-		if (m_internal_dsr)
-		{
-			if (TRACE_ILLWRITE) logerror("Ignoring DSR write access at %04x\n", addroff);
-			return;
-		}
-		else
-		{
-			if (m_access_mapper && ((addroff & 0xffe0)==0x4000))
-			{
-				m_mapper[offset & 0x000f] = data;
-				return;
-			}
-		}
-	}
+	case SGCPU_RAM:
+		// see above
+		if (m_map_mode)
+			address = (m_mapper[(m_addr_buf & 0xf000)>>12] << 12) | (m_addr_buf & 0x0fff);
+		else // transparent mode
+			address = m_addr_buf;
 
-	if (zone==0x6000 && m_internal_rom6)
-	{
-		m_rom6_bank = offset & 0x0001;
-		return;
-	}
+		m_ram[address>>1] = data;
+		break;
 
-	// Scratch pad RAM and sound
-	// speech is in peribox
-	// groms are in hsgpl in peribox
-	if (zone==0x8000)
-	{
-		if ((addroff & 0xfff0)==0x8400)     //sound write
-		{
-			m_sound->write(space, 0, (data >> 8) & 0xff);
-			return;
-		}
-		if ((addroff & 0xfc00)==0x8000)
-		{
-			m_scratchpad[(addroff & 0x03ff)>>1] = data;
-			return;
-		}
-		// Video: 8C00, 8C02
-		if ((addroff & 0xfffd)==0x8c00)
-		{
-			m_video->write16(space, offset, data, mem_mask);
-			return;
-		}
-	}
+	case SGCPU_INTDSR:
+		if (TRACE_ILLWRITE) logerror("Ignoring DSR write access at %04x\n", m_addr_buf);
+		break;
 
-	// If we are here, check the peribox via the datamux
-	// catch-all for unmapped zones
-	datamux_write(space, offset, data, mem_mask);
+	case SGCPU_MAPPER:
+		m_mapper[(m_addr_buf>>1) & 0x000f] = data;  // writing both bytes, but only the first is accepted
+		break;
+
+	case SGCPU_ROM6:
+		// Writing to 6002 sets upper bank
+		m_rom6_upper = (m_addr_buf & 0x0002)!=0;
+		break;
+
+	case SGCPU_PADRAM:
+		// Scratch pad RAM (16 bit)
+		// 8000 ... 83ff (1K, 4 times the size of the internal RAM of the TI-99/4A)
+		m_scratchpad[(m_addr_buf & 0x03ff)>>1] = data;
+		break;
+
+	case SGCPU_PEB:
+		if (space.debugger_access()) { debugger_write(space, offset, data); return; }
+
+		// Writing the even address now (addr)
+		// The databus multplexer puts the even value into the latch and outputs the odd value now.
+		m_latch = (data >> 8) & 0xff;
+
+		// write odd byte
+		if (TRACE_MEM) logerror("datamux: write odd byte to address %04x <- %02x\n",  m_addr_buf+1, data & 0xff);
+		m_peribox->write(space, m_addr_buf+1, data & 0xff);
+		m_peribox->memen_in(CLEAR_LINE);
+	}
 }
 
-/***************************************************************************
-    Internal datamux; similar to TI-99/4A. However, here we have just
-    one device, the peripheral box, so it is much simpler.
-***************************************************************************/
+/*
+    Used when the debugger is reading values from PEB cards.
+*/
+READ16_MEMBER( ti99_4p_state::debugger_read )
+{
+	UINT8 lval = 0;
+	UINT8 hval = 0;
+	UINT16 addrb = offset << 1;
+	m_peribox->memen_in(ASSERT_LINE);
+	m_peribox->readz(space, addrb+1, &lval);
+	m_peribox->readz(space, addrb, &hval);
+	m_peribox->memen_in(CLEAR_LINE);
+	return ((hval << 8)&0xff00) | (lval & 0xff);
+}
+
+/*
+    Used when the debugger is writing values to PEB cards.
+*/
+WRITE16_MEMBER( ti99_4p_state::debugger_write )
+{
+	int addrb = offset << 1;
+	m_peribox->memen_in(ASSERT_LINE);
+	m_peribox->write(space, addrb+1, data & 0xff);
+	m_peribox->write(space, addrb,  (data>>8) & 0xff);
+	m_peribox->memen_in(CLEAR_LINE);
+}
+
+/*
+   Data bus in (DBIN) line from the CPU.
+*/
+WRITE_LINE_MEMBER( ti99_4p_state::dbin_line )
+{
+	m_dbin = (line_state)state;
+}
 
 /*
     The datamux is connected to the clock line in order to operate
-    the wait state counter.
+    the wait state counter and to read/write the bytes.
 */
-void ti99_4p_state::clock_in(int clock)
+WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 {
-	if (clock==ASSERT_LINE && m_waitcount!=0)
+	// return immediately if the datamux is currently inactive
+	if (m_waitcount>0)
 	{
-		m_waitcount--;
-		if (m_waitcount==0) console_ready_dmux(ASSERT_LINE);
+		if (TRACE_MUX) logerror("datamux: wait count %d\n", m_waitcount);
+		if (m_sysready==CLEAR_LINE)
+		{
+			if (TRACE_MUX) logerror("datamux: stalled due to external READY=0\n");
+			return;
+		}
+
+		if (m_dbin==ASSERT_LINE)
+		{
+			// Reading
+			if (state==ASSERT_LINE)
+			{   // raising edge
+				if (--m_waitcount==0)
+				{
+					m_muxready = true;
+					ready_join();
+				}
+				if (m_waitcount==2)
+				{
+					// read odd byte
+					m_peribox->readz(*m_spacep, m_addr_buf+1, &m_latch);
+					m_peribox->memen_in(CLEAR_LINE);
+
+					if (TRACE_MEM) logerror("datamux: read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
+
+					// do the setaddress for the even address
+					m_peribox->memen_in(ASSERT_LINE);
+					m_peribox->setaddress_dbin(*m_spacep, m_addr_buf, m_dbin);
+				}
+			}
+		}
+		else    // write access
+		{
+			if (state==ASSERT_LINE)
+			{   // raising edge
+				if (--m_waitcount==0)
+				{
+					m_muxready = true;
+					ready_join();
+				}
+			}
+			else
+			{   // falling edge
+				if (m_waitcount==2)
+				{
+					// do the setaddress for the even address
+					m_peribox->memen_in(ASSERT_LINE);
+					m_peribox->setaddress_dbin(*m_spacep, m_addr_buf, m_dbin);
+
+					// write even byte
+					if (TRACE_MEM) logerror("datamux: write even byte to address %04x <- %02x\n",  m_addr_buf, m_latch);
+					m_peribox->write(*m_spacep,  m_addr_buf, m_latch);
+					m_peribox->memen_in(CLEAR_LINE);
+				}
+			}
+		}
 	}
-}
-
-
-READ16_MEMBER( ti99_4p_state::datamux_read )
-{
-	UINT8 hbyte = 0;
-	UINT16 addroff = (offset << 1);
-
-	m_peribox->memen_in(ASSERT_LINE);
-
-	m_peribox->readz(space, addroff+1, &m_latch, mem_mask);
-	m_lowbyte = m_latch;
-
-	m_peribox->readz(space, addroff, &hbyte, mem_mask);
-	m_highbyte = hbyte;
-
-	m_peribox->memen_in(CLEAR_LINE);
-
-	// use the latch and the currently read byte and put it on the 16bit bus
-//  printf("read  address = %04x, value = %04x, memmask = %4x\n", addroff,  (hbyte<<8) | sgcpu->latch, mem_mask);
-
-	// Insert four wait states and let CPU enter wait state
-	m_waitcount = 6;
-	console_ready_dmux(CLEAR_LINE);
-
-	return (hbyte<<8) | m_latch ;
-}
-
-/*
-    Write access.
-    TODO: use the 16-bit expansion in the box for suitable cards
-*/
-WRITE16_MEMBER( ti99_4p_state::datamux_write )
-{
-	UINT16 addroff = (offset << 1);
-//  printf("write address = %04x, value = %04x, memmask = %4x\n", addroff, data, mem_mask);
-
-	// read more about the datamux in datamux.c
-
-	// Write to the PEB
-	m_peribox->memen_in(ASSERT_LINE);
-
-	m_peribox->write(space, addroff+1, data & 0xff);
-
-	// Write to the PEB
-	m_peribox->write(space, addroff, (data>>8) & 0xff);
-
-	m_peribox->memen_in(CLEAR_LINE);
-
-	// Insert four wait states and let CPU enter wait state
-	m_waitcount = 6;
-	console_ready_dmux(CLEAR_LINE);
 }
 
 /***************************************************************************
@@ -526,46 +717,6 @@ READ8_MEMBER( ti99_4p_state::cruread )
 	UINT8 value = 0;
 	m_peribox->crureadz(space, offset<<4, &value);
 	return value;
-}
-
-/***************************************************************************
-   AMS Memory implementation
-***************************************************************************/
-
-/*
-    Memory read. The SAMS card has two address areas: The memory is at locations
-    0x2000-0x3fff and 0xa000-0xffff, and the mapper area is at 0x4000-0x401e
-    (only even addresses).
-*/
-READ16_MEMBER( ti99_4p_state::samsmem_read )
-{
-	UINT32 address = 0;
-	int addroff = offset << 1;
-
-	// select memory expansion
-	if (m_map_mode)
-		address = (m_mapper[(addroff>>12) & 0x000f] << 12) + (addroff & 0x0fff);
-	else // transparent mode
-		address = addroff;
-
-	return m_ram[address>>1];
-}
-
-/*
-    Memory write
-*/
-WRITE16_MEMBER( ti99_4p_state::samsmem_write )
-{
-	UINT32 address = 0;
-	int addroff = offset << 1;
-
-	// select memory expansion
-	if (m_map_mode)
-		address = (m_mapper[(addroff>>12) & 0x000f] << 12) + (addroff & 0x0fff);
-	else // transparent mode
-		address = addroff;
-
-	m_ram[address>>1] = data;
 }
 
 /***************************************************************************
@@ -700,15 +851,11 @@ WRITE_LINE_MEMBER( ti99_4p_state::cassette_output )
 ****************************************************************************/
 
 /*
-    We may have lots of devices pulling down this line; so we should use a AND
-    gate to do it right. On the other hand, when READY is down, there is just
-    no chance to make another device pull down the same line; the CPU just
-    won't access any other device in this time.
+    Combine the external (sysready) and the own (muxready) READY states.
 */
-WRITE_LINE_MEMBER( ti99_4p_state::console_ready )
+void ti99_4p_state::ready_join()
 {
-	m_ready_line = state;
-	int combined = (m_ready_line == ASSERT_LINE && m_ready_line_dmux == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE;
+	int combined = (m_sysready == ASSERT_LINE && m_muxready)? ASSERT_LINE : CLEAR_LINE;
 
 	if (TRACE_READY)
 	{
@@ -719,21 +866,17 @@ WRITE_LINE_MEMBER( ti99_4p_state::console_ready )
 }
 
 /*
-    The exception of the above rule. Memory access over the datamux also operates
-    the READY line, and the datamux raises READY depending on the clock pulse.
-    So we must make sure this does not interfere.
+    Incoming READY line from other cards in the Peripheral Expansion Box.
 */
-WRITE_LINE_MEMBER( ti99_4p_state::console_ready_dmux )
+WRITE_LINE_MEMBER( ti99_4p_state::ready_line )
 {
-	m_ready_line_dmux = state;
-	int combined = (m_ready_line == ASSERT_LINE && m_ready_line_dmux == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE;
-
 	if (TRACE_READY)
 	{
-		if (m_ready_prev != combined) logerror("READY dmux level = %d\n", state);
+		if (state != m_sysready) logerror("READY line from PBox = %d\n", state);
 	}
-	m_ready_prev = combined;
-	m_cpu->set_ready(combined);
+	m_sysready = (line_state)state;
+	// Also propagate to CPU via driver
+	ready_join();
 }
 
 void ti99_4p_state::set_9901_int( int line, line_state state)
@@ -760,7 +903,8 @@ WRITE_LINE_MEMBER( ti99_4p_state::notconnected )
 */
 WRITE_LINE_MEMBER( ti99_4p_state::clock_out )
 {
-	clock_in(state);
+	datamux_clock_in(state);
+	m_peribox->clock_in(state);
 }
 
 WRITE8_MEMBER( ti99_4p_state::tms9901_interrupt )
@@ -781,7 +925,7 @@ READ8_MEMBER( ti99_4p_state::interrupt_level )
 WRITE8_MEMBER( ti99_4p_state::external_operation )
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
-	logerror("External operation %s not implemented on the SGCPU board\n", extop[offset]);
+	if (offset != IDLE_OP) logerror("External operation %s not implemented on the SGCPU board\n", extop[offset]);
 }
 
 /*****************************************************************************/
@@ -796,19 +940,16 @@ void ti99_4p_state::machine_start()
 
 	m_firstjoy = 6;
 
-	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
+	m_sysready = ASSERT_LINE;
+	m_muxready = true;
 
-	UINT16 *rom = (UINT16*)(memregion("maincpu")->base());
-	m_rom0  = rom + 0x2000;
-	m_dsr   = rom + 0x6000;
-	m_rom6a = rom + 0x3000;
-	m_rom6b = rom + 0x7000;
+	m_rom = (UINT16*)(memregion("maincpu")->base());
 }
 
 /*
     set the state of int2 (called by the v9938)
 */
-WRITE_LINE_MEMBER(ti99_4p_state::set_tms9901_INT2_from_v9938)
+WRITE_LINE_MEMBER(ti99_4p_state::video_interrupt_in)
 {
 	set_9901_int(2, (line_state)state);
 }
@@ -836,12 +977,7 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4p_state, external_operation) )
 	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti99_4p_state, interrupt_level) )
 	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(ti99_4p_state, clock_out) )
-
-	/* video hardware */
-	MCFG_DEVICE_ADD(VIDEO_SYSTEM_TAG, V9938VIDEO, 0)
-	MCFG_V9938_ADD(VDP_TAG, SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(ti99_4p_state, set_tms9901_INT2_from_v9938))
-	MCFG_V99X8_SCREEN_ADD_NTSC(SCREEN_TAG, VDP_TAG, XTAL_21_4772MHz)
+	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(ti99_4p_state, dbin_line) )
 
 	// tms9901
 	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
@@ -849,6 +985,7 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_4p_state, keyC0) )
 	MCFG_TMS9901_P3_HANDLER( WRITELINE( ti99_4p_state, keyC1) )
 	MCFG_TMS9901_P4_HANDLER( WRITELINE( ti99_4p_state, keyC2) )
+	MCFG_TMS9901_P5_HANDLER( WRITELINE( ti99_4p_state, alphaW) )
 	MCFG_TMS9901_P6_HANDLER( WRITELINE( ti99_4p_state, cs_motor) )
 	MCFG_TMS9901_P8_HANDLER( WRITELINE( ti99_4p_state, audio_gate) )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4p_state, cassette_output) )
@@ -858,13 +995,10 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_SG, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4p_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4p_state, notconnected) )
-	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_4p_state, console_ready) )
+	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_4p_state, ready_line) )
 
-	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("sound_out")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER( WRITELINE(ti99_4p_state, console_ready) )
+	// The SGCPU actually makes use of this pin which was unused before
+	MCFG_PERIBOX_LCP_HANDLER( WRITELINE(ti99_4p_state, video_interrupt_in) )
 
 	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
@@ -887,4 +1021,4 @@ ROM_START(ti99_4p)
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT    INIT      COMPANY     FULLNAME */
-COMP( 1996, ti99_4p,  0,       0,       ti99_4p_60hz, ti99_4p, driver_device, 0, "System 99 Users Group",       "SGCPU (a.k.a. 99/4P)" , 0 )
+COMP( 1996, ti99_4p,  0,       0,       ti99_4p_60hz, ti99_4p, driver_device, 0, "System-99 User Group",       "SGCPU (aka TI-99/4P)" , 0 )

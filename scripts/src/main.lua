@@ -321,13 +321,6 @@ if (_OPTIONS["SOURCES"] ~= nil) then
 		}
 end
 
-if _OPTIONS["FORCE_VERSION_COMPILE"]=="1" then
-	configuration { "gmake" }
-		dependency {
-			{ ".PHONY", ".FORCE", true },
-			{ "$(OBJDIR)/src/version.o", ".FORCE", true },
-		}
-end
 	configuration { "mingw*" }
 		custombuildtask {
 			{ MAME_DIR .. "src/version.cpp" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc",    {  MAME_DIR .. "scripts/build/verinfo.py" }, {"@echo Emitting " .. rctarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. rctarget .. " $(<) > $(@)" }},

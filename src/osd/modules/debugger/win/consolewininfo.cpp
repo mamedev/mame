@@ -37,13 +37,12 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	{
 		// Add image menu only if image devices exist
 		image_interface_iterator iter(machine().root_device());
-		device_image_interface *img = iter.first();
-		if (img != NULL)
+		if (iter.first() != nullptr)
 		{
 			m_devices_menu = CreatePopupMenu();
-			for ( ; img != NULL; img = iter.next())
+			for (device_image_interface &img : iter)
 			{
-				TCHAR *tc_buf = tstring_from_utf8(string_format("%s : %s", img->device().name(), img->exists() ? img->filename() : "[no image]").c_str());
+				TCHAR *tc_buf = tstring_from_utf8(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]").c_str());
 				if (tc_buf != NULL)
 				{
 					AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf);
@@ -163,32 +162,30 @@ void consolewin_info::update_menu()
 	if (m_devices_menu != NULL)
 	{
 		// create the image menu
-		image_interface_iterator iter(machine().root_device());
-		device_image_interface *img;
-		UINT32 cnt;
-		for (img = iter.first(), cnt = 0; img != NULL; img = iter.next(), cnt++)
+		UINT32 cnt = 0;
+		for (device_image_interface &img : image_interface_iterator(machine().root_device()))
 		{
 			HMENU const devicesubmenu = CreatePopupMenu();
 
 			UINT_PTR const new_item = ID_DEVICE_OPTIONS + (cnt * DEVOPTION_MAX);
 
 			UINT flags_for_exists = MF_ENABLED | MF_STRING;
-			if (!img->exists())
+			if (!img.exists())
 				flags_for_exists |= MF_GRAYED;
 
 			UINT flags_for_writing = flags_for_exists;
-			if (img->is_readonly())
+			if (img.is_readonly())
 				flags_for_writing |= MF_GRAYED;
 
 			AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_OPEN, TEXT("Mount..."));
 
-			//if (img->is_creatable())
+			//if (img.is_creatable())
 				//AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_CREATE, TEXT("Create..."));
 			AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CLOSE, TEXT("Unmount"));
 
-			if (img->device().type() == CASSETTE)
+			if (img.device().type() == CASSETTE)
 			{
-				cassette_state const state = (cassette_state)(img->exists() ? (downcast<cassette_image_device *>(&img->device())->get_state() & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
+				cassette_state const state = (cassette_state)(img.exists() ? (downcast<cassette_image_device *>(&img.device())->get_state() & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
 				AppendMenu(devicesubmenu, MF_SEPARATOR, 0, NULL);
 				AppendMenu(devicesubmenu, flags_for_exists | ((state == CASSETTE_STOPPED) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_STOPPAUSE, TEXT("Pause/Stop"));
 				AppendMenu(devicesubmenu, flags_for_exists | ((state == CASSETTE_PLAY) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_PLAY, TEXT("Play"));
@@ -197,12 +194,14 @@ void consolewin_info::update_menu()
 				AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
 			}
 
-			TCHAR *tc_buf = tstring_from_utf8(string_format("%s :%s", img->device().name(), img->exists() ? img->filename() : "[empty slot]").c_str());
+			TCHAR *tc_buf = tstring_from_utf8(string_format("%s :%s", img.device().name(), img.exists() ? img.filename() : "[empty slot]").c_str());
 			if (tc_buf != NULL)
 			{
 				ModifyMenu(m_devices_menu, cnt, MF_BYPOSITION | MF_POPUP, (UINT_PTR)devicesubmenu, tc_buf);
 				osd_free(tc_buf);
 			}
+
+			cnt++;
 		}
 	}
 }

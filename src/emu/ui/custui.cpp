@@ -9,6 +9,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "ui/custui.h"
 
 #include "ui/ui.h"
@@ -150,7 +151,7 @@ void ui_menu_custom_ui::populate()
 	arrow_flags = get_arrow_flags(0, (int)HIDE_BOTH, ui_globals::panels_status);
 	item_append(_("Show side panels"), _(hide_status[ui_globals::panels_status]), arrow_flags, (void *)(FPTR)HIDE_MENU);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
@@ -357,13 +358,13 @@ void ui_menu_font_ui::populate()
 	arrow_flags = get_arrow_flags(m_font_min, m_font_max, m_font_size);
 	item_append(_("Lines"), string_format("%2d", m_font_size).c_str(), arrow_flags, (void *)(FPTR)FONT_SIZE);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	// add item
 	arrow_flags = get_arrow_flags(m_info_min, m_info_max, m_info_size);
 	item_append(_("Infos text size"), string_format("%3.2f", m_info_size).c_str(), arrow_flags, (void *)(FPTR)INFOS_SIZE);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	custombottom = customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -520,7 +521,7 @@ void ui_menu_colors_ui::populate()
 	item_append(_("Mouse down color"), nullptr, 0, (void *)(FPTR)MUI_MOUSEDOWN_COLOR);
 	item_append(_("Mouse down background color"), nullptr, 0, (void *)(FPTR)MUI_MOUSEDOWN_BG_COLOR);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	item_append(_("Restore originals colors"), nullptr, 0, (void *)(FPTR)MUI_RESTORE);
 
 	custombottom = customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -863,9 +864,9 @@ void ui_menu_rgb_ui::populate()
 	else
 		item_append(_("Blue"), s_text.c_str(), 0, (void *)(FPTR)RGB_BLUE);
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	item_append(_("Choose from palette"), nullptr, 0, (void *)(FPTR)PALETTE_CHOOSE);
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	custombottom = customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -1057,7 +1058,7 @@ void ui_menu_palette_sel::populate()
 	for (int x = 0; x < ARRAY_LENGTH(m_palette); ++x)
 		item_append(_(m_palette[x].name), m_palette[x].argb, MENU_FLAG_UI_PALETTE, (void *)(FPTR)(x + 1));
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 }
 
 //-------------------------------------------------

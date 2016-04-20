@@ -67,12 +67,14 @@ function cheat.startplugin()
 	local output = {}
 	local line = 0
 	local start_time = 0
+	local stop = true
 
 	local function load_cheats()
 		local filename = emu.romname()
 		local json = require("json")
-		local file = emu.file(manager:machine():options().entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat"), 1)
-
+		local newcheats = {}
+		local path = manager:machine():options().entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat")
+		local file = emu.file(path, 1)
 		if emu.softname() ~= "" then
 			for name, image in pairs(manager:machine().images) do
 				if image:exists() and image:software_list_name() ~= "" then
@@ -80,17 +82,27 @@ function cheat.startplugin()
 				end
 			end
 		end
-
-		if file:open(filename .. ".json") then
-			local xml = require("cheat/xml_conv")
-
-			if file:open(filename .. ".xml") then
-				return {}
+		function add(addcheats)
+			if not next(newcheats) then
+				newcheats = addcheats
+			else
+				for num, cheat in pairs(addcheats) do
+					newcheats[#newcheats + 1] = cheat
+				end
 			end
-			return xml.conv_cheat(file:read(file:size()))
 		end
-
-		return json.parse(file:read(file:size()))
+		local ret = file:open(filename .. ".json")
+		while not ret do
+			add(json.parse(file:read(file:size())))
+			ret = file:open_next()
+		end
+		local xml = require("cheat/xml_conv")
+		ret = file:open(filename .. ".xml")
+		while not ret do
+			add(xml.conv_cheat(file:read(file:size())))
+			ret = file:open_next()
+		end
+		return newcheats
 	end
 
 	local function draw_text(screen, x, y, color, form, ...)
@@ -100,7 +112,7 @@ function cheat.startplugin()
 			line = line + 1
 		end
 		if not screen then
-			print("draw_text: invalid screen")
+			emu.print_verbose("draw_text: invalid screen")
 			return
 		end
 		if type(x) == "string" then
@@ -111,7 +123,7 @@ function cheat.startplugin()
 
 	local function draw_line(screen, x1, y1, x2, y2, color)
 		if not screen then
-			print("draw_line: invalid screen")
+			emu.print_verbose("draw_line: invalid screen")
 			return
 		end
 		output[#output + 1] = { type = "line", scr = screen, x1 = x1, x2 = x2, y1 = y1, y2 = y2, color = color }
@@ -119,7 +131,7 @@ function cheat.startplugin()
 
 	local function draw_box(screen, x1, y1, x2, y2, bgcolor, linecolor)
 		if not screen then
-			print("draw_box: invalid screen")
+			emu.print_verbose("draw_box: invalid screen")
 			return
 		end
 		output[#output + 1] = { type = "box", scr = screen, x1 = x1, x2 = x2, y1 = y1, y2 = y2, bgcolor = bgcolor, linecolor = linecolor }
@@ -172,7 +184,7 @@ function cheat.startplugin()
 		for name, script in pairs(cheat.script) do
 			script, err = load(script, cheat.desc .. name, "t", cheat.cheat_env)
 			if not script then
-				print("error loading cheat script: " .. cheat.desc .. " " .. err)
+				emu.print_verbose("error loading cheat script: " .. cheat.desc .. " " .. err)
 				cheat = { desc = cheat.desc .. " error" }
 				return
 			end
@@ -187,7 +199,7 @@ function cheat.startplugin()
 				local cpu, mem
 				cpu = manager:machine().devices[space.tag]
 				if not cpu then
-					print("error loading cheat script: " .. cheat.desc)
+					emu.print_verbose("error loading cheat script: " .. cheat.desc)
 					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
@@ -197,7 +209,7 @@ function cheat.startplugin()
 					mem = cpu.spaces["program"]
 				end
 				if not mem then
-					print("error loading cheat script: " .. cheat.desc)
+					emu.print_verbose("error loading cheat script: " .. cheat.desc)
 					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
@@ -220,7 +232,7 @@ function cheat.startplugin()
 				local mem 
 				mem = manager:machine():memory().regions[region]
 				if not mem then
-					print("error loading cheat script: " .. cheat.desc)
+					emu.print_verbose("error loading cheat script: " .. cheat.desc)
 					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
@@ -232,7 +244,7 @@ function cheat.startplugin()
 				local ram
 				ram = manager:machine().devices[ram]
 				if not ram then
-					print("error loading cheat script: " .. cheat.desc)
+					emu.print_verbose("error loading cheat script: " .. cheat.desc)
 					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
@@ -308,10 +320,41 @@ function cheat.startplugin()
 				end
 			end
 		end
+		menu[#menu + 1] = {"---", "", 0}
+		menu[#menu + 1] = {"Reset All", "", 0}
+		menu[#menu + 1] = {"Reload All", "", 0}
 		return menu
 	end
 
 	local function menu_callback(index, event)
+		manager:machine():popmessage()
+		if index > #cheats and event == "select" then
+			index = index - #cheats
+			if index == 2 then
+				for num, cheat in pairs(cheats) do
+					if cheat.script and cheat.script.off then
+						cheat.script.off()
+					end
+					cheat.enabled = false
+					if cheat.parameter then
+						cheat.parameter.value = cheat.parameter.min
+						cheat.parameter.index = 0
+					end
+				end
+			elseif index == 3 then
+				for num, cheat in pairs(cheats) do 
+					if cheat.script and cheat.script.off then
+						cheat.script.off()
+					end
+				end
+				cheats = load_cheats()
+				for num, cheat in pairs(cheats) do
+					parse_cheat(cheat)
+				end
+			end
+			return true
+		end
+
 		local function param_calc(param)
 			if param.item then
 				if not param.item[param.index] then -- uh oh
@@ -429,6 +472,10 @@ function cheat.startplugin()
 			  end, "Cheat")
 
 	emu.register_start(function()
+		if not stop then
+			return
+		end
+		stop = false
 		start_time = emu.time()
 		cheats = load_cheats()
 		for num, cheat in pairs(cheats) do
@@ -436,7 +483,14 @@ function cheat.startplugin()
 		end
 	end)
 
+	emu.register_stop(function()
+		stop = true
+	end)
+
 	emu.register_frame(function()
+		if stop then
+			return
+		end
 		for num, cheat in pairs(cheats) do
 			if cheat.enabled and cheat.script.run then
 				cheat.script.run()
@@ -445,6 +499,9 @@ function cheat.startplugin()
 	end)
 
 	emu.register_frame_done(function()
+		if stop then
+			return
+		end
 		line = 0
 		for num, draw in pairs(output) do
 			if draw.type == "text" then
@@ -469,6 +526,21 @@ function cheat.startplugin()
 		cheats[#cheats + 1] = newcheat
 		parse_cheat(newcheat)
 		manager:machine():popmessage(newcheat.desc .. " added")
+	end
+
+	function ce.dump(index)
+		cheat = cheats[index]
+		if cheat then
+			for k, v in pairs(cheat.cheat_env) do
+				emu.print_verbose(k, v)
+			end
+		end
+	end
+
+	function ce.list()
+		for num, cheat in pairs(cheats) do
+			emu.print_verbose(num, cheat.desc)
+		end
 	end
 
 	_G.ce = ce

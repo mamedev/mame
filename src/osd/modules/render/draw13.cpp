@@ -60,8 +60,8 @@ static inline bool is_transparent(const float &a)
 //  CONSTRUCTOR & DESTRUCTOR
 //============================================================
 
-renderer_sdl1::renderer_sdl1(osd_window *window, int extra_flags)
-	: osd_renderer(window, extra_flags)
+renderer_sdl2::renderer_sdl2(osd_window *window, int extra_flags)
+	: osd_renderer(window,  FLAG_NEEDS_OPENGL | extra_flags)
 	, m_sdl_renderer(nullptr)
 	, m_blittimer(0)
 	, m_last_hofs(0)
@@ -101,7 +101,7 @@ renderer_sdl1::renderer_sdl1(osd_window *window, int extra_flags)
 #define ENTRY_BM(a,b,f,bm) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, bm, #a, #b, 0, 0, 0, 0}
 #define ENTRY_LR(a,b,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, -1}
 
-const copy_info_t renderer_sdl1::s_blit_info_default[] =
+const copy_info_t renderer_sdl2::s_blit_info_default[] =
 {
 	/* no rotation */
 	ENTRY(ARGB32,           ARGB8888,   argb32_argb32),
@@ -180,8 +180,8 @@ const copy_info_t renderer_sdl1::s_blit_info_default[] =
 { -1 },
 };
 
-copy_info_t* renderer_sdl1::s_blit_info[SDL_TEXFORMAT_LAST+1] = { nullptr };
-bool renderer_sdl1::s_blit_info_initialized = false;
+copy_info_t* renderer_sdl2::s_blit_info[SDL_TEXFORMAT_LAST+1] = { nullptr };
+bool renderer_sdl2::s_blit_info_initialized = false;
 
 //============================================================
 //  INLINES
@@ -266,7 +266,7 @@ void texture_info::render_quad(const render_primitive &prim, const int x, const 
 	//SDL_RenderCopyEx(m_renderer->m_sdl_renderer,  m_texture_id, nullptr, nullptr, 0, nullptr, SDL_FLIP_NONE);
 }
 
-void renderer_sdl1::render_quad(texture_info *texture, const render_primitive &prim, const int x, const int y)
+void renderer_sdl2::render_quad(texture_info *texture, const render_primitive &prim, const int x, const int y)
 {
 	SDL_Rect target_rect;
 
@@ -303,7 +303,7 @@ void renderer_sdl1::render_quad(texture_info *texture, const render_primitive &p
 	}
 }
 
-int renderer_sdl1::RendererSupportsFormat(Uint32 format, Uint32 access, const char *sformat)
+int renderer_sdl2::RendererSupportsFormat(Uint32 format, Uint32 access, const char *sformat)
 {
 	int i;
 	for (i = 0; fmt_support[i].format != 0; i++)
@@ -333,7 +333,7 @@ int renderer_sdl1::RendererSupportsFormat(Uint32 format, Uint32 access, const ch
 //  drawsdl_init
 //============================================================
 
-void renderer_sdl1::add_list(copy_info_t **head, const copy_info_t *element, Uint32 bm)
+void renderer_sdl2::add_list(copy_info_t **head, const copy_info_t *element, Uint32 bm)
 {
 	copy_info_t *newci = global_alloc(copy_info_t);
 	*newci = *element;
@@ -343,7 +343,7 @@ void renderer_sdl1::add_list(copy_info_t **head, const copy_info_t *element, Uin
 	*head = newci;
 }
 
-void renderer_sdl1::expand_copy_info(const copy_info_t *list)
+void renderer_sdl2::expand_copy_info(const copy_info_t *list)
 {
 	for (const copy_info_t *bi = list; bi->src_fmt != -1; bi++)
 	{
@@ -362,7 +362,7 @@ void renderer_sdl1::expand_copy_info(const copy_info_t *list)
 }
 
 // FIXME: machine only used to access options.
-bool renderer_sdl1::init(running_machine &machine)
+void renderer_sdl2::init(running_machine &machine)
 {
 	osd_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
 
@@ -380,8 +380,6 @@ bool renderer_sdl1::init(running_machine &machine)
 		osd_printf_warning("Warning: Unable to load opengl library: %s\n", stemp ? stemp : "<default>");
 	else
 		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
-
-	return false;
 }
 
 
@@ -419,7 +417,7 @@ static void drawsdl_show_info(struct SDL_RendererInfo *render_info)
 }
 
 
-int renderer_sdl1::create()
+int renderer_sdl2::create()
 {
 	// create renderer
 
@@ -437,9 +435,9 @@ int renderer_sdl1::create()
 	}
 
 	if (video_config.waitvsync)
-		m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(window().platform_window<SDL_Window*>(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
-		m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(window().platform_window<SDL_Window*>(), -1, SDL_RENDERER_ACCELERATED);
 
 	if (!m_sdl_renderer)
 	{
@@ -451,7 +449,7 @@ int renderer_sdl1::create()
 	m_blittimer = 3;
 
 	//SDL_RenderPresent(m_sdl_renderer);
-	osd_printf_verbose("Leave renderer_sdl1::create\n");
+	osd_printf_verbose("Leave renderer_sdl2::create\n");
 
 	struct SDL_RendererInfo render_info;
 
@@ -466,7 +464,7 @@ int renderer_sdl1::create()
 //  drawsdl_xy_to_render_target
 //============================================================
 
-int renderer_sdl1::xy_to_render_target(int x, int y, int *xt, int *yt)
+int renderer_sdl2::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
@@ -481,7 +479,7 @@ int renderer_sdl1::xy_to_render_target(int x, int y, int *xt, int *yt)
 //  drawsdl_destroy_all_textures
 //============================================================
 
-void renderer_sdl1::destroy_all_textures()
+void renderer_sdl2::destroy_all_textures()
 {
 	if(window().m_primlist)
 	{
@@ -497,7 +495,7 @@ void renderer_sdl1::destroy_all_textures()
 //  sdl_info::draw
 //============================================================
 
-int renderer_sdl1::draw(int update)
+int renderer_sdl2::draw(int update)
 {
 	texture_info *texture=nullptr;
 	float vofs, hofs;
@@ -612,7 +610,7 @@ copy_info_t *texture_info::compute_size_type()
 	copy_info_t *result = nullptr;
 	int maxperf = 0;
 
-	for (copy_info_t *bi = renderer_sdl1::s_blit_info[m_format]; bi != nullptr; bi = bi->next)
+	for (copy_info_t *bi = renderer_sdl2::s_blit_info[m_format]; bi != nullptr; bi = bi->next)
 	{
 		if ((m_is_rotated == bi->blitter->m_is_rot)
 				&& (m_sdl_blendmode == bi->bm_mask))
@@ -635,7 +633,7 @@ copy_info_t *texture_info::compute_size_type()
 		return result;
 
 	/* try last resort handlers */
-	for (copy_info_t *bi = renderer_sdl1::s_blit_info[m_format]; bi != nullptr; bi = bi->next)
+	for (copy_info_t *bi = renderer_sdl2::s_blit_info[m_format]; bi != nullptr; bi = bi->next)
 	{
 		if ((m_is_rotated == bi->blitter->m_is_rot)
 			&& (m_sdl_blendmode == bi->bm_mask))
@@ -676,7 +674,7 @@ bool texture_info::matches(const render_primitive &prim, const quad_setup_data &
 //  texture_create
 //============================================================
 
-texture_info::texture_info(renderer_sdl1 *renderer, const render_texinfo &texsource, const quad_setup_data &setup, UINT32 flags)
+texture_info::texture_info(renderer_sdl2 *renderer, const render_texinfo &texsource, const quad_setup_data &setup, UINT32 flags)
 {
 	// fill in the core data
 	m_renderer = renderer;
@@ -864,7 +862,7 @@ void quad_setup_data::compute(const render_primitive &prim, const int prescale)
 //  texture_find
 //============================================================
 
-texture_info *renderer_sdl1::texture_find(const render_primitive &prim, const quad_setup_data &setup)
+texture_info *renderer_sdl2::texture_find(const render_primitive &prim, const quad_setup_data &setup)
 {
 	HashT texhash = texture_compute_hash(prim.texture, prim.flags);
 	texture_info *texture;
@@ -901,7 +899,7 @@ texture_info *renderer_sdl1::texture_find(const render_primitive &prim, const qu
 //  exit
 //============================================================
 
-void renderer_sdl1::exit()
+void renderer_sdl2::exit()
 {
 	if (s_blit_info_initialized)
 	{
@@ -927,7 +925,7 @@ void renderer_sdl1::exit()
 //  texture_update
 //============================================================
 
-texture_info * renderer_sdl1::texture_update(const render_primitive &prim)
+texture_info * renderer_sdl2::texture_update(const render_primitive &prim)
 {
 	quad_setup_data setup;
 	texture_info *texture;
@@ -957,7 +955,7 @@ texture_info * renderer_sdl1::texture_update(const render_primitive &prim)
 	return texture;
 }
 
-render_primitive_list *renderer_sdl1::get_primitives()
+render_primitive_list *renderer_sdl2::get_primitives()
 {
 	osd_dim nd = window().get_size();
 	if (nd != m_blit_dim)

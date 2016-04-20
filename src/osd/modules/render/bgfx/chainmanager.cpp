@@ -245,7 +245,7 @@ void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, render_p
         tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
 
     std::string full_name = "screen" + std::to_string(screen);
-    bgfx_texture *texture = new bgfx_texture(full_name, bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem);
+    bgfx_texture *texture = new bgfx_texture(full_name, bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem, BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
     m_textures.add_provider(full_name, texture);
 
     m_targets.update_target_sizes(screen, tex_width, tex_height, TARGET_STYLE_GUEST);
@@ -263,26 +263,12 @@ std::vector<render_primitive*> chain_manager::count_screens(render_primitive* pr
     std::vector<render_primitive*> screens;
 
     int screen_count = 0;
-    std::vector<void*> bases;
     while (prim != nullptr)
     {
         if (PRIMFLAG_GET_SCREENTEX(prim->flags))
         {
-            bool found = false;
-            for (void* base : bases)
-            {
-                if (base == prim->texture.base)
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                screen_count++;
-                screens.push_back(prim);
-                bases.push_back(prim->texture.base);
-            }
+			screen_count++;
+			screens.push_back(prim);
         }
         prim = prim->next();
     }
@@ -373,7 +359,7 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
     item.subtext = "";
     item.flags = 0;
     item.ref = state;
-    item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER;
+    item.type = ui_menu_item_type::SLIDER;
     m_selection_sliders.push_back(item);
 }
 
@@ -435,7 +421,7 @@ std::vector<ui_menu_item> chain_manager::get_slider_list()
         return sliders;
     }
 
-    for (size_t index = 0; index < m_screen_chains.size(); index++)
+    for (size_t index = 0; index < m_screen_chains.size() && index < m_screen_count; index++)
     {
         bgfx_chain* chain = m_screen_chains[index];
 		sliders.push_back(m_selection_sliders[index]);
@@ -455,7 +441,7 @@ std::vector<ui_menu_item> chain_manager::get_slider_list()
             item.subtext = "";
             item.flags = 0;
             item.ref = core_slider;
-            item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SLIDER;
+            item.type = ui_menu_item_type::SLIDER;
             m_selection_sliders.push_back(item);
 
             sliders.push_back(item);
@@ -468,7 +454,7 @@ std::vector<ui_menu_item> chain_manager::get_slider_list()
             item.subtext = "";
             item.flags = 0;
             item.ref = nullptr;
-            item.type = ui_menu_item_type::UI_MENU_ITEM_TYPE_SEPARATOR;
+            item.type = ui_menu_item_type::SEPARATOR;
 
             sliders.push_back(item);
 		}

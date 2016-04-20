@@ -47,6 +47,11 @@ public:
 	void resize(INT32 width, INT32 height);
 	void destroy();
 
+	void capture_pointer() override;
+	void release_pointer() override;
+	void show_pointer() override;
+	void hide_pointer() override;
+
 	void notify_changed();
 
 	osd_dim get_size() override;
@@ -58,18 +63,12 @@ public:
 	int fullscreen() const override { return m_fullscreen; }
 
 	render_target *target() override { return m_target; }
-	SDL_Window *sdl_window() override { return m_sdl_window; }
 
 	int prescale() const { return m_prescale; }
 	osd_renderer &renderer() const { return *m_renderer; }
 
 	// Pointer to next window
 	sdl_window_info *   m_next;
-
-	// These are used in combine resizing events ... #if SDL13_COMBINE_RESIZE
-	int                 m_resize_width;
-	int                 m_resize_height;
-	osd_ticks_t         m_last_resize;
 
 private:
 	// window handle and info
@@ -84,8 +83,6 @@ private:
 	osd_event           m_rendered_event;
 	render_target *     m_target;
 
-	// Needs to be here as well so we can identify window
-	SDL_Window          *m_sdl_window;
 	// Original display_mode
 	SDL_DM_Wrapper	 	*m_original_mode;
 

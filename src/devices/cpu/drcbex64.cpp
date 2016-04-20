@@ -5954,7 +5954,7 @@ void drcbe_x64::op_fmov(x86code *&dst, const instruction &inst)
 	{
 		if (srcp.is_float_register())
 		{
-			emit_movss_p32_r128(dst, dstp, srcp.ireg());                                // movss dstp,srcp
+			emit_movss_p32_r128(dst, dstp, srcp.freg());                                // movss dstp,srcp
 		}
 		else
 		{
@@ -5968,7 +5968,7 @@ void drcbe_x64::op_fmov(x86code *&dst, const instruction &inst)
 	{
 		if (srcp.is_float_register())
 		{
-			emit_movsd_p64_r128(dst, dstp, srcp.ireg());                                // movsd dstp,srcp
+			emit_movsd_p64_r128(dst, dstp, srcp.freg());                                // movsd dstp,srcp
 		}
 		else
 		{

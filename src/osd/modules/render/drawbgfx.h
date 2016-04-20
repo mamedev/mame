@@ -23,35 +23,33 @@ class bgfx_texture;
 class bgfx_effect;
 class bgfx_target;
 class bgfx_chain;
+class osd_options;
+class avi_write;
 
 /* sdl_info is the information about SDL for the current screen */
 class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
-	renderer_bgfx(osd_window *w)
-		: osd_renderer(w, FLAG_NONE)
-		, m_dimensions(0, 0)
-		, m_max_view(0)
-	{
-	}
+	renderer_bgfx(osd_window *w);
 	virtual ~renderer_bgfx();
 
-	static bool init(running_machine &machine) { return false; }
+	static void init(running_machine &machine) { }
 	static void exit();
 
 	virtual int create() override;
     virtual int draw(const int update) override;
 
+	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
     virtual std::vector<ui_menu_item> get_slider_list() override;
     virtual void set_sliders_dirty() override;
 
 #ifdef OSD_SDL
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
-#else
-	virtual void save() override { }
-	virtual void record() override { }
-	virtual void toggle_fsfx() override { }
 #endif
+
+	virtual void save() override { }
+	virtual void record() override;
+	virtual void toggle_fsfx() override { }
 
 	virtual render_primitive_list *get_primitives() override
 	{
@@ -63,13 +61,16 @@ public:
     static const char* WINDOW_PREFIX;
 
 private:
-	void handle_screen_chains(render_primitive *starting_prim);
-	bgfx_chain* screen_chain(int32_t screen);
+    void vertex(ScreenVertex* vertex, float x, float y, float z, uint32_t rgba, float u, float v);
+    void render_avi_quad();
+    void update_recording();
 
-	bool update_dimensions();
-	void setup_view(uint32_t view_index, bool screen);
+    bool update_dimensions();
+
+    void setup_view(uint32_t view_index, bool screen);
 	void init_ui_view();
-	void setup_matrices(uint32_t view_index, bool screen);
+
+    void setup_matrices(uint32_t view_index, bool screen);
 
 	void allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::TransientVertexBuffer *buffer);
 	enum buffer_status
@@ -98,6 +99,8 @@ private:
 	void process_atlas_packs(std::vector<std::vector<rectangle_packer::packed_rectangle>>& packed);
 	UINT32 get_texture_hash(render_primitive *prim);
 
+	osd_options& m_options;
+
 	bgfx_target* m_framebuffer;
 	bgfx_texture* m_texture_cache;
 
@@ -123,6 +126,12 @@ private:
 	uint32_t m_white[16*16];
 	int32_t m_ui_view;
 	uint32_t m_max_view;
+
+	avi_write* m_avi_writer;
+	bgfx_target* m_avi_target;
+    bgfx::TextureHandle m_avi_texture;
+    bitmap_rgb32 m_avi_bitmap;
+	uint8_t* m_avi_data;
 
 	static const uint16_t CACHE_SIZE;
 	static const uint32_t PACKABLE_SIZE;

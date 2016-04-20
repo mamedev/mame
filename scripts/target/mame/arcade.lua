@@ -566,6 +566,7 @@ MACHINES["STEPPERS"] = true
 MACHINES["PCI9050"] = true
 --MACHINES["TMS1024"] = true
 MACHINES["GENPC"] = true
+MACHINES["GEN_LATCH"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1902,6 +1903,7 @@ files {
 	MAME_DIR .. "src/mame/machine/irem_cpu.h",
 	MAME_DIR .. "src/mame/audio/irem.cpp",
 	MAME_DIR .. "src/mame/audio/irem.h",
+  MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "itech")

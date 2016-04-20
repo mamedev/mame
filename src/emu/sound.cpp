@@ -899,19 +899,20 @@ void sound_manager::set_attenuation(int attenuation)
 bool sound_manager::indexed_mixer_input(int index, mixer_input &info) const
 {
 	// scan through the mixers until we find the indexed input
-	mixer_interface_iterator iter(machine().root_device());
-	for (info.mixer = iter.first(); info.mixer != nullptr; info.mixer = iter.next())
+	for (device_mixer_interface &mixer : mixer_interface_iterator(machine().root_device()))
 	{
-		if (index < info.mixer->inputs())
+		if (index < mixer.inputs())
 		{
-			info.stream = info.mixer->input_to_stream_input(index, info.inputnum);
+			info.mixer = &mixer;
+			info.stream = mixer.input_to_stream_input(index, info.inputnum);
 			assert(info.stream != nullptr);
 			return true;
 		}
-		index -= info.mixer->inputs();
+		index -= mixer.inputs();
 	}
 
 	// didn't locate
+	info.mixer = nullptr;
 	return false;
 }
 
@@ -937,9 +938,8 @@ void sound_manager::mute(bool mute, UINT8 reason)
 void sound_manager::reset()
 {
 	// reset all the sound chips
-	sound_interface_iterator iter(machine().root_device());
-	for (device_sound_interface *sound = iter.first(); sound != nullptr; sound = iter.next())
-		sound->device().reset();
+	for (device_sound_interface &sound : sound_interface_iterator(machine().root_device()))
+		sound.device().reset();
 }
 
 
@@ -1039,9 +1039,8 @@ void sound_manager::update(void *ptr, int param)
 
 	// force all the speaker streams to generate the proper number of samples
 	int samples_this_update = 0;
-	speaker_device_iterator iter(machine().root_device());
-	for (speaker_device *speaker = iter.first(); speaker != nullptr; speaker = iter.next())
-		speaker->mix(&m_leftmix[0], &m_rightmix[0], samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
+	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+		speaker.mix(&m_leftmix[0], &m_rightmix[0], samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// now downmix the final result
 	UINT32 finalmix_step = machine().video().speed_factor();
@@ -1075,6 +1074,7 @@ void sound_manager::update(void *ptr, int param)
 	{
 		if (!m_nosound_mode)
 			machine().osd().update_audio_stream(finalmix, finalmix_offset / 2);
+		machine().osd().add_audio_to_recording(finalmix, finalmix_offset / 2);
 		machine().video().add_sound_to_recording(finalmix, finalmix_offset / 2);
 		if (m_wavfile != nullptr)
 			wav_add_data_16(m_wavfile, finalmix, finalmix_offset);

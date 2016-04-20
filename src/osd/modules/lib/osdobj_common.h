@@ -14,6 +14,7 @@
 #define MAME_OSD_LIB_OSDOBJ_COMMON_H
 
 #include "osdepend.h"
+#include "watchdog.h"
 #include "modules/osdmodule.h"
 #include "modules/font/font_module.h"
 #include "modules/input/input_module.h"
@@ -22,7 +23,7 @@
 #include "modules/netdev/netdev_module.h"
 #include "modules/midi/midi_module.h"
 #include "modules/output/output_module.h"
-#include "cliopts.h"
+#include "emuopts.h"
 
 class ui_menu_item;
 
@@ -83,12 +84,13 @@ class ui_menu_item;
 #define OSDOPTION_BGFX_DEBUG            "bgfx_debug"
 #define OSDOPTION_BGFX_SCREEN_CHAINS    "bgfx_screen_chains"
 #define OSDOPTION_BGFX_SHADOW_MASK      "bgfx_shadow_mask"
+#define OSDOPTION_BGFX_AVI_NAME			"bgfx_avi_name"
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-class osd_options : public cli_options
+class osd_options : public emu_options
 {
 public:
 	// construction/destruction
@@ -156,6 +158,7 @@ public:
 	const bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
 	const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
+	const char *bgfx_avi_name() const { return value(OSDOPTION_BGFX_AVI_NAME); }
 
 private:
 	static const options_entry s_option_entries[];
@@ -191,6 +194,7 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
 	// video overridables
+	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
 	virtual std::vector<ui_menu_item> get_slider_list() override;
 
 	// command option overrides
@@ -273,14 +277,15 @@ private:
 	}
 
 protected:
-	sound_module* m_sound;
-	debug_module* m_debugger;
-	midi_module* m_midi;
-	input_module* m_keyboard_input;
-	input_module* m_mouse_input;
-	input_module* m_lightgun_input;
-	input_module* m_joystick_input;
+	sound_module*  m_sound;
+	debug_module*  m_debugger;
+	midi_module*   m_midi;
+	input_module*  m_keyboard_input;
+	input_module*  m_mouse_input;
+	input_module*  m_lightgun_input;
+	input_module*  m_joystick_input;
 	output_module* m_output;
+	std::unique_ptr<osd_watchdog> m_watchdog;
 	std::vector<ui_menu_item> m_sliders;
 
 private:

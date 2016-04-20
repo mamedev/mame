@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  TMS1000 family - TMS1000, TMS1070, TMS1040, TMS1200
+  TMS1000 family - TMS1000, TMS1070, TMS1040, TMS1200, TMS1700, TMS1730
 
 */
 
@@ -23,6 +23,8 @@ const device_type TMS1070 = &device_creator<tms1070_cpu_device>; // high voltage
 const device_type TMS1040 = &device_creator<tms1040_cpu_device>; // same as TMS1070 with just a different pinout?
 const device_type TMS1200 = &device_creator<tms1200_cpu_device>; // 40-pin DIP, 13 R pins
 // TMS1270 has 10 O pins, how does that work?
+const device_type TMS1700 = &device_creator<tms1700_cpu_device>; // 28-pin DIP, RAM/ROM size halved, 9 R pins
+const device_type TMS1730 = &device_creator<tms1730_cpu_device>; // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins(output PLA is still 8-bit, O1,O3,O5 unused)
 
 
 // internal memory maps
@@ -30,8 +32,19 @@ static ADDRESS_MAP_START(program_10bit_8, AS_PROGRAM, 8, tms1k_base_device)
 	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(program_9bit_8, AS_PROGRAM, 8, tms1k_base_device)
+	AM_RANGE(0x000, 0x1ff) AM_MIRROR(0x200) AM_ROM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START(data_64x4, AS_DATA, 8, tms1k_base_device)
 	AM_RANGE(0x00, 0x3f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(data_32x4, AS_DATA, 8, tms1k_base_device)
+	AM_RANGE(0x00, 0x07) AM_MIRROR(0x08) AM_RAM
+	AM_RANGE(0x10, 0x17) AM_MIRROR(0x08) AM_RAM
+	AM_RANGE(0x20, 0x27) AM_MIRROR(0x08) AM_RAM
+	AM_RANGE(0x30, 0x37) AM_MIRROR(0x08) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -54,6 +67,14 @@ tms1040_cpu_device::tms1040_cpu_device(const machine_config &mconfig, const char
 
 tms1200_cpu_device::tms1200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1000_cpu_device(mconfig, TMS1200, "TMS1200", tag, owner, clock, 8, 13, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1200", __FILE__)
+{ }
+
+tms1700_cpu_device::tms1700_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms1000_cpu_device(mconfig, TMS1700, "TMS1700", tag, owner, clock, 8, 9, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_9bit_8), 6, ADDRESS_MAP_NAME(data_32x4), "tms1700", __FILE__)
+{ }
+
+tms1730_cpu_device::tms1730_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms1000_cpu_device(mconfig, TMS1730, "TMS1730", tag, owner, clock, 8, 9, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_9bit_8), 6, ADDRESS_MAP_NAME(data_32x4), "tms1730", __FILE__)
 { }
 
 

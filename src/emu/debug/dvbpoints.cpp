@@ -132,12 +132,11 @@ void debug_view_breakpoints::enumerate_sources()
 	m_source_list.reset();
 
 	// iterate over devices with disassembly interfaces
-	disasm_interface_iterator iter(machine().root_device());
-	for (device_disasm_interface *dasm = iter.first(); dasm != nullptr; dasm = iter.next())
+	for (device_disasm_interface &dasm : disasm_interface_iterator(machine().root_device()))
 	{
 		std::string name;
-		name = string_format("%s '%s'", dasm->device().name(), dasm->device().tag());
-		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
+		name = string_format("%s '%s'", dasm.device().name(), dasm.device().tag());
+		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm.device())));
 	}
 
 	// reset the source to a known good entry

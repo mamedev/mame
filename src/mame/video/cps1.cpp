@@ -1383,7 +1383,17 @@ static const struct gfx_range mapper_KNM10B_table[] =
 	{ 0 }
 };
 
-
+// unknown part number, this could still be incorrect
+#define mapper_pokonyan   { 0x8000, 0x8000, 0x8000, 0 }, mapper_pokonyan_table
+static const struct gfx_range mapper_pokonyan_table[] =
+{
+	/* type            start    end      bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x7fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x7000, 0x7fff, 0 },
+	{ GFXTYPE_SCROLL3, 0x0000, 0x7fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x0000, 0x7fff, 0 },
+	{ 0 }
+};
 
 static const struct CPS1config cps1_config_table[]=
 {
@@ -1502,6 +1512,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"knightsj",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsja",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, this set uses KR22B, still not dumped
 	//{"knightsb",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, knightsb bootleg doesn't use the KR63B PAL
+	{"pokonyan",       CPS_B_21_DEF, mapper_pokonyan, 0x36 },
 	{"sf2ce",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceea",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceua",     CPS_B_21_DEF, mapper_S9263B, 0x36 },

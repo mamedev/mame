@@ -9,7 +9,9 @@
     - how does dual-CPU work?
     - IRQ level/timing is unknown
     - USART is not emulated
-    - V11 CPU should be M68EC060, not yet emulated
+    - V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
+      at twice the frequency due to lack of superscalar.
+    - V11 beeper is too high pitched, obviously related to wrong CPU type too
 
 ******************************************************************************
 
@@ -426,7 +428,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( eagv11, eag )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2) // wrong! should be M68EC060
+	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2*2) // wrong! should be M68EC060 @ 72MHz
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
 MACHINE_CONFIG_END

@@ -20,7 +20,6 @@
 #include "bus/ti99_peb/peribox.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
-#include "bus/ti99x/videowrp.h"
 
 extern const device_type DATAMUX;
 
@@ -56,7 +55,7 @@ protected:
 
 private:
 	// Link to the video processor
-	bus8z_device* m_video;
+	tms9928a_device* m_video;
 
 	// Link to the sound processor
 	sn76496_base_device* m_sound;

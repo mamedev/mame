@@ -2222,15 +2222,13 @@ MACHINE_CONFIG_END
 	MCFG_CPU_PROGRAM_MAP(system1_map) \
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map) \
 	MCFG_CPU_IO_MAP(system1_ppi_io_map) \
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold) \
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
 
 #define ENCRYPTED_SYS1PIO_MAPS \
 	MCFG_CPU_PROGRAM_MAP(system1_map) \
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map) \
 	MCFG_CPU_IO_MAP(system1_pio_io_map) \
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold) \
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
 
 
 static MACHINE_CONFIG_DERIVED( sys1ppix_315_5178, sys1ppi )

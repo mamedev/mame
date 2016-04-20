@@ -81,7 +81,9 @@ public:
 		CU_PHOSPHOR_IGNORE,
 
 		CU_POST_VIGNETTING,
-		CU_POST_CURVATURE,
+		CU_POST_DISTORTION,
+		CU_POST_CUBIC_DISTORTION,
+		CU_POST_DISTORT_CORNER,
 		CU_POST_ROUND_CORNER,
 		CU_POST_SMOOTH_BORDER,
 		CU_POST_REFLECTION,
@@ -197,7 +199,9 @@ struct hlsl_options
 	float                   shadow_mask_v_size;
 	float                   shadow_mask_u_offset;
 	float                   shadow_mask_v_offset;
-	float                   curvature;
+	float                   distortion;
+	float                   cubic_distortion;
+	float                   distort_corner;
 	float                   round_corner;
 	float                   smooth_border;
 	float                   reflection;
@@ -439,6 +443,7 @@ private:
 
 	static slider_desc      s_sliders[];
 	static hlsl_options     last_options;               // last used options
+	static char             last_system_name[16];       // last used system
 };
 
 #endif

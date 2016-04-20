@@ -161,15 +161,24 @@ void ui_menu_game_options::handle()
 				break;
 			case MISC_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
+				{
 					ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, misc_submenu_options));
+					ui_globals::reset = true;
+				}
 				break;
 			case SOUND_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
+				{
 					ui_menu::stack_push(global_alloc_clear<ui_menu_sound_options>(machine(), container));
+					ui_globals::reset = true;
+				}
 				break;
 			case DISPLAY_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
+				{
 					ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, video_submenu_options));
+					ui_globals::reset = true;
+				}
 				break;
 			case CUSTOM_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
@@ -189,7 +198,10 @@ void ui_menu_game_options::handle()
 				break;
 			case ADVANCED_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
+				{
 					ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, advanced_submenu_options));
+					ui_globals::reset = true;
+				}
 				break;
 			case SAVE_CONFIG:
 				if (m_event->iptkey == IPT_UI_SELECT)
@@ -255,7 +267,7 @@ void ui_menu_game_options::populate()
 			item_append(fbuff.c_str(), nullptr, 0, (void *)(FPTR)CUSTOM_FILTER);
 		}
 
-		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+		item_append(ui_menu_item_type::SEPARATOR);
 
 		// add options items
 		item_append(_("Customize UI"), nullptr, 0, (void *)(FPTR)CUSTOM_MENU);
@@ -267,7 +279,7 @@ void ui_menu_game_options::populate()
 	item_append(_(control_submenu_options[0].description), nullptr, 0, (void *)(FPTR)CONTROLLER_MENU);
 	item_append(_("General Inputs"), nullptr, 0, (void *)(FPTR)CGI_MENU);
 	item_append(_(advanced_submenu_options[0].description), nullptr, 0, (void *)(FPTR)ADVANCED_MENU);
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 	item_append(_("Save Configuration"), nullptr, 0, (void *)(FPTR)SAVE_CONFIG);
 
 	custombottom = 2.0f * machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;

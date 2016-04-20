@@ -574,6 +574,7 @@ MACHINES["TMS1024"] = true
 MACHINES["NSC810"] = true
 MACHINES["VT82C496"] = true
 MACHINES["GENPC"] = true
+MACHINES["GEN_LATCH"] = true
 
 --------------------------------------------------
 -- specify available bus cores

@@ -130,7 +130,7 @@ public:
 	}
 	virtual ~renderer_ogl();
 
-	static bool init(running_machine &machine);
+	static void init(running_machine &machine);
 	static void exit();
 
 	virtual int create() override;

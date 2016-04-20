@@ -32,6 +32,8 @@ enum ui_event_type
 	UI_EVENT_MOUSE_LEAVE,
 	UI_EVENT_MOUSE_DOWN,
 	UI_EVENT_MOUSE_UP,
+	UI_EVENT_MOUSE_RDOWN,
+	UI_EVENT_MOUSE_RUP,
 	UI_EVENT_MOUSE_DOUBLE_CLICK,
 	UI_EVENT_MOUSE_WHEEL,
 	UI_EVENT_CHAR
@@ -86,6 +88,8 @@ public:
 	void push_mouse_leave_event(render_target* target);
 	void push_mouse_down_event(render_target* target, INT32 x, INT32 y);
 	void push_mouse_up_event(render_target* target, INT32 x, INT32 y);
+	void push_mouse_rdown_event(render_target* target, INT32 x, INT32 y);
+	void push_mouse_rup_event(render_target* target, INT32 x, INT32 y);
 	void push_mouse_double_click_event(render_target* target, INT32 x, INT32 y);
 	void push_char_event(render_target* target, unicode_char ch);
 	void push_mouse_wheel_event(render_target *target, INT32 x, INT32 y, short delta, int ucNumLines);

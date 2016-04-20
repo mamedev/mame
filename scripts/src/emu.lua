@@ -67,8 +67,6 @@ files {
 	MAME_DIR .. "src/emu/cheat.h",
 	MAME_DIR .. "src/emu/clifront.cpp",
 	MAME_DIR .. "src/emu/clifront.h",
-	MAME_DIR .. "src/emu/cliopts.cpp",
-	MAME_DIR .. "src/emu/cliopts.h",
 	MAME_DIR .. "src/emu/config.cpp",
 	MAME_DIR .. "src/emu/config.h",
 	MAME_DIR .. "src/emu/crsshair.cpp",

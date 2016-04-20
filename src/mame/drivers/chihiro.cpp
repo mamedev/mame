@@ -382,13 +382,19 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #define LOG_PCI
 //#define LOG_BASEBOARD
 
-class ohci_hlean2131qc_device : public ohci_function_device
+extern const device_type OHCI_HLEAN2131QC;
+
+class ohci_hlean2131qc_device : public device_t, public ohci_function_device
 {
 public:
-	ohci_hlean2131qc_device(running_machine &machine, xbox_base_state *usb_bus_manager);
+	ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	void initialize(running_machine &machine, xbox_base_state *usb_bus_manager) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size) override;
 	void set_region_base(UINT8 *data);
+
+protected:
+	virtual void device_start() override;
 private:
 	static const USBStandardDeviceDescriptor devdesc;
 	static const USBStandardConfigurationDescriptor condesc;
@@ -410,11 +416,19 @@ private:
 	UINT8 *region;
 };
 
-class ohci_hlean2131sc_device : public ohci_function_device
+const device_type OHCI_HLEAN2131QC = &device_creator<ohci_hlean2131qc_device>;
+
+extern const device_type OHCI_HLEAN2131SC;
+
+class ohci_hlean2131sc_device : public device_t, public ohci_function_device
 {
 public:
-	ohci_hlean2131sc_device(running_machine &machine, xbox_base_state *usb_bus_manager);
+	ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	void initialize(running_machine &machine, xbox_base_state *usb_bus_manager) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+
+protected:
+	virtual void device_start() override;
 private:
 	static const USBStandardDeviceDescriptor devdesc;
 	static const USBStandardConfigurationDescriptor condesc;
@@ -429,6 +443,8 @@ private:
 	static const UINT8 strdesc1[];
 	static const UINT8 strdesc2[];
 };
+
+const device_type OHCI_HLEAN2131SC = &device_creator<ohci_hlean2131sc_device>;
 
 class chihiro_state : public xbox_base_state
 {
@@ -665,9 +681,17 @@ const UINT8 ohci_hlean2131qc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
 const UINT8 ohci_hlean2131qc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
 const UINT8 ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x03,0xFF,0x0B };
 
-ohci_hlean2131qc_device::ohci_hlean2131qc_device(running_machine &machine, xbox_base_state *usb_bus_manager) :
-	ohci_function_device(machine, usb_bus_manager)
+ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, OHCI_HLEAN2131QC, "OHCI Hlean2131qc", tag, owner, clock, "ohci_hlean2131qc", __FILE__),
+	ohci_function_device()
 {
+	maximum_send = 0;
+	region = nullptr;
+}
+
+void ohci_hlean2131qc_device::initialize(running_machine &machine, xbox_base_state *usb_bus_manager)
+{
+	ohci_function_device::initialize(machine, usb_bus_manager);
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -685,8 +709,6 @@ ohci_hlean2131qc_device::ohci_hlean2131qc_device(running_machine &machine, xbox_
 	add_string_descriptor(strdesc0);
 	add_string_descriptor(strdesc1);
 	add_string_descriptor(strdesc2);
-	maximum_send = 0;
-	region = nullptr;
 }
 
 void ohci_hlean2131qc_device::set_region_base(UINT8 *data)
@@ -756,6 +778,10 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffe
 	return size;
 }
 
+void ohci_hlean2131qc_device::device_start()
+{
+}
+
 //pc20
 const USBStandardDeviceDescriptor ohci_hlean2131sc_device::devdesc = { 0x12,0x01,0x0100,0x60,0x01,0x00,0x40,0x0CA3,0x0003,0x0110,0x01,0x02,0x00,0x01 };
 const USBStandardConfigurationDescriptor ohci_hlean2131sc_device::condesc = { 0x09,0x02,0x003C,0x01,0x01,0x00,0x80,0x96 };
@@ -770,9 +796,15 @@ const UINT8 ohci_hlean2131sc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
 const UINT8 ohci_hlean2131sc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
 const UINT8 ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x00,0x44,0x00 };
 
-ohci_hlean2131sc_device::ohci_hlean2131sc_device(running_machine &machine, xbox_base_state *usb_bus_manager) :
-	ohci_function_device(machine, usb_bus_manager)
+ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, OHCI_HLEAN2131SC, "OHCI Hlean2131sc", tag, owner, clock, "ohci_hlean2131sc", __FILE__),
+	ohci_function_device()
 {
+}
+
+void ohci_hlean2131sc_device::initialize(running_machine &machine, xbox_base_state *usb_bus_manager)
+{
+	ohci_function_device::initialize(machine, usb_bus_manager);
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -797,6 +829,10 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	endpoints[endpoint].position = endpoints[endpoint].buffer;
 	endpoints[endpoint].remain = setup->wLength;
 	return 0;
+}
+
+void ohci_hlean2131sc_device::device_start()
+{
 }
 
 // ======================> ide_baseboard_device
@@ -1069,7 +1105,8 @@ void chihiro_state::machine_start()
 			break;
 		}
 	usbhack_counter = 0;
-	usb_device = new ohci_hlean2131qc_device(machine(), this);
+	usb_device = machine().device<ohci_hlean2131qc_device>("ohci_hlean2131qc");
+	usb_device->initialize(machine(), this);
 	usb_device->set_region_base(memregion(":others")->base()); // temporary
 	//usb_device = new ohci_hlean2131sc_device(machine());
 	usb_ohci_plug(1, usb_device); // connect
@@ -1091,6 +1128,9 @@ static MACHINE_CONFIG_DERIVED_CLASS(chihiro_base, xbox_base, chihiro_state)
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, nullptr, true)
 	MCFG_DEVICE_MODIFY("ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, "bb", true)
+	
+	// next line is temporary
+	MCFG_DEVICE_ADD("ohci_hlean2131qc", OHCI_HLEAN2131QC, 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(chihirogd, chihiro_base)

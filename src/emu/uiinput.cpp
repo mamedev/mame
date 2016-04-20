@@ -298,6 +298,36 @@ void ui_input_manager::push_mouse_up_event(render_target* target, INT32 x, INT32
 }
 
 /*-------------------------------------------------
+push_mouse_down_event - pushes a mouse
+down event to the specified render_target
+-------------------------------------------------*/
+
+void ui_input_manager::push_mouse_rdown_event(render_target* target, INT32 x, INT32 y)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_MOUSE_RDOWN;
+	event.target = target;
+	event.mouse_x = x;
+	event.mouse_y = y;
+	push_event(event);
+}
+
+/*-------------------------------------------------
+push_mouse_down_event - pushes a mouse
+down event to the specified render_target
+-------------------------------------------------*/
+
+void ui_input_manager::push_mouse_rup_event(render_target* target, INT32 x, INT32 y)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_MOUSE_RUP;
+	event.target = target;
+	event.mouse_x = x;
+	event.mouse_y = y;
+	push_event(event);
+}
+
+/*-------------------------------------------------
     push_mouse_double_click_event - pushes
     a mouse double-click event to the specified
     render_target

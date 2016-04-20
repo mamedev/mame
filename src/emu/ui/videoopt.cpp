@@ -190,7 +190,7 @@ void ui_menu_video_options::populate()
 	}
 
 	/* add a separator */
-	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append(ui_menu_item_type::SEPARATOR);
 
 	/* add a rotate item */
 	switch (target->orientation())
