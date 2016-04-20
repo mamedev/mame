@@ -4267,6 +4267,34 @@ ROM_START( espgal )
 	ROM_LOAD( "w04801b032.u17",    0x400000, 0x400000, CRC(60298536) SHA1(6b7333f16cce778c5725dbdf75a5446f0906397a) ) //music-1
 ROM_END
 
+ROM_START( espgalbl ) // this assumes a Dodonpachi 2 Bee Storm cart was used
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	// the program rom in the cartridge actually ends up mapping OVER the motherboard bios rom, you don't get the PGM splash etc.
+	ROM_LOAD16_WORD_SWAP( "espgaluda_u8.bin", 0x000000, 0x400000, CRC(6a92dd52) SHA1(d4b694c88deaeebb7b1c0ddbf29a06380b06426f) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ // leftover from original game
+	ROM_LOAD( "ddp2_igs027a_japan.bin", 0x000000, 0x04000, CRC(742d34d2) SHA1(4491c08f3cefef2933ad5a741f4bb05cc2f3e1a0) )
+
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */ // leftover from original game
+	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
+
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t04801w064.u19",   0x180000, 0x800000, CRC(6021c79e) SHA1(fbc340dafb18aa3094de29b881318a5a9794e4bc) ) //text-1
+
+	ROM_REGION( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a04801w064.u7",    0x0000000, 0x0800000, CRC(26dd4932) SHA1(9bbabb5a53cb5ba88397cc2c258980f3b70314ce) ) //image-1
+	ROM_LOAD( "a04802w064.u8",    0x0800000, 0x0800000, CRC(0e6bf7a9) SHA1(a7541e2b5a0df2bc62a5b347e54dbc2ed1922db2) ) //image-2
+
+	ROM_REGION( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b04801w064.u1",    0x0000000, 0x0800000, CRC(98dce13a) SHA1(61d48b7117459f7babc022b68231f6928177a71d) ) //bitmap-1
+
+	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "w04801b032.u17",    0x400000, 0x400000, CRC(60298536) SHA1(6b7333f16cce778c5725dbdf75a5446f0906397a) ) //music-1
+ROM_END
+
 ROM_START( ddpdoj )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
@@ -4596,8 +4624,7 @@ GAME( 2002, ddpdoja,    ddpdoj,      pgm_arm_type1_cave,    pgm, pgm_arm_type1_s
 GAME( 2002, ddpdojb,    ddpdoj,      pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (2002.04.05 Master Ver)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ddpdojblk,  ddpdoj,      pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (2002.10.07.Black Ver)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
 GAME( 2002, ddpdojblka, ddpdoj,      pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (2002.10.07 Black Ver)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
-
-GAME( 2012, ddpdojblkbl, ddpdoj,     pgm_arm_type1,         pgm, pgm_arm_type1_state,    kovsh,      ROT270,   "bootleg", "DoDonPachi Dai-Ou-Jou (2002.10.07 Black Ver., bootleg Knights of Valour Super Heroes conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V100 12/06/99 13:36:04, ARM: China internal ROM
+GAME( 2012, ddpdojblkbl, ddpdoj,     pgm_arm_type1,         pgm, pgm_arm_type1_state,    kovsh,      ROT270, "bootleg",            "DoDonPachi Dai-Ou-Jou (2002.10.07 Black Ver., bootleg Knights of Valour Super Heroes conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V100 12/06/99 13:36:04, ARM: China internal ROM
 
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
@@ -4606,8 +4633,7 @@ GAME( 2002, ket,          0,         pgm_arm_type1_cave,    pgm, pgm_arm_type1_s
 GAME( 2002, ket1,         ket,       pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ket,       ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.) (alt rom fill)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, keta,         ket,       pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ket,       ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver.)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ketb,         ket,       pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ket,       ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-
-GAME( 2001, ketbl,        ket,       pgm_arm_type2,         pgm, pgm_arm_type2_state,     ddp2,       ROT270, "bootleg", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver., bootleg cartridge conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ketbl,        ket,       pgm_arm_type2,         pgm, pgm_arm_type2_state,     ddp2,      ROT270, "bootleg",            "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver., bootleg cartridge conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 
 // these are modern hacks, some of them have been seen on original PCBs, also reportedly on a bootleg PCB with mostly original components but the ARM replaced with a custom chip.
@@ -4630,6 +4656,7 @@ GAME( 2012, ketarrf,    ket,       pgm_arm_type1_cave, pgm,      pgm_arm_type1_s
 
 
 GAME( 2003, espgal,       0,         pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     espgal,    ROT270, "Cave (AMI license)", "Espgaluda (2003/10/15 Master Ver)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, espgalbl,     espgal,    pgm_arm_type2,         pgm, pgm_arm_type2_state,     ddp2,      ROT270, "bootleg",            "Espgaluda (2003/10/15 Master Ver, bootleg cartridge conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // protection simulated, but should be correct
 GAME( 1999, puzzli2,      pgm,       pgm_arm_type1_sim,  puzzli2, pgm_arm_type1_state,    puzzli2,    ROT0,   "IGS", "Puzzli 2 (ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROM label is V100 ( V0001, 11/22/99 09:27:58 in program ROM )
