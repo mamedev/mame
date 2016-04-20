@@ -161,15 +161,24 @@ void ui_menu_game_options::handle()
 				break;
 			case MISC_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
+				{
 					ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, misc_submenu_options));
+					ui_globals::reset = true;
+				}
 				break;
 			case SOUND_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
+				{
 					ui_menu::stack_push(global_alloc_clear<ui_menu_sound_options>(machine(), container));
+					ui_globals::reset = true;
+				}
 				break;
 			case DISPLAY_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
+				{
 					ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, video_submenu_options));
+					ui_globals::reset = true;
+				}
 				break;
 			case CUSTOM_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
@@ -189,7 +198,10 @@ void ui_menu_game_options::handle()
 				break;
 			case ADVANCED_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
+				{
 					ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, advanced_submenu_options));
+					ui_globals::reset = true;
+				}
 				break;
 			case SAVE_CONFIG:
 				if (m_event->iptkey == IPT_UI_SELECT)

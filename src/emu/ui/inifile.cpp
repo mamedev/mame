@@ -60,6 +60,9 @@ void inifile_manager::directory_scan()
 			}
 		}
 	}
+
+	// sort
+	std::stable_sort(ini_index.begin(), ini_index.end());
 }
 
 //-------------------------------------------------
@@ -84,6 +87,9 @@ void inifile_manager::init_category(std::string &filename)
 				index.emplace_back(name, ftell(fp));
 		}
 	}
+
+	// sort
+	std::stable_sort(index.begin(), index.end());
 
 	if (!index.empty())
 		ini_index.emplace_back(filename, index);

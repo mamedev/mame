@@ -30,7 +30,7 @@ public:
 	std::string get_file(int file = -1) { return ((file == -1) ? ini_index[c_file].first : ini_index[file].first); }
 	std::string get_category(int cat = -1) { return ((cat == -1) ? ini_index[c_file].second[c_cat].first : ini_index[c_file].second[cat].first); }
 	size_t total() { return ini_index.size(); }
-	size_t cat_total() { return ini_index[c_file].second.size(); }
+	size_t cat_total(int cat = -1) { return ((cat == -1) ? ini_index[c_file].second.size() : ini_index[cat].second.size()); }
 	UINT16 &cur_file() { return c_file; }
 	UINT16 &cur_cat() { return c_cat; }
 

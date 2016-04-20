@@ -773,12 +773,14 @@ void ui_menu_machine_configure::handle()
 void ui_menu_machine_configure::populate()
 {
 	// add options items
+	item_append(_("Bios"), nullptr, MENU_FLAG_DISABLE | MENU_FLAG_UI_HEADING, nullptr);
 	if (!m_bios.empty())
 	{
-		item_append(_("Bios"), nullptr, MENU_FLAG_DISABLE | MENU_FLAG_UI_HEADING, nullptr);
 		UINT32 arrows = get_arrow_flags(0, m_bios.size() - 1, m_curbios);
 		item_append(_("Driver"), m_bios[m_curbios].first.c_str(), arrows, (void *)(FPTR)BIOS);
 	}
+	else
+		item_append(_("This machine has no bios."), nullptr, MENU_FLAG_DISABLE, nullptr);
 
 	item_append(ui_menu_item_type::SEPARATOR);
 	item_append(_(advanced_submenu_options[0].description), nullptr, 0, (void *)(FPTR)ADVANCED);

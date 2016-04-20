@@ -580,7 +580,7 @@ void emu_options::set_system_name(const char *name)
 	if (*software_name() != 0)
 	{
 		std::string sw_load(software_name());
-		std::string sw_list, sw_name, sw_part, sw_instance, option_errors, error_string;
+		std::string sw_list, sw_name, sw_part, sw_instance, error_string;
 		int left = sw_load.find_first_of(':');
 		int middle = sw_load.find_first_of(':', left + 1);
 		int right = sw_load.find_last_of(':');
