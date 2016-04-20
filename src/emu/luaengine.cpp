@@ -712,7 +712,7 @@ luabridge::LuaRef lua_engine::l_dev_get_memspaces(const device_t *d)
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef sp_table = luabridge::LuaRef::newTable(L);
 
-	if(!&dev->memory())
+	if(!dynamic_cast<device_memory_interface *>(dev))
 		return sp_table;
 
 	for (address_spacenum sp = AS_0; sp < ADDRESS_SPACES; ++sp) {
@@ -735,7 +735,7 @@ luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef st_table = luabridge::LuaRef::newTable(L);
 
-	if(!&dev->state())
+	if(!dynamic_cast<device_state_interface *>(dev))
 		return st_table;
 
 	for (device_state_entry &s : dev->state().state_entries())
