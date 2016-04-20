@@ -1772,7 +1772,7 @@ Tout lua_engine::run(const char *env, int ref, Tin in)
 	luabridge::Stack<Tin>::push(m_lua_state, in);
 	run_internal(env, ref);
 	if(lua_isnil(m_lua_state, 1))
-		ret = reinterpret_cast<Tout>(0);
+		ret = Tout(0);
 	else
 		ret = luabridge::Stack<Tout>::get(m_lua_state, 1);
 	lua_pop(m_lua_state, 1);
@@ -1787,7 +1787,7 @@ Tout lua_engine::run(const char *env, int ref)
 	lua_pushnil(m_lua_state);
 	run_internal(env, ref);
 	if(lua_isnil(m_lua_state, 1))
-		ret = reinterpret_cast<Tout>(0);
+		ret = Tout(0);
 	else
 		ret = luabridge::Stack<Tout>::get(m_lua_state, 1);
 	lua_pop(m_lua_state, 1);
