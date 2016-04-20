@@ -570,11 +570,10 @@ void validity_checker::validate_driver()
 void validity_checker::validate_roms()
 {
 	// iterate, starting with the driver's ROMs and continuing with device ROMs
-	device_iterator deviter(m_current_config->root_device());
-	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
+	for (device_t &device : device_iterator(m_current_config->root_device()))
 	{
 		// track the current device
-		m_current_device = device;
+		m_current_device = &device;
 
 		// scan the ROM entries for this device
 		const char *last_region_name = "???";
@@ -583,7 +582,7 @@ void validity_checker::validate_roms()
 		int items_since_region = 1;
 		int last_bios = 0;
 		int total_files = 0;
-		for (const rom_entry *romp = rom_first_region(*device); romp != nullptr && !ROMENTRY_ISEND(romp); romp++)
+		for (const rom_entry *romp = rom_first_region(device); romp != nullptr && !ROMENTRY_ISEND(romp); romp++)
 		{
 			// if this is a region, make sure it's valid, and record the length
 			if (ROMENTRY_ISREGION(romp))
@@ -608,7 +607,7 @@ void validity_checker::validate_roms()
 				validate_tag(basetag);
 
 				// generate the full tag
-				std::string fulltag = rom_region_name(*device, romp);
+				std::string fulltag = rom_region_name(device, romp);
 
 				// attempt to add it to the map, reporting duplicates as errors
 				current_length = ROMREGION_GETLENGTH(romp);
@@ -831,20 +830,19 @@ void validity_checker::validate_inputs()
 	std::unordered_set<std::string> port_map;
 
 	// iterate over devices
-	device_iterator iter(m_current_config->root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+	for (device_t &device : device_iterator(m_current_config->root_device()))
 	{
 		// see if this device has ports; if not continue
-		if (device->input_ports() == nullptr)
+		if (device.input_ports() == nullptr)
 			continue;
 
 		// track the current device
-		m_current_device = device;
+		m_current_device = &device;
 
 		// allocate the input ports
 		ioport_list portlist;
 		std::string errorbuf;
-		portlist.append(*device, errorbuf);
+		portlist.append(device, errorbuf);
 
 		// report any errors during construction
 		if (!errorbuf.empty())
@@ -904,12 +902,12 @@ void validity_checker::validate_inputs()
 
 				// verify conditions on the field
 				if (!field.condition().none())
-					validate_condition(field.condition(), *device, port_map);
+					validate_condition(field.condition(), device, port_map);
 
 				// verify conditions on the settings
 				for (ioport_setting &setting : field.settings())
 					if (!setting.condition().none())
-						validate_condition(setting.condition(), *device, port_map);
+						validate_condition(setting.condition(), device, port_map);
 			}
 
 			// done with this port
@@ -931,32 +929,31 @@ void validity_checker::validate_devices()
 {
 	std::unordered_set<std::string> device_map;
 
-	device_iterator iter_find(m_current_config->root_device());
-	for (const device_t *device = iter_find.first(); device != nullptr; device = iter_find.next())
+	for (device_t &device : device_iterator(m_current_config->root_device()))
 	{
 		// track the current device
-		m_current_device = device;
+		m_current_device = &device;
 
 		// validate auto-finders
-		device->findit(true);
+		device.findit(true);
 
 		// validate the device tag
-		validate_tag(device->basetag());
+		validate_tag(device.basetag());
 
 		// look for duplicates
-		if (!device_map.insert(device->tag()).second)
-			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device->tag());
+		if (!device_map.insert(device.tag()).second)
+			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device.tag());
 
 		// all devices must have a shortname
-		if (strcmp(device->shortname(), "") == 0)
+		if (strcmp(device.shortname(), "") == 0)
 			osd_printf_error("Device does not have short name defined\n");
 
 		// all devices must have a source file defined
-		if (strcmp(device->source(), "") == 0)
+		if (strcmp(device.source(), "") == 0)
 			osd_printf_error("Device does not have source file location defined\n");
 
 		// check for device-specific validity check
-		device->validity_check(*this);
+		device.validity_check(*this);
 
 		// done with this device
 		m_current_device = nullptr;
@@ -964,24 +961,22 @@ void validity_checker::validate_devices()
 
 	// if device is slot cart device, we must have a shortname
 	std::unordered_set<std::string> slot_device_map;
-	slot_interface_iterator slotiter(m_current_config->root_device());
-	for (const device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
+	for (const device_slot_interface &slot : slot_interface_iterator(m_current_config->root_device()))
 	{
-		for (const device_slot_option &option : slot->option_list())
+		for (const device_slot_option &option : slot.option_list())
 		{
 			std::string temptag("_");
 			temptag.append(option.name());
 			device_t *dev = const_cast<machine_config &>(*m_current_config).device_add(&m_current_config->root_device(), temptag.c_str(), option.devtype(), 0);
 
 			// notify this device and all its subdevices that they are now configured
-			device_iterator subiter(*dev);
-			for (device_t *device = subiter.first(); device != nullptr; device = subiter.next())
-				if (!device->configured())
-					device->config_complete();
+			for (device_t &device : device_iterator(*dev))
+				if (!device.configured())
+					device.config_complete();
 
 			if (strcmp(dev->shortname(), "") == 0) {
 				if (slot_device_map.insert(dev->name()).second)
-					osd_printf_error("Device '%s' is slot cart device but does not have short name defined\n",dev->name());
+					osd_printf_error("Device '%s' is slot cart device but does not have short name defined\n", dev->name());
 			}
 
 			const_cast<machine_config &>(*m_current_config).device_remove(&m_current_config->root_device(), temptag.c_str());

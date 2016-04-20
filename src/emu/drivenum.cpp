@@ -404,7 +404,6 @@ void driver_enumerator::release_current() const
 		return;
 
 	// iterate over software lists in this entry and reset
-	software_list_device_iterator deviter(m_config[m_current]->root_device());
-	for (software_list_device *swlistdev = deviter.first(); swlistdev != nullptr; swlistdev = deviter.next())
-		swlistdev->release();
+	for (software_list_device &swlistdev : software_list_device_iterator(m_config[m_current]->root_device()))
+		swlistdev.release();
 }

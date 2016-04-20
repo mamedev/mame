@@ -696,11 +696,10 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 			std::string entry_region = entry.m_devbase.subtag(entry.m_region);
 
 			// look for the region
-			device_iterator deviter(device.mconfig().root_device());
-			for (device_t *dev = deviter.first(); dev != nullptr; dev = deviter.next())
-				for (const rom_entry *romp = rom_first_region(*dev); romp != nullptr && !found; romp = rom_next_region(romp))
+			for (device_t &dev : device_iterator(device.mconfig().root_device()))
+				for (const rom_entry *romp = rom_first_region(dev); romp != nullptr && !found; romp = rom_next_region(romp))
 				{
-					if (rom_region_name(*dev, romp) == entry_region)
+					if (rom_region_name(dev, romp) == entry_region)
 					{
 						// verify the address range is within the region's bounds
 						offs_t length = ROMREGION_GETLENGTH(romp);

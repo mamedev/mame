@@ -1103,11 +1103,14 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 					break;
 				if (viewscreens.count() >= scrcount)
 				{
-					screen_device *screen;
-					for (screen = iter.first(); screen != nullptr; screen = iter.next())
-						if (!viewscreens.contains(*screen))
+					bool has_screen = false;
+					for (screen_device &screen : iter)
+						if (!viewscreens.contains(screen))
+						{
+							has_screen = true;
 							break;
-					if (screen == nullptr)
+						}
+					if (!has_screen)
 						break;
 				}
 			}
@@ -2567,9 +2570,8 @@ render_manager::render_manager(running_machine &machine)
 	machine.configuration().config_register("video", config_saveload_delegate(FUNC(render_manager::config_load), this), config_saveload_delegate(FUNC(render_manager::config_save), this));
 
 	// create one container per screen
-	screen_device_iterator iter(machine.root_device());
-	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
-		screen->set_container(*container_alloc(screen));
+	for (screen_device &screen : screen_device_iterator(machine.root_device()))
+		screen.set_container(*container_alloc(&screen));
 }
 
 

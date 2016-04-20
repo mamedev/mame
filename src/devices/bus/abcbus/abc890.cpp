@@ -252,11 +252,9 @@ void abc890_t::device_reset()
 
 void abc890_t::abcbus_cs(UINT8 data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->cs_w(data);
+		slot.cs_w(data);
 	}
 }
 
@@ -269,11 +267,9 @@ UINT8 abc890_t::abcbus_inp()
 {
 	UINT8 data = 0xff;
 
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		data &= slot->inp_r();
+		data &= slot.inp_r();
 	}
 
 	return data;
@@ -286,11 +282,9 @@ UINT8 abc890_t::abcbus_inp()
 
 void abc890_t::abcbus_out(UINT8 data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->out_w(data);
+		slot.out_w(data);
 	}
 }
 
@@ -303,11 +297,9 @@ UINT8 abc890_t::abcbus_stat()
 {
 	UINT8 data = 0xff;
 
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		data &= slot->stat_r();
+		data &= slot.stat_r();
 	}
 
 	return data;
@@ -320,11 +312,9 @@ UINT8 abc890_t::abcbus_stat()
 
 void abc890_t::abcbus_c1(UINT8 data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->c1_w(data);
+		slot.c1_w(data);
 	}
 }
 
@@ -335,11 +325,9 @@ void abc890_t::abcbus_c1(UINT8 data)
 
 void abc890_t::abcbus_c2(UINT8 data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->c2_w(data);
+		slot.c2_w(data);
 	}
 }
 
@@ -350,11 +338,9 @@ void abc890_t::abcbus_c2(UINT8 data)
 
 void abc890_t::abcbus_c3(UINT8 data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->c3_w(data);
+		slot.c3_w(data);
 	}
 }
 
@@ -365,11 +351,9 @@ void abc890_t::abcbus_c3(UINT8 data)
 
 void abc890_t::abcbus_c4(UINT8 data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->c4_w(data);
+		slot.c4_w(data);
 	}
 }
 
@@ -382,11 +366,9 @@ UINT8 abc890_t::abcbus_xmemfl(offs_t offset)
 {
 	UINT8 data = 0xff;
 
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		data &= slot->xmemfl_r(offset);
+		data &= slot.xmemfl_r(offset);
 	}
 
 	return data;
@@ -399,10 +381,8 @@ UINT8 abc890_t::abcbus_xmemfl(offs_t offset)
 
 void abc890_t::abcbus_xmemw(offs_t offset, UINT8 data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->xmemw_w(offset, data);
+		slot.xmemw_w(offset, data);
 	}
 }

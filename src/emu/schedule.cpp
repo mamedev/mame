@@ -781,20 +781,19 @@ void device_scheduler::rebuild_execute_list()
 	device_execute_interface **suspend_tailptr = &suspend_list;
 
 	// iterate over all devices
-	execute_interface_iterator iter(machine().root_device());
-	for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
+	for (device_execute_interface &exec : execute_interface_iterator(machine().root_device()))
 	{
 		// append to the appropriate list
-		exec->m_nextexec = nullptr;
-		if (exec->m_suspend == 0)
+		exec.m_nextexec = nullptr;
+		if (exec.m_suspend == 0)
 		{
-			*active_tailptr = exec;
-			active_tailptr = &exec->m_nextexec;
+			*active_tailptr = &exec;
+			active_tailptr = &exec.m_nextexec;
 		}
 		else
 		{
-			*suspend_tailptr = exec;
-			suspend_tailptr = &exec->m_nextexec;
+			*suspend_tailptr = &exec;
+			suspend_tailptr = &exec.m_nextexec;
 		}
 	}
 

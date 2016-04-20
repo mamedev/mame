@@ -430,9 +430,8 @@ void ui_menu_select_software::populate()
 	int old_software = -1;
 
 	machine_config config(*m_driver, machine().options());
-	image_interface_iterator iter(config.root_device());
-	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
-		if (image->filename() == nullptr && image->must_be_loaded())
+	for (device_image_interface &image : image_interface_iterator(config.root_device()))
+		if (image.filename() == nullptr && image.must_be_loaded())
 		{
 			m_has_empty_start = false;
 			break;
@@ -528,32 +527,30 @@ void ui_menu_select_software::build_software_list()
 	m_swinfo.emplace_back(m_driver->name, m_driver->description, "", "", "", 0, "", m_driver, "", "", "", 1, "", "", "", true);
 
 	machine_config config(*m_driver, machine().options());
-	software_list_device_iterator deviter(config.root_device());
 
 	// iterate thru all software lists
-	for (software_list_device *swlist = deviter.first(); swlist != nullptr; swlist = deviter.next())
+	for (software_list_device &swlist : software_list_device_iterator(config.root_device()))
 	{
-		m_filter.swlist.name.push_back(swlist->list_name());
-		m_filter.swlist.description.push_back(swlist->description());
-		for (software_info &swinfo : swlist->get_info())
+		m_filter.swlist.name.push_back(swlist.list_name());
+		m_filter.swlist.description.push_back(swlist.description());
+		for (software_info &swinfo : swlist.get_info())
 		{
 			software_part *part = swinfo.first_part();
-			if (part->is_compatible(*swlist))
+			if (part->is_compatible(swlist))
 			{
 				const char *instance_name = nullptr;
 				const char *type_name = nullptr;
 				ui_software_info tmpmatches;
-				image_interface_iterator imgiter(config.root_device());
-				for (device_image_interface *image = imgiter.first(); image != nullptr; image = imgiter.next())
+				for (device_image_interface &image : image_interface_iterator(config.root_device()))
 				{
-					const char *interface = image->image_interface();
+					const char *interface = image.image_interface();
 					if (interface != nullptr && part->matches_interface(interface))
 					{
-						instance_name = image->instance_name();
+						instance_name = image.instance_name();
 						if (instance_name != nullptr)
-							tmpmatches.instance = image->instance_name();
+							tmpmatches.instance = image.instance_name();
 
-						type_name = image->image_type_name();
+						type_name = image.image_type_name();
 						if (type_name != nullptr)
 							tmpmatches.devicetype = type_name;
 						break;
@@ -571,7 +568,7 @@ void ui_menu_select_software::build_software_list()
 				tmpmatches.supported = swinfo.supported();
 				tmpmatches.part = strensure(part->name());
 				tmpmatches.driver = m_driver;
-				tmpmatches.listname = strensure(swlist->list_name());
+				tmpmatches.listname = strensure(swlist.list_name());
 				tmpmatches.interface = strensure(part->interface());
 				tmpmatches.startempty = 0;
 				tmpmatches.parentlongname.clear();

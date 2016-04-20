@@ -1376,11 +1376,7 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	int next_index = source_index;
 
 	screen_device_iterator screen_iterator(machine->root_device());
-	screen_device *screen = screen_iterator.first();
-	for (int i = 0; i < curr_screen; i++)
-	{
-		screen = screen_iterator.next();
-	}
+	screen_device *screen = screen_iterator.byindex(curr_screen);
 	render_container &screen_container = screen->container();
 
 	float xscale = screen_container.xscale();

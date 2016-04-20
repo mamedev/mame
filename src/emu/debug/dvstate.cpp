@@ -74,12 +74,11 @@ void debug_view_state::enumerate_sources()
 	m_source_list.reset();
 
 	// iterate over devices that have state interfaces
-	state_interface_iterator iter(machine().root_device());
 	std::string name;
-	for (device_state_interface *state = iter.first(); state != nullptr; state = iter.next())
+	for (device_state_interface &state : state_interface_iterator(machine().root_device()))
 	{
-		name = string_format("%s '%s'", state->device().name(), state->device().tag());
-		m_source_list.append(*global_alloc(debug_view_state_source(name.c_str(), state->device())));
+		name = string_format("%s '%s'", state.device().name(), state.device().tag());
+		m_source_list.append(*global_alloc(debug_view_state_source(name.c_str(), state.device())));
 	}
 
 	// reset the source to a known good entry

@@ -1549,13 +1549,13 @@ void memory_manager::initialize()
 {
 	// loop over devices and spaces within each device
 	memory_interface_iterator iter(machine().root_device());
-	for (device_memory_interface *memory = iter.first(); memory != nullptr; memory = iter.next())
+	for (device_memory_interface &memory : iter)
 		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
 		{
 			// if there is a configuration for this space, we need an address space
-			const address_space_config *spaceconfig = memory->space_config(spacenum);
+			const address_space_config *spaceconfig = memory.space_config(spacenum);
 			if (spaceconfig != nullptr)
-				m_spacelist.append(address_space::allocate(*this, *spaceconfig, *memory, spacenum));
+				m_spacelist.append(address_space::allocate(*this, *spaceconfig, memory, spacenum));
 		}
 
 	// construct and preprocess the address_map for each space
