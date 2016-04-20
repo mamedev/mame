@@ -168,11 +168,8 @@ void ui_gfx_init(running_machine &machine)
 
 static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 {
-	palette_device_iterator pal_iter(machine.root_device());
-	gfx_interface_iterator gfx_iter(machine.root_device());
-
 	// count the palette devices
-	state.palette.devcount = pal_iter.count();
+	state.palette.devcount = palette_device_iterator(machine.root_device()).count();
 
 	// set the pointer to the first palette
 	if (state.palette.devcount > 0)
@@ -180,27 +177,20 @@ static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 
 	// count the gfx devices
 	state.gfxset.devcount = 0;
-	int tempcount = gfx_iter.count();
-
-	// count the gfx sets in each device, skipping devices with none
-	if (tempcount > 0)
+	for (device_gfx_interface &interface : gfx_interface_iterator(machine.root_device()))
 	{
-		device_gfx_interface *interface;
-		int i, count;
+		// count the gfx sets in each device, skipping devices with none
+		int count = 0;
+		while (count < MAX_GFX_ELEMENTS && interface.gfx(count) != nullptr)
+			count++;
 
-		for (i = 0, interface = gfx_iter.first();
-				i < tempcount && state.gfxset.devcount < MAX_GFX_DECODERS;
-				i++, interface = gfx_iter.next())
+		// count = index of first NULL
+		if (count > 0)
 		{
-			for (count = 0; count < MAX_GFX_ELEMENTS && interface->gfx(count) != nullptr; count++) { }
-
-			// count = index of first NULL
-			if (count > 0)
-			{
-				state.gfxdev[state.gfxset.devcount].interface = interface;
-				state.gfxdev[state.gfxset.devcount].setcount = count;
-				state.gfxset.devcount++;
-			}
+			state.gfxdev[state.gfxset.devcount].interface = &interface;
+			state.gfxdev[state.gfxset.devcount].setcount = count;
+			if (++state.gfxset.devcount == MAX_GFX_DECODERS)
+				break;
 		}
 	}
 

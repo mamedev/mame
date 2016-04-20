@@ -1103,11 +1103,14 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 					break;
 				if (viewscreens.count() >= scrcount)
 				{
-					screen_device *screen;
-					for (screen = iter.first(); screen != nullptr; screen = iter.next())
-						if (!viewscreens.contains(*screen))
+					bool has_screen = false;
+					for (screen_device &screen : iter)
+						if (!viewscreens.contains(screen))
+						{
+							has_screen = true;
 							break;
-					if (screen == nullptr)
+						}
+					if (!has_screen)
 						break;
 				}
 			}
@@ -1695,7 +1698,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 			fname.insert(0, PATH_SEPARATOR).insert(0, dirname);
 
 		// attempt to open the file; bail if we can't
-		emu_file layoutfile(manager().machine().options().art_path(), OPEN_FLAG_READ);
+		emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
 		osd_file::error filerr = layoutfile.open(fname.c_str());
 		if (filerr != osd_file::error::NONE)
 			return false;
@@ -1902,9 +1905,9 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 						// 1  1  0   solarq      X  Y
 						// 1  1  1   barrier    !X !Y
 
-						bool flip_x = (manager().machine().system().flags & ORIENTATION_FLIP_X) == ORIENTATION_FLIP_X;
-						bool flip_y = (manager().machine().system().flags & ORIENTATION_FLIP_Y) == ORIENTATION_FLIP_Y;
-						bool swap_xy = (manager().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+						bool flip_x = (m_manager.machine().system().flags & ORIENTATION_FLIP_X) == ORIENTATION_FLIP_X;
+						bool flip_y = (m_manager.machine().system().flags & ORIENTATION_FLIP_Y) == ORIENTATION_FLIP_Y;
+						bool swap_xy = (m_manager.machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
 
 						int vectororient = 0;
 						if (flip_x)
@@ -2063,7 +2066,7 @@ bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_co
 	// convert target coordinates to float
 	float target_fx = (float)(target_x - root_xform.xoffs) / viswidth;
 	float target_fy = (float)(target_y - root_xform.yoffs) / visheight;
-	if (manager().machine().ui().is_menu_active())
+	if (m_manager.machine().ui().is_menu_active())
 	{
 		target_fx = (float)target_x / m_width;
 		target_fy = (float)target_y / m_height;
@@ -2567,9 +2570,8 @@ render_manager::render_manager(running_machine &machine)
 	machine.configuration().config_register("video", config_saveload_delegate(FUNC(render_manager::config_load), this), config_saveload_delegate(FUNC(render_manager::config_save), this));
 
 	// create one container per screen
-	screen_device_iterator iter(machine.root_device());
-	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
-		screen->set_container(*container_alloc(screen));
+	for (screen_device &screen : screen_device_iterator(machine.root_device()))
+		screen.set_container(*container_alloc(&screen));
 }
 
 

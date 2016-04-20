@@ -5386,6 +5386,37 @@
 	</software>
 
 	<!--***************************************
+	dev board, same ID as gowcaizr
+***************************************-->
+
+	<software name="dragonsh">
+		<description>Dragon's Heaven (development board)</description>
+		<year>1997</year>
+		<publisher>Face</publisher>
+		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_byte" name="EP2.bin" offset="0x000000" size="0x080000" crc="f25c71ad" sha1="803fb6cd6a7ada59678ad901ff9788b1e54ddd0c" />
+				<rom loadflag="load16_byte" name="EP1.bin" offset="0x000001" size="0x080000" crc="f353448c" sha1="f0f966ca15d503e01b40e901765ff0888463b65d" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="s1.s1" status="baddump" crc="706477a7" sha1="8cbee7f6832e7edd2dc792ca330420a6a984b879" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x30000">
+				<rom value="0xff" size="0x30000" offset="0" loadflag="fill" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x200000">
+				<rom offset="0x000000" size="0x200000" name="sram.v1" status="nodump" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="no3.bin" offset="0x000000" size="0x1000000" crc="81821826" sha1="b7c1a53e32633383675206a16c68f6f2ff984865" />
+				<rom loadflag="load16_byte" name="no4.bin" offset="0x000001" size="0x1000000" crc="3601d568" sha1="800323e52f5d33b402f84d31850b42c688082d67" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--***************************************
 	ID-0095
 	. NGM-095
 	NEO-MVS PROGBK1 / NEO-MVS CHA256

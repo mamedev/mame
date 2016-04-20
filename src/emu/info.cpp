@@ -248,35 +248,36 @@ void info_xml_creator::output_one()
 	ioport_list portlist;
 	std::string errors;
 	device_iterator iter(config.root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-		portlist.append(*device, errors);
-    // renumber player numbers for controller ports
-    int player_offset = 0;
-    // but treat keyboard count separately from players' number
-    int kbd_offset = 0;
-    for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-    {
-        int nplayers = 0;
-        bool new_kbd = FALSE;
-        for (ioport_port &port : portlist)
-            if (&port.device() == device)
-                for (ioport_field &field : port.fields())
-                    if (field.type() >= IPT_START && field.type() < IPT_ANALOG_LAST)
-                    {
-                        if (field.type() == IPT_KEYBOARD)
-                        {
-                            if (!new_kbd) new_kbd = TRUE;
-                            field.set_player(field.player() + kbd_offset);
-                        }
-                        else
-                        {
-                            nplayers = MAX(nplayers, field.player() + 1);
-                            field.set_player(field.player() + player_offset);
-                        }
-                    }
-        player_offset += nplayers;
-        if (new_kbd) kbd_offset++;
-    }
+	for (device_t &device : iter)
+		portlist.append(device, errors);
+
+	// renumber player numbers for controller ports
+	int player_offset = 0;
+	// but treat keyboard count separately from players' number
+	int kbd_offset = 0;
+	for (device_t &device : iter)
+	{
+		int nplayers = 0;
+		bool new_kbd = false;
+		for (ioport_port &port : portlist)
+			if (&port.device() == &device)
+				for (ioport_field &field : port.fields())
+					if (field.type() >= IPT_START && field.type() < IPT_ANALOG_LAST)
+					{
+						if (field.type() == IPT_KEYBOARD)
+						{
+							if (!new_kbd) new_kbd = TRUE;
+							field.set_player(field.player() + kbd_offset);
+						}
+						else
+						{
+							nplayers = MAX(nplayers, field.player() + 1);
+							field.set_player(field.player() + player_offset);
+						}
+					}
+		player_offset += nplayers;
+		if (new_kbd) kbd_offset++;
+	}
 
 	// print the header and the game name
 	fprintf(m_output, "\t<%s",XML_TOP);
@@ -360,9 +361,8 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	// generate input list
 	ioport_list portlist;
 	std::string errors;
-	device_iterator iptiter(device);
-	for (device_t *dev = iptiter.first(); dev != nullptr; dev = iptiter.next())
-		portlist.append(*dev, errors);
+	for (device_t &dev : device_iterator(device))
+		portlist.append(dev, errors);
 	// check if the device adds player inputs (other than dsw and configs) to the system
 	for (ioport_port &port : portlist)
 		for (ioport_field &field : port.fields())
@@ -424,43 +424,39 @@ void info_xml_creator::output_devices()
 	while (m_drivlist.next())
 	{
 		// first, run through devices with roms which belongs to the default configuration
-		device_iterator deviter(m_drivlist.config().root_device());
-		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
+		for (device_t &device : device_iterator(m_drivlist.config().root_device()))
 		{
-			if (device->owner() != nullptr && device->shortname()!= nullptr && device->shortname()[0]!='\0')
+			if (device.owner() != nullptr && device.shortname() != nullptr && device.shortname()[0]!='\0')
 			{
-				if (shortnames.insert(device->shortname()).second)
-					output_one_device(*device, device->tag());
+				if (shortnames.insert(device.shortname()).second)
+					output_one_device(device, device.tag());
 			}
 		}
 
 		// then, run through slot devices
-		slot_interface_iterator iter(m_drivlist.config().root_device());
-		for (const device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
+		for (const device_slot_interface &slot : slot_interface_iterator(m_drivlist.config().root_device()))
 		{
-			for (const device_slot_option &option : slot->option_list())
+			for (const device_slot_option &option : slot.option_list())
 			{
 				std::string temptag("_");
 				temptag.append(option.name());
 				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.c_str(), option.devtype(), 0);
 
 				// notify this device and all its subdevices that they are now configured
-				device_iterator subiter(*dev);
-				for (device_t *device = subiter.first(); device != nullptr; device = subiter.next())
-					if (!device->configured())
-						device->config_complete();
+				for (device_t &device : device_iterator(*dev))
+					if (!device.configured())
+						device.config_complete();
 
 				if (shortnames.insert(dev->shortname()).second)
 					output_one_device(*dev, temptag.c_str());
 
 				// also, check for subdevices with ROMs (a few devices are missed otherwise, e.g. MPU401)
-				device_iterator deviter2(*dev);
-				for (device_t *device = deviter2.first(); device != nullptr; device = deviter2.next())
+				for (device_t &device : device_iterator(*dev))
 				{
-					if (device->owner() == dev && device->shortname()!= nullptr && device->shortname()[0]!='\0')
+					if (device.owner() == dev && device.shortname() != nullptr && device.shortname()[0]!='\0')
 					{
-						if (shortnames.insert(device->shortname()).second)
-							output_one_device(*device, device->tag());
+						if (shortnames.insert(device.shortname()).second)
+							output_one_device(device, device.tag());
 					}
 				}
 
@@ -478,10 +474,9 @@ void info_xml_creator::output_devices()
 
 void info_xml_creator::output_device_roms()
 {
-	device_iterator deviter(m_drivlist.config().root_device());
-	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
-		if (device->owner() != nullptr && device->shortname()!= nullptr && device->shortname()[0]!='\0')
-			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device->shortname()));
+	for (device_t &device : device_iterator(m_drivlist.config().root_device()))
+		if (device.owner() != nullptr && device.shortname() != nullptr && device.shortname()[0] != '\0')
+			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device.shortname()));
 }
 
 
@@ -493,10 +488,9 @@ void info_xml_creator::output_device_roms()
 void info_xml_creator::output_sampleof()
 {
 	// iterate over sample devices
-	samples_device_iterator iter(m_drivlist.config().root_device());
-	for (samples_device *device = iter.first(); device != nullptr; device = iter.next())
+	for (samples_device &device : samples_device_iterator(m_drivlist.config().root_device()))
 	{
-		samples_iterator sampiter(*device);
+		samples_iterator sampiter(device);
 		if (sampiter.altbasename() != nullptr)
 		{
 			fprintf(m_output, " sampleof=\"%s\"", xml_normalize_string(sampiter.altbasename()));
@@ -650,10 +644,9 @@ void info_xml_creator::output_rom(device_t &device)
 void info_xml_creator::output_sample(device_t &device)
 {
 	// iterate over sample devices
-	samples_device_iterator sampiter(device);
-	for (samples_device *samples = sampiter.first(); samples != nullptr; samples = sampiter.next())
+	for (samples_device &samples : samples_device_iterator(device))
 	{
-		samples_iterator iter(*samples);
+		samples_iterator iter(samples);
 		std::unordered_set<std::string> already_printed;
 		for (const char *samplename = iter.first(); samplename != nullptr; samplename = iter.next())
 		{
@@ -676,38 +669,36 @@ void info_xml_creator::output_sample(device_t &device)
 void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 {
 	// iterate over executable devices
-	execute_interface_iterator execiter(device);
-	for (device_execute_interface *exec = execiter.first(); exec != nullptr; exec = execiter.next())
+	for (device_execute_interface &exec : execute_interface_iterator(device))
 	{
-		if (strcmp(exec->device().tag(), device.tag()))
+		if (strcmp(exec.device().tag(), device.tag()))
 		{
-			std::string newtag(exec->device().tag()), oldtag(":");
+			std::string newtag(exec.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"cpu\"");
 			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec->device().name()));
-			fprintf(m_output, " clock=\"%d\"", exec->device().clock());
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec.device().name()));
+			fprintf(m_output, " clock=\"%d\"", exec.device().clock());
 			fprintf(m_output, "/>\n");
 		}
 	}
 
 	// iterate over sound devices
-	sound_interface_iterator sounditer(device);
-	for (device_sound_interface *sound = sounditer.first(); sound != nullptr; sound = sounditer.next())
+	for (device_sound_interface &sound : sound_interface_iterator(device))
 	{
-		if (strcmp(sound->device().tag(), device.tag()))
+		if (strcmp(sound.device().tag(), device.tag()))
 		{
-			std::string newtag(sound->device().tag()), oldtag(":");
+			std::string newtag(sound.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"audio\"");
 			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound->device().name()));
-			if (sound->device().clock() != 0)
-				fprintf(m_output, " clock=\"%d\"", sound->device().clock());
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound.device().name()));
+			if (sound.device().clock() != 0)
+				fprintf(m_output, " clock=\"%d\"", sound.device().clock());
 			fprintf(m_output, "/>\n");
 		}
 	}
@@ -722,18 +713,17 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 void info_xml_creator::output_display(device_t &device, const char *root_tag)
 {
 	// iterate over screens
-	screen_device_iterator iter(device);
-	for (const screen_device *screendev = iter.first(); screendev != nullptr; screendev = iter.next())
+	for (const screen_device &screendev : screen_device_iterator(device))
 	{
-		if (strcmp(screendev->tag(), device.tag()))
+		if (strcmp(screendev.tag(), device.tag()))
 		{
-			std::string newtag(screendev->tag()), oldtag(":");
+			std::string newtag(screendev.tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			fprintf(m_output, "\t\t<display");
 			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
 
-			switch (screendev->screen_type())
+			switch (screendev.screen_type())
 			{
 				case SCREEN_TYPE_RASTER:    fprintf(m_output, " type=\"raster\"");  break;
 				case SCREEN_TYPE_VECTOR:    fprintf(m_output, " type=\"vector\"");  break;
@@ -771,29 +761,29 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 			}
 
 			// output width and height only for games that are not vector
-			if (screendev->screen_type() != SCREEN_TYPE_VECTOR)
+			if (screendev.screen_type() != SCREEN_TYPE_VECTOR)
 			{
-				const rectangle &visarea = screendev->visible_area();
+				const rectangle &visarea = screendev.visible_area();
 				fprintf(m_output, " width=\"%d\"", visarea.width());
 				fprintf(m_output, " height=\"%d\"", visarea.height());
 			}
 
 			// output refresh rate
-			fprintf(m_output, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev->refresh_attoseconds()));
+			fprintf(m_output, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
 
 			// output raw video parameters only for games that are not vector
 			// and had raw parameters specified
-			if (screendev->screen_type() != SCREEN_TYPE_VECTOR && !screendev->oldstyle_vblank_supplied())
+			if (screendev.screen_type() != SCREEN_TYPE_VECTOR && !screendev.oldstyle_vblank_supplied())
 			{
-				int pixclock = screendev->width() * screendev->height() * ATTOSECONDS_TO_HZ(screendev->refresh_attoseconds());
+				int pixclock = screendev.width() * screendev.height() * ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds());
 
 				fprintf(m_output, " pixclock=\"%d\"", pixclock);
-				fprintf(m_output, " htotal=\"%d\"", screendev->width());
-				fprintf(m_output, " hbend=\"%d\"", screendev->visible_area().min_x);
-				fprintf(m_output, " hbstart=\"%d\"", screendev->visible_area().max_x+1);
-				fprintf(m_output, " vtotal=\"%d\"", screendev->height());
-				fprintf(m_output, " vbend=\"%d\"", screendev->visible_area().min_y);
-				fprintf(m_output, " vbstart=\"%d\"", screendev->visible_area().max_y+1);
+				fprintf(m_output, " htotal=\"%d\"", screendev.width());
+				fprintf(m_output, " hbend=\"%d\"", screendev.visible_area().min_x);
+				fprintf(m_output, " hbstart=\"%d\"", screendev.visible_area().max_x+1);
+				fprintf(m_output, " vtotal=\"%d\"", screendev.height());
+				fprintf(m_output, " vbend=\"%d\"", screendev.visible_area().min_y);
+				fprintf(m_output, " vbstart=\"%d\"", screendev.visible_area().max_y+1);
 			}
 			fprintf(m_output, " />\n");
 		}
@@ -1430,20 +1420,19 @@ void info_xml_creator::output_driver()
 
 void info_xml_creator::output_images(device_t &device, const char *root_tag)
 {
-	image_interface_iterator iter(device);
-	for (const device_image_interface *imagedev = iter.first(); imagedev != nullptr; imagedev = iter.next())
+	for (const device_image_interface &imagedev : image_interface_iterator(device))
 	{
-		if (strcmp(imagedev->device().tag(), device.tag()))
+		if (strcmp(imagedev.device().tag(), device.tag()))
 		{
-            bool loadable = imagedev->user_loadable();
-			std::string newtag(imagedev->device().tag()), oldtag(":");
+			bool loadable = imagedev.user_loadable();
+			std::string newtag(imagedev.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			// print m_output device type
-			fprintf(m_output, "\t\t<device type=\"%s\"", xml_normalize_string(imagedev->image_type_name()));
+			fprintf(m_output, "\t\t<device type=\"%s\"", xml_normalize_string(imagedev.image_type_name()));
 
 			// does this device have a tag?
-			if (imagedev->device().tag())
+			if (imagedev.device().tag())
 				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
 
 			// is this device available as media switch?
@@ -1451,26 +1440,26 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 				fprintf(m_output, " fixed_image=\"1\"");
             
             // is this device mandatory?
-            if (imagedev->must_be_loaded())
+            if (imagedev.must_be_loaded())
                 fprintf(m_output, " mandatory=\"1\"");
 
-			if (imagedev->image_interface() && imagedev->image_interface()[0])
-				fprintf(m_output, " interface=\"%s\"", xml_normalize_string(imagedev->image_interface()));
+			if (imagedev.image_interface() && imagedev.image_interface()[0])
+				fprintf(m_output, " interface=\"%s\"", xml_normalize_string(imagedev.image_interface()));
 
 			// close the XML tag
 			fprintf(m_output, ">\n");
 
             if (loadable)
             {
-                const char *name = imagedev->instance_name();
-                const char *shortname = imagedev->brief_instance_name();
+                const char *name = imagedev.instance_name();
+                const char *shortname = imagedev.brief_instance_name();
                 
                 fprintf(m_output, "\t\t\t<instance");
                 fprintf(m_output, " name=\"%s\"", xml_normalize_string(name));
                 fprintf(m_output, " briefname=\"%s\"", xml_normalize_string(shortname));
                 fprintf(m_output, "/>\n");
                 
-                std::string extensions(imagedev->file_extensions());
+                std::string extensions(imagedev.file_extensions());
                 
                 char *ext = strtok((char *)extensions.c_str(), ",");
                 while (ext != nullptr)
@@ -1493,25 +1482,24 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 
 void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 {
-	slot_interface_iterator iter(device);
-	for (const device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (const device_slot_interface &slot : slot_interface_iterator(device))
 	{
-		if (slot->fixed()) continue;    // or shall we list these as non-configurable?
+		if (slot.fixed()) continue;    // or shall we list these as non-configurable?
 
-		if (strcmp(slot->device().tag(), device.tag()))
+		if (strcmp(slot.device().tag(), device.tag()))
 		{
-			std::string newtag(slot->device().tag()), oldtag(":");
+			std::string newtag(slot.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			// print m_output device type
 			fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(newtag.c_str()));
 
 			/*
-			 if (slot->slot_interface()[0])
-			 fprintf(m_output, " interface=\"%s\"", xml_normalize_string(slot->slot_interface()));
+			 if (slot.slot_interface()[0])
+			 fprintf(m_output, " interface=\"%s\"", xml_normalize_string(slot.slot_interface()));
 			 */
 
-			for (const device_slot_option &option : slot->option_list())
+			for (const device_slot_option &option : slot.option_list())
 			{
 				if (option.selectable())
 				{
@@ -1522,7 +1510,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 					fprintf(m_output, "\t\t\t<slotoption");
 					fprintf(m_output, " name=\"%s\"", xml_normalize_string(option.name()));
 					fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname()));
-					if (slot->default_option() != nullptr && strcmp(slot->default_option(),option.name())==0)
+					if (slot.default_option() != nullptr && strcmp(slot.default_option(),option.name())==0)
 						fprintf(m_output, " default=\"yes\"");
 					fprintf(m_output, "/>\n");
 					const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), "dummy");
@@ -1542,14 +1530,12 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 
 void info_xml_creator::output_software_list()
 {
-	software_list_device_iterator iter(m_drivlist.config().root_device());
-	for (const software_list_device *swlist = iter.first(); swlist != nullptr; swlist = iter.next())
+	for (const software_list_device &swlist : software_list_device_iterator(m_drivlist.config().root_device()))
 	{
-		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist->list_name());
-		fprintf(m_output, "status=\"%s\" ", (swlist->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible");
-		if (swlist->filter()) {
-			fprintf(m_output, "filter=\"%s\" ", swlist->filter());
-		}
+		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist.list_name());
+		fprintf(m_output, "status=\"%s\" ", (swlist.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible");
+		if (swlist.filter())
+			fprintf(m_output, "filter=\"%s\" ", swlist.filter());
 		fprintf(m_output, "/>\n");
 	}
 }
@@ -1563,14 +1549,13 @@ void info_xml_creator::output_software_list()
 
 void info_xml_creator::output_ramoptions()
 {
-	ram_device_iterator iter(m_drivlist.config().root_device());
-	for (const ram_device *ram = iter.first(); ram != nullptr; ram = iter.next())
+	for (const ram_device &ram : ram_device_iterator(m_drivlist.config().root_device()))
 	{
-		fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram->default_size());
+		fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram.default_size());
 
-		if (ram->extra_options() != nullptr)
+		if (ram.extra_options() != nullptr)
 		{
-			std::string options(ram->extra_options());
+			std::string options(ram.extra_options());
 			for (int start = 0, end = options.find_first_of(',');; start = end + 1, end = options.find_first_of(',', start))
 			{
 				std::string option;

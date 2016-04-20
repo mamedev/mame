@@ -2457,22 +2457,22 @@ time_t ioport_manager::initialize()
 
 	// if we have a token list, proceed
 	device_iterator iter(machine().root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+	for (device_t &device : iter)
 	{
 		std::string errors;
-		m_portlist.append(*device, errors);
+		m_portlist.append(device, errors);
 		if (!errors.empty())
 			osd_printf_error("Input port errors:\n%s", errors.c_str());
 	}
 
 	// renumber player numbers for controller ports
 	int player_offset = 0;
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+	for (device_t &device : iter)
 	{
 		int players = 0;
 		for (ioport_port &port : m_portlist)
 		{
-			if (&port.device() == device)
+			if (&port.device() == &device)
 			{
 				for (ioport_field &field : port.fields())
 					if (field.type_class()==INPUT_CLASS_CONTROLLER)
@@ -2532,10 +2532,9 @@ time_t ioport_manager::initialize()
 				if (field.is_analog())
 					m_has_analog = true;
 			}
-		device_iterator deviter(machine().root_device());
-		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
-			if (device->rom_region())
-				for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
+		for (device_t &device : device_iterator(machine().root_device()))
+			if (device.rom_region())
+				for (const rom_entry *rom = device.rom_region(); !ROMENTRY_ISEND(rom); rom++)
 					if (ROMENTRY_ISSYSTEM_BIOS(rom)) { m_has_bioses= true; break; }
 	}
 

@@ -36,14 +36,10 @@ ui_menu_control_device_image::ui_menu_control_device_image(running_machine &mach
 {
 	image = _image;
 
-	sld = nullptr;
-	if (image->software_list_name()) {
-		software_list_device_iterator iter(machine.config().root_device());
-		for (software_list_device *swlist = iter.first(); swlist != nullptr; swlist = iter.next())
-		{
-			if (strcmp(swlist->list_name(),image->software_list_name())==0) sld = swlist;
-		}
-	}
+	if (image->software_list_name())
+		sld = software_list_device::find_by_name(machine.config(), image->software_list_name());
+	else
+		sld = nullptr;
 	swi = image->software_entry();
 	swp = image->part_entry();
 

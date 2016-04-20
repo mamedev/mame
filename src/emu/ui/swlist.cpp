@@ -409,32 +409,32 @@ void ui_menu_software::populate()
 
 	// Add original software lists for this system
 	software_list_device_iterator iter(machine().config().root_device());
-	for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
-		if (swlistdev->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
-			if (!swlistdev->get_info().empty() && m_interface != nullptr)
+	for (software_list_device &swlistdev : iter)
+		if (swlistdev.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+			if (!swlistdev.get_info().empty() && m_interface != nullptr)
 			{
 				bool found = false;
-				for (const software_info &swinfo : swlistdev->get_info())
+				for (const software_info &swinfo : swlistdev.get_info())
 					if (swinfo.first_part()->matches_interface(m_interface))
 						found = true;
 				if (found)
-					item_append(swlistdev->description(), nullptr, 0, (void *)swlistdev);
+					item_append(swlistdev.description(), nullptr, 0, (void *)&swlistdev);
 			}
 
 	// add compatible software lists for this system
-	for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
-		if (swlistdev->list_type() == SOFTWARE_LIST_COMPATIBLE_SYSTEM)
-			if (!swlistdev->get_info().empty() && m_interface != nullptr)
+	for (software_list_device &swlistdev : iter)
+		if (swlistdev.list_type() == SOFTWARE_LIST_COMPATIBLE_SYSTEM)
+			if (!swlistdev.get_info().empty() && m_interface != nullptr)
 			{
 				bool found = false;
-				for (const software_info &swinfo : swlistdev->get_info())
+				for (const software_info &swinfo : swlistdev.get_info())
 					if (swinfo.first_part()->matches_interface(m_interface))
 						found = true;
 				if (found)
 				{
 					if (!have_compatible)
 						item_append(_("[compatible lists]"), nullptr, MENU_FLAG_DISABLE, nullptr);
-					item_append(swlistdev->description(), nullptr, 0, (void *)swlistdev);
+					item_append(swlistdev.description(), nullptr, 0, (void *)&swlistdev);
 				}
 				have_compatible = true;
 			}

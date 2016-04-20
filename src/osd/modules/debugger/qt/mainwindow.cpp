@@ -469,13 +469,12 @@ void MainWindow::createImagesMenu()
 	QMenu* imagesMenu = menuBar()->addMenu("&Images");
 
 	int interfaceIndex = 0;
-	image_interface_iterator iter(m_machine->root_device());
-	for (device_image_interface *img = iter.first(); img != NULL; img = iter.next())
+	for (device_image_interface &img : image_interface_iterator(m_machine->root_device()))
 	{
-		std::string menuName = string_format("%s : %s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
+		std::string menuName = string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[empty slot]");
 
 		QMenu* interfaceMenu = imagesMenu->addMenu(menuName.c_str());
-		interfaceMenu->setObjectName(img->device().name());
+		interfaceMenu->setObjectName(img.device().name());
 
 		QAction* mountAct = new QAction("Mount...", interfaceMenu);
 		QAction* unmountAct = new QAction("Unmount", interfaceMenu);
@@ -486,7 +485,7 @@ void MainWindow::createImagesMenu()
 		connect(mountAct, &QAction::triggered, this, &MainWindow::mountImage);
 		connect(unmountAct, &QAction::triggered, this, &MainWindow::unmountImage);
 
-		if (!img->exists())
+		if (!img.exists())
 			unmountAct->setEnabled(false);
 
 		interfaceMenu->addAction(mountAct);

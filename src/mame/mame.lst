@@ -28316,6 +28316,7 @@ ctomaday                        // 0249 (c) 1999 Visco
 cyberlip                        // 0010 (c) 1990 SNK
 diggerma                        // No Game ID (unlicensed), (c) 2000 Kyle Hodgetts, prototype
 doubledr                        // 0082 (c) 1995 Technos
+dragonsh                        // same ID as gowcaizr, dev board
 eightman                        // 0025 (c) 1991 SNK / Pallas
 fatfursp                        // 0058 (c) 1993 SNK
 fatfurspa                       // 0058 (c) 1993 SNK
@@ -28336,7 +28337,6 @@ garoup                          // 0253 (c) 1999 SNK
 ghostlop                        // 0228 GhostLop (prototype) 1996? Data East
 goalx3                          // 0209 (c) 1995 Visco
 gowcaizr                        // 0094 (c) 1995 Technos
-unkneo							// prototype
 gpilots                         // 0020 (c) 1991 SNK
 gpilotsh                        // 0020 (c) 1991 SNK
 gururin                         // 0067 (c) 1994 Face

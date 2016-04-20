@@ -23,7 +23,7 @@
 #include "modules/netdev/netdev_module.h"
 #include "modules/midi/midi_module.h"
 #include "modules/output/output_module.h"
-#include "cliopts.h"
+#include "emuopts.h"
 
 class ui_menu_item;
 
@@ -90,7 +90,7 @@ class ui_menu_item;
 //  TYPE DEFINITIONS
 //============================================================
 
-class osd_options : public cli_options
+class osd_options : public emu_options
 {
 public:
 	// construction/destruction

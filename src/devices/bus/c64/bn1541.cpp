@@ -74,17 +74,13 @@ c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *
 
 void c64_bn1541_device::device_start()
 {
-	device_iterator iter(machine().root_device());
-
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+	for (device_t &device : device_iterator(machine().root_device()))
 	{
-		device_iterator subiter(*device);
-
-		for (device_t *subdevice = subiter.first(); subdevice != nullptr; subdevice = iter.next())
+		for (device_t &subdevice : device_iterator(device))
 		{
-			if (subdevice->interface(m_other) && subdevice != this)
+			if (subdevice.interface(m_other) && &subdevice != this)
 			{
-				if (LOG) logerror("Parallel device %s\n", subdevice->tag());
+				if (LOG) logerror("Parallel device %s\n", subdevice.tag());
 
 				// grab the first 1541/1571 and run to the hills
 				m_other->m_other = this;

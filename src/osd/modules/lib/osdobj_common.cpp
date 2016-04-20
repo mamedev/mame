@@ -154,7 +154,7 @@ const options_entry osd_options::s_option_entries[] =
 };
 
 osd_options::osd_options()
-: cli_options()
+: emu_options()
 {
 	add_entries(osd_options::s_option_entries);
 }

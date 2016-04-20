@@ -130,12 +130,9 @@ VIDEO_START_MEMBER(cyberbal_state,cyberbal2p)
 
 void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 {
-	int i;
-	screen_device *update_screen;
-
 	/* loop over screens */
-	screen_device_iterator iter(*this);
-	for (i = 0, update_screen = iter.first(); update_screen != nullptr; i++, update_screen = iter.next())
+	int i = 0;
+	for (screen_device &update_screen : screen_device_iterator(*this))
 	{
 		/* need explicit target() because one is optional_device and other is required_device */
 		tilemap_t *curplayfield = i ? m_playfield2_tilemap.target() : m_playfield_tilemap.target();
@@ -155,7 +152,7 @@ void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 			if (((word >> 1) & 7) != m_playfield_palette_bank[i])
 			{
 				if (scanline > 0)
-					update_screen->update_partial(scanline - 1);
+					update_screen.update_partial(scanline - 1);
 				m_playfield_palette_bank[i] = (word >> 1) & 7;
 				curplayfield->set_palette_offset(m_playfield_palette_bank[i] << 8);
 			}
@@ -167,7 +164,7 @@ void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 			if (newscroll != m_playfield_xscroll[i])
 			{
 				if (scanline > 0)
-					update_screen->update_partial(scanline - 1);
+					update_screen.update_partial(scanline - 1);
 				curplayfield->set_scrollx(0, newscroll);
 				m_playfield_xscroll[i] = newscroll;
 			}
@@ -180,7 +177,7 @@ void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 			if (newscroll != m_playfield_yscroll[i])
 			{
 				if (scanline > 0)
-					update_screen->update_partial(scanline - 1);
+					update_screen.update_partial(scanline - 1);
 				curplayfield->set_scrolly(0, newscroll);
 				m_playfield_yscroll[i] = newscroll;
 			}
@@ -191,10 +188,11 @@ void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 			if (m_current_slip[i] != word)
 			{
 				if (scanline > 0)
-					update_screen->update_partial(scanline - 1);
+					update_screen.update_partial(scanline - 1);
 				m_current_slip[i] = word;
 			}
 		}
+		i++;
 	}
 }
 

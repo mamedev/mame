@@ -81,7 +81,7 @@ void device_video_interface::interface_validity_check(validity_checker &valid) c
 		{
 			screen_device_iterator iter(device().mconfig().root_device());
 			screen = iter.first();
-			if (iter.next() != nullptr)
+			if (iter.count() > 1)
 				osd_printf_error("No screen specified for device '%s', but multiple screens found\n", device().tag());
 		}
 	}
@@ -115,7 +115,7 @@ void device_video_interface::interface_pre_start()
 		{
 			screen_device_iterator iter(device().machine().root_device());
 			m_screen = iter.first();
-			if (iter.next() != nullptr)
+			if (iter.count() > 1)
 				throw emu_fatalerror("No screen specified for device '%s', but multiple screens found", device().tag());
 		}
 	}

@@ -172,10 +172,9 @@ void debug_cpu_flush_traces(running_machine &machine)
 {
 	/* this can be called on exit even when no debugging is enabled, so
 	 make sure the devdebug is valid before proceeding */
-	device_iterator iter(machine.root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-		if (device->debug() != nullptr)
-			device->debug()->trace_flush();
+	for (device_t &device : device_iterator(machine.root_device()))
+		if (device.debug() != nullptr)
+			device.debug()->trace_flush();
 }
 
 
@@ -311,19 +310,18 @@ bool debug_comment_save(running_machine &machine)
 		xml_set_attribute(systemnode, "name", machine.system().name);
 
 		// for each device
-		device_iterator iter(machine.root_device());
 		bool found_comments = false;
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			if (device->debug() && device->debug()->comment_count() > 0)
+		for (device_t &device : device_iterator(machine.root_device()))
+			if (device.debug() && device.debug()->comment_count() > 0)
 			{
 				// create a node for this device
 				xml_data_node *curnode = xml_add_child(systemnode, "cpu", nullptr);
 				if (curnode == nullptr)
 					throw emu_exception();
-				xml_set_attribute(curnode, "tag", device->tag());
+				xml_set_attribute(curnode, "tag", device.tag());
 
 				// export the comments
-				if (!device->debug()->comment_export(*curnode))
+				if (!device.debug()->comment_export(*curnode))
 					throw emu_exception();
 				found_comments = true;
 			}
@@ -1049,9 +1047,8 @@ static void on_vblank(running_machine &machine, screen_device &device, bool vbla
 static void reset_transient_flags(running_machine &machine)
 {
 	/* loop over CPUs and reset the transient flags */
-	device_iterator iter(machine.root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-		device->debug()->reset_transient_flag();
+	for (device_t &device : device_iterator(machine.root_device()))
+		device.debug()->reset_transient_flag();
 	machine.debugcpu_data->m_stop_when_not_device = nullptr;
 }
 

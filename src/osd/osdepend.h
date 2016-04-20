@@ -16,7 +16,6 @@
 #include "emucore.h"
 #include "osdcore.h"
 #include "unicode.h"
-#include "cliopts.h"
 #include "ui/menu.h"
 
 #include <memory>

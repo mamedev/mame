@@ -372,7 +372,6 @@ void cassette_image_device::call_display()
 	int n;
 	double position, length;
 	cassette_state uistate;
-	cassette_image_device *dev;
 	static const UINT8 shapes[8] = { 0x2d, 0x5c, 0x7c, 0x2f, 0x2d, 0x20, 0x20, 0x20 };
 
 	/* abort if we should not be showing the image */
@@ -390,9 +389,7 @@ void cassette_image_device::call_display()
 	x = 0.2f;
 	y = 0.5f;
 
-	cassette_device_iterator iter(device().machine().root_device());
-	for (dev = iter.first(); dev != nullptr && strcmp( dev->tag(), device().tag() ); dev = iter.next())
-		y += 1;
+	y += cassette_device_iterator(device().machine().root_device()).indexof(*this);
 
 	y *= device().machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 	/* choose which frame of the animation we are at */

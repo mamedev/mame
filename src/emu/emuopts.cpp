@@ -249,15 +249,14 @@ bool emu_options::add_slot_options(const software_part *swpart)
 
 	// iterate through all slot devices
 	int starting_count = options_count();
-	slot_interface_iterator iter(config.root_device());
-	for (const device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (const device_slot_interface &slot : slot_interface_iterator(config.root_device()))
 	{
 		// skip fixed slots
-		if (slot->fixed())
+		if (slot.fixed())
 			continue;
 
 		// retrieve info about the device instance
-		const char *name = slot->device().tag() + 1;
+		const char *name = slot.device().tag() + 1;
 		if (!exists(name))
 		{
 			// first device? add the header as to be pretty
@@ -265,7 +264,7 @@ bool emu_options::add_slot_options(const software_part *swpart)
 				add_entry(nullptr, "SLOT DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
 
 			// add the option
-			add_entry(name, nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, slot->default_option(), true);
+			add_entry(name, nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, slot.default_option(), true);
 		}
 
 		// allow software lists to supply their own defaults
@@ -273,7 +272,7 @@ bool emu_options::add_slot_options(const software_part *swpart)
 		{
 			std::string featurename = std::string(name).append("_default");
 			const char *value = swpart->feature(featurename.c_str());
-			if (value != nullptr && (*value == '\0' || slot->option(value) != nullptr))
+			if (value != nullptr && (*value == '\0' || slot.option(value) != nullptr))
 			{
 				// set priority above INIs but below actual command line
 				std::string error;
@@ -299,14 +298,13 @@ void emu_options::update_slot_options(const software_part *swpart)
 	machine_config config(*cursystem, *this);
 
 	// iterate through all slot devices
-	slot_interface_iterator iter(config.root_device());
-	for (device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))
 	{
 		// retrieve info about the device instance
-		const char *name = slot->device().tag() + 1;
-		if (exists(name) && !slot->option_list().empty())
+		const char *name = slot.device().tag() + 1;
+		if (exists(name) && !slot.option_list().empty())
 		{
-			std::string defvalue = slot->get_default_card_software();
+			std::string defvalue = slot.get_default_card_software();
 			if (defvalue.empty())
 			{
 				// keep any non-default setting
@@ -314,13 +312,13 @@ void emu_options::update_slot_options(const software_part *swpart)
 					continue;
 
 				// reinstate the actual default value as configured
-				if (slot->default_option() != nullptr)
-					defvalue.assign(slot->default_option());
+				if (slot.default_option() != nullptr)
+					defvalue.assign(slot.default_option());
 			}
 
 			// set the value and hide the option if not selectable
 			set_default_value(name, defvalue.c_str());
-			const device_slot_option *option = slot->option(defvalue.c_str());
+			const device_slot_option *option = slot.option(defvalue.c_str());
 			set_flag(name, ~OPTION_FLAG_INTERNAL, (option != nullptr && !option->selectable()) ? OPTION_FLAG_INTERNAL : 0);
 		}
 	}
@@ -343,20 +341,19 @@ void emu_options::add_device_options()
 	machine_config config(*cursystem, *this);
 
 	// iterate through all image devices
-	image_interface_iterator iter(config.root_device());
-	for (const device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
+	for (const device_image_interface &image : image_interface_iterator(config.root_device()))
 	{
-        if (!image->user_loadable())
-            continue;
+		if (!image.user_loadable())
+			continue;
 
         // retrieve info about the device instance
 		std::ostringstream option_name;
-		util::stream_format(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
-		if (strcmp(image->device_typename(image->image_type()), image->instance_name()) == 0)
-			util::stream_format(option_name, ";%s1;%s1", image->instance_name(), image->brief_instance_name());
+		util::stream_format(option_name, "%s;%s", image.instance_name(), image.brief_instance_name());
+		if (strcmp(image.device_typename(image.image_type()), image.instance_name()) == 0)
+			util::stream_format(option_name, ";%s1;%s1", image.instance_name(), image.brief_instance_name());
 
 		// add the option
-		if (!exists(image->instance_name()))
+		if (!exists(image.instance_name()))
 		{
 			// first device? add the header as to be pretty
 			if (m_device_options++ == 0)
@@ -486,23 +483,22 @@ void emu_options::parse_standard_inis(std::string &error_string, const game_driv
 		parse_one_ini("othersys", OPTION_PRIORITY_SYSTYPE_INI, &error_string);
 
 	machine_config config(*cursystem, *this);
-	screen_device_iterator iter(config.root_device());
-	for (const screen_device *device = iter.first(); device != nullptr; device = iter.next())
+	for (const screen_device &device : screen_device_iterator(config.root_device()))
 	{
 		// parse "raster.ini" for raster games
-		if (device->screen_type() == SCREEN_TYPE_RASTER)
+		if (device.screen_type() == SCREEN_TYPE_RASTER)
 		{
 			parse_one_ini("raster", OPTION_PRIORITY_SCREEN_INI, &error_string);
 			break;
 		}
 		// parse "vector.ini" for vector games
-		if (device->screen_type() == SCREEN_TYPE_VECTOR)
+		if (device.screen_type() == SCREEN_TYPE_VECTOR)
 		{
 			parse_one_ini("vector", OPTION_PRIORITY_SCREEN_INI, &error_string);
 			break;
 		}
 		// parse "lcd.ini" for lcd games
-		if (device->screen_type() == SCREEN_TYPE_LCD)
+		if (device.screen_type() == SCREEN_TYPE_LCD)
 		{
 			parse_one_ini("lcd", OPTION_PRIORITY_SCREEN_INI, &error_string);
 			break;
@@ -580,7 +576,7 @@ void emu_options::set_system_name(const char *name)
 	if (*software_name() != 0)
 	{
 		std::string sw_load(software_name());
-		std::string sw_list, sw_name, sw_part, sw_instance, option_errors, error_string;
+		std::string sw_list, sw_name, sw_part, sw_instance, error_string;
 		int left = sw_load.find_first_of(':');
 		int middle = sw_load.find_first_of(':', left + 1);
 		int right = sw_load.find_last_of(':');

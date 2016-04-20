@@ -472,7 +472,7 @@ float render_font::utf8string_width(float height, float aspect, const char *utf8
 bool render_font::load_cached_bdf(const char *filename)
 {
 	// first try to open the BDF itself
-	emu_file file(manager().machine().options().font_path(), OPEN_FLAG_READ);
+	emu_file file(m_manager.machine().options().font_path(), OPEN_FLAG_READ);
 	osd_file::error filerr = file.open(filename);
 	if (filerr != osd_file::error::NONE)
 		return false;
@@ -495,7 +495,7 @@ bool render_font::load_cached_bdf(const char *filename)
 
 	// attempt to open the cached version of the font
 	{
-		emu_file cachefile(manager().machine().options().font_path(), OPEN_FLAG_READ);
+		emu_file cachefile(m_manager.machine().options().font_path(), OPEN_FLAG_READ);
 		filerr = cachefile.open(cachedname.c_str());
 		if (filerr == osd_file::error::NONE)
 		{
@@ -732,7 +732,7 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 	osd_printf_warning("Generating cached BDF font...\n");
 
 	// attempt to open the file
-	emu_file file(manager().machine().options().font_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+	emu_file file(m_manager.machine().options().font_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 	osd_file::error filerr = file.open(filename);
 	if (filerr != osd_file::error::NONE)
 		return false;
