@@ -820,7 +820,7 @@ bool cheat_entry::activate()
 	{
 		execute_on_script();
 		changed = true;
-		manager().machine().popmessage("Activated %s", m_description.c_str());
+		m_manager.machine().popmessage("Activated %s", m_description.c_str());
 	}
 
 	// if we're a oneshot parameter cheat and we're active, execute the "state change" script and indicate change
@@ -828,7 +828,7 @@ bool cheat_entry::activate()
 	{
 		execute_change_script();
 		changed = true;
-		manager().machine().popmessage("Activated\n %s = %s", m_description.c_str(), m_parameter->text());
+		m_manager.machine().popmessage("Activated\n %s = %s", m_description.c_str(), m_parameter->text());
 	}
 
 	return changed;
