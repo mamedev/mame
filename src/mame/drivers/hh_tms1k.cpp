@@ -4964,7 +4964,8 @@ MACHINE_CONFIG_END
 
   known releases:
   - World: Copy Cat
-  - USA: Follow Me, distributed by Sears
+  - USA(1): Follow Me, distributed by Sears
+  - USA(2): Electronic Repeat, distributed by Tandy
 
 ***************************************************************************/
 
@@ -5031,7 +5032,7 @@ static INPUT_PORTS_START( copycat )
 
 	PORT_START("IN.3") // R7
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Best Play")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Play")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Replay")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
@@ -5085,14 +5086,16 @@ public:
 WRITE16_MEMBER(copycatm2_state::write_r)
 {
 	// R0-R3: leds
-	display_matrix(4, 1, data & 0xf, 1);
+	display_matrix(9, 1, data, 1);
 }
 
 WRITE16_MEMBER(copycatm2_state::write_o)
 {
 	// O0,O1: speaker out
 	// others: N/C
-	m_speaker->level_w(data & 3);
+	//m_speaker->level_w(data & 3);
+	
+	popmessage("O = %02x", data);
 }
 
 
@@ -5115,7 +5118,7 @@ static MACHINE_CONFIG_START( copycatm2, copycatm2_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(copycatm2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_copycat)
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -5979,7 +5982,7 @@ CONS( 1982, lostreas,  0,        0, lostreas,  lostreas,  driver_device, 0, "Par
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
 CONS( 1979, copycat,   0,        0, copycat,   copycat,   driver_device, 0, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, copycatm2, copycat,  0, copycatm2, copycatm2, driver_device, 0, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1989, copycatm2, copycat,  0, copycatm2, copycatm2, driver_device, 0, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,   0,        0, phpball,   phpball,   driver_device, 0, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
