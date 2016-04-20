@@ -70,11 +70,6 @@ public:
 	// Pointer to next window
 	sdl_window_info *   m_next;
 
-	// These are used in combine resizing events ... #if SDL13_COMBINE_RESIZE
-	int                 m_resize_width;
-	int                 m_resize_height;
-	osd_ticks_t         m_last_resize;
-
 private:
 	// window handle and info
 	char                m_title[256];

@@ -181,15 +181,6 @@ static inline void execute_async_wait(osd_work_callback callback, const worker_p
 static OSDWORK_CALLBACK(sdlwindow_thread_id)
 {
 	window_threadid = SDL_ThreadID();
-
-	if (SDLMAME_INIT_IN_WORKER_THREAD)
-	{
-		if (SDL_InitSubSystem(SDL_INIT_VIDEO))
-		{
-			osd_printf_error("Could not initialize SDL: %s.\n", SDL_GetError());
-			exit(-1);
-		}
-	}
 	return nullptr;
 }
 
@@ -310,9 +301,6 @@ void sdl_osd_interface::build_slider_list()
 
 static OSDWORK_CALLBACK( sdlwindow_exit_wt )
 {
-	if (SDLMAME_INIT_IN_WORKER_THREAD)
-		SDL_Quit();
-
 	if (param)
 		osd_free(param);
 	return nullptr;
@@ -1357,9 +1345,6 @@ sdl_window_info::sdl_window_info(running_machine &a_machine, int index, osd_moni
 		const osd_window_config *config)
 : osd_window(), m_next(NULL),
 	// Following three are used by input code to defer resizes
-	m_resize_width(0),
-	m_resize_height(0),
-	m_last_resize(0),
 	m_minimum_dim(0,0),
 	m_windowed_dim(0,0),
 	m_rendered_event(0, 1), m_target(0),

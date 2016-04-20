@@ -8,21 +8,6 @@
 #include "modules/font/font_module.h"
 
 //============================================================
-//  System dependent defines
-//============================================================
-
-
-#if defined(SDLMAME_WIN32)
-		#define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
-		#define SDLMAME_INIT_IN_WORKER_THREAD   (0)
-		#define SDL13_COMBINE_RESIZE (0) //(1) no longer needed
-#else
-	#define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
-	#define SDLMAME_INIT_IN_WORKER_THREAD   (0)
-	#define SDL13_COMBINE_RESIZE (0)
-#endif
-
-//============================================================
 //  Defines
 //============================================================
 

@@ -113,7 +113,6 @@ public:
 
 class sdl_window_info;
 
-// REVIEW: Do we need to handle SDLMAME_EVENTS_IN_WORKER_THREAD eventually?
 class sdl_event_manager : public event_manager_t<sdl_event_subscriber>
 {
 private:
