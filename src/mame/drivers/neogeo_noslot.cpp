@@ -9786,7 +9786,7 @@ GAME( 2001, nitdbl,     nitd,     neogeo_noslot,   neogeo, neogeo_state,   neoge
 /* Face */
 GAME( 1994, gururin,    neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Face", "Gururin", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, miexchng,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Face", "Money Puzzle Exchanger / Money Idol Exchanger", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, dragonsh,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Face", "Dragon's Heaven (prototype)", MACHINE_SUPPORTS_SAVE ) // same ID code as Voltage Fighter Gowkaizer, developed by ex-Technos staff
+GAME( 1997, dragonsh,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Face", "Dragon's Heaven (development board)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE ) // same ID code as Voltage Fighter Gowkaizer, developed by ex-Technos staff
 
 /* Hudson Soft */
 GAME( 1994, panicbom,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Eighting / Hudson", "Panic Bomber", MACHINE_SUPPORTS_SAVE )
