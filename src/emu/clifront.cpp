@@ -17,7 +17,6 @@
 #include "unzip.h"
 #include "validity.h"
 #include "sound/samples.h"
-#include "cliopts.h"
 #include "clifront.h"
 #include "xmlfile.h"
 
@@ -32,6 +31,80 @@
 #include <ctype.h>
 
 
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+// core commands
+#define CLICOMMAND_HELP                 "help"
+#define CLICOMMAND_VALIDATE             "validate"
+
+// configuration commands
+#define CLICOMMAND_CREATECONFIG         "createconfig"
+#define CLICOMMAND_SHOWCONFIG           "showconfig"
+#define CLICOMMAND_SHOWUSAGE            "showusage"
+
+// frontend commands
+#define CLICOMMAND_LISTXML              "listxml"
+#define CLICOMMAND_LISTFULL             "listfull"
+#define CLICOMMAND_LISTSOURCE           "listsource"
+#define CLICOMMAND_LISTCLONES           "listclones"
+#define CLICOMMAND_LISTBROTHERS         "listbrothers"
+#define CLICOMMAND_LISTCRC              "listcrc"
+#define CLICOMMAND_LISTROMS             "listroms"
+#define CLICOMMAND_LISTSAMPLES          "listsamples"
+#define CLICOMMAND_VERIFYROMS           "verifyroms"
+#define CLICOMMAND_VERIFYSAMPLES        "verifysamples"
+#define CLICOMMAND_ROMIDENT             "romident"
+#define CLICOMMAND_LISTDEVICES          "listdevices"
+#define CLICOMMAND_LISTSLOTS            "listslots"
+#define CLICOMMAND_LISTMEDIA            "listmedia"     // needed by MESS
+#define CLICOMMAND_LISTSOFTWARE         "listsoftware"
+#define CLICOMMAND_VERIFYSOFTWARE       "verifysoftware"
+#define CLICOMMAND_GETSOFTLIST          "getsoftlist"
+#define CLICOMMAND_VERIFYSOFTLIST       "verifysoftlist"
+
+
+//**************************************************************************
+//  COMMAND-LINE OPTIONS
+//**************************************************************************
+
+static const options_entry cli_option_entries[] =
+{
+	/* core commands */
+	{ nullptr,                            nullptr,       OPTION_HEADER,     "CORE COMMANDS" },
+	{ CLICOMMAND_HELP ";h;?",           "0",       OPTION_COMMAND,    "show help message" },
+	{ CLICOMMAND_VALIDATE ";valid",     "0",       OPTION_COMMAND,    "perform driver validation on all game drivers" },
+
+	/* configuration commands */
+	{ nullptr,                            nullptr,       OPTION_HEADER,     "CONFIGURATION COMMANDS" },
+	{ CLICOMMAND_CREATECONFIG ";cc",    "0",       OPTION_COMMAND,    "create the default configuration file" },
+	{ CLICOMMAND_SHOWCONFIG ";sc",      "0",       OPTION_COMMAND,    "display running parameters" },
+	{ CLICOMMAND_SHOWUSAGE ";su",       "0",       OPTION_COMMAND,    "show this help" },
+
+	/* frontend commands */
+	{ nullptr,                            nullptr,       OPTION_HEADER,     "FRONTEND COMMANDS" },
+	{ CLICOMMAND_LISTXML ";lx",         "0",       OPTION_COMMAND,    "all available info on driver in XML format" },
+	{ CLICOMMAND_LISTFULL ";ll",        "0",       OPTION_COMMAND,    "short name, full name" },
+	{ CLICOMMAND_LISTSOURCE ";ls",      "0",       OPTION_COMMAND,    "driver sourcefile" },
+	{ CLICOMMAND_LISTCLONES ";lc",      "0",       OPTION_COMMAND,    "show clones" },
+	{ CLICOMMAND_LISTBROTHERS ";lb",    "0",       OPTION_COMMAND,    "show \"brothers\", or other drivers from same sourcefile" },
+	{ CLICOMMAND_LISTCRC,               "0",       OPTION_COMMAND,    "CRC-32s" },
+	{ CLICOMMAND_LISTROMS ";lr",        "0",       OPTION_COMMAND,    "list required roms for a driver" },
+	{ CLICOMMAND_LISTSAMPLES,           "0",       OPTION_COMMAND,    "list optional samples for a driver" },
+	{ CLICOMMAND_VERIFYROMS,            "0",       OPTION_COMMAND,    "report romsets that have problems" },
+	{ CLICOMMAND_VERIFYSAMPLES,         "0",       OPTION_COMMAND,    "report samplesets that have problems" },
+	{ CLICOMMAND_ROMIDENT,              "0",       OPTION_COMMAND,    "compare files with known MAME roms" },
+	{ CLICOMMAND_LISTDEVICES ";ld",     "0",       OPTION_COMMAND,    "list available devices" },
+	{ CLICOMMAND_LISTSLOTS ";lslot",    "0",       OPTION_COMMAND,    "list available slots and slot devices" },
+	{ CLICOMMAND_LISTMEDIA ";lm",       "0",       OPTION_COMMAND,    "list available media for the system" },
+	{ CLICOMMAND_LISTSOFTWARE ";lsoft", "0",       OPTION_COMMAND,    "list known software for the system" },
+	{ CLICOMMAND_VERIFYSOFTWARE ";vsoft", "0",     OPTION_COMMAND,    "verify known software for the system" },
+	{ CLICOMMAND_GETSOFTLIST ";glist",  "0",       OPTION_COMMAND,    "retrieve software list by name" },
+	{ CLICOMMAND_VERIFYSOFTLIST ";vlist", "0",     OPTION_COMMAND,    "verify software list by name" },
+	{ nullptr }
+};
+
 
 // media_identifier class identifies media by hash via a search in
 // the driver database
@@ -39,7 +112,7 @@ class media_identifier
 {
 public:
 	// construction/destruction
-	media_identifier(cli_options &options);
+	media_identifier(emu_options &options);
 
 	// getters
 	int total() const { return m_total; }
@@ -70,11 +143,12 @@ private:
 //  cli_frontend - constructor
 //-------------------------------------------------
 
-cli_frontend::cli_frontend(cli_options &options, osd_interface &osd)
+cli_frontend::cli_frontend(emu_options &options, osd_interface &osd)
 	: m_options(options),
 		m_osd(osd),
 		m_result(MAMERR_NONE)
 {
+	m_options.add_entries(cli_option_entries);
 }
 
 
@@ -1727,7 +1801,7 @@ void cli_frontend::display_suggestions(const char *gamename)
 //  media_identifier - constructor
 //-------------------------------------------------
 
-media_identifier::media_identifier(cli_options &options)
+media_identifier::media_identifier(emu_options &options)
 	: m_drivlist(options),
 		m_total(0),
 		m_matches(0),
