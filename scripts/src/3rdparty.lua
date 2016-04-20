@@ -468,11 +468,16 @@ end
 			"LUA_COMPAT_5_1",
 			"LUA_COMPAT_5_2",
 		}
-	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") and not (_OPTIONS["targetos"]=="pnacl") then
-		defines {
-			"LUA_USE_POSIX",
+		local luaosdefine = {
+			windows = { "LUA_USE_WINDOWS" },
+			linux = { "LUA_USE_LINUX" },
+			macosx = { "LUA_USE_MACOSX" },
+			asmjs = {},
+			pnacl = {},
+			default = { "LUA_USE_POSIX" }
 		}
-	end
+		defines(luaosdefine[_OPTIONS["targetos"]] or luaosdefine.default)
+		
 	if ("pnacl" == _OPTIONS["gcc"]) then
 		defines {
 			"LUA_32BITS",
