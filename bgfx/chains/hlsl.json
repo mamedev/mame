@@ -14,6 +14,9 @@
 	// type: string
 	"author": "Ryan Holtz & ImJezze",
 
+	// transform (optional): This value determines whether the screen container is transformed the chain's shaders, otherwise the core renderer will handle the transformation (scale, offset).
+	"transform": true,
+
 	// sliders (optional): The list of sliders used by all of the entries in this chain. Can be omitted if no entries use any sliders.
 	"sliders": [
 		// type (required): The sliders's conceptual type. Is it a list of string selections? Is it a single floating-point value? Does it require RGB values, or XY values?
@@ -315,7 +318,7 @@
 			],
 			"output": "guest"
 		},
-		{	"effect": "hlsl/blit",
+		{	"effect": "misc/blit",
 			"name": "NTSC Skip",
 			"disablewhen": [
 				{ "type": "slider", "condition": "notequal", "combine": "and", "name": "adjustments", "value": 0 },
@@ -496,7 +499,7 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "hlsl/blit",
+		{	"effect": "misc/blit",
 			"name": "Final Blit",
 			"input": [
 				{ "sampler": "s_tex", "target": "internal" }

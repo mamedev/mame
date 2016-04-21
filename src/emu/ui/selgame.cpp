@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "ui/ui.h"
-#include "ui/menu.h"
 #include "uiinput.h"
 #include "ui/selgame.h"
 #include "ui/miscmenu.h"
@@ -29,7 +28,6 @@
 #include "ui/auditmenu.h"
 #include "rendutil.h"
 #include "softlist.h"
-#include <algorithm>
 
 extern const char UI_VERSION_TAG[];
 

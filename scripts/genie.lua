@@ -520,17 +520,6 @@ if (_OPTIONS["SOURCES"] == nil) then
 	dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
 end
 
-
-if _OPTIONS["IGNORE_GIT"]~="1" then	
-	GIT_VERSION = backtick( "git describe" )
-	local p = string.find(GIT_VERSION, '-', 1)
-	if (p~=nil) then
-		defines {
-			"GIT_VERSION=" .. string.sub(GIT_VERSION,p+1)
-		}
-	end
-end
-
 configuration { "gmake" }
 	flags {
 		"SingleOutputDir",

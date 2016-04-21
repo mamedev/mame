@@ -12,8 +12,8 @@ $input v_color0, v_texcoord0
 uniform vec4 u_swap_xy;
 uniform vec4 u_source_dims; // size of the guest machine
 uniform vec4 u_quad_dims;
-uniform vec4 u_screen_scale; // TODO: Hook up ScreenScale code-side
-uniform vec4 u_screen_offset; // TODO: Hook up ScreenOffset code-side
+uniform vec4 u_screen_scale;
+uniform vec4 u_screen_offset;
 
 // User-supplied
 uniform vec4 u_scanline_alpha;
@@ -50,7 +50,7 @@ vec2 GetAdjustedCoords(vec2 coord, vec2 center_offset)
 	coord -= center_offset;
 
 	// apply screen scale
-	//coord /= u_screen_scale.xy;
+	coord *= u_screen_scale.xy;
 
 	// un-center coordinates
 	coord += center_offset;
@@ -102,7 +102,7 @@ void main()
 	// Color
 	vec4 BaseColor = texture2D(s_tex, BaseCoord);
 
-	if (BaseCoord.x < 0.0 || BaseCoord.y < 0.0)
+	if (BaseCoord.x < 0.0 || BaseCoord.y < 0.0 || BaseCoord.x > 1.0 || BaseCoord.y > 1.0)
 	{
 		BaseColor.rgb = vec3(0.0, 0.0, 0.0);
 	}
@@ -111,7 +111,7 @@ void main()
 	if (u_shadow_alpha.x > 0.0)
 	{
 		vec2 ShadowCoord = GetShadowCoord(v_texcoord0.xy, v_texcoord0.xy);
-		
+
 		vec4 ShadowColor = texture2D(s_shadow, ShadowCoord);
 		vec3 ShadowMaskColor = mix(vec3(1.0, 1.0, 1.0), ShadowColor.rgb, u_shadow_alpha.xxx);
 
@@ -122,7 +122,7 @@ void main()
 	// Color Compression
 	// increasing the floor of the signal without affecting the ceiling
 	BaseColor.rgb = u_floor.rgb + (vec3(1.0, 1.0, 1.0) - u_floor.rgb) * BaseColor.rgb;
-	
+
 	// Color Power
 	BaseColor.r = pow(BaseColor.r, u_power.r);
 	BaseColor.g = pow(BaseColor.g, u_power.g);
@@ -136,7 +136,7 @@ void main()
 
 		float ColorBrightness = 0.299 * BaseColor.r + 0.587 * BaseColor.g + 0.114 * BaseColor.b;
 
-		float ScanCoord = v_texcoord0.y * u_source_dims.y * u_scanline_scale.x * 3.1415927;
+		float ScanCoord = BaseCoord.y * u_source_dims.y * u_scanline_scale.x * 3.1415927;
 		float ScanCoordJitter = u_scanline_jitter.x * u_jitter_amount.x * 1.618034;
 		float ScanSine = sin(ScanCoord + ScanCoordJitter);
 		float ScanlineWide = u_scanline_height.x + u_scanline_variation.x * max(1.0, u_scanline_height.x) * (1.0 - ColorBrightness);

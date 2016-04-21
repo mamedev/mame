@@ -209,7 +209,7 @@ render_primitive_list *renderer_d3d9::get_primitives()
 	if (m_shaders != nullptr)
 	{
 		// do not transform primitives (scale, offset) if shaders are enabled, the shaders will handle the transformation
-		window().target()->set_transform_primitives(!m_shaders->enabled());
+		window().target()->set_transform_container(!m_shaders->enabled());
 	}
 	return &window().target()->get_primitives();
 }

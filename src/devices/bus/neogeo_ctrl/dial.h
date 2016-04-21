@@ -22,7 +22,7 @@
 // ======================> neogeo_dial_device
 
 class neogeo_dial_device : public device_t,
-						public device_neogeo_control_port_interface
+						public device_neogeo_ctrl_edge_interface
 {
 public:
 	// construction/destruction
@@ -37,12 +37,15 @@ protected:
 	virtual void device_reset() override;
 	
 	// device_neogeo_control_port_interface overrides
-	virtual UINT8 read_ctrl() override;
+	virtual DECLARE_READ8_MEMBER( in0_r ) override;
+	virtual DECLARE_READ8_MEMBER( in1_r ) override;
 	virtual void write_ctrlsel(UINT8 data) override;
 	
 private:
-	required_ioport m_joy;
-	required_ioport m_dial;
+	required_ioport m_joy1;
+	required_ioport m_joy2;
+	required_ioport m_dial1;
+	required_ioport m_dial2;
 	UINT8 m_ctrl_sel;
 };
 

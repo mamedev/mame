@@ -22,7 +22,6 @@
 #include "rendfont.h"
 #include "rendutil.h"
 #include "softlist.h"
-#include <algorithm>
 
 std::string reselect_last::driver;
 std::string reselect_last::software;

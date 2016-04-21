@@ -53,6 +53,13 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		}
 	}
 
+	// Parse whether the screen container is transformed by the chain's shaders
+	bool transform = false;
+	if (value.HasMember("transform"))
+	{
+		transform = value["transform"].GetBool();
+	}
+
 	// Map sliders
 	std::map<std::string, bgfx_slider*> slider_map;
 	for (bgfx_slider* slider : sliders)
@@ -116,7 +123,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		}
 	}
 
-	return new bgfx_chain(name, author, targets, sliders, parameters, entries, target_list, screen_index);
+	return new bgfx_chain(name, author, transform, targets, sliders, parameters, entries, target_list, screen_index);
 }
 
 bool chain_reader::validate_parameters(const Value& value, std::string prefix)
