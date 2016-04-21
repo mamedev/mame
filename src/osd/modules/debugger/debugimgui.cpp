@@ -64,10 +64,11 @@ public:
 	int                 ofs_x;
 	int                 ofs_y;
 	int                 width;
-	int                 height;  // width and height of the view area, passed to ImGui::BeginChild
+	int                 height;  // initial view size
 	std::string         title;
-	int                 last_x;
-	int                 last_y;
+	int                 view_width;
+	int                 view_height;
+	bool                has_focus;
 	bool                exec_cmd;  // console only
 	int                 src_sel;
 	char                console_input[512];
@@ -95,6 +96,7 @@ public:
 
 private:
 	void handle_mouse();
+	void handle_mouse_views();
 	void handle_keys();
 	void handle_console(running_machine* machine);
 	void update();
@@ -114,9 +116,11 @@ private:
 	INT32            m_mouse_x;
 	INT32            m_mouse_y;
 	bool             m_mouse_button;
+	bool             m_prev_mouse_button;
 	bool             m_running;
 	const char*      font_name;
 	float            font_size;
+	ImVec2           m_text_size;  // size of character (assumes monospaced font is in use)
 	ImguiFontHandle  m_font;
 	UINT8            m_key_char;
 	bool             m_hide;
@@ -182,7 +186,52 @@ static inline void map_attr_to_fg_bg(unsigned char attr, rgb_t *fg, rgb_t *bg)
 
 void debug_imgui::handle_mouse()
 {
+	m_prev_mouse_button = m_mouse_button;
 	m_machine->ui_input().find_mouse(&m_mouse_x, &m_mouse_y, &m_mouse_button);
+}
+
+void debug_imgui::handle_mouse_views()
+{
+	rectangle rect;
+	bool clicked = false;
+	if(m_mouse_button == true && m_prev_mouse_button == false)
+		clicked = true;
+
+	// check all views, and pass mouse clicks to them
+	if(!m_mouse_button)
+		return;
+	rect.min_x = view_main_disasm->ofs_x;
+	rect.min_y = view_main_disasm->ofs_y;
+	rect.max_x = view_main_disasm->ofs_x + view_main_disasm->view_width;
+	rect.max_y = view_main_disasm->ofs_y + view_main_disasm->view_height;
+	if(rect.contains(m_mouse_x,m_mouse_y) && clicked && view_main_disasm->has_focus)
+	{
+		debug_view_xy topleft = view_main_disasm->view->visible_position();
+		debug_view_xy newpos;
+		newpos.x = topleft.x + (m_mouse_x-view_main_disasm->ofs_x) / m_text_size.x;
+		newpos.y = topleft.y + (m_mouse_y-view_main_disasm->ofs_y) / m_text_size.y;
+		view_main_disasm->view->set_cursor_position(newpos);
+		view_main_disasm->view->set_cursor_visible(true);
+	}
+	for(std::vector<debug_area*>::iterator it = view_list.begin();it != view_list.end();++it)
+	{
+		rect.min_x = (*it)->ofs_x;
+		rect.min_y = (*it)->ofs_y;
+		rect.max_x = (*it)->ofs_x + (*it)->view_width;
+		rect.max_y = (*it)->ofs_y + (*it)->view_height;
+		if(rect.contains(m_mouse_x,m_mouse_y) && clicked && (*it)->has_focus)
+		{
+			if((*it)->view->cursor_supported())
+			{
+				debug_view_xy topleft = (*it)->view->visible_position();
+				debug_view_xy newpos;
+				newpos.x = topleft.x + (m_mouse_x-(*it)->ofs_x) / m_text_size.x;
+				newpos.y = topleft.y + (m_mouse_y-(*it)->ofs_y) / m_text_size.y;
+				(*it)->view->set_cursor_position(newpos);
+				(*it)->view->set_cursor_visible(true);
+			}
+		}
+	}
 }
 
 void debug_imgui::handle_keys()
@@ -377,6 +426,10 @@ void debug_imgui::draw_bpoints(debug_area* view_ptr, bool* opened)
 		ImGui::BeginChild("##break_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
+		// update view location, while the cursor is at 0,0.
+		view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
+		view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
+		view_ptr->has_focus = ImGui::IsWindowFocused();
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
@@ -462,6 +515,12 @@ void debug_imgui::draw_log(debug_area* view_ptr, bool* opened)
 		ImGui::BeginChild("##log_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
+		// update view location, while the cursor is at 0,0.
+		view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
+		view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
+		view_ptr->view_width = ImGui::GetContentRegionMax().x;
+		view_ptr->view_height = ImGui::GetContentRegionMax().y;
+		view_ptr->has_focus = ImGui::IsWindowFocused();
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
@@ -577,6 +636,12 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		}
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
+		// update view location, while the cursor is at 0,0.
+		view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
+		view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
+		view_ptr->view_width = ImGui::GetContentRegionMax().x;
+		view_ptr->view_height = ImGui::GetContentRegionMax().y;
+		view_ptr->has_focus = ImGui::IsWindowFocused();
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
@@ -730,6 +795,12 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		}
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
+		// update view location, while the cursor is at 0,0.
+		view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
+		view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
+		view_ptr->view_width = ImGui::GetContentRegionMax().x;
+		view_ptr->view_height = ImGui::GetContentRegionMax().y;
+		view_ptr->has_focus = ImGui::IsWindowFocused();
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
@@ -882,6 +953,12 @@ void debug_imgui::draw_console()
 		ImGui::BeginChild("##state_output", ImVec2(180,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*2));  // account for title bar and menu
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
+		// update view location, while the cursor is at 0,0.
+		view_main_regs->ofs_x = ImGui::GetCursorScreenPos().x;
+		view_main_regs->ofs_y = ImGui::GetCursorScreenPos().y;
+		view_main_regs->view_width = ImGui::GetContentRegionMax().x;
+		view_main_regs->view_height = ImGui::GetContentRegionMax().y;
+		view_main_regs->has_focus = ImGui::IsWindowFocused();
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
@@ -913,6 +990,12 @@ void debug_imgui::draw_console()
 		ImGui::BeginChild("##disasm_output", ImVec2(ImGui::GetWindowWidth() - ImGui::GetCursorPosX() - 8,(ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*4)/2));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
+		// update view location, while the cursor is at 0,0.
+		view_main_disasm->ofs_x = ImGui::GetCursorScreenPos().x;
+		view_main_disasm->ofs_y = ImGui::GetCursorScreenPos().y;
+		view_main_disasm->view_width = ImGui::GetContentRegionMax().x;
+		view_main_disasm->view_height = ImGui::GetContentRegionMax().y;
+		view_main_disasm->has_focus = ImGui::IsWindowFocused();
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
@@ -957,6 +1040,12 @@ void debug_imgui::draw_console()
 		ImGui::BeginChild("##console_output", ImVec2(ImGui::GetWindowWidth() - ImGui::GetCursorPosX() - 8,(ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*4)/2 - ImGui::GetTextLineHeight()));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
+		// update view location, while the cursor is at 0,0.
+		view_main_console->ofs_x = ImGui::GetCursorScreenPos().x;
+		view_main_console->ofs_y = ImGui::GetCursorScreenPos().y;
+		view_main_console->view_width = ImGui::GetContentRegionMax().x;
+		view_main_console->view_height = ImGui::GetContentRegionMax().y;
+		view_main_console->has_focus = ImGui::IsWindowFocused();
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
@@ -1001,6 +1090,7 @@ void debug_imgui::update()
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered,ImVec4(0.7f,0.7f,0.7f,0.9f));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,ImVec4(0.9f,0.9f,0.9f,0.9f));
 
+	m_text_size = ImGui::CalcTextSize("A");  // hopefully you're using a monospaced font...
 	draw_console();  // We'll always have a console window
 
 	view_ptr = view_list.begin();
@@ -1047,6 +1137,7 @@ void debug_imgui::init_debugger(running_machine &machine)
 {
         ImGuiIO& io = ImGui::GetIO();
 	m_machine = &machine;
+	m_mouse_button = false;
 	if(strcmp(downcast<osd_options &>(m_machine->options()).video(),"bgfx") != 0)
 		fatalerror("Error: ImGui debugger requires the BGFX renderer.\n");
 
@@ -1117,6 +1208,7 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 	imguiBeginFrame(m_mouse_x,m_mouse_y,m_mouse_button ? IMGUI_MBUT_LEFT : 0, 0, width, height,m_key_char);
 	update();
 	imguiEndFrame();
+	handle_mouse_views();
 	device.machine().osd().update(false);
 }
 
