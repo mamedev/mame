@@ -13,12 +13,6 @@
 #ifndef MAME_EMU_UI_UI_CUSTUI_H
 #define MAME_EMU_UI_UI_CUSTUI_H
 
-#include "ui/menu.h"
-
-#include <vector>
-#include <string>
-
-
 //-------------------------------------------------
 //  Custom UI menu
 //-------------------------------------------------

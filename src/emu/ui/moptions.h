@@ -13,8 +13,6 @@
 #ifndef __UI_OPTS_H__
 #define __UI_OPTS_H__
 
-#include "options.h"
-
 // core directory options
 #define OPTION_HISTORY_PATH           "historypath"
 #define OPTION_EXTRAINI_PATH          "extrainipath"

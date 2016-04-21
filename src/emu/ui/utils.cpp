@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "ui/utils.h"
-#include <algorithm>
 
 extern const char UI_VERSION_TAG[];
 const char UI_VERSION_TAG[] = "# UI INFO ";
