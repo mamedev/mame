@@ -526,8 +526,6 @@ const device_type OHCI_USB_CONTROLLER = &device_creator<ohci_usb_controller>;
 
 ohci_usb_controller::ohci_usb_controller(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, OHCI_USB_CONTROLLER, "OHCI USB CONTROLLER", tag, owner, clock, "ohciusb", __FILE__),
-	//m_maincpu(*this, "maincpu"),
-	//pic8259_1(*this, "pic8259_1"),
 	m_interrupt_handler(*this)
 {
 	memset(&ohcist, 0, sizeof(ohcist));
@@ -550,7 +548,7 @@ void ohci_usb_controller::device_start()
 	for (int n = 0; n < 256; n++)
 		ohcist.address[n].port = -1;
 	ohcist.space = &(m_maincpu->space());
-	ohcist.timer = timer_alloc(0);// machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xbox_base_state::usb_ohci_timer), this), (void *)"USB OHCI Timer");
+	ohcist.timer = timer_alloc(0);
 	ohcist.timer->enable(false);
 }
 
