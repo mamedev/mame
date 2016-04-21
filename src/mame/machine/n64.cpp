@@ -2089,6 +2089,11 @@ void n64_periphs::si_dma_tick()
 
 void n64_periphs::pif_dma(int direction)
 {
+	if(si_status & 1)
+	{
+		si_status |= 8; //DMA Error, overlapping request		
+		return; // SI Busy, ignore request
+	}
 	if (!DWORD_ALIGNED(si_dram_addr))
 	{
 		fatalerror("pif_dma: si_dram_addr unaligned: %08X\n", si_dram_addr);
@@ -2127,7 +2132,7 @@ void n64_periphs::pif_dma(int direction)
 		}
 	}
 	si_status |= 1;
-	si_dma_timer->adjust(attotime::from_hz(10000));
+	si_dma_timer->adjust(attotime::from_hz(50000));
 }
 
 READ32_MEMBER( n64_periphs::si_reg_r )
