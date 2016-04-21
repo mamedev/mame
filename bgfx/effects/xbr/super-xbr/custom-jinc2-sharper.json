@@ -1,0 +1,38 @@
+// license:GPL-2.0+
+// copyright-holders:Hyllian
+
+/*
+   Hyllian's jinc windowed-jinc 2-lobe sharper with anti-ringing Shader
+   
+   Copyright (C) 2011-2014 Hyllian/Jararaca - sergiogdb@gmail.com
+*/
+
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "1",
+    	"dstColor": "0",
+    	"srcAlpha": "1",
+    	"dstAlpha": "0"
+    },
+    "depth": {
+    	"function": "always",
+    	"writeenable": false
+    },
+    "cull": {
+    	"mode": "none"
+    },
+    "write": {
+    	"rgb": true,
+    	"alpha": true
+    },
+    "vertex": "chains/super-xbr-2p/vs_custom-jinc2-sharper",
+    "fragment": "chains/super-xbr-2p/fs_custom-jinc2-sharper",
+    "uniforms": [
+    	{ "name": "s_p",               "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "JINC2_WINDOW_SINC", "type": "vec4", "values": [ 0.42, 0.0, 0.0, 0.0 ] },
+    	{ "name": "JINC2_SINC",        "type": "vec4", "values": [ 0.92, 0.0, 0.0, 0.0 ] },
+    	{ "name": "JINC2_AR_STRENGTH", "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "u_tex_size0",       "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
+    ]
+}

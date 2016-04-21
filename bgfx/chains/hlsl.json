@@ -318,7 +318,7 @@
 			],
 			"output": "guest"
 		},
-		{	"effect": "hlsl/blit",
+		{	"effect": "misc/blit",
 			"name": "NTSC Skip",
 			"disablewhen": [
 				{ "type": "slider", "condition": "notequal", "combine": "and", "name": "adjustments", "value": 0 },
@@ -499,7 +499,7 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "hlsl/blit",
+		{	"effect": "misc/blit",
 			"name": "Final Blit",
 			"input": [
 				{ "sampler": "s_tex", "target": "internal" }
