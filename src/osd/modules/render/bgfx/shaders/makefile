@@ -6,8 +6,11 @@ include shader.mk
 
 SUBDIRS := $(patsubst .,,$(patsubst ./,,$(shell find . -type d)))
 
-
+ifneq ($(CHAIN),)
+rebuild: chains/$(CHAIN)
+else
 rebuild: main $(SUBDIRS)
+endif
 
 $(SUBDIRS):
 	@echo $@
