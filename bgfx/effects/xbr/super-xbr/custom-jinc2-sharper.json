@@ -26,8 +26,8 @@
     	"rgb": true,
     	"alpha": true
     },
-    "vertex": "chains/super-xbr-2p/vs_custom-jinc2-sharper",
-    "fragment": "chains/super-xbr-2p/fs_custom-jinc2-sharper",
+    "vertex": "chains/xbr/super-xbr/vs_custom-jinc2-sharper",
+    "fragment": "chains/xbr/super-xbr/fs_custom-jinc2-sharper",
     "uniforms": [
     	{ "name": "s_p",               "type": "int",  "values": [ 1.0 ] },
     	{ "name": "JINC2_WINDOW_SINC", "type": "vec4", "values": [ 0.42, 0.0, 0.0, 0.0 ] },
