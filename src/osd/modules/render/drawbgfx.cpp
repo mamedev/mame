@@ -77,7 +77,7 @@ uint32_t renderer_bgfx::s_current_view = 0;
 //  renderer_bgfx - constructor
 //============================================================
 
-renderer_bgfx::renderer_bgfx(osd_window *w)
+renderer_bgfx::renderer_bgfx(std::shared_ptr<osd_window> w)
 	: osd_renderer(w, FLAG_NONE)
 	, m_options(downcast<osd_options &>(w->machine().options()))
 	, m_dimensions(0, 0)
@@ -85,7 +85,7 @@ renderer_bgfx::renderer_bgfx(osd_window *w)
 	, m_avi_writer(nullptr)
 	, m_avi_target(nullptr)
 {
-	m_options = downcast<osd_options &>(window().machine().options());
+	m_options = downcast<osd_options &>(assert_window()->machine().options());
 }
 
 //============================================================
@@ -146,10 +146,11 @@ static void* sdlNativeWindowHandle(SDL_Window* _window)
 int renderer_bgfx::create()
 {
 	// create renderer
-	osd_dim wdim = window().get_size();
-	m_width[window().m_index] = wdim.width();
-	m_height[window().m_index] = wdim.height();
-	if (window().m_index == 0)
+	auto win = assert_window();
+	osd_dim wdim = win->get_size();
+	m_width[win->m_index] = wdim.width();
+	m_height[win->m_index] = wdim.height();
+	if (win->m_index == 0)
 	{
 		if (!s_window_set)
 		{
@@ -164,9 +165,9 @@ int renderer_bgfx::create()
 			bgfx::setPlatformData(blank_pd);
 		}
 #ifdef OSD_WINDOWS
-		bgfx::winSetHwnd(window().platform_window<HWND>());
+		bgfx::winSetHwnd(win->platform_window<HWND>());
 #else
-		bgfx::sdlSetWindow(window().platform_window<SDL_Window*>());
+		bgfx::sdlSetWindow(win->platform_window<SDL_Window*>());
 #endif
 		std::string backend(m_options.bgfx_backend());
 		if (backend == "auto")
@@ -198,7 +199,7 @@ int renderer_bgfx::create()
 			printf("Unknown backend type '%s', going with auto-detection\n", backend.c_str());
 			bgfx::init();
 		}
-		bgfx::reset(m_width[window().m_index], m_height[window().m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+		bgfx::reset(m_width[win->m_index], m_height[win->m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
 		bgfx::setDebug(m_options.bgfx_debug() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
 		m_dimensions = osd_dim(m_width[0], m_height[0]);
@@ -210,14 +211,14 @@ int renderer_bgfx::create()
 	m_shaders = new shader_manager(m_options);
 	m_effects = new effect_manager(m_options, *m_shaders);
 
-	if (window().m_index != 0)
+	if (win->m_index != 0)
 	{
 #ifdef OSD_WINDOWS
-		m_framebuffer = m_targets->create_backbuffer(window().platform_window<HWND>(), m_width[window().m_index], m_height[window().m_index]);
+		m_framebuffer = m_targets->create_backbuffer(win->platform_window<HWND>(), m_width[win->m_index], m_height[win->m_index]);
 #else
-		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().platform_window<SDL_Window*>()), m_width[window().m_index], m_height[window().m_index]);
+		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(win->platform_window<SDL_Window*>()), m_width[win->m_index], m_height[win->m_index]);
 #endif
-		bgfx::touch(window().m_index);
+		bgfx::touch(win->m_index);
 	}
 
 	// Create program from shaders.
@@ -231,7 +232,7 @@ int renderer_bgfx::create()
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
 	m_screen_effect[3] = m_effects->effect("screen_add");
 
-	m_chains = new chain_manager(window().machine(), m_options, *m_textures, *m_targets, *m_effects, window().m_index, *this);
+	m_chains = new chain_manager(win->machine(), m_options, *m_textures, *m_targets, *m_effects, win->m_index, *this);
 	m_sliders_dirty = true;
 
 	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
@@ -251,7 +252,8 @@ int renderer_bgfx::create()
 
 void renderer_bgfx::record()
 {
-	if (m_avi_writer == nullptr || window().m_index > 0)
+	auto win = assert_window();
+	if (m_avi_writer == nullptr || win->m_index > 0)
 	{
 		return;
 	}
@@ -648,15 +650,16 @@ uint32_t renderer_bgfx::u32Color(uint32_t r, uint32_t g, uint32_t b, uint32_t a 
 
 int renderer_bgfx::draw(int update)
 {
-	int window_index = window().m_index;
+	auto win = assert_window();
+	int window_index = win->m_index;
 	if (window_index == 0)
 	{
 		s_current_view = 0;
 		if (m_avi_writer == nullptr)
 		{
-            uint32_t width = window().get_size().width();
-            uint32_t height = window().get_size().height();
-            m_avi_writer = new avi_write(window().machine(), width, height);
+            uint32_t width = win->get_size().width();
+            uint32_t height = win->get_size().height();
+            m_avi_writer = new avi_write(win->machine(), width, height);
 			m_avi_data = new uint8_t[width * height * 4];
             m_avi_bitmap.allocate(width, height);
 		}
@@ -666,13 +669,13 @@ int renderer_bgfx::draw(int update)
 	m_ui_view = -1;
 
 	// Set view 0 default viewport.
-	osd_dim wdim = window().get_size();
+	osd_dim wdim = win->get_size();
 	m_width[window_index] = wdim.width();
 	m_height[window_index] = wdim.height();
 
-    window().m_primlist->acquire_lock();
-    s_current_view += m_chains->handle_screen_chains(s_current_view, window().m_primlist->first(), window());
-    window().m_primlist->release_lock();
+	win->m_primlist->acquire_lock();
+    s_current_view += m_chains->handle_screen_chains(s_current_view, win->m_primlist->first(), *win.get());
+	win->m_primlist->release_lock();
 
 	bool skip_frame = update_dimensions();
 	if (skip_frame)
@@ -689,12 +692,12 @@ int renderer_bgfx::draw(int update)
 		s_current_view = m_max_view;
 	}
 
-	window().m_primlist->acquire_lock();
+	win->m_primlist->acquire_lock();
 
 	// Mark our texture atlas as dirty if we need to do so
 	bool atlas_valid = update_atlas();
 
-	render_primitive *prim = window().m_primlist->first();
+	render_primitive *prim = win->m_primlist->first();
 	std::vector<void*> sources;
 	while (prim != nullptr)
 	{
@@ -734,7 +737,7 @@ int renderer_bgfx::draw(int update)
 		}
 	}
 
-	window().m_primlist->release_lock();
+	win->m_primlist->release_lock();
 
     // This dummy draw call is here to make sure that view 0 is cleared
     // if no other draw calls are submitted to view 0.
@@ -774,7 +777,8 @@ void renderer_bgfx::update_recording()
 
 void renderer_bgfx::add_audio_to_recording(const INT16 *buffer, int samples_this_frame)
 {
-	if (m_avi_writer != nullptr && m_avi_writer->recording() && window().m_index == 0)
+	auto win = assert_window();
+	if (m_avi_writer != nullptr && m_avi_writer->recording() && win->m_index == 0)
 	{
 		m_avi_writer->audio_frame(buffer, samples_this_frame);
 	}
@@ -782,7 +786,9 @@ void renderer_bgfx::add_audio_to_recording(const INT16 *buffer, int samples_this
 
 bool renderer_bgfx::update_dimensions()
 {
-	const uint32_t window_index = window().m_index;
+	auto win = assert_window();
+
+	const uint32_t window_index = win->m_index;
 	const uint32_t width = m_width[window_index];
 	const uint32_t height = m_height[window_index];
 
@@ -798,14 +804,14 @@ bool renderer_bgfx::update_dimensions()
 	{
 		if ((m_dimensions != osd_dim(width, height)))
 		{
-			bgfx::reset(window().m_main->get_size().width(), window().m_main->get_size().height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+			bgfx::reset(win->main_window()->get_size().width(), win->main_window()->get_size().height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 			m_dimensions = osd_dim(width, height);
 
 			delete m_framebuffer;
 #ifdef OSD_WINDOWS
-			m_framebuffer = m_targets->create_backbuffer(window().platform_window<HWND>(), width, height);
+			m_framebuffer = m_targets->create_backbuffer(win->platform_window<HWND>(), width, height);
 #else
-			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(window().platform_window<SDL_Window*>()), width, height);
+			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(win->platform_window<SDL_Window*>()), width, height);
 #endif
 
 			bgfx::setViewFrameBuffer(s_current_view, m_framebuffer->target());
@@ -820,7 +826,9 @@ bool renderer_bgfx::update_dimensions()
 
 void renderer_bgfx::setup_view(uint32_t view_index, bool screen)
 {
-	const uint32_t window_index = window().m_index;
+	auto win = assert_window();
+
+	const uint32_t window_index = win->m_index;
 	const uint32_t width = m_width[window_index];
 	const uint32_t height = m_height[window_index];
 
@@ -845,7 +853,7 @@ void renderer_bgfx::setup_view(uint32_t view_index, bool screen)
 	{
 		m_seen_views[view_index] = true;
 #endif
-		if (m_avi_writer != nullptr && m_avi_writer->recording() && window().m_index == 0)
+		if (m_avi_writer != nullptr && m_avi_writer->recording() && win->m_index == 0)
 		{
 			bgfx::setViewFrameBuffer(view_index, m_avi_target->target());
 		}
@@ -857,7 +865,8 @@ void renderer_bgfx::setup_view(uint32_t view_index, bool screen)
 
 void renderer_bgfx::setup_matrices(uint32_t view_index, bool screen)
 {
-	const uint32_t window_index = window().m_index;
+	auto win = assert_window();
+	const uint32_t window_index = win->m_index;
 	const uint32_t width = m_width[window_index];
 	const uint32_t height = m_height[window_index];
 
@@ -1064,8 +1073,9 @@ bool renderer_bgfx::check_for_dirty_atlas()
 {
 	bool atlas_dirty = false;
 
+	auto win = assert_window();
 	std::map<UINT32, rectangle_packer::packable_rectangle> acquired_infos;
-	for (render_primitive &prim : *window().m_primlist)
+	for (render_primitive &prim : *win->m_primlist)
 	{
 		bool pack = prim.packable(PACKABLE_SIZE);
 		if (prim.type == render_primitive::QUAD && prim.texture.base != nullptr && pack)
