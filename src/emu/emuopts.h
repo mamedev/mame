@@ -218,25 +218,43 @@ enum
 struct game_driver;
 class software_part;
 
-
-class emu_options : public core_options
+class mame_options
 {
 	static const UINT32 OPTION_FLAG_DEVICE = 0x80000000;
 
 public:
+	// parsing wrappers
+	static bool parse_command_line(emu_options &options, int argc, char *argv[], std::string &error_string);
+	static void parse_standard_inis(emu_options &options, std::string &error_string, const game_driver *driver = nullptr);
+	static bool parse_slot_devices(emu_options &options, int argc, char *argv[], std::string &error_string, const char *name = nullptr, const char *value = nullptr, const software_part *swpart = nullptr);
+	// FIXME: Couriersud: This should be in image_device_exit
+	static void remove_device_options(emu_options &options);
+
+	static void set_system_name(emu_options &options, const char *name);
+	static bool add_slot_options(emu_options &options, const software_part *swpart = nullptr);
+private:
+	// device-specific option handling
+	static void add_device_options(emu_options &options);
+	static void update_slot_options(emu_options &options, const software_part *swpart = nullptr);
+
+	// INI parsing helper
+	static bool parse_one_ini(emu_options &options, const char *basename, int priority, std::string *error_string = nullptr);
+
+	static int m_slot_options;
+	static int m_device_options;
+
+};
+
+class emu_options : public core_options
+{
+public:
 	// construction/destruction
 	emu_options();
-
-	// parsing wrappers
-	bool parse_command_line(int argc, char *argv[], std::string &error_string);
-	void parse_standard_inis(std::string &error_string, const game_driver *driver = nullptr);
-	bool parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name = nullptr, const char *value = nullptr, const software_part *swpart = nullptr);
 
 	// core options
 	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
 	const char *software_name() const { return value(OPTION_SOFTWARENAME); }
 	const game_driver *system() const;
-	void set_system_name(const char *name);
 
 	// core configuration options
 	bool read_config() const { return bool_value(OPTION_READCONFIG); }
@@ -405,26 +423,13 @@ public:
 	const char *no_plugin() const { return value(OPTION_NO_PLUGIN); }
 
 	const char *language() const { return value(OPTION_LANGUAGE); }
-
-	// FIXME: Couriersud: This should be in image_device_exit
-	void remove_device_options();
-
-	std::string main_value(const char *option) const;
-	std::string sub_value(const char *name, const char *subname) const;
-	bool add_slot_options(const software_part *swpart = nullptr);
-
-
-private:
-	// device-specific option handling
-	void add_device_options();
-	void update_slot_options(const software_part *swpart = nullptr);
-
-	// INI parsing helper
-	bool parse_one_ini(const char *basename, int priority, std::string *error_string = nullptr);
-
+	
 	// cache frequently used options in members
 	void update_cached_options();
 
+	std::string main_value(const char *option) const;
+	std::string sub_value(const char *name, const char *subname) const;
+private:
 	static const options_entry s_option_entries[];
 
 	// cached options
@@ -432,8 +437,6 @@ private:
 	bool m_joystick_contradictory;
 	bool m_sleep;
 	bool m_refresh_speed;
-	int m_slot_options;
-	int m_device_options;
 };
 
 
