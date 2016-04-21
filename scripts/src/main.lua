@@ -136,7 +136,17 @@ end
 		end
 
 	configuration { }
-
+	
+if _OPTIONS["IGNORE_GIT"]~="1" then	
+	GIT_VERSION = backtick( "git describe --dirty" )
+	local p = string.find(GIT_VERSION, '-', 1)
+	if (p~=nil) then
+		defines {
+			"GIT_VERSION=" .. string.sub(GIT_VERSION,p+1)
+		}
+	end
+end
+	
 	if _OPTIONS["targetos"]=="android" then
 		includedirs {
 			MAME_DIR .. "3rdparty/SDL2/include",
