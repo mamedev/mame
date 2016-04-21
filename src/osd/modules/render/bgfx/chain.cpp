@@ -17,6 +17,7 @@
 #include "targetmanager.h"
 #include "target.h"
 #include "vertex.h"
+#include "screen.h"
 #include "modules/osdwindow.h"
 
 #include "chain.h"
@@ -62,11 +63,7 @@ bgfx_chain::~bgfx_chain()
 void bgfx_chain::process(render_primitive* prim, int view, int screen, texture_manager& textures, osd_window& window, uint64_t blend)
 {
 	screen_device_iterator screen_iterator(window.machine().root_device());
-	screen_device* screen_device = screen_iterator.first();
-	for (int i = 0; i < screen; i++)
-	{
-		screen_device = screen_iterator.next();
-	}
+    screen_device* screen_device = screen_iterator.byindex(screen);
 	render_container &screen_container = screen_device->container();
 
 	int current_view = view;
