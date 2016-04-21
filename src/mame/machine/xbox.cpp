@@ -522,7 +522,43 @@ static const char *const usbregnames[] = {
 };
 #endif
 
-READ32_MEMBER(xbox_base_state::usbctrl_r)
+const device_type OHCI_USB_CONTROLLER = &device_creator<ohci_usb_controller>;
+
+ohci_usb_controller::ohci_usb_controller(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, OHCI_USB_CONTROLLER, "OHCI USB CONTROLLER", tag, owner, clock, "ohciusb", __FILE__),
+	//m_maincpu(*this, "maincpu"),
+	//pic8259_1(*this, "pic8259_1"),
+	m_interrupt_handler(*this)
+{
+	memset(&ohcist, 0, sizeof(ohcist));
+}
+
+void ohci_usb_controller::device_start()
+{
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_interrupt_handler.resolve_safe();
+	ohcist.hc_regs[HcRevision] = 0x10;
+	ohcist.hc_regs[HcFmInterval] = 0x2edf;
+	ohcist.hc_regs[HcLSThreshold] = 0x628;
+	ohcist.hc_regs[HcRhDescriptorA] = 4;
+	ohcist.hc_regs[HcControl] = UsbReset << 6;
+	ohcist.state = UsbReset;
+	ohcist.interruptbulkratio = 1;
+	ohcist.writebackdonehadcounter = 7;
+	for (int n = 0; n <= 4; n++)
+		ohcist.ports[n].address = -1;
+	for (int n = 0; n < 256; n++)
+		ohcist.address[n].port = -1;
+	ohcist.space = &(m_maincpu->space());
+	ohcist.timer = timer_alloc(0);// machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xbox_base_state::usb_ohci_timer), this), (void *)"USB OHCI Timer");
+	ohcist.timer->enable(false);
+}
+
+void ohci_usb_controller::device_reset()
+{
+}
+
+READ32_MEMBER(ohci_usb_controller::read)
 {
 	UINT32 ret;
 
@@ -532,7 +568,7 @@ READ32_MEMBER(xbox_base_state::usbctrl_r)
 	else
 		logerror("usb controller 0 register %s read\n", usbregnames[offset]);
 #endif
-	ret=ohcist.hc_regs[offset];
+	ret = ohcist.hc_regs[offset];
 	if (offset == 0) { /* hacks needed until usb (and jvs) is implemented */
 #ifndef USB_HACK_ENABLED
 		hack_usb();
@@ -541,7 +577,7 @@ READ32_MEMBER(xbox_base_state::usbctrl_r)
 	return ret;
 }
 
-WRITE32_MEMBER(xbox_base_state::usbctrl_w)
+WRITE32_MEMBER(ohci_usb_controller::write)
 {
 	UINT32 old = ohcist.hc_regs[offset];
 
@@ -603,7 +639,7 @@ WRITE32_MEMBER(xbox_base_state::usbctrl_w)
 	}
 	if (offset >= HcRhPortStatus1) {
 		int port = offset - HcRhPortStatus1 + 1; // port 0 not used
-		// bit 0  R:CurrentConnectStatus           W:ClearPortEnable: 1 clears PortEnableStatus
+												 // bit 0  R:CurrentConnectStatus           W:ClearPortEnable: 1 clears PortEnableStatus
 		if (data & CCS) {
 			ohcist.hc_regs[offset] &= ~PES;
 			ohcist.address[ohcist.ports[port].address].port = -1;
@@ -674,7 +710,7 @@ WRITE32_MEMBER(xbox_base_state::usbctrl_w)
 	ohcist.hc_regs[offset] = data;
 }
 
-TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
+void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	UINT32 hcca;
 	UINT32 plh;
@@ -710,7 +746,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 			if (list == 0) {
 				if (ohcist.hc_regs[HcControl] & PLE) {
 					// periodic list
-					plh=ohcist.space->read_dword(hcca + (ohcist.framenumber & 0x1f) * 4);
+					plh = ohcist.space->read_dword(hcca + (ohcist.framenumber & 0x1f) * 4);
 					cont = true;
 					while (cont == true) {
 						if (plh != 0) {
@@ -752,7 +788,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 										pid = OutPid; // out
 									else if (ohcist.endpoint_descriptor.d == 2)
 										pid = InPid; // in
-									else 
+									else
 										pid = InPid; // in
 									R = (int)ohcist.framenumber - (int)ohcist.isochronous_transfer_descriptor.sf;
 									//if ((R < 0) || (R > (int)ohcist.isochronous_transfer_descriptor.fc))
@@ -766,7 +802,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 										else
 											a = ohcist.isochronous_transfer_descriptor.bp0 | (a & 0xfff);
 									}
-									b=ohcist.isochronous_transfer_descriptor.offset[R];
+									b = ohcist.isochronous_transfer_descriptor.offset[R];
 									if (b & (1 << 12))
 										b = (ohcist.isochronous_transfer_descriptor.be & 0xfffff000) | (b & 0xfff);
 									else
@@ -836,7 +872,8 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 									else {
 										usb_ohci_writeback_transfer_descriptor(ohcist.endpoint_descriptor.headp);
 									}
-								} else
+								}
+								else
 								{
 									// status writeback
 									ohcist.isochronous_transfer_descriptor.cc = NoError;
@@ -865,7 +902,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 						{
 							plh = ohcist.endpoint_descriptor.nexted;
 						}
-						else 
+						else
 							cont = false;
 					}
 				}
@@ -911,9 +948,9 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 								usb_ohci_read_transfer_descriptor(ohcist.endpoint_descriptor.headp);
 								// get pid
 								if (ohcist.endpoint_descriptor.d == 1)
-									pid=OutPid; // out
+									pid = OutPid; // out
 								else if (ohcist.endpoint_descriptor.d == 2)
-									pid=InPid; // in
+									pid = InPid; // in
 								else {
 									pid = ohcist.transfer_descriptor.dp; // 0 setup 1 out 2 in
 								}
@@ -951,7 +988,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 								if (pid == InPid) {
 									// ... store done bytes
 									for (int c = 0; c < done; c++) {
-										ohcist.space->write_byte(b,ohcist.buffer[c]);
+										ohcist.space->write_byte(b, ohcist.buffer[c]);
 										b++;
 										if ((b & 0xfff) == 0)
 											b = ohcist.transfer_descriptor.be & 0xfffff000;
@@ -986,7 +1023,8 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 									}
 									usb_ohci_writeback_transfer_descriptor(a);
 									usb_ohci_writeback_endpoint_descriptor(ohcist.hc_regs[HcControlCurrentED]);
-								} else {
+								}
+								else {
 									usb_ohci_writeback_transfer_descriptor(ohcist.endpoint_descriptor.headp);
 								}
 							}
@@ -1161,12 +1199,12 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::usb_ohci_timer)
 	usb_ohci_interrupts();
 }
 
-void xbox_base_state::usb_ohci_plug(int port, ohci_function_device *function)
+void ohci_usb_controller::usb_ohci_plug(int port, ohci_function_device *function)
 {
 	if ((port > 0) && (port <= 4)) {
 		ohcist.ports[port].function = function;
 		ohcist.ports[port].address = -1;
-		ohcist.hc_regs[HcRhPortStatus1+port-1] = CCS | CSC;
+		ohcist.hc_regs[HcRhPortStatus1 + port - 1] = CCS | CSC;
 		if (ohcist.state != UsbReset)
 		{
 			ohcist.hc_regs[HcInterruptStatus] |= RootHubStatusChange;
@@ -1175,11 +1213,146 @@ void xbox_base_state::usb_ohci_plug(int port, ohci_function_device *function)
 	}
 }
 
+void ohci_usb_controller::usb_ohci_interrupts()
+{
+	if (((ohcist.hc_regs[HcInterruptStatus] & ohcist.hc_regs[HcInterruptEnable]) != 0) && ((ohcist.hc_regs[HcInterruptEnable] & MasterInterruptEnable) != 0)) 
+	{
+		//pic8259_1->ir1_w(1);
+		m_interrupt_handler(1);
+	} else 
+	{
+		//pic8259_1->ir1_w(0);
+		m_interrupt_handler(0);
+	}
+}
+
+void ohci_usb_controller::usb_ohci_read_endpoint_descriptor(UINT32 address)
+{
+	UINT32 w;
+
+	w = ohcist.space->read_dword(address);
+	ohcist.endpoint_descriptor.word0 = w;
+	ohcist.endpoint_descriptor.fa = w & 0x7f;
+	ohcist.endpoint_descriptor.en = (w >> 7) & 15;
+	ohcist.endpoint_descriptor.d = (w >> 11) & 3;
+	ohcist.endpoint_descriptor.s = (w >> 13) & 1;
+	ohcist.endpoint_descriptor.k = (w >> 14) & 1;
+	ohcist.endpoint_descriptor.f = (w >> 15) & 1;
+	ohcist.endpoint_descriptor.mps = (w >> 16) & 0x7ff;
+	ohcist.endpoint_descriptor.tailp = ohcist.space->read_dword(address + 4);
+	w = ohcist.space->read_dword(address + 8);
+	ohcist.endpoint_descriptor.headp = w & 0xfffffffc;
+	ohcist.endpoint_descriptor.h = w & 1;
+	ohcist.endpoint_descriptor.c = (w >> 1) & 1;
+	ohcist.endpoint_descriptor.nexted = ohcist.space->read_dword(address + 12);
+}
+
+void ohci_usb_controller::usb_ohci_writeback_endpoint_descriptor(UINT32 address)
+{
+	UINT32 w;
+
+	w = ohcist.endpoint_descriptor.word0 & 0xf8000000;
+	w = w | (ohcist.endpoint_descriptor.mps << 16) | (ohcist.endpoint_descriptor.f << 15) | (ohcist.endpoint_descriptor.k << 14) | (ohcist.endpoint_descriptor.s << 13) | (ohcist.endpoint_descriptor.d << 11) | (ohcist.endpoint_descriptor.en << 7) | ohcist.endpoint_descriptor.fa;
+	ohcist.space->write_dword(address, w);
+	w = ohcist.endpoint_descriptor.headp | (ohcist.endpoint_descriptor.c << 1) | ohcist.endpoint_descriptor.h;
+	ohcist.space->write_dword(address + 8, w);
+}
+
+void ohci_usb_controller::usb_ohci_read_transfer_descriptor(UINT32 address)
+{
+	UINT32 w;
+
+	w = ohcist.space->read_dword(address);
+	ohcist.transfer_descriptor.word0 = w;
+	ohcist.transfer_descriptor.cc = (w >> 28) & 15;
+	ohcist.transfer_descriptor.ec = (w >> 26) & 3;
+	ohcist.transfer_descriptor.t = (w >> 24) & 3;
+	ohcist.transfer_descriptor.di = (w >> 21) & 7;
+	ohcist.transfer_descriptor.dp = (w >> 19) & 3;
+	ohcist.transfer_descriptor.r = (w >> 18) & 1;
+	ohcist.transfer_descriptor.cbp = ohcist.space->read_dword(address + 4);
+	ohcist.transfer_descriptor.nexttd = ohcist.space->read_dword(address + 8);
+	ohcist.transfer_descriptor.be = ohcist.space->read_dword(address + 12);
+}
+
+void ohci_usb_controller::usb_ohci_writeback_transfer_descriptor(UINT32 address)
+{
+	UINT32 w;
+
+	w = ohcist.transfer_descriptor.word0 & 0x0003ffff;
+	w = w | (ohcist.transfer_descriptor.cc << 28) | (ohcist.transfer_descriptor.ec << 26) | (ohcist.transfer_descriptor.t << 24) | (ohcist.transfer_descriptor.di << 21) | (ohcist.transfer_descriptor.dp << 19) | (ohcist.transfer_descriptor.r << 18);
+	ohcist.space->write_dword(address, w);
+	ohcist.space->write_dword(address + 4, ohcist.transfer_descriptor.cbp);
+	ohcist.space->write_dword(address + 8, ohcist.transfer_descriptor.nexttd);
+}
+
+void ohci_usb_controller::usb_ohci_read_isochronous_transfer_descriptor(UINT32 address)
+{
+	UINT32 w;
+
+	w = ohcist.space->read_dword(address);
+	ohcist.isochronous_transfer_descriptor.word0 = w;
+	ohcist.isochronous_transfer_descriptor.cc = (w >> 28) & 15;
+	ohcist.isochronous_transfer_descriptor.fc = (w >> 24) & 7;
+	ohcist.isochronous_transfer_descriptor.di = (w >> 21) & 7;
+	ohcist.isochronous_transfer_descriptor.sf = w & 0xffff;
+	w = ohcist.space->read_dword(address + 4);
+	ohcist.isochronous_transfer_descriptor.word1 = w;
+	ohcist.isochronous_transfer_descriptor.bp0 = w & 0xfffff000;
+	ohcist.isochronous_transfer_descriptor.nexttd = ohcist.space->read_dword(address + 8);
+	ohcist.isochronous_transfer_descriptor.be = ohcist.space->read_dword(address + 12);
+	w = ohcist.space->read_dword(address + 16);
+	ohcist.isochronous_transfer_descriptor.offset[0] = w & 0xffff;
+	ohcist.isochronous_transfer_descriptor.offset[1] = (w >> 16) & 0xffff;
+	w = ohcist.space->read_dword(address + 20);
+	ohcist.isochronous_transfer_descriptor.offset[2] = w & 0xffff;
+	ohcist.isochronous_transfer_descriptor.offset[3] = (w >> 16) & 0xffff;
+	w = ohcist.space->read_dword(address + 24);
+	ohcist.isochronous_transfer_descriptor.offset[4] = w & 0xffff;
+	ohcist.isochronous_transfer_descriptor.offset[5] = (w >> 16) & 0xffff;
+	w = ohcist.space->read_dword(address + 28);
+	ohcist.isochronous_transfer_descriptor.offset[6] = w & 0xffff;
+	ohcist.isochronous_transfer_descriptor.offset[7] = (w >> 16) & 0xffff;
+}
+
+void ohci_usb_controller::usb_ohci_writeback_isochronous_transfer_descriptor(UINT32 address)
+{
+	UINT32 w;
+
+	w = ohcist.isochronous_transfer_descriptor.word0 & 0x1f0000;
+	w = w | (ohcist.isochronous_transfer_descriptor.cc << 28) | (ohcist.isochronous_transfer_descriptor.fc << 24) | (ohcist.isochronous_transfer_descriptor.di << 21) | ohcist.isochronous_transfer_descriptor.sf;
+	ohcist.space->write_dword(address, w);
+	w = ohcist.isochronous_transfer_descriptor.word1 & 0xfff;
+	w = w | ohcist.isochronous_transfer_descriptor.bp0;
+	ohcist.space->write_dword(address + 4, w);
+	ohcist.space->write_dword(address + 8, ohcist.isochronous_transfer_descriptor.nexttd);
+	ohcist.space->write_dword(address + 12, ohcist.isochronous_transfer_descriptor.be);
+	w = (ohcist.isochronous_transfer_descriptor.offset[1] << 16) | ohcist.isochronous_transfer_descriptor.offset[0];
+	ohcist.space->write_dword(address + 16, w);
+	w = (ohcist.isochronous_transfer_descriptor.offset[3] << 16) | ohcist.isochronous_transfer_descriptor.offset[2];
+	ohcist.space->write_dword(address + 20, w);
+	w = (ohcist.isochronous_transfer_descriptor.offset[5] << 16) | ohcist.isochronous_transfer_descriptor.offset[4];
+	ohcist.space->write_dword(address + 24, w);
+	w = (ohcist.isochronous_transfer_descriptor.offset[7] << 16) | ohcist.isochronous_transfer_descriptor.offset[6];
+	ohcist.space->write_dword(address + 28, w);
+}
+
+void ohci_usb_controller::usb_ohci_device_address_changed(int old_address, int new_address)
+{
+	ohcist.address[new_address].function = ohcist.address[old_address].function;
+	ohcist.address[new_address].port = ohcist.address[old_address].port;
+	ohcist.address[old_address].port = -1;
+}
+
+/*
+* ohci device base class
+*/
+
 ohci_function_device::ohci_function_device()
 {
 }
 
-void ohci_function_device::initialize(running_machine &machine, xbox_base_state *usb_bus_manager)
+void ohci_function_device::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
 {
 	busmanager = usb_bus_manager;
 	state = DefaultState;
@@ -1726,7 +1899,7 @@ ohci_game_controller_device::ohci_game_controller_device(const machine_config &m
 {
 }
 
-void ohci_game_controller_device::initialize(running_machine &machine, xbox_base_state *usb_bus_manager)
+void ohci_game_controller_device::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
 {
 	ohci_function_device::initialize(machine, usb_bus_manager);
 	add_device_descriptor(devdesc);
@@ -1838,130 +2011,9 @@ ioport_constructor ohci_game_controller_device::device_input_ports() const
 	return INPUT_PORTS_NAME(xbox_controller);
 }
 
-void xbox_base_state::usb_ohci_interrupts()
+WRITE_LINE_MEMBER(xbox_base_state::xbox_ohci_usb_interrupt_changed)
 {
-	if (((ohcist.hc_regs[HcInterruptStatus] & ohcist.hc_regs[HcInterruptEnable]) != 0) && ((ohcist.hc_regs[HcInterruptEnable] & MasterInterruptEnable) != 0))
-		xbox_base_devs.pic8259_1->ir1_w(1);
-	else
-		xbox_base_devs.pic8259_1->ir1_w(0);
-}
-
-void xbox_base_state::usb_ohci_read_endpoint_descriptor(UINT32 address)
-{
-	UINT32 w;
-
-	w = ohcist.space->read_dword(address);
-	ohcist.endpoint_descriptor.word0 = w;
-	ohcist.endpoint_descriptor.fa = w & 0x7f;
-	ohcist.endpoint_descriptor.en = (w >> 7) & 15;
-	ohcist.endpoint_descriptor.d = (w >> 11) & 3;
-	ohcist.endpoint_descriptor.s = (w >> 13) & 1;
-	ohcist.endpoint_descriptor.k = (w >> 14) & 1;
-	ohcist.endpoint_descriptor.f = (w >> 15) & 1;
-	ohcist.endpoint_descriptor.mps = (w >> 16) & 0x7ff;
-	ohcist.endpoint_descriptor.tailp = ohcist.space->read_dword(address + 4);
-	w = ohcist.space->read_dword(address + 8);
-	ohcist.endpoint_descriptor.headp = w & 0xfffffffc;
-	ohcist.endpoint_descriptor.h = w & 1;
-	ohcist.endpoint_descriptor.c = (w >> 1) & 1;
-	ohcist.endpoint_descriptor.nexted = ohcist.space->read_dword(address + 12);
-}
-
-void xbox_base_state::usb_ohci_writeback_endpoint_descriptor(UINT32 address)
-{
-	UINT32 w;
-
-	w = ohcist.endpoint_descriptor.word0 & 0xf8000000;
-	w = w | (ohcist.endpoint_descriptor.mps << 16) | (ohcist.endpoint_descriptor.f << 15) | (ohcist.endpoint_descriptor.k << 14) | (ohcist.endpoint_descriptor.s << 13) | (ohcist.endpoint_descriptor.d << 11) | (ohcist.endpoint_descriptor.en << 7) | ohcist.endpoint_descriptor.fa;
-	ohcist.space->write_dword(address, w);
-	w = ohcist.endpoint_descriptor.headp | (ohcist.endpoint_descriptor.c << 1) | ohcist.endpoint_descriptor.h;
-	ohcist.space->write_dword(address + 8, w);
-}
-
-void xbox_base_state::usb_ohci_read_transfer_descriptor(UINT32 address)
-{
-	UINT32 w;
-
-	w = ohcist.space->read_dword(address);
-	ohcist.transfer_descriptor.word0 = w;
-	ohcist.transfer_descriptor.cc = (w >> 28) & 15;
-	ohcist.transfer_descriptor.ec= (w >> 26) & 3;
-	ohcist.transfer_descriptor.t= (w >> 24) & 3;
-	ohcist.transfer_descriptor.di= (w >> 21) & 7;
-	ohcist.transfer_descriptor.dp= (w >> 19) & 3;
-	ohcist.transfer_descriptor.r = (w >> 18) & 1;
-	ohcist.transfer_descriptor.cbp = ohcist.space->read_dword(address + 4);
-	ohcist.transfer_descriptor.nexttd = ohcist.space->read_dword(address + 8);
-	ohcist.transfer_descriptor.be = ohcist.space->read_dword(address + 12);
-}
-
-void xbox_base_state::usb_ohci_writeback_transfer_descriptor(UINT32 address)
-{
-	UINT32 w;
-
-	w = ohcist.transfer_descriptor.word0 & 0x0003ffff;
-	w = w | (ohcist.transfer_descriptor.cc << 28) | (ohcist.transfer_descriptor.ec << 26) | (ohcist.transfer_descriptor.t << 24) | (ohcist.transfer_descriptor.di << 21) | (ohcist.transfer_descriptor.dp << 19) | (ohcist.transfer_descriptor.r << 18);
-	ohcist.space->write_dword(address, w);
-	ohcist.space->write_dword(address + 4, ohcist.transfer_descriptor.cbp);
-	ohcist.space->write_dword(address + 8, ohcist.transfer_descriptor.nexttd);
-}
-
-void xbox_base_state::usb_ohci_read_isochronous_transfer_descriptor(UINT32 address)
-{
-	UINT32 w;
-
-	w = ohcist.space->read_dword(address);
-	ohcist.isochronous_transfer_descriptor.word0 = w;
-	ohcist.isochronous_transfer_descriptor.cc = (w >> 28) & 15;
-	ohcist.isochronous_transfer_descriptor.fc = (w >> 24) & 7;
-	ohcist.isochronous_transfer_descriptor.di = (w >> 21) & 7;
-	ohcist.isochronous_transfer_descriptor.sf = w & 0xffff;
-	w = ohcist.space->read_dword(address + 4);
-	ohcist.isochronous_transfer_descriptor.word1 = w;
-	ohcist.isochronous_transfer_descriptor.bp0 = w & 0xfffff000;
-	ohcist.isochronous_transfer_descriptor.nexttd = ohcist.space->read_dword(address + 8);
-	ohcist.isochronous_transfer_descriptor.be = ohcist.space->read_dword(address + 12);
-	w = ohcist.space->read_dword(address + 16);
-	ohcist.isochronous_transfer_descriptor.offset[0] = w & 0xffff;
-	ohcist.isochronous_transfer_descriptor.offset[1] = (w >> 16) & 0xffff;
-	w = ohcist.space->read_dword(address + 20);
-	ohcist.isochronous_transfer_descriptor.offset[2] = w & 0xffff;
-	ohcist.isochronous_transfer_descriptor.offset[3] = (w >> 16) & 0xffff;
-	w = ohcist.space->read_dword(address + 24);
-	ohcist.isochronous_transfer_descriptor.offset[4] = w & 0xffff;
-	ohcist.isochronous_transfer_descriptor.offset[5] = (w >> 16) & 0xffff;
-	w = ohcist.space->read_dword(address + 28);
-	ohcist.isochronous_transfer_descriptor.offset[6] = w & 0xffff;
-	ohcist.isochronous_transfer_descriptor.offset[7] = (w >> 16) & 0xffff;
-}
-
-void xbox_base_state::usb_ohci_writeback_isochronous_transfer_descriptor(UINT32 address)
-{
-	UINT32 w;
-
-	w = ohcist.isochronous_transfer_descriptor.word0 & 0x1f0000;
-	w = w | (ohcist.isochronous_transfer_descriptor.cc << 28) | (ohcist.isochronous_transfer_descriptor.fc << 24) | (ohcist.isochronous_transfer_descriptor.di << 21) | ohcist.isochronous_transfer_descriptor.sf;
-	ohcist.space->write_dword(address, w);
-	w = ohcist.isochronous_transfer_descriptor.word1 & 0xfff;
-	w = w | ohcist.isochronous_transfer_descriptor.bp0;
-	ohcist.space->write_dword(address + 4, w);
-	ohcist.space->write_dword(address + 8, ohcist.isochronous_transfer_descriptor.nexttd);
-	ohcist.space->write_dword(address + 12, ohcist.isochronous_transfer_descriptor.be);
-	w = (ohcist.isochronous_transfer_descriptor.offset[1] << 16) | ohcist.isochronous_transfer_descriptor.offset[0];
-	ohcist.space->write_dword(address + 16, w);
-	w = (ohcist.isochronous_transfer_descriptor.offset[3] << 16) | ohcist.isochronous_transfer_descriptor.offset[2];
-	ohcist.space->write_dword(address + 20, w);
-	w = (ohcist.isochronous_transfer_descriptor.offset[5] << 16) | ohcist.isochronous_transfer_descriptor.offset[4];
-	ohcist.space->write_dword(address + 24, w);
-	w = (ohcist.isochronous_transfer_descriptor.offset[7] << 16) | ohcist.isochronous_transfer_descriptor.offset[6];
-	ohcist.space->write_dword(address + 28, w);
-}
-
-void xbox_base_state::usb_ohci_device_address_changed(int old_address, int new_address)
-{
-	ohcist.address[new_address].function = ohcist.address[old_address].function;
-	ohcist.address[new_address].port = ohcist.address[old_address].port;
-	ohcist.address[old_address].port = -1;
+	xbox_base_devs.pic8259_1->ir1_w(state);
 }
 
 /*
@@ -2476,7 +2528,7 @@ ADDRESS_MAP_START(xbox_base_map, AS_PROGRAM, 32, xbox_base_state)
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM AM_SHARE("nv2a_share") // 128 megabytes
 	AM_RANGE(0xf0000000, 0xf7ffffff) AM_RAM AM_SHARE("nv2a_share") // 3d accelerator wants this
 	AM_RANGE(0xfd000000, 0xfdffffff) AM_RAM AM_READWRITE(geforce_r, geforce_w)
-	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE(usbctrl_r, usbctrl_w)
+	AM_RANGE(0xfed00000, 0xfed003ff) AM_DEVREADWRITE("ohci_usb", ohci_usb_controller, read, write)
 	AM_RANGE(0xfe800000, 0xfe85ffff) AM_READWRITE(audio_apu_r, audio_apu_w)
 	AM_RANGE(0xfec00000, 0xfec001ff) AM_READWRITE(audio_ac93_r, audio_ac93_w)
 	AM_RANGE(0xff000000, 0xff0fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
@@ -2521,31 +2573,16 @@ void xbox_base_state::machine_start()
 	apust.timer->enable(false);
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 		debug_console_register_command(machine(), "xbox", CMDFLAG_NONE, 0, 1, 4, xbox_debug_commands);
-	memset(&ohcist, 0, sizeof(ohcist));
 	// PIC challenge handshake data
 	pic16lc_buffer[0x1c] = 0x0c;
 	pic16lc_buffer[0x1d] = 0x0d;
 	pic16lc_buffer[0x1e] = 0x0e;
 	pic16lc_buffer[0x1f] = 0x0f;
 	// usb
-	ohcist.hc_regs[HcRevision] = 0x10;
-	ohcist.hc_regs[HcFmInterval] = 0x2edf;
-	ohcist.hc_regs[HcLSThreshold] = 0x628;
-	ohcist.hc_regs[HcRhDescriptorA] = 4;
-	ohcist.hc_regs[HcControl] = UsbReset << 6;
-	ohcist.state = UsbReset;
-	ohcist.interruptbulkratio = 1;
-	ohcist.writebackdonehadcounter = 7;
-	for (int n = 0; n <= 4; n++)
-		ohcist.ports[n].address = -1;
-	for (int n = 0; n < 256; n++)
-		ohcist.address[n].port = -1;
-	ohcist.space = &m_maincpu->space();
-	ohcist.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xbox_base_state::usb_ohci_timer), this), (void *)"USB OHCI Timer");
-	ohcist.timer->enable(false);
+	ohci_usb = machine().device<ohci_usb_controller>("ohci_usb");
 	usb_device = machine().device<ohci_game_controller_device>("ohci_gamepad");
-	usb_device->initialize(machine(), this);
-	usb_ohci_plug(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
+	usb_device->initialize(machine(), ohci_usb);
+	ohci_usb->usb_ohci_plug(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
 	// super-io
 	memset(&superiost, 0, sizeof(superiost));
 	superiost.configuration_mode = false;
@@ -2604,6 +2641,8 @@ MACHINE_CONFIG_START(xbox_base, xbox_base_state)
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
 
 	// next line is temporary
+	MCFG_OHCI_USB_CONTROLLER_ADD("ohci_usb")
+	MCFG_OHCI_USB_CONTROLLER_INTERRUPT_HANDLER(WRITELINE(xbox_base_state, xbox_ohci_usb_interrupt_changed))
 	MCFG_DEVICE_ADD("ohci_gamepad", OHCI_GAME_CONTROLLER, 0)
 
 	/* video hardware */
