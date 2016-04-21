@@ -1379,8 +1379,8 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	screen_device *screen = screen_iterator.byindex(curr_screen);
 	render_container &screen_container = screen->container();
 
-	float xscale = screen_container.xscale();
-	float yscale = screen_container.yscale();
+	float xscale = 1.0f / screen_container.xscale();
+	float yscale = 1.0f / screen_container.yscale();
 	float xoffset = -screen_container.xoffset();
 	float yoffset = -screen_container.yoffset();
 

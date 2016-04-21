@@ -922,7 +922,7 @@ render_target::render_target(render_manager &manager, const internal_layout *lay
 		m_base_orientation(ROT0),
 		m_maxtexwidth(65536),
 		m_maxtexheight(65536),
-		m_transform_primitives(true)
+		m_transform_container(true)
 {
 	// determine the base layer configuration based on options
 	m_base_layerconfig.set_backdrops_enabled(manager.machine().options().use_backdrops());
@@ -1766,7 +1766,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 		float yoffs = (container_xform.orientation & ORIENTATION_SWAP_XY) ? container.xoffset() : container.yoffset();
 		if (container_xform.orientation & ORIENTATION_FLIP_X) xoffs = -xoffs;
 		if (container_xform.orientation & ORIENTATION_FLIP_Y) yoffs = -yoffs;
-		if (!m_transform_primitives)
+		if (!m_transform_container)
 		{
 			xscale = 1.0f;
 			yscale = 1.0f;

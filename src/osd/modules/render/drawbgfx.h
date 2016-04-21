@@ -12,6 +12,8 @@
 
 #include "binpacker.h"
 #include "bgfx/vertex.h"
+#include "bgfx/chain.h"
+#include "bgfx/chainmanager.h"
 #include "sliderdirtynotifier.h"
 
 class texture_manager;
@@ -53,8 +55,19 @@ public:
 
 	virtual render_primitive_list *get_primitives() override
 	{
+		// determines whether the screen container is transformed by the chain's shaders
+		bool chain_transform = false;
+
+		// check the first chain
+		bgfx_chain* chain = this->m_chains->screen_chain(0);
+		if (chain != nullptr)
+		{
+			chain_transform = chain->transform();
+		}
+
 		osd_dim wdim = window().get_size();
 		window().target()->set_bounds(wdim.width(), wdim.height(), window().pixel_aspect());
+		window().target()->set_transform_container(!chain_transform);
 		return &window().target()->get_primitives();
 	}
 

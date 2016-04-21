@@ -147,7 +147,7 @@ float2 GetAdjustedCoords(float2 coord, float2 centerOffset)
 	coord -= centerOffset;
 
 	// apply screen scale
-	coord /= ScreenScale;
+	coord *= ScreenScale;
 
 	// un-center coordinates
 	coord += centerOffset;
