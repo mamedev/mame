@@ -633,18 +633,17 @@ WRITE8_MEMBER(neogeo_state::audio_cpu_enable_nmi_w)
 
 READ16_MEMBER(neogeo_state::in0_r)
 {
-	return (m_ctrl1->ctrl_r(space, offset) << 8) | m_dsw->read();
+	return ((m_edge->in0_r(space, offset) & m_ctrl1->ctrl_r(space, offset)) << 8) | m_dsw->read();
 }
 
-READ16_MEMBER(neogeo_state::irrmaze_in0_r)
+READ16_MEMBER(neogeo_state::in1_r)
 {
-	UINT8 track_ipt = (m_controller_select & 0x01) ? m_tracky->read() : m_trackx->read();
-	return (track_ipt << 8) | m_dsw->read();
+	return ((m_edge->in1_r(space, offset) & m_ctrl2->ctrl_r(space, offset)) << 8) | 0xff;
 }
 
 CUSTOM_INPUT_MEMBER(neogeo_state::kizuna4p_start_r)
 {
-	return (m_ctrl1->read_start_sel()) | (m_ctrl2->read_start_sel() << 2) | ~0x05;
+	return (m_edge->read_start_sel() & 0x05) | ~0x05;
 }
 
 WRITE8_MEMBER(neogeo_state::io_control_w)
@@ -652,9 +651,9 @@ WRITE8_MEMBER(neogeo_state::io_control_w)
 	switch (offset)
 	{
 		case 0x00:
-			m_controller_select = data;
 			if (m_ctrl1) m_ctrl1->write_ctrlsel(data);
 			if (m_ctrl2) m_ctrl2->write_ctrlsel(data);
+			if (m_edge) m_edge->write_ctrlsel(data);
 			break;
 
 		case 0x10:
@@ -1025,7 +1024,7 @@ DRIVER_INIT_MEMBER(neogeo_state,neogeo)
 
 	// install controllers
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, 0, 0x01ff7e, read16_delegate(FUNC(neogeo_state::in0_r), this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x340000, 0x340001, 0, 0x01fffe, read8_delegate(FUNC(neogeo_control_port_device::ctrl_r),(neogeo_control_port_device*)m_ctrl2), 0xff00);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x340000, 0x340001, 0, 0x01fffe, read16_delegate(FUNC(neogeo_state::in1_r), this));
 }
 
 
@@ -1072,7 +1071,6 @@ void neogeo_state::machine_start()
 	save_item(NAME(m_irq3_pending));
 	save_item(NAME(m_audio_cpu_nmi_enabled));
 	save_item(NAME(m_audio_cpu_nmi_pending));
-	save_item(NAME(m_controller_select));
 	save_item(NAME(m_save_ram_unlocked));
 	save_item(NAME(m_output_data));
 	save_item(NAME(m_output_latch));
@@ -1423,8 +1421,10 @@ static MACHINE_CONFIG_DERIVED( mvs, neogeo_arcade )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_slot)
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "joy", false)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "joy", false)
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
+
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "", false)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", false)
 
 	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, nullptr)
 	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot2", neogeo_cart, nullptr)

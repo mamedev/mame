@@ -23,8 +23,12 @@ static MACHINE_CONFIG_DERIVED_CLASS( neogeo_noslot, neogeo_arcade, neogeo_noslot
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_noslot)
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "joy", true)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "joy", true)
+	//joystick controller
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "joy", true)
+
+	//no mahjong controller
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", true)
 
 	MCFG_MSLUGX_PROT_ADD("mslugx_prot")
 	MCFG_SMA_PROT_ADD("sma_prot")
@@ -42,8 +46,12 @@ static MACHINE_CONFIG_DERIVED_CLASS( neogeo_kog, neogeo_arcade, neogeo_noslot_ko
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_noslot)
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "joy", true)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "joy", true)
+	//joystick controller
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "joy", true)
+
+	//no mahjong controller
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", true)
 
 	MCFG_NGBOOTLEG_PROT_ADD("bootleg_prot")
 	MCFG_KOG_PROT_ADD("kog_prot")
@@ -52,27 +60,34 @@ MACHINE_CONFIG_END
 // these basically correspond to the cabinets which were available in arcades:
 // with mahjong panel, with dial for Pop'n Bounce and with 4 controls for Kizuna...
 static MACHINE_CONFIG_DERIVED( neogeo_mj, neogeo_noslot )
+
+	//no joystick panel
+	MCFG_DEVICE_REMOVE("edge")
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "", true)
+
+	//P1 mahjong controller
 	MCFG_DEVICE_REMOVE("ctrl1")
 	MCFG_DEVICE_REMOVE("ctrl2")
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "mahjong", true)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "mahjong", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", true)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( neogeo_dial, neogeo_noslot )
-	MCFG_DEVICE_REMOVE("ctrl1")
-	MCFG_DEVICE_REMOVE("ctrl2")
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "dial", true)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "dial", true)
+	MCFG_DEVICE_REMOVE("edge")
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "dial", true)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( neogeo_imaze, neogeo_noslot )
+	MCFG_DEVICE_REMOVE("edge")
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "irrmaze", true)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( neogeo_kiz4p, neogeo_noslot )
-	MCFG_DEVICE_REMOVE("ctrl1")
-	MCFG_DEVICE_REMOVE("ctrl2")
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_kiz4p, "kiz4p", true)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_kiz4p, "kiz4p", true)
+	MCFG_DEVICE_REMOVE("edge")
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "kiz4p", true)
 MACHINE_CONFIG_END
 
-// this is used by V-Liner and Irritating Maze, which handle differently inputs...
+// this is used by V-Liner, which handles differently inputs...
 static MACHINE_CONFIG_DERIVED( neogeo_noctrl, neogeo_noslot )
 	MCFG_DEVICE_REMOVE("ctrl1")
 	MCFG_DEVICE_REMOVE("ctrl2")
@@ -224,19 +239,6 @@ static INPUT_PORTS_START( irrmaze )
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("BUTTONS")
-	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-
-	PORT_START("TRACK_X")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(20) PORT_REVERSE
-
-	PORT_START("TRACK_Y")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(20) PORT_REVERSE
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vliner )
@@ -8861,17 +8863,6 @@ DRIVER_INIT_MEMBER(neogeo_noslot_state,jockeygp)
 //  m_maincpu->space(AS_PROGRAM).install_read_port(0x2c0000, 0x2c0001, "IN6");
 }
 
-
-DRIVER_INIT_MEMBER(neogeo_noslot_state,irrmaze)
-{
-	if (!m_cartslots[0]) m_banked_cart->install_banks(machine(), m_maincpu, m_region_maincpu->base(), m_region_maincpu->bytes());
-
-	m_sprgen->m_fixed_layer_bank_type = 0;
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, 0, 0x01ff7e, read16_delegate(FUNC(neogeo_state::irrmaze_in0_r), this));
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x340000, 0x340001, 0, 0x01fffe, "BUTTONS");
-}
-
 DRIVER_INIT_MEMBER(neogeo_noslot_state,vliner)
 {
 	if (!m_cartslots[0]) m_banked_cart->install_banks(machine(), m_maincpu, m_region_maincpu->base(), m_region_maincpu->bytes());
@@ -9676,7 +9667,7 @@ GAME( 1997, kog,        kof97,    neogeo_kog,   neogeo,    neogeo_noslot_kog_sta
 GAME( 1997, lastblad,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGM-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastbladh,  lastblad, neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGH-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastsold,   lastblad, neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Soldier (Korean release of The Last Blade)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, irrmaze,    neogeo,   neogeo_noctrl,  irrmaze, neogeo_noslot_state,  irrmaze,  ROT0, "SNK / Saurus", "The Irritating Maze / Ultra Denryu Iraira Bou", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, irrmaze,    neogeo,   neogeo_imaze,   irrmaze, neogeo_state,   neogeo,   ROT0, "SNK / Saurus", "The Irritating Maze / Ultra Denryu Iraira Bou", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2,      neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (NGM-2400)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2h,     rbff2,    neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (NGH-2400)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2k,     rbff2,    neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers (Korean release)", MACHINE_SUPPORTS_SAVE ) // no Japanese title / mode

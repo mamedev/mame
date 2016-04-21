@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef __NEOGEO_DIAL__
-#define __NEOGEO_DIAL__
+#ifndef __NEOGEO_IRRMAZE__
+#define __NEOGEO_IRRMAZE__
 
 
 #include "emu.h"
@@ -21,12 +21,12 @@
 
 // ======================> neogeo_dial_device
 
-class neogeo_dial_device : public device_t,
+class neogeo_irrmaze_device : public device_t,
 						public device_neogeo_ctrl_edge_interface
 {
 public:
 	// construction/destruction
-	neogeo_dial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	neogeo_irrmaze_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -42,17 +42,16 @@ protected:
 	virtual void write_ctrlsel(UINT8 data) override;
 	
 private:
-	required_ioport m_joy1;
-	required_ioport m_joy2;
-	required_ioport m_dial1;
-	required_ioport m_dial2;
+	required_ioport m_tx;
+	required_ioport m_ty;
+	required_ioport m_buttons;
 	UINT8 m_ctrl_sel;
 };
 
 
 
 // device type definition
-extern const device_type NEOGEO_DIAL;
+extern const device_type NEOGEO_IRRMAZE;
 
 
 #endif
