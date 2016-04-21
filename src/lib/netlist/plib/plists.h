@@ -413,6 +413,7 @@ struct phash_functor<pstring>
 		m_hash = result;
 	}
 	friend unsigned operator%(const phash_functor<pstring> &lhs, const unsigned &rhs) { return lhs.m_hash % rhs; }
+	unsigned operator()() { return m_hash; }
 	bool operator==(const phash_functor<pstring> &lhs) const { return (m_hash == lhs.m_hash); }
 private:
 	unsigned m_hash;

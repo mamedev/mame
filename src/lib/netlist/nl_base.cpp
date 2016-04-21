@@ -202,7 +202,8 @@ netlist_t::netlist_t(const pstring &aname)
 		m_params(NULL),
 		m_name(aname),
 		m_setup(NULL),
-		m_log(this)
+		m_log(this),
+		m_lib(nullptr)
 {
 	save_item(static_cast<pstate_callback_t &>(m_queue), this,  "m_queue");
 	save_item(m_time, this, "m_time");
@@ -221,6 +222,7 @@ netlist_t::~netlist_t()
 	m_nets.clear();
 	m_devices.clear_and_free();
 
+	pfree(m_lib);
 	pstring::resetmem();
 }
 
@@ -231,6 +233,12 @@ ATTR_HOT nl_double netlist_t::gmin() const
 
 ATTR_COLD void netlist_t::start()
 {
+	/* load the library ... */
+
+	pstring libpath = nl_util::environment("NL_BOOSTLIB", nl_util::buildpath({".", "nlboost.so"}));
+
+	m_lib = palloc(pdynlib(libpath));
+
 	/* find the main clock and solver ... */
 
 	log().debug("Searching for mainclock and solver ...\n");

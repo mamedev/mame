@@ -162,6 +162,7 @@
 #include "nl_util.h"
 #include "plib/pstate.h"
 #include "plib/pfmtlog.h"
+#include "plib/pdynlib.h"
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
@@ -1273,7 +1274,9 @@ namespace netlist
 
 		virtual void reset();
 
-	protected:
+		ATTR_COLD pdynlib &lib() { return *m_lib; }
+
+protected:
 
 	#if (NL_KEEP_STATISTICS)
 		// performance
@@ -1298,6 +1301,7 @@ namespace netlist
 		pstring m_name;
 		setup_t *m_setup;
 		plog_base<NL_DEBUG> m_log;
+		pdynlib *m_lib;					// external lib needs to be loaded as long as netlist exists
 	};
 
 	// -----------------------------------------------------------------------------

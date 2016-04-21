@@ -10,6 +10,7 @@
 
 #include "nl_setup.h"
 #include "nl_base.h"
+#include "plib/pstream.h"
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
@@ -62,6 +63,8 @@ public:
 	ATTR_COLD void stop() override;
 
 	inline nl_double gmin() { return m_gmin.Value(); }
+
+	void create_solver_code(postream &strm);
 
 protected:
 	void update() override;
