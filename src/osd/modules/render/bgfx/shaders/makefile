@@ -4,10 +4,13 @@ BUILD_DIR=../../../../../../build
 
 include shader.mk
 
+ifneq ($(CHAIN),)
+SUBDIRS := $(patsubst .,,$(patsubst ,,$(shell find chains/$(CHAIN) -type d)))
+rebuild: $(SUBDIRS)
+else
 SUBDIRS := $(patsubst .,,$(patsubst ./,,$(shell find . -type d)))
-
-
 rebuild: main $(SUBDIRS)
+endif
 
 $(SUBDIRS):
 	@echo $@

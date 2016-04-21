@@ -31,7 +31,7 @@
 	],
 	
 	"passes": [
-		{	"effect": "pillarbox_right_horizontal/blit",
+		{	"effect": "misc/blit",
 			"name": "Blit to scalable target",
 			"input": [
 				{ "sampler": "s_tex", "target": "screen" }
@@ -79,7 +79,7 @@
 			"output": "internal"
 		},
 		{
-			"effect": "pillarbox_right_horizontal/saturation",
+			"effect": "misc/saturation",
 			"name": "Saturation Pass",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "name": "saturation", "value": 100 }
@@ -92,7 +92,7 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "pillarbox_right_horizontal/blit",
+		{	"effect": "misc/blit",
 			"name": "Final Blit",
 			"input": [
 				{ "sampler": "s_tex", "target": "internal" }

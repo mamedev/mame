@@ -48,7 +48,7 @@ chain_manager::chain_manager(running_machine& machine, osd_options& options, tex
     , m_slider_notifier(slider_notifier)
     , m_screen_count(0)
 {
-	find_available_chains(options.bgfx_path());
+	refresh_available_chains();
     parse_chain_selections(options.bgfx_screen_chains());
 }
 
@@ -57,12 +57,41 @@ chain_manager::~chain_manager()
     destroy_chains();
 }
 
-void chain_manager::find_available_chains(std::string path)
+void chain_manager::refresh_available_chains()
 {
 	m_available_chains.clear();
 	m_available_chains.push_back("none");
 
-	osd_directory *directory = osd_opendir((path + "/chains").c_str());
+	find_available_chains(std::string(m_options.bgfx_path()) + "/chains");
+
+	destroy_unloaded_chains();
+}
+
+void chain_manager::destroy_unloaded_chains()
+{
+	// O(shaders*available_chains), but we don't care because asset reloading happens rarely
+	for (int i = 0; i < m_chain_names.size(); i++)
+	{
+		std::string name = m_chain_names[i];
+		if (name.length() > 0)
+		{
+			for (std::string available_name : m_available_chains)
+			{
+				if (available_name == name)
+				{
+					delete m_screen_chains[i];
+					m_chain_names[i] = "";
+					m_current_chain[i] = CHAIN_NONE;
+					break;
+				}
+			}
+		}
+	}
+}
+
+void chain_manager::find_available_chains(std::string path)
+{
+	osd_directory *directory = osd_opendir(path.c_str());
 	if (directory != nullptr)
 	{
 		for (const osd_directory_entry *entry = osd_readdir(directory); entry != nullptr; entry = osd_readdir(directory))
@@ -83,6 +112,14 @@ void chain_manager::find_available_chains(std::string path)
 					{
 						m_available_chains.push_back(name.substr(0, start));
 					}
+				}
+			}
+			else if (entry->type == ENTTYPE_DIR)
+			{
+				std::string name = entry->name;
+				if (!(name == "." || name == ".."))
+				{
+					find_available_chains(path + PATH_SEPARATOR + name);
 				}
 			}
 		}
@@ -144,6 +181,7 @@ void chain_manager::parse_chain_selections(std::string chain_str)
     while (m_current_chain.size() != chain_names.size())
     {
         m_screen_chains.push_back(nullptr);
+        m_chain_names.push_back("");
         m_current_chain.push_back(CHAIN_NONE);
     }
 
@@ -161,10 +199,12 @@ void chain_manager::parse_chain_selections(std::string chain_str)
         if (chain_index < m_available_chains.size())
         {
             m_current_chain[index] = chain_index;
+            m_chain_names[index] = m_available_chains[chain_index];
         }
         else
         {
             m_current_chain[index] = CHAIN_NONE;
+            m_chain_names[index] = "";
         }
     }
 }
@@ -201,7 +241,8 @@ void chain_manager::load_chains()
     {
         if (m_current_chain[chain] != CHAIN_NONE)
         {
-            m_screen_chains[chain] = load_chain(m_available_chains[m_current_chain[chain]], uint32_t(chain));
+			m_chain_names[chain] = m_available_chains[m_current_chain[chain]];
+            m_screen_chains[chain] = load_chain(m_chain_names[chain], uint32_t(chain));
         }
     }
 }
@@ -245,7 +286,7 @@ void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, render_p
         tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
 
     std::string full_name = "screen" + std::to_string(screen);
-    bgfx_texture *texture = new bgfx_texture(full_name, bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem, BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
+    bgfx_texture *texture = new bgfx_texture(full_name, bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem, BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
     m_textures.add_provider(full_name, texture);
 
     m_targets.update_target_sizes(screen, tex_width, tex_height, TARGET_STYLE_GUEST);
@@ -293,6 +334,7 @@ void chain_manager::update_screen_count(uint32_t screen_count)
         while (m_screen_chains.size() < m_screen_count)
         {
             m_screen_chains.push_back(nullptr);
+            m_chain_names.push_back("");
             m_current_chain.push_back(CHAIN_NONE);
         }
 

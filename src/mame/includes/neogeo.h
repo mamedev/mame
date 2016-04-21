@@ -52,6 +52,7 @@ public:
 		m_dsw(*this, "DSW"),
 		m_trackx(*this, "TRACK_X"),
 		m_tracky(*this, "TRACK_Y"),
+		m_edge(*this, "edge"),
 		m_ctrl1(*this, "ctrl1"),
 		m_ctrl2(*this, "ctrl2"),
 		m_sprgen(*this, "spritegen"),
@@ -81,7 +82,7 @@ public:
 	DECLARE_WRITE16_MEMBER(neogeo_video_register_w);
 	READ16_MEMBER(banked_vectors_r);
 	DECLARE_READ16_MEMBER(in0_r);
-	DECLARE_READ16_MEMBER(irrmaze_in0_r);
+	DECLARE_READ16_MEMBER(in1_r);
 
 	void set_slot_number(int slot);
 
@@ -161,7 +162,6 @@ protected:
 	enum {NEOGEO_MVS, NEOGEO_AES, NEOGEO_CD} m_type;
 
 	// internal state
-	UINT8      m_controller_select;
 	bool       m_recurse;
 	bool       m_audio_cpu_nmi_enabled;
 	bool       m_audio_cpu_nmi_pending;
@@ -177,6 +177,7 @@ protected:
 	optional_ioport m_dsw;
 	optional_ioport m_trackx;
 	optional_ioport m_tracky;
+	optional_device<neogeo_ctrl_edge_port_device> m_edge;
 	optional_device<neogeo_control_port_device> m_ctrl1;
 	optional_device<neogeo_control_port_device> m_ctrl2;
 

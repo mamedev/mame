@@ -12,6 +12,8 @@
 
 #include "binpacker.h"
 #include "bgfx/vertex.h"
+#include "bgfx/chain.h"
+#include "bgfx/chainmanager.h"
 #include "sliderdirtynotifier.h"
 
 class texture_manager;
@@ -30,7 +32,7 @@ class avi_write;
 class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
-	renderer_bgfx(osd_window *w);
+	renderer_bgfx(std::shared_ptr<osd_window> w);
 	virtual ~renderer_bgfx();
 
 	static void init(running_machine &machine) { }
@@ -53,9 +55,24 @@ public:
 
 	virtual render_primitive_list *get_primitives() override
 	{
-		osd_dim wdim = window().get_size();
-		window().target()->set_bounds(wdim.width(), wdim.height(), window().pixel_aspect());
-		return &window().target()->get_primitives();
+		auto win = try_getwindow();
+		if (win == nullptr)
+			return nullptr;
+
+		// determines whether the screen container is transformed by the chain's shaders
+		bool chain_transform = false;
+
+		// check the first chain
+		bgfx_chain* chain = this->m_chains->screen_chain(0);
+		if (chain != nullptr)
+		{
+			chain_transform = chain->transform();
+		}
+
+		osd_dim wdim = win->get_size();
+		win->target()->set_bounds(wdim.width(), wdim.height(), win->pixel_aspect());
+		win->target()->set_transform_container(!chain_transform);
+		return &win->target()->get_primitives();
 	}
 
     static const char* WINDOW_PREFIX;

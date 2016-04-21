@@ -13,7 +13,6 @@
 #include "ui/inifile.h"
 #include "softlist.h"
 #include "drivenum.h"
-#include <algorithm>
 
 //-------------------------------------------------
 //  GLOBAL VARIABLES

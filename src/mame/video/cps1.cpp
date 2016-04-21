@@ -1383,15 +1383,15 @@ static const struct gfx_range mapper_KNM10B_table[] =
 	{ 0 }
 };
 
-// unknown part number, this could still be incorrect
+// unknown part number, this is just based on where the gfx are in the ROM
 #define mapper_pokonyan   { 0x8000, 0x8000, 0x8000, 0 }, mapper_pokonyan_table
 static const struct gfx_range mapper_pokonyan_table[] =
 {
 	/* type            start    end      bank */
-	{ GFXTYPE_SPRITES, 0x0000, 0x7fff, 0 },
+	{ GFXTYPE_SPRITES, 0x0000, 0x2fff, 0 },
 	{ GFXTYPE_SCROLL1, 0x7000, 0x7fff, 0 },
-	{ GFXTYPE_SCROLL3, 0x0000, 0x7fff, 0 },
-	{ GFXTYPE_SCROLL2, 0x0000, 0x7fff, 0 },
+	{ GFXTYPE_SCROLL3, 0x3000, 0x3fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x4000, 0x6fff, 0 },
 	{ 0 }
 };
 

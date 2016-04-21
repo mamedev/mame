@@ -17,7 +17,7 @@
 class renderer_none : public osd_renderer
 {
 public:
-	renderer_none(osd_window *window)
+	renderer_none(std::shared_ptr<osd_window> window)
 	: osd_renderer(window, FLAG_NONE) { }
 
 	virtual ~renderer_none() { }

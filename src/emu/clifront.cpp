@@ -159,7 +159,7 @@ cli_frontend::cli_frontend(emu_options &options, osd_interface &osd)
 cli_frontend::~cli_frontend()
 {
 	// nuke any device options since they will leak memory
-	m_options.remove_device_options();
+	mame_options::remove_device_options(m_options);
 }
 
 //-------------------------------------------------
@@ -177,9 +177,9 @@ int cli_frontend::execute(int argc, char **argv)
 	{
 		// first parse options to be able to get software from it
 		std::string option_errors;
-		m_options.parse_command_line(argc, argv, option_errors);
+		mame_options::parse_command_line(m_options,argc, argv, option_errors);
 
-		m_options.parse_standard_inis(option_errors);
+		mame_options::parse_standard_inis(m_options,option_errors);
 
 		load_translation(m_options);
 
@@ -226,7 +226,7 @@ int cli_frontend::execute(int argc, char **argv)
 												std::string val = string_format("%s:%s:%s", swlistdev.list_name(), m_options.software_name(), swpart.name());
 
 												// call this in order to set slot devices according to mounting
-												m_options.parse_slot_devices(argc, argv, option_errors, image.instance_name(), val.c_str(), &swpart);
+												mame_options::parse_slot_devices(m_options, argc, argv, option_errors, image.instance_name(), val.c_str(), &swpart);
 												break;
 											}
 										}
@@ -249,7 +249,7 @@ int cli_frontend::execute(int argc, char **argv)
 		}
 
 		// parse the command line, adding any system-specific options
-		if (!m_options.parse_command_line(argc, argv, option_errors))
+		if (!mame_options::parse_command_line(m_options,argc, argv, option_errors))
 		{
 			// if we failed, check for no command and a system name first; in that case error on the name
 			if (*(m_options.command()) == 0 && m_options.system() == nullptr && *(m_options.system_name()) != 0)
@@ -276,7 +276,7 @@ int cli_frontend::execute(int argc, char **argv)
 			if (m_options.read_config())
 			{
 				m_options.revert(OPTION_PRIORITY_INI);
-				m_options.parse_standard_inis(option_errors);
+				mame_options::parse_standard_inis(m_options,option_errors);
 			}
 			if (!option_errors.empty())
 				osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
@@ -1670,7 +1670,7 @@ void cli_frontend::execute_commands(const char *exename)
 
 	// other commands need the INIs parsed
 	std::string option_errors;
-	m_options.parse_standard_inis(option_errors);
+	mame_options::parse_standard_inis(m_options,option_errors);
 	if (!option_errors.empty())
 		osd_printf_error("%s\n", option_errors.c_str());
 

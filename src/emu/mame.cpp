@@ -259,7 +259,7 @@ int machine_manager::execute()
 		{
 			m_options.revert(OPTION_PRIORITY_INI);
 			std::string errors;
-			m_options.parse_standard_inis(errors);
+			mame_options::parse_standard_inis(m_options,errors);
 		}
 
 		// otherwise, perform validity checks before anything else
@@ -286,12 +286,12 @@ int machine_manager::execute()
 		if (m_new_driver_pending)
 		{
 			// set up new system name and adjust device options accordingly
-			m_options.set_system_name(m_new_driver_pending->name);
+			mame_options::set_system_name(m_options,m_new_driver_pending->name);
 			firstrun = true;
 		}
 		else
 		{
-			if (machine.exit_pending()) m_options.set_system_name("");
+			if (machine.exit_pending()) mame_options::set_system_name(m_options,"");
 		}
 
 		if (machine.exit_pending() && (!started_empty || (system == &GAME_NAME(___empty))))

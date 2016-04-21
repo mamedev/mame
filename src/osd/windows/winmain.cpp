@@ -69,11 +69,11 @@ public:
 			char buffer[1024];
 
 			// if we are in fullscreen mode, go to windowed mode
-			if ((video_config.windowed == 0) && (win_window_list != nullptr))
+			if ((video_config.windowed == 0) && !win_window_list.empty())
 				winwindow_toggle_full_screen();
 
 			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
-			win_message_box_utf8(win_window_list ? win_window_list->platform_window<HWND>() : nullptr, buffer, emulator_info::get_appname(), MB_OK);
+			win_message_box_utf8(!win_window_list.empty() ? win_window_list.front()->platform_window<HWND>() : nullptr, buffer, emulator_info::get_appname(), MB_OK);
 		}
 		else
 			chain_output(channel, msg, args);
@@ -515,7 +515,7 @@ void windows_osd_interface::init(running_machine &machine)
 	osd_common_t::init_subsystems();
 
 	// notify listeners of screen configuration
-	for (win_window_info *info = win_window_list; info != nullptr; info = info->m_next)
+	for (auto info : win_window_list)
 	{
 		machine.output().set_value(string_format("Orientation(%s)", info->m_monitor->devicename()).c_str(), info->m_targetorient);
 	}

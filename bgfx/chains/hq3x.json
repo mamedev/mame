@@ -49,7 +49,7 @@
 			],
 			"output": "scaled_out"
 		},
-		{	"effect": "hq3x/blit",
+		{	"effect": "misc/blit",
 			"name": "Final Blit",
 			"input": [
 				{ "sampler": "s_tex", "target": "scaled_out" }

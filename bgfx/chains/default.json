@@ -7,7 +7,7 @@
 		}
 	],
 	"passes": [
-		{	"effect": "default/blit",
+		{	"effect": "misc/blit",
 			"name": "Final Upscale",
 			"input": [
 				{ "sampler": "s_tex", "texture": "screen" }

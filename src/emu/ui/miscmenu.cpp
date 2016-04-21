@@ -693,7 +693,7 @@ ui_menu_machine_configure::ui_menu_machine_configure(running_machine &machine, r
 {
 	// parse the INI file
 	std::string error;
-	m_opts.parse_standard_inis(error, m_drv);
+	mame_options::parse_standard_inis(m_opts,error, m_drv);
 	setup_bios();
 }
 

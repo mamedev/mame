@@ -13,9 +13,6 @@
 #ifndef __UI_UTILS_H__
 #define __UI_UTILS_H__
 
-#include "osdepend.h"
-#include "rendutil.h"
-
 #define MAX_CHAR_INFO            256
 #define MAX_CUST_FILTER          8
 
