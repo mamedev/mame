@@ -1082,15 +1082,12 @@ void video_manager::recompute_speed(const attotime &emutime)
 	// if we're past the "time-to-execute" requested, signal an exit
 	if (m_seconds_to_run != 0 && emutime.seconds() >= m_seconds_to_run)
 	{
-		screen_device *screen = machine().first_screen();
-		if (screen != nullptr)
-		{
-			// create a final screenshot
-			emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = file.open(machine().basename(), PATH_SEPARATOR "final.png");
-			if (filerr == osd_file::error::NONE)
-				save_snapshot(screen, file);
-		}
+		// create a final screenshot
+		emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		osd_file::error filerr = file.open(machine().basename(), PATH_SEPARATOR "final.png");
+		if (filerr == osd_file::error::NONE)
+			save_snapshot(nullptr, file);
+
 		//printf("Scheduled exit at %f\n", emutime.as_double());
 		// schedule our demise
 		machine().schedule_exit();
