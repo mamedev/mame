@@ -36,6 +36,7 @@ protected:
 	static void validate_boolean_parameter(const Value& value, std::string type_name, std::string name);
 
 	static bool get_bool(const Value& value, const std::string name, const bool default_value);
+	static float get_float(const Value& value, const std::string name, float default_value);
 	static void get_float(const Value& value, const std::string name, float* out, float* default_value, const int count = 1);
 	static int get_int(const Value& value, const std::string name, int default_value);
 	static std::string get_string(const Value& value, const std::string name, const std::string default_value);

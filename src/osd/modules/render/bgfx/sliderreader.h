@@ -24,7 +24,7 @@ public:
 	static std::vector<bgfx_slider*> read_from_value(const Value& value, std::string prefix, running_machine& machine, uint32_t window_index, uint32_t screen_index);
 
 private:
-	static bool get_values(const Value& value, std::string prefix, std::string name, int* values, const int count);
+	static bool get_values(const Value& value, std::string prefix, std::string name, float* values, const int count);
 	static bool validate_parameters(const Value& value, std::string prefix);
 
 	static const int TYPE_COUNT = 5;

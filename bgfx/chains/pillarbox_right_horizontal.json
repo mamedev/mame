@@ -12,7 +12,7 @@
 	"author": "Ryan Holtz",
 	
 	"sliders": [
-		{ "type": "float", "name": "saturation", "text": "Saturation",   "default": 25, "max": 100, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" }
+		{ "type": "float", "name": "saturation", "text": "Saturation", "default": 0.25, "max": 1.00, "min": 0.00, "step": 0.01, "format": "%1.2f", "screen": "raster" }
 	],
 	
 	"targets": [

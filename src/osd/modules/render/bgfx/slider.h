@@ -43,7 +43,7 @@ public:
 		SLIDER_SCREEN_TYPE_ANY = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_VECTOR | SLIDER_SCREEN_TYPE_LCD
 	};
 
-	bgfx_slider(running_machine& machine, std::string name, int32_t min, int32_t def, int32_t max, int32_t step, slider_type type, screen_type screen, float scale, std::string format, std::string description, std::vector<std::string>& strings);
+	bgfx_slider(running_machine& machine, std::string name, float min, float def, float max, float step, slider_type type, screen_type screen, std::string format, std::string description, std::vector<std::string>& strings);
 	~bgfx_slider();
 
 	int32_t update(std::string *str, int32_t newval);
@@ -60,16 +60,15 @@ public:
 
 protected:
 	slider_state* create_core_slider(running_machine &machine);
-	int32_t as_int() const { return int32_t(floor(m_value + 0.5f)); }
+	int32_t as_int() const { return int32_t(floor(m_value / m_step + 0.5f)); }
 
 	std::string     m_name;
-	int32_t         m_min;
-	int32_t         m_default;
-	int32_t         m_max;
-	int32_t         m_step;
+	float           m_min;
+	float           m_default;
+	float           m_max;
+	float           m_step;
 	slider_type     m_type;
 	screen_type     m_screen_type;
-	float           m_scale;
 	std::string     m_format;
 	std::string     m_description;
 	std::vector<std::string> m_strings;

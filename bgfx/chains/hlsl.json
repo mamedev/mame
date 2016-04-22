@@ -42,11 +42,8 @@
 		// min (required): The lower limit to which the slider can be adjusted by a user.
 		// type: See type for "default"
 		// 
-		// step (required): How much, in integer units, does a single left/right adjustment adjust the slider?
+		// step (required): How much does a single left/right adjustment adjust the slider?
 		// type: Integer value
-		// 
-		// scale (required): By what value should we multiply the slider's integer value in order to get a usable value to disable?
-		// type: Numeric value
 		// 
 		// format (required): A C-style formatting string to use when displaying the slider's value.
 		// type: Any standard C-style formatting string (%s, %d, %1.2f, and so on)
@@ -58,66 +55,65 @@
 		// strings (optional): A list of strings to use with the "intenum" type, to select from a list of text options instead of simply numbers.
 		// value: An array of 2 or more entries, with one entry per possible slider setting from "min" to "max" inclusive.
 
-		{ "type": "intenum", "name": "adjustments", "text": "Enable Adjustments", "default": 0, "max": 1, "min": 0, "step": 1, "scale": 1.0, "format": "%s", "screen": "any", "strings": [ "Off", "On" ] },
+		{ "type": "intenum", "name": "adjustments", "text": "Enable Adjustments", "default": 0, "max": 1, "min": 0, "step": 1, "format": "%s", "screen": "any", "strings": [ "Off", "On" ] },
 
-		{ "type": "intenum", "name": "ntsc",            "text": "Enable NTSC",                           "default": 0,        "max": 1,        "min": 0,        "step": 1,   "scale": 1.0,       "format": "%s",    "screen": "any", "strings": [ "Off", "On" ] },
-		{ "type": "float",   "name": "a_value",         "text": "NTSC A Value",                          "default": 50,       "max": 100,      "min": 0,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
-		{ "type": "float",   "name": "b_value",         "text": "NTSC B Value",                          "default": 50,       "max": 100,      "min": 0,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
-		{ "type": "float",   "name": "cc_value",        "text": "NTSC Color Carrier (Hz)",               "default": 35795454, "max": 36795454, "min": 34795454, "step": 100, "scale": 0.0000001, "format": "%1.7f", "screen": "raster" },
-		{ "type": "float",   "name": "o_value",         "text": "NTSC Outgoing Phase Offset",            "default": 0,        "max": 100,      "min": 0,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
-		{ "type": "float",   "name": "p_value",         "text": "NTSC Incoming Phase Pixel Clock Scale", "default": 100,      "max": 200,      "min": 0,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
-		{ "type": "float",   "name": "scan_time",       "text": "NTSC Scanline Duration (uSec)",         "default": 526,      "max": 1500,     "min": 1,        "step": 1,   "scale": 0.1,       "format": "%3.1f", "screen": "raster" },
-		{ "type": "float",   "name": "notch_width",     "text": "NTSC Color Notch Filter Width",         "default": 200,      "max": 400,      "min": 1,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
-		{ "type": "float",   "name": "y_freq_response", "text": "NTSC Y Signal Bandwidth (Hz)",          "default": 600,      "max": 2100,     "min": 1,        "step": 10,  "scale": 0.01,      "format": "%2.2f", "screen": "raster" },
-		{ "type": "float",   "name": "i_freq_response", "text": "NTSC I Signal Bandwidth (Hz)",          "default": 120,      "max": 2100,     "min": 1,        "step": 10,  "scale": 0.01,      "format": "%2.2f", "screen": "raster" },
-		{ "type": "float",   "name": "q_freq_response", "text": "NTSC Q Signal Bandwidth (Hz)",          "default": 60,       "max": 2100,     "min": 1,        "step": 10,  "scale": 0.01,      "format": "%2.2f", "screen": "raster" },
-		{ "type": "float",   "name": "jitter_offset",   "text": "NTSC Frame Jitter Offset",              "default": 0,        "max": 200,      "min": 1,        "step": 1,   "scale": 0.01,      "format": "%1.2f", "screen": "raster" },
+		{ "type": "intenum", "name": "ntsc",            "text": "Enable NTSC",                           "default":  0,       "max":   1,       "min": 0,       "step": 1,       "format": "%s",    "screen": "any", "strings": [ "Off", "On" ] },
+		{ "type": "float",   "name": "a_value",         "text": "NTSC A Value",                          "default":  0.50,    "max":   1.00,    "min": 0.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",   "name": "b_value",         "text": "NTSC B Value",                          "default":  0.50,    "max":   1.00,    "min": 0.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",   "name": "cc_value",        "text": "NTSC Color Carrier (Hz)",               "default":  3.57954, "max":   3.67954, "min": 3.47954, "step": 0.00001, "format": "%1.5f", "screen": "raster" },
+		{ "type": "float",   "name": "o_value",         "text": "NTSC Outgoing Phase Offset",            "default":  0.00,    "max":   1.00,    "min": 0.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",   "name": "p_value",         "text": "NTSC Incoming Phase Pixel Clock Scale", "default":  1.00,    "max":   2.00,    "min": 0.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",   "name": "scan_time",       "text": "NTSC Scanline Duration (uSec)",         "default": 52.60,    "max": 150.00,    "min": 1.00,    "step": 0.1,     "format": "%3.1f", "screen": "raster" },
+		{ "type": "float",   "name": "notch_width",     "text": "NTSC Color Notch Filter Width",         "default":  2.00,    "max":   4.00,    "min": 1.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
+		{ "type": "float",   "name": "y_freq_response", "text": "NTSC Y Signal Bandwidth (Hz)",          "default":  6.00,    "max":  21.00,    "min": 0.00,    "step": 0.01,    "format": "%2.2f", "screen": "raster" },
+		{ "type": "float",   "name": "i_freq_response", "text": "NTSC I Signal Bandwidth (Hz)",          "default":  1.20,    "max":  21.00,    "min": 0.00,    "step": 0.01,    "format": "%2.2f", "screen": "raster" },
+		{ "type": "float",   "name": "q_freq_response", "text": "NTSC Q Signal Bandwidth (Hz)",          "default":  0.60,    "max":  21.00,    "min": 0.00,    "step": 0.01,    "format": "%2.2f", "screen": "raster" },
+		{ "type": "float",   "name": "jitter_offset",   "text": "NTSC Frame Jitter Offset",              "default":  0.00,    "max":   2.00,    "min": 0.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
 
-		{ "type": "color", "name": "red_ratios", "text": "Red Output from ",   "default": [ 100,   0,   0 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
-		{ "type": "color", "name": "grn_ratios", "text": "Green Output from ", "default": [   0, 100,   0 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
-		{ "type": "color", "name": "blu_ratios", "text": "Blue Output from ",  "default": [   0,   0, 100 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
-		{ "type": "color", "name": "offset",     "text": "Signal Offset, ",    "default": [   0,   0,   0 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
-		{ "type": "color", "name": "scale",      "text": "Signal Scale, ",     "default": [  95,  95,  95 ], "max": [ 200, 200, 200 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
-		{ "type": "float", "name": "saturation", "text": "Color Saturation",   "default": 150,               "max": 400,               "min": 0,           "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "red_ratios", "text": "Red Output from ",   "default": [ 1.00, 0.00, 0.00 ], "max": [ 2.00, 2.00, 2.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "grn_ratios", "text": "Green Output from ", "default": [ 0.00, 1.00, 0.00 ], "max": [ 2.00, 2.00, 2.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "blu_ratios", "text": "Blue Output from ",  "default": [ 0.00, 0.00, 1.00 ], "max": [ 2.00, 2.00, 2.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "offset",     "text": "Signal Offset, ",    "default": [ 0.00, 0.00, 0.00 ], "max": [ 2.00, 2.00, 2.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "color", "name": "scale",      "text": "Signal Scale, ",     "default": [ 0.95, 0.95, 0.95 ], "max": [ 2.00, 2.00, 2.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "float", "name": "saturation", "text": "Color Saturation",   "default": 1.50,                 "max": 4.00,                 "min": 0.00,                 "step": 0.01, "format": "%1.2f", "screen": "raster" },
 
-		{ "type": "vec2", "name": "converge_red",          "text": "Red Convergence, ",   "default": [ 5, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
-		{ "type": "vec2", "name": "converge_green",        "text": "Green Convergence, ", "default": [ 0, 5 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
-		{ "type": "vec2", "name": "converge_blue",         "text": "Blue Convergence, ",  "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "converge_red",          "text": "Red Convergence, ",          "default": [ 0.5, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "converge_green",        "text": "Green Convergence, ",        "default": [ 0.0, 0.5 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "converge_blue",         "text": "Blue Convergence, ",         "default": [ 0.0, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "radial_converge_red",   "text": "Red Radial Convergence, ",   "default": [ 0.0, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "radial_converge_green", "text": "Green Radial Convergence, ", "default": [ 0.0, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "radial_converge_blue",  "text": "Blue Radial Convergence, ",  "default": [ 0.0, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
 
-		{ "type": "vec2", "name": "radial_converge_red",   "text": "Red Radial Convergence, ",   "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
-		{ "type": "vec2", "name": "radial_converge_green", "text": "Green Radial Convergence, ", "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
-		{ "type": "vec2", "name": "radial_converge_blue",  "text": "Blue Radial Convergence, ",  "default": [ 0, 0 ], "max": [ 8000, 6000 ], "min": [ -8000, -6000 ], "step": 1, "scale": 0.1, "format": "%3.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "defocus", "text": "Defocus, ", "default": [ 1.5, 1.5 ], "max": [ 10.0, 10.0 ], "min": [ 0.0, 0.0 ], "step": 0.1, "format": "%2.1f", "screen": "crt" },
 
-		{ "type": "vec2", "name": "defocus", "text": "Defocus, ",  "default": [ 15, 15 ], "max": [ 500, 500 ], "min": [ 0, 0 ], "step": 1, "scale": 0.1, "format": "%2.1f", "screen": "crt" },
+		{ "type": "color", "name": "phosphor", "text": "Phosphor Persistence, ",  "default": [ 0.45, 0.45, 0.45 ], "max": [ 1.00, 1.00, 1.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "crt" },
 
-		{ "type": "color", "name": "phosphor", "text": "Phosphor Persistence, ",  "default": [ 45, 45, 45 ], "max": [ 100, 100, 100 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "scanline_alpha",         "text": "Scanline Amount",            "default": 0.80, "max": 1.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "scanline_scale",         "text": "Overall Scanline Scale",     "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "scanline_bright_scale",  "text": "Scanline Brightness Scale",  "default": 2.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 0.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "scanline_jitter_amount", "text": "Scanline Jitter Amount",     "default": 0.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "scanline_height",        "text": "Individual Scanline Scale",  "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "scanline_variation",     "text": "Scanline Variation",         "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+ 
+		{ "type": "float", "name": "shadow_alpha",     "text": "Shadow Mask Amount",       "default": 0.20,             "max": 1.00,             "min": 0.00,             "step": 0.01,  "format": "%1.2f", "screen": "crt" },
+		{ "type": "vec2",  "name": "shadow_uv_count",  "text": "Shadow Mask Pixel Count ", "default": [ 12, 12 ],       "max": [ 128, 128 ],     "min": [ 1, 1 ],         "step": 1,     "format": "%3f",   "screen": "crt" },
+		{ "type": "vec2",  "name": "shadow_uv_size",   "text": "Shadow Mask UV Size ",     "default": [ 0.500, 0.500 ], "max": [ 1.000, 1.000 ], "min": [ 0.000, 0.000 ], "step": 0.001, "format": "%1.3f", "screen": "crt" },
+		{ "type": "vec2",  "name": "shadow_uv_offset", "text": "Shadow Mask UV Offset ",   "default": [ 0.000, 0.000 ], "max": [ 1.000, 1.000 ], "min": [ 0.000, 0.000 ], "step": 0.001, "format": "%1.3f", "screen": "crt" },
 
-		{ "type": "float",   "name": "scanline_alpha",         "text": "Scanline Amount",            "default": 80,             "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
-		{ "type": "float",   "name": "scanline_scale",         "text": "Overall Scanline Scale",     "default": 100,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
-		{ "type": "float",   "name": "scanline_bright_scale",  "text": "Scanline Brightness Scale",  "default": 200,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
-		{ "type": "float",   "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 0,              "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
-		{ "type": "float",   "name": "scanline_jitter_amount", "text": "Scanline Jitter Amount",     "default": 0,              "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
-		{ "type": "float",   "name": "scanline_height",        "text": "Individual Scanline Scale",  "default": 100,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
-		{ "type": "float",   "name": "scanline_variation",     "text": "Scanline Variation",         "default": 100,            "max": 400,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "humbar_alpha",      "text": "Hum Bar Amount",    "default": 0.05,  "max": 1.00,  "min": 0.00,  "step": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "humbar_hertz_rate", "text": "Hum Bar Frequency", "default": 0.001, "max": 1.000, "min": 0.000, "step": 0.00001, "format": "%1.5f", "screen": "crt" },
 
-		{ "type": "float",   "name": "shadow_alpha",           "text": "Shadow Mask Amount",         "default": 20,             "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
-		{ "type": "vec2",    "name": "shadow_uv_count",        "text": "Shadow Mask Pixel Count ",   "default": [  12,  12 ],   "max": [ 128, 128 ],      "min": [ 1, 1 ],    "step": 1, "scale": 1.0,     "format": "%3f",   "screen": "crt" },
-		{ "type": "vec2",    "name": "shadow_uv_size",         "text": "Shadow Mask UV Size ",       "default": [ 500, 500 ],   "max": [ 1000, 1000 ],    "min": [ 0, 0 ],    "step": 1, "scale": 0.001,   "format": "%1.4f", "screen": "crt" },
-		{ "type": "vec2",    "name": "shadow_uv_offset",       "text": "Shadow Mask UV Offset ",     "default": [   0,   0 ],   "max": [ 1000, 1000 ],    "min": [ 0, 0 ],    "step": 1, "scale": 0.001,   "format": "%1.4f", "screen": "crt" },
+		{ "type": "color", "name": "floor", "text": "Signal Floor, ",    "default": [ 0.05, 0.05, 0.05 ], "max": [ 1.00, 1.00, 1.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "color", "name": "power", "text": "Signal Exponent, ", "default": [ 0.80, 0.80, 0.80 ], "max": [ 4.00, 4.00, 4.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "crt" },
 
-		{ "type": "float",   "name": "humbar_alpha",           "text": "Hum Bar Amount",             "default": 5,              "max": 100,               "min": 0,           "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
-		{ "type": "float",   "name": "humbar_hertz_rate",      "text": "Hum Bar Frequency",          "default": 100,            "max": 10000,             "min": 0,           "step": 1, "scale": 0.00001, "format": "%1.7f", "screen": "crt" },
-
-		{ "type": "color",   "name": "floor",                  "text": "Signal Floor, ",             "default": [  5,  5,  5 ], "max": [ 100, 100, 100 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
-		{ "type": "color",   "name": "power",                  "text": "Signal Exponent, ",          "default": [ 80, 80, 80 ], "max": [ 400, 400, 400 ], "min": [ 0, 0, 0 ], "step": 1, "scale": 0.01,    "format": "%1.2f", "screen": "crt" },
-
-		{ "type": "float", "name": "distortion",       "text": "Screen Distortion Amount",       "default": 20, "max": 200, "min": -200, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "cubic_distortion", "text": "Screen Cubic Distortion Amount", "default": 0,  "max": 200, "min": -200, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "distort_corner",   "text": "Distorted Corner Amount",        "default": 20, "max": 200, "min": 0,    "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "round_corner",     "text": "Rounded Corner Amount",          "default": 15, "max": 200, "min": 0,    "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "smooth_border",    "text": "Smooth Border Amount",           "default": 5,  "max": 200, "min": 0,    "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "vignetting",       "text": "Vignetting Amount",              "default": 20, "max": 200, "min": 0,    "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "reflection",       "text": "Reflection Amount",              "default": 15, "max": 200, "min": 0,    "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "crt" }
+		{ "type": "float", "name": "distortion",       "text": "Screen Distortion Amount",       "default": 0.20, "max": 2.00, "min": -2.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "cubic_distortion", "text": "Screen Cubic Distortion Amount", "default": 0.00, "max": 2.00, "min": -2.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "distort_corner",   "text": "Distorted Corner Amount",        "default": 0.20, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "round_corner",     "text": "Rounded Corner Amount",          "default": 0.15, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "smooth_border",    "text": "Smooth Border Amount",           "default": 0.05, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "vignetting",       "text": "Vignetting Amount",              "default": 0.20, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "reflection",       "text": "Reflection Amount",              "default": 0.15, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" }
 	],
 
 	// parameters (optional): A list of procedurally-generated parameters that can be bound to entry uniforms.
