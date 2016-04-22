@@ -9,6 +9,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "mameopts.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/submenu.h"

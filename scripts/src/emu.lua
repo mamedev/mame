@@ -154,6 +154,8 @@ files {
 	MAME_DIR .. "src/emu/language.h",
 	MAME_DIR .. "src/emu/mame.cpp",
 	MAME_DIR .. "src/emu/mame.h",
+	MAME_DIR .. "src/emu/mameopts.cpp",
+	MAME_DIR .. "src/emu/mameopts.h",
 	MAME_DIR .. "src/emu/machine.cpp",
 	MAME_DIR .. "src/emu/machine.h",
 	MAME_DIR .. "src/emu/mconfig.cpp",

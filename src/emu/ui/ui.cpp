@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "mameopts.h"
 #include "video/vector.h"
 #include "machine/laserdsc.h"
 #include "render.h"

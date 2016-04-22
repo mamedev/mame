@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "chd.h"
 #include "emuopts.h"
+#include "mameopts.h"
 #include "jedparse.h"
 #include "audit.h"
 #include "info.h"

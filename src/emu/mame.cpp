@@ -72,6 +72,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "mameopts.h"
 #include "osdepend.h"
 #include "validity.h"
 #include "luaengine.h"

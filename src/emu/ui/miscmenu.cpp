@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "osdnet.h"
+#include "mameopts.h"
 
 #include "uiinput.h"
 #include "ui/ui.h"

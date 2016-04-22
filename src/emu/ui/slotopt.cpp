@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "mameopts.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/slotopt.h"
