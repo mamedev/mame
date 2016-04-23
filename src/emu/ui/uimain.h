@@ -18,20 +18,6 @@
     CONSTANTS
 ***************************************************************************/
 
-// flags for menu items
-#define MENU_FLAG_LEFT_ARROW        (1 << 0)
-#define MENU_FLAG_RIGHT_ARROW       (1 << 1)
-#define MENU_FLAG_INVERT            (1 << 2)
-#define MENU_FLAG_MULTILINE         (1 << 3)
-#define MENU_FLAG_REDTEXT           (1 << 4)
-#define MENU_FLAG_DISABLE           (1 << 5)
-#define MENU_FLAG_UI                (1 << 6)
-#define MENU_FLAG_UI_DATS           (1 << 7)
-#define MENU_FLAG_UI_SWLIST         (1 << 8)
-#define MENU_FLAG_UI_FAVORITE       (1 << 9)
-#define MENU_FLAG_UI_PALETTE        (1 << 10)
-#define MENU_FLAG_UI_HEADING        (1 << 11)
-
 // special menu item for separators
 #define MENU_SEPARATOR_ITEM         "---"
 
