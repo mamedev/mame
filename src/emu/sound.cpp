@@ -12,7 +12,7 @@
 #include "emuopts.h"
 #include "osdepend.h"
 #include "config.h"
-#include "sound/wavwrite.h"
+#include "wavwrite.h"
 
 
 
