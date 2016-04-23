@@ -148,7 +148,7 @@
  *
  *************************************/
 
-#define CPU_CLOCK           8000000
+#define CPU_CLOCK           8000000     /* not used when video boards are connected */
 #define VIDEO_CLOCK         15468480
 
 
@@ -871,7 +871,7 @@ static const char *const zektor_sample_names[] =
 static MACHINE_CONFIG_START( g80v_base, segag80v_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK/2)
+	MCFG_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80v_state,  irq0_line_hold)
@@ -923,7 +923,7 @@ static MACHINE_CONFIG_DERIVED( zektor, g80v_base )
 	MCFG_SAMPLES_NAMES(zektor_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK/2/2)
+	MCFG_SOUND_ADD("aysnd", AY8910, VIDEO_CLOCK/4/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	/* speech board */
