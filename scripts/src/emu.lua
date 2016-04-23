@@ -24,7 +24,6 @@ includedirs {
 	MAME_DIR .. "src/emu",
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
-	MAME_DIR .. "3rdparty/rapidjson/include",
 	MAME_DIR .. "3rdparty",
 	GEN_DIR  .. "emu",
 	GEN_DIR  .. "emu/layout",
@@ -282,11 +281,7 @@ precompiledheaders()
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",
-	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
-	MAME_DIR .. "3rdparty",
-	GEN_DIR  .. "emu",
-	GEN_DIR  .. "emu/layout",
 }
 files {
 	MAME_DIR .. "src/emu/drivers/empty.cpp",
