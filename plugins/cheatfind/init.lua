@@ -12,7 +12,6 @@ local cheatfind = exports
 
 function cheatfind.startplugin()
 	local cheat = {}
-	local watches = {}
 
 	-- return table of devices and spaces
 	function cheat.getspaces()
@@ -80,7 +79,7 @@ function cheatfind.startplugin()
 		end
 
 		local function beq(a, b, val, addr)
-			if val == 0 then
+			if type(val) ~= "table" then
 				bitmask = ~a ~ b
 				return bitmask ~= 0
 			elseif not val[addr] then
@@ -187,13 +186,13 @@ function cheatfind.startplugin()
 	-- compare a data block to the current state
 	function cheat.compcur(olddata, oper, format, val, bcd)
 		local newdata = cheat.save(olddata.space, olddata.start, olddata.size, olddata.space)
-		return cheat.comp(olddata, newdata, oper, format, check_val(oper, val, oldmatch), bcd)
+		return cheat.comp(olddata, newdata, oper, format, val, bcd)
 	end
 
 	-- compare a data block to the current state and filter
 	function cheat.compcurnext(olddata, oldmatch, oper, format, val, bcd)
 		local newdata = cheat.save(olddata.space, olddata.start, olddata.size, olddata.space)
-		return cheat.compnext(olddata, newdata, oldmatch, oper, format, check_val(oper, val, oldmatch), bcd)
+		return cheat.compnext(olddata, newdata, oldmatch, oper, format, val, bcd)
 	end
 
 
@@ -217,6 +216,7 @@ function cheatfind.startplugin()
 	local menu_blocks = {}
 	local midx = { region = 1, init = 2, undo = 3, save = 4, lop = 6, op = 7, rop = 8, val = 9,
 		       width = 11,  bcd = 12, comp = 13, match = 15, watch = 0 }
+	local watches = {}
 
 	local function start()
 		devtable = {}
@@ -231,6 +231,7 @@ function cheatfind.startplugin()
 		matches = {}
 		matchsel = 1
 		menu_blocks = {}
+		watches = {}
 
 		local space_table = cheat.getspaces()
 		for tag, list in pairs(space_table) do
@@ -427,9 +428,9 @@ function cheatfind.startplugin()
 			bcd = incdec(bcd, 0, 1)
 		elseif index == midx.comp then
 			if event == "select" then
-				for num = 1, #menu_blocks do
-					if #matches == 0 then
-						matches[1] = {}
+				if #matches == 0 then
+					matches[1] = {}
+					for num = 1, #menu_blocks do
 						if rightop == #menu_blocks[1] + 1 then
 							matches[1][num] = cheat.compcur(menu_blocks[num][leftop], optable[opsel],
 										formtable[width], value, bcd == 1)
@@ -437,9 +438,11 @@ function cheatfind.startplugin()
 							matches[1][num] = cheat.comp(menu_blocks[num][leftop], menu_blocks[num][rightop],
 										   optable[opsel], formtable[width], value, bcd == 1)
 						end
-					else
-						lastmatch = matches[#matches]
-						matches[#matches + 1] = {}
+					end
+				else
+					lastmatch = matches[#matches]
+					matches[#matches + 1] = {}
+					for num = 1, #menu_blocks do
 						if rightop == #menu_blocks[1] + 1 then
 							matches[#matches][num] = cheat.compcurnext(menu_blocks[num][leftop], lastmatch[num],
 											optable[opsel], formtable[width], value, bcd == 1)
@@ -448,8 +451,6 @@ function cheatfind.startplugin()
 											lastmatch[num], optable[opsel], formtable[width], value, bcd == 1)
 						end
 					end
-
-
 				end
 				ret = true
 			end
