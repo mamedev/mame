@@ -58,7 +58,7 @@ class matrix_solver_w_t: public matrix_solver_t
 	friend class matrix_solver_t;
 public:
 
-	matrix_solver_w_t(const solver_parameters_t *params, const int size);
+	matrix_solver_w_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const int size);
 
 	virtual ~matrix_solver_w_t();
 
@@ -389,8 +389,9 @@ inline int matrix_solver_w_t<m_N, _storage_N>::vsolve_non_dynamic(const bool new
 }
 
 template <unsigned m_N, unsigned _storage_N>
-matrix_solver_w_t<m_N, _storage_N>::matrix_solver_w_t(const solver_parameters_t *params, const int size)
-: matrix_solver_t(NOSORT, params)
+matrix_solver_w_t<m_N, _storage_N>::matrix_solver_w_t(netlist_t &anetlist, const pstring &name,
+		const solver_parameters_t *params, const int size)
+: matrix_solver_t(anetlist, name, NOSORT, params)
 	,m_cnt(0)
 	, m_dim(size)
 {

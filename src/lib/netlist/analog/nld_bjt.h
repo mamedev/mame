@@ -40,7 +40,7 @@ public:
 		BJT_PNP
 	};
 
-	NETLIB_NAME(Q)(const family_t afamily);
+	NETLIB_NAME(Q)(const family_t afamily, netlist_t &anetlist, const pstring &name);
 	virtual ~NETLIB_NAME(Q)();
 
 	inline q_type qtype() const { return m_qtype; }
@@ -60,8 +60,8 @@ class NETLIB_NAME(QBJT) : public NETLIB_NAME(Q)
 {
 public:
 
-	NETLIB_NAME(QBJT)(const family_t afamily)
-	: NETLIB_NAME(Q)(afamily) { }
+	NETLIB_NAME(QBJT)(const family_t afamily, netlist_t &anetlist, const pstring &name)
+	: NETLIB_NAME(Q)(afamily, anetlist, name) { }
 
 	virtual ~NETLIB_NAME(QBJT)() { }
 
@@ -94,12 +94,15 @@ private:
 class NETLIB_NAME(QBJT_switch) : public NETLIB_NAME(QBJT)
 {
 public:
-	ATTR_COLD NETLIB_NAME(QBJT_switch)()
-	: NETLIB_NAME(QBJT)(BJT_SWITCH),
-		m_RB(object_t::ANALOG),
-		m_RC(object_t::ANALOG),
-		m_BC_dummy(object_t::ANALOG),
-		m_gB(NETLIST_GMIN_DEFAULT), m_gC(NETLIST_GMIN_DEFAULT), m_V(0.0), m_state_on(0) { }
+	ATTR_COLD NETLIB_NAME(QBJT_switch)(netlist_t &anetlist, const pstring &name)
+	: NETLIB_NAME(QBJT)(BJT_SWITCH, anetlist, name),
+		m_RB(object_t::ANALOG, anetlist, "m_RB"),
+		m_RC(object_t::ANALOG, anetlist, "m_RC"),
+		m_BC_dummy(object_t::ANALOG, anetlist, "m_BC"),
+		m_gB(NETLIST_GMIN_DEFAULT),
+		m_gC(NETLIST_GMIN_DEFAULT),
+		m_V(0.0),
+		m_state_on(0) { }
 
 
 	ATTR_HOT void virtual update() override;
@@ -134,11 +137,11 @@ private:
 class NETLIB_NAME(QBJT_EB) : public NETLIB_NAME(QBJT)
 {
 public:
-	ATTR_COLD NETLIB_NAME(QBJT_EB)()
-	: NETLIB_NAME(QBJT)(BJT_EB),
-		m_D_CB(object_t::ANALOG),
-		m_D_EB(object_t::ANALOG),
-		m_D_EC(object_t::ANALOG),
+	ATTR_COLD NETLIB_NAME(QBJT_EB)(netlist_t &anetlist, const pstring &name)
+	: NETLIB_NAME(QBJT)(BJT_EB, anetlist, name),
+		m_D_CB(object_t::ANALOG, anetlist, "m_D_CB"),
+		m_D_EB(object_t::ANALOG, anetlist, "m_D_EB"),
+		m_D_EC(object_t::ANALOG, anetlist, "m_D_EC"),
 		m_alpha_f(0),
 		m_alpha_r(0)
 		{ }

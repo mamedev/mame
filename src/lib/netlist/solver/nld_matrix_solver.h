@@ -84,7 +84,8 @@ public:
 		DESCENDING
 	};
 
-	matrix_solver_t(const eSortType sort, const solver_parameters_t *params);
+	matrix_solver_t(netlist_t &anetlist, const pstring &name,
+			const eSortType sort, const solver_parameters_t *params);
 	virtual ~matrix_solver_t();
 
 	void setup(analog_net_t::list_t &nets) { vsetup(nets); }

@@ -503,8 +503,8 @@ private:
 class NETLIB_NAME(analog_callback) : public netlist::device_t
 {
 public:
-	NETLIB_NAME(analog_callback)()
-		: device_t(), m_cpu_device(nullptr), m_last(0) { }
+	NETLIB_NAME(analog_callback)(netlist::netlist_t &anetlist, const pstring &name)
+		: device_t(anetlist, name), m_cpu_device(nullptr), m_last(0) { }
 
 	ATTR_COLD void start() override
 	{
@@ -552,8 +552,8 @@ private:
 class NETLIB_NAME(sound_out) : public netlist::device_t
 {
 public:
-	NETLIB_NAME(sound_out)()
-		: netlist::device_t() { }
+	NETLIB_NAME(sound_out)(netlist::netlist_t &anetlist, const pstring &name)
+		: netlist::device_t(anetlist, name) { }
 
 	static const int BUFSIZE = 2048;
 
@@ -626,8 +626,8 @@ private:
 class NETLIB_NAME(sound_in) : public netlist::device_t
 {
 public:
-	NETLIB_NAME(sound_in)()
-		: netlist::device_t() { }
+	NETLIB_NAME(sound_in)(netlist::netlist_t &anetlist, const pstring &name)
+		: netlist::device_t(anetlist, name) { }
 
 	static const int MAX_INPUT_CHANNELS = 10;
 

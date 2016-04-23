@@ -185,6 +185,7 @@ typedef unsigned int netlist_sig_t;
 #define NETLIB_NAMESPACE_DEVICES_END()  }}
 
 #define NETLIB_NAME(_chip) nld_ ## _chip
+#define NETLIB_SUB(_chip) std::unique_ptr< nld_ ## _chip >
 
 #define NETLIB_NAME_STR_S(_s) # _s
 #define NETLIB_NAME_STR(_chip) NETLIB_NAME_STR_S(nld_ ## _chip)
@@ -207,8 +208,8 @@ typedef unsigned int netlist_sig_t;
 	class _name : public _pclass                                                \
 	{                                                                           \
 	public:                                                                     \
-		_name()                                                                 \
-		: _pclass()    { }                                                      \
+		_name(netlist_t &anetlist, const pstring &name)                         \
+		: _pclass(anetlist, name)    { }                                        \
 	protected:                                                                  \
 		_extra                                                                  \
 		ATTR_HOT void update() override;                                        \
@@ -230,8 +231,8 @@ typedef unsigned int netlist_sig_t;
 	class NETLIB_NAME(_name) : public device_t                                  \
 	{                                                                           \
 	public:                                                                     \
-		NETLIB_NAME(_name) ()                                                   \
-		: device_t()                                                            \
+		NETLIB_NAME(_name) (netlist_t &anetlist, const pstring &name)           \
+		: device_t(anetlist, name)                                              \
 			{ }                                                                 \
 	/*protected:*/                                                              \
 		ATTR_HOT void update() override;                                        \
@@ -326,7 +327,8 @@ namespace netlist
 	public:
 		logic_family_desc_t() : m_is_static(false) {}
 		virtual ~logic_family_desc_t() {}
-		virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const = 0;
+		virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_t &anetlist, const pstring &name,
+				logic_output_t *proxied) const = 0;
 
 		nl_double m_low_thresh_V;
 		nl_double m_high_thresh_V;
@@ -1025,11 +1027,10 @@ namespace netlist
 
 		typedef pvector_t<core_device_t *> list_t;
 
-		ATTR_COLD core_device_t(const family_t afamily);
+		ATTR_COLD core_device_t(const family_t afamily, netlist_t &anetlist, const pstring &name);
 
 		virtual ~core_device_t();
 
-		virtual void init(netlist_t &anetlist, const pstring &name);
 		ATTR_HOT virtual void update_param() {}
 
 		ATTR_HOT  void update_dev()
@@ -1117,16 +1118,28 @@ namespace netlist
 		P_PREVENT_COPYING(device_t)
 	public:
 
-		ATTR_COLD device_t();
-		ATTR_COLD device_t(const family_t afamily);
+		ATTR_COLD device_t(netlist_t &anetlist, const pstring &name);
+		ATTR_COLD device_t(const family_t afamily, netlist_t &anetlist, const pstring &name);
 
 		virtual ~device_t();
 
-		virtual void init(netlist_t &anetlist, const pstring &name) override;
-
 		ATTR_COLD setup_t &setup();
 
-		ATTR_COLD void register_sub(const pstring &name, device_t &dev);
+		template<class C>
+		void register_sub(const pstring &name, std::unique_ptr<C> &dev)
+		{
+			dev.reset(new C(this->netlist(), this->name() + "." + name));
+
+			register_sub_p(*dev);
+		}
+
+#if 1
+		void register_sub(device_t &dev)
+		{
+			register_sub_p(dev);
+		}
+#endif
+
 		ATTR_COLD void register_subalias(const pstring &name, core_terminal_t &term);
 		ATTR_COLD void register_subalias(const pstring &name, const pstring &aliased);
 		ATTR_COLD void register_terminal(const pstring &name, terminal_t &port);
@@ -1151,6 +1164,7 @@ namespace netlist
 		ATTR_COLD void register_param(const pstring &sname, C &param, const T initialVal);
 
 	private:
+		ATTR_COLD void register_sub_p(device_t &dev);
 	};
 
 

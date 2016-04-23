@@ -15,26 +15,26 @@ NETLIB_START(CD4020)
 	register_sub("supply", m_supply);
 
 	register_input("RESET", m_RESET);
-	register_subalias("IP", sub.m_IP);
-	register_subalias("Q1", sub.m_Q[0]);
-	register_subalias("Q4", sub.m_Q[3]);
-	register_subalias("Q5", sub.m_Q[4]);
-	register_subalias("Q6", sub.m_Q[5]);
-	register_subalias("Q7", sub.m_Q[6]);
-	register_subalias("Q8", sub.m_Q[7]);
-	register_subalias("Q9", sub.m_Q[8]);
-	register_subalias("Q10", sub.m_Q[9]);
-	register_subalias("Q11", sub.m_Q[10]);
-	register_subalias("Q12", sub.m_Q[11]);
-	register_subalias("Q13", sub.m_Q[12]);
-	register_subalias("Q14", sub.m_Q[13]);
-	register_subalias("VDD", m_supply.m_vdd);
-	register_subalias("VSS", m_supply.m_vss);
+	register_subalias("IP", sub->m_IP);
+	register_subalias("Q1", sub->m_Q[0]);
+	register_subalias("Q4", sub->m_Q[3]);
+	register_subalias("Q5", sub->m_Q[4]);
+	register_subalias("Q6", sub->m_Q[5]);
+	register_subalias("Q7", sub->m_Q[6]);
+	register_subalias("Q8", sub->m_Q[7]);
+	register_subalias("Q9", sub->m_Q[8]);
+	register_subalias("Q10", sub->m_Q[9]);
+	register_subalias("Q11", sub->m_Q[10]);
+	register_subalias("Q12", sub->m_Q[11]);
+	register_subalias("Q13", sub->m_Q[12]);
+	register_subalias("Q14", sub->m_Q[13]);
+	register_subalias("VDD", m_supply->m_vdd);
+	register_subalias("VSS", m_supply->m_vss);
 }
 
 NETLIB_RESET(CD4020)
 {
-	sub.do_reset();
+	sub->do_reset();
 }
 
 
@@ -76,15 +76,15 @@ NETLIB_UPDATE(CD4020)
 {
 	if (INPLOGIC(m_RESET))
 	{
-		sub.m_cnt = 0;
-		sub.m_IP.inactivate();
+		sub->m_cnt = 0;
+		sub->m_IP.inactivate();
 		/* static */ const netlist_time reset_time = netlist_time::from_nsec(140);
-		OUTLOGIC(sub.m_Q[0], 0, reset_time);
+		OUTLOGIC(sub->m_Q[0], 0, reset_time);
 		for (int i=3; i<14; i++)
-			OUTLOGIC(sub.m_Q[i], 0, reset_time);
+			OUTLOGIC(sub->m_Q[i], 0, reset_time);
 	}
 	else
-		sub.m_IP.activate_hl();
+		sub->m_IP.activate_hl();
 }
 
 inline NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const UINT16 cnt))

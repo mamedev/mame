@@ -73,15 +73,15 @@ NETLIB_SUBDEVICE(74153sub,
 
 NETLIB_DEVICE(74153,
 public:
-	NETLIB_NAME(74153sub) m_sub;
+	NETLIB_SUB(74153sub) m_sub;
 	logic_input_t m_A;
 	logic_input_t m_B;
 );
 
 NETLIB_DEVICE(74153_dip,
 
-	NETLIB_NAME(74153sub) m_1;
-	NETLIB_NAME(74153sub) m_2;
+	NETLIB_SUB(74153sub) m_1;
+	NETLIB_SUB(74153sub) m_2;
 	logic_input_t m_A;
 	logic_input_t m_B;
 );

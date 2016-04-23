@@ -57,8 +57,8 @@ NETLIB_SUBDEVICE(CD4020_sub,
 
 NETLIB_DEVICE(CD4020,
 	NETLIB_LOGIC_FAMILY(CD4XXX)
-	NETLIB_NAME(CD4020_sub) sub;
-	NETLIB_NAME(vdd_vss) m_supply;
+	NETLIB_SUB(CD4020_sub) sub;
+	NETLIB_SUB(vdd_vss) m_supply;
 	logic_input_t m_RESET;
 );
 

@@ -130,41 +130,41 @@ NETLIB_START(9312_dip)
 
 #if (1 && USE_TRUTHTABLE)
 
-	register_subalias("13", m_sub.m_I[0]);
-	register_subalias("12", m_sub.m_I[1]);
-	register_subalias("11", m_sub.m_I[2]);
-	register_subalias("10", m_sub.m_I[3]);
+	register_subalias("13", m_sub->m_I[0]);
+	register_subalias("12", m_sub->m_I[1]);
+	register_subalias("11", m_sub->m_I[2]);
+	register_subalias("10", m_sub->m_I[3]);
 
-	register_subalias("1", m_sub.m_I[4]);
-	register_subalias("2", m_sub.m_I[5]);
-	register_subalias("3", m_sub.m_I[6]);
-	register_subalias("4", m_sub.m_I[7]);
-	register_subalias("5", m_sub.m_I[8]);
-	register_subalias("6", m_sub.m_I[9]);
-	register_subalias("7", m_sub.m_I[10]);
-	register_subalias("9", m_sub.m_I[11]);
+	register_subalias("1", m_sub->m_I[4]);
+	register_subalias("2", m_sub->m_I[5]);
+	register_subalias("3", m_sub->m_I[6]);
+	register_subalias("4", m_sub->m_I[7]);
+	register_subalias("5", m_sub->m_I[8]);
+	register_subalias("6", m_sub->m_I[9]);
+	register_subalias("7", m_sub->m_I[10]);
+	register_subalias("9", m_sub->m_I[11]);
 
-	register_subalias("15", m_sub.m_Q[0]); // Y
-	register_subalias("14", m_sub.m_Q[1]); // YQ
+	register_subalias("15", m_sub->m_Q[0]); // Y
+	register_subalias("14", m_sub->m_Q[1]); // YQ
 
 #else
 
-	register_subalias("13", m_sub.m_C);
-	register_subalias("12", m_sub.m_B);
-	register_subalias("11", m_sub.m_A);
-	register_subalias("10", m_sub.m_G);
+	register_subalias("13", m_sub->m_C);
+	register_subalias("12", m_sub->m_B);
+	register_subalias("11", m_sub->m_A);
+	register_subalias("10", m_sub->m_G);
 
-	register_subalias("1", m_sub.m_D[0]);
-	register_subalias("2", m_sub.m_D[1]);
-	register_subalias("3", m_sub.m_D[2]);
-	register_subalias("4", m_sub.m_D[3]);
-	register_subalias("5", m_sub.m_D[4]);
-	register_subalias("6", m_sub.m_D[5]);
-	register_subalias("7", m_sub.m_D[6]);
-	register_subalias("9", m_sub.m_D[7]);
+	register_subalias("1", m_sub->m_D[0]);
+	register_subalias("2", m_sub->m_D[1]);
+	register_subalias("3", m_sub->m_D[2]);
+	register_subalias("4", m_sub->m_D[3]);
+	register_subalias("5", m_sub->m_D[4]);
+	register_subalias("6", m_sub->m_D[5]);
+	register_subalias("7", m_sub->m_D[6]);
+	register_subalias("9", m_sub->m_D[7]);
 
-	register_subalias("15", m_sub.m_Y); // Y
-	register_subalias("14", m_sub.m_YQ); // YQ
+	register_subalias("15", m_sub->m_Y); // Y
+	register_subalias("14", m_sub->m_YQ); // YQ
 
 #endif
 }
@@ -172,11 +172,11 @@ NETLIB_START(9312_dip)
 NETLIB_UPDATE(9312_dip)
 {
 	/* only called during startup */
-	m_sub.update_dev();
+	m_sub->update_dev();
 }
 
 NETLIB_RESET(9312_dip)
 {
-	m_sub.do_reset();
+	m_sub->do_reset();
 }
 NETLIB_NAMESPACE_DEVICES_END()

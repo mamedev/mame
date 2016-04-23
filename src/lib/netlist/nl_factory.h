@@ -31,7 +31,7 @@ namespace netlist
 
 		virtual ~base_factory_t() {}
 
-		virtual device_t *Create() = 0;
+		virtual device_t *Create(netlist_t &anetlist, const pstring &name) = 0;
 
 		ATTR_COLD const pstring &name() const { return m_name; }
 		ATTR_COLD const pstring &classname() const { return m_classname; }
@@ -54,10 +54,9 @@ namespace netlist
 				const pstring &def_param)
 		: base_factory_t(name, classname, def_param) { }
 
-		ATTR_COLD device_t *Create() override
+		ATTR_COLD device_t *Create(netlist_t &anetlist, const pstring &name) override
 		{
-			device_t *r = palloc(_device_class);
-			//r->init(setup, name);
+			device_t *r = palloc(_device_class(anetlist, name));
 			return r;
 		}
 	};
@@ -83,8 +82,9 @@ namespace netlist
 		}
 
 		//ATTR_COLD device_t *new_device_by_classname(const pstring &classname) const;
-		ATTR_COLD device_t *new_device_by_name(const pstring &name);
-		ATTR_COLD base_factory_t * factory_by_name(const pstring &name);
+		// FIXME: legacy, should use factory_by_name
+		ATTR_COLD device_t *new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name);
+		ATTR_COLD base_factory_t * factory_by_name(const pstring &devname);
 
 	private:
 		void error(const pstring &s);

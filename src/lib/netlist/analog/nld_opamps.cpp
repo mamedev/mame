@@ -123,36 +123,36 @@ NETLIB_UPDATE(OPAMP)
 
 NETLIB_RESET(OPAMP)
 {
-	m_G1.do_reset();
-	m_G1.m_RI.setTo(m_model.model_value("RI"));
+	m_G1->do_reset();
+	m_G1->m_RI.setTo(m_model.model_value("RI"));
 
 	if (m_type == 1)
 	{
 		double RO = m_model.model_value("RO");
 		double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RO;
-		m_RP.set_R(RO);
-		m_G1.m_G.setTo(G);
+		m_RP->set_R(RO);
+		m_G1->m_G.setTo(G);
 	}
 	else if (m_type == 3)
 	{
-		m_EBUF.do_reset();
-		m_DP.do_reset();
-		m_DN.do_reset();
-		m_CP.do_reset();
-		m_RP.do_reset();
+		m_EBUF->do_reset();
+		m_DP->do_reset();
+		m_DN->do_reset();
+		m_CP->do_reset();
+		m_RP->do_reset();
 
-		m_EBUF.m_G.setTo(1.0);
-		m_EBUF.m_RO.setTo(m_model.model_value("RO"));
-		m_DP.m_model.setTo("D(IS=1e-15 N=1)");
-		m_DN.m_model.setTo("D(IS=1e-15 N=1)");
+		m_EBUF->m_G.setTo(1.0);
+		m_EBUF->m_RO.setTo(m_model.model_value("RO"));
+		m_DP->m_model.setTo("D(IS=1e-15 N=1)");
+		m_DN->m_model.setTo("D(IS=1e-15 N=1)");
 
 		double CP = m_model.model_value("DAB") / m_model.model_value("SLEW");
 		double RP = 0.5 / 3.1459 / CP / m_model.model_value("FPF");
 		double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RP;
 
-		m_CP.m_C.setTo(CP);
-		m_RP.set_R(RP);
-		m_G1.m_G.setTo(G);
+		m_CP->m_C.setTo(CP);
+		m_RP->set_R(RP);
+		m_G1->m_G.setTo(G);
 
 	}
 

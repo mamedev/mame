@@ -73,7 +73,7 @@ public:
 #endif
 
 NETLIB_DEVICE(9312_dip,
-	NETLIB_NAME(9312) m_sub;
+	NETLIB_SUB(9312) m_sub;
 );
 
 NETLIB_NAMESPACE_DEVICES_END()

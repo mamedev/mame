@@ -101,8 +101,8 @@ NETLIB_SUBDEVICE(9316_sub,
 );
 
 NETLIB_DEVICE(9316,
-	NETLIB_NAME(9316_sub) sub;
-	NETLIB_NAME(9316_subABCD) subABCD;
+	NETLIB_SUB(9316_sub) sub;
+	NETLIB_SUB(9316_subABCD) subABCD;
 	logic_input_t m_ENP;
 	logic_input_t m_ENT;
 	logic_input_t m_CLRQ;

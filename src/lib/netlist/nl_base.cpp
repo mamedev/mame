@@ -38,9 +38,9 @@ public:
 		m_R_high = 130.0;
 		m_is_static = true;
 	}
-	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const override
+	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
-		return palloc(devices::nld_d_to_a_proxy(proxied));
+		return palloc(devices::nld_d_to_a_proxy(anetlist, name, proxied));
 	}
 };
 
@@ -59,9 +59,9 @@ public:
 		m_R_high = 10.0;
 		m_is_static = true;
 	}
-	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const override
+	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
-		return palloc(devices::nld_d_to_a_proxy(proxied));
+		return palloc(devices::nld_d_to_a_proxy(anetlist, name, proxied));
 	}
 };
 
@@ -389,7 +389,7 @@ ATTR_HOT void netlist_t::process_queue(const netlist_time &delta)
 // net_core_device_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD core_device_t::core_device_t(const family_t afamily)
+ATTR_COLD core_device_t::core_device_t(const family_t afamily, netlist_t &anetlist, const pstring &name)
 : object_t(DEVICE, afamily), logic_family_t()
 #if (NL_KEEP_STATISTICS)
 	, stat_total_time(0)
@@ -397,23 +397,9 @@ ATTR_COLD core_device_t::core_device_t(const family_t afamily)
 	, stat_call_count(0)
 #endif
 {
-}
-
-ATTR_COLD void core_device_t::init(netlist_t &anetlist, const pstring &name)
-{
 	if (logic_family() == nullptr)
 		set_logic_family(this->default_logic_family());
 	init_object(anetlist, name);
-
-#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
-	void (core_device_t::* pFunc)() = &core_device_t::update;
-	m_static_update = pFunc;
-#elif (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV)
-	void (core_device_t::* pFunc)() = &core_device_t::update;
-	m_static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
-#elif (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL)
-	m_static_update = pmfp::get_mfp<net_update_delegate>(&core_device_t::update, this);
-#endif
 }
 
 ATTR_COLD core_device_t::~core_device_t()
@@ -424,6 +410,15 @@ ATTR_COLD void core_device_t::start_dev()
 {
 #if (NL_KEEP_STATISTICS)
 	netlist().m_started_devices.add(this, false);
+#endif
+#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
+	void (core_device_t::* pFunc)() = &core_device_t::update;
+	m_static_update = pFunc;
+#elif (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV)
+	void (core_device_t::* pFunc)() = &core_device_t::update;
+	m_static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
+#elif (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL)
+	m_static_update = pmfp::get_mfp<net_update_delegate>(&core_device_t::update, this);
 #endif
 	start();
 }
@@ -453,14 +448,14 @@ ATTR_HOT netlist_sig_t core_device_t::INPLOGIC_PASSIVE(logic_input_t &inp)
 // device_t
 // ----------------------------------------------------------------------------------------
 
-device_t::device_t()
-	: core_device_t(GENERIC),
+device_t::device_t(netlist_t &anetlist, const pstring &name)
+	: core_device_t(GENERIC, anetlist, name),
 		m_terminals()
 {
 }
 
-device_t::device_t(const family_t afamily)
-	: core_device_t(afamily),
+device_t::device_t(const family_t afamily, netlist_t &anetlist, const pstring &name)
+	: core_device_t(afamily, anetlist, name),
 		m_terminals()
 {
 }
@@ -475,15 +470,8 @@ ATTR_COLD setup_t &device_t::setup()
 	return netlist().setup();
 }
 
-ATTR_COLD void device_t::init(netlist_t &anetlist, const pstring &name)
+ATTR_COLD void device_t::register_sub_p(device_t &dev)
 {
-	core_device_t::init(anetlist, name);
-}
-
-
-ATTR_COLD void device_t::register_sub(const pstring &name, device_t &dev)
-{
-	dev.init(netlist(), this->name() + "." + name);
 	// subdevices always first inherit the logic family of the parent
 	dev.set_logic_family(this->logic_family());
 	dev.start_dev();

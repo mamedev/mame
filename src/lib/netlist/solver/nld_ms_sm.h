@@ -52,7 +52,8 @@ class matrix_solver_sm_t: public matrix_solver_t
 
 public:
 
-	matrix_solver_sm_t(const solver_parameters_t *params, const int size);
+	matrix_solver_sm_t(netlist_t &anetlist, const pstring &name,
+			const solver_parameters_t *params, const int size);
 
 	virtual ~matrix_solver_sm_t();
 
@@ -324,8 +325,9 @@ inline int matrix_solver_sm_t<m_N, _storage_N>::vsolve_non_dynamic(const bool ne
 }
 
 template <unsigned m_N, unsigned _storage_N>
-matrix_solver_sm_t<m_N, _storage_N>::matrix_solver_sm_t(const solver_parameters_t *params, const int size)
-: matrix_solver_t(NOSORT, params)
+matrix_solver_sm_t<m_N, _storage_N>::matrix_solver_sm_t(netlist_t &anetlist, const pstring &name,
+		const solver_parameters_t *params, const int size)
+: matrix_solver_t(anetlist, name, NOSORT, params)
 , m_dim(size)
 {
 #if (NL_USE_DYNAMIC_ALLOCATION)

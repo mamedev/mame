@@ -137,7 +137,7 @@ namespace netlist
 
 		pstring build_fqn(const pstring &obj_name) const;
 
-		device_t *register_dev(device_t *dev, const pstring &name);
+		device_t *register_dev(device_t *dev);
 		device_t *register_dev(const pstring &classname, const pstring &name);
 		void remove_dev(const pstring &name);
 

@@ -360,8 +360,8 @@ void parser_t::device(const pstring &dev_type)
 
 		pstring devname = get_identifier();
 
-		dev = f->Create();
-		m_setup.register_dev(dev, devname);
+		dev = f->Create(m_setup.netlist(), m_setup.build_fqn(devname));
+		m_setup.register_dev(dev);
 
 		m_setup.log().debug("Parser: IC: {1}\n", devname);
 
