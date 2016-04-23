@@ -35,7 +35,7 @@ class mame_ui_manager;
 
 // ======================> machine_manager
 
-class mame_machine_manager : machine_manager
+class mame_machine_manager : public machine_manager
 {
 	DISABLE_COPYING(mame_machine_manager);
 private:

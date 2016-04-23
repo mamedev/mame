@@ -2169,10 +2169,13 @@ void lua_engine::initialize()
 			.addCFunction ("print_error",   l_osd_printf_error )
 			.addCFunction ("print_info",    l_osd_printf_info )
 			.addCFunction ("print_debug",   l_osd_printf_debug )
-			.beginClass <mame_machine_manager> ("manager")
-				.addFunction ("machine", &machine_manager::machine)
-				.addFunction ("options", &machine_manager::options)
+			.beginClass <machine_manager>("manager")
+				.addFunction("machine", &machine_manager::machine)
+				.addFunction("options", &machine_manager::options)
+			.endClass()
+			.beginClass <mame_machine_manager> ("mame_manager")
 				.addFunction ("plugins", &mame_machine_manager::plugins)
+				.addFunction ("cheat", &mame_machine_manager::cheat)
 			.endClass ()
 			.beginClass <lua_machine> ("lua_machine")
 				.addCFunction ("popmessage", &lua_machine::l_popmessage)
@@ -2190,7 +2193,6 @@ void lua_engine::initialize()
 				.addFunction ("render", &running_machine::render)
 				.addFunction ("ioport", &running_machine::ioport)
 				.addFunction ("parameters", &running_machine::parameters)
-				.addFunction ("cheat", &mame_machine_manager::cheat)
 				.addFunction ("memory", &running_machine::memory)
 				.addFunction ("options", &running_machine::options)
 				.addFunction ("outputs", &running_machine::output)
@@ -2501,8 +2503,10 @@ void lua_engine::initialize()
 			.endClass()
 		.endNamespace();
 
-	luabridge::push (m_lua_state, mame_machine_manager::instance());
+	luabridge::push (m_lua_state, (machine_manager*)mame_machine_manager::instance());
 	lua_setglobal(m_lua_state, "manager");
+	luabridge::push(m_lua_state, mame_machine_manager::instance());
+	lua_setglobal(m_lua_state, "mame_manager");
 }
 
 void lua_engine::start_console()
