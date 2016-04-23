@@ -22,6 +22,7 @@
   Magic Colors (ver. 1.7a),       1999, Unknown.
   Super Gran Safari (ver 3.11),   1996, New Impeuropex Corp.
   Luna Park (ver. 1.2),           1998, ABM Games.
+  Alta Tensione (ver. 2.01a),     199?, Unknown.
 
 *****************************************************************************
 
@@ -54,6 +55,20 @@
   The player can play the "Super Game" to grab the points.
   In this subgame, you must to hit the lion to get the prize.
   For now, you must miss the shot till hopper & ticket dispenser are properly emulated.
+
+
+  * Alta Tensione
+
+  First time boot instructions:
+
+  As soon as you get the "DATI NVRAM-68K NON VALIDI!!!" screen...
+
+  - Press F2 to enter the Test Mode.
+  - Press HOLD 5 (AZZERAMENTO) (key 'b')
+  - Press HOLD 1 (AZZERAMENTO TOTALE) (key 'z')
+  - Press HOLD 4 (SI) (key 'v') when the legend "CONFERMI AZZERAMENTO TOTALE" appear.
+  - Press BET (key 'm') twice to leave the Test Mode and start the game...
+
 
 *****************************************************************************
 
@@ -122,6 +137,7 @@ public:
 	DECLARE_DRIVER_INIT(magic102);
 	DECLARE_DRIVER_INIT(magic10);
 	DECLARE_DRIVER_INIT(hotslot);
+	DECLARE_DRIVER_INIT(altaten);
 	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
@@ -1391,12 +1407,12 @@ ROM_END
   STATUS:
 
   Memory map = done.
-  Inputs =     no.
-  Machine =    no.
+  Inputs =     done.
+  Machine =    done.
 
   OKI 6295 =     ok.
   Screen size =  ok.
-  Fixed layers = no.
+  Fixed layers = yes.
 
 */
 ROM_START( altaten )
@@ -1455,6 +1471,18 @@ DRIVER_INIT_MEMBER(magic10_state, sgsafari)
 	m_layer2_offset[1] = 20;
 }
 
+DRIVER_INIT_MEMBER(magic10_state, altaten)
+{
+	m_layer2_offset[0] = 8;
+	m_layer2_offset[1] = 16;
+
+	// patching the boot protection...
+	UINT8 *rom = memregion("maincpu")->base();
+
+		rom[0x7668] = 0x71;
+		rom[0x7669] = 0x4e;
+}
+
 
 /******************************
 *        Game Drivers         *
@@ -1472,4 +1500,4 @@ GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, magic102, RO
 GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, magic10_state, sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver 3.11)",   0,               layout_sgsafari )
 GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10_state, magic10,  ROT0, "ABM Games",            "Music Sort (ver 2.02, English)", 0,               layout_musicsrt )
 GAME(  1998, lunaprk,  0,        magic102, magic102, magic10_state, suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING )
-GAME(  199?, altaten,  0,        magic102, magic102, magic10_state, suprpool, ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING )
+GAME(  199?, altaten,  0,        magic102, magic102, magic10_state, altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING )
