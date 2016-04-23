@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "sprite.h"
+#include "video/sprite.h"
 #include "segaic16.h"
 
 #ifndef __SEGA16SP_H__

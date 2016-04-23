@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#include "emu.h"
-#include "sound/wavwrite.h"
+#include "osdcomm.h"
+#include "corealloc.h"
+#include <vector>
+#include "wavwrite.h"
 
 struct wav_file
 {
