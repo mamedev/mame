@@ -1964,6 +1964,8 @@ if (BUSES["NEOGEO_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/neogeo_ctrl/mahjong.h",
 		MAME_DIR .. "src/devices/bus/neogeo_ctrl/dial.cpp",
 		MAME_DIR .. "src/devices/bus/neogeo_ctrl/dial.h",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/irrmaze.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo_ctrl/irrmaze.h",
 		MAME_DIR .. "src/devices/bus/neogeo_ctrl/kizuna4p.cpp",
 		MAME_DIR .. "src/devices/bus/neogeo_ctrl/kizuna4p.h",
 	}
@@ -2076,8 +2078,6 @@ if (BUSES["TI99X"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99x/mecmouse.cpp",
 		MAME_DIR .. "src/devices/bus/ti99x/mecmouse.h",
 		MAME_DIR .. "src/devices/bus/ti99x/ti99defs.h",
-		MAME_DIR .. "src/devices/bus/ti99x/videowrp.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/videowrp.h",
 	}
 end
 

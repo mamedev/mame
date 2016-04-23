@@ -9,14 +9,13 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui/custui.h"
-
+#include "emuopts.h"
+#include "osdepend.h"
 #include "ui/ui.h"
+#include "ui/menu.h"
 #include "ui/selector.h"
 #include "ui/utils.h"
-
-#include <algorithm>
-
+#include "ui/custui.h"
 
 const char *const ui_menu_custom_ui::hide_status[] = {
 	__("Show All"),

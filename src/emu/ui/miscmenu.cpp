@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "osdnet.h"
+#include "mameopts.h"
 
 #include "uiinput.h"
 #include "ui/ui.h"
@@ -72,19 +73,19 @@ ui_menu_bios_selection::ui_menu_bios_selection(running_machine &machine, render_
 void ui_menu_bios_selection::populate()
 {
 	/* cycle through all devices for this system */
-	device_iterator deviter(machine().root_device());
-	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
+	for (device_t &device : device_iterator(machine().root_device()))
 	{
-		if (device->rom_region()) {
+		if (device.rom_region())
+		{
 			const char *val = "default";
-			for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
+			for (const rom_entry *rom = device.rom_region(); !ROMENTRY_ISEND(rom); rom++)
 			{
-				if (ROMENTRY_ISSYSTEM_BIOS(rom) && ROM_GETBIOSFLAGS(rom)==device->system_bios())
+				if (ROMENTRY_ISSYSTEM_BIOS(rom) && ROM_GETBIOSFLAGS(rom) == device.system_bios())
 				{
 					val = ROM_GETHASHDATA(rom);
 				}
 			}
-			item_append(strcmp(device->tag(),":")==0 ? "driver" : device->tag()+1, val, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)device);
+			item_append(device.owner() == nullptr ? "driver" : device.tag()+1, val, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)&device);
 		}
 	}
 
@@ -154,10 +155,9 @@ ui_menu_network_devices::~ui_menu_network_devices()
 void ui_menu_network_devices::populate()
 {
 	/* cycle through all devices for this system */
-	network_interface_iterator iter(machine().root_device());
-	for (device_network_interface *network = iter.first(); network != nullptr; network = iter.next())
+	for (device_network_interface &network : network_interface_iterator(machine().root_device()))
 	{
-		int curr = network->get_interface();
+		int curr = network.get_interface();
 		const char *title = nullptr;
 		const osd_netdev::entry_t *entry = netdev_first();
 		while(entry) {
@@ -168,7 +168,7 @@ void ui_menu_network_devices::populate()
 			entry = entry->m_next;
 		}
 
-		item_append(network->device().tag(),  (title) ? title : "------", MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)network);
+		item_append(network.device().tag(),  (title) ? title : "------", MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)network);
 	}
 }
 
@@ -694,7 +694,7 @@ ui_menu_machine_configure::ui_menu_machine_configure(running_machine &machine, r
 {
 	// parse the INI file
 	std::string error;
-	m_opts.parse_standard_inis(error, m_drv);
+	mame_options::parse_standard_inis(m_opts,error, m_drv);
 	setup_bios();
 }
 
@@ -773,12 +773,14 @@ void ui_menu_machine_configure::handle()
 void ui_menu_machine_configure::populate()
 {
 	// add options items
+	item_append(_("Bios"), nullptr, MENU_FLAG_DISABLE | MENU_FLAG_UI_HEADING, nullptr);
 	if (!m_bios.empty())
 	{
-		item_append(_("Bios"), nullptr, MENU_FLAG_DISABLE | MENU_FLAG_UI_HEADING, nullptr);
 		UINT32 arrows = get_arrow_flags(0, m_bios.size() - 1, m_curbios);
 		item_append(_("Driver"), m_bios[m_curbios].first.c_str(), arrows, (void *)(FPTR)BIOS);
 	}
+	else
+		item_append(_("This machine has no bios."), nullptr, MENU_FLAG_DISABLE, nullptr);
 
 	item_append(ui_menu_item_type::SEPARATOR);
 	item_append(_(advanced_submenu_options[0].description), nullptr, 0, (void *)(FPTR)ADVANCED);

@@ -15,30 +15,7 @@
 
 #include "options.h"
 
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// option priorities
-enum
-{
-	// command-line options are HIGH priority
-	OPTION_PRIORITY_SUBCMD = OPTION_PRIORITY_HIGH,
-	OPTION_PRIORITY_CMDLINE,
-
-	// INI-based options are NORMAL priority, in increasing order:
-	OPTION_PRIORITY_MAME_INI = OPTION_PRIORITY_NORMAL + 1,
-	OPTION_PRIORITY_DEBUG_INI,
-	OPTION_PRIORITY_ORIENTATION_INI,
-	OPTION_PRIORITY_SYSTYPE_INI,
-	OPTION_PRIORITY_SCREEN_INI,
-	OPTION_PRIORITY_SOURCE_INI,
-	OPTION_PRIORITY_GPARENT_INI,
-	OPTION_PRIORITY_PARENT_INI,
-	OPTION_PRIORITY_DRIVER_INI,
-	OPTION_PRIORITY_INI,
-};
-
+#define OPTION_PRIORITY_CMDLINE		OPTION_PRIORITY_HIGH + 1
 // core options
 #define OPTION_SYSTEMNAME           core_options::unadorned(0)
 #define OPTION_SOFTWARENAME         core_options::unadorned(1)
@@ -214,29 +191,16 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward references
-struct game_driver;
-class software_part;
-
-
 class emu_options : public core_options
 {
-	static const UINT32 OPTION_FLAG_DEVICE = 0x80000000;
-
 public:
 	// construction/destruction
 	emu_options();
-
-	// parsing wrappers
-	bool parse_command_line(int argc, char *argv[], std::string &error_string);
-	void parse_standard_inis(std::string &error_string, const game_driver *driver = nullptr);
-	bool parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name = nullptr, const char *value = nullptr, const software_part *swpart = nullptr);
 
 	// core options
 	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
 	const char *software_name() const { return value(OPTION_SOFTWARENAME); }
 	const game_driver *system() const;
-	void set_system_name(const char *name);
 
 	// core configuration options
 	bool read_config() const { return bool_value(OPTION_READCONFIG); }
@@ -405,26 +369,13 @@ public:
 	const char *no_plugin() const { return value(OPTION_NO_PLUGIN); }
 
 	const char *language() const { return value(OPTION_LANGUAGE); }
-
-	// FIXME: Couriersud: This should be in image_device_exit
-	void remove_device_options();
-
-	std::string main_value(const char *option) const;
-	std::string sub_value(const char *name, const char *subname) const;
-	bool add_slot_options(const software_part *swpart = nullptr);
-
-
-private:
-	// device-specific option handling
-	void add_device_options();
-	void update_slot_options(const software_part *swpart = nullptr);
-
-	// INI parsing helper
-	bool parse_one_ini(const char *basename, int priority, std::string *error_string = nullptr);
-
+	
 	// cache frequently used options in members
 	void update_cached_options();
 
+	std::string main_value(const char *option) const;
+	std::string sub_value(const char *name, const char *subname) const;
+private:
 	static const options_entry s_option_entries[];
 
 	// cached options
@@ -432,8 +383,6 @@ private:
 	bool m_joystick_contradictory;
 	bool m_sleep;
 	bool m_refresh_speed;
-	int m_slot_options;
-	int m_device_options;
 };
 
 

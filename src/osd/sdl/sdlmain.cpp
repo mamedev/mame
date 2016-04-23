@@ -44,6 +44,7 @@
 #include "video.h"
 #include "osdsdl.h"
 #include "modules/lib/osdlib.h"
+#include "modules/diagnostics/diagnostics_module.h"
 
 // we override SDL's normal startup on Win32
 // please see sdlprefix.h as well
@@ -196,6 +197,9 @@ int main(int argc, char *argv[])
 	setvbuf(stdout, (char *) NULL, _IONBF, 0);
 	setvbuf(stderr, (char *) NULL, _IONBF, 0);
 
+	// Initialize crash diagnostics
+	diagnostics_module::get_instance()->init_crash_diagnostics();
+
 #if defined(SDLMAME_ANDROID)
 	/* Enable standard application logging */
 	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
@@ -270,10 +274,7 @@ void sdl_osd_interface::osd_exit()
 {
 	osd_common_t::osd_exit();
 
-	if (!SDLMAME_INIT_IN_WORKER_THREAD)
-	{
-		SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER );
-	}
+	SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
 //============================================================
@@ -487,14 +488,11 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	/* Initialize SDL */
 
-	if (!SDLMAME_INIT_IN_WORKER_THREAD)
-	{
-		if (SDL_InitSubSystem(SDL_INIT_VIDEO)) {
-			osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
-			exit(-1);
-		}
-		osd_sdl_info();
+	if (SDL_InitSubSystem(SDL_INIT_VIDEO)) {
+		osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
+		exit(-1);
 	}
+	osd_sdl_info();
 
 	defines_verbose();
 

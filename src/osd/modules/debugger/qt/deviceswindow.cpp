@@ -91,14 +91,7 @@ int DevicesWindowModel::rowCount(const QModelIndex &parent) const
 		return 1;
 
 	device_t *dparent = static_cast<device_t *>(parent.internalPointer());
-	int count = 0;
-	for (device_t &child : dparent->subdevices()) 
-	{
-		(void)child;
-		count++;
-	}
-
-	return count;
+	return dparent->subdevices().count();
 }
 
 int DevicesWindowModel::columnCount(const QModelIndex &parent) const

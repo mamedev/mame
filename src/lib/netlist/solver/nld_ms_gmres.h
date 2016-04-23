@@ -27,7 +27,7 @@ class matrix_solver_GMRES_t: public matrix_solver_direct_t<m_N, _storage_N>
 public:
 
 	matrix_solver_GMRES_t(const solver_parameters_t *params, int size)
-		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::GAUSSIAN_ELIMINATION, params, size)
+		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::ASCENDING, params, size)
 		, m_use_iLU_preconditioning(true)
 		, m_use_more_precise_stop_condition(false)
 		, m_accuracy_mult(1.0)

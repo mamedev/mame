@@ -51,8 +51,6 @@ osd_monitor_info *osd_monitor_info::list = NULL;
 
 static void init_monitors(void);
 
-static void check_osd_inputs(running_machine &machine);
-
 static float get_aspect(const char *defdata, const char *data, int report_error);
 static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error);
 
@@ -83,7 +81,7 @@ bool windows_osd_interface::video_init()
 	}
 
 	if (video_config.mode != VIDEO_MODE_NONE)
-		SetForegroundWindow(win_window_list->m_hwnd);
+		SetForegroundWindow(win_window_list.front()->platform_window<HWND>());
 
 	return true;
 }
@@ -172,7 +170,7 @@ void windows_osd_interface::update(bool skip_redraw)
 	if (!skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
-		for (win_window_info *window = win_window_list; window != NULL; window = window->m_next)
+		for (auto window : win_window_list)
 			window->update();
 //      profiler_mark(PROFILER_END);
 	}
@@ -180,7 +178,7 @@ void windows_osd_interface::update(bool skip_redraw)
 	// poll the joystick values here
 	winwindow_process_events(machine(), TRUE, FALSE);
 	poll_input(machine());
-	check_osd_inputs(machine());
+	check_osd_inputs();
 	// if we're running, disable some parts of the debugger
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugger_update();
@@ -308,22 +306,22 @@ finishit:
 //  check_osd_inputs
 //============================================================
 
-static void check_osd_inputs(running_machine &machine)
+void windows_osd_interface::check_osd_inputs()
 {
 	// check for toggling fullscreen mode
-	if (machine.ui_input().pressed(IPT_OSD_1))
+	if (machine().ui_input().pressed(IPT_OSD_1))
 		winwindow_toggle_full_screen();
 
 	// check for taking fullscreen snap
-	if (machine.ui_input().pressed(IPT_OSD_2))
+	if (machine().ui_input().pressed(IPT_OSD_2))
 		winwindow_take_snap();
 
 	// check for taking fullscreen video
-	if (machine.ui_input().pressed(IPT_OSD_3))
+	if (machine().ui_input().pressed(IPT_OSD_3))
 		winwindow_take_video();
 
 	// check for taking fullscreen video
-	if (machine.ui_input().pressed(IPT_OSD_4))
+	if (machine().ui_input().pressed(IPT_OSD_4))
 		winwindow_toggle_fsfx();
 }
 

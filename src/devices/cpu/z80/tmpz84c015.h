@@ -23,9 +23,6 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-// If an external daisy chain is used, insert this before your own device tags:
-#define TMPZ84C015_DAISY_INTERNAL { "tmpz84c015_ctc" }, { "tmpz84c015_sio" }, { "tmpz84c015_pio" }
-
 // SIO callbacks
 #define MCFG_TMPZ84C015_OUT_TXDA_CB(_devcb) \
 	devcb = &tmpz84c015_device::set_out_txda_callback(*device, DEVCB_##_devcb);

@@ -22,6 +22,7 @@
   Magic Colors (ver. 1.7a),       1999, Unknown.
   Super Gran Safari (ver 3.11),   1996, New Impeuropex Corp.
   Luna Park (ver. 1.2),           1998, ABM Games.
+  Alta Tensione (ver. 2.01a),     199?, Unknown.
 
 *****************************************************************************
 
@@ -54,6 +55,20 @@
   The player can play the "Super Game" to grab the points.
   In this subgame, you must to hit the lion to get the prize.
   For now, you must miss the shot till hopper & ticket dispenser are properly emulated.
+
+
+  * Alta Tensione
+
+  First time boot instructions:
+
+  As soon as you get the "DATI NVRAM-68K NON VALIDI!!!" screen...
+
+  - Press F2 to enter the Test Mode.
+  - Press HOLD 5 (AZZERAMENTO) (key 'b')
+  - Press HOLD 1 (AZZERAMENTO TOTALE) (key 'z')
+  - Press HOLD 4 (SI) (key 'v') when the legend "CONFERMI AZZERAMENTO TOTALE" appear.
+  - Press BET (key 'm') twice to leave the Test Mode and start the game...
+
 
 *****************************************************************************
 
@@ -122,6 +137,7 @@ public:
 	DECLARE_DRIVER_INIT(magic102);
 	DECLARE_DRIVER_INIT(magic10);
 	DECLARE_DRIVER_INIT(hotslot);
+	DECLARE_DRIVER_INIT(altaten);
 	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
@@ -1351,6 +1367,72 @@ ROM_START( lunaprk )
 	ROM_LOAD( "1.u32", 0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
 ROM_END
 
+/*
+  Alta Tensione (ver. 2.01a)
+  199?, Unknown manufacturer.
+
+  1x  MC68HC000FN12 (u1)    16/32-bit Microprocessor.
+  1x  HD6473308CP10 (u24)   16-bit Single-Chip Microcomputer. NOT DUMPED.
+
+  1x  M6295         (u31)   4-Channel Mixing ADCPM Voice Synthesis LSI.
+  1x  KA358         (u33)   Dual Operational Amplifier.
+  1x  TDA2003       (u34)   Audio Amplifier.
+
+  1x 20.000000MHz oscillator (osc1).
+  1x 30.000MHz oscillator (osc2).
+  1x blu resonator 1000J (xtal1).
+
+  5x MX27C1000APC-12 ROMs(2-6).
+  1x M271001 ROM (7).
+  1x MX27C2000DC-90 ROM (1).
+
+  1x ZMDU6216ADC-08L RAM (u6).
+  4x LP6264D-70LL RAM (u4, u5, u43, u44).
+  2x HM3-65728H-5 RAM (u61, u62).
+
+  1x A40MX04-PL84 (u50), read protected.
+  1x PALCE16V8H-25PC/4 (u54), read protected.
+  1x PALC22V10H-25PC/4 (u22), read protected.
+
+  1x 28x2 JAMMA edge connector.
+  1x 12-legs connector (J1).
+  1x 12-pins jumper (J2, J3).
+  1x 2 pins jumper (J4).
+  1x trimmer (volume)(P1).
+  1x trimmer (unknown)(P2).
+  1x 8x2 DIP switches (DIP1).
+  1x Rayovac 3V. BR20xx lithium battery.
+
+
+  STATUS:
+
+  Memory map = done.
+  Inputs =     done.
+  Machine =    done.
+
+  OKI 6295 =     ok.
+  Screen size =  ok.
+  Fixed layers = yes.
+
+*/
+ROM_START( altaten )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "alta_t.2.01a_2.u3", 0x00000, 0x20000, CRC(2ea79d6d) SHA1(2fc5a5c33e3e970b2b631b93238fe2411bdc2be9) )
+	ROM_LOAD16_BYTE( "alta_t.2.01a_3.u2", 0x00001, 0x20000, CRC(62d57606) SHA1(1ad0935f511e22387ce7248f97ce4b89910570d2) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics */
+	ROM_LOAD( "alta_tensione_7.u35", 0x00000, 0x20000, CRC(90446541) SHA1(5d0e11221a762c9c11392c27e6bae931c8d2ad86) )
+	ROM_LOAD( "alta_tensione_6.u36", 0x20000, 0x20000, CRC(84070651) SHA1(00d17d74e0923be41978064331940d145dc5f5e3) )
+	ROM_LOAD( "alta_tensione_5.u37", 0x40000, 0x20000, CRC(68b26756) SHA1(7df0db4ec60b5179f27c08a401a9fa9f7dc316e9) )
+	ROM_LOAD( "alta_tensione_4.u38", 0x60000, 0x20000, CRC(7683d3f5) SHA1(fc6ee8e6763eeb9d2bc5bdadf0507c5d606a69e9) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "alta_tensione_1.u32", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
+ROM_END
+
 
 /****************************
 *       Driver Init         *
@@ -1389,6 +1471,18 @@ DRIVER_INIT_MEMBER(magic10_state, sgsafari)
 	m_layer2_offset[1] = 20;
 }
 
+DRIVER_INIT_MEMBER(magic10_state, altaten)
+{
+	m_layer2_offset[0] = 8;
+	m_layer2_offset[1] = 16;
+
+	// patching the boot protection...
+	UINT8 *rom = memregion("maincpu")->base();
+
+		rom[0x7668] = 0x71;
+		rom[0x7669] = 0x4e;
+}
+
 
 /******************************
 *        Game Drivers         *
@@ -1399,10 +1493,11 @@ GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10_state, magic10,  RO
 GAMEL( 1995, magic10a, magic10,  magic10,  magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,               layout_sgsafari )
 GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,               layout_sgsafari )
 GAMEL( 1995, magic10c, magic10,  magic10a, magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,               layout_sgsafari )
-GAME(  1997, magic102, 0,        magic102, magic102, magic10_state, magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver 1.1)",         MACHINE_NOT_WORKING                 )
-GAME(  1998, suprpool, 0,        magic102, magic102, magic10_state, suprpool, ROT0, "ABM Games",            "Super Pool (ver. 1.2)",          MACHINE_NOT_WORKING                 )
-GAME(  1996, hotslot,  0,        hotslot,  hotslot,  magic10_state, hotslot,  ROT0, "ABM Electronics",      "Hot Slot (ver. 05.01)",          MACHINE_NOT_WORKING                 )
-GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING                 )
+GAME(  1997, magic102, 0,        magic102, magic102, magic10_state, magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver 1.1)",         MACHINE_NOT_WORKING )
+GAME(  1998, suprpool, 0,        magic102, magic102, magic10_state, suprpool, ROT0, "ABM Games",            "Super Pool (ver. 1.2)",          MACHINE_NOT_WORKING )
+GAME(  1996, hotslot,  0,        hotslot,  hotslot,  magic10_state, hotslot,  ROT0, "ABM Electronics",      "Hot Slot (ver. 05.01)",          MACHINE_NOT_WORKING )
+GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING )
 GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, magic10_state, sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver 3.11)",   0,               layout_sgsafari )
 GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10_state, magic10,  ROT0, "ABM Games",            "Music Sort (ver 2.02, English)", 0,               layout_musicsrt )
-GAME(  1998, lunaprk,  0,        magic102, magic102, magic10_state, suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING                 )
+GAME(  1998, lunaprk,  0,        magic102, magic102, magic10_state, suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING )
+GAME(  199?, altaten,  0,        magic102, magic102, magic10_state, altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING )

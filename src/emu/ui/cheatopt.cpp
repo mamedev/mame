@@ -158,8 +158,7 @@ ui_menu_cheat::~ui_menu_cheat()
 
 ui_menu_autofire::ui_menu_autofire(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-	screen_device_iterator iter(machine.root_device());
-	const screen_device *screen = iter.first();
+	const screen_device *screen = machine.first_screen();
 
 	if (screen == nullptr)
 	{

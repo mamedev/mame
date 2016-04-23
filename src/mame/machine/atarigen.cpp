@@ -970,17 +970,15 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 
 void atarigen_state::machine_start()
 {
-	screen_device *screen;
-	int i;
-
 	// allocate timers for all screens
-	screen_device_iterator iter(*this);
-	assert(iter.count() <= ARRAY_LENGTH(m_screen_timer));
-	for (i = 0, screen = iter.first(); screen != nullptr; i++, screen = iter.next())
+	int i = 0;
+	for (screen_device &screen : screen_device_iterator(*this))
 	{
-		m_screen_timer[i].screen = screen;
-		m_screen_timer[i].scanline_interrupt_timer = timer_alloc(TID_SCANLINE_INTERRUPT, (void *)screen);
-		m_screen_timer[i].scanline_timer = timer_alloc(TID_SCANLINE_TIMER, (void *)screen);
+		assert(i <= ARRAY_LENGTH(m_screen_timer));
+		m_screen_timer[i].screen = &screen;
+		m_screen_timer[i].scanline_interrupt_timer = timer_alloc(TID_SCANLINE_INTERRUPT, (void *)&screen);
+		m_screen_timer[i].scanline_timer = timer_alloc(TID_SCANLINE_TIMER, (void *)&screen);
+		i++;
 	}
 
 	save_item(NAME(m_scanline_int_state));

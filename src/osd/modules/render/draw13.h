@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __DRAW13__
-#define __DRAW13__
+#ifndef __DRAW20__
+#define __DRAW20__
 
 // OSD headers
 #ifndef OSD_WINDOWS
@@ -50,7 +50,7 @@ struct quad_setup_data
 //  Textures
 //============================================================
 
-class renderer_sdl1;
+class renderer_sdl2;
 struct copy_info_t;
 
 /* texture_info holds information about a texture */
@@ -58,7 +58,7 @@ class texture_info
 {
 	friend class simple_list<texture_info>;
 public:
-	texture_info(renderer_sdl1 *renderer, const render_texinfo &texsource, const quad_setup_data &setup, const UINT32 flags);
+	texture_info(renderer_sdl2 *renderer, const render_texinfo &texsource, const quad_setup_data &setup, const UINT32 flags);
 	~texture_info();
 
 	void set_data(const render_texinfo &texsource, const UINT32 flags);
@@ -91,7 +91,7 @@ private:
 	void set_coloralphamode(SDL_Texture *texture_id, const render_color *color);
 
 	Uint32              m_sdl_access;
-	renderer_sdl1 *     m_renderer;
+	renderer_sdl2 *     m_renderer;
 	render_texinfo      m_texinfo;            // copy of the texture info
 	HashT               m_hash;               // hash value for the texture (must be >= pointer size)
 	UINT32              m_flags;              // rendering flags
@@ -146,19 +146,19 @@ struct copy_info_t
 };
 
 /* sdl_info is the information about SDL for the current screen */
-class renderer_sdl1 : public osd_renderer
+class renderer_sdl2 : public osd_renderer
 {
 public:
-	renderer_sdl1(osd_window *window, int extra_flags);
+	renderer_sdl2(std::shared_ptr<osd_window> window, int extra_flags);
 
-	virtual ~renderer_sdl1()
+	virtual ~renderer_sdl2()
 	{
 		destroy_all_textures();
 		SDL_DestroyRenderer(m_sdl_renderer);
 		m_sdl_renderer = nullptr;
 	}
 
-	static bool init(running_machine &machine);
+	static void init(running_machine &machine);
 	static void exit();
 
 	virtual int create() override;
@@ -210,4 +210,4 @@ private:
 	static const copy_info_t s_blit_info_default[];
 };
 
-#endif // __DRAW13__
+#endif // __DRAW20__

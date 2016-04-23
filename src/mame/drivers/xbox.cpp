@@ -191,8 +191,8 @@ void xbox_state::machine_reset()
 }
 
 SLOT_INTERFACE_START(xbox_ata_devices)
-SLOT_INTERFACE("hdd", IDE_HARDDISK)
-SLOT_INTERFACE("cdrom", ATAPI_CDROM)
+	SLOT_INTERFACE("hdd", IDE_HARDDISK)
+	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_DERIVED_CLASS(xbox, xbox_base, xbox_state)

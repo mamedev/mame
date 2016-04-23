@@ -29,15 +29,14 @@ ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container 
 	, m_issoft(false)
 
 {
-	image_interface_iterator iter(machine.root_device());
-	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
+	for (device_image_interface &image : image_interface_iterator(machine.root_device()))
 	{
-		if (image->filename())
+		if (image.filename())
 		{
-			m_list = strensure(image->software_list_name());
-			m_short = strensure(image->software_entry()->shortname());
-			m_long = strensure(image->software_entry()->longname());
-			m_parent = strensure(image->software_entry()->parentname());
+			m_list = strensure(image.software_list_name());
+			m_short = strensure(image.software_entry()->shortname());
+			m_long = strensure(image.software_entry()->longname());
+			m_parent = strensure(image.software_entry()->parentname());
 		}
 	}
 

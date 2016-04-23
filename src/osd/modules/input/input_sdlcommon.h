@@ -113,13 +113,12 @@ public:
 
 class sdl_window_info;
 
-// REVIEW: Do we need to handle SDLMAME_EVENTS_IN_WORKER_THREAD eventually?
 class sdl_event_manager : public event_manager_t<sdl_event_subscriber>
 {
 private:
 	bool                  m_mouse_over_window;
 	bool                  m_has_focus;
-	sdl_window_info *     m_focus_window;
+	std::shared_ptr<sdl_window_info>     m_focus_window;
 
 	sdl_event_manager()
 		: m_mouse_over_window(true),
@@ -130,8 +129,8 @@ private:
 
 public:
 	bool mouse_over_window() const { return m_mouse_over_window; }
-	bool has_focus() const { return m_focus_window; }
-	sdl_window_info * focus_window() { return m_focus_window; }
+	bool has_focus() const { return m_focus_window != nullptr; }
+	std::shared_ptr<sdl_window_info> focus_window() { return m_focus_window; }
 
 	static sdl_event_manager& instance()
 	{

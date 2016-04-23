@@ -1589,7 +1589,7 @@ shaders: bgfx-tools
 	-$(call MKDIR,build/bgfx/shaders/gles)
 	-$(call MKDIR,build/bgfx/shaders/glsl)
 	-$(call MKDIR,build/bgfx/shaders/metal)	
-	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx/shaders rebuild
+	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx/shaders rebuild CHAIN="$(CHAIN)"
 	
 #-------------------------------------------------
 # Translation

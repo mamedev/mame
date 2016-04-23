@@ -13,7 +13,6 @@
 #include "ui/inifile.h"
 #include "softlist.h"
 #include "drivenum.h"
-#include <algorithm>
 
 //-------------------------------------------------
 //  GLOBAL VARIABLES
@@ -60,6 +59,9 @@ void inifile_manager::directory_scan()
 			}
 		}
 	}
+
+	// sort
+	std::stable_sort(ini_index.begin(), ini_index.end());
 }
 
 //-------------------------------------------------
@@ -84,6 +86,9 @@ void inifile_manager::init_category(std::string &filename)
 				index.emplace_back(name, ftell(fp));
 		}
 	}
+
+	// sort
+	std::stable_sort(index.begin(), index.end());
 
 	if (!index.empty())
 		ini_index.emplace_back(filename, index);
@@ -207,30 +212,29 @@ void favorite_manager::add_favorite_game()
 	}
 
 	bool software_avail = false;
-	image_interface_iterator iter(machine().root_device());
-	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
+	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
-		if (image->exists() && image->software_entry())
+		if (image.exists() && image.software_entry())
 		{
-			const software_info *swinfo = image->software_entry();
-			const software_part *part = image->part_entry();
+			const software_info *swinfo = image.software_entry();
+			const software_part *part = image.part_entry();
 			ui_software_info tmpmatches;
 			tmpmatches.shortname = strensure(swinfo->shortname());
-			tmpmatches.longname = strensure(image->longname());
+			tmpmatches.longname = strensure(image.longname());
 			tmpmatches.parentname = strensure(swinfo->parentname());
-			tmpmatches.year = strensure(image->year());
-			tmpmatches.publisher = strensure(image->manufacturer());
-			tmpmatches.supported = image->supported();
+			tmpmatches.year = strensure(image.year());
+			tmpmatches.publisher = strensure(image.manufacturer());
+			tmpmatches.supported = image.supported();
 			tmpmatches.part = strensure(part->name());
 			tmpmatches.driver = &machine().system();
-			tmpmatches.listname = strensure(image->software_list_name());
+			tmpmatches.listname = strensure(image.software_list_name());
 			tmpmatches.interface = strensure(part->interface());
-			tmpmatches.instance = strensure(image->instance_name());
+			tmpmatches.instance = strensure(image.instance_name());
 			tmpmatches.startempty = 0;
 			tmpmatches.parentlongname.clear();
 			if (swinfo->parentname())
 			{
-				software_list_device *swlist = software_list_device::find_by_name(machine().config(), image->software_list_name());
+				software_list_device *swlist = software_list_device::find_by_name(machine().config(), image.software_list_name());
 				for (software_info &c_swinfo : swlist->get_info())
 				{
 					std::string c_parent(c_swinfo.parentname());
@@ -247,7 +251,7 @@ void favorite_manager::add_favorite_game()
 				if (!strcmp(flist.name(), "usage"))
 					tmpmatches.usage = flist.value();
 
-			tmpmatches.devicetype = strensure(image->image_type_name());
+			tmpmatches.devicetype = strensure(image.image_type_name());
 			tmpmatches.available = true;
 			software_avail = true;
 			m_list.push_back(tmpmatches);
@@ -288,18 +292,17 @@ bool favorite_manager::isgame_favorite()
 	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0)
 		return isgame_favorite(&machine().system());
 
-	image_interface_iterator iter(machine().root_device());
 	bool image_loaded = false;
 
-	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
+	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
-		const software_info *swinfo = image->software_entry();
-		if (image->exists() && swinfo != nullptr)
+		const software_info *swinfo = image.software_entry();
+		if (image.exists() && swinfo != nullptr)
 		{
 			image_loaded = true;
 			for (size_t current = 0; current < m_list.size(); current++)
 				if (m_list[current].shortname == swinfo->shortname() &&
-					m_list[current].listname == image->software_list_name())
+					m_list[current].listname == image.software_list_name())
 				{
 					m_current = current;
 					return true;

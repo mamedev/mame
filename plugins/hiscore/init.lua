@@ -129,14 +129,14 @@ function hiscore.startplugin()
 
 
 	local function write_scores ( posdata )
-	  print("write_scores")
+	  emu.print_verbose("write_scores")
 	  local output = io.open(get_file_name(), "wb");
 	  if not output then
 		-- attempt to create the directory, and try again
 		lfs.mkdir( hiscore_path );
 		output = io.open(get_file_name(), "wb");
 	  end
-	  print("write_scores output")
+	  emu.print_verbose("write_scores output")
 	  if output then
 		for ri,row in ipairs(posdata) do
 		  t = {};
@@ -147,7 +147,7 @@ function hiscore.startplugin()
 		end
 		output:close();
 	  end
-	  print("write_scores end")
+	  emu.print_verbose("write_scores end")
 	end
 
 
@@ -184,10 +184,10 @@ function hiscore.startplugin()
 		if check_mem( positions ) then
 		  default_checksum = check_scores( positions );
 		  if read_scores( positions ) then
-			print( "scores read", "OK" );
+			emu.print_verbose( "scores read", "OK" );
 		  else
 			-- likely there simply isn't a .hi file around yet
-			print( "scores read", "FAIL" );
+			emu.print_verbose( "scores read", "FAIL" );
 		  end
 		  scores_have_been_read = true;
 		  current_checksum = check_scores( positions );
@@ -219,7 +219,7 @@ function hiscore.startplugin()
 			write_scores( positions );
 			current_checksum = checksum;
 			last_write_time = emu.time();
-			-- print( "SAVE SCORES EVENT!", last_write_time );
+			-- emu.print_verbose( "SAVE SCORES EVENT!", last_write_time );
 		  end
 		end
 	  end
@@ -243,13 +243,13 @@ function hiscore.startplugin()
 		mem_check_passed = false
 	   	scores_have_been_read = false;
 		last_write_time = -10
-	  	print("Starting " .. emu.gamename())
+	  	emu.print_verbose("Starting " .. emu.gamename())
 		local dat = read_hiscore_dat()
 		if dat and dat ~= "" then
-			print( "found hiscore.dat entry for " .. emu.romname() );
+			emu.print_verbose( "found hiscore.dat entry for " .. emu.romname() );
 			positions = parse_table( dat );
 			if not positions then
-				print("hiscore.dat parse error");
+				emu.print_error("hiscore.dat parse error");
 				return;
 			end
 			found_hiscore_entry = true

@@ -155,7 +155,7 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 			{ 1, 2, 0 }  // 5: sio -> pio -> ctc -> ext
 		};
 
-		// reconfigure first 3 entries in daisy chain
+		// reconfigure daisy chain
 		const z80_daisy_config daisy_chain[] =
 		{
 			{ dev[prio[data][0]] },
@@ -163,6 +163,8 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 			{ dev[prio[data][2]] },
 			{ nullptr }
 		};
+
+		// insert these 3 entries in order before any externally linked devices
 		daisy_init(daisy_chain);
 
 		m_irq_priority = data;

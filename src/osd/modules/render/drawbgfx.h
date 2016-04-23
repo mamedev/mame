@@ -12,8 +12,9 @@
 
 #include "binpacker.h"
 #include "bgfx/vertex.h"
+#include "bgfx/chain.h"
+#include "bgfx/chainmanager.h"
 #include "sliderdirtynotifier.h"
-#include "aviio.h"
 
 class texture_manager;
 class target_manager;
@@ -25,48 +26,68 @@ class bgfx_effect;
 class bgfx_target;
 class bgfx_chain;
 class osd_options;
+class avi_write;
 
 /* sdl_info is the information about SDL for the current screen */
 class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
-	renderer_bgfx(osd_window *w);
+	renderer_bgfx(std::shared_ptr<osd_window> w);
 	virtual ~renderer_bgfx();
 
-	static bool init(running_machine &machine) { return false; }
+	static void init(running_machine &machine) { }
 	static void exit();
 
 	virtual int create() override;
     virtual int draw(const int update) override;
 
+	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
     virtual std::vector<ui_menu_item> get_slider_list() override;
     virtual void set_sliders_dirty() override;
 
 #ifdef OSD_SDL
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
-#else
+#endif
+
 	virtual void save() override { }
 	virtual void record() override;
 	virtual void toggle_fsfx() override { }
-#endif
 
 	virtual render_primitive_list *get_primitives() override
 	{
-		osd_dim wdim = window().get_size();
-		window().target()->set_bounds(wdim.width(), wdim.height(), window().pixel_aspect());
-		return &window().target()->get_primitives();
+		auto win = try_getwindow();
+		if (win == nullptr)
+			return nullptr;
+
+		// determines whether the screen container is transformed by the chain's shaders
+		bool chain_transform = false;
+
+		// check the first chain
+		bgfx_chain* chain = this->m_chains->screen_chain(0);
+		if (chain != nullptr)
+		{
+			chain_transform = chain->transform();
+		}
+
+		osd_dim wdim = win->get_size();
+		win->target()->set_bounds(wdim.width(), wdim.height(), win->pixel_aspect());
+		win->target()->set_transform_container(!chain_transform);
+		return &win->target()->get_primitives();
 	}
 
     static const char* WINDOW_PREFIX;
 
 private:
-	void end_avi_recording();
-	void begin_avi_recording(std::string filename);
+    void vertex(ScreenVertex* vertex, float x, float y, float z, uint32_t rgba, float u, float v);
+    void render_avi_quad();
+    void update_recording();
 
-	bool update_dimensions();
-	void setup_view(uint32_t view_index, bool screen);
+    bool update_dimensions();
+
+    void setup_view(uint32_t view_index, bool screen);
 	void init_ui_view();
-	void setup_matrices(uint32_t view_index, bool screen);
+
+    void setup_matrices(uint32_t view_index, bool screen);
 
 	void allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::TransientVertexBuffer *buffer);
 	enum buffer_status
@@ -123,10 +144,11 @@ private:
 	int32_t m_ui_view;
 	uint32_t m_max_view;
 
-	// AVI
-	avi_file::ptr           m_avi_output_file;            // AVI file
-	int                     m_avi_frame;                  // AVI frame
-	attotime                m_avi_frame_period;           // AVI frame period
+	avi_write* m_avi_writer;
+	bgfx_target* m_avi_target;
+    bgfx::TextureHandle m_avi_texture;
+    bitmap_rgb32 m_avi_bitmap;
+	uint8_t* m_avi_data;
 
 	static const uint16_t CACHE_SIZE;
 	static const uint32_t PACKABLE_SIZE;

@@ -11,13 +11,13 @@
 #include "emu.h"
 #include "chd.h"
 #include "emuopts.h"
+#include "mameopts.h"
 #include "jedparse.h"
 #include "audit.h"
 #include "info.h"
 #include "unzip.h"
 #include "validity.h"
 #include "sound/samples.h"
-#include "cliopts.h"
 #include "clifront.h"
 #include "xmlfile.h"
 
@@ -32,6 +32,80 @@
 #include <ctype.h>
 
 
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+// core commands
+#define CLICOMMAND_HELP                 "help"
+#define CLICOMMAND_VALIDATE             "validate"
+
+// configuration commands
+#define CLICOMMAND_CREATECONFIG         "createconfig"
+#define CLICOMMAND_SHOWCONFIG           "showconfig"
+#define CLICOMMAND_SHOWUSAGE            "showusage"
+
+// frontend commands
+#define CLICOMMAND_LISTXML              "listxml"
+#define CLICOMMAND_LISTFULL             "listfull"
+#define CLICOMMAND_LISTSOURCE           "listsource"
+#define CLICOMMAND_LISTCLONES           "listclones"
+#define CLICOMMAND_LISTBROTHERS         "listbrothers"
+#define CLICOMMAND_LISTCRC              "listcrc"
+#define CLICOMMAND_LISTROMS             "listroms"
+#define CLICOMMAND_LISTSAMPLES          "listsamples"
+#define CLICOMMAND_VERIFYROMS           "verifyroms"
+#define CLICOMMAND_VERIFYSAMPLES        "verifysamples"
+#define CLICOMMAND_ROMIDENT             "romident"
+#define CLICOMMAND_LISTDEVICES          "listdevices"
+#define CLICOMMAND_LISTSLOTS            "listslots"
+#define CLICOMMAND_LISTMEDIA            "listmedia"     // needed by MESS
+#define CLICOMMAND_LISTSOFTWARE         "listsoftware"
+#define CLICOMMAND_VERIFYSOFTWARE       "verifysoftware"
+#define CLICOMMAND_GETSOFTLIST          "getsoftlist"
+#define CLICOMMAND_VERIFYSOFTLIST       "verifysoftlist"
+
+
+//**************************************************************************
+//  COMMAND-LINE OPTIONS
+//**************************************************************************
+
+static const options_entry cli_option_entries[] =
+{
+	/* core commands */
+	{ nullptr,                            nullptr,       OPTION_HEADER,     "CORE COMMANDS" },
+	{ CLICOMMAND_HELP ";h;?",           "0",       OPTION_COMMAND,    "show help message" },
+	{ CLICOMMAND_VALIDATE ";valid",     "0",       OPTION_COMMAND,    "perform driver validation on all game drivers" },
+
+	/* configuration commands */
+	{ nullptr,                            nullptr,       OPTION_HEADER,     "CONFIGURATION COMMANDS" },
+	{ CLICOMMAND_CREATECONFIG ";cc",    "0",       OPTION_COMMAND,    "create the default configuration file" },
+	{ CLICOMMAND_SHOWCONFIG ";sc",      "0",       OPTION_COMMAND,    "display running parameters" },
+	{ CLICOMMAND_SHOWUSAGE ";su",       "0",       OPTION_COMMAND,    "show this help" },
+
+	/* frontend commands */
+	{ nullptr,                            nullptr,       OPTION_HEADER,     "FRONTEND COMMANDS" },
+	{ CLICOMMAND_LISTXML ";lx",         "0",       OPTION_COMMAND,    "all available info on driver in XML format" },
+	{ CLICOMMAND_LISTFULL ";ll",        "0",       OPTION_COMMAND,    "short name, full name" },
+	{ CLICOMMAND_LISTSOURCE ";ls",      "0",       OPTION_COMMAND,    "driver sourcefile" },
+	{ CLICOMMAND_LISTCLONES ";lc",      "0",       OPTION_COMMAND,    "show clones" },
+	{ CLICOMMAND_LISTBROTHERS ";lb",    "0",       OPTION_COMMAND,    "show \"brothers\", or other drivers from same sourcefile" },
+	{ CLICOMMAND_LISTCRC,               "0",       OPTION_COMMAND,    "CRC-32s" },
+	{ CLICOMMAND_LISTROMS ";lr",        "0",       OPTION_COMMAND,    "list required roms for a driver" },
+	{ CLICOMMAND_LISTSAMPLES,           "0",       OPTION_COMMAND,    "list optional samples for a driver" },
+	{ CLICOMMAND_VERIFYROMS,            "0",       OPTION_COMMAND,    "report romsets that have problems" },
+	{ CLICOMMAND_VERIFYSAMPLES,         "0",       OPTION_COMMAND,    "report samplesets that have problems" },
+	{ CLICOMMAND_ROMIDENT,              "0",       OPTION_COMMAND,    "compare files with known MAME roms" },
+	{ CLICOMMAND_LISTDEVICES ";ld",     "0",       OPTION_COMMAND,    "list available devices" },
+	{ CLICOMMAND_LISTSLOTS ";lslot",    "0",       OPTION_COMMAND,    "list available slots and slot devices" },
+	{ CLICOMMAND_LISTMEDIA ";lm",       "0",       OPTION_COMMAND,    "list available media for the system" },
+	{ CLICOMMAND_LISTSOFTWARE ";lsoft", "0",       OPTION_COMMAND,    "list known software for the system" },
+	{ CLICOMMAND_VERIFYSOFTWARE ";vsoft", "0",     OPTION_COMMAND,    "verify known software for the system" },
+	{ CLICOMMAND_GETSOFTLIST ";glist",  "0",       OPTION_COMMAND,    "retrieve software list by name" },
+	{ CLICOMMAND_VERIFYSOFTLIST ";vlist", "0",     OPTION_COMMAND,    "verify software list by name" },
+	{ nullptr }
+};
+
 
 // media_identifier class identifies media by hash via a search in
 // the driver database
@@ -39,7 +113,7 @@ class media_identifier
 {
 public:
 	// construction/destruction
-	media_identifier(cli_options &options);
+	media_identifier(emu_options &options);
 
 	// getters
 	int total() const { return m_total; }
@@ -70,11 +144,12 @@ private:
 //  cli_frontend - constructor
 //-------------------------------------------------
 
-cli_frontend::cli_frontend(cli_options &options, osd_interface &osd)
+cli_frontend::cli_frontend(emu_options &options, osd_interface &osd)
 	: m_options(options),
 		m_osd(osd),
 		m_result(MAMERR_NONE)
 {
+	m_options.add_entries(cli_option_entries);
 }
 
 
@@ -85,7 +160,7 @@ cli_frontend::cli_frontend(cli_options &options, osd_interface &osd)
 cli_frontend::~cli_frontend()
 {
 	// nuke any device options since they will leak memory
-	m_options.remove_device_options();
+	mame_options::remove_device_options(m_options);
 }
 
 //-------------------------------------------------
@@ -103,9 +178,9 @@ int cli_frontend::execute(int argc, char **argv)
 	{
 		// first parse options to be able to get software from it
 		std::string option_errors;
-		m_options.parse_command_line(argc, argv, option_errors);
+		mame_options::parse_command_line(m_options,argc, argv, option_errors);
 
-		m_options.parse_standard_inis(option_errors);
+		mame_options::parse_standard_inis(m_options,option_errors);
 
 		load_translation(m_options);
 
@@ -123,37 +198,36 @@ int cli_frontend::execute(int argc, char **argv)
 				throw emu_fatalerror(MAMERR_FATALERROR, "Error: unknown option: %s\n", m_options.software_name());
 
 			bool found = false;
-			for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
+			for (software_list_device &swlistdev : iter)
 			{
-				software_info *swinfo = swlistdev->find(m_options.software_name());
+				software_info *swinfo = swlistdev.find(m_options.software_name());
 				if (swinfo != nullptr)
 				{
 					// loop through all parts
 					for (software_part &swpart : swinfo->parts())
 					{
 						const char *mount = swpart.feature("automount");
-						if (swpart.is_compatible(*swlistdev))
+						if (swpart.is_compatible(swlistdev))
 						{
 							if (mount == nullptr || strcmp(mount,"no") != 0)
 							{
 								// search for an image device with the right interface
-								image_interface_iterator imgiter(config.root_device());
-								for (device_image_interface *image = imgiter.first(); image != nullptr; image = imgiter.next())
+								for (device_image_interface &image : image_interface_iterator(config.root_device()))
 								{
-									const char *interface = image->image_interface();
+									const char *interface = image.image_interface();
 									if (interface != nullptr)
 									{
 										if (swpart.matches_interface(interface))
 										{
-											const char *option = m_options.value(image->brief_instance_name());
+											const char *option = m_options.value(image.brief_instance_name());
 
 											// mount only if not already mounted
 											if (*option == 0)
 											{
-												std::string val = string_format("%s:%s:%s", swlistdev->list_name(), m_options.software_name(), swpart.name());
+												std::string val = string_format("%s:%s:%s", swlistdev.list_name(), m_options.software_name(), swpart.name());
 
 												// call this in order to set slot devices according to mounting
-												m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.c_str(), &swpart);
+												mame_options::parse_slot_devices(m_options, argc, argv, option_errors, image.instance_name(), val.c_str(), &swpart);
 												break;
 											}
 										}
@@ -176,7 +250,7 @@ int cli_frontend::execute(int argc, char **argv)
 		}
 
 		// parse the command line, adding any system-specific options
-		if (!m_options.parse_command_line(argc, argv, option_errors))
+		if (!mame_options::parse_command_line(m_options,argc, argv, option_errors))
 		{
 			// if we failed, check for no command and a system name first; in that case error on the name
 			if (*(m_options.command()) == 0 && m_options.system() == nullptr && *(m_options.system_name()) != 0)
@@ -203,7 +277,7 @@ int cli_frontend::execute(int argc, char **argv)
 			if (m_options.read_config())
 			{
 				m_options.revert(OPTION_PRIORITY_INI);
-				m_options.parse_standard_inis(option_errors);
+				mame_options::parse_standard_inis(m_options,option_errors);
 			}
 			if (!option_errors.empty())
 				osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
@@ -434,15 +508,14 @@ void cli_frontend::listcrc(const char *gamename)
 	// iterate through matches, and then through ROMs
 	while (drivlist.next())
 	{
-		device_iterator deviter(drivlist.config().root_device());
-		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
-			for (const rom_entry *region = rom_first_region(*device); region; region = rom_next_region(region))
+		for (device_t &device : device_iterator(drivlist.config().root_device()))
+			for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
 					// if we have a CRC, display it
 					UINT32 crc;
 					if (hash_collection(ROM_GETHASHDATA(rom)).crc(crc))
-						osd_printf_info("%08x %-16s \t %-8s \t %s\n", crc, ROM_GETNAME(rom), device->shortname(), device->name());
+						osd_printf_info("%08x %-16s \t %-8s \t %s\n", crc, ROM_GETNAME(rom), device.shortname(), device.name());
 				}
 	}
 }
@@ -472,9 +545,8 @@ void cli_frontend::listroms(const char *gamename)
 				"Name                    Size Checksum\n", drivlist.driver().name);
 
 		// iterate through roms
-		device_iterator deviter(drivlist.config().root_device());
-		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
-			for (const rom_entry *region = rom_first_region(*device); region; region = rom_next_region(region))
+		for (device_t &device : device_iterator(drivlist.config().root_device()))
+			for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
 					// accumulate the total length of all chunks
@@ -538,9 +610,9 @@ void cli_frontend::listsamples(const char *gamename)
 		osd_printf_info("Samples required for driver \"%s\".\n", drivlist.driver().name);
 
 		// iterate over samples devices and print the samples from each one
-		for (samples_device *device = iter.first(); device != nullptr; device = iter.next())
+		for (samples_device &device : iter)
 		{
-			samples_iterator sampiter(*device);
+			samples_iterator sampiter(device);
 			for (const char *samplename = sampiter.first(); samplename != nullptr; samplename = sampiter.next())
 				osd_printf_info("%s\n", samplename);
 		}
@@ -578,10 +650,9 @@ void cli_frontend::listdevices(const char *gamename)
 		printf("Driver %s (%s):\n", drivlist.driver().name, drivlist.driver().description);
 
 		// build a list of devices
-		device_iterator iter(drivlist.config().root_device());
 		std::vector<device_t *> device_list;
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			device_list.push_back(device);
+		for (device_t &device : device_iterator(drivlist.config().root_device()))
+			device_list.push_back(&device);
 
 		// sort them by tag
 		qsort(&device_list[0], device_list.size(), sizeof(device_list[0]), compare_devices);
@@ -649,18 +720,17 @@ void cli_frontend::listslots(const char *gamename)
 	while (drivlist.next())
 	{
 		// iterate
-		slot_interface_iterator iter(drivlist.config().root_device());
 		bool first = true;
-		for (const device_slot_interface *slot = iter.first(); slot != nullptr; slot = iter.next())
+		for (const device_slot_interface &slot : slot_interface_iterator(drivlist.config().root_device()))
 		{
-			if (slot->fixed()) continue;
+			if (slot.fixed()) continue;
 			// output the line, up to the list of extensions
-			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", slot->device().tag()+1);
+			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", slot.device().tag()+1);
 
 			bool first_option = true;
 
 			// get the options and print them
-			for (const device_slot_option &option : slot->option_list())
+			for (const device_slot_option &option : slot.option_list())
 			{
 				if (option.selectable())
 				{
@@ -710,21 +780,20 @@ void cli_frontend::listmedia(const char *gamename)
 	while (drivlist.next())
 	{
 		// iterate
-		image_interface_iterator iter(drivlist.config().root_device());
 		bool first = true;
-		for (const device_image_interface *imagedev = iter.first(); imagedev != nullptr; imagedev = iter.next())
+		for (const device_image_interface &imagedev : image_interface_iterator(drivlist.config().root_device()))
 		{
-            if (!imagedev->user_loadable())
-                continue;
-            
+			if (!imagedev.user_loadable())
+				continue;
+
 			// extract the shortname with parentheses
-			std::string paren_shortname = string_format("(%s)", imagedev->brief_instance_name());
+			std::string paren_shortname = string_format("(%s)", imagedev.brief_instance_name());
 
 			// output the line, up to the list of extensions
-			printf("%-13s%-12s%-8s   ", first ? drivlist.driver().name : "", imagedev->instance_name(), paren_shortname.c_str());
+			printf("%-13s%-12s%-8s   ", first ? drivlist.driver().name : "", imagedev.instance_name(), paren_shortname.c_str());
 
 			// get the extensions and print them
-			std::string extensions(imagedev->file_extensions());
+			std::string extensions(imagedev.file_extensions());
 			for (int start = 0, end = extensions.find_first_of(',');; start = end + 1, end = extensions.find_first_of(',', start))
 			{
 				std::string curext(extensions, start, (end == -1) ? extensions.length() - start : end - start);
@@ -817,11 +886,10 @@ void cli_frontend::verifyroms(const char *gamename)
 		while (dummy_drivlist.next())
 		{
 			machine_config &config = dummy_drivlist.config();
-			device_iterator iter(config.root_device());
-			for (device_t *dev = iter.first(); dev != nullptr; dev = iter.next())
+			for (device_t &dev : device_iterator(config.root_device()))
 			{
-				if (dev->owner() != nullptr && (*(dev->shortname()) != 0) && dev->rom_region() != nullptr && (device_map.insert(dev->shortname()).second)) {
-					if (core_strwildcmp(gamename, dev->shortname()) == 0)
+				if (dev.owner() != nullptr && (*(dev.shortname()) != 0) && dev.rom_region() != nullptr && (device_map.insert(dev.shortname()).second)) {
+					if (core_strwildcmp(gamename, dev.shortname()) == 0)
 					{
 						matched++;
 
@@ -836,11 +904,11 @@ void cli_frontend::verifyroms(const char *gamename)
 						{
 							// output the summary of the audit
 							std::string summary_string;
-							auditor.summarize(dev->shortname(),&summary_string);
+							auditor.summarize(dev.shortname(),&summary_string);
 							osd_printf_info("%s", summary_string.c_str());
 
 							// display information about what we discovered
-							osd_printf_info("romset %s ", dev->shortname());
+							osd_printf_info("romset %s ", dev.shortname());
 
 							// switch off of the result
 							switch (summary)
@@ -868,20 +936,18 @@ void cli_frontend::verifyroms(const char *gamename)
 				}
 			}
 
-			slot_interface_iterator slotiter(config.root_device());
-			for (const device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
+			for (const device_slot_interface &slot : slot_interface_iterator(config.root_device()))
 			{
-				for (const device_slot_option &option : slot->option_list())
+				for (const device_slot_option &option : slot.option_list())
 				{
 					std::string temptag("_");
 					temptag.append(option.name());
 					device_t *dev = const_cast<machine_config &>(config).device_add(&config.root_device(), temptag.c_str(), option.devtype(), 0);
 
 					// notify this device and all its subdevices that they are now configured
-					device_iterator subiter(*dev);
-					for (device_t *device = subiter.first(); device != nullptr; device = subiter.next())
-						if (!device->configured())
-							device->config_complete();
+					for (device_t &device : device_iterator(*dev))
+						if (!device.configured())
+							device.config_complete();
 
 					if (device_map.insert(dev->shortname()).second) {
 						if (core_strwildcmp(gamename, dev->shortname()) == 0)
@@ -890,7 +956,7 @@ void cli_frontend::verifyroms(const char *gamename)
 							if (dev->rom_region() != nullptr)
 							{
 								// audit the ROMs in this set
-								media_auditor::summary summary = auditor.audit_device(dev, AUDIT_VALIDATE_FAST);
+								media_auditor::summary summary = auditor.audit_device(*dev, AUDIT_VALIDATE_FAST);
 
 								// if not found, count that and leave it at that
 								if (summary == media_auditor::NOTFOUND)
@@ -933,17 +999,15 @@ void cli_frontend::verifyroms(const char *gamename)
 						}
 					} else {
 						// check for subdevices with ROMs (a few devices are missed otherwise, e.g. MPU401)
-						device_iterator subiter(*dev);
-						for (device_t *device = subiter.first(); device != nullptr; device = subiter.next())
+						for (device_t &device : device_iterator(*dev))
 						{
-							device_iterator subsubiter(*device);
-							for (device_t *subdev = subsubiter.first(); subdev != nullptr; subdev = subsubiter.next())
+							for (device_t &subdev : device_iterator(device))
 							{
-								if (subdev->owner() == device && subdev->rom_region() != nullptr && subdev->shortname() != nullptr && subdev->shortname()[0] != '\0')
+								if (subdev.owner() == &device && subdev.rom_region() != nullptr && subdev.shortname() != nullptr && subdev.shortname()[0] != '\0')
 								{
-									if (device_map.insert(subdev->shortname()).second)
+									if (device_map.insert(subdev.shortname()).second)
 									{
-										if (core_strwildcmp(gamename, subdev->shortname()) == 0)
+										if (core_strwildcmp(gamename, subdev.shortname()) == 0)
 										{
 											matched++;
 
@@ -959,11 +1023,11 @@ void cli_frontend::verifyroms(const char *gamename)
 											{
 												// output the summary of the audit
 												std::string summary_string;
-												auditor.summarize(subdev->shortname(),&summary_string);
+												auditor.summarize(subdev.shortname(),&summary_string);
 												osd_printf_info("%s", summary_string.c_str());
 
 												// display information about what we discovered
-												osd_printf_info("romset %s ", subdev->shortname());
+												osd_printf_info("romset %s ", subdev.shortname());
 
 												// switch off of the result
 												switch (summary)
@@ -1311,13 +1375,12 @@ void cli_frontend::listsoftware(const char *gamename)
 
 	while (drivlist.next())
 	{
-		software_list_device_iterator iter(drivlist.config().root_device());
-		for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
-			if (list_map.insert(swlistdev->list_name()).second)
-				if (!swlistdev->get_info().empty())
+		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config().root_device()))
+			if (list_map.insert(swlistdev.list_name()).second)
+				if (!swlistdev.get_info().empty())
 				{
 					if (isfirst) { fprintf(out, SOFTLIST_XML_BEGIN); isfirst = false; }
-					output_single_softlist(out, *swlistdev);
+					output_single_softlist(out, swlistdev);
 				}
 	}
 
@@ -1354,16 +1417,15 @@ void cli_frontend::verifysoftware(const char *gamename)
 	{
 		matched++;
 
-		software_list_device_iterator iter(drivlist.config().root_device());
-		for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
-			if (swlistdev->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
-				if (list_map.insert(swlistdev->list_name()).second)
-					if (!swlistdev->get_info().empty())
+		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config().root_device()))
+			if (swlistdev.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+				if (list_map.insert(swlistdev.list_name()).second)
+					if (!swlistdev.get_info().empty())
 					{
 						nrlists++;
-						for (software_info &swinfo : swlistdev->get_info())
+						for (software_info &swinfo : swlistdev.get_info())
 						{
-							media_auditor::summary summary = auditor.audit_software(swlistdev->list_name(), &swinfo, AUDIT_VALIDATE_FAST);
+							media_auditor::summary summary = auditor.audit_software(swlistdev.list_name(), &swinfo, AUDIT_VALIDATE_FAST);
 
 							// if not found, count that and leave it at that
 							if (summary == media_auditor::NOTFOUND)
@@ -1379,7 +1441,7 @@ void cli_frontend::verifysoftware(const char *gamename)
 								osd_printf_info("%s", summary_string.c_str());
 
 								// display information about what we discovered
-								osd_printf_info("romset %s:%s ", swlistdev->list_name(), swinfo.shortname());
+								osd_printf_info("romset %s:%s ", swlistdev.list_name(), swinfo.shortname());
 
 								// switch off of the result
 								switch (summary)
@@ -1442,13 +1504,12 @@ void cli_frontend::getsoftlist(const char *gamename)
 	driver_enumerator drivlist(m_options);
 	while (drivlist.next())
 	{
-		software_list_device_iterator iter(drivlist.config().root_device());
-		for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
-			if (core_strwildcmp(gamename, swlistdev->list_name()) == 0 && list_map.insert(swlistdev->list_name()).second)
-				if (!swlistdev->get_info().empty())
+		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config().root_device()))
+			if (core_strwildcmp(gamename, swlistdev.list_name()) == 0 && list_map.insert(swlistdev.list_name()).second)
+				if (!swlistdev.get_info().empty())
 				{
 					if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = FALSE; }
-					output_single_softlist(out, *swlistdev);
+					output_single_softlist(out, swlistdev);
 				}
 	}
 
@@ -1475,17 +1536,16 @@ void cli_frontend::verifysoftlist(const char *gamename)
 
 	while (drivlist.next())
 	{
-		software_list_device_iterator iter(drivlist.config().root_device());
-		for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
-			if (core_strwildcmp(gamename, swlistdev->list_name()) == 0 && list_map.insert(swlistdev->list_name()).second)
-				if (!swlistdev->get_info().empty())
+		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config().root_device()))
+			if (core_strwildcmp(gamename, swlistdev.list_name()) == 0 && list_map.insert(swlistdev.list_name()).second)
+				if (!swlistdev.get_info().empty())
 				{
 					matched++;
 
 					// Get the actual software list contents
-					for (software_info &swinfo : swlistdev->get_info())
+					for (software_info &swinfo : swlistdev.get_info())
 					{
-						media_auditor::summary summary = auditor.audit_software(swlistdev->list_name(), &swinfo, AUDIT_VALIDATE_FAST);
+						media_auditor::summary summary = auditor.audit_software(swlistdev.list_name(), &swinfo, AUDIT_VALIDATE_FAST);
 
 						// if not found, count that and leave it at that
 						if (summary == media_auditor::NOTFOUND)
@@ -1501,7 +1561,7 @@ void cli_frontend::verifysoftlist(const char *gamename)
 							osd_printf_info("%s", summary_string.c_str());
 
 							// display information about what we discovered
-							osd_printf_info("romset %s:%s ", swlistdev->list_name(), swinfo.shortname());
+							osd_printf_info("romset %s:%s ", swlistdev.list_name(), swinfo.shortname());
 
 							// switch off of the result
 							switch (summary)
@@ -1611,7 +1671,7 @@ void cli_frontend::execute_commands(const char *exename)
 
 	// other commands need the INIs parsed
 	std::string option_errors;
-	m_options.parse_standard_inis(option_errors);
+	mame_options::parse_standard_inis(m_options,option_errors);
 	if (!option_errors.empty())
 		osd_printf_error("%s\n", option_errors.c_str());
 
@@ -1742,7 +1802,7 @@ void cli_frontend::display_suggestions(const char *gamename)
 //  media_identifier - constructor
 //-------------------------------------------------
 
-media_identifier::media_identifier(cli_options &options)
+media_identifier::media_identifier(emu_options &options)
 	: m_drivlist(options),
 		m_total(0),
 		m_matches(0),
@@ -1937,13 +1997,12 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 	m_drivlist.reset();
 	while (m_drivlist.next())
 	{
-		// iterate over devices, regions and files within the region */
-		device_iterator deviter(m_drivlist.config().root_device());
-		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
+		// iterate over devices, regions and files within the region
+		for (device_t &device : device_iterator(m_drivlist.config().root_device()))
 		{
-			if (shortnames.insert(device->shortname()).second)
+			if (shortnames.insert(device.shortname()).second)
 			{
-				for (const rom_entry *region = rom_first_region(*device); region != nullptr; region = rom_next_region(region))
+				for (const rom_entry *region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
 					for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
 					{
 						hash_collection romhashes(ROM_GETHASHDATA(rom));
@@ -1962,12 +2021,11 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 		}
 
 		// next iterate over softlists
-		software_list_device_iterator iter(m_drivlist.config().root_device());
-		for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
+		for (software_list_device &swlistdev : software_list_device_iterator(m_drivlist.config().root_device()))
 		{
-			if (listnames.insert(swlistdev->list_name()).second)
+			if (listnames.insert(swlistdev.list_name()).second)
 			{
-				for (software_info &swinfo : swlistdev->get_info())
+				for (software_info &swinfo : swlistdev.get_info())
 					for (software_part &part : swinfo.parts())
 						for (const rom_entry *region = part.romdata(); region != nullptr; region = rom_next_region(region))
 							for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
@@ -1980,7 +2038,7 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 									// output information about the match
 									if (found)
 										osd_printf_info("                    ");
-									osd_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlistdev->list_name(), swinfo.shortname(), swinfo.longname());
+									osd_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlistdev.list_name(), swinfo.shortname(), swinfo.longname());
 									found++;
 								}
 							}

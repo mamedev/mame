@@ -88,7 +88,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 	// if no success, try the font path
 	if (!font)
 	{
-		osd_printf_verbose("Searching font %s in -%s\n", family.c_str(), OPTION_FONTPATH);
+		osd_printf_verbose("Searching font %s in -%s path/s\n", family.c_str(), font_path.c_str());
 		//emu_file file(options().font_path(), OPEN_FLAG_READ);
 		emu_file file(font_path.c_str(), OPEN_FLAG_READ);
 		if (file.open(family.c_str()) == osd_file::error::NONE)

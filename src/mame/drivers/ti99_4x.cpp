@@ -46,7 +46,7 @@
 #include "machine/tms9901.h"
 #include "imagedev/cassette.h"
 
-#include "bus/ti99x/videowrp.h"
+#include "bus/ti99x/ti99defs.h"
 #include "bus/ti99x/datamux.h"
 #include "bus/ti99x/gromport.h"
 #include "bus/ti99x/joyport.h"
@@ -73,7 +73,7 @@ public:
 		m_peribox(*this, PERIBOX_TAG),
 		m_joyport(*this, JOYPORT_TAG),
 		m_datamux(*this, DATAMUX_TAG),
-		m_video(*this, VIDEO_SYSTEM_TAG),
+		m_video(*this, VDP_TAG),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2")
 		{ }
@@ -130,6 +130,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
 	// Used by EVPC
+	DECLARE_WRITE_LINE_MEMBER( video_interrupt_evpc_in );
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -157,7 +158,7 @@ private:
 	required_device<peribox_device>     m_peribox;
 	required_device<joyport_device>     m_joyport;
 	required_device<ti99_datamux_device> m_datamux;
-	required_device<ti_video_device>    m_video;
+	optional_device<tms9928a_device>    m_video;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
 
@@ -655,6 +656,13 @@ void ti99_4x_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 /*****************************************************************************/
 
+WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_evpc_in )
+{
+	if (TRACE_INTERRUPTS) logerror("ti99_4x: VDP INT2 from EVPC on tms9901, level=%d\n", state);
+	m_int2 = (line_state)state;
+	m_tms9901->set_single_int(2, state);
+}
+
 /*
     set the state of TMS9901's INT2 (called by the tms9928 core)
 */
@@ -754,7 +762,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::console_reset )
 	{
 		logerror("ti99_4x: Console reset line = %d\n", state);
 		m_cpu->set_input_line(INT_9900_RESET, state);
-		m_video->reset_vdp(state);
+		m_video->reset_line(state);
 	}
 }
 
@@ -769,6 +777,37 @@ WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
 {
 	if (TRACE_INTERRUPTS) logerror("ti99_4x: Setting a not connected line ... ignored\n");
 }
+
+#if 0
+/*
+    External clock connector. This is actually a separate cable lead going from
+    the EPVC in the PEB to a pin inside the console. This cable sends the
+    video interrupt from the v9938 on the EVPC into the console.
+    This workaround must be done on the real system because the peripheral
+    box and its connector were not designed to deliver a video interrupt signal.
+    This was fixed with the EVPC2 which uses the external interrupt EXTINT
+    with a special firmware (DSR).
+
+    Emulation detail: We are using a separate device class in order to avoid
+    exposing the console class to the external class.
+*/
+evpc_clock_connector::evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: device_t(mconfig, EVPC_CONN, "EVPC clock connector", tag, owner, clock, "ti99_evpc_clock", __FILE__)
+{
+}
+
+void evpc_clock_connector::device_start()
+{
+	m_console = downcast<ti99_4x_state*>(owner());
+}
+
+WRITE_LINE_MEMBER( evpc_clock_connector::vclock_line )
+{
+	m_console->video_interrupt_in(state);
+};
+
+const device_type EVPC_CONN = &device_creator<evpc_clock_connector>;
+#endif
 
 /******************************************************************************
     Machine definitions
@@ -863,14 +902,24 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
 */
 static MACHINE_CONFIG_DERIVED( ti99_4_60hz, ti99_4 )
-	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918, 0x4000, ti99_4x_state, video_interrupt_in, gromclk_in)
+	MCFG_DEVICE_ADD( VDP_TAG, TMS9918, XTAL_10_738635MHz / 2 )                  \
+	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )                             \
+	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
 static MACHINE_CONFIG_DERIVED( ti99_4_50hz, ti99_4 )
-	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929, 0x4000, ti99_4x_state, video_interrupt_in, gromclk_in)
+	MCFG_DEVICE_ADD( VDP_TAG, TMS9929, XTAL_10_738635MHz / 2 ) \
+	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))   \
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
+	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )                              \
+	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /**********************************************************************
@@ -961,14 +1010,24 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
 */
 static MACHINE_CONFIG_DERIVED( ti99_4a_60hz, ti99_4a )
-	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, 0x4000, ti99_4x_state, video_interrupt_in, gromclk_in)
+	MCFG_DEVICE_ADD( VDP_TAG, TMS9918A, XTAL_10_738635MHz / 2 )                  \
+	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )                             \
+	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
 static MACHINE_CONFIG_DERIVED( ti99_4a_50hz, ti99_4a )
-	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, 0x4000, ti99_4x_state, video_interrupt_in, gromclk_in)
+	MCFG_DEVICE_ADD( VDP_TAG, TMS9929A, XTAL_10_738635MHz / 2 ) \
+	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))   \
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
+	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )                              \
+	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /************************************************************************
@@ -996,19 +1055,32 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
 */
 static MACHINE_CONFIG_DERIVED( ti99_4qi_60hz, ti99_4qi )
-	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, 0x4000, ti99_4x_state, video_interrupt_in, gromclk_in)
+	MCFG_DEVICE_ADD( VDP_TAG, TMS9918A, XTAL_10_738635MHz / 2 )                  \
+	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )                             \
+	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
 static MACHINE_CONFIG_DERIVED( ti99_4qi_50hz, ti99_4qi )
-	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, 0x4000, ti99_4x_state, video_interrupt_in, gromclk_in)
+	MCFG_DEVICE_ADD( VDP_TAG, TMS9929A, XTAL_10_738635MHz / 2 ) \
+	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))   \
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
+	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )                              \
+	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /************************************************************************
     TI-99/4A with 80-column support. Actually a separate expansion card (EVPC),
     replacing the console video processor.
+
+    Note that the sound chip is also moved to this card, because the SGCPU,
+    which is intended to use the EVPC, does not have an own sound chip.
 *************************************************************************/
 
 MACHINE_START_MEMBER(ti99_4x_state, ti99_4ev)
@@ -1043,12 +1115,6 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4ev )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4ev )
 
-	/* video hardware */
-	MCFG_DEVICE_ADD(VIDEO_SYSTEM_TAG, V9938VIDEO, 0)
-	MCFG_V9938_ADD(VDP_TAG, SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(ti99_4x_state, video_interrupt_in))
-	MCFG_V99X8_SCREEN_ADD_NTSC(SCREEN_TAG, VDP_TAG, XTAL_21_4772MHz)
-
 	/* Main board */
 	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4x_state, read_by_9901) )
@@ -1068,6 +1134,9 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
 
+	// EVPC connector
+	MCFG_ADD_EVPC_CONNECTOR( EVPC_CONN_TAG, WRITELINE( ti99_4x_state, video_interrupt_evpc_in ) )
+
 	/* Software list */
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
@@ -1076,12 +1145,6 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
 	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
-
-	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("sound_out")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_sound) )
 
 	/* Cassette drives */
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")

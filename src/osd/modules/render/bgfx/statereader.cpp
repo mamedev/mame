@@ -97,6 +97,15 @@ int state_reader::get_int(const Value& value, const std::string name, const int 
 	return default_value;
 }
 
+float state_reader::get_float(const Value& value, const std::string name, const float default_value)
+{
+	if (value.HasMember(name.c_str()))
+	{
+		return (float)value[name.c_str()].GetDouble();
+	}
+	return default_value;
+}
+
 void state_reader::get_float(const Value& value, const std::string name, float* out, float* default_value, int count)
 {
 	if (value.HasMember(name.c_str()))

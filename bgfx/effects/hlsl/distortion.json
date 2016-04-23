@@ -8,33 +8,34 @@
 //============================================================
 {
     "blend": {
-    	"equation": "add",
-    	"srcColor": "srcalpha",
-    	"dstColor": "1-srcalpha",
-    	"srcAlpha": "srcalpha",
-    	"dstAlpha": "1-srcalpha"
+        "equation": "add",
+        "srcColor": "srcalpha",
+        "dstColor": "1-srcalpha",
+        "srcAlpha": "srcalpha",
+        "dstAlpha": "1-srcalpha"
     },
     "depth": {
-    	"function": "always"
+        "function": "always"
     },
     "cull": { "mode": "none" },
     "write": {
-    	"rgb": true,
-    	"alpha": true
+        "rgb": true,
+        "alpha": true
     },
     "vertex": "chains/hlsl/vs_distortion",
     "fragment": "chains/hlsl/fs_distortion",
     "uniforms": [
-    	{ "name": "s_tex",            "type": "int",  "values": [ 0.0 ] },
-    	{ "name": "u_swap_xy",        "type": "vec4", "values": [ 0.0,  0.0, 0.0, 0.0 ] },
-    	{ "name": "u_screen_dims",    "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] },
-    	{ "name": "u_quad_dims",      "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] },
-    	{ "name": "u_rotation_type",  "type": "vec4", "values": [ 0.0,  0.0, 0.0, 0.0 ] },
-    	{ "name": "u_prepare_vector", "type": "vec4", "values": [ 0.0,  0.0, 0.0, 0.0 ] },
-    	{ "name": "u_curvature",      "type": "vec4", "values": [ 0.25, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_round_corner",   "type": "vec4", "values": [ 0.2,  0.0, 0.0, 0.0 ] },
-    	{ "name": "u_smooth_border",  "type": "vec4", "values": [ 0.05, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_vignetting",     "type": "vec4", "values": [ 0.20, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_reflection",     "type": "vec4", "values": [ 0.30, 0.0, 0.0, 0.0 ] }
+        { "name": "s_tex",              "type": "int",  "values": [ 0.0 ] },
+        { "name": "u_swap_xy",          "type": "vec4", "values": [ 0.0,  0.0, 0.0, 0.0 ] },
+        { "name": "u_screen_dims",      "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] },
+        { "name": "u_target_dims",      "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] },
+        { "name": "u_quad_dims",        "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] },
+        { "name": "u_distortion",       "type": "vec4", "values": [ 0.20, 0.0, 0.0, 0.0 ] },
+        { "name": "u_cubic_distortion", "type": "vec4", "values": [ 0.20, 0.0, 0.0, 0.0 ] },
+        { "name": "u_distort_corner",   "type": "vec4", "values": [ 0.20, 0.0, 0.0, 0.0 ] },
+        { "name": "u_round_corner",     "type": "vec4", "values": [ 0.20, 0.0, 0.0, 0.0 ] },
+        { "name": "u_smooth_border",    "type": "vec4", "values": [ 0.05, 0.0, 0.0, 0.0 ] },
+        { "name": "u_vignetting",       "type": "vec4", "values": [ 0.20, 0.0, 0.0, 0.0 ] },
+        { "name": "u_reflection",       "type": "vec4", "values": [ 0.30, 0.0, 0.0, 0.0 ] }
     ]
 }

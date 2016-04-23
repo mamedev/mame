@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "mameopts.h"
 #include "video/vector.h"
 #include "machine/laserdsc.h"
 #include "render.h"
@@ -1188,21 +1189,20 @@ std::string &ui_manager::game_info_astring(std::string &str)
 	// loop over all CPUs
 	execute_interface_iterator execiter(machine().root_device());
 	std::unordered_set<std::string> exectags;
-	for (device_execute_interface *exec = execiter.first(); exec != nullptr; exec = execiter.next())
+	for (device_execute_interface &exec : execiter)
 	{
-		if (!exectags.insert(exec->device().tag()).second)
+		if (!exectags.insert(exec.device().tag()).second)
 			continue;
 		// get cpu specific clock that takes internal multiplier/dividers into account
-		int clock = exec->device().clock();
+		int clock = exec.device().clock();
 
 		// count how many identical CPUs we have
 		int count = 1;
-		const char *name = exec->device().name();
-		execute_interface_iterator execinneriter(machine().root_device());
-		for (device_execute_interface *scan = execinneriter.first(); scan != nullptr; scan = execinneriter.next())
+		const char *name = exec.device().name();
+		for (device_execute_interface &scan : execiter)
 		{
-			if (exec->device().type() == scan->device().type() && strcmp(name, scan->device().name()) == 0 && exec->device().clock() == scan->device().clock())
-				if (exectags.insert(scan->device().tag()).second)
+			if (exec.device().type() == scan.device().type() && strcmp(name, scan.device().name()) == 0 && exec.device().clock() == scan.device().clock())
+				if (exectags.insert(scan.device().tag()).second)
 					count++;
 		}
 
@@ -1222,9 +1222,9 @@ std::string &ui_manager::game_info_astring(std::string &str)
 	sound_interface_iterator snditer(machine().root_device());
 	std::unordered_set<std::string> soundtags;
 	bool found_sound = false;
-	for (device_sound_interface *sound = snditer.first(); sound != nullptr; sound = snditer.next())
+	for (device_sound_interface &sound : snditer)
 	{
-		if (!soundtags.insert(sound->device().tag()).second)
+		if (!soundtags.insert(sound.device().tag()).second)
 			continue;
 
 		// append the Sound: string
@@ -1234,23 +1234,22 @@ std::string &ui_manager::game_info_astring(std::string &str)
 
 		// count how many identical sound chips we have
 		int count = 1;
-		sound_interface_iterator sndinneriter(machine().root_device());
-		for (device_sound_interface *scan = sndinneriter.first(); scan != nullptr; scan = sndinneriter.next())
+		for (device_sound_interface &scan : snditer)
 		{
-			if (sound->device().type() == scan->device().type() && sound->device().clock() == scan->device().clock())
-				if (soundtags.insert(scan->device().tag()).second)
+			if (sound.device().type() == scan.device().type() && sound.device().clock() == scan.device().clock())
+				if (soundtags.insert(scan.device().tag()).second)
 					count++;
 		}
 
 		// if more than one, prepend a #x in front of the CPU name
 		// display clock in kHz or MHz
-		int clock = sound->device().clock();
+		int clock = sound.device().clock();
 		util::stream_format(buf,
 				(count > 1)
 					? ((clock != 0) ? "%1$d" UTF8_MULTIPLY "%2$s %3$d.%4$0*5$d%6$s\n" : "%1$d" UTF8_MULTIPLY "%2$s\n")
 					: ((clock != 0) ? "%2$s %3$d.%4$0*5$d%6$s\n" : "%2$s\n"),
 				count,
-				sound->device().name(),
+				sound.device().name(),
 				(clock >= 1000000) ? (clock / 1000000) : (clock / 1000),
 				(clock >= 1000000) ? (clock % 1000000) : (clock % 1000),
 				(clock >= 1000000) ? 6 : 3,
@@ -1265,23 +1264,23 @@ std::string &ui_manager::game_info_astring(std::string &str)
 		buf << _("None\n");
 	else
 	{
-		for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
+		for (screen_device &screen : scriter)
 		{
 			std::string detail;
-			if (screen->screen_type() == SCREEN_TYPE_VECTOR)
+			if (screen.screen_type() == SCREEN_TYPE_VECTOR)
 				detail = _("Vector");
 			else
 			{
-				const rectangle &visarea = screen->visible_area();
+				const rectangle &visarea = screen.visible_area();
 				detail = string_format("%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz",
 						visarea.width(), visarea.height(),
 						(machine().system().flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-						ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds()));
+						ATTOSECONDS_TO_HZ(screen.frame_period().attoseconds()));
 			}
 
 			util::stream_format(buf,
 					(scrcount > 1) ? _("%1$s: %2$s\n") : _("%2$s\n"),
-					slider_get_screen_desc(*screen), detail);
+					slider_get_screen_desc(screen), detail);
 		}
 	}
 
@@ -1467,11 +1466,8 @@ void ui_manager::image_handler_ingame()
 {
 	// run display routine for devices
 	if (machine().phase() == MACHINE_PHASE_RUNNING)
-	{
-		image_interface_iterator iter(machine().root_device());
-		for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
-			image->call_display();
-	}
+		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+			image.call_display();
 }
 
 
@@ -1605,19 +1601,17 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	// handle a tape control key
 	if (machine.ui_input().pressed(IPT_UI_TAPE_START))
 	{
-		cassette_device_iterator cassiter(machine.root_device());
-		for (cassette_image_device *cass = cassiter.first(); cass != nullptr; cass = cassiter.next())
+		for (cassette_image_device &cass : cassette_device_iterator(machine.root_device()))
 		{
-			cass->change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
+			cass.change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
 			return 0;
 		}
 	}
 	if (machine.ui_input().pressed(IPT_UI_TAPE_STOP))
 	{
-		cassette_device_iterator cassiter(machine.root_device());
-		for (cassette_image_device *cass = cassiter.first(); cass != nullptr; cass = cassiter.next())
+		for (cassette_image_device &cass : cassette_device_iterator(machine.root_device()))
 		{
-			cass->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+			cass.change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 			return 0;
 		}
 	}
@@ -1939,25 +1933,24 @@ std::vector<ui_menu_item> ui_manager::slider_init(running_machine &machine)
 	// add CPU overclocking (cheat only)
 	if (machine.options().cheat())
 	{
-		execute_interface_iterator iter(machine.root_device());
-		for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
+		for (device_execute_interface &exec : execute_interface_iterator(machine.root_device()))
 		{
-			void *param = (void *)&exec->device();
-			std::string str = string_format(_("Overclock CPU %1$s"), exec->device().tag());
+			void *param = (void *)&exec.device();
+			std::string str = string_format(_("Overclock CPU %1$s"), exec.device().tag());
 			sliders.push_back(slider_alloc(machine, str.c_str(), 10, 1000, 2000, 1, slider_overclock, param));
 		}
 	}
 
 	// add screen parameters
 	screen_device_iterator scriter(machine.root_device());
-	for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
+	for (screen_device &screen : scriter)
 	{
-		int defxscale = floor(screen->xscale() * 1000.0f + 0.5f);
-		int defyscale = floor(screen->yscale() * 1000.0f + 0.5f);
-		int defxoffset = floor(screen->xoffset() * 1000.0f + 0.5f);
-		int defyoffset = floor(screen->yoffset() * 1000.0f + 0.5f);
-		void *param = (void *)screen;
-		std::string screen_desc = slider_get_screen_desc(*screen);
+		int defxscale = floor(screen.xscale() * 1000.0f + 0.5f);
+		int defyscale = floor(screen.yscale() * 1000.0f + 0.5f);
+		int defxoffset = floor(screen.xoffset() * 1000.0f + 0.5f);
+		int defyoffset = floor(screen.yoffset() * 1000.0f + 0.5f);
+		void *param = (void *)&screen;
+		std::string screen_desc = slider_get_screen_desc(screen);
 
 		// add refresh rate tweaker
 		if (machine.options().cheat())
@@ -1985,34 +1978,33 @@ std::vector<ui_menu_item> ui_manager::slider_init(running_machine &machine)
 		sliders.push_back(slider_alloc(machine, str.c_str(), -500, defyoffset, 500, 2, slider_yoffset, param));
 	}
 
-	laserdisc_device_iterator lditer(machine.root_device());
-	for (laserdisc_device *laserdisc = lditer.first(); laserdisc != nullptr; laserdisc = lditer.next())
+	for (laserdisc_device &laserdisc : laserdisc_device_iterator(machine.root_device()))
 	{
-		if (laserdisc->overlay_configured())
+		if (laserdisc.overlay_configured())
 		{
 			laserdisc_overlay_config config;
-			laserdisc->get_overlay_config(config);
+			laserdisc.get_overlay_config(config);
 			int defxscale = floor(config.m_overscalex * 1000.0f + 0.5f);
 			int defyscale = floor(config.m_overscaley * 1000.0f + 0.5f);
 			int defxoffset = floor(config.m_overposx * 1000.0f + 0.5f);
 			int defyoffset = floor(config.m_overposy * 1000.0f + 0.5f);
-			void *param = (void *)laserdisc;
+			void *param = (void *)&laserdisc;
 
 			// add scale and offset controls per-overlay
-			std::string str = string_format(_("Laserdisc '%1$s' Horiz Stretch"), laserdisc->tag());
+			std::string str = string_format(_("Laserdisc '%1$s' Horiz Stretch"), laserdisc.tag());
 			sliders.push_back(slider_alloc(machine, str.c_str(), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param));
-			str = string_format(_("Laserdisc '%1$s' Horiz Position"), laserdisc->tag());
+			str = string_format(_("Laserdisc '%1$s' Horiz Position"), laserdisc.tag());
 			sliders.push_back(slider_alloc(machine, str.c_str(), -500, defxoffset, 500, 2, slider_overxoffset, param));
-			str = string_format(_("Laserdisc '%1$s' Vert Stretch"), laserdisc->tag());
+			str = string_format(_("Laserdisc '%1$s' Vert Stretch"), laserdisc.tag());
 			sliders.push_back(slider_alloc(machine, str.c_str(), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param));
-			str = string_format(_("Laserdisc '%1$s' Vert Position"), laserdisc->tag());
+			str = string_format(_("Laserdisc '%1$s' Vert Position"), laserdisc.tag());
 			sliders.push_back(slider_alloc(machine, str.c_str(), -500, defyoffset, 500, 2, slider_overyoffset, param));
 		}
 	}
 
-	for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
+	for (screen_device &screen : scriter)
 	{
-		if (screen->screen_type() == SCREEN_TYPE_VECTOR)
+		if (screen.screen_type() == SCREEN_TYPE_VECTOR)
 		{
 			// add vector control
 			sliders.push_back(slider_alloc(machine, _("Vector Flicker"), 0, 0, 1000, 10, slider_flicker, nullptr));
@@ -2462,10 +2454,7 @@ static INT32 slider_beam_intensity_weight(running_machine &machine, void *arg, i
 
 static std::string slider_get_screen_desc(screen_device &screen)
 {
-	screen_device_iterator iter(screen.machine().root_device());
-	int scrcount = iter.count();
-
-	if (scrcount > 1)
+	if (screen_device_iterator(screen.machine().root_device()).count() > 1)
 		return string_format(_("Screen '%1$s'"), screen.tag());
 	else
 		return _("Screen");

@@ -112,6 +112,25 @@ tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag,
 	: tms9928a_device( mconfig, TMS9929A, "TMS9929A", tag, owner, clock, true, true, true, "tms9929a", __FILE__)
 { }
 
+READ8_MEMBER( tms9928a_device::read )
+{
+	UINT8 value = 0;
+
+	if ((offset & 1) == 0)
+		value = vram_read(space, 0);
+	else
+		value = register_read(space, 0);
+
+	return value;
+}
+
+WRITE8_MEMBER( tms9928a_device::write )
+{
+	if ((offset & 1) == 0)
+		vram_write(space, 0, data);
+	else
+		register_write(space, 0, data);
+}
 
 READ8_MEMBER( tms9928a_device::vram_read )
 {

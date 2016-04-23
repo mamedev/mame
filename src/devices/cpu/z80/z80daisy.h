@@ -85,6 +85,7 @@ public:
 
 	// getters
 	bool daisy_chain_present() const { return (m_chain != nullptr); }
+	std::string daisy_show_chain() const;
 
 protected:
 	// interface-level overrides

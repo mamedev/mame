@@ -90,24 +90,25 @@ int drawsdl_scale_mode(const char *s)
 //  drawsdl_init
 //============================================================
 
-bool renderer_sdl2::init(running_machine &machine)
+void renderer_sdl1::init(running_machine &machine)
 {
 	osd_printf_verbose("Using SDL multi-window soft driver (SDL 2.0+)\n");
-	return false;
 }
 
 //============================================================
 //  setup_texture for window
 //============================================================
 
-void renderer_sdl2::setup_texture(const osd_dim &size)
+void renderer_sdl1::setup_texture(const osd_dim &size)
 {
 	const sdl_scale_mode *sdl_sm = &scale_modes[video_config.scale_mode];
 	SDL_DisplayMode mode;
 	UINT32 fmt;
 
+	auto win = assert_window();
+
 	// Determine preferred pixelformat and set up yuv if necessary
-	SDL_GetCurrentDisplayMode(*((UINT64 *)window().monitor()->oshandle()), &mode);
+	SDL_GetCurrentDisplayMode(*((UINT64 *)win->monitor()->oshandle()), &mode);
 
 	if (m_yuv_bitmap)
 	{
@@ -122,11 +123,11 @@ void renderer_sdl2::setup_texture(const osd_dim &size)
 		int m_hw_scale_width = 0;
 		int m_hw_scale_height = 0;
 
-		window().target()->compute_minimum_size(m_hw_scale_width, m_hw_scale_height);
-		if (window().prescale())
+		win->target()->compute_minimum_size(m_hw_scale_width, m_hw_scale_height);
+		if (win->prescale())
 		{
-			m_hw_scale_width *= window().prescale();
-			m_hw_scale_height *= window().prescale();
+			m_hw_scale_width *= win->prescale();
+			m_hw_scale_height *= win->prescale();
 
 			/* This must be a multiple of 2 */
 			m_hw_scale_width = (m_hw_scale_width + 1) & ~1;
@@ -151,7 +152,7 @@ void renderer_sdl2::setup_texture(const osd_dim &size)
 //  drawsdl_show_info
 //============================================================
 
-void renderer_sdl2::show_info(struct SDL_RendererInfo *render_info)
+void renderer_sdl1::show_info(struct SDL_RendererInfo *render_info)
 {
 #define RF_ENTRY(x) {x, #x }
 	static struct
@@ -182,10 +183,11 @@ void renderer_sdl2::show_info(struct SDL_RendererInfo *render_info)
 //  renderer_sdl2::create
 //============================================================
 
-int renderer_sdl2::create()
+int renderer_sdl1::create()
 {
 	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 
+	auto win = assert_window();
 	// create renderer
 
 	/* set hints ... */
@@ -193,16 +195,16 @@ int renderer_sdl2::create()
 
 
 	if (video_config.waitvsync)
-		m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(win->platform_window<SDL_Window*>(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
-		m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(win->platform_window<SDL_Window*>(), -1, SDL_RENDERER_ACCELERATED);
 
 	if (!m_sdl_renderer)
 	{
 		if (video_config.waitvsync)
-			m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE);
+			m_sdl_renderer = SDL_CreateRenderer(win->platform_window<SDL_Window*>(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE);
 		else
-			m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_SOFTWARE);
+			m_sdl_renderer = SDL_CreateRenderer(win->platform_window<SDL_Window*>(), -1, SDL_RENDERER_SOFTWARE);
 	}
 
 	if (!m_sdl_renderer)
@@ -250,7 +252,7 @@ int renderer_sdl2::create()
 //  DESTRUCTOR
 //============================================================
 
-renderer_sdl2::~renderer_sdl2()
+renderer_sdl1::~renderer_sdl1()
 {
 	destroy_all_textures();
 
@@ -271,7 +273,7 @@ renderer_sdl2::~renderer_sdl2()
 //  drawsdl_xy_to_render_target
 //============================================================
 
-int renderer_sdl2::xy_to_render_target(int x, int y, int *xt, int *yt)
+int renderer_sdl1::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
@@ -286,7 +288,7 @@ int renderer_sdl2::xy_to_render_target(int x, int y, int *xt, int *yt)
 //  drawsdl_destroy_all_textures
 //============================================================
 
-void renderer_sdl2::destroy_all_textures()
+void renderer_sdl1::destroy_all_textures()
 {
 	SDL_DestroyTexture(m_texture_id);
 	m_texture_id = nullptr;
@@ -297,7 +299,7 @@ void renderer_sdl2::destroy_all_textures()
 //  renderer_sdl2::draw
 //============================================================
 
-int renderer_sdl2::draw(int update)
+int renderer_sdl1::draw(int update)
 {
 	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 	UINT8 *surfptr;
@@ -312,7 +314,9 @@ int renderer_sdl2::draw(int update)
 		return 0;
 	}
 
-	osd_dim wdim = window().get_size();
+	auto win = assert_window();
+
+	osd_dim wdim = win->get_size();
 	if (has_flags(FI_CHANGED) || (wdim != m_last_dim))
 	{
 		destroy_all_textures();
@@ -379,7 +383,7 @@ int renderer_sdl2::draw(int update)
 	m_last_hofs = hofs;
 	m_last_vofs = vofs;
 
-	window().m_primlist->acquire_lock();
+	win->m_primlist->acquire_lock();
 
 	int mamewidth, mameheight;
 
@@ -397,7 +401,7 @@ int renderer_sdl2::draw(int update)
 	// FIXME: this could be a lot easier if we get the primlist here!
 	//          Bounds would be set fit for purpose and done!
 
-	for (render_primitive &prim : *window().m_primlist)
+	for (render_primitive &prim : *win->m_primlist)
 	{
 		prim.bounds.x0 = floor(fw * prim.bounds.x0 + 0.5f);
 		prim.bounds.x1 = floor(fw * prim.bounds.x1 + 0.5f);
@@ -411,23 +415,23 @@ int renderer_sdl2::draw(int update)
 		switch (rmask)
 		{
 			case 0x0000ff00:
-				software_renderer<UINT32, 0,0,0, 8,16,24>::draw_primitives(*window().m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
+				software_renderer<UINT32, 0,0,0, 8,16,24>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0x00ff0000:
-				software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*window().m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
+				software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0x000000ff:
-				software_renderer<UINT32, 0,0,0, 0,8,16>::draw_primitives(*window().m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
+				software_renderer<UINT32, 0,0,0, 0,8,16>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0xf800:
-				software_renderer<UINT16, 3,2,3, 11,5,0>::draw_primitives(*window().m_primlist, surfptr, mamewidth, mameheight, pitch / 2);
+				software_renderer<UINT16, 3,2,3, 11,5,0>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 2);
 				break;
 
 			case 0x7c00:
-				software_renderer<UINT16, 3,3,3, 10,5,0>::draw_primitives(*window().m_primlist, surfptr, mamewidth, mameheight, pitch / 2);
+				software_renderer<UINT16, 3,3,3, 10,5,0>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 2);
 				break;
 
 			default:
@@ -439,11 +443,11 @@ int renderer_sdl2::draw(int update)
 	{
 		assert (m_yuv_bitmap != nullptr);
 		assert (surfptr != nullptr);
-		software_renderer<UINT16, 3,3,3, 10,5,0>::draw_primitives(*window().m_primlist, m_yuv_bitmap, mamewidth, mameheight, mamewidth);
+		software_renderer<UINT16, 3,3,3, 10,5,0>::draw_primitives(*win->m_primlist, m_yuv_bitmap, mamewidth, mameheight, mamewidth);
 		sm->yuv_blit((UINT16 *)m_yuv_bitmap, surfptr, pitch, m_yuv_lookup, mamewidth, mameheight);
 	}
 
-	window().m_primlist->release_lock();
+	win->m_primlist->release_lock();
 
 	// unlock and flip
 	SDL_UnlockTexture(m_texture_id);
@@ -502,7 +506,7 @@ int renderer_sdl2::draw(int update)
 #define YMASK  (Y1MASK|Y2MASK)
 #define UVMASK (UMASK|VMASK)
 
-void renderer_sdl2::yuv_lookup_set(unsigned int pen, unsigned char red,
+void renderer_sdl1::yuv_lookup_set(unsigned int pen, unsigned char red,
 			unsigned char green, unsigned char blue)
 {
 	UINT32 y,u,v;
@@ -514,7 +518,7 @@ void renderer_sdl2::yuv_lookup_set(unsigned int pen, unsigned char red,
 	m_yuv_lookup[pen]=(y<<Y1SHIFT)|(u<<USHIFT)|(y<<Y2SHIFT)|(v<<VSHIFT);
 }
 
-void renderer_sdl2::yuv_init()
+void renderer_sdl1::yuv_init()
 {
 	unsigned char r,g,b;
 	if (m_yuv_lookup == nullptr)
@@ -670,14 +674,18 @@ static void yuv_RGB_to_YUY2X2(const UINT16 *bitmap, UINT8 *ptr, const int pitch,
 	}
 }
 
-render_primitive_list *renderer_sdl2::get_primitives()
+render_primitive_list *renderer_sdl1::get_primitives()
 {
-	osd_dim nd = window().get_size();
+	auto win = try_getwindow();
+	if (win == nullptr)
+		return nullptr;
+	
+	osd_dim nd = win->get_size();
 	if (nd != m_blit_dim)
 	{
 		m_blit_dim = nd;
 		notify_changed();
 	}
-	window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().pixel_aspect());
-	return &window().target()->get_primitives();
+	win->target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), win->pixel_aspect());
+	return &win->target()->get_primitives();
 }

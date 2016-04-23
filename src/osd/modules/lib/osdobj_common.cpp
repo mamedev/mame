@@ -147,13 +147,14 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_BGFX_DEBUG,                   "0",               OPTION_BOOLEAN, "enable BGFX debugging statistics" },
 	{ OSDOPTION_BGFX_SCREEN_CHAINS,           "default",         OPTION_STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
 	{ OSDOPTION_BGFX_SHADOW_MASK,             "slot-mask.png",   OPTION_STRING, "shadow mask texture name" },
+	{ OSDOPTION_BGFX_AVI_NAME,                "bgfx.avi",        OPTION_STRING, "filename for BGFX output logging" },
 
 		// End of list
 	{ nullptr }
 };
 
 osd_options::osd_options()
-: cli_options()
+: emu_options()
 {
 	add_entries(osd_options::s_option_entries);
 }
@@ -217,6 +218,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, DEBUG_WINDOWS);
 	REGISTER_MODULE(m_mod_man, DEBUG_QT);
 	REGISTER_MODULE(m_mod_man, DEBUG_INTERNAL);
+	REGISTER_MODULE(m_mod_man, DEBUG_IMGUI);
 	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
 #endif
 
@@ -421,8 +423,8 @@ void osd_common_t::init(running_machine &machine)
 
 	// ensure we get called on the way out
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_common_t::osd_exit), this));
-	
-	
+
+
 	/* now setup watchdog */
 	int watchdog_timeout = options.watchdog();
 
@@ -557,6 +559,18 @@ std::vector<ui_menu_item> osd_common_t::get_slider_list()
 {
 	return m_sliders;
 }
+
+
+//-------------------------------------------------
+//  add_audio_to_recording - append audio samples
+//  to an AVI recording if one is active
+//-------------------------------------------------
+
+void osd_common_t::add_audio_to_recording(const INT16 *buffer, int samples_this_frame)
+{
+	// Do nothing
+}
+
 
 //-------------------------------------------------
 //  execute_command - execute a command not yet

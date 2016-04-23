@@ -98,11 +98,12 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_LALT);
 				break;
 
-			// lshift-lalt-F12 for fullscreen video (HLSL)
+			// lshift-lalt-F12 for fullscreen video (HLSL, BGFX)
 			case IPT_OSD_3:
 				entry.configure_osd("RENDER_AVI", "Record Rendered Video");
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LALT);
 				break;
+
 			// add a NOT-lalt to our default shift-F12
 			case IPT_UI_RECORD_MOVIE: // emu/input.c: input_seq(KEYCODE_F12, KEYCODE_LSHIFT)
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_LALT);

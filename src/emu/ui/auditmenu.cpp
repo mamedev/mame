@@ -13,7 +13,6 @@
 #include "ui/menu.h"
 #include "audit.h"
 #include "ui/auditmenu.h"
-#include <algorithm>
 
 extern const char UI_VERSION_TAG[];
 

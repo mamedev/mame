@@ -392,9 +392,9 @@
 
 		<bezel element="text_king"><bounds x="84.01" y="31.1" width="6" height="6" /></bezel>
 		<bezel element="text_queen"><bounds x="84.01" y="39.9" width="6" height="6" /></bezel>
-		<bezel element="text_bishop"><bounds x="84.01" y="48.7" width="6" height="6" /></bezel>
-		<bezel element="text_knight"><bounds x="84.01" y="57.5" width="6" height="6" /></bezel>
-		<bezel element="text_rook"><bounds x="84.01" y="66.3" width="6" height="6" /></bezel>
+		<bezel element="text_rook"><bounds x="84.01" y="48.7" width="6" height="6" /></bezel>
+		<bezel element="text_bishop"><bounds x="84.01" y="57.5" width="6" height="6" /></bezel>
+		<bezel element="text_knight"><bounds x="84.01" y="66.3" width="6" height="6" /></bezel>
 		<bezel element="text_pion"><bounds x="84.01" y="75.1" width="6" height="6" /></bezel>
 
 		<bezel element="disk_black"><bounds x="89" y="13" width="7.4" height="7.4" /></bezel>

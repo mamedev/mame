@@ -23,8 +23,12 @@ static MACHINE_CONFIG_DERIVED_CLASS( neogeo_noslot, neogeo_arcade, neogeo_noslot
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_noslot)
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "joy", true)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "joy", true)
+	//joystick controller
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "joy", true)
+
+	//no mahjong controller
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", true)
 
 	MCFG_MSLUGX_PROT_ADD("mslugx_prot")
 	MCFG_SMA_PROT_ADD("sma_prot")
@@ -42,8 +46,12 @@ static MACHINE_CONFIG_DERIVED_CLASS( neogeo_kog, neogeo_arcade, neogeo_noslot_ko
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_noslot)
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "joy", true)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "joy", true)
+	//joystick controller
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "joy", true)
+
+	//no mahjong controller
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", true)
 
 	MCFG_NGBOOTLEG_PROT_ADD("bootleg_prot")
 	MCFG_KOG_PROT_ADD("kog_prot")
@@ -52,27 +60,34 @@ MACHINE_CONFIG_END
 // these basically correspond to the cabinets which were available in arcades:
 // with mahjong panel, with dial for Pop'n Bounce and with 4 controls for Kizuna...
 static MACHINE_CONFIG_DERIVED( neogeo_mj, neogeo_noslot )
+
+	//no joystick panel
+	MCFG_DEVICE_REMOVE("edge")
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "", true)
+
+	//P1 mahjong controller
 	MCFG_DEVICE_REMOVE("ctrl1")
 	MCFG_DEVICE_REMOVE("ctrl2")
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "mahjong", true)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "mahjong", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", true)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( neogeo_dial, neogeo_noslot )
-	MCFG_DEVICE_REMOVE("ctrl1")
-	MCFG_DEVICE_REMOVE("ctrl2")
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_ctrls, "dial", true)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_ctrls, "dial", true)
+	MCFG_DEVICE_REMOVE("edge")
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "dial", true)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( neogeo_imaze, neogeo_noslot )
+	MCFG_DEVICE_REMOVE("edge")
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "irrmaze", true)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( neogeo_kiz4p, neogeo_noslot )
-	MCFG_DEVICE_REMOVE("ctrl1")
-	MCFG_DEVICE_REMOVE("ctrl2")
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_kiz4p, "kiz4p", true)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_kiz4p, "kiz4p", true)
+	MCFG_DEVICE_REMOVE("edge")
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "kiz4p", true)
 MACHINE_CONFIG_END
 
-// this is used by V-Liner and Irritating Maze, which handle differently inputs...
+// this is used by V-Liner, which handles differently inputs...
 static MACHINE_CONFIG_DERIVED( neogeo_noctrl, neogeo_noslot )
 	MCFG_DEVICE_REMOVE("ctrl1")
 	MCFG_DEVICE_REMOVE("ctrl2")
@@ -224,19 +239,6 @@ static INPUT_PORTS_START( irrmaze )
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("BUTTONS")
-	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-
-	PORT_START("TRACK_X")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(20) PORT_REVERSE
-
-	PORT_START("TRACK_Y")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(20) PORT_REVERSE
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vliner )
@@ -3703,6 +3705,33 @@ ROM_START( gowcaizr )
 	ROM_LOAD16_BYTE( "094-c6.c6", 0x800001, 0x200000, CRC(31bbd918) SHA1(7ff8c5e3f17d40e7a8a189ad8f8026de55368810) ) /* Plane 2,3 */ /* TC5316200 */
 	ROM_LOAD16_BYTE( "094-c7.c7", 0xc00000, 0x200000, CRC(2091ec04) SHA1(a81d4bdbef1ac6ea49845dc30e31bf9745694100) ) /* Plane 0,1 */ /* TC5316200 */
 	ROM_LOAD16_BYTE( "094-c8.c8", 0xc00001, 0x200000, CRC(d80dd241) SHA1(1356a64e4d4e271f62cd0d83f79ee9c906440810) ) /* Plane 2,3 */ /* TC5316200 */
+ROM_END
+
+/****************************************
+ dev board, same ID as gowcaizr
+****************************************/
+
+ROM_START( dragonsh )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "EP2.bin", 0x000000, 0x080000, CRC(f25c71ad) SHA1(803fb6cd6a7ada59678ad901ff9788b1e54ddd0c) )
+	ROM_LOAD16_BYTE( "EP1.bin", 0x000001, 0x080000, CRC(f353448c) SHA1(f0f966ca15d503e01b40e901765ff0888463b65d) )
+
+	NEO_SFIX_128K( "s1.s1", BAD_DUMP CRC(706477a7) SHA1(8cbee7f6832e7edd2dc792ca330420a6a984b879) ) // was a dead AXS512PC 512KB sram card, this data is handcrafted to make the set usable (hence BAD_DUMP)
+
+	NEOGEO_BIOS
+	ROM_REGION( 0x20000, "audiobios", 0 )
+	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) )
+	ROM_REGION( 0x30000, "audiocpu", ROMREGION_ERASEFF )
+	/* not present */
+
+	ROM_REGION( 0x200000, "ymsnd", ROMREGION_ERASE00 )
+	ROM_LOAD( "sram.v1", 0x000000, 0x200000, NO_DUMP ) // was a dead AXS2000PC 2MB sram card, battery dead, data lost.
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x2000000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "no3.bin", 0x000000, 0x1000000, CRC(81821826) SHA1(b7c1a53e32633383675206a16c68f6f2ff984865) ) 
+	ROM_LOAD16_BYTE( "no4.bin", 0x000001, 0x1000000, CRC(3601d568) SHA1(800323e52f5d33b402f84d31850b42c688082d67) )
 ROM_END
 
 /****************************************
@@ -7459,29 +7488,6 @@ ROM_END
 
 
 
-ROM_START( unkneo )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "EP1.bin", 0x000001, 0x080000, CRC(f353448c) SHA1(f0f966ca15d503e01b40e901765ff0888463b65d) )
-	ROM_LOAD16_BYTE( "EP2.bin", 0x000000, 0x080000, CRC(f25c71ad) SHA1(803fb6cd6a7ada59678ad901ff9788b1e54ddd0c) )
-
-	NEO_SFIX_128K( "s1.s1", CRC(706477a7) SHA1(8cbee7f6832e7edd2dc792ca330420a6a984b879) ) // was a dead AXS512PC 512KB sram card, this data is handcrafted to make the set usable (hence BAD_DUMP)
-
-	NEOGEO_BIOS
-	ROM_REGION( 0x20000, "audiobios", 0 )
-	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) )
-	ROM_REGION( 0x30000, "audiocpu", ROMREGION_ERASE00 )
-	/* not present */
-
-	ROM_REGION( 0x400000, "ymsnd", 0 )
-	ROM_LOAD( "sram.v1", 0x000000, 0x200000, NO_DUMP ) // was a dead AXS2000PC 2MB sram card, battery dead, data lost.
-
-	NO_DELTAT_REGION
-
-	ROM_REGION( 0x2000000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "no3.bin", 0x000000, 0x1000000, CRC(81821826) SHA1(b7c1a53e32633383675206a16c68f6f2ff984865) ) 
-	ROM_LOAD16_BYTE( "no4.bin", 0x000001, 0x1000000, CRC(3601d568) SHA1(800323e52f5d33b402f84d31850b42c688082d67) )
-ROM_END
-
 /*************************************
  *
  *  Bootleg sets
@@ -8857,17 +8863,6 @@ DRIVER_INIT_MEMBER(neogeo_noslot_state,jockeygp)
 //  m_maincpu->space(AS_PROGRAM).install_read_port(0x2c0000, 0x2c0001, "IN6");
 }
 
-
-DRIVER_INIT_MEMBER(neogeo_noslot_state,irrmaze)
-{
-	if (!m_cartslots[0]) m_banked_cart->install_banks(machine(), m_maincpu, m_region_maincpu->base(), m_region_maincpu->bytes());
-
-	m_sprgen->m_fixed_layer_bank_type = 0;
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, 0, 0x01ff7e, read16_delegate(FUNC(neogeo_state::irrmaze_in0_r), this));
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x340000, 0x340001, 0, 0x01fffe, "BUTTONS");
-}
-
 DRIVER_INIT_MEMBER(neogeo_noslot_state,vliner)
 {
 	if (!m_cartslots[0]) m_banked_cart->install_banks(machine(), m_maincpu, m_region_maincpu->base(), m_region_maincpu->bytes());
@@ -9672,7 +9667,7 @@ GAME( 1997, kog,        kof97,    neogeo_kog,   neogeo,    neogeo_noslot_kog_sta
 GAME( 1997, lastblad,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGM-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastbladh,  lastblad, neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGH-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastsold,   lastblad, neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Soldier (Korean release of The Last Blade)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, irrmaze,    neogeo,   neogeo_noctrl,  irrmaze, neogeo_noslot_state,  irrmaze,  ROT0, "SNK / Saurus", "The Irritating Maze / Ultra Denryu Iraira Bou", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, irrmaze,    neogeo,   neogeo_imaze,   irrmaze, neogeo_state,   neogeo,   ROT0, "SNK / Saurus", "The Irritating Maze / Ultra Denryu Iraira Bou", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2,      neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (NGM-2400)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2h,     rbff2,    neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (NGH-2400)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2k,     rbff2,    neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers (Korean release)", MACHINE_SUPPORTS_SAVE ) // no Japanese title / mode
@@ -9786,6 +9781,7 @@ GAME( 2001, nitdbl,     nitd,     neogeo_noslot,   neogeo, neogeo_state,   neoge
 /* Face */
 GAME( 1994, gururin,    neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Face", "Gururin", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, miexchng,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Face", "Money Puzzle Exchanger / Money Idol Exchanger", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, dragonsh,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Face", "Dragon's Heaven (development board)", MACHINE_IS_INCOMPLETE | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // same ID code as Voltage Fighter Gowkaizer, developed by ex-Technos staff
 
 /* Hudson Soft */
 GAME( 1994, panicbom,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Eighting / Hudson", "Panic Bomber", MACHINE_SUPPORTS_SAVE )
@@ -9812,8 +9808,8 @@ GAME( 1995, quizkofk,   quizkof,  neogeo_noslot,   neogeo, neogeo_state,   neoge
 GAME( 1995, stakwin,    neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Saurus", "Stakes Winner / Stakes Winner - GI kinzen seiha e no michi", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ragnagrd,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Saurus", "Ragnagard / Shin-Oh-Ken", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, pgoal,      neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Saurus", "Pleasure Goal / Futsal - 5 on 5 Mini Soccer (NGM-219)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ironclad,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Saurus", "Choutetsu Brikin'ger - Iron clad (Prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ironclado,  ironclad, neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "Choutetsu Brikin'ger - Iron clad (Prototype, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ironclad,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Saurus", "Choutetsu Brikin'ger - Iron clad (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ironclado,  ironclad, neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "Choutetsu Brikin'ger - Iron clad (prototype, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, stakwin2,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Saurus", "Stakes Winner 2", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, shocktro,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Saurus", "Shock Troopers (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, shocktroa,  shocktro, neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Saurus", "Shock Troopers (set 2)", MACHINE_SUPPORTS_SAVE )
@@ -9837,8 +9833,6 @@ GAME( 1995, marukodq,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neoge
 GAME( 1995, doubledr,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Technos Japan", "Double Dragon (Neo-Geo)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gowcaizr,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Technos Japan", "Voltage Fighter - Gowcaizer / Choujin Gakuen Gowcaizer", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, sdodgeb,    neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Technos Japan", "Super Dodge Ball / Kunio no Nekketsu Toukyuu Densetsu", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkneo,     neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Technos Japan?", "Unknown Neo-Geo Vs. Fighter (prototype)", MACHINE_SUPPORTS_SAVE ) // same ID code as Voltage Fighter Gowkaizer so probably by Technos
-
 
 /* Tecmo */
 GAME( 1996, tws96,      neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Tecmo", "Tecmo World Soccer '96", MACHINE_SUPPORTS_SAVE )

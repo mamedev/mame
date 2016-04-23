@@ -23,7 +23,7 @@
 #include "modules/netdev/netdev_module.h"
 #include "modules/midi/midi_module.h"
 #include "modules/output/output_module.h"
-#include "cliopts.h"
+#include "emuopts.h"
 
 class ui_menu_item;
 
@@ -84,12 +84,13 @@ class ui_menu_item;
 #define OSDOPTION_BGFX_DEBUG            "bgfx_debug"
 #define OSDOPTION_BGFX_SCREEN_CHAINS    "bgfx_screen_chains"
 #define OSDOPTION_BGFX_SHADOW_MASK      "bgfx_shadow_mask"
+#define OSDOPTION_BGFX_AVI_NAME			"bgfx_avi_name"
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-class osd_options : public cli_options
+class osd_options : public emu_options
 {
 public:
 	// construction/destruction
@@ -157,6 +158,7 @@ public:
 	const bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
 	const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
+	const char *bgfx_avi_name() const { return value(OSDOPTION_BGFX_AVI_NAME); }
 
 private:
 	static const options_entry s_option_entries[];
@@ -192,6 +194,7 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
 	// video overridables
+	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
 	virtual std::vector<ui_menu_item> get_slider_list() override;
 
 	// command option overrides

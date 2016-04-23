@@ -1151,14 +1151,13 @@ void device_image_interface::unload()
 
 void device_image_interface::update_names(const device_type device_type, const char *inst, const char *brief)
 {
-	image_interface_iterator iter(device().mconfig().root_device());
 	int count = 0;
 	int index = -1;
-	for (const device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
+	for (const device_image_interface &image : image_interface_iterator(device().mconfig().root_device()))
 	{
-		if (this == image)
+		if (this == &image)
 			index = count;
-		if ((image->image_type() == image_type() && device_type==nullptr) || (device_type==image->device().type()))
+		if ((image.image_type() == image_type() && device_type == nullptr) || (device_type == image.device().type()))
 			count++;
 	}
 	const char *inst_name = (device_type!=nullptr) ? inst : device_typename(image_type());
@@ -1234,12 +1233,11 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 		interface = image_interface();
 
 	// find the software list if explicitly specified
-	software_list_device_iterator deviter(device().mconfig().root_device());
-	for (software_list_device *swlistdev = deviter.first(); swlistdev != nullptr; swlistdev = deviter.next())
+	for (software_list_device &swlistdev : software_list_device_iterator(device().mconfig().root_device()))
 	{
-		if (swlist_name.compare(swlistdev->list_name())==0 || !(swlist_name.length() > 0))
+		if (swlist_name.compare(swlistdev.list_name())==0 || !(swlist_name.length() > 0))
 		{
-			software_info *info = swlistdev->find(swinfo_name.c_str());
+			software_info *info = swlistdev.find(swinfo_name.c_str());
 			if (info != nullptr)
 			{
 				software_part *part = info->find_part(swpart_name.c_str(), interface);
@@ -1248,13 +1246,13 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 			}
 		}
 
-		if (swinfo_name == swlistdev->list_name())
+		if (swinfo_name == swlistdev.list_name())
 		{
 			// ad hoc handling for the case path = swlist_name:swinfo_name (e.g.
 			// gameboy:sml) which is not handled properly by software_name_split
 			// since the function cannot distinguish between this and the case
 			// path = swinfo_name:swpart_name
-			software_info *info = swlistdev->find(swpart_name.c_str());
+			software_info *info = swlistdev.find(swpart_name.c_str());
 			if (info != nullptr)
 			{
 				software_part *part = info->find_part(nullptr, interface);
@@ -1309,20 +1307,19 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 		software_part *req_swpart = find_software_item(requirement, false);
 		if (req_swpart != nullptr)
 		{
-			image_interface_iterator imgiter(device().machine().root_device());
-			for (device_image_interface *req_image = imgiter.first(); req_image != nullptr; req_image = imgiter.next())
+			for (device_image_interface &req_image : image_interface_iterator(device().machine().root_device()))
 			{
-				const char *interface = req_image->image_interface();
+				const char *interface = req_image.image_interface();
 				if (interface != nullptr)
 				{
 					if (req_swpart->matches_interface(interface))
 					{
-						const char *option = device().mconfig().options().value(req_image->brief_instance_name());
+						const char *option = device().mconfig().options().value(req_image.brief_instance_name());
 						// mount only if not already mounted
-						if (*option == '\0' && !req_image->filename())
+						if (*option == '\0' && !req_image.filename())
 						{
-							req_image->set_init_phase();
-							req_image->load(requirement);
+							req_image.set_init_phase();
+							req_image.load(requirement);
 						}
 						break;
 					}

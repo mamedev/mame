@@ -277,7 +277,7 @@ static void texture_set_data(ogl_texture_info *texture, const render_texinfo *te
 bool renderer_ogl::s_shown_video_info = false;
 bool renderer_ogl::s_dll_loaded = false;
 
-bool renderer_ogl::init(running_machine &machine)
+void renderer_ogl::init(running_machine &machine)
 {
 	s_dll_loaded = false;
 
@@ -287,8 +287,6 @@ bool renderer_ogl::init(running_machine &machine)
 #else
 	osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
 #endif
-
-	return false;
 }
 
 //============================================================
@@ -561,11 +559,13 @@ void renderer_ogl::initialize_gl()
 
 int renderer_ogl::create()
 {
+	auto win = assert_window();
+
 	// create renderer
 #if defined(OSD_WINDOWS)
-	m_gl_context = global_alloc(win_gl_context(window().m_hwnd));
+	m_gl_context = global_alloc(win_gl_context(win->platform_window<HWND>()));
 #else
-	m_gl_context = global_alloc(sdl_gl_context(window().sdl_window()));
+	m_gl_context = global_alloc(sdl_gl_context(win->platform_window<SDL_Window*>()));
 #endif
 	if  (m_gl_context->LastErrorMsg() != nullptr)
 	{
@@ -629,12 +629,19 @@ void renderer_ogl::destroy_all_textures()
 	if ( !m_initialized )
 		return;
 
+	auto win = try_getwindow();
+
+	// During destroy this can get called 
+	// and the window is no longer available
+	if (win == nullptr)
+		return;
+
 	m_gl_context->MakeCurrent();
 
-	if(window().m_primlist)
+	if(win->m_primlist)
 	{
 		lock=TRUE;
-		window().m_primlist->acquire_lock();
+		win->m_primlist->acquire_lock();
 	}
 
 	glFinish();
@@ -696,7 +703,7 @@ void renderer_ogl::destroy_all_textures()
 	m_initialized = 0;
 
 	if (lock)
-		window().m_primlist->release_lock();
+		win->m_primlist->release_lock();
 }
 //============================================================
 //  loadGLExtensions
@@ -916,7 +923,7 @@ void renderer_ogl::loadGLExtensions()
 
 	if ( m_useglsl )
 	{
-		if ( window().prescale() != 1 )
+		if (assert_window()->prescale() != 1 )
 		{
 			m_useglsl = 0;
 			if (_once)
@@ -1025,7 +1032,9 @@ int renderer_ogl::draw(const int update)
 	}
 #endif
 
-	osd_dim wdim = window().get_size();
+	auto win = assert_window();
+
+	osd_dim wdim = win->get_size();
 
 	if (has_flags(FI_CHANGED) || (wdim.width() != m_width) || (wdim.height() != m_height))
 	{
@@ -1076,7 +1085,7 @@ int renderer_ogl::draw(const int update)
 		// we're doing nothing 3d, so the Z-buffer is currently not interesting
 		glDisable(GL_DEPTH_TEST);
 
-		if (window().machine().options().antialias())
+		if (win->machine().options().antialias())
 		{
 			// enable antialiasing for lines
 			glEnable(GL_LINE_SMOOTH);
@@ -1156,10 +1165,10 @@ int renderer_ogl::draw(const int update)
 	m_last_hofs = hofs;
 	m_last_vofs = vofs;
 
-	window().m_primlist->acquire_lock();
+	win->m_primlist->acquire_lock();
 
 	// now draw
-	for (render_primitive &prim : *window().m_primlist)
+	for (render_primitive &prim : *win->m_primlist)
 	{
 		int i;
 
@@ -1375,7 +1384,7 @@ int renderer_ogl::draw(const int update)
 		pendingPrimitive=GL_NO_PRIMITIVE;
 	}
 
-	window().m_primlist->release_lock();
+	win->m_primlist->release_lock();
 	m_init_context = 0;
 
 	m_gl_context->SwapBuffer();
@@ -1510,8 +1519,10 @@ void renderer_ogl::texture_compute_size_subroutine(ogl_texture_info *texture, UI
 		texture->xprescale--;
 	while (texture->yprescale > 1 && height_create * texture->yprescale > m_texture_max_height)
 		texture->yprescale--;
-	if (PRIMFLAG_GET_SCREENTEX(flags) && (texture->xprescale != window().prescale() || texture->yprescale != window().prescale()))
-		osd_printf_warning("SDL: adjusting prescale from %dx%d to %dx%d\n", window().prescale(), window().prescale(), texture->xprescale, texture->yprescale);
+
+	auto win = assert_window();
+	if (PRIMFLAG_GET_SCREENTEX(flags) && (texture->xprescale != win->prescale() || texture->yprescale != win->prescale()))
+		osd_printf_warning("SDL: adjusting prescale from %dx%d to %dx%d\n", win->prescale(), win->prescale(), texture->xprescale, texture->yprescale);
 
 	width  *= texture->xprescale;
 	height *= texture->yprescale;
@@ -1873,8 +1884,9 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 	texture->texinfo.seqid = -1; // force set data
 	if (PRIMFLAG_GET_SCREENTEX(flags))
 	{
-		texture->xprescale = window().prescale();
-		texture->yprescale = window().prescale();
+		auto win = assert_window();
+		texture->xprescale = win->prescale();
+		texture->yprescale = win->prescale();
 	}
 	else
 	{

@@ -605,17 +605,11 @@ ROM_START( dbldynu )
 ROM_END
 
 
-/* Driver Initialization */
-
-DRIVER_INIT_MEMBER(dynduke_state,dynduke)
-{
-}
-
 /* Game Drivers */
 
-GAME( 1989, dynduke,  0,       dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukea, dynduke, dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukej, dynduke, dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukeu, dynduke, dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynj,  dynduke, dbldyn,  dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynu,  dynduke, dynduke, dynduke, dynduke_state, dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dynduke,  0,       dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukea, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukej, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukeu, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynj,  dynduke, dbldyn,  dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynu,  dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US)", MACHINE_SUPPORTS_SAVE )

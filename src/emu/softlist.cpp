@@ -391,10 +391,9 @@ void software_list_device::release()
 software_list_device *software_list_device::find_by_name(const machine_config &config, const char *name)
 {
 	// iterate over each device in the system and find a match
-	software_list_device_iterator deviter(config.root_device());
-	for (software_list_device *swlistdev = deviter.first(); swlistdev != nullptr; swlistdev = deviter.next())
-		if (strcmp(swlistdev->list_name(), name) == 0)
-			return swlistdev;
+	for (software_list_device &swlistdev : software_list_device_iterator(config.root_device()))
+		if (strcmp(swlistdev.list_name(), name) == 0)
+			return &swlistdev;
 	return nullptr;
 }
 
@@ -409,25 +408,25 @@ void software_list_device::display_matches(const machine_config &config, const c
 {
 	// check if there is at least one software list
 	software_list_device_iterator deviter(config.root_device());
-	if (deviter.first())
+	if (deviter.first() != nullptr)
 		osd_printf_error("\n\"%s\" approximately matches the following\n"
 							"supported software items (best match first):\n\n", name);
 
 	// iterate through lists
-	for (software_list_device *swlistdev = deviter.first(); swlistdev != nullptr; swlistdev = deviter.next())
+	for (software_list_device &swlistdev : deviter)
 	{
 		// get the top 16 approximate matches for the selected device interface (i.e. only carts for cartslot, etc.)
 		software_info *matches[16] = { nullptr };
-		swlistdev->find_approx_matches(name, ARRAY_LENGTH(matches), matches, interface);
+		swlistdev.find_approx_matches(name, ARRAY_LENGTH(matches), matches, interface);
 
 		// if we found some, print them
 		if (matches[0] != nullptr)
 		{
 			// different output depending on original system or compatible
-			if (swlistdev->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
-				osd_printf_error("* Software list \"%s\" (%s) matches: \n", swlistdev->list_name(), swlistdev->description());
+			if (swlistdev.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+				osd_printf_error("* Software list \"%s\" (%s) matches: \n", swlistdev.list_name(), swlistdev.description());
 			else
-				osd_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlistdev->list_name(), swlistdev->description());
+				osd_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlistdev.list_name(), swlistdev.description());
 
 			// print them out
 			for (auto & matche : matches)

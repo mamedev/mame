@@ -12,7 +12,7 @@
 	"author": "Ryan Holtz",
 	
 	"sliders": [
-		{ "type": "float", "name": "saturation", "text": "Saturation",   "default": 25, "max": 100, "min": 0, "step": 1, "scale": 0.01, "format": "%1.2f", "screen": "raster" }
+		{ "type": "float", "name": "saturation", "text": "Saturation", "default": 0.25, "max": 1.00, "min": 0.00, "step": 0.01, "format": "%1.2f", "screen": "raster" }
 	],
 	
 	"targets": [
@@ -31,7 +31,7 @@
 	],
 	
 	"passes": [
-		{	"effect": "pillarbox_left_horizontal/blit",
+		{	"effect": "misc/blit",
 			"name": "Blit to scalable target",
 			"input": [
 				{ "sampler": "s_tex", "target": "screen" }
@@ -58,20 +58,6 @@
 			],
 			"output": "internal"
 		},
-		{
-			"effect": "pillarbox_left_horizontal/saturation",
-			"name": "Saturation Pass",
-			"disablewhen": [
-				{ "type": "slider", "condition": "equal", "name": "saturation", "value": 100 }
-			],
-			"uniforms": [
-				{ "uniform": "u_saturation", "slider": "saturation" }
-			],
-			"input": [
-				{ "sampler": "s_tex", "target": "internal" }
-			],
-			"output": "internal"
-		},
 		{	"effect": "pillarbox_left_horizontal/gaussian",
 			"name": "Gaussian Blur 2, Horizontal",
 			"uniforms": [
@@ -92,7 +78,21 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "pillarbox_left_horizontal/blit",
+		{
+			"effect": "misc/saturation",
+			"name": "Saturation Pass",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "name": "saturation", "value": 100 }
+			],
+			"uniforms": [
+				{ "uniform": "u_saturation", "slider": "saturation" }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "internal"
+		},
+		{	"effect": "misc/blit",
 			"name": "Final Blit",
 			"input": [
 				{ "sampler": "s_tex", "target": "internal" }

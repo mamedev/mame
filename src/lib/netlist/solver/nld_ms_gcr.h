@@ -29,7 +29,7 @@ class matrix_solver_GCR_t: public matrix_solver_direct_t<m_N, _storage_N>
 public:
 
 	matrix_solver_GCR_t(const solver_parameters_t *params, int size)
-		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::GAUSSIAN_ELIMINATION, params, size)
+		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::ASCENDING, params, size)
 		{
 		}
 
@@ -69,21 +69,36 @@ void matrix_solver_GCR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 			touched[k][j] = true;
 	}
 
+	unsigned fc = 0;
+
 	unsigned ops = 0;
+
+	const bool static_compile = false;
 	for (unsigned k = 0; k < iN; k++)
 	{
 		ops++; // 1/A(k,k)
+		if (static_compile) printf("const double fd%d = 1.0 / A(%d,%d); \n", k, k, k);
 		for (unsigned row = k + 1; row < iN; row++)
 		{
 			if (touched[row][k])
 			{
 				ops++;
+				fc++;
+				if (static_compile) printf("  const double f%d = -fd%d * A(%d,%d); \n", fc, k, row, k);
 				for (unsigned col = k + 1; col < iN; col++)
 					if (touched[k][col])
 					{
+						if (touched[row][col])
+						{
+							if (static_compile) printf("    A(%d,%d) += f%d * A(%d,%d); \n", row, col, fc, k, col);
+						} else
+						{
+							if (static_compile) printf("    A(%d,%d) = f%d * A(%d,%d); \n", row, col, fc, k, col);
+						}
 						touched[row][col] = true;
 						ops += 2;
 					}
+				if (static_compile) printf("    RHS(%d) += f%d * RHS(%d); \n", row, fc, k);
 			}
 		}
 	}

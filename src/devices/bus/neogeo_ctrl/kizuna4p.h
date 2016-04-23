@@ -22,7 +22,7 @@
 // ======================> neogeo_kizuna4p_device
 
 class neogeo_kizuna4p_device : public device_t,
-						public device_neogeo_control_port_interface
+						public device_neogeo_ctrl_edge_interface
 {
 public:
 	// construction/destruction
@@ -37,14 +37,18 @@ protected:
 	virtual void device_reset() override;
 	
 	// device_neogeo_control_port_interface overrides
-	virtual UINT8 read_ctrl() override;
+	virtual DECLARE_READ8_MEMBER( in0_r ) override;
+	virtual DECLARE_READ8_MEMBER( in1_r ) override;
 	virtual UINT8 read_start_sel() override;
 	virtual void write_ctrlsel(UINT8 data) override;
 	
 private:
 	required_ioport m_joy1;
 	required_ioport m_joy2;
-	required_ioport m_ss;
+	required_ioport m_joy3;
+	required_ioport m_joy4;
+	required_ioport m_ss1;
+	required_ioport m_ss2;
 	UINT8 m_ctrl_sel;
 };
 

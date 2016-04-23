@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "ui/ui.h"
-#include "ui/menu.h"
 #include "uiinput.h"
 #include "ui/selgame.h"
 #include "ui/miscmenu.h"
@@ -29,7 +28,6 @@
 #include "ui/auditmenu.h"
 #include "rendutil.h"
 #include "softlist.h"
-#include <algorithm>
 
 extern const char UI_VERSION_TAG[];
 
@@ -1048,9 +1046,8 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 		{
 			if ((driver->flags & MACHINE_TYPE_ARCADE) == 0)
 			{
-				software_list_device_iterator iter(enumerator.config().root_device());
-				for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
-					if (!swlistdev->get_info().empty())
+				for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config().root_device()))
+					if (!swlistdev.get_info().empty())
 					{
 						ui_menu::stack_push(global_alloc_clear<ui_menu_select_software>(machine(), container, driver));
 						return;

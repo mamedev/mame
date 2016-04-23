@@ -71,46 +71,40 @@ void ui_menu_main::populate()
 	/* add game info menu */
 	item_append(_("Machine Information"), nullptr, 0, (void *)GAME_INFO);
 
-	image_interface_iterator imgiter(machine().root_device());
-    for (device_image_interface *image = imgiter.first(); image != nullptr; image = imgiter.next())
-    {
-        if (image->user_loadable())
-        {
-            /* add image info menu */
-            item_append(_("Image Information"), nullptr, 0, (void *)IMAGE_MENU_IMAGE_INFO);
-            
-            /* add file manager menu */
-            item_append(_("File Manager"), nullptr, 0, (void *)IMAGE_MENU_FILE_MANAGER);
-            
-            break;
-        }
-    }
+	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+	{
+		if (image.user_loadable())
+		{
+			/* add image info menu */
+			item_append(_("Image Information"), nullptr, 0, (void *)IMAGE_MENU_IMAGE_INFO);
 
-    /* add tape control menu */
-    cassette_device_iterator cassiter(machine().root_device());
-    if (cassiter.first() != nullptr)
-        item_append(_("Tape Control"), nullptr, 0, (void *)TAPE_CONTROL);
+			/* add file manager menu */
+			item_append(_("File Manager"), nullptr, 0, (void *)IMAGE_MENU_FILE_MANAGER);
 
-    pty_interface_iterator ptyiter(machine().root_device());
-    if (ptyiter.first() != nullptr)
-        item_append(_("Pseudo terminals"), nullptr, 0, (void *)PTY_INFO);
+			break;
+		}
+	}
 
-    if (machine().ioport().has_bioses())
+	/* add tape control menu */
+	if (cassette_device_iterator(machine().root_device()).first() != nullptr)
+		item_append(_("Tape Control"), nullptr, 0, (void *)TAPE_CONTROL);
+
+	if (pty_interface_iterator(machine().root_device()).first() != nullptr)
+		item_append(_("Pseudo terminals"), nullptr, 0, (void *)PTY_INFO);
+
+	if (machine().ioport().has_bioses())
 		item_append(_("Bios Selection"), nullptr, 0, (void *)BIOS_SELECTION);
 
-    /* add slot info menu */
-	slot_interface_iterator slotiter(machine().root_device());
-	if (slotiter.first() != nullptr)
+	/* add slot info menu */
+	if (slot_interface_iterator(machine().root_device()).first() != nullptr)
 		item_append(_("Slot Devices"), nullptr, 0, (void *)SLOT_DEVICES);
 
-    /* add Barcode reader menu */
-	barcode_reader_device_iterator bcriter(machine().root_device());
-	if (bcriter.first() != nullptr)
+	/* add Barcode reader menu */
+	if (barcode_reader_device_iterator(machine().root_device()).first() != nullptr)
 		item_append(_("Barcode Reader"), nullptr, 0, (void *)BARCODE_READ);
 
-    /* add network info menu */
-	network_interface_iterator netiter(machine().root_device());
-	if (netiter.first() != nullptr)
+	/* add network info menu */
+	if (network_interface_iterator(machine().root_device()).first() != nullptr)
 		item_append(_("Network Devices"), nullptr, 0, (void*)NETWORK_DEVICES);
 
 	/* add keyboard mode menu */

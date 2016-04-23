@@ -87,6 +87,8 @@ void z80_daisy_chain_interface::interface_post_start()
 
 void z80_daisy_chain_interface::daisy_init(const z80_daisy_config *daisy)
 {
+	assert(daisy != nullptr);
+
 	// create a linked list of devices
 	device_z80daisy_interface **tailptr = &m_chain;
 	for ( ; daisy->devname != nullptr; daisy++)
@@ -105,12 +107,23 @@ void z80_daisy_chain_interface::daisy_init(const z80_daisy_config *daisy)
 		if (!target->interface(intf))
 			fatalerror("Device '%s' does not implement the z80daisy interface!\n", daisy->devname);
 
-		// append to the end, or overwrite existing entry
-		device_z80daisy_interface *next = (*tailptr != nullptr) ? (*tailptr)->m_daisy_next : nullptr;
+		// splice it out of the list if it was previously added
+		device_z80daisy_interface **oldtailptr = tailptr;
+		while (*oldtailptr != nullptr)
+		{
+			if (*oldtailptr == intf)
+				*oldtailptr = (*oldtailptr)->m_daisy_next;
+			else
+				oldtailptr = &(*oldtailptr)->m_daisy_next;
+		}
+
+		// add the interface to the list
+		intf->m_daisy_next = *tailptr;
 		*tailptr = intf;
-		(*tailptr)->m_daisy_next = next;
 		tailptr = &(*tailptr)->m_daisy_next;
 	}
+
+	osd_printf_verbose("Daisy chain = %s\n", daisy_show_chain().c_str());
 }
 
 
@@ -192,4 +205,25 @@ void z80_daisy_chain_interface::daisy_call_reti_device()
 		}
 	}
 	//logerror("z80daisy_call_reti_device: failed to find an device to reti!\n");
+}
+
+
+//-------------------------------------------------
+//  daisy_show_chain - list devices in the chain
+//  in string format (for debugging purposes)
+//-------------------------------------------------
+
+std::string z80_daisy_chain_interface::daisy_show_chain() const
+{
+	std::ostringstream result;
+
+	// loop over all devices
+	for (device_z80daisy_interface *intf = m_chain; intf != nullptr; intf = intf->m_daisy_next)
+	{
+		if (intf != m_chain)
+			result << " -> ";
+		result << intf->device().tag();
+	}
+
+	return result.str();
 }

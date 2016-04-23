@@ -404,10 +404,10 @@ HRESULT sound_direct_sound::dsound_init()
 #ifdef SDLMAME_WIN32
 		SDL_SysWMinfo wminfo;
 		SDL_VERSION(&wminfo.version);
-		SDL_GetWindowWMInfo(sdl_window_list->sdl_window(), &wminfo);
+		SDL_GetWindowWMInfo(sdl_window_list.front()->platform_window<SDL_Window*>(), &wminfo);
 		HWND const window = wminfo.info.win.window;
 #else // SDLMAME_WIN32
-		HWND const window = win_window_list->m_hwnd;
+		HWND const window = win_window_list.front()->platform_window<HWND>();
 #endif // SDLMAME_WIN32
 		result = m_dsound->SetCooperativeLevel(window, DSSCL_PRIORITY);
 	}

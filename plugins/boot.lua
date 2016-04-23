@@ -19,7 +19,7 @@ for file in lfs.dir("plugins") do
 		if (meta["plugin"]["type"]=="plugin") and (manager:plugins().entries[meta["plugin"]["name"]]~=nil) then
 			local entry = manager:plugins().entries[meta["plugin"]["name"]]	
 			if (entry:value()==true) then
-				print("Starting plugin " .. meta["plugin"]["name"] .. "...")
+				emu.print_verbose("Starting plugin " .. meta["plugin"]["name"] .. "...")
 				plugin = require(meta["plugin"]["name"])
 				if plugin.set_folder~=nil then plugin.set_folder("plugins/" .. file) end
 				plugin.startplugin();

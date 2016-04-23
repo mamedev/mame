@@ -95,7 +95,7 @@ public:
 class renderer_ogl : public osd_renderer
 {
 public:
-	renderer_ogl(osd_window *window)
+	renderer_ogl(std::shared_ptr<osd_window> window)
 		: osd_renderer(window, FLAG_NEEDS_OPENGL)
 		, m_blittimer(0)
 		, m_width(0)
@@ -130,7 +130,7 @@ public:
 	}
 	virtual ~renderer_ogl();
 
-	static bool init(running_machine &machine);
+	static void init(running_machine &machine);
 	static void exit();
 
 	virtual int create() override;
@@ -141,14 +141,18 @@ public:
 #endif
 	virtual render_primitive_list *get_primitives() override
 	{
-		osd_dim nd = window().get_size();
+		auto win = try_getwindow();
+		if (win == nullptr)
+			return nullptr;
+
+		osd_dim nd = win->get_size();
 		if (nd != m_blit_dim)
 		{
 			m_blit_dim = nd;
 			notify_changed();
 		}
-		window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().pixel_aspect());
-		return &window().target()->get_primitives();
+		win->target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), win->pixel_aspect());
+		return &win->target()->get_primitives();
 	}
 
 #ifdef OSD_WINDOWS
