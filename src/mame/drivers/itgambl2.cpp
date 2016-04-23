@@ -726,13 +726,14 @@ ROMs:
 1x M27C1001 (0)
 4x M27C4001 (1,2,3,4)
 
-
 RAMs
 3x TC551001
 
 PLDs
 2x ispLSI10032E-70LJ
-Note    1x 28x2 edge connector
+
+Other
+1x 28x2 edge connector
 1x 14 legs connector
 1x RS232 connector
 1x trimmer (volume)
@@ -951,6 +952,51 @@ ROM_START( unkh8gam )
 	ROM_LOAD( "30.bin", 0x00000, 0x20000, CRC(72e56518) SHA1(7afdd6434beeea22673228c2417e4dee253a42b5) )
 ROM_END
 
+/*
+  Euro Double Star Record (ver.1.2)
+
+  CPUs
+  1x HD64F3337YCP16   (32-bit Single-Chip Microcomputer - main) (not dumped)
+  1x NEC D7759GC      (ADPCM Speech Synthesizer LSIs - sound)
+  1x TDA2003          (Audio Amplifier - sound)
+
+  1x 16.000000 MHz. oscillator.
+  1x 14.318180 MHz. oscillator.
+
+  ROMs
+  1x 27010 (yellow, dumped)
+  3x 27040 (blue, red, green, dumped)
+
+  RAMs
+  3x MX6C1024MC-70
+
+  PLDs
+  2x ispLSI10032E-70LJ (not dumped)
+
+  Others
+  1x 28x2 edge connector
+  1x 14 legs connector
+  1x RS232 connector
+  1x trimmer (volume)
+  1x trimmer (unknown)
+  1x red LED
+  2x 8 DIP switches banks
+  1x battery 3.6V
+*/
+
+ROM_START( eurodsr )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "europass_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "red.bin",   0x000000, 0x80000, CRC(a8e57e99) SHA1(0b7ce23ec7892733efff5e41fc7ea22eda04416b) )
+	ROM_LOAD( "green.bin", 0x080000, 0x80000, CRC(62ebc05f) SHA1(d59298241c14b459f00b9d36e819a00a2c075e96) )
+	ROM_LOAD( "blue.bin",  0x100000, 0x80000, CRC(14a9b936) SHA1(8892b1e0dbf4c756b0e16c766fa10c4f17da9fd2) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "yellow.bin", 0x00000, 0x20000, CRC(04f44a53) SHA1(0b27d1fe1992d1769abec2078defc30896c36bcb) )
+ROM_END
+
 
 /*************************
 *      Game Drivers      *
@@ -974,3 +1020,4 @@ GAME( 200?, mclass,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<un
 GAME( 200?, europass, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Euro Pass (Ver 1.1)",                   MACHINE_IS_SKELETON )
 GAME( 200?, thedrink, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "The Drink",                             MACHINE_IS_SKELETON )
 GAME( 200?, unkh8gam, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "unknown H8 Italian Gambling game",      MACHINE_IS_SKELETON )
+GAME( 200?, eurodsr,  0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Euro Double Star Record (ver.1.2)",     MACHINE_IS_SKELETON )
