@@ -108,10 +108,9 @@ bool hp_optrom_slot_device::call_load()
         memcpy(buffer , get_software_region("rom") , length * 2);
 
         // Install ROM in address space of every CPU
-        device_interface_iterator<hp_hybrid_cpu_device> iter(machine().root_device());
-        for (hp_hybrid_cpu_device *cpu = iter.first(); cpu != nullptr; cpu = iter.next()) {
-                logerror("hp_optrom: install in %s AS\n" , cpu->tag());
-                cpu->space(AS_PROGRAM).install_rom(base_addr , end_addr , buffer);
+        for (hp_hybrid_cpu_device& cpu : device_interface_iterator<hp_hybrid_cpu_device>(machine().root_device())) {
+                logerror("hp_optrom: install in %s AS\n" , cpu.tag());
+                cpu.space(AS_PROGRAM).install_rom(base_addr , end_addr , buffer);
         }
 
         m_base_addr = base_addr;
@@ -124,9 +123,8 @@ void hp_optrom_slot_device::call_unload()
 {
         logerror("hp_optrom: call_unload\n");
         if (m_cart != nullptr && m_base_addr != 0 && m_end_addr != 0) {
-                device_interface_iterator<hp_hybrid_cpu_device> iter(machine().root_device());
-                for (hp_hybrid_cpu_device *cpu = iter.first(); cpu != nullptr; cpu = iter.next()) {
-                        cpu->space(AS_PROGRAM).unmap_read(m_base_addr , m_end_addr);
+                for (hp_hybrid_cpu_device& cpu : device_interface_iterator<hp_hybrid_cpu_device>(machine().root_device())) {
+                        cpu.space(AS_PROGRAM).unmap_read(m_base_addr , m_end_addr);
                 }
                 m_content.resize(0);
                 m_base_addr = 0;
