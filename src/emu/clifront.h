@@ -59,7 +59,7 @@ public:
 private:
 	// internal helpers
 	void execute_commands(const char *exename);
-	void display_help();
+	void display_help(const char *exename);
 	void display_suggestions(const char *gamename);
 	void output_single_softlist(FILE *out, software_list_device &swlist);
 

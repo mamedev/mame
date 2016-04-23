@@ -823,10 +823,12 @@ ifeq (posix,$(SHELLTYPE))
 GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> /dev/null)
 CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) --version 2> /dev/null| head -n 1 | grep clang | sed "s/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$$/\1/" | head -n 1)
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
+GIT_AVAILABLE    := $(shell git --version > /dev/null 2>&1 && echo git)
 else
 GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> NUL)
 CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) --version 2> NUL| head -n 1 | grep clang | sed "s/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$$/\1/" | head -n 1)
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > NUL 2>&1 && echo python)
+GIT_AVAILABLE    := $(shell git --version > NUL 2>&1 && echo git)
 endif
 ifdef MSBUILD
 MSBUILD_PARAMS   := /v:minimal /m:$(NUMBER_OF_PROCESSORS)
@@ -847,6 +849,7 @@ ifneq ($(OS),solaris)
 CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC))  --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\.[0-9]\(\.[0-9]\)\?' -o | grep -e '[0-9]\.[0-9]\(\.[0-9]\)\?' -o | tail -n 1)
 endif
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
+GIT_AVAILABLE := $(shell git --version > /dev/null 2>&1 && echo git)
 endif
 
 ifeq ($(CLANG_VERSION),)
@@ -865,6 +868,27 @@ endif
 ifneq ($(PYTHON_AVAILABLE),python)
 $(error Python is not available in path)
 endif
+
+ifneq ($(GIT_AVAILABLE),git)
+PARAMS += --IGNORE_GIT='1'
+endif
+ifeq ($(wildcard .git/*),)
+PARAMS += --IGNORE_GIT='1'
+endif
+
+ifeq ($(GIT_AVAILABLE),git)
+NEW_GIT_VERSION := $(shell git describe)
+ifeq (posix,$(SHELLTYPE))
+OLD_GIT_VERSION := $(shell cat .mame_version 2> /dev/null)
+else
+OLD_GIT_VERSION := $(shell cat .mame_version 2> NUL)
+endif
+ifneq ($(NEW_GIT_VERSION),$(OLD_GIT_VERSION))
+$(shell git describe > .mame_version)
+$(shell touch $(SRC)/version.cpp)
+endif
+endif
+
 
 GENIE := 3rdparty/genie/bin/$(GENIEOS)/genie$(EXE)
 

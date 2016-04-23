@@ -349,17 +349,17 @@ newoption {
 }
 
 newoption {
-	trigger = "SOURCES",
-	description = "List of sources to compile.",
+	trigger = "IGNORE_GIT",
+	description = "Ignore usage of git command in build process",
+	allowed = {
+		{ "0",  "Do not ignore"   },
+		{ "1",  "Ingore"  },
+	},
 }
 
 newoption {
-	trigger = "FORCE_VERSION_COMPILE",
-	description = "Force compiling of version.c file.",
-	allowed = {
-		{ "0",   "Disabled"     },
-		{ "1",   "Enabled"      },
-	}
+	trigger = "SOURCES",
+	description = "List of sources to compile.",
 }
 
 newoption {
@@ -518,6 +518,17 @@ if (_OPTIONS["SOURCES"] == nil) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
 	dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
+end
+
+
+if _OPTIONS["IGNORE_GIT"]~="1" then	
+	GIT_VERSION = backtick( "git describe" )
+	local p = string.find(GIT_VERSION, '-', 1)
+	if (p~=nil) then
+		defines {
+			"GIT_VERSION=" .. string.sub(GIT_VERSION,p+1)
+		}
+	end
 end
 
 configuration { "gmake" }

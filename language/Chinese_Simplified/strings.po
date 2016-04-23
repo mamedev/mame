@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-15 17:42+0200\n"
-"PO-Revision-Date: 2016-04-11 14:17+0800\n"
+"PO-Revision-Date: 2016-04-15 03:34+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh\n"
@@ -888,15 +888,15 @@ msgstr "%s.txt 已储存于 ui 资料夹下。"
 
 #: src/emu/ui/miscmenu.cpp:677
 msgid "Export list in XML format (like -listxml)"
-msgstr ""
+msgstr "汇出 XML 格式列表 （同 -listxml）"
 
 #: src/emu/ui/miscmenu.cpp:678
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr ""
+msgstr "汇出 TXT 格式列表 （同 -listfull，但不包含装置）"
 
 #: src/emu/ui/miscmenu.cpp:679
 msgid "Export list in TXT format (like -listfull)"
-msgstr ""
+msgstr "汇出 TXT 格式列表 （同 -listfull）"
 
 #: src/emu/ui/miscmenu.cpp:729 src/emu/ui/optsmenu.cpp:376
 msgid ""
@@ -914,7 +914,7 @@ msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:776
 msgid "Driver"
-msgstr ""
+msgstr "驱动"
 
 #: src/emu/ui/miscmenu.cpp:790
 msgid "Save machine configuration"
@@ -922,7 +922,7 @@ msgstr "保存机械设定"
 
 #: src/emu/ui/miscmenu.cpp:806
 msgid "Configure machine:"
-msgstr ""
+msgstr "设定机台："
 
 #: src/emu/ui/miscmenu.cpp:868 src/emu/ui/selsoft.cpp:109
 msgid " (default)"
@@ -1030,7 +1030,7 @@ msgstr "设定选项"
 
 #: src/emu/ui/selgame.cpp:596
 msgid "Configure Machine"
-msgstr ""
+msgstr "设定机台"
 
 #: src/emu/ui/selgame.cpp:758
 #, c-format
@@ -1308,7 +1308,7 @@ msgstr ""
 #: src/emu/ui/selsoft.cpp:683
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s ( %3$d / %4$d 软件包 )"
 
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
@@ -1935,78 +1935,3 @@ msgstr " 色彩"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " PENS"
-
-#~ msgid "Export XML format (like -listxml)"
-#~ msgstr "汇出为 XML 格式 （同 -listxml）"
-
-#~ msgid "Export TXT format (like -listfull)"
-#~ msgstr "汇出为 TXT 格式 （同 -listfull）"
-
-#~ msgid "Dummy"
-#~ msgstr "Dummy"
-
-#~ msgid "%1$s %2$s ( %3$d / %4$d softwares )"
-#~ msgstr "%1$s %2$s ( %3$d / %4$d 软件 )"
-
-#~ msgid "Lightgun Device Assignment"
-#~ msgstr "配置光枪设备"
-
-#~ msgid "Trackball Device Assignment"
-#~ msgstr "配置轨迹球设备"
-
-#~ msgid "Pedal Device Assignment"
-#~ msgstr "配置踏板设备"
-
-#~ msgid "Adstick Device Assignment"
-#~ msgstr "配置 AD 游戏杆设备"
-
-#~ msgid "Paddle Device Assignment"
-#~ msgstr "配置操纵杆设备"
-
-#~ msgid "Dial Device Assignment"
-#~ msgstr "配置方向盘设备"
-
-#~ msgid "Positional Device Assignment"
-#~ msgstr "配置定位设备"
-
-#~ msgid "Mouse Device Assignment"
-#~ msgstr "配置鼠标设备"
-
-#~ msgid "Device Mapping"
-#~ msgstr "装置映对"
-
-#~ msgid "Video Mode"
-#~ msgstr "视讯模式"
-
-#~ msgid "Triple Buffering"
-#~ msgstr "三重缓冲"
-
-#~ msgid "HLSL"
-#~ msgstr "HLSL"
-
-#~ msgid "GLSL"
-#~ msgstr "GLSL"
-
-#~ msgid "Bilinear Filtering"
-#~ msgstr "双线过滤"
-
-#~ msgid "Bitmap Prescaling"
-#~ msgstr "点阵预缩放"
-
-#~ msgid "Window Mode"
-#~ msgstr "视窗模式"
-
-#~ msgid "Enforce Aspect Ratio"
-#~ msgstr "强制长宽比例"
-
-#~ msgid "Start Out Maximized"
-#~ msgstr "启动时最大化"
-
-#~ msgid "Synchronized Refresh"
-#~ msgstr "同步更新"
-
-#~ msgid "Wait Vertical Sync"
-#~ msgstr "等待垂直同步"
-
-#~ msgid "Display Options"
-#~ msgstr "视讯选项"

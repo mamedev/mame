@@ -484,9 +484,11 @@ function cheatfind.startplugin()
 						_G.ce.inject(cheat)
 					end
 				else
-
+					local json = require("json")
+					local file = io.open(string.format("%s_%08x_cheat.json", emu.romname(), match.addr), "w")
+					file:write(json.stringify(cheat))
+					file:close()
 				end
-
 			end
 		end
 		devsel = devcur

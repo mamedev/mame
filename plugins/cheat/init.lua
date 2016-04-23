@@ -72,8 +72,9 @@ function cheat.startplugin()
 	local function load_cheats()
 		local filename = emu.romname()
 		local json = require("json")
-		local file = emu.file(manager:machine():options().entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat"), 1)
-
+		local newcheats = {}
+		local path = manager:machine():options().entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat")
+		local file = emu.file(path, 1)
 		if emu.softname() ~= "" then
 			for name, image in pairs(manager:machine().images) do
 				if image:exists() and image:software_list_name() ~= "" then
@@ -81,17 +82,27 @@ function cheat.startplugin()
 				end
 			end
 		end
-
-		if file:open(filename .. ".json") then
-			local xml = require("cheat/xml_conv")
-
-			if file:open(filename .. ".xml") then
-				return {}
+		function add(addcheats)
+			if not next(newcheats) then
+				newcheats = addcheats
+			else
+				for num, cheat in pairs(addcheats) do
+					newcheats[#newcheats + 1] = cheat
+				end
 			end
-			return xml.conv_cheat(file:read(file:size()))
 		end
-
-		return json.parse(file:read(file:size()))
+		local ret = file:open(filename .. ".json")
+		while not ret do
+			add(json.parse(file:read(file:size())))
+			ret = file:open_next()
+		end
+		local xml = require("cheat/xml_conv")
+		ret = file:open(filename .. ".xml")
+		while not ret do
+			add(xml.conv_cheat(file:read(file:size())))
+			ret = file:open_next()
+		end
+		return newcheats
 	end
 
 	local function draw_text(screen, x, y, color, form, ...)

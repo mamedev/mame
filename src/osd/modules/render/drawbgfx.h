@@ -13,6 +13,7 @@
 #include "binpacker.h"
 #include "bgfx/vertex.h"
 #include "sliderdirtynotifier.h"
+#include "aviio.h"
 
 class texture_manager;
 class target_manager;
@@ -23,17 +24,13 @@ class bgfx_texture;
 class bgfx_effect;
 class bgfx_target;
 class bgfx_chain;
+class osd_options;
 
 /* sdl_info is the information about SDL for the current screen */
 class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
-	renderer_bgfx(osd_window *w)
-		: osd_renderer(w, FLAG_NONE)
-		, m_dimensions(0, 0)
-		, m_max_view(0)
-	{
-	}
+	renderer_bgfx(osd_window *w);
 	virtual ~renderer_bgfx();
 
 	static bool init(running_machine &machine) { return false; }
@@ -49,7 +46,7 @@ public:
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
 #else
 	virtual void save() override { }
-	virtual void record() override { }
+	virtual void record() override;
 	virtual void toggle_fsfx() override { }
 #endif
 
@@ -63,8 +60,8 @@ public:
     static const char* WINDOW_PREFIX;
 
 private:
-	void handle_screen_chains(render_primitive *starting_prim);
-	bgfx_chain* screen_chain(int32_t screen);
+	void end_avi_recording();
+	void begin_avi_recording(std::string filename);
 
 	bool update_dimensions();
 	void setup_view(uint32_t view_index, bool screen);
@@ -98,6 +95,8 @@ private:
 	void process_atlas_packs(std::vector<std::vector<rectangle_packer::packed_rectangle>>& packed);
 	UINT32 get_texture_hash(render_primitive *prim);
 
+	osd_options& m_options;
+
 	bgfx_target* m_framebuffer;
 	bgfx_texture* m_texture_cache;
 
@@ -123,6 +122,11 @@ private:
 	uint32_t m_white[16*16];
 	int32_t m_ui_view;
 	uint32_t m_max_view;
+
+	// AVI
+	avi_file::ptr           m_avi_output_file;            // AVI file
+	int                     m_avi_frame;                  // AVI frame
+	attotime                m_avi_frame_period;           // AVI frame period
 
 	static const uint16_t CACHE_SIZE;
 	static const uint32_t PACKABLE_SIZE;
