@@ -61,17 +61,43 @@ function cheatfind.startplugin()
 		return data
 	end
 
-	-- compare two data blocks, format is as lua string.unpack
+	-- compare two data blocks, format is as lua string.unpack, bne and beq val is table of masks
 	function cheat.comp(olddata, newdata, oper, format, val, bcd)
 		local ret = {}
 		local ref = {} -- this is a helper for comparing two match lists
+		local bitmask = nil
+
+		local function bne(a, b, val, addr)
+			if val == 0 then
+				bitmask = a ~ b
+				return bitmask ~= 0
+			elseif not val[addr] then
+				return false
+			else
+				bitmask = (a ~ b) & val[addr]
+				return bitmask ~= 0
+			end
+		end
+
+		local function beq(a, b, val, addr)
+			if val == 0 then
+				bitmask = ~a ~ b
+				return bitmask ~= 0
+			elseif not val[addr] then
+				return false
+			else
+				bitmask = (~a ~ b) & val[addr]
+				return bitmask ~= 0
+			end
+		end
 
 		local cfoper = { 
 			lt = function(a, b, val) return (a < b and val == 0) or (val > 0 and (a + val) == b) end,
 			gt = function(a, b, val) return (a > b and val == 0) or (val > 0 and (a - val) == b) end,
 			eq = function(a, b, val) return a == b end,
 			ne = function(a, b, val) return (a ~= b and val == 0) or
-				(val > 0 and ((a - val) == b or (a + val) == b)) end }
+				(val > 0 and ((a - val) == b or (a + val) == b)) end,
+			bne = bne, beq = beq }
 
 		local function check_bcd(val)
 			local a = val + 0x0666666666666666
@@ -101,15 +127,17 @@ function cheatfind.startplugin()
 			local new = string.unpack(format, newdata.block, i)
 			local oldc, newc = old, new
 			local comp = false
+			local addr = olddata.start + i - 1
 			if not bcd or (check_bcd(old) and check_bcd(new)) then
 				if bcd then
 					oldc = frombcd(old)
 					newc = frombcd(new)
 				end
-				if cfoper[oper](oldc, newc, val) then
-					ret[#ret + 1] = { addr = olddata.start + i - 1,
+				if cfoper[oper](oldc, newc, val, addr) then
+					ret[#ret + 1] = { addr = addr,
 					oldval = old,
-					newval = new}
+					newval = new,
+					bitmask = bitmask }
 					ref[ret[#ret].addr] = #ret
 				end
 			end
@@ -117,9 +145,22 @@ function cheatfind.startplugin()
 		return ret, ref
 	end
 
+	local function check_val(oper, val, matches)
+		if oper ~= "beq" and oper ~= "bne" then
+			return val
+		elseif not matches or not matches[1].bitmask then
+			return nil
+		end
+		local masks = {}
+		for num, match in pairs(matches) do
+			masks[match.addr] = match.bitmask
+		end
+		return masks
+	end
+
 	-- compare two blocks and filter by table of previous matches
 	function cheat.compnext(olddata, newdata, oldmatch, oper, format, val, bcd)
-		local matches, refs = cheat.comp(olddata, newdata, oper, format, val, bcd)
+		local matches, refs = cheat.comp(olddata, newdata, oper, format, check_val(oper, val, oldmatch), bcd)
 		local nonmatch = {}
 		local oldrefs = {}
 		for num, match in pairs(oldmatch) do
@@ -146,13 +187,13 @@ function cheatfind.startplugin()
 	-- compare a data block to the current state
 	function cheat.compcur(olddata, oper, format, val, bcd)
 		local newdata = cheat.save(olddata.space, olddata.start, olddata.size, olddata.space)
-		return cheat.comp(olddata, newdata, oper, format, val, bcd)
+		return cheat.comp(olddata, newdata, oper, format, check_val(oper, val, oldmatch), bcd)
 	end
 
 	-- compare a data block to the current state and filter
 	function cheat.compcurnext(olddata, oldmatch, oper, format, val, bcd)
 		local newdata = cheat.save(olddata.space, olddata.start, olddata.size, olddata.space)
-		return cheat.compnext(olddata, newdata, oldmatch, oper, format, val, bcd)
+		return cheat.compnext(olddata, newdata, oldmatch, oper, format, check_val(oper, val, oldmatch), bcd)
 	end
 
 
@@ -166,7 +207,7 @@ function cheatfind.startplugin()
 			   "little u32", "big u32", "little s32", "big s32", "little u64", "big u64", "little s64", "big s64" }
 	local width = 1
 	local bcd = 0
-	local optable = { "lt", "gt", "eq", "ne" }
+	local optable = { "lt", "gt", "eq", "ne", "beq", "bne" }
 	local opsel = 1
 	local value = 0
 	local leftop = 1
@@ -368,6 +409,10 @@ function cheatfind.startplugin()
 					manager:machine():popmessage("Left equal to right, value is ignored")
 				elseif optable[opsel] == "ne" then
 					manager:machine():popmessage("Left not equal to right, value is difference")
+				elseif optable[opsel] == "beq" then
+					manager:machine():popmessage("Left equal to right with bitmask, value is ignored")
+				elseif optable[opsel] == "bne" then
+					manager:machine():popmessage("Left not equal to right with bitmask, value is ignored")
 				end
 			end
 		elseif index == midx.val then
@@ -452,7 +497,7 @@ function cheatfind.startplugin()
 					manager:machine():popmessage("Cheat written to " .. filename)
 				else
 					local func = "return space:read"
-					local env = { space = devtable[devcur].space, read = devtable[devcur].space.read }
+					local env = { space = devtable[devcur].space }
 					if not dev.space.shortname then
 						func = func .. "_" .. wid
 					end
