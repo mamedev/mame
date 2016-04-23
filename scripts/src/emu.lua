@@ -225,8 +225,6 @@ files {
 	MAME_DIR .. "src/emu/video/rgbsse.h",
 	MAME_DIR .. "src/emu/video/rgbvmx.cpp",
 	MAME_DIR .. "src/emu/video/rgbvmx.h",
-	MAME_DIR .. "src/emu/video/vector.cpp",
-	MAME_DIR .. "src/emu/video/vector.h",
 }
 
 dependency {
