@@ -9,6 +9,7 @@
 #define NLD_MATRIX_SOLVER_H_
 
 #include "solver/nld_solver.h"
+#include "plib/pstream.h"
 
 #include <type_traits>
 
@@ -111,6 +112,11 @@ public:
 	plog_base<NL_DEBUG> &log() { return netlist().log(); }
 
 	virtual void log_stats();
+
+	virtual void create_solver_code(postream &strm)
+	{
+		strm.writeline(pfmt("/* {1} doesn't support static compile */"));
+	}
 
 protected:
 

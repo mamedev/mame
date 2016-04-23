@@ -12,7 +12,7 @@
 // MAME headers
 #include "emu.h"
 #include "rendutil.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 #include "emuopts.h"
 #include "uiinput.h"
 

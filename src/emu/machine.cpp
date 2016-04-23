@@ -74,15 +74,11 @@
 #include "config.h"
 #include "debugger.h"
 #include "render.h"
-#include "cheat.h"
 #include "uiinput.h"
 #include "crsshair.h"
 #include "unzip.h"
-#include "ui/datfile.h"
-#include "ui/inifile.h"
 #include "debug/debugvw.h"
 #include "image.h"
-#include "luaengine.h"
 #include "network.h"
 #include <time.h>
 
@@ -189,18 +185,6 @@ const char *running_machine::describe_context()
 	return m_context.c_str();
 }
 
-TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
-{
-	if (strlen(options().autoboot_script())!=0) {
-		manager().lua()->load_script(options().autoboot_script());
-	}
-	else if (strlen(options().autoboot_command())!=0) {
-		std::string cmd = std::string(options().autoboot_command());
-		strreplace(cmd, "'", "\\'");
-		std::string val = std::string("emu.keypost('").append(cmd).append("')");
-		manager().lua()->load_string(val.c_str());
-	}
-}
 
 //-------------------------------------------------
 //  start - initialize the emulated machine
@@ -226,11 +210,7 @@ void running_machine::start()
 
 	// create the video manager
 	m_video = std::make_unique<video_manager>(*this);
-	m_ui = std::make_unique<ui_manager>(*this);
-	m_ui->init();
-
-	// start the inifile manager
-	m_inifile = std::make_unique<inifile_manager>(*this);
+	m_ui = manager().create_ui(*this);
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
@@ -277,10 +257,6 @@ void running_machine::start()
 
 	m_render->resolve_tags();
 
-	// call the game driver's init function
-	// this is where decryption is done and memory maps are altered
-	// so this location in the init order is important
-	ui().set_startup_text("Initializing...", true);
 
 	// register callbacks for the devices, then start them
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(running_machine::reset_all_devices), this));
@@ -298,17 +274,6 @@ void running_machine::start()
 	else if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) != 0)
 		schedule_load("auto");
 
-	// set up the cheat engine
-	m_cheat = std::make_unique<cheat_manager>(*this);
-
-	// allocate autoboot timer
-	m_autoboot_timer = scheduler().timer_alloc(timer_expired_delegate(FUNC(running_machine::autoboot_callback), this));
-
-	// start datfile manager
-	m_datfile = std::make_unique<datfile_manager>(*this);
-
-	// start favorite manager
-	m_favorite = std::make_unique<favorite_manager>(*this);
 
 	manager().update_machine();
 }
@@ -320,7 +285,7 @@ void running_machine::start()
 
 int running_machine::run(bool firstrun)
 {
-	int error = MAMERR_NONE;
+	int error = EMU_ERR_NONE;
 
 	// use try/catch for deep error recovery
 	try
@@ -352,10 +317,8 @@ int running_machine::run(bool firstrun)
 		sound().ui_mute(false);
 
 		// initialize ui lists
-		ui().initialize(*this);
-
 		// display the startup screens
-		ui().display_startup_screens(firstrun);
+		manager().ui_initialize(*this, firstrun);
 
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();
@@ -379,7 +342,7 @@ int running_machine::run(bool firstrun)
 			if (!m_paused)
 			{
 				m_scheduler.timeslice();
-				manager().lua()->periodic_check();
+				emulator_info::periodic_check();
 			}
 			// otherwise, just pump video updates through
 			else
@@ -403,34 +366,34 @@ int running_machine::run(bool firstrun)
 	catch (emu_fatalerror &fatal)
 	{
 		osd_printf_error("Fatal error: %s\n", fatal.string());
-		error = MAMERR_FATALERROR;
+		error = EMU_ERR_FATALERROR;
 		if (fatal.exitcode() != 0)
 			error = fatal.exitcode();
 	}
 	catch (emu_exception &)
 	{
 		osd_printf_error("Caught unhandled emulator exception\n");
-		error = MAMERR_FATALERROR;
+		error = EMU_ERR_FATALERROR;
 	}
 	catch (binding_type_exception &btex)
 	{
 		osd_printf_error("Error performing a late bind of type %s to %s\n", btex.m_actual_type.name(), btex.m_target_type.name());
-		error = MAMERR_FATALERROR;
+		error = EMU_ERR_FATALERROR;
 	}
 	catch (add_exception &aex)
 	{
 		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag());
-		error = MAMERR_FATALERROR;
+		error = EMU_ERR_FATALERROR;
 	}
 	catch (std::exception &ex)
 	{
 		osd_printf_error("Caught unhandled %s exception: %s\n", typeid(ex).name(), ex.what());
-		error = MAMERR_FATALERROR;
+		error = EMU_ERR_FATALERROR;
 	}
 	catch (...)
 	{
 		osd_printf_error("Caught unhandled exception\n");
-		error = MAMERR_FATALERROR;
+		error = EMU_ERR_FATALERROR;
 	}
 
 	// make sure our phase is set properly before cleaning up,
@@ -918,9 +881,6 @@ void running_machine::soft_reset(void *ptr, INT32 param)
 
 	// call all registered reset callbacks
 	call_notifiers(MACHINE_NOTIFY_RESET);
-
-	// setup autoboot if needed
-	m_autoboot_timer->adjust(attotime(options().autoboot_delay(),0),0);
 
 	// now we're running
 	m_current_phase = MACHINE_PHASE_RUNNING;

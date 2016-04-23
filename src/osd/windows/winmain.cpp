@@ -20,7 +20,6 @@
 
 // MAME headers
 #include "emu.h"
-#include "clifront.h"
 #include "emuopts.h"
 
 // MAMEOS headers
@@ -294,8 +293,7 @@ int main(int argc, char *argv[])
 			FreeConsole();
 		}
 		osd.register_options();
-		cli_frontend frontend(options, osd);
-		result = frontend.execute(argc, argv);
+		result = emulator_info::start_frontend(options, osd, argc, argv);
 		osd_output::pop(&winerror);
 	}
 
@@ -324,7 +322,7 @@ static BOOL WINAPI control_handler(DWORD type)
 	if (g_current_machine == nullptr || type == CTRL_C_EVENT || type == CTRL_BREAK_EVENT)
 	{
 		fprintf(stderr, ", exiting\n");
-		TerminateProcess(GetCurrentProcess(), MAMERR_FATALERROR);
+		TerminateProcess(GetCurrentProcess(), EMU_ERR_FATALERROR);
 	}
 
 	// all other situations attempt to do a clean exit
@@ -379,14 +377,13 @@ void MameMainApp::Run()
 	osd_output::push(&winerror);
 
 	m_osd->register_options();
-	m_frontend = std::make_unique<cli_frontend>(*m_options.get(), *m_osd.get());
 
 	// To satisfy the latter things, pass in the module path name
 	char exe_path[MAX_PATH];
 	GetModuleFileNameA(NULL, exe_path, MAX_PATH);
 	char* args[2] = { exe_path, (char*)"-verbose" };
 
-	DWORD result = m_frontend->execute(ARRAY_LENGTH(args), args);
+	DWORD result = emulator_info::start_frontend(*m_options.get(), *m_osd.get(), ARRAY_LENGTH(args), args);
 	osd_output::pop(&winerror);
 }
 

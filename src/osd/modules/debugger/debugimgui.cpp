@@ -417,6 +417,9 @@ void debug_imgui::draw_bpoints(debug_area* view_ptr, bool* opened)
 		debug_view_xy vsize,totalsize;
 		unsigned char v;
 		int x,y;
+		ImVec2 xy1,xy2;
+		ImVec2 fsize = ImGui::CalcTextSize("A"); // any character will do, we should be using a monospaced font
+		ImDrawList* drawlist;
 
 		viewdata = view_ptr->view->viewdata();
 		totalsize = view_ptr->view->total_size();
@@ -430,33 +433,39 @@ void debug_imgui::draw_bpoints(debug_area* view_ptr, bool* opened)
 		view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
 		view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
 		view_ptr->has_focus = ImGui::IsWindowFocused();
+		drawlist = ImGui::GetWindowDrawList();
+		xy1.x = view_ptr->ofs_x;
+		xy1.y = view_ptr->ofs_y;
+		xy2 = fsize;
+		xy2.x += view_ptr->ofs_x;
+		xy2.y += view_ptr->ofs_y;
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
 			{
-				ImVec2 xy1,xy2;
 				char str[2];
 				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
+				ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
 				str[0] = v = viewdata->byte;
 				str[1] = '\0';
 				if(bg != base)
 				{
 					ImU32 bg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(bg.r()/255.0f,bg.g()/255.0f,bg.b()/255.0f,bg.a()/255.0f));
-					xy1.x = ImGui::GetCursorScreenPos().x + 1;
-					xy1.y = ImGui::GetCursorScreenPos().y;
-					xy2 = ImGui::CalcTextSize(str);
-					xy2.x += ImGui::GetCursorScreenPos().x + 1;
-					xy2.y += ImGui::GetCursorScreenPos().y;
-					ImGui::GetWindowDrawList()->AddRectFilled(xy1,xy2,bg_col);
+					xy1.x++; xy2.x++;
+					drawlist->AddRectFilled(xy1,xy2,bg_col);
+					xy1.x--; xy2.x--;
 				}
-				ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
-				ImGui::Text("%c",v);
-				ImGui::PopStyleColor();
-				if(x<vsize.x - 1)
-					ImGui::SameLine();
+				drawlist->AddText(xy1,fg_col,str);
+				xy1.x += fsize.x;
+				xy2.x += fsize.x;
 				viewdata++;
 			}
+			xy1.x = view_ptr->ofs_x;
+			xy2.x = view_ptr->ofs_x + fsize.x;
+			xy1.y += fsize.y;
+			xy2.y += fsize.y;
 		}
+		ImGui::SetCursorPos(ImVec2(xy1.x - view_ptr->ofs_x, xy1.y - view_ptr->ofs_y));
 		ImGui::PopStyleVar(2);
 		ImGui::EndChild();
 
@@ -504,6 +513,9 @@ void debug_imgui::draw_log(debug_area* view_ptr, bool* opened)
 		debug_view_xy vsize,totalsize;
 		unsigned char v;
 		int x,y;
+		ImVec2 xy1;
+		ImVec2 fsize = ImGui::CalcTextSize("A"); // any character will do, we should be using a monospaced font
+		ImDrawList* drawlist;
 
 		viewdata = view_ptr->view->viewdata();
 		totalsize = view_ptr->view->total_size();
@@ -521,21 +533,26 @@ void debug_imgui::draw_log(debug_area* view_ptr, bool* opened)
 		view_ptr->view_width = ImGui::GetContentRegionMax().x;
 		view_ptr->view_height = ImGui::GetContentRegionMax().y;
 		view_ptr->has_focus = ImGui::IsWindowFocused();
+		xy1.x = view_ptr->ofs_x;
+		xy1.y = view_ptr->ofs_y;
+		drawlist = ImGui::GetWindowDrawList();
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
 			{
-				ImVec2 xy1,xy2;
+				char str[2];
 				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
-				v = viewdata->byte;
-				ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
-				ImGui::Text("%c",v);
-				ImGui::PopStyleColor();
-				if(x<vsize.x - 1)
-					ImGui::SameLine();
+				ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
+				str[0] = v = viewdata->byte;
+				str[1] = '\0';
+				drawlist->AddText(xy1,fg_col,str);
+				xy1.x += fsize.x;
 				viewdata++;
 			}
+			xy1.x = view_ptr->ofs_x;
+			xy1.y += fsize.y;
 		}
+		ImGui::SetCursorPos(ImVec2(xy1.x - view_ptr->ofs_x, xy1.y - view_ptr->ofs_y));
 		ImGui::PopStyleVar(2);
 		ImGui::EndChild();
 
@@ -582,6 +599,9 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		unsigned char v;
 		int x,y,idx;
 		bool done = false;
+		ImVec2 xy1,xy2;
+		ImVec2 fsize = ImGui::CalcTextSize("A"); // any character will do, we should be using a monospaced font
+		ImDrawList* drawlist;
 
 		if(ImGui::BeginMenuBar())
 		{
@@ -642,33 +662,39 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		view_ptr->view_width = ImGui::GetContentRegionMax().x;
 		view_ptr->view_height = ImGui::GetContentRegionMax().y;
 		view_ptr->has_focus = ImGui::IsWindowFocused();
+		drawlist = ImGui::GetWindowDrawList();
+		xy1.x = view_ptr->ofs_x;
+		xy1.y = view_ptr->ofs_y;
+		xy2 = fsize;
+		xy2.x += view_ptr->ofs_x;
+		xy2.y += view_ptr->ofs_y;
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
 			{
-				ImVec2 xy1,xy2;
 				char str[2];
 				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
+				ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
 				str[0] = v = viewdata->byte;
 				str[1] = '\0';
 				if(bg != base)
 				{
 					ImU32 bg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(bg.r()/255.0f,bg.g()/255.0f,bg.b()/255.0f,bg.a()/255.0f));
-					xy1.x = ImGui::GetCursorScreenPos().x + 1;
-					xy1.y = ImGui::GetCursorScreenPos().y;
-					xy2 = ImGui::CalcTextSize(str);
-					xy2.x += ImGui::GetCursorScreenPos().x + 1;
-					xy2.y += ImGui::GetCursorScreenPos().y;
+					xy1.x++; xy2.x++;
 					ImGui::GetWindowDrawList()->AddRectFilled(xy1,xy2,bg_col);
+					xy1.x--; xy2.x--;
 				}
-				ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
-				ImGui::Text("%c",v);
-				ImGui::PopStyleColor();
-				if(x<vsize.x - 1)
-					ImGui::SameLine();
+				drawlist->AddText(xy1,fg_col,str);
+				xy1.x += fsize.x;
+				xy2.x += fsize.x;
 				viewdata++;
 			}
+			xy1.x = view_ptr->ofs_x;
+			xy2.x = view_ptr->ofs_x + fsize.x;
+			xy1.y += fsize.y;
+			xy2.y += fsize.y;
 		}
+		ImGui::SetCursorPos(ImVec2(xy1.x - view_ptr->ofs_x, xy1.y - view_ptr->ofs_y));
 		ImGui::PopStyleVar(2);
 		ImGui::EndChild();
 
@@ -708,6 +734,9 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		unsigned char v;
 		int x,y,idx;
 		bool done = false;
+		ImVec2 xy1,xy2;
+		ImVec2 fsize = ImGui::CalcTextSize("A"); // any character will do, we should be using a monospaced font
+		ImDrawList* drawlist;
 		
 		if(ImGui::BeginMenuBar())
 		{
@@ -801,33 +830,39 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		view_ptr->view_width = ImGui::GetContentRegionMax().x;
 		view_ptr->view_height = ImGui::GetContentRegionMax().y;
 		view_ptr->has_focus = ImGui::IsWindowFocused();
+		drawlist = ImGui::GetWindowDrawList();
+		xy1.x = view_ptr->ofs_x;
+		xy1.y = view_ptr->ofs_y;
+		xy2 = fsize;
+		xy2.x += view_ptr->ofs_x;
+		xy2.y += view_ptr->ofs_y;
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
 			{
-				ImVec2 xy1,xy2;
 				char str[2];
 				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
+				ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
 				str[0] = v = viewdata->byte;
 				str[1] = '\0';
 				if(bg != base)
 				{
 					ImU32 bg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(bg.r()/255.0f,bg.g()/255.0f,bg.b()/255.0f,bg.a()/255.0f));
-					xy1.x = ImGui::GetCursorScreenPos().x + 1;
-					xy1.y = ImGui::GetCursorScreenPos().y;
-					xy2 = ImGui::CalcTextSize(str);
-					xy2.x += ImGui::GetCursorScreenPos().x + 1;
-					xy2.y += ImGui::GetCursorScreenPos().y;
-					ImGui::GetWindowDrawList()->AddRectFilled(xy1,xy2,bg_col);
+					xy1.x++; xy2.x++;
+					drawlist->AddRectFilled(xy1,xy2,bg_col);
+					xy1.x--; xy2.x--;
 				}
-				ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
-				ImGui::Text("%c",v);
-				ImGui::PopStyleColor();
-				if(x<vsize.x - 1)
-					ImGui::SameLine();
+				drawlist->AddText(xy1,fg_col,str);
+				xy1.x += fsize.x;
+				xy2.x += fsize.x;
 				viewdata++;
 			}
+			xy1.x = view_ptr->ofs_x;
+			xy2.x = view_ptr->ofs_x + fsize.x;
+			xy1.y += fsize.y;
+			xy2.y += fsize.y;
 		}
+		ImGui::SetCursorPos(ImVec2(xy1.x - view_ptr->ofs_x, xy1.y - view_ptr->ofs_y));
 		ImGui::PopStyleVar(2);
 		ImGui::EndChild();
 
@@ -865,6 +900,10 @@ void debug_imgui::draw_console()
 		debug_view_xy vsize,totalsize;
 		unsigned char v;
 		int x,y;
+		ImDrawList* drawlist;
+		ImVec2 xy1,xy2;
+		ImVec2 fsize = ImGui::CalcTextSize("A");
+		std::string str;
 
 		if(ImGui::BeginMenuBar())
 		{
@@ -959,20 +998,25 @@ void debug_imgui::draw_console()
 		view_main_regs->view_width = ImGui::GetContentRegionMax().x;
 		view_main_regs->view_height = ImGui::GetContentRegionMax().y;
 		view_main_regs->has_focus = ImGui::IsWindowFocused();
+		xy1.x = view_main_regs->ofs_x;
+		xy1.y = view_main_regs->ofs_y;
+		drawlist = ImGui::GetWindowDrawList();
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
 			{
 				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
+				ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
 				v = viewdata->byte;
-				ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
-				ImGui::Text("%c",v);
-				ImGui::PopStyleColor();
-				if(x<vsize.x - 1)
-					ImGui::SameLine();
+				str = v;
+				drawlist->AddText(xy1,fg_col,str.c_str());
 				viewdata++;
+				xy1.x += fsize.x;
 			}
+			xy1.x = view_main_regs->ofs_x;
+			xy1.y += fsize.y;
 		}
+		ImGui::SetCursorPos(ImVec2(xy1.x - view_main_regs->ofs_x, xy1.y - view_main_regs->ofs_y));
 		ImGui::PopStyleVar(2);
 		ImGui::EndChild();
 
@@ -996,33 +1040,38 @@ void debug_imgui::draw_console()
 		view_main_disasm->view_width = ImGui::GetContentRegionMax().x;
 		view_main_disasm->view_height = ImGui::GetContentRegionMax().y;
 		view_main_disasm->has_focus = ImGui::IsWindowFocused();
+		xy1.x = view_main_disasm->ofs_x;
+		xy1.y = view_main_disasm->ofs_y;
+		xy2.x = view_main_disasm->ofs_x + fsize.x;
+		xy2.y = view_main_disasm->ofs_y + fsize.y;
+		drawlist = ImGui::GetWindowDrawList();
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
 			{
-				ImVec2 xy1,xy2;
 				char str[2];
 				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
+				ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
 				str[0] = v = viewdata->byte;
 				str[1] = '\0';
 				if(bg != base)
 				{
 					ImU32 bg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(bg.r()/255.0f,bg.g()/255.0f,bg.b()/255.0f,bg.a()/255.0f));
-					xy1.x = ImGui::GetCursorScreenPos().x + 1;
-					xy1.y = ImGui::GetCursorScreenPos().y;
-					xy2 = ImGui::CalcTextSize(str);
-					xy2.x += ImGui::GetCursorScreenPos().x + 1;
-					xy2.y += ImGui::GetCursorScreenPos().y;
+					xy1.x++; xy2.x++;
 					ImGui::GetWindowDrawList()->AddRectFilled(xy1,xy2,bg_col);
+					xy1.x--; xy2.x--;
 				}
-				ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
-				ImGui::Text("%c",v);
-				ImGui::PopStyleColor();
-				if(x<vsize.x - 1)
-					ImGui::SameLine();
+				drawlist->AddText(xy1,fg_col,str);
 				viewdata++;
+				xy1.x += fsize.x;
+				xy2.x += fsize.x;
 			}
+			xy1.x = view_main_disasm->ofs_x;
+			xy1.y += fsize.y;
+			xy2.x = view_main_disasm->ofs_x + fsize.x;
+			xy2.y += fsize.y;
 		}
+		ImGui::SetCursorPos(ImVec2(xy1.x - view_main_disasm->ofs_x, xy1.y - view_main_disasm->ofs_y));
 		ImGui::PopStyleVar(2);
 		ImGui::EndChild();
 
@@ -1046,17 +1095,23 @@ void debug_imgui::draw_console()
 		view_main_console->view_width = ImGui::GetContentRegionMax().x;
 		view_main_console->view_height = ImGui::GetContentRegionMax().y;
 		view_main_console->has_focus = ImGui::IsWindowFocused();
+		xy1.x = view_main_console->ofs_x;
+		xy1.y = view_main_console->ofs_y;
+		drawlist = ImGui::GetWindowDrawList();
 		for(y=0;y<vsize.y;y++)
 		{
 			for(x=0;x<vsize.x;x++)
 			{
 				v = viewdata->byte;
-				ImGui::Text("%c",v);
-				if(x<vsize.x - 1)
-					ImGui::SameLine();
+				str = v;
+				drawlist->AddText(xy1,ImGui::ColorConvertFloat4ToU32(ImVec4(0,0,0,255)),str.c_str());
+				xy1.x += fsize.x;
 				viewdata++;
 			}
+			xy1.x = view_main_console->ofs_x;
+			xy1.y += fsize.y;
 		}
+		ImGui::SetCursorPos(ImVec2(xy1.x - view_main_console->ofs_x, xy1.y - view_main_console->ofs_y));
 		ImGui::PopStyleVar(2);
 		ImGui::EndChild();
 		ImGui::Separator();

@@ -17,13 +17,12 @@
 // MAME headers
 #include "emu.h"
 #include "render.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 #include "rendutil.h"
 #include "emuopts.h"
 #include "aviio.h"
 #include "png.h"
 #include "screen.h"
-#include "ui/ui.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -275,7 +274,7 @@ void shaders::render_snapshot(surface *surface)
 	}
 
 	// add two text entries describing the image
-	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(build_version);
+	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
 	std::string text2 = std::string(machine->system().manufacturer).append(" ").append(machine->system().description);
 	png_info pnginfo = { 0 };
 	png_add_text(&pnginfo, "Software", text1.c_str());

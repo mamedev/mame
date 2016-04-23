@@ -36,63 +36,8 @@
 inline osd_ticks_t osd_ticks_per_second() { return CLOCKS_PER_SEC; }
 
 osd_ticks_t osd_ticks(void) { return clock(); }
-#else
-
 #endif
 
-/***************************************************************************
- * MAME COMPATIBILITY ...
- *
- * These are needed if we link without libutil
- ***************************************************************************/
-
-#if 0
-void ATTR_PRINTF(1,2) osd_printf_warning(const char *format, ...)
-{
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
-	vprintf(format, argptr);
-	va_end(argptr);
-}
-
-void *malloc_file_line(size_t size, const char *file, int line)
-{
-	// allocate the memory and fail if we can't
-	void *ret = osd_malloc(size);
-	memset(ret, 0, size);
-	return ret;
-}
-
-void *malloc_array_file_line(size_t size, const char *file, int line)
-{
-	// allocate the memory and fail if we can't
-	void *ret = osd_malloc_array(size);
-	memset(ret, 0, size);
-	return ret;
-}
-
-void free_file_line( void *memory, const char *file, int line )
-{
-	osd_free( memory );
-}
-
-void CLIB_DECL logerror(const char *format, ...)
-{
-	va_list arg;
-	va_start(arg, format);
-	vprintf(format, arg);
-	va_end(arg);
-}
-
-void report_bad_cast(const std::type_info &src_type, const std::type_info &dst_type)
-{
-	printf("Error: bad downcast<> or device<>.  Tried to convert a %s to a %s, which are incompatible.\n",
-			src_type.name(), dst_type.name());
-	throw;
-}
-#endif
 
 class tool_options_t : public poptions
 {
@@ -104,7 +49,7 @@ public:
 		opt_logs("l", "logs",        "",      "colon separated list of terminals to log", this),
 		opt_file("f", "file",        "-",     "file to process (default is stdin)", this),
 		opt_type("y", "type",        "spice", "spice:eagle", "type of file to be converted: spice,eagle", this),
-		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices", this),
+		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices|static", this),
 		opt_inp( "i", "input",       "",      "input file to process (default is none)", this),
 		opt_verb("v", "verbose",              "be verbose - this produces lots of output", this),
 		opt_quiet("q", "quiet",               "be quiet - no warnings", this),
@@ -209,7 +154,7 @@ void usage(tool_options_t &opts)
 {
 	perr("{}",
 		"Usage:\n"
-		"  nltool -help\n"
+		"  nltool --help\n"
 		"  nltool [options]\n"
 		"\n"
 		"Where:\n"
@@ -319,6 +264,24 @@ static void run(tool_options_t &opts)
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n", ttr, emutime, ttr/emutime*100.0);
 }
 
+static void static_compile(tool_options_t &opts)
+{
+	netlist_tool_t nt("netlist");
+
+	nt.m_opts = &opts;
+	nt.init();
+
+	nt.log().verbose.set_enabled(false);
+	nt.log().warning.set_enabled(false);
+
+	nt.read_netlist(opts.opt_file(), opts.opt_name());
+
+	nt.solver()->create_solver_code(pout_strm);
+
+	nt.stop();
+
+}
+
 /*-------------------------------------------------
     listdevices - list all known devices
 -------------------------------------------------*/
@@ -384,6 +347,7 @@ static void listdevices()
 #include "corealloc.h"
 #endif
 
+#if 0
 static const char *pmf_verbose[] =
 {
 	"NL_PMF_TYPE_VIRTUAL",
@@ -391,6 +355,7 @@ static const char *pmf_verbose[] =
 	"NL_PMF_TYPE_GNUC_PMF_CONV",
 	"NL_PMF_TYPE_INTERNAL"
 };
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -398,7 +363,7 @@ int main(int argc, char *argv[])
 	int ret;
 
 	perr("{}", "WARNING: This is Work In Progress! - It may fail anytime\n");
-	perr("Update dispatching using method {}\n", pmf_verbose[NL_PMF_TYPE]);
+	//perr("Update dispatching using method {}\n", pmf_verbose[NL_PMF_TYPE]);
 	if ((ret = opts.parse(argc, argv)) != argc)
 	{
 		perr("Error parsing {}\n", argv[ret]);
@@ -417,6 +382,8 @@ int main(int argc, char *argv[])
 		listdevices();
 	else if (cmd == "run")
 		run(opts);
+	else if (cmd == "static")
+		static_compile(opts);
 	else if (cmd == "convert")
 	{
 		pstring contents;

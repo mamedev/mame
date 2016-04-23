@@ -24,7 +24,7 @@
 
 #include "emu.h"
 #include "namcot.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 
 #include "cpu/m6502/m6502.h"
 

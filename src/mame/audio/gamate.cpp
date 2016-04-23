@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "includes/gamate.h"
-#include "ui/ui.h"
 
 
 enum { ClockDelay=32 };

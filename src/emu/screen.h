@@ -157,6 +157,7 @@ typedef device_delegate<void (screen_device &, bool)> screen_vblank_delegate;
 // ======================> screen_device
 
 class screen_device_svg_renderer;
+class render_container;
 
 class screen_device : public device_t
 {

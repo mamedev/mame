@@ -100,7 +100,6 @@ class device_image_interface;
 struct feature_list;
 class software_part;
 class software_info;
-class ui_menu;
 
 // device image interface function types
 typedef delegate<int (device_image_interface &)> device_image_load_delegate;
@@ -165,8 +164,6 @@ public:
 	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const = 0;
 	virtual const option_guide *create_option_guide() const = 0;
-
-	virtual ui_menu *get_selection_menu(running_machine &machine, class render_container *container);
 
 	const image_device_format *device_get_indexed_creatable_format(int index) { return m_formatlist.find(index); }
 	const image_device_format *device_get_named_creatable_format(const char *format_name);

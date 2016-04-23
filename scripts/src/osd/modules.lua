@@ -114,6 +114,9 @@ function osdmodulesbuild()
 		ext_includedir("uv"),
 	}
 
+	includedirs {
+		MAME_DIR .. "src/frontend/mame", -- for internal debugger
+	}
 	if _OPTIONS["targetos"]=="windows" then
 		includedirs {
 			MAME_DIR .. "3rdparty/winpcap/Include",

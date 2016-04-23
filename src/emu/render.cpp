@@ -45,7 +45,7 @@
 #include "config.h"
 #include "drivenum.h"
 #include "xmlfile.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 #include <zlib.h>
 
 

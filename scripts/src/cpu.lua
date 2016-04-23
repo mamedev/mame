@@ -1465,6 +1465,8 @@ end
 --------------------------------------------------
 -- NEC V-series Intel-compatible
 --@src/devices/cpu/nec/nec.h,CPUS["NEC"] = true
+--@src/devices/cpu/nec/v25.h,CPUS["NEC"] = true
+--@src/devices/cpu/nec/v53.h,CPUS["NEC"] = true
 --@src/devices/cpu/v30mz/v30mz.h,CPUS["V30MZ"] = true
 --------------------------------------------------
 

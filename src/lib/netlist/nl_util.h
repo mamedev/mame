@@ -12,6 +12,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
+#include <initializer_list>
 
 #include "plib/pstring.h"
 #include "plib/plists.h"
@@ -24,6 +25,22 @@ private:
 
 public:
 
+	static const pstring buildpath(std::initializer_list<pstring> list )
+	{
+		pstring ret = "";
+	    for( auto elem : list )
+	    {
+	    	if (ret == "")
+	    		ret = elem;
+	    	else
+#ifdef _WIN32
+	    		ret = ret + '\\' + elem;
+#else
+	    		ret = ret + '/' + elem;
+#endif
+	    }
+	    return ret;
+	}
 
 	static const pstring environment(const pstring &var, const pstring &default_val = "")
 	{

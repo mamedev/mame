@@ -9,6 +9,12 @@
 --
 ---------------------------------------------------------------------------
 
+files {
+	MAME_DIR .. "src/devices/video/poly.h",
+	MAME_DIR .. "src/devices/video/vector.cpp",
+	MAME_DIR .. "src/devices/video/vector.h",
+}
+
 --------------------------------------------------
 --
 --@src/devices/video/315_5124.h,VIDEOS["SEGA315_5124"] = true

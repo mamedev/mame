@@ -25,7 +25,7 @@ class matrix_solver_SOR_t: public matrix_solver_direct_t<m_N, _storage_N>
 public:
 
 	matrix_solver_SOR_t(const solver_parameters_t *params, int size)
-		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::DESCENDING, params, size)
+		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::ASCENDING, params, size)
 		, m_lp_fact(0)
 		{
 		}

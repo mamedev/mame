@@ -921,4 +921,11 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	}
 }
 
+void NETLIB_NAME(solver)::create_solver_code(postream &strm)
+{
+	for (auto & s : m_mat_solvers)
+		s->create_solver_code(strm);
+}
+
+
 NETLIB_NAMESPACE_DEVICES_END()
