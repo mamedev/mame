@@ -492,7 +492,7 @@ function cheatfind.startplugin()
 					local filename = string.format("%s_%08x_cheat.json", emu.romname(), match.addr)
 					local json = require("json")
 					local file = io.open(filename, "w")
-					file:write(json.stringify(cheat))
+					file:write(json.stringify({[1] = cheat}))
 					file:close()
 					manager:machine():popmessage("Cheat written to " .. filename)
 				else
