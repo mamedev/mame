@@ -61,6 +61,7 @@ struct filter_state
 	filter_real xprev[FILTER_ORDER_MAX];
 };
 
+#if 0
 /* Insert a value in the filter state */
 static inline void filter_insert(filter* f, filter_state* s, filter_real x) {
 	/* next state */
@@ -71,6 +72,7 @@ static inline void filter_insert(filter* f, filter_state* s, filter_real x) {
 	/* set x[0] */
 	s->xprev[s->prev_mac] = x;
 }
+#endif
 
 /* Filter types */
 #define FILTER_LOWPASS      0
