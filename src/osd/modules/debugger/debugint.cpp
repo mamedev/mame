@@ -9,7 +9,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 #include "ui/menu.h"
 #include "rendfont.h"
 #include "uiinput.h"

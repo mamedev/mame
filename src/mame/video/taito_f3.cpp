@@ -208,7 +208,6 @@ Playfield tile info:
 
 #include "emu.h"
 #include "includes/taito_f3.h"
-#include "ui/ui.h"
 #include "render.h"
 
 #define VERBOSE 0
@@ -327,7 +326,7 @@ pri_alp_bitmap
 
 void taito_f3_state::print_debug_info(bitmap_rgb32 &bitmap)
 {
-	UINT16 *f3_line_ram = m_f3_line_ram.get();
+/*	UINT16 *f3_line_ram = m_f3_line_ram.get();
 	int l[16];
 	char buf[64*16];
 	char *bufptr = buf;
@@ -395,7 +394,7 @@ void taito_f3_state::print_debug_info(bitmap_rgb32 &bitmap)
 	l[3]=f3_line_ram[0x15e0*2]&0xffff;
 	bufptr += sprintf(bufptr,"5000: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	machine().ui().draw_text(&machine().render().ui_container(), buf, 60, 40);
+	machine().ui().draw_text(&machine().render().ui_container(), buf, 60, 40);*/
 }
 
 /******************************************************************************/

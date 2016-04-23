@@ -172,7 +172,6 @@ Rowscroll style:
 
 #include "emu.h"
 #include "video/deco16ic.h"
-#include "ui/ui.h"
 #include "render.h"
 
 const device_type DECO16IC = &device_creator<deco16ic_device>;
@@ -866,7 +865,7 @@ void deco16ic_device::pf_update( const UINT16 *rowscroll_1_ptr, const UINT16 *ro
 
 void deco16ic_device::print_debug_info(bitmap_ind16 &bitmap)
 {
-	char buf[64*5];
+/*	char buf[64*5];
 
 	if (machine().input().code_pressed(KEYCODE_O))
 		return;
@@ -879,7 +878,7 @@ void deco16ic_device::print_debug_info(bitmap_ind16 &bitmap)
 	else
 		sprintf(buf, "\n\n");
 
-	machine().ui().draw_text(&machine().render().ui_container(), buf, 60, 40);
+	machine().ui().draw_text(&machine().render().ui_container(), buf, 60, 40);*/
 }
 
 /*****************************************************************************************/

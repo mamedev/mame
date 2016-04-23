@@ -30,7 +30,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 
 
 // OSD headers

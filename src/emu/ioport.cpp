@@ -95,7 +95,7 @@
 #include "config.h"
 #include "xmlfile.h"
 #include "profiler.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 #include "uiinput.h"
 
 #include "osdepend.h"
@@ -3545,7 +3545,7 @@ void ioport_manager::record_init()
 	header.set_basetime(systime.time);
 	header.set_version();
 	header.set_sysname(machine().system().name);
-	header.set_appdesc(util::string_format("%s %s", emulator_info::get_appname(), build_version));
+	header.set_appdesc(util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()));
 
 	// write it
 	header.write(m_record_file);

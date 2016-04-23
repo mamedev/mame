@@ -11,7 +11,7 @@
 #include "emuopts.h"
 #include "drivenum.h"
 #include "softlist.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 
 
 #define LOG_LOAD 0
@@ -487,7 +487,7 @@ void rom_load_manager::display_rom_load_results(bool from_list)
 	{
 		/* create the error message and exit fatally */
 		osd_printf_error("%s", m_errorstring.c_str());
-		fatalerror_exitcode(machine(), MAMERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
+		fatalerror_exitcode(machine(), EMU_ERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
 	}
 
 	/* if we had warnings, output them, but continue */

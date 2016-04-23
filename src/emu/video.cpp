@@ -12,12 +12,11 @@
 #include "emuopts.h"
 #include "png.h"
 #include "debugger.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 #include "aviio.h"
 #include "crsshair.h"
 #include "rendersw.inc"
 #include "output.h"
-#include "luaengine.h"
 
 #include "snap.lh"
 
@@ -223,7 +222,7 @@ void video_manager::frame_update(bool debug)
 	}
 
 	// draw the user interface
-	machine().ui().update_and_render(&machine().render().ui_container());
+	emulator_info::draw_user_interface(machine());
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();
@@ -235,7 +234,7 @@ void video_manager::frame_update(bool debug)
 	machine().osd().update(!debug && skipped_it);
 	g_profiler.stop();
 
-	machine().manager().lua()->periodic_check();
+	emulator_info::periodic_check();
 
 	// perform tasks for this frame
 	if (!debug)
@@ -315,7 +314,7 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	create_snapshot_bitmap(screen);
 
 	// add two text entries describing the image
-	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(build_version);
+	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
 	std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().description);
 	png_info pnginfo = { nullptr };
 	png_add_text(&pnginfo, "Software", text1.c_str());
@@ -708,7 +707,7 @@ bool video_manager::finish_screen_updates()
 			anything_changed = true;
 
 	// draw HUD from LUA callback (if any)
-	anything_changed |= machine().manager().lua()->frame_hook();
+	anything_changed |= emulator_info::frame_hook();
 
 	// update our movie recording and burn-in state
 	if (!machine().paused())
@@ -1312,7 +1311,7 @@ void video_manager::record_frame()
 			png_info pnginfo = { nullptr };
 			if (m_mng_frame == 0)
 			{
-				std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(build_version);
+				std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
 				std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().description);
 				png_add_text(&pnginfo, "Software", text1.c_str());
 				png_add_text(&pnginfo, "System", text2.c_str());

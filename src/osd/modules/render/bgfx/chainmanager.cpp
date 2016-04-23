@@ -10,8 +10,7 @@
 //============================================================
 
 #include "emu.h"
-#include "ui/ui.h"
-#include "ui/menu.h"
+#include "ui/uimain.h"
 
 #include "osdcore.h"
 #include "modules/osdwindow.h"

@@ -192,6 +192,7 @@ end
 	links {
 		"netlist",
 		"optional",
+		"frontend",
 		"emu",
 		"formats",
 	}

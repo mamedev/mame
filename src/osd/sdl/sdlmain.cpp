@@ -36,7 +36,6 @@
 // MAME headers
 #include "osdepend.h"
 #include "emu.h"
-#include "clifront.h"
 #include "emuopts.h"
 #include "strconv.h"
 
@@ -218,8 +217,7 @@ int main(int argc, char *argv[])
 		sdl_options options;
 		sdl_osd_interface osd(options);
 		osd.register_options();
-		cli_frontend frontend(options, osd);
-		res = frontend.execute(argc, argv);
+		res = emulator_info::start_frontend(options, osd, argc, argv);
 	}
 
 #ifdef SDLMAME_UNIX
@@ -292,7 +290,7 @@ void sdl_osd_interface::osd_exit()
 
 static void defines_verbose(void)
 {
-	osd_printf_verbose("Build version:      %s\n", build_version);
+	osd_printf_verbose("Build version:      %s\n", emulator_info::get_build_version());
 	osd_printf_verbose("Build architecure:  ");
 	MACRO_VERBOSE(SDLMAME_ARCH);
 	osd_printf_verbose("\n");

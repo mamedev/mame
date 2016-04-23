@@ -82,7 +82,6 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 //**************************************************************************
 
 // forward declarations
-class cheat_manager;
 class render_manager;
 class sound_manager;
 class video_manager;
@@ -99,10 +98,7 @@ class image_manager;
 class rom_load_manager;
 class debugger_manager;
 class osd_interface;
-class datfile_manager;
 enum class config_type;
-class inifile_manager;
-class favorite_manager;
 struct debugcpu_private;
 
 
@@ -170,10 +166,6 @@ public:
 	memory_manager &memory() { return m_memory; }
 	ioport_manager &ioport() { return m_ioport; }
 	parameters_manager &parameters() { return m_parameters; }
-	cheat_manager &cheat() const { assert(m_cheat != nullptr); return *m_cheat; }
-	datfile_manager &datfile() const { assert(m_datfile != nullptr); return *m_datfile; }
-	inifile_manager &inifile() const { assert(m_inifile != nullptr); return *m_inifile; }
-	favorite_manager &favorite() const { assert(m_favorite != nullptr); return *m_favorite; }
 	render_manager &render() const { assert(m_render != nullptr); return *m_render; }
 	input_manager &input() const { assert(m_input != nullptr); return *m_input; }
 	sound_manager &sound() const { assert(m_sound != nullptr); return *m_sound; }
@@ -288,19 +280,16 @@ private:
 	void presave_all_devices();
 	void postload_all_devices();
 
-	TIMER_CALLBACK_MEMBER(autoboot_callback);
-
 	// internal state
 	const machine_config &  m_config;               // reference to the constructed machine_config
 	const game_driver &     m_system;               // reference to the definition of the game machine
 	machine_manager &       m_manager;              // reference to machine manager system
 	// managers
-	std::unique_ptr<cheat_manager> m_cheat;            // internal data from cheat.cpp
 	std::unique_ptr<render_manager> m_render;          // internal data from render.cpp
 	std::unique_ptr<input_manager> m_input;            // internal data from input.cpp
 	std::unique_ptr<sound_manager> m_sound;            // internal data from sound.cpp
 	std::unique_ptr<video_manager> m_video;            // internal data from video.cpp
-	std::unique_ptr<ui_manager> m_ui;                  // internal data from ui.cpp
+	ui_manager *m_ui;				                   // internal data from ui.cpp
 	std::unique_ptr<ui_input_manager> m_ui_input;      // internal data from uiinput.cpp
 	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.cpp
 	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.cpp
@@ -375,11 +364,6 @@ private:
 	ioport_manager          m_ioport;               // I/O port manager
 	parameters_manager      m_parameters;           // parameters manager
 	device_scheduler        m_scheduler;            // scheduler object
-	emu_timer               *m_autoboot_timer;      // autoboot timer
-
-	std::unique_ptr<datfile_manager>   m_datfile;      // internal data from datfile.c
-	std::unique_ptr<inifile_manager>   m_inifile;      // internal data from inifile.c for INIs
-	std::unique_ptr<favorite_manager>  m_favorite;     // internal data from inifile.c for favorites
 
 	// string formatting buffer
 	mutable util::ovectorstream m_string_buffer;

@@ -11,12 +11,9 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "drivenum.h"
-#include "ui/ui.h"
-#include "ui/menu.h"
+#include "ui/uimain.h"
 #include "zippath.h"
-#include "ui/imgcntrl.h"
 #include "softlist.h"
-#include "image.h"
 #include "formats/ioprocs.h"
 
 //**************************************************************************
@@ -1350,16 +1347,6 @@ std::string device_image_interface::software_get_default_slot(const char *defaul
 		}
 	}
 	return result;
-}
-
-/*-------------------------------------------------
-    get_selection_menu - create the menu stack
-    for ui-level image selection
--------------------------------------------------*/
-
-ui_menu *device_image_interface::get_selection_menu(running_machine &machine, render_container *container)
-{
-	return global_alloc_clear<ui_menu_control_device_image>(machine, container, this);
 }
 
 /* ----------------------------------------------------------------------- */

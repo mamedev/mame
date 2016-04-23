@@ -1317,6 +1317,8 @@ group "core"
 
 dofile(path.join("src", "emu.lua"))
 
+dofile(path.join("src", "mame", "frontend.lua"))
+
 group "devices"
 dofile(path.join("src", "devices.lua"))
 devicesProject(_OPTIONS["target"],_OPTIONS["subtarget"])

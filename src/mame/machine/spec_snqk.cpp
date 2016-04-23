@@ -28,7 +28,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 #include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
 #include "sound/ay8910.h"

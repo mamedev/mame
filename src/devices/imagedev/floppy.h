@@ -19,8 +19,6 @@
 #include "formats/td0_dsk.h"
 #include "formats/cqm_dsk.h"
 #include "formats/dsk_dsk.h"
-#include "ui/menu.h"
-#include "ui/imgcntrl.h"
 #include "sound/samples.h"
 
 #define MCFG_FLOPPY_DRIVE_ADD(_tag, _slot_intf, _def_slot, _formats)  \
@@ -134,8 +132,6 @@ public:
 	UINT32 get_form_factor() const;
 	UINT32 get_variant() const;
 
-	virtual ui_menu *get_selection_menu(running_machine &machine, class render_container *container) override;
-
 	static const floppy_format_type default_floppy_formats[];
 
 	// Enable sound
@@ -206,25 +202,6 @@ protected:
 	bool    m_make_sound;
 	floppy_sound_device* m_sound_out;
 };
-
-class ui_menu_control_floppy_image : public ui_menu_control_device_image {
-public:
-	ui_menu_control_floppy_image(running_machine &machine, render_container *container, device_image_interface *image);
-	virtual ~ui_menu_control_floppy_image();
-
-	virtual void handle() override;
-
-protected:
-	enum { SELECT_FORMAT = LAST_ID, SELECT_MEDIA, SELECT_RW };
-
-	floppy_image_format_t **format_array;
-	floppy_image_format_t *input_format, *output_format;
-	std::string input_filename, output_filename;
-
-	void do_load_create();
-	virtual void hook_load(std::string filename, bool softlist) override;
-};
-
 
 #define DECLARE_FLOPPY_IMAGE_DEVICE(_name, _interface) \
 	class _name : public floppy_image_device { \

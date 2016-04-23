@@ -27,7 +27,7 @@
 // MAME headers
 #include "emu.h"
 #include "osdepend.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 #include "uiinput.h"
 #include "strconv.h"
 

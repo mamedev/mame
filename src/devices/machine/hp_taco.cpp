@@ -139,7 +139,7 @@
 //
 #include "emu.h"
 #include "hp_taco.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 
 // Debugging
 #define VERBOSE 1
@@ -1688,6 +1688,7 @@ void hp_taco_device::call_unload()
 
 void hp_taco_device::call_display()
 {
+/*	
         // Mostly lifted from cassette_image_device::call_display ;)
 
         // Do not show anything if image not loaded or tape not moving
@@ -1720,6 +1721,7 @@ void hp_taco_device::call_display()
 	y *= device().machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 
 	device().machine().ui().draw_text_box(&device().machine().render().ui_container(), buffer, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
+	*/
 }
 
 const char *hp_taco_device::file_extensions() const

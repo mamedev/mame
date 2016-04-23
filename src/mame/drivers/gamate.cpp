@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "includes/gamate.h"
-#include "ui/ui.h"
+#include "ui/uimain.h"
 #include "rendlay.h"
 #include "softlist.h"
 
