@@ -67,7 +67,7 @@ function cheatfind.startplugin()
 		local bitmask = nil
 
 		local function bne(a, b, val, addr)
-			if val == 0 then
+			if type(val) ~= "table" then
 				bitmask = a ~ b
 				return bitmask ~= 0
 			elseif not val[addr] then
