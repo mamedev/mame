@@ -1971,6 +1971,35 @@ if (BUSES["NEOGEO_CTRL"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/sat_ctrl/ctrl.h,BUSES["SAT_CTRL"] = true
+---------------------------------------------------
+
+if (BUSES["SAT_CTRL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sat_ctrl/ctrl.cpp",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/ctrl.h",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/analog.cpp",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/analog.h",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/joy.cpp",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/joy.h",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/joy_md.cpp",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/joy_md.h",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/keybd.cpp",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/keybd.h",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/mouse.h",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/multitap.cpp",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/multitap.h",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/pointer.cpp",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/pointer.h",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/racing.cpp",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/racing.h",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/segatap.cpp",
+		MAME_DIR .. "src/devices/bus/sat_ctrl/segatap.h",
+	}
+end
 
 ---------------------------------------------------
 --

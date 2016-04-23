@@ -8,6 +8,8 @@
 #include "cpu/scudsp/scudsp.h"
 #include "cpu/sh2/sh2.h"
 
+#include "bus/sat_ctrl/ctrl.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -38,7 +40,9 @@ public:
 			m_cart3(*this, "stv_slot3"),
 			m_cart4(*this, "stv_slot4"),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_ctrl1(*this, "ctrl1"),
+			m_ctrl2(*this, "ctrl2")
 	{
 	}
 
@@ -173,8 +177,8 @@ public:
 	optional_device<generic_slot_device> m_cart4;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-
-
+	optional_device<saturn_control_port_device> m_ctrl1;
+	optional_device<saturn_control_port_device> m_ctrl2;
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);
