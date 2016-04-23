@@ -9,7 +9,54 @@
 --
 ----------------------------------------------------------------------------
 
-
+files {
+	MAME_DIR .. "src/devices/machine/bcreader.cpp",
+	MAME_DIR .. "src/devices/machine/bcreader.h",
+	MAME_DIR .. "src/devices/machine/buffer.cpp",
+	MAME_DIR .. "src/devices/machine/buffer.h",
+	MAME_DIR .. "src/devices/machine/clock.cpp",
+	MAME_DIR .. "src/devices/machine/clock.h",
+	MAME_DIR .. "src/devices/machine/keyboard.cpp",
+	MAME_DIR .. "src/devices/machine/keyboard.h",
+	MAME_DIR .. "src/devices/machine/laserdsc.cpp",
+	MAME_DIR .. "src/devices/machine/laserdsc.h",
+	MAME_DIR .. "src/devices/machine/latch.cpp",
+	MAME_DIR .. "src/devices/machine/latch.h",
+	MAME_DIR .. "src/devices/machine/nvram.cpp",
+	MAME_DIR .. "src/devices/machine/nvram.h",
+	MAME_DIR .. "src/devices/machine/ram.cpp",
+	MAME_DIR .. "src/devices/machine/ram.h",
+	MAME_DIR .. "src/devices/machine/legscsi.cpp",
+	MAME_DIR .. "src/devices/machine/legscsi.h",
+	MAME_DIR .. "src/devices/machine/terminal.cpp",
+	MAME_DIR .. "src/devices/machine/terminal.h",
+}
+files {
+	MAME_DIR .. "src/devices/imagedev/bitbngr.cpp",
+	MAME_DIR .. "src/devices/imagedev/bitbngr.h",
+	MAME_DIR .. "src/devices/imagedev/cassette.cpp",
+	MAME_DIR .. "src/devices/imagedev/cassette.h",
+	MAME_DIR .. "src/devices/imagedev/chd_cd.cpp",
+	MAME_DIR .. "src/devices/imagedev/chd_cd.h",
+	MAME_DIR .. "src/devices/imagedev/diablo.cpp",
+	MAME_DIR .. "src/devices/imagedev/diablo.h",
+	MAME_DIR .. "src/devices/imagedev/flopdrv.cpp",
+	MAME_DIR .. "src/devices/imagedev/flopdrv.h",
+	MAME_DIR .. "src/devices/imagedev/floppy.cpp",
+	MAME_DIR .. "src/devices/imagedev/floppy.h",
+	MAME_DIR .. "src/devices/imagedev/harddriv.cpp",
+	MAME_DIR .. "src/devices/imagedev/harddriv.h",
+	MAME_DIR .. "src/devices/imagedev/mfmhd.cpp",
+	MAME_DIR .. "src/devices/imagedev/mfmhd.h",
+	MAME_DIR .. "src/devices/imagedev/midiin.cpp",
+	MAME_DIR .. "src/devices/imagedev/midiin.h",
+	MAME_DIR .. "src/devices/imagedev/midiout.cpp",
+	MAME_DIR .. "src/devices/imagedev/midiout.h",
+	MAME_DIR .. "src/devices/imagedev/printer.cpp",
+	MAME_DIR .. "src/devices/imagedev/printer.h",
+	MAME_DIR .. "src/devices/imagedev/snapquik.cpp",
+	MAME_DIR .. "src/devices/imagedev/snapquik.h",
+}
 ---------------------------------------------------
 --
 --@src/devices/machine/akiko.h,MACHINES["AKIKO"] = true

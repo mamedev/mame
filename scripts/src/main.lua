@@ -190,9 +190,9 @@ end
 		"qtdbg_" .. _OPTIONS["osd"],
 	}
 	links {
+		"frontend",
 		"netlist",
 		"optional",
-		"frontend",
 		"emu",
 		"formats",
 	}
