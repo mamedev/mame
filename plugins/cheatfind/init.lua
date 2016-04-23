@@ -476,7 +476,7 @@ function cheatfind.startplugin()
 				end
 				
 				if dev.space.shortname then
-					cheat.ram = dev.tag
+					cheat.ram = { ram = dev.tag }
 					cheat.script.on = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
 				else
 					cheat.space = { cpu = { tag = dev.tag, type = "program" } }

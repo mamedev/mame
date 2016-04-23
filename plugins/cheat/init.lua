@@ -217,8 +217,7 @@ function cheat.startplugin()
 		end
 		if cheat.screen then
 			for name, screen in pairs(cheat.screen) do
-				local scr
-				scr = manager:machine().screens[screen]
+				local scr = manager:machine().screens[screen]
 				if not scr then
 					local tag
 					tag, scr = next(manager:machine().screens) -- get any screen
@@ -228,8 +227,7 @@ function cheat.startplugin()
 		end
 		if cheat.region then
 			for name, region in pairs(cheat.region) do
-				local mem 
-				mem = manager:machine():memory().regions[region]
+				local mem = manager:machine():memory().regions[region]
 				if not mem then
 					emu.print_verbose("error loading cheat script: " .. cheat.desc)
 					cheat = { desc = cheat.desc .. " error" }
@@ -239,15 +237,14 @@ function cheat.startplugin()
 			end
 		end
 		if cheat.ram then
-			for name, ram in pairs(cheat.ram) do
-				local ram
-				ram = manager:machine().devices[ram]
+			for name, tag in pairs(cheat.ram) do
+				local ram = manager:machine().devices[tag]
 				if not ram then
 					emu.print_verbose("error loading cheat script: " .. cheat.desc)
 					cheat = { desc = cheat.desc .. " error" }
 					return
 				end
-				cheat.cheat_env[name] = emu.item(ram.items["0/pointer"])
+				cheat.cheat_env[name] = emu.item(ram.items["0/m_pointer"])
 			end
 		end
 		local param = cheat.parameter
