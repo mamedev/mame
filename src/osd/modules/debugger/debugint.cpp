@@ -9,7 +9,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui/uimain.h"
+#include "ui/ui.h"
 #include "ui/menu.h"
 #include "rendfont.h"
 #include "uiinput.h"
@@ -370,7 +370,7 @@ static void dview_draw_outlined_box(DView *dv, int rtype, int x, int y, int w, i
 	rectangle r;
 
 	dview_get_rect(dv, rtype, r);
-	dv->container->manager().machine().ui().draw_outlined_box(dv->container, NX(dv, x + r.min_x), NY(dv, y + r.min_y),
+	mame_machine_manager::instance()->ui().draw_outlined_box(dv->container, NX(dv, x + r.min_x), NY(dv, y + r.min_y),
 			NX(dv, x + r.min_x + w), NY(dv, y + r.min_y + h), bg);
 }
 

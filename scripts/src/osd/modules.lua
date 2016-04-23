@@ -57,6 +57,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/diagnostics/none.cpp",
 		MAME_DIR .. "src/osd/modules/diagnostics/diagnostics_win32.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/none.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/debugint.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugwin.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugimgui.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_sdl.cpp",
@@ -113,6 +114,9 @@ function osdmodulesbuild()
 		ext_includedir("uv"),
 	}
 
+	includedirs {
+		MAME_DIR .. "src/frontend/mame", -- for internal debugger
+	}
 	if _OPTIONS["targetos"]=="windows" then
 		includedirs {
 			MAME_DIR .. "3rdparty/winpcap/Include",
