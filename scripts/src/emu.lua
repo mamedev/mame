@@ -205,8 +205,6 @@ files {
 	MAME_DIR .. "src/emu/debug/express.h",
 	MAME_DIR .. "src/emu/debug/textbuf.cpp",
 	MAME_DIR .. "src/emu/debug/textbuf.h",
-	MAME_DIR .. "src/emu/sound/filter.cpp",
-	MAME_DIR .. "src/emu/sound/filter.h",
 	MAME_DIR .. "src/emu/sound/wavwrite.cpp",
 	MAME_DIR .. "src/emu/sound/wavwrite.h",
 	MAME_DIR .. "src/emu/drivers/empty.cpp",
