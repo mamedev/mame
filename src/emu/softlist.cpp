@@ -1139,6 +1139,8 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				add_rom_entry(nullptr, nullptr, offset, length, ROMENTRYTYPE_RELOAD);
 			else if (loadflag != nullptr && strcmp(loadflag, "continue") == 0)
 				add_rom_entry(nullptr, nullptr, offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS);
+			else if (loadflag != nullptr && strcmp(loadflag, "ignore") == 0)
+				add_rom_entry(nullptr, nullptr, offset, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
 			else if (loadflag != nullptr && strcmp(loadflag, "fill") == 0)
 				add_rom_entry(nullptr, (const char *)(FPTR)(strtol(value, nullptr, 0) & 0xff), offset, length, ROMENTRYTYPE_FILL);
 			else if (name != nullptr)
