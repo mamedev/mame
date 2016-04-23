@@ -9382,9 +9382,10 @@ chqflag                         // GX717 (c) 1988
 chqflagj                        // GX717 (c) 1988 (Japan)
 
 @source:chsuper.cpp
-chmpnum                         // unknown
-chsuper2                        // unknown
-chsuper3                        // unknown
+chsuper2                        // 1999, unknown
+chsuper3                        // 1999, unknown
+chmpnum                         // 1999, unknown
+chmpnuma                        // 1999, unknown
 
 @source:cidelsa.cpp
 altair                          // (c) 1981 Cidelsa
