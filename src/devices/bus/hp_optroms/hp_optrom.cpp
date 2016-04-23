@@ -61,17 +61,11 @@ bool hp_optrom_slot_device::call_load()
 {
         logerror("hp_optrom: call_load\n");
         if (m_cart == nullptr || !m_from_swlist) {
-                logerror("hp_optrom: fail 1\n");
+                logerror("hp_optrom: must be loaded from sw list\n");
                 return IMAGE_INIT_FAIL;
         }
 
-        const software_part *part_ptr = part_entry();
-        if (part_ptr == nullptr) {
-                logerror("hp_optrom: fail 2\n");
-                return IMAGE_INIT_FAIL;
-        }
-
-        const char *base_feature = part_ptr->feature("base");
+        const char *base_feature = get_feature("base");
         if (base_feature == nullptr) {
                 logerror("hp_optrom: no 'base' feature\n");
                 return IMAGE_INIT_FAIL;
