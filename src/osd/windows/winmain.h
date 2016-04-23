@@ -317,7 +317,6 @@ ref class MameMainApp sealed : public Windows::ApplicationModel::Core::IFramewor
 private:
 	std::unique_ptr<windows_options>        m_options;
 	std::unique_ptr<windows_osd_interface>  m_osd;
-	std::unique_ptr<cli_frontend>           m_frontend;
 
 public:
 	MameMainApp();

@@ -377,14 +377,13 @@ void MameMainApp::Run()
 	osd_output::push(&winerror);
 
 	m_osd->register_options();
-	m_frontend = std::make_unique<cli_frontend>(*m_options.get(), *m_osd.get());
 
 	// To satisfy the latter things, pass in the module path name
 	char exe_path[MAX_PATH];
 	GetModuleFileNameA(NULL, exe_path, MAX_PATH);
 	char* args[2] = { exe_path, (char*)"-verbose" };
 
-	DWORD result = m_frontend->execute(ARRAY_LENGTH(args), args);
+	DWORD result = emulator_info::start_frontend(*m_options.get(), *m_osd.get(), ARRAY_LENGTH(args), args);
 	osd_output::pop(&winerror);
 }
 
