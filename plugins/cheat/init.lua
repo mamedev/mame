@@ -73,8 +73,7 @@ function cheat.startplugin()
 		local filename = emu.romname()
 		local json = require("json")
 		local newcheats = {}
-		local path = manager:machine():options().entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat")
-		local file = emu.file(path, 1)
+		local file = emu.file(manager:machine():options().entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat") , 1)
 		if emu.softname() ~= "" then
 			for name, image in pairs(manager:machine().images) do
 				if image:exists() and image:software_list_name() ~= "" then
@@ -116,7 +115,7 @@ function cheat.startplugin()
 			return
 		end
 		if type(x) == "string" then
-			y = y * manager:machine():ui():get_line_height()
+			y = y * mame_manager:ui():get_line_height()
 		end
 		output[#output + 1] = { type = "text", scr = screen, x = x, y = y, str = str, color = color }
 	end

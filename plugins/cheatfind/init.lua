@@ -512,7 +512,7 @@ function cheatfind.startplugin()
 	emu.register_menu(menu_callback, menu_populate, "Cheat Finder")
 	emu.register_frame_done(function () 
 			local tag, screen = next(manager:machine().screens)
-			local height = manager:machine():ui():get_line_height()
+			local height = mame_manager:ui():get_line_height()
 			for num, watch in ipairs(watches) do
 				screen:draw_text("left", num * height, string.format("%08x %08x", watch.addr, watch.func()))
 			end
