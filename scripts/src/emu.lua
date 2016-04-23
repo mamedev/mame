@@ -22,7 +22,6 @@ options {
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",
-	MAME_DIR .. "src/devices", -- till deps are fixed
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty/rapidjson/include",
@@ -212,7 +211,6 @@ files {
 	MAME_DIR .. "src/emu/sound/wavwrite.cpp",
 	MAME_DIR .. "src/emu/sound/wavwrite.h",
 	MAME_DIR .. "src/emu/drivers/empty.cpp",
-	MAME_DIR .. "src/emu/drivers/testcpu.cpp",
 	MAME_DIR .. "src/emu/drivers/xtal.h",
 	MAME_DIR .. "src/emu/video/generic.cpp",
 	MAME_DIR .. "src/emu/video/generic.h",
@@ -284,7 +282,6 @@ precompiledheaders()
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",
-	MAME_DIR .. "src/devices", -- till deps are fixed
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
