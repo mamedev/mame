@@ -7,11 +7,7 @@
     driver by Olivier Galibert
 
     TODO:
-    - is there a third coin input?
-
-    - Is sfj confirmed to have a 68705?, sfua has an i8751 and the actual
-      gamecode is closer to sfua than the other sets.  The protection
-      appears to be the same on both.
+    - acquire i8751 protection mcu internal rom dump and emulate it
 
 ***************************************************************************/
 
@@ -24,7 +20,7 @@
 
 
 /* The protection of the Japanese (and alt US) version */
-/* I'd love to see someone dump the 68705 / i8751 roms */
+/* I'd love to see someone dump the i8751 rom */
 
 void sf_state::write_dword( address_space &space, offs_t offset, UINT32 data )
 {
@@ -769,8 +765,8 @@ ROM_START( sfj )
 	ROM_LOAD( "sf-00.bin", 0x00000, 0x20000, CRC(4b733845) SHA1(f7ff46e02f8ce6682d6e573588271bae2edfa90f) )
 	ROM_LOAD( "sf-01.bin", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
 
-	ROM_REGION( 0x0800, "mcu", 0 ) /* 68705 MCU */ // or should it be an i8751 like the above set? the protection is the same!
-	ROM_LOAD( "68705.bin",   0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 ) /* i8751 MCU */
+	ROM_LOAD( "i8751.bin",   0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "sf-39.bin", 0x000000, 0x020000, CRC(cee3d292) SHA1(a8c22f1dc81976e8dd5d6c70361c61fa3f9f89d6) ) /* Background b planes 0-1*/
