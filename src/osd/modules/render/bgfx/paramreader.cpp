@@ -14,6 +14,7 @@
 #include "frameparameter.h"
 #include "windowparameter.h"
 #include "timeparameter.h"
+#include "chainmanager.h"
 
 const parameter_reader::string_to_enum parameter_reader::TYPE_NAMES[parameter_reader::TYPE_COUNT] = {
 	{ "frame",  bgfx_parameter::parameter_type::PARAM_FRAME },
@@ -21,7 +22,7 @@ const parameter_reader::string_to_enum parameter_reader::TYPE_NAMES[parameter_re
 	{ "time",   bgfx_parameter::parameter_type::PARAM_TIME }
 };
 
-bgfx_parameter* parameter_reader::read_from_value(const Value& value, std::string prefix, uint32_t window_index)
+bgfx_parameter* parameter_reader::read_from_value(const Value& value, std::string prefix, chain_manager& chains)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -38,7 +39,7 @@ bgfx_parameter* parameter_reader::read_from_value(const Value& value, std::strin
 	}
 	else if (type == bgfx_parameter::parameter_type::PARAM_WINDOW)
 	{
-		return new bgfx_window_parameter(name, type, window_index);
+		return new bgfx_window_parameter(name, type, chains.window_index());
 	}
 	else if (type == bgfx_parameter::parameter_type::PARAM_TIME)
 	{

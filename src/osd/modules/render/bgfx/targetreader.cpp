@@ -11,8 +11,8 @@
 #include "emu.h"
 #include <modules/lib/osdobj_common.h>
 
+#include "chainmanager.h"
 #include "targetreader.h"
-#include "targetmanager.h"
 #include "target.h"
 
 const target_reader::string_to_enum target_reader::STYLE_NAMES[target_reader::STYLE_COUNT] = {
@@ -21,7 +21,7 @@ const target_reader::string_to_enum target_reader::STYLE_NAMES[target_reader::ST
 	{ "custom", TARGET_STYLE_CUSTOM }
 };
 
-bgfx_target* target_reader::read_from_value(const Value& value, std::string prefix, target_manager& targets, osd_options& options, uint32_t screen_index)
+bgfx_target* target_reader::read_from_value(const Value& value, std::string prefix, chain_manager& chains, uint32_t screen_index)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -43,12 +43,12 @@ bgfx_target* target_reader::read_from_value(const Value& value, std::string pref
 	switch (mode)
 	{
 		case TARGET_STYLE_GUEST:
-            width = targets.width(TARGET_STYLE_GUEST, screen_index);
-            height = targets.height(TARGET_STYLE_GUEST, screen_index);
+            width = chains.targets().width(TARGET_STYLE_GUEST, screen_index);
+            height = chains.targets().height(TARGET_STYLE_GUEST, screen_index);
             break;
 		case TARGET_STYLE_NATIVE:
-            width = targets.width(TARGET_STYLE_NATIVE, screen_index);
-            height = targets.height(TARGET_STYLE_NATIVE, screen_index);
+            width = chains.targets().width(TARGET_STYLE_NATIVE, screen_index);
+            height = chains.targets().height(TARGET_STYLE_NATIVE, screen_index);
             break;
 		case TARGET_STYLE_CUSTOM:
 			if (!READER_CHECK(value.HasMember("width"), (prefix + "Target '" + target_name + "': Must have numeric value 'width'\n").c_str())) return nullptr;
@@ -60,7 +60,7 @@ bgfx_target* target_reader::read_from_value(const Value& value, std::string pref
 			break;
 	}
 
-	return targets.create_target(target_name, bgfx::TextureFormat::RGBA8, width, height, mode, double_buffer, bilinear, scale, screen_index);
+	return chains.targets().create_target(target_name, bgfx::TextureFormat::RGBA8, width, height, mode, double_buffer, bilinear, scale, screen_index);
 }
 
 bool target_reader::validate_parameters(const Value& value, std::string prefix)

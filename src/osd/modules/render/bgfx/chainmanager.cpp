@@ -162,7 +162,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 		return nullptr;
 	}
 
-	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", m_options, m_machine, m_window_index, screen_index, m_textures, m_targets, m_effects);
+	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", *this, screen_index);
 
 	if (chain == nullptr)
 	{
@@ -471,6 +471,20 @@ std::vector<ui_menu_item> chain_manager::get_slider_list()
         {
             continue;
         }
+
+		std::vector<bgfx_chain_entry*> chain_entries = chain->entries();
+		for (bgfx_chain_entry* entry : chain_entries)
+		{
+			std::vector<bgfx_input_pair*> entry_inputs = entry->inputs();
+			for (bgfx_input_pair* input : entry_inputs)
+			{
+				std::vector<ui_menu_item> input_sliders = input->get_slider_list();
+				for (ui_menu_item slider : input_sliders)
+				{
+					sliders.push_back(slider);
+				}
+			}
+		}
 
         std::vector<bgfx_slider*> chain_sliders = chain->sliders();
         for (bgfx_slider* slider : chain_sliders)

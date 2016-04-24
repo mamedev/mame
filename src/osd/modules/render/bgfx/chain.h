@@ -35,6 +35,7 @@ public:
 
 	// Getters
 	std::vector<bgfx_slider*>& sliders() { return m_sliders; }
+	std::vector<bgfx_chain_entry*>& entries() { return m_entries; }
 	uint32_t applicable_passes();
 	bool transform() { return m_transform; }
 

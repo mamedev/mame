@@ -96,10 +96,11 @@
 		{ "type": "float", "name": "scanline_height",        "text": "Individual Scanline Scale",  "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_variation",     "text": "Scanline Variation",         "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
  
-		{ "type": "float", "name": "shadow_alpha",     "text": "Shadow Mask Amount",       "default": 0.20,             "max": 1.00,             "min": 0.00,             "step": 0.01,  "format": "%1.2f", "screen": "crt" },
-		{ "type": "vec2",  "name": "shadow_uv_count",  "text": "Shadow Mask Pixel Count ", "default": [ 12, 12 ],       "max": [ 128, 128 ],     "min": [ 1, 1 ],         "step": 1,     "format": "%3f",   "screen": "crt" },
-		{ "type": "vec2",  "name": "shadow_uv_size",   "text": "Shadow Mask UV Size ",     "default": [ 0.500, 0.500 ], "max": [ 1.000, 1.000 ], "min": [ 0.000, 0.000 ], "step": 0.001, "format": "%1.3f", "screen": "crt" },
-		{ "type": "vec2",  "name": "shadow_uv_offset", "text": "Shadow Mask UV Offset ",   "default": [ 0.000, 0.000 ], "max": [ 1.000, 1.000 ], "min": [ 0.000, 0.000 ], "step": 0.001, "format": "%1.3f", "screen": "crt" },
+		{ "type": "intenum", "name": "shadow_tile_mode", "text": "Shadow Mask Tile Mode",    "default":  0,               "max": 1,                "min": 0,                "step": 1,     "format": "%s",    "screen": "any", "strings": [ "Screen", "Source" ] },
+		{ "type": "float",   "name": "shadow_alpha",     "text": "Shadow Mask Amount",       "default": 0.20,             "max": 1.00,             "min": 0.00,             "step": 0.01,  "format": "%1.2f", "screen": "crt" },
+		{ "type": "vec2",    "name": "shadow_uv_count",  "text": "Shadow Mask Pixel Count ", "default": [ 12, 12 ],       "max": [ 128, 128 ],     "min": [ 1, 1 ],         "step": 1,     "format": "%3f",   "screen": "crt" },
+		{ "type": "vec2",    "name": "shadow_uv_size",   "text": "Shadow Mask UV Size ",     "default": [ 0.500, 0.500 ], "max": [ 1.000, 1.000 ], "min": [ 0.000, 0.000 ], "step": 0.001, "format": "%1.3f", "screen": "crt" },
+		{ "type": "vec2",    "name": "shadow_uv_offset", "text": "Shadow Mask UV Offset ",   "default": [ 0.000, 0.000 ], "max": [ 1.000, 1.000 ], "min": [ 0.000, 0.000 ], "step": 0.001, "format": "%1.3f", "screen": "crt" },
 
 		{ "type": "float", "name": "humbar_alpha",      "text": "Hum Bar Amount",    "default": 0.05,  "max": 1.00,  "min": 0.00,  "step": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "humbar_hertz_rate", "text": "Hum Bar Frequency", "default": 0.001, "max": 1.000, "min": 0.000, "step": 0.00001, "format": "%1.5f", "screen": "crt" },
@@ -280,6 +281,9 @@
 				// bilinear (optional, texture and target only): Whether to apply bilinear filtering to the sampler.
 				// values: true, false
 				// default: true
+				// 
+				// selection (optional, option and texture only): Determines the name of the selection and alowes to select other textures in the same directory as the specified texture file.
+				// values: Any valid ASCII string.
 				{ "sampler": "s_tex", "texture": "screen" }
 			],
 
@@ -451,6 +455,7 @@
 				{ "uniform": "u_scanline_bright_offset", "slider": "scanline_bright_offset" },
 				{ "uniform": "u_scanline_height",        "slider": "scanline_height" },
 				{ "uniform": "u_scanline_variation",     "slider": "scanline_variation" },
+				{ "uniform": "u_shadow_tile_mode",       "slider": "shadow_tile_mode" },
 				{ "uniform": "u_shadow_alpha",           "slider": "shadow_alpha" },
 				{ "uniform": "u_shadow_count",           "slider": "shadow_uv_count" },
 				{ "uniform": "u_shadow_uv",              "slider": "shadow_uv_size" },
@@ -465,7 +470,7 @@
 			],
 			"input": [
 				{ "sampler": "s_tex",    "target": "internal" },
-				{ "sampler": "s_shadow", "option": "bgfx_shadow_mask" }
+				{ "sampler": "s_shadow", "option": "bgfx_shadow_mask", "selection": "Shadow Mask" }
 			],
 			"output": "internal"
 		},
