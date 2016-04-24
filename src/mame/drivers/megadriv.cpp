@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "includes/md_cons.h"
+#include "includes/megadriv.h"
 #include "sound/sn76496.h"
 
 #include "imagedev/chd_cd.h"
