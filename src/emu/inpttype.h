@@ -435,6 +435,74 @@ void construct_core_types_P8(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_DIGITAL_TYPE( 8, PLAYER8, SELECT,              "P8 Select",              input_seq() )
 }
 
+void construct_core_types_P9(simple_list<input_type_entry> &typelist)
+{
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, JOYSTICK_UP,         "P9 Up",                  input_seq(JOYCODE_Y_UP_SWITCH_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, JOYSTICK_DOWN,       "P9 Down",                input_seq(JOYCODE_Y_DOWN_SWITCH_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, JOYSTICK_LEFT,       "P9 Left",                input_seq(JOYCODE_X_LEFT_SWITCH_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, JOYSTICK_RIGHT,      "P9 Right",               input_seq(JOYCODE_X_RIGHT_SWITCH_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, JOYSTICKRIGHT_UP,    "P9 Right/Up",            input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, JOYSTICKRIGHT_DOWN,  "P9 Right/Down",          input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, JOYSTICKRIGHT_LEFT,  "P9 Right/Left",          input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, JOYSTICKRIGHT_RIGHT, "P9 Right/Right",         input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, JOYSTICKLEFT_UP,     "P9 Left/Up",             input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, JOYSTICKLEFT_DOWN,   "P9 Left/Down",           input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, JOYSTICKLEFT_LEFT,   "P9 Left/Left",           input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, JOYSTICKLEFT_RIGHT,  "P9 Left/Right",          input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON1,             "P9 Button 1",            input_seq(JOYCODE_BUTTON1_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON2,             "P9 Button 2",            input_seq(JOYCODE_BUTTON2_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON3,             "P9 Button 3",            input_seq(JOYCODE_BUTTON3_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON4,             "P9 Button 4",            input_seq(JOYCODE_BUTTON4_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON5,             "P9 Button 5",            input_seq(JOYCODE_BUTTON5_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON6,             "P9 Button 6",            input_seq(JOYCODE_BUTTON6_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON7,             "P9 Button 7",            input_seq(JOYCODE_BUTTON7_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON8,             "P9 Button 8",            input_seq(JOYCODE_BUTTON8_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON9,             "P9 Button 9",            input_seq(JOYCODE_BUTTON9_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON10,            "P9 Button 10",           input_seq(JOYCODE_BUTTON10_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON11,            "P9 Button 11",           input_seq(JOYCODE_BUTTON11_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON12,            "P9 Button 12",           input_seq(JOYCODE_BUTTON12_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON13,            "P9 Button 13",           input_seq(JOYCODE_BUTTON13_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON14,            "P9 Button 14",           input_seq(JOYCODE_BUTTON14_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON15,            "P9 Button 15",           input_seq(JOYCODE_BUTTON15_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, BUTTON16,            "P9 Button 16",           input_seq(JOYCODE_BUTTON16_INDEXED(8)) )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, START,               "P9 Start",               input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 9, PLAYER9, SELECT,              "P9 Select",              input_seq() )
+}
+
+void construct_core_types_P10(simple_list<input_type_entry> &typelist)
+{
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, JOYSTICK_UP,         "P10 Up",                  input_seq(JOYCODE_Y_UP_SWITCH_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, JOYSTICK_DOWN,       "P10 Down",                input_seq(JOYCODE_Y_DOWN_SWITCH_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, JOYSTICK_LEFT,       "P10 Left",                input_seq(JOYCODE_X_LEFT_SWITCH_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, JOYSTICK_RIGHT,      "P10 Right",               input_seq(JOYCODE_X_RIGHT_SWITCH_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, JOYSTICKRIGHT_UP,    "P10 Right/Up",            input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, JOYSTICKRIGHT_DOWN,  "P10 Right/Down",          input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, JOYSTICKRIGHT_LEFT,  "P10 Right/Left",          input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, JOYSTICKRIGHT_RIGHT, "P10 Right/Right",         input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, JOYSTICKLEFT_UP,     "P10 Left/Up",             input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, JOYSTICKLEFT_DOWN,   "P10 Left/Down",           input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, JOYSTICKLEFT_LEFT,   "P10 Left/Left",           input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, JOYSTICKLEFT_RIGHT,  "P10 Left/Right",          input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON1,             "P10 Button 1",            input_seq(JOYCODE_BUTTON1_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON2,             "P10 Button 2",            input_seq(JOYCODE_BUTTON2_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON3,             "P10 Button 3",            input_seq(JOYCODE_BUTTON3_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON4,             "P10 Button 4",            input_seq(JOYCODE_BUTTON4_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON5,             "P10 Button 5",            input_seq(JOYCODE_BUTTON5_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON6,             "P10 Button 6",            input_seq(JOYCODE_BUTTON6_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON7,             "P10 Button 7",            input_seq(JOYCODE_BUTTON7_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON8,             "P10 Button 8",            input_seq(JOYCODE_BUTTON8_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON9,             "P10 Button 9",            input_seq(JOYCODE_BUTTON9_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON10,            "P10 Button 10",           input_seq(JOYCODE_BUTTON10_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON11,            "P10 Button 11",           input_seq(JOYCODE_BUTTON11_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON12,            "P10 Button 12",           input_seq(JOYCODE_BUTTON12_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON13,            "P10 Button 13",           input_seq(JOYCODE_BUTTON13_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON14,            "P10 Button 14",           input_seq(JOYCODE_BUTTON14_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON15,            "P10 Button 15",           input_seq(JOYCODE_BUTTON15_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, BUTTON16,            "P10 Button 16",           input_seq(JOYCODE_BUTTON16_INDEXED(9)) )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, START,               "P10 Start",               input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 10, PLAYER10, SELECT,              "P10 Select",              input_seq() )
+}
+
 void construct_core_types_start(simple_list<input_type_entry> &typelist)
 {
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   START1,              "1 Player Start",         input_seq(KEYCODE_1, input_seq::or_code, JOYCODE_START_INDEXED(0)) )
@@ -501,6 +569,8 @@ void construct_core_types_pedal(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, PEDAL,               "P6 Pedal 1",             input_seq(JOYCODE_Z_NEG_ABSOLUTE_INDEXED(5)), input_seq(), input_seq(JOYCODE_BUTTON1_INDEXED(5)) )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, PEDAL,               "P7 Pedal 1",             input_seq(JOYCODE_Z_NEG_ABSOLUTE_INDEXED(6)), input_seq(), input_seq(JOYCODE_BUTTON1_INDEXED(6)) )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, PEDAL,               "P8 Pedal 1",             input_seq(JOYCODE_Z_NEG_ABSOLUTE_INDEXED(7)), input_seq(), input_seq(JOYCODE_BUTTON1_INDEXED(7)) )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, PEDAL,               "P9 Pedal 1",             input_seq(JOYCODE_Z_NEG_ABSOLUTE_INDEXED(8)), input_seq(), input_seq(JOYCODE_BUTTON1_INDEXED(8)) )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, PEDAL,              "P10 Pedal 1",            input_seq(JOYCODE_Z_NEG_ABSOLUTE_INDEXED(9)), input_seq(), input_seq(JOYCODE_BUTTON1_INDEXED(9)) )
 }
 
 void construct_core_types_pedal2(simple_list<input_type_entry> &typelist)
@@ -513,6 +583,8 @@ void construct_core_types_pedal2(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, PEDAL2,              "P6 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(5)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(5)) )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, PEDAL2,              "P7 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(6)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(6)) )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, PEDAL2,              "P8 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(7)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(7)) )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, PEDAL2,              "P9 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(8)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(8)) )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, PEDAL2,             "P10 Pedal 2",            input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(9)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(9)) )
 }
 
 void construct_core_types_pedal3(simple_list<input_type_entry> &typelist)
@@ -525,6 +597,8 @@ void construct_core_types_pedal3(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, PEDAL3,              "P6 Pedal 3",             input_seq(), input_seq(), input_seq(JOYCODE_BUTTON3_INDEXED(5)) )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, PEDAL3,              "P7 Pedal 3",             input_seq(), input_seq(), input_seq(JOYCODE_BUTTON3_INDEXED(6)) )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, PEDAL3,              "P8 Pedal 3",             input_seq(), input_seq(), input_seq(JOYCODE_BUTTON3_INDEXED(7)) )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, PEDAL3,              "P9 Pedal 3",             input_seq(), input_seq(), input_seq(JOYCODE_BUTTON3_INDEXED(8)) )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, PEDAL3,             "P10 Pedal 3",            input_seq(), input_seq(), input_seq(JOYCODE_BUTTON3_INDEXED(9)) )
 }
 
 void construct_core_types_paddle(simple_list<input_type_entry> &typelist)
@@ -537,6 +611,8 @@ void construct_core_types_paddle(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, PADDLE,              "Paddle 6",               input_seq(JOYCODE_X_INDEXED(5), input_seq::or_code, MOUSECODE_X_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, PADDLE,              "Paddle 7",               input_seq(JOYCODE_X_INDEXED(6), input_seq::or_code, MOUSECODE_X_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, PADDLE,              "Paddle 8",               input_seq(JOYCODE_X_INDEXED(7), input_seq::or_code, MOUSECODE_X_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, PADDLE,              "Paddle 9",               input_seq(JOYCODE_X_INDEXED(8), input_seq::or_code, MOUSECODE_X_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, PADDLE,             "Paddle 10",              input_seq(JOYCODE_X_INDEXED(9), input_seq::or_code, MOUSECODE_X_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_paddle_v(simple_list<input_type_entry> &typelist)
@@ -549,6 +625,8 @@ void construct_core_types_paddle_v(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, PADDLE_V,            "Paddle V 6",             input_seq(JOYCODE_Y_INDEXED(5), input_seq::or_code, MOUSECODE_Y_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, PADDLE_V,            "Paddle V 7",             input_seq(JOYCODE_Y_INDEXED(6), input_seq::or_code, MOUSECODE_Y_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, PADDLE_V,            "Paddle V 8",             input_seq(JOYCODE_Y_INDEXED(7), input_seq::or_code, MOUSECODE_Y_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, PADDLE_V,            "Paddle V 9",             input_seq(JOYCODE_Y_INDEXED(8), input_seq::or_code, MOUSECODE_Y_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, PADDLE_V,            "Paddle V 10",             input_seq(JOYCODE_Y_INDEXED(9), input_seq::or_code, MOUSECODE_Y_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_positional(simple_list<input_type_entry> &typelist)
@@ -561,6 +639,8 @@ void construct_core_types_positional(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, POSITIONAL,          "Positional 6",           input_seq(MOUSECODE_X_INDEXED(5), input_seq::or_code, JOYCODE_X_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, POSITIONAL,          "Positional 7",           input_seq(MOUSECODE_X_INDEXED(6), input_seq::or_code, JOYCODE_X_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, POSITIONAL,          "Positional 8",           input_seq(MOUSECODE_X_INDEXED(7), input_seq::or_code, JOYCODE_X_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, POSITIONAL,          "Positional 9",           input_seq(MOUSECODE_X_INDEXED(8), input_seq::or_code, JOYCODE_X_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, POSITIONAL,         "Positional 10",          input_seq(MOUSECODE_X_INDEXED(9), input_seq::or_code, JOYCODE_X_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_positional_v(simple_list<input_type_entry> &typelist)
@@ -573,6 +653,8 @@ void construct_core_types_positional_v(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, POSITIONAL_V,        "Positional V 6",         input_seq(MOUSECODE_Y_INDEXED(5), input_seq::or_code, JOYCODE_Y_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, POSITIONAL_V,        "Positional V 7",         input_seq(MOUSECODE_Y_INDEXED(6), input_seq::or_code, JOYCODE_Y_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, POSITIONAL_V,        "Positional V 8",         input_seq(MOUSECODE_Y_INDEXED(7), input_seq::or_code, JOYCODE_Y_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, POSITIONAL_V,        "Positional V 9",         input_seq(MOUSECODE_Y_INDEXED(8), input_seq::or_code, JOYCODE_Y_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, POSITIONAL_V,       "Positional V 10",        input_seq(MOUSECODE_Y_INDEXED(9), input_seq::or_code, JOYCODE_Y_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_dial(simple_list<input_type_entry> &typelist)
@@ -585,6 +667,8 @@ void construct_core_types_dial(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, DIAL,                "Dial 6",                 input_seq(MOUSECODE_X_INDEXED(5), input_seq::or_code, JOYCODE_X_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, DIAL,                "Dial 7",                 input_seq(MOUSECODE_X_INDEXED(6), input_seq::or_code, JOYCODE_X_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, DIAL,                "Dial 8",                 input_seq(MOUSECODE_X_INDEXED(7), input_seq::or_code, JOYCODE_X_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, DIAL,                "Dial 9",                 input_seq(MOUSECODE_X_INDEXED(8), input_seq::or_code, JOYCODE_X_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, DIAL,               "Dial 10",                input_seq(MOUSECODE_X_INDEXED(9), input_seq::or_code, JOYCODE_X_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_dial_v(simple_list<input_type_entry> &typelist)
@@ -597,6 +681,8 @@ void construct_core_types_dial_v(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, DIAL_V,              "Dial V 6",               input_seq(MOUSECODE_Y_INDEXED(5), input_seq::or_code, JOYCODE_Y_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, DIAL_V,              "Dial V 7",               input_seq(MOUSECODE_Y_INDEXED(6), input_seq::or_code, JOYCODE_Y_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, DIAL_V,              "Dial V 8",               input_seq(MOUSECODE_Y_INDEXED(7), input_seq::or_code, JOYCODE_Y_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, DIAL_V,              "Dial V 9",               input_seq(MOUSECODE_Y_INDEXED(8), input_seq::or_code, JOYCODE_Y_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, DIAL_V,             "Dial V 10",              input_seq(MOUSECODE_Y_INDEXED(9), input_seq::or_code, JOYCODE_Y_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_trackball_X(simple_list<input_type_entry> &typelist)
@@ -609,6 +695,8 @@ void construct_core_types_trackball_X(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, TRACKBALL_X,         "Track X 6",              input_seq(MOUSECODE_X_INDEXED(5), input_seq::or_code, JOYCODE_X_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, TRACKBALL_X,         "Track X 7",              input_seq(MOUSECODE_X_INDEXED(6), input_seq::or_code, JOYCODE_X_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, TRACKBALL_X,         "Track X 8",              input_seq(MOUSECODE_X_INDEXED(7), input_seq::or_code, JOYCODE_X_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, TRACKBALL_X,         "Track X 9",              input_seq(MOUSECODE_X_INDEXED(8), input_seq::or_code, JOYCODE_X_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, TRACKBALL_X,        "Track X 10",             input_seq(MOUSECODE_X_INDEXED(9), input_seq::or_code, JOYCODE_X_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_trackball_Y(simple_list<input_type_entry> &typelist)
@@ -621,6 +709,8 @@ void construct_core_types_trackball_Y(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, TRACKBALL_Y,         "Track Y 6",              input_seq(MOUSECODE_Y_INDEXED(5), input_seq::or_code, JOYCODE_Y_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, TRACKBALL_Y,         "Track Y 7",              input_seq(MOUSECODE_Y_INDEXED(6), input_seq::or_code, JOYCODE_Y_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, TRACKBALL_Y,         "Track Y 8",              input_seq(MOUSECODE_Y_INDEXED(7), input_seq::or_code, JOYCODE_Y_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, TRACKBALL_Y,         "Track Y 9",              input_seq(MOUSECODE_Y_INDEXED(8), input_seq::or_code, JOYCODE_Y_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, TRACKBALL_Y,        "Track Y 10",             input_seq(MOUSECODE_Y_INDEXED(9), input_seq::or_code, JOYCODE_Y_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_AD_stick_X(simple_list<input_type_entry> &typelist)
@@ -633,6 +723,8 @@ void construct_core_types_AD_stick_X(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, AD_STICK_X,          "AD Stick X 6",           input_seq(JOYCODE_X_INDEXED(5), input_seq::or_code, MOUSECODE_X_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, AD_STICK_X,          "AD Stick X 7",           input_seq(JOYCODE_X_INDEXED(6), input_seq::or_code, MOUSECODE_X_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, AD_STICK_X,          "AD Stick X 8",           input_seq(JOYCODE_X_INDEXED(7), input_seq::or_code, MOUSECODE_X_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, AD_STICK_X,          "AD Stick X 9",           input_seq(JOYCODE_X_INDEXED(8), input_seq::or_code, MOUSECODE_X_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, AD_STICK_X,         "AD Stick X 10",          input_seq(JOYCODE_X_INDEXED(9), input_seq::or_code, MOUSECODE_X_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_AD_stick_Y(simple_list<input_type_entry> &typelist)
@@ -645,6 +737,8 @@ void construct_core_types_AD_stick_Y(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, AD_STICK_Y,          "AD Stick Y 6",           input_seq(JOYCODE_Y_INDEXED(5), input_seq::or_code, MOUSECODE_Y_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, AD_STICK_Y,          "AD Stick Y 7",           input_seq(JOYCODE_Y_INDEXED(6), input_seq::or_code, MOUSECODE_Y_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, AD_STICK_Y,          "AD Stick Y 8",           input_seq(JOYCODE_Y_INDEXED(7), input_seq::or_code, MOUSECODE_Y_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, AD_STICK_Y,          "AD Stick Y 9",           input_seq(JOYCODE_Y_INDEXED(8), input_seq::or_code, MOUSECODE_Y_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, AD_STICK_Y,         "AD Stick Y 10",          input_seq(JOYCODE_Y_INDEXED(9), input_seq::or_code, MOUSECODE_Y_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_AD_stick_Z(simple_list<input_type_entry> &typelist)
@@ -657,6 +751,8 @@ void construct_core_types_AD_stick_Z(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, AD_STICK_Z,          "AD Stick Z 6",           input_seq(JOYCODE_Z_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, AD_STICK_Z,          "AD Stick Z 7",           input_seq(JOYCODE_Z_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, AD_STICK_Z,          "AD Stick Z 8",           input_seq(JOYCODE_Z_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, AD_STICK_Z,          "AD Stick Z 9",           input_seq(JOYCODE_Z_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, AD_STICK_Z,         "AD Stick Z 10",          input_seq(JOYCODE_Z_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_lightgun_X(simple_list<input_type_entry> &typelist)
@@ -669,6 +765,8 @@ void construct_core_types_lightgun_X(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, LIGHTGUN_X,          "Lightgun X 6",           input_seq(GUNCODE_X_INDEXED(5), input_seq::or_code, MOUSECODE_X_INDEXED(5), input_seq::or_code, JOYCODE_X_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, LIGHTGUN_X,          "Lightgun X 7",           input_seq(GUNCODE_X_INDEXED(6), input_seq::or_code, MOUSECODE_X_INDEXED(6), input_seq::or_code, JOYCODE_X_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, LIGHTGUN_X,          "Lightgun X 8",           input_seq(GUNCODE_X_INDEXED(7), input_seq::or_code, MOUSECODE_X_INDEXED(7), input_seq::or_code, JOYCODE_X_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, LIGHTGUN_X,          "Lightgun X 9",           input_seq(GUNCODE_X_INDEXED(8), input_seq::or_code, MOUSECODE_X_INDEXED(8), input_seq::or_code, JOYCODE_X_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, LIGHTGUN_X,         "Lightgun X 10",          input_seq(GUNCODE_X_INDEXED(9), input_seq::or_code, MOUSECODE_X_INDEXED(9), input_seq::or_code, JOYCODE_X_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_lightgun_Y(simple_list<input_type_entry> &typelist)
@@ -681,6 +779,8 @@ void construct_core_types_lightgun_Y(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, LIGHTGUN_Y,          "Lightgun Y 6",           input_seq(GUNCODE_Y_INDEXED(5), input_seq::or_code, MOUSECODE_Y_INDEXED(5), input_seq::or_code, JOYCODE_Y_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, LIGHTGUN_Y,          "Lightgun Y 7",           input_seq(GUNCODE_Y_INDEXED(6), input_seq::or_code, MOUSECODE_Y_INDEXED(6), input_seq::or_code, JOYCODE_Y_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, LIGHTGUN_Y,          "Lightgun Y 8",           input_seq(GUNCODE_Y_INDEXED(7), input_seq::or_code, MOUSECODE_Y_INDEXED(7), input_seq::or_code, JOYCODE_Y_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, LIGHTGUN_Y,          "Lightgun Y 9",           input_seq(GUNCODE_Y_INDEXED(8), input_seq::or_code, MOUSECODE_Y_INDEXED(8), input_seq::or_code, JOYCODE_Y_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, LIGHTGUN_Y,         "Lightgun Y 10",          input_seq(GUNCODE_Y_INDEXED(9), input_seq::or_code, MOUSECODE_Y_INDEXED(9), input_seq::or_code, JOYCODE_Y_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_mouse_X(simple_list<input_type_entry> &typelist)
@@ -693,6 +793,8 @@ void construct_core_types_mouse_X(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, MOUSE_X,             "Mouse X 6",              input_seq(MOUSECODE_X_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, MOUSE_X,             "Mouse X 7",              input_seq(MOUSECODE_X_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, MOUSE_X,             "Mouse X 8",              input_seq(MOUSECODE_X_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, MOUSE_X,             "Mouse X 9",              input_seq(MOUSECODE_X_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, MOUSE_X,            "Mouse X 10",             input_seq(MOUSECODE_X_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_mouse_Y(simple_list<input_type_entry> &typelist)
@@ -705,6 +807,8 @@ void construct_core_types_mouse_Y(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, MOUSE_Y,             "Mouse Y 6",              input_seq(MOUSECODE_Y_INDEXED(5)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, MOUSE_Y,             "Mouse Y 7",              input_seq(MOUSECODE_Y_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, MOUSE_Y,             "Mouse Y 8",              input_seq(MOUSECODE_Y_INDEXED(7)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, MOUSE_Y,             "Mouse Y 9",              input_seq(MOUSECODE_Y_INDEXED(8)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, MOUSE_Y,            "Mouse Y 10",             input_seq(MOUSECODE_Y_INDEXED(9)), input_seq(), input_seq() )
 }
 
 void construct_core_types_keypad(simple_list<input_type_entry> &typelist)
@@ -819,6 +923,8 @@ void construct_core_types(simple_list<input_type_entry> &typelist)
 	construct_core_types_P6(typelist);
 	construct_core_types_P7(typelist);
 	construct_core_types_P8(typelist);
+	construct_core_types_P9(typelist);
+	construct_core_types_P10(typelist);
 	construct_core_types_start(typelist);
 	construct_core_types_coin(typelist);
 	construct_core_types_service(typelist);

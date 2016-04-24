@@ -34,7 +34,7 @@ const ioport_value IP_ACTIVE_HIGH = 0x00000000;
 const ioport_value IP_ACTIVE_LOW = 0xffffffff;
 
 // maximum number of players supported
-const int MAX_PLAYERS = 8;
+const int MAX_PLAYERS = 10;
 
 // unicode constants
 const unicode_char UCHAR_PRIVATE = 0x100000;
@@ -78,6 +78,8 @@ enum ioport_group
 	IPG_PLAYER6,
 	IPG_PLAYER7,
 	IPG_PLAYER8,
+	IPG_PLAYER9,
+	IPG_PLAYER10,
 	IPG_OTHER,
 	IPG_TOTAL_GROUPS,
 	IPG_INVALID
@@ -105,6 +107,8 @@ enum ioport_type
 	IPT_START6,
 	IPT_START7,
 	IPT_START8,
+	IPT_START9,
+	IPT_START10,
 
 	// coin slots
 	IPT_COIN1,

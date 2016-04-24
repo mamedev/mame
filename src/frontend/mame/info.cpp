@@ -853,6 +853,8 @@ void info_xml_creator::output_input(const ioport_list &portlist)
         CTRL_P6,
         CTRL_P7,
         CTRL_P8,
+		CTRL_P9,
+		CTRL_P10,
         CTRL_PCOUNT
     };
     
@@ -1102,6 +1104,10 @@ void info_xml_creator::output_input(const ioport_list &portlist)
                 case IPT_COIN6:
                 case IPT_COIN7:
                 case IPT_COIN8:
+				case IPT_COIN9:
+				case IPT_COIN10:
+				case IPT_COIN11:
+				case IPT_COIN12:
                     ncoin = MAX(ncoin, field.type() - IPT_COIN1 + 1);
                     break;
                     
