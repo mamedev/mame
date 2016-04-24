@@ -52,9 +52,19 @@ function cheatfind.startplugin()
 			end
 		else
 			local block = ""
+			local temp = {}
+			local j = 1
 			for i = start, start + size do
-				block = block .. string.pack("B", space:read_u8(i))
+				if j < 65536 then
+					temp[j] = string.pack("B", space:read_u8(i))
+					j = j + 1
+				else
+					block = block .. table.concat(temp) .. string.pack("B", space:read_u8(i))
+					temp = {}
+					j = 1
+				end
 			end
+			block = block .. table.concat(temp)
 			data.block = block
 		end
 		return data
@@ -201,8 +211,8 @@ function cheatfind.startplugin()
 	local devtable = {}
 	local devsel = 1
 	local devcur = 1
-	local formtable = { "<B", ">B", "<b", ">b", "<H", ">H", "<h", ">h", "<L", ">L", "<l", ">l", "<J", ">J", "<j", ">j" }
-	local formname = { "little u8", "big u8", "little s8", "big s8", "little u16", "big u16", "little s16", "big s16",
+	local formtable = { "B", "b", "<H", ">H", "<h", ">h", "<L", ">L", "<l", ">l", "<J", ">J", "<j", ">j" }
+	local formname = { "u8", "s8", "little u16", "big u16", "little s16", "big s16",
 			   "little u32", "big u32", "little s32", "big s32", "little u64", "big u64", "little s64", "big s64" }
 	local width = 1
 	local bcd = 0
@@ -214,8 +224,8 @@ function cheatfind.startplugin()
 	local matches = {}
 	local matchsel = 1
 	local menu_blocks = {}
-	local midx = { region = 1, init = 2, undo = 3, save = 4, lop = 6, op = 7, rop = 8, val = 9,
-		       width = 11,  bcd = 12, comp = 13, match = 15, watch = 0 }
+	local midx = { region = 1, init = 2, lop = 4, op = 5, rop = 6, val = 7,
+		       width = 9,  bcd = 10, undo = 11, save = 12, comp = 13, match = 15, watch = 0 }
 	local watches = {}
 
 	local function start()
@@ -243,7 +253,11 @@ function cheatfind.startplugin()
 					end
 				end
 				if next(ram) then
-					devtable[#devtable + 1] = { tag = tag, space = list.program, ram = ram }
+					if tag == ":maincpu" then
+						table.insert(devtable, 1, { tag = tag, space = list.program, ram = ram })
+					else
+						devtable[#devtable + 1] = { tag = tag, space = list.program, ram = ram }
+					end
 				end
 			end
 		end
@@ -276,9 +290,7 @@ function cheatfind.startplugin()
 		end
 		menu[midx.init] = { "Start new search", "", 0 }
 		if #menu_blocks ~= 0 then
-			menu[midx.undo] = { "Undo last search -- #" .. #matches, "", 0 }
-			menu[midx.save] = { "Save current -- #" .. #menu_blocks[1] + 1, "", 0 }
-			menu[midx.save + 1] = { "---", "", "off" }
+			menu[midx.init + 1] = { "---", "", "off" }
 			menu[midx.lop] = { "Left operand", leftop, "" }
 			menu_lim(leftop, 1, #menu_blocks[1] + 1, menu[midx.lop])
 			if leftop == #menu_blocks[1] + 1 then
@@ -304,6 +316,8 @@ function cheatfind.startplugin()
 			if bcd == 1 then
 				menu[midx.bcd][2] = "On"
 			end
+			menu[midx.undo] = { "Undo last search -- #" .. #matches, "", 0 }
+			menu[midx.save] = { "Save current -- #" .. #menu_blocks[1] + 1, "", 0 }
 			menu[midx.comp] = { "Compare", "", 0 }
 			if #matches ~= 0 then
 				menu[midx.comp + 1] = { "---", "", "off" }
@@ -464,24 +478,35 @@ function cheatfind.startplugin()
 			match.mode = incdec(match.mode, 1, 3)
 			if event == "select" then
 				local dev = devtable[devcur]
-				local cheat = { desc = string.format("Test cheat at addr %08x", match.addr), script = {} }
+				local cheat = { desc = string.format("Test cheat at addr %08X", match.addr), script = {} }
 				local wid = formtable[width]:sub(2, 2):lower()
+				local xmlcheat
+				local form
 				if wid == "h" then
 					wid = "u16"
+					form = "%08x %04x"
+					xmlcheat = "pw"
 				elseif wid == "l" then
 					wid = "u32"
+					form = "%08x %08x"
+					xmlcheat = "pd"
 				elseif wid == "j" then
 					wid = "u64"
+					form = "%08x %016x"
+					xmlcheat = "pq"
 				else
 					wid = "u8"
+					form = "%08x %02x"
+					xmlcheat = "pb"
 				end
-				
+				xmlcheat = string.format("<mamecheat version=1>\n<cheat desc=\"%s\">\n<script state=\"run\">\n<action>%s.%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", cheat.desc, dev.tag:sub(2), xmlcheat, match.addr, match.newval)
+
 				if dev.space.shortname then
 					cheat.ram = { ram = dev.tag }
 					cheat.script.on = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
 				else
 					cheat.space = { cpu = { tag = dev.tag, type = "program" } }
-					cheat.script.on = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ")"
+					cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ")"
 				end
 				if match.mode == 1 then
 					if not _G.ce then
@@ -490,10 +515,13 @@ function cheatfind.startplugin()
 						_G.ce.inject(cheat)
 					end
 				elseif match.mode == 2 then
-					local filename = string.format("%s_%08x_cheat.json", emu.romname(), match.addr)
+					local filename = string.format("%s/%s_%08X_cheat", manager:machine():options().entries.cheatpath:value(), emu.romname(), match.addr)
 					local json = require("json")
-					local file = io.open(filename, "w")
+					local file = io.open(filename .. ".json", "w")
 					file:write(json.stringify({[1] = cheat}))
+					file:close()
+					file = io.open(filename .. ".xml", "w")
+					file:write(xmlcheat)
 					file:close()
 					manager:machine():popmessage("Cheat written to " .. filename)
 				else
@@ -503,7 +531,7 @@ function cheatfind.startplugin()
 						func = func .. "_" .. wid
 					end
 					func = func .. "(" .. match.addr .. ")"
-					watches[#watches + 1] = { addr = match.addr, func = load(func, func, "t", env) }
+					watches[#watches + 1] = { addr = match.addr, func = load(func, func, "t", env), format = form }
 				end
 			end
 		end
@@ -515,7 +543,7 @@ function cheatfind.startplugin()
 			local tag, screen = next(manager:machine().screens)
 			local height = mame_manager:ui():get_line_height()
 			for num, watch in ipairs(watches) do
-				screen:draw_text("left", num * height, string.format("%08x %08x", watch.addr, watch.func()))
+				screen:draw_text("left", num * height, string.format(watch.format, watch.addr, watch.func()))
 			end
 		end)
 end
