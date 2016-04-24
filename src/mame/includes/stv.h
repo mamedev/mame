@@ -146,13 +146,6 @@ public:
 		UINT8 slave_on;
 	}m_smpc;
 
-	struct {
-		UINT8 status;
-		UINT8 data;
-		UINT8 prev_data;
-		UINT16 repeat_count;
-	}m_keyb;
-
 	/* Saturn specific*/
 	int m_saturn_region;
 	UINT8 m_cart_type;
@@ -682,12 +675,6 @@ public:
 	TIMER_CALLBACK_MEMBER( smpc_change_clock );
 	TIMER_CALLBACK_MEMBER( stv_intback_peripheral );
 	TIMER_CALLBACK_MEMBER( stv_smpc_intback );
-	void smpc_digital_pad(UINT8 pad_num, UINT8 offset);
-	void smpc_analog_pad(UINT8 pad_num, UINT8 offset, UINT8 id);
-	void smpc_keyboard(UINT8 pad_num, UINT8 offset);
-	void smpc_mouse(UINT8 pad_num, UINT8 offset, UINT8 id);
-	void smpc_md_pad(UINT8 pad_num, UINT8 offset, UINT8 id);
-	void smpc_unconnected(UINT8 pad_num, UINT8 offset);
 	TIMER_CALLBACK_MEMBER( intback_peripheral );
 	TIMER_CALLBACK_MEMBER( saturn_smpc_intback );
 	void smpc_rtc_write();

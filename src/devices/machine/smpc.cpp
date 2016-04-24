@@ -364,11 +364,18 @@ TIMER_CALLBACK_MEMBER( saturn_state::stv_smpc_intback )
  - ID first controller, followed by the number of reads needed by the plugged controller
  - ID second controller, followed by the number of reads needed by the plugged controller
  - and so on... until the 4th (for SegaTap) or 6th (for Multitap) controller is read
+ TODO: how does the multitap check if a controller is connected? does it ask for the
+ controller status of each subport? how does this work exactly?
+ currently, there is a small problem in some specific controller config which seems to 
+ lose track of one controller. E.g. if I put multitap in port2 with inserted joy1, joy2 and joy4
+ it does not see joy4 controller, but if I put joy1, joy2, joy4 and joy5 it sees
+ all four of them. The same happens if I skip controllers with id = 0xff...
+ how did a real unit behave in this case?
 */
 
 TIMER_CALLBACK_MEMBER( saturn_state::intback_peripheral )
 {
-	//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
+//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
 	
 	// doesn't work?
 	//pad_num = m_smpc.intback_stage - 1;
