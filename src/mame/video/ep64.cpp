@@ -3,10 +3,11 @@
 /**********************************************************************
 
     Intelligent Designs NICK emulation
+    Used in Enterprise Enterprise Sixty Four / One Two Eight Computers
 
 **********************************************************************/
 
-#include "nick.h"
+#include "ep64.h"
 
 
 
