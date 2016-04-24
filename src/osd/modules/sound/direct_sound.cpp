@@ -51,7 +51,7 @@ public:
 	sound_direct_sound() :
 		osd_module(OSD_SOUND_PROVIDER, "dsound"),
 		sound_module(),
-		m_dsound(NULL),
+		m_dsound(nullptr),
 		m_bytes_per_sample(0),
 		m_primary_buffer(),
 		m_stream_buffer(),
@@ -73,13 +73,13 @@ private:
 	class buffer
 	{
 	public:
-		buffer() : m_buffer(NULL) { }
+		buffer() : m_buffer(nullptr) { }
 		~buffer() { release(); }
 
 		ULONG release()
 		{
 			ULONG const result = m_buffer ? m_buffer->Release() : 0;
-			m_buffer = NULL;
+			m_buffer = nullptr;
 			return result;
 		}
 
@@ -99,16 +99,16 @@ private:
 			memset(&desc, 0, sizeof(desc));
 			desc.dwSize = sizeof(desc);
 			desc.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_GETCURRENTPOSITION2;
-			desc.lpwfxFormat = NULL;
-			return dsound->CreateSoundBuffer(&desc, &m_buffer, NULL);
+			desc.lpwfxFormat = nullptr;
+			return dsound->CreateSoundBuffer(&desc, &m_buffer, nullptr);
 		}
 
-		HRESULT get_format(WAVEFORMATEX &format)
+		HRESULT get_format(WAVEFORMATEX &format) const
 		{
 			assert(m_buffer);
-			return m_buffer->GetFormat(&format, sizeof(format), NULL);
+			return m_buffer->GetFormat(&format, sizeof(format), nullptr);
 		}
-		HRESULT set_format(WAVEFORMATEX const &format)
+		HRESULT set_format(WAVEFORMATEX const &format) const
 		{
 			assert(m_buffer);
 			return m_buffer->SetFormat(&format);
@@ -118,7 +118,7 @@ private:
 	class stream_buffer : public buffer
 	{
 	public:
-		stream_buffer() : m_size(0), m_bytes1(NULL), m_bytes2(NULL), m_locked1(0), m_locked2(0) { }
+		stream_buffer() : m_size(0), m_bytes1(nullptr), m_bytes2(nullptr), m_locked1(0), m_locked2(0) { }
 
 		HRESULT create(LPDIRECTSOUND dsound, DWORD size, WAVEFORMATEX &format)
 		{
@@ -130,27 +130,27 @@ private:
 			desc.dwBufferBytes = size;
 			desc.lpwfxFormat = &format;
 			m_size = size;
-			return dsound->CreateSoundBuffer(&desc, &m_buffer, NULL);
+			return dsound->CreateSoundBuffer(&desc, &m_buffer, nullptr);
 		}
 
-		HRESULT play_looping()
+		HRESULT play_looping() const
 		{
 			assert(m_buffer);
 			return m_buffer->Play(0, 0, DSBPLAY_LOOPING);
 		}
-		HRESULT stop()
+		HRESULT stop() const
 		{
 			assert(m_buffer);
 			return m_buffer->Stop();
 		}
-		HRESULT set_volume(LONG volume)
+		HRESULT set_volume(LONG volume) const
 		{
 			assert(m_buffer);
 			return m_buffer->SetVolume(volume);
 		}
 		HRESULT set_min_volume() { return set_volume(DSBVOLUME_MIN); }
 
-		HRESULT get_current_positions(DWORD &play_pos, DWORD &write_pos)
+		HRESULT get_current_positions(DWORD &play_pos, DWORD &write_pos) const
 		{
 			assert(m_buffer);
 			return m_buffer->GetCurrentPosition(&play_pos, &write_pos);
@@ -216,7 +216,7 @@ private:
 					m_locked1,
 					m_bytes2,
 					m_locked2);
-			m_bytes1 = m_bytes2 = NULL;
+			m_bytes1 = m_bytes2 = nullptr;
 			m_locked1 = m_locked2 = 0;
 			return result;
 		}
@@ -382,7 +382,7 @@ HRESULT sound_direct_sound::dsound_init()
 	HRESULT result;
 
 	// create the DirectSound object
-	result = DirectSoundCreate(NULL, &m_dsound, NULL);
+	result = DirectSoundCreate(nullptr, &m_dsound, nullptr);
 	if (result != DS_OK)
 	{
 		osd_printf_error("Error creating DirectSound: %08x\n", (unsigned)result);
@@ -467,7 +467,7 @@ void sound_direct_sound::dsound_kill()
 	// release the object
 	if (m_dsound)
 		m_dsound->Release();
-	m_dsound = NULL;
+	m_dsound = nullptr;
 }
 
 

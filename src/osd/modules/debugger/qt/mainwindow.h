@@ -26,7 +26,7 @@ class MainWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	MainWindow(running_machine* machine, QWidget* parent=NULL);
+	MainWindow(running_machine* machine, QWidget* parent=nullptr);
 	virtual ~MainWindow();
 
 	void setProcessor(device_t* processor);
@@ -87,7 +87,7 @@ class DasmDockWidget : public QWidget
 	Q_OBJECT
 
 public:
-	DasmDockWidget(running_machine* machine, QWidget* parent=NULL) :
+	DasmDockWidget(running_machine* machine, QWidget* parent=nullptr) :
 		QWidget(parent),
 		m_machine(machine)
 	{
@@ -138,9 +138,9 @@ class ProcessorDockWidget : public QWidget
 
 public:
 	ProcessorDockWidget(running_machine* machine,
-						QWidget* parent=NULL) :
+						QWidget* parent=nullptr) :
 		QWidget(parent),
-		m_processorView(NULL),
+		m_processorView(nullptr),
 		m_machine(machine)
 	{
 		m_processorView = new DebuggerView(DVT_STATE,

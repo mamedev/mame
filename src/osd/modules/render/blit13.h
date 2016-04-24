@@ -146,7 +146,7 @@ struct blit_texcopy : public blit_base
 			x = texsource->width / (_len_div);
 			while (x > 0) {
 				*dst++ = m_op.op(*src, palbase);
-				src++;
+				++src;
 				x--;
 			}
 		}

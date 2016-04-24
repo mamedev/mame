@@ -13,7 +13,6 @@
 #include "ui/submenu.h"
 #include "ui/utils.h"
 #include <limits>
-#include <iterator>
 
 //-------------------------------------------------
 //  ctor / dtor
@@ -89,7 +88,6 @@ ui_submenu::ui_submenu(running_machine &machine, render_container *container, st
 				sm_option.options = dynamic_cast<core_options*>(&mame_machine_manager::instance()->ui().options());
 				break;
 			default:
-				continue;
 				break;
 		}
 	}
@@ -204,7 +202,7 @@ void ui_submenu::populate()
 	UINT32 arrow_flags;
 
 	// add options
-	for (auto sm_option = m_options.begin(); sm_option < m_options.end(); sm_option++)
+	for (auto sm_option = m_options.begin(); sm_option < m_options.end(); ++sm_option)
 	{
 		// skip first heading (is menu title)
 		if (sm_option == m_options.begin() && sm_option->type == ui_submenu::HEAD) continue;

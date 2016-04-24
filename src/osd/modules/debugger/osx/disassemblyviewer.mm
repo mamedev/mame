@@ -175,9 +175,9 @@
 		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:address forDevice:device];
 
 		// if it doesn't exist, add a new one
-		if (bp == NULL)
+		if (bp == nullptr)
 		{
-			UINT32 const bpnum = device.debug()->breakpoint_set(address, NULL, NULL);
+			UINT32 const bpnum = device.debug()->breakpoint_set(address, nullptr, nullptr);
 			debug_console_printf(*machine, "Breakpoint %X set\n", bpnum);
 		}
 		else
@@ -200,7 +200,7 @@
 		device_t &device = [dasmView source]->device();
 		offs_t const address = [dasmView selectedAddress];
 		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:address forDevice:device];
-		if (bp != NULL)
+		if (bp != nullptr)
 		{
 			device.debug()->breakpoint_enable(bp->index(), !bp->enabled());
 			debug_console_printf(*machine,
@@ -231,7 +231,7 @@
 	BOOL const inContextMenu = ([item menu] == [dasmView menu]);
 	BOOL const haveCursor = [dasmView cursorVisible];
 
-	device_debug::breakpoint *breakpoint = NULL;
+	device_debug::breakpoint *breakpoint = nullptr;
 	if (haveCursor)
 	{
 		breakpoint = [[self class] findBreakpointAtAddress:[dasmView selectedAddress]
@@ -242,7 +242,7 @@
 	{
 		if (haveCursor)
 		{
-			if (breakpoint != NULL)
+			if (breakpoint != nullptr)
 			{
 				if (inContextMenu)
 					[item setTitle:@"Clear Breakpoint"];
@@ -268,7 +268,7 @@
 	}
 	else if (action == @selector(debugToggleBreakpointEnable:))
 	{
-		if ((breakpoint != NULL) && !breakpoint->enabled())
+		if ((breakpoint != nullptr) && !breakpoint->enabled())
 		{
 			if (inContextMenu)
 				[item setTitle:@"Enable Breakpoint"];
@@ -282,7 +282,7 @@
 			else
 				[item setTitle:@"Disable Breakpoint at Cursor"];
 		}
-		return breakpoint != NULL;
+		return breakpoint != nullptr;
 	}
 	else
 	{

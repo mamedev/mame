@@ -142,7 +142,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 	// iterate over items
 	for (xml_data_node *itemnode = xml_get_sibling(paramnode.child, "item"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "item"))
 	{
-		// check for NULL text
+		// check for nullptr text
 		if (itemnode->value == nullptr || itemnode->value[0] == 0)
 			throw emu_fatalerror("%s.xml(%d): item is missing text\n", filename, itemnode->line);
 
@@ -705,7 +705,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		xml_data_node *commentnode = xml_get_sibling(cheatnode.child, "comment");
 		if (commentnode != nullptr)
 		{
-			// set the value if not NULL
+			// set the value if not nullptr
 			if (commentnode->value != nullptr && commentnode->value[0] != 0)
 				m_comment.assign(commentnode->value);
 

@@ -27,8 +27,8 @@ public:
 
 	virtual ~output_network_server() { delete m_tcp_server; }
 
-	void terminate_all() { m_tcp_server->terminate(); }
-	void send_to_all(const uint8_t* data, size_t len) { m_tcp_server->send_to_all(data,len); }
+	void terminate_all() const { m_tcp_server->terminate(); }
+	void send_to_all(const uint8_t* data, size_t len) const { m_tcp_server->send_to_all(data,len); }
 
 	/* Pure virtual methods inherited from raw_tcp_server::listener. */
 	virtual void on_raw_tcp_connection_closed(raw_tcp_server* tcpServer, raw_tcp_connection* connection, bool is_closed_by_peer) override { }

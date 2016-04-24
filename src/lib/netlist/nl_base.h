@@ -342,7 +342,7 @@ namespace netlist
 	{
 	public:
 
-		logic_family_t() : m_logic_family(NULL) {}
+		logic_family_t() : m_logic_family(nullptr) {}
 		~logic_family_t() { }
 
 		ATTR_HOT  logic_family_desc_t *logic_family() const { return m_logic_family; }
@@ -412,7 +412,7 @@ namespace netlist
 
 		ATTR_COLD void init_object(const pstring &aname);
 		ATTR_COLD void init_object(netlist_t &nl, const pstring &aname);
-		ATTR_COLD bool isInitialized() { return (m_netlist != NULL); }
+		ATTR_COLD bool isInitialized() { return (m_netlist != nullptr); }
 
 		ATTR_COLD const pstring &name() const;
 
@@ -489,8 +489,8 @@ namespace netlist
 		ATTR_COLD core_terminal_t(const type_t atype, const family_t afamily);
 
 		ATTR_COLD void set_net(net_t &anet);
-		ATTR_COLD  void clear_net() { m_net = NULL; }
-		ATTR_HOT  bool has_net() const { return (m_net != NULL); }
+		ATTR_COLD  void clear_net() { m_net = nullptr; }
+		ATTR_HOT  bool has_net() const { return (m_net != nullptr); }
 
 		ATTR_HOT  const net_t & net() const { return *m_net;}
 		ATTR_HOT  net_t & net() { return *m_net;}
@@ -594,7 +594,7 @@ namespace netlist
 	private:
 		ATTR_HOT void set_ptr(nl_double *ptr, const nl_double val)
 		{
-			if (ptr != NULL && *ptr != val)
+			if (ptr != nullptr && *ptr != val)
 			{
 				*ptr = val;
 			}
@@ -618,7 +618,7 @@ namespace netlist
 
 		ATTR_COLD logic_t(const type_t atype)
 			: core_terminal_t(atype, LOGIC), logic_family_t(),
-				m_proxy(NULL)
+				m_proxy(nullptr)
 		{
 		}
 
@@ -626,7 +626,7 @@ namespace netlist
 		{
 		}
 
-		ATTR_COLD bool has_proxy() const { return (m_proxy != NULL); }
+		ATTR_COLD bool has_proxy() const { return (m_proxy != nullptr); }
 		ATTR_COLD devices::nld_base_proxy *get_proxy() const  { return m_proxy; }
 		ATTR_COLD void set_proxy(devices::nld_base_proxy *proxy) { m_proxy = proxy; }
 
@@ -720,7 +720,7 @@ namespace netlist
 		ATTR_HOT  const netlist_time &time() const { return m_time; }
 		ATTR_HOT  void set_time(const netlist_time &ntime) { m_time = ntime; }
 
-		ATTR_HOT  bool isRailNet() const { return !(m_railterminal == NULL); }
+		ATTR_HOT  bool isRailNet() const { return !(m_railterminal == nullptr); }
 		ATTR_HOT  core_terminal_t & railterminal() const { return *m_railterminal; }
 
 		ATTR_HOT  void push_to_queue(const netlist_time &delay);
@@ -1227,7 +1227,7 @@ namespace netlist
 			for (std::size_t i = 0; i < m_devices.size(); i++)
 			{
 				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
-				if (dev != NULL)
+				if (dev != nullptr)
 					tmp.push_back(dev);
 			}
 			return tmp;
@@ -1239,22 +1239,22 @@ namespace netlist
 			for (std::size_t i = 0; i < m_devices.size(); i++)
 			{
 				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
-				if (dev != NULL)
+				if (dev != nullptr)
 					return dev;
 			}
-			return NULL;
+			return nullptr;
 		}
 
 		template<class _device_class>
 		ATTR_COLD _device_class *get_single_device(const char *classname)
 		{
-			_device_class *ret = NULL;
+			_device_class *ret = nullptr;
 			for (std::size_t i = 0; i < m_devices.size(); i++)
 			{
 				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
-				if (dev != NULL)
+				if (dev != nullptr)
 				{
-					if (ret != NULL)
+					if (ret != nullptr)
 						this->log().fatal("more than one {1} device found", classname);
 					else
 						ret = dev;

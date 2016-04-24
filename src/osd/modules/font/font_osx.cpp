@@ -24,8 +24,8 @@
 class osd_font_osx : public osd_font
 {
 public:
-	osd_font_osx() : m_font(NULL) { }
-	osd_font_osx(osd_font_osx &&obj) : m_font(obj.m_font) { obj.m_font = NULL; }
+	osd_font_osx() : m_font(nullptr) { }
+	osd_font_osx(osd_font_osx &&obj) : m_font(obj.m_font) { obj.m_font = nullptr; }
 	virtual ~osd_font_osx() { close(); }
 
 	virtual bool open(std::string const &font_path, std::string const &name, int &height);
@@ -60,14 +60,14 @@ bool osd_font_osx::open(std::string const &font_path, std::string const &name, i
 	}
 #endif
 
-	CFStringRef const font_name = CFStringCreateWithCString(NULL, name.c_str(), kCFStringEncodingUTF8);
+	CFStringRef const font_name = CFStringCreateWithCString(nullptr, name.c_str(), kCFStringEncodingUTF8);
 	if (font_name && (kCFNotFound != CFStringFind(font_name, CFSTR(".BDF"), kCFCompareCaseInsensitive | kCFCompareBackwards | kCFCompareAnchored | kCFCompareNonliteral).location))
 	{
 		// handle bdf fonts in the core
 		CFRelease(font_name);
 		return false;
 	}
-	CTFontRef ct_font = NULL;
+	CTFontRef ct_font = nullptr;
 	if (font_name)
 	{
 		CTFontDescriptorRef const font_descriptor = CTFontDescriptorCreateWithNameAndSize(font_name, 0.0);
@@ -109,9 +109,9 @@ bool osd_font_osx::open(std::string const &font_path, std::string const &name, i
 
 void osd_font_osx::close()
 {
-	if (m_font != NULL)
+	if (m_font != nullptr)
 		CFRelease(m_font);
-	m_font = NULL;
+	m_font = nullptr;
 }
 
 //-------------------------------------------------
@@ -170,10 +170,10 @@ bool osd_font_osx::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::in
 
 		context_ref = CGBitmapContextCreate( bitmap.raw_pixptr(0), bitmap_width, bitmap_height, bits_per_component, bitmap.rowpixels()*4, color_space, bitmap_info );
 
-		if( context_ref != NULL )
+		if( context_ref != nullptr )
 		{
 			CGFontRef font_ref;
-			font_ref = CTFontCopyGraphicsFont( ct_font, NULL );
+			font_ref = CTFontCopyGraphicsFont( ct_font, nullptr );
 			CGContextSetTextPosition(context_ref, -bounding_rect.origin.x*EXTRA_WIDTH, CTFontGetDescent(ct_font)+CTFontGetLeading(ct_font) );
 			CGContextSetRGBFillColor(context_ref, 1.0, 1.0, 1.0, 1.0);
 			CGContextSetFont( context_ref, font_ref );
@@ -202,9 +202,9 @@ public:
 private:
 	static CFComparisonResult sort_callback(CTFontDescriptorRef first, CTFontDescriptorRef second, void *refCon)
 	{
-		CFStringRef left = (CFStringRef)CTFontDescriptorCopyLocalizedAttribute(first, kCTFontDisplayNameAttribute, NULL);
+		CFStringRef left = (CFStringRef)CTFontDescriptorCopyLocalizedAttribute(first, kCTFontDisplayNameAttribute, nullptr);
 		if (!left) left = (CFStringRef)CTFontDescriptorCopyAttribute(first, kCTFontNameAttribute);
-		CFStringRef right = (CFStringRef)CTFontDescriptorCopyLocalizedAttribute(second, kCTFontDisplayNameAttribute, NULL);
+		CFStringRef right = (CFStringRef)CTFontDescriptorCopyLocalizedAttribute(second, kCTFontDisplayNameAttribute, nullptr);
 		if (!right) right = (CFStringRef)CTFontDescriptorCopyAttribute(second, kCTFontNameAttribute);
 
 		CFComparisonResult result;
@@ -223,8 +223,8 @@ bool font_osx::get_font_families(std::string const &font_path, std::vector<std::
 {
 	CFStringRef keys[] = { kCTFontCollectionRemoveDuplicatesOption };
 	std::uintptr_t values[ARRAY_LENGTH(keys)] = { 1 };
-	CFDictionaryRef const options = CFDictionaryCreate(kCFAllocatorDefault, (void const **)keys, (void const **)values, ARRAY_LENGTH(keys), &kCFTypeDictionaryKeyCallBacks, NULL);
-	CTFontCollectionRef const collection = CTFontCollectionCreateFromAvailableFonts(NULL);
+	CFDictionaryRef const options = CFDictionaryCreate(kCFAllocatorDefault, (void const **)keys, (void const **)values, ARRAY_LENGTH(keys), &kCFTypeDictionaryKeyCallBacks, nullptr);
+	CTFontCollectionRef const collection = CTFontCollectionCreateFromAvailableFonts(nullptr);
 	CFRelease(options);
 	if (!collection) return false;
 
@@ -239,7 +239,7 @@ bool font_osx::get_font_families(std::string const &font_path, std::vector<std::
 	{
 		CTFontDescriptorRef const font = (CTFontDescriptorRef)CFArrayGetValueAtIndex(descriptors, i);
 		CFStringRef const name = (CFStringRef)CTFontDescriptorCopyAttribute(font, kCTFontNameAttribute);
-		CFStringRef const display = (CFStringRef)CTFontDescriptorCopyLocalizedAttribute(font, kCTFontDisplayNameAttribute, NULL);
+		CFStringRef const display = (CFStringRef)CTFontDescriptorCopyLocalizedAttribute(font, kCTFontDisplayNameAttribute, nullptr);
 
 		if (name && display)
 		{

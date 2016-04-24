@@ -236,7 +236,7 @@
 
 		// if it doesn't exist, add a new one
 		NSString *command;
-		if (bp == NULL)
+		if (bp == nullptr)
 			command = [NSString stringWithFormat:@"bpset 0x%lX", (unsigned long)address];
 		else
 			command = [NSString stringWithFormat:@"bpclear 0x%X", (unsigned)bp->index()];
@@ -251,7 +251,7 @@
 	{
 		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:[dasmView selectedAddress]
 																   forDevice:device];
-		if (bp != NULL)
+		if (bp != nullptr)
 		{
 			NSString *command;
 			if (bp->enabled())
@@ -483,7 +483,7 @@
 	BOOL const haveCursor = [dasmView cursorVisible];
 	BOOL const isCurrent = (debug_cpu_get_visible_cpu(*machine) == &[dasmView source]->device());
 
-	device_debug::breakpoint *breakpoint = NULL;
+	device_debug::breakpoint *breakpoint = nullptr;
 	if (haveCursor)
 	{
 		breakpoint = [[self class] findBreakpointAtAddress:[dasmView selectedAddress]
@@ -494,7 +494,7 @@
 	{
 		if (haveCursor)
 		{
-			if (breakpoint != NULL)
+			if (breakpoint != nullptr)
 			{
 				if (inContextMenu)
 					[item setTitle:@"Clear Breakpoint"];
@@ -520,7 +520,7 @@
 	}
 	else if (action == @selector(debugToggleBreakpointEnable:))
 	{
-		if ((breakpoint != NULL) && !breakpoint->enabled())
+		if ((breakpoint != nullptr) && !breakpoint->enabled())
 		{
 			if (inContextMenu)
 				[item setTitle:@"Enable Breakpoint"];
@@ -534,7 +534,7 @@
 			else
 				[item setTitle:@"Disable Breakpoint at Cursor"];
 		}
-		return (breakpoint != NULL) && isCurrent;
+		return (breakpoint != nullptr) && isCurrent;
 	}
 	else if (action == @selector(debugRunToCursor:))
 	{

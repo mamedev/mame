@@ -169,7 +169,7 @@ void matrix_solver_GCR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 	{
 		pstring symname = static_compile_name();
 		m_proc = this->netlist().lib().template getsym<extsolver>(symname);
-		if (m_proc != NULL)
+		if (m_proc != nullptr)
 			this->log().verbose("External static solver {1} found ...", symname);
 		else
 			this->log().verbose("External static solver {1} not found ...", symname);

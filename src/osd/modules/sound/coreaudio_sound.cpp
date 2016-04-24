@@ -39,12 +39,12 @@ public:
 	sound_coreaudio() :
 		osd_module(OSD_SOUND_PROVIDER, "coreaudio"),
 		sound_module(),
-		m_graph(NULL),
+		m_graph(nullptr),
 		m_node_count(0),
 		m_sample_bytes(0),
 		m_headroom(0),
 		m_buffer_size(0),
-		m_buffer(NULL),
+		m_buffer(nullptr),
 		m_playpos(0),
 		m_writepos(0),
 		m_in_underrun(false),
@@ -68,7 +68,7 @@ public:
 private:
 	struct node_detail
 	{
-		node_detail() : m_node(0), m_unit(NULL) { }
+		node_detail() : m_node(0), m_unit(nullptr) { }
 
 		AUNode      m_node;
 		AudioUnit   m_unit;
@@ -110,7 +110,7 @@ private:
 		return AUGraphNodeInfo(
 				m_graph,
 				m_node_details[m_node_count].m_node,
-				NULL,
+				nullptr,
 				&m_node_details[m_node_count].m_unit);
 	}
 
@@ -150,7 +150,7 @@ private:
 		if (!CFStringGetCString(str, result, len + 1, kCFStringEncodingUTF8))
 		{
 			global_free_array(result);
-			return NULL;
+			return nullptr;
 		}
 		return result;
 	}
@@ -261,11 +261,11 @@ int sound_coreaudio::init(const osd_options &options)
 free_buffer_and_return_error:
 	global_free_array(m_buffer);
 	m_buffer_size = 0;
-	m_buffer = NULL;
+	m_buffer = nullptr;
 close_graph_and_return_error:
 	AUGraphClose(m_graph);
 	DisposeAUGraph(m_graph);
-	m_graph = NULL;
+	m_graph = nullptr;
 	m_node_count = 0;
 	return -1;
 }
@@ -280,13 +280,13 @@ void sound_coreaudio::exit()
 		AUGraphStop(m_graph);
 		AUGraphUninitialize(m_graph);
 		DisposeAUGraph(m_graph);
-		m_graph = NULL;
+		m_graph = nullptr;
 		m_node_count = 0;
 	}
 	if (m_buffer)
 	{
 		global_free_array(m_buffer);
-		m_buffer = NULL;
+		m_buffer = nullptr;
 	}
 	if (m_overflows || m_underflows)
 		osd_printf_verbose("Sound buffer: overflows=%u underflows=%u\n", m_overflows, m_underflows);
@@ -373,7 +373,7 @@ bool sound_coreaudio::create_graph(osd_options const &options)
 		goto close_graph_and_return_error;
 	}
 
-	err = AUGraphUpdate(m_graph, NULL);
+	err = AUGraphUpdate(m_graph, nullptr);
 	if (noErr != err)
 	{
 		osd_printf_error(
@@ -389,7 +389,7 @@ close_graph_and_return_error:
 dispose_graph_and_return_error:
 	DisposeAUGraph(m_graph);
 return_error:
-	m_graph = NULL;
+	m_graph = nullptr;
 	m_node_count = 0;
 	return false;
 }
@@ -537,7 +537,7 @@ bool sound_coreaudio::add_effect(char const *name)
 		return true;
 
 	CFPropertyListRef const properties = load_property_list(name);
-	if (NULL == properties)
+	if (nullptr == properties)
 		return true;
 
 	OSType type, subtype, manufacturer;
@@ -589,7 +589,7 @@ bool sound_coreaudio::add_effect(char const *name)
 				kAUParameterListener_AnyParameter,
 				0,
 				0 };
-		err = AUParameterListenerNotify(NULL, NULL, &change);
+		err = AUParameterListenerNotify(nullptr, nullptr, &change);
 	}
 	if (noErr != err)
 	{
@@ -640,7 +640,7 @@ bool sound_coreaudio::get_output_device_id(
 			kAudioObjectSystemObject,
 			&devices_addr,
 			0,
-			NULL,
+			nullptr,
 			&property_size);
 	if (noErr != err)
 	{
@@ -654,7 +654,7 @@ bool sound_coreaudio::get_output_device_id(
 			kAudioObjectSystemObject,
 			&devices_addr,
 			0,
-			NULL,
+			nullptr,
 			&property_size,
 			devices);
 	UInt32 const device_count = property_size / sizeof(AudioDeviceID);
@@ -669,7 +669,7 @@ bool sound_coreaudio::get_output_device_id(
 	{
 		char *const device_uid = get_device_uid(devices[i]);
 		char *const device_name = get_device_name(devices[i]);
-		if ((NULL == device_uid) && (NULL == device_name))
+		if ((nullptr == device_uid) && (nullptr == device_name))
 		{
 			osd_printf_warning(
 					"Could not get UID or name for device %lu - skipping\n",
@@ -685,10 +685,10 @@ bool sound_coreaudio::get_output_device_id(
 		{
 			osd_printf_verbose(
 					"No output streams found for device %s (%s) - skipping\n",
-					(NULL != device_name) ? device_name : "<anonymous>",
-					(NULL != device_uid) ? device_uid : "<unknown>");
-			if (NULL != device_uid) global_free_array(device_uid);
-			if (NULL != device_name) global_free_array(device_name);
+					(nullptr != device_name) ? device_name : "<anonymous>",
+					(nullptr != device_uid) ? device_uid : "<unknown>");
+			if (nullptr != device_uid) global_free_array(device_uid);
+			if (nullptr != device_name) global_free_array(device_name);
 			continue;
 		}
 
@@ -697,14 +697,14 @@ bool sound_coreaudio::get_output_device_id(
 		for (std::size_t j = strlen(device_name); (0 < j) && (' ' == device_name[j - 1]); j--)
 			device_name[j - 1] = '\0';
 
-		bool const matched_uid = (NULL != device_uid) && !strcmp(name, device_uid);
-		bool const matched_name = (NULL != device_name) && !strcmp(name, device_name);
+		bool const matched_uid = (nullptr != device_uid) && !strcmp(name, device_uid);
+		bool const matched_name = (nullptr != device_name) && !strcmp(name, device_name);
 		if (matched_uid || matched_name)
 		{
 			osd_printf_verbose(
 					"Matched device %s (%s) with %lu output stream(s)\n",
-					(NULL != device_name) ? device_name : "<anonymous>",
-					(NULL != device_uid) ? device_uid : "<unknown>",
+					(nullptr != device_name) ? device_name : "<anonymous>",
+					(nullptr != device_uid) ? device_uid : "<unknown>",
 					(unsigned long)streams);
 		}
 		global_free_array(device_uid);
@@ -730,26 +730,26 @@ char *sound_coreaudio::get_device_uid(AudioDeviceID id) const
 			kAudioDevicePropertyDeviceUID,
 			kAudioObjectPropertyScopeGlobal,
 			kAudioObjectPropertyElementMaster };
-	CFStringRef device_uid = NULL;
+	CFStringRef device_uid = nullptr;
 	UInt32 property_size = sizeof(device_uid);
 	OSStatus const err = AudioObjectGetPropertyData(
 			id,
 			&uid_addr,
 			0,
-			NULL,
+			nullptr,
 			&property_size,
 			&device_uid);
-	if ((noErr != err) || (NULL == device_uid))
+	if ((noErr != err) || (nullptr == device_uid))
 	{
 		osd_printf_warning(
 				"Error getting UID for audio device %lu (%ld)\n",
 				(unsigned long)id,
 				(long)err);
-		return NULL;
+		return nullptr;
 	}
 	char *const result = convert_cfstring_to_utf8(device_uid);
 	CFRelease(device_uid);
-	if (NULL == result)
+	if (nullptr == result)
 	{
 		osd_printf_warning(
 				"Error converting UID for audio device %lu to UTF-8\n",
@@ -765,26 +765,26 @@ char *sound_coreaudio::get_device_name(AudioDeviceID id) const
 			kAudioDevicePropertyDeviceNameCFString,
 			kAudioObjectPropertyScopeGlobal,
 			kAudioObjectPropertyElementMaster };
-	CFStringRef device_name = NULL;
+	CFStringRef device_name = nullptr;
 	UInt32 property_size = sizeof(device_name);
 	OSStatus const err = AudioObjectGetPropertyData(
 			id,
 			&name_addr,
 			0,
-			NULL,
+			nullptr,
 			&property_size,
 			&device_name);
-	if ((noErr != err) || (NULL == device_name))
+	if ((noErr != err) || (nullptr == device_name))
 	{
 		osd_printf_warning(
 				"Error getting name for audio device %lu (%ld)\n",
 				(unsigned long)id,
 				(long)err);
-		return NULL;
+		return nullptr;
 	}
 	char *const result = convert_cfstring_to_utf8(device_name);
 	CFRelease(device_name);
-	if (NULL == result)
+	if (nullptr == result)
 	{
 		osd_printf_warning(
 				"Error converting name for audio device %lu to UTF-8\n",
@@ -808,14 +808,14 @@ UInt32 sound_coreaudio::get_output_stream_count(
 			id,
 			&streams_addr,
 			0,
-			NULL,
+			nullptr,
 			&property_size);
 	if (noErr != err)
 	{
 		osd_printf_warning(
 				"Error getting output stream count for audio device %s (%s) (%ld)\n",
-				(NULL != name) ? name : "<anonymous>",
-				(NULL != uid) ? uid : "<unknown>",
+				(nullptr != name) ? name : "<anonymous>",
+				(nullptr != uid) ? uid : "<unknown>",
 				(long)err);
 		return 0;
 	}
@@ -840,9 +840,9 @@ bool sound_coreaudio::extract_effect_info(
 	}
 
 	CFDictionaryRef const desc = (CFDictionaryRef)properties;
-	CFTypeRef type_val = NULL;
-	CFTypeRef subtype_val = NULL;
-	CFTypeRef manufacturer_val = NULL;
+	CFTypeRef type_val = nullptr;
+	CFTypeRef subtype_val = nullptr;
+	CFTypeRef manufacturer_val = nullptr;
 	if (CFDictionaryContainsKey(desc, CFSTR("ComponentType"))
 		&& CFDictionaryContainsKey(desc, CFSTR("ComponentSubType"))
 		&& CFDictionaryContainsKey(desc, CFSTR("ComponentManufacturer"))
@@ -871,10 +871,10 @@ bool sound_coreaudio::extract_effect_info(
 	}
 
 	SInt64 type_int, subtype_int, manufacturer_int;
-	if ((NULL == type_val)
-		|| (NULL == subtype_val)
-		|| (NULL == manufacturer_val)
-		|| (NULL == class_info)
+	if ((nullptr == type_val)
+		|| (nullptr == subtype_val)
+		|| (nullptr == manufacturer_val)
+		|| (nullptr == class_info)
 		|| (CFNumberGetTypeID() != CFGetTypeID(type_val))
 		|| (CFNumberGetTypeID() != CFGetTypeID(subtype_val))
 		|| (CFNumberGetTypeID() != CFGetTypeID(manufacturer_val))
@@ -909,23 +909,23 @@ bool sound_coreaudio::extract_effect_info(
 CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 {
 	CFURLRef const url = CFURLCreateFromFileSystemRepresentation(
-			NULL,
+			nullptr,
 			(UInt8 const *)name,
 			strlen(name),
 			false);
-	if (NULL == url)
+	if (nullptr == url)
 	{
-		return NULL;
+		return nullptr;
 	}
 
-	CFDataRef data = NULL;
+	CFDataRef data = nullptr;
 	SInt32 err;
 	Boolean const status = CFURLCreateDataAndPropertiesFromResource(
-			NULL,
+			nullptr,
 			url,
 			&data,
-			NULL,
-			NULL,
+			nullptr,
+			nullptr,
 			&err);
 	CFRelease(url);
 	if (!status)
@@ -934,24 +934,24 @@ CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 				"Error reading data from %s (%ld)\n",
 				name,
 				(long)err);
-		if (NULL != data) CFRelease(data);
-		return NULL;
+		if (nullptr != data) CFRelease(data);
+		return nullptr;
 	}
 
-	CFStringRef msg = NULL;
+	CFStringRef msg = nullptr;
 	CFPropertyListRef const result = CFPropertyListCreateFromXMLData(
-			NULL,
+			nullptr,
 			data,
 			kCFPropertyListImmutable,
 			&msg);
 	CFRelease(data);
-	if ((NULL == result) || (NULL != msg))
+	if ((nullptr == result) || (nullptr != msg))
 	{
-		char *buf = (NULL != msg) ? convert_cfstring_to_utf8(msg) : NULL;
-		if (NULL != msg)
+		char *buf = (nullptr != msg) ? convert_cfstring_to_utf8(msg) : nullptr;
+		if (nullptr != msg)
 			CFRelease(msg);
 
-		if (NULL != buf)
+		if (nullptr != buf)
 		{
 			osd_printf_error(
 					"Error creating property list from %s: %s\n",
@@ -965,8 +965,8 @@ CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 					"Error creating property list from %s\n",
 					name);
 		}
-		if (NULL != result) CFRelease(result);
-		return NULL;
+		if (nullptr != result) CFRelease(result);
+		return nullptr;
 	}
 
 	return result;

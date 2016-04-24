@@ -15,7 +15,6 @@
 #include "ui/menu.h"
 #include "uiinput.h"
 #include "ui/simpleselgame.h"
-#include "ui/inputmap.h"
 #include "ui/miscmenu.h"
 #include "ui/optsmenu.h"
 #include "audit.h"

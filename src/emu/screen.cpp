@@ -67,7 +67,7 @@ screen_device_svg_renderer::screen_device_svg_renderer(memory_region *region)
 	delete[] s;
 	m_rasterizer = nsvgCreateRasterizer();
 
-	for (NSVGshape *shape = m_image->shapes; shape != NULL; shape = shape->next)
+	for (NSVGshape *shape = m_image->shapes; shape != nullptr; shape = shape->next)
 		if(shape->title[0]) {
 			shape->flags &= ~NSVG_FLAGS_VISIBLE;
 			m_keyed_shapes[shape->title].push_back(shape);

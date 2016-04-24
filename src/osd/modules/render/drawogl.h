@@ -42,7 +42,7 @@ public:
 	:   hash(0), flags(0), rawwidth(0), rawheight(0),
 		rawwidth_create(0), rawheight_create(0),
 		type(0), format(0), borderpix(0), xprescale(0), yprescale(0), nocopy(0),
-		texture(0), texTarget(0), texpow2(0), mpass_dest_idx(0), pbo(0), data(NULL),
+		texture(0), texTarget(0), texpow2(0), mpass_dest_idx(0), pbo(0), data(nullptr),
 		data_own(0), texCoordBufferName(0)
 	{
 		for (int i=0; i<2; i++)
@@ -101,7 +101,7 @@ public:
 		, m_width(0)
 		, m_height(0)
 		, m_blit_dim(0, 0)
-		, m_gl_context(NULL)
+		, m_gl_context(nullptr)
 		, m_initialized(0)
 		, m_last_blendmode(0)
 		, m_texture_max_width(0)
@@ -122,7 +122,7 @@ public:
 		, m_surf_h(0)
 	{
 		for (int i=0; i < HASH_SIZE + OVERFLOW_SIZE; i++)
-			m_texhash[i] = NULL;
+			m_texhash[i] = nullptr;
 		for (int i=0; i < 2*GLSL_SHADER_MAX; i++)
 			m_glsl_program[i] = 0;
 		for (int i=0; i < 8; i++)

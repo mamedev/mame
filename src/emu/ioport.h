@@ -1195,7 +1195,7 @@ private:
 	// internal state
 	ioport_field *              m_next;             // pointer to next field in sequence
 	ioport_port &               m_port;             // reference to the port that owns us
-	std::unique_ptr<ioport_field_live> m_live;         // live state of field (NULL if not live)
+	std::unique_ptr<ioport_field_live> m_live;         // live state of field (nullptr if not live)
 	int                         m_modcount;         // modification count
 	simple_list<ioport_setting> m_settinglist;      // list of input_setting_configs
 	simple_list<ioport_diplocation> m_diploclist;   // list of locations for various bits
@@ -1321,7 +1321,7 @@ private:
 	std::string                 m_tag;          // copy of this port's tag
 	int                         m_modcount;     // modification count
 	ioport_value                m_active;       // mask of active bits in the port
-	std::unique_ptr<ioport_port_live> m_live;      // live state of port (NULL if not live)
+	std::unique_ptr<ioport_port_live> m_live;      // live state of port (nullptr if not live)
 };
 
 inline ioport_value read_safe(ioport_port *port, ioport_value defval) { return (port == nullptr) ? defval : port->read(); }
@@ -1543,7 +1543,7 @@ private:
 
 	template<typename _Type> void timecode_write(_Type value);
 	void timecode_init();
-	void timecode_end(const char *message = NULL);
+	void timecode_end(const char *message = nullptr);
 
 	// internal state
 	running_machine &       m_machine;              // reference to owning machine
@@ -1563,11 +1563,11 @@ private:
 	attoseconds_t           m_last_delta_nsec;      // nanoseconds that passed since the previous callback
 
 	// playback/record information
-	emu_file                m_record_file;          // recording file (NULL if not recording)
-	emu_file                m_playback_file;        // playback file (NULL if not recording)
+	emu_file                m_record_file;          // recording file (nullptr if not recording)
+	emu_file                m_playback_file;        // playback file (nullptr if not recording)
 	UINT64                  m_playback_accumulated_speed; // accumulated speed during playback
 	UINT32                  m_playback_accumulated_frames; // accumulated frames during playback
-	emu_file                m_timecode_file;        // timecode/frames playback file (NULL if not recording)
+	emu_file                m_timecode_file;        // timecode/frames playback file (nullptr if not recording)
 	int                     m_timecode_count;
 	attotime                m_timecode_last_time;
 
@@ -1675,7 +1675,7 @@ private:
 //**************************************************************************
 
 // so that "0" can be used for unneeded input ports
-#define construct_ioport_0 NULL
+#define construct_ioport_0 nullptr
 
 // name of table
 #define INPUT_PORTS_NAME(_name) construct_ioport_##_name
@@ -1706,7 +1706,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 #define PORT_BIT(_mask, _default, _type) \
 	configurer.field_alloc((_type), (_default), (_mask));
 #define PORT_SPECIAL_ONOFF(_mask, _default, _strindex) \
-	PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, NULL)
+	PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, nullptr)
 
 #define PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, _diploc) \
 	configurer.onoff_alloc(DEF_STR(_strindex), _default, _mask, _diploc);
@@ -1779,10 +1779,10 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_set_crosshair(CROSSHAIR_AXIS_##axis, altaxis, scale, offset);
 
 #define PORT_CROSSHAIR_MAPPER(_callback) \
-	configurer.field_set_crossmapper(ioport_field_crossmap_delegate(_callback, #_callback, DEVICE_SELF, (device_t *)NULL));
+	configurer.field_set_crossmapper(ioport_field_crossmap_delegate(_callback, #_callback, DEVICE_SELF, (device_t *)nullptr));
 
 #define PORT_CROSSHAIR_MAPPER_MEMBER(_device, _class, _member) \
-	configurer.field_set_crossmapper(ioport_field_crossmap_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)NULL));
+	configurer.field_set_crossmapper(ioport_field_crossmap_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr));
 
 // how many optical counts for 1 full turn of the control
 #define PORT_FULL_TURN_COUNT(_count) \
@@ -1809,19 +1809,19 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 
 // read callbacks
 #define PORT_CUSTOM_MEMBER(_device, _class, _member, _param) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)NULL), (void *)(_param));
+	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr), (void *)(_param));
 
 // write callbacks
 #define PORT_CHANGED_MEMBER(_device, _class, _member, _param) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)NULL), (void *)(_param));
+	configurer.field_set_dynamic_write(ioport_field_write_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr), (void *)(_param));
 
 // input device handler
 #define PORT_READ_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device, ioport_field &field, void *param)->ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; } , #_class "::" #_member, _device, (_class *)NULL));
+	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device, ioport_field &field, void *param)->ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; } , #_class "::" #_member, _device, (_class *)nullptr));
 
 // output device handler
 #define PORT_WRITE_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate([](_class &device, ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { device._member(newval); }, #_class "::" #_member, _device, (_class *)NULL));
+	configurer.field_set_dynamic_write(ioport_field_write_delegate([](_class &device, ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { device._member(newval); }, #_class "::" #_member, _device, (_class *)nullptr));
 
 // dip switch definition
 #define PORT_DIPNAME(_mask, _default, _name) \
@@ -1853,10 +1853,10 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 // name of table
 #define DEVICE_INPUT_DEFAULTS_NAME(_name) device_iptdef_##_name
 
-#define device_iptdef_0 NULL
-#define device_iptdef_0L NULL
-#define device_iptdef_0LL NULL
-#define device_iptdef___null NULL
+#define device_iptdef_0 nullptr
+#define device_iptdef_0L nullptr
+#define device_iptdef_0LL nullptr
+#define device_iptdef___null nullptr
 
 // start of table
 #define DEVICE_INPUT_DEFAULTS_START(_name) \
@@ -1866,7 +1866,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	{ _tag ,_mask, _defval },
 // end of table
 #define DEVICE_INPUT_DEFAULTS_END \
-	{NULL,0,0} };
+	{nullptr,0,0} };
 
 
 

@@ -36,7 +36,7 @@
 osd_video_config video_config;
 
 // monitor info
-osd_monitor_info *osd_monitor_info::list = NULL;
+osd_monitor_info *osd_monitor_info::list = nullptr;
 
 
 //============================================================
@@ -94,7 +94,7 @@ void windows_osd_interface::video_exit()
 	window_exit();
 
 	// free all of our monitor information
-	while (osd_monitor_info::list != NULL)
+	while (osd_monitor_info::list != nullptr)
 	{
 		osd_monitor_info *temp = osd_monitor_info::list;
 		osd_monitor_info::list = temp->m_next;
@@ -149,10 +149,10 @@ osd_monitor_info *win_monitor_info::monitor_from_handle(HMONITOR hmonitor)
 	osd_monitor_info *monitor;
 
 	// find the matching monitor
-	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->m_next)
+	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->m_next)
 		if (*((HMONITOR *)monitor->oshandle()) == hmonitor)
 			return monitor;
-	return NULL;
+	return nullptr;
 }
 
 
@@ -231,14 +231,14 @@ static void init_monitors(void)
 	osd_monitor_info **tailptr;
 
 	// make a list of monitors
-	osd_monitor_info::list = NULL;
+	osd_monitor_info::list = nullptr;
 	tailptr = &osd_monitor_info::list;
-	EnumDisplayMonitors(NULL, NULL, win_monitor_info::monitor_enum_callback, (LPARAM)&tailptr);
+	EnumDisplayMonitors(nullptr, nullptr, win_monitor_info::monitor_enum_callback, (LPARAM)&tailptr);
 
 	// if we're verbose, print the list of monitors
 	{
 		osd_monitor_info *monitor;
-		for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->m_next)
+		for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->m_next)
 		{
 			osd_printf_verbose("Video: Monitor %p = \"%s\" %s\n", monitor->oshandle(), monitor->devicename(), monitor->is_primary() ? "(primary)" : "");
 		}
@@ -270,9 +270,9 @@ osd_monitor_info *osd_monitor_info::pick_monitor(osd_options &osdopts, int index
 	aspect = get_aspect(options.aspect(), options.aspect(index), TRUE);
 
 	// look for a match in the name first
-	if (scrname != NULL && (scrname[0] != 0))
+	if (scrname != nullptr && (scrname[0] != 0))
 	{
-		for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
+		for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
 		{
 			moncount++;
 			if (strcmp(scrname, monitor->devicename()) == 0)
@@ -282,12 +282,12 @@ osd_monitor_info *osd_monitor_info::pick_monitor(osd_options &osdopts, int index
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
-	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
+	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
 		if (index-- == 0)
 			goto finishit;
 
 	// return the primary just in case all else fails
-	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
+	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
 		if (monitor->is_primary())
 			goto finishit;
 
@@ -411,7 +411,7 @@ void windows_osd_interface::extract_video_config()
 					strcpy(video_config.glsl_shader_mamebm[i], stemp);
 					video_config.glsl_shader_mamebm_num++;
 				} else {
-					video_config.glsl_shader_mamebm[i] = NULL;
+					video_config.glsl_shader_mamebm[i] = nullptr;
 				}
 			}
 
@@ -426,7 +426,7 @@ void windows_osd_interface::extract_video_config()
 					strcpy(video_config.glsl_shader_scrn[i], stemp);
 					video_config.glsl_shader_scrn_num++;
 				} else {
-					video_config.glsl_shader_scrn[i] = NULL;
+					video_config.glsl_shader_scrn[i] = nullptr;
 				}
 			}
 		} else {
@@ -435,12 +435,12 @@ void windows_osd_interface::extract_video_config()
 			video_config.glsl_shader_mamebm_num=0;
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
-				video_config.glsl_shader_mamebm[i] = NULL;
+				video_config.glsl_shader_mamebm[i] = nullptr;
 			}
 			video_config.glsl_shader_scrn_num=0;
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
-				video_config.glsl_shader_scrn[i] = NULL;
+				video_config.glsl_shader_scrn[i] = nullptr;
 			}
 		}
 

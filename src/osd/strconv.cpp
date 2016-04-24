@@ -26,15 +26,15 @@ CHAR *astring_from_utf8(const char *utf8string)
 	CHAR *result;
 
 	// convert MAME string (UTF-8) to UTF-16
-	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, NULL, 0);
+	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, nullptr, 0);
 	wstring = (WCHAR *)alloca(char_count * sizeof(*wstring));
 	MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, wstring, char_count);
 
 	// convert UTF-16 to "ANSI code page" string
-	char_count = WideCharToMultiByte(CP_ACP, 0, wstring, -1, NULL, 0, NULL, NULL);
+	char_count = WideCharToMultiByte(CP_ACP, 0, wstring, -1, nullptr, 0, nullptr, nullptr);
 	result = (CHAR *)osd_malloc_array(char_count * sizeof(*result));
-	if (result != NULL)
-		WideCharToMultiByte(CP_ACP, 0, wstring, -1, result, char_count, NULL, NULL);
+	if (result != nullptr)
+		WideCharToMultiByte(CP_ACP, 0, wstring, -1, result, char_count, nullptr, nullptr);
 
 	return result;
 }
@@ -51,15 +51,15 @@ char *utf8_from_astring(const CHAR *astring)
 	CHAR *result;
 
 	// convert "ANSI code page" string to UTF-16
-	char_count = MultiByteToWideChar(CP_ACP, 0, astring, -1, NULL, 0);
+	char_count = MultiByteToWideChar(CP_ACP, 0, astring, -1, nullptr, 0);
 	wstring = (WCHAR *)alloca(char_count * sizeof(*wstring));
 	MultiByteToWideChar(CP_ACP, 0, astring, -1, wstring, char_count);
 
 	// convert UTF-16 to MAME string (UTF-8)
-	char_count = WideCharToMultiByte(CP_UTF8, 0, wstring, -1, NULL, 0, NULL, NULL);
+	char_count = WideCharToMultiByte(CP_UTF8, 0, wstring, -1, nullptr, 0, nullptr, nullptr);
 	result = (CHAR *)osd_malloc_array(char_count * sizeof(*result));
-	if (result != NULL)
-		WideCharToMultiByte(CP_UTF8, 0, wstring, -1, result, char_count, NULL, NULL);
+	if (result != nullptr)
+		WideCharToMultiByte(CP_UTF8, 0, wstring, -1, result, char_count, nullptr, nullptr);
 
 	return result;
 }
@@ -75,9 +75,9 @@ WCHAR *wstring_from_utf8(const char *utf8string)
 	WCHAR *result;
 
 	// convert MAME string (UTF-8) to UTF-16
-	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, NULL, 0);
+	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, nullptr, 0);
 	result = (WCHAR *)osd_malloc_array(char_count * sizeof(*result));
-	if (result != NULL)
+	if (result != nullptr)
 		MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, result, char_count);
 
 	return result;
@@ -94,10 +94,10 @@ char *utf8_from_wstring(const WCHAR *wstring)
 	char *result;
 
 	// convert UTF-16 to MAME string (UTF-8)
-	char_count = WideCharToMultiByte(CP_UTF8, 0, wstring, -1, NULL, 0, NULL, NULL);
+	char_count = WideCharToMultiByte(CP_UTF8, 0, wstring, -1, nullptr, 0, nullptr, nullptr);
 	result = (char *)osd_malloc_array(char_count * sizeof(*result));
-	if (result != NULL)
-		WideCharToMultiByte(CP_UTF8, 0, wstring, -1, result, char_count, NULL, NULL);
+	if (result != nullptr)
+		WideCharToMultiByte(CP_UTF8, 0, wstring, -1, result, char_count, nullptr, nullptr);
 
 	return result;
 }

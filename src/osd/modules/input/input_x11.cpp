@@ -130,7 +130,7 @@ find_device_info(Display    *display,
 			bool       only_extended)
 {
 	XDeviceInfo *devices;
-	XDeviceInfo *found = NULL;
+	XDeviceInfo *found = nullptr;
 	int     loop;
 	int     num_devices;
 	int     len = strlen(name);
@@ -287,7 +287,7 @@ public:
 		if (m_display != nullptr)
 			return 0;
 
-		m_display = XOpenDisplay(NULL);
+		m_display = XOpenDisplay(nullptr);
 		if (m_display == nullptr)
 		{
 			osd_printf_verbose("Unable to connect to X server\n");

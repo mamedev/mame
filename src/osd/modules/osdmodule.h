@@ -68,7 +68,7 @@ public:
 	~osd_module_manager();
 
 	void register_module(const module_type &mod_type);
-	bool type_has_name(const char *type, const char *name);
+	bool type_has_name(const char *type, const char *name) const;
 
 	osd_module *get_module_generic(const char *type, const char *name);
 
@@ -80,14 +80,14 @@ public:
 
 	osd_module *select_module(const char *type, const char *name = "");
 
-	void get_module_names(const char *type, const int max, int *num, const char *names[]);
+	void get_module_names(const char *type, const int max, int *num, const char *names[]) const;
 
 	void init(const osd_options &options);
 
 	void exit();
 
 private:
-	int get_module_index(const char *type, const char *name);
+	int get_module_index(const char *type, const char *name) const;
 
 	osd_module *m_modules[MAX_MODULES];
 	osd_module *m_selected[MAX_MODULES];

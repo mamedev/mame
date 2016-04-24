@@ -72,7 +72,7 @@ void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname)
 
 void nl_convert_base_t::add_term(pstring netname, pstring termname)
 {
-	net_t * net = NULL;
+	net_t * net = nullptr;
 	if (m_nets.contains(netname))
 		net = m_nets[netname];
 	else
@@ -84,7 +84,7 @@ void nl_convert_base_t::add_term(pstring netname, pstring termname)
 	/* if there is a pin alias, translate ... */
 	pin_alias_t *alias = m_pins[termname];
 
-	if (alias != NULL)
+	if (alias != nullptr)
 		net->terminals().push_back(alias->alias());
 	else
 		net->terminals().push_back(termname);

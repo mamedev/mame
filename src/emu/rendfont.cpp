@@ -32,7 +32,7 @@ inline const char *next_line(const char *ptr)
 	// scan forward until we hit the end or a carriage return
 	while (*ptr != 13 && *ptr != 10 && *ptr != 0) ptr++;
 
-	// if we hit the end, return NULL
+	// if we hit the end, return nullptr
 	if (*ptr == 0)
 		return nullptr;
 

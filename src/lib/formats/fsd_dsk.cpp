@@ -159,7 +159,7 @@ bool fsd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					//sects[i].actual_size = 0;
 					//sects[i].deleted = false;
 					//sects[i].bad_crc = false;
-					//sects[i].data = NULL;
+					//sects[i].data = nullptr;
 					//osd_printf_verbose("Unread      %x    %x    %x    %x    %x  %x  %x\n", i, sects[i].track, sects[i].head, sects[i].sector, sects[i].size, sects[i].actual_size, 0);
 				}
 			}

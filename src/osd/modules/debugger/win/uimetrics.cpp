@@ -20,8 +20,8 @@ ui_metrics::ui_metrics(osd_options const &options) :
 	m_vscroll_width(GetSystemMetrics(SM_CXVSCROLL))
 {
 	// create a temporary DC
-	HDC const temp_dc = GetDC(NULL);
-	if (temp_dc != NULL)
+	HDC const temp_dc = GetDC(nullptr);
+	if (temp_dc != nullptr)
 	{
 		float const size = options.debugger_font_size();
 		char const *const face = options.debugger_font();
@@ -32,7 +32,7 @@ ui_metrics::ui_metrics(osd_options const &options) :
 					ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, t_face);
 		osd_free(t_face);
 
-		if (m_debug_font == NULL)
+		if (m_debug_font == nullptr)
 			fatalerror("Unable to create debugger font\n");
 
 		// get the metrics
@@ -45,13 +45,13 @@ ui_metrics::ui_metrics(osd_options const &options) :
 			m_debug_font_ascent = metrics.tmAscent + metrics.tmExternalLeading;
 		}
 		SelectObject(temp_dc, old_font);
-		ReleaseDC(NULL, temp_dc);
+		ReleaseDC(nullptr, temp_dc);
 	}
 }
 
 
 ui_metrics::ui_metrics(ui_metrics const &that) :
-	m_debug_font(NULL),
+	m_debug_font(nullptr),
 	m_debug_font_height(that.m_debug_font_height),
 	m_debug_font_width(that.m_debug_font_width),
 	m_debug_font_ascent(that.m_debug_font_ascent),

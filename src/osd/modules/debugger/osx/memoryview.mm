@@ -65,7 +65,7 @@
 - (NSSize)maximumFrameSize {
 	debug_view_xy			max(0, 0);
 	debug_view_source const	*source = view->source();
-	for (debug_view_source const *source = view->first_source(); source != NULL; source = source->next())
+	for (debug_view_source const *source = view->first_source(); source != nullptr; source = source->next())
 	{
 		view->set_source(*source);
 		debug_view_xy const current = view->total_size();
@@ -88,7 +88,7 @@
 
 - (NSString *)selectedSubviewName {
 	debug_view_source const *source = view->source();
-	if (source != NULL)
+	if (source != nullptr)
 		return [NSString stringWithUTF8String:source->name()];
 	else
 		return @"";
@@ -97,7 +97,7 @@
 
 - (int)selectedSubviewIndex {
 	debug_view_source const *source = view->source();
-	if (source != NULL)
+	if (source != nullptr)
 		return view->source_list().indexof(*source);
 	else
 		return -1;
@@ -116,7 +116,7 @@
 
 - (BOOL)selectSubviewForDevice:(device_t *)device {
 	debug_view_source const *const source = view->source_for_device(device);
-	if (source != NULL)
+	if (source != nullptr)
 	{
 		if (view->source() != source)
 		{
@@ -134,11 +134,11 @@
 
 
 - (BOOL)selectSubviewForSpace:(address_space *)space {
-	if (space == NULL) return NO;
+	if (space == nullptr) return NO;
 	debug_view_memory_source const *source = downcast<debug_view_memory_source const *>(view->first_source());
-	while ((source != NULL) && (source->space() != space))
+	while ((source != nullptr) && (source->space() != space))
 		source = downcast<debug_view_memory_source *>(source->next());
-	if (source != NULL)
+	if (source != nullptr)
 	{
 		if (view->source() != source)
 		{
@@ -275,7 +275,7 @@
 
 
 - (void)insertSubviewItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index {
-	for (const debug_view_source *source = view->source_list().first(); source != NULL; source = source->next())
+	for (const debug_view_source *source = view->source_list().first(); source != nullptr; source = source->next())
 	{
 		[[menu insertItemWithTitle:[NSString stringWithUTF8String:source->name()]
 							action:NULL

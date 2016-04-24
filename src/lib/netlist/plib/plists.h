@@ -52,9 +52,9 @@ public:
 
 	~parray_t()
 	{
-		if (m_list != NULL)
+		if (m_list != nullptr)
 			pfree_array(m_list);
-		m_list = NULL;
+		m_list = nullptr;
 	}
 
 	ATTR_HOT  _ListClass& operator[](const std::size_t index) { return m_list[index]; }
@@ -70,12 +70,12 @@ public:
 protected:
 	ATTR_COLD void set_capacity(const std::size_t new_capacity)
 	{
-		if (m_list != NULL)
+		if (m_list != nullptr)
 			pfree_array(m_list);
 		if (new_capacity > 0)
 			m_list = palloc_array(_ListClass, new_capacity);
 		else
-			m_list = NULL;
+			m_list = nullptr;
 		m_capacity = new_capacity;
 	}
 
@@ -153,7 +153,7 @@ public:
 
 	friend class plinkedlist_t<_ListClass>;
 
-	plinkedlist_element_t() : m_next(NULL) {}
+	plinkedlist_element_t() : m_next(nullptr) {}
 
 	_ListClass *next() const { return m_next; }
 private:
@@ -165,7 +165,7 @@ class plinkedlist_t
 {
 public:
 
-	plinkedlist_t() : m_head(NULL) {}
+	plinkedlist_t() : m_head(nullptr) {}
 
 	ATTR_HOT  void insert(const _ListClass &before, _ListClass &elem)
 	{
@@ -177,7 +177,7 @@ public:
 		else
 		{
 			_ListClass *p = m_head;
-			while (p != NULL)
+			while (p != nullptr)
 			{
 				if (p->m_next == &before)
 				{
@@ -200,12 +200,12 @@ public:
 	ATTR_HOT  void add(_ListClass &elem)
 	{
 		_ListClass **p = &m_head;
-		while (*p != NULL)
+		while (*p != nullptr)
 		{
 			p = &((*p)->m_next);
 		}
 		*p = &elem;
-		elem.m_next = NULL;
+		elem.m_next = nullptr;
 	}
 
 	ATTR_HOT  void remove(const _ListClass &elem)
@@ -213,14 +213,14 @@ public:
 		_ListClass **p;
 		for (p = &m_head; *p != &elem; p = &((*p)->m_next))
 		{
-			//nl_assert(*p != NULL);
+			//nl_assert(*p != nullptr);
 		}
 		(*p) = elem.m_next;
 	}
 
 	ATTR_HOT  _ListClass *first() const { return m_head; }
-	ATTR_HOT  void clear() { m_head = NULL; }
-	ATTR_HOT  bool is_empty() const { return (m_head == NULL); }
+	ATTR_HOT  void clear() { m_head = nullptr; }
+	ATTR_HOT  bool is_empty() const { return (m_head == nullptr); }
 
 private:
 	_ListClass *m_head;
@@ -234,7 +234,7 @@ public:
 
 	friend class plinkedlist_t<_ListClass>;
 
-	plinkedlist_element_t() : m_next(NULL), m_prev(NULL) {}
+	plinkedlist_element_t() : m_next(nullptr), m_prev(nullptr) {}
 
 	_ListClass *next() const { return m_next; }
 private:
@@ -247,46 +247,46 @@ class plinkedlist_t
 {
 public:
 
-	plinkedlist_t() : m_head(NULL), m_tail(NULL) {}
+	plinkedlist_t() : m_head(nullptr), m_tail(nullptr) {}
 
 	ATTR_HOT  void insert(_ListClass &elem)
 	{
-		if (m_head != NULL)
+		if (m_head != nullptr)
 			m_head->m_prev = &elem;
 		elem.m_next = m_head;
-		elem.m_prev = NULL;
+		elem.m_prev = nullptr;
 		m_head = &elem;
-		if (m_tail == NULL)
+		if (m_tail == nullptr)
 			m_tail = &elem;
 	}
 
 	ATTR_HOT  void add(_ListClass &elem)
 	{
-		if (m_tail != NULL)
+		if (m_tail != nullptr)
 			m_tail->m_next = &elem;
 		elem.m_prev = m_tail;
 		m_tail = &elem;
-		elem.m_next = NULL;
-		if (m_head == NULL)
+		elem.m_next = nullptr;
+		if (m_head == nullptr)
 			m_head = &elem;
 	}
 
 	ATTR_HOT  void remove(const _ListClass &elem)
 	{
-		if (prev(elem) == NULL)
+		if (prev(elem) == nullptr)
 		{
 			m_head = next(elem);
 			if (m_tail == &elem)
-				m_tail = NULL;
+				m_tail = nullptr;
 		}
 		else
 			prev(elem)->m_next = next(elem);
 
-		if (next(elem) == NULL)
+		if (next(elem) == nullptr)
 		{
 			m_tail = prev(elem);
 			if (m_head == &elem)
-				m_head = NULL;
+				m_head = nullptr;
 		}
 		else
 			next(elem)->m_prev = prev(elem);
@@ -298,8 +298,8 @@ public:
 	ATTR_HOT static  _ListClass *prev(const _ListClass &elem) { return static_cast<_ListClass *>(elem.m_prev); }
 	ATTR_HOT static  _ListClass *prev(const _ListClass *elem) { return static_cast<_ListClass *>(elem->m_prev); }
 	ATTR_HOT  _ListClass *first() const { return m_head; }
-	ATTR_HOT  void clear() { m_head = m_tail = NULL; }
-	ATTR_HOT  bool is_empty() const { return (m_head == NULL); }
+	ATTR_HOT  void clear() { m_head = m_tail = nullptr; }
+	ATTR_HOT  bool is_empty() const { return (m_head == nullptr); }
 
 private:
 	_ListClass *m_head;

@@ -35,12 +35,12 @@ public:
 	}
 	inline void set(rgb_t& rgba) { set(rgba.a(), rgba.r(), rgba.g(), rgba.b()); }
 
-	inline rgb_t to_rgba()
+	inline rgb_t to_rgba() const
 	{
 		return rgb_t(m_a, m_r, m_g, m_b);
 	}
 
-	inline rgb_t to_rgba_clamp()
+	inline rgb_t to_rgba_clamp() const
 	{
 		UINT8 a = (m_a < 0) ? 0 : (m_a > 255) ? 255 : m_a;
 		UINT8 r = (m_r < 0) ? 0 : (m_r > 255) ? 255 : m_r;

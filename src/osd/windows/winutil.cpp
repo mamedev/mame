@@ -122,7 +122,7 @@ lazy_loaded_function::lazy_loaded_function(const char * name, const wchar_t* dll
 }
 
 lazy_loaded_function::lazy_loaded_function(const char * name, const wchar_t** dll_names, int dll_count)
-	: m_name(name), m_module(NULL), m_initialized(false), m_pfn(nullptr)
+	: m_name(name), m_module(nullptr), m_initialized(false), m_pfn(nullptr)
 {
 	for (int i = 0; i < dll_count; i++)
 		m_dll_names.push_back(std::wstring(dll_names[i]));
@@ -144,11 +144,11 @@ int lazy_loaded_function::initialize()
 		for (int i = 0; i < m_dll_names.size(); i++)
 		{
 			m_module = LoadLibraryW(m_dll_names[i].c_str());
-			if (m_module != NULL)
+			if (m_module != nullptr)
 				break;
 		}
 
-		if (m_module == NULL)
+		if (m_module == nullptr)
 		{
 			osd_printf_verbose("Could not find DLL to dynamically link function %s.\n", m_name.c_str());
 			return ERROR_DLL_NOT_FOUND;
@@ -170,7 +170,7 @@ int lazy_loaded_function::initialize()
 	return 0;
 }
 
-void lazy_loaded_function::check_init()
+void lazy_loaded_function::check_init() const
 {
 	if (!m_initialized)
 		fatalerror("Attempt to use function pointer for function %s prior to init!", name());

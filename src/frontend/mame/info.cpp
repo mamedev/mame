@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "mame.h"
-#include "emuopts.h"
 #include "mameopts.h"
 #include "machine/ram.h"
 #include "sound/samples.h"

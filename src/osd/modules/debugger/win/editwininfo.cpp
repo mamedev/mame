@@ -23,18 +23,18 @@
 
 editwin_info::editwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler) :
 	debugwin_info(debugger, is_main_console, title, handler),
-	m_editwnd(NULL),
+	m_editwnd(nullptr),
 	m_edit_defstr(),
-	m_original_editproc(NULL),
+	m_original_editproc(nullptr),
 	m_history_count(0),
 	m_last_history(0)
 {
-	if (window() == NULL)
+	if (window() == nullptr)
 		return;
 
 	// create an edit box and override its key handling
-	m_editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), NULL, EDIT_BOX_STYLE,
-			0, 0, 100, 100, window(), NULL, GetModuleHandleUni(), NULL);
+	m_editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), nullptr, EDIT_BOX_STYLE,
+			0, 0, 100, 100, window(), nullptr, GetModuleHandleUni(), nullptr);
 	m_original_editproc = (WNDPROC)(FPTR)GetWindowLongPtr(m_editwnd, GWLP_WNDPROC);
 	SetWindowLongPtr(m_editwnd, GWLP_USERDATA, (LONG_PTR)this);
 	SetWindowLongPtr(m_editwnd, GWLP_WNDPROC, (LONG_PTR)&editwin_info::static_edit_proc);
@@ -80,7 +80,7 @@ void editwin_info::set_editwnd_bounds(RECT const &bounds)
 void editwin_info::set_editwnd_text(char const *text)
 {
 	TCHAR *tc_buffer = tstring_from_utf8(text);
-	if (tc_buffer != NULL)
+	if (tc_buffer != nullptr)
 	{
 		SendMessage(m_editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)tc_buffer);
 		osd_free(tc_buffer);
@@ -138,20 +138,20 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 			break;
 
 		case VK_PRIOR:
-			if (m_views[0] != NULL)
+			if (m_views[0] != nullptr)
 				m_views[0]->send_pageup();
 			break;
 
 		case VK_NEXT:
-			if (m_views[0] != NULL)
+			if (m_views[0] != nullptr)
 				m_views[0]->send_pagedown();
 			break;
 
 		case VK_TAB:
 			if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
-				prev_view(NULL);
+				prev_view(nullptr);
 			else
-				next_view(NULL);
+				next_view(nullptr);
 			set_ignore_char_lparam(lparam);
 			break;
 
@@ -191,7 +191,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 
 						// process
 						char *utf8_buffer = utf8_from_tstring(buffer);
-						if (utf8_buffer != NULL)
+						if (utf8_buffer != nullptr)
 						{
 							process_string(utf8_buffer);
 							osd_free(utf8_buffer);

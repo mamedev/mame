@@ -32,9 +32,9 @@ namespace {
 class osd_font_windows : public osd_font
 {
 public:
-	osd_font_windows(): m_font(NULL) { }
-	osd_font_windows(osd_font_windows &&obj) : m_font(obj.m_font) { obj.m_font = NULL; }
-	virtual ~osd_font_windows() {close(); }
+	osd_font_windows(): m_font(nullptr) { }
+	osd_font_windows(osd_font_windows &&obj) : m_font(obj.m_font) { obj.m_font = nullptr; }
+	virtual ~osd_font_windows() { osd_font_windows::close(); }
 
 	virtual bool open(std::string const &font_path, std::string const &name, int &height) override;
 	virtual void close() override;
@@ -93,11 +93,11 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 	// create the font
 	height = logfont.lfHeight;
 	m_font = CreateFontIndirect(&logfont);
-	if (m_font == NULL)
+	if (m_font == nullptr)
 		return false;
 
 	// select it into a temp DC and get the real font name
-	HDC dummyDC = CreateCompatibleDC(NULL);
+	HDC dummyDC = CreateCompatibleDC(nullptr);
 	HGDIOBJ oldfont = SelectObject(dummyDC, m_font);
 	std::vector<TCHAR> realname((std::max)(GetTextFace(dummyDC, 0, nullptr), 0));
 	int facelen = GetTextFace(dummyDC, realname.size(), &realname[0]);
@@ -106,7 +106,7 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 	if (facelen <= 0)
 	{
 		DeleteObject(m_font);
-		m_font = NULL;
+		m_font = nullptr;
 		return false;
 	}
 
@@ -119,7 +119,7 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 	if (result != 0)
 	{
 		DeleteObject(m_font);
-		m_font = NULL;
+		m_font = nullptr;
 		return false;
 	}
 	return true;
@@ -133,9 +133,9 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 void osd_font_windows::close()
 {
 	// delete the font ojbect
-	if (m_font != NULL)
+	if (m_font != nullptr)
 		DeleteObject(m_font);
-	m_font = NULL;
+	m_font = nullptr;
 }
 
 //-------------------------------------------------
@@ -149,7 +149,7 @@ void osd_font_windows::close()
 bool osd_font_windows::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	// create a dummy DC to work with
-	HDC dummyDC = CreateCompatibleDC(NULL);
+	HDC dummyDC = CreateCompatibleDC(nullptr);
 	HGDIOBJ oldfont = SelectObject(dummyDC, m_font);
 
 	// get the text metrics
@@ -191,7 +191,7 @@ bool osd_font_windows::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT
 
 	// create a DIB to render to
 	BYTE *bits;
-	HBITMAP dib = CreateDIBSection(dummyDC, &info, DIB_RGB_COLORS, reinterpret_cast<VOID **>(&bits), NULL, 0);
+	HBITMAP dib = CreateDIBSection(dummyDC, &info, DIB_RGB_COLORS, reinterpret_cast<VOID **>(&bits), nullptr, 0);
 
 	if (dib)
 	{
@@ -205,7 +205,7 @@ bool osd_font_windows::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT
 		WCHAR tempchar = chnum;
 		SetTextColor(dummyDC, RGB(0xff, 0xff, 0xff));
 		SetBkColor(dummyDC, RGB(0x00, 0x00, 0x00));
-		ExtTextOutW(dummyDC, 50 + abc.abcA, 50, ETO_OPAQUE, NULL, &tempchar, 1, NULL);
+		ExtTextOutW(dummyDC, 50 + abc.abcA, 50, ETO_OPAQUE, nullptr, &tempchar, 1, nullptr);
 
 		// characters are expected to be full-height
 		rectangle actbounds;

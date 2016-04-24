@@ -269,7 +269,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	else
 		threadnum = (flags & WORK_QUEUE_FLAG_MULTI) ? (numprocs - 1) : 1;
 
-	if (osdworkqueuemaxthreads != NULL && sscanf(osdworkqueuemaxthreads, "%d", &osdthreadnum) == 1 && threadnum > osdthreadnum)
+	if (osdworkqueuemaxthreads != nullptr && sscanf(osdworkqueuemaxthreads, "%d", &osdthreadnum) == 1 && threadnum > osdthreadnum)
 		threadnum = osdthreadnum;
 
 	// clamp to the maximum
@@ -315,7 +315,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 
 error:
 	osd_work_queue_free(queue);
-	return NULL;
+	return nullptr;
 }
 
 
@@ -406,7 +406,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		work_thread_info *thread = queue->thread[threadnum];
 
 		// block on the thread going away, then close the handle
-		if (thread->handle != NULL)
+		if (thread->handle != nullptr)
 		{
 			thread->handle->join();
 			delete thread->handle;
@@ -439,7 +439,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 	{
 		osd_work_item *item = (osd_work_item *)queue->free;
 		queue->free = item->next;
-		if (item->event != NULL)
+		if (item->event != nullptr)
 			delete item->event;
 		delete item;
 	}
@@ -449,7 +449,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 	{
 		osd_work_item *item = (osd_work_item *)queue->list;
 		queue->list = item->next;
-		if (item->event != NULL)
+		if (item->event != nullptr)
 			delete item->event;
 		delete item;
 	}
@@ -472,7 +472,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 
 osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_callback callback, INT32 numitems, void *parambase, INT32 paramstep, UINT32 flags)
 {
-	osd_work_item *itemlist = NULL, *lastitem = NULL;
+	osd_work_item *itemlist = nullptr, *lastitem = nullptr;
 	osd_work_item **item_tailptr = &itemlist;
 	int itemnum;
 
@@ -487,16 +487,16 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 			do
 			{
 				item = (osd_work_item *)queue->free;
-			} while (item != NULL && !queue->free.compare_exchange_weak(item, item->next, std::memory_order_release, std::memory_order_relaxed));
+			} while (item != nullptr && !queue->free.compare_exchange_weak(item, item->next, std::memory_order_release, std::memory_order_relaxed));
 		}
 
 		// if nothing, allocate something new
-		if (item == NULL)
+		if (item == nullptr)
 		{
 			// allocate the item
 			item = new osd_work_item(*queue);
-			if (item == NULL)
-				return NULL;
+			if (item == nullptr)
+				return nullptr;
 		}
 		else
 		{
@@ -504,10 +504,10 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		}
 
 		// fill in the basics
-		item->next = NULL;
+		item->next = nullptr;
 		item->callback = callback;
 		item->param = parambase;
-		item->result = NULL;
+		item->result = nullptr;
 		item->flags = flags;
 
 		// advance to the next
@@ -559,7 +559,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		begin_timing(queue->thread[0]->waittime);
 	}
 	// only return the item if it won't get released automatically
-	return (flags & WORK_ITEM_FLAG_AUTO_RELEASE) ? NULL : lastitem;
+	return (flags & WORK_ITEM_FLAG_AUTO_RELEASE) ? nullptr : lastitem;
 }
 
 
@@ -574,7 +574,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 		return TRUE;
 
 	// if we don't have an event, create one
-	if (item->event == NULL)
+	if (item->event == nullptr)
 	{
 		std::lock_guard<std::mutex> lock(item->queue.lock);
 		item->event = new osd_event(TRUE, FALSE);     // manual reset, not signalled
@@ -583,7 +583,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 		item->event->reset();
 
 	// if we don't have an event, we need to spin (shouldn't ever really happen)
-	if (item->event == NULL)
+	if (item->event == nullptr)
 	{
 		// TODO: do we need to measure the spin time here as well? and how can we do it?
 		spin_while<std::atomic<int>,int>(&item->done, 0, timeout);
@@ -649,7 +649,7 @@ static int effective_num_processors(void)
 		// if the OSDPROCESSORS environment variable is set, use that value if valid
 		// note that we permit more than the real number of processors for testing
 		const char *procsoverride = osd_getenv(ENV_PROCESSORS);
-		if (procsoverride != NULL && sscanf(procsoverride, "%d", &numprocs) == 1 && numprocs > 0)
+		if (procsoverride != nullptr && sscanf(procsoverride, "%d", &numprocs) == 1 && numprocs > 0)
 			return MIN(4 * physprocs, numprocs);
 
 		// otherwise, return the info from the system
@@ -715,7 +715,7 @@ static void *worker_thread_entry(void *param)
 		--queue.livethreads;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -732,7 +732,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 	// loop until everything is processed
 	while (true)
 	{
-		osd_work_item *item = NULL;
+		osd_work_item *item = nullptr;
 
 		bool end_loop = false;
 
@@ -748,7 +748,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 			{
 				// pull the item from the queue
 				item = (osd_work_item *)queue->list;
-				if (item != NULL)
+				if (item != nullptr)
 				{
 					queue->list = item->next;
 					if (queue->list.load() == nullptr)
@@ -761,7 +761,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 			break;
 
 		// process non-NULL items
-		if (item != NULL)
+		if (item != nullptr)
 		{
 			// call the callback and stash the result
 			begin_timing(thread->actruntime);
@@ -782,7 +782,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 			{
 				std::lock_guard<std::mutex> lock(queue->lock);
 
-				if (item->event != NULL)
+				if (item->event != nullptr)
 				{
 					item->event->set();
 					add_to_stat(item->queue.setevents, 1);

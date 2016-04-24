@@ -41,7 +41,7 @@ class debugger_osx : public osd_module, public debug_module
 public:
 	debugger_osx()
 	: osd_module(OSD_DEBUG_PROVIDER, "osx"), debug_module(),
-	  m_machine(NULL),
+	  m_machine(nullptr),
 	  m_console(nil)
 	{
 	}
@@ -95,7 +95,7 @@ void debugger_osx::exit()
 														  userInfo:info];
 		[m_console release];
 		m_console = nil;
-		m_machine = NULL;
+		m_machine = nullptr;
 	}
 	[pool release];
 }

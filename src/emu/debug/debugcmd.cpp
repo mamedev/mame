@@ -510,7 +510,7 @@ static void global_set(symbol_table &table, void *ref, UINT64 value)
 
 int debug_command_parameter_number(running_machine &machine, const char *param, UINT64 *result)
 {
-	/* NULL parameter does nothing and returns no error */
+	/* nullptr parameter does nothing and returns no error */
 	if (param == nullptr)
 		return TRUE;
 
@@ -614,7 +614,7 @@ int debug_command_parameter_cpu_space(running_machine &machine, const char *para
 
 static int debug_command_parameter_expression(running_machine &machine, const char *param, parsed_expression &result)
 {
-	/* NULL parameter does nothing and returns no error */
+	/* nullptr parameter does nothing and returns no error */
 	if (param == nullptr)
 		return TRUE;
 
@@ -644,7 +644,7 @@ static int debug_command_parameter_command(running_machine &machine, const char 
 {
 	CMDERR err;
 
-	/* NULL parameter does nothing and returns no error */
+	/* nullptr parameter does nothing and returns no error */
 	if (param == nullptr)
 		return TRUE;
 

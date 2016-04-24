@@ -70,7 +70,7 @@ static const char *copystring(const char *input)
 {
 	char *newstr;
 
-	/* NULL just passes through */
+	/* nullptr just passes through */
 	if (input == nullptr)
 		return nullptr;
 
@@ -94,7 +94,7 @@ static const char *copystring_lower(const char *input)
 	char *newstr;
 	int i;
 
-	/* NULL just passes through */
+	/* nullptr just passes through */
 	if (input == nullptr)
 		return nullptr;
 
@@ -300,7 +300,7 @@ xml_data_node *xml_find_matching_sibling(xml_data_node *node, const char *name, 
 	/* loop over siblings and find a matching attribute */
 	for ( ; node; node = node->next)
 	{
-		/* can pass NULL as a wildcard for the node name */
+		/* can pass nullptr as a wildcard for the node name */
 		if (name == nullptr || strcmp(name, node->name) == 0)
 		{
 			/* find a matching attribute */
@@ -373,7 +373,7 @@ void xml_delete_node(xml_data_node *node)
 
 /*-------------------------------------------------
     xml_get_attribute - get the value of the
-    specified attribute, or NULL if not found
+    specified attribute, or nullptr if not found
 -------------------------------------------------*/
 
 xml_attribute_node *xml_get_attribute(xml_data_node *node, const char *attribute)
@@ -934,7 +934,7 @@ static xml_data_node *add_child(xml_data_node *parent, const char *name, const c
 	node->attribute = nullptr;
 
 	/* add us to the end of the list of siblings */
-	for (pnode = &parent->child; *pnode; pnode = &(*pnode)->next) ;
+	for (pnode = &parent->child; *pnode; pnode = &(*pnode)->next) { }
 	*pnode = node;
 
 	return node;
@@ -984,7 +984,7 @@ static xml_attribute_node *add_attribute(xml_data_node *node, const char *name, 
 	}
 
 	/* add us to the end of the list of attributes */
-	for (panode = &node->attribute; *panode; panode = &(*panode)->next) ;
+	for (panode = &node->attribute; *panode; panode = &(*panode)->next) { }
 	*panode = anode;
 
 	return anode;

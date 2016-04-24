@@ -10,11 +10,11 @@
 
 
 LogWindow::LogWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, NULL)
+	WindowQt(machine, nullptr)
 {
 	setWindowTitle("Debug: Machine Log");
 
-	if (parent != NULL)
+	if (parent != nullptr)
 	{
 		QPoint parentPos = parent->pos();
 		setGeometry(parentPos.x()+100, parentPos.y()+100, 800, 400);

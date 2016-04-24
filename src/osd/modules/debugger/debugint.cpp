@@ -33,8 +33,8 @@ class debug_internal : public osd_module, public debug_module
 public:
 	debug_internal()
 	: osd_module(OSD_DEBUG_PROVIDER, "internal"), debug_module(),
-		m_machine(nullptr)
-	{
+		m_machine(nullptr), font_name(nullptr), font_size(0)
+{
 	}
 
 	virtual ~debug_internal() { }

@@ -613,7 +613,7 @@ void parsed_expression::print_tokens(FILE *out)
 {
 #if DEBUG_TOKENS
 	osd_printf_debug("----\n");
-	for (parse_token *token = m_tokens.first(); token != NULL; token = token->next())
+	for (parse_token *token = m_tokens.first(); token != nullptr; token = token->next())
 	{
 		switch (token->type)
 		{

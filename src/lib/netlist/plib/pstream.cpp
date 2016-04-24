@@ -70,7 +70,7 @@ pifilestream::pifilestream(void *file, const bool do_close)
 void pifilestream::init(void *file)
 {
 	m_file = file;
-	if (m_file == NULL)
+	if (m_file == nullptr)
 	{
 		set_flag(FLAG_ERROR);
 		set_flag(FLAG_EOF);
@@ -170,7 +170,7 @@ pofilestream::pofilestream(void *file, const bool do_close)
 void pofilestream::init(void *file)
 {
 	m_file = file;
-	if (m_file == NULL)
+	if (m_file == nullptr)
 	{
 		set_flag(FLAG_ERROR);
 		set_flag(FLAG_CLOSED);
@@ -322,7 +322,7 @@ void pomemstream::vwrite(const void *buf, const unsigned n)
 			m_capacity *= 2;
 		char *o = m_mem;
 		m_mem = palloc_array(char, m_capacity);
-		if (m_mem == NULL)
+		if (m_mem == nullptr)
 		{
 			set_flag(FLAG_ERROR);
 			return;
@@ -346,7 +346,7 @@ void pomemstream::vseek(const pos_type n)
 			m_capacity *= 2;
 		char *o = m_mem;
 		m_mem = palloc_array(char, m_capacity);
-		if (m_mem == NULL)
+		if (m_mem == nullptr)
 		{
 			set_flag(FLAG_ERROR);
 			return;

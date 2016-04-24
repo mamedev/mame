@@ -111,7 +111,7 @@ device_state_entry &device_state_entry::formatstr(const char *_format)
 	m_format.assign(_format);
 	m_default_format = false;
 
-	// set the DSF_CUSTOM_STRING flag by formatting with a NULL string
+	// set the DSF_CUSTOM_STRING flag by formatting with a nullptr string
 	m_flags &= ~DSF_CUSTOM_STRING;
 	format(nullptr);
 
@@ -417,7 +417,7 @@ device_state_interface::~device_state_interface()
 
 UINT64 device_state_interface::state_int(int index)
 {
-	// NULL or out-of-range entry returns 0
+	// nullptr or out-of-range entry returns 0
 	const device_state_entry *entry = state_find_entry(index);
 	if (entry == nullptr)
 		return 0;
@@ -438,7 +438,7 @@ UINT64 device_state_interface::state_int(int index)
 
 std::string device_state_interface::state_string(int index) const
 {
-	// NULL or out-of-range entry returns bogus string
+	// nullptr or out-of-range entry returns bogus string
 	const device_state_entry *entry = state_find_entry(index);
 	if (entry == nullptr)
 		return std::string("???");
@@ -460,7 +460,7 @@ std::string device_state_interface::state_string(int index) const
 
 int device_state_interface::state_string_max_length(int index)
 {
-	// NULL or out-of-range entry returns bogus string
+	// nullptr or out-of-range entry returns bogus string
 	const device_state_entry *entry = state_find_entry(index);
 	if (entry == nullptr)
 		return 3;
@@ -477,7 +477,7 @@ int device_state_interface::state_string_max_length(int index)
 
 void device_state_interface::set_state_int(int index, UINT64 value)
 {
-	// NULL or out-of-range entry is a no-op
+	// nullptr or out-of-range entry is a no-op
 	const device_state_entry *entry = state_find_entry(index);
 	if (entry == nullptr)
 		return;
@@ -498,7 +498,7 @@ void device_state_interface::set_state_int(int index, UINT64 value)
 
 void device_state_interface::set_state_string(int index, const char *string)
 {
-	// NULL or out-of-range entry is a no-op
+	// nullptr or out-of-range entry is a no-op
 	const device_state_entry *entry = state_find_entry(index);
 	if (entry == nullptr)
 		return;
@@ -625,6 +625,6 @@ const device_state_entry *device_state_interface::state_find_entry(int index) co
 		if (entry->m_index == index)
 			return entry;
 
-	// handle failure by returning NULL
+	// handle failure by returning nullptr
 	return nullptr;
 }

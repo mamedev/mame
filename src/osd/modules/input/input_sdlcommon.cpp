@@ -47,7 +47,7 @@ static inline std::shared_ptr<sdl_window_info> window_from_id(Uint32 windowID)
 			return w;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void sdl_event_manager::process_events(running_machine &machine)
@@ -64,7 +64,7 @@ void sdl_event_manager::process_events(running_machine &machine)
 		auto subscribers = m_subscription_index.equal_range(sdlevent.type);
 
 		// Dispatch the events
-		for (auto iter = subscribers.first; iter != subscribers.second; iter++)
+		for (auto iter = subscribers.first; iter != subscribers.second; ++iter)
 			iter->second->handle_event(sdlevent);
 	}
 }
@@ -73,7 +73,7 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 {
 	std::shared_ptr<sdl_window_info> window = GET_WINDOW(&sdlevent.window);
 
-	if (window == NULL)
+	if (window == nullptr)
 		return;
 
 	switch (sdlevent.window.event)

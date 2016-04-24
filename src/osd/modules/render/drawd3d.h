@@ -91,36 +91,36 @@ public:
 	void                    reset_render_states();
 
 	// Setters / getters
-	int                     get_adapter() { return m_adapter; }
-	int                     get_width() { return m_width; }
-	vec2f                   get_dims() { return vec2f(m_width, m_height); }
-	int                     get_height() { return m_height; }
-	int                     get_refresh() { return m_refresh; }
+	int                     get_adapter() const { return m_adapter; }
+	int                     get_width() const { return m_width; }
+	vec2f                   get_dims() const { return vec2f(m_width, m_height); }
+	int                     get_height() const { return m_height; }
+	int                     get_refresh() const { return m_refresh; }
 
-	device *                get_device() { return m_device; }
+	device *                get_device() const { return m_device; }
 	present_parameters *    get_presentation() { return &m_presentation; }
 
-	vertex_buffer *         get_vertex_buffer() { return m_vertexbuf; }
-	vertex *                get_locked_buffer() { return m_lockedbuf; }
-	VOID **                 get_locked_buffer_ptr() { return (VOID **)&m_lockedbuf; }
+	vertex_buffer *         get_vertex_buffer() const { return m_vertexbuf; }
+	vertex *                get_locked_buffer() const { return m_lockedbuf; }
+	VOID **                 get_locked_buffer_ptr()const { return (VOID **)&m_lockedbuf; }
 	void                    set_locked_buffer(vertex *lockedbuf) { m_lockedbuf = lockedbuf; }
 
 	void                    set_restarting(bool restarting) { m_restarting = restarting; }
-	bool                    is_mod2x_supported() { return (bool)m_mod2x_supported; }
-	bool                    is_mod4x_supported() { return (bool)m_mod4x_supported; }
+	bool                    is_mod2x_supported() const { return (bool)m_mod2x_supported; }
+	bool                    is_mod4x_supported() const { return (bool)m_mod4x_supported; }
 
-	D3DFORMAT               get_screen_format() { return m_screen_format; }
-	D3DFORMAT               get_pixel_format() { return m_pixformat; }
-	D3DDISPLAYMODE          get_origmode() { return m_origmode; }
+	D3DFORMAT               get_screen_format() const { return m_screen_format; }
+	D3DFORMAT               get_pixel_format() const { return m_pixformat; }
+	D3DDISPLAYMODE          get_origmode() const { return m_origmode; }
 
-	UINT32                  get_last_texture_flags() { return m_last_texture_flags; }
+	UINT32                  get_last_texture_flags() const { return m_last_texture_flags; }
 
-	d3d_texture_manager *   get_texture_manager() { return m_texture_manager; }
+	d3d_texture_manager *   get_texture_manager() const { return m_texture_manager; }
 	texture_info *          get_default_texture();
 	texture_info *          get_vector_texture();
 
-	shaders *               get_shaders() { return m_shaders; }
-	hlsl_options *          get_shaders_options() { return m_shaders_options; }
+	shaders *               get_shaders() const { return m_shaders; }
+	hlsl_options *          get_shaders_options() const { return m_shaders_options; }
 
 private:
 	int                     m_adapter;                  // ordinal adapter number

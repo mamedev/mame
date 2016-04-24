@@ -52,7 +52,7 @@ class debug_view_memory : public debug_view
 
 public:
 	// getters
-	const char *expression() { return m_expression.string(); }
+	const char *expression() const { return m_expression.string(); }
 	int get_data_format() { flush_updates(); return m_data_format; }
 	UINT32 chunks_per_row() { flush_updates(); return m_chunks_per_row; }
 	bool reverse() const { return m_reverse_view; }

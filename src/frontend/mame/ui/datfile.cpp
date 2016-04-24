@@ -530,19 +530,19 @@ int datfile_manager::index_datafile(dataindex &index, int &swcount)
 					while (cpoint < cends)
 					{
 						// search for comma
-						size_t found = s_roms.find(",", cpoint);
+						size_t comma_found = s_roms.find(",", cpoint);
 
 						// found it
-						if (found != std::string::npos)
+						if (comma_found != std::string::npos)
 						{
 							// copy data
-							name = s_roms.substr(cpoint, found - cpoint);
+							name = s_roms.substr(cpoint, comma_found - cpoint);
 
 							// add a SoftwareItem
 							m_swindex[lname].emplace(name, ftell(fp));
 
 							// update current point
-							cpoint = ++found;
+							cpoint = ++comma_found;
 							swcount++;
 						}
 						else

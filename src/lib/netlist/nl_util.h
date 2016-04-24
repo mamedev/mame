@@ -44,7 +44,7 @@ public:
 
 	static const pstring environment(const pstring &var, const pstring &default_val = "")
 	{
-		if (getenv(var.cstr()) == NULL)
+		if (getenv(var.cstr()) == nullptr)
 			return default_val;
 		else
 			return pstring(getenv(var.cstr()));

@@ -16,14 +16,14 @@
 
 
 memorywin_info::memorywin_info(debugger_windows_interface &debugger) :
-	editwin_info(debugger, false, "Memory", NULL),
-	m_combownd(NULL)
+	editwin_info(debugger, false, "Memory", nullptr),
+	m_combownd(nullptr)
 {
 	if (!window())
 		return;
 
 	m_views[0].reset(global_alloc(memoryview_info(debugger, *this, window())));
-	if ((m_views[0] == NULL) || !m_views[0]->is_valid())
+	if ((m_views[0] == nullptr) || !m_views[0]->is_valid())
 	{
 		m_views[0].reset();
 		return;

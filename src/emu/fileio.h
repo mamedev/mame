@@ -92,7 +92,7 @@ public:
 	const char *fullpath() const { return m_fullpath.c_str(); }
 	UINT32 openflags() const { return m_openflags; }
 	hash_collection &hashes(const char *types);
-	bool restrict_to_mediapath() { return m_restrict_to_mediapath; }
+	bool restrict_to_mediapath() const { return m_restrict_to_mediapath; }
 	bool part_of_mediapath(std::string path);
 
 	// setters

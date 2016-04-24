@@ -18,7 +18,7 @@ class WindowQt : public QMainWindow
 	Q_OBJECT
 
 public:
-	WindowQt(running_machine* machine, QWidget* parent=NULL);
+	WindowQt(running_machine* machine, QWidget* parent=nullptr);
 	virtual ~WindowQt();
 
 	// The interface to an all-window refresh

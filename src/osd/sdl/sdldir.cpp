@@ -139,7 +139,7 @@ static UINT64 osd_get_file_size(const char *file)
 
 osd_directory *osd_opendir(const char *dirname)
 {
-	osd_directory *dir = NULL;
+	osd_directory *dir = nullptr;
 	char *tmpstr, *envstr;
 	int i, j;
 
@@ -147,7 +147,7 @@ osd_directory *osd_opendir(const char *dirname)
 	if (dir)
 	{
 		memset(dir, 0, sizeof(osd_directory));
-		dir->fd = NULL;
+		dir->fd = nullptr;
 	}
 
 	tmpstr = (char *) osd_malloc_array(strlen(dirname)+1);
@@ -168,7 +168,7 @@ osd_directory *osd_opendir(const char *dirname)
 		envstr[i] = '\0';
 
 		const char *envval = osd_getenv(&envstr[1]);
-		if (envval != NULL)
+		if (envval != nullptr)
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;
 			osd_free(tmpstr);
@@ -189,11 +189,11 @@ osd_directory *osd_opendir(const char *dirname)
 	dir->fd = opendir(tmpstr);
 	dir->path = tmpstr;
 
-	if (dir && (dir->fd == NULL))
+	if (dir && (dir->fd == nullptr))
 	{
 		osd_free(dir->path);
 		osd_free(dir);
-		dir = NULL;
+		dir = nullptr;
 	}
 
 	return dir;
@@ -209,8 +209,8 @@ const osd_directory_entry *osd_readdir(osd_directory *dir)
 	char *temp;
 	dir->data = sdl_readdir(dir->fd);
 
-	if (dir->data == NULL)
-		return NULL;
+	if (dir->data == nullptr)
+		return nullptr;
 
 	dir->ent.name = dir->data->d_name;
 	temp = build_full_path(dir->path, dir->data->d_name);
@@ -231,7 +231,7 @@ const osd_directory_entry *osd_readdir(osd_directory *dir)
 
 void osd_closedir(osd_directory *dir)
 {
-	if (dir->fd != NULL)
+	if (dir->fd != nullptr)
 		closedir(dir->fd);
 	osd_free(dir->path);
 	osd_free(dir);

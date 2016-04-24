@@ -142,7 +142,7 @@ const char *software_part::feature(const char *feature_name) const
 
 bool software_part::is_compatible(const software_list_device &swlistdev) const
 {
-	// get the compatibility feature and the softlist filter; if either is NULL, assume compatible
+	// get the compatibility feature and the softlist filter; if either is nullptr, assume compatible
 	const char *compatibility = feature("compatibility");
 	const char *filter = swlistdev.filter();
 	if (compatibility == nullptr || filter == nullptr)
@@ -447,7 +447,7 @@ void software_list_device::display_matches(const machine_config &config, const c
 
 software_info *software_list_device::find(const char *look_for, software_info *prev)
 {
-	// NULL search returns nothing
+	// nullptr search returns nothing
 	if (look_for == nullptr)
 		return nullptr;
 

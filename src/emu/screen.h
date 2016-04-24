@@ -445,13 +445,13 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 #define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)  \
 	screen_device::static_set_default_position(*device, _xscale, _xoffs, _yscale, _yoffs);
 #define MCFG_SCREEN_UPDATE_DRIVER(_class, _method) \
-	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, NULL));
+	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, nullptr));
 #define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
 	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device));
 #define MCFG_SCREEN_VBLANK_NONE() \
 	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate());
 #define MCFG_SCREEN_VBLANK_DRIVER(_class, _method) \
-	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)0));
 #define MCFG_SCREEN_VBLANK_DEVICE(_device, _class, _method) \
 	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)0));
 #define MCFG_SCREEN_PALETTE(_palette_tag) \

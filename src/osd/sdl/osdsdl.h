@@ -140,7 +140,7 @@ public:
 	bool should_hide_mouse();
 	void process_events_buf();
 
-	sdl_options &options() { return m_options; }
+	virtual sdl_options &options() override { return m_options; }
 
 protected:
 	virtual void build_slider_list() override;

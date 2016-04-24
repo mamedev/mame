@@ -114,9 +114,9 @@ private:
 #define MACHINE_CONFIG_START(_name, _class) \
 ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
 { \
-	devcb_base *devcb = NULL; \
+	devcb_base *devcb = nullptr; \
 	(void)devcb; \
-	if (owner == NULL) owner = config.device_add(NULL, "root", &driver_device_creator<_class>, 0);
+	if (owner == nullptr) owner = config.device_add(nullptr, "root", &driver_device_creator<_class>, 0);
 
 /**
  @def MACHINE_CONFIG_FRAGMENT(_name)
@@ -127,9 +127,9 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 #define MACHINE_CONFIG_FRAGMENT(_name) \
 ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
 { \
-	devcb_base *devcb = NULL; \
+	devcb_base *devcb = nullptr; \
 	(void)devcb; \
-	assert(owner != NULL);
+	assert(owner != nullptr);
 
 /**
  @def MACHINE_CONFIG_DERIVED(_name, _base)
@@ -141,10 +141,10 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 #define MACHINE_CONFIG_DERIVED(_name, _base) \
 ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
 { \
-	devcb_base *devcb = NULL; \
+	devcb_base *devcb = nullptr; \
 	(void)devcb; \
 	owner = MACHINE_CONFIG_NAME(_base)(config, owner, device); \
-	assert(owner != NULL);
+	assert(owner != nullptr);
 
 /**
 @def MACHINE_CONFIG_DERIVED_CLASS(_name, _base, _class)
@@ -157,9 +157,9 @@ Begins a machine_config that is derived from another machine_config that can spe
 #define MACHINE_CONFIG_DERIVED_CLASS(_name, _base, _class) \
 ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
 { \
-	devcb_base *devcb = NULL; \
+	devcb_base *devcb = nullptr; \
 	(void)devcb; \
-	if (owner == NULL) owner = config.device_add(NULL, "root", &driver_device_creator<_class>, 0); \
+	if (owner == nullptr) owner = config.device_add(nullptr, "root", &driver_device_creator<_class>, 0); \
 	owner = MACHINE_CONFIG_NAME(_base)(config, owner, device);
 
 /**

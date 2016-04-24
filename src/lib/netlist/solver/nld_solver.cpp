@@ -69,7 +69,7 @@ ATTR_COLD void terms_t::add(terminal_t *term, int net_other, bool sorted)
 				m_gt.insert_at(i, 0.0);
 				m_go.insert_at(i, 0.0);
 				m_Idr.insert_at(i, 0.0);
-				m_other_curanalog.insert_at(i, NULL);
+				m_other_curanalog.insert_at(i, nullptr);
 				return;
 			}
 		}
@@ -78,7 +78,7 @@ ATTR_COLD void terms_t::add(terminal_t *term, int net_other, bool sorted)
 	m_gt.push_back(0.0);
 	m_go.push_back(0.0);
 	m_Idr.push_back(0.0);
-	m_other_curanalog.push_back(NULL);
+	m_other_curanalog.push_back(nullptr);
 }
 
 ATTR_COLD void terms_t::set_pointers()
@@ -169,7 +169,7 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					break;
 				case terminal_t::INPUT:
 					{
-						analog_output_t *net_proxy_output = NULL;
+						analog_output_t *net_proxy_output = nullptr;
 						for (auto & input : m_inps)
 							if (input->m_proxied_net == &p->net().as_analog())
 							{
@@ -177,7 +177,7 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 								break;
 							}
 
-						if (net_proxy_output == NULL)
+						if (net_proxy_output == nullptr)
 						{
 							//net_proxy_output = palloc(analog_output_t(*this,
 							//		this->name() + "." + pfmt("m{1}")(m_inps.size())));
@@ -755,7 +755,7 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 			else
 			{
 				netlist().log().fatal("Unknown solver type: {1}\n", m_iterative_solver.Value());
-				return NULL;
+				return nullptr;
 			}
 		}
 		else
@@ -894,7 +894,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 				else
 				{
 					netlist().log().fatal("Encountered netgroup with > 128 nets");
-					ms = NULL; /* tease compilers */
+					ms = nullptr; /* tease compilers */
 				}
 
 				break;

@@ -155,7 +155,7 @@ public:
 	// BGFX specific options
 	const char *bgfx_path() const { return value(OSDOPTION_BGFX_PATH); }
 	const char *bgfx_backend() const { return value(OSDOPTION_BGFX_BACKEND); }
-	const bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
+	bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
 	const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
 	const char *bgfx_avi_name() const { return value(OSDOPTION_BGFX_AVI_NAME); }
@@ -209,7 +209,7 @@ public:
 	//        this INTERFACE but part of the osd IMPLEMENTATION
 
 	// getters
-	running_machine &machine() { assert(m_machine != nullptr); return *m_machine; }
+	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
 
 	virtual void debugger_update();
 
@@ -230,14 +230,14 @@ public:
 
 	virtual void video_options_add(const char *name, void *type);
 
-	osd_options &options() { return m_options; }
+	virtual osd_options &options() { return m_options; }
 
 	// osd_output interface ...
 	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args)  override;
 	bool verbose() const { return m_print_verbose; }
 	void set_verbose(bool print_verbose) { m_print_verbose = print_verbose; }
 
-	void notify(const char *outname, INT32 value) { m_output->notify(outname, value); }
+	void notify(const char *outname, INT32 value) const { m_output->notify(outname, value); }
 protected:
 	virtual bool input_init();
 	virtual void input_pause();

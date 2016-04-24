@@ -91,7 +91,7 @@ static int x07_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 	}
 	else
 	{
-		// remove the NULL chars at start
+		// remove the nullptr chars at start
 		while (!bytes[img_start])
 			img_start++;
 

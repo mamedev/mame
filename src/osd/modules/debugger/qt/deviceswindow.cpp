@@ -46,7 +46,7 @@ QModelIndex DevicesWindowModel::index(int row, int column, const QModelIndex &pa
 	if(!hasIndex(row, column, parent))
 		return QModelIndex();
 
-	device_t *target = NULL;
+	device_t *target = nullptr;
 
 	if(!parent.isValid()) {
 		if(row == 0)
@@ -102,14 +102,14 @@ int DevicesWindowModel::columnCount(const QModelIndex &parent) const
 
 
 DevicesWindow::DevicesWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, NULL),
+	WindowQt(machine, nullptr),
 	m_devices_model(machine)
 {
-	m_selected_device = NULL;
+	m_selected_device = nullptr;
 
 	setWindowTitle("Debug: All Devices");
 
-	if (parent != NULL)
+	if (parent != nullptr)
 	{
 		QPoint parentPos = parent->pos();
 		setGeometry(parentPos.x()+100, parentPos.y()+100, 600, 400);

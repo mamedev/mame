@@ -340,7 +340,7 @@ void m7z_file_impl::close(ptr &&archive)
 	osd_printf_verbose("un7z: closing archive file %s and sending to cache\n", archive->m_filename.c_str());
 	archive->m_archive_stream.osdfile.reset();
 
-	// find the first NULL entry in the cache
+	// find the first nullptr entry in the cache
 	std::lock_guard<std::mutex> guard(s_cache_mutex);
 	std::size_t cachenum;
 	for (cachenum = 0; cachenum < s_cache.size(); cachenum++)
@@ -504,7 +504,7 @@ void m7z_file_impl::make_utf8_name(int index)
 
 archive_file::error archive_file::open_7z(const std::string &filename, ptr &result)
 {
-	// ensure we start with a NULL result
+	// ensure we start with a nullptr result
 	result.reset();
 
 	// see if we are in the cache, and reopen if so

@@ -76,7 +76,7 @@ public:
 	osd_interface &osd() const { return m_osd; }
 	emu_options &options() const { return m_options; }
 
-	running_machine *machine() { return m_machine; }
+	running_machine *machine() const { return m_machine; }
 
 	void set_machine(running_machine *machine) { m_machine = machine; }
 

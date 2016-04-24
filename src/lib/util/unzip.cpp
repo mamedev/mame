@@ -585,7 +585,7 @@ void zip_file_impl::close(ptr &&zip)
 	osd_printf_verbose("unzip: closing archive file %s and sending to cache\n", zip->m_filename.c_str());
 	zip->m_file.reset();
 
-	// find the first NULL entry in the cache
+	// find the first nullptr entry in the cache
 	std::lock_guard<std::mutex> guard(s_cache_mutex);
 	std::size_t cachenum;
 	for (cachenum = 0; cachenum < s_cache.size(); cachenum++)
@@ -1334,7 +1334,7 @@ void m7z_file_cache_clear();
 
 archive_file::error archive_file::open_zip(const std::string &filename, ptr &result)
 {
-	// ensure we start with a NULL result
+	// ensure we start with a nullptr result
 	result.reset();
 
 	// see if we are in the cache, and reopen if so

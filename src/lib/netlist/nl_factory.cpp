@@ -62,7 +62,7 @@ device_t *factory_list_t::new_device_by_classname(const pstring &classname) cons
 		}
 		p++;
 	}
-	return NULL; // appease code analysis
+	return nullptr; // appease code analysis
 }
 #endif
 
@@ -84,7 +84,7 @@ base_factory_t * factory_list_t::factory_by_name(const pstring &name)
 	else
 	{
 		m_setup.log().fatal("Class {1} not found!\n", name);
-		return NULL; // appease code analysis
+		return nullptr; // appease code analysis
 	}
 }
 

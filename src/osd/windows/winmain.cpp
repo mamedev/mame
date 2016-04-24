@@ -380,7 +380,7 @@ void MameMainApp::Run()
 
 	// To satisfy the latter things, pass in the module path name
 	char exe_path[MAX_PATH];
-	GetModuleFileNameA(NULL, exe_path, MAX_PATH);
+	GetModuleFileNameA(nullptr, exe_path, MAX_PATH);
 	char* args[2] = { exe_path, (char*)"-verbose" };
 
 	DWORD result = emulator_info::start_frontend(*m_options.get(), *m_osd.get(), ARRAY_LENGTH(args), args);

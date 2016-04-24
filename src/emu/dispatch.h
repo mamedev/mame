@@ -25,7 +25,8 @@
 
 template<int N> class devcb_line_dispatch_device : public device_t {
 public:
-	devcb_line_dispatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	devcb_line_dispatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		device_t(mconfig, tag, owner, clock) { }
 
 	void init_fwd() {
 		for(auto & elem : fwd_cb)

@@ -202,7 +202,7 @@ public:
 
 		// allocate a device
 		devinfo = devicelist()->create_device<win32_mouse_device>(machine, "Win32 Mouse 1", *this);
-		if (devinfo == NULL)
+		if (devinfo == nullptr)
 			return;
 
 		// populate the axes
@@ -377,7 +377,7 @@ public:
 
 			// allocate a device
 			devinfo = devicelist()->create_device<win32_lightgun_device>(machine, gun_names[gunnum], *this);
-			if (devinfo == NULL)
+			if (devinfo == nullptr)
 				break;
 
 			// populate the axes

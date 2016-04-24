@@ -23,7 +23,6 @@ public:
 	UINT8 data_format() const;
 	UINT32 chunks_per_row() const;
 	bool reverse() const;
-	bool ascii() const;
 	bool physical() const;
 
 	void set_expression(char const *string);

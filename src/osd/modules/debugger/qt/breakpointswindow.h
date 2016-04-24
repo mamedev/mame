@@ -15,7 +15,7 @@ class BreakpointsWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	BreakpointsWindow(running_machine* machine, QWidget* parent=NULL);
+	BreakpointsWindow(running_machine* machine, QWidget* parent=nullptr);
 	virtual ~BreakpointsWindow();
 
 

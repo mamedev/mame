@@ -113,8 +113,9 @@ mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &o
 		: machine_manager(options, osd),
 		m_plugins(std::make_unique<plugin_options>()),
 		m_lua(global_alloc(lua_engine)),
-		m_new_driver_pending(nullptr)
-{
+		m_new_driver_pending(nullptr), 
+	    m_autoboot_timer(nullptr)
+	{
 }
 
 

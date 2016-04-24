@@ -184,7 +184,7 @@ static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 		while (count < MAX_GFX_ELEMENTS && interface.gfx(count) != nullptr)
 			count++;
 
-		// count = index of first NULL
+		// count = index of first nullptr
 		if (count > 0)
 		{
 			state.gfxdev[state.gfxset.devcount].interface = &interface;

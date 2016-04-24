@@ -302,7 +302,7 @@ public:
 //**************************************************************************
 
 // so that "0" can be used for unneeded address maps
-#define construct_address_map_0 NULL
+#define construct_address_map_0 nullptr
 
 // start/end tags for the address map
 #define ADDRESS_MAP_NAME(_name) construct_address_map_##_name
@@ -312,7 +312,7 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, device_t &device) \
 { \
 	typedef read##_bits##_delegate read_delegate ATTR_UNUSED; \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
-	address_map_entry##_bits *curentry = NULL; \
+	address_map_entry##_bits *curentry = nullptr; \
 	(void)curentry; \
 	assert(&device != nullptr); \
 	map.configure(_space, _bits); \
@@ -322,7 +322,7 @@ void _class :: _name(::address_map &map, device_t &device) \
 { \
 	typedef read##_bits##_delegate read_delegate ATTR_UNUSED; \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
-	address_map_entry##_bits *curentry = NULL; \
+	address_map_entry##_bits *curentry = nullptr; \
 	(void)curentry; \
 	assert(&device != nullptr); \
 	map.configure(AS_PROGRAM, _bits);  \

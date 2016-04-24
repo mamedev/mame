@@ -87,10 +87,10 @@ struct pstate_entry_t
 
 	pstate_entry_t(const pstring &stname, const pstate_data_type_e dt, const void *owner,
 			const int size, const int count, void *ptr, bool is_ptr)
-	: m_name(stname), m_dt(dt), m_owner(owner), m_callback(NULL), m_size(size), m_count(count), m_ptr(ptr), m_is_ptr(is_ptr) { }
+	: m_name(stname), m_dt(dt), m_owner(owner), m_callback(nullptr), m_size(size), m_count(count), m_ptr(ptr), m_is_ptr(is_ptr) { }
 
 	pstate_entry_t(const pstring &stname, const void *owner, pstate_callback_t *callback)
-	: m_name(stname), m_dt(DT_CUSTOM), m_owner(owner), m_callback(callback), m_size(0), m_count(0), m_ptr(NULL), m_is_ptr(false) { }
+	: m_name(stname), m_dt(DT_CUSTOM), m_owner(owner), m_callback(callback), m_size(0), m_count(0), m_ptr(nullptr), m_is_ptr(false) { }
 
 	~pstate_entry_t() { }
 

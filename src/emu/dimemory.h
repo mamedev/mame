@@ -47,7 +47,7 @@ const int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 	device_memory_interface::static_set_addrmap(*device, _space, ADDRESS_MAP_NAME(_map));
 
 #define MCFG_DEVICE_REMOVE_ADDRESS_MAP(_space) \
-	device_memory_interface::static_set_addrmap(*device, _space, NULL);
+	device_memory_interface::static_set_addrmap(*device, _space, nullptr);
 
 #define MCFG_DEVICE_PROGRAM_MAP(_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _map)

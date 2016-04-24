@@ -25,7 +25,6 @@
 
 debug_view_disasm_source::debug_view_disasm_source(const char *name, device_t &device)
 	: debug_view_source(name, &device),
-		m_device(device),
 		m_disasmintf(dynamic_cast<device_disasm_interface *>(&device)),
 		m_space(device.memory().space(AS_PROGRAM)),
 		m_decrypted_space(device.memory().has_space(AS_DECRYPTED_OPCODES) ? device.memory().space(AS_DECRYPTED_OPCODES) : device.memory().space(AS_PROGRAM))
@@ -69,7 +68,7 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 	for (const debug_view_source &source : m_source_list)
 	{
 		const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(source);
-		total_comments += dasmsource.m_device.debug()->comment_count();
+		total_comments += dasmsource.device()->debug()->comment_count();
 	}
 
 	// configure the view
@@ -122,7 +121,7 @@ void debug_view_disasm::view_notify(debug_view_notification type)
 		adjust_visible_y_for_cursor();
 
 	else if (type == VIEW_NOTIFY_SOURCE_CHANGED)
-		m_expression.set_context(&downcast<const debug_view_disasm_source *>(m_source)->device().debug()->symtable());
+		m_expression.set_context(&downcast<const debug_view_disasm_source *>(m_source)->device()->debug()->symtable());
 }
 
 
@@ -168,7 +167,7 @@ void debug_view_disasm::view_char(int chval)
 		case DCH_HOME:              // set the active column to the PC
 		{
 			const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-			offs_t pc = source.m_space.address_to_byte(source.m_device.safe_pc()) & source.m_space.logbytemask();
+			offs_t pc = source.m_space.address_to_byte(source.device()->safe_pc()) & source.m_space.logbytemask();
 
 			// figure out which row the pc is on
 			for (unsigned int curline = 0; curline < m_byteaddress.size(); curline++)
@@ -273,7 +272,7 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 			if (debug_cpu_translate(source.m_space, TRANSLATE_FETCH, &physpcbyte))
 			{
 				char dasmbuffer[100];
-				instlen = source.m_device.debug()->disassemble(dasmbuffer, scanpc, &opbuf[1000 + scanpcbyte - targetpcbyte], &argbuf[1000 + scanpcbyte - targetpcbyte]) & DASMFLAG_LENGTHMASK;
+				instlen = source.device()->debug()->disassemble(dasmbuffer, scanpc, &opbuf[1000 + scanpcbyte - targetpcbyte], &argbuf[1000 + scanpcbyte - targetpcbyte]) & DASMFLAG_LENGTHMASK;
 			}
 
 			// count this one
@@ -408,7 +407,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 			}
 
 			// disassemble the result
-			pc += numbytes = source.m_device.debug()->disassemble(buffer, pc & source.m_space.logaddrmask(), opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			pc += numbytes = source.device()->debug()->disassemble(buffer, pc & source.m_space.logaddrmask(), opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 		else
 			strcpy(buffer, "<unmapped>");
@@ -428,7 +427,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 		{
 			// get and add the comment, if present
 			const offs_t comment_address = source.m_space.byte_to_address(m_byteaddress[instr]);
-			const char *const text = source.m_device.debug()->comment_text(comment_address);
+			const char *const text = source.device()->debug()->comment_text(comment_address);
 			if (text != nullptr)
 				util::stream_format(m_dasm.seekp(base + m_divider2), "// %.*s", m_total.x - m_divider2 - 4, text);
 		}
@@ -442,7 +441,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 	// update opcode base information
 	m_last_direct_decrypted = source.m_decrypted_space.direct().ptr();
 	m_last_direct_raw = source.m_space.direct().ptr();
-	m_last_change_count = source.m_device.debug()->comment_change_count();
+	m_last_change_count = source.device()->debug()->comment_change_count();
 
 	// no longer need to recompute
 	m_recompute = false;
@@ -459,7 +458,7 @@ void debug_view_disasm::view_update()
 {
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 
-	offs_t pc = source.m_device.safe_pc();
+	offs_t pc = source.device()->safe_pc();
 	offs_t pcbyte = source.m_space.address_to_byte(pc) & source.m_space.logbytemask();
 
 	// update our context; if the expression is dirty, recompute
@@ -493,7 +492,7 @@ void debug_view_disasm::view_update()
 		m_recompute = true;
 
 	// if the comments have changed, redo it
-	if (m_last_change_count != source.m_device.debug()->comment_change_count())
+	if (m_last_change_count != source.device()->debug()->comment_change_count())
 		m_recompute = true;
 
 	// if we need to recompute, do it
@@ -502,7 +501,7 @@ recompute:
 	if (m_recompute)
 	{
 		// recompute the view
-		if (!m_byteaddress.empty() && m_last_change_count != source.m_device.debug()->comment_change_count())
+		if (!m_byteaddress.empty() && m_last_change_count != source.device()->debug()->comment_change_count())
 		{
 			// smoosh us against the left column, but not the top row
 			m_topleft.x = 0;
@@ -569,7 +568,7 @@ recompute:
 			// if we're on a line with a breakpoint, tag it changed
 			else
 			{
-				for (device_debug::breakpoint *bp = source.m_device.debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
+				for (device_debug::breakpoint *bp = source.device()->debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
 					if (m_byteaddress[effrow] == (source.m_space.address_to_byte(bp->address()) & source.m_space.logbytemask()))
 						attrib = DCA_CHANGED;
 			}
@@ -579,7 +578,7 @@ recompute:
 				attrib |= DCA_SELECTED;
 
 			// if we've visited this pc, mark it as such
-			if (source.m_device.debug()->track_pc_visited(m_byteaddress[effrow]))
+			if (source.device()->debug()->track_pc_visited(m_byteaddress[effrow]))
 				attrib |= DCA_VISITED;
 
 			// get the effective string
