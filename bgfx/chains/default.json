@@ -1,4 +1,4 @@
-{	"name": "Default Bilinear Filter",
+{	"name": "Default Nearest-Neighbor Filter",
 	"author": "Ryan Holtz",
 	"targets": [
 		{	"name": "temp",
@@ -8,9 +8,16 @@
 	],
 	"passes": [
 		{	"effect": "misc/blit",
-			"name": "Final Upscale",
+			"name": "Copy To Filtered Texture",
 			"input": [
 				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "temp"
+		},
+		{	"effect": "misc/blit",
+			"name": "Final Upscale",
+			"input": [
+				{ "sampler": "s_tex", "target": "temp" }
 			],
 			"output": "output"
 		}

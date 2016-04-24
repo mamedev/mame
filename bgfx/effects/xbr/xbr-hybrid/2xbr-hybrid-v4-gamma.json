@@ -1,0 +1,35 @@
+// license:GPL-2.0+
+// copyright-holders:Hyllian
+
+/*
+   Hyllian's 2xBR v3.8c+ReverseAA (squared) Shader - beta3
+   
+   Copyright (C) 2011/2012 Hyllian/Jararaca - sergiogdb@gmail.com
+*/
+
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "1",
+    	"dstColor": "0",
+    	"srcAlpha": "1",
+    	"dstAlpha": "0"
+    },
+    "depth": {
+    	"function": "always",
+    	"writeenable": false
+    },
+    "cull": {
+    	"mode": "none"
+    },
+    "write": {
+    	"rgb": true,
+    	"alpha": true
+    },
+    "vertex": "chains/xbr/xbr-hybrid/vs_2xbr-hybrid-v4-gamma",
+    "fragment": "chains/xbr/xbr-hybrid/fs_2xbr-hybrid-v4-gamma",
+    "uniforms": [
+    	{ "name": "decal",         "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_tex_size0",   "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
+    ]
+}
