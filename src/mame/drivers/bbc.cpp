@@ -937,7 +937,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(bbc_state, econet_clk_w))
 	MCFG_ECONET_DATA_CALLBACK(DEVWRITELINE("mc6854", mc6854_device, set_rx))
-	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, NULL)
+	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_b",      "bbcb_cass")

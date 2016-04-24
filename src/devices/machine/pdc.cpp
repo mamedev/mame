@@ -280,7 +280,7 @@ static MACHINE_CONFIG_FRAGMENT( pdc )
 
 	/* Hard Disk Controller - HDC9224 */
 	MCFG_DEVICE_ADD(HDC_TAG, HDC9224, 0)
-	MCFG_MFM_HARDDISK_CONN_ADD("h1", pdc_harddisks, NULL, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
+	MCFG_MFM_HARDDISK_CONN_ADD("h1", pdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

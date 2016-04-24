@@ -160,7 +160,7 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 //{
 //  membank("bankr0")->set_entry(BIT(data, 6));
 //  m_fdc->dden_w(BIT(data, 5));
-//  floppy_image_device *floppy = NULL;
+//  floppy_image_device *floppy = nullptr;
 //  if (BIT(data, 0)) floppy = m_floppy0->get_device();
 //  m_fdc->set_floppy(floppy);
 //  if (floppy)

@@ -769,8 +769,8 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("ipcsyspic" , pic8259_device , inta_cb)
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
-		MCFG_PIC8259_ADD("ipcsyspic" , WRITELINE(imds2_state , imds2_ipc_intr) , VCC , NULL)
-		MCFG_PIC8259_ADD("ipclocpic" , DEVWRITELINE("ipcsyspic" , pic8259_device , ir7_w) , VCC  , NULL)
+		MCFG_PIC8259_ADD("ipcsyspic" , WRITELINE(imds2_state , imds2_ipc_intr) , VCC, NOOP)
+		MCFG_PIC8259_ADD("ipclocpic" , DEVWRITELINE("ipcsyspic" , pic8259_device , ir7_w) , VCC, NOOP)
 
 		MCFG_DEVICE_ADD("ipctimer" , PIT8253 , 0)
 		MCFG_PIT8253_CLK0(IPC_XTAL_Y1 / 16)

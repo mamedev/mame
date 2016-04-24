@@ -2625,7 +2625,7 @@ MACHINE_CONFIG_START(xbox_base, xbox_base_state)
 	MCFG_PCI_BUS_LEGACY_SIBLING("pcibus")
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "NV2A GeForce 3MX Integrated GPU/Northbridge", geforce_pci_r, geforce_pci_w)
 	MCFG_PIC8259_ADD("pic8259_1", WRITELINE(xbox_base_state, xbox_pic8259_1_set_int_line), VCC, READ8(xbox_base_state, get_slave_ack))
-	MCFG_PIC8259_ADD("pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL)
+	MCFG_PIC8259_ADD("pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NOOP)
 
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(1125000) /* heartbeat IRQ */

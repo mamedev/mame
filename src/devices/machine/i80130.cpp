@@ -98,7 +98,7 @@ const rom_entry *i80130_device::device_rom_region() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( i80130 )
-	MCFG_PIC8259_ADD("pic", DEVWRITELINE(DEVICE_SELF, i80130_device, irq_w), VCC, NULL)
+	MCFG_PIC8259_ADD("pic", DEVWRITELINE(DEVICE_SELF, i80130_device, irq_w), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(0)

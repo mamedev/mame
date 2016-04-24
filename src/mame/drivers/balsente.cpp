@@ -971,7 +971,7 @@ static INPUT_PORTS_START( nstocker )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "G1:7" )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, balsente_state,nstocker_bits_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, balsente_state,nstocker_bits_r, nullptr)
 
 	/* cheese alert -- we have to map this to player 2 so that it doesn't interfere with
 	   the crosshair controls */

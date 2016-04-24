@@ -772,7 +772,7 @@ QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
 	if (!strncmp(file_name, "PFILE:", 6))
 		strcpy(file_name, file_name + 6);
 
-	UINT32 img_start = oz_wzd_extract_tag(data, "<BIN>", NULL);
+	UINT32 img_start = oz_wzd_extract_tag(data, "<BIN>", nullptr);
 
 	if (img_start == 0)
 		return IMAGE_INIT_FAIL;
@@ -960,7 +960,7 @@ static MACHINE_CONFIG_START( oz750, oz750_state )
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(rex6000_state, serial_irq))
 
-	MCFG_RS232_PORT_ADD( "serport", default_rs232_devices, NULL )
+	MCFG_RS232_PORT_ADD( "serport", default_rs232_devices, nullptr )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dsr_w))

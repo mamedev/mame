@@ -357,9 +357,9 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)\
 	/* bit 6 is the VG HALT bit. We set it to "low" */\
 	/* per default (busy vector processor). */\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_bzone_device, done_r, NULL)\
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_bzone_device, done_r, nullptr)\
 	/* bit 7 is tied to a 3kHz clock */\
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bzone_state,clock_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bzone_state,clock_r, nullptr)
 
 
 #define BZONEDSW0\

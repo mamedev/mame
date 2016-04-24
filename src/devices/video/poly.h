@@ -607,7 +607,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tile(
 			extent_t &extent = unit.extent[extnum];
 			extent.startx = istartx;
 			extent.stopx = istopx;
-			extent.userdata = NULL;
+			extent.userdata = nullptr;
 			pixels += istopx - istartx;
 
 			// fill in the parameters for the extent

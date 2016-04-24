@@ -170,7 +170,7 @@ WRITE32_MEMBER(_39in1_state::pxa255_i2s_w)
 		{
 			sprintf(filename, "39in1_%04d.raw", count++);
 			audio_dump = fopen(filename, "rb");
-		}while(audio_dump != NULL);
+		}while(audio_dump != nullptr);
 		count--;
 		sprintf(filename, "39in1_%04d.raw", count);
 		audio_dump = fopen(filename, "wb");

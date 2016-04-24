@@ -359,7 +359,7 @@ static INPUT_PORTS_START( ccastles )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ccastles_state,get_vblank, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ccastles_state,get_vblank, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )                    /* 1p Jump, non-cocktail start1 */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)     /* 2p Jump, non-cocktail start2 */
 

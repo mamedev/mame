@@ -84,7 +84,7 @@ extern const device_type LYNX2_SND;
 
 
 #define MCFG_LYNX_SND_SET_TIMER( _class, _method) \
-	lynx_sound_device::set_timer_delegate(*device, lynx_sound_timer_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	lynx_sound_device::set_timer_delegate(*device, lynx_sound_timer_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 
 #endif

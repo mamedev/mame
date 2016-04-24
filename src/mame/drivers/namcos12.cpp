@@ -1682,7 +1682,7 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
 	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb_line_dispatch_device<2>, in_w))
 
-	MCFG_AT28C16_ADD("at28c16", NULL)
+	MCFG_AT28C16_ADD("at28c16", nullptr)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )

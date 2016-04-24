@@ -1345,7 +1345,7 @@ void sc499_ctape_image_device::call_unload()
 {
 	m_ctape_data.resize(0);
 	// TODO: add save tape on exit?
-	//if (software_entry() == NULL)
+	//if (software_entry() == nullptr)
 	//{
 	//    fseek(0, SEEK_SET);
 	//    fwrite(m_ctape_data, m_ctape_data.size);

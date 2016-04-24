@@ -757,7 +757,7 @@ static INPUT_PORTS_START( funrlgl )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN.1") // fake
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, funrlgl_state, reset_button, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, funrlgl_state, reset_button, nullptr)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)

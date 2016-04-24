@@ -472,7 +472,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(pc100_state, upper_mask_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc100_state, crtc_bank_w))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), GND, NULL )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), GND, NOOP)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 

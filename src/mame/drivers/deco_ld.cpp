@@ -362,7 +362,7 @@ static INPUT_PORTS_START( begas )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF,deco_ld_state,begas_vblank_r, NULL) // TODO: IPT_VBLANK doesn't seem to work fine?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF,deco_ld_state,begas_vblank_r, nullptr) // TODO: IPT_VBLANK doesn't seem to work fine?
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSWA" )

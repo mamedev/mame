@@ -200,7 +200,7 @@ static INPUT_PORTS_START( pirates )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)  // EEPROM data
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )     // seems checked in "test mode"
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )     // seems checked in "test mode"
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pirates_state,prot_r, NULL)      // protection
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pirates_state,prot_r, nullptr)      // protection
 	/* What do these bits do ? */
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )

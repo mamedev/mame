@@ -38,7 +38,7 @@
 
 #define MCFG_IOEXP_SLOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, IOEXP_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ioexp_slot_carts, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(ioexp_slot_carts, nullptr, false)
 
 
 //**************************************************************************

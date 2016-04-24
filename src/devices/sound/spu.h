@@ -203,10 +203,10 @@ protected:
 #if 0
 	void write_cache_pointer(outfile *fout,
 														cache_pointer *cp,
-														sample_loop_cache *lc=NULL);
+														sample_loop_cache *lc=nullptr);
 	void read_cache_pointer(infile *fin,
 													cache_pointer *cp,
-													sample_loop_cache **lc=NULL);
+													sample_loop_cache **lc=nullptr);
 #endif
 	static float get_linear_rate(const int n);
 	static float get_linear_rate_neg_phase(const int n);

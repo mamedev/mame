@@ -226,7 +226,7 @@ static MACHINE_CONFIG_FRAGMENT( c64_magic_voice )
 	MCFG_TPI6525_OUT_PB_CB(WRITE8(c64_magic_voice_cartridge_device, tpi_pb_w))
 	MCFG_TPI6525_OUT_CA_CB(WRITELINE(c64_magic_voice_cartridge_device, tpi_ca_w))
 	MCFG_TPI6525_OUT_CA_CB(WRITELINE(c64_magic_voice_cartridge_device, tpi_cb_w))
-	MCFG_40105_ADD(CMOS40105_TAG, DEVWRITELINE(MOS6525_TAG, tpi6525_device, i3_w), NULL)
+	MCFG_40105_ADD(CMOS40105_TAG, DEVWRITELINE(MOS6525_TAG, tpi6525_device, i3_w), NOOP)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(T6721A_TAG, T6721A, XTAL_640kHz)

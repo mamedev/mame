@@ -304,7 +304,7 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("IN.3") // fake
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( cfrogger, cfrogger_state )
@@ -417,7 +417,7 @@ static INPUT_PORTS_START( gjungler )
 	PORT_CONFSETTING(    0x08, "B" )
 
 	PORT_START("IN.3") // fake
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( gjungler, gjungler_state )

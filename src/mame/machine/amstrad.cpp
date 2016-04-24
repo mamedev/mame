@@ -2019,7 +2019,7 @@ WRITE8_MEMBER(amstrad_state::rom_select)
 		}
 		else
 		{
-			exp_port = NULL;
+			exp_port = nullptr;
 		}
 	}
 
@@ -2983,7 +2983,7 @@ void amstrad_state::enumerate_roms()
 		}
 		else
 		{
-			exp_port = NULL;
+			exp_port = nullptr;
 		}
 	}
 
@@ -2997,7 +2997,7 @@ void amstrad_state::enumerate_roms()
 			char str[20];
 			sprintf(str, "rom%i", i + 1);
 			rom_image_device* romimage = romexp->subdevice<rom_image_device>(str);
-			if(romimage != NULL && romimage->base() != nullptr)
+			if(romimage != nullptr && romimage->base() != nullptr)
 			{
 				m_Amstrad_ROM_Table[m_rom_count] = romimage->base();
 				NEXT_ROM_SLOT

@@ -2234,9 +2234,9 @@ PALETTE_INIT_MEMBER(pc6001_state,pc6001m2)
 static const cassette_interface pc6001_cassette_interface =
 {
 	pc6001_cassette_formats,
-	NULL,
+	nullptr,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
+	nullptr
 };
 #endif
 

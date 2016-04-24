@@ -361,11 +361,11 @@ static inline UINT32 compute_raster_hash(const raster_info *info)
 #define DITHER_G(val,dith)  ((((val) << 2) - ((val) >> 4) + ((val) >> 6) + (dith)) >> 2)
 
 #define DECLARE_DITHER_POINTERS                                                 \
-	const UINT8 *dither_lookup = NULL;                                          \
-	const UINT8 *dither4 = NULL;                                                \
-	const UINT8 *dither = NULL
+	const UINT8 *dither_lookup = nullptr;                                          \
+	const UINT8 *dither4 = nullptr;                                                \
+	const UINT8 *dither = nullptr
 #define DECLARE_DITHER_POINTERS_NO_DITHER_VAR                                               \
-	const UINT8 *dither_lookup = NULL;
+	const UINT8 *dither_lookup = nullptr;
 #define COMPUTE_DITHER_POINTERS(FBZMODE, YY)                                    \
 do                                                                              \
 {                                                                               \
@@ -2718,7 +2718,7 @@ void voodoo_device::raster_##name(void *destbase, INT32 y, const poly_extent *ex
 																				\
 	/* get pointers to the target buffer and depth buffer */                    \
 	dest = (UINT16 *)destbase + scry * vd->fbi.rowpixels;                        \
-	depth = (vd->fbi.auxoffs != ~0) ? ((UINT16 *)(vd->fbi.ram + vd->fbi.auxoffs) + scry * vd->fbi.rowpixels) : NULL; \
+	depth = (vd->fbi.auxoffs != ~0) ? ((UINT16 *)(vd->fbi.ram + vd->fbi.auxoffs) + scry * vd->fbi.rowpixels) : nullptr; \
 																				\
 	/* compute the starting parameters */                                       \
 	dx = startx - (extra->ax >> 4);                                             \

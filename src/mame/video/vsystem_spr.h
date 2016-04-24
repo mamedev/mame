@@ -6,7 +6,7 @@
 typedef device_delegate<UINT32 (UINT32)> vsystem_tile_indirection_delegate;
 
 #define MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( _class, _method) \
-	vsystem_spr_device::set_tile_indirect_cb(*device, vsystem_tile_indirection_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	vsystem_spr_device::set_tile_indirect_cb(*device, vsystem_tile_indirection_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 #define MCFG_VSYSTEM_SPR_SET_GFXREGION( _rgn ) \
 	vsystem_spr_device::set_gfx_region(*device, _rgn);
 #define MCFG_VSYSTEM_SPR_SET_PALBASE( _palbase ) \

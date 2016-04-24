@@ -477,12 +477,12 @@ static INPUT_PORTS_START( tempest )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_tempest_device, done_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_tempest_device, done_r, nullptr)
 	/* bit 7 is tied to a 3kHz (?) clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,clock_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,clock_r, nullptr)
 
 	PORT_START("IN1/DSW0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_knob_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_knob_r, nullptr)
 	/* The next one is reponsible for cocktail mode.
 	 * According to the documentation, this is not a switch, although
 	 * it may have been planned to put it on the Math Box PCB, D/E2 )
@@ -503,7 +503,7 @@ static INPUT_PORTS_START( tempest )
 	PORT_DIPNAME(  0x04, 0x04, "Rating" ) PORT_DIPLOCATION("DE2:2")
 	PORT_DIPSETTING(     0x04, "1, 3, 5, 7, 9" )
 	PORT_DIPSETTING(     0x00, "tied to high score" )
-	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_buttons_r, NULL)
+	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_buttons_r, nullptr)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )

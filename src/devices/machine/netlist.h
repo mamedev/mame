@@ -34,7 +34,7 @@
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_ANALOG_OUTPUT, 0)                    \
 	netlist_mame_analog_output_t::static_set_params(*device, _IN,                   \
 				netlist_analog_output_delegate(& _class :: _member,                 \
-						# _class "::" # _member, _class_tag, (_class *) 0)   );
+						# _class "::" # _member, _class_tag, (_class *)nullptr)   );
 
 #define MCFG_NETLIST_LOGIC_INPUT(_basetag, _tag, _name, _shift, _mask)              \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_LOGIC_INPUT, 0)                      \

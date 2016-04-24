@@ -79,7 +79,7 @@ static const unif unif_list[] =
 	{ "UNL-8237",                   0,    0, CHRRAM_0,  UNL_8237},
 	{ "UNL-SL1632",                 0,    0, CHRRAM_0,  REXSOFT_SL1632},
 	{ "UNL-SACHEN-74LS374N",        0,    0, CHRRAM_0,  SACHEN_74LS374},
-	// mapper 243 variant exists! how to distinguish?!?  mapper243_l_w, NULL, NULL, NULL, NULL, NULL, NULL (also uses NT_VERT!)
+	// mapper 243 variant exists! how to distinguish?!?  mapper243_l_w, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr (also uses NT_VERT!)
 	{ "UNL-TC-U01-1.5M",            0,    0, CHRRAM_0,  SACHEN_TCU01},
 	{ "UNL-SACHEN-8259C",           0,    0, CHRRAM_0,  SACHEN_8259C},
 	{ "UNL-SA-016-1M",              0,    0, CHRRAM_0,  AVE_NINA06},    // actually this is Mapper 146, but works like 79!

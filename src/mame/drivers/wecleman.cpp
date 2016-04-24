@@ -882,7 +882,7 @@ static INPUT_PORTS_START( hotchase )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Left SW")  // left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Thermo SW")  // thermo
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // from sound cpu
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wecleman_state,hotchase_sound_status_r, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wecleman_state,hotchase_sound_status_r, nullptr)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW2")  /* $140015.b */

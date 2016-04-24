@@ -486,43 +486,43 @@ emu_file jaguar_state::*jaguar_nvram_fopen( UINT32 openflags)
     {
         std::string fname(machine().system().name, PATH_SEPARATOR, image->basename_noext(), ".nv");
         filerr = mame_fopen( SEARCHPATH_NVRAM, fname, openflags, &file);
-        return (filerr == osd_file::error::NONE) ? file : NULL;
+        return (filerr == osd_file::error::NONE) ? file : nullptr;
     }
     else
-        return NULL;
+        return nullptr;
 }
 
 void jaguar_state::jaguar_nvram_load()
 {
-    emu_file *nvram_file = NULL;
+    emu_file *nvram_file = nullptr;
     device_t *device;
 
-    for (device = machine().m_devicelist.first(); device != NULL; device = device->next())
+    for (device = machine().m_devicelist.first(); device != nullptr; device = device->next())
     {
         device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
-        if (nvram != NULL)
+        if (nvram != nullptr)
         {
-            if (nvram_file == NULL)
+            if (nvram_file == nullptr)
                 nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_READ);
             (*nvram)(device, nvram_file, 0);
         }
     }
-    if (nvram_file != NULL)
+    if (nvram_file != nullptr)
         mame_fclose(nvram_file);
 }
 
 
 void jaguar_state::jaguar_nvram_save()
 {
-    emu_file *nvram_file = NULL;
+    emu_file *nvram_file = nullptr;
     device_t *device;
 
-    for (device = machine().m_devicelist.first(); device != NULL; device = device->next())
+    for (device = machine().m_devicelist.first(); device != nullptr; device = device->next())
     {
         device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
-        if (nvram != NULL)
+        if (nvram != nullptr)
         {
-            if (nvram_file == NULL)
+            if (nvram_file == nullptr)
                 nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
             // check nvram_file to avoid crash when no image is mounted or cannot be created
             if (nvram_file)
@@ -530,7 +530,7 @@ void jaguar_state::jaguar_nvram_save()
         }
     }
 
-    if (nvram_file != NULL)
+    if (nvram_file != nullptr)
         mame_fclose(nvram_file);
 }
 
@@ -617,7 +617,7 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 	}
 
 	/* adjust banking */
-	if (m_romboard_region != NULL)
+	if (m_romboard_region != nullptr)
 	{
 		membank("mainsndbank")->set_entry((data >> 1) & 7);
 		membank("dspsndbank")->set_entry((data >> 1) & 7);
@@ -776,7 +776,7 @@ WRITE32_MEMBER(jaguar_state::latch_w)
 	logerror("%08X:latch_w(%X)\n", space.device().safe_pcbase(), data);
 
 	/* adjust banking */
-	if (m_romboard_region != NULL)
+	if (m_romboard_region != nullptr)
 	{
 		if (m_is_r3000)
 		{

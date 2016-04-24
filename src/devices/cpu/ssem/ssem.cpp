@@ -130,7 +130,7 @@ void ssem_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 

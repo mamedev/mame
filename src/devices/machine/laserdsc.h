@@ -66,7 +66,7 @@ enum laserdisc_field_code
 #define MCFG_LASERDISC_OVERLAY_STATIC(_width, _height, _func) \
 	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func));
 #define MCFG_LASERDISC_OVERLAY_DRIVER(_width, _height, _class, _method) \
-	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, NULL));
+	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, nullptr));
 #define MCFG_LASERDISC_OVERLAY_DEVICE(_width, _height, _device, _class, _method) \
 	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device));
 #define MCFG_LASERDISC_OVERLAY_CLIP(_minx, _maxx, _miny, _maxy) \

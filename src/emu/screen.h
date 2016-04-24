@@ -451,9 +451,9 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 #define MCFG_SCREEN_VBLANK_NONE() \
 	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate());
 #define MCFG_SCREEN_VBLANK_DRIVER(_class, _method) \
-	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)0));
+	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 #define MCFG_SCREEN_VBLANK_DEVICE(_device, _class, _method) \
-	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)0));
+	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)nullptr));
 #define MCFG_SCREEN_PALETTE(_palette_tag) \
 	screen_device::static_set_palette(*device, "^" _palette_tag);
 #define MCFG_SCREEN_NO_PALETTE \

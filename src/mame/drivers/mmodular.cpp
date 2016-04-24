@@ -1536,7 +1536,7 @@ static MACHINE_CONFIG_START( sfortea, polgar_state )
 	MCFG_FRAGMENT_ADD( chess_common )
 
 	/* acia */
-//  MCFG_MOS6551_ADD("acia65c51", XTAL_1_8432MHz, NULL)
+//  MCFG_MOS6551_ADD("acia65c51", XTAL_1_8432MHz, nullptr)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", polgar_state, cause_M6502_irq, attotime::from_hz(600))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(60))
@@ -1599,7 +1599,7 @@ static MACHINE_CONFIG_START( diablo68, polgar_state )
 	MCFG_FRAGMENT_ADD( chess_common )
 
 	/* acia */
-//  MCFG_MOS6551_ADD("acia65c51", XTAL_1_8432MHz, NULL)
+//  MCFG_MOS6551_ADD("acia65c51", XTAL_1_8432MHz, nullptr)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq2, attotime::from_hz(60))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(30))

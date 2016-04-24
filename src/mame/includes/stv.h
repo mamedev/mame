@@ -605,7 +605,7 @@ public:
 	partitionT *cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok);
 	partitionT *cd_read_filtered_sector(INT32 fad, UINT8 *p_ok);
 
-	cdrom_file *cdrom;// = (cdrom_file *)NULL;
+	cdrom_file *cdrom;// = (cdrom_file *)nullptr;
 
 	// local variables
 	timer_device *sector_timer;

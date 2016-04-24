@@ -543,7 +543,7 @@ public:
 			global_free(xam);
 		}
 
-		// Set marker head to NULL if the list is now empty
+		// Set marker head to nullptr if the list is now empty
 
 		if (! marker_tail) marker_head=nullptr;
 

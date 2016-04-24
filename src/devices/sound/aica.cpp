@@ -414,7 +414,7 @@ void aica_device::Init()
 	m_MidiOutR=m_MidiOutW=0;
 
 	// get AICA RAM
-	if (m_ram_region != NULL)
+	if (m_ram_region != nullptr)
 	{
 		m_AICARAM = m_ram_region->base();
 		m_AICARAM += m_roffset;

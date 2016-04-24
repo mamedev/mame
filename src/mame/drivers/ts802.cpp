@@ -166,7 +166,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ "z80dart2" },
 	{ "z80dma" },
 	{ "z80ctc" },
-	{ NULL }
+	{ nullptr }
 };
 #endif
 

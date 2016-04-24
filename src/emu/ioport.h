@@ -1853,10 +1853,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 // name of table
 #define DEVICE_INPUT_DEFAULTS_NAME(_name) device_iptdef_##_name
 
-#define device_iptdef_0 nullptr
-#define device_iptdef_0L nullptr
-#define device_iptdef_0LL nullptr
-#define device_iptdef___null nullptr
+#define device_iptdef_NOOP nullptr
 
 // start of table
 #define DEVICE_INPUT_DEFAULTS_START(_name) \

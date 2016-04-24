@@ -687,7 +687,7 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(z100_state, get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir3_w), GND, NULL )
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir3_w), GND, NOOP)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(z100_state, video_pia_A_w))

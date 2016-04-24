@@ -791,7 +791,7 @@ void mips3_device::static_generate_exception(UINT8 exception, int recover, const
 	if ((PRINTF_EXCEPTIONS && exception != EXCEPTION_INTERRUPT && exception != EXCEPTION_SYSCALL) ||
 		(PRINTF_MMU && (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)))
 	{
-		UML_CALLC(block, cfunc_printf_exception, this);                            // callc   cfunc_printf_exception,NULL
+		UML_CALLC(block, cfunc_printf_exception, this);                            // callc   cfunc_printf_exception,nullptr
 	}
 
 	/* choose our target PC */

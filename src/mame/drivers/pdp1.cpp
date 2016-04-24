@@ -819,7 +819,7 @@ bool pdp1_readtape_image_device::call_load()
 		/* restart reader IO when necessary */
 		/* note that this function may be called before pdp1_init_machine, therefore
 		before state->m_tape_reader.timer is allocated.  It does not matter, as the clutch is never
-		down at power-up, but we must not call timer_enable with a NULL parameter! */
+		down at power-up, but we must not call timer_enable with a nullptr parameter! */
 
 	if (state->m_tape_reader.timer)
 	{

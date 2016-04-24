@@ -173,12 +173,12 @@ WRITE8_MEMBER( irem_audio_device::ay8910_45M_portb_w )
 {
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
 	m_adpcm1->playmode_w((data >> 2) & 7);
-	if (m_adpcm2 != NULL)
+	if (m_adpcm2 != nullptr)
 		m_adpcm2->playmode_w(((data >> 2) & 4) | 3); /* always in slave mode */
 
 	/* bits 0 and 1 reset the two chips */
 	m_adpcm1->reset_w(data & 1);
-	if (m_adpcm2 != NULL)
+	if (m_adpcm2 != nullptr)
 		m_adpcm2->reset_w(data & 2);
 }
 
@@ -223,7 +223,7 @@ WRITE8_MEMBER( irem_audio_device::m52_adpcm_w )
 	}
 	if (offset & 2)
 	{
-		if (m_adpcm2 != NULL)
+		if (m_adpcm2 != nullptr)
 			m_adpcm2->data_w(data);
 	}
 }
@@ -232,7 +232,7 @@ WRITE8_MEMBER( irem_audio_device::m52_adpcm_w )
 WRITE8_MEMBER( irem_audio_device::m62_adpcm_w )
 {
 	msm5205_device *adpcm = (offset & 1) ? m_adpcm2 : m_adpcm1;
-	if (adpcm != NULL)
+	if (adpcm != nullptr)
 		adpcm->data_w(data);
 }
 
@@ -249,7 +249,7 @@ void irem_audio_device::adpcm_int(int st)
 	subdevice("iremsound")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
-	if (m_adpcm2 != NULL)
+	if (m_adpcm2 != nullptr)
 	{
 		m_adpcm2->vclk_w(1);
 		m_adpcm2->vclk_w(0);

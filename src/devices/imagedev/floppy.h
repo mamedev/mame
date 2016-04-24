@@ -36,7 +36,7 @@
 	const floppy_format_type _member [] = {
 #define FLOPPY_FORMATS_END0 \
 		, \
-		NULL };
+		nullptr };
 #define FLOPPY_FORMATS_END \
 		, \
 		FLOPPY_D88_FORMAT, \

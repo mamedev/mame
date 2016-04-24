@@ -922,7 +922,7 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_PIT8253_CLK2(MAIN_CLOCK) /* RS-232c */
 
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(apc_state,get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: check ir7_w
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NOOP) // TODO: check ir7_w
 	MCFG_DEVICE_ADD("i8237", AM9517A, MAIN_CLOCK)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(apc_state, apc_dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(apc_state, apc_tc_w))
@@ -936,7 +936,7 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(apc_state, apc_dack3_w))
 
 	MCFG_NVRAM_ADD_1FILL("cmos")
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
+	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NOOP, NOOP)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir4_w))

@@ -614,7 +614,7 @@ static MACHINE_CONFIG_START( poisk1, p1_state )
 	MCFG_PIT8253_CLK2(XTAL_15MHz/12) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(p1_state, p1_pit8253_out2_changed))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("ppi8255n1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(p1_state, p1_ppi_porta_r)) /*60H*/

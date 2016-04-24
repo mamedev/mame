@@ -708,7 +708,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("upd7201", z80dart_device, rxtxcb_w))
 
 	MCFG_PIC8259_ADD("pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(qx10_state, get_slave_ack))
-	MCFG_PIC8259_ADD("pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL)
+	MCFG_PIC8259_ADD("pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NOOP)
 
 	MCFG_UPD7201_ADD("upd7201", MAIN_CLK/4, 0, 0, 0, 0) // channel b clock set by pit2 channel 2
 	// Channel A: Keyboard

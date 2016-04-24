@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( macs_io, AS_IO, 8, macs_state )
 ADDRESS_MAP_END
 
 //static GFXDECODE_START( macs )
-//  GFXDECODE_ENTRY( NULL, 0, charlayout,      0, 16*4  )
+//  GFXDECODE_ENTRY( nullptr, 0, charlayout,      0, 16*4  )
 //GFXDECODE_END
 
 static INPUT_PORTS_START( macs_base )

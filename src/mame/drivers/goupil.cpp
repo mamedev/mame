@@ -50,7 +50,7 @@ public:
 		, m_fdc(*this, "fd1791")
 		, m_floppy0(*this, "fd1791:0")
 		, m_floppy1(*this, "fd1791:1")
-		, m_floppy(NULL)
+		, m_floppy(nullptr)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(via_video_pba_w);
@@ -391,7 +391,7 @@ void goupil_g1_state::machine_start()
 {
 	std::string region_tag;
 
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	valkeyb = 0xFF;
 }
 

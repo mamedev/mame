@@ -866,8 +866,8 @@ static MACHINE_CONFIG_START( cops, cops_state )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, cdrom_ctrl_w))
 
 	/* acia */
-//  MCFG_MOS6551_ADD("acia6551_1", XTAL_1_8432MHz, NULL)
-//  MCFG_MOS6551_ADD("acia6551_2", XTAL_1_8432MHz, NULL)
+//  MCFG_MOS6551_ADD("acia6551_1", XTAL_1_8432MHz, nullptr)
+//  MCFG_MOS6551_ADD("acia6551_2", XTAL_1_8432MHz, nullptr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

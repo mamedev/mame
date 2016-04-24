@@ -201,7 +201,7 @@ CPU_DISASSEMBLE( lr35902 )
 	int pos = 0;
 
 	dst = buffer;
-	//symbol = NULL;
+	//symbol = nullptr;
 
 	op = oprom[pos++];
 	op1 = 0; /* keep GCC happy */

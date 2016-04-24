@@ -1345,7 +1345,7 @@ void avg_device::device_start()
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
 
 	memory_share *colorram = machine().root_device().memshare("colorram");
-	if (colorram != NULL)
+	if (colorram != nullptr)
 	{
 		avgdvg_colorram = reinterpret_cast<UINT8 *>(colorram->ptr());
 	}
@@ -1385,7 +1385,7 @@ void dvg_device::device_start()
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
 
 	memory_share *colorram = machine().root_device().memshare("colorram");
-	if (colorram != NULL)
+	if (colorram != nullptr)
 	{
 		avgdvg_colorram = reinterpret_cast<UINT8 *>(colorram->ptr());
 	}

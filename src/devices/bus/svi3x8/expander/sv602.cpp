@@ -25,7 +25,7 @@ static MACHINE_CONFIG_FRAGMENT( sv602 )
 	MCFG_SVI_SLOT_INT_HANDLER(WRITELINE(sv602_device, int_w))
 	MCFG_SVI_SLOT_ROMDIS_HANDLER(WRITELINE(sv602_device, romdis_w))
 	MCFG_SVI_SLOT_RAMDIS_HANDLER(WRITELINE(sv602_device, ramdis_w))
-	MCFG_SVI_SLOT_ADD("0", sv602_slot_cards, NULL)
+	MCFG_SVI_SLOT_ADD("0", sv602_slot_cards, nullptr)
 MACHINE_CONFIG_END
 
 machine_config_constructor sv602_device::device_mconfig_additions() const

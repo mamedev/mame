@@ -918,7 +918,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_80186_TMROUT0_HANDLER(WRITELINE(ngen_state, cpu_timer_w))
 	MCFG_80186_IRQ_SLAVE_ACK(READ8(ngen_state, irq_cb))
 
-	MCFG_PIC8259_ADD( "pic", DEVWRITELINE("maincpu",i80186_cpu_device,int0_w), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic", DEVWRITELINE("maincpu",i80186_cpu_device,int0_w), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
@@ -1028,7 +1028,7 @@ static MACHINE_CONFIG_START( ngen386, ngen386_state )
 	MCFG_CPU_IO_MAP(ngen386_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
-	MCFG_PIC8259_ADD( "pic", INPUTLINE("i386cpu",0), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic", INPUTLINE("i386cpu",0), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?

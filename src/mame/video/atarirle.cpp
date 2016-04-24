@@ -534,7 +534,7 @@ if (count++ == atarirle_hilite_index)
 
 void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &clip, int code, int color, int hflip, int vflip, int x, int y, int xscale, int yscale)
 {
-	// bail on a NULL object
+	// bail on a nullptr object
 	const object_info &info = m_info[code];
 	if (info.data == nullptr)
 		return;

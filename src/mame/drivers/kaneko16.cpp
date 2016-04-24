@@ -2455,7 +2455,7 @@ MACHINE_CONFIG_END
 void kaneko16_state::kaneko16_unscramble_tiles(const char *region)
 {
 	memory_region *tile_region = memregion(region);
-	if (tile_region == NULL)
+	if (tile_region == nullptr)
 	{
 		return;
 	}

@@ -380,10 +380,10 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 //  DEVCB_INPUT_PORT("DSW1"),  /* not used */
 //  DEVCB_INPUT_PORT("DSW2"),  /* not used */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NOOP, /* callback for display state changes */
+	DEVCB_NOOP, /* callback for cursor state changes */
+	DEVCB_NOOP,
+	DEVCB_NOOP
 };
 #endif
 

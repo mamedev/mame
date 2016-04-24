@@ -102,7 +102,7 @@ static render_texture *get_vector_texture(float dx, float dy, float intensity)
 		ibucket = TEXTURE_INTENSITY_BUCKETS;
 
 	tex = &vectortex[ibucket][lbucket];
-	if (tex->texture != NULL)
+	if (tex->texture != nullptr)
 		return tex->texture;
 
 	height = lbucket * VECTOR_WIDTH_DENOM / TEXTURE_LENGTH_BUCKETS;
