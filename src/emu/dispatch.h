@@ -23,11 +23,17 @@
 #define MCFG_LINE_DISPATCH_FWD_CB(_entry, _count, _devcb) \
 	devcb = &devcb_line_dispatch_device<_count>::set_fwd_cb(*device, _entry, DEVCB_##_devcb);
 
+extern const device_type DEVCB_LINE_DISPATCH_2;
+extern const device_type DEVCB_LINE_DISPATCH_3;
+extern const device_type DEVCB_LINE_DISPATCH_4;
+extern const device_type DEVCB_LINE_DISPATCH_5;
+extern const device_type DEVCB_LINE_DISPATCH_6;
+
 template<int N> class devcb_line_dispatch_device : public device_t {
 public:
 	devcb_line_dispatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, tag, owner, clock) { }
-
+		device_t(mconfig, DEVCB_LINE_DISPATCH_2, "DEVCB_LINE_DISPATCH_2", tag, owner, clock, "devcb_line_dispatch_2", __FILE__) { }
+		
 	void init_fwd() {
 		for(auto & elem : fwd_cb)
 			elem = new devcb_write_line(*this);
@@ -54,11 +60,5 @@ protected:
 private:
 	devcb_write_line *fwd_cb[N];
 };
-
-extern const device_type DEVCB_LINE_DISPATCH_2;
-extern const device_type DEVCB_LINE_DISPATCH_3;
-extern const device_type DEVCB_LINE_DISPATCH_4;
-extern const device_type DEVCB_LINE_DISPATCH_5;
-extern const device_type DEVCB_LINE_DISPATCH_6;
 
 #endif

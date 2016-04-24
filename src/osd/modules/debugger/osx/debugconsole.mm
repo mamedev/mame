@@ -227,7 +227,7 @@
 
 
 - (IBAction)debugToggleBreakpoint:(id)sender {
-	device_t &device = [dasmView source]->device();
+	device_t &device = *[dasmView source]->device();
 	if ([dasmView cursorVisible] && (debug_cpu_get_visible_cpu(*machine) == &device))
 	{
 		offs_t const address = [dasmView selectedAddress];
@@ -246,7 +246,7 @@
 
 
 - (IBAction)debugToggleBreakpointEnable:(id)sender {
-	device_t &device = [dasmView source]->device();
+	device_t &device = *[dasmView source]->device();
 	if ([dasmView cursorVisible] && (debug_cpu_get_visible_cpu(*machine) == &device))
 	{
 		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:[dasmView selectedAddress]
@@ -265,7 +265,7 @@
 
 
 - (IBAction)debugRunToCursor:(id)sender {
-	device_t &device = [dasmView source]->device();
+	device_t &device = *[dasmView source]->device();
 	if ([dasmView cursorVisible] && (debug_cpu_get_visible_cpu(*machine) == &device))
 	{
 		NSString *command = [NSString stringWithFormat:@"go 0x%lX", (unsigned long)[dasmView selectedAddress]];
@@ -481,13 +481,13 @@
 	SEL const action = [item action];
 	BOOL const inContextMenu = ([item menu] == [dasmView menu]);
 	BOOL const haveCursor = [dasmView cursorVisible];
-	BOOL const isCurrent = (debug_cpu_get_visible_cpu(*machine) == &[dasmView source]->device());
+	BOOL const isCurrent = (debug_cpu_get_visible_cpu(*machine) == [dasmView source]->device());
 
 	device_debug::breakpoint *breakpoint = nullptr;
 	if (haveCursor)
 	{
 		breakpoint = [[self class] findBreakpointAtAddress:[dasmView selectedAddress]
-												 forDevice:[dasmView source]->device()];
+												 forDevice:*[dasmView source]->device()];
 	}
 
 	if (action == @selector(debugToggleBreakpoint:))

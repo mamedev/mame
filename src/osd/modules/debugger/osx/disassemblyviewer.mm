@@ -138,7 +138,7 @@
 - (IBAction)debugNewMemoryWindow:(id)sender {
 	debug_view_disasm_source const *source = [dasmView source];
 	[console debugNewMemoryWindowForSpace:&source->space()
-								   device:&source->device()
+								   device:source->device()
 							   expression:nil];
 }
 
@@ -146,7 +146,7 @@
 - (IBAction)debugNewDisassemblyWindow:(id)sender {
 	debug_view_disasm_source const *source = [dasmView source];
 	[console debugNewDisassemblyWindowForSpace:&source->space()
-										device:&source->device()
+										device:source->device()
 									expression:[dasmView expression]];
 }
 
@@ -170,7 +170,7 @@
 - (IBAction)debugToggleBreakpoint:(id)sender {
 	if ([dasmView cursorVisible])
 	{
-		device_t &device = [dasmView source]->device();
+		device_t &device = *[dasmView source]->device();
 		offs_t const address = [dasmView selectedAddress];
 		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:address forDevice:device];
 
@@ -197,7 +197,7 @@
 - (IBAction)debugToggleBreakpointEnable:(id)sender {
 	if ([dasmView cursorVisible])
 	{
-		device_t &device = [dasmView source]->device();
+		device_t &device = *[dasmView source]->device();
 		offs_t const address = [dasmView selectedAddress];
 		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:address forDevice:device];
 		if (bp != nullptr)
@@ -216,7 +216,7 @@
 
 - (IBAction)debugRunToCursor:(id)sender {
 	if ([dasmView cursorVisible])
-		[dasmView source]->device().debug()->go([dasmView selectedAddress]);
+		[dasmView source]->device()->debug()->go([dasmView selectedAddress]);
 }
 
 
@@ -235,7 +235,7 @@
 	if (haveCursor)
 	{
 		breakpoint = [[self class] findBreakpointAtAddress:[dasmView selectedAddress]
-												 forDevice:[dasmView source]->device()];
+												 forDevice:*[dasmView source]->device()];
 	}
 
 	if (action == @selector(debugToggleBreakpoint:))
