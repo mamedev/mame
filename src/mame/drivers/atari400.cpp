@@ -46,7 +46,7 @@
 #include "machine/ram.h"
 #include "sound/dac.h"
 #include "sound/pokey.h"
-#include "includes/atari.h"
+#include "includes/atari400.h"
 #include "machine/atarifdc.h"
 #include "bus/a800/a800_slot.h"
 #include "bus/a800/a800_carts.h"

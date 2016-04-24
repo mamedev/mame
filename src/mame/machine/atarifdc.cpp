@@ -14,7 +14,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "includes/atari.h"
+#include "includes/atari400.h"
 #include "atarifdc.h"
 #include "sound/pokey.h"
 #include "machine/6821pia.h"

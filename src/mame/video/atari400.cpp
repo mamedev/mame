@@ -9,7 +9,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/atari.h"
+#include "includes/atari400.h"
 
 #define VERBOSE 0
 
