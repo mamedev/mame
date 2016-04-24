@@ -1286,7 +1286,7 @@ files {
 	MAME_DIR .. "src/mame/video/cps1.cpp",
 	MAME_DIR .. "src/mame/drivers/kenseim.cpp",
 	MAME_DIR .. "src/mame/drivers/cps2.cpp",
-	MAME_DIR .. "src/mame/machine/cps2crpt.cpp",
+	MAME_DIR .. "src/mame/machine/cps2crypt.cpp",
 	MAME_DIR .. "src/mame/machine/cps2crypt.h",
 	MAME_DIR .. "src/mame/drivers/cps3.cpp",
 	MAME_DIR .. "src/mame/includes/cps3.h",

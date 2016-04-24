@@ -740,7 +740,7 @@ struct game_keys
 
 
 
-DRIVER_INIT_MEMBER(cps_state,cps2crpt)
+DRIVER_INIT_MEMBER(cps_state,cps2crypt)
 {
 	UINT32 key[2];
 	UINT32 lower;
