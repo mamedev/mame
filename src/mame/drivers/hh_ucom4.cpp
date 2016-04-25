@@ -74,7 +74,7 @@ TODO:
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
 
-#include "hh_ucom4_test.lh" // common test-layout - use external artwork
+#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 // machine start/reset

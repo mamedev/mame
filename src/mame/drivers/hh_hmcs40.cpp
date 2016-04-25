@@ -91,7 +91,7 @@
 // internal artwork
 #include "pairmtch.lh"
 
-#include "hh_hmcs40_test.lh" // common test-layout - use external artwork
+#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 class hh_hmcs40_state : public driver_device
