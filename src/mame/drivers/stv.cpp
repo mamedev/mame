@@ -3241,6 +3241,27 @@ ROM_START( pclb2elk ) // set to 1p
 	ROM_LOAD( "pclb2elk.nv", 0x0000, 0x0080, CRC(54c7564f) SHA1(574dcc5e8fe4aac091fee1476347485ed660eddd) )
 ROM_END
 
+ROM_START( pckobe99 ) // set to 1p
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	// all ROM tests fail both in MAME and on real hardware, but ROMs read consistently.
+	// there do seem to be bad values on some 0x40000 boundaries in places tho (obvious if you look at the blank fill area of ic36 for instance)
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",    0x0200000, 0x0200000, CRC(670296eb) SHA1(18055dddf59edbf6d6a97bc81ba332e681f460ba) ) //
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",    0x0400000, 0x0200000, CRC(c2139f62) SHA1(9e7060d77571349b13e58a845fde0f75c29a1bac) ) //
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",    0x0600000, 0x0200000, CRC(17e3efd0) SHA1(f004bb27c1708ed5a78426aa26a51496470c173d) ) //
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",    0x0800000, 0x0200000, CRC(a52f99f6) SHA1(9d23f63a9515b468c93320458d12f54850e9e121) ) //
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",    0x0a00000, 0x0200000, CRC(f1b7e3d5) SHA1(2e1f881c0abe8bfb168478b3cbbd724c74c374c0) ) //
+	ROM_LOAD16_WORD_SWAP( "ic32.bin",    0x0c00000, 0x0200000, CRC(76f6efaa) SHA1(d861d178a37adbde6b86df84231b34b89c5fc1d8) ) // 
+	ROM_LOAD16_WORD_SWAP( "ic34.bin",    0x0e00000, 0x0200000, CRC(894c63f9) SHA1(9956fd512cb715780616c4262d2b05474e3337ff) ) //
+	ROM_LOAD16_WORD_SWAP( "ic36.bin",    0x1000000, 0x0200000, CRC(078694c3) SHA1(a37eb118338c0fc07aa75705dc6a7a1b866cb081) ) // 2ND HALF = xx00
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "eeprom", 0x0000, 0x0080, CRC(dbe305a9) SHA1(4b738104db8345385db3f622672dcc536bbfe67e) )
+ROM_END
+
+
+
 ROM_START( pclove )
 	STV_BIOS
 
@@ -3416,11 +3437,11 @@ GAME( 1999, pclubpok,  stvbios, stv,      stv, stv_state,       stv,        ROT0
 // Japan sets
 GAME( 1999, pclub2fc,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Felix The Cat (Rev. A) (J 970415 V1.100)", MACHINE_NOT_WORKING )
 GAME( 1998, pclub2pf,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (Japan)", MACHINE_NOT_WORKING ) // version info is blank
-GAME( 1997, pclb2elk,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Earth Limited Kobe (Print Club Custom) (J 970808 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1997, pclub2pe,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Pepsiman (J 970618 V1.100)", MACHINE_NOT_WORKING )
 GAME( 1997, pclub2wb,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Warner Bros (J 970228 V1.000)", MACHINE_NOT_WORKING )
 
-
+GAME( 1997, pclb2elk,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Earth Limited Kobe (Print Club Custom) (J 970808 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pckobe99,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Kobe Luminaire '99 (Print Club Custom 3) (J 991203 V1.000)", MACHINE_NOT_WORKING )
 
 GAME( 1997, pclub26w,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 961210 V1.000)", MACHINE_NOT_WORKING ) // internal string is 'PURIKURA2 97FUYU' (but in reality it seems to be an end of 96 Winter version)
 GAME( 1997, pclub26wa, pclub26w,stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 970121 V1.200)", MACHINE_NOT_WORKING ) // ^
