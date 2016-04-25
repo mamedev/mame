@@ -1676,8 +1676,8 @@ files {
 	MAME_DIR .. "src/mame/includes/gamepock.h",
 	MAME_DIR .. "src/mame/machine/gamepock.cpp",
 	MAME_DIR .. "src/mame/drivers/scv.cpp",
-	MAME_DIR .. "src/mame/audio/upd1771.cpp",
-	MAME_DIR .. "src/mame/audio/upd1771.h",
+	MAME_DIR .. "src/devices/sound/upd1771.cpp",
+	MAME_DIR .. "src/devices/sound/upd1771.h",
 }
 
 createMESSProjects(_target, _subtarget, "epson")

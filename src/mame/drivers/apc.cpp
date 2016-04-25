@@ -54,7 +54,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "audio/upd1771.h"
+#include "sound/upd1771.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/am9517a.h"
