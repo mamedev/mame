@@ -13,7 +13,7 @@
 #ifndef __INFO_H__
 #define __INFO_H__
 
-#include "drivenum.h"
+class driver_enumerator;
 
 
 //**************************************************************************

@@ -18,6 +18,7 @@
 #include "ui/inputmap.h"
 #include "ui/miscmenu.h"
 #include "ui/optsmenu.h"
+#include "drivenum.h"
 #include "audit.h"
 #include <ctype.h>
 

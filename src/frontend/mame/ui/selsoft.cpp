@@ -15,6 +15,7 @@
 #include "ui/menu.h"
 #include "uiinput.h"
 #include "audit.h"
+#include "drivenum.h"
 #include "ui/selsoft.h"
 #include "ui/datmenu.h"
 #include "ui/datfile.h"

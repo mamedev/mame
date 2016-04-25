@@ -15,6 +15,7 @@
 #include "uiinput.h"
 #include "ui/selgame.h"
 #include "ui/miscmenu.h"
+#include "drivenum.h"
 #include "audit.h"
 #include "ui/datfile.h"
 #include "ui/inifile.h"

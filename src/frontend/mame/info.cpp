@@ -17,6 +17,7 @@
 #include "info.h"
 #include "xmlfile.h"
 #include "config.h"
+#include "drivenum.h"
 #include "softlist.h"
 
 #include <ctype.h>

@@ -13,8 +13,9 @@
 #ifndef __UI_SIMPLESELGAME_H__
 #define __UI_SIMPLESELGAME_H__
 
-#include "drivenum.h"
 #include "menu.h"
+
+class driver_enumerator;
 
 class ui_simple_menu_select_game : public ui_menu {
 public:

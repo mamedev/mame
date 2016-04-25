@@ -16,6 +16,7 @@
 #include "ui/filesel.h"
 #include "ui/swlist.h"
 #include "zippath.h"
+#include "drivenum.h"
 #include "audit.h"
 #include "softlist.h"
 
