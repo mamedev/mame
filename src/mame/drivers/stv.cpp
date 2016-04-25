@@ -2885,6 +2885,8 @@ ROM_START( pclub2 ) // set to 1p / runs with the USA bios
 	ROM_LOAD( "pclub2.nv", 0x0000, 0x0080, CRC(00d0f04e) SHA1(8b5a3e1c52e34443f83fd4a8948a00cacb5071d0) )
 ROM_END
 
+
+
 ROM_START( pclub2fc ) // set to 1p
 	STV_BIOS
 
@@ -3123,6 +3125,8 @@ ROM_START( pclubor ) // set to 1p
 	ROM_LOAD( "pclubor.nv", 0x0000, 0x0080, CRC(3ad918c0) SHA1(70b63d78948e2fc26fd95f98b93ed86c6130ed8e) )
 ROM_END
 
+
+
 ROM_START( pclubol ) // set to 1p
 	STV_BIOS
 
@@ -3209,7 +3213,7 @@ ROM_START( pclove )
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	// note, 'IC2' in service mode (the test of IC24/IC26) fails once you map the protection device because it occupies the same memory address as the rom at IC26
-	// there must be a way to enable / disable it.
+	// this sometimes causes it to fail on real hardware too(!)
 	ROM_LOAD16_WORD_SWAP( "pclbLove.ic22",    0x0200000, 0x0200000, CRC(8cd25a0f) SHA1(c938d5f4f800db019abc2e17cce1e780e93f3d02) ) // OK (tested as IC7)
 	ROM_LOAD16_WORD_SWAP( "pclbLove.ic24",    0x0400000, 0x0200000, CRC(85583e2c) SHA1(7f407d1bce40317fc10433dafcd82ee41be05839) ) // OK (tested as IC2)
 	ROM_LOAD16_WORD_SWAP( "pclbLove.ic26",    0x0600000, 0x0200000, CRC(7efcabcc) SHA1(b99a67ab2053c3be5ce37530b65f9693c2a4eef8) ) // OK (tested as IC2)
@@ -3228,7 +3232,7 @@ ROM_START( pclove2 )
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	// note, 'IC2' in service mode (the test of IC24/IC26) fails once you map the protection device because it occupies the same memory address as the rom at IC26
-	// there must be a way to enable / disable it.
+	// this sometimes causes it to fail on real hardware too(!)
 	ROM_LOAD16_WORD_SWAP( "ic22",    0x0200000, 0x0200000, CRC(d7d968d6) SHA1(59916a453ba8a53af2138272e359c6d6ce11ea8c) ) // OK (tested as IC7)
 	ROM_LOAD16_WORD_SWAP( "ic24",    0x0400000, 0x0200000, CRC(9c9b7e57) SHA1(ae834a3648126ec2456d2cc5544f81b6dc2f5825) ) // OK (tested as IC2)
 	ROM_LOAD16_WORD_SWAP( "ic26",    0x0600000, 0x0200000, CRC(55eb859f) SHA1(4f25536787142f965d688d1758a45885b52ae52e) ) // OK (tested as IC2)
@@ -3241,6 +3245,43 @@ ROM_START( pclove2 )
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclove2.nv", 0x0000, 0x0080, CRC(93b30600) SHA1(eadba12ec322911823a6873a343e4d9b4089ed93) )
 ROM_END
+
+ROM_START( pcpooh2 ) // set to 1p
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	// note, 'IC2' in service mode (the test of IC24/IC26) fails once you map the protection device because it occupies the same memory address as the rom at IC26
+	// this sometimes causes it to fail on real hardware too(!)
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",    0x0200000, 0x0200000, CRC(2cb33332) SHA1(7c05035358c08b6327d9f0581bf7036e95001eae) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",    0x0400000, 0x0200000, CRC(3c6fc10f) SHA1(8edb4c583be7270c1a8c155663f47554064f5213) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",    0x0600000, 0x0200000, CRC(b891c7ab) SHA1(7948ac76cde2851dcba3752e84e1fc35affe0bc4) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",    0x0800000, 0x0200000, CRC(1a1c74cb) SHA1(0a35e5a5ccf42bda641d56cce2fd0d02953f3878) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",    0x0a00000, 0x0200000, CRC(b7b6fc61) SHA1(bb02b321d3e2ff120f1b84f008507f0cf6c36768) ) // OK
+
+	// protection device is 317-0230
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "eeprom", 0x0000, 0x0080, CRC(5aee29d0) SHA1(a1dd443cf2dd9d52ca45ea687eff2f88cae25b85) )
+ROM_END
+
+ROM_START( pcpooh3 ) // set to 1p
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	// note, 'IC2' in service mode (the test of IC24/IC26) fails once you map the protection device because it occupies the same memory address as the rom at IC26
+	// this sometimes causes it to fail on real hardware too(!)
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",    0x0200000, 0x0200000, CRC(efc83c4f) SHA1(8cabb88d8d52beddcde6a62858f4666092ed179e) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",    0x0400000, 0x0200000, CRC(e8753d0d) SHA1(571fe30075ad63dc395402cfb1d4734b54017e77) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",    0x0600000, 0x0200000, CRC(daf1a0d4) SHA1(474fe24fb95ad3065a66e664f362692d86a8d563) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",    0x0800000, 0x0200000, CRC(3c0f040f) SHA1(18d3917a1c1f49a2b45b13b92ba7da37341d3d1f) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",    0x0a00000, 0x0200000, CRC(6006d785) SHA1(b6f4d1c26288c5ae48ad5ec785512a4b0fd3f8ef) ) // OK
+
+	// protection device is 317-0230
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "eeprom", 0x0000, 0x0080, CRC(e41d541b) SHA1(511fe00745787ee5dbd813125ddc3db921d6531e) )
+ROM_END
+
 
 
 // Name Club / Name Club vol.2
@@ -3353,8 +3394,8 @@ GAME( 1997, pclub27s,  stvbios, stv,      stv, stv_state,       stv,        ROT0
 // Autumn 97?
 GAME( 1997, prc297wi,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 1)", MACHINE_NOT_WORKING ) // internal string is '97WINTER'
 GAME( 1997, prc297wia, prc297wi,stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 2)", MACHINE_NOT_WORKING ) // different program revision, same date code, clearly didn't get updated properly
-GAME( 1998, prc298sp,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, dat doesn't appear to have bene updated, this should be early 98
-GAME( 1998, prc298su,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Summer Ver (J 980603 V1.100)", MACHINE_NOT_WORKING ) // again, dat doesn't appear to have bene updated, this should be early 98
+GAME( 1998, prc298sp,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have bene updated, this should be early 98
+GAME( 1998, prc298su,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Summer Ver (J 980603 V1.100)", MACHINE_NOT_WORKING ) //
 GAME( 1998, prc298au,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
 
 GAME( 1999, pclubor,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", MACHINE_NOT_WORKING )
@@ -3362,8 +3403,11 @@ GAME( 1999, pclubol,   stvbios, stv,      stv, stv_state,       stv,        ROT0
 GAME( 1997, pclub2kc,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Kome Kome Club (J 970203 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1997, pclubyo2,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V2 (J 970422 V1.100)", MACHINE_NOT_WORKING )
 
+
 GAME( 1997, pclove,    stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
 GAME( 1997, pclove2,   stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1997, pcpooh2,   stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1998, pcpooh3,   stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
 
 GAME( 1998, stress,    stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
@@ -3372,6 +3416,8 @@ GAME( 1996, nclubv2,   stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0
 GAME( 1997, nclubv3,   stvbios, stv,      stv, stv_state,       nameclv3,   ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
 
 
+ 
+ 
 
 /* Doing something.. but not enough yet */
 GAME( 1995, vfremix,   stvbios, stv,      stv, stv_state,        vfremix,    ROT0,   "Sega",                         "Virtua Fighter Remix (JUETBKAL 950428 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
