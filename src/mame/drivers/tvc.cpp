@@ -16,7 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "machine/ram.h"
-#include "audio/tvc_snd.h"
+#include "audio/tvc.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"

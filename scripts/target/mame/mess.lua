@@ -2921,8 +2921,8 @@ files {
 createMESSProjects(_target, _subtarget, "videoton")
 files {
 	MAME_DIR .. "src/mame/drivers/tvc.cpp",
-	MAME_DIR .. "src/mame/audio/tvc_snd.cpp",
-	MAME_DIR .. "src/mame/audio/tvc_snd.h",
+	MAME_DIR .. "src/mame/audio/tvc.cpp",
+	MAME_DIR .. "src/mame/audio/tvc.h",
 }
 
 createMESSProjects(_target, _subtarget, "visual")
