@@ -55,8 +55,10 @@ public:
 	float uniform_value() const { return float(m_value); }
 	slider_state* core_slider() const { return m_slider_state; }
 	size_t size() const { return get_size_for_type(m_type); }
-
 	static size_t get_size_for_type(slider_type type);
+
+	// Setters
+	void import(float val);
 
 protected:
 	slider_state* create_core_slider(running_machine &machine);
@@ -74,6 +76,7 @@ protected:
 	std::vector<std::string> m_strings;
 	float           m_value;
 	slider_state*   m_slider_state;
+	running_machine&m_machine;
 };
 
 #endif // __DRAWBGFX_SLIDER__

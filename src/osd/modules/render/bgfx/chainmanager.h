@@ -65,6 +65,10 @@ public:
     bgfx_chain* load_chain(std::string name, uint32_t screen_index);
     bool has_applicable_chain(uint32_t screen);
     std::vector<ui_menu_item> get_slider_list();
+    std::vector<std::vector<float>> slider_settings();
+
+    // Setters
+    void restore_slider_settings(int32_t id, std::vector<std::vector<float>>& settings);
 
 private:
     void load_chains();

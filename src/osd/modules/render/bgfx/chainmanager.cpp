@@ -368,7 +368,9 @@ int32_t chain_manager::chain_changed(int32_t id, std::string *str, int32_t newva
     {
         m_current_chain[id] = newval;
 
+		std::vector<std::vector<float>> settings = slider_settings();
         reload_chains();
+    	restore_slider_settings(id, settings);
 
         m_slider_notifier.set_sliders_dirty();
     }
@@ -457,6 +459,63 @@ bool chain_manager::has_applicable_chain(uint32_t screen)
 bool chain_manager::needs_sliders()
 {
 	return m_screen_count > 0 && m_available_chains.size() > 1;
+}
+
+void chain_manager::restore_slider_settings(int32_t id, std::vector<std::vector<float>>& settings)
+{
+    if (!needs_sliders())
+    {
+        return;
+    }
+
+    for (size_t index = 0; index < m_screen_chains.size() && index < m_screen_count; index++)
+    {
+		if (index == id)
+		{
+			continue;
+		}
+
+        bgfx_chain* chain = m_screen_chains[index];
+        if (chain == nullptr)
+        {
+            continue;
+        }
+
+        std::vector<bgfx_slider*> chain_sliders = chain->sliders();
+		for (size_t slider = 0; slider < chain_sliders.size(); slider++)
+		{
+			chain_sliders[slider]->import(settings[index][slider]);
+		}
+    }
+}
+
+std::vector<std::vector<float>> chain_manager::slider_settings()
+{
+	std::vector<std::vector<float>> curr;
+
+    if (!needs_sliders())
+    {
+        return curr;
+    }
+
+    for (size_t index = 0; index < m_screen_chains.size() && index < m_screen_count; index++)
+    {
+		curr.push_back(std::vector<float>());
+
+        bgfx_chain* chain = m_screen_chains[index];
+        if (chain == nullptr)
+        {
+            continue;
+        }
+
+        std::vector<bgfx_slider*> chain_sliders = chain->sliders();
+        for (bgfx_slider* slider : chain_sliders)
+        {
+			curr[index].push_back(slider->value());
+        }
+    }
+
+    return curr;
 }
 
 std::vector<ui_menu_item> chain_manager::get_slider_list()
