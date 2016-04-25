@@ -526,7 +526,6 @@ static INPUT_PORTS_START( hattrick )
 	UNUSED_ANALOG
 INPUT_PORTS_END
 
-#if 0
 static INPUT_PORTS_START( teamht )
 	PORT_INCLUDE( sentetst )
 
@@ -617,7 +616,7 @@ static INPUT_PORTS_START( teamht )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
 INPUT_PORTS_END
-#endif
+
 
 static INPUT_PORTS_START( otwalls )
 	PORT_INCLUDE( sentetst )
@@ -1452,7 +1451,6 @@ ROM_START( hattrick )
 ROM_END
 
 
-#if 0
 ROM_START( teamht )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "HATTRK.U8A", 0x10000, 0x4000, CRC(cb746de8) SHA1(b0e5003370b65f2aed4dc9ccb2a2d3eb29050245) )
@@ -1466,7 +1464,7 @@ ROM_START( teamht )
 
 	MOTHERBOARD_PALS
 ROM_END
-#endif
+
 
 ROM_START( otwalls )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
@@ -2403,6 +2401,5 @@ GAME( 1987, rescraid, 0,        balsente, rescraid, balsente_state, rescraid, RO
 GAME( 1986, shrike,   0,        shrike,   shrike, balsente_state,   shrike,   ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rescraida,rescraid, balsente, rescraid, balsente_state, rescraid, ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, grudge,   0,        balsente, grudge, balsente_state,   grudge,   ROT0, "Bally Midway", "Grudge Match (prototype)", MACHINE_SUPPORTS_SAVE )
-#if 0
-GAME( 1985, teamht,   hattrick, balsente, teamht, balsente_state, teamht, ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
-#endif
+GAME( 1985, teamht,   0,        balsente, teamht, balsente_state, teamht, ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
+
