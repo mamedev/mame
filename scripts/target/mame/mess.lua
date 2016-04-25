@@ -1875,8 +1875,8 @@ createMESSProjects(_target, _subtarget, "interton")
 files {
 	MAME_DIR .. "src/mame/drivers/vc4000.cpp",
 	MAME_DIR .. "src/mame/includes/vc4000.h",
-	MAME_DIR .. "src/mame/audio/vc4000snd.cpp",
-	MAME_DIR .. "src/mame/audio/vc4000snd.h",
+	MAME_DIR .. "src/mame/audio/vc4000.cpp",
+	MAME_DIR .. "src/mame/audio/vc4000.h",
 	MAME_DIR .. "src/mame/video/vc4000.cpp",
 }
 
@@ -2593,8 +2593,8 @@ createMESSProjects(_target, _subtarget, "special")
 files {
 	MAME_DIR .. "src/mame/drivers/special.cpp",
 	MAME_DIR .. "src/mame/includes/special.h",
-	MAME_DIR .. "src/mame/audio/specimx_snd.cpp",
-	MAME_DIR .. "src/mame/audio/specimx_snd.h",
+	MAME_DIR .. "src/mame/audio/special.cpp",
+	MAME_DIR .. "src/mame/audio/special.h",
 	MAME_DIR .. "src/mame/machine/special.cpp",
 	MAME_DIR .. "src/mame/video/special.cpp",
 }

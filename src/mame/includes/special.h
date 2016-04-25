@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
-#include "audio/specimx_snd.h"
+#include "audio/special.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
 #include "machine/i8255.h"

@@ -2,14 +2,14 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-  audio/special.c
+  audio/special.cpp
 
   Functions to emulate sound hardware of Specialist MX
   ( based on code of DAI interface )
 
 ****************************************************************************/
 
-#include "specimx_snd.h"
+#include "special.h"
 
 
 // device type definition

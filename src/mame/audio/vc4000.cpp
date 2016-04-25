@@ -7,7 +7,7 @@
 
 ***************************************************************************/
 
-#include "vc4000snd.h"
+#include "vc4000.h"
 
 
 const device_type VC4000_SND = &device_creator<vc4000_sound_device>;
