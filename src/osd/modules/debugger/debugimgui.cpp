@@ -106,6 +106,7 @@ private:
 	void handle_mouse();
 	void handle_mouse_views();
 	void handle_keys();
+	void handle_keys_views();
 	void handle_console(running_machine* machine);
 	void update();
 	void draw_console();
@@ -362,7 +363,62 @@ void debug_imgui::handle_keys()
 	if(ImGui::IsKeyPressed(ITEM_ID_L) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_log(++m_win_count);
 
-	m_machine->ui_input().reset();  // clear remaining inputs, so they don't fall through to the UI
+}
+
+void debug_imgui::handle_keys_views()
+{
+	debug_area* focus_view = nullptr;
+	// find view that has focus (should only be one at a time)
+	for(std::vector<debug_area*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
+		if((*view_ptr)->has_focus)
+			focus_view = *view_ptr;
+
+	// check views in main views also (only the disassembler view accepts inputs)
+	if(view_main_disasm->has_focus)
+		focus_view = view_main_disasm;
+
+	// if no view has focus, then there's nothing to do
+	if(focus_view == nullptr)
+		return;
+					
+	// pass keypresses to debug view with focus
+	if(m_machine->input().code_pressed_once(KEYCODE_UP))
+		focus_view->view->process_char(DCH_UP);
+	if(m_machine->input().code_pressed_once(KEYCODE_DOWN))
+		focus_view->view->process_char(DCH_DOWN);
+	if(m_machine->input().code_pressed_once(KEYCODE_LEFT))
+	{
+		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+			focus_view->view->process_char(DCH_CTRLLEFT);
+		else
+			focus_view->view->process_char(DCH_LEFT);
+	}
+	if(m_machine->input().code_pressed_once(KEYCODE_RIGHT))
+	{
+		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+			focus_view->view->process_char(DCH_CTRLRIGHT);
+		else
+			focus_view->view->process_char(DCH_RIGHT);
+	}
+	if(m_machine->input().code_pressed_once(KEYCODE_PGUP))
+		focus_view->view->process_char(DCH_PUP);
+	if(m_machine->input().code_pressed_once(KEYCODE_PGDN))
+		focus_view->view->process_char(DCH_PDOWN);
+	if(m_machine->input().code_pressed_once(KEYCODE_HOME))
+	{
+		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+			focus_view->view->process_char(DCH_CTRLHOME);
+		else
+			focus_view->view->process_char(DCH_HOME);
+	}
+	if(m_machine->input().code_pressed_once(KEYCODE_END))
+	{
+		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+			focus_view->view->process_char(DCH_CTRLEND);
+		else
+			focus_view->view->process_char(DCH_END);
+	}
+
 }
 
 void debug_imgui::handle_console(running_machine* machine)
@@ -1272,6 +1328,8 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 	update();
 	imguiEndFrame();
 	handle_mouse_views();
+	handle_keys_views();
+	m_machine->ui_input().reset();  // clear remaining inputs, so they don't fall through to the UI
 	device.machine().osd().update(false);
 }
 
