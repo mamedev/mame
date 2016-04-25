@@ -79,6 +79,7 @@ void chain_manager::destroy_unloaded_chains()
 				if (desc.m_name == name)
 				{
 					delete m_screen_chains[i];
+					m_screen_chains[i] = nullptr;
 					m_chain_names[i] = "";
 					m_current_chain[i] = CHAIN_NONE;
 					break;
