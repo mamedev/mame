@@ -1656,10 +1656,10 @@ createMESSProjects(_target, _subtarget, "enterprise")
 files {
 	MAME_DIR .. "src/mame/drivers/ep64.cpp",
 	MAME_DIR .. "src/mame/includes/ep64.h",
-	MAME_DIR .. "src/mame/audio/ep64.cpp",
-	MAME_DIR .. "src/mame/audio/ep64.h",
-	MAME_DIR .. "src/mame/video/ep64.cpp",
-	MAME_DIR .. "src/mame/video/ep64.h",
+	MAME_DIR .. "src/mame/audio/dave.cpp",
+	MAME_DIR .. "src/mame/audio/dave.h",
+	MAME_DIR .. "src/mame/video/nick.cpp",
+	MAME_DIR .. "src/mame/video/nick.h",
 }
 
 createMESSProjects(_target, _subtarget, "entex")

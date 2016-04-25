@@ -11,7 +11,7 @@
 #ifndef __EP64__
 #define __EP64__
 
-#include "audio/ep64.h"
+#include "audio/dave.h"
 #include "bus/rs232/rs232.h"
 #include "bus/ep64/exp.h"
 #include "cpu/z80/z80.h"
@@ -20,7 +20,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "machine/ram.h"
-#include "video/ep64.h"
+#include "video/nick.h"
 
 #define Z80_TAG         "u1"
 #define DAVE_TAG        "u3"

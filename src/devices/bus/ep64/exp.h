@@ -48,7 +48,7 @@
 #define __EP64_EXPANSION_BUS__
 
 #include "emu.h"
-#include "audio/ep64.h"
+#include "audio/dave.h"
 
 
 

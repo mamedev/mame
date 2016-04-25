@@ -3,7 +3,6 @@
 /**********************************************************************
 
     Intelligent Designs NICK emulation
-    Used in Enterprise Enterprise Sixty Four / One Two Eight Computers
 
 **********************************************************************/
 
