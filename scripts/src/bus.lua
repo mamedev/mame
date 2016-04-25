@@ -2702,3 +2702,14 @@ if (BUSES["SVI_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv807.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/hp_optroms/hp_optrom.h,BUSES["HP_OPTROM"] = true
+---------------------------------------------------
+
+if (BUSES["HP_OPTROM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp_optroms/hp_optrom.cpp",
+        }
+end
