@@ -104,10 +104,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
 	bool    is_available() { return m_pcb != nullptr; }
-	bool    has_grom();
 	void    set_slot(int i);
-	// UINT16  grom_base();
-	// UINT16  grom_mask();
 
 protected:
 	virtual void device_start() override { };
@@ -177,7 +174,7 @@ protected:
 	virtual void device_config_complete() override;
 
 	gromport_device*    m_gromport;
-	int     m_gsel;
+	bool     m_grom_selected;
 };
 
 /*
@@ -283,6 +280,7 @@ protected:
 private:
 	int     m_gk_switch[6];         // Used to cache the switch settings.
 
+	bool    m_romspace_selected;
 	int     m_ram_page;
 	int     m_grom_address;
 	UINT8*  m_ram_ptr;
@@ -323,8 +321,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(gromwrite);
 	inline void         set_grom_pointer(int number, device_t *dev);
 	void                set_cartridge(ti99_cartridge_device *cart);
-	// UINT16              grom_base();
-	// UINT16              grom_mask();
 	const char*         tag() { return m_tag; }
 	void                set_tag(const char* tag) { m_tag = tag; }
 
@@ -336,7 +332,7 @@ protected:
 
 	UINT8*              m_rom_ptr;
 	UINT8*              m_ram_ptr;
-	bool                m_access_cartspace;
+	bool                m_romspace_selected;
 	int                 m_rom_page;     // for some cartridge types
 	UINT8*              m_grom_ptr;     // for gromemu
 	int                 m_grom_address; // for gromemu
