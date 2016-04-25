@@ -3008,6 +3008,21 @@ ROM_START( pclub26w ) // set to 1p
 	ROM_LOAD( "pclub26w.nv", 0x0000, 0x0080, CRC(448f770d) SHA1(5f966c511c4c8e9d5b2d257c41c2c88a453b4944) )
 ROM_END
 
+ROM_START( pclub26wa ) // set to 1p
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",    0x0200000, 0x0200000, CRC(a88e117d) SHA1(afbc862c558f710b2a87e1326c91881996008055) )
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",    0x0400000, 0x0200000, CRC(d98371e2) SHA1(813ac5f3c5b57d07cc319c73560bc0719ddcfe6b) )
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",    0x0600000, 0x0200000, CRC(d0412c8d) SHA1(4cb3c0ed3176bf86dee00649678a8e868819e92e) ) // this is actually blank after 0x199404 but otherwise matches the rom in the parent set, the rom check expects this and fails with the rom from the parent set.
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",    0x0800000, 0x0200000, CRC(3c330c9b) SHA1(92f8e8d4f43db7c4ce431d17501492a7f8d8a867) )
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",    0x0a00000, 0x0200000, CRC(00a0c702) SHA1(f2c4a7a51559f0ade96b8e6337cd1a1d61472de7) ) // same as the Warner Bros and Print Club Kome Kome Club versions?!
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "pclub26w.nv", 0x0000, 0x0080, CRC(448f770d) SHA1(5f966c511c4c8e9d5b2d257c41c2c88a453b4944) )
+ROM_END
+
 ROM_START( pclub27s ) // set to 1p
 	STV_BIOS
 
@@ -3332,6 +3347,7 @@ GAME( 1997, pclub2pe,  stvbios, stv,      stv, stv_state,       stv,        ROT0
 GAME( 1997, pclub2wb,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Warner Bros (J 970228 V1.000)", MACHINE_NOT_WORKING )
 
 GAME( 1997, pclub26w,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 961210 V1.000)", MACHINE_NOT_WORKING ) // internal string is 'PURIKURA2 97FUYU' (but in reality it seems to be an end of 96 Winter version)
+GAME( 1997, pclub26wa, pclub26w,stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 970121 V1.200)", MACHINE_NOT_WORKING ) // ^
 GAME( 1997, pclub27s,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 7 Spring (J 970313 V1.100)", MACHINE_NOT_WORKING )
 // Summer 97?
 // Autumn 97?
