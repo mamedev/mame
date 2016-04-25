@@ -115,7 +115,7 @@ public:
 	}
 
 protected:
-	sdl_window_info * focus_window()
+	std::shared_ptr<sdl_window_info> focus_window()
 	{
 		return sdl_event_manager::instance().focus_window();
 	}
@@ -144,7 +144,7 @@ public:
 		case SDL_KEYDOWN:
 			keyboard.state[OSD_SDL_INDEX_KEYSYM(&sdlevent.key.keysym)] = 0x80;
 			if (sdlevent.key.keysym.sym < 0x20)
-				machine().ui_input().push_char_event(sdl_window_list->target(), sdlevent.key.keysym.sym);
+				machine().ui_input().push_char_event(sdl_window_list.front()->target(), sdlevent.key.keysym.sym);
 			break;
 
 		case SDL_KEYUP:
@@ -154,7 +154,7 @@ public:
 		case SDL_TEXTINPUT:
 			if (*sdlevent.text.text)
 			{
-				sdl_window_info *window = GET_FOCUS_WINDOW(&event.text);
+				auto window = GET_FOCUS_WINDOW(&event.text);
 				//printf("Focus window is %p - wl %p\n", window, sdl_window_list);
 				unicode_char result;
 				if (window != nullptr)
@@ -210,7 +210,7 @@ public:
 
 			{
 				int cx = -1, cy = -1;
-				sdl_window_info *window = GET_FOCUS_WINDOW(&sdlevent.motion);
+				auto window = GET_FOCUS_WINDOW(&sdlevent.motion);
 
 				if (window != nullptr && window->xy_to_render_target(sdlevent.motion.x, sdlevent.motion.y, &cx, &cy))
 					machine().ui_input().push_mouse_move_event(window->target(), cx, cy);
@@ -228,7 +228,7 @@ public:
 				static int last_y = 0;
 				int cx, cy;
 				osd_ticks_t click = osd_ticks() * 1000 / osd_ticks_per_second();
-				sdl_window_info *window = GET_FOCUS_WINDOW(&sdlevent.button);
+				auto window = GET_FOCUS_WINDOW(&sdlevent.button);
 				if (window != nullptr && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
 				{
 					machine().ui_input().push_mouse_down_event(window->target(), cx, cy);
@@ -252,7 +252,7 @@ public:
 			else if (sdlevent.button.button == 3)
 			{
 				int cx, cy;
-				sdl_window_info *window = GET_FOCUS_WINDOW(&sdlevent.button);
+				auto window = GET_FOCUS_WINDOW(&sdlevent.button);
 
 				if (window != nullptr && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
 				{
@@ -268,7 +268,7 @@ public:
 			if (sdlevent.button.button == 1)
 			{
 				int cx, cy;
-				sdl_window_info *window = GET_FOCUS_WINDOW(&sdlevent.button);
+				auto window = GET_FOCUS_WINDOW(&sdlevent.button);
 
 				if (window != nullptr && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
 				{
@@ -278,7 +278,7 @@ public:
 			else if (sdlevent.button.button == 3)
 			{
 				int cx, cy;
-				sdl_window_info *window = GET_FOCUS_WINDOW(&sdlevent.button);
+				auto window = GET_FOCUS_WINDOW(&sdlevent.button);
 
 				if (window != nullptr && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
 				{
@@ -288,7 +288,7 @@ public:
 			break;
 
 		case SDL_MOUSEWHEEL:
-			sdl_window_info *window = GET_FOCUS_WINDOW(&sdlevent.wheel);
+			auto window = GET_FOCUS_WINDOW(&sdlevent.wheel);
 			if (window != nullptr)
 				machine().ui_input().push_mouse_wheel_event(window->target(), 0, 0, sdlevent.wheel.y, 3);
 			break;

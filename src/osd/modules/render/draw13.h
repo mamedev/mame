@@ -149,7 +149,7 @@ struct copy_info_t
 class renderer_sdl2 : public osd_renderer
 {
 public:
-	renderer_sdl2(osd_window *window, int extra_flags);
+	renderer_sdl2(std::shared_ptr<osd_window> window, int extra_flags);
 
 	virtual ~renderer_sdl2()
 	{

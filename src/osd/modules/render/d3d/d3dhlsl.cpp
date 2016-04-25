@@ -1611,6 +1611,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	curr_texture = poly->get_texture();
 	curr_poly = poly;
 
+	auto win = d3d->assert_window();
+
 	if (PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && curr_texture != nullptr)
 	{
 		curr_screen = curr_screen < num_screens ? curr_screen : 0;
@@ -1662,7 +1664,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		lines_pending = true;
 
-		bool swap_xy = d3d->window().swap_xy();
+		bool swap_xy = win->swap_xy();
 		int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
 		int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
 
@@ -1689,7 +1691,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_screen = curr_screen < num_screens ? curr_screen : 0;
 
-		bool swap_xy = d3d->window().swap_xy();
+		bool swap_xy = win->swap_xy();
 		int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
 		int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
 
@@ -1804,7 +1806,9 @@ d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_i
 		return nullptr;
 	}
 
-	bool swap_xy = d3d->window().swap_xy();
+	auto win = d3d->assert_window();
+
+	bool swap_xy = win->swap_xy();
 	int target_width = swap_xy
 		? static_cast<int>(prim->get_quad_height() + 0.5f)
 		: static_cast<int>(prim->get_quad_width() + 0.5f);
@@ -1834,7 +1838,9 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 		return nullptr;
 	}
 
-	bool swap_xy = d3d->window().swap_xy();
+	auto win = d3d->assert_window();
+
+	bool swap_xy = win->swap_xy();
 	int target_width = swap_xy
 		? static_cast<int>(prim->get_quad_height() + 0.5f)
 		: static_cast<int>(prim->get_quad_width() + 0.5f);
@@ -1861,7 +1867,9 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 
 void shaders::create_vector_target(render_primitive *prim)
 {
-	bool swap_xy = d3d->window().swap_xy();
+	auto win = d3d->assert_window();
+
+	bool swap_xy = win->swap_xy();
 	int target_width = swap_xy
 		? static_cast<int>(prim->get_quad_height() + 0.5f)
 		: static_cast<int>(prim->get_quad_width() + 0.5f);
@@ -1973,7 +1981,9 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 		return false;
 	}
 
-	bool swap_xy = d3d->window().swap_xy();
+	auto win = d3d->assert_window();
+
+	bool swap_xy = win->swap_xy();
 	int target_width = swap_xy
 		? static_cast<int>(prim->get_quad_height() + 0.5f)
 		: static_cast<int>(prim->get_quad_width() + 0.5f);
@@ -2613,6 +2623,8 @@ void uniform::update()
 	hlsl_options *options = shadersys->options;
 	renderer_d3d9 *d3d = shadersys->d3d;
 
+	auto win = d3d->assert_window();
+
 	switch (m_id)
 	{
 		case CU_SCREEN_DIMS:
@@ -2624,7 +2636,7 @@ void uniform::update()
 		case CU_SOURCE_DIMS:
 		{
 			bool vector_screen =
-				d3d->window().machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
+				win->machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 			if (vector_screen)
 			{
 				if (shadersys->curr_render_target)
@@ -2672,13 +2684,13 @@ void uniform::update()
 
 		case CU_SWAP_XY:
 		{
-			m_shader->set_bool("SwapXY", d3d->window().swap_xy());
+			m_shader->set_bool("SwapXY", win->swap_xy());
 			break;
 		}
 		case CU_VECTOR_SCREEN:
 		{
 			bool vector_screen =
-				d3d->window().machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
+				win->machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 			m_shader->set_bool("VectorScreen", vector_screen);
 			break;
 		}

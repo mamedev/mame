@@ -20,7 +20,7 @@ class renderer_sdl1 : public osd_renderer
 {
 public:
 
-	renderer_sdl1(osd_window *w, int extra_flags)
+	renderer_sdl1(std::shared_ptr<osd_window> w, int extra_flags)
 		: osd_renderer(w,  FLAG_NEEDS_OPENGL | extra_flags)
 		, m_sdl_renderer(nullptr)
 		, m_texture_id(nullptr)

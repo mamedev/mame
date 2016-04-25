@@ -40,7 +40,7 @@ class poly_info;
 class renderer_d3d9 : public osd_renderer
 {
 public:
-	renderer_d3d9(osd_window *window);
+	renderer_d3d9(std::shared_ptr<osd_window> window);
 	virtual ~renderer_d3d9();
 
 	static bool init(running_machine &machine);
