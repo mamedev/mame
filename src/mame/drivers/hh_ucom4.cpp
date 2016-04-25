@@ -246,8 +246,6 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
   - Japan: "Missile Guerilla Warfare Maneuvers", published by Tomy
   - World: UFO Master-Blaster Station
 
-  NOTE!: MAME external artwork is required
-
 ***************************************************************************/
 
 class ufombs_state : public hh_ucom4_state
@@ -328,8 +326,13 @@ static MACHINE_CONFIG_START( ufombs, ufombs_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(ufombs_state, grid_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(ufombs_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(225, 1000)
+	MCFG_SCREEN_VISIBLE_AREA(0, 225-1, 0, 1000-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -354,8 +357,6 @@ MACHINE_CONFIG_END
   Press the Kick button to start the game, an automatic sequence follows.
   Then choose a formation(A,B,C) and either pass the ball, and/or start
   running. For more information, refer to the official manual.
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -471,8 +472,13 @@ static MACHINE_CONFIG_START( ssfball, ssfball_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(ssfball_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(ssfball_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1000, 251)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 251-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -495,8 +501,6 @@ MACHINE_CONFIG_END
   Press the Display button twice to start the game. Action won't start until
   player 1 presses one of the directional keys. In 2-player mode, player 2
   controls the goalkeeper, defensive players are still controlled by the CPU.
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -596,8 +600,13 @@ static MACHINE_CONFIG_START( bmsoccer, bmsoccer_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(bmsoccer_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(bmsoccer_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(251, 1000)
+	MCFG_SCREEN_VISIBLE_AREA(0, 251-1, 0, 1000-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -615,8 +624,6 @@ MACHINE_CONFIG_END
   * PCB label Emix Corp. ET-11
   * NEC uCOM-44 MCU, label EMIX D552C 049
   * cyan VFD display Emix-108
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -700,8 +707,13 @@ static MACHINE_CONFIG_START( bmsafari, bmsafari_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(bmsafari_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(bmsafari_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(230, 1000)
+	MCFG_SCREEN_VISIBLE_AREA(0, 230-1, 0, 1000-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -722,8 +734,6 @@ MACHINE_CONFIG_END
 
   This is basically a revamp of their earlier Boxing game (ET-06), case and
   buttons are exactly the same.
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -848,8 +858,13 @@ static MACHINE_CONFIG_START( splasfgt, splasfgt_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(splasfgt_state, grid_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(splasfgt_state, grid_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1000, 248)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 248-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -872,8 +887,6 @@ MACHINE_CONFIG_END
   known releases:
   - Japan: FL Crazy Climbing
   - USA: Crazy Climber
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -949,8 +962,13 @@ static MACHINE_CONFIG_START( bcclimbr, bcclimbr_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(bcclimbr_state, grid_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(bcclimbr_state, grid_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(287, 1000)
+	MCFG_SCREEN_VISIBLE_AREA(0, 287-1, 0, 1000-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -974,8 +992,6 @@ MACHINE_CONFIG_END
   2: Jump-Off (peg solitaire)
   3: Triple Play (3 in a row)
   4: Concentration (memory)
-
-  note: MAME external artwork is not needed for this game
 
 ***************************************************************************/
 
@@ -1090,8 +1106,6 @@ MACHINE_CONFIG_END
   - USA: Invader From Space
   - UK: Invader From Space, published by Grandstand
 
-  NOTE!: MAME external artwork is required
-
 ***************************************************************************/
 
 class invspace_state : public hh_ucom4_state
@@ -1165,8 +1179,13 @@ static MACHINE_CONFIG_START( invspace, invspace_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(invspace_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(invspace_state, grid_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(268, 1000)
+	MCFG_SCREEN_VISIBLE_AREA(0, 268-1, 0, 1000-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1415,8 +1434,6 @@ MACHINE_CONFIG_END
   - USA: Astro Command, published by Tandy
   - UK: Scramble, published by Grandstand
 
-  NOTE!: MAME external artwork is required
-
 ***************************************************************************/
 
 class astrocmd_state : public hh_ucom4_state
@@ -1497,8 +1514,13 @@ static MACHINE_CONFIG_START( astrocmd, astrocmd_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(astrocmd_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(astrocmd_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1000, 273)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 273-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1521,8 +1543,6 @@ MACHINE_CONFIG_END
   - Japan: Dracula House, yellow case
   - USA: Dracula, red case
   - Other: Dracula, yellow case, published by Hales
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1590,8 +1610,13 @@ static MACHINE_CONFIG_START( edracula, edracula_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(edracula_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(edracula_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1000, 274)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 274-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1792,8 +1817,6 @@ MACHINE_CONFIG_END
   - USA: Cosmic Combat
   - Japan: Space Attack
 
-  NOTE!: MAME external artwork is required
-
 ***************************************************************************/
 
 class tccombat_state : public hh_ucom4_state
@@ -1863,8 +1886,13 @@ static MACHINE_CONFIG_START( tccombat, tccombat_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(tccombat_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(tccombat_state, grid_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(278, 1000)
+	MCFG_SCREEN_VISIBLE_AREA(0, 278-1, 0, 1000-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1888,8 +1916,6 @@ MACHINE_CONFIG_END
 
   Press the Serve button to start, then hit the ball by pressing one of the
   positional buttons when the ball flies over it.
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2019,8 +2045,13 @@ static MACHINE_CONFIG_START( tmtennis, tmtennis_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(tmtennis_state, grid_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(tmtennis_state, grid_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1000, 217)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 217-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2048,8 +2079,6 @@ MACHINE_CONFIG_END
 
   The game will start automatically after turning it on. This Pac Man refuses
   to eat dots with his butt, you can only eat them going right-to-left.
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2125,8 +2154,13 @@ static MACHINE_CONFIG_START( tmpacman, tmpacman_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(tmpacman_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(tmpacman_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1000, 265)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 265-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2150,8 +2184,6 @@ MACHINE_CONFIG_END
   - USA: Scramble, published by Tandy
   - UK: Astro Blaster, published by Hales (Epoch Astro Command was named Scramble)
   - Germany: Rambler
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2225,8 +2257,13 @@ static MACHINE_CONFIG_START( tmscramb, tmscramb_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(tmscramb_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(tmscramb_state, grid_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1000, 289)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 289-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2249,8 +2286,6 @@ MACHINE_CONFIG_END
   - World: Caveman
   - USA: Caveman, published by Tandy
   - UK: Cave Man - Jr. Caveman vs Dinosaur, published by Grandstand
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2321,8 +2356,13 @@ static MACHINE_CONFIG_START( tcaveman, tcaveman_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(tcaveman_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(tcaveman_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1000, 291)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 291-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2346,8 +2386,6 @@ MACHINE_CONFIG_END
   basically a mirror-image.
 
   To start the game, simply press [UP]. Hold a joystick direction to move around.
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2451,8 +2489,13 @@ static MACHINE_CONFIG_START( alnchase, alnchase_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(alnchase_state, output_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(alnchase_state, output_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(338, 1000)
+	MCFG_SCREEN_VISIBLE_AREA(0, 338-1, 0, 1000-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2473,36 +2516,54 @@ MACHINE_CONFIG_END
 ROM_START( ufombs )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-017", 0x0000, 0x0400, CRC(0e208cb3) SHA1(57db6566916c94325e2b67ccb94b4ea3b233487d) )
+
+	ROM_REGION( 222395, "svg", 0)
+	ROM_LOAD( "ufombs.svg", 0, 222395, CRC(ae9fb93f) SHA1(165ea78eee93c503dbd277a56c41e3c63c534e38) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( ssfball )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
+
+	ROM_REGION( 330197, "svg", 0)
+	ROM_LOAD( "ssfball.svg", 0, 330197, CRC(cde0d483) SHA1(99d218aab4bb42e97194fdc38e9a0efbcde082de) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( bmsoccer )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-043", 0x0000, 0x0400, CRC(10c2a4ea) SHA1(6ebca7d406e22ff7a8cd529579b55a700da487b4) )
+
+	ROM_REGION( 273804, "svg", 0)
+	ROM_LOAD( "bmsoccer.svg", 0, 273804, CRC(29525b4a) SHA1(2f59d3ed59923a834b7ddcdfb9d61a9818196f2e) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( bmsafari )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-049", 0x0000, 0x0400, CRC(82fa3cbe) SHA1(019e7ec784e977eba09997fc46af253054fb222c) )
+
+	ROM_REGION( 273889, "svg", 0)
+	ROM_LOAD( "bmsafari.svg", 0, 273889, CRC(c61e26b3) SHA1(467db0396d350fddb46ecf2b1ad60501013c5dff) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( splasfgt )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-055", 0x0000, 0x0800, CRC(eb471fbd) SHA1(f06cfe567bf6f9ed4dcdc88acdcfad50cd370a02) )
+
+	ROM_REGION( 246609, "svg", 0)
+	ROM_LOAD( "splasfgt.svg", 0, 246609, CRC(365fae43) SHA1(344c120c2efa92ada9171047affac801a06cf303) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( bcclimbr )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-170", 0x0000, 0x0800, CRC(fc2eabdb) SHA1(0f5cc854be7fdf105d9bd2114659d40c65f9d782) )
+
+	ROM_REGION( 219971, "svg", 0)
+	ROM_LOAD( "bcclimbr.svg", 0, 219971, CRC(9c9102f4) SHA1(6a7e02fd1467a26c734b01724e23cef9e4917805) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
@@ -2515,6 +2576,9 @@ ROM_END
 ROM_START( invspace )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-054", 0x0000, 0x0400, CRC(913d9c13) SHA1(f20edb5458e54d2f6d4e45e5d59efd87e05a6f3f) )
+
+	ROM_REGION( 110899, "svg", 0)
+	ROM_LOAD( "invspace.svg", 0, 110899, CRC(ae794333) SHA1(3552215389f02e4ef1d608f7dfc84f0499a78ee2) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
@@ -2544,12 +2608,18 @@ ROM_END
 ROM_START( astrocmd )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-202.s01", 0x0000, 0x0800, CRC(b4b34883) SHA1(6246d561c2df1f2124575d2ca671ef85b1819edd) )
+
+	ROM_REGION( 335362, "svg", 0)
+	ROM_LOAD( "astrocmd.svg", 0, 335362, CRC(fe2cd30f) SHA1(898a3d9afc5dca6c63ae28aed2c8530716ad1c45) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( edracula )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-206.s01", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
+
+	ROM_REGION( 794532, "svg", 0)
+	ROM_LOAD( "edracula.svg", 0, 794532, CRC(d20e018c) SHA1(7f70f1d373c034ec8c93e27b7e3371578ddaf61b) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
@@ -2568,65 +2638,83 @@ ROM_END
 ROM_START( tccombat )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-042", 0x0000, 0x0400, CRC(d7b5cfeb) SHA1(a267be8e43b7740758eb0881b655b1cc8aec43da) )
+
+	ROM_REGION( 210960, "svg", 0)
+	ROM_LOAD( "tccombat.svg", 0, 210960, CRC(03e9eba6) SHA1(d558d3063da42dc7cc02b769bca06a3732418837) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( tmtennis )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-048", 0x0000, 0x0400, CRC(78702003) SHA1(4d427d4dbeed901770c682338867f58c7b54eee3) )
+
+	ROM_REGION( 203979, "svg", 0)
+	ROM_LOAD( "tmtennis.svg", 0, 203979, BAD_DUMP CRC(4679487c) SHA1(845e961e309fa9e52c4a856b3e7f5cecd1173a1b) ) // by kevtris, ver. 25 apr 2016 - BAD_DUMP: needs overlay
 ROM_END
 
 
 ROM_START( tmpacman )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-160", 0x0000, 0x0800, CRC(b21a8af7) SHA1(e3122be1873ce76a4067386bf250802776f0c2f9) )
+
+	ROM_REGION( 230216, "svg", 0)
+	ROM_LOAD( "tmpacman.svg", 0, 230216, CRC(2ab5c0f1) SHA1(b2b6482b03c28515dc76fd3d6034c8b7e6bf6efc) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( tmscramb )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-192", 0x0000, 0x0800, CRC(00fcc501) SHA1(a7771e934bf8268c83f38c7ec0acc668836e0939) )
+
+	ROM_REGION( 235601, "svg", 0)
+	ROM_LOAD( "tmscramb.svg", 0, 235601, CRC(9e76219a) SHA1(275273b98d378c9313dd73a3b86cc661a824b7af) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( tcaveman )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-209", 0x0000, 0x0800, CRC(d230d4b7) SHA1(2fb12b60410f5567c5e3afab7b8f5aa855d283be) )
+
+	ROM_REGION( 306952, "svg", 0)
+	ROM_LOAD( "tcaveman.svg", 0, 306952, CRC(a0588b14) SHA1(f67edf579963fc19bc7f9d268329cbc0230712d8) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( alnchase )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-258", 0x0000, 0x0800, CRC(c5284ff5) SHA1(6a20aaacc9748f0e0335958f3cea482e36153704) )
+
+	ROM_REGION( 576864, "svg", 0)
+	ROM_LOAD( "alnchase.svg", 0, 576864, CRC(fe7c7078) SHA1(0d201eeaeb291ded14c0759d1d3d5b2491cf0792) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 
 /*    YEAR  NAME      PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   driver_device, 0, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, driver_device, 0, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, driver_device, 0, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   driver_device, 0, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, driver_device, 0, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, driver_device, 0, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, driver_device, 0, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, driver_device, 0, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, tactix,   0,        0, tactix,   tactix,   driver_device, 0, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, invspace, 0,        0, invspace, invspace, driver_device, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, invspace, 0,        0, invspace, invspace, driver_device, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, efball,   0,        0, efball,   efball,   driver_device, 0, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  driver_device, 0, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  driver_device, 0, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, driver_device, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  driver_device, 0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, tccombat, 0,        0, tccombat, tccombat, driver_device, 0, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, driver_device, 0, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, driver_device, 0, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, driver_device, 0, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, alnchase, 0,        0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, tccombat, 0,        0, tccombat, tccombat, driver_device, 0, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, driver_device, 0, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, driver_device, 0, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, driver_device, 0, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, alnchase, 0,        0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
