@@ -358,7 +358,7 @@ win_window_info::win_window_info(
 		m_isminimized(0),
 		m_ismaximized(0),
 		m_monitor(monitor),
-		//m_fullscreen(0),
+		m_fullscreen(!video_config.windowed),
 		m_fullscreen_safe(0),
 		m_aspect(0),
 		m_target(nullptr),
@@ -1977,7 +1977,7 @@ void win_window_info::set_fullscreen(int fullscreen)
 	// if we're in the right state, punt
 	if (this->fullscreen() == fullscreen)
 		return;
-	video_config.windowed = !fullscreen;
+	m_fullscreen = fullscreen;
 
 	// kill off the drawers
 	m_renderer.reset();
