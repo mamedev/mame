@@ -21,34 +21,33 @@
 #include "render/drawsdl.h"
 #endif
 
-osd_window::~osd_window()
-{	
-}
-
-std::unique_ptr<osd_renderer> osd_renderer::make_for_type(int mode, std::shared_ptr<osd_window> window, int extra_flags)
+osd_renderer* osd_renderer::make_for_type(int mode, osd_window* window, int extra_flags)
 {
 	switch(mode)
 	{
 #ifdef OSD_WINDOWS
 		case VIDEO_MODE_NONE:
-			return std::make_unique<renderer_none>(window);
+			return new renderer_none(window);
 #endif
 		case VIDEO_MODE_BGFX:
-			return std::make_unique<renderer_bgfx>(window);
+			return new renderer_bgfx(window);
 #if (USE_OPENGL)
 		case VIDEO_MODE_OPENGL:
-			return std::make_unique<renderer_ogl>(window);
+			return new renderer_ogl(window);
 #endif
 #ifdef OSD_WINDOWS
 		case VIDEO_MODE_GDI:
-			return std::make_unique<renderer_gdi>(window);
+			return new renderer_gdi(window);
 		case VIDEO_MODE_D3D:
-			return std::make_unique<renderer_d3d9>(window);
+		{
+			osd_renderer *renderer = new renderer_d3d9(window);
+			return renderer;
+		}
 #else
 		case VIDEO_MODE_SDL2ACCEL:
-			return std::make_unique<renderer_sdl2>(window, extra_flags);
+			return new renderer_sdl2(window, extra_flags);
 		case VIDEO_MODE_SOFT:
-			return std::make_unique<renderer_sdl1>(window, extra_flags);
+			return new renderer_sdl1(window, extra_flags);
 #endif
 		default:
 			return nullptr;

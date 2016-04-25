@@ -103,7 +103,7 @@ public:
 		}
 
 		// set the cooperative level
-		result = devinfo->dinput.device->SetCooperativeLevel(win_window_list.front()->platform_window<HWND>(), cooperative_level);
+		result = devinfo->dinput.device->SetCooperativeLevel(win_window_list->platform_window<HWND>(), cooperative_level);
 		if (result != DI_OK)
 			goto error;
 

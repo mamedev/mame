@@ -60,7 +60,7 @@ static inline bool is_transparent(const float &a)
 //  CONSTRUCTOR & DESTRUCTOR
 //============================================================
 
-renderer_sdl2::renderer_sdl2(std::shared_ptr<osd_window> window, int extra_flags)
+renderer_sdl2::renderer_sdl2(osd_window *window, int extra_flags)
 	: osd_renderer(window,  FLAG_NEEDS_OPENGL | extra_flags)
 	, m_sdl_renderer(nullptr)
 	, m_blittimer(0)
@@ -434,12 +434,10 @@ int renderer_sdl2::create()
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 	}
 
-	auto win = assert_window();
-
 	if (video_config.waitvsync)
-		m_sdl_renderer = SDL_CreateRenderer(win->platform_window<SDL_Window*>(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(window().platform_window<SDL_Window*>(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
-		m_sdl_renderer = SDL_CreateRenderer(win->platform_window<SDL_Window*>(), -1, SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(window().platform_window<SDL_Window*>(), -1, SDL_RENDERER_ACCELERATED);
 
 	if (!m_sdl_renderer)
 	{
@@ -483,15 +481,11 @@ int renderer_sdl2::xy_to_render_target(int x, int y, int *xt, int *yt)
 
 void renderer_sdl2::destroy_all_textures()
 {
-	auto win = assert_window();
-	if (win == nullptr)
-		return;
-
-	if(win->m_primlist)
+	if(window().m_primlist)
 	{
-		win->m_primlist->acquire_lock();
+		window().m_primlist->acquire_lock();
 		m_texlist.reset();
-		win->m_primlist->release_lock();
+		window().m_primlist->release_lock();
 	}
 	else
 		m_texlist.reset();
@@ -512,8 +506,7 @@ int renderer_sdl2::draw(int update)
 		return 0;
 	}
 
-	auto win = assert_window();
-	osd_dim wdim = win->get_size();
+	osd_dim wdim = window().get_size();
 
 	if (has_flags(FI_CHANGED) || (wdim.width() != m_width) || (wdim.height() != m_height))
 	{
@@ -560,10 +553,10 @@ int renderer_sdl2::draw(int update)
 	m_last_hofs = hofs;
 	m_last_vofs = vofs;
 
-	win->m_primlist->acquire_lock();
+	window().m_primlist->acquire_lock();
 
 	// now draw
-	for (render_primitive &prim : *win->m_primlist)
+	for (render_primitive &prim : *window().m_primlist)
 	{
 		Uint8 sr, sg, sb, sa;
 
@@ -593,7 +586,7 @@ int renderer_sdl2::draw(int update)
 		}
 	}
 
-	win->m_primlist->release_lock();
+	window().m_primlist->release_lock();
 
 	m_last_blit_pixels = blit_pixels;
 	m_last_blit_time = -osd_ticks();
@@ -937,8 +930,7 @@ texture_info * renderer_sdl2::texture_update(const render_primitive &prim)
 	quad_setup_data setup;
 	texture_info *texture;
 
-	auto win = assert_window();
-	setup.compute(prim, win->prescale());
+	setup.compute(prim, window().prescale());
 
 	texture = texture_find(prim, setup);
 
@@ -965,16 +957,12 @@ texture_info * renderer_sdl2::texture_update(const render_primitive &prim)
 
 render_primitive_list *renderer_sdl2::get_primitives()
 {
-	auto win = assert_window();
-	if (win == nullptr)
-		return nullptr;
-
-	osd_dim nd = win->get_size();
+	osd_dim nd = window().get_size();
 	if (nd != m_blit_dim)
 	{
 		m_blit_dim = nd;
 		notify_changed();
 	}
-	win->target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), win->pixel_aspect());
-	return &win->target()->get_primitives();
+	window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().pixel_aspect());
+	return &window().target()->get_primitives();
 }

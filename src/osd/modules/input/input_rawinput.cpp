@@ -475,7 +475,7 @@ public:
 		registration.usUsagePage = usagepage();
 		registration.usUsage = usage();
 		registration.dwFlags = m_global_inputs_enabled ? 0x00000100 : 0;
-		registration.hwndTarget = win_window_list.front()->platform_window<HWND>();
+		registration.hwndTarget = win_window_list->platform_window<HWND>();
 
 		// register the device
 		register_rawinput_devices(&registration, 1, sizeof(registration));

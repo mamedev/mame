@@ -32,7 +32,7 @@ class avi_write;
 class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
-	renderer_bgfx(std::shared_ptr<osd_window> w);
+	renderer_bgfx(osd_window *w);
 	virtual ~renderer_bgfx();
 
 	static void init(running_machine &machine) { }
@@ -55,10 +55,6 @@ public:
 
 	virtual render_primitive_list *get_primitives() override
 	{
-		auto win = try_getwindow();
-		if (win == nullptr)
-			return nullptr;
-
 		// determines whether the screen container is transformed by the chain's shaders
 		bool chain_transform = false;
 
@@ -69,10 +65,10 @@ public:
 			chain_transform = chain->transform();
 		}
 
-		osd_dim wdim = win->get_size();
-		win->target()->set_bounds(wdim.width(), wdim.height(), win->pixel_aspect());
-		win->target()->set_transform_container(!chain_transform);
-		return &win->target()->get_primitives();
+		osd_dim wdim = window().get_size();
+		window().target()->set_bounds(wdim.width(), wdim.height(), window().pixel_aspect());
+		window().target()->set_transform_container(!chain_transform);
+		return &window().target()->get_primitives();
 	}
 
     static const char* WINDOW_PREFIX;

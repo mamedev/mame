@@ -45,14 +45,10 @@ int renderer_gdi::create()
 
 render_primitive_list *renderer_gdi::get_primitives()
 {
-	auto win = try_getwindow();
-	if (win == nullptr)
-		return nullptr;
-
 	RECT client;
-	GetClientRect(win->platform_window<HWND>(), &client);
-	win->target()->set_bounds(rect_width(&client), rect_height(&client), win->pixel_aspect());
-	return &win->target()->get_primitives();
+	GetClientRect(window().platform_window<HWND>(), &client);
+	window().target()->set_bounds(rect_width(&client), rect_height(&client), window().pixel_aspect());
+	return &window().target()->get_primitives();
 }
 
 //============================================================
@@ -61,15 +57,13 @@ render_primitive_list *renderer_gdi::get_primitives()
 
 int renderer_gdi::draw(const int update)
 {
-	auto win = assert_window();
-
 	// we don't have any special resize behaviors
-	if (win->m_resize_state == RESIZE_STATE_PENDING)
-		win->m_resize_state = RESIZE_STATE_NORMAL;
+	if (window().m_resize_state == RESIZE_STATE_PENDING)
+		window().m_resize_state = RESIZE_STATE_NORMAL;
 
 	// get the target bounds
 	RECT bounds;
-	GetClientRect(win->platform_window<HWND>(), &bounds);
+	GetClientRect(window().platform_window<HWND>(), &bounds);
 
 	// compute width/height/pitch of target
 	int width = rect_width(&bounds);
@@ -85,16 +79,16 @@ int renderer_gdi::draw(const int update)
 	}
 
 	// draw the primitives to the bitmap
-	win->m_primlist->acquire_lock();
-	software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*win->m_primlist, m_bmdata, width, height, pitch);
-	win->m_primlist->release_lock();
+	window().m_primlist->acquire_lock();
+	software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*window().m_primlist, m_bmdata, width, height, pitch);
+	window().m_primlist->release_lock();
 
 	// fill in bitmap-specific info
 	m_bminfo.bmiHeader.biWidth = pitch;
 	m_bminfo.bmiHeader.biHeight = -height;
 
 	// blit to the screen
-	StretchDIBits(win->m_dc, 0, 0, width, height,
+	StretchDIBits(window().m_dc, 0, 0, width, height,
 				0, 0, width, height,
 				m_bmdata, &m_bminfo, DIB_RGB_COLORS, SRCCOPY);
 	return 0;

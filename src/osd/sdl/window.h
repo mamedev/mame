@@ -17,8 +17,6 @@
 #include "modules/osdwindow.h"
 
 #include <cstdint>
-#include <memory>
-#include <list>
 
 
 //============================================================
@@ -67,6 +65,7 @@ public:
 	render_target *target() override { return m_target; }
 
 	int prescale() const { return m_prescale; }
+	osd_renderer &renderer() const { return *m_renderer; }
 
 	// Pointer to next window
 	sdl_window_info *   m_next;
@@ -89,6 +88,11 @@ private:
 
 	int                 m_extra_flags;
 
+	void set_renderer(osd_renderer *renderer)
+	{
+		m_renderer = renderer;
+	}
+
 	static OSDWORK_CALLBACK( complete_create_wt );
 
 private:
@@ -107,6 +111,7 @@ private:
 	// monitor info
 	osd_monitor_info *  m_monitor;
 	int                 m_fullscreen;
+	osd_renderer *      m_renderer;
 
 	// static callbacks ...
 
@@ -131,7 +136,7 @@ struct osd_draw_callbacks
 //============================================================
 
 // window - list
-extern std::list<std::shared_ptr<sdl_window_info>> sdl_window_list;
+extern sdl_window_info *sdl_window_list;
 
 //============================================================
 //  PROTOTYPES

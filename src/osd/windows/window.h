@@ -17,9 +17,6 @@
 
 #include <chrono>
 #include <mutex>
-#include <memory>
-#include <list>
-
 #include "video.h"
 #include "render.h"
 
@@ -47,13 +44,13 @@
 class win_window_info  : public osd_window
 {
 public:
-	win_window_info(running_machine &machine, int index, osd_monitor_info *monitor, const osd_window_config *config);
+	win_window_info(running_machine &machine);
 	virtual ~win_window_info();
 
 	running_machine &machine() const override { return m_machine; }
 
 	virtual render_target *target() override { return m_target; }
-	int fullscreen() const override { return !video_config.windowed; }
+	int fullscreen() const override { return m_fullscreen; }
 
 	void update();
 
@@ -111,7 +108,7 @@ public:
 
 	// monitor info
 	osd_monitor_info *  m_monitor;
-	//int                 m_fullscreen;
+	int                 m_fullscreen;
 	int                 m_fullscreen_safe;
 	float               m_aspect;
 
@@ -128,7 +125,7 @@ public:
 	int                                    m_lastclicky;
 
 	// drawing data
-	std::unique_ptr<osd_renderer>      m_renderer;
+	osd_renderer *      m_renderer;
 
 private:
 	void draw_video_contents(HDC dc, int update);
@@ -165,7 +162,7 @@ struct osd_draw_callbacks
 //============================================================
 
 // windows
-extern std::list<std::shared_ptr<win_window_info>> win_window_list;
+extern win_window_info *win_window_list;
 
 
 

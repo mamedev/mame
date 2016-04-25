@@ -82,7 +82,7 @@ bool sdl_osd_interface::video_init()
 		get_resolution(options().resolution(), options().resolution(index), &conf, TRUE);
 
 		// create window ...
-		std::shared_ptr<sdl_window_info> win = std::make_shared<sdl_window_info>(machine(), index, osd_monitor_info::pick_monitor(reinterpret_cast<osd_options &>(options()), index), &conf);
+		sdl_window_info *win = global_alloc(sdl_window_info(machine(), index, osd_monitor_info::pick_monitor(reinterpret_cast<osd_options &>(options()), index), &conf));
 
 		if (win->window_init())
 			return false;
@@ -140,7 +140,7 @@ void sdl_osd_interface::update(bool skip_redraw)
 	if (!skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
-		for (auto window : sdl_window_list)
+		for (sdl_window_info *window = sdl_window_list; window != NULL; window = window->m_next)
 			window->update();
 //      profiler_mark(PROFILER_END);
 	}
@@ -270,14 +270,20 @@ finishit:
 
 static void check_osd_inputs(running_machine &machine)
 {
+	sdl_window_info *window = sdl_window_list;
+
 	// check for toggling fullscreen mode
 	if (machine.ui_input().pressed(IPT_OSD_1))
 	{
-		for (auto curwin : sdl_window_list)
+		sdl_window_info *curwin = sdl_window_list;
+
+		while (curwin != (sdl_window_info *)NULL)
+		{
 			curwin->toggle_full_screen();
+			curwin = curwin->m_next;
+		}
 	}
 
-	auto window = sdl_window_list.front();
 	if (machine.ui_input().pressed(IPT_OSD_2))
 	{
 		//FIXME: on a per window basis
