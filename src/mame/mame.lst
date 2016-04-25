@@ -17234,6 +17234,7 @@ macse30                         // 1989 Apple Macintosh SE/30
 macsefd                         // 1988 Apple Macintosh SE (FDHD)
 pmac6100                        // 1993 Apple Power Macintosh 6100
 unitron                         // 1985 Unitron
+utrn1024						// 1986 Unitron 1024
 
 @source:macpci.cpp
 pippin                          //
