@@ -13,7 +13,7 @@ The noise taps and behavior are the same as the Virtual Boy.
 
 **************************************************************************************/
 
-#include "wswan_snd.h"
+#include "wswan.h"
 
 
 // device type definition

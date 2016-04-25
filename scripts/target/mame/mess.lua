@@ -1324,11 +1324,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/tamag1.cpp",
 	MAME_DIR .. "src/mame/drivers/wswan.cpp",
 	MAME_DIR .. "src/mame/includes/wswan.h",
-	MAME_DIR .. "src/mame/audio/wswan_snd.cpp",
-	MAME_DIR .. "src/mame/audio/wswan_snd.h",
+	MAME_DIR .. "src/mame/audio/wswan.cpp",
+	MAME_DIR .. "src/mame/audio/wswan.h",
 	MAME_DIR .. "src/mame/machine/wswan.cpp",
-	MAME_DIR .. "src/mame/video/wswan_video.cpp",
-	MAME_DIR .. "src/mame/video/wswan_video.h",
+	MAME_DIR .. "src/mame/video/wswan.cpp",
+	MAME_DIR .. "src/mame/video/wswan.h",
 }
 
 createMESSProjects(_target, _subtarget, "be")

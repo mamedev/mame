@@ -17,8 +17,8 @@
 #include "emu.h"
 #include "cpu/v30mz/v30mz.h"
 #include "machine/nvram.h"
-#include "audio/wswan_snd.h"
-#include "video/wswan_video.h"
+#include "audio/wswan.h"
+#include "video/wswan.h"
 #include "bus/wswan/slot.h"
 #include "bus/wswan/rom.h"
 

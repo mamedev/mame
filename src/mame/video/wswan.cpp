@@ -2,8 +2,6 @@
 // copyright-holders:Anthony Kruize, Wilbert Pol
 /***************************************************************************
 
- wswan_video.c
-
  File to handle video emulation of the Bandai WonderSwan VDP.
 
  Anthony Kruize
@@ -15,7 +13,7 @@
 
  ***************************************************************************/
 
-#include "wswan_video.h"
+#include "wswan.h"
 
 const device_type WSWAN_VIDEO = &device_creator<wswan_video_device>;
 
