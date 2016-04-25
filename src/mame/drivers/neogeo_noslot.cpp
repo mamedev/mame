@@ -8541,6 +8541,28 @@ ROM_START( diggerma ) /* Unlicensed Prototype, no official game ID # */
 	ROM_LOAD16_BYTE( "dig-c2.bin", 0x000001, 0x080000, CRC(3e632161) SHA1(83711c4286fb1d9f3f91414ac6e5fed36618033e) ) /* Plane 2,3 */
 ROM_END
 
+// MVS cart
+ROM_START( lasthope )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "NGDT-300-P1.bin", 0x000000, 0x100000, CRC(3776a88f) SHA1(ea8b669da06d7c6b5ff7fa97a195f56a9253a7a1) )
+
+	NEO_SFIX_64K( "NGDT-300-S1.bin", CRC(0c0ff9e6) SHA1(c87d1ea8731ac1e63ab960b8182dd1043bcc10bb) )
+
+	NEO_BIOS_AUDIO_128K( "NGDT-300-M1.bin", CRC(113c870f) SHA1(854425eb4be0d7fa088a6c3bf6078fdd011707f5) )
+
+	ROM_REGION( 0x600000, "ymsnd", 0 )
+	ROM_LOAD( "NGDT-300-V1.bin", 0x000000, 0x200000, CRC(b765bafe) SHA1(b2048c44089bf250c8dcfabb27c7981e9ee5002a) )
+	ROM_LOAD( "NGDT-300-V2.bin", 0x200000, 0x200000, CRC(9fd0d559) SHA1(09e70d5e1c6e172a33f48feb3e442515c34a8f3d) )
+	ROM_LOAD( "NGDT-300-V3.bin", 0x400000, 0x200000, CRC(6d5107e2) SHA1(4ba74836e3d0421a28af47d3d8341ac16af1d7d7) )
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x1000000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "NGDT-300-C1.bin", 0x000000, 0x400000, CRC(53ef41b5) SHA1(a8f1fe546403b609e12f0df211c05d7ac479d98d) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "NGDT-300-C2.bin", 0x000001, 0x400000, CRC(f9b15ab3) SHA1(d8ff2f43686bfc8c2f7ead3ef445e51c15dfbf16) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "NGDT-300-C3.bin", 0x800000, 0x400000, CRC(50cc21cf) SHA1(0350aaef480c5fa12e68e540a4c974dbf5870add) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "NGDT-300-C4.bin", 0x800001, 0x400000, CRC(8486ad9e) SHA1(19a2a73c825687e0cb9fd62bde00db91b5409529)) /* Plane 2,3 */
+ROM_END
 
 
 /*************************************
@@ -9889,7 +9911,7 @@ GAME( 2000, diggerma,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neoge
 GAME( 2004, sbp,        neogeo,   neogeo_noslot,   neogeo, neogeo_noslot_state,   sbp,      ROT0, "Vektorlogic", "Super Bubble Pop", MACHINE_NOT_WORKING )
 
 /* NG:DEV.TEAM */
-// Last Hope (c)2006 - AES/NEOCD (has no MVS mode)
+GAME( 2005, lasthope,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "NG:DEV.TEAM", "Last Hope (bootleg AES to MVS conversion, no coin support)", MACHINE_SUPPORTS_SAVE ) // wasn't actually released on MVS but bootleg carts have been sold, this doesn't accept coins, runs like a console game
 // Last Hope Pink Bullets (c)2008 - MVS/AES
 // Fast Striker (c)2010 - MVS/AES
 // Fast Striker 1.5 (c)2010 - MVS/AES
