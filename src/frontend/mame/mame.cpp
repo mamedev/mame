@@ -335,8 +335,6 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 	m_inifile = std::make_unique<inifile_manager>(machine);
 	
 	m_ui->set_startup_text("Initializing...", true);
-	// set up the cheat engine
-	m_cheat = std::make_unique<cheat_manager>(machine);
 
 	// allocate autoboot timer
 	m_autoboot_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_machine_manager::autoboot_callback), this));
@@ -348,6 +346,12 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 	m_favorite = std::make_unique<favorite_manager>(machine);
 
 	return m_ui.get();
+}
+
+void mame_machine_manager::create_custom(running_machine& machine) 
+{ 
+	// set up the cheat engine
+	m_cheat = std::make_unique<cheat_manager>(machine);
 }
 
 void mame_machine_manager::ui_initialize(running_machine& machine,bool firstrun)
