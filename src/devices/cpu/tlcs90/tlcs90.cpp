@@ -24,6 +24,7 @@ ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental 
 
 const device_type TMP90840 = &device_creator<tmp90840_device>;
 const device_type TMP90841 = &device_creator<tmp90841_device>;
+const device_type TMP90845 = &device_creator<tmp90845_device>;
 const device_type TMP91640 = &device_creator<tmp91640_device>;
 const device_type TMP91641 = &device_creator<tmp91641_device>;
 
@@ -70,6 +71,12 @@ tmp90841_device::tmp90841_device(const machine_config &mconfig, const char *tag,
 	: tlcs90_device(mconfig, TMP90841, "TMP90841", tag, owner, clock, "tmp90841", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
 {
 }
+
+tmp90845_device::tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tlcs90_device(mconfig, TMP90841, "TMP90845", tag, owner, clock, "tmp90845", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
+{
+}
+
 
 
 tmp91640_device::tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
