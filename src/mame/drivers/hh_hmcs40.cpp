@@ -83,12 +83,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "rendlay.h"
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
 #include "sound/speaker.h"
 
 // internal artwork
-#include "rendlay.h"
 #include "pairmtch.lh"
 
 #include "hh_hmcs40_test.lh" // common test-layout - use external artwork
@@ -1526,8 +1526,6 @@ MACHINE_CONFIG_END
   * Hitachi HD38800B52 MCU
   * cyan/red/blue VFD display NEC FIP8BM25T no. 21-8 2
 
-  NOTE!: MAME external artwork is required
-
 ***************************************************************************/
 
 class bultrman_state : public hh_hmcs40_state
@@ -1594,8 +1592,13 @@ static MACHINE_CONFIG_START( bultrman, bultrman_state )
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(bultrman_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(2033, 713)
+	MCFG_SCREEN_VISIBLE_AREA(0, 2033-1, 0, 713-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2072,7 +2075,7 @@ static MACHINE_CONFIG_START( cdkong, cdkong_state )
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(559, 998)
-	MCFG_SCREEN_VISIBLE_AREA(0, 558, 0, 997)
+	MCFG_SCREEN_VISIBLE_AREA(0, 559-1, 0, 998-1)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
@@ -2553,7 +2556,7 @@ static MACHINE_CONFIG_START( egalaxn2, egalaxn2_state )
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(421, 900)
-	MCFG_SCREEN_VISIBLE_AREA(0, 420, 0, 899)
+	MCFG_SCREEN_VISIBLE_AREA(0, 421-1, 0, 900-1)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
@@ -2625,7 +2628,7 @@ static MACHINE_CONFIG_DERIVED( epacman2, egalaxn2 )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(467, 1000)
-	MCFG_SCREEN_VISIBLE_AREA(0, 466, 0, 999)
+	MCFG_SCREEN_VISIBLE_AREA(0, 467-1, 0, 1000-1)
 MACHINE_CONFIG_END
 
 
@@ -3941,6 +3944,9 @@ ROM_START( bultrman )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38800b52", 0x0000, 0x1000, CRC(88d372dc) SHA1(f2ac3b89be8afe6fb65914ccebe1a56316b9472a) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 405717, "svg", 0)
+	ROM_LOAD( "bultrman.svg", 0, 405717, CRC(13367971) SHA1(f294898712d1e146ff267bb1e3cfd059f972b248) ) // by Rik/kevtris, ver. 7 apr 2016
 ROM_END
 
 
@@ -4124,7 +4130,7 @@ CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Banda
 CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   driver_device, 0, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   driver_device, 0, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, driver_device, 0, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1983, bultrman,  0,        0, bultrman, bultrman, driver_device, 0, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1983, bultrman,  0,        0, bultrman, bultrman, driver_device, 0, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, driver_device, 0, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 

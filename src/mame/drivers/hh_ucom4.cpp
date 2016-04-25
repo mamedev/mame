@@ -1304,8 +1304,6 @@ MACHINE_CONFIG_END
   - Japan: Astro Wars
   - UK: Astro Wars, published by Grandstand
 
-  NOTE!: MAME external artwork is required
-
 ***************************************************************************/
 
 class galaxy2_state : public hh_ucom4_state
@@ -1379,13 +1377,26 @@ static MACHINE_CONFIG_START( galaxy2, galaxy2_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(galaxy2_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(galaxy2_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(281, 1000)
+	MCFG_SCREEN_VISIBLE_AREA(0, 281-1, 0, 1000-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( galaxy2b, galaxy2 )
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(283, 1000)
+	MCFG_SCREEN_VISIBLE_AREA(0, 283-2, 0, 1000-1)
 MACHINE_CONFIG_END
 
 
@@ -2516,6 +2527,17 @@ ROM_END
 ROM_START( galaxy2 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
+
+	ROM_REGION( 325057, "svg", 0)
+	ROM_LOAD( "galaxy2d.svg", 0, 325057, CRC(b2d27a0e) SHA1(502ec22c324903ffe8ff235b9a3b8898dce17a64) ) // by kevtris, ver. 25 apr 2016
+ROM_END
+
+ROM_START( galaxy2b )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
+
+	ROM_REGION( 266377, "svg", 0)
+	ROM_LOAD( "galaxy2b.svg", 0, 266377, CRC(8633cebb) SHA1(6c41f5e918e1522eb55ef24270900a1b2477722b) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
@@ -2593,7 +2615,8 @@ CONS( 1980, tactix,   0,        0, tactix,   tactix,   driver_device, 0, "Castle
 
 CONS( 1980, invspace, 0,        0, invspace, invspace, driver_device, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1980, efball,   0,        0, efball,   efball,   driver_device, 0, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  driver_device, 0, "Epoch", "Galaxy II", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  driver_device, 0, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  driver_device, 0, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

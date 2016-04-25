@@ -11,6 +11,7 @@
 
 
 #include "emu.h"
+#include "rendlay.h"
 #include "cpu/ucom4/ucom4.h"
 #include "sound/speaker.h"
 
