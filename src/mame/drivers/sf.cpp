@@ -696,7 +696,7 @@ ROM_START( sfua )
 	ROM_LOAD( "sf-01.bin", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
 
 	ROM_REGION( 0x0800, "mcu", 0 ) /* i8751 MCU */
-	ROM_LOAD( "i8751.bin",   0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "sf_s.id8751h-8.14f",   0x0000, 0x0800, NO_DUMP ) // is this mcu label right for the US set?
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "sf-39.bin", 0x000000, 0x020000, CRC(cee3d292) SHA1(a8c22f1dc81976e8dd5d6c70361c61fa3f9f89d6) ) /* Background b planes 0-1*/
@@ -766,7 +766,7 @@ ROM_START( sfj )
 	ROM_LOAD( "sf-01.bin", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
 
 	ROM_REGION( 0x0800, "mcu", 0 ) /* i8751 MCU */
-	ROM_LOAD( "i8751.bin",   0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "sf_s.id8751h-8.14f",   0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "sf-39.bin", 0x000000, 0x020000, CRC(cee3d292) SHA1(a8c22f1dc81976e8dd5d6c70361c61fa3f9f89d6) ) /* Background b planes 0-1*/
