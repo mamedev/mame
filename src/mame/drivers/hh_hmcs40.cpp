@@ -34,6 +34,7 @@
  @23      HD38800B  1982, Tomy Kingman (THF-01II)
  *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
  *29      HD38800B  1984, Tomy Portable 6000 Bombman
+ *31      HD38800B  1983, Gongoll Frog Prince (ET-806)
  *35      HD38800B  1983, Bandai Gundam vs Gelgoog Zaku
  @43      HD38800B  1983, Bandai Dokodemo Dorayaki Doraemon (PT-412)
  @52      HD38800B  1983, Bandai Ultraman Monster Battle (PT-424)
@@ -2358,8 +2359,8 @@ static MACHINE_CONFIG_START( cpacman, cpacman_state )
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(446, 999)
-	MCFG_SCREEN_VISIBLE_AREA(0, 446-1, 0, 999-1)
+	MCFG_SCREEN_SIZE(447, 997)
+	MCFG_SCREEN_VISIBLE_AREA(0, 447-1, 0, 997-1)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
@@ -4105,8 +4106,8 @@ ROM_START( cpacman )
 	ROM_LOAD( "hd38820a29", 0x0000, 0x1000, CRC(1082d577) SHA1(0ef73132bd41f6ca1e4c001ae19f7f7c97eaa8d1) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 668115, "svg", 0)
-	ROM_LOAD( "cpacman.svg", 0, 668115, CRC(2fac0f78) SHA1(7fae908ec6137035237beaba01bf14c4a951f433) ) // by kevtris, ver. 1 apr 2015
+	ROM_REGION( 359765, "svg", 0)
+	ROM_LOAD( "cpacman.svg", 0, 359765, CRC(e3810a46) SHA1(d0994edd71a6adc8f238c71e360a8606ce397a14) ) // by Rik/kevtris, ver. 26 apr 2016
 ROM_END
 
 ROM_START( cpacmanr1 )
@@ -4114,8 +4115,8 @@ ROM_START( cpacmanr1 )
 	ROM_LOAD( "hd38820a28", 0x0000, 0x1000, CRC(d2ed57e5) SHA1(f56f1341485ac28ea9e6cc4d162fab18d8a4c977) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 668115, "svg", 0)
-	ROM_LOAD( "cpacman.svg", 0, 668115, CRC(2fac0f78) SHA1(7fae908ec6137035237beaba01bf14c4a951f433) ) // by kevtris, ver. 1 apr 2015
+	ROM_REGION( 359765, "svg", 0)
+	ROM_LOAD( "cpacman.svg", 0, 359765, CRC(e3810a46) SHA1(d0994edd71a6adc8f238c71e360a8606ce397a14) ) // by Rik/kevtris, ver. 26 apr 2016
 ROM_END
 
 
