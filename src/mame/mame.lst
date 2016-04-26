@@ -14464,6 +14464,9 @@ ip224613                        // IP22: Indy, R4600, 133MHz
 ip225015                        // IP22: Indy, R5000, 150MHz
 ip244415                        // IP24: Indigo 2, R4400, 150MHz
 
+@source:instantm.cpp
+instantm                        //
+
 @source:instruct.cpp
 instruct                        //
 

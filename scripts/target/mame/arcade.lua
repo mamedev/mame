@@ -1337,6 +1337,7 @@ files {
 	MAME_DIR .. "src/mame/machine/kabuki.cpp",
 	MAME_DIR .. "src/mame/machine/kabuki.h",
 	MAME_DIR .. "src/mame/drivers/tvcapcom.cpp",
+	MAME_DIR .. "src/mame/drivers/instantm.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "cinemat")
