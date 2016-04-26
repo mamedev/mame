@@ -656,13 +656,14 @@ Notes:
 
 
   <!--Raiden -->
-  <software name="tvraiden">
+  <software name="raiden">
     <description>Raiden (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Seibu Kaihatsu inc / Hudson Soft</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_raiden.bin" size="0x100000" crc="b99a85b6" sha1="5c8b103c5a7bfeba20dcc490204d672b55e36452" offset="000000" />
+      <dataarea name="rom" size="786432">
+        <!-- verified identical -->
+        <rom name="raiden (japan).pce" size="786432" crc="850829f2" sha1="cef25446294884053442a4214434d7d97319ddca" offset="000000" />
       </dataarea>
     </part>
   </software>
@@ -674,14 +675,15 @@ Rastan Saga II Tourvision cart - Taito
 Notes:
 -Cart's A18 line seems not connected to anything.
 -->
-  <software name="tvrs2">
+  <software name="rastan2">
     <description>Rastan Saga II (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Taito Corporation</publisher>
-    <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_rastansagaii.bin" size="0x100000" crc="cfe4c2f1" sha1="1e39276b7d4bdb49421cc1102ad2fbba946127da" offset="000000" />
-      </dataarea>
+    <part name="cart" interface="tourvision_cart">     
+      <dataarea name="rom" size="393216">
+        <!-- verified identical -->
+				<rom name="rastan saga ii (japan).pce" size="393216" crc="00c38e69" sha1="cf06ba4d1bd31ebd69f0415ae52848f752ec8f6b" offset="000000" />
+			</dataarea>
     </part>
   </software>
 
@@ -693,6 +695,7 @@ Notes:
     <publisher>bootleg (Tourvision) / IREM Corp</publisher>
     <part name="cart" interface="tourvision_cart">
       <dataarea name="rom" size="0x100000">
+        <!-- NOT identical, copyright strings have been erased -->
         <rom name="tourv_r-type_ii.bin" size="0x100000" crc="b03bfd7a" sha1="cc8cec1fc4bae3937d0ed60468ff703d07ce9d0c" offset="000000" />
       </dataarea>
     </part>
@@ -700,13 +703,14 @@ Notes:
 
 
   <!--Saiga No Nindou - Ninja Spirit -->
-  <software name="tvninjas">
+  <software name="saigonin">
     <description>Saigo no Nindou - Ninja Spirit (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / IREM Corp</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_saiga_no_nindou.bin" size="0x100000" crc="87894514" sha1="6845c29247f9dd805b7cd8cb046e88526e853a11" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="saigo no nindou - ninja spirit (japan).pce" size="524288" crc="0590a156" sha1="14fc48758d658413f952a0b4f9465137164bdacc" offset="000000" />
       </dataarea>
     </part>
   </software>
