@@ -163,24 +163,6 @@ static INT32 slider_crossoffset(running_machine &machine, void *arg, int id, std
 ***************************************************************************/
 
 //-------------------------------------------------
-//  load ui options
-//-------------------------------------------------
-
-static void load_ui_options(running_machine &machine)
-{
-	// parse the file
-	std::string error;
-	// attempt to open the output file
-	emu_file file(machine.options().ini_path(), OPEN_FLAG_READ);
-	if (file.open("ui.ini") == osd_file::error::NONE)
-	{
-		bool result = mame_machine_manager::instance()->ui().options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
-		if (!result)
-			osd_printf_error("**Error loading ui.ini**");
-	}
-}
-
-//-------------------------------------------------
 //  is_breakable_char - is a given unicode
 //  character a possible line break?
 //-------------------------------------------------
@@ -284,9 +266,9 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 
 void mame_ui_manager::init()
 {
-	load_ui_options(machine());
+	load_ui_options();
 	// initialize the other UI bits
-	ui_menu::init(machine());
+	ui_menu::init(machine(), options());
 	ui_gfx_init(machine());
 
 	get_font_rows(&machine());
@@ -415,7 +397,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				{
 					std::string warning;
 					warning.assign(_("This driver requires images to be loaded in the following device(s): ")).append(messagebox_text.substr(0, messagebox_text.length() - 2));
-					ui_menu_file_manager::force_file_manager(machine(), &machine().render().ui_container(), warning.c_str());
+					ui_menu_file_manager::force_file_manager(*this, &machine().render().ui_container(), warning.c_str());
 				}
 				break;
 		}
@@ -490,12 +472,12 @@ void mame_ui_manager::update_and_render(render_container *container)
 	if (machine().phase() >= MACHINE_PHASE_RESET)
 	{
 		mame_machine_manager::instance()->lua()->on_frame_done();
-		mame_machine_manager::instance()->cheat().render_text(*container);
+		mame_machine_manager::instance()->cheat().render_text(*this, *container);
 	}
 
 	// call the current UI handler
 	assert(m_handler_callback != nullptr);
-	m_handler_param = (*m_handler_callback)(machine(), container, m_handler_param);
+	m_handler_param = (*m_handler_callback)(*this, container, m_handler_param);
 
 	// display any popup messages
 	if (osd_ticks() < m_popup_text_end)
@@ -515,7 +497,7 @@ void mame_ui_manager::update_and_render(render_container *container)
 			float mouse_y=-1,mouse_x=-1;
 			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
 			{
-				const float cursor_size = 0.6 * mame_machine_manager::instance()->ui().get_line_height();
+				const float cursor_size = 0.6 * get_line_height();
 				container->add_quad(mouse_x, mouse_y, mouse_x + cursor_size*container->manager().ui_aspect(container), mouse_y + cursor_size, UI_TEXT_COLOR, m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
 		}
@@ -1285,9 +1267,9 @@ std::string &mame_ui_manager::game_info_astring(std::string &str)
 //  messagebox_text string but handles no input
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_messagebox(running_machine &machine, render_container *container, UINT32 state)
+UINT32 mame_ui_manager::handler_messagebox(mame_ui_manager &mui, render_container *container, UINT32 state)
 {
-	mame_machine_manager::instance()->ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	mui.draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 	return 0;
 }
 
@@ -1298,20 +1280,20 @@ UINT32 mame_ui_manager::handler_messagebox(running_machine &machine, render_cont
 //  any keypress
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state)
+UINT32 mame_ui_manager::handler_messagebox_anykey(mame_ui_manager &mui, render_container *container, UINT32 state)
 {
 	// draw a standard message window
-	mame_machine_manager::instance()->ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	mui.draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	// if the user cancels, exit out completely
-	if (machine.ui_input().pressed(IPT_UI_CANCEL))
+	if (mui.machine().ui_input().pressed(IPT_UI_CANCEL))
 	{
-		machine.schedule_exit();
+		mui.machine().schedule_exit();
 		state = UI_HANDLER_CANCEL;
 	}
 
 	// if any key is pressed, just exit
-	else if (machine.input().poll_switches() != INPUT_CODE_INVALID)
+	else if (mui.machine().input().poll_switches() != INPUT_CODE_INVALID)
 		state = UI_HANDLER_CANCEL;
 
 	return state;
@@ -1384,7 +1366,7 @@ void mame_ui_manager::increase_frameskip()
 	machine().video().set_frameskip(newframeskip);
 
 	// display the FPS counter for 2 seconds
-	mame_machine_manager::instance()->ui().show_fps_temp(2.0);
+	show_fps_temp(2.0);
 }
 
 
@@ -1401,7 +1383,7 @@ void mame_ui_manager::decrease_frameskip()
 	machine().video().set_frameskip(newframeskip);
 
 	// display the FPS counter for 2 seconds
-	mame_machine_manager::instance()->ui().show_fps_temp(2.0);
+	show_fps_temp(2.0);
 }
 
 
@@ -1512,61 +1494,62 @@ void mame_ui_manager::image_display(const device_type &type, device_image_interf
 //  of the standard keypresses
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_ingame(running_machine &machine, render_container *container, UINT32 state)
+UINT32 mame_ui_manager::handler_ingame(mame_ui_manager &mui, render_container *container, UINT32 state)
 {
-	bool is_paused = machine.paused();
+	bool is_paused = mui.machine().paused();
 
 	// first draw the FPS counter
-	if (mame_machine_manager::instance()->ui().show_fps_counter())
+	if (mui.show_fps_counter())
 	{
-		mame_machine_manager::instance()->ui().draw_text_full(container, machine.video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
+		mui.draw_text_full(container, mui.machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
+					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
 	}
 
 	// Show the duration of current part (intro or gameplay or extra)
-	if (mame_machine_manager::instance()->ui().show_timecode_counter()) {
+	if (mui.show_timecode_counter()) {
 		std::string tempstring;
-		mame_machine_manager::instance()->ui().draw_text_full(container, machine.video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
-			JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0xf0,0x10,0x10), ARGB_BLACK, nullptr, nullptr);
+		mui.draw_text_full(container, mui.machine().video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+			JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0xf0,0x10,0x10), rgb_t::black, nullptr, nullptr);
 	}
 	// Show the total time elapsed for the video preview (all parts intro, gameplay, extras)
-	if (mame_machine_manager::instance()->ui().show_timecode_total()) {
+	if (mui.show_timecode_total()) {
 		std::string tempstring;
-		mame_machine_manager::instance()->ui().draw_text_full(container, machine.video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
-			JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0x10,0xf0,0x10), ARGB_BLACK, nullptr, nullptr);
+		mui.draw_text_full(container, mui.machine().video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+			JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0x10,0xf0,0x10), rgb_t::black, nullptr, nullptr);
 	}
 
 
 	// draw the profiler if visible
-	if (mame_machine_manager::instance()->ui().show_profiler())
+	if (mui.show_profiler())
 	{
-		const char *text = g_profiler.text(machine);
-		mame_machine_manager::instance()->ui().draw_text_full(container, text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
+		const char *text = g_profiler.text(mui.machine());
+		mui.draw_text_full(container, text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
 	}
 
 	// if we're single-stepping, pause now
-	if (mame_machine_manager::instance()->ui().single_step())
+	if (mui.single_step())
 	{
-		machine.pause();
-		mame_machine_manager::instance()->ui().set_single_step(false);
+		mui.machine().pause();
+		mui.set_single_step(false);
 	}
 
 	// determine if we should disable the rest of the UI
-	bool ui_disabled = (machine.ioport().has_keyboard() && !machine.ui_active());
+	bool has_keyboard = mui.machine().ioport().has_keyboard();
+	bool ui_disabled = (has_keyboard && !mui.machine().ui_active());
 
 	// is ScrLk UI toggling applicable here?
-	if (machine.ioport().has_keyboard())
+	if (has_keyboard)
 	{
 		// are we toggling the UI with ScrLk?
-		if (machine.ui_input().pressed(IPT_UI_TOGGLE_UI))
+		if (mui.machine().ui_input().pressed(IPT_UI_TOGGLE_UI))
 		{
 			// toggle the UI
-			machine.set_ui_active(!machine.ui_active());
+			mui.machine().set_ui_active(!mui.machine().ui_active());
 
 			// display a popup indicating the new status
-			if (machine.ui_active())
+			if (mui.machine().ui_active())
 			{
-				mame_machine_manager::instance()->ui().popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
+				mui.popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
 					_("Keyboard Emulation Status"),
 					"-------------------------",
 					_("Mode: PARTIAL Emulation"),
@@ -1576,7 +1559,7 @@ UINT32 mame_ui_manager::handler_ingame(running_machine &machine, render_containe
 			}
 			else
 			{
-				mame_machine_manager::instance()->ui().popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
+				mui.popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
 					_("Keyboard Emulation Status"),
 					"-------------------------",
 					_("Mode: FULL Emulation"),
@@ -1588,64 +1571,64 @@ UINT32 mame_ui_manager::handler_ingame(running_machine &machine, render_containe
 	}
 
 	// is the natural keyboard enabled?
-	if (mame_machine_manager::instance()->ui().use_natural_keyboard() && (machine.phase() == MACHINE_PHASE_RUNNING))
-		mame_machine_manager::instance()->ui().process_natural_keyboard();
+	if (mui.use_natural_keyboard() && (mui.machine().phase() == MACHINE_PHASE_RUNNING))
+		mui.process_natural_keyboard();
 
 	if (!ui_disabled)
 	{
 		// paste command
-		if (machine.ui_input().pressed(IPT_UI_PASTE))
-			mame_machine_manager::instance()->ui().paste();
+		if (mui.machine().ui_input().pressed(IPT_UI_PASTE))
+			mui.paste();
 	}
 
-	mame_machine_manager::instance()->ui().image_handler_ingame();
+	mui.image_handler_ingame();
 
 	// handle a save input timecode request
-	if (machine.ui_input().pressed(IPT_UI_TIMECODE))
-		machine.video().save_input_timecode();
+	if (mui.machine().ui_input().pressed(IPT_UI_TIMECODE))
+		mui.machine().video().save_input_timecode();
 
 	if (ui_disabled) return ui_disabled;
 
-	if (machine.ui_input().pressed(IPT_UI_CANCEL))
+	if (mui.machine().ui_input().pressed(IPT_UI_CANCEL))
 	{
-		mame_machine_manager::instance()->ui().request_quit();
+		mui.request_quit();
 		return 0;
 	}
 
 	// turn on menus if requested
-	if (machine.ui_input().pressed(IPT_UI_CONFIGURE))
-		return mame_machine_manager::instance()->ui().set_handler(ui_menu::ui_handler, 0);
+	if (mui.machine().ui_input().pressed(IPT_UI_CONFIGURE))
+		return mui.set_handler(ui_menu::ui_handler, 0);
 
 	// if the on-screen display isn't up and the user has toggled it, turn it on
-	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0 && machine.ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
-		return mame_machine_manager::instance()->ui().set_handler(ui_menu_sliders::ui_handler, 1);
+	if ((mui.machine().debug_flags & DEBUG_FLAG_ENABLED) == 0 && mui.machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
+		return mui.set_handler(ui_menu_sliders::ui_handler, 1);
 
 	// handle a reset request
-	if (machine.ui_input().pressed(IPT_UI_RESET_MACHINE))
-		machine.schedule_hard_reset();
-	if (machine.ui_input().pressed(IPT_UI_SOFT_RESET))
-		machine.schedule_soft_reset();
+	if (mui.machine().ui_input().pressed(IPT_UI_RESET_MACHINE))
+		mui.machine().schedule_hard_reset();
+	if (mui.machine().ui_input().pressed(IPT_UI_SOFT_RESET))
+		mui.machine().schedule_soft_reset();
 
 	// handle a request to display graphics/palette
-	if (machine.ui_input().pressed(IPT_UI_SHOW_GFX))
+	if (mui.machine().ui_input().pressed(IPT_UI_SHOW_GFX))
 	{
 		if (!is_paused)
-			machine.pause();
-		return mame_machine_manager::instance()->ui().set_handler(ui_gfx_ui_handler, is_paused);
+			mui.machine().pause();
+		return mui.set_handler(ui_gfx_ui_handler, is_paused);
 	}
 
 	// handle a tape control key
-	if (machine.ui_input().pressed(IPT_UI_TAPE_START))
+	if (mui.machine().ui_input().pressed(IPT_UI_TAPE_START))
 	{
-		for (cassette_image_device &cass : cassette_device_iterator(machine.root_device()))
+		for (cassette_image_device &cass : cassette_device_iterator(mui.machine().root_device()))
 		{
 			cass.change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
 			return 0;
 		}
 	}
-	if (machine.ui_input().pressed(IPT_UI_TAPE_STOP))
+	if (mui.machine().ui_input().pressed(IPT_UI_TAPE_STOP))
 	{
-		for (cassette_image_device &cass : cassette_device_iterator(machine.root_device()))
+		for (cassette_image_device &cass : cassette_device_iterator(mui.machine().root_device()))
 		{
 			cass.change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 			return 0;
@@ -1653,87 +1636,87 @@ UINT32 mame_ui_manager::handler_ingame(running_machine &machine, render_containe
 	}
 
 	// handle a save state request
-	if (machine.ui_input().pressed(IPT_UI_SAVE_STATE))
+	if (mui.machine().ui_input().pressed(IPT_UI_SAVE_STATE))
 	{
-		machine.pause();
-		mame_machine_manager::instance()->ui().m_load_save_hold = true;
-		return mame_machine_manager::instance()->ui().set_handler(handler_load_save, LOADSAVE_SAVE);
+		mui.machine().pause();
+		mui.m_load_save_hold = true;
+		return mui.set_handler(handler_load_save, LOADSAVE_SAVE);
 	}
 
 	// handle a load state request
-	if (machine.ui_input().pressed(IPT_UI_LOAD_STATE))
+	if (mui.machine().ui_input().pressed(IPT_UI_LOAD_STATE))
 	{
-		machine.pause();
-		mame_machine_manager::instance()->ui().m_load_save_hold = true;
-		return mame_machine_manager::instance()->ui().set_handler(handler_load_save, LOADSAVE_LOAD);
+		mui.machine().pause();
+		mui.m_load_save_hold = true;
+		return mui.set_handler(handler_load_save, LOADSAVE_LOAD);
 	}
 
 	// handle a save snapshot request
-	if (machine.ui_input().pressed(IPT_UI_SNAPSHOT))
-		machine.video().save_active_screen_snapshots();
+	if (mui.machine().ui_input().pressed(IPT_UI_SNAPSHOT))
+		mui.machine().video().save_active_screen_snapshots();
 
 	// toggle pause
-	if (machine.ui_input().pressed(IPT_UI_PAUSE))
-		machine.toggle_pause();
+	if (mui.machine().ui_input().pressed(IPT_UI_PAUSE))
+		mui.machine().toggle_pause();
 
 	// pause single step
-	if (machine.ui_input().pressed(IPT_UI_PAUSE_SINGLE))
+	if (mui.machine().ui_input().pressed(IPT_UI_PAUSE_SINGLE))
 	{
-		mame_machine_manager::instance()->ui().set_single_step(true);
-		machine.resume();
+		mui.set_single_step(true);
+		mui.machine().resume();
 	}
 
 	// handle a toggle cheats request
-	if (machine.ui_input().pressed(IPT_UI_TOGGLE_CHEAT))
+	if (mui.machine().ui_input().pressed(IPT_UI_TOGGLE_CHEAT))
 		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
 
 	// toggle movie recording
-	if (machine.ui_input().pressed(IPT_UI_RECORD_MOVIE))
-		machine.video().toggle_record_movie();
+	if (mui.machine().ui_input().pressed(IPT_UI_RECORD_MOVIE))
+		mui.machine().video().toggle_record_movie();
 
 	// toggle profiler display
-	if (machine.ui_input().pressed(IPT_UI_SHOW_PROFILER))
-		mame_machine_manager::instance()->ui().set_show_profiler(!mame_machine_manager::instance()->ui().show_profiler());
+	if (mui.machine().ui_input().pressed(IPT_UI_SHOW_PROFILER))
+		mui.set_show_profiler(!mui.show_profiler());
 
 	// toggle FPS display
-	if (machine.ui_input().pressed(IPT_UI_SHOW_FPS))
-		mame_machine_manager::instance()->ui().set_show_fps(!mame_machine_manager::instance()->ui().show_fps());
+	if (mui.machine().ui_input().pressed(IPT_UI_SHOW_FPS))
+		mui.set_show_fps(!mui.show_fps());
 
 	// increment frameskip?
-	if (machine.ui_input().pressed(IPT_UI_FRAMESKIP_INC))
-		mame_machine_manager::instance()->ui().increase_frameskip();
+	if (mui.machine().ui_input().pressed(IPT_UI_FRAMESKIP_INC))
+		mui.increase_frameskip();
 
 	// decrement frameskip?
-	if (machine.ui_input().pressed(IPT_UI_FRAMESKIP_DEC))
-		mame_machine_manager::instance()->ui().decrease_frameskip();
+	if (mui.machine().ui_input().pressed(IPT_UI_FRAMESKIP_DEC))
+		mui.decrease_frameskip();
 
 	// toggle throttle?
-	if (machine.ui_input().pressed(IPT_UI_THROTTLE))
-		machine.video().toggle_throttle();
+	if (mui.machine().ui_input().pressed(IPT_UI_THROTTLE))
+		mui.machine().video().toggle_throttle();
 
 	// toggle autofire
-	if (machine.ui_input().pressed(IPT_UI_TOGGLE_AUTOFIRE))
+	if (mui.machine().ui_input().pressed(IPT_UI_TOGGLE_AUTOFIRE))
 	{
-		if (!machine.options().cheat())
+		if (!mui.machine().options().cheat())
 		{
-			machine.popmessage(_("Autofire can't be enabled"));
+			mui.machine().popmessage(_("Autofire can't be enabled"));
 		}
 		else
 		{
-			bool autofire_toggle = machine.ioport().get_autofire_toggle();
-			machine.ioport().set_autofire_toggle(!autofire_toggle);
-			machine.popmessage("Autofire %s", autofire_toggle ? _("Enabled") : _("Disabled"));
+			bool autofire_toggle = mui.machine().ioport().get_autofire_toggle();
+			mui.machine().ioport().set_autofire_toggle(!autofire_toggle);
+			mui.machine().popmessage("Autofire %s", autofire_toggle ? _("Enabled") : _("Disabled"));
 		}
 	}
 
 	// check for fast forward
-	if (machine.ioport().type_pressed(IPT_UI_FAST_FORWARD))
+	if (mui.machine().ioport().type_pressed(IPT_UI_FAST_FORWARD))
 	{
-		machine.video().set_fastforward(true);
-		mame_machine_manager::instance()->ui().show_fps_temp(0.5);
+		mui.machine().video().set_fastforward(true);
+		mui.show_fps_temp(0.5);
 	}
 	else
-		machine.video().set_fastforward(false);
+		mui.machine().video().set_fastforward(false);
 
 	return 0;
 }
@@ -1744,7 +1727,7 @@ UINT32 mame_ui_manager::handler_ingame(running_machine &machine, render_containe
 //  specifying a game to save or load
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_load_save(running_machine &machine, render_container *container, UINT32 state)
+UINT32 mame_ui_manager::handler_load_save(mame_ui_manager &mui, render_container *container, UINT32 state)
 {
 	char filename[20];
 	char file = 0;
@@ -1755,52 +1738,52 @@ UINT32 mame_ui_manager::handler_load_save(running_machine &machine, render_conta
 
 	// okay, we're waiting for a key to select a slot; display a message
 	if (state == LOADSAVE_SAVE)
-		mame_machine_manager::instance()->ui().draw_message_window(container, _("Select position to save to"));
+		mui.draw_message_window(container, _("Select position to save to"));
 	else
-		mame_machine_manager::instance()->ui().draw_message_window(container, _("Select position to load from"));
+		mui.draw_message_window(container, _("Select position to load from"));
 
 	// if load/save state sequence is still being pressed, do not read the filename yet
-	if (mame_machine_manager::instance()->ui().m_load_save_hold) {
+	if (mui.m_load_save_hold) {
 		bool seq_in_progress = false;
 		const input_seq &load_save_seq = state == LOADSAVE_SAVE ?
-			machine.ioport().type_seq(IPT_UI_SAVE_STATE) :
-			machine.ioport().type_seq(IPT_UI_LOAD_STATE);
+			mui.machine().ioport().type_seq(IPT_UI_SAVE_STATE) :
+			mui.machine().ioport().type_seq(IPT_UI_LOAD_STATE);
 
 		for (int i = 0; i < load_save_seq.length(); i++)
-			if (machine.input().code_pressed_once(load_save_seq[i]))
+			if (mui.machine().input().code_pressed_once(load_save_seq[i]))
 				seq_in_progress = true;
 
 		if (seq_in_progress)
 			return state;
 		else
-			mame_machine_manager::instance()->ui().m_load_save_hold = false;
+			mui.m_load_save_hold = false;
 	}
 
 	// check for cancel key
-	if (machine.ui_input().pressed(IPT_UI_CANCEL))
+	if (mui.machine().ui_input().pressed(IPT_UI_CANCEL))
 	{
 		// display a popup indicating things were cancelled
 		if (state == LOADSAVE_SAVE)
-			machine.popmessage(_("Save cancelled"));
+			mui.machine().popmessage(_("Save cancelled"));
 		else
-			machine.popmessage(_("Load cancelled"));
+			mui.machine().popmessage(_("Load cancelled"));
 
 		// reset the state
-		machine.resume();
+		mui.machine().resume();
 		return UI_HANDLER_CANCEL;
 	}
 
 	// check for A-Z or 0-9
 	for (input_item_id id = ITEM_ID_A; id <= ITEM_ID_Z; ++id)
-		if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
+		if (mui.machine().input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 			file = id - ITEM_ID_A + 'a';
 	if (file == 0)
 		for (input_item_id id = ITEM_ID_0; id <= ITEM_ID_9; ++id)
-			if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
+			if (mui.machine().input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 				file = id - ITEM_ID_0 + '0';
 	if (file == 0)
 		for (input_item_id id = ITEM_ID_0_PAD; id <= ITEM_ID_9_PAD; ++id)
-			if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
+			if (mui.machine().input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 				file = id - ITEM_ID_0_PAD + '0';
 	if (file == 0)
 	{
@@ -1808,7 +1791,7 @@ UINT32 mame_ui_manager::handler_load_save(running_machine &machine, render_conta
 
 		for (int joy_index = 0; joy_index <= MAX_SAVED_STATE_JOYSTICK; joy_index++)
 			for (input_item_id id = ITEM_ID_BUTTON1; id <= ITEM_ID_BUTTON32; ++id)
-				if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_JOYSTICK, joy_index, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
+				if (mui.machine().input().code_pressed_once(input_code(DEVICE_CLASS_JOYSTICK, joy_index, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 				{
 					snprintf(filename, sizeof(filename), "joy%i-%i", joy_index, id - ITEM_ID_BUTTON1 + 1);
 					found = true;
@@ -1826,20 +1809,20 @@ UINT32 mame_ui_manager::handler_load_save(running_machine &machine, render_conta
 	// display a popup indicating that the save will proceed
 	if (state == LOADSAVE_SAVE)
 	{
-		machine.popmessage(_("Save to position %s"), filename);
-		machine.schedule_save(filename);
+		mui.machine().popmessage(_("Save to position %s"), filename);
+		mui.machine().schedule_save(filename);
 	}
 	else
 	{
-		machine.popmessage(_("Load from position %s"), filename);
-		machine.schedule_load(filename);
+		mui.machine().popmessage(_("Load from position %s"), filename);
+		mui.machine().schedule_load(filename);
 	}
 
 	// avoid handling the name of the save state slot as a seperate input
-	machine.ui_input().mark_all_as_pressed();
+	mui.machine().ui_input().mark_all_as_pressed();
 
 	// remove the pause and reset the state
-	machine.resume();
+	mui.machine().resume();
 	return UI_HANDLER_CANCEL;
 }
 
@@ -1862,13 +1845,13 @@ void mame_ui_manager::request_quit()
 //  confirming quit emulation
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state)
+UINT32 mame_ui_manager::handler_confirm_quit(mame_ui_manager &mui, render_container *container, UINT32 state)
 {
 	// get the text for 'UI Select'
-	std::string ui_select_text = machine.input().seq_name(machine.ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
+	std::string ui_select_text = mui.machine().input().seq_name(mui.machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
 
 	// get the text for 'UI Cancel'
-	std::string ui_cancel_text = machine.input().seq_name(machine.ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
+	std::string ui_cancel_text = mui.machine().input().seq_name(mui.machine().ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
 
 	// assemble the quit message
 	std::string quit_message = string_format(_("Are you sure you want to quit?\n\n"
@@ -1877,17 +1860,17 @@ UINT32 mame_ui_manager::handler_confirm_quit(running_machine &machine, render_co
 			ui_select_text,
 			ui_cancel_text);
 
-	mame_machine_manager::instance()->ui().draw_text_box(container, quit_message.c_str(), JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
-	machine.pause();
+	mui.draw_text_box(container, quit_message.c_str(), JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+	mui.machine().pause();
 
 	// if the user press ENTER, quit the game
-	if (machine.ui_input().pressed(IPT_UI_SELECT))
-		machine.schedule_exit();
+	if (mui.machine().ui_input().pressed(IPT_UI_SELECT))
+		mui.machine().schedule_exit();
 
 	// if the user press ESC, just continue
-	else if (machine.ui_input().pressed(IPT_UI_CANCEL))
+	else if (mui.machine().ui_input().pressed(IPT_UI_CANCEL))
 	{
-		machine.resume();
+		mui.machine().resume();
 		state = UI_HANDLER_CANCEL;
 	}
 
@@ -2735,4 +2718,97 @@ void mame_ui_manager::popup_time_string(int seconds, std::string message)
 
 	// set a timer
 	m_popup_text_end = osd_ticks() + osd_ticks_per_second() * seconds;	
+}
+
+
+/***************************************************************************
+    LOADING AND SAVING OPTIONS
+***************************************************************************/
+
+//-------------------------------------------------
+//  load ui options
+//-------------------------------------------------
+
+void mame_ui_manager::load_ui_options()
+{
+	// parse the file
+	std::string error;
+	// attempt to open the output file
+	emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
+	if (file.open("ui.ini") == osd_file::error::NONE)
+	{
+		bool result = options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+		if (!result)
+			osd_printf_error("**Error loading ui.ini**");
+	}
+}
+
+//-------------------------------------------------
+//  save ui options
+//-------------------------------------------------
+
+void mame_ui_manager::save_ui_options()
+{
+	// attempt to open the output file
+	emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	if (file.open("ui.ini") == osd_file::error::NONE)
+	{
+		// generate the updated INI
+		std::string initext = options().output_ini();
+		file.puts(initext.c_str());
+		file.close();
+	}
+	else
+		machine().popmessage(_("**Error saving ui.ini**"));
+}
+
+//-------------------------------------------------
+//  save main option
+//-------------------------------------------------
+
+void mame_ui_manager::save_main_option()
+{
+	// parse the file
+	std::string error;
+	emu_options options(machine().options()); // This way we make sure that all OSD parts are in
+	std::string error_string;
+
+	// attempt to open the main ini file
+	{
+		emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
+		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
+		{
+			bool result = options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+			if (!result)
+			{
+				osd_printf_error("**Error loading %s.ini**", emulator_info::get_configname());
+				return;
+			}
+		}
+	}
+
+	for (emu_options::entry &f_entry : machine().options())
+	{
+		if (f_entry.is_changed())
+		{
+			options.set_value(f_entry.name(), f_entry.value(), OPTION_PRIORITY_CMDLINE, error_string);
+		}
+	}
+
+	// attempt to open the output file
+	{
+		emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
+		{
+			// generate the updated INI
+			std::string initext = options.output_ini();
+			file.puts(initext.c_str());
+			file.close();
+		}
+		else {
+			machine().popmessage(_("**Error saving %s.ini**"), emulator_info::get_configname());
+			return;
+		}
+	}
+	popup_time(3, "%s", _("\n    Configuration saved    \n\n"));
 }

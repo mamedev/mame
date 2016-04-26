@@ -15,7 +15,7 @@
 
 #include "render.h"
 #include "language.h"
-#include "ui/uimain.h"
+#include "ui/ui.h"
 
 
 /***************************************************************************
@@ -77,10 +77,11 @@ struct ui_menu_pool
 class ui_menu
 {
 public:
-	ui_menu(running_machine &machine, render_container *container);
+	ui_menu(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu();
 
-	running_machine &machine() const { return m_machine; }
+	mame_ui_manager &ui() const { return m_ui; }
+	running_machine &machine() const { return m_ui.machine(); }
 
 	render_container            *container;   // render_container we render to
 	ui_menu_event               menu_event;   // the UI menu_event that occurred
@@ -126,7 +127,7 @@ public:
 	void set_special_main_menu(bool disable);
 
 	// Global initialization
-	static void init(running_machine &machine);
+	static void init(running_machine &machine, ui_options &mopt);
 	static void exit(running_machine &machine);
 
 	// reset the menus, clearing everything
@@ -148,7 +149,7 @@ public:
 	static void draw_arrow(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, UINT32 orientation);
 
 	// master handler
-	static UINT32 ui_handler(running_machine &machine, render_container *container, UINT32 state);
+	static UINT32 ui_handler(mame_ui_manager &mui, render_container *container, UINT32 state);
 
 	// Used by sliders
 	void validate_selection(int scandir);
@@ -171,7 +172,7 @@ private:
 	static render_texture *hilight_texture, *arrow_texture;
 
 	bool m_special_main_menu;
-	running_machine &m_machine;  // machine we are attached to
+	mame_ui_manager &m_ui;  // UI we are attached to
 
 	void draw(UINT32 flags, float x0 = 0.0f, float y0 = 0.0f);
 	void draw_text_box();
@@ -217,7 +218,7 @@ public:
 	void draw_star(float x0, float y0);
 
 	// Global initialization
-	static void init_ui(running_machine &machine);
+	static void init_ui(running_machine &machine, ui_options &mopt);
 
 	// get arrows status
 	template <typename _T1, typename _T2, typename _T3>
@@ -247,6 +248,9 @@ protected:
 	// images render
 	std::string arts_render_common(float origx1, float origy1, float origx2, float origy2);
 	void arts_render_images(bitmap_argb32 *bitmap, float origx1, float origy1, float origx2, float origy2, bool software);
+
+	// draw header and footer text
+	void extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, const char *header, const char *footer);
 
 	int visible_lines;        // main box visible lines
 	int right_visible_lines;  // right box lines
@@ -292,6 +296,7 @@ private:
 	void handle_main_events(UINT32 flags);
 
 	void draw_icon(int linenum, void *selectedref, float x1, float y1);
+	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction);
 };
 
 #endif  // __UI_MENU_H__

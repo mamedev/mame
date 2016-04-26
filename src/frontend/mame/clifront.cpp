@@ -28,6 +28,8 @@
 #include "softlist.h"
 
 #include "ui/moptions.h"
+#include "language.h"
+#include "pluginopts.h"
 
 #include <new>
 #include <ctype.h>

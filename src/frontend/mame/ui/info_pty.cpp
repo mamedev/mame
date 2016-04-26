@@ -12,8 +12,8 @@
 #include "ui/menu.h"
 #include "ui/info_pty.h"
 
-ui_menu_pty_info::ui_menu_pty_info(running_machine &machine, render_container *container) :
-	ui_menu(machine, container)
+ui_menu_pty_info::ui_menu_pty_info(mame_ui_manager &mui, render_container *container) :
+	ui_menu(mui, container)
 {
 }
 

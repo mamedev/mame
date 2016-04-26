@@ -18,7 +18,7 @@
  menu
  -------------------------------------------------*/
 
-ui_menu_device_config::ui_menu_device_config(running_machine &machine, render_container *container, device_slot_interface *slot, device_slot_option *option) : ui_menu(machine, container)
+ui_menu_device_config::ui_menu_device_config(mame_ui_manager &mui, render_container *container, device_slot_interface *slot, device_slot_option *option) : ui_menu(mui, container)
 {
 	m_option = option;
 	m_owner = slot;

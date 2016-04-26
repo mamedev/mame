@@ -22,8 +22,8 @@
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
-ui_menu_custom_filter::ui_menu_custom_filter(running_machine &machine, render_container *container, bool _single_menu)
-	: ui_menu(machine, container)
+ui_menu_custom_filter::ui_menu_custom_filter(mame_ui_manager &mui, render_container *container, bool _single_menu)
+	: ui_menu(mui, container)
 	, m_single_menu(_single_menu)
 	, m_added(false)
 {
@@ -104,7 +104,7 @@ void ui_menu_custom_filter::handle()
 					else
 						s_sel[index] = main_filters::text[index];
 
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, custfltr::other[pos]));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, s_sel, custfltr::other[pos]));
 			}
 		}
 		else if ((FPTR)m_event->itemref >= YEAR_FILTER && (FPTR)m_event->itemref < YEAR_FILTER + MAX_CUST_FILTER)
@@ -121,7 +121,7 @@ void ui_menu_custom_filter::handle()
 				changed = true;
 			}
 			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, c_year::ui, custfltr::year[pos]));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, c_year::ui, custfltr::year[pos]));
 		}
 		else if ((FPTR)m_event->itemref >= MNFCT_FILTER && (FPTR)m_event->itemref < MNFCT_FILTER + MAX_CUST_FILTER)
 		{
@@ -137,7 +137,7 @@ void ui_menu_custom_filter::handle()
 				changed = true;
 			}
 			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, c_mnfct::ui, custfltr::mnfct[pos]));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, c_mnfct::ui, custfltr::mnfct[pos]));
 		}
 	}
 
@@ -196,7 +196,7 @@ void ui_menu_custom_filter::populate()
 		item_append(_("Add filter"), nullptr, 0, (void *)(FPTR)ADD_FILTER);
 
 	item_append(ui_menu_item_type::SEPARATOR);
-	customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -205,11 +205,10 @@ void ui_menu_custom_filter::populate()
 void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 
 	// get the size of the text
-	mui.draw_text_full(container, _("Select custom filters:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, _("Select custom filters:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+		DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
 
@@ -220,7 +219,7 @@ void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bo
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -228,7 +227,7 @@ void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bo
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, _("Select custom filters:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	ui().draw_text_full(container, _("Select custom filters:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
@@ -239,7 +238,7 @@ void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bo
 void ui_menu_custom_filter::save_custom_filters()
 {
 	// attempt to open the output file
-	emu_file file(mame_machine_manager::instance()->ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == osd_file::error::NONE)
 	{
 		// generate custom filters info
@@ -266,8 +265,8 @@ void ui_menu_custom_filter::save_custom_filters()
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
-ui_menu_swcustom_filter::ui_menu_swcustom_filter(running_machine &machine, render_container *container, const game_driver *_driver, s_filter &_filter) :
-	ui_menu(machine, container)
+ui_menu_swcustom_filter::ui_menu_swcustom_filter(mame_ui_manager &mui, render_container *container, const game_driver *_driver, s_filter &_filter) :
+	ui_menu(mui, container)
 	, m_added(false)
 	, m_filter(_filter)
 	, m_driver(_driver)
@@ -344,7 +343,7 @@ void ui_menu_swcustom_filter::handle()
 					else
 						s_sel[index] = sw_filters::text[index];
 
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, sw_custfltr::other[pos]));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, s_sel, sw_custfltr::other[pos]));
 			}
 		}
 		else if ((FPTR)m_event->itemref >= YEAR_FILTER && (FPTR)m_event->itemref < YEAR_FILTER + MAX_CUST_FILTER)
@@ -361,7 +360,7 @@ void ui_menu_swcustom_filter::handle()
 				changed = true;
 			}
 			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, m_filter.year.ui, sw_custfltr::year[pos]));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, m_filter.year.ui, sw_custfltr::year[pos]));
 		}
 		else if ((FPTR)m_event->itemref >= TYPE_FILTER && (FPTR)m_event->itemref < TYPE_FILTER + MAX_CUST_FILTER)
 		{
@@ -377,7 +376,7 @@ void ui_menu_swcustom_filter::handle()
 				changed = true;
 			}
 			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, m_filter.type.ui, sw_custfltr::type[pos]));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, m_filter.type.ui, sw_custfltr::type[pos]));
 		}
 		else if ((FPTR)m_event->itemref >= MNFCT_FILTER && (FPTR)m_event->itemref < MNFCT_FILTER + MAX_CUST_FILTER)
 		{
@@ -393,7 +392,7 @@ void ui_menu_swcustom_filter::handle()
 				changed = true;
 			}
 			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, m_filter.publisher.ui, sw_custfltr::mnfct[pos]));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, m_filter.publisher.ui, sw_custfltr::mnfct[pos]));
 		}
 		else if ((FPTR)m_event->itemref >= REGION_FILTER && (FPTR)m_event->itemref < REGION_FILTER + MAX_CUST_FILTER)
 		{
@@ -409,7 +408,7 @@ void ui_menu_swcustom_filter::handle()
 				changed = true;
 			}
 			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, m_filter.region.ui, sw_custfltr::region[pos]));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, m_filter.region.ui, sw_custfltr::region[pos]));
 		}
 		else if ((FPTR)m_event->itemref >= LIST_FILTER && (FPTR)m_event->itemref < LIST_FILTER + MAX_CUST_FILTER)
 		{
@@ -425,7 +424,7 @@ void ui_menu_swcustom_filter::handle()
 				changed = true;
 			}
 			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, m_filter.swlist.description, sw_custfltr::list[pos]));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, m_filter.swlist.description, sw_custfltr::list[pos]));
 		}
 	}
 
@@ -512,7 +511,7 @@ void ui_menu_swcustom_filter::populate()
 
 	item_append(ui_menu_item_type::SEPARATOR);
 
-	customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -521,11 +520,10 @@ void ui_menu_swcustom_filter::populate()
 void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 
 	// get the size of the text
-	mui.draw_text_full(container, _("Select custom filters:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, _("Select custom filters:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+		DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
 
@@ -536,7 +534,7 @@ void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float 
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -544,7 +542,7 @@ void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float 
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, _("Select custom filters:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	ui().draw_text_full(container, _("Select custom filters:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
@@ -555,7 +553,7 @@ void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float 
 void ui_menu_swcustom_filter::save_sw_custom_filters()
 {
 	// attempt to open the output file
-	emu_file file(mame_machine_manager::instance()->ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open("custom_", m_driver->name, "_filter.ini") == osd_file::error::NONE)
 	{
 		// generate custom filters info

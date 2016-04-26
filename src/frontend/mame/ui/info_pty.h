@@ -15,7 +15,7 @@
 
 class ui_menu_pty_info : public ui_menu {
 public:
-	ui_menu_pty_info(running_machine &machine, render_container *container);
+	ui_menu_pty_info(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_pty_info();
 	virtual void populate() override;
 	virtual void handle() override;

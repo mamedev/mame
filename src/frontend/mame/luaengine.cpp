@@ -1507,6 +1507,7 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	}
 	const char *msg = luaL_checkstring(L,4);
 	rgb_t textcolor = UI_TEXT_COLOR;
+	rgb_t bgcolor = UI_TEXT_BG_COLOR;
 	if (!lua_isnone(L, 5)) {
 		textcolor = rgb_t(lua_tounsigned(L, 5));
 	}
@@ -1515,7 +1516,7 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	render_container &rc = sc->container();
 	mame_machine_manager::instance()->ui().draw_text_full(&rc, msg, x, y, (1.0f - x),
 						justify, WRAP_WORD, DRAW_NORMAL, textcolor,
-						UI_TEXT_BG_COLOR, nullptr, nullptr);
+						bgcolor, nullptr, nullptr);
 	return 0;
 }
 

@@ -46,7 +46,7 @@ public:
 		std::vector<std::string> value;
 	};
 
-	ui_submenu(running_machine &machine, render_container *container, std::vector<ui_submenu::option> &suboptions, const game_driver *drv = nullptr, emu_options *options = nullptr);
+	ui_submenu(mame_ui_manager &mui, render_container *container, std::vector<ui_submenu::option> &suboptions, const game_driver *drv = nullptr, emu_options *options = nullptr);
 	virtual ~ui_submenu();
 	virtual void populate() override;
 	virtual void handle() override;

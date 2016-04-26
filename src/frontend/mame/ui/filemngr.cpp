@@ -30,7 +30,7 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_file_manager::ui_menu_file_manager(running_machine &machine, render_container *container, const char *warnings) : ui_menu(machine, container), selected_device(nullptr)
+ui_menu_file_manager::ui_menu_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings) : ui_menu(mui, container), selected_device(nullptr)
 {
 	// This warning string is used when accessing from the force_file_manager call, i.e.
 	// when the file manager is loaded top front in the case of mandatory image devices
@@ -62,8 +62,7 @@ void ui_menu_file_manager::custom_render(void *selectedref, float top, float bot
 
 	// access the path
 	path = selected_device ? selected_device->filename() : nullptr;
-	extra_text_render(container, top, bottom,
-						origx1, origy1, origx2, origy2, nullptr, path);
+	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, nullptr, path);
 }
 
 
@@ -156,7 +155,7 @@ void ui_menu_file_manager::populate()
 	item_append(ui_menu_item_type::SEPARATOR);
 	item_append("Reset",  nullptr, 0, (void *)1);
 
-	custombottom = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 
@@ -185,11 +184,11 @@ void ui_menu_file_manager::handle()
 				floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
 				if (floppy_device != nullptr)
 				{
-					ui_menu::stack_push(global_alloc_clear<ui_menu_control_floppy_image>(machine(), container, floppy_device));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_control_floppy_image>(ui(), container, floppy_device));
 				} 
 				else
 				{
-					ui_menu::stack_push(global_alloc_clear<ui_menu_control_device_image>(machine(), container, selected_device));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_control_device_image>(ui(), container, selected_device));
 				}
 				// reset the existing menu
 				reset(UI_MENU_RESET_REMEMBER_POSITION);
@@ -199,20 +198,20 @@ void ui_menu_file_manager::handle()
 }
 
 // force file manager menu
-void ui_menu_file_manager::force_file_manager(running_machine &machine, render_container *container, const char *warnings)
+void ui_menu_file_manager::force_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings)
 {
 	// reset the menu stack
-	ui_menu::stack_reset(machine);
+	ui_menu::stack_reset(mui.machine());
 
 	// add the quit entry followed by the game select entry
-	ui_menu *quit = global_alloc_clear<ui_menu_quit_game>(machine, container);
+	ui_menu *quit = global_alloc_clear<ui_menu_quit_game>(mui, container);
 	quit->set_special_main_menu(true);
 	ui_menu::stack_push(quit);
-	ui_menu::stack_push(global_alloc_clear<ui_menu_file_manager>(machine, container, warnings));
+	ui_menu::stack_push(global_alloc_clear<ui_menu_file_manager>(mui, container, warnings));
 
 	// force the menus on
-	mame_machine_manager::instance()->ui().show_menu();
+	mui.show_menu();
 
 	// make sure MAME is paused
-	machine.pause();
+	mui.machine().pause();
 }

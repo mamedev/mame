@@ -12,11 +12,7 @@
 #ifndef __MAME_H__
 #define __MAME_H__
 
-#include "emu.h"
-#include <time.h>
-#include "pluginopts.h"
-#include "ui/ui.h"
-
+class plugin_options;
 class osd_interface;
 
 //**************************************************************************

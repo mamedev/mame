@@ -21,7 +21,7 @@ using vptr_game = std::vector<const game_driver *>;
 class ui_menu_audit : public ui_menu
 {
 public:
-	ui_menu_audit(running_machine &machine, render_container *container, vptr_game &availablesorted, vptr_game &unavailablesorted, int audit_mode);
+	ui_menu_audit(mame_ui_manager &mui, render_container *container, vptr_game &availablesorted, vptr_game &unavailablesorted, int audit_mode);
 	virtual ~ui_menu_audit();
 	virtual void populate() override;
 	virtual void handle() override;

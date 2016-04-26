@@ -20,7 +20,7 @@
 class ui_menu_custom_ui : public ui_menu
 {
 public:
-	ui_menu_custom_ui(running_machine &machine, render_container *container);
+	ui_menu_custom_ui(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_custom_ui();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -46,7 +46,7 @@ private:
 class ui_menu_font_ui : public ui_menu
 {
 public:
-	ui_menu_font_ui(running_machine &machine, render_container *container);
+	ui_menu_font_ui(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_font_ui();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -81,7 +81,7 @@ private:
 class ui_menu_colors_ui : public ui_menu
 {
 public:
-	ui_menu_colors_ui(running_machine &machine, render_container *container);
+	ui_menu_colors_ui(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_colors_ui();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -126,7 +126,7 @@ private:
 class ui_menu_rgb_ui : public ui_menu
 {
 public:
-	ui_menu_rgb_ui(running_machine &machine, render_container *container, rgb_t *_color, std::string _title);
+	ui_menu_rgb_ui(mame_ui_manager &mui, render_container *container, rgb_t *_color, std::string _title);
 	virtual ~ui_menu_rgb_ui();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -158,7 +158,7 @@ private:
 class ui_menu_palette_sel : public ui_menu
 {
 public:
-	ui_menu_palette_sel(running_machine &machine, render_container *container, rgb_t &_color);
+	ui_menu_palette_sel(mame_ui_manager &mui, render_container *container, rgb_t &_color);
 	virtual ~ui_menu_palette_sel();
 	virtual void populate() override;
 	virtual void handle() override;

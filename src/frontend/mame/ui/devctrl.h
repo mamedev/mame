@@ -27,7 +27,7 @@ template<class _DeviceType>
 class ui_menu_device_control : public ui_menu
 {
 public:
-	ui_menu_device_control(running_machine &machine, render_container *container, _DeviceType *device);
+	ui_menu_device_control(mame_ui_manager &mui, render_container *container, _DeviceType *device);
 
 protected:
 	_DeviceType *current_device() { return m_device; }
@@ -53,10 +53,10 @@ private:
 //-------------------------------------------------
 
 template<class _DeviceType>
-ui_menu_device_control<_DeviceType>::ui_menu_device_control(running_machine &machine, render_container *container, _DeviceType *device)
-	: ui_menu(machine, container)
+ui_menu_device_control<_DeviceType>::ui_menu_device_control(mame_ui_manager &mui, render_container *container, _DeviceType *device)
+	: ui_menu(mui, container)
 {
-	iterator iter(machine.root_device());
+	iterator iter(mui.machine().root_device());
 	m_count = iter.count();
 	m_device = device ? device : iter.first();
 }

@@ -16,7 +16,7 @@
 #include "ui/sliders.h"
 
 
-ui_menu_sliders::ui_menu_sliders(running_machine &machine, render_container *container, bool menuless_mode) : ui_menu(machine, container)
+ui_menu_sliders::ui_menu_sliders(mame_ui_manager &mui, render_container *container, bool menuless_mode) : ui_menu(mui, container)
 {
 	m_menuless_mode = m_hidden = menuless_mode;
 }
@@ -139,7 +139,7 @@ void ui_menu_sliders::populate()
 	std::string tempstring;
 
 	/* add UI sliders */
-	std::vector<ui_menu_item> ui_sliders = mame_machine_manager::instance()->ui().get_slider_list();
+	std::vector<ui_menu_item> ui_sliders = ui().get_slider_list();
 	for (ui_menu_item item : ui_sliders)
 	{
         if (item.type == ui_menu_item_type::SLIDER)
@@ -182,7 +182,7 @@ void ui_menu_sliders::populate()
         }
 	}
 
-	custombottom = 2.0f * mame_machine_manager::instance()->ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+	custombottom = 2.0f * ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 }
 
 /*-------------------------------------------------
@@ -196,7 +196,7 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 	if (curslider != nullptr)
 	{
 		float bar_left, bar_area_top, bar_width, bar_area_height, bar_top, bar_bottom, default_x, current_x;
-		float line_height = mame_machine_manager::instance()->ui().get_line_height();
+		float line_height = ui().get_line_height();
 		float percentage, default_percentage;
 		std::string tempstring;
 		float text_height;
@@ -219,12 +219,12 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 		x2 = 1.0f - UI_BOX_LR_BORDER;
 
 		/* draw extra menu area */
-		mame_machine_manager::instance()->ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+		ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 		y1 += UI_BOX_TB_BORDER;
 
 		/* determine the text height */
-		mame_machine_manager::instance()->ui().draw_text_full(container, tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
-					JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, nullptr, &text_height);
+		ui().draw_text_full(container, tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
+					JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, rgb_t::white, rgb_t::black, nullptr, &text_height);
 
 		/* draw the thermometer */
 		bar_left = x1 + UI_BOX_LR_BORDER;
@@ -250,7 +250,7 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 		container->add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		/* draw the actual text */
-		mame_machine_manager::instance()->ui().draw_text_full(container, tempstring.c_str(), x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
+		ui().draw_text_full(container, tempstring.c_str(), x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
 					JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, &text_height);
 	}
 }
@@ -262,20 +262,20 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
  standard menu handler
  -------------------------------------------------*/
 
-UINT32 ui_menu_sliders::ui_handler(running_machine &machine, render_container *container, UINT32 state)
+UINT32 ui_menu_sliders::ui_handler(mame_ui_manager &mui, render_container *container, UINT32 state)
 {
 	UINT32 result;
 
 	/* if this is the first call, push the sliders menu */
 	if (state)
-		ui_menu::stack_push(global_alloc_clear<ui_menu_sliders>(machine, container, true));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_sliders>(mui, container, true));
 
 	/* handle standard menus */
-	result = ui_menu::ui_handler(machine, container, state);
+	result = ui_menu::ui_handler(mui, container, state);
 
 	/* if we are cancelled, pop the sliders menu */
 	if (result == UI_HANDLER_CANCEL)
-		ui_menu::stack_pop(machine);
+		ui_menu::stack_pop(mui.machine());
 
 	ui_menu_sliders *uim = dynamic_cast<ui_menu_sliders *>(menu_stack);
 	return uim && uim->m_menuless_mode ? 0 : UI_HANDLER_CANCEL;

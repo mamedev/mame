@@ -23,8 +23,8 @@ struct ui_software_info;
 class ui_menu_dats_view : public ui_menu
 {
 public:
-	ui_menu_dats_view(running_machine &machine, render_container *container, ui_software_info *swinfo, const game_driver *driver = nullptr);
-	ui_menu_dats_view(running_machine &machine, render_container *container, const game_driver *driver = nullptr);
+	ui_menu_dats_view(mame_ui_manager &mui, render_container *container, ui_software_info *swinfo, const game_driver *driver = nullptr);
+	ui_menu_dats_view(mame_ui_manager &mui, render_container *container, const game_driver *driver = nullptr);
 	virtual ~ui_menu_dats_view();
 	virtual void populate() override;
 	virtual void handle() override;

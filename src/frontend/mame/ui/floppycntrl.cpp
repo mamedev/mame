@@ -17,7 +17,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-ui_menu_control_floppy_image::ui_menu_control_floppy_image(running_machine &machine, render_container *container, device_image_interface *_image) : ui_menu_control_device_image(machine, container, _image)
+ui_menu_control_floppy_image::ui_menu_control_floppy_image(mame_ui_manager &mui, render_container *container, device_image_interface *_image) : ui_menu_control_device_image(mui, container, _image)
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
 	const floppy_image_format_t *fif_list = fd->get_formats();
@@ -91,7 +91,7 @@ void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist
 			can_in_place = false;
 	}
 	submenu_result = -1;
-	ui_menu::stack_push(global_alloc_clear<ui_menu_select_rw>(machine(), container, can_in_place, &submenu_result));
+	ui_menu::stack_push(global_alloc_clear<ui_menu_select_rw>(ui(), container, can_in_place, &submenu_result));
 	state = SELECT_RW;
 }
 
@@ -117,7 +117,7 @@ void ui_menu_control_floppy_image::handle()
 				format_array[total_usable++] = i;
 		}
 		submenu_result = -1;
-		ui_menu::stack_push(global_alloc_clear<ui_menu_select_format>(machine(), container, format_array, ext_match, total_usable, &submenu_result));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_select_format>(ui(), container, format_array, ext_match, total_usable, &submenu_result));
 
 		state = SELECT_FORMAT;
 		break;
@@ -154,7 +154,7 @@ void ui_menu_control_floppy_image::handle()
 			break;
 
 		case ui_menu_select_rw::WRITE_OTHER:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_file_create>(machine(), container, image, current_directory, current_file, &create_ok));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_file_create>(ui(), container, image, current_directory, current_file, &create_ok));
 			state = CHECK_CREATE;
 			break;
 

@@ -26,7 +26,7 @@ void ui_gfx_init(running_machine &machine);
 bool ui_gfx_is_relevant(running_machine &machine);
 
 // master handler
-UINT32 ui_gfx_ui_handler(running_machine &machine, render_container *container, UINT32 state);
+UINT32 ui_gfx_ui_handler(mame_ui_manager &mui, render_container *container, UINT32 state);
 
 
 #endif  /* __UI_VIEWGFX_H__ */

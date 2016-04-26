@@ -17,14 +17,14 @@
 
 class ui_menu_sliders : public ui_menu {
 public:
-	ui_menu_sliders(running_machine &machine, render_container *container, bool menuless_mode = false);
+	ui_menu_sliders(mame_ui_manager &mui, render_container *container, bool menuless_mode = false);
 	virtual ~ui_menu_sliders();
 	virtual void populate() override;
 	virtual void handle() override;
 
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
-	static UINT32 ui_handler(running_machine &machine, render_container *container, UINT32 state);
+	static UINT32 ui_handler(mame_ui_manager &mui, render_container *container, UINT32 state);
 
 private:
 	enum {
