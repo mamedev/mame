@@ -481,104 +481,112 @@ Notes:
 
 
   <!--Ninja Ryukenden -->
-  <software name="tvninjar">
+  <software name="nryukend">
     <description>Ninja Ryukenden (Tourvision PCE bootleg)</description>
     <year>1992</year>
     <publisher>bootleg (Tourvision) / Temco / Hudson Soft</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_ninja_ryukenden.bin" size="0x100000" crc="d9cc00ca" sha1="42d914d338d7d0073b5cc98a4e85729e86bbfad1" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="ninja ryuuken den (japan).pce" size="524288" crc="67573bac" sha1="7f6a088424f849fc80f883d19533c031305d9616" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Operation Wolf -->
-  <software name="tvopwolf">
+  <software name="opwolf">
     <description>Operation Wolf (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Taito / Nec Avenue</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_operation_wolf.bin" size="0x100000" crc="d4a755a9" sha1="cd236ba0c3439ba2356cb270f56a41a52e0d6dc6" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="operation wolf (japan).pce" size="524288" crc="ff898f87" sha1="da2a28e2961fa295c4b8f55bd5a6ce6f1c58beb7" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Override -->
-  <software name="tvovride">
+  <software name="override">
     <description>Override (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Sting / Data East Corporation</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_override.bin" size="0x100000" crc="4dbbf4ef" sha1="180a68f87a881db1d01ffa3566e0d2e28303d09e" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="override (japan).pce" size="262144" crc="b74ec562" sha1="9da08c896e02b67257521b948c2fa5bc55724c0d" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Pac-Land -->
-  <software name="tvpaclnd">
+  <software name="pacland">
     <description>Pac-Land (Tourvision PCE bootleg)</description>
     <year>1989</year>
     <publisher>bootleg (Tourvision) / Namco / Namcot</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_pac-land.bin" size="0x100000" crc="32aee4e2" sha1="900a918e73aaa1dc5752f851ebd85217e736109b" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="pac-land (japan).pce" size="262144" crc="14fad3ba" sha1="fc0166da82ed3cf4a4e06fc6c73fd3184ba8bb3b" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--PC Genjin Punkic Cyborg -->
-  <software name="tvpcybrg">
-    <description>PC Genjin Punkic Cyborg (Tourvision PCE bootleg)</description>
+  <software name="pcdenj">
+    <description>PC Denjin Punkic Cyborg (Tourvision PCE bootleg)</description>
     <year>1992</year>
     <publisher>bootleg (Tourvision) / Hudson Soft / Red</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_pc_genijin_punkic_cyborg.bin" size="0x100000" crc="5dfdc8fd" sha1="e4e263cf7c102837c7d669d27894085f3369dd9b" offset="000000" />
-      </dataarea>
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="pc denjin - punkic cyborgs (japan).pce" size="524288" crc="740491c2" sha1="7713236070c2d5252faa651b6a8b7726cadb9bf4" offset="000000" />
+      </dataarea>     
     </part>
   </software>
 
 
   <!--PC Genjin 2 - Hudson -->
-  <software name="tvpcgen2">
+  <software name="pcgenj2">
     <description>PC Genjin 2 - Pithecanthropus Computerurus (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Hudson Soft / Red</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_pckid2.bin" size="0x100000" crc="57fab9ee" sha1="07c8b18905fceac73c3e18b747e8cf92d8a5f515" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="pc genjin 2 - pithecanthropus computerurus (japan).pce" size="524288" crc="3028f7ca" sha1="ef2b10e9bd35428bff3d67b9f77dd3ff50d91f2e" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Power 11 - Hudson -->
-  <software name="tvpow11">
+  <software name="power11">
     <description>Power Eleven (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Hudson Soft</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_pow11.bin" size="0x100000" crc="375114a3" sha1="845633345886b335e6c82b3f56ef012d9820e64d" offset="000000" />
+      <dataarea name="rom" size="393216">
+        <!-- verified identical -->
+        <rom name="power eleven (japan).pce" size="393216" crc="3e647d8b" sha1="f132948117d3135ec8d5d74eaac8d965e6676fb4" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Power Drift -->
-  <software name="tvpdrift">
+  <software name="pdrift">
     <description>Power Drift (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Sega / Asmik Corporation</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_power_drift.bin" size="0x100000" crc="eb2fdf0b" sha1="da2191dd6e9d186c10c1c4d415254b8d7c456159" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="power drift (japan).pce" size="524288" crc="25e0f6e9" sha1="1ffe1111a570b0cca256a356965fd6cdf7bcf2e9" offset="000000" />
       </dataarea>
     </part>
   </software>
@@ -592,52 +600,56 @@ Notes:
 -Cart's A19 line seems not connected to anything.
 -CRC of split ROM ("30cc3563") matches the common PC Engine Hu-Card ROM dump.
 -->
-  <software name="tvpwlg4">
+  <software name="pleag4">
     <description>Power League IV (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Hudson Soft</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_powerleague4.bin" size="0x100000" crc="0a6e65f8" sha1="88adf3f5b9a6d139f216bdb73abf8606bb8e5b16" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="power league iv (japan).pce" size="524288" crc="30cc3563" sha1="a21825a19bef0a4d7847f72b4a00acd74a53ebb8" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Pro Yakyuu World Stadium '91 -->
-  <software name="tvpros91">
+  <software name="proyak91">
     <description>Pro Yakyuu World Stadium '91 (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Namco / Namcot</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_pro_yakyuu_world_stadium_91.bin" size="0x100000" crc="2a5f1283" sha1="e5044e397e6ccbc5c5741fa3f073697b60116325" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="pro yakyuu world stadium '91 (japan).pce" size="262144" crc="66b167a9" sha1="6b76e9cc10a812c15631450b617ea3719fdcdc16" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Psycho Chaser -->
-  <software name="tvpchasr">
+  <software name="psychas">
     <description>Psycho Chaser (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Naxat Soft</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_pyscho_chaser.bin" size="0x100000" crc="e0b65280" sha1="83248975e9bea62e67b5314c663d372c12b08416" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="psycho chaser (japan).pce" size="262144" crc="03883ee8" sha1="753fc6f1aa16770c87cc12967a43e951a7b1ec83" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Puzzle Boy -->
-  <software name="tvpzlboy">
+  <software name="puzzlboy">
     <description>Puzzle Boy (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Atlus / Telenet Japan</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_puzzle_boy.bin" size="0x100000" crc="0dd96cda" sha1="652ce8b06f2aef69698d4372ff67b86362655de5" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="puzzle boy (japan).pce" size="262144" crc="faa6e187" sha1="f3d87e780683cd1873287069f4758581bb848935" offset="000000" />
       </dataarea>
     </part>
   </software>
