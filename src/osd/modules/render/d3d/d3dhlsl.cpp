@@ -16,6 +16,7 @@
 
 // MAME headers
 #include "emu.h"
+#include "drivenum.h"
 #include "render.h"
 #include "ui/uimain.h"
 #include "rendutil.h"
