@@ -1,0 +1,903 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pce_tourvision" description="Tourvision (bootleg Arcade NEC PC-Engine) cartridges">
+
+  <!--1943 Kai -->
+  <software name="tv1943">
+    <description>1943 Kai (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Capcom / Naxat Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_1943_kia.bin" size="0x100000" crc="de4672ab" sha1="2da1ee082bfb920c632a95014208f11fb48c58e1" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <!--Aero Blasters - Hudson / Kaneko -->
+  <software name="tvablast">
+    <description>Aero Blasters (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Inter State / Kaneko / Hudson Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_ablast.bin" size="0x100000" crc="9302f6d0" sha1="76ef27a6d639514ed261b9d65f37217f2989d1c0" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--After Burner -->
+  <software name="tvaburn">
+    <description>After Burner (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Sega / Nec Avenue</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_afterburner.bin" size="0x100000" crc="5ce31322" sha1="08918d443891bd70f1b0b0c739522b764b16bc96" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Armed-F -->
+  <software name="tvarmedf">
+    <description>Armed-F (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Nichibutsu / Big Don</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_armed-f.bin" size="0x100000" crc="056617f5" sha1="d10eb80b8436b8d217170309647104181cca750a" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Ballistix -->
+  <software name="tvbalstx">
+    <description>Ballistix (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Psygnosis / Coconuts Japan</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_ballistix.bin" size="0x100000" crc="9d32ed98" sha1="404cc3695940a7fdc802ac166ec564a858a894d0" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Be Ball -->
+  <software name="tvbeball">
+    <description>Be Ball (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Hudson Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_be_ball.bin" size="0x100000" crc="4b1e2861" sha1="bea449543284bb6f4b33b1fb4156cd18a782ad6a" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Bomberman -->
+  <software name="tvbomber">
+    <description>Bomberman (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Hudson Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_bomberman.bin" size="0x100000" crc="cfcabe78" sha1="bdd1766fad43c6c76e1b0d6e8b4f0ba3363442d6" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Chozetsurinjin Beraboh Man (Super Foolist Man) -->
+  <software name="tvbrabho">
+    <description>Chouzetsu Rinjin - Bravoman (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Namco / Namcot</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_chozetsurinjin_beraboh_man.bin" size="0x100000" crc="1f80cf04" sha1="121bfb9ba4de4d047b08442d900b7f351210dd48" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Chuka Taisen -->
+  <software name="tvtaisen">
+    <description>Chuka Taisen (Tourvision PCE bootleg)</description>
+    <year>1992</year>
+    <publisher>bootleg (Tourvision) / Taito Corporation</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_chuka_taisen.bin" size="0x100000" crc="3b9e9185" sha1="96f9f82a9fa6ee2b92c0294e71d47886e27fdc06" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Columns - Telenet Japan -->
+  <software name="tvcolumn">
+    <description>Columns (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Telenet Japan</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_column.bin" size="0x100000" crc="bb01dea8" sha1="24e00aee5117e996becb56b59851e54e3f2fa11f" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Coryoon -->
+  <software name="tvcoryon">
+    <description>Coryoon - Child of Dragon (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Naxat Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_corycoon.bin" size="0x100000" crc="c377db91" sha1="1585d886f775ed361b2558839e544660533e9297" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Daisenpu -->
+  <software name="tvdsenpu">
+    <description>Daisenpu (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Toaplan / Nec Avenue</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_daisenpu.bin" size="0x100000" crc="5a8cef75" sha1="00f27127114e4f5bf69c81212e66948caaec755d" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Dead Moon -->
+  <software name="tvdmoon">
+    <description>Dead Moon (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / T.S.S</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_dead_moon.bin" size="0x100000" crc="b54793c1" sha1="8899947092d9a02f3be61ac9c293642e83a015ec" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Devil Crash -->
+  <software name="tvdevilc">
+    <description>Devil Crash (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Naxat / Red</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_devil_crash.bin" size="0x100000" crc="c163e5c1" sha1="2134b3943df87af556694dbe6c77b30723f9175a" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Dodge Ball -->
+  <software name="tvdodgeb">
+    <description>Dodge Ball (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Technos Japan Corp / Naxat Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_dodge_ball.bin" size="0x100000" crc="7a12cf72" sha1="c477bc5dae4e82a89766052f185afb73ca2234f3" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Doraemon Meikyuu Daisakusen -->
+  <software name="tvdormon">
+    <description>Doraemon Meikyuu Dai Sakusen (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Fujiko-Shogakukan-TV Asahi / Hudson Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_doreamon.bin" size="0x100000" crc="22e8b5ba" sha1="f21101358df8625c39a5078b9f1b1a0215470bed" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Dragon Spirit -->
+  <software name="tvdrgnst">
+    <description>Dragon Spirit (Tourvision PCE bootleg)</description>
+    <year>1988</year>
+    <publisher>bootleg (Tourvision) / Namcot</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_dragon_spirit.bin" size="0x100000" crc="5733951f" sha1="0256b4c343a3ad1ca625c316a470cc91a5254e8e" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+
+  <!--
+Dungeon Explorer TourVision cart - Hudson / Atlus
+
+Notes:
+-Cart's A18 line (pin 32) seems not connected to anything.
+-->
+  <software name="tvdunexp">
+    <description>Dungeon Explorer (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Atlus Ltd. / Hudson Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_dungeonexplorer.bin" size="0x100000" crc="6ecc87f4" sha1="02eb3ae0b336dbcda12166b10c9f19486fb177e0" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Final Blaster -->
+  <software name="tvfblast">
+    <description>Final Blaster (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Namco / Namcot</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_final_blaster.bin" size="0x100000" crc="f5f7483c" sha1="3933719bdd7a0c73cdad76de78d80463112b475a" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Final Lap Twin - Namco -->
+  <software name="tvflaptw">
+    <description>Final Lap Twin (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Namco Ltd. / Namcot</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_flaptw.bin" size="0x100000" crc="3ca56272" sha1="9b5417ae9a9400fead170e882d3dae19edfd7157" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Final Match Tennis -->
+  <software name="tvftenis">
+    <description>Final Match Tennis (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Human</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_final_match_tennis.bin" size="0x100000" crc="f83ed70f" sha1="f566bd7a806c11f3d33ba0a976e36026a131e6fd" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Formation Soccer - Human Cup ' 90 - Human -->
+  <software name="tvfsoc90">
+    <description>Formation Soccer - Human Cup '90 (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Human</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_fsoc90.bin" size="0x100000" crc="428ffeb1" sha1="5d12f3ed7f42b2b6da4d8eba95a16e2d34616846" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Gomola Speed - Human -->
+  <software name="tvgomola">
+    <description>Gomola Speed (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Human</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_gomola.bin" size="0x100000" crc="41e8e18f" sha1="210e511b85056bf216fc0d2540ed379a9dc7c18f" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Gunhed -->
+  <software name="tvgunhed">
+    <description>GunHed (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Hudson / Toho Sunrise</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_gunhed.bin" size="0x100000" crc="9baace99" sha1="ab676ba72a80314e8cba3810789041d3cc6298f9" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Hana Taka Daka (Super Long Nose Goblin) -->
+  <software name="tvhtdaka">
+    <description>Hana Taaka Daka!? (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Taito Corporation</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_hana_taka_daka.bin" size="0x100000" crc="0fbfda5c" sha1="02b2ce93ee5e2aaa11c8640ced15258d0d844e6f" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Jakie Chan - Hudson -->
+  <software name="tvjchan">
+    <description>Jackie Chan (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Hudson Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_jchan.bin" size="0x100000" crc="7fe2b77c" sha1="f27251451301dfb800e454c09fbb82d43b518592" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--jinmu Densho -->
+  <software name="tvdensho">
+    <description>Jinmu Denshou (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Big Club / Wolf Team</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_dinmu_densho.bin" size="0x100000" crc="411a8643" sha1="46258042dcf6510404ebccaf47034421928f72a8" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Kiki Kaikai -->
+  <software name="tvkaikai">
+    <description>Kiki Kaikai (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Taito</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_kiki_kaikai.bin" size="0x100000" crc="2bdd93f9" sha1="9b08606865abb8cc8fa17a22becae34b172ff81a" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Ledgnd of Hero Tonma -->
+  <software name="tvtonma">
+    <description>Legend of Hero Tonma (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / IREM Corp</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_legend_of_hero_tonma.bin" size="0x100000" crc="e7c2efe3" sha1="5767bdfa5600b1586e49c17cebd0fd7ef2c5426c" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+
+  <!--Makyo Densetsu - The Legenary Axe - Victor Musical Industries, Inc. -->
+  <software name="tvlegaxe">
+    <description>Makyou Densetsu - The Legenary Axe (Tourvision PCE bootleg)</description>
+    <year>1988</year>
+    <publisher>bootleg (Tourvision) / Victor Musical Industries, Inc.</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_makyodensetsuthelegendaryaxe.bin" size="0x100000" crc="50ec3f97" sha1="d583fa240a4dfd14b0d53ff78762fbac52694dd2" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Mizubaku Daibouken Liquid Kids -->
+  <software name="tvlqkids">
+    <description>Mizubaku Daibouken Liquid Kids (Tourvision PCE bootleg)</description>
+    <year>1992</year>
+    <publisher>bootleg (Tourvision) / Taito Corporation</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_liquid_kids.bin" size="0x100000" crc="23a8636d" sha1="752e03dcf8617b5a39cd250f4db1fe13cd13b761" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Mr Heli -->
+  <software name="tvmrheli">
+    <description>Mr. Heli no Daibouken (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / IREM Corp</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_mr_heli.bin" size="0x100000" crc="bf197c7a" sha1="048f91f8ab86220a39ab146e531081950eaf1138" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Ninja Ryukenden -->
+  <software name="tvninjar">
+    <description>Ninja Ryukenden (Tourvision PCE bootleg)</description>
+    <year>1992</year>
+    <publisher>bootleg (Tourvision) / Temco / Hudson Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_ninja_ryukenden.bin" size="0x100000" crc="d9cc00ca" sha1="42d914d338d7d0073b5cc98a4e85729e86bbfad1" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Operation Wolf -->
+  <software name="tvopwolf">
+    <description>Operation Wolf (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Taito / Nec Avenue</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_operation_wolf.bin" size="0x100000" crc="d4a755a9" sha1="cd236ba0c3439ba2356cb270f56a41a52e0d6dc6" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Override -->
+  <software name="tvovride">
+    <description>Override (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Sting / Data East Corporation</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_override.bin" size="0x100000" crc="4dbbf4ef" sha1="180a68f87a881db1d01ffa3566e0d2e28303d09e" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Pac-Land -->
+  <software name="tvpaclnd">
+    <description>Pac-Land (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Namco / Namcot</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_pac-land.bin" size="0x100000" crc="32aee4e2" sha1="900a918e73aaa1dc5752f851ebd85217e736109b" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--PC Genjin Punkic Cyborg -->
+  <software name="tvpcybrg">
+    <description>PC Genjin Punkic Cyborg (Tourvision PCE bootleg)</description>
+    <year>1992</year>
+    <publisher>bootleg (Tourvision) / Hudson Soft / Red</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_pc_genijin_punkic_cyborg.bin" size="0x100000" crc="5dfdc8fd" sha1="e4e263cf7c102837c7d669d27894085f3369dd9b" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--PC Genjin 2 - Hudson -->
+  <software name="tvpcgen2">
+    <description>PC Genjin 2 - Pithecanthropus Computerurus (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Hudson Soft / Red</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_pckid2.bin" size="0x100000" crc="57fab9ee" sha1="07c8b18905fceac73c3e18b747e8cf92d8a5f515" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Power 11 - Hudson -->
+  <software name="tvpow11">
+    <description>Power Eleven (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Hudson Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_pow11.bin" size="0x100000" crc="375114a3" sha1="845633345886b335e6c82b3f56ef012d9820e64d" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Power Drift -->
+  <software name="tvpdrift">
+    <description>Power Drift (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Sega / Asmik Corporation</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_power_drift.bin" size="0x100000" crc="eb2fdf0b" sha1="da2191dd6e9d186c10c1c4d415254b8d7c456159" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--
+Power League IV - Hudson
+
+Notes:
+-1st and 2nd halfs are identical, left unsplit for reference.
+-Cart's A19 line seems not connected to anything.
+-CRC of split ROM ("30cc3563") matches the common PC Engine Hu-Card ROM dump.
+-->
+  <software name="tvpwlg4">
+    <description>Power League IV (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Hudson Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_powerleague4.bin" size="0x100000" crc="0a6e65f8" sha1="88adf3f5b9a6d139f216bdb73abf8606bb8e5b16" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Pro Yakyuu World Stadium '91 -->
+  <software name="tvpros91">
+    <description>Pro Yakyuu World Stadium '91 (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Namco / Namcot</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_pro_yakyuu_world_stadium_91.bin" size="0x100000" crc="2a5f1283" sha1="e5044e397e6ccbc5c5741fa3f073697b60116325" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Psycho Chaser -->
+  <software name="tvpchasr">
+    <description>Psycho Chaser (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Naxat Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_pyscho_chaser.bin" size="0x100000" crc="e0b65280" sha1="83248975e9bea62e67b5314c663d372c12b08416" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Puzzle Boy -->
+  <software name="tvpzlboy">
+    <description>Puzzle Boy (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Atlus / Telenet Japan</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_puzzle_boy.bin" size="0x100000" crc="0dd96cda" sha1="652ce8b06f2aef69698d4372ff67b86362655de5" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Raiden -->
+  <software name="tvraiden">
+    <description>Raiden (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Seibu Kaihatsu inc / Hudson Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_raiden.bin" size="0x100000" crc="b99a85b6" sha1="5c8b103c5a7bfeba20dcc490204d672b55e36452" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--
+Rastan Saga II Tourvision cart - Taito
+
+Notes:
+-Cart's A18 line seems not connected to anything.
+-->
+  <software name="tvrs2">
+    <description>Rastan Saga II (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Taito Corporation</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_rastansagaii.bin" size="0x100000" crc="cfe4c2f1" sha1="1e39276b7d4bdb49421cc1102ad2fbba946127da" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--R-Type II -->
+  <software name="tvrtype2">
+    <description>R-Type II (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / IREM Corp</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_r-type_ii.bin" size="0x100000" crc="b03bfd7a" sha1="cc8cec1fc4bae3937d0ed60468ff703d07ce9d0c" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Saiga No Nindou - Ninja Spirit -->
+  <software name="tvninjas">
+    <description>Saigo no Nindou - Ninja Spirit (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / IREM Corp</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_saiga_no_nindou.bin" size="0x100000" crc="87894514" sha1="6845c29247f9dd805b7cd8cb046e88526e853a11" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Salamander -->
+  <software name="tvslmndr">
+    <description>Salamander (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Konami</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_salamander.bin" size="0x100000" crc="ae8bcdf1" sha1="3cc48fa594ab5ce1573c61861ec8e927163b6abb" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Shinobi -->
+  <software name="tvshnobi">
+    <description>Shinobi (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Sega / Asmik Corporation</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_shinobi.bin" size="0x100000" crc="091a2b01" sha1="aac2d5fadc74f837b73f662456f8a308413de57a" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Side arms -->
+  <software name="tvsdarms">
+    <description>Side Arms (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Capcom / Nec Avenue</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_side_arms.bin" size="0x100000" crc="04256267" sha1="a4ff8f19fa528fc8a7aae5ad7e0c574dc52c3388" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Skweek -->
+  <software name="tvskweek">
+    <description>Skweek (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Victor Musical Industries, Inc.</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_skweek.bin" size="0x100000" crc="b2a86ecc" sha1="c1b113132ca6be1b0f3f16f31cc5ba894bee7e91" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Son Son II -->
+  <software name="tvsson2">
+    <description>Son Son II (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Capcom / Nec Avenue</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_son_son_ii.bin" size="0x100000" crc="8fb484cd" sha1="553838dcb3524fe0b620ea60e926a57cc371068d" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--
+Special Criminal Investigation (SCI) - Taito
+
+Notes:
+-1st and 2nd halfs are identical, left unsplit for reference.
+-Cart's A19 line seems not connected to anything.
+-CRC of split ROM ("09a0bfcc") matches the common English language PC Engine Hu-Card ROM dump.
+-->
+  <software name="tvsci">
+    <description>Special Criminal Investigation (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Taito Corporation</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_sci.bin" size="0x100000" crc="4baac6d8" sha1="4c2431d9553e2bd952cf816e78fc1e3387376ef4" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Super Star Soldier - Hudson / Kaneko -->
+  <software name="tvsssold">
+    <description>Super Star Soldier (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Inter State / Kaneko / Hudson Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_sssold.bin" size="0x100000" crc="bb2a0b14" sha1="5380d25b4d5bb3e0048ed857fd36a8206e81a234" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Super Volley ball - Video System -->
+  <software name="tvsvball">
+    <description>Super Volley ball (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Video System</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_supervolleyball.bin" size="0x100000" crc="8a32a1ca" sha1="80144fb4035415eb9b2c67d78d55757ed0d641a1" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Tatsujin -->
+  <software name="tvtsujin">
+    <description>Tatsujin (Tourvision PCE bootleg)</description>
+    <year>1992</year>
+    <publisher>bootleg (Tourvision) / Toaplan Co Ltd / Taito Corporation</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_tatsujin.bin" size="0x100000" crc="023adbcc" sha1="bef7d03fff2e74970a0747c12d31ec8661703deb" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Terra Cresta II -->
+  <software name="tvtcrst2">
+    <description>Terra Cresta II (Tourvision PCE bootleg)</description>
+    <year>1992</year>
+    <publisher>bootleg (Tourvision) / Nichibutsu / Nihon Bussan Co., Ltd</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_terra_cresta_ii.bin" size="0x100000" crc="8e7bb390" sha1="af13afe006313b0db1273782c977efdad6100291" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--
+Thunder Blade Tourvision cart - Sega / NEC Avenue
+
+Notes:
+-1st and 2nd halfs are identical, left unsplit for reference.
+-Cart's A19 line seems not connected to anything.
+-CRC of split ROM ("DDC3E809") matches the common PC Engine Hu-Card ROM dump.
+-->
+  <software name="tvthbld">
+    <description>Thunder Blade (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Sega / NEC Avenue</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_thunderblade.bin" size="0x100000" crc="0b93b85b" sha1="b7d9fc2f46f95d305aa24326eded13abbe93738c" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Toy Shop Boys -->
+  <software name="tvtsboys">
+    <description>Toy Shop Boys (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Victor Musical Industries, Inc.</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_toy_shop_boys.bin" size="0x100000" crc="a9ed3440" sha1="c519744cc16dad7a1455e359020ce95f4ac0b51a" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--
+USA Pro Basketball - Aicom
+
+Notes:
+-4 identical 256KB parts, left unsplit for reference.
+-Cart's A19 and A18 lines seems not connected to anything.
+-CRC of split ROM ("1CAD4B7F") matches the common PC Engine Hu-Card ROM dump.
+-->
+  <software name="tvusapb">
+    <description>USA Pro Basketball (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Aicom Corporation</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_usaprobasketball.bin" size="0x100000" crc="f9a86270" sha1="45f33fd80a0fa16a9271d258d8e827c3d5e8c98d" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Veigues -->
+  <software name="tveigues">
+    <description>Veigues - Tactical Gladiator (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Victor Musical Industries, Inc.</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_veigues.bin" size="0x100000" crc="64ef8be7" sha1="634191a181cbccbed8cf7a86e4f074691ba9b715" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Volfied - Taito -->
+  <software name="tvvolfd">
+    <description>Volfied (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Taito Corporation</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_volfd.bin" size="0x100000" crc="6349113d" sha1="b413342122409ea4ed981bd5077285cdcf337890" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--Winning Shot -->
+  <software name="tvwnshot">
+    <description>Winning Shot (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Data East Corp.</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_winning_shot.bin" size="0x100000" crc="7196b2ca" sha1="a1ae2e875541ad39751a95629d614d2c913b8c02" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <!--W-Ring -->
+  <software name="tvwring">
+    <description>W-Ring - The Double Rings (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Naxat Soft</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_w-ring.bin" size="0x100000" crc="609dc08d" sha1="191b8751fc5b8700c7d9dae23d194016fe84586c" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <!--Xevious -->
+  <software name="tvxvious">
+    <description>Xevious (Tourvision PCE bootleg)</description>
+    <year>1990</year>
+    <publisher>bootleg (Tourvision) / Namco Ltd. / Namcot</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <rom name="tourv_xevious.bin" size="0x100000" crc="3c0fb5a9" sha1="1fd9ff582da83e1b9fee569da4db4de15e912f62" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+</softwarelist>
+
+
+
