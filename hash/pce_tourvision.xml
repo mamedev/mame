@@ -988,7 +988,20 @@ Notes:
       </dataarea>
     </part>
   </software>
-  
+
+
+  <software name="parasol">
+    <description>Parasol Stars - The Story of Bubble Bobble III (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Taito</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="393216">
+        <!-- NOT dumped from an actual Tourvision cart yet, hence bad_dump, but we know it exists, and it's likely identical. -->
+        <rom name="parasol stars - the story of bubble bobble iii (japan).pce" status="baddump" size="393216" crc="51e86451" sha1="94a4c4b16435b043b0b985af446d8767602f5041" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
 </softwarelist>
 
 
