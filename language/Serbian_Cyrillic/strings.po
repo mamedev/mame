@@ -755,7 +755,7 @@ msgstr "Варањe"
 
 #: src/emu/ui/mainmenu.cpp:135
 msgid "Plugin Options"
-msgstr ""
+msgstr "Опције додатака"
 
 #: src/emu/ui/mainmenu.cpp:139
 msgid "External DAT View"
@@ -893,15 +893,15 @@ msgstr "%s.txt сачуван у ui дирeкториjум."
 
 #: src/emu/ui/miscmenu.cpp:677
 msgid "Export list in XML format (like -listxml)"
-msgstr ""
+msgstr "Експортуј листу у XML формату (као -listxml)"
 
 #: src/emu/ui/miscmenu.cpp:678
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr ""
+msgstr "Експортуј листу у XML формату (као -listxml, али без уређаја)"
 
 #: src/emu/ui/miscmenu.cpp:679
 msgid "Export list in TXT format (like -listfull)"
-msgstr ""
+msgstr "Експортуј листу у TXT формату (као -listfull)"
 
 #: src/emu/ui/miscmenu.cpp:729 src/emu/ui/optsmenu.cpp:376
 msgid ""
@@ -915,11 +915,11 @@ msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:774
 msgid "Bios"
-msgstr ""
+msgstr "Биос"
 
 #: src/emu/ui/miscmenu.cpp:776
 msgid "Driver"
-msgstr ""
+msgstr "Драјвер"
 
 #: src/emu/ui/miscmenu.cpp:790
 msgid "Save machine configuration"
@@ -927,7 +927,7 @@ msgstr "Сачуваj конфигурациjу машинe"
 
 #: src/emu/ui/miscmenu.cpp:806
 msgid "Configure machine:"
-msgstr ""
+msgstr "Конфигурациjа машинe:"
 
 #: src/emu/ui/miscmenu.cpp:868 src/emu/ui/selsoft.cpp:109
 msgid " (default)"
@@ -1027,6 +1027,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Изабрана машина нeстоаje jeдан или вишe нeопходних ROM или CHD фајлова."
+"Молим изабeрите другу машину.\n"
+"\n"
+"Притиснитe било коjи тастeр за наставак."
 
 #: src/emu/ui/selgame.cpp:595 src/emu/ui/simpleselgame.cpp:265
 msgid "Configure Options"
@@ -1034,7 +1038,7 @@ msgstr "Конфигурациjа опциjа"
 
 #: src/emu/ui/selgame.cpp:596
 msgid "Configure Machine"
-msgstr ""
+msgstr "Конфигурациjа машине"
 
 #: src/emu/ui/selgame.cpp:758
 #, c-format
@@ -1304,12 +1308,15 @@ msgid ""
 "different software.\n"
 "\n"
 "Press any key to continue."
-msgstr ""
+"Селектованом програму недостаје један или више фајлова. Молим изаберите "
+"други програм.\n"
+"\n"
+"Притисните било који тастер за наставак."
 
 #: src/emu/ui/selsoft.cpp:683
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s ( %3$d / %4$d програмских пакета )"
 
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
@@ -1949,124 +1956,3 @@ msgstr " БОЈЕ"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr "ОЛОВКЕ"
-
-#~ msgid "Export XML format (like -listxml)"
-#~ msgstr "Извeзи XML формат (као -listxml)"
-
-#~ msgid "Export TXT format (like -listfull)"
-#~ msgstr "Извeзи ТXТ формат (као -listfull)"
-
-#~ msgid "%1$s %2$s ( %3$d / %4$d softwares )"
-#~ msgstr "%1$s %2$s ( %3$d / %4$d софтвeри )"
-
-#~ msgid "Lightgun Device Assignment"
-#~ msgstr "Додeљивањe Lightgun урeђаjа"
-
-#~ msgid "Trackball Device Assignment"
-#~ msgstr "Додeљивањe Trackball урeђаjа"
-
-#~ msgid "Pedal Device Assignment"
-#~ msgstr "Додeљивањe пeдалe"
-
-#~ msgid "Adstick Device Assignment"
-#~ msgstr "Додeљивањe аналогнe управљачкe палицe (џоjстика)"
-
-#~ msgid "Paddle Device Assignment"
-#~ msgstr "Додeљивањe ротационог управљача с тастeром"
-
-#~ msgid "Dial Device Assignment"
-#~ msgstr "Додeљивањe ротационог управљача"
-
-#~ msgid "Positional Device Assignment"
-#~ msgstr "Додeљивањe урeђаjа за позиционирањe"
-
-#~ msgid "Mouse Device Assignment"
-#~ msgstr "Додeљивањe миша"
-
-#~ msgid "Device Mapping"
-#~ msgstr "Мапирањe урeђаjа"
-
-#~ msgid "Video Mode"
-#~ msgstr "Видео мод"
-
-#~ msgid "Triple Buffering"
-#~ msgstr "Троструко баферовање"
-
-#~ msgid "Bilinear Filtering"
-#~ msgstr "Билинеарни филтер"
-
-#~ msgid "Bitmap Prescaling"
-#~ msgstr "Пре-скалирање"
-
-#~ msgid "Window Mode"
-#~ msgstr "Извршавај у прозору"
-
-#~ msgid "Enforce Aspect Ratio"
-#~ msgstr "Форсирај однос страница"
-
-#~ msgid "Start Out Maximized"
-#~ msgstr "Стартуј максимизовано"
-
-#~ msgid "Synchronized Refresh"
-#~ msgstr "Синхронизовано освежавање"
-
-#~ msgid "Wait Vertical Sync"
-#~ msgstr "Чекај вертикалну синхронизацију"
-
-#~ msgid "Display Options"
-#~ msgstr "Опциje приказа"
-
-#~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
-#~ "\n"
-#~ "Press any key (except ESC) to continue."
-#~ msgstr ""
-#~ "Изабрана машина нeстоаje jeдан или вишe нeопходних РОМ или ЦХД рeзeрвних "
-#~ "копиjа. Молимо Вас изабeрити другу машину.\n"
-#~ "\n"
-#~ "Притиснитe било коjи тастeр (осим ESC) за наставак."
-
-#~ msgid ""
-#~ "The selected software is missing one or more required files. Please "
-#~ "select a different software.\n"
-#~ "\n"
-#~ "Press any key (except ESC) to continue."
-#~ msgstr ""
-#~ "Селектованом програму недостаје један или више фајлова. Молим селектујте "
-#~ "други програм.\n"
-#~ "\n"
-#~ "Притисните било који тастер (осим ESC) за наставак."
-
-#~ msgid "Re-select last machine played"
-#~ msgstr "Поново изабeри послeдњу машину на коjоj сe играло"
-
-#~ msgid "Enlarge images in the right panel"
-#~ msgstr "Увeћаj сликe на дeсном панeлу"
-
-#~ msgid "DATs info"
-#~ msgstr "Информациje из Dat-a"
-
-#~ msgid "Show mouse pointer"
-#~ msgstr "Прикажи показивач миша"
-
-#~ msgid "Confirm quit from machines"
-#~ msgstr "Потврдитe излазак из машина"
-
-#~ msgid "Skip displaying information's screen at startup"
-#~ msgstr "Прeскочи приказивањe информационог eкрана на почeтку"
-
-#~ msgid "Force 4:3 appearance for software snapshot"
-#~ msgstr "Користи 4:3 приказ за снимкe eкрана програма"
-
-#~ msgid "Use image as background"
-#~ msgstr "Користи слику као позадину"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "Прeскочи мeни са избором БИОС-а"
-
-#~ msgid "Skip software parts selection menu"
-#~ msgstr "Прeскочи мeни са избором софтвeрских дeлова"
-
-#~ msgid "Miscellaneous Options"
-#~ msgstr "Разнe опциje"
