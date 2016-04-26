@@ -96,14 +96,14 @@
 
 
   <!--Be Ball -->
-  <software name="tvbeball">
-    <description>Be Ball (Tourvision PCE bootleg)</description>
+  <software name="beballa">
+    <description>Be Ball (alt) (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Hudson Soft</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
+      <dataarea name="rom" size="262144">
         <!-- byte at 0xBCD is changed 0x05 -> 0x02 -->
-        <rom name="tourv_be_ball.bin" size="0x100000" crc="4b1e2861" sha1="bea449543284bb6f4b33b1fb4156cd18a782ad6a" offset="000000" />
+        <rom name="tourv_be_ball_alt.pce" size="262144" crc="261f1013" sha1="55d8815a4a432e587fc7483b63b73114fe40e710" offset="000000" />
       </dataarea>
     </part>
   </software>
@@ -340,17 +340,19 @@ Notes:
 
 
   <!--Gomola Speed - Human -->
-  <software name="tvgomola">
-    <description>Gomola Speed (Tourvision PCE bootleg)</description>
+  <software name="gomolaa">
+    <description>Gomola Speed (alt) (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Human</publisher>
     <part name="cart" interface="tourvision_cart">
-      <!-- NOT identical, significant changes - check -->
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_gomola.bin" size="0x100000" crc="41e8e18f" sha1="210e511b85056bf216fc0d2540ed379a9dc7c18f" offset="000000" />
+      <dataarea name="rom" size="393216">
+        <!-- NOT identical to the set in the PCE list, alt revison? -->
+        <rom name="gomolaa.pce" size="393216" crc="4bd38f17" sha1="fe4b08fb0cd9d0a53726c2709db3e31fbeae1213" offset="000000" />
       </dataarea>
     </part>
   </software>
+
+
 
 
   <!--Gunhed -->
@@ -689,14 +691,14 @@ Notes:
 
 
   <!--R-Type II -->
-  <software name="tvrtype2">
-    <description>R-Type II (Tourvision PCE bootleg)</description>
+  <software name="rtypep2a">
+    <description>R-Type II (hack, no copyright string) (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / IREM Corp</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <!-- NOT identical, copyright strings have been erased -->
-        <rom name="tourv_r-type_ii.bin" size="0x100000" crc="b03bfd7a" sha1="cc8cec1fc4bae3937d0ed60468ff703d07ce9d0c" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- NOT identical to pce list, copyright strings have been erased -->
+        <rom name="tourv_r-type_ii_hacked.pce" size="262144" crc="ae65fe80" sha1="1a6c6f5bd017f23ab9d00a9385986ddf498f9a82" offset="000000" />
       </dataarea>
     </part>
   </software>
