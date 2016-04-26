@@ -242,6 +242,7 @@
     <publisher>bootleg (Tourvision) / Fujiko-Shogakukan-TV Asahi / Hudson Soft</publisher>
     <part name="cart" interface="tourvision_cart">
       <dataarea name="rom" size="262144">
+        <!-- verified identical -->
         <rom name="doraemon - meikyuu dai sakusen (japan).pce" size="262144" crc="dc760a07" sha1="81769dc4e2e669f6ae98872d22c52ac290530a28" offset="000000" />
       </dataarea>
     </part>
@@ -249,13 +250,14 @@
 
 
   <!--Dragon Spirit -->
-  <software name="tvdrgnst">
+  <software name="dspirit">
     <description>Dragon Spirit (Tourvision PCE bootleg)</description>
     <year>1988</year>
     <publisher>bootleg (Tourvision) / Namcot</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_dragon_spirit.bin" size="0x100000" crc="5733951f" sha1="0256b4c343a3ad1ca625c316a470cc91a5254e8e" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="dragon spirit (japan).pce" size="262144" crc="01a76935" sha1="09b037fde801b71d1ff343c40ff5a58372b9a514" offset="000000" />
       </dataarea>
     </part>
   </software>
@@ -268,65 +270,70 @@ Dungeon Explorer TourVision cart - Hudson / Atlus
 Notes:
 -Cart's A18 line (pin 32) seems not connected to anything.
 -->
-  <software name="tvdunexp">
+  <software name="dungexpl">
     <description>Dungeon Explorer (Tourvision PCE bootleg)</description>
     <year>1989</year>
     <publisher>bootleg (Tourvision) / Atlus Ltd. / Hudson Soft</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_dungeonexplorer.bin" size="0x100000" crc="6ecc87f4" sha1="02eb3ae0b336dbcda12166b10c9f19486fb177e0" offset="000000" />
+      <dataarea name="rom" size="393216">
+        <!-- verified identical -->
+        <rom name="dungeon explorer (japan).pce" size="393216" crc="1b1a80a2" sha1="77caece9655a0e14330884673ffb41ff2bb625c4" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Final Blaster -->
-  <software name="tvfblast">
+  <software name="finlblst">
     <description>Final Blaster (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Namco / Namcot</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_final_blaster.bin" size="0x100000" crc="f5f7483c" sha1="3933719bdd7a0c73cdad76de78d80463112b475a" offset="000000" />
+      <dataarea name="rom" size="393216">
+        <!-- verified identical -->
+        <rom name="final blaster (japan).pce" size="393216" crc="c90971ba" sha1="4a013fde3938ceaacf38fcc4f56828d1292142d0" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Final Lap Twin - Namco -->
-  <software name="tvflaptw">
+  <software name="finallap">
     <description>Final Lap Twin (Tourvision PCE bootleg)</description>
     <year>1989</year>
     <publisher>bootleg (Tourvision) / Namco Ltd. / Namcot</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_flaptw.bin" size="0x100000" crc="3ca56272" sha1="9b5417ae9a9400fead170e882d3dae19edfd7157" offset="000000" />
+      <dataarea name="rom" size="393216">
+        <!-- verified identical -->
+        <rom name="final lap twin (japan).pce" size="393216" crc="c8c084e3" sha1="ad695b7d1fb8bac7d9e13045bf229dba98d56a71" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Final Match Tennis -->
-  <software name="tvftenis">
+  <software name="finalmt">
     <description>Final Match Tennis (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Human</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_final_match_tennis.bin" size="0x100000" crc="f83ed70f" sha1="f566bd7a806c11f3d33ba0a976e36026a131e6fd" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="final match tennis (japan).pce" size="262144" crc="560d2305" sha1="e3a97b468d0a6c94effde70bf331dc4b3d90b166" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Formation Soccer - Human Cup ' 90 - Human -->
-  <software name="tvfsoc90">
+  <software name="fsoccr90">
     <description>Formation Soccer - Human Cup '90 (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Human</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_fsoc90.bin" size="0x100000" crc="428ffeb1" sha1="5d12f3ed7f42b2b6da4d8eba95a16e2d34616846" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="formation soccer - human cup '90 (japan).pce" size="262144" crc="85a1e7b6" sha1="d53db608475ca26ff81837dc43b40726bd0440a5" offset="000000" />
       </dataarea>
     </part>
   </software>
@@ -338,6 +345,7 @@ Notes:
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Human</publisher>
     <part name="cart" interface="tourvision_cart">
+      <!-- NOT identical, significant changes - check -->
       <dataarea name="rom" size="0x100000">
         <rom name="tourv_gomola.bin" size="0x100000" crc="41e8e18f" sha1="210e511b85056bf216fc0d2540ed379a9dc7c18f" offset="000000" />
       </dataarea>
@@ -346,13 +354,14 @@ Notes:
 
 
   <!--Gunhed -->
-  <software name="tvgunhed">
+  <software name="gunhed">
     <description>GunHed (Tourvision PCE bootleg)</description>
     <year>1989</year>
     <publisher>bootleg (Tourvision) / Hudson / Toho Sunrise</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_gunhed.bin" size="0x100000" crc="9baace99" sha1="ab676ba72a80314e8cba3810789041d3cc6298f9" offset="000000" />
+      <dataarea name="rom" size="393216">
+        <!-- verified identical -->
+        <rom name="gunhed (japan).pce" size="393216" crc="a17d4d7e" sha1="0107d93ff5d10325092d45e6bfd21e8130efeed7" offset="000000" />
       </dataarea>
     </part>
   </software>
