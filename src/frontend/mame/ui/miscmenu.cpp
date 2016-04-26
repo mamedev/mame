@@ -12,6 +12,7 @@
 #include "mame.h"
 #include "osdnet.h"
 #include "mameopts.h"
+#include "drivenum.h"
 
 #include "uiinput.h"
 #include "ui/ui.h"

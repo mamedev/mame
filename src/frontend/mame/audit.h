@@ -13,7 +13,6 @@
 #ifndef __AUDIT_H__
 #define __AUDIT_H__
 
-#include "drivenum.h"
 #include "hash.h"
 
 
@@ -32,6 +31,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+
+// forward declarations
+class driver_enumerator;
 
 // ======================> audit_record
 

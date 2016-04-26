@@ -21,6 +21,7 @@
 #include "ui/icorender.h"
 #include "ui/toolbar.h"
 #include "ui/miscmenu.h"
+#include "drivenum.h"
 
 
 /***************************************************************************

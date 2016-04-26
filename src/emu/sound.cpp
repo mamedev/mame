@@ -834,15 +834,12 @@ sound_manager::sound_manager(running_machine &machine)
 	VPRINTF(("total mixers = %d\n", iter.count()));
 #endif
 
-	// open the output WAV file if specified
-	if (wavfile[0] != 0 && &machine.system() != &GAME_NAME(___empty))
-		m_wavfile = wav_open(wavfile, machine.sample_rate(), 2);
-
 	// register callbacks
 	machine.configuration().config_register("mixer", config_saveload_delegate(FUNC(sound_manager::config_load), this), config_saveload_delegate(FUNC(sound_manager::config_save), this));
 	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(sound_manager::pause), this));
 	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(sound_manager::resume), this));
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(sound_manager::reset), this));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sound_manager::stop_recording), this));
 
 	// register global states
 	machine.save().save_item(NAME(m_last_update));
@@ -861,6 +858,28 @@ sound_manager::sound_manager(running_machine &machine)
 //-------------------------------------------------
 
 sound_manager::~sound_manager()
+{
+}
+
+
+//-------------------------------------------------
+//  start_recording - begin audio recording
+//-------------------------------------------------
+
+void sound_manager::start_recording()
+{
+	// open the output WAV file if specified
+	const char *wavfile = machine().options().wav_write();
+	if (wavfile[0] != 0 && m_wavfile == nullptr)
+		m_wavfile = wav_open(wavfile, machine().sample_rate(), 2);
+}
+
+
+//-------------------------------------------------
+//  stop_recording - end audio recording
+//-------------------------------------------------
+
+void sound_manager::stop_recording()
 {
 	// close any open WAV file
 	if (m_wavfile != nullptr)

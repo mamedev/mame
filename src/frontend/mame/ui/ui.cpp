@@ -14,6 +14,7 @@
 #include "mameopts.h"
 #include "video/vector.h"
 #include "machine/laserdsc.h"
+#include "drivenum.h"
 #include "render.h"
 #include "luaengine.h"
 #include "cheat.h"

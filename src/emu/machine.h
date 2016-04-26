@@ -203,7 +203,7 @@ public:
 	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
 
 	// immediate operations
-	int run(bool firstrun);
+	int run(bool quiet);
 	void pause();
 	void resume();
 	void toggle_pause();

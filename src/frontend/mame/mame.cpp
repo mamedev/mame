@@ -5,68 +5,6 @@
     mame.c
 
     Controls execution of the core MAME system.
-****************************************************************************
-
-    Since there has been confusion in the past over the order of
-    initialization and other such things, here it is, all spelled out
-    as of January, 2008:
-
-    main()
-        - does platform-specific init
-        - calls mame_execute() [mame.c]
-
-        mame_execute() [mame.c]
-            - calls mame_validitychecks() [validity.c] to perform validity checks on all compiled drivers
-            - begins resource tracking (level 1)
-            - calls create_machine [mame.c] to initialize the running_machine structure
-            - calls init_machine() [mame.c]
-
-            init_machine() [mame.c]
-                - calls fileio_init() [fileio.c] to initialize file I/O info
-                - calls config_init() [config.c] to initialize configuration system
-                - calls input_init() [input.c] to initialize the input system
-                - calls output_init() [output.c] to initialize the output system
-                - calls state_init() [state.c] to initialize save state system
-                - calls state_save_allow_registration() [state.c] to allow registrations
-                - calls palette_init() [palette.c] to initialize palette system
-                - calls render_init() [render.c] to initialize the rendering system
-                - calls ui_init() [ui.c] to initialize the user interface
-                - calls generic_machine_init() [machine/generic.c] to initialize generic machine structures
-                - calls generic_video_init() [video/generic.c] to initialize generic video structures
-                - calls generic_sound_init() [audio/generic.c] to initialize generic sound structures
-                - calls timer_init() [timer.c] to reset the timer system
-                - calls osd_init() [osdepend.h] to do platform-specific initialization
-                - calls input_port_init() [inptport.c] to set up the input ports
-                - calls rom_init() [romload.c] to load the game's ROMs
-                - calls memory_init() [memory.c] to process the game's memory maps
-                - calls watchdog_init() [watchdog.c] to initialize the watchdog system
-                - calls the driver's DRIVER_INIT callback
-                - calls device_list_start() [devintrf.c] to start any devices
-                - calls video_init() [video.c] to start the video system
-                - calls tilemap_init() [tilemap.c] to start the tilemap system
-                - calls crosshair_init() [crsshair.c] to configure the crosshairs
-                - calls sound_init() [sound.c] to start the audio system
-                - calls debugger_init() [debugger.c] to set up the debugger
-                - calls the driver's MACHINE_START, SOUND_START, and VIDEO_START callbacks
-                - calls cheat_init() [cheat.c] to initialize the cheat system
-                - calls image_init() [image.c] to initialize the image system
-
-            - calls config_load_settings() [config.c] to load the configuration file
-            - calls nvram_load [machine/generic.c] to load NVRAM
-            - calls ui_display_startup_screens() [ui.c] to display the startup screens
-            - begins resource tracking (level 2)
-            - calls soft_reset() [mame.c] to reset all systems
-
-                -------------------( at this point, we're up and running )----------------------
-
-            - calls scheduler->timeslice() [schedule.c] over and over until we exit
-            - ends resource tracking (level 2), freeing all auto_mallocs and timers
-            - calls the nvram_save() [machine/generic.c] to save NVRAM
-            - calls config_save_settings() [config.c] to save the game's configuration
-            - calls all registered exit routines [mame.c]
-            - ends resource tracking (level 1), freeing all auto_mallocs and timers
-
-        - exits the program
 
 ***************************************************************************/
 
@@ -77,6 +15,7 @@
 #include "osdepend.h"
 #include "validity.h"
 #include "clifront.h"
+#include "drivenum.h"
 #include "luaengine.h"
 #include <time.h>
 #include "ui/selgame.h"
@@ -113,9 +52,10 @@ mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &o
 		: machine_manager(options, osd),
 		m_plugins(std::make_unique<plugin_options>()),
 		m_lua(global_alloc(lua_engine)),
-		m_new_driver_pending(nullptr), 
+		m_new_driver_pending(nullptr),
+		m_firstrun(true),
 	    m_autoboot_timer(nullptr)
-	{
+{
 }
 
 
@@ -231,7 +171,6 @@ int mame_machine_manager::execute()
 	bool started_empty = false;
 
 	bool firstgame = true;
-	bool firstrun = true;
 
 	// loop across multiple hard resets
 	bool exit_pending = false;
@@ -264,7 +203,8 @@ int mame_machine_manager::execute()
 		}
 
 		// otherwise, perform validity checks before anything else
-		if (system != nullptr)
+		bool is_empty = (system == &GAME_NAME(___empty));
+		if (!is_empty)
 		{
 			validity_checker valid(m_options);
 			valid.set_verbose(false);
@@ -280,22 +220,22 @@ int mame_machine_manager::execute()
 		set_machine(&machine);
 
 		// run the machine
-		error = machine.run(firstrun);
-		firstrun = false;
+		error = machine.run(is_empty);
+		m_firstrun = false;
 
 		// check the state of the machine
 		if (m_new_driver_pending)
 		{
 			// set up new system name and adjust device options accordingly
 			mame_options::set_system_name(m_options,m_new_driver_pending->name);
-			firstrun = true;
+			m_firstrun = true;
 		}
 		else
 		{
 			if (machine.exit_pending()) mame_options::set_system_name(m_options,"");
 		}
 
-		if (machine.exit_pending() && (!started_empty || (system == &GAME_NAME(___empty))))
+		if (machine.exit_pending() && (!started_empty || is_empty))
 			exit_pending = true;
 
 		// machine will go away when we exit scope
@@ -354,12 +294,12 @@ void mame_machine_manager::create_custom(running_machine& machine)
 	m_cheat = std::make_unique<cheat_manager>(machine);
 }
 
-void mame_machine_manager::ui_initialize(running_machine& machine,bool firstrun)
+void mame_machine_manager::ui_initialize(running_machine& machine)
 {
 	m_ui->initialize(machine);
 
 	// display the startup screens
-	m_ui->display_startup_screens(firstrun);
+	m_ui->display_startup_screens(m_firstrun);
 }
 
 const char * emulator_info::get_bare_build_version() { return bare_build_version; }

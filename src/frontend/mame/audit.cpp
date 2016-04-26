@@ -12,6 +12,7 @@
 #include "emuopts.h"
 #include "audit.h"
 #include "chd.h"
+#include "drivenum.h"
 #include "sound/samples.h"
 #include "softlist.h"
 
