@@ -288,6 +288,12 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state, tourvision_cart )
 	UINT8* rgn = memregion("maincpu")->base();
 	UINT8* base = m_cart->get_rom_base();
 
+	if (m_rom_size == 0x0c0000)
+	{
+		memcpy(rgn+0x000000, base+0x000000, 0x0c0000 );
+		memcpy(rgn+0x0c0000, base+0x080000, 0x040000 );
+	}
+	else
 	if (m_rom_size == 0x060000)
 	{
 		memcpy(rgn+0x000000, base+0x000000, 0x040000 );

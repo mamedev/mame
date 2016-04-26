@@ -717,65 +717,70 @@ Notes:
 
 
   <!--Salamander -->
-  <software name="tvslmndr">
+  <software name="salamand">
     <description>Salamander (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Konami</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_salamander.bin" size="0x100000" crc="ae8bcdf1" sha1="3cc48fa594ab5ce1573c61861ec8e927163b6abb" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="salamander (japan).pce" size="262144" crc="faecce20" sha1="a24e3a4ff36ec9fffd5ea1f4c6b526f61f842584" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Shinobi -->
-  <software name="tvshnobi">
+  <software name="shinobi">
     <description>Shinobi (Tourvision PCE bootleg)</description>
     <year>1989</year>
     <publisher>bootleg (Tourvision) / Sega / Asmik Corporation</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_shinobi.bin" size="0x100000" crc="091a2b01" sha1="aac2d5fadc74f837b73f662456f8a308413de57a" offset="000000" />
+      <dataarea name="rom" size="393216">
+        <!-- verified identical -->
+        <rom name="shinobi (japan).pce" size="393216" crc="bc655cf3" sha1="c219f8477dc2b34b53c25a419332595835d1f5ec" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Side arms -->
-  <software name="tvsdarms">
+  <software name="sidearms">
     <description>Side Arms (Tourvision PCE bootleg)</description>
     <year>1989</year>
     <publisher>bootleg (Tourvision) / Capcom / Nec Avenue</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_side_arms.bin" size="0x100000" crc="04256267" sha1="a4ff8f19fa528fc8a7aae5ad7e0c574dc52c3388" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="sidearms - hyper dyne (japan).pce" size="262144" crc="e5e7b8b7" sha1="b732b3485bd8841d3571221170b04b7f699e9109" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Skweek -->
-  <software name="tvskweek">
+  <software name="skweek">
     <description>Skweek (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Victor Musical Industries, Inc.</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_skweek.bin" size="0x100000" crc="b2a86ecc" sha1="c1b113132ca6be1b0f3f16f31cc5ba894bee7e91" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="skweek (japan).pce" size="262144" crc="4d539c9f" sha1="3436b48a9c748269f6ae65e40c9115a27321d440" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Son Son II -->
-  <software name="tvsson2">
+  <software name="sonson2">
     <description>Son Son II (Tourvision PCE bootleg)</description>
     <year>1989</year>
     <publisher>bootleg (Tourvision) / Capcom / Nec Avenue</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_son_son_ii.bin" size="0x100000" crc="8fb484cd" sha1="553838dcb3524fe0b620ea60e926a57cc371068d" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="son son ii (japan).pce" size="262144" crc="d7921df2" sha1="51aa9b47aa5f68102989885a1b92bb6b563ffe3a" offset="000000" />
       </dataarea>
     </part>
   </software>
@@ -789,65 +794,70 @@ Notes:
 -Cart's A19 line seems not connected to anything.
 -CRC of split ROM ("09a0bfcc") matches the common English language PC Engine Hu-Card ROM dump.
 -->
-  <software name="tvsci">
+  <software name="sci">
     <description>Special Criminal Investigation (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Taito Corporation</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_sci.bin" size="0x100000" crc="4baac6d8" sha1="4c2431d9553e2bd952cf816e78fc1e3387376ef4" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="special criminal investigation (japan).pce" size="524288" crc="09a0bfcc" sha1="8d18aea811d752d24cc00f20d2c6ced67df1efa9" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Super Star Soldier - Hudson / Kaneko -->
-  <software name="tvsssold">
+  <software name="sssoldr">
     <description>Super Star Soldier (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Inter State / Kaneko / Hudson Soft</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_sssold.bin" size="0x100000" crc="bb2a0b14" sha1="5380d25b4d5bb3e0048ed857fd36a8206e81a234" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="super star soldier (japan).pce" size="524288" crc="5d0e3105" sha1="4220516a17bc32a3f68ed51ef2af63e496e79f7d" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Super Volley ball - Video System -->
-  <software name="tvsvball">
+  <software name="svolley">
     <description>Super Volley ball (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Video System</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_supervolleyball.bin" size="0x100000" crc="8a32a1ca" sha1="80144fb4035415eb9b2c67d78d55757ed0d641a1" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="super volleyball (japan).pce" size="262144" crc="ce2e4f9f" sha1="46dd4acebe25de38f28e56cf149b24b42f3aef31" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Tatsujin -->
-  <software name="tvtsujin">
+  <software name="tatsujin">
     <description>Tatsujin (Tourvision PCE bootleg)</description>
     <year>1992</year>
     <publisher>bootleg (Tourvision) / Toaplan Co Ltd / Taito Corporation</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_tatsujin.bin" size="0x100000" crc="023adbcc" sha1="bef7d03fff2e74970a0747c12d31ec8661703deb" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="tatsujin (japan).pce" size="524288" crc="a6088275" sha1="dda768075fbf8c0624e2c1f217b1092513b1c942" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Terra Cresta II -->
-  <software name="tvtcrst2">
+  <software name="terracr2">
     <description>Terra Cresta II (Tourvision PCE bootleg)</description>
     <year>1992</year>
     <publisher>bootleg (Tourvision) / Nichibutsu / Nihon Bussan Co., Ltd</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_terra_cresta_ii.bin" size="0x100000" crc="8e7bb390" sha1="af13afe006313b0db1273782c977efdad6100291" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="terra cresta ii - mandoraa no gyakushuu (japan).pce" size="524288" crc="1b2d0077" sha1="c58d3ea8df6cb518349d431d6b3d6fd2c14898ec" offset="000000" />
       </dataarea>
     </part>
   </software>
@@ -861,26 +871,28 @@ Notes:
 -Cart's A19 line seems not connected to anything.
 -CRC of split ROM ("DDC3E809") matches the common PC Engine Hu-Card ROM dump.
 -->
-  <software name="tvthbld">
+  <software name="tblade">
     <description>Thunder Blade (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Sega / NEC Avenue</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_thunderblade.bin" size="0x100000" crc="0b93b85b" sha1="b7d9fc2f46f95d305aa24326eded13abbe93738c" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="thunder blade (japan).pce" size="524288" crc="ddc3e809" sha1="553f8026dd68e85cd17855adbf920b3971acfdc4" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Toy Shop Boys -->
-  <software name="tvtsboys">
+  <software name="toyshopb">
     <description>Toy Shop Boys (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Victor Musical Industries, Inc.</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_toy_shop_boys.bin" size="0x100000" crc="a9ed3440" sha1="c519744cc16dad7a1455e359020ce95f4ac0b51a" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="toy shop boys (japan).pce" size="262144" crc="97c5ee9a" sha1="d552223399ff54c3664a5a06fc620ffb717cea57" offset="000000" />
       </dataarea>
     </part>
   </software>
