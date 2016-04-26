@@ -1134,7 +1134,7 @@ static MACHINE_CONFIG_DERIVED_CLASS(chihiro_base, xbox_base, chihiro_state)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(chihirogd, chihiro_base)
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", "gdrom", "pic", nullptr, NOOP)
+	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", "^pic", nullptr, NOOP)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
