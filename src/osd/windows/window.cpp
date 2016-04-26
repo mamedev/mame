@@ -23,6 +23,7 @@
 // MAME headers
 #include "emu.h"
 #include "uiinput.h"
+#include "ui/menu.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -1979,8 +1980,11 @@ void win_window_info::set_fullscreen(int fullscreen)
 		return;
 	m_fullscreen = fullscreen;
 
+	// reset UI to main menu
+	ui_menu::stack_reset(machine());
+
 	// kill off the drawers
-	m_renderer.reset();
+	renderer_reset();
 
 	// hide ourself
 	ShowWindow(platform_window<HWND>(), SW_HIDE);

@@ -31,6 +31,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "ui/uimain.h"
+#include "ui/menu.h"
 
 
 // OSD headers
@@ -451,6 +452,9 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 		window->m_windowed_dim = window->get_size();
 	}
 
+	// reset UI to main menu
+	ui_menu::stack_reset(window->machine());
+	// kill off the drawers
 	window->renderer_reset();
 	window->set_platform_window(nullptr);
 	bool is_osx = false;
