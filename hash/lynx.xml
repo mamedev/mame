@@ -1075,4 +1075,16 @@ Known undumped prototypes:
 		</part>
 	</software>
 
+  <software name="zaku">
+    <description>Zaku</description>
+    <year>2009</year>
+    <publisher>Super Fighter Team</publisher>
+    <part name="cart" interface="lynx_cart">
+      <dataarea name="rom" size="0x80000">
+        <rom name="Zaku.lyx" size="0x80000" crc="4ea845da" sha1="2723c29b4e00dd76402e9fc4dc50cb59b673b507" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+
 </softwarelist>
