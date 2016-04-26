@@ -282,7 +282,7 @@ WRITE8_MEMBER(namcos16_state::irq_disable_w)
 
 WRITE8_MEMBER(namcos16_state::irq_ctrl_w)
 {
-	m_master_irq_enable = (offset & 0x8000) ? false : true;
+	m_master_irq_enable = (offset & 0x0800) ? false : true;
 }
 
 WRITE8_MEMBER(namcos16_state::slave_halt_ctrl_w)
