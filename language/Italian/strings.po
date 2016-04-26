@@ -645,11 +645,11 @@ msgstr ""
 
 #: src/emu/ui/info.cpp:98
 msgid "Not supported"
-msgstr ""
+msgstr "Non supportato"
 
 #: src/emu/ui/info.cpp:101
 msgid "Partially supported"
-msgstr ""
+msgstr "Parzialmente supportato"
 
 #: src/emu/ui/info.cpp:109
 msgid "[empty]"
@@ -754,7 +754,7 @@ msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:135
 msgid "Plugin Options"
-msgstr ""
+msgstr "Opzioni Plugin"
 
 #: src/emu/ui/mainmenu.cpp:139
 msgid "External DAT View"
@@ -892,15 +892,15 @@ msgstr "%s.txt salvato nella cartella UI."
 
 #: src/emu/ui/miscmenu.cpp:677
 msgid "Export list in XML format (like -listxml)"
-msgstr ""
+msgstr "Esporta lista in formato XML (come -listxml)"
 
 #: src/emu/ui/miscmenu.cpp:678
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr ""
+msgstr "Esporta lista in formato XML (come -listxml, ma escludendo i device)"
 
 #: src/emu/ui/miscmenu.cpp:679
 msgid "Export list in TXT format (like -listfull)"
-msgstr ""
+msgstr "Esporta lista in formato TXT (come -listfull)"
 
 #: src/emu/ui/miscmenu.cpp:729 src/emu/ui/optsmenu.cpp:376
 msgid ""
@@ -922,11 +922,11 @@ msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:790
 msgid "Save machine configuration"
-msgstr ""
+msgstr "Salva configurazione per questo sistema"
 
 #: src/emu/ui/miscmenu.cpp:806
 msgid "Configure machine:"
-msgstr ""
+msgstr "Configura questo sistema:"
 
 #: src/emu/ui/miscmenu.cpp:868 src/emu/ui/selsoft.cpp:109
 msgid " (default)"
@@ -1026,6 +1026,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Nella macchina selezionata mancano uno o più file ROM o CHD. "
+"Seleziona un'altra macchina.\n"
+"\n"
+"Premi un tasto per continuare."
 
 #: src/emu/ui/selgame.cpp:595 src/emu/ui/simpleselgame.cpp:265
 msgid "Configure Options"
@@ -1033,7 +1037,7 @@ msgstr "Configura Opzioni"
 
 #: src/emu/ui/selgame.cpp:596
 msgid "Configure Machine"
-msgstr ""
+msgstr "Configura Macchina"
 
 #: src/emu/ui/selgame.cpp:758
 #, c-format
@@ -1074,7 +1078,7 @@ msgstr "Il Driver è un clone di: %-.100s"
 
 #: src/emu/ui/selgame.cpp:855 src/emu/ui/selsoft.cpp:758
 msgid "Driver is parent"
-msgstr ""
+msgstr "Il Driver è un parent"
 
 #: src/emu/ui/selgame.cpp:859 src/emu/ui/selsoft.cpp:762
 #: src/emu/ui/simpleselgame.cpp:335
@@ -1304,6 +1308,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Nel software selezionato mancano uno o più file richiesti. Seleziona "
+"un'altra macchina.\n"
+"\n"
+"Premi un tasto per continuare."
 
 #: src/emu/ui/selsoft.cpp:683
 #, c-format
