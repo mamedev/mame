@@ -906,77 +906,83 @@ Notes:
 -Cart's A19 and A18 lines seems not connected to anything.
 -CRC of split ROM ("1CAD4B7F") matches the common PC Engine Hu-Card ROM dump.
 -->
-  <software name="tvusapb">
+  <software name="usaprobs">
     <description>USA Pro Basketball (Tourvision PCE bootleg)</description>
     <year>1989</year>
     <publisher>bootleg (Tourvision) / Aicom Corporation</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_usaprobasketball.bin" size="0x100000" crc="f9a86270" sha1="45f33fd80a0fa16a9271d258d8e827c3d5e8c98d" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="usa pro basketball (japan).pce" size="262144" crc="1cad4b7f" sha1="62f3e0c56d22c015bea15fe04cd16fae380fefcd" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Veigues -->
-  <software name="tveigues">
+  <software name="veigues">
     <description>Veigues - Tactical Gladiator (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Victor Musical Industries, Inc.</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_veigues.bin" size="0x100000" crc="64ef8be7" sha1="634191a181cbccbed8cf7a86e4f074691ba9b715" offset="000000" />
+      <dataarea name="rom" size="393216">
+        <!-- verified identical -->
+        <rom name="veigues - tactical gladiator (japan).pce" size="393216" crc="04188c5c" sha1="da66c085ecbb317cb160cb192142a3d2c044f26f" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Volfied - Taito -->
-  <software name="tvvolfd">
+  <software name="volfied">
     <description>Volfied (Tourvision PCE bootleg)</description>
     <year>1989</year>
     <publisher>bootleg (Tourvision) / Taito Corporation</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_volfd.bin" size="0x100000" crc="6349113d" sha1="b413342122409ea4ed981bd5077285cdcf337890" offset="000000" />
+      <dataarea name="rom" size="393216">
+        <!-- verified identical -->
+        <rom name="volfied (japan).pce" size="393216" crc="ad226f30" sha1="0ecee557815b93fc37f2f5675c2c01c77ef8569e" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Winning Shot -->
-  <software name="tvwnshot">
+  <software name="winshot">
     <description>Winning Shot (Tourvision PCE bootleg)</description>
     <year>1989</year>
     <publisher>bootleg (Tourvision) / Data East Corp.</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_winning_shot.bin" size="0x100000" crc="7196b2ca" sha1="a1ae2e875541ad39751a95629d614d2c913b8c02" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="winning shot (japan).pce" size="262144" crc="9b5ebc58" sha1="039ff38e6221b4b7722144e85dc7c84873d7efe6" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--W-Ring -->
-  <software name="tvwring">
+  <software name="wring">
     <description>W-Ring - The Double Rings (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Naxat Soft</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_w-ring.bin" size="0x100000" crc="609dc08d" sha1="191b8751fc5b8700c7d9dae23d194016fe84586c" offset="000000" />
+      <dataarea name="rom" size="393216">
+        <!-- verified identical -->
+        <rom name="w-ring - the double rings (japan).pce" size="393216" crc="be990010" sha1="95d0a95ce9f08da3f096cfdc654ba5dfeb794add" offset="000000" />
       </dataarea>
     </part>
   </software>
 
   <!--Xevious -->
-  <software name="tvxvious">
+  <software name="xevious">
     <description>Xevious (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Namco Ltd. / Namcot</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_xevious.bin" size="0x100000" crc="3c0fb5a9" sha1="1fd9ff582da83e1b9fee569da4db4de15e912f62" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="xevious - fardraut densetsu (japan).pce" size="262144" crc="f8f85eec" sha1="13da0500ace1957d0748b11dfaae68e40e71230e" offset="000000" />
       </dataarea>
     </part>
   </software>
