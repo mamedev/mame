@@ -9,7 +9,7 @@
 
     See cat.c for the machine which the swyft later became.
 
-    This driver is dedicated in memory of Jef Raskin and Dave Boulton
+    This driver is dedicated in memory of Jef Raskin, Dave Boulton, and John "Sandy" Bumgarner (1941-2016)
 
 IAI detailed credits:
 Scott Kim - responsible for fonts on swyft and cat
