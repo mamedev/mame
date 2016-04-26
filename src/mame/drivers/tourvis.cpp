@@ -299,7 +299,8 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state, tourvision_cart )
 	}
 	else
 	{
-		memcpy(rgn, base, m_rom_size );
+		for (int i=0;i<0x100000;i+=m_rom_size)
+			memcpy(rgn+i, base+0x000000, m_rom_size );
 	}
 
 #if 0
