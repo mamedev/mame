@@ -982,7 +982,7 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_I8257_OUT_IOW_0_CB(WRITE8(fanucspmg_state, fdcdma_w))
 
 	MCFG_PIC8259_ADD(PIC0_TAG, INPUTLINE("maincpu", 0), VCC, READ8(fanucspmg_state, get_slave_ack))
-	MCFG_PIC8259_ADD(PIC1_TAG, DEVWRITELINE(PIC0_TAG, pic8259_device, ir7_w), GND, NULL)
+	MCFG_PIC8259_ADD(PIC1_TAG, DEVWRITELINE(PIC0_TAG, pic8259_device, ir7_w), GND, NOOP)
 
 	MCFG_UPD765A_ADD(FDC_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(PIC0_TAG, pic8259_device, ir3_w))

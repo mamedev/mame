@@ -147,7 +147,7 @@ extern const struct CassetteFormat wavfile_format;
 #define CASSETTE_FORMAT(name)               \
 		&(name),
 #define CASSETTE_FORMATLIST_END             \
-		NULL                                \
+		nullptr                                \
 	};
 
 CASSETTE_FORMATLIST_EXTERN(cassette_default_formats);

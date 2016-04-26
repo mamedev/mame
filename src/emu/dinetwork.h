@@ -15,9 +15,9 @@ public:
 	void set_promisc(bool promisc);
 	void set_mac(const char *mac);
 
-	const char *get_mac() { return m_mac; }
-	bool get_promisc() { return m_promisc; }
-	int get_interface() { return m_intf; }
+	const char *get_mac() const { return m_mac; }
+	bool get_promisc() const { return m_promisc; }
+	int get_interface() const { return m_intf; }
 
 	int send(UINT8 *buf, int len) const;
 	virtual void recv_cb(UINT8 *buf, int len);

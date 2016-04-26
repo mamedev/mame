@@ -2241,7 +2241,7 @@ SLOT_INTERFACE_END
 static const cassette_interface pc88_cassette_interface =
 {
 	cassette_default_formats,   // we need T88 format support!
-	NULL,
+	nullptr,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
 	"pc8801_cass"
 };
@@ -2598,7 +2598,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	#ifdef USE_PROPER_I8214
 	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)
 	#endif
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
 	//MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)

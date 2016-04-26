@@ -442,7 +442,7 @@ static inline int pc_is_valid(address_space &space, UINT32 pc, UINT32 flags)
 		return 0;
 	if (pc & 0xff000000)
 		return 0;
-	if (space.direct().read_ptr(pc) == NULL)
+	if (space.direct().read_ptr(pc) == nullptr)
 		return 0;
 	return 1;
 }
@@ -670,7 +670,7 @@ void fd1094_regenerate_key(running_machine &machine)
 	}
 
 	/* update the key with the current fd1094 manager */
-	if (key_changed != NULL)
+	if (key_changed != nullptr)
 		(*key_changed)(machine);
 
 	/* force all memory and disassembly views to update */
@@ -2089,7 +2089,7 @@ static void build_optable(running_machine &machine)
 	for (opnum = 0; opnum < 65536; opnum++)
 	{
 		optable[opnum].flags = OF_INVALID;
-		optable[opnum].string = NULL;
+		optable[opnum].string = nullptr;
 	}
 
 	/* now iterate over entries in our intruction table */

@@ -1166,7 +1166,7 @@ static INPUT_PORTS_START( h2hbaseb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Swing")
 
 	PORT_START("IN.5") // fake
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, h2hbaseb_state, skill_switch, NULL)
+	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, h2hbaseb_state, skill_switch, nullptr)
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 INPUT_PORTS_END
@@ -2016,7 +2016,7 @@ static INPUT_PORTS_START( ebball3 )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // fake
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ebball3_state, skill_switch, NULL)
+	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ebball3_state, skill_switch, nullptr)
 	PORT_CONFSETTING(    0x00, "Amateur" )
 	PORT_CONFSETTING(    0x01, "Professional" )
 INPUT_PORTS_END
@@ -2130,7 +2130,7 @@ static INPUT_PORTS_START( einvader )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
-	PORT_CONFNAME( 0x08, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, einvader_state, skill_switch, NULL)
+	PORT_CONFNAME( 0x08, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, einvader_state, skill_switch, nullptr)
 	PORT_CONFSETTING(    0x00, "Amateur" )
 	PORT_CONFSETTING(    0x08, "Professional" )
 INPUT_PORTS_END
@@ -2507,7 +2507,7 @@ static INPUT_PORTS_START( raisedvl )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R1 (only bit 0)
-	PORT_CONFNAME( 0x31, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, raisedvl_state, skill_switch, NULL)
+	PORT_CONFNAME( 0x31, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, raisedvl_state, skill_switch, nullptr)
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x10, "2" )
 	PORT_CONFSETTING(    0x11, "3" )
@@ -3814,7 +3814,7 @@ static INPUT_PORTS_START( ssimon )
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.6") // fake
-	PORT_CONFNAME( 0x03, 0x01, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssimon_state, speed_switch, NULL)
+	PORT_CONFNAME( 0x03, 0x01, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssimon_state, speed_switch, nullptr)
 	PORT_CONFSETTING(    0x00, "Simple" )
 	PORT_CONFSETTING(    0x01, "Normal" )
 	PORT_CONFSETTING(    0x02, "Super" )
@@ -5277,7 +5277,7 @@ static INPUT_PORTS_START( tbreakup )
 	PORT_CONFSETTING(    0x04, "5" )
 
 	PORT_START("IN.3") // fake
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, tbreakup_state, skill_switch, NULL)
+	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, tbreakup_state, skill_switch, nullptr)
 	PORT_CONFSETTING(    0x00, "Pro 1" )
 	PORT_CONFSETTING(    0x01, "Pro 2" )
 INPUT_PORTS_END

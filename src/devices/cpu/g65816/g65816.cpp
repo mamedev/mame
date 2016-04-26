@@ -736,7 +736,7 @@ void g65816_device::g65816_set_sp(unsigned val)
 /* Get a register */
 unsigned g65816_device::g65816_get_reg(int regnum)
 {
-	/* Set the function tables to emulation mode if the FTABLE is NULL */
+	/* Set the function tables to emulation mode if the FTABLE is nullptr */
 	if( FTABLE_GET_REG == nullptr )
 		g65816i_set_execution_mode(EXECUTION_MODE_E);
 

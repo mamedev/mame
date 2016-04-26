@@ -13,10 +13,10 @@ typedef device_delegate<UINT16 (UINT32)> sega_dec_read_delegate;
 extern const device_type SEGA315_5838_COMP;
 
 #define MCFG_SET_5838_READ_CALLBACK_CH1( _class, _method) \
-	sega_315_5838_comp_device::set_read_cb_ch1(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	sega_315_5838_comp_device::set_read_cb_ch1(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_SET_5838_READ_CALLBACK_CH2( _class, _method) \
-	sega_315_5838_comp_device::set_read_cb_ch2(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	sega_315_5838_comp_device::set_read_cb_ch2(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 class sega_315_5838_comp_device :  public device_t
 {

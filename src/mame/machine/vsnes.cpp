@@ -197,7 +197,7 @@ MACHINE_START_MEMBER(vsnes_state,vsnes)
 
 	ppu1_space.install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt0_r),this), write8_delegate(FUNC(vsnes_state::vsnes_nt0_w),this));
 
-	if (m_gfx1_rom != NULL)
+	if (m_gfx1_rom != nullptr)
 	{
 		m_vrom[0] = memregion("gfx1")->base();
 		m_vrom_size[0] = memregion("gfx1")->bytes();
@@ -205,7 +205,7 @@ MACHINE_START_MEMBER(vsnes_state,vsnes)
 	}
 	else
 	{
-		m_vrom[0] = NULL;
+		m_vrom[0] = nullptr;
 		m_vrom_size[0] = 0;
 		m_vrom_banks = 0;
 	}

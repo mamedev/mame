@@ -100,7 +100,7 @@ public:
 		m_dac(*this, "dac"),
 		m_fdc(*this, "wd1791"),
 		m_floppy0(*this, "wd1791:0"),
-		m_floppy(NULL)
+		m_floppy(nullptr)
 	{
 	}
 // devices
@@ -781,14 +781,14 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	MCFG_CPU_PROGRAM_MAP(notetaker_iocpu_mem)
 	MCFG_CPU_IO_MAP(notetaker_iocpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("iopic8259", pic8259_device, inta_cb)
-	MCFG_PIC8259_ADD("iopic8259", INPUTLINE("iocpu", 0), VCC, NULL) // iP8259A-2 @ E6
+	MCFG_PIC8259_ADD("iopic8259", INPUTLINE("iocpu", 0), VCC, NOOP) // iP8259A-2 @ E6
 
 	/* Emulator CPU: 8086@5MHz */
 	/*MCFG_CPU_ADD("emulatorcpu", I8086, XTAL_15MHz/3)
 	MCFG_CPU_PROGRAM_MAP(notetaker_emulatorcpu_mem)
 	MCFG_CPU_IO_MAP(notetaker_emulatorcpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("emulatorpic8259", pic8259_device, inta_cb)
-	MCFG_PIC8259_ADD("emulatorpic8259", INPUTLINE("emulatorcpu", 0), VCC, NULL) // iP8259A-2 @ E6
+	MCFG_PIC8259_ADD("emulatorpic8259", INPUTLINE("emulatorcpu", 0), VCC, NOOP) // iP8259A-2 @ E6
 	*/
 
 	/* video hardware */

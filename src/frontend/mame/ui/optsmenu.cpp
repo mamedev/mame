@@ -13,12 +13,10 @@
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/submenu.h"
-#include "ui/datfile.h"
 #include "ui/inifile.h"
 #include "ui/selector.h"
 #include "ui/custui.h"
 #include "ui/sndmenu.h"
-#include "ui/miscmenu.h"
 #include "ui/optsmenu.h"
 #include "ui/custmenu.h"
 #include "ui/inputmap.h"
@@ -41,7 +39,8 @@ ui_menu_game_options::ui_menu_game_options(running_machine &machine, render_cont
 ui_menu_game_options::~ui_menu_game_options()
 {
 	main_filters::actual = m_main;
-	ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
+	if (ui_menu::menu_stack != nullptr)
+		ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
 	save_ui_options(machine());
 	ui_globals::switch_image = true;
 }

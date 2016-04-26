@@ -141,7 +141,7 @@ private:
 		m_count += count;
 	}
 
-	// insert the given object after a particular object (NULL means prepend)
+	// insert the given object after a particular object (nullptr means prepend)
 	_ElementType &insert_after(_ElementType &object, _ElementType *insert_after) noexcept
 	{
 		if (insert_after == nullptr)
@@ -154,7 +154,7 @@ private:
 		return object;
 	}
 
-	// insert the given object before a particular object (NULL means append)
+	// insert the given object before a particular object (nullptr means append)
 	_ElementType &insert_before(_ElementType &object, _ElementType *insert_before) noexcept
 	{
 		if (insert_before == nullptr)

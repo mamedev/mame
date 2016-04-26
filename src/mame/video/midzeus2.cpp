@@ -340,7 +340,7 @@ void midzeus2_state::exit_handler2()
 		else
 		{
 			printf("\tWritten %d times\n", regwrite_count[regnum]);
-			for (info = regdata[regnum]; info != NULL; info = info->next)
+			for (info = regdata[regnum]; info != nullptr; info = info->next)
 				printf("\t%08X\n", info->value);
 		}
 	}
@@ -349,7 +349,7 @@ void midzeus2_state::exit_handler2()
 		if (subregwrite_count[regnum] != 0)
 		{
 			printf("Sub-Register %02X (%d writes)\n", regnum, subregwrite_count[regnum]);
-			for (info = subregdata[regnum]; info != NULL; info = info->next)
+			for (info = subregdata[regnum]; info != nullptr; info = info->next)
 				printf("\t%08X\n", info->value);
 		}
 }
@@ -501,13 +501,13 @@ if (regdata_count[offset] < 256)
 {
 	reg_info **tailptr;
 
-	for (tailptr = &regdata[offset]; *tailptr != NULL; tailptr = &(*tailptr)->next)
+	for (tailptr = &regdata[offset]; *tailptr != nullptr; tailptr = &(*tailptr)->next)
 		if ((*tailptr)->value == data)
 			break;
-	if (*tailptr == NULL)
+	if (*tailptr == nullptr)
 	{
 		*tailptr = alloc_or_die(reg_info);
-		(*tailptr)->next = NULL;
+		(*tailptr)->next = nullptr;
 		(*tailptr)->value = data;
 		regdata_count[offset]++;
 	}
@@ -741,13 +741,13 @@ if (subregdata_count[which] < 256)
 {
 	reg_info **tailptr;
 
-	for (tailptr = &subregdata[which]; *tailptr != NULL; tailptr = &(*tailptr)->next)
+	for (tailptr = &subregdata[which]; *tailptr != nullptr; tailptr = &(*tailptr)->next)
 		if ((*tailptr)->value == value)
 			break;
-	if (*tailptr == NULL)
+	if (*tailptr == nullptr)
 	{
 		*tailptr = alloc_or_die(reg_info);
-		(*tailptr)->next = NULL;
+		(*tailptr)->next = nullptr;
 		(*tailptr)->value = value;
 		subregdata_count[which]++;
 	}

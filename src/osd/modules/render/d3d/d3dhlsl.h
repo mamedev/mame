@@ -326,7 +326,7 @@ public:
 
 	void window_save();
 	void window_record();
-	bool recording() { return avi_output_file != nullptr; }
+	bool recording() const { return avi_output_file != nullptr; }
 
 	void avi_update_snap(surface *surface);
 	void render_snapshot(surface *surface);

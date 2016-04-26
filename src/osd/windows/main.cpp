@@ -32,12 +32,12 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 
 	/* convert arguments to UTF-8 */
 	utf8_argv = (char **) malloc(argc * sizeof(*argv));
-	if (utf8_argv == NULL)
+	if (utf8_argv == nullptr)
 		return 999;
 	for (i = 0; i < argc; i++)
 	{
 		utf8_argv[i] = utf8_from_tstring(argv[i]);
-		if (utf8_argv[i] == NULL)
+		if (utf8_argv[i] == nullptr)
 			return 999;
 	}
 

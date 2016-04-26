@@ -65,7 +65,7 @@ public:
 
 		// then perform the read
 		DWORD result = 0;
-		if (!ReadFile(m_handle, buffer, length, &result, NULL))
+		if (!ReadFile(m_handle, buffer, length, &result, nullptr))
 			return win_error_to_file_error(GetLastError());
 
 		actual = result;
@@ -82,7 +82,7 @@ public:
 
 		// then perform the write
 		DWORD result = 0;
-		if (!WriteFile(m_handle, buffer, length, &result, NULL))
+		if (!WriteFile(m_handle, buffer, length, &result, nullptr))
 			return win_error_to_file_error(GetLastError());
 
 		actual = result;
@@ -157,7 +157,7 @@ DWORD create_path_recursive(TCHAR *path)
 	WIN32_FILE_ATTRIBUTE_DATA fileinfo;
 	if (GetFileAttributesEx(path, GetFileExInfoStandard, &fileinfo))
 		return NO_ERROR;
-	else if (!CreateDirectory(path, NULL))
+	else if (!CreateDirectory(path, nullptr))
 		return GetLastError();
 	else
 		return NO_ERROR;
@@ -212,7 +212,7 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 	}
 
 	// attempt to open the file
-	HANDLE h = CreateFile(t_path, access, sharemode, NULL, disposition, 0, NULL);
+	HANDLE h = CreateFile(t_path, access, sharemode, nullptr, disposition, 0, nullptr);
 	if (INVALID_HANDLE_VALUE == h)
 	{
 		DWORD err = GetLastError();
@@ -220,7 +220,7 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 		if ((ERROR_PATH_NOT_FOUND == err) && (openflags & OPEN_FLAG_CREATE) && (openflags & OPEN_FLAG_CREATE_PATHS))
 		{
 			TCHAR *pathsep = _tcsrchr(t_path, '\\');
-			if (pathsep != NULL)
+			if (pathsep != nullptr)
 			{
 				// create the path up to the file
 				*pathsep = 0;
@@ -230,7 +230,7 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 				// attempt to reopen the file
 				if (err == NO_ERROR)
 				{
-					h = CreateFile(t_path, access, sharemode, NULL, disposition, 0, NULL);
+					h = CreateFile(t_path, access, sharemode, nullptr, disposition, 0, nullptr);
 					err = GetLastError();
 				}
 			}
@@ -318,15 +318,15 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 
 	// do a create file on the drive
 	t_filename = tstring_from_utf8(filename);
-	if (t_filename == NULL)
+	if (t_filename == nullptr)
 		return FALSE;
-	file = CreateFile(t_filename, GENERIC_READ, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, NULL);
+	file = CreateFile(t_filename, GENERIC_READ, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, nullptr);
 	osd_free(t_filename);
 	if (file == INVALID_HANDLE_VALUE)
 		return FALSE;
 
 	// device I/O control should return the geometry
-	result = DeviceIoControl(file, IOCTL_DISK_GET_DRIVE_GEOMETRY, NULL, 0, &dg, sizeof(dg), &bytesRead, NULL);
+	result = DeviceIoControl(file, IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0, &dg, sizeof(dg), &bytesRead, nullptr);
 	CloseHandle(file);
 
 	// if that failed, return false
@@ -373,7 +373,7 @@ osd_directory_entry *osd_stat(const std::string &path)
 	else
 	{
 		// attempt to find the first file
-		HANDLE find = FindFirstFileEx(t_path.get(), FindExInfoStandard, &find_data, FindExSearchNameMatch, NULL, 0);
+		HANDLE find = FindFirstFileEx(t_path.get(), FindExInfoStandard, &find_data, FindExSearchNameMatch, nullptr, 0);
 		if (find == INVALID_HANDLE_VALUE)
 			return nullptr;
 		FindClose(find);
@@ -407,7 +407,7 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 
 	// cannonicalize the path
 	TCHAR buffer[MAX_PATH];
-	if (!GetFullPathName(t_path, ARRAY_LENGTH(buffer), buffer, NULL))
+	if (!GetFullPathName(t_path, ARRAY_LENGTH(buffer), buffer, nullptr))
 		return win_error_to_file_error(GetLastError());
 
 	// convert the result back to UTF-8
@@ -430,7 +430,7 @@ bool osd_is_absolute_path(std::string const &path)
 {
 	bool result = false;
 	TCHAR *t_path = tstring_from_utf8(path.c_str());
-	if (t_path != NULL)
+	if (t_path != nullptr)
 	{
 		result = !PathIsRelative(t_path);
 		osd_free(t_path);
@@ -454,7 +454,7 @@ const char *osd_get_volume_name(int idx)
 	p = szBuffer;
 	while(idx--) {
 		p += strlen(p) + 1;
-		if (!*p) return NULL;
+		if (!*p) return nullptr;
 	}
 
 	return p;

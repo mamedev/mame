@@ -553,7 +553,7 @@ static INPUT_PORTS_START( elim4 )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D7D6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segag80v_state,elim4_joint_coin_r, NULL)   /* combination of all four coin inputs */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segag80v_state,elim4_joint_coin_r, nullptr)   /* combination of all four coin inputs */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 

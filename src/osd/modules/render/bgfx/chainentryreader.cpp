@@ -20,6 +20,7 @@
 #include "targetmanager.h"
 #include "effectmanager.h"
 #include "chainentry.h"
+#include "chainmanager.h"
 #include "slider.h"
 #include "inputpair.h"
 #include "entryuniform.h"
@@ -29,7 +30,7 @@
 #include "clear.h"
 #include "clearreader.h"
 
-bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::string prefix, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, std::map<std::string, bgfx_slider*>& sliders, std::map<std::string, bgfx_parameter*>& params, uint32_t screen_index)
+bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::string prefix, chain_manager& chains, std::map<std::string, bgfx_slider*>& sliders, std::map<std::string, bgfx_parameter*>& params, uint32_t screen_index)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -37,7 +38,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 		return nullptr;
 	}
 
-	bgfx_effect* effect = effects.effect(value["effect"].GetString());
+	bgfx_effect* effect = chains.effects().effect(value["effect"].GetString());
 	if (effect == nullptr)
 	{
 		return nullptr;
@@ -45,7 +46,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 
 	std::string name = value["name"].GetString();
 
-	std::vector<bgfx_input_pair> inputs;
+	std::vector<bgfx_input_pair*> inputs;
 	if (value.HasMember("input"))
 	{
 		const Value& input_array = value["input"];
@@ -62,19 +63,105 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 			if (!READER_CHECK(!has_target || input["target"].IsString(), (prefix + "input[" + std::to_string(i) + ": Value 'target' must be a string\n").c_str())) return nullptr;
 			if (!READER_CHECK(!has_option || input["option"].IsString(), (prefix + "input[" + std::to_string(i) + ": Value 'option' must be a string\n").c_str())) return nullptr;
 			if (!READER_CHECK(has_target || !input.HasMember("bilinear") || input["bilinear"].IsBool(), (prefix + "input[" + std::to_string(i) + ": Value 'bilinear' must be a boolean\n").c_str())) return nullptr;
+			if (!READER_CHECK(has_texture || has_option || !input.HasMember("selection") || input["selection"].IsString(), (prefix + "input[" + std::to_string(i) + ": Value 'selection' must be a string\n").c_str())) return nullptr;
+			bool bilinear = get_bool(input, "bilinear", true);
+			std::string selection = get_string(input, "selection", "");
 
+			std::vector<std::string> texture_names;
 			std::string texture_name = "";
-			if (has_texture)
+			if (has_texture || has_option)
 			{
-				texture_name = input["texture"].GetString();
-				if (texture_name != "screen")
+				if (has_texture)
 				{
-					bool bilinear = get_bool(input, "bilinear", true);
-					uint32_t flags = bilinear ? 0 : (BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
-					bgfx_texture* texture = textures.create_png_texture(options.art_path(), texture_name, texture_name, flags, screen_index);
-					if (texture == nullptr)
+					texture_name = input["texture"].GetString();
+				}
+				if (has_option)
+				{
+					std::string option = input["option"].GetString();
+
+					texture_name = chains.options().value(option.c_str());
+				}
+
+				if (texture_name != "" && texture_name != "screen")
+				{
+					if (selection == "")
 					{
-						return nullptr;
+						// create texture for specified file name
+						uint32_t flags = bilinear ? 0 : (BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
+						bgfx_texture* texture = chains.textures().create_png_texture(chains.options().art_path(), texture_name, texture_name, flags, screen_index);
+						if (texture == nullptr)
+						{
+							return nullptr;
+						}
+					}
+					else
+					{
+						// create texture for specified file name
+						uint32_t flags = bilinear ? 0 : (BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
+						bgfx_texture* texture = chains.textures().create_png_texture(chains.options().art_path(), texture_name, texture_name, flags, screen_index);
+						if (texture == nullptr)
+						{
+							return nullptr;
+						}
+
+						// get directory of file
+						std::string directory_path = std::string(chains.options().art_path());
+						std::string file_directory = "";
+						const size_t last_slash = texture_name.rfind('/');
+						if (last_slash != std::string::npos)
+						{
+							file_directory = texture_name.substr(0, last_slash);
+
+							directory_path += "/" + file_directory;
+						}
+
+						osd_directory *directory = osd_opendir(directory_path.c_str());
+						if (directory != nullptr)
+						{
+							for (const osd_directory_entry *entry = osd_readdir(directory); entry != nullptr; entry = osd_readdir(directory))
+							{
+								if (entry->type == ENTTYPE_FILE)
+								{
+									std::string file(entry->name);
+									std::string extension(".png");
+
+									// split into file name and extension
+									std::string file_name;
+									std::string file_extension;
+									const size_t last_dot = file.rfind('.');
+									if (last_dot != std::string::npos)
+									{
+										file_name = file.substr(0, last_dot);
+										file_extension = file.substr(last_dot, file.length() - last_dot);
+									}
+
+									std::string file_path;
+									if (file_directory == "")
+									{
+										file_path = file;
+									}
+									else
+									{
+										file_path = file_directory + "/" + file;
+									}
+
+									// check for .png extension
+									if (file_extension == extension)
+									{
+										// create textures for all files containd in the path of the specified file name
+										uint32_t flags = bilinear ? 0 : (BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
+										bgfx_texture* texture = chains.textures().create_png_texture(chains.options().art_path(), file_path, file_path, flags, screen_index);
+										if (texture == nullptr)
+										{
+											return nullptr;
+										}
+										texture_names.push_back(file_path);
+									}
+								}
+							}
+
+							osd_closedir(directory);
+						}
 					}
 				}
 			}
@@ -82,24 +169,14 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 			{
 				texture_name = input["target"].GetString();
 			}
-			else if (has_option)
-			{
-				bool bilinear = get_bool(input, "bilinear", true);
-				uint32_t flags = bilinear ? 0 : (BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
-				texture_name = input["option"].GetString();
-				bgfx_texture* texture = textures.create_png_texture(options.art_path(), options.value(texture_name.c_str()), texture_name, flags, screen_index);
-				if (texture == nullptr)
-				{
-					return nullptr;
-				}
-			}
 			else
 			{
 				return nullptr;
 			}
 
 			std::string sampler = input["sampler"].GetString();
-			inputs.push_back(bgfx_input_pair(i, sampler, texture_name));
+			bgfx_input_pair* input_pair = new bgfx_input_pair(i, sampler, texture_name, texture_names, selection, chains, screen_index);
+			inputs.push_back(input_pair);
 		}
 	}
 
@@ -148,7 +225,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 	}
 
 	std::string output = value["output"].GetString();
-	return new bgfx_chain_entry(name, effect, clear, suppressors, inputs, uniforms, targets, output);
+	return new bgfx_chain_entry(name, effect, clear, suppressors, inputs, uniforms, chains.targets(), output);
 }
 
 bool chain_entry_reader::validate_parameters(const Value& value, std::string prefix)

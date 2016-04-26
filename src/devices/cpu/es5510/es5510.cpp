@@ -497,7 +497,7 @@ WRITE8_MEMBER(es5510_device::host_w)
 
 	case 0xc0: /* Write select - INSTR */
 #if VERBOSE
-		DESCRIBE_INSTR(buf, instr_latch, gpr[data], NULL, NULL, NULL, NULL);
+		DESCRIBE_INSTR(buf, instr_latch, gpr[data], nullptr, nullptr, nullptr, nullptr);
 		LOG(("%s",string_format("ES5510: Host Write INSTR %02x %012I64x: %s\n", data, instr_latch&U64(0xffffffffffff), buf).c_str()));
 #endif
 		if (data < 0xa0) {
@@ -507,7 +507,7 @@ WRITE8_MEMBER(es5510_device::host_w)
 
 	case 0xe0: /* Write select - GPR + INSTR */
 #if VERBOSE
-		DESCRIBE_INSTR(buf, instr_latch, gpr_latch, NULL, NULL, NULL, NULL);
+		DESCRIBE_INSTR(buf, instr_latch, gpr_latch, nullptr, nullptr, nullptr, nullptr);
 		LOG(("%s",string_format("ES5510: Host Write INSTR+GPR %02x (%s): %012I64x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, SX(gpr_latch), buf).c_str()));
 #endif
 		if (data < 0xa0) {
@@ -700,7 +700,7 @@ void es5510_device::execute_run() {
 
 #if VERBOSE_EXEC
 			char buf[1024];
-			DESCRIBE_INSTR(buf, instr[pc], gpr[pc], NULL, NULL, NULL, NULL);
+			DESCRIBE_INSTR(buf, instr[pc], gpr[pc], nullptr, nullptr, nullptr, nullptr);
 			LOG_EXEC(("%s",string_format("EXECUTING %02x: %012I64x %06x  %s\n", pc, instr[pc], gpr[pc]&0xffffff, buf).c_str()));
 #endif
 

@@ -34,7 +34,7 @@ gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, d
 
 const address_space_config *gt64xxx_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? pci_bridge_device::memory_space_config(spacenum) : (spacenum == AS_DATA) ? &m_mem_config : (spacenum == AS_IO) ? &m_io_config : NULL;
+	return (spacenum == AS_PROGRAM) ? pci_bridge_device::memory_space_config(spacenum) : (spacenum == AS_DATA) ? &m_mem_config : (spacenum == AS_IO) ? &m_io_config : nullptr;
 }
 
 void gt64xxx_device::device_start()

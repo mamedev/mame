@@ -3219,7 +3219,7 @@ static INPUT_PORTS_START( gmgalax )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("GAMESEL")      /* fake - game select */
-	PORT_DIPNAME( 0x01, 0x00, "Game Select") PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, galaxian_state, gmgalax_game_changed, NULL)
+	PORT_DIPNAME( 0x01, 0x00, "Game Select") PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, galaxian_state, gmgalax_game_changed, nullptr)
 	PORT_DIPSETTING( 0x00, "Ghost Muncher" )
 	PORT_DIPSETTING( 0x01, "Galaxian" )
 INPUT_PORTS_END
@@ -3969,14 +3969,14 @@ static INPUT_PORTS_START( kingball )
 	PORT_INCLUDE(galaxian)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, kingball_muxbit_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, kingball_muxbit_r, nullptr)
 	/* Relating to above port:Hack? - possibly multiplexed via writes to $b003 */
 	//PORT_DIPNAME( 0x40, 0x40, "Speech" )
 	//PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	//PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, kingball_noise_r, NULL)   /* NOISE line */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, kingball_noise_r, nullptr)   /* NOISE line */
 	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
@@ -4860,7 +4860,7 @@ CUSTOM_INPUT_MEMBER(galaxian_state::moonwar_dial_r)
 /* verified from Z80 code */
 static INPUT_PORTS_START( moonwar )
 	PORT_START("IN0")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, moonwar_dial_r, NULL)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, moonwar_dial_r, nullptr)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL // cocktail: p2 shield
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -7074,7 +7074,7 @@ DRIVER_INIT_MEMBER(galaxian_state,amidar)
 {
 	/* no existing amidar sets run on Amidar hardware as described by Amidar schematics! */
 	/* video extensions */
-	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::amidar_draw_background, NULL, NULL);
+	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::amidar_draw_background, nullptr, nullptr);
 }
 #endif
 

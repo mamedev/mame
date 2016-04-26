@@ -40,7 +40,7 @@ class debug_qt : public osd_module, public debug_module
 public:
 	debug_qt()
 	: osd_module(OSD_DEBUG_PROVIDER, "qt"), debug_module(),
-		m_machine(NULL)
+		m_machine(nullptr)
 	{
 	}
 
@@ -64,10 +64,10 @@ private:
 //============================================================
 
 int qtArgc = 0;
-char** qtArgv = NULL;
+char** qtArgv = nullptr;
 
 bool oneShot = true;
-static MainWindow* mainQtWindow = NULL;
+static MainWindow* mainQtWindow = nullptr;
 
 //============================================================
 //  XML configuration save/load
@@ -84,7 +84,7 @@ static void xml_configuration_load(running_machine &machine, config_type cfg_typ
 		return;
 
 	// Might not have any data
-	if (parentnode == NULL)
+	if (parentnode == nullptr)
 		return;
 
 	for (int i = 0; i < xmlConfigurations.size(); i++)
@@ -92,8 +92,8 @@ static void xml_configuration_load(running_machine &machine, config_type cfg_typ
 	xmlConfigurations.clear();
 
 	// Configuration load
-	xml_data_node* wnode = NULL;
-	for (wnode = xml_get_sibling(parentnode->child, "window"); wnode != NULL; wnode = xml_get_sibling(wnode->next, "window"))
+	xml_data_node* wnode = nullptr;
+	for (wnode = xml_get_sibling(parentnode->child, "window"); wnode != nullptr; wnode = xml_get_sibling(wnode->next, "window"))
 	{
 		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)xml_get_attribute_int(wnode, "type", WindowQtConfig::WIN_TYPE_UNKNOWN);
 		switch (type)
@@ -124,8 +124,8 @@ static void xml_configuration_save(running_machine &machine, config_type cfg_typ
 
 		// Create an xml node
 		xml_data_node *debugger_node;
-		debugger_node = xml_add_child(parentnode, "window", NULL);
-		if (debugger_node == NULL)
+		debugger_node = xml_add_child(parentnode, "window", nullptr);
+		if (debugger_node == nullptr)
 			continue;
 
 		// Insert the appropriate information
@@ -195,7 +195,7 @@ static void setup_additional_startup_windows(running_machine& machine, std::vect
 	{
 		WindowQtConfig* config = configList[i];
 
-		WindowQt* foo = NULL;
+		WindowQt* foo = nullptr;
 		switch (config->m_type)
 		{
 			case WindowQtConfig::WIN_TYPE_MEMORY:
@@ -246,7 +246,7 @@ bool debug_qt::nativeEventFilter(const QByteArray &eventType, void *message, lon
 
 void debug_qt::init_debugger(running_machine &machine)
 {
-	if (qApp == NULL)
+	if (qApp == nullptr)
 	{
 		// If you're starting from scratch, create a new qApp
 		new QApplication(qtArgc, qtArgv);

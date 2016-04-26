@@ -112,7 +112,7 @@ public:
 	nld_truthtable_t(truthtable_t *ttbl, const char *desc[])
 	: device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
 	{
-		while (*desc != NULL && **desc != 0 )
+		while (*desc != nullptr && **desc != 0 )
 			{
 				m_desc.push_back(*desc);
 				desc++;

@@ -632,7 +632,7 @@ BUSES["PC_KBD"] = true
 --BUSES["QL"] = true
 BUSES["RS232"] = true
 --BUSES["S100"] = true
---BUSES["SAT_CTRL"] = true
+BUSES["SAT_CTRL"] = true
 --BUSES["SATURN"] = true
 BUSES["SCSI"] = true
 --BUSES["SCV"] = true
@@ -1286,7 +1286,7 @@ files {
 	MAME_DIR .. "src/mame/video/cps1.cpp",
 	MAME_DIR .. "src/mame/drivers/kenseim.cpp",
 	MAME_DIR .. "src/mame/drivers/cps2.cpp",
-	MAME_DIR .. "src/mame/machine/cps2crpt.cpp",
+	MAME_DIR .. "src/mame/machine/cps2crypt.cpp",
 	MAME_DIR .. "src/mame/machine/cps2crypt.h",
 	MAME_DIR .. "src/mame/drivers/cps3.cpp",
 	MAME_DIR .. "src/mame/includes/cps3.h",
@@ -1664,9 +1664,9 @@ files {
 	MAME_DIR .. "src/mame/video/exidy440.cpp",
 	MAME_DIR .. "src/mame/drivers/exidyttl.cpp",
 	MAME_DIR .. "src/mame/drivers/maxaflex.cpp",
-	MAME_DIR .. "src/mame/machine/atari.cpp",
-	MAME_DIR .. "src/mame/includes/atari.h",
-	MAME_DIR .. "src/mame/video/atari.cpp",
+	MAME_DIR .. "src/mame/machine/atari400.cpp",
+	MAME_DIR .. "src/mame/includes/atari400.h",
+	MAME_DIR .. "src/mame/video/atari400.cpp",
 	MAME_DIR .. "src/mame/video/antic.cpp",
 	MAME_DIR .. "src/mame/video/antic.h",
 	MAME_DIR .. "src/mame/video/gtia.cpp",
@@ -3002,7 +3002,7 @@ files {
 	MAME_DIR .. "src/mame/machine/segabb.cpp",
 	MAME_DIR .. "src/mame/machine/segabb.h",
 	MAME_DIR .. "src/mame/machine/megadriv.cpp",
-	MAME_DIR .. "src/mame/includes/md_cons.h",
+	MAME_DIR .. "src/mame/includes/megadriv.h",
 	MAME_DIR .. "src/mame/drivers/megadrvb.cpp",
 	MAME_DIR .. "src/mame/drivers/megaplay.cpp",
 	MAME_DIR .. "src/mame/drivers/megatech.cpp",

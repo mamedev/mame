@@ -93,7 +93,7 @@ static MACHINE_CONFIG_FRAGMENT( at_mb )
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(at_mb_device, dack7_w))
 
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE(":maincpu", 0), VCC, READ8(at_mb_device, get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NULL )
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NOOP)
 
 	MCFG_DEVICE_ADD("isabus", ISA16, 0)
 	MCFG_ISA16_CPU(":maincpu")

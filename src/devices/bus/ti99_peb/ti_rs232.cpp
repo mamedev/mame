@@ -199,7 +199,7 @@ bool ti_rs232_attached_device::call_load()
 	}
 
 	// The following line may cause trouble in the init phase
-	// card->incoming_dtr(devnumber, (m_file!=NULL)? ASSERT_LINE : CLEAR_LINE);
+	// card->incoming_dtr(devnumber, (m_file!=nullptr)? ASSERT_LINE : CLEAR_LINE);
 
 	return false;  // OK
 }

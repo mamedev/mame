@@ -1251,9 +1251,9 @@ void n64_periphs::ai_dma()
 	AUDIO_DMA *current = ai_fifo_get_top();
 	attotime period;
 
-	//static FILE * audio_dump = NULL;
+	//static FILE * audio_dump = nullptr;
 	//
-	//if (audio_dump == NULL)
+	//if (audio_dump == nullptr)
 	//    audio_dump = fopen("audio_dump.raw","wb");
 	//
 	//fwrite(&ram[current->address/2],current->length,1,audio_dump);
@@ -2704,7 +2704,7 @@ void n64_state::n64_machine_stop()
 	device_image_interface *image = dynamic_cast<device_image_interface *>(periphs->m_nvram_image);
 
 	UINT8 data[0x30800];
-	if (m_sram != NULL)
+	if (m_sram != nullptr)
 	{
 		memset(data, 0, 0x20000);
 	}

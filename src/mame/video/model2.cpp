@@ -2376,7 +2376,7 @@ static UINT32 * geo_end( geo_state *geo, UINT32 opcode, UINT32 *input )
 	/* signal the end of this data block the rasterizer */
 	model2_3d_push( raster, 0xFF000000 );
 
-	/* signal end by returning NULL */
+	/* signal end by returning nullptr */
 	return nullptr;
 }
 

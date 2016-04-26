@@ -12,14 +12,14 @@ device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config 
 	: device_slot_card_interface(mconfig, device),
 		m_sprite_gfx_address_mask(0)
 /*
-m_rom(NULL),
-m_fixed(NULL),
-m_sprites(NULL),
-m_sprites_optimized(NULL),
-m_audio(NULL),
-m_ym(NULL),
-m_ymdelta(NULL),
-m_audiocrypt(NULL)
+m_rom(nullptr),
+m_fixed(nullptr),
+m_sprites(nullptr),
+m_sprites_optimized(nullptr),
+m_audio(nullptr),
+m_ym(nullptr),
+m_ymdelta(nullptr),
+m_audiocrypt(nullptr)
 */
 {
 }

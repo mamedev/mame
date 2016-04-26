@@ -80,7 +80,7 @@ struct X1_010_CHANNEL {
 
 
 /* mixer tables and internal buffers */
-//static short  *mixer_buffer = NULL;
+//static short  *mixer_buffer = nullptr;
 
 
 const device_type X1_010 = &device_creator<x1_010_device>;

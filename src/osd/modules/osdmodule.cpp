@@ -44,7 +44,7 @@ void osd_module_manager::register_module(const module_type &mod_type)
 	}
 }
 
-bool osd_module_manager::type_has_name(const char *type, const char *name)
+bool osd_module_manager::type_has_name(const char *type, const char *name) const
 {
 	return (get_module_index(type, name) >= 0);
 }
@@ -91,7 +91,7 @@ void osd_module_manager::exit()
 	}
 }
 
-int osd_module_manager::get_module_index(const char *type, const char *name)
+int osd_module_manager::get_module_index(const char *type, const char *name) const
 {
 	for (int i = 0; m_modules[i] != nullptr; i++)
 	{
@@ -101,7 +101,7 @@ int osd_module_manager::get_module_index(const char *type, const char *name)
 	return -1;
 }
 
-void osd_module_manager::get_module_names(const char *type, const int max, int *num, const char *names[])
+void osd_module_manager::get_module_names(const char *type, const int max, int *num, const char *names[]) const
 {
 	*num = 0;
 	for (int i = 0; m_modules[i] != nullptr; i++)

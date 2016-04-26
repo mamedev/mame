@@ -158,7 +158,6 @@ float2 GetAdjustedCoords(float2 coord)
 	return coord;
 }
 
-// vector screen has the same quad texture coordinates for every screen orientation, raster screen differs
 float2 GetShadowCoord(float2 QuadCoord, float2 SourceCoord)
 {
 	float2 QuadTexel = 1.0f / QuadDims;

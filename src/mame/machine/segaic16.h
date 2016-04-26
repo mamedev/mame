@@ -23,8 +23,8 @@
 #define MCFG_SEGA_315_5195_MAPPER_ADD(_tag, _cputag, _class, _mapper, _read, _write) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5195_MEM_MAPPER, 0) \
 	sega_315_5195_mapper_device::static_set_cputag(*device, "^" _cputag); \
-	sega_315_5195_mapper_device::static_set_mapper(*device, sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, NULL, (_class *)0)); \
-	sega_315_5195_mapper_device::static_set_sound_readwrite(*device, sega_315_5195_mapper_device::sound_read_delegate(&_class::_read, #_class "::" #_read, NULL, (_class *)0), sega_315_5195_mapper_device::sound_write_delegate(&_class::_write, #_class "::" #_write, NULL, (_class *)0));
+	sega_315_5195_mapper_device::static_set_mapper(*device, sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr)); \
+	sega_315_5195_mapper_device::static_set_sound_readwrite(*device, sega_315_5195_mapper_device::sound_read_delegate(&_class::_read, #_class "::" #_read, nullptr, (_class *)nullptr), sega_315_5195_mapper_device::sound_write_delegate(&_class::_write, #_class "::" #_write, nullptr, (_class *)nullptr));
 
 #define MCFG_SEGA_315_5248_MULTIPLIER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5248_MULTIPLIER, 0)
@@ -35,9 +35,9 @@
 #define MCFG_SEGA_315_5250_COMPARE_TIMER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5250_COMPARE_TIMER, 0)
 #define MCFG_SEGA_315_5250_TIMER_ACK(_class, _func) \
-	sega_315_5250_compare_timer_device::static_set_timer_ack(*device, sega_315_5250_compare_timer_device::timer_ack_delegate(&_class::_func, #_class "::" #_func, NULL, (_class *)0));
+	sega_315_5250_compare_timer_device::static_set_timer_ack(*device, sega_315_5250_compare_timer_device::timer_ack_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
 #define MCFG_SEGA_315_5250_SOUND_WRITE(_class, _func) \
-	sega_315_5250_compare_timer_device::static_set_sound_write(*device, sega_315_5250_compare_timer_device::sound_write_delegate(&_class::_func, #_class "::" #_func, NULL, (_class *)0));
+	sega_315_5250_compare_timer_device::static_set_sound_write(*device, sega_315_5250_compare_timer_device::sound_write_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
 
 
 //**************************************************************************

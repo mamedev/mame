@@ -3315,7 +3315,7 @@ void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 template<typename _Type>
 _Type ioport_manager::playback_read(_Type &result)
 {
-	// protect against NULL handles if previous reads fail
+	// protect against nullptr handles if previous reads fail
 	if (!m_playback_file.is_open())
 		result = 0;
 
@@ -3480,7 +3480,7 @@ void ioport_manager::playback_port(ioport_port &port)
 template<typename _Type>
 void ioport_manager::record_write(_Type value)
 {
-	// protect against NULL handles if previous reads fail
+	// protect against nullptr handles if previous reads fail
 	if (!m_record_file.is_open())
 		return;
 
@@ -3499,7 +3499,7 @@ void ioport_manager::record_write<bool>(bool value)
 template<typename _Type>
 void ioport_manager::timecode_write(_Type value)
 {
-	// protect against NULL handles if previous reads fail
+	// protect against nullptr handles if previous reads fail
 	if (!m_timecode_file.is_open())
 		return;
 

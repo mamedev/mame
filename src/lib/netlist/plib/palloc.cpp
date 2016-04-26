@@ -40,7 +40,7 @@ void* operator new(std::size_t size, pmemory_pool *pool) throw (std::bad_alloc)
 
 void operator delete(void *ptr, pmemory_pool *pool)
 {
-	if (ptr != NULL)
+	if (ptr != nullptr)
 		pfree_raw(ptr);
 }
 

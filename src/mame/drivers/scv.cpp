@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/upd7810/upd7810.h"
-#include "audio/upd1771.h"
+#include "sound/upd1771.h"
 #include "bus/scv/slot.h"
 #include "bus/scv/rom.h"
 #include "softlist.h"

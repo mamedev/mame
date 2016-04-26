@@ -11,7 +11,6 @@
 #include "emu.h"
 
 #include "osdepend.h"
-#include "uiinput.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/sliders.h"

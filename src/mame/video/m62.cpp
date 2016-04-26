@@ -304,7 +304,7 @@ WRITE8_MEMBER(m62_state::m62_flipscreen_w)
 	machine().bookkeeping().coin_counter_w(1, data & 4);
 
 	/* Sound inhibit ... connected to D6 which is not present on any board */
-	if (m_audio->m_audio_SINH != NULL)
+	if (m_audio->m_audio_SINH != nullptr)
 		m_audio->m_audio_SINH->write((data >> 3) & 1);
 }
 

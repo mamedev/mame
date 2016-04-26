@@ -102,7 +102,7 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 		if (fd == -1)
 		{
 			osd_free(os_shmem);
-			return NULL;
+			return nullptr;
 		}
 		os_shmem->creator = 0;
 	}
@@ -111,7 +111,7 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 
 	assert(fd != -1);
 
-	os_shmem->ptr = mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	os_shmem->ptr = mmap(nullptr, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
 	os_shmem->size = size;
 	close(fd);
 	return os_shmem;

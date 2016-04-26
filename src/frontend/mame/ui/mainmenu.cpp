@@ -11,8 +11,6 @@
 #include "emu.h"
 #include "crsshair.h"
 #include "emuopts.h"
-#include "rendutil.h"
-#include "cheat.h"
 #include "ui/menu.h"
 #include "ui/filemngr.h"
 #include "ui/barcode.h"

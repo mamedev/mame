@@ -262,7 +262,7 @@ static const z80_daisy_config lc80_daisy_chain[] =
 	{ Z80CTC_TAG },
 	{ Z80PIO2_TAG },
 	{ Z80PIO1_TAG },
-	{ NULL }
+	{ nullptr }
 };
 #endif
 

@@ -75,7 +75,7 @@ static INPUT_PORTS_START( phoenix )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, NULL)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, nullptr)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )            PORT_DIPLOCATION( "SW1:1,2" )
@@ -158,7 +158,7 @@ static INPUT_PORTS_START( condor )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, NULL)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, nullptr)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )            PORT_DIPLOCATION( "SW1:1,2" )
@@ -288,7 +288,7 @@ static INPUT_PORTS_START( pleiads )
 	PORT_INCLUDE( phoenix )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, NULL)     /* Protection. See 0x0552 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, nullptr)     /* Protection. See 0x0552 */
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION( "SW1:7" )
@@ -311,7 +311,7 @@ static INPUT_PORTS_START( pleiadbl )
 	PORT_INCLUDE( phoenix )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, NULL)     /* Protection. See 0x0552 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, nullptr)     /* Protection. See 0x0552 */
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION( "SW1:7" )

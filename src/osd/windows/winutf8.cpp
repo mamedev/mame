@@ -24,7 +24,7 @@
 void win_output_debug_string_utf8(const char *string)
 {
 	TCHAR *t_string = tstring_from_utf8(string);
-	if (t_string != NULL)
+	if (t_string != nullptr)
 	{
 		OutputDebugString(t_string);
 		osd_free(t_string);
@@ -40,8 +40,8 @@ void win_output_debug_string_utf8(const char *string)
 int win_message_box_utf8(HWND window, const char *text, const char *caption, UINT type)
 {
 	int result = IDNO;
-	TCHAR *t_text = NULL;
-	TCHAR *t_caption = NULL;
+	TCHAR *t_text = nullptr;
+	TCHAR *t_caption = nullptr;
 
 	if (text)
 	{
@@ -76,7 +76,7 @@ done:
 BOOL win_set_window_text_utf8(HWND window, const char *text)
 {
 	BOOL result = FALSE;
-	TCHAR *t_text = NULL;
+	TCHAR *t_text = nullptr;
 
 	if (text)
 	{
@@ -107,7 +107,7 @@ done:
 int win_get_window_text_utf8(HWND window, char *buffer, size_t buffer_size)
 {
 	int result = 0;
-	char *utf8_buffer = NULL;
+	char *utf8_buffer = nullptr;
 	TCHAR t_buffer[256];
 
 	t_buffer[0] = '\0';
@@ -143,8 +143,8 @@ HWND win_create_window_ex_utf8(DWORD exstyle, const char* classname, const char*
 								HINSTANCE instance, void* param)
 {
 	TCHAR* t_classname;
-	TCHAR* t_windowname = NULL;
-	HWND result = 0;
+	TCHAR* t_windowname = nullptr;
+	HWND result = nullptr;
 
 	t_classname = tstring_from_utf8(classname);
 	if( !t_classname )

@@ -290,7 +290,7 @@ void core_options::add_entry(const char *name, const char *description, UINT32 f
 
 void core_options::add_entries(const options_entry *entrylist, bool override_existing)
 {
-	// loop over entries until we hit a NULL name
+	// loop over entries until we hit a nullptr name
 	for ( ; entrylist->name != nullptr || (entrylist->flags & OPTION_HEADER) != 0; entrylist++)
 		add_entry(*entrylist, override_existing);
 }

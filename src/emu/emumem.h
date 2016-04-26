@@ -878,7 +878,7 @@ private:
 
 //-------------------------------------------------
 //  read_ptr - return a pointer to valid RAM
-//  referenced by the address, or NULL if no RAM
+//  referenced by the address, or nullptr if no RAM
 //  backing that address
 //-------------------------------------------------
 

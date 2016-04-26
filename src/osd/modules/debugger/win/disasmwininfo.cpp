@@ -15,10 +15,10 @@
 
 
 disasmwin_info::disasmwin_info(debugger_windows_interface &debugger) :
-	disasmbasewin_info(debugger, false, "Disassembly", NULL),
-	m_combownd(NULL)
+	disasmbasewin_info(debugger, false, "Disassembly", nullptr),
+	m_combownd(nullptr)
 {
-	if ((window() == NULL) || (m_views[0] == NULL))
+	if ((window() == nullptr) || (m_views[0] == nullptr))
 		return;
 
 	// set up the view to track the initial expression

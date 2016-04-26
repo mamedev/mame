@@ -71,6 +71,8 @@ class ui_manager
 public:
 	// construction/destruction
 	ui_manager(running_machine &machine) : m_machine(machine),m_use_natural_keyboard(false),m_show_timecode_counter(false),m_show_timecode_total(false) { }
+
+	virtual ~ui_manager() { }
 	
 	virtual void set_startup_text(const char *text, bool force) { }
 	
@@ -80,8 +82,8 @@ public:
 	
 	void set_show_timecode_counter(bool value) { m_show_timecode_counter = value; m_show_timecode_total = true; }
 
-	bool show_timecode_counter() { return m_show_timecode_counter; }
-    bool show_timecode_total() { return m_show_timecode_total; }
+	bool show_timecode_counter() const { return m_show_timecode_counter; }
+    bool show_timecode_total() const { return m_show_timecode_total; }
 	
 	virtual void popup_time_string(int seconds, std::string message) { } 
 

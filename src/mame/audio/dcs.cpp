@@ -610,7 +610,7 @@ void dcs_audio_device::dcs_boot()
 			{
 				buffer[i] = base[i];
 			}
-			assert(m_internal_program_ram != NULL);
+			assert(m_internal_program_ram != nullptr);
 			m_cpu->load_boot_data(buffer, m_internal_program_ram);
 			break;
 		}
@@ -637,7 +637,7 @@ void dcs_audio_device::dcs_boot()
 			{
 				buffer[i] = base[i];
 			}
-			assert(m_internal_program_ram != NULL);
+			assert(m_internal_program_ram != nullptr);
 			m_cpu->load_boot_data(buffer, m_internal_program_ram);
 			break;
 		}
@@ -814,8 +814,8 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_sounddata_banks(0),
 	m_sounddata_bank(0),
 	m_data_bank(*this, "databank"),
-	m_rom_page(NULL),
-	m_dram_page(NULL),
+	m_rom_page(nullptr),
+	m_dram_page(nullptr),
 	m_auto_ack(0),
 	m_latch_control(0),
 	m_input_data(0),
@@ -855,12 +855,12 @@ void dcs_audio_device::device_start()
 	m_sram = nullptr;
 
 	memory_share *internal_ram = memshare("dcsint");
-	if (internal_ram != NULL)
+	if (internal_ram != nullptr)
 	{
 		m_internal_program_ram = (UINT32 *)internal_ram->ptr();
 	}
 	memory_share *external_ram = memshare("dcsext");
-	if (external_ram != NULL)
+	if (external_ram != nullptr)
 	{
 		m_external_program_ram = (UINT32 *)external_ram->ptr();
 	}
@@ -909,12 +909,12 @@ void dcs2_audio_device::device_start()
 	int soundbank_words;
 
 	memory_share *internal_ram = memshare("dcsint");
-	if (internal_ram != NULL)
+	if (internal_ram != nullptr)
 	{
 		m_internal_program_ram = (UINT32 *)internal_ram->ptr();
 	}
 	memory_share *external_ram = memshare("dcsext");
-	if (external_ram != NULL)
+	if (external_ram != nullptr)
 	{
 		m_external_program_ram = (UINT32 *)external_ram->ptr();
 	}
@@ -946,7 +946,7 @@ void dcs2_audio_device::device_start()
 
 	/* always boot from the base of "dcs" */
 	memory_region *bootrom_region = machine().root_device().memregion("dcs");
-	if (bootrom_region != NULL)
+	if (bootrom_region != nullptr)
 	{
 		m_bootrom = (UINT16 *)bootrom_region->base();
 		m_bootrom_words = bootrom_region->bytes() / 2;
@@ -1013,14 +1013,14 @@ void dcs_audio_device::set_auto_ack(int state)
 
 READ16_MEMBER( dcs_audio_device::dcs_dataram_r )
 {
-	assert(m_external_program_ram != NULL);
+	assert(m_external_program_ram != nullptr);
 	return m_external_program_ram[offset] >> 8;
 }
 
 
 WRITE16_MEMBER( dcs_audio_device::dcs_dataram_w )
 {
-	assert(m_external_program_ram != NULL);
+	assert(m_external_program_ram != nullptr);
 	UINT16 val = m_external_program_ram[offset] >> 8;
 	COMBINE_DATA(&val);
 	m_external_program_ram[offset] = (val << 8) | (m_external_program_ram[offset] & 0x0000ff);

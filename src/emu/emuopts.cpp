@@ -228,7 +228,7 @@ emu_options::emu_options()
 
 //-------------------------------------------------
 //  system - return a pointer to the specified
-//  system driver, or NULL if no match
+//  system driver, or nullptr if no match
 //-------------------------------------------------
 
 const game_driver *emu_options::system() const

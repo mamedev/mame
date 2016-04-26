@@ -1445,7 +1445,7 @@ Notes:
 Development ROM board:
 
 There are a few unreleased and many prototype game versions known to exist on this ROM board.
-Currently Rumble Fish 1 and 2 prototypes is dumped.
+Currently Rumble Fish 1, Rumble Fish 2 prototypes and Sushi Bar is dumped.
 
 PC BD SYSTEMX 3MODE FLASH Rev.B
 1111-00001402
@@ -1576,7 +1576,6 @@ Chase 1929
 Force Five
 Kenju
 Premier Eleven
-Sushi Bar
 
 */
 
@@ -2480,7 +2479,7 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("OUTPUT")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, nullptr)
 
 	PORT_START("P1")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY1\0KEY2\0KEY3\0KEY4\0KEY5")
@@ -9352,7 +9351,8 @@ ROM_START( rumblef2 )
 	ROM_LOAD( "ax3401f01.bin", 0, 4, CRC(952919a1) SHA1(d343fdbbd1d8b651401133f21facc1584bb66c04) )
 ROM_END
 
-// Prototype, have internal text: (C)Dimps Tue Jan 11 14:32:45 2005 NONAME (build 0001)
+// Prototype ROM board
+// (C)Dimps Tue Jan 11 14:32:45 2005 NONAME (build 0001)
 ROM_START( rumblf2p )
 	AW_BIOS
 
@@ -9430,6 +9430,25 @@ ROM_START( basschal )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "315-6248.bin", 0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+ROM_END
+
+// Prototype ROM board
+// Build:May 23 2003 14:40:15
+ROM_START( sushibar )
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD("ic12", 0x00000000, 0x00800000, CRC(06a2ed58) SHA1(a807fa8c1c83cb8b18595c210479d5f1dd6be4ca) )
+	// IC 13 populated, empty
+	ROM_LOAD("ic14", 0x01000000, 0x00800000, CRC(4860f944) SHA1(55c75630c33cba35512a1349650f28fd56757f9f) )
+	ROM_LOAD("ic15", 0x01800000, 0x00800000, CRC(7113506c) SHA1(0548d67b3a1c0b8f17fcafd4fe5c1e6b0e91b6e7) )
+	ROM_LOAD("ic16", 0x02000000, 0x00800000, CRC(77e8e39e) SHA1(1286010cdba5c3c0ad5cbe19718fd0f8e5f579db) )
+	ROM_LOAD("ic17", 0x02800000, 0x00800000, CRC(0eba54ea) SHA1(51842ec326a5ba65bd280e652e7d9b395a2586c6) )
+	ROM_LOAD("ic18", 0x03000000, 0x00800000, CRC(b9957c76) SHA1(6d72c7ac8e1e0cbed7eb01b66f71bedf46a833e1) )
+	// IC19 - IC27 populated, empty
+
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "julie_dev.bin", 0, 4, CRC(757054c4) SHA1(7d5556d0940c582adbcf5697c7b81453d0c91153) )
 ROM_END
 
 /* All games have the regional titles at the start of the IC22 rom in the following order
@@ -9783,6 +9802,7 @@ GAME( 2003, demofist,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "P
 GAME( 2003, dolphin,   awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
 GAME( 2003, kov7sprt,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
 GAME( 2003, ggisuka,   awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2003, sushibar,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Sushi Bar", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
 GAME( 2004, dirtypig,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Dirty Pigskin Football", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
 GAME( 2004, rumblef,   awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
 GAME( 2004, rumblefp,  rumblef,  aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish (prototype)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )

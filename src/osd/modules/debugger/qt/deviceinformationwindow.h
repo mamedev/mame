@@ -13,7 +13,7 @@ class DeviceInformationWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	DeviceInformationWindow(running_machine* machine, device_t* device = NULL, QWidget* parent=NULL);
+	DeviceInformationWindow(running_machine* machine, device_t* device = nullptr, QWidget* parent=nullptr);
 	virtual ~DeviceInformationWindow();
 
 	void set_device(const char *tag);

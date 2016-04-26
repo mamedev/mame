@@ -139,7 +139,7 @@ ADDRESS_MAP_END
 
 const address_space_config *ef9365_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 //**************************************************************************

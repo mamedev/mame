@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "slider.h"
+#include "chainmanager.h"
 
 const slider_reader::string_to_enum slider_reader::TYPE_NAMES[slider_reader::TYPE_COUNT] = {
 	{ "intenum", uint64_t(bgfx_slider::slider_type::SLIDER_INT_ENUM) },
@@ -33,7 +34,7 @@ const slider_reader::string_to_enum slider_reader::SCREEN_NAMES[slider_reader::S
 	{ "all",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_ANY) }
 };
 
-std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, std::string prefix, running_machine& machine, uint32_t window_index, uint32_t screen_index)
+std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, std::string prefix, chain_manager& chains, uint32_t screen_index)
 {
 	std::vector<bgfx_slider*> sliders;
 
@@ -82,7 +83,7 @@ std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, std
 			break;
 	}
 
-	std::string prefixed_desc = "Window " + std::to_string(window_index) + ", Screen " + std::to_string(screen_index) + ", " + description;
+	std::string prefixed_desc = "Window " + std::to_string(chains.window_index()) + ", Screen " + std::to_string(screen_index) + ", " + description;
 	if (slider_count > 1)
 	{
 		float min[3];
@@ -113,7 +114,7 @@ std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, std
 					desc = prefixed_desc + "Invalid";
 					break;
 			}
-			sliders.push_back(new bgfx_slider(machine, full_name, min[index], defaults[index], max[index], step, type, screen_type, format, desc, strings));
+			sliders.push_back(new bgfx_slider(chains.machine(), full_name, min[index], defaults[index], max[index], step, type, screen_type, format, desc, strings));
 		}
 	}
 	else
@@ -121,7 +122,7 @@ std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, std
 		float min = get_float(value, "min", 0.0f);
 		float def = get_float(value, "default", 0.0f);
 		float max = get_float(value, "max", 1.0f);
-		sliders.push_back(new bgfx_slider(machine, name + "0", min, def, max, step, type, screen_type, format, prefixed_desc, strings));
+		sliders.push_back(new bgfx_slider(chains.machine(), name + "0", min, def, max, step, type, screen_type, format, prefixed_desc, strings));
 	}
 	return sliders;
 }
@@ -132,7 +133,7 @@ bool slider_reader::get_values(const Value& value, std::string prefix, std::stri
 	const Value& value_array = value[name_str];
 	for (UINT32 i = 0; i < value_array.Size() && i < count; i++)
 	{
-		if (!READER_CHECK(value_array[i].IsNumber(), (prefix + "Entry " + std::to_string(i) + " must be a number point\n").c_str())) return false;
+		if (!READER_CHECK(value_array[i].IsNumber(), (prefix + "Entry " + std::to_string(i) + " must be a number\n").c_str())) return false;
 		values[i] = value_array[i].GetFloat();
 	}
 	return true;
@@ -144,11 +145,11 @@ bool slider_reader::validate_parameters(const Value& value, std::string prefix)
 	if (!READER_CHECK(value["name"].IsString(), (prefix + "Value 'name' must be a string\n").c_str())) return false;
 	if (!READER_CHECK(value.HasMember("min"), (prefix + "Must have a number or array value 'min'\n").c_str())) return false;
 	if (!READER_CHECK(value["min"].IsNumber() || value["min"].IsArray(), (prefix + "Value 'min' must be a number or an array the size of the corresponding slider type\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("default"), (prefix + "Must have a number point or array value 'default'\n").c_str())) return false;
-	if (!READER_CHECK(value["default"].IsNumber() || value["default"].IsArray(), (prefix + "Value 'default' must be a number point or an array the size of the corresponding slider type\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("max"), (prefix + "Must have a number point or array value 'max'\n").c_str())) return false;
+	if (!READER_CHECK(value.HasMember("default"), (prefix + "Must have a number or array value 'default'\n").c_str())) return false;
+	if (!READER_CHECK(value["default"].IsNumber() || value["default"].IsArray(), (prefix + "Value 'default' must be a number or an array the size of the corresponding slider type\n").c_str())) return false;
+	if (!READER_CHECK(value.HasMember("max"), (prefix + "Must have a number or array value 'max'\n").c_str())) return false;
 	if (!READER_CHECK(value["max"].IsNumber() || value["max"].IsArray(), (prefix + "Value 'max' must be a number or an array the size of the corresponding slider type\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("step"), (prefix + "Must have a number point value 'step'\n").c_str())) return false;
+	if (!READER_CHECK(value.HasMember("step"), (prefix + "Must have a number value 'step'\n").c_str())) return false;
 	if (!READER_CHECK(value["step"].IsNumber(), (prefix + "Value 'step' must be a number (how much does this slider increment by internally?)\n").c_str())) return false;
 	if (!READER_CHECK(value.HasMember("type"), (prefix + "Must have string value 'type'\n").c_str())) return false;
 	if (!READER_CHECK(value["type"].IsString(), (prefix + "Value 'type' must be a string (what type of slider is this? [int_enum, int, float])\n").c_str())) return false;

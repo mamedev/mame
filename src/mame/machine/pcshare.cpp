@@ -137,7 +137,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT(pcat_common)
 	MCFG_PIC8259_ADD( "pic8259_1", INPUTLINE("maincpu", 0), VCC, READ8(pcat_base_state, get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
+	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NOOP)
 	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL_14_31818MHz/3 )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pcat_base_state, pc_dma_hrq_changed))
 	MCFG_I8237_IN_MEMR_CB(READ8(pcat_base_state, pc_dma_read_byte))

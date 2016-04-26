@@ -1968,7 +1968,7 @@ WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
 
 	/*
 	static FILE *out;
-	if (out == NULL)
+	if (out == nullptr)
 	    out = fopen("sound.bin", "wb");
 
 	fputc((data >> 24) & 0xff, out);

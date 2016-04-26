@@ -42,7 +42,7 @@ class DevicesWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	DevicesWindow(running_machine* machine, QWidget* parent=NULL);
+	DevicesWindow(running_machine* machine, QWidget* parent=nullptr);
 	virtual ~DevicesWindow();
 
 public slots:

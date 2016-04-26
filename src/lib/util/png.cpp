@@ -312,7 +312,7 @@ static png_error process_chunk(png_private *png, UINT8 *data, UINT32 type, UINT3
 			text->next = nullptr;
 
 			/* add to the end of the list */
-			for (pt = nullptr, ct = png->pnginfo->textlist; ct != nullptr; pt = ct, ct = ct->next) ;
+			for (pt = nullptr, ct = png->pnginfo->textlist; ct != nullptr; pt = ct, ct = ct->next) { }
 			if (pt == nullptr)
 				png->pnginfo->textlist = text;
 			else
@@ -726,13 +726,13 @@ png_error png_add_text(png_info *pnginfo, const char *keyword, const char *text)
 	strcpy(textdata, keyword);
 	strcpy(textdata + keylen + 1, text);
 
-	/* text follows a trailing NULL */
+	/* text follows a trailing nullptr */
 	newtext->keyword = textdata;
 	newtext->text = textdata + keylen + 1;
 	newtext->next = nullptr;
 
 	/* add us to the end of the linked list */
-	for (pt = nullptr, ct = pnginfo->textlist; ct != nullptr; pt = ct, ct = ct->next) ;
+	for (pt = nullptr, ct = pnginfo->textlist; ct != nullptr; pt = ct, ct = ct->next) { }
 	if (pt == nullptr)
 		pnginfo->textlist = newtext;
 	else
@@ -905,7 +905,7 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 		return PNGERR_OUT_OF_MEMORY;
 	}
 
-	/* copy in the pixels, specifying a NULL filter */
+	/* copy in the pixels, specifying a nullptr filter */
 	for (y = 0; y < pnginfo->height; y++)
 	{
 		UINT16 *src = reinterpret_cast<UINT16 *>(bitmap.raw_pixptr(y));
@@ -944,7 +944,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
 	if (pnginfo->image == nullptr)
 		return PNGERR_OUT_OF_MEMORY;
 
-	/* copy in the pixels, specifying a NULL filter */
+	/* copy in the pixels, specifying a nullptr filter */
 	for (y = 0; y < pnginfo->height; y++)
 	{
 		UINT8 *dst = pnginfo->image + y * (rowbytes + 1);

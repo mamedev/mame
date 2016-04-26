@@ -48,7 +48,7 @@
 
 #define MCFG_SVI_EXPANDER_BUS_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SVI_EXPANDER, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(svi_expander_modules, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(svi_expander_modules, nullptr, false)
 #define MCFG_SVI_EXPANDER_INT_HANDLER(_devcb) \
 	devcb = &svi_expander_device::set_int_handler(*device, DEVCB_##_devcb);
 

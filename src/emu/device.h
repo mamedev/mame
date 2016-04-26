@@ -190,7 +190,7 @@ public:
 	virtual ~device_t();
 
 	// getters
-	running_machine &machine() const { /*assert(m_machine != NULL);*/ return *m_machine; }
+	running_machine &machine() const { /*assert(m_machine != nullptr);*/ return *m_machine; }
 	const char *tag() const { return m_tag.c_str(); }
 	const char *basetag() const { return m_basetag.c_str(); }
 	device_type type() const { return m_type; }
@@ -442,7 +442,7 @@ protected:
 		// search depth-first for the next device
 		void advance()
 		{
-			// remember our starting position, and end immediately if we're NULL
+			// remember our starting position, and end immediately if we're nullptr
 			device_t *start = m_curdevice;
 			if (start == nullptr)
 				return;
@@ -730,7 +730,7 @@ private:
 
 inline device_t *device_t::subdevice(const char *tag) const
 {
-	// empty string or NULL means this device
+	// empty string or nullptr means this device
 	if (tag == nullptr || *tag == 0)
 		return const_cast<device_t *>(this);
 
@@ -747,7 +747,7 @@ inline device_t *device_t::subdevice(const char *tag) const
 
 inline device_t *device_t::siblingdevice(const char *tag) const
 {
-	// empty string or NULL means this device
+	// empty string or nullptr means this device
 	if (tag == nullptr || *tag == 0)
 		return const_cast<device_t *>(this);
 
@@ -758,7 +758,7 @@ inline device_t *device_t::siblingdevice(const char *tag) const
 	if (m_owner != nullptr)
 		return m_owner->subdevice(tag);
 
-	// otherwise, it's NULL unless the tag is absolute
+	// otherwise, it's nullptr unless the tag is absolute
 	return (tag[0] == ':') ? subdevice(tag) : nullptr;
 }
 

@@ -74,7 +74,7 @@ setup_t::~setup_t()
 	m_terminals.clear();
 	m_params_temp.clear();
 
-	netlist().set_setup(NULL);
+	netlist().set_setup(nullptr);
 	pfree(m_factory);
 	m_sources.clear_and_free();
 
@@ -132,13 +132,13 @@ device_t *setup_t::register_dev(const pstring &classname, const pstring &name)
 		namespace_push(name);
 		include(classname);
 		namespace_pop();
-		return NULL;
+		return nullptr;
 	}
 	else
 	{
 		device_t *dev = factory().new_device_by_name(classname);
 		//device_t *dev = factory().new_device_by_classname(classname);
-		if (dev == NULL)
+		if (dev == nullptr)
 			log().fatal("Class {1} not found!\n", classname);
 		return register_dev(dev, name);
 	}
@@ -412,11 +412,11 @@ core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool require
 		ret = m_terminals.index_of(tname + ".Q");
 	}
 
-	core_terminal_t *term = (ret < 0 ? NULL : m_terminals.value_at(ret));
+	core_terminal_t *term = (ret < 0 ? nullptr : m_terminals.value_at(ret));
 
-	if (term == NULL && required)
+	if (term == nullptr && required)
 		log().fatal("terminal {1}({2}) not found!\n", terminal_in, tname);
-	if (term != NULL)
+	if (term != nullptr)
 		log().debug("Found input {1}\n", tname);
 	return term;
 }
@@ -436,16 +436,16 @@ core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, object_t::ty
 	if (ret < 0 && required)
 		log().fatal("terminal {1}({2}) not found!\n", terminal_in, tname);
 
-	core_terminal_t *term = (ret < 0 ? NULL : m_terminals.value_at(ret));
+	core_terminal_t *term = (ret < 0 ? nullptr : m_terminals.value_at(ret));
 
-	if (term != NULL && term->type() != atype)
+	if (term != nullptr && term->type() != atype)
 	{
 		if (required)
 			log().fatal("object {1}({2}) found but wrong type\n", terminal_in, tname);
 		else
-			term = NULL;
+			term = nullptr;
 	}
-	if (term != NULL)
+	if (term != nullptr)
 		log().debug("Found input {1}\n", tname);
 
 	return term;
@@ -463,7 +463,7 @@ param_t *setup_t::find_param(const pstring &param_in, bool required)
 		log().fatal("parameter {1}({2}) not found!\n", param_in_fqn, outname);
 	if (ret != -1)
 		log().debug("Found parameter {1}\n", outname);
-	return (ret == -1 ? NULL : m_params.value_at(ret));
+	return (ret == -1 ? nullptr : m_params.value_at(ret));
 }
 
 // FIXME avoid dynamic cast here
@@ -474,7 +474,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 	logic_output_t &out_cast = dynamic_cast<logic_output_t &>(out);
 	devices::nld_base_proxy *proxy = out_cast.get_proxy();
 
-	if (proxy == NULL)
+	if (proxy == nullptr)
 	{
 		// create a new one ...
 		devices::nld_base_d_to_a_proxy *new_proxy = out_cast.logic_family()->create_d_a_proxy(&out_cast);
@@ -782,7 +782,7 @@ void setup_t::resolve_inputs()
 	for (std::size_t i = 0; i < m_terminals.size(); i++)
 	{
 		core_terminal_t *term = m_terminals.value_at(i);
-		if (!term->has_net() && dynamic_cast< devices::NETLIB_NAME(dummy_input) *>(&term->device()) != NULL)
+		if (!term->has_net() && dynamic_cast< devices::NETLIB_NAME(dummy_input) *>(&term->device()) != nullptr)
 			log().warning("Found dummy terminal {1} without connections", term->name());
 		else if (!term->has_net())
 			errstr += pfmt("Found terminal {1} without a net\n")(term->name());
@@ -798,7 +798,7 @@ void setup_t::resolve_inputs()
 	for (std::size_t i=0; i < netlist().m_devices.size(); i++)
 	{
 		devices::NETLIB_NAME(twoterm) *t = dynamic_cast<devices::NETLIB_NAME(twoterm) *>(netlist().m_devices[i]);
-		if (t != NULL)
+		if (t != nullptr)
 		{
 			has_twoterms = true;
 			if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
@@ -809,7 +809,7 @@ void setup_t::resolve_inputs()
 
 	log().verbose("initialize solver ...\n");
 
-	if (netlist().solver() == NULL)
+	if (netlist().solver() == nullptr)
 	{
 		if (has_twoterms)
 			log().fatal("No solver found for this net although analog elements are present\n");

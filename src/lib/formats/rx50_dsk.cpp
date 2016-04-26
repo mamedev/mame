@@ -216,8 +216,8 @@ const floppy_format_type FLOPPY_RX50IMG_FORMAT = &floppy_image_format_creator<rx
 // The BIOS can also * read * VT-180 disks and access MS-DOS 160 k disks (R + W)
 // ( 40 tracks; single sided with 9 or 8 sectors per track )
 static LEGACY_FLOPPY_OPTIONS_START( dec100_floppy )
-    LEGACY_FLOPPY_OPTION( dec100_floppy, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, NULL )
-    LEGACY_FLOPPY_OPTION( dec100_floppy, "img", "DEC Rainbow 100", basicdsk_identify_default, basicdsk_construct_default,    NULL,
+    LEGACY_FLOPPY_OPTION( dec100_floppy, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, nullptr )
+    LEGACY_FLOPPY_OPTION( dec100_floppy, "img", "DEC Rainbow 100", basicdsk_identify_default, basicdsk_construct_default,    nullptr,
         HEADS([1])
         TRACKS(40/[80])
         SECTORS(8/9/[10])

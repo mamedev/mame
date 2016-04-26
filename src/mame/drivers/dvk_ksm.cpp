@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( ksm, ksm_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ksm)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(ksm_state, ksm_ppi_porta_w))

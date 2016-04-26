@@ -84,14 +84,14 @@ void ui_menu_custom_filter::handle()
 			{
 				custfltr::other[pos]--;
 				for ( ; custfltr::other[pos] > FILTER_UNAVAILABLE && (custfltr::other[pos] == FILTER_CATEGORY
-						|| custfltr::other[pos] == FILTER_FAVORITE); custfltr::other[pos]--) ;
+						|| custfltr::other[pos] == FILTER_FAVORITE); custfltr::other[pos]--) { };
 				changed = true;
 			}
 			else if (m_event->iptkey == IPT_UI_RIGHT && custfltr::other[pos] < FILTER_LAST - 1)
 			{
 				custfltr::other[pos]++;
 				for ( ; custfltr::other[pos] < FILTER_LAST && (custfltr::other[pos] == FILTER_CATEGORY
-						|| custfltr::other[pos] == FILTER_FAVORITE); custfltr::other[pos]++) ;
+						|| custfltr::other[pos] == FILTER_FAVORITE); custfltr::other[pos]++) { };
 				changed = true;
 			}
 			else if (m_event->iptkey == IPT_UI_SELECT)

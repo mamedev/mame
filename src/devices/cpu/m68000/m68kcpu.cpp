@@ -598,18 +598,18 @@ const UINT8 m68ki_exception_cycle_table[7][256] =
 const UINT8 m68ki_ea_idx_cycle_table[64] =
 {
 		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		0, /* ..01.000 no memory indirect, base NULL             */
-		5, /* ..01..01 memory indirect,    base NULL, outer NULL */
-		7, /* ..01..10 memory indirect,    base NULL, outer 16   */
-		7, /* ..01..11 memory indirect,    base NULL, outer 32   */
+		0, /* ..01.000 no memory indirect, base nullptr             */
+		5, /* ..01..01 memory indirect,    base nullptr, outer nullptr */
+		7, /* ..01..10 memory indirect,    base nullptr, outer 16   */
+		7, /* ..01..11 memory indirect,    base nullptr, outer 32   */
 		0,  5,  7,  7,  0,  5,  7,  7,  0,  5,  7,  7,
 		2, /* ..10.000 no memory indirect, base 16               */
-		7, /* ..10..01 memory indirect,    base 16,   outer NULL */
+		7, /* ..10..01 memory indirect,    base 16,   outer nullptr */
 		9, /* ..10..10 memory indirect,    base 16,   outer 16   */
 		9, /* ..10..11 memory indirect,    base 16,   outer 32   */
 		0,  7,  9,  9,  0,  7,  9,  9,  0,  7,  9,  9,
 		6, /* ..11.000 no memory indirect, base 32               */
-	11, /* ..11..01 memory indirect,    base 32,   outer NULL */
+	11, /* ..11..01 memory indirect,    base 32,   outer nullptr */
 	13, /* ..11..10 memory indirect,    base 32,   outer 16   */
 	13, /* ..11..11 memory indirect,    base 32,   outer 32   */
 		0, 11, 13, 13,  0, 11, 13, 13,  0, 11, 13, 13

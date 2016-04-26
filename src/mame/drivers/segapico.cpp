@@ -118,7 +118,7 @@ C = MB3514 / 9325 M36
 */
 
 #include "emu.h"
-#include "includes/md_cons.h"
+#include "includes/megadriv.h"
 #include "sound/315-5641.h"
 #include "softlist.h"
 

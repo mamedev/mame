@@ -35,7 +35,7 @@ char *utf8_from_wstring(const WCHAR *s);
 
 struct osd_wstr_deleter
 {
-	void operator () (wchar_t* wstr)
+	void operator () (wchar_t* wstr) const
 	{
 		if (wstr != nullptr)
 			osd_free(wstr);

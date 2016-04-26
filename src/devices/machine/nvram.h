@@ -33,7 +33,7 @@
 	nvram_device::static_set_default_value(*device, nvram_device::DEFAULT_NONE);
 #define MCFG_NVRAM_ADD_CUSTOM_DRIVER(_tag, _class, _method) \
 	MCFG_DEVICE_ADD(_tag, NVRAM, 0) \
-	nvram_device::static_set_custom_handler(*device, nvram_init_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	nvram_device::static_set_custom_handler(*device, nvram_init_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_NVRAM_REPLACE_0FILL(_tag) \
 	MCFG_DEVICE_REPLACE(_tag, NVRAM, 0) \
@@ -46,7 +46,7 @@
 	nvram_device::static_set_default_value(*device, nvram_device::DEFAULT_RANDOM);
 #define MCFG_NVRAM_REPLACE_CUSTOM_DRIVER(_tag, _class, _method) \
 	MCFG_DEVICE_REPLACE(_tag, NVRAM, 0) \
-	nvram_device::static_set_custom_handler(*device, nvram_init_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	nvram_device::static_set_custom_handler(*device, nvram_init_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 
 //**************************************************************************

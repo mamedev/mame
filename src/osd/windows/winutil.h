@@ -31,7 +31,7 @@ private:
 	bool                        m_initialized;
 
 protected:
-	void check_init();
+	void check_init() const;
 	FARPROC m_pfn;
 
 public:
@@ -39,7 +39,7 @@ public:
 	lazy_loaded_function(const char * name, const wchar_t** dll_names, int dll_count);
 	~lazy_loaded_function();
 	int initialize();
-	const char * name() { return m_name.c_str(); }
+	const char * name() const { return m_name.c_str(); }
 };
 
 // No parameters

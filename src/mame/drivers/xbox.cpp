@@ -127,6 +127,8 @@ void xbox_state::hack_eeprom()
 	m_maincpu->space(0).write_byte(0x4e5da, 0xc3); // remove audio wait
 	// 8006e654,6e654=0
 	m_maincpu->space(0).write_byte(0x6e654, 0); // disable boot animation
+	// 800375f0,375f0=0
+	m_maincpu->space(0).write_byte(0x375f0, m_maincpu->space(0).read_byte(0x375f0) & 0xfe); // internal hub not used
 }
 
 /*static const struct {

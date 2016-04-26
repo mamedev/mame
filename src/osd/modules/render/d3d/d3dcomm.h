@@ -40,12 +40,12 @@ public:
 		c.y = y;
 	}
 
-	vec2f operator+(const vec2f& a)
+	vec2f operator+(const vec2f& a) const
 	{
 		return vec2f(c.x + a.c.x, c.y + a.c.y);
 	}
 
-	vec2f operator-(const vec2f& a)
+	vec2f operator-(const vec2f& a) const
 	{
 		return vec2f(c.x - a.c.x, c.y - a.c.y);
 	}
@@ -59,7 +59,9 @@ public:
 class d3d_texture_manager
 {
 public:
-	d3d_texture_manager() { }
+	d3d_texture_manager(): m_renderer(nullptr), m_texlist(nullptr), m_dynamic_supported(0), m_stretch_supported(0), m_yuv_format(), m_texture_caps(0), m_texture_max_aspect(0), m_texture_max_width(0), m_texture_max_height(0), m_vector_texture(nullptr), m_default_texture(nullptr)
+	{ }
+
 	d3d_texture_manager(renderer_d3d9 *d3d);
 	~d3d_texture_manager();
 
@@ -71,22 +73,22 @@ public:
 	texture_info *          find_texinfo(const render_texinfo *texture, UINT32 flags);
 	UINT32                  texture_compute_hash(const render_texinfo *texture, UINT32 flags);
 
-	texture_info *          get_texlist() { return m_texlist; }
+	texture_info *          get_texlist() const { return m_texlist; }
 	void                    set_texlist(texture_info *texlist) { m_texlist = texlist; }
-	bool                    is_dynamic_supported() { return (bool)m_dynamic_supported; }
+	bool                    is_dynamic_supported() const { return (bool)m_dynamic_supported; }
 	void                    set_dynamic_supported(bool dynamic_supported) { m_dynamic_supported = dynamic_supported; }
-	bool                    is_stretch_supported() { return (bool)m_stretch_supported; }
-	D3DFORMAT               get_yuv_format() { return m_yuv_format; }
+	bool                    is_stretch_supported() const { return (bool)m_stretch_supported; }
+	D3DFORMAT               get_yuv_format() const { return m_yuv_format; }
 
-	DWORD                   get_texture_caps() { return m_texture_caps; }
-	DWORD                   get_max_texture_aspect() { return m_texture_max_aspect; }
-	DWORD                   get_max_texture_width() { return m_texture_max_width; }
-	DWORD                   get_max_texture_height() { return m_texture_max_height; }
+	DWORD                   get_texture_caps() const { return m_texture_caps; }
+	DWORD                   get_max_texture_aspect() const { return m_texture_max_aspect; }
+	DWORD                   get_max_texture_width() const { return m_texture_max_width; }
+	DWORD                   get_max_texture_height() const { return m_texture_max_height; }
 
-	texture_info *          get_default_texture() { return m_default_texture; }
-	texture_info *          get_vector_texture() { return m_vector_texture; }
+	texture_info *          get_default_texture() const { return m_default_texture; }
+	texture_info *          get_vector_texture() const { return m_vector_texture; }
 
-	renderer_d3d9 *         get_d3d() { return m_renderer; }
+	renderer_d3d9 *         get_d3d() const { return m_renderer; }
 
 private:
 	renderer_d3d9 *         m_renderer;
@@ -248,7 +250,9 @@ class cache_target
 {
 public:
 	// construction/destruction
-	cache_target() { }
+	cache_target(): last_target(nullptr), last_texture(nullptr), target_width(0), target_height(0), width(0), height(0), screen_index(0), next(nullptr), prev(nullptr)
+	{ }
+
 	~cache_target();
 
 	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height);
@@ -273,7 +277,9 @@ class d3d_render_target
 {
 public:
 	// construction/destruction
-	d3d_render_target() { }
+	d3d_render_target(): target_width(0), target_height(0), width(0), height(0), screen_index(0), page_index(0), next(nullptr), prev(nullptr), bloom_count(0)
+	{ }
+
 	~d3d_render_target();
 
 	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height);

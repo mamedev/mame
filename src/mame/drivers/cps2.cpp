@@ -9319,8 +9319,8 @@ void cps_state::init_digital_volume()
 
 DRIVER_INIT_MEMBER(cps_state,cps2)
 {
-	/* Decrypt the game - see machine/cps2crpt.c */
-	DRIVER_INIT_CALL(cps2crpt);
+	/* Decrypt the game - see machine/cps2crypt.cpp */
+	DRIVER_INIT_CALL(cps2crypt);
 	DRIVER_INIT_CALL(cps2nc);
 }
 

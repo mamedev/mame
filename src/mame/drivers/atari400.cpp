@@ -46,7 +46,7 @@
 #include "machine/ram.h"
 #include "sound/dac.h"
 #include "sound/pokey.h"
-#include "includes/atari.h"
+#include "includes/atari400.h"
 #include "machine/atarifdc.h"
 #include "bus/a800/a800_slot.h"
 #include "bus/a800/a800_carts.h"
@@ -2314,8 +2314,8 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 
 	// FIXME: should there be anything connected where other system have the fdc?
 	MCFG_SOUND_MODIFY("pokey")
-	MCFG_POKEY_SERIN_R_CB(NULL)
-	MCFG_POKEY_SEROUT_W_CB(NULL)
+	MCFG_POKEY_SERIN_R_CB(NOOP)
+	MCFG_POKEY_SEROUT_W_CB(NOOP)
 	MCFG_POKEY_KEYBOARD_CB(atari_common_state, a5200_keypads)
 	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
 
@@ -2327,9 +2327,9 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_ANTIC_GTIA("gtia")
 
 	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_READPA_HANDLER(NULL) // FIXME: is there anything connected here
-	MCFG_PIA_READPB_HANDLER(NULL) // FIXME: is there anything connected here
-	MCFG_PIA_CB2_HANDLER(NULL) // FIXME: is there anything connected here
+	MCFG_PIA_READPA_HANDLER(NOOP) // FIXME: is there anything connected here
+	MCFG_PIA_READPB_HANDLER(NOOP) // FIXME: is there anything connected here
+	MCFG_PIA_CB2_HANDLER(NOOP) // FIXME: is there anything connected here
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
 

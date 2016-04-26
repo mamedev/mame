@@ -358,7 +358,7 @@ win_window_info::win_window_info(
 		m_isminimized(0),
 		m_ismaximized(0),
 		m_monitor(monitor),
-		//m_fullscreen(0),
+		m_fullscreen(!video_config.windowed),
 		m_fullscreen_safe(0),
 		m_aspect(0),
 		m_target(nullptr),
@@ -1977,7 +1977,7 @@ void win_window_info::set_fullscreen(int fullscreen)
 	// if we're in the right state, punt
 	if (this->fullscreen() == fullscreen)
 		return;
-	video_config.windowed = !fullscreen;
+	m_fullscreen = fullscreen;
 
 	// kill off the drawers
 	m_renderer.reset();
@@ -1991,7 +1991,7 @@ void win_window_info::set_fullscreen(int fullscreen)
 		// adjust the style
 		SetWindowLong(platform_window<HWND>(), GWL_STYLE, WINDOW_STYLE);
 		SetWindowLong(platform_window<HWND>(), GWL_EXSTYLE, WINDOW_STYLE_EX);
-		SetWindowPos(platform_window<HWND>(), 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		SetWindowPos(platform_window<HWND>(), nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
 		// force to the bottom, then back on top
 		SetWindowPos(platform_window<HWND>(), HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
@@ -2022,7 +2022,7 @@ void win_window_info::set_fullscreen(int fullscreen)
 		// adjust the style
 		SetWindowLong(platform_window<HWND>(), GWL_STYLE, FULLSCREEN_STYLE);
 		SetWindowLong(platform_window<HWND>(), GWL_EXSTYLE, FULLSCREEN_STYLE_EX);
-		SetWindowPos(platform_window<HWND>(), 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		SetWindowPos(platform_window<HWND>(), nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
 		// set topmost
 		SetWindowPos(platform_window<HWND>(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);

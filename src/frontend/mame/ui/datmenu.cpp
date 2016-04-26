@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
-#include "drivenum.h"
 #include "rendfont.h"
 #include "ui/datfile.h"
 #include "ui/datmenu.h"

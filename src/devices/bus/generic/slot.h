@@ -191,11 +191,11 @@ extern const device_type GENERIC_SOCKET;
 
 #define MCFG_GENERIC_CARTSLOT_ADD(_tag, _slot_intf, _dev_intf) \
 	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false) \
 	MCFG_GENERIC_INTERFACE(_dev_intf)
 #define MCFG_GENERIC_SOCKET_ADD(_tag, _slot_intf, _dev_intf) \
 	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false) \
 	MCFG_GENERIC_INTERFACE(_dev_intf)
 
 #define MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT(_tag, _slot_intf, _dev_intf, _default) \

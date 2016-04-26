@@ -590,7 +590,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pcjr_state, out2_changed))
 
-	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pcjr_state, pic8259_set_int_line), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pcjr_state, pic8259_set_int_line), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(CONSTANT(0xff))

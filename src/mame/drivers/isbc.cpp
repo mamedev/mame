@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( isbc86, isbc_state )
 	MCFG_CPU_IO_MAP(isbc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
 
-	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
+	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_22_1184MHz/18)
@@ -232,7 +232,7 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_CPU_IO_MAP(rpc86_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
 
-	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
+	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_22_1184MHz/18)
@@ -268,7 +268,7 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
 
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, READ8(isbc_state, get_slave_ack))
-	MCFG_PIC8259_ADD("pic_1", DEVWRITELINE("pic_0", pic8259_device, ir7_w), GND, NULL)
+	MCFG_PIC8259_ADD("pic_1", DEVWRITELINE("pic_0", pic8259_device, ir7_w), GND, NOOP)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL_22_1184MHz/18)

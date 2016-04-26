@@ -267,7 +267,18 @@ static const UINT32 mouse_bitmap[32*32] =
 //-------------------------------------------------
 
 mame_ui_manager::mame_ui_manager(running_machine &machine)
-	: ui_manager(machine)
+	: ui_manager(machine), 
+	  m_font(nullptr), 
+	  m_handler_callback(nullptr), 
+	  m_handler_param(0), 
+	  m_single_step(false), 
+	  m_showfps(false), 
+	  m_showfps_end(0), 
+	  m_show_profiler(false), 
+	  m_popup_text_end(0), 
+	  m_mouse_arrow_texture(nullptr), 
+	  m_mouse_show(false), 
+	  m_load_save_hold(false)
 {
 }
 
@@ -277,18 +288,6 @@ void mame_ui_manager::init()
 	// initialize the other UI bits
 	ui_menu::init(machine());
 	ui_gfx_init(machine());
-
-	// reset instance variables
-	m_font = nullptr;
-	m_handler_callback = nullptr;
-	m_handler_param = 0;
-	m_single_step = false;
-	m_showfps = false;
-	m_showfps_end = 0;
-	m_show_profiler = false;
-	m_popup_text_end = 0;
-	m_mouse_arrow_texture = nullptr;
-	m_load_save_hold = false;
 
 	get_font_rows(&machine());
 	decode_ui_color(0, &machine());
@@ -1528,13 +1527,13 @@ UINT32 mame_ui_manager::handler_ingame(running_machine &machine, render_containe
 	if (mame_machine_manager::instance()->ui().show_timecode_counter()) {
 		std::string tempstring;
 		mame_machine_manager::instance()->ui().draw_text_full(container, machine.video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
-			JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0xf0,0x10,0x10), ARGB_BLACK, NULL, NULL);
+			JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0xf0,0x10,0x10), ARGB_BLACK, nullptr, nullptr);
 	}
 	// Show the total time elapsed for the video preview (all parts intro, gameplay, extras)
 	if (mame_machine_manager::instance()->ui().show_timecode_total()) {
 		std::string tempstring;
 		mame_machine_manager::instance()->ui().draw_text_full(container, machine.video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
-			JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0x10,0xf0,0x10), ARGB_BLACK, NULL, NULL);
+			JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0x10,0xf0,0x10), ARGB_BLACK, nullptr, nullptr);
 	}
 
 

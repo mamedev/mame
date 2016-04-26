@@ -6,7 +6,7 @@
 typedef device_delegate<UINT16 (UINT16)> igs017_igs031_palette_scramble_delegate;
 
 #define MCFG_PALETTE_SCRAMBLE_CB( _class, _method) \
-	igs017_igs031_device::set_palette_scramble_cb(*device, igs017_igs031_palette_scramble_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	igs017_igs031_device::set_palette_scramble_cb(*device, igs017_igs031_palette_scramble_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_REVERSE_TEXT_BITS \
 	igs017_igs031_device::static_set_text_reverse_bits(*device);

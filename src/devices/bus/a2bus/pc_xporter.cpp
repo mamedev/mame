@@ -118,7 +118,7 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(a2bus_pcxporter_device, pc_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(a2bus_pcxporter_device, pc_dack3_w))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("v30", 0), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("v30", 0), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(a2bus_pcxporter_device, pc_ppi_porta_r))

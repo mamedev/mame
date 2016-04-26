@@ -64,7 +64,7 @@ typedef struct{
 //  load an ICO file into a bitmap
 //-------------------------------------------------
 
-void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename)
+inline void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename)
 {
 	INT32 width = 0;
 	INT32 height = 0;

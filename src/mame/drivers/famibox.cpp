@@ -477,7 +477,7 @@ static INPUT_PORTS_START( famibox )
 	PORT_DIPSETTING(    0x08, "Key position 4" )
 	PORT_DIPSETTING(    0x10, "Key position 5" )
 	PORT_DIPSETTING(    0x20, "Key position 6" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, famibox_state,famibox_coin_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, famibox_state,famibox_coin_r, nullptr)
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, famibox_state,coin_inserted, 0)

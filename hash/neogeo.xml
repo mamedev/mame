@@ -8465,33 +8465,6 @@
 		</part>
 	</software>
 
-	<software name="totc">
-		<description>Treasures of The Caribbean</description>
-		<year>2010</year>
-		<publisher>Face / NCI</publisher>
-		<sharedfeat name="release" value="AES" />
-		<sharedfeat name="compatibility" value="AES" />
-		<part name="cart" interface="neo_cart">
-			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
-				<rom loadflag="load16_word_swap" name="316.p1" offset="0x000000" size="0x100000" crc="99604539" sha1="88d5f4fe56516aa36496cafd2508f6864118f1e2" />
-			</dataarea>
-			<dataarea name="fixed" size="0x040000">
-				<rom offset="0x000000" size="0x020000" name="316.s1" crc="0a3fee41" sha1="0ab2120e462086be942efcf6ffb37f58ea966ca3" />
-			</dataarea>
-			<dataarea name="audiocpu" size="0x020000">
-				<rom offset="0x000000" size="0x020000" name="316.m1" crc="18b23ace" sha1="d55495f3d8bb5568c8f2322763278a86ba5297b3" />
-			</dataarea>
-			<dataarea name="ymsnd" size="0x500000">
-				<rom name="316.v1" offset="0x000000" size="0x200000" crc="15c7f9e6" sha1="c51328a92dc7c612fd6c2f3841caee4fbd120f36" />
-				<rom name="316.v2" offset="0x200000" size="0x200000" crc="1b264559" sha1="50c28858304e51cdc60f425483a1d1d2bbfb2f8d" />
-				<rom name="316.v3" offset="0x400000" size="0x100000" crc="84b62c5d" sha1="30d7f2e16c6d602cebce5e9b4b8a5b2bde20af58" />
-			</dataarea>
-			<dataarea name="sprites" size="0x400000">
-				<rom loadflag="load16_byte" name="316.c1" offset="0x000000" size="0x200000" crc="cdd6600f" sha1="85649c199b32db7553012cb5a058a92bbbb7355a" />
-				<rom loadflag="load16_byte" name="316.c2" offset="0x000001" size="0x200000" crc="f362c271" sha1="4a2efa043cd2553ff7039cb18a1dba8b41493be7" />
-			</dataarea>
-		</part>
-	</software>
 
 	<!--***************************************
 	ID-0249
@@ -12028,6 +12001,67 @@
 			</dataarea>
 		</part>
 	</software>
+ 
+  <!-- Unlicensed 3rd party -->
+
+  <!-- the exact same roms were put on bootleg MVS carts, despite having no MVS mode in the code and running as an AES game with menu and no coins required -->
+  <software name="lasthope">
+    <description>Last Hope</description>
+    <year>2005</year>
+    <publisher>NG:DEV.TEAM</publisher>
+    <sharedfeat name="release" value="AES" />
+    <sharedfeat name="compatibility" value="AES" />
+    <part name="cart" interface="neo_cart">
+      <dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+        <rom loadflag="load16_word_swap" name="NGDT-300-P1.bin" offset="0x000000" size="0x100000" crc="3776a88f" sha1="ea8b669da06d7c6b5ff7fa97a195f56a9253a7a1" />
+      </dataarea>
+      <dataarea name="fixed" size="0x040000">
+        <rom offset="0x000000" size="0x010000" name="NGDT-300-S1.bin" crc="0c0ff9e6" sha1="c87d1ea8731ac1e63ab960b8182dd1043bcc10bb" />
+      </dataarea>
+      <dataarea name="audiocpu" size="0x020000">
+        <rom offset="0x000000" size="0x020000" name="NGDT-300-M1.bin" crc="113c870f" sha1="854425eb4be0d7fa088a6c3bf6078fdd011707f5" />
+      </dataarea>
+      <dataarea name="ymsnd" size="0x600000">
+        <rom name="NGDT-300-V1.bin" offset="0x000000" size="0x200000" crc="b765bafe" sha1="b2048c44089bf250c8dcfabb27c7981e9ee5002a" />
+        <rom name="NGDT-300-V2.bin" offset="0x200000" size="0x200000" crc="9fd0d559" sha1="09e70d5e1c6e172a33f48feb3e442515c34a8f3d" />
+        <rom name="NGDT-300-V3.bin" offset="0x400000" size="0x200000" crc="6d5107e2" sha1="4ba74836e3d0421a28af47d3d8341ac16af1d7d7" />
+      </dataarea>
+      <dataarea name="sprites" size="0x1000000">
+        <rom loadflag="load16_byte" name="NGDT-300-C1.bin" offset="0x000000" size="0x400000" crc="53ef41b5" sha1="a8f1fe546403b609e12f0df211c05d7ac479d98d" />
+        <rom loadflag="load16_byte" name="NGDT-300-C2.bin" offset="0x000001" size="0x400000" crc="f9b15ab3" sha1="d8ff2f43686bfc8c2f7ead3ef445e51c15dfbf16" />
+        <rom loadflag="load16_byte" name="NGDT-300-C3.bin" offset="0x800000" size="0x400000" crc="50cc21cf" sha1="0350aaef480c5fa12e68e540a4c974dbf5870add" />
+        <rom loadflag="load16_byte" name="NGDT-300-C4.bin" offset="0x800001" size="0x400000" crc="8486ad9e" sha1="19a2a73c825687e0cb9fd62bde00db91b5409529" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="totc">
+    <description>Treasures of The Caribbean</description>
+    <year>2010</year>
+    <publisher>Face / NCI</publisher>
+    <sharedfeat name="release" value="AES" />
+    <sharedfeat name="compatibility" value="AES" />
+    <part name="cart" interface="neo_cart">
+      <dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+        <rom loadflag="load16_word_swap" name="316.p1" offset="0x000000" size="0x100000" crc="99604539" sha1="88d5f4fe56516aa36496cafd2508f6864118f1e2" />
+      </dataarea>
+      <dataarea name="fixed" size="0x040000">
+        <rom offset="0x000000" size="0x020000" name="316.s1" crc="0a3fee41" sha1="0ab2120e462086be942efcf6ffb37f58ea966ca3" />
+      </dataarea>
+      <dataarea name="audiocpu" size="0x020000">
+        <rom offset="0x000000" size="0x020000" name="316.m1" crc="18b23ace" sha1="d55495f3d8bb5568c8f2322763278a86ba5297b3" />
+      </dataarea>
+      <dataarea name="ymsnd" size="0x500000">
+        <rom name="316.v1" offset="0x000000" size="0x200000" crc="15c7f9e6" sha1="c51328a92dc7c612fd6c2f3841caee4fbd120f36" />
+        <rom name="316.v2" offset="0x200000" size="0x200000" crc="1b264559" sha1="50c28858304e51cdc60f425483a1d1d2bbfb2f8d" />
+        <rom name="316.v3" offset="0x400000" size="0x100000" crc="84b62c5d" sha1="30d7f2e16c6d602cebce5e9b4b8a5b2bde20af58" />
+      </dataarea>
+      <dataarea name="sprites" size="0x400000">
+        <rom loadflag="load16_byte" name="316.c1" offset="0x000000" size="0x200000" crc="cdd6600f" sha1="85649c199b32db7553012cb5a058a92bbbb7355a" />
+        <rom loadflag="load16_byte" name="316.c2" offset="0x000001" size="0x200000" crc="f362c271" sha1="4a2efa043cd2553ff7039cb18a1dba8b41493be7" />
+      </dataarea>
+    </part>
+  </software>
 
 </softwarelist>
 

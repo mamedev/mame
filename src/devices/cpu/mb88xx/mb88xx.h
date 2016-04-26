@@ -56,7 +56,7 @@ enum
 CPU_DISASSEMBLE( mb88 );
 
 
-// Configure 32 byte PLA, if NULL (default) assume direct output */
+// Configure 32 byte PLA, if nullptr (default) assume direct output */
 #define MCFG_MB88_PLA(_pla) mb88_cpu_device::set_pla(*device, _pla);
 
 

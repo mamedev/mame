@@ -396,7 +396,7 @@ static fix_strings_t convert_text[] =
 	{ "charge",  131 }, // Charge
 	{ "tap",     132 }, // Serious Tap
 	{ "button",  133 }, // Any Button
-	{ 0, 0 }    // end of array
+	{ nullptr, 0 }    // end of array
 };
 
 #endif /* __UI_CMDDATA_H__ */

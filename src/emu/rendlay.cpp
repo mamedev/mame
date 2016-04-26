@@ -647,7 +647,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		}
 		m_stopnames[m_numstops++] = symbollist;
 
-		// careful, dirname is NULL if we're coming from internal layout, and our string assignment doesn't like that
+		// careful, dirname is nullptr if we're coming from internal layout, and our string assignment doesn't like that
 		if (dirname != nullptr)
 			m_dirname = dirname;
 

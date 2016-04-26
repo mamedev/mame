@@ -331,7 +331,7 @@ sha1_t chd_file::sha1()
 	}
 	catch (chd_error &)
 	{
-		// on failure, return NULL
+		// on failure, return nullptr
 		return sha1_t::null;
 	}
 }
@@ -364,7 +364,7 @@ sha1_t chd_file::raw_sha1()
 	}
 	catch (chd_error &)
 	{
-		// on failure, return NULL
+		// on failure, return nullptr
 		return sha1_t::null;
 	}
 }
@@ -397,7 +397,7 @@ sha1_t chd_file::parent_sha1()
 	}
 	catch (chd_error &)
 	{
-		// on failure, return NULL
+		// on failure, return nullptr
 		return sha1_t::null;
 	}
 }

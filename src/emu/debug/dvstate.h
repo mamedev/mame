@@ -25,14 +25,8 @@ class debug_view_state_source : public debug_view_source
 
 	// construction/destruction
 	debug_view_state_source(const char *name, device_t &device);
-
-public:
-	// getters
-	device_t &device() const { return m_device; }
-
 private:
 	// internal state
-	device_t &          m_device;               // underlying device
 	device_state_interface *m_stateintf;        // state interface
 	device_execute_interface *m_execintf;       // execution interface
 };

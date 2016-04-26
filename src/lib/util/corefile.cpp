@@ -541,7 +541,7 @@ char *core_text_file::gets(char *s, int n)
 		}
 	}
 
-	// if we put nothing in, return NULL
+	// if we put nothing in, return nullptr
 	if (cur == s)
 		return nullptr;
 
@@ -734,7 +734,7 @@ core_osd_file::~core_osd_file()
 {
 	// close files and free memory
 	if (m_zdata)
-		compress(FCOMPRESS_NONE);
+		core_osd_file::compress(FCOMPRESS_NONE);
 }
 
 

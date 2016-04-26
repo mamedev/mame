@@ -714,7 +714,7 @@ INPUT_PORTS_START( igrosoft_gamble )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) // unused?
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igrosoft_gamble_state,igrosoft_gamble_hopper_r, NULL )// Hopper SW (22 B)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igrosoft_gamble_state,igrosoft_gamble_hopper_r, nullptr )// Hopper SW (22 B)
 	PORT_DIPNAME(     0x02, 0x02, "BK Door (17 A)"  )
 	PORT_DIPSETTING(  0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
@@ -807,7 +807,7 @@ static INPUT_PORTS_START( rollfr )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igrosoft_gamble_state,igrosoft_gamble_hopper_r, NULL )// Hopper SW (22 B)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igrosoft_gamble_state,igrosoft_gamble_hopper_r, nullptr )// Hopper SW (22 B)
 	PORT_DIPNAME(     0x02, 0x02, "BK Door (17 A)"  )
 	PORT_DIPSETTING(  0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )

@@ -40,7 +40,7 @@
 
 #define lua_readline(b,p) \
 	(fputs(p, stdout), fflush(stdout),  /* show prompt */ \
-	fgets(b, LUA_MAXINPUT, stdin) != NULL)  /* get line */
+	fgets(b, LUA_MAXINPUT, stdin) != nullptr)  /* get line */
 
 static lua_State *globalL = nullptr;
 
@@ -1669,7 +1669,7 @@ static void *serve_lua(void *param)
 {
 	lua_engine *engine = (lua_engine *)param;
 	engine->serve_lua();
-	return NULL;
+	return nullptr;
 }
 
 //-------------------------------------------------

@@ -927,7 +927,7 @@ DRIVER_INIT_MEMBER( arcadia_amiga_state, arcadia )
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;
 
-	if (m_bios_region != NULL)
+	if (m_bios_region != nullptr)
 	{
 		/* OnePlay bios is encrypted, TenPlay is not */
 		UINT16 *rom = (UINT16 *)m_bios_region->base();

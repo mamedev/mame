@@ -362,7 +362,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 1a) 'arkmcubl'
 
   - Region = 0x76 (Japan).
-  - The bootleg is based on the Japenese version.
+  - The bootleg is based on the Japanese version.
   - The MCU is dumped, but the game doesn't run with it.
     However, there is no problem if I use the one from the World early version.
     Until I know what to do with it, I use the MCU from the World early version
@@ -385,7 +385,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
     and a fix (no dips selection) 1 ball x game and NO starting level selection".
     However, there is still code in the game which tests the Dip Switches !
   - Region = 0x76 (Japan).
-  - The bootleg is based on a Japenese early version we don't have.
+  - The bootleg is based on a Japanese early version we don't have.
     In fact, it is completely based on 'arkmcubl' :
 
       Z:\MAME\roms>romcmp ark1ball.zip arkmcubl.zip -d
@@ -599,7 +599,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 3) "Tayto" bootlegs and assimilated ones.
 
   - Region = 0x76 (Japan).
-  - All bootlegs are based on a Japenese early version we don't have.
+  - All bootlegs are based on a Japanese early version we don't have.
   - Start of levels table at 0xbd75 (32 * 2 bytes - LSB first)
 
 3a) 'arkatayt'
@@ -956,7 +956,7 @@ static INPUT_PORTS_START( arkanoid )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state,arkanoid_68705_input_r, NULL)  /* Inputs from the 68705 */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state,arkanoid_68705_input_r, nullptr)  /* Inputs from the 68705 */
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1440,7 +1440,7 @@ MACHINE_CONFIG_END
     A75 03   = GFX 1/3
     A75 04   = GFX 2/3
     A75 05   = GFX 3/3
-    A75 06   = MC68705P5 MCU code, v1.x Japan and v1.x USA/Romstar (verified to have crc&sha1 of 0be83647 and 625fd1e6061123df612f115ef14a06cd6009f5d1; the rom with crc&sha1 of 4e44b50a and c61e7d158dc8e2b003c8158053ec139b904599af is also probably legit as well, only differing due to a different fill in an unused area from the verified one )
+    A75 06   = MC68705P5 MCU code, v1.x Japan and v1.x USA/Romstar (DUMPED, verified to have crc&sha1 of 0be83647 and 625fd1e6061123df612f115ef14a06cd6009f5d1; the rom with crc&sha1 of 4e44b50a and c61e7d158dc8e2b003c8158053ec139b904599af is also probably legit as well, only differing due to a different fill in an unused area from the verified one )
     A75 07   = PROM red
     A75 08   = PROM green
     A75 09   = PROM blue
@@ -1449,19 +1449,19 @@ MACHINE_CONFIG_END
     (A75 12 through 17 are unknown, could be another two sets of z80 code plus mc68705p5)
     A75 18   = Z80 code v2.0 2/2 USA/Romstar
     A75 19   = Z80 code v2.0 1/2 USA/Romstar
-    A75 20   = MC68705P5 MCU code, v2.0 USA/Romstar
+    A75 20   = MC68705P5 MCU code, v2.0 USA/Romstar (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
     A75 21   = Z80 code v2.0 1/2 Japan w/level select
     A75 22   = Z80 code v2.0 2/2 Japan w/level select
-    A75 23   = MC68705P5 MCU code, v2.0 Japan w/level select
+    A75 23   = MC68705P5 MCU code, v2.0 Japan w/level select (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
     A75 24   = Z80 code v2.1 1/2 Japan
     A75 25   = Z80 code v2.1 2/2 Japan
-    A75 26   = MC68705P5 MCU code, v2.1 Japan
+    A75 26   = MC68705P5 MCU code, v2.1 Japan (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
     A75 27   = Z80 code 1/2 Tournament
     A75 28   = Z80 code 2/2 Tournament
     A75 29   = GFX 1/3 Tournament
     A75 30   = GFX 2/3 Tournament
     A75 31   = GFX 3/3 Tournament
-    A75 32   = MC68705P5 MCU code, Tournament
+    A75 32   = MC68705P5 MCU code, Tournament (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
     A75 33   = PROM red Tournament
     A75 34   = PROM green Tournament
     A75 35   = PROM blue Tournament

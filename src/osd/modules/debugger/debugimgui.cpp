@@ -79,8 +79,16 @@ class debug_imgui : public osd_module, public debug_module
 public:
 	debug_imgui()
 	: osd_module(OSD_DEBUG_PROVIDER, "imgui"), debug_module(),
-		m_machine(nullptr),
-		m_hide(false),
+		m_machine(nullptr), 
+		m_mouse_x(0), 
+		m_mouse_y(0), 
+		m_mouse_button(false), 
+		m_prev_mouse_button(false), 
+		m_running(false), 
+		font_name(nullptr), 
+		font_size(0), 
+		m_key_char(0),
+	    m_hide(false),
 		m_win_count(0)
 	{
 	}
@@ -98,6 +106,7 @@ private:
 	void handle_mouse();
 	void handle_mouse_views();
 	void handle_keys();
+	void handle_keys_views();
 	void handle_console(running_machine* machine);
 	void update();
 	void draw_console();
@@ -322,7 +331,7 @@ void debug_imgui::handle_keys()
 	else
 		io.KeyAlt = false;
 
-	for(input_item_id id = ITEM_ID_A; id <= ITEM_ID_CANCEL; id++)
+	for(input_item_id id = ITEM_ID_A; id <= ITEM_ID_CANCEL; ++id)
 	{
 		if(m_machine->input().code_pressed(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 			io.KeysDown[id] = true;
@@ -354,7 +363,62 @@ void debug_imgui::handle_keys()
 	if(ImGui::IsKeyPressed(ITEM_ID_L) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_log(++m_win_count);
 
-	m_machine->ui_input().reset();  // clear remaining inputs, so they don't fall through to the UI
+}
+
+void debug_imgui::handle_keys_views()
+{
+	debug_area* focus_view = nullptr;
+	// find view that has focus (should only be one at a time)
+	for(std::vector<debug_area*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
+		if((*view_ptr)->has_focus)
+			focus_view = *view_ptr;
+
+	// check views in main views also (only the disassembler view accepts inputs)
+	if(view_main_disasm->has_focus)
+		focus_view = view_main_disasm;
+
+	// if no view has focus, then there's nothing to do
+	if(focus_view == nullptr)
+		return;
+					
+	// pass keypresses to debug view with focus
+	if(m_machine->input().code_pressed_once(KEYCODE_UP))
+		focus_view->view->process_char(DCH_UP);
+	if(m_machine->input().code_pressed_once(KEYCODE_DOWN))
+		focus_view->view->process_char(DCH_DOWN);
+	if(m_machine->input().code_pressed_once(KEYCODE_LEFT))
+	{
+		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+			focus_view->view->process_char(DCH_CTRLLEFT);
+		else
+			focus_view->view->process_char(DCH_LEFT);
+	}
+	if(m_machine->input().code_pressed_once(KEYCODE_RIGHT))
+	{
+		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+			focus_view->view->process_char(DCH_CTRLRIGHT);
+		else
+			focus_view->view->process_char(DCH_RIGHT);
+	}
+	if(m_machine->input().code_pressed_once(KEYCODE_PGUP))
+		focus_view->view->process_char(DCH_PUP);
+	if(m_machine->input().code_pressed_once(KEYCODE_PGDN))
+		focus_view->view->process_char(DCH_PDOWN);
+	if(m_machine->input().code_pressed_once(KEYCODE_HOME))
+	{
+		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+			focus_view->view->process_char(DCH_CTRLHOME);
+		else
+			focus_view->view->process_char(DCH_HOME);
+	}
+	if(m_machine->input().code_pressed_once(KEYCODE_END))
+	{
+		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+			focus_view->view->process_char(DCH_CTRLEND);
+		else
+			focus_view->view->process_char(DCH_END);
+	}
+
 }
 
 void debug_imgui::handle_console(running_machine* machine)
@@ -610,13 +674,13 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 				debug_view_disasm* disasm = downcast<debug_view_disasm*>(view_ptr->view);
 				int rightcol = disasm->right_column();
 
-				if(ImGui::MenuItem("Raw opcodes",NULL,(rightcol == DASM_RIGHTCOL_RAW) ? true : false))
+				if(ImGui::MenuItem("Raw opcodes", nullptr,(rightcol == DASM_RIGHTCOL_RAW) ? true : false))
 					disasm->set_right_column(DASM_RIGHTCOL_RAW);
-				if(ImGui::MenuItem("Encrypted opcodes",NULL,(rightcol == DASM_RIGHTCOL_ENCRYPTED) ? true : false))
+				if(ImGui::MenuItem("Encrypted opcodes", nullptr,(rightcol == DASM_RIGHTCOL_ENCRYPTED) ? true : false))
 					disasm->set_right_column(DASM_RIGHTCOL_ENCRYPTED);
-				if(ImGui::MenuItem("No opcodes",NULL,(rightcol == DASM_RIGHTCOL_NONE) ? true : false))
+				if(ImGui::MenuItem("No opcodes", nullptr,(rightcol == DASM_RIGHTCOL_NONE) ? true : false))
 					disasm->set_right_column(DASM_RIGHTCOL_NONE);
-				if(ImGui::MenuItem("Comments",NULL,(rightcol == DASM_RIGHTCOL_COMMENTS) ? true : false))
+				if(ImGui::MenuItem("Comments", nullptr,(rightcol == DASM_RIGHTCOL_COMMENTS) ? true : false))
 					disasm->set_right_column(DASM_RIGHTCOL_COMMENTS);
 					
 				ImGui::EndMenu();
@@ -748,27 +812,27 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 				int format = mem->get_data_format();
 				UINT32 chunks = mem->chunks_per_row();
 				
-				if(ImGui::MenuItem("1-byte chunks",NULL,(format == 1) ? true : false))
+				if(ImGui::MenuItem("1-byte chunks", nullptr,(format == 1) ? true : false))
 					mem->set_data_format(1);
-				if(ImGui::MenuItem("2-byte chunks",NULL,(format == 2) ? true : false))
+				if(ImGui::MenuItem("2-byte chunks", nullptr,(format == 2) ? true : false))
 					mem->set_data_format(2);
-				if(ImGui::MenuItem("4-byte chunks",NULL,(format == 4) ? true : false))
+				if(ImGui::MenuItem("4-byte chunks", nullptr,(format == 4) ? true : false))
 					mem->set_data_format(4);
-				if(ImGui::MenuItem("8-byte chunks",NULL,(format == 8) ? true : false))
+				if(ImGui::MenuItem("8-byte chunks", nullptr,(format == 8) ? true : false))
 					mem->set_data_format(8);
-				if(ImGui::MenuItem("32-bit floating point",NULL,(format == 9) ? true : false))
+				if(ImGui::MenuItem("32-bit floating point", nullptr,(format == 9) ? true : false))
 					mem->set_data_format(9);
-				if(ImGui::MenuItem("64-bit floating point",NULL,(format == 10) ? true : false))
+				if(ImGui::MenuItem("64-bit floating point", nullptr,(format == 10) ? true : false))
 					mem->set_data_format(10);
-				if(ImGui::MenuItem("80-bit floating point",NULL,(format == 11) ? true : false))
+				if(ImGui::MenuItem("80-bit floating point", nullptr,(format == 11) ? true : false))
 					mem->set_data_format(11);
 				ImGui::Separator();
-				if(ImGui::MenuItem("Logical addresses",NULL,!physical))
+				if(ImGui::MenuItem("Logical addresses", nullptr,!physical))
 					mem->set_physical(false);
-				if(ImGui::MenuItem("Physical addresses",NULL,physical))
+				if(ImGui::MenuItem("Physical addresses", nullptr,physical))
 					mem->set_physical(true);
 				ImGui::Separator();
-				if(ImGui::MenuItem("Reverse view",NULL,rev))
+				if(ImGui::MenuItem("Reverse view", nullptr,rev))
 					mem->set_reverse(!rev);
 				ImGui::Separator();
 				if(ImGui::MenuItem("Increase bytes per line"))
@@ -894,7 +958,7 @@ void debug_imgui::draw_console()
 	ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 
 	ImGui::SetNextWindowSize(ImVec2(view_main_regs->width + view_main_disasm->width,view_main_disasm->height + view_main_console->height + ImGui::GetTextLineHeight()*3),ImGuiSetCond_Once);
-	if(ImGui::Begin(view_main_console->title.c_str(),NULL,flags))
+	if(ImGui::Begin(view_main_console->title.c_str(), nullptr,flags))
 	{
 		const debug_view_char *viewdata;
 		debug_view_xy vsize,totalsize;
@@ -975,7 +1039,7 @@ void debug_imgui::draw_console()
 						collapsed = true;
 						ImGui::End();
 					}
-					if(ImGui::MenuItem((*view_ptr)->title.c_str(),NULL,!collapsed))
+					if(ImGui::MenuItem((*view_ptr)->title.c_str(), nullptr,!collapsed))
 						ImGui::SetWindowCollapsed((*view_ptr)->title.c_str(),false);
 				}
 				ImGui::EndMenu();
@@ -1176,7 +1240,7 @@ void debug_imgui::update()
 				to_delete = (*view_ptr);
 			break;
 		}
-		view_ptr++;
+		++view_ptr;
 		count++;
 	}
 	// check for a closed window
@@ -1264,6 +1328,8 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 	update();
 	imguiEndFrame();
 	handle_mouse_views();
+	handle_keys_views();
+	m_machine->ui_input().reset();  // clear remaining inputs, so they don't fall through to the UI
 	device.machine().osd().update(false);
 }
 

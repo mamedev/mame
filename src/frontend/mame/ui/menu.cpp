@@ -18,10 +18,6 @@
 #include "ui/utils.h"
 #include "ui/defimg.h"
 #include "ui/starimg.h"
-#include "ui/optsmenu.h"
-#include "ui/datfile.h"
-#include "rendfont.h"
-#include "ui/custmenu.h"
 #include "ui/icorender.h"
 #include "ui/toolbar.h"
 #include "ui/miscmenu.h"
@@ -1436,8 +1432,8 @@ void ui_menu::init_ui(running_machine &machine)
 		sw_toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32(32, 32));
 		toolbar_texture[x] = mrender.texture_alloc();
 		sw_toolbar_texture[x] = mrender.texture_alloc();
-		UINT32 *dst = &toolbar_bitmap[x]->pix32(0);
-		memcpy(dst, toolbar_bitmap_bmp[x], 32 * 32 * sizeof(UINT32));
+		UINT32 *texture_dst = &toolbar_bitmap[x]->pix32(0);
+		memcpy(texture_dst, toolbar_bitmap_bmp[x], 32 * 32 * sizeof(UINT32));
 		if (toolbar_bitmap[x]->valid())
 			toolbar_texture[x]->set_bitmap(*toolbar_bitmap[x], toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
 		else
@@ -1445,8 +1441,8 @@ void ui_menu::init_ui(running_machine &machine)
 
 		if (x == 0 || x == 2)
 		{
-			dst = &sw_toolbar_bitmap[x]->pix32(0);
-			memcpy(dst, toolbar_bitmap_bmp[x], 32 * 32 * sizeof(UINT32));
+			texture_dst = &sw_toolbar_bitmap[x]->pix32(0);
+			memcpy(texture_dst, toolbar_bitmap_bmp[x], 32 * 32 * sizeof(UINT32));
 			if (sw_toolbar_bitmap[x]->valid())
 				sw_toolbar_texture[x]->set_bitmap(*sw_toolbar_bitmap[x], sw_toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
 			else

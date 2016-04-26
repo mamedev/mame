@@ -450,7 +450,7 @@ void osd_common_t::update(bool skip_redraw)
 	// irregular intervals in some circumstances (e.g., multi-screen games
 	// or games with asynchronous updates).
 	//
-	if (m_watchdog != NULL)
+	if (m_watchdog != nullptr)
 		m_watchdog->reset();
 
 	update_slider_list();
@@ -644,7 +644,7 @@ void osd_common_t::init_subsystems()
 	m_midi = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
 
 	m_output = select_module_options<output_module *>(options(), OSD_OUTPUT_PROVIDER);
-	machine().output().set_notifier(NULL, output_notifier_callback, this);
+	machine().output().set_notifier(nullptr, output_notifier_callback, this);
 
 	m_mod_man.init(options());
 

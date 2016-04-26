@@ -1034,7 +1034,7 @@ void discrete_sound_device::device_reset()
 //
 //  input / output buffers are stream_sample_t
 //  to not to have to convert the buffers.
-//  a "discrete cpu" device will pass NULL here
+//  a "discrete cpu" device will pass nullptr here
 //-------------------------------------------------
 
 void discrete_device::process(int samples)

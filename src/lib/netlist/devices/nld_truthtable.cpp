@@ -270,7 +270,7 @@ netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const
 			pstring msg = pfmt("unable to create truthtable<{1},{2},{3}>")(ni)(no)(has_state);
 			nl_assert_always(false, msg);
 	}
-	return NULL;
+	return nullptr;
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

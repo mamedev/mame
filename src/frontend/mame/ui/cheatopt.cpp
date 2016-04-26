@@ -156,7 +156,7 @@ ui_menu_cheat::~ui_menu_cheat()
     menu
 -------------------------------------------------*/
 
-ui_menu_autofire::ui_menu_autofire(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_autofire::ui_menu_autofire(running_machine &machine, render_container *container) : ui_menu(machine, container), last_toggle(false)
 {
 	const screen_device *screen = machine.first_screen();
 

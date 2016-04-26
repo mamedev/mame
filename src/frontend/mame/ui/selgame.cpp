@@ -24,7 +24,6 @@
 #include "ui/optsmenu.h"
 #include "ui/selector.h"
 #include "ui/selsoft.h"
-#include "sound/samples.h"
 #include "ui/custmenu.h"
 #include "../info.h"
 #include "ui/auditmenu.h"
@@ -2085,13 +2084,13 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 			{
 				// check size
 				float textlen = mui.get_string_width(tempbuf.c_str(), text_size);
-				float tmp_size = (textlen > sc) ? text_size * (sc / textlen) : text_size;
+				float tmp_size2 = (textlen > sc) ? text_size * (sc / textlen) : text_size;
 
 				size_t last_underscore = tempbuf.find_last_of("_");
 				if (last_underscore == std::string::npos)
 				{
 					mui.draw_text_full(container, tempbuf.c_str(), origx1, oy1, origx2 - origx1, JUSTIFY_CENTER,
-						WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size);
+						WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size2);
 				}
 				else
 				{
@@ -2102,11 +2101,11 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 					float item_width;
 
 					mui.draw_text_full(container, first_part.c_str(), effective_left, oy1, effective_width,
-						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &item_width, nullptr, tmp_size);
+						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &item_width, nullptr, tmp_size2);
 
 					mui.draw_text_full(container, last_part.c_str(), effective_left + item_width, oy1,
 						origx2 - origx1 - 2.0f * gutter_width - item_width, JUSTIFY_RIGHT, WRAP_TRUNCATE,
-						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size);
+						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size2);
 				}
 			}
 
@@ -2115,7 +2114,7 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 			{
 				// check size
 				float textlen = mui.get_string_width(tempbuf.c_str(), text_size);
-				float tmp_size = (textlen > sc) ? text_size * (sc / textlen) : text_size;
+				float tmp_size3 = (textlen > sc) ? text_size * (sc / textlen) : text_size;
 
 				int first_dspace = (ui_globals::curdats_view == UI_COMMAND_LOAD) ? tempbuf.find("  ") : tempbuf.find(":");
 				if (first_dspace > 0)
@@ -2126,14 +2125,14 @@ void ui_menu_select_game::infos_render(void *selectedref, float origx1, float or
 					std::string last_part(tempbuf.substr(first_dspace + 1));
 					strtrimspace(last_part);
 					mui.draw_text_full(container, first_part.c_str(), effective_left, oy1, effective_width, JUSTIFY_LEFT,
-						WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size);
+						WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size3);
 
 					mui.draw_text_full(container, last_part.c_str(), effective_left, oy1, origx2 - origx1 - 2.0f * gutter_width,
-						JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size);
+						JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size3);
 				}
 				else
 					mui.draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT,
-						WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size);
+						WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size3);
 			}
 			else
 				mui.draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT,

@@ -116,10 +116,9 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 			break;
 
 		default:
-			fatalerror("Unexpected\n");
 			can_create = false;
 			need_confirm = false;
-			break;
+			fatalerror("Unexpected\n");
 	}
 
 	if (entry != nullptr)

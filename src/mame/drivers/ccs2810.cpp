@@ -175,12 +175,12 @@ WRITE8_MEMBER( ccs_state::kbd_put )
 #if 0
 static const ins8250_interface com_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NOOP,
+	DEVCB_NOOP,
+	DEVCB_NOOP,
+	DEVCB_NOOP,
+	DEVCB_NOOP,
+	DEVCB_NOOP
 };
 #endif
 

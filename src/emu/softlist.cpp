@@ -142,7 +142,7 @@ const char *software_part::feature(const char *feature_name) const
 
 bool software_part::is_compatible(const software_list_device &swlistdev) const
 {
-	// get the compatibility feature and the softlist filter; if either is NULL, assume compatible
+	// get the compatibility feature and the softlist filter; if either is nullptr, assume compatible
 	const char *compatibility = feature("compatibility");
 	const char *filter = swlistdev.filter();
 	if (compatibility == nullptr || filter == nullptr)
@@ -447,7 +447,7 @@ void software_list_device::display_matches(const machine_config &config, const c
 
 software_info *software_list_device::find(const char *look_for, software_info *prev)
 {
-	// NULL search returns nothing
+	// nullptr search returns nothing
 	if (look_for == nullptr)
 		return nullptr;
 
@@ -1139,8 +1139,6 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				add_rom_entry(nullptr, nullptr, offset, length, ROMENTRYTYPE_RELOAD);
 			else if (loadflag != nullptr && strcmp(loadflag, "continue") == 0)
 				add_rom_entry(nullptr, nullptr, offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS);
-			else if (loadflag != nullptr && strcmp(loadflag, "ignore") == 0)
-				add_rom_entry(nullptr, nullptr, offset, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
 			else if (loadflag != nullptr && strcmp(loadflag, "fill") == 0)
 				add_rom_entry(nullptr, (const char *)(FPTR)(strtol(value, nullptr, 0) & 0xff), offset, length, ROMENTRYTYPE_FILL);
 			else if (name != nullptr)
@@ -1180,6 +1178,11 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			}
 			else
 				parse_error("Rom name missing");
+		}
+		else if (sizestr != nullptr && loadflag != nullptr && strcmp(loadflag, "ignore") == 0)
+		{
+			UINT32 length = strtol(sizestr, nullptr, 0);
+			add_rom_entry(nullptr, nullptr, 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
 		}
 		else
 			parse_error("Incomplete rom definition");

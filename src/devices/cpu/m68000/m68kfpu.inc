@@ -1991,7 +1991,7 @@ static int perform_fsave(m68000_base_device *m68k, UINT32 addr, int inc)
 	}
 }
 
-// FRESTORE on a NULL frame reboots the FPU - all registers to NaN, the 3 status regs to 0
+// FRESTORE on a nullptr frame reboots the FPU - all registers to NaN, the 3 status regs to 0
 static void do_frestore_null(m68000_base_device *m68k)
 {
 	int i;
@@ -2005,8 +2005,8 @@ static void do_frestore_null(m68000_base_device *m68k)
 		REG_FP(m68k)[i].low = U64(0xffffffffffffffff);
 	}
 
-	// Mac IIci at 408458e6 wants an FSAVE of a just-restored NULL frame to also be NULL
-	// The PRM says it's possible to generate a NULL frame, but not how/when/why.  (need the 68881/68882 manual!)
+	// Mac IIci at 408458e6 wants an FSAVE of a just-restored nullptr frame to also be nullptr
+	// The PRM says it's possible to generate a nullptr frame, but not how/when/why.  (need the 68881/68882 manual!)
 	m68k->fpu_just_reset = 1;
 }
 
@@ -2030,10 +2030,10 @@ static void m68040_do_frestore(m68000_base_device *m68k, UINT32 addr, int reg)
 	bool m40 = m68k->cpu_type & CPU_TYPE_040;
 	UINT32 temp = m68ki_read_32(m68k, addr);
 
-	// check for NULL frame
+	// check for nullptr frame
 	if (temp & 0xff000000)
 	{
-		// we don't handle non-NULL frames
+		// we don't handle non-nullptr frames
 		m68k->fpu_just_reset = 0;
 
 		if (reg != -1)

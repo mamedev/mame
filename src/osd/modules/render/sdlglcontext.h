@@ -45,7 +45,7 @@ public:
 	virtual const char *LastErrorMsg() override
 	{
 		if (m_error[0] == 0)
-			return NULL;
+			return nullptr;
 		else
 			return m_error;
 	}

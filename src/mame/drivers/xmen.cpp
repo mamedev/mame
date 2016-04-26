@@ -265,7 +265,7 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START5 ) /* not verified */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START6 ) /* not verified */
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xmen_state,xmen_frame_r, NULL)  /* screen indicator? */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xmen_state,xmen_frame_r, nullptr)  /* screen indicator? */
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)

@@ -1,0 +1,48 @@
+// license:GPL-2.0+
+// copyright-holders:Hyllian
+
+{
+	"name": "2xBR v3.7c+ReverseAA (squared)",
+	"author": "Hyllian",
+	"targets": [
+		{
+			"name": "pass0",
+			"mode": "guest",
+			"scale": 2,
+			"bilinear": true,
+			"doublebuffer": true
+		},
+		{
+			"name": "pass1",
+			"mode": "guest",
+			"scale": 4,
+			"doublebuffer": true
+		}
+	],
+	"passes": [
+		{
+			"effect": "xbr/xbr-hybrid/2xbr-hybrid-v4b",
+			"name": "Pass 0",
+			"input": [
+				{ "sampler": "decal", "texture": "screen" }
+			],
+			"output": "pass0"
+		},
+		{
+			"effect": "xbr/xbr-hybrid/2xbr-hybrid-v4b",
+			"name": "Pass 1",
+			"input": [
+				{ "sampler": "decal", "target": "pass0" }
+			],
+			"output": "pass1"
+		},
+		{
+			"effect": "misc/blit",
+			"name": "Upscale",
+			"input": [
+				{ "sampler": "s_tex", "target": "pass1" }
+			],
+			"output": "output"
+		}
+	]
+}

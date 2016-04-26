@@ -1712,7 +1712,7 @@ static MACHINE_CONFIG_DERIVED( mysticm, williams2 )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_CA2_HANDLER(NULL)
+	MCFG_PIA_CA2_HANDLER(NOOP)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_firq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,mysticm_main_irq))
 

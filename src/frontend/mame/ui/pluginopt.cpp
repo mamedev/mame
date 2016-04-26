@@ -34,7 +34,7 @@ ui_menu_plugin::ui_menu_plugin(running_machine &machine, render_container *conta
 void ui_menu_plugin::populate()
 {
 	for (auto &curplugin : m_plugins)
-		item_append(curplugin.c_str(), 0, 0, (void *)curplugin.c_str());
+		item_append(curplugin.c_str(), nullptr, 0, (void *)curplugin.c_str());
 	item_append(ui_menu_item_type::SEPARATOR);
 }
 

@@ -273,13 +273,13 @@ template<typename F>
 double pstring_t<F>::as_double(bool *error) const
 {
 	double ret;
-	char *e = NULL;
+	char *e = nullptr;
 
-	if (error != NULL)
+	if (error != nullptr)
 		*error = false;
 	ret = strtod(cstr(), &e);
 	if (*e != 0)
-		if (error != NULL)
+		if (error != nullptr)
 			*error = true;
 	return ret;
 }
@@ -288,16 +288,16 @@ template<typename F>
 long pstring_t<F>::as_long(bool *error) const
 {
 	long ret;
-	char *e = NULL;
+	char *e = nullptr;
 
-	if (error != NULL)
+	if (error != nullptr)
 		*error = false;
 	if (startsWith("0x"))
 		ret = strtol(substr(2).cstr(), &e, 16);
 	else
 		ret = strtol(cstr(), &e, 10);
 	if (*e != 0)
-		if (error != NULL)
+		if (error != nullptr)
 			*error = true;
 	return ret;
 }
@@ -314,7 +314,7 @@ long pstring_t<F>::as_long(bool *error) const
 
 #if 1
 
-static std::stack<pstr_t *> *stk = NULL;
+static std::stack<pstr_t *> *stk = nullptr;
 
 static inline unsigned countleadbits(unsigned x)
 {
@@ -358,7 +358,7 @@ void pstring_t<F>::sfree(pstr_t *s)
 	s->m_ref_count--;
 	if (s->m_ref_count == 0 && s != &m_zero)
 	{
-		if (stk != NULL)
+		if (stk != nullptr)
 		{
 			unsigned sn= ((32 - countleadbits(s->len())) + 1) / 2;
 			stk[sn].push(s);
@@ -372,7 +372,7 @@ void pstring_t<F>::sfree(pstr_t *s)
 template<typename F>
 pstr_t *pstring_t<F>::salloc(int n)
 {
-	if (stk == NULL)
+	if (stk == nullptr)
 		stk = palloc_array(std::stack<pstr_t *>, 17);
 	pstr_t *p;
 	unsigned sn= ((32 - countleadbits(n)) + 1) / 2;
@@ -392,7 +392,7 @@ pstr_t *pstring_t<F>::salloc(int n)
 template<typename F>
 void pstring_t<F>::resetmem()
 {
-	if (stk != NULL)
+	if (stk != nullptr)
 	{
 		for (unsigned i=0; i<=16; i++)
 		{
@@ -403,7 +403,7 @@ void pstring_t<F>::resetmem()
 			}
 		}
 		pfree_array(stk);
-		stk = NULL;
+		stk = nullptr;
 	}
 }
 
@@ -532,13 +532,13 @@ int pstring_t<F>::pcmp(const mem_t *right) const
 
 pstringbuffer::~pstringbuffer()
 {
-	if (m_ptr != NULL)
+	if (m_ptr != nullptr)
 		pfree_array(m_ptr);
 }
 
 void pstringbuffer::resize(const std::size_t size)
 {
-	if (m_ptr == NULL)
+	if (m_ptr == nullptr)
 	{
 		m_size = DEFAULT_SIZE;
 		while (m_size <= size)

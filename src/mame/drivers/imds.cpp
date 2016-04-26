@@ -82,10 +82,10 @@ void imds_state::machine_reset()
 //static const ins8250_interface imds_com_interface =
 //{
 //  1843200,
-//  DEVCB_NULL,
-//  NULL,
-//  NULL,
-//  NULL
+//  DEVCB_NOOP,
+//  nullptr,
+//  nullptr,
+//  nullptr
 //};
 
 static MACHINE_CONFIG_START( imds, imds_state )

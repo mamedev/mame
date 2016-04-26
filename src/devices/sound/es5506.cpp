@@ -146,7 +146,7 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 		m_ulaw_lookup(nullptr),
 		m_volume_lookup(nullptr),
 		#if MAKE_WAVS
-		m_wavraw(NULL),
+		m_wavraw(nullptr),
 		#endif
 		m_eslog(nullptr),
 		m_region0(nullptr),
@@ -1047,7 +1047,7 @@ void es5506_device::generate_samples(INT32 **outputs, int offset, int samples)
 		/* generate from the appropriate source */
 		if (!base)
 		{
-			logerror("es5506: NULL region base %d\n",voice->control >> 14);
+			logerror("es5506: nullptr region base %d\n",voice->control >> 14);
 			generate_dummy(voice, base, left, right, samples);
 		}
 		else if (voice->control & 0x2000)
@@ -1110,7 +1110,7 @@ void es5505_device::generate_samples(INT32 **outputs, int offset, int samples)
 		/* generate from the appropriate source */
 		if (!base)
 		{
-			logerror("es5506: NULL region base %d\n",voice->control >> 14);
+			logerror("es5506: nullptr region base %d\n",voice->control >> 14);
 			generate_dummy(voice, base, left, right, samples);
 		}
 		else if (voice->control & 0x2000)

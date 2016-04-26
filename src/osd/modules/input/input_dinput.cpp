@@ -236,7 +236,7 @@ public:
 		instance.dwSize = sizeof(instance);
 		result = devinfo->dinput.device->GetObjectInfo(&instance, offset, DIPH_BYOFFSET);
 
-		// if we got an error and have no default string, just return NULL
+		// if we got an error and have no default string, just return nullptr
 		if (result != DI_OK)
 		{
 			if (defstring == nullptr)

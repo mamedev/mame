@@ -777,7 +777,7 @@ void segas24_state::reset_control_w(UINT8 data)
 
 void segas24_state::reset_bank()
 {
-	if (m_romboard != NULL)
+	if (m_romboard != nullptr)
 	{
 		membank("bank1")->set_entry(curbank & 15);
 		membank("bank2")->set_entry(curbank & 15);
@@ -1326,7 +1326,7 @@ void segas24_state::machine_start()
 	if (track_size)
 		machine().device<nvram_device>("floppy_nvram")->set_base(memregion("floppy")->base(), 2*track_size);
 
-	if (m_romboard != NULL)
+	if (m_romboard != nullptr)
 	{
 		UINT8 *usr1 = m_romboard->base();
 		membank("bank1")->configure_entries(0, 16, usr1, 0x40000);

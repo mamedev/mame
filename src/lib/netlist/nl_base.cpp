@@ -175,7 +175,7 @@ ATTR_COLD const pstring &object_t::name() const
 ATTR_COLD device_object_t::device_object_t(const type_t atype,
 		const family_t afamily)
 : object_t(atype, afamily)
-, m_device(NULL)
+, m_device(nullptr)
 {
 }
 
@@ -196,12 +196,12 @@ netlist_t::netlist_t(const pstring &aname)
 		m_time(netlist_time::zero),
 		m_use_deactivate(0),
 		m_queue(*this),
-		m_mainclock(NULL),
-		m_solver(NULL),
-		m_gnd(NULL),
-		m_params(NULL),
+		m_mainclock(nullptr),
+		m_solver(nullptr),
+		m_gnd(nullptr),
+		m_params(nullptr),
 		m_name(aname),
-		m_setup(NULL),
+		m_setup(nullptr),
 		m_log(this),
 		m_lib(nullptr)
 {
@@ -250,10 +250,10 @@ ATTR_COLD void netlist_t::start()
 
 	/* make sure the solver and parameters are started first! */
 
-	if (m_solver != NULL)
+	if (m_solver != nullptr)
 		m_solver->start_dev();
 
-	if (m_params != NULL)
+	if (m_params != nullptr)
 	{
 		m_params->start_dev();
 	}
@@ -282,7 +282,7 @@ ATTR_COLD net_t *netlist_t::find_net(const pstring &name)
 		if (net->name() == name)
 			return net;
 
-	return NULL;
+	return nullptr;
 }
 
 ATTR_COLD void netlist_t::rebuild_lists()
@@ -296,9 +296,9 @@ ATTR_COLD void netlist_t::reset()
 {
 	m_time = netlist_time::zero;
 	m_queue.clear();
-	if (m_mainclock != NULL)
+	if (m_mainclock != nullptr)
 		m_mainclock->m_Q.net().set_time(netlist_time::zero);
-	if (m_solver != NULL)
+	if (m_solver != nullptr)
 		m_solver->do_reset();
 
 	// Reset all nets once !
@@ -330,7 +330,7 @@ ATTR_HOT void netlist_t::process_queue(const netlist_time &delta)
 {
 	m_stop = m_time + delta;
 
-	if (m_mainclock == NULL)
+	if (m_mainclock == nullptr)
 	{
 		while ( (m_time < m_stop) && (m_queue.is_not_empty()))
 		{
@@ -401,7 +401,7 @@ ATTR_COLD core_device_t::core_device_t(const family_t afamily)
 
 ATTR_COLD void core_device_t::init(netlist_t &anetlist, const pstring &name)
 {
-	if (logic_family() == NULL)
+	if (logic_family() == nullptr)
 		set_logic_family(this->default_logic_family());
 	init_object(anetlist, name);
 
@@ -587,7 +587,7 @@ ATTR_COLD net_t::net_t(const family_t afamily)
 	: object_t(NET, afamily)
 	, m_new_Q(0)
 	, m_cur_Q (0)
-	, m_railterminal(NULL)
+	, m_railterminal(nullptr)
 	, m_time(netlist_time::zero)
 	, m_active(0)
 	, m_in_queue(2)
@@ -648,7 +648,7 @@ ATTR_HOT void net_t::dec_active(core_terminal_t &term)
 
 ATTR_COLD void net_t::register_railterminal(core_terminal_t &mr)
 {
-	nl_assert(m_railterminal == NULL);
+	nl_assert(m_railterminal == nullptr);
 	m_railterminal = &mr;
 }
 
@@ -689,7 +689,7 @@ ATTR_HOT /* inline */ void net_t::update_devs()
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
 
-	for (core_terminal_t *p = m_list_active.first(); p != NULL; p = p->next())
+	for (core_terminal_t *p = m_list_active.first(); p != nullptr; p = p->next())
 	{
 		inc_stat(p->netdev().stat_call_count);
 		if ((p->state() & mask) != 0)
@@ -742,7 +742,7 @@ ATTR_COLD void net_t::move_connections(net_t *dest_net)
 ATTR_COLD void net_t::merge_net(net_t *othernet)
 {
 	netlist().log().debug("merging nets ...\n");
-	if (othernet == NULL)
+	if (othernet == nullptr)
 		return; // Nothing to do
 
 	if (othernet == this)
@@ -792,7 +792,7 @@ ATTR_COLD void logic_net_t::save_register()
 
 ATTR_COLD analog_net_t::analog_net_t()
 	: net_t(ANALOG)
-	, m_solver(NULL)
+	, m_solver(nullptr)
 {
 }
 
@@ -844,7 +844,7 @@ ATTR_COLD void analog_net_t::process_net(pvector_t<list_t> &groups)
 ATTR_COLD core_terminal_t::core_terminal_t(const type_t atype, const family_t afamily)
 : device_object_t(atype, afamily)
 , plinkedlist_element_t()
-, m_net(NULL)
+, m_net(nullptr)
 , m_state(STATE_NONEX)
 {
 }
@@ -860,10 +860,10 @@ ATTR_COLD void core_terminal_t::set_net(net_t &anet)
 
 ATTR_COLD terminal_t::terminal_t()
 : analog_t(TERMINAL)
-, m_otherterm(NULL)
-, m_Idr1(NULL)
-, m_go1(NULL)
-, m_gt1(NULL)
+, m_otherterm(nullptr)
+, m_Idr1(nullptr)
+, m_go1(nullptr)
+, m_gt1(nullptr)
 {
 }
 
@@ -871,14 +871,14 @@ ATTR_COLD terminal_t::terminal_t()
 ATTR_HOT void terminal_t::schedule_solve()
 {
 	// FIXME: Remove this after we found a way to remove *ALL* twoterms connected to railnets only.
-	if (net().solver() != NULL)
+	if (net().solver() != nullptr)
 		net().solver()->update_forced();
 }
 
 ATTR_HOT void terminal_t::schedule_after(const netlist_time &after)
 {
 	// FIXME: Remove this after we found a way to remove *ALL* twoterms connected to railnets only.
-	if (net().solver() != NULL)
+	if (net().solver() != nullptr)
 		net().solver()->update_after(after);
 }
 
@@ -936,7 +936,7 @@ ATTR_COLD void logic_output_t::initial(const netlist_sig_t val)
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD analog_output_t::analog_output_t()
-	: analog_t(OUTPUT), m_proxied_net(NULL)
+	: analog_t(OUTPUT), m_proxied_net(nullptr)
 {
 	this->set_net(m_my_net);
 	set_state(STATE_OUT);
@@ -945,7 +945,7 @@ ATTR_COLD analog_output_t::analog_output_t()
 }
 
 ATTR_COLD analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
-	: analog_t(OUTPUT), m_proxied_net(NULL)
+	: analog_t(OUTPUT), m_proxied_net(nullptr)
 {
 	this->set_net(m_my_net);
 	set_state(STATE_OUT);

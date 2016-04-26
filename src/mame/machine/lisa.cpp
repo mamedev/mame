@@ -955,7 +955,7 @@ void lisa_state::machine_reset()
 	m_videoROM_ptr = memregion("gfx1")->base();
 
 //  m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine()));
-//  m68k_set_reset_callback(m_maincpu, /*lisa_reset_instr_callback*/NULL);
+//  m68k_set_reset_callback(m_maincpu, /*lisa_reset_instr_callback*/nullptr);
 
 	/* init MMU */
 	m_setup = 1;

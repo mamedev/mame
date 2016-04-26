@@ -18,7 +18,6 @@
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/miscmenu.h"
-#include "ui/utils.h"
 #include "../info.h"
 #include "ui/inifile.h"
 #include "ui/submenu.h"
@@ -523,7 +522,7 @@ void ui_menu_crosshair::populate()
 	}
 //  else
 //      /* leave a blank filler line when not in auto time so size does not rescale */
-//      item_append("", "", NULL, NULL);
+//      item_append("", "", nullptr, nullptr);
 }
 
 ui_menu_crosshair::~ui_menu_crosshair()

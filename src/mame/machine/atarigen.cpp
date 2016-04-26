@@ -792,7 +792,7 @@ void atari_vad_device::eof_update(emu_timer &timer)
     update_pf_xscrolls();
 
     m_playfield_tilemap->set_scrolly(0, m_pf0_yscroll);
-    if (m_playfield2_tilemap != NULL)
+    if (m_playfield2_tilemap != nullptr)
         m_playfield2_tilemap->set_scrolly(0, m_pf1_yscroll);*/
 	timer.adjust(m_screen->time_until_pos(0));
 

@@ -291,7 +291,7 @@ public:
 	bool should_hide_mouse() const;
 	void poll_input(running_machine &machine) const;
 
-	windows_options &options() { return m_options; }
+	virtual windows_options &options() override { return m_options; }
 
 	int window_count();
 
@@ -307,7 +307,6 @@ private:
 	windows_options &   m_options;
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
-	static long __stdcall exception_filter(struct _EXCEPTION_POINTERS *info);
 };
 
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
