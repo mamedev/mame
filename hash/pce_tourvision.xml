@@ -2,52 +2,81 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pce_tourvision" description="Tourvision (bootleg Arcade NEC PC-Engine) cartridges">
 
+  <software name="dsaber">
+    <description>Dragon Saber - After Story of Dragon Spirit (Tourvision PCE bootleg)</description>
+    <year>1991</year>
+    <publisher>bootleg (Tourvision) / Namcot</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <!-- verified identical -->
+        <rom name="dragon saber - after story of dragon spirit (japan).pce" size="524288" crc="3219849c" sha1="6d94cd3e27dbe1694229f7f006dc821be4764aa2" offset="000000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="bullfght">
+    <description>Bull Fight - Ring no Haja (Tourvision PCE bootleg)</description>
+    <year>1989</year>
+    <publisher>bootleg (Tourvision) / Cream</publisher>
+    <part name="cart" interface="tourvision_cart">
+      <dataarea name="rom" size="0x100000">
+        <!-- need to verify, PCE roms of this size use different loading, 0x40000 data in original PCE rom is at 0x80000 in the edge connector dump -->
+        <rom name="bull_fight.bin" size="0x100000" crc="53e02944" sha1="c3921da8018f510dd35198d278245837dc69bcd7" offset="000000" />
+        <!--<rom name="bull fight - ring no haja (japan).pce" size="393216" crc="5c4d1991" sha1="6cd94e6209da2939752ab6b1c2d46e5b48c8e0cb" offset="000000" />-->
+      </dataarea>
+    </part>
+  </software>  
+  
   <!--1943 Kai -->
-  <software name="tv1943">
+  <software name="1943kai">
     <description>1943 Kai (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Capcom / Naxat Soft</publisher>
     <part name="cart" interface="tourvision_cart">
       <dataarea name="rom" size="0x100000">
-        <rom name="tourv_1943_kia.bin" size="0x100000" crc="de4672ab" sha1="2da1ee082bfb920c632a95014208f11fb48c58e1" offset="000000" />
+        <!-- verified identical -->
+        <rom name="1943 kai (japan).pce" size="524288" crc="fde08d6d" sha1="3ac86354155ca01859c53e2f2287a715cd3fca13" offset="000000" />
       </dataarea>
     </part>
   </software>
 
   <!--Aero Blasters - Hudson / Kaneko -->
-  <software name="tvablast">
+  <software name="aeroblst">
     <description>Aero Blasters (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Inter State / Kaneko / Hudson Soft</publisher>
     <part name="cart" interface="tourvision_cart">
       <dataarea name="rom" size="0x100000">
-        <rom name="tourv_ablast.bin" size="0x100000" crc="9302f6d0" sha1="76ef27a6d639514ed261b9d65f37217f2989d1c0" offset="000000" />
+        <!-- verified identical -->
+        <rom name="aero blasters (japan).pce" size="524288" crc="25be2b81" sha1="748ec92246140565d95f6fb727de6167227b85d3" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--After Burner -->
-  <software name="tvaburn">
+  <software name="aburner2">
     <description>After Burner (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Sega / Nec Avenue</publisher>
     <part name="cart" interface="tourvision_cart">
       <dataarea name="rom" size="0x100000">
-        <rom name="tourv_afterburner.bin" size="0x100000" crc="5ce31322" sha1="08918d443891bd70f1b0b0c739522b764b16bc96" offset="000000" />
+        <!-- verified identical -->
+        <rom name="after burner ii (japan).pce" size="524288" crc="ca72a828" sha1="50b9d22fe5179aee5cb95022472714ef8483841f" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Armed-F -->
-  <software name="tvarmedf">
+  <software name="armedf">
     <description>Armed-F (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Nichibutsu / Big Don</publisher>
     <part name="cart" interface="tourvision_cart">
       <dataarea name="rom" size="0x100000">
-        <rom name="tourv_armed-f.bin" size="0x100000" crc="056617f5" sha1="d10eb80b8436b8d217170309647104181cca750a" offset="000000" />
+        <!-- verified identical -->
+        <rom name="armed formation f (japan).pce" size="262144" crc="20ef87fd" sha1="a326c9cece6f14b82629c4c79b34df819b022dce" offset="000000" />
       </dataarea>
     </part>
   </software>
@@ -896,7 +925,7 @@ Notes:
       </dataarea>
     </part>
   </software>
-
+  
 </softwarelist>
 
 
