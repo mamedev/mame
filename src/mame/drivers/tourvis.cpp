@@ -286,7 +286,33 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state, tourvision_cart )
 	m_cart->common_load_rom(m_cart->get_rom_base(), m_rom_size, "rom");
 
 	UINT8* rgn = memregion("maincpu")->base();
-	memcpy(rgn, m_cart->get_rom_base(), m_rom_size);
+	UINT8* base = m_cart->get_rom_base();
+
+	if (m_rom_size == 0x060000)
+	{
+		memcpy(rgn+0x000000, base+0x000000, 0x040000 );
+		memcpy(rgn+0x040000, base+0x000000, 0x040000 );
+		memcpy(rgn+0x080000, base+0x040000, 0x020000 );
+		memcpy(rgn+0x0a0000, base+0x040000, 0x020000 );
+		memcpy(rgn+0x0c0000, base+0x040000, 0x020000 );
+		memcpy(rgn+0x0e0000, base+0x040000, 0x020000 );
+	}
+	else
+	{
+		memcpy(rgn, base, m_rom_size );
+	}
+
+#if 0
+	{
+		FILE *fp;
+		fp=fopen("tourvision.bin", "w+b");
+		if (fp)
+		{
+			fwrite(rgn, 0x100000, 1, fp);
+			fclose(fp);
+		}
+	}
+#endif
 
 	return IMAGE_INIT_PASS;
 }

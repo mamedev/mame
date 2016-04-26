@@ -19,10 +19,9 @@
     <year>1989</year>
     <publisher>bootleg (Tourvision) / Cream</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <!-- need to verify, PCE roms of this size use different loading, 0x40000 data in original PCE rom is at 0x80000 in the edge connector dump -->
-        <rom name="bull_fight.bin" size="0x100000" crc="53e02944" sha1="c3921da8018f510dd35198d278245837dc69bcd7" offset="000000" />
-        <!--<rom name="bull fight - ring no haja (japan).pce" size="393216" crc="5c4d1991" sha1="6cd94e6209da2939752ab6b1c2d46e5b48c8e0cb" offset="000000" />-->
+      <dataarea name="rom" size="0x060000">
+        <!-- verified identical -->
+        <rom name="bull fight - ring no haja (japan).pce" size="393216" crc="5c4d1991" sha1="6cd94e6209da2939752ab6b1c2d46e5b48c8e0cb" offset="000000" />
       </dataarea>
     </part>
   </software>  
