@@ -368,65 +368,70 @@ Notes:
 
 
   <!--Hana Taka Daka (Super Long Nose Goblin) -->
-  <software name="tvhtdaka">
+  <software name="hanataka">
     <description>Hana Taaka Daka!? (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Taito Corporation</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_hana_taka_daka.bin" size="0x100000" crc="0fbfda5c" sha1="02b2ce93ee5e2aaa11c8640ced15258d0d844e6f" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="hana taaka daka! (japan).pce" size="524288" crc="ba4d0dd4" sha1="664ccd11372b04739e388fb921ac507eb71986cd" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Jakie Chan - Hudson -->
-  <software name="tvjchan">
+  <software name="jchan">
     <description>Jackie Chan (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / Hudson Soft</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_jchan.bin" size="0x100000" crc="7fe2b77c" sha1="f27251451301dfb800e454c09fbb82d43b518592" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="jackie chan (japan).pce" size="524288" crc="c6fa6373" sha1="44c9ce3b37ca9c5edfe840f78485048e2bd1bf41" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--jinmu Densho -->
-  <software name="tvdensho">
+  <software name="jinmu">
     <description>Jinmu Denshou (Tourvision PCE bootleg)</description>
     <year>1989</year>
     <publisher>bootleg (Tourvision) / Big Club / Wolf Team</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_dinmu_densho.bin" size="0x100000" crc="411a8643" sha1="46258042dcf6510404ebccaf47034421928f72a8" offset="000000" />
-      </dataarea>
+			<dataarea name="rom" size="524288">
+        <!-- verified identical -->
+				<rom name="jinmu denshou (japan).pce" size="524288" crc="c150637a" sha1="e38d6d83120301a7befa7f496f1a93768060032d" offset="000000" />
+			</dataarea>
     </part>
   </software>
 
 
   <!--Kiki Kaikai -->
-  <software name="tvkaikai">
+  <software name="kikikai">
     <description>Kiki Kaikai (Tourvision PCE bootleg)</description>
     <year>1990</year>
     <publisher>bootleg (Tourvision) / Taito</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_kiki_kaikai.bin" size="0x100000" crc="2bdd93f9" sha1="9b08606865abb8cc8fa17a22becae34b172ff81a" offset="000000" />
-      </dataarea>
+      <dataarea name="rom" size="393216">
+        <!-- verified identical -->
+        <rom name="kiki kaikai (japan).pce" size="393216" crc="c0cb5add" sha1="8dc4fce4beca91f51f123acf8f1cc659ed58d312" offset="000000" />
+      </dataarea> 
     </part>
   </software>
 
 
   <!--Ledgnd of Hero Tonma -->
-  <software name="tvtonma">
+  <software name="loht">
     <description>Legend of Hero Tonma (Tourvision PCE bootleg)</description>
     <year>1991</year>
     <publisher>bootleg (Tourvision) / IREM Corp</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_legend_of_hero_tonma.bin" size="0x100000" crc="e7c2efe3" sha1="5767bdfa5600b1586e49c17cebd0fd7ef2c5426c" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="legend of hero tonma (japan).pce" size="524288" crc="c28b0d8a" sha1="352e91337db64bc7edd788e4ccb9c240c7040898" offset="000000" />
       </dataarea>
     </part>
   </software>
@@ -434,39 +439,42 @@ Notes:
 
 
   <!--Makyo Densetsu - The Legenary Axe - Victor Musical Industries, Inc. -->
-  <software name="tvlegaxe">
+  <software name="makyoden">
     <description>Makyou Densetsu - The Legenary Axe (Tourvision PCE bootleg)</description>
     <year>1988</year>
     <publisher>bootleg (Tourvision) / Victor Musical Industries, Inc.</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_makyodensetsuthelegendaryaxe.bin" size="0x100000" crc="50ec3f97" sha1="d583fa240a4dfd14b0d53ff78762fbac52694dd2" offset="000000" />
+      <dataarea name="rom" size="262144">
+        <!-- verified identical -->
+        <rom name="makyou densetsu (japan).pce" size="262144" crc="d4c5af46" sha1="7e1b1f52222663e9e98973fdb3cf67879122b617" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Mizubaku Daibouken Liquid Kids -->
-  <software name="tvlqkids">
+  <software name="mizubaku">
     <description>Mizubaku Daibouken Liquid Kids (Tourvision PCE bootleg)</description>
     <year>1992</year>
     <publisher>bootleg (Tourvision) / Taito Corporation</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_liquid_kids.bin" size="0x100000" crc="23a8636d" sha1="752e03dcf8617b5a39cd250f4db1fe13cd13b761" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="mizubaku dai bouken (japan).pce" size="524288" crc="b2ef558d" sha1="6e99a1982b6e2b0b9fb82f1d30270620917e1b92" offset="000000" />
       </dataarea>
     </part>
   </software>
 
 
   <!--Mr Heli -->
-  <software name="tvmrheli">
+  <software name="mrheli">
     <description>Mr. Heli no Daibouken (Tourvision PCE bootleg)</description>
     <year>1989</year>
     <publisher>bootleg (Tourvision) / IREM Corp</publisher>
     <part name="cart" interface="tourvision_cart">
-      <dataarea name="rom" size="0x100000">
-        <rom name="tourv_mr_heli.bin" size="0x100000" crc="bf197c7a" sha1="048f91f8ab86220a39ab146e531081950eaf1138" offset="000000" />
+      <dataarea name="rom" size="524288">
+        <!-- verified identical -->
+        <rom name="mr. heli no daibouken (japan).pce" size="524288" crc="2cb92290" sha1="df6346583d7169ffdec03925c9b15d3e4f066079" offset="000000" />
       </dataarea>
     </part>
   </software>
