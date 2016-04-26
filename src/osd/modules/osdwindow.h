@@ -174,6 +174,7 @@ public:
 	virtual void show_pointer() = 0;
 	virtual void hide_pointer() = 0;
 
+	void renderer_reset() { m_renderer.reset(); }
 #ifndef OSD_SDL
 	virtual bool win_has_menu() = 0;
 	// FIXME: cann we replace winwindow_video_window_monitor(nullptr) with monitor() ?
