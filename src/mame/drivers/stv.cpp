@@ -3058,6 +3058,29 @@ ROM_START( prc28su ) // set to 1p
 	ROM_LOAD( "eeprom", 0x0000, 0x0080, CRC(447bb3bd) SHA1(9fefec09849bfa0c14b49e73ff13e2a538dff511) )
 ROM_END
 
+// this is the first one to offer visual display of the frames in the Frame Coun test menu?
+ROM_START( prc29au ) // set to 1p
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",    0x0200000, 0x0200000, CRC(b7a9bfa4) SHA1(d756eb1232fb121ccce6d74feb86becc95335e11) ) // OK (tested as IC7)
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",    0x0400000, 0x0200000, BAD_DUMP CRC(91f36785) SHA1(1cdbb9236e119be37ad782b03e51ba401d0a1dd1) ) // BAD? (tested as IC2)
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",    0x0600000, 0x0200000, BAD_DUMP CRC(4c1b8823) SHA1(8b9f79da973e0331c04da3e776e922aaf2c0e0b7) ) // BAD? (tested as IC2)
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",    0x0800000, 0x0200000, CRC(594d200f) SHA1(9e490b4189348bfde44098dcfbcefb7f070f51fe) ) // OK (tested as IC3)
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) ) // OK (tested as IC3)
+// these aren't tested by the ROM check but can be viewed as 'frame set 2' in the Each Game Test -> Frame Count -> Frame Count Display menu
+// they match the ones found on pckobe99 except for the final rom, which might be a better dump of the one in the pckobe99 romset
+	ROM_LOAD16_WORD_SWAP( "ic32.bin",    0x0c00000, 0x0200000, CRC(76f6efaa) SHA1(d861d178a37adbde6b86df84231b34b89c5fc1d8) ) // not tested?!
+	ROM_LOAD16_WORD_SWAP( "ic34.bin",    0x0e00000, 0x0200000, CRC(894c63f9) SHA1(9956fd512cb715780616c4262d2b05474e3337ff) ) // not tested?!
+	ROM_LOAD16_WORD_SWAP( "ic36.bin",    0x1000000, 0x0200000, CRC(524a1c4e) SHA1(182dcc9d4808595ec67b4f80a5bf6d25016bf2a7) ) // not tested?!
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "eeprom", 0x0000, 0x0080, CRC(447bb3bd) SHA1(9fefec09849bfa0c14b49e73ff13e2a538dff511) )
+ROM_END
+
+
+
 ROM_START( prc2ksu ) // set to 1p (this dump is too damaged to even run the ROM tests properly)
 	STV_BIOS
 
@@ -3247,14 +3270,15 @@ ROM_START( pckobe99 ) // set to 1p
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	// all ROM tests fail both in MAME and on real hardware, but ROMs read consistently.
 	// there do seem to be bad values on some 0x40000 boundaries in places tho (obvious if you look at the blank fill area of ic36 for instance)
-	ROM_LOAD16_WORD_SWAP( "ic22.bin",    0x0200000, 0x0200000, CRC(670296eb) SHA1(18055dddf59edbf6d6a97bc81ba332e681f460ba) ) //
-	ROM_LOAD16_WORD_SWAP( "ic24.bin",    0x0400000, 0x0200000, CRC(c2139f62) SHA1(9e7060d77571349b13e58a845fde0f75c29a1bac) ) //
-	ROM_LOAD16_WORD_SWAP( "ic26.bin",    0x0600000, 0x0200000, CRC(17e3efd0) SHA1(f004bb27c1708ed5a78426aa26a51496470c173d) ) //
-	ROM_LOAD16_WORD_SWAP( "ic28.bin",    0x0800000, 0x0200000, CRC(a52f99f6) SHA1(9d23f63a9515b468c93320458d12f54850e9e121) ) //
-	ROM_LOAD16_WORD_SWAP( "ic30.bin",    0x0a00000, 0x0200000, CRC(f1b7e3d5) SHA1(2e1f881c0abe8bfb168478b3cbbd724c74c374c0) ) //
-	ROM_LOAD16_WORD_SWAP( "ic32.bin",    0x0c00000, 0x0200000, CRC(76f6efaa) SHA1(d861d178a37adbde6b86df84231b34b89c5fc1d8) ) // 
-	ROM_LOAD16_WORD_SWAP( "ic34.bin",    0x0e00000, 0x0200000, CRC(894c63f9) SHA1(9956fd512cb715780616c4262d2b05474e3337ff) ) //
-	ROM_LOAD16_WORD_SWAP( "ic36.bin",    0x1000000, 0x0200000, CRC(078694c3) SHA1(a37eb118338c0fc07aa75705dc6a7a1b866cb081) ) // 2ND HALF = xx00
+	// as a result I'm marking them as bad, we'll need a 2nd cartridge to verify tho.
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",    0x0200000, 0x0200000, BAD_DUMP CRC(670296eb) SHA1(18055dddf59edbf6d6a97bc81ba332e681f460ba) ) //
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",    0x0400000, 0x0200000, BAD_DUMP CRC(c2139f62) SHA1(9e7060d77571349b13e58a845fde0f75c29a1bac) ) //
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",    0x0600000, 0x0200000, BAD_DUMP CRC(17e3efd0) SHA1(f004bb27c1708ed5a78426aa26a51496470c173d) ) //
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",    0x0800000, 0x0200000, BAD_DUMP CRC(a52f99f6) SHA1(9d23f63a9515b468c93320458d12f54850e9e121) ) //
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",    0x0a00000, 0x0200000, BAD_DUMP CRC(f1b7e3d5) SHA1(2e1f881c0abe8bfb168478b3cbbd724c74c374c0) ) //
+	ROM_LOAD16_WORD_SWAP( "ic32.bin",    0x0c00000, 0x0200000, BAD_DUMP CRC(76f6efaa) SHA1(d861d178a37adbde6b86df84231b34b89c5fc1d8) ) // not tested
+	ROM_LOAD16_WORD_SWAP( "ic34.bin",    0x0e00000, 0x0200000, BAD_DUMP CRC(894c63f9) SHA1(9956fd512cb715780616c4262d2b05474e3337ff) ) // not tested
+	ROM_LOAD16_WORD_SWAP( "ic36.bin",    0x1000000, 0x0200000, BAD_DUMP CRC(078694c3) SHA1(a37eb118338c0fc07aa75705dc6a7a1b866cb081) ) // not tested 2ND HALF = xx00
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "eeprom", 0x0000, 0x0080, CRC(dbe305a9) SHA1(4b738104db8345385db3f622672dcc536bbfe67e) )
@@ -3447,7 +3471,7 @@ GAME( 1997, pclub26w,  stvbios, stv,      stv, stv_state,       stv,        ROT0
 GAME( 1997, pclub26wa, pclub26w,stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 970121 V1.200)", MACHINE_NOT_WORKING ) // ^
 GAME( 1997, pclub27s,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 7 Spring (J 970313 V1.100)", MACHINE_NOT_WORKING )
 GAME( 1997, prc28su,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 8 Summer (J 970616 V1.100)", MACHINE_NOT_WORKING ) // internal string 97SUMMER   *** BAD DUMP ***
-// Autumn 97?
+GAME( 1997, prc29au,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 9 Autumn (J V1.100)", MACHINE_NOT_WORKING ) // internal string 97AUTUMN, no date code! (all 0)
 GAME( 1997, prc297wi,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 1)", MACHINE_NOT_WORKING ) // internal string is '97WINTER'
 GAME( 1997, prc297wia, prc297wi,stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 2)", MACHINE_NOT_WORKING ) // different program revision, same date code, clearly didn't get updated properly
 GAME( 1998, prc298sp,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have bene updated, this should be early 98
