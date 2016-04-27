@@ -1,8 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
 
+if(POLICY CMP0054)
+  cmake_policy(SET CMP0054 NEW)
+endif()
+
 set(EXAMPLES
     capitalize
     condense
+    filterkey
+    filterkeydom
     jsonx
     messagereader
     parsebyparts
@@ -23,8 +29,6 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Werror -Wall -Wextra -Weffc++ -Wswitch-default")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal -Wimplicit-fallthrough -Weverything")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
 endif()
 
 foreach (example ${EXAMPLES})
