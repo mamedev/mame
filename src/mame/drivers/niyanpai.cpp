@@ -736,7 +736,7 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", niyanpai_state,  interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_ADD("tmp68301", "maincpu")
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(niyanpai_state, tmp68301_parallel_port_w))
 
 	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000) /* TMPZ84C011, 8.00 MHz */

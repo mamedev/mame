@@ -20,6 +20,7 @@ ToDo:
 
 #include "includes/cybiko.h"
 #include "rendlay.h"
+#include "bus/rs232/rs232.h"
 
 //  +------------------------------------------------------+
 //  | Cybiko Classic (CY6411)                         | V2 |
@@ -59,8 +60,24 @@ ToDo:
 static ADDRESS_MAP_START( cybikov1_mem, AS_PROGRAM, 16, cybiko_state )
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w )
-	AM_RANGE( 0xe00000, 0xe07fff ) AM_READ( cybikov1_key_r )
+//	AM_RANGE( 0xe00000, 0xe07fff ) AM_READ( cybikov1_key_r )
 ADDRESS_MAP_END
+
+/*
+
+v1 shutdown:
+242628: sleep of powerdown
+-> 2425d2
+242ad2 bsr 2425d2
+check 242ac4
+counter at 235fa0
+242a2e?
+24297a -> 294e32 -> thread start?
+ptr: 243150=24297a
+21cf3e writes the pointer
+
+*/
+
 
 //  +-------------------------------------+
 //  | Cybiko Classic (V2) - Memory Map    |
@@ -137,8 +154,25 @@ READ16_MEMBER(cybiko_state::xtpower_r)
 {
 	// bit 7 = on/off button
 	// bit 6 = battery charged if "1"
-	return 0xc0c0;
+	return 0xc0;
 }
+
+READ16_MEMBER(cybiko_state::adc1_r)
+{
+	return 0x01;
+}
+
+READ16_MEMBER(cybiko_state::adc2_r)
+{
+	return 0x00;
+}
+
+READ16_MEMBER(cybiko_state::port0_r)
+{
+	// bit 3 = on/off button
+	return 0x08;
+}
+
 
 //////////////////////
 // ADDRESS MAP - IO //
@@ -146,11 +180,17 @@ READ16_MEMBER(cybiko_state::xtpower_r)
 
 static ADDRESS_MAP_START( cybikov1_io, AS_IO, 16, cybiko_state )
 	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_WRITE(serflash_w)
+	AM_RANGE(h8_device::PORT_F, h8_device::PORT_F) AM_READWRITE(clock_r, clock_w)
+	AM_RANGE(h8_device::ADC_1,  h8_device::ADC_1)  AM_READ(adc1_r)
+	AM_RANGE(h8_device::ADC_2,  h8_device::ADC_2)  AM_READ(adc2_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cybikov2_io, AS_IO, 16, cybiko_state )
+	AM_RANGE(h8_device::PORT_1, h8_device::PORT_1) AM_READ(port0_r)
 	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_WRITE(serflash_w)
 	AM_RANGE(h8_device::PORT_F, h8_device::PORT_F) AM_READWRITE(clock_r, clock_w)
+	AM_RANGE(h8_device::ADC_1,  h8_device::ADC_1)  AM_READ(adc1_r)
+	AM_RANGE(h8_device::ADC_2,  h8_device::ADC_2)  AM_READ(adc2_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cybikoxt_io, AS_IO, 16, cybiko_state )
@@ -331,6 +371,15 @@ INPUT_PORTS_END
 // MACHINE DRIVER //
 ////////////////////
 
+static DEVICE_INPUT_DEFAULTS_START( debug_serial ) // set up debug port to default to 57600
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_57600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_57600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	// cpu
 	MCFG_CPU_ADD( "maincpu", H8S2241, XTAL_11_0592MHz )
@@ -368,6 +417,17 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("1M")
 
+	/* serial debug port */
+	MCFG_RS232_PORT_ADD ("debug_serial", default_rs232_devices, nullptr)
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("null_modem", debug_serial)
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", debug_serial)
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("pty", debug_serial)
+
+	MCFG_DEVICE_MODIFY("debug_serial")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(":maincpu:sci2", h8_sci_device, rx_w))
+	MCFG_DEVICE_MODIFY("maincpu:sci2")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":debug_serial", rs232_port_device, write_txd))
+
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", cybiko_state, cybiko, "bin,nv", 0)
 MACHINE_CONFIG_END
@@ -389,6 +449,12 @@ static MACHINE_CONFIG_DERIVED( cybikov2, cybikov1)
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 	MCFG_RAM_EXTRA_OPTIONS("512K,1M")
+
+	/* serial debug port */
+	MCFG_DEVICE_MODIFY("debug_serial")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(":maincpu:sci2", h8_sci_device, rx_w))
+	MCFG_DEVICE_MODIFY("maincpu:sci2")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":debug_serial", rs232_port_device, write_txd))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
@@ -405,6 +471,12 @@ static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 
+	/* serial debug port */
+	MCFG_DEVICE_MODIFY("debug_serial")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(":maincpu:sci2", h8_sci_device, rx_w))
+	MCFG_DEVICE_MODIFY("maincpu:sci2")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":debug_serial", rs232_port_device, write_txd))
+
 	/* quickload */
 	MCFG_DEVICE_REMOVE("quickload")
 	MCFG_QUICKLOAD_ADD("quickload", cybiko_state, cybikoxt, "bin,nv", 0)
@@ -419,7 +491,7 @@ ROM_START( cybikov1 )
 	ROM_LOAD( "cyrom112.bin", 0, 0x8000, CRC(9e1f1a0f) SHA1(6fc08de6b2c67d884ec78f748e4a4bad27ee8045) )
 
 	ROM_REGION( 0x84000, "flash1", 0 )
-	ROM_LOAD( "flash1.bin", 0, 0x84000, NO_DUMP )
+	ROM_LOAD( "flash_v1246.bin", 0, 0x84000, CRC(3816d0ab) SHA1(19be4fed8d95112568adf93219afe9406d7baecf) )
 ROM_END
 
 ROM_START( cybikov2 )

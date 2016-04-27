@@ -3,6 +3,12 @@
 #include "emu.h"
 #include "h8_timer8.h"
 
+// Verbosity level
+// 0 = no messages
+// 1 = timer setup
+// 2 = everything
+const int V = 1;
+
 const device_type H8_TIMER8_CHANNEL  = &device_creator<h8_timer8_channel_device>;
 const device_type H8H_TIMER8_CHANNEL = &device_creator<h8h_timer8_channel_device>;
 
@@ -61,70 +67,73 @@ void h8_timer8_channel_device::set_extra_clock_bit(bool bit)
 
 void h8_timer8_channel_device::update_tcr()
 {
+	char buf[4096];
+	char *p = buf;
 	switch(tcr & TCR_CKS) {
 	case 0:
 		clock_type = STOPPED;
 		clock_divider = 0;
-		logerror("%s: clock stopped", tag());
+		if(V>=1) p += sprintf(p, "clock stopped");
 		break;
 
 	case 1: case 2: case 3:
 		clock_type = DIV;
 		clock_divider = div_tab[((tcr & TCR_CKS)-1)*2 + extra_clock_bit];
-		logerror("%s: clock %dHz", tag(), cpu->clock()/clock_divider);
+		if(V>=1) p += sprintf(p, "clock %dHz", cpu->clock()/clock_divider);
 		break;
 
 	case 4:
 		clock_type = chain_type;
 		clock_divider = 0;
-		logerror("%s: clock chained %s", tag(), clock_type == CHAIN_A ? "tcora" : "overflow");
+		if(V>=1) p += sprintf(p, "clock chained %s", clock_type == CHAIN_A ? "tcora" : "overflow");
 		break;
 
 	case 5:
 		clock_type = INPUT_UP;
 		clock_divider = 0;
-		logerror("%s: clock external raising edge", tag());
+		if(V>=1) p += sprintf(p, "clock external raising edge");
 		break;
 
 	case 6:
 		clock_type = INPUT_DOWN;
 		clock_divider = 0;
-		logerror("%s: clock external falling edge", tag());
+		if(V>=1) p += sprintf(p, "clock external falling edge");
 		break;
 
 	case 7:
 		clock_type = INPUT_UPDOWN;
 		clock_divider = 0;
-		logerror("%s: clock external both edges", tag());
+		if(V>=1) p += sprintf(p, "clock external both edges");
 		break;
 	}
 
 	switch(tcr & TCR_CCLR) {
 	case 0x00:
 		clear_type = CLEAR_NONE;
-		logerror(", no clear");
+		if(V>=1) p += sprintf(p, ", no clear");
 		break;
 
 	case 0x08:
 		clear_type = CLEAR_A;
-		logerror(", clear on tcora");
+		if(V>=1) p += sprintf(p, ", clear on tcora");
 		break;
 
 	case 0x10:
 		clear_type = CLEAR_B;
-		logerror(", clear on tcorb");
+		if(V>=1) p += sprintf(p, ", clear on tcorb");
 		break;
 
 	case 0x18:
 		clear_type = CLEAR_EXTERNAL;
-		logerror(", clear on external");
+		if(V>=1) p += sprintf(p, ", clear on external");
 		break;
 	}
 
-	logerror(", irq=%c%c%c\n",
-				tcr & TCR_CMIEB ? 'b' : '-',
-				tcr & TCR_CMIEA ? 'a' : '-',
-				tcr & TCR_OVIE  ? 'o' : '-');
+	if(V>=1) p += sprintf(p, ", irq=%c%c%c\n",
+					  tcr & TCR_CMIEB ? 'b' : '-',
+					  tcr & TCR_CMIEA ? 'a' : '-',
+					  tcr & TCR_OVIE  ? 'o' : '-');
+	logerror(buf);
 }
 
 READ8_MEMBER(h8_timer8_channel_device::tcsr_r)
@@ -140,7 +149,7 @@ WRITE8_MEMBER(h8_timer8_channel_device::tcsr_w)
 	tcsr = (tcsr & ~mask) | (data & mask);
 	tcsr &= data | 0x1f;
 
-	logerror("%s: tcsr_w %02x\n", tag(), tcsr);
+	if(V>=2) logerror("tcsr_w %02x\n", tcsr);
 
 	recalc_event();
 }
@@ -154,7 +163,7 @@ WRITE8_MEMBER(h8_timer8_channel_device::tcor_w)
 {
 	update_counter();
 	tcor[offset] = data;
-	logerror("%s: tcor%c_w %02x\n", tag(), 'a'+offset, data);
+	if(V>=2) logerror("tcor%c_w %02x\n", 'a'+offset, data);
 	recalc_event();
 }
 
@@ -169,7 +178,7 @@ WRITE8_MEMBER(h8_timer8_channel_device::tcnt_w)
 {
 	update_counter();
 	tcnt = data;
-	logerror("%s: tcnt_w %02x\n", tag(), data);
+	if(V>=2) logerror("tcnt_w %02x\n", data);
 	recalc_event();
 }
 
@@ -202,8 +211,6 @@ UINT64 h8_timer8_channel_device::internal_update(UINT64 current_time)
 {
 	if(event_time && current_time >= event_time) {
 		update_counter(current_time);
-		if(0)
-			logerror("%s: Reached event time (%ld), counter=%02x, dt=%d\n", tag(), long(current_time), tcnt, int(current_time - event_time));
 		recalc_event(current_time);
 	}
 

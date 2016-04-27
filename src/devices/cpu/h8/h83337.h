@@ -22,12 +22,13 @@
 #define __H83337_H__
 
 #include "h8.h"
+#include "h8_intc.h"
 #include "h8_adc.h"
 #include "h8_port.h"
-#include "h8_intc.h"
 #include "h8_timer8.h"
 #include "h8_timer16.h"
 #include "h8_sci.h"
+#include "h8_watchdog.h"
 
 class h83337_device : public h8_device {
 public:
@@ -61,6 +62,7 @@ protected:
 	required_device<h8_timer16_channel_device> timer16_0;
 	required_device<h8_sci_device> sci0;
 	required_device<h8_sci_device> sci1;
+	required_device<h8_watchdog_device> watchdog;
 
 	UINT8 syscr;
 	UINT32 ram_start;

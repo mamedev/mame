@@ -12,6 +12,8 @@
 #include "emu.h"
 #include "debugger.h"
 #include "h8.h"
+#include "h8_dma.h"
+#include "h8_dtc.h"
 
 h8_device::h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
@@ -69,14 +71,14 @@ void h8_device::device_start()
 		state_add(H8_E5,           "E5",        R[13]).noshow();
 		state_add(H8_E6,           "E6",        R[14]).noshow();
 		state_add(H8_E7,           "E7",        R[15]).noshow();
-		state_add(H8_R0,           "ER0",       TMPR).callimport().formatstr("%9s");
-		state_add(H8_R1,           "ER1",       TMPR).callimport().formatstr("%9s");
-		state_add(H8_R2,           "ER2",       TMPR).callimport().formatstr("%9s");
-		state_add(H8_R3,           "ER3",       TMPR).callimport().formatstr("%9s");
-		state_add(H8_R4,           "ER4",       TMPR).callimport().formatstr("%9s");
-		state_add(H8_R5,           "ER5",       TMPR).callimport().formatstr("%9s");
-		state_add(H8_R6,           "ER6",       TMPR).callimport().formatstr("%9s");
-		state_add(H8_R7,           "ER7",       TMPR).callimport().formatstr("%9s");
+		state_add(H8_R0,           "ER0",       TMPR).callimport().callexport().formatstr("%9s");
+		state_add(H8_R1,           "ER1",       TMPR).callimport().callexport().formatstr("%9s");
+		state_add(H8_R2,           "ER2",       TMPR).callimport().callexport().formatstr("%9s");
+		state_add(H8_R3,           "ER3",       TMPR).callimport().callexport().formatstr("%9s");
+		state_add(H8_R4,           "ER4",       TMPR).callimport().callexport().formatstr("%9s");
+		state_add(H8_R5,           "ER5",       TMPR).callimport().callexport().formatstr("%9s");
+		state_add(H8_R6,           "ER6",       TMPR).callimport().callexport().formatstr("%9s");
+		state_add(H8_R7,           "ER7",       TMPR).callimport().callexport().formatstr("%9s");
 	}
 
 	save_item(NAME(PPC));
@@ -110,20 +112,54 @@ void h8_device::device_start()
 	MACF = 0;
 	inst_state = STATE_RESET;
 	inst_substate = 0;
+	count_before_instruction_step = 0;
+	requested_state = -1;
+	dma_device = NULL;
+	dtc_device = NULL;
 }
 
 void h8_device::device_reset()
 {
 	inst_state = STATE_RESET;
 	inst_substate = 0;
+	count_before_instruction_step = 0;
+	requested_state = -1;
 
 	irq_vector = 0;
 	irq_level = -1;
 	irq_nmi = false;
 	taken_irq_vector = 0;
 	taken_irq_level = -1;
+	current_dma = NULL;
+	current_dtc = NULL;
 }
 
+bool h8_device::trigger_dma(int vector)
+{
+	return (dma_device && dma_device->trigger_dma(vector)) || (dtc_device && dtc_device->trigger_dtc(vector));
+}
+
+void h8_device::set_current_dma(h8_dma_state *state)
+{
+	current_dma = state;
+	if(!state)
+		logerror("DMA done\n");
+	else
+		logerror("New current dma s=%x d=%x is=%d id=%d count=%x m=%d\n",
+				 state->source, state->dest, state->incs, state->incd,
+				 state->count, state->mode_16 ? 16 : 8);
+			 
+}
+
+void h8_device::set_current_dtc(h8_dtc_state *state)
+{
+	current_dtc = state;
+}
+
+void h8_device::request_state(int state)
+{
+	requested_state = state;
+}
 
 UINT32 h8_device::execute_min_cycles() const
 {
@@ -153,7 +189,17 @@ void h8_device::execute_run()
 {
 	internal_update(total_cycles());
 
-	if(inst_substate)
+	icount -= count_before_instruction_step;
+	if(icount < 0) {
+		count_before_instruction_step = -icount;
+		icount = 0;
+	} else
+		count_before_instruction_step = 0;
+
+	while(bcount && icount <= bcount)
+		internal_update(total_cycles() + icount - bcount);
+
+	if(icount > 0 && inst_substate)
 		do_exec_partial();
 
 	while(icount > 0) {
@@ -165,10 +211,15 @@ void h8_device::execute_run()
 			}
 			do_exec_full();
 		}
-		while(bcount && icount && icount <= bcount)
-			internal_update(total_cycles() + icount - bcount);
-		if(inst_substate)
+		if(icount > 0)
+			while(bcount && icount <= bcount)
+				internal_update(total_cycles() + icount - bcount);
+		if(icount > 0 && inst_substate)
 			do_exec_partial();
+	}
+	if(icount < 0) {
+		count_before_instruction_step = -icount;
+		icount = 0;
 	}
 }
 
@@ -214,6 +265,20 @@ void h8_device::state_import(const device_state_entry &entry)
 
 void h8_device::state_export(const device_state_entry &entry)
 {
+	switch(entry.index()) {
+	case H8_R0:
+	case H8_R1:
+	case H8_R2:
+	case H8_R3:
+	case H8_R4:
+	case H8_R5:
+	case H8_R6:
+	case H8_R7: {
+		int r = entry.index() - H8_R0;
+		TMPR = (R[r + 8] << 16) | R[r];
+		break;
+	}
+	}
 }
 
 void h8_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -269,7 +334,7 @@ UINT32 h8_device::disasm_max_opcode_bytes() const
 	return 10;
 }
 
-void h8_device::disassemble_am(char *&buffer, int am, offs_t pc, const UINT8 *oprom, UINT32 opcode, int offset)
+void h8_device::disassemble_am(char *&buffer, int am, offs_t pc, const UINT8 *oprom, UINT32 opcode, int slot, int offset)
 {
 	static const char *const r8_names[16] = {
 		"r0h", "r1h",  "r2h", "r3h",  "r4h", "r5h",  "r6h", "r7h",
@@ -394,7 +459,7 @@ void h8_device::disassemble_am(char *&buffer, int am, offs_t pc, const UINT8 *op
 		break;
 
 	case DASM_abs32:
-		if(offset >= 8)
+		if(slot == 3)
 			buffer += sprintf(buffer, "@%08x", (oprom[offset-6] << 24) | (oprom[offset-5] << 16) | (oprom[offset-4] << 8) | oprom[offset-3]);
 		else
 			buffer += sprintf(buffer, "@%08x", (oprom[offset-4] << 24) | (oprom[offset-3] << 16) | (oprom[offset-2] << 8) | oprom[offset-1]);
@@ -494,12 +559,12 @@ offs_t h8_device::disassemble_generic(char *buffer, offs_t pc, const UINT8 *opro
 
 	if(e.am1 != DASM_none) {
 		*buffer++ = ' ';
-		disassemble_am(buffer, e.am1, pc, oprom, slot[e.slot], e.flags & DASMFLAG_LENGTHMASK);
+		disassemble_am(buffer, e.am1, pc, oprom, slot[e.slot], e.slot, e.flags & DASMFLAG_LENGTHMASK);
 	}
 	if(e.am2 != DASM_none) {
 		*buffer++ = ',';
 		*buffer++ = ' ';
-		disassemble_am(buffer, e.am2, pc, oprom, slot[e.slot], e.flags & DASMFLAG_LENGTHMASK);
+		disassemble_am(buffer, e.am2, pc, oprom, slot[e.slot], e.slot, e.flags & DASMFLAG_LENGTHMASK);
 	}
 	return e.flags | DASMFLAG_SUPPORTED;
 }
@@ -530,7 +595,6 @@ UINT8 h8_device::read8(UINT32 adr)
 
 void h8_device::write8(UINT32 adr, UINT8 data)
 {
-	//  logerror("W %06x %02x\n", adr & 0xffffff, data);
 	icount--;
 	program->write_byte(adr, data);
 }
@@ -543,7 +607,6 @@ UINT16 h8_device::read16(UINT32 adr)
 
 void h8_device::write16(UINT32 adr, UINT16 data)
 {
-	//  logerror("W %06x %04x\n", adr & 0xfffffe, data);
 	icount--;
 	program->write_word(adr & ~1, data);
 }
@@ -555,7 +618,14 @@ bool h8_device::exr_in_stack() const
 
 void h8_device::prefetch_done()
 {
-	if(irq_vector) {
+	if(requested_state != -1) {
+		inst_state = requested_state;
+		requested_state = -1;
+	} else if(current_dma)
+		inst_state = STATE_DMA;
+	else if(current_dtc)
+		inst_state = STATE_DTC;
+	else if(irq_vector) {
 		inst_state = STATE_IRQ;
 		taken_irq_vector = irq_vector;
 		taken_irq_level = irq_level;
@@ -592,7 +662,8 @@ void h8_device::internal(int cycles)
 
 void h8_device::illegal()
 {
-	throw emu_fatalerror("%s: Illegal instruction at address %x\n", tag(), PPC);
+	logerror("Illegal instruction at address %x\n", PPC);
+	icount = -10000000;
 }
 
 int h8_device::trace_setup()

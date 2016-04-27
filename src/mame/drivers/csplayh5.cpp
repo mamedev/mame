@@ -21,6 +21,34 @@
       After returning a correct status code, tmp68301 sends "FSDVD04.MPG00001<CR>" to serial, probably tries
       to playback the file ...
 
+serial: prescaler (spr) = a0
+        baud rate (sbrr0) = 2
+
+H8 typing:
+  - at least h8h
+  - watchdog at ffffffaa/ffffffa8 = a500 5a00  ok 3002 3044
+  - ffffffaf/ad/ac = 05 18 23                  ok 3002 3044 (refresh controller)
+  - p6ddr |= 06
+  - p6dr  |= 02
+  - p8ddr =  fe
+  - p8dr  =  ff
+  - p9ddr =  c3
+  - p9dr  =  cf
+  - paddr =  ff
+  - padr  =  1f
+  - pbddr =  3f
+  - pbdr  =  19
+  - abwcr =  06
+  - ipra  =  1f  a4/a3/a2/a1/a0
+  - iprb  =  e8  b7/b6/b5/b3
+  - ier   =  00
+  - iscr  =  10
+  - tstr  =  e0
+  - tsnc  =  e0
+  - tmdr  =  80
+  (etc)
+
+
 ***********************************************************************************************************/
 
 #include "emu.h"
@@ -67,12 +95,16 @@ public:
 	DECLARE_WRITE16_MEMBER(csplayh5_sound_w);
 	DECLARE_READ8_MEMBER(csplayh5_sound_r);
 	DECLARE_WRITE8_MEMBER(csplayh5_soundclr_w);
-
+	DECLARE_READ8_MEMBER(r40020_r);
+	DECLARE_WRITE8_MEMBER(r40020_w);
 	DECLARE_READ8_MEMBER(soundcpu_portd_r);
 	DECLARE_WRITE8_MEMBER(soundcpu_porta_w);
 	DECLARE_WRITE8_MEMBER(soundcpu_dac2_w);
 	DECLARE_WRITE8_MEMBER(soundcpu_dac1_w);
 	DECLARE_WRITE8_MEMBER(soundcpu_porte_w);
+
+	DECLARE_READ8_MEMBER(ext_r);
+	DECLARE_WRITE8_MEMBER(ext_w);
 
 	DECLARE_DRIVER_INIT(mjmania);
 	DECLARE_DRIVER_INIT(csplayh5);
@@ -91,10 +123,6 @@ public:
 	void general_init(int patchaddress, int patchvalue);
 	void soundbank_w(int data);
 };
-
-
-
-#define USE_H8 0
 
 WRITE_LINE_MEMBER(csplayh5_state::csplayh5_vdp0_interrupt)
 {
@@ -143,17 +171,27 @@ static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x380000) // work RAM
 ADDRESS_MAP_END
 
-#if USE_H8
-READ16_MEMBER(csplayh5_state::test_r)
+READ8_MEMBER(csplayh5_state::r40020_r)
 {
-	return machine().rand();
+	logerror("read %05x (%06x)\n", 0x40020+offset, int(space.device().safe_pc()));
+	if(space.device().safe_pc() == 0x7a54)
+		return 0x08;
+	if(space.device().safe_pc() == 0x7a3c)
+		return 0x01;
+	return 0x00;
+}
+
+WRITE8_MEMBER(csplayh5_state::r40020_w)
+{
+	logerror("%05x = %02x (%06x)\n", 0x40020+offset, data, int(space.device().safe_pc()));
 }
 
 static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
-	AM_RANGE(0x04002a, 0x04002b) AM_READ(test_r)
-	AM_RANGE(0x040036, 0x040037) AM_READ(test_r)
+	AM_RANGE(0x020008, 0x02000f) AM_READWRITE8(ext_r, ext_w, 0xff00)
+
+	AM_RANGE(0x040020, 0x04002f) AM_READWRITE8(r40020_r, r40020_w, 0xffff)
 
 	AM_RANGE(0x078000, 0x07ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x080000, 0x0fffff) AM_RAM
@@ -163,8 +201,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( csplayh5_sub_io_map, AS_IO, 16, csplayh5_state )
 
 ADDRESS_MAP_END
-#endif
 
+
+READ8_MEMBER(csplayh5_state::ext_r)
+{
+	return 0x08;
+}
+
+WRITE8_MEMBER(csplayh5_state::ext_w)
+{
+	//	logerror("ext_w %d, %02x\n", offset, data);
+}
 
 /*
 sound HW is identical to Niyanpai
@@ -219,10 +266,6 @@ WRITE8_MEMBER(csplayh5_state::soundcpu_porte_w)
 {
 	if (!(data & 0x01)) csplayh5_soundclr_w(space, 0, 0);
 }
-
-
-
-
 
 
 static ADDRESS_MAP_START( csplayh5_sound_map, AS_PROGRAM, 8, csplayh5_state )
@@ -451,19 +494,17 @@ static const z80_daisy_config daisy_chain_sound[] =
 static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
+	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16, gives a 6250bps serial */
 	MCFG_CPU_PROGRAM_MAP(csplayh5_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_ADD("tmp68301", "maincpu")
 
-#if USE_H8
-	MCFG_CPU_ADD("subcpu", H83002, 16000000)    /* unknown clock */
+	MCFG_CPU_ADD("subcpu", H83002, 17600000)    /* unknown clock, 17.6MHz gives a 6250bps serial too */
 	MCFG_CPU_PROGRAM_MAP(csplayh5_sub_map)
 	MCFG_CPU_IO_MAP(csplayh5_sub_io_map)
-#endif
 
 	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000)  /* TMPZ84C011, unknown clock */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)

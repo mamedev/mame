@@ -124,6 +124,7 @@ protected:
 	UINT8 rdr, tdr, smr, scr, ssr, brr, rsr, tsr;
 	UINT64 clock_base, divider;
 
+	std::string last_clock_message;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

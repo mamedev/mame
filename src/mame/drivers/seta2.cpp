@@ -2106,7 +2106,7 @@ static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_ADD("tmp68301", "maincpu")
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2336,7 +2336,7 @@ static MACHINE_CONFIG_START( namcostr, seta2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)  // does this have a ticket dispenser?
+	MCFG_TMP68301_ADD("tmp68301", "maincpu")  // does this have a ticket dispenser?
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
