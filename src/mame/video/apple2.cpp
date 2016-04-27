@@ -827,7 +827,7 @@ void a2_video_device::plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, i
 			bg = i;
 		}
 	}
-	else if (code < 0x40)	// inverse: flip FG and BG
+	else if (code < 0x40)   // inverse: flip FG and BG
 	{
 			i = fg;
 			fg = bg;
@@ -868,7 +868,7 @@ void a2_video_device::plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, 
 			bg = i;
 		}
 	}
-	else if (code < 0x40)	// inverse: flip FG and BG
+	else if (code < 0x40)   // inverse: flip FG and BG
 	{
 			i = fg;
 			fg = bg;

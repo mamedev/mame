@@ -26,14 +26,14 @@ enum e_mnemonics
 	mRM, mSM,
 	mPRE, mSME, mRME, mTMEL,
 	mSKIP, mCEND, mIDIV, mDR, mDTA,
-	
+
 	// SM500-specific
 	mCOMCB, mRTN, mRTNS, mSSR, mTR, mTRS,
 	mADDC, mPDTW, mTW, mDTW,
 	mATS, mEXKSA, mEXKFA,
 	mRMF, mSMF, mCOMCN,
 	mTA, mTM2, mTG,
-	
+
 	// KB1013VK1-2 aliases
 	mLC, mLM, mLE, mLAF, mLAS, mLDF, mBS0, mBS1, mXL, mXM, mXI, mXEI, mXD, mXED, mXE, mBM0, mBM1, mSM1,
 	mAM, mAC, mA10, mAS, mCLL, mCOM, mCLC, mSTC, mSCO, mSAO, mINC, mDEC, mSAM, mSAL, mNOP,
@@ -81,7 +81,7 @@ static const UINT8 s_bits[] =
 	2, 2,
 	8, 0, 0, 0,
 	0, 0, 0, 0, 0,
-	
+
 	//
 	0, 0, 0, 4, 6, 6,
 	0, 0, 0, 0,

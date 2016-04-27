@@ -50,13 +50,13 @@ public:
 	virtual ~saturn_control_port_device();
 
 	UINT16 read_direct();
-    UINT8 read_ctrl(UINT8 offset);
+	UINT8 read_ctrl(UINT8 offset);
 	UINT8 read_status();
 	UINT8 read_id(int idx);
 
 	// device-level overrides
 	virtual void device_start() override;
-	
+
 protected:
 	device_saturn_control_port_interface *m_device;
 };

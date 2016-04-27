@@ -631,7 +631,7 @@ void renderer_ogl::destroy_all_textures()
 
 	auto win = try_getwindow();
 
-	// During destroy this can get called 
+	// During destroy this can get called
 	// and the window is no longer available
 	if (win == nullptr)
 		return;

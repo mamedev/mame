@@ -2228,7 +2228,7 @@ static INPUT_PORTS_START( kamikazp )
 	PORT_DIPSETTING(    0x03, "6C / 3C" ) // first 3 coins give 1 credit, 2nd 3 coins give 2 credits
 	PORT_DIPSETTING(    0x0b, "7C / 3C" )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 4C_2C )  ) // first 3 coins give 1 credit, next coin gives 1 credit
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) ) // 2		
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) ) // 2
 	PORT_DIPSETTING(    0x09, DEF_STR( 3C_2C ) ) // first 2 coins give 1 credit, next coin gives 1 credit
 	PORT_DIPSETTING(    0x05, DEF_STR( 4C_3C ) ) // first 2 coins give 1 credit, 2nd 2 coins give 2 credits
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C )   )

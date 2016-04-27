@@ -679,7 +679,7 @@ render_primitive_list *renderer_sdl1::get_primitives()
 	auto win = try_getwindow();
 	if (win == nullptr)
 		return nullptr;
-	
+
 	osd_dim nd = win->get_size();
 	if (nd != m_blit_dim)
 	{

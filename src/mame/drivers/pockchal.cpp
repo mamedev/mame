@@ -32,7 +32,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot")
-	 { }
+		{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -98,7 +98,7 @@ static MACHINE_CONFIG_START( pockchalv1, pockchalv1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMP90845,8000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(pockchalv1_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", pockchalv1_state,  irq0_line_hold)
+//  MCFG_CPU_VBLANK_INT_DRIVER("screen", pockchalv1_state,  irq0_line_hold)
 
 	// wrong, it's a b&w / greyscale thing
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -113,7 +113,7 @@ static MACHINE_CONFIG_START( pockchalv1, pockchalv1_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pockchalv1_state, screen_update_pockchalv1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pockchalv1_cart")
 	MCFG_GENERIC_EXTENSIONS("bin")
 	MCFG_GENERIC_LOAD(pockchalv1_state, pockchalv1_cart)

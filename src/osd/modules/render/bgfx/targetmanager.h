@@ -39,8 +39,8 @@ public:
 
 	// Getters
 	bgfx_target* target(uint32_t screen, std::string name);
-    uint16_t width(uint32_t style, uint32_t screen);
-    uint16_t height(uint32_t style, uint32_t screen);
+	uint16_t width(uint32_t style, uint32_t screen);
+	uint16_t height(uint32_t style, uint32_t screen);
 
 private:
 	void rebuild_targets(uint32_t screen, uint32_t style);

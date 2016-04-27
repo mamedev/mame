@@ -1301,7 +1301,7 @@ protected:
 		pstring m_name;
 		setup_t *m_setup;
 		plog_base<NL_DEBUG> m_log;
-		pdynlib *m_lib;					// external lib needs to be loaded as long as netlist exists
+		pdynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
 	};
 
 	// -----------------------------------------------------------------------------

@@ -23,6 +23,7 @@
 // MAME headers
 #include "emu.h"
 #include "uiinput.h"
+#include "ui/menu.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -377,7 +378,7 @@ win_window_info::win_window_info(
 	m_non_fullscreen_bounds.bottom = 0;
 	m_prescale = video_config.prescale;
 
-	
+
 }
 
 win_window_info::~win_window_info()
@@ -718,7 +719,7 @@ void winwindow_toggle_full_screen(void)
 	// iterate over windows and toggle their fullscreen state
 	for (auto window : win_window_list)
 		SendMessage(window->platform_window<HWND>(), WM_USER_SET_FULLSCREEN, !video_config.windowed, 0);
-	
+
 	// Set the first window as foreground
 	SetForegroundWindow(win_window_list.front()->platform_window<HWND>());
 }
@@ -1291,7 +1292,7 @@ int win_window_info::complete_create()
 						menu,
 						GetModuleHandleUni(),
 						nullptr);
-	
+
 	if (hwnd == nullptr)
 		return 1;
 
@@ -1979,8 +1980,11 @@ void win_window_info::set_fullscreen(int fullscreen)
 		return;
 	m_fullscreen = fullscreen;
 
+	// reset UI to main menu
+	ui_menu::stack_reset(machine());
+
 	// kill off the drawers
-	m_renderer.reset();
+	renderer_reset();
 
 	// hide ourself
 	ShowWindow(platform_window<HWND>(), SW_HIDE);

@@ -218,4 +218,3 @@ public:
 	DECLARE_READ16_MEMBER(tmss_r);
 	DECLARE_WRITE16_MEMBER(tmss_swap_w);
 };
-

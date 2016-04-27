@@ -30,14 +30,14 @@ public:
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 	// device_saturn_control_port_interface overrides
 	virtual UINT8 read_ctrl(UINT8 offset) override;
 	virtual UINT8 read_status() override { return 0xf1; }
@@ -48,9 +48,9 @@ private:
 	UINT8 m_data;
 	UINT8 m_prev_data;
 	UINT16 m_repeat_count;
-	
+
 	UINT16 get_game_key();
-	
+
 	required_ioport_array<16> m_key;
 	required_ioport m_key_s1;
 };

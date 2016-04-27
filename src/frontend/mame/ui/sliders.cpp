@@ -142,21 +142,21 @@ void ui_menu_sliders::populate()
 	std::vector<ui_menu_item> ui_sliders = ui().get_slider_list();
 	for (ui_menu_item item : ui_sliders)
 	{
-        if (item.type == ui_menu_item_type::SLIDER)
-        {
-            slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
-            INT32 curval = (*slider->update)(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
-            UINT32 flags = 0;
-            if (curval > slider->minval)
-                flags |= MENU_FLAG_LEFT_ARROW;
-            if (curval < slider->maxval)
-                flags |= MENU_FLAG_RIGHT_ARROW;
-            item_append(slider->description, tempstring.c_str(), flags, (void *)slider, ui_menu_item_type::SLIDER);
-        }
-        else
-        {
-            item_append(item);
-        }
+		if (item.type == ui_menu_item_type::SLIDER)
+		{
+			slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
+			INT32 curval = (*slider->update)(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
+			UINT32 flags = 0;
+			if (curval > slider->minval)
+				flags |= MENU_FLAG_LEFT_ARROW;
+			if (curval < slider->maxval)
+				flags |= MENU_FLAG_RIGHT_ARROW;
+			item_append(slider->description, tempstring.c_str(), flags, (void *)slider, ui_menu_item_type::SLIDER);
+		}
+		else
+		{
+			item_append(item);
+		}
 	}
 
 	item_append(ui_menu_item_type::SEPARATOR);
@@ -165,21 +165,21 @@ void ui_menu_sliders::populate()
 	std::vector<ui_menu_item> osd_sliders = machine().osd().get_slider_list();
 	for (ui_menu_item item : osd_sliders)
 	{
-        if (item.type == ui_menu_item_type::SLIDER)
-        {
-            slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
-            INT32 curval = (*slider->update)(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
-            UINT32 flags = 0;
-            if (curval > slider->minval)
-                flags |= MENU_FLAG_LEFT_ARROW;
-            if (curval < slider->maxval)
-                flags |= MENU_FLAG_RIGHT_ARROW;
-            item_append(slider->description, tempstring.c_str(), flags, (void *)slider, ui_menu_item_type::SLIDER);
-        }
-        else
-        {
-            item_append(item);
-        }
+		if (item.type == ui_menu_item_type::SLIDER)
+		{
+			slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
+			INT32 curval = (*slider->update)(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
+			UINT32 flags = 0;
+			if (curval > slider->minval)
+				flags |= MENU_FLAG_LEFT_ARROW;
+			if (curval < slider->maxval)
+				flags |= MENU_FLAG_RIGHT_ARROW;
+			item_append(slider->description, tempstring.c_str(), flags, (void *)slider, ui_menu_item_type::SLIDER);
+		}
+		else
+		{
+			item_append(item);
+		}
 	}
 
 	custombottom = 2.0f * ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;

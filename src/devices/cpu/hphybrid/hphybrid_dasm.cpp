@@ -355,9 +355,9 @@ static const dis_entry_t dis_table_emc[] = {
 		{0xffff , 0x7b40 , "MRY" , param_none , 0 },
 		{0xffff , 0x7b61 , "MLY" , param_none , 0 },
 		{0xffff , 0x7b8f , "MPY" , param_none , 0 },
-                // *** Undocumented instructions of 5061-3001 ***
-                {0xffff , 0x7026 , "CIM" , param_none , 0 },
-                {0xffff , 0x7027 , "SIM" , param_none , 0 },
+				// *** Undocumented instructions of 5061-3001 ***
+				{0xffff , 0x7026 , "CIM" , param_none , 0 },
+				{0xffff , 0x7027 , "SIM" , param_none , 0 },
 		// *** END ***
 		{0 , 0 , nullptr , nullptr , 0 }
 };

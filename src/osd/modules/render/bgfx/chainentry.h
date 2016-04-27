@@ -61,7 +61,7 @@ private:
 
 	std::string                         m_name;
 	bgfx_effect*                        m_effect;
-	clear_state*						m_clear;
+	clear_state*                        m_clear;
 	std::vector<bgfx_suppressor*>       m_suppressors;
 	std::vector<bgfx_input_pair*>       m_inputs;
 	std::vector<bgfx_entry_uniform*>    m_uniforms;

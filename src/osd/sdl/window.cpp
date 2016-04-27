@@ -31,6 +31,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "ui/uimain.h"
+#include "ui/menu.h"
 
 
 // OSD headers
@@ -310,7 +311,7 @@ void sdl_osd_interface::window_exit()
 	while (!sdl_window_list.empty())
 	{
 		auto window = sdl_window_list.front();
-		
+
 		// Part of destroy removes the window from the list
 		window->destroy();
 	}
@@ -363,7 +364,7 @@ void sdl_window_info::hide_pointer()
 void sdl_window_info::show_pointer()
 {
 	SDL_ShowCursor(SDL_ENABLE);
-	
+
 }
 
 
@@ -451,6 +452,9 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 		window->m_windowed_dim = window->get_size();
 	}
 
+	// reset UI to main menu
+	ui_menu::stack_reset(window->machine());
+	// kill off the drawers
 	window->renderer_reset();
 	window->set_platform_window(nullptr);
 	bool is_osx = false;
@@ -1321,11 +1325,11 @@ osd_dim sdl_window_info::get_max_bounds(int constrain)
 sdl_window_info::sdl_window_info(running_machine &a_machine, int index, osd_monitor_info *a_monitor,
 		const osd_window_config *config)
 : osd_window(), m_next(nullptr), m_startmaximized(0),
-  // Following three are used by input code to defer resizes
+	// Following three are used by input code to defer resizes
 	m_minimum_dim(0,0),
 	m_windowed_dim(0,0),
 	m_rendered_event(0, 1), m_target(nullptr), m_extra_flags(0),
-  m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0)
+	m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0)
 {
 	m_win_config = *config;
 	m_index = index;

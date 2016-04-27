@@ -289,7 +289,7 @@ private:
 	std::unique_ptr<input_manager> m_input;            // internal data from input.cpp
 	std::unique_ptr<sound_manager> m_sound;            // internal data from sound.cpp
 	std::unique_ptr<video_manager> m_video;            // internal data from video.cpp
-	ui_manager *m_ui;				                   // internal data from ui.cpp
+	ui_manager *m_ui;                                  // internal data from ui.cpp
 	std::unique_ptr<ui_input_manager> m_ui_input;      // internal data from uiinput.cpp
 	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.cpp
 	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.cpp

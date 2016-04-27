@@ -2550,15 +2550,15 @@ std::vector<ui_menu_item> shaders::init_slider_list()
 						break;
 				}
 
-                slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_update_trampoline, slider_arg);
+				slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_update_trampoline, slider_arg);
 
-                ui_menu_item item;
-                item.text = core_slider->description;
-                item.subtext = "";
-                item.flags = 0;
-                item.ref = core_slider;
-                item.type = ui_menu_item_type::SLIDER;
-                sliders.push_back(item);
+				ui_menu_item item;
+				item.text = core_slider->description;
+				item.subtext = "";
+				item.flags = 0;
+				item.ref = core_slider;
+				item.type = ui_menu_item_type::SLIDER;
+				sliders.push_back(item);
 			}
 		}
 	}

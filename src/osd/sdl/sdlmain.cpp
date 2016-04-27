@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 	/* Enable standard application logging */
 	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
 #endif
-	
+
 	// FIXME: this should be done differently
 
 #ifdef SDLMAME_UNIX

@@ -1019,14 +1019,14 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *m_event)
 	// special case for configure options
 	if ((FPTR)driver == CONF_OPTS)
 		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(ui(), container));
-	
+
 	// special case for configure machine
 	else if ((FPTR)driver == CONF_MACHINE)
 	{
-	    if (m_prev_selected != nullptr)
-	        ui_menu::stack_push(global_alloc_clear<ui_menu_machine_configure>(ui(), container, (const game_driver *)m_prev_selected));
-	    else
-	        return;
+		if (m_prev_selected != nullptr)
+			ui_menu::stack_push(global_alloc_clear<ui_menu_machine_configure>(ui(), container, (const game_driver *)m_prev_selected));
+		else
+			return;
 	}
 
 	// special case for configure plugins

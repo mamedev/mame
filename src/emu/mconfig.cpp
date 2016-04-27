@@ -34,7 +34,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 	bool is_selected_driver = core_stricmp(gamedrv.name,options.system_name())==0;
 	// intialize slot devices - make sure that any required devices have been allocated
-	
+
 	for (device_slot_interface &slot : slot_interface_iterator(root_device()))
 	{
 		device_t &owner = slot.device();

@@ -23,7 +23,6 @@ NETLIB_NAMESPACE_DEVICES_START()
 template <unsigned m_N, unsigned _storage_N>
 class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<m_N, _storage_N>
 {
-
 	friend class matrix_solver_t;
 
 public:

@@ -390,8 +390,8 @@ void MameMainApp::Run()
 // Required for IFrameworkView.
 void MameMainApp::Uninitialize()
 {
-	// Terminate events do not cause Uninitialize to be called. It will be called if your IFrameworkView 
-	// class is torn down while the app is in the foreground. 
+	// Terminate events do not cause Uninitialize to be called. It will be called if your IFrameworkView
+	// class is torn down while the app is in the foreground.
 }
 
 IFrameworkView^ MameViewSource::CreateView()

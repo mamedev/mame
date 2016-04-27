@@ -558,37 +558,37 @@ void ui_menu::draw(UINT32 flags, float origx0, float origy0)
 	float visible_left = (1.0f - visible_width) * 0.5f;
 	float visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
 
-/*	float visible_left;
-	float visible_top;
-	if (origx0 == 0.0f && origy0 == 0.0f)
-	{
-		visible_left = (1.0f - visible_width) * 0.5f;
-		visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
-	}
-	else
-	{
-		INT32 mouse_target_x, mouse_target_y;
-		float m_x, m_y;
-		render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
-		if (mouse_target != nullptr)
-		{
-			if (mouse_target->map_point_container(origx0, origy0, *container, m_x, m_y))
-			{
-				visible_left = m_x;
-				visible_top = m_y;
-			}
-			else
-			{
-				visible_left = (1.0f - visible_width) * 0.5f;
-				visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
-			}
-		}
-		else
-		{
-			visible_left = (1.0f - visible_width) * 0.5f;
-			visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
-		}
-	}
+/*  float visible_left;
+    float visible_top;
+    if (origx0 == 0.0f && origy0 == 0.0f)
+    {
+        visible_left = (1.0f - visible_width) * 0.5f;
+        visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
+    }
+    else
+    {
+        INT32 mouse_target_x, mouse_target_y;
+        float m_x, m_y;
+        render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
+        if (mouse_target != nullptr)
+        {
+            if (mouse_target->map_point_container(origx0, origy0, *container, m_x, m_y))
+            {
+                visible_left = m_x;
+                visible_top = m_y;
+            }
+            else
+            {
+                visible_left = (1.0f - visible_width) * 0.5f;
+                visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
+            }
+        }
+        else
+        {
+            visible_left = (1.0f - visible_width) * 0.5f;
+            visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
+        }
+    }
 */
 	// if the menu is at the bottom of the extra, adjust
 	visible_top += customtop;

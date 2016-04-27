@@ -120,4 +120,3 @@ void texture_manager::remove_provider(std::string name, bool delete_provider)
 		m_textures[name] = nullptr;
 	}
 }
-

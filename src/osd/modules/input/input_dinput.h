@@ -23,7 +23,7 @@ public:
 	struct dinput_callback_context
 	{
 		device_enum_interface *     self;
-		void *						state;
+		void *                      state;
 	};
 
 	virtual ~device_enum_interface()

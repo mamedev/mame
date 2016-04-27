@@ -79,16 +79,16 @@ class debug_imgui : public osd_module, public debug_module
 public:
 	debug_imgui()
 	: osd_module(OSD_DEBUG_PROVIDER, "imgui"), debug_module(),
-		m_machine(nullptr), 
-		m_mouse_x(0), 
-		m_mouse_y(0), 
-		m_mouse_button(false), 
-		m_prev_mouse_button(false), 
-		m_running(false), 
-		font_name(nullptr), 
-		font_size(0), 
+		m_machine(nullptr),
+		m_mouse_x(0),
+		m_mouse_y(0),
+		m_mouse_button(false),
+		m_prev_mouse_button(false),
+		m_running(false),
+		font_name(nullptr),
+		font_size(0),
 		m_key_char(0),
-	    m_hide(false),
+		m_hide(false),
 		m_win_count(0)
 	{
 	}
@@ -154,7 +154,7 @@ static void view_list_remove(debug_area* item)
 		return;
 	it = std::find(view_list.begin(),view_list.end(),item);
 	view_list.erase(it);
-		
+
 }
 
 static debug_area *dview_alloc(running_machine &machine, debug_view_type type)
@@ -245,7 +245,7 @@ void debug_imgui::handle_mouse_views()
 
 void debug_imgui::handle_keys()
 {
-        ImGuiIO& io = ImGui::GetIO();
+		ImGuiIO& io = ImGui::GetIO();
 	ui_event event;
 
 	// global keys
@@ -289,35 +289,35 @@ void debug_imgui::handle_keys()
 		m_hide = true;
 	}
 
-/*	if(m_machine->input().code_pressed_once(KEYCODE_UP))
-		io.KeysDown[ImGuiKey_UpArrow] = true;
-	if(m_machine->input().code_pressed_once(KEYCODE_DOWN))
-		io.KeysDown[ImGuiKey_DownArrow] = true;
-	if(m_machine->input().code_pressed_once(KEYCODE_LEFT))
-		io.KeysDown[ImGuiKey_LeftArrow] = true;
-	if(m_machine->input().code_pressed_once(KEYCODE_RIGHT))
-		io.KeysDown[ImGuiKey_RightArrow] = true;
+/*  if(m_machine->input().code_pressed_once(KEYCODE_UP))
+        io.KeysDown[ImGuiKey_UpArrow] = true;
+    if(m_machine->input().code_pressed_once(KEYCODE_DOWN))
+        io.KeysDown[ImGuiKey_DownArrow] = true;
+    if(m_machine->input().code_pressed_once(KEYCODE_LEFT))
+        io.KeysDown[ImGuiKey_LeftArrow] = true;
+    if(m_machine->input().code_pressed_once(KEYCODE_RIGHT))
+        io.KeysDown[ImGuiKey_RightArrow] = true;
 
-	if(m_machine->input().code_pressed(KEYCODE_TAB))
-		io.KeysDown[ImGuiKey_Tab] = true;
+    if(m_machine->input().code_pressed(KEYCODE_TAB))
+        io.KeysDown[ImGuiKey_Tab] = true;
 
-	if(m_machine->input().code_pressed_once(KEYCODE_PGUP))
-	{
-		io.KeysDown[ImGuiKey_PageUp] = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_PGDN))
-	{
-		io.KeysDown[ImGuiKey_PageDown] = true;
-	}
+    if(m_machine->input().code_pressed_once(KEYCODE_PGUP))
+    {
+        io.KeysDown[ImGuiKey_PageUp] = true;
+    }
+    if(m_machine->input().code_pressed_once(KEYCODE_PGDN))
+    {
+        io.KeysDown[ImGuiKey_PageDown] = true;
+    }
 
-	if(m_machine->input().code_pressed_once(KEYCODE_HOME))
-	{
-		io.KeysDown[ImGuiKey_Home] = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_END))
-	{
-		io.KeysDown[ImGuiKey_End] = true;
-	}*/
+    if(m_machine->input().code_pressed_once(KEYCODE_HOME))
+    {
+        io.KeysDown[ImGuiKey_Home] = true;
+    }
+    if(m_machine->input().code_pressed_once(KEYCODE_END))
+    {
+        io.KeysDown[ImGuiKey_End] = true;
+    }*/
 	if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
 		io.KeyCtrl = true;
 	else
@@ -351,7 +351,7 @@ void debug_imgui::handle_keys()
 			break;
 		}
 	}
-	
+
 	if(ImGui::IsKeyPressed(ITEM_ID_D) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_disasm(++m_win_count);
 	if(ImGui::IsKeyPressed(ITEM_ID_M) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
@@ -380,7 +380,7 @@ void debug_imgui::handle_keys_views()
 	// if no view has focus, then there's nothing to do
 	if(focus_view == nullptr)
 		return;
-					
+
 	// pass keypresses to debug view with focus
 	if(m_machine->input().code_pressed_once(KEYCODE_UP))
 		focus_view->view->process_char(DCH_UP);
@@ -489,7 +489,7 @@ void debug_imgui::draw_bpoints(debug_area* view_ptr, bool* opened)
 		totalsize = view_ptr->view->total_size();
 		view_ptr->view->set_visible_size(totalsize);
 		vsize = view_ptr->view->visible_size();
-		
+
 		ImGui::BeginChild("##break_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
@@ -587,7 +587,7 @@ void debug_imgui::draw_log(debug_area* view_ptr, bool* opened)
 			totalsize.y = 100;
 		view_ptr->view->set_visible_size(totalsize);
 		vsize = view_ptr->view->visible_size();
-		
+
 		ImGui::BeginChild("##log_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
@@ -644,7 +644,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 	std::string cpu_list = "";
 	const debug_view_source* src = view_ptr->view->first_source();
 
-	// build source CPU list	
+	// build source CPU list
 	while(src != nullptr)
 	{
 		cpu_list += src->name();
@@ -682,7 +682,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 					disasm->set_right_column(DASM_RIGHTCOL_NONE);
 				if(ImGui::MenuItem("Comments", nullptr,(rightcol == DASM_RIGHTCOL_COMMENTS) ? true : false))
 					disasm->set_right_column(DASM_RIGHTCOL_COMMENTS);
-					
+
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
@@ -705,7 +705,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		totalsize.y = 50;
 		view_ptr->view->set_visible_size(totalsize);
 		vsize = view_ptr->view->visible_size();
-		
+
 		ImGui::BeginChild("##disasm_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		src = view_ptr->view->first_source();
 		idx = 0;
@@ -801,7 +801,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		ImVec2 xy1,xy2;
 		ImVec2 fsize = ImGui::CalcTextSize("A"); // any character will do, we should be using a monospaced font
 		ImDrawList* drawlist;
-		
+
 		if(ImGui::BeginMenuBar())
 		{
 			if(ImGui::BeginMenu("Options"))
@@ -811,7 +811,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 				bool rev = mem->reverse();
 				int format = mem->get_data_format();
 				UINT32 chunks = mem->chunks_per_row();
-				
+
 				if(ImGui::MenuItem("1-byte chunks", nullptr,(format == 1) ? true : false))
 					mem->set_data_format(1);
 				if(ImGui::MenuItem("2-byte chunks", nullptr,(format == 2) ? true : false))
@@ -844,12 +844,12 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 			}
 			ImGui::EndMenuBar();
 		}
-		
+
 		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
 		ImGui::PushItemWidth(100.0f);
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
-		// build source CPU list	
+		// build source CPU list
 		while(src != nullptr)
 		{
 			region_list += src->name();
@@ -865,7 +865,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		ImGui::Combo("##region",&view_ptr->src_sel,region_list.c_str());
 		ImGui::PopItemWidth();
 		ImGui::Separator();
-		
+
 		// memory editor portion
 		viewdata = view_ptr->view->viewdata();
 		totalsize = view_ptr->view->total_size();
@@ -873,7 +873,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 			totalsize.y = 256;
 		view_ptr->view->set_visible_size(totalsize);
 		vsize = view_ptr->view->visible_size();
-		
+
 		ImGui::BeginChild("##memory_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		src = view_ptr->view->first_source();
 		idx = 0;
@@ -975,13 +975,13 @@ void debug_imgui::draw_console()
 			{
 				if(ImGui::MenuItem("New disassembly window", "Ctrl+D"))
 					add_disasm(++m_win_count);
-				if(ImGui::MenuItem("New memory window", "Ctrl+M")) 
+				if(ImGui::MenuItem("New memory window", "Ctrl+M"))
 					add_memory(++m_win_count);
-				if(ImGui::MenuItem("New breakpoints window", "Ctrl+B")) 
+				if(ImGui::MenuItem("New breakpoints window", "Ctrl+B"))
 					add_bpoints(++m_win_count);
-				if(ImGui::MenuItem("New watchpoints window", "Ctrl+W")) 
+				if(ImGui::MenuItem("New watchpoints window", "Ctrl+W"))
 					add_wpoints(++m_win_count);
-				if(ImGui::MenuItem("New log window", "Ctrl+L")) 
+				if(ImGui::MenuItem("New log window", "Ctrl+L"))
 					add_log(++m_win_count);
 				ImGui::Separator();
 				if(ImGui::MenuItem("Run", "F5"))
@@ -1013,7 +1013,7 @@ void debug_imgui::draw_console()
 					debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_over();
 				if(ImGui::MenuItem("Step out", "F9"))
 					debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_out();
-				
+
 				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("Window"))
@@ -1046,13 +1046,13 @@ void debug_imgui::draw_console()
 			}
 			ImGui::EndMenuBar();
 		}
-		
+
 		// CPU state portion
 		viewdata = view_main_regs->view->viewdata();
 		totalsize = view_main_regs->view->total_size();
 		view_main_regs->view->set_visible_size(totalsize);
 		vsize = view_main_regs->view->visible_size();
-		
+
 		ImGui::BeginChild("##state_output", ImVec2(180,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*2));  // account for title bar and menu
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
@@ -1092,9 +1092,9 @@ void debug_imgui::draw_console()
 		totalsize = view_main_disasm->view->total_size();
 		totalsize.y = 20;
 		view_main_disasm->view->set_visible_size(totalsize);
-//		height = ImGui::GetTextLineHeight();
+//      height = ImGui::GetTextLineHeight();
 		vsize = view_main_disasm->view->visible_size();
-		
+
 		ImGui::BeginChild("##disasm_output", ImVec2(ImGui::GetWindowWidth() - ImGui::GetCursorPosX() - 8,(ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*4)/2));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
@@ -1147,7 +1147,7 @@ void debug_imgui::draw_console()
 		if(totalsize.y > 100)
 			totalsize.y = 100;
 		view_main_console->view->set_visible_size(totalsize);
-//		height = ImGui::GetTextLineHeight();
+//      height = ImGui::GetTextLineHeight();
 		vsize = view_main_console->view->visible_size();
 
 		ImGui::BeginChild("##console_output", ImVec2(ImGui::GetWindowWidth() - ImGui::GetCursorPosX() - 8,(ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*4)/2 - ImGui::GetTextLineHeight()));
@@ -1180,7 +1180,7 @@ void debug_imgui::draw_console()
 		ImGui::EndChild();
 		ImGui::Separator();
 		//if(ImGui::IsWindowFocused())
-		//	ImGui::SetKeyboardFocusHere();
+		//  ImGui::SetKeyboardFocusHere();
 		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
@@ -1254,7 +1254,7 @@ void debug_imgui::update()
 
 void debug_imgui::init_debugger(running_machine &machine)
 {
-        ImGuiIO& io = ImGui::GetIO();
+		ImGuiIO& io = ImGui::GetIO();
 	m_machine = &machine;
 	m_mouse_button = false;
 	if(strcmp(downcast<osd_options &>(m_machine->options()).video(),"bgfx") != 0)
@@ -1314,12 +1314,12 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 	}
 	if(firststop)
 	{
-//		debug_show_all();
+//      debug_show_all();
 		device.machine().ui_input().reset();
 		m_running = false;
 	}
 	m_hide = false;
-//	m_machine->ui_input().frame_update();
+//  m_machine->ui_input().frame_update();
 	handle_mouse();
 	handle_keys();
 	handle_console(m_machine);

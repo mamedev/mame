@@ -1180,7 +1180,7 @@ MACHINE_START_MEMBER(ngcd_state,neocd)
 MACHINE_RESET_MEMBER(ngcd_state,neocd)
 {
 	MACHINE_RESET_CALL_MEMBER( neogeo );
-	
+
 	NeoSpriteRAM = memregion("sprites")->base();
 	YM2610ADPCMAROM = memregion("ymsnd")->base();
 	NeoZ80ROMActive = memregion("audiocpu")->base();

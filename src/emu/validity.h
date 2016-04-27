@@ -112,7 +112,7 @@ private:
 	const char *            m_current_ioport;
 	int_map                 m_region_map;
 	std::unordered_set<std::string>   m_already_checked;
-	bool					m_validate_all;
+	bool                    m_validate_all;
 };
 
 #endif

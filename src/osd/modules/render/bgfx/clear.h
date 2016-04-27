@@ -21,10 +21,10 @@ public:
 	void bind(int view) const;
 
 private:
-	const uint64_t	m_flags;
-	const uint32_t	m_color;
-	const float		m_depth;
-	const uint8_t	m_stencil;
+	const uint64_t  m_flags;
+	const uint32_t  m_color;
+	const float     m_depth;
+	const uint8_t   m_stencil;
 };
 
 #endif // __DRAWBGFX_CLEAR__

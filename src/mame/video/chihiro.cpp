@@ -3024,6 +3024,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				wait();
 			}
 		}
+		else if (primitive_type == NV2A_BEGIN_END::LINE_LOOP) {
+		}
 		else {
 			machine().logerror("Unsupported primitive %d for method 0x1818\n", int(primitive_type));
 			countlen = 0;

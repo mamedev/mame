@@ -35,7 +35,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 	// device_saturn_control_port_interface overrides
 	virtual UINT8 read_ctrl(UINT8 offset) override;
 	virtual UINT8 read_status() override { return 0xf1; }

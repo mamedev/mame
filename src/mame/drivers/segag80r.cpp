@@ -1515,8 +1515,6 @@ DRIVER_INIT_MEMBER(segag80r_state,monsterb)
 
 DRIVER_INIT_MEMBER(segag80r_state,monster2)
 {
-
-
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
@@ -1565,8 +1563,6 @@ DRIVER_INIT_MEMBER(segag80r_state,pignewt)
 
 DRIVER_INIT_MEMBER(segag80r_state,sindbadm)
 {
-
-
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 

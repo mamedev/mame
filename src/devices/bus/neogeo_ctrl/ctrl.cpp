@@ -3,13 +3,13 @@
 /**********************************************************************
 
     SNK Neo Geo Controller Port emulation
- 
+
     This actually covers two separate piece of hardware of Neo Geo system:
-	- The 15-pin controller ports that are used for controllers in the
+    - The 15-pin controller ports that are used for controllers in the
       AES home system and for mahjong controllers in the MVS arcade PCB
     - The controller part of the main edge connector that is used for
       joystick inputs in the MVS arcade PCB
- 
+
     Technically, the latter is not a configurable slot, because it's not
     a component that arcade operators could simply change with a different
     controller, but this implementation allows for simpler code.
@@ -219,4 +219,3 @@ SLOT_INTERFACE_END
 SLOT_INTERFACE_START( neogeo_arc_pin15 )
 	SLOT_INTERFACE("mahjong", NEOGEO_MJCTRL)
 SLOT_INTERFACE_END
-

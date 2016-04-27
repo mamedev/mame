@@ -88,7 +88,7 @@ public:
 protected:
 	osd_interface &         m_osd;                  // reference to OSD system
 	emu_options &           m_options;              // reference to options
-	running_machine *		m_machine;
+	running_machine *       m_machine;
 };
 
 

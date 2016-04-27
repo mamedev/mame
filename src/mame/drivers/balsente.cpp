@@ -2402,4 +2402,3 @@ GAME( 1986, shrike,   0,        shrike,   shrike, balsente_state,   shrike,   RO
 GAME( 1987, rescraida,rescraid, balsente, rescraid, balsente_state, rescraid, ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, grudge,   0,        balsente, grudge, balsente_state,   grudge,   ROT0, "Bally Midway", "Grudge Match (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, teamht,   0,        balsente, teamht, balsente_state, teamht, ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
-

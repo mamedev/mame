@@ -284,6 +284,7 @@ private:
 	UINT32 si_pif_addr_rd64b;
 	UINT32 si_pif_addr_wr64b;
 	UINT32 si_status;
+	UINT32 si_dma_dir;
 	UINT32 cic_status;
 	int cic_type;
 

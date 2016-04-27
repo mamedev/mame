@@ -1978,7 +1978,7 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			UINT32 pixel = dest[x];
-			
+
 			// skip if transparent or under poly
 			if (pri[x] == 2)
 			{

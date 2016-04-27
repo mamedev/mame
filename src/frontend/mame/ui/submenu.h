@@ -153,8 +153,8 @@ static std::vector<ui_submenu::option> video_submenu_options = {
 };
 
 //static std::vector<ui_submenu::option> export_submenu_options = {
-//	{ ui_submenu::COMMAND, __("Export XML format (like -listxml)"),               "exportxml" },
-//	{ ui_submenu::COMMAND, __("Export TXT format (like -listfull)"),              "exporttxt" },
+//  { ui_submenu::COMMAND, __("Export XML format (like -listxml)"),               "exportxml" },
+//  { ui_submenu::COMMAND, __("Export TXT format (like -listfull)"),              "exporttxt" },
 //};
 
 #endif /* __UI_SUBMENU_H__ */

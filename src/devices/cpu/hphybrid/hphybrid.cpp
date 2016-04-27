@@ -534,7 +534,7 @@ UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
 																																memmove(&m_reg_PA[ 0 ] , &m_reg_PA[ 1 ] , HPHYBRID_INT_LVLS);
 																																																																m_pa_changed_func((UINT8)CURRENT_PA);
 																												}
-                                                                                                                                                                                                                                BIT_CLR(m_flags, HPHYBRID_IM_BIT);
+																																																								BIT_CLR(m_flags, HPHYBRID_IM_BIT);
 																								}
 																								tmp = RM(AEC_CASE_C , m_reg_R--) + (opcode & 0x1f);
 																								return BIT(opcode , 5) ? tmp - 0x20 : tmp;
@@ -903,17 +903,17 @@ UINT16 hp_hybrid_cpu_device::get_skip_addr_sc(UINT16 opcode , UINT16& v , unsign
 
 UINT16 hp_hybrid_cpu_device::get_skip_addr_sc(UINT16 opcode , UINT32& v , unsigned n)
 {
-        bool val = BIT(v , n);
+		bool val = BIT(v , n);
 
-        if (BIT(opcode , 7)) {
-                if (BIT(opcode , 6)) {
-                        BIT_SET(v , n);
-                } else {
-                        BIT_CLR(v , n);
-                }
-        }
+		if (BIT(opcode , 7)) {
+				if (BIT(opcode , 6)) {
+						BIT_SET(v , n);
+				} else {
+						BIT_CLR(v , n);
+				}
+		}
 
-        return get_skip_addr(opcode , val);
+		return get_skip_addr(opcode , val);
 }
 
 void hp_hybrid_cpu_device::do_pw(UINT16 opcode)
@@ -1007,7 +1007,7 @@ void hp_hybrid_cpu_device::do_pw(UINT16 opcode)
 
 void hp_hybrid_cpu_device::check_for_interrupts(void)
 {
-        if (!BIT(m_flags , HPHYBRID_INTEN_BIT) || BIT(m_flags , HPHYBRID_IRH_SVC_BIT) || BIT(m_flags , HPHYBRID_IM_BIT)) {
+		if (!BIT(m_flags , HPHYBRID_INTEN_BIT) || BIT(m_flags , HPHYBRID_IRH_SVC_BIT) || BIT(m_flags , HPHYBRID_IM_BIT)) {
 								return;
 				}
 
@@ -1017,9 +1017,9 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 								// Service high-level interrupt
 								BIT_SET(m_flags , HPHYBRID_IRH_SVC_BIT);
 								irqline = HPHYBRID_IRH;
-                                                                if (BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
-                                                                        logerror("H pre-empted L @ %06x\n" , m_genpc);
-                                                                }
+																if (BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
+																		logerror("H pre-empted L @ %06x\n" , m_genpc);
+																}
 				} else if (BIT(m_flags , HPHYBRID_IRL_BIT) && !BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
 								// Service low-level interrupt
 								BIT_SET(m_flags , HPHYBRID_IRL_SVC_BIT);
@@ -1055,8 +1055,8 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 				// lasts for 32 cycles
 				m_icount -= 32;
 
-                                // Allow special processing in 5061-3001
-                                enter_isr();
+								// Allow special processing in 5061-3001
+								enter_isr();
 
 				// Do a double-indirect JSM IV,I instruction
 				WM(AEC_CASE_C , ++m_reg_R , m_reg_P);
@@ -1066,7 +1066,7 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 
 void hp_hybrid_cpu_device::enter_isr(void)
 {
-        // Do nothing special
+		// Do nothing special
 }
 
 void hp_hybrid_cpu_device::handle_dma(void)
@@ -1477,33 +1477,33 @@ UINT16 hp_5061_3001_cpu_device::execute_no_bpc_ioc(UINT16 opcode)
 						do_mpy();
 						break;
 
-                                case 0x7026:
-                                        // CIM
-                                        // Undocumented instruction, see beginning of this file
-                                        // Probably "Clear Interrupt Mask"
-                                        // No idea at all about exec. time: make it 9 cycles
-                                        m_icount -= 9;
+								case 0x7026:
+										// CIM
+										// Undocumented instruction, see beginning of this file
+										// Probably "Clear Interrupt Mask"
+										// No idea at all about exec. time: make it 9 cycles
+										m_icount -= 9;
 #ifndef NO_ISR_WITH_IM_CLEARED
-                                        BIT_CLR(m_flags, HPHYBRID_IM_BIT);
+										BIT_CLR(m_flags, HPHYBRID_IM_BIT);
 #else
-                                        BIT_SET(m_flags, HPHYBRID_IM_BIT);
+										BIT_SET(m_flags, HPHYBRID_IM_BIT);
 #endif
-                                        logerror("hp-5061-3001: CIM, P = %06x flags = %05x\n" , m_genpc , m_flags);
-                                        break;
+										logerror("hp-5061-3001: CIM, P = %06x flags = %05x\n" , m_genpc , m_flags);
+										break;
 
-                                case 0x7027:
-                                        // SIM
-                                        // Undocumented instruction, see beginning of this file
-                                        // Probably "Set Interrupt Mask"
-                                        // No idea at all about exec. time: make it 9 cycles
-                                        m_icount -= 9;
+								case 0x7027:
+										// SIM
+										// Undocumented instruction, see beginning of this file
+										// Probably "Set Interrupt Mask"
+										// No idea at all about exec. time: make it 9 cycles
+										m_icount -= 9;
 #ifndef NO_ISR_WITH_IM_CLEARED
-                                        BIT_SET(m_flags, HPHYBRID_IM_BIT);
+										BIT_SET(m_flags, HPHYBRID_IM_BIT);
 #else
-                                        BIT_CLR(m_flags, HPHYBRID_IM_BIT);
+										BIT_CLR(m_flags, HPHYBRID_IM_BIT);
 #endif
-                                        logerror("hp-5061-3001: SIM, P = %06x flags = %05x\n" , m_genpc , m_flags);
-                                        break;
+										logerror("hp-5061-3001: SIM, P = %06x flags = %05x\n" , m_genpc , m_flags);
+										break;
 
 				default:
 						if ((opcode & 0xfec0) == 0x74c0) {
@@ -1655,9 +1655,9 @@ void hp_5061_3001_cpu_device::write_non_common_reg(UINT16 addr , UINT16 v)
 
 void hp_5061_3001_cpu_device::enter_isr(void)
 {
-        // Set interrupt mask when entering an ISR
+		// Set interrupt mask when entering an ISR
 #ifndef NO_ISR_WITH_IM_CLEARED
-        BIT_SET(m_flags, HPHYBRID_IM_BIT);
+		BIT_SET(m_flags, HPHYBRID_IM_BIT);
 #endif
 }
 

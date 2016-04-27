@@ -176,12 +176,12 @@ void target_manager::create_target_if_nonexistent(uint32_t screen, std::string n
 
 uint16_t target_manager::width(uint32_t style, uint32_t screen)
 {
-    std::vector<osd_dim>& sizes = style == TARGET_STYLE_GUEST ? m_guest_dims : m_native_dims;
-    return screen < sizes.size() ? sizes[screen].width() : 0;
+	std::vector<osd_dim>& sizes = style == TARGET_STYLE_GUEST ? m_guest_dims : m_native_dims;
+	return screen < sizes.size() ? sizes[screen].width() : 0;
 }
 
 uint16_t target_manager::height(uint32_t style, uint32_t screen)
 {
-    std::vector<osd_dim>& sizes = style == TARGET_STYLE_GUEST ? m_guest_dims : m_native_dims;
-    return screen < sizes.size() ? sizes[screen].height() : 0;
+	std::vector<osd_dim>& sizes = style == TARGET_STYLE_GUEST ? m_guest_dims : m_native_dims;
+	return screen < sizes.size() ? sizes[screen].height() : 0;
 }

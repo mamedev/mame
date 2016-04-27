@@ -102,7 +102,7 @@ static MACHINE_CONFIG_FRAGMENT( sub_slot )
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("ctrl_port", intvecs_control_port_device, portA_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono_ecs", 0.33)
 
-    MCFG_INTVECS_CONTROL_PORT_ADD("ctrl_port", intvecs_control_port_devices, "keybd")
+	MCFG_INTVECS_CONTROL_PORT_ADD("ctrl_port", intvecs_control_port_devices, "keybd")
 	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, nullptr)
 MACHINE_CONFIG_END
 

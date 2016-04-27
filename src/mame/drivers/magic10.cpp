@@ -886,7 +886,7 @@ ROM_END
   1x TDA2003    (u24) Audio Amplifier (sound).
 
   1x 20.000MHz. oscillator (OSC1, close to main CPU).
-  1x 30.000MHz.	oscillator (OSC2, close to sound).
+  1x 30.000MHz. oscillator (OSC2, close to sound).
   1x blu resonator 1000J (XTAL1, close to sound).
 
   ROMs:

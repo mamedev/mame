@@ -212,6 +212,7 @@ void n64_periphs::device_reset()
 	si_dram_addr = 0;
 	si_pif_addr = 0;
 	si_status = 0;
+	si_dma_dir = 0;
 	si_dma_timer->adjust(attotime::never);
 
 	//memset(m_save_data.eeprom, 0, 2048);
@@ -2082,6 +2083,7 @@ TIMER_CALLBACK_MEMBER(n64_periphs::si_dma_callback)
 void n64_periphs::si_dma_tick()
 {
 	si_dma_timer->adjust(attotime::never);
+	pif_dma(si_dma_dir);
 	si_status = 0;
 	si_status |= 0x1000;
 	signal_rcp_interrupt(SI_INTERRUPT);
@@ -2089,11 +2091,6 @@ void n64_periphs::si_dma_tick()
 
 void n64_periphs::pif_dma(int direction)
 {
-	if(si_status & 1)
-	{
-		si_status |= 8; //DMA Error, overlapping request		
-		return; // SI Busy, ignore request
-	}
 	if (!DWORD_ALIGNED(si_dram_addr))
 	{
 		fatalerror("pif_dma: si_dram_addr unaligned: %08X\n", si_dram_addr);
@@ -2131,8 +2128,6 @@ void n64_periphs::pif_dma(int direction)
 			*dst++ = d;
 		}
 	}
-	si_status |= 1;
-	si_dma_timer->adjust(attotime::from_hz(50000));
 }
 
 READ32_MEMBER( n64_periphs::si_reg_r )
@@ -2160,16 +2155,29 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 
 		case 0x04/4:        // SI_PIF_ADDR_RD64B_REG
 			// PIF RAM -> RDRAM
+			if(si_status & 1)
+			{
+				si_status |= 8; //DMA Error, overlapping request
+				return; // SI Busy, ignore request
+			}
 			si_pif_addr = data;
 			si_pif_addr_rd64b = data;
-			pif_dma(0);
+			si_dma_dir = 0;
+			si_status |= 1;
+			si_dma_timer->adjust(attotime::from_hz(50000));
 			break;
 
 		case 0x10/4:        // SI_PIF_ADDR_WR64B_REG
 			// RDRAM -> PIF RAM
+			if(si_status & 1)
+			{
+				si_status |= 8; //DMA Error, overlapping request
+				return; // SI Busy, ignore request
+			}
 			si_pif_addr = data;
 			si_pif_addr_wr64b = data;
-			pif_dma(1);
+			si_dma_dir = 1;
+			si_dma_timer->adjust(attotime::from_hz(50000));
 			break;
 
 		case 0x18/4:        // SI_STATUS_REG

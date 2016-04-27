@@ -253,13 +253,18 @@ I can't tell ATM if units are seconds (even if values in tables seem very relate
 #include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
 #include "machine/i8155.h"
+#include "softlist.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 class tourvision_state : public pce_common_state
 {
 public:
 	tourvision_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pce_common_state(mconfig, type, tag),
-		m_subcpu(*this, "subcpu") { }
+		m_subcpu(*this, "subcpu"),
+		m_cart(*this, "cartslot")
+		{ }
 
 	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_a_w);
@@ -268,7 +273,57 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
 	DECLARE_WRITE_LINE_MEMBER(pce_irq_changed);
 	required_device<cpu_device> m_subcpu;
+	required_device<generic_slot_device> m_cart;
+	UINT32  m_rom_size;
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tourvision_cart);
 };
+
+DEVICE_IMAGE_LOAD_MEMBER( tourvision_state, tourvision_cart )
+{
+	m_rom_size = m_cart->common_get_size("rom");
+	m_cart->rom_alloc(m_rom_size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), m_rom_size, "rom");
+
+	UINT8* rgn = memregion("maincpu")->base();
+	UINT8* base = m_cart->get_rom_base();
+
+	if (m_rom_size == 0x0c0000)
+	{
+		memcpy(rgn+0x000000, base+0x000000, 0x0c0000 );
+		memcpy(rgn+0x0c0000, base+0x080000, 0x040000 );
+	}
+	else
+	if (m_rom_size == 0x060000)
+	{
+		memcpy(rgn+0x000000, base+0x000000, 0x040000 );
+		memcpy(rgn+0x040000, base+0x000000, 0x040000 );
+		memcpy(rgn+0x080000, base+0x040000, 0x020000 );
+		memcpy(rgn+0x0a0000, base+0x040000, 0x020000 );
+		memcpy(rgn+0x0c0000, base+0x040000, 0x020000 );
+		memcpy(rgn+0x0e0000, base+0x040000, 0x020000 );
+	}
+	else
+	{
+		for (int i=0;i<0x100000;i+=m_rom_size)
+			memcpy(rgn+i, base+0x000000, m_rom_size );
+	}
+
+#if 0
+	{
+		FILE *fp;
+		fp=fopen("tourvision.bin", "w+b");
+		if (fp)
+		{
+			fwrite(rgn, 0x100000, 1, fp);
+			fclose(fp);
+		}
+	}
+#endif
+
+	return IMAGE_INIT_PASS;
+}
+
 
 
 static INPUT_PORTS_START( tourvision )
@@ -443,6 +498,14 @@ static MACHINE_CONFIG_START( tourvision, tourvision_state )
 	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tourvision_cart")
+	MCFG_GENERIC_EXTENSIONS("bin")
+	MCFG_GENERIC_LOAD(tourvision_state, tourvision_cart)
+	MCFG_GENERIC_MANDATORY
+
+	MCFG_SOFTWARE_LIST_ADD("tv_list","pce_tourvision")
+
 
 MACHINE_CONFIG_END
 

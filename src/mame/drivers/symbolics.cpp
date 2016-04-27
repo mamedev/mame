@@ -105,29 +105,29 @@ READ16_MEMBER(symbolics_state::fep_paddle_id_prom_r) // bits 8 and 9 do somethin
 /*
 READ16_MEMBER(symbolics_state::ram_parity_hack_r)
 {
-	UINT16 *ram = (UINT16 *)(memregion("fepdram")->base());
-	//m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-	if (!(m_parity_error_has_occurred[offset]))
-	{
-		//m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		m_parity_error_has_occurred[offset] = true;
-	}
-	ram += offset;
-	return *ram;
+    UINT16 *ram = (UINT16 *)(memregion("fepdram")->base());
+    //m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
+    m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+    if (!(m_parity_error_has_occurred[offset]))
+    {
+        //m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
+        m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+        m_parity_error_has_occurred[offset] = true;
+    }
+    ram += offset;
+    return *ram;
 }
 
 WRITE16_MEMBER(symbolics_state::ram_parity_hack_w)
 {
-	UINT16 *ram = (UINT16 *)(memregion("fepdram")->base());
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-	if (!(m_parity_error_has_occurred[offset]))
-	{
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		m_parity_error_has_occurred[offset] = true;
-	}
-	COMBINE_DATA(&ram[offset]);
+    UINT16 *ram = (UINT16 *)(memregion("fepdram")->base());
+    m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+    if (!(m_parity_error_has_occurred[offset]))
+    {
+        m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+        m_parity_error_has_occurred[offset] = true;
+    }
+    COMBINE_DATA(&ram[offset]);
 }
 */
 
@@ -289,7 +289,7 @@ void symbolics_state::machine_start()
 void symbolics_state::machine_reset()
 {
 	/*for(int i=0; i < 0x20000; i++)
-		m_parity_error_has_occurred[i] = false;
+	    m_parity_error_has_occurred[i] = false;
 	*/
 }
 

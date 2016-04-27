@@ -9,7 +9,7 @@
 
   Notes:
   - To init chsuper3, chmpnum & chmpnuma, just keep pressed both service keys (9 & 0),
-    and do a soft-reset (F3). 
+    and do a soft-reset (F3).
 
   TODO:
   - sound.

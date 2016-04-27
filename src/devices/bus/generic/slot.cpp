@@ -39,7 +39,7 @@ device_generic_cart_interface::device_generic_cart_interface(const machine_confi
 	: device_slot_card_interface(mconfig, device),
 		m_rom(nullptr),
 		m_rom_size(0),
-        m_region(*this, DEVICE_SELF)
+		m_region(*this, DEVICE_SELF)
 {
 }
 

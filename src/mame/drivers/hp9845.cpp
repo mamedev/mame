@@ -418,10 +418,10 @@ void hp9845b_state::video_render_buff(unsigned line_in_row, bool buff_idx)
 		const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 		if (m_video_blanked) {
-                        // Blank scanline
-                        for (unsigned i = 0; i < (80 * 9); i++) {
-                                m_bitmap.pix32(m_video_scanline , i) = palette[ 0 ];
-                        }
+						// Blank scanline
+						for (unsigned i = 0; i < (80 * 9); i++) {
+								m_bitmap.pix32(m_video_scanline , i) = palette[ 0 ];
+						}
 		} else {
 				bool cursor_line = line_in_row == 12;
 				bool ul_line = line_in_row == 14;
@@ -718,15 +718,15 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 		MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845b_state , t15_flg_w))
 		MCFG_TACO_STS_HANDLER(WRITELINE(hp9845b_state , t15_sts_w))
 
-        // In real machine there were 8 slots for LPU ROMs and 8 slots for PPU ROMs in
-        // right-hand side and left-hand side drawers, respectively.
-        // Here we do away with the distinction between LPU & PPU ROMs: in the end they
-        // are visible to both CPUs at the same addresses.
-        // For now we define just a couple of slots..
-        MCFG_DEVICE_ADD("drawer1", HP_OPTROM_SLOT, 0)
-        MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
-        MCFG_DEVICE_ADD("drawer2", HP_OPTROM_SLOT, 0)
-        MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+		// In real machine there were 8 slots for LPU ROMs and 8 slots for PPU ROMs in
+		// right-hand side and left-hand side drawers, respectively.
+		// Here we do away with the distinction between LPU & PPU ROMs: in the end they
+		// are visible to both CPUs at the same addresses.
+		// For now we define just a couple of slots..
+		MCFG_DEVICE_ADD("drawer1", HP_OPTROM_SLOT, 0)
+		MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+		MCFG_DEVICE_ADD("drawer2", HP_OPTROM_SLOT, 0)
+		MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
 
 		MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
 MACHINE_CONFIG_END

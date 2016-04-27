@@ -84,7 +84,7 @@ class ui_menu_item;
 #define OSDOPTION_BGFX_DEBUG            "bgfx_debug"
 #define OSDOPTION_BGFX_SCREEN_CHAINS    "bgfx_screen_chains"
 #define OSDOPTION_BGFX_SHADOW_MASK      "bgfx_shadow_mask"
-#define OSDOPTION_BGFX_AVI_NAME			"bgfx_avi_name"
+#define OSDOPTION_BGFX_AVI_NAME         "bgfx_avi_name"
 
 //============================================================
 //  TYPE DEFINITIONS

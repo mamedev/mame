@@ -17,15 +17,15 @@
 const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(UINT32 format, int width, int height, int rowpixels, const rgb_t *palette, void *base)
 {
 	const bgfx::Memory* mem = bgfx::alloc(width * height * 4);
-    UINT32* data = reinterpret_cast<UINT32*>(mem->data);
-    UINT16* src16 = reinterpret_cast<UINT16*>(base);
-    UINT32* src32 = reinterpret_cast<UINT32*>(base);
+	UINT32* data = reinterpret_cast<UINT32*>(mem->data);
+	UINT16* src16 = reinterpret_cast<UINT16*>(base);
+	UINT32* src32 = reinterpret_cast<UINT32*>(base);
 
-    for (int y = 0; y < height; y++)
+	for (int y = 0; y < height; y++)
 	{
-        UINT32* dst_line = data + y * width;
-        UINT16* src_line16 = src16 + y * rowpixels;
-        UINT32* src_line32 = src32 + y * rowpixels;
+		UINT32* dst_line = data + y * width;
+		UINT16* src_line16 = src16 + y * rowpixels;
+		UINT32* src_line32 = src32 + y * rowpixels;
 		switch (format)
 		{
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):

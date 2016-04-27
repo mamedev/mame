@@ -59,11 +59,11 @@ enum ui_menu_reset_options
 // menu-related events
 struct ui_menu_event
 {
-	void         		*itemref;   // reference for the selected item
-	ui_menu_item_type	type;		// item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
-	int          		iptkey;     // one of the IPT_* values from inptport.h
-	unicode_char 		unichar;    // unicode character if iptkey == IPT_SPECIAL
-	render_bounds       mouse;		// mouse position if iptkey == IPT_CUSTOM
+	void                *itemref;   // reference for the selected item
+	ui_menu_item_type   type;       // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
+	int                 iptkey;     // one of the IPT_* values from inptport.h
+	unicode_char        unichar;    // unicode character if iptkey == IPT_SPECIAL
+	render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
 };
 
 struct ui_menu_pool

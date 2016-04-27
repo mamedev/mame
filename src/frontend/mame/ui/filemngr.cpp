@@ -179,7 +179,6 @@ void ui_menu_file_manager::handle()
 			selected_device = (device_image_interface *) event->itemref;
 			if (selected_device != nullptr)
 			{
-
 				m_curr_selected = TRUE;
 				floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
 				if (floppy_device != nullptr)

@@ -1449,7 +1449,7 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 	: m_machine(machine)
 {
 	/* figure out which BIOS we are using */
-	
+
 	for (device_t &device : device_iterator(machine.config().root_device()))
 	{
 		if (device.rom_region())
