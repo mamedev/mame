@@ -1732,6 +1732,8 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		result = false;
 	}
 
+	emulator_info::layout_file_cb(*rootnode);
+
 	// free the root node
 	xml_file_free(rootnode);
 	return result;

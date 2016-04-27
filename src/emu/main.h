@@ -59,6 +59,7 @@ public:
 	static void draw_user_interface(running_machine& machine);
 	static void periodic_check();
 	static bool frame_hook();
+	static void layout_file_cb(xml_data_node &layout);
 };
 
 // ======================> machine_manager

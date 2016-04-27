@@ -171,6 +171,7 @@ function cheat.startplugin()
 				    frombcd = frombcd,
 				    pairs = pairs,
 				    ipairs = ipairs,
+				    outputs = manager:machine():outputs(),
 				    time = time,
 			    	    table = 
 				    { insert = table.insert,

@@ -23,6 +23,7 @@
 #include "cheat.h"
 #include "ui/datfile.h"
 #include "ui/inifile.h"
+#include "xmlfile.h"
 
 //**************************************************************************
 //  MACHINE MANAGER
@@ -335,4 +336,15 @@ void emulator_info::periodic_check()
 bool emulator_info::frame_hook()
 {
 	return mame_machine_manager::instance()->lua()->frame_hook();
+}
+
+void emulator_info::layout_file_cb(xml_data_node &layout)
+{
+	xml_data_node *mamelayout = xml_get_sibling(layout.child, "mamelayout");
+	if(mamelayout)
+	{
+		xml_data_node *script = xml_get_sibling(mamelayout->child, "script");
+		if(script)
+			mame_machine_manager::instance()->lua()->call_plugin(script->value, "layout");
+	}
 }
