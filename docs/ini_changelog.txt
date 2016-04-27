@@ -1,0 +1,244 @@
+This describes addition or removal of ini parameters (usually console parameter as well), along with changes in default values. Indicate also changes in comments (as they describe sections).
++ added
+- removed
+> change of default
+0 section change
+
+0.173
+-----
+
++	intoverscan				0
++	# OSD OUTPUT OPTIONS
++	output                    auto
++	bgfx_avi_name             bgfx.avi
+-	curvature                 0.0
++	distortion                0.0
++	cubic_distortion          0.0
++	distort_corner            0.0
+
+(plugin.ini)
++	cheat                     0
++	cheatfind                 0
++	timer                     0
+
+0.172
+-----
+(introduction of plugin.ini)
+
+>	inipath                   .;ini > .;ini;ini/presets
++	# CORE RENDER OPTIONS
+0	keepaspect                1
+0	unevenstretch             1
++	unevenstretchx            0
++	intscalex                 0
++	intscaley                 0
+>	autoboot_delay            2 > 0
++	plugins                   1
++	plugin                    
++	noplugin                  
++	# OSD INPUT OPTIONS
++	keyboardprovider          auto
++	mouseprovider             auto
++	lightgunprovider          auto
++	joystickprovider          auto
+-	multithreading            0
++	# BGFX POST-PROCESSING OPTIONS
++	bgfx_path                 bgfx
++	bgfx_backend              auto
++	bgfx_debug                0
++	bgfx_screen_chains        default
++	bgfx_shadow_mask          slot-mask.png
+-	# DIRECTDRAW-SPECIFIC OPTIONS
+-	hwstretch                 1
+-	hlsl_prescale_x           0
+-	hlsl_prescale_y           0
++	hlsl_oversampling         0
++	scanline_variation        1.0
+>	defocus                   1.0,0.0 > 0.0,0.0
+>	converge_x                0.25,0.00,-0.25 > 0.0,0.0,0.0
+>	converge_y                0.0,0.25,-0.25 > 0.0,0.0,0.0
+>	saturation                1.4 > 1.0
+>	scale                     0.95,0.95,0.95 > 1.0,1.0,1.0
+>	power                     0.8,0.8,0.8 > 1.0,1.0,1.0
+>	floor                     0.05,0.05,0.05 > 0.0,0.0,0.0
+>	phosphor_life             0.4,0.4,0.4 > 0.0,0.0,0.0
+>	bloom_scale               0.25 > 0.0
+>	bloom_lvl5_weight         0.04 > 0.06
+>	bloom_lvl8_weight         0.02 > 0.01
+-	bloom_lvl9_weight         0.01
+-	bloom_lvl10_weight        0.01
+
+(plugin.ini)
++	# PLUGINS OPTIONS
++	dummy                     0
++	hiscore                   0
+
+(ui.ini)
+>	artwork_preview_directory "artwork preview" > "artwork preview;artpreview"
++	covers_directory          covers
+
+0.171
+-----
+(introduction of ui.ini)
+
++	pluginspath               plugins
++	languagepath              language
++	record_timecode           0
++	exit_after_playback       0
++	ui                        cabinet
+>	ui_mouse                  0 > 1
++	language                  English
+
+(ui.ini)
++	# UI SEARCH PATH OPTIONS
++	historypath               history;dats;.
++	extrainipath              folders
++	cabinets_directory        cabinets;cabdevs
++	cpanels_directory         cpanel
++	pcbs_directory            pcb
++	flyers_directory          flyers
++	titles_directory          titles
++	ends_directory            ends
++	marquees_directory        marquees
++	artwork_preview_directory "artwork preview"
++	bosses_directory          bosses
++	logos_directory           logo
++	scores_directory          scores
++	versus_directory          versus
++	gameover_directory        gameover
++	howto_directory           howto
++	select_directory          select
++	icons_directory           icons
++	ui_path                   ui
++	# UI MISC OPTIONS
++	dats_enabled              1
++	remember_last             1
++	enlarge_snaps             1
++	forced4x3                 1
++	use_background            1
++	skip_biosmenu             0
++	skip_partsmenu            0
++	last_used_filter          
++	last_used_machine         
++	info_audit_enabled        0
++	# UI OPTIONS
++	infos_text_size           0.75
++	font_rows                 30
++	hide_main_panel           0
++	ui_border_color           ffffffff
++	ui_bg_color               ef101030
++	ui_clone_color            ff808080
++	ui_dipsw_color            ffffff00
++	ui_gfxviewer_color        ef101030
++	ui_mousedown_bg_color     b0606000
++	ui_mousedown_color        ffffff80
++	ui_mouseover_bg_color     70404000
++	ui_mouseover_color        ffffff80
++	ui_selected_bg_color      ef808000
++	ui_selected_color         ffffff00
++	ui_slider_color           ffffffff
++	ui_subitem_color          ffffffff
++	ui_text_bg_color          ef000000
++	ui_text_color             ffffffff
++	ui_unavail_color          ff404040
+
+0.170
+-----
+
++	console                   0
+>	scanline_alpha            1.0 > 0.0
++	hum_bar_alpha             0.0
++	yiq_jitter                0.0
+>	yiq_cc                    3.59754545 > 3.57954545
+>	yiq_o                     1.570796325 > 0.0
+
+0.169
+-----
+
++	shadow_mask_tile_mode     0
++	bloom_blend_mode          0
+
+0.168
+-----
+
+-	http                      0
+-	http_port                 8080
+-	http_path                 web
+-	console                   0
+-	hlsl_preset               -1
+>	shadow_mask_texture       aperture.png > shadow-mask.png
+>	shadow_mask_y_count       6 > 4
+>	shadow_mask_vsize         0.1875 > 0.25
+>	defocus                   0.0,0.0 > 1.0,0.0
+>	converge_x                0.3,0.0,-0.3 > 0.25,0.00,-0.25
+>	converge_y                0.0,0.3,-0.3 > 0.0,0.25,-0.25
+>	vector_length_scale       0.8 > 0.5
+>	bloom_overdrive           0.0,0.0,0.0 > 1.0,1.0,1.0
+>	bloom_lvl1_weight         0.21 > 0.64
+>	bloom_lvl2_weight         0.19 > 0.32
+>	bloom_lvl3_weight         0.17 > 0.16
+>	bloom_lvl4_weight         0.15 > 0.08
+>	bloom_lvl5_weight         0.14 > 0.04
+>	bloom_lvl6_weight         0.13 > 0.04
+>	bloom_lvl7_weight         0.12 > 0.02
+>	bloom_lvl8_weight         0.11 > 0.02
+>	bloom_lvl9_weight         0.10 > 0.01
+>	bloom_lvl10_weight        0.09 > 0.01
+
+0.167
+-----
+
+-	beam                      1.0
++	beam_width_min            1.0
++	beam_width_max            1.0
++	beam_intensity_weight     0
++	smooth_border             0.0
+>	curvature                 0.03 > 0.0
+>	round_corner              0.03 > 0.0
+>	reflection                0.03 > 0.0
+>	vignetting                0.03 > 0.0
+-	vector_bloom_scale        0.3
+-	raster_bloom_scale        0.225
++	bloom_scale               0.25
++	bloom_overdrive           0.0,0.0,0.0
+
+0.166
+-----
+
++	global_inputs             0
+
+0.165
+-----
+
+NULL
+
+0.164
+-----
+
+NULL
+
+0.163
+-----
+
++	# CORE COMM OPTIONS
++	comm_localhost            0.0.0.0
++	comm_localport            15112
++	comm_remotehost           127.0.0.1
++	comm_remoteport           15112
++	# OSD KEYBOARD MAPPING OPTIONS
++	uimodekey                 SCRLOCK
+
+0.162
+-----
+(first MAME + MESS merged release)
+
+>	shadow_mask_x_count       320 > 6
+>	shadow_mask_y_count       240 > 6
+>	shadow_mask_usize         0.09375 > 0.1875
+>	shadow_mask_vsize         0.109375 > 0.1875
+-	pincushion                0.03
++	shadow_mask_uoffset       0.0
++	shadow_mask_voffset       0.0
++	round_corner              0.03
++	reflection                0.03
++	vignetting                0.03
