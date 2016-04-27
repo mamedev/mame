@@ -128,7 +128,7 @@
 						local cfg = premake.getconfig(prj, cfginfo.src_buildcfg, cfginfo.src_platform)
 
 						local usePCH = (not prj.flags.NoPCH and prj.pchsource == node.cfg.name)
-						local isSourceCode = path.iscppfile(fname)
+						local isSourceCode = path.isSourceFile(fname)
 						local needsCompileAs = (path.iscfile(fname) ~= premake.project.iscproject(prj))
 
 						if usePCH or isSourceCode then

@@ -43,6 +43,8 @@
 		elseif vstudio.iswinrt() then
 			_p(2, '<DefaultLanguage>en-US</DefaultLanguage>')
 			if vstudio.storeapp == "durango" then
+				_p(2, '<Keyword>Win32Proj</Keyword>')
+				_p(2, '<ApplicationEnvironment>title</ApplicationEnvironment>')
 				_p(2, '<MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>')
 				_p(2, '<TargetRuntime>Native</TargetRuntime>')
 			else
@@ -140,48 +142,50 @@
 	end
 
 	function vc2010.outputProperties(prj)
-			for _, cfginfo in ipairs(prj.solution.vstudio_configs) do
-				local cfg = premake.getconfig(prj, cfginfo.src_buildcfg, cfginfo.src_platform)
-				local target = cfg.buildtarget
-				local outdir = add_trailing_backslash(target.directory)
-				local intdir = add_trailing_backslash(cfg.objectsdir)
+		for _, cfginfo in ipairs(prj.solution.vstudio_configs) do
+			local cfg = premake.getconfig(prj, cfginfo.src_buildcfg, cfginfo.src_platform)
+			local target = cfg.buildtarget
+			local outdir = add_trailing_backslash(target.directory)
+			local intdir = add_trailing_backslash(cfg.objectsdir)
 
-				_p(1,'<PropertyGroup '..if_config_and_platform() ..'>', premake.esc(cfginfo.name))
+			_p(1,'<PropertyGroup '..if_config_and_platform() ..'>', premake.esc(cfginfo.name))
 
-				_p(2,'<OutDir>%s</OutDir>', premake.esc(outdir))
+			_p(2,'<OutDir>%s</OutDir>', premake.esc(outdir))
 
-				if cfg.platform == "Xbox360" then
-					_p(2,'<OutputFile>$(OutDir)%s</OutputFile>', premake.esc(target.name))
-				end
-
-				_p(2,'<IntDir>%s</IntDir>', premake.esc(intdir))
-				_p(2,'<TargetName>%s</TargetName>', premake.esc(path.getbasename(target.name)))
-				_p(2,'<TargetExt>%s</TargetExt>', premake.esc(path.getextension(target.name)))
-
-				if cfg.kind == "SharedLib" then
-					local ignore = (cfg.flags.NoImportLib ~= nil)
-					 _p(2,'<IgnoreImportLibrary>%s</IgnoreImportLibrary>', tostring(ignore))
-				end
-
-				if cfg.platform == "Durango" then
-					_p(2, '<ReferencePath>$(Console_SdkLibPath);$(Console_SdkWindowsMetadataPath)</ReferencePath>')
-					_p(2, '<LibraryPath>$(Console_SdkLibPath)</LibraryPath>')
-					_p(2, '<LibraryWPath>$(Console_SdkLibPath);$(Console_SdkWindowsMetadataPath)</LibraryWPath>')
-					_p(2, '<IncludePath>$(Console_SdkIncludeRoot)</IncludePath>')
-					_p(2, '<ExecutablePath>$(Console_SdkRoot)bin;$(VCInstallDir)bin\\x86_amd64;$(VCInstallDir)bin;$(WindowsSDK_ExecutablePath_x86);$(VSInstallDir)Common7\\Tools\\bin;$(VSInstallDir)Common7\\tools;$(VSInstallDir)Common7\\ide;$(ProgramFiles)\\HTML Help Workshop;$(MSBuildToolsPath32);$(FxCopDir);$(PATH);</ExecutablePath>')
-				end
-
-				if cfg.kind ~= "StaticLib" then
-					_p(2,'<LinkIncremental>%s</LinkIncremental>', tostring(premake.config.isincrementallink(cfg)))
-				end
-
-				if cfg.flags.NoManifest then
-					_p(2,'<GenerateManifest>false</GenerateManifest>')
-				end
-
-				_p(1,'</PropertyGroup>')
+			if cfg.platform == "Xbox360" then
+				_p(2,'<OutputFile>$(OutDir)%s</OutputFile>', premake.esc(target.name))
 			end
 
+			_p(2,'<IntDir>%s</IntDir>', premake.esc(intdir))
+			_p(2,'<TargetName>%s</TargetName>', premake.esc(path.getbasename(target.name)))
+			_p(2,'<TargetExt>%s</TargetExt>', premake.esc(path.getextension(target.name)))
+
+			if cfg.kind == "SharedLib" then
+				local ignore = (cfg.flags.NoImportLib ~= nil)
+				_p(2,'<IgnoreImportLibrary>%s</IgnoreImportLibrary>', tostring(ignore))
+			end
+
+			if cfg.platform == "Durango" then
+				_p(2, '<ReferencePath>$(Console_SdkLibPath);$(Console_SdkWindowsMetadataPath)</ReferencePath>')
+				_p(2, '<LibraryPath>$(Console_SdkLibPath)</LibraryPath>')
+				_p(2, '<LibraryWPath>$(Console_SdkLibPath);$(Console_SdkWindowsMetadataPath)</LibraryWPath>')
+				_p(2, '<IncludePath>$(Console_SdkIncludeRoot)</IncludePath>')
+				_p(2, '<ExecutablePath>$(Console_SdkRoot)bin;$(VCInstallDir)bin\\x86_amd64;$(VCInstallDir)bin;$(WindowsSDK_ExecutablePath_x86);$(VSInstallDir)Common7\\Tools\\bin;$(VSInstallDir)Common7\\tools;$(VSInstallDir)Common7\\ide;$(ProgramFiles)\\HTML Help Workshop;$(MSBuildToolsPath32);$(FxCopDir);$(PATH);</ExecutablePath>')
+				_p(2, '<LayoutDir>%s</LayoutDir>', prj.name)
+				_p(2, '<LayoutExtensionFilter>*.pdb;*.ilk;*.exp;*.lib;*.winmd;*.appxrecipe;*.pri;*.idb</LayoutExtensionFilter>')
+				_p(2, '<IsolateConfigurationsOnDeploy>true</IsolateConfigurationsOnDeploy>')
+			end
+
+			if cfg.kind ~= "StaticLib" then
+				_p(2,'<LinkIncremental>%s</LinkIncremental>', tostring(premake.config.isincrementallink(cfg)))
+			end
+
+			if cfg.flags.NoManifest then
+				_p(2,'<GenerateManifest>false</GenerateManifest>')
+			end
+
+			_p(1,'</PropertyGroup>')
+		end
 	end
 
 	local function runtime(cfg)
@@ -333,8 +337,8 @@
 
 		_p(3,'<Optimization>%s</Optimization>',optimisation(cfg))
 
-		include_dirs(3,cfg)
-		preprocessor(3,cfg)
+		include_dirs(3, cfg)
+		preprocessor(3, cfg)
 		minimal_build(cfg)
 
 		if  not premake.config.isoptimizedbuild(cfg.flags) then
@@ -559,7 +563,7 @@
 
 			local foundAppxManifest = false
 			for file in premake.project.eachfile(prj) do
-				if path.iscppfile(file.name) then
+				if path.isSourceFileVS(file.name) then
 					table.insert(sortedfiles.ClCompile, file)
 				elseif path.iscppheader(file.name) then
 					if not table.icontains(prj.removefiles, file) then
@@ -582,15 +586,30 @@
 				vstudio.needAppxManifest = true
 
 				local fcfg = {}
-				fcfg.name = prj.name .. ".appxmanifest"
+				fcfg.name = prj.name .. "/Package.appxmanifest"
 				fcfg.vpath = premake.project.getvpath(prj, fcfg.name)
 				table.insert(sortedfiles.AppxManifest, fcfg)
 
 				-- We also need a link to the splash screen because WinRT is retarded
-				local splashcfg = {}
-				splashcfg.name = premake.vstudio.splashpath
-				splashcfg.vpath = premake.vstudio.splashpath
-				table.insert(sortedfiles.Image, splashcfg)
+				local logo = {}
+				logo.name  = prj.name .. "/Logo.png"
+				logo.vpath = logo.name
+				table.insert(sortedfiles.Image, logo)
+
+				local smallLogo = {}
+				smallLogo.name  = prj.name .. "/SmallLogo.png"
+				smallLogo.vpath = smallLogo.name
+				table.insert(sortedfiles.Image, smallLogo)
+
+				local storeLogo = {}
+				storeLogo.name  = prj.name .. "/StoreLogo.png"
+				storeLogo.vpath = storeLogo.name
+				table.insert(sortedfiles.Image, storeLogo)
+
+				local splashScreen = {}
+				splashScreen.name  = prj.name .. "/SplashScreen.png"
+				splashScreen.vpath = splashScreen.name
+				table.insert(sortedfiles.Image, splashScreen)
 			end
 
 			-- Cache the sorted files; they are used several places
@@ -688,13 +707,13 @@
 		if filetype == nil then
 			filetype = section
 		end
-		
+
 		local files = vc2010.getfilegroup(prj, section)
 		if #files > 0  then
 			_p(1,'<ItemGroup>')
 			for _, file in ipairs(files) do
 				_p(2,'<%s Include=\"%s\">', filetype, path.translate(file.name, "\\"))
-				
+
 				_p(3,'<DeploymentContent>true</DeploymentContent>')
 				_p(3,'<Link>%s</Link>', path.translate(file.vpath, "\\"))
 				_p(2,'</%s>', filetype)
@@ -722,6 +741,12 @@
 				_p(3, '<ObjectFileName>$(IntDir)%s\\</ObjectFileName>'
 					, premake.esc(path.translate(path.trimdots(path.getdirectory(file.name))))
 					)
+
+				if path.iscxfile(file.name) then
+					_p(3, '<CompileAsWinRT>true</CompileAsWinRT>')
+					_p(3, '<RuntimeTypeInfo>true</RuntimeTypeInfo>')
+					_p(3, '<PrecompiledHeader>NotUsing</PrecompiledHeader>')
+				end
 
 				--For Windows Store Builds, if the file is .c we have to exclude it from /ZW compilation
 				if vstudio.iswinrt() and string.len(file.name) > 2 and string.sub(file.name, -2) == ".c" then
@@ -880,7 +905,27 @@
 		_p('</Project>')
 	end
 
---- This whole thing is stupid
+	local png1x1data = {
+		0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52, -- .PNG........IHDR
+		0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x01, 0x03, 0x00, 0x00, 0x00, 0x25, 0xdb, 0x56, -- .............%.V
+		0xca, 0x00, 0x00, 0x00, 0x03, 0x50, 0x4c, 0x54, 0x45, 0x00, 0x00, 0x00, 0xa7, 0x7a, 0x3d, 0xda, -- .....PLTE....z=.
+		0x00, 0x00, 0x00, 0x01, 0x74, 0x52, 0x4e, 0x53, 0x00, 0x40, 0xe6, 0xd8, 0x66, 0x00, 0x00, 0x00, -- ....tRNS.@..f...
+		0x0a, 0x49, 0x44, 0x41, 0x54, 0x08, 0xd7, 0x63, 0x60, 0x00, 0x00, 0x00, 0x02, 0x00, 0x01, 0xe2, -- .IDAT..c`.......
+		0x21, 0xbc, 0x33, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,       -- !.3....IEND.B`.
+	}
+
+	function png1x1(obj, filename)
+		filename = premake.project.getfilename(obj, filename)
+
+		local f, err = io.open(filename, "wb")
+		if f then
+			for _, byte in ipairs(png1x1data) do
+				f:write(string.char(byte))
+			end
+			f:close()
+		end
+	end
+
 	function premake.vs2010_appxmanifest(prj)
 		io.indent = "  "
 		io.eol = "\r\n"
@@ -896,17 +941,20 @@
 		end
 
 		_p(1,'<Identity Name="' .. prj.uuid .. '"')
-		_p(2,'Publisher="CN=Unknown"')
+		_p(2,'Publisher="CN=Publisher"')
 		_p(2,'Version="1.0.0.0" />')
 
 		if vstudio.toolset == "v120_wp81" or vstudio.storeapp == "8.2" then
 			_p(1,'<mp:PhoneIdentity PhoneProductId="' .. prj.uuid .. '" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>')
 		end
 
-		_p(1,'<Properties>')
-		_p(2,'<DisplayName>' .. prj.name .. '</DisplayName>')
-		_p(2,'<PublisherDisplayName>Unknown</PublisherDisplayName>')
-		_p(2,'<Logo>EmptyLogo.png</Logo>')
+		_p(1, '<Properties>')
+		_p(2, '<DisplayName>' .. prj.name .. '</DisplayName>')
+		_p(2, '<PublisherDisplayName>PublisherDisplayName</PublisherDisplayName>')
+		_p(2, '<Logo>' .. prj.name .. '\\StoreLogo.png</Logo>')
+		png1x1(prj, "%%/StoreLogo.png")
+		_p(2, '<Description>' .. prj.name .. '</Description>')
+
 		_p(1,'</Properties>')
 
 		if vstudio.storeapp == "8.2" then
@@ -926,22 +974,25 @@
 		end
 
 		_p(1,'<Resources>')
-		_p(2,'<Resource Language="x-generate"/>')
+		_p(2,'<Resource Language="en-us"/>')
 		_p(1,'</Resources>')
 
 		_p(1,'<Applications>')
 		_p(2,'<Application Id="App"')
 		_p(3,'Executable="$targetnametoken$.exe"')
-		_p(3,'EntryPoint="App">')
+		_p(3,'EntryPoint="' .. prj.name .. '.App">')
 		if vstudio.storeapp == "durango" then
 			_p(3, '<VisualElements')
-			_p(4, 'DisplayName="GENie"')
-			_p(4, 'Logo="Assets\\Logo.png"')
-			_p(4, 'SmallLogo="Assets\\SmallLogo.png"')
-			_p(4, 'Description="GENie"')
+			_p(4, 'DisplayName="' .. prj.name .. '"')
+			_p(4, 'Logo="' .. prj.name .. '\\Logo.png"')
+			png1x1(prj, "%%/Logo.png")
+			_p(4, 'SmallLogo="' .. prj.name .. '\\SmallLogo.png"')
+			png1x1(prj, "%%/SmallLogo.png")
+			_p(4, 'Description="' .. prj.name .. '"')
 			_p(4, 'ForegroundText="light"')
 			_p(4, 'BackgroundColor="transparent">')
-			_p(5, '<SplashScreen Image="Assets\\SplashScreen.png" />')
+			_p(5, '<SplashScreen Image="' .. prj.name .. '\\SplashScreen.png" />')
+			png1x1(prj, "%%/SplashScreen.png")
 			_p(3, '</VisualElements>')
 			_p(3, '<Extensions>')
 			_p(4, '<mx:Extension Category="xbox.system.resources">')
@@ -950,17 +1001,21 @@
 			_p(3, '</Extensions>')
 		else
 			_p(3, '<m3:VisualElements')
-			_p(4, 'DisplayName="GENie"')
-			_p(4, 'Square150x150Logo="Assets\\Logo.png"')
+			_p(4, 'DisplayName="' .. prj.name .. '"')
+			_p(4, 'Square150x150Logo="' .. prj.name .. '\\Logo.png"')
+			png1x1(prj, "%%/Logo.png")
 			if vstudio.toolset == "v120_wp81" or vstudio.storeapp == "8.2" then
-				_p(4, 'Square44x44Logo="Assets\\SmallLogo.png"')
+				_p(4, 'Square44x44Logo="' .. prj.name .. '\\SmallLogo.png"')
+				png1x1(prj, "%%/SmallLogo.png")
 			else
-				_p(4, 'Square30x30Logo="Assets\\SmallLogo.png"')
+				_p(4, 'Square30x30Logo="' .. prj.name .. '\\SmallLogo.png"')
+				png1x1(prj, "%%/SmallLogo.png")
 			end
-			_p(4, 'Description="GENie"')
+			_p(4, 'Description="' .. prj.name .. '"')
 			_p(4, 'ForegroundText="light"')
 			_p(4, 'BackgroundColor="transparent">')
-			_p(4, '<m3:SplashScreen Image="%s" />', path.getname(vstudio.splashpath))
+			_p(4, '<m3:SplashScreen Image="' .. prj.name .. '\\SplashScreen.png"')
+			png1x1(prj, "%%/SplashScreen.png")
 			_p(3, '</m3:VisualElements>')
 		end
 		_p(2,'</Application>')
