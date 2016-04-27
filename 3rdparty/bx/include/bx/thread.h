@@ -65,7 +65,7 @@ namespace bx
 			m_stackSize = _stackSize;
 			m_running = true;
 
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE
 			m_handle = ::CreateThread(NULL
 				, m_stackSize
 				, (LPTHREAD_START_ROUTINE)threadFunc
@@ -103,6 +103,8 @@ namespace bx
 
 			result = pthread_create(&m_handle, &attr, &threadFunc, this);
 			BX_CHECK(0 == result, "pthread_attr_setschedparam failed! %d", result);
+#else
+#	error "Not implemented!"
 #endif // BX_PLATFORM_
 
 			m_sem.wait();
