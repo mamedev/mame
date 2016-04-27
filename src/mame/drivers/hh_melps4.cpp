@@ -320,8 +320,8 @@ static MACHINE_CONFIG_START( cfrogger, cfrogger_state )
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(449, 970)
-	MCFG_SCREEN_VISIBLE_AREA(0, 449-1, 0, 970-1)
+	MCFG_SCREEN_SIZE(1000, 2160)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 2160-1)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
 
@@ -437,8 +437,8 @@ static MACHINE_CONFIG_START( gjungler, gjungler_state )
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(445, 1000)
-	MCFG_SCREEN_VISIBLE_AREA(0, 445-1, 0, 1000-1)
+	MCFG_SCREEN_SIZE(962, 2160)
+	MCFG_SCREEN_VISIBLE_AREA(0, 962-1, 0, 2160-1)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
 

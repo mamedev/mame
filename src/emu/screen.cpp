@@ -120,6 +120,23 @@ screen_device_svg_renderer::screen_device_svg_renderer(memory_region *region)
 
 	m_sx = m_sy = 0;
 	m_scale = 1.0;
+
+#if 0
+	double ar = m_image->width / m_image->height;
+	int w,h;
+	if (ar < 1)
+	{
+		h = 1080*2;
+		w = (h * ar) + 0.5;
+	}
+	else
+	{
+		w = 1920*2;
+		h = (w / ar) + 0.5;
+	}
+	
+	printf("\n\nMCFG_SCREEN_SIZE(%d, %d)\nMCFG_SCREEN_VISIBLE_AREA(0, %d-1, 0, %d-1)\n", w, h, w, h);
+#endif
 }
 
 screen_device_svg_renderer::~screen_device_svg_renderer()
