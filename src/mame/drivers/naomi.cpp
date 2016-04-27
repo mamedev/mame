@@ -1199,38 +1199,7 @@ ROMEO           - Sammy AX0201A01 'ROMEO' 4111-00000501 0250 K13 custom ASIC (TQ
 315-6267        - SEGA 315-6267 custom ASIC (BGAxxx)
 TD62064         - Toshiba TD62064 NPN 50V 1.5A Quad Darlington Driver (SOIC16)
 SH4             - Hitachi SH-4 HD6417091RA CPU (BGA256)
-BIOS.IC23       - Macronix 29L001MC-10 3.3volt FlashROM (SOP44)
-                  This is a little strange, the ROM appears to be a standard SOP44 with reverse pinout but the
-                  address lines are shifted one pin out of position compared to industry-standard pinouts.
-                  The actual part number doesn't exist on the Macronix web site, even though they have datasheets for
-                  everything else! So it's probably a custom design for Sammy and top-secret!
-                  The size is assumed to be 1MBit and is 8-bit (D0-D7 only). The pinout appears to be this.....
-
-                               +--\/--+
-tied to WE of BS62LV1023   VCC | 1  44| VCC - tied to a transistor, probably RESET
-                           NC  | 2  43| NC
-                           A9  | 3  42| NC
-                           A10 | 4  41| A8
-                           A11 | 5  40| A7
-                           A12 | 6  39| A6
-                           A13 | 7  38| A5
-                           A14 | 8  37| A4
-                           A15 | 9  36| A3
-                           A16 |10  35| A2
-                           NC  |11  34| A1
-                           NC  |12  33| CE - tied to 315-6267
-                           GND |13  32| GND
-                           A0  |14  31| OE
-                           D7  |15  30| D0
-                           NC  |16  29| NC
-                           D6  |17  28| D1
-                           NC  |18  27| NC
-                           D5  |19  26| D2
-                           NC  |20  25| NC
-                           D4  |21  24| D3
-                           VCC |22  23| NC
-                               +------+
-
+BIOS.IC23       - Macronix 29L001MC-10 3.3volt (1MBit) FlashROM (SOP44, reverse pinout)
 W129AG          - IC Works W129AG Programmable Clock Frequency Generator, clock input of 13.5MHz (SOIC16)
 SW1             - 2-position Dip Switch
 VGA             - 15 pin VGA out connector @ 31.5kHz
@@ -3088,11 +3057,16 @@ Region byte encoding is as follows:
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-23607b.ic27",   0x000000, 0x200000, CRC(f308c5e9) SHA1(5470ab1cee6afecbd8ca8cf40f8fbe4ec2cb1471) ) \
 	ROM_SYSTEM_BIOS( 9, "bios9", "epr-23607 (USA)"  ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-23607.ic27",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) )
-/* First half is BIOS, second half is game settings and is blanked/reprogrammed by the BIOS as necessary */
+/*
+   First half is BIOS, second half is game settings and is blanked/reprogrammed by the BIOS if game cartridge exchange was detected
+   area 0x1A000-0x1BFFF is write protected and contain 12 bytes of unit-specific unique information (probably serial number, manufacture date, etc),
+   2 dumps included for reference
+*/
 #define AW_BIOS \
 	ROM_REGION( 0x200000, "awflash", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Atomiswave BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_l", 0x000000, 0x010000, BAD_DUMP CRC(e5693ce3) SHA1(1bde3ed87af64b0f675ebd47f12a53e1fc5709c1) ) /* Might be bad.. especially. bytes 0x0000, 0x6000, 0x8000 which gave different reads */
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios0.ic23", 0x000000, 0x020000, CRC(719b2b0b) SHA1(b4c1a26bc8906d5275eb28c701dff2b9365bcdfa) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios1.ic23", 0x000000, 0x020000, CRC(d3e80a9f) SHA1(33024f9d51c04884c2b44ce146f340e7a857b959) )
 /* default EEPROM values, same works for all games */
 #define NAOMI_DEFAULT_EEPROM \
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
