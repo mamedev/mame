@@ -124,7 +124,7 @@ screen_device_svg_renderer::screen_device_svg_renderer(memory_region *region)
 #if 0
 	double ar = m_image->width / m_image->height;
 	int w,h;
-	if (ar < 1)
+	if (ar < (16.0/9.0))
 	{
 		h = 1080*2;
 		w = (h * ar) + 0.5;
