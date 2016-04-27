@@ -100,7 +100,7 @@ void rtc_tcp_connection::user_on_tcp_connection_read()
 			{
 				break;
 			}
-		}		
+		}
 		else // Incomplete packet.
 		{
 			// Check if the buffer is full.

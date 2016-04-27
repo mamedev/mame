@@ -131,7 +131,7 @@ private:
 
 public:
 	xinput_joystick_device(running_machine &machine, const char *name, input_module &module, std::shared_ptr<xinput_api_helper> helper);
-	
+
 	void poll() override;
 	void reset() override;
 	void configure();

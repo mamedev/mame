@@ -951,7 +951,7 @@ void ppc_device::device_start()
 		if (beinfo.direct_iregs > 7)
 			m_regmap[2] = uml::I7;
 
-		
+
 		if (beinfo.direct_fregs > 3)
 			m_fdregmap[0] = uml::F3;
 		if (beinfo.direct_fregs > 4)

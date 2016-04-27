@@ -46,16 +46,16 @@ public:
 	lua_engine *lua() { return m_lua; }
 
 	virtual void update_machine() override;
-	
+
 	void reset();
 	TIMER_CALLBACK_MEMBER(autoboot_callback);
-	
+
 	virtual ui_manager* create_ui(running_machine& machine) override;
 
 	virtual void create_custom(running_machine& machine) override;
 
 	virtual void ui_initialize(running_machine& machine) override;
-	
+
 	/* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
 	int execute();
 	void start_luaengine();

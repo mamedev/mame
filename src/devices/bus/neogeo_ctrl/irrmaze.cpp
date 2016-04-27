@@ -90,7 +90,7 @@ READ8_MEMBER(neogeo_irrmaze_device::in0_r)
 		res = m_ty->read();
 	else
 		res = m_tx->read();
-	
+
 	return res;
 }
 
@@ -111,4 +111,3 @@ void neogeo_irrmaze_device::write_ctrlsel(UINT8 data)
 {
 	m_ctrl_sel = data;
 }
-

@@ -1083,4 +1083,3 @@ diagnostics_module * diagnostics_module::get_instance()
 #endif // WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 #endif
-

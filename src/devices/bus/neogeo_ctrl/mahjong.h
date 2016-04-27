@@ -28,19 +28,19 @@ public:
 	// construction/destruction
 	neogeo_mjctrl_ac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	neogeo_mjctrl_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 	// device_neogeo_control_port_interface overrides
 	virtual UINT8 read_ctrl() override;
 	virtual void write_ctrlsel(UINT8 data) override;
-	
+
 private:
 	required_ioport_array<4> m_mjpanel;
 	UINT8 m_ctrl_sel;

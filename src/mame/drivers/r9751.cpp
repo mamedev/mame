@@ -125,12 +125,12 @@ UINT32 r9751_state::debug_a6()
 
 UINT32 r9751_state::debug_a5()
 {
-        return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13]);
+		return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13]);
 }
 
 UINT32 r9751_state::debug_a5_20()
 {
-        return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13] + 0x20);
+		return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13] + 0x20);
 }
 
 READ8_MEMBER(r9751_state::pdc_dma_r)

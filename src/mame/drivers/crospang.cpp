@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bestria_map, AS_PROGRAM, 16, crospang_state )
 	AM_IMPORT_FROM(crospang_base_map)
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITENOP // ??	
+	AM_RANGE(0x100000, 0x100001) AM_WRITENOP // ??
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(bestri_fg_scrollx_w)
 	AM_RANGE(0x100008, 0x100009) AM_WRITE(bestri_fg_scrolly_w)
 	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(bestri_bg_scrollx_w)

@@ -112,7 +112,7 @@ void avi_write::end_avi_recording()
 		m_output_file.reset();
 	}
 
-    m_recording = false;
+	m_recording = false;
 	m_output_file = nullptr;
 	m_frame = 0;
 }

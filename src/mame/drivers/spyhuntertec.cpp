@@ -409,7 +409,7 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 
 	*/
 //  printf("%04x spyhuntertec_in2_r\n", space.device().safe_pc());
-	
+
 	return (ioport("IN2")->read() & ~0x40) | ((m_analog_count == 0) ? 0x40 : 0x00);
 }
 

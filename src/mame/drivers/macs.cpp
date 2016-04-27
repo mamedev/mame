@@ -70,8 +70,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_ram2(*this, "ram2"),
 			m_maincpu(*this,"maincpu"),
-            m_cart1(*this, "slot_a"),
-            m_cart2(*this, "slot_b")
+			m_cart1(*this, "slot_a"),
+			m_cart2(*this, "slot_b")
 			{ }
 
 	UINT8 m_mux_data;
@@ -87,13 +87,13 @@ public:
 	DECLARE_DRIVER_INIT(kisekaem);
 	DECLARE_DRIVER_INIT(macs2);
 	DECLARE_MACHINE_RESET(macs);
-    DECLARE_MACHINE_START(macs);
+	DECLARE_MACHINE_START(macs);
 
 	UINT32 screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	optional_device<st0016_cpu_device> m_maincpu;
-    optional_device<generic_slot_device> m_cart1;
-    optional_device<generic_slot_device> m_cart2;
+	optional_device<generic_slot_device> m_cart1;
+	optional_device<generic_slot_device> m_cart2;
 
 };
 
@@ -115,7 +115,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(macs_state::rambank_w)
 {
-    membank("bank3")->set_entry(2 + (data & 1));
+	membank("bank3")->set_entry(2 + (data & 1));
 }
 
 READ8_MEMBER(macs_state::macs_input_r)
@@ -153,12 +153,12 @@ READ8_MEMBER(macs_state::macs_input_r)
 
 WRITE8_MEMBER(macs_state::macs_rom_bank_w)
 {
-    membank("bank1")->set_entry(macs_cart_slot * 0x100 + data);
+	membank("bank1")->set_entry(macs_cart_slot * 0x100 + data);
 }
 
 WRITE8_MEMBER(macs_state::macs_output_w)
 {
-    switch(offset)
+	switch(offset)
 	{
 		case 0:
 		/*
@@ -169,13 +169,13 @@ WRITE8_MEMBER(macs_state::macs_output_w)
 
 		if(m_rev == 1)
 		{
-            /* FIXME: dunno if this RAM bank is right, DASM tracking made on the POST
-                screens indicates that there's just one RAM bank, but then MACS2 games 
-                locks up. */
-            membank("bank3")->set_entry(BIT(data, 5));
+			/* FIXME: dunno if this RAM bank is right, DASM tracking made on the POST
+			    screens indicates that there's just one RAM bank, but then MACS2 games
+			    locks up. */
+			membank("bank3")->set_entry(BIT(data, 5));
 
 			macs_cart_slot = (data & 0xc) >> 2;
-            membank("bank4")->set_entry(macs_cart_slot * 0x100);
+			membank("bank4")->set_entry(macs_cart_slot * 0x100);
 		}
 
 		membank("bank2")->set_entry(BIT(data, 5));
@@ -492,7 +492,7 @@ static MACHINE_CONFIG_START( macs, macs_state )
 
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", macs_state,  irq0_line_hold)
 
-    MCFG_MACHINE_START_OVERRIDE(macs_state,macs)
+	MCFG_MACHINE_START_OVERRIDE(macs_state,macs)
 	MCFG_MACHINE_RESET_OVERRIDE(macs_state,macs)
 
 	/* video hardware */
@@ -504,10 +504,10 @@ static MACHINE_CONFIG_START( macs, macs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(macs_state, screen_update_macs)
 	MCFG_SCREEN_PALETTE("maincpu:palette")
 
-    MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT("slot_a", generic_plain_slot, "macs_cart", "rom")
-    MCFG_SET_IMAGE_LOADABLE(FALSE)
-    MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT("slot_b", generic_plain_slot, "macs_cart", "rom")
-    MCFG_SET_IMAGE_LOADABLE(FALSE)
+	MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT("slot_a", generic_plain_slot, "macs_cart", "rom")
+	MCFG_SET_IMAGE_LOADABLE(FALSE)
+	MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT("slot_b", generic_plain_slot, "macs_cart", "rom")
+	MCFG_SET_IMAGE_LOADABLE(FALSE)
 
 MACHINE_CONFIG_END
 
@@ -528,8 +528,8 @@ ROM_START( macsbios )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
 
-    ROM_REGION( 0x400000, "slot_a:rom", ROMREGION_ERASEFF )
-    ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "slot_a:rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( mac2bios )
@@ -538,8 +538,8 @@ ROM_START( mac2bios )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
 
-    ROM_REGION( 0x400000, "slot_a:rom", ROMREGION_ERASEFF )
-    ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "slot_a:rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( kisekaem )
@@ -548,12 +548,12 @@ ROM_START( kisekaem )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
 
-    ROM_REGION( 0x400000, "slot_a:rom", 0 )
-    ROM_LOAD16_BYTE( "am-mj.u8", 0x000000, 0x100000, CRC(3cf85151) SHA1(e05400065c384730f04ef565db5ba27eb3973d15) )
-    ROM_LOAD16_BYTE( "am-mj.u7", 0x000001, 0x100000, CRC(4b645354) SHA1(1dbf9141c3724e5dff2cd8066117fb1b94671a80) )
-    ROM_LOAD16_BYTE( "am-mj.u6", 0x200000, 0x100000, CRC(23b3aa24) SHA1(bfabdb16f9b1b60230bb636a944ab46fdfda49d7) )
-    ROM_LOAD16_BYTE( "am-mj.u5", 0x200001, 0x100000, CRC(b4d53e29) SHA1(d7683fdd5531bf1aa0ef1e4e6f517b31e2d5829e) )
-    ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "slot_a:rom", 0 )
+	ROM_LOAD16_BYTE( "am-mj.u8", 0x000000, 0x100000, CRC(3cf85151) SHA1(e05400065c384730f04ef565db5ba27eb3973d15) )
+	ROM_LOAD16_BYTE( "am-mj.u7", 0x000001, 0x100000, CRC(4b645354) SHA1(1dbf9141c3724e5dff2cd8066117fb1b94671a80) )
+	ROM_LOAD16_BYTE( "am-mj.u6", 0x200000, 0x100000, CRC(23b3aa24) SHA1(bfabdb16f9b1b60230bb636a944ab46fdfda49d7) )
+	ROM_LOAD16_BYTE( "am-mj.u5", 0x200001, 0x100000, CRC(b4d53e29) SHA1(d7683fdd5531bf1aa0ef1e4e6f517b31e2d5829e) )
+	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( kisekaeh )
@@ -562,19 +562,19 @@ ROM_START( kisekaeh )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
 
-    ROM_REGION( 0x400000, "slot_a:rom", 0 )
-    ROM_LOAD16_BYTE( "kh-u8.bin", 0x000000, 0x100000, CRC(601b9e6a) SHA1(54508a6db3928f78897df64ce400791e4789d0f6) )
-    ROM_LOAD16_BYTE( "kh-u7.bin", 0x000001, 0x100000, CRC(8f6e4bb3) SHA1(361545189feeda0887f930727d25655309b84629) )
-    ROM_LOAD16_BYTE( "kh-u6.bin", 0x200000, 0x100000, CRC(8e700204) SHA1(876e5530d749828de077293cb109a71b67cef140) )
-    ROM_LOAD16_BYTE( "kh-u5.bin", 0x200001, 0x100000, CRC(709bf7c8) SHA1(0a93e0c4f9be22a3302a1c5d2a6ec4739b202ea8) )
-    ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "slot_a:rom", 0 )
+	ROM_LOAD16_BYTE( "kh-u8.bin", 0x000000, 0x100000, CRC(601b9e6a) SHA1(54508a6db3928f78897df64ce400791e4789d0f6) )
+	ROM_LOAD16_BYTE( "kh-u7.bin", 0x000001, 0x100000, CRC(8f6e4bb3) SHA1(361545189feeda0887f930727d25655309b84629) )
+	ROM_LOAD16_BYTE( "kh-u6.bin", 0x200000, 0x100000, CRC(8e700204) SHA1(876e5530d749828de077293cb109a71b67cef140) )
+	ROM_LOAD16_BYTE( "kh-u5.bin", 0x200001, 0x100000, CRC(709bf7c8) SHA1(0a93e0c4f9be22a3302a1c5d2a6ec4739b202ea8) )
+	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( cultname ) // uses printer - two different games ? (slot a - checks for printer, slot b - not)
 	MACS_BIOS
 
-    ROM_REGION( 0x1000000, "maincpu", 0 )
-    ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
 
 	ROM_REGION( 0x400000, "slot_a:rom", 0 )
 	ROM_LOAD16_BYTE( "cult-d0.u8", 0x000000, 0x100000, CRC(394bc1a6) SHA1(98df5406862234815b46c7b0ac0b19e4b597d1b6) )
@@ -602,8 +602,8 @@ ROM_START( yuka )
 
 	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASE00 )
 
-    ROM_REGION( 0x1000000, "maincpu", 0 )
-    ROM_COPY( "slot_a:rom",   0x000000, 0x000000, 0x400000 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_COPY( "slot_a:rom",   0x000000, 0x000000, 0x400000 )
 ROM_END
 
 ROM_START( yujan )
@@ -617,8 +617,8 @@ ROM_START( yujan )
 
 	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
 
-    ROM_REGION( 0x1000000, "maincpu", 0 )
-    ROM_COPY( "slot_a:rom",   0x000000, 0x000000, 0x400000 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_COPY( "slot_a:rom",   0x000000, 0x000000, 0x400000 )
 ROM_END
 
 #if 0
@@ -639,27 +639,27 @@ static const UINT8 ramdata[160]=
 
 MACHINE_START_MEMBER(macs_state,macs)
 {
-    membank("bank1")->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
-    membank("bank1")->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
-    membank("bank1")->configure_entries(512, 256, m_cart2->get_rom_base(), 0x4000);
-    membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
+	membank("bank1")->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
+	membank("bank1")->configure_entries(512, 256, m_cart2->get_rom_base(), 0x4000);
+	membank("bank1")->set_entry(0);
 
-    membank("bank2")->configure_entries(0, 2, m_ram1.get() + 0x2000, 0x800);
-    membank("bank2")->set_entry(0);
+	membank("bank2")->configure_entries(0, 2, m_ram1.get() + 0x2000, 0x800);
+	membank("bank2")->set_entry(0);
 
-    membank("bank3")->configure_entries(0, 4, m_ram1.get(), 0x800);
-    membank("bank3")->set_entry(2);
+	membank("bank3")->configure_entries(0, 4, m_ram1.get(), 0x800);
+	membank("bank3")->set_entry(2);
 
-    membank("bank4")->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
-    membank("bank4")->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
-    membank("bank4")->configure_entries(512, 256, m_cart2->get_rom_base(), 0x4000);
-    membank("bank4")->set_entry(0);
+	membank("bank4")->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
+	membank("bank4")->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
+	membank("bank4")->configure_entries(512, 256, m_cart2->get_rom_base(), 0x4000);
+	membank("bank4")->set_entry(0);
 }
 
 MACHINE_RESET_MEMBER(macs_state,macs)
 {
 	#if 0
-    UINT8 *macs_ram1 = m_ram1.get();
+	UINT8 *macs_ram1 = m_ram1.get();
 	UINT8 *macs_ram2 = m_ram2;
 /*
         BIOS ram init:

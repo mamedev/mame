@@ -63,7 +63,7 @@ class sdl_event_subscriber
 {
 public:
 	virtual ~sdl_event_subscriber() {}
-	virtual void handle_event(SDL_Event &sdlevent) = 0;	
+	virtual void handle_event(SDL_Event &sdlevent) = 0;
 };
 
 template <class TSubscriber>

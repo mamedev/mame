@@ -2157,7 +2157,7 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 			// PIF RAM -> RDRAM
 			if(si_status & 1)
 			{
-				si_status |= 8; //DMA Error, overlapping request		
+				si_status |= 8; //DMA Error, overlapping request
 				return; // SI Busy, ignore request
 			}
 			si_pif_addr = data;
@@ -2171,7 +2171,7 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 			// RDRAM -> PIF RAM
 			if(si_status & 1)
 			{
-				si_status |= 8; //DMA Error, overlapping request		
+				si_status |= 8; //DMA Error, overlapping request
 				return; // SI Busy, ignore request
 			}
 			si_pif_addr = data;

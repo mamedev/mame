@@ -917,16 +917,12 @@ DRIVER_INIT_MEMBER(senjyo_state,starforc)
 }
 DRIVER_INIT_MEMBER(senjyo_state,starfore)
 {
-
-
 	m_is_senjyo = 0;
 	m_scrollhack = 0;
 }
 
 DRIVER_INIT_MEMBER(senjyo_state,starfora)
 {
-
-
 	m_is_senjyo = 0;
 	m_scrollhack = 1;
 }

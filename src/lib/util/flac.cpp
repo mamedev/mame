@@ -277,18 +277,18 @@ FLAC__StreamEncoderWriteStatus flac_encoder::write_callback(const FLAC__byte buf
 
 flac_decoder::flac_decoder()
 	: m_decoder(FLAC__stream_decoder_new()),
-	  m_file(nullptr), 
-	  m_sample_rate(0), 
-	  m_channels(0), 
-	  m_bits_per_sample(0),
-	  m_compressed_offset(0),
-	  m_compressed_start(nullptr),
-	  m_compressed_length(0),
-	  m_compressed2_start(nullptr),
-	  m_compressed2_length(0), 
-	  m_uncompressed_offset(0),
-	  m_uncompressed_length(0), 
-	  m_uncompressed_swap(false)
+		m_file(nullptr),
+		m_sample_rate(0),
+		m_channels(0),
+		m_bits_per_sample(0),
+		m_compressed_offset(0),
+		m_compressed_start(nullptr),
+		m_compressed_length(0),
+		m_compressed2_start(nullptr),
+		m_compressed2_length(0),
+		m_uncompressed_offset(0),
+		m_uncompressed_length(0),
+		m_uncompressed_swap(false)
 {
 }
 

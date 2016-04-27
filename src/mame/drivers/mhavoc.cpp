@@ -302,7 +302,7 @@ ADDRESS_MAP_END
  *  Gamma CPU memory handlers
  *
  *************************************/
- 
+
 /*
 a15 a14 a13 a12 a11 a10 a09 a08 a07 a06 a05 a04 a03 a02 a01 a00
 0   0   0   x   x   *   *   *   *   *   *   *   *   *   *   *      RW ZRAM (6116 SRAM@9PQ)

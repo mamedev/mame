@@ -159,7 +159,7 @@ void sm511_device::execute_one()
 			break; // 0xfc
 
 	} // big switch
-	
+
 	// BM high bit is only valid for 1 step
 	m_sbm = (m_op == 0x02);
 }

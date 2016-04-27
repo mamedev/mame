@@ -14948,7 +14948,7 @@ but dumps still have to be confirmed.
 				<rom name="F1 Champion Edtn MDRIVE ROM3 Eval only.BIN" size="0x080000" crc="7863f441" sha1="ccad151b160a7b361d2d8982d56e80895b4799a7" offset="0x100001" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="f1circus">
 		<description>F1 Circus MD (Jpn)</description>

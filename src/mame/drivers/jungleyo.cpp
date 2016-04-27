@@ -4,24 +4,24 @@
 /*
 
  CPUs
-QTY 	Type 	clock 	position 	function
-1x 	MC68HC000FN10 		u3 	16/32-bit Microprocessor - main
-1x 	u6295 		u98 	4-Channel Mixing ADCPM Voice Synthesis LSI - sound
-1x 	HA17358 		u101 	Dual Operational Amplifier - sound
-1x 	TDA2003 		u104 	Audio Amplifier - sound
-1x 	oscillator 	12.000MHz 	osc1 	
+QTY     Type    clock   position    function
+1x  MC68HC000FN10       u3  16/32-bit Microprocessor - main
+1x  u6295       u98     4-Channel Mixing ADCPM Voice Synthesis LSI - sound
+1x  HA17358         u101    Dual Operational Amplifier - sound
+1x  TDA2003         u104    Audio Amplifier - sound
+1x  oscillator  12.000MHz   osc1
 ROMs
-QTY 	Type 	position 	status
-2x 	M27C1001 	2,3 	dumped
-1x 	M27C2001 	1 	dumped
-3x 	M27C4001 	4,5,6 	dumped
+QTY     Type    position    status
+2x  M27C1001    2,3     dumped
+1x  M27C2001    1   dumped
+3x  M27C4001    4,5,6   dumped
 RAMs
-QTY 	Type 	position
-11x 	LH52B256-10PLL 	u16a,u17a,u27,u28,u29,u30,u39,u40,u74,u75,u76
+QTY     Type    position
+11x     LH52B256-10PLL  u16a,u17a,u27,u28,u29,u30,u39,u40,u74,u75,u76
 PLDs
-QTY 	Type 	position 	status
-1x 	ATF20V8B-15PC 	u37 	read protected
-2x 	A40MX04-F-PL84 	u83,u86 	read protected
+QTY     Type    position    status
+1x  ATF20V8B-15PC   u37     read protected
+2x  A40MX04-F-PL84  u83,u86     read protected
 Others
 
 1x 28x2 JAMMA edge connector
@@ -31,7 +31,7 @@ Others
 1x battery 3.6V (BT1)
 Notes
 
-PCB silkscreened: "MADE IN TAIWAN YONSHI PCB NO-006F" 
+PCB silkscreened: "MADE IN TAIWAN YONSHI PCB NO-006F"
 
 */
 
@@ -95,9 +95,9 @@ static const gfx_layout jungleyo16_layout =
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	  8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64,
-	 16*64,17*64,18*64,19*64,20*64,21*64,22*64,23*64,
-	 24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64 },
+		8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64,
+		16*64,17*64,18*64,19*64,20*64,21*64,22*64,23*64,
+		24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64 },
 	8*64*4
 };
 

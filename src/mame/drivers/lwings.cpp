@@ -1746,5 +1746,3 @@ GAME( 1987, buraikenb, avengers, avengersb,avengers, lwings_state, avengersb, RO
 
 // cloned lwings hardware
 GAME( 1992, fball,  0,    fball, fball, driver_device,  0, ROT0, "FM Work", "Fire Ball (FM Work)", MACHINE_SUPPORTS_SAVE )
-
-	

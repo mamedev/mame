@@ -6756,21 +6756,20 @@ void drcbe_x64::op_fcopyi(x86code *&dst, const instruction &inst)
 		{
 			if (dstp.is_memory())
 			{
-				emit_mov_p32_r32(dst, dstp, srcp.ireg());								// mov      dstp,srcp
+				emit_mov_p32_r32(dst, dstp, srcp.ireg());                               // mov      dstp,srcp
 			}
 			else
 			{
-				emit_movd_r128_r32(dst, dstreg, srcp.ireg());							// movd     dstreg,srcp
-				emit_movss_p32_r128(dst, dstp, dstreg);									// movss    dstp,dstreg
+				emit_movd_r128_r32(dst, dstreg, srcp.ireg());                           // movd     dstreg,srcp
+				emit_movss_p32_r128(dst, dstp, dstreg);                                 // movss    dstp,dstreg
 			}
 		}
-		
+
 	}
 
 	// 64-bit form
 	else if (inst.size() == 8)
 	{
-		
 		if (srcp.is_memory())
 		{
 			emit_movq_r128_m64(dst, dstreg, MABS(srcp.memory()));                       // movq     dstreg,[srcp]
@@ -6780,12 +6779,12 @@ void drcbe_x64::op_fcopyi(x86code *&dst, const instruction &inst)
 		{
 			if (dstp.is_memory())
 			{
-				emit_mov_p64_r64(dst, dstp, srcp.ireg());								// mov      dstp,srcp
+				emit_mov_p64_r64(dst, dstp, srcp.ireg());                               // mov      dstp,srcp
 			}
 			else
 			{
-				emit_movq_r128_r64(dst, dstreg, srcp.ireg());							// movq     dstreg,srcp
-				emit_movsd_p64_r128(dst, dstp, dstreg);									// movsd    dstp,dstreg
+				emit_movq_r128_r64(dst, dstreg, srcp.ireg());                           // movq     dstreg,srcp
+				emit_movsd_p64_r128(dst, dstp, dstreg);                                 // movsd    dstp,dstreg
 			}
 		}
 
@@ -6821,13 +6820,13 @@ void drcbe_x64::op_icopyf(x86code *&dst, const instruction &inst)
 		{
 			if (dstp.is_memory())
 			{
-				emit_movd_m32_r128(dst, MABS(dstp.memory()), srcp.freg());				// movd     dstp,srcp
+				emit_movd_m32_r128(dst, MABS(dstp.memory()), srcp.freg());              // movd     dstp,srcp
 			}
 			else
 			{
-				emit_movd_r32_r128(dst, dstp.ireg(), srcp.freg());						// movd     dstp,srcp
+				emit_movd_r32_r128(dst, dstp.ireg(), srcp.freg());                      // movd     dstp,srcp
 			}
-		}	
+		}
 	}
 
 	// 64-bit form
@@ -6843,11 +6842,11 @@ void drcbe_x64::op_icopyf(x86code *&dst, const instruction &inst)
 		{
 			if (dstp.is_memory())
 			{
-				emit_movq_m64_r128(dst, MABS(dstp.memory()), srcp.freg());				// movq     dstp,srcp
+				emit_movq_m64_r128(dst, MABS(dstp.memory()), srcp.freg());              // movq     dstp,srcp
 			}
 			else
 			{
-				emit_movq_r64_r128(dst, dstp.ireg(), srcp.freg());						// movq     dstp,srcp
+				emit_movq_r64_r128(dst, dstp.ireg(), srcp.freg());                      // movq     dstp,srcp
 			}
 		}
 	}

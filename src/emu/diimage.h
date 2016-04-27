@@ -129,7 +129,7 @@ typedef void (*device_image_partialhash_func)(hash_collection &, const unsigned 
 #define DEVICE_IMAGE_UNLOAD_DELEGATE(_class,_name)      device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_name),#_class "::device_image_unload_" #_name, downcast<_class *>(device->owner()))
 
 #define MCFG_SET_IMAGE_LOADABLE(_usrload) \
-    device_image_interface::static_set_user_loadable(*device, _usrload);
+	device_image_interface::static_set_user_loadable(*device, _usrload);
 
 
 // ======================> device_image_interface
@@ -237,15 +237,15 @@ public:
 	int reopen_for_write(const char *path);
 
 	static void software_name_split(const char *swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart);
-    static void static_set_user_loadable(device_t &device, bool user_loadable) {
-        device_image_interface *img;
-        if (!device.interface(img))
-            throw emu_fatalerror("MCFG_SET_IMAGE_LOADABLE called on device '%s' with no image interface\n", device.tag());
-        
-        img->m_user_loadable = user_loadable;
-    }
+	static void static_set_user_loadable(device_t &device, bool user_loadable) {
+		device_image_interface *img;
+		if (!device.interface(img))
+			throw emu_fatalerror("MCFG_SET_IMAGE_LOADABLE called on device '%s' with no image interface\n", device.tag());
 
-    bool user_loadable() const { return m_user_loadable; }
+		img->m_user_loadable = user_loadable;
+	}
+
+	bool user_loadable() const { return m_user_loadable; }
 
 protected:
 	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args, bool just_load);
@@ -318,13 +318,13 @@ protected:
 
 	std::string m_brief_instance_name;
 	std::string m_instance_name;
-    
+
 	/* creation info */
 	simple_list<image_device_format> m_formatlist;
 
-    /* in the case of arcade cabinet with fixed carts inserted, 
-     we want to disable command line cart loading... */
-    bool m_user_loadable;
+	/* in the case of arcade cabinet with fixed carts inserted,
+	 we want to disable command line cart loading... */
+	bool m_user_loadable;
 
 	bool m_is_loading;
 };

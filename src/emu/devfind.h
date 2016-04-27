@@ -359,7 +359,7 @@ class optional_region_ptr : public region_ptr_finder<_PointerType, false>
 {
 public:
 	optional_region_ptr(device_t &base, const char *tag, size_t length = 0) : region_ptr_finder<_PointerType, false>(base, tag, length) { }
-	optional_region_ptr(device_t &base, size_t length = 0) : 	region_ptr_finder<_PointerType, false>(base, FINDER_DUMMY_TAG, length) { }
+	optional_region_ptr(device_t &base, size_t length = 0) :    region_ptr_finder<_PointerType, false>(base, FINDER_DUMMY_TAG, length) { }
 };
 
 // required region pointer finder
@@ -368,7 +368,7 @@ class required_region_ptr : public region_ptr_finder<_PointerType, true>
 {
 public:
 	required_region_ptr(device_t &base, const char *tag, size_t length = 0) : region_ptr_finder<_PointerType, true>(base, tag, length) { }
-	required_region_ptr(device_t &base, size_t length = 0) : 	region_ptr_finder<_PointerType, true>(base, FINDER_DUMMY_TAG, length) { }
+	required_region_ptr(device_t &base, size_t length = 0) :    region_ptr_finder<_PointerType, true>(base, FINDER_DUMMY_TAG, length) { }
 };
 
 

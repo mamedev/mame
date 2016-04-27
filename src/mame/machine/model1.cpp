@@ -268,11 +268,11 @@ TGP_FUNCTION( model1_state::triangle_normal )
 		nn = 0;
 	else
 		nn = 1/nn;
-			
+
 	nx *= nn;
 	ny *= nn;
 	nz *= nn;
-		
+
 	logerror("TGP triangle_normal %f, %f, %f, %f, %f, %f, %f, %f, %f (%x)\n", p1x, p1y, p1z, p2x, p2y,p2z, p3x, p3y, p3z, m_pushpc);
 	fifoout_push_f(nx);
 	fifoout_push_f(ny);

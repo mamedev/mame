@@ -420,11 +420,11 @@ float render_font::string_width(float height, float aspect, const char *string)
 	const char *ends = string + strlen(string);
 	const char *s = string;
 	unicode_char schar;
-	
+
 	// loop over characters
 	while (*s != 0)
 	{
-		int	scharcount = uchar_from_utf8(&schar, s, ends - s);
+		int scharcount = uchar_from_utf8(&schar, s, ends - s);
 		totwidth += get_char(schar).width;
 		s += scharcount;
 	}

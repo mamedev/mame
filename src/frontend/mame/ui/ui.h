@@ -155,7 +155,7 @@ public:
 	std::string &game_info_astring(std::string &str);
 
 	// slider controls
-	std::vector<ui_menu_item>&	get_slider_list(void);
+	std::vector<ui_menu_item>&  get_slider_list(void);
 
 	// other
 	void process_natural_keyboard();
@@ -166,7 +166,7 @@ public:
 	// draw an outlined box with given line color and filled with a texture
 	void draw_textured_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, UINT32 flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	virtual void popup_time_string(int seconds, std::string message) override;
-	
+
 	virtual void image_display(const device_type &type, device_image_interface *image) override;
 private:
 	// instance variables

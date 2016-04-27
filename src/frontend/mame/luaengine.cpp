@@ -1469,7 +1469,7 @@ int lua_engine::lua_screen::l_draw_line(lua_State *L)
 
 //-------------------------------------------------
 //  draw_text - draw text on a screen container
-//	if x is a position, then y is a pixel position, otherwise x and y are screen size relative
+//  if x is a position, then y is a pixel position, otherwise x and y are screen size relative
 //  -> manager:machine().screens[":screen"]:draw_text(x, y, message)
 //-------------------------------------------------
 
@@ -2093,26 +2093,26 @@ int lua_engine::lua_machine::l_logerror(lua_State *L)
 
 std::string lua_engine::get_print_buffer(lua_State *L)
 {
-    int nargs = lua_gettop(L);
-    
-    const std::string sep = " ";
-    
-    std::ostringstream ss;
-    bool first = true;
+	int nargs = lua_gettop(L);
 
-    for (int i = 1; i <= nargs; i++) {
-      const char* c = lua_tostring(L, i);
-      const std::string str = c ? c : "<nil>";
-      if (first) first = false;
-      else ss << sep;
-      ss << str;
-    }
+	const std::string sep = " ";
+
+	std::ostringstream ss;
+	bool first = true;
+
+	for (int i = 1; i <= nargs; i++) {
+		const char* c = lua_tostring(L, i);
+		const std::string str = c ? c : "<nil>";
+		if (first) first = false;
+		else ss << sep;
+		ss << str;
+	}
 
 	return ss.str();
 }
 int lua_engine::l_osd_printf_verbose(lua_State *L)
 {
-    osd_printf_verbose("%s\n",get_print_buffer(L).c_str());
+	osd_printf_verbose("%s\n",get_print_buffer(L).c_str());
 	return 0;
 }
 

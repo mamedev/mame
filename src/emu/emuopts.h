@@ -15,7 +15,7 @@
 
 #include "options.h"
 
-#define OPTION_PRIORITY_CMDLINE		OPTION_PRIORITY_HIGH + 1
+#define OPTION_PRIORITY_CMDLINE     OPTION_PRIORITY_HIGH + 1
 // core options
 #define OPTION_SYSTEMNAME           core_options::unadorned(0)
 #define OPTION_SOFTWARENAME         core_options::unadorned(1)
@@ -369,7 +369,7 @@ public:
 	const char *no_plugin() const { return value(OPTION_NO_PLUGIN); }
 
 	const char *language() const { return value(OPTION_LANGUAGE); }
-	
+
 	// cache frequently used options in members
 	void update_cached_options();
 

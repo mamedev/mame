@@ -275,10 +275,10 @@ private:
 	}
 
 	//-----------------------------------------------------------------------------
-	// Enum each PNP device using WMI and check each device ID to see if it contains 
+	// Enum each PNP device using WMI and check each device ID to see if it contains
 	// "IG_" (ex. "VID_045E&PID_028E&IG_00").  If it does, then it's an XInput device
 	// Unfortunately this information can not be found by just using DirectInput.
-	// Checking against a VID/PID of 0x028E/0x045E won't find 3rd party or future 
+	// Checking against a VID/PID of 0x028E/0x045E won't find 3rd party or future
 	// XInput devices.
 	//-----------------------------------------------------------------------------
 	HRESULT get_xinput_devices(std::list<DWORD> &xinput_id_list) const
@@ -317,7 +317,7 @@ private:
 		bstrDeviceID = bstr_ptr(SysAllocString(L"DeviceID"));
 		bstrClassName = bstr_ptr(SysAllocString(L"Win32_PNPEntity"));
 
-		// Connect to WMI 
+		// Connect to WMI
 		hr = pIWbemLocator->ConnectServer(
 			bstrNamespace.get(),
 			nullptr,
@@ -377,7 +377,7 @@ private:
 				if (SUCCEEDED(hr) && var.vt == VT_BSTR && var.bstrVal != nullptr)
 				{
 					// Check if the device ID contains "IG_".  If it does, then it's an XInput device
-					// Unfortunately this information can not be found by just using DirectInput 
+					// Unfortunately this information can not be found by just using DirectInput
 					if (wcsstr(var.bstrVal, L"IG_"))
 					{
 						// If it does, then get the VID/PID from var.bstrVal

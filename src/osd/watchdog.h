@@ -27,7 +27,7 @@ public:
 	osd_ticks_t     getTimeout(void) const { return m_timeout; }
 	void            setTimeout(int timeout);
 private:
-	osd_event      	m_event;
+	osd_event       m_event;
 	std::thread*    m_thread;
 	std::atomic<INT32>  m_do_exit;
 

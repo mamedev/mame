@@ -120,4 +120,3 @@ UINT8 saturn_analog_device::read_ctrl(UINT8 offset)
 	}
 	return res;
 }
-

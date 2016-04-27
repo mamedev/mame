@@ -2468,8 +2468,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cclimber_state,yamato)
 {
-
-
 	save_item(NAME(m_yamato_p0));
 	save_item(NAME(m_yamato_p1));
 }

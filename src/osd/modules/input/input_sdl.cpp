@@ -702,24 +702,24 @@ public:
 		: sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER), m_sixaxis_mode(false)
 	{
 	}
-	
+
 	virtual void exit() override
 	{
 		sdl_input_module::exit();
-	
+
 		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-	}	
-	
+	}
+
 	virtual void input_init(running_machine &machine) override
 	{
-	    SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
 		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK))
 		{
 			osd_printf_error("Could not initialize SDL Joystick: %s.\n", SDL_GetError());
 			return;
 		}
-		
+
 		sdl_input_module::input_init(machine);
 
 		char tempname[512];

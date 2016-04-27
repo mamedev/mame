@@ -106,7 +106,7 @@ void rtc9701_device::device_start()
 	rtc_state = RTC9701_CMD_WAIT;
 	cmd_stream_pos = 0;
 	current_cmd = 0;
-	
+
 	save_item(NAME(m_latch));
 	save_item(NAME(m_reset_line));
 	save_item(NAME(m_clock_line));

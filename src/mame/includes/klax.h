@@ -39,5 +39,5 @@ private:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
 
-	required_ioport	m_p1;
+	required_ioport m_p1;
 };

@@ -128,8 +128,8 @@ void dinput_keyboard_device::reset()
 
 dinput_api_helper::dinput_api_helper(int version)
 	: m_dinput(nullptr),
-	  m_dinput_version(version),
-	  m_pfn_DirectInputCreate("DirectInputCreateW", L"dinput.dll")
+		m_dinput_version(version),
+		m_pfn_DirectInputCreate("DirectInputCreateW", L"dinput.dll")
 {
 }
 
@@ -200,7 +200,7 @@ protected:
 public:
 	dinput_module(const char* type, const char* name)
 		: wininput_module(type, name),
-		  m_dinput_helper(nullptr)
+			m_dinput_helper(nullptr)
 	{
 	}
 

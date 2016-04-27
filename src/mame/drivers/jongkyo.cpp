@@ -499,7 +499,7 @@ static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 	MCFG_SEGACRPT_SET_SIZE(0x6c00)
 	MCFG_SEGACRPT_SET_NUMBANKS(8)
 	MCFG_SEGACRPT_SET_BANKSIZE(0x400)
-	//	sega_decode(rom, opcodes, 0x6c00, convtable, 8, 0x400);
+	//  sega_decode(rom, opcodes, 0x6c00, convtable, 8, 0x400);
 
 
 	/* video hardware */
@@ -557,7 +557,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(jongkyo_state,jongkyo)
 {
-
 	UINT8 *rom = memregion("maincpu")->base();
 
 	/* first of all, do a simple bitswap */
@@ -595,5 +594,3 @@ DRIVER_INIT_MEMBER(jongkyo_state,jongkyo)
  *************************************/
 
 GAME( 1985, jongkyo,  0,    jongkyo, jongkyo, jongkyo_state,  jongkyo, ROT0, "Kiwako", "Jongkyo", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-
-

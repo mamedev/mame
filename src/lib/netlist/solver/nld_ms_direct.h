@@ -46,7 +46,7 @@ struct ti_t
 	volatile std::atomic<int> lo;
 	thr_intf *intf;
 	void *params;
-//	int _block[29]; /* make it 256 bytes */
+//  int _block[29]; /* make it 256 bytes */
 };
 
 static ti_t ti[MAXTHR];
@@ -287,7 +287,7 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 #else
 					vec_add_mult_scalar(kN-i-1,pj,f1,pi);
 					//for (unsigned k = i+1; k < kN; k++)
-					//	pj[k] = pj[k] + pi[k] * f1;
+					//  pj[k] = pj[k] + pi[k] * f1;
 					//for (unsigned k = i+1; k < kN; k++)
 						//A(j,k) += A(i,k) * f1;
 					RHS(j) += RHS(i) * f1;

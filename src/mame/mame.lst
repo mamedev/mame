@@ -31,7 +31,7 @@
 
 @source:1945kiii.cpp
 1945kiii                        // (c) 2000 Oriental
-1945kiiio						// (c) 1999 Oriental
+1945kiiio                       // (c) 1999 Oriental
 flagrall                        // ?
 
 @source:20pacgal.cpp
@@ -2457,7 +2457,7 @@ gghost                          // (c) 1984
 gimeabrk                        // (c) 1985
 grudge                          // prototype - Bally/Midway
 hattrick                        // (c) 1984
-teamht							//
+teamht                          //
 minigolf                        // (c) 1985
 minigolf2                       // (c) 1985
 nametune                        // (c) 1986
@@ -2566,7 +2566,7 @@ bbcbc                           // 1985 BBC Bridge Companion
 bbusters                        // A9003 'BB' (c) 1989
 bbustersu                       // A9003 'BB' (c) 1989
 bbustersua                      // A9003 'BB' (c) 1989
-bbustersj						//
+bbustersj                       //
 mechatt                         // A8002 'MA' (c) 1989
 mechattj                        // A8002 'MA' (c) 1989
 mechattu                        // A8002 'MA' (c) 1989
@@ -10246,7 +10246,7 @@ crimfghtj                       // GX821 (c) 1989 (Japan)
 
 @source:crospang.cpp
 bestri                          // (c) F2 System
-bestria							//
+bestria                         //
 crospang                        // (c) 1998 F2 System
 heuksun                         // (c) 1998 Oksan / F2 System
 
@@ -12440,7 +12440,7 @@ snowboara                       // (c) 1996 - Ref 960419/1
 touchgo                         // (c) 1995 - Ref 950906
 touchgoe                        // (c) 1995 - Ref 950510-1
 touchgon                        // (c) 1995 - Ref 950906
-touchgok						// (c) 1995 - Ref 950510-1
+touchgok                        // (c) 1995 - Ref 950510-1
 wrally2                         // (c) 1995 - Ref 950510
 
 @source:gaelco3d.cpp
@@ -12597,7 +12597,7 @@ monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, 
 moonal2                         // [1980] Nichibutsu
 moonal2b                        // [1980] Nichibutsu
 moonaln                         // [Nichibutsu] (Karateco license) or hack
-kamikazp						// bootleg (Potomac Games)
+kamikazp                        // bootleg (Potomac Games)
 mooncmw                         // bootleg
 mooncptc                        // bootleg (Petaco S.A.)
 mooncreg                        // bootleg
@@ -17181,7 +17181,7 @@ leaguemn                        // (c) 1993 Irem (Japan)
 lethalth                        // (c) 1991 Irem (World)
 majtitl2                        // (c) 1992 Irem (World)
 majtitl2a                       //
-majtitl2b						//
+majtitl2b                       //
 majtitl2j                       // (c) 1992 Irem (Japan)
 mysticri                        // (c) 1992 Irem (World)
 mysticrib                       // bootleg?
@@ -17239,7 +17239,7 @@ macse30                         // 1989 Apple Macintosh SE/30
 macsefd                         // 1988 Apple Macintosh SE (FDHD)
 pmac6100                        // 1993 Apple Power Macintosh 6100
 unitron                         // 1985 Unitron
-utrn1024						// 1986 Unitron 1024
+utrn1024                        // 1986 Unitron 1024
 
 @source:macpci.cpp
 pippin                          //
@@ -19929,7 +19929,7 @@ mkla3                           // (c) 1992 Midway
 mkla4                           // (c) 1992 Midway
 mknifty                         // hack
 mknifty666                      // hack
-mkrep							// hack
+mkrep                           // hack
 mkprot4                         // (c) 1992 Midway
 mkprot8                         // (c) 1992 Midway
 mkprot9                         // (c) 1992 Midway
@@ -27705,7 +27705,7 @@ cosmogng                        // (c) 1991 (US)
 cosmogngj                       // (c) 1991 (Japan)
 dirtfoxj                        // (c) 1989 (Japan)
 dsaber                          // (c) 1990
-dsabera							//
+dsabera                         //
 dsaberj                         // (c) 1990 (Japan)
 finalap2                        // 90.8  Final Lap 2
 finalap2j                       // 90.8  Final Lap 2 (Japan)
@@ -28636,7 +28636,7 @@ rdaction                        // UPL-87003?(c) 1987 + World Games license
 robokid                         // UPL-88013 (c) 1988
 robokidj                        // UPL-88013 (c) 1988
 robokidj2                       // UPL-88013 (c) 1988
-robokidj3						//
+robokidj3                       //
 
 @source:ninjaw.cpp
 darius2                         // C07 (c) 1989 Taito Corporation (Japan)
@@ -28909,7 +28909,7 @@ opwolfa                         // B20 (c) 1987 Taito Corporation Japan (World)
 opwolfb                         // bootleg
 opwolfj                         // B20 (c) 1987 Taito Corporation (Japan)
 opwolfu                         // B20 (c) 1987 Taito America Corporation (US)
-opwolfp							// prototype?
+opwolfp                         // prototype?
 
 @source:orao.cpp
 orao                            //
@@ -29206,7 +29206,7 @@ sicpc1605                       //
 ssam88s                         //
 sx16                            // Sanyo SX-16
 zdsupers                        //
-ncrpc4i							// NCR PC4i
+ncrpc4i                         // NCR PC4i
 
 @source:pc100.cpp
 pc100                           //
@@ -29966,7 +29966,7 @@ ddpdoja                         //
 ddpdojb                         //
 ddpdojblk                       //
 ddpdojblka                      //
-ddpdojblkbl						//
+ddpdojblkbl                     //
 dmnfrnt                         // (c) 2002 Demon Front
 dmnfrnta                        //
 dmnfrntb                        //
@@ -29984,7 +29984,7 @@ dw2v100x                        //
 dwex                            // (c) 1998 Dragon World 3 EX
 dwpc                            // (c) 2001 Dragon World Pretty Chance
 espgal                          // (c) 2003 Espgaluda
-espgalbl						//
+espgalbl                        //
 happy6                          // (c) 2004 Happy 6
 happy6101                       //
 ket                             // (c) 2002 Ketsui
@@ -29997,7 +29997,7 @@ ketarr151                       // hack
 ketarrf                         // hack
 ketarrs15                       // hack
 ketarrs151                      // hack
-ketb							//
+ketb                            //
 ketbl                           //
 killbld                         // (c) 1998 The Killing Blade
 killbld104                      //
@@ -30273,7 +30273,7 @@ pc_moglf                        // (c) 1991 Nintendo
 pc_mtoid                        // (c) 1986 Nintendo
 pc_ngai2                        // (c) 1990 Tecmo (Nintendo of America license)
 pc_ngai3                        // (c) 1991 Tecmo (Nintendo of America license)
-pc_ttoon						//
+pc_ttoon                        //
 pc_ngaid                        // (c) 1989 Tecmo (Nintendo of America license)
 pc_pinbt                        // (c) 1988 Rare (Nintendo of America license)
 pc_pwbld                        // (c) 1991 Taito (Nintendo of America license)
@@ -31040,7 +31040,7 @@ raidendxa2                      // (c) 1994 Seibu Kaihatsu + Metrotainment licen
 raidendxch                      //
 raidendxg                       // (c) 1994 Seibu Kaihatsu + Tuning license
 raidendxj                       // (c) 1994 Seibu Kaihatsu
-raidendxja						// (c) 1994 Seibu Kaihatsu
+raidendxja                      // (c) 1994 Seibu Kaihatsu
 raidendxk                       // (c) 1994 Seibu Kaihatsu
 raidendxnl                      // (c) 1994 Seibu Kaihatsu
 raidendxu                       // (c) 1994 Seibu Kaihatsu + Fabtek license
@@ -33805,12 +33805,12 @@ nclubv3                         // 1997.07 Name Club Ver. 3
 othellos                        // 1998.07 Othello Shiyouyo (Success)
 pblbeach                        // 1996.03 Pebble Beach the Great Shot (T&E Soft)
 pclb2elk                        // 1997.07 Print Club Custom
-pckobe99						// Print Club Custom 3
+pckobe99                        // Print Club Custom 3
 pclove                          //
 pclove2                         //
 pclub2                          // 1997.09 Print Club 2
 pclub26w                        //
-pclub26wa						//
+pclub26wa                       //
 pclub27s                        //
 pclub2fc                        // 1997.04 Print Club 2 Felix The Cat
 pclub2kc                        // 1997.02 Print Club Kome Kome Club
@@ -33821,17 +33821,17 @@ pclub2wb                        //
 pclubol                         // 1998.07 Print Club Olive
 pclubor                         // 1999.11 Print Club Goukakenran
 pclubpok                        // 1999.11 Print Club Pokemon
-pcpooh2							//
-pcpooh3							//
+pcpooh2                         //
+pcpooh3                         //
 pclubyo2                        //
-prc28su							// Vol 8. Summer 97
-prc29au							// Vol 9. Autumn 97
+prc28su                         // Vol 8. Summer 97
+prc29au                         // Vol 9. Autumn 97
 prc297wi                        // 1997.10 Print Club 2 '97 Winter Ver
 prc297wia                       //
 prc298au                        // 1998.08 Print Club 2 '98 Autumn Ver
 prc298sp                        // 1997.10 Print Club 2 '98 Spring Ver
 prc298su                        //
-prc2ksu							// Print Club Summer 2000
+prc2ksu                         // Print Club Summer 2000
 prikura                         // 1996.10 Prikura Daisakusen (Atlus)
 puyosun                         // 1996.12 Puyo Puyo SUN (Compile)
 rsgun                           // 1998.05 Radient Silver Gun (Treasure)
@@ -34202,7 +34202,7 @@ wboy4                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy5                           // 834-5984 (c) 1986 + Escape license (S1)
 wboyo                           // 834-5984 (c) 1986 + Escape license (S1)
 wboysys2                        // 834-5984  (c) 1986 + Escape license (S1)
-wboysys2a						//
+wboysys2a                       //
 wboyu                           // 834-5753 (? maybe a conversion) (c) 1986 + Escape license (S1)
 wboyub                          // bootleg of wboyu
 wmatch                          // (c) 1984 (S1)

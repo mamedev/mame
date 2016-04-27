@@ -39,7 +39,7 @@ O46 47 |                                                | 14 K3
 O36 48 | *                                              | 13 K2
        |________________________________________________/
 
-          1   2   3   4   5   6   7   8   9  10  11  12      
+          1   2   3   4   5   6   7   8   9  10  11  12
          O26 O16 R4  R3  R2  R1  GND _T  bt  al  ACL K1   note: bt = beta symbol, al = alpha symbol
 */
 
@@ -57,7 +57,7 @@ protected:
 	// opcode handlers
 	virtual void op_lb() override;
 	virtual void op_incb() override;
-	
+
 	virtual void op_comcb();
 	virtual void op_ssr();
 	virtual void op_trs();

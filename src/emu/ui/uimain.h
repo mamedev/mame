@@ -57,11 +57,11 @@ enum class ui_menu_item_type
 class ui_menu_item
 {
 public:
-	const char  		*text;
-	const char  		*subtext;
-	UINT32      		flags;
-	void        		*ref;
-	ui_menu_item_type	type;	// item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
+	const char          *text;
+	const char          *subtext;
+	UINT32              flags;
+	void                *ref;
+	ui_menu_item_type   type;   // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
 
 	inline bool is_selectable() const;
 };
@@ -73,27 +73,27 @@ public:
 	ui_manager(running_machine &machine) : m_machine(machine),m_use_natural_keyboard(false),m_show_timecode_counter(false),m_show_timecode_total(false) { }
 
 	virtual ~ui_manager() { }
-	
+
 	virtual void set_startup_text(const char *text, bool force) { }
-	
+
 	virtual bool is_menu_active() { return false; }
-	
+
 	bool use_natural_keyboard() const { return m_use_natural_keyboard; }
-	
+
 	void set_show_timecode_counter(bool value) { m_show_timecode_counter = value; m_show_timecode_total = true; }
 
 	bool show_timecode_counter() const { return m_show_timecode_counter; }
-    bool show_timecode_total() const { return m_show_timecode_total; }
-	
-	virtual void popup_time_string(int seconds, std::string message) { } 
+	bool show_timecode_total() const { return m_show_timecode_total; }
+
+	virtual void popup_time_string(int seconds, std::string message) { }
 
 	virtual void image_display(const device_type &type, device_image_interface *image) { }
-	
+
 	template <typename Format, typename... Params> void popup_time(int seconds, Format &&fmt, Params &&... args);
-	
+
 protected:
 	// instance variables
-	running_machine &       m_machine;	
+	running_machine &       m_machine;
 	bool                    m_use_natural_keyboard;
 	bool                    m_show_timecode_counter;
 	bool                    m_show_timecode_total;

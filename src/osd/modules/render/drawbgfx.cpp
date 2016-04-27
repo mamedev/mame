@@ -94,16 +94,19 @@ renderer_bgfx::renderer_bgfx(std::shared_ptr<osd_window> w)
 
 renderer_bgfx::~renderer_bgfx()
 {
+	bgfx::reset(0, 0, BGFX_RESET_NONE);
+	bgfx::touch(0);
+	bgfx::frame();
 	if (m_avi_writer != nullptr && m_avi_writer->recording())
 	{
 		m_avi_writer->stop();
 
-        m_targets->destroy_target("avibuffer0");
-        m_avi_target = nullptr;
+		m_targets->destroy_target("avibuffer0");
+		m_avi_target = nullptr;
 
-        bgfx::destroyTexture(m_avi_texture);
+		bgfx::destroyTexture(m_avi_texture);
 
-        delete m_avi_writer;
+		delete m_avi_writer;
 		delete [] m_avi_data;
 	}
 
@@ -263,13 +266,13 @@ void renderer_bgfx::record()
 		m_avi_writer->stop();
 		m_targets->destroy_target("avibuffer0");
 		m_avi_target = nullptr;
-        bgfx::destroyTexture(m_avi_texture);
+		bgfx::destroyTexture(m_avi_texture);
 	}
 	else
 	{
 		m_avi_writer->record(m_options.bgfx_avi_name());
-        m_avi_target = m_targets->create_target("avibuffer", bgfx::TextureFormat::RGBA8, m_width[0], m_height[0], TARGET_STYLE_CUSTOM, false, true, 1, 0);
-        m_avi_texture = bgfx::createTexture2D(m_width[0], m_height[0], 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK);
+		m_avi_target = m_targets->create_target("avibuffer", bgfx::TextureFormat::RGBA8, m_width[0], m_height[0], TARGET_STYLE_CUSTOM, false, true, 1, 0);
+		m_avi_texture = bgfx::createTexture2D(m_width[0], m_height[0], 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK);
 	}
 }
 
@@ -307,7 +310,7 @@ bgfx::VertexDecl ScreenVertex::ms_decl;
 void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertices)
 {
 	rectangle_packer::packed_rectangle& rect = m_hash_to_entry[hash];
-    float size = float(CACHE_SIZE);
+	float size = float(CACHE_SIZE);
 	float u0 = (float(rect.x()) + 0.5f) / size;
 	float v0 = (float(rect.y()) + 0.5f) / size;
 	float u1 = u0 + (float(rect.width()) - 1.0f) / size;
@@ -341,22 +344,22 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, UINT32 hash, ScreenV
 		std::swap(v[1], v[3]);
 	}
 
-    vertex(&vertices[0], x[0], y[0], 0, rgba, u[0], v[0]);
-    vertex(&vertices[1], x[1], y[1], 0, rgba, u[1], v[1]);
-    vertex(&vertices[2], x[3], y[3], 0, rgba, u[3], v[3]);
-    vertex(&vertices[3], x[3], y[3], 0, rgba, u[3], v[3]);
-    vertex(&vertices[4], x[2], y[2], 0, rgba, u[2], v[2]);
-    vertex(&vertices[5], x[0], y[0], 0, rgba, u[0], v[0]);
+	vertex(&vertices[0], x[0], y[0], 0, rgba, u[0], v[0]);
+	vertex(&vertices[1], x[1], y[1], 0, rgba, u[1], v[1]);
+	vertex(&vertices[2], x[3], y[3], 0, rgba, u[3], v[3]);
+	vertex(&vertices[3], x[3], y[3], 0, rgba, u[3], v[3]);
+	vertex(&vertices[4], x[2], y[2], 0, rgba, u[2], v[2]);
+	vertex(&vertices[5], x[0], y[0], 0, rgba, u[0], v[0]);
 }
 
 void renderer_bgfx::vertex(ScreenVertex* vertex, float x, float y, float z, uint32_t rgba, float u, float v)
 {
-    vertex->m_x = x;
-    vertex->m_y = y;
-    vertex->m_z = z;
-    vertex->m_rgba = rgba;
-    vertex->m_u = u;
-    vertex->m_v = v;
+	vertex->m_x = x;
+	vertex->m_y = y;
+	vertex->m_z = z;
+	vertex->m_rgba = rgba;
+	vertex->m_u = u;
+	vertex->m_v = v;
 }
 
 void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen)
@@ -368,12 +371,12 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 	float u[4] = { prim->texcoords.tl.u, prim->texcoords.tr.u, prim->texcoords.bl.u, prim->texcoords.br.u };
 	float v[4] = { prim->texcoords.tl.v, prim->texcoords.tr.v, prim->texcoords.bl.v, prim->texcoords.br.v };
 
-    vertex(&vertices[0], x[0], y[0], 0, 0xffffffff, u[0], v[0]);
-    vertex(&vertices[1], x[1], y[1], 0, 0xffffffff, u[1], v[1]);
-    vertex(&vertices[2], x[3], y[3], 0, 0xffffffff, u[3], v[3]);
-    vertex(&vertices[3], x[3], y[3], 0, 0xffffffff, u[3], v[3]);
-    vertex(&vertices[4], x[2], y[2], 0, 0xffffffff, u[2], v[2]);
-    vertex(&vertices[5], x[0], y[0], 0, 0xffffffff, u[0], v[0]);
+	vertex(&vertices[0], x[0], y[0], 0, 0xffffffff, u[0], v[0]);
+	vertex(&vertices[1], x[1], y[1], 0, 0xffffffff, u[1], v[1]);
+	vertex(&vertices[2], x[3], y[3], 0, 0xffffffff, u[3], v[3]);
+	vertex(&vertices[3], x[3], y[3], 0, 0xffffffff, u[3], v[3]);
+	vertex(&vertices[4], x[2], y[2], 0, 0xffffffff, u[2], v[2]);
+	vertex(&vertices[5], x[0], y[0], 0, 0xffffffff, u[0], v[0]);
 
 	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
 	if (video_config.filter == 0)
@@ -389,33 +392,33 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 
 void renderer_bgfx::render_avi_quad()
 {
-    bgfx::setViewSeq(s_current_view, true);
-    bgfx::setViewRect(s_current_view, 0, 0, m_width[0], m_height[0]);
-    bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+	bgfx::setViewSeq(s_current_view, true);
+	bgfx::setViewRect(s_current_view, 0, 0, m_width[0], m_height[0]);
+	bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 
-    setup_matrices(s_current_view, false);
+	setup_matrices(s_current_view, false);
 
-    bgfx::TransientVertexBuffer buffer;
-    bgfx::allocTransientVertexBuffer(&buffer, 6, ScreenVertex::ms_decl);
-    ScreenVertex* vertices = reinterpret_cast<ScreenVertex*>(buffer.data);
+	bgfx::TransientVertexBuffer buffer;
+	bgfx::allocTransientVertexBuffer(&buffer, 6, ScreenVertex::ms_decl);
+	ScreenVertex* vertices = reinterpret_cast<ScreenVertex*>(buffer.data);
 
-    float x[4] = { 0.0f, float(m_width[0]), 0.0f, float(m_width[0]) };
-    float y[4] = { 0.0f, 0.0f, float(m_height[0]), float(m_height[0]) };
-    float u[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
-    float v[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
-    UINT32 rgba = 0xffffffff;
+	float x[4] = { 0.0f, float(m_width[0]), 0.0f, float(m_width[0]) };
+	float y[4] = { 0.0f, 0.0f, float(m_height[0]), float(m_height[0]) };
+	float u[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
+	float v[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
+	UINT32 rgba = 0xffffffff;
 
-    vertex(&vertices[0], x[0], y[0], 0, rgba, u[0], v[0]);
-    vertex(&vertices[1], x[1], y[1], 0, rgba, u[1], v[1]);
-    vertex(&vertices[2], x[3], y[3], 0, rgba, u[3], v[3]);
-    vertex(&vertices[3], x[3], y[3], 0, rgba, u[3], v[3]);
-    vertex(&vertices[4], x[2], y[2], 0, rgba, u[2], v[2]);
-    vertex(&vertices[5], x[0], y[0], 0, rgba, u[0], v[0]);
+	vertex(&vertices[0], x[0], y[0], 0, rgba, u[0], v[0]);
+	vertex(&vertices[1], x[1], y[1], 0, rgba, u[1], v[1]);
+	vertex(&vertices[2], x[3], y[3], 0, rgba, u[3], v[3]);
+	vertex(&vertices[3], x[3], y[3], 0, rgba, u[3], v[3]);
+	vertex(&vertices[4], x[2], y[2], 0, rgba, u[2], v[2]);
+	vertex(&vertices[5], x[0], y[0], 0, rgba, u[0], v[0]);
 
-    bgfx::setVertexBuffer(&buffer);
-    bgfx::setTexture(0, m_gui_effect[PRIMFLAG_GET_BLENDMODE(BLENDMODE_NONE)]->uniform("s_tex")->handle(), m_avi_target->texture());
-    m_gui_effect[PRIMFLAG_GET_BLENDMODE(BLENDMODE_NONE)]->submit(s_current_view);
-    s_current_view++;
+	bgfx::setVertexBuffer(&buffer);
+	bgfx::setTexture(0, m_gui_effect[PRIMFLAG_GET_BLENDMODE(BLENDMODE_NONE)]->uniform("s_tex")->handle(), m_avi_target->texture());
+	m_gui_effect[PRIMFLAG_GET_BLENDMODE(BLENDMODE_NONE)]->submit(s_current_view);
+	s_current_view++;
 }
 
 void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::TransientVertexBuffer* buffer)
@@ -423,17 +426,17 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	ScreenVertex* vertices = reinterpret_cast<ScreenVertex*>(buffer->data);
 	UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
 
-    float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };
-    float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
-    float u[4] = { prim->texcoords.tl.u, prim->texcoords.tr.u, prim->texcoords.bl.u, prim->texcoords.br.u };
-    float v[4] = { prim->texcoords.tl.v, prim->texcoords.tr.v, prim->texcoords.bl.v, prim->texcoords.br.v };
+	float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };
+	float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
+	float u[4] = { prim->texcoords.tl.u, prim->texcoords.tr.u, prim->texcoords.bl.u, prim->texcoords.br.u };
+	float v[4] = { prim->texcoords.tl.v, prim->texcoords.tr.v, prim->texcoords.bl.v, prim->texcoords.br.v };
 
-    vertex(&vertices[0], x[0], y[0], 0, rgba, u[0], v[0]);
-    vertex(&vertices[1], x[1], y[1], 0, rgba, u[1], v[1]);
-    vertex(&vertices[2], x[3], y[3], 0, rgba, u[3], v[3]);
-    vertex(&vertices[3], x[3], y[3], 0, rgba, u[3], v[3]);
-    vertex(&vertices[4], x[2], y[2], 0, rgba, u[2], v[2]);
-    vertex(&vertices[5], x[0], y[0], 0, rgba, u[0], v[0]);
+	vertex(&vertices[0], x[0], y[0], 0, rgba, u[0], v[0]);
+	vertex(&vertices[1], x[1], y[1], 0, rgba, u[1], v[1]);
+	vertex(&vertices[2], x[3], y[3], 0, rgba, u[3], v[3]);
+	vertex(&vertices[3], x[3], y[3], 0, rgba, u[3], v[3]);
+	vertex(&vertices[4], x[2], y[2], 0, rgba, u[2], v[2]);
+	vertex(&vertices[5], x[0], y[0], 0, rgba, u[0], v[0]);
 
 	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
 	if (video_config.filter == 0)
@@ -657,11 +660,11 @@ int renderer_bgfx::draw(int update)
 		s_current_view = 0;
 		if (m_avi_writer == nullptr)
 		{
-            uint32_t width = win->get_size().width();
-            uint32_t height = win->get_size().height();
-            m_avi_writer = new avi_write(win->machine(), width, height);
+			uint32_t width = win->get_size().width();
+			uint32_t height = win->get_size().height();
+			m_avi_writer = new avi_write(win->machine(), width, height);
 			m_avi_data = new uint8_t[width * height * 4];
-            m_avi_bitmap.allocate(width, height);
+			m_avi_bitmap.allocate(width, height);
 		}
 	}
 
@@ -674,7 +677,7 @@ int renderer_bgfx::draw(int update)
 	m_height[window_index] = wdim.height();
 
 	win->m_primlist->acquire_lock();
-    s_current_view += m_chains->handle_screen_chains(s_current_view, win->m_primlist->first(), *win.get());
+	s_current_view += m_chains->handle_screen_chains(s_current_view, win->m_primlist->first(), *win.get());
 	win->m_primlist->release_lock();
 
 	bool skip_frame = update_dimensions();
@@ -739,20 +742,20 @@ int renderer_bgfx::draw(int update)
 
 	win->m_primlist->release_lock();
 
-    // This dummy draw call is here to make sure that view 0 is cleared
-    // if no other draw calls are submitted to view 0.
-    bgfx::touch(s_current_view > 0 ? s_current_view - 1 : 0);
+	// This dummy draw call is here to make sure that view 0 is cleared
+	// if no other draw calls are submitted to view 0.
+	bgfx::touch(s_current_view > 0 ? s_current_view - 1 : 0);
 
-    // Advance to next frame. Rendering thread will be kicked to
+	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
 	if (window_index == 0)
 	{
 		if (m_avi_writer != nullptr && m_avi_writer->recording() && window_index == 0)
 		{
-            render_avi_quad();
-            bgfx::touch(s_current_view);
-            update_recording();
-        }
+			render_avi_quad();
+			bgfx::touch(s_current_view);
+			update_recording();
+		}
 
 		bgfx::frame();
 	}
@@ -762,17 +765,17 @@ int renderer_bgfx::draw(int update)
 
 void renderer_bgfx::update_recording()
 {
-    bgfx::blit(s_current_view > 0 ? s_current_view - 1 : 0, m_avi_texture, 0, 0, m_avi_target->target());
-    bgfx::readTexture(m_avi_texture, m_avi_data);
+	bgfx::blit(s_current_view > 0 ? s_current_view - 1 : 0, m_avi_texture, 0, 0, m_avi_target->target());
+	bgfx::readTexture(m_avi_texture, m_avi_data);
 
-    UINT32* start = &m_avi_bitmap.pix32(0);
-    // loop over Y
-    for (int i = 0; i < m_width[0] * m_height[0] * 4; i += 4)
-    {
-        *start++ = 0xff000000 | (m_avi_data[i + 0] << 16) | (m_avi_data[i + 1] << 8) | m_avi_data[i + 2];
-    }
+	UINT32* start = &m_avi_bitmap.pix32(0);
+	// loop over Y
+	for (int i = 0; i < m_width[0] * m_height[0] * 4; i += 4)
+	{
+		*start++ = 0xff000000 | (m_avi_data[i + 0] << 16) | (m_avi_data[i + 1] << 8) | m_avi_data[i + 2];
+	}
 
-    m_avi_writer->video_frame(m_avi_bitmap);
+	m_avi_writer->video_frame(m_avi_bitmap);
 }
 
 void renderer_bgfx::add_audio_to_recording(const INT16 *buffer, int samples_this_frame)
@@ -857,7 +860,7 @@ void renderer_bgfx::setup_view(uint32_t view_index, bool screen)
 		{
 			bgfx::setViewFrameBuffer(view_index, m_avi_target->target());
 		}
-        bgfx::setViewClear(view_index, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+		bgfx::setViewClear(view_index, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 	}
 
 	setup_matrices(view_index, screen);
@@ -1157,11 +1160,11 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::
 
 std::vector<ui_menu_item> renderer_bgfx::get_slider_list()
 {
-    m_sliders_dirty = false;
-    return m_chains->get_slider_list();
+	m_sliders_dirty = false;
+	return m_chains->get_slider_list();
 }
 
 void renderer_bgfx::set_sliders_dirty()
 {
-    m_sliders_dirty = true;
+	m_sliders_dirty = true;
 }

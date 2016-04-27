@@ -824,7 +824,7 @@ void ui_menu_machine_configure::custom_render(void *selectedref, float top, floa
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
-//	float x1 = origx1;
+//  float x1 = origx1;
 	float x2 = x1 + maxwidth;
 	float y1 = origy1 - top;
 	float y2 = origy1 - UI_BOX_TB_BORDER;
@@ -856,7 +856,7 @@ void ui_menu_machine_configure::setup_bios()
 	for (const rom_entry *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
 			default_name = ROM_GETNAME(rom);
-	
+
 	int bios_count = 0;
 	for (const rom_entry *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
 	{

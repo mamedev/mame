@@ -393,7 +393,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( opwolfp_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
-	
+
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)          /* dip switches */
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
@@ -563,7 +563,7 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_x_r )
 {
-  /* P1X - Have to remap 8 bit input value, into 0-319 visible range */
+	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
 	int scaled = (ioport(P1X_PORT_TAG)->read() * 320 ) / 256;
 	return (scaled + 0x15 + m_opwolf_gun_xoffs);
 }
@@ -625,11 +625,11 @@ static INPUT_PORTS_START( opwolf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	
+
 	PORT_START("IN2")
 	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, opwolf_state, opwolf_gun_x_r, nullptr)
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW,  IPT_UNUSED )
-	
+
 	PORT_START("IN3")
 	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, opwolf_state, opwolf_gun_y_r, nullptr)
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW,  IPT_UNUSED )

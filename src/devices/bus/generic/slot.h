@@ -28,8 +28,8 @@ public:
 	virtual void rom_alloc(size_t size, int width, endianness_t end, const char *tag);
 	virtual void ram_alloc(UINT32 size);
 
-    UINT8* get_rom_base()  { return m_rom; }
-    UINT32 get_rom_size() { return m_rom_size; }
+	UINT8* get_rom_base()  { return m_rom; }
+	UINT32 get_rom_size() { return m_rom_size; }
 
 	UINT8* get_region_base()  { if (m_region.found()) return m_region->base(); return nullptr; }
 	UINT32 get_region_size() { if (m_region.found()) return m_region->bytes(); return 0; }
@@ -44,8 +44,8 @@ public:
 	UINT32  m_rom_size;
 	dynamic_buffer m_ram;
 
-    // this replaces m_rom for non-user configurable carts!
-    optional_memory_region  m_region;
+	// this replaces m_rom for non-user configurable carts!
+	optional_memory_region  m_region;
 };
 
 
@@ -153,7 +153,7 @@ public:
 		}
 		return nullptr;
 	}
-	UINT32 get_rom_size()	{
+	UINT32 get_rom_size()   {
 		if (m_cart)
 		{
 			if (!user_loadable())
@@ -199,7 +199,7 @@ extern const device_type GENERIC_SOCKET;
 	MCFG_GENERIC_INTERFACE(_dev_intf)
 
 #define MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT(_tag, _slot_intf, _dev_intf, _default) \
-    MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
-    MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false) \
-    MCFG_GENERIC_INTERFACE(_dev_intf)
+	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false) \
+	MCFG_GENERIC_INTERFACE(_dev_intf)
 #endif

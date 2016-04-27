@@ -180,13 +180,12 @@ void ui_menu_file_manager::handle()
 			selected_device = (device_image_interface *) event->itemref;
 			if (selected_device != nullptr)
 			{
-
 				m_curr_selected = TRUE;
 				floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
 				if (floppy_device != nullptr)
 				{
 					ui_menu::stack_push(global_alloc_clear<ui_menu_control_floppy_image>(machine(), container, floppy_device));
-				} 
+				}
 				else
 				{
 					ui_menu::stack_push(global_alloc_clear<ui_menu_control_device_image>(machine(), container, selected_device));

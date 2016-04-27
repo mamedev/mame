@@ -54,7 +54,7 @@ mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &o
 		m_lua(global_alloc(lua_engine)),
 		m_new_driver_pending(nullptr),
 		m_firstrun(true),
-	    m_autoboot_timer(nullptr)
+		m_autoboot_timer(nullptr)
 {
 }
 
@@ -263,17 +263,17 @@ void mame_machine_manager::reset()
 	// setup autoboot if needed
 	m_autoboot_timer->adjust(attotime(options().autoboot_delay(),0),0);
 }
-	
+
 ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 {
 	m_ui = std::make_unique<mame_ui_manager>(machine);
 	m_ui->init();
 
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(mame_machine_manager::reset), this));
-	
+
 	// start the inifile manager
 	m_inifile = std::make_unique<inifile_manager>(machine);
-	
+
 	m_ui->set_startup_text("Initializing...", true);
 
 	// allocate autoboot timer
@@ -288,8 +288,8 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 	return m_ui.get();
 }
 
-void mame_machine_manager::create_custom(running_machine& machine) 
-{ 
+void mame_machine_manager::create_custom(running_machine& machine)
+{
 	// set up the cheat engine
 	m_cheat = std::make_unique<cheat_manager>(machine);
 }

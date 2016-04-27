@@ -80,30 +80,30 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 /*
 
-	Custom SIMM module placement
+    Custom SIMM module placement
 
-	The Air Raid PCB has 3 custom modules shown
-	in the rough diagram of the PCB below.
+    The Air Raid PCB has 3 custom modules shown
+    in the rough diagram of the PCB below.
 
-	The modules do not appear to be 100% 
-	identical based on external shapes visible.
+    The modules do not appear to be 100%
+    identical based on external shapes visible.
 
-	The data they contain is as follows
-	MODULE1
-	Background tilemap graphic data
-	Background tilemap layout data
+    The data they contain is as follows
+    MODULE1
+    Background tilemap graphic data
+    Background tilemap layout data
 
-	MODULE2
-	Foreground tilemap graphic data
-	Foreground tilemap layout data
+    MODULE2
+    Foreground tilemap graphic data
+    Foreground tilemap layout data
 
-	MODULE3
-	Sprite graphic data
+    MODULE3
+    Sprite graphic data
 
-	it's also possible each module contains a
-	0x100 colour look up table for that layer.
+    it's also possible each module contains a
+    0x100 colour look up table for that layer.
 
- 
+
    |-------------------------------------------------|
    |    A   B   C   D   E   F   G   H   I   J   K    |
  20|            ##MOD1#######                        |
@@ -267,12 +267,11 @@ WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
 
 void cshooter_state::video_start()
 {
-
 	// there might actually be 4 banks of 2048 x 16 tilemaps in here as the upper scroll bits are with the rom banking.
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cshooter_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(cshooter_state::bg_scan),this),16,16,2048, 64);
-	
+
 	// which could in turn mean this is actually 256 x 128, not 256 x 512
-//	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cshooter_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(cshooter_state::fg_scan),this),16,16,256, 512);
+//  m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cshooter_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(cshooter_state::fg_scan),this),16,16,256, 512);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cshooter_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(cshooter_state::fg_scan),this),16,16,256, 128);
 
 	m_fg_tilemap->set_transparent_pen(0);
@@ -304,7 +303,6 @@ void cshooter_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 UINT32 cshooter_state::screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	UINT16 bgscrolly = DM_GETSCROLL(0x6);
 	// this is more likely to be 'bank' than scroll, like NMK16
 	bgscrolly += ((m_hw & 0xc0) >> 6) * 256;
@@ -374,7 +372,7 @@ WRITE8_MEMBER(cshooter_state::cshooter_c700_w)
 WRITE8_MEMBER(cshooter_state::bank_w)
 {
 	// format of this address is TTBB tbfs
-	
+
 	// TT = bg tilemap upper scroll bits (probably bg tilemap bank select?)
 	// BB = prg ROM bank select
 	// t = text layer enable
@@ -382,7 +380,7 @@ WRITE8_MEMBER(cshooter_state::bank_w)
 	// f = fg layer disable
 	// s = sprite layer enable
 
-//	printf("bankw %02x\n", data & 0xc0);
+//  printf("bankw %02x\n", data & 0xc0);
 
 	m_hw = data;
 
@@ -419,18 +417,18 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(cshooter_c500_w)
-//	AM_RANGE(0xc600, 0xc600) AM_WRITE(cshooter_c600_w)            // see notes
+//  AM_RANGE(0xc600, 0xc600) AM_WRITE(cshooter_c600_w)            // see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
-//	AM_RANGE(0xc801, 0xc801) AM_WRITE(cshooter_c801_w)            // see notes
+//  AM_RANGE(0xc801, 0xc801) AM_WRITE(cshooter_c801_w)            // see notes
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_SHARE("txram")
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("paletteram")
 	AM_RANGE(0xda00, 0xdaff) AM_RAM AM_SHARE("paletteram2")
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
 	AM_RANGE(0xdc00, 0xdc0f) AM_RAM_WRITE(vregs_w) AM_SHARE("vregs")
-//	AM_RANGE(0xdc10, 0xdc10) AM_RAM
-//	AM_RANGE(0xdc19, 0xdc19) AM_RAM
-//	AM_RANGE(0xdc1e, 0xdc1e) AM_RAM
-//	AM_RANGE(0xdc1f, 0xdc1f) AM_RAM
+//  AM_RANGE(0xdc10, 0xdc10) AM_RAM
+//  AM_RANGE(0xdc19, 0xdc19) AM_RAM
+//  AM_RANGE(0xdc1e, 0xdc1e) AM_RAM
+//  AM_RANGE(0xdc1f, 0xdc1f) AM_RAM
 
 	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("mainram")
@@ -661,7 +659,7 @@ ROM_START( cshootere )
 
 	ROM_REGION( 0x100, "tx_clut", 0 ) // taken from parent set (need proper IC locations for this PCB type)
 	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
-	
+
 	ROM_REGION( 0x220, "proms", 0 ) // taken from parent set (need proper IC locations for this PCB type)
 	ROM_LOAD( "82s123.7a",  0x0000, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
 	ROM_LOAD( "82s129.9s",  0x0020, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
@@ -686,13 +684,13 @@ ROM_START( cshootere )
 	ROM_LOAD16_BYTE( "fg_tiles_odd",    0x00001, 0x20000, NO_DUMP )
 	ROM_REGION( 0x100, "fg_clut", 0 )
 	ROM_LOAD( "fg_clut",   0x000, 0x100, NO_DUMP )
-	
+
 	/* ### MODULE 3 ### Sprite graphics  */
 	ROM_REGION( 0x40000, "spr_gfx", 0 )
 	ROM_LOAD16_BYTE( "sprite_tiles_even",   0x00000, 0x20000, NO_DUMP )
 	ROM_LOAD16_BYTE( "sprite_tiles_odd",    0x00001, 0x20000, NO_DUMP )
 	ROM_REGION( 0x100, "spr_clut", 0 )
-	ROM_LOAD( "spr_clut",   0x000, 0x100, NO_DUMP )	
+	ROM_LOAD( "spr_clut",   0x000, 0x100, NO_DUMP )
 ROM_END
 
 /*
@@ -758,13 +756,13 @@ ROM_START( airraid )
 	ROM_LOAD16_BYTE( "fg_tiles_odd",    0x00001, 0x20000, NO_DUMP )
 	ROM_REGION( 0x100, "fg_clut", 0 )
 	ROM_LOAD( "fg_clut",   0x000, 0x100, NO_DUMP )
-	
+
 	/* ### MODULE 3 ### Sprite graphics  */
 	ROM_REGION( 0x40000, "spr_gfx", 0 )
 	ROM_LOAD16_BYTE( "sprite_tiles_even",   0x00000, 0x20000, NO_DUMP )
 	ROM_LOAD16_BYTE( "sprite_tiles_odd",    0x00001, 0x20000, NO_DUMP )
 	ROM_REGION( 0x100, "spr_clut", 0 )
-	ROM_LOAD( "spr_clut",   0x000, 0x100, NO_DUMP )	
+	ROM_LOAD( "spr_clut",   0x000, 0x100, NO_DUMP )
 ROM_END
 
 

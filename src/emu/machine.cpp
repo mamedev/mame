@@ -258,7 +258,7 @@ void running_machine::start()
 	m_render->resolve_tags();
 
 	manager().create_custom(*this);
-	
+
 	// register callbacks for the devices, then start them
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(running_machine::reset_all_devices), this));
 	add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(running_machine::stop_all_devices), this));

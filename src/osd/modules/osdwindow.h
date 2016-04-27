@@ -162,7 +162,7 @@ public:
 		m_platform_window = window;
 	}
 
-	std::shared_ptr<osd_window> main_window() const { return m_main;	}
+	std::shared_ptr<osd_window> main_window() const { return m_main;    }
 	void set_main_window(std::shared_ptr<osd_window> main) { m_main = main; }
 
 	// Clips the pointer to the bounds of this window
@@ -187,7 +187,7 @@ public:
 
 	render_primitive_list   *m_primlist;
 	osd_window_config       m_win_config;
-	int                     m_index;	
+	int                     m_index;
 protected:
 	int                     m_prescale;
 private:
@@ -253,8 +253,8 @@ protected:
 
 	/* Internal flags */
 	static const int FI_CHANGED                 = 0x010000;
-	bool        				m_sliders_dirty;
-	std::vector<ui_menu_item>	m_sliders;
+	bool                        m_sliders_dirty;
+	std::vector<ui_menu_item>   m_sliders;
 
 private:
 	std::weak_ptr<osd_window>  m_window;

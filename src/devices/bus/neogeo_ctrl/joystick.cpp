@@ -11,9 +11,9 @@
 
 
 /**********************************************************************
- 
+
    Implementation through the 15-pin controller port (used by AES)
- 
+
  **********************************************************************/
 
 
@@ -92,7 +92,7 @@ void neogeo_joystick_device::device_reset()
 
 UINT8 neogeo_joystick_device::read_ctrl()
 {
-    return m_joy->read();
+	return m_joy->read();
 }
 
 //-------------------------------------------------
@@ -107,10 +107,10 @@ UINT8 neogeo_joystick_device::read_start_sel()
 
 
 /**********************************************************************
- 
- Implementation through the edge connector (used by MVS) and 
+
+ Implementation through the edge connector (used by MVS) and
  connecting two controllers
- 
+
  **********************************************************************/
 
 //**************************************************************************
@@ -203,4 +203,3 @@ READ8_MEMBER(neogeo_joy_ac_device::in1_r)
 {
 	return m_joy2->read();
 }
-

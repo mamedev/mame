@@ -3,8 +3,8 @@
 /**********************************************************************
 
     Sega Saturn Mouse emulation
- 
-	This is basically the same as a pointing controller, but it uses a different ID
+
+    This is basically the same as a pointing controller, but it uses a different ID
 
 **********************************************************************/
 
@@ -89,16 +89,16 @@ UINT8 saturn_mouse_device::read_ctrl(UINT8 offset)
 	UINT8 mouse_ctrl = m_buttons->read();
 	INT16 mouse_x = m_pointx->read();
 	INT16 mouse_y = m_pointy->read();
-	
+
 	if (mouse_x < 0)
 		mouse_ctrl |= 0x10;
-	
+
 	if (mouse_y < 0)
 		mouse_ctrl |= 0x20;
-	
+
 	if ((mouse_x & 0xff00) != 0xff00 && (mouse_x & 0xff00) != 0x0000)
 		mouse_ctrl |= 0x40;
-	
+
 	if ((mouse_y & 0xff00) != 0xff00 && (mouse_y & 0xff00) != 0x0000)
 		mouse_ctrl |= 0x80;
 
@@ -117,4 +117,3 @@ UINT8 saturn_mouse_device::read_ctrl(UINT8 offset)
 	}
 	return res;
 }
-

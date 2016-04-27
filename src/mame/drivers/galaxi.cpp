@@ -545,7 +545,7 @@ ROM_END
   2x DS1230Y-100 (u4, u5) not dumped.
 
   PLDs:
-  1x A40MX04-PL84 (u29)	read protected.
+  1x A40MX04-PL84 (u29) read protected.
 
   Others:
   1x 28x2 JAMMA edge connector.

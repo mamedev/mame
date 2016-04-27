@@ -637,7 +637,7 @@ WRITE32_MEMBER(ohci_usb_controller::write)
 	}
 	if (offset >= HcRhPortStatus1) {
 		int port = offset - HcRhPortStatus1 + 1; // port 0 not used
-												 // bit 0  R:CurrentConnectStatus           W:ClearPortEnable: 1 clears PortEnableStatus
+													// bit 0  R:CurrentConnectStatus           W:ClearPortEnable: 1 clears PortEnableStatus
 		if (data & CCS) {
 			ohcist.hc_regs[offset] &= ~PES;
 			ohcist.address[ohcist.ports[port].address].port = -1;
@@ -790,7 +790,7 @@ void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int
 										pid = InPid; // in
 									R = (int)ohcist.framenumber - (int)ohcist.isochronous_transfer_descriptor.sf;
 									//if ((R < 0) || (R > (int)ohcist.isochronous_transfer_descriptor.fc))
-									//	; // greater than fc should be an error
+									//  ; // greater than fc should be an error
 									if (R == (int)ohcist.isochronous_transfer_descriptor.fc)
 										a = ohcist.isochronous_transfer_descriptor.be;
 									else {
@@ -1213,11 +1213,11 @@ void ohci_usb_controller::usb_ohci_plug(int port, ohci_function_device *function
 
 void ohci_usb_controller::usb_ohci_interrupts()
 {
-	if (((ohcist.hc_regs[HcInterruptStatus] & ohcist.hc_regs[HcInterruptEnable]) != 0) && ((ohcist.hc_regs[HcInterruptEnable] & MasterInterruptEnable) != 0)) 
+	if (((ohcist.hc_regs[HcInterruptStatus] & ohcist.hc_regs[HcInterruptEnable]) != 0) && ((ohcist.hc_regs[HcInterruptEnable] & MasterInterruptEnable) != 0))
 	{
 		//pic8259_1->ir1_w(1);
 		m_interrupt_handler(1);
-	} else 
+	} else
 	{
 		//pic8259_1->ir1_w(0);
 		m_interrupt_handler(0);

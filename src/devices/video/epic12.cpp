@@ -49,7 +49,7 @@ void epic12_device::device_start()
 
 	m_blitter_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epic12_device::blitter_delay_callback),this));
 	m_blitter_delay_timer->adjust(attotime::never);
-	
+
 	save_item(NAME(m_gfx_addr));
 	save_item(NAME(m_gfx_scroll_0_x));
 	save_item(NAME(m_gfx_scroll_0_y));

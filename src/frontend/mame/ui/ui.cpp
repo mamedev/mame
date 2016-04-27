@@ -267,18 +267,18 @@ static const UINT32 mouse_bitmap[32*32] =
 //-------------------------------------------------
 
 mame_ui_manager::mame_ui_manager(running_machine &machine)
-	: ui_manager(machine), 
-	  m_font(nullptr), 
-	  m_handler_callback(nullptr), 
-	  m_handler_param(0), 
-	  m_single_step(false), 
-	  m_showfps(false), 
-	  m_showfps_end(0), 
-	  m_show_profiler(false), 
-	  m_popup_text_end(0), 
-	  m_mouse_arrow_texture(nullptr), 
-	  m_mouse_show(false), 
-	  m_load_save_hold(false)
+	: ui_manager(machine),
+		m_font(nullptr),
+		m_handler_callback(nullptr),
+		m_handler_param(0),
+		m_single_step(false),
+		m_showfps(false),
+		m_showfps_end(0),
+		m_show_profiler(false),
+		m_popup_text_end(0),
+		m_mouse_arrow_texture(nullptr),
+		m_mouse_show(false),
+		m_load_save_hold(false)
 {
 }
 
@@ -2068,17 +2068,17 @@ std::vector<ui_menu_item> mame_ui_manager::slider_init(running_machine &machine)
 	}
 #endif
 
-    std::vector<ui_menu_item> items;
-    for (slider_state *slider : sliders)
-    {
-        ui_menu_item item;
-        item.text = slider->description;
-        item.subtext = "";
-        item.flags = 0;
-        item.ref = slider;
-        item.type = ui_menu_item_type::SLIDER;
-        items.push_back(item);
-    }
+	std::vector<ui_menu_item> items;
+	for (slider_state *slider : sliders)
+	{
+		ui_menu_item item;
+		item.text = slider->description;
+		item.subtext = "";
+		item.flags = 0;
+		item.ref = slider;
+		item.type = ui_menu_item_type::SLIDER;
+		items.push_back(item);
+	}
 
 	return items;
 }
@@ -2734,5 +2734,5 @@ void mame_ui_manager::popup_time_string(int seconds, std::string message)
 	messagebox_backcolor = UI_BACKGROUND_COLOR;
 
 	// set a timer
-	m_popup_text_end = osd_ticks() + osd_ticks_per_second() * seconds;	
+	m_popup_text_end = osd_ticks() + osd_ticks_per_second() * seconds;
 }

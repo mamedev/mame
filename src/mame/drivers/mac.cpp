@@ -2219,8 +2219,8 @@ ROM_END
 ROM_START( utrn1024 )
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
 	// CRCs match the original "Lonely Hearts" version 1 Mac Plus ROM
-	ROM_LOAD16_BYTE( "macplus_mem_h.e6", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b) ) 
-	ROM_LOAD16_BYTE( "macplus_mem_l.e7", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7) ) 
+	ROM_LOAD16_BYTE( "macplus_mem_h.e6", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b) )
+	ROM_LOAD16_BYTE( "macplus_mem_l.e7", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7) )
 ROM_END
 
 ROM_START( mac512ke )

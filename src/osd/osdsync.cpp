@@ -117,7 +117,7 @@ struct work_thread_info
 	std::thread *       handle;         // handle to the thread
 	osd_event           wakeevent;      // wake event for the thread
 	std::atomic<INT32>  active;         // are we actively processing work?
-	UINT32				id;
+	UINT32              id;
 
 #if KEEP_STATISTICS
 	INT32               itemsdone;
@@ -149,7 +149,6 @@ struct osd_work_queue
 	, spinloops(0)
 #endif
 	{
-
 	}
 
 	std::mutex          lock;           // lock for protecting the queue
@@ -182,7 +181,7 @@ struct osd_work_item
 	, callback(nullptr)
 	, param(nullptr)
 	, result(nullptr)
-	, event(nullptr)				// manual reset, not signalled
+	, event(nullptr)                // manual reset, not signalled
 	, flags(0)
 	, done(FALSE)
 	{

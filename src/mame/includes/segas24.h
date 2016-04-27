@@ -148,5 +148,3 @@ public:
 	TIMER_CALLBACK_MEMBER(gground_hack_timer_callback);
 	emu_timer *m_gground_hack_timer;
 };
-
-

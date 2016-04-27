@@ -43,13 +43,13 @@ bgfx_target* target_reader::read_from_value(const Value& value, std::string pref
 	switch (mode)
 	{
 		case TARGET_STYLE_GUEST:
-            width = chains.targets().width(TARGET_STYLE_GUEST, screen_index);
-            height = chains.targets().height(TARGET_STYLE_GUEST, screen_index);
-            break;
+			width = chains.targets().width(TARGET_STYLE_GUEST, screen_index);
+			height = chains.targets().height(TARGET_STYLE_GUEST, screen_index);
+			break;
 		case TARGET_STYLE_NATIVE:
-            width = chains.targets().width(TARGET_STYLE_NATIVE, screen_index);
-            height = chains.targets().height(TARGET_STYLE_NATIVE, screen_index);
-            break;
+			width = chains.targets().width(TARGET_STYLE_NATIVE, screen_index);
+			height = chains.targets().height(TARGET_STYLE_NATIVE, screen_index);
+			break;
 		case TARGET_STYLE_CUSTOM:
 			if (!READER_CHECK(value.HasMember("width"), (prefix + "Target '" + target_name + "': Must have numeric value 'width'\n").c_str())) return nullptr;
 			if (!READER_CHECK(value["width"].IsNumber(), (prefix + "Target '" + target_name + "': Value 'width' must be a number\n").c_str())) return nullptr;

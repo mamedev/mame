@@ -173,7 +173,7 @@ protected:
 	UINT8      m_el_value;
 	UINT8      m_led1_value;
 	UINT8      m_led2_value;
-	
+
 	optional_ioport m_dsw;
 	optional_ioport m_trackx;
 	optional_ioport m_tracky;

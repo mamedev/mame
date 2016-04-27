@@ -438,7 +438,7 @@ UINT32 napple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitm
 			if (m_video->m_mix)
 			{
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-			   	m_video->text_update_jplus(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update_jplus(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -538,7 +538,7 @@ void napple2_state::do_io(address_space &space, int offset)
 			m_an1 = true; break;
 
 		case 0x5c: // AN2 off
-			m_an2 = false; 
+			m_an2 = false;
 			m_video->m_an2 = false;
 			break;
 
@@ -1533,7 +1533,7 @@ ROM_END
 /*
     J-Plus ROM numbers confirmed by:
     http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/Apple%20II/Apple%20II%20j-plus/Photos/Apple%20II%20j-plus%20-%20Motherboard.jpg
- 
+
 */
 
 ROM_START(apple2jp)

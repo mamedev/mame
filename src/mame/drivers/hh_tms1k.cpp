@@ -5068,9 +5068,9 @@ MACHINE_CONFIG_END
   * PCB label WS 8107-1
   * TMS1730 MCU, label MP3005N (die label 1700 MP3005)
   * 4 LEDs, 1-bit sound
-  
+
   This is a simplified rerelease of Copy Cat, 10(!) years later.
-  
+
   3 variations exist, each with a different colored case. Let's assume that
   they're on the same hardware.
   - white case, yellow orange green red buttons and leds (same as model 7-520)

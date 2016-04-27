@@ -83,7 +83,7 @@ void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist
 		osd_file::error filerr;
 		std::string tmp_path;
 		util::core_file::ptr tmp_file;
-		// attempt to open the file for writing but *without* create 
+		// attempt to open the file for writing but *without* create
 		filerr = util::zippath_fopen(filename.c_str(), OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
 		if(filerr == osd_file::error::NONE)
 			tmp_file.reset();

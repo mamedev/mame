@@ -11,7 +11,7 @@ Android (C) 198? Nasco
 
 // Android uses PCBS MK-P102 and MK-P101 ONLY, there is no MK-P103 (extra sprites used on Himeshikibu)
 // Real hardware video of parent set can be seen at https://www.youtube.com/watch?v=5rtqZqMBACI (uploaded by Chris Hardy)
-// for some reason music fails to play the 2nd attract loop in MAME? 
+// for some reason music fails to play the 2nd attract loop in MAME?
 
 
 
@@ -323,7 +323,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( androidp )
 	PORT_INCLUDE(androidpo)
-	
+
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -346,7 +346,7 @@ static INPUT_PORTS_START( androidp )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) ) 
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
@@ -456,7 +456,7 @@ static MACHINE_CONFIG_START( himesiki, himesiki_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym2203", YM2203, CLK2/4) // ?? 
+	MCFG_SOUND_ADD("ym2203", YM2203, CLK2/4) // ??
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)

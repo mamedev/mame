@@ -24,7 +24,7 @@ pdynlib::pdynlib(const pstring libname)
 	if (m_lib != nullptr)
 		m_isLoaded = true;
 	//else
-	//	fprintf(stderr, "win: library <%s> not found!\n", libname.cstr());
+	//  fprintf(stderr, "win: library <%s> not found!\n", libname.cstr());
 #else
 	//printf("loading <%s>\n", libname.cstr());
 	if (libname != "")
@@ -34,7 +34,7 @@ pdynlib::pdynlib(const pstring libname)
 	if (m_lib != nullptr)
 		m_isLoaded = true;
 	//else
-	//	printf("library <%s> not found!\n", libname.cstr());
+	//  printf("library <%s> not found!\n", libname.cstr());
 #endif
 	}
 
@@ -88,4 +88,3 @@ void *pdynlib::getsym_p(const pstring name)
 	return dlsym(m_lib, name.cstr());
 #endif
 }
-

@@ -516,7 +516,7 @@ COMP( 1990, mc1702,     ibm5150,    0,          pccga,      pccga, driver_device
 
 COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga, driver_device,      0,      "Zenith Data Systems", "SuperSport", 0)
 COMP( 1985, sicpc1605,  ibm5150,    0,          siemens,    pccga, driver_device,      0,      "Siemens", "Sicomp PC16-05", MACHINE_NOT_WORKING)
-COMP( 1985, ncrpc4i,	ibm5150,	0,			pccga,		pccga, driver_device,	   0,	   "NCR","PC4i", MACHINE_NOT_WORKING)
+COMP( 1985, ncrpc4i,    ibm5150,    0,          pccga,      pccga, driver_device,      0,      "NCR","PC4i", MACHINE_NOT_WORKING)
 
 COMP( 198?, olivm15,    ibm5150,    0,          m15,        pccga, driver_device,      0,      "Olivetti", "M15", 0)
 

@@ -11,8 +11,8 @@
 class bgfx_util
 {
 public:
-    static const bgfx::Memory* mame_texture_data_to_bgfx_texture_data(UINT32 format, int width, int height, int rowpixels, const rgb_t *palette, void *base);
-    static uint64_t get_blend_state(UINT32 blend);
+	static const bgfx::Memory* mame_texture_data_to_bgfx_texture_data(UINT32 format, int width, int height, int rowpixels, const rgb_t *palette, void *base);
+	static uint64_t get_blend_state(UINT32 blend);
 };
 
 #endif // __RENDER_BGFX_UTIL__

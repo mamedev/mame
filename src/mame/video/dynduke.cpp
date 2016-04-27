@@ -176,7 +176,7 @@ void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 
 	scrolly = ((m_scroll_ram[0x01]&0x30)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7);
 	scrollx = ((m_scroll_ram[0x09]&0x30)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7);
-	
+
 	if (flip_screen())
 	{
 		scrolly = 256 - scrolly;
