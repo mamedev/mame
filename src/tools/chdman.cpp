@@ -25,6 +25,10 @@
 #include <ctype.h>
 
 #include <iostream>
+#include <cassert>
+#include <cstring>
+#include <limits>
+#include <memory>
 #include <new>
 #include <unordered_map>
 
@@ -191,19 +195,52 @@ private:
 };
 
 
+// ======================> chd_zero_compressor
+
+class chd_zero_compressor : public chd_file_compressor
+{
+public:
+	// construction/destruction
+	chd_zero_compressor(std::uint64_t offset = 0, std::uint64_t maxoffset = 0)
+		: m_offset(offset)
+		, m_maxoffset(maxoffset)
+	{
+	}
+
+	// read interface
+	virtual std::uint32_t read_data(void *dest, std::uint64_t offset, std::uint32_t length) override
+	{
+		offset += m_offset;
+		if (offset >= m_maxoffset)
+			return 0;
+		if (offset + length > m_maxoffset)
+			length = m_maxoffset - offset;
+		std::memset(dest, 0, length);
+		return length;
+	}
+
+private:
+	// internal state
+	std::uint64_t   m_offset;
+	std::uint64_t   m_maxoffset;
+};
+
+
 // ======================> chd_rawfile_compressor
 
 class chd_rawfile_compressor : public chd_file_compressor
 {
 public:
 	// construction/destruction
-	chd_rawfile_compressor(util::core_file &file, UINT64 offset = 0, UINT64 maxoffset = ~0)
-		: m_file(file),
-			m_offset(offset),
-			m_maxoffset((std::min)(maxoffset, file.size())) { }
+	chd_rawfile_compressor(util::core_file &file, std::uint64_t offset = 0, std::uint64_t maxoffset = std::numeric_limits<std::uint64_t>::max())
+		: m_file(file)
+		, m_offset(offset)
+		, m_maxoffset((std::min)(maxoffset, file.size()))
+	{
+	}
 
 	// read interface
-	virtual UINT32 read_data(void *dest, UINT64 offset, UINT32 length)
+	virtual std::uint32_t read_data(void *dest, std::uint64_t offset, std::uint32_t length) override
 	{
 		offset += m_offset;
 		if (offset >= m_maxoffset)
@@ -217,8 +254,8 @@ public:
 private:
 	// internal state
 	util::core_file &   m_file;
-	UINT64              m_offset;
-	UINT64              m_maxoffset;
+	std::uint64_t       m_offset;
+	std::uint64_t       m_maxoffset;
 };
 
 
@@ -1626,11 +1663,10 @@ static void do_create_raw(parameters_t &params)
 	printf("Logical size: %s\n", big_int_string(tempstr, input_end - input_start));
 
 	// catch errors so we can close & delete the output file
-	chd_rawfile_compressor *chd = nullptr;
 	try
 	{
 		// create the new CHD
-		chd = new chd_rawfile_compressor(*input_file, input_start, input_end);
+		std::unique_ptr<chd_file_compressor> chd(new chd_rawfile_compressor(*input_file, input_start, input_end));
 		chd_error err;
 		if (output_parent.opened())
 			err = chd->create(output_chd_str->c_str(), input_end - input_start, hunk_size, compression, output_parent);
@@ -1645,11 +1681,9 @@ static void do_create_raw(parameters_t &params)
 
 		// compress it generically
 		compress_common(*chd);
-		delete chd;
 	}
 	catch (...)
 	{
-		delete chd;
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())
@@ -1804,11 +1838,12 @@ static void do_create_hd(parameters_t &params)
 	printf("Logical size: %s\n", big_int_string(tempstr, UINT64(totalsectors) * UINT64(sector_size)));
 
 	// catch errors so we can close & delete the output file
-	chd_rawfile_compressor *chd = nullptr;
 	try
 	{
 		// create the new hard drive
-		chd = new chd_rawfile_compressor(*input_file, input_start, input_end);
+		std::unique_ptr<chd_file_compressor> chd;
+		if (input_file) chd.reset(new chd_rawfile_compressor(*input_file, input_start, input_end));
+		else chd.reset(new chd_zero_compressor(input_start, input_end));
 		chd_error err;
 		if (output_parent.opened())
 			err = chd->create(output_chd_str->c_str(), UINT64(totalsectors) * UINT64(sector_size), hunk_size, compression, output_parent);
@@ -1834,11 +1869,9 @@ static void do_create_hd(parameters_t &params)
 		// compress it generically
 		if (input_file)
 			compress_common(*chd);
-		delete chd;
 	}
 	catch (...)
 	{
-		delete chd;
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())
