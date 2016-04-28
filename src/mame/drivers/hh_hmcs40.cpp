@@ -805,8 +805,8 @@ static MACHINE_CONFIG_START( packmon, packmon_state )
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(3840, 1376)
-	MCFG_SCREEN_VISIBLE_AREA(0, 3840-1, 0, 1376-1)
+	MCFG_SCREEN_SIZE(3840, 1532)
+	MCFG_SCREEN_VISIBLE_AREA(0, 3840-1, 0, 1532-1)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
@@ -3978,8 +3978,8 @@ ROM_START( packmon )
 	ROM_LOAD( "hd38800a27", 0x0000, 0x1000, CRC(86e09e84) SHA1(ac7d3c43667d5720ca513f8ff51d146d9f2af124) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 400909, "svg", 0)
-	ROM_LOAD( "packmon.svg", 0, 400909, CRC(d91393ac) SHA1(1aa27b6dbef59ea6482a41f3e6eb30ff0eb91b4a) ) // by kevtris/OG/hap, ver. 25 apr 2016
+	ROM_REGION( 246356, "svg", 0)
+	ROM_LOAD( "packmon.svg", 0, 246356, CRC(991eea96) SHA1(bf42765aea838e9c26453642b01a962399b3e74c) ) // by Rik/kevtris, ver. 27 apr 2016
 ROM_END
 
 
