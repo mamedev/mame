@@ -1199,7 +1199,7 @@ ROMEO           - Sammy AX0201A01 'ROMEO' 4111-00000501 0250 K13 custom ASIC (TQ
 315-6267        - SEGA 315-6267 custom ASIC (BGAxxx)
 TD62064         - Toshiba TD62064 NPN 50V 1.5A Quad Darlington Driver (SOIC16)
 SH4             - Hitachi SH-4 HD6417091RA CPU (BGA256)
-BIOS.IC23       - Macronix 29L001MC-10 3.3volt (1MBit) FlashROM (SOP44, reverse pinout: use reverse adapter or "dead bug" method)
+BIOS.IC23       - Macronix 29L001MC-10 3.3volt (1MBit) FlashROM (SOP44, byte mode, reverse pinout: use reverse adapter or "dead bug" method, pinout equivalent to reversed MX29LV160 with four high address lines unused)
 W129AG          - IC Works W129AG Programmable Clock Frequency Generator, clock input of 13.5MHz (SOIC16)
 SW1             - 2-position Dip Switch
 VGA             - 15 pin VGA out connector @ 31.5kHz
