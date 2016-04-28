@@ -4,7 +4,6 @@
 #define __NEOGEO_SLOT_H
 
 #include "emu.h"
-#include "bus/neogeo/neogeo_helper.h"
 
 /* PCB */
 enum
@@ -135,14 +134,6 @@ public:
 	UINT8* get_region_sprites_base()  { if (m_region_spr.found()) return m_region_spr->base(); return nullptr; }
 	UINT32 get_region_sprites_size() { if (m_region_spr.found()) return m_region_spr->bytes(); return 0; }
 
-	UINT8* get_sprites_optimized() { return &m_sprites_optimized[0]; }
-	std::vector<UINT8>& get_sprites_optimized_arr() { return m_sprites_optimized; }
-	
-	UINT32 get_sprites_addrmask() { return m_sprite_gfx_address_mask; }
-	void init_sprites_addrmask(UINT8 *spr_base, UINT32 spr_size) {
-		m_sprite_gfx_address_mask = neogeohelper_optimize_sprite_data(get_sprites_optimized_arr(), &spr_base[0], spr_size);
-	}
-
 	void ym_alloc(UINT32 size) { m_ym.resize(size); }
 	UINT8* get_ym_base() { return &m_ym[0]; }
 	UINT32 get_ym_size() { return m_ym.size(); }
@@ -155,15 +146,12 @@ public:
 	UINT8* get_region_ymdelta_base()  { if (m_region_ymd.found()) return m_region_ymd->base(); return nullptr; }
 	UINT32 get_region_ymdelta_size() { if (m_region_ymd.found()) return m_region_ymd->bytes(); return 0; }
 
-	UINT32 m_sprite_gfx_address_mask;
-	
 protected:
 	// these are allocated when loading from softlist
 	std::vector<UINT16> m_rom;
 	std::vector<UINT8> m_fixed;
 	std::vector<UINT8> m_audio;
 	std::vector<UINT8> m_sprites;
-	std::vector<UINT8> m_sprites_optimized;
 	std::vector<UINT8> m_ym;
 	std::vector<UINT8> m_ymdelta;
 	std::vector<UINT8> m_audiocrypt;
@@ -310,25 +298,6 @@ public:
 		return 0;
 	}
 
-
-	UINT8* get_sprites_opt_base()  {
-		if (m_cart)
-			return m_cart->get_sprites_optimized();
-		return nullptr;
-	}
-	
-	void init_sprites_addrmask() {
-		if (m_cart)
-		{
-			if (!user_loadable())
-				m_cart->init_sprites_addrmask(m_cart->get_region_sprites_base(), m_cart->get_region_sprites_size());
-			else
-				m_cart->init_sprites_addrmask(m_cart->get_sprites_base(), m_cart->get_sprites_size());
-		}
-	}
-
-	
-	UINT32 get_sprites_addrmask() { if (m_cart) return m_cart->get_sprites_addrmask(); return 0; }
 	int get_fixed_bank_type(void) { if (m_cart) return m_cart->get_fixed_bank_type(); return 0; }
 	UINT32 get_bank_base(UINT16 sel) { if (m_cart) return m_cart->get_bank_base(sel); return 0; }
 	UINT32 get_special_bank() { if (m_cart) return m_cart->get_special_bank(); return 0; }

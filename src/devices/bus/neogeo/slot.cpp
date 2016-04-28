@@ -21,7 +21,6 @@ const device_type NEOGEO_CART_SLOT = &device_creator<neogeo_cart_slot_device>;
 
 device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-	m_sprite_gfx_address_mask(0),
 	m_region_rom(*this, "^maincpu"),
 	m_region_fixed(*this, "^fixed"),
 	m_region_audio(*this, "^audiocpu"),
@@ -262,9 +261,6 @@ bool neogeo_cart_slot_device::call_load()
 				m_cart->get_ymdelta_base(), m_cart->get_ymdelta_size(),
 				m_cart->get_audio_base(), m_cart->get_audio_size(),
 				m_cart->get_audiocrypt_base(), m_cart->get_audiocrypt_size());
-			
-			// create optimized sprite cache  [NOT GOOD FOR NOSLOT!!!!]
-			m_cart->m_sprite_gfx_address_mask = neogeohelper_optimize_sprite_data(m_cart->get_sprites_optimized_arr(), m_cart->get_sprites_base(), m_cart->get_sprites_size());
 
 			return IMAGE_INIT_PASS;
 		}

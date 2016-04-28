@@ -1142,11 +1142,7 @@ void neogeo_state::init_sprites()
 	{
 		m_sprgen->set_sprite_region(m_slots[m_curr_slot]->get_sprites_base(), m_slots[m_curr_slot]->get_sprites_size());
 		m_sprgen->set_fixed_regions(m_slots[m_curr_slot]->get_fixed_base(), m_slots[m_curr_slot]->get_fixed_size(), m_region_fixedbios);
-		
-		// give the sprite chip pointers to the graphics for this cartslot from the slot device
-		if (!m_slots[m_curr_slot]->user_loadable())
-			m_slots[m_curr_slot]->init_sprites_addrmask();
-		m_sprgen->set_optimized_sprite_data(m_slots[m_curr_slot]->get_sprites_opt_base(), m_slots[m_curr_slot]->get_sprites_addrmask());
+		m_sprgen->optimize_sprite_data();
 		m_sprgen->m_fixed_layer_bank_type = m_slots[m_curr_slot]->get_fixed_bank_type();
 	}
 	else
@@ -2029,9 +2025,9 @@ DRIVER_INIT_MEMBER(neogeo_state, neogeo)
 }
 
 
-/*    YEAR  NAME        PARENT    COMPAT    MACHINE   INPUT     INIT    */
-CONS( 1990, neogeo, 0,      0,   mvs,  neogeo_6slot,  neogeo_state,   neogeo,  "SNK", "Neo-Geo", MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-CONS( 1990, aes,    0,      0,   aes,  aes,           driver_device,  0,       "SNK", "Neo-Geo AES", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT MACHINE   INPUT          INIT    */
+CONS( 1990, neogeo, 0,      0,     mvs,      neogeo_6slot,  neogeo_state,   neogeo,  "SNK", "Neo-Geo", MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+CONS( 1990, aes,    0,      0,     aes,      aes,           driver_device,  0,       "SNK", "Neo-Geo AES", MACHINE_SUPPORTS_SAVE )
 
 
 // Include standalone drivers for the single games

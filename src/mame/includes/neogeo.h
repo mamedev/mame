@@ -31,6 +31,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_upd4990a(*this, "upd4990a"),
+		m_ym(*this, "ymsnd"),
+		m_sprgen(*this, "spritegen"),
+		m_save_ram(*this, "saveram"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_memcard(*this, "memcard"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_sprites(*this, "sprites"),
 		m_region_fixed(*this, "fixed"),
@@ -39,19 +46,12 @@ public:
 		m_region_audiobios(*this, "audiobios"),
 		m_region_audiocpu(*this, "audiocpu"),
 		m_bank_audio_main(*this, "audio_main"),
-		m_upd4990a(*this, "upd4990a"),
-		m_ym(*this, "ymsnd"),
-		m_save_ram(*this, "saveram"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_memcard(*this, "memcard"),
 		m_dsw(*this, "DSW"),
 		m_trackx(*this, "TRACK_X"),
 		m_tracky(*this, "TRACK_Y"),
 		m_edge(*this, "edge"),
 		m_ctrl1(*this, "ctrl1"),
 		m_ctrl2(*this, "ctrl2"),
-		m_sprgen(*this, "spritegen"),
 		m_use_cart_vectors(0),
 		m_use_cart_audio(0),
 		m_slot1(*this, "cslot1"),
@@ -89,12 +89,6 @@ public:
 
 	UINT32 screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(mvs);
-
-	// NEW IMPLEMENTATION!!!
-	void set_slot_idx(int slot);
-	void neogeo_postload();
-	
 	DECLARE_WRITE8_MEMBER(io_control_w);
 	DECLARE_WRITE8_MEMBER(system_control_w);
 	DECLARE_READ16_MEMBER(banked_vectors_r);
@@ -110,36 +104,27 @@ public:
 
 protected:
 	void common_machine_start();
-
-	void update_interrupts();
-	void create_interrupt_timers();
-	void start_interrupt_timers();
-	void acknowledge_interrupt(UINT16 data);
-
-	void adjust_display_position_interrupt_timer();
-	void set_display_position_interrupt_control(UINT16 data);
-	void set_display_counter_msb(UINT16 data);
-	void set_display_counter_lsb(UINT16 data);
-	void set_video_control(UINT16 data);
-
-	void create_rgb_lookups();
-	void set_pens();
-	void set_screen_shadow(int data);
-	void set_palette_bank(int data);
-
-	void audio_cpu_check_nmi();
-	void set_save_ram_unlock(UINT8 data);
+	
 	void set_outputs();
-	void set_output_latch(UINT8 data);
-	void set_output_data(UINT8 data);
 
 	// device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void neogeo_postload();
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	// MVS-specific devices
+	optional_device<upd4990a_device> m_upd4990a;
+	optional_device<ym2610_device> m_ym;
+	required_device<neosprite_optimized_device> m_sprgen;
+	optional_shared_ptr<UINT16> m_save_ram;
+	
+	required_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
+	optional_device<ng_memcard_device> m_memcard;
 
 	// memory
 	optional_memory_region m_region_maincpu;
@@ -152,31 +137,9 @@ protected:
 	optional_memory_bank   m_bank_audio_main; // optional because of neocd
 	memory_bank           *m_bank_audio_cart[4];
 	memory_bank           *m_bank_cartridge;
-	
-	// MVS-specific devices
-	optional_device<upd4990a_device> m_upd4990a;
-	optional_device<ym2610_device> m_ym;
-	optional_shared_ptr<UINT16> m_save_ram;
-
-	required_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
-	optional_device<ng_memcard_device> m_memcard;
 
 	// configuration
 	enum {NEOGEO_MVS, NEOGEO_AES, NEOGEO_CD} m_type;
-
-	// internal state
-	bool       m_recurse;
-	bool       m_audio_cpu_nmi_enabled;
-	bool       m_audio_cpu_nmi_pending;
-
-	// MVS-specific state
-	UINT8      m_save_ram_unlocked;
-	UINT8      m_output_data;
-	UINT8      m_output_latch;
-	UINT8      m_el_value;
-	UINT8      m_led1_value;
-	UINT8      m_led2_value;
 
 	optional_ioport m_dsw;
 	optional_ioport m_trackx;
@@ -190,30 +153,14 @@ protected:
 	virtual void video_start() override;
 	virtual void video_reset() override;
 
-	emu_timer  *m_display_position_interrupt_timer;
-	emu_timer  *m_display_position_vblank_timer;
-	emu_timer  *m_vblank_interrupt_timer;
-	UINT32     m_display_counter;
-	UINT8      m_vblank_interrupt_pending;
-	UINT8      m_display_position_interrupt_pending;
-	UINT8      m_irq3_pending;
-	UINT8      m_display_position_interrupt_control;
+	const pen_t *m_bg_pen;
 	UINT8      m_vblank_level;
 	UINT8      m_raster_level;
 
-	required_device<neosprite_optimized_device> m_sprgen;
-	UINT16 get_video_control();
-
-	// color/palette related
-	std::vector<UINT16> m_paletteram;
-	UINT8        m_palette_lookup[32][4];
-	const pen_t *m_bg_pen;
-	int          m_screen_shadow;
-	int          m_palette_bank;
-
-
 	int m_use_cart_vectors;
 	int m_use_cart_audio;
+
+	void set_slot_idx(int slot);
 
 	// cart slots
 	void init_cpu();
@@ -232,6 +179,58 @@ protected:
 	
 	int m_curr_slot;
 	neogeo_cart_slot_device* m_slots[6];
+
+private:
+	void update_interrupts();
+	void create_interrupt_timers();
+	void start_interrupt_timers();
+	void acknowledge_interrupt(UINT16 data);
+	
+	void adjust_display_position_interrupt_timer();
+	void set_display_position_interrupt_control(UINT16 data);
+	void set_display_counter_msb(UINT16 data);
+	void set_display_counter_lsb(UINT16 data);
+	void set_video_control(UINT16 data);
+	
+	void create_rgb_lookups();
+	void set_pens();
+	void set_screen_shadow(int data);
+	void set_palette_bank(int data);
+	
+	void audio_cpu_check_nmi();
+	void set_save_ram_unlock(UINT8 data);
+	void set_output_latch(UINT8 data);
+	void set_output_data(UINT8 data);
+	
+	// internal state
+	bool       m_recurse;
+	bool       m_audio_cpu_nmi_enabled;
+	bool       m_audio_cpu_nmi_pending;
+	
+	// MVS-specific state
+	UINT8      m_save_ram_unlocked;
+	UINT8      m_output_data;
+	UINT8      m_output_latch;
+	UINT8      m_el_value;
+	UINT8      m_led1_value;
+	UINT8      m_led2_value;
+	
+	emu_timer  *m_display_position_interrupt_timer;
+	emu_timer  *m_display_position_vblank_timer;
+	emu_timer  *m_vblank_interrupt_timer;
+	UINT32     m_display_counter;
+	UINT8      m_vblank_interrupt_pending;
+	UINT8      m_display_position_interrupt_pending;
+	UINT8      m_irq3_pending;
+	UINT8      m_display_position_interrupt_control;
+	
+	UINT16 get_video_control();
+	
+	// color/palette related
+	std::vector<UINT16> m_paletteram;
+	UINT8        m_palette_lookup[32][4];
+	int          m_screen_shadow;
+	int          m_palette_bank;
 };
 
 
@@ -244,9 +243,7 @@ class aes_state : public neogeo_state
 	{}
 	
 	DECLARE_READ16_MEMBER(aes_in2_r);
-	
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
-	
 	DECLARE_MACHINE_START(aes);
 	
 protected:

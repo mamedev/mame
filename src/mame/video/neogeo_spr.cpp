@@ -5,7 +5,6 @@
 
 #include "emu.h"
 #include "neogeo_spr.h"
-#include "bus/neogeo/neogeo_helper.h"
 
 // pure virtual functions
 //const device_type NEOGEO_SPRITE_BASE = &device_creator<neosprite_base_device>;
@@ -611,11 +610,6 @@ void neosprite_base_device::optimize_sprite_data()
 	return;
 }
 
-void neosprite_base_device::set_optimized_sprite_data(UINT8* sprdata, UINT32 mask)
-{
-	return;
-}
-
 
 // these are for passing in pointers from the main system
 void neosprite_base_device::set_sprite_region(UINT8* region_sprites, UINT32 region_sprites_size)
@@ -710,17 +704,50 @@ neosprite_optimized_device::neosprite_optimized_device(const machine_config &mco
 {
 }
 
+UINT32 neosprite_optimized_device::optimize_helper(std::vector<UINT8> &spritegfx, UINT8* region_sprites, UINT32 region_sprites_size)
+{
+	// convert the sprite graphics data into a format that allows faster blitting
+	UINT8 *src;
+	UINT8 *dest;
+	
+	UINT32 mask = get_region_mask(region_sprites, region_sprites_size);
+	
+	spritegfx.resize(mask + 1);
+	UINT32 spritegfx_address_mask = mask;
+	
+	src = region_sprites;
+	dest = &spritegfx[0];
+	
+	for (unsigned i = 0; i < region_sprites_size; i += 0x80, src += 0x80)
+	{
+		for (unsigned y = 0; y < 0x10; y++)
+		{
+			for (unsigned x = 0; x < 8; x++)
+			{
+				*(dest++) = (((src[0x43 | (y << 2)] >> x) & 0x01) << 3) |
+				(((src[0x41 | (y << 2)] >> x) & 0x01) << 2) |
+				(((src[0x42 | (y << 2)] >> x) & 0x01) << 1) |
+				(((src[0x40 | (y << 2)] >> x) & 0x01) << 0);
+			}
+			
+			for (unsigned x = 0; x < 8; x++)
+			{
+				*(dest++) = (((src[0x03 | (y << 2)] >> x) & 0x01) << 3) |
+				(((src[0x01 | (y << 2)] >> x) & 0x01) << 2) |
+				(((src[0x02 | (y << 2)] >> x) & 0x01) << 1) |
+				(((src[0x00 | (y << 2)] >> x) & 0x01) << 0);
+			}
+		}
+	}
+	
+	return spritegfx_address_mask;
+}
+
 
 void neosprite_optimized_device::optimize_sprite_data()
 {
-	m_sprite_gfx_address_mask = neogeohelper_optimize_sprite_data(m_sprite_gfx, m_region_sprites, m_region_sprites_size);
+	m_sprite_gfx_address_mask = optimize_helper(m_sprite_gfx, m_region_sprites, m_region_sprites_size);
 	m_spritegfx8 = &m_sprite_gfx[0];
-}
-
-void neosprite_optimized_device::set_optimized_sprite_data(UINT8* sprdata, UINT32 mask)
-{
-	m_spritegfx8 = sprdata;
-	m_sprite_gfx_address_mask = mask;
 }
 
 inline void neosprite_optimized_device::draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens)
