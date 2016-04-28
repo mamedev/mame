@@ -21,16 +21,11 @@ struct point
 		x(0),
 		y(0),
 		col(0),
-		intensity(0),
-		arg1(0),
-		arg2(0),
-		status(0) {}
+		intensity(0) {}
 
 	int x; int y;
 	rgb_t col;
 	int intensity;
-	int arg1; int arg2; /* start/end in pixel array or clipping info */
-	int status;         /* for dirty and clipping handling */
 };
 
 class vector_options
@@ -52,13 +47,11 @@ class vector_device : public device_t, public device_video_interface
 public:
 	// construction/destruction
 	vector_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	vector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void clear_list();
 
 	void add_point(int x, int y, rgb_t color, int intensity);
-	void add_clip(int minx, int miny, int maxx, int maxy);
 
 	void set_flicker(float newval);
 	float get_flicker();

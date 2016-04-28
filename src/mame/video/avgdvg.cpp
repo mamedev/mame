@@ -69,19 +69,81 @@ void avgdvg_device::apply_flipping(int *x, int *y)
 
 void avgdvg_device::vg_flush()
 {
+	int cx0 = 0, cy0 = 0, cx1 = 0x2000000, cy1 = 0x2000000;
 	int i = 0;
 
 	while (vectbuf[i].status == VGCLIP)
 		i++;
-	m_vector->add_point(vectbuf[i].x, vectbuf[i].y, vectbuf[i].color, 0);
+	int xs = vectbuf[i].x;
+	int ys = vectbuf[i].y;
 
 	for (i = 0; i < nvect; i++)
 	{
 		if (vectbuf[i].status == VGVECTOR)
-			m_vector->add_point(vectbuf[i].x, vectbuf[i].y, vectbuf[i].color, vectbuf[i].intensity);
+		{
+			int xe = vectbuf[i].x;
+			int ye = vectbuf[i].y;
+			int x0 = xs, y0 = ys, x1 = xe, y1 = ye;
 
-		if (vectbuf[i].status == VGCLIP)
-			m_vector->add_clip(vectbuf[i].x, vectbuf[i].y, vectbuf[i].arg1, vectbuf[i].arg2);
+			xs = xe;
+			ys = ye;
+
+			if((x0 < cx0 && x1 < cx0) || (x0 > cx1 && x1 > cx1))
+				continue;
+
+			if(x0 < cx0) {
+				y0 += INT64(cx0-x0)*INT64(y1-y0)/(x1-x0);
+				x0 = cx0;
+			} else if(x0 > cx1) {
+				y0 += INT64(cx1-x0)*INT64(y1-y0)/(x1-x0);
+				x0 = cx1;
+			}
+			if(x1 < cx0) {
+				y1 += INT64(cx0-x1)*INT64(y1-y0)/(x1-x0);
+				x1 = cx0;
+			} else if(x1 > cx1) {
+				y1 += INT64(cx1-x1)*INT64(y1-y0)/(x1-x0);
+				x1 = cx1;
+			}
+
+			if((y0 < cy0 && y1 < cy0) || (y0 > cy1 && y1 > cy1))
+				continue;
+
+			if(y0 < cy0) {
+				x0 += INT64(cy0-y0)*INT64(x1-x0)/(y1-y0);
+				y0 = cy0;
+			} else if(y0 > cy1) {
+				x0 += INT64(cy1-y0)*INT64(x1-x0)/(y1-y0);
+				y0 = cy1;
+			}
+			if(y1 < cy0) {
+				x1 += INT64(cy0-y1)*INT64(x1-x0)/(y1-y0);
+				y1 = cy0;
+			} else if(y1 > cy1) {
+				x1 += INT64(cy1-y1)*INT64(x1-x0)/(y1-y0);
+				y1 = cy1;
+			}
+
+			m_vector->add_point(x0, y0, vectbuf[i].color, 0);
+			m_vector->add_point(x1, y1, vectbuf[i].color, vectbuf[i].intensity);
+		}
+
+		if (vectbuf[i].status == VGCLIP) {
+			cx0 = vectbuf[i].x;
+			cy0 = vectbuf[i].y;
+			cx1 = vectbuf[i].arg1;
+			cy1 = vectbuf[i].arg2;
+			if(cx0 > cx1) {
+				int t = cx1;
+				cx1 = cx0;
+				cx0 = t;
+			}
+			if(cy0 > cx1) {
+				int t = cy1;
+				cy1 = cy0;
+				cy0 = t;
+			}
+		}
 	}
 
 	nvect=0;
@@ -692,7 +754,7 @@ void avg_tempest_device::vggo() // tempest_vggo
 	*
 	*************************************/
 
-	int avg_mhavoc_device::handler_1() //  mhavoc_latch1
+int avg_mhavoc_device::handler_1() //  mhavoc_latch1
 {
 	/*
 	 * Major Havoc just has ymin clipping
