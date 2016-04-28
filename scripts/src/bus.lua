@@ -1188,7 +1188,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/vcs/ctrl.h,BUSES["VCS_CTRL"] = true
+--@src/devices/bus/vcs_ctrl/ctrl.h,BUSES["VCS_CTRL"] = true
 ---------------------------------------------------
 
 if (BUSES["VCS_CTRL"]~=null) then
