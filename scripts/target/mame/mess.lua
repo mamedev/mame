@@ -951,6 +951,7 @@ files {
 	MAME_DIR .. "src/mame/machine/amiga.cpp",
 	MAME_DIR .. "src/mame/video/amiga.cpp",
 	MAME_DIR .. "src/mame/video/amigaaga.cpp",
+	MAME_DIR .. "src/mame/video/amigaaga.h",
 	MAME_DIR .. "src/mame/video/tia.cpp",
 	MAME_DIR .. "src/mame/video/tia.h",
 	MAME_DIR .. "src/mame/machine/atari400.cpp",

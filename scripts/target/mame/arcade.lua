@@ -872,6 +872,7 @@ files {
 	MAME_DIR .. "src/mame/machine/amiga.cpp",
 	MAME_DIR .. "src/mame/video/amiga.cpp",
 	MAME_DIR .. "src/mame/video/amigaaga.cpp",
+	MAME_DIR .. "src/mame/video/amigaaga.h",
 	MAME_DIR .. "src/mame/drivers/arsystems.cpp",
 	MAME_DIR .. "src/mame/drivers/cubo.cpp",
 	MAME_DIR .. "src/mame/drivers/mquake.cpp",
