@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "drivenum.h"
 
 //**************************************************************************
 //  CORE EMULATOR OPTIONS
@@ -222,19 +221,6 @@ emu_options::emu_options()
 , m_refresh_speed(false)
 {
 	add_entries(emu_options::s_option_entries);
-}
-
-
-
-//-------------------------------------------------
-//  system - return a pointer to the specified
-//  system driver, or nullptr if no match
-//-------------------------------------------------
-
-const game_driver *emu_options::system() const
-{
-	int index = driver_list::find(core_filename_extract_base(system_name(), true).c_str());
-	return (index != -1) ? &driver_list::driver(index) : nullptr;
 }
 
 

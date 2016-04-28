@@ -60,6 +60,7 @@ public:
 	// FIXME: Couriersud: This should be in image_device_exit
 	static void remove_device_options(emu_options &options);
 
+	static const game_driver *system(const emu_options &options);
 	static void set_system_name(emu_options &options, const char *name);
 	static bool add_slot_options(emu_options &options, const software_part *swpart = nullptr);
 private:

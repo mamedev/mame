@@ -2627,7 +2627,7 @@ void ui_menu::draw_palette_menu()
 	float gutter_width = lr_arrow_width * 1.3f;
 	int itemnum, linenum;
 
-	if (ui().options().use_background_image() && machine().options().system() == nullptr && bgrnd_bitmap->valid())
+	if (ui().options().use_background_image() && &machine().system() == &GAME_NAME(___empty) && bgrnd_bitmap->valid())
 		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t::white, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	// compute the width and height of the full menu

@@ -187,7 +187,7 @@ int mame_machine_manager::execute()
 		m_new_driver_pending = nullptr;
 
 		// if no driver, use the internal empty driver
-		const game_driver *system = m_options.system();
+		const game_driver *system = mame_options::system(m_options);
 		if (system == nullptr)
 		{
 			system = &GAME_NAME(___empty);
