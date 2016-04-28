@@ -31,8 +31,8 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_software_parts::ui_menu_software_parts(running_machine &machine, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, int *result)
-	: ui_menu(machine, container)
+ui_menu_software_parts::ui_menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, int *result)
+	: ui_menu(mui, container)
 {
 	m_info = info;
 	m_interface = interface;
@@ -121,8 +121,8 @@ void ui_menu_software_parts::handle()
 //  ctor
 //-------------------------------------------------
 
-ui_menu_software_list::ui_menu_software_list(running_machine &machine, render_container *container, software_list_device *swlist, const char *interface, std::string &result)
-	: ui_menu(machine, container), m_result(result)
+ui_menu_software_list::ui_menu_software_list(mame_ui_manager &mui, render_container *container, software_list_device *swlist, const char *interface, std::string &result)
+	: ui_menu(mui, container), m_result(result)
 {
 	m_swlist = swlist;
 	m_interface = interface;
@@ -286,7 +286,7 @@ void ui_menu_software_list::handle()
 				update_selected = true;
 
 				if (ARRAY_LENGTH(m_filename_buffer) > 0)
-					mame_machine_manager::instance()->ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
 			}
 			// if it's any other key and we're not maxed out, update
 			else if (event->unichar >= ' ' && event->unichar < 0x7f)
@@ -296,7 +296,7 @@ void ui_menu_software_list::handle()
 				update_selected = true;
 
 				if (ARRAY_LENGTH(m_filename_buffer) > 0)
-					mame_machine_manager::instance()->ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
 			}
 
 			if (update_selected)
@@ -382,8 +382,8 @@ void ui_menu_software_list::handle()
 //  ctor
 //-------------------------------------------------
 
-ui_menu_software::ui_menu_software(running_machine &machine, render_container *container, const char *interface, software_list_device **result)
-	: ui_menu(machine, container)
+ui_menu_software::ui_menu_software(mame_ui_manager &mui, render_container *container, const char *interface, software_list_device **result)
+	: ui_menu(mui, container)
 {
 	m_interface = interface;
 	m_result = result;
@@ -451,7 +451,7 @@ void ui_menu_software::handle()
 	const ui_menu_event *event = process(0);
 
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT) {
-		//      ui_menu::stack_push(global_alloc_clear<ui_menu_software_list>(machine(), container, (software_list_config *)event->itemref, image));
+		//      ui_menu::stack_push(global_alloc_clear<ui_menu_software_list>(ui(), container, (software_list_config *)event->itemref, image));
 		*m_result = (software_list_device *)event->itemref;
 		ui_menu::stack_pop(machine());
 	}

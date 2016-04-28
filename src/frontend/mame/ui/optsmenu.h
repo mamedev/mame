@@ -16,7 +16,7 @@
 class ui_menu_game_options : public ui_menu
 {
 public:
-	ui_menu_game_options(running_machine &machine, render_container *container);
+	ui_menu_game_options(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_game_options();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -45,9 +45,5 @@ private:
 		SAVE_CONFIG
 	};
 };
-
-// save options to file
-void save_ui_options(running_machine &machine);
-void save_main_option(running_machine &machine);
 
 #endif /* __UI_OPTSMENU_H__ */

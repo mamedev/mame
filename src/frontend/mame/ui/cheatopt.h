@@ -21,7 +21,7 @@
 
 class ui_menu_cheat : public ui_menu {
 public:
-	ui_menu_cheat(running_machine &machine, render_container *container);
+	ui_menu_cheat(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_cheat();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -35,7 +35,7 @@ public:
 
 class ui_menu_autofire : public ui_menu {
 public:
-	ui_menu_autofire(running_machine &machine, render_container *container);
+	ui_menu_autofire(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_autofire();
 	virtual void populate() override;
 	virtual void handle() override;

@@ -19,9 +19,9 @@ public:
 	std::string current_file;
 	device_image_interface *selected_device;
 
-	static void force_file_manager(running_machine &machine, render_container *container, const char *warnings);
+	static void force_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings);
 
-	ui_menu_file_manager(running_machine &machine, render_container *container, const char *warnings);
+	ui_menu_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings);
 	virtual ~ui_menu_file_manager();
 	virtual void populate() override;
 	virtual void handle() override;

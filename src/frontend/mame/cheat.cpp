@@ -75,6 +75,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "xmlfile.h"
+#include "mame.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "cheat.h"
@@ -1221,17 +1222,17 @@ bool cheat_manager::save_all(const char *filename)
 //  render text
 //-------------------------------------------------
 
-void cheat_manager::render_text(render_container &container)
+void cheat_manager::render_text(mame_ui_manager &mui, render_container &container)
 {
 	// render any text and free it along the way
 	for (int linenum = 0; linenum < m_output.size(); linenum++)
 		if (!m_output[linenum].empty())
 		{
 			// output the text
-			mame_machine_manager::instance()->ui().draw_text_full(&container, m_output[linenum].c_str(),
-					0.0f, (float)linenum * mame_machine_manager::instance()->ui().get_line_height(), 1.0f,
+			mui.draw_text_full(&container, m_output[linenum].c_str(),
+					0.0f, (float)linenum * mui.get_line_height(), 1.0f,
 					m_justify[linenum], WRAP_NEVER, DRAW_OPAQUE,
-					ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
+					rgb_t::white, rgb_t::black, nullptr, nullptr);
 		}
 }
 

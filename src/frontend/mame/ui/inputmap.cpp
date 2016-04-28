@@ -40,7 +40,7 @@
     input groups menu
 -------------------------------------------------*/
 
-ui_menu_input_groups::ui_menu_input_groups(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_input_groups::ui_menu_input_groups(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
@@ -73,7 +73,7 @@ void ui_menu_input_groups::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		ui_menu::stack_push(global_alloc_clear<ui_menu_input_general>(machine(), container, int((long long)(menu_event->itemref)-1)));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_input_general>(ui(), container, int((long long)(menu_event->itemref)-1)));
 }
 
 
@@ -83,7 +83,7 @@ void ui_menu_input_groups::handle()
     input menu
 -------------------------------------------------*/
 
-ui_menu_input_general::ui_menu_input_general(running_machine &machine, render_container *container, int _group) : ui_menu_input(machine, container)
+ui_menu_input_general::ui_menu_input_general(mame_ui_manager &mui, render_container *container, int _group) : ui_menu_input(mui, container)
 {
 	group = _group;
 }
@@ -146,7 +146,7 @@ ui_menu_input_general::~ui_menu_input_general()
     input menu
 -------------------------------------------------*/
 
-ui_menu_input_specific::ui_menu_input_specific(running_machine &machine, render_container *container) : ui_menu_input(machine, container)
+ui_menu_input_specific::ui_menu_input_specific(mame_ui_manager &mui, render_container *container) : ui_menu_input(mui, container)
 {
 }
 
@@ -224,7 +224,7 @@ ui_menu_input_specific::~ui_menu_input_specific()
 /*-------------------------------------------------
     menu_input - display a menu for inputs
 -------------------------------------------------*/
-ui_menu_input::ui_menu_input(running_machine &machine, render_container *container) : ui_menu(machine, container), last_sortorder(0), record_next(false)
+ui_menu_input::ui_menu_input(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container), last_sortorder(0), record_next(false)
 {
 	pollingitem = nullptr;
 	pollingref = nullptr;
@@ -447,7 +447,7 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
     switches menu
 -------------------------------------------------*/
 
-ui_menu_settings_dip_switches::ui_menu_settings_dip_switches(running_machine &machine, render_container *container) : ui_menu_settings(machine, container, IPT_DIPSWITCH)
+ui_menu_settings_dip_switches::ui_menu_settings_dip_switches(mame_ui_manager &mui, render_container *container) : ui_menu_settings(mui, container, IPT_DIPSWITCH)
 {
 }
 
@@ -460,7 +460,7 @@ ui_menu_settings_dip_switches::~ui_menu_settings_dip_switches()
     driver config menu
 -------------------------------------------------*/
 
-ui_menu_settings_driver_config::ui_menu_settings_driver_config(running_machine &machine, render_container *container) : ui_menu_settings(machine, container, IPT_CONFIG)
+ui_menu_settings_driver_config::ui_menu_settings_driver_config(mame_ui_manager &mui, render_container *container) : ui_menu_settings(mui, container, IPT_CONFIG)
 {
 }
 
@@ -530,7 +530,7 @@ void ui_menu_settings::handle()
     switches menus
 -------------------------------------------------*/
 
-ui_menu_settings::ui_menu_settings(running_machine &machine, render_container *container, UINT32 _type) : ui_menu(machine, container), diplist(nullptr), dipcount(0)
+ui_menu_settings::ui_menu_settings(mame_ui_manager &mui, render_container *container, UINT32 _type) : ui_menu(mui, container), diplist(nullptr), dipcount(0)
 {
 	type = _type;
 }
@@ -642,7 +642,7 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
 	y2 = y1 + bottom;
 
 	// draw extra menu area
-	mame_machine_manager::instance()->ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 	y1 += (float)DIP_SWITCH_SPACING;
 
 	// iterate over DIP switches
@@ -688,11 +688,11 @@ void ui_menu_settings_dip_switches::custom_render_one(float x1, float y1, float 
 	x1 += (x2 - x1 - numtoggles * switch_field_width) / 2;
 
 	/* draw the dip switch name */
-	mame_machine_manager::instance()->ui().draw_text_full(  container,
+	ui().draw_text_full(  container,
 						dip->name,
 						0,
 						y1 + (DIP_SWITCH_HEIGHT - UI_TARGET_FONT_HEIGHT) / 2,
-						x1 - mame_machine_manager::instance()->ui().get_string_width(" "),
+						x1 - ui().get_string_width(" "),
 						JUSTIFY_RIGHT,
 						WRAP_NEVER,
 						DRAW_NORMAL,
@@ -712,7 +712,7 @@ void ui_menu_settings_dip_switches::custom_render_one(float x1, float y1, float 
 		float innerx1;
 
 		/* first outline the switch */
-		mame_machine_manager::instance()->ui().draw_outlined_box(container, x1, y1, x1 + switch_field_width, y2, UI_BACKGROUND_COLOR);
+		ui().draw_outlined_box(container, x1, y1, x1 + switch_field_width, y2, UI_BACKGROUND_COLOR);
 
 		/* compute x1/x2 for the inner filled in switch */
 		innerx1 = x1 + (switch_field_width - switch_width) / 2;
@@ -805,7 +805,7 @@ void ui_menu_analog::handle()
     settings menu
 -------------------------------------------------*/
 
-ui_menu_analog::ui_menu_analog(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_analog::ui_menu_analog(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 

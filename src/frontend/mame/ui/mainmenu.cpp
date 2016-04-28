@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "crsshair.h"
 #include "emuopts.h"
+#include "mame.h"
 #include "ui/menu.h"
 #include "ui/filemngr.h"
 #include "ui/barcode.h"
@@ -42,7 +43,7 @@
     ui_menu_main constructor - populate the main menu
 -------------------------------------------------*/
 
-ui_menu_main::ui_menu_main(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_main::ui_menu_main(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
@@ -127,7 +128,7 @@ void ui_menu_main::populate()
 		item_append(_("Plugin Options"), nullptr, 0, (void *)PLUGINS);
 
 	// add dats menu
-	if (mame_machine_manager::instance()->ui().options().enabled_dats() && mame_machine_manager::instance()->datfile().has_data())
+	if (ui().options().enabled_dats() && mame_machine_manager::instance()->datfile().has_data())
 		item_append(_("External DAT View"), nullptr, 0, (void *)EXTERNAL_DATS);
 
 	item_append(ui_menu_item_type::SEPARATOR);
@@ -161,103 +162,103 @@ void ui_menu_main::handle()
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT) {
 		switch((long long)(menu_event->itemref)) {
 		case INPUT_GROUPS:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_input_groups>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_input_groups>(ui(), container));
 			break;
 
 		case INPUT_SPECIFIC:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_input_specific>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_input_specific>(ui(), container));
 			break;
 
 		case SETTINGS_DIP_SWITCHES:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_settings_dip_switches>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_settings_dip_switches>(ui(), container));
 			break;
 
 		case SETTINGS_DRIVER_CONFIG:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_settings_driver_config>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_settings_driver_config>(ui(), container));
 			break;
 
 		case ANALOG:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_analog>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_analog>(ui(), container));
 			break;
 
 		case BOOKKEEPING:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_bookkeeping>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_bookkeeping>(ui(), container));
 			break;
 
 		case GAME_INFO:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_game_info>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_game_info>(ui(), container));
 			break;
 
 		case IMAGE_MENU_IMAGE_INFO:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_image_info>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_image_info>(ui(), container));
 			break;
 
 		case IMAGE_MENU_FILE_MANAGER:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_file_manager>(machine(), container, nullptr));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_file_manager>(ui(), container, nullptr));
 			break;
 
 		case TAPE_CONTROL:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_tape_control>(machine(), container, nullptr));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_tape_control>(ui(), container, nullptr));
 			break;
 
 		case PTY_INFO:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_pty_info>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_pty_info>(ui(), container));
 			break;
 
 		case SLOT_DEVICES:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_slot_devices>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_slot_devices>(ui(), container));
 			break;
 
 		case NETWORK_DEVICES:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_network_devices>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_network_devices>(ui(), container));
 			break;
 
 		case KEYBOARD_MODE:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_keyboard_mode>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_keyboard_mode>(ui(), container));
 			break;
 
 		case SLIDERS:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_sliders>(machine(), container, false));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_sliders>(ui(), container, false));
 			break;
 
 		case VIDEO_TARGETS:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_video_targets>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_video_targets>(ui(), container));
 			break;
 
 		case VIDEO_OPTIONS:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_video_options>(machine(), container, machine().render().first_target()));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_video_options>(ui(), container, machine().render().first_target()));
 			break;
 
 		case CROSSHAIR:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_crosshair>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_crosshair>(ui(), container));
 			break;
 
 		case CHEAT:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_cheat>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_cheat>(ui(), container));
 			break;
 
 		case PLUGINS:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_plugin>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_plugin>(ui(), container));
 			break;
 
 		case SELECT_GAME:
 			if (strcmp(machine().options().ui(),"simple")==0) {
-				ui_menu::stack_push(global_alloc_clear<ui_simple_menu_select_game>(machine(), container, nullptr));
+				ui_menu::stack_push(global_alloc_clear<ui_simple_menu_select_game>(ui(), container, nullptr));
 			} else {
-				ui_menu::stack_push(global_alloc_clear<ui_menu_select_game>(machine(), container, nullptr));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_select_game>(ui(), container, nullptr));
 			}
 			break;
 
 		case BIOS_SELECTION:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_bios_selection>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_bios_selection>(ui(), container));
 			break;
 
 		case BARCODE_READ:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_barcode_reader>(machine(), container, nullptr));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_barcode_reader>(ui(), container, nullptr));
 			break;
 
 		case EXTERNAL_DATS:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(ui(), container));
 			break;
 
 		case ADD_FAVORITE:
@@ -272,7 +273,7 @@ void ui_menu_main::handle()
 
 		case QUIT_GAME:
 			ui_menu::stack_pop(machine());
-			mame_machine_manager::instance()->ui().request_quit();
+			ui().request_quit();
 			break;
 
 		default:

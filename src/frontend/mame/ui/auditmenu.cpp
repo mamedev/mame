@@ -84,8 +84,8 @@ bool sorted_game_list(const game_driver *x, const game_driver *y)
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_audit::ui_menu_audit(running_machine &machine, render_container *container, vptr_game &availablesorted, vptr_game &unavailablesorted,  int _audit_mode)
-	: ui_menu(machine, container)
+ui_menu_audit::ui_menu_audit(mame_ui_manager &mui, render_container *container, vptr_game &availablesorted, vptr_game &unavailablesorted,  int _audit_mode)
+	: ui_menu(mui, container)
 	, m_availablesorted(availablesorted)
 	, m_unavailablesorted(unavailablesorted)
 	, m_audit_mode(_audit_mode)
@@ -112,7 +112,7 @@ void ui_menu_audit::handle()
 
 	if (m_first)
 	{
-		mame_machine_manager::instance()->ui().draw_text_box(container, _("Audit in progress..."), JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
+		ui().draw_text_box(container, _("Audit in progress..."), JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
 		m_first = false;
 		return;
 	}
@@ -177,7 +177,7 @@ void ui_menu_audit::populate()
 void ui_menu_audit::save_available_machines()
 {
 	// attempt to open the output file
-	emu_file file(mame_machine_manager::instance()->ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open(emulator_info::get_configname(), "_avail.ini") == osd_file::error::NONE)
 	{
 		// generate header

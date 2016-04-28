@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "mame.h"
 #include "mameopts.h"
 #include "machine/ram.h"
 #include "sound/samples.h"
@@ -216,7 +215,7 @@ void info_xml_creator::output(FILE *out, bool nodevices)
 #endif
 		"\" mameconfig=\"%d\">\n",
 		XML_ROOT,
-		xml_normalize_string(build_version),
+		xml_normalize_string(emulator_info::get_build_version()),
 		CONFIG_VERSION
 	);
 

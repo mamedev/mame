@@ -19,11 +19,13 @@
 //  INIFILE MANAGER
 //-------------------------------------------------
 
+class ui_options;
+
 class inifile_manager
 {
 public:
 	// construction/destruction
-	inifile_manager(running_machine &machine);
+	inifile_manager(running_machine &machine, ui_options &moptions);
 
 	// getters
 	running_machine &machine() const { return m_machine; }
@@ -64,6 +66,7 @@ private:
 
 	// internal state
 	running_machine &m_machine;  // reference to our machine
+	ui_options      &m_options;
 	std::string     m_fullpath;
 	FILE            *fp = nullptr;
 };
@@ -76,7 +79,7 @@ class favorite_manager
 {
 public:
 	// construction/destruction
-	favorite_manager(running_machine &machine);
+	favorite_manager(running_machine &machine, ui_options &moptions);
 
 	// favorite indices
 	std::vector<ui_software_info> m_list;
@@ -112,6 +115,7 @@ private:
 
 	// internal state
 	running_machine &m_machine;  // reference to our machine
+	ui_options &m_options;
 };
 
 #endif  /* __UI_INIFILE_H__ */

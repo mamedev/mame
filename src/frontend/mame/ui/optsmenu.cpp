@@ -9,6 +9,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "mame.h"
 #include "mameopts.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
@@ -27,7 +28,7 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_game_options::ui_menu_game_options(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_game_options::ui_menu_game_options(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 	m_main = main_filters::actual;
 }
@@ -41,7 +42,7 @@ ui_menu_game_options::~ui_menu_game_options()
 	main_filters::actual = m_main;
 	if (ui_menu::menu_stack != nullptr)
 		ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
-	save_ui_options(machine());
+	ui().save_ui_options();
 	ui_globals::switch_image = true;
 }
 
@@ -82,7 +83,7 @@ void ui_menu_game_options::handle()
 					for (int index = 0; index < total; ++index)
 						s_sel[index] = main_filters::text[index];
 
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, m_main));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, s_sel, m_main));
 				}
 				break;
 			}
@@ -107,7 +108,7 @@ void ui_menu_game_options::handle()
 					for (size_t index = 0; index < total; ++index)
 						s_sel[index] = ifile.get_file(index);
 
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, ifile.cur_file(), SELECTOR_INIFILE));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, s_sel, ifile.cur_file(), SELECTOR_INIFILE));
 				}
 				break;
 			}
@@ -131,7 +132,7 @@ void ui_menu_game_options::handle()
 					for (int index = 0; index < total; ++index)
 						s_sel[index] = ifile.get_category(index);
 
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, ifile.cur_cat(), SELECTOR_CATEGORY));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, s_sel, ifile.cur_cat(), SELECTOR_CATEGORY));
 				}
 				break;
 			}
@@ -142,7 +143,7 @@ void ui_menu_game_options::handle()
 					changed = true;
 				}
 				else if (m_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, c_mnfct::ui, c_mnfct::actual));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, c_mnfct::ui, c_mnfct::actual));
 
 				break;
 			case YEAR_CAT_FILTER:
@@ -152,60 +153,60 @@ void ui_menu_game_options::handle()
 					changed = true;
 				}
 				else if (m_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, c_year::ui, c_year::actual));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, c_year::ui, c_year::actual));
 
 				break;
 			case CONF_DIR:
 				if (m_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_directory>(machine(), container));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_directory>(ui(), container));
 				break;
 			case MISC_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
 				{
-					ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, misc_submenu_options));
+					ui_menu::stack_push(global_alloc_clear<ui_submenu>(ui(), container, misc_submenu_options));
 					ui_globals::reset = true;
 				}
 				break;
 			case SOUND_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
 				{
-					ui_menu::stack_push(global_alloc_clear<ui_menu_sound_options>(machine(), container));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_sound_options>(ui(), container));
 					ui_globals::reset = true;
 				}
 				break;
 			case DISPLAY_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
 				{
-					ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, video_submenu_options));
+					ui_menu::stack_push(global_alloc_clear<ui_submenu>(ui(), container, video_submenu_options));
 					ui_globals::reset = true;
 				}
 				break;
 			case CUSTOM_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_custom_ui>(machine(), container));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_custom_ui>(ui(), container));
 				break;
 			case CONTROLLER_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, control_submenu_options));
+					ui_menu::stack_push(global_alloc_clear<ui_submenu>(ui(), container, control_submenu_options));
 				break;
 			case CGI_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_input_groups>(machine(), container));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_input_groups>(ui(), container));
 				break;
 			case CUSTOM_FILTER:
 				if (m_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_custom_filter>(machine(), container));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_custom_filter>(ui(), container));
 				break;
 			case ADVANCED_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
 				{
-					ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, advanced_submenu_options));
+					ui_menu::stack_push(global_alloc_clear<ui_submenu>(ui(), container, advanced_submenu_options));
 					ui_globals::reset = true;
 				}
 				break;
 			case SAVE_CONFIG:
 				if (m_event->iptkey == IPT_UI_SELECT)
-					save_main_option(machine());
+					ui().save_main_option();
 				break;
 		}
 
@@ -282,8 +283,8 @@ void ui_menu_game_options::populate()
 	item_append(ui_menu_item_type::SEPARATOR);
 	item_append(_("Save Configuration"), nullptr, 0, (void *)(FPTR)SAVE_CONFIG);
 
-	custombottom = 2.0f * mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -293,9 +294,8 @@ void ui_menu_game_options::populate()
 void ui_menu_game_options::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
-	mui.draw_text_full(container, _("Settings"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, _("Settings"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+									DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -306,7 +306,7 @@ void ui_menu_game_options::custom_render(void *selectedref, float top, float bot
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -314,76 +314,6 @@ void ui_menu_game_options::custom_render(void *selectedref, float top, float bot
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, _("Settings"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui().draw_text_full(container, _("Settings"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-}
-
-//-------------------------------------------------
-//  save ui options
-//-------------------------------------------------
-
-void save_ui_options(running_machine &machine)
-{
-	// attempt to open the output file
-	emu_file file(machine.options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open("ui.ini") == osd_file::error::NONE)
-	{
-		// generate the updated INI
-		std::string initext = mame_machine_manager::instance()->ui().options().output_ini();
-		file.puts(initext.c_str());
-		file.close();
-	}
-	else
-		machine.popmessage(_("**Error saving ui.ini**"));
-}
-
-//-------------------------------------------------
-//  save main option
-//-------------------------------------------------
-
-void save_main_option(running_machine &machine)
-{
-	// parse the file
-	std::string error;
-	emu_options options(machine.options()); // This way we make sure that all OSD parts are in
-	std::string error_string;
-
-	// attempt to open the main ini file
-	{
-		emu_file file(machine.options().ini_path(), OPEN_FLAG_READ);
-		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
-		{
-			bool result = options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
-			if (!result)
-			{
-				osd_printf_error("**Error loading %s.ini**", emulator_info::get_configname());
-				return;
-			}
-		}
-	}
-
-	for (emu_options::entry &f_entry : machine.options())
-	{
-		if (f_entry.is_changed())
-		{
-			options.set_value(f_entry.name(), f_entry.value(), OPTION_PRIORITY_CMDLINE, error_string);
-		}
-	}
-
-	// attempt to open the output file
-	{
-		emu_file file(machine.options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
-		{
-			// generate the updated INI
-			std::string initext = options.output_ini();
-			file.puts(initext.c_str());
-			file.close();
-		}
-		else {
-			machine.popmessage(_("**Error saving %s.ini**"), emulator_info::get_configname());
-			return;
-		}
-	}
-	mame_machine_manager::instance()->ui().popup_time(3, "%s", _("\n    Configuration saved    \n\n"));
 }

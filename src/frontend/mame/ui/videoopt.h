@@ -16,7 +16,7 @@
 
 class ui_menu_video_targets : public ui_menu {
 public:
-	ui_menu_video_targets(running_machine &machine, render_container *container);
+	ui_menu_video_targets(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_video_targets();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -24,7 +24,7 @@ public:
 
 class ui_menu_video_options : public ui_menu {
 public:
-	ui_menu_video_options(running_machine &machine, render_container *container, render_target *target);
+	ui_menu_video_options(mame_ui_manager &mui, render_container *container, render_target *target);
 	virtual ~ui_menu_video_options();
 	virtual void populate() override;
 	virtual void handle() override;

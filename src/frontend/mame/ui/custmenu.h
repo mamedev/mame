@@ -73,7 +73,7 @@ struct s_filter
 class ui_menu_swcustom_filter : public ui_menu
 {
 public:
-	ui_menu_swcustom_filter(running_machine &machine, render_container *container, const game_driver *_driver, s_filter &_filter);
+	ui_menu_swcustom_filter(mame_ui_manager &mui, render_container *container, const game_driver *_driver, s_filter &_filter);
 	virtual ~ui_menu_swcustom_filter();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -106,7 +106,7 @@ private:
 class ui_menu_custom_filter : public ui_menu
 {
 public:
-	ui_menu_custom_filter(running_machine &machine, render_container *container, bool _single_menu = false);
+	ui_menu_custom_filter(mame_ui_manager &mui, render_container *container, bool _single_menu = false);
 	virtual ~ui_menu_custom_filter();
 	virtual void populate() override;
 	virtual void handle() override;

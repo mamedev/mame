@@ -20,7 +20,7 @@ using s_bios = std::vector<std::pair<std::string, int>>;
 
 class ui_menu_keyboard_mode : public ui_menu {
 public:
-	ui_menu_keyboard_mode(running_machine &machine, render_container *container);
+	ui_menu_keyboard_mode(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_keyboard_mode();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -28,7 +28,7 @@ public:
 
 class ui_menu_network_devices : public ui_menu {
 public:
-	ui_menu_network_devices(running_machine &machine, render_container *container);
+	ui_menu_network_devices(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_network_devices();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -36,7 +36,7 @@ public:
 
 class ui_menu_bookkeeping : public ui_menu {
 public:
-	ui_menu_bookkeeping(running_machine &machine, render_container *container);
+	ui_menu_bookkeeping(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_bookkeeping();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -47,7 +47,7 @@ private:
 
 class ui_menu_crosshair : public ui_menu {
 public:
-	ui_menu_crosshair(running_machine &machine, render_container *container);
+	ui_menu_crosshair(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_crosshair();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -73,7 +73,7 @@ private:
 
 class ui_menu_quit_game : public ui_menu {
 public:
-	ui_menu_quit_game(running_machine &machine, render_container *container);
+	ui_menu_quit_game(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_quit_game();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -81,7 +81,7 @@ public:
 
 class ui_menu_bios_selection : public ui_menu {
 public:
-	ui_menu_bios_selection(running_machine &machine, render_container *container);
+	ui_menu_bios_selection(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_bios_selection();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -95,7 +95,7 @@ public:
 class ui_menu_export : public ui_menu
 {
 public:
-	ui_menu_export(running_machine &machine, render_container *container, std::vector<const game_driver*> list);
+	ui_menu_export(mame_ui_manager &mui, render_container *container, std::vector<const game_driver*> list);
 	virtual ~ui_menu_export();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -111,7 +111,7 @@ private:
 class ui_menu_machine_configure : public ui_menu
 {
 public:
-	ui_menu_machine_configure(running_machine &machine, render_container *container, const game_driver *prev, float x0 = 0.0f, float y0 = 0.0f);
+	ui_menu_machine_configure(mame_ui_manager &mui, render_container *container, const game_driver *prev, float x0 = 0.0f, float y0 = 0.0f);
 	virtual ~ui_menu_machine_configure();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -144,7 +144,7 @@ private:
 class ui_menu_plugins_configure : public ui_menu
 {
 public:
-	ui_menu_plugins_configure(running_machine &machine, render_container *container);
+	ui_menu_plugins_configure(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_plugins_configure();
 	virtual void populate() override;
 	virtual void handle() override;

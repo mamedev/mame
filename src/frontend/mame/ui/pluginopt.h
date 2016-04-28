@@ -18,7 +18,7 @@
 
 class ui_menu_plugin : public ui_menu {
 public:
-	ui_menu_plugin(running_machine &machine, render_container *container);
+	ui_menu_plugin(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_plugin();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -28,7 +28,7 @@ private:
 
 class ui_menu_plugin_opt : public ui_menu {
 public:
-	ui_menu_plugin_opt(running_machine &machine, render_container *container, char *menu);
+	ui_menu_plugin_opt(mame_ui_manager &mui, render_container *container, char *menu);
 	virtual ~ui_menu_plugin_opt();
 	virtual void populate() override;
 	virtual void handle() override;

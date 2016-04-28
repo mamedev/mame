@@ -19,7 +19,7 @@
 class ui_menu_sound_options : public ui_menu
 {
 public:
-	ui_menu_sound_options(running_machine &machine, render_container *container);
+	ui_menu_sound_options(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_sound_options();
 	virtual void populate() override;
 	virtual void handle() override;

@@ -30,8 +30,8 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_barcode_reader::ui_menu_barcode_reader(running_machine &machine, render_container *container, barcode_reader_device *device)
-						: ui_menu_device_control<barcode_reader_device>(machine, container, device)
+ui_menu_barcode_reader::ui_menu_barcode_reader(mame_ui_manager &mui, render_container *container, barcode_reader_device *device)
+						: ui_menu_device_control<barcode_reader_device>(mui, container, device)
 {
 }
 
@@ -75,7 +75,7 @@ void ui_menu_barcode_reader::populate()
 		item_append(ui_menu_item_type::SEPARATOR);
 		item_append(_("Enter Code"), nullptr, 0, ITEMREF_ENTER_BARCODE);
 
-		customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+		customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	}
 }
 
@@ -115,7 +115,7 @@ void ui_menu_barcode_reader::handle()
 					std::string tmp_file(m_barcode_buffer);
 					//printf("code %s\n", m_barcode_buffer);
 					if (!current_device()->is_valid(tmp_file.length()))
-						mame_machine_manager::instance()->ui().popup_time(5, "%s", _("Barcode length invalid!"));
+						ui().popup_time(5, "%s", _("Barcode length invalid!"));
 					else
 					{
 						current_device()->write_code(tmp_file.c_str(), tmp_file.length());

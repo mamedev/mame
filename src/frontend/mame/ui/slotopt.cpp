@@ -145,7 +145,7 @@ void ui_menu_slot_devices::set_slot_device(device_slot_interface &slot, const ch
     slot device menu
 -------------------------------------------------*/
 
-ui_menu_slot_devices::ui_menu_slot_devices(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_slot_devices::ui_menu_slot_devices(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
@@ -204,7 +204,7 @@ void ui_menu_slot_devices::handle()
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
 			device_slot_option *option = slot_get_current_option(*slot);
 			if (option)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_device_config>(machine(), container, slot, option));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_device_config>(ui(), container, slot, option));
 		}
 	}
 }

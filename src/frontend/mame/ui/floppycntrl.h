@@ -16,7 +16,7 @@
 
 class ui_menu_control_floppy_image : public ui_menu_control_device_image {
 public:
-	ui_menu_control_floppy_image(running_machine &machine, render_container *container, device_image_interface *image);
+	ui_menu_control_floppy_image(mame_ui_manager &ui, render_container *container, device_image_interface *image);
 	virtual ~ui_menu_control_floppy_image();
 
 	virtual void handle() override;

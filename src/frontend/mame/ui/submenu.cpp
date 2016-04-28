@@ -18,14 +18,14 @@
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_submenu::ui_submenu(running_machine &machine, render_container *container, std::vector<ui_submenu::option> &suboptions, const game_driver *drv, emu_options *options)
-	: ui_menu(machine, container)
+ui_submenu::ui_submenu(mame_ui_manager &mui, render_container *container, std::vector<ui_submenu::option> &suboptions, const game_driver *drv, emu_options *options)
+	: ui_menu(mui, container)
 	, m_options(suboptions)
 	, m_driver(drv)
 {
 	core_options *opts = nullptr;
 	if (m_driver == nullptr)
-		opts = dynamic_cast<core_options*>(&machine.options());
+		opts = dynamic_cast<core_options*>(&mui.machine().options());
 	else
 		opts = dynamic_cast<core_options*>(options);
 
@@ -84,8 +84,8 @@ ui_submenu::ui_submenu(running_machine &machine, render_container *container, st
 				}
 				break;
 			case ui_submenu::UI:
-				sm_option.entry = mame_machine_manager::instance()->ui().options().get_entry(sm_option.name);
-				sm_option.options = dynamic_cast<core_options*>(&mame_machine_manager::instance()->ui().options());
+				sm_option.entry = mui.options().get_entry(sm_option.name);
+				sm_option.options = dynamic_cast<core_options*>(&mui.options());
 				break;
 			default:
 				break;
@@ -298,7 +298,7 @@ void ui_submenu::populate()
 	}
 
 	item_append(ui_menu_item_type::SEPARATOR);
-	custombottom = customtop = mame_machine_manager::instance()->ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+	custombottom = customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
 }
 
 //-------------------------------------------------
@@ -308,10 +308,9 @@ void ui_submenu::populate()
 void ui_submenu::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 
-	mui.draw_text_full(container, _(m_options[0].description), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, _(m_options[0].description), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -322,7 +321,7 @@ void ui_submenu::custom_render(void *selectedref, float top, float bottom, float
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -330,7 +329,7 @@ void ui_submenu::custom_render(void *selectedref, float top, float bottom, float
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, _(m_options[0].description), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui().draw_text_full(container, _(m_options[0].description), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	if (selectedref != nullptr)
@@ -338,8 +337,8 @@ void ui_submenu::custom_render(void *selectedref, float top, float bottom, float
 		ui_submenu::option *selected_sm_option = (ui_submenu::option *)selectedref;
 		if (selected_sm_option->entry != nullptr)
 		{
-			mui.draw_text_full(container, selected_sm_option->entry->description(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-					DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+			ui().draw_text_full(container, selected_sm_option->entry->description(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+					DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 
 			width += 2 * UI_BOX_LR_BORDER;
 			maxwidth = MAX(origx2 - origx1, width);
@@ -351,7 +350,7 @@ void ui_submenu::custom_render(void *selectedref, float top, float bottom, float
 			y2 = origy2 + bottom;
 
 			// draw a box
-			mui.draw_outlined_box(container, x1, y1, x2, y2, UI_RED_COLOR);
+			ui().draw_outlined_box(container, x1, y1, x2, y2, UI_RED_COLOR);
 
 			// take off the borders
 			x1 += UI_BOX_LR_BORDER;
@@ -359,7 +358,7 @@ void ui_submenu::custom_render(void *selectedref, float top, float bottom, float
 			y1 += UI_BOX_TB_BORDER;
 
 			// draw the text within it
-			mui.draw_text_full(container, selected_sm_option->entry->description(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+			ui().draw_text_full(container, selected_sm_option->entry->description(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 					DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		}
 	}
