@@ -35,8 +35,9 @@ public:
 		m_region_sprites(*this, "sprites"),
 		m_region_fixed(*this, "fixed"),
 		m_region_fixedbios(*this, "fixedbios"),
-		//m_bank_vectors(*this, "vectors"),
-		//m_bank_cartridge(*this, "cartridge"),
+		m_region_mainbios(*this, "mainbios"),
+		m_region_audiobios(*this, "audiobios"),
+		m_region_audiocpu(*this, "audiocpu"),
 		m_bank_audio_main(*this, "audio_main"),
 		m_upd4990a(*this, "upd4990a"),
 		m_ym(*this, "ymsnd"),
@@ -97,7 +98,6 @@ public:
 	DECLARE_WRITE8_MEMBER(io_control_w);
 	DECLARE_WRITE8_MEMBER(system_control_w);
 	DECLARE_READ16_MEMBER(banked_vectors_r);
-	DECLARE_READ16_MEMBER(low_rom);
 	DECLARE_WRITE16_MEMBER(write_banksel);
 	DECLARE_WRITE16_MEMBER(write_bankprot);
 	DECLARE_WRITE16_MEMBER(write_bankprot_pvc);
@@ -146,11 +146,13 @@ protected:
 	optional_memory_region m_region_sprites;
 	optional_memory_region m_region_fixed;
 	optional_memory_region m_region_fixedbios;
-	//required_memory_bank   m_bank_vectors;
-	//optional_memory_bank   m_bank_cartridge;  // optional because of neocd
+	optional_memory_region m_region_mainbios;
+	optional_memory_region m_region_audiobios;
+	optional_memory_region m_region_audiocpu;
 	optional_memory_bank   m_bank_audio_main; // optional because of neocd
 	memory_bank           *m_bank_audio_cart[4];
-
+	memory_bank           *m_bank_cartridge;
+	
 	// MVS-specific devices
 	optional_device<upd4990a_device> m_upd4990a;
 	optional_device<ym2610_device> m_ym;
@@ -200,7 +202,7 @@ protected:
 	UINT8      m_raster_level;
 
 	required_device<neosprite_optimized_device> m_sprgen;
-	UINT16 get_video_control(  );
+	UINT16 get_video_control();
 
 	// color/palette related
 	std::vector<UINT16> m_paletteram;
