@@ -17382,6 +17382,9 @@ mastboy                         // (c) 1987 - No Ref on the PCB
 mastboyi                        // (c) 1987 - No Ref on the PCB
 mastboyia                       // (c) 1987 - No Ref on the PCB
 
+@source:mastrglf.cpp
+mastrglf
+
 @source:matmania.cpp
 excthour                        // TA-0015 (c) 1985 + Taito license
 maniach                         // TA-0017 (c) 1986 + Taito America license
