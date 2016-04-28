@@ -60,6 +60,15 @@ INPUT_PORTS_END
  *
  *************************************/
 
+#define ROM_Y_ZOOM \
+	ROM_REGION( 0x20000, "zoomy", 0 ) \
+	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
+
+
+#define NO_DELTAT_REGION
+
+
+
 /****************************************
  ID-2680
  . MV-0 ????

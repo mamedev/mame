@@ -141,7 +141,6 @@ public:
 	UINT32 get_sprites_addrmask() { return m_sprite_gfx_address_mask; }
 	void init_sprites_addrmask(UINT8 *spr_base, UINT32 spr_size) {
 		m_sprite_gfx_address_mask = neogeohelper_optimize_sprite_data(get_sprites_optimized_arr(), &spr_base[0], spr_size);
-		printf("gfx mask: %x\n", m_sprite_gfx_address_mask);
 	}
 
 	void ym_alloc(UINT32 size) { m_ym.resize(size); }

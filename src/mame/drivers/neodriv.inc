@@ -1,10 +1,3 @@
-// license:BSD-3-Clause
-// copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
-// thanks-to:Fuzz
-
-
-#include "emu.h"
-#include "includes/neogeo.h"
 
 
 // non-configurable slot (to be used for non-softlist sets, until we introduce some 'template' concept)

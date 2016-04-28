@@ -936,7 +936,7 @@ function createProjects_mame_mess(_target, _subtarget)
 -- n64.c (MESS), aleck64.c (MAME)
 -- megadriv.c, segapico.c (MESS), hshavoc.c, megadrvb.c, megaplay.c, megatech.c, puckpkmn.c, segac2.c, segas18.c (MAME)
 -- dccons.c (MESS), naomi.c (MAME)
--- ng_aes.c (MESS), midas.c, neogeo.c, neogeo_noslot.c, neoprint.c (MAME)
+-- neogeocd.c (MESS), midas.c, neogeo.c, neoprint.c (MAME)
 -- cdi.c (MESS + MAME)
 -- 3do.c (MESS + MAME), konamim2.c (MAME)
 -- vectrex.c (MESS + MAME)
@@ -1028,7 +1028,6 @@ files {
 	MAME_DIR .. "src/mame/video/powervr2.h",
 	MAME_DIR .. "src/mame/drivers/neogeo.cpp",
 	MAME_DIR .. "src/mame/includes/neogeo.h",
-	MAME_DIR .. "src/mame/machine/neocrypt.cpp",
 	MAME_DIR .. "src/mame/machine/ng_memcard.cpp",
 	MAME_DIR .. "src/mame/machine/ng_memcard.h",
 	MAME_DIR .. "src/mame/video/neogeo.cpp",
@@ -2568,7 +2567,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "snk")
 files {
-	MAME_DIR .. "src/mame/drivers/ng_aes.cpp",
+	MAME_DIR .. "src/mame/drivers/neogeocd.cpp",
 	MAME_DIR .. "src/mame/drivers/ngp.cpp",
 	MAME_DIR .. "src/mame/video/k1ge.cpp",
 	MAME_DIR .. "src/mame/video/k1ge.h",

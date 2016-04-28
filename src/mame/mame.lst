@@ -28292,8 +28292,6 @@ twinbee                         // GX412 (c) 1985
 @source:neogeo.cpp
 neogeo                          // NeoGeo MVS
 aes                             // NeoGeo AES
-
-@source:neogeo_noslot.cpp
 2020bb                          // 0030 (c) 1991 SNK / Pallas
 2020bba                         // 0030 (c) 1991 SNK / Pallas
 2020bbh                         // 0030 (c) 1991 SNK / Pallas
@@ -28598,7 +28596,7 @@ nextstc                         //
 acheart                         //
 acheartf                        // (c) 2006 Examu
 
-@source:ng_aes.cpp
+@source:neogeocd.cpp
 neocd                           // NeoGeo CD
 neocdz                          // NeoGeo CDZ
 neocdzj                         //
