@@ -357,8 +357,8 @@ static ADDRESS_MAP_START( mastrglf_io, AS_IO, 8, crgolf_state )
 	AM_RANGE(0x07, 0x07) AM_WRITEONLY AM_SHARE("screena_enable")
 
 //	AM_RANGE(0x20, 0x20) AM_WRITE( unk_20_w )
-//	AM_RANGE(0x40, 0x40) AM_WRITE( unk_40_w )
-//	AM_RANGE(0xa0, 0xa0) AM_READ( unk_cmd_r ) // read in the NMI seems to be a comms IN port here, maybe this is actually the sub CPU, that would make the content of the box worrying tho.
+//	AM_RANGE(0x40, 0x40) AM_WRITE( main_to_sound_w )
+//	AM_RANGE(0xa0, 0xa0) AM_READ( sound_to_main_r )
 ADDRESS_MAP_END
 
 
@@ -369,6 +369,8 @@ static ADDRESS_MAP_START( mastrglf_submap, AS_PROGRAM, 8, crgolf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastrglf_subio, AS_IO, 8, crgolf_state )
+//	AM_RANGE(0x00, 0x00) AM_WRITE(sound_to_main_w)
+//	AM_RANGE(0x06, 0x06) AM_READ(main_to_sound_r)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -507,6 +509,8 @@ static MACHINE_CONFIG_DERIVED( mastrglf, crgolf )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(mastrglf_submap)
 	MCFG_CPU_IO_MAP(mastrglf_subio)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
+
 MACHINE_CONFIG_END
 
 
@@ -688,7 +692,7 @@ ROM_START( mastrglf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "M-GF_A1.4A.27128", 0x00000, 0x04000, CRC(55b89e8f) SHA1(2860fd3f8e4241dc25bb9a14e8967cdcaf769432) )
 
-	ROM_REGION( 0x48000, "maindata", 0 )
+	ROM_REGION( 0x40000, "maindata", 0 )
 	ROM_LOAD( "M-GF_A2.5A.27256",   0x00000, 0x08000, CRC(98aa20d8) SHA1(64007c4706f8e2e3b57c4a8467b37d44e8be9a01) )
 	ROM_LOAD( "M-GF_A3.7A.27256",   0x08000, 0x08000, CRC(3f62b979) SHA1(90cc784230f6ed7fd3dd943e0808f0c3d722806a) )
 	ROM_LOAD( "M-GF_A4.8A.27256",   0x10000, 0x08000, CRC(08a470d1) SHA1(4dabff8fc915406b1d4f7936d925378eec0df915) )
@@ -697,7 +701,6 @@ ROM_START( mastrglf )
 	ROM_LOAD( "M-GF_A7.13A.27256",  0x28000, 0x08000, CRC(06075e41) SHA1(3426f4ede8449288519e25bc8a1d679bb5137279) )
 	ROM_LOAD( "M-GF_A8.15A.27256",  0x30000, 0x08000, CRC(9ea9183b) SHA1(55f54575cd662b6194f69532baa25c9b2272760f) )
 	ROM_LOAD( "M-GF_A9.16A.27256",  0x38000, 0x08000, CRC(61ab715f) SHA1(6b9cccaa83a9a9e44a46bae796e2f9eaa9f9c951) )
-	ROM_LOAD( "M-GF_A10.12K.27256", 0x40000, 0x08000, CRC(d145b144) SHA1(52370d56106f0280c52266b5a727493a3396a8e3) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // next to large module
 	ROM_LOAD( "M-GF_A10.12K.27256", 0x00000, 0x08000, CRC(d145b144) SHA1(52370d56106f0280c52266b5a727493a3396a8e3) )
