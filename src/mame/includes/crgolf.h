@@ -65,6 +65,10 @@ public:
 	DECLARE_READ8_MEMBER(sound_to_main_r);
 	DECLARE_WRITE8_MEMBER(screen_select_w);
 	DECLARE_WRITE8_MEMBER(crgolfhi_sample_w);
+	DECLARE_READ8_MEMBER(unk_sub_02_r);
+	DECLARE_READ8_MEMBER(unk_sub_05_r);
+	DECLARE_READ8_MEMBER(unk_sub_07_r);
+	DECLARE_WRITE8_MEMBER(unk_sub_0c_w);
 	DECLARE_DRIVER_INIT(crgolfhi);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
