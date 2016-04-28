@@ -274,10 +274,23 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(mame_machine_manager::reset), this));
 
+	m_ui->set_startup_text("Initializing...", true);
+
+	return m_ui.get();
+}
+
+void mame_machine_manager::ui_initialize(running_machine& machine)
+{
+	m_ui->initialize(machine);
+
+	// display the startup screens
+	m_ui->display_startup_screens(m_firstrun);
+}
+
+void mame_machine_manager::create_custom(running_machine& machine)
+{
 	// start the inifile manager
 	m_inifile = std::make_unique<inifile_manager>(machine, m_ui->options());
-
-	m_ui->set_startup_text("Initializing...", true);
 
 	// allocate autoboot timer
 	m_autoboot_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_machine_manager::autoboot_callback), this));
@@ -288,21 +301,8 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 	// start favorite manager
 	m_favorite = std::make_unique<favorite_manager>(machine, m_ui->options());
 
-	return m_ui.get();
-}
-
-void mame_machine_manager::create_custom(running_machine& machine)
-{
 	// set up the cheat engine
 	m_cheat = std::make_unique<cheat_manager>(machine);
-}
-
-void mame_machine_manager::ui_initialize(running_machine& machine)
-{
-	m_ui->initialize(machine);
-
-	// display the startup screens
-	m_ui->display_startup_screens(m_firstrun);
 }
 
 const char * emulator_info::get_bare_build_version() { return bare_build_version; }
