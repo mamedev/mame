@@ -3,32 +3,6 @@
 // thanks-to:Fuzz
 /***************************************************************************
 
-    Neo-Geo AES hardware
-
-    Credits (from MAME neogeo.c, since this is just a minor edit of that driver):
-        * This driver was made possible by the research done by
-          Charles MacDonald.  For a detailed description of the Neo-Geo
-          hardware, please visit his page at:
-          http://cgfm2.emuviews.com/temp/mvstech.txt
-        * Presented to you by the Shin Emu Keikaku team.
-        * The following people have all spent probably far
-          too much time on this:
-          AVDB
-          Bryan McPhail
-          Fuzz
-          Ernesto Corvi
-          Andrew Prime
-          Zsolt Vasvari
-
-    MESS cartridge support by R. Belmont based on work by Michael Zapf
-
-    Current status:
-        - Cartridges run.
-        - Riding Hero runs in slow-mo due to the unemulated comm link MCU in the cartridge.
-          In MAME if dip SW6 is set to ON to enable link play, it runs the same way!
-          On AES there are no dipswitches, and so it always tries to talk to the MCU.
-
-
     Neo-Geo CD hardware
 
     Thanks to:
@@ -51,308 +25,13 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/neogeo.h"
 #include "machine/nvram.h"
-#include "cpu/z80/z80.h"
-#include "sound/2610intf.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 #include "machine/megacdcd.h"
 #include "softlist.h"
 
-extern const char layout_neogeo[];
-
-
-/*************************************
- *
- *  AES
- *
- *************************************/
-
-class ng_aes_state : public neogeo_state
-{
-public:
-	ng_aes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: neogeo_state(mconfig, type, tag)
-		, m_io_in2(*this, "IN2")
-	{ }
-
-	DECLARE_READ16_MEMBER(aes_in2_r);
-
-	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
-
-	DECLARE_MACHINE_START(neogeo);
-	DECLARE_MACHINE_RESET(neogeo);
-
-	DECLARE_DRIVER_INIT(neogeo);
-
-protected:
-	required_ioport m_io_in2;
-
-	void common_machine_start();
-};
-
-
-/*************************************
- *
- *  Input read handlers
- *
- *************************************/
-
-READ16_MEMBER(ng_aes_state::aes_in2_r)
-{
-	UINT32 ret = m_io_in2->read();
-	ret = (ret & 0xfcff) | (m_ctrl1->read_start_sel() << 8);
-	ret = (ret & 0xf3ff) | (m_ctrl2->read_start_sel() << 10);
-	return ret;
-}
-
-/*************************************
- *
- *  Machine initialization
- *
- *************************************/
-
-
-void ng_aes_state::common_machine_start()
-{
-	/* set the initial main CPU bank */
-	neogeo_main_cpu_banking_init();
-
-	/* set the initial audio CPU ROM banks */
-	neogeo_audio_cpu_banking_init(1);
-
-	create_interrupt_timers();
-
-	/* irq levels for MVS / AES */
-	m_vblank_level = 1;
-	m_raster_level = 2;
-
-	/* start with an IRQ3 - but NOT on a reset */
-	m_irq3_pending = 1;
-
-	/* register state save */
-	save_item(NAME(m_display_position_interrupt_control));
-	save_item(NAME(m_display_counter));
-	save_item(NAME(m_vblank_interrupt_pending));
-	save_item(NAME(m_display_position_interrupt_pending));
-	save_item(NAME(m_irq3_pending));
-	save_item(NAME(m_audio_cpu_nmi_enabled));
-	save_item(NAME(m_audio_cpu_nmi_pending));
-	save_item(NAME(m_use_cart_vectors));
-	save_item(NAME(m_use_cart_audio));
-	//save_item(NAME(m_main_cpu_bank_address));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(ng_aes_state::neogeo_postload), this));
-
-
-	m_cartslots[0] = m_cartslot1;
-	m_cartslots[1] = m_cartslot2;
-	m_cartslots[2] = m_cartslot3;
-	m_cartslots[3] = m_cartslot4;
-	m_cartslots[4] = m_cartslot5;
-	m_cartslots[5] = m_cartslot6;
-
-	m_sprgen->set_screen(m_screen);
-
-	m_sprgen->set_sprite_region(m_region_sprites->base(), m_region_sprites->bytes());
-	m_sprgen->set_fixed_regions(m_region_fixed->base(), m_region_fixed->bytes(), m_region_fixedbios);
-
-}
-
-MACHINE_START_MEMBER(ng_aes_state,neogeo)
-{
-	m_type = NEOGEO_AES;
-	common_machine_start();
-}
-
-
-/*************************************
- *
- *  Machine reset
- *
- *************************************/
-
-MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
-{
-	offs_t offs;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* reset system control registers */
-	for (offs = 0; offs < 8; offs++)
-		system_control_w(space, offs, 0);
-
-	// disable audiocpu nmi
-	m_audio_cpu_nmi_enabled = false;
-	m_audio_cpu_nmi_pending = false;
-	audio_cpu_check_nmi();
-
-	m_maincpu->reset();
-
-	start_interrupt_timers();
-
-	/* trigger the IRQ3 that was set by MACHINE_START */
-	update_interrupts();
-
-	m_recurse = false;
-
-	/* AES has no SFIX ROM and always uses the cartridge's */
-	m_sprgen->neogeo_set_fixed_layer_source(1);
-
-	if (m_cartslots[0]) // if thie system has cart slots then do some extra initialization
-	{
-		set_slot_number(0);
-	}
-}
-
-
-/*************************************
- *
- *  Main CPU memory handlers
- *
- *************************************/
-
-static ADDRESS_MAP_START( aes_main_map, AS_PROGRAM, 16, ng_aes_state )
-//  AM_RANGE(0x000000, 0x00007f) AM_ROMBANK("vectors")
-	AM_RANGE(0x000000, 0x00007f) AM_READ(neogeo_slot_rom_low_bectors_r)
-	AM_RANGE(0x000080, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
-	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
-	//AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("cartridge")
-	//AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl1", neogeo_control_port_device, ctrl_r, 0xff00)
-	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)
-	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl2", neogeo_control_port_device, ctrl_r, 0xff00)
-	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
-	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
-	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITE8(system_control_w, 0x00ff)
-	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(neogeo_video_register_r)
-	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(neogeo_video_register_w)
-	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(neogeo_unmapped_r)
-	AM_RANGE(0x400000, 0x401fff) AM_MIRROR(0x3fe000) AM_READWRITE(neogeo_paletteram_r, neogeo_paletteram_w)
-	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(memcard_r, memcard_w)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_MIRROR(0x0e0000) AM_ROM AM_REGION("mainbios", 0)
-	AM_RANGE(0xd00000, 0xffffff) AM_READ(neogeo_unmapped_r)
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  Input port definitions
- *
- *************************************/
-
-
-static INPUT_PORTS_START( aes )
-	PORT_START("IN2")
-	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
-	// Start & Select are read from controller slot device
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, get_memcard_status, nullptr)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Hardware type (AES=0, MVS=1) Some games check this and show a piracy warning screen if the hardware and BIOS don't match */
-
-	PORT_START("AUDIO")
-	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )  /* AES has no coin slots, it's a console */
-	PORT_BIT( 0x0018, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* what is this? Universe BIOS uses these bits to detect MVS or AES hardware */
-	PORT_BIT( 0x00e0, IP_ACTIVE_HIGH, IPT_UNUSED )  /* AES has no upd4990a */
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, get_audio_result, nullptr)
-
-	PORT_START("JP") // JP1 and JP2 are jumpers or solderpads depending on AES board revision, intended for use on the Development BIOS
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Short JP1 (Debug Monitor)") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ng_aes_state, aes_jp1, 0)
-//  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) // what is JP2 for? somehow related to system reset, disable watchdog?
-INPUT_PORTS_END
-
-INPUT_CHANGED_MEMBER(ng_aes_state::aes_jp1)
-{
-	// Shorting JP1 causes a 68000 /BERR (Bus Error). On Dev Bios, this pops up the debug monitor.
-	if (newval)
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, HOLD_LINE);
-}
-
-
-
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
-
-
-static MACHINE_CONFIG_DERIVED_CLASS( aes, neogeo_base, ng_aes_state )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aes_main_map)
-
-	MCFG_NEOGEO_MEMCARD_ADD("memcard")
-
-	MCFG_MACHINE_START_OVERRIDE(ng_aes_state, neogeo)
-	MCFG_MACHINE_RESET_OVERRIDE(ng_aes_state, neogeo)
-
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, nullptr)
-
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy", false)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy", false)
-
-	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list","AES")
-MACHINE_CONFIG_END
-
-
-
-/*************************************
- *
- *  Driver initalization
- *
- *************************************/
-
-#define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
-
-ROM_START( aes )
-	ROM_REGION16_BE( 0x20000, "mainbios", 0 )
-	ROM_SYSTEM_BIOS( 0, "asia", "Asia AES" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "neo-epo.bin",  0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */
-	ROM_SYSTEM_BIOS( 1, "japan", "Japan AES" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "neo-po.bin",   0x00000, 0x020000, CRC(16d0c132) SHA1(4e4a440cae46f3889d20234aebd7f8d5f522e22c) ) /* AES Console (Japan) Bios */
-	ROM_SYSTEM_BIOS( 2, "devel", "Development System ROM" )
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Official debug (development) ROM, for home-use base board */
-	NEOGEO_UNIBIOS(3)
-
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "zoomy", 0 )
-	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
-
-	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x1000000, "ymsnd", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x1000000, "ymsnd.deltat", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x900000, "sprites", ROMREGION_ERASEFF )
-ROM_END
-
-
-DRIVER_INIT_MEMBER(ng_aes_state,neogeo)
-{
-	if (!m_cartslots[0]) m_banked_cart->install_banks(machine(), m_maincpu, m_region_maincpu->base(), m_region_maincpu->bytes());
-}
-
-
-/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
-CONS( 1990, aes,    0,      0,   aes,      aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo AES", MACHINE_SUPPORTS_SAVE )
-
-
-
-
-/*************************************
- *
- *  NEOCD
- *
- *************************************/
 
 /* Stubs for various functions called by the FBA code, replace with MAME specifics later */
 
@@ -372,12 +51,11 @@ UINT8* NeoZ80ROMActive;
 UINT8 NeoSystem = NEOCD_REGION_JAPAN;
 
 
-
-class ngcd_state : public ng_aes_state
+class ngcd_state : public aes_state
 {
 public:
 	ngcd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ng_aes_state(mconfig, type, tag)
+		: aes_state(mconfig, type, tag)
 		, m_tempcdc(*this,"tempcdc")
 	{
 		NeoCDDMAAddress1 = 0;
@@ -459,9 +137,6 @@ protected:
 
 	INT32 SekIdle(INT32 nCycles);
 };
-
-
-
 
 
 
@@ -1154,17 +829,26 @@ MACHINE_START_MEMBER(ngcd_state,neocd)
 	m_type = NEOGEO_CD;
 	common_machine_start();
 
-	/* irq levels for NEOCD (swapped compared to MVS / AES) */
+	// set curr_slot to 0, so to allow checking m_slots[m_curr_slot] != nullptr
+	m_curr_slot = 0;
+
+	// initialize sprite to point to memory regions
+	m_sprgen->m_fixed_layer_bank_type = 0;
+	m_sprgen->set_screen(m_screen);
+	m_sprgen->set_sprite_region(m_region_sprites->base(), m_region_sprites->bytes());
+	m_sprgen->set_fixed_regions(m_region_fixed->base(), m_region_fixed->bytes(), m_region_fixedbios);
+	m_sprgen->neogeo_set_fixed_layer_source(1);
+
+	// irq levels for NEOCD (swapped compared to MVS / AES)
 	m_vblank_level = 2;
 	m_raster_level = 1;
 
-	/* initialize the memcard data structure */
-	/* NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same */
+	// initialize the memcard data structure
+	// NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same
 	m_meminternal_data = make_unique_clear<UINT8[]>(0x2000);
 	machine().device<nvram_device>("saveram")->set_base(m_meminternal_data.get(), 0x2000);
 	save_pointer(NAME(m_meminternal_data.get()), 0x2000);
 
-	//m_bank_vectors->set_entry(0); // default to the BIOS vectors
 	m_use_cart_vectors = 0;
 
 	m_tempcdc->reset_cd();
@@ -1179,7 +863,7 @@ MACHINE_START_MEMBER(ngcd_state,neocd)
 
 MACHINE_RESET_MEMBER(ngcd_state,neocd)
 {
-	MACHINE_RESET_CALL_MEMBER( neogeo );
+	neogeo_state::machine_reset();
 
 	NeoSpriteRAM = memregion("sprites")->base();
 	YM2610ADPCMAROM = memregion("ymsnd")->base();
@@ -1225,9 +909,6 @@ static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ngcd_state )
 	AM_RANGE(0xff0000, 0xff01ff) AM_READWRITE(neocd_control_r, neocd_control_w) // CDROM / DMA
 	AM_RANGE(0xff0200, 0xffffff) AM_READ(neogeo_unmapped_r)
 ADDRESS_MAP_END
-
-
-
 
 
 /*************************************
@@ -1464,4 +1145,4 @@ CONS( 1996, neocdz,  0,      0,   neocd, neocd, ngcd_state,  neocdz,  "SNK", "Ne
 CONS( 1996, neocdzj, neocdz, 0,   neocd, neocd, ngcd_state,  neocdzj,  "SNK", "Neo-Geo CDZ (Japan)", 0 )
 
 
-CONS( 1994, neocd,   neocdz, 0,   neocd, neocd, ng_aes_state,  neogeo,  "SNK", "Neo-Geo CD", MACHINE_NOT_WORKING ) // older  model, ignores disc protections?
+CONS( 1994, neocd,   neocdz, 0,   neocd, neocd, driver_device,  0,  "SNK", "Neo-Geo CD", MACHINE_NOT_WORKING ) // older  model, ignores disc protections?

@@ -28290,7 +28290,8 @@ salamandj                       // GX587 (c) 1986
 twinbee                         // GX412 (c) 1985
 
 @source:neogeo.cpp
-neogeo                          //
+neogeo                          // NeoGeo MVS
+aes                             // NeoGeo AES
 
 @source:neogeo_noslot.cpp
 2020bb                          // 0030 (c) 1991 SNK / Pallas
@@ -28367,7 +28368,6 @@ kf2k2pla                        // bootleg
 kf2k2pls                        // bootleg
 kf2k3bl                         // bootleg
 kf2k3bla                        // bootleg
-kf2k3pcb                        // 0271 (c) 2003 Playmore - JAMMA PCB
 kf2k3pl                         // bootleg
 kf2k3upl                        // bootleg
 kf2k5uni                        // bootleg of kof2002
@@ -28428,9 +28428,8 @@ matrim                          // 0266 (c) 2002 Atlus
 matrimbl                        // bootleg
 miexchng                        // 0231 (c) 1997 Face
 minasan                         // 0027 (c) 1990 Monolith Corp.
-mosyougi                        // 0203 (c) 1995 ADK / SNK
+moshougi                        // 0203 (c) 1995 ADK / SNK
 ms4plus                         // bootleg
-ms5pcb                          // 0268 (c) 2003 Playmore
 ms5plus                         // bootleg
 mslug                           // 0201 (c) 1996 Nazca
 mslug2                          // 0241 (c) 1998 SNK
@@ -28524,8 +28523,6 @@ strhoop                         // 0079 (c) 1994 Data East Corporation
 superspy                        // 0011 (c) 1990 SNK
 svc                             // 0269 (c) 2003 Playmore / Capcom
 svcboot                         // bootleg
-svcpcb                          // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
-svcpcba                         // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
 svcplus                         // bootleg
 svcplusa                        // bootleg
 svcsplus                        // bootleg
@@ -28551,6 +28548,12 @@ zedblade                        // 0076 (c) 1994 NMK
 zintrckb                        // 0211 hack - this is not a genuine MVS proto, its a bootleg made from the CD version
 zupapa                          // 0070 Zupapa - released in 2001, 1994 prototype probably exists
 lasthope
+
+@source:neopcb.cpp
+kf2k3pcb                        // 0271 (c) 2003 Playmore - JAMMA PCB
+ms5pcb                          // 0268 (c) 2003 Playmore - JAMMA PCB
+svcpcb                          // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
+svcpcba                         // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
 
 @source:neoprint.cpp
 98best44                        //
@@ -28596,7 +28599,6 @@ acheart                         //
 acheartf                        // (c) 2006 Examu
 
 @source:ng_aes.cpp
-aes                             // NeoGeo AES
 neocd                           // NeoGeo CD
 neocdz                          // NeoGeo CDZ
 neocdzj                         //
