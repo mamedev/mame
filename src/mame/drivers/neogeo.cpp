@@ -856,7 +856,6 @@ WRITE8_MEMBER(neogeo_state::system_control_w)
 			if (m_type == NEOGEO_CD)
 				printf("NeoCD: write to regular vector change address? %d\n", bit); // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
 			else
-				//m_bank_vectors->set_entry(bit);
 				m_use_cart_vectors = bit;
 			break;
 
@@ -906,7 +905,7 @@ WRITE16_MEMBER(neogeo_state::write_banksel)
 		}
 		UINT8 *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->base() : (UINT8 *)m_slots[m_curr_slot]->get_rom_base();
 		m_bank_base = (bank + 1) * 0x100000;
-		membank("cartridge")->set_base(ROM + m_bank_base);
+		m_bank_cartridge->set_base(ROM + m_bank_base);
 	}
 }
 
@@ -979,7 +978,7 @@ void neogeo_state::set_output_data( UINT8 data )
 WRITE16_MEMBER(neogeo_state::write_bankprot)
 {
 	m_bank_base = m_slots[m_curr_slot]->get_bank_base(data);
-	membank("cartridge")->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+	m_bank_cartridge->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 }
 
 WRITE16_MEMBER(neogeo_state::write_bankprot_pvc)
@@ -991,7 +990,7 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_pvc)
 	if (offset >= 0xff8)
 	{
 		m_bank_base = m_slots[m_curr_slot]->get_bank_base(data);
-		membank("cartridge")->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+		m_bank_cartridge->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 	}
 }
 
@@ -1004,7 +1003,7 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_kf2k3bl)
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2)
 	{
 		m_bank_base = m_slots[m_curr_slot]->get_bank_base(data);
-		membank("cartridge")->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+		m_bank_cartridge->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 	}
 }
 
@@ -1015,12 +1014,12 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_ms5p)
 	if ((offset == 0) && (data == 0xa0))
 	{
 		m_bank_base = 0xa0;
-		membank("cartridge")->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+		m_bank_cartridge->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 	}
 	else if (offset == 2)
 	{
 		m_bank_base = m_slots[m_curr_slot]->get_bank_base(data);
-		membank("cartridge")->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+		m_bank_cartridge->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 	}
 }
 
@@ -1032,13 +1031,13 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_kof10th)
 	{
 		// Standard bankswitch
 		m_bank_base = m_slots[m_curr_slot]->get_bank_base(data);
-		membank("cartridge")->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+		m_bank_cartridge->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 	}
 }
 
 READ16_MEMBER(neogeo_state::read_lorom_kof10th)
 {
-	UINT16* rom = (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0) ? m_slots[m_curr_slot]->get_rom_base() : (UINT16*)memregion("maincpu")->base();
+	UINT16* rom = (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0) ? m_slots[m_curr_slot]->get_rom_base() : (UINT16*)m_region_maincpu->base();
 	if (offset + 0x80/2 >= 0x10000/2)
 		offset += m_slots[m_curr_slot]->get_special_bank();
 	return rom[offset + 0x80/2];
@@ -1056,19 +1055,19 @@ void neogeo_state::init_cpu()
 	UINT32 len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
 	
 	if (len > 0x100000)
-		membank("cartridge")->set_base(ROM + 0x100000);
+		m_bank_cartridge->set_base(ROM + 0x100000);
 	else
-		membank("cartridge")->set_base(ROM);
+		m_bank_cartridge->set_base(ROM);
 }
 
 void neogeo_state::init_audio()
 {
-	UINT8 *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? memregion("audiocpu")->base() : m_slots[m_curr_slot]->get_audio_base();
-	UINT32 len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? memregion("audiocpu")->bytes() : m_slots[m_curr_slot]->get_audio_size();
+	UINT8 *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->base() : m_slots[m_curr_slot]->get_audio_base();
+	UINT32 len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->bytes() : m_slots[m_curr_slot]->get_audio_size();
 	UINT32 address_mask;
 	
 	/* audio bios/cartridge selection */
-	m_bank_audio_main->configure_entry(0, (memregion("audiobios") != nullptr) ? memregion("audiobios")->base() : ROM); /* on hardware with no SM1 ROM, the cart ROM is always enabled */
+	m_bank_audio_main->configure_entry(0, (m_region_audiobios != nullptr) ? m_region_audiobios->base() : ROM); /* on hardware with no SM1 ROM, the cart ROM is always enabled */
 	m_bank_audio_main->configure_entry(1, ROM);
 	m_bank_audio_main->set_entry(1);
 	
@@ -1172,9 +1171,15 @@ void neogeo_state::set_slot_idx(int slot)
 		// unmap any handler that previous carts could have installed
 		space.unmap_readwrite(0x000080, 0x0fffff);
 		space.unmap_readwrite(0x200000, 0x2fffff);
-		space.install_read_handler(0x000080, 0x0fffff, read16_delegate(FUNC(neogeo_state::low_rom),this));
+		if (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0)
+			space.install_rom(0x000080, 0x0fffff, 0, 0, (UINT16 *)m_region_maincpu->base() + 0x80/2);
+		else
+			space.install_rom(0x000080, 0x0fffff, 0, 0, (UINT16 *)m_slots[m_curr_slot]->get_rom_base() + 0x80/2);
+		
+
 		space.install_read_bank(0x200000, 0x2fffff, 0, 0, "cartridge");
 		space.install_write_handler(0x2ffff0, 0x2fffff, write16_delegate(FUNC(neogeo_state::write_banksel),this));
+		m_bank_cartridge = membank("cartridge");
 		
 		init_cpu();
 		
@@ -1372,7 +1377,7 @@ void neogeo_state::neogeo_postload()
 		set_outputs();
 	if (m_type == NEOGEO_MVS || m_type == NEOGEO_AES)
 		if (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0)
-			membank("cartridge")->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+			m_bank_cartridge->set_base((UINT8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 }
 
 
@@ -1415,22 +1420,16 @@ void neogeo_state::machine_reset()
  *************************************/
 
 
-READ16_MEMBER(neogeo_state::low_rom)
-{
-	UINT16* rom = (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0) ? m_slots[m_curr_slot]->get_rom_base() : (UINT16*)memregion("maincpu")->base();
-	return rom[offset + (0x80/2)];
-}
-
 READ16_MEMBER(neogeo_state::banked_vectors_r)
 {
 	if (!m_use_cart_vectors)
 	{
-		UINT16* bios = (UINT16*)memregion("mainbios")->base();
+		UINT16* bios = (UINT16*)m_region_mainbios->base();
 		return bios[offset];
 	}
 	else
 	{
-		UINT16* rom = (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0) ? m_slots[m_curr_slot]->get_rom_base() : (UINT16*)memregion("maincpu")->base();
+		UINT16* rom = (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0) ? m_slots[m_curr_slot]->get_rom_base() : (UINT16*)m_region_maincpu->base();
 		return rom[offset];
 	}
 }
@@ -1465,7 +1464,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_map_slot, AS_PROGRAM, 16, neogeo_state )
 	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
-	AM_RANGE(0x000080, 0x0fffff) AM_READ(low_rom)
 	AM_IMPORT_FROM( neogeo_main_map )
 ADDRESS_MAP_END
 
@@ -1481,7 +1479,6 @@ READ16_MEMBER(aes_state::aes_in2_r)
 
 static ADDRESS_MAP_START( aes_main_map, AS_PROGRAM, 16, aes_state )
 	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
-	AM_RANGE(0x000080, 0x0fffff) AM_READ(low_rom)
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
 	// some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl1", neogeo_control_port_device, ctrl_r, 0xff00)
