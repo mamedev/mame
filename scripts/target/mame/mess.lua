@@ -257,7 +257,7 @@ SOUNDS["T6721A"] = true
 SOUNDS["MOS7360"] = true
 SOUNDS["ESQPUMP"] = true
 SOUNDS["VRC6"] = true
-
+SOUNDS["UPD1771"] = true
 --------------------------------------------------
 -- specify available video cores
 --------------------------------------------------
@@ -1678,8 +1678,6 @@ files {
 	MAME_DIR .. "src/mame/includes/gamepock.h",
 	MAME_DIR .. "src/mame/machine/gamepock.cpp",
 	MAME_DIR .. "src/mame/drivers/scv.cpp",
-	MAME_DIR .. "src/devices/sound/upd1771.cpp",
-	MAME_DIR .. "src/devices/sound/upd1771.h",
 }
 
 createMESSProjects(_target, _subtarget, "epson")
