@@ -48,6 +48,38 @@
     Pin 19 - Pin 22 of F1 (2764 on cpu/sound board), Output
     Pin 20 - VCC
 
+	-------------------------------------------------------------------
+
+	Master's Golf is a different PCB, but appears to operate in a similar way
+
+	
+			PCB X-081-PC-A
+
+			contains a large box marked
+
+
+		|-----------------------\_/--------------------|
+		|                                   NASCO-9000 |
+		|                                              |
+		|                  /-  NASCO  -\               |
+		|       /\         |  ORIGINAL |               |
+		|  NASCO\/YUVO     \- 0001941 -/               |
+		|                                              |
+		|                      PAT.P                   |
+		|   |---------------------------------------|  |
+		|   |        MASTER'S GOLF vers JAPAN       |  |
+		|   |                                       |  |
+		|   |            CUSTOM BOARD               |  |
+		|   |---------------------------------------|  |
+		|                                              |
+		|                 YUVO CO., LTD                |
+		|-----------------------------------------------
+
+		 next to rom M-GF_A10.12K
+		 the box must contain at least a Z80
+		 possibly other sound hardware??
+
+
 ****************************************************************************
 
     Memory map (TBA)
@@ -75,9 +107,12 @@ WRITE8_MEMBER(crgolf_state::rom_bank_select_w)
 
 void crgolf_state::machine_start()
 {
-	/* configure the banking */
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
-	membank("bank1")->set_entry(0);
+	if (membank("bank1"))
+	{
+		/* configure the banking */
+		membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
+		membank("bank1")->set_entry(0);
+	}
 
 	/* register for save states */
 	save_item(NAME(m_port_select));
@@ -247,6 +282,12 @@ WRITE8_MEMBER(crgolf_state::crgolfhi_sample_w)
 	}
 }
 
+WRITE8_MEMBER(crgolf_state::screen_select_w)
+{
+//	if (data & 0xfe) printf("vram_page_select_w %02x\n", data);
+	m_vrambank->set_bank(data & 0x1);
+}
+
 
 
 /*************************************
@@ -261,14 +302,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, crgolf_state )
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_SHARE("color_select")
 	AM_RANGE(0x8004, 0x8004) AM_WRITEONLY AM_SHARE("screen_flip")
-	AM_RANGE(0x8005, 0x8005) AM_WRITEONLY AM_SHARE("screen_select")
+	AM_RANGE(0x8005, 0x8005) AM_WRITE( screen_select_w )
 	AM_RANGE(0x8006, 0x8006) AM_WRITEONLY AM_SHARE("screenb_enable")
 	AM_RANGE(0x8007, 0x8007) AM_WRITEONLY AM_SHARE("screena_enable")
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(sound_to_main_r, main_to_sound_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0xa000, 0xffff) AM_READWRITE(crgolf_videoram_r, crgolf_videoram_w)
+	AM_RANGE(0xa000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( vrambank_map, AS_PROGRAM, 8, crgolf_state )
+	AM_RANGE(0x0000, 0x5fff) AM_RAM AM_SHARE("vrama")
+	AM_RANGE(0x8000, 0xdfff) AM_RAM AM_SHARE("vramb")
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -285,6 +330,46 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, crgolf_state )
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(switch_input_r, switch_input_select_w)
 	AM_RANGE(0xe001, 0xe001) AM_READWRITE(analog_input_r, unknown_w)
 	AM_RANGE(0xe003, 0xe003) AM_READWRITE(main_to_sound_r, sound_to_main_w)
+ADDRESS_MAP_END
+
+
+
+
+
+
+
+static ADDRESS_MAP_START( mastrglf_map, AS_PROGRAM, 8, crgolf_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x6000, 0x8fff) AM_RAM // maybe RAM and ROM here?
+	AM_RANGE(0x9000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
+
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( mastrglf_io, AS_IO, 8, crgolf_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	
+	AM_RANGE(0x03, 0x03) AM_WRITEONLY AM_SHARE("color_select")
+	AM_RANGE(0x04, 0x04) AM_WRITEONLY AM_SHARE("screen_flip")
+	AM_RANGE(0x05, 0x05) AM_WRITE( screen_select_w )
+	AM_RANGE(0x06, 0x06) AM_WRITEONLY AM_SHARE("screenb_enable")
+	AM_RANGE(0x07, 0x07) AM_WRITEONLY AM_SHARE("screena_enable")
+
+//	AM_RANGE(0x20, 0x20) AM_WRITE( unk_20_w )
+//	AM_RANGE(0x40, 0x40) AM_WRITE( unk_40_w )
+//	AM_RANGE(0xa0, 0xa0) AM_READ( unk_cmd_r ) // read in the NMI seems to be a comms IN port here, maybe this is actually the sub CPU, that would make the content of the box worrying tho.
+ADDRESS_MAP_END
+
+
+
+static ADDRESS_MAP_START( mastrglf_submap, AS_PROGRAM, 8, crgolf_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mastrglf_subio, AS_IO, 8, crgolf_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 
@@ -384,6 +469,14 @@ static MACHINE_CONFIG_START( crgolf, crgolf_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000) /* technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
+
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(crgolf_video)
 
@@ -402,6 +495,19 @@ static MACHINE_CONFIG_DERIVED( crgolfhi, crgolf )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_DERIVED( mastrglf, crgolf )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mastrglf_map)
+	MCFG_CPU_IO_MAP(mastrglf_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
+
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(mastrglf_submap)
+	MCFG_CPU_IO_MAP(mastrglf_subio)
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -578,6 +684,31 @@ ROM_START( crgolfhi )
 ROM_END
 
 
+ROM_START( mastrglf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "M-GF_A1.4A.27128", 0x00000, 0x04000, CRC(55b89e8f) SHA1(2860fd3f8e4241dc25bb9a14e8967cdcaf769432) )
+
+	ROM_REGION( 0x48000, "maindata", 0 )
+	ROM_LOAD( "M-GF_A2.5A.27256",   0x00000, 0x08000, CRC(98aa20d8) SHA1(64007c4706f8e2e3b57c4a8467b37d44e8be9a01) )
+	ROM_LOAD( "M-GF_A3.7A.27256",   0x08000, 0x08000, CRC(3f62b979) SHA1(90cc784230f6ed7fd3dd943e0808f0c3d722806a) )
+	ROM_LOAD( "M-GF_A4.8A.27256",   0x10000, 0x08000, CRC(08a470d1) SHA1(4dabff8fc915406b1d4f7936d925378eec0df915) )
+	ROM_LOAD( "M-GF_A5.10A.27256",  0x18000, 0x08000, CRC(4397c8a0) SHA1(deb9de1cf7ce6ddc69addf18ff5bf2f25ed11602) )
+	ROM_LOAD( "M-GF_A6.12A.27256",  0x20000, 0x08000, CRC(b1fccecf) SHA1(8fb5e40f34596d9faa73255afc2c2635e9008954) )
+	ROM_LOAD( "M-GF_A7.13A.27256",  0x28000, 0x08000, CRC(06075e41) SHA1(3426f4ede8449288519e25bc8a1d679bb5137279) )
+	ROM_LOAD( "M-GF_A8.15A.27256",  0x30000, 0x08000, CRC(9ea9183b) SHA1(55f54575cd662b6194f69532baa25c9b2272760f) )
+	ROM_LOAD( "M-GF_A9.16A.27256",  0x38000, 0x08000, CRC(61ab715f) SHA1(6b9cccaa83a9a9e44a46bae796e2f9eaa9f9c951) )
+	ROM_LOAD( "M-GF_A10.12K.27256", 0x40000, 0x08000, CRC(d145b144) SHA1(52370d56106f0280c52266b5a727493a3396a8e3) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // next to large module
+	ROM_LOAD( "M-GF_A10.12K.27256", 0x00000, 0x08000, CRC(d145b144) SHA1(52370d56106f0280c52266b5a727493a3396a8e3) )
+
+	ROM_REGION( 0x0020,  "proms", 0 ) // temp, for the video code, need to verify if this PCB has a PROM
+	ROM_LOAD( "pr5877.1s", 0x0000, 0x0020, BAD_DUMP CRC(f880b95d) SHA1(5ad0ee39e2b9befaf3895ec635d5865b7b1e562b) )
+ROM_END
+
+
+
+
 
 /*************************************
  *
@@ -604,3 +735,5 @@ GAME( 1984, crgolfb,  crgolf, crgolf,   crgolf, driver_device,  0,        ROT0, 
 GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, driver_device,  0,        ROT0, "Nasco Japan", "Champion Golf", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, driver_device,  0,        ROT0, "bootleg", "Champion Golf (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state,  crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii" , MACHINE_SUPPORTS_SAVE )
+
+GAME( 198?, mastrglf,  0,    mastrglf, crgolf, driver_device,  0, ROT0, "Nasco", "Master's Golf", MACHINE_NOT_WORKING )

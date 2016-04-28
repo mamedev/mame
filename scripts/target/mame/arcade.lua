@@ -2642,7 +2642,6 @@ files {
 createMAMEProjects(_target, _subtarget, "nasco")
 files {
 	MAME_DIR .. "src/mame/drivers/crgolf.cpp",
-	MAME_DIR .. "src/mame/drivers/mastrglf.cpp",
 	MAME_DIR .. "src/mame/includes/crgolf.h",
 	MAME_DIR .. "src/mame/video/crgolf.cpp",
 	MAME_DIR .. "src/mame/drivers/suprgolf.cpp",

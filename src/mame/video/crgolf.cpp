@@ -14,34 +14,6 @@
 #define VIDEORAM_SIZE   (0x2000 * 3)
 
 
-/*************************************
- *
- *  Video RAM access
- *
- *************************************/
-
-WRITE8_MEMBER(crgolf_state::crgolf_videoram_w)
-{
-	if (*m_screen_select & 1)
-		m_videoram_b[offset] = data;
-	else
-		m_videoram_a[offset] = data;
-}
-
-
-READ8_MEMBER(crgolf_state::crgolf_videoram_r)
-{
-	UINT8 ret;
-
-	if (*m_screen_select & 1)
-		ret = m_videoram_b[offset];
-	else
-		ret = m_videoram_a[offset];
-
-	return ret;
-}
-
-
 
 /*************************************
  *
@@ -91,13 +63,6 @@ void crgolf_state::get_pens( pen_t *pens )
 
 VIDEO_START_MEMBER(crgolf_state,crgolf)
 {
-	/* allocate memory for the two bitmaps */
-	m_videoram_a = std::make_unique<UINT8[]>(VIDEORAM_SIZE);
-	m_videoram_b = std::make_unique<UINT8[]>(VIDEORAM_SIZE);
-
-	/* register for save states */
-	save_pointer(NAME(m_videoram_a.get()), VIDEORAM_SIZE);
-	save_pointer(NAME(m_videoram_b.get()), VIDEORAM_SIZE);
 }
 
 
