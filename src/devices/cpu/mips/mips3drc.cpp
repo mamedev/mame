@@ -3609,7 +3609,7 @@ int mips3_device::generate_cop1_fr1(drcuml_block *block, compiler_state *compile
 					}
 					else                    /* CVT.D.S - MIPS I */
 					{
-						UML_FDFRFLT(block, FDVALD_FR1, FDVALS_FR1, SIZE_DWORD);     // fdfrflt <fdreg>,<fsreg>,dword
+						UML_FDFRFLT(block, FDVALD_FR1, FSVALS_FR1, SIZE_DWORD);     // fdfrflt <fdreg>,<fsreg>,dword
 					}
 					return TRUE;
 
