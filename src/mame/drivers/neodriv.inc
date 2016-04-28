@@ -819,7 +819,7 @@ ROM_START( alpham2p ) /* early prototype - all roms were hand labeled with CRCs,
 	ROM_REGION( 0x080000, "cslot1:ymsnd.deltat", 0 )
 	ROM_COPY( "ymsnd", 0x180000, 0x00000, 0x80000 )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) // note, ROM_LOAD32_BYTE
+	ROM_REGION( 0x400000, "cslot1:sprites", 0 ) // note, ROM_LOAD32_BYTE
 	ROM_LOAD32_BYTE( "007_c1_210e.c11", 0x000000, 0x80000, CRC(24841639) SHA1(fcc2a349121dad86ffefc44b9f0e8ba616ce0d30) ) /* Plane 0 */
 	ROM_LOAD32_BYTE( "007_c2_29ae.c12", 0x000002, 0x80000, CRC(912763ab) SHA1(cedf26d7d85ad140399ee62813c71f35e65498d6) ) /* Plane 2 */
 	ROM_LOAD32_BYTE( "007_c3_c873.c13", 0x000001, 0x80000, CRC(0743bde2) SHA1(0d13ad6333909ad3cf10f9ac360f9abf191318de) ) /* Plane 1 */
@@ -1180,7 +1180,7 @@ ROM_START( burningfp ) /* early prototype - all roms were hand labeled with CRCs
 	ROM_REGION( 0x080000, "cslot1:ymsnd.deltat", 0 )
 	ROM_COPY( "ymsnd", 0x100000, 0x00000, 0x80000 )
 
-	ROM_REGION( 0x400000, "sprites", 0 ) // note, ROM_LOAD32_BYTE
+	ROM_REGION( 0x400000, "cslot1:sprites", 0 ) // note, ROM_LOAD32_BYTE
 	ROM_LOAD32_BYTE( "018_c1_ba06.c11", 0x000000, 0x80000, CRC(6569018b) SHA1(25040e0a9c2b72900100a22a2a41de5f6c339d8a) ) /* Plane 0 */
 	ROM_LOAD32_BYTE( "018_c2_d534.c12", 0x000002, 0x80000, CRC(6949b501) SHA1(d8ee48837faff6cc849046ee8757b2b94d440303) ) /* Plane 2 */
 	ROM_LOAD32_BYTE( "018_c3_9d70.c13", 0x000001, 0x80000, CRC(410f653b) SHA1(ce94667721baa7b2c318fc268e3bb9209671c9f5) ) /* Plane 1 */
@@ -1426,7 +1426,7 @@ ROM_START( lresortp ) /* prototype - all roms were hand labeled with CRCs */ /* 
 
 	NO_DELTAT_REGION
 
-	ROM_REGION( 0x400000, "sprites", 0 ) // note, ROM_LOAD32_BYTE
+	ROM_REGION( 0x400000, "cslot1:sprites", 0 ) // note, ROM_LOAD32_BYTE
 	ROM_LOAD32_BYTE( "024_c1_b764.c1", 0x000000, 0x80000, CRC(677749ec) SHA1(6f94675e037956a380652ab1056e6f1dec605bec) ) /* Plane 0 */
 	ROM_LOAD32_BYTE( "024_c2_1951.c2", 0x000002, 0x80000, CRC(104d7b59) SHA1(404e8776ee8df4ca282eb7b747759af8628ddca1) ) /* Plane 2 */
 	ROM_LOAD32_BYTE( "024_c3_0f63.c3", 0x000001, 0x80000, CRC(b0965a74) SHA1(e8026dd4f722ccab9c913261d09ab8843ef56a0e) ) /* Plane 1 */
@@ -1900,7 +1900,7 @@ ROM_START( kotm2p ) /* fairly late prototype release, only the code differs from
 	NO_DELTAT_REGION
 
 	// same data as main set, but prototype board layout
-	ROM_REGION( 0x600000, "sprites", 0 ) // note, ROM_LOAD32_BYTE
+	ROM_REGION( 0x600000, "cslot1:sprites", 0 ) // note, ROM_LOAD32_BYTE
 	ROM_LOAD32_BYTE( "proto_039-c1.c1", 0x000000, 0x100000, CRC(7192a787) SHA1(7bef6ce79c618103485480aee3c6f856968eb51f) ) /* Plane 0 */
 	ROM_LOAD32_BYTE( "proto_039-c2.c2", 0x000002, 0x100000, CRC(7157eca1) SHA1(65f36c6a3834775b04076d2c38a6047bffe9a8cf) ) /* Plane 2 */
 	ROM_LOAD32_BYTE( "proto_039-c3.c3", 0x000001, 0x100000, CRC(11d75727) SHA1(5a4c7b5ca3f1195e7853b45c5e71c13fe74d16e9) ) /* Plane 1 */
