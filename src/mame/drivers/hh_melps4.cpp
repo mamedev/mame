@@ -472,7 +472,7 @@ ROM_START( gjungler )
 	ROM_LOAD( "m58846-702p", 0x0000, 0x1000, CRC(94ab7060) SHA1(3389bc115d1df8d01a30611fa9e95a900d32b29b) )
 
 	ROM_REGION( 419696, "svg", 0)
-	ROM_LOAD( "gjungler.svg", 0, 419696, CRC(c5f6d1f2) SHA1(5032f35326ca689c8e329f760e380cdc9f5dff86) ) // by hap/kevtris, ver. 25 apr 2016
+	ROM_LOAD( "gjungler.svg", 0, 419696, BAD_DUMP CRC(c5f6d1f2) SHA1(5032f35326ca689c8e329f760e380cdc9f5dff86) ) // by hap/kevtris, ver. 25 apr 2016 - BAD_DUMP: needs cleanup/redo
 ROM_END
 
 

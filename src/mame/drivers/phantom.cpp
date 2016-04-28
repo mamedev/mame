@@ -30,7 +30,7 @@ It has a small LCD panel added, the rest looks nearly the same from the outside.
 
 Hardware notes:
 - PCB label 510.1128A01
-- CPU: R65C02P4, 5MHz?
+- CPU: R65C02P4, XTAL marked 4.91?200
 - ROM 2*32KB 27C256-15
 - RAM: 8KB MS6264L-10
 - LCD driver, display panel for digits
@@ -121,7 +121,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( fphantom, phantom_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 5000000) // 5MHz?
+	MCFG_CPU_ADD("maincpu", R65C02, XTAL_4_9152MHz)
 	MCFG_CPU_PERIODIC_INT_DRIVER(phantom_state, irq0_line_hold, 600) // guessed
 	MCFG_CPU_PROGRAM_MAP(fphantom_mem)
 
