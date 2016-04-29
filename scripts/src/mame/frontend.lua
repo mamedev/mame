@@ -16,9 +16,13 @@ kind (LIBTYPE)
 
 addprojectflags()
 precompiledheaders()
-options {
-	"ArchiveSplit",
-}
+
+if (_OPTIONS["targetos"] ~= "asmjs") then
+	options {
+		"ArchiveSplit",
+	}
+end
+
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",
