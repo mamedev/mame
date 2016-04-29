@@ -26,7 +26,7 @@ int mame_options::m_device_options = 0;
 bool mame_options::add_slot_options(emu_options &options, const software_part *swpart)
 {
 	// look up the system configured by name; if no match, do nothing
-	const game_driver *cursystem = options.system();
+	const game_driver *cursystem = system(options);
 	if (cursystem == nullptr)
 		return false;
 
@@ -78,7 +78,7 @@ bool mame_options::add_slot_options(emu_options &options, const software_part *s
 void mame_options::update_slot_options(emu_options &options, const software_part *swpart)
 {
 	// look up the system configured by name; if no match, do nothing
-	const game_driver *cursystem = options.system();
+	const game_driver *cursystem = system(options);
 	if (cursystem == nullptr)
 		return;
 	machine_config config(*cursystem, options);
@@ -121,7 +121,7 @@ void mame_options::update_slot_options(emu_options &options, const software_part
 void mame_options::add_device_options(emu_options &options)
 {
 	// look up the system configured by name; if no match, do nothing
-	const game_driver *cursystem = options.system();
+	const game_driver *cursystem = system(options);
 	if (cursystem == nullptr)
 		return;
 	machine_config config(*cursystem, options);
@@ -249,7 +249,7 @@ void mame_options::parse_standard_inis(emu_options &options, std::string &error_
 		parse_one_ini(options,"debug", OPTION_PRIORITY_DEBUG_INI, &error_string);
 
 	// if we have a valid system driver, parse system-specific INI files
-	const game_driver *cursystem = (driver == nullptr) ? options.system() : driver;
+	const game_driver *cursystem = (driver == nullptr) ? system(options) : driver;
 	if (cursystem == nullptr)
 		return;
 
@@ -314,6 +314,19 @@ void mame_options::parse_standard_inis(emu_options &options, std::string &error_
 	options.update_cached_options();
 }
 
+
+//-------------------------------------------------
+//  system - return a pointer to the specified
+//  system driver, or nullptr if no match
+//-------------------------------------------------
+
+const game_driver *mame_options::system(const emu_options &options)
+{
+	int index = driver_list::find(core_filename_extract_base(options.system_name(), true).c_str());
+	return (index != -1) ? &driver_list::driver(index) : nullptr;
+}
+
+
 //-------------------------------------------------
 //  set_system_name - set a new system name
 //-------------------------------------------------
@@ -342,7 +355,7 @@ void mame_options::set_system_name(emu_options &options, const char *name)
 	}
 
 	// get the new system
-	const game_driver *cursystem = options.system();
+	const game_driver *cursystem = system(options);
 	if (cursystem == nullptr)
 		return;
 

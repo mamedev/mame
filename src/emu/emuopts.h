@@ -200,7 +200,6 @@ public:
 	// core options
 	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
 	const char *software_name() const { return value(OPTION_SOFTWARENAME); }
-	const game_driver *system() const;
 
 	// core configuration options
 	bool read_config() const { return bool_value(OPTION_READCONFIG); }
