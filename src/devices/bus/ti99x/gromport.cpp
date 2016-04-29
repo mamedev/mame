@@ -218,12 +218,6 @@ void gromport_device::device_reset()
 	m_reset_on_insert = (ioport("CARTRESET")->read()==0x01);
 }
 
-// void gromport_device::set_grom_base(UINT16 grombase, UINT16 grommask)
-// {
-	// m_grombase = grombase;
-	// m_grommask = grommask;
-// }
-
 /*
     Shall we reset the console when a cartridge has been inserted?
     This is triggered by the cartridge by pulling down /RESET via a capacitor.
@@ -1160,6 +1154,9 @@ static const pcb_type sw_pcbdefs[] =
 {
 	{ PCB_STANDARD, "standard" },
 	{ PCB_PAGED, "paged" },
+	{ PCB_MINIMEM, "minimem" },
+	{ PCB_SUPER, "super" },
+	{ PCB_MBX, "mbx" },
 	{ PCB_GROMEMU, "gromemu" },
 	{ 0, nullptr}
 };
@@ -1235,8 +1232,27 @@ void ti99_cartridge_device::prepare_cartridge()
 		memcpy(regr->base() + 0x2000, rom_ptr, rom2_length);
 	}
 
-	// NVRAM cartridges are not supported by softlists (we need to find a way to load the nvram contents first)
-	if (!m_softlist)
+	// (NV)RAM cartridges
+	if (m_softlist)
+	{
+		// Do we have NVRAM?
+		if (get_software_region("nvram")!=nullptr)
+		{
+			m_pcb->m_ram_size = get_software_region_length("nvram");
+			m_pcb->m_nvram.resize(m_pcb->m_ram_size);
+			m_pcb->m_ram_ptr = &m_pcb->m_nvram[0];
+			battery_load(m_pcb->m_ram_ptr, m_pcb->m_ram_size, 0xff);
+		}
+
+		// Do we have RAM?
+		if (get_software_region("ram")!=nullptr)
+		{
+			m_pcb->m_ram_size = get_software_region_length("ram");
+			m_pcb->m_ram.resize(m_pcb->m_ram_size);
+			m_pcb->m_ram_ptr = &m_pcb->m_ram[0];
+		}
+	}
+	else
 	{
 		m_pcb->m_ram_size = m_rpk->get_resource_length("ram_socket");
 		if (m_pcb->m_ram_size > 0)
@@ -1363,6 +1379,16 @@ void ti99_cartridge_device::call_unload()
 	{
 		m_rpk->close(); // will write NVRAM contents
 		delete m_rpk;
+	}
+	else
+	{
+		// Softlist
+		bool has_nvram = (get_software_region("nvram")!=nullptr);
+		if (has_nvram)
+		{
+			int nvsize = get_software_region_length("nvram");
+			battery_save(m_pcb->m_ram_ptr, nvsize);
+		}
 	}
 
 	delete m_pcb;

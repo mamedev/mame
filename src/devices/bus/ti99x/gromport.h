@@ -1,11 +1,9 @@
 // license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /***************************************************************************
-    Gromport of the TI-99 consoles
+    Gromport (Cartridge port) of the TI-99 consoles
 
     For details see gromport.c
-
-    Michael Zapf, July 2012
 ***************************************************************************/
 
 #ifndef __GROMPORT__
@@ -42,9 +40,6 @@ public:
 	template<class _Object> static devcb_base &static_set_reset_callback(device_t &device, _Object object) { return downcast<gromport_device &>(device).m_console_reset.set_callback(object); }
 
 	void    cartridge_inserted();
-	// void    set_grom_base(UINT16 grombase, UINT16 grommask);
-	// UINT16  get_grom_base() { return m_grombase; }
-	// UINT16  get_grom_mask() { return m_grommask; }
 
 protected:
 	virtual void device_start() override;
@@ -59,8 +54,6 @@ private:
 	devcb_write_line   m_console_reset;
 	int             m_mask;
 	int m_romgq;
-	// UINT16              m_grombase;
-	// UINT16              m_grommask;
 };
 
 SLOT_INTERFACE_EXTERN(gromport4);
@@ -338,6 +331,8 @@ protected:
 	int                 m_grom_address; // for gromemu
 	int                 m_ram_page;     // for super
 	const char*         m_tag;
+	dynamic_buffer      m_nvram;    // for MiniMemory
+	dynamic_buffer      m_ram;  // for MBX
 };
 
 /******************** Standard cartridge ******************************/
