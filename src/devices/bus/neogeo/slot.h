@@ -146,6 +146,12 @@ public:
 	UINT8* get_region_ymdelta_base()  { if (m_region_ymd.found()) return m_region_ymd->base(); return nullptr; }
 	UINT32 get_region_ymdelta_size() { if (m_region_ymd.found()) return m_region_ymd->bytes(); return 0; }
 
+	// this is only used to setup optimized sprites when loading on multi-slot drivers from softlist
+	// therefore, we do not need a separate region accessor!
+	UINT8* get_sprites_opt_base() { return &m_sprites_opt[0]; }
+	UINT32 get_sprites_opt_size() { return m_sprites_opt.size(); }
+	void optimize_sprites(UINT8* region_sprites, UINT32 region_sprites_size);
+
 protected:
 	// these are allocated when loading from softlist
 	std::vector<UINT16> m_rom;
@@ -155,16 +161,19 @@ protected:
 	std::vector<UINT8> m_ym;
 	std::vector<UINT8> m_ymdelta;
 	std::vector<UINT8> m_audiocrypt;
-	
+
+	std::vector<UINT8> m_sprites_opt;
+
 	// these replace m_rom, etc. above for non-user configurable carts!
 	optional_memory_region  m_region_rom;
 	optional_memory_region  m_region_fixed;
 	optional_memory_region  m_region_audio;
 	optional_memory_region  m_region_audiocrypt;
 	optional_memory_region  m_region_spr;
-	optional_memory_region  m_region_spr_opt;
 	optional_memory_region  m_region_ym;
 	optional_memory_region  m_region_ymd;
+	
+	UINT32 get_region_mask(UINT8* rgn, UINT32 rgn_size);
 };
 
 
@@ -296,6 +305,13 @@ public:
 			if (!user_loadable()) return m_cart->get_region_ymdelta_size(); else return m_cart->get_ymdelta_size();
 		}
 		return 0;
+	}
+
+	UINT8* get_sprites_opt_base()  {
+		if (m_cart) return m_cart->get_sprites_opt_base(); else return nullptr;
+	}
+	UINT32 get_sprites_opt_size()	{
+		if (m_cart) return m_cart->get_sprites_opt_size(); else return 0;
 	}
 
 	int get_fixed_bank_type(void) { if (m_cart) return m_cart->get_fixed_bank_type(); return 0; }

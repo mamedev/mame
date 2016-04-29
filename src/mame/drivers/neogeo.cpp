@@ -1142,7 +1142,10 @@ void neogeo_state::init_sprites()
 	{
 		m_sprgen->set_sprite_region(m_slots[m_curr_slot]->get_sprites_base(), m_slots[m_curr_slot]->get_sprites_size());
 		m_sprgen->set_fixed_regions(m_slots[m_curr_slot]->get_fixed_base(), m_slots[m_curr_slot]->get_fixed_size(), m_region_fixedbios);
-		m_sprgen->optimize_sprite_data();
+		if (!m_slots[m_curr_slot]->user_loadable())
+			m_sprgen->optimize_sprite_data();
+		else
+			m_sprgen->set_optimized_sprite_data(m_slots[m_curr_slot]->get_sprites_opt_base(), m_slots[m_curr_slot]->get_sprites_opt_size() - 1);
 		m_sprgen->m_fixed_layer_bank_type = m_slots[m_curr_slot]->get_fixed_bank_type();
 	}
 	else

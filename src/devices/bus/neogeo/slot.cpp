@@ -26,7 +26,6 @@ device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config 
 	m_region_audio(*this, "^audiocpu"),
 	m_region_audiocrypt(*this, "^audiocrypt"),
 	m_region_spr(*this, "^sprites"),
-	m_region_spr_opt(*this, "^spr_opt"),
 	m_region_ym(*this, "^ymsnd"),
 	m_region_ymd(*this, "^ymsnd.deltat")
 {
@@ -38,6 +37,55 @@ device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config 
 
 device_neogeo_cart_interface::~device_neogeo_cart_interface()
 {
+}
+
+UINT32 device_neogeo_cart_interface::get_region_mask(UINT8* rgn, UINT32 rgn_size)
+{
+	// get mask based on the length rounded up to the nearest power of 2
+	UINT32 mask = 0xffffffff;
+	UINT32 len = rgn_size;
+	
+	for (UINT32 bit = 0x80000000; bit != 0; bit >>= 1)
+	{
+		if ((len * 2 - 1) & bit)
+			break;
+		
+		mask >>= 1;
+	}
+	
+	return mask;
+}
+
+void device_neogeo_cart_interface::optimize_sprites(UINT8* region_sprites, UINT32 region_sprites_size)
+{
+	// convert the sprite graphics data into a format that allows faster blitting
+	UINT32 spritegfx_address_mask = get_region_mask(region_sprites, region_sprites_size);
+	UINT8 *src = region_sprites;
+
+	m_sprites_opt.resize(spritegfx_address_mask + 1);
+	UINT8 *dest = &m_sprites_opt[0];
+	
+	for (unsigned i = 0; i < region_sprites_size; i += 0x80, src += 0x80)
+	{
+		for (unsigned y = 0; y < 0x10; y++)
+		{
+			for (unsigned x = 0; x < 8; x++)
+			{
+				*(dest++) = (((src[0x43 | (y << 2)] >> x) & 0x01) << 3) |
+				(((src[0x41 | (y << 2)] >> x) & 0x01) << 2) |
+				(((src[0x42 | (y << 2)] >> x) & 0x01) << 1) |
+				(((src[0x40 | (y << 2)] >> x) & 0x01) << 0);
+			}
+			
+			for (unsigned x = 0; x < 8; x++)
+			{
+				*(dest++) = (((src[0x03 | (y << 2)] >> x) & 0x01) << 3) |
+				(((src[0x01 | (y << 2)] >> x) & 0x01) << 2) |
+				(((src[0x02 | (y << 2)] >> x) & 0x01) << 1) |
+				(((src[0x00 | (y << 2)] >> x) & 0x01) << 0);
+			}
+		}
+	}
 }
 
 
@@ -261,6 +309,10 @@ bool neogeo_cart_slot_device::call_load()
 				m_cart->get_ymdelta_base(), m_cart->get_ymdelta_size(),
 				m_cart->get_audio_base(), m_cart->get_audio_size(),
 				m_cart->get_audiocrypt_base(), m_cart->get_audiocrypt_size());
+
+			// SPEED UP WORKAROUND: to speed up sprite drawing routine, let us store the sprite data in
+			// a different format (we then always access such alt format for drawing)
+			m_cart->optimize_sprites(m_cart->get_sprites_base(), m_cart->get_sprites_size());
 
 			return IMAGE_INIT_PASS;
 		}

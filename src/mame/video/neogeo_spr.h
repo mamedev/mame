@@ -25,7 +25,8 @@ public:
 //  neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void optimize_sprite_data();
-
+	virtual void set_optimized_sprite_data(UINT8* sprdata, UINT32 mask);
+	
 	virtual void draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens);
 	void draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline);
 	void set_videoram_offset(UINT16 data);
@@ -109,6 +110,7 @@ class neosprite_optimized_device : public neosprite_base_device
 public:
 	neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual void optimize_sprite_data() override;
+	virtual void set_optimized_sprite_data(UINT8* sprdata, UINT32 mask) override;
 	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens) override;
 	std::vector<UINT8> m_sprite_gfx;
 	UINT8* m_spritegfx8;
