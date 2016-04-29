@@ -47,6 +47,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "imagedev/cassette.h"
 #include "formats/ap2_dsk.h"
 #include "cpu/m6502/m6502.h"
+#include "includes/apple2.h"
 #include "video/apple2.h"
 
 #include "bus/a2bus/a2bus.h"
