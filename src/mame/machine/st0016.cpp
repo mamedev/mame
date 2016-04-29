@@ -6,9 +6,6 @@
 
 const device_type ST0016_CPU = &device_creator<st0016_cpu_device>;
 
-UINT8 macs_cart_slot;
-
-
 static ADDRESS_MAP_START(st0016_cpu_internal_map, AS_PROGRAM, 8, st0016_cpu_device)
 	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
@@ -32,7 +29,6 @@ ADDRESS_MAP_END
 st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: z80_device(mconfig, ST0016_CPU, "ST0016", tag, owner, clock, "st0016_cpu", __FILE__),
 		device_gfx_interface(mconfig, *this, nullptr, "palette"),
-		st0016_game(-1),
 		st0016_spr_bank(0),
 		st0016_spr2_bank(0),
 		st0016_pal_bank(0),
@@ -40,11 +36,10 @@ st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *
 		spr_dx(0),
 		spr_dy(0),
 		st0016_ramgfx(0),
-
 		m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(st0016_cpu_internal_io_map)),
 		m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(st0016_cpu_internal_map)),
-
-		m_screen(*this, ":screen")
+		m_screen(*this, ":screen"),
+		m_game_flag(-1)
 {
 	for (auto & elem : st0016_vregs)
 		elem = 0;
@@ -61,6 +56,7 @@ void st0016_cpu_device::device_start()
 {
 	z80_device::device_start();
 	startup();
+	m_dma_offs_cb.bind_relative_to(*owner());
 }
 
 
@@ -72,7 +68,7 @@ void st0016_cpu_device::device_reset()
 {
 	z80_device::device_reset();
 
-	switch(st0016_game&0x3f)
+	switch (m_game_flag & 0x3f)
 	{
 		case 0: //renju kizoku
 			m_screen->set_visible_area(0, 40*8-1, 0, 30*8-1);
@@ -298,12 +294,14 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_vregs_w)
 		UINT32 dstadr=(st0016_vregs[0xa3]|(st0016_vregs[0xa4]<<8)|(st0016_vregs[0xa5]<<16))<<1;
 		UINT32 length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
 
-		// todo : dma callback so macs_cart_slot can be local to MACs driver?
 
 		UINT32 srclen = (memregion(":maincpu")->bytes());
 		UINT8 *mem = memregion(":maincpu")->base();
 
-		srcadr += macs_cart_slot*0x400000;
+		int xfer_offs = m_dma_offset;
+		if (!m_dma_offs_cb.isnull())
+			xfer_offs = m_dma_offs_cb() * 0x400000;
+		srcadr += xfer_offs;
 
 		while(length>0)
 		{
@@ -561,6 +559,7 @@ void st0016_cpu_device::st0016_save_init()
 	save_item(NAME(st0016_spr2_bank));
 	save_item(NAME(st0016_pal_bank));
 	save_item(NAME(st0016_char_bank));
+	save_item(NAME(m_dma_offset));
 	//save_item(NAME(st0016_rom_bank));
 	save_item(NAME(st0016_vregs));
 	save_pointer(NAME(m_charram.get()), ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
@@ -573,7 +572,7 @@ void st0016_cpu_device::startup()
 {
 	int gfx_index=0;
 
-	macs_cart_slot = 0;
+	m_dma_offset = 0;
 	m_charram=make_unique_clear<UINT8[]>(ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
 	st0016_spriteram=make_unique_clear<UINT8[]>(ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
 	st0016_paletteram=make_unique_clear<UINT8[]>(ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
@@ -591,8 +590,6 @@ void st0016_cpu_device::startup()
 
 	spr_dx=0;
 	spr_dy=0;
-
-
 
 	st0016_save_init();
 }

@@ -68,6 +68,7 @@ class macs_state : public driver_device
 public:
 	macs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_cart_bank(0),
 			m_ram2(*this, "ram2"),
 			m_maincpu(*this,"maincpu"),
 			m_cart1(*this, "slot_a"),
@@ -76,6 +77,7 @@ public:
 
 	UINT8 m_mux_data;
 	UINT8 m_rev;
+	UINT8 m_cart_bank;
 	std::unique_ptr<UINT8[]> m_ram1;
 	required_shared_ptr<UINT8> m_ram2;
 	DECLARE_WRITE8_MEMBER(rambank_w);
@@ -88,7 +90,8 @@ public:
 	DECLARE_DRIVER_INIT(macs2);
 	DECLARE_MACHINE_RESET(macs);
 	DECLARE_MACHINE_START(macs);
-
+	ST0016_DMA_OFFS_CB(dma_offset);
+	
 	UINT32 screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	optional_device<st0016_cpu_device> m_maincpu;
@@ -153,7 +156,7 @@ READ8_MEMBER(macs_state::macs_input_r)
 
 WRITE8_MEMBER(macs_state::macs_rom_bank_w)
 {
-	membank("bank1")->set_entry(macs_cart_slot * 0x100 + data);
+	membank("bank1")->set_entry(m_cart_bank * 0x100 + data);
 }
 
 WRITE8_MEMBER(macs_state::macs_output_w)
@@ -174,8 +177,8 @@ WRITE8_MEMBER(macs_state::macs_output_w)
 			    locks up. */
 			membank("bank3")->set_entry(BIT(data, 5));
 
-			macs_cart_slot = (data & 0xc) >> 2;
-			membank("bank4")->set_entry(macs_cart_slot * 0x100);
+			m_cart_bank = (data & 0xc) >> 2;
+			membank("bank4")->set_entry(m_cart_bank * 0x100);
 		}
 
 		membank("bank2")->set_entry(BIT(data, 5));
@@ -204,7 +207,6 @@ ADDRESS_MAP_END
 //GFXDECODE_END
 
 static INPUT_PORTS_START( macs_base )
-	/*0*/
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, "DSW0 - BIT 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -231,7 +233,6 @@ static INPUT_PORTS_START( macs_base )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/*1*/
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSW1 - BIT 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -258,7 +259,6 @@ static INPUT_PORTS_START( macs_base )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/*2*/
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "DSW2 - BIT 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -285,7 +285,6 @@ static INPUT_PORTS_START( macs_base )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/*3*/
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, "DSW3 - BIT 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -312,7 +311,7 @@ static INPUT_PORTS_START( macs_base )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/*4 - external (printer  in cultname)*/
+	// external (printer  in cultname)
 	PORT_START("DSW4")
 	PORT_DIPNAME( 0x01, 0x01, "DSW4 - BIT 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -339,9 +338,7 @@ static INPUT_PORTS_START( macs_base )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/*
-	Note: These could likely to be switches that are on the game board and not Dip Switches
-	*/
+	//Note: These could likely to be switches that are on the game board and not Dip Switches
 	PORT_START("SYS0")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Note In") PORT_CODE(KEYCODE_4_PAD)
@@ -357,7 +354,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( macs_m )
 	PORT_INCLUDE( macs_base )
 
-	/*MAHJONG PANEL*/
+	// MAHJONG PANEL
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
@@ -432,7 +429,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( macs_h )
 	PORT_INCLUDE( macs_base )
 
-	/*HANAFUDA PANEL*/
+	// HANAFUDA PANEL
 	// Also other inputs from the Mahjong panel are detected in Service Mode
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
@@ -484,16 +481,22 @@ UINT32 macs_state::screen_update_macs(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
+ST0016_DMA_OFFS_CB(macs_state::dma_offset)
+{
+	return m_cart_bank;
+}
+
 static MACHINE_CONFIG_START( macs, macs_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(macs_mem)
 	MCFG_CPU_IO_MAP(macs_io)
+	MCFG_ST0016_DMA_OFFS_CB(macs_state, dma_offset)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", macs_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", macs_state, irq0_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(macs_state,macs)
-	MCFG_MACHINE_RESET_OVERRIDE(macs_state,macs)
+	MCFG_MACHINE_START_OVERRIDE(macs_state, macs)
+	MCFG_MACHINE_RESET_OVERRIDE(macs_state, macs)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -734,31 +737,32 @@ MACHINE_RESET_MEMBER(macs_state,macs)
 		#endif
 }
 
+
 DRIVER_INIT_MEMBER(macs_state,macs)
 {
 	m_ram1=std::make_unique<UINT8[]>(0x20000);
-	m_maincpu->st0016_game=10|0x80;
+	m_maincpu->set_st0016_game_flag((10 | 0x80));
 	m_rev = 1;
 }
 
 DRIVER_INIT_MEMBER(macs_state,macs2)
 {
 	m_ram1=std::make_unique<UINT8[]>(0x20000);
-	m_maincpu->st0016_game=10|0x80;
+	m_maincpu->set_st0016_game_flag((10 | 0x80));
 	m_rev = 2;
 }
 
 DRIVER_INIT_MEMBER(macs_state,kisekaeh)
 {
 	m_ram1=std::make_unique<UINT8[]>(0x20000);
-	m_maincpu->st0016_game=11|0x180;
+	m_maincpu->set_st0016_game_flag((11 | 0x180));
 	m_rev = 1;
 }
 
 DRIVER_INIT_MEMBER(macs_state,kisekaem)
 {
 	m_ram1=std::make_unique<UINT8[]>(0x20000);
-	m_maincpu->st0016_game=10|0x180;
+	m_maincpu->set_st0016_game_flag((10 | 0x180));
 	m_rev = 1;
 }
 

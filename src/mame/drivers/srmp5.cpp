@@ -610,7 +610,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(srmp5_state,srmp5)
 {
-	m_maincpu->st0016_game = 9;
+	m_maincpu->set_st0016_game_flag(9);
 
 	m_tileram = std::make_unique<UINT16[]>(0x100000/2);
 	m_sprram  = std::make_unique<UINT16[]>(0x080000/2);
