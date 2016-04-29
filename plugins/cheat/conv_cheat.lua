@@ -8,4 +8,4 @@ function readAll(file)
     return content
 end
 
-print(json.stringify(xml.conv_cheat(readAll(arg[1]))))
+print(json.stringify(xml.conv_cheat(readAll(arg[1])), {indent = true}))

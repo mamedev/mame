@@ -477,7 +477,7 @@ function cheat.startplugin()
 		cheats = load_cheats()
 		local json = require("json")
 		local file = io.open(manager:machine():options().entries.cheatpath:value() .. "/output.json", "w")
-		file:write(json.stringify(cheats))
+		file:write(json.stringify(cheats, {indent = true}))
 		file:close()
 		for num, cheat in pairs(cheats) do
 			parse_cheat(cheat)
