@@ -10,7 +10,6 @@
 ---------------------------------------------------------------------------
 
 project ("frontend")
-targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 uuid ("e98e14c4-82a4-4988-ba29-01c90c817ab8")
 kind (LIBTYPE)
 
