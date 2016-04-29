@@ -368,10 +368,11 @@ nakajies.cpp
 nanos.cpp
 nascom1.cpp
 nc.cpp
+neogeo.cpp
+neogeocd.cpp
 nes.cpp
 newbrain.cpp
 next.cpp
-ng_aes.cpp
 ngen.cpp
 ngp.cpp
 nokia_3310.cpp
