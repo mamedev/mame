@@ -550,6 +550,8 @@ DRIVER_INIT_MEMBER( mbee_state, mbee56 )
 	m_has_oldkb = 1;
 }
 
+// 128k uses 32 RAM banks.
+// PP has 1024k which is 256 banks, but having 64 banks stops it crashing during the self-test. Need a schematic before we can fix it.
 DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 {
 	UINT8 *RAM = memregion("rams")->base();
@@ -559,11 +561,11 @@ DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 	for (UINT8 b_bank = 0; b_bank < 16; b_bank++)
 	{
 		sprintf(banktag, "bankr%d", b_bank);
-		membank(banktag)->configure_entries(0, 32, &RAM[0x0000], 0x1000); // RAM banks
+		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
 		membank(banktag)->configure_entries(64, 4, &ROM[0x0000], 0x1000); // rom
 
 		sprintf(banktag, "bankw%d", b_bank);
-		membank(banktag)->configure_entries(0, 32, &RAM[0x0000], 0x1000); // RAM banks
+		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
 		membank(banktag)->configure_entries(64, 1, &ROM[0x4000], 0x1000); // dummy rom
 	}
 
