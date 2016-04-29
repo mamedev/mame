@@ -121,6 +121,9 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 
+#include "audio/wow.h"
+#include "audio/gorf.h"
+
 #include "gorf.lh"
 #include "seawolf2.lh"
 #include "spacezap.lh"
