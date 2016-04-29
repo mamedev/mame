@@ -78,6 +78,14 @@
 		 next to rom M-GF_A10.12K
 		 the box must contain at least a Z80
 
+DASM Notes:
+- main CPU currently stalls with a RAM buffer check ($63fe), then it 
+tries to see if $612c onward has a "MASTERJ" string on it, resets itself 
+otherwise.
+During irq routines it also checks if bit 7 is active for $640a-$6415, 
+modifies this area if condition is true.
+Neither of above matches what we have in the rom data banks, so it's either
+protected or a snippet should do the aforementioned string copy.
 
 ***************************************************************************/
 
@@ -794,4 +802,4 @@ GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, driver_device,  0,        ROT0, 
 GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, driver_device,  0,        ROT0, "bootleg", "Champion Golf (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state,  crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii" , MACHINE_SUPPORTS_SAVE )
 
-GAME( 198?, mastrglf,  0,    mastrglf, crgolf, driver_device,  0, ROT0, "Nasco", "Master's Golf", MACHINE_NOT_WORKING )
+GAME( 198?, mastrglf,  0,    mastrglf, crgolf, driver_device,  0, ROT0, "Nasco", "Master's Golf", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
