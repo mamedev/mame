@@ -69,7 +69,7 @@ void avgdvg_device::apply_flipping(int *x, int *y)
 
 void avgdvg_device::vg_flush()
 {
-	int cx0 = 0, cy0 = 0, cx1 = 0x2000000, cy1 = 0x2000000;
+	int cx0 = 0, cy0 = 0, cx1 = 0x5000000, cy1 = 0x5000000;
 	int i = 0;
 
 	while (vectbuf[i].status == VGCLIP)
