@@ -510,7 +510,6 @@ static MACHINE_CONFIG_START( crgolf, crgolf_state )
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000) /* technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
 
-	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(crgolf_state, crgolf)
 
