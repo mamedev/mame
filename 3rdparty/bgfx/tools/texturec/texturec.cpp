@@ -19,9 +19,11 @@
 #include <tinyexr/tinyexr.h>
 #include <edtaa3/edtaa3func.h>
 
+#if 0
 extern "C" {
 #include <iqa.h>
 }
+#endif
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.c>
@@ -416,7 +418,7 @@ int main(int _argc, const char* _argv[])
 
 	const bool mips      = cmdLine.hasArg('m',  "mips");
 	const bool normalMap = cmdLine.hasArg('n',  "normalmap");
-	const bool iqa       = cmdLine.hasArg('\0', "iqa");
+	//const bool iqa       = cmdLine.hasArg('\0', "iqa");
 
 	uint32_t size = (uint32_t)bx::getSize(&reader);
 	const bgfx::Memory* mem = bgfx::alloc(size);
@@ -574,11 +576,13 @@ int main(int _argc, const char* _argv[])
 						);
 
 					void* ref = NULL;
+#if 0
 					if (iqa)
 					{
 						ref = BX_ALLOC(&allocator, size);
 						memcpy(ref, rgba, size);
 					}
+#endif
 
 					imageEncodeFromRgba8(output->data, rgba, dstMip.m_width, dstMip.m_height, format);
 
@@ -600,6 +604,7 @@ int main(int _argc, const char* _argv[])
 							, format
 							);
 
+#if 0
 						static const iqa_ssim_args args =
 						{
 							0.39f,     // alpha
@@ -620,6 +625,7 @@ int main(int _argc, const char* _argv[])
 								, &args
 								);
 						printf("%f\n", result);
+#endif
 
 						BX_FREE(&allocator, ref);
 					}
