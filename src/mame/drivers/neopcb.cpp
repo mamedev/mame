@@ -423,6 +423,7 @@ WRITE16_MEMBER(neopcb_state::write_bankpvc)
 void neopcb_state::install_common()
 {
 	// install memory bank
+	m_maincpu->space(AS_PROGRAM).install_rom(0x000080, 0x0fffff, 0, 0, (UINT16 *)m_region_maincpu->base() + 0x80/2);
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x2fffff, 0, 0, "cpu_bank");
 	membank("cpu_bank")->set_base(m_region_maincpu->base() + 0x100000);
 
