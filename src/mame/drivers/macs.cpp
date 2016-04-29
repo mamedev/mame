@@ -545,22 +545,20 @@ ROM_END
 ROM_START( kisekaem )
 	MACS_BIOS
 
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
-
 	ROM_REGION( 0x400000, "slot_a:rom", 0 )
 	ROM_LOAD16_BYTE( "am-mj.u8", 0x000000, 0x100000, CRC(3cf85151) SHA1(e05400065c384730f04ef565db5ba27eb3973d15) )
 	ROM_LOAD16_BYTE( "am-mj.u7", 0x000001, 0x100000, CRC(4b645354) SHA1(1dbf9141c3724e5dff2cd8066117fb1b94671a80) )
 	ROM_LOAD16_BYTE( "am-mj.u6", 0x200000, 0x100000, CRC(23b3aa24) SHA1(bfabdb16f9b1b60230bb636a944ab46fdfda49d7) )
 	ROM_LOAD16_BYTE( "am-mj.u5", 0x200001, 0x100000, CRC(b4d53e29) SHA1(d7683fdd5531bf1aa0ef1e4e6f517b31e2d5829e) )
 	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "slot_a:rom", 0x000000, 0x400000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( kisekaeh )
 	MACS_BIOS
-
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
 
 	ROM_REGION( 0x400000, "slot_a:rom", 0 )
 	ROM_LOAD16_BYTE( "kh-u8.bin", 0x000000, 0x100000, CRC(601b9e6a) SHA1(54508a6db3928f78897df64ce400791e4789d0f6) )
@@ -568,13 +566,14 @@ ROM_START( kisekaeh )
 	ROM_LOAD16_BYTE( "kh-u6.bin", 0x200000, 0x100000, CRC(8e700204) SHA1(876e5530d749828de077293cb109a71b67cef140) )
 	ROM_LOAD16_BYTE( "kh-u5.bin", 0x200001, 0x100000, CRC(709bf7c8) SHA1(0a93e0c4f9be22a3302a1c5d2a6ec4739b202ea8) )
 	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "slot_a:rom", 0x000000, 0x400000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( cultname ) // uses printer - two different games ? (slot a - checks for printer, slot b - not)
 	MACS_BIOS
-
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
 
 	ROM_REGION( 0x400000, "slot_a:rom", 0 )
 	ROM_LOAD16_BYTE( "cult-d0.u8", 0x000000, 0x100000, CRC(394bc1a6) SHA1(98df5406862234815b46c7b0ac0b19e4b597d1b6) )
@@ -587,6 +586,11 @@ ROM_START( cultname ) // uses printer - two different games ? (slot a - checks f
 	ROM_LOAD16_BYTE( "cult-g1.u7", 0x000001, 0x100000, CRC(32ae15a4) SHA1(061992efec1ed5527f200bf4c111344b156e759d) )
 	ROM_LOAD16_BYTE( "cult-g2.u6", 0x200000, 0x100000, CRC(30ed056d) SHA1(71735339bb501b94402ef403b5a2a60effa39c36) )
 	ROM_LOAD16_BYTE( "cult-g3.u5", 0x200001, 0x100000, CRC(fe58b418) SHA1(512f5c544cfafaa98bd2b3791ff1cf67adecec8d) )
+
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "slot_a:rom", 0x000000, 0x400000, 0x400000 ) // Slot A
+	ROM_COPY( "slot_b:rom", 0x000000, 0x800000, 0x400000 ) // Slot B
 ROM_END
 
 /* these are listed as MACS2 sub-boards, is it the same?  - it's not ;) */
