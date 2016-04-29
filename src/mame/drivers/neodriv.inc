@@ -817,7 +817,7 @@ ROM_START( alpham2p ) /* early prototype - all roms were hand labeled with CRCs,
 	ROM_LOAD( "007_v21_28c2.v21", 0x180000, 0x080000, CRC(ac44b75a) SHA1(7399a05cd4e2c7ecde4a7323d3e189255afe5fc2) )
 
 	ROM_REGION( 0x080000, "cslot1:ymsnd.deltat", 0 )
-	ROM_COPY( "ymsnd", 0x180000, 0x00000, 0x80000 )
+	ROM_COPY( "cslot1:ymsnd", 0x180000, 0x00000, 0x80000 )
 
 	ROM_REGION( 0x400000, "cslot1:sprites", 0 ) // note, ROM_LOAD32_BYTE
 	ROM_LOAD32_BYTE( "007_c1_210e.c11", 0x000000, 0x80000, CRC(24841639) SHA1(fcc2a349121dad86ffefc44b9f0e8ba616ce0d30) ) /* Plane 0 */
@@ -1178,7 +1178,7 @@ ROM_START( burningfp ) /* early prototype - all roms were hand labeled with CRCs
 	ROM_LOAD( "018_v21_98dd.v21", 0x100000, 0x080000, CRC(9f3b4eda) SHA1(7f516923d04daa483b4b99c9babba66505931a34) )
 
 	ROM_REGION( 0x080000, "cslot1:ymsnd.deltat", 0 )
-	ROM_COPY( "ymsnd", 0x100000, 0x00000, 0x80000 )
+	ROM_COPY( "cslot1:ymsnd", 0x100000, 0x00000, 0x80000 )
 
 	ROM_REGION( 0x400000, "cslot1:sprites", 0 ) // note, ROM_LOAD32_BYTE
 	ROM_LOAD32_BYTE( "018_c1_ba06.c11", 0x000000, 0x80000, CRC(6569018b) SHA1(25040e0a9c2b72900100a22a2a41de5f6c339d8a) ) /* Plane 0 */
