@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * wpc_pin.h
+ * wpc_dot.h
  *
  *  Created on: 18/10/2013
  *      Author: bsr
  */
 
-#ifndef WPC_PIN_H_
-#define WPC_PIN_H_
+#ifndef WPC_DOT_H_
+#define WPC_DOT_H_
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
@@ -81,46 +81,4 @@ private:
 	emu_timer* m_irq_timer;
 };
 
-class wpc_flip1_state : public wpc_dot_state
-{
-public:
-	wpc_flip1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: wpc_dot_state(mconfig, type, tag)
-	{ }
-public:
-	DECLARE_DRIVER_INIT(wpc_flip1);
-};
-
-
-class wpc_flip2_state : public wpc_flip1_state
-{
-public:
-	wpc_flip2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: wpc_flip1_state(mconfig, type, tag)
-	{ }
-public:
-	DECLARE_DRIVER_INIT(wpc_flip2);
-};
-
-class wpc_dcs_state : public wpc_flip2_state
-{
-public:
-	wpc_dcs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: wpc_flip2_state(mconfig, type, tag),
-			m_dcs(*this, "dcs")
-	{ }
-public:
-
-	DECLARE_DRIVER_INIT(wpc_dcs);
-	DECLARE_READ8_MEMBER(wpc_dcs_sound_ctrl_r);
-	DECLARE_WRITE8_MEMBER(wpc_dcs_sound_ctrl_w);
-	DECLARE_READ8_MEMBER(wpc_dcs_sound_data_r);
-	DECLARE_WRITE8_MEMBER(wpc_dcs_sound_data_w);
-
-	required_device<dcs_audio_wpc_device> m_dcs;
-private:
-	bool m_send;
-//  UINT8 m_prev_data;
-};
-
-#endif /* WPC_PIN_H_ */
+#endif /* WPC_DOT_H_ */

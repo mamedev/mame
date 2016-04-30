@@ -8,7 +8,6 @@ Road generator. Two roads allow for forking. Gfx data fetched from ROM. Refer to
 
 #include "emu.h"
 #include "tc0150rod.h"
-#include "video/taito_helper.h"
 
 #define TC0150ROD_RAM_SIZE 0x2000
 

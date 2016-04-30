@@ -650,9 +650,10 @@ end
 --@src/devices/sound/okim6376.h,SOUNDS["OKIM6376"] = true
 --@src/devices/sound/okim6295.h,SOUNDS["OKIM6295"] = true
 --@src/devices/sound/okim9810.h,SOUNDS["OKIM9810"] = true
+--@src/devices/sound/okiadpcm.h,SOUNDS["OKIADPCM"] = true
 ---------------------------------------------------
 
-if (SOUNDS["OKIM6258"]~=null or SOUNDS["OKIM6295"]~=null or SOUNDS["OKIM9810"]~=null or SOUNDS["I5000_SND"]~=null) then
+if (SOUNDS["OKIM6258"]~=null or SOUNDS["OKIM6295"]~=null or SOUNDS["OKIM9810"]~=null or SOUNDS["I5000_SND"]~=null or SOUNDS["OKIADPCM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/okiadpcm.cpp",
 		MAME_DIR .. "src/devices/sound/okiadpcm.h",

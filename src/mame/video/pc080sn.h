@@ -3,6 +3,8 @@
 #ifndef __PC080SN_H__
 #define __PC080SN_H__
 
+#include "video/taito_helper.h"
+
 class pc080sn_device : public device_t
 {
 public:

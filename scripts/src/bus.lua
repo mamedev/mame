@@ -479,6 +479,7 @@ end
 ---------------------------------------------------
 --
 --@src/devices/bus/coleco/ctrl.h,BUSES["COLECO"] = true
+--@src/devices/bus/coleco/exp.h,BUSES["COLECO"] = true
 ---------------------------------------------------
 
 if (BUSES["COLECO"]~=null) then
@@ -516,7 +517,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/dmv/dmv.h,BUSES["DMV"] = true
+--@src/devices/bus/dmv/dmvbus.h,BUSES["DMV"] = true
 ---------------------------------------------------
 
 if (BUSES["DMV"]~=null) then
@@ -2356,7 +2357,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/compucolor/compclr_flp.h,BUSES["COMPUCOLOR"] = true
+--@src/devices/bus/compucolor/floppy.h,BUSES["COMPUCOLOR"] = true
 ---------------------------------------------------
 if (BUSES["COMPUCOLOR"]~=null) then
 	files {
@@ -2600,7 +2601,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/cgenie/expansion.h,BUSES["CGENIE_EXPANSION"] = true
+--@src/devices/bus/cgenie/expansion/expansion.h,BUSES["CGENIE_EXPANSION"] = true
 ---------------------------------------------------
 
 if (BUSES["CGENIE_EXPANSION"]~=null) then
@@ -2616,7 +2617,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/cgenie/parallel.h,BUSES["CGENIE_PARALLEL"] = true
+--@src/devices/bus/cgenie/parallel/parallel.h,BUSES["CGENIE_PARALLEL"] = true
 ---------------------------------------------------
 
 if (BUSES["CGENIE_PARALLEL"]~=null) then
