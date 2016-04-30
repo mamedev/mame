@@ -1148,6 +1148,7 @@ files {
 createMESSProjects(_target, _subtarget, "altos")
 files {
 	MAME_DIR .. "src/mame/drivers/altos5.cpp",
+	MAME_DIR .. "src/mame/drivers/altos486.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "amiga")
