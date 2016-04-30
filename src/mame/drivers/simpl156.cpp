@@ -91,7 +91,8 @@ Are the OKI M6295 clocks from Heavy Smash are correct at least for the Mitchell 
 */
 
 #include "emu.h"
-#include "includes/decocrpt.h"
+#include "machine/decocrpt.h"
+#include "machine/deco156.h"
 #include "cpu/arm/arm.h"
 #include "includes/simpl156.h"
 #include "machine/eepromser.h"

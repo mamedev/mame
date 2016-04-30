@@ -368,7 +368,8 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 #include "cpu/h6280/h6280.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
-#include "includes/decocrpt.h"
+#include "machine/decocrpt.h"
+#include "machine/deco156.h"
 #include "includes/deco32.h"
 #include "sound/2151intf.h"
 
