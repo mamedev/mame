@@ -476,9 +476,11 @@ function cheat.startplugin()
 		start_time = emu.time()
 		cheats = load_cheats()
 		local json = require("json")
-		local file = io.open(manager:machine():options().entries.cheatpath:value() .. "/output.json", "w")
-		file:write(json.stringify(cheats, {indent = true}))
-		file:close()
+		local file = io.open(manager:machine():options().entries.cheatpath:value():match("([^;]+)") .. "/output.json", "w")
+		if file then
+			file:write(json.stringify(cheats, {indent = true}))
+			file:close()
+		end
 		for num, cheat in pairs(cheats) do
 			parse_cheat(cheat)
 		end
