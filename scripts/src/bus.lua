@@ -2600,7 +2600,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/cgenie/expansion.h,BUSES["CGENIE_EXPANSION"] = true
+--@src/devices/bus/cgenie/expansion/expansion.h,BUSES["CGENIE_EXPANSION"] = true
 ---------------------------------------------------
 
 if (BUSES["CGENIE_EXPANSION"]~=null) then
@@ -2616,7 +2616,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/cgenie/parallel.h,BUSES["CGENIE_PARALLEL"] = true
+--@src/devices/bus/cgenie/parallel/parallel.h,BUSES["CGENIE_PARALLEL"] = true
 ---------------------------------------------------
 
 if (BUSES["CGENIE_PARALLEL"]~=null) then
