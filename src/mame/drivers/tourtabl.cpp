@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "machine/6532riot.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/watchdog.h"
 #include "sound/tiaintf.h"
 #include "video/tia.h"
 
@@ -27,7 +28,6 @@ public:
 	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
 	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
 	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
-	DECLARE_WRITE8_MEMBER(watchdog_w);
 };
 
 
@@ -68,11 +68,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tourtabl_state )
 	AM_RANGE(0xe800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-
-WRITE8_MEMBER(tourtabl_state::watchdog_w)
-{
-	machine().watchdog_reset();
-}
 
 static INPUT_PORTS_START( tourtabl )
 
@@ -157,12 +152,14 @@ static MACHINE_CONFIG_START( tourtabl, tourtabl_state )
 	MCFG_DEVICE_ADD("riot1", RIOT6532, MASTER_CLOCK / 3)
 	MCFG_RIOT6532_IN_PA_CB(IOPORT("RIOT0_SWA"))
 	MCFG_RIOT6532_IN_PB_CB(IOPORT("RIOT0_SWB"))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(tourtabl_state, watchdog_w))
+	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("watchdog", watchdog_timer_device, reset_w))
 
 	MCFG_DEVICE_ADD("riot2", RIOT6532, MASTER_CLOCK / 3)
 	MCFG_RIOT6532_IN_PA_CB(IOPORT("RIOT1_SWA"))
 	MCFG_RIOT6532_IN_PB_CB(IOPORT("RIOT1_SWB"))
 	MCFG_RIOT6532_OUT_PB_CB(WRITE8(tourtabl_state, tourtabl_led_w))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)

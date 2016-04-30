@@ -220,6 +220,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/watchdog.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "machine/atari_vg.h"
@@ -400,7 +401,7 @@ static ADDRESS_MAP_START( bwidowp_map, AS_PROGRAM, 8, bwidow_state )
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("avg", avg_device, go_w)
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("avg", avg_device, reset_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(bwidow_misc_w) /* coin counters, leds */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0x4800, 0x6fff) AM_ROM
@@ -757,6 +758,7 @@ static MACHINE_CONFIG_DERIVED( bwidowp, bwidow )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bwidowp_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gravitar, bwidow )

@@ -32,6 +32,7 @@
 #include "video/avgdvg.h"
 #include "machine/timekpr.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "machine/6532riot.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
@@ -288,7 +289,7 @@ static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
 	AM_RANGE(0x402000, 0x402001) AM_READ(tomcat_adcread_r) AM_WRITE(tomcat_adcon_w)
 	AM_RANGE(0x404000, 0x404001) AM_READ(tomcat_inputs_r) AM_DEVWRITE("avg", avg_tomcat_device, go_word_w)
 	AM_RANGE(0x406000, 0x406001) AM_DEVWRITE("avg", avg_tomcat_device, reset_word_w)
-	AM_RANGE(0x408000, 0x408001) AM_READWRITE(tomcat_inputs2_r, watchdog_reset16_w)
+	AM_RANGE(0x408000, 0x408001) AM_READ(tomcat_inputs2_r) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x40a000, 0x40a001) AM_READWRITE(tomcat_320bio_r, tomcat_irqclr_w)
 	AM_RANGE(0x40e000, 0x40e001) AM_WRITE(tomcat_led1on_w)
 	AM_RANGE(0x40e002, 0x40e003) AM_WRITE(tomcat_led2on_w)
@@ -415,6 +416,8 @@ static MACHINE_CONFIG_START( tomcat, tomcat_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(4000))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_M48T02_ADD( "m48t02" )
 

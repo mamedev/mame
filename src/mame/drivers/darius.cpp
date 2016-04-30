@@ -132,6 +132,7 @@ sounds.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
@@ -158,11 +159,6 @@ WRITE16_MEMBER(darius_state::cpua_ctrl_w)
 	parse_control();
 
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
-}
-
-WRITE16_MEMBER(darius_state::darius_watchdog_w)
-{
-	watchdog_reset_w(space, 0, data);
 }
 
 
@@ -240,7 +236,7 @@ static ADDRESS_MAP_START( darius_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM                                             /* main RAM */
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x0b0000, 0x0b0001) AM_WRITE(darius_watchdog_w)
+	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xc00000, 0xc0007f) AM_READWRITE(darius_ioc_r, darius_ioc_w)           /* inputs, sound */
 	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)  /* tilemaps */
 	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
@@ -764,6 +760,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame ? */
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darius)

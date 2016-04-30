@@ -42,6 +42,7 @@ PROMs : NEC B406 (1kx4) x2
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/watchdog.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
 
@@ -250,7 +251,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, sbowling_state )
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(controls_r, pix_data_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(pix_data_r, pix_shift_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1") AM_WRITENOP
@@ -403,6 +404,8 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sbowling_state, interrupt, "screen", 0, 1)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

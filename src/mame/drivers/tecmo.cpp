@@ -52,6 +52,7 @@ f80b      ????
 ***************************************************************************/
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/3812intf.h"
 #include "includes/tecmo.h"
 
@@ -162,7 +163,7 @@ static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xf80b, 0xf80b) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xf80b, 0xf80b) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
@@ -190,7 +191,7 @@ static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xf80b, 0xf80b) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xf80b, 0xf80b) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
@@ -621,6 +622,8 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_4MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rygar_sound_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

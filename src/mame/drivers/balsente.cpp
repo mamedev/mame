@@ -233,6 +233,7 @@ DIP locations verified for:
 #include "includes/balsente.h"
 #include "sound/cem3394.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 #include "stocker.lh"
 
@@ -254,7 +255,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, balsente_state )
 	AM_RANGE(0x9880, 0x989f) AM_WRITE(balsente_random_reset_w)
 	AM_RANGE(0x98a0, 0x98bf) AM_WRITE(balsente_rombank_select_w)
 	AM_RANGE(0x98c0, 0x98df) AM_WRITE(balsente_palette_select_w)
-	AM_RANGE(0x98e0, 0x98ff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x98e0, 0x98ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x9900, 0x9900) AM_READ_PORT("SWH")
 	AM_RANGE(0x9901, 0x9901) AM_READ_PORT("SWG")
 	AM_RANGE(0x9902, 0x9902) AM_READ_PORT("IN0")
@@ -1288,6 +1289,8 @@ static MACHINE_CONFIG_START( balsente, balsente_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", balsente_state, balsente_interrupt_timer)
 	MCFG_TIMER_DRIVER_ADD("8253_0_timer", balsente_state, balsente_clock_counter_0_ff)

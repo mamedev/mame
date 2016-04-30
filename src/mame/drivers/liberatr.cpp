@@ -277,7 +277,7 @@ static ADDRESS_MAP_START( liberatr_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x6400, 0x6400) AM_WRITENOP
 	AM_RANGE(0x6600, 0x6600) AM_WRITE(earom_control_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITEONLY AM_SHARE("planet_frame")
-	AM_RANGE(0x6a00, 0x6a00) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x6a00, 0x6a00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x6c00, 0x6c01) AM_WRITE(led_w)
 	AM_RANGE(0x6c04, 0x6c04) AM_WRITE(trackball_reset_w)
 	AM_RANGE(0x6c05, 0x6c06) AM_WRITE(coin_counter_w)
@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( liberat2_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x4600, 0x4600) AM_WRITE(earom_control_w)
 	AM_RANGE(0x4800, 0x483f) AM_READ(earom_r)
 	AM_RANGE(0x4800, 0x4800) AM_WRITEONLY AM_SHARE("planet_frame")
-	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x4a00, 0x4a00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x4c00, 0x4c01) AM_WRITE(led_w)
 	AM_RANGE(0x4c04, 0x4c04) AM_WRITE(trackball_reset_w)
 	AM_RANGE(0x4c05, 0x4c06) AM_WRITE(coin_counter_w)
@@ -422,6 +422,8 @@ static MACHINE_CONFIG_START( liberatr, liberatr_state )
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(driver_device,irq0_line_hold,4*60)
 
 	MCFG_ER2055_ADD("earom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

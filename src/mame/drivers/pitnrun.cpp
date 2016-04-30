@@ -68,6 +68,7 @@ K1000233A
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/pitnrun.h"
 
@@ -115,7 +116,7 @@ static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
 	AM_RANGE(0xc807, 0xc807) AM_WRITE(ha_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(mcu_data_r)
 	AM_RANGE(0xd800, 0xd800) AM_READ(mcu_status_r)
-	AM_RANGE(0xf000, 0xf000) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pitnrun_sound_map, AS_PROGRAM, 8, pitnrun_state )
@@ -232,6 +233,7 @@ static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
 	MCFG_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_mcu_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

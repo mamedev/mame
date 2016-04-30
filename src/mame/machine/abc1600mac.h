@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 
 
 
@@ -48,6 +49,7 @@ public:
 	abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const rom_entry *device_rom_region() const override;
 
 	void set_cpu_tag(const char *cpu_tag) { m_cpu_tag = cpu_tag; }
@@ -117,6 +119,8 @@ private:
 	required_memory_region m_rom;
 	optional_shared_ptr<UINT8> m_segment_ram;
 	optional_shared_ptr<UINT16> m_page_ram;
+
+	required_device<watchdog_timer_device> m_watchdog;
 
 	const char *m_cpu_tag;
 	m68000_base_device *m_cpu;

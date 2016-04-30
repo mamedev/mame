@@ -240,7 +240,7 @@ WRITE16_MEMBER(tecmosys_state::unk880000_w)
 			break;
 
 		case 0x22/2:
-			machine().watchdog_reset();
+			m_watchdog->watchdog_reset();
 			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, space.device().safe_pc() );
 			break;
 
@@ -453,7 +453,9 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
-	MCFG_WATCHDOG_VBLANK_INIT(400) // guess
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 400) // guess
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2 )
 	MCFG_CPU_PROGRAM_MAP(sound_map)

@@ -277,6 +277,7 @@ Notes:
 
 #include "cpu/sh2/sh2.h"
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "sound/ymf278b.h"
 
 #include "includes/psikyosh.h"
@@ -494,7 +495,7 @@ static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32, psikyosh_state )
 	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_SHARE("bgram") // video banks 7-0x1f (backgrounds and other effects)
 	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // palette..
 	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_SHARE("zoomram") // sprite zoom lookup table
-	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READ(watchdog_reset32_r) AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
+	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_DEVREAD("watchdog", watchdog_timer_device, reset32_r) AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_SHARE("vidregs") //  video registers
 	AM_RANGE(0x03060000, 0x0307ffff) AM_ROMBANK("gfxbank") // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
@@ -770,6 +771,7 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 	MCFG_CPU_PROGRAM_MAP(ps3v1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", psikyosh_state,  psikyosh_interrupt)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_EEPROM_SERIAL_93C56_8BIT_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)

@@ -70,6 +70,7 @@
 #include "cpu/dsp56k/dsp56k.h"
 #include "sound/k054539.h"
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "includes/plygonet.h"
 
 enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
@@ -480,7 +481,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
 	AM_RANGE(0x600000, 0x600007) AM_WRITE8(sound_comms_w, 0xffffffff)
 	AM_RANGE(0x600008, 0x60000b) AM_READ8(sound_comms_r, 0xffffffff)
 	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x680000, 0x680003) AM_WRITE(watchdog_reset32_w)
+	AM_RANGE(0x680000, 0x680003) AM_DEVWRITE("watchdog", watchdog_timer_device, reset32_w)
 	AM_RANGE(0x700000, 0x73ffff) AM_ROM AM_REGION("gfx2", 0)
 	AM_RANGE(0x780000, 0x79ffff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
@@ -617,6 +618,8 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", plygonet)
 

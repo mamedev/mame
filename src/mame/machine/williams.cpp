@@ -7,12 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/ticket.h"
 #include "includes/williams.h"
-#include "sound/dac.h"
-#include "sound/hc55516.h"
 
 
 /*************************************
@@ -423,7 +418,7 @@ WRITE8_MEMBER(williams_state::williams_watchdog_reset_w)
 {
 	/* yes, the data bits are checked for this specific value */
 	if (data == 0x39)
-		watchdog_reset_w(space,0,0);
+		m_watchdog->reset_w(space,0,0);
 }
 
 
@@ -431,7 +426,7 @@ WRITE8_MEMBER(williams2_state::williams2_watchdog_reset_w)
 {
 	/* yes, the data bits are checked for this specific value */
 	if ((data & 0x3f) == 0x14)
-		watchdog_reset_w(space,0,0);
+		m_watchdog->reset_w(space,0,0);
 }
 
 

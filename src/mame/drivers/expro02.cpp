@@ -208,6 +208,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/kaneko_hit.h"
+#include "machine/watchdog.h"
 #include "video/kaneko_tmap.h"
 #include "video/kaneko_spr.h"
 #include "includes/galpnipt.h"
@@ -940,6 +941,7 @@ static MACHINE_CONFIG_START( expro02, expro02_state )
 
 
 	/* arm watchdog */
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
 	/* sound hardware */
@@ -963,6 +965,7 @@ static MACHINE_CONFIG_DERIVED( comad, expro02 )
 	kaneko_view2_tilemap_device::set_invert_flip(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, -256, -216, 256, 224);
 
+	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0))  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 

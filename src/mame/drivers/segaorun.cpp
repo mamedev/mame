@@ -700,7 +700,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 		}
 
 		case 0x60/2:
-			return watchdog_reset_r(space, 0);
+			return m_watchdog->reset_r(space, 0);
 
 		default:
 			break;
@@ -747,7 +747,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 			return;
 
 		case 0x60/2:
-			machine().watchdog_reset();
+			m_watchdog->watchdog_reset();
 			return;
 
 		case 0x70/2:
@@ -830,7 +830,7 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 			return;
 
 		case 0x3000/2:
-			machine().watchdog_reset();
+			m_watchdog->watchdog_reset();
 			return;
 
 		case 0x3020/2:
@@ -1168,6 +1168,8 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(segaorun_state, bankmotor_limit_r))

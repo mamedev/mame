@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/kyugo.h"
 
@@ -46,6 +47,11 @@ static ADDRESS_MAP_START( kyugo_main_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(kyugo_gfxctrl_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(kyugo_scroll_y_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("shared_ram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( gyrodine_main_map, AS_PROGRAM, 8, kyugo_state )
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+	AM_IMPORT_FROM(kyugo_main_map)
 ADDRESS_MAP_END
 
 
@@ -72,6 +78,7 @@ static ADDRESS_MAP_START( kyugo_main_portmap, AS_IO, 8, kyugo_state )
 	AM_RANGE(0x01, 0x01) AM_WRITE(kyugo_flipscreen_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(kyugo_sub_cpu_control_w)
 ADDRESS_MAP_END
+
 
 
 
@@ -508,7 +515,7 @@ INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( gyrodine, kyugo_state )
+static MACHINE_CONFIG_START( kyugo_base, kyugo_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)  /* verified on pcb */
@@ -548,7 +555,14 @@ static MACHINE_CONFIG_START( gyrodine, kyugo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( repulse, gyrodine )
+static MACHINE_CONFIG_DERIVED( gyrodine, kyugo_base )
+	/* add watchdog */
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(gyrodine_main_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( repulse, kyugo_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -556,7 +570,7 @@ static MACHINE_CONFIG_DERIVED( repulse, gyrodine )
 	MCFG_CPU_IO_MAP(repulse_sub_portmap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( srdmissn, gyrodine )
+static MACHINE_CONFIG_DERIVED( srdmissn, kyugo_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -564,7 +578,7 @@ static MACHINE_CONFIG_DERIVED( srdmissn, gyrodine )
 	MCFG_CPU_IO_MAP(srdmissn_sub_portmap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( flashgala, gyrodine )
+static MACHINE_CONFIG_DERIVED( flashgala, kyugo_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -572,7 +586,7 @@ static MACHINE_CONFIG_DERIVED( flashgala, gyrodine )
 	MCFG_CPU_IO_MAP(flashgala_sub_portmap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( legend, gyrodine )
+static MACHINE_CONFIG_DERIVED( legend, kyugo_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -1342,12 +1356,6 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(kyugo_state,gyrodine)
-{
-	/* add watchdog */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(kyugo_state::watchdog_reset_w),this));
-}
-
 
 DRIVER_INIT_MEMBER(kyugo_state,srdmissn)
 {
@@ -1366,9 +1374,9 @@ DRIVER_INIT_MEMBER(kyugo_state,srdmissn)
  *
  *************************************/
 
-GAME( 1984, gyrodine,  0,        gyrodine,  gyrodine, kyugo_state,   gyrodine, ROT90, "Crux", "Gyrodine", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gyrodinet, gyrodine, gyrodine,  gyrodine, kyugo_state,   gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, buzzard,   gyrodine, gyrodine,  gyrodine, kyugo_state,   gyrodine, ROT90, "Crux", "Buzzard", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gyrodine,  0,        gyrodine,  gyrodine, driver_device, 0,        ROT90, "Crux", "Gyrodine", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gyrodinet, gyrodine, gyrodine,  gyrodine, driver_device, 0,        ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, buzzard,   gyrodine, gyrodine,  gyrodine, driver_device, 0,        ROT90, "Crux", "Buzzard", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, repulse,   0,        repulse,   repulse,  driver_device, 0,        ROT90, "Crux / Sega", "Repulse", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, 99lstwar,  repulse,  repulse,   repulse,  driver_device, 0,        ROT90, "Crux / Proma", "'99: The Last War (set 1)", MACHINE_SUPPORTS_SAVE ) // Crux went bankrupt during Repulse development,
 GAME( 1985, 99lstwara, repulse,  repulse,   repulse,  driver_device, 0,        ROT90, "Crux / Proma", "'99: The Last War (set 2)", MACHINE_SUPPORTS_SAVE ) // some of their staff later worked on the newer games on this hardware,

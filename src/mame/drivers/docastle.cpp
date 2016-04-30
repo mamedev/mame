@@ -154,6 +154,7 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "includes/docastle.h"
 
@@ -218,7 +219,7 @@ static ADDRESS_MAP_START( docastle_map, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0x8000, 0x97ff) AM_RAM
 	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
@@ -261,7 +262,7 @@ static ADDRESS_MAP_START( dorunrun_map, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x4000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(docastle_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb400, 0xb7ff) AM_RAM_WRITE(docastle_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(docastle_nmitrigger_w)
@@ -290,7 +291,7 @@ static ADDRESS_MAP_START( idsoccer_map, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0x5800, 0x59ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x6000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(idsoccer_adpcm_status_r, idsoccer_adpcm_w)
@@ -596,6 +597,8 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 	MCFG_CPU_ADD("cpu3", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(docastle_map3)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, nmi_line_pulse)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16)

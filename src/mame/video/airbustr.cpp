@@ -33,7 +33,6 @@
 
 **************************************************************************/
 #include "emu.h"
-#include "video/kan_pand.h"
 #include "includes/airbustr.h"
 
 WRITE8_MEMBER(airbustr_state::airbustr_videoram_w)

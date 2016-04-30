@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-
+#include "machine/watchdog.h"
 
 #define MASTER_CLOCK XTAL_12_096MHz
 
@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8, boxer_state )
 	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(boxer_irq_reset_w)
 	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(boxer_bell_w)
 	AM_RANGE(0x1e00, 0x1eff) AM_WRITEONLY AM_SHARE("sprite_ram")
-	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1f00, 0x1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -480,6 +480,7 @@ static MACHINE_CONFIG_START( boxer, boxer_state )
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16)
 	MCFG_CPU_PROGRAM_MAP(boxer_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

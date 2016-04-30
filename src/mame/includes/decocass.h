@@ -8,6 +8,7 @@
 #define LOG(n,x)  do { if (LOGLEVEL >= n) logerror x; } while (0)
 
 #include "machine/decocass_tape.h"
+#include "machine/watchdog.h"
 #include "cpu/mcs48/mcs48.h"
 
 #define T1PROM 1
@@ -23,6 +24,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_mcu(*this, "mcu"),
+			m_watchdog(*this, "watchdog"),
 			m_cassette(*this, "cassette"),
 			m_rambase(*this, "rambase"),
 			m_charram(*this, "charram"),
@@ -42,6 +44,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<upi41_cpu_device> m_mcu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<decocass_tape_device> m_cassette;
 
 	/* memory pointers */

@@ -26,6 +26,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/2151intf.h"
 #include "includes/konamipt.h"
 #include "includes/gradius3.h"
@@ -156,7 +157,7 @@ static ADDRESS_MAP_START( gradius3_map, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x0d0000, 0x0d0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0d0002, 0x0d0003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0d8000, 0x0d8001) AM_WRITE(cpuB_irqtrigger_w)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE8(soundlatch_byte_w, 0xff00)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("share1")
@@ -286,6 +287,8 @@ static MACHINE_CONFIG_START( gradius3, gradius3_state )
 	MCFG_CPU_PROGRAM_MAP(gradius3_s_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

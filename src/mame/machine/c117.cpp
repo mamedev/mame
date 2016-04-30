@@ -26,6 +26,11 @@ two 6809s and as the reset generator for the entire system.
 #include "machine/c117.h"
 
 
+static MACHINE_CONFIG_FRAGMENT( namco_c117 )
+	MCFG_WATCHDOG_ADD("watchdog")
+MACHINE_CONFIG_END
+
+
 const device_type NAMCO_C117 = &device_creator<namco_c117_device>;
 
 
@@ -39,7 +44,8 @@ namco_c117_device::namco_c117_device(const machine_config &mconfig, const char *
 	m_subres_cb(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 23),
 	m_maincpu_tag(nullptr),
-	m_subcpu_tag(nullptr)
+	m_subcpu_tag(nullptr),
+	m_watchdog(*this, "watchdog")
 {
 }
 
@@ -105,6 +111,17 @@ void namco_c117_device::device_reset()
 
 	// reset the main CPU so it picks up the reset vector from the correct bank
 	m_cpuexec[0]->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+}
+
+
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor namco_c117_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( namco_c117 );
 }
 
 
@@ -225,6 +242,6 @@ void namco_c117_device::kick_watchdog(int whichcpu)
 	if (m_wdog == ALL_CPU_MASK || !m_subres)
 	{
 		m_wdog = 0;
-		machine().watchdog_reset();
+		m_watchdog->watchdog_reset();
 	}
 }

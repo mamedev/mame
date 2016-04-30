@@ -66,6 +66,7 @@ C004      76489 #4 trigger
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "sound/flt_rc.h"
 #include "includes/konamipt.h"
@@ -123,7 +124,7 @@ WRITE8_MEMBER(tp84_state::tp84_sh_irqtrigger_w)
 
 
 static ADDRESS_MAP_START( tp84_cpu1_map, AS_PROGRAM, 8, tp84_state )
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("SYSTEM") AM_WRITEONLY AM_SHARE("palette_bank")
 	AM_RANGE(0x2820, 0x2820) AM_READ_PORT("P1")
 	AM_RANGE(0x2840, 0x2840) AM_READ_PORT("P2")
@@ -149,7 +150,7 @@ static ADDRESS_MAP_START( tp84b_cpu1_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("bg_colorram")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("fg_colorram")
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("SYSTEM") AM_WRITEONLY AM_SHARE("palette_bank")
 	AM_RANGE(0x1a20, 0x1a20) AM_READ_PORT("P1")
 	AM_RANGE(0x1a40, 0x1a40) AM_READ_PORT("P2")
@@ -299,6 +300,7 @@ static MACHINE_CONFIG_START( tp84, tp84_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

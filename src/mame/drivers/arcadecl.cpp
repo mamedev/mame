@@ -70,6 +70,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/atarimo.h"
 #include "includes/arcadecl.h"
@@ -163,7 +164,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, arcadecl_state )
 	AM_RANGE(0x641000, 0x641fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
 	AM_RANGE(0x642000, 0x642001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x646000, 0x646fff) AM_WRITE(scanline_int_ack_w)
-	AM_RANGE(0x647000, 0x647fff) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x647000, 0x647fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 ADDRESS_MAP_END
 
 
@@ -324,6 +325,8 @@ static MACHINE_CONFIG_START( arcadecl, arcadecl_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(arcadecl_state,arcadecl)
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arcadecl)

@@ -55,6 +55,7 @@ Press one of the start buttons to exit.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/2608intf.h"
 #include "includes/wc90.h"
 
@@ -105,7 +106,7 @@ static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xfc46, 0xfc46) AM_WRITEONLY AM_SHARE("scroll2xlo")
 	AM_RANGE(0xfc47, 0xfc47) AM_WRITEONLY AM_SHARE("scroll2xhi")
 	AM_RANGE(0xfcc0, 0xfcc0) AM_WRITE(sound_command_w)
-	AM_RANGE(0xfcd0, 0xfcd0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xfcd0, 0xfcd0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xfce0, 0xfce0) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
@@ -118,7 +119,7 @@ static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch1_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wc90_state )
@@ -359,6 +360,8 @@ static MACHINE_CONFIG_START( wc90, wc90_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	/* NMIs are triggered by the main CPU */
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

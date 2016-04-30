@@ -133,6 +133,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
@@ -400,7 +401,7 @@ static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07a304, 0x07a305) AM_WRITE(gaiden_bgscrolly_w)
 	AM_RANGE(0x07a308, 0x07a309) AM_WRITE(gaiden_bgoffsety_w)
 	AM_RANGE(0x07a30c, 0x07a30d) AM_WRITE(gaiden_bgscrollx_w)
-	AM_RANGE(0x07a800, 0x07a801) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x07a800, 0x07a801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x07a802, 0x07a803) AM_WRITE(gaiden_sound_command_w)
 	AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
 	AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
@@ -757,6 +758,8 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_MACHINE_START_OVERRIDE(gaiden_state,raiga)
 	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.17)   /* verified on pcb */
@@ -925,7 +928,7 @@ static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07f002, 0x07f003) AM_WRITE(gaiden_bgscrollx_w)
 	AM_RANGE(0x07f004, 0x07f005) AM_WRITE(gaiden_fgscrolly_w)
 	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
-	AM_RANGE(0x07a800, 0x07a801) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x07a800, 0x07a801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x07e000, 0x07e001) AM_WRITE(gaiden_sound_command_w)
 //  AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
 //  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
@@ -944,6 +947,8 @@ static MACHINE_CONFIG_START( mastninj, gaiden_state )
 
 	MCFG_MACHINE_START_OVERRIDE(gaiden_state,raiga)
 	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/watchdog.h"
 #include "includes/konamipt.h"
 #include "includes/bottom9.h"
 
@@ -158,7 +159,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bottom9_state )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bottom9_bankedram1_r, bottom9_bankedram1_w)
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(bottom9_1f90_w)
-	AM_RANGE(0x1fa0, 0x1fa0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1fa0, 0x1fa0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1fb0, 0x1fb0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x1fc0, 0x1fc0) AM_WRITE(bottom9_sh_irqtrigger_w)
 	AM_RANGE(0x1fd0, 0x1fd0) AM_READ_PORT("SYSTEM")
@@ -303,6 +304,8 @@ static MACHINE_CONFIG_START( bottom9, bottom9_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bottom9_state, bottom9_sound_interrupt, 8*60)  /* irq is triggered by the main CPU */
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

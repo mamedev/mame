@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/watchdog.h"
 #include "includes/wolfpack.h"
 
 
@@ -153,7 +154,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wolfpack_state )
 	AM_RANGE(0x4004, 0x4004) AM_WRITE(wolfpack_ship_pic_w)
 	AM_RANGE(0x4005, 0x4005) AM_WRITE(wolfpack_torpedo_h_w)
 	AM_RANGE(0x4006, 0x4006) AM_WRITE(wolfpack_torpedo_v_w)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x9000) AM_READNOP /* debugger ROM location? */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -302,6 +303,8 @@ static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
 	MCFG_CPU_PROGRAM_MAP(main_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

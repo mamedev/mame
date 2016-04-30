@@ -90,6 +90,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/zodiack.h"
 
@@ -150,7 +151,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zodiack_state )
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN0")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN1")
 	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_byte_r, master_soundlatch_w)
-	AM_RANGE(0x7000, 0x7000) AM_READNOP AM_WRITE(watchdog_reset_w)  /* NOP??? */
+	AM_RANGE(0x7000, 0x7000) AM_READNOP AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)  /* NOP??? */
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(attributes_w) AM_SHARE("attributeram")
@@ -570,6 +571,8 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zodiack_state, zodiack_sound_nmi_gen, 8*60) // sound tempo - unknown source, timing is guessed
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

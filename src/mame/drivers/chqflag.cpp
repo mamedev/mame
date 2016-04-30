@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h"
+#include "machine/watchdog.h"
 #include "sound/2151intf.h"
 #include "includes/chqflag.h"
 #include "includes/konamipt.h"
@@ -132,7 +133,7 @@ static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("IN1")                                /* COINSW, STARTSW, test mode */
 	AM_RANGE(0x3201, 0x3201) AM_READ_PORT("IN0")                                /* DIPSW #3, SW 4 */
 	AM_RANGE(0x3203, 0x3203) AM_READ_PORT("DSW2")                               /* DIPSW #2 */
-	AM_RANGE(0x3300, 0x3300) AM_WRITE(watchdog_reset_w)                         /* watchdog timer */
+	AM_RANGE(0x3300, 0x3300) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* watchdog timer */
 	AM_RANGE(0x3400, 0x341f) AM_DEVREADWRITE("k051733", k051733_device, read, write)                    /* 051733 (protection) */
 	AM_RANGE(0x3500, 0x350f) AM_DEVWRITE("k051316_1", k051316_device, ctrl_w)                            /* 051316 control registers (chip 1) */
 	AM_RANGE(0x3600, 0x360f) AM_DEVWRITE("k051316_2", k051316_device, ctrl_w)                            /* 051316 control registers (chip 2) */
@@ -301,6 +302,8 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

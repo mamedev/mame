@@ -167,7 +167,7 @@ WRITE16_MEMBER(mcatadv_state::mcat_coin_w)
 
 READ16_MEMBER(mcatadv_state::mcat_wd_r)
 {
-	watchdog_reset_r(space, 0);
+	m_watchdog->reset_r(space, 0);
 	return 0xc00;
 }
 
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16, mcatadv_state )
 
 	AM_RANGE(0xb00000, 0xb0000f) AM_RAM AM_SHARE("vidregs")
 
-	AM_RANGE(0xb00018, 0xb00019) AM_WRITE(watchdog_reset16_w) // NOST Only
+	AM_RANGE(0xb00018, 0xb00019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // NOST Only
 	AM_RANGE(0xb0001e, 0xb0001f) AM_READ(mcat_wd_r) // MCAT Only
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(soundlatch2_word_r) AM_WRITE(mcat_soundlatch_w)
 ADDRESS_MAP_END
@@ -458,6 +458,7 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_PALETTE_ADD("palette", 0x2000/2)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
 

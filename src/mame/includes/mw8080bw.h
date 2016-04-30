@@ -8,6 +8,7 @@
 ****************************************************************************/
 
 #include "machine/mb14241.h"
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
@@ -42,6 +43,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_mb14241(*this,"mb14241"),
+		m_watchdog(*this, "watchdog"),
 		m_main_ram(*this, "main_ram"),
 		m_colorram(*this, "colorram"),
 		m_colorram2(*this, "colorram2"),
@@ -58,6 +60,7 @@ public:
 	/* device/memory pointers */
 	required_device<cpu_device> m_maincpu;
 	optional_device<mb14241_device> m_mb14241;
+	optional_device<watchdog_timer_device> m_watchdog;
 	required_shared_ptr<UINT8> m_main_ram;
 	optional_shared_ptr<UINT8> m_colorram;
 	optional_shared_ptr<UINT8> m_colorram2;

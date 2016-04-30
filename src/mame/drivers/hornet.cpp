@@ -319,6 +319,7 @@
 #include "machine/konppc.h"
 #include "machine/timekpr.h"
 #include "machine/ds2401.h"
+#include "machine/watchdog.h"
 #include "sound/rf5c400.h"
 #include "sound/k056800.h"
 #include "video/voodoo.h"
@@ -354,7 +355,8 @@ public:
 		m_analog2(*this, "ANALOG2"),
 		m_user3_ptr(*this, "user3"),
 		m_user5_ptr(*this, "user5"),
-		m_lan_ds2401(*this, "lan_serial_id")
+		m_lan_ds2401(*this, "lan_serial_id"),
+		m_watchdog(*this, "watchdog")
 	{ }
 
 	// TODO: Needs verification on real hardware
@@ -379,6 +381,7 @@ public:
 	optional_region_ptr<UINT8> m_user3_ptr;
 	optional_region_ptr<UINT8> m_user5_ptr;
 	optional_device<ds2401_device> m_lan_ds2401;
+	required_device<watchdog_timer_device> m_watchdog;
 
 	emu_timer *m_sound_irq_timer;
 	UINT8 m_led_reg0;
@@ -625,7 +628,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			    0x80 = WDTCLK
 			*/
 			if (data & 0x80)
-				machine().watchdog_reset();
+				m_watchdog->watchdog_reset();
 			break;
 
 		case 7: /* CG Control Register */
@@ -1011,6 +1014,8 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 	MCFG_CPU_DATA_MAP(sharc0_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 //  PCB description at top doesn't mention any EEPROM on the base board...
 //  MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

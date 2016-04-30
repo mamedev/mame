@@ -418,6 +418,7 @@ each direction to assign the boundries.
 #include "cpu/m6502/m6502.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "machine/atari_vg.h"
 #include "includes/centiped.h"
 #include "sound/ay8910.h"
@@ -665,7 +666,7 @@ static ADDRESS_MAP_START( centiped_base_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x1c00, 0x1c02) AM_WRITE(coin_count_w)
 	AM_RANGE(0x1c03, 0x1c04) AM_WRITE(led_w)
 	AM_RANGE(0x1c07, 0x1c07) AM_WRITE(centiped_flip_screen_w)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -759,7 +760,7 @@ static ADDRESS_MAP_START( milliped_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x2506, 0x2506) AM_WRITE(centiped_flip_screen_w)
 	AM_RANGE(0x2507, 0x2507) AM_WRITE(control_select_w) /* CNTRLSEL */
 	AM_RANGE(0x2600, 0x2600) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x2680, 0x2680) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x2680, 0x2680) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2700, 0x2700) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
 	AM_RANGE(0x2780, 0x27bf) AM_DEVWRITE("earom", atari_vg_earom_device, write)
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
@@ -807,7 +808,7 @@ static ADDRESS_MAP_START( multiped_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x2506, 0x2506) AM_WRITE(centiped_flip_screen_w)
 	AM_RANGE(0x2507, 0x2507) AM_WRITE(control_select_w)
 	AM_RANGE(0x2600, 0x2600) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x2680, 0x2680) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x2680, 0x2680) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2700, 0x2700) AM_WRITENOP
 	AM_RANGE(0x2780, 0x27bf) AM_WRITENOP
 	AM_RANGE(0x4000, 0x5fff) AM_ROM
@@ -878,7 +879,7 @@ static ADDRESS_MAP_START( warlords_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x1c00, 0x1c02) AM_WRITE(coin_count_w)
 	AM_RANGE(0x1c03, 0x1c06) AM_WRITE(led_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x5000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -910,7 +911,7 @@ static ADDRESS_MAP_START( mazeinv_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x2506, 0x2506) AM_WRITE(centiped_flip_screen_w)
 	AM_RANGE(0x2580, 0x2583) AM_WRITE(mazeinv_input_select_w)
 	AM_RANGE(0x2600, 0x2600) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x2680, 0x2680) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x2680, 0x2680) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2700, 0x2700) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
 	AM_RANGE(0x2780, 0x27bf) AM_DEVWRITE("earom", atari_vg_earom_device, write)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
@@ -937,7 +938,7 @@ static ADDRESS_MAP_START( bullsdrt_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x1481, 0x1481) AM_MIRROR(0x6000) AM_WRITE(bullsdrt_coin_count_w)
 	AM_RANGE(0x1483, 0x1484) AM_MIRROR(0x6000) AM_WRITE(led_w)
 	AM_RANGE(0x1487, 0x1487) AM_MIRROR(0x6000) AM_WRITE(centiped_flip_screen_w)
-	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_NOP
 	AM_RANGE(0x1800, 0x1bbf) AM_MIRROR(0x6000) AM_WRITE(centiped_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1bc0, 0x1bff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("spriteram")
@@ -1690,6 +1691,8 @@ static MACHINE_CONFIG_START( centiped_base, centiped_state )
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* timer */
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", centiped_state, generate_interrupt, "screen", 0, 16)
 
@@ -1848,6 +1851,8 @@ static MACHINE_CONFIG_START( bullsdrt, centiped_state )
 	MCFG_CPU_IO_MAP(bullsdrt_port_map)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

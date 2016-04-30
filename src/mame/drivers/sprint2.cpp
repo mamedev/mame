@@ -112,7 +112,7 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 
 	/* interrupts and watchdog are disabled during service mode */
 
-	machine().watchdog_enable(!service_mode());
+	m_watchdog->watchdog_enable(!service_mode());
 
 	if (!service_mode())
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
 	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE(sprint2_lamp1_w)
 	AM_RANGE(0x0c40, 0x0c4f) AM_WRITE(sprint2_lamp2_w)
 	AM_RANGE(0x0c60, 0x0c6f) AM_WRITENOP /* SPARE */
-	AM_RANGE(0x0c80, 0x0cff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0c80, 0x0cff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x0d00, 0x0d7f) AM_WRITE(sprint2_collision_reset1_w)
 	AM_RANGE(0x0d80, 0x0dff) AM_WRITE(sprint2_collision_reset2_w)
 	AM_RANGE(0x0e00, 0x0e7f) AM_WRITE(sprint2_steering_reset1_w)
@@ -533,7 +533,9 @@ static MACHINE_CONFIG_START( sprint2, sprint2_state )
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(sprint2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sprint2_state,  sprint2)
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

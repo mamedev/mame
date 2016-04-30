@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
 
+#include "machine/watchdog.h"
 #include "audio/geebee.h"
 #include "audio/warpwarp.h"
 
@@ -10,6 +11,7 @@ public:
 	warpwarp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_warpwarp_sound(*this, "warpwarp_custom"),
 		m_geebee_sound(*this, "geebee_custom"),
@@ -25,6 +27,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<warpwarp_sound_device> m_warpwarp_sound;
 	optional_device<geebee_sound_device> m_geebee_sound;

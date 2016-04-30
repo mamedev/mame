@@ -279,6 +279,7 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, dev
 			m_soundcpu(*this, "soundcpu"),
 			m_soundcpu2(*this, "soundcpu2"),
 			m_mcu(*this, "mcu"),
+			m_watchdog(*this, "watchdog"),
 			m_cmptimer_1(*this, "cmptimer_main"),
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
@@ -593,7 +594,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_0_w )
 			//  D1: (CONT) - affects sprite hardware
 			//  D0: Sound section reset (1= normal operation, 0= reset)
 			if (((oldval ^ data) & 0x40) && !(data & 0x40))
-				machine().watchdog_reset();
+				m_watchdog->watchdog_reset();
 
 			m_segaic16vid->set_display_enable(data & 0x20);
 
@@ -1823,6 +1824,8 @@ static MACHINE_CONFIG_FRAGMENT( xboard )
 	MCFG_NVRAM_ADD_0FILL("backup1")
 	MCFG_NVRAM_ADD_0FILL("backup2")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")

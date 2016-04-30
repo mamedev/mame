@@ -381,6 +381,8 @@ INTERRUPT_GEN_MEMBER( driver_device::irq7_line_assert ) { device.execute().set_i
 //  WATCHDOG READ/WRITE HELPERS
 //**************************************************************************
 
+#ifdef LEGACY_WATCHDOG
+
 //-------------------------------------------------
 //  8-bit reset read/write handlers
 //-------------------------------------------------
@@ -403,6 +405,8 @@ READ16_MEMBER( driver_device::watchdog_reset16_r ) { machine().watchdog_reset();
 
 WRITE32_MEMBER( driver_device::watchdog_reset32_w ) { machine().watchdog_reset(); }
 READ32_MEMBER( driver_device::watchdog_reset32_r ) { machine().watchdog_reset(); return space.unmap(); }
+
+#endif
 
 
 

@@ -40,6 +40,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/ldv1000.h"
 #include "machine/ldstub.h"
+#include "machine/watchdog.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "sound/ay8910.h"
@@ -390,7 +391,7 @@ static ADDRESS_MAP_START( dleuro_map, AS_PROGRAM, 8, dlair_state )
 	AM_RANGE(0xe018, 0xe018) AM_MIRROR(0x1f47) AM_WRITE(led_den2_w)         // WT EXT LED 2
 	AM_RANGE(0xe020, 0xe020) AM_MIRROR(0x1f47) AM_WRITE(laserdisc_w)        // DISC WT
 	AM_RANGE(0xe028, 0xe028) AM_MIRROR(0x1f47) AM_WRITE(dleuro_misc_w)      // WT MISC
-	AM_RANGE(0xe030, 0xe030) AM_MIRROR(0x1f47) AM_WRITE(watchdog_reset_w)   // CLR WDOG
+	AM_RANGE(0xe030, 0xe030) AM_MIRROR(0x1f47) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)   // CLR WDOG
 	AM_RANGE(0xe080, 0xe080) AM_MIRROR(0x1f47) AM_READ_PORT("P1")           // CP A
 	AM_RANGE(0xe088, 0xe088) AM_MIRROR(0x1f47) AM_READ_PORT("SYSTEM")       // CP B
 	AM_RANGE(0xe090, 0xe090) AM_MIRROR(0x1f47) AM_READ_PORT("DSW1")         // OPT SW A
@@ -709,6 +710,7 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// TODO: hook up tx and rx callbacks
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
 
 	MCFG_MACHINE_START_OVERRIDE(dlair_state,dlair)

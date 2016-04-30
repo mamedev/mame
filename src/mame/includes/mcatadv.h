@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Priest, David Haywood
 
+#include "machine/watchdog.h"
+
 class mcatadv_state : public driver_device
 {
 public:
@@ -14,6 +16,7 @@ public:
 		m_vidregs(*this, "vidregs"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
@@ -36,6 +39,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

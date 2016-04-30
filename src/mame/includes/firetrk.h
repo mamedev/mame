@@ -6,6 +6,7 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 
 *************************************************************************/
 
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
 
 #define FIRETRUCK_MOTOR_DATA    NODE_01
@@ -38,6 +39,7 @@ public:
 	firetrk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_discrete(*this, "discrete"),
 		m_alpha_num_ram(*this, "alpha_num_ram"),
 		m_playfield_ram(*this, "playfield_ram"),
@@ -54,6 +56,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_device> m_discrete;
 	required_shared_ptr<UINT8> m_alpha_num_ram;
 	required_shared_ptr<UINT8> m_playfield_ram;

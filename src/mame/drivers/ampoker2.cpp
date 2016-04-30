@@ -573,7 +573,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_watchdog_reset_w)
 
 	if (((data >> 3) & 0x01) == 0)      /* check for refresh value (0x08) */
 	{
-		machine().watchdog_reset();
+		m_watchdog->watchdog_reset();
 //      popmessage("%02x", data);
 	}
 	else
@@ -1142,6 +1142,8 @@ static MACHINE_CONFIG_START( ampoker2, ampoker2_state )
 	MCFG_CPU_PROGRAM_MAP(ampoker2_map)
 	MCFG_CPU_IO_MAP(ampoker2_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ampoker2_state, nmi_line_pulse, 1536)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))   /* 200 ms, measured */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

@@ -35,6 +35,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "sound/tms5220.h"
 #include "machine/ldvp931.h"
 #include "machine/6532riot.h"
+#include "machine/watchdog.h"
 #include "machine/x2212.h"
 
 
@@ -538,7 +539,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, firefox_state )
 	AM_RANGE(0x4107, 0x4107) AM_MIRROR(0x00f8) AM_READ(adc_r)                   /* ADC */
 	AM_RANGE(0x4200, 0x4200) AM_MIRROR(0x0047) AM_WRITE(main_irq_clear_w)       /* RSTIRQ */
 	AM_RANGE(0x4208, 0x4208) AM_MIRROR(0x0047) AM_WRITE(main_firq_clear_w)      /* RSTFIRQ */
-	AM_RANGE(0x4210, 0x4210) AM_MIRROR(0x0047) AM_WRITE(watchdog_reset_w)       /* WDCLK */
+	AM_RANGE(0x4210, 0x4210) AM_MIRROR(0x0047) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)       /* WDCLK */
 	AM_RANGE(0x4218, 0x4218) AM_MIRROR(0x0047) AM_WRITE(firefox_disc_read_w)    /* DSKREAD */
 	AM_RANGE(0x4220, 0x4223) AM_MIRROR(0x0044) AM_WRITE(adc_select_w)           /* ADCSTART */
 	AM_RANGE(0x4230, 0x4230) AM_MIRROR(0x0047) AM_WRITE(self_reset_w)           /* AMUCK */
@@ -716,6 +717,7 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz((double)MASTER_XTAL/8/16/16/16/16))
 
 	/* video hardware */

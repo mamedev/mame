@@ -127,6 +127,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "sound/3812intf.h"
 #include "includes/sauro.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 
 WRITE8_MEMBER(sauro_state::sauro_sound_command_w)
@@ -196,7 +197,7 @@ static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
 	AM_RANGE(0xcc, 0xcc) AM_WRITENOP        /* same as 0xca */
 	AM_RANGE(0xcd, 0xcd) AM_WRITENOP        /* same as 0xcb */
 	AM_RANGE(0xce, 0xce) AM_WRITENOP        /* only written at startup */
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
@@ -221,13 +222,13 @@ static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("P1")
 	AM_RANGE(0xf818, 0xf818) AM_READ_PORT("P2")
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xf828, 0xf828) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf828, 0xf828) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xf830, 0xf830) AM_WRITE(scroll_bg_w)
 	AM_RANGE(0xf838, 0xf838) AM_WRITENOP                /* only written at startup */
 	AM_RANGE(0xf839, 0xf839) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xf83a, 0xf83a) AM_WRITE(coin1_w)
 	AM_RANGE(0xf83b, 0xf83b) AM_WRITE(coin2_w)
-	AM_RANGE(0xf83c, 0xf83c) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xf83c, 0xf83c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xf83f, 0xf83f) AM_WRITENOP                /* only written at startup */
 ADDRESS_MAP_END
 
@@ -369,6 +370,8 @@ static MACHINE_CONFIG_START( tecfri, sauro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sauro_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

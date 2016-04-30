@@ -11,6 +11,7 @@
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
+#include "machine/watchdog.h"
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"
 #include "video/sega16sp.h"
@@ -30,6 +31,7 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_i8255(*this, "i8255"),
 		m_nvram(*this, "nvram"),
+		m_watchdog(*this, "watchdog"),
 		m_sprites(*this, "sprites"),
 		m_segaic16vid(*this, "segaic16vid"),
 		m_segaic16road(*this, "segaic16road"),
@@ -119,6 +121,7 @@ protected:
 	required_device<z80_device> m_soundcpu;
 	required_device<i8255_device> m_i8255;
 	optional_device<nvram_device> m_nvram;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<sega_16bit_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;

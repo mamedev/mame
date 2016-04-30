@@ -41,6 +41,7 @@ Stephh's notes (based on the games M6809 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "includes/konamipt.h"
 #include "includes/mikie.h"
@@ -99,7 +100,7 @@ static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(mikie_sh_irqtrigger_w)
 	AM_RANGE(0x2006, 0x2006) AM_WRITE(mikie_flipscreen_w)
 	AM_RANGE(0x2007, 0x2007) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x2100, 0x2100) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x2100, 0x2100) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(mikie_palettebank_w)
 	AM_RANGE(0x2300, 0x2300) AM_WRITENOP    // ???
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM") AM_WRITE(soundlatch_byte_w)
@@ -258,6 +259,7 @@ static MACHINE_CONFIG_START( mikie, mikie_state )
 	MCFG_CPU_ADD("audiocpu", Z80, CLK)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

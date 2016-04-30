@@ -57,6 +57,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 #include "cpu/tms9900/tms9980a.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
@@ -557,7 +558,7 @@ static ADDRESS_MAP_START( looping_io_map, AS_IO, 8, looping_state )
 	/* 404 = C0 */
 	/* 405 = C1 */
 	AM_RANGE(0x406, 0x406) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x407, 0x407) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x407, 0x407) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 
 	AM_RANGE(0x10000, 0x10000) AM_NOP       /* external IDLE signal -- we can ignore it */
 ADDRESS_MAP_END
@@ -632,6 +633,8 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_COP400_READ_G_CB(READ8(looping_state, cop_unk_r))
 	MCFG_COP400_READ_IN_CB(READ8(looping_state, cop_unk_r))
 	MCFG_COP400_READ_SI_CB(READLINE(looping_state, cop_serial_r))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

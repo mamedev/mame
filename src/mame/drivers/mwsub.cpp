@@ -13,6 +13,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 
 #include "submar.lh"
 
@@ -134,7 +135,7 @@ static ADDRESS_MAP_START( submar_portmap, AS_IO, 8, submar_state )
 	AM_RANGE(0x02, 0x02) AM_WRITE(submar_solenoid_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(submar_sound_w)
 	AM_RANGE(0x04, 0x05) AM_WRITE(submar_led_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(submar_irq_clear_w)
 ADDRESS_MAP_END
 
@@ -202,6 +203,8 @@ static MACHINE_CONFIG_START( submar, submar_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(submar_state, irq0_line_assert, 124.675) // 555 IC
 	MCFG_CPU_PROGRAM_MAP(submar_map)
 	MCFG_CPU_IO_MAP(submar_portmap)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* no video! */
 

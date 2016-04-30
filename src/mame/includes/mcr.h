@@ -11,6 +11,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
+#include "machine/watchdog.h"
 #include "audio/midway.h"
 #include "sound/samples.h"
 
@@ -25,6 +26,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ipu(*this, "ipu"),
+		m_watchdog(*this, "watchdog"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_paletteram(*this, "paletteram"),
@@ -41,10 +43,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	// these should be required but can't because mcr68 shares with us
-	// once the sound boards are properly device-ified, fix this
-	optional_device<z80_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	optional_device<cpu_device> m_ipu;
+	required_device<watchdog_timer_device> m_watchdog;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_paletteram;

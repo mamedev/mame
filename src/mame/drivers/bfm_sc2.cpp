@@ -145,6 +145,7 @@ Adder hardware:
 #include "cpu/m6809/m6809.h"
 
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 #include "video/bfm_adr2.h"
 
@@ -1439,7 +1440,7 @@ static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x232F, 0x232F) AM_WRITE(coininhib_w)
 	AM_RANGE(0x2330, 0x2330) AM_WRITE(payout_latch_w)
 	AM_RANGE(0x2331, 0x2331) AM_WRITE(payout_triac_w)
-	AM_RANGE(0x2332, 0x2332) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x2332, 0x2332) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2333, 0x2333) AM_WRITE(mmtr_w)
 	AM_RANGE(0x2334, 0x2335) AM_WRITE(unknown_w)
 	AM_RANGE(0x2336, 0x2336) AM_WRITE(dimcnt_w)
@@ -2169,8 +2170,10 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 ) // 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap_vid)                    // setup scorpion2 board memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, timer_irq,  1000)               // generate 1000 IRQ's per second
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_BFMBD1_ADD("vfd1",1)
@@ -3624,6 +3627,8 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, timer_irq,  1000)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
 	MCFG_BFMBD1_ADD("vfd0",0)
@@ -3682,6 +3687,8 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, timer_irq,  1000)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

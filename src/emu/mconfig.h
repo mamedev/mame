@@ -68,8 +68,10 @@ public:
 	// public state
 	attotime                m_minimum_quantum;          // minimum scheduling quantum
 	std::string             m_perfect_cpu_quantum;      // tag of CPU to use for "perfect" scheduling
+#ifdef LEGACY_WATCHDOG
 	INT32                   m_watchdog_vblank_count;    // number of VBLANKs until the watchdog kills us
 	attotime                m_watchdog_time;            // length of time until the watchdog kills us
+#endif
 
 	// other parameters
 	const internal_layout *            m_default_layout;           // default layout for this machine
@@ -199,11 +201,13 @@ References an external machine config.
 #define MCFG_QUANTUM_PERFECT_CPU(_cputag) \
 	config.m_perfect_cpu_quantum = owner->subtag(_cputag);
 
+#ifdef LEGACY_WATCHDOG
 // watchdog configuration
 #define MCFG_WATCHDOG_VBLANK_INIT(_count) \
 	config.m_watchdog_vblank_count = _count;
 #define MCFG_WATCHDOG_TIME_INIT(_time) \
 	config.m_watchdog_time = _time;
+#endif
 
 // core video parameters
 #define MCFG_DEFAULT_LAYOUT(_layout) \

@@ -17,6 +17,7 @@ pf: but some gameplay bugs - sprite positioning is incorrect, no enemies, jump a
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "includes/thoop2.h"
 
@@ -63,7 +64,7 @@ static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                 /* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                 /* Video Registers */
-	AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset16_w)                           /* INT 6 ACK/Watchdog timer */
+	AM_RANGE(0x10800c, 0x10800d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)                           /* INT 6 ACK/Watchdog timer */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                       /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
@@ -204,6 +205,8 @@ static MACHINE_CONFIG_START( thoop2, thoop2_state )
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(thoop2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thoop2_state,  irq6_line_hold)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

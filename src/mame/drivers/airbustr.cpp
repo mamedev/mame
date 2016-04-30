@@ -235,7 +235,7 @@ READ8_MEMBER(airbustr_state::devram_r)
 		   that would reset the main cpu. We avoid this and patch
 		   the rom instead (main cpu has to be reset once at startup) */
 		case 0xfe0:
-			return watchdog_reset_r(space, 0);
+			return m_watchdog->reset_r(space, 0);
 
 		/* Reading a word at eff2 probably yelds the product
 		   of the words written to eff0 and eff2 */
@@ -600,6 +600,8 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
+
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
 	/* video hardware */
@@ -636,6 +638,7 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( airbustrb, airbustr )
+	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0)) // no protection device or watchdog
 MACHINE_CONFIG_END
 

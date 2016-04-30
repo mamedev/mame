@@ -110,7 +110,7 @@ WRITE32_MEMBER(groundfx_state::groundfx_input_w)
 		case 0x00:
 			if (ACCESSING_BITS_24_31)   /* $500000 is watchdog */
 			{
-				machine().watchdog_reset();
+				m_watchdog->watchdog_reset();
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -317,6 +317,8 @@ static MACHINE_CONFIG_START( groundfx, groundfx_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", groundfx_state,  groundfx_interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -123,6 +123,7 @@ e000 - e7ff        R/W      Work RAM
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/nova2001.h"
 
@@ -185,7 +186,7 @@ static ADDRESS_MAP_START( nova2001_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
 	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0xc003, 0xc003) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xc004, 0xc004) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xc004, 0xc004) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("IN0")
 	AM_RANGE(0xc007, 0xc007) AM_READ_PORT("IN1")
 	AM_RANGE(0xc00e, 0xc00e) AM_READ_PORT("IN2")
@@ -639,6 +640,8 @@ static MACHINE_CONFIG_START( nova2001, nova2001_state )
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz verified on schematics
 	MCFG_CPU_PROGRAM_MAP(nova2001_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

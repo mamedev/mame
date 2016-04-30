@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "machine/atarigen.h"
 #include "includes/blstroid.h"
 
@@ -64,7 +65,7 @@ MACHINE_RESET_MEMBER(blstroid_state,blstroid)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blstroid_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x7c0000) AM_ROM
-	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x7f81fe) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x7f81fe) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xff8200, 0xff8201) AM_MIRROR(0x7f81fe) AM_WRITE(scanline_int_ack_w)
 	AM_RANGE(0xff8400, 0xff8401) AM_MIRROR(0x7f81fe) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x7f81fe) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
@@ -180,6 +181,8 @@ static MACHINE_CONFIG_START( blstroid, blstroid_state )
 	MCFG_MACHINE_RESET_OVERRIDE(blstroid_state,blstroid)
 
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blstroid)

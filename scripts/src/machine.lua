@@ -2797,7 +2797,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/gen_latch.h,MACHINES["GEN_LATCH] = true
+--@src/devices/machine/gen_latch.h,MACHINES["GEN_LATCH"] = true
 ---------------------------------------------------
 
 if (MACHINES["GEN_LATCH"]~=null) then
@@ -2816,6 +2816,18 @@ if (MACHINES["FDC_PLL"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/fdc_pll.cpp",
 		MAME_DIR .. "src/devices/machine/fdc_pll.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/watchdog.h,MACHINES["WATCHDOG"] = true
+---------------------------------------------------
+
+if (MACHINES["WATCHDOG"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/watchdog.cpp",
+		MAME_DIR .. "src/devices/machine/watchdog.h",
 	}
 end
 

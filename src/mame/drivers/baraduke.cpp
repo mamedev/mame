@@ -110,6 +110,7 @@ DIP locations verified for:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/watchdog.h"
 #include "includes/baraduke.h"
 
 
@@ -166,7 +167,7 @@ static ADDRESS_MAP_START( baraduke_map, AS_PROGRAM, 8, baraduke_state )
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(baraduke_videoram_r,baraduke_videoram_w) AM_SHARE("videoram") /* Video RAM */
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)       /* PSG device, shared RAM */
 	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(baraduke_textram_r,baraduke_textram_w) AM_SHARE("textram")/* video RAM (text layer) */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)         /* watchdog reset */
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* watchdog reset */
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(baraduke_irq_ack_w)       /* irq acknowledge */
 	AM_RANGE(0xb000, 0xb002) AM_WRITE(baraduke_scroll0_w)       /* scroll (layer 0) */
 	AM_RANGE(0xb004, 0xb006) AM_WRITE(baraduke_scroll1_w)       /* scroll (layer 1) */
@@ -379,6 +380,8 @@ static MACHINE_CONFIG_START( baraduke, baraduke_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", baraduke_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* we need heavy synch */
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

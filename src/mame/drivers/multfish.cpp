@@ -940,7 +940,7 @@ static ADDRESS_MAP_START( igrosoft_gamble_portmap, AS_IO, 8, igrosoft_gamble_sta
 	AM_RANGE(0x34, 0x34) AM_WRITE(igrosoft_gamble_lamps2_w)
 	AM_RANGE(0x35, 0x35) AM_WRITE(igrosoft_gamble_lamps3_w)
 //  AM_RANGE(0x36, 0x36) AM_WRITE(igrosoft_gamble_port36_w)
-	AM_RANGE(0x37, 0x37) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x37, 0x37) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x38, 0x38) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x39, 0x39) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x3a, 0x3a) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -1040,6 +1040,7 @@ MACHINE_CONFIG_START( igrosoft_gamble, igrosoft_gamble_state )
 	MCFG_CPU_IO_MAP(igrosoft_gamble_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igrosoft_gamble_state, irq0_line_hold)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

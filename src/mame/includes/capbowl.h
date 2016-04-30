@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "video/tms34061.h"
 
 class capbowl_state : public driver_device
@@ -20,6 +21,7 @@ public:
 	capbowl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tms34061(*this, "tms34061"),
 		m_screen(*this, "screen"),
@@ -27,6 +29,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<cpu_device> m_audiocpu;
 	required_device<tms34061_device> m_tms34061;
 	required_device<screen_device> m_screen;

@@ -35,6 +35,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
+#include "machine/watchdog.h"
 #include "sound/bsmt2000.h"
 #include "includes/dcheese.h"
 
@@ -201,7 +202,7 @@ static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 16, dcheese_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("200000") AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("200000") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("220000") AM_WRITE(madmax_blitter_color_w)
 	AM_RANGE(0x240000, 0x240001) AM_READ_PORT("240000") AM_WRITE(eeprom_control_w)
 	AM_RANGE(0x260000, 0x26001f) AM_WRITE(madmax_blitter_xparam_w)
@@ -405,9 +406,11 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(dcheese_state, irq1_line_hold,  480)   /* accurate for fredmem */
 
-
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
