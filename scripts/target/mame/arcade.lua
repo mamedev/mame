@@ -3371,6 +3371,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/berzerk.cpp",
 	MAME_DIR .. "src/mame/drivers/cliffhgr.cpp",
 	MAME_DIR .. "src/mame/audio/cliffhgr.cpp",
+	MAME_DIR .. "src/mame/audio/cliffhgr.h",
 	MAME_DIR .. "src/mame/drivers/mazerbla.cpp",
 	MAME_DIR .. "src/mame/drivers/supdrapo.cpp",
 }
