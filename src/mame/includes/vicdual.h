@@ -155,10 +155,3 @@ public:
 	int get_vcounter();
 	int is_cabinet_color();
 };
-
-MACHINE_CONFIG_EXTERN( carnival_audio );
-MACHINE_CONFIG_EXTERN( depthch_audio );
-MACHINE_CONFIG_EXTERN( frogs_audio );
-MACHINE_CONFIG_EXTERN( headon_audio );
-MACHINE_CONFIG_EXTERN( invinco_audio );
-MACHINE_CONFIG_EXTERN( pulsar_audio );
