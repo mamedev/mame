@@ -517,7 +517,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/dmv/dmv.h,BUSES["DMV"] = true
+--@src/devices/bus/dmv/dmvbus.h,BUSES["DMV"] = true
 ---------------------------------------------------
 
 if (BUSES["DMV"]~=null) then
