@@ -35,25 +35,10 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nes )
 	// input devices go through slot options
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x00, "Draw Top/Bottom 8 Lines")
-	PORT_CONFSETTING(    0x01, DEF_STR(No) )
-	PORT_CONFSETTING(    0x00, DEF_STR(Yes) )
-	PORT_CONFNAME( 0x02, 0x00, "Enforce 8 Sprites/line")
-	PORT_CONFSETTING(    0x02, DEF_STR(No) )
-	PORT_CONFSETTING(    0x00, DEF_STR(Yes) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( famicom )
 	// input devices go through slot options
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x00, "Draw Top/Bottom 8 Lines")
-	PORT_CONFSETTING(    0x01, DEF_STR(No) )
-	PORT_CONFSETTING(    0x00, DEF_STR(Yes) )
-	PORT_CONFNAME( 0x02, 0x00, "Enforce 8 Sprites/line")
-	PORT_CONFSETTING(    0x02, DEF_STR(No) )
-	PORT_CONFSETTING(    0x00, DEF_STR(Yes) )
-
 	PORT_START("FLIPDISK") /* fake key */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Change Disk Side") PORT_CODE(KEYCODE_SPACE)
 INPUT_PORTS_END
