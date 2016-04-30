@@ -3,6 +3,8 @@
 #ifndef __TC0150ROD_H__
 #define __TC0150ROD_H__
 
+#include "video/taito_helper.h"
+
 class tc0150rod_device : public device_t
 {
 public:
