@@ -2617,6 +2617,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/warpwarp.cpp",
 	MAME_DIR .. "src/mame/includes/warpwarp.h",
 	MAME_DIR .. "src/mame/audio/geebee.cpp",
+	MAME_DIR .. "src/mame/audio/geebee.h",
 	MAME_DIR .. "src/mame/audio/warpwarp.cpp",
 	MAME_DIR .. "src/mame/audio/warpwarp.h",
 	MAME_DIR .. "src/mame/video/warpwarp.cpp",
