@@ -2357,7 +2357,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/compucolor/compclr_flp.h,BUSES["COMPUCOLOR"] = true
+--@src/devices/bus/compucolor/floppy.h,BUSES["COMPUCOLOR"] = true
 ---------------------------------------------------
 if (BUSES["COMPUCOLOR"]~=null) then
 	files {
