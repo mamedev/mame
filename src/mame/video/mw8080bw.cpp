@@ -68,13 +68,31 @@ UINT32 mw8080bw_state::screen_update_mw8080bw(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
+/* video signals mixed via R2 open collector nand gates and 'brite' RC circuit
 
-#define PHANTOM2_BOTTOM_TRENCH_DARK_RGB32_PEN    rgb_t::black
-#define PHANTOM2_BOTTOM_TRENCH_LIGHT_RGB32_PEN   rgb_t(0x5a, 0x5a, 0x5a)
-#define PHANTOM2_TOP_TRENCH_DARK_RGB32_PEN       rgb_t::black
-#define PHANTOM2_TOP_TRENCH_LIGHT_RGB32_PEN      rgb_t::white
-#define PHANTOM2_SIDE_TRENCH_DARK_RGB32_PEN      rgb_t::black
-#define PHANTOM2_SIDE_TRENCH_LIGHT_RGB32_PEN     rgb_t(0x72, 0x72, 0x72)
+    * when /BRITE lo, cap C23 discharge rapidly, disabling Q2, overpowering all other video signals
+    * when /BRITE hi, cap C23 charge through 10k res, brite voltage decrease to 0 over approx 0.4 sec
+
+    * inverted video data is fed into R2 nand gates:
+        * when /VIDEO lo, all gates open for max brightness
+            * max V = (5 - 0.7) * 470 / (470 + 100) = 3.5 V
+        * when /video hi, pin 5 always gnd, max = 3 V, min = 1 V
+        * (guess) pin 11 state controls trench color
+        * (guess) pin 3 low for trench side
+        * (guess) pin 8 low for trench floor
+        * thus, trench side: 1.4 or 2.2 V
+        * trench floor: 1.3 or 2.0 V
+        * trech top: 1.8 or 3 V 
+		* scaled to 3.2 V = 255, 1.2 V = 0 (arbitrary values chosen to match video)
+*/
+
+#define SPCENCTR_TOP_TRENCH_DARK_RGB32_PEN       rgb_t(0x4d, 0x4d, 0x4d)
+#define SPCENCTR_TOP_TRENCH_LIGHT_RGB32_PEN      rgb_t(0xe6, 0xe6, 0xe6)
+#define SPCENCTR_SIDE_TRENCH_DARK_RGB32_PEN      rgb_t(0x1a, 0x1a, 0x1a)
+#define SPCENCTR_SIDE_TRENCH_LIGHT_RGB32_PEN     rgb_t(0x80, 0x80, 0x80)
+#define SPCENCTR_BOTTOM_TRENCH_DARK_RGB32_PEN    rgb_t(0x0d, 0x0d, 0x0d)
+#define SPCENCTR_BOTTOM_TRENCH_LIGHT_RGB32_PEN   rgb_t(0x66, 0x66, 0x66)
+#define SPCENCTR_BRIGHTNESS_DECAY                10
 
 
 UINT32 mw8080bw_state::screen_update_spcenctr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -93,6 +111,13 @@ UINT32 mw8080bw_state::screen_update_spcenctr(screen_device &screen, bitmap_rgb3
 
 	memset(line_buf, 0, 256);
 
+	if(m_spcenctr_bright_control) 
+		m_spcenctr_brightness = 255;
+	else if(m_spcenctr_brightness > SPCENCTR_BRIGHTNESS_DECAY)
+		m_spcenctr_brightness -= SPCENCTR_BRIGHTNESS_DECAY;
+	else
+		m_spcenctr_brightness = 0;
+
 	while (1)
 	{
 		/* plot the current pixel */
@@ -105,13 +130,13 @@ UINT32 mw8080bw_state::screen_update_spcenctr(screen_device &screen, bitmap_rgb3
 			line_buf[x] = draw_line;
 
 			if (!bit)
-				pen = draw_line ? PHANTOM2_TOP_TRENCH_LIGHT_RGB32_PEN : PHANTOM2_TOP_TRENCH_DARK_RGB32_PEN;
+				pen = draw_line ? SPCENCTR_TOP_TRENCH_LIGHT_RGB32_PEN : SPCENCTR_TOP_TRENCH_DARK_RGB32_PEN;
 		}
 		/* sides of trench? */
 		else if (!(floor_width & 0x80) && (draw_trench || draw_floor))
 		{
 			if (!bit)
-				pen = line_buf[x] ? PHANTOM2_SIDE_TRENCH_LIGHT_RGB32_PEN : PHANTOM2_SIDE_TRENCH_DARK_RGB32_PEN;
+				pen = line_buf[x] ? SPCENCTR_SIDE_TRENCH_LIGHT_RGB32_PEN : SPCENCTR_SIDE_TRENCH_DARK_RGB32_PEN;
 		}
 		/* bottom of trench? */
 		else if (draw_floor)
@@ -119,8 +144,11 @@ UINT32 mw8080bw_state::screen_update_spcenctr(screen_device &screen, bitmap_rgb3
 			line_buf[x] = line_buf[x - 1];
 
 			if (!bit)
-				pen = line_buf[x] ? PHANTOM2_BOTTOM_TRENCH_LIGHT_RGB32_PEN : PHANTOM2_BOTTOM_TRENCH_DARK_RGB32_PEN;
+				pen = line_buf[x] ? SPCENCTR_BOTTOM_TRENCH_LIGHT_RGB32_PEN : SPCENCTR_BOTTOM_TRENCH_DARK_RGB32_PEN;
 		}
+
+		if(m_spcenctr_brightness > (pen & 0xff))
+			pen = rgb_t(m_spcenctr_brightness, m_spcenctr_brightness, m_spcenctr_brightness);
 
 		bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
@@ -143,7 +171,13 @@ UINT32 mw8080bw_state::screen_update_spcenctr(screen_device &screen, bitmap_rgb3
 
 			for (i = 0; i < 4; i++)
 			{
-				pen = (video_data & 0x01) ? rgb_t::white : rgb_t::black;
+				if(video_data & 0x01)
+					pen = rgb_t::white;
+				else if(m_spcenctr_brightness)
+					pen = rgb_t(m_spcenctr_brightness, m_spcenctr_brightness, m_spcenctr_brightness);
+				else
+					pen = rgb_t::black;
+
 				bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 
 				video_data = video_data >> 1;
