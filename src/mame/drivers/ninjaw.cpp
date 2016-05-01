@@ -322,7 +322,7 @@ rumbling on a subwoofer in the cabinet.)
 #include "includes/taitoipt.h"
 #include "includes/ninjaw.h"
 
-extern const internal_layout layout_darius;
+#include "ninjaw.lh"
 
 void ninjaw_state::parse_control(  )   /* assumes Z80 sandwiched between 68Ks */
 {
@@ -749,7 +749,7 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 	MCFG_PALETTE_ADD("palette2", 4096)
 	MCFG_PALETTE_ADD("palette3", 4096)
 
-	MCFG_DEFAULT_LAYOUT(layout_darius)
+	MCFG_DEFAULT_LAYOUT(layout_ninjaw)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -869,7 +869,7 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 	MCFG_PALETTE_ADD("palette2", 4096)
 	MCFG_PALETTE_ADD("palette3", 4096)
 
-	MCFG_DEFAULT_LAYOUT(layout_darius)
+	MCFG_DEFAULT_LAYOUT(layout_ninjaw)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -14,7 +14,7 @@
 #define __COCO3__
 
 
-#include "includes/coco.h"
+#include "includes/coco12.h"
 #include "video/gime.h"
 
 

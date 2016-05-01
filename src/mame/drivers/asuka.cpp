@@ -226,6 +226,7 @@ DIP locations verified for:
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
 #include "includes/asuka.h"
+#include "machine/bonzeadv.h"
 
 
 /***********************************************************

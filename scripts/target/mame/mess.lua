@@ -578,6 +578,10 @@ MACHINES["VT82C496"] = true
 MACHINES["GENPC"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["WATCHDOG"] = true
+MACHINES["SMARTMEDIA"] = true
+MACHINES["APPLE_DRIVE"] = true
+MACHINES["APPLE_FDC"] = true
+MACHINES["SONY_DRIVE"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1070,16 +1074,8 @@ createMESSProjects(_target, _subtarget, "messshared")
 files {
 	MAME_DIR .. "src/mame/audio/mea8000.cpp",
 	MAME_DIR .. "src/mame/audio/mea8000.h",
-	MAME_DIR .. "src/mame/machine/appldriv.cpp",
-	MAME_DIR .. "src/mame/machine/appldriv.h",
-	MAME_DIR .. "src/mame/machine/applefdc.cpp",
-	MAME_DIR .. "src/mame/machine/applefdc.h",
 	MAME_DIR .. "src/mame/machine/microdrv.cpp",
 	MAME_DIR .. "src/mame/machine/microdrv.h",
-	MAME_DIR .. "src/mame/machine/smartmed.cpp",
-	MAME_DIR .. "src/mame/machine/smartmed.h",
-	MAME_DIR .. "src/mame/machine/sonydriv.cpp",
-	MAME_DIR .. "src/mame/machine/sonydriv.h",
 	MAME_DIR .. "src/mame/machine/teleprinter.cpp",
 	MAME_DIR .. "src/mame/machine/teleprinter.h",
 	MAME_DIR .. "src/mame/machine/z80bin.cpp",
@@ -1206,6 +1202,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/apple2.cpp",
 	MAME_DIR .. "src/mame/includes/apple2.h",
 	MAME_DIR .. "src/mame/drivers/apple2e.cpp",
+	MAME_DIR .. "src/mame/includes/apple2e.h",
 	MAME_DIR .. "src/mame/machine/apple2.cpp",
 	MAME_DIR .. "src/mame/video/apple2.cpp",
 	MAME_DIR .. "src/mame/video/apple2.h",
@@ -1228,6 +1225,7 @@ files {
 	MAME_DIR .. "src/mame/machine/egret.h",
 	MAME_DIR .. "src/mame/machine/mac.cpp",
 	MAME_DIR .. "src/mame/machine/macadb.cpp",
+	MAME_DIR .. "src/mame/machine/macadb.h",
 	MAME_DIR .. "src/mame/machine/macrtc.cpp",
 	MAME_DIR .. "src/mame/machine/macrtc.h",
 	MAME_DIR .. "src/mame/machine/mackbd.cpp",
@@ -1903,6 +1901,7 @@ files {
 	MAME_DIR .. "src/mame/includes/kaypro.h",
 	MAME_DIR .. "src/mame/machine/kaypro.cpp",
 	MAME_DIR .. "src/mame/machine/kay_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/kay_kbd.h",
 	MAME_DIR .. "src/mame/video/kaypro.cpp",
 }
 
@@ -2537,8 +2536,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/spectrum.cpp",
 	MAME_DIR .. "src/mame/includes/spectrum.h",
 	MAME_DIR .. "src/mame/drivers/spec128.cpp",
+	MAME_DIR .. "src/mame/includes/spec128.h",
 	MAME_DIR .. "src/mame/drivers/timex.cpp",
+	MAME_DIR .. "src/mame/includes/timex.h",
 	MAME_DIR .. "src/mame/drivers/specpls3.cpp",
+	MAME_DIR .. "src/mame/includes/specpls3.h",
 	MAME_DIR .. "src/mame/drivers/scorpion.cpp",
 	MAME_DIR .. "src/mame/drivers/atm.cpp",
 	MAME_DIR .. "src/mame/drivers/pentagon.cpp",

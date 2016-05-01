@@ -345,6 +345,10 @@ Boards:
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
+#include "machine/acitya.h"
+#include "machine/jumpshot.h"
+#include "machine/pacplus.h"
+#include "machine/theglobp.h"
 
 
 /*************************************

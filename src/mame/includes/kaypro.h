@@ -106,5 +106,3 @@ private:
 	optional_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_beep;
 };
-
-INPUT_PORTS_EXTERN( kay_kbd );

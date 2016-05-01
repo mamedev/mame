@@ -84,6 +84,7 @@
 #include "bus/macpds/pds_tpdfpd.h"
 
 #include "includes/mac.h"
+#include "machine/macadb.h"
 #include "softlist.h"
 #include "mac.lh"
 

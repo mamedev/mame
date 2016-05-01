@@ -16704,7 +16704,6 @@ ladybgb2                        // bootleg
 ladybug                         // 8110 (c) 1981
 ladybugb                        // bootleg
 snapjack                        // ???? (c)
-sraider                         // ???? (c) 1982 Universal
 
 @source:ladyfrog.cpp
 ladyfrog                        // (c) 1990 Mondial Games
@@ -19417,7 +19416,6 @@ rampage2                        // (c) 1986
 sarge                           // (c) 1985
 spyhunt                         // (c) 1983
 spyhuntp                        // (c) 1983
-spyhuntpr                       //
 stargrds                        // (c) 1987
 turbotag                        // (c) 1985
 
@@ -31168,6 +31166,7 @@ redclashk                       // (c) Kaneko (bootleg?)
 zerohour                        // 8011 (c) Universal
 zerohoura                       // 8011 (c) Universal
 zerohouri                       //
+sraider                         // ???? (c) 1982 Universal
 
 @source:relief.cpp
 relief                          // 136093           (c) 1992
@@ -33543,6 +33542,9 @@ sprint8a                        // ??????           1977/05 [6800]
 @source:spy.cpp
 spy                             // GX857 (c) 1989 (World)
 spyu                            // GX857 (c) 1989 (US)
+
+@source:spyhuntertec.cpp
+spyhuntpr                       //
 
 @source:squale.cpp
 squale                          //

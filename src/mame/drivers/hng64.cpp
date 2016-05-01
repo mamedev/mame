@@ -441,6 +441,7 @@ or Fatal Fury for example).
 #include "cpu/mips/mips3.h"
 #include "machine/nvram.h"
 #include "includes/hng64.h"
+#include "machine/hng64_net.h"
 
 /* TODO: NOT measured! */
 #define PIXEL_CLOCK         ((HNG64_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
@@ -1527,7 +1528,6 @@ void hng64_state::machine_reset()
 }
 
 MACHINE_CONFIG_EXTERN(hng64_audio);
-MACHINE_CONFIG_EXTERN(hng64_network);
 
 static MACHINE_CONFIG_START(hng64, hng64_state)
 	/* basic machine hardware */

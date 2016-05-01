@@ -1,9 +1,6 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner, Andrew Zaferakis
 
-#include "includes/hng64.h"
-
-
 /////////////////////////////////
 /// Hyper NeoGeo 64 - 3D bits ///
 /////////////////////////////////

@@ -2,6 +2,7 @@
 // copyright-holders:Miodrag Milanovic, MetalliC
 #include "emu.h"
 #include "includes/spectrum.h"
+#include "includes/spec128.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "sound/ay8910.h"
@@ -10,6 +11,7 @@
 #include "machine/beta.h"
 #include "machine/ram.h"
 #include "softlist.h"
+#include "machine/spec_snqk.h"
 
 class pentagon_state : public spectrum_state
 {

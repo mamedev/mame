@@ -17,6 +17,7 @@
 
 #include "emu.h"
 #include "includes/spectrum.h"
+#include "includes/timex.h"
 #include "machine/ram.h"
 
 inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)

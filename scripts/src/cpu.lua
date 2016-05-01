@@ -1032,7 +1032,7 @@ end
 
 --------------------------------------------------
 -- Fujitsu MB86235
---@src/devices/cpu/mb86233/mb86235.h,CPUS["MB86235"] = true
+--@src/devices/cpu/mb86235/mb86235.h,CPUS["MB86235"] = true
 --------------------------------------------------
 
 if (CPUS["MB86235"]~=null) then
@@ -1925,6 +1925,7 @@ end
 --@src/devices/cpu/tms9900/tms9900.h,CPUS["TMS9900"] = true
 --@src/devices/cpu/tms9900/tms9980a.h,CPUS["TMS9900"] = true
 --@src/devices/cpu/tms9900/tms9995.h,CPUS["TMS9900"] = true
+--@src/devices/cpu/tms9900/ti990_10.h,CPUS["TMS9900"] = true
 --------------------------------------------------
 
 if (CPUS["TMS9900"]~=null) then
