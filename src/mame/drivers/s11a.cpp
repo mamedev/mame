@@ -29,7 +29,7 @@ Note: To start a game, certain switches need to be activated.  You must first pr
 #include "sound/2151intf.h"
 #include "sound/dac.h"
 #include "audio/s11c_bg.h"
-#include "includes/s11.h"
+#include "includes/s11a.h"
 #include "s11a.lh"
 
 static ADDRESS_MAP_START( s11a_main_map, AS_PROGRAM, 8, s11a_state )
