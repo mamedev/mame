@@ -412,7 +412,13 @@ bool floppy_image_device::call_load()
 	}
 
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
-	best_format->load(&io, form_factor, image);
+	if (!best_format->load(&io, form_factor, image))
+	{
+		seterror(IMAGE_ERROR_UNSUPPORTED, "Incompatible image format or corrupted data");
+		global_free(image);
+		image = nullptr;
+		return IMAGE_INIT_FAIL;
+	}
 	output_format = is_readonly() ? nullptr : best_format;
 
 	revolution_start_time = mon ? attotime::never : machine().time();
