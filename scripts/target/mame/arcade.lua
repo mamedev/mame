@@ -2491,6 +2491,7 @@ files {
 	MAME_DIR .. "src/mame/video/midyunit.cpp",
 	MAME_DIR .. "src/mame/drivers/midzeus.cpp",
 	MAME_DIR .. "src/mame/includes/midzeus.h",
+	MAME_DIR .. "src/mame/includes/midzeus2.h",
 	MAME_DIR .. "src/mame/video/midzeus.cpp",
 	MAME_DIR .. "src/mame/video/midzeus2.cpp",
 	MAME_DIR .. "src/mame/drivers/mw18w.cpp",
