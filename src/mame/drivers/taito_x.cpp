@@ -321,6 +321,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
 #include "includes/taito_x.h"
+#include "machine/cchip.h"
 #include "sound/2610intf.h"
 #include "sound/2151intf.h"
 

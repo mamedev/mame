@@ -3636,6 +3636,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/taito_x.cpp",
 	MAME_DIR .. "src/mame/includes/taito_x.h",
 	MAME_DIR .. "src/mame/machine/cchip.cpp",
+	MAME_DIR .. "src/mame/machine/cchip.h",
 	MAME_DIR .. "src/mame/drivers/taito_z.cpp",
 	MAME_DIR .. "src/mame/includes/taito_z.h",
 	MAME_DIR .. "src/mame/video/taito_z.cpp",
