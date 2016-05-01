@@ -5282,7 +5282,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1993</year>
 		<publisher>Arena</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_nbajam"/>
+			<feature name="slot" value="rom_nbajam_alt"/>
 			<feature name="pcb" value="670120 REV 2"/>
 			<feature name="u1" value="NBA JAM GEN VER 1.00"/>  <!-- also found pic (from US cart?) with rom marked "GEN NBA JAM 9402 VER 1.00 S285" -->
 			<feature name="u2" value="DV74ALS138N"/>
@@ -5302,7 +5302,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Acclaim Japan</publisher>
 		<info name="alt_title" value="NBA ジャム"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_nbajam"/>
+			<feature name="slot" value="rom_nbajam_alt"/>
 			<feature name="pcb" value="171-6568C"/>
 			<feature name="pcb2" value="837-9952"/>
 			<feature name="ic1" value="27c4000"/>
@@ -19553,7 +19553,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1993</year>
 		<publisher>Arena</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_nbajam"/>
+			<feature name="slot" value="rom_nbajam_alt"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="nba jam (euro, usa) (v1.1).bin" size="2097152" crc="eb8360e6" sha1="55f2b26a932c69b2c7cb4f24f56b43f24f113a7c" offset="0x000000"/>
 			</dataarea>
@@ -19568,7 +19568,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19940429"/>
 		<info name="alt_title" value="NBA ジャム"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_nbajam"/>
+			<feature name="slot" value="rom_nbajam_alt"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="nba jam (jpn).bin" size="2097152" crc="a6c6305a" sha1="2a88b2e1ecf115fa6246397d829448b755a5385e" offset="0x000000"/>
 			</dataarea>
