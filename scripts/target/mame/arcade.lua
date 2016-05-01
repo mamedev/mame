@@ -2893,9 +2893,13 @@ files {
 	MAME_DIR .. "src/mame/includes/pacman.h",
 	MAME_DIR .. "src/mame/video/pacman.cpp",
 	MAME_DIR .. "src/mame/machine/acitya.cpp",
+	MAME_DIR .. "src/mame/machine/acitya.h",
 	MAME_DIR .. "src/mame/machine/jumpshot.cpp",
+	MAME_DIR .. "src/mame/machine/jumpshot.h",
 	MAME_DIR .. "src/mame/machine/pacplus.cpp",
+	MAME_DIR .. "src/mame/machine/pacplus.h",
 	MAME_DIR .. "src/mame/machine/theglobp.cpp",
+	MAME_DIR .. "src/mame/machine/theglobp.h",
 	MAME_DIR .. "src/mame/drivers/pengo.cpp",
 }
 
