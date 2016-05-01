@@ -416,6 +416,8 @@ function cheatfind.startplugin()
 					menu_blocks[num][#menu_blocks[num] + 1] = cheat.save(devtable[devcur].space, region.offset, region.size)
 				end
 				manager:machine():popmessage("Current state saved")
+				leftop = (leftop == #menu_blocks[1]) and #menu_blocks[1] + 1 or leftop
+				rightop = (rightop == #menu_blocks[1] - 1) and #menu_blocks[1] or rightop
 				ret = true
 			end
 		elseif index == midx.op then
@@ -459,8 +461,8 @@ function cheatfind.startplugin()
 				if #matches == 0 then
 					matches[1] = {}
 					for num = 1, #menu_blocks do
-						if rightop == #menu_blocks[1] + 1 then
-							matches[1][num] = cheat.compcur(menu_blocks[num][leftop], optable[opsel],
+						if leftop == #menu_blocks[1] + 1 then
+							matches[1][num] = cheat.compcur(menu_blocks[num][rightop], optable[opsel],
 										formtable[width], value, bcd == 1)
 						else
 							matches[1][num] = cheat.comp(menu_blocks[num][leftop], menu_blocks[num][rightop],
@@ -471,8 +473,8 @@ function cheatfind.startplugin()
 					lastmatch = matches[#matches]
 					matches[#matches + 1] = {}
 					for num = 1, #menu_blocks do
-						if rightop == #menu_blocks[1] + 1 then
-							matches[#matches][num] = cheat.compcurnext(menu_blocks[num][leftop], lastmatch[num],
+						if leftop == #menu_blocks[1] + 1 then
+							matches[#matches][num] = cheat.compcurnext(menu_blocks[num][rightop], lastmatch[num],
 											optable[opsel], formtable[width], value, bcd == 1)
 						else
 							matches[#matches][num] = cheat.compnext(menu_blocks[num][leftop], menu_blocks[num][rightop],
@@ -480,6 +482,7 @@ function cheatfind.startplugin()
 						end
 					end
 				end
+				manager:machine():popmessage(#matches[#matches] .. " found" .. ((#matches[#matches] > 50) and ", first 50 shown" or ""))
 				ret = true
 			end
 		elseif index == midx.match then
@@ -532,12 +535,16 @@ function cheatfind.startplugin()
 					local filename = string.format("%s/%s_%08X_cheat", manager:machine():options().entries.cheatpath:value():match("([^;]+)"), emu.romname(), match.addr)
 					local json = require("json")
 					local file = io.open(filename .. ".json", "w")
-					file:write(json.stringify({[1] = cheat}, {indent = true}))
-					file:close()
-					file = io.open(filename .. ".xml", "w")
-					file:write(xmlcheat)
-					file:close()
-					manager:machine():popmessage("Cheat written to " .. filename)
+					if file then
+						file:write(json.stringify({[1] = cheat}, {indent = true}))
+						file:close()
+						file = io.open(filename .. ".xml", "w")
+						file:write(xmlcheat)
+						file:close()
+						manager:machine():popmessage("Cheat written to " .. filename)
+					else
+						manager:machine():popmessage("Unable to write file\nCheck cheatpath dir exists")
+					end
 				else
 					local func = "return space:read"
 					local env = { space = devtable[devcur].space }
