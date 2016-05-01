@@ -3,8 +3,6 @@
 
 /* Hyper NeoGeo 64 Sprite bits */
 
-#include "includes/hng64.h"
-
 /*
  * Sprite Format
  * ------------------
