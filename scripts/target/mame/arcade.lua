@@ -3954,6 +3954,7 @@ files {
 	MAME_DIR .. "src/mame/includes/mrdo.h",
 	MAME_DIR .. "src/mame/video/mrdo.cpp",
 	MAME_DIR .. "src/mame/drivers/redclash.cpp",
+	MAME_DIR .. "src/mame/includes/redclash.h",
 	MAME_DIR .. "src/mame/video/redclash.cpp",
 	MAME_DIR .. "src/mame/drivers/superdq.cpp",
 }

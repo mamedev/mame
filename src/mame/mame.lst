@@ -16704,7 +16704,6 @@ ladybgb2                        // bootleg
 ladybug                         // 8110 (c) 1981
 ladybugb                        // bootleg
 snapjack                        // ???? (c)
-sraider                         // ???? (c) 1982 Universal
 
 @source:ladyfrog.cpp
 ladyfrog                        // (c) 1990 Mondial Games
@@ -31167,6 +31166,7 @@ redclashk                       // (c) Kaneko (bootleg?)
 zerohour                        // 8011 (c) Universal
 zerohoura                       // 8011 (c) Universal
 zerohouri                       //
+sraider                         // ???? (c) 1982 Universal
 
 @source:relief.cpp
 relief                          // 136093           (c) 1992
