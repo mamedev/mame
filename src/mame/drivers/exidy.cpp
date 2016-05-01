@@ -148,6 +148,7 @@ Fax                  1982  6502   FXL, FLA
 #include "machine/6821pia.h"
 #include "audio/exidy.h"
 #include "includes/exidy.h"
+#include "audio/targ.h"
 
 
 /*************************************

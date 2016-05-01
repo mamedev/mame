@@ -128,6 +128,3 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
-
-MACHINE_CONFIG_EXTERN( spectar_audio );
-MACHINE_CONFIG_EXTERN( targ_audio );
