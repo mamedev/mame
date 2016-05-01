@@ -23,10 +23,6 @@
 
 machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	: m_minimum_quantum(attotime::zero),
-#ifdef LEGACY_WATCHDOG
-		m_watchdog_vblank_count(0),
-		m_watchdog_time(attotime::zero),
-#endif
 		m_default_layout(nullptr),
 		m_gamedrv(gamedrv),
 		m_options(options)

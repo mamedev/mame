@@ -230,16 +230,6 @@ void running_machine::start()
 	m_rom_load = make_unique_clear<rom_load_manager>(*this);
 	m_memory.initialize();
 
-#ifdef LEGACY_WATCHDOG
-	// initialize the watchdog
-	m_watchdog_counter = 0;
-	m_watchdog_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::watchdog_fired), this));
-	if (config().m_watchdog_vblank_count != 0 && primary_screen != nullptr)
-		primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(running_machine::watchdog_vblank), this));
-	save().save_item(NAME(m_watchdog_enabled));
-	save().save_item(NAME(m_watchdog_counter));
-#endif
-
 	// save the random seed or save states might be broken in drivers that use the rand() method
 	save().save_item(NAME(m_rand_seed));
 
@@ -879,103 +869,12 @@ void running_machine::soft_reset(void *ptr, INT32 param)
 	// temporarily in the reset phase
 	m_current_phase = MACHINE_PHASE_RESET;
 
-#ifdef LEGACY_WATCHDOG
-	// set up the watchdog timer; only start off enabled if explicitly configured
-	m_watchdog_enabled = (config().m_watchdog_vblank_count != 0 || config().m_watchdog_time != attotime::zero);
-	watchdog_reset();
-	m_watchdog_enabled = true;
-#endif
-
 	// call all registered reset callbacks
 	call_notifiers(MACHINE_NOTIFY_RESET);
 
 	// now we're running
 	m_current_phase = MACHINE_PHASE_RUNNING;
 }
-
-
-//-------------------------------------------------
-//  watchdog_reset - reset the watchdog timer
-//-------------------------------------------------
-
-#ifdef LEGACY_WATCHDOG
-void running_machine::watchdog_reset()
-{
-	// if we're not enabled, skip it
-	if (!m_watchdog_enabled)
-		m_watchdog_timer->adjust(attotime::never);
-
-	// VBLANK-based watchdog?
-	else if (config().m_watchdog_vblank_count != 0)
-		m_watchdog_counter = config().m_watchdog_vblank_count;
-
-	// timer-based watchdog?
-	else if (config().m_watchdog_time != attotime::zero)
-		m_watchdog_timer->adjust(config().m_watchdog_time);
-
-	// default to an obscene amount of time (3 seconds)
-	else
-		m_watchdog_timer->adjust(attotime::from_seconds(3));
-}
-#endif
-
-
-//-------------------------------------------------
-//  watchdog_enable - reset the watchdog timer
-//-------------------------------------------------
-
-#ifdef LEGACY_WATCHDOG
-void running_machine::watchdog_enable(bool enable)
-{
-	// when re-enabled, we reset our state
-	if (m_watchdog_enabled != enable)
-	{
-		m_watchdog_enabled = enable;
-		watchdog_reset();
-	}
-}
-#endif
-
-
-//-------------------------------------------------
-//  watchdog_fired - watchdog timer callback
-//-------------------------------------------------
-
-#ifdef LEGACY_WATCHDOG
-void running_machine::watchdog_fired(void *ptr, INT32 param)
-{
-	logerror("Reset caused by the watchdog!!!\n");
-
-	bool verbose = options().verbose();
-#ifdef MAME_DEBUG
-	verbose = true;
-#endif
-	if (verbose)
-		popmessage("Reset caused by the watchdog!!!\n");
-
-	schedule_soft_reset();
-}
-#endif
-
-
-//-------------------------------------------------
-//  watchdog_vblank - VBLANK state callback for
-//  watchdog timers
-//-------------------------------------------------
-
-#ifdef LEGACY_WATCHDOG
-void running_machine::watchdog_vblank(screen_device &screen, bool vblank_state)
-{
-	// VBLANK starting
-	if (vblank_state && m_watchdog_enabled)
-	{
-		// check the watchdog
-		if (config().m_watchdog_vblank_count != 0)
-			if (--m_watchdog_counter == 0)
-				watchdog_fired();
-	}
-}
-#endif
 
 
 //-------------------------------------------------
