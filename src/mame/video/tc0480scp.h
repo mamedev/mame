@@ -3,8 +3,6 @@
 #ifndef __TC0480SCP_H__
 #define __TC0480SCP_H__
 
-#include "video/taito_helper.h"
-
 class tc0480scp_device : public device_t
 {
 public:

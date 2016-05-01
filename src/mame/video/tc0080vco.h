@@ -3,8 +3,6 @@
 #ifndef __TC0080VCO_H__
 #define __TC0080VCO_H__
 
-#include "video/taito_helper.h"
-
 class tc0080vco_device : public device_t
 {
 public:

@@ -160,7 +160,9 @@ def parse_file(root, srcfile, folder):
                    files_included.append(fullname)
                    newfolder = fullname.rsplit('/', 1)[0] + '/'
                    parse_file(root, fullname, newfolder)
-                   if (fullname.endswith('.h')):
+                   if (fullname.endswith('.h') and not("src/emu" in fullname) and not("src/devices" in fullname) and not("src/lib" in fullname) and not("src/osd" in fullname)):
+                       parse_file_for_deps(root, fullname.replace('.h','.cpp'), newfolder)
+                   elif fullname.endswith('.h'):
                        parse_file(root, fullname.replace('.h','.cpp'), newfolder)
                continue
     fp.close()
