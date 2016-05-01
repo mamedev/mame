@@ -14,19 +14,12 @@
 
 */
 
-#include "emu.h"
-#include "includes/mpu4.h"
 #include "connect4.lh"
-
-
 
 MACHINE_CONFIG_EXTERN( mod2 );
 INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 
-
-
-#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 DRIVER_INIT_MEMBER( mpu4_state, m4_showstring_mod2 )
 {

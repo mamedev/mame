@@ -4,16 +4,9 @@
 
 /* Crystal games tend to have scrambled ROM + a different sound chip */
 
-#include "emu.h"
-#include "includes/mpu4.h"
-
 MACHINE_CONFIG_EXTERN( mod4oki );
 MACHINE_CONFIG_EXTERN( mpu4crys );
 INPUT_PORTS_EXTERN( mpu4 );
-
-#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
-
-
 
 #define M4FRKSTN_SOUND \
 	ROM_REGION( 0x40000, "upd", 0 ) \

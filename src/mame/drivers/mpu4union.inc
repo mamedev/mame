@@ -2,15 +2,9 @@
 // copyright-holders:David Haywood
 /* MPU4 games by 'Union' */
 
-#include "emu.h"
-#include "includes/mpu4.h"
-
 MACHINE_CONFIG_EXTERN( mod4oki );
 MACHINE_CONFIG_EXTERN( mod2 );
 INPUT_PORTS_EXTERN( mpu4 );
-
-#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
-
 
 ROM_START( m4cwalk )
 	ROM_REGION( 0x010000, "maincpu", 0 )

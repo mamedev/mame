@@ -21,17 +21,10 @@
 
 */
 
-
-
-#include "emu.h"
-#include "includes/mpu4.h"
-
 MACHINE_CONFIG_EXTERN( mod4oki );
 MACHINE_CONFIG_EXTERN( bwboki );
 MACHINE_CONFIG_EXTERN( mod2 );
 INPUT_PORTS_EXTERN( mpu4 );
-
-#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 
 #define M4BIGMT_EXTRA_ROMS \

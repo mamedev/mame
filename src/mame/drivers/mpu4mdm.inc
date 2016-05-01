@@ -2,16 +2,8 @@
 // copyright-holders:David Haywood
 /* MPU4 games by MDM */
 
-
-#include "emu.h"
-#include "includes/mpu4.h"
-
 MACHINE_CONFIG_EXTERN( mod4oki );
 INPUT_PORTS_EXTERN( mpu4 );
-
-#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
-
-
 
 ROM_START( m42punlm )
 	ROM_REGION( 0x020000, "maincpu", 0 )

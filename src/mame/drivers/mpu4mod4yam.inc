@@ -2,13 +2,9 @@
 // copyright-holders:David Haywood
 /* This is MPU4 MOD4 with a Y2413 instead of an OKI */
 
-#include "emu.h"
-#include "includes/mpu4.h"
-
 MACHINE_CONFIG_EXTERN( mod4yam );
 INPUT_PORTS_EXTERN( mpu4 );
 
-#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK)
 
 #include "gamball.lh"
 

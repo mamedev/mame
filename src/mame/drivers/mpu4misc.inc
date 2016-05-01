@@ -2,14 +2,8 @@
 // copyright-holders:David Haywood
 /* MPU4 sets from various other manufactuers which appear to be based off unique code / behaviors (no barcrest headers etc.) */
 
-#include "emu.h"
-#include "includes/mpu4.h"
-
 MACHINE_CONFIG_EXTERN( mod4oki );
 INPUT_PORTS_EXTERN( mpu4 );
-
-#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
-
 
 
 ROM_START( m4bangin )
