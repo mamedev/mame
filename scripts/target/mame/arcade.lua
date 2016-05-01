@@ -2560,7 +2560,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/namcofl.cpp",
 	MAME_DIR .. "src/mame/includes/namcofl.h",
 	MAME_DIR .. "src/mame/video/namcofl.cpp",
-	MAME_DIR .. "src/mame/drivers/namcoic.cpp",
+	MAME_DIR .. "src/mame/machine/namcoic.cpp",
 	MAME_DIR .. "src/mame/includes/namcoic.h",
 	MAME_DIR .. "src/mame/drivers/namcona1.cpp",
 	MAME_DIR .. "src/mame/includes/namcona1.h",
