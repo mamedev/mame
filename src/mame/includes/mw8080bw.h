@@ -85,6 +85,8 @@ public:
 	UINT8       m_spcenctr_trench_width;
 	UINT8       m_spcenctr_trench_center;
 	UINT8       m_spcenctr_trench_slope[16];  /* 16x4 bit RAM */
+	UINT8       m_spcenctr_bright_control;
+    UINT8       m_spcenctr_brightness;
 
 	/* timer */
 	emu_timer   *m_interrupt_timer;

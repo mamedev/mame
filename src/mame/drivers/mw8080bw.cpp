@@ -58,7 +58,6 @@
           "Extra Inning" as "Ball Park II".
 
     Known issues/to-do's:
-        * Space Encounters: verify trench colors
         * Space Encounters: verify strobe light frequency
         * Phantom II: cloud generator is implemented according to the schematics,
            but it doesn't look right.  Cloud color mixing to be verified as well
@@ -2143,28 +2142,12 @@ MACHINE_START_MEMBER(mw8080bw_state,spcenctr)
 	save_item(NAME(m_spcenctr_trench_width));
 	save_item(NAME(m_spcenctr_trench_center));
 	save_item(NAME(m_spcenctr_trench_slope));
+	save_item(NAME(m_spcenctr_bright_control));
+	save_item(NAME(m_spcenctr_brightness));
 
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
-#if 0
-UINT8 mw8080bw_state::spcenctr_get_trench_width()
-{
-	return m_spcenctr_trench_width;
-}
-
-
-UINT8 mw8080bw_state::spcenctr_get_trench_center()
-{
-	return m_spcenctr_trench_center;
-}
-
-
-UINT8 mw8080bw_state::spcenctr_get_trench_slope(UINT8 addr )
-{
-	return m_spcenctr_trench_slope[addr & 0x0f];
-}
-#endif
 
 WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
 {                                               /* A7 A6 A5 A4 A3 A2 A1 A0 */
@@ -2190,7 +2173,15 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
 		m_spcenctr_trench_center = data;            /*  -  -  -  -  -  1  0  0 */
 
 	else if ((offset & 0x07) == 0x07)
-		m_spcenctr_trench_width = data;         /*  -  -  -  -  -  1  1  1 */
+		m_spcenctr_trench_width = data;             /*  -  -  -  -  -  1  1  1 */
+
+	else if ((offset & 0x07) == 0x00)
+		// hex flip-flop B5
+		// bit 3: /BRITE
+		// bit 2: /NO_PLANET
+		// bit 1: /SET_WSL
+		// bit 0: COIN_COUNTER
+		m_spcenctr_bright_control = ~data & 0x08;    /*  -  -  -  -  -  0  0  0 */
 
 	else
 		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", space.device().safe_pc(), offset, data);
