@@ -1901,6 +1901,7 @@ files {
 	MAME_DIR .. "src/mame/includes/kaypro.h",
 	MAME_DIR .. "src/mame/machine/kaypro.cpp",
 	MAME_DIR .. "src/mame/machine/kay_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/kay_kbd.h",
 	MAME_DIR .. "src/mame/video/kaypro.cpp",
 }
 
