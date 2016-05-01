@@ -3240,6 +3240,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/raiden2.cpp",
 	MAME_DIR .. "src/mame/includes/raiden2.h",
 	MAME_DIR .. "src/mame/machine/r2crypt.cpp",
+	MAME_DIR .. "src/mame/machine/r2crypt.h",
 	MAME_DIR .. "src/mame/machine/raiden2cop.cpp",
 	MAME_DIR .. "src/mame/machine/raiden2cop.h",
 	MAME_DIR .. "src/mame/drivers/r2dx_v33.cpp",

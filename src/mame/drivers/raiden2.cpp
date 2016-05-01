@@ -139,7 +139,7 @@ Protection Notes:
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
-
+#include "machine/r2crypt.h"
 
 void raiden2_state::machine_start()
 {
