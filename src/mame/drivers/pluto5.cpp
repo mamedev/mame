@@ -831,8 +831,26 @@ ROM_END
 
 
 
-extern void astra_addresslines( UINT16* src, size_t srcsize, int small );
+static void astra_addresslines( UINT16* src, size_t srcsize, int small )
+{
+	std::vector<UINT16> dst(srcsize/2);
 
+	int blocksize;
+
+	if (small) blocksize= 0x100000/2;
+	else blocksize= 0x100000;
+
+	for (int block = 0; block < srcsize; block += blocksize)
+	{
+		for (int x = 0; x<blocksize/2;x+=2)
+		{
+			dst[((block/2)+(x/2))^1] = src[(block/2)+x+1];
+			dst[((block/2)+(x/2+blocksize/4))^1] = src[(block/2)+x];
+		}
+	}
+
+	memcpy(src,&dst[0], srcsize);
+}
 
 
 DRIVER_INIT_MEMBER(pluto5_state,hb)
