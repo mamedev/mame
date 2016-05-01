@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/galaga.h"
+#include "includes/bosco.h"
 
 
 #define MAX_STARS 252
