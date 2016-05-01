@@ -43,6 +43,7 @@ Control registers
 
 #include "emu.h"
 #include "pc080sn.h"
+#include "video/taito_helper.h"
 
 #define PC080SN_RAM_SIZE 0x10000
 #define TOPSPEED_ROAD_COLORS

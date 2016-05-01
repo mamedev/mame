@@ -63,6 +63,7 @@ this seems to be the only zoom feature actually used in the games.
 #include "emu.h"
 #include "drawgfxm.h"
 #include "tc0080vco.h"
+#include "video/taito_helper.h"
 
 #define TC0080VCO_RAM_SIZE 0x21000
 #define TC0080VCO_CHAR_RAM_SIZE 0x2000

@@ -143,6 +143,7 @@ Control registers
 
 #include "emu.h"
 #include "tc0480scp.h"
+#include "video/taito_helper.h"
 
 #define TC0480SCP_RAM_SIZE 0x10000
 #define TC0480SCP_TOTAL_CHARS 256
