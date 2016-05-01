@@ -2773,7 +2773,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/machine/pdc.h,MACHINES["PDC"] = true
+--@src/devices/machine/pdc.h,MACHINES["PDC"] = true
 ---------------------------------------------------
 
 if (MACHINES["PDC"]~=null) then
