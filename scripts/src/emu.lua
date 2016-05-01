@@ -172,7 +172,7 @@ files {
 	MAME_DIR .. "src/emu/validity.h",
 	MAME_DIR .. "src/emu/video.cpp",
 	MAME_DIR .. "src/emu/video.h",
-	MAME_DIR .. "src/emu/rendersw.inc",
+	MAME_DIR .. "src/emu/rendersw.hxx",
 	MAME_DIR .. "src/emu/ui/uimain.h",
 	MAME_DIR .. "src/emu/ui/cmdrender.h", -- TODO: remove
 	MAME_DIR .. "src/emu/ui/cmddata.h",   -- TODO: remove

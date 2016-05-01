@@ -86,4 +86,4 @@ MACHINE_CONFIG_START( bfm_ad5, adder5_state )
 	/* unknown sound */
 MACHINE_CONFIG_END
 
-#include "bfm_ad5sw.inc"
+#include "bfm_ad5sw.hxx"

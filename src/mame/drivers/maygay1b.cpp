@@ -714,4 +714,4 @@ DRIVER_INIT_MEMBER(maygay1b_state,m1)
 	}
 }
 
-#include "maygay1b.inc"
+#include "maygay1b.hxx"

@@ -1459,7 +1459,7 @@ generate: \
 		$(GEN_FOLDERS) \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
-		$(GENDIR)/mame/drivers/ymmu100.inc \
+		$(GENDIR)/mame/drivers/ymmu100.hxx \
 		$(SRC)/devices/cpu/m68000/m68kops.cpp \
 		$(GENDIR)/includes/SDL2
 
@@ -1471,7 +1471,7 @@ $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/complay.py | $(GEN_FOLDERS)
 	@echo Compressing $<...
 	$(SILENT)$(PYTHON) scripts/build/complay.py $< $@ layout_$(basename $(notdir $<))
 
-$(GENDIR)/mame/drivers/ymmu100.inc: $(SRC)/mame/drivers/ymmu100.ppm scripts/build/file2str.py
+$(GENDIR)/mame/drivers/ymmu100.hxx: $(SRC)/mame/drivers/ymmu100.ppm scripts/build/file2str.py
 	@echo Converting $<...
 	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ ymmu100_bkg UINT8
 
@@ -1513,7 +1513,7 @@ ifeq ($(OS),windows)
 	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
 	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
 	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.inc) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.hxx) do srcclean %%i >&2 )
 	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
 else
 	$(shell find src/ -name *.c -exec ./srcclean {} >&2 ;)
@@ -1521,7 +1521,7 @@ else
 	$(shell find src/ -name *.mak -exec ./srcclean {} >&2 ;)
 	$(shell find src/ -name *.lst -exec ./srcclean {} >&2 ;)
 	$(shell find src/ -name *.lay -exec ./srcclean {} >&2 ;)
-	$(shell find src/ -name *.inc -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.hxx -exec ./srcclean {} >&2 ;)
 	$(shell find hash/ -name *.xml -exec ./srcclean {} >&2 ;)
 endif
 

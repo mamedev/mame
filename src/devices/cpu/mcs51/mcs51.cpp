@@ -1343,7 +1343,7 @@ void mcs51_cpu_device::i8051_set_serial_rx_callback(read8_delegate rx_func)
 
 #define OPHANDLER( _name ) void mcs51_cpu_device::_name (UINT8 r)
 
-#include "mcs51ops.inc"
+#include "mcs51ops.hxx"
 
 
 void mcs51_cpu_device::execute_op(UINT8 op)

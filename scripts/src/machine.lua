@@ -1988,7 +1988,7 @@ if (MACHINES["S3C2400"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/s3c2400.cpp",
 		MAME_DIR .. "src/devices/machine/s3c2400.h",
-		MAME_DIR .. "src/devices/machine/s3c24xx.inc",
+		MAME_DIR .. "src/devices/machine/s3c24xx.hxx",
 	}
 end
 
@@ -2001,7 +2001,7 @@ if (MACHINES["S3C2410"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/s3c2410.cpp",
 		MAME_DIR .. "src/devices/machine/s3c2410.h",
-		MAME_DIR .. "src/devices/machine/s3c24xx.inc",
+		MAME_DIR .. "src/devices/machine/s3c24xx.hxx",
 	}
 end
 
@@ -2026,7 +2026,7 @@ if (MACHINES["S3C2440"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/s3c2440.cpp",
 		MAME_DIR .. "src/devices/machine/s3c2440.h",
-		MAME_DIR .. "src/devices/machine/s3c24xx.inc",
+		MAME_DIR .. "src/devices/machine/s3c24xx.hxx",
 	}
 end
 

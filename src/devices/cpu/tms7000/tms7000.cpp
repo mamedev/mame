@@ -621,7 +621,7 @@ WRITE8_MEMBER(tms7000_device::tms7000_pf_w)
 //  execute
 //-------------------------------------------------
 
-#include "tms70op.inc"
+#include "tms70op.hxx"
 
 void tms7000_device::execute_run()
 {

@@ -353,7 +353,7 @@ void mc68hc11_cpu_device::WRITE16(UINT32 address, UINT16 value)
 /*****************************************************************************/
 
 
-#include "hc11ops.inc"
+#include "hc11ops.hxx"
 #include "hc11ops.h"
 
 void mc68hc11_cpu_device::device_start()

@@ -29,7 +29,7 @@ static const char copyright_notice[] =
 #include "m68kcpu.h"
 #include "m68kops.h"
 
-#include "m68kfpu.inc"
+#include "m68kfpu.hxx"
 #include "m68kmmu.h"
 
 extern void m68040_fpu_op0(m68000_base_device *m68k);

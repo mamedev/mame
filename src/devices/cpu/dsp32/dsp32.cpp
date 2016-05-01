@@ -550,7 +550,7 @@ void dsp32c_device::update_pins(void)
 //  CORE INCLUDE
 //**************************************************************************
 
-#include "dsp32ops.inc"
+#include "dsp32ops.hxx"
 
 
 

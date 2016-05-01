@@ -1112,7 +1112,7 @@ case 0xCB: /*      PREFIX! */
 	x = mem_read_byte( m_PC++ );
 	switch (x)
 	{
-	#include "opc_cb.inc"
+	#include "opc_cb.hxx"
 	}
 	break;
 case 0xCC: /*      CALL Z,n16 */

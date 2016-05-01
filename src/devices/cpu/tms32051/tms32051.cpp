@@ -148,7 +148,7 @@ void tms32051_device::DM_WRITE16(UINT16 address, UINT16 data)
 	m_data->write_word(address << 1, data);
 }
 
-#include "32051ops.inc"
+#include "32051ops.hxx"
 #include "32051ops.h"
 
 void tms32051_device::op_group_be()

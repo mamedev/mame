@@ -12,7 +12,7 @@
     #define COMMAND  -- blitter command bits for blitter
     #define A1FIXED  -- fixed A1 flag bits for blitter
     #define A2FIXED  -- fixed A2 flag bits for blitter
-    #include "jagblit.inc"
+    #include "jagblit.hxx"
 
 ****************************************************************************/
 

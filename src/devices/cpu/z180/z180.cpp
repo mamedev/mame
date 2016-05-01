@@ -762,12 +762,12 @@ static std::unique_ptr<UINT8[]> SZHVC_sub;
 #include "z180ops.h"
 #include "z180tbl.h"
 
-#include "z180cb.inc"
-#include "z180xy.inc"
-#include "z180dd.inc"
-#include "z180fd.inc"
-#include "z180ed.inc"
-#include "z180op.inc"
+#include "z180cb.hxx"
+#include "z180xy.hxx"
+#include "z180dd.hxx"
+#include "z180fd.hxx"
+#include "z180ed.hxx"
+#include "z180op.hxx"
 
 
 const address_space_config *z180_device::memory_space_config(address_spacenum spacenum) const

@@ -37,7 +37,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#include "arm7tdrc.inc"
+#include "arm7tdrc.hxx"
 
 /* map variables */
 #define MAPVAR_PC                       uml::M0

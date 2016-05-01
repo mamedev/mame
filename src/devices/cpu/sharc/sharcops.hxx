@@ -701,7 +701,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 	}
 }
 
-#include "compute.inc"
+#include "compute.hxx"
 
 void adsp21062_device::COMPUTE(UINT32 opcode)
 {

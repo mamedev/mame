@@ -450,4 +450,4 @@ void dsp16_device::execute_run()
 	} while (m_icount > 0);
 }
 
-#include "dsp16ops.inc"
+#include "dsp16ops.hxx"

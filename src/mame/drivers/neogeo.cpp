@@ -2038,5 +2038,5 @@ CONS( 1990, aes,    0,      0,     aes,      aes,           driver_device,  0,  
 
 
 // Include standalone drivers for the single games
-#include "neodriv.inc"
+#include "neodriv.hxx"
 

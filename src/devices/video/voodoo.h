@@ -1829,7 +1829,7 @@ public:
 	static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, const void *extradata, int threadid);
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
 	RASTERIZER_HEADER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1)
-#include "voodoo_rast.inc"
+#include "voodoo_rast.hxx"
 
 #undef RASTERIZER_ENTRY
 

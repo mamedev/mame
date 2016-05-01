@@ -2879,12 +2879,12 @@ void i386_device::report_invalid_modrm(const char* opcode, UINT8 modrm)
 }
 
 
-#include "i386ops.inc"
-#include "i386op16.inc"
-#include "i386op32.inc"
-#include "i486ops.inc"
-#include "pentops.inc"
-#include "x87ops.inc"
+#include "i386ops.hxx"
+#include "i386op16.hxx"
+#include "i386op32.hxx"
+#include "i486ops.hxx"
+#include "pentops.hxx"
+#include "x87ops.hxx"
 #include "i386ops.h"
 
 void i386_device::i386_decode_opcode()

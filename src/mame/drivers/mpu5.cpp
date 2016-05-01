@@ -401,4 +401,4 @@ MACHINE_CONFIG_START( mpu5, mpu5_state )
 	/* unknown sound */
 MACHINE_CONFIG_END
 
-#include "mpu5.inc"
+#include "mpu5.hxx"

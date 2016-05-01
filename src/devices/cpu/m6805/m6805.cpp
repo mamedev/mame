@@ -561,7 +561,7 @@ void m6805_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-#include "6805ops.inc"
+#include "6805ops.hxx"
 
 //-------------------------------------------------
 //  execute_clocks_to_cycles - convert the raw

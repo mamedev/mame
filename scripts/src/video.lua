@@ -203,8 +203,8 @@ if (VIDEOS["EPIC12"]~=null) then
 		MAME_DIR .. "src/devices/video/epic12_blit6.cpp",
 		MAME_DIR .. "src/devices/video/epic12_blit7.cpp",
 		MAME_DIR .. "src/devices/video/epic12_blit8.cpp",
-		MAME_DIR .. "src/devices/video/epic12in.inc",
-		MAME_DIR .. "src/devices/video/epic12pixel.inc",
+		MAME_DIR .. "src/devices/video/epic12in.hxx",
+		MAME_DIR .. "src/devices/video/epic12pixel.hxx",
 	}
 end
 

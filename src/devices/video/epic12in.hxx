@@ -143,21 +143,21 @@ void epic12_device::FUNCNAME(BLIT_PARAMS)
 
 		while (bigblocks)
 		{
-			#include "epic12pixel.inc"
-			#include "epic12pixel.inc"
-			#include "epic12pixel.inc"
-			#include "epic12pixel.inc"
-			#include "epic12pixel.inc"
-			#include "epic12pixel.inc"
-			#include "epic12pixel.inc"
-			#include "epic12pixel.inc"
+			#include "epic12pixel.hxx"
+			#include "epic12pixel.hxx"
+			#include "epic12pixel.hxx"
+			#include "epic12pixel.hxx"
+			#include "epic12pixel.hxx"
+			#include "epic12pixel.hxx"
+			#include "epic12pixel.hxx"
+			#include "epic12pixel.hxx"
 
 			bigblocks--;
 		}
 #endif
 		while (bmp<end)
 		{
-			#include "epic12pixel.inc"
+			#include "epic12pixel.hxx"
 		}
 
 	}

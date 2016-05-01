@@ -806,7 +806,7 @@ void nes_cart_slot_device::pcb_reset()
  -------------------------------------------------*/
 
 /* Include emulation of NES PCBs for softlist */
-#include "nes_pcb.inc"
+#include "nes_pcb.hxx"
 
 
 /*-------------------------------------------------
@@ -816,7 +816,7 @@ void nes_cart_slot_device::pcb_reset()
  -------------------------------------------------*/
 
 /* Include emulation of UNIF Boards for .unf files */
-#include "nes_unif.inc"
+#include "nes_unif.hxx"
 
 
 /*-------------------------------------------------
@@ -826,7 +826,7 @@ void nes_cart_slot_device::pcb_reset()
  -------------------------------------------------*/
 
 /* Include emulation of iNES Mappers for .nes files */
-#include "nes_ines.inc"
+#include "nes_ines.hxx"
 
 
 bool nes_cart_slot_device::call_load()

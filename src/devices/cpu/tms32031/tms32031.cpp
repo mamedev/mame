@@ -846,4 +846,4 @@ void tms3203x_device::execute_run()
 //  CORE OPCODES
 //**************************************************************************
 
-#include "32031ops.inc"
+#include "32031ops.hxx"

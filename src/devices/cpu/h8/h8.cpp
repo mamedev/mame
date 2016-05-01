@@ -1592,4 +1592,4 @@ void h8_device::set_nz32(UINT32 v)
 		CCR |= F_N;
 }
 
-#include "cpu/h8/h8.inc"
+#include "cpu/h8/h8.hxx"

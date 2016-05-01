@@ -205,7 +205,7 @@ UINT32 voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
 	RASTERIZER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, (((tex0) == 0xffffffff) ? 0 : ((tex1) == 0xffffffff) ? 1 : 2), fbzcp, fbz, alpha, fog, tex0, tex1)
 
-#include "voodoo_rast.inc"
+#include "voodoo_rast.hxx"
 
 #undef RASTERIZER_ENTRY
 
@@ -222,7 +222,7 @@ UINT32 voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
 
 static const raster_info predef_raster_table[] =
 {
-#include "voodoo_rast.inc"
+#include "voodoo_rast.hxx"
 	{ nullptr }
 };
 

@@ -1634,9 +1634,9 @@ if (BUSES["NES"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/nes/nes_slot.cpp",
 		MAME_DIR .. "src/devices/bus/nes/nes_slot.h",
-		MAME_DIR .. "src/devices/bus/nes/nes_ines.inc",
-		MAME_DIR .. "src/devices/bus/nes/nes_pcb.inc",
-		MAME_DIR .. "src/devices/bus/nes/nes_unif.inc",
+		MAME_DIR .. "src/devices/bus/nes/nes_ines.hxx",
+		MAME_DIR .. "src/devices/bus/nes/nes_pcb.hxx",
+		MAME_DIR .. "src/devices/bus/nes/nes_unif.hxx",
 		MAME_DIR .. "src/devices/bus/nes/nes_carts.cpp",
 		MAME_DIR .. "src/devices/bus/nes/nes_carts.h",
 		MAME_DIR .. "src/devices/bus/nes/2a03pur.cpp",

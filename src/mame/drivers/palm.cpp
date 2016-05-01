@@ -501,4 +501,4 @@ COMP( 19??, spt1500,  pilot1k,  0,       palmvx,      palm, driver_device,     0
 COMP( 19??, spt1700,  pilot1k,  0,       palmvx,      palm, driver_device,     0,     "Symbol", "SPT 1700", MACHINE_NOT_WORKING )
 COMP( 19??, spt1740,  pilot1k,  0,       palmvx,      palm, driver_device,     0,     "Symbol", "SPT 1740", MACHINE_NOT_WORKING )
 
-#include "palm_dbg.inc"
+#include "palm_dbg.hxx"

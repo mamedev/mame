@@ -21,7 +21,7 @@
 #include "e0c6200.h"
 #include "debugger.h"
 
-#include "e0c6200op.inc"
+#include "e0c6200op.hxx"
 
 
 // disasm

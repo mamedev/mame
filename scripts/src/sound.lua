@@ -81,15 +81,15 @@ if (SOUNDS["DISCRETE"]~=null) then
 		MAME_DIR .. "src/devices/sound/discrete.h",
 		MAME_DIR .. "src/devices/sound/disc_cls.h",
 		MAME_DIR .. "src/devices/sound/disc_dev.h",
-		MAME_DIR .. "src/devices/sound/disc_dev.inc",
+		MAME_DIR .. "src/devices/sound/disc_dev.hxx",
 		MAME_DIR .. "src/devices/sound/disc_flt.h",
-		MAME_DIR .. "src/devices/sound/disc_flt.inc",
-		MAME_DIR .. "src/devices/sound/disc_inp.inc",
+		MAME_DIR .. "src/devices/sound/disc_flt.hxx",
+		MAME_DIR .. "src/devices/sound/disc_inp.hxx",
 		MAME_DIR .. "src/devices/sound/disc_mth.h",
-		MAME_DIR .. "src/devices/sound/disc_mth.inc",
-		MAME_DIR .. "src/devices/sound/disc_sys.inc",
+		MAME_DIR .. "src/devices/sound/disc_mth.hxx",
+		MAME_DIR .. "src/devices/sound/disc_sys.hxx",
 		MAME_DIR .. "src/devices/sound/disc_wav.h",
-		MAME_DIR .. "src/devices/sound/disc_wav.inc",
+		MAME_DIR .. "src/devices/sound/disc_wav.hxx",
 	}
 end
 
@@ -1014,7 +1014,7 @@ if (SOUNDS["TMS5110"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/tms5110.cpp",
 		MAME_DIR .. "src/devices/sound/tms5110.h",
-		MAME_DIR .. "src/devices/sound/tms5110r.inc",
+		MAME_DIR .. "src/devices/sound/tms5110r.hxx",
 	}
 end
 
@@ -1026,7 +1026,7 @@ if (SOUNDS["TMS5220"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/tms5220.cpp",
 		MAME_DIR .. "src/devices/sound/tms5220.h",
-		MAME_DIR .. "src/devices/sound/tms5110r.inc",
+		MAME_DIR .. "src/devices/sound/tms5110r.hxx",
 		MAME_DIR .. "src/devices/machine/spchrom.cpp",
 		MAME_DIR .. "src/devices/machine/spchrom.h",
 	}
@@ -1082,7 +1082,7 @@ if (SOUNDS["VLM5030"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/vlm5030.cpp",
 		MAME_DIR .. "src/devices/sound/vlm5030.h",
-		MAME_DIR .. "src/devices/sound/tms5110r.inc",
+		MAME_DIR .. "src/devices/sound/tms5110r.hxx",
 	}
 end
 

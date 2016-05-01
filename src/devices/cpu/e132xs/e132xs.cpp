@@ -4871,7 +4871,7 @@ void hyperstone_device::hyperstone_trap(struct hyperstone_device::regs_decode *d
 }
 
 
-#include "e132xsop.inc"
+#include "e132xsop.hxx"
 
 //**************************************************************************
 //  CORE EXECUTION LOOP

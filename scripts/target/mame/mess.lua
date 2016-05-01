@@ -974,8 +974,8 @@ files {
 	MAME_DIR .. "src/mame/audio/jaguar.cpp",
 	MAME_DIR .. "src/mame/video/jaguar.cpp",
 	MAME_DIR .. "src/mame/video/jagblit.h",
-	MAME_DIR .. "src/mame/video/jagblit.inc",
-	MAME_DIR .. "src/mame/video/jagobj.inc",
+	MAME_DIR .. "src/mame/video/jagblit.hxx",
+	MAME_DIR .. "src/mame/video/jagobj.hxx",
 	MAME_DIR .. "src/mame/audio/gorf.cpp",
 	MAME_DIR .. "src/mame/audio/wow.cpp",
 	MAME_DIR .. "src/mame/drivers/astrocde.cpp",
@@ -992,7 +992,7 @@ files {
 	MAME_DIR .. "src/mame/machine/n64.cpp",
 	MAME_DIR .. "src/mame/video/n64.cpp",
 	MAME_DIR .. "src/mame/video/n64types.h",
-	MAME_DIR .. "src/mame/video/rdpfiltr.inc",
+	MAME_DIR .. "src/mame/video/rdpfiltr.hxx",
 	MAME_DIR .. "src/mame/video/n64.h",
 	MAME_DIR .. "src/mame/video/rdpblend.cpp",
 	MAME_DIR .. "src/mame/video/rdpblend.h",
@@ -2157,10 +2157,10 @@ files {
 	MAME_DIR .. "src/mame/includes/snes.h",
 	MAME_DIR .. "src/mame/machine/snescx4.cpp",
 	MAME_DIR .. "src/mame/machine/snescx4.h",
-	MAME_DIR .. "src/mame/machine/cx4data.inc",
-	MAME_DIR .. "src/mame/machine/cx4fn.inc",
-	MAME_DIR .. "src/mame/machine/cx4oam.inc",
-	MAME_DIR .. "src/mame/machine/cx4ops.inc",
+	MAME_DIR .. "src/mame/machine/cx4data.hxx",
+	MAME_DIR .. "src/mame/machine/cx4fn.hxx",
+	MAME_DIR .. "src/mame/machine/cx4oam.hxx",
+	MAME_DIR .. "src/mame/machine/cx4ops.hxx",
 	MAME_DIR .. "src/mame/drivers/vboy.cpp",
 	MAME_DIR .. "src/mame/audio/vboy.cpp",
 	MAME_DIR .. "src/mame/audio/vboy.h",
@@ -2251,7 +2251,7 @@ files {
 createMESSProjects(_target, _subtarget, "palm")
 files {
 	MAME_DIR .. "src/mame/drivers/palm.cpp",
-	MAME_DIR .. "src/mame/drivers/palm_dbg.inc",
+	MAME_DIR .. "src/mame/drivers/palm_dbg.hxx",
 	MAME_DIR .. "src/mame/drivers/palmz22.cpp",
 }
 

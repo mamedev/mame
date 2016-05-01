@@ -145,4 +145,4 @@ UINT8 m6509_device::mi_6509_nd::read_arg(UINT16 adr)
 	return res;
 }
 
-#include "cpu/m6502/m6509.inc"
+#include "cpu/m6502/m6509.hxx"

@@ -14,4 +14,4 @@ offs_t h8s2000_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *
 	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
 }
 
-#include "cpu/h8/h8s2000.inc"
+#include "cpu/h8/h8s2000.hxx"
