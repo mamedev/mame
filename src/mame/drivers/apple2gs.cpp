@@ -46,6 +46,7 @@
 #include "emu.h"
 #include "cpu/g65816/g65816.h"
 #include "includes/apple2.h"
+#include "includes/apple2e.h"
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
