@@ -1356,3 +1356,14 @@ if (SOUNDS["UPD1771"]~=null) then
 		MAME_DIR .. "src/devices/sound/upd1771.h",
 	}
 end
+---------------------------------------------------
+-- GB_SOUND
+--@src/devices/sound/gb.h,SOUNDS["GB_SOUND"] = true
+---------------------------------------------------
+
+if (SOUNDS["GB_SOUND"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/gb.cpp",
+		MAME_DIR .. "src/devices/sound/gb.h",
+	}
+end

@@ -864,3 +864,15 @@ if (VIDEOS["JANGOU_BLITTER"]~=null) then
 		MAME_DIR .. "src/devices/video/jangou_blitter.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/gb_lcd.h,VIDEOS["GB_LCD"] = true
+--------------------------------------------------
+
+if (VIDEOS["GB_LCD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/gb_lcd.cpp",
+		MAME_DIR .. "src/devices/video/gb_lcd.h",
+	}
+end

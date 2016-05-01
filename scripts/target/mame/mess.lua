@@ -258,6 +258,7 @@ SOUNDS["MOS7360"] = true
 SOUNDS["ESQPUMP"] = true
 SOUNDS["VRC6"] = true
 SOUNDS["UPD1771"] = true
+SOUNDS["GB_SOUND"] = true
 --------------------------------------------------
 -- specify available video cores
 --------------------------------------------------
@@ -329,6 +330,7 @@ VIDEOS["V9938"] = true
 VIDEOS["VIC4567"] = true
 --VIDEOS+= VOODOO"] = true
 VIDEOS["SCN2674"] = true
+VIDEOS["GB_LCD"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -2137,11 +2139,7 @@ createMESSProjects(_target, _subtarget, "nintendo")
 files {
 	MAME_DIR .. "src/mame/drivers/gb.cpp",
 	MAME_DIR .. "src/mame/includes/gb.h",
-	MAME_DIR .. "src/mame/audio/gb.cpp",
-	MAME_DIR .. "src/mame/audio/gb.h",
 	MAME_DIR .. "src/mame/machine/gb.cpp",
-	MAME_DIR .. "src/mame/video/gb_lcd.cpp",
-	MAME_DIR .. "src/mame/video/gb_lcd.h",
 	MAME_DIR .. "src/mame/drivers/gba.cpp",
 	MAME_DIR .. "src/mame/includes/gba.h",
 	MAME_DIR .. "src/mame/video/gba.cpp",
