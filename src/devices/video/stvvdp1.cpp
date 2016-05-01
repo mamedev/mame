@@ -16,7 +16,7 @@ Framebuffer todo:
 
 
 #include "emu.h"
-#include "includes/stv.h"
+#include "includes/saturn.h"
 
 #define VDP1_LOG 0
 

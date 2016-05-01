@@ -150,7 +150,7 @@ TODO:
 
 #include "emu.h"
 #include "coreutil.h"
-#include "includes/stv.h"
+#include "includes/saturn.h"
 #include "machine/smpc.h"
 #include "machine/eepromser.h"
 

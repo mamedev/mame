@@ -47,6 +47,7 @@
 #include "sound/cdda.h"
 #include "sound/dmadac.h"
 #include "machine/smpc.h"
+#include "machine/stvprot.h"
 #include "includes/stv.h"
 #include "imagedev/chd_cd.h"
 #include "coreutil.h"

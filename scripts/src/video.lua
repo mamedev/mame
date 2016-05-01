@@ -666,7 +666,9 @@ end
 if (VIDEOS["STVVDP"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/stvvdp1.cpp",
+		MAME_DIR .. "src/devices/video/stvvdp1.h",
 		MAME_DIR .. "src/devices/video/stvvdp2.cpp",
+		MAME_DIR .. "src/devices/video/stvvdp2.h",
 	}
 end
 

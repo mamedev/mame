@@ -44,7 +44,7 @@
 **************************************************************************************/
 
 #include "emu.h"
-#include "includes/stv.h"
+#include "includes/saturn.h"
 #include "cpu/sh2/sh2.h"
 #include "cpu/scudsp/scudsp.h"
 

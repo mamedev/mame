@@ -25,7 +25,7 @@
 
 #include "emu.h"
 #include "imagedev/chd_cd.h"
-#include "includes/stv.h"
+#include "includes/saturn.h"
 #include "cdrom.h"
 #include "sound/cdda.h"
 #include "debugger.h"

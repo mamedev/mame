@@ -2032,17 +2032,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/saturn.h,MACHINES["SATURN"] = true
----------------------------------------------------
-
-if (MACHINES["SATURN"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/saturn.cpp",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/serflash.h,MACHINES["SERFLASH"] = true
 ---------------------------------------------------
 
@@ -2085,6 +2074,7 @@ end
 if (MACHINES["STVCD"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/stvcd.cpp",
+		MAME_DIR .. "src/devices/machine/stvcd.h",
 	}
 end
 
