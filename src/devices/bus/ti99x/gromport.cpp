@@ -2036,7 +2036,7 @@ WRITE8_MEMBER(ti99_pagedcru_cartridge::cruwrite)
   Cartridge type: GROM emulation/paged
 
   This cartridge offers GROM address space without real GROM circuits. The GROMs
-  are emulated by a normal EPROM with a circuits that mimics GROM behavior.
+  are emulated by a normal EPROM with a circuit that mimics GROM behavior.
   Each simulated GROM offers 8K (real GROMs only offer 6K).
 
   Some assumptions:
@@ -2048,7 +2048,7 @@ WRITE8_MEMBER(ti99_pagedcru_cartridge::cruwrite)
 
   If any of these fails, the cartridge will crash, so we'll see.
 
-  Typical cartridges: RXB, Super Extended Basic
+  Typical cartridges: Third-party cartridges
 
   For the sake of simplicity, we register GROMs like the other PCB types, but
   we implement special access methods for the GROM space.
@@ -2064,23 +2064,27 @@ WRITE8_MEMBER(ti99_pagedcru_cartridge::cruwrite)
 
 ******************************************************************************/
 
-WRITE_LINE_MEMBER(ti99_gromemu_cartridge::gsq_line)
+WRITE8_MEMBER(ti99_gromemu_cartridge::set_gromlines)
 {
-	m_grom_space = (state==ASSERT_LINE);
+	m_grom_selected = (data != CLEAR_LINE);
+	m_grom_read_mode = ((offset & GROM_M_LINE)!=0);
+	m_grom_address_mode = ((offset & GROM_MO_LINE)!=0);
 }
-
 
 READ8Z_MEMBER(ti99_gromemu_cartridge::readz)
 {
-	if (m_grom_space)
-		gromemureadz(space, offset, value, mem_mask);
+	if (m_grom_selected)
+	{
+		if (m_grom_read_mode) gromemureadz(space, offset, value, mem_mask);
+	}
 	else
 	{
 		if (m_ram_ptr != nullptr)
 		{
 			// Variant of the cartridge which emulates MiniMemory. We don't introduce
 			// another type for this single cartridge.
-			if ((offset & 0x1fff)==0x1000) {
+			if ((offset & 0x1000)==0x1000)
+			{
 				*value = m_ram_ptr[offset & 0x0fff];
 				return;
 			}
@@ -2093,20 +2097,25 @@ READ8Z_MEMBER(ti99_gromemu_cartridge::readz)
 
 WRITE8_MEMBER(ti99_gromemu_cartridge::write)
 {
-	if (m_grom_space)
-		gromemuwrite(space, offset, data, mem_mask);
-
-	else {
+	if (m_romspace_selected)
+	{
 		if (m_ram_ptr != nullptr)
 		{
 			// Lines for Super-Minimem; see above
-			if ((offset & 0x1fff)==0x1000) {
+			if ((offset & 0x1000)==0x1000) {
 				m_ram_ptr[offset & 0x0fff] = data;
 			}
 			return; // no paging
 		}
-
 		m_rom_page = (offset >> 1) & 1;
+	}
+	else
+	{
+		// Will not change anything when not selected (preceding gsq=ASSERT)
+		if (m_grom_selected)
+		{
+			if (!m_grom_read_mode) gromemuwrite(space, offset, data, mem_mask);
+		}
 	}
 }
 
@@ -2114,9 +2123,11 @@ READ8Z_MEMBER(ti99_gromemu_cartridge::gromemureadz)
 {
 	// Similar to the GKracker implemented above, we do not have a readable
 	// GROM address counter but use the one from the console GROMs.
-	if ((offset & 0x0002)!=0) return;
+	if (m_grom_address_mode) return;
+
 	int id = ((m_grom_address & 0xe000)>>13)&0x07;
-	if (id > 2) {
+	if (id > 2)
+	{
 		// Cartridge space (0x6000 - 0xffff)
 		*value = m_grom_ptr[m_grom_address-0x6000]; // use the GROM memory
 	}
@@ -2131,22 +2142,23 @@ READ8Z_MEMBER(ti99_gromemu_cartridge::gromemureadz)
 WRITE8_MEMBER(ti99_gromemu_cartridge::gromemuwrite)
 {
 	// Set GROM address
-	if ((offset & 0x0002)==0x0002) {
+	if (m_grom_address_mode)
+	{
 		if (m_waddr_LSB == true)
 		{
 			// Accept low address byte (second write)
-			m_grom_address = (m_grom_address & 0xff00) | data;
+			m_grom_address = (m_grom_address << 8) | data;
 			m_waddr_LSB = false;
-			if (TRACE_GROM) space.device().logerror("Set GROM address %04x\n", m_grom_address);
 		}
 		else
 		{
 			// Accept high address byte (first write)
-			m_grom_address = (m_grom_address & 0x00ff) | (data << 8);
+			m_grom_address = data;
 			m_waddr_LSB = true;
 		}
 	}
-	else {
+	else
+	{
 		if (TRACE_ILLWRITE) space.device().logerror("Ignoring write to GROM area at address %04x\n", m_grom_address);
 	}
 }

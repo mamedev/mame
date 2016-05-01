@@ -307,7 +307,7 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER(cruwrite);
 
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
-	DECLARE_WRITE8_MEMBER(set_gromlines);
+	virtual DECLARE_WRITE8_MEMBER(set_gromlines);
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
 	DECLARE_READ8Z_MEMBER(gromreadz);
@@ -434,19 +434,20 @@ public:
 class ti99_gromemu_cartridge : public ti99_cartridge_pcb
 {
 public:
-	ti99_gromemu_cartridge(): m_waddr_LSB(false), m_grom_space(false)
+	ti99_gromemu_cartridge(): m_waddr_LSB(false), m_grom_selected(false), m_grom_read_mode(false), m_grom_address_mode(false)
 	{  m_grom_address = 0; }
 	~ti99_gromemu_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(gromemureadz);
 	DECLARE_WRITE8_MEMBER(gromemuwrite);
-
-	DECLARE_WRITE_LINE_MEMBER(gsq_line);
+	DECLARE_WRITE8_MEMBER(set_gromlines) override;
 
 private:
 	bool    m_waddr_LSB;
-	bool    m_grom_space;
+	bool    m_grom_selected;
+	bool    m_grom_read_mode;
+	bool    m_grom_address_mode;
 };
 
 
