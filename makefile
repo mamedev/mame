@@ -211,6 +211,9 @@ ifndef SUBTARGET
 SUBTARGET := $(TARGET)
 endif
 
+SUBTARGET_FULL := $(subst -,_,$(SUBTARGET))
+
+
 CONFIG = release
 ifdef DEBUG
 CONFIG := debug
@@ -578,8 +581,8 @@ ifdef TARGET
 PARAMS += --target='$(TARGET)'
 endif
 
-ifdef SUBTARGET
-PARAMS += --subtarget='$(SUBTARGET)'
+ifdef SUBTARGET_FULL
+PARAMS += --subtarget='$(SUBTARGET_FULL)'
 endif
 
 ifdef OSD
@@ -757,15 +760,15 @@ SCRIPTS = scripts/genie.lua \
 	scripts/toolchain.lua \
 	scripts/src/osd/modules.lua \
 	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
-	$(wildcard src/$(TARGET)/$(SUBTARGET).mak)
+	$(wildcard src/$(TARGET)/$(SUBTARGET_FULL).mak)
 
-ifeq ($(SUBTARGET),mame)
+ifeq ($(SUBTARGET_FULL),mame)
 SCRIPTS += scripts/target/$(TARGET)/arcade.lua
 SCRIPTS += scripts/target/$(TARGET)/mess.lua
 endif
 
 ifndef SOURCES
-SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET).lua
+SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
 endif
 
 ifdef REGENIE
@@ -809,12 +812,12 @@ SRC = src
 
 # all 3rd party sources are under the 3rdparty/ directory
 3RDPARTY = 3rdparty
-ifeq ($(SUBTARGET),mame)
-PROJECT_NAME := $(SUBTARGET)
-else ifeq ($(SUBTARGET),mess)
-PROJECT_NAME := $(SUBTARGET)
+ifeq ($(SUBTARGET_FULL),mame)
+PROJECT_NAME := $(SUBTARGET_FULL)
+else ifeq ($(SUBTARGET_FULL),mess)
+PROJECT_NAME := $(SUBTARGET_FULL)
 else
-PROJECT_NAME := $(TARGET)$(SUBTARGET)
+PROJECT_NAME := $(TARGET)$(SUBTARGET_FULL))
 endif
 
 
@@ -892,10 +895,10 @@ endif
 
 GENIE := 3rdparty/genie/bin/$(GENIEOS)/genie$(EXE)
 
-ifeq ($(TARGET),$(SUBTARGET))
+ifeq ($(TARGET),$(SUBTARGET_FULL))
 FULLTARGET := $(TARGET)
 else
-FULLTARGET := $(TARGET)$(SUBTARGET)
+FULLTARGET := $(TARGET)$(SUBTARGET_FULL)
 endif
 PROJECTDIR := $(BUILDDIR)/projects/$(OSD)/$(FULLTARGET)
 PROJECTDIR_SDL := $(BUILDDIR)/projects/sdl/$(FULLTARGET)
@@ -1433,7 +1436,7 @@ clean: genieclean
 	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 clean
 	-@rm -rf 3rdparty/bgfx/.build
 
-GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET)/
+GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 LAYOUTS=$(wildcard $(SRC)/$(TARGET)/layout/*.lay)
