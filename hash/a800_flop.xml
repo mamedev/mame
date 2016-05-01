@@ -403,5 +403,87 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="b1bomber">
+		<description>B1-Nuclear Bomber</description>
+		<year>1981</year>
+		<publisher>Avalon Hill</publisher>
+		<sharedfeat name="requirement" value="a800:basicb"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="b-1 nuclear bomber (1981)(avalon hill)(us)[!][basic].atr" size="92176" crc="1d4a3876" sha1="aba9f4e932cf0d15d9752b385e016c795c8411ba" offset="0" />  <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ccchomp">
+		<description>Crush, Crumble and Chomp!</description>
+		<year>1981</year>
+		<publisher>Epyx</publisher>
+		<sharedfeat name="compatibility" value="OSb"/>
+		<sharedfeat name="requirement" value="a800:basicb"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="crush, crumble and chomp! (1981)(epyx)(us)[!][basic][os-b].atr" size="92176" crc="419fce77" sha1="513ff8617ebf45e95d19a1ec9e067d1a3121ecf6" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+		
+	<software name="mbasic2x">
+		<description>Microsoft BASIC II Programming Language (Extensions)</description>
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<sharedfeat name="requirement" value="a800:msbasic2"/>
+		<part name="flop1" interface="floppy_5_25">
+		<!-- Adds 10 more BASIC commands that could not fit on the cartridge. -->
+			<dataarea name="flop" size="92176">
+				<rom name="microsoft basic ii extension disk.atr" size="92176" crc="9d6c44ea" sha1="8f305bf916fc6df9cf469a413686de8933ac36e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="basxe41x">
+		<description>Basic XE Programming Language v4.1 (Extensions)</description>
+		<year>1986</year>
+		<publisher>OSS</publisher>
+		<sharedfeat name="compatibility" value="XL/XE"/>
+		<sharedfeat name="requirement" value="a800:basxe41"/>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Adds BASIC commands for Player/Missile graphics control. -->
+			<dataarea name="flop" size="92176">
+				<rom name="basic xe v4.1 extension disk.atr" size="92176" crc="e1c6d065" sha1="8749107e28cfa7add26a5628562c708fa62e0ce0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="writer">
+		<description>The Writer's Tool</description>
+		<year>1985</year>
+		<publisher>OSS</publisher>
+		<sharedfeat name="requirement" value="a800:writerd"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="writer's tool.atr" size="92176" crc="5a6e2133" sha1="c6d4c49fb53a41b28634b209176c74ed86fbfc64" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="writer's tool dictionary.atr" size="92176" crc="18c875b0" sha1="7c727bcc488892dfd83cfbc09b3e1e642d1beff9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="specdemo" supported="no">
+		<description>Spectraview II Demo Disk</description>
+		<!-- Disk contains Sparta DOS and won't boot in MESS, works on other emulators -->
+		<year>198?</year>
+		<publisher>Display Systems International</publisher>
+		<sharedfeat name="requirement" value="a800:spectra2"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="183952">
+				<rom name="spectraview-ii demo disk.atr" size="183952" crc="50b3fb52" sha1="d3bc5b6bb03ad648b79ebb536dba4af4af078bdc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
