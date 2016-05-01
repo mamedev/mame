@@ -45,6 +45,7 @@
 
 #include "emu.h"
 #include "includes/pgm.h"
+#include "machine/pgmprot_igs027a_type3.h"
 
 WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_ram_sel_w )
 {

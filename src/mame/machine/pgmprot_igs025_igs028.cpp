@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "includes/pgm.h"
+#include "machine/pgmprot_igs025_igs028.h"
 
 // tables are xored by table at $1998dc
 // tables are the same as drgw3 and drgw2

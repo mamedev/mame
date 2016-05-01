@@ -191,7 +191,13 @@ Notes:
 
 #include "emu.h"
 #include "includes/pgm.h"
-
+#include "machine/pgmprot_igs025_igs012.h"
+#include "machine/pgmprot_igs025_igs022.h"
+#include "machine/pgmprot_igs025_igs028.h"
+#include "machine/pgmprot_igs027a_type1.h"
+#include "machine/pgmprot_igs027a_type2.h"
+#include "machine/pgmprot_igs027a_type3.h"
+#include "machine/pgmprot_orlegend.h"
 
 READ16_MEMBER(pgm_state::pgm_videoram_r)
 {
