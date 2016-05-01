@@ -531,19 +531,16 @@ function cheat.startplugin()
 		manager:machine():popmessage(newcheat.desc .. " added")
 	end
 
-	function ce.dump(index)
-		cheat = cheats[index]
-		if cheat then
-			for k, v in pairs(cheat.cheat_env) do
-				emu.print_verbose(k, v)
-			end
-		end
+	function ce.get(index)
+		return cheats[index]
 	end
 
 	function ce.list()
+		local list = {}
 		for num, cheat in pairs(cheats) do
-			emu.print_verbose(num, cheat.desc)
+			list[num] = cheat.desc
 		end
+		return list
 	end
 
 	_G.ce = ce
