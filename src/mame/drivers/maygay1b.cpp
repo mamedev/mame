@@ -713,3 +713,5 @@ DRIVER_INIT_MEMBER(maygay1b_state,m1)
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8_delegate(FUNC(maygay1b_state::m1ab_no_oki_w), this));
 	}
 }
+
+#include "maygay1b.inc"

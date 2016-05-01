@@ -112,11 +112,11 @@ belatra.cpp
 berzerk.cpp
 bestleag.cpp
 bfcobra.cpp
-bfm_ad5sw.cpp
+bfm_ad5.cpp
 bfm_sc1.cpp
 bfm_sc2.cpp
 bfm_sc4.cpp
-bfm_sc5sw.cpp
+bfm_sc5.cpp
 bfm_swp.cpp
 bfmsys83.cpp
 bfmsys85.cpp
@@ -661,7 +661,7 @@ markham.cpp
 mastboy.cpp
 matmania.cpp
 maxaflex.cpp
-maygay1bsw.cpp
+maygay1b.cpp
 maygayep.cpp
 maygaysw.cpp
 maygayv1.cpp

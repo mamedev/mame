@@ -13,9 +13,6 @@
 
 */
 
-#include "emu.h"
-#include "includes/bfm_ad5.h"
-
 
 MACHINE_CONFIG_EXTERN( bfm_ad5 );
 INPUT_PORTS_EXTERN( bfm_ad5 );

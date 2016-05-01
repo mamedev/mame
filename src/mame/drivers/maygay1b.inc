@@ -20,9 +20,6 @@
 
  */
 
-#include "emu.h"
-#include "includes/maygay1b.h"
-
 INPUT_PORTS_EXTERN( maygay_m1 );
 
 

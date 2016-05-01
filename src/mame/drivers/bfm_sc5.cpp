@@ -19,7 +19,7 @@
 #include "machine/mcf5206e.h"
 #include "bfm_sc5.lh"
 #include "video/awpvid.h"
-#include "bfm_sc45_helper.h"
+#include "machine/bfm_sc45_helper.h"
 
 
 
@@ -231,3 +231,5 @@ MACHINE_CONFIG_START( bfm_sc5, bfm_sc5_state )
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
+
+#include "bfm_sc5sw.inc"
