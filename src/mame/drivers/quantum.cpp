@@ -55,6 +55,7 @@ NOTE: The Atari 136002-125 PROM in the sets below wasn't dumped from an actual
 #include "sound/pokey.h"
 #include "sound/discrete.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 
 class quantum_state : public driver_device
@@ -151,7 +152,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, quantum_state )
 	AM_RANGE(0x960000, 0x960001) AM_WRITENOP
 	AM_RANGE(0x968000, 0x968001) AM_DEVWRITE("avg", avg_quantum_device, reset_word_w)
 	AM_RANGE(0x970000, 0x970001) AM_DEVWRITE("avg", avg_quantum_device, go_word_w)
-	AM_RANGE(0x978000, 0x978001) AM_READNOP AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x978000, 0x978001) AM_READNOP AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 ADDRESS_MAP_END
 
 
@@ -269,6 +270,8 @@ static MACHINE_CONFIG_START( quantum, quantum_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(quantum_state, irq1_line_hold, CLOCK_3KHZ / 12)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

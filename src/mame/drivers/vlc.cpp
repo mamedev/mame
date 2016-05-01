@@ -135,6 +135,7 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "machine/msm6242.h"
@@ -513,7 +514,7 @@ static ADDRESS_MAP_START( nevada_map, AS_PROGRAM, 16,nevada_state )
 	AM_RANGE(0x00908000, 0x00908001) AM_DEVWRITE8("crtc",mc6845_device,register_w,0x00ff )
 	AM_RANGE(0x00a00000, 0x00a00001) AM_READWRITE(io_board_r,io_board_w)
 	AM_RANGE(0x00a08000, 0x00a08001) AM_WRITE(io_board_x)
-	AM_RANGE(0x00a10000, 0x00a10001) AM_WRITE(watchdog_reset16_w )
+	AM_RANGE(0x00a10000, 0x00a10001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x00a20000, 0x00a20001) AM_DEVWRITE8("aysnd", ay8910_device, address_w, 0x00ff)
 	AM_RANGE(0x00a28000, 0x00a28001) AM_DEVWRITE8("aysnd", ay8910_device, data_w, 0x00ff)
 	AM_RANGE(0x00a30000, 0x00A300ff) AM_DEVREADWRITE8("rtc",msm6242_device, read, write, 0x00ff)
@@ -595,6 +596,7 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	MCFG_CPU_PROGRAM_MAP(nevada_map)
 	MCFG_CPU_IO_MAP(nevada_iomap)  //0x10000 0x20000
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(150))   /* 150ms Ds1232 TD to Ground */
 
 	MCFG_MACHINE_START_OVERRIDE(nevada_state, nevada)

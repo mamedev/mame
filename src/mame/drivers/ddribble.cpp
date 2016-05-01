@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "includes/konamipt.h"
 #include "includes/ddribble.h"
@@ -130,7 +131,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW3")
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(ddribble_coin_counter_w)                              /* coin counters */
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(watchdog_reset_w)                                     /* watchdog reset */
+	AM_RANGE(0x3c00, 0x3c00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)        /* watchdog reset */
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                                         /* ROM */
 ADDRESS_MAP_END
 
@@ -265,6 +266,7 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synch */
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

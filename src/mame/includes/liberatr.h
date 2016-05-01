@@ -8,6 +8,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/er2055.h"
+#include "machine/watchdog.h"
 #include "sound/pokey.h"
 
 class liberatr_state : public driver_device

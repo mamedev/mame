@@ -19,6 +19,7 @@ solarwar
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/watchdog.h"
 #include "includes/videopin.h"
 #include "videopin.lh"
 #include "sound/discrete.h"
@@ -219,7 +220,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, videopin_state )
 	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(video_ram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x0800, 0x0800) AM_READ(misc_r) AM_WRITE(note_dvsr_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(led_w)
-	AM_RANGE(0x0802, 0x0802) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0802, 0x0802) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x0804, 0x0804) AM_WRITE(ball_w)
 	AM_RANGE(0x0805, 0x0805) AM_WRITE(out1_w)
 	AM_RANGE(0x0806, 0x0806) AM_WRITE(out2_w)
@@ -360,6 +361,7 @@ static MACHINE_CONFIG_START( videopin, videopin_state )
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

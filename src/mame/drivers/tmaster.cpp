@@ -111,6 +111,7 @@ To Do:
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "machine/ds1204.h"
+#include "machine/watchdog.h"
 
 /***************************************************************************
 
@@ -744,7 +745,7 @@ static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, tmaster_state )
 	AM_RANGE( 0x600000, 0x600001 ) AM_READ(dummy_read_01 ) AM_WRITENOP
 	AM_RANGE( 0x700000, 0x700001 ) AM_READ(dummy_read_01 ) AM_WRITENOP
 	AM_RANGE( 0x800020, 0x80003f ) AM_NOP   // ?
-	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE(watchdog_reset16_w )
+	AM_RANGE( 0x900000, 0x900001 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 
 	AM_RANGE( 0xa00000, 0xa00001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE( 0xb00000, 0xb7ffff ) AM_READWRITE(galgames_okiram_r, galgames_okiram_w ) // (only low bytes tested) 4x N341024SJ-15
@@ -955,6 +956,7 @@ static MACHINE_CONFIG_START( galgames, tmaster_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(galgames_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, tm3k_interrupt, "screen", 0, 1)
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	// 5 EEPROMs on the motherboard (for BIOS + 4 Carts)
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD(GALGAMES_EEPROM_BIOS)

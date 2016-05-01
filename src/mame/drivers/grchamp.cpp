@@ -195,7 +195,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 			break;
 
 		case 0x0d:  /* OUT13 */
-			machine().watchdog_reset();
+			m_watchdog->watchdog_reset();
 			break;
 
 		case 0x0e:  /* OUT14 */
@@ -662,7 +662,8 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
 
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */

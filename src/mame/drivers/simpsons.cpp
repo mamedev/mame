@@ -101,6 +101,7 @@ Notes:
 #include "cpu/z80/z80.h"
 
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
 #include "includes/simpsons.h"
@@ -128,7 +129,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x1fc4, 0x1fc4) AM_READ(simpsons_sound_interrupt_r)
 	AM_RANGE(0x1fc6, 0x1fc7) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write)
 	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD("k053246", k053247_device, k053246_r)
-	AM_RANGE(0x1fca, 0x1fca) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x1fca, 0x1fca) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("bank2000", address_map_bank_device, amap8)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
@@ -341,6 +342,8 @@ static MACHINE_CONFIG_START( simpsons, simpsons_state )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

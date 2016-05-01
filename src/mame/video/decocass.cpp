@@ -694,9 +694,9 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	if (0 == (m_watchdog_flip & 0x04))
-		machine().watchdog_reset();
+		m_watchdog->watchdog_reset();
 	else if (m_watchdog_count-- > 0)
-		machine().watchdog_reset();
+		m_watchdog->watchdog_reset();
 
 	/* (end) THIS CODE SHOULD NOT BE IN SCREEN UPDATE !! */
 

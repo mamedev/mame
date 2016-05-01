@@ -22,6 +22,7 @@
 #include "sound/dac.h"
 #include "machine/6840ptm.h"
 #include "machine/z80ctc.h"
+#include "machine/watchdog.h"
 #include "includes/cchasm.h"
 
 #define CCHASM_68K_CLOCK (XTAL_8MHz)
@@ -37,7 +38,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 16, cchasm_state )
 	AM_RANGE(0x040000, 0x04000f) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0xff)
 	AM_RANGE(0x050000, 0x050001) AM_WRITE(refresh_control_w)
 	AM_RANGE(0x060000, 0x060001) AM_READ_PORT("DSW") AM_WRITE(led_w)
-	AM_RANGE(0x070000, 0x070001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x070000, 0x070001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xf80000, 0xf800ff) AM_READWRITE(io_r,io_w)
 	AM_RANGE(0xffb000, 0xffffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
@@ -156,6 +157,8 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(cchasm_state, ctc_timer_1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(cchasm_state, ctc_timer_2_w))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

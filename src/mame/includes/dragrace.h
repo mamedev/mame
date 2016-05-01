@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
 
 /* Discrete Sound Input Nodes */
@@ -33,6 +34,7 @@ public:
 		m_position_ram(*this, "position_ram"),
 		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen") { }
 
@@ -50,6 +52,7 @@ public:
 	/* devices */
 	required_device<discrete_device> m_discrete;
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 

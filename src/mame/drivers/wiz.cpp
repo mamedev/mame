@@ -178,6 +178,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/wiz.h"
 
@@ -341,7 +342,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stinger_main_map, AS_PROGRAM, 8, wiz_state )
 //  AM_RANGE(0xf008, 0xf00f) AM_WRITENOP // ?
-	AM_RANGE(0xf800, 0xf800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(stinger_explosion_w)
 	AM_RANGE(0xf80a, 0xf80a) AM_WRITE(stinger_shot_w)
 	AM_IMPORT_FROM( kungfut_main_map )
@@ -839,6 +840,8 @@ static MACHINE_CONFIG_DERIVED( stinger, kungfut )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(stinger_sound_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

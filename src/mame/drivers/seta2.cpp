@@ -115,6 +115,7 @@ reelquak:
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/watchdog.h"
 #include "machine/mcf5206e.h"
 
 
@@ -166,7 +167,7 @@ static ADDRESS_MAP_START( grdians_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")             // Coins
-	AM_RANGE(0x70000c, 0x70000d) AM_READ(watchdog_reset16_r)        // Watchdog
+	AM_RANGE(0x70000c, 0x70000d) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
@@ -204,7 +205,7 @@ static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")             // Coins
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("IN0")                // P1
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN1")                // P2
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x70000c, 0x70000d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")   // Sprites
@@ -263,7 +264,7 @@ static ADDRESS_MAP_START( mj4simai_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x600000, 0x600001) AM_READ(mj4simai_p1_r)             // P1
 	AM_RANGE(0x600002, 0x600003) AM_READ(mj4simai_p2_r)             // P2
 	AM_RANGE(0x600004, 0x600005) AM_WRITE(mj4simai_keyboard_w)      // select keyboard row to read
-	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)        // Watchdog
+	AM_RANGE(0x600006, 0x600007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0x600100, 0x600101) AM_READ_PORT("SYSTEM")             //
 	AM_RANGE(0x600200, 0x600201) AM_WRITENOP                        // Leds? Coins?
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")               // DSW 1
@@ -287,7 +288,7 @@ static ADDRESS_MAP_START( myangel_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")             // Coins
-	AM_RANGE(0x700006, 0x700007) AM_READ(watchdog_reset16_r)        // Watchdog
+	AM_RANGE(0x700006, 0x700007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0x700200, 0x700201) AM_WRITENOP                        // Leds? Coins?
 	AM_RANGE(0x700300, 0x700301) AM_READ_PORT("DSW1")               // DSW 1
 	AM_RANGE(0x700302, 0x700303) AM_READ_PORT("DSW2")               // DSW 2
@@ -310,7 +311,7 @@ static ADDRESS_MAP_START( myangel2_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")             // Coins
-	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)        // Watchdog
+	AM_RANGE(0x600006, 0x600007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0x600200, 0x600201) AM_WRITENOP                        // Leds? Coins?
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")               // DSW 1
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")               // DSW 2
@@ -358,7 +359,7 @@ static ADDRESS_MAP_START( pzlbowl_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")                     // P1
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")                     // P2
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(pzlbowl_coins_r,pzlbowl_coin_counter_w)   // Coins + Protection?
-	AM_RANGE(0x500006, 0x500007) AM_READ(watchdog_reset16_r)            // Watchdog
+	AM_RANGE(0x500006, 0x500007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)          // Protection
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
 	AM_RANGE(0x840000, 0x84ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
@@ -384,7 +385,7 @@ static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")             // Coins
 	AM_RANGE(0x600004, 0x600005) AM_WRITE(pzlbowl_coin_counter_w)   // Coins Counter
-	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)        // Watchdog
+	AM_RANGE(0x600006, 0x600007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	//AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)      // Protection
 	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
 	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
@@ -439,7 +440,7 @@ static ADDRESS_MAP_START( reelquak_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("TICKET")             // Tickets
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("SYSTEM")             // Coins
-	AM_RANGE(0x400006, 0x400007) AM_READ(watchdog_reset16_r)        // Watchdog
+	AM_RANGE(0x400006, 0x400007) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0x400200, 0x400201) AM_WRITE(reelquak_coin_w)          // Coin Counters / IRQ Ack
 	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")               // DSW 1
 	AM_RANGE(0x400302, 0x400303) AM_READ_PORT("DSW2")               // DSW 2
@@ -499,7 +500,7 @@ static ADDRESS_MAP_START( samshoot_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE( 0x700000, 0x700001 ) AM_READ_PORT("TRIGGER")          // Trigger
 	AM_RANGE( 0x700002, 0x700003 ) AM_READ_PORT("PUMP")             // Pump
 	AM_RANGE( 0x700004, 0x700005 ) AM_READ_PORT("COIN") AM_WRITE(samshoot_coin_w )  // Coins
-	AM_RANGE( 0x700006, 0x700007 ) AM_READ(watchdog_reset16_r ) // Watchdog?
+	AM_RANGE( 0x700006, 0x700007 ) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r ) // Watchdog?
 
 	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_SHARE("spriteram") // Sprites
 	AM_RANGE( 0x840000, 0x84ffff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")  // Palette
@@ -700,7 +701,7 @@ static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32, seta2_state )
 	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
 
 	AM_RANGE( 0x00400000, 0x00400003 ) AM_READ(funcube_debug_r)
-	AM_RANGE( 0x00400004, 0x00400007 ) AM_READ(watchdog_reset32_r ) AM_WRITENOP
+	AM_RANGE( 0x00400004, 0x00400007 ) AM_DEVREAD("watchdog", watchdog_timer_device, reset32_r) AM_WRITENOP
 
 	AM_RANGE( 0x00500000, 0x00500003 ) AM_READWRITE(oki_read, oki_write)
 
@@ -719,7 +720,7 @@ static ADDRESS_MAP_START( funcube2_map, AS_PROGRAM, 32, seta2_state )
 	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
 
 	AM_RANGE( 0x00500000, 0x00500003 ) AM_READ(funcube_debug_r )
-	AM_RANGE( 0x00500004, 0x00500007 ) AM_READ(watchdog_reset32_r ) AM_WRITENOP
+	AM_RANGE( 0x00500004, 0x00500007 ) AM_DEVREAD("watchdog", watchdog_timer_device, reset32_r) AM_WRITENOP
 
 	AM_RANGE( 0x00600000, 0x00600003 ) AM_READWRITE(oki_read, oki_write)
 
@@ -2108,6 +2109,8 @@ static MACHINE_CONFIG_START( seta2, seta2_state )
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -2283,6 +2286,8 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(DEVWRITELINE(":sub:sci1", h8_sci_device, rx_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_MACHINE_START_OVERRIDE(seta2_state, funcube)
 	MCFG_MACHINE_RESET_OVERRIDE(seta2_state, funcube)

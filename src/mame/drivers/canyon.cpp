@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, canyon_state )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0x0400, 0x0401) AM_WRITE(canyon_motor_w)
 	AM_RANGE(0x0500, 0x0500) AM_WRITE(canyon_explode_w)
-	AM_RANGE(0x0501, 0x0501) AM_WRITE(watchdog_reset_w) /* watchdog, disabled in service mode */
+	AM_RANGE(0x0501, 0x0501) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* watchdog, disabled in service mode */
 	AM_RANGE(0x0600, 0x0603) AM_WRITE(canyon_whistle_w)
 	AM_RANGE(0x0680, 0x0683) AM_WRITE(canyon_led_w)
 	AM_RANGE(0x0700, 0x0703) AM_WRITE(canyon_attract_w)
@@ -242,7 +242,9 @@ static MACHINE_CONFIG_START( canyon, canyon_state )
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", canyon_state,  nmi_line_pulse)
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

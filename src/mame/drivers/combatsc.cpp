@@ -124,6 +124,7 @@ Dip location and recommended settings verified with the US manual
 #include "emu.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "includes/combatsc.h"
 
@@ -364,7 +365,7 @@ static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(combatsc_bankselect_w)
 	AM_RANGE(0x0414, 0x0414) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x0418, 0x0418) AM_WRITE(combatsc_sh_irqtrigger_w)
-	AM_RANGE(0x041c, 0x041c) AM_WRITE(watchdog_reset_w)         /* watchdog reset? */
+	AM_RANGE(0x041c, 0x041c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* watchdog reset? */
 
 	AM_RANGE(0x0600, 0x06ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x1fff) AM_RAM                             /* RAM */
@@ -703,6 +704,8 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
 	MCFG_MACHINE_START_OVERRIDE(combatsc_state,combatsc)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -351,6 +351,7 @@ Super Missile Attack Board Layout
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/watchdog.h"
 #include "sound/pokey.h"
 
 
@@ -361,6 +362,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_videoram(*this, "videoram"),
+		m_watchdog(*this, "watchdog"),
 		m_pokey(*this, "pokey"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
@@ -376,6 +378,7 @@ public:
 
 	required_device<m6502_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<pokey_device> m_pokey;
 	required_ioport m_in0;
 	required_ioport m_in1;
@@ -742,7 +745,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 
 	/* watchdog */
 	else if (offset >= 0x4c00 && offset < 0x4d00)
-		machine().watchdog_reset();
+		m_watchdog->watchdog_reset();
 
 	/* interrupt ack */
 	else if (offset >= 0x4d00 && offset < 0x4e00)
@@ -1015,7 +1018,8 @@ static MACHINE_CONFIG_START( missile, missile_state )
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 8)

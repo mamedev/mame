@@ -13,6 +13,7 @@
 #include "video/tlc34076.h"
 #include "machine/ticket.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "sound/dac.h"
 
 
@@ -22,6 +23,7 @@ public:
 	xtheball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_watchdog(*this, "watchdog"),
 			m_tlc34076(*this, "tlc34076"),
 			m_vram_bg(*this, "vrabg"),
 			m_vram_fg(*this, "vrafg"),
@@ -29,6 +31,7 @@ public:
 			m_analog_y(*this, "ANALOGY") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tlc34076_device> m_tlc34076;
 
 	required_shared_ptr<UINT16> m_vram_bg;
@@ -218,7 +221,7 @@ READ16_MEMBER(xtheball_state::analogx_r)
 READ16_MEMBER(xtheball_state::analogy_watchdog_r)
 {
 	/* doubles as a watchdog address */
-	watchdog_reset_w(space,0,0);
+	m_watchdog->reset_w(space,0,0);
 	return (m_analog_y->read() << 8) | 0x00ff;
 }
 
@@ -346,6 +349,8 @@ static MACHINE_CONFIG_START( xtheball, xtheball_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

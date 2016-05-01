@@ -278,6 +278,7 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/mathbox.h"
+#include "machine/watchdog.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
 #include "machine/atari_vg.h"
@@ -299,6 +300,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mathbox(*this, "mathbox"),
+		m_watchdog(*this, "watchdog"),
 		m_avg(*this, "avg"),
 		m_rom(*this, "maincpu"),
 		m_knob_p1(*this, TEMPEST_KNOB_P1_TAG),
@@ -311,6 +313,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<avg_tempest_device> m_avg;
 	required_region_ptr<UINT8> m_rom;
 
@@ -351,7 +354,7 @@ void tempest_state::machine_start()
 WRITE8_MEMBER(tempest_state::wdclr_w)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
-	machine().watchdog_reset();
+	m_watchdog->watchdog_reset();
 }
 
 /*************************************
@@ -589,8 +592,9 @@ static MACHINE_CONFIG_START( tempest, tempest_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-
 	MCFG_CPU_PERIODIC_INT_DRIVER(tempest_state, irq0_line_assert, CLOCK_3KHZ / 12)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 256))
 
 	MCFG_ATARIVGEAROM_ADD("earom")

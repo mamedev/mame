@@ -2,6 +2,8 @@
 // copyright-holders:Luca Elia, David Haywood,Stephane Humbert
 /* Kaneko Hit protection */
 
+#include "machine/watchdog.h"
+
 
 struct calc1_hit_t
 {
@@ -52,6 +54,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	required_device<watchdog_timer_device> m_watchdog;
+
 	calc1_hit_t m_hit;
 	calc3_hit_t m_hit3;
 

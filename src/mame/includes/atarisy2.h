@@ -10,6 +10,7 @@
 #include "video/atarimo.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/t11/t11.h"
+#include "machine/watchdog.h"
 #include "sound/2151intf.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"

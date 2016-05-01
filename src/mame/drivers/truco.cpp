@@ -232,7 +232,7 @@ WRITE_LINE_MEMBER(truco_state::pia_ca2_w)
     Legs 07 [OSC IN] and 08 [OSC SEL] aren't connected,
     setting 1.6 seconds as WD timeout.
 */
-	machine().watchdog_reset();
+	m_watchdog->watchdog_reset();
 }
 
 WRITE8_MEMBER(truco_state::portb_w)
@@ -421,6 +421,8 @@ static MACHINE_CONFIG_START( truco, truco_state )
 	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", truco_state,  interrupt)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1.6))    /* 1.6 seconds */
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)

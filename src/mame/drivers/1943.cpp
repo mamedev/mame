@@ -32,6 +32,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "includes/1943.h"
 
@@ -107,7 +108,7 @@ static ADDRESS_MAP_START( c1943_map, AS_PROGRAM, 8, _1943_state )
 	AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1943_c804_w) // ROM bank switch, screen flip
-	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xc806, 0xc806) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xc807, 0xc807) AM_WRITE(c1943_protection_w)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(c1943_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(c1943_colorram_w) AM_SHARE("colorram")
@@ -313,6 +314,8 @@ static MACHINE_CONFIG_START( 1943, _1943_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(_1943_state, irq0_line_hold, 4*60)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

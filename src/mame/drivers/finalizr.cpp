@@ -16,6 +16,7 @@
 #include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "sound/dac.h"
 #include "includes/konamipt.h"
@@ -108,7 +109,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
 	AM_RANGE(0x0811, 0x0811) AM_READ_PORT("P1")
 	AM_RANGE(0x0812, 0x0812) AM_READ_PORT("P2")
 	AM_RANGE(0x0813, 0x0813) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0818, 0x0818) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0818, 0x0818) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x0819, 0x0819) AM_WRITE(finalizr_coin_w)
 	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE("snsnd", sn76489a_device, write)   /* This address triggers the SN chip to read the data port. */
 	AM_RANGE(0x081b, 0x081b) AM_WRITENOP        /* Loads the snd command into the snd latch */
@@ -267,6 +268,8 @@ static MACHINE_CONFIG_START( finalizr, finalizr_state )
 	MCFG_CPU_ADD("audiocpu", I8039,XTAL_18_432MHz/2) /* 9.216MHz clkin ?? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

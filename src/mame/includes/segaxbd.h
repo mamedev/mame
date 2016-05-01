@@ -9,6 +9,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"
@@ -100,6 +101,7 @@ protected:
 	required_device<z80_device> m_soundcpu;
 	optional_device<z80_device> m_soundcpu2;
 	optional_device<i8751_device> m_mcu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
 	required_device<sega_xboard_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;

@@ -120,6 +120,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/pokey.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "includes/cloak.h"
 
 /*************************************
@@ -183,7 +184,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, cloak_state )
 	AM_RANGE(0x3803, 0x3803) AM_WRITE(cloak_flipscreen_w)
 	AM_RANGE(0x3805, 0x3805) AM_WRITENOP    // ???
 	AM_RANGE(0x3806, 0x3807) AM_WRITE(cloak_led_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(cloak_irq_reset_0_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(cloak_nvram_enable_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -323,6 +324,8 @@ static MACHINE_CONFIG_START( cloak, cloak_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

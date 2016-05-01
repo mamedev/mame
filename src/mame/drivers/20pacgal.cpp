@@ -86,6 +86,7 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "includes/20pacgal.h"
 
@@ -235,7 +236,7 @@ READ8_MEMBER( _25pacman_state::_25pacman_io_87_r )
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
 	AM_RANGE(0x82, 0x82) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x80, 0x80) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(timer_pulse_w)        /* ??? pulsed by the timer irq */
 	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
 //  AM_RANGE(0x84, 0x84) AM_NOP /* ?? */
@@ -257,7 +258,7 @@ static ADDRESS_MAP_START( 20pacgal_io_map, AS_IO, 8, _20pacgal_state )
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
 	AM_RANGE(0x82, 0x82) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x80, 0x80) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(timer_pulse_w)        /* ??? pulsed by the timer irq */
 	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
 	AM_RANGE(0x84, 0x84) AM_NOP /* ?? */
@@ -394,6 +395,8 @@ static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _20pacgal_state,  vblank_irq)
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(20pacgal_video)

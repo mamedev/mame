@@ -13,6 +13,7 @@ To enter service mode, keep 1&2 pressed on reset
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
@@ -84,7 +85,7 @@ static ADDRESS_MAP_START( megazone_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(megazone_coin_counter_w) /* coin counter 2, coin counter 1 */
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(megazone_flipscreen_w)
 	AM_RANGE(0x0007, 0x0007) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_SHARE("scrolly")
 	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY AM_SHARE("scrollx")
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("videoram")
@@ -107,7 +108,7 @@ static ADDRESS_MAP_START( megazone_sound_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP                    /* INTMAIN - Interrupts main CPU (unused) */
 	AM_RANGE(0xc000, 0xc000) AM_WRITENOP                    /* INT (Actually is NMI) enable/disable (unused)*/
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
@@ -248,6 +249,8 @@ static MACHINE_CONFIG_START( megazone, megazone_state )
 	MCFG_CPU_IO_MAP(megazone_i8039_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(900))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

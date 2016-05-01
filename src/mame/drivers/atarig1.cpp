@@ -21,6 +21,7 @@
 
 
 #include "emu.h"
+#include "machine/watchdog.h"
 #include "video/atarirle.h"
 #include "includes/atarig1.h"
 
@@ -192,7 +193,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0x038000, 0x03ffff) AM_ROM /* pitfight slapstic goes here */
 	AM_RANGE(0x040000, 0x077fff) AM_ROM
 	AM_RANGE(0x078000, 0x07ffff) AM_ROM /* hydra slapstic goes here */
-	AM_RANGE(0xf80000, 0xf80001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0xf80000, 0xf80001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xf88000, 0xf8ffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0xf90000, 0xf90001) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0xff00)
 	AM_RANGE(0xf98000, 0xf98001) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
@@ -432,6 +433,8 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)
 
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarig1)

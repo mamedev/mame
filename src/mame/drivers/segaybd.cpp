@@ -209,7 +209,7 @@ WRITE16_MEMBER( segaybd_state::io_chip_w )
 			//
 			m_segaic16vid->set_display_enable(data & 0x80);
 			if (((old ^ data) & 0x20) && !(data & 0x20))
-				machine().watchdog_reset();
+				m_watchdog->watchdog_reset();
 			m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			m_subx->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 			m_suby->set_input_line(INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
@@ -1379,6 +1379,8 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 
 	MCFG_NVRAM_ADD_0FILL("backupram")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")

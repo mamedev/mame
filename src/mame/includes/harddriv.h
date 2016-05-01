@@ -165,8 +165,6 @@ public:
 
 	TIMER_CALLBACK_MEMBER( xsdp_sport1_irq_off_callback );
 
-	WRITE16_MEMBER( watchdog_reset16_w );
-
 	DECLARE_READ16_MEMBER( hdgsp_control_lo_r );
 	DECLARE_WRITE16_MEMBER( hdgsp_control_lo_w );
 	DECLARE_READ16_MEMBER( hdgsp_control_hi_r );

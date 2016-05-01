@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/watchdog.h"
 #include "abckb.h"
 #include "sound/discrete.h"
 #include "sound/speaker.h"
@@ -66,6 +67,7 @@ protected:
 	inline void key_down(int state);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_sound_device> m_discrete;
 	required_ioport m_x0;
 	required_ioport m_x1;

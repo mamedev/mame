@@ -5,6 +5,8 @@
     Flak Attack / MX5000
 
 *************************************************************************/
+
+#include "machine/watchdog.h"
 #include "sound/k007232.h"
 #include "video/k007121.h"
 
@@ -18,6 +20,7 @@ public:
 		m_k007121(*this, "k007121"),
 		m_k007232(*this, "k007232"),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
@@ -51,5 +54,6 @@ public:
 	INTERRUPT_GEN_MEMBER(flkatck_interrupt);
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 };

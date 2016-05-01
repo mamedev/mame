@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
+#include "machine/watchdog.h"
 #include "sound/k007232.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
@@ -14,6 +15,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
+		m_watchdog(*this, "watchdog"),
 		m_k007232_1(*this, "k007232_1"),
 		m_k007232_2(*this, "k007232_2"),
 		m_k052109(*this, "k052109"),
@@ -31,6 +33,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<k007232_device> m_k007232_1;
 	required_device<k007232_device> m_k007232_2;
 	required_device<k052109_device> m_k052109;

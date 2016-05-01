@@ -33,6 +33,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/epos.h"
 
@@ -79,7 +80,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, epos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW") AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(epos_port_1_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("INPUTS") AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("UNK")
@@ -93,7 +94,7 @@ static ADDRESS_MAP_START( dealer_io_map, AS_IO, 8, epos_state )
 	AM_RANGE(0x34, 0x34) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x38, 0x38) AM_READ_PORT("DSW")
 	AM_RANGE(0x3C, 0x3C) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 
@@ -388,6 +389,7 @@ static MACHINE_CONFIG_START( epos, epos_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -417,6 +419,8 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(epos_state, write_prtc))
 
 	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -65,7 +65,7 @@ WRITE8_MEMBER(poolshrk_state::watchdog_w)
 {
 	if ((offset & 3) == 3)
 	{
-		watchdog_reset_w(space, 0, 0);
+		m_watchdog->reset_w(space, 0, 0);
 	}
 }
 
@@ -83,7 +83,7 @@ READ8_MEMBER(poolshrk_state::input_r)
 
 	if ((offset & 3) == 3)
 	{
-		watchdog_reset_r(space, 0);
+		m_watchdog->reset_r(space, 0);
 	}
 
 	return val;
@@ -218,6 +218,8 @@ static MACHINE_CONFIG_START( poolshrk, poolshrk_state )
 	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 8) /* ? */
 	MCFG_CPU_PROGRAM_MAP(poolshrk_cpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", poolshrk_state,  irq0_line_assert)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

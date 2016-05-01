@@ -127,7 +127,7 @@ WRITE32_MEMBER(superchs_state::superchs_input_w)
 		{
 			if (ACCESSING_BITS_24_31)   /* $300000 is watchdog */
 			{
-				machine().watchdog_reset();
+				m_watchdog->watchdog_reset();
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -316,6 +316,8 @@ static MACHINE_CONFIG_START( superchs, superchs_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -17,6 +17,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "cpu/mcs51/mcs51.h"
 #include "includes/blktiger.h"
@@ -88,7 +89,7 @@ static ADDRESS_MAP_START( blktiger_io_map, AS_IO, 8, blktiger_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")   AM_WRITE(blktiger_coinlockout_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")   AM_WRITE(blktiger_video_control_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x07, 0x07) AM_READWRITE(blktiger_from_mcu_r,blktiger_to_mcu_w)     /* Software protection (7) */
 	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
 	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
@@ -105,7 +106,7 @@ static ADDRESS_MAP_START( blktigerbl_io_map, AS_IO, 8, blktiger_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")   AM_WRITE(blktiger_coinlockout_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")   AM_WRITE(blktiger_video_control_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x07, 0x07) AM_NOP  /* Software protection (7) */
 	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
 	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
@@ -313,6 +314,7 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_CPU_IO_MAP(blktiger_mcu_io_map)
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

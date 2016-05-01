@@ -72,7 +72,7 @@ WRITE8_MEMBER(flkatck_state::flkatck_ls138_w)
 			m_audiocpu->set_input_line(0, HOLD_LINE);
 			break;
 		case 0x07:  /* watchdog reset */
-			watchdog_reset_w(space, 0, data);
+			m_watchdog->reset_w(space, 0, data);
 			break;
 	}
 }
@@ -216,6 +216,7 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -227,10 +227,12 @@ public:
 	void base_datetime(system_time &systime);
 	void current_datetime(system_time &systime);
 
+#ifdef LEGACY_WATCHDOG
 	// watchdog control
 	void watchdog_reset();
 	void watchdog_enable(bool enable = true);
 	INT32 get_vblank_watchdog_counter() const { return m_watchdog_counter; }
+#endif
 
 	// misc
 	void popmessage() const { popmessage(static_cast<char const *>(nullptr)); }
@@ -262,8 +264,10 @@ private:
 	std::string get_statename(const char *statename_opt) const;
 	void handle_saveload();
 	void soft_reset(void *ptr = nullptr, INT32 param = 0);
+#ifdef LEGACY_WATCHDOG
 	void watchdog_fired(void *ptr = nullptr, INT32 param = 0);
 	void watchdog_vblank(screen_device &screen, bool vblank_state);
+#endif
 	std::string nvram_filename(device_t &device) const;
 	void nvram_load();
 	void nvram_save();
@@ -309,10 +313,12 @@ private:
 	bool                    m_exit_pending;         // is an exit pending?
 	emu_timer *             m_soft_reset_timer;     // timer used to schedule a soft reset
 
+#ifdef LEGACY_WATCHDOG
 	// watchdog state
 	bool                    m_watchdog_enabled;     // is the watchdog enabled?
 	INT32                   m_watchdog_counter;     // counter for watchdog tracking
 	emu_timer *             m_watchdog_timer;       // timer for watchdog tracking
+#endif
 
 	// misc state
 	UINT32                  m_rand_seed;            // current random number seed

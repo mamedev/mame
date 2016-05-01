@@ -221,6 +221,7 @@
 #include "video/avgdvg.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 #include "omegrace.lh"
 
@@ -361,7 +362,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( port_map, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_READ(omegrace_vg_go_r)
-	AM_RANGE(0x09, 0x09) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x09, 0x09) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("dvg", dvg_device, reset_w)
 	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("AVGDVG")             /* vg_halt */
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")               /* DIP SW C4 */
@@ -512,6 +513,8 @@ static MACHINE_CONFIG_START( omegrace, omegrace_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(omegrace_state, nmi_line_pulse, 250)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

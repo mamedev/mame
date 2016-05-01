@@ -93,6 +93,8 @@ static MACHINE_CONFIG_START( beezer, beezer_state )
 	MCFG_CPU_ADD("audiocpu", M6809, 1000000)        /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

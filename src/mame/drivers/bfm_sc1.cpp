@@ -98,6 +98,7 @@ Optional (on expansion card) (Viper)
 #include "sound/ay8910.h"
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "machine/bfm_comn.h"
 
 #include "sc1_vfd.lh"
@@ -689,7 +690,7 @@ static ADDRESS_MAP_START( sc1_base, AS_PROGRAM, 8, bfm_sc1_state )
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM                         // 8k  ROM
 	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")                    // 8k  paged ROM (4 pages)
-	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_WRITE (watchdog_reset_w) // 32k ROM
+	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) // 32k ROM
 
 ADDRESS_MAP_END
 
@@ -1066,6 +1067,8 @@ static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(sc1_base)                      // setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc1_state, timer_irq,  1000)               // generate 1000 IRQ's per second
+
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
 

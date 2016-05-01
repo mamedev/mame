@@ -33,7 +33,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 	output().set_value("P2gear", m_gear[1]);
 
 	/* watchdog is disabled during service mode */
-	machine().watchdog_enable(ioport("IN0")->read() & 0x20);
+	m_watchdog->watchdog_enable(ioport("IN0")->read() & 0x20);
 }
 
 
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( dragrace_map, AS_PROGRAM, 8, dragrace_state )
 	AM_RANGE(0x0b00, 0x0bff) AM_WRITEONLY AM_SHARE("position_ram")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ(dragrace_steering_r)
 	AM_RANGE(0x0d00, 0x0d00) AM_READ(dragrace_scanline_r)
-	AM_RANGE(0x0e00, 0x0eff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0e00, 0x0eff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM /* program */
 	AM_RANGE(0xf800, 0xffff) AM_ROM /* program mirror */
 ADDRESS_MAP_END
@@ -330,7 +330,9 @@ static MACHINE_CONFIG_START( dragrace, dragrace_state )
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 12)
 	MCFG_CPU_PROGRAM_MAP(dragrace_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(dragrace_state, irq0_line_hold,  4*60)
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("frame_timer", dragrace_state, dragrace_frame_callback, attotime::from_hz(60))
 

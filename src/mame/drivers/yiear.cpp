@@ -98,6 +98,7 @@ Sound: VLM5030 at 7B
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "includes/konamipt.h"
 #include "audio/trackfld.h"
@@ -147,7 +148,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yiear_state )
 	AM_RANGE(0x4e01, 0x4e01) AM_READ_PORT("P1")
 	AM_RANGE(0x4e02, 0x4e02) AM_READ_PORT("P2")
 	AM_RANGE(0x4e03, 0x4e03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x4f00, 0x4f00) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x4f00, 0x4f00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x5000, 0x502f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5400, 0x542f) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x5800, 0x5fff) AM_WRITE(yiear_videoram_w) AM_SHARE("videoram")
@@ -276,6 +277,7 @@ static MACHINE_CONFIG_START( yiear, yiear_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", yiear_state,  yiear_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(yiear_state, yiear_nmi_interrupt, 480) /* music tempo (correct frequency unknown) */
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

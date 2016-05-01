@@ -61,6 +61,7 @@ MACHINES["PIT8253"] = true
 MACHINES["Z80CTC"] = true
 MACHINES["68681"] = true
 MACHINES["BANKDEV"] = true
+MACHINES["WATCHDOG"] = true
 
 
 --------------------------------------------------

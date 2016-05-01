@@ -27,6 +27,7 @@ Boards:
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "includes/konamipt.h"
@@ -132,7 +133,7 @@ static ADDRESS_MAP_START( pandoras_master_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(pandoras_z80_irqtrigger_w)                            /* cause INT on the Z80 */
 	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(soundlatch_byte_w)                                            /* sound command to the Z80 */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(pandoras_cpub_irqtrigger_w)                           /* cause FIRQ on CPU B */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(watchdog_reset_w)                                     /* watchdog reset */
+	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)        /* watchdog reset */
 	AM_RANGE(0x4000, 0x5fff) AM_ROM                                                         /* space for diagnostic ROM */
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("share4")                                      /* Shared RAM with CPU B */
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                                         /* ROM */
@@ -150,7 +151,7 @@ static ADDRESS_MAP_START( pandoras_slave_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x1a03, 0x1a03) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW2")
 //  AM_RANGE(0x1e00, 0x1e00) AM_READNOP                                                     /* ??? seems to be important */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)                                     /* watchdog reset */
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)        /* watchdog reset */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(pandoras_cpua_irqtrigger_w)                           /* cause FIRQ on CPU A */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share4")                                      /* Shared RAM with the CPU A */
 	AM_RANGE(0xe000, 0xffff) AM_ROM                                                         /* ROM */
@@ -337,6 +338,7 @@ static MACHINE_CONFIG_START( pandoras, pandoras_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

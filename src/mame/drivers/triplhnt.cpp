@@ -100,7 +100,7 @@ READ8_MEMBER(triplhnt_state::triplhnt_cmos_r)
 
 READ8_MEMBER(triplhnt_state::triplhnt_input_port_4_r)
 {
-	watchdog_reset_w(space, 0, 0);
+	m_watchdog->watchdog_reset();
 	return ioport("0C0B")->read();
 }
 
@@ -308,6 +308,8 @@ static MACHINE_CONFIG_START( triplhnt, triplhnt_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", triplhnt_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

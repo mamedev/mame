@@ -14,6 +14,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/watchdog.h"
 
 #include "destroyr.lh"
 
@@ -30,6 +31,7 @@ public:
 	destroyr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -39,6 +41,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -230,7 +233,7 @@ WRITE8_MEMBER(destroyr_state::misc_w)
 WRITE8_MEMBER(destroyr_state::cursor_load_w)
 {
 	m_cursor = data;
-	watchdog_reset_w(space, offset, data);
+	m_watchdog->reset_w(space, offset, data);
 }
 
 
@@ -493,6 +496,7 @@ static MACHINE_CONFIG_START( destroyr, destroyr_state )
 	MCFG_CPU_PROGRAM_MAP(destroyr_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(destroyr_state, irq0_line_assert,  4*60)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
