@@ -3013,12 +3013,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ymmu100.cpp",
 	MAME_DIR .. "src/mame/drivers/fb01.cpp",
 }
-dependency {
-	{ MAME_DIR .. "src/mame/drivers/ymmu100.cpp",    GEN_DIR .. "mame/drivers/ymmu100.inc" },
-}
-custombuildtask {
-	{ MAME_DIR .. "src/mame/drivers/ymmu100.ppm", GEN_DIR .. "mame/drivers/ymmu100.inc",  {  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting src/drivers/ymmu100.ppm...", PYTHON .. " $(1) $(<) $(@) ymmu100_bkg UINT8" }},
-}
 
 createMESSProjects(_target, _subtarget, "zenith")
 files {
