@@ -73,7 +73,7 @@ end
 
 --------------------------------------------------
 -- ARcompact (ARCtangent-A5, ARC 600, ARC 700)
---@src/devices/cpu/arc/arc.h,CPUS["ARCOMPACT"] = true
+--@src/devices/cpu/arcompact/arcompact.h,CPUS["ARCOMPACT"] = true
 --------------------------------------------------
 
 if (CPUS["ARCOMPACT"]~=null) then
