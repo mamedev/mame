@@ -1228,6 +1228,7 @@ files {
 	MAME_DIR .. "src/mame/machine/egret.h",
 	MAME_DIR .. "src/mame/machine/mac.cpp",
 	MAME_DIR .. "src/mame/machine/macadb.cpp",
+	MAME_DIR .. "src/mame/machine/macadb.h",
 	MAME_DIR .. "src/mame/machine/macrtc.cpp",
 	MAME_DIR .. "src/mame/machine/macrtc.h",
 	MAME_DIR .. "src/mame/machine/mackbd.cpp",
