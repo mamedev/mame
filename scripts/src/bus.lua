@@ -672,7 +672,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/isbx/isbx.h,BUSES["IMI7000"] = true
+--@src/devices/bus/imi7000/imi7000.h,BUSES["IMI7000"] = true
 ---------------------------------------------------
 
 if (BUSES["IMI7000"]~=null) then
