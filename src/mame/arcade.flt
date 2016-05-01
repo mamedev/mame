@@ -957,6 +957,7 @@ sandscrp.cpp
 sangho.cpp
 sanremmg.cpp
 sanremo.cpp
+saturn.cpp
 sauro.cpp
 savquest.cpp
 sbasketb.cpp
@@ -1336,3 +1337,9 @@ zr107.cpp
 -jaguarcd
 //vectrex.cpp
 -vectrex
+//saturn.cpp
+-saturn
+-saturnjp
+-saturneu
+-vsaturn
+-hisaturn

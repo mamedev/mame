@@ -1066,6 +1066,9 @@ files {
 	MAME_DIR .. "src/mame/video/cps1.cpp",
 	MAME_DIR .. "src/mame/video/chihiro.cpp",
 	MAME_DIR .. "src/mame/machine/xbox.cpp",
+	MAME_DIR .. "src/mame/includes/saturn.h",
+	MAME_DIR .. "src/mame/drivers/saturn.cpp",
+	MAME_DIR .. "src/mame/machine/saturn.cpp",	
 }
 end
 --------------------------------------------------
@@ -2439,9 +2442,6 @@ files {
 	MAME_DIR .. "src/mame/machine/dccons.cpp",
 	MAME_DIR .. "src/mame/drivers/megadriv.cpp",
 	MAME_DIR .. "src/mame/includes/megadriv.h",
-	MAME_DIR .. "src/mame/includes/saturn.h",
-	MAME_DIR .. "src/mame/drivers/saturn.cpp",
-	MAME_DIR .. "src/mame/machine/saturn.cpp",
 	MAME_DIR .. "src/mame/drivers/segapico.cpp",
 	MAME_DIR .. "src/mame/drivers/sega_sawatte.cpp",
 	MAME_DIR .. "src/mame/drivers/segapm.cpp",
