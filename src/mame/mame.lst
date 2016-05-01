@@ -19731,6 +19731,9 @@ metalmx                         // 136103?          (c) 1994
 @source:metlclsh.cpp
 metlclsh                        // (c) 1985 Data East
 
+@source:metlfrzr.cpp
+metlfrzr
+
 @source:metro.cpp
 3kokushi                        // (c) 1996 Mitchell
 balcube                         // (c) 1996

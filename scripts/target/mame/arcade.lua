@@ -3231,6 +3231,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/legionna.cpp",
 	MAME_DIR .. "src/mame/includes/legionna.h",
 	MAME_DIR .. "src/mame/video/legionna.cpp",
+	MAME_DIR .. "src/mame/drivers/metlfrzr.cpp",
 	MAME_DIR .. "src/mame/drivers/mustache.cpp",
 	MAME_DIR .. "src/mame/includes/mustache.h",
 	MAME_DIR .. "src/mame/video/mustache.cpp",
