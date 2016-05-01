@@ -382,7 +382,7 @@ if (CPUS["E0C6200"]~=null) then
 		MAME_DIR .. "src/devices/cpu/e0c6200/e0c6200.h",
 		MAME_DIR .. "src/devices/cpu/e0c6200/e0c6s46.cpp",
 		MAME_DIR .. "src/devices/cpu/e0c6200/e0c6s46.h",
-		MAME_DIR .. "src/devices/cpu/e0c6200/e0c6200op.hxx",
+		MAME_DIR .. "src/devices/cpu/e0c6200/e0c6200op.cpp",
 	}
 end
 
@@ -1912,7 +1912,7 @@ if (CPUS["TMS7000"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/tms7000/tms7000.cpp",
 		MAME_DIR .. "src/devices/cpu/tms7000/tms7000.h",
-		MAME_DIR .. "src/devices/cpu/tms7000/tms70op.hxx",
+		MAME_DIR .. "src/devices/cpu/tms7000/tms7000op.cpp",
 	}
 end
 

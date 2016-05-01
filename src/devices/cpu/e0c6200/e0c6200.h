@@ -72,26 +72,33 @@ protected:
 	UINT8 m_yp, m_yh, m_yl; // "
 	UINT8 m_sp;             // stackpointer (SPH, SPL)
 	UINT8 m_f;              // flags
+	enum
+	{
+		C_FLAG = 1,
+		Z_FLAG = 2,
+		D_FLAG = 4,
+		I_FLAG = 8
+	};
 
 	// internal data memory read/write
-	inline UINT8 read_mx();
-	inline UINT8 read_my();
-	inline UINT8 read_mn();
-	inline void write_mx(UINT8 data);
-	inline void write_my(UINT8 data);
-	inline void write_mn(UINT8 data);
+	UINT8 read_mx();
+	UINT8 read_my();
+	UINT8 read_mn();
+	void write_mx(UINT8 data);
+	void write_my(UINT8 data);
+	void write_mn(UINT8 data);
 
 	// common stack ops
-	inline void push(UINT8 data);
-	inline UINT8 pop();
-	inline void push_pc();
-	inline void pop_pc();
+	void push(UINT8 data);
+	UINT8 pop();
+	void push_pc();
+	void pop_pc();
 
 	// misc internal helpers
-	inline void set_cf(UINT8 data);
-	inline void set_zf(UINT8 data);
-	inline void inc_x();
-	inline void inc_y();
+	void set_cf(UINT8 data);
+	void set_zf(UINT8 data);
+	void inc_x();
+	void inc_y();
 	void do_branch(int condition = 1);
 
 	// opcode handlers

@@ -3,38 +3,32 @@
 
 // E0C6200 opcode handlers
 
-enum
-{
-	C_FLAG = 1,
-	Z_FLAG = 2,
-	D_FLAG = 4,
-	I_FLAG = 8
-};
+#include "e0c6200.h"
 
 
 // internal data memory read/write
 
 // MX/MY
 
-inline UINT8 e0c6200_cpu_device::read_mx()
+UINT8 e0c6200_cpu_device::read_mx()
 {
 	UINT16 address = m_xp << 8 | m_xh << 4 | m_xl;
 	return m_data->read_byte(address) & 0xf;
 }
 
-inline UINT8 e0c6200_cpu_device::read_my()
+UINT8 e0c6200_cpu_device::read_my()
 {
 	UINT16 address = m_yp << 8 | m_yh << 4 | m_yl;
 	return m_data->read_byte(address) & 0xf;
 }
 
-inline void e0c6200_cpu_device::write_mx(UINT8 data)
+void e0c6200_cpu_device::write_mx(UINT8 data)
 {
 	UINT16 address = m_xp << 8 | m_xh << 4 | m_xl;
 	m_data->write_byte(address, data);
 }
 
-inline void e0c6200_cpu_device::write_my(UINT8 data)
+void e0c6200_cpu_device::write_my(UINT8 data)
 {
 	UINT16 address = m_yp << 8 | m_yh << 4 | m_yl;
 	m_data->write_byte(address, data);
@@ -42,12 +36,12 @@ inline void e0c6200_cpu_device::write_my(UINT8 data)
 
 // Mn(RP)
 
-inline UINT8 e0c6200_cpu_device::read_mn()
+UINT8 e0c6200_cpu_device::read_mn()
 {
 	return m_data->read_byte(m_op & 0xf) & 0xf;
 }
 
-inline void e0c6200_cpu_device::write_mn(UINT8 data)
+void e0c6200_cpu_device::write_mn(UINT8 data)
 {
 	m_data->write_byte(m_op & 0xf, data);
 }
@@ -55,17 +49,17 @@ inline void e0c6200_cpu_device::write_mn(UINT8 data)
 
 // common stack ops
 
-inline void e0c6200_cpu_device::push(UINT8 data)
+void e0c6200_cpu_device::push(UINT8 data)
 {
 	m_data->write_byte(--m_sp, data);
 }
 
-inline UINT8 e0c6200_cpu_device::pop()
+UINT8 e0c6200_cpu_device::pop()
 {
 	return m_data->read_byte(m_sp++) & 0xf;
 }
 
-inline void e0c6200_cpu_device::push_pc()
+void e0c6200_cpu_device::push_pc()
 {
 	// the highest bit(bank bit) is not pushed onto the stack
 	push(m_pc >> 8 & 0xf);
@@ -73,7 +67,7 @@ inline void e0c6200_cpu_device::push_pc()
 	push(m_pc & 0xf);
 }
 
-inline void e0c6200_cpu_device::pop_pc()
+void e0c6200_cpu_device::pop_pc()
 {
 	// the highest bit(bank bit) is unchanged
 	UINT16 bank = m_pc & 0x1000;
@@ -86,19 +80,19 @@ inline void e0c6200_cpu_device::pop_pc()
 
 // misc internal helpers
 
-inline void e0c6200_cpu_device::set_cf(UINT8 data)
+void e0c6200_cpu_device::set_cf(UINT8 data)
 {
 	// set carry flag if bit 4 is set, reset otherwise
 	m_f = (m_f & ~C_FLAG) | ((data & 0x10) ? C_FLAG : 0);
 }
 
-inline void e0c6200_cpu_device::set_zf(UINT8 data)
+void e0c6200_cpu_device::set_zf(UINT8 data)
 {
 	// set zero flag if 4-bit data is 0, reset otherwise
 	m_f = (m_f & ~Z_FLAG) | ((data & 0xf) ? 0 : Z_FLAG);
 }
 
-inline void e0c6200_cpu_device::inc_x()
+void e0c6200_cpu_device::inc_x()
 {
 	// increment X (XH.XL)
 	m_xl++;
@@ -106,7 +100,7 @@ inline void e0c6200_cpu_device::inc_x()
 	m_xl &= 0xf;
 }
 
-inline void e0c6200_cpu_device::inc_y()
+void e0c6200_cpu_device::inc_y()
 {
 	// increment Y (YH.YL)
 	m_yl++;

@@ -3,6 +3,15 @@
 
 // TMS7000 opcode handlers
 
+#include "tms7000.h"
+
+// flag helpers
+#define GET_C()     (m_sr >> 7 & 1)
+#define SET_C(x)    m_sr = (m_sr & 0x7f) | ((x) >> 1 & 0x80)
+#define SET_NZ(x)   m_sr = (m_sr & 0x9f) | ((x) >> 1 & 0x40) | (((x) & 0xff) ? 0 : 0x20)
+#define SET_CNZ(x)  m_sr = (m_sr & 0x1f) | ((x) >> 1 & 0xc0) | (((x) & 0xff) ? 0 : 0x20)
+
+
 // addressing modes (not all opcodes have a write cycle)
 #define WB_NO -1
 #define AM_WB(write_func, address, param1, param2) \
@@ -348,7 +357,7 @@ int tms7000_device::op_dsb(UINT8 param1, UINT8 param2)
 }
 
 // branches
-inline void tms7000_device::shortbranch(bool check)
+void tms7000_device::shortbranch(bool check)
 {
 	m_icount -= 2;
 	INT8 d = (INT8)imm8();
@@ -360,7 +369,7 @@ inline void tms7000_device::shortbranch(bool check)
 	}
 }
 
-inline void tms7000_device::jmp(bool check)
+void tms7000_device::jmp(bool check)
 {
 	m_icount -= 3;
 	shortbranch(check);

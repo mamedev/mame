@@ -21,8 +21,6 @@
 #include "e0c6200.h"
 #include "debugger.h"
 
-#include "e0c6200op.hxx"
-
 
 // disasm
 void e0c6200_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
