@@ -19417,7 +19417,6 @@ rampage2                        // (c) 1986
 sarge                           // (c) 1985
 spyhunt                         // (c) 1983
 spyhuntp                        // (c) 1983
-spyhuntpr                       //
 stargrds                        // (c) 1987
 turbotag                        // (c) 1985
 
@@ -33543,6 +33542,9 @@ sprint8a                        // ??????           1977/05 [6800]
 @source:spy.cpp
 spy                             // GX857 (c) 1989 (World)
 spyu                            // GX857 (c) 1989 (US)
+
+@source:spyhuntertec.cpp
+spyhuntpr                       //
 
 @source:squale.cpp
 squale                          //
