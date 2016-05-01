@@ -3262,6 +3262,7 @@ files {
 	MAME_DIR .. "src/mame/machine/seicop.cpp",
 	MAME_DIR .. "src/mame/machine/seicop.h",
 	MAME_DIR .. "src/mame/machine/spisprit.cpp",
+	MAME_DIR .. "src/mame/machine/spisprit.h",
 	MAME_DIR .. "src/mame/audio/seibu.cpp",
 	MAME_DIR .. "src/mame/audio/seibu.h",
 	MAME_DIR .. "src/mame/video/seibu_crtc.cpp",

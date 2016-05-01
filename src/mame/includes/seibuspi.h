@@ -153,6 +153,3 @@ public:
 	DECLARE_DRIVER_INIT(ejanhs);
 	DECLARE_DRIVER_INIT(sys386f);
 };
-
-/*----------- defined in machine/spisprit.c -----------*/
-void seibuspi_sprite_decrypt(UINT8 *src, int romsize);
