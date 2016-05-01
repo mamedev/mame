@@ -3466,6 +3466,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/asuka.cpp",
 	MAME_DIR .. "src/mame/includes/asuka.h",
 	MAME_DIR .. "src/mame/machine/bonzeadv.cpp",
+	MAME_DIR .. "src/mame/machine/bonzeadv.h",
 	MAME_DIR .. "src/mame/video/asuka.cpp",
 	MAME_DIR .. "src/mame/drivers/bigevglf.cpp",
 	MAME_DIR .. "src/mame/includes/bigevglf.h",
