@@ -2558,7 +2558,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ncr5389.h,MACHINES["NCR5390"] = true
+--@src/devices/machine/ncr5390.h,MACHINES["NCR5390"] = true
 ---------------------------------------------------
 
 if (MACHINES["NCR5390"]~=null) then
