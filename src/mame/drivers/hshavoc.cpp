@@ -42,6 +42,7 @@ Unfortunately it's read protected.
 #include "sound/2612intf.h"
 #include "sound/sn76496.h"
 #include "includes/megadriv.h"
+#include "includes/megadrvb.h"
 
 static INPUT_PORTS_START( hshavoc )
 	PORT_START("IN0")   /* 16bit */
