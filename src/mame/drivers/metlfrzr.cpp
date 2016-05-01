@@ -23,6 +23,8 @@ public:
 	virtual void video_start() override;
 	UINT32 screen_update_metlfrzr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+
+	DECLARE_DRIVER_INIT(metlfrzr);
 };
 
 
@@ -160,6 +162,25 @@ ROM_END
     
 
 
+DRIVER_INIT_MEMBER(metlfrzr_state,metlfrzr)
+{
+	UINT8 *ROM = memregion("maincpu")->base();
+
+	for(int i=0;i<0x8000;i++)
+	{
 
 
-GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, driver_device,  0, ROT90, "Seibu", "Metal Freezer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+		//		61 70 45 44 49 54
+		//      to
+		//		43 52 45 44 49 54
+		ROM[i] = BITSWAP8(ROM[i], 7,6,1,4,  3,2,5,0);
+
+
+			
+			
+	}
+}
+
+
+
+GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT90, "Seibu", "Metal Freezer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
