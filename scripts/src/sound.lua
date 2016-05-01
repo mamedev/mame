@@ -95,7 +95,7 @@ end
 
 ---------------------------------------------------
 -- AC97
---@src/devices/sound/pic-ac97.h,SOUNDS["AC97"] = true
+--@src/devices/sound/pci-ac97.h,SOUNDS["AC97"] = true
 ---------------------------------------------------
 
 if (SOUNDS["AC97"]~=null) then
