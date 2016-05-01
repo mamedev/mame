@@ -578,6 +578,7 @@ MACHINES["VT82C496"] = true
 MACHINES["GENPC"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["WATCHDOG"] = true
+MACHINES["SMARTMEDIA"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1076,8 +1077,6 @@ files {
 	MAME_DIR .. "src/mame/machine/applefdc.h",
 	MAME_DIR .. "src/mame/machine/microdrv.cpp",
 	MAME_DIR .. "src/mame/machine/microdrv.h",
-	MAME_DIR .. "src/mame/machine/smartmed.cpp",
-	MAME_DIR .. "src/mame/machine/smartmed.h",
 	MAME_DIR .. "src/mame/machine/sonydriv.cpp",
 	MAME_DIR .. "src/mame/machine/sonydriv.h",
 	MAME_DIR .. "src/mame/machine/teleprinter.cpp",

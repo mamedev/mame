@@ -2087,6 +2087,10 @@ end
 ---------------------------------------------------
 --
 --@src/devices/bus/ti99x/990_dk.h,BUSES["TI99X"] = true
+--@src/devices/bus/ti99x/990_tap.h,BUSES["TI99X"] = true
+--@src/devices/bus/ti99x/990_hd.h,BUSES["TI99X"] = true
+--@src/devices/bus/ti99x/genboard.h,BUSES["TI99X"] = true
+--@src/devices/bus/ti99x/joyport.h,BUSES["TI99X"] = true
 ---------------------------------------------------
 
 if (BUSES["TI99X"]~=null) then
