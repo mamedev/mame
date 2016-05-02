@@ -1488,22 +1488,23 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Clown Percentage" )
-	PORT_DIPSETTING(    0xc0, "60%" )
-	PORT_DIPSETTING(    0x80, "70%" )
-	PORT_DIPSETTING(    0x40, "80%" )
-	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")  /* AY8910 port A */
-	PORT_DIPNAME( 0x07, 0x07, "Coinage A, B & C" )
-	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit" )
-	PORT_DIPSETTING(    0x01, "1 Coin / 5 Credits" )
-	PORT_DIPSETTING(    0x02, "1 Coin / 10 Credits" )
-	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
-	PORT_DIPSETTING(    0x04, "1 Coin / 30 Credits" )
-	PORT_DIPSETTING(    0x05, "1 Coin / 40 Credits" )
-	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )
-	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credit" )
+	PORT_DIPNAME( 0x07, 0x07, "Coinage A, B & C" )  // OK on test
+	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x01, "1 Coin / 5 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x02, "1 Coin / 10 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x04, "1 Coin / 30 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x05, "1 Coin / 40 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credit" )  // OK on test, always 1c-1c in game...
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
