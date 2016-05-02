@@ -163,6 +163,7 @@ public:
 	DECLARE_READ8_MEMBER(ret_ff);
 	DECLARE_WRITE8_MEMBER(skylncr_nmi_enable_w);
 	DECLARE_DRIVER_INIT(skylncr);
+	DECLARE_DRIVER_INIT(sonikfig);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
@@ -1723,6 +1724,7 @@ ROM_END
 /*
   Sonik Fighter.
   Greek Version By ZBOUNOS (Z GAMES).
+  Year 2000.
 
   Multiple Butterfly type with naked girls.
   + new features and hold a pair.
@@ -1753,8 +1755,53 @@ ROM_END
 *           Driver Init           *
 **********************************/
 
-DRIVER_INIT_MEMBER(skylncr_state,skylncr)
+DRIVER_INIT_MEMBER(skylncr_state, skylncr)
 {
+	m_generic_paletteram_8.allocate(0x100 * 3);
+	m_generic_paletteram2_8.allocate(0x100 * 3);
+}
+
+DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
+/*
+  Encryption: For each 8 bytes group,
+  swap byte #1 with #4 and #3 with #6.
+
+       SWAPPED
+      /       \
+  00 01 02 03 04 05 06 07
+            \       /
+             SWAPPED
+  
+  00 01 02 03 04 05 06 07
+      \     \ /     /
+       \     X     /
+        \   / \   /
+         \ /   \ /
+          X     X
+         / \   / \
+        /   \ /   \
+       /     X     \
+      /     / \     \
+  00 04 02 06 01 05 03 07
+*/
+{
+	UINT8 *ROM = memregion("maincpu")->base();
+	UINT8 byte01, byte03, byte04, byte06;  // for a better visual understanding...
+	int x;
+
+	for (x= 0; x < 0x10000; x += 8)
+	{
+		byte01 = ROM[x + 1];
+		byte03 = ROM[x + 3];
+		byte04 = ROM[x + 4];
+		byte06 = ROM[x + 6];
+
+        ROM[x + 1] = byte04;
+        ROM[x + 3] = byte06;
+        ROM[x + 4] = byte01;
+        ROM[x + 6] = byte03;
+	}
+	
 	m_generic_paletteram_8.allocate(0x100 * 3);
 	m_generic_paletteram2_8.allocate(0x100 * 3);
 }
@@ -1764,14 +1811,14 @@ DRIVER_INIT_MEMBER(skylncr_state,skylncr)
 *                  Game Drivers                     *
 ****************************************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT     ROT    COMPANY                 FULLNAME                                         FLAGS  */
-GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
-GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
-GAME( 1999, mbutrfly, 0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Magical Butterfly (version U350C, encrypted)",   MACHINE_NOT_WORKING )
-GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
-GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr, ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
-GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr, ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
-GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr, ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
-GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
-GAME( 199?, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr, ROT0, "bootleg",              "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_NOT_WORKING )
-GAME( 199?, sonikfig, 0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Z Games",              "Sonik Fighter (encrypted)",                      MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT    COMPANY                 FULLNAME                                         FLAGS  */
+GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
+GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
+GAME( 1999, mbutrfly, 0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Magical Butterfly (version U350C, encrypted)",   MACHINE_NOT_WORKING )
+GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
+GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr,  ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
+GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr,  ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
+GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr,  ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
+GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
+GAME( 199?, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr,  ROT0, "bootleg",              "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_NOT_WORKING )
+GAME( 2000, sonikfig, 0,       skylncr,  skylncr,  skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_NOT_WORKING )
