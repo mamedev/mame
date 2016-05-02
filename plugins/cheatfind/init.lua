@@ -519,7 +519,6 @@ function cheatfind.startplugin()
 					return mpairs_it, list, 0
 				end
 				local bitwidth = formtable[width]:sub(2, 2):lower()
-				local mstart = #menu + 1
 				if bitwidth == "h" then
 					bitwidth = " %04x"
 				elseif bitwidth == "l" then
@@ -551,20 +550,6 @@ function cheatfind.startplugin()
 							local r
 							match.mode, r = incdec(event, match.mode, 1, 3)
 							if event == "select" then
-								local match
-								if matchsel == 0 then
-									local sel = index - mstart 
-									for i = 1, #matches[#matches] do
-										if sel <= #matches[#matches][i] then
-											match = matches[#matches][i][sel]
-											break
-										else
-											sel = sel - #matches[#matches][i]
-										end
-									end
-								else
-									match = matches[#matches][matchsel][index - mstart]
-								end
 								local dev = devtable[devcur]
 								local cheat = { desc = string.format("Test cheat at addr %08X", match.addr), script = {} }
 								local wid = formtable[width]:sub(2, 2):lower()
