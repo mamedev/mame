@@ -161,7 +161,11 @@ namespace bx
 			prctl(PR_SET_NAME,_name, 0, 0, 0);
 #	endif // defined(__GLIBC__) ...
 #elif BX_PLATFORM_BSD
+#ifdef __NetBSD__
+			pthread_setname_np(m_handle, "%s", (void *)_name);
+#else
 			pthread_setname_np(m_handle, _name);
+#endif
 #elif BX_PLATFORM_WINDOWS && BX_COMPILER_MSVC
 #	pragma pack(push, 8)
 			struct ThreadName
