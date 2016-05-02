@@ -50,6 +50,18 @@ using namespace DirectX;
 class voodoo_gpu
 {
 public:
+	struct ShaderPoint
+	{
+		int intX;
+		int intY;
+		int intZ;
+		int intW;
+		int intR;
+		int intG;
+		int intB;
+		int intA;
+	};
+
 	struct ShaderVertex
 	{
 		XMFLOAT4 Pos;
@@ -187,7 +199,7 @@ public:
 	bool CompileShaders();
 	bool InitBuffers(int sizeX, int sizeY);
 	bool InitRenderBuffers(int sizeX, int sizeY, int fbiWidth);
-	HRESULT CreateVertexShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11VertexShader** ppShaderOut, bool compShader = false);
+	HRESULT CreateVertexShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11VertexShader** ppShaderOut, int mode = 0);
 	HRESULT CreatePixelShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11PixelShader** ppShaderOut);
 	HRESULT RenderToTex();
 	void ReadTex();
@@ -238,10 +250,11 @@ private:
 	ID3D11Buffer*           m_pixelBuffer;
 
 	ID3D11VertexShader*     m_pVS;
+	ID3D11VertexShader*     m_pixelVS;
 	ID3D11PixelShader*      m_pPS;
 	ID3D11PixelShader*      m_fastFillPS;
 
-	ID3D11InputLayout*      m_compVertexLayout;
+	ID3D11InputLayout*      m_pixelVertexLayout;
 	ID3D11VertexShader*     m_compVS;
 	ID3D11PixelShader*      m_compPS;
 
@@ -282,7 +295,7 @@ private:
 	frameBufferCtrl m_frameBufferCtrl;
 	Color_Ctrl_Struct m_colorCtrl;
 	Tex_Interface_Struct m_texCtrl;
-	std::vector<ShaderVertex> m_pixelPoints;
+	std::vector<ShaderPoint> m_pixelPoints;
 	std::vector<LFBWriteStruct> m_lfbWritePoints;
 
 	bool m_updateBlendState;		// Blending

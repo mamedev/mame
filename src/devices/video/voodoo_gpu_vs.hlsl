@@ -77,7 +77,14 @@ cbuffer cbTexInterface : register(b2)
 	Tex_Ctrl_Struct texCtrl[NUM_TEX];
 	//float pad20, pad21;
 };
+//--------------------------------------------------------------------------------------
+// Functions
+//--------------------------------------------------------------------------------------
+float2 ConvertScreenPos(float2 posXY);
 
+//--------------------------------------------------------------------------------------
+// Vertex Shader
+//--------------------------------------------------------------------------------------
 struct VS_INPUT
 {
 	float4 Pos : POSITION;
@@ -95,16 +102,11 @@ struct PS_INPUT
 	float4 TexPos1 : TEXCOORD1;
 };
 
-//--------------------------------------------------------------------------------------
-// Vertex Shader
-//--------------------------------------------------------------------------------------
 PS_INPUT VS(VS_INPUT input)
 {
 	PS_INPUT output = (PS_INPUT)0;
-	output.Pos.x = input.Pos.x / (xSize / 2.0f) - 1.0f + 1 / xSize;
-	output.Pos.y = 1.0f - input.Pos.y / (ySize / 2.0f) - 1 / ySize;
-	if (flipY)
-		output.Pos.y = -output.Pos.y;
+
+	output.Pos.xy = ConvertScreenPos(input.Pos.xy);
 
 	output.Pos.z = input.Pos.z;
 	if (pixel_mode) {
@@ -140,6 +142,38 @@ PS_INPUT VS(VS_INPUT input)
 	}
 	return output;
 }
+//--------------------------------------------------------------------------------------
+// Pixel Vertex Shader
+//--------------------------------------------------------------------------------------
+struct PIXEL_VS_INPUT
+{
+	float4 intPos : POSITION;
+	float4 intCol : COLOR;
+};
+
+
+PS_INPUT PIXEL_VS(PIXEL_VS_INPUT input)
+{
+	PS_INPUT output;
+
+	output.Pos.xy = ConvertScreenPos(float2(asint(input.intPos.xy)));
+
+	output.Pos.z = float(asint(input.intPos.z)) / 65535.0f;
+	output.Pos.w = 1.0f;
+
+	output.Oow = float(asint(input.intPos.w)) / 65535.0f;
+	
+	output.Col.r = float(asint(input.intCol.r));
+	output.Col.g = float(asint(input.intCol.g));
+	output.Col.b = float(asint(input.intCol.b));
+	output.Col.a = float(asint(input.intCol.a));
+	output.Col /= 255.0f;
+
+	output.TexPos0 = 0.0f;
+	output.TexPos1 = 0.0f;
+
+	return output;
+}
 
 //--------------------------------------------------------------------------------------
 // Comp Vertex Shader
@@ -159,12 +193,17 @@ struct COMP_PS_INPUT
 COMP_PS_INPUT COMP_VS(COMP_VS_INPUT input)
 {
 	COMP_PS_INPUT output = (COMP_PS_INPUT)0;
-	output.Pos.x = input.Pos.x / (xSize / 2.0f) - 1.0f + 1 / xSize;
-	output.Pos.y = 1.0f - input.Pos.y / (ySize / 2.0f) - 1 / ySize;
-	if (flipY)
-		output.Pos.y = -output.Pos.y;
 
-	output.Pos.z = input.Pos.z;
+	if (pixel_mode) {
+		output.Pos.xy = ConvertScreenPos(float2(asint(input.Pos.xy)));
+
+		output.Pos.z = float(asint(input.Pos.z)) / 65535.0f;
+	} else {
+		output.Pos.xy = ConvertScreenPos(input.Pos.xy);
+
+		output.Pos.z = input.Pos.z;
+	}
+
 	output.Pos.w = 1.0f;
 
 	output.Oow = input.Pos.w;
@@ -175,3 +214,17 @@ COMP_PS_INPUT COMP_VS(COMP_VS_INPUT input)
 
 	return output;
 }
+
+//--------------------------------------------------------------------------------------
+// Functions
+//--------------------------------------------------------------------------------------
+float2 ConvertScreenPos(float2 posXY)
+{
+	float2 output;
+	output.x = posXY.x / (xSize / 2.0f) - 1.0f + 1 / xSize;
+	output.y = 1.0f - posXY.y / (ySize / 2.0f) - 1 / ySize;
+	if (flipY)
+		output.y = -output.y;
+	return output;
+}
+

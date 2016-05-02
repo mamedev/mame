@@ -25,10 +25,11 @@ voodoo_gpu::voodoo_gpu()
 	m_lfb_write_ready = false;
 
 	m_pVS = nullptr;
+	m_pixelVS = nullptr;
 	m_pPS = nullptr;
 	m_fastFillPS = nullptr;
 
-	m_compVertexLayout = nullptr;
+	m_pixelVertexLayout = nullptr;
 	m_compVS = nullptr;
 	m_compPS = nullptr;
 
@@ -126,9 +127,10 @@ voodoo_gpu::~voodoo_gpu()
 	SAFE_RELEASE(m_rasterState);
 	SAFE_RELEASE(m_blendState);
 	SAFE_RELEASE(m_pVS);
+	SAFE_RELEASE(m_pixelVS);
 	SAFE_RELEASE(m_pPS);
 	SAFE_RELEASE(m_fastFillPS);
-	SAFE_RELEASE(m_compVertexLayout);
+	SAFE_RELEASE(m_pixelVertexLayout);
 	SAFE_RELEASE(m_compVS);
 	SAFE_RELEASE(m_compPS);
 	SAFE_RELEASE(m_pixelBuffer);
@@ -219,8 +221,14 @@ bool voodoo_gpu::CompileShaders()
 
 	// Compile vertex and pixel shader routines
 	SAFE_RELEASE(m_pVS);
-	if (FAILED(CreateVertexShader(L"src/devices/video/voodoo_gpu_vs.hlsl", "VS", &m_pVS))) {
+	if (FAILED(CreateVertexShader(L"src/devices/video/voodoo_gpu_vs.hlsl", "VS", &m_pVS, 1))) {
 		printf("voodoo_gpu:: Error could not compile VS\n");
+		return false;
+	}
+
+	SAFE_RELEASE(m_pixelVS);
+	if (FAILED(CreateVertexShader(L"src/devices/video/voodoo_gpu_vs.hlsl", "PIXEL_VS", &m_pixelVS, 2))) {
+		printf("voodoo_gpu:: Error could not compile PIXEL_VS\n");
 		return false;
 	}
 
@@ -238,7 +246,7 @@ bool voodoo_gpu::CompileShaders()
 
 	// Compile vertex and pixel shader routines for compressed buffer
 	SAFE_RELEASE(m_compVS);
-	if (FAILED(CreateVertexShader(L"src/devices/video/voodoo_gpu_vs.hlsl", "COMP_VS", &m_compVS, true))) {
+	if (FAILED(CreateVertexShader(L"src/devices/video/voodoo_gpu_vs.hlsl", "COMP_VS", &m_compVS))) {
 		printf("voodoo_gpu:: Error could not compile COMP_VS\n");
 		return false;
 	}
@@ -447,7 +455,7 @@ bool voodoo_gpu::InitBuffers(int sizeX, int sizeY)
 	// Pixel buffer
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(ShaderVertex) * DEPTH_PIXEL_BUFFER;
+	bd.ByteWidth = sizeof(ShaderPoint) * DEPTH_PIXEL_BUFFER;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0;
 	if (FAILED(m_gpu->CreateBuffer(&bd, NULL, &m_pixelBuffer)))
@@ -604,7 +612,7 @@ ID3D11DeviceContext* voodoo_gpu::GetContext()
 	return m_context;
 }
 
-HRESULT voodoo_gpu::CreateVertexShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11VertexShader** ppShaderOut, bool compShader)
+HRESULT voodoo_gpu::CreateVertexShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11VertexShader** ppShaderOut, int mode)
 {
 	HRESULT result;
 
@@ -645,7 +653,7 @@ HRESULT voodoo_gpu::CreateVertexShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, I
 	}
 
 	// Define the input layout
-	if (!compShader) {
+	if (mode==1) {
 		D3D11_INPUT_ELEMENT_DESC layout[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -661,15 +669,16 @@ HRESULT voodoo_gpu::CreateVertexShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, I
 		if (FAILED(result))
 			return result;
 	}
-	else {
+	else  if (mode==2) {
 		D3D11_INPUT_ELEMENT_DESC layout[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 
 		// Create the input layout
 		result = m_gpu->CreateInputLayout(layout, ARRAYSIZE(layout), pVSBlob->GetBufferPointer(),
-			pVSBlob->GetBufferSize(), &m_compVertexLayout);
+			pVSBlob->GetBufferSize(), &m_pixelVertexLayout);
 		pVSBlob->Release();
 		if (FAILED(result))
 			return result;
@@ -1056,6 +1065,8 @@ void voodoo_gpu::FastFill(ShaderVertex *triangleVertices)
 	// Check to see if we are in the right mode
 	if (m_renderMode != FASTFILL)
 	{
+		// Set input layout
+		m_context->IASetInputLayout(m_pVertexLayout);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		UINT stride = sizeof(ShaderVertex);
 		UINT offset = 0;
@@ -1137,6 +1148,8 @@ void voodoo_gpu::DrawTriangle(ShaderVertex *triangleVertices)
 	// Check to see if we are in the right mode
 	if (m_renderMode != TRIANGLE)
 	{
+		// Set input layout
+		m_context->IASetInputLayout(m_pVertexLayout);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		UINT stride = sizeof(ShaderVertex);
 		UINT offset = 0;
@@ -1145,6 +1158,8 @@ void voodoo_gpu::DrawTriangle(ShaderVertex *triangleVertices)
 		// Clear pixel mode in constant buffer
 		m_colorCtrl.pixel_mode = 0;
 		m_updateColorCtrl = true;
+		// Set input layout
+		m_context->IASetInputLayout(m_pVertexLayout);
 	}
 
 	// See if parameters have changed
@@ -1197,14 +1212,17 @@ void voodoo_gpu::DrawPixels()
 		m_texCtrl.texCtrl[1].enable = 0;
 		m_updateTexCtrl = true;
 
+		// Set input layout
+		m_context->IASetInputLayout(m_pixelVertexLayout);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-		UINT stride = sizeof(ShaderVertex);
+		UINT stride = sizeof(ShaderPoint);
 		UINT offset = 0;
 		m_context->IASetVertexBuffers(0, 1, &m_pixelBuffer, &stride, &offset);
 		m_renderMode = PIXEL;
 		// Set pixel mode in gpu constant buffer
 		m_colorCtrl.pixel_mode = 1;
 		m_updateColorCtrl = true;
+
 	}
 
 	UpdateConstants();
@@ -1212,7 +1230,7 @@ void voodoo_gpu::DrawPixels()
 	// Copy pixel point buffer over
 	D3D11_BOX pointBox;
 	pointBox.left = 0;
-	pointBox.right = m_pixelPoints.size() * sizeof(ShaderVertex);
+	pointBox.right = m_pixelPoints.size() * sizeof(ShaderPoint);
 	pointBox.top = 0;
 	pointBox.bottom = 1;
 	pointBox.front = 0;
@@ -1230,7 +1248,7 @@ void voodoo_gpu::DrawPixels()
 	m_context->OMSetBlendState(m_blendState, 0, 0xffffffff);
 	// Write to depth buffer first pass
 	m_context->OMSetDepthStencilState(m_depthState, 0);
-	m_context->VSSetShader(m_pVS, nullptr, 0);
+	m_context->VSSetShader(m_pixelVS, nullptr, 0);
 	m_context->PSSetShader(m_pPS, nullptr, 0);
 
 	m_context->Draw(m_pixelPoints.size(), 0);
@@ -1697,24 +1715,22 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, UINT32 &texMode,
 
 void voodoo_gpu::PushPixel(int &x, int &y, int &mask, int *sr, int *sg, int *sb, int *sa, int *sz, UINT32 wSel, UINT32 &wVal)
 {
-	ShaderVertex pixel;
+	ShaderPoint pixel;
 	for (size_t pix = 0; pix < 2; ++pix)
 	{
 		if (mask & (0xf << (pix*4))) {
-			pixel.Pos.x = float(x + pix);
-			pixel.Pos.y = float(y);
-			pixel.Pos.z = float(sz[pix]) / 65535.0f;
+			pixel.intX = x + pix;
+			pixel.intY = y;
+			pixel.intZ = sz[pix];
 			if (wSel) {
-				pixel.Pos.w = float(wVal) / 65535.0f; // W is normalized
+				pixel.intW = wVal;
 			} else {
-				pixel.Pos.w = pixel.Pos.z;
+				pixel.intW = pixel.intZ;
 			}
-			pixel.Col.x = float(sr[pix]);
-			pixel.Col.y = float(sg[pix]);
-			pixel.Col.z = float(sb[pix]);
-			pixel.Col.w = float(sa[pix]);
-			pixel.Tex0 = { 0.0f, 0.0f, 0.0f };
-			pixel.Tex1 = { 0.0f, 0.0f, 0.0f };
+			pixel.intR = sr[pix];
+			pixel.intG = sg[pix];
+			pixel.intB = sb[pix];
+			pixel.intA = sa[pix];
 			m_pixelPoints.push_back(pixel);
 			m_pixels_ready = true;
 		}
