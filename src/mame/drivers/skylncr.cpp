@@ -1446,12 +1446,12 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")  /* $02 (PPI0 port C) */
-	PORT_DIPNAME( 0x11, 0x11, "D-UP Percentage" )
-	PORT_DIPSETTING(    0x11, "60%" )
-	PORT_DIPSETTING(    0x01, "70%" )
-	PORT_DIPSETTING(    0x10, "80%" )
-	PORT_DIPSETTING(    0x00, "90%" )
-	PORT_DIPNAME( 0x0e, 0x0e, "Main Game Percentage" )  // OK
+	PORT_DIPNAME( 0x11, 0x00, "D-UP Percentage" )  // OK
+	PORT_DIPSETTING(    0x11, "40%" )  // OK
+	PORT_DIPSETTING(    0x01, "50%" )  // OK
+	PORT_DIPSETTING(    0x10, "60%" )  // OK
+	PORT_DIPSETTING(    0x00, "70%" )  // OK
+	PORT_DIPNAME( 0x0e, 0x00, "Main Game Percentage" )  // OK
 	PORT_DIPSETTING(    0x0e, "55%" )  // OK
 	PORT_DIPSETTING(    0x0c, "60%" )  // OK
 	PORT_DIPSETTING(    0x0a, "65%" )  // OK
