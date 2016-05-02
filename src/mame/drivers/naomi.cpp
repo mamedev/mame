@@ -216,6 +216,13 @@ Notes: (* - these parts on other side of PCB)
     LED1 / LED2 - Red LED / Green LED
         CN1/2/3 - Connectors for ROM cart or GDROM DIMM Unit
         CN25/26 - Connectors for Filter Board
+       JP9-JP13 - JUMPERs set CN8 connector function: 1-2 = RS422 (315-6146 "MIE"), 2-3 = RS232C (SH4 SCIF)
+                        CN8  1-2   2-3
+                  JP9    1   RXD+  RXD
+                  JP10   4   TXD+  RTS
+                  JP11   2   RXD-  TXD
+                  JP12   5   TXD-  CTS
+                  JP13  3/6  422   232  (GND)
 
 
 Filter Board

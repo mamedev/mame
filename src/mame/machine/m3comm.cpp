@@ -249,6 +249,8 @@ READ16_MEMBER(m3comm_device::ioregs_r)
 		return 5; // dbg random
 	case 0x18 / 2:  // transmit result/status
 		return 5; // dbg random
+	case 0x82 / 2: // IRQ/status ?
+		return 0xA0;
 	case 0x88 / 2:
 		return m_status0;
 	case 0x8A / 2:
