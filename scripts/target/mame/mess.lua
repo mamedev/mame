@@ -648,6 +648,7 @@ BUSES["PSX_CONTROLLER"] = true
 BUSES["QL"] = true
 BUSES["RS232"] = true
 BUSES["S100"] = true
+BUSES["SAT_CTRL"] = true
 BUSES["SATURN"] = true
 BUSES["SCSI"] = true
 BUSES["SCV"] = true

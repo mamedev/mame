@@ -11,7 +11,7 @@
 #ifndef __ATARIMO__
 #define __ATARIMO__
 
-#include "sprite.h"
+#include "video/sprite.h"
 
 
 //**************************************************************************

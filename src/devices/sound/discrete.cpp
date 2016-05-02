@@ -36,7 +36,7 @@
  ************************************************************************/
 
 #include "emu.h"
-#include "sound/wavwrite.h"
+#include "wavwrite.h"
 #include "discrete.h"
 #include <atomic>
 #include <iostream>
