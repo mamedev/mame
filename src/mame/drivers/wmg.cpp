@@ -68,6 +68,7 @@ of save-state is also needed.
 
 ***********************************************************************************************************/
 
+#include "emu.h"
 #include "includes/williams.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/nvram.h"
