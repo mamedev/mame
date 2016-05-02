@@ -150,7 +150,7 @@ function cheatfind.startplugin()
 					oldc = frombcd(old)
 					newc = frombcd(new)
 				end
-				if cfoper[oper](oldc, newc, val, addr) then
+				if cfoper[oper](newc, oldc, val, addr) then
 					ret[#ret + 1] = { addr = addr,
 					oldval = old,
 					newval = new,
