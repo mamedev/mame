@@ -1519,7 +1519,7 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPSETTING(    0x00, "32" )  // OK
 
 	PORT_START("DSW4")  /* AY8910 port B */
-	PORT_DIPNAME( 0x07, 0x07, "Key In" )  // OK on test
+	PORT_DIPNAME( 0x07, 0x00, "Key In" )  // OK on test
 	PORT_DIPSETTING(    0x00, "1 Pulse / 100 Credits" )  // OK on test, always 1 credit in game...
 	PORT_DIPSETTING(    0x01, "1 Pulse / 110 Credits" )  // OK on test, always 1 credit in game...
 	PORT_DIPSETTING(    0x02, "1 Pulse / 120 Credits" )  // OK on test, always 1 credit in game...
@@ -1528,11 +1528,11 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPSETTING(    0x05, "1 Pulse / 400 Credits" )  // OK on test, always 1 credit in game...
 	PORT_DIPSETTING(    0x06, "1 Pulse / 500 Credits" )  // OK on test, always 1 credit in game...
 	PORT_DIPSETTING(    0x07, "1 Pulse / 1000 Credits" )  // OK on test, always 1 credit in game...
-	PORT_DIPNAME( 0x18, 0x00, "Max Bet" )
-	PORT_DIPSETTING(    0x18, "32" )
-	PORT_DIPSETTING(    0x10, "64" )
-	PORT_DIPSETTING(    0x08, "72" )
-	PORT_DIPSETTING(    0x00, "80" )
+	PORT_DIPNAME( 0x18, 0x00, "Max Bet" )  // OK
+	PORT_DIPSETTING(    0x18, "64" )  // OK
+	PORT_DIPSETTING(    0x10, "72" )  // OK
+	PORT_DIPSETTING(    0x08, "80" )  // OK
+	PORT_DIPSETTING(    0x00, "96" )  // OK
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
