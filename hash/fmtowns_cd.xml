@@ -393,6 +393,258 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="bacta12v">
+		<description>Bacta 1 &amp; 2 + Voice</description>
+		<year>1996</year>
+		<publisher>Himeya Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Bacta 1 &amp; 2 + Voice" sha1="86c2d8dcb4e40b108e7e8fab5c1f9f3609f65ed7" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="bfmaria">
+		<description>Ballade for Maria / Maria ni Sasageru Ballade</description>
+		<year>1995</year>
+		<publisher>Fairytale</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="Ballade for Maria (User disk).hdm" size="1261568" crc="200678ab" sha1="c658fd357318eb5f1522c88ea333f70bda75a72a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ballade for Maria" sha1="1f9e39ca63a8a896c5487b4a21100dd67e6a1ffd" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="beast3">
+		<description>Beast 3</description>
+		<year>1994</year>
+		<publisher>Birdy Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Beast 3" sha1="5505a0105fa9abe32b3240bac1144555b22740ee" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="biblemas">
+		<description>Bible Master</description>
+		<year>1993</year>
+		<publisher>Glodia</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="Bible Master (System disk).hdm" size="1261568" crc="f264d93e" sha1="b7939c12ab503fcddb1ad828e7c546cf21987b0c" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Bible Master" sha1="cddc6fc109ed6de40a59dce4918b9b0f1c928992" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="blandia">
+		<description>Blandia Plus</description>
+		<year>1994</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Blandia Plus" sha1="5505a0105fa9abe32b3240bac1144555b22740ee" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="blue">
+		<description>Blue: Will to Power</description>
+		<year>1992</year>
+		<publisher>Sofcom</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Blue - Will to Power" sha1="6ef80af0ccf21be12d68cd4ea2baf0988762f004" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="panicbom">
+		<description>Bomberman: Panic Bomber</description>
+		<year>1995</year>
+		<publisher>ASCII</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Bomberman - Panic Bomber" sha1="1fc5adf361f2a4ec5ddf1d55bacda3284f43f00d" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="branmark">
+		<description>Branmarker</description>
+		<year>1991</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Branmarker" sha1="dd04adb6bb27f61337a9b6e3da6ae2afd1d1ae47" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="branmar2">
+		<description>Branmarker 2</description>
+		<year>1995</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Branmarker 2" sha1="b7a41a36bf83c293defa929dd8b2daea961cd3aa" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="bublbobl">
+		<description>Bubble Bobble</description>
+		<year>1990</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Bubble Bobble" sha1="6832299e67d17aca22d0ec2265b78d6e42336e30" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="buraij">
+		<description>Burai Joukan</description>
+		<year>1990</year>
+		<publisher>Riverhill Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Burai Joukan" sha1="55fdc68201b54439b4aba027891b3db41cd88250" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="buraik">
+		<description>Burai Kanketsu-hen</description>
+		<year>1991</year>
+		<publisher>Riverhill Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Burai Kanketsu-hen" sha1="acf9f3c856ef1398805509352b4e6e2f53f61b47" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="cal">
+		<description>Cal Towns</description>
+		<year>1992</year>
+		<publisher>Birdy Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Cal Towns" sha1="ab905889b8a3edfd7cdfe51c728d017f257e34f7" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="cancanb">
+		<description>Can Can Bunny Extra</description>
+		<year>1993</year>
+		<publisher>Cocktail Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Can Can Bunny Extra" sha1="385d444f67398de5b1acc65dd19e6aecafab0de1" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="castles">
+		<description>Castles</description>
+		<year>1992</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Castles" sha1="411c2753dbbef40b91bc6cd922f82eda27820280" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="centurio">
+		<description>Centurion</description>
+		<year>1993</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Centurion" sha1="7df6066270855bd7ae85286ce502e1663610760c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="classcrd">
+		<description>Classic Road</description>
+		<year>1994</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Classic Road" sha1="a4debada6767e53ec0edb0ee9128f8fe96a99a6c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="crystrnl">
+		<description>Crystal Rinal</description>
+		<year>1994</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Crystal Rinal" sha1="96bce4606ee6775e966328143a6051fe312d9a8d" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="cm2itsuk">
+		<description>Custom Mate 2 &amp; Itsuka dokoka de</description>
+		<year>1995</year>
+		<publisher>Cocktail Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="Custom Mate 2 &amp; Itsuka dokoka de (Save disk).hdm" size="1261568" crc="aead04fb" sha1="70197de9a7a138209b7e726063b5bca8f6534575" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Custom Mate 2 &amp; Itsuka dokoka de" sha1="c7671fa372beae381bb95728ac85793fd0a0ccc7" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="cybercty">
+		<description>Cybercity</description>
+		<year>1989</year>
+		<publisher>Nihon Telenet</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="Cybercity (Boot disk).hdm" size="1261568" crc="384203a7" sha1="8e332eae5055a911c87dd2038f550ec614c30111" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Cybercity" sha1="e0cd1ae978cffd94a9c4a47304aaacd2170f86d0" />
+			</diskarea>
+		</part>
+	</software>
+		
+	<software name="cyberia">
+		<description>Cyberia</description>
+		<year>1995</year>
+		<publisher>Fujitsu</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Cyberia" sha1="9b6100154ebe61fe19e17b01a2f037310448a72a" />
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- works well on fmtmarty, keyboard seems to interfere with movements on fmtowns -->
 	<software name="raiden">
