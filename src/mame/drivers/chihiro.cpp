@@ -1328,6 +1328,7 @@ ROM_START( wangmid )
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-5101-com.data", 0x00, 0x50, CRC(3af801f3) SHA1(e9a2558930f3f1f55d5b3c2cadad69329d931f26) )
 
+	// Sanwa CRP-1231LR-10NAB card reader-printer
 	ROM_REGION( 0x20000, "card_reader", ROMREGION_ERASE)
 	// CRP1231LR10     8B16
 	// Ver. 01.10      ???
