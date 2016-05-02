@@ -1506,9 +1506,9 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )  // OK on test, always 1c-1c in game...
 	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credit" )  // OK on test, always 1c-1c in game...
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )  // This input should be turned ON, otherwise you can't enter the setup (F2)
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Attract / Girls" )  // OK... Could be either or both. Need the game working to check it.
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x20, "Max Bonus" )  // OK
 	PORT_DIPSETTING(    0x20, "10000" )  // OK
 	PORT_DIPSETTING(    0x00, "20000" )  // OK
