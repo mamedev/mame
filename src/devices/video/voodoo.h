@@ -1529,10 +1529,10 @@ struct tmu_shared_state
 struct setup_vertex
 {
 	float               x, y;                   /* X, Y coordinates */
-	float               a, r, g, b;             /* A, R, G, B values */
 	float               z, wb;                  /* Z and broadcast W values */
-	float               w0, s0, t0;             /* W, S, T for TMU 0 */
-	float               w1, s1, t1;             /* W, S, T for TMU 1 */
+	float               r, g, b, a;             /* A, R, G, B values */
+	float               s0, t0, w0;             /* W, S, T for TMU 0 */
+	float               s1, t1, w1;             /* W, S, T for TMU 1 */
 };
 
 

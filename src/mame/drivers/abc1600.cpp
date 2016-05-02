@@ -845,8 +845,8 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_CPU_PROGRAM_MAP(abc1600_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(abc1600_state,abc1600_int_ack)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1600)) // XTAL_64MHz/8/10/20000/8/8
+	//MCFG_WATCHDOG_ADD("watchdog")
+	//MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1600)) // XTAL_64MHz/8/10/20000/8/8
 
 	// video hardware
 	MCFG_ABC1600_MOVER_ADD()
