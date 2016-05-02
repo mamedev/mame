@@ -1460,12 +1460,12 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPSETTING(    0x04, "80%" )  // OK
 	PORT_DIPSETTING(    0x02, "85%" )  // OK
 	PORT_DIPSETTING(    0x00, "90%" )  // OK
-	PORT_DIPNAME( 0x20, 0x20, "Reels Speed" )
-	PORT_DIPSETTING(    0x20, "Slow" )
-	PORT_DIPSETTING(    0x00, "Fast" )
-	PORT_DIPNAME( 0x40, 0x40, "Bonus Score" )
-	PORT_DIPSETTING(    0x40, "32" )
-	PORT_DIPSETTING(    0x00, "24" )
+	PORT_DIPNAME( 0x20, 0x00, "Reels Speed" )  // OK
+	PORT_DIPSETTING(    0x20, "Low" )  // OK
+	PORT_DIPSETTING(    0x00, "Hi" )  // OK
+	PORT_DIPNAME( 0x40, 0x00, "Bonus Score" )  // OK
+	PORT_DIPSETTING(    0x40, "32" )  // OK
+	PORT_DIPSETTING(    0x00, "24" )  // OK
 	PORT_DIPNAME( 0x80, 0x00, "Key Out" )
 	PORT_DIPSETTING(    0x00, "x1" )
 	PORT_DIPSETTING(    0x80, "x100" )
