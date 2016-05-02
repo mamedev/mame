@@ -176,6 +176,11 @@ bits(7:4) and bit(24)), X, and Y:
 // otherwise timer interrupts won't match nodrc debug mode.
 #define EAT_CYCLES          (1)
 
+#ifdef VOODOO_GPU_ACCEL
+#define USE_GPU (1)
+#else
+#define USE_GPU (0)
+#endif
 
 /*************************************
  *
@@ -793,6 +798,15 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 	if (count > 15)
 		count = 15;
 	vd->reg[fbiSwapHistory].u = (vd->reg[fbiSwapHistory].u << 4) | count;
+
+	if USE_GPU {
+		// Check for pixels
+		vd->m_gpu.DrawPixels();
+		if (vd->vd_type <= TYPE_VOODOO_2)
+			vd->m_gpu.CopyBuffer((UINT16 *)(vd->fbi.ram + vd->fbi.rgboffs[vd->fbi.frontbuf]), vd->fbi.rowpixels);
+		else
+			vd->m_gpu.CopyBuffer((UINT16 *)(vd->fbi.ram + vd->fbi.rgboffs[0]), vd->fbi.rowpixels);
+	}
 
 	/* rotate the buffers */
 	if (vd->vd_type <= TYPE_VOODOO_2)
@@ -2410,34 +2424,52 @@ INT32 voodoo_device::register_w(voodoo_device *vd, offs_t offset, UINT32 data)
 			poly_wait(vd->poly, vd->regnames[regnum]);
 			if (vd->vd_type < TYPE_VOODOO_2)
 				data &= 0x0fffffff;
-			if (chips & 1) vd->reg[fbzColorPath].u = data;
+			if (chips & 1) {
+				vd->reg[fbzColorPath].u = data;
+				if USE_GPU
+					vd->m_gpu.SetColorCtrl(vd->reg[fbzColorPath].u, vd->reg[color0].u, vd->reg[color1].u);
+			}
 			break;
 
 		case fbzMode:
 			poly_wait(vd->poly, vd->regnames[regnum]);
 			if (vd->vd_type < TYPE_VOODOO_2)
 				data &= 0x001fffff;
-			if (chips & 1) vd->reg[fbzMode].u = data;
+			if (chips & 1) {
+				vd->reg[fbzMode].u = data;
+				if USE_GPU
+					vd->m_gpu.SetFbzMode(vd->reg[fbzMode].u);
+			}
 			break;
 
 		case fogMode:
 			poly_wait(vd->poly, vd->regnames[regnum]);
 			if (vd->vd_type < TYPE_VOODOO_2)
 				data &= 0x0000003f;
-			if (chips & 1) vd->reg[fogMode].u = data;
+			if (chips & 1) {
+				vd->reg[fogMode].u = data;
+				if USE_GPU
+					vd->m_gpu.SetFogCtrl(vd->reg[fogMode].u, vd->reg[fogColor].u);
+			}
 			break;
 
 		/* triangle drawing */
 		case triangleCMD:
 			vd->fbi.cheating_allowed = (vd->fbi.ax != 0 || vd->fbi.ay != 0 || vd->fbi.bx > 50 || vd->fbi.by != 0 || vd->fbi.cx != 0 || vd->fbi.cy > 50);
 			vd->fbi.sign = data;
-			cycles = triangle(vd);
+			if USE_GPU
+				cycles = gpu_setup_triangle(vd);
+			else
+				cycles = triangle(vd);
 			break;
 
 		case ftriangleCMD:
 			vd->fbi.cheating_allowed = TRUE;
 			vd->fbi.sign = data;
-			cycles = triangle(vd);
+			if USE_GPU
+				cycles = gpu_setup_triangle(vd);
+			else
+				cycles = triangle(vd);
 			break;
 
 		case sBeginTriCMD:
@@ -2597,8 +2629,11 @@ INT32 voodoo_device::register_w(voodoo_device *vd, offs_t offset, UINT32 data)
 					adjust_vblank_timer(vd);
 
 					/* if changing dimensions, update video memory layout */
-					if (regnum == videoDimensions)
+					if (regnum == videoDimensions) {
 						recompute_video_memory(vd);
+						if USE_GPU
+							vd->m_gpu.InitRenderBuffers(vd->fbi.rowpixels, vd->fbi.height, vd->fbi.width);
+					}
 				}
 			}
 			break;
@@ -2805,6 +2840,8 @@ INT32 voodoo_device::register_w(voodoo_device *vd, offs_t offset, UINT32 data)
 				vd->fbi.fogblend[base + 0] = (data >> 8) & 0xff;
 				vd->fbi.fogdelta[base + 1] = (data >> 16) & 0xff;
 				vd->fbi.fogblend[base + 1] = (data >> 24) & 0xff;
+				if USE_GPU
+					vd->m_gpu.SetFogTable(data, base);
 			}
 			break;
 
@@ -2846,7 +2883,16 @@ INT32 voodoo_device::register_w(voodoo_device *vd, offs_t offset, UINT32 data)
 		case clipLowYHighY:
 		case clipLeftRight:
 			poly_wait(vd->poly, vd->regnames[regnum]);
-			/* fall through to default implementation */
+			if (chips & 1) {
+				vd->reg[regnum].u = data;
+				if USE_GPU {
+					vd->m_gpu.SetColorCtrl(vd->reg[fbzColorPath].u, vd->reg[color0].u, vd->reg[color1].u);
+					vd->m_gpu.SetAlphaMode(vd->reg[alphaMode].u);
+					vd->m_gpu.SetZAColor(vd->reg[zaColor].u);
+					vd->m_gpu.SetFogCtrl(vd->reg[fogMode].u, vd->reg[fogColor].u);
+				}
+			}
+			break;
 
 		/* by default, just feed the data to the chips */
 		default:
@@ -3215,6 +3261,13 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 	/* tricky case: run the full pixel pipeline on the pixel */
 	else
 	{
+		if USE_GPU {
+			// Send pixel to gpu
+			UINT32 wReg = vd->reg[zaColor].u & 0xffff;
+			vd->m_gpu.PushPixel(x, y, mask, sr, sg, sb, sa, sz, LFBMODE_WRITE_W_SELECT(vd->reg[lfbMode].u), wReg);
+			return 0;
+		}
+
 		DECLARE_DITHER_POINTERS;
 
 		if (LOG_LFB) vd->device->logerror("VOODOO.%d.LFB:write pipelined mode %X (%d,%d) = %08X & %08X\n", vd->index, LFBMODE_WRITE_FORMAT(vd->reg[lfbMode].u), x, y, data, mem_mask);
@@ -3374,6 +3427,11 @@ INT32 voodoo_device::texture_w(voodoo_device *vd, offs_t offset, UINT32 data)
 	/* update texture info if dirty */
 	if (t->regdirty)
 		recompute_texture_params(t);
+
+	// Check to see if memory location being used by existing texture
+	if USE_GPU {
+		vd->m_gpu.FlagTexture(tmunum, t->lodoffset, t->reg[tLOD].u);
+	}
 
 	/* swizzle the data */
 	if (TEXLOD_TDATA_SWIZZLE(t->reg[tLOD].u))
@@ -4008,11 +4066,29 @@ static UINT32 lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
 		scry = y;
 		if (LFBMODE_Y_ORIGIN(vd->reg[lfbMode].u))
 			scry = (vd->fbi.yorigin - y) & 0x3ff;
+
+		if USE_GPU{
+			if (destbuf != 2) {
+				// Check for pixels
+				vd->m_gpu.DrawPixels();
+				// Check for triangle drawings
+				vd->m_gpu.CopyBuffer(buffer, vd->fbi.rowpixels);
+			}
+		}
+
 	} else {
 		// Direct lfb access
 		buffer = (UINT16 *)(vd->fbi.ram + vd->fbi.lfb_base*4);
 		bufmax = (vd->fbi.mask + 1 - vd->fbi.lfb_base*4) / 2;
 		scry = y;
+
+		if USE_GPU{
+			// Check for pixels
+			vd->m_gpu.DrawPixels();
+			// Check for triangle drawings
+			// TODO: Verify buffer is correct for Voodoo 1
+			vd->m_gpu.CopyBuffer((UINT16 *)(vd->fbi.ram + vd->fbi.rgboffs[vd->fbi.backbuf]), vd->fbi.rowpixels);
+		}
 	}
 
 	/* advance pointers to the proper row */
@@ -4855,6 +4931,8 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 				fbi.width = data & 0xfff;
 			if (data & 0xfff000)
 				fbi.height = (data >> 12) & 0xfff;
+			if USE_GPU
+				m_gpu.InitRenderBuffers(fbi.width, fbi.height, fbi.width);
 			/* fall through */
 		case io_vidOverlayDudx:
 		case io_vidOverlayDvdy:
@@ -4919,6 +4997,15 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 
 void voodoo_device::common_start_voodoo(UINT8 type)
 {
+	if USE_GPU {
+		if (!m_gpu.InitDevice()) {
+			fatalerror("Error initialize gpu device\n");
+		}
+		if (!m_gpu.InitBuffers(640, 480)) {
+			fatalerror("Error setting up gpu\n");
+		}
+	}
+
 	const raster_info *info;
 	void *fbmem, *tmumem[2];
 	UINT32 tmumem0, tmumem1;
@@ -5128,6 +5215,13 @@ INT32 voodoo_device::fastfill(voodoo_device *vd)
 	/* if we're not clearing either, take no time */
 	if (!FBZMODE_RGB_BUFFER_MASK(vd->reg[fbzMode].u) && !FBZMODE_AUX_BUFFER_MASK(vd->reg[fbzMode].u))
 		return 0;
+
+	if USE_GPU {
+		vd->m_gpu.ClearBuffer(sx, ex, sy, ey);
+		pixels = ((ex - sx) * (ey - sy));
+		// 2 pixels per clock
+		return pixels >> 1;
+	}
 
 	/* are we clearing the RGB buffer? */
 	if (FBZMODE_RGB_BUFFER_MASK(vd->reg[fbzMode].u))
@@ -5375,7 +5469,177 @@ INT32 voodoo_device::draw_triangle(voodoo_device *vd)
 	return cycles;
 }
 
+#ifdef VOODOO_GPU_ACCEL
+/***************************************************************************
+GPU Acceleration TRIANGLE HELPERS
+***************************************************************************/
+/*-------------------------------------------------
+gpu_setup_triangle - Setup vertices and draw on gpu
+-------------------------------------------------*/
 
+INT32 voodoo_device::gpu_setup_triangle(voodoo_device *vd)
+{
+	// Setup xy
+	vd->fbi.svert[0].x = vd->fbi.ax / 16.0f;
+	vd->fbi.svert[0].y = vd->fbi.ay / 16.0f;
+	vd->fbi.svert[1].x = vd->fbi.bx / 16.0f;
+	vd->fbi.svert[1].y = vd->fbi.by / 16.0f;
+	vd->fbi.svert[2].x = vd->fbi.cx / 16.0f;
+	vd->fbi.svert[2].y = vd->fbi.cy / 16.0f;
+
+	// Compute dx/dy
+	float dx01, dx02, dy01, dy02;
+	dx01 = vd->fbi.svert[1].x - vd->fbi.svert[0].x;
+	dx02 = vd->fbi.svert[2].x - vd->fbi.svert[0].x;
+	dy01 = vd->fbi.svert[1].y - vd->fbi.svert[0].y;
+	dy02 = vd->fbi.svert[2].y - vd->fbi.svert[0].y;
+
+	// Setup RGBA
+	vd->fbi.svert[0].r = vd->fbi.startr / 4096.0f;
+	vd->fbi.svert[0].g = vd->fbi.startg / 4096.0f;
+	vd->fbi.svert[0].b = vd->fbi.startb / 4096.0f;
+	vd->fbi.svert[0].a = vd->fbi.starta / 4096.0f;
+	vd->fbi.svert[1].r = vd->fbi.svert[0].r + vd->fbi.drdx / 4096.0f * dx01 + vd->fbi.drdy / 4096.0f * dy01;
+	vd->fbi.svert[1].g = vd->fbi.svert[0].g + vd->fbi.dgdx / 4096.0f * dx01 + vd->fbi.dgdy / 4096.0f * dy01;
+	vd->fbi.svert[1].b = vd->fbi.svert[0].b + vd->fbi.dbdx / 4096.0f * dx01 + vd->fbi.dbdy / 4096.0f * dy01;
+	vd->fbi.svert[1].a = vd->fbi.svert[0].a + vd->fbi.dadx / 4096.0f * dx01 + vd->fbi.dady / 4096.0f * dy01;
+	vd->fbi.svert[2].r = vd->fbi.svert[0].r + vd->fbi.drdx / 4096.0f * dx02 + vd->fbi.drdy / 4096.0f * dy02;
+	vd->fbi.svert[2].g = vd->fbi.svert[0].g + vd->fbi.dgdx / 4096.0f * dx02 + vd->fbi.dgdy / 4096.0f * dy02;
+	vd->fbi.svert[2].b = vd->fbi.svert[0].b + vd->fbi.dbdx / 4096.0f * dx02 + vd->fbi.dbdy / 4096.0f * dy02;
+	vd->fbi.svert[2].a = vd->fbi.svert[0].a + vd->fbi.dadx / 4096.0f * dx02 + vd->fbi.dady / 4096.0f * dy02;
+
+	// Setup Z
+	vd->fbi.svert[0].z = vd->fbi.startz / 4096.0f;
+	vd->fbi.svert[1].z = vd->fbi.svert[0].z + vd->fbi.dzdx / 4096.0f * dx01 + vd->fbi.dzdy / 4096.0f * dy01;
+	vd->fbi.svert[2].z = vd->fbi.svert[0].z + vd->fbi.dzdx / 4096.0f * dx02 + vd->fbi.dzdy / 4096.0f * dy02;
+
+	// Setup W
+	// If w==0 then the rasterizer will pare the pixels.  Assume 0 means no perspective correction.
+	if (vd->fbi.startw == 0) {
+		vd->fbi.svert[0].wb = 1.0f;
+	}
+	else {
+		vd->fbi.svert[0].wb = vd->fbi.startw / 65536.0f / 65536.0f;
+	}
+	vd->fbi.svert[1].wb = vd->fbi.svert[0].wb + vd->fbi.dwdx / 65536.0f / 65536.0f * dx01 + vd->fbi.dwdy / 65536.0f / 65536.0f * dy01;
+	vd->fbi.svert[2].wb = vd->fbi.svert[0].wb + vd->fbi.dwdx / 65536.0f / 65536.0f * dx02 + vd->fbi.dwdy / 65536.0f / 65536.0f * dy02;
+
+	// Setup TMU0 s, t, w
+	vd->fbi.svert[0].s0 = vd->tmu[0].starts / 65536.0f / 65536.0f;
+	vd->fbi.svert[1].s0 = vd->fbi.svert[0].s0 + vd->tmu[0].dsdx / 65536.0f / 65536.0f * dx01 + vd->tmu[0].dsdy / 65536.0f / 65536.0f * dy01;
+	vd->fbi.svert[2].s0 = vd->fbi.svert[0].s0 + vd->tmu[0].dsdx / 65536.0f / 65536.0f * dx02 + vd->tmu[0].dsdy / 65536.0f / 65536.0f * dy02;
+	vd->fbi.svert[0].t0 = vd->tmu[0].startt / 65536.0f / 65536.0f;
+	vd->fbi.svert[1].t0 = vd->fbi.svert[0].t0 + vd->tmu[0].dtdx / 65536.0f / 65536.0f * dx01 + vd->tmu[0].dtdy / 65536.0f / 65536.0f * dy01;
+	vd->fbi.svert[2].t0 = vd->fbi.svert[0].t0 + vd->tmu[0].dtdx / 65536.0f / 65536.0f * dx02 + vd->tmu[0].dtdy / 65536.0f / 65536.0f * dy02;
+	vd->fbi.svert[0].w0 = vd->tmu[0].startw / 65536.0f / 65536.0f;
+	vd->fbi.svert[1].w0 = vd->fbi.svert[0].w0 + vd->tmu[0].dwdx / 65536.0f / 65536.0f * dx01 + vd->tmu[0].dwdy / 65536.0f / 65536.0f * dy01;
+	vd->fbi.svert[2].w0 = vd->fbi.svert[0].w0 + vd->tmu[0].dwdx / 65536.0f / 65536.0f * dx02 + vd->tmu[0].dwdy / 65536.0f / 65536.0f * dy02;
+
+	// Setup TMU1 s, t, w
+	vd->fbi.svert[0].s1 = vd->tmu[1].starts / 65536.0f / 65536.0f;
+	vd->fbi.svert[1].s1 = vd->fbi.svert[0].s1 + vd->tmu[1].dsdx / 65536.0f / 65536.0f * dx01 + vd->tmu[1].dsdy / 65536.0f / 65536.0f * dy01;
+	vd->fbi.svert[2].s1 = vd->fbi.svert[0].s1 + vd->tmu[1].dsdx / 65536.0f / 65536.0f * dx02 + vd->tmu[1].dsdy / 65536.0f / 65536.0f * dy02;
+	vd->fbi.svert[0].t1 = vd->tmu[1].startt / 65536.0f / 65536.0f;
+	vd->fbi.svert[1].t1 = vd->fbi.svert[0].t1 + vd->tmu[1].dtdx / 65536.0f / 65536.0f * dx01 + vd->tmu[1].dtdy / 65536.0f / 65536.0f * dy01;
+	vd->fbi.svert[2].t1 = vd->fbi.svert[0].t1 + vd->tmu[1].dtdx / 65536.0f / 65536.0f * dx02 + vd->tmu[1].dtdy / 65536.0f / 65536.0f * dy02;
+	vd->fbi.svert[0].w1 = vd->tmu[1].startw / 65536.0f / 65536.0f;
+	vd->fbi.svert[1].w1 = vd->fbi.svert[0].w1 + vd->tmu[1].dwdx / 65536.0f / 65536.0f * dx01 + vd->tmu[1].dwdy / 65536.0f / 65536.0f * dy01;
+	vd->fbi.svert[2].w1 = vd->fbi.svert[0].w1 + vd->tmu[1].dwdx / 65536.0f / 65536.0f * dx02 + vd->tmu[1].dwdy / 65536.0f / 65536.0f * dy02;
+
+	// Draw the triangle
+	gpu_draw_triangle(vd);
+
+	// Area
+	//float area = ((vd->fbi.svert[0].x - vd->fbi.svert[1].x) * (vd->fbi.svert[0].y - vd->fbi.svert[2].y) -
+	//	(vd->fbi.svert[0].x - vd->fbi.svert[2].x) * (vd->fbi.svert[0].y - vd->fbi.svert[1].y)) / 2.0f;
+
+	float area2x =
+		abs((vd->fbi.svert[0].x*(vd->fbi.svert[1].y - vd->fbi.svert[2].y)
+			+ vd->fbi.svert[1].x*(vd->fbi.svert[2].y - vd->fbi.svert[0].y)
+			+ vd->fbi.svert[2].x*(vd->fbi.svert[0].y - vd->fbi.svert[1].y)));
+	/* 1 pixel per clock, plus some setup time */
+	INT32 cycles = TRIANGLE_SETUP_CLOCKS + (INT32(area2x) >> 1);
+	if (LOG_REGISTERS) vd->device->logerror("cycles = %d\n", cycles);
+
+	return cycles;
+}
+
+/*-------------------------------------------------
+gpu_draw_triangle - send triangle to gpu
+-------------------------------------------------*/
+
+void voodoo_device::gpu_draw_triangle(voodoo_device *vd)
+{
+	/* determine the number of TMUs involved */
+	int texcount = 0;
+	if (!FBIINIT3_DISABLE_TMUS(vd->reg[fbiInit3].u) && FBZCP_TEXTURE_ENABLE(vd->reg[fbzColorPath].u))
+	{
+		texcount = 1;
+		if (vd->chipmask & 0x04)
+			texcount = 2;
+	}
+
+	/* fill in texture 0 parameters */
+	if (texcount > 0)
+	{
+		/* if the texture parameters are dirty, update them */
+		if (vd->tmu[0].regdirty)
+		{
+			recompute_texture_params(&vd->tmu[0]);
+			if (vd->tmu[0].lodmin < (8 << 8)) {
+				voodoo_gpu::texDescription texDesc;
+				texDesc.lodMask = vd->tmu[0].lodmask;
+				texDesc.ram = vd->tmu[0].ram;
+				texDesc.sSize = vd->tmu[0].wmask + 1;
+				texDesc.tSize = vd->tmu[0].hmask + 1;
+				texDesc.texMask = vd->tmu[0].mask;
+				texDesc.texBase = vd->tmu[0].lodoffset;
+				texDesc.texFormat = TEXMODE_FORMAT(vd->tmu[0].reg[textureMode].u);
+				texDesc.texLookup = reinterpret_cast<UINT32*>(vd->tmu[0].lookup);
+				texDesc.sendConfig = vd->send_config;
+				texDesc.tmuConfig = vd->tmu_config;
+				vd->m_gpu.CreateTexture(texDesc, 0, vd->tmu[0].reg[textureMode].u, vd->tmu[0].reg[tLOD].u, vd->tmu[0].reg[tDetail].u);
+			}
+		}
+		vd->stats.texture_mode[TEXMODE_FORMAT(vd->tmu[0].reg[textureMode].u)]++;
+
+		/* fill in texture 1 parameters */
+		if (texcount > 1)
+		{
+			/* if the texture parameters are dirty, update them */
+			if (vd->tmu[1].regdirty)
+			{
+				recompute_texture_params(&vd->tmu[1]);
+				if (vd->tmu[1].lodmin < (8 << 8)) {
+					voodoo_gpu::texDescription texDesc;
+					texDesc.lodMask = vd->tmu[1].lodmask;
+					texDesc.ram = vd->tmu[1].ram;
+					texDesc.sSize = vd->tmu[1].wmask + 1;
+					texDesc.tSize = vd->tmu[1].hmask + 1;
+					texDesc.texMask = vd->tmu[1].mask;
+					texDesc.texBase = vd->tmu[1].lodoffset;
+					texDesc.texFormat = TEXMODE_FORMAT(vd->tmu[1].reg[textureMode].u);
+					texDesc.texLookup = reinterpret_cast<UINT32*>(vd->tmu[1].lookup);
+					texDesc.sendConfig = vd->send_config;
+					texDesc.tmuConfig = vd->tmu_config;
+					vd->m_gpu.CreateTexture(texDesc, 1, vd->tmu[1].reg[textureMode].u, vd->tmu[1].reg[tLOD].u, vd->tmu[1].reg[tDetail].u);
+				}
+			}
+			vd->stats.texture_mode[TEXMODE_FORMAT(vd->tmu[1].reg[textureMode].u)]++;
+		}
+	}
+
+	vd->m_gpu.UpdateTexCtrl((texcount > 0) && vd->tmu[0].lodmin < (8 << 8), (texcount > 1) && vd->tmu[1].lodmin < (8 << 8));
+	vd->m_gpu.DrawTriangle(reinterpret_cast<voodoo_gpu::ShaderVertex*>(vd->fbi.svert));
+
+	/* update stats */
+	vd->reg[fbiTrianglesOut].u++;
+
+	/* update stats */
+	vd->stats.total_triangles++;
+}
+
+#endif // VOODOO_GPU_ACCEL
 
 /***************************************************************************
     TRIANGLE HELPERS
@@ -5409,6 +5673,12 @@ INT32 voodoo_device::setup_and_draw_triangle(voodoo_device *vd)
 		/* if our sign matches the culling sign, we're done for */
 		if (divisor_sign == culling_sign)
 			return TRIANGLE_SETUP_CLOCKS;
+	}
+
+	if USE_GPU {
+		gpu_draw_triangle(vd);
+		// TODO: Check if number of pixels is correct
+		return TRIANGLE_SETUP_CLOCKS + (INT32(abs(divisor)) >> 1);
 	}
 
 	// Finish the divisor

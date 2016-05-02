@@ -826,6 +826,8 @@ if (VIDEOS["VOODOO"]~=null) then
 		MAME_DIR .. "src/devices/video/voodoo.cpp",
 		MAME_DIR .. "src/devices/video/voodoo.h",
 		MAME_DIR .. "src/devices/video/vooddefs.h",
+		MAME_DIR .. "src/devices/video/voodoo_gpu.cpp",
+		MAME_DIR .. "src/devices/video/voodoo_gpu.h",
 	}
 end
 

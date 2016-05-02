@@ -13,6 +13,11 @@
 
 #include "video/polylgcy.h"
 
+#define VOODOO_GPU_ACCEL
+#ifdef VOODOO_GPU_ACCEL
+#include "video/voodoo_gpu.h"
+#endif
+
 #pragma once
 
 
@@ -1808,6 +1813,11 @@ public:
 	static INT32 triangle(voodoo_device *vd);
 	static INT32 begin_triangle(voodoo_device *vd);
 	static INT32 draw_triangle(voodoo_device *vd);
+#ifdef VOODOO_GPU_ACCEL
+	voodoo_gpu m_gpu;
+	static INT32 gpu_setup_triangle(voodoo_device *vd);
+	static void gpu_draw_triangle(voodoo_device *vd);
+#endif
 	static INT32 setup_and_draw_triangle(voodoo_device *vd);
 	static INT32 triangle_create_work_item(voodoo_device* vd,UINT16 *drawbuf, int texcount);
 	static raster_info *add_rasterizer(voodoo_device *vd, const raster_info *cinfo);
