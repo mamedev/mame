@@ -1512,11 +1512,11 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPNAME( 0x20, 0x20, "Max Bonus" )  // OK
 	PORT_DIPSETTING(    0x20, "10000" )  // OK
 	PORT_DIPSETTING(    0x00, "20000" )  // OK
-	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Bet" )
-	PORT_DIPSETTING(    0xc0, "0" )
-	PORT_DIPSETTING(    0x80, "8" )
-	PORT_DIPSETTING(    0x40, "16" )
-	PORT_DIPSETTING(    0x00, "32" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Bet" )  // OK
+	PORT_DIPSETTING(    0xc0, "0" )  // OK
+	PORT_DIPSETTING(    0x80, "8" )  // OK
+	PORT_DIPSETTING(    0x40, "16" )  // OK
+	PORT_DIPSETTING(    0x00, "32" )  // OK
 
 	PORT_START("DSW4")  /* AY8910 port B */
 	PORT_DIPNAME( 0x07, 0x07, "Remote Credits" )
