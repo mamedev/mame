@@ -1466,9 +1466,9 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPNAME( 0x40, 0x00, "Bonus Score" )  // OK
 	PORT_DIPSETTING(    0x40, "32" )  // OK
 	PORT_DIPSETTING(    0x00, "24" )  // OK
-	PORT_DIPNAME( 0x80, 0x00, "Key Out" )
-	PORT_DIPSETTING(    0x00, "x1" )
-	PORT_DIPSETTING(    0x80, "x100" )
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )  // OK
+	PORT_DIPSETTING(    0x00, "x1" )  // OK
+	PORT_DIPSETTING(    0x80, "x100" )  // OK
 
 	PORT_START("DSW2")  /* $10 (PPI1 port A) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
