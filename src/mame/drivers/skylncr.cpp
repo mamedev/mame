@@ -1536,10 +1536,10 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPNAME( 0x20, 0x00, "Lit" )  // OK
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )  // OK
 	PORT_DIPSETTING(    0x00, "Yes (50.000)"  // OK, 50.000
-	PORT_DIPNAME( 0x40, 0x40, "Control" )  // OK
+	PORT_DIPNAME( 0x40, 0x00, "Control" )  // OK
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )  // OK
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )  // OK
-	PORT_DIPNAME( 0x80, 0x80, "Reel Cover" )  // OK
+	PORT_DIPNAME( 0x80, 0x00, "Reel Cover" )  // OK
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )  // OK
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )  // OK
 INPUT_PORTS_END
@@ -1963,4 +1963,4 @@ GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr,  ROT
 GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr,  ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
 GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
 GAME( 199?, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr,  ROT0, "bootleg",              "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_NOT_WORKING )
-GAME( 2000, sonikfig, 0,       skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_NOT_WORKING )
+GAME( 2000, sonikfig, 0,       skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )
