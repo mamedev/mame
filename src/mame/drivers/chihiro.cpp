@@ -1327,6 +1327,13 @@ ROM_START( wangmid )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-5101-com.data", 0x00, 0x50, CRC(3af801f3) SHA1(e9a2558930f3f1f55d5b3c2cadad69329d931f26) )
+
+	ROM_REGION( 0x20000, "card_reader", ROMREGION_ERASE)
+	// CRP1231LR10     8B16
+	// Ver. 01.10      ???
+	// 01/10/12        NA
+	// ?? : ME163-5258Z01
+	ROM_LOAD("crp1231lr10_ver0110.ic2", 0, 0x20000, CRC(0d30707c) SHA1(425e25c6203d0b400d12391916db3f7cdad00f7a) ) // H8/3003 code
 ROM_END
 
 ROM_START( ghostsqo )
