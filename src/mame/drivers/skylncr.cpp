@@ -25,11 +25,6 @@
 
   - Press key 0 to navigate between statistics pages. Press START to exit the mode.
 
-
-  TODO:
-
-  - Proper M5M82C255 device emulation.
-
 ****************************************************************************************************
 
   Settings:
@@ -83,6 +78,28 @@
   all statistics and the whole historial by winning hand.
 
   Press START (key 1) to exit the mode.
+
+****************************************************************************************************
+
+  Game specific notes...
+
+  * Sonik Fighter
+
+  The game is encrypted, and runs with an obfuscated daughterboard in place of the CPU.
+  Even when I have the attract working, accepting coins, getting sounds and accurate inputs,
+  the game is still not working. Once coined, there's no way to start a game.
+
+  The PPI0 port B, D5 input line behaves like a reset, when the Attract/Girls DSW is set OFF.
+  Need more investigation about...
+
+  Colors are wrong due to can't find a way to set the palette.
+
+****************************************************************************************************
+
+  TODO:
+
+  - Proper M5M82C255 device emulation.
+  - Colors: Find the palette in Sonik Fighter.
 
 ***************************************************************************************************/
 
