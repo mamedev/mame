@@ -1505,9 +1505,7 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPSETTING(    0x05, "1 Coin / 40 Credits" )  // OK on test, always 1c-1c in game...
 	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )  // OK on test, always 1c-1c in game...
 	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credit" )  // OK on test, always 1c-1c in game...
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )  // This input should be turned ON, otherwise you can't enter the setup (F2)
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
