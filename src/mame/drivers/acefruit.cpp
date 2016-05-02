@@ -13,6 +13,7 @@ Inputs and Dip Switches by Stephh
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 #include "sidewndr.lh"
 
@@ -329,7 +330,7 @@ static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
 	AM_RANGE(0xa002, 0xa003) AM_WRITE(acefruit_coin_w)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(acefruit_solenoid_w)
 	AM_RANGE(0xa005, 0xa006) AM_WRITE(acefruit_sound_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -609,6 +610,8 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	MCFG_CPU_PROGRAM_MAP(acefruit_map)
 	MCFG_CPU_IO_MAP(acefruit_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", acefruit)
 

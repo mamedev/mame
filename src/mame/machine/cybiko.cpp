@@ -27,13 +27,13 @@
 DRIVER_INIT_MEMBER(cybiko_state,cybiko)
 {
 	_logerror( 0, ("init_cybikov1\n"));
-	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, 0, 0x200000 - m_ram->size(), m_ram->pointer());
+	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, m_ram->pointer());
 }
 
 DRIVER_INIT_MEMBER(cybiko_state,cybikoxt)
 {
 	_logerror( 0, ("init_cybikoxt\n"));
-	m_maincpu->space(AS_PROGRAM).install_ram(0x400000, 0x400000 + m_ram->size() - 1, 0, 0x200000 - m_ram->size(), m_ram->pointer());
+	m_maincpu->space(AS_PROGRAM).install_ram(0x400000, 0x400000 + m_ram->size() - 1, m_ram->pointer());
 }
 
 QUICKLOAD_LOAD_MEMBER( cybiko_state, cybiko )
@@ -62,12 +62,6 @@ QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
 
 void cybiko_state::machine_start()
 {
-	_logerror( 0, ("machine_start_cybikov1\n"));
-	// serial port
-	cybiko_rs232_init();
-	// other
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cybiko_state::machine_stop_cybiko),this));
-
 	int nvram_size = RAMDISK_SIZE;
 
 	if (m_ram->size() < nvram_size)
@@ -84,91 +78,6 @@ void cybiko_state::machine_start()
 
 void cybiko_state::machine_reset()
 {
-	_logerror( 0, ("machine_reset_cybikov1\n"));
-	cybiko_rs232_reset();
-}
-
-//////////////////
-// MACHINE STOP //
-//////////////////
-
-void cybiko_state::machine_stop_cybiko()
-{
-	_logerror( 0, ("machine_stop_cybikov1\n"));
-	// serial port
-	cybiko_rs232_exit();
-}
-
-///////////
-// RS232 //
-///////////
-
-
-void cybiko_state::cybiko_rs232_init()
-{
-	_logerror( 0, ("cybiko_rs232_init\n"));
-	memset( &m_rs232, 0, sizeof(m_rs232));
-//  machine().scheduler().timer_pulse(TIME_IN_HZ( 10), FUNC(rs232_timer_callback));
-}
-
-void cybiko_state::cybiko_rs232_exit()
-{
-	_logerror( 0, ("cybiko_rs232_exit\n"));
-}
-
-void cybiko_state::cybiko_rs232_reset()
-{
-	_logerror( 0, ("cybiko_rs232_reset\n"));
-}
-
-void cybiko_state::cybiko_rs232_write_byte( int data )
-{
-//  printf( "%c", data);
-}
-
-void cybiko_state::cybiko_rs232_pin_sck( int data )
-{
-	_logerror( 3, ("cybiko_rs232_pin_sck (%d)\n", data));
-	// clock high-to-low
-	if ((m_rs232.pin.sck == 1) && (data == 0))
-	{
-		// transmit
-		if (m_rs232.pin.txd) m_rs232.tx_byte = m_rs232.tx_byte | (1 << m_rs232.tx_bits);
-		m_rs232.tx_bits++;
-		if (m_rs232.tx_bits == 8)
-		{
-			m_rs232.tx_bits = 0;
-			cybiko_rs232_write_byte(m_rs232.tx_byte);
-			m_rs232.tx_byte = 0;
-		}
-		// receive
-		m_rs232.pin.rxd = (m_rs232.rx_byte >> m_rs232.rx_bits) & 1;
-		m_rs232.rx_bits++;
-		if (m_rs232.rx_bits == 8)
-		{
-			m_rs232.rx_bits = 0;
-			m_rs232.rx_byte = 0;
-		}
-	}
-	// save sck
-	m_rs232.pin.sck = data;
-}
-
-void cybiko_state::cybiko_rs232_pin_txd( int data )
-{
-	_logerror( 3, ("cybiko_rs232_pin_txd (%d)\n", data));
-	m_rs232.pin.txd = data;
-}
-
-int cybiko_state::cybiko_rs232_pin_rxd()
-{
-	_logerror( 3, ("cybiko_rs232_pin_rxd\n"));
-	return m_rs232.pin.rxd;
-}
-
-int cybiko_state::cybiko_rs232_rx_queue()
-{
-	return 0;
 }
 
 /////////////////////////

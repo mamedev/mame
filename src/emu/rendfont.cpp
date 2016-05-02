@@ -32,7 +32,7 @@ inline const char *next_line(const char *ptr)
 	// scan forward until we hit the end or a carriage return
 	while (*ptr != 13 && *ptr != 10 && *ptr != 0) ptr++;
 
-	// if we hit the end, return NULL
+	// if we hit the end, return nullptr
 	if (*ptr == 0)
 		return nullptr;
 
@@ -420,11 +420,11 @@ float render_font::string_width(float height, float aspect, const char *string)
 	const char *ends = string + strlen(string);
 	const char *s = string;
 	unicode_char schar;
-	
+
 	// loop over characters
 	while (*s != 0)
 	{
-		int	scharcount = uchar_from_utf8(&schar, s, ends - s);
+		int scharcount = uchar_from_utf8(&schar, s, ends - s);
 		totwidth += get_char(schar).width;
 		s += scharcount;
 	}

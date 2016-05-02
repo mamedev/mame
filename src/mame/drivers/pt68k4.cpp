@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert, R. Belmont
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     Peripheral Technology PT68K2/PT68K4 family

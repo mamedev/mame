@@ -102,7 +102,7 @@ READ8_MEMBER(neogeo_dial_device::in0_r)
 		res = m_joy1->read();
 	else
 		res = m_dial1->read();
-	
+
 	return res;
 }
 
@@ -117,7 +117,7 @@ READ8_MEMBER(neogeo_dial_device::in1_r)
 		res = m_joy2->read();
 	else
 		res = m_dial2->read();
-	
+
 	return res;
 }
 
@@ -129,4 +129,3 @@ void neogeo_dial_device::write_ctrlsel(UINT8 data)
 {
 	m_ctrl_sel = data;
 }
-

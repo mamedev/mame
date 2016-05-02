@@ -2161,7 +2161,7 @@ avi_file::error avi_file_impl::get_next_chunk_internal(const avi_chunk *parent, 
 	std::uint8_t buffer[12];
 	std::uint32_t bytesread;
 
-	/* NULL parent implies the root */
+	/* nullptr parent implies the root */
 	if (parent == nullptr)
 		parent = &m_rootchunk;
 

@@ -301,7 +301,7 @@ void dsp32c_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -550,7 +550,7 @@ void dsp32c_device::update_pins(void)
 //  CORE INCLUDE
 //**************************************************************************
 
-#include "dsp32ops.inc"
+#include "dsp32ops.hxx"
 
 
 

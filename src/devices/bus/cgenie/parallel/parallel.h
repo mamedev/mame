@@ -33,7 +33,7 @@
 
 #define MCFG_PARALLEL_SLOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PARALLEL_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(parallel_slot_carts, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(parallel_slot_carts, nullptr, false)
 
 
 //**************************************************************************

@@ -68,7 +68,7 @@ NETLIB_SUBDEVICE(7448_sub,
 
 NETLIB_DEVICE(7448,
 public:
-	NETLIB_NAME(7448_sub) sub;
+	NETLIB_SUB(7448_sub) sub;
 
 	logic_input_t m_LTQ;
 	logic_input_t m_BIQ;

@@ -739,7 +739,7 @@ const char* viper_state::epic_get_register_name(UINT32 reg)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 #endif
 

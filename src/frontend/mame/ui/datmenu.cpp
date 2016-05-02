@@ -9,9 +9,9 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "mame.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
-#include "drivenum.h"
 #include "rendfont.h"
 #include "ui/datfile.h"
 #include "ui/datmenu.h"
@@ -22,14 +22,14 @@
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, const game_driver *driver)
-	: ui_menu(machine, container)
+ui_menu_dats_view::ui_menu_dats_view(mame_ui_manager &mui, render_container *container, const game_driver *driver)
+	: ui_menu(mui, container)
 	, m_actual(0)
-	, m_driver((driver == nullptr) ? &machine.system() : driver)
+	, m_driver((driver == nullptr) ? &mui.machine().system() : driver)
 	, m_issoft(false)
 
 {
-	for (device_image_interface &image : image_interface_iterator(machine.root_device()))
+	for (device_image_interface &image : image_interface_iterator(mui.machine().root_device()))
 	{
 		if (image.filename())
 		{
@@ -47,10 +47,10 @@ ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container 
 //  ctor
 //-------------------------------------------------
 
-ui_menu_dats_view::ui_menu_dats_view(running_machine &machine, render_container *container, ui_software_info *swinfo, const game_driver *driver)
-	: ui_menu(machine, container)
+ui_menu_dats_view::ui_menu_dats_view(mame_ui_manager &mui, render_container *container, ui_software_info *swinfo, const game_driver *driver)
+	: ui_menu(mui, container)
 	, m_actual(0)
-	, m_driver((driver == nullptr) ? &machine.system() : driver)
+	, m_driver((driver == nullptr) ? &mui.machine().system() : driver)
 	, m_swinfo(swinfo)
 	, m_list(swinfo->listname)
 	, m_short(swinfo->shortname)
@@ -109,8 +109,8 @@ void ui_menu_dats_view::populate()
 	(m_issoft == true) ? get_data_sw() : get_data();
 
 	item_append(MENU_SEPARATOR_ITEM, nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), nullptr);
-	customtop = 2.0f * mame_machine_manager::instance()->ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
-	custombottom = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = 2.0f * ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
+	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 
 	if (!paused)
 		machine().resume();
@@ -122,13 +122,12 @@ void ui_menu_dats_view::populate()
 
 void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 	float maxwidth = origx2 - origx1;
 	float width;
 	std::string driver = (m_issoft == true) ? m_swinfo->longname : m_driver->description;
 
-	mui.draw_text_full(container, driver.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, driver.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(maxwidth, width);
 
@@ -136,24 +135,24 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	float x1 = 0.5f - 0.5f * maxwidth;
 	float x2 = x1 + maxwidth;
 	float y1 = origy1 - top;
-	float y2 = origy1 - 2.0f * UI_BOX_TB_BORDER - mui.get_line_height();
+	float y2 = origy1 - 2.0f * UI_BOX_TB_BORDER - ui().get_line_height();
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
 	x2 -= UI_BOX_LR_BORDER;
 	y1 += UI_BOX_TB_BORDER;
 
-	mui.draw_text_full(container, driver.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	ui().draw_text_full(container, driver.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	maxwidth = 0;
 	for (auto & elem : m_items_list)
 	{
-		mui.draw_text_full(container, elem.label.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-			DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+		ui().draw_text_full(container, elem.label.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+			DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		maxwidth += width;
 	}
 
@@ -163,10 +162,10 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	x1 -= UI_BOX_LR_BORDER;
 	x2 += UI_BOX_LR_BORDER;
 	y1 = y2 + UI_BOX_TB_BORDER;
-	y2 += mui.get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+	y2 += ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
 	x2 -= UI_BOX_LR_BORDER;
@@ -179,13 +178,13 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 		x1 += space;
 		rgb_t fcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0x00) : UI_TEXT_COLOR;
 		rgb_t bcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
-		mui.draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER, DRAW_NONE, fcolor, bcolor, &width, nullptr);
+		ui().draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER, DRAW_NONE, fcolor, bcolor, &width, nullptr);
 
 		if (bcolor != UI_TEXT_BG_COLOR)
-			mui.draw_textured_box(container, x1 - (space / 2), y1, x1 + width + (space / 2), y2, bcolor, rgb_t(255, 43, 43, 43),
+			ui().draw_textured_box(container, x1 - (space / 2), y1, x1 + width + (space / 2), y2, bcolor, rgb_t(255, 43, 43, 43),
 				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
-		mui.draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER, DRAW_NORMAL, fcolor, bcolor, &width, nullptr);
+		ui().draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER, DRAW_NORMAL, fcolor, bcolor, &width, nullptr);
 		x1 += width + space;
 		++x;
 	}
@@ -193,7 +192,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	// bottom
 	std::string revision;
 	revision.assign(_("Revision: ")).append(m_items_list[m_actual].revision);
-	mui.draw_text_full(container, revision.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, revision.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(origx2 - origx1, width);
 
@@ -204,7 +203,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	y2 = origy2 + bottom;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -212,7 +211,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, revision.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui().draw_text_full(container, revision.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
@@ -245,7 +244,7 @@ void ui_menu_dats_view::get_data()
 	else
 		mame_machine_manager::instance()->datfile().load_data_info(m_driver, buffer, m_items_list[m_actual].option);
 
-	int lines = mame_machine_manager::instance()->ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	int lines = ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
@@ -268,7 +267,7 @@ void ui_menu_dats_view::get_data_sw()
 			mame_machine_manager::instance()->datfile().load_software_info(m_swinfo->listname, buffer, m_swinfo->shortname, m_swinfo->parentname);
 	}
 
-	int lines = mame_machine_manager::instance()->ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	int lines = ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));

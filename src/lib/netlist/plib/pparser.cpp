@@ -352,7 +352,7 @@ ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 	if (idx >= 0)
 		return &m_defines.value_at(idx);
 	else
-		return NULL;
+		return nullptr;
 }
 
 pstring ppreprocessor::replace_macros(const pstring &line)
@@ -362,7 +362,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 	for (std::size_t i=0; i<elems.size(); i++)
 	{
 		define_t *def = get_define(elems[i]);
-		if (def != NULL)
+		if (def != nullptr)
 			ret.cat(def->m_replace);
 		else
 			ret.cat(elems[i]);
@@ -403,13 +403,13 @@ pstring  ppreprocessor::process_line(const pstring &line)
 		else if (lti[0].equals("#ifdef"))
 		{
 			m_level++;
-			if (get_define(lti[1]) == NULL)
+			if (get_define(lti[1]) == nullptr)
 				m_ifflag |= (1 << m_level);
 		}
 		else if (lti[0].equals("#ifndef"))
 		{
 			m_level++;
-			if (get_define(lti[1]) != NULL)
+			if (get_define(lti[1]) != nullptr)
 				m_ifflag |= (1 << m_level);
 		}
 		else if (lti[0].equals("#else"))

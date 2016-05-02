@@ -53,7 +53,7 @@ class osd_monitor_info
 {
 public:
 	osd_monitor_info(void *handle, const char *monitor_device, float aspect)
-	: m_next(NULL), m_handle(handle), m_aspect(aspect)
+	: m_next(nullptr), m_is_primary(false), m_handle(handle), m_aspect(aspect)
 	{
 		strncpy(m_name, monitor_device, ARRAY_LENGTH(m_name) - 1);
 	}
@@ -62,21 +62,21 @@ public:
 
 	virtual void refresh() = 0;
 
-	const void *oshandle() { return m_handle; }
+	const void *oshandle() const { return m_handle; }
 
-	const osd_rect &position_size() { return m_pos_size; }
-	const osd_rect &usuable_position_size() { return m_usuable_pos_size; }
+	const osd_rect &position_size() const { return m_pos_size; }
+	const osd_rect &usuable_position_size() const { return m_usuable_pos_size; }
 
 	const char *devicename() { return m_name[0] ? m_name : "UNKNOWN"; }
 
-	float aspect() { return m_aspect; }
-	float pixel_aspect() { return m_aspect / ((float)m_pos_size.width() / (float)m_pos_size.height()); }
+	float aspect() const { return m_aspect; }
+	float pixel_aspect() const { return m_aspect / ((float)m_pos_size.width() / (float)m_pos_size.height()); }
 
-	void update_resolution(const int new_width, const int new_height) { m_pos_size.resize(new_width, new_height); }
+	void update_resolution(const int new_width, const int new_height) const { m_pos_size.resize(new_width, new_height); }
 	void set_aspect(const float a) { m_aspect = a; }
-	bool is_primary() { return m_is_primary; }
+	bool is_primary() const { return m_is_primary; }
 
-	osd_monitor_info    * next() { return m_next; }   // pointer to next monitor in list
+	osd_monitor_info    * next() const { return m_next; }   // pointer to next monitor in list
 
 	static osd_monitor_info *pick_monitor(osd_options &options, int index);
 	static osd_monitor_info *list;
@@ -114,7 +114,7 @@ public:
 	osd_window()
 	:
 #ifndef OSD_SDL
-		m_dc(0), m_resize_state(0),
+		m_dc(nullptr), m_resize_state(0),
 #endif
 		m_primlist(nullptr),
 		m_index(0),
@@ -162,7 +162,7 @@ public:
 		m_platform_window = window;
 	}
 
-	std::shared_ptr<osd_window> main_window() { return m_main;	}
+	std::shared_ptr<osd_window> main_window() const { return m_main;    }
 	void set_main_window(std::shared_ptr<osd_window> main) { m_main = main; }
 
 	// Clips the pointer to the bounds of this window
@@ -174,9 +174,10 @@ public:
 	virtual void show_pointer() = 0;
 	virtual void hide_pointer() = 0;
 
+	void renderer_reset() { m_renderer.reset(); }
 #ifndef OSD_SDL
 	virtual bool win_has_menu() = 0;
-	// FIXME: cann we replace winwindow_video_window_monitor(NULL) with monitor() ?
+	// FIXME: cann we replace winwindow_video_window_monitor(nullptr) with monitor() ?
 	virtual osd_monitor_info *winwindow_video_window_monitor(const osd_rect *proposed) = 0;
 
 	HDC                     m_dc;       // only used by GDI renderer!
@@ -186,7 +187,7 @@ public:
 
 	render_primitive_list   *m_primlist;
 	osd_window_config       m_win_config;
-	int                     m_index;	
+	int                     m_index;
 protected:
 	int                     m_prescale;
 private:
@@ -225,7 +226,7 @@ public:
 		return m_window.lock();
 	}
 
-	bool has_flags(const int flag) { return ((m_flags & flag)) == flag; }
+	bool has_flags(const int flag) const { return ((m_flags & flag)) == flag; }
 	void set_flags(int aflag) { m_flags |= aflag; }
 	void clear_flags(int aflag) { m_flags &= ~aflag; }
 
@@ -252,8 +253,8 @@ protected:
 
 	/* Internal flags */
 	static const int FI_CHANGED                 = 0x010000;
-	bool        				m_sliders_dirty;
-	std::vector<ui_menu_item>	m_sliders;
+	bool                        m_sliders_dirty;
+	std::vector<ui_menu_item>   m_sliders;
 
 private:
 	std::weak_ptr<osd_window>  m_window;

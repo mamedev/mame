@@ -647,7 +647,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		}
 		m_stopnames[m_numstops++] = symbollist;
 
-		// careful, dirname is NULL if we're coming from internal layout, and our string assignment doesn't like that
+		// careful, dirname is nullptr if we're coming from internal layout, and our string assignment doesn't like that
 		if (dirname != nullptr)
 			m_dirname = dirname;
 
@@ -950,12 +950,12 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 	const char *ends = origs + strlen(origs);
 	const char *s = origs;
 	unicode_char schar;
-	
+
 	// loop over characters
 	while (*s != 0)
 	{
-		int	scharcount = uchar_from_utf8(&schar, s, ends - s);
-		
+		int scharcount = uchar_from_utf8(&schar, s, ends - s);
+
 		if (scharcount == -1)
 			break;
 
@@ -1124,8 +1124,8 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 					// loop over characters
 					while (*s != 0)
 					{
-						int	scharcount = uchar_from_utf8(&schar, s, ends - s);
-		
+						int scharcount = uchar_from_utf8(&schar, s, ends - s);
+
 						if (scharcount == -1)
 							break;
 
@@ -1285,8 +1285,8 @@ void layout_element::component::draw_beltreel(running_machine &machine, bitmap_a
 				// loop over characters
 				while (*s != 0)
 				{
-					int	scharcount = uchar_from_utf8(&schar, s, ends - s);
-		
+					int scharcount = uchar_from_utf8(&schar, s, ends - s);
+
 					if (scharcount == -1)
 						break;
 

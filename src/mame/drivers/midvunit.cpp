@@ -192,7 +192,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 
 	/* bit 3 is the watchdog */
 	if ((olddata ^ m_control_data) & 0x0008)
-		watchdog_reset_w(space, 0, 0);
+		m_watchdog->reset_w(space, 0, 0);
 
 	/* bit 1 is the DCS sound reset */
 	m_dcs->reset_w((~m_control_data >> 1) & 1);
@@ -213,7 +213,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 
 	/* bit 9 is the watchdog */
 	if ((olddata ^ m_control_data) & 0x0200)
-		watchdog_reset_w(space, 0, 0);
+		m_watchdog->reset_w(space, 0, 0);
 
 	/* bit 8 is the LED */
 
@@ -417,7 +417,7 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 			/* bit 0x10 resets watchdog */
 			if ((olddata ^ m_midvplus_misc[offset]) & 0x0010)
 			{
-				watchdog_reset_w(space, 0, 0);
+				m_watchdog->reset_w(space, 0, 0);
 				logit = 0;
 			}
 			break;
@@ -1010,6 +1010,8 @@ static MACHINE_CONFIG_START( midvcommon, midvunit_state )
 
 	MCFG_TIMER_ADD_NONE("timer0")
 	MCFG_TIMER_ADD_NONE("timer1")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)

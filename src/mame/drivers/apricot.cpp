@@ -419,7 +419,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(apricot_state, i8255_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(apricot_state, i8255_portc_w))
 
-	MCFG_PIC8259_ADD("ic31", INPUTLINE("ic91", 0), VCC, NULL)
+	MCFG_PIC8259_ADD("ic31", INPUTLINE("ic91", 0), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("ic16", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_4MHz / 16)

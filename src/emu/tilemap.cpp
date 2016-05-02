@@ -100,7 +100,7 @@ inline bool tilemap_t::gfx_elements_changed()
 //**************************************************************************
 
 //-------------------------------------------------
-//  scanline_draw_opaque_null - draw to a NULL
+//  scanline_draw_opaque_null - draw to a nullptr
 //  bitmap, setting priority only
 //-------------------------------------------------
 
@@ -117,7 +117,7 @@ inline void tilemap_t::scanline_draw_opaque_null(int count, UINT8 *pri, UINT32 p
 
 
 //-------------------------------------------------
-//  scanline_draw_masked_null - draw to a NULL
+//  scanline_draw_masked_null - draw to a nullptr
 //  bitmap using a mask, setting priority only
 //-------------------------------------------------
 

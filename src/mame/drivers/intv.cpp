@@ -471,8 +471,8 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
 
-    MCFG_INTV_CONTROL_PORT_ADD("iopt_right_ctrl", intv_control_port_devices, "handctrl")
-    MCFG_INTV_CONTROL_PORT_ADD("iopt_left_ctrl", intv_control_port_devices, "handctrl")
+	MCFG_INTV_CONTROL_PORT_ADD("iopt_right_ctrl", intv_control_port_devices, "handctrl")
+	MCFG_INTV_CONTROL_PORT_ADD("iopt_left_ctrl", intv_control_port_devices, "handctrl")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

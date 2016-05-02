@@ -546,7 +546,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
 
-			// if no adjustment necessary, return NULL
+			// if no adjustment necessary, return nullptr
 			if (!container.has_brightness_contrast_gamma_changes())
 				return nullptr;
 			return container.bcg_lookup_table(m_format);
@@ -1732,6 +1732,8 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		result = false;
 	}
 
+	emulator_info::layout_file_cb(*rootnode);
+
 	// free the root node
 	xml_file_free(rootnode);
 	return result;
@@ -2123,7 +2125,7 @@ bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_co
 
 //-------------------------------------------------
 //  view_name - return the name of the indexed
-//  view, or NULL if it doesn't exist
+//  view, or nullptr if it doesn't exist
 //-------------------------------------------------
 
 layout_view *render_target::view_by_index(int index) const
@@ -2770,7 +2772,7 @@ void render_manager::font_free(render_font *font)
 
 void render_manager::invalidate_all(void *refptr)
 {
-	// permit NULL
+	// permit nullptr
 	if (refptr == nullptr)
 		return;
 

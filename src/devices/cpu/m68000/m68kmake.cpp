@@ -687,12 +687,12 @@ opcode_struct* find_illegal_opcode(void)
 {
 	opcode_struct* op;
 
-	for(op = g_opcode_input_table;op->name != NULL;op++)
+	for(op = g_opcode_input_table;op->name != nullptr;op++)
 	{
 		if(strcmp(op->name, "illegal") == 0)
 			return op;
 	}
-	return NULL;
+	return nullptr;
 }
 #endif
 

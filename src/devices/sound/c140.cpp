@@ -113,7 +113,7 @@ void c140_device::device_start()
 
 	m_stream = stream_alloc(0, 2, m_sample_rate);
 
-	if (m_rom_ptr != NULL)
+	if (m_rom_ptr != nullptr)
 	{
 		m_pRom = m_rom_ptr;
 	}

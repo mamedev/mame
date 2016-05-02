@@ -500,7 +500,7 @@ static ADDRESS_MAP_START( mcrmono_portmap, AS_IO, 8, mcr3_state )
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP3")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP4")
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x78) AM_WRITE(mcrmono_control_port_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x78) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x78) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xf0, 0xf3) AM_MIRROR(0x0c) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
@@ -529,7 +529,7 @@ static ADDRESS_MAP_START( spyhunt_portmap, AS_IO, 8, mcr3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS("ssio")
 	AM_RANGE(0x84, 0x86) AM_WRITE(spyhunt_scroll_value_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
@@ -1092,7 +1092,9 @@ static MACHINE_CONFIG_START( mcrmono, mcr3_state )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
 
-	MCFG_WATCHDOG_VBLANK_INIT(16)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+
 	MCFG_MACHINE_START_OVERRIDE(mcr3_state,mcr)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr3_state,mcr)
 	MCFG_NVRAM_ADD_0FILL("nvram")

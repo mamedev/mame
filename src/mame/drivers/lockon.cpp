@@ -133,7 +133,7 @@ WRITE16_MEMBER(lockon_state::inten_w)
 
 WRITE16_MEMBER(lockon_state::emres_w)
 {
-	machine().watchdog_reset();
+	m_watchdog->watchdog_reset();
 	m_main_inten = 0;
 }
 
@@ -492,6 +492,7 @@ static MACHINE_CONFIG_START( lockon, lockon_state )
 	MCFG_CPU_PROGRAM_MAP(sound_prg)
 	MCFG_CPU_IO_MAP(sound_io)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

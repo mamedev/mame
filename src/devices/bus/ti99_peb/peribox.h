@@ -247,7 +247,7 @@ protected:
 
 #define MCFG_PERIBOX_SLOT_ADD(_tag, _slot_intf) \
 	MCFG_DEVICE_ADD(_tag, PERIBOX_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false)
 
 #define MCFG_PERIBOX_SLOT_ADD_DEF(_tag, _slot_intf, _default) \
 	MCFG_DEVICE_ADD(_tag, PERIBOX_SLOT, 0) \

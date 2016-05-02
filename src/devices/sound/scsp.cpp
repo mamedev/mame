@@ -518,7 +518,7 @@ void scsp_device::init()
 	memory_region* ram_region = memregion(tag());
 
 	// coolridr.c defines a region for the RAM, stv.c doesn't (uses set_ram_base instead, which seems to be more correct anyway?)
-	if (ram_region != NULL)
+	if (ram_region != nullptr)
 	{
 		m_SCSPRAM = ram_region->base();
 		m_SCSPRAM_LENGTH = ram_region->bytes();

@@ -96,7 +96,6 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
-	DECLARE_WRITE16_MEMBER(darius_watchdog_w);
 	DECLARE_READ16_MEMBER(darius_ioc_r);
 	DECLARE_WRITE16_MEMBER(darius_ioc_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);

@@ -80,6 +80,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/champbas.h"
 
@@ -93,7 +94,7 @@ TODO:
 
 CUSTOM_INPUT_MEMBER(champbas_state::watchdog_bit2)
 {
-	return (0x10 - machine().get_vblank_watchdog_counter()) >> 2 & 1;
+	return (0x10 - m_watchdog->get_vblank_counter()) >> 2 & 1;
 }
 
 WRITE8_MEMBER(champbas_state::irq_enable_w)
@@ -205,7 +206,7 @@ static ADDRESS_MAP_START( champbas_map, AS_PROGRAM, 8, champbas_state )
 
 	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xa0c0, 0xa0c0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 // base map + ALPHA-8x0x protection
@@ -329,7 +330,7 @@ static INPUT_PORTS_START( talbot )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, watchdog_bit2, NULL) // bit 2 of the watchdog counter
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, watchdog_bit2, nullptr) // bit 2 of the watchdog counter
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -528,7 +529,8 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_18_432MHz/6/8)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
-	MCFG_WATCHDOG_VBLANK_INIT(0x10)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -561,7 +563,8 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sound_map)
 
-	MCFG_WATCHDOG_VBLANK_INIT(0x10)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -630,7 +633,8 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_18_432MHz/6/8) // note: 8302 rom, or 8303 on exctscc2 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
-	MCFG_WATCHDOG_VBLANK_INIT(0x10)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -683,7 +687,8 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_18_432MHz/6/8) // champbasj 8201 on pcb, though unused
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
-	MCFG_WATCHDOG_VBLANK_INIT(0x10)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

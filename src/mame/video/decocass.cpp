@@ -244,12 +244,10 @@ void decocass_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	color = (m_color_center_bot >> 4) & 15;
 
-	sy = 192 - (m_part_v_shift & 0x7f);
-
-	if (m_part_h_shift & 0x80)
-		sx = (m_part_h_shift & 0x7f) + 1;
-	else
-		sx = 91 - (m_part_h_shift & 0x7f);
+	sy = 64 - m_part_v_shift + 1;
+	if (sy < 0)
+		sy += 256;
+	sx = m_part_h_shift - 128;
 
 	m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, 0, color, 0, 0, sx + 64, sy, 0);
 	m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, 1, color, 0, 0, sx, sy, 0);
@@ -455,7 +453,7 @@ WRITE8_MEMBER(decocass_state::decocass_back_vr_shift_w )
 
 WRITE8_MEMBER(decocass_state::decocass_part_h_shift_w )
 {
-	if (data == m_part_v_shift )
+	if (data == m_part_h_shift )
 		return;
 	LOG(1,("decocass_part_h_shift_w: $%02x\n", data));
 	m_part_h_shift = data;
@@ -694,9 +692,9 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	if (0 == (m_watchdog_flip & 0x04))
-		machine().watchdog_reset();
+		m_watchdog->watchdog_reset();
 	else if (m_watchdog_count-- > 0)
-		machine().watchdog_reset();
+		m_watchdog->watchdog_reset();
 
 	/* (end) THIS CODE SHOULD NOT BE IN SCREEN UPDATE !! */
 

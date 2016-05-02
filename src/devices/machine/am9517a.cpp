@@ -1337,4 +1337,3 @@ void pcxport_dmac_device::end_of_process()
 
 	m_state = STATE_SI;
 }
-

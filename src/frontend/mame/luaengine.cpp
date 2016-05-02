@@ -20,6 +20,7 @@
 #include "emuopts.h"
 #include "ui/ui.h"
 #include "luaengine.h"
+#include "uiinput.h"
 #include <mutex>
 
 #ifdef __clang__
@@ -40,7 +41,7 @@
 
 #define lua_readline(b,p) \
 	(fputs(p, stdout), fflush(stdout),  /* show prompt */ \
-	fgets(b, LUA_MAXINPUT, stdin) != NULL)  /* get line */
+	fgets(b, LUA_MAXINPUT, stdin) != nullptr)  /* get line */
 
 static lua_State *globalL = nullptr;
 
@@ -1469,7 +1470,7 @@ int lua_engine::lua_screen::l_draw_line(lua_State *L)
 
 //-------------------------------------------------
 //  draw_text - draw text on a screen container
-//	if x is a position, then y is a pixel position, otherwise x and y are screen size relative
+//  if x is a position, then y is a pixel position, otherwise x and y are screen size relative
 //  -> manager:machine().screens[":screen"]:draw_text(x, y, message)
 //-------------------------------------------------
 
@@ -1507,6 +1508,7 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	}
 	const char *msg = luaL_checkstring(L,4);
 	rgb_t textcolor = UI_TEXT_COLOR;
+	rgb_t bgcolor = UI_TEXT_BG_COLOR;
 	if (!lua_isnone(L, 5)) {
 		textcolor = rgb_t(lua_tounsigned(L, 5));
 	}
@@ -1515,7 +1517,7 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	render_container &rc = sc->container();
 	mame_machine_manager::instance()->ui().draw_text_full(&rc, msg, x, y, (1.0f - x),
 						justify, WRAP_WORD, DRAW_NORMAL, textcolor,
-						UI_TEXT_BG_COLOR, nullptr, nullptr);
+						bgcolor, nullptr, nullptr);
 	return 0;
 }
 
@@ -1529,6 +1531,19 @@ int lua_engine::lua_emu_file::l_emu_file_read(lua_State *L)
 	ret = file->file.read(ptr, len);
 	luaL_pushresultsize(&buff, ret);
 	return 1;
+}
+
+int lua_engine::lua_ui_input::l_ui_input_find_mouse(lua_State *L)
+{
+	ui_input_manager *ui_input = luabridge::Stack<ui_input_manager *>::get(L, 1);
+	INT32 x, y;
+	bool button;
+	render_target *target = ui_input->find_mouse(&x, &y, &button);
+	lua_pushnumber(L, x);
+	lua_pushnumber(L, y);
+	lua_pushboolean(L, button);
+	luabridge::Stack<render_target *>::push(L, target);
+	return 4;
 }
 
 void *lua_engine::checkparam(lua_State *L, int idx, const char *tname)
@@ -1669,7 +1684,7 @@ static void *serve_lua(void *param)
 {
 	lua_engine *engine = (lua_engine *)param;
 	engine->serve_lua();
-	return NULL;
+	return nullptr;
 }
 
 //-------------------------------------------------
@@ -1718,121 +1733,38 @@ lua_engine::~lua_engine()
 	close();
 }
 
-int lua_engine::compile_with_env(const char *envname, const char *script, const char *env)
+void lua_engine::call_plugin(const char *data, const char *name)
 {
-	std::string field = std::string("env_").append(envname);
+	std::string field("cb_");
+	field += name;
+	lua_settop(m_lua_state, 0);
+	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
+
+	if(!lua_isfunction(m_lua_state, -1))
+	{
+		lua_pop(m_lua_state, 1);
+		return;
+	}
+	lua_pushstring(m_lua_state, data);
 	int error;
-	lua_settop(m_lua_state, 0);
-	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
-
-	if(!lua_istable(m_lua_state, -1))
+	if((error = lua_pcall(m_lua_state, 1, 0, 0)) != LUA_OK)
 	{
-		lua_newtable(m_lua_state);
-		lua_setfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
-		lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
-	}
-
-	// optionally load a string to prepare the environment
-	if(env)
-	{
-		error = luaL_loadstring(m_lua_state, env);
-		if(error == LUA_OK)
-			lua_pushvalue(m_lua_state, -2);
-		if((error != LUA_OK) || ((error = lua_pcall(m_lua_state, 1, 0, 0)) != LUA_OK))
-		{
-			if((error == LUA_ERRSYNTAX) || (error == LUA_ERRRUN))
-				printf("%s\n", lua_tostring(m_lua_state, -1));
-			lua_pop(m_lua_state, 1);
-		}
-		lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
-	}
-
-	if((error = luaL_loadstring(m_lua_state, script)) != LUA_OK)
-	{
-		if(error == LUA_ERRSYNTAX)
+		if(error == LUA_ERRRUN)
 			printf("%s\n", lua_tostring(m_lua_state, -1));
-		lua_tostring(m_lua_state, -1);
-		lua_pop(m_lua_state, 2);
-		return -1;
+		lua_pop(m_lua_state, 1);
+		return;
 	}
-	lua_pushvalue(m_lua_state, -2);
-	lua_setupvalue(m_lua_state, -2, 1);
-	int ref = luaL_ref(m_lua_state, -2);
-	lua_pop(m_lua_state, 1);
-	return ref;
 }
 
-template <typename Tout, typename Tin>
-Tout lua_engine::run(const char *env, int ref, Tin in)
+int lua_engine::l_emu_register_callback(lua_State *L)
 {
-	Tout ret;
-	lua_settop(m_lua_state, 0);
-	luabridge::Stack<Tin>::push(m_lua_state, in);
-	run_internal(env, ref);
-	if(lua_isnil(m_lua_state, 1))
-		ret = Tout(0);
-	else
-		ret = luabridge::Stack<Tout>::get(m_lua_state, 1);
-	lua_pop(m_lua_state, 1);
-	return ret;
-}
-
-template <typename Tout>
-Tout lua_engine::run(const char *env, int ref)
-{
-	Tout ret;
-	lua_settop(m_lua_state, 0);
-	lua_pushnil(m_lua_state);
-	run_internal(env, ref);
-	if(lua_isnil(m_lua_state, 1))
-		ret = Tout(0);
-	else
-		ret = luabridge::Stack<Tout>::get(m_lua_state, 1);
-	lua_pop(m_lua_state, 1);
-	return ret;
-}
-
-template <typename Tin>
-void lua_engine::run(const char *env, int ref, Tin in)
-{
-	lua_settop(m_lua_state, 0);
-	luabridge::Stack<Tin>::push(m_lua_state, in);
-	run_internal(env, ref);
-	lua_pop(m_lua_state, 1);
-}
-
-void lua_engine::run(const char *env, int ref)
-{
-	lua_settop(m_lua_state, 0);
-	lua_pushnil(m_lua_state);
-	run_internal(env, ref);
-	lua_pop(m_lua_state, 1);
-}
-// create specialization so luabridge doesn't have to be included everywhere
-template int lua_engine::run<int>(const char *env, int ref);
-
-void lua_engine::run_internal(const char *env, int ref)
-{
-	std::string field = std::string("env_").append(env);
-	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
-	if(lua_istable(m_lua_state, -1))
-	{
-		lua_rawgeti(m_lua_state, -1, ref);
-		if(lua_isfunction(m_lua_state, -1))
-		{
-			lua_pushvalue(m_lua_state, -3);
-			int error;
-			if((error = lua_pcall(m_lua_state, 1, 1, 0)) != LUA_OK)
-			{
-				if(error == LUA_ERRRUN)
-					printf("%s\n", lua_tostring(m_lua_state, -1));
-				lua_pop(m_lua_state, 1);
-				lua_pushnil(m_lua_state);
-			}
-		}
-	}
-	lua_replace(m_lua_state, 1);
-	lua_pop(m_lua_state, 1);
+	luaL_argcheck(L, lua_isfunction(L, 1), 1, "callback function expected");
+	luaL_argcheck(L, lua_isstring(L, 2), 2, "name (string) expected");
+	std::string name = luaL_checkstring(L, 2);
+	std::string field = "cb_" + name;
+	lua_pushvalue(L, 1);
+	lua_setfield(L, LUA_REGISTRYINDEX, field.c_str());
+	return 1;
 }
 
 void lua_engine::menu_populate(std::string &menu, std::vector<menu_item> &menu_list)
@@ -2093,26 +2025,26 @@ int lua_engine::lua_machine::l_logerror(lua_State *L)
 
 std::string lua_engine::get_print_buffer(lua_State *L)
 {
-    int nargs = lua_gettop(L);
-    
-    const std::string sep = " ";
-    
-    std::ostringstream ss;
-    bool first = true;
+	int nargs = lua_gettop(L);
 
-    for (int i = 1; i <= nargs; i++) {
-      const char* c = lua_tostring(L, i);
-      const std::string str = c ? c : "<nil>";
-      if (first) first = false;
-      else ss << sep;
-      ss << str;
-    }
+	const std::string sep = " ";
+
+	std::ostringstream ss;
+	bool first = true;
+
+	for (int i = 1; i <= nargs; i++) {
+		const char* c = lua_tostring(L, i);
+		const std::string str = c ? c : "<nil>";
+		if (first) first = false;
+		else ss << sep;
+		ss << str;
+	}
 
 	return ss.str();
 }
 int lua_engine::l_osd_printf_verbose(lua_State *L)
 {
-    osd_printf_verbose("%s\n",get_print_buffer(L).c_str());
+	osd_printf_verbose("%s\n",get_print_buffer(L).c_str());
 	return 0;
 }
 
@@ -2165,6 +2097,7 @@ void lua_engine::initialize()
 			.addCFunction ("register_frame", l_emu_register_frame )
 			.addCFunction ("register_frame_done", l_emu_register_frame_done )
 			.addCFunction ("register_menu",  l_emu_register_menu )
+			.addCFunction ("register_callback",  l_emu_register_callback )
 			.addCFunction ("print_verbose", l_osd_printf_verbose )
 			.addCFunction ("print_error",   l_osd_printf_error )
 			.addCFunction ("print_info",    l_osd_printf_info )
@@ -2196,6 +2129,8 @@ void lua_engine::initialize()
 				.addFunction ("memory", &running_machine::memory)
 				.addFunction ("options", &running_machine::options)
 				.addFunction ("outputs", &running_machine::output)
+				.addFunction ("input", &running_machine::ui_input)
+				.addProperty <bool> ("paused", &running_machine::paused)
 				.addProperty <luabridge::LuaRef, void> ("devices", &lua_engine::l_machine_get_devices)
 				.addProperty <luabridge::LuaRef, void> ("screens", &lua_engine::l_machine_get_screens)
 				.addProperty <luabridge::LuaRef, void> ("images", &lua_engine::l_machine_get_images)
@@ -2368,6 +2303,12 @@ void lua_engine::initialize()
 			.deriveClass <address_space, lua_addr_space> ("addr_space")
 				.addFunction("name", &address_space::name)
 				.addProperty <luabridge::LuaRef, void> ("map", &lua_engine::l_addr_space_map)
+			.endClass()
+			.beginClass <lua_ui_input> ("lua_input")
+				.addCFunction ("find_mouse", &lua_ui_input::l_ui_input_find_mouse)
+			.endClass()
+			.deriveClass <ui_input_manager, lua_ui_input> ("input")
+				.addFunction ("pressed", &ui_input_manager::pressed)
 			.endClass()
 			.beginClass <render_target> ("target")
 				.addFunction ("width", &render_target::width)

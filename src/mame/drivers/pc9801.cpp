@@ -2493,7 +2493,7 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) //system clock = 5 MHz (0) / 8 MHz (1)
 	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pc9801_state, system_type_r, NULL)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pc9801_state, system_type_r, nullptr)
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "System Specification" ) PORT_DIPLOCATION("SW1:1") //jumps to daa00 if off, presumably some card booting
@@ -3210,7 +3210,7 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_common )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pc9801_state, dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pc9801_state, dack3_w))
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc9801_state,get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NOOP) // TODO: Check ir7_w
 
 	MCFG_DEVICE_ADD("ppi8255_sys", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
@@ -3289,7 +3289,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats)
 
 	MCFG_FRAGMENT_ADD(pc9801_sasi)
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
 
 	MCFG_DEVICE_MODIFY("i8237")
 	MCFG_I8237_IN_IOR_3_CB(DEVREAD8("upd765_2dd", upd765a_device, mdma_r))
@@ -3323,7 +3323,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_DEVICE_CLOCK(MAIN_CLOCK_X1*8); // unknown clock
 
 	MCFG_FRAGMENT_ADD(pc9801_ide)
-	MCFG_UPD4990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
+	MCFG_UPD4990A_ADD("upd1990a", XTAL_32_768kHz, NOOP, NOOP)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")

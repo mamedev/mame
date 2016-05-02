@@ -9,16 +9,16 @@ typedef device_delegate<void (address_space &space, UINT16 data, UINT16 mem_mask
 
 
 #define MCFG_DECO146_SET_PORTA_CALLBACK( _class, _method) \
-	deco_146_base_device::set_port_a_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	deco_146_base_device::set_port_a_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_DECO146_SET_PORTB_CALLBACK( _class, _method) \
-	deco_146_base_device::set_port_b_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	deco_146_base_device::set_port_b_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_DECO146_SET_PORTC_CALLBACK( _class, _method) \
-	deco_146_base_device::set_port_c_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	deco_146_base_device::set_port_c_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_DECO146_SET_SOUNDLATCH_CALLBACK( _class, _method) \
-	deco_146_base_device::set_soundlatch_cb(*device, deco146_port_write_cb(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	deco_146_base_device::set_soundlatch_cb(*device, deco146_port_write_cb(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 
 // there are some standard ways the chip gets hooked up, so have them here ready to use

@@ -65,67 +65,6 @@ static void input_character(char *buffer, size_t buffer_length, unicode_char uni
 	}
 }
 
-//-------------------------------------------------
-//  extra_text_draw_box - generically adds header
-//  or footer text
-//-------------------------------------------------
-
-static void extra_text_draw_box(render_container *container, float origx1, float origx2, float origy, float yspan, const char *text, int direction)
-{
-	float text_width, text_height;
-	float width, maxwidth;
-	float x1, y1, x2, y2, temp;
-
-	// get the size of the text
-	mame_machine_manager::instance()->ui().draw_text_full(container,text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD,
-		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &text_width, &text_height);
-	width = text_width + (2 * UI_BOX_LR_BORDER);
-	maxwidth = MAX(width, origx2 - origx1);
-
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy + (yspan * direction);
-	y2 = origy + (UI_BOX_TB_BORDER * direction);
-
-	if (y1 > y2)
-	{
-		temp = y1;
-		y1 = y2;
-		y2 = temp;
-	}
-
-	// draw a box
-	mame_machine_manager::instance()->ui().draw_outlined_box(container,x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	mame_machine_manager::instance()->ui().draw_text_full(container,text, x1, y1, text_width, JUSTIFY_LEFT, WRAP_WORD,
-						DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
-}
-
-
-//-------------------------------------------------
-//  extra_text_render - generically adds header
-//  and footer text
-//-------------------------------------------------
-
-void extra_text_render(render_container *container, float top, float bottom,
-	float origx1, float origy1, float origx2, float origy2,
-	const char *header, const char *footer)
-{
-	header = ((header != nullptr) && (header[0] != '\0')) ? header : nullptr;
-	footer = ((footer != nullptr) && (footer[0] != '\0')) ? footer : nullptr;
-
-	if (header != nullptr)
-		extra_text_draw_box(container, origx1, origx2, origy1, top, header, -1);
-	if (footer != nullptr)
-		extra_text_draw_box(container, origx1, origx2, origy2, bottom, footer, +1);
-}
-
 
 /***************************************************************************
     CONFIRM SAVE AS MENU
@@ -135,8 +74,8 @@ void extra_text_render(render_container *container, float top, float bottom,
 //  ctor
 //-------------------------------------------------
 
-ui_menu_confirm_save_as::ui_menu_confirm_save_as(running_machine &machine, render_container *container, bool *yes)
-	: ui_menu(machine, container)
+ui_menu_confirm_save_as::ui_menu_confirm_save_as(mame_ui_manager &mui, render_container *container, bool *yes)
+	: ui_menu(mui, container)
 {
 	m_yes = yes;
 	*m_yes = false;
@@ -217,8 +156,8 @@ static int is_valid_filename_char(unicode_char unichar)
 //  ctor
 //-------------------------------------------------
 
-ui_menu_file_create::ui_menu_file_create(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool *ok)
-	: ui_menu(machine, container),
+ui_menu_file_create::ui_menu_file_create(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool *ok)
+	: ui_menu(mui, container),
 		m_current_directory(current_directory),
 		m_current_file(current_file),
 		m_current_format(nullptr)
@@ -246,7 +185,7 @@ ui_menu_file_create::~ui_menu_file_create()
 
 void ui_menu_file_create::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	extra_text_render(container, top, bottom, origx1, origy1, origx2, origy2,
+	extra_text_render(top, bottom, origx1, origy1, origx2, origy2,
 		m_current_directory.c_str(),
 		nullptr);
 }
@@ -286,7 +225,7 @@ void ui_menu_file_create::populate()
 	item_append(ui_menu_item_type::SEPARATOR);
 	item_append(_("Create"), nullptr, 0, ITEMREF_CREATE);
 
-	customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 
@@ -315,7 +254,7 @@ void ui_menu_file_create::handle()
 						ui_menu::stack_pop(machine());
 					}
 					else
-						mame_machine_manager::instance()->ui().popup_time(1, "%s", _("Please enter a file extension too"));
+						ui().popup_time(1, "%s", _("Please enter a file extension too"));
 				}
 				break;
 
@@ -345,8 +284,8 @@ void ui_menu_file_create::handle()
 //  ctor
 //-------------------------------------------------
 
-ui_menu_file_selector::ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, int *result)
-	: ui_menu(machine, container),
+ui_menu_file_selector::ui_menu_file_selector(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, int *result)
+	: ui_menu(mui, container),
 		m_current_directory(current_directory),
 		m_current_file(current_file),
 		m_entrylist(nullptr)
@@ -374,7 +313,7 @@ ui_menu_file_selector::~ui_menu_file_selector()
 
 void ui_menu_file_selector::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	extra_text_render(container, top, bottom,
+	extra_text_render(top, bottom,
 		origx1, origy1, origx2, origy2,
 		m_current_directory.c_str(),
 		nullptr);
@@ -612,7 +551,7 @@ void ui_menu_file_selector::populate()
 		set_selection((void *) selected_entry);
 
 	// set up custom render proc
-	customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 
 	if (directory != nullptr)
 		util::zippath_closedir(directory);
@@ -664,7 +603,7 @@ void ui_menu_file_selector::handle()
 					if (err != osd_file::error::NONE)
 					{
 						// this path is problematic; present the user with an error and bail
-						mame_machine_manager::instance()->ui().popup_time(1, "Error accessing %s", entry->fullpath);
+						ui().popup_time(1, "Error accessing %s", entry->fullpath);
 						break;
 					}
 					m_current_directory.assign(entry->fullpath);
@@ -695,7 +634,7 @@ void ui_menu_file_selector::handle()
 				update_selected = TRUE;
 
 				if (ARRAY_LENGTH(m_filename_buffer) > 0)
-					mame_machine_manager::instance()->ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
 			}
 			// if it's any other key and we're not maxed out, update
 			else if (event->unichar >= ' ' && event->unichar < 0x7f)
@@ -705,7 +644,7 @@ void ui_menu_file_selector::handle()
 				update_selected = TRUE;
 
 				if (ARRAY_LENGTH(m_filename_buffer) > 0)
-					mame_machine_manager::instance()->ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
 			}
 
 			if (update_selected)
@@ -778,8 +717,8 @@ void ui_menu_file_selector::handle()
 //  ctor
 //-------------------------------------------------
 
-ui_menu_select_format::ui_menu_select_format(running_machine &machine, render_container *container, floppy_image_format_t **formats, int ext_match, int total_usable, int *result)
-	: ui_menu(machine, container)
+ui_menu_select_format::ui_menu_select_format(mame_ui_manager &mui, render_container *container, floppy_image_format_t **formats, int ext_match, int total_usable, int *result)
+	: ui_menu(mui, container)
 {
 	m_formats = formats;
 	m_ext_match = ext_match;
@@ -839,9 +778,9 @@ void ui_menu_select_format::handle()
 //  ctor
 //-------------------------------------------------
 
-ui_menu_select_rw::ui_menu_select_rw(running_machine &machine, render_container *container,
+ui_menu_select_rw::ui_menu_select_rw(mame_ui_manager &mui, render_container *container,
 										bool can_in_place, int *result)
-	: ui_menu(machine, container)
+	: ui_menu(mui, container)
 {
 	m_can_in_place = can_in_place;
 	m_result = result;

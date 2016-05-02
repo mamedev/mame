@@ -528,7 +528,7 @@ static MACHINE_CONFIG_START( rc759, rc759_state )
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(rc759_state, i186_timer1_w))
 
 	// interrupt controller
-	MCFG_PIC8259_ADD("pic", DEVWRITELINE("maincpu", i80186_cpu_device, int0_w), VCC, NULL)
+	MCFG_PIC8259_ADD("pic", DEVWRITELINE("maincpu", i80186_cpu_device, int0_w), VCC, NOOP)
 
 	// nvram
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", rc759_state, nvram_init)

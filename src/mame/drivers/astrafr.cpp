@@ -2090,7 +2090,7 @@ ROM_END
 
 
 
-void astra_addresslines( UINT16* src, size_t srcsize, int small )
+static void astra_addresslines( UINT16* src, size_t srcsize, int small )
 {
 	std::vector<UINT16> dst(srcsize/2);
 

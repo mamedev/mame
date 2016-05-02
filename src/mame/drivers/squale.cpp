@@ -84,7 +84,7 @@ public:
 		, m_fdc(*this, "wd1770")
 		, m_floppy0(*this, "wd1770:0")
 		, m_floppy1(*this, "wd1770:1")
-		, m_floppy(NULL)
+		, m_floppy(nullptr)
 		, m_cart(*this, "cartslot")
 	{ }
 
@@ -747,7 +747,7 @@ void squale_state::machine_start()
 
 	fdc_sel0 = 0x00;
 	fdc_sel1 = 0x00;
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	cart_addr_counter_reset = 0;
 	cart_addr_counter = 0x0000;

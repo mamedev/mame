@@ -125,7 +125,7 @@ static MACHINE_CONFIG_FRAGMENT( cs4031 )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(cs4031_device, dma2_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(cs4031_device, dma2_dack3_w))
 	MCFG_PIC8259_ADD("intc1", WRITELINE(cs4031_device, intc1_int_w), VCC, READ8(cs4031_device, intc1_slave_ack_r))
-	MCFG_PIC8259_ADD("intc2", DEVWRITELINE("intc1", pic8259_device, ir2_w), GND, NULL)
+	MCFG_PIC8259_ADD("intc2", DEVWRITELINE("intc1", pic8259_device, ir2_w), GND, NOOP)
 
 	MCFG_DEVICE_ADD("ctc", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL_14_31818MHz / 12)

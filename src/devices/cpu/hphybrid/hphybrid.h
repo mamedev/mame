@@ -109,7 +109,7 @@ protected:
 		virtual UINT16 execute_no_bpc_ioc(UINT16 opcode) = 0;
 
 				// device_memory_interface overrides
-				virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
+				virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
 
 				// device_state_interface overrides
 				void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -161,7 +161,7 @@ protected:
 				UINT16 m_reg_IV;    // Register IV
 		UINT16 m_reg_W; // Register W
 				UINT8  m_reg_PA[ HPHYBRID_INT_LVLS + 1 ];   // Stack of register PA (4 bit-long)
-				UINT16 m_flags;     // Flags
+				UINT32 m_flags;     // Flags
 				UINT8  m_dmapa;     // DMA peripheral address (4 bits)
 				UINT16 m_dmama;     // DMA address
 				UINT16 m_dmac;      // DMA counter
@@ -179,8 +179,10 @@ private:
 				UINT32 get_ea(UINT16 opcode);
 				void do_add(UINT16& addend1 , UINT16 addend2);
 				UINT16 get_skip_addr_sc(UINT16 opcode , UINT16& v , unsigned n);
+				UINT16 get_skip_addr_sc(UINT16 opcode , UINT32& v , unsigned n);
 				void do_pw(UINT16 opcode);
 				void check_for_interrupts(void);
+		virtual void enter_isr(void);
 								void handle_dma(void);
 
 				UINT16 RIO(UINT8 pa , UINT8 ic);
@@ -225,6 +227,8 @@ private:
 		UINT16 m_reg_r26;       // R26 register
 		UINT16 m_reg_r27;       // R27 register
 		UINT16 m_reg_aec[ HP_REG_R37_ADDR - HP_REG_R32_ADDR + 1 ];      // AEC registers R32-R37
+
+		virtual void enter_isr(void) override;
 };
 
 class hp_5061_3011_cpu_device : public hp_hybrid_cpu_device

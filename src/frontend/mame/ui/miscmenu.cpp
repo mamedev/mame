@@ -12,12 +12,13 @@
 #include "mame.h"
 #include "osdnet.h"
 #include "mameopts.h"
+#include "pluginopts.h"
+#include "drivenum.h"
 
 #include "uiinput.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/miscmenu.h"
-#include "ui/utils.h"
 #include "../info.h"
 #include "ui/inifile.h"
 #include "ui/submenu.h"
@@ -30,13 +31,13 @@
     ui_menu_keyboard_mode - menu that
 -------------------------------------------------*/
 
-ui_menu_keyboard_mode::ui_menu_keyboard_mode(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_keyboard_mode::ui_menu_keyboard_mode(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
 void ui_menu_keyboard_mode::populate()
 {
-	bool natural = mame_machine_manager::instance()->ui().use_natural_keyboard();
+	bool natural = ui().use_natural_keyboard();
 	item_append(_("Keyboard Mode:"), natural ? _("Natural") : _("Emulated"), natural ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, nullptr);
 }
 
@@ -46,7 +47,7 @@ ui_menu_keyboard_mode::~ui_menu_keyboard_mode()
 
 void ui_menu_keyboard_mode::handle()
 {
-	bool natural = mame_machine_manager::instance()->ui().use_natural_keyboard();
+	bool natural = ui().use_natural_keyboard();
 
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
@@ -55,7 +56,7 @@ void ui_menu_keyboard_mode::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
-			mame_machine_manager::instance()->ui().set_use_natural_keyboard(natural ^ true);
+			ui().set_use_natural_keyboard(natural ^ true);
 			reset(UI_MENU_RESET_REMEMBER_REF);
 		}
 	}
@@ -67,7 +68,7 @@ void ui_menu_keyboard_mode::handle()
     bios selection menu
 -------------------------------------------------*/
 
-ui_menu_bios_selection::ui_menu_bios_selection(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_bios_selection::ui_menu_bios_selection(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
@@ -140,7 +141,7 @@ void ui_menu_bios_selection::handle()
 
 
 
-ui_menu_network_devices::ui_menu_network_devices(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_network_devices::ui_menu_network_devices(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
@@ -223,7 +224,7 @@ void ui_menu_bookkeeping::handle()
     menu_bookkeeping - handle the bookkeeping
     information menu
 -------------------------------------------------*/
-ui_menu_bookkeeping::ui_menu_bookkeeping(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_bookkeeping::ui_menu_bookkeeping(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
@@ -372,7 +373,7 @@ void ui_menu_crosshair::handle()
     crosshair settings menu
 -------------------------------------------------*/
 
-ui_menu_crosshair::ui_menu_crosshair(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_crosshair::ui_menu_crosshair(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
@@ -522,7 +523,7 @@ void ui_menu_crosshair::populate()
 	}
 //  else
 //      /* leave a blank filler line when not in auto time so size does not rescale */
-//      item_append("", "", NULL, NULL);
+//      item_append("", "", nullptr, nullptr);
 }
 
 ui_menu_crosshair::~ui_menu_crosshair()
@@ -534,7 +535,7 @@ ui_menu_crosshair::~ui_menu_crosshair()
     quitting the game
 -------------------------------------------------*/
 
-ui_menu_quit_game::ui_menu_quit_game(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_quit_game::ui_menu_quit_game(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
@@ -559,8 +560,8 @@ void ui_menu_quit_game::handle()
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_export::ui_menu_export(running_machine &machine, render_container *container, std::vector<const game_driver *> drvlist)
-	: ui_menu(machine, container), m_list(drvlist)
+ui_menu_export::ui_menu_export(mame_ui_manager &mui, render_container *container, std::vector<const game_driver *> drvlist)
+	: ui_menu(mui, container), m_list(drvlist)
 {
 }
 
@@ -587,7 +588,7 @@ void ui_menu_export::handle()
 				if (m_event->iptkey == IPT_UI_SELECT)
 				{
 					std::string filename("exported");
-					emu_file infile(mame_machine_manager::instance()->ui().options().ui_path(), OPEN_FLAG_READ);
+					emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
 					if (infile.open(filename.c_str(), ".xml") == osd_file::error::NONE)
 						for (int seq = 0; ; ++seq)
 						{
@@ -600,7 +601,7 @@ void ui_menu_export::handle()
 						}
 
 					// attempt to open the output file
-					emu_file file(mame_machine_manager::instance()->ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+					emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 					if (file.open(filename.c_str(), ".xml") == osd_file::error::NONE)
 					{
 						FILE *pfile;
@@ -627,7 +628,7 @@ void ui_menu_export::handle()
 				if (m_event->iptkey == IPT_UI_SELECT)
 				{
 					std::string filename("exported");
-					emu_file infile(mame_machine_manager::instance()->ui().options().ui_path(), OPEN_FLAG_READ);
+					emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
 					if (infile.open(filename.c_str(), ".txt") == osd_file::error::NONE)
 						for (int seq = 0; ; ++seq)
 						{
@@ -640,7 +641,7 @@ void ui_menu_export::handle()
 						}
 
 					// attempt to open the output file
-					emu_file file(mame_machine_manager::instance()->ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+					emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 					if (file.open(filename.c_str(), ".txt") == osd_file::error::NONE)
 					{
 						// print the header
@@ -685,10 +686,10 @@ void ui_menu_export::populate()
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_machine_configure::ui_menu_machine_configure(running_machine &machine, render_container *container, const game_driver *prev, float _x0, float _y0)
-	: ui_menu(machine, container)
+ui_menu_machine_configure::ui_menu_machine_configure(mame_ui_manager &mui, render_container *container, const game_driver *prev, float _x0, float _y0)
+	: ui_menu(mui, container)
 	, m_drv(prev)
-	, m_opts(machine.options())
+	, m_opts(mui.machine().options())
 	, x0(_x0)
 	, y0(_y0)
 	, m_curbios(0)
@@ -727,7 +728,7 @@ void ui_menu_machine_configure::handle()
 					{
 						std::string inistring = m_opts.output_ini();
 						file.puts(inistring.c_str());
-						mame_machine_manager::instance()->ui().popup_time(2, "%s", _("\n    Configuration saved    \n\n"));
+						ui().popup_time(2, "%s", _("\n    Configuration saved    \n\n"));
 					}
 					break;
 				}
@@ -742,15 +743,15 @@ void ui_menu_machine_configure::handle()
 					break;
 				case CONTROLLER:
 					if (m_event->iptkey == IPT_UI_SELECT)
-						ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, control_submenu_options, m_drv, &m_opts));
+						ui_menu::stack_push(global_alloc_clear<ui_submenu>(ui(), container, control_submenu_options, m_drv, &m_opts));
 					break;
 				case VIDEO:
 					if (m_event->iptkey == IPT_UI_SELECT)
-						ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, video_submenu_options, m_drv, &m_opts));
+						ui_menu::stack_push(global_alloc_clear<ui_submenu>(ui(), container, video_submenu_options, m_drv, &m_opts));
 					break;
 				case ADVANCED:
 					if (m_event->iptkey == IPT_UI_SELECT)
-						ui_menu::stack_push(global_alloc_clear<ui_submenu>(machine(), container, advanced_submenu_options, m_drv, &m_opts));
+						ui_menu::stack_push(global_alloc_clear<ui_submenu>(ui(), container, advanced_submenu_options, m_drv, &m_opts));
 					break;
 				default:
 					break;
@@ -797,7 +798,7 @@ void ui_menu_machine_configure::populate()
 	item_append(ui_menu_item_type::SEPARATOR);
 	item_append(_("Save machine configuration"), nullptr, 0, (void *)(FPTR)SAVE);
 	item_append(ui_menu_item_type::SEPARATOR);
-	customtop = 2.0f * mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -807,7 +808,6 @@ void ui_menu_machine_configure::populate()
 void ui_menu_machine_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 	std::string text[2];
 	float maxwidth = origx2 - origx1;
 
@@ -816,21 +816,21 @@ void ui_menu_machine_configure::custom_render(void *selectedref, float top, floa
 
 	for (auto & elem : text)
 	{
-		mui.draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-			DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+		ui().draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+			DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
 	}
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
-//	float x1 = origx1;
+//  float x1 = origx1;
 	float x2 = x1 + maxwidth;
 	float y1 = origy1 - top;
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -840,9 +840,9 @@ void ui_menu_machine_configure::custom_render(void *selectedref, float top, floa
 	// draw the text within it
 	for (auto & elem : text)
 	{
-		mui.draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		ui().draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-		y1 += mui.get_line_height();
+		y1 += ui().get_line_height();
 	}
 }
 
@@ -856,7 +856,7 @@ void ui_menu_machine_configure::setup_bios()
 	for (const rom_entry *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
 			default_name = ROM_GETNAME(rom);
-	
+
 	int bios_count = 0;
 	for (const rom_entry *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
 	{
@@ -889,8 +889,8 @@ void ui_menu_machine_configure::setup_bios()
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_plugins_configure::ui_menu_plugins_configure(running_machine &machine, render_container *container)
-	: ui_menu(machine, container)
+ui_menu_plugins_configure::ui_menu_plugins_configure(mame_ui_manager &mui, render_container *container)
+	: ui_menu(mui, container)
 {
 }
 
@@ -946,7 +946,7 @@ void ui_menu_plugins_configure::populate()
 		}
 	}
 	item_append(ui_menu_item_type::SEPARATOR);
-	customtop = mame_machine_manager::instance()->ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
 }
 
 //-------------------------------------------------
@@ -956,10 +956,9 @@ void ui_menu_plugins_configure::populate()
 void ui_menu_plugins_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 
-	mui.draw_text_full(container, _("Plugins"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, _("Plugins"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -970,7 +969,7 @@ void ui_menu_plugins_configure::custom_render(void *selectedref, float top, floa
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -978,6 +977,6 @@ void ui_menu_plugins_configure::custom_render(void *selectedref, float top, floa
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, _("Plugins"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui().draw_text_full(container, _("Plugins"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }

@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "mame.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/dirmenu.h"
@@ -67,13 +68,13 @@ static const folders_entry s_folders[] =
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_directory::ui_menu_directory(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_directory::ui_menu_directory(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
 ui_menu_directory::~ui_menu_directory()
 {
-	save_ui_options(machine());
+	ui().save_ui_options();
 	ui_globals::reset = true;
 	mame_machine_manager::instance()->datfile().reset_run();
 }
@@ -88,7 +89,7 @@ void ui_menu_directory::handle()
 	const ui_menu_event *m_event = process(0);
 
 	if (m_event != nullptr && m_event->itemref != nullptr && m_event->iptkey == IPT_UI_SELECT)
-		ui_menu::stack_push(global_alloc_clear<ui_menu_display_actual>(machine(), container, selected));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_display_actual>(ui(), container, selected));
 }
 
 //-------------------------------------------------
@@ -101,7 +102,7 @@ void ui_menu_directory::populate()
 		item_append(_(elem.name), nullptr, 0, (void *)(FPTR)elem.action);
 
 	item_append(ui_menu_item_type::SEPARATOR);
-	customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -111,11 +112,10 @@ void ui_menu_directory::populate()
 void ui_menu_directory::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 
 	// get the size of the text
-	mui.draw_text_full(container, _("Folders Setup"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, _("Folders Setup"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
 
@@ -126,7 +126,7 @@ void ui_menu_directory::custom_render(void *selectedref, float top, float bottom
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -134,7 +134,7 @@ void ui_menu_directory::custom_render(void *selectedref, float top, float bottom
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, _("Folders Setup"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui().draw_text_full(container, _("Folders Setup"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
@@ -145,8 +145,8 @@ void ui_menu_directory::custom_render(void *selectedref, float top, float bottom
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_display_actual::ui_menu_display_actual(running_machine &machine, render_container *container, int ref)
-	: ui_menu(machine, container), m_ref(ref)
+ui_menu_display_actual::ui_menu_display_actual(mame_ui_manager &mui, render_container *container, int ref)
+	: ui_menu(mui, container), m_ref(ref)
 {
 }
 
@@ -166,11 +166,11 @@ void ui_menu_display_actual::handle()
 		switch ((FPTR)m_event->itemref)
 		{
 			case REMOVE:
-				ui_menu::stack_push(global_alloc_clear<ui_menu_remove_folder>(machine(), container, m_ref));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_remove_folder>(ui(), container, m_ref));
 				break;
 
 			case ADD_CHANGE:
-				ui_menu::stack_push(global_alloc_clear<ui_menu_add_change_folder>(machine(), container, m_ref));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_add_change_folder>(ui(), container, m_ref));
 				break;
 		}
 }
@@ -182,8 +182,8 @@ void ui_menu_display_actual::handle()
 void ui_menu_display_actual::populate()
 {
 	m_tempbuf = string_format(_("Current %1$s Folders"), _(s_folders[m_ref].name));
-	if (mame_machine_manager::instance()->ui().options().exists(s_folders[m_ref].option))
-		m_searchpath.assign(mame_machine_manager::instance()->ui().options().value(s_folders[m_ref].option));
+	if (ui().options().exists(s_folders[m_ref].option))
+		m_searchpath.assign(ui().options().value(s_folders[m_ref].option));
 	else
 		m_searchpath.assign(machine().options().value(s_folders[m_ref].option));
 
@@ -199,7 +199,7 @@ void ui_menu_display_actual::populate()
 		item_append(_("Remove Folder"), nullptr, 0, (void *)REMOVE);
 
 	item_append(ui_menu_item_type::SEPARATOR);
-	customtop = (m_folders.size() + 1) * mame_machine_manager::instance()->ui().get_line_height() + 6.0f * UI_BOX_TB_BORDER;
+	customtop = (m_folders.size() + 1) * ui().get_line_height() + 6.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -209,18 +209,17 @@ void ui_menu_display_actual::populate()
 void ui_menu_display_actual::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width, maxwidth = origx2 - origx1;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
-	float lineh = mui.get_line_height();
+	float lineh = ui().get_line_height();
 
 	for (auto & elem : m_folders)
 	{
-		mui.draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+		ui().draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 		maxwidth = MAX(maxwidth, width);
 	}
 
 	// get the size of the text
-	mui.draw_text_full(container, m_tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, m_tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	maxwidth = MAX(width, maxwidth);
 
@@ -231,7 +230,7 @@ void ui_menu_display_actual::custom_render(void *selectedref, float top, float b
 	float y2 = y1 + lineh + 2.0f * UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -239,7 +238,7 @@ void ui_menu_display_actual::custom_render(void *selectedref, float top, float b
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, m_tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui().draw_text_full(container, m_tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// compute our bounds
@@ -249,7 +248,7 @@ void ui_menu_display_actual::custom_render(void *selectedref, float top, float b
 	y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -259,7 +258,7 @@ void ui_menu_display_actual::custom_render(void *selectedref, float top, float b
 	// draw the text within it
 	for (auto & elem : m_folders)
 	{
-		mui.draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, JUSTIFY_LEFT, WRAP_TRUNCATE,
+		ui().draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, JUSTIFY_LEFT, WRAP_TRUNCATE,
 			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		y1 += lineh;
 	}
@@ -273,7 +272,7 @@ MENU ADD FOLDER
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_add_change_folder::ui_menu_add_change_folder(running_machine &machine, render_container *container, int ref) : ui_menu(machine, container)
+ui_menu_add_change_folder::ui_menu_add_change_folder(mame_ui_manager &mui, render_container *container, int ref) : ui_menu(mui, container)
 {
 	m_ref = ref;
 	m_change = (s_folders[ref].action == CHANGE);
@@ -283,10 +282,10 @@ ui_menu_add_change_folder::ui_menu_add_change_folder(running_machine &machine, r
 	osd_get_full_path(m_current_path, ".");
 
 	std::string searchpath;
-	if (mame_machine_manager::instance()->ui().options().exists(s_folders[m_ref].option))
-		searchpath = mame_machine_manager::instance()->ui().options().value(s_folders[m_ref].option);
+	if (mui.options().exists(s_folders[m_ref].option))
+		searchpath = mui.options().value(s_folders[m_ref].option);
 	else
-		searchpath = machine.options().value(s_folders[m_ref].option);
+		searchpath = mui.machine().options().value(s_folders[m_ref].option);
 
 	path_iterator path(searchpath.c_str());
 	std::string curpath;
@@ -365,8 +364,8 @@ void ui_menu_add_change_folder::handle()
 				std::string error_string;
 				if (m_change)
 				{
-					if (mame_machine_manager::instance()->ui().options().exists(s_folders[m_ref].option))
-						mame_machine_manager::instance()->ui().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+					if (ui().options().exists(s_folders[m_ref].option))
+						ui().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 					else if (strcmp(machine().options().value(s_folders[m_ref].option), m_current_path.c_str()) != 0)
 					{
 						machine().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
@@ -385,8 +384,8 @@ void ui_menu_add_change_folder::handle()
 							tmppath.append(";");
 					}
 
-					if (mame_machine_manager::instance()->ui().options().exists(s_folders[m_ref].option))
-						mame_machine_manager::instance()->ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+					if (ui().options().exists(s_folders[m_ref].option))
+						ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 					else if (strcmp(machine().options().value(s_folders[m_ref].option), tmppath.c_str()) != 0)
 					{
 						machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
@@ -479,8 +478,8 @@ void ui_menu_add_change_folder::populate()
 	item_append(ui_menu_item_type::SEPARATOR);
 
 	// configure the custom rendering
-	customtop = 2.0f * mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	custombottom = 1.0f * mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = 1.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -490,7 +489,6 @@ void ui_menu_add_change_folder::populate()
 void ui_menu_add_change_folder::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width, maxwidth = origx2 - origx1;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 	std::string tempbuf[2];
 	tempbuf[0] = string_format(
 			(m_change)
@@ -503,8 +501,8 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 	// get the size of the text
 	for (auto & elem : tempbuf)
 	{
-		mui.draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-			DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+		ui().draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+			DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 		maxwidth = MAX(width, maxwidth);
 	}
@@ -516,7 +514,7 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -526,16 +524,16 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 	// draw the text within it
 	for (auto & elem : tempbuf)
 	{
-		mui.draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+		ui().draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-		y1 = y1 + mui.get_line_height();
+		y1 = y1 + ui().get_line_height();
 	}
 
 	// bottom text
 	tempbuf[0] = _("Press TAB to set");
 
-	mui.draw_text_full(container, tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(maxwidth, width);
 
@@ -546,7 +544,7 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 	y2 = origy2 + bottom;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_RED_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_RED_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -554,7 +552,7 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, tempbuf[0].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui().draw_text_full(container, tempbuf[0].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 }
@@ -566,13 +564,13 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_remove_folder::ui_menu_remove_folder(running_machine &machine, render_container *container, int ref) : ui_menu(machine, container)
+ui_menu_remove_folder::ui_menu_remove_folder(mame_ui_manager &mui, render_container *container, int ref) : ui_menu(mui, container)
 {
 	m_ref = ref;
-	if (mame_machine_manager::instance()->ui().options().exists(s_folders[m_ref].option))
-		m_searchpath.assign(mame_machine_manager::instance()->ui().options().value(s_folders[m_ref].option));
+	if (mui.options().exists(s_folders[m_ref].option))
+		m_searchpath.assign(mui.options().value(s_folders[m_ref].option));
 	else
-		m_searchpath.assign(machine.options().value(s_folders[m_ref].option));
+		m_searchpath.assign(mui.machine().options().value(s_folders[m_ref].option));
 
 	path_iterator path(m_searchpath.c_str());
 	std::string curpath;
@@ -603,8 +601,8 @@ void ui_menu_remove_folder::handle()
 				tmppath.append(";");
 		}
 
-		if (mame_machine_manager::instance()->ui().options().exists(s_folders[m_ref].option))
-			mame_machine_manager::instance()->ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+		if (ui().options().exists(s_folders[m_ref].option))
+			ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 		else if (strcmp(machine().options().value(s_folders[m_ref].option),tmppath.c_str())!=0)
 		{
 			machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
@@ -627,7 +625,7 @@ void ui_menu_remove_folder::populate()
 		item_append(elem.c_str(), nullptr, 0, (void *)(FPTR)++folders_count);
 
 	item_append(ui_menu_item_type::SEPARATOR);
-	customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -637,11 +635,10 @@ void ui_menu_remove_folder::populate()
 void ui_menu_remove_folder::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 	std::string tempbuf = string_format(_("Remove %1$s Folder"), _(s_folders[m_ref].name));
 
 	// get the size of the text
-	mui.draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER, DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
 
@@ -652,7 +649,7 @@ void ui_menu_remove_folder::custom_render(void *selectedref, float top, float bo
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -660,6 +657,6 @@ void ui_menu_remove_folder::custom_render(void *selectedref, float top, float bo
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL,
+	ui().draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL,
 		UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }

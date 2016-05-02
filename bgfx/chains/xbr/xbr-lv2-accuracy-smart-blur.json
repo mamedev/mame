@@ -1,0 +1,47 @@
+// license:GPL-2.0+
+// copyright-holders:Hyllian
+
+{
+	"name": "xBR-lv2 Accuracy w/ Smart Blur",
+	"author": "Hyllian",
+	"targets": [
+		{
+			"name": "internal",
+			"mode": "guest",
+			"bilinear": false,
+			"doublebuffer": true
+		},
+		{
+			"name": "native",
+			"mode": "native",
+			"bilinear": true,
+			"doublebuffer": true
+		}
+	],
+	"passes": [
+		{
+			"effect": "xbr/xbr-lv2-multipass/xbr-lv2-accuracy-pass0",
+			"name": "Pass 0",
+			"input": [
+				{ "sampler": "decal", "texture": "screen" }
+			],
+			"output": "internal"
+		},
+		{
+			"effect": "xbr/xbr-lv2-multipass/xbr-lv2-accuracy-pass1",
+			"name": "Pass 1",
+			"input": [
+				{ "sampler": "decal", "target": "internal" }
+			],
+			"output": "native"
+		},
+		{
+			"effect": "blurs/smart-blur",
+			"name": "Blur Pass",
+			"input": [
+				{ "sampler": "s_p", "target": "native" }
+			],
+			"output": "output"
+		}
+	]
+}

@@ -146,7 +146,7 @@ char *osd_get_clipboard_text(void)
 
 char *osd_get_clipboard_text(void)
 {
-	char *result = NULL;
+	char *result = nullptr;
 
 	if (SDL_HasClipboardText())
 	{

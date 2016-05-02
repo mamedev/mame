@@ -375,37 +375,6 @@ INTERRUPT_GEN_MEMBER( driver_device::irq7_line_hold )   { device.execute().set_i
 INTERRUPT_GEN_MEMBER( driver_device::irq7_line_pulse )  { generic_pulse_irq_line(device.execute(), 7, 1); }
 INTERRUPT_GEN_MEMBER( driver_device::irq7_line_assert ) { device.execute().set_input_line(7, ASSERT_LINE); }
 
-
-
-//**************************************************************************
-//  WATCHDOG READ/WRITE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  8-bit reset read/write handlers
-//-------------------------------------------------
-
-WRITE8_MEMBER( driver_device::watchdog_reset_w ) { machine().watchdog_reset(); }
-READ8_MEMBER( driver_device::watchdog_reset_r ) { machine().watchdog_reset(); return space.unmap(); }
-
-
-//-------------------------------------------------
-//  16-bit reset read/write handlers
-//-------------------------------------------------
-
-WRITE16_MEMBER( driver_device::watchdog_reset16_w ) { machine().watchdog_reset(); }
-READ16_MEMBER( driver_device::watchdog_reset16_r ) { machine().watchdog_reset(); return space.unmap(); }
-
-
-//-------------------------------------------------
-//  32-bit reset read/write handlers
-//-------------------------------------------------
-
-WRITE32_MEMBER( driver_device::watchdog_reset32_w ) { machine().watchdog_reset(); }
-READ32_MEMBER( driver_device::watchdog_reset32_r ) { machine().watchdog_reset(); return space.unmap(); }
-
-
-
 //**************************************************************************
 //  GENERIC SOUND COMMAND LATCHING
 //**************************************************************************

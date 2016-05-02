@@ -23,11 +23,11 @@ public:
 	void reset() { m_event.set(); }
 
 	osd_event &     event(void) { return m_event; }
-	INT32           do_exit(void) { return m_do_exit; }
-	osd_ticks_t     getTimeout(void) { return m_timeout; }
+	INT32           do_exit(void) const { return m_do_exit; }
+	osd_ticks_t     getTimeout(void) const { return m_timeout; }
 	void            setTimeout(int timeout);
 private:
-	osd_event      	m_event;
+	osd_event       m_event;
 	std::thread*    m_thread;
 	std::atomic<INT32>  m_do_exit;
 

@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "includes/pgm.h"
+#include "machine/pgmprot_igs025_igs022.h"
 
 /* The IGS022 is an MCU which performs encrypted DMA used by
  - The Killing Blade

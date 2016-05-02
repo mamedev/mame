@@ -76,7 +76,7 @@
  *   Changes in 2.6:
  *    - BUSY_LOOP_HACKS needed to call change_pc() earlier, before
  *      checking the opcodes at the new address, because otherwise they
- *      might access the old (wrong or even NULL) banked memory region.
+ *      might access the old (wrong or even nullptr) banked memory region.
  *      Thanks to Sean Young for finding this nasty bug.
  *   Changes in 2.5:
  *    - Burning cycles always adjusts the ICount by a multiple of 4.

@@ -756,7 +756,7 @@ void tms57002_device::execute_run()
 				goto inst;
 
 #define CINTRP
-#include "cpu/tms57002/tms57002.inc"
+#include "cpu/tms57002/tms57002.hxx"
 #undef CINTRP
 
 			default:

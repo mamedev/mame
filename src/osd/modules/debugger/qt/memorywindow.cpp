@@ -19,11 +19,11 @@
 
 
 MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, NULL)
+	WindowQt(machine, nullptr)
 {
 	setWindowTitle("Debug: Memory View");
 
-	if (parent != NULL)
+	if (parent != nullptr)
 	{
 		QPoint parentPos = parent->pos();
 		setGeometry(parentPos.x()+100, parentPos.y()+100, 800, 400);
@@ -278,7 +278,7 @@ void MemoryWindow::decreaseBytesPerLine(bool checked)
 
 void MemoryWindow::populateComboBox()
 {
-	if (m_memTable == NULL)
+	if (m_memTable == nullptr)
 		return;
 
 	m_memoryComboBox->clear();
@@ -312,7 +312,7 @@ QAction* MemoryWindow::dataFormatMenuItem(const QString& itemName)
 				return actions[j];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -357,7 +357,7 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 			{
 				// TODO: You can specify a box that the tooltip stays alive within - might be good?
 				const QString addressAndPc = QString("Address %1 written at PC=%2").arg(address, 2, 16).arg(pc, 2, 16);
-				QToolTip::showText(QCursor::pos(), addressAndPc, NULL);
+				QToolTip::showText(QCursor::pos(), addressAndPc, nullptr);
 
 				// Copy the PC into the clipboard as well
 				QClipboard *clipboard = QApplication::clipboard();
@@ -365,7 +365,7 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 			}
 			else
 			{
-				QToolTip::showText(QCursor::pos(), "UNKNOWN PC", NULL);
+				QToolTip::showText(QCursor::pos(), "UNKNOWN PC", nullptr);
 			}
 		}
 

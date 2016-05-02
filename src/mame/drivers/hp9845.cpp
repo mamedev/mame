@@ -18,22 +18,22 @@
 // - Text mode screen
 // - Keyboard
 // - T15 tape drive
+// - Software list to load optional ROMs
 // What's not yet in:
 // - Beeper
 // - Graphic screen
 // - Better naming of tape drive image (it's now "magt", should be "t15")
 // - Better documentation of this file
-// - Software list to load optional ROMs
 // What's wrong:
 // - I'm using character generator from HP64K (another driver of mine): no known dump of the original one
 // - Speed, as usual
-// - There are a couple of undocumented opcodes that PPU executes at each keyboard interrupt: don't know if ignoring them is a Bad Thing (tm) or not
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "softlist.h"
 #include "cpu/hphybrid/hphybrid.h"
 #include "machine/hp_taco.h"
+#include "bus/hp_optroms/hp_optrom.h"
 
 #define BIT_MASK(n) (1U << (n))
 
@@ -418,10 +418,10 @@ void hp9845b_state::video_render_buff(unsigned line_in_row, bool buff_idx)
 		const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 		if (m_video_blanked) {
-                        // Blank scanline
-                        for (unsigned i = 0; i < (80 * 9); i++) {
-                                m_bitmap.pix32(m_video_scanline , i) = palette[ 0 ];
-                        }
+						// Blank scanline
+						for (unsigned i = 0; i < (80 * 9); i++) {
+								m_bitmap.pix32(m_video_scanline , i) = palette[ 0 ];
+						}
 		} else {
 				bool cursor_line = line_in_row == 12;
 				bool ul_line = line_in_row == 14;
@@ -674,7 +674,6 @@ static ADDRESS_MAP_START(global_mem_map , AS_PROGRAM , 16 , hp9845b_state)
 		AM_RANGE(0x014000 , 0x017fff) AM_RAM AM_SHARE("ppu_ram")
 		AM_RANGE(0x030000 , 0x037fff) AM_ROM AM_REGION("lpu" , 0)
 		AM_RANGE(0x050000 , 0x057fff) AM_ROM AM_REGION("ppu" , 0)
-//AM_RANGE(0x250000 , 0x251fff) AM_ROM AM_REGION("test_rom" , 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845b_state)
@@ -719,6 +718,16 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 		MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845b_state , t15_flg_w))
 		MCFG_TACO_STS_HANDLER(WRITELINE(hp9845b_state , t15_sts_w))
 
+		// In real machine there were 8 slots for LPU ROMs and 8 slots for PPU ROMs in
+		// right-hand side and left-hand side drawers, respectively.
+		// Here we do away with the distinction between LPU & PPU ROMs: in the end they
+		// are visible to both CPUs at the same addresses.
+		// For now we define just a couple of slots..
+		MCFG_DEVICE_ADD("drawer1", HP_OPTROM_SLOT, 0)
+		MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+		MCFG_DEVICE_ADD("drawer2", HP_OPTROM_SLOT, 0)
+		MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+
 		MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
 MACHINE_CONFIG_END
 
@@ -755,10 +764,6 @@ ROM_END
 #define rom_hp9835b rom_hp9835a
 
 ROM_START( hp9845b )
-		ROM_REGION(0x4000 , "test_rom" , ROMREGION_16BIT | ROMREGION_BE)
-		ROM_LOAD("09845-66520-45_00-Test_ROM.bin" , 0x0000 , 0x2000 , CRC(95a5b299))
-		ROM_LOAD("09845-66520-45_10-Test_ROM.bin" , 0x2000 , 0x2000 , CRC(257e4c66))
-
 	ROM_REGION(0x800 , "chargen" , 0)
 		// Don't have the real character generator from HP9845, use the one from HP64000 for now
 	ROM_LOAD("1818_2668.bin" , 0 , 0x800 , BAD_DUMP CRC(32a52664) SHA1(8b2a49a32510103ff424e8481d5ed9887f609f2f))

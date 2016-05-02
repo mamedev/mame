@@ -70,6 +70,7 @@
 		"actions/vstudio/vs2012.lua",
 		"actions/vstudio/vs2013.lua",
 		"actions/vstudio/vs2015.lua",
+		"actions/vstudio/vs15.lua",
 
 		-- Xcode action
 		"actions/xcode/_xcode.lua",

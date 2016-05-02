@@ -483,7 +483,7 @@ bool arm7_cpu_device::memory_translate(address_spacenum spacenum, int intention,
 
 
 /* include the arm7 core */
-#include "arm7core.inc"
+#include "arm7core.hxx"
 
 /***************************************************************************
  * CPU SPECIFIC IMPLEMENTATIONS
@@ -1211,4 +1211,4 @@ UINT8 arm7_cpu_device::arm7_cpu_read8(UINT32 addr)
 	return m_program->read_byte(addr);
 }
 
-#include "arm7drc.inc"
+#include "arm7drc.hxx"

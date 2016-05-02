@@ -40,7 +40,7 @@
 
   Other:  1x 28x2 edge connector.
           1x 15-pins connector.
-		  1x 7 pins connector (JTAG?) (on Crystals Colours boards).
+          1x 7 pins connector (JTAG?) (on Crystals Colours boards).
           1x trimmer (volume).
           1x 8 DIP switches.
           1x 3.6 Volt, 55-80 mAh battery.
@@ -508,7 +508,7 @@
   - Added proper default NVRAM.
   - Added technical notes.
 
-  
+
   [2013/05/12]
 
   Crystals Colours:
@@ -1158,7 +1158,7 @@ ROM_END
 
 /*
   Crystals Colours
-  
+
   Ver 1.01
   The top left bonus is called "Pool"
 
@@ -1174,7 +1174,7 @@ ROM_END
   - Coin B: 10 credits per coin.
   - Key In: 100 credits per coin.
 
-*/ 
+*/
 ROM_START( crystalc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crystals_colours_1__(1.02).u2", 0x8000, 0x8000, CRC(a803d857) SHA1(8eb34f6b4f820776459d92f9c589794bec7547ea) )

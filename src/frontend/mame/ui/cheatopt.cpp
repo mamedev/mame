@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cheat.h"
+#include "mame.h"
 
 #include "ui/ui.h"
 #include "ui/menu.h"
@@ -93,7 +94,7 @@ void ui_menu_cheat::handle()
 		/* handle autofire menu */
 		if (menu_event->itemref == ITEMREF_CHEATS_AUTOFIRE_SETTINGS && menu_event->iptkey == IPT_UI_SELECT)
 		{
-			ui_menu::stack_push(global_alloc_clear<ui_menu_autofire>(machine(), container));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_autofire>(ui(), container));
 		}
 
 		/* if things changed, update */
@@ -107,7 +108,7 @@ void ui_menu_cheat::handle()
     menu_cheat_populate - populate the cheat menu
 -------------------------------------------------*/
 
-ui_menu_cheat::ui_menu_cheat(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_cheat::ui_menu_cheat(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
@@ -156,9 +157,9 @@ ui_menu_cheat::~ui_menu_cheat()
     menu
 -------------------------------------------------*/
 
-ui_menu_autofire::ui_menu_autofire(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_autofire::ui_menu_autofire(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container), last_toggle(false)
 {
-	const screen_device *screen = machine.first_screen();
+	const screen_device *screen = mui.machine().first_screen();
 
 	if (screen == nullptr)
 	{

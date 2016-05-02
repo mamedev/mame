@@ -249,7 +249,7 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 
 	/* determine how many sound banks */
 	m_sound_banks = 0;
-	if (m_upd_region != NULL)
+	if (m_upd_region != nullptr)
 	{
 		m_sound_banks = m_upd_region->bytes() / 0x20000;
 	}

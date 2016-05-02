@@ -268,6 +268,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "audio/taitosnd.h"
 #include "includes/taito_f2.h"
 #include "sound/2203intf.h"
@@ -795,7 +796,7 @@ static ADDRESS_MAP_START( quizhq_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x500004, 0x500005) AM_WRITE(growl_coin_word_w)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSWB")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN0")
-	AM_RANGE(0x580000, 0x580001) AM_WRITE(watchdog_reset16_w)   /* ??? */
+	AM_RANGE(0x580000, 0x580001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
 	AM_RANGE(0x580006, 0x580007) AM_WRITENOP   /* ??? */
 	AM_RANGE(0x580000, 0x580001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x580002, 0x580003) AM_READ_PORT("IN1")
@@ -846,7 +847,7 @@ static ADDRESS_MAP_START( growl_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN0")
 	AM_RANGE(0x320002, 0x320003) AM_READ_PORT("IN1")
 	AM_RANGE(0x320004, 0x320005) AM_READ_PORT("IN2")
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x340000, 0x340001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x500000, 0x50000f) AM_WRITE(taitof2_spritebank_w)
@@ -894,7 +895,7 @@ static ADDRESS_MAP_START( footchmp_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
 	AM_RANGE(0x70000e, 0x70000f) AM_READ_PORT("IN3")
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("IN4")
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(watchdog_reset16_w)   /* ??? */
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 ADDRESS_MAP_END
@@ -933,7 +934,7 @@ static ADDRESS_MAP_START( ninjak_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30000f) AM_READ(ninjak_input_r)
 	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(ninjak_coin_word_w)
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(watchdog_reset16_w)   /* ??? */
+	AM_RANGE(0x380000, 0x380001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x600000, 0x60000f) AM_WRITE(taitof2_spritebank_w)
@@ -953,7 +954,7 @@ static ADDRESS_MAP_START( solfigtr_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN0")
 	AM_RANGE(0x320002, 0x320003) AM_READ_PORT("IN1")
 	AM_RANGE(0x320004, 0x320005) AM_READ_PORT("IN2")
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(watchdog_reset16_w)   /* NOT VERIFIED */
+	AM_RANGE(0x340000, 0x340001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* NOT VERIFIED */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x500000, 0x50000f) AM_WRITE(taitof2_spritebank_w)
@@ -1055,7 +1056,7 @@ static ADDRESS_MAP_START( deadconx_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x700006, 0x700007) AM_WRITE(taitof2_4p_coin_word_w)
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN0")
 	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(watchdog_reset16_w)   /* ??? */
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 ADDRESS_MAP_END
@@ -2864,6 +2865,8 @@ static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 
 	MCFG_MACHINE_START_OVERRIDE(taitof2_state,f2)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -2898,7 +2901,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( taito_f2_tc0220ioc, taito_f2 )
 
 	/* basic machine hardware */
-
+	MCFG_DEVICE_REMOVE("watchdog")
 	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
 	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
@@ -2910,7 +2913,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( taito_f2_tc0510nio, taito_f2 )
 
 	/* basic machine hardware */
-
+	MCFG_DEVICE_REMOVE("watchdog")
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))

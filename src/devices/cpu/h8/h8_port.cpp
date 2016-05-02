@@ -20,21 +20,21 @@ void h8_port_device::set_info(int _address, UINT8 _default_ddr, UINT8 _mask)
 
 WRITE8_MEMBER(h8_port_device::ddr_w)
 {
-	//  logerror("%s: ddr_w %02x\n", tag(), data);
+	//  logerror("ddr_w %02x\n", data);
 	ddr = data;
 	update_output();
 }
 
 WRITE8_MEMBER(h8_port_device::dr_w)
 {
-	//  logerror("%s: dr_w %02x\n", tag(), data);
+	//  logerror("dr_w %02x\n", data);
 	dr = data;
 	update_output();
 }
 
 READ8_MEMBER(h8_port_device::dr_r)
 {
-	//  logerror("%s: dr_r %02x\n", tag(), (dr | mask) & 0xff);
+	//  logerror("dr_r %02x\n", (dr | mask) & 0xff);
 	return dr | mask;
 }
 
@@ -44,31 +44,31 @@ READ8_MEMBER(h8_port_device::port_r)
 	if((ddr & ~mask) != UINT8(~mask))
 		res |= io->read_word(address) & ~ddr;
 
-	//  logerror("%s: port_r %02x (%02x %02x)\n", tag(), res, ddr & ~mask, UINT8(~mask));
+	//  logerror("port_r %02x (%02x %02x)\n", res, ddr & ~mask, UINT8(~mask));
 	return res;
 }
 
 WRITE8_MEMBER(h8_port_device::pcr_w)
 {
-	logerror("%s: pcr_w %02x\n", tag(), data);
+	logerror("pcr_w %02x\n", data);
 	pcr = data;
 }
 
 READ8_MEMBER(h8_port_device::pcr_r)
 {
-	logerror("%s: dr_r %02x\n", tag(), (pcr | mask) & 0xff);
+	logerror("dr_r %02x\n", (pcr | mask) & 0xff);
 	return pcr | mask;
 }
 
 WRITE8_MEMBER(h8_port_device::odr_w)
 {
-	logerror("%s: odr_w %02x\n", tag(), data);
+	logerror("odr_w %02x\n", data);
 	odr = data;
 }
 
 READ8_MEMBER(h8_port_device::odr_r)
 {
-	logerror("%s: odr_r %02x\n", tag(), (odr | mask) & 0xff);
+	logerror("odr_r %02x\n", (odr | mask) & 0xff);
 	return odr | ~mask;
 }
 

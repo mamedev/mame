@@ -35,7 +35,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 	DECLARE_WRITE8_MEMBER( preset_w );
 	DECLARE_WRITE8_MEMBER( clear_w );
 	DECLARE_WRITE_LINE_MEMBER( preset_w );
@@ -43,7 +43,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-	
+
 	void sync_callback(void *ptr, INT32 param);
 private:
 	UINT16                  m_latched_value;
@@ -64,7 +64,7 @@ public:
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
-	
+
 	DECLARE_WRITE16_MEMBER( preset_w );
 	DECLARE_WRITE16_MEMBER( clear_w );
 	DECLARE_WRITE_LINE_MEMBER( preset_w );
@@ -72,7 +72,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-	
+
 	void sync_callback(void *ptr, INT32 param);
 private:
 	UINT16                  m_latched_value;

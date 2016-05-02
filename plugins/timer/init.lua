@@ -55,6 +55,12 @@ function timer.startplugin()
 			play_count = file:read("n")
 			file:close()
 		end
+		if not play_count then
+			play_count = 0
+		end
+		if not total_time then
+			total_time = 0
+		end
 		start_time = os.time()
 		play_count = play_count + 1
 	end)

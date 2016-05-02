@@ -1222,7 +1222,7 @@ void corvus_hdc_t::device_timer(emu_timer &timer, device_timer_id id, int param,
 //      Nothing
 //
 // Returns:
-//      NULL if there's no file to attach to
+//      nullptr if there's no file to attach to
 //
 void corvus_hdc_t::device_start() {
 	m_status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY); // Host-to-controller mode, Idle (awaiting command from Host mode)

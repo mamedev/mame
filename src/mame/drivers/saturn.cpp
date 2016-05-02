@@ -431,9 +431,12 @@ test1f diagnostic hacks:
 #include "sound/cdda.h"
 #include "machine/smpc.h"
 #include "machine/nvram.h"
-#include "includes/stv.h"
+#include "includes/saturn.h"
 #include "imagedev/chd_cd.h"
 #include "coreutil.h"
+#include "video/stvvdp1.h"
+#include "video/stvvdp2.h"
+#include "machine/stvcd.h"
 
 #include "bus/saturn/sat_slot.h"
 #include "bus/saturn/rom.h"

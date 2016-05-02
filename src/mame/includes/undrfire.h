@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
+
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
 
@@ -29,6 +31,7 @@ public:
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_eeprom(*this, "eeprom"),
+		m_watchdog(*this, "watchdog"),
 		m_ram(*this, "ram"),
 		m_shared_ram(*this, "shared_ram"),
 		m_spriteram(*this, "spriteram"),
@@ -40,6 +43,7 @@ public:
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<watchdog_timer_device> m_watchdog;
 	optional_shared_ptr<UINT32> m_ram;
 	optional_shared_ptr<UINT32> m_shared_ram;
 	UINT16 m_coin_word;

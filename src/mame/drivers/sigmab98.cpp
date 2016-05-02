@@ -117,6 +117,7 @@ Notes:
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/watchdog.h"
 
 class sigmab98_state : public driver_device
 {
@@ -1235,7 +1236,7 @@ static ADDRESS_MAP_START( animalc_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(watchdog_reset_w )  // 1
+	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1479,7 +1480,7 @@ static ADDRESS_MAP_START( haekaka_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(watchdog_reset_w )  // 1
+	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1726,7 +1727,7 @@ static ADDRESS_MAP_START( itazuram_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(watchdog_reset_w )  // 1
+	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1955,7 +1956,7 @@ static ADDRESS_MAP_START( tdoboon_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(watchdog_reset_w )  // 1
+	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
 ADDRESS_MAP_END
 
 
@@ -2236,6 +2237,8 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

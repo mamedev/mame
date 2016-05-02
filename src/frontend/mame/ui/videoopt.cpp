@@ -24,7 +24,7 @@ void ui_menu_video_targets::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		ui_menu::stack_push(global_alloc_clear<ui_menu_video_options>(machine(), container, static_cast<render_target *>(menu_event->itemref)));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_video_options>(ui(), container, static_cast<render_target *>(menu_event->itemref)));
 }
 
 
@@ -33,7 +33,7 @@ void ui_menu_video_targets::handle()
     video targets menu
 -------------------------------------------------*/
 
-ui_menu_video_targets::ui_menu_video_targets(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_video_targets::ui_menu_video_targets(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
@@ -164,7 +164,7 @@ void ui_menu_video_options::handle()
     video options menu
 -------------------------------------------------*/
 
-ui_menu_video_options::ui_menu_video_options(running_machine &machine, render_container *container, render_target *_target) : ui_menu(machine, container)
+ui_menu_video_options::ui_menu_video_options(mame_ui_manager &mui, render_container *container, render_target *_target) : ui_menu(mui, container)
 {
 	target = _target;
 }

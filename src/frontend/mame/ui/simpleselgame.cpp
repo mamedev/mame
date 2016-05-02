@@ -15,9 +15,9 @@
 #include "ui/menu.h"
 #include "uiinput.h"
 #include "ui/simpleselgame.h"
-#include "ui/inputmap.h"
 #include "ui/miscmenu.h"
 #include "ui/optsmenu.h"
+#include "drivenum.h"
 #include "audit.h"
 #include <ctype.h>
 
@@ -26,7 +26,7 @@
 //  ctor
 //-------------------------------------------------
 
-ui_simple_menu_select_game::ui_simple_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container), m_driverlist(driver_list::total() + 1)
+ui_simple_menu_select_game::ui_simple_menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename) : ui_menu(mui, container), m_driverlist(driver_list::total() + 1)
 {
 	build_driver_list();
 	if(gamename)
@@ -129,7 +129,7 @@ void ui_simple_menu_select_game::handle()
 
 	// if we're in an error state, overlay an error message
 	if (m_error)
-		mame_machine_manager::instance()->ui().draw_text_box(container,
+		ui().draw_text_box(container,
 							"The selected game is missing one or more required ROM or CHD images. "
 							"Please select a different game.\n\nPress any key to continue.",
 							JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
@@ -146,7 +146,7 @@ void ui_simple_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 
 	// special case for configure inputs
 	if ((FPTR)driver == 1)
-		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(machine(), container));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(ui(), container));
 	// anything else is a driver
 	else
 	{
@@ -268,8 +268,8 @@ void ui_simple_menu_select_game::populate()
 	}
 
 	// configure the custom rendering
-	customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	custombottom = 4.0f * mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = 4.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 
@@ -293,8 +293,8 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 		tempbuf[0] = _("Type name or select: (random)");
 
 	// get the size of the text
-	mame_machine_manager::instance()->ui().draw_text_full(container, tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+						DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, origx2 - origx1);
 
@@ -305,7 +305,7 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 	y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mame_machine_manager::instance()->ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -313,7 +313,7 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mame_machine_manager::instance()->ui().draw_text_full(container, tempbuf[0].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui().draw_text_full(container, tempbuf[0].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// determine the text to render below
@@ -383,8 +383,8 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 	maxwidth = origx2 - origx1;
 	for (line = 0; line < 4; line++)
 	{
-		mame_machine_manager::instance()->ui().draw_text_full(container, tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-							DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+		ui().draw_text_full(container, tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+							DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
 	}
@@ -403,7 +403,7 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 		color = UI_YELLOW_COLOR;
 	if (driver != nullptr && (driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
 		color = UI_RED_COLOR;
-	mame_machine_manager::instance()->ui().draw_outlined_box(container, x1, y1, x2, y2, color);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, color);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -413,9 +413,9 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 	// draw all lines
 	for (line = 0; line < 4; line++)
 	{
-		mame_machine_manager::instance()->ui().draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		ui().draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 							DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-		y1 += mame_machine_manager::instance()->ui().get_line_height();
+		y1 += ui().get_line_height();
 	}
 }
 
@@ -425,22 +425,22 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 //  select menu to be visible and inescapable
 //-------------------------------------------------
 
-void ui_simple_menu_select_game::force_game_select(running_machine &machine, render_container *container)
+void ui_simple_menu_select_game::force_game_select(mame_ui_manager &mui, render_container *container)
 {
-	char *gamename = (char *)machine.options().system_name();
+	char *gamename = (char *)mui.machine().options().system_name();
 
 	// reset the menu stack
-	ui_menu::stack_reset(machine);
+	ui_menu::stack_reset(mui.machine());
 
 	// add the quit entry followed by the game select entry
-	ui_menu *quit = global_alloc_clear<ui_menu_quit_game>(machine, container);
+	ui_menu *quit = global_alloc_clear<ui_menu_quit_game>(mui, container);
 	quit->set_special_main_menu(true);
 	ui_menu::stack_push(quit);
-	ui_menu::stack_push(global_alloc_clear<ui_simple_menu_select_game>(machine, container, gamename));
+	ui_menu::stack_push(global_alloc_clear<ui_simple_menu_select_game>(mui, container, gamename));
 
 	// force the menus on
-	mame_machine_manager::instance()->ui().show_menu();
+	mui.show_menu();
 
 	// make sure MAME is paused
-	machine.pause();
+	mui.machine().pause();
 }

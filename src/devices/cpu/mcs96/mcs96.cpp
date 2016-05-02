@@ -749,4 +749,4 @@ void mcs96_device::set_nz16(UINT16 v)
 		PSW |= F_N;
 }
 
-#include "cpu/mcs96/mcs96.inc"
+#include "cpu/mcs96/mcs96.hxx"

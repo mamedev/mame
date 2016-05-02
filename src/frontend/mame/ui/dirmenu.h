@@ -20,7 +20,7 @@
 class ui_menu_directory : public ui_menu
 {
 public:
-	ui_menu_directory(running_machine &machine, render_container *container);
+	ui_menu_directory(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_directory();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -34,7 +34,7 @@ public:
 class ui_menu_display_actual : public ui_menu
 {
 public:
-	ui_menu_display_actual(running_machine &machine, render_container *container, int selectedref);
+	ui_menu_display_actual(mame_ui_manager &mui, render_container *container, int selectedref);
 	virtual ~ui_menu_display_actual();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -59,7 +59,7 @@ private:
 class ui_menu_remove_folder : public ui_menu
 {
 public:
-	ui_menu_remove_folder(running_machine &machine, render_container *container, int ref);
+	ui_menu_remove_folder(mame_ui_manager &mui, render_container *container, int ref);
 	virtual ~ui_menu_remove_folder();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -78,7 +78,7 @@ private:
 class ui_menu_add_change_folder : public ui_menu
 {
 public:
-	ui_menu_add_change_folder(running_machine &machine, render_container *container, int ref);
+	ui_menu_add_change_folder(mame_ui_manager &mui, render_container *container, int ref);
 	virtual ~ui_menu_add_change_folder();
 	virtual void populate() override;
 	virtual void handle() override;

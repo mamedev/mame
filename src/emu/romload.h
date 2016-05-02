@@ -194,11 +194,11 @@ struct rom_entry
 /* ----- start/stop macros ----- */
 #define ROM_NAME(name)                              rom_##name
 #define ROM_START(name)                             static const rom_entry ROM_NAME(name)[] = {
-#define ROM_END                                     { NULL, NULL, 0, 0, ROMENTRYTYPE_END } };
+#define ROM_END                                     { nullptr, nullptr, 0, 0, ROMENTRYTYPE_END } };
 
 
 /* ----- ROM region macros ----- */
-#define ROM_REGION(length,tag,flags)                { tag, NULL, 0, length, ROMENTRYTYPE_REGION | (flags) },
+#define ROM_REGION(length,tag,flags)                { tag, nullptr, 0, length, ROMENTRYTYPE_REGION | (flags) },
 #define ROM_REGION16_LE(length,tag,flags)           ROM_REGION(length, tag, (flags) | ROMREGION_16BIT | ROMREGION_LE)
 #define ROM_REGION16_BE(length,tag,flags)           ROM_REGION(length, tag, (flags) | ROMREGION_16BIT | ROMREGION_BE)
 #define ROM_REGION32_LE(length,tag,flags)           ROM_REGION(length, tag, (flags) | ROMREGION_32BIT | ROMREGION_LE)
@@ -229,19 +229,19 @@ struct rom_entry
 
 
 /* ----- ROM_RELOAD related macros ----- */
-#define ROM_RELOAD(offset,length)                   { NULL, NULL, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS },
-#define ROM_RELOAD_PLAIN(offset,length)                 { NULL, NULL, offset, length, ROMENTRYTYPE_RELOAD },
+#define ROM_RELOAD(offset,length)                   { nullptr, nullptr, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS },
+#define ROM_RELOAD_PLAIN(offset,length)                 { nullptr, nullptr, offset, length, ROMENTRYTYPE_RELOAD },
 
 /* ----- additional ROM-related macros ----- */
-#define ROM_CONTINUE(offset,length)                 { NULL, NULL, offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS },
-#define ROM_IGNORE(length)                          { NULL, NULL, 0,      length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS },
-#define ROM_FILL(offset,length,value)               { NULL, (const char *)value, offset, length, ROMENTRYTYPE_FILL },
+#define ROM_CONTINUE(offset,length)                 { nullptr, nullptr, offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS },
+#define ROM_IGNORE(length)                          { nullptr, nullptr, 0,      length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS },
+#define ROM_FILL(offset,length,value)               { nullptr, (const char *)value, offset, length, ROMENTRYTYPE_FILL },
 #define ROM_COPY(srctag,srcoffs,offset,length)      { srctag, (const char *)srcoffs, offset, length, ROMENTRYTYPE_COPY },
 
 
 /* ----- system BIOS macros ----- */
 #define ROM_SYSTEM_BIOS(value,name,description)     { name, description, 0, 0, ROMENTRYTYPE_SYSTEM_BIOS | ROM_BIOS(value+1) },
-#define ROM_DEFAULT_BIOS(name)                      { name, NULL, 0, 0, ROMENTRYTYPE_DEFAULT_BIOS },
+#define ROM_DEFAULT_BIOS(name)                      { name, nullptr, 0, 0, ROMENTRYTYPE_DEFAULT_BIOS },
 
 
 /* ----- game parameter macro ----- */

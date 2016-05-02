@@ -11,7 +11,7 @@ typedef device_delegate<UINT16 (UINT32)> sega_m2_read_delegate;
 extern const device_type SEGA315_5881_CRYPT;
 
 #define MCFG_SET_READ_CALLBACK( _class, _method) \
-	sega_315_5881_crypt_device::set_read_cb(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	sega_315_5881_crypt_device::set_read_cb(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 
 class sega_315_5881_crypt_device :  public device_t

@@ -239,6 +239,7 @@ Notes:
 #include "machine/fdc37c665gt.h"
 #include "machine/i2cmem.h"
 #include "machine/rtc65271.h"
+#include "machine/watchdog.h"
 #include "machine/x76f041.h"
 #include "sound/spu.h"
 #include "sound/cdda.h"
@@ -697,7 +698,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, twinkle_state )
 	AM_RANGE(0x1f200000, 0x1f20001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f20a01c, 0x1f20a01f) AM_WRITENOP /* scsi? */
 	AM_RANGE(0x1f210000, 0x1f2107ff) AM_DEVREADWRITE8("fdc37c665gt", fdc37c665gt_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f218000, 0x1f218003) AM_WRITE8(watchdog_reset_w, 0x000000ff) /* LTC1232 */
+	AM_RANGE(0x1f218000, 0x1f218003) AM_DEVWRITE8("watchdog", watchdog_timer_device, reset_w, 0x000000ff) /* LTC1232 */
 	AM_RANGE(0x1f220000, 0x1f220003) AM_WRITE8(twinkle_io_w, 0x00ff00ff)
 	AM_RANGE(0x1f220004, 0x1f220007) AM_READ8(twinkle_io_r, 0x00ff00ff)
 	AM_RANGE(0x1f230000, 0x1f230003) AM_WRITENOP
@@ -946,6 +947,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(twinkle_state, irq1_line_assert, 60)
 	MCFG_CPU_PERIODIC_INT_DRIVER(twinkle_state, irq2_line_assert, 60)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200)) /* check TD pin on LTC1232 */
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)

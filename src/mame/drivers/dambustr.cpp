@@ -53,6 +53,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "audio/galaxian.h"
 #include "includes/galaxold.h"
 
@@ -117,7 +118,7 @@ static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, dambustr_state )
 	AM_RANGE(0xf007, 0xf007) AM_WRITE(galaxold_flip_screen_y_w)
 
 	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf800, 0xffff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
 
@@ -263,6 +264,8 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(dambustr_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", dambustr_state, galaxold_interrupt_timer)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

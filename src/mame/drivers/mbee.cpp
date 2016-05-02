@@ -20,6 +20,13 @@ from Brett Selwood and Andrew Davies.
     The unemulated Matilda is a IBM XT clone fitted with a NEC V40, and has the
     ability to emulate the 256TC as mentioned above.
 
+    The Premium Plus was a limited-edition kit from Microbee Systems, but we don't
+    have any technical info or schematic as yet. It starts up, keyboard works, disks
+    work much the same as a 128k or 256tc. It has 1024k of RAM but we do not know how
+    the extra RAM is selected. At this time it has 256k allocated and it seems happy enough.
+    The kit itself has an extra custom FPGA CPU board with memory-card slot, but there's
+    no info on it yet. We just emulate the Z80 portion.
+
     Floppy formats:
     - All disks are the standard CPCEMU 'dsk' format.
     - Types are 9/13cm 40/80 track (single or double sided)
@@ -1143,6 +1150,26 @@ ROM_START( mbee256 ) // 256tc
 	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
 ROM_END
 
+// Note: The bios rom is the only one confirmed to be in the machine. IC position numbers are unknown.
+ROM_START( mbeepp ) // Premium Plus
+	ROM_REGION(0x40000, "rams", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x5000, "roms", 0) // rom plus dummy area
+	ROM_LOAD( "pp.bin", 0x0000, 0x4000, CRC(33292300) SHA1(8ba32123ef1b3beffa797855a1de0ea2078d652a) ) // ver 1.0
+
+	ROM_REGION(0x4000, "pals", 0)
+	ROM_LOAD( "silver.u39", 0x0000, 0x4000, CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
+
+	ROM_REGION(0x9800, "gfx", 0)
+	ROM_LOAD("char256.u53", 0x1000, 0x1000, CRC(9372af3c) SHA1(a63591822c0504de2fed52e88d64e1dbd6124b74) )
+	ROM_IGNORE( 0x1000 )    // throw away swedish characters for now
+	ROM_COPY( "gfx", 0x1000, 0x0000, 0x1000 )
+
+	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
+	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1162,3 +1189,4 @@ COMP( 1986, mbee56,   mbee,     0,      mbee56,   mbee,     mbee_state,  mbee56,
 COMP( 1986, mbee128,  mbee,     0,      mbee128,  mbee128,  mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k Standard" , MACHINE_NOT_WORKING )
 COMP( 1986, mbee128p, mbee,     0,      mbee128p, mbee128,  mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k Premium" , MACHINE_NOT_WORKING )
 COMP( 1987, mbee256,  mbee,     0,      mbee256,  mbee256,  mbee_state,  mbee256,    "Applied Technology",  "Microbee 256TC" , MACHINE_NOT_WORKING )
+COMP( 2012, mbeepp,   mbee,     0,      mbee256,  mbee128,  mbee_state,  mbee128,    "Microbee Systems",  "Microbee Premium Plus" , MACHINE_NOT_WORKING )

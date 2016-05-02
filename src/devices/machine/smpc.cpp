@@ -150,7 +150,7 @@ TODO:
 
 #include "emu.h"
 #include "coreutil.h"
-#include "includes/stv.h"
+#include "includes/saturn.h"
 #include "machine/smpc.h"
 #include "machine/eepromser.h"
 
@@ -345,16 +345,16 @@ TIMER_CALLBACK_MEMBER( saturn_state::stv_smpc_intback )
 }
 
 /*
-	[0] port status:
-		0x04 Sega-tap
-		0x16 Multi-tap
-		0x2x clock serial peripheral
-		0xf0 peripheral isn't connected
-		0xf1 peripheral is connected
-	[1] Peripheral ID (note: lowest four bits determines the size of the input packet)
-		0x02 digital pad
-		0x25 (tested by Game Basic?)
-		0x34 keyboard
+    [0] port status:
+        0x04 Sega-tap
+        0x16 Multi-tap
+        0x2x clock serial peripheral
+        0xf0 peripheral isn't connected
+        0xf1 peripheral is connected
+    [1] Peripheral ID (note: lowest four bits determines the size of the input packet)
+        0x02 digital pad
+        0x25 (tested by Game Basic?)
+        0x34 keyboard
 
  Lower 4 bits of the port status tell the number of controllers to check for the port
  Lower 4 bits of the peripheral ID tell the number of registers used by each controller
@@ -364,23 +364,30 @@ TIMER_CALLBACK_MEMBER( saturn_state::stv_smpc_intback )
  - ID first controller, followed by the number of reads needed by the plugged controller
  - ID second controller, followed by the number of reads needed by the plugged controller
  - and so on... until the 4th (for SegaTap) or 6th (for Multitap) controller is read
+ TODO: how does the multitap check if a controller is connected? does it ask for the
+ controller status of each subport? how does this work exactly?
+ currently, there is a small problem in some specific controller config which seems to
+ lose track of one controller. E.g. if I put multitap in port2 with inserted joy1, joy2 and joy4
+ it does not see joy4 controller, but if I put joy1, joy2, joy4 and joy5 it sees
+ all four of them. The same happens if I skip controllers with id = 0xff...
+ how did a real unit behave in this case?
 */
 
 TIMER_CALLBACK_MEMBER( saturn_state::intback_peripheral )
 {
-	//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
-	
+//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
+
 	// doesn't work?
 	//pad_num = m_smpc.intback_stage - 1;
-	
+
 	if(LOG_PAD_CMD) printf("%d %d %d\n", m_smpc.intback_stage - 1, machine().first_screen()->vpos(), (int)machine().first_screen()->frame_number());
 
 	UINT8 status1 = m_ctrl1 ? m_ctrl1->read_status() : 0xf0;
 	UINT8 status2 = m_ctrl2 ? m_ctrl2->read_status() : 0xf0;
 
 	UINT8 reg_offset = 0;
-	UINT8 ctrl1_offset = 0;		// this is used when there is segatap or multitap connected
-	UINT8 ctrl2_offset = 0;		// this is used when there is segatap or multitap connected
+	UINT8 ctrl1_offset = 0;     // this is used when there is segatap or multitap connected
+	UINT8 ctrl2_offset = 0;     // this is used when there is segatap or multitap connected
 
 	m_smpc.OREG[reg_offset++] = status1;
 	// read ctrl1
@@ -829,7 +836,7 @@ UINT8 saturn_state::smpc_direct_mode(UINT8 pad_n)
 {
 	int hshake = (pad_n == 0) ? ((m_smpc.PDR1 >> 5) & 3) : ((m_smpc.PDR2 >> 5) & 3);
 	const int shift_bit[4] = { 4, 12, 8, 0 };
-	
+
 	UINT16 ctrl_read = 0;
 	if (m_ctrl1 && pad_n == 0)
 		ctrl_read = m_ctrl1->read_direct();

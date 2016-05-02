@@ -1184,7 +1184,7 @@ void input_manager::reset_polling()
 	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
 		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
 		{
-			// fetch the device; ignore if NULL
+			// fetch the device; ignore if nullptr
 			input_device *device = m_class[devclass]->device(devnum);
 			if (device == nullptr)
 				continue;
@@ -1211,7 +1211,7 @@ input_code input_manager::poll_switches()
 	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
 		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
 		{
-			// fetch the device; ignore if NULL
+			// fetch the device; ignore if nullptr
 			input_device *device = m_class[devclass]->device(devnum);
 			if (device == nullptr)
 				continue;
@@ -1291,7 +1291,7 @@ input_code input_manager::poll_keyboard_switches()
 	// iterate over devices within each class
 	for (int devnum = 0; devnum < m_keyboard_class.maxindex(); devnum++)
 	{
-		// fetch the device; ignore if NULL
+		// fetch the device; ignore if nullptr
 		input_device *device = m_keyboard_class.device(devnum);
 		if (device == nullptr)
 			continue;
@@ -1365,7 +1365,7 @@ input_code input_manager::poll_axes()
 	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
 		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
 		{
-			// fetch the device; ignore if NULL
+			// fetch the device; ignore if nullptr
 			input_device *device = m_class[devclass]->device(devnum);
 			if (device == nullptr)
 				continue;
@@ -1400,7 +1400,7 @@ input_device *input_manager::device_from_code(input_code code) const
 	if (devclass >= DEVICE_CLASS_FIRST_VALID && devclass <= DEVICE_CLASS_LAST_VALID)
 		return m_class[devclass]->device(code.device_index());
 
-	// otherwise, return NULL
+	// otherwise, return nullptr
 	return nullptr;
 }
 

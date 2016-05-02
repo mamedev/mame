@@ -157,7 +157,7 @@ public:
 				auto window = GET_FOCUS_WINDOW(&event.text);
 				//printf("Focus window is %p - wl %p\n", window, sdl_window_list);
 				unicode_char result;
-				if (window != NULL)
+				if (window != nullptr)
 				{
 					osd_uchar_from_osdchar(&result, sdlevent.text.text, 1);
 					machine().ui_input().push_char_event(window->target(), result);
@@ -212,7 +212,7 @@ public:
 				int cx = -1, cy = -1;
 				auto window = GET_FOCUS_WINDOW(&sdlevent.motion);
 
-				if (window != NULL && window->xy_to_render_target(sdlevent.motion.x, sdlevent.motion.y, &cx, &cy))
+				if (window != nullptr && window->xy_to_render_target(sdlevent.motion.x, sdlevent.motion.y, &cx, &cy))
 					machine().ui_input().push_mouse_move_event(window->target(), cx, cy);
 			}
 			break;
@@ -229,7 +229,7 @@ public:
 				int cx, cy;
 				osd_ticks_t click = osd_ticks() * 1000 / osd_ticks_per_second();
 				auto window = GET_FOCUS_WINDOW(&sdlevent.button);
-				if (window != NULL && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
+				if (window != nullptr && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
 				{
 					machine().ui_input().push_mouse_down_event(window->target(), cx, cy);
 					// FIXME Parameter ?
@@ -254,7 +254,7 @@ public:
 				int cx, cy;
 				auto window = GET_FOCUS_WINDOW(&sdlevent.button);
 
-				if (window != NULL && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
+				if (window != nullptr && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
 				{
 					machine().ui_input().push_mouse_rdown_event(window->target(), cx, cy);
 				}
@@ -270,7 +270,7 @@ public:
 				int cx, cy;
 				auto window = GET_FOCUS_WINDOW(&sdlevent.button);
 
-				if (window != NULL && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
+				if (window != nullptr && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
 				{
 					machine().ui_input().push_mouse_up_event(window->target(), cx, cy);
 				}
@@ -280,7 +280,7 @@ public:
 				int cx, cy;
 				auto window = GET_FOCUS_WINDOW(&sdlevent.button);
 
-				if (window != NULL && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
+				if (window != nullptr && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
 				{
 					machine().ui_input().push_mouse_rup_event(window->target(), cx, cy);
 				}
@@ -289,7 +289,7 @@ public:
 
 		case SDL_MOUSEWHEEL:
 			auto window = GET_FOCUS_WINDOW(&sdlevent.wheel);
-			if (window != NULL)
+			if (window != nullptr)
 				machine().ui_input().push_mouse_wheel_event(window->target(), 0, 0, sdlevent.wheel.y, 3);
 			break;
 		}
@@ -324,7 +324,7 @@ public:
 	sdl_joystick_device(running_machine &machine, const char *name, input_module &module)
 		: sdl_device(machine, name, DEVICE_CLASS_JOYSTICK, module),
 			joystick({{0}}),
-			sdl_state({0})
+			sdl_state({ nullptr })
 	{
 	}
 
@@ -492,7 +492,7 @@ class sdl_keyboard_module : public sdl_input_module
 	keyboard_trans_table * m_key_trans_table;
 public:
 	sdl_keyboard_module()
-		: sdl_input_module(OSD_KEYBOARDINPUT_PROVIDER)
+		: sdl_input_module(OSD_KEYBOARDINPUT_PROVIDER), m_key_trans_table(nullptr)
 	{
 	}
 
@@ -553,7 +553,7 @@ private:
 		osd_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
 
 		keymap_file = fopen(keymap_filename, "r");
-		if (keymap_file == NULL)
+		if (keymap_file == nullptr)
 		{
 			osd_printf_warning("Keymap: Unable to open keymap %s, using default\n", keymap_filename);
 			return &default_table;
@@ -699,27 +699,27 @@ private:
 	bool           m_sixaxis_mode;
 public:
 	sdl_joystick_module()
-		: sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER)
+		: sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER), m_sixaxis_mode(false)
 	{
 	}
-	
+
 	virtual void exit() override
 	{
 		sdl_input_module::exit();
-	
+
 		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-	}	
-	
+	}
+
 	virtual void input_init(running_machine &machine) override
 	{
-	    SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
 		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK))
 		{
 			osd_printf_error("Could not initialize SDL Joystick: %s.\n", SDL_GetError());
 			return;
 		}
-		
+
 		sdl_input_module::input_init(machine);
 
 		char tempname[512];
@@ -740,7 +740,7 @@ public:
 		{
 			sdl_joystick_device *devinfo = create_joystick_device(machine, &m_joy_map, stick, DEVICE_CLASS_JOYSTICK);
 
-			if (devinfo == NULL)
+			if (devinfo == nullptr)
 				continue;
 
 			physical_stick = m_joy_map.map[stick].physical;
@@ -844,7 +844,7 @@ public:
 private:
 	sdl_joystick_device* create_joystick_device(running_machine &machine, device_map_t *devmap, int index, input_device_class devclass)
 	{
-		sdl_joystick_device *devinfo = NULL;
+		sdl_joystick_device *devinfo = nullptr;
 		char tempname[20];
 
 		if (devmap->map[index].name.length() == 0)
@@ -858,7 +858,7 @@ private:
 					: devicelist()->create_device<sdl_joystick_device>(machine, tempname, *this);
 			}
 
-			return NULL;
+			return nullptr;
 		}
 		else
 		{

@@ -693,28 +693,25 @@ ROM_END
 
 DRIVER_INIT_MEMBER(st0016_state,renju)
 {
-	m_maincpu->st0016_game=0;
+	m_maincpu->set_st0016_game_flag(0);
 }
 
 DRIVER_INIT_MEMBER(st0016_state,nratechu)
 {
-	m_maincpu->st0016_game=1;
+	m_maincpu->set_st0016_game_flag(1);
 }
 
 DRIVER_INIT_MEMBER(st0016_state,mayjinsn)
 {
-	m_maincpu->st0016_game=4;//|0x80;
+	m_maincpu->set_st0016_game_flag(4 /*| 0x80*/);
 	membank("bank2")->set_base(memregion("user1")->base());
 }
 
 DRIVER_INIT_MEMBER(st0016_state,mayjisn2)
 {
-	m_maincpu->st0016_game=4;
+	m_maincpu->set_st0016_game_flag(4);
 	membank("bank2")->set_base(memregion("user1")->base());
 }
-
-
-
 
 
 /*************************************

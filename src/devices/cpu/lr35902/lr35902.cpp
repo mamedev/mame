@@ -302,7 +302,7 @@ void lr35902_cpu_device::execute_run()
 			UINT8   x;
 			/* Execute instruction */
 			switch( m_op ) {
-#include "opc_main.inc"
+#include "opc_main.hxx"
 				default:
 					// actually this should lock up the cpu!
 					logerror("LR35902: Illegal opcode $%02X @ %04X\n", m_op, m_PC);

@@ -42,6 +42,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/watchdog.h"
 #include "includes/zaccaria.h"
 
 
@@ -156,7 +157,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x6e00, 0x6e00) AM_MIRROR(0x81f8) AM_READ(dsw_r) AM_DEVWRITE("audiopcb", zac1b11142_audio_device, hs_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x7c00, 0x7c00) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x7c00, 0x7c00) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
@@ -341,6 +342,8 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaccaria_state,  vblank_irq)
 //  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))

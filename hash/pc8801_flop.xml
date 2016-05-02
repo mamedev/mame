@@ -10351,7 +10351,7 @@ but in different order
 		<info name="alt_title" value="ドラゴンスレイヤー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="448144">    <!-- Data CRC16: 15654 -->
-				<rom name="dragon slayer level 1.1.d88" size="448144" crc="e891dbb1" sha1="16ab5b15fe71c6a47903478b8e4bc654f2ccc66c" offset="0" />
+				<rom name="dragon slayer level 1.1.d88" size="448144" crc="6080247b" sha1="7815acdec65967733573147abaf717b75277d486" offset="0"  status="baddump"/>
 			</dataarea>
 		</part>
 	</software>

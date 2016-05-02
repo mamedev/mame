@@ -244,7 +244,7 @@ void upd7759_device::device_start()
 			m_rommask = romsize - 1;
 		}
 
-		m_drqcallback.set_callback(DEVCB_NULL);
+		m_drqcallback.set_callback(DEVCB_NOOP);
 	}
 	else
 	{
@@ -325,7 +325,7 @@ void upd7756_device::device_start()
 			m_rommask = romsize - 1;
 		}
 
-		m_drqcallback.set_callback(DEVCB_NULL);
+		m_drqcallback.set_callback(DEVCB_NOOP);
 	}
 	else
 	{

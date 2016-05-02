@@ -28,7 +28,7 @@
 #include "render.h"
 
 
-bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_state* clear, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output)
+bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_state* clear, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair*> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output)
 	: m_name(name)
 	, m_effect(effect)
 	, m_clear(clear)
@@ -42,6 +42,11 @@ bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_
 
 bgfx_chain_entry::~bgfx_chain_entry()
 {
+	for (bgfx_input_pair* input : m_inputs)
+	{
+		delete input;
+	}
+	m_inputs.clear();
 	for (bgfx_entry_uniform* uniform : m_uniforms)
 	{
 		delete uniform;
@@ -59,9 +64,9 @@ void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager&
 		return;
 	}
 
-	for (bgfx_input_pair input : m_inputs)
+	for (bgfx_input_pair* input : m_inputs)
 	{
-		input.bind(m_effect, m_targets, textures, screen);
+		input->bind(m_effect, screen);
 	}
 
 	bgfx::TransientVertexBuffer buffer;
@@ -92,7 +97,7 @@ void bgfx_chain_entry::setup_screensize_uniforms(texture_manager& textures, uint
 	float height = screen_height;
 	if (m_inputs.size() > 0)
 	{
-		std::string name = m_inputs[0].texture() + std::to_string(screen);
+		std::string name = m_inputs[0]->texture() + std::to_string(screen);
 		width = float(textures.provider(name)->width());
 		height = float(textures.provider(name)->height());
 	}
@@ -181,7 +186,7 @@ void bgfx_chain_entry::setup_quaddims_uniform(render_primitive* prim) const
 	bgfx_uniform* quad_dims_uniform = m_effect->uniform("u_quad_dims");
 	if (quad_dims_uniform != nullptr)
 	{
-		float values[2] = { (prim->bounds.x1 - prim->bounds.x0) + 0.5f, (prim->bounds.y1 - prim->bounds.y0) + 0.5f};
+		float values[2] = { float(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f)), float(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f)) };
 		quad_dims_uniform->set(values, sizeof(float) * 2);
 	}
 }

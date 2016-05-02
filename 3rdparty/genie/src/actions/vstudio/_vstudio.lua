@@ -14,7 +14,8 @@
 		vs2010 = "v100",
 		vs2012 = "v110",
 		vs2013 = "v120",
-		vs2015 = "v140"
+		vs2015 = "v140",
+		vs15   = "v140",
 	}
 	premake.vstudio.toolset = toolsets[_ACTION] or "unknown?"
 	premake.vstudio.splashpath = ''
@@ -193,7 +194,11 @@
 		if prj.language == "C#" then
 			pattern = "%%.csproj"
 		else
-			pattern = iif(_ACTION > "vs2008", "%%.vcxproj", "%%.vcproj")
+			if _ACTION == "vs15" then
+				pattern = "%%.vcxproj"
+			else
+				pattern = iif(_ACTION > "vs2008", "%%.vcxproj", "%%.vcproj")
+			end
 		end
 
 		local fname = premake.project.getbasename(prj.name, pattern)

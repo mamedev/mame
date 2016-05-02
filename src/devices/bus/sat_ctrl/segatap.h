@@ -29,15 +29,15 @@ class saturn_segatap_device : public device_t,
 public:
 	// construction/destruction
 	saturn_segatap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 	// device_saturn_control_port_interface overrides
 	virtual UINT8 read_ctrl(UINT8 offset) override;
 	virtual UINT8 read_status() override { return 0x04; }

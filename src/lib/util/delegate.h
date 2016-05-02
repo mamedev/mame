@@ -276,7 +276,7 @@ private:
 	raw_mfp_data                m_rawdata;          // raw buffer to hold the copy of the function pointer
 	delegate_generic_class *    m_realobject;       // pointer to the object used for calling
 	delegate_generic_function   m_stubfunction;     // pointer to our matching stub function
-	static raw_mfp_data         s_null_mfp;         // NULL mfp
+	static raw_mfp_data         s_null_mfp;         // nullptr mfp
 };
 
 #elif (USE_DELEGATE_TYPE == DELEGATE_TYPE_INTERNAL)

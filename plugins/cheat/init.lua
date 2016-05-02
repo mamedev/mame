@@ -171,6 +171,7 @@ function cheat.startplugin()
 				    frombcd = frombcd,
 				    pairs = pairs,
 				    ipairs = ipairs,
+				    outputs = manager:machine():outputs(),
 				    time = time,
 			    	    table = 
 				    { insert = table.insert,
@@ -474,6 +475,12 @@ function cheat.startplugin()
 		stop = false
 		start_time = emu.time()
 		cheats = load_cheats()
+		local json = require("json")
+		local file = io.open(manager:machine():options().entries.cheatpath:value():match("([^;]+)") .. "/output.json", "w")
+		if file then
+			file:write(json.stringify(cheats, {indent = true}))
+			file:close()
+		end
 		for num, cheat in pairs(cheats) do
 			parse_cheat(cheat)
 		end
@@ -524,19 +531,16 @@ function cheat.startplugin()
 		manager:machine():popmessage(newcheat.desc .. " added")
 	end
 
-	function ce.dump(index)
-		cheat = cheats[index]
-		if cheat then
-			for k, v in pairs(cheat.cheat_env) do
-				emu.print_verbose(k, v)
-			end
-		end
+	function ce.get(index)
+		return cheats[index]
 	end
 
 	function ce.list()
+		local list = {}
 		for num, cheat in pairs(cheats) do
-			emu.print_verbose(num, cheat.desc)
+			list[num] = cheat.desc
 		end
+		return list
 	end
 
 	_G.ce = ce

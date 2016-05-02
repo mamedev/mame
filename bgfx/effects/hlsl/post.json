@@ -35,6 +35,7 @@
     	{ "name": "u_time",                   "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_screen_scale",           "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
     	{ "name": "u_screen_offset",          "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+        { "name": "u_shadow_tile_mode",       "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_scanline_alpha",         "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_scanline_scale",         "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
     	{ "name": "u_scanline_bright_scale",  "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },

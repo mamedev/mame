@@ -234,4 +234,4 @@ offs_t i860_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 /**************************************************************************
  * The actual decode and execute code.
  **************************************************************************/
-#include "i860dec.inc"
+#include "i860dec.hxx"

@@ -7,7 +7,6 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "cpu/mcs51/mcs51.h"
 
 class lg_dvd_state : public driver_device {

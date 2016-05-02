@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "drivenum.h"
-#include "ui/ui.h"
+#include "ui/moptions.h"
 #include "ui/datfile.h"
 #include "ui/utils.h"
 
@@ -58,9 +58,9 @@ bool datfile_manager::first_run = true;
 //-------------------------------------------------
 // ctor
 //-------------------------------------------------
-datfile_manager::datfile_manager(running_machine &machine) : m_machine(machine)
+datfile_manager::datfile_manager(running_machine &machine, ui_options &moptions) : m_machine(machine), m_options(moptions)
 {
-	if (mame_machine_manager::instance()->ui().options().enabled_dats() && first_run)
+	if (m_options.enabled_dats() && first_run)
 	{
 		first_run = false;
 		if (parseopen("mameinfo.dat"))
@@ -530,19 +530,19 @@ int datfile_manager::index_datafile(dataindex &index, int &swcount)
 					while (cpoint < cends)
 					{
 						// search for comma
-						size_t found = s_roms.find(",", cpoint);
+						size_t comma_found = s_roms.find(",", cpoint);
 
 						// found it
-						if (found != std::string::npos)
+						if (comma_found != std::string::npos)
 						{
 							// copy data
-							name = s_roms.substr(cpoint, found - cpoint);
+							name = s_roms.substr(cpoint, comma_found - cpoint);
 
 							// add a SoftwareItem
 							m_swindex[lname].emplace(name, ftell(fp));
 
 							// update current point
-							cpoint = ++found;
+							cpoint = ++comma_found;
 							swcount++;
 						}
 						else
@@ -577,7 +577,7 @@ bool datfile_manager::parseopen(const char *filename)
 	// MAME core file parsing functions fail in recognizing UNICODE chars in UTF-8 without BOM,
 	// so it's better and faster use standard C fileio functions.
 
-	emu_file file(mame_machine_manager::instance()->ui().options().history_path(), OPEN_FLAG_READ);
+	emu_file file(m_options.history_path(), OPEN_FLAG_READ);
 	if (file.open(filename) != osd_file::error::NONE)
 		return false;
 

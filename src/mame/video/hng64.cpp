@@ -1295,3 +1295,6 @@ void hng64_state::video_start()
 	m_vertsrom = (UINT16*)memregion("verts")->base();
 	m_vertsrom_size = memregion("verts")->bytes();
 }
+
+#include "video/hng64_3d.hxx"
+#include "video/hng64_sprite.hxx"

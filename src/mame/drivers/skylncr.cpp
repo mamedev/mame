@@ -25,11 +25,6 @@
 
   - Press key 0 to navigate between statistics pages. Press START to exit the mode.
 
-
-  TODO:
-
-  - Proper M5M82C255 device emulation.
-
 ****************************************************************************************************
 
   Settings:
@@ -83,6 +78,28 @@
   all statistics and the whole historial by winning hand.
 
   Press START (key 1) to exit the mode.
+
+****************************************************************************************************
+
+  Game specific notes...
+
+  * Sonik Fighter
+
+  The game is encrypted, and runs with an obfuscated daughterboard in place of the CPU.
+  Even when I have the attract working, accepting coins, getting sounds and accurate inputs,
+  the game is still not working. Once coined, there's no way to start a game.
+
+  The PPI0 port B, D5 input line behaves like a reset, when the Attract/Girls DSW is set OFF.
+  Need more investigation about...
+
+  Colors are wrong due to can't find a way to set the palette.
+
+****************************************************************************************************
+
+  TODO:
+
+  - Proper M5M82C255 device emulation.
+  - Colors: Find the palette in Sonik Fighter.
 
 ***************************************************************************************************/
 
@@ -163,6 +180,7 @@ public:
 	DECLARE_READ8_MEMBER(ret_ff);
 	DECLARE_WRITE8_MEMBER(skylncr_nmi_enable_w);
 	DECLARE_DRIVER_INIT(skylncr);
+	DECLARE_DRIVER_INIT(sonikfig);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
@@ -1403,6 +1421,148 @@ static INPUT_PORTS_START( sstar97 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( sonikfig )
+	PORT_START("IN1")   /* $00 (PPI0 port A) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_D) PORT_NAME("IN1-02")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_F) PORT_NAME("IN1-08")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_G) PORT_NAME("IN1-20")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_H) PORT_NAME("IN1-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_J) PORT_NAME("IN1-80")
+
+	PORT_START("IN2")   /* $01 (PPI0 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_K) PORT_NAME("IN2-02")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_L) PORT_NAME("IN2-08")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")  // OK
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_T) PORT_NAME("Reset #2") // Behaves like a reset, only when attract DSW is off...
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_Y) PORT_NAME("IN2-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_U) PORT_NAME("IN2-80")
+
+	PORT_START("IN3")   /* $11 (PPI1 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)     // OK
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)     // OK
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)     // OK
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )              // OK
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_I) PORT_NAME("IN3-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score")
+
+	PORT_START("IN4")   /* $12 (PPI1 port C) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-01")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset #1")  // OK
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   // Settings OK
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-10")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-20")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START("DSW1")  /* $02 (PPI0 port C) */
+	PORT_DIPNAME( 0x11, 0x00, "D-UP Percentage" )  // OK
+	PORT_DIPSETTING(    0x11, "40%" )  // OK
+	PORT_DIPSETTING(    0x01, "50%" )  // OK
+	PORT_DIPSETTING(    0x10, "60%" )  // OK
+	PORT_DIPSETTING(    0x00, "70%" )  // OK
+	PORT_DIPNAME( 0x0e, 0x00, "Main Game Percentage" )  // OK
+	PORT_DIPSETTING(    0x0e, "55%" )  // OK
+	PORT_DIPSETTING(    0x0c, "60%" )  // OK
+	PORT_DIPSETTING(    0x0a, "65%" )  // OK
+	PORT_DIPSETTING(    0x08, "70%" )  // OK
+	PORT_DIPSETTING(    0x06, "75%" )  // OK
+	PORT_DIPSETTING(    0x04, "80%" )  // OK
+	PORT_DIPSETTING(    0x02, "85%" )  // OK
+	PORT_DIPSETTING(    0x00, "90%" )  // OK
+	PORT_DIPNAME( 0x20, 0x00, "Reels Speed" )  // OK
+	PORT_DIPSETTING(    0x20, "Low" )  // OK
+	PORT_DIPSETTING(    0x00, "Hi" )  // OK
+	PORT_DIPNAME( 0x40, 0x00, "Bonus Score" )  // OK
+	PORT_DIPSETTING(    0x40, "32" )  // OK
+	PORT_DIPSETTING(    0x00, "24" )  // OK
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )  // OK
+	PORT_DIPSETTING(    0x00, "x1" )  // OK
+	PORT_DIPSETTING(    0x80, "x100" )  // OK
+
+	PORT_START("DSW2")  /* $10 (PPI1 port A) */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )  // OK
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )  // OK
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )  // OK
+	PORT_DIPNAME( 0x18, 0x18, "Payout Limit" )  // OK
+	PORT_DIPSETTING(    0x00, "0" )  // OK
+	PORT_DIPSETTING(    0x18, "1000" )  // OK
+	PORT_DIPSETTING(    0x10, "2000" )  // OK
+	PORT_DIPSETTING(    0x08, "5000" )  // OK
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")  /* AY8910 port A */
+	PORT_DIPNAME( 0x07, 0x07, "Coinage A, B & C" )  // OK on test
+	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x01, "1 Coin / 5 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x02, "1 Coin / 10 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x04, "1 Coin / 30 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x05, "1 Coin / 40 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credit" )  // OK on test, always 1c-1c in game...
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )  // This input should be turned ON, otherwise you can't enter the setup (F2)
+	PORT_DIPNAME( 0x10, 0x00, "Attract / Girls" )  // OK... Could be either or both. Need the game working to check it.
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Max Bonus" )  // OK
+	PORT_DIPSETTING(    0x20, "10000" )  // OK
+	PORT_DIPSETTING(    0x00, "20000" )  // OK
+	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Bet" )  // OK
+	PORT_DIPSETTING(    0xc0, "0" )  // OK
+	PORT_DIPSETTING(    0x80, "8" )  // OK
+	PORT_DIPSETTING(    0x40, "16" )  // OK
+	PORT_DIPSETTING(    0x00, "32" )  // OK
+
+	PORT_START("DSW4")  /* AY8910 port B */
+	PORT_DIPNAME( 0x07, 0x00, "Key In" )  // OK on test
+	PORT_DIPSETTING(    0x00, "1 Pulse / 100 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x01, "1 Pulse / 110 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x02, "1 Pulse / 120 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x03, "1 Pulse / 130 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x04, "1 Pulse / 200 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x05, "1 Pulse / 400 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x06, "1 Pulse / 500 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x07, "1 Pulse / 1000 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPNAME( 0x18, 0x00, "Max Bet" )  // OK
+	PORT_DIPSETTING(    0x18, "64" )  // OK
+	PORT_DIPSETTING(    0x10, "72" )  // OK
+	PORT_DIPSETTING(    0x08, "80" )  // OK
+	PORT_DIPSETTING(    0x00, "96" )  // OK
+	PORT_DIPNAME( 0x20, 0x00, "Lit" )  // OK
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )  // OK
+	PORT_DIPSETTING(    0x00, "Yes (50.000)" )  // OK, 50.000
+	PORT_DIPNAME( 0x40, 0x00, "Control" )  // OK
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )  // OK
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )  // OK
+	PORT_DIPNAME( 0x80, 0x00, "Reel Cover" )  // OK
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )  // OK
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )  // OK
+INPUT_PORTS_END
+
+
+
 // It runs in IM 0, thus needs an opcode on the data bus
 INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 {
@@ -1723,6 +1883,7 @@ ROM_END
 /*
   Sonik Fighter.
   Greek Version By ZBOUNOS (Z GAMES).
+  Year 2000.
 
   Multiple Butterfly type with naked girls.
   + new features and hold a pair.
@@ -1753,8 +1914,53 @@ ROM_END
 *           Driver Init           *
 **********************************/
 
-DRIVER_INIT_MEMBER(skylncr_state,skylncr)
+DRIVER_INIT_MEMBER(skylncr_state, skylncr)
 {
+	m_generic_paletteram_8.allocate(0x100 * 3);
+	m_generic_paletteram2_8.allocate(0x100 * 3);
+}
+
+DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
+/*
+  Encryption: For each 8 bytes group,
+  swap byte #1 with #4 and #3 with #6.
+
+       SWAPPED
+      /       \
+  00 01 02 03 04 05 06 07
+            \       /
+             SWAPPED
+  
+  00 01 02 03 04 05 06 07
+      \     \ /     /
+       \     X     /
+        \   / \   /
+         \ /   \ /
+          X     X
+         / \   / \
+        /   \ /   \
+       /     X     \
+      /     / \     \
+  00 04 02 06 01 05 03 07
+*/
+{
+	UINT8 *ROM = memregion("maincpu")->base();
+	UINT8 byte01, byte03, byte04, byte06;  // for a better visual understanding...
+	int x;
+
+	for (x= 0; x < 0x10000; x += 8)
+	{
+		byte01 = ROM[x + 1];
+		byte03 = ROM[x + 3];
+		byte04 = ROM[x + 4];
+		byte06 = ROM[x + 6];
+
+        ROM[x + 1] = byte04;
+        ROM[x + 3] = byte06;
+        ROM[x + 4] = byte01;
+        ROM[x + 6] = byte03;
+	}
+	
 	m_generic_paletteram_8.allocate(0x100 * 3);
 	m_generic_paletteram2_8.allocate(0x100 * 3);
 }
@@ -1764,14 +1970,14 @@ DRIVER_INIT_MEMBER(skylncr_state,skylncr)
 *                  Game Drivers                     *
 ****************************************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT     ROT    COMPANY                 FULLNAME                                         FLAGS  */
-GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
-GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
-GAME( 1999, mbutrfly, 0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Magical Butterfly (version U350C, encrypted)",   MACHINE_NOT_WORKING )
-GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
-GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr, ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
-GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr, ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
-GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr, ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
-GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
-GAME( 199?, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr, ROT0, "bootleg",              "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_NOT_WORKING )
-GAME( 199?, sonikfig, 0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Z Games",              "Sonik Fighter (encrypted)",                      MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT    COMPANY                 FULLNAME                                         FLAGS  */
+GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
+GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
+GAME( 1999, mbutrfly, 0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Magical Butterfly (version U350C, encrypted)",   MACHINE_NOT_WORKING )
+GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
+GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr,  ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
+GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr,  ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
+GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr,  ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
+GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
+GAME( 199?, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr,  ROT0, "bootleg",              "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_NOT_WORKING )
+GAME( 2000, sonikfig, 0,       skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )

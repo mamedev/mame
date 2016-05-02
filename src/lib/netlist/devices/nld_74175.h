@@ -57,7 +57,7 @@ NETLIB_SUBDEVICE(74175_sub,
 
 NETLIB_DEVICE(74175,
 
-	NETLIB_NAME(74175_sub) m_sub;
+	NETLIB_SUB(74175_sub) m_sub;
 	logic_input_t m_D[4];
 	logic_input_t m_CLRQ;
 );

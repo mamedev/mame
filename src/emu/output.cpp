@@ -183,7 +183,7 @@ INT32 output_manager::get_indexed_value(const char *basename, int index)
 /*-------------------------------------------------
     output_set_notifier - sets a notifier callback
     for a particular output, or for all outputs
-    if NULL is specified
+    if nullptr is specified
 -------------------------------------------------*/
 
 void output_manager::set_notifier(const char *outname, output_notifier_func callback, void *param)

@@ -21,7 +21,7 @@ using s_parts = std::unordered_map<std::string, std::string>;
 class ui_menu_select_software : public ui_menu
 {
 public:
-	ui_menu_select_software(running_machine &machine, render_container *container, const game_driver *driver);
+	ui_menu_select_software(mame_ui_manager &mui, render_container *container, const game_driver *driver);
 	virtual ~ui_menu_select_software();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -65,7 +65,7 @@ private:
 class ui_software_parts : public ui_menu
 {
 public:
-	ui_software_parts(running_machine &machine, render_container *container, s_parts parts, ui_software_info *ui_info);
+	ui_software_parts(mame_ui_manager &mui, render_container *container, s_parts parts, ui_software_info *ui_info);
 	virtual ~ui_software_parts();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -79,7 +79,7 @@ private:
 class ui_bios_selection : public ui_menu
 {
 public:
-	ui_bios_selection(running_machine &machine, render_container *container, s_bios biosname, void *driver, bool software, bool inlist);
+	ui_bios_selection(mame_ui_manager &mui, render_container *container, s_bios biosname, void *driver, bool software, bool inlist);
 	virtual ~ui_bios_selection();
 	virtual void populate() override;
 	virtual void handle() override;

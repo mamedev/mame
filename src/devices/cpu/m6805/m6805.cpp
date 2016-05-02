@@ -474,7 +474,7 @@ void m6805_base_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -561,7 +561,7 @@ void m6805_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-#include "6805ops.inc"
+#include "6805ops.hxx"
 
 //-------------------------------------------------
 //  execute_clocks_to_cycles - convert the raw

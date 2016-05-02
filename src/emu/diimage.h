@@ -129,7 +129,7 @@ typedef void (*device_image_partialhash_func)(hash_collection &, const unsigned 
 #define DEVICE_IMAGE_UNLOAD_DELEGATE(_class,_name)      device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_name),#_class "::device_image_unload_" #_name, downcast<_class *>(device->owner()))
 
 #define MCFG_SET_IMAGE_LOADABLE(_usrload) \
-    device_image_interface::static_set_user_loadable(*device, _usrload);
+	device_image_interface::static_set_user_loadable(*device, _usrload);
 
 
 // ======================> device_image_interface
@@ -165,24 +165,24 @@ public:
 	virtual const char *file_extensions() const = 0;
 	virtual const option_guide *create_option_guide() const = 0;
 
-	const image_device_format *device_get_indexed_creatable_format(int index) { return m_formatlist.find(index); }
+	const image_device_format *device_get_indexed_creatable_format(int index) const { return m_formatlist.find(index); }
 	const image_device_format *device_get_named_creatable_format(const char *format_name);
-	const option_guide *device_get_creation_option_guide() { return create_option_guide(); }
+	const option_guide *device_get_creation_option_guide() const { return create_option_guide(); }
 
 	const char *error();
 	void seterror(image_error_t err, const char *message);
 	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
 	bool exists() { return !m_image_name.empty(); }
-	const char *filename() { if (m_image_name.empty()) return nullptr; else return m_image_name.c_str(); }
-	const char *basename() { if (m_basename.empty()) return nullptr; else return m_basename.c_str(); }
-	const char *basename_noext()  { if (m_basename_noext.empty()) return nullptr; else return m_basename_noext.c_str(); }
-	const char *filetype()  { if (m_filetype.empty()) return nullptr; else return m_filetype.c_str(); }
+	const char *filename() const { if (m_image_name.empty()) return nullptr; else return m_image_name.c_str(); }
+	const char *basename() const { if (m_basename.empty()) return nullptr; else return m_basename.c_str(); }
+	const char *basename_noext()  const { if (m_basename_noext.empty()) return nullptr; else return m_basename_noext.c_str(); }
+	const char *filetype() const { if (m_filetype.empty()) return nullptr; else return m_filetype.c_str(); }
 	bool is_open() const { return bool(m_file); }
-	util::core_file &image_core_file() { return *m_file; }
+	util::core_file &image_core_file() const { return *m_file; }
 	UINT64 length() { check_for_file(); return m_file->size(); }
-	bool is_readonly() { return m_readonly; }
-	bool has_been_created() { return m_created; }
+	bool is_readonly() const { return m_readonly; }
+	bool has_been_created() const { return m_created; }
 	void make_readonly() { m_readonly = true; }
 	UINT32 fread(void *buffer, UINT32 length) { check_for_file(); return m_file->read(buffer, length); }
 	UINT32 fread(optional_shared_ptr<UINT8> &ptr, UINT32 length) { ptr.allocate(length); return fread(ptr.target(), length); }
@@ -197,14 +197,14 @@ public:
 	// configuration access
 	void set_init_phase() { m_init_phase = TRUE; }
 
-	const char* longname() { return m_longname.c_str(); }
-	const char* manufacturer() { return m_manufacturer.c_str(); }
-	const char* year() { return m_year.c_str(); }
-	UINT32 supported() { return m_supported; }
+	const char* longname() const { return m_longname.c_str(); }
+	const char* manufacturer() const { return m_manufacturer.c_str(); }
+	const char* year() const { return m_year.c_str(); }
+	UINT32 supported() const { return m_supported; }
 
-	const software_info *software_entry() { return m_software_info_ptr; }
-	const software_part *part_entry() { return m_software_part_ptr; }
-	const char *software_list_name() { return m_software_list_name.c_str(); }
+	const software_info *software_entry() const { return m_software_info_ptr; }
+	const software_part *part_entry() const { return m_software_part_ptr; }
+	const char *software_list_name() const { return m_software_list_name.c_str(); }
 
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const char * working_directory();
@@ -237,15 +237,15 @@ public:
 	int reopen_for_write(const char *path);
 
 	static void software_name_split(const char *swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart);
-    static void static_set_user_loadable(device_t &device, bool user_loadable) {
-        device_image_interface *img;
-        if (!device.interface(img))
-            throw emu_fatalerror("MCFG_SET_IMAGE_LOADABLE called on device '%s' with no image interface\n", device.tag());
-        
-        img->m_user_loadable = user_loadable;
-    }
+	static void static_set_user_loadable(device_t &device, bool user_loadable) {
+		device_image_interface *img;
+		if (!device.interface(img))
+			throw emu_fatalerror("MCFG_SET_IMAGE_LOADABLE called on device '%s' with no image interface\n", device.tag());
 
-    bool user_loadable() const { return m_user_loadable; }
+		img->m_user_loadable = user_loadable;
+	}
+
+	bool user_loadable() const { return m_user_loadable; }
 
 protected:
 	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args, bool just_load);
@@ -258,7 +258,7 @@ protected:
 
 	void clear_error();
 
-	void check_for_file() { assert_always(m_file, "Illegal operation on unmounted image"); }
+	void check_for_file() const { assert_always(m_file, "Illegal operation on unmounted image"); }
 
 	void setup_working_directory();
 	bool try_change_working_directory(const char *subdir);
@@ -318,13 +318,13 @@ protected:
 
 	std::string m_brief_instance_name;
 	std::string m_instance_name;
-    
+
 	/* creation info */
 	simple_list<image_device_format> m_formatlist;
 
-    /* in the case of arcade cabinet with fixed carts inserted, 
-     we want to disable command line cart loading... */
-    bool m_user_loadable;
+	/* in the case of arcade cabinet with fixed carts inserted,
+	 we want to disable command line cart loading... */
+	bool m_user_loadable;
 
 	bool m_is_loading;
 };

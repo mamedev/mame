@@ -181,7 +181,7 @@ public:
 	void add(const char *name, UINT64 constvalue);
 	void add(const char *name, void *ref, getter_func getter, setter_func setter = nullptr);
 	void add(const char *name, void *ref, int minparams, int maxparams, execute_func execute);
-	symbol_entry *find(const char *name) { return m_symlist.find(name); }
+	symbol_entry *find(const char *name) const { return m_symlist.find(name); }
 	symbol_entry *find_deep(const char *name);
 
 	// value getter/setter

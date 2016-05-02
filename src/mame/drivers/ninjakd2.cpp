@@ -172,7 +172,7 @@ TODO:
 
 SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 {
-	if (m_pcm_region == NULL)
+	if (m_pcm_region == nullptr)
 	{
 		return;
 	}
@@ -193,7 +193,7 @@ SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
 {
 	// only Ninja Kid II uses this
-	if (m_pcm_region == NULL)
+	if (m_pcm_region == nullptr)
 	{
 		return;
 	}

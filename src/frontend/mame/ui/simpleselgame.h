@@ -13,19 +13,20 @@
 #ifndef __UI_SIMPLESELGAME_H__
 #define __UI_SIMPLESELGAME_H__
 
-#include "drivenum.h"
 #include "menu.h"
+
+class driver_enumerator;
 
 class ui_simple_menu_select_game : public ui_menu {
 public:
-	ui_simple_menu_select_game(running_machine &machine, render_container *container, const char *gamename);
+	ui_simple_menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename);
 	virtual ~ui_simple_menu_select_game();
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 	// force game select menu
-	static void force_game_select(running_machine &machine, render_container *container);
+	static void force_game_select(mame_ui_manager &mui, render_container *container);
 
 	virtual bool menu_has_search_active() override { return (m_search[0] != 0); }
 private:

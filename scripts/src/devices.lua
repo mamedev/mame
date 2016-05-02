@@ -19,9 +19,12 @@ function devicesProject(_target, _subtarget)
 	uuid (os.uuid("optional-" .. _target .."_" .. _subtarget))
 	kind (LIBTYPE)
 	targetsubdir(_target .."_" .. _subtarget)
-	options {
-		"ArchiveSplit",
-	}
+
+	if (_OPTIONS["targetos"] ~= "asmjs") then
+		options {
+			"ArchiveSplit",
+		}
+	end
 
 	addprojectflags()
 	precompiledheaders()

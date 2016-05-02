@@ -8,6 +8,7 @@
 
 #include "bx.h"
 #include "debug.h"
+#include <sys/stat.h>
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
@@ -272,6 +273,65 @@ namespace bx
 #else
 		return ::getcwd(_buffer, _size);
 #endif // BX_COMPILER_
+	}
+
+	struct FileInfo
+	{
+		enum Enum
+		{
+			Regular,
+			Directory,
+
+			Count
+		};
+
+		uint64_t m_size;
+		Enum m_type;
+	};
+
+	inline bool stat(const char* _filePath, FileInfo& _fileInfo)
+	{
+		_fileInfo.m_size = 0;
+		_fileInfo.m_type = FileInfo::Count;
+
+#if BX_COMPILER_MSVC
+		struct ::_stat64 st;
+		int32_t result = ::_stat64(_filePath, &st);
+
+		if (0 != result)
+		{
+			return false;
+		}
+
+		if (0 != (st.st_mode & _S_IFREG) )
+		{
+			_fileInfo.m_type = FileInfo::Regular;
+		}
+		else if (0 != (st.st_mode & _S_IFDIR) )
+		{
+			_fileInfo.m_type = FileInfo::Directory;
+		}
+#else
+		struct ::stat st;
+		int32_t result = ::stat(_filePath, &st);
+		if (0 != result)
+		{
+			return false;
+		}
+
+		if (0 != (st.st_mode & S_IFREG) )
+		{
+			_fileInfo.m_type = FileInfo::Regular;
+		}
+		else if (0 != (st.st_mode & S_IFDIR) )
+		{
+			_fileInfo.m_type = FileInfo::Directory;
+		}
+#endif // BX_COMPILER_MSVC
+
+		_fileInfo.m_size = st.st_size;
+
+		return true;
 	}
 
 } // namespace bx

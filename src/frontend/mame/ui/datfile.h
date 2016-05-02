@@ -13,6 +13,8 @@
 #ifndef __UI_DATFILE_H__
 #define __UI_DATFILE_H__
 
+class ui_options;
+
 //-------------------------------------------------
 //  Datafile Manager
 //-------------------------------------------------
@@ -20,7 +22,7 @@ class datfile_manager
 {
 public:
 	// construction/destruction
-	datfile_manager(running_machine &machine);
+	datfile_manager(running_machine &machine, ui_options &moptions);
 
 	// getters
 	running_machine &machine() const { return m_machine; }
@@ -86,6 +88,7 @@ private:
 
 	// internal state
 	running_machine     &m_machine;             // reference to our machine
+	ui_options          &m_options;
 	std::string         m_fullpath;
 	static std::string  m_history_rev, m_mame_rev, m_mess_rev, m_sysinfo_rev, m_story_rev, m_ginit_rev;
 	FILE                *fp = nullptr;

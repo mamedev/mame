@@ -37,9 +37,9 @@ NETLIB_DEVICE(CD4066_GATE,
 public:
 
 	analog_input_t m_control;
-	NETLIB_NAME(R) m_R;
+	NETLIB_SUB(R) m_R;
 
-	NETLIB_NAME(vdd_vss) m_supply;
+	NETLIB_SUB(vdd_vss) m_supply;
 	param_double_t m_base_r;
 );
 

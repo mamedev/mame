@@ -106,4 +106,3 @@ UINT8 saturn_wheel_device::read_ctrl(UINT8 offset)
 	}
 	return res;
 }
-

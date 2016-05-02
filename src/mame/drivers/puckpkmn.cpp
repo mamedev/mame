@@ -51,7 +51,7 @@ Notes:
 #include "sound/2612intf.h"
 
 #include "includes/megadriv.h"
-
+#include "includes/megadrvb.h"
 
 /* Puckman Pockimon Input Ports */
 static INPUT_PORTS_START( puckpkmn )

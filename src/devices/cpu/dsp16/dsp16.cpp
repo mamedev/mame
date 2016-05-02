@@ -197,7 +197,7 @@ void dsp16_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -450,4 +450,4 @@ void dsp16_device::execute_run()
 	} while (m_icount > 0);
 }
 
-#include "dsp16ops.inc"
+#include "dsp16ops.hxx"

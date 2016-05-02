@@ -18,8 +18,8 @@
 	class NETLIB_NAME(_name) : public net_signal_t<_num_input, _check, _invert>     \
 	{                                                                               \
 	public:                                                                         \
-		NETLIB_NAME(_name) ()                                             \
-		: net_signal_t<_num_input, _check, _invert>() { }                           \
+		NETLIB_NAME(_name) (netlist_t &anetlist, const pstring &name)               \
+		: net_signal_t<_num_input, _check, _invert>(anetlist, name) { }             \
 	}
 
 NETLIB_NAMESPACE_DEVICES_START()
@@ -32,8 +32,8 @@ template <int _numdev, int _check, int _invert>
 class net_signal_t : public device_t
 {
 public:
-	net_signal_t()
-	: device_t(), m_active(1)
+	net_signal_t(netlist_t &anetlist, const pstring &name)
+	: device_t(anetlist, name), m_active(1)
 	{
 	}
 

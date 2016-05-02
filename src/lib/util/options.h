@@ -169,7 +169,6 @@ public:
 	bool is_changed(const char *name) const;
 
 	// setting
-	void set_command(const char *command);
 	bool set_value(const char *name, const char *value, int priority, std::string &error_string);
 	bool set_value(const char *name, int value, int priority, std::string &error_string);
 	bool set_value(const char *name, float value, int priority, std::string &error_string);

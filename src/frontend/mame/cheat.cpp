@@ -75,6 +75,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "xmlfile.h"
+#include "mame.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "cheat.h"
@@ -142,7 +143,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 	// iterate over items
 	for (xml_data_node *itemnode = xml_get_sibling(paramnode.child, "item"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "item"))
 	{
-		// check for NULL text
+		// check for nullptr text
 		if (itemnode->value == nullptr || itemnode->value[0] == 0)
 			throw emu_fatalerror("%s.xml(%d): item is missing text\n", filename, itemnode->line);
 
@@ -705,7 +706,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		xml_data_node *commentnode = xml_get_sibling(cheatnode.child, "comment");
 		if (commentnode != nullptr)
 		{
-			// set the value if not NULL
+			// set the value if not nullptr
 			if (commentnode->value != nullptr && commentnode->value[0] != 0)
 				m_comment.assign(commentnode->value);
 
@@ -1221,17 +1222,17 @@ bool cheat_manager::save_all(const char *filename)
 //  render text
 //-------------------------------------------------
 
-void cheat_manager::render_text(render_container &container)
+void cheat_manager::render_text(mame_ui_manager &mui, render_container &container)
 {
 	// render any text and free it along the way
 	for (int linenum = 0; linenum < m_output.size(); linenum++)
 		if (!m_output[linenum].empty())
 		{
 			// output the text
-			mame_machine_manager::instance()->ui().draw_text_full(&container, m_output[linenum].c_str(),
-					0.0f, (float)linenum * mame_machine_manager::instance()->ui().get_line_height(), 1.0f,
+			mui.draw_text_full(&container, m_output[linenum].c_str(),
+					0.0f, (float)linenum * mui.get_line_height(), 1.0f,
 					m_justify[linenum], WRAP_NEVER, DRAW_OPAQUE,
-					ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
+					rgb_t::white, rgb_t::black, nullptr, nullptr);
 		}
 }
 

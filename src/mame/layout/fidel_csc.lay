@@ -4,6 +4,83 @@
 <!-- other than panel button mappings, layout is identical to vsc -->
 
 <!-- define elements -->
+	<script>
+	local layout = {}
+	local board
+	local first_sq
+	local curr_sq = {x = 0, y = 0}
+
+	local port_tags = { ":IN.0", ":IN.1", ":IN.2", ":IN.3", ":IN.4", ":IN.5", ":IN.6", ":IN.7" }
+	local ports
+
+	local function move_piece(from, to)
+		if board[from.y][from.x] == 0 then
+			return false
+		end
+		board[to.y][to.x] = board[from.y][from.x]
+		board[from.y][from.x] = 0
+		machine:outputs():set_indexed_value("pos", (to.y * 10) + to.x, board[to.y][to.x])
+		machine:outputs():set_indexed_value("pos", (from.y * 10) + from.x, 0)
+		return true
+	end
+
+	function layout.reset()
+		board = 
+			{{ 3, 5, 4, 2, 1, 4, 5, 3},
+	 		 { 6, 6, 6, 6, 6, 6, 6, 6},
+			 { 0, 0, 0, 0, 0, 0, 0, 0},
+			 { 0, 0, 0, 0, 0, 0, 0, 0},
+			 { 0, 0, 0, 0, 0, 0, 0, 0},
+			 { 0, 0, 0, 0, 0, 0, 0, 0},
+			 {12,12,12,12,12,12,12,12},
+			 { 9,11,10, 8, 7,10,11, 9}}
+		
+		for y, row in ipairs(board) do
+			for x, cell in ipairs(row) do
+				machine:outputs():set_indexed_value("pos", (y * 10) + x, board[y][x])
+			end
+		end
+		ports = machine:ioport().ports
+	end
+
+	function layout.frame()
+		local value = ports[":IN.8"]:read()
+		if value &amp; 0x80 ~= 0 then
+			layout.reset()
+			return
+		end
+		
+		for x, tag in ipairs(port_tags) do
+			local port = ports[tag]
+			if port then
+				local newvalue = port:read()
+				if newvalue ~= 0 then
+					for y = 8, 1, -1 do
+						if newvalue &amp; 1 == 1 then
+							if (curr_sq.y == y) and (curr_sq.x == x) then
+								return
+							end
+							if not first_sq then
+								first_sq = {x = x, y = y}
+							else
+								if move_piece(first_sq, {x = x, y = y}) then
+									first_sq = nil
+								else
+									first_sq = {x = x, y = y}
+								end
+							end
+							curr_sq = {x = x, y = y}
+							return
+						end
+						newvalue = newvalue >> 1
+					end
+				end
+			end
+		end
+	end
+
+	return layout, "fidel_csc"
+	</script>
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
 
@@ -176,6 +253,21 @@
 		<text string="LV"><color red="0.81" green="0.8" blue="0.79" /></text>
 	</element>
 
+	<element name="piece" defstate="0">
+		<text string="&#x265a;" state="1"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265b;" state="2"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265c;" state="3"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265d;" state="4"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265e;" state="5"><color red="0.27" green="0.25" blue="0.25" /></text>
+		<text string="&#x265f;" state="6"><color red="0.27" green="0.25" blue="0.25" /></text>
+		
+		<text string="&#x265a;" state="7"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265b;" state="8"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265c;" state="9"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265d;" state="10"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265e;" state="11"><color red="0.71" green="0.7" blue="0.69" /></text>
+		<text string="&#x265f;" state="12"><color red="0.71" green="0.7" blue="0.69" /></text>
+	</element>
 
 <!-- build screen -->
 
@@ -251,6 +343,79 @@
 		<bezel element="black"><bounds x="23" y="73" width="10" height="10.5" /></bezel>
 		<bezel element="black"><bounds x="43" y="73" width="10" height="10.5" /></bezel>
 		<bezel element="black"><bounds x="63" y="73" width="10" height="10.5" /></bezel>
+
+
+		<bezel name="pos11" element="piece"><bounds x="3" y="3" width="10" height="10" /></bezel>
+		<bezel name="pos12" element="piece"><bounds x="13" y="3" width="10" height="10" /></bezel>
+		<bezel name="pos13" element="piece"><bounds x="23" y="3" width="10" height="10" /></bezel>
+		<bezel name="pos14" element="piece"><bounds x="33" y="3" width="10" height="10" /></bezel>
+		<bezel name="pos15" element="piece"><bounds x="43" y="3" width="10" height="10" /></bezel>
+		<bezel name="pos16" element="piece"><bounds x="53" y="3" width="10" height="10" /></bezel>
+		<bezel name="pos17" element="piece"><bounds x="63" y="3" width="10" height="10" /></bezel>
+		<bezel name="pos18" element="piece"><bounds x="73" y="3" width="10" height="10" /></bezel>
+
+		<bezel name="pos21" element="piece"><bounds x="3" y="13" width="10" height="10" /></bezel>
+		<bezel name="pos22" element="piece"><bounds x="13" y="13" width="10" height="10" /></bezel>
+		<bezel name="pos23" element="piece"><bounds x="23" y="13" width="10" height="10" /></bezel>
+		<bezel name="pos24" element="piece"><bounds x="33" y="13" width="10" height="10" /></bezel>
+		<bezel name="pos25" element="piece"><bounds x="43" y="13" width="10" height="10" /></bezel>
+		<bezel name="pos26" element="piece"><bounds x="53" y="13" width="10" height="10" /></bezel>
+		<bezel name="pos27" element="piece"><bounds x="63" y="13" width="10" height="10" /></bezel>
+		<bezel name="pos28" element="piece"><bounds x="73" y="13" width="10" height="10" /></bezel>
+
+		<bezel name="pos31" element="piece"><bounds x="3" y="23" width="10" height="10" /></bezel>
+		<bezel name="pos32" element="piece"><bounds x="13" y="23" width="10" height="10" /></bezel>
+		<bezel name="pos33" element="piece"><bounds x="23" y="23" width="10" height="10" /></bezel>
+		<bezel name="pos34" element="piece"><bounds x="33" y="23" width="10" height="10" /></bezel>
+		<bezel name="pos35" element="piece"><bounds x="43" y="23" width="10" height="10" /></bezel>
+		<bezel name="pos36" element="piece"><bounds x="53" y="23" width="10" height="10" /></bezel>
+		<bezel name="pos37" element="piece"><bounds x="63" y="23" width="10" height="10" /></bezel>
+		<bezel name="pos38" element="piece"><bounds x="73" y="23" width="10" height="10" /></bezel>
+
+		<bezel name="pos41" element="piece"><bounds x="3" y="33" width="10" height="10" /></bezel>
+		<bezel name="pos42" element="piece"><bounds x="13" y="33" width="10" height="10" /></bezel>
+		<bezel name="pos43" element="piece"><bounds x="23" y="33" width="10" height="10" /></bezel>
+		<bezel name="pos44" element="piece"><bounds x="33" y="33" width="10" height="10" /></bezel>
+		<bezel name="pos45" element="piece"><bounds x="43" y="33" width="10" height="10" /></bezel>
+		<bezel name="pos46" element="piece"><bounds x="53" y="33" width="10" height="10" /></bezel>
+		<bezel name="pos47" element="piece"><bounds x="63" y="33" width="10" height="10" /></bezel>
+		<bezel name="pos48" element="piece"><bounds x="73" y="33" width="10" height="10" /></bezel>
+
+		<bezel name="pos51" element="piece"><bounds x="3" y="43" width="10" height="10" /></bezel>
+		<bezel name="pos52" element="piece"><bounds x="13" y="43" width="10" height="10" /></bezel>
+		<bezel name="pos53" element="piece"><bounds x="23" y="43" width="10" height="10" /></bezel>
+		<bezel name="pos54" element="piece"><bounds x="33" y="43" width="10" height="10" /></bezel>
+		<bezel name="pos55" element="piece"><bounds x="43" y="43" width="10" height="10" /></bezel>
+		<bezel name="pos56" element="piece"><bounds x="53" y="43" width="10" height="10" /></bezel>
+		<bezel name="pos57" element="piece"><bounds x="63" y="43" width="10" height="10" /></bezel>
+		<bezel name="pos58" element="piece"><bounds x="73" y="43" width="10" height="10" /></bezel>
+
+		<bezel name="pos61" element="piece"><bounds x="3" y="53" width="10" height="10" /></bezel>
+		<bezel name="pos62" element="piece"><bounds x="13" y="53" width="10" height="10" /></bezel>
+		<bezel name="pos63" element="piece"><bounds x="23" y="53" width="10" height="10" /></bezel>
+		<bezel name="pos64" element="piece"><bounds x="33" y="53" width="10" height="10" /></bezel>
+		<bezel name="pos65" element="piece"><bounds x="43" y="53" width="10" height="10" /></bezel>
+		<bezel name="pos66" element="piece"><bounds x="53" y="53" width="10" height="10" /></bezel>
+		<bezel name="pos67" element="piece"><bounds x="63" y="53" width="10" height="10" /></bezel>
+		<bezel name="pos68" element="piece"><bounds x="73" y="53" width="10" height="10" /></bezel>
+
+		<bezel name="pos71" element="piece"><bounds x="3" y="63" width="10" height="10" /></bezel>
+		<bezel name="pos72" element="piece"><bounds x="13" y="63" width="10" height="10" /></bezel>
+		<bezel name="pos73" element="piece"><bounds x="23" y="63" width="10" height="10" /></bezel>
+		<bezel name="pos74" element="piece"><bounds x="33" y="63" width="10" height="10" /></bezel>
+		<bezel name="pos75" element="piece"><bounds x="43" y="63" width="10" height="10" /></bezel>
+		<bezel name="pos76" element="piece"><bounds x="53" y="63" width="10" height="10" /></bezel>
+		<bezel name="pos77" element="piece"><bounds x="63" y="63" width="10" height="10" /></bezel>
+		<bezel name="pos78" element="piece"><bounds x="73" y="63" width="10" height="10" /></bezel>
+
+		<bezel name="pos81" element="piece"><bounds x="3" y="73" width="10" height="10" /></bezel>
+		<bezel name="pos82" element="piece"><bounds x="13" y="73" width="10" height="10" /></bezel>
+		<bezel name="pos83" element="piece"><bounds x="23" y="73" width="10" height="10" /></bezel>
+		<bezel name="pos84" element="piece"><bounds x="33" y="73" width="10" height="10" /></bezel>
+		<bezel name="pos85" element="piece"><bounds x="43" y="73" width="10" height="10" /></bezel>
+		<bezel name="pos86" element="piece"><bounds x="53" y="73" width="10" height="10" /></bezel>
+		<bezel name="pos87" element="piece"><bounds x="63" y="73" width="10" height="10" /></bezel>
+		<bezel name="pos88" element="piece"><bounds x="73" y="73" width="10" height="10" /></bezel>
 
 	<!-- chessboard leds -->
 

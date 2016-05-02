@@ -34,7 +34,7 @@ NETLIB_DEVICE(MM5837_dip,
 	analog_input_t m_VSS;
 
 	/* output stage */
-	nld_twoterm m_RV;
+	std::unique_ptr<nld_twoterm> m_RV;
 	analog_output_t m_V0; /* could be gnd as well */
 
 	/* clock stage */

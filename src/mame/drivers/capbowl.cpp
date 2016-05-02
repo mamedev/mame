@@ -181,7 +181,7 @@ WRITE8_MEMBER(capbowl_state::track_reset_w)
 	m_last_trackball_val[0] = ioport("TRACKY")->read();
 	m_last_trackball_val[1] = ioport("TRACKX")->read();
 
-	watchdog_reset_w(space, offset, data);
+	m_watchdog->reset_w(space, offset, data);
 }
 
 
@@ -316,6 +316,8 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_CPU_ADD("maincpu", M6809E, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(capbowl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", capbowl_state,  interrupt)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // ~0.3s
 
 	MCFG_CPU_ADD("audiocpu", M6809E, MASTER_CLOCK)

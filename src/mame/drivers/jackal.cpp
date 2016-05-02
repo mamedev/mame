@@ -73,6 +73,7 @@ Address          Dir Data     Description
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/watchdog.h"
 #include "sound/2151intf.h"
 #include "includes/jackal.h"
 #include "includes/konamipt.h"
@@ -164,7 +165,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, jackal_state )
 	AM_RANGE(0x0013, 0x0013) AM_READ_PORT("IN0")
 	AM_RANGE(0x0014, 0x0015) AM_READ(jackalr_rotary_r)
 	AM_RANGE(0x0018, 0x0018) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0019, 0x0019) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0019, 0x0019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x001c, 0x001c) AM_WRITE(jackal_rambank_w)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(jackal_zram_r, jackal_zram_w)             // MAIN   Z RAM,SUB    Z RAM
 	AM_RANGE(0x0060, 0x1fff) AM_RAM AM_SHARE("share1")                          // M COMMON RAM,S COMMON RAM
@@ -360,6 +361,7 @@ static MACHINE_CONFIG_START( jackal, jackal_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -18,9 +18,10 @@
 #include "h8_adc.h"
 #include "h8_port.h"
 #include "h8_intc.h"
-#include "h8_sci.h"
 #include "h8_timer8.h"
 #include "h8_timer16.h"
+#include "h8_sci.h"
+#include "h8_watchdog.h"
 
 class h83006_device : public h8h_device {
 public:
@@ -51,6 +52,7 @@ protected:
 	required_device<h8_sci_device> sci0;
 	required_device<h8_sci_device> sci1;
 	required_device<h8_sci_device> sci2;
+	required_device<h8_watchdog_device> watchdog;
 
 	UINT8 syscr;
 	UINT32 ram_start;

@@ -632,7 +632,7 @@ chd_compressor_group::chd_compressor_group(chd_file &chd, UINT32 compressor_list
 				throw CHDERR_UNKNOWN_COMPRESSION;
 #if CHDCODEC_VERIFY_COMPRESSION
 			m_decompressor[codecnum] = chd_codec_list::new_decompressor(compressor_list[codecnum], chd);
-			if (m_decompressor[codecnum] == NULL)
+			if (m_decompressor[codecnum] == nullptr)
 				throw CHDERR_UNKNOWN_COMPRESSION;
 #endif
 		}

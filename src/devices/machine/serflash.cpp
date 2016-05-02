@@ -43,7 +43,7 @@ void serflash_device::device_start()
 
 	m_flashwritemap.resize(m_length / FLASH_PAGE_SIZE);
 	memset(&m_flashwritemap[0], 0, m_length / FLASH_PAGE_SIZE);
-	
+
 	save_item(NAME(m_flash_state));
 	save_item(NAME(m_flash_enab));
 	save_item(NAME(m_flash_cmd_seq));

@@ -346,7 +346,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 		//printf("Loading\n");
 		UINT8 data[0x30800];
 		battery_image->battery_load(data, 0x30800, 0x00);
-		if (m_sram != NULL)
+		if (m_sram != nullptr)
 		{
 			memcpy(m_sram, data, 0x20000);
 		}

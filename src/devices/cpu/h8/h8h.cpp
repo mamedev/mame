@@ -15,4 +15,4 @@ offs_t h8h_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opro
 	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
 }
 
-#include "cpu/h8/h8h.inc"
+#include "cpu/h8/h8h.hxx"

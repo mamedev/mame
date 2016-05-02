@@ -88,6 +88,7 @@ Notes:
 #include "emu.h"
 #include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "includes/konamipt.h"
 #include "includes/jailbrek.h"
@@ -140,7 +141,7 @@ static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
 	AM_RANGE(0x3000, 0x307f) AM_RAM /* related to sprites? */
 	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW2") AM_DEVWRITE("snsnd", sn76489a_device, write)
 	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("DSW3") AM_WRITENOP /* mirror of the previous? */
-	AM_RANGE(0x3300, 0x3300) AM_READ_PORT("SYSTEM") AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x3300, 0x3300) AM_READ_PORT("SYSTEM") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3301, 0x3301) AM_READ_PORT("P1")
 	AM_RANGE(0x3302, 0x3302) AM_READ_PORT("P2")
 	AM_RANGE(0x3303, 0x3303) AM_READ_PORT("DSW1")
@@ -251,6 +252,7 @@ static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jailbrek_state,  jb_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(jailbrek_state, jb_interrupt_nmi,  500) /* ? */
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jailbrek)

@@ -174,9 +174,9 @@ public:
 		m_speaker(*this, "beeper"),
 		m_uart(*this, "i8251"),
 		m_dbrg(*this, COM5016T_TAG),
-		//m_i8251_rx_timer(NULL),
-		//m_i8251_tx_timer(NULL),
-		//m_sync_timer(NULL),
+		//m_i8251_rx_timer(nullptr),
+		//m_i8251_tx_timer(nullptr),
+		//m_sync_timer(nullptr),
 
 		m_capsshift(*this, "CAPSSHIFT"),
 		m_dipsw(*this, "SWITCHES")

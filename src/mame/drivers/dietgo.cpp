@@ -25,7 +25,8 @@ PAL16R6A 11H
 #include "cpu/h6280/h6280.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "includes/decocrpt.h"
+#include "machine/decocrpt.h"
+#include "machine/deco102.h"
 #include "includes/dietgo.h"
 
 

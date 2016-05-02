@@ -154,6 +154,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/namco62.h"
+#include "machine/watchdog.h"
 #include "sound/samples.h"
 #include "includes/gaplus.h"
 
@@ -277,7 +278,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, gaplus_state )
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("namcoio_2", namcoio_device, read, write)                                                   /* custom I/O chips interface */
 	AM_RANGE(0x6820, 0x682f) AM_READWRITE(customio_3_r, customio_3_w) AM_SHARE("customio_3")  /* custom I/O chip #3 interface */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(irq_1_ctrl_w)                                                      /* main CPU irq control */
-	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)                                                          /* watchdog */
+	AM_RANGE(0x7800, 0x7fff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(sreset_w)                                                          /* reset CPU #2 & #3, enable sound */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(freset_w)                                                          /* reset I/O chips */
 	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(starfield_control_w)               /* starfield control */
@@ -294,7 +295,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, gaplus_state )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)  /* shared RAM with the main CPU + sound registers */
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)                       /* watchdog? */
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)  /* watchdog? */
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(irq_3_ctrl_w)                                          /* interrupt enable/disable */
 	AM_RANGE(0xe000, 0xffff) AM_ROM                                                                 /* ROM */
 ADDRESS_MAP_END
@@ -522,6 +523,8 @@ static MACHINE_CONFIG_START( gaplus, gaplus_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_sub2_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* a high value to ensure proper synchronization of the CPUs */
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))

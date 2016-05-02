@@ -62,12 +62,8 @@ public:
 	std::vector<std::string> &get_menu() { return m_menu; }
 	void attach_notifiers();
 	void on_frame_done();
+	void call_plugin(const char *data, const char *name);
 
-	int compile_with_env(const char *envname, const char *script, const char *env = nullptr);
-	template <typename Tout, typename Tin> Tout run(const char *envname, int ref, Tin in);
-	template <typename Tout> Tout run(const char *envname, int ref);
-	template <typename Tin> void run(const char *envname, int ref, Tin in);
-	void run(const char *envname, int ref);
 private:
 	struct hook {
 		lua_State *L;
@@ -141,6 +137,7 @@ private:
 	static int l_emu_register_frame(lua_State *L);
 	static int l_emu_register_frame_done(lua_State *L);
 	static int l_emu_register_menu(lua_State *L);
+	static int l_emu_register_callback(lua_State *L);
 	static std::string get_print_buffer(lua_State *L);
 	static int l_osd_printf_verbose(lua_State *L);
 	static int l_osd_printf_error(lua_State *L);
@@ -207,6 +204,10 @@ private:
 		template<typename T> int l_region_write(lua_State *L);
 	};
 
+	struct lua_ui_input {
+		int l_ui_input_find_mouse(lua_State *L);
+	};
+
 	struct lua_emu_file {
 		lua_emu_file(const char *searchpath, UINT32 openflags) :
 			path(searchpath),
@@ -233,7 +234,6 @@ private:
 		int l_item_read_block(lua_State *L);
 		int l_item_write(lua_State *L);
 	};
-	void run_internal(const char *env, int ref);
 
 	void resume(void *L, INT32 param);
 	void start();

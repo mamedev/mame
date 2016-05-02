@@ -269,10 +269,10 @@ void *pool_object_add_file_line(object_pool *pool, object_type _type, void *obje
 		return object;
 	}
 
-	/* if we get a NULL object, fail */
+	/* if we get a nullptr object, fail */
 	if (object == nullptr)
 	{
-		report_failure(pool, "pool_object_add (via %s:%d): Attempted to add a NULL object of size %d", file, line, (int)size);
+		report_failure(pool, "pool_object_add (via %s:%d): Attempted to add a nullptr object of size %d", file, line, (int)size);
 		return object;
 	}
 

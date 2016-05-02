@@ -62,6 +62,7 @@ struct device_map_t
 class sdl_event_subscriber
 {
 public:
+	virtual ~sdl_event_subscriber() {}
 	virtual void handle_event(SDL_Event &sdlevent) = 0;
 };
 
@@ -130,7 +131,7 @@ private:
 public:
 	bool mouse_over_window() const { return m_mouse_over_window; }
 	bool has_focus() const { return m_focus_window != nullptr; }
-	std::shared_ptr<sdl_window_info> focus_window() { return m_focus_window; }
+	std::shared_ptr<sdl_window_info> focus_window() const { return m_focus_window; }
 
 	static sdl_event_manager& instance()
 	{

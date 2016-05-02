@@ -3,6 +3,11 @@
 #include "emu.h"
 #include "h8_adc.h"
 
+// Verbosity level
+// 0 = no messages
+// 1 = everything
+const int V = 0;
+
 const device_type H8_ADC_3337 = &device_creator<h8_adc_3337_device>;
 const device_type H8_ADC_3006 = &device_creator<h8_adc_3006_device>;
 const device_type H8_ADC_2245 = &device_creator<h8_adc_2245_device>;
@@ -27,31 +32,31 @@ void h8_adc_device::set_info(const char *_intc_tag, int _intc_vector)
 
 READ8_MEMBER(h8_adc_device::addr8_r)
 {
-	logerror("%s: addr8_r %d %03x\n", tag(), offset, addr[offset >> 1]);
+	if(V>=1) logerror("addr8_r %d %03x\n", offset, addr[offset >> 1]);
 	return offset & 1 ? addr[offset >> 1] >> 2 : addr[offset >> 1] << 6;
 }
 
 READ16_MEMBER(h8_adc_device::addr16_r)
 {
-	logerror("%s: addr16_r %d %03x\n", tag(), offset, addr[offset]);
+	if(V>=1) logerror("addr16_r %d %03x\n", offset, addr[offset]);
 	return addr[offset];
 }
 
 READ8_MEMBER(h8_adc_device::adcsr_r)
 {
-	logerror("%s: adcsr_r %02x\n", tag(), adcsr);
+	if(V>=1) logerror("adcsr_r %02x\n", adcsr);
 	return adcsr;
 }
 
 READ8_MEMBER(h8_adc_device::adcr_r)
 {
-	logerror("%s: adcr_r %02x\n", tag(), adcr);
+	if(V>=1) logerror("adcr_r %02x\n", adcr);
 	return adcr;
 }
 
 WRITE8_MEMBER(h8_adc_device::adcsr_w)
 {
-	logerror("%s: adcsr_w %02x\n", tag(), data);
+	if(V>=1) logerror("adcsr_w %02x\n", data);
 	UINT8 prev = adcsr;
 	adcsr = (data & 0x7f) | (adcsr & data & F_ADF);
 	mode_update();
@@ -72,7 +77,7 @@ WRITE8_MEMBER(h8_adc_device::adcsr_w)
 
 WRITE8_MEMBER(h8_adc_device::adcr_w)
 {
-	logerror("%s: adcr_w %02x\n", tag(), data);
+	if(V>=1) logerror("adcr_w %02x\n", data);
 	adcr = data;
 	mode_update();
 }
@@ -163,13 +168,13 @@ void h8_adc_device::conversion_wait(bool first, bool poweron, UINT64 current_tim
 void h8_adc_device::buffer_value(int port, int buffer)
 {
 	buf[buffer] = io->read_word(2*(h8_device::ADC_0 + port));
-	logerror("%s: adc buffer %d -> %d:%03x\n", tag(), port, buffer, buf[buffer]);
+	if(V>=1) logerror("adc buffer %d -> %d:%03x\n", port, buffer, buf[buffer]);
 }
 
 void h8_adc_device::commit_value(int reg, int buffer)
 {
 	reg &= register_mask;
-	logerror("%s: adc commit %d -> %d:%03x\n", tag(), buffer, reg, buf[buffer]);
+	if(V>=1) logerror("adc commit %d -> %d:%03x\n", buffer, reg, buf[buffer]);
 	addr[reg] = buf[buffer];
 }
 

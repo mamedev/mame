@@ -637,7 +637,7 @@ void adsp21xx_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -818,7 +818,7 @@ inline UINT32 adsp21xx_device::opcode_read()
     IMPORT CORE UTILITIES
 ***************************************************************************/
 
-#include "2100ops.inc"
+#include "2100ops.hxx"
 
 
 

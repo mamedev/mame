@@ -8,7 +8,7 @@
 typedef device_delegate<void (void)> igs025_execute_external;
 
 #define MCFG_IGS025_SET_EXTERNAL_EXECUTE( _class, _method) \
-	igs025_device::set_external_cb(*device, igs025_execute_external(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	igs025_device::set_external_cb(*device, igs025_execute_external(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 class igs025_device : public device_t
 {

@@ -8,10 +8,6 @@
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef __SPRITE_H__
 #define __SPRITE_H__
 

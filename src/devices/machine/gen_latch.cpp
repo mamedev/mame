@@ -32,7 +32,7 @@ generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, co
 
 READ8_MEMBER( generic_latch_8_device::read )
 {
-	m_latch_read = 1; 
+	m_latch_read = 1;
 	return m_latched_value;
 }
 
@@ -114,7 +114,7 @@ generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, 
 
 READ16_MEMBER( generic_latch_16_device::read )
 {
-	m_latch_read = 1; 
+	m_latch_read = 1;
 	return m_latched_value;
 }
 
@@ -171,5 +171,3 @@ void generic_latch_16_device::device_start()
 	save_item(NAME(m_latched_value));
 	save_item(NAME(m_latch_read));
 }
-
-

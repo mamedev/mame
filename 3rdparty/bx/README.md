@@ -5,6 +5,8 @@ Base library.
 
 [![Build Status](https://travis-ci.org/bkaradzic/bx.svg?branch=master)](https://travis-ci.org/bkaradzic/bx)
 [![Build status](https://ci.appveyor.com/api/projects/status/edras3mltmoy31g5?svg=true)](https://ci.appveyor.com/project/bkaradzic/bx)
+[![License](https://img.shields.io/badge/license-BSD--2%20clause-blue.svg)](https://bkaradzic.github.io/bgfx/license.html)
+[![Join the chat at https://gitter.im/bkaradzic/bgfx](https://badges.gitter.im/bkaradzic/bgfx.svg)](https://gitter.im/bkaradzic/bgfx)
 
 Contact
 -------

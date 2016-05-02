@@ -35,21 +35,22 @@ public:
 
 	// Getters
 	std::vector<bgfx_slider*>& sliders() { return m_sliders; }
+	std::vector<bgfx_chain_entry*>& entries() { return m_entries; }
 	uint32_t applicable_passes();
 	bool transform() { return m_transform; }
 
 private:
 	std::string                         m_name;
 	std::string                         m_author;
-	bool								m_transform;
-	target_manager&						m_targets;
+	bool                                m_transform;
+	target_manager&                     m_targets;
 	std::vector<bgfx_slider*>           m_sliders;
 	std::vector<bgfx_parameter*>        m_params;
 	std::vector<bgfx_chain_entry*>      m_entries;
-	std::vector<bgfx_target*> 			m_target_list;
+	std::vector<bgfx_target*>           m_target_list;
 	std::map<std::string, bgfx_slider*> m_slider_map;
 	int64_t                             m_current_time;
-	uint32_t							m_screen_index;
+	uint32_t                            m_screen_index;
 };
 
 #endif // __DRAWBGFX_CHAIN__

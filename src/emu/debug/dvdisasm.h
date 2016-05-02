@@ -45,12 +45,10 @@ class debug_view_disasm_source : public debug_view_source
 
 public:
 	// getters
-	device_t &device() const { return m_device; }
 	address_space &space() const { return m_space; }
 
 private:
 	// internal state
-	device_t &          m_device;               // underlying device
 	device_disasm_interface *m_disasmintf;      // disassembly interface
 	address_space &     m_space;                // address space to display
 	address_space &     m_decrypted_space;      // address space to display for decrypted opcodes

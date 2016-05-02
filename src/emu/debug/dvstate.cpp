@@ -24,7 +24,6 @@
 
 debug_view_state_source::debug_view_state_source(const char *name, device_t &device)
 	: debug_view_source(name, &device),
-		m_device(device),
 		m_stateintf(dynamic_cast<device_state_interface *>(&device)),
 		m_execintf(dynamic_cast<device_execute_interface *>(&device))
 {

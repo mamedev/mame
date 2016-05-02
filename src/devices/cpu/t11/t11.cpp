@@ -234,10 +234,10 @@ void t11_device::t11_check_irqs()
  *************************************/
 
 /* includes the static function prototypes and the master opcode table */
-#include "t11table.inc"
+#include "t11table.hxx"
 
 /* includes the actual opcode implementations */
-#include "t11ops.inc"
+#include "t11ops.hxx"
 
 
 

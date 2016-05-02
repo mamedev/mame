@@ -274,7 +274,7 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
 			m_warpwarp_sound->sound_w(space,0,data);
 			break;
 		case 3:
-			watchdog_reset_w(space,0,data);
+			m_watchdog->reset_w(space,0,data);
 			break;
 	}
 }
@@ -773,6 +773,8 @@ static MACHINE_CONFIG_START( bombbee, warpwarp_state )
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)
 	MCFG_CPU_PROGRAM_MAP(bombbee_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpwarp_state, vblank_irq)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

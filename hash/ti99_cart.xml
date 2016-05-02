@@ -4405,4 +4405,40 @@
 			</dataarea>
 		</part>
 	</software>
+
+<!-- Softlist entry for MiniMemory -->
+	<software name="minimem">
+		<description>Mini Memory</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="PHM 3058"/>
+		<part name="cart" interface="ti99_cart">
+			<feature name="pcb" value="minimem" />
+			<dataarea name="grom_socket" size="0x1800">
+				<rom name="phm3058g3.bin" size="0x1800" crc="e2fc7485" sha1="ab62d115b0a9357bc9c988020a8d75f1642981e8" offset="0x0000" />
+			</dataarea>
+			<dataarea name="rom_socket" size="0x1000">
+				<rom name="phm3058c.bin" size="0x1000" crc="c705118e" sha1="5c037b5ff34320921da142fc2038de35807b51e9" offset="0x0000" />
+			</dataarea>
+			<dataarea name="nvram" size="4096">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Softlist entry for SuperSpace2 cartridge -->
+	<software name="supersp2">
+		<description>SuperSpace II</description>
+		<year>1986</year>
+		<publisher>DataBioTics</publisher>
+		<info name="serial" value="DBC2SS"/>
+		<part name="cart" interface="ti99_cart">
+			<feature name="pcb" value="super" />
+			<dataarea name="grom_socket" size="0x1800">
+				<rom name="phm3055g3.bin" size="0x1800" crc="2abf46b5" sha1="9686225c4aa04dcb42d7029ad3d7a31344eae361" offset="0x0000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -276,6 +276,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
 #include "cpu/m6805/m6805.h"
@@ -300,7 +301,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE(bublbobl_sound_status_r, bublbobl_sound_command_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_WRITE(bublbobl_soundcpu_reset_w)
-	AM_RANGE(0xfa80, 0xfa80) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xfa80, 0xfa80) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xfb40, 0xfb40) AM_WRITE(bublbobl_bankswitch_w)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_SHARE("mcu_sharedram")
 ADDRESS_MAP_END
@@ -378,7 +379,7 @@ static ADDRESS_MAP_START( tokio_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfa04, 0xfa04) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfa05, 0xfa05) AM_READ_PORT("IN0")
@@ -782,6 +783,8 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, tokio)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, tokio)
 
@@ -863,6 +866,8 @@ static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_pulse) // comes from the same clock that latches the INT pin on the second Z80
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, bublbobl)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, bublbobl)

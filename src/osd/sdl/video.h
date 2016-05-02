@@ -24,7 +24,7 @@ public:
 	sdl_monitor_info(const UINT64 handle, const char *monitor_device, float aspect)
 	: osd_monitor_info(&m_handle, monitor_device, aspect), m_handle(handle)
 	{
-		refresh();
+		sdl_monitor_info::refresh();
 	}
 
 	// STATIC

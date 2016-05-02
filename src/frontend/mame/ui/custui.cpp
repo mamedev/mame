@@ -27,11 +27,11 @@ const char *const ui_menu_custom_ui::hide_status[] = {
 //  ctor
 //-------------------------------------------------
 
-ui_menu_custom_ui::ui_menu_custom_ui(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_custom_ui::ui_menu_custom_ui(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 	// load languages
-	file_enumerator path(machine.options().language_path());
-	const char *lang = machine.options().language();
+	file_enumerator path(mui.machine().options().language_path());
+	const char *lang = mui.machine().options().language();
 	const osd_directory_entry *dirent;
 	int cnt = 0;
 	while ((dirent = path.next()) != nullptr)
@@ -54,7 +54,7 @@ ui_menu_custom_ui::ui_menu_custom_ui(running_machine &machine, render_container 
 ui_menu_custom_ui::~ui_menu_custom_ui()
 {
 	std::string error_string;
-	mame_machine_manager::instance()->ui().options().set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
+	ui().options().set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
 	if (!m_lang.empty())
 	{
 		machine().options().set_value(OPTION_LANGUAGE, m_lang[m_currlang].c_str(), OPTION_PRIORITY_CMDLINE, error_string);
@@ -81,11 +81,11 @@ void ui_menu_custom_ui::handle()
 		{
 			case FONT_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_font_ui>(machine(), container));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_font_ui>(ui(), container));
 				break;
 			case COLORS_MENU:
 				if (m_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_colors_ui>(machine(), container));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_colors_ui>(ui(), container));
 				break;
 			case HIDE_MENU:
 			{
@@ -101,7 +101,7 @@ void ui_menu_custom_ui::handle()
 					for (int index = 0; index < total; ++index)
 						s_sel[index] = _(hide_status[index]);
 
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, ui_globals::panels_status));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, s_sel, ui_globals::panels_status));
 				}
 				break;
 			}
@@ -119,7 +119,7 @@ void ui_menu_custom_ui::handle()
 					for (int index = 0; index < total; ++index)
 						s_sel[index] = m_lang[index];
 
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, m_currlang));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, s_sel, m_currlang));
 				}
 				break;
 			}
@@ -150,7 +150,7 @@ void ui_menu_custom_ui::populate()
 	item_append(_("Show side panels"), _(hide_status[ui_globals::panels_status]), arrow_flags, (void *)(FPTR)HIDE_MENU);
 
 	item_append(ui_menu_item_type::SEPARATOR);
-	customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -160,10 +160,9 @@ void ui_menu_custom_ui::populate()
 void ui_menu_custom_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 
-	mui.draw_text_full(container, _("Custom UI Settings"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, _("Custom UI Settings"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+									DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -174,7 +173,7 @@ void ui_menu_custom_ui::custom_render(void *selectedref, float top, float bottom
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -182,7 +181,7 @@ void ui_menu_custom_ui::custom_render(void *selectedref, float top, float bottom
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, _("Custom UI Settings"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui().draw_text_full(container, _("Custom UI Settings"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
@@ -190,10 +189,10 @@ void ui_menu_custom_ui::custom_render(void *selectedref, float top, float bottom
 //  ctor
 //-------------------------------------------------
 
-ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_font_ui::ui_menu_font_ui(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
-	ui_options &moptions = mame_machine_manager::instance()->ui().options();
-	std::string name(machine.options().ui_font());
+	ui_options &moptions = mui.options();
+	std::string name(mui.machine().options().ui_font());
 	list();
 
 #ifdef UI_WINDOWS
@@ -216,13 +215,13 @@ ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *con
 
 	for (ui_options::entry &f_entry : moptions)
 	{
-		const char *name = f_entry.name();
-		if (name && strlen(name) && !strcmp(OPTION_INFOS_SIZE, f_entry.name()))
+		const char *entry_name = f_entry.name();
+		if (entry_name && strlen(entry_name) && !strcmp(OPTION_INFOS_SIZE, f_entry.name()))
 		{
 			m_info_max = atof(f_entry.maximum());
 			m_info_min = atof(f_entry.minimum());
 		}
-		else if (name && strlen(name) && !strcmp(OPTION_FONT_ROWS, f_entry.name()))
+		else if (entry_name && strlen(entry_name) && !strcmp(OPTION_FONT_ROWS, f_entry.name()))
 		{
 			m_font_max = atof(f_entry.maximum());
 			m_font_min = atof(f_entry.minimum());
@@ -250,7 +249,7 @@ void ui_menu_font_ui::list()
 ui_menu_font_ui::~ui_menu_font_ui()
 {
 	std::string error_string;
-	ui_options &moptions = mame_machine_manager::instance()->ui().options();
+	ui_options &moptions = ui().options();
 
 	std::string name(m_fonts[m_actual].first);
 #ifdef UI_WINDOWS
@@ -311,7 +310,7 @@ void ui_menu_font_ui::handle()
 					std::vector<std::string> display_names;
 					display_names.reserve(m_fonts.size());
 					for (auto const &font : m_fonts) display_names.emplace_back(font.second);
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, std::move(display_names), m_actual));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, std::move(display_names), m_actual));
 					changed = true;
 				}
 				break;
@@ -364,7 +363,7 @@ void ui_menu_font_ui::populate()
 
 	item_append(ui_menu_item_type::SEPARATOR);
 
-	custombottom = customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -374,13 +373,12 @@ void ui_menu_font_ui::populate()
 void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 
 	// top text
 	std::string topbuf(_("UI Fonts Settings"));
 
-	mui.draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+									DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -391,7 +389,7 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -399,15 +397,15 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	if ((FPTR)selectedref == INFOS_SIZE)
 	{
 		topbuf = _("Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
 
-		mui.draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_NEVER,
-										DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr, m_info_size);
+		ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_NEVER,
+										DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr, m_info_size);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(origx2 - origx1, width);
 
@@ -418,7 +416,7 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 		y2 = origy2 + bottom;
 
 		// draw a box
-		mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+		ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 		// take off the borders
 		x1 += UI_BOX_LR_BORDER;
@@ -426,7 +424,7 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 		y1 += UI_BOX_TB_BORDER;
 
 		// draw the text within it
-		mui.draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
+		ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
 										DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, m_info_size);
 	}
 }
@@ -436,7 +434,7 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 //-------------------------------------------------
 #define SET_COLOR_UI(var, opt) var[M##opt].color = opt; var[M##opt].option = OPTION_##opt
 
-ui_menu_colors_ui::ui_menu_colors_ui(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_colors_ui::ui_menu_colors_ui(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 	SET_COLOR_UI(m_color_table, UI_BACKGROUND_COLOR);
 	SET_COLOR_UI(m_color_table, UI_BORDER_COLOR);
@@ -466,7 +464,7 @@ ui_menu_colors_ui::~ui_menu_colors_ui()
 	for (int index = 1; index < MUI_RESTORE; index++)
 	{
 		dec_color = string_format("%x", (UINT32)m_color_table[index].color);
-		mame_machine_manager::instance()->ui().options().set_value(m_color_table[index].option, dec_color.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+		ui().options().set_value(m_color_table[index].option, dec_color.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	}
 }
 
@@ -484,7 +482,7 @@ void ui_menu_colors_ui::handle()
 	if (m_event != nullptr && m_event->itemref != nullptr && m_event->iptkey == IPT_UI_SELECT)
 	{
 		if ((FPTR)m_event->itemref != MUI_RESTORE)
-			ui_menu::stack_push(global_alloc_clear<ui_menu_rgb_ui>(machine(), container, &m_color_table[(FPTR)m_event->itemref].color, item[selected].text));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_rgb_ui>(ui(), container, &m_color_table[(FPTR)m_event->itemref].color, item[selected].text));
 		else
 		{
 			changed = true;
@@ -522,7 +520,7 @@ void ui_menu_colors_ui::populate()
 	item_append(ui_menu_item_type::SEPARATOR);
 	item_append(_("Restore originals colors"), nullptr, 0, (void *)(FPTR)MUI_RESTORE);
 
-	custombottom = customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -532,14 +530,13 @@ void ui_menu_colors_ui::populate()
 void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width, maxwidth = origx2 - origx1;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
-	float line_height = mui.get_line_height();
+	float line_height = ui().get_line_height();
 
 	// top text
 	std::string topbuf(_("UI Colors Settings"));
 
-	mui.draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+									DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(maxwidth, width);
 
@@ -550,7 +547,7 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -558,7 +555,7 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// bottom text
@@ -566,8 +563,8 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	std::string ui_select_text = machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
 	topbuf = string_format(_("Double click or press %1$s to change the color value"), ui_select_text);
 
-	mui.draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+									DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(maxwidth, width);
 
@@ -578,7 +575,7 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	y2 = origy2 + bottom;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_RED_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_RED_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -586,14 +583,14 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// compute maxwidth
 	topbuf = _("Menu Preview");
 
-	mui.draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+									DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	maxwidth = width + 2.0f * UI_BOX_LR_BORDER;
 
 	std::string sampletxt[5];
@@ -606,8 +603,8 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 
 	for (auto & elem: sampletxt)
 	{
-		mui.draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-										DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+		ui().draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+										DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
 	}
@@ -619,7 +616,7 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	y2 = y1 + bottom - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -628,7 +625,7 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	y2 -= UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// compute our bounds for menu preview
@@ -638,7 +635,7 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	y2 = y1 + 5.0f * line_height + 2.0f * UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, m_color_table[MUI_BACKGROUND_COLOR].color);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, m_color_table[MUI_BACKGROUND_COLOR].color);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -646,29 +643,29 @@ void ui_menu_colors_ui::custom_render(void *selectedref, float top, float bottom
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw normal text
-	mui.draw_text_full(container, sampletxt[0].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	ui().draw_text_full(container, sampletxt[0].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 									DRAW_NORMAL, m_color_table[MUI_TEXT_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, nullptr, nullptr);
 	y1 += line_height;
 
 	// draw subitem text
-	mui.draw_text_full(container, sampletxt[1].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	ui().draw_text_full(container, sampletxt[1].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 									DRAW_NORMAL, m_color_table[MUI_SUBITEM_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, nullptr, nullptr);
 	y1 += line_height;
 
 	// draw selected text
 	highlight(container, x1, y1, x2, y1 + line_height, m_color_table[MUI_SELECTED_BG_COLOR].color);
-	mui.draw_text_full(container, sampletxt[2].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	ui().draw_text_full(container, sampletxt[2].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 									DRAW_NORMAL, m_color_table[MUI_SELECTED_COLOR].color, m_color_table[MUI_SELECTED_BG_COLOR].color, nullptr, nullptr);
 	y1 += line_height;
 
 	// draw mouse over text
 	highlight(container, x1, y1, x2, y1 + line_height, m_color_table[MUI_MOUSEOVER_BG_COLOR].color);
-	mui.draw_text_full(container, sampletxt[3].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	ui().draw_text_full(container, sampletxt[3].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 									DRAW_NORMAL, m_color_table[MUI_MOUSEOVER_COLOR].color, m_color_table[MUI_MOUSEOVER_BG_COLOR].color, nullptr, nullptr);
 	y1 += line_height;
 
 	// draw clone text
-	mui.draw_text_full(container, sampletxt[4].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	ui().draw_text_full(container, sampletxt[4].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 									DRAW_NORMAL, m_color_table[MUI_CLONE_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, nullptr, nullptr);
 
 }
@@ -688,7 +685,7 @@ void ui_menu_colors_ui::restore_colors()
 //  ctor
 //-------------------------------------------------
 
-ui_menu_rgb_ui::ui_menu_rgb_ui(running_machine &machine, render_container *container, rgb_t *_color, std::string _title) : ui_menu(machine, container)
+ui_menu_rgb_ui::ui_menu_rgb_ui(mame_ui_manager &mui, render_container *container, rgb_t *_color, std::string _title) : ui_menu(mui, container)
 {
 	m_color = _color;
 	m_key_active = false;
@@ -811,7 +808,7 @@ void ui_menu_rgb_ui::handle()
 
 			case PALETTE_CHOOSE:
 				if (m_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(global_alloc_clear<ui_menu_palette_sel>(machine(), container, *m_color));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_palette_sel>(ui(), container, *m_color));
 				break;
 		}
 	}
@@ -866,7 +863,7 @@ void ui_menu_rgb_ui::populate()
 	item_append(_("Choose from palette"), nullptr, 0, (void *)(FPTR)PALETTE_CHOOSE);
 	item_append(ui_menu_item_type::SEPARATOR);
 
-	custombottom = customtop = mame_machine_manager::instance()->ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
@@ -876,12 +873,11 @@ void ui_menu_rgb_ui::populate()
 void ui_menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width, maxwidth = origx2 - origx1;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 
 	// top text
 	std::string topbuf = std::string(m_title).append(_(" - ARGB Settings"));
-	mui.draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+									DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(maxwidth, width);
 
@@ -892,7 +888,7 @@ void ui_menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, f
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -900,13 +896,13 @@ void ui_menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, f
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	std::string sampletxt(_("Color preview ="));
 	maxwidth = origx2 - origx1;
-	mui.draw_text_full(container, sampletxt.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, sampletxt.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+									DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(maxwidth, width);
 
@@ -917,7 +913,7 @@ void ui_menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, f
 	y2 = origy2 + bottom;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_RED_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_RED_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -925,15 +921,15 @@ void ui_menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, f
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the normal text
-	mui.draw_text_full(container, sampletxt.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-									DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
+	ui().draw_text_full(container, sampletxt.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+									DRAW_NORMAL, rgb_t::white, rgb_t::black, nullptr, nullptr);
 
 	float t_x2 = x1 - UI_BOX_LR_BORDER + maxwidth;
 	x1 = x2 + 2.0f * UI_BOX_LR_BORDER;
 	x2 = t_x2;
 	y1 -= UI_BOX_TB_BORDER;
 
-	mui.draw_outlined_box(container, x1, y1, x2, y2, *m_color);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, *m_color);
 
 }
 
@@ -1015,8 +1011,8 @@ ui_menu_palette_sel::palcolor ui_menu_palette_sel::m_palette[] = {
 //  ctor
 //-------------------------------------------------
 
-ui_menu_palette_sel::ui_menu_palette_sel(running_machine &machine, render_container *container, rgb_t &_color)
-	: ui_menu(machine, container), m_original(_color)
+ui_menu_palette_sel::ui_menu_palette_sel(mame_ui_manager &mui, render_container *container, rgb_t &_color)
+	: ui_menu(mui, container), m_original(_color)
 {
 }
 

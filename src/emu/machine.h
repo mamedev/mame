@@ -203,7 +203,7 @@ public:
 	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
 
 	// immediate operations
-	int run(bool firstrun);
+	int run(bool quiet);
 	void pause();
 	void resume();
 	void toggle_pause();
@@ -227,11 +227,6 @@ public:
 	void base_datetime(system_time &systime);
 	void current_datetime(system_time &systime);
 
-	// watchdog control
-	void watchdog_reset();
-	void watchdog_enable(bool enable = true);
-	INT32 get_vblank_watchdog_counter() const { return m_watchdog_counter; }
-
 	// misc
 	void popmessage() const { popmessage(static_cast<char const *>(nullptr)); }
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
@@ -244,7 +239,7 @@ public:
 
 private:
 	// video-related information
-	screen_device *         primary_screen;     // the primary screen device, or NULL if screenless
+	screen_device *         primary_screen;     // the primary screen device, or nullptr if screenless
 
 public:
 	// debugger-related information
@@ -262,8 +257,6 @@ private:
 	std::string get_statename(const char *statename_opt) const;
 	void handle_saveload();
 	void soft_reset(void *ptr = nullptr, INT32 param = 0);
-	void watchdog_fired(void *ptr = nullptr, INT32 param = 0);
-	void watchdog_vblank(screen_device &screen, bool vblank_state);
 	std::string nvram_filename(device_t &device) const;
 	void nvram_load();
 	void nvram_save();
@@ -289,7 +282,7 @@ private:
 	std::unique_ptr<input_manager> m_input;            // internal data from input.cpp
 	std::unique_ptr<sound_manager> m_sound;            // internal data from sound.cpp
 	std::unique_ptr<video_manager> m_video;            // internal data from video.cpp
-	ui_manager *m_ui;				                   // internal data from ui.cpp
+	ui_manager *m_ui;                                  // internal data from ui.cpp
 	std::unique_ptr<ui_input_manager> m_ui_input;      // internal data from uiinput.cpp
 	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.cpp
 	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.cpp
@@ -308,11 +301,6 @@ private:
 	bool                    m_hard_reset_pending;   // is a hard reset pending?
 	bool                    m_exit_pending;         // is an exit pending?
 	emu_timer *             m_soft_reset_timer;     // timer used to schedule a soft reset
-
-	// watchdog state
-	bool                    m_watchdog_enabled;     // is the watchdog enabled?
-	INT32                   m_watchdog_counter;     // counter for watchdog tracking
-	emu_timer *             m_watchdog_timer;       // timer for watchdog tracking
 
 	// misc state
 	UINT32                  m_rand_seed;            // current random number seed
@@ -382,7 +370,7 @@ private:
 template <typename Format, typename... Params>
 inline void running_machine::popmessage(Format &&fmt, Params &&... args) const
 {
-	// if the format is NULL, it is a signal to clear the popmessage
+	// if the format is nullptr, it is a signal to clear the popmessage
 	// otherwise, generate the buffer and call the UI to display the message
 	if (is_null<Format>::value(fmt))
 		popup_clear();

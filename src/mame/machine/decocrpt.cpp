@@ -44,7 +44,7 @@ Sotsugyo Shousho        1995
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/decocrpt.h"
+#include "machine/decocrpt.h"
 
 static const UINT16 xor_masks[16] =
 {

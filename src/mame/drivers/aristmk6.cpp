@@ -266,7 +266,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD32_WORD_BIOS( 7, "System 04 Eprom Set -1MB-M27V800 Right", 0x0000000, 0x0100000, CRC(3daefb7a) SHA1(411471713219f4bab5ccf5fe7a12a6c138c8c550) ) \
 	ROM_SYSTEM_BIOS( 8, "bios8",   "Aristocrat MK6 Base (05010601)" ) \
 	ROM_LOAD32_WORD_BIOS( 8, "05010601_SYSTEM_EPROM_NSW_LEFT", 0x0000000, 0x0100000, CRC(b3e6b4a0) SHA1(3bf398c9257579f8e51ce716d6ebfa74fa510273) ) /* From Thai Princess & Venetian Nights */ \
-	ROM_LOAD32_WORD_BIOS( 8, "05010601_SYSTEM_EPROM_NSW_RIGHT", 0x0000000, 0x0100000, CRC(c12eac11) SHA1(683b9ddc323865ace7dca37d13b55de6e42759a5) )	 \
+	ROM_LOAD32_WORD_BIOS( 8, "05010601_SYSTEM_EPROM_NSW_RIGHT", 0x0000000, 0x0100000, CRC(c12eac11) SHA1(683b9ddc323865ace7dca37d13b55de6e42759a5) )     \
 	ROM_SYSTEM_BIOS( 9, "bios9",   "Aristocrat MK6 Base (13012001)" ) \
 	ROM_LOAD32_WORD_BIOS( 9, "System 13012001_left", 0x0000000, 0x0400000, CRC(d346773f) SHA1(baa9103478fd667eecd13064cfa051a06763c6ca) ) /* From Queen of the Nile */ \
 	ROM_LOAD32_WORD_BIOS( 9, "System 13012001_right", 0x0000000, 0x0400000, CRC(4c8bfa18) SHA1(cac4932a5b19ed8c2798693ac387cc1a6f0201c7) ) \
@@ -2754,12 +2754,12 @@ ROM_START( whlcshus )
 	ROM_LOAD32_WORD("whales of cash 68DE.u72", 0x0800002, 0x0400000, CRC(f138de3f) SHA1(69a54457c8090f23023f197f0eba1d645a260f3f) )
 	ROM_LOAD32_WORD("whales of cash 3517.u73", 0x0000002, 0x0400000, CRC(74c93c56) SHA1(34c48620b08c3a03f0d6a333acbc45c14a91d3cb) )
 	ROM_LOAD32_WORD("whales of cash 59AF.u86", 0x0000000, 0x0400000, CRC(a7118016) SHA1(725a46ac861bf4abaf9cc0e7084cfa20913c2299) )
-ROM_END	
+ROM_END
 
 ROM_START( whlcshusa )
 	ARISTMK6_BIOS
 	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
-	// 2nd, incomplete, set?	
+	// 2nd, incomplete, set?
 	ROM_LOAD32_WORD("whalesofcash.u72", 0x0800002, 0x0400000, CRC(e9ddd951) SHA1(16863b49b5db1881afda30ea19a55f6122981eba) )
 	ROM_LOAD32_WORD("whalesofcash.u73", 0x0000002, 0x0400000, CRC(22785960) SHA1(2ebfd230209fd438338f981c1c133e6576a67468) )
 	ROM_LOAD32_WORD("whalesofcash.u86", 0x0000000, 0x0400000, CRC(8aef1004) SHA1(270379b0a3abc98adfb1a9b031a5e98050635a80) ) // missing a rom?
@@ -3427,6 +3427,3 @@ Sweet Hearts II
 Venetian Nights             MK5 version is possibly rare
 Wicked Winnings             Only seen a Cash Express Hyperlink version so far, not to be confused with the more common 'Wicked Winnings II - Power Pay'
 */
-
-
-

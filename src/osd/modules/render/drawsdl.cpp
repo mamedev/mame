@@ -17,7 +17,7 @@
 // MAME headers
 #include "emu.h"
 #include "ui/uimain.h"
-#include "rendersw.inc"
+#include "rendersw.hxx"
 
 // standard SDL headers
 #include "sdlinc.h"
@@ -59,9 +59,9 @@ static void yuv_RGB_to_YUY2X2(const UINT16 *bitmap, UINT8 *ptr, const int pitch,
 
 static const sdl_scale_mode scale_modes[] =
 {
-		{ "none",    0, 0, 1, 1, DRAW2_SCALEMODE_NEAREST, 0, 0 },
-		{ "hwblit",  1, 0, 1, 1, DRAW2_SCALEMODE_LINEAR, 0, 0 },
-		{ "hwbest",  1, 0, 1, 1, DRAW2_SCALEMODE_BEST, 0, 0 },
+		{ "none",    0, 0, 1, 1, DRAW2_SCALEMODE_NEAREST, 0, nullptr },
+		{ "hwblit",  1, 0, 1, 1, DRAW2_SCALEMODE_LINEAR, 0, nullptr },
+		{ "hwbest",  1, 0, 1, 1, DRAW2_SCALEMODE_BEST, 0, nullptr },
 		/* SDL1.2 uses interpolation as well */
 		{ "yv12",    1, 1, 1, 1, DRAW2_SCALEMODE_BEST, SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12 },
 		{ "yv12x2",  1, 1, 2, 2, DRAW2_SCALEMODE_BEST, SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12X2 },
@@ -679,7 +679,7 @@ render_primitive_list *renderer_sdl1::get_primitives()
 	auto win = try_getwindow();
 	if (win == nullptr)
 		return nullptr;
-	
+
 	osd_dim nd = win->get_size();
 	if (nd != m_blit_dim)
 	{

@@ -114,7 +114,7 @@ enum
 	ppu2c0x_device::set_color_base(*device, _color);
 
 #define MCFG_PPU2C0X_SET_NMI(_class, _method) \
-	ppu2c0x_device::set_nmi_delegate(*device, ppu2c0x_nmi_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	ppu2c0x_device::set_nmi_delegate(*device, ppu2c0x_nmi_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_PPU2C0X_IGNORE_SPRITE_WRITE_LIMIT \
 	ppu2c0x_device::use_sprite_write_limitation_disable(*device);

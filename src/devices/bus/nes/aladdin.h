@@ -79,7 +79,7 @@ extern const device_type NES_ALADDIN_SLOT;
 
 #define MCFG_ALADDIN_MINICART_ADD(_tag, _slot_intf) \
 	MCFG_DEVICE_ADD(_tag, NES_ALADDIN_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false)
 
 
 //----------------------------------

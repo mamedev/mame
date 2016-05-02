@@ -19,10 +19,10 @@
     Snow Board     | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
     Bang!          | 1998 | CG-1V 388 | 980921/1 | No
 
-	Notes:
-	touchgok:
-	sounds cut out sometimes, others are often missing (sound status reads as busy,
-	so no attempt made to play new sound) probably bug in devices\sound\gaelco.cpp ??
+    Notes:
+    touchgok:
+    sounds cut out sometimes, others are often missing (sound status reads as busy,
+    so no attempt made to play new sound) probably bug in devices\sound\gaelco.cpp ??
 
 ***************************************************************************/
 

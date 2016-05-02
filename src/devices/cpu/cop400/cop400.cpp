@@ -351,7 +351,7 @@ INSTRUCTION(illegal)
 	logerror("COP400: PC = %04x, Illegal opcode = %02x\n", PC-1, ROM(PC-1));
 }
 
-#include "cop400op.inc"
+#include "cop400op.hxx"
 
 /***************************************************************************
     OPCODE TABLES

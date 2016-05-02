@@ -107,7 +107,7 @@ void cclimber_audio_device::play_sample(int start,int freq,int volume)
 	int len;
 	int romlen = m_samples_region.bytes();
 
-	if (m_samples_region == NULL)
+	if (m_samples_region == nullptr)
 	{
 		return;
 	}

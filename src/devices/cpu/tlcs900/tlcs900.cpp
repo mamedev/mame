@@ -525,7 +525,7 @@ void tmp95c061_device::device_reset()
 }
 
 
-#include "900tbl.inc"
+#include "900tbl.hxx"
 
 
 #define TMP95C061_NUM_MASKABLE_IRQS   22

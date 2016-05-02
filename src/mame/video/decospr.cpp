@@ -125,7 +125,7 @@ tttttttt tttttttt
 
 t = sprite tile
 
-todo: the priotity callback for using pdrawgfx should really pack those 8 bits, and pass them instead of currently just
+todo: the priority callback for using pdrawgfx should really pack those 8 bits, and pass them instead of currently just
 passing offs+2 which lacks the extra priority bit
 
 */
@@ -207,7 +207,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 	int offs, end, incr;
 
-	int flipscreen = machine().driver_data()->flip_screen();
+	bool flipscreen = (machine().driver_data()->flip_screen() != 0);
 
 	if (invert_flip)
 		flipscreen = !flipscreen;
@@ -332,7 +332,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 					else
 						mult = -16;
 
-					if (flipscreen || m_flipallx)
+					if (flipscreen ^ m_flipallx)
 					{
 						if (cliprect.max_x>256)
 							x = 304 - x;
@@ -380,14 +380,14 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 												(sprite - multi * inc)-mult2,
 												colour,
 												fx,fy,
-												x-16,ypos,
+												!flipscreen ? x-16 : x+16,ypos,
 												m_screen->priority(),pri,m_transpen);
 									else
 										m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 												(sprite - multi * inc)-mult2,
 												colour,
 												fx,fy,
-												x-16,ypos,
+												!flipscreen ? x-16 : x+16,ypos,
 												m_transpen);
 								}
 							}
@@ -406,7 +406,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 										(sprite - multi * inc)-mult2,
 										colour<<m_raw_shift,
 										fx,fy,
-										x-16,ypos,
+										!flipscreen ? x-16 : x+16,ypos,
 										m_transpen);
 								}
 

@@ -83,6 +83,7 @@ Blitter source graphics
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
@@ -293,7 +294,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x800f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("DSW2")
-	AM_RANGE(0x801c, 0x801c) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x801c, 0x801c) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x8020, 0x8020) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x8024, 0x8024) AM_READ_PORT("P1")
 	AM_RANGE(0x8028, 0x8028) AM_READ_PORT("P2")
@@ -419,6 +420,8 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_CPU_ADD("mcu", I8039,8000000)  /* 8MHz crystal */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_io_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_MACHINE_START_OVERRIDE(junofrst_state,junofrst)
 	MCFG_MACHINE_RESET_OVERRIDE(junofrst_state,junofrst)

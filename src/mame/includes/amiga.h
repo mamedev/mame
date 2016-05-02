@@ -22,6 +22,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "machine/akiko.h"
 #include "machine/i2cmem.h"
 #include "sound/amiga.h"
+#include "video/amigaaga.h"
 
 
 /*************************************
@@ -685,9 +686,5 @@ void amiga_sprite_enable_comparitor(running_machine &machine, int which, int ena
 
 MACHINE_CONFIG_EXTERN( pal_video );
 MACHINE_CONFIG_EXTERN( ntsc_video );
-
-/*----------- defined in video/amigaaga.c -----------*/
-
-void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 data);
 
 #endif /* __AMIGA_H__ */

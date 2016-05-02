@@ -154,7 +154,7 @@ public:
 		: object_finder_base<memory_region>(base, tag) { }
 
 	// make reference use transparent as well
-	operator memory_region &() { assert(object_finder_base<memory_region>::m_target != NULL); return *object_finder_base<memory_region>::m_target; }
+	operator memory_region &() const { assert(object_finder_base<memory_region>::m_target != nullptr); return *object_finder_base<memory_region>::m_target; }
 
 	// finder
 	virtual bool findit(bool isvalidation = false) override
@@ -192,7 +192,7 @@ public:
 		: object_finder_base<memory_bank>(base, tag) { }
 
 	// make reference use transparent as well
-	operator memory_bank &() { assert(object_finder_base<memory_bank>::m_target != NULL); return *object_finder_base<memory_bank>::m_target; }
+	operator memory_bank &() const { assert(object_finder_base<memory_bank>::m_target != nullptr); return *object_finder_base<memory_bank>::m_target; }
 
 	// finder
 	virtual bool findit(bool isvalidation = false) override
@@ -230,9 +230,9 @@ public:
 		: object_finder_base<ioport_port>(base, tag) { }
 
 	// make reference use transparent as well
-	operator ioport_port &() { assert(object_finder_base<ioport_port>::m_target != NULL); return *object_finder_base<ioport_port>::m_target; }
+	operator ioport_port &() const { assert(object_finder_base<ioport_port>::m_target != nullptr); return *object_finder_base<ioport_port>::m_target; }
 
-	// allow dereference even when target is NULL so read_safe() can be used
+	// allow dereference even when target is nullptr so read_safe() can be used
 	ioport_port *operator->() const override { return object_finder_base<ioport_port>::m_target; }
 
 	// finder
@@ -359,7 +359,7 @@ class optional_region_ptr : public region_ptr_finder<_PointerType, false>
 {
 public:
 	optional_region_ptr(device_t &base, const char *tag, size_t length = 0) : region_ptr_finder<_PointerType, false>(base, tag, length) { }
-	optional_region_ptr(device_t &base, size_t length = 0) : 	region_ptr_finder<_PointerType, false>(base, FINDER_DUMMY_TAG, length) { }
+	optional_region_ptr(device_t &base, size_t length = 0) :    region_ptr_finder<_PointerType, false>(base, FINDER_DUMMY_TAG, length) { }
 };
 
 // required region pointer finder
@@ -368,7 +368,7 @@ class required_region_ptr : public region_ptr_finder<_PointerType, true>
 {
 public:
 	required_region_ptr(device_t &base, const char *tag, size_t length = 0) : region_ptr_finder<_PointerType, true>(base, tag, length) { }
-	required_region_ptr(device_t &base, size_t length = 0) : 	region_ptr_finder<_PointerType, true>(base, FINDER_DUMMY_TAG, length) { }
+	required_region_ptr(device_t &base, size_t length = 0) :    region_ptr_finder<_PointerType, true>(base, FINDER_DUMMY_TAG, length) { }
 };
 
 

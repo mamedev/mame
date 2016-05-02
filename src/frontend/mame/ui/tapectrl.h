@@ -18,7 +18,7 @@
 
 class ui_menu_tape_control : public ui_menu_device_control<cassette_image_device> {
 public:
-	ui_menu_tape_control(running_machine &machine, render_container *container, cassette_image_device *device);
+	ui_menu_tape_control(mame_ui_manager &mui, render_container *container, cassette_image_device *device);
 	virtual ~ui_menu_tape_control();
 	virtual void populate() override;
 	virtual void handle() override;

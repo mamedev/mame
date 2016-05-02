@@ -68,10 +68,10 @@ public:
 	// return the current value for a given indexed output
 	INT32 get_indexed_value(const char *outname, int index);
 
-	// set a notifier on a particular output, or globally if NULL
+	// set a notifier on a particular output, or globally if nullptr
 	void set_notifier(const char *outname, output_notifier_func callback, void *param);
 
-	// set a notifier on a particular output, or globally if NULL
+	// set a notifier on a particular output, or globally if nullptr
 	void notify_all(output_notifier_func callback, void *param);
 
 	// map a name to a unique ID

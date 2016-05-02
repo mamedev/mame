@@ -62,7 +62,7 @@ private:
 	emu_timer *m_SQW_timer;
 	UINT8 m_SQW_internal_state;
 
-	/* callback called when interrupt pin state changes (may be NULL) */
+	/* callback called when interrupt pin state changes (may be nullptr) */
 	devcb_write_line    m_interrupt_cb;
 };
 

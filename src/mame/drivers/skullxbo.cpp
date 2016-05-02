@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "includes/skullxbo.h"
 
 
@@ -106,11 +107,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, skullxbo_state )
 	AM_RANGE(0xff1c00, 0xff1c7f) AM_WRITE(playfield_latch_w)
 	AM_RANGE(0xff1c80, 0xff1cff) AM_WRITE(skullxbo_xscroll_w) AM_SHARE("xscroll")
 	AM_RANGE(0xff1d00, 0xff1d7f) AM_WRITE(scanline_int_ack_w)
-	AM_RANGE(0xff1d80, 0xff1dff) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0xff1d80, 0xff1dff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xff1e00, 0xff1e7f) AM_WRITE(playfield_latch_w)
 	AM_RANGE(0xff1e80, 0xff1eff) AM_WRITE(skullxbo_xscroll_w)
 	AM_RANGE(0xff1f00, 0xff1f7f) AM_WRITE(scanline_int_ack_w)
-	AM_RANGE(0xff1f80, 0xff1fff) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0xff1f80, 0xff1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff4000, 0xff47ff) AM_WRITE(skullxbo_yscroll_w) AM_SHARE("yscroll")
 	AM_RANGE(0xff4800, 0xff4fff) AM_WRITE(skullxbo_mobwr_w)
@@ -232,6 +233,8 @@ static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
 	MCFG_MACHINE_RESET_OVERRIDE(skullxbo_state,skullxbo)
 
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skullxbo)

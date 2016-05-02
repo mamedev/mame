@@ -66,6 +66,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 class supdrapo_state : public driver_device
 {
@@ -73,6 +74,7 @@ public:
 	supdrapo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_col_line(*this, "col_line"),
@@ -80,6 +82,7 @@ public:
 		m_char_bank(*this, "char_bank") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -212,7 +215,7 @@ WRITE8_MEMBER(supdrapo_state::wdog8000_w)
 
 	if (m_wdog == data)
 	{
-		watchdog_reset_w(space, 0, 0);  /* Reset */
+		m_watchdog->reset_w(space, 0, 0);  /* Reset */
 	}
 
 	m_wdog = data;
@@ -450,6 +453,7 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 	MCFG_CPU_PROGRAM_MAP(sdpoker_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", supdrapo_state,  irq0_line_hold)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

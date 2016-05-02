@@ -28,6 +28,8 @@
 #include "softlist.h"
 
 #include "ui/moptions.h"
+#include "language.h"
+#include "pluginopts.h"
 
 #include <new>
 #include <ctype.h>
@@ -189,7 +191,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 		if (*(m_options.software_name()) != 0)
 		{
-			const game_driver *system = m_options.system();
+			const game_driver *system = mame_options::system(m_options);
 			if (system == nullptr && *(m_options.system_name()) != 0)
 				throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
@@ -254,7 +256,7 @@ int cli_frontend::execute(int argc, char **argv)
 		if (!mame_options::parse_command_line(m_options,argc, argv, option_errors))
 		{
 			// if we failed, check for no command and a system name first; in that case error on the name
-			if (*(m_options.command()) == 0 && m_options.system() == nullptr && *(m_options.system_name()) != 0)
+			if (*(m_options.command()) == 0 && mame_options::system(m_options) == nullptr && *(m_options.system_name()) != 0)
 				throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
 			// otherwise, error on the options
@@ -284,7 +286,7 @@ int cli_frontend::execute(int argc, char **argv)
 				osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
 
 			// if we can't find it, give an appropriate error
-			const game_driver *system = m_options.system();
+			const game_driver *system = mame_options::system(m_options);
 			if (system == nullptr && *(m_options.system_name()) != 0)
 				throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
@@ -303,7 +305,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 		// if a game was specified, wasn't a wildcard, and our error indicates this was the
 		// reason for failure, offer some suggestions
-		if (m_result == EMU_ERR_NO_SUCH_GAME && *(m_options.system_name()) != 0 && strchr(m_options.system_name(), '*') == nullptr && m_options.system() == nullptr)
+		if (m_result == EMU_ERR_NO_SUCH_GAME && *(m_options.system_name()) != 0 && strchr(m_options.system_name(), '*') == nullptr && mame_options::system(m_options) == nullptr)
 		{
 			// get the top 16 approximate matches
 			driver_enumerator drivlist(m_options);

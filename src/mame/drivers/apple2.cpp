@@ -47,6 +47,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "imagedev/cassette.h"
 #include "formats/ap2_dsk.h"
 #include "cpu/m6502/m6502.h"
+#include "includes/apple2.h"
 #include "video/apple2.h"
 
 #include "bus/a2bus/a2bus.h"
@@ -137,6 +138,7 @@ public:
 
 	DECLARE_PALETTE_INIT(apple2);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -425,6 +427,46 @@ UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
+UINT32 napple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// always update the flash timer here so it's smooth regardless of mode switches
+	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
+
+	if (m_video->m_graphics)
+	{
+		if (m_video->m_hires)
+		{
+			if (m_video->m_mix)
+			{
+				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
+				m_video->text_update_jplus(screen, bitmap, cliprect, 160, 191);
+			}
+			else
+			{
+				m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
+			}
+		}
+		else    // lo-res
+		{
+			if (m_video->m_mix)
+			{
+				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
+				m_video->text_update_jplus(screen, bitmap, cliprect, 160, 191);
+			}
+			else
+			{
+				m_video->lores_update(screen, bitmap, cliprect, 0, 191);
+			}
+		}
+	}
+	else
+	{
+		m_video->text_update_jplus(screen, bitmap, cliprect, 0, 191);
+	}
+
+	return 0;
+}
+
 /***************************************************************************
     I/O
 ***************************************************************************/
@@ -497,10 +539,14 @@ void napple2_state::do_io(address_space &space, int offset)
 			m_an1 = true; break;
 
 		case 0x5c: // AN2 off
-			m_an2 = false; break;
+			m_an2 = false;
+			m_video->m_an2 = false;
+			break;
 
 		case 0x5d: // AN2 on
-			m_an2 = true; break;
+			m_an2 = true;
+			m_video->m_an2 = true;
+			break;
 
 		case 0x5e: // AN3 off
 			m_an3 = false; break;
@@ -1351,6 +1397,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( space84, apple2p )
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( apple2jp, apple2p )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(napple2_state, screen_update_jp)
+MACHINE_CONFIG_END
+
 #if 0
 static MACHINE_CONFIG_DERIVED( laba2p, apple2p )
 	MCFG_MACHINE_START_OVERRIDE(napple2_state,laba2p)
@@ -1359,8 +1410,8 @@ static MACHINE_CONFIG_DERIVED( laba2p, apple2p )
 	MCFG_A2BUS_SLOT_REMOVE("sl3")
 	MCFG_A2BUS_SLOT_REMOVE("sl6")
 
-//  MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LAB_80COL, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NULL)
+//  MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LAB_80COL, NOOP)
+	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NOOP)
 
 MACHINE_CONFIG_END
 #endif
@@ -1373,6 +1424,8 @@ MACHINE_CONFIG_END
 
 ROM_START(apple2) /* the classic, non-autoboot apple2 with integer basic in rom. optional card with autoboot and applesoft basic was possible but isn't yet supported */
 	ROM_REGION(0x0800,"gfx1",0)
+	// This is a GI RO-3-2513 on Rev. 0 Apple ][s, as per http://www.solivant.com/php/eview.php?album=appleII&filen=11 which shows serial #97
+	// However, the presence of the lo-res patterns means it's a customized-mask variant, and not the same as the Apple I's 2513 that truly is stock.
 	ROM_LOAD ( "a2.chr", 0x0000, 0x0800, BAD_DUMP CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659)) /* current dump is 341-0036 which is the appleII+ character generator, not the original appleII one, whose rom number is not yet known! */
 
 	ROM_REGION(0x4000,"maincpu",0)
@@ -1481,18 +1534,20 @@ ROM_END
 /*
     J-Plus ROM numbers confirmed by:
     http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/Apple%20II/Apple%20II%20j-plus/Photos/Apple%20II%20j-plus%20-%20Motherboard.jpg
+
 */
 
 ROM_START(apple2jp)
 	ROM_REGION(0x0800,"gfx1",0)
+	// probably a custom-mask variant of the Signetics 2513N or equivalent
 	ROM_LOAD ( "a2jp.chr", 0x0000, 0x0800, CRC(487104b5) SHA1(0a382be58db5215c4a3de53b19a72fab660d5da2))
 
 	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "341-0011.d0", 0x1000, 0x0800, BAD_DUMP CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
-	ROM_LOAD ( "341-0012.d8", 0x1800, 0x0800, BAD_DUMP CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
-	ROM_LOAD ( "341-0013.e0", 0x2000, 0x0800, BAD_DUMP CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
-	ROM_LOAD ( "341-0014.e8", 0x2800, 0x0800, BAD_DUMP CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
-	ROM_LOAD ( "341-0015.f0", 0x3000, 0x0800, BAD_DUMP CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
+	ROM_LOAD ( "341-0011.d0", 0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
+	ROM_LOAD ( "341-0012.d8", 0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
+	ROM_LOAD ( "341-0013.e0", 0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
+	ROM_LOAD ( "341-0014.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
+	ROM_LOAD ( "341-0015.f0", 0x3000, 0x0800, CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
 	ROM_LOAD ( "341-0047.f8", 0x3800, 0x0800, CRC(6ea8379b) SHA1(00a75ae3b58e1917ad640249366f654608589cf4))
 ROM_END
 
@@ -1610,9 +1665,9 @@ ROM_END
 #endif
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
-COMP( 1977, apple2,   0,        0,        apple2,      apple2,  driver_device,   0,        "Apple Computer",    "Apple ][", MACHINE_SUPPORTS_SAVE )
+COMP( 1977, apple2,   0,        0,        apple2,      apple2,  driver_device,  0,        "Apple Computer",    "Apple ][", MACHINE_SUPPORTS_SAVE )
 COMP( 1979, apple2p,  apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][+", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, apple2jp, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][ J-Plus", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, apple2jp, apple2,   0,        apple2jp,    apple2p, driver_device,  0,        "Apple Computer",    "Apple ][ J-Plus", MACHINE_SUPPORTS_SAVE )
 COMP( 198?, elppa,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Victor do Brasil",  "Elppa II+", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, microeng, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Spectrum Eletronica (SCOPUS)", "Micro Engenho", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, maxxi,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Polymax",  "Maxxi", MACHINE_SUPPORTS_SAVE )

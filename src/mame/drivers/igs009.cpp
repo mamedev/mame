@@ -677,7 +677,7 @@ static INPUT_PORTS_START( jingbell )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Memory Clear")    // stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igs009_state,hopper_r, NULL)  // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igs009_state,hopper_r, nullptr)  // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // test (press during boot)
@@ -725,7 +725,7 @@ static const gfx_layout layout_8x8x6 =
 	8, 8,
 	RGN_FRAC(1, 3),
 	6,
-	{	RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
+	{   RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
 		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
 		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
@@ -738,7 +738,7 @@ static const gfx_layout layout_8x32x6 =
 	8, 32,
 	RGN_FRAC(1, 3),
 	6,
-	{	RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
+	{   RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
 		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
 		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
@@ -794,9 +794,9 @@ void igs009_state::machine_start()
 
 void igs009_state::machine_reset()
 {
-	m_nmi_enable	=	0;
-	m_hopper		=	0;
-	m_video_enable	=	1;
+	m_nmi_enable    =   0;
+	m_hopper        =   0;
+	m_video_enable  =   1;
 }
 
 INTERRUPT_GEN_MEMBER(igs009_state::interrupt)
@@ -1159,7 +1159,7 @@ ROM_END
 
 /*    YEAR   NAME       PARENT    MACHINE   INPUT     STATE          INIT       ROT   COMPANY           FULLNAME                      FLAGS  */
 GAME( 1997,  jingbell,  0,        jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (US, V157US)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V155UE)",   MACHINE_SUPPORTS_SAVE )	// Shows V154UE in test mode!
+GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V155UE)",   MACHINE_SUPPORTS_SAVE )   // Shows V154UE in test mode!
 GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", MACHINE_SUPPORTS_SAVE )

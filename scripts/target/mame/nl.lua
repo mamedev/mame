@@ -86,8 +86,8 @@ function createProjects_mame_nl(_target, _subtarget)
 	targetsubdir(_target .."_" .. _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-mame-nl"))
-  addprojectflags()
-  precompiledheaders()
+	addprojectflags()
+	precompiledheaders()
 
 	includedirs {
 		MAME_DIR .. "src/osd",
@@ -103,9 +103,12 @@ function createProjects_mame_nl(_target, _subtarget)
 
 files{
 	MAME_DIR .. "src/mame/drivers/pong.cpp",
-	MAME_DIR .. "src/mame/drivers/nl_pong.cpp",
-	MAME_DIR .. "src/mame/drivers/nl_pongd.cpp",
-	MAME_DIR .. "src/mame/drivers/nl_breakout.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pong.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pong.h",
+	MAME_DIR .. "src/mame/machine/nl_pongd.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pongd.h",
+	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",
+	MAME_DIR .. "src/mame/machine/nl_breakout.h",
 
 	MAME_DIR .. "src/mame/drivers/1942.cpp",
 	MAME_DIR .. "src/mame/includes/1942.h",
@@ -114,13 +117,13 @@ files{
 	MAME_DIR .. "src/mame/includes/popeye.h",
 	MAME_DIR .. "src/mame/video/popeye.cpp",
 	
-  MAME_DIR .. "src/mame/drivers/m62.cpp",
-  MAME_DIR .. "src/mame/includes/m62.h",
-  MAME_DIR .. "src/mame/video/m62.cpp",
-  MAME_DIR .. "src/mame/audio/irem.cpp",
-  MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
-  MAME_DIR .. "src/mame/audio/irem.h",
-
+	MAME_DIR .. "src/mame/drivers/m62.cpp",
+	MAME_DIR .. "src/mame/includes/m62.h",
+	MAME_DIR .. "src/mame/video/m62.cpp",
+	MAME_DIR .. "src/mame/audio/irem.cpp",
+	MAME_DIR .. "src/mame/audio/irem.h",
+	MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
+	MAME_DIR .. "src/mame/audio/nl_kidniki.h",
 }
 end
 

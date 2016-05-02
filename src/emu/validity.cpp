@@ -599,7 +599,7 @@ void validity_checker::validate_roms()
 				// check for a valid tag
 				if (basetag == nullptr)
 				{
-					osd_printf_error("ROM_REGION tag with NULL name\n");
+					osd_printf_error("ROM_REGION tag with nullptr name\n");
 					continue;
 				}
 
@@ -874,7 +874,7 @@ void validity_checker::validate_inputs()
 				{
 					// dip switch fields must have a name
 					if (field.name() == nullptr)
-						osd_printf_error("DIP switch has a NULL name\n");
+						osd_printf_error("DIP switch has a nullptr name\n");
 
 					// verify the settings list
 					validate_dip_settings(field);

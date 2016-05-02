@@ -30,13 +30,13 @@
 NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_DEVICE_WITH_PARAMS(switch1,
-	NETLIB_NAME(R_base) m_R;
+	NETLIB_SUB(R_base) m_R;
 
 	param_int_t m_POS;
 );
 
 NETLIB_DEVICE_WITH_PARAMS(switch2,
-	NETLIB_NAME(R_base) m_R[2];
+	NETLIB_SUB(R_base) m_R[2];
 
 	param_int_t m_POS;
 );

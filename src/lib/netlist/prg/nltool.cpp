@@ -91,13 +91,13 @@ class netlist_tool_t : public netlist::netlist_t
 public:
 
 	netlist_tool_t(const pstring &aname)
-	: netlist::netlist_t(aname), m_opts(NULL), m_setup(NULL)
+	: netlist::netlist_t(aname), m_opts(nullptr), m_setup(nullptr)
 	{
 	}
 
 	~netlist_tool_t()
 	{
-		if (m_setup != NULL)
+		if (m_setup != nullptr)
 			pfree(m_setup);
 	};
 
@@ -165,7 +165,7 @@ void usage(tool_options_t &opts)
 struct input_t
 {
 	input_t()
-	: m_param(NULL), m_value(0.0)
+	: m_param(nullptr), m_value(0.0)
 	{
 	}
 	input_t(netlist::netlist_t *netlist, const pstring &line)
@@ -304,8 +304,7 @@ static void listdevices()
 		pstring out = pfmt("{1} {2}(<id>")(f->classname(),"-20")(f->name());
 		pstring terms("");
 
-		netlist::device_t *d = f->Create();
-		d->init(nt, pfmt("dummy{1}")(i));
+		netlist::device_t *d = f->Create(nt.setup().netlist(), pfmt("dummy{1}")(i));
 		d->start_dev();
 
 		// get the list of terminals ...

@@ -13,11 +13,9 @@
 #ifndef __UI_INPUTMAP_H__
 #define __UI_INPUTMAP_H__
 
-//#include "drivenum.h"
-
 class ui_menu_input_groups : public ui_menu {
 public:
-	ui_menu_input_groups(running_machine &machine, render_container *container);
+	ui_menu_input_groups(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_input_groups();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -25,7 +23,7 @@ public:
 
 class ui_menu_input : public ui_menu {
 public:
-	ui_menu_input(running_machine &machine, render_container *container);
+	ui_menu_input(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_input();
 	virtual void handle() override;
 
@@ -70,7 +68,7 @@ private:
 
 class ui_menu_input_general : public ui_menu_input {
 public:
-	ui_menu_input_general(running_machine &machine, render_container *container, int group);
+	ui_menu_input_general(mame_ui_manager &mui, render_container *container, int group);
 	virtual ~ui_menu_input_general();
 	virtual void populate() override;
 
@@ -81,7 +79,7 @@ protected:
 
 class ui_menu_input_specific : public ui_menu_input {
 public:
-	ui_menu_input_specific(running_machine &machine, render_container *container);
+	ui_menu_input_specific(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_input_specific();
 	virtual void populate() override;
 
@@ -91,7 +89,7 @@ protected:
 
 class ui_menu_settings : public ui_menu {
 public:
-	ui_menu_settings(running_machine &machine, render_container *container, UINT32 type);
+	ui_menu_settings(mame_ui_manager &mui, render_container *container, UINT32 type);
 	virtual ~ui_menu_settings();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -112,7 +110,7 @@ protected:
 
 class ui_menu_settings_dip_switches : public ui_menu_settings {
 public:
-	ui_menu_settings_dip_switches(running_machine &machine, render_container *container);
+	ui_menu_settings_dip_switches(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_settings_dip_switches();
 
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -122,13 +120,13 @@ private:
 
 class ui_menu_settings_driver_config : public ui_menu_settings {
 public:
-	ui_menu_settings_driver_config(running_machine &machine, render_container *container);
+	ui_menu_settings_driver_config(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_settings_driver_config();
 };
 
 class ui_menu_analog : public ui_menu {
 public:
-	ui_menu_analog(running_machine &machine, render_container *container);
+	ui_menu_analog(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_analog();
 	virtual void populate() override;
 	virtual void handle() override;

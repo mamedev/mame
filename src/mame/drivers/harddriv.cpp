@@ -326,6 +326,7 @@ Notes:
 
 
 #include "emu.h"
+#include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "includes/slapstic.h"
 #include "includes/harddriv.h"
@@ -522,16 +523,12 @@ public:
 };
 
 
-WRITE16_MEMBER( harddriv_state::watchdog_reset16_w )
-{
-}
-
 static ADDRESS_MAP_START( driver_68k_map, AS_PROGRAM, 16, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x600000, 0x603fff) AM_READ(hd68k_port0_r)
 	AM_RANGE(0x604000, 0x607fff) AM_WRITE(hd68k_nwr_w)
-	AM_RANGE(0x608000, 0x60bfff) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x608000, 0x60bfff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x60c000, 0x60ffff) AM_WRITE(hd68k_irq_ack_w)
 	AM_RANGE(0xa00000, 0xa7ffff) AM_WRITE(hd68k_wr0_write)
 	AM_RANGE(0xa80000, 0xafffff) AM_READ(hd68k_a80000_r) AM_WRITE(hd68k_wr1_write)
@@ -578,7 +575,7 @@ static ADDRESS_MAP_START( multisync_68k_map, AS_PROGRAM, 16, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x604000, 0x607fff) AM_READWRITE(hd68k_sound_reset_r, hd68k_nwr_w)
-	AM_RANGE(0x608000, 0x60bfff) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x608000, 0x60bfff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x60c000, 0x60ffff) AM_READWRITE(hd68k_port0_r, hd68k_irq_ack_w)
 	AM_RANGE(0xa00000, 0xa7ffff) AM_WRITE(hd68k_wr0_write)
 	AM_RANGE(0xa80000, 0xafffff) AM_READ(hd68k_a80000_r) AM_WRITE(hd68k_wr1_write)
@@ -616,7 +613,7 @@ static ADDRESS_MAP_START( multisync2_68k_map, AS_PROGRAM, 16, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x604000, 0x607fff) AM_WRITE(hd68k_nwr_w)
-	AM_RANGE(0x608000, 0x60bfff) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x608000, 0x60bfff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x60c000, 0x60ffff) AM_READWRITE(hd68k_port0_r, hd68k_irq_ack_w)
 	AM_RANGE(0xa00000, 0xa7ffff) AM_WRITE(hd68k_wr0_write)
 	AM_RANGE(0xa80000, 0xafffff) AM_READ(hd68k_a80000_r) AM_WRITE(hd68k_wr1_write)
@@ -1428,6 +1425,8 @@ static MACHINE_CONFIG_FRAGMENT( driver_nomsp )
 
 	MCFG_SLAPSTIC_ADD("slapstic", 117)
 	MCFG_SLAPSTIC_68K_ACCESS(1)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(driver_gsp_map)

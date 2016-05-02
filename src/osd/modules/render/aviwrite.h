@@ -34,12 +34,12 @@ private:
 	void begin_avi_recording(std::string name);
 	void end_avi_recording();
 
-	running_machine&		m_machine;
+	running_machine&        m_machine;
 
-	bool					m_recording;
+	bool                    m_recording;
 
-	uint32_t				m_width;
-	uint32_t				m_height;
+	uint32_t                m_width;
+	uint32_t                m_height;
 
 	avi_file::ptr           m_output_file;
 

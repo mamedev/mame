@@ -1,6 +1,77 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
 
+	<script>
+	local layout = {}
+	local walls = { { 7.5, {0, 10, 20, 30, 40, 50, 60, 70}},
+					{17.5, {0, 10, 20, 30, 40, 50, 60, 70}},
+					{27.5, {0, 10, 20, 30, 40, 50, 60, 70}},
+					{37.5, {0, 10, 20, 30, 40, 50, 60, 70}},
+					{47.5, {0, 10, 20, 30, 40, 50, 60, 70}},
+					{57.5, {0, 10, 20, 30, 40, 50, 60, 70}},
+					{67.5, {0, 10, 20, 30, 40, 50, 60, 70}} }
+
+	local last_state = false
+
+	local function get_mouse()
+		local x, y, button, target = machine:input():find_mouse()
+		if not button then
+			last_state = false
+			return nil
+		end
+		if last_state then
+			return nil
+		end
+		last_state = true
+		x = ((x / target:width()) * 95) - 15
+		y = ((y / target:height()) * 82.5) - 2.5
+		return x, y
+	end
+
+	function layout.reset()
+		for num, col in pairs(walls) do
+			for num2, wall in pairs(col[2]) do
+				machine:outputs():set_indexed_value("colwall", (num * 10) + num2, 0)
+			end
+		end
+		for num, row in pairs(walls) do
+			for num2, wall in pairs(row[2]) do
+				machine:outputs():set_indexed_value("rowwall", (num * 10) + num2, 0)
+			end
+		end
+	end
+
+	function layout.frame()
+		local x, y = get_mouse()
+		if not x or x &lt; 0 or y &lt; 0 then
+			return
+		end
+		for num, col in pairs(walls) do
+			if col[1] &lt; x and (col[1] + 2.5) &gt; x then
+				for num2, wall in pairs(col[2]) do
+					 if wall &lt; y and (wall + 7.5) &gt; y then
+						local state = machine:outputs():get_indexed_value("colwall", (num * 10) + num2)
+						machine:outputs():set_indexed_value("colwall", (num * 10) + num2, (~state) &amp; 1)
+						return
+					end
+				end
+			end
+		end
+		for num, row in pairs(walls) do
+			if row[1] &lt; y and (row[1] + 2.5) &gt; y then
+				for num2, wall in pairs(row[2]) do
+					 if wall &lt; x and (wall + 7.5) &gt; x then
+						local state = machine:outputs():get_indexed_value("rowwall", (num * 10) + num2)
+						machine:outputs():set_indexed_value("rowwall", (num * 10) + num2, (~state) &amp; 1)
+						return
+					end
+				end
+			end
+		end
+	end
+	return layout, "mdndclab"
+	</script>
+
 <!-- define elements -->
 
 	<element name="static_black"><rect><color red="0.07" green="0.07" blue="0.06" /></rect></element>
@@ -122,6 +193,9 @@
 		<text string="Treasure"><color red="0.8" green="0.75" blue="0.7" /></text>
 	</element>
 
+	<element name="wall" defstate="0">
+		<rect state="1"><color red="0.55" green="0.1" blue="0.05" /></rect>
+	</element>
 
 <!-- build screen -->
 
@@ -205,7 +279,121 @@
 		<bezel element="hlr" inputtag="IN.6" inputmask="0x08"><bounds x="60" y="70" width="7.5" height="7.5" /></bezel>
 		<bezel element="hlr" inputtag="IN.7" inputmask="0x08"><bounds x="70" y="70" width="7.5" height="7.5" /></bezel>
 
-	<!-- left side -->
+		<bezel name="colwall11" element="wall"><bounds x= "7.5" y= "0" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall12" element="wall"><bounds x= "7.5" y="10" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall13" element="wall"><bounds x= "7.5" y="20" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall14" element="wall"><bounds x= "7.5" y="30" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall15" element="wall"><bounds x= "7.5" y="40" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall16" element="wall"><bounds x= "7.5" y="50" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall17" element="wall"><bounds x= "7.5" y="60" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall18" element="wall"><bounds x= "7.5" y="70" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall21" element="wall"><bounds x="17.5" y= "0" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall22" element="wall"><bounds x="17.5" y="10" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall23" element="wall"><bounds x="17.5" y="20" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall24" element="wall"><bounds x="17.5" y="30" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall25" element="wall"><bounds x="17.5" y="40" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall26" element="wall"><bounds x="17.5" y="50" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall27" element="wall"><bounds x="17.5" y="60" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall28" element="wall"><bounds x="17.5" y="70" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall31" element="wall"><bounds x="27.5" y= "0" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall32" element="wall"><bounds x="27.5" y="10" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall33" element="wall"><bounds x="27.5" y="20" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall34" element="wall"><bounds x="27.5" y="30" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall35" element="wall"><bounds x="27.5" y="40" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall36" element="wall"><bounds x="27.5" y="50" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall37" element="wall"><bounds x="27.5" y="60" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall38" element="wall"><bounds x="27.5" y="70" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall41" element="wall"><bounds x="37.5" y= "0" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall42" element="wall"><bounds x="37.5" y="10" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall43" element="wall"><bounds x="37.5" y="20" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall44" element="wall"><bounds x="37.5" y="30" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall45" element="wall"><bounds x="37.5" y="40" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall46" element="wall"><bounds x="37.5" y="50" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall47" element="wall"><bounds x="37.5" y="60" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall48" element="wall"><bounds x="37.5" y="70" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall51" element="wall"><bounds x="47.5" y= "0" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall52" element="wall"><bounds x="47.5" y="10" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall53" element="wall"><bounds x="47.5" y="20" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall54" element="wall"><bounds x="47.5" y="30" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall55" element="wall"><bounds x="47.5" y="40" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall56" element="wall"><bounds x="47.5" y="50" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall57" element="wall"><bounds x="47.5" y="60" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall58" element="wall"><bounds x="47.5" y="70" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall61" element="wall"><bounds x="57.5" y= "0" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall62" element="wall"><bounds x="57.5" y="10" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall63" element="wall"><bounds x="57.5" y="20" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall64" element="wall"><bounds x="57.5" y="30" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall65" element="wall"><bounds x="57.5" y="40" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall66" element="wall"><bounds x="57.5" y="50" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall67" element="wall"><bounds x="57.5" y="60" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall68" element="wall"><bounds x="57.5" y="70" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall71" element="wall"><bounds x="67.5" y= "0" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall72" element="wall"><bounds x="67.5" y="10" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall73" element="wall"><bounds x="67.5" y="20" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall74" element="wall"><bounds x="67.5" y="30" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall75" element="wall"><bounds x="67.5" y="40" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall76" element="wall"><bounds x="67.5" y="50" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall77" element="wall"><bounds x="67.5" y="60" width="2.5" height="7.5" /></bezel>
+		<bezel name="colwall78" element="wall"><bounds x="67.5" y="70" width="2.5" height="7.5" /></bezel>
+
+		<bezel name="rowwall11" element="wall"><bounds x= "0" y= "7.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall12" element="wall"><bounds x="10" y= "7.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall13" element="wall"><bounds x="20" y= "7.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall14" element="wall"><bounds x="30" y= "7.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall15" element="wall"><bounds x="40" y= "7.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall16" element="wall"><bounds x="50" y= "7.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall17" element="wall"><bounds x="60" y= "7.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall18" element="wall"><bounds x="70" y= "7.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall21" element="wall"><bounds x= "0" y="17.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall22" element="wall"><bounds x="10" y="17.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall23" element="wall"><bounds x="20" y="17.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall24" element="wall"><bounds x="30" y="17.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall25" element="wall"><bounds x="40" y="17.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall26" element="wall"><bounds x="50" y="17.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall27" element="wall"><bounds x="60" y="17.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall28" element="wall"><bounds x="70" y="17.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall31" element="wall"><bounds x= "0" y="27.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall32" element="wall"><bounds x="10" y="27.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall33" element="wall"><bounds x="20" y="27.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall34" element="wall"><bounds x="30" y="27.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall35" element="wall"><bounds x="40" y="27.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall36" element="wall"><bounds x="50" y="27.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall37" element="wall"><bounds x="60" y="27.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall38" element="wall"><bounds x="70" y="27.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall41" element="wall"><bounds x= "0" y="37.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall42" element="wall"><bounds x="10" y="37.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall43" element="wall"><bounds x="20" y="37.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall44" element="wall"><bounds x="30" y="37.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall45" element="wall"><bounds x="40" y="37.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall46" element="wall"><bounds x="50" y="37.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall47" element="wall"><bounds x="60" y="37.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall48" element="wall"><bounds x="70" y="37.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall51" element="wall"><bounds x= "0" y="47.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall52" element="wall"><bounds x="10" y="47.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall53" element="wall"><bounds x="20" y="47.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall54" element="wall"><bounds x="30" y="47.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall55" element="wall"><bounds x="40" y="47.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall56" element="wall"><bounds x="50" y="47.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall57" element="wall"><bounds x="60" y="47.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall58" element="wall"><bounds x="70" y="47.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall61" element="wall"><bounds x= "0" y="57.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall62" element="wall"><bounds x="10" y="57.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall63" element="wall"><bounds x="20" y="57.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall64" element="wall"><bounds x="30" y="57.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall65" element="wall"><bounds x="40" y="57.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall66" element="wall"><bounds x="50" y="57.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall67" element="wall"><bounds x="60" y="57.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall68" element="wall"><bounds x="70" y="57.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall71" element="wall"><bounds x= "0" y="67.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall72" element="wall"><bounds x="10" y="67.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall73" element="wall"><bounds x="20" y="67.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall74" element="wall"><bounds x="30" y="67.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall75" element="wall"><bounds x="40" y="67.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall76" element="wall"><bounds x="50" y="67.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall77" element="wall"><bounds x="60" y="67.5" width="7.5" height="2.5" /></bezel>
+		<bezel name="rowwall78" element="wall"><bounds x="70" y="67.5" width="7.5" height="2.5" /></bezel>
+		
+		<!-- left side -->
 
 		<bezel element="static_red"><bounds x="-12.5" y="0" width="7.5" height="7.5" /></bezel>
 		<bezel element="static_red"><bounds x="-12.5" y="10" width="7.5" height="7.5" /></bezel>

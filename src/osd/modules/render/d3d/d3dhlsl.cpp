@@ -16,6 +16,7 @@
 
 // MAME headers
 #include "emu.h"
+#include "drivenum.h"
 #include "render.h"
 #include "ui/uimain.h"
 #include "rendutil.h"
@@ -276,7 +277,7 @@ void shaders::render_snapshot(surface *surface)
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
 	std::string text2 = std::string(machine->system().manufacturer).append(" ").append(machine->system().description);
-	png_info pnginfo = { 0 };
+	png_info pnginfo = { nullptr };
 	png_add_text(&pnginfo, "Software", text1.c_str());
 	png_add_text(&pnginfo, "System", text2.c_str());
 
@@ -2549,15 +2550,15 @@ std::vector<ui_menu_item> shaders::init_slider_list()
 						break;
 				}
 
-                slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_update_trampoline, slider_arg);
+				slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_update_trampoline, slider_arg);
 
-                ui_menu_item item;
-                item.text = core_slider->description;
-                item.subtext = "";
-                item.flags = 0;
-                item.ref = core_slider;
-                item.type = ui_menu_item_type::SLIDER;
-                sliders.push_back(item);
+				ui_menu_item item;
+				item.text = core_slider->description;
+				item.subtext = "";
+				item.flags = 0;
+				item.ref = core_slider;
+				item.type = ui_menu_item_type::SLIDER;
+				sliders.push_back(item);
 			}
 		}
 	}

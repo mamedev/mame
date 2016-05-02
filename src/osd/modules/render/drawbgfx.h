@@ -39,11 +39,11 @@ public:
 	static void exit();
 
 	virtual int create() override;
-    virtual int draw(const int update) override;
+	virtual int draw(const int update) override;
 
 	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
-    virtual std::vector<ui_menu_item> get_slider_list() override;
-    virtual void set_sliders_dirty() override;
+	virtual std::vector<ui_menu_item> get_slider_list() override;
+	virtual void set_sliders_dirty() override;
 
 #ifdef OSD_SDL
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
@@ -75,19 +75,19 @@ public:
 		return &win->target()->get_primitives();
 	}
 
-    static const char* WINDOW_PREFIX;
+	static const char* WINDOW_PREFIX;
 
 private:
-    void vertex(ScreenVertex* vertex, float x, float y, float z, uint32_t rgba, float u, float v);
-    void render_avi_quad();
-    void update_recording();
+	void vertex(ScreenVertex* vertex, float x, float y, float z, uint32_t rgba, float u, float v);
+	void render_avi_quad();
+	void update_recording();
 
-    bool update_dimensions();
+	bool update_dimensions();
 
-    void setup_view(uint32_t view_index, bool screen);
+	void setup_view(uint32_t view_index, bool screen);
 	void init_ui_view();
 
-    void setup_matrices(uint32_t view_index, bool screen);
+	void setup_matrices(uint32_t view_index, bool screen);
 
 	void allocate_buffer(render_primitive *prim, UINT32 blend, bgfx::TransientVertexBuffer *buffer);
 	enum buffer_status
@@ -146,8 +146,8 @@ private:
 
 	avi_write* m_avi_writer;
 	bgfx_target* m_avi_target;
-    bgfx::TextureHandle m_avi_texture;
-    bitmap_rgb32 m_avi_bitmap;
+	bgfx::TextureHandle m_avi_texture;
+	bitmap_rgb32 m_avi_bitmap;
 	uint8_t* m_avi_data;
 
 	static const uint16_t CACHE_SIZE;

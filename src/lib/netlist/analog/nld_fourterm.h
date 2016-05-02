@@ -54,10 +54,10 @@ NETLIB_NAMESPACE_DEVICES_START()
 class NETLIB_NAME(VCCS) : public device_t
 {
 public:
-	ATTR_COLD NETLIB_NAME(VCCS)()
-	: device_t(VCCS), m_gfac(1.0) {  }
-	ATTR_COLD NETLIB_NAME(VCCS)(const family_t afamily)
-	: device_t(afamily), m_gfac(1.0) {  }
+	ATTR_COLD NETLIB_NAME(VCCS)(netlist_t &anetlist, const pstring &name)
+	: device_t(VCCS, anetlist, name), m_gfac(1.0) {  }
+	ATTR_COLD NETLIB_NAME(VCCS)(const family_t afamily, netlist_t &anetlist, const pstring &name)
+	: device_t(afamily, anetlist, name), m_gfac(1.0) {  }
 
 	param_double_t m_G;
 	param_double_t m_RI;
@@ -87,10 +87,10 @@ protected:
 class NETLIB_NAME(LVCCS) : public NETLIB_NAME(VCCS)
 {
 public:
-	ATTR_COLD NETLIB_NAME(LVCCS)()
-	: NETLIB_NAME(VCCS)(LVCCS), m_vi(0.0) {  }
-	ATTR_COLD NETLIB_NAME(LVCCS)(const family_t afamily)
-	: NETLIB_NAME(VCCS)(afamily), m_vi(0.0) {  }
+	ATTR_COLD NETLIB_NAME(LVCCS)(netlist_t &anetlist, const pstring &name)
+	: NETLIB_NAME(VCCS)(LVCCS, anetlist, name), m_vi(0.0) {  }
+	ATTR_COLD NETLIB_NAME(LVCCS)(const family_t afamily, netlist_t &anetlist, const pstring &name)
+	: NETLIB_NAME(VCCS)(afamily, anetlist, name), m_vi(0.0) {  }
 
 	param_double_t m_cur_limit; /* current limit */
 
@@ -130,8 +130,8 @@ protected:
 class NETLIB_NAME(CCCS) : public NETLIB_NAME(VCCS)
 {
 public:
-	ATTR_COLD NETLIB_NAME(CCCS)()
-	: NETLIB_NAME(VCCS)(CCCS), m_gfac(1.0) {  }
+	ATTR_COLD NETLIB_NAME(CCCS)(netlist_t &anetlist, const pstring &name)
+	: NETLIB_NAME(VCCS)(CCCS, anetlist, name), m_gfac(1.0) {  }
 
 protected:
 	virtual void start() override;
@@ -174,8 +174,8 @@ protected:
 class NETLIB_NAME(VCVS) : public NETLIB_NAME(VCCS)
 {
 public:
-	ATTR_COLD NETLIB_NAME(VCVS)()
-	: NETLIB_NAME(VCCS)(VCVS) { }
+	ATTR_COLD NETLIB_NAME(VCVS)(netlist_t &anetlist, const pstring &name)
+	: NETLIB_NAME(VCCS)(VCVS, anetlist, name) { }
 
 	param_double_t m_RO;
 

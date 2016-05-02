@@ -31,7 +31,7 @@
 
 @source:1945kiii.cpp
 1945kiii                        // (c) 2000 Oriental
-1945kiiio						// (c) 1999 Oriental
+1945kiiio                       // (c) 1999 Oriental
 flagrall                        // ?
 
 @source:20pacgal.cpp
@@ -1032,6 +1032,9 @@ alto2                           //
 
 @source:altos5.cpp
 altos5                          //
+
+@source:altos486.cpp
+altos486
 
 @source:alvg.cpp
 agsoccer                        //
@@ -2457,6 +2460,7 @@ gghost                          // (c) 1984
 gimeabrk                        // (c) 1985
 grudge                          // prototype - Bally/Midway
 hattrick                        // (c) 1984
+teamht                          //
 minigolf                        // (c) 1985
 minigolf2                       // (c) 1985
 nametune                        // (c) 1986
@@ -2565,7 +2569,7 @@ bbcbc                           // 1985 BBC Bridge Companion
 bbusters                        // A9003 'BB' (c) 1989
 bbustersu                       // A9003 'BB' (c) 1989
 bbustersua                      // A9003 'BB' (c) 1989
-bbustersj						//
+bbustersj                       //
 mechatt                         // A8002 'MA' (c) 1989
 mechattj                        // A8002 'MA' (c) 1989
 mechattu                        // A8002 'MA' (c) 1989
@@ -2634,7 +2638,7 @@ qosb                            // 1992 BFM
 quizvadr                        // 1991 BFM
 trebltop                        // 1991 BFM
 
-@source:bfm_ad5sw.cpp
+@source:bfm_ad5.cpp
 ad5bpfpm                        // Bullseye Pounds For Points (Mazooma)
 ad5bpfpma                       //
 ad5bpfpmb                       //
@@ -6710,7 +6714,7 @@ sc4ziggye                       //
 sc4ziggyf                       //
 sc4ziggyg                       //
 
-@source:bfm_sc5sw.cpp
+@source:bfm_sc5.cpp
 sc5_3414                        //
 sc5_3434                        //
 sc5_3435                        //
@@ -10169,9 +10173,10 @@ xmvsfar2                        // 19/09/1996 (c) 1996 (Asia)
 xmvsfar3                        // 10/09/1996 (c) 1996 (Asia)
 xmvsfb                          // 23/10/1996 (c) 1996 (Brazil)
 xmvsfh                          // 04/10/1996 (c) 1996 (Hispanic)
-xmvsfj                          // 04/10/1996 (c) 1996 (Japan)
-xmvsfjr1                        // 10/09/1996 (c) 1996 (Japan)
-xmvsfjr2                        // 09/09/1996 (c) 1996 (Japan)
+xmvsfj                          // 23/10/1996 (c) 1996 (Japan)
+xmvsfjr1                        // 04/10/1996 (c) 1996 (Japan)
+xmvsfjr2                        // 10/09/1996 (c) 1996 (Japan)
+xmvsfjr3                        // 09/09/1996 (c) 1996 (Japan)
 xmvsfr1                         // 10/09/1996 (c) 1996 (Euro)
 xmvsfu                          // 23/10/1996 (c) 1996 (USA)
 xmvsfu1d                        //
@@ -10237,6 +10242,7 @@ crgolfb                         // (c) 1984 Nasco Japan
 crgolfbt                        // bootleg
 crgolfc                         // (c) 1984 Nasco Japan
 crgolfhi                        // (c) 1984 Nasco Japan
+mastrglf
 
 @source:crimfght.cpp
 crimfght                        // GX821 (c) 1989 (World)
@@ -10245,7 +10251,7 @@ crimfghtj                       // GX821 (c) 1989 (Japan)
 
 @source:crospang.cpp
 bestri                          // (c) F2 System
-bestria							//
+bestria                         //
 crospang                        // (c) 1998 F2 System
 heuksun                         // (c) 1998 Oksan / F2 System
 
@@ -12439,7 +12445,7 @@ snowboara                       // (c) 1996 - Ref 960419/1
 touchgo                         // (c) 1995 - Ref 950906
 touchgoe                        // (c) 1995 - Ref 950510-1
 touchgon                        // (c) 1995 - Ref 950906
-touchgok						// (c) 1995 - Ref 950510-1
+touchgok                        // (c) 1995 - Ref 950510-1
 wrally2                         // (c) 1995 - Ref 950510
 
 @source:gaelco3d.cpp
@@ -12596,7 +12602,7 @@ monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, 
 moonal2                         // [1980] Nichibutsu
 moonal2b                        // [1980] Nichibutsu
 moonaln                         // [Nichibutsu] (Karateco license) or hack
-kamikazp						// bootleg (Potomac Games)
+kamikazp                        // bootleg (Potomac Games)
 mooncmw                         // bootleg
 mooncptc                        // bootleg (Petaco S.A.)
 mooncreg                        // bootleg
@@ -14054,6 +14060,7 @@ bmsoccer                        // Bambino
 edracula                        // Epoch
 efball                          // Epoch
 galaxy2                         // Epoch
+galaxy2b                        // Epoch
 invspace                        // Epoch
 mcompgin                        // Mattel
 mvbfree                         // Mego
@@ -14461,6 +14468,9 @@ indigo4k                        // IP20: Indigo 1, R4400, 150MHz
 ip224613                        // IP22: Indy, R4600, 133MHz
 ip225015                        // IP22: Indy, R5000, 150MHz
 ip244415                        // IP24: Indigo 2, R4400, 150MHz
+
+@source:instantm.cpp
+instantm                        //
 
 @source:instruct.cpp
 instruct                        //
@@ -16695,7 +16705,6 @@ ladybgb2                        // bootleg
 ladybug                         // 8110 (c) 1981
 ladybugb                        // bootleg
 snapjack                        // ???? (c)
-sraider                         // ???? (c) 1982 Universal
 
 @source:ladyfrog.cpp
 ladyfrog                        // (c) 1990 Mondial Games
@@ -17176,7 +17185,7 @@ leaguemn                        // (c) 1993 Irem (Japan)
 lethalth                        // (c) 1991 Irem (World)
 majtitl2                        // (c) 1992 Irem (World)
 majtitl2a                       //
-majtitl2b						//
+majtitl2b                       //
 majtitl2j                       // (c) 1992 Irem (Japan)
 mysticri                        // (c) 1992 Irem (World)
 mysticrib                       // bootleg?
@@ -17234,6 +17243,7 @@ macse30                         // 1989 Apple Macintosh SE/30
 macsefd                         // 1988 Apple Macintosh SE (FDHD)
 pmac6100                        // 1993 Apple Power Macintosh 6100
 unitron                         // 1985 Unitron
+utrn1024                        // 1986 Unitron 1024
 
 @source:macpci.cpp
 pippin                          //
@@ -17389,7 +17399,7 @@ mf_bdash                        // (c) 1984 Exidy / First Star Software
 mf_brist                        // (c) 1983 Exidy / First Star Software
 mf_flip                         // (c) 1983 Exidy / First Star Software
 
-@source:maygay1bsw.cpp
+@source:maygay1b.cpp
 m1albsq                         // Albert Square (Maygay)
 m1albsq1                        //
 m1albsq1p                       //
@@ -19330,6 +19340,7 @@ mbeepc                          // Microbee 32 PC
 mbeepc85                        // Microbee 32 PC85
 mbeepc85b                       // Microbee 32 PC85 (Business version)
 mbeepc85s                       // Microbee 32 PC85 (Swedish)
+mbeepp                          // Microbee Premium Plus
 mbeeppc                         // Microbee 32 PPC85
 mbeett                          // Microbee Teleterm
 
@@ -19406,7 +19417,6 @@ rampage2                        // (c) 1986
 sarge                           // (c) 1985
 spyhunt                         // (c) 1983
 spyhuntp                        // (c) 1983
-spyhuntpr                       //
 stargrds                        // (c) 1987
 turbotag                        // (c) 1985
 
@@ -19720,6 +19730,9 @@ metalmx                         // 136103?          (c) 1994
 @source:metlclsh.cpp
 metlclsh                        // (c) 1985 Data East
 
+@source:metlfrzr.cpp
+metlfrzr
+
 @source:metro.cpp
 3kokushi                        // (c) 1996 Mitchell
 balcube                         // (c) 1996
@@ -19923,6 +19936,7 @@ mkla3                           // (c) 1992 Midway
 mkla4                           // (c) 1992 Midway
 mknifty                         // hack
 mknifty666                      // hack
+mkrep                           // hack
 mkprot4                         // (c) 1992 Midway
 mkprot8                         // (c) 1992 Midway
 mkprot9                         // (c) 1992 Midway
@@ -20667,7 +20681,7 @@ m4wnud                          // Unknown MPU4 'W Nudge'
 m4zill                          // Zillionare's Challenge (Pure Leisure)
 m4zilla                         //
 
-@source:mpu4avan.cpp
+//@source:mpu4avan.inc
 m4abeaut                        //
 m4abeaut_1                      //
 m4abeaut_2                      //
@@ -21169,7 +21183,7 @@ m4trg__x                        //
 m4trg__y                        //
 m4trg__z                        //
 
-@source:mpu4bwb.cpp
+//@source:mpu4bwb.inc
 m4abra                          // Abracadabra (Bwb)
 m4abra__a                       //
 m4abra__b                       //
@@ -21631,7 +21645,7 @@ m4xtrm                          // X-treme (Bwb)
 m4xtrm__a                       //
 m4xtrm__b                       //
 
-@source:mpu4concept.cpp
+//@source:mpu4concept.inc
 m4nudgwc                        // Nudge a Win (Concept)
 m4nudgwc__a                     //
 m4nudgwc__b                     //
@@ -21703,7 +21717,7 @@ m4spnwnc                        // Spin-A-Win (Concept)
 m4spnwnc__a                     //
 m4spnwnc__b                     //
 
-@source:mpu4crystal.cpp
+//@source:mpu4crystal.inc
 m4aladn                         // Aladdin's Cave (Crystal)
 m4aladna                        //
 m4aladnb                        //
@@ -21806,10 +21820,7 @@ m4twstrd                        //
 m4tylb                          // Thank Your Lucky Bars (Crystal)
 m4tylba                         //
 
-@source:mpu4dealem.cpp
-v4dealem                        // Deal 'Em
-
-@source:mpu4empire.cpp
+//@source:mpu4empire.inc
 m4apachg                        // Apache Gold (Empire)
 m4apachga                       //
 m4apachgb                       //
@@ -21892,7 +21903,7 @@ m4ttrail                        // Treasure Trail (Empire)
 m4ttraila                       //
 m4ttrailb                       //
 
-@source:mpu4mdm.cpp
+//@source:mpu4mdm.inc
 m42punlm                        // 2p Unlimited (Mdm)
 m4bigapl                        // The Big Apple (Mdm)
 m4bigapla                       //
@@ -21938,7 +21949,7 @@ m4themob                        // The Mob (Mdm)
 m4themoba                       //
 m4themobb                       //
 
-@source:mpu4misc.cpp
+//@source:mpu4misc.inc
 m4bangin                        // Bangin' Away (Global)
 m4bangina                       //
 m4banginb                       //
@@ -22077,7 +22088,7 @@ m4wwc                           // Wacky Weekend Club (Global)
 m4wwca                          //
 m4wwcb                          //
 
-@source:mpu4mod2sw.cpp
+//@source:mpu4mod2sw.inc
 m421                            // Twenty One (Barcrest)
 m421club                        // 21 Club (Barcrest)
 m4actbnka                       //
@@ -22322,7 +22333,7 @@ m4wayin                         // Way In (Barcrest)
 m4wayina                        //
 m4wildms                        // Wild Mystery (Barcrest)
 
-@source:mpu4mod4yam.cpp
+//@source:mpu4mod4yam.inc
 m4acechs                        // Ace Chase (Bwb)
 m4acechs__a                     //
 m4acechs__b                     //
@@ -22605,16 +22616,7 @@ m4vivalv__y                     //
 m4vivalv__z                     //
 m4voodoo                        // Voodoo 1000 (Barcrest)
 
-@source:mpu4plasma.cpp
-m4apach                         // Apache (Barcrest)
-m4bigchf                        // Big Chief (Barcrest)
-m4bigchfa                       //
-m4bigchfb                       //
-m4bigchfc                       //
-m4click                         // Clickity Click (Barcrest)
-m4elite                         // Elite (Barcrest)
-
-@source:mpu4sw.cpp
+//@source:mpu4sw.inc
 m4actbnk                        // Action Bank (Barcrest)
 m4actbnk__a                     //
 m4actbnk__b                     //
@@ -25994,7 +25996,7 @@ m4wta__x                        //
 m4wta__y                        //
 m4wta__z                        //
 
-@source:mpu4union.cpp
+//@source:mpu4union.inc
 m4crzbn                         // Crazy Bingo
 m4cwalk                         // Cake Walk (Union)
 m4eezee                         // Eezee Fruits (Union)
@@ -26027,6 +26029,18 @@ m4unibox                        // Unibox (Union)
 m4uniboxa                       //
 m4unique                        // Unique (Union)
 m4uniquep                       //
+
+@source:mpu4dealem.cpp
+v4dealem                        // Deal 'Em
+
+@source:mpu4plasma.cpp
+m4apach                         // Apache (Barcrest)
+m4bigchf                        // Big Chief (Barcrest)
+m4bigchfa                       //
+m4bigchfb                       //
+m4bigchfc                       //
+m4click                         // Clickity Click (Barcrest)
+m4elite                         // Elite (Barcrest)
 
 @source:mpu4vid.cpp
 v4addlad                        // Adders and Ladders
@@ -27303,6 +27317,9 @@ murogmbl                        // ???
 @source:mustache.cpp
 mustache                        // (c) 1987 March
 
+@source:mvme350.cpp
+mvme350                         // 
+
 @source:mw18w.cpp
 18w                             // 653 (c) 1979 Midway
 18w2                            // 653 (c) 1979 Midway
@@ -27698,7 +27715,7 @@ cosmogng                        // (c) 1991 (US)
 cosmogngj                       // (c) 1991 (Japan)
 dirtfoxj                        // (c) 1989 (Japan)
 dsaber                          // (c) 1990
-dsabera							//
+dsabera                         //
 dsaberj                         // (c) 1990 (Japan)
 finalap2                        // 90.8  Final Lap 2
 finalap2j                       // 90.8  Final Lap 2 (Japan)
@@ -28042,6 +28059,7 @@ starhrse                        // 2000.?? Star Horse (big screens)
 starhrsp                        // 2003.12.01 Star Horse Progress (satellite) (Rev A)
 starseek                        // 2001.07 Dokidoki Idol Star Seeker
 suchie3                         // 1999.09 Idol Janshi Su-Chi-Pi 3
+sushibar                        // 2003 Sushi Bar
 takoron                         // 2006.12.16 Noukone Puzzle Takoron
 tduno                           // 1999.08 Touch de UNO! / Unou Nouryoku Check Machine
 tduno2                          // 2000.02 Touch de UNO! 2
@@ -28282,9 +28300,8 @@ salamandj                       // GX587 (c) 1986
 twinbee                         // GX412 (c) 1985
 
 @source:neogeo.cpp
-neogeo                          //
-
-@source:neogeo_noslot.cpp
+neogeo                          // NeoGeo MVS
+aes                             // NeoGeo AES
 2020bb                          // 0030 (c) 1991 SNK / Pallas
 2020bba                         // 0030 (c) 1991 SNK / Pallas
 2020bbh                         // 0030 (c) 1991 SNK / Pallas
@@ -28359,7 +28376,6 @@ kf2k2pla                        // bootleg
 kf2k2pls                        // bootleg
 kf2k3bl                         // bootleg
 kf2k3bla                        // bootleg
-kf2k3pcb                        // 0271 (c) 2003 Playmore - JAMMA PCB
 kf2k3pl                         // bootleg
 kf2k3upl                        // bootleg
 kf2k5uni                        // bootleg of kof2002
@@ -28420,9 +28436,8 @@ matrim                          // 0266 (c) 2002 Atlus
 matrimbl                        // bootleg
 miexchng                        // 0231 (c) 1997 Face
 minasan                         // 0027 (c) 1990 Monolith Corp.
-mosyougi                        // 0203 (c) 1995 ADK / SNK
+moshougi                        // 0203 (c) 1995 ADK / SNK
 ms4plus                         // bootleg
-ms5pcb                          // 0268 (c) 2003 Playmore
 ms5plus                         // bootleg
 mslug                           // 0201 (c) 1996 Nazca
 mslug2                          // 0241 (c) 1998 SNK
@@ -28516,8 +28531,6 @@ strhoop                         // 0079 (c) 1994 Data East Corporation
 superspy                        // 0011 (c) 1990 SNK
 svc                             // 0269 (c) 2003 Playmore / Capcom
 svcboot                         // bootleg
-svcpcb                          // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
-svcpcba                         // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
 svcplus                         // bootleg
 svcplusa                        // bootleg
 svcsplus                        // bootleg
@@ -28541,7 +28554,15 @@ whp                             // 0090 (c) 1995 ADK / SNK
 wjammers                        // 0065 (c) 1994 Data East Corporation
 zedblade                        // 0076 (c) 1994 NMK
 zintrckb                        // 0211 hack - this is not a genuine MVS proto, its a bootleg made from the CD version
+crswd2bl						// 0054 bootleg made from CD version
 zupapa                          // 0070 Zupapa - released in 2001, 1994 prototype probably exists
+lasthope
+
+@source:neopcb.cpp
+kf2k3pcb                        // 0271 (c) 2003 Playmore - JAMMA PCB
+ms5pcb                          // 0268 (c) 2003 Playmore - JAMMA PCB
+svcpcb                          // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
+svcpcba                         // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
 
 @source:neoprint.cpp
 98best44                        //
@@ -28586,8 +28607,7 @@ nextstc                         //
 acheart                         //
 acheartf                        // (c) 2006 Examu
 
-@source:ng_aes.cpp
-aes                             // NeoGeo AES
+@source:neogeocd.cpp
 neocd                           // NeoGeo CD
 neocdz                          // NeoGeo CDZ
 neocdzj                         //
@@ -28627,7 +28647,7 @@ rdaction                        // UPL-87003?(c) 1987 + World Games license
 robokid                         // UPL-88013 (c) 1988
 robokidj                        // UPL-88013 (c) 1988
 robokidj2                       // UPL-88013 (c) 1988
-robokidj3						//
+robokidj3                       //
 
 @source:ninjaw.cpp
 darius2                         // C07 (c) 1989 Taito Corporation (Japan)
@@ -28900,7 +28920,7 @@ opwolfa                         // B20 (c) 1987 Taito Corporation Japan (World)
 opwolfb                         // bootleg
 opwolfj                         // B20 (c) 1987 Taito Corporation (Japan)
 opwolfu                         // B20 (c) 1987 Taito America Corporation (US)
-opwolfp							// prototype?
+opwolfp                         // prototype?
 
 @source:orao.cpp
 orao                            //
@@ -29197,7 +29217,7 @@ sicpc1605                       //
 ssam88s                         //
 sx16                            // Sanyo SX-16
 zdsupers                        //
-ncrpc4i							// NCR PC4i
+ncrpc4i                         // NCR PC4i
 
 @source:pc100.cpp
 pc100                           //
@@ -29957,7 +29977,7 @@ ddpdoja                         //
 ddpdojb                         //
 ddpdojblk                       //
 ddpdojblka                      //
-ddpdojblkbl						//
+ddpdojblkbl                     //
 dmnfrnt                         // (c) 2002 Demon Front
 dmnfrnta                        //
 dmnfrntb                        //
@@ -29975,7 +29995,7 @@ dw2v100x                        //
 dwex                            // (c) 1998 Dragon World 3 EX
 dwpc                            // (c) 2001 Dragon World Pretty Chance
 espgal                          // (c) 2003 Espgaluda
-espgalbl						//
+espgalbl                        //
 happy6                          // (c) 2004 Happy 6
 happy6101                       //
 ket                             // (c) 2002 Ketsui
@@ -29988,7 +30008,7 @@ ketarr151                       // hack
 ketarrf                         // hack
 ketarrs15                       // hack
 ketarrs151                      // hack
-ketb							//
+ketb                            //
 ketbl                           //
 killbld                         // (c) 1998 The Killing Blade
 killbld104                      //
@@ -30264,7 +30284,7 @@ pc_moglf                        // (c) 1991 Nintendo
 pc_mtoid                        // (c) 1986 Nintendo
 pc_ngai2                        // (c) 1990 Tecmo (Nintendo of America license)
 pc_ngai3                        // (c) 1991 Tecmo (Nintendo of America license)
-pc_ttoon						//
+pc_ttoon                        //
 pc_ngaid                        // (c) 1989 Tecmo (Nintendo of America license)
 pc_pinbt                        // (c) 1988 Rare (Nintendo of America license)
 pc_pwbld                        // (c) 1991 Taito (Nintendo of America license)
@@ -30453,6 +30473,9 @@ pc1403                          // Pocket Computer 1403
 pc1403h                         // Pocket Computer 1403H
 pc1450                          // Pocket Computer 1450
 trs80pc3                        // Tandy TRS80 PC-3
+
+@source:pockchal.cpp
+pockchal
 
 @source:pockstat.cpp
 pockstat                        // 1999 Sony PocketStation
@@ -31028,7 +31051,7 @@ raidendxa2                      // (c) 1994 Seibu Kaihatsu + Metrotainment licen
 raidendxch                      //
 raidendxg                       // (c) 1994 Seibu Kaihatsu + Tuning license
 raidendxj                       // (c) 1994 Seibu Kaihatsu
-raidendxja						// (c) 1994 Seibu Kaihatsu
+raidendxja                      // (c) 1994 Seibu Kaihatsu
 raidendxk                       // (c) 1994 Seibu Kaihatsu
 raidendxnl                      // (c) 1994 Seibu Kaihatsu
 raidendxu                       // (c) 1994 Seibu Kaihatsu + Fabtek license
@@ -31148,6 +31171,7 @@ redclashk                       // (c) Kaneko (bootleg?)
 zerohour                        // 8011 (c) Universal
 zerohoura                       // 8011 (c) Universal
 zerohouri                       //
+sraider                         // ???? (c) 1982 Universal
 
 @source:relief.cpp
 relief                          // 136093           (c) 1992
@@ -33524,6 +33548,9 @@ sprint8a                        // ??????           1977/05 [6800]
 spy                             // GX857 (c) 1989 (World)
 spyu                            // GX857 (c) 1989 (US)
 
+@source:spyhuntertec.cpp
+spyhuntpr                       //
+
 @source:squale.cpp
 squale                          //
 
@@ -33793,10 +33820,12 @@ nclubv3                         // 1997.07 Name Club Ver. 3
 othellos                        // 1998.07 Othello Shiyouyo (Success)
 pblbeach                        // 1996.03 Pebble Beach the Great Shot (T&E Soft)
 pclb2elk                        // 1997.07 Print Club Custom
+pckobe99                        // Print Club Custom 3
 pclove                          //
 pclove2                         //
 pclub2                          // 1997.09 Print Club 2
 pclub26w                        //
+pclub26wa                       //
 pclub27s                        //
 pclub2fc                        // 1997.04 Print Club 2 Felix The Cat
 pclub2kc                        // 1997.02 Print Club Kome Kome Club
@@ -33807,12 +33836,17 @@ pclub2wb                        //
 pclubol                         // 1998.07 Print Club Olive
 pclubor                         // 1999.11 Print Club Goukakenran
 pclubpok                        // 1999.11 Print Club Pokemon
+pcpooh2                         //
+pcpooh3                         //
 pclubyo2                        //
+prc28su                         // Vol 8. Summer 97
+prc29au                         // Vol 9. Autumn 97
 prc297wi                        // 1997.10 Print Club 2 '97 Winter Ver
 prc297wia                       //
 prc298au                        // 1998.08 Print Club 2 '98 Autumn Ver
 prc298sp                        // 1997.10 Print Club 2 '98 Spring Ver
 prc298su                        //
+prc2ksu                         // Print Club Summer 2000
 prikura                         // 1996.10 Prikura Daisakusen (Atlus)
 puyosun                         // 1996.12 Puyo Puyo SUN (Compile)
 rsgun                           // 1998.05 Radient Silver Gun (Treasure)
@@ -34183,7 +34217,7 @@ wboy4                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy5                           // 834-5984 (c) 1986 + Escape license (S1)
 wboyo                           // 834-5984 (c) 1986 + Escape license (S1)
 wboysys2                        // 834-5984  (c) 1986 + Escape license (S1)
-wboysys2a						//
+wboysys2a                       //
 wboyu                           // 834-5753 (? maybe a conversion) (c) 1986 + Escape license (S1)
 wboyub                          // bootleg of wboyu
 wmatch                          // (c) 1984 (S1)
@@ -35208,7 +35242,8 @@ drtoppelj                       // B19 (c) 1987 Taito Corporation (Japan)
 drtoppelu                       // B19 (c) 1987 Taito Corporation (US)
 extrmatn                        // B06 (c) 1987 Taito Corporation Japan (World)
 extrmatnj                       // B06 (c) 1987 Taito Corporation (Japan)
-extrmatnu                       // B06 (c) 1987 World Games
+extrmatnu                       // B06 (c) 1987 World Games (US)
+extrmatnur						// B06 (c) 1987 Taito America Corporation + Romstar license (US)
 insectx                         // B97 (c) 1989 Taito Corporation Japan (World)
 insectxj                        // B97 (c) 1989 Taito Corporation (Japan)
 jpopnics                        // (c)1992 NICs, based on Plump Pop code
@@ -35364,72 +35399,6 @@ tourtabl                        // 030170           1978/03 [6507]
 
 @source:tourvis.cpp
 tourvis                         // (c) ???? Tourvision
-tv1943                          // (c) 1991 Capcom / Nexat Soft (Tourvision bootleg)
-tvablast                        // (c) 1990 Hudson / Kaneko (Tourvision bootleg)
-tvaburn                         // (c) 1990 Sega / Nec Avenue (Tourvision bootleg)
-tvarmedf                        // (c) 1990 Nichibutsu / Big Don (Tourvision bootleg)
-tvbalstx                        // (c) 1991 Psygnosis / Coconuts Japan (Tourvision bootleg)
-tvbeball                        // (c) 1990 Hudson (Tourvision bootleg)
-tvbomber                        // (c) 1990 Hudson (Tourvision bootleg)
-tvbrabho                        // (c) 1990 Namco / Namcot (Tourvision bootleg)
-tvcolumn                        // (c) 1991 Telenet Japan (Tourvision bootleg)
-tvcoryon                        // (c) 1991 Naxat Soft (Tourvision bootleg)
-tvdensho                        // (c) 1989 Big Club / Wolf Team (Tourvision bootleg)
-tvdevilc                        // (c) 1990 Naxat / Red (Tourvision bootleg)
-tvdmoon                         // (c) 1991 T.S.S. (Tourvision bootleg)
-tvdodgeb                        // (c) 1990 Technos Japan Corp / Naxat Soft (Tourvision bootleg)
-tvdormon                        // (c) 1989 Hudson / Fujiko-Shogakukan-TV Asahi (Tourvision bootleg)
-tvdrgnst                        // (c) 1988 Namcot (Tourvision bootleg)
-tvdsenpu                        // (c) 1990 Toaplan / Nec Avenue (Tourvision bootleg)
-tvdunexp                        // (c) 1989 Hudson / Atlus (Tourvision bootleg)
-tveigues                        // (c) 1990 Victor Musical Industries, Inc. (Tourvision bootleg)
-tvfblast                        // (c) 1990 Namco / Namcot (Tourvision bootleg)
-tvflaptw                        // (c) 1989 Namco (Tourvision bootleg)
-tvfsoc90                        // (c) 1990 Human (Tourvision bootleg)
-tvftenis                        // (c) 1991 Human (Tourvision bootleg)
-tvgomola                        // (c) 1990 Human (Tourvision bootleg)
-tvgunhed                        // (c) 1989 Hudson / Toho Sunrise (Tourvision bootleg)
-tvhtdaka                        // (c) 1991 Taito(Tourvision bootleg)
-tvjchan                         // (c) 1991 Hudson (Tourvision bootleg)
-tvkaikai                        // (c) 1990 Taito (Tourvision bootleg)
-tvlegaxe                        // (c) 1988 Victor Musical Industries, Inc. (Tourvision bootleg)
-tvlqkids                        // (c) 1992 Taito (Tourvision bootleg)
-tvmrheli                        // (c) 1989 IREM Corp (Tourvision bootleg)
-tvninjar                        // (c) 1992 Tecmo / Hudson Soft (Tourvision bootleg)
-tvninjas                        // (c) 1990 IREM Corp (Tourvision bootleg)
-tvopwolf                        // (c) 1990 Taito / Nec Avenue (Tourvision bootleg)
-tvovride                        // (c) 1990 Sting / Data East Corporation (Tourvision bootleg)
-tvpaclnd                        // (c) 1991 Namco / Namcot (Tourvision bootleg)
-tvpcgen2                        // (c) 1991 Hudson Soft / Red (Tourvision bootleg)
-tvpchasr                        // (c) 1990 Naxat Soft (Tourvision bootleg)
-tvpcybrg                        // (c) 1992 Hudson Soft / Red (Tourvision bootleg)
-tvpdrift                        // (c) 1991 Sega / Asmik Corporation (Tourvision bootleg)
-tvpow11                         // (c) 1991 Hudson (Tourvision bootleg)
-tvpros91                        // (c) 1991 Namco / Namcot (Tourvision bootleg)
-tvpwlg4                         // (c) 1991 Hudson (Tourvision bootleg)
-tvpzlboy                        // (c) 1991 Atlus / Telenet Japan (Tourvision bootleg)
-tvraiden                        // (c) 1991 Seibu Kaihatsu inc / Hudson Soft (Tourvision bootleg)
-tvrs2                           // (c) 1990 Taito (Tourvision bootleg)
-tvrtype2                        // (c) 1991 IREM (Tourvision bootleg)
-tvsci                           // (c) 1991 Taito (Tourvision bootleg)
-tvsdarms                        // (c) 1989 Capcom / Nec Avenue (Tourvision bootleg)
-tvshnobi                        // (c) 1989 Sega / Asmik Corporation (Tourvision bootleg)
-tvskweek                        // (c) 1991 Victor Musical Industries, Inc. (Tourvision bootleg)
-tvslmndr                        // (c) 1991 Konami (Tourvision bootleg)
-tvsson2                         // (c) 1989 Capcom / Nec Avenue (Tourvision bootleg)
-tvsssold                        // (c) 1990 Hudson / Kaneko (Tourvision bootleg)
-tvsvball                        // (c) 1990 Video System (Tourvision bootleg)
-tvtaisen                        // (c) 1992 Taito (Tourvision bootleg)
-tvtcrst2                        // (c) 1992 Nichibutsu / Nihon Bussan Co., Ltd (Tourvision bootleg)
-tvthbld                         // (c) 1990 Sega / NEC Avenue (Tourvision bootleg)
-tvtonma                         // (c) 1991 IREM Corp (Tourvision bootleg)
-tvtsboys                        // (c) 1990 Victor Musical Industries, Inc. (Tourvision bootleg)
-tvtsujin                        // (c) 1992 Toaplan Co Ltd / Taito Corporation (Tourvision bootleg)
-tvusapb                         // (c) 1989 Aicom (Tourvision bootleg)
-tvvolfd                         // (c) 1989 Taito (Tourvision bootleg)
-tvwnshot                        // (c) 1989 Data East Corp. (Tourvision bootleg)
-tvwring                         // (c) 1990 Naxat Soft (Tourvision bootleg)
-tvxvious                        // (c) 1990 Namco Ltd. / Namcot (Tourvision bootleg)
 
 @source:toypop.cpp
 liblrabl                        // (c) 1983

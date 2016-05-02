@@ -43,6 +43,7 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
@@ -58,6 +59,7 @@ public:
 		m_fgram(*this, "fgram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
@@ -72,6 +74,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -136,7 +139,7 @@ WRITE8_MEMBER(onetwo_state::onetwo_cpubank_w)
 
 WRITE8_MEMBER(onetwo_state::onetwo_coin_counters_w)
 {
-	machine().watchdog_reset();
+	m_watchdog->watchdog_reset();
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 }
@@ -359,6 +362,7 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)
 	MCFG_CPU_IO_MAP(sound_cpu_io)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -128,9 +128,9 @@ READ8_MEMBER(neogeo_kizuna4p_device::in0_r)
 		res = m_joy3->read();
 	else
 		res = m_joy1->read();
-	
+
 	if (m_ctrl_sel & 0x04) res &= ((m_ctrl_sel & 0x01) ? ~0x20 : ~0x10);
-	
+
 	return res;
 }
 
@@ -145,9 +145,9 @@ READ8_MEMBER(neogeo_kizuna4p_device::in1_r)
 		res = m_joy4->read();
 	else
 		res = m_joy2->read();
-	
+
 	if (m_ctrl_sel & 0x04) res &= ((m_ctrl_sel & 0x01) ? ~0x20 : ~0x10);
-	
+
 	return res;
 }
 

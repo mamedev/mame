@@ -216,6 +216,13 @@ Notes: (* - these parts on other side of PCB)
     LED1 / LED2 - Red LED / Green LED
         CN1/2/3 - Connectors for ROM cart or GDROM DIMM Unit
         CN25/26 - Connectors for Filter Board
+       JP9-JP13 - JUMPERs set CN8 connector function: 1-2 = RS422 (315-6146 "MIE"), 2-3 = RS232C (SH4 SCIF)
+                        CN8  1-2   2-3
+                  JP9    1   RXD+  RXD
+                  JP10   4   TXD+  RTS
+                  JP11   2   RXD-  TXD
+                  JP12   5   TXD-  CTS
+                  JP13  3/6  422   232  (GND)
 
 
 Filter Board
@@ -1199,38 +1206,7 @@ ROMEO           - Sammy AX0201A01 'ROMEO' 4111-00000501 0250 K13 custom ASIC (TQ
 315-6267        - SEGA 315-6267 custom ASIC (BGAxxx)
 TD62064         - Toshiba TD62064 NPN 50V 1.5A Quad Darlington Driver (SOIC16)
 SH4             - Hitachi SH-4 HD6417091RA CPU (BGA256)
-BIOS.IC23       - Macronix 29L001MC-10 3.3volt FlashROM (SOP44)
-                  This is a little strange, the ROM appears to be a standard SOP44 with reverse pinout but the
-                  address lines are shifted one pin out of position compared to industry-standard pinouts.
-                  The actual part number doesn't exist on the Macronix web site, even though they have datasheets for
-                  everything else! So it's probably a custom design for Sammy and top-secret!
-                  The size is assumed to be 1MBit and is 8-bit (D0-D7 only). The pinout appears to be this.....
-
-                               +--\/--+
-tied to WE of BS62LV1023   VCC | 1  44| VCC - tied to a transistor, probably RESET
-                           NC  | 2  43| NC
-                           A9  | 3  42| NC
-                           A10 | 4  41| A8
-                           A11 | 5  40| A7
-                           A12 | 6  39| A6
-                           A13 | 7  38| A5
-                           A14 | 8  37| A4
-                           A15 | 9  36| A3
-                           A16 |10  35| A2
-                           NC  |11  34| A1
-                           NC  |12  33| CE - tied to 315-6267
-                           GND |13  32| GND
-                           A0  |14  31| OE
-                           D7  |15  30| D0
-                           NC  |16  29| NC
-                           D6  |17  28| D1
-                           NC  |18  27| NC
-                           D5  |19  26| D2
-                           NC  |20  25| NC
-                           D4  |21  24| D3
-                           VCC |22  23| NC
-                               +------+
-
+BIOS.IC23       - Macronix 29L001MC-10 3.3volt (1MBit) FlashROM (SOP44, byte mode, reverse pinout: use reverse adapter or "dead bug" method, pinout equivalent to reversed MX29LV160 with four high address lines unused)
 W129AG          - IC Works W129AG Programmable Clock Frequency Generator, clock input of 13.5MHz (SOIC16)
 SW1             - 2-position Dip Switch
 VGA             - 15 pin VGA out connector @ 31.5kHz
@@ -1445,7 +1421,7 @@ Notes:
 Development ROM board:
 
 There are a few unreleased and many prototype game versions known to exist on this ROM board.
-Currently Rumble Fish 1 and 2 prototypes is dumped.
+Currently Rumble Fish 1, Rumble Fish 2 prototypes and Sushi Bar is dumped.
 
 PC BD SYSTEMX 3MODE FLASH Rev.B
 1111-00001402
@@ -1576,7 +1552,6 @@ Chase 1929
 Force Five
 Kenju
 Premier Eleven
-Sushi Bar
 
 */
 
@@ -2480,7 +2455,7 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("OUTPUT")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, nullptr)
 
 	PORT_START("P1")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY1\0KEY2\0KEY3\0KEY4\0KEY5")
@@ -2720,7 +2695,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomigd, naomi_base )
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", "gdrom", "pic", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -3089,11 +3064,16 @@ Region byte encoding is as follows:
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-23607b.ic27",   0x000000, 0x200000, CRC(f308c5e9) SHA1(5470ab1cee6afecbd8ca8cf40f8fbe4ec2cb1471) ) \
 	ROM_SYSTEM_BIOS( 9, "bios9", "epr-23607 (USA)"  ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-23607.ic27",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) )
-/* First half is BIOS, second half is game settings and is blanked/reprogrammed by the BIOS as necessary */
+/*
+   First half is BIOS, second half is game settings and is blanked/reprogrammed by the BIOS if game cartridge exchange was detected
+   area 0x1A000-0x1BFFF is write protected and contain 12 bytes of unit-specific unique information (probably serial number, manufacture date, etc),
+   2 dumps included for reference
+*/
 #define AW_BIOS \
 	ROM_REGION( 0x200000, "awflash", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Atomiswave BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_l", 0x000000, 0x010000, BAD_DUMP CRC(e5693ce3) SHA1(1bde3ed87af64b0f675ebd47f12a53e1fc5709c1) ) /* Might be bad.. especially. bytes 0x0000, 0x6000, 0x8000 which gave different reads */
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios0.ic23", 0x000000, 0x020000, CRC(719b2b0b) SHA1(b4c1a26bc8906d5275eb28c701dff2b9365bcdfa) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios1.ic23", 0x000000, 0x020000, CRC(d3e80a9f) SHA1(33024f9d51c04884c2b44ce146f340e7a857b959) )
 /* default EEPROM values, same works for all games */
 #define NAOMI_DEFAULT_EEPROM \
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
@@ -8549,6 +8529,14 @@ ROM_START( initd )
 	//PIC16C622A (317-0331-JPN)
 	//(sticker 253-5508-0331J)
 	ROM_LOAD("317-0331-jpn.pic", 0x00, 0x4000, CRC(0a3bf606) SHA1(7c0e22df4a43a440571ac55fd0a6575931e8f959) )
+
+	// Sanwa CRP-1231BR-10 card reader-printer (Sega p/n 601-11082), also used in Derby Owners Club WE, Derby Owners Club II, F-Zero AX
+	ROM_REGION( 0x20000, "card_reader", ROMREGION_ERASE)
+	// CRP1231BR10     2306
+	// Ver.01.07       ???
+	// 01/08/20
+	// ?? : ME131-5244Z01
+	ROM_LOAD("crp1231br10_ver0107.ic2", 0, 0x20000, CRC(3198f0ac) SHA1(fa38bce7ca217ed6df558dc2456b010f690d0729) ) // H8/3003 code
 ROM_END
 
 ROM_START( initdo )
@@ -9352,7 +9340,8 @@ ROM_START( rumblef2 )
 	ROM_LOAD( "ax3401f01.bin", 0, 4, CRC(952919a1) SHA1(d343fdbbd1d8b651401133f21facc1584bb66c04) )
 ROM_END
 
-// Prototype, have internal text: (C)Dimps Tue Jan 11 14:32:45 2005 NONAME (build 0001)
+// Prototype ROM board
+// (C)Dimps Tue Jan 11 14:32:45 2005 NONAME (build 0001)
 ROM_START( rumblf2p )
 	AW_BIOS
 
@@ -9430,6 +9419,25 @@ ROM_START( basschal )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "315-6248.bin", 0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+ROM_END
+
+// Prototype ROM board
+// Build:May 23 2003 14:40:15
+ROM_START( sushibar )
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD("ic12", 0x00000000, 0x00800000, CRC(06a2ed58) SHA1(a807fa8c1c83cb8b18595c210479d5f1dd6be4ca) )
+	// IC 13 populated, empty
+	ROM_LOAD("ic14", 0x01000000, 0x00800000, CRC(4860f944) SHA1(55c75630c33cba35512a1349650f28fd56757f9f) )
+	ROM_LOAD("ic15", 0x01800000, 0x00800000, CRC(7113506c) SHA1(0548d67b3a1c0b8f17fcafd4fe5c1e6b0e91b6e7) )
+	ROM_LOAD("ic16", 0x02000000, 0x00800000, CRC(77e8e39e) SHA1(1286010cdba5c3c0ad5cbe19718fd0f8e5f579db) )
+	ROM_LOAD("ic17", 0x02800000, 0x00800000, CRC(0eba54ea) SHA1(51842ec326a5ba65bd280e652e7d9b395a2586c6) )
+	ROM_LOAD("ic18", 0x03000000, 0x00800000, CRC(b9957c76) SHA1(6d72c7ac8e1e0cbed7eb01b66f71bedf46a833e1) )
+	// IC19 - IC27 populated, empty
+
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "julie_dev.bin", 0, 4, CRC(757054c4) SHA1(7d5556d0940c582adbcf5697c7b81453d0c91153) )
 ROM_END
 
 /* All games have the regional titles at the start of the IC22 rom in the following order
@@ -9783,6 +9791,7 @@ GAME( 2003, demofist,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "P
 GAME( 2003, dolphin,   awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
 GAME( 2003, kov7sprt,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
 GAME( 2003, ggisuka,   awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
+GAME( 2003, sushibar,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Sushi Bar", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
 GAME( 2004, dirtypig,  awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Dirty Pigskin Football", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
 GAME( 2004, rumblef,   awbios,   aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )
 GAME( 2004, rumblefp,  rumblef,  aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish (prototype)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING )

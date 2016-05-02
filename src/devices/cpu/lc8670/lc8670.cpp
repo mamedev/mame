@@ -387,7 +387,7 @@ void lc8670_cpu_device::state_string_export(const device_state_entry &entry, std
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 

@@ -20,6 +20,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/watchdog.h"
 #include "video/atarirle.h"
 #include "includes/atarig42.h"
 
@@ -341,7 +342,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xe00050, 0xe00051) AM_WRITE(io_latch_w)
 	AM_RANGE(0xe00060, 0xe00061) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0xe03000, 0xe03001) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xe03800, 0xe03801) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0xe03800, 0xe03801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xe80000, 0xe80fff) AM_RAM
 	AM_RANGE(0xf40000, 0xf40001) AM_DEVREAD("asic65", asic65_device, io_r)
 	AM_RANGE(0xf60000, 0xf60001) AM_DEVREAD("asic65", asic65_device, read)
@@ -542,6 +543,8 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 	MCFG_MACHINE_RESET_OVERRIDE(atarig42_state,atarig42)
 
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarig42)

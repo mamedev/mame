@@ -112,11 +112,11 @@ belatra.cpp
 berzerk.cpp
 bestleag.cpp
 bfcobra.cpp
-bfm_ad5sw.cpp
+bfm_ad5.cpp
 bfm_sc1.cpp
 bfm_sc2.cpp
 bfm_sc4.cpp
-bfm_sc5sw.cpp
+bfm_sc5.cpp
 bfm_swp.cpp
 bfmsys83.cpp
 bfmsys85.cpp
@@ -516,6 +516,7 @@ igspoker.cpp
 ikki.cpp
 imolagp.cpp
 inder.cpp
+instantm.cpp
 intrscti.cpp
 inufuku.cpp
 invqix.cpp
@@ -660,7 +661,7 @@ markham.cpp
 mastboy.cpp
 matmania.cpp
 maxaflex.cpp
-maygay1bsw.cpp
+maygay1b.cpp
 maygayep.cpp
 maygaysw.cpp
 maygayv1.cpp
@@ -733,19 +734,8 @@ mpu12wbk.cpp
 mpu2.cpp
 mpu3.cpp
 mpu4.cpp
-mpu4avan.cpp
-mpu4bwb.cpp
-mpu4concept.cpp
-mpu4crystal.cpp
 mpu4dealem.cpp
-mpu4empire.cpp
-mpu4mdm.cpp
-mpu4misc.cpp
-mpu4mod2sw.cpp
-mpu4mod4yam.cpp
 mpu4plasma.cpp
-mpu4sw.cpp
-mpu4union.cpp
 mpu4vid.cpp
 mpu5.cpp
 mquake.cpp
@@ -793,7 +783,7 @@ nbmj8991.cpp
 nbmj9195.cpp
 nemesis.cpp
 neogeo.cpp
-neogeo_noslot.cpp
+neopcb.cpp
 neoprint.cpp
 neptunp2.cpp
 news.cpp
@@ -967,6 +957,7 @@ sandscrp.cpp
 sangho.cpp
 sanremmg.cpp
 sanremo.cpp
+saturn.cpp
 sauro.cpp
 savquest.cpp
 sbasketb.cpp
@@ -1346,3 +1337,9 @@ zr107.cpp
 -jaguarcd
 //vectrex.cpp
 -vectrex
+//saturn.cpp
+-saturn
+-saturnjp
+-saturneu
+-vsaturn
+-hisaturn

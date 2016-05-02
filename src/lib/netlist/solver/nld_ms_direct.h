@@ -46,7 +46,7 @@ struct ti_t
 	volatile std::atomic<int> lo;
 	thr_intf *intf;
 	void *params;
-//	int _block[29]; /* make it 256 bytes */
+//  int _block[29]; /* make it 256 bytes */
 };
 
 static ti_t ti[MAXTHR];
@@ -121,8 +121,8 @@ class matrix_solver_direct_t: public matrix_solver_t
 	friend class matrix_solver_t;
 public:
 
-	matrix_solver_direct_t(const solver_parameters_t *params, const int size);
-	matrix_solver_direct_t(const eSortType sort, const solver_parameters_t *params, const int size);
+	matrix_solver_direct_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const int size);
+	matrix_solver_direct_t(netlist_t &anetlist, const pstring &name, const eSortType sort, const solver_parameters_t *params, const int size);
 
 	virtual ~matrix_solver_direct_t();
 
@@ -287,7 +287,7 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 #else
 					vec_add_mult_scalar(kN-i-1,pj,f1,pi);
 					//for (unsigned k = i+1; k < kN; k++)
-					//	pj[k] = pj[k] + pi[k] * f1;
+					//  pj[k] = pj[k] + pi[k] * f1;
 					//for (unsigned k = i+1; k < kN; k++)
 						//A(j,k) += A(i,k) * f1;
 					RHS(j) += RHS(i) * f1;
@@ -308,10 +308,10 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 					x_i[p] = i;
 					x_start[p] = chunks * p;
 					x_stop[p] = nl_math::min(chunks*(p+1), eb);
-					if (p<num_thr && x_start[p] < x_stop[p]) thr_process(p, this, NULL);
+					if (p<num_thr && x_start[p] < x_stop[p]) thr_process(p, this, nullptr);
 				}
 				if (x_start[num_thr] < x_stop[num_thr])
-					do_work(num_thr, NULL);
+					do_work(num_thr, nullptr);
 				thr_wait();
 			}
 			else if (eb > 0)
@@ -319,7 +319,7 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 				x_i[0] = i;
 				x_start[0] = 0;
 				x_stop[0] = eb;
-				do_work(0, NULL);
+				do_work(0, nullptr);
 			}
 #else
 
@@ -415,8 +415,9 @@ inline int matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const boo
 }
 
 template <unsigned m_N, unsigned _storage_N>
-matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const solver_parameters_t *params, const int size)
-: matrix_solver_t(ASCENDING, params)
+matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(netlist_t &anetlist, const pstring &name,
+		const solver_parameters_t *params, const int size)
+: matrix_solver_t(anetlist, name, ASCENDING, params)
 , m_dim(size)
 {
 #if (NL_USE_DYNAMIC_ALLOCATION)
@@ -432,8 +433,9 @@ matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const solver_par
 }
 
 template <unsigned m_N, unsigned _storage_N>
-matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const eSortType sort, const solver_parameters_t *params, const int size)
-: matrix_solver_t(sort, params)
+matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(netlist_t &anetlist, const pstring &name,
+		const eSortType sort, const solver_parameters_t *params, const int size)
+: matrix_solver_t(anetlist, name, sort, params)
 , m_dim(size)
 {
 #if (NL_USE_DYNAMIC_ALLOCATION)

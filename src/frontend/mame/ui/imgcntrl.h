@@ -13,13 +13,11 @@
 #ifndef __UI_IMGCNTRL_H__
 #define __UI_IMGCNTRL_H__
 
-#include "drivenum.h"
-
 // ======================> ui_menu_control_device_image
 
 class ui_menu_control_device_image : public ui_menu {
 public:
-	ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *image);
+	ui_menu_control_device_image(mame_ui_manager &mui, render_container *container, device_image_interface *image);
 	virtual ~ui_menu_control_device_image();
 	virtual void populate() override;
 	virtual void handle() override;

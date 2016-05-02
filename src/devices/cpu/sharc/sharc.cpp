@@ -224,9 +224,9 @@ void adsp21062_device::sharc_iop_w(UINT32 address, UINT32 data)
 }
 
 
-#include "sharcmem.inc"
-#include "sharcdma.inc"
-#include "sharcops.inc"
+#include "sharcmem.hxx"
+#include "sharcdma.hxx"
+#include "sharcops.hxx"
 #include "sharcops.h"
 
 

@@ -110,7 +110,7 @@ WRITE32_MEMBER(groundfx_state::groundfx_input_w)
 		case 0x00:
 			if (ACCESSING_BITS_24_31)   /* $500000 is watchdog */
 			{
-				machine().watchdog_reset();
+				m_watchdog->watchdog_reset();
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -207,7 +207,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( groundfx )
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, groundfx_state,frame_counter_r, NULL)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, groundfx_state,frame_counter_r, nullptr)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -239,7 +239,7 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, groundfx_state,coin_word_r, NULL)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, groundfx_state,coin_word_r, nullptr)
 
 	PORT_START("AN0")   /* IN 2, steering wheel */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
@@ -317,6 +317,8 @@ static MACHINE_CONFIG_START( groundfx, groundfx_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", groundfx_state,  groundfx_interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

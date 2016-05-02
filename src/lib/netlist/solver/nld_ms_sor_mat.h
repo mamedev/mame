@@ -23,13 +23,12 @@ NETLIB_NAMESPACE_DEVICES_START()
 template <unsigned m_N, unsigned _storage_N>
 class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<m_N, _storage_N>
 {
-
 	friend class matrix_solver_t;
 
 public:
 
-	matrix_solver_SOR_mat_t(const solver_parameters_t *params, int size)
-		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::DESCENDING, params, size)
+	matrix_solver_SOR_mat_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, int size)
+		: matrix_solver_direct_t<m_N, _storage_N>(anetlist, name, matrix_solver_t::DESCENDING, params, size)
 		, m_omega(params->m_sor)
 		, m_lp_fact(0)
 		, m_gs_fail(0)

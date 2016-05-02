@@ -51,9 +51,10 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "includes/lwings.h"
 #include "sound/okim6295.h"
+#include "includes/lwings.h"
 
 /* Avengers runs on hardware almost identical to Trojan, but with a protection
  * device and some small changes to the memory map and videohardware.
@@ -322,7 +323,7 @@ static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf80a, 0xf80b) AM_WRITE(lwings_bg1_scrolly_w)
 	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB") AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xf80d, 0xf80d) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xf80d, 0xf80d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -379,7 +380,7 @@ static ADDRESS_MAP_START( fball_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf80a, 0xf80b) AM_WRITE(lwings_bg1_scrolly_w)
 	AM_RANGE(0xf80c, 0xf80c) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xf80d, 0xf80d) AM_READ_PORT("P3") AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xf80d, 0xf80d) AM_READ_PORT("P3") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xf80e, 0xf80e) AM_READ_PORT("P4")
 
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
@@ -923,6 +924,8 @@ static MACHINE_CONFIG_START( lwings, lwings_state )
 	MCFG_CPU_PROGRAM_MAP(lwings_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222) // approximation from pcb music recording - where is the frequency actually derived from??
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
@@ -974,6 +977,8 @@ static MACHINE_CONFIG_START( fball, lwings_state )
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4) // ?
 	MCFG_CPU_PROGRAM_MAP(fball_sound_map)
 //  MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -1746,5 +1751,3 @@ GAME( 1987, buraikenb, avengers, avengersb,avengers, lwings_state, avengersb, RO
 
 // cloned lwings hardware
 GAME( 1992, fball,  0,    fball, fball, driver_device,  0, ROT0, "FM Work", "Fire Ball (FM Work)", MACHINE_SUPPORTS_SAVE )
-
-	

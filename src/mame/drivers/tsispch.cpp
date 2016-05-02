@@ -392,7 +392,7 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 	MCFG_NECDSP_OUT_P1_CB(WRITELINE(tsispch_state, dsp_to_8086_p1_w))
 
 	/* PIC 8259 */
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NULL)
+	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
 
 	/* uarts */
 	MCFG_DEVICE_ADD("i8251a_u15", I8251, 0)

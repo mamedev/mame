@@ -360,8 +360,8 @@ void z8002_device::cycles(int cycles)
 	m_icount -= cycles;
 }
 
-#include "z8000ops.inc"
-#include "z8000tbl.inc"
+#include "z8000ops.hxx"
+#include "z8000tbl.hxx"
 
 void z8002_device::set_irq(int type)
 {

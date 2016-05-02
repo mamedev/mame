@@ -1822,7 +1822,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc88va_state,get_slave_ack) )
 
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL )
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NOOP)
 
 	MCFG_DEVICE_ADD("dmac", AM9517A, 8000000) /* ch2 is FDC, ch0/3 are "user". ch1 is unused */
 	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(pc88va_state, pc88va_hlda_w))

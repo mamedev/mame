@@ -50,6 +50,9 @@ TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifica
 #include "netlist/devices/net_lib.h"
 #include "sound/dac.h"
 #include "video/fixfreq.h"
+#include "machine/nl_breakout.h"
+#include "machine/nl_pong.h"
+#include "machine/nl_pongd.h"
 
 #include "breakout.lh"
 
@@ -117,10 +120,6 @@ enum input_changed_enum
 	IC_VR1,
 	IC_VR2
 };
-
-NETLIST_EXTERNAL(pongdoubles)
-NETLIST_EXTERNAL(pong_fast)
-NETLIST_EXTERNAL(breakout)
 
 class ttl_mono_state : public driver_device
 {

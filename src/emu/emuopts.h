@@ -15,7 +15,7 @@
 
 #include "options.h"
 
-#define OPTION_PRIORITY_CMDLINE		OPTION_PRIORITY_HIGH + 1
+#define OPTION_PRIORITY_CMDLINE     OPTION_PRIORITY_HIGH + 1
 // core options
 #define OPTION_SYSTEMNAME           core_options::unadorned(0)
 #define OPTION_SOFTWARENAME         core_options::unadorned(1)
@@ -200,7 +200,6 @@ public:
 	// core options
 	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
 	const char *software_name() const { return value(OPTION_SOFTWARENAME); }
-	const game_driver *system() const;
 
 	// core configuration options
 	bool read_config() const { return bool_value(OPTION_READCONFIG); }
@@ -369,7 +368,7 @@ public:
 	const char *no_plugin() const { return value(OPTION_NO_PLUGIN); }
 
 	const char *language() const { return value(OPTION_LANGUAGE); }
-	
+
 	// cache frequently used options in members
 	void update_cached_options();
 

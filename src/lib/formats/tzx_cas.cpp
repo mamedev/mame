@@ -532,7 +532,7 @@ static const char *const hw_info[] =
 };
 
 /*  Will go through blocks and calculate number of samples needed.
-If buffer is not NULL the sample data will also be written. */
+If buffer is not nullptr the sample data will also be written. */
 static int tzx_cas_do_work( INT16 **buffer )
 {
 	int current_block = 0;

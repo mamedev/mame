@@ -339,9 +339,9 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-rpi"))
 
 		elseif "riscv" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "/opt/riscv/bin/riscv64-unknown-elf-gcc"
-			premake.gcc.cxx = "/opt/riscv/bin/riscv64-unknown-elf-g++"
-			premake.gcc.ar  = "/opt/riscv/bin/riscv64-unknown-elf-ar"
+			premake.gcc.cc  = "$(RISCV_DIR)/bin/riscv64-unknown-elf-gcc"
+			premake.gcc.cxx = "$(RISCV_DIR)/bin/riscv64-unknown-elf-g++"
+			premake.gcc.ar  = "$(RISCV_DIR)/bin/riscv64-unknown-elf-ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-riscv"))
 
 		end
@@ -1139,9 +1139,13 @@ function toolchain(_buildDir, _libDir)
 	configuration { "riscv" }
 		targetdir (path.join(_buildDir, "riscv/bin"))
 		objdir (path.join(_buildDir, "riscv/obj"))
+		includedirs {
+			"$(RISCV_DIR)/sysroot/usr/include",
+		}
 		buildoptions {
 			"-Wunused-value",
 			"-Wundef",
+			"--sysroot=$(RISCV_DIR)/sysroot",
 		}
 		buildoptions_cpp {
 			"-std=c++0x",

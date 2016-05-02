@@ -19,7 +19,7 @@
   menu
  -------------------------------------------------*/
 
-ui_menu_game_info::ui_menu_game_info(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_game_info::ui_menu_game_info(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 
@@ -30,7 +30,7 @@ ui_menu_game_info::~ui_menu_game_info()
 void ui_menu_game_info::populate()
 {
 	std::string tempstring;
-	item_append(mame_machine_manager::instance()->ui().game_info_astring(tempstring).c_str(), nullptr, MENU_FLAG_MULTILINE, nullptr);
+	item_append(ui().game_info_astring(tempstring).c_str(), nullptr, MENU_FLAG_MULTILINE, nullptr);
 }
 
 void ui_menu_game_info::handle()
@@ -45,7 +45,7 @@ void ui_menu_game_info::handle()
   menu
  -------------------------------------------------*/
 
-ui_menu_image_info::ui_menu_image_info(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_image_info::ui_menu_image_info(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
 }
 

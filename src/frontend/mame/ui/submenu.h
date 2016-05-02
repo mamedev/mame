@@ -46,7 +46,7 @@ public:
 		std::vector<std::string> value;
 	};
 
-	ui_submenu(running_machine &machine, render_container *container, std::vector<ui_submenu::option> &suboptions, const game_driver *drv = nullptr, emu_options *options = nullptr);
+	ui_submenu(mame_ui_manager &mui, render_container *container, std::vector<ui_submenu::option> &suboptions, const game_driver *drv = nullptr, emu_options *options = nullptr);
 	virtual ~ui_submenu();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -153,8 +153,8 @@ static std::vector<ui_submenu::option> video_submenu_options = {
 };
 
 //static std::vector<ui_submenu::option> export_submenu_options = {
-//	{ ui_submenu::COMMAND, __("Export XML format (like -listxml)"),               "exportxml" },
-//	{ ui_submenu::COMMAND, __("Export TXT format (like -listfull)"),              "exporttxt" },
+//  { ui_submenu::COMMAND, __("Export XML format (like -listxml)"),               "exportxml" },
+//  { ui_submenu::COMMAND, __("Export TXT format (like -listfull)"),              "exporttxt" },
 //};
 
 #endif /* __UI_SUBMENU_H__ */

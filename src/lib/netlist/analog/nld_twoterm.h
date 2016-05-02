@@ -103,8 +103,8 @@ NETLIB_NAMESPACE_DEVICES_START()
 class NETLIB_NAME(twoterm) : public device_t
 {
 public:
-	ATTR_COLD NETLIB_NAME(twoterm)(const family_t afamily);
-	ATTR_COLD NETLIB_NAME(twoterm)();
+	ATTR_COLD NETLIB_NAME(twoterm)(const family_t afamily, netlist_t &anetlist, const pstring &name);
+	ATTR_COLD NETLIB_NAME(twoterm)(netlist_t &anetlist, const pstring &name);
 
 	terminal_t m_P;
 	terminal_t m_N;
@@ -147,7 +147,8 @@ private:
 class NETLIB_NAME(R_base) : public NETLIB_NAME(twoterm)
 {
 public:
-	ATTR_COLD NETLIB_NAME(R_base)() : NETLIB_NAME(twoterm)(RESISTOR) { }
+	ATTR_COLD NETLIB_NAME(R_base)(netlist_t &anetlist, const pstring &name)
+	: NETLIB_NAME(twoterm)(RESISTOR, anetlist, name) { }
 
 	inline void set_R(const nl_double R)
 	{
@@ -169,8 +170,8 @@ NETLIB_DEVICE_WITH_PARAMS_DERIVED(R, R_base,
 // -----------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(POT,
-	NETLIB_NAME(R_base) m_R1;
-	NETLIB_NAME(R_base) m_R2;
+	NETLIB_SUB(R_base) m_R1;
+	NETLIB_SUB(R_base) m_R2;
 
 	param_double_t m_R;
 	param_double_t m_Dial;
@@ -178,7 +179,7 @@ NETLIB_DEVICE_WITH_PARAMS(POT,
 );
 
 NETLIB_DEVICE_WITH_PARAMS(POT2,
-	NETLIB_NAME(R_base) m_R1;
+	NETLIB_SUB(R_base) m_R1;
 
 	param_double_t m_R;
 	param_double_t m_Dial;
@@ -194,7 +195,8 @@ NETLIB_DEVICE_WITH_PARAMS(POT2,
 class NETLIB_NAME(C) : public NETLIB_NAME(twoterm)
 {
 public:
-	ATTR_COLD NETLIB_NAME(C)() : NETLIB_NAME(twoterm)(CAPACITOR), m_GParallel(0.0) { }
+	ATTR_COLD NETLIB_NAME(C)(netlist_t &anetlist, const pstring &name)
+	: NETLIB_NAME(twoterm)(CAPACITOR, anetlist, name), m_GParallel(0.0) { }
 
 	ATTR_HOT void step_time(const nl_double st) override;
 
@@ -291,7 +293,8 @@ private:
 class NETLIB_NAME(D) : public NETLIB_NAME(twoterm)
 {
 public:
-	ATTR_COLD NETLIB_NAME(D)() : NETLIB_NAME(twoterm)(DIODE) { }
+	ATTR_COLD NETLIB_NAME(D)(netlist_t &anetlist, const pstring &name)
+	: NETLIB_NAME(twoterm)(DIODE, anetlist, name) { }
 
 	NETLIB_UPDATE_TERMINALSI();
 
@@ -314,7 +317,8 @@ protected:
 class NETLIB_NAME(VS) : public NETLIB_NAME(twoterm)
 {
 public:
-	ATTR_COLD NETLIB_NAME(VS)() : NETLIB_NAME(twoterm)(VS) { }
+	ATTR_COLD NETLIB_NAME(VS)(netlist_t &anetlist, const pstring &name)
+	: NETLIB_NAME(twoterm)(VS, anetlist, name) { }
 
 protected:
 	virtual void start() override;
@@ -332,7 +336,8 @@ protected:
 class NETLIB_NAME(CS) : public NETLIB_NAME(twoterm)
 {
 public:
-	ATTR_COLD NETLIB_NAME(CS)() : NETLIB_NAME(twoterm)(CS) { }
+	ATTR_COLD NETLIB_NAME(CS)(netlist_t &anetlist, const pstring &name)
+	: NETLIB_NAME(twoterm)(CS, anetlist, name) { }
 
 protected:
 	virtual void start() override;

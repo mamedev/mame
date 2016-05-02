@@ -78,7 +78,7 @@ extern const device_type NES_KSEXPANSION_SLOT;
 
 #define MCFG_KSTUDIO_MINICART_ADD(_tag, _slot_intf) \
 	MCFG_DEVICE_ADD(_tag, NES_KSEXPANSION_SLOT, 0) \
-MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, false)
+MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false)
 
 
 //-----------------------------------------------

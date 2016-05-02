@@ -18,7 +18,7 @@
 class win_gl_context : public osd_gl_context
 {
 public:
-	win_gl_context(HWND window) : osd_gl_context(), m_context(0), m_window(NULL), m_hdc(0)
+	win_gl_context(HWND window) : osd_gl_context(), m_context(0), m_window(nullptr), m_hdc(0)
 	{
 		m_error[0] = 0;
 
@@ -36,8 +36,8 @@ public:
 		}
 		else
 		{
-			pfn_wglSwapIntervalEXT = NULL;
-			pfn_wglGetSwapIntervalEXT = NULL;
+			pfn_wglSwapIntervalEXT = nullptr;
+			pfn_wglGetSwapIntervalEXT = nullptr;
 		}
 
 		m_hdc = GetDC(window);
@@ -46,7 +46,7 @@ public:
 			m_context = this->pfn_wglCreateContext(m_hdc);
 			if  (!m_context)
 			{
-				FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), 0, m_error, 255, NULL);
+				FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, GetLastError(), 0, m_error, 255, nullptr);
 				return;
 			}
 			this->pfn_wglMakeCurrent(m_hdc, m_context);
@@ -67,7 +67,7 @@ public:
 	virtual const char *LastErrorMsg() override
 	{
 		if (m_error[0] == 0)
-			return NULL;
+			return nullptr;
 		else
 			return m_error;
 	}
@@ -75,14 +75,14 @@ public:
 	virtual void *getProcAddress(const char *proc) override
 	{
 		void *ret = (void *) GetProcAddress(m_module, proc);
-		if (ret == NULL)
+		if (ret == nullptr)
 			ret = (void *) this->pfn_wglGetProcAddress(proc);
 		return ret;
 	}
 
 	virtual int SetSwapInterval(const int swap) override
 	{
-		if (this->pfn_wglSwapIntervalEXT != NULL)
+		if (this->pfn_wglSwapIntervalEXT != nullptr)
 		{
 			this->pfn_wglSwapIntervalEXT(swap ? 1 : 0);
 		}
@@ -141,10 +141,10 @@ private:
 
 	bool WGLExtensionSupported(const char *extension_name)
 	{
-		//if (pfn_wglGetExtensionsStringEXT != NULL)
+		//if (pfn_wglGetExtensionsStringEXT != nullptr)
 		//  printf("%s\n", this->pfn_wglGetExtensionsStringEXT());
 
-		if (pfn_wglGetExtensionsStringEXT != NULL && strstr(pfn_wglGetExtensionsStringEXT(), extension_name) != NULL)
+		if (pfn_wglGetExtensionsStringEXT != nullptr && strstr(pfn_wglGetExtensionsStringEXT(), extension_name) != nullptr)
 			return true;
 		else
 			return false;

@@ -261,7 +261,7 @@ void text_buffer_print_wrap(text_buffer *text, const char *data, int wrapcol)
 		}
 	}
 
-	/* NULL terminate what we have on this line */
+	/* nullptr terminate what we have on this line */
 	text->buffer[text->bufend] = 0;
 }
 

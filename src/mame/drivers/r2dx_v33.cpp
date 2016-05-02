@@ -67,6 +67,7 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
+#include "machine/r2crypt.h"
 
 
 class r2dx_v33_state : public raiden2_state

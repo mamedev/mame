@@ -16,6 +16,7 @@
 #define __H8S2000_H__
 
 #include "h8h.h"
+#include "h8_dtc.h"
 
 class h8s2000_device : public h8h_device {
 public:
@@ -45,6 +46,9 @@ protected:
 	O(tas_r32ih);
 
 	O(state_trace);
+	O(state_dtc);
+	O(state_dtc_vector);
+	O(state_dtc_writeback);
 #undef O
 };
 

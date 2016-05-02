@@ -28,4 +28,4 @@ offs_t r65c02_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
 }
 
-#include "cpu/m6502/r65c02.inc"
+#include "cpu/m6502/r65c02.hxx"

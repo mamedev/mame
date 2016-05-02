@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 
-	MCFG_AT28C16_ADD( "at28c16", NULL )
+	MCFG_AT28C16_ADD( "at28c16", nullptr )
 
 	MCFG_YGV608_ADD("ygv608")
 	MCFG_YGV608_PALETTE("palette")

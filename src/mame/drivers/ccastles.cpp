@@ -121,6 +121,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "includes/ccastles.h"
 
@@ -333,7 +334,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ccastles_state )
 	AM_RANGE(0x9c80, 0x9cff) AM_WRITE(ccastles_hscroll_w)
 	AM_RANGE(0x9d00, 0x9d7f) AM_WRITE(ccastles_vscroll_w)
 	AM_RANGE(0x9d80, 0x9dff) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x9e00, 0x9e7f) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x9e00, 0x9e7f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x9e80, 0x9e81) AM_MIRROR(0x0078) AM_WRITE(led_w)
 	AM_RANGE(0x9e82, 0x9e83) AM_MIRROR(0x0078) AM_WRITE(nvram_store_w)
 	AM_RANGE(0x9e85, 0x9e86) AM_MIRROR(0x0078) AM_WRITE(ccounter_w)
@@ -359,7 +360,7 @@ static INPUT_PORTS_START( ccastles )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ccastles_state,get_vblank, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ccastles_state,get_vblank, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )                    /* 1p Jump, non-cocktail start1 */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)     /* 2p Jump, non-cocktail start2 */
 
@@ -454,7 +455,8 @@ static MACHINE_CONFIG_START( ccastles, ccastles_state )
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	MCFG_X2212_ADD_AUTOSAVE("nvram_4b")
 	MCFG_X2212_ADD_AUTOSAVE("nvram_4a")

@@ -25,8 +25,8 @@ static void CX4_writew(running_machine &machine, UINT16 addr, UINT16 data);
 
 static void CX4_C4DrawLine(INT32 X1, INT32 Y1, INT16 Z1, INT32 X2, INT32 Y2, INT16 Z2, UINT8 Color);
 
-#include "machine/cx4data.inc"
-#include "machine/cx4fn.inc"
+#include "machine/cx4data.hxx"
+#include "machine/cx4fn.hxx"
 
 static UINT32 CX4_ldr(UINT8 r)
 {
@@ -115,8 +115,8 @@ static void CX4_transfer_data(running_machine &machine)
 	}
 }
 
-#include "machine/cx4oam.inc"
-#include "machine/cx4ops.inc"
+#include "machine/cx4oam.hxx"
+#include "machine/cx4ops.hxx"
 
 void CX4_write(running_machine &machine, UINT32 addr, UINT8 data)
 {

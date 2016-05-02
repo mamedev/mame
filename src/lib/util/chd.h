@@ -416,7 +416,7 @@ private:
 	UINT32                  m_unitbytes;        // size of each unit in bytes
 	UINT64                  m_unitcount;        // number of units represented
 	chd_codec_type          m_compression[4];   // array of compression types used
-	chd_file *              m_parent;           // pointer to parent file, or NULL if none
+	chd_file *              m_parent;           // pointer to parent file, or nullptr if none
 	bool                    m_parent_missing;   // are we missing our parent?
 
 	// key offsets within the header

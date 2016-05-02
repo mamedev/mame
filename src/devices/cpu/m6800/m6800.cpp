@@ -838,10 +838,10 @@ void m6800_cpu_device::write_port2()
 }
 
 /* include the opcode prototypes and function pointer tables */
-#include "6800tbl.inc"
+#include "6800tbl.hxx"
 
 /* include the opcode functions */
-#include "6800ops.inc"
+#include "6800ops.hxx"
 
 int m6800_cpu_device::m6800_rx()
 {

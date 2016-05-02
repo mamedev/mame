@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/hd6309.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 
 #include "includes/konamipt.h"
@@ -57,7 +58,7 @@ static ADDRESS_MAP_START( labyrunr_map, AS_PROGRAM, 8, labyrunr_state )
 	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(labyrunr_bankswitch_w)
 	AM_RANGE(0x0d00, 0x0d1f) AM_DEVREADWRITE("k051733", k051733_device, read, write)
-	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("spriteram")
@@ -170,6 +171,7 @@ static MACHINE_CONFIG_START( labyrunr, labyrunr_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", labyrunr_state,  labyrunr_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(labyrunr_state, labyrunr_timer_interrupt,  4*60)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -7,6 +7,7 @@
 #include "sound/ay8910.h"
 #include "cpu/z80/z80.h"
 #include "machine/timekpr.h"
+#include "machine/watchdog.h"
 
 #define igrosoft_gamble_ROM_SIZE 0x80000
 #define igrosoft_gamble_VIDRAM_SIZE (0x2000*0x04)

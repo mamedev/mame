@@ -855,6 +855,7 @@ Notes:
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
 #include "machine/seibuspi.h"
+#include "machine/spisprit.h"
 #include "includes/seibuspi.h"
 
 // default values written to CRTC (note: SYS386F does not have this chip)

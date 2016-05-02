@@ -53,7 +53,7 @@ public:
 	running_machine &machine() const override { return m_machine; }
 
 	virtual render_target *target() override { return m_target; }
-	int fullscreen() const override { return !video_config.windowed; }
+	int fullscreen() const override { return m_fullscreen; }
 
 	void update();
 
@@ -111,7 +111,7 @@ public:
 
 	// monitor info
 	osd_monitor_info *  m_monitor;
-	//int                 m_fullscreen;
+	int                 m_fullscreen;
 	int                 m_fullscreen_safe;
 	float               m_aspect;
 

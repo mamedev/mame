@@ -55,7 +55,7 @@
 		// strings (optional): A list of strings to use with the "intenum" type, to select from a list of text options instead of simply numbers.
 		// value: An array of 2 or more entries, with one entry per possible slider setting from "min" to "max" inclusive.
 
-		{ "type": "intenum", "name": "adjustments", "text": "Enable Adjustments", "default": 0, "max": 1, "min": 0, "step": 1, "format": "%s", "screen": "any", "strings": [ "Off", "On" ] },
+		{ "type": "intenum", "name": "adjustments", "text": "Enable Adjustments", "default": 1, "max": 1, "min": 0, "step": 1, "format": "%s", "screen": "any", "strings": [ "Off", "On" ] },
 
 		{ "type": "intenum", "name": "ntsc",            "text": "Enable NTSC",                           "default":  0,       "max":   1,       "min": 0,       "step": 1,       "format": "%s",    "screen": "any", "strings": [ "Off", "On" ] },
 		{ "type": "float",   "name": "a_value",         "text": "NTSC A Value",                          "default":  0.50,    "max":   1.00,    "min": 0.00,    "step": 0.01,    "format": "%1.2f", "screen": "raster" },
@@ -75,45 +75,46 @@
 		{ "type": "color", "name": "blu_ratios", "text": "Blue Output from ",  "default": [ 0.00, 0.00, 1.00 ], "max": [ 2.00, 2.00, 2.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "raster" },
 		{ "type": "color", "name": "offset",     "text": "Signal Offset, ",    "default": [ 0.00, 0.00, 0.00 ], "max": [ 2.00, 2.00, 2.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "raster" },
 		{ "type": "color", "name": "scale",      "text": "Signal Scale, ",     "default": [ 0.95, 0.95, 0.95 ], "max": [ 2.00, 2.00, 2.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "raster" },
-		{ "type": "float", "name": "saturation", "text": "Color Saturation",   "default": 1.50,                 "max": 4.00,                 "min": 0.00,                 "step": 0.01, "format": "%1.2f", "screen": "raster" },
+		{ "type": "float", "name": "saturation", "text": "Color Saturation",   "default": 1.20,                 "max": 4.00,                 "min": 0.00,                 "step": 0.01, "format": "%1.2f", "screen": "raster" },
 
-		{ "type": "vec2", "name": "converge_red",          "text": "Red Convergence, ",          "default": [ 0.5, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
-		{ "type": "vec2", "name": "converge_green",        "text": "Green Convergence, ",        "default": [ 0.0, 0.5 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "converge_red",          "text": "Red Convergence, ",          "default": [ 0.0, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
+		{ "type": "vec2", "name": "converge_green",        "text": "Green Convergence, ",        "default": [ 0.0, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
 		{ "type": "vec2", "name": "converge_blue",         "text": "Blue Convergence, ",         "default": [ 0.0, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
 		{ "type": "vec2", "name": "radial_converge_red",   "text": "Red Radial Convergence, ",   "default": [ 0.0, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
 		{ "type": "vec2", "name": "radial_converge_green", "text": "Green Radial Convergence, ", "default": [ 0.0, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
 		{ "type": "vec2", "name": "radial_converge_blue",  "text": "Blue Radial Convergence, ",  "default": [ 0.0, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
 
-		{ "type": "vec2", "name": "defocus", "text": "Defocus, ", "default": [ 1.5, 1.5 ], "max": [ 10.0, 10.0 ], "min": [ 0.0, 0.0 ], "step": 0.1, "format": "%2.1f", "screen": "crt" },
+		{ "type": "vec2", "name": "defocus", "text": "Defocus, ", "default": [ 0.5, 0.5 ], "max": [ 10.0, 10.0 ], "min": [ 0.0, 0.0 ], "step": 0.1, "format": "%2.1f", "screen": "crt" },
 
 		{ "type": "color", "name": "phosphor", "text": "Phosphor Persistence, ",  "default": [ 0.45, 0.45, 0.45 ], "max": [ 1.00, 1.00, 1.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "crt" },
 
-		{ "type": "float", "name": "scanline_alpha",         "text": "Scanline Amount",            "default": 0.80, "max": 1.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "scanline_alpha",         "text": "Scanline Amount",            "default": 0.50, "max": 1.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_scale",         "text": "Overall Scanline Scale",     "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_bright_scale",  "text": "Scanline Brightness Scale",  "default": 2.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 0.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 4.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_jitter_amount", "text": "Scanline Jitter Amount",     "default": 0.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_height",        "text": "Individual Scanline Scale",  "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_variation",     "text": "Scanline Variation",         "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
  
-		{ "type": "float", "name": "shadow_alpha",     "text": "Shadow Mask Amount",       "default": 0.20,             "max": 1.00,             "min": 0.00,             "step": 0.01,  "format": "%1.2f", "screen": "crt" },
-		{ "type": "vec2",  "name": "shadow_uv_count",  "text": "Shadow Mask Pixel Count ", "default": [ 12, 12 ],       "max": [ 128, 128 ],     "min": [ 1, 1 ],         "step": 1,     "format": "%3f",   "screen": "crt" },
-		{ "type": "vec2",  "name": "shadow_uv_size",   "text": "Shadow Mask UV Size ",     "default": [ 0.500, 0.500 ], "max": [ 1.000, 1.000 ], "min": [ 0.000, 0.000 ], "step": 0.001, "format": "%1.3f", "screen": "crt" },
-		{ "type": "vec2",  "name": "shadow_uv_offset", "text": "Shadow Mask UV Offset ",   "default": [ 0.000, 0.000 ], "max": [ 1.000, 1.000 ], "min": [ 0.000, 0.000 ], "step": 0.001, "format": "%1.3f", "screen": "crt" },
+		{ "type": "intenum", "name": "shadow_tile_mode", "text": "Shadow Mask Tile Mode",    "default":  0,               "max": 1,                "min": 0,                "step": 1,     "format": "%s",    "screen": "any", "strings": [ "Screen", "Source" ] },
+		{ "type": "float",   "name": "shadow_alpha",     "text": "Shadow Mask Amount",       "default": 0.50,             "max": 1.00,             "min": 0.00,             "step": 0.01,  "format": "%1.2f", "screen": "crt" },
+		{ "type": "vec2",    "name": "shadow_uv_count",  "text": "Shadow Mask Pixel Count ", "default": [ 12, 12 ],       "max": [ 128, 128 ],     "min": [ 1, 1 ],         "step": 1,     "format": "%3f",   "screen": "crt" },
+		{ "type": "vec2",    "name": "shadow_uv_size",   "text": "Shadow Mask UV Size ",     "default": [ 0.500, 0.500 ], "max": [ 1.000, 1.000 ], "min": [ 0.000, 0.000 ], "step": 0.001, "format": "%1.3f", "screen": "crt" },
+		{ "type": "vec2",    "name": "shadow_uv_offset", "text": "Shadow Mask UV Offset ",   "default": [ 0.000, 0.000 ], "max": [ 1.000, 1.000 ], "min": [ 0.000, 0.000 ], "step": 0.001, "format": "%1.3f", "screen": "crt" },
 
-		{ "type": "float", "name": "humbar_alpha",      "text": "Hum Bar Amount",    "default": 0.05,  "max": 1.00,  "min": 0.00,  "step": 0.01,    "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "humbar_alpha",      "text": "Hum Bar Amount",    "default": 0.0,   "max": 1.00,  "min": 0.00,  "step": 0.01,    "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "humbar_hertz_rate", "text": "Hum Bar Frequency", "default": 0.001, "max": 1.000, "min": 0.000, "step": 0.00001, "format": "%1.5f", "screen": "crt" },
 
 		{ "type": "color", "name": "floor", "text": "Signal Floor, ",    "default": [ 0.05, 0.05, 0.05 ], "max": [ 1.00, 1.00, 1.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "color", "name": "power", "text": "Signal Exponent, ", "default": [ 0.80, 0.80, 0.80 ], "max": [ 4.00, 4.00, 4.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "color", "name": "power", "text": "Signal Exponent, ", "default": [ 1.00, 1.00, 1.00 ], "max": [ 4.00, 4.00, 4.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "crt" },
 
-		{ "type": "float", "name": "distortion",       "text": "Screen Distortion Amount",       "default": 0.20, "max": 2.00, "min": -2.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "distortion",       "text": "Screen Distortion Amount",       "default": 0.05, "max": 2.00, "min": -2.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "cubic_distortion", "text": "Screen Cubic Distortion Amount", "default": 0.00, "max": 2.00, "min": -2.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "distort_corner",   "text": "Distorted Corner Amount",        "default": 0.20, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "round_corner",     "text": "Rounded Corner Amount",          "default": 0.15, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "smooth_border",    "text": "Smooth Border Amount",           "default": 0.05, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "vignetting",       "text": "Vignetting Amount",              "default": 0.20, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "reflection",       "text": "Reflection Amount",              "default": 0.15, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" }
+		{ "type": "float", "name": "distort_corner",   "text": "Distorted Corner Amount",        "default": 0.05, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "round_corner",     "text": "Rounded Corner Amount",          "default": 0.05, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "smooth_border",    "text": "Smooth Border Amount",           "default": 0.03, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "vignetting",       "text": "Vignetting Amount",              "default": 0.08, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "reflection",       "text": "Reflection Amount",              "default": 0.05, "max": 2.00, "min":  0.00, "step": 0.01, "format": "%1.2f", "screen": "crt" }
 	],
 
 	// parameters (optional): A list of procedurally-generated parameters that can be bound to entry uniforms.
@@ -184,6 +185,17 @@
 
 	// passes (required): The list of individual shaders to invoke, and any dynamic input parameters they need.
 	"passes": [
+		{	"effect": "misc/blit",
+			"name": "Blit to filterable surface for NTSC",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "adjustments", "value": 0 },
+				{ "type": "slider", "condition": "equal", "combine": "and", "name": "ntsc",        "value": 0 }
+			],
+			"input": [
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "ntsc"
+		},
 		{
 			// effect (required): The name of the effect JSON file to load for this pass.
 			// value: Any valid JSON filename included in your shader chain, without the extension.
@@ -280,7 +292,10 @@
 				// bilinear (optional, texture and target only): Whether to apply bilinear filtering to the sampler.
 				// values: true, false
 				// default: true
-				{ "sampler": "s_tex", "texture": "screen" }
+				// 
+				// selection (optional, option and texture only): Determines the name of the selection and alowes to select other textures in the same directory as the specified texture file.
+				// values: Any valid ASCII string.
+				{ "sampler": "s_tex", "target": "ntsc" }
 			],
 
 			// output (required): The target to use as the output for this pass. Can be one of the named targets in "targets", or "output" 
@@ -451,6 +466,7 @@
 				{ "uniform": "u_scanline_bright_offset", "slider": "scanline_bright_offset" },
 				{ "uniform": "u_scanline_height",        "slider": "scanline_height" },
 				{ "uniform": "u_scanline_variation",     "slider": "scanline_variation" },
+				{ "uniform": "u_shadow_tile_mode",       "slider": "shadow_tile_mode" },
 				{ "uniform": "u_shadow_alpha",           "slider": "shadow_alpha" },
 				{ "uniform": "u_shadow_count",           "slider": "shadow_uv_count" },
 				{ "uniform": "u_shadow_uv",              "slider": "shadow_uv_size" },
@@ -465,7 +481,7 @@
 			],
 			"input": [
 				{ "sampler": "s_tex",    "target": "internal" },
-				{ "sampler": "s_shadow", "option": "bgfx_shadow_mask" }
+				{ "sampler": "s_shadow", "option": "bgfx_shadow_mask", "selection": "Shadow Mask" }
 			],
 			"output": "internal"
 		},

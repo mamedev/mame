@@ -115,6 +115,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "includes/jedi.h"
 
 
@@ -270,7 +271,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, jedi_state )
 	AM_RANGE(0x1c80, 0x1c82) AM_MIRROR(0x0078) AM_READNOP AM_WRITE(a2d_select_w)
 	AM_RANGE(0x1c83, 0x1c87) AM_MIRROR(0x0078) AM_NOP
 	AM_RANGE(0x1d00, 0x1d00) AM_MIRROR(0x007f) AM_NOP   /* write: NVRAM store */
-	AM_RANGE(0x1d80, 0x1d80) AM_MIRROR(0x007f) AM_READNOP AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1d80, 0x1d80) AM_MIRROR(0x007f) AM_READNOP AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1e00, 0x1e00) AM_MIRROR(0x007f) AM_READNOP AM_WRITE(main_irq_ack_w)
 	AM_RANGE(0x1e80, 0x1e81) AM_MIRROR(0x0078) AM_READNOP AM_WRITE(jedi_coin_counter_w)
 	AM_RANGE(0x1e82, 0x1e83) AM_MIRROR(0x0078) AM_NOP   /* write: LED control - not used */
@@ -314,7 +315,7 @@ static INPUT_PORTS_START( jedi )
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x18, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,jedi_state,jedi_audio_comm_stat_r, NULL)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,jedi_state,jedi_audio_comm_stat_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("STICKY")    /* analog Y */
@@ -341,6 +342,8 @@ static MACHINE_CONFIG_START( jedi, jedi_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(240))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(jedi_video)

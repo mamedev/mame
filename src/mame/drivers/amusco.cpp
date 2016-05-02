@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", amusco_state, amusco_vblank_irq)
 	MCFG_CPU_PERIODIC_INT_DRIVER(amusco_state, amusco_timer_irq,  60*32)
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

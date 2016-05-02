@@ -31,7 +31,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 
 #define DEVICE_S3C2400
 #define S3C24_CLASS_NAME s3c2400_device
-#include "machine/s3c24xx.inc"
+#include "machine/s3c24xx.hxx"
 #undef DEVICE_S3C2400
 
 UINT32 s3c2400_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

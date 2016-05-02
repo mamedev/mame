@@ -361,6 +361,7 @@ D                                                                               
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "includes/equites.h"
 
 #define FRQ_ADJUSTER_TAG    "FRQ"
@@ -667,7 +668,7 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x18c000, 0x18c001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_switch_w)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("IN0") AM_WRITE(equites_scrollreg_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE8(equites_bgcolor_w, 0xff00)
-	AM_RANGE(0x780000, 0x780001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x780000, 0x780001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekisou_map, AS_PROGRAM, 16, equites_state )
@@ -797,7 +798,7 @@ static INPUT_PORTS_START( gekisou )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, equites_state, gekisou_unknown_bit_r, NULL)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, equites_state, gekisou_unknown_bit_r, nullptr)
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)
@@ -1147,6 +1148,8 @@ static MACHINE_CONFIG_START( equites, equites_state )
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, 4000000/8) // 8303 or 8304 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

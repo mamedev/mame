@@ -479,6 +479,7 @@ end
 ---------------------------------------------------
 --
 --@src/devices/bus/coleco/ctrl.h,BUSES["COLECO"] = true
+--@src/devices/bus/coleco/exp.h,BUSES["COLECO"] = true
 ---------------------------------------------------
 
 if (BUSES["COLECO"]~=null) then
@@ -516,7 +517,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/dmv/dmv.h,BUSES["DMV"] = true
+--@src/devices/bus/dmv/dmvbus.h,BUSES["DMV"] = true
 ---------------------------------------------------
 
 if (BUSES["DMV"]~=null) then
@@ -671,7 +672,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/isbx/isbx.h,BUSES["IMI7000"] = true
+--@src/devices/bus/imi7000/imi7000.h,BUSES["IMI7000"] = true
 ---------------------------------------------------
 
 if (BUSES["IMI7000"]~=null) then
@@ -1188,7 +1189,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/vcs/ctrl.h,BUSES["VCS_CTRL"] = true
+--@src/devices/bus/vcs_ctrl/ctrl.h,BUSES["VCS_CTRL"] = true
 ---------------------------------------------------
 
 if (BUSES["VCS_CTRL"]~=null) then
@@ -1633,9 +1634,9 @@ if (BUSES["NES"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/nes/nes_slot.cpp",
 		MAME_DIR .. "src/devices/bus/nes/nes_slot.h",
-		MAME_DIR .. "src/devices/bus/nes/nes_ines.inc",
-		MAME_DIR .. "src/devices/bus/nes/nes_pcb.inc",
-		MAME_DIR .. "src/devices/bus/nes/nes_unif.inc",
+		MAME_DIR .. "src/devices/bus/nes/nes_ines.hxx",
+		MAME_DIR .. "src/devices/bus/nes/nes_pcb.hxx",
+		MAME_DIR .. "src/devices/bus/nes/nes_unif.hxx",
 		MAME_DIR .. "src/devices/bus/nes/nes_carts.cpp",
 		MAME_DIR .. "src/devices/bus/nes/nes_carts.h",
 		MAME_DIR .. "src/devices/bus/nes/2a03pur.cpp",
@@ -1886,65 +1887,69 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/neogeo/neogeo_slot.h,BUSES["NEOGEO"] = true
+--@src/devices/bus/neogeo/slot.h,BUSES["NEOGEO"] = true
 ---------------------------------------------------
 
 if (BUSES["NEOGEO"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/neogeo/neogeo_slot.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/neogeo_slot.h",
-		MAME_DIR .. "src/devices/bus/neogeo/neogeo_intf.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/neogeo_intf.h",
-		MAME_DIR .. "src/devices/bus/neogeo/neogeo_carts.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/neogeo_carts.h",
-		MAME_DIR .. "src/devices/bus/neogeo/neogeo_helper.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/neogeo_helper.h",
-		MAME_DIR .. "src/devices/bus/neogeo/banked_cart.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/banked_cart.h",
-		MAME_DIR .. "src/devices/bus/neogeo/mslugx_prot.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/mslugx_prot.h",
-		MAME_DIR .. "src/devices/bus/neogeo/mslugx_cart.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/mslugx_cart.h",
-		MAME_DIR .. "src/devices/bus/neogeo/sma_prot.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/sma_prot.h",
-		MAME_DIR .. "src/devices/bus/neogeo/sma_cart.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/sma_cart.h",
-		MAME_DIR .. "src/devices/bus/neogeo/cmc_prot.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/cmc_prot.h",
-		MAME_DIR .. "src/devices/bus/neogeo/cmc_cart.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/cmc_cart.h",
-		MAME_DIR .. "src/devices/bus/neogeo/pcm2_prot.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/pcm2_prot.h",
-		MAME_DIR .. "src/devices/bus/neogeo/pcm2_cart.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/pcm2_cart.h",
-		MAME_DIR .. "src/devices/bus/neogeo/kof2002_prot.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/kof2002_prot.h",
-		MAME_DIR .. "src/devices/bus/neogeo/kof2002_cart.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/kof2002_cart.h",
-		MAME_DIR .. "src/devices/bus/neogeo/pvc_prot.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/pvc_prot.h",
-		MAME_DIR .. "src/devices/bus/neogeo/pvc_cart.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/pvc_cart.h",
-		MAME_DIR .. "src/devices/bus/neogeo/fatfury2_prot.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/fatfury2_prot.h",
-		MAME_DIR .. "src/devices/bus/neogeo/fatfury2_cart.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/fatfury2_cart.h",
-		MAME_DIR .. "src/devices/bus/neogeo/kof98_prot.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/kof98_prot.h",
-		MAME_DIR .. "src/devices/bus/neogeo/kof98_cart.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/kof98_cart.h",
-		MAME_DIR .. "src/devices/bus/neogeo/bootleg_prot.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/bootleg_prot.h",
-		MAME_DIR .. "src/devices/bus/neogeo/bootleg_cart.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/bootleg_cart.h",
-		MAME_DIR .. "src/devices/bus/neogeo/bootleg_hybrid_cart.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/bootleg_hybrid_cart.h",
-		MAME_DIR .. "src/devices/bus/neogeo/sbp_prot.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/sbp_prot.h",
-		MAME_DIR .. "src/devices/bus/neogeo/kog_prot.cpp",
-		MAME_DIR .. "src/devices/bus/neogeo/kog_prot.h",
+		MAME_DIR .. "src/devices/bus/neogeo/slot.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/slot.h",
+		MAME_DIR .. "src/devices/bus/neogeo/carts.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/carts.h",
 		MAME_DIR .. "src/devices/bus/neogeo/rom.cpp",
 		MAME_DIR .. "src/devices/bus/neogeo/rom.h",
+		MAME_DIR .. "src/devices/bus/neogeo/fatfury2.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/fatfury2.h",
+		MAME_DIR .. "src/devices/bus/neogeo/kof98.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/kof98.h",
+		MAME_DIR .. "src/devices/bus/neogeo/mslugx.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/mslugx.h",
+		MAME_DIR .. "src/devices/bus/neogeo/cmc.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/cmc.h",
+		MAME_DIR .. "src/devices/bus/neogeo/sma.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/sma.h",
+		MAME_DIR .. "src/devices/bus/neogeo/pcm2.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/pcm2.h",
+		MAME_DIR .. "src/devices/bus/neogeo/kof2k2.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/kof2k2.h",
+		MAME_DIR .. "src/devices/bus/neogeo/pvc.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/pvc.h",
+		MAME_DIR .. "src/devices/bus/neogeo/boot_cthd.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/boot_cthd.h",
+		MAME_DIR .. "src/devices/bus/neogeo/boot_misc.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/boot_misc.h",
+		MAME_DIR .. "src/devices/bus/neogeo/boot_svc.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/boot_svc.h",
+		MAME_DIR .. "src/devices/bus/neogeo/boot_kof2k2.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/boot_kof2k2.h",
+		MAME_DIR .. "src/devices/bus/neogeo/boot_kof2k3.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/boot_kof2k3.h",
+		MAME_DIR .. "src/devices/bus/neogeo/sbp.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/sbp.h",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_fatfury2.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_fatfury2.h",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_kof98.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_kof98.h",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_mslugx.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_mslugx.h",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_cmc.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_cmc.h",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_sma.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_sma.h",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_pcm2.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_pcm2.h",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_kof2k2.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_kof2k2.h",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_pvc.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_pvc.h",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_cthd.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_cthd.h",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_kof2k3bl.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_kof2k3bl.h",
+		MAME_DIR .. "src/devices/bus/neogeo/boot_kof10th.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/boot_kof10th.h",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_misc.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/prot_misc.h",
 	}
 end
 
@@ -2082,6 +2087,10 @@ end
 ---------------------------------------------------
 --
 --@src/devices/bus/ti99x/990_dk.h,BUSES["TI99X"] = true
+--@src/devices/bus/ti99x/990_tap.h,BUSES["TI99X"] = true
+--@src/devices/bus/ti99x/990_hd.h,BUSES["TI99X"] = true
+--@src/devices/bus/ti99x/genboard.h,BUSES["TI99X"] = true
+--@src/devices/bus/ti99x/joyport.h,BUSES["TI99X"] = true
 ---------------------------------------------------
 
 if (BUSES["TI99X"]~=null) then
@@ -2352,7 +2361,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/compucolor/compclr_flp.h,BUSES["COMPUCOLOR"] = true
+--@src/devices/bus/compucolor/floppy.h,BUSES["COMPUCOLOR"] = true
 ---------------------------------------------------
 if (BUSES["COMPUCOLOR"]~=null) then
 	files {
@@ -2596,7 +2605,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/cgenie/expansion.h,BUSES["CGENIE_EXPANSION"] = true
+--@src/devices/bus/cgenie/expansion/expansion.h,BUSES["CGENIE_EXPANSION"] = true
 ---------------------------------------------------
 
 if (BUSES["CGENIE_EXPANSION"]~=null) then
@@ -2612,7 +2621,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/cgenie/parallel.h,BUSES["CGENIE_PARALLEL"] = true
+--@src/devices/bus/cgenie/parallel/parallel.h,BUSES["CGENIE_PARALLEL"] = true
 ---------------------------------------------------
 
 if (BUSES["CGENIE_PARALLEL"]~=null) then
@@ -2701,4 +2710,15 @@ if (BUSES["SVI_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv807.cpp",
 		MAME_DIR .. "src/devices/bus/svi3x8/slot/sv807.h",
 	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/hp_optroms/hp_optrom.h,BUSES["HP_OPTROM"] = true
+---------------------------------------------------
+
+if (BUSES["HP_OPTROM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp_optroms/hp_optrom.cpp",
+        }
 end

@@ -945,10 +945,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, // read A
-	DEVCB_NULL, // read B
-	DEVCB_NULL, // write A
-	DEVCB_NULL  // write B
+	DEVCB_NOOP, // read A
+	DEVCB_NOOP, // read B
+	DEVCB_NOOP, // write A
+	DEVCB_NOOP  // write B
 };
 #endif
 

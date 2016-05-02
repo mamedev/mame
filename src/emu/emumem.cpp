@@ -1050,7 +1050,7 @@ public:
 		accessors.write_qword_masked = reinterpret_cast<void (*)(address_space &, offs_t, UINT64, UINT64)>(&write_qword_masked_static);
 	}
 
-	// return a pointer to the read bank, or NULL if none
+	// return a pointer to the read bank, or nullptr if none
 	virtual void *get_read_ptr(offs_t byteaddress) override
 	{
 		// perform the lookup
@@ -1064,7 +1064,7 @@ public:
 		return handler.ramptr(handler.byteoffset(byteaddress));
 	}
 
-	// return a pointer to the write bank, or NULL if none
+	// return a pointer to the write bank, or nullptr if none
 	virtual void *get_write_ptr(offs_t byteaddress) override
 	{
 		// perform the lookup
@@ -4005,9 +4005,9 @@ void memory_bank::invalidate_references()
 
 void memory_bank::set_base(void *base)
 {
-	// NULL is not an option
+	// nullptr is not an option
 	if (base == nullptr)
-		throw emu_fatalerror("memory_bank::set_base called NULL base");
+		throw emu_fatalerror("memory_bank::set_base called nullptr base");
 
 	// set the base and invalidate any referencing spaces
 	*m_baseptr = reinterpret_cast<UINT8 *>(base);

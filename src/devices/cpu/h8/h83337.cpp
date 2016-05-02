@@ -26,8 +26,11 @@ h83337_device::h83337_device(const machine_config &mconfig, device_type type, co
 	timer16(*this, "timer16"),
 	timer16_0(*this, "timer16:0"),
 	sci0(*this, "sci0"),
-	sci1(*this, "sci1"), syscr(0), ram_start(0)
+	sci1(*this, "sci1"),
+	watchdog(*this, "watchdog")
 {
+	syscr = 0;
+	ram_start = 0;
 }
 
 h83337_device::h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -48,8 +51,10 @@ h83337_device::h83337_device(const machine_config &mconfig, const char *tag, dev
 	timer16(*this, "timer16"),
 	timer16_0(*this, "timer16:0"),
 	sci0(*this, "sci0"),
-	sci1(*this, "sci1"), syscr(0)
+	sci1(*this, "sci1"),
+	watchdog(*this, "watchdog")
 {
+	syscr = 0;
 	ram_start = 0xf780;
 }
 
@@ -83,6 +88,7 @@ static MACHINE_CONFIG_FRAGMENT(h83337)
 	MCFG_H8_TIMER16_CHANNEL_ADD("timer16:0", 4, 0, "intc", 32)
 	MCFG_H8_SCI_ADD("sci0", "intc", 27, 28, 29, 30)
 	MCFG_H8_SCI_ADD("sci1", "intc", 31, 32, 33, 34)
+	MCFG_H8_WATCHDOG_ADD("watchdog", "intc", 36, h8_watchdog_device::B)
 MACHINE_CONFIG_END
 
 DEVICE_ADDRESS_MAP_START(map, 16, h83337_device)
@@ -102,6 +108,7 @@ DEVICE_ADDRESS_MAP_START(map, 16, h83337_device)
 //  AM_RANGE(0xff96, 0xff97) AM_DEVREADWRITE8("timer16:0", h8_timer16_channel_device, tocr_r,  tocr_w,  0x00ff)
 	AM_RANGE(0xff98, 0xff9f) AM_DEVREAD(      "timer16:0", h8_timer16_channel_device, tgr_r                   )
 
+	AM_RANGE(0xffa8, 0xffa9) AM_DEVREADWRITE( "watchdog",  h8_watchdog_device,        wd_r,    wd_w           )
 	AM_RANGE(0xffac, 0xffad) AM_DEVREADWRITE8("port1",     h8_port_device,            pcr_r,   pcr_w,   0xff00)
 	AM_RANGE(0xffac, 0xffad) AM_DEVREADWRITE8("port2",     h8_port_device,            pcr_r,   pcr_w,   0x00ff)
 	AM_RANGE(0xffae, 0xffaf) AM_DEVREADWRITE8("port3",     h8_port_device,            pcr_r,   pcr_w,   0xff00)
@@ -188,6 +195,7 @@ void h83337_device::internal_update(UINT64 current_time)
 	add_event(event_time, timer8_0->internal_update(current_time));
 	add_event(event_time, timer8_1->internal_update(current_time));
 	add_event(event_time, timer16_0->internal_update(current_time));
+	add_event(event_time, watchdog->internal_update(current_time));
 
 	recompute_bcount(event_time);
 }
@@ -211,7 +219,7 @@ READ8_MEMBER(h83337_device::syscr_r)
 WRITE8_MEMBER(h83337_device::syscr_w)
 {
 	syscr = data;
-	logerror("%s: syscr = %02x\n", tag(), data);
+	logerror("syscr = %02x\n", data);
 }
 
 READ8_MEMBER(h83337_device::wscr_r)
@@ -221,7 +229,7 @@ READ8_MEMBER(h83337_device::wscr_r)
 
 WRITE8_MEMBER(h83337_device::wscr_w)
 {
-	logerror("%s: wscr = %02x\n", tag(), data);
+	logerror("wscr = %02x\n", data);
 }
 
 READ8_MEMBER(h83337_device::stcr_r)
@@ -231,7 +239,7 @@ READ8_MEMBER(h83337_device::stcr_r)
 
 WRITE8_MEMBER(h83337_device::stcr_w)
 {
-	logerror("%s: stcr = %02x\n", tag(), data);
+	logerror("stcr = %02x\n", data);
 	timer8_0->set_extra_clock_bit(data & 0x01);
 	timer8_1->set_extra_clock_bit(data & 0x02);
 }
@@ -243,5 +251,5 @@ READ8_MEMBER(h83337_device::mdcr_r)
 
 WRITE8_MEMBER(h83337_device::mdcr_w)
 {
-	logerror("%s: mdcr = %02x\n", tag(), data);
+	logerror("mdcr = %02x\n", data);
 }

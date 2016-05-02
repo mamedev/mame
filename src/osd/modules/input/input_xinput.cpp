@@ -115,7 +115,7 @@ xinput_joystick_device::xinput_joystick_device(running_machine &machine, const c
 		gamepad({{0}}),
 		xinput_state({0}),
 		m_xinput_helper(helper),
-	    m_configured(false)
+		m_configured(false)
 {
 }
 

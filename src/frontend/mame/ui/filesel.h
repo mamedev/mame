@@ -18,7 +18,7 @@
 class ui_menu_confirm_save_as : public ui_menu
 {
 public:
-	ui_menu_confirm_save_as(running_machine &machine, render_container *container, bool *yes);
+	ui_menu_confirm_save_as(mame_ui_manager &mui, render_container *container, bool *yes);
 	virtual ~ui_menu_confirm_save_as();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -33,7 +33,7 @@ private:
 class ui_menu_file_create : public ui_menu
 {
 public:
-	ui_menu_file_create(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool *ok);
+	ui_menu_file_create(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool *ok);
 	virtual ~ui_menu_file_create();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -57,7 +57,7 @@ class ui_menu_file_selector : public ui_menu
 {
 public:
 	enum { R_EMPTY, R_SOFTLIST, R_CREATE, R_FILE };
-	ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, int *result);
+	ui_menu_file_selector(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, int *result);
 	virtual ~ui_menu_file_selector();
 	virtual void populate() override;
 	virtual void handle() override;
@@ -107,7 +107,7 @@ private:
 class ui_menu_select_format : public ui_menu
 {
 public:
-	ui_menu_select_format(running_machine &machine, render_container *container,
+	ui_menu_select_format(mame_ui_manager &mui, render_container *container,
 							class floppy_image_format_t **formats, int ext_match, int total_usable, int *result);
 	virtual ~ui_menu_select_format();
 	virtual void populate() override;
@@ -128,7 +128,7 @@ class ui_menu_select_rw : public ui_menu
 {
 public:
 	enum { READONLY, READWRITE, WRITE_OTHER, WRITE_DIFF };
-	ui_menu_select_rw(running_machine &machine, render_container *container,
+	ui_menu_select_rw(mame_ui_manager &mui, render_container *container,
 						bool can_in_place, int *result);
 	virtual ~ui_menu_select_rw();
 	virtual void populate() override;
@@ -139,10 +139,5 @@ private:
 	bool        m_can_in_place;
 	int *       m_result;
 };
-
-// helper
-void extra_text_render(render_container *container, float top, float bottom,
-	float origx1, float origy1, float origx2, float origy2,
-	const char *header, const char *footer);
 
 #endif /* __UI_FILESEL_H__ */

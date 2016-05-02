@@ -718,7 +718,7 @@ static ADDRESS_MAP_START( cpu_90009_portmap, AS_IO, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS("ssio")
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
@@ -745,7 +745,7 @@ static ADDRESS_MAP_START( cpu_90010_portmap, AS_IO, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS("ssio")
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
@@ -773,7 +773,7 @@ static ADDRESS_MAP_START( cpu_91490_portmap, AS_IO, 8, mcr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS("ssio")
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
@@ -941,7 +941,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dpoker )
 	PORT_START("ssio:IP0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, mcr_state, dpoker_coin_in_hit, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, mcr_state, dpoker_coin_in_hit, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) // see dpoker_ip0_r
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) // "
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) // "
@@ -1766,7 +1766,9 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
 
-	MCFG_WATCHDOG_VBLANK_INIT(16)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+
 	MCFG_MACHINE_START_OVERRIDE(mcr_state,mcr)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr_state,mcr)
 	MCFG_NVRAM_ADD_1FILL("nvram")

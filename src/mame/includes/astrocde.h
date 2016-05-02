@@ -204,10 +204,3 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-/*----------- defined in audio/wow.c -----------*/
-
-extern const char *const wow_sample_names[];
-
-/*----------- defined in audio/gorf.c -----------*/
-
-extern const char *const gorf_sample_names[];

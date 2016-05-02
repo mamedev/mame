@@ -13,9 +13,9 @@
  * In this specific implementation, u is a unit vector specifying the row which
  * changed. Thus v contains the changed column.
  *
- * Than z = A⁻¹ u ,  w = transpose(A⁻¹) v , lambda = v z
+ * Than z = A^-1 u ,  w = transpose(A^-1) v , lambda = v z
  *
- * A⁻¹ <- 1.0 / (1.0 + lambda) * (z x w)
+ * A^-1 <- 1.0 / (1.0 + lambda) * (z x w)
  *
  * The approach is iterative and applied for each row changed.
  *
@@ -52,7 +52,8 @@ class matrix_solver_sm_t: public matrix_solver_t
 
 public:
 
-	matrix_solver_sm_t(const solver_parameters_t *params, const int size);
+	matrix_solver_sm_t(netlist_t &anetlist, const pstring &name,
+			const solver_parameters_t *params, const int size);
 
 	virtual ~matrix_solver_sm_t();
 
@@ -324,8 +325,9 @@ inline int matrix_solver_sm_t<m_N, _storage_N>::vsolve_non_dynamic(const bool ne
 }
 
 template <unsigned m_N, unsigned _storage_N>
-matrix_solver_sm_t<m_N, _storage_N>::matrix_solver_sm_t(const solver_parameters_t *params, const int size)
-: matrix_solver_t(NOSORT, params)
+matrix_solver_sm_t<m_N, _storage_N>::matrix_solver_sm_t(netlist_t &anetlist, const pstring &name,
+		const solver_parameters_t *params, const int size)
+: matrix_solver_t(anetlist, name, NOSORT, params)
 , m_dim(size)
 {
 #if (NL_USE_DYNAMIC_ALLOCATION)

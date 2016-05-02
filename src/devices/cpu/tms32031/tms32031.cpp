@@ -462,7 +462,7 @@ void tms3203x_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -846,4 +846,4 @@ void tms3203x_device::execute_run()
 //  CORE OPCODES
 //**************************************************************************
 
-#include "32031ops.inc"
+#include "32031ops.hxx"

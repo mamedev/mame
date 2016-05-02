@@ -85,7 +85,7 @@ private:
 	render_target *     m_target;
 
 	// Original display_mode
-	SDL_DM_Wrapper	 	*m_original_mode;
+	SDL_DM_Wrapper      *m_original_mode;
 
 	int                 m_extra_flags;
 

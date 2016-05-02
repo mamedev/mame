@@ -655,7 +655,7 @@ WRITE16_MEMBER(cischeat_state::scudhamm_vregs_w)
 		case 0x100/2+1 : CISCHEAT_VREG_SCROLL(2,y);     break;
 		case 0x100/2+2 : cischeat_set_vreg_flag(2,new_data);break;
 
-		case 0x208/2   : watchdog_reset_w(space,0,0);   break;
+		case 0x208/2   : m_watchdog->reset_w(space,0,0);   break;
 
 		default: SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
 	}

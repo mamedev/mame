@@ -516,7 +516,7 @@ int i386_device::translate_address(int pl, int type, UINT32 *address, UINT32 *er
 	}
 	*address = (entry & 0xfffff000) | (*address & 0xfff);
 #ifdef TEST_TLB
-	int test_ret = i386_translate_address(type | TRANSLATE_DEBUG_MASK, &test_addr, NULL);
+	int test_ret = i386_translate_address(type | TRANSLATE_DEBUG_MASK, &test_addr, nullptr);
 	if(!test_ret || (test_addr != *address))
 		logerror("TLB-PTE mismatch! %06X %06X %06x\n", *address, test_addr, m_pc);
 #endif

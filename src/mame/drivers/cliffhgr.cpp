@@ -82,6 +82,7 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 #include "video/tms9928a.h"
 #include "sound/discrete.h"
 #include "machine/nvram.h"
+#include "audio/cliffhgr.h"
 
 #define CLIFF_ENABLE_SND_1  NODE_01
 #define CLIFF_ENABLE_SND_2  NODE_02
@@ -670,17 +671,6 @@ static INPUT_PORTS_START( goaltogo )
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT ( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
-
-
-
-/*************************************
- *
- *  Video/sound interfaces
- *
- *************************************/
-
-DISCRETE_SOUND_EXTERN( cliffhgr );
-
 
 
 /*************************************

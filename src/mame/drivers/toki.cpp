@@ -95,6 +95,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
@@ -166,7 +167,7 @@ static ADDRESS_MAP_START( tokib_map, AS_PROGRAM, 16, toki_state )
 				/* gets written the same value as 75000a (bg2 scrollx) */
 	AM_RANGE(0x071804, 0x071807) AM_WRITENOP    /* sprite related, always 01be0100 */
 	AM_RANGE(0x07180e, 0x071e45) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x072000, 0x072001) AM_READ(watchdog_reset16_r)   /* probably */
+	AM_RANGE(0x072000, 0x072001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)   /* probably */
 	AM_RANGE(0x075000, 0x075001) AM_WRITE(tokib_soundcommand_w)
 	AM_RANGE(0x075004, 0x07500b) AM_WRITEONLY AM_SHARE("scrollram")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("DSW")
@@ -476,6 +477,8 @@ static MACHINE_CONFIG_START( tokib, toki_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* verified with PCB */
 	MCFG_CPU_PROGRAM_MAP(tokib_audio_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")

@@ -28,7 +28,7 @@ public:
 
 	// starts the profiler
 	virtual void start_profiler(std::uint32_t max_seconds, std::uint8_t stack_depth) = 0;
-	
+
 	// stops the currently active profiler
 	virtual void stop_profiler() = 0;
 

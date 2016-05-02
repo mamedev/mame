@@ -74,7 +74,7 @@ public:
 	state_entry *       m_next;                 // pointer to next entry
 	void *              m_data;                 // pointer to the memory to save/restore
 	std::string         m_name;                 // full name
-	device_t *          m_device;               // associated device, NULL if none
+	device_t *          m_device;               // associated device, nullptr if none
 	std::string         m_module;               // module name
 	std::string         m_tag;                  // tag name
 	int                 m_index;                // index

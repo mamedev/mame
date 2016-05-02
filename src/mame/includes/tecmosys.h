@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 
 class tecmosys_state : public driver_device
 {
@@ -15,6 +16,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_eeprom(*this, "eeprom"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -36,6 +38,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

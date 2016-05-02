@@ -52,8 +52,8 @@ public:
 	}
 
 	/*-----------------------------------------------------------------------------
-	    wait: 	wait for an event to be signalled
-	        	If the event is in signalled state, the
+	    wait:   wait for an event to be signalled
+	            If the event is in signalled state, the
 	            function returns immediately. If not it will wait for the event
 	            to become signalled.
 

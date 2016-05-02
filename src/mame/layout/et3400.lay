@@ -15,25 +15,28 @@
 	<view name="Default Layout">
 		<!-- Black background -->
 		<bezel element="background">
-			<bounds left="97" top="95" right="405" bottom="195" />
+			<bounds left="0" top="230" right="308" bottom="325" />
 		</bezel>
+		<screen index="0">
+			<bounds x="2" y="0" width="304" height="230" />
+		</screen>
 		<bezel name="digit6" element="digit">
-			<bounds left="107" top="105" right="155" bottom="185" />
+			<bounds x="10" y="240" width="48" height="80" />
 		</bezel>
 		<bezel name="digit5" element="digit">
-			<bounds left="155" top="105" right="203" bottom="185" />
+			<bounds x="58" y="240" width="48" height="80" />
 		</bezel>
 		<bezel name="digit4" element="digit">
-			<bounds left="203" top="105" right="251" bottom="185" />
+			<bounds x="106" y="240" width="48" height="80" />
 		</bezel>
 		<bezel name="digit3" element="digit">
-			<bounds left="251" top="105" right="299" bottom="185" />
+			<bounds x="154" y="240" width="48" height="80" />
 		</bezel>
 		<bezel name="digit2" element="digit">
-			<bounds left="299" top="105" right="347" bottom="185" />
+			<bounds x="202" y="240" width="48" height="80" />
 		</bezel>
 		<bezel name="digit1" element="digit">
-			<bounds left="347" top="105" right="395" bottom="185" />
+			<bounds x="250" y="240" width="48" height="80" />
 		</bezel>
 	</view>
 </mamelayout>

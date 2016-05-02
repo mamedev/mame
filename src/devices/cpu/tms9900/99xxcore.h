@@ -535,7 +535,7 @@ struct tms99xx_state
 
 static inline tms99xx_state *get_safe_token(device_t *device)
 {
-	assert(device != NULL);
+	assert(device != nullptr);
 //  assert(device->type() == TMS99XX_GET_INFO);
 	return (tms99xx_state *)downcast<legacy_cpu_device *>(device)->token();
 }
@@ -1798,18 +1798,18 @@ static CPU_INIT( tms99xx )
 	cpustate->timer = device->machine().scheduler().timer_alloc(FUNC(decrementer_callback), cpustate);
 #endif
 
-	cpustate->idle_callback = param ? param->idle_callback : NULL;
+	cpustate->idle_callback = param ? param->idle_callback : nullptr;
 	#if (TMS99XX_MODEL == TI990_10_ID)
-		cpustate->rset_callback = param ? param->rset_callback : NULL;
-		cpustate->lrex_callback = param ? param->lrex_callback : NULL;
-		cpustate->ckon_ckof_callback = param ? param->ckon_ckof_callback : NULL;
+		cpustate->rset_callback = param ? param->rset_callback : nullptr;
+		cpustate->lrex_callback = param ? param->lrex_callback : nullptr;
+		cpustate->ckon_ckof_callback = param ? param->ckon_ckof_callback : nullptr;
 
-		cpustate->error_interrupt_callback = param ? param->error_interrupt_callback : NULL;
+		cpustate->error_interrupt_callback = param ? param->error_interrupt_callback : nullptr;
 	#endif
 
 #if (TMS99XX_MODEL == TMS9995_ID)
 	/* we can ask at reset time that the CPU always generates one wait state automatically */
-	if (param == NULL)
+	if (param == nullptr)
 	{   /* if no param, the default is currently "wait state added" */
 		cpustate->memory_wait_states_byte = 4;
 		cpustate->memory_wait_states_word = 12;
@@ -5133,7 +5133,7 @@ static CPU_SET_INFO( tms99xx )
 
 void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 {
-	tms99xx_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
+	tms99xx_state *cpustate = (device != nullptr && device->token() != nullptr) ? get_safe_token(device) : nullptr;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -5261,7 +5261,7 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(tms99xx);          break;
 		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(tms99xx);                break;
 		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(tms99xx);      break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
+		case CPUINFO_FCT_BURN:                          info->burn = nullptr;                      break;
 		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(tms99xx);      break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;           break;
 

@@ -1,7 +1,398 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="fmtowns_cd" description="FM Towns CD-ROMs">
-<!-- skeleton test list -->
+<!-- 
+Preliminary list for FM Towns CDs.
+
+Most images come from the Neo Kobe Collection, dated 2016-02-25. 
+
+Software with a CUE file was converted directly with CHDMAN. The rest were
+converted to CUE+BIN with IsoBuster+EAC (preserving the pregaps if present)
+and then converted to CHD with CHDMAN.
+
+Floppy disks are included for software that actually requires them to boot.
+User/save disks that can be created from the game itself are not included.
+-->
+
+	<software name="3x3eyes">
+		<description>3x3 Eyes: Sanjiyan Henjou</description>
+		<year>1993</year>
+		<publisher>Nihon Create</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="3x3 Eyes - Sanjiyan Henjou" sha1="243e61ee754eb6c7efc55a692cc89b0dd31d944c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="4dboxing">
+		<description>4D Boxing</description>
+		<year>1992</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="4D Boxing" sha1="0691df337359f39a820e8953c85d56c807fabaa9" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Converted from MDS/MDF -->
+	<software name="4ddriv">
+		<description>4D Driving</description>
+		<year>1993</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="4D Driving" sha1="b09e774be4ee926dc32efd2e3b28dd72bc223c76" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="4dtennis">
+		<description>4D Tennis</description>
+		<year>1993</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="4D Tennis" sha1="5ee1a3342469e87bc0f1d613982a92bc8ab5c5bb" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="38mank">
+		<description>38-man Kilo no Kokuu</description>
+		<year>1989</year>
+		<publisher>System Sacom</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="38-man Kilo no Kokuu (Utility disk).hdm" size="1261568" crc="43a7b57f" sha1="1477b8a9297d91a069132d74ec9ed1b67828c2fd" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="38-man Kilo no Kokuu" sha1="8b3aed4b095183e3b9a0ee88e7dfd34d1c44e7d7" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="atrain3">
+		<description>A Ressha de Ikou III</description>
+		<year>1991</year>
+		<publisher>Artdink</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="A Ressha de Ikou III" sha1="095710f80f004917dce963719cb1c4bae4d5fc49" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="atrain4">
+		<description>A Ressha de Ikou IV</description>
+		<year>1992</year>
+		<publisher>Artdink</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="A Ressha de Ikou IV (System disk).hdm" size="1261568" crc="469ff718" sha1="f9667e06ae1948350bee029e98903216d1cda98f" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="A Ressha de Ikou IV" sha1="c032ef409acb0f3ff797c4446f4dfb97ddffad27" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="abel">
+		<description>Abel: Shin Mokushiroku Taisen</description>
+		<year>1995</year>
+		<publisher>Family Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Abel" sha1="5fb92a84f3d1e7530b6dce9060f9814ec2fa6d2b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="adtennis">
+		<description>Advantage Tennis</description>
+		<year>1992</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Advantage Tennis" sha1="4210307af2238e8b0bc546b36f13f2fe651464cd" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="aeternam">
+		<description>Aeternam</description>
+		<year>1992</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Aeternam" sha1="e5c5955e303d9fbc9f1e7b3bb4d601aeace34765" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="aburner">
+		<description>After Burner</description>
+		<year>1989</year>
+		<publisher>CRI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="After Burner" sha1="e1c6cc2df19b89ca1dab88358337d97ece90dd58" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="aburner3">
+		<description>After Burner III</description>
+		<year>1992</year>
+		<publisher>CRI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="After Burner III" sha1="70b10643e32f4d4a254a0c8f29e3224c2f810c1d" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="aircmb2s">
+		<description>Air Combat II Special</description>
+		<year>1993</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Air Combat II Special" sha1="8a8b49b7ca086084fe3c1ff23e6ee95e69559cf3" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="alice1">
+		<description>Alice no Yakata CD</description>
+		<year>1992</year>
+		<publisher>Alice Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alice no Yakata CD" sha1="03ee698cd4801d8e297eb6eade6aae7c87b7f2e8" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="alice2">
+		<description>Alice no Yakata II</description>
+		<year>1992</year>
+		<publisher>Alice Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alice no Yakata CD 2" sha1="d375cc44c0e421834f6ec3b2da3568eec7d28192" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- probably a bad dump -->
+	<software name="alice3">
+		<description>Alice no Yakata III</description>
+		<year>1995</year>
+		<publisher>Alice Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alice no Yakata III" sha1="03ee698cd4801d8e297eb6eade6aae7c87b7f2e8" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="aitd">
+		<description>Alone in the Dark</description>
+		<year>1993</year>
+		<publisher>Arrow Micro-Techs</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alone in the Dark" sha1="7cd07179e94161d59e0f426b71d87a72aeeae581" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="aitd2">
+		<description>Alone in the Dark 2</description>
+		<year>1994</year>
+		<publisher>Arrow Micro-Techs</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alone in the Dark 2" sha1="6ac20d5879eaa4e4e65b0bc2377306e27ecc37a1" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="alshark">
+		<description>Alshark</description>
+		<year>1993</year>
+		<publisher>Right Stuff</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alshark" sha1="ecbdc6dead64d45836037a341bfd49332c7f8e29" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="amarant3">
+		<description>Amaranth III</description>
+		<year>1994</year>
+		<publisher>Fuga System</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amaranth 3" sha1="9c83fcd4623dd62dcfc7c683c82836704f8665a7" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="ambival">
+		<description>Ambivalenz</description>
+		<year>1994</year>
+		<publisher>Alice Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="Ambivalenz (Boot disk).hdm" size="1261568" crc="7f3d6d6e" sha1="61c23afc9dc3b3ceaf2c28d6ab571d9bc83720fa" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ambivalenz" sha1="ccb8f8fafb4d321023d11f78d57f7cd9cf9b772a" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="aouq">
+		<description>America Oudan Ultra Quiz</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="America Oudan Ultra Quiz" sha1="08cdcfb5ba9d421da422852be6d29f4544a99e9b" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="angel">
+		<description>Angel</description>
+		<year>1993</year>
+		<publisher>Cocktail Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Angel" sha1="e8da3eae3b949459751fd027579aee52b167dc2f" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="anghalo">
+		<description>Angel Halo</description>
+		<year>1996</year>
+		<publisher>Active</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Angel Halo" sha1="9d79b87bdfa4a3c3308c15a7e7c2927686f79c68" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="aokiooka">
+		<description>Aoki Ookami to Shiroki Mejika: Genchou Hishi</description>
+		<year>1993</year>
+		<publisher>Koei</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Aoki Ookami to Shiroki Mejika - Genchou Hishi" sha1="45b8790a77cb77632f067f366cc055e830eddae8" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="arabesq">
+		<description>Arabesque</description>
+		<year>1994</year>
+		<publisher>Fairytale</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Arabesque" sha1="5869c0c1d2eee0f551722a7d08d7feef6be53868" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="aska">
+		<description>Aska Towns</description>
+		<year>1989</year>
+		<publisher>Algo Software</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Aska Towns" sha1="027d5a8920980d5eccff93df192148b9acf51309" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="asukabfe">
+		<description>Asuka 120% Burning Fest. Excellent</description>
+		<year>1994</year>
+		<publisher>Family Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="Asuka 120% Burning Fest. Excellent (Boot disk).hdm" size="1261568" crc="12c7d6e2" sha1="0eb696be9666300d76863ae08882485eb69725d4" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Asuka 120% Burning Fest. Excellent" sha1="a93c4f091a1d74deaf556fb27c2800cd97cd52cf" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="awesome">
+		<description>Awesome</description>
+		<year>1992</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Awesome" sha1="f758d24ebb1e94dfe1499b1af38c32fd1b9de8ff" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="ayumi">
+		<description>Ayumi-chan Monogatari</description>
+		<year>1993</year>
+		<publisher>Alice Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="Ayumi-chan Monogatari.hdm" size="1261568" crc="9bf209ba" sha1="cc2be00834492b0ccf5b25a1b0a5ceb810a2e330" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ayumi-chan Monogatari" sha1="b4adc7cb1f2f74f8beea76afb930d053addea67e" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="ayumijb">
+		<description>Ayumi-chan Monogatari Jissha-ban</description>
+		<year>1995</year>
+		<publisher>Core Magazine</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ayumi-chan Monogatari Jissha-ban" sha1="5a78396c9acb9c593710e0ce9aad520147b3759d" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="azure">
+		<description>Azure</description>
+		<year>1993</year>
+		<publisher>Family Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Azure" sha1="cc85c3223336a3f237ff2e5030fefae78e6d0d01" />
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- works well on fmtmarty, keyboard seems to interfere with movements on fmtowns -->
 	<software name="raiden">

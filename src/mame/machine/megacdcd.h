@@ -123,15 +123,15 @@ typedef device_delegate<void (void)> interrupt_delegate;
 
 
 #define MCFG_SEGACD_HACK_SET_CDC_DO_DMA( _class, _method) \
-	lc89510_temp_device::set_CDC_Do_DMA(*device, segacd_dma_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	lc89510_temp_device::set_CDC_Do_DMA(*device, segacd_dma_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 #define MCFG_SEGACD_HACK_SET_NEOCD \
 	lc89510_temp_device::set_is_neoCD(*device, true);
 #define MCFG_SET_TYPE1_INTERRUPT_CALLBACK( _class, _method) \
-	lc89510_temp_device::set_type1_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	lc89510_temp_device::set_type1_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 #define MCFG_SET_TYPE2_INTERRUPT_CALLBACK( _class, _method) \
-	lc89510_temp_device::set_type2_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	lc89510_temp_device::set_type2_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 #define MCFG_SET_TYPE3_INTERRUPT_CALLBACK( _class, _method) \
-	lc89510_temp_device::set_type3_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	lc89510_temp_device::set_type3_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 /* neocd */
 
 #define CD_FRAMES_MINUTE (60 * 75)

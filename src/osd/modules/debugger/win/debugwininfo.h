@@ -41,9 +41,9 @@ public:
 		}
 	}
 
-	void show() { smart_show_window(m_wnd, true); }
-	void hide() { smart_show_window(m_wnd, false); }
-	void set_foreground() { SetForegroundWindow(m_wnd); }
+	void show() const { smart_show_window(m_wnd, true); }
+	void hide() const { smart_show_window(m_wnd, false); }
+	void set_foreground() const { SetForegroundWindow(m_wnd); }
 	void destroy();
 
 	virtual bool set_default_focus();

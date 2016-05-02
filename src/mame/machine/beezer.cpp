@@ -131,7 +131,7 @@ WRITE8_MEMBER(beezer_state::beezer_bankswitch_w)
 	if ((data & 0x07) == 0)
 	{
 		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-		space.install_write_handler(0xc600, 0xc7ff, write8_delegate(FUNC(beezer_state::watchdog_reset_w),this));
+		space.install_write_handler(0xc600, 0xc7ff, write8_delegate(FUNC(watchdog_timer_device::reset_w),&*m_watchdog));
 		space.install_write_handler(0xc800, 0xc9ff, write8_delegate(FUNC(beezer_state::beezer_map_w),this));
 		space.install_read_handler(0xca00, 0xcbff, read8_delegate(FUNC(beezer_state::beezer_line_r),this));
 		space.install_readwrite_handler(0xce00, 0xcfff, read8_delegate(FUNC(via6522_device::read), via_0), write8_delegate(FUNC(via6522_device::write), via_0));

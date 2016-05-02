@@ -68,7 +68,7 @@ NETLIB_SUBDEVICE(7474sub,
 
 NETLIB_DEVICE(7474,
 public:
-	NETLIB_NAME(7474sub) sub;
+	NETLIB_SUB(7474sub) sub;
 
 	logic_input_t m_D;
 	logic_input_t m_CLRQ;
@@ -77,8 +77,8 @@ public:
 
 NETLIB_DEVICE(7474_dip,
 
-	NETLIB_NAME(7474) m_1;
-	NETLIB_NAME(7474) m_2;
+	NETLIB_SUB(7474) m_1;
+	NETLIB_SUB(7474) m_2;
 );
 
 NETLIB_NAMESPACE_DEVICES_END()

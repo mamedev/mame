@@ -89,7 +89,7 @@ bitmap_rgb32* ::x68k_get_gfx_page(int pri,int type)
     if(type == GFX65536)
         return x68k_gfx_0_bitmap_65536;
 
-    return NULL;  // should never reach here either.
+    return nullptr;  // should never reach here either.
 }
 */
 void x68k_state::x68k_crtc_text_copy(int src, int dest, UINT8 planes)

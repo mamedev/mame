@@ -445,7 +445,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(speglsht_state,speglsht)
 {
-	m_maincpu->st0016_game=3;
+	m_maincpu->set_st0016_game_flag(3);
 }
 
 

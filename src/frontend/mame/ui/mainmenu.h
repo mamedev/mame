@@ -13,11 +13,9 @@
 #ifndef __UI_MAINMENU_H__
 #define __UI_MAINMENU_H__
 
-#include "drivenum.h"
-
 class ui_menu_main : public ui_menu {
 public:
-	ui_menu_main(running_machine &machine, render_container *container);
+	ui_menu_main(mame_ui_manager &mui, render_container *container);
 	virtual ~ui_menu_main();
 	virtual void populate() override;
 	virtual void handle() override;

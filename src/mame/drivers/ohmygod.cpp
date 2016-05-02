@@ -15,6 +15,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "includes/ohmygod.h"
 
@@ -56,7 +57,7 @@ static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16, ohmygod_state )
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW2")
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xc00000, 0xc00001) AM_READ(watchdog_reset16_r)
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(ohmygod_spritebank_w)
 ADDRESS_MAP_END
 
@@ -321,6 +322,7 @@ static MACHINE_CONFIG_START( ohmygod, ohmygod_state )
 	MCFG_CPU_PROGRAM_MAP(ohmygod_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ohmygod_state,  irq1_line_hold)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
 

@@ -108,4 +108,3 @@ UINT16 saturn_joy_device::read_direct()
 {
 	return m_joy->read();
 }
-

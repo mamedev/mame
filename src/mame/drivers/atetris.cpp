@@ -56,6 +56,7 @@
 #include "sound/sn76496.h"
 #include "sound/pokey.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 
 #define MASTER_CLOCK        XTAL_14_31818MHz
@@ -198,7 +199,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x2810, 0x281f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITE(nvram_enable_w)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE(coincount_w)
@@ -218,7 +219,7 @@ static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x2806, 0x2806) AM_DEVWRITE("sn3", sn76496_device, write)
 	AM_RANGE(0x2808, 0x2808) AM_READ_PORT("IN0")
 	AM_RANGE(0x2818, 0x2818) AM_READ_PORT("IN1")
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(nvram_enable_w)
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(coincount_w)
@@ -238,7 +239,7 @@ static ADDRESS_MAP_START( atetrisb3_map, AS_PROGRAM, 8, atetris_state )
 	//AM_RANGE(0x2806, 0x2806) AM_DEVWRITE("sn3", sn76489_device, write)
 	AM_RANGE(0x2808, 0x2808) AM_READ_PORT("IN0")
 	AM_RANGE(0x2818, 0x2818) AM_READ_PORT("IN1")
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(nvram_enable_w)
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(coincount_w)
@@ -334,6 +335,8 @@ static MACHINE_CONFIG_START( atetris, atetris_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atetris)
 
@@ -370,6 +373,8 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 	MCFG_SLAPSTIC_ADD("slapstic", 101)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atetris)

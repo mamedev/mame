@@ -352,6 +352,7 @@ namespace bgfx { namespace d3d12
 		_commandList->ResourceBarrier(1, &barrier);
 	}
 
+#if USE_D3D12_DYNAMIC_LIB
 	static const GUID IID_ID3D12CommandAllocator    = { 0x6102dee4, 0xaf59, 0x4b09, { 0xb9, 0x99, 0xb4, 0x4d, 0x73, 0xf0, 0x9b, 0x24 } };
 	static const GUID IID_ID3D12CommandQueue        = { 0x0ec870a6, 0x5d7e, 0x4c22, { 0x8c, 0xfc, 0x5b, 0xaa, 0xe0, 0x76, 0x16, 0xed } };
 	static const GUID IID_ID3D12CommandSignature    = { 0xc36a797c, 0xec80, 0x4f0a, { 0x89, 0x85, 0xa7, 0xb2, 0x47, 0x50, 0x82, 0xd1 } };
@@ -366,6 +367,7 @@ namespace bgfx { namespace d3d12
 	static const GUID IID_ID3D12RootSignature       = { 0xc54a6b66, 0x72df, 0x4ee8, { 0x8b, 0xe5, 0xa9, 0x46, 0xa1, 0x42, 0x92, 0x14 } };
 	static const GUID IID_ID3D12QueryHeap           = { 0x0d9658ae, 0xed45, 0x469e, { 0xa6, 0x1d, 0x97, 0x0e, 0xc5, 0x83, 0xca, 0xb4 } };
 	static const GUID IID_IDXGIFactory4             = { 0x1bc6ea02, 0xef36, 0x464f, { 0xbf, 0x0c, 0x21, 0xca, 0x39, 0xe5, 0x16, 0x8a } };
+#endif // USE_D3D12_DYNAMIC_LIB
 
 	struct HeapProperty
 	{
@@ -578,6 +580,7 @@ namespace bgfx { namespace d3d12
 			m_adapter = NULL;
 			m_driverType = D3D_DRIVER_TYPE_HARDWARE;
 
+			if (NULL != m_factory)
 			{
 #if BX_PLATFORM_WINDOWS
 				IDXGIAdapter3* adapter;
@@ -674,6 +677,7 @@ namespace bgfx { namespace d3d12
 				goto error;
 			}
 
+			if (NULL != m_factory)
 			{
 				memset(&m_adapterDesc, 0, sizeof(m_adapterDesc) );
 				luid = m_device->GetAdapterLuid();
@@ -726,6 +730,36 @@ namespace bgfx { namespace d3d12
 				}
 			}
 
+#if !BX_PLATFORM_WINDOWS
+			if (NULL == m_factory)
+			{
+				IDXGIDevice1* dxgiDevice;
+				hr = m_device->QueryInterface(IID_IDXGIDevice1, (void**)&dxgiDevice);
+
+				if (FAILED(hr) )
+				{
+					BX_TRACE("Unable to query IDXGIDevice1 interface 0x%08x.", hr);
+					goto error;
+				}
+
+				hr = dxgiDevice->GetAdapter(&m_adapter);
+
+				if (FAILED(hr) )
+				{
+					BX_TRACE("DXGIDevice1::GetAdapter failed 0x%08x.", hr);
+					goto error;
+				}
+
+				hr = m_adapter->GetParent(IID_IDXGIFactory2, (void**)&m_factory);
+
+				if (FAILED(hr) )
+				{
+					BX_TRACE("IDXGIAdapter::GetParent failed 0x%08x.", hr);
+					goto error;
+				}
+			}
+#endif // !BX_PLATFORM_WINDOWS
+
 			DX_CHECK(m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &m_options, sizeof(m_options) ) );
 			BX_TRACE("D3D12 options:")
 			BX_TRACE("\tTiledResourcesTier %d", m_options.TiledResourcesTier);
@@ -738,34 +772,96 @@ namespace bgfx { namespace d3d12
 			m_cmd.init(m_device);
 			errorState = ErrorState::CreatedCommandQueue;
 
-			m_scd.BufferDesc.Width  = BGFX_DEFAULT_WIDTH;
-			m_scd.BufferDesc.Height = BGFX_DEFAULT_HEIGHT;
-			m_scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			m_scd.BufferDesc.Scaling                 = DXGI_MODE_SCALING_STRETCHED;
-			m_scd.BufferDesc.ScanlineOrdering        = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-			m_scd.BufferDesc.RefreshRate.Numerator   = 60;
-			m_scd.BufferDesc.RefreshRate.Denominator = 1;
-			m_scd.SampleDesc.Count   = 1;
-			m_scd.SampleDesc.Quality = 0;
-			m_scd.BufferUsage  = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-			m_scd.BufferCount  = bx::uint32_min(BX_COUNTOF(m_backBufferColor), 4);
-			m_scd.OutputWindow = (HWND)g_platformData.nwh;
-			m_scd.Windowed     = true;
-			m_scd.SwapEffect   = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-			m_scd.Flags        = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-
-			BX_CHECK(m_scd.BufferCount <= BX_COUNTOF(m_backBufferColor), "Swap chain buffer count %d (max %d)."
-					, m_scd.BufferCount
-					, BX_COUNTOF(m_backBufferColor)
-					);
-			hr = m_factory->CreateSwapChain(m_cmd.m_commandQueue
-					, &m_scd
-					, reinterpret_cast<IDXGISwapChain**>(&m_swapChain)
-					);
-			BX_WARN(SUCCEEDED(hr), "Failed to create swap chain.");
-			if (FAILED(hr) )
+			if (NULL == g_platformData.backBuffer)
 			{
-				goto error;
+#if !BX_PLATFORM_WINDOWS
+				hr = m_adapter->GetParent(__uuidof(IDXGIFactory2), (void**)&m_factory);
+				DX_RELEASE(m_adapter, 1);
+				if (FAILED(hr) )
+				{
+					BX_TRACE("Unable to create Direct3D11 device.");
+					goto error;
+				}
+
+				m_scd.Width  = BGFX_DEFAULT_WIDTH;
+				m_scd.Height = BGFX_DEFAULT_HEIGHT;
+				m_scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				m_scd.Stereo  = false;
+				m_scd.SampleDesc.Count   = 1;
+				m_scd.SampleDesc.Quality = 0;
+				m_scd.BufferUsage  = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+				m_scd.BufferCount  = bx::uint32_min(BX_COUNTOF(m_backBufferColor), 4);
+				m_scd.Scaling      = DXGI_SCALING_STRETCH;
+				m_scd.SwapEffect   = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+				m_scd.Flags        = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+				if (NULL == g_platformData.ndt)
+				{
+					hr = m_factory->CreateSwapChainForCoreWindow(m_device
+						, (::IUnknown*)g_platformData.nwh
+						, &m_scd
+						, NULL
+						, &m_swapChain
+						);
+					BGFX_FATAL(SUCCEEDED(hr), Fatal::UnableToInitialize, "Unable to create Direct3D11 swap chain.");
+				}
+				else
+				{
+					BGFX_FATAL(g_platformData.ndt == reinterpret_cast<void*>(1), Fatal::UnableToInitialize, "Unable to set swap chain on panel.");
+
+					hr = m_factory->CreateSwapChainForComposition(m_device
+							, &m_scd
+							, NULL
+							, &m_swapChain
+							);
+					BX_WARN(SUCCEEDED(hr), "Unable to create Direct3D11 swap chain.");
+
+#	if BX_PLATFORM_WINRT
+					IInspectable* nativeWindow = reinterpret_cast<IInspectable *>(g_platformData.nwh);
+					ISwapChainBackgroundPanelNative* panel = NULL;
+					hr = nativeWindow->QueryInterface(__uuidof(ISwapChainBackgroundPanelNative), (void**)&panel);
+					BGFX_FATAL(SUCCEEDED(hr), Fatal::UnableToInitialize, "Unable to set swap chain on panel.");
+
+					if (NULL != panel)
+					{
+						hr = panel->SetSwapChain(m_swapChain);
+						BGFX_FATAL(SUCCEEDED(hr), Fatal::UnableToInitialize, "Unable to set swap chain on panel.");
+
+						panel->Release();
+					}
+#	endif // BX_PLATFORM_WINRT
+				}
+#else
+				m_scd.BufferDesc.Width  = BGFX_DEFAULT_WIDTH;
+				m_scd.BufferDesc.Height = BGFX_DEFAULT_HEIGHT;
+				m_scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				m_scd.BufferDesc.Scaling                 = DXGI_MODE_SCALING_STRETCHED;
+				m_scd.BufferDesc.ScanlineOrdering        = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+				m_scd.BufferDesc.RefreshRate.Numerator   = 60;
+				m_scd.BufferDesc.RefreshRate.Denominator = 1;
+				m_scd.SampleDesc.Count   = 1;
+				m_scd.SampleDesc.Quality = 0;
+				m_scd.BufferUsage  = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+				m_scd.BufferCount  = bx::uint32_min(BX_COUNTOF(m_backBufferColor), 4);
+				m_scd.OutputWindow = (HWND)g_platformData.nwh;
+				m_scd.Windowed     = true;
+				m_scd.SwapEffect   = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+				m_scd.Flags        = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+				BX_CHECK(m_scd.BufferCount <= BX_COUNTOF(m_backBufferColor), "Swap chain buffer count %d (max %d)."
+						, m_scd.BufferCount
+						, BX_COUNTOF(m_backBufferColor)
+						);
+				hr = m_factory->CreateSwapChain(m_cmd.m_commandQueue
+						, &m_scd
+						, reinterpret_cast<IDXGISwapChain**>(&m_swapChain)
+						);
+#endif // BX_PLATFORM_*
+				if (FAILED(hr) )
+				{
+					BX_TRACE("Failed to create swap chain.");
+					goto error;
+				}
 			}
 
 			m_presentElapsed = 0;
@@ -1537,8 +1633,8 @@ namespace bgfx { namespace d3d12
 
 		void blitSetup(TextVideoMemBlitter& _blitter) BX_OVERRIDE
 		{
-			const uint32_t width  = m_scd.BufferDesc.Width;
-			const uint32_t height = m_scd.BufferDesc.Height;
+			const uint32_t width  = getBufferWidth();
+			const uint32_t height = getBufferHeight();
 
 			FrameBufferHandle fbh = BGFX_INVALID_HANDLE;
 			setFrameBuffer(fbh, false);
@@ -1732,7 +1828,7 @@ namespace bgfx { namespace d3d12
 
 				D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS data;
 				memset(&data, 0, sizeof(msaa) );
-				data.Format = m_scd.BufferDesc.Format;
+				data.Format = getBufferFormat();
 				data.SampleCount = msaa;
 				data.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
 				HRESULT hr = m_device->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &data, sizeof(data) );
@@ -1793,8 +1889,7 @@ data.NumQualityLevels = 0;
 				m_textVideoMem.resize(false, _resolution.m_width, _resolution.m_height);
 				m_textVideoMem.clear();
 
-				m_scd.BufferDesc.Width  = _resolution.m_width;
-				m_scd.BufferDesc.Height = _resolution.m_height;
+				setBufferSize(_resolution.m_width, _resolution.m_height);
 
 				preReset();
 
@@ -1824,12 +1919,14 @@ data.NumQualityLevels = 0;
 
 					DX_RELEASE(m_swapChain, 0);
 
+#if BX_PLATFORM_WINDOWS
 					HRESULT hr;
 					hr = m_factory->CreateSwapChain(m_cmd.m_commandQueue
 							, &m_scd
 							, reinterpret_cast<IDXGISwapChain**>(&m_swapChain)
 							);
 					BGFX_FATAL(SUCCEEDED(hr), bgfx::Fatal::UnableToInitialize, "Failed to create swap chain.");
+#endif // BX_PLATFORM_WINDOWS
 				}
 
 				postReset();
@@ -2462,6 +2559,44 @@ data.NumQualityLevels = 0;
 			return _visible == (0 != _render->m_occlusion[_handle.idx]);
 		}
 
+		DXGI_FORMAT getBufferFormat()
+		{
+#if BX_PLATFORM_WINDOWS
+			return m_scd.BufferDesc.Format;
+#else
+			return m_scd.Format;
+#endif
+		}
+
+		uint32_t getBufferWidth()
+		{
+#if BX_PLATFORM_WINDOWS
+			return m_scd.BufferDesc.Width;
+#else
+			return m_scd.Width;
+#endif
+		}
+
+		uint32_t getBufferHeight()
+		{
+#if BX_PLATFORM_WINDOWS
+			return m_scd.BufferDesc.Height;
+#else
+			return m_scd.Height;
+#endif
+		}
+
+		void setBufferSize(uint32_t _width, uint32_t _height)
+		{
+#if BX_PLATFORM_WINDOWS
+			m_scd.BufferDesc.Width  = _width;
+			m_scd.BufferDesc.Height = _height;
+#else
+			m_scd.Width  = _width;
+			m_scd.Height = _height;
+#endif
+		}
+
 		void commit(UniformBuffer& _uniformBuffer)
 		{
 			_uniformBuffer.reset();
@@ -2614,8 +2749,8 @@ data.NumQualityLevels = 0;
 			}
 			else
 			{
-				width  = m_scd.BufferDesc.Width;
-				height = m_scd.BufferDesc.Height;
+				width  = getBufferWidth();
+				height = getBufferHeight();
 			}
 
 			if (0      == _rect.m_x
@@ -2711,7 +2846,11 @@ data.NumQualityLevels = 0;
 		Resolution m_resolution;
 		bool m_wireframe;
 
+#if BX_PLATFORM_WINDOWS
 		DXGI_SWAP_CHAIN_DESC m_scd;
+#else
+		DXGI_SWAP_CHAIN_DESC1 m_scd;
+#endif // BX_PLATFORM_WINDOWS
 		uint32_t m_maxAnisotropy;
 		bool m_depthClamp;
 
@@ -3539,7 +3678,7 @@ data.NumQualityLevels = 0;
 		DXGI_FORMAT format;
 		uint32_t    stride;
 
-		D3D12_RESOURCE_FLAGS flags = needUav
+		uint32_t flags = needUav
 			? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS
 			: D3D12_RESOURCE_FLAG_NONE
 			;
@@ -3602,7 +3741,7 @@ data.NumQualityLevels = 0;
 		ID3D12Device* device = s_renderD3D12->m_device;
 		ID3D12GraphicsCommandList* commandList = s_renderD3D12->m_commandList;
 
-		m_ptr   = createCommittedResource(device, HeapProperty::Default, _size, flags);
+		m_ptr   = createCommittedResource(device, HeapProperty::Default, _size, D3D12_RESOURCE_FLAGS(flags) );
 		m_gpuVA = m_ptr->GetGPUVirtualAddress();
 		setState(commandList, drawIndirect
 			? D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT

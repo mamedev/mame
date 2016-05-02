@@ -16,6 +16,7 @@
 #include "ui/filesel.h"
 #include "ui/swlist.h"
 #include "zippath.h"
+#include "drivenum.h"
 #include "audit.h"
 #include "softlist.h"
 
@@ -28,8 +29,8 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_control_device_image::ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *_image)
-	: ui_menu(machine, container),
+ui_menu_control_device_image::ui_menu_control_device_image(mame_ui_manager &mui, render_container *container, device_image_interface *_image)
+	: ui_menu(mui, container),
 		submenu_result(0),
 		create_ok(false),
 		create_confirmed(false)
@@ -37,7 +38,7 @@ ui_menu_control_device_image::ui_menu_control_device_image(running_machine &mach
 	image = _image;
 
 	if (image->software_list_name())
-		sld = software_list_device::find_by_name(machine.config(), image->software_list_name());
+		sld = software_list_device::find_by_name(mui.machine().config(), image->software_list_name());
 	else
 		sld = nullptr;
 	swi = image->software_entry();
@@ -109,16 +110,15 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 
 		case ENTTYPE_DIR:
 			/* a directory exists here - we can't save over it */
-			mame_machine_manager::instance()->ui().popup_time(5, "%s", _("Cannot save over directory"));
+			ui().popup_time(5, "%s", _("Cannot save over directory"));
 			can_create = false;
 			need_confirm = false;
 			break;
 
 		default:
-			fatalerror("Unexpected\n");
 			can_create = false;
 			need_confirm = false;
-			break;
+			fatalerror("Unexpected\n");
 	}
 
 	if (entry != nullptr)
@@ -187,20 +187,20 @@ void ui_menu_control_device_image::handle()
 				util::zippath_closedir(directory);
 		}
 		submenu_result = -1;
-		ui_menu::stack_push(global_alloc_clear<ui_menu_file_selector>(machine(), container, image, current_directory, current_file, true, image->image_interface()!=nullptr, can_create, &submenu_result));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_file_selector>(ui(), container, image, current_directory, current_file, true, image->image_interface()!=nullptr, can_create, &submenu_result));
 		state = SELECT_FILE;
 		break;
 	}
 
 	case START_SOFTLIST:
 		sld = nullptr;
-		ui_menu::stack_push(global_alloc_clear<ui_menu_software>(machine(), container, image->image_interface(), &sld));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_software>(ui(), container, image->image_interface(), &sld));
 		state = SELECT_SOFTLIST;
 		break;
 
 	case START_OTHER_PART: {
 		submenu_result = -1;
-		ui_menu::stack_push(global_alloc_clear<ui_menu_software_parts>(machine(), container, swi, swp->interface(), &swp, true, &submenu_result));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_software_parts>(ui(), container, swi, swp->interface(), &swp, true, &submenu_result));
 		state = SELECT_OTHER_PART;
 		break;
 	}
@@ -211,7 +211,7 @@ void ui_menu_control_device_image::handle()
 			break;
 		}
 		software_info_name = "";
-		ui_menu::stack_push(global_alloc_clear<ui_menu_software_list>(machine(), container, sld, image->image_interface(), software_info_name));
+		ui_menu::stack_push(global_alloc_clear<ui_menu_software_list>(ui(), container, sld, image->image_interface(), software_info_name));
 		state = SELECT_PARTLIST;
 		break;
 
@@ -223,7 +223,7 @@ void ui_menu_control_device_image::handle()
 		{
 			submenu_result = -1;
 			swp = nullptr;
-			ui_menu::stack_push(global_alloc_clear<ui_menu_software_parts>(machine(), container, swi, image->image_interface(), &swp, false, &submenu_result));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_software_parts>(ui(), container, swi, image->image_interface(), &swp, false, &submenu_result));
 			state = SELECT_ONE_PART;
 		}
 		else
@@ -287,7 +287,7 @@ void ui_menu_control_device_image::handle()
 			break;
 
 		case ui_menu_file_selector::R_CREATE:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_file_create>(machine(), container, image, current_directory, current_file, &create_ok));
+			ui_menu::stack_push(global_alloc_clear<ui_menu_file_create>(ui(), container, image, current_directory, current_file, &create_ok));
 			state = CHECK_CREATE;
 			break;
 
@@ -307,7 +307,7 @@ void ui_menu_control_device_image::handle()
 		test_create(can_create, need_confirm);
 		if(can_create) {
 			if(need_confirm) {
-				ui_menu::stack_push(global_alloc_clear<ui_menu_confirm_save_as>(machine(), container, &create_confirmed));
+				ui_menu::stack_push(global_alloc_clear<ui_menu_confirm_save_as>(ui(), container, &create_confirmed));
 				state = CREATE_CONFIRM;
 			} else {
 				state = DO_CREATE;

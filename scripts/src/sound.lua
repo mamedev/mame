@@ -81,21 +81,21 @@ if (SOUNDS["DISCRETE"]~=null) then
 		MAME_DIR .. "src/devices/sound/discrete.h",
 		MAME_DIR .. "src/devices/sound/disc_cls.h",
 		MAME_DIR .. "src/devices/sound/disc_dev.h",
-		MAME_DIR .. "src/devices/sound/disc_dev.inc",
+		MAME_DIR .. "src/devices/sound/disc_dev.hxx",
 		MAME_DIR .. "src/devices/sound/disc_flt.h",
-		MAME_DIR .. "src/devices/sound/disc_flt.inc",
-		MAME_DIR .. "src/devices/sound/disc_inp.inc",
+		MAME_DIR .. "src/devices/sound/disc_flt.hxx",
+		MAME_DIR .. "src/devices/sound/disc_inp.hxx",
 		MAME_DIR .. "src/devices/sound/disc_mth.h",
-		MAME_DIR .. "src/devices/sound/disc_mth.inc",
-		MAME_DIR .. "src/devices/sound/disc_sys.inc",
+		MAME_DIR .. "src/devices/sound/disc_mth.hxx",
+		MAME_DIR .. "src/devices/sound/disc_sys.hxx",
 		MAME_DIR .. "src/devices/sound/disc_wav.h",
-		MAME_DIR .. "src/devices/sound/disc_wav.inc",
+		MAME_DIR .. "src/devices/sound/disc_wav.hxx",
 	}
 end
 
 ---------------------------------------------------
 -- AC97
---@src/devices/sound/pic-ac97.h,SOUNDS["AC97"] = true
+--@src/devices/sound/pci-ac97.h,SOUNDS["AC97"] = true
 ---------------------------------------------------
 
 if (SOUNDS["AC97"]~=null) then
@@ -650,9 +650,10 @@ end
 --@src/devices/sound/okim6376.h,SOUNDS["OKIM6376"] = true
 --@src/devices/sound/okim6295.h,SOUNDS["OKIM6295"] = true
 --@src/devices/sound/okim9810.h,SOUNDS["OKIM9810"] = true
+--@src/devices/sound/okiadpcm.h,SOUNDS["OKIADPCM"] = true
 ---------------------------------------------------
 
-if (SOUNDS["OKIM6258"]~=null or SOUNDS["OKIM6295"]~=null or SOUNDS["OKIM9810"]~=null or SOUNDS["I5000_SND"]~=null) then
+if (SOUNDS["OKIM6258"]~=null or SOUNDS["OKIM6295"]~=null or SOUNDS["OKIM9810"]~=null or SOUNDS["I5000_SND"]~=null or SOUNDS["OKIADPCM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/okiadpcm.cpp",
 		MAME_DIR .. "src/devices/sound/okiadpcm.h",
@@ -1013,7 +1014,7 @@ if (SOUNDS["TMS5110"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/tms5110.cpp",
 		MAME_DIR .. "src/devices/sound/tms5110.h",
-		MAME_DIR .. "src/devices/sound/tms5110r.inc",
+		MAME_DIR .. "src/devices/sound/tms5110r.hxx",
 	}
 end
 
@@ -1025,7 +1026,7 @@ if (SOUNDS["TMS5220"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/tms5220.cpp",
 		MAME_DIR .. "src/devices/sound/tms5220.h",
-		MAME_DIR .. "src/devices/sound/tms5110r.inc",
+		MAME_DIR .. "src/devices/sound/tms5110r.hxx",
 		MAME_DIR .. "src/devices/machine/spchrom.cpp",
 		MAME_DIR .. "src/devices/machine/spchrom.h",
 	}
@@ -1081,7 +1082,7 @@ if (SOUNDS["VLM5030"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/vlm5030.cpp",
 		MAME_DIR .. "src/devices/sound/vlm5030.h",
-		MAME_DIR .. "src/devices/sound/tms5110r.inc",
+		MAME_DIR .. "src/devices/sound/tms5110r.hxx",
 	}
 end
 
@@ -1341,5 +1342,28 @@ if (SOUNDS["AD1848"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/ad1848.cpp",
 		MAME_DIR .. "src/devices/sound/ad1848.h",
+	}
+end
+
+---------------------------------------------------
+-- UPD1771
+--@src/devices/sound/upd1771.h,SOUNDS["UPD1771"] = true
+---------------------------------------------------
+
+if (SOUNDS["UPD1771"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/upd1771.cpp",
+		MAME_DIR .. "src/devices/sound/upd1771.h",
+	}
+end
+---------------------------------------------------
+-- GB_SOUND
+--@src/devices/sound/gb.h,SOUNDS["GB_SOUND"] = true
+---------------------------------------------------
+
+if (SOUNDS["GB_SOUND"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/gb.cpp",
+		MAME_DIR .. "src/devices/sound/gb.h",
 	}
 end

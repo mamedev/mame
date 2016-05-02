@@ -78,7 +78,7 @@ UINT32 canyon_state::screen_update_canyon(screen_device &screen, bitmap_ind16 &b
 	draw_bombs(bitmap, cliprect);
 
 	/* watchdog is disabled during service mode */
-	machine().watchdog_enable(!(ioport("IN2")->read() & 0x10));
+	m_watchdog->watchdog_enable(!(ioport("IN2")->read() & 0x10));
 
 	return 0;
 }

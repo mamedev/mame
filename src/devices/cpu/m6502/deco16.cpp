@@ -51,4 +51,4 @@ const address_space_config *deco16_device::memory_space_config(address_spacenum 
 	}
 }
 
-#include "cpu/m6502/deco16.inc"
+#include "cpu/m6502/deco16.hxx"

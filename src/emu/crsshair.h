@@ -65,7 +65,7 @@ public:
 	void set_screen(int player, screen_device *screen) { m_screen[player] = screen; }
 
 	/* return TRUE if any crosshairs are used */
-	int get_usage() { return m_usage; }
+	int get_usage() const { return m_usage; }
 
 	/* return the current crosshair settings for the given player */
 	void get_user_settings(UINT8 player, crosshair_user_settings *settings);

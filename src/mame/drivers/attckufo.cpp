@@ -2,11 +2,11 @@
 // copyright-holders:Tomasz Slanina
 /***************************************************************************
 
-	"Attack UFO" © 1980 Ryoto Electric Co.
+    "Attack UFO" (c) 1980 Ryoto Electric Co.
 
-	TODO:
-	- Verify I/O chip
-	- Is game speed ok? A bit slow sometimes
+    TODO:
+    - Verify I/O chip
+    - Is game speed ok? A bit slow sometimes
 
 ***************************************************************************/
 

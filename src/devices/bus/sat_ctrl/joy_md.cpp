@@ -119,4 +119,3 @@ UINT8 saturn_joymd6b_device::read_ctrl(UINT8 offset)
 	}
 	return res;
 }
-

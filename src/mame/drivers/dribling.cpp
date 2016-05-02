@@ -129,7 +129,7 @@ WRITE8_MEMBER(dribling_state::shr_w)
 {
 	/* bit 3 = watchdog */
 	if (data & 0x08)
-		machine().watchdog_reset();
+		m_watchdog->watchdog_reset();
 
 	/* bit 2-0 = SH0-2 */
 	m_sh = data & 0x07;
@@ -282,6 +282,8 @@ static MACHINE_CONFIG_START( dribling, dribling_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(dribling_state, pb_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN0"))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(dribling_state, shr_w))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

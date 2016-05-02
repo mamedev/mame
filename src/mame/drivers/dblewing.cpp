@@ -62,7 +62,6 @@ Notes:
 
 
  - sound CPU seems to miss commands sometimes
- - flipscreen is wrong
  - should sprites be buffered, is the Deco '77' a '71' or similar?
 
 */
@@ -70,7 +69,8 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/decocrpt.h"
+#include "machine/decocrpt.h"
+#include "machine/deco102.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"

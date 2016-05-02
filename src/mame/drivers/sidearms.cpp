@@ -46,6 +46,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "includes/sidearms.h"
@@ -81,7 +82,7 @@ static ADDRESS_MAP_START( sidearms_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("SYSTEM") AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1") AM_WRITE(bankswitch_w)
-	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("P2") AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("P2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("DSW0")
 	AM_RANGE(0xc804, 0xc804) AM_READ_PORT("DSW1") AM_WRITE(c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_READ_PORT("DSW2") AM_WRITE(star_scrollx_w)
@@ -105,7 +106,7 @@ static ADDRESS_MAP_START( turtship_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xe800, 0xe807) AM_READ(turtship_ports_r)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xe801, 0xe801) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xe802, 0xe802) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xe802, 0xe802) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xe804, 0xe804) AM_WRITE(c804_w)
 	AM_RANGE(0xe805, 0xe805) AM_WRITE(star_scrollx_w)
 	AM_RANGE(0xe806, 0xe806) AM_WRITE(star_scrolly_w)
@@ -146,7 +147,7 @@ static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW0") AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("DSW1") AM_WRITE(whizz_bankswitch_w)
-	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW2") AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("IN0") AM_WRITENOP
 	AM_RANGE(0xc804, 0xc804) AM_READ_PORT("IN1") AM_WRITE(c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_READ_PORT("IN2") AM_WRITENOP
@@ -600,6 +601,8 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(sidearms_sound_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
@@ -644,6 +647,8 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(sidearms_sound_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -692,6 +697,8 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")

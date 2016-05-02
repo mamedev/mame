@@ -21,13 +21,13 @@ const int ui_menu_sound_options::m_sound_rate[] = { 11025, 22050, 44100, 48000 }
 //  ctor
 //-------------------------------------------------
 
-ui_menu_sound_options::ui_menu_sound_options(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_sound_options::ui_menu_sound_options(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
 {
-	osd_options &options = downcast<osd_options &>(machine.options());
+	osd_options &options = downcast<osd_options &>(mui.machine().options());
 
-	m_sample_rate = machine.options().sample_rate();
+	m_sample_rate = mui.machine().options().sample_rate();
 	m_sound = (strcmp(options.sound(), OSDOPTVAL_NONE) && strcmp(options.sound(), "0"));
-	m_samples = machine.options().samples();
+	m_samples = mui.machine().options().samples();
 
 	int total = ARRAY_LENGTH(m_sound_rate);
 
@@ -101,7 +101,7 @@ void ui_menu_sound_options::handle()
 					for (int index = 0; index < total; index++)
 						s_sel[index] = std::to_string(m_sound_rate[index]);
 
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(machine(), container, s_sel, m_cur_rates));
+					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, s_sel, m_cur_rates));
 				}
 				break;
 
@@ -135,7 +135,7 @@ void ui_menu_sound_options::populate()
 	item_append(_("Use External Samples"), m_samples ? _("On") : _("Off"), m_samples ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SAMPLES);
 	item_append(ui_menu_item_type::SEPARATOR);
 
-	customtop = mame_machine_manager::instance()->ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
 }
 
 //-------------------------------------------------
@@ -145,9 +145,8 @@ void ui_menu_sound_options::populate()
 void ui_menu_sound_options::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
-	mui.draw_text_full(container, _("Sound Options"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
+	ui().draw_text_full(container, _("Sound Options"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+									DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -158,7 +157,7 @@ void ui_menu_sound_options::custom_render(void *selectedref, float top, float bo
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	mui.draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -166,6 +165,6 @@ void ui_menu_sound_options::custom_render(void *selectedref, float top, float bo
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	mui.draw_text_full(container, _("Sound Options"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui().draw_text_full(container, _("Sound Options"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }

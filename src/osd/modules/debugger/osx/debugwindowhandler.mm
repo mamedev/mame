@@ -131,7 +131,7 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 + (device_debug::breakpoint *)findBreakpointAtAddress:(offs_t)address forDevice:(device_t &)device {
 	device_debug *const cpuinfo = device.debug();
 	device_debug::breakpoint *bp = cpuinfo->breakpoint_first();
-	while ((bp != NULL) && (address != bp->address())) bp = bp->next();
+	while ((bp != nullptr) && (address != bp->address())) bp = bp->next();
 	return bp;
 }
 

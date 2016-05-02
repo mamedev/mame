@@ -9,6 +9,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "mame.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "rendfont.h"
@@ -33,8 +34,8 @@ class debug_internal : public osd_module, public debug_module
 public:
 	debug_internal()
 	: osd_module(OSD_DEBUG_PROVIDER, "internal"), debug_module(),
-		m_machine(nullptr)
-	{
+		m_machine(nullptr), font_name(nullptr), font_size(0)
+{
 	}
 
 	virtual ~debug_internal() { }
@@ -1310,7 +1311,7 @@ static void render_editor(DView_edit *editor)
 
 class ui_menu_debug : public ui_menu {
 public:
-	ui_menu_debug(running_machine &machine, render_container *container) : ui_menu(machine, container) {}
+	ui_menu_debug(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container) {}
 	virtual ~ui_menu_debug() {}
 	virtual void populate() override {}
 	virtual void handle() override {}
@@ -1327,7 +1328,7 @@ static void CreateMainMenu(running_machine &machine)
 		menu_sel = menu->get_selection();
 		global_free( menu);
 	}
-	menu = global_alloc_clear<ui_menu_debug>(machine, &machine.render().ui_container());
+	menu = global_alloc_clear<ui_menu_debug>(mame_machine_manager::instance()->ui(), &machine.render().ui_container());
 
 	switch (focus_view->type)
 	{

@@ -41,10 +41,10 @@ protected:
 
 private:
 	required_ioport m_cfg;
-    required_ioport m_keypad;
-    required_ioport m_disc_dig;
-    required_ioport m_disc_anx;
-    required_ioport m_disc_any;
+	required_ioport m_keypad;
+	required_ioport m_disc_dig;
+	required_ioport m_disc_anx;
+	required_ioport m_disc_any;
 };
 
 

@@ -30,10 +30,10 @@ clear_state* clear_reader::read_from_value(const Value& value, std::string prefi
 		for (int i = 0; i < colors.Size(); i++)
 		{
 			if (!READER_CHECK(colors[i].IsNumber(), (prefix + "clearcolor[" + std::to_string(i) + "] must be a numeric value\n").c_str())) return nullptr;
-			int32_t value = int32_t(float(colors[i].GetDouble()) * 255.0f);
-			if (value > 255) value = 255;
-			if (value < 0) value = 0;
-			clear_color |= value << (24 - (i * 3));
+			int32_t val = int32_t(float(colors[i].GetDouble()) * 255.0f);
+			if (val > 255) val = 255;
+			if (val < 0) val = 0;
+			clear_color |= val << (24 - (i * 3));
 		}
 		clear_flags |= BGFX_CLEAR_COLOR;
 	}

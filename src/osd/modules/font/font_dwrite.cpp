@@ -109,7 +109,7 @@ void SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 		reinterpret_cast<void**>(d2dfactory.GetAddressOf())));
 
 	// Initialize COM - ignore failure
-	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 	// Create a DirectWrite factory.
 	HR_RET(pfn_DWriteCreateFactory(
@@ -119,7 +119,7 @@ void SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 
 	HR_RET(CoCreateInstance(
 		CLSID_WICImagingFactory,
-		NULL,
+		nullptr,
 		CLSCTX_INPROC_SERVER,
 		__uuidof(IWICImagingFactory),
 		(void**)&wicFactory));
@@ -128,19 +128,19 @@ void SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	HR_RET(stream->InitializeFromFilename(filename, GENERIC_WRITE));
 
 	ComPtr<IWICBitmapEncoder> encoder;
-	HR_RET(wicFactory->CreateEncoder(GUID_ContainerFormatBmp, NULL, &encoder));
+	HR_RET(wicFactory->CreateEncoder(GUID_ContainerFormatBmp, nullptr, &encoder));
 	HR_RET(encoder->Initialize(stream.Get(), WICBitmapEncoderNoCache));
 
 	ComPtr<IWICBitmapFrameEncode> frameEncode;
-	HR_RET(encoder->CreateNewFrame(&frameEncode, NULL));
-	HR_RET(frameEncode->Initialize(NULL));
+	HR_RET(encoder->CreateNewFrame(&frameEncode, nullptr));
+	HR_RET(frameEncode->Initialize(nullptr));
 
 	UINT width, height;
 	HR_RET(bitmap->GetSize(&width, &height));
 	HR_RET(frameEncode->SetSize(width, height));
 	HR_RET(frameEncode->SetPixelFormat(&pixelFormat));
 
-	HR_RET(frameEncode->WriteSource(bitmap, NULL));
+	HR_RET(frameEncode->WriteSource(bitmap, nullptr));
 
 	HR_RET(frameEncode->Commit());
 	HR_RET(encoder->Commit());
@@ -165,7 +165,7 @@ void SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 	ComPtr<IWICImagingFactory> wicFactory;
 	HR_RET(CoCreateInstance(
 		CLSID_WICImagingFactory,
-		NULL,
+		nullptr,
 		CLSCTX_INPROC_SERVER,
 		__uuidof(IWICImagingFactory),
 		(void**)&wicFactory));
@@ -710,7 +710,7 @@ public:
 
 		HR_RET1(CoCreateInstance(
 			CLSID_WICImagingFactory,
-			NULL,
+			nullptr,
 			CLSCTX_INPROC_SERVER,
 			__uuidof(IWICImagingFactory),
 			static_cast<void**>(&m_wicFactory)));

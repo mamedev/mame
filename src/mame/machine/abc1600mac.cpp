@@ -73,6 +73,16 @@ static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, abc1600_mac_device )
 ADDRESS_MAP_END
 
 
+static MACHINE_CONFIG_FRAGMENT( abc1600_mac )
+	MCFG_WATCHDOG_ADD("watchdog")
+MACHINE_CONFIG_END
+
+machine_config_constructor abc1600_mac_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( abc1600_mac );
+}
+
+
 //-------------------------------------------------
 //  ROM( abc1600_mac )
 //-------------------------------------------------
@@ -112,6 +122,7 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 		m_rom(*this, "boot"),
 		m_segment_ram(*this, "segment_ram"),
 		m_page_ram(*this, "page_ram"),
+		m_watchdog(*this, "watchdog"),
 		m_task(0)
 {
 }
@@ -400,7 +411,7 @@ READ8_MEMBER( abc1600_mac_device::cause_r )
 	// DMA status
 	data |= m_cause;
 
-	machine().watchdog_reset();
+	m_watchdog->watchdog_reset();
 
 	return data;
 }

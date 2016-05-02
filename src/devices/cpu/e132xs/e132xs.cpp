@@ -1825,7 +1825,7 @@ void hyperstone_device::device_stop()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -4871,7 +4871,7 @@ void hyperstone_device::hyperstone_trap(struct hyperstone_device::regs_decode *d
 }
 
 
-#include "e132xsop.inc"
+#include "e132xsop.hxx"
 
 //**************************************************************************
 //  CORE EXECUTION LOOP

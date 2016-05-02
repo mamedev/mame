@@ -43,7 +43,7 @@ NETLIB_NAMESPACE_DEVICES_START()
 NETLIB_DEVICE(74192,
 	ATTR_HOT void update_outputs();
 
-	NETLIB_NAME(9316_subABCD) m_ABCD;
+	NETLIB_SUB(9316_subABCD) m_ABCD;
 	logic_input_t m_CLEAR;
 	logic_input_t m_LOADQ;
 	logic_input_t m_CU;

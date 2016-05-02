@@ -1,11 +1,9 @@
 // license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /***************************************************************************
-    Gromport of the TI-99 consoles
+    Gromport (Cartridge port) of the TI-99 consoles
 
     For details see gromport.c
-
-    Michael Zapf, July 2012
 ***************************************************************************/
 
 #ifndef __GROMPORT__
@@ -42,9 +40,6 @@ public:
 	template<class _Object> static devcb_base &static_set_reset_callback(device_t &device, _Object object) { return downcast<gromport_device &>(device).m_console_reset.set_callback(object); }
 
 	void    cartridge_inserted();
-	// void    set_grom_base(UINT16 grombase, UINT16 grommask);
-	// UINT16  get_grom_base() { return m_grombase; }
-	// UINT16  get_grom_mask() { return m_grommask; }
 
 protected:
 	virtual void device_start() override;
@@ -59,8 +54,6 @@ private:
 	devcb_write_line   m_console_reset;
 	int             m_mask;
 	int m_romgq;
-	// UINT16              m_grombase;
-	// UINT16              m_grommask;
 };
 
 SLOT_INTERFACE_EXTERN(gromport4);
@@ -104,10 +97,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
 	bool    is_available() { return m_pcb != nullptr; }
-	bool    has_grom();
 	void    set_slot(int i);
-	// UINT16  grom_base();
-	// UINT16  grom_mask();
 
 protected:
 	virtual void device_start() override { };
@@ -177,7 +167,7 @@ protected:
 	virtual void device_config_complete() override;
 
 	gromport_device*    m_gromport;
-	int     m_gsel;
+	bool     m_grom_selected;
 };
 
 /*
@@ -283,6 +273,7 @@ protected:
 private:
 	int     m_gk_switch[6];         // Used to cache the switch settings.
 
+	bool    m_romspace_selected;
 	int     m_ram_page;
 	int     m_grom_address;
 	UINT8*  m_ram_ptr;
@@ -316,15 +307,13 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER(cruwrite);
 
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
-	DECLARE_WRITE8_MEMBER(set_gromlines);
+	virtual DECLARE_WRITE8_MEMBER(set_gromlines);
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
 	DECLARE_READ8Z_MEMBER(gromreadz);
 	DECLARE_WRITE8_MEMBER(gromwrite);
 	inline void         set_grom_pointer(int number, device_t *dev);
 	void                set_cartridge(ti99_cartridge_device *cart);
-	// UINT16              grom_base();
-	// UINT16              grom_mask();
 	const char*         tag() { return m_tag; }
 	void                set_tag(const char* tag) { m_tag = tag; }
 
@@ -336,12 +325,14 @@ protected:
 
 	UINT8*              m_rom_ptr;
 	UINT8*              m_ram_ptr;
-	bool                m_access_cartspace;
+	bool                m_romspace_selected;
 	int                 m_rom_page;     // for some cartridge types
 	UINT8*              m_grom_ptr;     // for gromemu
 	int                 m_grom_address; // for gromemu
 	int                 m_ram_page;     // for super
 	const char*         m_tag;
+	dynamic_buffer      m_nvram;    // for MiniMemory
+	dynamic_buffer      m_ram;  // for MBX
 };
 
 /******************** Standard cartridge ******************************/
@@ -443,19 +434,20 @@ public:
 class ti99_gromemu_cartridge : public ti99_cartridge_pcb
 {
 public:
-	ti99_gromemu_cartridge(): m_waddr_LSB(false), m_grom_space(false)
+	ti99_gromemu_cartridge(): m_waddr_LSB(false), m_grom_selected(false), m_grom_read_mode(false), m_grom_address_mode(false)
 	{  m_grom_address = 0; }
 	~ti99_gromemu_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(gromemureadz);
 	DECLARE_WRITE8_MEMBER(gromemuwrite);
-
-	DECLARE_WRITE_LINE_MEMBER(gsq_line);
+	DECLARE_WRITE8_MEMBER(set_gromlines) override;
 
 private:
 	bool    m_waddr_LSB;
-	bool    m_grom_space;
+	bool    m_grom_selected;
+	bool    m_grom_read_mode;
+	bool    m_grom_address_mode;
 };
 
 

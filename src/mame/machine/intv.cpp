@@ -436,4 +436,3 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 
 	m_stic->screenrefresh();
 }
-

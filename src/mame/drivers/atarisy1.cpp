@@ -195,6 +195,7 @@ RoadBlasters (aka Future Vette):005*
 #include "cpu/m6502/m6502.h"
 #include "machine/atarigen.h"
 #include "machine/6522via.h"
+#include "machine/watchdog.h"
 #include "sound/2151intf.h"
 #include "sound/pokey.h"
 #include "video/atarimo.h"
@@ -435,7 +436,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
 	AM_RANGE(0x820000, 0x820001) AM_WRITE(atarisy1_yscroll_w) AM_SHARE("yscroll")
 	AM_RANGE(0x840000, 0x840001) AM_WRITE(atarisy1_priority_w)
 	AM_RANGE(0x860000, 0x860001) AM_WRITE(atarisy1_bankselect_w) AM_SHARE("bankselect")
-	AM_RANGE(0x880000, 0x880001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0x8c0000, 0x8c0001) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0x900000, 0x9fffff) AM_RAM
@@ -720,6 +721,8 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
 
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_TIMER_DRIVER_ADD("joystick_timer", atarisy1_state, delayed_joystick_int)
 	MCFG_TIMER_DRIVER_ADD("scan_timer", atarisy1_state, atarisy1_int3_callback)

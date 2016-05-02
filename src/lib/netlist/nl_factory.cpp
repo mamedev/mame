@@ -62,7 +62,7 @@ device_t *factory_list_t::new_device_by_classname(const pstring &classname) cons
 		}
 		p++;
 	}
-	return NULL; // appease code analysis
+	return nullptr; // appease code analysis
 }
 #endif
 
@@ -71,20 +71,20 @@ void factory_list_t::error(const pstring &s)
 	m_setup.log().fatal("{1}", s);
 }
 
-device_t *factory_list_t::new_device_by_name(const pstring &name)
+device_t *factory_list_t::new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name)
 {
-	base_factory_t *f = factory_by_name(name);
-	return f->Create();
+	base_factory_t *f = factory_by_name(devname);
+	return f->Create(anetlist, name);
 }
 
-base_factory_t * factory_list_t::factory_by_name(const pstring &name)
+base_factory_t * factory_list_t::factory_by_name(const pstring &devname)
 {
-	if (contains(name))
-		return (*this)[name];
+	if (contains(devname))
+		return (*this)[devname];
 	else
 	{
-		m_setup.log().fatal("Class {1} not found!\n", name);
-		return NULL; // appease code analysis
+		m_setup.log().fatal("Class {1} not found!\n", devname);
+		return nullptr; // appease code analysis
 	}
 }
 

@@ -12,13 +12,13 @@
 #define TRANSPARENT 1
 #define FLIPX 0
 #define FUNCNAME draw_sprite_f0_ti0_tr1_simple
-#include "epic12in.inc"
+#include "epic12in.hxx"
 #undef FUNCNAME
 #undef FLIPX
 
 #define FLIPX 1
 #define FUNCNAME draw_sprite_f1_ti0_tr1_simple
-#include "epic12in.inc"
+#include "epic12in.hxx"
 #undef FUNCNAME
 #undef FLIPX
 #undef TRANSPARENT
@@ -27,13 +27,13 @@
 #define TRANSPARENT 0
 #define FLIPX 0
 #define FUNCNAME draw_sprite_f0_ti0_tr0_simple
-#include "epic12in.inc"
+#include "epic12in.hxx"
 #undef FUNCNAME
 #undef FLIPX
 
 #define FLIPX 1
 #define FUNCNAME draw_sprite_f1_ti0_tr0_simple
-#include "epic12in.inc"
+#include "epic12in.hxx"
 #undef FUNCNAME
 #undef FLIPX
 #undef TRANSPARENT

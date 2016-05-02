@@ -131,7 +131,7 @@ WRITE8_MEMBER(skydiver_state::_2000_201F_w)
 {
 	int bit = offset & 0x01;
 
-	watchdog_reset_w(space,0,0);
+	m_watchdog->reset_w(space,0,0);
 
 	switch (offset & 0x0e)
 	{

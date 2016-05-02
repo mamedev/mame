@@ -1840,7 +1840,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_helper(OPS_32, const char
 }
 
 
-#include "cpu/arcompact/arcompact.inc"
+#include "cpu/arcompact/arcompact.hxx"
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_01(OPS_32)
 {

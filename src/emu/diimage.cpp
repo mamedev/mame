@@ -65,7 +65,7 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 		m_from_swlist(false),
 		m_create_format(0),
 		m_create_args(nullptr),
-        m_user_loadable(TRUE),
+		m_user_loadable(TRUE),
 		m_is_loading(FALSE)
 {
 }
@@ -372,7 +372,7 @@ UINT8 *device_image_interface::get_software_region(const char *tag)
 
 	sprintf( full_tag, "%s:%s", device().tag(), tag );
 	memory_region *region = device().machine().root_device().memregion(full_tag);
-	return region != NULL ? region->base() : NULL;
+	return region != nullptr ? region->base() : nullptr;
 }
 
 
@@ -387,7 +387,7 @@ UINT32 device_image_interface::get_software_region_length(const char *tag)
 	sprintf( full_tag, "%s:%s", device().tag(), tag );
 
 	memory_region *region = device().machine().root_device().memregion(full_tag);
-	return region != NULL ? region->bytes() : 0;
+	return region != nullptr ? region->bytes() : 0;
 }
 
 
@@ -1178,8 +1178,8 @@ void device_image_interface::update_names(const device_type device_type, const c
 //  strings.
 //
 //  str1:str2:str3  => swlist_name - str1, swname - str2, swpart - str3
-//  str1:str2       => swlist_name - NULL, swname - str1, swpart - str2
-//  str1            => swlist_name - NULL, swname - str1, swpart - NULL
+//  str1:str2       => swlist_name - nullptr, swname - str1, swpart - str2
+//  str1            => swlist_name - nullptr, swname - str1, swpart - nullptr
 //
 //  Notice however that we could also have been
 //  passed a string swlist_name:swname, and thus

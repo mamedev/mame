@@ -445,7 +445,7 @@ void address_map::configure(address_spacenum spacenum, UINT8 databits)
 
 void address_map::set_global_mask(offs_t mask)
 {
-//  if (m_entrylist != NULL)
+//  if (m_entrylist != nullptr)
 //      throw emu_fatalerror("AM_GLOBALMASK must be specified before any entries");
 	m_globalmask = mask;
 }
@@ -755,8 +755,8 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 		}
 
 		// make sure ports exist
-//      if ((entry.m_read.m_type == AMH_PORT && entry.m_read.m_tag != NULL && portlist.find(entry.m_read.m_tag) == NULL) ||
-//          (entry.m_write.m_type == AMH_PORT && entry.m_write.m_tag != NULL && portlist.find(entry.m_write.m_tag) == NULL))
+//      if ((entry.m_read.m_type == AMH_PORT && entry.m_read.m_tag != nullptr && portlist.find(entry.m_read.m_tag) == nullptr) ||
+//          (entry.m_write.m_type == AMH_PORT && entry.m_write.m_tag != nullptr && portlist.find(entry.m_write.m_tag) == nullptr))
 //          osd_printf_error("%s space memory map entry references nonexistent port tag '%s'\n", spaceconfig.m_name, entry.m_read.m_tag);
 
 		// validate bank and share tags

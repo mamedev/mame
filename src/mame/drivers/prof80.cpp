@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 
 	// devices
 	MCFG_PROF80_MMU_ADD(MMU_TAG, prof80_mmu)
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats)

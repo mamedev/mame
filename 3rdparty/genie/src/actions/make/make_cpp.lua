@@ -30,7 +30,7 @@
 		local objdirs = {}
 		local additionalobjdirs = {}
 		for _, file in ipairs(prj.files) do
-			if path.iscppfile(file) then
+			if path.isSourceFile(file) then
 				objdirs[_MAKE.esc(path.getdirectory(path.trimdots(file)))] = 1
 			end
 		end
@@ -288,7 +288,7 @@
 		-- add objects for compilation, and remove any that are excluded per config.
 		_p('  OBJECTS := \\')
 		for _, file in ipairs(prj.files) do
-			if path.iscppfile(file) then
+			if path.isSourceFile(file) then
 				-- check if file is excluded.
 				if not table.icontains(cfg.excludes, file) then
 					-- if not excluded, add it.
@@ -457,7 +457,7 @@
 			_p('\t@echo ' .. prj.msgprecompile)
 		else
 			_p('\t@echo $(notdir $<)')
-		end	
+		end
 
 		local cmd = iif(prj.language == "C", "$(CC) $(ALL_CFLAGS) -x c-header", "$(CXX) $(ALL_CXXFLAGS) -x c++-header")
 		_p('\t$(SILENT) %s $(DEFINES) $(INCLUDES) -o "$@" -c "$<"', cmd)
@@ -473,7 +473,7 @@
 
 	function cpp.fileRules(prj)
 		for _, file in ipairs(prj.files or {}) do
-			if path.iscppfile(file) then
+			if path.isSourceFile(file) then
 				_p('$(OBJDIR)/%s.o: %s $(GCH)'
 					, _MAKE.esc(path.trimdots(path.removeext(file)))
 					, _MAKE.esc(file)

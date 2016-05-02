@@ -189,52 +189,52 @@ enum {
 #define CMD_CODE(reg) \
 		(((reg) >> 10) & 0x1f)
 #define DIR_FWD(reg) \
-        (BIT(reg , 15))
+		(BIT(reg , 15))
 #define AUTO_STOP(reg) \
-        (BIT(reg , 9))
+		(BIT(reg , 9))
 #define LONG_GAP(reg) \
-        (BIT(reg , 8))
+		(BIT(reg , 8))
 #define SPEED_FAST(reg) \
 		(BIT(reg , 7))
 #define CMD_OPT(reg) \
-        (BIT(reg , 6))
+		(BIT(reg , 6))
 #define DIR_FWD_MASK    BIT_MASK(15)    // Direction = forward
 #define SPEED_FAST_MASK BIT_MASK(7)     // Speed = fast
 
 // Commands
 enum {
-        CMD_INDTA_INGAP,        // 00: scan for data first then for gap
-        CMD_UNK_01,             // 01: unknown
-        CMD_FINAL_GAP,          // 02: write final gap
-        CMD_INIT_WRITE,         // 03: write words for tape formatting
-        CMD_STOP,               // 04: stop
-        CMD_UNK_05,             // 05: unknown
-        CMD_SET_TRACK,          // 06: set A/B track
-        CMD_UNK_07,             // 07: unknown
-        CMD_UNK_08,             // 08: unknown
-        CMD_UNK_09,             // 09: unknown
-        CMD_MOVE,               // 0a: move tape
-        CMD_UNK_0b,             // 0b: unknown
-        CMD_INGAP_MOVE,         // 0c: scan for gap then move a bit further (used to gain some margin when inverting tape movement)
-        CMD_UNK_0d,             // 0d: unknown
-        CMD_CLEAR,              // 0e: clear errors/unlatch status bits
-        CMD_UNK_0f,             // 0f: unknown
-        CMD_NOT_INDTA,          // 10: scan for end of data
-        CMD_UNK_11,             // 11: unknown
-        CMD_UNK_12,             // 12: unknown
-        CMD_UNK_13,             // 13: unknown
-        CMD_UNK_14,             // 14: unknown
-        CMD_UNK_15,             // 15: unknown
-        CMD_WRITE_IRG,          // 16: write inter-record gap
-        CMD_UNK_17,             // 17: unknown
-        CMD_SCAN_RECORDS,       // 18: scan records (count IRGs)
-        CMD_RECORD_WRITE,       // 19: write record words
-        CMD_MOVE_INDTA,         // 1a: move then scan for data
-        CMD_UNK_1b,             // 1b: unknown (for now it seems harmless to handle it as NOP)
-        CMD_MOVE_INGAP,         // 1c: move tape a given distance then scan for gap (as cmd 0c but in reverse order)
-        CMD_START_READ,         // 1d: start record reading
-        CMD_DELTA_MOVE_IRG,     // 1e: move tape a given distance, detect gaps in parallel
-        CMD_END_READ            // 1f: stop reading
+		CMD_INDTA_INGAP,        // 00: scan for data first then for gap
+		CMD_UNK_01,             // 01: unknown
+		CMD_FINAL_GAP,          // 02: write final gap
+		CMD_INIT_WRITE,         // 03: write words for tape formatting
+		CMD_STOP,               // 04: stop
+		CMD_UNK_05,             // 05: unknown
+		CMD_SET_TRACK,          // 06: set A/B track
+		CMD_UNK_07,             // 07: unknown
+		CMD_UNK_08,             // 08: unknown
+		CMD_UNK_09,             // 09: unknown
+		CMD_MOVE,               // 0a: move tape
+		CMD_UNK_0b,             // 0b: unknown
+		CMD_INGAP_MOVE,         // 0c: scan for gap then move a bit further (used to gain some margin when inverting tape movement)
+		CMD_UNK_0d,             // 0d: unknown
+		CMD_CLEAR,              // 0e: clear errors/unlatch status bits
+		CMD_UNK_0f,             // 0f: unknown
+		CMD_NOT_INDTA,          // 10: scan for end of data
+		CMD_UNK_11,             // 11: unknown
+		CMD_UNK_12,             // 12: unknown
+		CMD_UNK_13,             // 13: unknown
+		CMD_UNK_14,             // 14: unknown
+		CMD_UNK_15,             // 15: unknown
+		CMD_WRITE_IRG,          // 16: write inter-record gap
+		CMD_UNK_17,             // 17: unknown
+		CMD_SCAN_RECORDS,       // 18: scan records (count IRGs)
+		CMD_RECORD_WRITE,       // 19: write record words
+		CMD_MOVE_INDTA,         // 1a: move then scan for data
+		CMD_UNK_1b,             // 1b: unknown (for now it seems harmless to handle it as NOP)
+		CMD_MOVE_INGAP,         // 1c: move tape a given distance then scan for gap (as cmd 0c but in reverse order)
+		CMD_START_READ,         // 1d: start record reading
+		CMD_DELTA_MOVE_IRG,     // 1e: move tape a given distance, detect gaps in parallel
+		CMD_END_READ            // 1f: stop reading
 };
 
 // Bits of status register
@@ -304,34 +304,34 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, d
 
 WRITE16_MEMBER(hp_taco_device::reg_w)
 {
-        LOG_0(("wr R%u = %04x\n", 4 + offset , data));
+		LOG_0(("wr R%u = %04x\n", 4 + offset , data));
 
-        // Any I/O activity clears IRQ
-        irq_w(false);
+		// Any I/O activity clears IRQ
+		irq_w(false);
 
-        switch (offset) {
-        case 0:
-                // Data register
-                m_data_reg = data;
-                m_data_reg_full = true;
-                break;
+		switch (offset) {
+		case 0:
+				// Data register
+				m_data_reg = data;
+				m_data_reg_full = true;
+				break;
 
-        case 1:
-                // Command register
-                start_cmd_exec(data & CMD_REG_MASK);
-                break;
+		case 1:
+				// Command register
+				start_cmd_exec(data & CMD_REG_MASK);
+				break;
 
-        case 2:
-                // Tachometer register
-                m_tach_reg = data;
-                freeze_tach_reg(true);
-                break;
+		case 2:
+				// Tachometer register
+				m_tach_reg = data;
+				freeze_tach_reg(true);
+				break;
 
-        case 3:
-                // Timing register
-                m_timing_reg = data;
-                break;
-        }
+		case 3:
+				// Timing register
+				m_timing_reg = data;
+				break;
+		}
 }
 
 READ16_MEMBER(hp_taco_device::reg_r)
@@ -352,18 +352,18 @@ READ16_MEMBER(hp_taco_device::reg_r)
 				res = (m_cmd_reg & CMD_REG_MASK) | (m_status_reg & STATUS_REG_MASK);
 				break;
 
-        case 2:
-                // Tachometer register
-                update_tach_reg();
-                res = m_tach_reg;
-                break;
+		case 2:
+				// Tachometer register
+				update_tach_reg();
+				res = m_tach_reg;
+				break;
 
-        case 3:
-                // Checksum register: it clears when read
-                res = m_checksum_reg;
-                m_clear_checksum_reg = true;
-                break;
-        }
+		case 3:
+				// Checksum register: it clears when read
+				res = m_checksum_reg;
+				m_clear_checksum_reg = true;
+				break;
+		}
 
 		LOG_0(("rd R%u = %04x\n", 4 + offset , res));
 
@@ -390,38 +390,38 @@ void hp_taco_device::device_config_complete()
 // device_start
 void hp_taco_device::device_start()
 {
-        LOG(("device_start"));
-        m_irq_handler.resolve_safe();
-        m_flg_handler.resolve_safe();
-        m_sts_handler.resolve_safe();
+		LOG(("device_start"));
+		m_irq_handler.resolve_safe();
+		m_flg_handler.resolve_safe();
+		m_sts_handler.resolve_safe();
 
-        save_item(NAME(m_data_reg));
-        save_item(NAME(m_data_reg_full));
-        save_item(NAME(m_cmd_reg));
-        //save_item(NAME(m_cmd_state));
-        save_item(NAME(m_status_reg));
-        save_item(NAME(m_tach_reg));
-        save_item(NAME(m_tach_reg_ref));
-        save_item(NAME(m_tach_reg_frozen));
-        save_item(NAME(m_checksum_reg));
-        save_item(NAME(m_clear_checksum_reg));
-        save_item(NAME(m_timing_reg));
-        save_item(NAME(m_irq));
-        save_item(NAME(m_flg));
-        save_item(NAME(m_sts));
-        save_item(NAME(m_tape_pos));
-        save_item(NAME(m_start_time));
-        save_item(NAME(m_tape_fwd));
-        save_item(NAME(m_tape_fast));
-        save_item(NAME(m_image_dirty));
-        save_item(NAME(m_tape_wr));
-        save_item(NAME(m_rw_pos));
-        save_item(NAME(m_next_word));
-        save_item(NAME(m_rd_it_valid));
-        save_item(NAME(m_gap_detect_start));
+		save_item(NAME(m_data_reg));
+		save_item(NAME(m_data_reg_full));
+		save_item(NAME(m_cmd_reg));
+		//save_item(NAME(m_cmd_state));
+		save_item(NAME(m_status_reg));
+		save_item(NAME(m_tach_reg));
+		save_item(NAME(m_tach_reg_ref));
+		save_item(NAME(m_tach_reg_frozen));
+		save_item(NAME(m_checksum_reg));
+		save_item(NAME(m_clear_checksum_reg));
+		save_item(NAME(m_timing_reg));
+		save_item(NAME(m_irq));
+		save_item(NAME(m_flg));
+		save_item(NAME(m_sts));
+		save_item(NAME(m_tape_pos));
+		save_item(NAME(m_start_time));
+		save_item(NAME(m_tape_fwd));
+		save_item(NAME(m_tape_fast));
+		save_item(NAME(m_image_dirty));
+		save_item(NAME(m_tape_wr));
+		save_item(NAME(m_rw_pos));
+		save_item(NAME(m_next_word));
+		save_item(NAME(m_rd_it_valid));
+		save_item(NAME(m_gap_detect_start));
 
-        m_tape_timer = timer_alloc(TAPE_TMR_ID);
-        m_hole_timer = timer_alloc(HOLE_TMR_ID);
+		m_tape_timer = timer_alloc(TAPE_TMR_ID);
+		m_hole_timer = timer_alloc(HOLE_TMR_ID);
 }
 
 // device_stop
@@ -445,92 +445,92 @@ void hp_taco_device::device_reset()
 
 void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-        update_tape_pos();
+		update_tape_pos();
 
-        switch (id) {
-        case TAPE_TMR_ID:
-                LOG_0(("Tape tmr @%g cmd %02x st %d\n" , machine().time().as_double() , CMD_CODE(m_cmd_reg) , m_cmd_state));
+		switch (id) {
+		case TAPE_TMR_ID:
+				LOG_0(("Tape tmr @%g cmd %02x st %d\n" , machine().time().as_double() , CMD_CODE(m_cmd_reg) , m_cmd_state));
 
-                cmd_fsm();
-                break;
+				cmd_fsm();
+				break;
 
-        case HOLE_TMR_ID:
-                LOG_0(("Hole tmr @%g cmd %02x st %d\n" , machine().time().as_double() , CMD_CODE(m_cmd_reg) , m_cmd_state));
+		case HOLE_TMR_ID:
+				LOG_0(("Hole tmr @%g cmd %02x st %d\n" , machine().time().as_double() , CMD_CODE(m_cmd_reg) , m_cmd_state));
 
-                BIT_SET(m_status_reg , STATUS_HOLE_BIT);
+				BIT_SET(m_status_reg , STATUS_HOLE_BIT);
 
-                if (m_cmd_state >= CMD_PH0 && m_cmd_state <= CMD_END) {
-                        switch (CMD_CODE(m_cmd_reg)) {
-                        case CMD_FINAL_GAP:
-                        case CMD_WRITE_IRG:
-                                write_gap(m_rw_pos , m_tape_pos);
-                                m_rw_pos = m_tape_pos;
-                                break;
+				if (m_cmd_state >= CMD_PH0 && m_cmd_state <= CMD_END) {
+						switch (CMD_CODE(m_cmd_reg)) {
+						case CMD_FINAL_GAP:
+						case CMD_WRITE_IRG:
+								write_gap(m_rw_pos , m_tape_pos);
+								m_rw_pos = m_tape_pos;
+								break;
 
-                        case CMD_SCAN_RECORDS:
-                                // Cmds 18 is terminated at first hole
-                                terminate_cmd_now();
-                                // No reloading of hole timer
-                                return;
+						case CMD_SCAN_RECORDS:
+								// Cmds 18 is terminated at first hole
+								terminate_cmd_now();
+								// No reloading of hole timer
+								return;
 
-                        case CMD_MOVE_INGAP:
-                                m_hole_timer->adjust(time_to_next_hole());
-                                // No IRQ at holes
-                                return;
+						case CMD_MOVE_INGAP:
+								m_hole_timer->adjust(time_to_next_hole());
+								// No IRQ at holes
+								return;
 
-                        case CMD_DELTA_MOVE_IRG:
-                                // Hit hole before end of programmed pulses
-                                terminate_cmd_now();
-                                update_tach_reg();
-                                freeze_tach_reg(true);
-                                return;
+						case CMD_DELTA_MOVE_IRG:
+								// Hit hole before end of programmed pulses
+								terminate_cmd_now();
+								update_tach_reg();
+								freeze_tach_reg(true);
+								return;
 
-                        case CMD_START_READ:
-                        case CMD_END_READ:
-                                set_error(true);
-                                break;
+						case CMD_START_READ:
+						case CMD_END_READ:
+								set_error(true);
+								break;
 
-                        default:
-                                // Other cmds: default processing (update tape pos, set IRQ, schedule timer for next hole)
-                                break;
-                        }
+						default:
+								// Other cmds: default processing (update tape pos, set IRQ, schedule timer for next hole)
+								break;
+						}
 
-                        irq_w(true);
-                }
-                m_hole_timer->adjust(time_to_next_hole());
-                break;
+						irq_w(true);
+				}
+				m_hole_timer->adjust(time_to_next_hole());
+				break;
 
-        default:
-                break;
-        }
+		default:
+				break;
+		}
 }
 
 void hp_taco_device::clear_state(void)
 {
-        m_data_reg = 0;
-        m_data_reg_full = false;
-        m_cmd_reg = 0;
-        m_status_reg = 0;
-        m_tach_reg = 0;
-        m_tach_reg_ref = m_tape_pos;
-        m_tach_reg_frozen = true;
-        m_checksum_reg = 0;
-        m_clear_checksum_reg = false;
-        m_timing_reg = 0;
-        m_cmd_state = CMD_IDLE;
-        // m_tape_pos is not reset, tape stays where it is
-        m_start_time = attotime::never;
-        m_tape_fwd = false;
-        m_tape_fast = false;
-        // m_image_dirty is not touched
-        m_tape_wr = false;
-        m_rw_pos = 0;
-        m_next_word = 0;
-        m_rd_it_valid = false;
-        m_gap_detect_start = NULL_TAPE_POS;
+		m_data_reg = 0;
+		m_data_reg_full = false;
+		m_cmd_reg = 0;
+		m_status_reg = 0;
+		m_tach_reg = 0;
+		m_tach_reg_ref = m_tape_pos;
+		m_tach_reg_frozen = true;
+		m_checksum_reg = 0;
+		m_clear_checksum_reg = false;
+		m_timing_reg = 0;
+		m_cmd_state = CMD_IDLE;
+		// m_tape_pos is not reset, tape stays where it is
+		m_start_time = attotime::never;
+		m_tape_fwd = false;
+		m_tape_fast = false;
+		// m_image_dirty is not touched
+		m_tape_wr = false;
+		m_rw_pos = 0;
+		m_next_word = 0;
+		m_rd_it_valid = false;
+		m_gap_detect_start = NULL_TAPE_POS;
 
-        set_tape_present(false);
-        set_tape_present(is_loaded());
+		set_tape_present(false);
+		set_tape_present(is_loaded());
 }
 
 void hp_taco_device::irq_w(bool state)
@@ -551,14 +551,14 @@ void hp_taco_device::set_error(bool state)
 
 bool hp_taco_device::is_braking(void) const
 {
-        return m_cmd_state == CMD_INVERTING || m_cmd_state == CMD_STOPPING;
+		return m_cmd_state == CMD_INVERTING || m_cmd_state == CMD_STOPPING;
 }
 
 unsigned hp_taco_device::speed_to_tick_freq(void) const
 {
-        return is_braking() ?
-                (m_tape_fast ? TACH_FREQ_BRAKE_FAST * TAPE_POS_FRACT : TACH_FREQ_BRAKE_SLOW * TAPE_POS_FRACT) :
-                (m_tape_fast ? TACH_FREQ_FAST * TAPE_POS_FRACT : TACH_FREQ_SLOW * TAPE_POS_FRACT);
+		return is_braking() ?
+				(m_tape_fast ? TACH_FREQ_BRAKE_FAST * TAPE_POS_FRACT : TACH_FREQ_BRAKE_SLOW * TAPE_POS_FRACT) :
+				(m_tape_fast ? TACH_FREQ_FAST * TAPE_POS_FRACT : TACH_FREQ_SLOW * TAPE_POS_FRACT);
 }
 
 bool hp_taco_device::pos_offset(tape_pos_t& pos , tape_pos_t offset) const
@@ -587,78 +587,78 @@ bool hp_taco_device::pos_offset(tape_pos_t& pos , tape_pos_t offset) const
 
 hp_taco_device::tape_pos_t hp_taco_device::current_tape_pos(void) const
 {
-        if (m_start_time.is_never()) {
-                // Tape not moving
-                return m_tape_pos;
-        }
+		if (m_start_time.is_never()) {
+				// Tape not moving
+				return m_tape_pos;
+		}
 
-        attotime delta_time(machine().time() - m_start_time);
-        LOG_0(("delta_time = %g\n" , delta_time.as_double()));
-        // How many tachometer ticks has the tape moved?
-        tape_pos_t delta_tach = (tape_pos_t)(delta_time.as_ticks(speed_to_tick_freq()));
-        LOG_0(("delta_tach = %u\n" , delta_tach));
+		attotime delta_time(machine().time() - m_start_time);
+		LOG_0(("delta_time = %g\n" , delta_time.as_double()));
+		// How many tachometer ticks has the tape moved?
+		tape_pos_t delta_tach = (tape_pos_t)(delta_time.as_ticks(speed_to_tick_freq()));
+		LOG_0(("delta_tach = %u\n" , delta_tach));
 
-        tape_pos_t tape_pos = m_tape_pos;
-        if (!pos_offset(tape_pos , delta_tach)) {
-                LOG(("Tape unspooled!\n"));
-        }
+		tape_pos_t tape_pos = m_tape_pos;
+		if (!pos_offset(tape_pos , delta_tach)) {
+				LOG(("Tape unspooled!\n"));
+		}
 
-        return tape_pos;
+		return tape_pos;
 }
 
 void hp_taco_device::update_tape_pos(void)
 {
-        if (m_start_time.is_never()) {
-                // Tape not moving
-                return;
-        }
+		if (m_start_time.is_never()) {
+				// Tape not moving
+				return;
+		}
 
-        m_tape_pos = current_tape_pos();
-        m_start_time = machine().time();
-        LOG_0(("Tape pos = %u\n" , m_tape_pos));
+		m_tape_pos = current_tape_pos();
+		m_start_time = machine().time();
+		LOG_0(("Tape pos = %u\n" , m_tape_pos));
 
-        // Gap detection
-        bool gap_detected = false;
-        if (m_gap_detect_start != NULL_TAPE_POS && abs(m_gap_detect_start - m_tape_pos) >= min_gap_size()) {
-                tape_pos_t tmp = m_tape_pos;
-                pos_offset(tmp , -min_gap_size());
-                gap_detected = just_gap(tmp , m_tape_pos);
-        }
-        if (gap_detected) {
-                BIT_SET(m_status_reg, STATUS_GAP_BIT);
-        } else {
-                BIT_CLR(m_status_reg, STATUS_GAP_BIT);
-        }
-        // Tach register update
-        update_tach_reg();
+		// Gap detection
+		bool gap_detected = false;
+		if (m_gap_detect_start != NULL_TAPE_POS && abs(m_gap_detect_start - m_tape_pos) >= min_gap_size()) {
+				tape_pos_t tmp = m_tape_pos;
+				pos_offset(tmp , -min_gap_size());
+				gap_detected = just_gap(tmp , m_tape_pos);
+		}
+		if (gap_detected) {
+				BIT_SET(m_status_reg, STATUS_GAP_BIT);
+		} else {
+				BIT_CLR(m_status_reg, STATUS_GAP_BIT);
+		}
+		// Tach register update
+		update_tach_reg();
 }
 
 void hp_taco_device::update_tach_reg(void)
 {
-        if (m_tach_reg_frozen) {
-                LOG_0(("Tach reg frozen\n"));
-                return;
-        }
+		if (m_tach_reg_frozen) {
+				LOG_0(("Tach reg frozen\n"));
+				return;
+		}
 
-        tape_pos_t pos = current_tape_pos();
-        tape_pos_t pos_int = pos / TAPE_POS_FRACT;
-        tape_pos_t ref_int = m_tach_reg_ref / TAPE_POS_FRACT;
-        UINT16 reg_value = (UINT16)(abs(pos_int - ref_int) + m_tach_reg);
+		tape_pos_t pos = current_tape_pos();
+		tape_pos_t pos_int = pos / TAPE_POS_FRACT;
+		tape_pos_t ref_int = m_tach_reg_ref / TAPE_POS_FRACT;
+		UINT16 reg_value = (UINT16)(abs(pos_int - ref_int) + m_tach_reg);
 
-        LOG_0(("Tach = %04x @ pos = %d, ref_pos = %d\n" , reg_value , pos , m_tach_reg_ref));
+		LOG_0(("Tach = %04x @ pos = %d, ref_pos = %d\n" , reg_value , pos , m_tach_reg_ref));
 
-        m_tach_reg = reg_value;
-        m_tach_reg_ref = pos;
+		m_tach_reg = reg_value;
+		m_tach_reg_ref = pos;
 }
 
 void hp_taco_device::freeze_tach_reg(bool freeze)
 {
-        if (freeze) {
-                m_tach_reg_frozen = true;
-        } else {
-                m_tach_reg_frozen = false;
-                m_tach_reg_ref = current_tape_pos();
-        }
+		if (freeze) {
+				m_tach_reg_frozen = true;
+		} else {
+				m_tach_reg_frozen = false;
+				m_tach_reg_ref = current_tape_pos();
+		}
 
 }
 
@@ -710,62 +710,62 @@ attotime hp_taco_device::time_to_target(tape_pos_t target) const
 
 attotime hp_taco_device::time_to_stopping_pos(void) const
 {
-        return time_to_distance(m_tape_fast ? FAST_BRAKE_DIST : SLOW_BRAKE_DIST);
+		return time_to_distance(m_tape_fast ? FAST_BRAKE_DIST : SLOW_BRAKE_DIST);
 }
 
 bool hp_taco_device::start_tape_cmd(UINT16 cmd_reg , UINT16 must_be_1 , UINT16 must_be_0)
 {
-        m_cmd_reg = cmd_reg;
+		m_cmd_reg = cmd_reg;
 
-        UINT16 to_be_tested = (m_cmd_reg & CMD_REG_MASK) | (m_status_reg & STATUS_REG_MASK);
-        // Bits in STATUS_ERR_MASK must always be 0
-        must_be_0 |= STATUS_ERR_MASK;
+		UINT16 to_be_tested = (m_cmd_reg & CMD_REG_MASK) | (m_status_reg & STATUS_REG_MASK);
+		// Bits in STATUS_ERR_MASK must always be 0
+		must_be_0 |= STATUS_ERR_MASK;
 
-        // It's not an error if the error state is already set (sts false)
-        if (((to_be_tested & (must_be_1 | must_be_0)) ^ must_be_1) != 0) {
-                return false;
-        } else {
-                bool prev_tape_wr = m_tape_wr;
-                bool prev_tape_fwd = m_tape_fwd;
-                bool prev_tape_fast = m_tape_fast;
-                bool prev_tape_braking = is_braking();
-                bool not_moving = m_start_time.is_never();
+		// It's not an error if the error state is already set (sts false)
+		if (((to_be_tested & (must_be_1 | must_be_0)) ^ must_be_1) != 0) {
+				return false;
+		} else {
+				bool prev_tape_wr = m_tape_wr;
+				bool prev_tape_fwd = m_tape_fwd;
+				bool prev_tape_fast = m_tape_fast;
+				bool prev_tape_braking = is_braking();
+				bool not_moving = m_start_time.is_never();
 
-                m_start_time = machine().time();
-                m_tape_wr = (must_be_0 & STATUS_WPR_MASK) != 0;
-                m_tape_fwd = DIR_FWD(m_cmd_reg);
-                m_tape_fast = SPEED_FAST(m_cmd_reg);
-                // TODO: remove?
-                BIT_CLR(m_status_reg, STATUS_HOLE_BIT);
+				m_start_time = machine().time();
+				m_tape_wr = (must_be_0 & STATUS_WPR_MASK) != 0;
+				m_tape_fwd = DIR_FWD(m_cmd_reg);
+				m_tape_fast = SPEED_FAST(m_cmd_reg);
+				// TODO: remove?
+				BIT_CLR(m_status_reg, STATUS_HOLE_BIT);
 
-                if (m_tape_wr) {
-                        // Write command: disable gap detector
-                        m_gap_detect_start = NULL_TAPE_POS;
-                        BIT_CLR(m_status_reg, STATUS_GAP_BIT);
-                        m_image_dirty = true;
-                } else if (not_moving || prev_tape_braking || prev_tape_wr != m_tape_wr || prev_tape_fwd != m_tape_fwd || prev_tape_fast != m_tape_fast) {
-                        // Tape started or re-started right now, switched from writing to reading, direction changed or speed changed: (re)start gap detector
-                        m_gap_detect_start = m_tape_pos;
-                        BIT_CLR(m_status_reg, STATUS_GAP_BIT);
-                }
+				if (m_tape_wr) {
+						// Write command: disable gap detector
+						m_gap_detect_start = NULL_TAPE_POS;
+						BIT_CLR(m_status_reg, STATUS_GAP_BIT);
+						m_image_dirty = true;
+				} else if (not_moving || prev_tape_braking || prev_tape_wr != m_tape_wr || prev_tape_fwd != m_tape_fwd || prev_tape_fast != m_tape_fast) {
+						// Tape started or re-started right now, switched from writing to reading, direction changed or speed changed: (re)start gap detector
+						m_gap_detect_start = m_tape_pos;
+						BIT_CLR(m_status_reg, STATUS_GAP_BIT);
+				}
 
-                if (!not_moving && !prev_tape_braking && prev_tape_fwd != m_tape_fwd) {
-                        // Tape direction inverted, stop tape before executing command
-                        m_tape_fwd = prev_tape_fwd;
-                        m_tape_fast = prev_tape_fast;
-                        m_cmd_state = CMD_INVERTING;
-                        LOG_0(("Direction reversed! fwd = %d fast = %d\n" , m_tape_fwd , m_tape_fast));
-                        m_tape_timer->adjust(time_to_stopping_pos());
-                } else {
-                        // No change in direction, immediate execution
-                        m_cmd_state = CMD_PH0;
-                        m_tape_timer->adjust(attotime::zero);
-                }
+				if (!not_moving && !prev_tape_braking && prev_tape_fwd != m_tape_fwd) {
+						// Tape direction inverted, stop tape before executing command
+						m_tape_fwd = prev_tape_fwd;
+						m_tape_fast = prev_tape_fast;
+						m_cmd_state = CMD_INVERTING;
+						LOG_0(("Direction reversed! fwd = %d fast = %d\n" , m_tape_fwd , m_tape_fast));
+						m_tape_timer->adjust(time_to_stopping_pos());
+				} else {
+						// No change in direction, immediate execution
+						m_cmd_state = CMD_PH0;
+						m_tape_timer->adjust(attotime::zero);
+				}
 
-                m_hole_timer->reset();
+				m_hole_timer->reset();
 
-                return true;
-        }
+				return true;
+		}
 }
 
 void hp_taco_device::stop_tape(void)
@@ -909,23 +909,23 @@ hp_taco_device::adv_res_t hp_taco_device::adv_it(tape_track_t::iterator& it)
 
 attotime hp_taco_device::fetch_next_wr_word(void)
 {
-        if (m_data_reg_full) {
-                m_next_word = m_data_reg;
-                m_data_reg_full = false;
-                LOG_0(("next %04x (DR)\n" , m_next_word));
-        } else {
-                // When data register is empty, write checksum word
-                m_next_word = m_checksum_reg;
-                LOG_0(("next %04x (CS)\n" , m_next_word));
-        }
-        if (m_clear_checksum_reg) {
-            m_checksum_reg = 0;
-            m_clear_checksum_reg = false;
-        }
-        // Update checksum with new word
-        m_checksum_reg += m_next_word;
+		if (m_data_reg_full) {
+				m_next_word = m_data_reg;
+				m_data_reg_full = false;
+				LOG_0(("next %04x (DR)\n" , m_next_word));
+		} else {
+				// When data register is empty, write checksum word
+				m_next_word = m_checksum_reg;
+				LOG_0(("next %04x (CS)\n" , m_next_word));
+		}
+		if (m_clear_checksum_reg) {
+			m_checksum_reg = 0;
+			m_clear_checksum_reg = false;
+		}
+		// Update checksum with new word
+		m_checksum_reg += m_next_word;
 
-        return time_to_distance(word_length(m_next_word));
+		return time_to_distance(word_length(m_next_word));
 }
 
 attotime hp_taco_device::time_to_rd_next_word(tape_pos_t& word_rd_pos)
@@ -940,7 +940,7 @@ attotime hp_taco_device::time_to_rd_next_word(tape_pos_t& word_rd_pos)
 
 hp_taco_device::tape_pos_t hp_taco_device::min_gap_size(void) const
 {
-        return LONG_GAP(m_cmd_reg) ? LONG_GAP_LENGTH : SHORT_GAP_LENGTH;
+		return LONG_GAP(m_cmd_reg) ? LONG_GAP_LENGTH : SHORT_GAP_LENGTH;
 }
 
 /**
@@ -1156,498 +1156,498 @@ attotime hp_taco_device::time_to_tach_pulses(void) const
 
 void hp_taco_device::terminate_cmd_now(void)
 {
-        m_cmd_state = CMD_END;
-        m_tape_timer->adjust(attotime::zero);
-        m_hole_timer->reset();
+		m_cmd_state = CMD_END;
+		m_tape_timer->adjust(attotime::zero);
+		m_hole_timer->reset();
 }
 
 void hp_taco_device::cmd_fsm(void)
 {
-        if (m_cmd_state == CMD_END) {
-                // Command ended
-                m_cmd_state = CMD_IDLE;
-                m_hole_timer->reset();
-                irq_w(true);
-                if (AUTO_STOP(m_cmd_reg)) {
-                        // Automatic stop after command execution
-                        LOG_0(("Tape clamped\n"));
-                        m_cmd_state = CMD_STOPPING;
-                        m_tape_timer->adjust(time_to_stopping_pos());
-                }
-        } else if (m_cmd_state == CMD_STOPPING) {
-                // Braking phase ended
-                m_cmd_state = CMD_IDLE;
-                stop_tape();
-                if (CMD_CODE(m_cmd_reg) == CMD_STOP) {
-                        irq_w(true);
-                }
-        } else {
-                attotime cmd_duration = attotime::never;
+		if (m_cmd_state == CMD_END) {
+				// Command ended
+				m_cmd_state = CMD_IDLE;
+				m_hole_timer->reset();
+				irq_w(true);
+				if (AUTO_STOP(m_cmd_reg)) {
+						// Automatic stop after command execution
+						LOG_0(("Tape clamped\n"));
+						m_cmd_state = CMD_STOPPING;
+						m_tape_timer->adjust(time_to_stopping_pos());
+				}
+		} else if (m_cmd_state == CMD_STOPPING) {
+				// Braking phase ended
+				m_cmd_state = CMD_IDLE;
+				stop_tape();
+				if (CMD_CODE(m_cmd_reg) == CMD_STOP) {
+						irq_w(true);
+				}
+		} else {
+				attotime cmd_duration = attotime::never;
 
-                if (m_cmd_state == CMD_INVERTING) {
-                        m_tape_fwd = DIR_FWD(m_cmd_reg);
-                        m_tape_fast = SPEED_FAST(m_cmd_reg);
-                        m_cmd_state = CMD_PH0;
-                }
+				if (m_cmd_state == CMD_INVERTING) {
+						m_tape_fwd = DIR_FWD(m_cmd_reg);
+						m_tape_fast = SPEED_FAST(m_cmd_reg);
+						m_cmd_state = CMD_PH0;
+				}
 
-                if (m_cmd_state == CMD_PH0) {
-                        m_hole_timer->adjust(time_to_next_hole());
-                }
+				if (m_cmd_state == CMD_PH0) {
+						m_hole_timer->adjust(time_to_next_hole());
+				}
 
-                switch (CMD_CODE(m_cmd_reg)) {
-                case CMD_INDTA_INGAP:
-                        if (m_cmd_state == CMD_PH0) {
-                                // PH0
-                                if (next_data(m_rd_it , m_tape_pos , true)) {
-                                        cmd_duration = time_to_target(farthest_end(m_rd_it));
-                                }
-                                m_cmd_state = CMD_PH1;
-                        } else {
-                                // PH1
-                                tape_pos_t target = m_tape_pos;
-                                if (next_n_gap(target, 1, min_gap_size())) {
-                                        cmd_duration = time_to_target(target);
-                                }
-                                m_cmd_state = CMD_END;
-                        }
-                        break;
+				switch (CMD_CODE(m_cmd_reg)) {
+				case CMD_INDTA_INGAP:
+						if (m_cmd_state == CMD_PH0) {
+								// PH0
+								if (next_data(m_rd_it , m_tape_pos , true)) {
+										cmd_duration = time_to_target(farthest_end(m_rd_it));
+								}
+								m_cmd_state = CMD_PH1;
+						} else {
+								// PH1
+								tape_pos_t target = m_tape_pos;
+								if (next_n_gap(target, 1, min_gap_size())) {
+										cmd_duration = time_to_target(target);
+								}
+								m_cmd_state = CMD_END;
+						}
+						break;
 
-                case CMD_FINAL_GAP:
-                        if (m_cmd_state == CMD_PH0) {
-                                // PH0
-                                m_rw_pos = m_tape_pos;
-                                cmd_duration = time_to_distance(END_GAP_LENGTH);
-                                m_cmd_state = CMD_PH1;
-                        } else {
-                                // PH1
-                                write_gap(m_rw_pos , m_tape_pos);
-                                cmd_duration = attotime::zero;
-                                m_cmd_state = CMD_END;
-                        }
-                        break;
+				case CMD_FINAL_GAP:
+						if (m_cmd_state == CMD_PH0) {
+								// PH0
+								m_rw_pos = m_tape_pos;
+								cmd_duration = time_to_distance(END_GAP_LENGTH);
+								m_cmd_state = CMD_PH1;
+						} else {
+								// PH1
+								write_gap(m_rw_pos , m_tape_pos);
+								cmd_duration = attotime::zero;
+								m_cmd_state = CMD_END;
+						}
+						break;
 
-                case CMD_RECORD_WRITE:
-                        if (m_cmd_state == CMD_PH0) {
-                                // PH0
-                                // Search for preamble first
-                                m_rd_it_valid = next_data(m_rd_it , m_tape_pos , false);
-                                cmd_duration = time_to_rd_next_word(m_rw_pos);
-                                m_cmd_state = CMD_PH1;
-                                break;
-                        } else if (m_cmd_state == CMD_PH1) {
-                                // PH1
-                                if (m_rd_it->second == PREAMBLE_WORD) {
-                                        LOG_0(("Got preamble\n"));
-                                        m_cmd_state = CMD_PH2;
-                                        // m_rw_pos already at correct position
-                                        cmd_duration = fetch_next_wr_word();
-                                        irq_w(true);
-                                } else {
-                                        adv_res_t res = adv_it(m_rd_it);
-                                        if (res != ADV_NO_MORE_DATA) {
-                                                cmd_duration = time_to_rd_next_word(m_rw_pos);
-                                        }
-                                }
-                                break;
-                        }
-                        // Intentional fall-through on PH2
+				case CMD_RECORD_WRITE:
+						if (m_cmd_state == CMD_PH0) {
+								// PH0
+								// Search for preamble first
+								m_rd_it_valid = next_data(m_rd_it , m_tape_pos , false);
+								cmd_duration = time_to_rd_next_word(m_rw_pos);
+								m_cmd_state = CMD_PH1;
+								break;
+						} else if (m_cmd_state == CMD_PH1) {
+								// PH1
+								if (m_rd_it->second == PREAMBLE_WORD) {
+										LOG_0(("Got preamble\n"));
+										m_cmd_state = CMD_PH2;
+										// m_rw_pos already at correct position
+										cmd_duration = fetch_next_wr_word();
+										irq_w(true);
+								} else {
+										adv_res_t res = adv_it(m_rd_it);
+										if (res != ADV_NO_MORE_DATA) {
+												cmd_duration = time_to_rd_next_word(m_rw_pos);
+										}
+								}
+								break;
+						}
+						// Intentional fall-through on PH2
 
-                case CMD_INIT_WRITE:
-                        if (m_cmd_state == CMD_PH0) {
-                                // PH0
-                                m_next_word = PREAMBLE_WORD;
-                                m_rw_pos = m_tape_pos;
-                                cmd_duration = time_to_distance(word_length(m_next_word));
-                                m_cmd_state = CMD_PH1;
-                        } else {
-                                // PH1 & PH2 of CMD_RECORD_WRITE
-                                tape_pos_t length;
-                                write_word(m_rw_pos , m_next_word , length);
-                                pos_offset(m_rw_pos , length);
-                                // Just to be sure..
-                                m_tape_pos = m_rw_pos;
-                                cmd_duration = fetch_next_wr_word();
-                                irq_w(true);
-                        }
-                        break;
+				case CMD_INIT_WRITE:
+						if (m_cmd_state == CMD_PH0) {
+								// PH0
+								m_next_word = PREAMBLE_WORD;
+								m_rw_pos = m_tape_pos;
+								cmd_duration = time_to_distance(word_length(m_next_word));
+								m_cmd_state = CMD_PH1;
+						} else {
+								// PH1 & PH2 of CMD_RECORD_WRITE
+								tape_pos_t length;
+								write_word(m_rw_pos , m_next_word , length);
+								pos_offset(m_rw_pos , length);
+								// Just to be sure..
+								m_tape_pos = m_rw_pos;
+								cmd_duration = fetch_next_wr_word();
+								irq_w(true);
+						}
+						break;
 
-                case CMD_SET_TRACK:
-                        // PH0
-                        // When b9 is 0, set track A/B
-                        // When b9 is 1, ignore command (in TACO chip it has an unknown purpose)
-                        if (!AUTO_STOP(m_cmd_reg)) {
-                                if (CMD_OPT(m_cmd_reg)) {
-                                        BIT_SET(m_status_reg, STATUS_TRACKB_BIT);
-                                } else {
-                                        BIT_CLR(m_status_reg, STATUS_TRACKB_BIT);
-                                }
-                        }
-                        cmd_duration = attotime::from_usec(QUICK_CMD_USEC);
-                        m_hole_timer->reset();
-                        m_cmd_state = CMD_END;
-                        break;
+				case CMD_SET_TRACK:
+						// PH0
+						// When b9 is 0, set track A/B
+						// When b9 is 1, ignore command (in TACO chip it has an unknown purpose)
+						if (!AUTO_STOP(m_cmd_reg)) {
+								if (CMD_OPT(m_cmd_reg)) {
+										BIT_SET(m_status_reg, STATUS_TRACKB_BIT);
+								} else {
+										BIT_CLR(m_status_reg, STATUS_TRACKB_BIT);
+								}
+						}
+						cmd_duration = attotime::from_usec(QUICK_CMD_USEC);
+						m_hole_timer->reset();
+						m_cmd_state = CMD_END;
+						break;
 
-                case CMD_MOVE:
-                        // PH0
-                        // Endless movement: not setting cmd_duration
-                        m_cmd_state = CMD_END;
-                        break;
+				case CMD_MOVE:
+						// PH0
+						// Endless movement: not setting cmd_duration
+						m_cmd_state = CMD_END;
+						break;
 
-                case CMD_INGAP_MOVE:
-                        if (m_cmd_state == CMD_PH0) {
-                                // PH0
-                                tape_pos_t target = m_tape_pos;
-                                if (next_n_gap(target, 1, min_gap_size())) {
-                                        LOG_0(("IRG @%d\n" , target));
-                                        cmd_duration = time_to_target(target);
-                                }
-                                m_cmd_state = CMD_PH1;
-                        } else {
-                                // PH1
-                                cmd_duration = time_to_tach_pulses();
-                                freeze_tach_reg(false);
-                                m_cmd_state = CMD_END;
-                        }
-                        break;
+				case CMD_INGAP_MOVE:
+						if (m_cmd_state == CMD_PH0) {
+								// PH0
+								tape_pos_t target = m_tape_pos;
+								if (next_n_gap(target, 1, min_gap_size())) {
+										LOG_0(("IRG @%d\n" , target));
+										cmd_duration = time_to_target(target);
+								}
+								m_cmd_state = CMD_PH1;
+						} else {
+								// PH1
+								cmd_duration = time_to_tach_pulses();
+								freeze_tach_reg(false);
+								m_cmd_state = CMD_END;
+						}
+						break;
 
-                case CMD_NOT_INDTA:
-                        if (m_cmd_state == CMD_PH0) {
-                                // PH0
-                                if (next_data(m_rd_it , m_tape_pos , true)) {
-                                        cmd_duration = time_to_target(farthest_end(m_rd_it));
-                                }
-                                m_cmd_state = CMD_PH1;
-                        } else {
-                                // PH1
-                                tape_pos_t target = m_tape_pos;
-                                if (next_n_gap(target, 1, NO_DATA_GAP)) {
-                                        LOG_0(("End of data @%d\n" , target));
-                                        cmd_duration = time_to_target(target);
-                                }
-                                m_cmd_state = CMD_END;
-                        }
-                        break;
+				case CMD_NOT_INDTA:
+						if (m_cmd_state == CMD_PH0) {
+								// PH0
+								if (next_data(m_rd_it , m_tape_pos , true)) {
+										cmd_duration = time_to_target(farthest_end(m_rd_it));
+								}
+								m_cmd_state = CMD_PH1;
+						} else {
+								// PH1
+								tape_pos_t target = m_tape_pos;
+								if (next_n_gap(target, 1, NO_DATA_GAP)) {
+										LOG_0(("End of data @%d\n" , target));
+										cmd_duration = time_to_target(target);
+								}
+								m_cmd_state = CMD_END;
+						}
+						break;
 
-                case CMD_WRITE_IRG:
-                        if (m_cmd_state == CMD_PH0) {
-                                // PH0
-                                freeze_tach_reg(false);
-                                m_rw_pos = m_tape_pos;
-                                cmd_duration = time_to_tach_pulses();
-                                m_cmd_state = CMD_PH1;
-                        } else {
-                                // PH1
-                                write_gap(m_rw_pos , m_tape_pos);
-                                cmd_duration = attotime::zero;
-                                m_cmd_state = CMD_END;
-                        }
-                        break;
+				case CMD_WRITE_IRG:
+						if (m_cmd_state == CMD_PH0) {
+								// PH0
+								freeze_tach_reg(false);
+								m_rw_pos = m_tape_pos;
+								cmd_duration = time_to_tach_pulses();
+								m_cmd_state = CMD_PH1;
+						} else {
+								// PH1
+								write_gap(m_rw_pos , m_tape_pos);
+								cmd_duration = attotime::zero;
+								m_cmd_state = CMD_END;
+						}
+						break;
 
-                case CMD_SCAN_RECORDS:
-                        if (m_cmd_state == CMD_PH0) {
-                                // PH0
-                                if (next_data(m_rd_it , m_tape_pos , true)) {
-                                        cmd_duration = time_to_target(farthest_end(m_rd_it));
-                                }
-                                m_cmd_state = CMD_PH1;
-                        } else {
-                                // PH1
-                                tape_pos_t target = m_tape_pos;
-                                // b8 seems to select size of gaps
-                                // Tach. register is incremented at each gap. Command ends when this register goes positive (b15 = 0).
-                                unsigned n_gaps;
-                                if (BIT(m_tach_reg , 15)) {
-                                        n_gaps = 0x10000U - m_tach_reg;
-                                        m_tach_reg = 0;
-                                } else {
-                                        n_gaps = 1;
-                                        m_tach_reg++;
-                                }
-                                if (next_n_gap(target, n_gaps, min_gap_size())) {
-                                        LOG_0(("%u gaps @%d\n" , n_gaps, target));
-                                        cmd_duration = time_to_target(target);
-                                }
-                                m_cmd_state = CMD_END;
-                        }
-                        break;
+				case CMD_SCAN_RECORDS:
+						if (m_cmd_state == CMD_PH0) {
+								// PH0
+								if (next_data(m_rd_it , m_tape_pos , true)) {
+										cmd_duration = time_to_target(farthest_end(m_rd_it));
+								}
+								m_cmd_state = CMD_PH1;
+						} else {
+								// PH1
+								tape_pos_t target = m_tape_pos;
+								// b8 seems to select size of gaps
+								// Tach. register is incremented at each gap. Command ends when this register goes positive (b15 = 0).
+								unsigned n_gaps;
+								if (BIT(m_tach_reg , 15)) {
+										n_gaps = 0x10000U - m_tach_reg;
+										m_tach_reg = 0;
+								} else {
+										n_gaps = 1;
+										m_tach_reg++;
+								}
+								if (next_n_gap(target, n_gaps, min_gap_size())) {
+										LOG_0(("%u gaps @%d\n" , n_gaps, target));
+										cmd_duration = time_to_target(target);
+								}
+								m_cmd_state = CMD_END;
+						}
+						break;
 
-                case CMD_MOVE_INDTA:
-                        if (m_cmd_state == CMD_PH0) {
-                                // PH0
-                                freeze_tach_reg(false);
-                                cmd_duration = time_to_tach_pulses();
-                                m_cmd_state = CMD_PH1;
-                        } else {
-                                // PH1
-                                if (next_data(m_rd_it , m_tape_pos , true)) {
-                                        cmd_duration = time_to_target(farthest_end(m_rd_it));
-                                }
-                                m_cmd_state = CMD_END;
-                        }
-                        break;
+				case CMD_MOVE_INDTA:
+						if (m_cmd_state == CMD_PH0) {
+								// PH0
+								freeze_tach_reg(false);
+								cmd_duration = time_to_tach_pulses();
+								m_cmd_state = CMD_PH1;
+						} else {
+								// PH1
+								if (next_data(m_rd_it , m_tape_pos , true)) {
+										cmd_duration = time_to_target(farthest_end(m_rd_it));
+								}
+								m_cmd_state = CMD_END;
+						}
+						break;
 
-                case CMD_UNK_1b:
-                        // PH0
-                        // Unknown purpose, but make it a NOP (it's used in "T" test of test ROM)
-                        cmd_duration = attotime::from_usec(QUICK_CMD_USEC);
-                        m_cmd_state = CMD_END;
-                        break;
+				case CMD_UNK_1b:
+						// PH0
+						// Unknown purpose, but make it a NOP (it's used in "T" test of test ROM)
+						cmd_duration = attotime::from_usec(QUICK_CMD_USEC);
+						m_cmd_state = CMD_END;
+						break;
 
-                case CMD_MOVE_INGAP:
-                        if (m_cmd_state == CMD_PH0) {
-                                // PH0
-                                freeze_tach_reg(false);
-                                cmd_duration = time_to_tach_pulses();
-                                m_cmd_state = CMD_PH1;
-                        } else {
-                                // PH1
-                                tape_pos_t target = m_tape_pos;
-                                if (next_n_gap(target, 1, min_gap_size())) {
-                                        LOG_0(("GAP @%d\n" , target));
-                                        cmd_duration = time_to_target(target);
-                                }
-                                m_cmd_state = CMD_END;
-                        }
-                        break;
+				case CMD_MOVE_INGAP:
+						if (m_cmd_state == CMD_PH0) {
+								// PH0
+								freeze_tach_reg(false);
+								cmd_duration = time_to_tach_pulses();
+								m_cmd_state = CMD_PH1;
+						} else {
+								// PH1
+								tape_pos_t target = m_tape_pos;
+								if (next_n_gap(target, 1, min_gap_size())) {
+										LOG_0(("GAP @%d\n" , target));
+										cmd_duration = time_to_target(target);
+								}
+								m_cmd_state = CMD_END;
+						}
+						break;
 
-                case CMD_START_READ:
-                        if (m_cmd_state == CMD_PH0) {
-                                // PH0
-                                // Should also check if tape position has gone too far to read word @ m_rd_it
-                                if (!m_rd_it_valid) {
-                                        // Search for preamble first
-                                        m_rd_it_valid = next_data(m_rd_it , m_tape_pos , false);
-                                        m_cmd_state = CMD_PH1;
-                                } else {
-                                        // Resume reading from last position, skip preamble search
-                                        m_cmd_state = CMD_PH2;
-                                }
+				case CMD_START_READ:
+						if (m_cmd_state == CMD_PH0) {
+								// PH0
+								// Should also check if tape position has gone too far to read word @ m_rd_it
+								if (!m_rd_it_valid) {
+										// Search for preamble first
+										m_rd_it_valid = next_data(m_rd_it , m_tape_pos , false);
+										m_cmd_state = CMD_PH1;
+								} else {
+										// Resume reading from last position, skip preamble search
+										m_cmd_state = CMD_PH2;
+								}
 
-                                cmd_duration = time_to_rd_next_word(m_rw_pos);
-                        } else {
-                                // Just to be sure..
-                                m_tape_pos = m_rw_pos;
+								cmd_duration = time_to_rd_next_word(m_rw_pos);
+						} else {
+								// Just to be sure..
+								m_tape_pos = m_rw_pos;
 
-                                if (m_cmd_state == CMD_PH3) {
-                                        // PH3: delayed setting of error condition
-                                        set_error(true);
-                                        m_cmd_state = CMD_PH2;
-                                }
+								if (m_cmd_state == CMD_PH3) {
+										// PH3: delayed setting of error condition
+										set_error(true);
+										m_cmd_state = CMD_PH2;
+								}
 
-                                if (m_cmd_state == CMD_PH1) {
-                                        // PH1
-                                        // Any word with at least a 0 will do as preamble.
-                                        // But anything that's not the correct preamble word (0) will cause a wrong alignment
-                                        // with word boundaries. TACO will read garbage data in this case (this effect is not simulated here).
-                                        if (m_rd_it->second != 0xffff) {
-                                                m_cmd_state = CMD_PH2;
-                                                LOG_0(("Got preamble %04x\n" , m_rd_it->second));
-                                        }
-                                } else {
-                                        // PH2
-                                        irq_w(true);
-                                        m_data_reg = m_rd_it->second;
-                                        if (m_clear_checksum_reg) {
-                                                m_checksum_reg = 0;
-                                                m_clear_checksum_reg = false;
-                                        }
-                                        m_checksum_reg += m_data_reg;
-                                        LOG_0(("RD %04x\n" , m_data_reg));
-                                }
-                                adv_res_t res = adv_it(m_rd_it);
-                                LOG_0(("adv_it %d\n" , res));
-                                if (res == ADV_NO_MORE_DATA) {
-                                        m_rd_it_valid = false;
-                                } else {
-                                        cmd_duration = time_to_rd_next_word(m_rw_pos);
-                                        if (res == ADV_DISCONT_DATA) {
-                                                // Wild guess: TACO sets error flag when it stumbles on a gap between words
-                                                if (m_cmd_state == CMD_PH2 && abs(m_tape_pos - m_rw_pos) > ((tape_pos_t)(0.25 * ONE_INCH_POS))) {
-                                                        m_cmd_state = CMD_PH3;
-                                                } else {
-                                                        // Hit a gap, restart preamble search
-                                                        // TODO: is this ok?
-                                                        m_cmd_state = CMD_PH1;
-                                                }
-                                        }
-                                }
-                        }
-                        break;
+								if (m_cmd_state == CMD_PH1) {
+										// PH1
+										// Any word with at least a 0 will do as preamble.
+										// But anything that's not the correct preamble word (0) will cause a wrong alignment
+										// with word boundaries. TACO will read garbage data in this case (this effect is not simulated here).
+										if (m_rd_it->second != 0xffff) {
+												m_cmd_state = CMD_PH2;
+												LOG_0(("Got preamble %04x\n" , m_rd_it->second));
+										}
+								} else {
+										// PH2
+										irq_w(true);
+										m_data_reg = m_rd_it->second;
+										if (m_clear_checksum_reg) {
+												m_checksum_reg = 0;
+												m_clear_checksum_reg = false;
+										}
+										m_checksum_reg += m_data_reg;
+										LOG_0(("RD %04x\n" , m_data_reg));
+								}
+								adv_res_t res = adv_it(m_rd_it);
+								LOG_0(("adv_it %d\n" , res));
+								if (res == ADV_NO_MORE_DATA) {
+										m_rd_it_valid = false;
+								} else {
+										cmd_duration = time_to_rd_next_word(m_rw_pos);
+										if (res == ADV_DISCONT_DATA) {
+												// Wild guess: TACO sets error flag when it stumbles on a gap between words
+												if (m_cmd_state == CMD_PH2 && abs(m_tape_pos - m_rw_pos) > ((tape_pos_t)(0.25 * ONE_INCH_POS))) {
+														m_cmd_state = CMD_PH3;
+												} else {
+														// Hit a gap, restart preamble search
+														// TODO: is this ok?
+														m_cmd_state = CMD_PH1;
+												}
+										}
+								}
+						}
+						break;
 
-                case CMD_DELTA_MOVE_IRG:
-                        // PH0
-                        freeze_tach_reg(false);
-                        cmd_duration = time_to_tach_pulses();
-                        m_cmd_state = CMD_END;
-                        break;
+				case CMD_DELTA_MOVE_IRG:
+						// PH0
+						freeze_tach_reg(false);
+						cmd_duration = time_to_tach_pulses();
+						m_cmd_state = CMD_END;
+						break;
 
-                case CMD_END_READ:
-                        if (m_cmd_state == CMD_PH0) {
-                                // PH0
-                                cmd_duration = time_to_rd_next_word(m_rw_pos);
-                                m_cmd_state = CMD_PH1;
-                        } else {
-                                // PH1
-                                m_tape_pos = m_rw_pos;
-                                // Note: checksum is not updated
-                                m_data_reg = m_rd_it->second;
-                                LOG_0(("Final RD %04x\n" , m_data_reg));
-                                adv_res_t res = adv_it(m_rd_it);
-                                if (res == ADV_NO_MORE_DATA) {
-                                        m_rd_it_valid = false;
-                                }
-                                cmd_duration = attotime::zero;
-                                m_cmd_state = CMD_END;
-                        }
-                        break;
+				case CMD_END_READ:
+						if (m_cmd_state == CMD_PH0) {
+								// PH0
+								cmd_duration = time_to_rd_next_word(m_rw_pos);
+								m_cmd_state = CMD_PH1;
+						} else {
+								// PH1
+								m_tape_pos = m_rw_pos;
+								// Note: checksum is not updated
+								m_data_reg = m_rd_it->second;
+								LOG_0(("Final RD %04x\n" , m_data_reg));
+								adv_res_t res = adv_it(m_rd_it);
+								if (res == ADV_NO_MORE_DATA) {
+										m_rd_it_valid = false;
+								}
+								cmd_duration = attotime::zero;
+								m_cmd_state = CMD_END;
+						}
+						break;
 
-                default:
-                        break;
-                }
+				default:
+						break;
+				}
 
-                m_tape_timer->adjust(cmd_duration);
-        }
+				m_tape_timer->adjust(cmd_duration);
+		}
 }
 
 void hp_taco_device::start_cmd_exec(UINT16 new_cmd_reg)
 {
-        LOG_0(("New cmd %02x @ %g cmd %02x st %d\n" , CMD_CODE(new_cmd_reg) , machine().time().as_double() , CMD_CODE(m_cmd_reg) , m_cmd_state));
+		LOG_0(("New cmd %02x @ %g cmd %02x st %d\n" , CMD_CODE(new_cmd_reg) , machine().time().as_double() , CMD_CODE(m_cmd_reg) , m_cmd_state));
 
-        update_tape_pos();
+		update_tape_pos();
 
-        unsigned new_cmd_code = CMD_CODE(new_cmd_reg);
+		unsigned new_cmd_code = CMD_CODE(new_cmd_reg);
 
-        if (new_cmd_code != CMD_START_READ &&
-            new_cmd_code != CMD_END_READ &&
-            new_cmd_code != CMD_CLEAR) {
-                m_rd_it_valid = false;
-        }
+		if (new_cmd_code != CMD_START_READ &&
+			new_cmd_code != CMD_END_READ &&
+			new_cmd_code != CMD_CLEAR) {
+				m_rd_it_valid = false;
+		}
 
-        bool started = false;
+		bool started = false;
 
-        switch (new_cmd_code) {
-        case CMD_INDTA_INGAP:
-                // Errors: CART OUT,FAST SPEED
-                started = start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK);
-                break;
+		switch (new_cmd_code) {
+		case CMD_INDTA_INGAP:
+				// Errors: CART OUT,FAST SPEED
+				started = start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK);
+				break;
 
-        case CMD_FINAL_GAP:
-                // Errors: WP,CART OUT
-                started = start_tape_cmd(new_cmd_reg , 0 , STATUS_WPR_MASK);
-                break;
+		case CMD_FINAL_GAP:
+				// Errors: WP,CART OUT
+				started = start_tape_cmd(new_cmd_reg , 0 , STATUS_WPR_MASK);
+				break;
 
-        case CMD_INIT_WRITE:
-                // Errors: WP,CART OUT,fast speed,reverse
-                started = start_tape_cmd(new_cmd_reg , DIR_FWD_MASK , STATUS_WPR_MASK | SPEED_FAST_MASK);
-                break;
+		case CMD_INIT_WRITE:
+				// Errors: WP,CART OUT,fast speed,reverse
+				started = start_tape_cmd(new_cmd_reg , DIR_FWD_MASK , STATUS_WPR_MASK | SPEED_FAST_MASK);
+				break;
 
-        case CMD_STOP:
-                m_cmd_reg = new_cmd_reg;
-                freeze_tach_reg(false);
-                m_hole_timer->reset();
-                if (m_cmd_state == CMD_INVERTING || m_cmd_state == CMD_STOPPING) {
-                        // Already braking
-                        // m_tape_timer already set
-                } else if (m_start_time.is_never()) {
-                        // Tape is already stopped
-                        LOG_0(("Already stopped\n"));
-                        m_tape_timer->adjust(attotime::from_usec(QUICK_CMD_USEC));
-                } else {
-                        // Start braking timer
-                        m_cmd_state = CMD_STOPPING;
-                        m_tape_timer->adjust(time_to_stopping_pos());
-                }
-                m_cmd_state = CMD_STOPPING;
-                return;
+		case CMD_STOP:
+				m_cmd_reg = new_cmd_reg;
+				freeze_tach_reg(false);
+				m_hole_timer->reset();
+				if (m_cmd_state == CMD_INVERTING || m_cmd_state == CMD_STOPPING) {
+						// Already braking
+						// m_tape_timer already set
+				} else if (m_start_time.is_never()) {
+						// Tape is already stopped
+						LOG_0(("Already stopped\n"));
+						m_tape_timer->adjust(attotime::from_usec(QUICK_CMD_USEC));
+				} else {
+						// Start braking timer
+						m_cmd_state = CMD_STOPPING;
+						m_tape_timer->adjust(time_to_stopping_pos());
+				}
+				m_cmd_state = CMD_STOPPING;
+				return;
 
-        case CMD_SET_TRACK:
-                // Don't know if this command really starts the tape or not (probably it doesn't)
-                started = start_tape_cmd(new_cmd_reg , 0 , 0);
-                break;
+		case CMD_SET_TRACK:
+				// Don't know if this command really starts the tape or not (probably it doesn't)
+				started = start_tape_cmd(new_cmd_reg , 0 , 0);
+				break;
 
-        case CMD_MOVE:
-                started = start_tape_cmd(new_cmd_reg , 0 , 0);
-                break;
+		case CMD_MOVE:
+				started = start_tape_cmd(new_cmd_reg , 0 , 0);
+				break;
 
-        case CMD_INGAP_MOVE:
-                // Errors: CART OUT,FAST SPEED
-                started = start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK);
-                break;
+		case CMD_INGAP_MOVE:
+				// Errors: CART OUT,FAST SPEED
+				started = start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK);
+				break;
 
-        case CMD_CLEAR:
-                set_error(false);
-                BIT_CLR(m_status_reg, STATUS_HOLE_BIT);
-                BIT_CLR(m_status_reg, STATUS_CART_OUT_BIT);
-                BIT_CLR(m_status_reg, STATUS_WPR_BIT);
-                set_tape_present(is_loaded());
-                // This is a special command: it doesn't raise IRQ at completion and it
-                // doesn't replace current command
-                return;
+		case CMD_CLEAR:
+				set_error(false);
+				BIT_CLR(m_status_reg, STATUS_HOLE_BIT);
+				BIT_CLR(m_status_reg, STATUS_CART_OUT_BIT);
+				BIT_CLR(m_status_reg, STATUS_WPR_BIT);
+				set_tape_present(is_loaded());
+				// This is a special command: it doesn't raise IRQ at completion and it
+				// doesn't replace current command
+				return;
 
-        case CMD_NOT_INDTA:
-                // Errors: CART OUT,FAST SPEED
-                started = start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK);
-                break;
+		case CMD_NOT_INDTA:
+				// Errors: CART OUT,FAST SPEED
+				started = start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK);
+				break;
 
-        case CMD_WRITE_IRG:
-                // Errors: WP,CART OUT
-                started = start_tape_cmd(new_cmd_reg , 0 , STATUS_WPR_MASK);
-                break;
+		case CMD_WRITE_IRG:
+				// Errors: WP,CART OUT
+				started = start_tape_cmd(new_cmd_reg , 0 , STATUS_WPR_MASK);
+				break;
 
-        case CMD_SCAN_RECORDS:
-                // Errors: CART OUT
-                started = start_tape_cmd(new_cmd_reg , 0 , 0);
-                break;
+		case CMD_SCAN_RECORDS:
+				// Errors: CART OUT
+				started = start_tape_cmd(new_cmd_reg , 0 , 0);
+				break;
 
-        case CMD_RECORD_WRITE:
-                // Errors: WP,CART OUT,fast speed,reverse
-                started = start_tape_cmd(new_cmd_reg , DIR_FWD_MASK , STATUS_WPR_MASK | SPEED_FAST_MASK);
-                break;
+		case CMD_RECORD_WRITE:
+				// Errors: WP,CART OUT,fast speed,reverse
+				started = start_tape_cmd(new_cmd_reg , DIR_FWD_MASK , STATUS_WPR_MASK | SPEED_FAST_MASK);
+				break;
 
-        case CMD_MOVE_INDTA:
-                // Errors: CART OUT,FAST SPEED
-                started = start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK);
-                break;
+		case CMD_MOVE_INDTA:
+				// Errors: CART OUT,FAST SPEED
+				started = start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK);
+				break;
 
-        case CMD_UNK_1b:
-                started = start_tape_cmd(new_cmd_reg , 0 , 0);
-                break;
+		case CMD_UNK_1b:
+				started = start_tape_cmd(new_cmd_reg , 0 , 0);
+				break;
 
-        case CMD_MOVE_INGAP:
-                started = start_tape_cmd(new_cmd_reg , 0 , 0);
-                break;
+		case CMD_MOVE_INGAP:
+				started = start_tape_cmd(new_cmd_reg , 0 , 0);
+				break;
 
-        case CMD_START_READ:
-                // Yes, you can read tape backwards: test "C" does that!
-                // Because of this DIR_FWD_MASK is not in the "must be 1" mask.
-                started = start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK);
-                break;
+		case CMD_START_READ:
+				// Yes, you can read tape backwards: test "C" does that!
+				// Because of this DIR_FWD_MASK is not in the "must be 1" mask.
+				started = start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK);
+				break;
 
-        case CMD_DELTA_MOVE_IRG:
-                started = start_tape_cmd(new_cmd_reg , 0 , 0);
-                break;
+		case CMD_DELTA_MOVE_IRG:
+				started = start_tape_cmd(new_cmd_reg , 0 , 0);
+				break;
 
-        case CMD_END_READ:
-                // This command only makes sense after CMD_START_READ
-                if (CMD_CODE(m_cmd_reg) == CMD_START_READ &&
-                    (m_cmd_state == CMD_PH2 || m_cmd_state == CMD_PH3)) {
-                        started = start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK);
-                        LOG_0(("END_READ %d\n" , m_rd_it_valid));
-                }
-                break;
+		case CMD_END_READ:
+				// This command only makes sense after CMD_START_READ
+				if (CMD_CODE(m_cmd_reg) == CMD_START_READ &&
+					(m_cmd_state == CMD_PH2 || m_cmd_state == CMD_PH3)) {
+						started = start_tape_cmd(new_cmd_reg , 0 , SPEED_FAST_MASK);
+						LOG_0(("END_READ %d\n" , m_rd_it_valid));
+				}
+				break;
 
-        default:
-                LOG(("Unrecognized command\n"));
-                started = false;
-                break;
-        }
+		default:
+				LOG(("Unrecognized command\n"));
+				started = false;
+				break;
+		}
 
-        if (!started) {
-                set_error(true);
-                m_cmd_state = CMD_IDLE;
-                m_tape_timer->reset();
-                m_hole_timer->reset();
-        }
+		if (!started) {
+				set_error(true);
+				m_cmd_state = CMD_IDLE;
+				m_tape_timer->reset();
+				m_hole_timer->reset();
+		}
 }
 
 bool hp_taco_device::call_load()
@@ -1688,7 +1688,7 @@ void hp_taco_device::call_unload()
 
 void hp_taco_device::call_display()
 {
-/*	
+/*
         // Mostly lifted from cassette_image_device::call_display ;)
 
         // Do not show anything if image not loaded or tape not moving
@@ -1715,13 +1715,13 @@ void hp_taco_device::call_display()
 
         snprintf(buffer , sizeof(buffer) , "%c %c %c%c [%04d/1824]" , track , r_w , m1 , m2 , pos_in);
 
-	float x, y;
-	x = 0.2f;
-	y = 0.5f;
-	y *= device().machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+    float x, y;
+    x = 0.2f;
+    y = 0.5f;
+    y *= device().machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 
-	device().machine().ui().draw_text_box(&device().machine().render().ui_container(), buffer, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
-	*/
+    device().machine().ui().draw_text_box(&device().machine().render().ui_container(), buffer, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
+    */
 }
 
 const char *hp_taco_device::file_extensions() const

@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/watchdog.h"
 #include "video/tc0080vco.h"
 
 class taitoo_state : public driver_device
@@ -14,12 +15,14 @@ public:
 	taitoo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_tc0080vco(*this, "tc0080vco"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tc0080vco_device> m_tc0080vco;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

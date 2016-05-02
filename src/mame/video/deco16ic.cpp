@@ -865,20 +865,20 @@ void deco16ic_device::pf_update( const UINT16 *rowscroll_1_ptr, const UINT16 *ro
 
 void deco16ic_device::print_debug_info(bitmap_ind16 &bitmap)
 {
-/*	char buf[64*5];
+/*  char buf[64*5];
 
-	if (machine().input().code_pressed(KEYCODE_O))
-		return;
+    if (machine().input().code_pressed(KEYCODE_O))
+        return;
 
-	if (m_pf12_control)
-	{
-		sprintf(buf,"%04X %04X %04X %04X\n", m_pf12_control[0], m_pf12_control[1], m_pf12_control[2], m_pf12_control[3]);
-		sprintf(&buf[strlen(buf)],"%04X %04X %04X %04X\n", m_pf12_control[4], m_pf12_control[5], m_pf12_control[6], m_pf12_control[7]);
-	}
-	else
-		sprintf(buf, "\n\n");
+    if (m_pf12_control)
+    {
+        sprintf(buf,"%04X %04X %04X %04X\n", m_pf12_control[0], m_pf12_control[1], m_pf12_control[2], m_pf12_control[3]);
+        sprintf(&buf[strlen(buf)],"%04X %04X %04X %04X\n", m_pf12_control[4], m_pf12_control[5], m_pf12_control[6], m_pf12_control[7]);
+    }
+    else
+        sprintf(buf, "\n\n");
 
-	machine().ui().draw_text(&machine().render().ui_container(), buf, 60, 40);*/
+    machine().ui().draw_text(&machine().render().ui_container(), buf, 60, 40);*/
 }
 
 /*****************************************************************************************/

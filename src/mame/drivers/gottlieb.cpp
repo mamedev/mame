@@ -198,6 +198,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 
 #include "includes/gottlieb.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 
 #define LOG_AUDIO_DECODE    (0)
@@ -753,7 +754,7 @@ static ADDRESS_MAP_START( reactor_map, AS_PROGRAM, 8, gottlieb_state )
 	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_SHARE("charram")               /* BOJRSEL1 */
 /*  AM_RANGE(0x5000, 0x5fff) AM_WRITE() */                                                               /* BOJRSEL2 */
 	AM_RANGE(0x6000, 0x601f) AM_MIRROR(0x0fe0) AM_WRITE(gottlieb_paletteram_w) AM_SHARE("paletteram")       /* COLSEL */
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff8) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff8) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_analog_reset_w)                        /* A1J2 interface */
 	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_sh_w)                                  /* trackball H */
 	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff8) AM_WRITE(reactor_output_w)                               /* trackball V */
@@ -775,7 +776,7 @@ static ADDRESS_MAP_START( gottlieb_map, AS_PROGRAM, 8, gottlieb_state )
 	AM_RANGE(0x3800, 0x3bff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_SHARE("videoram")       /* BRSEL */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_SHARE("charram")               /* BOJRSEL1 */
 	AM_RANGE(0x5000, 0x501f) AM_MIRROR(0x07e0) AM_WRITE(gottlieb_paletteram_w) AM_SHARE("paletteram")       /* COLSEL */
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_analog_reset_w)                        /* A1J2 interface */
 	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_sh_w)                                  /* OP20-27 */
 	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_WRITE(general_output_w)                               /* OP30-37 */
@@ -1575,7 +1576,7 @@ static INPUT_PORTS_START( 3stooges )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN4")   /* joystick inputs */
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,stooges_joystick_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,stooges_joystick_r, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
@@ -1768,7 +1769,9 @@ static MACHINE_CONFIG_START( gottlieb_core, gottlieb_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gottlieb_state,  gottlieb_interrupt)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
-	MCFG_WATCHDOG_VBLANK_INIT(16)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

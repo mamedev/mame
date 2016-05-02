@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:S. Smith,David Haywood
+// copyright-holders:S. Smith,David Haywood,Fabio Priuli
 /***********************************************************************************************************
-
- NEOGEO ROM cart emulation
+ 
+ Neo Geo cart emulation
+ Standard cart type, possibly with bankswitch in the area beyond 0x100000
+ (We also include here V-Liner, which uses a standard cart + RAM + some custom input)
 
  ***********************************************************************************************************/
 
@@ -18,19 +20,15 @@
 const device_type NEOGEO_ROM = &device_creator<neogeo_rom_device>;
 
 
-neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_neogeo_cart_interface( mconfig, *this ),
-						m_banked_cart(*this, "banked_cart")
-{
-}
+neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source) :
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_neogeo_cart_interface(mconfig, *this)
+{}
 
-neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock)
-					: device_t(mconfig, NEOGEO_ROM, "NEOGEO ROM Carts", tag, owner, clock, "neogeo_rom", __FILE__),
-						device_neogeo_cart_interface( mconfig, *this ),
-						m_banked_cart(*this, "banked_cart")
-{
-}
+neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock) :
+		device_t(mconfig, NEOGEO_ROM, "Neo Geo Standard Carts", tag, owner, clock, "neocart_rom", __FILE__),
+		device_neogeo_cart_interface(mconfig, *this)
+{}
 
 
 //-------------------------------------------------
@@ -50,21 +48,41 @@ void neogeo_rom_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ16_MEMBER(neogeo_rom_device::read_rom)
+READ16_MEMBER(neogeo_rom_device::rom_r)
 {
-	return m_rom[offset];
+	// to speed up access to ROM, the access to ROM are actually replaced in the driver
+	// by accesses to the maincpu rom region, where we have anyway copied the rom content
+	UINT16* rom = (get_rom_size()) ? get_rom_base() : get_region_rom_base();
+	return rom[offset];
 }
 
-static MACHINE_CONFIG_FRAGMENT( banked_cart )
-	MCFG_NEOGEO_BANKED_CART_ADD("banked_cart")
-MACHINE_CONFIG_END
 
-machine_config_constructor neogeo_rom_device::device_mconfig_additions() const
+WRITE16_MEMBER(neogeo_rom_device::banksel_w)
 {
-	return MACHINE_CONFIG_NAME( banked_cart );
+	// to speed up access to ROM, the banking is taken care of at driver level
+	// by mapping higher banks to the corresponding offset in maincpu rom region
 }
 
-void neogeo_rom_device::activate_cart(ACTIVATE_CART_PARAMS)
+
+
+/*************************************************
+ V-Liner : this is plain NeoGeo cart + RAM
+ **************************************************/
+
+const device_type NEOGEO_VLINER_CART = &device_creator<neogeo_vliner_cart>;
+
+neogeo_vliner_cart::neogeo_vliner_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	neogeo_rom_device(mconfig, NEOGEO_VLINER_CART, "Neo Geo V-Liner Cart", tag, owner, clock, "neocart_vliner", __FILE__)
+{}
+
+
+void neogeo_vliner_cart::device_start()
 {
-	m_banked_cart->install_banks(machine, maincpu, cpuregion, cpuregion_size);
+	save_item(NAME(m_cart_ram));
 }
+
+void neogeo_vliner_cart::device_reset()
+{
+	memset(m_cart_ram, 0, 0x2000);
+}
+

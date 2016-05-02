@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/3812intf.h"
 #include "sound/k051649.h"
 #include "includes/konamipt.h"
@@ -43,7 +44,7 @@ static ADDRESS_MAP_START( hcastle_map, AS_PROGRAM, 8, hcastle_state )
 	AM_RANGE(0x0400, 0x0400) AM_WRITE(hcastle_bankswitch_w)
 	AM_RANGE(0x0404, 0x0404) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(hcastle_soundirq_w)
-	AM_RANGE(0x040c, 0x040c) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x040c, 0x040c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("SYSTEM") AM_WRITE(hcastle_coin_w)
 	AM_RANGE(0x0411, 0x0411) AM_READ_PORT("P1")
 	AM_RANGE(0x0412, 0x0412) AM_READ_PORT("P2")
@@ -192,6 +193,7 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")

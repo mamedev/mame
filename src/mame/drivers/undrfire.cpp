@@ -191,6 +191,7 @@ Board contains only 29 ROMs and not much else.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
 #include "includes/undrfire.h"
@@ -250,7 +251,7 @@ WRITE32_MEMBER(undrfire_state::undrfire_input_w)
 		{
 			if (ACCESSING_BITS_24_31)   /* $500000 is watchdog */
 			{
-				machine().watchdog_reset();
+				m_watchdog->watchdog_reset();
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -496,7 +497,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( undrfire )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, undrfire_state,frame_counter_r, NULL)   /* Frame counter */
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, undrfire_state,frame_counter_r, nullptr)   /* Frame counter */
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -564,7 +565,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cbombers )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, undrfire_state,frame_counter_r, NULL)   /* Frame counter */
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, undrfire_state,frame_counter_r, nullptr)   /* Frame counter */
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -682,6 +683,8 @@ static MACHINE_CONFIG_START( undrfire, undrfire_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -728,6 +731,8 @@ static MACHINE_CONFIG_START( cbombers, undrfire_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(480))   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

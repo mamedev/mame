@@ -35,7 +35,7 @@
 osd_video_config video_config;
 
 // monitor info
-osd_monitor_info *osd_monitor_info::list = NULL;
+osd_monitor_info *osd_monitor_info::list = nullptr;
 
 
 //============================================================
@@ -164,7 +164,7 @@ void sdl_monitor_info::init()
 	osd_monitor_info **tailptr;
 
 	// make a list of monitors
-	osd_monitor_info::list = NULL;
+	osd_monitor_info::list = nullptr;
 	tailptr = &osd_monitor_info::list;
 
 	{
@@ -200,7 +200,7 @@ void sdl_monitor_info::init()
 void sdl_monitor_info::exit()
 {
 	// free all of our monitor information
-	while (sdl_monitor_info::list != NULL)
+	while (sdl_monitor_info::list != nullptr)
 	{
 		osd_monitor_info *temp = sdl_monitor_info::list;
 		sdl_monitor_info::list = temp->next();
@@ -233,9 +233,9 @@ osd_monitor_info *osd_monitor_info::pick_monitor(osd_options &generic_options, i
 	aspect = get_aspect(options.aspect(), options.aspect(index), TRUE);
 
 	// look for a match in the name first
-	if (scrname != NULL && (scrname[0] != 0))
+	if (scrname != nullptr && (scrname[0] != 0))
 	{
-		for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
+		for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
 		{
 			moncount++;
 			if (strcmp(scrname, monitor->devicename()) == 0)
@@ -245,12 +245,12 @@ osd_monitor_info *osd_monitor_info::pick_monitor(osd_options &generic_options, i
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
-	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
+	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
 		if (index-- == 0)
 			goto finishit;
 
 	// return the primary just in case all else fails
-	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
+	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
 		if (monitor->is_primary())
 			goto finishit;
 
@@ -421,7 +421,7 @@ void sdl_osd_interface::extract_video_config()
 					strcpy(video_config.glsl_shader_mamebm[i], stemp);
 					video_config.glsl_shader_mamebm_num++;
 				} else {
-					video_config.glsl_shader_mamebm[i] = NULL;
+					video_config.glsl_shader_mamebm[i] = nullptr;
 				}
 			}
 
@@ -436,7 +436,7 @@ void sdl_osd_interface::extract_video_config()
 					strcpy(video_config.glsl_shader_scrn[i], stemp);
 					video_config.glsl_shader_scrn_num++;
 				} else {
-					video_config.glsl_shader_scrn[i] = NULL;
+					video_config.glsl_shader_scrn[i] = nullptr;
 				}
 			}
 		} else {
@@ -445,12 +445,12 @@ void sdl_osd_interface::extract_video_config()
 			video_config.glsl_shader_mamebm_num=0;
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
-				video_config.glsl_shader_mamebm[i] = NULL;
+				video_config.glsl_shader_mamebm[i] = nullptr;
 			}
 			video_config.glsl_shader_scrn_num=0;
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
-				video_config.glsl_shader_scrn[i] = NULL;
+				video_config.glsl_shader_scrn[i] = nullptr;
 			}
 		}
 

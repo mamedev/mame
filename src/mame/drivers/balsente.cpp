@@ -233,6 +233,7 @@ DIP locations verified for:
 #include "includes/balsente.h"
 #include "sound/cem3394.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 #include "stocker.lh"
 
@@ -254,7 +255,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, balsente_state )
 	AM_RANGE(0x9880, 0x989f) AM_WRITE(balsente_random_reset_w)
 	AM_RANGE(0x98a0, 0x98bf) AM_WRITE(balsente_rombank_select_w)
 	AM_RANGE(0x98c0, 0x98df) AM_WRITE(balsente_palette_select_w)
-	AM_RANGE(0x98e0, 0x98ff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x98e0, 0x98ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x9900, 0x9900) AM_READ_PORT("SWH")
 	AM_RANGE(0x9901, 0x9901) AM_READ_PORT("SWG")
 	AM_RANGE(0x9902, 0x9902) AM_READ_PORT("IN0")
@@ -526,7 +527,6 @@ static INPUT_PORTS_START( hattrick )
 	UNUSED_ANALOG
 INPUT_PORTS_END
 
-#if 0
 static INPUT_PORTS_START( teamht )
 	PORT_INCLUDE( sentetst )
 
@@ -605,19 +605,19 @@ static INPUT_PORTS_START( teamht )
 
 	PORT_START("EX2")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
 
 	PORT_START("EX3")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
 INPUT_PORTS_END
-#endif
+
 
 static INPUT_PORTS_START( otwalls )
 	PORT_INCLUDE( sentetst )
@@ -971,7 +971,7 @@ static INPUT_PORTS_START( nstocker )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "G1:7" )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, balsente_state,nstocker_bits_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, balsente_state,nstocker_bits_r, nullptr)
 
 	/* cheese alert -- we have to map this to player 2 so that it doesn't interfere with
 	   the crosshair controls */
@@ -1290,6 +1290,8 @@ static MACHINE_CONFIG_START( balsente, balsente_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	MCFG_TIMER_DRIVER_ADD("scan_timer", balsente_state, balsente_interrupt_timer)
 	MCFG_TIMER_DRIVER_ADD("8253_0_timer", balsente_state, balsente_clock_counter_0_ff)
 	MCFG_TIMER_DRIVER_ADD("8253_1_timer", balsente_state, balsente_counter_callback)
@@ -1452,7 +1454,6 @@ ROM_START( hattrick )
 ROM_END
 
 
-#if 0
 ROM_START( teamht )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "HATTRK.U8A", 0x10000, 0x4000, CRC(cb746de8) SHA1(b0e5003370b65f2aed4dc9ccb2a2d3eb29050245) )
@@ -1466,7 +1467,7 @@ ROM_START( teamht )
 
 	MOTHERBOARD_PALS
 ROM_END
-#endif
+
 
 ROM_START( otwalls )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
@@ -2403,6 +2404,4 @@ GAME( 1987, rescraid, 0,        balsente, rescraid, balsente_state, rescraid, RO
 GAME( 1986, shrike,   0,        shrike,   shrike, balsente_state,   shrike,   ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rescraida,rescraid, balsente, rescraid, balsente_state, rescraid, ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, grudge,   0,        balsente, grudge, balsente_state,   grudge,   ROT0, "Bally Midway", "Grudge Match (prototype)", MACHINE_SUPPORTS_SAVE )
-#if 0
-GAME( 1985, teamht,   hattrick, balsente, teamht, balsente_state, teamht, ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
-#endif
+GAME( 1985, teamht,   0,        balsente, teamht, balsente_state, teamht, ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )

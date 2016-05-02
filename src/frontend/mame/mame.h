@@ -9,18 +9,10 @@
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef __MAME_H__
 #define __MAME_H__
 
-#include "emu.h"
-#include <time.h>
-#include "pluginopts.h"
-#include "ui/ui.h"
-
+class plugin_options;
 class osd_interface;
 
 //**************************************************************************
@@ -50,13 +42,16 @@ public:
 	lua_engine *lua() { return m_lua; }
 
 	virtual void update_machine() override;
-	
+
 	void reset();
 	TIMER_CALLBACK_MEMBER(autoboot_callback);
-	
+
 	virtual ui_manager* create_ui(running_machine& machine) override;
-	virtual void ui_initialize(running_machine& machine,bool firstrun) override;
-	
+
+	virtual void create_custom(running_machine& machine) override;
+
+	virtual void ui_initialize(running_machine& machine) override;
+
 	/* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
 	int execute();
 	void start_luaengine();
@@ -71,6 +66,7 @@ private:
 	lua_engine *            m_lua;
 
 	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver
+	bool                    m_firstrun;
 
 	static mame_machine_manager* m_manager;
 	emu_timer               *m_autoboot_timer;      // autoboot timer

@@ -151,6 +151,15 @@ protected:
 	inline UINT16 pull16() { UINT16 ret = m_program->read_byte(m_sp--); return ret | m_program->read_byte(m_sp--) << 8; }
 	inline void push16(UINT16 data) { m_program->write_byte(++m_sp, data >> 8 & 0xff); m_program->write_byte(++m_sp, data & 0xff); }
 
+	// statusreg flags
+	enum
+	{
+		SR_C = 0x80, // carry
+		SR_N = 0x40, // negative
+		SR_Z = 0x20, // zero
+		SR_I = 0x10  // interrupt
+	};
+
 	// opcode handlers
 	void br_dir();
 	void br_inx();
@@ -218,8 +227,8 @@ protected:
 	int op_sub(UINT8 param1, UINT8 param2);
 	int op_xor(UINT8 param1, UINT8 param2);
 
-	inline void shortbranch(bool check);
-	inline void jmp(bool check);
+	void shortbranch(bool check);
+	void jmp(bool check);
 	int op_djnz(UINT8 param1, UINT8 param2);
 	int op_btjo(UINT8 param1, UINT8 param2);
 	int op_btjz(UINT8 param1, UINT8 param2);

@@ -17,8 +17,8 @@
 	class NETLIB_NAME(_name) : public nld_truthtable_t<_nIN, _nOUT, _state>         \
 	{                                                                               \
 	public:                                                                         \
-		NETLIB_NAME(_name)()                                                        \
-		: nld_truthtable_t<_nIN, _nOUT, _state>(&m_ttbl, m_desc) { }                \
+		NETLIB_NAME(_name)(netlist_t &anetlist, const pstring &name)                \
+		: nld_truthtable_t<_nIN, _nOUT, _state>(anetlist, name, &m_ttbl, m_desc) { }\
 	private:                                                                        \
 		static truthtable_t m_ttbl;                                                 \
 		static const char *m_desc[];                                                \
@@ -100,8 +100,10 @@ public:
 
 	struct truthtable_t
 	{
-		truthtable_t() : m_initialized(false),
-				m_desc(m_NO, m_NI, has_state, &m_initialized, m_outs, m_timing, m_timing_nt) {}
+		truthtable_t()
+		: m_initialized(false),
+		  m_desc(m_NO, m_NI, has_state,
+				  &m_initialized, m_outs, m_timing, m_timing_nt) {}
 		bool m_initialized;
 		UINT32 m_outs[m_size];
 		UINT8  m_timing[m_size * m_NO];
@@ -109,10 +111,10 @@ public:
 		truthtable_desc_t m_desc;
 	};
 
-	nld_truthtable_t(truthtable_t *ttbl, const char *desc[])
-	: device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
+	nld_truthtable_t(netlist_t &anetlist, const pstring &name, truthtable_t *ttbl, const char *desc[])
+	: device_t(anetlist, name), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
 	{
-		while (*desc != NULL && **desc != 0 )
+		while (*desc != nullptr && **desc != 0 )
 			{
 				m_desc.push_back(*desc);
 				desc++;
@@ -120,8 +122,8 @@ public:
 
 	}
 
-	nld_truthtable_t(truthtable_t *ttbl, const pstring_vector_t &desc)
-	: device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
+	nld_truthtable_t(netlist_t &anetlist, const pstring &name, truthtable_t *ttbl, const pstring_vector_t &desc)
+	: device_t(anetlist, name), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
 	{
 		m_desc = desc;
 	}
@@ -321,10 +323,10 @@ public:
 			const pstring &def_param)
 	: netlist_base_factory_truthtable_t(name, classname, def_param) { }
 
-	device_t *Create() override
+	device_t *Create(netlist_t &anetlist, const pstring &name) override
 	{
 		typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
-		device_t *r = palloc(tt_type(&m_ttbl, m_desc));
+		device_t *r = palloc(tt_type(anetlist, name, &m_ttbl, m_desc));
 		r->set_logic_family(m_family);
 		//r->init(setup, name);
 		return r;

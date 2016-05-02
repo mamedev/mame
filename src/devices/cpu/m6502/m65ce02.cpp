@@ -95,4 +95,4 @@ void m65ce02_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-#include "cpu/m6502/m65ce02.inc"
+#include "cpu/m6502/m65ce02.hxx"

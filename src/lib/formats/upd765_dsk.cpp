@@ -180,7 +180,13 @@ bool upd765_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 	if(type == -1)
 		return false;
 
+	// format shouldn't exceed image geometry
 	const format &f = formats[type];
+	int img_tracks, img_heads;
+	image->get_maximal_geometry(img_tracks, img_heads);
+	if (f.track_count > img_tracks || f.head_count > img_heads)
+		return false;
+
 	floppy_image_format_t::desc_e *desc;
 	int current_size;
 	int end_gap_index;

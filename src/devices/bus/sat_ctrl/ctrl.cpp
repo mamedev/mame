@@ -3,7 +3,7 @@
 /**********************************************************************
 
     Sega Saturn Controller Port emulation
- 
+
 **********************************************************************/
 
 #include "ctrl.h"
@@ -127,7 +127,7 @@ SLOT_INTERFACE_START( saturn_controls )
 	SLOT_INTERFACE("joypad",    SATURN_JOY)
 	SLOT_INTERFACE("racing",    SATURN_WHEEL)
 	SLOT_INTERFACE("analog",    SATURN_ANALOG)
-//	SLOT_INTERFACE("lightgun",  SATURN_LIGHTGUN)
+//  SLOT_INTERFACE("lightgun",  SATURN_LIGHTGUN)
 	SLOT_INTERFACE("trackball", SATURN_TRACK)
 	SLOT_INTERFACE("keyboard",  SATURN_KEYBD)
 	SLOT_INTERFACE("joy_md3",   SATURN_JOYMD3B)
@@ -140,4 +140,3 @@ SLOT_INTERFACE_END
 SLOT_INTERFACE_START( saturn_joys )
 	SLOT_INTERFACE("joypad",    SATURN_JOY)
 SLOT_INTERFACE_END
-

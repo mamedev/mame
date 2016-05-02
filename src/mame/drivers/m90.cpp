@@ -841,7 +841,7 @@ static MACHINE_CONFIG_DERIVED( dynablsb, m90 )
 	MCFG_DEVICE_REMOVE("m72")
 
 	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_YM2151_IRQ_HANDLER(NULL) /* this bootleg polls the YM2151 instead of taking interrupts from it */
+	MCFG_YM2151_IRQ_HANDLER(NOOP) /* this bootleg polls the YM2151 instead of taking interrupts from it */
 MACHINE_CONFIG_END
 
 

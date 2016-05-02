@@ -175,6 +175,75 @@ macro jsr32 %opc %spreg
 	internal(1);
 	prefetch_noirq();
 
+10003 dma
+	if(current_dma->mode_16) {
+		TMP1 = read16(current_dma->source);
+		write16(current_dma->dest, TMP1);
+	} else {
+		TMP1 = read8(current_dma->source);
+		write8(current_dma->dest, TMP1);
+	}
+	current_dma->source += current_dma->incs;
+	current_dma->dest   += current_dma->incd;
+	current_dma->count--;
+	if(!current_dma->count) {
+		UINT8 id = current_dma->id;
+		current_dma = nullptr;
+		dma_device->count_done(id);
+	}
+	prefetch_done();
+
+10004 dtc s20
+	if(current_dtc->sra & 0x01000000) {
+		TMP1 = read16(current_dtc->sra & 0xffffff);
+		write16(current_dtc->dar & 0xffffff, TMP1);
+	} else {
+		TMP1 = read8(current_dtc->sra & 0xffffff);
+		write8(current_dtc->dar & 0xffffff, TMP1);
+	}
+	current_dtc->sra = (current_dtc->sra & 0xff000000) | ((current_dtc->sra + current_dtc->incs) & 0x00ffffff);
+	current_dtc->dar = (current_dtc->dar & 0xff000000) | ((current_dtc->dar + current_dtc->incd) & 0x00ffffff);
+	current_dtc->count--;
+	if(!current_dtc->count) {
+		UINT8 id = current_dtc->id;
+		current_dtc = nullptr;
+		dtc_device->count_done(id);
+	}
+	prefetch_done();
+
+10005 dtc_vector s20
+	TMP1 = dtc_device->get_waiting_vector();
+	if(TMP1 < h8_dtc_device::DTC_CHAINED) {
+		TMP2 = dtc_device->get_vector_address(TMP1);
+		TMP2 = read16(TMP2);
+		TMP2 |= 0xff0000;
+	} else {
+		TMP1 -= h8_dtc_device::DTC_CHAINED;
+		TMP2 = dtc_device->get_object(TMP1)->base + 12;
+	}
+
+	dtc_device->get_object(TMP1)->base = TMP2;
+	dtc_device->get_object(TMP1)->sra  = read16(TMP2) << 16;
+	dtc_device->get_object(TMP1)->sra |= read16(TMP2+2);
+	dtc_device->get_object(TMP1)->dar  = read16(TMP2+4) << 16;
+	dtc_device->get_object(TMP1)->dar |= read16(TMP2+6);
+	dtc_device->get_object(TMP1)->cr   = read16(TMP2+8) << 16;
+	dtc_device->get_object(TMP1)->cr  |= read16(TMP2+10);
+	dtc_device->vector_done(TMP1);
+	prefetch_done();
+
+10006 dtc_writeback s20
+	TMP1 = dtc_device->get_waiting_writeback();
+	TMP2 = dtc_device->get_object(TMP1)->base;
+	write16(TMP2, dtc_device->get_object(TMP1)->sra >> 16);
+	write16(TMP2+2, dtc_device->get_object(TMP1)->sra);
+	write16(TMP2+4, dtc_device->get_object(TMP1)->dar >> 16);
+	write16(TMP2+6, dtc_device->get_object(TMP1)->dar);
+	write16(TMP2+8, dtc_device->get_object(TMP1)->cr >> 16);
+	write16(TMP2+10, dtc_device->get_object(TMP1)->cr);
+	dtc_device->writeback_done(TMP1);
+	prefetch_done();
+
 0000         ffff         0 nop      -        -
 	prefetch();
 

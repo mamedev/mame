@@ -143,7 +143,7 @@ static INT16 clip_analog(INT16 cliptemp);
 
 
 /* Pull in the ROM tables */
-#include "tms5110r.inc"
+#include "tms5110r.hxx"
 
 #define DEBUG_5110  0
 

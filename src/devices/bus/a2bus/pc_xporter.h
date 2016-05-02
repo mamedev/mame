@@ -50,7 +50,7 @@ public:
 	required_device<speaker_sound_device>  m_speaker;
 	required_device<isa8_device>  m_isabus;
 	optional_device<pc_kbdc_device>  m_pc_kbdc;
-	
+
 	// overrides of standard a2bus slot functions
 	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
 	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
@@ -114,7 +114,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 private:
 	UINT8 m_ram[768*1024];
 	UINT8 m_c800_ram[0x400];

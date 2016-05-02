@@ -723,4 +723,4 @@ WRITE_LINE_MEMBER( m6502_device::nmi_line )
 	set_input_line( M6502_NMI_LINE, state );
 }
 
-#include "cpu/m6502/m6502.inc"
+#include "cpu/m6502/m6502.hxx"

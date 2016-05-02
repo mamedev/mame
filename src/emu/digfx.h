@@ -178,7 +178,7 @@ struct gfx_decode_entry
 {
 	const char *    memory_region;      // memory region where the data resides
 	UINT32          start;              // offset of beginning of data to decode
-	const gfx_layout *gfxlayout;        // pointer to gfx_layout describing the layout; NULL marks the end of the array
+	const gfx_layout *gfxlayout;        // pointer to gfx_layout describing the layout; nullptr marks the end of the array
 	UINT16          color_codes_start;  // offset in the color lookup table where color codes start
 	UINT16          total_color_codes;  // total number of color codes
 	UINT32          flags;              // flags and optional scaling factors

@@ -30,6 +30,7 @@ enum
 	// EEPROM
 	SEGA_EEPROM,                 /* Wonder Boy V / Evander Holyfield's Boxing / Greatest Heavyweights of the Ring / Sports Talk Baseball / Megaman */
 	NBA_JAM,                     /* NBA Jam */
+	NBA_JAM_ALT,                     /* NBA Jam */
 	NBA_JAM_TE,                  /* NBA Jam TE / NFL Quarterback Club */
 	NFL_QB_96,                   /* NFL Quarterback Club '96 */
 	C_SLAM,                      /* College Slam / Frank Thomas Big Hurt Baseball */

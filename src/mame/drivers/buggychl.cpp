@@ -80,6 +80,7 @@ Dip locations and factory settings verified from dip listing
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/buggychl.h"
 
@@ -137,7 +138,7 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xd100, 0xd100) AM_WRITE(buggychl_ctrl_w)
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xd300, 0xd300) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xd300, 0xd300) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd303, 0xd303) AM_WRITE(buggychl_sprite_lookup_bank_w)
 	AM_RANGE(0xd400, 0xd400) AM_DEVREADWRITE("bmcu", buggychl_mcu_device, buggychl_mcu_r, buggychl_mcu_w)
 	AM_RANGE(0xd401, 0xd401) AM_DEVREAD("bmcu", buggychl_mcu_device, buggychl_mcu_status_r)
@@ -373,6 +374,7 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
 	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

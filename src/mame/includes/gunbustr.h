@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "video/tc0480scp.h"
 
 struct gb_tempsprite
@@ -24,6 +25,7 @@ public:
 	gunbustr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram"),
@@ -35,6 +37,7 @@ public:
 	}
 
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_shared_ptr<UINT32> m_ram;
 	required_shared_ptr<UINT32> m_spriteram;

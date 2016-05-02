@@ -35,11 +35,11 @@
         then read Cn00 to map C800-CFFF first.
 
         PC RAM from 0xA0000-0xAFFFF is where the V30 BIOS is downloaded,
-        plus used for general storage by the system.  This is mirrored at 
+        plus used for general storage by the system.  This is mirrored at
         Fxxxx on the V30 so that it can boot.
         RAM from 0xB0000-0xBFFFF is the CGA framebuffer as usual.
 
-		C800-CBFF?: RAM, used as scratchpad space by the software
+        C800-CBFF?: RAM, used as scratchpad space by the software
         CF00: PC memory pointer (bits 0-7)
         CF01: PC memory pointer (bits 8-15)
         CF02: PC memory pointer (bits 16-23)
@@ -53,11 +53,11 @@
         CF31: control/flags: bit 4 = 1 to assert reset on V30, 5 = 1 to assert halt on V30
 
     TODO:
-    	- Code at $70b0-$70c5 waits for the V30 to answer FPU presence.
+        - Code at $70b0-$70c5 waits for the V30 to answer FPU presence.
         - What's going on at CF0E/CF0F?
-    	- The manual indicates there is no ROM; special drivers installed into ProDOS 8
-    	  provide the RAMdisk and A2-accessing-PC-drives functionality.
-          
+        - The manual indicates there is no ROM; special drivers installed into ProDOS 8
+          provide the RAMdisk and A2-accessing-PC-drives functionality.
+
 *********************************************************************/
 
 #include "pc_xporter.h"
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START(pc_io, AS_IO, 16, a2bus_pcxporter_device )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( pcxporter )
-	MCFG_CPU_ADD("v30", V30, XTAL_14_31818MHz/2)	// 7.16 MHz as per manual
+	MCFG_CPU_ADD("v30", V30, XTAL_14_31818MHz/2)    // 7.16 MHz as per manual
 	MCFG_CPU_PROGRAM_MAP(pc_map)
 	MCFG_CPU_IO_MAP(pc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
@@ -118,7 +118,7 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(a2bus_pcxporter_device, pc_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(a2bus_pcxporter_device, pc_dack3_w))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("v30", 0), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("v30", 0), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(a2bus_pcxporter_device, pc_ppi_porta_r))
@@ -141,7 +141,7 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(a2bus_pcxporter_device, keyboard_clock_w))
 	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(a2bus_pcxporter_device, keyboard_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -214,10 +214,10 @@ void a2bus_pcxporter_device::device_start()
 	save_item(NAME(m_ram));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_offset));
-	
+
 	m_v30->space(AS_PROGRAM).install_ram(0, 0xaffff, m_ram);
 	m_v30->space(AS_PROGRAM).install_rom(0xf0000, 0xfffff, &m_ram[0xa0000]);
-	
+
 	m_pcmem_space = &m_v30->space(AS_PROGRAM);
 	m_pcio_space = &m_v30->space(AS_IO);
 }
@@ -313,11 +313,11 @@ UINT8 a2bus_pcxporter_device::read_c800(address_space &space, UINT16 offset)
 
 			case 0x704: // read w/o increment
 				rv = m_ram[m_offset];
-				return rv;			
-				
+				return rv;
+
 			default:
 				//printf("Read $C800 at %x\n", offset + 0xc800);
-				break;					
+				break;
 		}
 
 		return m_regs[offset];
@@ -371,13 +371,13 @@ void a2bus_pcxporter_device::write_c800(address_space &space, UINT16 offset, UIN
 				else if (m_offset >= 0xb8000 && m_offset <= 0xbbfff) m_pcmem_space->write_byte(m_offset, data);
 				else if (m_offset >= 0xbc000 && m_offset <= 0xbffff) m_pcmem_space->write_byte(m_offset-0x4000, data);
 				break;
-				
-			case 0x72c:	// CGA 6845 register select
+
+			case 0x72c: // CGA 6845 register select
 				m_pcio_space->write_byte(0x3d6, data);
 				m_6845_reg = data;
 				break;
-			
-			case 0x72d:	// CGA 6845 data read/write
+
+			case 0x72d: // CGA 6845 data read/write
 				// HACK: adjust the 40 column mode the 6502 sets to
 				// be more within specs.
 				switch (m_6845_reg)
@@ -406,37 +406,37 @@ void a2bus_pcxporter_device::write_c800(address_space &space, UINT16 offset, UIN
 
 				m_pcio_space->write_byte(0x3d7, data);
 				break;
-			
-			case 0x72e:	// CGA mode select
+
+			case 0x72e: // CGA mode select
 				m_pcio_space->write_byte(0x3d8, data);
 				break;
 
 			case 0x72f: // CGA color select
 				m_pcio_space->write_byte(0x3d9, data);
 				break;
-				
-			case 0x730:	// control 1
+
+			case 0x730: // control 1
 				if (data & 0x10) { m_v30->set_input_line(INPUT_LINE_RESET, CLEAR_LINE); m_reset_during_halt = true; }
 				if (data & 0x20)
-				{ 
+				{
 					if (m_reset_during_halt)
 					{
 						m_v30->reset();
 						m_reset_during_halt = false;
 					}
-				
+
 					m_v30->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 					m_v30->resume(SUSPEND_REASON_HALT | SUSPEND_REASON_DISABLE);
 				}
 				break;
-				
-			case 0x731:	// control 2
+
+			case 0x731: // control 2
 				if (data & 0x10) m_v30->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 				if (data & 0x20) m_v30->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 				break;
-				
+
 			default:
-//				printf("%02x to C800 at %x\n", data, offset + 0xc800);
+//              printf("%02x to C800 at %x\n", data, offset + 0xc800);
 				m_regs[offset] = data;
 				break;
 		}
@@ -703,7 +703,7 @@ READ8_MEMBER (a2bus_pcxporter_device::pc_ppi_porta_r)
 	{
 		data = m_ppi_shift_register;
 	}
-//	PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
+//  PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
 	return data;
 }
 
@@ -719,13 +719,13 @@ READ8_MEMBER ( a2bus_pcxporter_device::pc_ppi_portc_r )
 	{
 		/* read hi nibble of S2 */
 		data = (data & 0xf0) | ((0x3) & 0x0f);
-//		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
+//      PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
 	{
 		/* read lo nibble of S2 */
 		data = (data & 0xf0) | (0x0 & 0x0f);
-//		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
+//      PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
 	if ( m_ppi_portb & 0x01 )
@@ -773,6 +773,3 @@ WRITE8_MEMBER( a2bus_pcxporter_device::nmi_enable_w )
 	m_nmi_enabled = BIT(data,7);
 	m_isabus->set_nmi_state(m_nmi_enabled);
 }
-
-
-

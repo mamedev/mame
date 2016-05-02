@@ -54,8 +54,8 @@ class matrix_solver_t;
 class NETLIB_NAME(solver) : public device_t
 {
 public:
-	NETLIB_NAME(solver)()
-	: device_t()    { }
+	NETLIB_NAME(solver)(netlist_t &anetlist, const pstring &name)
+	: device_t(anetlist, name)    { }
 
 	virtual ~NETLIB_NAME(solver)();
 

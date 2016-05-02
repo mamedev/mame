@@ -42,7 +42,7 @@ finder_base::~finder_base()
 
 void *finder_base::find_memregion(UINT8 width, size_t &length, bool required) const
 {
-	// look up the region and return NULL if not found
+	// look up the region and return nullptr if not found
 	memory_region *region = m_base.memregion(m_tag);
 	if (region == nullptr)
 	{
@@ -119,7 +119,7 @@ bool finder_base::validate_memregion(size_t bytes, bool required) const
 
 void *finder_base::find_memshare(UINT8 width, size_t &bytes, bool required) const
 {
-	// look up the share and return NULL if not found
+	// look up the share and return nullptr if not found
 	memory_share *share = m_base.memshare(m_tag);
 	if (share == nullptr)
 		return nullptr;

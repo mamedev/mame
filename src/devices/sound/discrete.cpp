@@ -157,12 +157,12 @@ private:
  *
  *************************************/
 
-#include "disc_sys.inc"       /* discrete core modules and support functions */
-#include "disc_wav.inc"       /* Wave sources   - SINE/SQUARE/NOISE/etc */
-#include "disc_mth.inc"       /* Math Devices   - ADD/GAIN/etc */
-#include "disc_inp.inc"       /* Input Devices  - INPUT/CONST/etc */
-#include "disc_flt.inc"       /* Filter Devices - RCF/HPF/LPF */
-#include "disc_dev.inc"       /* Popular Devices - NE555/etc */
+#include "disc_sys.hxx"       /* discrete core modules and support functions */
+#include "disc_wav.hxx"       /* Wave sources   - SINE/SQUARE/NOISE/etc */
+#include "disc_mth.hxx"       /* Math Devices   - ADD/GAIN/etc */
+#include "disc_inp.hxx"       /* Input Devices  - INPUT/CONST/etc */
+#include "disc_flt.hxx"       /* Filter Devices - RCF/HPF/LPF */
+#include "disc_dev.hxx"       /* Popular Devices - NE555/etc */
 
 /*************************************
  *
@@ -1034,7 +1034,7 @@ void discrete_sound_device::device_reset()
 //
 //  input / output buffers are stream_sample_t
 //  to not to have to convert the buffers.
-//  a "discrete cpu" device will pass NULL here
+//  a "discrete cpu" device will pass nullptr here
 //-------------------------------------------------
 
 void discrete_device::process(int samples)

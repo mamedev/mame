@@ -18,6 +18,7 @@ bgfx_slider::bgfx_slider(running_machine &machine, std::string name, float min, 
 	, m_screen_type(screen)
 	, m_format(format)
 	, m_description(description)
+	, m_machine(machine)
 {
 	m_min = min;
 	m_default = def;
@@ -43,6 +44,12 @@ static INT32 update_trampoline(running_machine &machine, void *arg, int /*id*/, 
 		return reinterpret_cast<bgfx_slider*>(arg)->update(str, newval);
 	}
 	return 0;
+}
+
+void bgfx_slider::import(float val)
+{
+	m_value = val;
+	update_trampoline(m_machine, this, m_slider_state->id, nullptr, int32_t(floor(m_value / m_step + 0.5f)));
 }
 
 slider_state* bgfx_slider::create_core_slider(running_machine& machine)

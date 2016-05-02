@@ -53,7 +53,7 @@
 //============================================================
 
 #ifdef OSD_WINDOWS
-void (*s_debugger_stack_crawler)() = NULL;
+void (*s_debugger_stack_crawler)() = nullptr;
 #endif
 
 
@@ -116,8 +116,8 @@ void *osd_malloc(size_t size)
 
 	// basic objects just come from the heap
 	UINT8 *const block = reinterpret_cast<UINT8 *>(HeapAlloc(GetProcessHeap(), 0, size));
-	if (block == NULL)
-		return NULL;
+	if (block == nullptr)
+		return nullptr;
 	UINT8 *const result = reinterpret_cast<UINT8 *>(reinterpret_cast<FPTR>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(FPTR(MAX_ALIGNMENT) - 1));
 
 	// store the size and return and pointer to the data afterward
@@ -145,14 +145,14 @@ void *osd_malloc_array(size_t size)
 	size_t const rounded_size = ((size + sizeof(void *) + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
 
 	// reserve that much memory, plus two guard pages
-	void *page_base = VirtualAlloc(NULL, rounded_size + 2 * PAGE_SIZE, MEM_RESERVE, PAGE_NOACCESS);
-	if (page_base == NULL)
-		return NULL;
+	void *page_base = VirtualAlloc(nullptr, rounded_size + 2 * PAGE_SIZE, MEM_RESERVE, PAGE_NOACCESS);
+	if (page_base == nullptr)
+		return nullptr;
 
 	// now allow access to everything but the first and last pages
 	page_base = VirtualAlloc(reinterpret_cast<UINT8 *>(page_base) + PAGE_SIZE, rounded_size, MEM_COMMIT, PAGE_READWRITE);
-	if (page_base == NULL)
-		return NULL;
+	if (page_base == nullptr)
+		return nullptr;
 
 	// work backwards from the page base to get to the block base
 	UINT8 *const block = GUARD_ALIGN_START ? reinterpret_cast<UINT8 *>(page_base) : (reinterpret_cast<UINT8 *>(page_base) + rounded_size - size);
@@ -231,7 +231,7 @@ void osd_break_into_debugger(const char *message)
 		win_output_debug_string_utf8(message);
 		DebugBreak();
 	}
-	else if (s_debugger_stack_crawler != NULL)
+	else if (s_debugger_stack_crawler != nullptr)
 		(*s_debugger_stack_crawler)();
 #else
 	if (IsDebuggerPresent())
@@ -248,7 +248,7 @@ void osd_break_into_debugger(const char *message)
 
 static char *get_clipboard_text_by_format(UINT format, char *(*convert)(LPCVOID data))
 {
-	char *result = NULL;
+	char *result = nullptr;
 	HANDLE data_handle;
 	LPVOID data;
 
@@ -256,15 +256,15 @@ static char *get_clipboard_text_by_format(UINT format, char *(*convert)(LPCVOID 
 	if (IsClipboardFormatAvailable(format))
 	{
 		// open the clipboard
-		if (OpenClipboard(NULL))
+		if (OpenClipboard(nullptr))
 		{
 			// try to access clipboard data
 			data_handle = GetClipboardData(format);
-			if (data_handle != NULL)
+			if (data_handle != nullptr)
 			{
 				// lock the data
 				data = GlobalLock(data_handle);
-				if (data != NULL)
+				if (data != nullptr)
 				{
 					// invoke the convert
 					result = (*convert)(data);

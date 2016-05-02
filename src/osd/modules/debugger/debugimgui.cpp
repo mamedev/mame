@@ -72,6 +72,7 @@ public:
 	bool                exec_cmd;  // console only
 	int                 src_sel;
 	char                console_input[512];
+	std::string         region_list;  // memory window only
 };
 
 class debug_imgui : public osd_module, public debug_module
@@ -80,6 +81,14 @@ public:
 	debug_imgui()
 	: osd_module(OSD_DEBUG_PROVIDER, "imgui"), debug_module(),
 		m_machine(nullptr),
+		m_mouse_x(0),
+		m_mouse_y(0),
+		m_mouse_button(false),
+		m_prev_mouse_button(false),
+		m_running(false),
+		font_name(nullptr),
+		font_size(0),
+		m_key_char(0),
 		m_hide(false),
 		m_win_count(0)
 	{
@@ -98,6 +107,7 @@ private:
 	void handle_mouse();
 	void handle_mouse_views();
 	void handle_keys();
+	void handle_keys_views();
 	void handle_console(running_machine* machine);
 	void update();
 	void draw_console();
@@ -145,7 +155,7 @@ static void view_list_remove(debug_area* item)
 		return;
 	it = std::find(view_list.begin(),view_list.end(),item);
 	view_list.erase(it);
-		
+
 }
 
 static debug_area *dview_alloc(running_machine &machine, debug_view_type type)
@@ -236,7 +246,7 @@ void debug_imgui::handle_mouse_views()
 
 void debug_imgui::handle_keys()
 {
-        ImGuiIO& io = ImGui::GetIO();
+		ImGuiIO& io = ImGui::GetIO();
 	ui_event event;
 
 	// global keys
@@ -280,35 +290,35 @@ void debug_imgui::handle_keys()
 		m_hide = true;
 	}
 
-/*	if(m_machine->input().code_pressed_once(KEYCODE_UP))
-		io.KeysDown[ImGuiKey_UpArrow] = true;
-	if(m_machine->input().code_pressed_once(KEYCODE_DOWN))
-		io.KeysDown[ImGuiKey_DownArrow] = true;
-	if(m_machine->input().code_pressed_once(KEYCODE_LEFT))
-		io.KeysDown[ImGuiKey_LeftArrow] = true;
-	if(m_machine->input().code_pressed_once(KEYCODE_RIGHT))
-		io.KeysDown[ImGuiKey_RightArrow] = true;
+/*  if(m_machine->input().code_pressed_once(KEYCODE_UP))
+        io.KeysDown[ImGuiKey_UpArrow] = true;
+    if(m_machine->input().code_pressed_once(KEYCODE_DOWN))
+        io.KeysDown[ImGuiKey_DownArrow] = true;
+    if(m_machine->input().code_pressed_once(KEYCODE_LEFT))
+        io.KeysDown[ImGuiKey_LeftArrow] = true;
+    if(m_machine->input().code_pressed_once(KEYCODE_RIGHT))
+        io.KeysDown[ImGuiKey_RightArrow] = true;
 
-	if(m_machine->input().code_pressed(KEYCODE_TAB))
-		io.KeysDown[ImGuiKey_Tab] = true;
+    if(m_machine->input().code_pressed(KEYCODE_TAB))
+        io.KeysDown[ImGuiKey_Tab] = true;
 
-	if(m_machine->input().code_pressed_once(KEYCODE_PGUP))
-	{
-		io.KeysDown[ImGuiKey_PageUp] = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_PGDN))
-	{
-		io.KeysDown[ImGuiKey_PageDown] = true;
-	}
+    if(m_machine->input().code_pressed_once(KEYCODE_PGUP))
+    {
+        io.KeysDown[ImGuiKey_PageUp] = true;
+    }
+    if(m_machine->input().code_pressed_once(KEYCODE_PGDN))
+    {
+        io.KeysDown[ImGuiKey_PageDown] = true;
+    }
 
-	if(m_machine->input().code_pressed_once(KEYCODE_HOME))
-	{
-		io.KeysDown[ImGuiKey_Home] = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_END))
-	{
-		io.KeysDown[ImGuiKey_End] = true;
-	}*/
+    if(m_machine->input().code_pressed_once(KEYCODE_HOME))
+    {
+        io.KeysDown[ImGuiKey_Home] = true;
+    }
+    if(m_machine->input().code_pressed_once(KEYCODE_END))
+    {
+        io.KeysDown[ImGuiKey_End] = true;
+    }*/
 	if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
 		io.KeyCtrl = true;
 	else
@@ -322,7 +332,7 @@ void debug_imgui::handle_keys()
 	else
 		io.KeyAlt = false;
 
-	for(input_item_id id = ITEM_ID_A; id <= ITEM_ID_CANCEL; id++)
+	for(input_item_id id = ITEM_ID_A; id <= ITEM_ID_CANCEL; ++id)
 	{
 		if(m_machine->input().code_pressed(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 			io.KeysDown[id] = true;
@@ -342,7 +352,7 @@ void debug_imgui::handle_keys()
 			break;
 		}
 	}
-	
+
 	if(ImGui::IsKeyPressed(ITEM_ID_D) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_disasm(++m_win_count);
 	if(ImGui::IsKeyPressed(ITEM_ID_M) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
@@ -354,7 +364,62 @@ void debug_imgui::handle_keys()
 	if(ImGui::IsKeyPressed(ITEM_ID_L) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_log(++m_win_count);
 
-	m_machine->ui_input().reset();  // clear remaining inputs, so they don't fall through to the UI
+}
+
+void debug_imgui::handle_keys_views()
+{
+	debug_area* focus_view = nullptr;
+	// find view that has focus (should only be one at a time)
+	for(std::vector<debug_area*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
+		if((*view_ptr)->has_focus)
+			focus_view = *view_ptr;
+
+	// check views in main views also (only the disassembler view accepts inputs)
+	if(view_main_disasm->has_focus)
+		focus_view = view_main_disasm;
+
+	// if no view has focus, then there's nothing to do
+	if(focus_view == nullptr)
+		return;
+
+	// pass keypresses to debug view with focus
+	if(m_machine->input().code_pressed_once(KEYCODE_UP))
+		focus_view->view->process_char(DCH_UP);
+	if(m_machine->input().code_pressed_once(KEYCODE_DOWN))
+		focus_view->view->process_char(DCH_DOWN);
+	if(m_machine->input().code_pressed_once(KEYCODE_LEFT))
+	{
+		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+			focus_view->view->process_char(DCH_CTRLLEFT);
+		else
+			focus_view->view->process_char(DCH_LEFT);
+	}
+	if(m_machine->input().code_pressed_once(KEYCODE_RIGHT))
+	{
+		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+			focus_view->view->process_char(DCH_CTRLRIGHT);
+		else
+			focus_view->view->process_char(DCH_RIGHT);
+	}
+	if(m_machine->input().code_pressed_once(KEYCODE_PGUP))
+		focus_view->view->process_char(DCH_PUP);
+	if(m_machine->input().code_pressed_once(KEYCODE_PGDN))
+		focus_view->view->process_char(DCH_PDOWN);
+	if(m_machine->input().code_pressed_once(KEYCODE_HOME))
+	{
+		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+			focus_view->view->process_char(DCH_CTRLHOME);
+		else
+			focus_view->view->process_char(DCH_HOME);
+	}
+	if(m_machine->input().code_pressed_once(KEYCODE_END))
+	{
+		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+			focus_view->view->process_char(DCH_CTRLEND);
+		else
+			focus_view->view->process_char(DCH_END);
+	}
+
 }
 
 void debug_imgui::handle_console(running_machine* machine)
@@ -425,7 +490,7 @@ void debug_imgui::draw_bpoints(debug_area* view_ptr, bool* opened)
 		totalsize = view_ptr->view->total_size();
 		view_ptr->view->set_visible_size(totalsize);
 		vsize = view_ptr->view->visible_size();
-		
+
 		ImGui::BeginChild("##break_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
@@ -523,7 +588,7 @@ void debug_imgui::draw_log(debug_area* view_ptr, bool* opened)
 			totalsize.y = 100;
 		view_ptr->view->set_visible_size(totalsize);
 		vsize = view_ptr->view->visible_size();
-		
+
 		ImGui::BeginChild("##log_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
@@ -577,17 +642,7 @@ void debug_imgui::add_log(int id)
 
 void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 {
-	std::string cpu_list = "";
-	const debug_view_source* src = view_ptr->view->first_source();
-
-	// build source CPU list	
-	while(src != nullptr)
-	{
-		cpu_list += src->name();
-		cpu_list += '\0';
-		src = src->next();
-	}
-	cpu_list += '\0'; // end of list
+	const debug_view_source* src;
 
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened,ImGuiWindowFlags_MenuBar))
@@ -610,15 +665,15 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 				debug_view_disasm* disasm = downcast<debug_view_disasm*>(view_ptr->view);
 				int rightcol = disasm->right_column();
 
-				if(ImGui::MenuItem("Raw opcodes",NULL,(rightcol == DASM_RIGHTCOL_RAW) ? true : false))
+				if(ImGui::MenuItem("Raw opcodes", nullptr,(rightcol == DASM_RIGHTCOL_RAW) ? true : false))
 					disasm->set_right_column(DASM_RIGHTCOL_RAW);
-				if(ImGui::MenuItem("Encrypted opcodes",NULL,(rightcol == DASM_RIGHTCOL_ENCRYPTED) ? true : false))
+				if(ImGui::MenuItem("Encrypted opcodes", nullptr,(rightcol == DASM_RIGHTCOL_ENCRYPTED) ? true : false))
 					disasm->set_right_column(DASM_RIGHTCOL_ENCRYPTED);
-				if(ImGui::MenuItem("No opcodes",NULL,(rightcol == DASM_RIGHTCOL_NONE) ? true : false))
+				if(ImGui::MenuItem("No opcodes", nullptr,(rightcol == DASM_RIGHTCOL_NONE) ? true : false))
 					disasm->set_right_column(DASM_RIGHTCOL_NONE);
-				if(ImGui::MenuItem("Comments",NULL,(rightcol == DASM_RIGHTCOL_COMMENTS) ? true : false))
+				if(ImGui::MenuItem("Comments", nullptr,(rightcol == DASM_RIGHTCOL_COMMENTS) ? true : false))
 					disasm->set_right_column(DASM_RIGHTCOL_COMMENTS);
-					
+
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
@@ -627,7 +682,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
-		ImGui::Combo("##cpu",&view_ptr->src_sel,cpu_list.c_str());
+		ImGui::Combo("##cpu",&view_ptr->src_sel,view_ptr->region_list.c_str());
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1.0f);
 		if(ImGui::InputText("##addr",view_ptr->console_input,512,flags))
@@ -641,7 +696,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		totalsize.y = 50;
 		view_ptr->view->set_visible_size(totalsize);
 		vsize = view_ptr->view->visible_size();
-		
+
 		ImGui::BeginChild("##disasm_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		src = view_ptr->view->first_source();
 		idx = 0;
@@ -705,6 +760,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 void debug_imgui::add_disasm(int id)
 {
 	std::stringstream str;
+	const debug_view_source* src;
 	debug_area* new_view;
 	new_view = dview_alloc(*m_machine, DVT_DISASSEMBLY);
 	str << id;
@@ -716,13 +772,20 @@ void debug_imgui::add_disasm(int id)
 	new_view->ofs_y = 0;
 	new_view->src_sel = 0;
 	strcpy(new_view->console_input,"curpc");
+	// build source CPU list
+	src = new_view->view->first_source();
+	while(src != nullptr)
+	{
+		new_view->region_list += src->name();
+		new_view->region_list += '\0';
+		src = src->next();
+	}
 	view_list_add(new_view);
 }
 
 void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 {
-	std::string region_list = "";
-	const debug_view_source* src = view_ptr->view->first_source();
+	const debug_view_source* src;
 
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened,ImGuiWindowFlags_MenuBar))
@@ -737,7 +800,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		ImVec2 xy1,xy2;
 		ImVec2 fsize = ImGui::CalcTextSize("A"); // any character will do, we should be using a monospaced font
 		ImDrawList* drawlist;
-		
+
 		if(ImGui::BeginMenuBar())
 		{
 			if(ImGui::BeginMenu("Options"))
@@ -747,28 +810,28 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 				bool rev = mem->reverse();
 				int format = mem->get_data_format();
 				UINT32 chunks = mem->chunks_per_row();
-				
-				if(ImGui::MenuItem("1-byte chunks",NULL,(format == 1) ? true : false))
+
+				if(ImGui::MenuItem("1-byte chunks", nullptr,(format == 1) ? true : false))
 					mem->set_data_format(1);
-				if(ImGui::MenuItem("2-byte chunks",NULL,(format == 2) ? true : false))
+				if(ImGui::MenuItem("2-byte chunks", nullptr,(format == 2) ? true : false))
 					mem->set_data_format(2);
-				if(ImGui::MenuItem("4-byte chunks",NULL,(format == 4) ? true : false))
+				if(ImGui::MenuItem("4-byte chunks", nullptr,(format == 4) ? true : false))
 					mem->set_data_format(4);
-				if(ImGui::MenuItem("8-byte chunks",NULL,(format == 8) ? true : false))
+				if(ImGui::MenuItem("8-byte chunks", nullptr,(format == 8) ? true : false))
 					mem->set_data_format(8);
-				if(ImGui::MenuItem("32-bit floating point",NULL,(format == 9) ? true : false))
+				if(ImGui::MenuItem("32-bit floating point", nullptr,(format == 9) ? true : false))
 					mem->set_data_format(9);
-				if(ImGui::MenuItem("64-bit floating point",NULL,(format == 10) ? true : false))
+				if(ImGui::MenuItem("64-bit floating point", nullptr,(format == 10) ? true : false))
 					mem->set_data_format(10);
-				if(ImGui::MenuItem("80-bit floating point",NULL,(format == 11) ? true : false))
+				if(ImGui::MenuItem("80-bit floating point", nullptr,(format == 11) ? true : false))
 					mem->set_data_format(11);
 				ImGui::Separator();
-				if(ImGui::MenuItem("Logical addresses",NULL,!physical))
+				if(ImGui::MenuItem("Logical addresses", nullptr,!physical))
 					mem->set_physical(false);
-				if(ImGui::MenuItem("Physical addresses",NULL,physical))
+				if(ImGui::MenuItem("Physical addresses", nullptr,physical))
 					mem->set_physical(true);
 				ImGui::Separator();
-				if(ImGui::MenuItem("Reverse view",NULL,rev))
+				if(ImGui::MenuItem("Reverse view", nullptr,rev))
 					mem->set_reverse(!rev);
 				ImGui::Separator();
 				if(ImGui::MenuItem("Increase bytes per line"))
@@ -780,28 +843,20 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 			}
 			ImGui::EndMenuBar();
 		}
-		
+
 		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
 		ImGui::PushItemWidth(100.0f);
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
-		// build source CPU list	
-		while(src != nullptr)
-		{
-			region_list += src->name();
-			region_list += '\0';
-			src = src->next();
-		}
-		region_list += '\0'; // end of list
 		if(ImGui::InputText("##addr",view_ptr->console_input,512,flags))
 			downcast<debug_view_memory *>(view_ptr->view)->set_expression(view_ptr->console_input);
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1.0f);
-		ImGui::Combo("##region",&view_ptr->src_sel,region_list.c_str());
+		ImGui::Combo("##region",&view_ptr->src_sel,view_ptr->region_list.c_str());
 		ImGui::PopItemWidth();
 		ImGui::Separator();
-		
+
 		// memory editor portion
 		viewdata = view_ptr->view->viewdata();
 		totalsize = view_ptr->view->total_size();
@@ -809,7 +864,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 			totalsize.y = 256;
 		view_ptr->view->set_visible_size(totalsize);
 		vsize = view_ptr->view->visible_size();
-		
+
 		ImGui::BeginChild("##memory_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		src = view_ptr->view->first_source();
 		idx = 0;
@@ -873,6 +928,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 void debug_imgui::add_memory(int id)
 {
 	std::stringstream str;
+	const debug_view_source* src;
 	debug_area* new_view;
 	new_view = dview_alloc(*m_machine, DVT_MEMORY);
 	str << id;
@@ -884,6 +940,15 @@ void debug_imgui::add_memory(int id)
 	new_view->ofs_y = 0;
 	new_view->src_sel = 0;
 	strcpy(new_view->console_input,"0");
+	// build source CPU list
+	src = new_view->view->first_source();
+	while(src != nullptr)
+	{
+		new_view->region_list += src->name();
+		new_view->region_list += '\0';
+		src = src->next();
+	}
+	new_view->region_list += '\0'; // end of list
 	view_list_add(new_view);
 }
 
@@ -894,7 +959,7 @@ void debug_imgui::draw_console()
 	ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 
 	ImGui::SetNextWindowSize(ImVec2(view_main_regs->width + view_main_disasm->width,view_main_disasm->height + view_main_console->height + ImGui::GetTextLineHeight()*3),ImGuiSetCond_Once);
-	if(ImGui::Begin(view_main_console->title.c_str(),NULL,flags))
+	if(ImGui::Begin(view_main_console->title.c_str(), nullptr,flags))
 	{
 		const debug_view_char *viewdata;
 		debug_view_xy vsize,totalsize;
@@ -911,13 +976,13 @@ void debug_imgui::draw_console()
 			{
 				if(ImGui::MenuItem("New disassembly window", "Ctrl+D"))
 					add_disasm(++m_win_count);
-				if(ImGui::MenuItem("New memory window", "Ctrl+M")) 
+				if(ImGui::MenuItem("New memory window", "Ctrl+M"))
 					add_memory(++m_win_count);
-				if(ImGui::MenuItem("New breakpoints window", "Ctrl+B")) 
+				if(ImGui::MenuItem("New breakpoints window", "Ctrl+B"))
 					add_bpoints(++m_win_count);
-				if(ImGui::MenuItem("New watchpoints window", "Ctrl+W")) 
+				if(ImGui::MenuItem("New watchpoints window", "Ctrl+W"))
 					add_wpoints(++m_win_count);
-				if(ImGui::MenuItem("New log window", "Ctrl+L")) 
+				if(ImGui::MenuItem("New log window", "Ctrl+L"))
 					add_log(++m_win_count);
 				ImGui::Separator();
 				if(ImGui::MenuItem("Run", "F5"))
@@ -949,7 +1014,7 @@ void debug_imgui::draw_console()
 					debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_over();
 				if(ImGui::MenuItem("Step out", "F9"))
 					debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_out();
-				
+
 				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("Window"))
@@ -975,20 +1040,20 @@ void debug_imgui::draw_console()
 						collapsed = true;
 						ImGui::End();
 					}
-					if(ImGui::MenuItem((*view_ptr)->title.c_str(),NULL,!collapsed))
+					if(ImGui::MenuItem((*view_ptr)->title.c_str(), nullptr,!collapsed))
 						ImGui::SetWindowCollapsed((*view_ptr)->title.c_str(),false);
 				}
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
 		}
-		
+
 		// CPU state portion
 		viewdata = view_main_regs->view->viewdata();
 		totalsize = view_main_regs->view->total_size();
 		view_main_regs->view->set_visible_size(totalsize);
 		vsize = view_main_regs->view->visible_size();
-		
+
 		ImGui::BeginChild("##state_output", ImVec2(180,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*2));  // account for title bar and menu
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
@@ -1028,9 +1093,9 @@ void debug_imgui::draw_console()
 		totalsize = view_main_disasm->view->total_size();
 		totalsize.y = 20;
 		view_main_disasm->view->set_visible_size(totalsize);
-//		height = ImGui::GetTextLineHeight();
+//      height = ImGui::GetTextLineHeight();
 		vsize = view_main_disasm->view->visible_size();
-		
+
 		ImGui::BeginChild("##disasm_output", ImVec2(ImGui::GetWindowWidth() - ImGui::GetCursorPosX() - 8,(ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*4)/2));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
@@ -1083,7 +1148,7 @@ void debug_imgui::draw_console()
 		if(totalsize.y > 100)
 			totalsize.y = 100;
 		view_main_console->view->set_visible_size(totalsize);
-//		height = ImGui::GetTextLineHeight();
+//      height = ImGui::GetTextLineHeight();
 		vsize = view_main_console->view->visible_size();
 
 		ImGui::BeginChild("##console_output", ImVec2(ImGui::GetWindowWidth() - ImGui::GetCursorPosX() - 8,(ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*4)/2 - ImGui::GetTextLineHeight()));
@@ -1116,7 +1181,7 @@ void debug_imgui::draw_console()
 		ImGui::EndChild();
 		ImGui::Separator();
 		//if(ImGui::IsWindowFocused())
-		//	ImGui::SetKeyboardFocusHere();
+		//  ImGui::SetKeyboardFocusHere();
 		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
@@ -1176,7 +1241,7 @@ void debug_imgui::update()
 				to_delete = (*view_ptr);
 			break;
 		}
-		view_ptr++;
+		++view_ptr;
 		count++;
 	}
 	// check for a closed window
@@ -1190,7 +1255,7 @@ void debug_imgui::update()
 
 void debug_imgui::init_debugger(running_machine &machine)
 {
-        ImGuiIO& io = ImGui::GetIO();
+		ImGuiIO& io = ImGui::GetIO();
 	m_machine = &machine;
 	m_mouse_button = false;
 	if(strcmp(downcast<osd_options &>(m_machine->options()).video(),"bgfx") != 0)
@@ -1250,12 +1315,12 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 	}
 	if(firststop)
 	{
-//		debug_show_all();
+//      debug_show_all();
 		device.machine().ui_input().reset();
 		m_running = false;
 	}
 	m_hide = false;
-//	m_machine->ui_input().frame_update();
+//  m_machine->ui_input().frame_update();
 	handle_mouse();
 	handle_keys();
 	handle_console(m_machine);
@@ -1264,6 +1329,8 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 	update();
 	imguiEndFrame();
 	handle_mouse_views();
+	handle_keys_views();
+	m_machine->ui_input().reset();  // clear remaining inputs, so they don't fall through to the UI
 	device.machine().osd().update(false);
 }
 

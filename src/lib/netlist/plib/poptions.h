@@ -28,7 +28,7 @@ public:
 	: m_short(""), m_long(""), m_help(""), m_has_argument(false)
 	{}
 
-	poption(pstring ashort, pstring along, pstring help, bool has_argument, poptions *parent = NULL);
+	poption(pstring ashort, pstring along, pstring help, bool has_argument, poptions *parent = nullptr);
 
 	virtual ~poption()
 	{
@@ -48,7 +48,7 @@ private:
 class poption_str : public poption
 {
 public:
-	poption_str(pstring ashort, pstring along, pstring defval, pstring help, poptions *parent = NULL)
+	poption_str(pstring ashort, pstring along, pstring defval, pstring help, poptions *parent = nullptr)
 	: poption(ashort, along, help, true, parent), m_val(defval)
 	{}
 
@@ -62,7 +62,7 @@ private:
 class poption_str_limit : public poption
 {
 public:
-	poption_str_limit(pstring ashort, pstring along, pstring defval, pstring limit, pstring help, poptions *parent = NULL)
+	poption_str_limit(pstring ashort, pstring along, pstring defval, pstring limit, pstring help, poptions *parent = nullptr)
 	: poption(ashort, along, help, true, parent), m_val(defval), m_limit(limit, ":")
 	{}
 
@@ -86,7 +86,7 @@ private:
 class poption_bool : public poption
 {
 public:
-	poption_bool(pstring ashort, pstring along, pstring help, poptions *parent = NULL)
+	poption_bool(pstring ashort, pstring along, pstring help, poptions *parent = nullptr)
 	: poption(ashort, along, help, false, parent), m_val(false)
 	{}
 
@@ -100,7 +100,7 @@ private:
 class poption_double : public poption
 {
 public:
-	poption_double(pstring ashort, pstring along, double defval, pstring help, poptions *parent = NULL)
+	poption_double(pstring ashort, pstring along, double defval, pstring help, poptions *parent = nullptr)
 	: poption(ashort, along, help, true, parent), m_val(defval)
 	{}
 
@@ -125,7 +125,7 @@ public:
 	poptions(poption *o[])
 	{
 		int i=0;
-		while (o[i] != NULL)
+		while (o[i] != nullptr)
 		{
 			m_opts.push_back(o[i]);
 			i++;
@@ -149,7 +149,7 @@ public:
 		for (int i=1; i<argc; )
 		{
 			pstring arg(argv[i]);
-			poption *opt = NULL;
+			poption *opt = nullptr;
 
 			if (arg.startsWith("--"))
 			{
@@ -161,7 +161,7 @@ public:
 			}
 			else
 				return i;
-			if (opt == NULL)
+			if (opt == nullptr)
 				return i;
 			if (opt->m_has_argument)
 			{
@@ -210,7 +210,7 @@ private:
 			if (m_opts[i]->m_short == arg)
 				return m_opts[i];
 		}
-		return NULL;
+		return nullptr;
 	}
 	poption *getopt_long(pstring arg)
 	{
@@ -219,7 +219,7 @@ private:
 			if (m_opts[i]->m_long == arg)
 				return m_opts[i];
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	pvector_t<poption *> m_opts;
@@ -229,7 +229,7 @@ private:
 poption::poption(pstring ashort, pstring along, pstring help, bool has_argument, poptions *parent)
 : m_short(ashort), m_long(along), m_help(help), m_has_argument(has_argument)
 {
-	if (parent != NULL)
+	if (parent != nullptr)
 		parent->register_option(this);
 }
 

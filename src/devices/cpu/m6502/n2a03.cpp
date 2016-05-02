@@ -139,4 +139,4 @@ machine_config_constructor n2a03_device::device_mconfig_additions() const
 }
 
 
-#include "cpu/m6502/n2a03.inc"
+#include "cpu/m6502/n2a03.hxx"

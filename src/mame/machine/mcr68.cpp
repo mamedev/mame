@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "audio/midway.h"
-#include "includes/mcr.h"
 #include "includes/mcr68.h"
 
 #define VERBOSE 0
@@ -190,7 +189,7 @@ TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_callback)
 WRITE8_MEMBER(mcr68_state::zwackery_pia0_w)
 {
 	/* bit 7 is the watchdog */
-	if (!(data & 0x80)) machine().watchdog_reset();
+	if (!(data & 0x80)) m_watchdog->watchdog_reset();
 
 	/* bits 5 and 6 control hflip/vflip */
 	/* bits 3 and 4 control coin counters? */

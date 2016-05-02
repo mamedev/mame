@@ -652,7 +652,7 @@ void v99x8_device::device_start()
 	save_item(NAME(m_cont_reg));
 	save_item(NAME(m_read_ahead));
 	//  save_item(NAME(m_vram));
-	//  if ( m_vram_exp != NULL )
+	//  if ( m_vram_exp != nullptr )
 	//      save_pointer(NAME(m_vram_exp), 0x10000);
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_scanline));

@@ -345,7 +345,7 @@ static INPUT_PORTS_START( crshrace )
     PORT_DIPSETTING(      0x0e00, "5" )
     PORT_DIPSETTING(      0x0f00, "5" )
 */
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, crshrace_state,country_sndpending_r, NULL)  /* pending sound command */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, crshrace_state,country_sndpending_r, nullptr)  /* pending sound command */
 INPUT_PORTS_END
 
 /* Same as 'crshrace', but additional "unknown" Dip Switch (see notes) */

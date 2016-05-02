@@ -16,8 +16,8 @@ NETLIB_NAMESPACE_DEVICES_START()
 class nld_vdd_vss : public device_t
 {
 	public:
-		nld_vdd_vss ()
-		: device_t()
+		nld_vdd_vss (netlist_t &anetlist, const pstring &name)
+		: device_t(anetlist, name)
 			{ }
 
 		analog_input_t m_vdd;

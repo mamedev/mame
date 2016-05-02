@@ -226,7 +226,7 @@ static const z80_daisy_config poly880_daisy_chain[] =
 	{ Z80PIO1_TAG },
 	{ Z80PIO2_TAG },
 	{ Z80CTC_TAG },
-	{ NULL }
+	{ nullptr }
 };
 #endif
 

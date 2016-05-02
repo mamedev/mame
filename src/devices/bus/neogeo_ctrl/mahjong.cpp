@@ -150,7 +150,7 @@ UINT8 neogeo_mjctrl_ac_device::read_ctrl()
 		case 0x1b: res = m_mjpanel[2]->read(); break;
 		case 0x24: res = m_mjpanel[3]->read(); break;
 	}
-	
+
 	return res;
 }
 
@@ -171,4 +171,3 @@ UINT8 neogeo_mjctrl_device::read_start_sel()
 {
 	return m_ss->read();
 }
-

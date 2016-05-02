@@ -105,7 +105,7 @@ In other words,the first three types uses the offset and not the color allocated
 */
 
 #include "emu.h"
-#include "includes/stv.h"
+#include "includes/saturn.h"
 
 enum
 {

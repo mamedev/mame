@@ -14,8 +14,8 @@
 #include <modules/lib/osdobj_common.h>
 
 #include "chainreader.h"
-
 #include "chain.h"
+#include "chainmanager.h"
 #include "sliderreader.h"
 #include "paramreader.h"
 #include "chainentryreader.h"
@@ -24,7 +24,7 @@
 #include "slider.h"
 #include "parameter.h"
 
-bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix, osd_options& options, running_machine& machine, uint32_t window_index, uint32_t screen_index, texture_manager& textures, target_manager& targets, effect_manager& effects)
+bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix, chain_manager& chains, uint32_t screen_index)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -41,7 +41,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		const Value& slider_array = value["sliders"];
 		for (UINT32 i = 0; i < slider_array.Size(); i++)
 		{
-			std::vector<bgfx_slider*> expanded_sliders = slider_reader::read_from_value(slider_array[i], prefix + "sliders[" + std::to_string(i) + "]: ", machine, window_index, screen_index);
+			std::vector<bgfx_slider*> expanded_sliders = slider_reader::read_from_value(slider_array[i], prefix + "sliders[" + std::to_string(i) + "]: ", chains, screen_index);
 			if (expanded_sliders.size() == 0)
 			{
 				return nullptr;
@@ -74,7 +74,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		const Value& param_array = value["parameters"];
 		for (UINT32 i = 0; i < param_array.Size(); i++)
 		{
-			bgfx_parameter* parameter = parameter_reader::read_from_value(param_array[i], prefix + "parameters[" + std::to_string(i) + "]; ", window_index);
+			bgfx_parameter* parameter = parameter_reader::read_from_value(param_array[i], prefix + "parameters[" + std::to_string(i) + "]; ", chains);
 			if (parameter == nullptr)
 			{
 				return nullptr;
@@ -98,7 +98,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		// TODO: Move into its own reader
 		for (UINT32 i = 0; i < target_array.Size(); i++)
 		{
-			bgfx_target* target = target_reader::read_from_value(target_array[i], prefix + "targets[" + std::to_string(i) + "]: ", targets, options, screen_index);
+			bgfx_target* target = target_reader::read_from_value(target_array[i], prefix + "targets[" + std::to_string(i) + "]: ", chains, screen_index);
 			if (target == nullptr)
 			{
 				return nullptr;
@@ -114,7 +114,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		const Value& entry_array = value["passes"];
 		for (UINT32 i = 0; i < entry_array.Size(); i++)
 		{
-			bgfx_chain_entry* entry = chain_entry_reader::read_from_value(entry_array[i], prefix + "passes[" + std::to_string(i) + "]: ", options, textures, targets, effects, slider_map, param_map, screen_index);
+			bgfx_chain_entry* entry = chain_entry_reader::read_from_value(entry_array[i], prefix + "passes[" + std::to_string(i) + "]: ", chains, slider_map, param_map, screen_index);
 			if (entry == nullptr)
 			{
 				return nullptr;
@@ -123,7 +123,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, std::string prefix
 		}
 	}
 
-	return new bgfx_chain(name, author, transform, targets, sliders, parameters, entries, target_list, screen_index);
+	return new bgfx_chain(name, author, transform, chains.targets(), sliders, parameters, entries, target_list, screen_index);
 }
 
 bool chain_reader::validate_parameters(const Value& value, std::string prefix)

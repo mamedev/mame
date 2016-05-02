@@ -19,6 +19,7 @@ likewise be a 2 screen game
 #include "cpu/m68000/m68000.h"
 
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/k054539.h"
@@ -101,7 +102,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x10804e, 0x10804f) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
 	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
@@ -136,7 +137,7 @@ static ADDRESS_MAP_START( 6p_main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x10804e, 0x10804f) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
 	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x10a006, 0x10a007) AM_READ_PORT("P5_P6")
@@ -265,7 +266,7 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START5 ) /* not verified */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START6 ) /* not verified */
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xmen_state,xmen_frame_r, NULL)  /* screen indicator? */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xmen_state,xmen_frame_r, nullptr)  /* screen indicator? */
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
@@ -323,6 +324,8 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.17)   /* verified on pcb */
@@ -370,6 +373,8 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2048)

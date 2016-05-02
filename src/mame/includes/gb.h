@@ -9,7 +9,7 @@
 #ifndef GB_H_
 #define GB_H_
 
-#include "audio/gb.h"
+#include "sound/gb.h"
 #include "cpu/lr35902/lr35902.h"
 #include "bus/gameboy/gb_slot.h"
 #include "machine/ram.h"

@@ -14,7 +14,6 @@
 #define __CHEAT_H__
 
 #include "debug/express.h"
-#include "ui/ui.h"
 
 
 //**************************************************************************
@@ -38,6 +37,7 @@ DECLARE_ENUM_OPERATORS(script_state)
 //**************************************************************************
 
 class cheat_manager;
+class mame_ui_manager;
 
 
 // ======================> number_and_format
@@ -303,7 +303,7 @@ public:
 	// actions
 	void reload();
 	bool save_all(const char *filename);
-	void render_text(render_container &container);
+	void render_text(mame_ui_manager &mui, render_container &container);
 
 	// output helpers
 	std::string &get_output_astring(int row, int justify);

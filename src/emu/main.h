@@ -59,6 +59,7 @@ public:
 	static void draw_user_interface(running_machine& machine);
 	static void periodic_check();
 	static bool frame_hook();
+	static void layout_file_cb(xml_data_node &layout);
 };
 
 // ======================> machine_manager
@@ -76,18 +77,19 @@ public:
 	osd_interface &osd() const { return m_osd; }
 	emu_options &options() const { return m_options; }
 
-	running_machine *machine() { return m_machine; }
+	running_machine *machine() const { return m_machine; }
 
 	void set_machine(running_machine *machine) { m_machine = machine; }
 
 	virtual ui_manager* create_ui(running_machine& machine) { return nullptr;  }
-	virtual void ui_initialize(running_machine& machine,bool firstrun) { }
+	virtual void create_custom(running_machine& machine) { }
+	virtual void ui_initialize(running_machine& machine) { }
 
 	virtual void update_machine() { }
 protected:
 	osd_interface &         m_osd;                  // reference to OSD system
 	emu_options &           m_options;              // reference to options
-	running_machine *		m_machine;
+	running_machine *       m_machine;
 };
 
 

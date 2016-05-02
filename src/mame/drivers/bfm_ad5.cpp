@@ -14,10 +14,7 @@
 #include "emu.h"
 #include "includes/bfm_ad5.h"
 #include "machine/mcf5206e.h"
-
-
-extern int find_project_string(running_machine &machine, int addrxor, int mode);
-
+#include "machine/bfm_sc45_helper.h"
 
 DRIVER_INIT_MEMBER(adder5_state,ad5)
 {
@@ -88,3 +85,5 @@ MACHINE_CONFIG_START( bfm_ad5, adder5_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */
 MACHINE_CONFIG_END
+
+#include "bfm_ad5sw.hxx"

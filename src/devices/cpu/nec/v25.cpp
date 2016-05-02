@@ -361,8 +361,8 @@ void v25_common_device::external_int()
 /*                             OPCODES                                      */
 /****************************************************************************/
 
-#include "necinstr.inc"
-#include "v25instr.inc"
+#include "necinstr.hxx"
+#include "v25instr.hxx"
 
 /*****************************************************************************/
 

@@ -997,7 +997,7 @@ UINT32 thomson_state::screen_update_thom(screen_device &screen, bitmap_ind16 &bi
 		draw_scanline16( bitmap, xbleft, ypos, xwidth, v, nullptr );
 #if 0
 		if ( thom_hires )
-			draw_scanline16( bitmap, xbleft, ypos+1, xwidth, v, NULL );
+			draw_scanline16( bitmap, xbleft, ypos+1, xwidth, v, nullptr );
 #endif
 	}
 

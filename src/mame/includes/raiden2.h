@@ -156,7 +156,3 @@ public:
 protected:
 	virtual void machine_start() override;
 };
-
-/*----------- defined in machine/r2crypt.c -----------*/
-void raiden2_decrypt_sprites(running_machine &machine);
-void zeroteam_decrypt_sprites(running_machine &machine);
