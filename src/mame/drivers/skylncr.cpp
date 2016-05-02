@@ -1509,9 +1509,9 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Max Win Bonus" )
-	PORT_DIPSETTING(    0x20, "10000" )
-	PORT_DIPSETTING(    0x00, "20000" )
+	PORT_DIPNAME( 0x20, 0x20, "Max Bonus" )  // OK
+	PORT_DIPSETTING(    0x20, "10000" )  // OK
+	PORT_DIPSETTING(    0x00, "20000" )  // OK
 	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Bet" )
 	PORT_DIPSETTING(    0xc0, "0" )
 	PORT_DIPSETTING(    0x80, "8" )
