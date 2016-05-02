@@ -1213,6 +1213,15 @@ project "uv"
 			MAME_DIR .. "3rdparty/libuv/src/unix/kqueue.c",
 		}
 	end
+	if _OPTIONS["targetos"]=="netbsd" then
+		files {
+			MAME_DIR .. "3rdparty/libuv/src/unix/netbsd.c",
+			MAME_DIR .. "3rdparty/libuv/src/unix/kqueue.c",
+		}
+		links {
+			"kvm",
+		}
+	end
 
 	if (_OPTIONS["SHADOW_CHECK"]=="1") then
 		removebuildoptions {
