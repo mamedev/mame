@@ -1477,9 +1477,9 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )  // OK
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )  // OK
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )  // OK
 	PORT_DIPNAME( 0x18, 0x08, "Payout Limit" )
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x18, "1000" )
