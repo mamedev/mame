@@ -1669,8 +1669,6 @@ void saturn_state::stv_vdp1_draw_scaled_sprite(const rectangle &cliprect)
 
 void saturn_state::stv_vdp1_draw_normal_sprite(const rectangle &cliprect, int sprite_type)
 {
-	//UINT16 *destline;
-	//saturn_state *state = machine.driver_data<saturn_state>();
 	int y, ysize, drawypos;
 	int x, xsize, drawxpos;
 	int direction;
