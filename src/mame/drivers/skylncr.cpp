@@ -1404,6 +1404,149 @@ static INPUT_PORTS_START( sstar97 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( sonikfig )
+	PORT_START("IN1")   /* $00 (PPI0 port A) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_D) PORT_NAME("IN1-02")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_F) PORT_NAME("IN1-08")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_G) PORT_NAME("IN1-20")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_H) PORT_NAME("IN1-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_J) PORT_NAME("IN1-80")
+
+	PORT_START("IN2")   /* $01 (PPI0 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_K) PORT_NAME("IN2-02")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_L) PORT_NAME("IN2-08")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")  // OK
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_T) PORT_NAME("IN2-20")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_Y) PORT_NAME("IN2-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_U) PORT_NAME("IN2-80")
+
+	PORT_START("IN3")   /* $11 (PPI1 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)     // OK
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)     // OK
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)     // OK
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )              // OK
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_I) PORT_NAME("IN3-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score")
+
+	PORT_START("IN4")   /* $12 (PPI1 port C) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-01")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")  // OK
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   // Settings OK
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-10")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-20")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START("DSW1")  /* $02 (PPI0 port C) */
+	PORT_DIPNAME( 0x11, 0x11, "D-UP Percentage" )
+	PORT_DIPSETTING(    0x11, "60%" )
+	PORT_DIPSETTING(    0x01, "70%" )
+	PORT_DIPSETTING(    0x10, "80%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x0e, 0x0e, "Main Game Percentage" )  // OK
+	PORT_DIPSETTING(    0x0e, "55%" )  // OK
+	PORT_DIPSETTING(    0x0c, "60%" )  // OK
+	PORT_DIPSETTING(    0x0a, "65%" )  // OK
+	PORT_DIPSETTING(    0x08, "70%" )  // OK
+	PORT_DIPSETTING(    0x06, "75%" )  // OK
+	PORT_DIPSETTING(    0x04, "80%" )  // OK
+	PORT_DIPSETTING(    0x02, "85%" )  // OK
+	PORT_DIPSETTING(    0x00, "90%" )  // OK
+	PORT_DIPNAME( 0x20, 0x20, "Reels Speed" )
+	PORT_DIPSETTING(    0x20, "Slow" )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x40, 0x40, "Bonus Score" )
+	PORT_DIPSETTING(    0x40, "32" )
+	PORT_DIPSETTING(    0x00, "24" )
+	PORT_DIPNAME( 0x80, 0x00, "Key Out" )
+	PORT_DIPSETTING(    0x00, "x1" )
+	PORT_DIPSETTING(    0x80, "x100" )
+
+	PORT_START("DSW2")  /* $10 (PPI1 port A) */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x18, 0x08, "Payout Limit" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x18, "1000" )
+	PORT_DIPSETTING(    0x10, "2000" )
+	PORT_DIPSETTING(    0x08, "5000" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Clown Percentage" )
+	PORT_DIPSETTING(    0xc0, "60%" )
+	PORT_DIPSETTING(    0x80, "70%" )
+	PORT_DIPSETTING(    0x40, "80%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+
+	PORT_START("DSW3")  /* AY8910 port A */
+	PORT_DIPNAME( 0x07, 0x07, "Coinage A, B & C" )
+	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 5 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin / 30 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Coin / 40 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credit" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Max Win Bonus" )
+	PORT_DIPSETTING(    0x20, "10000" )
+	PORT_DIPSETTING(    0x00, "20000" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Bet" )
+	PORT_DIPSETTING(    0xc0, "0" )
+	PORT_DIPSETTING(    0x80, "8" )
+	PORT_DIPSETTING(    0x40, "16" )
+	PORT_DIPSETTING(    0x00, "32" )
+
+	PORT_START("DSW4")  /* AY8910 port B */
+	PORT_DIPNAME( 0x07, 0x07, "Remote Credits" )
+	PORT_DIPSETTING(    0x00, "1 Pulse / 100 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Pulse / 110 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Pulse / 120 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Pulse / 130 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Pulse / 200 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Pulse / 400 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Pulse / 500 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Pulse / 1000 Credits" )
+	PORT_DIPNAME( 0x18, 0x00, "Max Bet" )
+	PORT_DIPSETTING(    0x18, "32" )
+	PORT_DIPSETTING(    0x10, "64" )
+	PORT_DIPSETTING(    0x08, "72" )
+	PORT_DIPSETTING(    0x00, "80" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+
 // It runs in IM 0, thus needs an opcode on the data bus
 INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 {
@@ -1821,4 +1964,4 @@ GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr,  ROT
 GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr,  ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
 GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
 GAME( 199?, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr,  ROT0, "bootleg",              "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_NOT_WORKING )
-GAME( 2000, sonikfig, 0,       skylncr,  skylncr,  skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_NOT_WORKING )
+GAME( 2000, sonikfig, 0,       skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_NOT_WORKING )
