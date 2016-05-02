@@ -126,12 +126,12 @@ screen_device_svg_renderer::screen_device_svg_renderer(memory_region *region)
 	int w,h;
 	if (ar < (16.0/9.0))
 	{
-		h = 1080*2;
+		h = 1080;
 		w = (h * ar) + 0.5;
 	}
 	else
 	{
-		w = 1920*2;
+		w = 1920;
 		h = (w / ar) + 0.5;
 	}
 	
