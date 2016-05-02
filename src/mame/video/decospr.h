@@ -59,7 +59,7 @@ protected:
 	bool m_is_bootleg; // used by various bootlegs (disables masking of sprite tile number when multi-sprite is used)
 	int m_bootleg_type; // for Puzzlove, has sprite bits moved around (probably to prevent board swaps)
 	int m_x_offset, m_y_offset; // used by various bootlegs
-	int m_flipallx; // used by esd16.c - hedpanio, multchmp , and nmg5.c
+	bool m_flipallx; // used by esd16.c - hedpanico, multchmp, and nmg5.c
 	int m_transpen; // used by fncywld (tumbleb.c)
 
 private:

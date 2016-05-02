@@ -62,7 +62,6 @@ Notes:
 
 
  - sound CPU seems to miss commands sometimes
- - flipscreen is wrong
  - should sprites be buffered, is the Deco '77' a '71' or similar?
 
 */
