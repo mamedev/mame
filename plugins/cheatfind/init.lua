@@ -248,7 +248,6 @@ function cheatfind.startplugin()
 		rightop = 1
 		matches = {}
 		matchsel = 0
-		matchcnt = 0
 		matchpg = 0
 		menu_blocks = {}
 		watches = {}
@@ -361,7 +360,7 @@ function cheatfind.startplugin()
 				return { "Save current -- #" .. #menu_blocks[1] + 1, "", 0 }, f
 			end
 			menu[#menu + 1] = function()
-				function f(event)
+				local function f(event)
 					if event == "select" then
 						local count = 0
 						if #matches == 0 then
@@ -392,6 +391,7 @@ function cheatfind.startplugin()
 						end
 						manager:machine():popmessage(count .. " total matches found")
 						matches[#matches].count = count
+						matchpg = 0
 						devsel = devcur
 						return true
 					end
@@ -409,7 +409,7 @@ function cheatfind.startplugin()
 			menu[#menu + 1] = function()
 				local m = { "Operator", optable[opsel], "" }
 				menu_lim(opsel, 1, #optable, m)
-				function f(event)
+				local function f(event)
 					local r
 					opsel, r = incdec(event, opsel, 1, #optable)
 					if event == "left" or event == "right" or event == "comment" then
@@ -480,9 +480,10 @@ function cheatfind.startplugin()
 				if #matches == 0 then
 					return nil
 				end
-				function f(event)
+				local function f(event)
 					if event == "select" and #matches > 0 then
 						matches[#matches] = nil
+						matchpg = 0
 						return true
 					end
 				end
@@ -496,7 +497,7 @@ function cheatfind.startplugin()
 					if matchsel == 0 then
 						m[2] = "All"
 					end
-					function f(event)
+					local function f(event)
 						local r
 						matchsel, r = incdec(event, matchsel, 0, #matches[#matches])
 						if r then
@@ -560,7 +561,7 @@ function cheatfind.startplugin()
 							m[2] = "Watch"
 						end
 						menu_lim(match.mode, 1, 3, m)
-						function f(event)
+						local function f(event)
 							local r
 							match.mode, r = incdec(event, match.mode, 1, 3)
 							if event == "select" then
@@ -642,7 +643,7 @@ function cheatfind.startplugin()
 						max = #matches[#matches][matchsel]
 					end
 					menu_lim(matchpg, 0, max, m)
-					function f(event)
+					local function f(event)
 						matchpg, r = incdec(event, matchpg, 0, max)
 						return r
 					end
