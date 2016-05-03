@@ -9,13 +9,14 @@
 #include "bus/generic/carts.h"
 #include "softlist.h"
 #include "cpu/patinhofeio/patinho_feio.h"
+#include "machine/terminal.h"
 
 class patinho_feio_state : public driver_device
 {
 public:
 	patinho_feio_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		//,m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "decwriter_paper")
 	{ }
 
 	DECLARE_DRIVER_INIT(patinho_feio);
@@ -27,8 +28,8 @@ public:
 	void load_tape(const char* name);
 	void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
 	virtual void machine_start() override;
-//    virtual void machine_reset();
-//    required_device<patinho_feio_cpu_device> m_maincpu;
+
+	required_device<generic_terminal_device> m_terminal;
 private:
         UINT8* paper_tape_data;
         UINT32 paper_tape_length;
@@ -49,7 +50,7 @@ READ16_MEMBER(patinho_feio_state::rc_r)
 
 WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
 {
-	printf("DECWRITTER: byte value = %02X ('%c')\n", data, data);
+	m_terminal->write(space, 0, data);
 }
 
 READ8_MEMBER(patinho_feio_state::decwriter_status_r)
@@ -173,6 +174,10 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 //	MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(patinho_feio_state, papertapereader_data_r))
 //	MCFG_PATINHO_IODEV_STATUS_CB(0xE, READ8(patinho_feio_state, papertapereader_status_r))
 
+
+        /* video hardware to represent what you'd see
+           printed on paper on the DECWRITER */
+        MCFG_DEVICE_ADD("decwriter_paper", GENERIC_TERMINAL, 0)
 
 	/* punched tape */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "patinho_tape")
