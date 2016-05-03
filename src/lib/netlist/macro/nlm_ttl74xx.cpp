@@ -117,7 +117,7 @@ NETLIST_START(TTL_7404_DIP)
 		s3.A,  /*    A3 |5           10| Y5   */ s5.Q,
 		s3.Q,  /*    Y3 |6            9| A4   */ s4.A,
 		GND.I, /*   GND |7            8| Y4   */ s4.Q
-				/*       +--------------+      */
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -181,6 +181,43 @@ NETLIST_START(TTL_7410_DIP)
 	TTL_7410_GATE(s1)
 	TTL_7410_GATE(s2)
 	TTL_7410_GATE(s3)
+
+	DUMMY_INPUT(GND)
+	DUMMY_INPUT(VCC)
+
+	DIPPINS(   /*       +--------------+      */
+		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.B,  /*    B1 |2           13| C1   */ s1.C,
+		s2.A,  /*    A2 |3           12| Y1   */ s1.Q,
+		s2.B,  /*    B2 |4    7400   11| C3   */ s3.C,
+		s2.C,  /*    C2 |5           10| B3   */ s3.B,
+		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
+		GND.I, /*   GND |7            8| Y3   */ s3.Q
+			   /*       +--------------+      */
+	)
+NETLIST_END()
+
+/*
+ *  DM7411: Triple 3-Input AND Gates
+ *
+ *              Y = ABC
+ *          +---+---+---++---+
+ *          | A | B | C || Y |
+ *          +===+===+===++===+
+ *          | X | X | 0 || 0 |
+ *          | X | 0 | X || 0 |
+ *          | 0 | X | X || 0 |
+ *          | 1 | 1 | 1 || 1 |
+ *          +---+---+---++---+
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
+ */
+
+NETLIST_START(TTL_7411_DIP)
+	TTL_7411_GATE(s1)
+	TTL_7411_GATE(s2)
+	TTL_7411_GATE(s3)
 
 	DUMMY_INPUT(GND)
 	DUMMY_INPUT(VCC)
@@ -290,7 +327,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7410_NAND, 3, 1, 0, "A,B")
+	TRUTHTABLE_START(TTL_7410_NAND, 3, 1, 0, "A,B,C")
 		TT_HEAD("A,B,C|Q ")
 		TT_LINE("0,X,X|1|22")
 		TT_LINE("X,0,X|1|22")
@@ -308,6 +345,24 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
+	TRUTHTABLE_START(TTL_7411_AND, 3, 1, 0, "A,B,C")
+		TT_HEAD("A,B,C|Q ")
+		TT_LINE("0,X,X|0|22")
+		TT_LINE("X,0,X|0|22")
+		TT_LINE("X,X,0|0|22")
+		TT_LINE("1,1,1|1|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_7411_GATE, 3, 1, 0, "")
+		TT_HEAD("A,B,C|Q ")
+		TT_LINE("0,X,X|0|22")
+		TT_LINE("X,0,X|0|22")
+		TT_LINE("X,X,0|0|22")
+		TT_LINE("1,1,1|1|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
 	TRUTHTABLE_START(TTL_7416_GATE, 1, 1, 0, "")
 		TT_HEAD(" A | Q ")
 		TT_LINE(" 0 | 1 |15")
@@ -321,5 +376,6 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7404_DIP)
 	LOCAL_LIB_ENTRY(TTL_7408_DIP)
 	LOCAL_LIB_ENTRY(TTL_7410_DIP)
+	LOCAL_LIB_ENTRY(TTL_7411_DIP)
 	LOCAL_LIB_ENTRY(TTL_7416_DIP)
 NETLIST_END()
