@@ -189,7 +189,7 @@ NETLIST_START(TTL_7410_DIP)
 		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
 		s1.B,  /*    B1 |2           13| C1   */ s1.C,
 		s2.A,  /*    A2 |3           12| Y1   */ s1.Q,
-		s2.B,  /*    B2 |4    7400   11| C3   */ s3.C,
+		s2.B,  /*    B2 |4    7410   11| C3   */ s3.C,
 		s2.C,  /*    C2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
 		GND.I, /*   GND |7            8| Y3   */ s3.Q
@@ -226,7 +226,7 @@ NETLIST_START(TTL_7411_DIP)
 		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
 		s1.B,  /*    B1 |2           13| C1   */ s1.C,
 		s2.A,  /*    A2 |3           12| Y1   */ s1.Q,
-		s2.B,  /*    B2 |4    7400   11| C3   */ s3.C,
+		s2.B,  /*    B2 |4    7411   11| C3   */ s3.C,
 		s2.C,  /*    C2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
 		GND.I, /*   GND |7            8| Y3   */ s3.Q
@@ -262,6 +262,45 @@ NETLIST_START(TTL_7416_DIP)
 				/*       +--------------+      */
 	)
 NETLIST_END()
+
+/*
+ *  DM7427: Triple 3-Input NOR Gates
+ *
+ *                  _____
+ *              Y = A+B+C
+ *          +---+---+---++---+
+ *          | A | B | C || Y |
+ *          +===+===+===++===+
+ *          | X | X | 1 || 0 |
+ *          | X | 1 | X || 0 |
+ *          | 1 | X | X || 0 |
+ *          | 0 | 0 | 0 || 1 |
+ *          +---+---+---++---+
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
+ */
+
+NETLIST_START(TTL_7427_DIP)
+	TTL_7427_GATE(s1)
+	TTL_7427_GATE(s2)
+	TTL_7427_GATE(s3)
+
+	DUMMY_INPUT(GND)
+	DUMMY_INPUT(VCC)
+
+	DIPPINS(   /*       +--------------+      */
+		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.B,  /*    B1 |2           13| C1   */ s1.C,
+		s2.A,  /*    A2 |3           12| Y1   */ s1.Q,
+		s2.B,  /*    B2 |4    7427   11| C3   */ s3.C,
+		s2.C,  /*    C2 |5           10| B3   */ s3.B,
+		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
+		GND.I, /*   GND |7            8| Y3   */ s3.Q
+			   /*       +--------------+      */
+	)
+NETLIST_END()
+
 
 NETLIST_START(TTL74XX_lib)
 
@@ -371,6 +410,24 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XXOC")
 	TRUTHTABLE_END()
 
+	TRUTHTABLE_START(TTL_7427_GATE, 3, 1, 0, "")
+		TT_HEAD("A,B,C|Q ")
+		TT_LINE("1,X,X|0|22")
+		TT_LINE("X,1,X|0|22")
+		TT_LINE("X,X,1|0|22")
+		TT_LINE("0,0,0|1|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_7427_NOR, 3, 1, 0, "A,B,C")
+		TT_HEAD("A,B,C|Q ")
+		TT_LINE("1,X,X|0|22")
+		TT_LINE("X,1,X|0|22")
+		TT_LINE("X,X,1|0|22")
+		TT_LINE("0,0,0|1|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
 	LOCAL_LIB_ENTRY(TTL_7400_DIP)
 	LOCAL_LIB_ENTRY(TTL_7402_DIP)
 	LOCAL_LIB_ENTRY(TTL_7404_DIP)
@@ -378,4 +435,5 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7410_DIP)
 	LOCAL_LIB_ENTRY(TTL_7411_DIP)
 	LOCAL_LIB_ENTRY(TTL_7416_DIP)
+	LOCAL_LIB_ENTRY(TTL_7427_DIP)
 NETLIST_END()

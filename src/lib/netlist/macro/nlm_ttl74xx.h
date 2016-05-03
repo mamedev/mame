@@ -70,6 +70,7 @@
 #define TTL_7410_DIP(_name)                                                    \
 		NET_REGISTER_DEV(TTL_7410_DIP, _name)
 
+
 #define TTL_7411_GATE(_name)                                                   \
 		NET_REGISTER_DEV(TTL_7411_GATE, _name)
 
@@ -88,6 +89,19 @@
 
 #define TTL_7416_DIP(_name)                                                    \
 		NET_REGISTER_DEV(TTL7416_DIP, _name)
+
+
+#define TTL_7427_GATE(_name)                                                   \
+		NET_REGISTER_DEV(TTL_7427_GATE, _name)
+
+#define TTL_7427_NOR(_name, _I1, _I2, _I3)                                     \
+		NET_REGISTER_DEV(TTL_7427_NOR, _name)                                  \
+		NET_CONNECT(_name, A, _I1)                                             \
+		NET_CONNECT(_name, B, _I2)                                             \
+		NET_CONNECT(_name, C, _I3)
+
+#define TTL_7427_DIP(_name)                                                    \
+		NET_REGISTER_DEV(TTL_7427_DIP, _name)
 
 /* ----------------------------------------------------------------------------
  *  External declarations
