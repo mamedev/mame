@@ -476,20 +476,17 @@ function cheatfind.startplugin()
 				end
 				return m, function(event) local r bcd, r = incdec(event, bcd, 0, 1) return r end
 			end
-			menu[#menu + 1] = function()
-				if #matches == 0 then
-					return nil
-				end
-				local function f(event)
-					if event == "select" and #matches > 0 then
-						matches[#matches] = nil
-						matchpg = 0
-						return true
-					end
-				end
-				return { "Undo last search -- #" .. #matches, "", 0 }, f
-			end
 			if #matches ~= 0 then
+				menu[#menu + 1] = function()
+					local function f(event)
+						if event == "select" then
+							matches[#matches] = nil
+							matchpg = 0
+							return true
+						end
+					end
+					return { "Undo last search -- #" .. #matches, "", 0 }, f
+				end
 				menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 				menu[#menu + 1] = function()
 					local m = { "Match block", matchsel, "" }
@@ -632,22 +629,22 @@ function cheatfind.startplugin()
 						return m, f
 					end
 				end
-			end
-			if #matches > 0 and matches[#matches].count > 100 then
-				menu[#menu + 1] = function()
-					local m = { "Page", matchpg, 0 }
-					local max
-					if matchsel == 0 then
-						max = math.ceil(matches[#matches].count / 100)
-					else
-						max = #matches[#matches][matchsel]
+				if matches[#matches].count > 100 then
+					menu[#menu + 1] = function()
+						local m = { "Page", matchpg, 0 }
+						local max
+						if matchsel == 0 then
+							max = math.ceil(matches[#matches].count / 100)
+						else
+							max = #matches[#matches][matchsel]
+						end
+						menu_lim(matchpg, 0, max, m)
+						local function f(event)
+							matchpg, r = incdec(event, matchpg, 0, max)
+							return r
+						end
+						return m, f
 					end
-					menu_lim(matchpg, 0, max, m)
-					local function f(event)
-						matchpg, r = incdec(event, matchpg, 0, max)
-						return r
-					end
-					return m, f
 				end
 			end
 			if #watches ~= 0 then
