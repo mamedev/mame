@@ -42,7 +42,7 @@
 #ifndef NLD_7474_H_
 #define NLD_7474_H_
 
-#include "nld_signal.h"
+#include "nl_base.h"
 
 #define TTL_7474(_name, _CLK, _D, _CLRQ, _PREQ)                                     \
 		NET_REGISTER_DEV(TTL_7474, _name)                                               \

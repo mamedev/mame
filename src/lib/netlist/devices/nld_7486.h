@@ -32,7 +32,6 @@
 #ifndef NLD_7486_H_
 #define NLD_7486_H_
 
-#include "nld_signal.h"
 #include "nld_truthtable.h"
 
 #define TTL_7486_XOR(_name, _A, _B)                                                 \

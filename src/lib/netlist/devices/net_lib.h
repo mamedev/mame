@@ -12,7 +12,6 @@
 #define NET_LIB_H
 
 #include "nl_base.h"
-#include "nld_signal.h"
 #include "nld_system.h"
 
 #include "nld_4020.h"

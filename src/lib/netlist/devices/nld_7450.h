@@ -24,7 +24,7 @@
 #ifndef NLD_7450_H_
 #define NLD_7450_H_
 
-#include "nld_signal.h"
+#include "nl_base.h"
 
 #define TTL_7450_ANDORINVERT(_name, _I1, _I2, _I3, _I4)                             \
 		NET_REGISTER_DEV(TTL_7450_ANDORINVERT, _name)                                               \
