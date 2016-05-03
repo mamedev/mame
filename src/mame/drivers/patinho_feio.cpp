@@ -16,24 +16,38 @@ class patinho_feio_state : public driver_device
 public:
 	patinho_feio_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_terminal(*this, "decwriter_paper")
+		, m_decwriter_paper(*this, "decwriter_paper")
+		, m_tty_paper(*this, "teletype_paper")
 	{ }
 
 	DECLARE_DRIVER_INIT(patinho_feio);
 	DECLARE_READ16_MEMBER(rc_r);
+
 	DECLARE_READ8_MEMBER(decwriter_status_r);
-//	DECLARE_READ8_MEMBER(decwriter_data_r);
+	DECLARE_READ8_MEMBER(decwriter_data_r);
 	DECLARE_WRITE8_MEMBER(decwriter_data_w);
+	DECLARE_WRITE8_MEMBER(decwriter_kbd_input);
+
+	DECLARE_READ8_MEMBER(teletype_status_r);
+	DECLARE_READ8_MEMBER(teletype_data_r);
+	DECLARE_WRITE8_MEMBER(teletype_data_w);
+	DECLARE_WRITE8_MEMBER(teletype_kbd_input);
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( patinho_tape );
 	void load_tape(const char* name);
 	void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
 	virtual void machine_start() override;
 
-	required_device<generic_terminal_device> m_terminal;
+	required_device<generic_terminal_device> m_decwriter_paper;
+	required_device<generic_terminal_device> m_tty_paper;
 private:
         UINT8* paper_tape_data;
         UINT32 paper_tape_length;
         UINT32 paper_tape_address;
+	UINT8 m_tty_data;
+	bool m_tty_ready;
+	UINT8 m_decwriter_data;
+	bool m_decwriter_ready;
 };
 
 /*
@@ -50,7 +64,18 @@ READ16_MEMBER(patinho_feio_state::rc_r)
 
 WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
 {
-	m_terminal->write(space, 0, data);
+	m_decwriter_paper->write(space, 0, data);
+}
+
+READ8_MEMBER(patinho_feio_state::decwriter_data_r)
+{
+	return m_decwriter_data;
+}
+
+WRITE8_MEMBER(patinho_feio_state::decwriter_kbd_input)
+{
+	m_decwriter_data = data;
+	m_decwriter_ready = true;
 }
 
 READ8_MEMBER(patinho_feio_state::decwriter_status_r)
@@ -59,7 +84,33 @@ READ8_MEMBER(patinho_feio_state::decwriter_status_r)
 	// We should verify in the DECWRITER specs what is its speed
 	// (in characters per second) in order to implement
 	// the high-level emulation of its behaviour here.
-        return true;
+        return m_decwriter_ready;
+}
+
+WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
+{
+        m_tty_paper->write(space, 0, data);
+}
+
+
+READ8_MEMBER(patinho_feio_state::teletype_data_r)
+{
+	return m_tty_data;
+}
+
+WRITE8_MEMBER(patinho_feio_state::teletype_kbd_input)
+{
+	m_tty_data = data;
+	m_tty_ready = true;
+}
+
+READ8_MEMBER(patinho_feio_state::teletype_status_r)
+{
+        //This should only return true after a certain delay
+        // We should verify in the DECWRITER specs what is its speed
+        // (in characters per second) in order to implement
+        // the high-level emulation of its behaviour here.
+        return m_tty_ready;
 }
 
 /* The hardware does not perform this checking.
@@ -168,7 +219,8 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 
 	/* Teletype */
 //	MCFG_PATINHO_IODEV_READ_CB(0xB, READ8(patinho_feio_state, teletype_data_r))
-//	MCFG_PATINHO_IODEV_STATUS_CB(0xB, READ8(patinho_feio_state, teletype_status_r))
+	MCFG_PATINHO_IODEV_WRITE_CB(0xB, WRITE8(patinho_feio_state, teletype_data_w))
+	MCFG_PATINHO_IODEV_STATUS_CB(0xB, READ8(patinho_feio_state, teletype_status_r))
 
 	/* Papertape Reader */
 //	MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(patinho_feio_state, papertapereader_data_r))
@@ -178,6 +230,12 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
         /* video hardware to represent what you'd see
            printed on paper on the DECWRITER */
         MCFG_DEVICE_ADD("decwriter_paper", GENERIC_TERMINAL, 0)
+        MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(patinho_feio_state, decwriter_kbd_input))
+
+        /* video hardware to represent what you'd see
+           printed on paper on the Teletype */
+        MCFG_DEVICE_ADD("teletype_paper", GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(patinho_feio_state, teletype_kbd_input))
 
 	/* punched tape */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "patinho_tape")

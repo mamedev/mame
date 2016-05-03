@@ -550,7 +550,11 @@ void patinho_feio_cpu_device::execute_instruction()
 					break;
 				case 0x40:
 					/* ENTR = "Input data from I/O device" */
-					printf("Unimplemented ENTR /%X0 instruction\n", channel);
+					if (m_iodev_read_cb[channel].isnull()){
+						printf("Warning: There's no device hooked up at I/O address 0x%X", channel);
+					} else {
+						ACC = m_iodev_read_cb[channel]();
+					}
 					break;
 				case 0x80:
 					/* SAI = "Output data to I/O device" */
