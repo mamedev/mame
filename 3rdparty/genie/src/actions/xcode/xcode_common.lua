@@ -679,7 +679,7 @@
 	end
 	
 	
-	function xcode.PBXSourcesBuildPhase(tr)
+	function xcode.PBXSourcesBuildPhase(tr,prj)
 		_p('/* Begin PBXSourcesBuildPhase section */')
 		for _, target in ipairs(tr.products.children) do
 			_p(2,'%s /* Sources */ = {', target.sourcesid)
@@ -689,7 +689,9 @@
 			tree.traverse(tr, {
 				onleaf = function(node)
 					if xcode.getbuildcategory(node) == "Sources" then
+        				if not table.icontains(prj.excludes, node.cfg.name) then -- if not excluded
 						_p(4,'%s /* %s in Sources */,', node.buildid, node.name)
+                        end
 					end
 				end
 			})

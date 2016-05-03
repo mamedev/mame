@@ -16,4 +16,9 @@ project "bin2c"
 		"../tools/bin2c/**.h",
 	}
 
+	configuration { "mingw-*" }
+		targetextension ".exe"
+
 	configuration {}
+
+	strip()

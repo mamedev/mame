@@ -13,31 +13,30 @@ function toolchain(_buildDir, _libDir)
 		value = "GCC",
 		description = "Choose GCC flavor",
 		allowed = {
-			{ "android-arm",     "Android - ARM"              },
-			{ "android-mips",    "Android - MIPS"             },
-			{ "android-x86",     "Android - x86"              },
-			{ "asmjs",           "Emscripten/asm.js"          },
-			{ "freebsd",         "FreeBSD"                    },
-			{ "ios-arm",         "iOS - ARM"                  },
-			{ "ios-simulator",   "iOS - Simulator"            },
-			{ "linux-gcc",       "Linux (GCC compiler)"       },
-			{ "linux-gcc-5",     "Linux (GCC-5 compiler)"     },
-			{ "linux-clang",     "Linux (Clang compiler)"     },
-			{ "linux-mips-gcc",  "Linux (MIPS, GCC compiler)" },
-			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
-			{ "linux-steamlink", "Steam Link"                 },
-			{ "tvos-arm64",      "tvOS - ARM64"               },
-			{ "tvos-simulator",  "tvOS - Simulator"           },
-			{ "mingw-gcc",       "MinGW"                      },
-			{ "mingw-clang",     "MinGW (clang compiler)"     },
-			{ "nacl",            "Native Client"              },
-			{ "nacl-arm",        "Native Client - ARM"        },
-			{ "osx",             "OSX"                        },
-			{ "pnacl",           "Native Client - PNaCl"      },
-			{ "ps4",             "PS4"                        },
-			{ "qnx-arm",         "QNX/Blackberry - ARM"       },
-			{ "rpi",             "RaspberryPi"                },
-			{ "riscv",           "RISC-V"                     },
+			{ "android-arm",    "Android - ARM"              },
+			{ "android-mips",   "Android - MIPS"             },
+			{ "android-x86",    "Android - x86"              },
+			{ "asmjs",          "Emscripten/asm.js"          },
+			{ "freebsd",        "FreeBSD"                    },
+			{ "linux-gcc",      "Linux (GCC compiler)"       },
+			{ "linux-gcc-5",    "Linux (GCC-5 compiler)"     },
+			{ "linux-clang",    "Linux (Clang compiler)"     },
+			{ "linux-mips-gcc", "Linux (MIPS, GCC compiler)" },
+			{ "linux-arm-gcc",  "Linux (ARM, GCC compiler)"  },
+			{ "ios-arm",        "iOS - ARM"                  },
+			{ "ios-simulator",  "iOS - Simulator"            },
+			{ "tvos-arm64",     "tvOS - ARM64"               },
+			{ "tvos-simulator", "tvOS - Simulator"           },
+			{ "mingw-gcc",      "MinGW"                      },
+			{ "mingw-clang",    "MinGW (clang compiler)"     },
+			{ "nacl",           "Native Client"              },
+			{ "nacl-arm",       "Native Client - ARM"        },
+			{ "netbsd",         "NetBSD"                     },
+			{ "osx",            "OSX"                        },
+			{ "pnacl",          "Native Client - PNaCl"      },
+			{ "ps4",            "PS4"                        },
+			{ "qnx-arm",        "QNX/Blackberry - ARM"       },
+			{ "rpi",            "RaspberryPi"                },
 		},
 	}
 
@@ -283,6 +282,9 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.ar  = naclToolchain .. "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-nacl-arm"))
 
+		elseif "netbsd" == _OPTIONS["gcc"] then
+			location (path.join(_buildDir, "projects", _ACTION .. "-netbsd"))
+
 		elseif "osx" == _OPTIONS["gcc"] then
 
 			if os.is("linux") then
@@ -440,6 +442,7 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "Release" }
 		flags {
+			"NoBufferSecurityCheck",
 			"OptimizeSpeed",
 		}
 		targetsuffix "Release"
@@ -543,7 +546,10 @@ function toolchain(_buildDir, _libDir)
 		libdirs {
 			path.join(_libDir, "lib/win32_mingw-gcc"),
 		}
-		buildoptions { "-m32" }
+		buildoptions {
+			"-m32",
+			"-mstackrealign",
+		}
 
 	configuration { "x64", "mingw-gcc" }
 		targetdir (path.join(_buildDir, "win64_mingw-gcc/bin"))
@@ -942,6 +948,14 @@ function toolchain(_buildDir, _libDir)
 		removeflags { "StaticRuntime" }
 		defines {
 			"NOMINMAX",
+		}
+
+	configuration { "netbsd" }
+		targetdir (path.join(_buildDir, "netbsd/bin"))
+		objdir (path.join(_buildDir, "netbsd/obj"))
+		libdirs { path.join(_libDir, "lib/netbsd") }
+		includedirs {
+			path.join(bxDir, "include/compat/freebsd"),
 		}
 
 	configuration { "osx", "x32" }
