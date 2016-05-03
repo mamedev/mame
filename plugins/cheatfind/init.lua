@@ -231,6 +231,7 @@ function cheatfind.startplugin()
 	local rightop = 1
 	local matches = {}
 	local matchsel = 0
+	local matchpg = 0
 	local menu_blocks = {}
 	local watches = {}
 	local menu_func
@@ -247,6 +248,8 @@ function cheatfind.startplugin()
 		rightop = 1
 		matches = {}
 		matchsel = 0
+		matchcnt = 0
+		matchpg = 0
 		menu_blocks = {}
 		watches = {}
 
@@ -325,6 +328,7 @@ function cheatfind.startplugin()
 				if event == "select" then
 					menu_blocks = {}
 					matches = {}
+					devcur = devsel
 					for num, region in ipairs(devtable[devcur].ram) do
 						menu_blocks[num] = {}
 						menu_blocks[num][1] = cheat.save(devtable[devcur].space, region.offset, region.size)
@@ -336,7 +340,6 @@ function cheatfind.startplugin()
 					matchsel = 0
 					return true
 				end
-				devcur = devsel
 			end
 			return { "Start new search", "", 0 }, f
 		end
@@ -351,6 +354,7 @@ function cheatfind.startplugin()
 						manager:machine():popmessage("Current state saved")
 						leftop = (leftop == #menu_blocks[1]) and #menu_blocks[1] + 1 or leftop
 						rightop = (rightop == #menu_blocks[1] - 1) and #menu_blocks[1] or rightop
+						devsel = devcur
 						return true
 					end
 				end
@@ -387,6 +391,8 @@ function cheatfind.startplugin()
 							end
 						end
 						manager:machine():popmessage(count .. " total matches found")
+						matches[#matches].count = count
+						devsel = devcur
 						return true
 					end
 				end
@@ -468,7 +474,7 @@ function cheatfind.startplugin()
 				if bcd == 1 then
 					m[2] = "On"
 				end
-				return m, function(event) local r bcd, r = incdec(bcd, 0, 1) return r end
+				return m, function(event) local r bcd, r = incdec(event, bcd, 0, 1) return r end
 			end
 			menu[#menu + 1] = function()
 				if #matches == 0 then
@@ -490,19 +496,27 @@ function cheatfind.startplugin()
 					if matchsel == 0 then
 						m[2] = "All"
 					end
-					return m, function(event) local r matchsel, r = incdec(matchsel, 0, #matches[#matches]) return r end
+					function f(event)
+						local r
+						matchsel, r = incdec(event, matchsel, 0, #matches[#matches])
+						if r then
+							matchpg = 0
+						end
+						return r
+					end
+					return m, f
 				end
-				local function mpairs(sel, list)
+				local function mpairs(sel, list, start)
 					if #list == 0 then
 						return function() end, nil, nil
 					end
 					if sel ~= 0 then
-						return ipairs(list[sel])
+						list = {list[sel]}
 					end
 					local function mpairs_it(list, i)
 						local match
 						i = i + 1
-						local sel = i
+						local sel = i + start
 						for j = 1, #list do
 							if sel <= #list[j] then
 								match = list[j][sel]
@@ -516,7 +530,7 @@ function cheatfind.startplugin()
 						end
 						return i, match
 					end
-					return mpairs_it, list, 0
+					return mpairs_it, list, 0 
 				end
 				local bitwidth = formtable[width]:sub(2, 2):lower()
 				if bitwidth == "h" then
@@ -528,8 +542,8 @@ function cheatfind.startplugin()
 				else
 					bitwidth = " %02x"
 				end
-				for num2, match in mpairs(matchsel, matches[#matches]) do
-					if #menu > 100 then
+				for num2, match in mpairs(matchsel, matches[#matches], matchpg * 100) do
+					if num2 > 100 then
 						break
 					end
 					menu[#menu + 1] = function()
@@ -616,6 +630,23 @@ function cheatfind.startplugin()
 						end
 						return m, f
 					end
+				end
+			end
+			if #matches > 0 and matches[#matches].count > 100 then
+				menu[#menu + 1] = function()
+					local m = { "Page", matchpg, 0 }
+					local max
+					if matchsel == 0 then
+						max = math.ceil(matches[#matches].count / 100)
+					else
+						max = #matches[#matches][matchsel]
+					end
+					menu_lim(matchpg, 0, max, m)
+					function f(event)
+						matchpg, r = incdec(event, matchpg, 0, max)
+						return r
+					end
+					return m, f
 				end
 			end
 			if #watches ~= 0 then
