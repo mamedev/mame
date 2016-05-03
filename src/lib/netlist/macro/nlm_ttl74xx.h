@@ -23,6 +23,18 @@
 		NET_REGISTER_DEV(TTL_7400_DIP, _name)
 
 
+#define TTL_7402_GATE(_name)                                                   \
+		NET_REGISTER_DEV(TTL_7402_GATE, _name)
+
+#define TTL_7402_NOR(_name, _I1, _I2)                                          \
+		NET_REGISTER_DEV(TTL_7402_NOR, _name)                                  \
+		NET_CONNECT(_name, A, _I1)                                             \
+		NET_CONNECT(_name, B, _I2)
+
+#define TTL_7402_DIP(_name)                                                    \
+		NET_REGISTER_DEV(TTL_7402_DIP, _name)
+
+
 #define TTL_7404_GATE(_name)                                                   \
 		NET_REGISTER_DEV(TTL_7404_GATE, _name)
 
@@ -32,6 +44,18 @@
 
 #define TTL_7404_DIP(_name)                                                    \
 		NET_REGISTER_DEV(TTL_7404_DIP, _name)
+
+
+#define TTL_7408_GATE(_name)                                                   \
+		NET_REGISTER_DEV(TTL_7408_GATE, _name)
+
+#define TTL_7408_NAND(_name, _A, _B)                                           \
+		NET_REGISTER_DEV(TTL_7408_NAND, _name)                         		   \
+		NET_CONNECT(_name, A, _A)                                      		   \
+		NET_CONNECT(_name, B, _B)
+
+#define TTL_7408_DIP(_name)                                                    \
+		NET_REGISTER_DEV(TTL_7408_DIP, _name)
 
 
 #define TTL_7416_GATE(_name)                                                   \

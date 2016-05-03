@@ -7,8 +7,6 @@
 
 #include "nld_7427.h"
 
-#include "nld_7402.h"
-
 NETLIB_NAMESPACE_DEVICES_START()
 
 #if (USE_TRUTHTABLE)
