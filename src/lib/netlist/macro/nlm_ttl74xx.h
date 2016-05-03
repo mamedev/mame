@@ -103,6 +103,18 @@
 #define TTL_7427_DIP(_name)                                                    \
 		NET_REGISTER_DEV(TTL_7427_DIP, _name)
 
+
+#define TTL_7437_GATE(_name)                                                   \
+		NET_REGISTER_DEV(TTL_7437_GATE, _name)
+
+#define TTL_7437_NAND(_name, _A, _B)                                           \
+		NET_REGISTER_DEV(TTL_7437_NAND, _name)                         		   \
+		NET_CONNECT(_name, A, _A)                                      		   \
+		NET_CONNECT(_name, B, _B)
+
+#define TTL_7437_DIP(_name)                                                    \
+		NET_REGISTER_DEV(TTL_7437_DIP, _name)
+
 /* ----------------------------------------------------------------------------
  *  External declarations
  * ---------------------------------------------------------------------------*/
