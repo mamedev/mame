@@ -104,6 +104,18 @@
 		NET_REGISTER_DEV(TTL_7427_DIP, _name)
 
 
+#define TTL_7432_GATE(_name)                                                   \
+		NET_REGISTER_DEV(TTL_7432_OR, _name)
+
+#define TTL_7432_OR(_name, _I1, _I2)                                           \
+		NET_REGISTER_DEV(TTL_7432_OR, _name)                                   \
+		NET_CONNECT(_name, A, _I1)                                             \
+		NET_CONNECT(_name, B, _I2)
+
+#define TTL_7432_DIP(_name)                                                    \
+		NET_REGISTER_DEV(TTL_7432_DIP, _name)
+
+
 #define TTL_7437_GATE(_name)                                                   \
 		NET_REGISTER_DEV(TTL_7437_GATE, _name)
 
