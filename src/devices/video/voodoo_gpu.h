@@ -203,10 +203,10 @@ public:
 	HRESULT CreatePixelShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11PixelShader** ppShaderOut);
 	HRESULT RenderToTex();
 	void ReadTex();
-	void FastFill(ShaderVertex *triangleVertices);
+	void DrawFastFill(ShaderPoint *triangleVertices);
 	void DrawTriangle(ShaderVertex *triangleVertices);
 	void DrawPixels();
-	void ClearBuffer(int sx, int ex, int sy, int ey);
+	void FastFill(int sx, int ex, int sy, int ey);
 	void CopyBuffer(uint16_t *dst, int rowPixels);
 	void CopyBufferComp(uint16_t *dst);
 	void CopyBufferRGB(uint8_t *dst);
@@ -281,6 +281,7 @@ private:
 
 	ID3D11Texture2D* m_depthBuffer;
 	ID3D11DepthStencilState* m_depthState;
+	ID3D11DepthStencilState* m_depthFastFillState;
 	ID3D11DepthStencilView* m_depthView;
 	ID3D11RasterizerState* m_rasterState;
 	ID3D11BlendState* m_blendState;
@@ -314,6 +315,7 @@ private:
 
 	int m_fbiWidth;
 
+	UINT32 m_fastFbzMode;
 	UINT32 m_regFbzMode, m_regFbzColorPath, m_regColor0, m_regColor1, m_regAlphaMode, m_regTexMode[NUM_TEX];
 	UINT32 m_regZAColor, m_regFogMode, m_regFogColor;
 };

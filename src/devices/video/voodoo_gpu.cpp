@@ -50,6 +50,7 @@ voodoo_gpu::voodoo_gpu()
 
 	m_depthBuffer = NULL;
 	m_depthState = NULL;
+	m_depthFastFillState = NULL;
 	m_depthView = NULL;
 	m_rasterState = NULL;
 	m_blendState = NULL;
@@ -69,6 +70,7 @@ voodoo_gpu::voodoo_gpu()
 	m_updateFrameBufferCtrl = true;
 	m_updateTexCtrl = false;
 
+	m_fastFbzMode = 0;
 	m_regFbzMode = 0;
 
 	m_updateColorCtrl = false;
@@ -123,6 +125,7 @@ voodoo_gpu::~voodoo_gpu()
 	SAFE_RELEASE(m_compTexture);
 	SAFE_RELEASE(m_depthBuffer);
 	SAFE_RELEASE(m_depthState);
+	SAFE_RELEASE(m_depthFastFillState);
 	SAFE_RELEASE(m_depthView);
 	SAFE_RELEASE(m_rasterState);
 	SAFE_RELEASE(m_blendState);
@@ -474,14 +477,21 @@ bool voodoo_gpu::InitBuffers(int sizeX, int sizeY)
 	if (FAILED(m_gpu->CreateSamplerState(&rendDesc, &m_renderState)))
 		return false;
 
-	// Create the depth stencil state
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+		// Create the depth stencil state
+		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
 	// Depth test parameters
 	depthStencilDesc.DepthEnable = FALSE;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 	if (FAILED(m_gpu->CreateDepthStencilState(&depthStencilDesc, &m_depthState)))
+		return false;
+
+	// Create the depth stencil state for fast fill
+	depthStencilDesc.DepthEnable = FALSE;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+	if (FAILED(m_gpu->CreateDepthStencilState(&depthStencilDesc, &m_depthFastFillState)))
 		return false;
 
 	// Dithering Textures
@@ -1056,7 +1066,7 @@ void voodoo_gpu::UpdateConstants()
 	}
 }
 
-void voodoo_gpu::FastFill(ShaderVertex *triangleVertices)
+void voodoo_gpu::DrawFastFill(ShaderPoint *triangleVertices)
 {
 	// Check for pixels that haven't been drawn
 	if (m_pixels_ready)
@@ -1066,36 +1076,38 @@ void voodoo_gpu::FastFill(ShaderVertex *triangleVertices)
 	if (m_renderMode != FASTFILL)
 	{
 		// Set input layout
-		m_context->IASetInputLayout(m_pVertexLayout);
+		m_context->IASetInputLayout(m_pixelVertexLayout);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		UINT stride = sizeof(ShaderVertex);
+		UINT stride = sizeof(ShaderPoint);
 		UINT offset = 0;
-		m_context->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
+		m_context->IASetVertexBuffers(0, 1, &m_pixelBuffer, &stride, &offset);
 		m_renderMode = FASTFILL;
 		// Set pixel mode in constant buffer
 		m_colorCtrl.pixel_mode = 1;
-		m_context->UpdateSubresource(m_colorCtrlBuf, 0, NULL, &m_colorCtrl, 0, 0);
 		m_updateColorCtrl = true;
 
-		// Create the depth stencil state
-		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-		ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
-		// Depth test parameters
-		depthStencilDesc.DepthEnable = (m_regFbzMode >> 4) & 1;
-		depthStencilDesc.DepthWriteMask = ((m_regFbzMode >> 10) & 1) ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
-		depthStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
-		// Release old state
-		SAFE_RELEASE(m_depthState);
-		// Create New
-		m_gpu->CreateDepthStencilState(&depthStencilDesc, &m_depthState);
-		m_updateDepth = true;
+		// Check for depth changes
+		if ((m_fastFbzMode ^ m_regFbzMode) & 0x410) {
+			m_fastFbzMode = m_regFbzMode;
+			// Create the depth stencil state
+			D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+			ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+			// Depth test parameters
+			depthStencilDesc.DepthEnable = (m_regFbzMode >> 4) & 1;
+			depthStencilDesc.DepthWriteMask = ((m_regFbzMode >> 10) & 1) ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+			depthStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+			// Release old state
+			SAFE_RELEASE(m_depthFastFillState);
+			// Create New
+			m_gpu->CreateDepthStencilState(&depthStencilDesc, &m_depthFastFillState);
+		}
 	}
 
 	// See if parameters have changed
-	//UpdateConstants();
+	UpdateConstants();
 
 	// Copy vertex buffer over
-	m_context->UpdateSubresource(m_pVertexBuffer, 0, nullptr, triangleVertices, 0, 0);
+	m_context->UpdateSubresource(m_pixelBuffer, 0, nullptr, triangleVertices, 0, 0);
 
 	//////// Pass 0 /////////
 	// Setup to draw to render buffer
@@ -1107,8 +1119,8 @@ void voodoo_gpu::FastFill(ShaderVertex *triangleVertices)
 	// Blending is disabled on the second pass
 	m_context->OMSetBlendState(NULL, 0, 0xffffffff);
 	// Write to depth buffer first pass
-	m_context->OMSetDepthStencilState(m_depthState, 0);
-	m_context->VSSetShader(m_pVS, nullptr, 0);
+	m_context->OMSetDepthStencilState(m_depthFastFillState, 0);
+	m_context->VSSetShader(m_pixelVS, nullptr, 0);
 	m_context->PSSetShader(m_fastFillPS, nullptr, 0);
 
 	m_context->Draw(3, 0);
@@ -1273,9 +1285,8 @@ void voodoo_gpu::DrawPixels()
 
 }
 
-void voodoo_gpu::ClearBuffer(int sx, int ex, int sy, int ey)
+void voodoo_gpu::FastFill(int sx, int ex, int sy, int ey)
 {
-	FLOAT depth = float(m_regZAColor & 0xffff) / 65535.0f;
 	
 	UpdateColorCtrl();
 
@@ -1283,25 +1294,34 @@ void voodoo_gpu::ClearBuffer(int sx, int ex, int sy, int ey)
 		// Check for pixels that haven't been drawn
 		if (m_pixels_ready)
 			DrawPixels();
+		FLOAT depth = float(m_regZAColor & 0xffff) / 65535.0f;
+		UpdateColorCtrl();
 		m_context->ClearRenderTargetView(m_renderTargetView, reinterpret_cast<const FLOAT*>(&m_colorCtrl.color1));
 		m_context->ClearDepthStencilView(m_depthView, D3D11_CLEAR_DEPTH, depth, 0);
 		// TODO: Should be dithering
 		m_context->ClearRenderTargetView(m_compTargetView, reinterpret_cast<const FLOAT*>(&m_colorCtrl.color1));
 		m_need_copy = true;
 	} else {
-		std::vector<ShaderVertex> inVec;
-		inVec.push_back({ XMFLOAT4(float(sx), float(sy), 0.0f, depth), m_colorCtrl.color1, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
-		inVec.push_back({ XMFLOAT4(float(ex), float(sy), 0.0f, depth), m_colorCtrl.color1, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
-		inVec.push_back({ XMFLOAT4(float(sx), float(ey), 0.0f, depth), m_colorCtrl.color1, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
+		int depth = m_regZAColor & 0xffff;
+		std::vector<ShaderPoint> inVec;
 		
-		FastFill(inVec.data());
+		int a = (m_regColor1 >> 24) & 0xff;
+		int r = (m_regColor1 >> 16) & 0xff;
+		int g = (m_regColor1 >> 8) & 0xff;
+		int b = (m_regColor1 >> 0) & 0xff;
+
+		inVec.push_back({ sx, sy, 0, depth, r, g, b, a });
+		inVec.push_back({ ex, sy, 0, depth, r, g, b, a });
+		inVec.push_back({ sx, ey, 0, depth, r, g, b, a });
+		
+		DrawFastFill(inVec.data());
 
 		inVec.clear();
-		inVec.push_back({ XMFLOAT4(float(ex), float(sy), 0.0f, depth), m_colorCtrl.color1, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
-		inVec.push_back({ XMFLOAT4(float(ex), float(ey), 0.0f, depth), m_colorCtrl.color1, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
-		inVec.push_back({ XMFLOAT4(float(sx), float(ey), 0.0f, depth), m_colorCtrl.color1, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
+		inVec.push_back({ ex, sy, 0, depth, r, g, b, a });
+		inVec.push_back({ ex, ey, 0, depth, r, g, b, a });
+		inVec.push_back({ sx, ey, 0, depth, r, g, b, a });
 
-		FastFill(inVec.data());
+		DrawFastFill(inVec.data());
 	}
 }
 
@@ -1317,7 +1337,7 @@ HRESULT voodoo_gpu::RenderToTex()
 
 	// Clear the back buffer 
 	XMFLOAT4 Zero = { 0.000000000f, 0.000000000f, 0.000000000f, 0.000000000f };
-	ClearBuffer(0, 511, 0, 384);
+	FastFill(0, 511, 0, 384);
 
 	// Setup constants
 	//m_frameBufferCtrl.xSize = 512.0f;

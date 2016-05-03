@@ -5217,7 +5217,7 @@ INT32 voodoo_device::fastfill(voodoo_device *vd)
 		return 0;
 
 	if USE_GPU {
-		vd->m_gpu.ClearBuffer(sx, ex, sy, ey);
+		vd->m_gpu.FastFill(sx, ex, sy, ey);
 		pixels = ((ex - sx) * (ey - sy));
 		// 2 pixels per clock
 		return pixels >> 1;
