@@ -6716,7 +6716,7 @@ List of unconfirmed retail cartridge roms
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="4194304">
-				<rom name="daikatana (proto).bin" size="4194304" crc="351862bd" sha1="361d05119aa6671415a8c583150dbfa4dfd93e5e" offset="000000" />
+				<rom name="daikatana (proto).bin" size="4194304" crc="351862bb" sha1="361d05119aa6671415a8c583150dbfa4dfd93e5e" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
