@@ -43872,7 +43872,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="bananap" cloneof="banana">
+	<software name="bananap1" cloneof="banana">
 		<description>Banana (Jpn, Prototype)</description>
 		<year>1986</year>
 		<publisher>Victor</publisher>
@@ -43885,6 +43885,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="banana (japan) (beta).prg" size="32768" crc="08cf506d" sha1="0fa71d53448f0a2298e6922bda01d9ce71d01d2b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bananap2" cloneof="banana">
+		<description>Banana (Jpn, Prototype 06/30)</description>
+		<year>1986</year>
+		<publisher>Victor</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="HVC-CNROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="16384">
+				<rom name="banana (6-30 prototype).chr" size="16384" crc="83e98784" sha1="a1125941c884e5ddbf119e0cb34d6381f18852ef" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="banana (6-30 prototype).prg" size="32768" crc="bcc39a91" sha1="71f8661f3d97ba9e2b99f3275ed8e547bcf4b36f" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -44594,6 +44611,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="chip to dale no daisakusen 2 (japan).prg" size="131072" crc="579e5d0b" sha1="9c86cc2bbedb182031ee98a15e17081efa774933" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chipchal">
+		<description>Chip's Challenge (USA, Prototype v.0924B, 19920805)</description>
+		<year>1992</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="chips challenge (v0.924b).prg" size="131072" crc="6ed31ccd" sha1="8b681fc7169096ec2faa12e21e20811daafd45a6" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -50140,6 +50173,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="wlddizzy" suppoted="no">
+		<description>Wonderland Dizzy (Euro, Prototype)</description>
+		<year>1991</year>
+		<publisher>Camerica</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bf9093" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="262144">
+				<rom name="wldfinal.prg" size="262144" crc="4f74e236" sha1="ae9cc1584fb50c2a8885b2ebdc57ced81f900ed0" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="worldbox">
 		<description>World Boxing (Jpn)</description>
 		<year>1990</year>
@@ -52444,10 +52493,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="CN-08"/>
 		<info name="release" value="19920101"/>
 		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NTDEC-N715062" />
 			<feature name="mirroring" value="vertical" />
-			<!-- dumped as booky man.bin with .nes header - manually split matched hashes previously known. -->
-			<!-- <rom name="booky man.bin" size="40976" crc="dc5e106c" sha1="7777da877f2704101e73c0075c4a2a914b8430e3" offset="00000" /-->
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="0d7ea169" sha1="f78f6589e4b209cc0e5a61c7dea45f73fdcadc5e" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -62952,20 +63000,21 @@ We don't include these hacks because they were not burned into real carts nor so
 	    </part>
 	</software-->
 
-	<!--software name="thundwarb" cloneof="thundwar">
-	    <description>The Thunder Warrior (Spa)</description>
-	    <year>19??</year>
-	    <publisher>Gluk Video</publisher>
-	    <part name="cart" interface="nes_cart">
-	        <feature name="pcb" value="TXC-PT8154" />
-	        <dataarea name="chr" size="131072">
-	            <rom name="04-01826-010" size="131072" crc="9219bd34" sha1="79bc6d68a6fc658882c2076461ec270e20310ab5" offset="00000" />
-	        </dataarea>
-	        <dataarea name="prg" size="131072">
-	            <rom name="04-01820-000" size="131072" crc="3f60ac50" sha1="dc326317557aa661f22c9457494c49ea1debf0b8" offset="00000" />
-	        </dataarea>
-	    </part>
-	</software-->
+	<software name="gluk" cloneof="thundwar">
+		<description>Gluk The Thunder Warrior (Spa)</description>
+		<year>19??</year>
+		<publisher>Gluk Video</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txc_tw" />
+			<feature name="pcb" value="TXC-PT8154" />
+			<dataarea name="chr" size="131072">
+				<rom name="04-01826-010" size="131072" crc="9219bd34" sha1="79bc6d68a6fc658882c2076461ec270e20310ab5" offset="00000" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="04-01820-000" size="131072" crc="3f60ac50" sha1="dc326317557aa661f22c9457494c49ea1debf0b8" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- nointro -->
 	<software name="wangzifu">
@@ -72528,7 +72577,7 @@ resulting in tons of glitches? -->
 	</software>
 
 	<software name="mc_15sny">
-		<description>Super New Year Cart 15-in-1</description>
+		<description>Super New Year Cart 15 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -79509,15 +79558,17 @@ that the real dumps might surface -->
 	</software>
 
 
+<!-- ONE BUS ENHANCED HARDWARE -->
+
 <!-- These are dumps from famiclones (of plug-and-play type) which are based on the famicom hw but with a slightly more powerful PPU. Hence it needs to be supported separately. We document here the dumps, in the meanwhile, but these do not belong to this list!! -->
 
+
 	<software name="mc_dgear" supported="no">
-		<description>DreamGEAR 75-in-1</description>
+		<description>DreamGEAR 75 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="dreamgear 75-in-1(unl)[!].prg" size="4194304" crc="9aabcb8f" sha1="aa9446b7777fa64503871225fcaf2a17aafd9af1" offset="00000" status="baddump" />
 			</dataarea>
@@ -79528,12 +79579,11 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_dg101" supported="no">
-		<description>DreamGEAR 101-in-1</description>
+		<description>DreamGEAR 101 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="dreamgear 101-in-1(unl)[u][!].prg" size="4194304" crc="6a7cd8f4" sha1="9a5ceb8e5e38eb93699dbb14c2c36f3a501d9c45" offset="00000" status="baddump" />
 			</dataarea>
@@ -79569,9 +79619,8 @@ that the real dumps might surface -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
-				<rom name="100-in-1 arcade action ii (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
+				<rom name="100 in 1 arcade action ii (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -79600,7 +79649,6 @@ that the real dumps might surface -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="8388608">
 				<rom name="2011 super hik 105-in-1 turbo edition.prg" size="8388608" crc="c0f85771" sha1="8c4182b1de3be10dd895089823cc67a9d12589ef" offset="00000" status="baddump" />
 			</dataarea>
@@ -79616,7 +79664,6 @@ that the real dumps might surface -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="sports game 69-in-1 (unl)[u][!].prg" size="4194304" crc="1242da7f" sha1="bb8f99b1f4a4783b3f7e54d74f1f2a6a628da154" offset="00000" status="baddump" />
 			</dataarea>
@@ -79627,17 +79674,28 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_dcat8" supported="no">
-		<description>100-in-1 (D-CAT8 8bit Console, v5.01.11-frd, BL 20041217)</description>
+		<description>100 in 1 (D-CAT8 8bit Console, v5.01.11-frd, BL 20041217)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="8388608">
 				<rom name="100-in-1 (d-cat8 8bit console, v5.01.11-frd, bl 20041217)(unl)[u][!].prg" size="8388608" crc="97d20611" sha1="d49796e66d7b1dff0ee2781cb0e48b777969d83f" offset="0" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_hh210" supported="no">
+		<description>Handheld 210 in 1</description>
+		<year>201?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="onebus" />
+			<dataarea name="prg" size="33554432">
+				<rom name="msp55lv128t.u4" size="16777216" crc="9ba520d4" sha1="627f811b24314197e289a2ade668ff4115421bed" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -79648,7 +79706,6 @@ that the real dumps might surface -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="power joy navigator 50-in-1 (unl)[u][!].prg" size="4194304" crc="d1bbadd4" sha1="2186c71bcedf6c2eedf58233faa26fca9586aa40" offset="00000" status="baddump" />
 			</dataarea>
@@ -79664,7 +79721,6 @@ that the real dumps might surface -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="power joy supermax 30-in-1 (unl)[u][!].prg" size="4194304" crc="947ac898" sha1="08bb99a8ad39c56780bc66f4e0a9830fba7372dc" offset="00000" status="baddump" />
 			</dataarea>
@@ -79680,7 +79736,6 @@ that the real dumps might surface -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="power joy supermax 60-in-1 (unl)[u][!].prg" size="4194304" crc="1ab45228" sha1="d148924afc39fc588235331a1a30df6e0d8e1e18" offset="00000" status="baddump" />
 			</dataarea>
@@ -79696,7 +79751,6 @@ that the real dumps might surface -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="ic1.prg" size="4194304" crc="de76f71f" sha1="ff6b37a76c6463af7ae901918fc008b4a2863951" offset="0" />
 			</dataarea>
@@ -79712,7 +79766,6 @@ that the real dumps might surface -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="ic1_ver2.prg" size="4194304" crc="b97a0dc7" sha1="bace32d73184df914113de5336e29a7a6f4c03fa" offset="0" />
 			</dataarea>
@@ -79726,10 +79779,9 @@ that the real dumps might surface -->
 	<software name="mc_8x6cb" supported="no">
 		<description>888888 in 1 (Coolboy AEF-390)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="888888-in-1 (coolboy aef-390 8bit console, b8vpcbver03 20130703 0401e2015897a)(unl)[u][!].prg" size="4194304" crc="ca4bd948" sha1="cfd6c0b03bb432de43d070100031b223c9ee7496" offset="00000" status="baddump" />
 			</dataarea>
@@ -79746,7 +79798,6 @@ that the real dumps might surface -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="s29gl032.u3" size="4194304" crc="9f4194e8" sha1="bd2a356aea56188ea78169095cbbe603d00e0063" offset="00000" />
 			</dataarea>
@@ -79757,12 +79808,11 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_110cb" supported="no">
-		<description>110-in-1 CoolBaby (CoolBoy RS-1S)</description>
+		<description>110 in 1 CoolBaby (CoolBoy RS-1S)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="flop" size="4194304">
 				<rom name="29w320dt.bin" size="4194304" crc="a4bed7eb" sha1="f1aa89916264ba781d3f1390a2336ef42129b607" offset="00000" />
 			</dataarea>
@@ -79773,12 +79823,11 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_138cb" supported="no">
-		<description>138-in-1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)</description>
+		<description>138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="flop" size="4194304">
 				<rom name="138-in-1 coolbaby (coolboy rs-5, pcb060-10009011v1.3)(unl)[u][!].bin" size="4194304" crc="6b5b1a1a" sha1="2df0cd717bd0de0b0c973ac356426ddbb0d736fa" offset="00000" status="baddump" />
 			</dataarea>
@@ -79788,29 +79837,12 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_cb198" supported="no">
-		<description>CoolBoy 198-in-1</description>
-		<year>201?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="UNL-COOLBOY" />
-			<dataarea name="prg" size="33554432">
-				<rom name="cb198in1.bin" size="33554432" crc="253364ea" sha1="808ad7ff037e016c6a7a88dbe7b2bf1d41a46546" offset="00000" />
-			</dataarea>
-			<!-- 256k VRAM on cartridge -->
-			<dataarea name="vram" size="262144">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mc_7x6ss" supported="no">
-		<description>777777-in-1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)(Unl)[U][!]</description>
+		<description>777777 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)(Unl)[U][!]</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="flop" size="1048576">
 				<rom name="777777-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin" size="1048576" crc="7790c21a" sha1="f320f3dd18b88ae5f65bb51f58d4cb869997bab3" offset="00000" status="baddump" />
 			</dataarea>
@@ -79821,12 +79853,11 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_8x6ss" supported="no">
-		<description>888888-in-1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)</description>
+		<description>888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="1051873">
 				<rom name="888888-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin" size="1051873" crc="47149d0b" sha1="5a8733886b550e3235dd90fb415b5a602e967f91" offset="00000" status="baddump" />
 			</dataarea>
@@ -79837,12 +79868,11 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_9x6sa" supported="no">
-		<description>999999-in-1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)</description>
+		<description>999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="2097152">
 				<rom name="999999-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin" size="2097152" crc="6a47c6a0" sha1="b4dd376167a57dbee3dea70eb16f1a38e16bcdaa" offset="00000" status="baddump" />
 			</dataarea>
@@ -79852,13 +79882,27 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_cb400" supported="no">
-		<description>CoolBoy 400-in-1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="mc_cb198" supported="no">
+		<description>CoolBoy 198 in 1</description>
+		<year>201?</year>
+		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="UNL-COOLBOY" />
+			<feature name="slot" value="onebus" />
+			<dataarea name="prg" size="33554432">
+				<rom name="b1146.u3" size="33554432" crc="253364ea" sha1="808ad7ff037e016c6a7a88dbe7b2bf1d41a46546" offset="00000" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_cb400" supported="no">
+		<description>CoolBoy 400 in 1</description>
+		<year>19??</year>
+		<publisher>CoolBoy</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="onebus" />
 			<dataarea name="prg" size="33554432">
 				<rom name="rom.prg" size="33554432" crc="da8f37f1" sha1="bc5a2777a04b58219702a2a32e1e6a04cc0a5c5a" offset="00000" />
 			</dataarea>
@@ -79869,14 +79913,13 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_cb400a" cloneof="mc_cb400" supported="no">
-		<description>CoolBoy 400-in-1 (Alt Version, 403 games)</description>
+		<description>CoolBoy 400 in 1 (Alt, 403 games)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="UNL-COOLBOY" />
+			<feature name="slot" value="onebus" />
 			<dataarea name="prg" size="33554432">
-				<rom name="coolboy 400-in-1 (alt version, 403 games)(unl)[u][!].cbp" size="33554432" crc="6a98c5ee" sha1="f5de587420d0ad4e8fdff6b4ba32a940f1fe35bd" offset="00000" status="baddump" />
+				<rom name="b1102.bin" size="33554432" crc="6a98c5ee" sha1="f5de587420d0ad4e8fdff6b4ba32a940f1fe35bd" offset="00000" />
 			</dataarea>
 			<!-- 8k? VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -79885,57 +79928,53 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_cb280" supported="no">
-		<description>Coolboy RS-18 (280-in-1)</description>
+		<description>Coolboy RS-18 (280 in 1)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-		<!--<feature name="slot" value="coolboy" /> <feature name="pcb" value="UNL-COOLBOY" /> -->
+			<feature name="slot" value="onebus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="w25q32.u5" size="4194304" crc="c9541bdf" sha1="f0ce46f18658ca5dbed881e5a80460e59820bbd0" offset="00000" />
 			</dataarea>
-		<!-- ?? -->
 			<dataarea name="vram" size="131072">
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mc_cb203" supported="no">
-		<description>Coolboy RS-17 (203-in-1)</description>
+		<description>Coolboy RS-17 (203 in 1)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-		<!--<feature name="slot" value="coolboy" /> <feature name="pcb" value="UNL-COOLBOY" /> -->
+			<feature name="slot" value="onebus" />
 			<dataarea name="prg" size="4194304">
 				<rom name="s25fl032.bin" size="4194304" crc="33c4e67b" sha1="5787db4c8ce4c2569a5f9e9054cbb1944c1b3092" offset="00000" />
 			</dataarea>
-		<!-- ?? -->
 			<dataarea name="vram" size="131072">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mc_samur" supported="no">
-	<!-- a VT03 OneBus based system -->
-		<description>Samurai (60-in-1)</description>
+	<software name="mc_sam60" supported="no">
+		<description>Samuri (60 in 1)</description>
 		<year>2006</year>
-		<publisher>Team Hummer</publisher>
+		<publisher>Hummer Team</publisher>
 		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="onebus" />
 			<dataarea name="prg" size="2097152">
 				<rom name="29lv160b.bin" size="2097152" crc="7dac8efe" sha1="ffb27ebb4299d5b9a4b976c418fcc7695200060c" offset="00000" />
 			</dataarea>
-		<!-- ?? -->
 			<dataarea name="vram" size="131072">
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mc_g450" supported="no">
-		<description>Game 450-in-1</description>
+		<description>Game 450 in 1</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="UNL-COOLBOY" />
+			<feature name="slot" value="onebus" />
 			<dataarea name="prg" size="33554432">
 				<rom name="g450in1.bin" size="33554432" crc="a4396e58" sha1="780d85b737bfc3ba9918f84d09c2d90d72c88dd3" offset="00000" />
 			</dataarea>
@@ -79946,12 +79985,11 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_g500" supported="no">
-		<description>Game 500-in-1</description>
+		<description>Game 500 in 1</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="UNL-COOLBOY" />
+			<feature name="slot" value="onebus" />
 			<dataarea name="prg" size="33554432">
 				<rom name="g500in1.bin" size="33554432" crc="74787d9d" sha1="63f28d991351320f3427ddd541c9edb6d3c8fe5f" offset="00000" />
 			</dataarea>
@@ -79962,14 +80000,13 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_sg218" supported="no">
-		<description>Super Game 218-in-1</description>
+		<description>Super Game 218 in 1 (JF2181)</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="UNL-COOLBOY" />
+			<feature name="slot" value="onebus" />
 			<dataarea name="prg" size="33554432">
-				<rom name="sg218in1.bin" size="33554432" crc="82fc4149" sha1="080cb14134e2756472114227267b6ade4f1aab9b" offset="00000" />
+				<rom name="b0932.u3" size="33554432" crc="82fc4149" sha1="080cb14134e2756472114227267b6ade4f1aab9b" offset="00000" />
 			</dataarea>
 			<!-- 256k VRAM on cartridge -->
 			<dataarea name="vram" size="262144">
@@ -79978,14 +80015,13 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_sg360" supported="no">
-		<description>Super Game 360-in-1</description>
+		<description>Super Game 360 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="UNL-COOLBOY" />
+			<feature name="slot" value="onebus" />
 			<dataarea name="prg" size="33554432">
-				<rom name="super game 360-in-1 (unl)[u][!].cbp" size="33554432" crc="f1371c17" sha1="77bdc59514e12910aee73c69e563a69f47675a2a" offset="00000" status="baddump" />
+				<rom name="b1324.u3" size="33554432" crc="f1371c17" sha1="77bdc59514e12910aee73c69e563a69f47675a2a" offset="00000" />
 			</dataarea>
 			<!-- 8k? VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -79994,49 +80030,20 @@ that the real dumps might surface -->
 	</software>
 
 	<software name="mc_sg402" supported="no">
-		<description>Super Game 402-in-1</description>
+		<description>Super Game 402 in 1</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="UNL-COOLBOY" />
+			<feature name="slot" value="onebus" />
 			<dataarea name="prg" size="33554432">
-				<rom name="sg402in1.bin" size="33554432" crc="205daab3" sha1="b403daad9e0cd3b8490ef9127bcb7acd5b40f710" offset="00000" />
+				<rom name="b1310.u3" size="33554432" crc="205daab3" sha1="b403daad9e0cd3b8490ef9127bcb7acd5b40f710" offset="00000" />
 			</dataarea>
 			<!-- 128k VRAM on cartridge -->
 			<dataarea name="vram" size="131072">
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="mc_gx121" supported="no">
-		<description>Games Xplosion 121-in-1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik8in1" />
-			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
-			<dataarea name="chr" size="4194304">
-				<rom name="gamesxplosion.chr" size="4194304" crc="788ae9fe" sha1="c0081db29f62c51cff7943682493c4d17fc1419d" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="4194304">
-				<rom name="gamesxplosion.prg" size="4194304" crc="0282d975" sha1="9ead7505b99a60834724a5818ee120e03c8bf975" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mc_hh210" supported="no">
-		<description>Handheld 210-in-1</description>
-		<year>201?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="UNL-COOLBOY" />
-			<dataarea name="prg" size="33554432">
-				<rom name="MSP55LV128T.bin" size="16777216" crc="9ba520d4" sha1="627f811b24314197e289a2ade668ff4115421bed" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
+	
 
 <!-- TO SORT AND RENAME PROPERLY!!! -->
 
@@ -80060,6 +80067,21 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
+<software name="mc_gx121" supported="no">
+	<description>Games Xplosion 121 in 1</description>
+	<year>19??</year>
+	<publisher>&lt;unknown&gt;</publisher>
+	<part name="cart" interface="nes_cart">
+		<feature name="slot" value="bmc_hik8in1" />
+		<feature name="pcb" value="BMC-SUPERHIK8IN1" />
+		<dataarea name="chr" size="4194304">
+			<rom name="gamesxplosion.chr" size="4194304" crc="788ae9fe" sha1="c0081db29f62c51cff7943682493c4d17fc1419d" offset="00000" status="baddump" />
+		</dataarea>
+		<dataarea name="prg" size="4194304">
+			<rom name="gamesxplosion.prg" size="4194304" crc="0282d975" sha1="9ead7505b99a60834724a5818ee120e03c8bf975" offset="00000" status="baddump" />
+		</dataarea>
+	</part>
+</software>
 
 
 

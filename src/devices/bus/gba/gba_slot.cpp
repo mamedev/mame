@@ -50,8 +50,11 @@ void device_gba_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
+		if (size < 0x4000000)
 		// we always alloc 32MB of rom region!
-		m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+			m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+		else
+			m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x4000000, 4, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -169,9 +172,9 @@ bool gba_cart_slot_device::call_load()
 	{
 		UINT8 *ROM;
 		UINT32 size = (software_entry() != nullptr) ? get_software_region_length("rom") : length();
-		if (size > 0x2000000)
+		if (size > 0x4000000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 32MB");
+			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 64MB");
 			return IMAGE_INIT_FAIL;
 		}
 

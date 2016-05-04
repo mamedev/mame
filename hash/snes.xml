@@ -26316,7 +26316,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="sloopz">
+	<software name="sloopzj" cloneof="sloopz">
 		<description>Super Loopz (Jpn)</description>
 		<year>1994</year>
 		<publisher>Imagineer</publisher>
@@ -36458,6 +36458,19 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="contraspd" cloneof="sprobot">
+		<description>Contra Spirits (Jpn, Demo)</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="魂斗羅スピリッツ" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="contra spirits prototype.sfc" size="1048576" crc="efa3a034" sha1="f51d1f36e0857898afca8107d797c9b132999100" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="conveni">
 		<description>Conveni Wars Barcode Battler Senki - Super Senshi Shutsugeki seyo! (Jpn)</description>
 		<year>1993</year>
@@ -43891,8 +43904,23 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="rummenig" cloneof="keeganpm">
+		<description>K.H. Rummenigge's Player Manager (Ger)</description>
+		<year>1993</year>
+		<publisher>Imagineer</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="k.h. rummenigge's player manager (germany).sfc" size="524288" crc="5e66a52c" sha1="5cb9caf37bfedd3fa9b946b0d5c58b49b96f698c" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rummenigs" cloneof="keeganpm">
-		<description>K.H. Rummenigge's Player Manager (Ger, Sample)</description>
+		<description>K.H. Rummenigge's Player Manager (Ger, Demo 20 Weeks)</description>
 		<year>1993</year>
 		<publisher>Imagineer</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -43906,17 +43934,17 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="rummenig" cloneof="keeganpm">
-		<description>K.H. Rummenigge's Player Manager (Ger)</description>
+	<software name="rummenigso" cloneof="keeganpm">
+		<description>K.H. Rummenigge's Player Manager (Ger, Demo 10 Weeks)</description>
 		<year>1993</year>
 		<publisher>Imagineer</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
-				<rom name="k.h. rummenigge's player manager (germany).sfc" size="524288" crc="5e66a52c" sha1="5cb9caf37bfedd3fa9b946b0d5c58b49b96f698c" offset="0x000000" />
+				<rom name="k.h. rummenigge's player manager - demo 10 week.sfc" size="524288" crc="e3dff03d" sha1="0c8b7f9d1eb8f0e26aff7dbe00ac38b6f376d688" offset="0x000000" />
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -45711,6 +45739,20 @@ List of unclassified roms
 				<rom name="little master - nijiiro no maseki (japan).sfc" size="2097152" crc="b916334c" sha1="75b76715d4a20371e0340dbeee3a51ff6a1dbad3" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is believed to match the original prototype binary, even if no extensive analysis has been carried out
+to ensure nothing has been touched in the Retro Quest cart production in 2013/2014 -->
+	<software name="lobo">
+		<description>Lobo (USA, Prototype, Dumped from bootleg cart)</description>
+		<year>1996</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="lobo.sfc" size="3145728" crc="890dc31c" sha1="ccb6324c6e8dc43ced93a2cba5970757affec755" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -57364,6 +57406,19 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="super linearball (japan).sfc" size="524288" crc="689ac35c" sha1="73cd9170c5935e3367da84956ca59aa4f851c671" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sloopz">
+		<description>Super Loopz (Euro, Prototype)</description>
+		<year>1994</year>
+		<publisher>Imagineer</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+			<!-- This is confirmed having been padded up to 2MB, despite the game being in the first 512KB -->
+				<rom name="super loopz (prototype - original dump).sfc" size="2097152" crc="654188b0" sha1="ed51006097a844c3c04c708e8ecb511794b18efa" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -6480,6 +6480,17 @@ patched out (+ a fix for internal checksum)
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="megamanp" cloneof="megaman">
+		<description>Mega Man 64 (USA, Prototype)</description>
+		<year>2000</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="67108864">
+				<rom name="mega man 64 (proto).bin" size="67108864" crc="421d2a09" sha1="4f37f66ac3adf8257162d3420fd558504334be0f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="miahamm" cloneof="mikeowen">
 		<description>Mia Hamm Soccer 64 (USA)</description>

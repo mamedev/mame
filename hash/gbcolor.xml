@@ -6706,6 +6706,22 @@ List of unconfirmed retail cartridge roms
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="daikatanp" cloneof="daikatan">
+		<!-- Notes: GBC only -->
+		<description>Daikatana (Euro, Prototype)</description>
+		<year>2000</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="4194304">
+				<rom name="daikatana (proto).bin" size="4194304" crc="351862bbd" sha1="361d05119aa6671415a8c583150dbfa4dfd93e5e" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="daikatanj" cloneof="daikatan">
 		<!-- Notes: GBC only, NP only -->
@@ -25951,6 +25967,17 @@ but the 256KB version is definitely underdumped and misses sprite data
 		</part>
 	</software>
 
+	<software name="terr911">
+		<description>Terrifying 9/11 (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="terrifying 911.bin" size="2097152" crc="0d17e940" sha1="d1fdd5b289165126091f5fba3da05903198a8620" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- TO BE VERIFIED: all of these files have the same first half and *very* similar second half (~99%). Hard to say which is good though -->
 <!-- Once sorted out what is good and what not, the entry should be moved among the Sintax games above! -->
