@@ -21,10 +21,10 @@ enum
 	PATINHO_FEIO_CI=1, PATINHO_FEIO_ACC, PATINHO_FEIO_EXT, PATINHO_FEIO_IDX, PATINHO_FEIO_RC
 };
 
-enum {
-       DEVICE_BUSY=0,
-       DEVICE_READY=1
-};
+#define IODEV_READY true
+#define IODEV_BUSY false
+#define REQUEST true
+#define NO_REQUEST false
 
 class patinho_feio_cpu_device : public cpu_device
 {
@@ -37,6 +37,7 @@ public:
         template<class _Object> static devcb_base &set_iodev_write_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_write_cb[devnumber].set_callback(object); }
         template<class _Object> static devcb_base &set_iodev_status_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_status_cb[devnumber].set_callback(object); }
 
+	void transfer_byte_from_external_device(UINT8 channel, UINT8 data);
 protected:
 
 	virtual void execute_run() override;
@@ -64,6 +65,14 @@ protected:
 	bool m_interrupts_enabled;
 	bool m_scheduled_IND_bit_reset;
 	bool m_indirect_addressing;
+        bool m_iodev_control[16];
+	bool m_iodev_status[16];
+
+        /* 8-bit registers for receiving data from peripherals */
+        UINT8 m_iodev_incoming_byte[16];
+
+        /* 8-bit registers for sending data to peripherals */
+        UINT8 m_iodev_outgoing_byte[16];
 
 	int m_flags;
 	// V = "Vai um" (Carry flag)

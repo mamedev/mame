@@ -71,6 +71,12 @@ UINT16 patinho_feio_cpu_device::read_panel_keys_register(){
 	return m_rc;
 }
 
+void patinho_feio_cpu_device::transfer_byte_from_external_device(UINT8 channel, UINT8 data){
+	m_iodev_incoming_byte[channel] = data;
+	m_iodev_status[channel] = IODEV_READY;
+	m_iodev_control[channel] = NO_REQUEST;
+}
+
 void patinho_feio_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
@@ -115,8 +121,6 @@ void patinho_feio_cpu_device::device_start()
 			m_iodev_read_cb[i].resolve();        
 		if (!m_iodev_write_cb[i].isnull())
 			m_iodev_write_cb[i].resolve();        
-		if (!m_iodev_status_cb[i].isnull())
-			m_iodev_status_cb[i].resolve();        
         }
 
 	m_icountptr = &m_icount;
@@ -573,7 +577,90 @@ void patinho_feio_cpu_device::execute_instruction()
 			function = value & 0x0F;
 			switch(value & 0xF0){
 				case 0x10:
-					printf("Unimplemented FNC /%X%X instruction\n", channel, function);
+					switch(function)
+					{
+						case 0:
+							// FNC /n0: Desliga flip-flop PERMITE/IMPEDE para
+							//          o dispositivo n (isto é, impede inter-
+							//          -rupcao do dispositivo n).
+							//
+							//          Turns off the interrupt ENABLE/DISABLE
+							//          flip-flop for channel n.
+							//TODO: Implement-me!
+							break;
+						case 1:
+							// FNC /n1: Desliga flip-flop de ESTADO do dispo-
+							//          -sitivo n ( ESTADO = "busy" ).
+							//
+							//          Turns off STATUS flip-flop for
+							//          channel n ( STATUS = "busy" ).
+							m_iodev_status[channel] = IODEV_BUSY;
+							break;
+						case 2:
+							// FNC /n2: Liga flip-flop de ESTADO do dispo-
+							//          -sitivo n ( ESTADO = "ready" ).
+							//
+							//          Turns on STATUS flip-flop for
+							//          channel n ( STATUS = "ready" ).
+							m_iodev_status[channel] = IODEV_READY;
+							break;
+						case 4:
+							// FNC /n4: Desliga flip-flop de PEDIDO de inter-
+							//          rupcao do  dispositivo n.
+							//
+							//          Turns off the interrupt REQUEST
+							//          flip-flop for channel n.
+							//TODO: Implement-me!
+							break;
+						case 5:
+							// FNC /n5: Liga flip-flop PERMITE/IMPEDE para  o
+							//          dispositivo n (isto é, permite inter-
+							//          -rupcao do dispositivo n).
+							//
+							//          Turns on the interrupt ENABLE/DISABLE
+							//          flip-flop for channel n.
+							//TODO: Implement-me!
+							break;
+						case 6:
+							// FNC /n6: Liga flip-flop de CONTROLE e  desliga
+							//          flip-flop de ESTADO (ESTADO = "BUSY")
+							//          do dispositivo n .
+							//
+							//          Turns on the CONTROL flip-flop and
+							//          turns off the STATUS flip-flop for
+							//          channel n ( STATUS = "BUSY").
+							m_iodev_control[channel] = REQUEST;
+							m_iodev_status[channel] = IODEV_BUSY;
+							break;
+						case 7:
+							// FNC /n7: Desliga flip-flop de CONTROLE do dis-
+							//          positivo n.
+							//
+							//          Turns off the CONTROL flip-flop for
+							//          for channel n.
+							m_iodev_control[channel] = NO_REQUEST;
+							break;
+						case 8:
+							// FNC /n8: Só funciona na leitora de fita, ca-
+							//          nal /E. Ignora todos os "feed-fra-
+							//          -mes" ("bytes" nulos) da fita, ate' a
+							//          proxima perfuracao (1o "byte" nao
+							//          nulo).
+							//
+							//          Only works with the punched tape reader,
+							//          device on channel /E. Ignores all
+							//          "feed-frames" (null 'bytes') of the tape,
+							//          until the first punch (1st non-zero 'byte').
+							if (channel==0xE){
+								//TODO: Implement-me!
+							} else {
+								printf("Function 8 of the /FNC instruction can only be used with"\
+								       "the papertape reader device at channel /E.\n");
+							}
+							break;
+						default:
+							printf("Invalid function (#%d) specified in /FNC instruction.\n", function);
+					}
 					break;
 				case 0x20:
 					//SAL="Salta"
@@ -582,10 +669,7 @@ void patinho_feio_cpu_device::execute_instruction()
 					switch(function)
 					{
 						case 1:
-							skip = true;
-							if (! m_iodev_status_cb[channel].isnull()
-							    && m_iodev_status_cb[channel](0) == DEVICE_BUSY)
-								skip = false;
+							skip = (m_iodev_status[channel] == IODEV_READY);
 							break;
 						case 2:
 							/* TODO:
@@ -610,11 +694,8 @@ void patinho_feio_cpu_device::execute_instruction()
 					break;
 				case 0x40:
 					/* ENTR = "Input data from I/O device" */
-					if (m_iodev_read_cb[channel].isnull()){
-						printf("Warning: There's no device hooked up at I/O address 0x%X", channel);
-					} else {
-						ACC = m_iodev_read_cb[channel]();
-					}
+					ACC = m_iodev_incoming_byte[channel];
+					m_iodev_control[channel] = NO_REQUEST; //TODO: <-- check if this is correct
 					break;
 				case 0x80:
 					/* SAI = "Output data to I/O device" */

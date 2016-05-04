@@ -16,6 +16,7 @@ class patinho_feio_state : public driver_device
 public:
 	patinho_feio_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+                , m_maincpu(*this, "maincpu")
 		, m_decwriter_paper(*this, "decwriter_paper")
 		, m_tty_paper(*this, "teletype_paper")
 	{ }
@@ -23,13 +24,9 @@ public:
 	DECLARE_DRIVER_INIT(patinho_feio);
 	DECLARE_READ16_MEMBER(rc_r);
 
-	DECLARE_READ8_MEMBER(decwriter_status_r);
-	DECLARE_READ8_MEMBER(decwriter_data_r);
 	DECLARE_WRITE8_MEMBER(decwriter_data_w);
 	DECLARE_WRITE8_MEMBER(decwriter_kbd_input);
 
-	DECLARE_READ8_MEMBER(teletype_status_r);
-	DECLARE_READ8_MEMBER(teletype_data_r);
 	DECLARE_WRITE8_MEMBER(teletype_data_w);
 	DECLARE_WRITE8_MEMBER(teletype_kbd_input);
 
@@ -38,16 +35,13 @@ public:
 	void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
 	virtual void machine_start() override;
 
+	required_device<patinho_feio_cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_decwriter_paper;
 	required_device<generic_terminal_device> m_tty_paper;
 private:
         UINT8* paper_tape_data;
         UINT32 paper_tape_length;
         UINT32 paper_tape_address;
-	UINT8 m_tty_data;
-	bool m_tty_ready;
-	UINT8 m_decwriter_data;
-	bool m_decwriter_ready;
 };
 
 /*
@@ -67,24 +61,10 @@ WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
 	m_decwriter_paper->write(space, 0, data);
 }
 
-READ8_MEMBER(patinho_feio_state::decwriter_data_r)
-{
-	return m_decwriter_data;
-}
-
 WRITE8_MEMBER(patinho_feio_state::decwriter_kbd_input)
 {
-	m_decwriter_data = data;
-	m_decwriter_ready = true;
-}
-
-READ8_MEMBER(patinho_feio_state::decwriter_status_r)
-{
-	//This should only return true after a certain delay
-	// We should verify in the DECWRITER specs what is its speed
-	// (in characters per second) in order to implement
-	// the high-level emulation of its behaviour here.
-        return m_decwriter_ready;
+//	if (m_decwriter_waiting_key)
+		m_maincpu->transfer_byte_from_external_device(0xA, ~data);
 }
 
 WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
@@ -93,24 +73,10 @@ WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
 }
 
 
-READ8_MEMBER(patinho_feio_state::teletype_data_r)
-{
-	return m_tty_data;
-}
-
 WRITE8_MEMBER(patinho_feio_state::teletype_kbd_input)
 {
-	m_tty_data = data;
-	m_tty_ready = true;
-}
-
-READ8_MEMBER(patinho_feio_state::teletype_status_r)
-{
-        //This should only return true after a certain delay
-        // We should verify in the DECWRITER specs what is its speed
-        // (in characters per second) in order to implement
-        // the high-level emulation of its behaviour here.
-        return m_tty_ready;
+//	if (m_teletype_waiting_key)
+		m_maincpu->transfer_byte_from_external_device(0xB, ~data);
 }
 
 /* The hardware does not perform this checking.
@@ -202,29 +168,21 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 
 	/* Printer */
 //	MCFG_PATINHO_IODEV_WRITE_CB(0x5, WRITE8(patinho_feio_state, printer_data_w))
-//	MCFG_PATINHO_IODEV_STATUS_CB(0x5, READ8(patinho_feio_state, printer_status_r))
 
 	/* Papertape Puncher */
 //	MCFG_PATINHO_IODEV_WRITE_CB(0x8, WRITE8(patinho_feio_state, papertape_punch_data_w))
-//	MCFG_PATINHO_IODEV_STATUS_CB(0x8, READ8(patinho_feio_state, papertape_punch_status_r))
 
 	/* Card Reader */
 //	MCFG_PATINHO_IODEV_READ_CB(0x9, READ8(patinho_feio_state, cardreader_data_r))
-//	MCFG_PATINHO_IODEV_STATUS_CB(0x9, READ8(patinho_feio_state, cardreader_status_r))
 
 	/* DECWRITER */
-//	MCFG_PATINHO_IODEV_READ_CB(0xA, READ8(patinho_feio_state, decwriter_data_r))
 	MCFG_PATINHO_IODEV_WRITE_CB(0xA, WRITE8(patinho_feio_state, decwriter_data_w))
-	MCFG_PATINHO_IODEV_STATUS_CB(0xA, READ8(patinho_feio_state, decwriter_status_r))
 
 	/* Teletype */
-//	MCFG_PATINHO_IODEV_READ_CB(0xB, READ8(patinho_feio_state, teletype_data_r))
 	MCFG_PATINHO_IODEV_WRITE_CB(0xB, WRITE8(patinho_feio_state, teletype_data_w))
-	MCFG_PATINHO_IODEV_STATUS_CB(0xB, READ8(patinho_feio_state, teletype_status_r))
 
 	/* Papertape Reader */
 //	MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(patinho_feio_state, papertapereader_data_r))
-//	MCFG_PATINHO_IODEV_STATUS_CB(0xE, READ8(patinho_feio_state, papertapereader_status_r))
 
 
         /* video hardware to represent what you'd see
