@@ -3102,6 +3102,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ht68k.cpp",
 	MAME_DIR .. "src/mame/drivers/hunter2.cpp",
 	MAME_DIR .. "src/mame/drivers/i7000.cpp",
+	MAME_DIR .. "src/mame/drivers/ibm3153.cpp",
 	MAME_DIR .. "src/mame/drivers/ibm6580.cpp",
 	MAME_DIR .. "src/mame/drivers/icatel.cpp",
 	MAME_DIR .. "src/mame/drivers/ie15.cpp",

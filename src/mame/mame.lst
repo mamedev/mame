@@ -14302,6 +14302,9 @@ magerror                        // (c) 1994 Technosoft (Japan) (Arcade TV Game L
 @source:i7000.cpp
 i7000                           //
 
+@source:ibm3153.cpp
+ibm3153                         //
+
 @source:ibm6580.cpp
 ibm6580                         //
 

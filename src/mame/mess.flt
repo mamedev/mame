@@ -242,6 +242,7 @@ hunter2.cpp
 hx20.cpp
 hyperscan.cpp
 i7000.cpp
+ibm3153.cpp
 ibm6580.cpp
 ibmpc.cpp
 ibmpcjr.cpp
