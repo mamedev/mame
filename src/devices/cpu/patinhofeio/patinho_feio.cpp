@@ -287,6 +287,66 @@ void patinho_feio_cpu_device::execute_instruction()
 			ACC = (RC & 0xFF);
 			FLAGS = V;
 			return;
+		case 0x90:
+			//ST 0 = "Se T=0, Pula"
+			//       If T is zero, skip the next instruction
+                        if ((FLAGS & T) == 0)
+				INCREMENT_PC_4K; //skip
+			return;
+		case 0x91:
+			//STM 0 = "Se T=0, Pula e muda"
+			//        If T is zero, skip the next instruction
+			//        and toggle T.
+			if ((FLAGS & T) == 0){
+				INCREMENT_PC_4K; //skip
+				FLAGS |= T; //set T=1
+			}
+			return;
+		case 0x92:
+			//ST 1 = "Se T=1, Pula"
+			//       If T is one, skip the next instruction
+                        if ((FLAGS & T) == 1)
+				INCREMENT_PC_4K; //skip
+			return;
+		case 0x93:
+			//STM 1 = "Se T=1, Pula e muda"
+			//        If T is one, skip the next instruction
+			//        and toggle T.
+			if ((FLAGS & T) == 1){
+				INCREMENT_PC_4K; //skip
+				FLAGS &= ~T; //set T=0
+			}
+			return;
+		case 0x94:
+			//SV 0 = "Se V=0, Pula"
+			//       If V is zero, skip the next instruction
+                        if ((FLAGS & V) == 0)
+				INCREMENT_PC_4K; //skip
+			return;
+		case 0x95:
+			//SVM 0 = "Se V=0, Pula e muda"
+			//        If V is zero, skip the next instruction
+			//        and toggle V.
+			if ((FLAGS & V) == 0){
+				INCREMENT_PC_4K; //skip
+				FLAGS |= V; //set V=1
+			}
+			return;
+		case 0x96:
+			//SV 1 = "Se V=1, Pula"
+			//       If V is one, skip the next instruction
+                        if ((FLAGS & V) == 1)
+				INCREMENT_PC_4K; //skip
+			return;
+		case 0x97:
+			//SVM 1 = "Se V=1, Pula e muda"
+			//        If V is one, skip the next instruction
+			//        and toggle V.
+			if ((FLAGS & V) == 1){
+				INCREMENT_PC_4K; //skip
+				FLAGS &= ~V; //set V=0
+			}
+			return;
 		case 0x98:
 			//PUL="Pula para /002 a limpa estado de interrupção"
 			//     Jump to address /002 and disables interrupts
