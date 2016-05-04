@@ -45177,7 +45177,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dquest4a" cloneof="dwarr4" supported="no">
+	<software name="dquest4a" cloneof="dwarr4">
 		<description>Dragon Quest IV - Michibikareshi Monotachi (Jpn)</description>
 		<year>1990</year>
 		<publisher>Enix</publisher>
@@ -45192,6 +45192,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -70782,7 +70786,7 @@ Other
 		</part>
 	</software>
 
-	<software name="testrus">
+	<software name="testrus" supported="no">
 		<description>Test (Rus, ver. 1.01, RT-01)</description>
 		<year>1994</year>
 		<publisher>Snake?</publisher>
