@@ -72,7 +72,6 @@ public:
 	bool                exec_cmd;  // console only
 	int                 src_sel;
 	char                console_input[512];
-	std::string         region_list;  // memory window only
 };
 
 class debug_imgui : public osd_module, public debug_module
@@ -121,6 +120,7 @@ private:
 	void draw_bpoints(debug_area* view_ptr, bool* opened);
 	void draw_log(debug_area* view_ptr, bool* opened);
 	void update_cpu_view(device_t* device);
+	static bool get_view_source(void* data, int idx, const char** out_text);
 
 	running_machine* m_machine;
 	INT32            m_mouse_x;
@@ -194,6 +194,13 @@ static inline void map_attr_to_fg_bg(unsigned char attr, rgb_t *fg, rgb_t *bg)
 	}
 }
 
+bool debug_imgui::get_view_source(void* data, int idx, const char** out_text)
+{
+	debug_view* vw = static_cast<debug_view*>(data);
+	*out_text = vw->source_list().find(idx)->name();
+	return true;
+}
+
 void debug_imgui::handle_mouse()
 {
 	m_prev_mouse_button = m_mouse_button;
@@ -246,7 +253,7 @@ void debug_imgui::handle_mouse_views()
 
 void debug_imgui::handle_keys()
 {
-		ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 	ui_event event;
 
 	// global keys
@@ -682,7 +689,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
-		ImGui::Combo("##cpu",&view_ptr->src_sel,view_ptr->region_list.c_str());
+		ImGui::Combo("##cpu",&view_ptr->src_sel,get_view_source,view_ptr->view,view_ptr->view->source_list().count());
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1.0f);
 		if(ImGui::InputText("##addr",view_ptr->console_input,512,flags))
@@ -760,7 +767,6 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 void debug_imgui::add_disasm(int id)
 {
 	std::stringstream str;
-	const debug_view_source* src;
 	debug_area* new_view;
 	new_view = dview_alloc(*m_machine, DVT_DISASSEMBLY);
 	str << id;
@@ -772,14 +778,6 @@ void debug_imgui::add_disasm(int id)
 	new_view->ofs_y = 0;
 	new_view->src_sel = 0;
 	strcpy(new_view->console_input,"curpc");
-	// build source CPU list
-	src = new_view->view->first_source();
-	while(src != nullptr)
-	{
-		new_view->region_list += src->name();
-		new_view->region_list += '\0';
-		src = src->next();
-	}
 	view_list_add(new_view);
 }
 
@@ -853,7 +851,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1.0f);
-		ImGui::Combo("##region",&view_ptr->src_sel,view_ptr->region_list.c_str());
+		ImGui::Combo("##region",&view_ptr->src_sel,get_view_source,view_ptr->view,view_ptr->view->source_list().count());
 		ImGui::PopItemWidth();
 		ImGui::Separator();
 
@@ -928,7 +926,6 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 void debug_imgui::add_memory(int id)
 {
 	std::stringstream str;
-	const debug_view_source* src;
 	debug_area* new_view;
 	new_view = dview_alloc(*m_machine, DVT_MEMORY);
 	str << id;
@@ -940,15 +937,6 @@ void debug_imgui::add_memory(int id)
 	new_view->ofs_y = 0;
 	new_view->src_sel = 0;
 	strcpy(new_view->console_input,"0");
-	// build source CPU list
-	src = new_view->view->first_source();
-	while(src != nullptr)
-	{
-		new_view->region_list += src->name();
-		new_view->region_list += '\0';
-		src = src->next();
-	}
-	new_view->region_list += '\0'; // end of list
 	view_list_add(new_view);
 }
 
