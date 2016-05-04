@@ -191,7 +191,7 @@ ui_menu_software_list::entry_info *ui_menu_software_list::append_software_entry(
 	// check if at least one of the parts has the correct interface and add a menu entry only in this case
 	for (const software_part &swpart : swinfo.parts())
 	{
-		if (swpart.matches_interface(m_interface) && swpart.is_compatible(*m_swlist))
+		if (swpart.matches_interface(m_interface) && swpart.is_compatible(*m_swlist) == SOFTWARE_IS_COMPATIBLE)
 		{
 			entry_updated = TRUE;
 			// allocate a new entry

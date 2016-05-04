@@ -140,26 +140,48 @@ const char *software_part::feature(const char *feature_name) const
 //  with the given software_list_device
 //-------------------------------------------------
 
-bool software_part::is_compatible(const software_list_device &swlistdev) const
+software_compatibility software_part::is_compatible(const software_list_device &swlistdev) const
 {
-	// get the compatibility feature and the softlist filter; if either is nullptr, assume compatible
-	const char *compatibility = feature("compatibility");
+	// get the softlist filter; if null, assume compatible
 	const char *filter = swlistdev.filter();
-	if (compatibility == nullptr || filter == nullptr)
-		return true;
+	if (filter == nullptr)
+		return SOFTWARE_IS_COMPATIBLE;
 
-	// copy the comma-delimited strings and ensure they end with a final comma
-	std::string comp = std::string(compatibility).append(",");
+	// copy the comma-delimited string and ensure it ends with a final comma
 	std::string filt = std::string(filter).append(",");
 
-	// iterate over filter items and see if they exist in the compatibility list; if so, return true
+	// get the incompatibility filter and test against it first if it exists
+	const char *incompatibility = feature("incompatibility");
+	if (incompatibility != nullptr)
+	{
+		// copy the comma-delimited string and ensure it ends with a final comma
+		std::string incomp = std::string(incompatibility).append(",");
+
+		// iterate over filter items and see if they exist in the list; if so, it's incompatible
+		for (int start = 0, end = filt.find_first_of(',',start); end != -1; start = end + 1, end = filt.find_first_of(',', start))
+		{
+			std::string token(filt, start, end - start + 1);
+			if (incomp.find(token) != -1)
+				return SOFTWARE_IS_INCOMPATIBLE;
+		}
+	}
+
+	// get the compatibility feature; if null, assume compatible
+	const char *compatibility = feature("compatibility");
+	if (compatibility == nullptr)
+		return SOFTWARE_IS_COMPATIBLE;
+
+	// copy the comma-delimited string and ensure it ends with a final comma
+	std::string comp = std::string(compatibility).append(",");
+
+	// iterate over filter items and see if they exist in the compatibility list; if so, it's compatible
 	for (int start = 0, end = filt.find_first_of(',',start); end != -1; start = end + 1, end = filt.find_first_of(',', start))
 	{
 		std::string token(filt, start, end - start + 1);
 		if (comp.find(token) != -1)
-			return true;
+			return SOFTWARE_IS_COMPATIBLE;
 	}
-	return false;
+	return SOFTWARE_NOT_COMPATIBLE;
 }
 
 
@@ -180,6 +202,34 @@ bool software_part::matches_interface(const char *interface_list) const
 	// then add a comma to the end of our interface and return true if we find it in the list string
 	std::string our_interface = std::string(m_interface).append(",");
 	return (interfaces.find(our_interface) != -1);
+}
+
+
+//-------------------------------------------------
+//  find_mountable_image - find an image interface
+//  that can automatically mount this software part
+//-------------------------------------------------
+
+device_image_interface *software_part::find_mountable_image(const machine_config &mconfig) const
+{
+	// if automount="no", don't bother
+	const char *mount = feature("automount");
+	if (mount != nullptr && strcmp(mount, "no") == 0)
+		return nullptr;
+
+	for (device_image_interface &image : image_interface_iterator(mconfig.root_device()))
+	{
+		const char *interface = image.image_interface();
+		if (interface != nullptr && matches_interface(interface))
+		{
+			// mount only if not already mounted
+			const char *option = mconfig.options().value(image.brief_instance_name());
+			if (*option == '\0' && !image.filename())
+
+				return &image;
+		}
+	}
+	return nullptr;
 }
 
 
@@ -340,7 +390,7 @@ void software_list_device::find_approx_matches(const char *name, int matches, so
 	for (software_info &swinfo : get_info())
 	{
 		software_part *part = swinfo.first_part();
-		if ((interface == nullptr || part->matches_interface(interface)) && part->is_compatible(*this))
+		if ((interface == nullptr || part->matches_interface(interface)) && part->is_compatible(*this) == SOFTWARE_IS_COMPATIBLE)
 		{
 			// pick the best match between driver name and description
 			int longpenalty = driver_list::penalty_compare(name, swinfo.longname());

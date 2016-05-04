@@ -201,6 +201,7 @@ int cli_frontend::execute(int argc, char **argv)
 				throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", m_options.software_name());
 
 			bool found = false;
+			bool compatible = false;
 			for (software_list_device &swlistdev : iter)
 			{
 				software_info *swinfo = swlistdev.find(m_options.software_name());
@@ -209,46 +210,33 @@ int cli_frontend::execute(int argc, char **argv)
 					// loop through all parts
 					for (software_part &swpart : swinfo->parts())
 					{
-						const char *mount = swpart.feature("automount");
-						if (swpart.is_compatible(swlistdev))
+						// only load compatible software this way
+						if (swpart.is_compatible(swlistdev) == SOFTWARE_IS_COMPATIBLE)
 						{
-							if (mount == nullptr || strcmp(mount,"no") != 0)
+							device_image_interface *image = swpart.find_mountable_image(config);
+							if (image != nullptr)
 							{
-								// search for an image device with the right interface
-								for (device_image_interface &image : image_interface_iterator(config.root_device()))
-								{
-									const char *interface = image.image_interface();
-									if (interface != nullptr)
-									{
-										if (swpart.matches_interface(interface))
-										{
-											const char *option = m_options.value(image.brief_instance_name());
+								std::string val = string_format("%s:%s:%s", swlistdev.list_name(), m_options.software_name(), swpart.name());
 
-											// mount only if not already mounted
-											if (*option == 0)
-											{
-												std::string val = string_format("%s:%s:%s", swlistdev.list_name(), m_options.software_name(), swpart.name());
-
-												// call this in order to set slot devices according to mounting
-												mame_options::parse_slot_devices(m_options, argc, argv, option_errors, image.instance_name(), val.c_str(), &swpart);
-												break;
-											}
-										}
-									}
-								}
+								// call this in order to set slot devices according to mounting
+								mame_options::parse_slot_devices(m_options, argc, argv, option_errors, image->instance_name(), val.c_str(), &swpart);
 							}
-							found = true;
+							compatible = true;
 						}
 					}
+					found = true;
 				}
 
-				if (found)
+				if (compatible)
 					break;
 			}
-			if (!found)
+			if (!compatible)
 			{
 				software_list_device::display_matches(config, nullptr, m_options.software_name());
-				throw emu_fatalerror(EMU_ERR_FATALERROR, nullptr);
+				if (!found)
+					throw emu_fatalerror(EMU_ERR_FATALERROR, nullptr);
+				else
+					throw emu_fatalerror(EMU_ERR_FATALERROR, "Software '%s' is incompatible with system '%s'\n", m_options.software_name(), m_options.system_name());
 			}
 		}
 
