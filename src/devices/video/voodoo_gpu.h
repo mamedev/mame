@@ -203,11 +203,12 @@ public:
 	HRESULT CreatePixelShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, ID3D11PixelShader** ppShaderOut);
 	HRESULT RenderToTex();
 	void ReadTex();
+	void FlushBuffer(void);
 	void DrawFastFill(ShaderPoint *triangleVertices);
-	void DrawTriangle(ShaderVertex *triangleVertices);
+	void DrawTriangle(ShaderVertex *triangleVertices, uint16_t *dst);
 	void DrawPixels();
-	void FastFill(int sx, int ex, int sy, int ey);
-	void CopyBuffer(uint16_t *dst, int rowPixels);
+	void FastFill(int sx, int ex, int sy, int ey, uint16_t *dst);
+	void CopyBuffer(uint16_t *dst);
 	void CopyBufferComp(uint16_t *dst);
 	void CopyBufferRGB(uint8_t *dst);
 	
@@ -231,7 +232,7 @@ public:
 	void FlagTexture(int index, UINT32 *texBase, UINT32 &texLod);
 	Combine_Struct ConvertTexmode(UINT32 &texMode);
 	void CreateTexture(texDescription &desc, int index, UINT32 &texMode, UINT32 &texLod, UINT32 &texDetail);
-	void PushPixel(int &x, int &y, int &mask, int *sr, int *sg, int *sb, int *sa, int *sz, UINT32 wSel, UINT32 &wVal);
+	void PushPixel(int &x, int &y, int &mask, int *sr, int *sg, int *sb, int *sa, int *sz, UINT32 wSel, UINT32 &wVal, uint16_t *dst);
 
 private:
 	ID3D11Device* GetGPU();
@@ -314,6 +315,7 @@ private:
 	bool m_lfb_write_ready;
 
 	int m_fbiWidth;
+	uint16_t *m_destBuffer;
 
 	UINT32 m_fastFbzMode;
 	UINT32 m_regFbzMode, m_regFbzColorPath, m_regColor0, m_regColor1, m_regAlphaMode, m_regTexMode[NUM_TEX];

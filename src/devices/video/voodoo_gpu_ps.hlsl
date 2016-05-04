@@ -255,9 +255,54 @@ PS_OUTPUT PS(PS_INPUT input)
 	return output;
 }
 //--------------------------------------------------------------------------------------
-// End Stage 0 Pixel Shader
+// COMP Pixel Shader
 //--------------------------------------------------------------------------------------
+struct COMP_PS_INPUT
+{
+	float4 Pos : SV_POSITION;
+	noperspective float Oow : FOG;
+	float2 TexPos : TEXCOORD;
+};
 
+struct COMP_PS_OUTPUT
+{
+	float4 Col : SV_TARGET;
+};
+
+COMP_PS_OUTPUT COMP_PS(COMP_PS_INPUT input)
+{
+	COMP_PS_OUTPUT output;
+
+	float4 srcColor = renderTexture.Sample(renderState, input.TexPos.xy);
+
+	// Dithering
+	srcColor = Dither(input.Pos, srcColor * 255.0f);
+
+	// Reduce bits for RGB565 format compression
+	srcColor.rb = floor(srcColor.rb / 8.0f) * 8.0f;
+	srcColor.g = floor(srcColor.g / 4.0f) * 4.0f;
+	srcColor /= 255.0;
+
+	output.Col = srcColor;
+
+	return output;
+}
+
+//--------------------------------------------------------------------------------------
+// FAST Fill Pixel Shader
+//--------------------------------------------------------------------------------------
+PS_OUTPUT FASTFILL_PS(PS_INPUT input)
+{
+	PS_OUTPUT output;
+
+	output.Col = input.Col;
+	output.Depth = input.Oow;
+
+	return output;
+}
+//--------------------------------------------------------------------------------------
+// Functions
+//--------------------------------------------------------------------------------------
 float4 SelectOther(float4 iterColor, float4 texColor)
 {
 	float4 c_other;
@@ -579,50 +624,4 @@ float4 FogUnit(float4 srcColor, float fogDepth, float4 inputPos)
 		saturate(foggedColor);
 		return foggedColor;
 	}
-}
-//--------------------------------------------------------------------------------------
-// COMP Pixel Shader
-//--------------------------------------------------------------------------------------
-struct COMP_PS_INPUT
-{
-	float4 Pos : SV_POSITION;
-	noperspective float Oow : FOG;
-	float2 TexPos : TEXCOORD;
-};
-
-struct COMP_PS_OUTPUT
-{
-	float4 Col : SV_TARGET;
-};
-
-COMP_PS_OUTPUT COMP_PS(COMP_PS_INPUT input)
-{
-	COMP_PS_OUTPUT output;
-
-	float4 srcColor = renderTexture.Sample(renderState, input.TexPos.xy);
-
-	// Dithering
-	srcColor = Dither(input.Pos, srcColor * 255.0f);
-
-	// Reduce bits for RGB565 format compression
-	srcColor.rb = floor(srcColor.rb / 8.0f) * 8.0f;
-	srcColor.g = floor(srcColor.g / 4.0f) * 4.0f;
-	srcColor /= 255.0;
-
-	output.Col = srcColor;
-
-	return output;
-}
-
-//--------------------------------------------------------------------------------------
-// FAST Fill Pixel Shader
-//--------------------------------------------------------------------------------------
-PS_OUTPUT FASTFILL_PS(PS_INPUT input)
-{
-	PS_OUTPUT output;
-
-	output.Col = input.Col;
-	output.Depth = input.Oow;
-
-	return output;
 }

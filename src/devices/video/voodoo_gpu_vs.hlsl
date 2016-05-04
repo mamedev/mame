@@ -83,7 +83,7 @@ cbuffer cbTexInterface : register(b2)
 float2 ConvertScreenPos(float2 posXY);
 
 //--------------------------------------------------------------------------------------
-// Vertex Shader
+// Vertex Shader for triangle rendering
 //--------------------------------------------------------------------------------------
 struct VS_INPUT
 {
@@ -143,7 +143,7 @@ PS_INPUT VS(VS_INPUT input)
 	return output;
 }
 //--------------------------------------------------------------------------------------
-// Pixel Vertex Shader
+// Pixel Vertex Shader for pixel pipeline lfb writes and fastfill
 //--------------------------------------------------------------------------------------
 struct PIXEL_VS_INPUT
 {
@@ -221,8 +221,13 @@ COMP_PS_INPUT COMP_VS(COMP_VS_INPUT input)
 float2 ConvertScreenPos(float2 posXY)
 {
 	float2 output;
-	output.x = posXY.x / (xSize / 2.0f) - 1.0f + 1 / xSize;
-	output.y = 1.0f - posXY.y / (ySize / 2.0f) - 1 / ySize;
+	if (pixel_mode) {
+		output.x = posXY.x / (xSize / 2.0f) - 1.0f + 1 / xSize;
+		output.y = 1.0f - posXY.y / (ySize / 2.0f) - 1 / ySize;
+	} else {
+		output.x = posXY.x / (xSize / 2.0f) - 1.0f;
+		output.y = 1.0f - posXY.y / (ySize / 2.0f);
+	}
 	if (flipY)
 		output.y = -output.y;
 	return output;

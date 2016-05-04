@@ -70,6 +70,7 @@ voodoo_gpu::voodoo_gpu()
 	m_updateFrameBufferCtrl = true;
 	m_updateTexCtrl = false;
 
+	m_destBuffer = nullptr;
 	m_fastFbzMode = 0;
 	m_regFbzMode = 0;
 
@@ -1066,6 +1067,15 @@ void voodoo_gpu::UpdateConstants()
 	}
 }
 
+void voodoo_gpu::FlushBuffer(void)
+{
+	// Check for pixels that haven't been drawn
+	if (m_pixels_ready)
+		DrawPixels();
+	if (m_need_copy)
+		CopyBuffer(m_destBuffer);
+}
+
 void voodoo_gpu::DrawFastFill(ShaderPoint *triangleVertices)
 {
 	// Check for pixels that haven't been drawn
@@ -1140,11 +1150,18 @@ void voodoo_gpu::DrawFastFill(ShaderPoint *triangleVertices)
 	m_need_copy = true;
 }
 
-void voodoo_gpu::DrawTriangle(ShaderVertex *triangleVertices)
+void voodoo_gpu::DrawTriangle(ShaderVertex *triangleVertices, uint16_t *dst)
 {
 	// Check for pixels that haven't been drawn
 	if (m_pixels_ready)
 		DrawPixels();
+
+	// Check if destination frame buffer has changed
+	if (m_need_copy && m_destBuffer != dst)
+	{
+		CopyBuffer(m_destBuffer);
+	}
+	m_destBuffer = dst;
 
 	/*
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -1285,15 +1302,23 @@ void voodoo_gpu::DrawPixels()
 
 }
 
-void voodoo_gpu::FastFill(int sx, int ex, int sy, int ey)
+void voodoo_gpu::FastFill(int sx, int ex, int sy, int ey, uint16_t *dst)
 {
+	// Check for pixels that haven't been drawn
+	if (m_pixels_ready)
+		DrawPixels();
+
+	// Check if destination frame buffer has changed
+	if (m_need_copy && m_destBuffer != dst)
+	{
+		CopyBuffer(m_destBuffer);
+	}
+	m_destBuffer = dst;
+
 	
 	UpdateColorCtrl();
 
 	if (sx == 0 && sy == 0 && ex >= m_fbiWidth && ey == m_frameBufferCtrl.ySize) {
-		// Check for pixels that haven't been drawn
-		if (m_pixels_ready)
-			DrawPixels();
 		FLOAT depth = float(m_regZAColor & 0xffff) / 65535.0f;
 		UpdateColorCtrl();
 		m_context->ClearRenderTargetView(m_renderTargetView, reinterpret_cast<const FLOAT*>(&m_colorCtrl.color1));
@@ -1337,7 +1362,7 @@ HRESULT voodoo_gpu::RenderToTex()
 
 	// Clear the back buffer 
 	XMFLOAT4 Zero = { 0.000000000f, 0.000000000f, 0.000000000f, 0.000000000f };
-	FastFill(0, 511, 0, 384);
+	FastFill(0, 511, 0, 384, 0);
 
 	// Setup constants
 	//m_frameBufferCtrl.xSize = 512.0f;
@@ -1365,12 +1390,12 @@ HRESULT voodoo_gpu::RenderToTex()
 		
 		UINT32 wSel = 0;
 		UINT32 wVal = 0x0;
-		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal);
+		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal, 0);
 		x = 0x2;
-		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal);
+		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal, 0);
 		x = 0x0;
 		y = 0x1;
-		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal);
+		PushPixel(x, y, mask, sr, sg, sb, sa, sz, wSel, wVal, 0);
 		DrawPixels();
 		return S_OK;
 	}
@@ -1383,7 +1408,7 @@ HRESULT voodoo_gpu::RenderToTex()
 	//inVec.push_back({ XMFLOAT4(10.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(128.0f, 254.0f, 253.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
 	//inVec.push_back({ XMFLOAT4(0.0f, 10.0f, 0.0f, 1.0f), XMFLOAT4(128.0f, 254.0f, 253.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) });
 
-	DrawTriangle(inVec.data());
+	DrawTriangle(inVec.data(), 0);
 	//DrawTriangle(inVec.data());
 
 	return S_OK;
@@ -1406,7 +1431,7 @@ HRESULT voodoo_gpu::RenderToTex()
 
 	return S_OK;
 }
-void voodoo_gpu::CopyBuffer(uint16_t *dst, int rowPixels)
+void voodoo_gpu::CopyBuffer(uint16_t *dst)
 {
 	if (!m_need_copy) return;
 	m_need_copy = false;
@@ -1455,8 +1480,8 @@ void voodoo_gpu::CopyBuffer(uint16_t *dst, int rowPixels)
 			//dst[h * m_hVis + elem] = rgb16;
 			dst[elem] = rgb16;
 		}
-		//dst += desc.Width;
-		dst += rowPixels;
+		dst += desc.Width;
+		//dst += rowPixels;
 	}
 
 	m_context->Unmap(pNewTexture, 0);
@@ -1733,8 +1758,15 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, UINT32 &texMode,
 	m_context->PSSetSamplers(index + TMU_TEX_OFFSET, 1, &m_texMap[mapIndex].texSampler);
 }
 
-void voodoo_gpu::PushPixel(int &x, int &y, int &mask, int *sr, int *sg, int *sb, int *sa, int *sz, UINT32 wSel, UINT32 &wVal)
+void voodoo_gpu::PushPixel(int &x, int &y, int &mask, int *sr, int *sg, int *sb, int *sa, int *sz, UINT32 wSel, UINT32 &wVal, uint16_t *dst)
 {
+	// Check if destination frame buffer has changed
+	if (m_need_copy && m_destBuffer != dst)
+	{
+		CopyBuffer(m_destBuffer);
+		m_destBuffer = dst;
+	}
+
 	ShaderPoint pixel;
 	for (size_t pix = 0; pix < 2; ++pix)
 	{
@@ -1809,7 +1841,7 @@ void voodoo_gpu::ReadTex()
 
 		uint16_t comp_arrray[384][512];
 		m_need_copy = true;
-		CopyBuffer(&comp_arrray[0][0], 512);
+		CopyBuffer(&comp_arrray[0][0]);
 		for (int row = 0; row < 11; row++) {
 			for (int col = 0; col < 9; col++)
 			{

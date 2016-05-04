@@ -262,6 +262,10 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		return changed;
 	}
 
+	if (USE_GPU) {
+		m_gpu.FlushBuffer();
+	}
+
 	/* if the CLUT is dirty, recompute the pens array */
 	if (fbi.clut_dirty)
 	{
@@ -799,13 +803,8 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 		count = 15;
 	vd->reg[fbiSwapHistory].u = (vd->reg[fbiSwapHistory].u << 4) | count;
 
-	if USE_GPU {
-		// Check for pixels
-		vd->m_gpu.DrawPixels();
-		if (vd->vd_type <= TYPE_VOODOO_2)
-			vd->m_gpu.CopyBuffer((UINT16 *)(vd->fbi.ram + vd->fbi.rgboffs[vd->fbi.frontbuf]), vd->fbi.rowpixels);
-		else
-			vd->m_gpu.CopyBuffer((UINT16 *)(vd->fbi.ram + vd->fbi.rgboffs[0]), vd->fbi.rowpixels);
+	if (USE_GPU) {
+		vd->m_gpu.FlushBuffer();
 	}
 
 	/* rotate the buffers */
@@ -1057,8 +1056,10 @@ void voodoo_device::recompute_video_memory(voodoo_device *vd)
 	}
 	vd->fbi.rowpixels = vd->fbi.tile_width * vd->fbi.x_tiles;
 
-	if USE_GPU
+	if (USE_GPU) {
+		vd->m_gpu.FlushBuffer();
 		vd->m_gpu.InitRenderBuffers(vd->fbi.rowpixels, vd->fbi.height, vd->fbi.width);
+	}
 
 //  logerror("VOODOO.%d.VIDMEM: buffer_pages=%X  fifo=%X-%X  tiles=%X  rowpix=%d\n", vd->index, buffer_pages, fifo_start_page, fifo_last_page, vd->fbi.x_tiles, vd->fbi.rowpixels);
 
@@ -3203,6 +3204,9 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 	/* simple case: no pipeline */
 	if (!LFBMODE_ENABLE_PIXEL_PIPELINE(vd->reg[lfbMode].u))
 	{
+		if (USE_GPU)
+			vd->m_gpu.FlushBuffer();
+
 		DECLARE_DITHER_POINTERS_NO_DITHER_VAR;
 		UINT32 bufoffs;
 
@@ -3262,11 +3266,11 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 	/* tricky case: run the full pixel pipeline on the pixel */
 	else
 	{
-		if USE_GPU {
+		if (USE_GPU) {
 			vd->fbi.lfb_stats.pixels_in += 2;
 			// Send pixel to gpu
 			UINT32 wReg = vd->reg[zaColor].u & 0xffff;
-			vd->m_gpu.PushPixel(x, y, mask, sr, sg, sb, sa, sz, LFBMODE_WRITE_W_SELECT(vd->reg[lfbMode].u), wReg);
+			vd->m_gpu.PushPixel(x, y, mask, sr, sg, sb, sa, sz, LFBMODE_WRITE_W_SELECT(vd->reg[lfbMode].u), wReg, dest);
 			return 0;
 		}
 
@@ -4032,6 +4036,9 @@ static UINT32 lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
 	/* statistics */
 	vd->stats.lfb_reads++;
 
+	if (USE_GPU)
+		vd->m_gpu.FlushBuffer();
+
 	/* compute X,Y */
 	offset <<= 1;
 	x = offset & ((1 << vd->fbi.lfb_stride) - 1);
@@ -4069,32 +4076,12 @@ static UINT32 lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
 		if (LFBMODE_Y_ORIGIN(vd->reg[lfbMode].u))
 			scry = (vd->fbi.yorigin - y) & 0x3ff;
 
-		if USE_GPU {
-			if (destbuf != 2) {
-				// Check for pixels
-				vd->m_gpu.DrawPixels();
-				// Check for triangle drawings
-				vd->m_gpu.CopyBuffer(buffer, vd->fbi.rowpixels);
-			}
-		}
-
 	} else {
 		// Direct lfb access
 		buffer = (UINT16 *)(vd->fbi.ram + vd->fbi.lfb_base*4);
 		bufmax = (vd->fbi.mask + 1 - vd->fbi.lfb_base*4) / 2;
 		scry = y;
 
-		if (USE_GPU) {
-			// Check for pixels
-			vd->m_gpu.DrawPixels();
-			// Check for triangle drawings
-			if (vd->vd_type >= TYPE_VOODOO_BANSHEE) {
-				vd->m_gpu.CopyBuffer((UINT16 *)(vd->fbi.ram + vd->fbi.rgboffs[vd->fbi.backbuf]), vd->fbi.rowpixels);
-			} else {
-				// TODO: Verify buffer is correct for Voodoo 1
-				vd->m_gpu.CopyBuffer((UINT16 *)(vd->fbi.ram + vd->fbi.rgboffs[vd->fbi.backbuf]), vd->fbi.rowpixels);
-			}
-		}
 	}
 
 	/* advance pointers to the proper row */
@@ -5222,13 +5209,6 @@ INT32 voodoo_device::fastfill(voodoo_device *vd)
 	if (!FBZMODE_RGB_BUFFER_MASK(vd->reg[fbzMode].u) && !FBZMODE_AUX_BUFFER_MASK(vd->reg[fbzMode].u))
 		return 0;
 
-	if USE_GPU {
-		vd->m_gpu.FastFill(sx, ex, sy, ey);
-		pixels = ((ex - sx) * (ey - sy));
-		// 2 pixels per clock
-		return pixels >> 1;
-	}
-
 	/* are we clearing the RGB buffer? */
 	if (FBZMODE_RGB_BUFFER_MASK(vd->reg[fbzMode].u))
 	{
@@ -5248,7 +5228,14 @@ INT32 voodoo_device::fastfill(voodoo_device *vd)
 				break;
 		}
 
-		/* determine the dither pattern */
+		if (USE_GPU) {
+			vd->m_gpu.FastFill(sx, ex, sy, ey, drawbuf);
+			pixels = ((ex - sx) * (ey - sy));
+			// 2 pixels per clock
+			return pixels >> 1;
+		}
+
+			/* determine the dither pattern */
 		for (y = 0; y < 4; y++)
 		{
 			DECLARE_DITHER_POINTERS_NO_DITHER_VAR;
@@ -5263,6 +5250,8 @@ INT32 voodoo_device::fastfill(voodoo_device *vd)
 				dithermatrix[y*4 + x] = (r << 11) | (g << 5) | b;
 			}
 		}
+	} else {
+		memset(dithermatrix, 0, 16*sizeof(UINT16));
 	}
 
 	/* fill in a block of extents */
@@ -5635,8 +5624,26 @@ void voodoo_device::gpu_draw_triangle(voodoo_device *vd)
 		}
 	}
 
+	/* determine the draw buffer */
+	UINT16 *drawbuf;
+	int destbuf = (vd->vd_type >= TYPE_VOODOO_BANSHEE) ? 1 : FBZMODE_DRAW_BUFFER(vd->reg[fbzMode].u);
+	switch (destbuf)
+	{
+	case 0:     /* front buffer */
+		drawbuf = (UINT16 *)(vd->fbi.ram + vd->fbi.rgboffs[vd->fbi.frontbuf]);
+		vd->fbi.video_changed = TRUE;
+		break;
+
+	case 1:     /* back buffer */
+		drawbuf = (UINT16 *)(vd->fbi.ram + vd->fbi.rgboffs[vd->fbi.backbuf]);
+		break;
+
+	default:    /* reserved */
+		return;
+	}
+
 	vd->m_gpu.UpdateTexCtrl((texcount > 0) && vd->tmu[0].lodmin < (8 << 8), (texcount > 1) && vd->tmu[1].lodmin < (8 << 8));
-	vd->m_gpu.DrawTriangle(reinterpret_cast<voodoo_gpu::ShaderVertex*>(vd->fbi.svert));
+	vd->m_gpu.DrawTriangle(reinterpret_cast<voodoo_gpu::ShaderVertex*>(vd->fbi.svert), drawbuf);
 
 	/* update stats */
 	vd->reg[fbiTrianglesOut].u++;
