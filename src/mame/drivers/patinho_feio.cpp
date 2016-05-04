@@ -248,7 +248,7 @@ MACHINE_CONFIG_END
 
 ROM_START( patinho )
 	ROM_REGION( 0x0d5, "hexam", 0 )
-	ROM_LOAD( "apendice_g__hexam.bin", 0x000, 0x0d5, CRC(c6addc59) SHA1(126bc97247eac45c58708eaac216c2438e9e4af9) )
+	ROM_LOAD( "apendice_g__hexam.bin", 0x000, 0x0d5, CRC(e608f6d3) SHA1(3f76b5f91d9b2573e70919539d47752e7623e40a) )
 
 	ROM_REGION( 0x0d5, "exemplo_16.7", 0 )
 	ROM_LOAD( "exemplo_16.7.bin", 0x000, 0x028, CRC(0a87ac8d) SHA1(7c35ac3eed9ed239f2ef56c26e6f0c59f635e1ac) )
