@@ -63,8 +63,7 @@ WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
 
 WRITE8_MEMBER(patinho_feio_state::decwriter_kbd_input)
 {
-//	if (m_decwriter_waiting_key)
-		m_maincpu->transfer_byte_from_external_device(0xA, ~data);
+	m_maincpu->transfer_byte_from_external_device(0xA, ~data);
 }
 
 WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
@@ -75,8 +74,13 @@ WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
 
 WRITE8_MEMBER(patinho_feio_state::teletype_kbd_input)
 {
-//	if (m_teletype_waiting_key)
-		m_maincpu->transfer_byte_from_external_device(0xB, ~data);
+	//I figured out that the data is provided inverted (2's complement)
+	//based on a comment in the source code listing of the HEXAM program.
+	//It is not clear though, if all I/O devices complement the data when
+	//communicating with the computer, or if this behavious is a particular
+	//caracteristics of the teletype.
+
+	m_maincpu->transfer_byte_from_external_device(0xB, ~data);
 }
 
 /* The hardware does not perform this checking.
