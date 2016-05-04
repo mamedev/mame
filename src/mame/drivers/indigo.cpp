@@ -91,7 +91,7 @@ protected:
 };
 
 
-#define VERBOSE_LEVEL ( 2 )
+#define VERBOSE_LEVEL (0)
 
 inline void ATTR_PRINTF(3,4) indigo_state::verboselog(int n_level, const char *s_fmt, ... )
 {
