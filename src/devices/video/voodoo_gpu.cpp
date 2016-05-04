@@ -1087,13 +1087,13 @@ void voodoo_gpu::DrawFastFill(ShaderPoint *triangleVertices)
 		m_updateColorCtrl = true;
 
 		// Check for depth changes
-		if ((m_fastFbzMode ^ m_regFbzMode) & 0x410) {
+		if ((m_fastFbzMode ^ m_regFbzMode) & 0x400) {
 			m_fastFbzMode = m_regFbzMode;
 			// Create the depth stencil state
 			D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 			ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
 			// Depth test parameters
-			depthStencilDesc.DepthEnable = (m_regFbzMode >> 4) & 1;
+			depthStencilDesc.DepthEnable = ((m_regFbzMode >> 10) & 1);
 			depthStencilDesc.DepthWriteMask = ((m_regFbzMode >> 10) & 1) ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
 			depthStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
 			// Release old state

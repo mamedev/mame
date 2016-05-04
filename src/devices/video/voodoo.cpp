@@ -1057,6 +1057,9 @@ void voodoo_device::recompute_video_memory(voodoo_device *vd)
 	}
 	vd->fbi.rowpixels = vd->fbi.tile_width * vd->fbi.x_tiles;
 
+	if USE_GPU
+		vd->m_gpu.InitRenderBuffers(vd->fbi.rowpixels, vd->fbi.height, vd->fbi.width);
+
 //  logerror("VOODOO.%d.VIDMEM: buffer_pages=%X  fifo=%X-%X  tiles=%X  rowpix=%d\n", vd->index, buffer_pages, fifo_start_page, fifo_last_page, vd->fbi.x_tiles, vd->fbi.rowpixels);
 
 	/* first RGB buffer always starts at 0 */
@@ -2631,8 +2634,6 @@ INT32 voodoo_device::register_w(voodoo_device *vd, offs_t offset, UINT32 data)
 					/* if changing dimensions, update video memory layout */
 					if (regnum == videoDimensions) {
 						recompute_video_memory(vd);
-						if USE_GPU
-							vd->m_gpu.InitRenderBuffers(vd->fbi.rowpixels, vd->fbi.height, vd->fbi.width);
 					}
 				}
 			}
@@ -3262,6 +3263,7 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 	else
 	{
 		if USE_GPU {
+			vd->fbi.lfb_stats.pixels_in += 2;
 			// Send pixel to gpu
 			UINT32 wReg = vd->reg[zaColor].u & 0xffff;
 			vd->m_gpu.PushPixel(x, y, mask, sr, sg, sb, sa, sz, LFBMODE_WRITE_W_SELECT(vd->reg[lfbMode].u), wReg);
@@ -4067,7 +4069,7 @@ static UINT32 lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
 		if (LFBMODE_Y_ORIGIN(vd->reg[lfbMode].u))
 			scry = (vd->fbi.yorigin - y) & 0x3ff;
 
-		if USE_GPU{
+		if USE_GPU {
 			if (destbuf != 2) {
 				// Check for pixels
 				vd->m_gpu.DrawPixels();
@@ -4082,12 +4084,16 @@ static UINT32 lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
 		bufmax = (vd->fbi.mask + 1 - vd->fbi.lfb_base*4) / 2;
 		scry = y;
 
-		if USE_GPU{
+		if (USE_GPU) {
 			// Check for pixels
 			vd->m_gpu.DrawPixels();
 			// Check for triangle drawings
-			// TODO: Verify buffer is correct for Voodoo 1
-			vd->m_gpu.CopyBuffer((UINT16 *)(vd->fbi.ram + vd->fbi.rgboffs[vd->fbi.backbuf]), vd->fbi.rowpixels);
+			if (vd->vd_type >= TYPE_VOODOO_BANSHEE) {
+				vd->m_gpu.CopyBuffer((UINT16 *)(vd->fbi.ram + vd->fbi.rgboffs[vd->fbi.backbuf]), vd->fbi.rowpixels);
+			} else {
+				// TODO: Verify buffer is correct for Voodoo 1
+				vd->m_gpu.CopyBuffer((UINT16 *)(vd->fbi.ram + vd->fbi.rgboffs[vd->fbi.backbuf]), vd->fbi.rowpixels);
+			}
 		}
 	}
 
