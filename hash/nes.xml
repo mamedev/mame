@@ -50173,7 +50173,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="wlddizzy" suppoted="no">
+	<software name="wlddizzy" supported="no">
 		<description>Wonderland Dizzy (Euro, Prototype)</description>
 		<year>1991</year>
 		<publisher>Camerica</publisher>
