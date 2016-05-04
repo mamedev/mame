@@ -319,6 +319,15 @@ static const nes_pcb pcb_list[] =
 	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "dance2k",          UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
+	{ "bmc_f15",          UNSUPPORTED_BOARD },	// 150-in-1 Unchained Melody
+	{ "bmc_hp898f",       UNSUPPORTED_BOARD },	// Primasoft 9999999-in-1
+	{ "bmc_8in1",         UNSUPPORTED_BOARD },	// Super 8-in-1 (Incl. Rockin' Kats)
+	{ "unl_eh8813a",      UNSUPPORTED_BOARD },	// Dr. Mario II
+	{ "unl_158b",         UNSUPPORTED_BOARD },	// Blood of Jurassic
+	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },	// Dragon Fighter by Flying Star
+	{ "ks7016",           UNSUPPORTED_BOARD },	// Exciting Basketball FDS
+	{ "ks7037",           UNSUPPORTED_BOARD },	// Metroid FDS Chinese
+	{ "rt01",             UNSUPPORTED_BOARD },	// Russian Test Cart
 	{ "test",             TEST_BOARD },
 	{ "unknown",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
 };
