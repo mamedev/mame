@@ -1288,14 +1288,26 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 	}
 
 	// Load the software part
-	bool result = call_softlist_load(swpart->info().list(), swpart->info().shortname(), swpart->romdata());
+	software_list_device &swlist = swpart->info().list();
+	bool result = call_softlist_load(swlist, swpart->info().shortname(), swpart->romdata());
 
 	// Tell the world which part we actually loaded
-	std::string full_sw_name = string_format("%s:%s:%s", swpart->info().list().list_name(), swpart->info().shortname(), swpart->name());
+	std::string full_sw_name = string_format("%s:%s:%s", swlist.list_name(), swpart->info().shortname(), swpart->name());
 
 	// check compatibility
-	if (!swpart->is_compatible(swpart->info().list()))
-		osd_printf_warning("WARNING! the set %s might not work on this system due to missing filter(s) '%s'\n", swpart->info().shortname(), swpart->info().list().filter());
+	switch (swpart->is_compatible(swlist))
+	{
+		case SOFTWARE_IS_COMPATIBLE:
+			break;
+
+		case SOFTWARE_IS_INCOMPATIBLE:
+			swlist.popmessage("WARNING! the set %s might not work on this system due to incompatible filter(s) '%s'\n", swpart->info().shortname(), swlist.filter());
+			break;
+
+		case SOFTWARE_NOT_COMPATIBLE:
+			swlist.popmessage("WARNING! the set %s might not work on this system due to missing filter(s) '%s'\n", swpart->info().shortname(), swlist.filter());
+			break;
+	}
 
 	// check requirements and load those images
 	const char *requirement = swpart->feature("requirement");
@@ -1304,23 +1316,11 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 		software_part *req_swpart = find_software_item(requirement, false);
 		if (req_swpart != nullptr)
 		{
-			for (device_image_interface &req_image : image_interface_iterator(device().machine().root_device()))
+			device_image_interface *req_image = req_swpart->find_mountable_image(device().mconfig());
+			if (req_image != nullptr)
 			{
-				const char *interface = req_image.image_interface();
-				if (interface != nullptr)
-				{
-					if (req_swpart->matches_interface(interface))
-					{
-						const char *option = device().mconfig().options().value(req_image.brief_instance_name());
-						// mount only if not already mounted
-						if (*option == '\0' && !req_image.filename())
-						{
-							req_image.set_init_phase();
-							req_image.load(requirement);
-						}
-						break;
-					}
-				}
+				req_image->set_init_phase();
+				req_image->load(requirement);
 			}
 		}
 	}

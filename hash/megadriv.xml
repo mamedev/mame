@@ -3800,6 +3800,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Ishido - The Way of Stones (USA)</description>
 		<year>1990</year>
 		<publisher>Accolade</publisher>
+		<sharedfeat name="incompatibility" value="TMSS"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="ACBWPC1190"/>
 			<feature name="ic1" value="MB834200A 2M5 BA 9044 T03 ISS0890"/>
@@ -11942,6 +11943,7 @@ but dumps still have to be confirmed.
 		<description>Budokan - The Martial Spirit (USA)</description>
 		<year>1990</year>
 		<publisher>Electronic Arts</publisher>
+		<sharedfeat name="incompatibility" value="TMSS"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="budokan - the martial spirit (usa).bin" size="524288" crc="acd9f5fc" sha1="93bc8242106bc9b2e0a8a974a3f65b559dd2941d" offset="0x000000"/>
@@ -20522,6 +20524,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Onslaught (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Ballistic</publisher>
+		<sharedfeat name="incompatibility" value="TMSS"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="onslaught (euro, usa).bin" size="524288" crc="9f19d6df" sha1="dc542ddfa878f2aed3a7fcedc4b0f8d503eb5d70" offset="0x000000"/>
@@ -21578,6 +21581,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Populous (USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="incompatibility" value="TMSS"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="populous (usa).bin" size="524288" crc="bd74b31e" sha1="89907c4ba4fd9db4e8ef2271c0253bb0e4b6d52d" offset="0x000000"/>
@@ -29417,6 +29421,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Zany Golf (Euro, USA)</description>
 		<year>1990</year>
 		<publisher>Electronic Arts</publisher>
+		<sharedfeat name="incompatibility" value="TMSS"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="zany golf (euro, usa).bin" size="524288" crc="ed5d12ea" sha1="4f9bea2d8f489bfbc963718a8dca212e033fb5a2" offset="0x000000"/>
