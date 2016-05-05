@@ -40,8 +40,6 @@ extern void mtlog_add(const char *event);
 //  CONSTANTS
 //============================================================
 
-#define ENABLE_BORDER_PIX   (1)
-
 enum
 {
 	TEXTURE_TYPE_PLAIN,
@@ -2265,14 +2263,12 @@ void texture_info::compute_size(int texwidth, int texheight)
 
 	bool shaders_enabled = m_renderer->get_shaders()->enabled();
 	bool wrap_texture = (m_flags & PRIMFLAG_TEXWRAP_MASK) == PRIMFLAG_TEXWRAP_MASK;
-	bool border_texture = ENABLE_BORDER_PIX && !wrap_texture;
-	bool surface_texture = m_type == TEXTURE_TYPE_SURFACE;
 
-	// skip border when shaders are enabled and we're not creating a surface (UI) texture
-	if (!shaders_enabled || surface_texture)
+	// skip border when shaders are enabled
+	if (!shaders_enabled)
 	{
 		// if we're not wrapping, add a 1-2 pixel border on all sides
-		if (border_texture)
+		if (!wrap_texture)
 		{
 			// note we need 2 pixels in X for YUY textures
 			m_xborderpix = (PRIMFLAG_GET_TEXFORMAT(m_flags) == TEXFORMAT_YUY16) ? 2 : 1;
@@ -2283,8 +2279,8 @@ void texture_info::compute_size(int texwidth, int texheight)
 	finalwidth += 2 * m_xborderpix;
 	finalheight += 2 * m_yborderpix;
 
-	// take texture size as given when shaders are enabled and we're not creating a surface (UI) texture, still update wrapped textures
-	if (!shaders_enabled || surface_texture || wrap_texture)
+	// take texture size as given when shaders are enabled
+	if (!shaders_enabled)
 	{
 		compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
 
