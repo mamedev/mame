@@ -264,6 +264,44 @@ NETLIST_START(TTL_7416_DIP)
 NETLIST_END()
 
 /*
+ *  DM7420: Dual 4-Input NAND Gates
+ *
+ *                  ____
+ *              Y = ABCD
+ *          +---+---+---+---++---+
+ *          | A | B | C | D || Y |
+ *          +===+===+===+===++===+
+ *          | X | X | X | 0 || 1 |
+ *          | X | X | 0 | X || 1 |
+ *          | X | 0 | X | X || 1 |
+ *          | 0 | X | X | X || 1 |
+ *          | 1 | 1 | 1 | 1 || 0 |
+ *          +---+---+---+---++---+
+ *
+ *  Naming conventions follow National Semiconductor datasheet *
+ */
+
+NETLIST_START(TTL_7420_DIP)
+	TTL_7420_GATE(s1)
+	TTL_7420_GATE(s2)
+
+	DUMMY_INPUT(GND)
+	DUMMY_INPUT(VCC)
+	DUMMY_INPUT(NC)
+
+	DIPPINS(   /*       +--------------+      */
+		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.B,  /*    B1 |2           13| D2   */ s2.D,
+		NC.I,  /*    NC |3           12| C2   */ s2.C,
+		s1.C,  /*    C1 |4    7420   11| NC   */ NC.I,
+		s1.D,  /*    D1 |5           10| B2   */ s2.B,
+		s1.Q,  /*    Y1 |6            9| A2   */ s2.A,
+		GND.I, /*   GND |7            8| Y2   */ s2.Q
+			   /*       +--------------+      */
+	)
+NETLIST_END()
+
+/*
  *  DM7427: Triple 3-Input NOR Gates
  *
  *                  _____
@@ -491,6 +529,26 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XXOC")
 	TRUTHTABLE_END()
 
+	TRUTHTABLE_START(TTL_7420_GATE, 4, 1, 0, "")
+		TT_HEAD("A,B,C,D|Q ")
+		TT_LINE("0,X,X,X|1|22")
+		TT_LINE("X,0,X,X|1|22")
+		TT_LINE("X,X,0,X|1|22")
+		TT_LINE("X,X,X,0|1|22")
+		TT_LINE("1,1,1,1|0|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_7420_NAND, 4, 1, 0, "A,B,C,D")
+		TT_HEAD("A,B,C,D|Q ")
+		TT_LINE("0,X,X,X|1|22")
+		TT_LINE("X,0,X,X|1|22")
+		TT_LINE("X,X,0,X|1|22")
+		TT_LINE("X,X,X,0|1|22")
+		TT_LINE("1,1,1,1|0|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
 	TRUTHTABLE_START(TTL_7427_GATE, 3, 1, 0, "")
 		TT_HEAD("A,B,C|Q ")
 		TT_LINE("1,X,X|0|15")
@@ -552,6 +610,7 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7410_DIP)
 	LOCAL_LIB_ENTRY(TTL_7411_DIP)
 	LOCAL_LIB_ENTRY(TTL_7416_DIP)
+	LOCAL_LIB_ENTRY(TTL_7420_DIP)
 	LOCAL_LIB_ENTRY(TTL_7427_DIP)
 	LOCAL_LIB_ENTRY(TTL_7432_DIP)
 	LOCAL_LIB_ENTRY(TTL_7437_DIP)
