@@ -139,7 +139,6 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/devices/nld_system.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_system.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_cmos.h",
-		MAME_DIR .. "src/lib/netlist/devices/nld_signal.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_truthtable.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_truthtable.h",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_ttl74xx.cpp",
