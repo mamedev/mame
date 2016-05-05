@@ -502,6 +502,43 @@ NETLIST_START(TTL_7437_DIP)
 	)
 NETLIST_END()
 
+/*
+ *  DM7486: Quad 2-Input Exclusive-OR Gates
+ *
+ *             Y = A+B
+ *          +---+---++---+
+ *          | A | B || Y |
+ *          +===+===++===+
+ *          | 0 | 0 || 0 |
+ *          | 0 | 1 || 1 |
+ *          | 1 | 0 || 1 |
+ *          | 1 | 1 || 0 |
+ *          +---+---++---+
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
+ */
+
+NETLIST_START(TTL_7486_DIP)
+	TTL_7486_GATE(s1)
+	TTL_7486_GATE(s2)
+	TTL_7486_GATE(s3)
+	TTL_7486_GATE(s4)
+
+	DUMMY_INPUT(GND)
+	DUMMY_INPUT(VCC)
+
+	DIPPINS(   /*       +--------------+      */
+		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.B,  /*    B1 |2           13| B4   */ s4.B,
+		s1.Q,  /*    Y1 |3           12| A4   */ s4.A,
+		s2.A,  /*    A2 |4    7400   11| Y4   */ s4.Q,
+		s2.B,  /*    B2 |5           10| B3   */ s3.B,
+		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
+		GND.I, /*   GND |7            8| Y3   */ s3.Q
+				/*       +--------------+      */
+	)
+NETLIST_END()
 
 NETLIST_START(TTL74XX_lib)
 
@@ -733,6 +770,24 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
+	TRUTHTABLE_START(TTL_7486_GATE, 2, 1, 0, "")
+		TT_HEAD("A,B|Q ")
+		TT_LINE("0,0|0|15")
+		TT_LINE("0,1|1|22")
+		TT_LINE("1,0|1|22")
+		TT_LINE("1,1|0|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_7486_XOR, 2, 1, 0, "A,B")
+		TT_HEAD("A,B|Q ")
+		TT_LINE("0,0|0|15")
+		TT_LINE("0,1|1|22")
+		TT_LINE("1,0|1|22")
+		TT_LINE("1,1|0|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
 	LOCAL_LIB_ENTRY(TTL_7400_DIP)
 	LOCAL_LIB_ENTRY(TTL_7402_DIP)
 	LOCAL_LIB_ENTRY(TTL_7404_DIP)
@@ -746,4 +801,5 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7430_DIP)
 	LOCAL_LIB_ENTRY(TTL_7432_DIP)
 	LOCAL_LIB_ENTRY(TTL_7437_DIP)
+	LOCAL_LIB_ENTRY(TTL_7486_DIP)
 NETLIST_END()

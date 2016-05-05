@@ -173,6 +173,18 @@
 #define TTL_7437_DIP(_name)                                                    \
 		NET_REGISTER_DEV(TTL_7437_DIP, _name)
 
+
+#define TTL_7486_GATE(_name)                                                   \
+		NET_REGISTER_DEV(TTL_7486_GATE, _name)
+
+#define TTL_7486_XOR(_name, _A, _B)                                            \
+		NET_REGISTER_DEV(TTL_7486_XOR, _name)                                  \
+		NET_CONNECT(_name, A, _A)                                              \
+		NET_CONNECT(_name, B, _B)
+
+#define TTL_7486_DIP(_name)                                                    \
+		NET_REGISTER_DEV(TTL_7486_DIP, _name)
+
 /* ----------------------------------------------------------------------------
  *  External declarations
  * ---------------------------------------------------------------------------*/
