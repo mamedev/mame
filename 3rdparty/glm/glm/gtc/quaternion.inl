@@ -98,7 +98,7 @@ namespace detail
 	// -- Explicit basic constructors --
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tquat<T, P>::tquat(ctor)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tquat<T, P>::tquat(ctor)
 	{}
 
 	template <typename T, precision P>

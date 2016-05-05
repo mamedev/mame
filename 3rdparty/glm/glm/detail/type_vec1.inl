@@ -59,11 +59,11 @@ namespace glm
 	// -- Explicit basic constructors --
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec1<T, P>::tvec1(ctor)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec1<T, P>::tvec1(ctor)
 	{}
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec1<T, P>::tvec1(T scalar)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_GCC tvec1<T, P>::tvec1(T scalar)
 		: x(scalar)
 	{}
 

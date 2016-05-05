@@ -102,8 +102,8 @@ namespace glm
 
 		// -- Explicit basic constructors --
 
-		GLM_FUNC_DECL GLM_CONSTEXPR explicit tvec3(ctor);
-		GLM_FUNC_DECL GLM_CONSTEXPR explicit tvec3(T scalar);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR explicit tvec3(ctor);
+		GLM_FUNC_DECL GLM_CONSTEXPR_GCC explicit tvec3(T scalar);
 		GLM_FUNC_DECL GLM_CONSTEXPR tvec3(T a, T b, T c);
 
 		// -- Conversion scalar constructors --

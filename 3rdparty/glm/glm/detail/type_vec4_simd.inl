@@ -36,7 +36,7 @@ namespace glm
 
 #	if !GLM_HAS_DEFAULTED_FUNCTIONS
 		template <>
-		GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec4<float, simd>::tvec4()
+		GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec4<float, simd>::tvec4()
 #			ifndef GLM_FORCE_NO_CTOR_INIT
 				: data(_mm_setzero_ps())
 #			endif
@@ -44,12 +44,12 @@ namespace glm
 #	endif//!GLM_HAS_DEFAULTED_FUNCTIONS
 
 	template <>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec4<float, simd>::tvec4(float s) :
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<float, simd>::tvec4(float s) :
 		data(_mm_set1_ps(s))
 	{}
 
 	template <>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec4<float, simd>::tvec4(float a, float b, float c, float d) :
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_SIMD tvec4<float, simd>::tvec4(float a, float b, float c, float d) :
 		data(_mm_set_ps(d, c, b, a))
 	{}
 

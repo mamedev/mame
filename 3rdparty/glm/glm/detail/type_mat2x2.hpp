@@ -60,7 +60,7 @@ namespace glm
 		template <precision Q>
 		GLM_FUNC_DECL tmat2x2(tmat2x2<T, Q> const & m);
 
-		GLM_FUNC_DECL GLM_CONSTEXPR explicit tmat2x2(ctor);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR explicit tmat2x2(ctor);
 		GLM_FUNC_DECL explicit tmat2x2(T scalar);
 		GLM_FUNC_DECL tmat2x2(
 			T const & x1, T const & y1,

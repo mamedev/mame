@@ -87,7 +87,7 @@ namespace glm
 	// -- Explicit basic constructors --
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tdualquat<T, P>::tdualquat(ctor)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tdualquat<T, P>::tdualquat(ctor)
 	{}
 
 	template <typename T, precision P>
@@ -119,13 +119,13 @@ namespace glm
 	{}
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tdualquat<T, P>::tdualquat(tmat2x4<T, P> const & m)
+	GLM_FUNC_QUALIFIER tdualquat<T, P>::tdualquat(tmat2x4<T, P> const & m)
 	{
 		*this = dualquat_cast(m);
 	}
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tdualquat<T, P>::tdualquat(tmat3x4<T, P> const & m)
+	GLM_FUNC_QUALIFIER tdualquat<T, P>::tdualquat(tmat3x4<T, P> const & m)
 	{
 		*this = dualquat_cast(m);
 	}

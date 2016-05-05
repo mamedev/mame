@@ -157,9 +157,9 @@ namespace detail
 
 		// -- Explicit basic constructors --
 
-		GLM_FUNC_DECL GLM_CONSTEXPR explicit tvec4(ctor);
-		GLM_FUNC_DECL GLM_CONSTEXPR explicit tvec4(T scalar);
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec4(T a, T b, T c, T d);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR explicit tvec4(ctor);
+		GLM_FUNC_DECL GLM_CONSTEXPR_SIMD explicit tvec4(T scalar);
+		GLM_FUNC_DECL GLM_CONSTEXPR_SIMD tvec4(T a, T b, T c, T d);
 
 		// -- Conversion scalar constructors --
 

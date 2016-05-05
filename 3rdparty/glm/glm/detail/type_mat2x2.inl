@@ -81,7 +81,7 @@ namespace detail
 	}
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tmat2x2<T, P>::tmat2x2(ctor)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tmat2x2<T, P>::tmat2x2(ctor)
 	{}
 
 	template <typename T, precision P>

@@ -69,7 +69,7 @@ namespace glm
 	}
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tmat4x3<T, P>::tmat4x3(ctor)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tmat4x3<T, P>::tmat4x3(ctor)
 	{}
 
 	template <typename T, precision P>

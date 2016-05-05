@@ -57,11 +57,11 @@ namespace glm
 		// -- Constructors --
 
 		GLM_FUNC_DECL tmat4x3() GLM_DEFAULT_CTOR;
-		GLM_FUNC_DECL GLM_CONSTEXPR tmat4x3(tmat4x3<T, P> const & m) GLM_DEFAULT;
+		GLM_FUNC_DECL tmat4x3(tmat4x3<T, P> const & m) GLM_DEFAULT;
 		template <precision Q>
 		GLM_FUNC_DECL tmat4x3(tmat4x3<T, Q> const & m);
 
-		GLM_FUNC_DECL GLM_CONSTEXPR explicit tmat4x3(ctor);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR explicit tmat4x3(ctor);
 		GLM_FUNC_DECL explicit tmat4x3(T const & x);
 		GLM_FUNC_DECL tmat4x3(
 			T const & x0, T const & y0, T const & z0,
