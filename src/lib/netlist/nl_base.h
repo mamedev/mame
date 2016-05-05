@@ -156,6 +156,7 @@
 #define NLBASE_H_
 
 #include <vector>
+#include <memory>
 
 #include "nl_lists.h"
 #include "nl_time.h"

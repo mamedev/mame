@@ -41,7 +41,7 @@ pdynlib::pdynlib(const pstring libname)
 pdynlib::pdynlib(const pstring path, const pstring libname)
 : m_isLoaded(false), m_lib(nullptr)
 {
-	printf("win: loading <%s>\n", libname.cstr());
+	//	printf("win: loading <%s>\n", libname.cstr());
 #ifdef _WIN32
 	if (libname != "")
 		m_lib = LoadLibrary(libname.cstr());
@@ -50,9 +50,11 @@ pdynlib::pdynlib(const pstring path, const pstring libname)
 	if (m_lib != nullptr)
 		m_isLoaded = true;
 	else
-		printf("win: library <%s> not found!\n", libname.cstr());
+	{
+		//printf("win: library <%s> not found!\n", libname.cstr());
+	}
 #else
-	printf("loading <%s>\n", libname.cstr());
+	//printf("loading <%s>\n", libname.cstr());
 	if (libname != "")
 		m_lib = dlopen(libname.cstr(), RTLD_LAZY);
 	else
@@ -60,7 +62,9 @@ pdynlib::pdynlib(const pstring path, const pstring libname)
 	if (m_lib != nullptr)
 		m_isLoaded = true;
 	else
-		printf("library <%s> not found!\n", libname.cstr());
+	{
+		//printf("library <%s> not found!\n", libname.cstr());
+	}
 #endif
 }
 
