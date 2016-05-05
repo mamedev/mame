@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+
+#include <glm/glm/geometric.hpp>
+
 #include "emu.h"
 #include "cpu/mb86233/mb86233.h"
 #include "includes/model1.h"
@@ -32,36 +35,23 @@ float model1_state::readf(const UINT16 *adr) const
 void model1_state::view_t::transform_point(point_t *p) const
 {
 	point_t q = *p;
-	float xx, zz;
-	  xx = translation[0] * q.x + translation[3] * q.y + translation[6] * q.z + translation[ 9] + vxx;
-	p->y = translation[1] * q.x + translation[4] * q.y + translation[7] * q.z + translation[10] + vyy;
-	  zz = translation[2] * q.x + translation[5] * q.y + translation[8] * q.z + translation[11] + vzz;
+	float xx = translation[0] * q.x + translation[3] * q.y + translation[6] * q.z + translation[ 9] + vxx;
+	    p->y = translation[1] * q.x + translation[4] * q.y + translation[7] * q.z + translation[10] + vyy;
+	float zz = translation[2] * q.x + translation[5] * q.y + translation[8] * q.z + translation[11] + vzz;
 	p->x = ayyc * xx - ayys * zz;
 	p->z = ayys * xx + ayyc * zz;
 }
 
-void model1_state::view_t::transform_vector(vector_t *p) const
+void model1_state::view_t::transform_vector(glm::vec3& p) const
 {
-	vector_t q = *p;
-	p->set_x(translation[0] * q.x() + translation[3] * q.y() + translation[6] * q.z());
-	p->set_x(translation[1] * q.x() + translation[4] * q.y() + translation[7] * q.z());
-	p->set_x(translation[2] * q.x() + translation[5] * q.y() + translation[8] * q.z());
-}
-
-void model1_state::vector_t::normalize()
-{
-	float norm = sqrt(dot(*this, *this));
-	if (norm)
-	{
-		v[0] /= norm;
-		v[1] /= norm;
-		v[2] /= norm;
-	}
-}
-
-float model1_state::vector_t::dot(const vector_t& a, const vector_t& b)
-{
-	return a.v[0] * b.v[0] + a.v[1] * b.v[1] + a.v[2] * b.v[2];
+	glm::vec3 q(p);
+	glm::vec3 row1(translation[0], translation[3], translation[6]);
+	glm::vec3 row2(translation[1], translation[4], translation[7]);
+	glm::vec3 row3(translation[2], translation[5], translation[8]);
+	p = glm::vec3(glm::dot(q, row1), glm::dot(q, row2), glm::dot(q, row3));
+	//p->set_x(translation[0] * q.x() + translation[3] * q.y() + translation[6] * q.z());
+	//p->set_y(translation[1] * q.x() + translation[4] * q.y() + translation[7] * q.z());
+	//p->set_z(translation[2] * q.x() + translation[5] * q.y() + translation[8] * q.z());
 }
 
 void model1_state::cross_product(point_t* o, const point_t* p, const point_t* q) const
@@ -735,14 +725,14 @@ float model1_state::max4f(float a, float b, float c, float d)
 #ifdef UNUSED_DEFINITION
 static const UINT8 num_of_times[]={1,1,1,1,2,2,2,3};
 #endif
-float model1_state::compute_specular(vector_t *normal, vector_t *light, float diffuse,int lmode)
+float model1_state::compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse, int lmode)
 {
 #if 0
-	int p = view->lightparams[lmode].p & 7;
-	float sv = view->lightparams[lmode].s;
+	int p = m_view->lightparams[lmode].p & 7;
+	float sv = m_view->lightparams[lmode].s;
 
 	//This is how it should be according to model2 geo program, but doesn't work fine
-	float s = 2 * (diffuse * normal->z - light->z);
+	float s = 2 * (diffuse * normal.z - light.z);
 	for (int i = 0; i < num_of_times[p]; i++)
 	{
 		s *= s;
@@ -769,7 +759,7 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
 #if 0
     int dump;
 #endif
-    
+
     float *poly_data;
     if (poly_adr & 0x800000)
         poly_data = (float *)m_poly_ram.get();
@@ -814,7 +804,7 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
     old_p1->z = poly_data[poly_adr + 5];
     m_view->transform_point(old_p0);
     m_view->transform_point(old_p1);
-    
+
     if (old_p0->z > 0)
     {
         m_view->project_point(old_p0);
@@ -823,7 +813,7 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
     {
         old_p0->s.x = old_p0->s.y = 0;
     }
-    
+
     if (old_p1->z > 0)
     {
         m_view->project_point(old_p1);
@@ -859,7 +849,7 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
         point_t *p0 = m_pointpt++;
         point_t *p1 = m_pointpt++;
 
-        vector_t vn(poly_data[poly_adr + 1], poly_data[poly_adr + 2], poly_data[poly_adr + 3]);
+        glm::vec3 vn(poly_data[poly_adr + 1], poly_data[poly_adr + 2], poly_data[poly_adr + 3]);
         p0->x = poly_data[poly_adr + 4];
         p0->y = poly_data[poly_adr + 5];
         p0->z = poly_data[poly_adr + 6];
@@ -869,7 +859,7 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
 
         int link = (flags >> 8) & 3;
 
-        m_view->transform_vector(&vn);
+        m_view->transform_vector(vn);
 
         m_view->transform_point(p0);
         m_view->transform_point(p1);
@@ -881,7 +871,7 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
         {
             p0->s.x = p0->s.y = 0;
         }
-        
+
         if (p1->z > 0)
         {
             m_view->project_point(p1);
@@ -919,7 +909,7 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
         if (!(flags & 0x00004000) && view_determinant(old_p1, old_p0, p0) > 0)
             goto next;
 
-        vn.normalize();
+        vn = glm::normalize(vn);
 
         cquad.p[0] = old_p1;
         cquad.p[1] = old_p0;
@@ -950,22 +940,22 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
             cquad.col = scale_color(machine().pens[0x1000 | (m_tgp_ram[tex_adr - 0x40000] & 0x3ff)], MIN(1.0, ln));
             cquad.col = scale_color(machine().pens[0x1000 | (m_tgp_ram[tex_adr - 0x40000] & 0x3ff)], MIN(1.0, ln));
 #endif
-            
-            float dif = vector_t::dot(vn, m_view->light);
-            float spec = compute_specular(&vn, &m_view->light, dif, lightmode);
+
+            float dif = glm::dot(vn, m_view->light);
+            float spec = compute_specular(vn, m_view->light, dif, lightmode);
             float ln = m_view->lightparams[lightmode].a + m_view->lightparams[lightmode].d * MAX(0.0f, dif) + spec;
             int lumval = 255.0f * MIN(1.0f, ln);
             int color = m_paletteram16[0x1000 | (m_tgp_ram[tex_adr - 0x40000] & 0x3ff)];
             int r = (color >> 0x0) & 0x1f;
             int g = (color >> 0x5) & 0x1f;
             int b = (color >> 0xA) & 0x1f;
-            
+
             lumval >>= 2; //there must be a luma translation table somewhere
             if (lumval > 0x3f)
                 lumval = 0x3f;
             else if (lumval < 0)
                 lumval = 0;
-            
+
             r = (m_color_xlat[(r << 8) | lumval | 0x0] >> 3) & 0x1f;
             g = (m_color_xlat[(g << 8) | lumval | 0x2000] >> 3) & 0x1f;
             b = (m_color_xlat[(b << 8) | lumval | 0x4000] >> 3) & 0x1f;
@@ -1280,10 +1270,7 @@ void model1_state::view_t::set_zoom(float x, float y)
 
 void model1_state::view_t::set_light_direction(float x, float y, float z)
 {
-    light.set_x(x);
-    light.set_y(y);
-    light.set_z(z);
-    light.normalize();
+	light = glm::normalize(glm::vec3(x, y, z));
 }
 
 void model1_state::view_t::set_translation_matrix(float* mat)

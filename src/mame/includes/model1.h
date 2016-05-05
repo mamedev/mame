@@ -2,6 +2,8 @@
 // copyright-holders:Olivier Galibert
 #include <functional>
 
+#include <glm/glm/vec3.hpp>
+
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
 #include "cpu/v60/v60.h"
@@ -125,36 +127,6 @@ public:
 		int col;
 	};
 
-    // TOOD: Replace with glm::vec3
-	class vector_t
-	{
-    public:
-        vector_t()
-        {
-            memset(v, 0, sizeof(float) * 3);
-        }
-        vector_t(float x, float y, float z)
-        {
-            set_x(x);
-            set_y(y);
-            set_z(z);
-        }
-		
-        void normalize();
-
-        static float dot(const vector_t& a, const vector_t& b);
-
-        float x() { return v[0]; }
-        float y() { return v[1]; }
-        float z() { return v[2]; }
-        void set_x(float x) { v[0] = x; }
-        void set_y(float y) { v[1] = y; }
-        void set_z(float z) { v[2] = z; }
-
-    private:
-        float v[3];
-	};
-
 	struct lightparam_t
 	{
 		float a;
@@ -169,18 +141,18 @@ public:
         view_t() { }
 
         void init_translation_matrix();
-        
+
         void set_viewport(float xcenter, float ycenter, float xl, float xr, float yb, float yt);
         void set_lightparam(int index, float diffuse, float ambient, float specular, int power);
         void set_zoom(float x, float y);
         void set_light_direction(float x, float y, float z);
         void set_translation_matrix(float* mat);
         void set_view_translation(float x, float y);
-        
+
         void project_point(point_t *p) const;
         void project_point_direct(point_t *p) const;
-        
-        void transform_vector(vector_t *p) const;
+
+        void transform_vector(glm::vec3& p) const;
         void transform_point(point_t *p) const;
 
         void recompute_frustum();
@@ -190,7 +162,7 @@ public:
 		float a_bottom, a_top, a_left, a_right;
 		float vxx, vyy, vzz, ayy, ayyc, ayys;
 		float translation[12];
-		vector_t light;
+		glm::vec3 light;
 		lightparam_t lightparams[32];
 	};
 
@@ -467,7 +439,7 @@ private:
 
     static float	min4f(float a, float b, float c, float d);
     static float	max4f(float a, float b, float c, float d);
-	static float	compute_specular(vector_t *normal, vector_t *light, float diffuse,int lmode);
+	static float	compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse,int lmode);
 
 	void	push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size);
 	UINT16*	push_direct(UINT16 *list);
