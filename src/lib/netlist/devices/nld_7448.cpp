@@ -9,7 +9,7 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-#if (0 && USE_TRUTHTABLE)
+#if (USE_TRUTHTABLE_7448 && USE_TRUTHTABLE)
 nld_7448::truthtable_t nld_7448::m_ttbl;
 const char *nld_7448::m_desc[] = {
 		" LTQ,BIQ,RBIQ, A , B , C , D | a, b, c, d, e, f, g",
@@ -45,13 +45,13 @@ NETLIB_START(7448_dip)
 {
 	NETLIB_NAME(7448)::start();
 
-	register_subalias("1", m_i[4]); // B
-	register_subalias("2", m_i[5]); // C
-	register_subalias("3", m_i[0]); // LTQ
-	register_subalias("4", m_i[1]); // BIQ
-	register_subalias("5", m_i[2]); // RBIQ
-	register_subalias("6", m_i[6]); // D
-	register_subalias("7", m_i[3]); // A
+	register_subalias("1", m_I[4]); // B
+	register_subalias("2", m_I[5]); // C
+	register_subalias("3", m_I[0]); // LTQ
+	register_subalias("4", m_I[1]); // BIQ
+	register_subalias("5", m_I[2]); // RBIQ
+	register_subalias("6", m_I[6]); // D
+	register_subalias("7", m_I[3]); // A
 
 	register_subalias("9",  m_Q[4]); // e
 	register_subalias("10", m_Q[3]); // d
