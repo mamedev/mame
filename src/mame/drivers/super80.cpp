@@ -219,6 +219,7 @@ ToDo:
 #include "emu.h"
 #include "super80.lh"
 #include "includes/super80.h"
+#include "softlist.h"
 
 #define MASTER_CLOCK    (XTAL_12MHz)
 #define PIXEL_CLOCK (MASTER_CLOCK/2)
@@ -733,10 +734,14 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("super80_cass")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", super80_state, timer_p, attotime::from_hz(40000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", super80_state, timer_k, attotime::from_hz(300)) // keyb scan
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_h", super80_state, timer_h, attotime::from_hz(100)) // half-speed
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "super80_cass")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( super80d, super80 )

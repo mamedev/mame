@@ -214,7 +214,7 @@ INPUT_PORTS_END
 
 static SLOT_INTERFACE_START( osborne1_floppies )
 	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD) // Siemens FDD 100-5, custom Osborne electronics
-	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD) // MPI 52(?), custom Osborne electronics
+	SLOT_INTERFACE("525ssdd", FLOPPY_525_QD) // SSDD) // MPI 52(?), custom Osborne electronics
 SLOT_INTERFACE_END
 
 

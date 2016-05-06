@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+     The original tapes have died long ago, so these were loaded from the
+     archived quickloads into MAME, then saved at 300 baud.
+ -->
+<softwarelist name="super80_cass" description="Super-80 cassettes">
+<!--
+     Sold in Dick Smith stores and intended for use with super80 and super80d.
+     debug, edasm, and basic have numerous bugs.
+ -->
+	<software name="horserac">
+		<description>Horse Race</description>
+		<year>1981</year>
+		<publisher>Dick Smith Electronics</publisher>
+		<info name="serial" value="X-3607" />
+		<info name="developer" value="George Georgiou"/>
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="14748244">
+				<rom name="horserace.wav" size="14748244" crc="fbc8ef36" sha1="a81da0caf9dddef2ce876ebb43b46f4debc626e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="dungeon">
+		<description>Dungeon Dilemma</description>
+		<year>1981</year>
+		<publisher>Dick Smith Electronics</publisher>
+		<info name="serial" value="X-3792" />
+		<info name="developer" value="George Georgiou"/>
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="28496858">
+				<rom name="dungeon.wav" size="28496858" crc="4231031b" sha1="7d6db9059e5699e7d9a7ff0ae656ca90d1531614" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="basic">
+		<description>Tape Basic</description>
+		<year>1981</year>
+		<publisher>Dick Smith Electronics</publisher>
+		<info name="serial" value="K-3602" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="32782636">
+				<rom name="basic.wav" size="32782636" crc="c2ca8df8" sha1="9d5ede3ca881138e4664c4464dea549964dad5d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="edasm">
+		<description>Editor Assembler</description>
+		<year>1981</year>
+		<publisher>Dick Smith Electronics</publisher>
+		<info name="serial" value="X-3791" />
+		<info name="usage" value="0xF0 must be nonzero, L to load, G8000 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="23330502">
+				<rom name="edasm.wav" size="23330502" crc="9d06f597" sha1="1b42f1ebec6b2259dcc992cb8fe95bd389409d43" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="debug">
+		<description>Debugger</description>
+		<year>1981</year>
+		<publisher>Dick Smith Electronics</publisher>
+		<info name="serial" value="X-3790" />
+		<info name="usage" value="0xF0 must be nonzero, L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="13885816">
+				<rom name="debug.wav" size="13885816" crc="27c6cfe7" sha1="c6c961cad63eee987405efff35d1843131660d4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
