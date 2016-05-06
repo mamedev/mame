@@ -182,6 +182,7 @@ void patinho_feio_state::machine_start(){
 	load_raw_data("hexam", 0xE00, 0x0D5);
 
 	load_raw_data("loader", 0xF80, 0x080);
+	load_raw_data("micro_pre_loader", 0x000, 0x02A);
 }
 
 static INPUT_PORTS_START( patinho_feio )
@@ -234,11 +235,11 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 
 
         /* DECWRITER */
-        MCFG_DEVICE_ADD("decwriter", TELEPRINTER, 0)
-        MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(WRITE8(patinho_feio_state, decwriter_kbd_input))
+	MCFG_DEVICE_ADD("decwriter", TELEPRINTER, 0)
+	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(WRITE8(patinho_feio_state, decwriter_kbd_input))
 
         /* Teletype */
-        MCFG_DEVICE_ADD("teletype", TELEPRINTER, 1)
+	MCFG_DEVICE_ADD("teletype", TELEPRINTER, 1)
 	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(WRITE8(patinho_feio_state, teletype_kbd_input))
 
 	/* punched tape */
@@ -259,6 +260,12 @@ ROM_START( patinho )
 
 	ROM_REGION( 0x080, "loader", 0 )
 	ROM_LOAD( "loader.bin", 0x000, 0x080, BAD_DUMP CRC(c2a8fa9d) SHA1(0ae4f711ef5d6e9d26c611fd2c8c8ac45ecbf9e7) )
+
+	/* Micro pre-loader:
+	   This was re-created by professor Joao Jose Neto based on his vague
+           recollection of sequences of opcode values from almost 40 years ago :-) */
+	ROM_REGION( 0x02a, "micro_pre_loader", 0 ) 
+	ROM_LOAD( "micro-pre-loader.bin", 0x000, 0x02a, CRC(1921feab) SHA1(bb063102e44e9ab963f95b45710141dc2c5046b0) )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE        INPUT         INIT                              COMPANY                                           FULLNAME */

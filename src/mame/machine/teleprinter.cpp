@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
 #include "teleprinter.h"
-#include "asr33_glyphs_11px.xpm"
+#include "asr33_16x20.xpm"
 #define KEYBOARD_TAG "keyboard"
 #define PAPER_COLOR 0xFEF0CC
 
@@ -96,7 +96,7 @@ UINT32 teleprinter_device::tp_update(screen_device &device, bitmap_rgb32 &bitmap
 
 	for (y = 0; y < TELEPRINTER_HEIGHT; y++)
 	{
-		for (c = 0; c < 12; c++)
+		for (c = 0; c < 20; c++)
 		{
 			int horpos = 0;
 			for (x = 0; x < TELEPRINTER_WIDTH; x++)
@@ -106,19 +106,19 @@ UINT32 teleprinter_device::tp_update(screen_device &device, bitmap_rgb32 &bitmap
 					if (teleprinter_chars[glyph_id] == textchar) break;
 				}
 				if (glyph_id == 62){
-					for (b = 0; b < 11; b++)
-						bitmap.pix32(y*12 + c, horpos++) = PAPER_COLOR;
+					for (b = 0; b < 16; b++)
+						bitmap.pix32(y*20 + c, horpos++) = PAPER_COLOR;
 				} else {
 
-					for (b = 0; b < 11; b++)
+					for (b = 0; b < 16; b++)
 					{
-						code = asr33_glyphs_11px_xpm[num_colors + 1 + c][2*(glyph_id*11 + b)];
-						code += asr33_glyphs_11px_xpm[num_colors + 1 + c][2*(glyph_id*11 + b) + 1] << 8;
+						code = asr33_16x20_xpm[num_colors + 1 + c][2*(glyph_id*16 + b)];
+						code += asr33_16x20_xpm[num_colors + 1 + c][2*(glyph_id*16 + b) + 1] << 8;
 						for (int idx=0; idx<num_colors;idx++){
-							abgr = get_color_if_code_matches(code, asr33_glyphs_11px_xpm[idx+1]);
+							abgr = get_color_if_code_matches(code, asr33_16x20_xpm[idx+1]);
 							if (abgr) break;
 						}
-						bitmap.pix32(y*12 + c, horpos++) =  abgr;
+						bitmap.pix32(y*20 + c, horpos++) =  abgr;
 					}
 				}
 			}
@@ -143,8 +143,8 @@ MACHINE_CONFIG_FRAGMENT( generic_teleprinter )
 	MCFG_SCREEN_ADD(TELEPRINTER_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(TELEPRINTER_WIDTH*11, TELEPRINTER_HEIGHT*12)
-	MCFG_SCREEN_VISIBLE_AREA(0, TELEPRINTER_WIDTH*11-1, 0, TELEPRINTER_HEIGHT*12-1)
+	MCFG_SCREEN_SIZE(TELEPRINTER_WIDTH*16, TELEPRINTER_HEIGHT*20)
+	MCFG_SCREEN_VISIBLE_AREA(0, TELEPRINTER_WIDTH*16-1, 0, TELEPRINTER_HEIGHT*20-1)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, teleprinter_device, tp_update)
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(generic_terminal_device, kbd_put))
