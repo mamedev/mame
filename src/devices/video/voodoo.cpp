@@ -803,10 +803,6 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 		count = 15;
 	vd->reg[fbiSwapHistory].u = (vd->reg[fbiSwapHistory].u << 4) | count;
 
-	if (USE_GPU) {
-		vd->m_gpu.FlushBuffer();
-	}
-
 	/* rotate the buffers */
 	if (vd->vd_type <= TYPE_VOODOO_2)
 	{
@@ -1887,6 +1883,9 @@ UINT32 voodoo_device::cmdfifo_execute(voodoo_device *vd, cmdfifo_info *f)
 					if (LOG_CMDFIFO) vd->device->logerror("  PACKET TYPE 5: FB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
 
 					UINT32 addr = target * 4;
+					// Check for texture updates
+					if (USE_GPU)
+						vd->m_gpu.FlagTexture(addr);
 					for (i=0; i < count; i++)
 					{
 						UINT32 data = *src++;
@@ -3435,7 +3434,7 @@ INT32 voodoo_device::texture_w(voodoo_device *vd, offs_t offset, UINT32 data)
 		recompute_texture_params(t);
 
 	// Check to see if memory location being used by existing texture
-	if USE_GPU {
+	if (USE_GPU) {
 		vd->m_gpu.FlagTexture(tmunum, t->lodoffset, t->reg[tLOD].u);
 	}
 
@@ -4810,8 +4809,9 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_fb_w )
 			cmdfifo_w(this, &fbi.cmdfifo[1], (addr - fbi.cmdfifo[1].base) / 4, data);
 		else
 		{
-			if (offset*4 <= fbi.mask)
+			if (addr <= fbi.mask) {
 				COMBINE_DATA(&((UINT32 *)fbi.ram)[offset]);
+			}
 			else
 				logerror("%s:banshee_fb_w Out of bounds (%X) = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 #if LOG_LFB

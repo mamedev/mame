@@ -229,6 +229,7 @@ public:
 
 	void UpdateTexCtrl(int enalbeTex0, int enableTex1);
 	void UpdateConstants();
+	void FlagTexture(UINT32 &offset);
 	void FlagTexture(int index, UINT32 *texBase, UINT32 &texLod);
 	Combine_Struct ConvertTexmode(UINT32 &texMode);
 	void CreateTexture(texDescription &desc, int index, UINT32 &texMode, UINT32 &texLod, UINT32 &texDetail);

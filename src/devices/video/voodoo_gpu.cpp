@@ -1157,7 +1157,7 @@ void voodoo_gpu::DrawTriangle(ShaderVertex *triangleVertices, uint16_t *dst)
 		DrawPixels();
 
 	// Check if destination frame buffer has changed
-	if (m_need_copy && m_destBuffer != dst)
+	if (1 && m_need_copy && m_destBuffer != dst)
 	{
 		CopyBuffer(m_destBuffer);
 	}
@@ -1309,7 +1309,7 @@ void voodoo_gpu::FastFill(int sx, int ex, int sy, int ey, uint16_t *dst)
 		DrawPixels();
 
 	// Check if destination frame buffer has changed
-	if (m_need_copy && m_destBuffer != dst)
+	if (1 && m_need_copy && m_destBuffer != dst)
 	{
 		CopyBuffer(m_destBuffer);
 	}
@@ -1563,6 +1563,28 @@ void voodoo_gpu::CopyBufferComp(uint16_t *dst)
 	SAFE_RELEASE(pNewTexture);
 }
 
+void voodoo_gpu::FlagTexture(UINT32 &offset)
+{
+	if (!m_texHist.empty()) {
+		if (m_texMap.find(offset) != m_texMap.end())
+		{
+			//printf("voodoo_gpu::FlagTexture: Write to offset 0x%08X .  Wiping out %d current textures\n", offset, INT32(m_texHist.size()));
+			//m_texMap.erase(mapIndex);
+			//m_texHist
+			// Nuke everything
+			for (std::map<UINT32, Tex_Map_List_Struct>::iterator ii = m_texMap.begin(); ii != m_texMap.end(); ++ii)
+			{
+				SAFE_RELEASE((*ii).second.texTexture);
+				SAFE_RELEASE((*ii).second.texRV);
+				SAFE_RELEASE((*ii).second.texSampler);
+			}
+			m_texMap.clear();
+			while (!m_texHist.empty())
+				m_texHist.pop();
+		}
+	}
+}
+
 void voodoo_gpu::FlagTexture(int index, UINT32 *texBase, UINT32 &texLod)
 {
 	if (!m_texHist.empty()) {
@@ -1570,6 +1592,7 @@ void voodoo_gpu::FlagTexture(int index, UINT32 *texBase, UINT32 &texLod)
 		UINT32 mapIndex = texBase[minLod] + index;
 		if (m_texMap.find(mapIndex) != m_texMap.end())
 		{
+			//printf("voodoo_gpu::FlagTexture: Write to mapIndex 0x%08X .  Wiping out all %d current textures\n", mapIndex, INT32(m_texHist.size()));
 			//m_texMap.erase(mapIndex);
 			//m_texHist
 			// Nuke everything
@@ -1613,6 +1636,7 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, UINT32 &texMode,
 	{
 		if (m_texMap.size() == MAX_TEX)
 		{
+			//printf("voodoo_gpu::CreateTexture mapIndex: %08X. Removing oldest enty\n", mapIndex);
 			// Erase the oldest entry
 			Tex_Map_List_Struct old_map = m_texMap[m_texHist.front()];
 			SAFE_RELEASE(old_map.texTexture);
@@ -1761,11 +1785,12 @@ void voodoo_gpu::CreateTexture(texDescription &desc, int index, UINT32 &texMode,
 void voodoo_gpu::PushPixel(int &x, int &y, int &mask, int *sr, int *sg, int *sb, int *sa, int *sz, UINT32 wSel, UINT32 &wVal, uint16_t *dst)
 {
 	// Check if destination frame buffer has changed
-	if (m_need_copy && m_destBuffer != dst)
+	// Skip this for now to save cycles
+	if (0 && m_need_copy && m_destBuffer != dst)
 	{
 		CopyBuffer(m_destBuffer);
-		m_destBuffer = dst;
 	}
+	m_destBuffer = dst;
 
 	ShaderPoint pixel;
 	for (size_t pix = 0; pix < 2; ++pix)
