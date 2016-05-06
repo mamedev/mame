@@ -9,7 +9,7 @@
 #include "bus/generic/carts.h"
 #include "softlist.h"
 #include "cpu/patinhofeio/patinho_feio.h"
-#include "machine/terminal.h"
+#include "machine/teleprinter.h"
 
 class patinho_feio_state : public driver_device
 {
@@ -17,8 +17,8 @@ public:
 	patinho_feio_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
                 , m_maincpu(*this, "maincpu")
-		, m_decwriter_paper(*this, "decwriter_paper")
-		, m_tty_paper(*this, "teletype_paper")
+		, m_decwriter(*this, "decwriter")
+		, m_tty(*this, "teletype")
 	{ }
 
 	DECLARE_DRIVER_INIT(patinho_feio);
@@ -26,9 +26,11 @@ public:
 
 	DECLARE_WRITE8_MEMBER(decwriter_data_w);
 	DECLARE_WRITE8_MEMBER(decwriter_kbd_input);
+	TIMER_CALLBACK_MEMBER(decwriter_callback);
 
 	DECLARE_WRITE8_MEMBER(teletype_data_w);
 	DECLARE_WRITE8_MEMBER(teletype_kbd_input);
+	TIMER_CALLBACK_MEMBER(teletype_callback);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( patinho_tape );
 	void load_tape(const char* name);
@@ -36,12 +38,15 @@ public:
 	virtual void machine_start() override;
 
 	required_device<patinho_feio_cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_decwriter_paper;
-	required_device<generic_terminal_device> m_tty_paper;
+	required_device<teleprinter_device> m_decwriter;
+	required_device<teleprinter_device> m_tty;
 private:
         UINT8* paper_tape_data;
         UINT32 paper_tape_length;
         UINT32 paper_tape_address;
+
+	emu_timer *m_decwriter_timer;
+	emu_timer *m_teletype_timer;
 };
 
 /*
@@ -58,7 +63,25 @@ READ16_MEMBER(patinho_feio_state::rc_r)
 
 WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
 {
-	m_decwriter_paper->write(space, 0, data);
+	m_decwriter->write(space, 0, data);
+
+	m_maincpu->set_iodev_status(0xA, IODEV_BUSY);
+
+	if (data == 0x0D){
+		m_decwriter_timer->adjust(attotime::from_hz(1/0.700)); //carriage return takes 700 msecs
+	} else {
+		m_decwriter_timer->adjust(attotime::from_hz(10)); //10 characters per second
+	}
+	m_decwriter_timer->enable(1); //start the timer
+}
+
+/*
+    timer callback to generate decwriter char print completion signal
+*/
+TIMER_CALLBACK_MEMBER(patinho_feio_state::decwriter_callback)
+{
+	m_maincpu->set_iodev_status(0xA, IODEV_READY);
+	m_decwriter_timer->enable(0); //stop the timer
 }
 
 WRITE8_MEMBER(patinho_feio_state::decwriter_kbd_input)
@@ -68,9 +91,21 @@ WRITE8_MEMBER(patinho_feio_state::decwriter_kbd_input)
 
 WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
 {
-        m_tty_paper->write(space, 0, data);
+        m_tty->write(space, 0, data);
+
+	m_maincpu->set_iodev_status(0xB, IODEV_READY);
+	m_teletype_timer->adjust(attotime::from_hz(10)); //10 characters per second
+	m_teletype_timer->enable(1); //start the timer
 }
 
+/*
+    timer callback to generate teletype char print completion signal
+*/
+TIMER_CALLBACK_MEMBER(patinho_feio_state::teletype_callback)
+{
+	m_maincpu->set_iodev_status(0xB, IODEV_READY);
+	m_teletype_timer->enable(0); //stop the timer
+}
 
 WRITE8_MEMBER(patinho_feio_state::teletype_kbd_input)
 {
@@ -129,6 +164,9 @@ DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state, patinho_tape )
 }
 
 void patinho_feio_state::machine_start(){
+	m_teletype_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(patinho_feio_state::teletype_callback),this));
+	m_decwriter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(patinho_feio_state::decwriter_callback),this));
+
 	// Copy some programs directly into RAM.
 	// This is a hack for setting up the computer
 	// while we don't support loading programs
@@ -179,25 +217,29 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 	/* Card Reader */
 //	MCFG_PATINHO_IODEV_READ_CB(0x9, READ8(patinho_feio_state, cardreader_data_r))
 
-	/* DECWRITER */
+	/* DECWRITER
+           (max. speed: ?) */
 	MCFG_PATINHO_IODEV_WRITE_CB(0xA, WRITE8(patinho_feio_state, decwriter_data_w))
 
-	/* Teletype */
+	/* Teleprinter
+           TeleType ASR33
+           (max. speed: 10 characteres per second)
+           with paper tape reading (and optionally punching) capabilities */
 	MCFG_PATINHO_IODEV_WRITE_CB(0xB, WRITE8(patinho_feio_state, teletype_data_w))
 
-	/* Papertape Reader */
+	/* Papertape Reader
+           Hewlett-Packard HP-2737-A
+           Optical Papertape Reader (max. speed: 300 characteres per second) */
 //	MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(patinho_feio_state, papertapereader_data_r))
 
 
-        /* video hardware to represent what you'd see
-           printed on paper on the DECWRITER */
-        MCFG_DEVICE_ADD("decwriter_paper", GENERIC_TERMINAL, 0)
-        MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(patinho_feio_state, decwriter_kbd_input))
+        /* DECWRITER */
+        MCFG_DEVICE_ADD("decwriter", TELEPRINTER, 0)
+        MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(WRITE8(patinho_feio_state, decwriter_kbd_input))
 
-        /* video hardware to represent what you'd see
-           printed on paper on the Teletype */
-        MCFG_DEVICE_ADD("teletype_paper", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(patinho_feio_state, teletype_kbd_input))
+        /* Teletype */
+        MCFG_DEVICE_ADD("teletype", TELEPRINTER, 1)
+	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(WRITE8(patinho_feio_state, teletype_kbd_input))
 
 	/* punched tape */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "patinho_tape")

@@ -12,8 +12,6 @@
 	devcb = &patinho_feio_cpu_device::set_iodev_read_callback(*device, devnumber, DEVCB_##_devcb);
 #define MCFG_PATINHO_IODEV_WRITE_CB(devnumber, _devcb) \
 	devcb = &patinho_feio_cpu_device::set_iodev_write_callback(*device, devnumber, DEVCB_##_devcb);
-#define MCFG_PATINHO_IODEV_STATUS_CB(devnumber, _devcb) \
-	devcb = &patinho_feio_cpu_device::set_iodev_status_callback(*device, devnumber, DEVCB_##_devcb);
 
 /* register IDs */
 enum
@@ -38,6 +36,9 @@ public:
         template<class _Object> static devcb_base &set_iodev_status_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_status_cb[devnumber].set_callback(object); }
 
 	void transfer_byte_from_external_device(UINT8 channel, UINT8 data);
+	void set_iodev_status(UINT8 channel, bool status) {
+		m_iodev_status[channel] = status;
+	}
 protected:
 
 	virtual void execute_run() override;

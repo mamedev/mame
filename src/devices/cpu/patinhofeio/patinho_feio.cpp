@@ -128,7 +128,7 @@ void patinho_feio_cpu_device::device_start()
 
 void patinho_feio_cpu_device::device_reset()
 {
-	m_pc = 0xE00;
+	m_pc = 0x006;
 	m_rc = 0;
 	m_acc = 0;
 	m_ext = READ_ACC_EXTENSION_REG();
