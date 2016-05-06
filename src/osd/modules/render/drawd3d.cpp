@@ -30,13 +30,6 @@
 
 
 //============================================================
-//  DEBUGGING
-//============================================================
-
-extern void mtlog_add(const char *event);
-
-
-//============================================================
 //  CONSTANTS
 //============================================================
 
@@ -704,7 +697,6 @@ void renderer_d3d9::begin_frame()
 	m_texture_manager->update_textures();
 
 	// begin the scene
-	mtlog_add("drawd3d_window_draw: begin_scene");
 	result = (*d3dintf->device.begin_scene)(m_device);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device begin_scene call\n", (int)result);
 

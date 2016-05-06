@@ -6,7 +6,6 @@
 //
 //============================================================
 
-#define LOG_THREADS         0
 #define LOG_TEMP_PAUSE      0
 
 // Needed for RAW Input
@@ -128,48 +127,6 @@ static HANDLE window_thread_ready_event;
 
 
 static void create_window_class(void);
-
-// temporary hacks
-#if LOG_THREADS
-struct mtlog
-{
-	osd_ticks_t timestamp;
-	const char *event;
-};
-
-static mtlog mtlog[100000];
-static std::atomic<INT32> mtlogindex;
-
-void mtlog_add(const char *event)
-{
-	int index = mtlogindex++;
-	if (index < ARRAY_LENGTH(mtlog))
-	{
-		mtlog[index].timestamp = osd_ticks();
-		mtlog[index].event = event;
-	}
-}
-
-static void mtlog_dump(void)
-{
-	osd_ticks_t cps = osd_ticks_per_second();
-	osd_ticks_t last = mtlog[0].timestamp * 1000000 / cps;
-	int i;
-
-	FILE *f = fopen("mt.log", "w");
-	for (i = 0; i < mtlogindex; i++)
-	{
-		osd_ticks_t curr = mtlog[i].timestamp * 1000000 / cps;
-		fprintf(f, "%s",string_format("%20I64d %10I64d %s\n", (UINT64)curr, (UINT64)(curr - last), mtlog[i].event).c_str());
-		last = curr;
-	}
-	fclose(f);
-}
-#else
-void mtlog_add(const char *event) { }
-#endif
-
-
 
 //============================================================
 //  window_init
@@ -892,8 +849,6 @@ void win_window_info::update()
 
 	assert(GetCurrentThreadId() == main_threadid);
 
-	mtlog_add("winwindow_video_window_update: begin");
-
 	// see if the target has changed significantly in window mode
 	targetview = m_target->view();
 	targetorient = m_target->orientation();
@@ -919,8 +874,6 @@ void win_window_info::update()
 	{
 		bool got_lock = true;
 
-		mtlog_add("winwindow_video_window_update: try lock");
-
 		// only block if we're throttled
 		if (machine().video().throttled() || timeGetTime() - last_update_time > 250)
 			m_render_lock.lock();
@@ -932,8 +885,6 @@ void win_window_info::update()
 		{
 			render_primitive_list *primlist;
 
-			mtlog_add("winwindow_video_window_update: got lock");
-
 			// don't hold the lock; we just used it to see if rendering was still happening
 			m_render_lock.unlock();
 
@@ -942,13 +893,10 @@ void win_window_info::update()
 
 			// post a redraw request with the primitive list as a parameter
 			last_update_time = timeGetTime();
-			mtlog_add("winwindow_video_window_update: PostMessage start");
+
 			SendMessage(platform_window<HWND>(), WM_USER_REDRAW, 0, (LPARAM)primlist);
-			mtlog_add("winwindow_video_window_update: PostMessage end");
 		}
 	}
-
-	mtlog_add("winwindow_video_window_update: end");
 }
 
 
@@ -1529,10 +1477,8 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		{
 			HDC hdc = GetDC(wnd);
 
-			mtlog_add("winwindow_video_window_proc: WM_USER_REDRAW begin");
 			window->m_primlist = (render_primitive_list *)lparam;
 			window->draw_video_contents(hdc, FALSE);
-			mtlog_add("winwindow_video_window_proc: WM_USER_REDRAW end");
 
 			ReleaseDC(wnd, hdc);
 			break;
@@ -1596,11 +1542,7 @@ void win_window_info::draw_video_contents(HDC dc, int update)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
-	mtlog_add("draw_video_contents: begin");
-
-	mtlog_add("draw_video_contents: render lock acquire");
 	std::lock_guard<std::mutex> lock(m_render_lock);
-	mtlog_add("draw_video_contents: render lock acquired");
 
 	// if we're iconic, don't bother
 	if (platform_window<HWND>() != nullptr && !IsIconic(platform_window<HWND>()))
@@ -1619,13 +1561,8 @@ void win_window_info::draw_video_contents(HDC dc, int update)
 			// update DC
 			m_dc = dc;
 			m_renderer->draw(update);
-			mtlog_add("draw_video_contents: drawing finished");
 		}
 	}
-
-	mtlog_add("draw_video_contents: render lock released");
-
-	mtlog_add("draw_video_contents: end");
 }
 
 
