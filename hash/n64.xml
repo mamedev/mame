@@ -3657,6 +3657,17 @@ patched out (+ a fix for internal checksum)
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="dukenk64p" cloneof="dukenk64">
+		<description>Duke Nukem 64 (Euro, Prototype)</description>
+		<year>1997</year>
+		<publisher>GT Interactive</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="duke nukem 64 (europe) (beta).bin" size="8388608" crc="1ff97bad" sha1="f4adffeb61eccf5715e3f61a9d24b87ce2ae08c9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="dukenkzh">
 		<description>Duke Nukem - Zero Hour (Euro)</description>

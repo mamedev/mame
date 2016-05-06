@@ -559,10 +559,14 @@ void nes_cart_slot_device::call_load_pcb()
 
 	// SETUP step 4: logging what we have found
 	logerror("Loaded game from softlist:\n");
-	logerror("-- PCB: %s", get_feature("pcb"));
-	if (m_pcb_id == UNSUPPORTED_BOARD)
-		logerror(" (currently not supported by MESS)");
-	logerror("\n-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
+	if (get_feature("pcb"))
+	{
+		logerror("-- PCB: %s", get_feature("pcb"));
+		if (m_pcb_id == UNSUPPORTED_BOARD)
+			logerror(" (currently not supported by MESS)");
+		logerror("\n");
+	}
+	logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
 	logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
 	logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
 	logerror("-- PRG NVWRAM: %d\n", battery_size + mapper_sram_size);

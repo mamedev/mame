@@ -6365,11 +6365,11 @@
 		<description>Garfield Labyrinth (Euro)</description>
 		<year>1992</year>
 		<publisher>Kemco</publisher>
-		<info name="serial" value="DMG-L4-UKV"/>
+		<info name="serial" value="DMG-L4-UKV, DMG-L4-NOE"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="garfield labyrinth (europe).bin" size="131072" crc="6a043abd" sha1="106b0b65fe06ed352de34c9bf640c3e024d8c0e5" offset="000000" />
+				<rom name="garfield labyrinth (europe).bin" size="131072" crc="51b8626d" sha1="87913e557dfb98c5f2a0f42ea074c36eca57a4f7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14231,12 +14231,12 @@
 		</part>
 	</software>
 
-	<software name="pacintim">
+	<software name="pacintimu" cloneof="pacintim">
 		<!-- Notes: SGB enhanced -->
-		<description>Pac-In-Time (Euro)</description>
+		<description>Pac-In-Time (USA)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
-		<info name="serial" value="DMG-APTP-NOE"/>
+		<info name="serial" value="DMG-APTE-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -14261,11 +14261,12 @@
 		</part>
 	</software>
 
-	<software name="pacintimu" cloneof="pacintim">
-		<description>Pac-In-Time (USA)</description>
+	<software name="pacintim">
+		<!-- Notes: SGB enhanced -->
+		<description>Pac-In-Time (Euro)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
-		<info name="serial" value="DMG-APTE-USA"/>
+		<info name="serial" value="DMG-APTP-NOE, DMG-APTP-FAH"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -19980,8 +19981,27 @@
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="sml2ja" cloneof="sml2">
+		<!-- Notes: Also released by NP in 2000-03 -->
+		<description>Super Mario Land 2 - 6-tsu no Kinka (Jpn, Rev. A)</description>
+		<year>1992</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="DMG-L6J"/>
+		<info name="release" value="19921021"/>
+		<info name="alt_title" value="スーパーマリオランド2 6つの金貨"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="524288">
+				<rom name="marioland2.bin" size="524288" crc="bf733e10" sha1="f536d4d76a22668b8672bb291e4c738abc55d759" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sml2jb" cloneof="sml2">
 		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Super Mario Land 2 - 6-tsu no Kinka (Jpn)</description>
 		<year>1992</year>
@@ -24019,6 +24039,30 @@
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="pocket sonar (japan).bin" size="524288" crc="d68c9f79" sha1="788cdf148431b82b5308c68b3e45b133a7074196" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="datenlog">
+		<description>Game Boy Datenlogger 1 (Ger, v1.0)</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="GBD1"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="game boy datenlogger 1 (germany) (v1.0) (gbd1) (unl).bin" size="32768" crc="9ab28af0" sha1="bfeba84926a72498ea65fcae767df8ba13f28d49" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="digitosc">
+		<description>Game Boy Digital Sampling Oscilloscope (Euro, v3.6)</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="GBDSO"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="game boy digital sampling oscilloscope (europe) (v3.6) (gbdso) (unl).bin" size="32768" crc="572ea59c" sha1="68128bd8b01970054590a88b785d553456b68ec1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

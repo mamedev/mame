@@ -23505,7 +23505,20 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		<description>Beast Fighter (Tw)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
-		<info name="serial" value="EB-001"/>
+		<info name="serial" value="1B-001"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="131072">
+				<rom name="beast fighter (1b-001, sachen) (unl).bin" size="131072" crc="0bc7a3c6" sha1="bb76bc7ea3482e775efdbbf112455921d11ac317" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beastfgth" cloneof="beastfgt">
+		<description>Beast Fighter (Tw, Hacked?)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="EB-001?"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -23547,7 +23560,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sachen2" />
 			<dataarea name="rom" size="524288">
-				<rom name="4b-001.gbc" size="524288" crc="42a2fdf8" sha1="79a4faddfd1aca397e56d7895e45b1bc12900dab" offset="000000" />
+				<rom name="4b-001.bin" size="524288" crc="42a2fdf8" sha1="79a4faddfd1aca397e56d7895e45b1bc12900dab" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23618,8 +23631,71 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 	</software>
 
 
+	<software name="mc_sac02" supported="no">
+		<description>4 in 1 + 8 in 1 (World, 4B-002)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="4B-002, 4B-004, 8B-002" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="524288">
+				<rom name="4 in 1 + 8 in 1 (world) (4b-002, 4b-004, 8b-002, sachen) (unl).bin" size="524288" crc="e7224f14" sha1="2d7d6cdc49ec71e20be9c752ceaf38c5e2c29c5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mc_sac05" supported="no">
+		<description>4 in 1 + 8 in 1 + 16 in 1 (World, 4B-005)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="4B-005, 4B-006, 8B-003" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="524288">
+				<rom name="4 in 1 + 8 in 1 (world) (4b-005, 4b-006, 8b-003, sachen) (unl).bin" size="524288" crc="b18465d2" sha1="40b4f3147ee7f79dbd64a862074ce50a7b4445ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mc_sac07" supported="no">
+		<description>4 in 1 + 8 in 1 (World, 4B-007)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="4B-002, 4B-004, 8B-002" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="524288">
+				<rom name="4 in 1 + 8 in 1 (world) (4b-007, 4b-008, 8b-004, sachen) (unl).bin" size="524288" crc="0a504426" sha1="9c436bb4e2c666a92d4f695c776c2751cd3eb3b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mc_6in1">
+		<description>Super 6 in 1 (Tw)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="6B-001" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="2097152">
+				<rom name="super 6 in 1 (taiwan) (en,zh) (6b-001, sachen) (unl).bin" size="2097152" crc="fb60d1c5" sha1="8670282e7ea22235e374d5dcd1beb5ac54b35fe6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mc_16in1">
+		<description>Super 16 in 1 (Tw)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="2097152">
+				<rom name="super 16 in 1 (taiwan) (en) (sachen) (unl).bin" size="2097152" crc="6a99a079" sha1="bcb683600278094e4d40a7da0226b83ec1f92c81" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-	<software name="mc31t" supported="no">
+	<software name="mc_31t" cloneof="mc_31" supported="no">
 		<description>31 in 1 Mighty Mix (Tw)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23631,7 +23707,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="mc31" supported="no">
+	<software name="mc_31" supported="no">
 		<description>31-in-1 Mighty Mix (Aus)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -23772,8 +23848,10 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 
   * CBA010 Shui Hu Shen Shou 水浒神兽
   * CBA011 Shu Ma Bao Long 3 - Shui Jing Ban 数码暴龙-水晶版
+  * CBA012 Chao Jin Hua - Shu Ma Bao Long - Zuan Shi Ban 超進化 数码暴龙－钻石版
   * CBA033 Emo Cheng 2 - Fengyun Pian 恶魔城2-风云篇
   * CBA060 Mingzhu Koudai Guaishou 2 明珠口袋怪兽2
+  * CBA063 Taikong Zhan Shi - Jing Dian Ban 太空战士经典版
   * CBA064 Gangdan Wuyu 2 钢弹物语2
   * CBA065 Mingzhu Koudai Guaishou 3 明珠口袋怪兽3
   * CBA073 Shuihu Zhuan - Jingdian Ban 水浒传-经典版
@@ -23787,8 +23865,13 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
   * CBA086 Shu Ma Bao Bei - Chao Mengmeng Fanji Zhan 数码宝贝-超梦梦反击战
   * CBA087 Shu Ma Bao Bei - Hai Zhi Shen 数码宝贝-海之神
   * CBA089 Mo Jie 3 - Bu Wanme De Shijie 魔戒3-不完美的世界
+  * CBA090 Xin Shediao Ying Xiong Chuan 新射雕英雄传
   * CBA091 Luoke Ren DX6 洛克人DX6
+  * CBA095 Xin Guangming Yu Hei'an 2 - Zhushen De Yichan 光明與黑暗2-諸神的遺產
   * CBA097 Shuma Baobei DX6 数码宝贝DX6
+  * CBA100 Tezhong Budui 特种部队
+  * CBA145 Taikong Zhanshi DX3 - Zuizhong Huanxian 太空战士DX3-最终幻想
+  * CBA146 Tezhong Budui 2 - Jidi 特种部队2-基地
   * CBA147 Shi Mian Maifu - Fengyun Pian 十面埋伏-风云篇
 
 -->
@@ -23841,6 +23924,23 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="digid3">
+		<description>Chao Jin Hua - Shu Ma Bao Long - Zuan Shi Ban (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA012"/>
+		<info name="alt_title" value="超進化 数码暴龙－钻石版"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="chao jinhua shuma baolong - zuanshi ban (unlicensed, chinese) (cba012) [raw dump].bin" size="1048576" crc="50babe99" sha1="c153550886e812f5e37746fe1be6f294f13f97b3" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="emochen2">
 		<description>Emo Cheng 2 - Fengyun Pian (Chi)</description>
@@ -23873,6 +23973,23 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 				<rom name="mingzhu koudai guaishou 2 (unlicensed, chinese) (cba060) [raw dump].bin" size="2097152" crc="31f14d99" sha1="0ea3390e4479acf96d65791dd9ab08464753d48a" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="taikonzs">
+		<description>Taikong Zhan Shi - Jing Dian Ban (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA063"/>
+		<info name="alt_title" value="太空战士经典版"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="taikong zhanshi - jingdian ban (unlicensed, chinese) (cba063) [raw dump].bin" size="1048576" crc="8b9f30d7" sha1="8f7272ed851844e78d1920614f5de94f0f0cecde" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -24091,6 +24208,23 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="xinshdyx">
+		<description>Xin Shediao Ying Xiong Chuan (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng / Sintax</publisher>
+		<info name="serial" value="CBA090"/>
+		<info name="alt_title" value="新射雕英雄传"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="xin shediao yingxiong chuan (unlicensed, chinese) (cba090) [raw dump].bin" size="1048576" crc="20e40d8f" sha1="a11aa648810f3e69d3678d2c53137575bfbd34d6" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
 
 <!-- This is a clone of the most famous (and still undumped) game by Vast Fame: Zook Hero Z ! -->
 	<software name="lkrdx6">
@@ -24109,6 +24243,23 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="xinguam2">
+		<description>Xin Guangming Yu Hei'an 2 - Zhushen De Yichan (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA095"/>
+		<info name="alt_title" value=""/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="xin guangming yu hei'an 2 - zhushen de yichan (unlicensed, chinese) (cba095) [raw dump].bin" size="1048576" crc="0881ed84" sha1="c1985e8a7a241af5a35748528b3e6a9d49b788e7" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="smbbdx6">
 		<description>Shu Ma Bao Bei - DX6 (Chi)</description>
@@ -24123,6 +24274,59 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 				<rom name="shuma baobei dx6 (unlicensed, chinese) (cba097) [raw dump].bin" size="2097152" crc="23c19a4d" sha1="f08a5470667be1bb232866b4cb4dfa974752e1a0" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768"> <!-- Unconfirmed size -->
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="teshu2k1" cloneof="mslug2k1">
+		<!-- probably developed by BDD -->
+		<description>Teshu Budui 2001 (Chi, Li Cheng)</description>
+		<year>20??</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA100"/>
+		<info name="alt_title" value="特殊部队2001 (Title Screen) / 特种部队 ~ Tezhong Budui (On cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="tezhong budui (teshu budui 2001) (unlicensed, chinese) (cba100) [raw dump].bin" size="1048576" crc="a658d85e" sha1="3b5e765dbda9b355a6ea9ab7920d31f4169fa1d3" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="taikond3">
+		<description>Taikong Zhanshi DX3 - Zui Zhong Huan Xiang (Chi)</description>
+		<year>200?</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA145"/>
+		<info name="alt_title" value="太空战士DX3-最终幻想"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="taikong zhanshi dx3 - zuizhong huanxiang (unlicensed, chinese) (cba145) [raw dump].bin" size="2097152" crc="ddf36a27" sha1="0a62b484c5730a3a1f8b32cc2ed97af128d2130c" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This also has an English version, titled Terrifying 9/11 (only on cart?) -->
+	<software name="terr911">
+		<description>Teshu Budui 2 - Jidi (Chi)</description>
+		<year>20??</year>
+		<publisher>Li Cheng</publisher>
+		<info name="serial" value="CBA146"/>
+		<info name="alt_title" value="特殊部队2-基地 (Title Screen) / 特种部队2-基地 ~ Tezhong Budui 2 - Jidi (On cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="tezhong budui 2 - jidi (teshu budui 2 - jidi) (unlicensed, chinese) (cba146) [raw dump].bin" size="2097152" crc="a2c4f7b3" sha1="5b516c6ce57eed1791a9c20184357c583febdcb8" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -24464,7 +24668,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 	</software>
 
 <!-- This got ripped by m_digi10 -->
-	<software name="digid3">
+	<software name="digid3h" cloneof="digid3">
 		<description>Chao Jin Hua - Shu Ma Bao Bei D-3 (Chi, Ripped from 10 in 1 multicart)</description>
 		<year>200?</year>
 		<publisher>SKOB?</publisher>
@@ -25967,18 +26171,6 @@ but the 256KB version is definitely underdumped and misses sprite data
 		</part>
 	</software>
 
-	<software name="terr911">
-		<description>Terrifying 9/11 (Chi)</description>
-		<year>20??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="2097152">
-				<rom name="terrifying 911.bin" size="2097152" crc="0d17e940" sha1="d1fdd5b289165126091f5fba3da05903198a8620" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 <!-- TO BE VERIFIED: all of these files have the same first half and *very* similar second half (~99%). Hard to say which is good though -->
 <!-- Once sorted out what is good and what not, the entry should be moved among the Sintax games above! -->
 	<software name="mslug2k1">
@@ -26023,22 +26215,6 @@ but the 256KB version is definitely underdumped and misses sprite data
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="metal slug 2001 (unl) (a2).bin" size="1048576" crc="bf0028d9" sha1="99f536400bb99892b736f66305e1b11d8229c668" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mslug2k1c" cloneof="mslug2k1">
-		<!-- probably developed by BDD -->
-		<description>Metal Slug 2001 (Chi, Alt 3)</description>
-		<year>20??</year>
-		<publisher>Sintax</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="1048576">
-				<rom name="metal slug 2001 (unl) (a3).bin" size="1048576" crc="a658d85e" sha1="3b5e765dbda9b355a6ea9ab7920d31f4169fa1d3" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>

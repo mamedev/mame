@@ -11229,6 +11229,22 @@
 		</part>
 	</software>
 
+	<software name="f15cws" cloneof="f15cw">
+		<description>F-15 City War (Spa)</description>
+		<year>1990</year>
+		<publisher>Gluk Video</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nina006" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="32768">
+				<rom name="1.chr" size="32768" crc="c470fadc" sha1="ab8634df0bdce15934291e66fea0c1ce4d69835c" offset="00000" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="f15 city war (spain) (gluk video) (unl).prg" size="32768" crc="8406ed8b" sha1="08ba83615527eff4b4c971a195c574127fd5f716" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="f15seu" cloneof="f15se">
 		<description>F-15 Strike Eagle (USA)</description>
 		<year>1992</year>
@@ -29165,6 +29181,23 @@
 		</part>
 	</software>
 
+	<software name="puzzles" cloneof="puzzle">
+		<description>Puzzle (Spa)</description>
+		<year>1990?</year>
+		<publisher>Gluk Video</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nina006" />
+			<feature name="pcb" value="AVE-NINA-03" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="32768">
+				<rom name="puzzle (spain) (gluk video) (unl).chr" size="32768" crc="6e7fcd59" sha1="ec36c47e143b47ccaae2b0a82047337d59ea169e" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="puzzle (spain) (gluk video) (unl).prg" size="32768" crc="78dbbc07" sha1="1e61985360265db50dff716b1c1e72f0958ca53c" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="puzznicu" cloneof="puzznic">
 		<description>Puzznic (USA)</description>
 		<year>1990</year>
@@ -44767,6 +44800,32 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="contrajd" cloneof="probot">
+		<description>Contra (Jpn, Demo)</description>
+		<year>1988</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="vrc2" />
+			<feature name="pcb" value="KONAMI-VRC-2" />
+			<feature name="vrc2-pin3" value="PRG A1" />
+			<feature name="vrc2-pin4" value="PRG A0" />
+			<feature name="vrc2-pin21" value="CHR A10" />
+			<feature name="vrc2-pin22" value="CHR A16" />
+			<feature name="vrc2-pin23" value="CHR A11" />
+			<feature name="vrc2-pin24" value="CHR A13" />
+			<feature name="vrc2-pin25" value="CHR A14" />
+			<feature name="vrc2-pin26" value="CHR A12" />
+			<feature name="vrc2-pin27" value="CHR A15" />
+			<feature name="vrc2-pin28" value="NC" />
+			<dataarea name="chr" size="131072">
+				<rom name="contra (japan) (sample).chr" size="131072" crc="944be135" sha1="5481603f2ae8ccb40e02b7803c3680811cd971ab" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="contra (japan) (sample).prg" size="131072" crc="18f4e9aa" sha1="8cbf33594a26d7dfd5ea57dbb92b58a3b433d5b9" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="galivan">
 		<description>Cosmo Police Galivan (Jpn)</description>
 		<year>1988</year>
@@ -46313,6 +46372,28 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="i love softball (japan).prg" size="131072" crc="1dea55eb" sha1="f67e8e7582446e9a2a8915b006d0f631c54bb438" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ideyumj1" cloneof="ideyumj">
+		<description>Ide Yousuke Meijin no Jissen Mahjong (Jpn)</description>
+		<year>1987</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="CAP-IM"/>
+		<info name="release" value="19870924"/>
+		<info name="alt_title" value="井出洋介名人の実戦麻雀"/>
+		<info name="usage" value="This only works on a Famicom with Mahjong Controller attached"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="HVC-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="mjcontroller" />
+			<dataarea name="prg" size="131072">
+				<rom name="ide yousuke meijin no jissen mahjong (japan).prg" size="131072" crc="8e066ccb" sha1="e5409c317403e2c56deaced9551971ad3f9c9995" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -52465,6 +52546,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="magicblks" cloneof="magicblk">
+		<description>Magic Block (Spa)</description>
+		<year>19??</year>
+		<publisher>Gluk Video</publisher>
+		<info name="alt_title" value="El Bloque Magico (on the cart label)"/>
+		<part name="cart" interface="nes_cart">
+			<dataarea name="chr" size="32768">
+				<rom name="bloque magico, el (spain) (gluk video) (unl).chr" size="32768" crc="4ed2d601" sha1="b2983c47eed95d94998a074c6fa1a6e9e91cfe54" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="bloque magico, el (spain) (gluk video) (unl).prg" size="32768" crc="e37c15fc" sha1="e1a6ef0fbc7240e57e9915c96327db1be19527ab" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="monstglb" cloneof="balloonm">
 		<description>Balloon Monster (Spa)</description>
 		<year>1992</year>
@@ -52540,24 +52636,25 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 		</part>
 	</software>
-
-	<!--software name="cosmocops" cloneof="cosmocop">
-	    <description>Cosmos Cop (Spa)</description>
-	    <year>1991</year>
-	    <publisher>Gluk Video</publisher>
-	    <info name="serial" value="CN-09"/>
-	    <info name="release" value="19910101"/>
-	    <part name="cart" interface="nes_cart">
-	        <feature name="pcb" value="NTDEC-N715061" />
-	        <feature name="mirroring" value="horizontal" />
-	        <dataarea name="prg" size="32768">
-	            <rom name="cc1" size="32768" crc="20204cfe" sha1="6eb882d7a9b891e8126058f8da6e653408619c12" offset="00000" />
-	        </dataarea>
-	        <dataarea name="chr" size="32768">
-	            <rom name="cc2" size="32768" crc="486efdb8" sha1="16ce67407dc5ebaca5c2da1ce2a226ba1636f437" offset="00000" />
-	        </dataarea>
-	    </part>
-	</software-->
+ 
+	<software name="cosmocops" cloneof="cosmocop">
+		<description>Cosmos Cop (Spa)</description>
+		<year>1991</year>
+		<publisher>Gluk Video</publisher>
+		<info name="serial" value="CN-09"/>
+		<info name="release" value="19910101"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="NTDEC-N715061" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="cc1" size="32768" crc="20204cfe" sha1="6eb882d7a9b891e8126058f8da6e653408619c12" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="cc2" size="32768" crc="486efdb8" sha1="16ce67407dc5ebaca5c2da1ce2a226ba1636f437" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="cosmocop">
 		<description>Cosmos Cop (Asia)</description>
@@ -52705,23 +52802,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<!--software name="skateboy">
-	    <description>Skate Boy (Spa)</description>
-	    <year>1992</year>
-	    <publisher>Gluk Video</publisher>
-	    <info name="serial" value="CN-18"/>
-	    <info name="release" value="19920101"/>
-	    <part name="cart" interface="nes_cart">
-	        <feature name="pcb" value="NTDEC-N715061" />
-	        <feature name="mirroring" value="horizontal" />
-	        <dataarea name="prg" size="32768">
-	            <rom name="0.prg" size="32768" crc="01207edc" sha1="7fbf27ce71406407d4bf1b0274f75df40dfe35a8" offset="00000" />
-	        </dataarea>
-	        <dataarea name="chr" size="8192">
-	            <rom name="0.chr" size="8192" crc="f594ae7b" sha1="d8b3d713d63d9275ee89fe5a6d214d81e5b25bc9" offset="00000" />
-	        </dataarea>
-	    </part>
-	</software-->
+	<software name="skateboy">
+		<description>Skate Boy (Spa)</description>
+		<year>1992</year>
+		<publisher>Gluk Video</publisher>
+		<info name="serial" value="CN-18"/>
+		<info name="release" value="19920101"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="NTDEC-N715061" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="32768" crc="01207edc" sha1="7fbf27ce71406407d4bf1b0274f75df40dfe35a8" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="0.chr" size="8192" crc="f594ae7b" sha1="d8b3d713d63d9275ee89fe5a6d214d81e5b25bc9" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="fighthr3" supported="no">
 		<description>Fighting Hero III (Asia)</description>
@@ -53023,7 +53121,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="policemn" supported="partial">
+	<software name="policemn">
 		<description>Policeman (Tw)</description>
 		<year>19??</year>
 		<publisher>TXC Corp</publisher>
@@ -53032,11 +53130,30 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txc_strikew" />
 			<feature name="pcb" value="TXC-STRIKEWOLF" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="bus_conflict" value="no" />
 			<dataarea name="chr" size="65536">
 				<rom name="policeman (mgc-015).chr" size="65536" crc="f73ee39e" sha1="0142d357b7a8e38c720bef9a13250da76dbc0738" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="policeman (mgc-015).prg" size="65536" crc="65fe1590" sha1="be06c1c9c76bf270e83e98f6c5a79ff4d5589c59" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="policemns" cloneof="policemn">
+		<description>Policeman (Spa)</description>
+		<year>19??</year>
+		<publisher>Gluk Video</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txc_strikew" />
+			<feature name="pcb" value="TXC-STRIKEWOLF" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="bus_conflict" value="no" />
+			<dataarea name="chr" size="65536">
+				<rom name="policeman (spain) (gluk video) (unl).chr" size="65536" crc="f73ee39e" sha1="0142d357b7a8e38c720bef9a13250da76dbc0738" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="policeman (spain) (gluk video) (unl).prg" size="65536" crc="65fe1590" sha1="be06c1c9c76bf270e83e98f6c5a79ff4d5589c59" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -64359,6 +64476,51 @@ All musics were removed in this game.
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="magic carpet 1001 (unl).prg" size="32768" crc="1031fc21" sha1="1b1a40158f749b38ad67719dd10403e50675e129" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+ 
+	<software name="magicarps" cloneof="magicarp">
+		<description>Magic Carpet 1001 (Spa, Rev. 1)</description>
+		<year>19??</year>
+		<publisher>Gluk Video</publisher>
+		<info name="alt_title" value="La Alfombra Magica (on the cart label)"/>
+		<part name="cart" interface="nes_cart">
+			<dataarea name="chr" size="32768">
+				<rom name="alfombra magica, la (spain) (rev 1) (gluk video).chr" size="32768" crc="c2901a91" sha1="28f22d6fdc90c0f23da5e4744981ccd3be9cb85b" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="alfombra magica, la (spain) (rev 1) (gluk video).prg" size="32768" crc="6b80d3de" sha1="4c5cbdc84d8ad820d69130d02a71e1e8e0ce8249" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicarps1" cloneof="magicarp">
+		<description>Magic Carpet 1001 (Spa, Rev. 1, Unlicensed?)</description>
+		<year>19??</year>
+		<publisher>Gluk Video</publisher>
+		<info name="alt_title" value="La Alfombra Magica (on the cart label)"/>
+		<part name="cart" interface="nes_cart">
+			<dataarea name="chr" size="32768">
+				<rom name="alfombra magica, la (spain) (rev 1) (gluk video) (unl).chr" size="32768" crc="39a920c1" sha1="3dbbfa0be006b8b60aaa7ef81356665c27a6d56e" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="alfombra magica, la (spain) (rev 1) (gluk video) (unl).prg" size="32768" crc="6b80d3de" sha1="4c5cbdc84d8ad820d69130d02a71e1e8e0ce8249" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicarps2" cloneof="magicarp">
+		<description>Magic Carpet 1001 (Spa)</description>
+		<year>19??</year>
+		<publisher>Gluk Video</publisher>
+		<info name="alt_title" value="La Alfombra Magica (on the cart label)"/>
+		<part name="cart" interface="nes_cart">
+			<dataarea name="chr" size="32768">
+				<rom name="alfombra magica, la (spain) (gluk video) (unl).chr" size="32768" crc="39a920c1" sha1="3dbbfa0be006b8b60aaa7ef81356665c27a6d56e" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="alfombra magica, la (spain) (gluk video) (unl).prg" size="32768" crc="6b80d3de" sha1="4c5cbdc84d8ad820d69130d02a71e1e8e0ce8249" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

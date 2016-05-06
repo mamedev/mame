@@ -221,7 +221,8 @@ READ8_MEMBER(nes_txc_mjblock_device::read_l)
 
  iNES: mapper 36
 
- In MESS: Partially Supported (Policeman has glitches)
+ In MESS: Supported (Policeman requires no bus conflict
+          though, or it has glitches)
 
  -------------------------------------------------*/
 

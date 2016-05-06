@@ -942,6 +942,32 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="metrdfsnp2" cloneof="metrdfsn">
+		<description>Metroid Fusion (Euro, Prototype 20020911)</description>
+		<year>2002</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="AGB-AMTP-EUR"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="metj01d.bin" size="16777216" crc="3acbd239" sha1="a45b539becbf10f3913255d6d624ee954dcc5593" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="metrdfsnp1" cloneof="metrdfsn">
+		<description>Metroid Fusion (Euro, Prototype 20020916)</description>
+		<year>2002</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="AGB-AMTP-EUR"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="metj01d_a.bin" size="8388608" crc="1605e4f7" sha1="f688f2d3186a0a90040abb214efd1e8e93a424cd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="mlbslg04">
 		<description>MLB SlugFest 20-04 (USA)</description>
@@ -2196,6 +2222,18 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="metroid - zero mission (usa).bin" size="8388608" crc="5c61a844" sha1="5de8536afe1f0078ee6fe1089f890e8c7aa0a6e8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="metroid0up" cloneof="metroid0">
+		<description>Metroid - Zero Mission (USA, Prototype)</description>
+		<year>2004</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="abmxe00.bin" size="16777216" crc="922c4a10" sha1="58986c4d6f2e5ccdc04936cc8b7c9d378570710c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8952,12 +8990,25 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="n_cvania">
-		<description>Classic NES Series - Castlevania (Euro, USA)</description>
+		<description>Classic NES Series - Castlevania (Euro)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-FADE-USA, AGB-FADP"/>
+		<info name="serial" value="AGB-FADP-EUR"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="4194304">
+				<rom name="castlevania (nes).bin" size="4194304" crc="2b510046" sha1="a01b809fd050749adbad188c58fd55e0949c1edb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n_cvaniau" cloneof="n_cvania">
+		<description>Classic NES Series - Castlevania (USA)</description>
+		<year>2004</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="AGB-FADE-USA"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
@@ -12962,6 +13013,19 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="extskateu" cloneof="extskate">
+		<description>Extreme Skate Adventure (USA, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="AGB-BESE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="extreme skate adventure (usa) (rev 1).bin" size="8388608" crc="7a3ef446" sha1="ad2a7b48f473778d0006cccf91c3058ad494be8f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="eztalk1">
 		<description>EZ-Talk - Shokyuu Hen 1 (Jpn)</description>
@@ -14477,6 +14541,19 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="firembssjp" cloneof="firembss">
+		<description>Fire Emblem - Seima no Kouseki (Jpn, Prototype)</description>
+		<year>2004</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="ファイアーエムブレム 聖魔の光石"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="16777216">
+				<rom name="fire emblem - seima no kouseki (japan) (beta).bin" size="16777216" crc="cd9d8972" sha1="81c48809c9b8c3a099b7f9b1e08ab3dd8adde368" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="firembssu" cloneof="firembss">
 		<description>Fire Emblem - The Sacred Stones (USA, Aus)</description>
@@ -15407,6 +15484,19 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
+	
+<!-- This uses an unemulated mapper -->
+	<software name="v_dccol2" supported="no">
+		<description>Game Boy Advance Video - Disney Channel Collection - Volume 2 (USA)</description>
+		<year>2004?</year>
+		<publisher>Majesco</publisher>
+		<info name="serial" value="AGB-MDSE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="67108864">
+				<rom name="disney channel collection - volume 2 (agb-mdse-usa).bin" size="67108864" crc="60dfd79c" sha1="864ce0db324b1252df923804f8c6e812d5ebcbba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="v_doraex">
 		<description>Game Boy Advance Video - Dora the Explorer - Volume 1 (USA)</description>
@@ -15512,7 +15602,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<info name="serial" value="AGB-MSKE-USA"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="67108864">
-				<rom name="shrek-mske.bin" size="67108864" crc="e698c9ae" sha1="95d57c0a825b5f6531c8a098c8b9f8b6eb3f8eb5" offset="000000" />
+				<rom name="shrek-mske.bin" size="67108864" crc="690176e5" sha1="2dedea86ec289a0e31089299613d9f74cca03609" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -15532,13 +15622,26 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 
 <!-- This uses an unemulated mapper -->
 	<software name="v_sharkt" supported="no">
-		<description>Game Boy Advance Video - Shark Tale (USA)</description>
+		<description>Game Boy Advance Video - Shark Tale (USA, Rev. 6)</description>
 		<year>2004?</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-MSAE-USA"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="67108864">
 				<rom name="sharkstale-msae.bin" size="67108864" crc="d2cf417a" sha1="9bc5b60793b8a6de3b80eb2c213cd125e1fa468e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+<!-- This uses an unemulated mapper -->
+	<software name="v_sharkta" cloneof="v_sharkt" supported="no">
+		<description>Game Boy Advance Video - Shark Tale (USA, Rev. 5)</description>
+		<year>2004?</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="AGB-MSAE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="67108864">
+				<rom name="shark tale (agb-msae-usa).bin" size="67108864" crc="01468820" sha1="6128a476edb10e6839ac5bd2697e83b9b7a9b234" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -22486,6 +22589,18 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="marivsdkud" cloneof="marivsdk">
+		<description>Mario vs. Donkey Kong (USA, Kiosk, v16)</description>
+		<year>2004</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_flash_512" />
+			<dataarea name="rom" size="16777216">
+				<rom name="mario vs. donkey kong (usa) (demo) (kiosk,multi-game demo disc version 16).bin" size="16777216" crc="25505164" sha1="68eebe6dbcf8973ed7426a793185db202a01288f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="marvelua">
 		<description>Marvel - Ultimate Alliance (Euro)</description>
@@ -23603,6 +23718,18 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="metroid - zero mission (europe) (en,fr,de,es,it).bin" size="8388608" crc="f1d92e63" sha1="0fd107445a42e6f3a3e5ce8c865f412583179903" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="metroid0p" cloneof="metroid0">
+		<description>Metroid - Zero Mission (Euro, Prototype)</description>
+		<year>2004</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="abmxped.bin" size="16777216" crc="b6438226" sha1="3c0b7ccd303c30ac5c4ffc9fb0aa7137a533ad69" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25206,8 +25333,23 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="nakayouc">
+		<description>Nakayoshi Youchien - Sukoyaka Enji Ikusei Game (Jpn, Rev. 1)</description>
+		<year>2002</year>
+		<publisher>TDK Core</publisher>
+		<info name="serial" value="AGB-AHVJ-JPN"/>
+		<info name="release" value="20021004"/>
+		<info name="alt_title" value="なかよし幼稚園 すこやか園児育成育成ゲーム"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="4194304">
+				<rom name="nakayoshi youchien - sukoyaka enji ikusei game (japan) (rev 1).bin" size="4194304" crc="b46daca0" sha1="5e0cdbd4b6aba17e26c262d8db7c64fc3441d263" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nakayouca" cloneof="nakayouc">
 		<description>Nakayoshi Youchien - Sukoyaka Enji Ikusei Game (Jpn)</description>
 		<year>2002</year>
 		<publisher>TDK Core</publisher>
@@ -25325,8 +25467,23 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="narutoks">
+		<description>Naruto - Konoha Senki (Jpn, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="serial" value="AGB-AUEJ-JPN"/>
+		<info name="release" value="20030912"/>
+		<info name="alt_title" value="NARUTO-ナルト- 木ノ葉戦記"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="naruto - konoha senki (japan) (v1.1).bin" size="8388608" crc="69cf0418" sha1="01deffedd9e78544465031333baa0eb16c1bc5bd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="narutoksa" cloneof="narutoks">
 		<description>Naruto - Konoha Senki (Jpn)</description>
 		<year>2003</year>
 		<publisher>Tomy</publisher>
@@ -26594,8 +26751,20 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="petpanrn">
+		<description>Disney's Peter Pan - Return to Neverland (Euro, Rev. 1)</description>
+		<year>2002</year>
+		<publisher>Ubi Soft</publisher>
+		<info name="serial" value="AGB-APPP"/>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="peterpan_rtn_appp01.bin" size="8388608" crc="4c682cc3" sha1="a3a45eabc4cb7ef00c5caf36eef6b22c2261ef14" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petpanrna" cloneof="petpanrn">
 		<description>Disney's Peter Pan - Return to Neverland (Euro)</description>
 		<year>2002</year>
 		<publisher>Ubi Soft</publisher>
@@ -28058,8 +28227,23 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="powrpkp4">
+		<description>Power Pro Kun Pocket 4 (Jpn, Rev. 1)</description>
+		<year>2002</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="AGB-AP4J-JPN (RK277-J1)"/>
+		<info name="release" value="20020320"/>
+		<info name="alt_title" value="パワプロクンポケット4"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="power pro kun pocket 4 (japan) (rev 1).bin" size="8388608" crc="89a3a2c7" sha1="af8006b7ef649ca35f21d53137f48dc5e6209f5e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powrpkp4a" cloneof="powrpkp4">
 		<description>Power Pro Kun Pocket 4 (Jpn)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
@@ -31687,6 +31871,21 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="stomv4tr">
+		<description>Simple 2960 Tomodachi Series Vol. 4 - The Trump - Minna de Asoberu 12 Shurui no Trump Game (Jpn, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>D3 Publishing</publisher>
+		<info name="serial" value="AGB-BS4J-JPN"/>
+		<info name="release" value="20031218"/>
+		<info name="alt_title" value="シンプルつくろうともだちシリーズ:SIMPLE2960ともだちシリーズVol.4 THE トランプ 〜みんなで遊べる12種類のトランプゲーム〜"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="4194304">
+				<rom name="simple 2960 tomodachi series vol. 4 - the trump - minna de asoberu 12 shurui no trump game (japan) (rev 1).bin" size="4194304" crc="07c2d7ed" sha1="4881cefc73d6b5d8daf7079c1b93cb261533e4c4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="stomv4tra" cloneof="stomv4tr">
 		<description>Simple 2960 Tomodachi Series Vol. 4 - The Trump - Minna de Asoberu 12 Shurui no Trump Game (Jpn)</description>
 		<year>2003</year>
 		<publisher>D3 Publishing</publisher>
@@ -39118,6 +39317,17 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="2273956">
 				<rom name="yoshi.bin" size="2273956" crc="954d2619" sha1="89fe5c0b5489a14f5f9bb1d4ebde998f07c4f939" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="yoshia" cloneof="yoshi">
+		<description>Yoshi Demo (Alt?)</description>
+		<year>2001?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="1717944">
+				<rom name="yoshi sample (japan) (en).bin" size="1717944" crc="34f2ef47" sha1="71b87b9684babfe5751a9fb6642ace5a927f21e0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
