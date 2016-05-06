@@ -20,7 +20,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Nihon Create</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="3x3 Eyes - Sanjiyan Henjou" sha1="243e61ee754eb6c7efc55a692cc89b0dd31d944c" />
+				<disk name="3x3 eyes - sanjiyan henjou" sha1="243e61ee754eb6c7efc55a692cc89b0dd31d944c" />
 			</diskarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Electronic Arts Victor</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="4D Boxing" sha1="0691df337359f39a820e8953c85d56c807fabaa9" />
+				<disk name="4d boxing" sha1="0691df337359f39a820e8953c85d56c807fabaa9" />
 			</diskarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Electronic Arts Victor</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="4D Driving" sha1="b09e774be4ee926dc32efd2e3b28dd72bc223c76" />
+				<disk name="4d driving" sha1="b09e774be4ee926dc32efd2e3b28dd72bc223c76" />
 			</diskarea>
 		</part>
 	</software>
@@ -54,7 +54,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Electronic Arts Victor</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="4D Tennis" sha1="5ee1a3342469e87bc0f1d613982a92bc8ab5c5bb" />
+				<disk name="4d tennis" sha1="5ee1a3342469e87bc0f1d613982a92bc8ab5c5bb" />
 			</diskarea>
 		</part>
 	</software>
@@ -65,12 +65,12 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>System Sacom</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="38-man Kilo no Kokuu (Utility disk).hdm" size="1261568" crc="43a7b57f" sha1="1477b8a9297d91a069132d74ec9ed1b67828c2fd" offset="000000" />
+				<rom name="38-man kilo no kokuu (utility disk).hdm" size="1261568" crc="43a7b57f" sha1="1477b8a9297d91a069132d74ec9ed1b67828c2fd" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="38-man Kilo no Kokuu" sha1="8b3aed4b095183e3b9a0ee88e7dfd34d1c44e7d7" />
+				<disk name="38-man kilo no kokuu" sha1="8b3aed4b095183e3b9a0ee88e7dfd34d1c44e7d7" />
 			</diskarea>
 		</part>
 	</software>
@@ -81,7 +81,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Artdink</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="A Ressha de Ikou III" sha1="095710f80f004917dce963719cb1c4bae4d5fc49" />
+				<disk name="a ressha de ikou iii" sha1="095710f80f004917dce963719cb1c4bae4d5fc49" />
 			</diskarea>
 		</part>
 	</software>
@@ -92,12 +92,12 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Artdink</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="A Ressha de Ikou IV (System disk).hdm" size="1261568" crc="469ff718" sha1="f9667e06ae1948350bee029e98903216d1cda98f" offset="000000" />
+				<rom name="a ressha de ikou iv (system disk).hdm" size="1261568" crc="469ff718" sha1="f9667e06ae1948350bee029e98903216d1cda98f" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="A Ressha de Ikou IV" sha1="c032ef409acb0f3ff797c4446f4dfb97ddffad27" />
+				<disk name="a ressha de ikou iv" sha1="c032ef409acb0f3ff797c4446f4dfb97ddffad27" />
 			</diskarea>
 		</part>
 	</software>
@@ -108,7 +108,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Family Soft</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Abel" sha1="5fb92a84f3d1e7530b6dce9060f9814ec2fa6d2b" />
+				<disk name="abel" sha1="5fb92a84f3d1e7530b6dce9060f9814ec2fa6d2b" />
 			</diskarea>
 		</part>
 	</software>
@@ -119,7 +119,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Fujitsu</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Advantage Tennis" sha1="4210307af2238e8b0bc546b36f13f2fe651464cd" />
+				<disk name="advantage tennis" sha1="4210307af2238e8b0bc546b36f13f2fe651464cd" />
 			</diskarea>
 		</part>
 	</software>
@@ -130,7 +130,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Fujitsu</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Aeternam" sha1="e5c5955e303d9fbc9f1e7b3bb4d601aeace34765" />
+				<disk name="aeternam" sha1="e5c5955e303d9fbc9f1e7b3bb4d601aeace34765" />
 			</diskarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>CRI</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="After Burner" sha1="e1c6cc2df19b89ca1dab88358337d97ece90dd58" />
+				<disk name="after burner" sha1="e1c6cc2df19b89ca1dab88358337d97ece90dd58" />
 			</diskarea>
 		</part>
 	</software>
@@ -152,7 +152,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>CRI</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="After Burner III" sha1="70b10643e32f4d4a254a0c8f29e3224c2f810c1d" />
+				<disk name="after burner iii" sha1="70b10643e32f4d4a254a0c8f29e3224c2f810c1d" />
 			</diskarea>
 		</part>
 	</software>
@@ -163,7 +163,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Victor</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Air Combat II Special" sha1="8a8b49b7ca086084fe3c1ff23e6ee95e69559cf3" />
+				<disk name="air combat ii special" sha1="8a8b49b7ca086084fe3c1ff23e6ee95e69559cf3" />
 			</diskarea>
 		</part>
 	</software>
@@ -174,7 +174,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Alice Soft</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Alice no Yakata CD" sha1="03ee698cd4801d8e297eb6eade6aae7c87b7f2e8" />
+				<disk name="alice no yakata cd" sha1="03ee698cd4801d8e297eb6eade6aae7c87b7f2e8" />
 			</diskarea>
 		</part>
 	</software>
@@ -185,7 +185,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Alice Soft</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Alice no Yakata CD 2" sha1="d375cc44c0e421834f6ec3b2da3568eec7d28192" />
+				<disk name="alice no yakata cd 2" sha1="d375cc44c0e421834f6ec3b2da3568eec7d28192" />
 			</diskarea>
 		</part>
 	</software>
@@ -197,7 +197,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Alice Soft</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Alice no Yakata III" sha1="03ee698cd4801d8e297eb6eade6aae7c87b7f2e8" />
+				<disk name="alice no yakata iii" sha1="aaae43036d123ba7b75d6322f646b1b1ecfe14ec" />
 			</diskarea>
 		</part>
 	</software>
@@ -208,7 +208,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Arrow Micro-Techs</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Alone in the Dark" sha1="7cd07179e94161d59e0f426b71d87a72aeeae581" />
+				<disk name="alone in the dark" sha1="7cd07179e94161d59e0f426b71d87a72aeeae581" />
 			</diskarea>
 		</part>
 	</software>
@@ -220,7 +220,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires HDD installation"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Alone in the Dark 2" sha1="6ac20d5879eaa4e4e65b0bc2377306e27ecc37a1" />
+				<disk name="alone in the dark 2" sha1="6ac20d5879eaa4e4e65b0bc2377306e27ecc37a1" />
 			</diskarea>
 		</part>
 	</software>
@@ -231,7 +231,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Right Stuff</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Alshark" sha1="ecbdc6dead64d45836037a341bfd49332c7f8e29" />
+				<disk name="alshark" sha1="ecbdc6dead64d45836037a341bfd49332c7f8e29" />
 			</diskarea>
 		</part>
 	</software>
@@ -242,7 +242,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Fuga System</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Amaranth 3" sha1="9c83fcd4623dd62dcfc7c683c82836704f8665a7" />
+				<disk name="amaranth 3" sha1="9c83fcd4623dd62dcfc7c683c82836704f8665a7" />
 			</diskarea>
 		</part>
 	</software>
@@ -253,12 +253,12 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Alice Soft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="Ambivalenz (Boot disk).hdm" size="1261568" crc="7f3d6d6e" sha1="61c23afc9dc3b3ceaf2c28d6ab571d9bc83720fa" offset="000000" />
+				<rom name="ambivalenz (boot disk).hdm" size="1261568" crc="7f3d6d6e" sha1="61c23afc9dc3b3ceaf2c28d6ab571d9bc83720fa" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Ambivalenz" sha1="ccb8f8fafb4d321023d11f78d57f7cd9cf9b772a" />
+				<disk name="ambivalenz" sha1="ccb8f8fafb4d321023d11f78d57f7cd9cf9b772a" />
 			</diskarea>
 		</part>
 	</software>
@@ -269,7 +269,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Fujitsu</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="America Oudan Ultra Quiz" sha1="08cdcfb5ba9d421da422852be6d29f4544a99e9b" />
+				<disk name="america oudan ultra quiz" sha1="08cdcfb5ba9d421da422852be6d29f4544a99e9b" />
 			</diskarea>
 		</part>
 	</software>
@@ -280,7 +280,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Cocktail Soft</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Angel" sha1="e8da3eae3b949459751fd027579aee52b167dc2f" />
+				<disk name="angel" sha1="e8da3eae3b949459751fd027579aee52b167dc2f" />
 			</diskarea>
 		</part>
 	</software>
@@ -291,7 +291,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Active</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Angel Halo" sha1="9d79b87bdfa4a3c3308c15a7e7c2927686f79c68" />
+				<disk name="angel halo" sha1="9d79b87bdfa4a3c3308c15a7e7c2927686f79c68" />
 			</diskarea>
 		</part>
 	</software>
@@ -302,7 +302,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Koei</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Aoki Ookami to Shiroki Mejika - Genchou Hishi" sha1="45b8790a77cb77632f067f366cc055e830eddae8" />
+				<disk name="aoki ookami to shiroki mejika - genchou hishi" sha1="45b8790a77cb77632f067f366cc055e830eddae8" />
 			</diskarea>
 		</part>
 	</software>
@@ -313,7 +313,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Fairytale</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Arabesque" sha1="5869c0c1d2eee0f551722a7d08d7feef6be53868" />
+				<disk name="arabesque" sha1="5869c0c1d2eee0f551722a7d08d7feef6be53868" />
 			</diskarea>
 		</part>
 	</software>
@@ -324,7 +324,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Algo Software</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Aska Towns" sha1="027d5a8920980d5eccff93df192148b9acf51309" />
+				<disk name="aska towns" sha1="027d5a8920980d5eccff93df192148b9acf51309" />
 			</diskarea>
 		</part>
 	</software>
@@ -335,12 +335,12 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Family Soft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="Asuka 120% Burning Fest. Excellent (Boot disk).hdm" size="1261568" crc="12c7d6e2" sha1="0eb696be9666300d76863ae08882485eb69725d4" offset="000000" />
+				<rom name="asuka 120% burning fest. excellent (boot disk).hdm" size="1261568" crc="12c7d6e2" sha1="0eb696be9666300d76863ae08882485eb69725d4" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Asuka 120% Burning Fest. Excellent" sha1="a93c4f091a1d74deaf556fb27c2800cd97cd52cf" />
+				<disk name="asuka 120% burning fest. excellent" sha1="a93c4f091a1d74deaf556fb27c2800cd97cd52cf" />
 			</diskarea>
 		</part>
 	</software>
@@ -351,7 +351,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Fujitsu</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Awesome" sha1="f758d24ebb1e94dfe1499b1af38c32fd1b9de8ff" />
+				<disk name="awesome" sha1="f758d24ebb1e94dfe1499b1af38c32fd1b9de8ff" />
 			</diskarea>
 		</part>
 	</software>
@@ -362,12 +362,12 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Alice Soft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="Ayumi-chan Monogatari.hdm" size="1261568" crc="9bf209ba" sha1="cc2be00834492b0ccf5b25a1b0a5ceb810a2e330" offset="000000" />
+				<rom name="ayumi-chan monogatari.hdm" size="1261568" crc="9bf209ba" sha1="cc2be00834492b0ccf5b25a1b0a5ceb810a2e330" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Ayumi-chan Monogatari" sha1="b4adc7cb1f2f74f8beea76afb930d053addea67e" />
+				<disk name="ayumi-chan monogatari" sha1="b4adc7cb1f2f74f8beea76afb930d053addea67e" />
 			</diskarea>
 		</part>
 	</software>
@@ -378,7 +378,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Core Magazine</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Ayumi-chan Monogatari Jissha-ban" sha1="5a78396c9acb9c593710e0ce9aad520147b3759d" />
+				<disk name="ayumi-chan monogatari jissha-ban" sha1="5a78396c9acb9c593710e0ce9aad520147b3759d" />
 			</diskarea>
 		</part>
 	</software>
@@ -389,7 +389,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Family Soft</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Azure" sha1="cc85c3223336a3f237ff2e5030fefae78e6d0d01" />
+				<disk name="azure" sha1="cc85c3223336a3f237ff2e5030fefae78e6d0d01" />
 			</diskarea>
 		</part>
 	</software>
@@ -400,7 +400,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Himeya Soft</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Bacta 1 &amp; 2 + Voice" sha1="86c2d8dcb4e40b108e7e8fab5c1f9f3609f65ed7" />
+				<disk name="bacta 1 &amp; 2 + voice" sha1="86c2d8dcb4e40b108e7e8fab5c1f9f3609f65ed7" />
 			</diskarea>
 		</part>
 	</software>
@@ -411,12 +411,12 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Fairytale</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="Ballade for Maria (User disk).hdm" size="1261568" crc="200678ab" sha1="c658fd357318eb5f1522c88ea333f70bda75a72a" offset="000000" />
+				<rom name="ballade for maria (user disk).hdm" size="1261568" crc="200678ab" sha1="c658fd357318eb5f1522c88ea333f70bda75a72a" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Ballade for Maria" sha1="1f9e39ca63a8a896c5487b4a21100dd67e6a1ffd" />
+				<disk name="ballade for maria" sha1="1f9e39ca63a8a896c5487b4a21100dd67e6a1ffd" />
 			</diskarea>
 		</part>
 	</software>
@@ -427,7 +427,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Birdy Soft</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Beast 3" sha1="5505a0105fa9abe32b3240bac1144555b22740ee" />
+				<disk name="beast 3" sha1="5505a0105fa9abe32b3240bac1144555b22740ee" />
 			</diskarea>
 		</part>
 	</software>
@@ -438,12 +438,12 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Glodia</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="Bible Master (System disk).hdm" size="1261568" crc="f264d93e" sha1="b7939c12ab503fcddb1ad828e7c546cf21987b0c" offset="000000" />
+				<rom name="bible master (system disk).hdm" size="1261568" crc="f264d93e" sha1="b7939c12ab503fcddb1ad828e7c546cf21987b0c" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Bible Master" sha1="cddc6fc109ed6de40a59dce4918b9b0f1c928992" />
+				<disk name="bible master" sha1="cddc6fc109ed6de40a59dce4918b9b0f1c928992" />
 			</diskarea>
 		</part>
 	</software>
@@ -454,7 +454,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Ving</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Blandia Plus" sha1="5505a0105fa9abe32b3240bac1144555b22740ee" />
+				<disk name="blandia plus" sha1="5505a0105fa9abe32b3240bac1144555b22740ee" />
 			</diskarea>
 		</part>
 	</software>
@@ -465,7 +465,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Sofcom</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Blue - Will to Power" sha1="6ef80af0ccf21be12d68cd4ea2baf0988762f004" />
+				<disk name="blue - will to power" sha1="6ef80af0ccf21be12d68cd4ea2baf0988762f004" />
 			</diskarea>
 		</part>
 	</software>
@@ -476,7 +476,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>ASCII</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Bomberman - Panic Bomber" sha1="1fc5adf361f2a4ec5ddf1d55bacda3284f43f00d" />
+				<disk name="bomberman - panic bomber" sha1="1fc5adf361f2a4ec5ddf1d55bacda3284f43f00d" />
 			</diskarea>
 		</part>
 	</software>
@@ -487,7 +487,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>D.O.</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Branmarker" sha1="dd04adb6bb27f61337a9b6e3da6ae2afd1d1ae47" />
+				<disk name="branmarker" sha1="dd04adb6bb27f61337a9b6e3da6ae2afd1d1ae47" />
 			</diskarea>
 		</part>
 	</software>
@@ -498,7 +498,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>D.O.</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Branmarker 2" sha1="b7a41a36bf83c293defa929dd8b2daea961cd3aa" />
+				<disk name="branmarker 2" sha1="b7a41a36bf83c293defa929dd8b2daea961cd3aa" />
 			</diskarea>
 		</part>
 	</software>
@@ -509,7 +509,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Ving</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Bubble Bobble" sha1="6832299e67d17aca22d0ec2265b78d6e42336e30" />
+				<disk name="bubble bobble" sha1="6832299e67d17aca22d0ec2265b78d6e42336e30" />
 			</diskarea>
 		</part>
 	</software>
@@ -520,7 +520,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Riverhill Soft</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Burai Joukan" sha1="55fdc68201b54439b4aba027891b3db41cd88250" />
+				<disk name="burai joukan" sha1="55fdc68201b54439b4aba027891b3db41cd88250" />
 			</diskarea>
 		</part>
 	</software>
@@ -531,7 +531,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Riverhill Soft</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Burai Kanketsu-hen" sha1="acf9f3c856ef1398805509352b4e6e2f53f61b47" />
+				<disk name="burai kanketsu-hen" sha1="acf9f3c856ef1398805509352b4e6e2f53f61b47" />
 			</diskarea>
 		</part>
 	</software>
@@ -542,7 +542,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Birdy Soft</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Cal Towns" sha1="ab905889b8a3edfd7cdfe51c728d017f257e34f7" />
+				<disk name="cal towns" sha1="ab905889b8a3edfd7cdfe51c728d017f257e34f7" />
 			</diskarea>
 		</part>
 	</software>
@@ -553,7 +553,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Cocktail Soft</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Can Can Bunny Extra" sha1="385d444f67398de5b1acc65dd19e6aecafab0de1" />
+				<disk name="can can bunny extra" sha1="385d444f67398de5b1acc65dd19e6aecafab0de1" />
 			</diskarea>
 		</part>
 	</software>
@@ -564,7 +564,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Victor</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Castles" sha1="411c2753dbbef40b91bc6cd922f82eda27820280" />
+				<disk name="castles" sha1="411c2753dbbef40b91bc6cd922f82eda27820280" />
 			</diskarea>
 		</part>
 	</software>
@@ -575,7 +575,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Electronic Arts Victor</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Centurion" sha1="7df6066270855bd7ae85286ce502e1663610760c" />
+				<disk name="centurion" sha1="7df6066270855bd7ae85286ce502e1663610760c" />
 			</diskarea>
 		</part>
 	</software>
@@ -586,7 +586,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Victor</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Classic Road" sha1="a4debada6767e53ec0edb0ee9128f8fe96a99a6c" />
+				<disk name="classic road" sha1="a4debada6767e53ec0edb0ee9128f8fe96a99a6c" />
 			</diskarea>
 		</part>
 	</software>
@@ -597,7 +597,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>D.O.</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Crystal Rinal" sha1="96bce4606ee6775e966328143a6051fe312d9a8d" />
+				<disk name="crystal rinal" sha1="96bce4606ee6775e966328143a6051fe312d9a8d" />
 			</diskarea>
 		</part>
 	</software>
@@ -608,12 +608,12 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Cocktail Soft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="Custom Mate 2 &amp; Itsuka dokoka de (Save disk).hdm" size="1261568" crc="aead04fb" sha1="70197de9a7a138209b7e726063b5bca8f6534575" offset="000000" />
+				<rom name="custom mate 2 &amp; itsuka dokoka de (save disk).hdm" size="1261568" crc="aead04fb" sha1="70197de9a7a138209b7e726063b5bca8f6534575" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Custom Mate 2 &amp; Itsuka dokoka de" sha1="c7671fa372beae381bb95728ac85793fd0a0ccc7" />
+				<disk name="custom mate 2 &amp; itsuka dokoka de" sha1="c7671fa372beae381bb95728ac85793fd0a0ccc7" />
 			</diskarea>
 		</part>
 	</software>
@@ -624,12 +624,12 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Nihon Telenet</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="Cybercity (Boot disk).hdm" size="1261568" crc="384203a7" sha1="8e332eae5055a911c87dd2038f550ec614c30111" offset="000000" />
+				<rom name="cybercity (boot disk).hdm" size="1261568" crc="384203a7" sha1="8e332eae5055a911c87dd2038f550ec614c30111" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Cybercity" sha1="e0cd1ae978cffd94a9c4a47304aaacd2170f86d0" />
+				<disk name="cybercity" sha1="e0cd1ae978cffd94a9c4a47304aaacd2170f86d0" />
 			</diskarea>
 		</part>
 	</software>
@@ -641,11 +641,142 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires HDD installation"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Cyberia" sha1="9b6100154ebe61fe19e17b01a2f037310448a72a" />
+				<disk name="cyberia" sha1="9b6100154ebe61fe19e17b01a2f037310448a72a" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dokanshu">
+		<description>D.O. Kanshuu Premium Box: Touch My Heart</description>
+		<year>1995</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="d.o. kanshuu premium box - touch my heart" sha1="b3b4fdd6a780911b432d925dbb5eeb5844f0485c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dpszenbu">
+		<description>D.P.S. Zenbu</description>
+		<year>1995</year>
+		<publisher>Alice Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="d.p.s. zenbu" sha1="0dfb4343e175a124795974183c17356530231b85" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="daikouk">
+		<description>Daikoukai Jidai</description>
+		<year>1990</year>
+		<publisher>Koei</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="daikoukai jidai (save disk).hdm" size="1261568" crc="a70bd7c7" sha1="887b11e25a7f07644245b3764b62bab6e14839bd" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="daikoukai jidai" sha1="66e29717ef026c1578308591b7917e3a21d28b9a" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="daikouk2">
+		<description>Daikoukai Jidai II</description>
+		<year>1993</year>
+		<publisher>Koei</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="daikoukai jidai 2 (save disk).hdm" size="1261568" crc="53f2a3fb" sha1="5523e3ecd3748461a208b4b9e4778bf3e98e831f" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="daikoukai jidai 2" sha1="fcf68e2646ab37c00b3e9a980f40a80a59cc1d38" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="daisenr3">
+		<description>Daisenryaku III '90</description>
+		<year>1990</year>
+		<publisher>Pegasus Japan</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="daisenryaku iii '90 (game disk).hdm" size="1261568" crc="d6fae63a" sha1="b55b1e005c22bf68ef523e81695146e6b7180376" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="daisenryaku iii '90" sha1="bfb6b25f52981add095ddc858d7b7077a1c8cfd8" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- 
+	The collection includes two Dalk images, one marked as "Trurip" and one marked as
+	"freeware".	Analysis of the tracks shows that the data track is exactly the same, and
+	audio tracks are the same but shifted forwards by 5980 bytes in the "freeware"
+	image. This difference is probably due to the read offset of the drive used
+	to dump the disk. 
+	
+	The only difference is in the last track. The image marked as freeware had its
+	data shifted beyond the boundaries of the disc, so it's missing some bytes at the
+	end. Trurip images are always offset-corrected, so we can assume that one is the
+	more "correct" one, and thus the one included in this list.
+	-->
+	<software name="dalk">
+		<description>Dalk</description>
+		<year>1993</year>
+		<publisher>Alice Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="dalk (boot disk).hdm" size="1261568" crc="64570ac2" sha1="c3b288ed90f57c218b3cfd9f7d962fd61063e88a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dalk" sha1="ca717908cac5e584cf0caddd57054a21181aa0b1" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="fshark">
+		<description>Hishouzame / Flying Shark</description>
+		<year>1993</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hishouzame" sha1="4704726801f67e1cd09ba1f7475985036edff19c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="imgfight">
+		<description>Image Fight</description>
+		<year>1990</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="image fight" sha1="a7f3b33eea6197eed14967902d1355c345244db0" />
 			</diskarea>
 		</part>
 	</software>
 
+	<software name="opwolf">
+		<description>Operation Wolf</description>
+		<year>1990</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="operation wolf" sha1="7d102b8918c67f8eafe841fc3ecb52e5eb760caa" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- works well on fmtmarty, keyboard seems to interfere with movements on fmtowns -->
 	<software name="raiden">
 		<description>Raiden Densetsu / Raiden Trad</description>
@@ -654,6 +785,28 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="raiden densetsu (1991)(kid corp)(jp-en)" sha1="d7484fac0fa8d0fff06c70af341b25d8b4f21ab2" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="win95">
+		<description>Windows 95</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="[os] windows 95" sha1="49b059efd2632ad45cbbf4cd549f01ffcd436aa6" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="zak">
+		<description>Zak McKracken and The Alien Mindbenders</description>
+		<year>1990</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zak mckracken" sha1="0a06dcd3aaebcd79ec3c03dd0b179b9047e2bccd" />
 			</diskarea>
 		</part>
 	</software>
