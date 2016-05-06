@@ -825,9 +825,13 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
             -------- -------- -------- ------x- ?
             -------- -------- -------- -------x ?
 
+	0x01,0x02 only present on Step 2+
 
-    0x01:   ? (not present on Step 1.0)
-    0x02:   ? (not present on Step 1.0)         Scud Race has 0x00000101
+    0x01:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx Model scale (float)
+    0x02:   -------- -------- x------- -------- Texture replace
+			-------- -------- -x------ -------- Switch bank
+			-------- -------- --xxxxxx x------- X offset
+			-------- -------- -------- -xxxxxxx Y offset
 
     0x03:   --x----- -------- -------- -------- ?
             -------- -xxxxxxx xxxx---- -------- LOD?
@@ -845,74 +849,74 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 
     Polygon Data
 
-    0x00:   x------- -------- -------- -------- Supermodel says specular enable
-            -xxxxx-- -------- -------- -------- ?
-            ------xx xxxxxxxx xxxxxx-- -------- Polygon ID
+    0x00:   xxxxxx-- -------- -------- -------- Specular
+			------x- -------- -------- -------- Clockwise data
+            -------x xxxxxxxx xxxxxx-- -------- Polygon ID
+			-------- -------- ------xx -------- Discard this polygon
+			-------- -------- -------- x------- Specular enable
             -------- -------- -------- -x------ 0 = Triangle, 1 = Quad
+			-------- -------- -------- --x----- Polygon is points
+			-------- -------- -------- ---x---- Smoothing enable
             -------- -------- -------- ----x--- Vertex 3 shared from previous polygon
             -------- -------- -------- -----x-- Vertex 2 shared from previous polygon
             -------- -------- -------- ------x- Vertex 1 shared from previous polygon
             -------- -------- -------- -------x Vertex 0 shared from previous polygon
-            -------- -------- -------- x-xx---- ?
-            -------- -------- ------xx -------- Broken polygons in srally2 set these (a way to mark them for HW to not render?)
+            
 
     0x01:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal X coordinate (2.22 fixed point)
+			-------- -------- -------- x------- Edge on translucency
             -------- -------- -------- -x------ UV format (0 = 13.3, 1 = 16.0)
-            -------- -------- -------- ---x---- 1 = Double-sided polygon
+			-------- -------- -------- --x----- Enable fixed shading
+            -------- -------- -------- ---x---- Enable double-sided polygon
+			-------- -------- -------- ----x--- Enable smooth shading
             -------- -------- -------- -----x-- If set, this is the last polygon
             -------- -------- -------- ------x- Poly color, 1 = RGB, 0 = color table
-            -------- -------- -------- x-x-x--x ?
+			-------- -------- -------- -------x No LOS return
 
 
     0x02:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal Y coordinate (2.22 fixed point)
+			-------- -------- -------- xxx----- Microtexture select
+			-------- -------- -------- ---x---- Microtexture enable
+			-------- -------- -------- ----xx-- Microtexture min LOD
             -------- -------- -------- ------x- Texture U mirror enable
             -------- -------- -------- -------x Texture V mirror enable
-            -------- -------- -------- xxxxxx-- ?
 
     0x03:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal Z coordinate (2.22 fixed point)
+			-------- -------- -------- x------- X wrap smoothing
+			-------- -------- -------- -x------ Y wrap smoothing
             -------- -------- -------- --xxx--- Texture width (in 8-pixel tiles)
             -------- -------- -------- -----xxx Texture height (in 8-pixel tiles)
 
     0x04:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Color (RGB888)
-            -------- -------- -------- -x------ Texture page
-            -------- -------- -------- ---xxxxx Upper 5 bits of texture U coordinate
-            -------- -------- -------- x------- ?
-            -------- -------- -------- --x----- ?
+            -------- -------- -------- x------- Translator map select
+			-------- -------- -------- -x------ Texture page
+            -------- -------- -------- --xxxxxx Upper 6 bits of texture U coordinate            
 
-    0x05:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Specular color?
+    0x05:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Texture NP scale
             -------- -------- -------- x------- Low bit of texture U coordinate
             -------- -------- -------- ---xxxxx Low 5 bits of texture V coordinate
-            -------- -------- -------- -xx----- ?
+            -------- -------- -------- -xx----- Top 2 bits of texture V coordinate (unused by Model 3)
 
     0x06:   x------- -------- -------- -------- Texture contour enable
-            -xxxxx-- -------- -------- -------- Fixed shading?
-            ------x- -------- -------- -------- Enable fixed shading?
-            -------x -------- -------- -------- Could be high priority polygon?
-            -------- x------- -------- -------- 1 = disable transparency?
-            -------- -xxxxx-- -------- -------- Polygon translucency (0 = fully transparent)
+            -xxxxxxx -------- -------- -------- Translator map offset
+            -------- xxxxxx-- -------- -------- Polygon translucency
+			-------- ------x- -------- -------- Translucency pattern select
             -------- -------x -------- -------- 1 = disable lighting
             -------- -------- xxxxx--- -------- Polygon light modifier (Amount that a luminous polygon will burn through fog.
                                                                         Valid range is 0.0 to 1.0. 0.0 is completely fogged;
                                                                         1.0 has no fog.)
             -------- -------- -----x-- -------- Texture enable
             -------- -------- ------xx x------- Texture format
-            -------- -------- -------- -------x Alpha enable?
-            -------- ------x- -------- -------- Never seen set?
-            -------- -------- -------- -----xx- Always set?
-            -------- -------- -------- -xxxx--- ?
-
-    TODO:   Bits to find (from Real3D dev guide):
-            SetHighPriority(): Indicates that the polygon has higher priority than others in scene
-            PolygonIsLayered(): Indicates a stencil polygon.
-            DoSmoothShading(): Indicates that the polygon will be smooth shaded
-            void SetNPScale ( float np_scale ) ; Sets the texture lod scale for the polygon. A value greater than 1 will increase the
-                                                 range of the transition of texture level of detail.
+			-------- -------- -------- -xx----- Shininess
+			-------- -------- -------- ---x---- High priority polygon
+			-------- -------- -------- ----x--- Layered polygon (stencil)
+			-------- -------- -------- -----xxx Translucency mode
 
 
     Vertex entry
 
     0x00:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Vertex X coordinate (17.7 fixed-point in Step 1.0, 13.11 otherwise)
-            -------- -------- -------- xxxxxxxx Vertex normal X (offset from polygon normal)
+            -------- -------- -------- xxxxxxxx Vertex normal X
 
     0x01:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Vertex Y coordinate
             -------- -------- -------- xxxxxxxx Vertex normal Y
