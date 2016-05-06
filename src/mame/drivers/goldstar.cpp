@@ -3526,7 +3526,7 @@ static INPUT_PORTS_START( ns8linwa )
 	PORT_DIPSETTING(    0x00, "As Hopper Line" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x07, "Key In Rate" )       PORT_DIPLOCATION("DSW4:1,2,3")  // OK
+	PORT_DIPNAME( 0x07, 0x03, "Key In Rate" )       PORT_DIPLOCATION("DSW4:1,2,3")  // OK
 	PORT_DIPSETTING(    0x00, "1 Pulse / 5 Credits" )  // OK
 	PORT_DIPSETTING(    0x01, "1 Pulse / 10 Credits" )  // OK
 	PORT_DIPSETTING(    0x02, "1 Pulse / 20 Credits" )  // OK
@@ -3535,13 +3535,14 @@ static INPUT_PORTS_START( ns8linwa )
 	PORT_DIPSETTING(    0x05, "1 Pulse / 120 Credits" )  // OK
 	PORT_DIPSETTING(    0x06, "1 Pulse / 130 Credits" )  // OK
 	PORT_DIPSETTING(    0x07, "1 Pulse / 500 Credits" )  // OK
-	PORT_DIPNAME( 0x38, 0x00, "Coin A Rate" )       PORT_DIPLOCATION("DSW4:4,5,6")  // not checked
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_6C ) )    // manual says 1c/8c
-	PORT_DIPSETTING(    0x28, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW4:4")  // not checked
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, "Coin A Rate" )       PORT_DIPLOCATION("DSW4:5,6")  // OK
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )  // OK
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )  // OK
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_5C ) )  // OK
+	PORT_DIPSETTING(    0x30, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW4:7")  // not checked
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3549,6 +3550,7 @@ static INPUT_PORTS_START( ns8linwa )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( luckylad ) // CHECK & FIX ME
 	PORT_START("IN0")
