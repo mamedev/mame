@@ -29,8 +29,6 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "ui/uimain.h"
-#include "ui/menu.h"
-
 
 // OSD headers
 
@@ -286,7 +284,7 @@ void sdl_window_info::toggle_full_screen()
 	}
 
 	// reset UI to main menu
-	ui_menu::stack_reset(machine());
+	machine().ui().menu_reset();
 	// kill off the drawers
 	renderer_reset();
 	set_platform_window(nullptr);

@@ -2812,3 +2812,8 @@ void mame_ui_manager::save_main_option()
 	}
 	popup_time(3, "%s", _("\n    Configuration saved    \n\n"));
 }
+
+void mame_ui_manager::menu_reset()
+{
+	ui_menu::stack_reset(machine()); 
+}

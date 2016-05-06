@@ -171,6 +171,8 @@ public:
 	virtual void popup_time_string(int seconds, std::string message) override;
 
 	virtual void image_display(const device_type &type, device_image_interface *image) override;
+	
+	virtual void menu_reset() override;
 private:
 	// instance variables
 	render_font *           m_font;
