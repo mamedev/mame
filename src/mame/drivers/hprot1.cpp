@@ -74,6 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(henry_io_r);
 	DECLARE_DRIVER_INIT(hprot1);
 	DECLARE_PALETTE_INIT(hprot1);
+	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -284,7 +285,7 @@ static GFXDECODE_START( hprot1 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, henry_prot_charlayout, 0, 1 )
 GFXDECODE_END
 
-static HD44780_PIXEL_UPDATE(hprot1_pixel_update)
+HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 {
 	if ( pos < 16 && line==0 )
 	{
@@ -319,7 +320,7 @@ static MACHINE_CONFIG_START( hprot1, hprot1_state )
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(hprot1_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(hprot1_state,hprot1_pixel_update)
 
 	/* TODO: figure out which RTC chip is in use. */
 

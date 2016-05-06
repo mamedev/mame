@@ -112,6 +112,8 @@ public:
 	DECLARE_PALETTE_INIT(ti74);
 	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
+	HD44780_PIXEL_UPDATE(ti74_pixel_update);
+	HD44780_PIXEL_UPDATE(ti95_pixel_update);
 };
 
 
@@ -171,7 +173,7 @@ void ti74_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
 	output().set_lamp_value(y * 10 + x, state);
 }
 
-static HD44780_PIXEL_UPDATE(ti74_pixel_update)
+HD44780_PIXEL_UPDATE(ti74_state::ti74_pixel_update)
 {
 	// char size is 5x7 + cursor
 	if (x > 4 || y > 7)
@@ -180,8 +182,7 @@ static HD44780_PIXEL_UPDATE(ti74_pixel_update)
 	if (line == 1 && pos == 15)
 	{
 		// the last char is used to control the 14 lcd indicators
-		ti74_state *driver_state = device.machine().driver_data<ti74_state>();
-		driver_state->update_lcd_indicator(y, x, state);
+		update_lcd_indicator(y, x, state);
 	}
 	else if (line < 2 && pos < 16)
 	{
@@ -191,7 +192,7 @@ static HD44780_PIXEL_UPDATE(ti74_pixel_update)
 	}
 }
 
-static HD44780_PIXEL_UPDATE(ti95_pixel_update)
+HD44780_PIXEL_UPDATE(ti74_state::ti95_pixel_update)
 {
 	// char size is 5x7 + cursor
 	if (x > 4 || y > 7)
@@ -200,8 +201,7 @@ static HD44780_PIXEL_UPDATE(ti95_pixel_update)
 	if (line == 1 && pos == 15)
 	{
 		// the last char is used to control the 17 lcd indicators
-		ti74_state *driver_state = device.machine().driver_data<ti74_state>();
-		driver_state->update_lcd_indicator(y, x, state);
+		update_lcd_indicator(y, x, state);
 	}
 	else if (line == 0 && pos < 16)
 	{
@@ -532,7 +532,7 @@ static MACHINE_CONFIG_START( ti74, ti74_state )
 
 	MCFG_HD44780_ADD("hd44780") // 270kHz
 	MCFG_HD44780_LCD_SIZE(2, 16) // 2*16 internal
-	MCFG_HD44780_PIXEL_UPDATE_CB(ti74_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(ti74_state,ti74_pixel_update)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ti74_cart")
@@ -566,7 +566,7 @@ static MACHINE_CONFIG_START( ti95, ti74_state )
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(ti95_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(ti74_state,ti95_pixel_update)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ti95_cart")

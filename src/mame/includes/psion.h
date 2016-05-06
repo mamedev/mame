@@ -81,7 +81,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(psion_on);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 
-	static HD44780_PIXEL_UPDATE(lz_pixel_update);
+	HD44780_PIXEL_UPDATE(lz_pixel_update);
 };
 
 
@@ -98,7 +98,7 @@ public:
 	DECLARE_READ8_MEMBER( inc_kb_counter_r );
 	DECLARE_READ8_MEMBER( switchoff_r );
 
-	static HD44780_PIXEL_UPDATE(psion1_pixel_update);
+	HD44780_PIXEL_UPDATE(psion1_pixel_update);
 };
 
 #endif  // _PSION_H_
