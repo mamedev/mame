@@ -13,7 +13,7 @@
 #include <SDL2/SDL_syswm.h>
 #endif
 #else
-#include "sdlinc.h"
+#include <SDL2/SDL_syswm.h>
 #endif
 
 // MAMEOS headers

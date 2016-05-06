@@ -31,7 +31,7 @@
 #include <windows.h>
 #endif
 
-#include "sdlinc.h"
+#include <SDL2/SDL.h>
 
 // MAME headers
 #include "osdepend.h"

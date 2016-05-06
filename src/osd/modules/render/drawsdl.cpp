@@ -20,7 +20,7 @@
 #include "rendersw.hxx"
 
 // standard SDL headers
-#include "sdlinc.h"
+#include <SDL2/SDL.h>
 
 // OSD headers
 #include "osdsdl.h"

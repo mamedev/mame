@@ -14,9 +14,7 @@
 #endif
 
 // standard SDL headers
-#include "sdlinc.h"
-
-#include <SDL2/SDL_thread.h>
+#include <SDL2/SDL.h>
 
 // standard C headers
 #include <math.h>

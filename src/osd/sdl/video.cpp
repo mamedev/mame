@@ -7,7 +7,7 @@
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
 //============================================================
-#include "sdlinc.h"
+#include <SDL2/SDL.h>
 
 // MAME headers
 #include "emu.h"
