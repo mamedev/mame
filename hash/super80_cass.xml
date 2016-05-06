@@ -2,11 +2,13 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
      The original tapes have died long ago, so these were loaded from the
-     archived quickloads into MAME, then saved at 300 baud.
+     archived quickloads into MAME, then saved to wav files.
+     Release dates are between 1981 and 1987, but precise dates are unknown.
+     Although each software is intended for certain computer variations, they may work on others.
  -->
 <softwarelist name="super80_cass" description="Super-80 cassettes">
 <!--
-     Sold in Dick Smith stores and intended for use with super80 and super80d.
+     Sold in Dick Smith stores and intended for use with super80 and super80d, recorded at 300 baud.
      debug, edasm, and basic have numerous bugs.
  -->
 	<software name="horserac">
@@ -68,6 +70,78 @@
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="13885816">
 				<rom name="debug.wav" size="13885816" crc="27c6cfe7" sha1="c6c961cad63eee987405efff35d1843131660d4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+<!--
+     Various commercial releases for use with super80, super80d and super80e, recorded at 300 baud.
+     Mini Typewriter has bugs.
+     There was quite a lot of commercially-available software available, however 99 percent of it has been lost forever.
+ -->
+ 	<software name="eldraw">
+		<description>El Draw 3.6.3</description>
+		<year>1981</year>
+		<publisher>El Graphix</publisher>
+		<info name="usage" value="super80e only. L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="17319458">
+				<rom name="eldraw.wav" size="17319458" crc="786ace93" sha1="000bfd1b6ce9864d2a9b0e733c9061dfdc4ecb4a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="minitype">
+		<description>Mini Typewriter</description>
+		<year>1981</year>
+		<publisher>Bemak</publisher>
+		<info name="usage" value="L to load, G8000 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="5294908">
+				<rom name="minitypewriter.wav" size="5294908" crc="01465f5c" sha1="5715fa5d3c8e450387f1c8dc32c761c2a7c61c23" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="missile">
+		<description>Missile Attack</description>
+		<year>1981</year>
+		<publisher>Matrix Software</publisher>
+		<info name="developer" value="George Georgiou"/>
+		<info name="usage" value="super80d only. LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="19040094">
+				<rom name="missileattack.wav" size="19040094" crc="b17cb7a6" sha1="dd0266414089c31967f08a956db6aa2c9913b389" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="pelatron">
+		<description>Pelatronics Editor Assembler</description>
+		<year>1981</year>
+		<publisher>Pelatronics</publisher>
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="27629118">
+				<rom name="pelatronics.wav" size="27629118" crc="20df6d1d" sha1="5a982a8f34d607c2c4af7e38403c1bd553e35bec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="vonshrin">
+		<description>Von Shrink</description>
+		<year>1981</year>
+		<publisher>unknown</publisher>
+		<info name="usage" value="LOAD while in BASIC, then RUN. SHUT to quit." />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="23345086">
+				<rom name="vonshrink.wav" size="23345086" crc="090605cd" sha1="b55a73bc403f3da3e5aaff33d06b4b37882a60ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="zipzap">
+		<description>Zip Zap</description>
+		<year>1981</year>
+		<publisher>Bemak</publisher>
+		<info name="usage" value="super80d only. L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="15616026">
+				<rom name="zipzap.wav" size="15616026" crc="7bf30894" sha1="50fe59484b5eb39f37933f23754e7f1c2c0f322b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
