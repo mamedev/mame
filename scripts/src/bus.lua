@@ -732,6 +732,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/isa.h",
 		MAME_DIR .. "src/devices/bus/isa/isa_cards.cpp",
 		MAME_DIR .. "src/devices/bus/isa/isa_cards.h",
+		MAME_DIR .. "src/devices/bus/isa/nv4.cpp",
+		MAME_DIR .. "src/devices/bus/isa/svga_nv4.cpp",
 		MAME_DIR .. "src/devices/bus/isa/mda.cpp",
 		MAME_DIR .. "src/devices/bus/isa/mda.h",
 		MAME_DIR .. "src/devices/bus/isa/wdxt_gen.cpp",

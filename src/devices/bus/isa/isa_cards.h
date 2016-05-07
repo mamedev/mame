@@ -22,6 +22,7 @@
 #include "vga.h"
 #include "vga_ati.h"
 #include "svga_cirrus.h"
+#include "svga_nv4.h"
 #include "svga_s3.h"
 #include "svga_tseng.h"
 #include "svga_trident.h"
