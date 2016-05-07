@@ -14,7 +14,6 @@ ROM_START( nv4 )
 
 	ROM_SYSTEM_BIOS( 0, "rivatnt", "nVidia RIVA TNT" )
 	ROMX_LOAD("rivatnt.bin", 0x00000, 0x10000, CRC(6c98a42c) SHA1(a77244d634b7aad2c8e7edb4bc188c116c75f57f), ROM_BIOS(1) )
-	ROM_IGNORE( 0x10000 )
 
 ROM_END
 
