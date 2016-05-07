@@ -128,8 +128,8 @@ void patinho_feio_cpu_device::device_start()
 
 void patinho_feio_cpu_device::device_reset()
 {
-	//m_pc = 0x006; //"PATINHO FEIO" hello-world
-	m_pc = 0x010; //micro-pre-loader
+	m_pc = 0x006; //"PATINHO FEIO" hello-world
+	//m_pc = 0x010; //micro-pre-loader
 	//m_pc = 0xE00; //HEXAM
 	m_rc = 0;
 	m_acc = 0;

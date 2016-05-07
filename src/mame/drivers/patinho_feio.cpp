@@ -182,7 +182,7 @@ void patinho_feio_state::machine_start(){
 	load_raw_data("hexam", 0xE00, 0x0D5);
 
 	load_raw_data("loader", 0xF80, 0x080);
-	load_raw_data("micro_pre_loader", 0x000, 0x02A);
+	//load_raw_data("micro_pre_loader", 0x000, 0x02A); //this is still experimental
 }
 
 static INPUT_PORTS_START( patinho_feio )
