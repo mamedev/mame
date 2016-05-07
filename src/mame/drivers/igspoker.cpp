@@ -2535,8 +2535,8 @@ DRIVER_INIT_MEMBER(igspoker_state,kungfu)
 GAMEL( 1993?,cpoker,    0,        igspoker, cpoker,   igspoker_state, cpoker,   ROT0, "IGS",                  "Champion Poker (v220I)",                     0, layout_igspoker )
 GAMEL( 1993?,cpokert,   cpoker,   igspoker, cpoker,   igspoker_state, cpokert,  ROT0, "IGS (Tuning license)", "Champion Poker (v200G)",                     0, layout_igspoker )
 GAMEL( 1993, cpokerx,   cpoker,   igspoker, cpokerx,  igspoker_state, cpokert,  ROT0, "IGS",                  "Champion Poker (v100)",                      0, layout_igspoker )
-GAMEL( 2000, chleague,  0,        igspoker, chleague, igspoker_state, chleague, ROT0, "IGS",                  "Champion League (Poker)",                    0, layout_igspoker )
-GAMEL( 2000, chleagul,  chleague, igspoker, chleague, igspoker_state, chleague, ROT0, "IGS",                  "Champion League (Lattine)",                  0, layout_igspoker )
+GAMEL( 2000, chleague,  0,        igspoker, chleague, igspoker_state, chleague, ROT0, "IGS",                  "Champion League (v220I, Poker)",             0, layout_igspoker )
+GAMEL( 2000, chleagul,  chleague, igspoker, chleague, igspoker_state, chleague, ROT0, "IGS",                  "Champion League (v220I, Lattine)",           0, layout_igspoker )
 GAMEL( 198?, csk227it,  0,        csk227it, csk227,   igspoker_state, cska,     ROT0, "IGS",                  "Champion Skill (with Ability)",              0, layout_igspoker ) /* SU 062 */
 GAMEL( 198?, csk234it,  csk227it, csk234it, csk234,   igspoker_state, cska,     ROT0, "IGS",                  "Champion Skill (Ability, Poker & Symbols)",  0, layout_igspoker ) /* SU 062 */
 GAMEL( 2000, number10,  0,        number10, number10, igspoker_state, number10, ROT0, "PlayMark SRL",         "Number Dieci (Poker)",                       0, layout_igspoker )
