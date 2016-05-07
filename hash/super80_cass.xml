@@ -13,7 +13,7 @@
  -->
 	<software name="horserac">
 		<description>Horse Race</description>
-		<year>1981</year>
+		<year>198?</year>
 		<publisher>Dick Smith Electronics</publisher>
 		<info name="serial" value="X-3607" /><!-- 012L1 -->
 		<info name="developer" value="George Georgiou"/>
@@ -26,7 +26,7 @@
 	</software>
 	<software name="dungeon">
 		<description>Dungeon Dilemma</description>
-		<year>1981</year>
+		<year>198?</year>
 		<publisher>Dick Smith Electronics</publisher>
 		<info name="serial" value="X-3792" /><!-- 028L1 -->
 		<info name="developer" value="George Georgiou"/>
@@ -39,7 +39,7 @@
 	</software>
 	<software name="basic">
 		<description>Tape Basic</description>
-		<year>1981</year>
+		<year>198?</year>
 		<publisher>Dick Smith Electronics</publisher>
 		<info name="serial" value="K-3602" /><!-- 421 -->
 		<info name="usage" value="L to load, G100 to run" />
@@ -51,7 +51,7 @@
 	</software>
 	<software name="edasm">
 		<description>Editor Assembler</description>
-		<year>1981</year>
+		<year>198?</year>
 		<publisher>Dick Smith Electronics</publisher>
 		<info name="serial" value="X-3791" /><!-- 437L1 -->
 		<info name="usage" value="0xF0 must be nonzero, L to load, G8000 to run" />
@@ -63,7 +63,7 @@
 	</software>
 	<software name="debug">
 		<description>Debugger</description>
-		<year>1981</year>
+		<year>198?</year>
 		<publisher>Dick Smith Electronics</publisher>
 		<info name="serial" value="X-3790" /><!-- 438L1 -->
 		<info name="usage" value="0xF0 must be nonzero, L to load, G100 to run" />
@@ -80,7 +80,7 @@
  -->
  	<software name="eldraw">
 		<description>El Draw 3.6.3</description>
-		<year>1981</year>
+		<year>198?</year>
 		<publisher>El Graphix</publisher>
 		<info name="serial" value="402" />
 		<info name="usage" value="super80e only. L to load, G100 to run" />
@@ -92,7 +92,7 @@
 	</software>
 	<software name="minitype">
 		<description>Mini Typewriter</description>
-		<year>1981</year>
+		<year>198?</year>
 		<publisher>Bemak</publisher>
 		<info name="serial" value="417" />
 		<info name="usage" value="L to load, G8000 to run" />
@@ -104,7 +104,7 @@
 	</software>
 	<software name="missile">
 		<description>Missile Attack</description>
-		<year>1981</year>
+		<year>198?</year>
 		<publisher>Matrix Software</publisher>
 		<info name="serial" value="013L2" />
 		<info name="developer" value="George Georgiou"/>
@@ -117,7 +117,7 @@
 	</software>
 	<software name="pelatron">
 		<description>Pelatronics Editor Assembler</description>
-		<year>1981</year>
+		<year>198?</year>
 		<publisher>Pelatronics</publisher>
 		<info name="serial" value="427" />
 		<info name="usage" value="L to load, G100 to run" />
@@ -129,7 +129,7 @@
 	</software>
 	<software name="zipzap">
 		<description>Zip Zap</description>
-		<year>1981</year>
+		<year>198?</year>
 		<publisher>Bemak</publisher>
 		<info name="serial" value="403" />
 		<info name="usage" value="super80d only. L to load, G100 to run" />
@@ -143,9 +143,22 @@
      Various homebrew programs for use with super80, super80d and super80e, recorded at 300 baud.
      Some is ok, some is junk.
  -->
+	<software name="horseracem" cloneof="horserac">
+		<description>Horse Race (modified)</description>
+		<year>198?</year>
+		<publisher>Matrix Software</publisher>
+		<info name="developer" value="George Georgiou"/>
+		<info name="serial" value="012L1R2" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="14748384">
+				<rom name="horsem.wav" size="14748384" crc="4e6c67ee" sha1="cc161b293c48fd19934cb29b0b3c85bae00f1d59" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 	<software name="vonshrin">
 		<description>Von Shrink</description>
-		<year>1981</year>
+		<year>198?</year>
 		<publisher>unknown</publisher>
 		<info name="serial" value="074L1" />
 		<info name="usage" value="LOAD while in BASIC, then RUN. SHUT to quit." />
@@ -161,8 +174,8 @@
      The "developer" field has the name of the original author.
  -->
 	<software name="pontoon">
-		<description>Shep's Casino (Pontoon)</description>
-		<year>1981</year>
+		<description>Shep's Casino (L4)(Pontoon)</description>
+		<year>198?</year>
 		<publisher>unknown</publisher>
 		<info name="serial" value="002L4" />
 		<info name="developer" value="Glyn Shepherd"/>
@@ -174,8 +187,8 @@
 		</part>
 	</software>
 	<software name="riverboa">
-		<description>Riverboat</description>
-		<year>1981</year>
+		<description>Riverboat (L4)</description>
+		<year>198?</year>
 		<publisher>unknown</publisher>
 		<info name="serial" value="003L4" />
 		<info name="usage" value="LOAD while in BASIC, then RUN" />
@@ -186,8 +199,8 @@
 		</part>
 	</software>
 	<software name="riverboatj" cloneof="riverboa">
-		<description>Riverboat (arrow keys)</description>
-		<year>1981</year>
+		<description>Riverboat (L4)(arrow keys)</description>
+		<year>198?</year>
 		<publisher>unknown</publisher>
 		<info name="serial" value="003L4J" />
 		<info name="usage" value="LOAD while in BASIC, then RUN" />
@@ -198,8 +211,8 @@
 		</part>
 	</software>
 	<software name="tibetian">
-		<description>Tibetian Disks</description>
-		<year>1981</year>
+		<description>Tibetian Disks (L4)</description>
+		<year>198?</year>
 		<publisher>unknown</publisher>
 		<info name="serial" value="004L4" />
 		<info name="usage" value="LOAD while in BASIC, then RUN" />
@@ -210,8 +223,8 @@
 		</part>
 	</software>
 	<software name="matchmat">
-		<description>Match Mates</description>
-		<year>1981</year>
+		<description>Match Mates (L4)</description>
+		<year>198?</year>
 		<publisher>unknown</publisher>
 		<info name="serial" value="005L4" />
 		<info name="developer" value="Glyn Shepherd"/>
@@ -223,8 +236,8 @@
 		</part>
 	</software>
 	<software name="aceyduce">
-		<description>Acey-Ducey</description>
-		<year>1981</year>
+		<description>Acey-Ducey (L4)</description>
+		<year>198?</year>
 		<publisher>unknown</publisher>
 		<info name="serial" value="006L4" />
 		<info name="developer" value="Glyn Shepherd"/>
@@ -232,6 +245,146 @@
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="4153556">
 				<rom name="aceyducey.wav" size="4153556" crc="0b8aab7a" sha1="77445735df1154e3b1c9a7d8baaf8465a7f6ec30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="hangman">
+		<description>Hangman (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="007L4" />
+		<info name="developer" value="Glyn Shepherd"/>
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="6776420">
+				<rom name="hangman.wav" size="6776420" crc="f5bf50f6" sha1="33030d0c81754394717f7ed8378def017e91ce00" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="suprtrek">
+		<description>Super Trek (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="008L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="8086370">
+				<rom name="suprtrek.wav" size="8086370" crc="0354afa1" sha1="3905b470a44ff4d67e98af820bd9d066195a5661" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="crash">
+		<description>Crash (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="009L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="4157770">
+				<rom name="crash.wav" size="4157770" crc="1ecb0626" sha1="6312169c5ba315491945ae145fcad7f24b468278" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="crashj">
+		<description>Crash (L4)(arrow keys)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="009L4J" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="4156730">
+				<rom name="crashj.wav" size="4156730" crc="5ed8faf2" sha1="65dbfc6e2cff26a1f2938229c8c6ccaa95ad4ba8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="meteor">
+		<description>Meteor Run (L4)</description>
+		<year>198?</year>
+		<publisher>Matrix Software</publisher>
+		<info name="developer" value="George Georgiou"/>
+		<info name="serial" value="010L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="2407872">
+				<rom name="meteor.wav" size="2407872" crc="c66afd8f" sha1="8851e70be0d2884577b38a08bc57a07a1ca79c97" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="meteorj">
+		<description>Meteor Run (L4)(arrow keys)</description>
+		<year>198?</year>
+		<publisher>Matrix Software</publisher>
+		<info name="developer" value="George Georgiou"/>
+		<info name="serial" value="010L4J" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="2406706">
+				<rom name="meteorj.wav" size="2406706" crc="e649983e" sha1="41b3428c6adc9d07df6563cbd2c1d2f7b830c7f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="snake">
+		<description>Snake (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="011L4" />
+		<info name="developer" value="Steve Lunney"/>
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="6774810">
+				<rom name="snake.wav" size="6774810" crc="f74ba2ff" sha1="5c89ceeda279103e7b0177609ddf39f775e383a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="snakej">
+		<description>Snake (L4)(with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="011L4J" />
+		<info name="developer" value="Steve Lunney"/>
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="5903456">
+				<rom name="snakej.wav" size="5903456" crc="75575ee6" sha1="23859093c697d89d8b0548f6a03ee3e11cb1de9f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="horserace4" cloneof="horserac">
+		<description>Horse Race (L4)</description>
+		<year>198?</year>
+		<publisher>Matrix Software</publisher>
+		<info name="developer" value="George Georgiou"/>
+		<info name="serial" value="012L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="4590882">
+				<rom name="horserace4.wav" size="4590882" crc="b2ae6027" sha1="ddb96566e8216c2c3e314335a372291ad4ff477e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="missile4" cloneof="missile">
+		<description>Missile Attack (L4)</description>
+		<year>198?</year>
+		<publisher>Matrix Software</publisher>
+		<info name="developer" value="George Georgiou"/>
+		<info name="serial" value="013L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="7647988">
+				<rom name="missileattack4.wav" size="7647988" crc="23863287" sha1="c41af95c8aa38faa182c53bd21693ee2708bd205" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="missile4j" cloneof="missile">
+		<description>Missile Attack (L4)(with arrows)</description>
+		<year>198?</year>
+		<publisher>Matrix Software</publisher>
+		<info name="developer" value="George Georgiou"/>
+		<info name="serial" value="013L4J" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="7648040">
+				<rom name="missileattack4j.wav" size="7648040" crc="7037ba84" sha1="175c1090768c9bb4821468487700958df7405518" offset="0" />
 			</dataarea>
 		</part>
 	</software>
