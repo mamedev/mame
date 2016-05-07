@@ -4480,7 +4480,49 @@ only have some part of Windows file and a Video driver(CLGD?).
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<software name="aress">
+		<description>Aress Ou no Monogatari - The Story of King Aress</description>
+		<year>1994</year>
+		<publisher>ガスト (Gust)</publisher>
+		<info name="alt_title" value="アレス王の物語" />
+		<info name="release" value="19940318" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_1.dip" size="1261824" crc="9f77a0bc" sha1="ec734291f8753e1f0838df8edd69b6fafd67daa9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_2.dip" size="1261824" crc="b9c32182" sha1="ff3cf49bfbf0479c571467e7267c3b076c80d53c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_3.dip" size="1261824" crc="bbafdc61" sha1="0aeb049d9e324b298e822dd92975e928f35f0f8f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_4.dip" size="1261824" crc="00f1c759" sha1="6ed99eefdde5e80fbe558e69bbd4fe6e27d74455" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_5.dip" size="1261824" crc="a50ff292" sha1="02eaac4a38a6ec7960b9a1b94afebb0094db19d8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_6.dip" size="1261824" crc="e0b79654" sha1="2d142970c69a716adcb6a69770e0b82ad3ba11a5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ares_7.dip" size="1261824" crc="d8420bd8" sha1="29422b02c0c5628bd2362ef3a66ac9537d19c13c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- 2dd image -->
 	<software name="arkanoid" supported="yes">
@@ -41556,6 +41598,38 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="vg1_d.fdi" size="1265664" crc="c1af613b" sha1="3f71de2d8f7fbff4adcdcf9854c8078bdb4f7142" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="vga" cloneof="vg">
+		<description>V.G. - Variable Geo (Alt)</description>
+		<year>1993</year>
+		<publisher>戯画 (Giga)</publisher>
+		<info name="alt_title" value="ヴァリアブル・ジオ" />
+		<info name="release" value="19930709" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="variable geo (1993)(giga)(a).fdi" size="1265664" crc="3a8a263d" sha1="3ca67357f1821fd49543ee7c3c972d16eae01bac" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="variable geo (1993)(giga)(b).fdi" size="1265664" crc="645ab1e3" sha1="de994b6a4f949acfdc2ee69c5b2d1e8c444020ff" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="variable geo (1993)(giga)(c).fdi" size="1265664" crc="0d016f6b" sha1="4fc826e43296d7f5c3d60307ca74c6f395af7500" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="variable geo (1993)(giga)(d).fdi" size="1265664" crc="07be9e68" sha1="69cb688f030efab51e08a4d546cbf83ad6513788" offset="0" />
 			</dataarea>
 		</part>
 	</software>
