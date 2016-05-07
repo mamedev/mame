@@ -500,7 +500,7 @@ public:
 		pstring m_dev_name;
 	};
 
-	ATTR_COLD device_t *Create(netlist_t &anetlist, const pstring &name) override
+	device_t *Create(netlist_t &anetlist, const pstring &name) override
 	{
 		return palloc(wrapper(this->name(), anetlist, name));
 	}

@@ -47,7 +47,7 @@
  */
 
 // This will be autodetected
-// #define NL_PMF_TYPE 2
+// #define NL_PMF_TYPE 3
 
 #define NL_PMF_TYPE_VIRTUAL         0
 #define NL_PMF_TYPE_GNUC_PMF        1

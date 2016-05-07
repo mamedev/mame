@@ -59,8 +59,8 @@ public:
 
 	virtual ~NETLIB_NAME(solver)();
 
-	ATTR_COLD void post_start();
-	ATTR_COLD void stop() override;
+	void post_start();
+	void stop() override;
 
 	inline nl_double gmin() { return m_gmin.Value(); }
 

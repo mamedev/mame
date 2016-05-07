@@ -74,8 +74,8 @@ private:
 class matrix_solver_t : public device_t
 {
 public:
-	typedef pvector_t<matrix_solver_t *> list_t;
-	typedef core_device_t::list_t dev_list_t;
+	using list_t = pvector_t<matrix_solver_t *>;
+	using dev_list_t = core_device_t::list_t;
 
 	enum eSortType
 	{

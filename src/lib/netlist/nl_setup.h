@@ -91,7 +91,7 @@ namespace netlist
 		class source_t
 		{
 		public:
-			typedef pvector_t<source_t *> list_t;
+			using list_t = pvector_t<source_t *>;
 
 			source_t()
 			{}

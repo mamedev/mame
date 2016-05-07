@@ -242,7 +242,7 @@ void truthtable_desc_t::setup(const pstring_vector_t &truthtable, UINT32 disable
 }
 
 #define ENTRYX(_n,_m,_h)    case (_n * 1000 + _m * 10 + _h): \
-	{ typedef netlist_factory_truthtable_t<_n,_m,_h> xtype; \
+	{ using xtype = netlist_factory_truthtable_t<_n,_m,_h>; \
 		return palloc(xtype(name,classname,def_param)); } break
 
 #define ENTRYY(_n,_m)   ENTRYX(_n,_m,0); ENTRYX(_n,_m,1)

@@ -27,9 +27,9 @@ public:
 	bool isLoaded() const;
 
 	template <typename T>
-	T *getsym(const pstring name)
+	T getsym(const pstring name)
 	{
-		return reinterpret_cast<T *>(getsym_p(name));
+		return reinterpret_cast<T>(getsym_p(name));
 	}
 private:
 	void *getsym_p(const pstring name);
