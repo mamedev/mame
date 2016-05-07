@@ -206,7 +206,7 @@
 		<info name="usage" value="LOAD while in BASIC, then RUN" />
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="2844850">
-				<rom name="riverboat.wav" size="2844850" crc="06438381" sha1="dc22308ffaa63c82e3fcfbe943832a269c07fe4d" offset="0" />
+				<rom name="riverboatj.wav" size="2844850" crc="06438381" sha1="dc22308ffaa63c82e3fcfbe943832a269c07fe4d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
