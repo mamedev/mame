@@ -336,7 +336,7 @@ int powervr2_device::uv_wrap(float uv, int size)
 int powervr2_device::uv_flip(float uv, int size)
 {
 	int iuv = (int)uv;
-	return (iuv & size) ? (iuv & (size - 1)) ^ (size - 1) : iuv & (size - 1);
+	return ((iuv & size) ? ~iuv : iuv) & (size - 1);
 }
 int powervr2_device::uv_clamp(float uv, int size)
 {
