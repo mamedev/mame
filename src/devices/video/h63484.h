@@ -33,6 +33,9 @@ typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, i
 #define MCFG_H63484_DISPLAY_CALLBACK_OWNER(_class, _method) \
 	h63484_device::static_set_display_callback(*device, h63484_display_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
+#define MCFG_H63484_AUTO_CONFIGURE_SCREEN(_val) \
+	h63484_device::static_set_auto_configure_screen(*device, _val);
+
 #define H63484_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, UINT16 data)
 
 
@@ -47,6 +50,7 @@ public:
 	h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_display_callback(device_t &device, h63484_display_delegate callback) { downcast<h63484_device &>(device).m_display_cb = callback; }
+	static void static_set_auto_configure_screen(device_t &device, bool auto_configure_screen) { downcast<h63484_device &>(device).m_auto_configure_screen = auto_configure_screen; }
 
 	DECLARE_WRITE16_MEMBER( address_w );
 	DECLARE_WRITE16_MEMBER( data_w );
@@ -113,6 +117,7 @@ private:
 	void register_save_state();
 
 	h63484_display_delegate  m_display_cb;
+	bool m_auto_configure_screen;
 
 	UINT8 m_ar;
 	UINT8 m_vreg[0x100];
