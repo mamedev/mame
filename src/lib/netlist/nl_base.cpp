@@ -501,35 +501,9 @@ ATTR_COLD void device_t::register_subalias(const pstring &name, const pstring &a
 	//  m_terminals.add(name);
 }
 
-ATTR_COLD void device_t::register_terminal(const pstring &name, terminal_t &port)
+ATTR_COLD void device_t::register_p(const pstring &name, object_t &obj)
 {
-	setup().register_object(*this, name, port);
-	if (port.isType(terminal_t::INPUT) || port.isType(terminal_t::TERMINAL))
-		m_terminals.push_back(port.name());
-}
-
-ATTR_COLD void device_t::register_output(const pstring &name, logic_output_t &port)
-{
-	port.set_logic_family(this->logic_family());
-	setup().register_object(*this, name, port);
-}
-
-ATTR_COLD void device_t::register_output(const pstring &name, analog_output_t &port)
-{
-	setup().register_object(*this, name, port);
-}
-
-ATTR_COLD void device_t::register_input(const pstring &name, logic_input_t &inp)
-{
-	inp.set_logic_family(this->logic_family());
-	setup().register_object(*this, name, inp);
-	m_terminals.push_back(inp.name());
-}
-
-ATTR_COLD void device_t::register_input(const pstring &name, analog_input_t &inp)
-{
-	setup().register_object(*this, name, inp);
-	m_terminals.push_back(inp.name());
+	setup().register_object(*this, name, obj);
 }
 
 ATTR_COLD void device_t::connect_late(core_terminal_t &t1, core_terminal_t &t2)
@@ -1008,7 +982,7 @@ ATTR_HOT /* inline */ void NETLIB_NAME(mainclock)::mc_update(logic_net_t &net)
 
 NETLIB_START(mainclock)
 {
-	register_output("Q", m_Q);
+	enregister("Q", m_Q);
 
 	register_param("FREQ", m_freq, 7159000.0 * 5);
 	m_inc = netlist_time::from_hz(m_freq.Value()*2);

@@ -71,8 +71,8 @@ NETLIB_START(7448)
 	register_subalias("B", sub->m_B);
 	register_subalias("C", sub->m_C);
 	register_subalias("D", sub->m_D);
-	register_input("LTQ", m_LTQ);
-	register_input("BIQ", m_BIQ);
+	enregister("LTQ", m_LTQ);
+	enregister("BIQ", m_BIQ);
 	register_subalias("RBIQ",sub->m_RBIQ);
 
 	register_subalias("a", sub->m_Q[0]);
@@ -122,19 +122,19 @@ NETLIB_UPDATE(7448)
 
 NETLIB_START(7448_sub)
 {
-	register_input("A0", m_A);
-	register_input("A1", m_B);
-	register_input("A2", m_C);
-	register_input("A3", m_D);
-	register_input("RBIQ", m_RBIQ);
+	enregister("A0", m_A);
+	enregister("A1", m_B);
+	enregister("A2", m_C);
+	enregister("A3", m_D);
+	enregister("RBIQ", m_RBIQ);
 
-	register_output("a", m_Q[0]);
-	register_output("b", m_Q[1]);
-	register_output("c", m_Q[2]);
-	register_output("d", m_Q[3]);
-	register_output("e", m_Q[4]);
-	register_output("f", m_Q[5]);
-	register_output("g", m_Q[6]);
+	enregister("a", m_Q[0]);
+	enregister("b", m_Q[1]);
+	enregister("c", m_Q[2]);
+	enregister("d", m_Q[3]);
+	enregister("e", m_Q[4]);
+	enregister("f", m_Q[5]);
+	enregister("g", m_Q[6]);
 
 	save(NLNAME(m_state));
 }

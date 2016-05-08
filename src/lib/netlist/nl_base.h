@@ -1130,11 +1130,11 @@ namespace netlist
 
 		ATTR_COLD void register_subalias(const pstring &name, core_terminal_t &term);
 		ATTR_COLD void register_subalias(const pstring &name, const pstring &aliased);
-		ATTR_COLD void register_terminal(const pstring &name, terminal_t &port);
-		ATTR_COLD void register_output(const pstring &name, analog_output_t &out);
-		ATTR_COLD void register_output(const pstring &name, logic_output_t &out);
-		ATTR_COLD void register_input(const pstring &name, analog_input_t &in);
-		ATTR_COLD void register_input(const pstring &name, logic_input_t &in);
+		ATTR_COLD void enregister(const pstring &name, terminal_t &port) { register_p(name, port); }
+		ATTR_COLD void enregister(const pstring &name, analog_output_t &out) { register_p(name, out); };
+		ATTR_COLD void enregister(const pstring &name, logic_output_t &out) { register_p(name, out); };
+		ATTR_COLD void enregister(const pstring &name, analog_input_t &in) { register_p(name, in); };
+		ATTR_COLD void enregister(const pstring &name, logic_input_t &in) { register_p(name, in); };
 
 		ATTR_COLD void connect_late(const pstring &t1, const pstring &t2);
 		ATTR_COLD void connect_late(core_terminal_t &t1, core_terminal_t &t2);
@@ -1152,6 +1152,7 @@ namespace netlist
 		ATTR_COLD void register_param(const pstring &sname, C &param, const T initialVal);
 
 	private:
+		ATTR_COLD void register_p(const pstring &name, object_t &obj);
 		ATTR_COLD void register_sub_p(device_t &dev);
 	};
 

@@ -19,8 +19,8 @@ NETLIB_START(7493)
 
 	register_subalias("CLKA", A->m_I);
 	register_subalias("CLKB", B->m_I);
-	register_input("R1",  m_R1);
-	register_input("R2",  m_R2);
+	enregister("R1",  m_R1);
+	enregister("R2",  m_R2);
 
 	register_subalias("QA", A->m_Q);
 	register_subalias("QB", B->m_Q);
@@ -41,8 +41,8 @@ NETLIB_RESET(7493)
 
 NETLIB_START(7493ff)
 {
-	register_input("CLK", m_I);
-	register_output("Q", m_Q);
+	enregister("CLK", m_I);
+	enregister("Q", m_Q);
 
 	save(NLNAME(m_reset));
 	save(NLNAME(m_state));

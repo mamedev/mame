@@ -14,7 +14,7 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(log)
 {
-	register_input("I", m_I);
+	enregister("I", m_I);
 
 	pstring filename = pfmt("{1}.log")(name());
 	m_strm = palloc(pofilestream(filename));
@@ -39,7 +39,7 @@ NETLIB_NAME(log)::~NETLIB_NAME(log)()
 NETLIB_START(logD)
 {
 	NETLIB_NAME(log)::start();
-	register_input("I2", m_I2);
+	enregister("I2", m_I2);
 }
 
 NETLIB_RESET(logD)
@@ -56,7 +56,7 @@ NETLIB_UPDATE(logD)
 #if 0
 NETLIB_START(wav)
 {
-	register_input("I", m_I);
+	enregister("I", m_I);
 
 	pstring filename = "netlist_" + name() + ".wav";
 	m_file = wav_open(filename, sample_rate(), active_inputs()/2)

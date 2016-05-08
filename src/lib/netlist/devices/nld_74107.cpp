@@ -11,9 +11,9 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(74107Asub)
 {
-	register_input("CLK", m_clk);
-	register_output("Q", m_Q);
-	register_output("QQ", m_QQ);
+	enregister("CLK", m_clk);
+	enregister("Q", m_Q);
+	enregister("QQ", m_QQ);
 
 	save(NLNAME(m_Q1));
 	save(NLNAME(m_Q2));
@@ -36,9 +36,9 @@ NETLIB_START(74107A)
 	register_sub("sub", sub);
 
 	register_subalias("CLK", sub->m_clk);
-	register_input("J", m_J);
-	register_input("K", m_K);
-	register_input("CLRQ", m_clrQ);
+	enregister("J", m_J);
+	enregister("K", m_K);
+	enregister("CLRQ", m_clrQ);
 	register_subalias("Q", sub->m_Q);
 	register_subalias("QQ", sub->m_QQ);
 

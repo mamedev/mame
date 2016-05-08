@@ -75,13 +75,13 @@ NETLIB_START(QBJT_switch)
 {
 	NETLIB_NAME(Q)::start();
 
-	register_terminal("B", m_RB.m_P);
-	register_terminal("E", m_RB.m_N);
-	register_terminal("C", m_RC.m_P);
-	register_terminal("_E1", m_RC.m_N);
+	enregister("B", m_RB.m_P);
+	enregister("E", m_RB.m_N);
+	enregister("C", m_RC.m_P);
+	enregister("_E1", m_RC.m_N);
 
-	register_terminal("_B1", m_BC_dummy.m_P);
-	register_terminal("_C1", m_BC_dummy.m_N);
+	enregister("_B1", m_BC_dummy.m_P);
+	enregister("_C1", m_BC_dummy.m_N);
 
 	connect_late(m_RB.m_N, m_RC.m_N);
 
@@ -173,14 +173,14 @@ NETLIB_START(QBJT_EB)
 {
 	NETLIB_NAME(Q)::start();
 
-	register_terminal("E", m_D_EB.m_P);   // Cathode
-	register_terminal("B", m_D_EB.m_N);   // Anode
+	enregister("E", m_D_EB.m_P);   // Cathode
+	enregister("B", m_D_EB.m_N);   // Anode
 
-	register_terminal("C", m_D_CB.m_P);   // Cathode
-	register_terminal("_B1", m_D_CB.m_N); // Anode
+	enregister("C", m_D_CB.m_P);   // Cathode
+	enregister("_B1", m_D_CB.m_N); // Anode
 
-	register_terminal("_E1", m_D_EC.m_P);
-	register_terminal("_C1", m_D_EC.m_N);
+	enregister("_E1", m_D_EC.m_P);
+	enregister("_C1", m_D_EC.m_N);
 
 	connect_late(m_D_EB.m_P, m_D_EC.m_P);
 	connect_late(m_D_EB.m_N, m_D_CB.m_N);

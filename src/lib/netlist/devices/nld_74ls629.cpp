@@ -46,8 +46,8 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(SN74LS629clk)
 {
-	register_input("FB",    m_FB);
-	register_output("Y",    m_Y);
+	enregister("FB",    m_FB);
+	enregister("Y",    m_Y);
 
 	connect_late(m_FB, m_Y);
 
@@ -84,9 +84,9 @@ NETLIB_START(SN74LS629)
 	register_sub("R_FC", m_R_FC);
 	register_sub("R_RNG", m_R_RNG);
 
-	register_input("ENQ", m_ENQ);
-	register_input("RNG",    m_RNG);
-	register_input("FC",     m_FC);
+	enregister("ENQ", m_ENQ);
+	enregister("RNG",    m_RNG);
+	enregister("FC",     m_FC);
 	register_subalias("GND",    m_R_FC->m_N);
 
 	connect_late(m_FC, m_R_FC->m_P);

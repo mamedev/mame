@@ -143,12 +143,12 @@ public:
 		for (unsigned i=0; i < m_NI; i++)
 		{
 			inout[i] = inout[i].trim();
-			register_input(inout[i], m_I[i]);
+			enregister(inout[i], m_I[i]);
 		}
 		for (unsigned i=0; i < m_NO; i++)
 		{
 			out[i] = out[i].trim();
-			register_output(out[i], m_Q[i]);
+			enregister(out[i], m_Q[i]);
 		}
 		// Connect output "Q" to input "_Q" if this exists
 		// This enables timed state without having explicit state ....

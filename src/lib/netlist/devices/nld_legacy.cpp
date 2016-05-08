@@ -12,10 +12,10 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(nicRSFF)
 {
-	register_input("S", m_S);
-	register_input("R", m_R);
-	register_output("Q", m_Q);
-	register_output("QQ", m_QQ);
+	enregister("S", m_S);
+	enregister("R", m_R);
+	enregister("Q", m_Q);
+	enregister("QQ", m_QQ);
 }
 
 NETLIB_RESET(nicRSFF)
@@ -40,8 +40,8 @@ NETLIB_UPDATE(nicRSFF)
 
 NETLIB_START(nicDelay)
 {
-	register_input("1", m_I);
-	register_output("2", m_Q);
+	enregister("1", m_I);
+	enregister("2", m_Q);
 
 	register_param("L_TO_H", m_L_to_H, 10);
 	register_param("H_TO_L", m_H_to_L, 10);

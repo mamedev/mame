@@ -19,10 +19,10 @@ NETLIB_START(9316)
 
 	register_subalias("CLK", sub->m_CLK);
 
-	register_input("ENP", m_ENP);
-	register_input("ENT", m_ENT);
-	register_input("CLRQ", m_CLRQ);
-	register_input("LOADQ", m_LOADQ);
+	enregister("ENP", m_ENP);
+	enregister("ENT", m_ENT);
+	enregister("CLRQ", m_CLRQ);
+	enregister("LOADQ", m_LOADQ);
 
 	register_subalias("A", subABCD->m_A);
 	register_subalias("B", subABCD->m_B);
@@ -45,10 +45,10 @@ NETLIB_RESET(9316)
 
 NETLIB_START(9316_subABCD)
 {
-	register_input("A", m_A);
-	register_input("B", m_B);
-	register_input("C", m_C);
-	register_input("D", m_D);
+	enregister("A", m_A);
+	enregister("B", m_B);
+	enregister("C", m_C);
+	enregister("D", m_D);
 
 }
 
@@ -68,13 +68,13 @@ NETLIB_UPDATE(9316_subABCD)
 
 NETLIB_START(9316_sub)
 {
-	register_input("CLK", m_CLK);
+	enregister("CLK", m_CLK);
 
-	register_output("QA", m_QA);
-	register_output("QB", m_QB);
-	register_output("QC", m_QC);
-	register_output("QD", m_QD);
-	register_output("RC", m_RC);
+	enregister("QA", m_QA);
+	enregister("QB", m_QB);
+	enregister("QC", m_QC);
+	enregister("QD", m_QD);
+	enregister("RC", m_RC);
 
 	save(NLNAME(m_cnt));
 	save(NLNAME(m_loadq));

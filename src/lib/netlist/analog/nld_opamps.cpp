@@ -54,12 +54,12 @@ NETLIB_START(OPAMP)
 
 	m_type = m_model.model_value("TYPE");
 
-	register_input("VCC", m_VCC);
-	register_input("GND", m_GND);
+	enregister("VCC", m_VCC);
+	enregister("GND", m_GND);
 
-	register_output("VL", m_VL);
-	register_output("VH", m_VH);
-	register_output("VREF", m_VREF);
+	enregister("VL", m_VL);
+	enregister("VH", m_VH);
+	enregister("VREF", m_VREF);
 
 	register_sub("G1", m_G1);
 	register_sub("RP1", m_RP);

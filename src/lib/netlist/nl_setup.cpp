@@ -214,14 +214,31 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 				if (obj.isType(terminal_t::OUTPUT))
 				{
 					if (obj.isFamily(terminal_t::LOGIC))
+					{
+						logic_output_t &port = dynamic_cast<logic_output_t &>(term);
+						port.set_logic_family(dev.logic_family());
 						dynamic_cast<logic_output_t &>(term).init_object(dev, dev.name() + "." + name);
+					}
 					else if (obj.isFamily(terminal_t::ANALOG))
 						dynamic_cast<analog_output_t &>(term).init_object(dev, dev.name() + "." + name);
 					else
 						log().fatal("Error adding {1} {2} to terminal list, neither LOGIC nor ANALOG\n", objtype_as_astr(term), term.name());
 				}
-				else
+				else if (obj.isType(terminal_t::INPUT))
+				{
+					if (obj.isFamily(terminal_t::LOGIC))
+					{
+						logic_input_t &port = dynamic_cast<logic_input_t &>(term);
+						port.set_logic_family(dev.logic_family());
+					}
 					term.init_object(dev, dev.name() + "." + name);
+					dev.m_terminals.push_back(obj.name());
+				}
+				else
+				{
+					term.init_object(dev, dev.name() + "." + name);
+					dev.m_terminals.push_back(obj.name());
+				}
 
 				if (!m_terminals.add(term.name(), &term))
 					log().fatal("Error adding {1} {2} to terminal list\n", objtype_as_astr(term), term.name());

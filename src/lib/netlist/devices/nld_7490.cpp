@@ -11,17 +11,17 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(7490)
 {
-	register_input("A", m_A);
-	register_input("B", m_B);
-	register_input("R1",  m_R1);
-	register_input("R2",  m_R2);
-	register_input("R91", m_R91);
-	register_input("R92", m_R92);
+	enregister("A", m_A);
+	enregister("B", m_B);
+	enregister("R1",  m_R1);
+	enregister("R2",  m_R2);
+	enregister("R91", m_R91);
+	enregister("R92", m_R92);
 
-	register_output("QA", m_Q[0]);
-	register_output("QB", m_Q[1]);
-	register_output("QC", m_Q[2]);
-	register_output("QD", m_Q[3]);
+	enregister("QA", m_Q[0]);
+	enregister("QB", m_Q[1]);
+	enregister("QC", m_Q[2]);
+	enregister("QD", m_Q[3]);
 
 	save(NLNAME(m_cnt));
 	save(NLNAME(m_last_A));
