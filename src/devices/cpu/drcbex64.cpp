@@ -5193,6 +5193,10 @@ void drcbe_x64::op_or(x86code *&dst, const instruction &inst)
 		if (dstp.is_memory() && dstp == src1p)
 			emit_or_m32_p32(dst, MABS(dstp.memory()), src2p, inst);                     // or    [dstp],src2p
 
+		// dstp == src2p in memory
+		else if (dstp.is_memory() && dstp == src2p)
+			emit_or_m32_p32(dst, MABS(dstp.memory()), src1p, inst);						// or    [dstp],src1p
+
 		// general case
 		else
 		{
@@ -5208,6 +5212,10 @@ void drcbe_x64::op_or(x86code *&dst, const instruction &inst)
 		// dstp == src1p in memory
 		if (dstp.is_memory() && dstp == src1p)
 			emit_or_m64_p64(dst, MABS(dstp.memory()), src2p, inst);                     // or    [dstp],src2p
+
+		// dstp == src2p in memory
+		else if (dstp.is_memory() && dstp == src2p)
+			emit_or_m64_p64(dst, MABS(dstp.memory()), src1p, inst);						// or    [dstp],src1p
 
 		// general case
 		else
@@ -5247,6 +5255,10 @@ void drcbe_x64::op_xor(x86code *&dst, const instruction &inst)
 		if (dstp.is_memory() && dstp == src1p)
 			emit_xor_m32_p32(dst, MABS(dstp.memory()), src2p, inst);                    // xor   [dstp],src2p
 
+		// dstp == src2p in memory
+		else if (dstp.is_memory() && dstp == src2p)
+			emit_xor_m32_p32(dst, MABS(dstp.memory()), src1p, inst);					// xor   [dstp],src1p
+
 		// general case
 		else
 		{
@@ -5262,6 +5274,10 @@ void drcbe_x64::op_xor(x86code *&dst, const instruction &inst)
 		// dstp == src1p in memory
 		if (dstp.is_memory() && dstp == src1p)
 			emit_xor_m64_p64(dst, MABS(dstp.memory()), src2p, inst);                    // xor   [dstp],src2p
+
+		// dstp == src2p in memory
+		else if (dstp.is_memory() && dstp == src2p)
+			emit_xor_m64_p64(dst, MABS(dstp.memory()), src1p, inst);					// xor   [dstp],src1p
 
 		// general case
 		else
