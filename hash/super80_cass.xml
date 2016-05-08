@@ -5,6 +5,7 @@
      archived quickloads into MAME, then saved to wav files.
      Release dates are between 1981 and 1987, but precise dates are unknown.
      Although each software is intended for certain computer variations, they may work on others.
+     Meaning of codes: L1 = super80; L2 = super80d; L3 = V3.7 system; L4 = 8Rx system; J = arrow keys can be used; R1,2 = revision numbers
  -->
 <softwarelist name="super80_cass" description="Super-80 cassettes">
 <!--
@@ -153,6 +154,43 @@
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="14748384">
 				<rom name="horsem.wav" size="14748384" crc="4e6c67ee" sha1="cc161b293c48fd19934cb29b0b3c85bae00f1d59" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="onearm">
+		<description>One Armed Bandit</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="014L2" />
+		<info name="usage" value="super80d only. LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="9593656">
+				<rom name="onearm.wav" size="9593656" crc="ce48a69c" sha1="34636cfda6824f1c91a161389f78a32faea4fb27" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="shell">
+		<description>Shell Game</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="019L1" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="4437880">
+				<rom name="shell.wav" size="4437880" crc="e7453a57" sha1="6fccddbaff2c14d19f688c8ef154d20d86eb3c4d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="cavemon">
+		<description>Caves and Monsters</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="D. Wales"/>
+		<info name="serial" value="020L3" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="9236928">
+				<rom name="cavemon.wav" size="9236928" crc="1452d36f" sha1="0cacb5480a4f0670e773b27dca1ace1b6ad6cf50" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -385,6 +423,105 @@
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="7648040">
 				<rom name="missileattack4j.wav" size="7648040" crc="7037ba84" sha1="175c1090768c9bb4821468487700958df7405518" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="onearm4" cloneof="onearm">
+		<description>One Armed Bandit (L4)</description><!-- this is a different program to "onearm" -->
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="014L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="1533630">
+				<rom name="onearm4.wav" size="1533630" crc="7005228d" sha1="ff52c638164f48bf4767ebf24ee0ed895445f7cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="aonearm">
+		<description>Australian One Armed Bandit (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Glyn Shepherd"/>
+		<info name="serial" value="015L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="5029226">
+				<rom name="aonearm.wav" size="5029226" crc="4dcc967" sha1="1cd11b07cf9b448f6e35d09cd59b329639b78aa6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="tenpin">
+		<description>Ten Pin Bowling (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="016L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="5027696">
+				<rom name="tenpin.wav" size="5027696" crc="ac5efc63" sha1="2e00f095a578100dab67dae7d2bccd4eb0dad214" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="findword">
+		<description>Find the Word (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Glyn Shepherd"/>
+		<info name="serial" value="017L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="4592054">
+				<rom name="findword.wav" size="4592054" crc="9136d8f0" sha1="7e4966160f009225d760bdfcbc7dc1143291a4ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="hydrax">
+		<description>Hydrax (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="018L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="7211848">
+				<rom name="hydrax.wav" size="7211848" crc="d0d14e64" sha1="d1d840db17bdfba8b645fb990706471f321745b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="hydraxj" cloneof="hydrax">
+		<description>Hydrax (L4)(arrow keys)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="018L4J" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="6774026">
+				<rom name="hydraxj.wav" size="6774026" crc="051ab937" sha1="636c24efe85d43dc90db490947f7871eb2bf21bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="shell4" cloneof="shell">
+		<description>Shell Game (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="019L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="1534396">
+				<rom name="shell4.wav" size="1534396" crc="c8776ad3" sha1="96dec9124a57224f42f21d28cb769a89fba1cb38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="cavemon4" cloneof="cavemon">
+		<description>Caves and Monsters (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="D. Wales"/>
+		<info name="serial" value="020L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="8960520">
+				<rom name="cavemon4.wav" size="8960520" crc="c75846cf" sha1="55d2e34ef485eb48ad13a02a554012610cf0bf9d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
