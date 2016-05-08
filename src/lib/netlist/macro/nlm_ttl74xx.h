@@ -49,8 +49,8 @@
 #define TTL_7408_GATE(_name)                                                   \
 		NET_REGISTER_DEV(TTL_7408_GATE, _name)
 
-#define TTL_7408_NAND(_name, _A, _B)                                           \
-		NET_REGISTER_DEV(TTL_7408_NAND, _name)                         		   \
+#define TTL_7408_AND(_name, _A, _B)                                            \
+		NET_REGISTER_DEV(TTL_7408_AND, _name)                         		   \
 		NET_CONNECT(_name, A, _A)                                      		   \
 		NET_CONNECT(_name, B, _B)
 

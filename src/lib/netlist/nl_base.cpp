@@ -398,7 +398,7 @@ ATTR_COLD core_device_t::core_device_t(const family_t afamily, netlist_t &anetli
 #endif
 {
 	if (logic_family() == nullptr)
-		set_logic_family(this->default_logic_family());
+		set_logic_family(family_TTL);
 	init_object(anetlist, name);
 }
 

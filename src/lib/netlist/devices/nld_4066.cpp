@@ -11,6 +11,7 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(CD4066_GATE)
 {
+	set_logic_family(family_CD4XXX);
 	register_input("CTL", m_control);
 	register_sub("PS", m_supply);
 	register_sub("R", m_R);

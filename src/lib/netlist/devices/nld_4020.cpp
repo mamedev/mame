@@ -11,6 +11,7 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(CD4020)
 {
+	set_logic_family(family_CD4XXX);
 	register_sub("sub", sub);
 	register_sub("supply", m_supply);
 

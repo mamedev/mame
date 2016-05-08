@@ -251,13 +251,6 @@ using netlist_sig_t = std::uint32_t;
 			ATTR_HOT void update_param() override;                              \
 		, _priv)
 
-#define NETLIB_LOGIC_FAMILY(_fam)                                               \
-virtual logic_family_desc_t *default_logic_family() override                    \
-{                                                                               \
-	return family_ ## _fam;                                                     \
-}
-
-
 //============================================================
 //  Asserts
 //============================================================
@@ -1089,11 +1082,7 @@ namespace netlist
 
 		ATTR_HOT virtual void update() { }
 		virtual void start() { }
-		virtual void stop() { }                                                  \
-		virtual logic_family_desc_t *default_logic_family()
-		{
-			return family_TTL;
-		}
+		virtual void stop() { }
 
 	private:
 
