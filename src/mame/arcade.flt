@@ -1335,11 +1335,13 @@ zr107.cpp
 //jaguar.cpp
 -jaguar
 -jaguarcd
-//vectrex.cpp
--vectrex
+//neogeo.cpp
+-aes
 //saturn.cpp
 -saturn
 -saturnjp
 -saturneu
 -vsaturn
 -hisaturn
+//vectrex.cpp
+-vectrex
