@@ -1,0 +1,272 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+ List of software from ja.wikipedia.org
+ Notice that this list might be missing different variants (for different ages),
+ and it was indeed missing the existence of two Chuugaku Koumin carts.
+ 
+ * Shinkenzemi Koukou Kouza ~ 進研ゼミ 高校講座
+ 頻出英単語
+ 頻出英熟語			[dumped]
+ 重要英語構文
+ 重要古文攻略			[dumped]
+ 頻出世界史攻略
+ 頻出日本史攻略
+ 
+ 
+ * Shinkenzemi Chuugaku Kouza ~ 進研ゼミ 中学講座
+ 中一英語
+ 中二英語
+ 中三英語
+ 中学理科(1分野)
+ 中学理科(2分野)
+ 中学理科パック			[dumped]
+ 中学歴史
+ 中学地理					[dumped]
+ 中学地理・歴史パック		[dumped]
+ 中学公民					[dumped x2]
+ 高校受験(国・数)			[dumped]
+ 高校受験(英・社・理)		[dumped]
+ 実技4教科				[dumped]
+ 
+ -->
+
+
+
+<softwarelist name="pockchalw" description="Pocket Challenge W cartridges">
+
+	<software name="chukomn1" supported="no" >
+		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Koumin (1K)</description>
+		<year>2000?</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="0BE311" />
+		<info name="alt_title" value="進研ゼミ 中学講座 - 中学公民" />
+		<part name="cart" interface="pockchalw_cart">
+			<feature name="pcb" value="M99CDNS" />
+			<feature name="u303" value="7W00F" />
+			<feature name="u305" value="7W00F" />
+			<feature name="u306" value="035 80B" />
+			<feature name="u307" value="01P0L C1/D1" />
+			<feature name="u309" value="HC573" />
+			<feature name="u310" value="LH5164AN-10L" />
+			<feature name="bt1" value="BATTERY" />
+			<dataarea name="rom" size="1048576">
+				<rom name="01p0l c1d1.u307" size="1048576" crc="bf9da3ea" sha1="423266d16f6fecc367223c45658e3802176f1f7a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="chukomnn" supported="no" >
+		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Koumin (NK)</description>
+		<year>2000?</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="7BE310" />
+		<info name="alt_title" value="進研ゼミ 中学講座 - 中学公民" />
+		<part name="cart" interface="pockchalw_cart">
+			<feature name="pcb" value="PTRM4MAG" />
+			<feature name="u303" value="7W00F" />
+			<feature name="u305" value="7W00F" />
+			<feature name="u306" value="707 80B" />
+			<feature name="u307" value="NK 7BE310 97CPOL C1D2" />
+			<feature name="u309" value="74HC573A" />
+			<feature name="u310" value="LH5168N-10L" />
+			<feature name="(bt1)" value="[empty?]" />
+			<dataarea name="rom" size="1048576">
+				<rom name="nk 7be310 97cpol c1d2.u307" size="1048576" crc="efef730e" sha1="6f4906d36fc751cf2c52bf9ff4a388fd19ae51d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="chuchi" supported="no" >
+		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Chiri (9C)</description>
+		<year>2000?</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="9BD410" />
+		<info name="alt_title" value="進研ゼミ 中学講座 - 中学地理" />
+		<part name="cart" interface="pockchalw_cart">
+			<feature name="pcb" value="PTRM4MAG" />
+			<feature name="u303" value="7W00F" />
+			<feature name="u305" value="7W00F" />
+			<feature name="u306" value="913 80B" />
+			<feature name="u307" value="9C 9BD410 99CGE0 C1D1" />
+			<feature name="u309" value="74HC573A" />
+			<feature name="u310" value="LH5168N-10L" />
+			<feature name="(bt1)" value="[empty?]" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9c 9bd410 99cge0 c1d1.u307" size="2097152" crc="a1b3c2c9" sha1="8e4964369b1c56ea634044f1a47824d169e06be7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuchire" supported="no" >
+		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Chiri - Rekishi Pack (PS)</description>
+		<year>2000?</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="0BD400" />
+		<info name="alt_title" value="進研ゼミ 中学講座 - 中学地理・歴史パック" />
+		<part name="cart" interface="pockchalw_cart">
+			<feature name="pcb" value="M99NS" />
+			<feature name="u1" value="74HC273A" />
+			<feature name="u2" value="74HC139A" />
+			<feature name="u3" value="7W32F" />
+			<feature name="u4" value="7W00F" />
+			<feature name="u5" value="[unpopulated]" />	<!-- space for a TC7W04 -->
+			<feature name="u6" value="[unpopulated]" />	<!-- space for a 74HC125 -->
+			<feature name="u7" value="[unpopulated]" />	<!-- space for a TC7W08 -->
+			<feature name="u8" value="74HC573A" />
+			<feature name="u9" value="PS 0BD400 00REPCS C1D1" />	<!-- mask ROM -->
+			<feature name="u10" value="[unpopulated]" />	<!-- space for a second mask ROM? -->
+			<feature name="u11" value="LH52256CN-70LL" />
+			<feature name="u12" value="7W00F" />
+			<feature name="u13" value="946 80B" />
+			<feature name="bt1" value="BATTERY" />
+			<dataarea name="rom" size="2097152">
+				<rom name="ps 0bd400 00repcs c1d1.u9" size="2097152" crc="21895af8" sha1="3f3149fdb7ceb36f7f3262eb9b29eda973c8d1ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="churika" supported="no" >
+		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika Pack (PL)</description>
+		<year>2000?</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="0BF400" />
+		<info name="alt_title" value="進研ゼミ 中学講座 - 中学理科パック" />
+		<part name="cart" interface="pockchalw_cart">
+			<feature name="pcb" value="M99NS" />
+			<feature name="u1" value="74HC273A" />
+			<feature name="u2" value="74HC139A" />
+			<feature name="u3" value="7W32F" />
+			<feature name="u4" value="7W00F" />
+			<feature name="u5" value="[unpopulated]" />	<!-- space for a TC7W04 -->
+			<feature name="u6" value="[unpopulated]" />	<!-- space for a 74HC125 -->
+			<feature name="u7" value="[unpopulated]" />	<!-- space for a TC7W08 -->
+			<feature name="u8" value="74HC573A" />
+			<feature name="u9" value="PL 0BF400 00PCR C1/D1" />	<!-- mask ROM -->
+			<feature name="u10" value="[unpopulated]" />	<!-- space for a second mask ROM? -->
+			<feature name="u11" value="LH52256CN-70LL" />
+			<feature name="u12" value="7W00F" />
+			<feature name="u13" value="012 80B" />
+			<feature name="bt1" value="BATTERY" />
+			<dataarea name="rom" size="2097152">
+				<rom name="pl 0bf400 00pcr c1d1.u9" size="2097152" crc="341e732b" sha1="cf6fd71ced47d67bcad3e9e45a1ecb295bc7eb68" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="chukkjuk" supported="no" >
+		<description>Shinkenzemi Chuugaku Kouza - Koukou Juken (Kuni - Suu) (0G2)</description>
+		<year>2000?</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="9BI712" />
+		<info name="alt_title" value="進研ゼミ 中学講座 - 高校受験(国・数)" />
+		<part name="cart" interface="pockchalw_cart">
+			<feature name="pcb" value="M99CDNS" />
+			<feature name="u303" value="7W00F" />
+			<feature name="u305" value="7W00F" />
+			<feature name="u306" value="019 80B" />
+			<feature name="u307" value="0G2 9BI712 00CJ 2MB C1/D1" />
+			<feature name="u309" value="74HC573A" />
+			<feature name="u310" value="LH5168N-10L" />
+			<feature name="bt1" value="BATTERY" />
+			<dataarea name="rom" size="2097152">
+				<rom name="0g2 9bi712 00cj 2mb c1d1.u307" size="2097152" crc="0fcdc311" sha1="1f6d2e1a2993c3d9ad703d02ee1b3175e170a0af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chukkesr" supported="no" >
+		<description>Shinkenzemi Chuugaku Kouza - Koukou Juken (Ei - Sha - Ri) (N-G1)</description>
+		<year>2000?</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="7BI711" />
+		<info name="alt_title" value="進研ゼミ 中学講座 - 高校受験(英・社・理)" />
+		<part name="cart" interface="pockchalw_cart">
+			<feature name="pcb" value="PTRM4M-S" />
+			<feature name="u301" value="uPD7759GC" />
+			<feature name="u302" value="7W32F" />
+			<feature name="u303" value="7W00F" />
+			<feature name="u304" value="7W125F" />
+			<feature name="u305" value="7W00F" />
+			<feature name="u306" value="750 80B" />
+			<feature name="u307" value="N-G1 7BI711 98CJ4MB C1D1" />
+			<feature name="u309" value="74HC573A" />
+			<feature name="u310" value="LH5168N-10L" />
+			<feature name="u311" value="74HC139A" />
+			<feature name="bt301" value="[empty?]" />
+			<dataarea name="rom" size="1048576">
+				<rom name="n-g1 7bi711 98cj4mb c1d1.u307" size="1048576" crc="efef730e" sha1="6f4906d36fc751cf2c52bf9ff4a388fd19ae51d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="jitsugi4" supported="no" >
+		<description>Shinkenzemi Chuugaku Kouza - Jitsugi 4 Kyouka (BG)</description>
+		<year>2000?</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="9BG410" />
+		<info name="alt_title" value="進研ゼミ 中学講座 - 実技4教科" />
+		<part name="cart" interface="pockchalw_cart">
+			<feature name="pcb" value="M99CD26NS" />
+			<feature name="u303" value="7W00F" />
+			<feature name="u305" value="7W00F" />
+			<feature name="u306" value="932 80B" />
+			<feature name="u307" value="0001K7010" />
+			<feature name="u309" value="74HC573A" />
+			<feature name="u310" value="LH52256CN-70LL" />
+			<feature name="bt1" value="BATTERY" />
+			<dataarea name="rom" size="4194304">
+				<rom name="0001k7010.u307" size="4194304" crc="e34787bb" sha1="047702d12370185477f36d2bd9a499285ae53d52" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hineijuk" supported="no" >
+		<description>Shinkenzemi Koukou Kouza - Hinshutsu Ei Jukugo (J)</description>
+		<year>2000?</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="7BBD02" />
+		<info name="alt_title" value="進研ゼミ 高校講座 - 頻出英熟語" />
+		<part name="cart" interface="pockchalw_cart">
+			<feature name="pcb" value="PTRM4MAG" />
+			<feature name="u303" value="7W00F" />
+			<feature name="u305" value="7W00F" />
+			<feature name="u306" value="907 80B" />
+			<feature name="u307" value="J 7BBD02 97KJUK C1D1" />
+			<feature name="u309" value="74HC573A" />
+			<feature name="u310" value="LH5168N-10L" />
+			<feature name="(bt1)" value="[empty?]" />
+			<dataarea name="rom" size="4194304">
+				<rom name="j 7bbd02 97kjuk c1d1.u307" size="4194304" crc="c3db01f2" sha1="00aa30156ea3fdc4d436e73719f5c6bf8565fc61" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="jukokor" supported="no" >
+		<description>Shinkenzemi Koukou Kouza - Juuyou Kobun Kouryaku (A)</description>
+		<year>2000?</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="8BKD01" />
+		<info name="alt_title" value="進研ゼミ 高校講座 - 重要古文攻略" />
+		<part name="cart" interface="pockchalw_cart">
+			<feature name="pcb" value="PTRM4MAG" />
+			<feature name="u303" value="7W00F" />
+			<feature name="u305" value="7W00F" />
+			<feature name="u306" value="751 80B" />
+			<feature name="u307" value="9810K7024" />
+			<feature name="u309" value="74HC573A" />
+			<feature name="u310" value="LH5168N-10L" />
+			<feature name="(bt1)" value="[empty?]" />
+			<dataarea name="rom" size="4194304">
+				<rom name="9810k7024.u307" size="4194304" crc="f5df48f5" sha1="870ee10ecd3cff631d5a3559b7b7b3f504684cfd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	
+</softwarelist>
+
+
+
