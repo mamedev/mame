@@ -350,3 +350,5 @@ void emulator_info::layout_file_cb(xml_data_node &layout)
 			mame_machine_manager::instance()->lua()->call_plugin(script->value, "layout");
 	}
 }
+
+bool emulator_info::standalone() { return false; }
