@@ -542,7 +542,10 @@ ATTR_COLD void device_t::connect_late(const pstring &t1, const pstring &t2)
 	setup().register_link_fqn(name() + "." + t1, name() + "." + t2);
 }
 
-ATTR_COLD void device_t::connect_direct(core_terminal_t &t1, core_terminal_t &t2)
+/* FIXME: this is only used by solver code since matrix solvers are started in
+ *        post_start.
+ */
+ATTR_COLD void device_t::connect_post_start(core_terminal_t &t1, core_terminal_t &t2)
 {
 	if (!setup().connect(t1, t2))
 		netlist().log().fatal("Error connecting {1} to {2}\n", t1.name(), t2.name());

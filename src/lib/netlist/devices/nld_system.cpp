@@ -203,7 +203,7 @@ void nld_d_to_a_proxy::start()
 	register_output("_Q", m_Q);
 	register_subalias("Q", m_RV.m_P);
 
-	connect_direct(m_RV.m_N, m_Q);
+	connect_late(m_RV.m_N, m_Q);
 
 	save(NLNAME(m_last_state));
 }

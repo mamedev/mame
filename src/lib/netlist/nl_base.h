@@ -1138,7 +1138,7 @@ namespace netlist
 
 		ATTR_COLD void connect_late(const pstring &t1, const pstring &t2);
 		ATTR_COLD void connect_late(core_terminal_t &t1, core_terminal_t &t2);
-		ATTR_COLD void connect_direct(core_terminal_t &t1, core_terminal_t &t2);
+		ATTR_COLD void connect_post_start(core_terminal_t &t1, core_terminal_t &t2);
 
 		pvector_t<pstring> m_terminals;
 

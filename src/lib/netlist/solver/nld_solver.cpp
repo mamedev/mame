@@ -407,7 +407,7 @@ ATTR_COLD void matrix_solver_t::start()
 {
 	register_output("Q_sync", m_Q_sync);
 	register_input("FB_sync", m_fb_sync);
-	connect_direct(m_fb_sync, m_Q_sync);
+	connect_post_start(m_fb_sync, m_Q_sync);
 
 	save(NLNAME(m_last_step));
 	save(NLNAME(m_cur_ts));
