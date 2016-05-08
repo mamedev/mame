@@ -10782,6 +10782,49 @@ ROM_START( ns8linewa )
 ROM_END
 
 
+/*
+  New Lucky 8 Lines / New Super 8 Lines (W-4)
+
+  Mini W4 board...
+
+  Silkscreened: LUCKY97-1.
+                06/07/1993.
+                TAIWAN.
+*/
+ROM_START( ns8linesa )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "8__27c256_main.14b",  0x0000, 0x8000, CRC(a3574e81) SHA1(60b037d2cfbad495897fa3e0fe6f6b81143103c6) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.bin",  0x00000, 0x8000, CRC(994a9894) SHA1(4063c2c5e111f24a85df1665fd3f9fbb20fda4da) )
+	ROM_LOAD( "6.bin",  0x08000, 0x8000, CRC(80888d64) SHA1(91ec96709df77c534d381e391839984a88aeb1e0) )
+	ROM_LOAD( "7.bin",  0x10000, 0x8000, CRC(255d5860) SHA1(f171fde3d542594132b38b44300f750d45fb67a2) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1__27c128.1h",  0x0000, 0x2000, CRC(a1503f96) SHA1(908997a93bf7cdb3661b1a4ac7b1af3ad07982ef) )  // Double size. Identical halves. Each half matches the ns8lines set.
+	ROM_IGNORE(                        0x2000)
+	ROM_LOAD( "2__27c128.3h",  0x2000, 0x2000, CRC(bf6c534c) SHA1(3647e606eda53837100a5477b632d9655b24db45) )  // Double size. Identical halves. Each half matches the ns8lines set.
+	ROM_IGNORE(                        0x2000)
+	ROM_LOAD( "3__27c128.4h",  0x4000, 0x2000, CRC(a3ce1126) SHA1(13b840d569445149242aaa77758742d82d0f35ba) )  // Double size. Identical halves. Each half matches the ns8lines set.
+	ROM_IGNORE(                        0x2000)
+	ROM_LOAD( "4__27c128.5h",  0x6000, 0x2000, CRC(c1204efa) SHA1(6ed1991e75e5fec249d0a563e97888f63281e8d2) )  // Double size. Identical halves. Each half matches the ns8lines set.
+	ROM_IGNORE(                        0x2000)
+
+	ROM_REGION( 0x200, "proms", 0 )  // Taken from ns8lines. Seems to match 100%.
+	ROM_LOAD( "u4.bin", 0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "u5.bin", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x40, "proms2", 0 )  // Taken from ns8lines. Seems to match 100%.
+	ROM_LOAD( "u2.bin", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )  // Taken from ns8lines. Seems to match 100%.
+	ROM_LOAD( "u3.bin", 0x0000, 0x0100, BAD_DUMP CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )  // Taken from ns8lines. Seems to match 100%.
+	ROM_LOAD( "u1.bin", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+
 /*  Lucky Bar
     Unknown reels game based on Wing's Lucky 8 Lines.
     W-4 hardware
@@ -14474,6 +14517,7 @@ GAMEL( 1989, lucky8c,   lucky8,   lucky8,   lucky8,   wingco_state,   lucky8a,  
 GAMEL( 1989, lucky8d,   lucky8,   lucky8,   lucky8d,  driver_device,  0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 5, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )    // 2 Players...
 GAMEL( 1989, lucky8e,   lucky8,   lucky8,   lucky8d,  driver_device,  0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 6, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )    // 2 Players...
 GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  driver_device,  0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // Only 1 player...
+GAMEL( 1985, ns8linesa, ns8lines, lucky8,   ns8linwa, driver_device,  0,         ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8)
 GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, driver_device,  0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 Players...
 GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, driver_device,  0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // Only 1 player...
 
