@@ -739,7 +739,281 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dalk" sha1="ca717908cac5e584cf0caddd57054a21181aa0b1" />
+				<disk name="dalk" sha1="6fbf153137807615fc2a62018a1ca2d790ce9728" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dangel">
+		<description>Dangel</description>
+		<year>1996</year>
+		<publisher>Mink</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dangel" sha1="5b748eb84966710bf125a84dac3e878f62872ba6" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="defana">
+		<description>De.FaNa</description>
+		<year>1995</year>
+		<publisher>Himeya Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="de.fana" sha1="935c63b0c38c56e7f19957cf6fe7cc2472728964" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="deadforc">
+		<description>Dead Force</description>
+		<year>1995</year>
+		<publisher>Fuga System</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dead force" sha1="737a16b6676808c759130ee78ecad3ca95a9d061" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dotb">
+		<description>Dead of the Brain</description>
+		<year>1993</year>
+		<publisher>Fairytale</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dead of the brain" sha1="c8493803f60156504f69d8003624f4caf98831b6" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="deathbrd">
+		<description>Death Brade</description>
+		<year>1992</year>
+		<publisher>KID</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="death brade" sha1="95031f278bec44906eeada2e00107d1e7f63bed0" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="deep">
+		<description>Deep</description>
+		<year>1995</year>
+		<publisher>JAST</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="deep (Boot disk).hdm" size="1261568" crc="31dd276f" sha1="2e06321ed8faeaf450623311c4b69e34a1ae3539" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="deep" sha1="5e3e689895a70a38099cd6fc57fbd506175061a9" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="deja2">
+		<description>De-Ja II</description>
+		<year>1992</year>
+		<publisher>Elf</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="de-ja 2" sha1="ef291dca8936bc9d9f59c3ef610ff68e858bca43" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dengekin">
+		<description>Dengeki Nurse</description>
+		<year>1992</year>
+		<publisher>Cocktail Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dengeki nurse" sha1="b2e82a8dea0c827f49abff6a346150df3ca16ec1" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="derbysta">
+		<description>Derby Stallion</description>
+		<year>1993</year>
+		<publisher>ASCII</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="derby stallion" sha1="326dfe815c3d08f6c9a866f5466fd3ef9f557944" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="desire">
+		<description>Desire: Haitoku no Rasen</description>
+		<year>1994</year>
+		<publisher>C's Ware</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="desire" sha1="a7ba23ec748ba4a58d0baab8172ee8ba17c450c5" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="diegekir">
+		<description>Die Gekirin</description>
+		<year>1995</year>
+		<publisher>Nihon Application</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="die gekirin" sha1="2c8e76eebd8b8578cbe7fc3b7b69298de39a9bfd" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="digipin1">
+		<description>Digital Pinup Girls Vol. 1</description>
+		<year>1993</year>
+		<publisher>Transpegasus</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="digital pinup girls vol. 1" sha1="8d411ad637a7aabd6d752a49c4db8568d508ef34" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dokidok1">
+		<description>Doki Doki Disk CD-ban Dai-1-kan: Club D.O. Jimukyoku</description>
+		<year>1994</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="doki doki disk cd vol.1" sha1="b11bdae6dccb9799535baee0d0e257507037b614" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dorbestj">
+		<description>DOR Best Selection Joukan</description>
+		<year>1993</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom1" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dor best selection joukan (disc 1)" sha1="4384e5214835b93d4cb60762913dc01a29294bb6" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dor best selection joukan (disc 2)" sha1="9035d96f4d17531ba50af8e6e27cfd217b6c5bf6" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dorse93">
+		<description>DOR Special Edition '93</description>
+		<year>1993</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dor special edition '93" sha1="3c37b0b2890920249c06a354d8d31ce608352fee" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dorsesak">
+		<description>DOR Special Edition Sakigake</description>
+		<year>1993</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dor special edition sakigake" sha1="134465d1bba5c1f2f1b35cb9e7dad90f9be11be7" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="doukyuu">
+		<description>Doukyuusei</description>
+		<year>1992</year>
+		<publisher>Elf</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="doukyuusei" sha1="e498df6b4ba95769a98e7e54a0c3afcb5ca88846" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="doukyuu2">
+		<description>Doukyuusei 2</description>
+		<year>1995</year>
+		<publisher>Elf</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="doukyuusei 2" sha1="ec43759d5482a5a29323ad7274bb6dc14e1cbc8d" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dhalf">
+		<description>Dragon Half</description>
+		<year>1994</year>
+		<publisher>Micro Cabin</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dragon half" sha1="390d5edd522faaeeda42237ced0856adbb0387ed" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dknight3">
+		<description>Dragon Knight III</description>
+		<year>1991</year>
+		<publisher>Elf</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dragon knight iii" sha1="7f1d23ee707023d5058fda1c958c80fb45677489" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dknight4">
+		<description>Dragon Knight 4</description>
+		<year>1994</year>
+		<publisher>Elf</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dragon knight 4" sha1="a8ed04efe5e90c18de6c1a76fc73d730670857dc" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="drakkhen">
+		<description>Drakkhen</description>
+		<year>1990</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="drakkhen" sha1="288b19695a2fc63038222658d52f96fa8755fe25" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dmaster">
+		<description>Dungeon Master</description>
+		<year>1989</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dungeon master" sha1="e4b7b106c1d303af3d41ce33c2979df830739df1" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="dmaster2">
+		<description>Dungeon Master II: Skullkeep</description>
+		<year>1994</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dungeon master ii - skullkeep" sha1="d94dcd021aeb4e020c202d31c9fe1c42b57f35e8" />
 			</diskarea>
 		</part>
 	</software>
@@ -777,6 +1051,71 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 	
+	<software name="powermon">
+		<description>Powermonger</description>
+		<year>1992</year>
+		<publisher>Imagineer</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="powermonger (en) (boot disk).hdm" size="1261568" crc="32bceed4" sha1="2bd713c50f4d8cd35d275c70f56acaff76ae5831" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="powermonger (jp) (boot disk).hdm" size="1261568" crc="46834f28" sha1="024edfc7b49f83d9b8054a0685fd7adbf79114af" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="powermonger" sha1="6c61cc6b3b9ebd06d98efde37e89c52f0a8ae9fa" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="prinpers">
+		<description>Prince of Persia</description>
+		<year>1992</year>
+		<publisher>Riverhill Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="prince of persia" sha1="0d942e85b923c848cd3e66754d1b871fb66f81f5" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="prinper2">
+		<description>Prince of Persia 2: The Shadow and the Flame</description>
+		<year>1994</year>
+		<publisher>Interprog</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="prince of persia 2" sha1="7e46f99eb028afc8f955e5d4d7d3e38b6fefbc73" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="puyopuyo">
+		<description>Puyo Puyo</description>
+		<year>1994</year>
+		<publisher>CRI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="puyo puyo" sha1="46c7dcf22b24e4438370cfee7e75d6c075f0b26a" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="puzznic">
+		<description>Puzznic</description>
+		<year>1990</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="puzznic" sha1="7758fce062d6eaff0fded5607917226aeda122ef" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- works well on fmtmarty, keyboard seems to interfere with movements on fmtowns -->
 	<software name="raiden">
 		<description>Raiden Densetsu / Raiden Trad</description>
@@ -785,6 +1124,17 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="raiden densetsu (1991)(kid corp)(jp-en)" sha1="d7484fac0fa8d0fff06c70af341b25d8b4f21ab2" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="volfied">
+		<description>Volfied</description>
+		<year>1991</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="volfied" sha1="353db36abf89433dfc2f63659f471fd9edfbaf8d" />
 			</diskarea>
 		</part>
 	</software>
@@ -799,6 +1149,83 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
+		
+	<software name="wingcmar">
+		<description>Wing Commander Armada</description>
+		<year>1995</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wing commander armada" sha1="fa9ff6997c774c59bf3a97b710049a22b3348e32" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="wingcmdr">
+		<description>Wing Commander</description>
+		<year>1992</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wing commander" sha1="0d2b8647d02e025a2a397f218d1eb104eae64c5b" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="wingcmsm">
+		<description>Wing Commander: Secret Missions</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wing commander - secret missions" sha1="68edf6a505bac8462dee5154d25c6a0d50d0d31c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="wingcm2s">
+		<description>Wing Commander II and Special Operations</description>
+		<year>1995</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wing commander ii and special operations" sha1="936038a14140fc7901a6642e1e43f38376703ddd" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="xak2">
+		<description>Xak II: Rising of the Redmoon</description>
+		<year>1991</year>
+		<publisher>Micro Cabin</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Xak II - Rising of the redmoon" sha1="b5383012b7d6e39b42edda4d13af7d5cc62b9191" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="xak3">
+		<description>Xak III: The Eternal Recurrence</description>
+		<year>1993</year>
+		<publisher>Micro Cabin</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="xak iii - the eternal recurrence" sha1="71f9b0dd3906a1c6d6e2b1ccb646e25530a66df3" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="xenon">
+		<description>Xenon</description>
+		<year>1995</year>
+		<publisher>C's Ware</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="xenon" sha1="d6544b946ece77ce93fb6cf1db3ffb231b464ac0" />
+			</diskarea>
+		</part>
+	</software>
 	
 	<software name="zak">
 		<description>Zak McKracken and The Alien Mindbenders</description>
@@ -807,6 +1234,28 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="zak mckracken" sha1="0a06dcd3aaebcd79ec3c03dd0b179b9047e2bccd" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="zenith">
+		<description>Zenith</description>
+		<year>1995</year>
+		<publisher>Himeya Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zenith" sha1="3709c5434e21c060895b0ee0d7921e7f2d0c4ca0" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="zokudm">
+		<description>Zoku Dungeon Master: Chaos no Gyakushuu</description>
+		<year>1990</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zoku dungeon master - chaos no gyakushuu" sha1="a4010dad3499bc7d87806a12e270890b1154032e" />
 			</diskarea>
 		</part>
 	</software>
