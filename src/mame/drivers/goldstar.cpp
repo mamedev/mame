@@ -10790,6 +10790,11 @@ ROM_END
   Silkscreened: LUCKY97-1.
                 06/07/1993.
                 TAIWAN.
+				
+  GFX ROMs 1, 2, 3, 4 are double size. Each half matches the set ns8lines.
+  GFX ROMs 5, 6, 7 match the ns8lines set.
+
+  Program ROM is different. 
 */
 ROM_START( ns8linesa )
 	ROM_REGION( 0x8000, "maincpu", 0 )
