@@ -11609,7 +11609,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="8388608">
-				<rom name="doubutsu-jima no chobigurumi (japan) (rev 1).gba" size="8388608" crc="b9c15f87" sha1="1273d6199c1a44c77132fc09bc04504bc680fe7d" offset="000000" />
+				<rom name="doubutsu-jima no chobigurumi (japan) (rev 1).bin" size="8388608" crc="b9c15f87" sha1="1273d6199c1a44c77132fc09bc04504bc680fe7d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35990,7 +35990,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="tomato adventure (japan).gba" size="8388608" crc="3482ad03" sha1="8772376a8f30db060915cdc2c19eaecc17bac043" offset="0" />
+				<rom name="tomato adventure (japan).bin" size="8388608" crc="3482ad03" sha1="8772376a8f30db060915cdc2c19eaecc17bac043" offset="0" />
 			</dataarea>
 		</part>
 	</software>
