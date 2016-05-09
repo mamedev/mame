@@ -14,88 +14,96 @@
     By now, six known BIOS versions, U4-52 (dumped from a board with-subboard PCB),
     U4-55 (dumped from an integrated PCB) and U4-60 (dumped from a board with-subboard PCB).
 
-    Known games:
+    Known games (followed by game ID, some are duplicate):
 
-    1943
-    Aero Blaster
-    After Burner
+    1943 Kai (65)
+    Aero Blaster (32)
+    After Burner II (46)
   * Ankoku Densetu
-    Armed-F
-    Ballistix
-    Be Ball
-    Bomberman
-    Chozetsurinjin Beraboh Man (Super Foolish Man)
-    Chuka Taisen
-    Columns
-    Coryoon
+    Armed-F (?)
+    Ballistix (186)
+    Be Ball (93)
+  * Blodia
+    Bomberman (71)
+    Bull Fight (185)
+    Chozetsurinjin Beraboh Man (Super Foolish Man) (27)
+    Chuka Taisen (37)
+    Columns (90)
+    Coryoon (43)
   * Cross Wiber
   * Cyber Core
-    Daisempuu
-    Dead Moon
-    Devil Crash
+    Daisempuu (3)
+    Dead Moon (?)
+    Devil Crash (47)
   * Die Hard
-    Dodge Ball
-    Doraemon Meikyuu Daisakusen
+    Dodge Ball (194)
+    Doraemon Meikyuu Daisakusen (20)
   * Doraemon II
   * Down Load
-    Dragon Spirit
-    Dungeon Explorer
-    Final Blaster
-    Final Lap Twin
-    Final Match Tennis
-    Formation Soccer
-    Gomola Speed
-    Gunhed
-    Hana Taka Daka (Super Long Nose Goblin)
-    Jackie Chan
-    Jinmu Densho
-    Kiki Kaikai
-    Legend Of Hero Tomna
-    Makyo Densetsu - The Legenary Axe
-    Mizubaku Daibouken Liquid Kids
-    Mr. Heli
-    Ninja Ryukenden
-    Operation Wolf
+    Dragon Saber (65)
+    Dragon Spirit (?)
+    Dungeon Explorer (?)
+  * F1 Triple Battle
+    Final Blaster (29)
+    Final Lap Twin (79)
+    Final Match Tennis (62)
+    Formation Soccer (1)
+    Gomola Speed (27)
+    Gunhed (148)
+    Hana Taka Daka (Super Long Nose Goblin) (6)
+    Jackie Chan (54)
+    Jinmu Densho (19)
+    Kiki Kaikai (120)
+    Legend Of Hero Tomna (56)
+    Makyo Densetsu - The Legenary Axe (?)
+    Mizubaku Daibouken Liquid Kids (10)
+    Mr. Heli (23)
+    Ninja Ryukenden (10)
+    Operation Wolf (26)
   * Out Run
-    Override
-    Pac-Land
+    Override (53)
+    Pac-Land (16)
+  * Paranoia (18)
   * PC Genjin
-    PC Genjin 2
-    PC Denjin Punkic Cyborg
-    Power Drift
-    Power Eleven
+    PC Genjin 2 (84)
+    PC Denjin Punkic Cyborg (201)
+    Power Drift (200)
+    Power Eleven (83)
   * Power Golf
-    Power League IV
+    Power League IV (?)
   * Power Sports
-    Pro Yakyuu World Stadium '91
-    Psycho Chaser
-    Puzzle Boy
-    R-Type II
-    Rastan Saga II
-    Saigo no Nindou
-    Salamander
-    Shinobi
-    Side Arms
-    Skweek
+    Pro Yakyuu World Stadium '91 (192)
+    Psycho Chaser (14)
+    Puzzle Boy (57)
+  * Puzznic
+    R-Type II (61)
+  * Rabio Lepus Special
+    Raiden (111)
+    Rastan Saga II (?)
+    Saigo no Nindou (44)
+    Salamander (184)
+    Shinobi (5)
+    Side Arms (2)
+    Skweek (89)
   * Soldier Blade
-    Son Son II
-    Special Criminal Investigation
-    Super Star Soldier
-    Super Volley ball
-    Tatsujin
-    Terra Cresta II
-    Thunder Blade
+    Son Son II (80)
+    Special Criminal Investigation (?)
+    Super Star Soldier (42)
+    Super Volley ball (?)
+    Tatsujin (31)
+    Terra Cresta II (27)
+    Thunder Blade (?)
   * Tiger Road
-    Toy Shop Boys
+    Toy Shop Boys (51)
   * Tricky
   * TV Sports
-    USA Pro Basketball
-    Veigues
+    USA Pro Basketball (?)
+    Veigues (40)
   * Vigilante
-    Volfied
-    W-Ring
-    Winning Shot
-    Xevious
+    Volfied (68)
+    W-Ring (21)
+    Winning Shot (28)
+    Xevious (?)
 
 * Denotes Not Dumped
 
@@ -173,31 +181,31 @@ Games are dumped directly from the cartridge edge connector using the following 
  ----------------------------------------------------------------------------
 
                        +----------+
-                (N.C.) |01      01| +5V
-                   +5V |02      02| +5V
-                   A18 |03      03| +5V
-                   A14 |04      04| A17
-                    A8 |05      05| A13
-                   A11 |06      06| A9
-                   A10 |07      07| OE#
-                    D7 |08      08| CE#
-(front of           D5 |09      09| D6               (rear of
- cartridge)         D3 |10      10| D4                cartridge)
-                    D2 |11      11| GND
-                    D0 |12      12| D1
-                    A1 |13      13| A0
-                    A3 |14      14| A2
-                    A5 |15      15| A4
-                    A7 |16      16| A6
-                   A15 |17      17| A12
-                   A19 |18      18| A16
-                   GND |19      19| (N.C.)
-                   GND |20      20| (N.C.)
-                 (KEY) |21------21| (KEY)
-                (N.C.) |22      22| (N.C.)
-                (N.C.) |23      23| (N.C.)
-                (N.C.) |24      24| (N.C.)
-                (N.C.) |25      25| (N.C.)
+                (N.C.) |50      49| +5V
+                   +5V |48      47| +5V
+                   A18 |46      45| +5V
+                   A14 |44      43| A17
+                    A8 |42      41| A13
+                   A11 |40      39| A9
+                   A10 |38      37| OE#
+                    D7 |36      35| CE#
+(front of           D5 |34      33| D6               (rear of
+ cartridge)         D3 |32      31| D4                cartridge)
+                    D2 |30      29| GND
+                    D0 |28      27| D1
+                    A1 |26      25| A0
+                    A3 |24      23| A2
+                    A5 |22      21| A4
+                    A7 |20      19| A6
+                   A15 |18      17| A12
+                   A19 |16      15| A16
+                   GND |14      13| (N.C.)
+                   GND |12      11| GND)
+                 (KEY) |10------09| (KEY)
+                   ID7 |08      07| ID6
+                   ID5 |06      05| ID4
+                   ID3 |04      03| ID2
+                   ID1 |02      01| ID0
                        +----------+
 
  ----------------------------------------------------------------------------
@@ -242,6 +250,15 @@ coin 2 triggers code at 0x028f
 
 in each coin insertion routine, you need to insert n coins (based on DSW settings) then you are awarded u units of time (also based on DSW settings)
 I can't tell ATM if units are seconds (even if values in tables seem very related to them)
+
+****************************************************************************
+Notes from system11:
+Game ID is configured on carts using pins 1 -> 8, these form a single byte integer, known IDs are tagged above.  IDs can be shared between games.  Game handling is defined based on data tables in the BIOS, using offset + ID*data block size.  Data block starts in 6.0 BIOS as follows:
+
+1184   1284   1384   1484   1584   3584   5d84   5684
+
+For full information see:
+http://blog.system11.org/?p=1943
 
 ****************************************************************************/
 
@@ -324,12 +341,12 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state, tourvision_cart )
 	return IMAGE_INIT_PASS;
 }
 
-
+/* note from system11 - this system actually supports 2 players */
 
 static INPUT_PORTS_START( tourvision )
 	PORT_START( "JOY" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button I */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* button II */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* button I */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button II */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* select */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) /* run */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -364,9 +381,7 @@ static INPUT_PORTS_START( tourvision )
 	PORT_DIPSETTING(    0x10, "120" )
 	PORT_DIPSETTING(    0x08, "90" )
 	PORT_DIPSETTING(    0x00, "60" )
-	PORT_DIPUNKNOWN( 0x80, 0x00 )
-// I can't tell what DSW1 bit 7 is really supposed to do, but it has an effect only when no "Free Play" and [0x8005] = [0x8006] = 0 (code at 0x0a58) :
-// Since these conditions seem to be true only in "attract mode" when there is no time left, this bit could enable/disable sounds.
+        PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 
 	PORT_START( "DSW2" )
 	PORT_DIPNAME( 0x03, 0x03, "Coins needed 2" )
