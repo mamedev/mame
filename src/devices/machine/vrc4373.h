@@ -48,15 +48,20 @@
 #define NREG_PCIEN          (0x074/4)
 #define NREG_PMIR           (0x078/4)
 
+#define PCI_BUS_CLOCK        33000000
+// Number of dma words to transfer at a time, real hardware bursts 8
+#define DMA_BURST_SIZE		 128
+#define DMA_TIMER_PERIOD     attotime::from_hz(PCI_BUS_CLOCK / 32)
+
 #define DMA_BUSY                0x80000000
-#define DMA_INT_EN          0x40000000
+#define DMA_INT_EN              0x40000000
 #define DMA_RW                  0x20000000
 #define DMA_GO                  0x10000000
 #define DMA_SUS                 0x08000000
 #define DMA_INC                 0x04000000
 #define DMA_MIO                 0x02000000
 #define DMA_RST                 0x01000000
-#define DMA_BLK_SIZE        0x000fffff
+#define DMA_BLK_SIZE            0x000fffff
 
 
 class vrc4373_device : public pci_host_device {
@@ -99,11 +104,12 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	void dma_transfer(int which);
+	TIMER_CALLBACK_MEMBER(dma_transfer);
 
 private:
 	mips3_device *m_cpu;
 	const char *cpu_tag;
+	int m_irq_num;
 
 	address_space_config m_mem_config, m_io_config;
 
@@ -125,6 +131,8 @@ private:
 	UINT32 m_target1_laddr, m_target2_laddr;
 
 	required_memory_region m_region;
+
+	emu_timer* m_dma_timer;
 };
 
 
