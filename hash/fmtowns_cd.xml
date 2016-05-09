@@ -454,7 +454,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Ving</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blandia plus" sha1="5505a0105fa9abe32b3240bac1144555b22740ee" />
+				<disk name="blandia plus" sha1="ff043158c1b37fcc43b43bd8f3492c3f203280cd" />
 			</diskarea>
 		</part>
 	</software>
@@ -1014,6 +1014,143 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="dungeon master ii - skullkeep" sha1="d94dcd021aeb4e020c202d31c9fe1c42b57f35e8" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="eimmy">
+		<description>Eimmy to Yobanaide</description>
+		<year>1995</year>
+		<publisher>C's Ware</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="eimmy to yobanaide" sha1="4c321b593322b94cf84a68ad1021d0cf3b24b1c4" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="elfish">
+		<description>Elfish</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="elfish" sha1="c0dd2d0c0caaea9098de8a550aac7b5005030f8f" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="elfishlt">
+		<description>Elfish Lite</description>
+		<year>1993</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="elfish" sha1="1667eb91450e756ae37910aa9291957430fc588b" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="elmknght">
+		<description>Elm Knight</description>
+		<year>1992</year>
+		<publisher>Micro Cabin</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="elm knight" sha1="98ff3cc7c954c1aa98b3c966d420bc72cb7fb423" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="emdragon">
+		<description>Emerald Dragon</description>
+		<year>1992</year>
+		<publisher>Glodia</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="emerald dragon (system disk).hdm" size="1261568" crc="35b0d7c1" sha1="55689ee69dc51816b2e2529c67ff9b14380571d5" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="emerald dragon" sha1="87147a20f1a7422e8ced81c664180538be39f9ae" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="etsuraku">
+		<description>Etsuraku no Gakuen</description>
+		<year>1994</year>
+		<publisher>C's Ware</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="etsuraku no gakuen" sha1="0c8f0badf5a5dbd86ad56c5302d5db519d828fd5" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="evolutn">
+		<description>Evolution</description>
+		<year>1989</year>
+		<publisher>System Sacom</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="evolution" sha1="93add8d48a5a0802cabc360b62c7cd39de7dabe2" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="excel10">
+		<description>Excellent 10</description>
+		<year>1990</year>
+		<publisher>Amorphous</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="excellent 10" sha1="ddaf24560a029527fcd02d0cd1fd1d09e2913b3f" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="excitcd">
+		<description>Exciting CD</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom1" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="exciting cd (disc 1)" sha1="f8840ecca419df7da393dccb844471d5324cab23" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="exciting cd (disc 2)" sha1="de63a1bb5ea6ff08219a94b042460ba5ca371957" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="excd94s">
+		<description>Exciting CD '94 Summer</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom1" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="exciting cd '94 summer (disc 1)" sha1="267497e6ea4ee286e702d5525f141585bdef0f7f" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="exciting cd '94 summer (disc 2)" sha1="5b00b3a5d1134ec82fbfab4bc107aa5b708b33ea" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="eyeotb2">
+		<description>Eye of the Beholder II: The Legend of Darkmoon</description>
+		<year>1993</year>
+		<publisher>Arrow Micro-Techs / Cybelle</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="eye of the beholder ii" sha1="50657bf7d7fc751c16975680410ea390f720084e" />
 			</diskarea>
 		</part>
 	</software>
