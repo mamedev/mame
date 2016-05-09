@@ -33765,6 +33765,7 @@ empcityj                        // (c) 1986 Taito Corporation (Japan)
 empcityu                        // (c) 1986 Taito (Romstar License)
 stfight                         // (c) 1986 Seibu Kaihatsu (Germany) (bootleg?)
 stfighta                        // (c) 1986 Seibu Kaihatsu (bootleg?)
+stfightgb                       // (c) 1986 Seibu Kaihatsu (Germany-Benelux)
 
 @source:stlforce.cpp
 stlforce                        // (c) 1994 Electronic Devices (Italy) / Ecogames S.L. (Spain)
