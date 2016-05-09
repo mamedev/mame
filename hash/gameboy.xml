@@ -142,11 +142,12 @@
 	</software>
 
 	<software name="advislnd">
-		<!-- Notes: reprinted by Electro Brain (DMG-T3-USA-T2) - Alt. Title: Adventure Island (Box) -->
+		<!-- Notes: reprinted by Electro Brain (DMG-T3-USA-T2) -->
 		<description>Hudson's Adventure Island (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-T3-USA, DMG-T3-FRG"/>
+		<info name="alt_title" value="Adventure Island (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -156,11 +157,11 @@
 	</software>
 
 	<software name="advisln2">
-		<!-- Alt. Title: Adventure Island II - Aliens in Paradise (Box) -->
 		<description>Hudson's Adventure Island II (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-GQ-USA, DMG-GQ-NOE"/>
+		<info name="alt_title" value="Adventure Island II - Aliens in Paradise (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -209,11 +210,11 @@
 	</software>
 
 	<software name="advstars">
-		<!-- Alt. Title: Die Abenteuer von Star Saver (Ger cart) -->
 		<description>The Adventures of Star Saver (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-KS-USA, DMG-KS-(NOE/ESP)"/>
+		<info name="alt_title" value="Die Abenteuer von Star Saver (Ger cart)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -226,6 +227,7 @@
 		<description>The Adventures of Tintin - Prisoners of the Sun (Euro)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
+		<info name="alt_title" value="Tintin - Prisoners of the Sun (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -323,7 +325,7 @@
 
 	<software name="akumajo" cloneof="cvanialg">
 		<!-- Notes: SGB enhanced -->
-		<description>Akumajou Dracula - Shikkokutaru Zensoukyoku (Jpn)</description>
+		<description>Akumajou Dracula - Shikkokutaru Prelude (Jpn)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ADNJ-JPN (RK138-J1)"/>
@@ -459,6 +461,7 @@
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-ALGP-UKV"/>
+		<info name="alt_title" value="Alien Olympics (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -486,7 +489,7 @@
 		<publisher>ASK Kodansha</publisher>
 		<info name="serial" value="DMG-A9J"/>
 		<info name="release" value="19930924"/>
-		<info name="alt_title" value="エイリアンVSプレデター"/>
+		<info name="alt_title" value="エイリアンVSプレデター ~ Alien vs Predator (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -1328,6 +1331,7 @@
 		<year>1990</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="DMG-BK-USA"/>
+		<info name="alt_title" value="Bases Loaded for Game Boy (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -1370,7 +1374,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-BAA, BMG-BA-USA, DMG-BA-(NOE/UKV)"/>
 		<info name="release" value="19900413 (JPN)"/>
-		<info name="alt_title" value="バットマン"/>
+		<info name="alt_title" value="バットマン (JPN), Batman - The Video Game (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -1691,7 +1695,7 @@
 	</software>
 
 	<software name="btoadsdd">
-		<description>Battletoads Double Dragon - The Ultimate Team (Euro)</description>
+		<description>Battletoads Double Dragon - The Ultimate Team. (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -1703,7 +1707,7 @@
 	</software>
 
 	<software name="btoadsddu" cloneof="btoadsdd">
-		<description>Battletoads Double Dragon - The Ultimate Team (USA)</description>
+		<description>Battletoads Double Dragon - The Ultimate Team. (USA)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
 		<info name="serial" value="DMG-VN-USA"/>
@@ -1806,7 +1810,7 @@
 	</software>
 
 	<software name="dokokinm">
-		<description>Bikkuri Nekketsu Shinkiroku! - Dokodemo Kin Medal (Jpn)</description>
+		<description>Bikkuri Nekketsu Shin Kiroku! - Dokodemo Kin Medal (Jpn)</description>
 		<year>1993</year>
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="DMG-NQJ"/>
@@ -1936,6 +1940,7 @@
 		<year>1994</year>
 		<publisher>Hot-B</publisher>
 		<info name="serial" value="DMG-HP-USA"/>
+		<info name="alt_title" value="Black Bass - Lure Fishing (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -2045,6 +2050,7 @@
 		<year>1994</year>
 		<publisher>Titus</publisher>
 		<info name="serial" value="DMG-J6-UKV"/>
+		<info name="alt_title" value="The Blues Brothers - Jukebox Adventure (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -2058,6 +2064,7 @@
 		<year>1991</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-BJ-USA"/>
+		<info name="alt_title" value="Bo Jackson 2 Games in 1 (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -2364,7 +2371,7 @@
 	</software>
 
 	<software name="boxxle2">
-		<description>Boxxle II (USA)</description>
+		<description>Boxxle II (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>FCI</publisher>
 		<info name="serial" value="DMG-SQ-USA"/>
@@ -2376,11 +2383,11 @@
 	</software>
 
 	<software name="prinblob">
-		<!-- Alt. Title: David Crane's The Rescue of Princess Blobette Starring A Boy and His Blob (Box) -->
 		<description>David Crane's A Boy and His Blob in: The Rescue of Princess Blobette (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-RP-UKV"/>
+		<info name="alt_title" value="David Crane's The Rescue of Princess Blobette Starring A Boy and His Blob (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
@@ -2390,11 +2397,11 @@
 	</software>
 
 	<software name="prinblobu" cloneof="prinblob">
-		<!-- Alt. Title: David Crane's The Rescue of Princess Blobette Starring A Boy and His Blob (Box) -->
 		<description>David Crane's A Boy and His Blob in: The Rescue of Princess Blobette (USA)</description>
 		<year>1991</year>
 		<publisher>Absolute Entertainment</publisher>
 		<info name="serial" value="DMG-RP-USA"/>
+		<info name="alt_title" value="David Crane's The Rescue of Princess Blobette Starring A Boy and His Blob (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
@@ -3294,7 +3301,7 @@
 
 	<software name="chibim4">
 		<!-- Notes: Also released by NP in 2000-11 -->
-		<description>Chibi Maruko-chan 4 - Kore ga Nihon dayo! Ouji-sama (Jpn)</description>
+		<description>Chibi Maruko-chan 4 - Kore ga Nihon Da yo! Ouji-sama (Jpn)</description>
 		<year>1992</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-C4J"/>
@@ -3699,7 +3706,7 @@
 	</software>
 
 	<software name="crayon1">
-		<description>Crayon Shin-chan - Ora to Shiro wa Otomodachi dayo (Jpn)</description>
+		<description>Crayon Shin-chan - Ora to Shiro wa Otomodachi Da yo (Jpn)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-K4J"/>
@@ -3802,7 +3809,7 @@
 	</software>
 
 	<software name="cutthr">
-		<description>Cutthroat Island (Euro, USA)</description>
+		<description>CutThroat Island (Euro, USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AC8E-USA, DMG-AC8P-EUR"/>
@@ -3860,7 +3867,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-YSA"/>
 		<info name="release" value="19940930"/>
-		<info name="alt_title" value="ルーニー・テューンズシリーズ ダフィー・ダック"/>
+		<info name="alt_title" value="ルーニー・テューンズシリーズ ダフィー・ダック ~ Looney Tunes Series - Daffy Duck (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -4418,7 +4425,7 @@
 	</software>
 
 	<software name="doraemon">
-		<description>Doraemon - Taiketsu Himitsu Dogu!! (Jpn)</description>
+		<description>Doraemon - Taiketsu Himitsudougu!! (Jpn)</description>
 		<year>1991</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="DMG-DEJ"/>
@@ -4601,11 +4608,11 @@
 	</software>
 
 	<software name="ddragon3" supported="no">
-		<!-- Alt. Title: Double Dragon 3 - The Arcade Game (Box) -->
 		<description>Double Dragon 3 (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-DX-USA, DMG-DX-NOE"/>
+		<info name="alt_title" value="Double Dragon 3 - The Arcade Game (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -5234,7 +5241,7 @@
 		<description>Exodus (USA)</description>
 		<year>1992</year>
 		<publisher>Wisdom Tree</publisher>
-		<info name="alt_title" value="Exodus: Journey to the Promised Land (Box)"/>
+		<info name="alt_title" value="Exodus - Journey to the Promised Land (Box)"/>
 		<info name="serial" value="EGB-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_wisdom" />
@@ -6379,6 +6386,7 @@
 		<year>1990</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-RA-USA, DMG-RA-NOE"/>
+		<info name="alt_title" value="Gargoyle's Quest (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -6683,7 +6691,7 @@
 	</software>
 
 	<software name="ginga">
-		<description>Ginga (Jpn)</description>
+		<description>Ginga - Card &amp; Puzzle Collection (Jpn)</description>
 		<year>1990</year>
 		<publisher>Hot-B</publisher>
 		<info name="serial" value="DMG-GGA"/>
@@ -7541,9 +7549,9 @@
 		</part>
 	</software>
 
-	<software name="gurander">
+	<software name="grander">
 		<!-- Notes: SGB enhanced -->
-		<description>Gurander Musashi RV (Jpn)</description>
+		<description>Grander Musashi RV (Jpn)</description>
 		<year>1998</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ARVJ-JPN"/>
@@ -7761,11 +7769,11 @@
 	</software>
 
 	<software name="histakes">
-		<!-- Alt. Title: High Stakes Gambling (Box) -->
 		<description>High Stakes (USA)</description>
 		<year>1992</year>
 		<publisher>Electro Brain</publisher>
 		<info name="serial" value="DMG-HY-USA"/>
+		<info name="alt_title" value="High Stakes Gambling (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -8132,6 +8140,7 @@
 		<year>1997</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-ANDE-USA, DMG-ANDP-NOE"/>
+		<info name="alt_title" value="Disney's The Hunchback of Notre Dame - 5 Foolishly Fun Topsy Turvy Games (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -8313,6 +8322,7 @@
 		<year>1991</year>
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-FH-USA, DMG-FH-UKV"/>
+		<info name="alt_title" value="InfoGenius Productivity Pak - Berlitz French Translator (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -8326,6 +8336,7 @@
 		<year>1991</year>
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-NL-USA, DMG-NL-UKV"/>
+		<info name="alt_title" value="InfoGenius Productivity Pak - Berlitz Spanish Translator (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -8339,6 +8350,7 @@
 		<year>1991</year>
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-GD-USA"/>
+		<info name="alt_title" value="InfoGenius Productivity Pak - Frommer's Travel Guide (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -8348,11 +8360,11 @@
 	</software>
 
 	<software name="persorg">
-		<!-- Alt. Title: InfoGenius Systems - Personal Organizer and Phone Book (Box) -->
 		<description>InfoGenius Systems - Personal Organizer (Euro)</description>
 		<year>1991</year>
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-ZR-UKV"/>
+		<info name="alt_title" value="InfoGenius Systems - Personal Organizer and Phone Book (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<!-- cartridge ram -->
@@ -8365,11 +8377,11 @@
 	</software>
 
 	<software name="persorgu" cloneof="persorg">
-		<!-- Alt. Title: InfoGenius Systems - Personal Organizer and Phone Book (Box) -->
 		<description>InfoGenius Systems - Personal Organizer (USA)</description>
 		<year>1991</year>
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-ZR-USA"/>
+		<info name="alt_title" value="InfoGenius Systems - Personal Organizer and Phone Book (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<!-- cartridge ram -->
@@ -8445,7 +8457,7 @@
 	</software>
 
 	<software name="ironmanx">
-		<description>Ironman X-O Manowar in Heavy Metal (Euro, USA)</description>
+		<description>Iron Man X-O Manowar in Heavy Metal (Euro, USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AXIE-USA, DMG-AXIP-EUR"/>
@@ -8458,7 +8470,7 @@
 	</software>
 
 	<software name="ishidayo">
-		<description>Ishida Yoshio Tsume Go Paradise (Jpn)</description>
+		<description>Ishida Yoshio Tsumego Paradise (Jpn)</description>
 		<year>1990</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="DMG-IGJ (R33G5933)"/>
@@ -8500,11 +8512,11 @@
 	</software>
 
 	<software name="itchy">
-		<!-- Alt. Title: The Simpsons Itchy &amp; Scratchy - Miniature Golf Madness (Box) -->
 		<description>Itchy &amp; Scratchy in Miniature Golf Madness! (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-YH-USA, DMG-YH-EUR"/>
+		<info name="alt_title" value="The Simpsons Itchy &amp; Scratchy - Miniature Golf Madness (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -8725,11 +8737,11 @@
 	</software>
 
 	<software name="jeepjamb">
-		<!-- Alt. Title: Jeep Jamboree - Off Road Adventure (Box) -->
 		<description>Jeep Jamboree (USA)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<info name="serial" value="DMG-JJ-USA"/>
+		<info name="alt_title" value="Jeep Jamboree - Off Road Adventure (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -9224,9 +9236,9 @@
 		</part>
 	</software>
 
-	<software name="kanzume">
+	<software name="kandume">
 		<!-- Notes: SGB enhanced -->
-		<description>Kanzume Monsters (Jpn)</description>
+		<description>Kandume Monsters (Jpn)</description>
 		<year>1998</year>
 		<publisher>I'Max</publisher>
 		<info name="serial" value="DMG-AKMJ-JPN"/>
@@ -9245,7 +9257,7 @@
 	</software>
 
 	<software name="karakuri">
-		<description>Karakuri Kengouden Musashi Lord (Jpn)</description>
+		<description>Karakuri Kengou-den - Musashi Lord (Jpn)</description>
 		<year>1991</year>
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="DMG-MUJ"/>
@@ -10134,7 +10146,7 @@
 	</software>
 
 	<software name="kuniokun">
-		<description>Kunio-kun no Jidaigeki dayo Zenin Shuugou! (Jpn)</description>
+		<description>Kunio-kun no Jidaigeki Da yo Zenin Shuugou! (Jpn)</description>
 		<year>1993</year>
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="DMG-JXJ"/>
@@ -10172,6 +10184,7 @@
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AP-USA, DMG-AP-UKV"/>
+		<info name="alt_title" value="Kwirk - He's A-maze-ing! (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="kwirk (usa, europe).bin" size="32768" crc="21c98af2" sha1="6ef48e912a47c774048456aa870c7e810fd45685" offset="000000" />
@@ -10248,12 +10261,12 @@
 	</software>
 
 	<software name="legend">
-		<description>Legend - Asu e no Tsubasa (Jpn)</description>
+		<description>Legend (Jpn)</description>
 		<year>1991</year>
 		<publisher>Quest</publisher>
 		<info name="serial" value="DMG-LGJ"/>
 		<info name="release" value="19910531"/>
-		<info name="alt_title" value="レジェンド -明日への翼-"/>
+		<info name="alt_title" value="レジェンド -明日への翼- ~ Legend - Ashita e no Tsubasa (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="131072">
@@ -10501,10 +10514,11 @@
 	</software>
 
 	<software name="lionking">
-		<description>Disney's The Lion King (Euro)</description>
+		<description>The Lion King (Euro)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="DMG-ALNP-EUR"/>
+		<info name="alt_title" value="Disney's The Lion King (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -10519,6 +10533,7 @@
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="DMG-ALNE-USA"/>
+		<info name="alt_title" value="Disney's The Lion King (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -10607,7 +10622,7 @@
 		<publisher>Data East</publisher>
 		<info name="serial" value="DMG-LCA, DMG-LC-USA, DMG-LC-UKV"/>
 		<info name="release" value="19900511 (JPN)"/>
-		<info name="alt_title" value="ロックンチェイス"/>
+		<info name="alt_title" value="ロックンチェイス ~ Lock 'n' Chase (Jpn Box), Lock n' Chase (Western Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
@@ -10839,7 +10854,7 @@
 
 	<software name="rayearth">
 		<!-- Notes: SGB enhanced -->
-		<description>Magic Knight RayEarth (Jpn)</description>
+		<description>Magic Knight Rayearth (Jpn)</description>
 		<year>1995</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-ARYJ-JPN"/>
@@ -10858,7 +10873,7 @@
 
 	<software name="rayeart2">
 		<!-- Notes: SGB enhanced -->
-		<description>Magic Knight RayEarth 2nd. - The Missing Colors (Jpn)</description>
+		<description>Magic Knight Rayearth 2nd. - The Missing Colors (Jpn)</description>
 		<year>1995</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-AR2J-JPN"/>
@@ -11216,11 +11231,12 @@
 	</software>
 
 	<software name="mauimall">
-		<!-- Alt. Title: Maui Mallard in Cold Shadow (Box) - Notes: SGB enhanced -->
+		<!-- Notes: SGB enhanced -->
 		<description>Maui Mallard (USA)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-AMIE-USA"/>
+		<info name="alt_title" value="Maui Mallard in Cold Shadow (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -11711,12 +11727,12 @@
 	</software>
 
 	<software name="mickey4" cloneof="garfield">
-		<description>Mickey Mouse IV - Mahou no Labyrinth (Jpn)</description>
+		<description>Mickey Mouse IV (Jpn)</description>
 		<year>1993</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-L4A"/>
 		<info name="release" value="19930423"/>
-		<info name="alt_title" value="ミッキーマウスIV 魔法のラビリンス"/>
+		<info name="alt_title" value="ミッキーマウスIV 魔法のラビリンス ~ Mickey Mouse IV - Mahou no Labyrinth (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -11726,12 +11742,12 @@
 	</software>
 
 	<software name="mickey5" cloneof="mickeymw">
-		<description>Mickey Mouse V - Mahou no Stick (Jpn)</description>
+		<description>Mickey Mouse V (Jpn)</description>
 		<year>1993</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-I5J"/>
 		<info name="release" value="19931222"/>
-		<info name="alt_title" value="ミッキーマウスV 魔法のステッキ"/>
+		<info name="alt_title" value="ミッキーマウスV 魔法のステッキ ~ Mickey Mouse V - Mahou no Stick (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -11745,6 +11761,7 @@
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-MC-ESP"/>
+		<info name="alt_title" value="Mickey's Dangerous Chase (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -11769,11 +11786,11 @@
 	</software>
 
 	<software name="mickeychu" cloneof="mickeych">
-		<!-- Alt. Title: Mickey's Dangerous Chase (Box) -->
 		<description>Mickey's Chase (USA)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-MC-USA"/>
+		<info name="alt_title" value="Mickey's Dangerous Chase (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -11927,6 +11944,7 @@
 		<year>1992</year    >
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="DMG-MV-USA"/>
+		<info name="alt_title" value="Miner 2049er Starring Bounty Bob (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
@@ -12714,6 +12732,7 @@
 		<year>1993</year>
 		<publisher>Virgin Games</publisher>
 		<info name="serial" value="DMG-XB-USA, DMG-XB-NOE"/>
+		<info name="alt_title" value="Muhammad Ali Heavyweight Boxing (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -13185,7 +13204,7 @@
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="DMG-NDJ"/>
 		<info name="release" value="19911108"/>
-		<info name="alt_title" value="熱血高校ドッジボール部 〜強敵!闘球戦士の巻〜"/>
+		<info name="alt_title" value="熱血高校ドッジボール部 〜強敵!闘球戦士の巻〜 ~ Nekketsu Koukou Dodgeball Bu - Kyouteki! Toukyuu Senshi no Maki (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -13211,7 +13230,7 @@
 
 	<software name="nekbvoll">
 		<!-- Notes: SGB enhanced -->
-		<description>Nekketsu! Beach Volley dayo Kunio-kun (Jpn)</description>
+		<description>Nekketsu! Beach Volley Da yo Kunio-kun (Jpn)</description>
 		<year>1994</year>
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="DMG-VXJ"/>
@@ -13314,7 +13333,7 @@
 
 	<software name="garou2">
 		<!-- Notes: SGB enhanced -->
-		<description>Nettou Garou Densetsu 2 (Jpn)</description>
+		<description>Nettou Garou Densetsu 2 - Aratanaru Tatakai (Jpn)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-X3J"/>
@@ -13473,11 +13492,11 @@
 	</software>
 
 	<software name="newchess">
-		<!-- Alt. Title: The Chessmaster Special Edition (Box?) -->
 		<description>The New Chessmaster (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="DMG-N5-USA, DMG-N5-FAH"/>
+		<info name="alt_title" value="The Chessmaster Special Edition (Box?)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
@@ -13625,7 +13644,7 @@
 		<year>1992</year>
 		<publisher>Gremlin Interactive</publisher>
 		<info name="serial" value="DMG-WC-(FAH/UKV)"/>
-		<info name="alt_title" value="Nigel Mansell's World Championship Racing (Alt)"/>
+		<info name="alt_title" value="Nigel Mansell's World Championship Racing (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -13805,12 +13824,12 @@
 
 	<software name="nintama">
 		<!-- Notes: SGB enhanced -->
-		<description>Nintama Rantarou - Ninjutsu Gakuen ni Nyuugaku Shiyou no Dan (Jpn)</description>
+		<description>Nintama Rantarou (Jpn)</description>
 		<year>1995</year>
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="DMG-AGNJ-JPN"/>
 		<info name="release" value="19951227"/>
-		<info name="alt_title" value="忍たま乱太郎GB"/>
+		<info name="alt_title" value="忍たま乱太郎GB ~ Nintama Rantarou GB"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -14750,10 +14769,11 @@
 	</software>
 
 	<software name="parasol">
-		<description>Parasol Stars (Euro)</description>
+		<description>Parasol Stars - The Story of Bubble Bobble III (Euro)</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-P6-UKV"/>
+		<info name="alt_title" value="Parasol Stars - Rainbow Islands II (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -16885,7 +16905,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-ARBJ-JPN"/>
 		<info name="release" value="19980327"/>
-		<info name="alt_title" value="熱闘 リアルバウト餓狼伝説SPECIAL"/>
+		<info name="alt_title" value="熱闘 リアルバウト餓狼伝説SPECIAL ~ Nettou Real Bout Garou Densetsu Special (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -17388,12 +17408,12 @@
 	</software>
 
 	<software name="rodlandj" cloneof="rodland">
-		<description>Rod Land (Jpn)</description>
+		<description>Rod-Land (Jpn)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="DMG-RLJ"/>
 		<info name="release" value="19930521"/>
-		<info name="alt_title" value="妖精物語 ロッド・ランド"/>
+		<info name="alt_title" value="妖精物語 ロッド・ランド ~ Yousei Monogatari - Rod Land (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
@@ -17408,7 +17428,7 @@
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="DMG-VMA"/>
 		<info name="release" value="19930827"/>
-		<info name="alt_title" value="MVPベースボール"/>
+		<info name="alt_title" value="MVPベースボール ~ MVP Baseball (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -17422,6 +17442,7 @@
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-VM-USA"/>
+		<info name="alt_title" value="Roger Clemens' MVP Baseball (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -17854,7 +17875,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-SDJ"/>
 		<info name="release" value="19900324"/>
-		<info name="alt_title" value="SDガンダム SD戦国伝 国盗り物語"/>
+		<info name="alt_title" value="SDガンダム SD戦国伝 国盗り物語 ~ SD Gundam - SD Sengokuden - Kunitori Monogatari (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -17869,7 +17890,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-G3J"/>
 		<info name="release" value="19920118"/>
-		<info name="alt_title" value="SDガンダム SD戦国伝2 天下統一編"/>
+		<info name="alt_title" value="SDガンダム SD戦国伝2 天下統一編 ~ SD Gundam - SD Sengokuden 2 - Tenka Touitsu Hen (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
@@ -17886,7 +17907,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-D3J"/>
 		<info name="release" value="19920904"/>
-		<info name="alt_title" value="SDガンダム SD戦国伝3 新SD戦国伝 地上最強編"/>
+		<info name="alt_title" value="SDガンダム SD戦国伝3 新SD戦国伝 地上最強編 ~ SD Gundam - SD Sengokuden 3 - Chijou Saikyou Hen (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
@@ -18692,7 +18713,7 @@
 
 	<software name="sstriker">
 		<!-- Notes: Also released by NP in 2000-03 -->
-		<description>Solar Striker (World)</description>
+		<description>SolarStriker (World)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-SSA, DMG-SS-USA, DMG-SS-NOE"/>
@@ -18792,13 +18813,13 @@
 		</part>
 	</software>
 
-	<software name="amidakun">
-		<description>Soreike! Amida-kun (Jpn)</description>
+	<software name="amida">
+		<description>Amida (Jpn)</description>
 		<year>1990</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="DMG-AMA"/>
 		<info name="release" value="19901023"/>
-		<info name="alt_title" value="アミーダくん 阿弥陀"/>
+		<info name="alt_title" value="アミーダくん 阿弥陀 ~ Soreike! Amida-kun (Box?)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="soreike! amida-kun (japan).bin" size="32768" crc="60128aa8" sha1="2b502583aa73cb72557589791dec7e28a2d29969" offset="000000" />
@@ -18980,6 +19001,7 @@
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-XG-USA, DMG-XG-NOE"/>
+		<info name="alt_title" value="Spider-Man - X-Men (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -19238,7 +19260,7 @@
 	</software>
 
 	<software name="squared">
-		<description>Square Deal (USA)</description>
+		<description>Square Deal - The Game of Two-Dimensional Poker (USA)</description>
 		<year>1992</year>
 		<publisher>DTMC</publisher>
 		<info name="serial" value="DMG-CA-USA"/>
@@ -20525,11 +20547,11 @@
 	</software>
 
 	<software name="tarzan">
-		<!-- Alt. Title: Tarzan - Lord of the Jungle (Box) -->
 		<description>Tarzan (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-ZK-USA, DMG-ZK-EUR"/>
+		<info name="alt_title" value="Tarzan - Lord of the Jungle (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -20565,10 +20587,11 @@
 	</software>
 
 	<software name="tazdevl">
-		<description>Tasmanian Devil - Island Chase (Euro) ~ Taz-Mania (USA)</description>
+		<description>Taz-Mania (Euro, USA, Sunsoft)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-ZT-USA, DMG-ZT-NOE"/>
+		<info name="alt_title" value="Tasmanian Devil - Island Chase (Euro Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -20578,7 +20601,7 @@
 	</software>
 
 	<software name="tazmania">
-		<description>Taz-Mania (Euro)</description>
+		<description>Taz-Mania (Euro, THQ)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ZM-UKV"/>
@@ -20591,7 +20614,7 @@
 	</software>
 
 	<software name="tazmani2u" cloneof="tazmania">
-		<description>Taz-Mania 2 (USA)</description>
+		<description>Taz-Mania 2 (USA, THQ)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ATZE-USA"/>
@@ -20760,8 +20783,9 @@
 		<publisher>Asmik Ace</publisher>
 		<info name="serial" value="DMG-ASJ"/>
 		<info name="release" value="19891227"/>
-		<info name="alt_title" value="てけてけ!アスミッくんワールド"/>
+		<info name="alt_title" value="てけてけ!アスミッくんワールド ~ Teke Teke! Asmik-kun World"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="teke! teke! asmik-kun world (japan).bin" size="65536" crc="a817450d" sha1="389cc31472b87ec70e3ea6487f8ad9198887bb89" offset="000000" />
 			</dataarea>
@@ -21426,7 +21450,7 @@
 
 	<software name="luckyman">
 		<!-- Notes: SGB enhanced -->
-		<description>Tottemo! Luckyman (Jpn)</description>
+		<description>Tottemo! Luckyman - Lucky Cookie Minna Daisuki!! (Jpn)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ALKJ-JPN"/>
@@ -21651,7 +21675,7 @@
 
 	<software name="tsumego">
 		<!-- Notes: SGB enhanced -->
-		<description>Tsume Go Series 1 - Fujisawa Hideyuki Meiyo Kisei (Jpn)</description>
+		<description>Tsumego Series 1 - Fujisawa Hideyuki Meiyo Kisei (Jpn)</description>
 		<year>1994</year>
 		<publisher>Mahou</publisher>
 		<info name="serial" value="DMG-ATGJ-JPN"/>
@@ -21666,7 +21690,7 @@
 	</software>
 
 	<software name="tshogihy">
-		<description>Tsume Shougi - Hyakuban Shoubu (Jpn)</description>
+		<description>Tsumeshougi - Hyakuban Shoubu (Jpn)</description>
 		<year>1994</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-S4J"/>
@@ -21681,7 +21705,7 @@
 	</software>
 
 	<software name="tshogikap" cloneof="tshogika">
-		<description>Tsume Shougi - Kanki Godan (Jpn, Prototype)</description>
+		<description>Tsumeshougi - Kanki Godan (Jpn, Prototype)</description>
 		<year>1994</year>
 		<publisher>Mahou</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -21694,7 +21718,7 @@
 
 	<software name="tshogika">
 		<!-- Notes: SGB enhanced -->
-		<description>Tsume Shougi - Kanki Godan (Jpn)</description>
+		<description>Tsumeshougi - Kanki Godan (Jpn)</description>
 		<year>1994</year>
 		<publisher>Mahou</publisher>
 		<info name="serial" value="DMG-ATKJ-JPN"/>
@@ -21709,7 +21733,7 @@
 	</software>
 
 	<software name="tshogimo">
-		<description>Tsume Shougi - Mondai Teikyou Shougi Sekai (Jpn)</description>
+		<description>Tsumeshougi - Mondai Teikyou Shougi Sekai (Jpn)</description>
 		<year>1994</year>
 		<publisher>I'Max</publisher>
 		<info name="serial" value="DMG-YNJ"/>
@@ -22618,11 +22642,11 @@
 	</software>
 
 	<software name="wizardwx">
-		<!-- Alt. Title: Wizards &amp; Warriors X - The Fortress of Fear (Box) -->
 		<description>Wizards &amp; Warriors Chapter X - The Fortress of Fear (Euro, USA)</description>
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-WW-USA, DMG-WW-(NOE/ESP-1/UKV)"/>
+		<info name="alt_title" value="Wizards &amp; Warriors X - The Fortress of Fear (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
@@ -23225,7 +23249,7 @@
 	</software>
 
 	<software name="yuyu2">
-		<description>Yu Yu Hakusho Dai-2-dan - Ankoku Bujutsu Kai (Jpn)</description>
+		<description>Yu Yu Hakusho Dai-2-dan - Ankoku Bujutsukai Hen (Jpn)</description>
 		<year>1993</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-UKJ"/>
@@ -23256,7 +23280,7 @@
 
 	<software name="yuyu4">
 		<!-- Notes: SGB enhanced -->
-		<description>Yu Yu Hakusho Dai-4-dan - Makai Touitsu (Jpn)</description>
+		<description>Yu Yu Hakusho Dai-4-dan - Makai Touitsu Hen (Jpn)</description>
 		<year>1994</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-AUUJ-JPN"/>
@@ -23271,12 +23295,12 @@
 	</software>
 
 	<software name="zas">
-		<!-- Alt. Title: 地球解放軍ジアース / Chikyuu Kaihou Gun ZAS (Box) -->
 		<description>ZAS (Jpn)</description>
 		<year>1992</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="DMG-ZAA"/>
 		<info name="release" value="19921218"/>
+		<info name="alt_title" value="地球解放軍ジアース ~ Chikyuu Kaihou Gun ZAS (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -23399,8 +23423,8 @@
 		</part>
 	</software>
 
-	<software name="zettaimu">
-		<description>Zettai Muteki Raijinou (Jpn)</description>
+	<software name="raijinoh">
+		<description>Zettai Muteki Raijin-Oh (Jpn)</description>
 		<year>1991</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-RGJ"/>
@@ -23434,6 +23458,7 @@
 		<year>1993</year>
 		<publisher>Gremlin</publisher>
 		<info name="serial" value="DMG-ZG-UKV"/>
+		<info name="alt_title" value="Zool - Ninja of the &quot;Nth&quot; Dimension (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -23447,6 +23472,7 @@
 		<year>1993</year>
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-ZG-USA"/>
+		<info name="alt_title" value="Zool - Ninja of the &quot;Nth&quot; Dimension (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">

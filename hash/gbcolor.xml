@@ -2293,7 +2293,7 @@ List of verified retail cartridges rom dumps
 	</software>
 
 	<software name="shadgatea" cloneof="shadgate">
-		<description>Shadowgate Classic (Aus, USA)</description><!-- only USA confirmed -->
+		<description>Shadowgate Classic (Aus, USA)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-ASWE-USA, DMG-ASWP-AUS"/>
@@ -2744,7 +2744,7 @@ List of verified retail cartridges rom dumps
 
 	<software name="turokrag">
 		<!-- Notes: GBC only -->
-		<description>Turok - Rage Wars (Euro, Aus, USA)</description><!-- only Euro confirmed -->
+		<description>Turok - Rage Wars (Euro, Aus, USA)</description><!-- only Euro & AUS confirmed -->
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="CGB-AR7E-USA, CGB-AR7P-(EUR/AUS)"/>
@@ -3417,7 +3417,7 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 	</software>
 
 	<software name="shadgate">
-		<description>Shadowgate Classic (Euro, USA, Rev. A)</description>
+		<description>Shadowgate Classic (Euro, USA, Rev. A)</description><!-- only Euro confirmed -->
 		<year>1999</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-ASWE-USA, DMG-ASWP-EUR"/>
@@ -3595,7 +3595,7 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 
 	<software name="yugidm2">
 		<!-- Notes: SGB enhanced -->
-		<description>Yu-Gi-Oh! Duel Monsters II - Yamikai Kettouki (Jpn)</description>
+		<description>Yu-Gi-Oh! Duel Monsters II - Yamikai Kettouki - Dark Duel Stories (Jpn)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AYKJ-JPN (RK188-J1)"/>
@@ -3957,7 +3957,7 @@ List of unconfirmed retail cartridge roms
 		<description>The Adventures of Tintin - Prisoners of the Sun (Euro)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
-		<info name="alt_title" value="Tintin - Le Temple du Soleil"/>
+		<info name="alt_title" value="Tintin - Prisoners of the Sun (Box?), Tintin - Le Temple du Soleil (French Box)"/>
 		<info name="serial" value="CGB-BTTP-FAH"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
@@ -5290,7 +5290,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="bionicc">
 		<!-- Notes: GBC only -->
-		<description>Bionic Commando - Elite Forces (Euro, USA)</description>
+		<description>Bionic Commando - Elite Forces (Aus, USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AV4E-USA, CGB-AV4P-AUS"/>
@@ -5367,7 +5367,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="bobbobet">
 		<!-- Notes: GBC only -->
-		<description>Bob et Bobette - Les Dompteurs du Temps (Euro)</description>
+		<description>Bob et Bobette - Les Dompteurs du Temps ~ Suske en Wiske - De Tijdtemmers (Euro)</description>
 		<year>2001</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="CGB-BBQP-FAH"/>
@@ -6231,7 +6231,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="chibim">
 		<!-- Notes: GBC only -->
-		<description>Chibi Maruko-chan - Go Chounai Minna de Game dayo! (Jpn)</description>
+		<description>Chibi Maruko-chan - Go Chounai Minna de Game Da yo! (Jpn)</description>
 		<year>2001</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="CGB-BCNJ-JPN"/>
@@ -6603,7 +6603,7 @@ List of unconfirmed retail cartridge roms
 	</software>
 
 	<software name="daffysub">
-		<description>Daffy Duck - Subette Koron de Taikin Mochi (Jpn)</description>
+		<description>Daffy Duck - Subette Koron de Ougane Mochi (Jpn)</description>
 		<year>2000</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-AD7J-JPN"/>
@@ -6624,7 +6624,7 @@ List of unconfirmed retail cartridge roms
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-ADZJ-JPN"/>
 		<info name="release" value="19990226"/>
-		<info name="alt_title" value="ポヨンのダンジョンルーム"/>
+		<info name="alt_title" value="大貝獣物語 ポヨンのダンジョンルーム ~ Daikaijuu Monogatari - Poyon no Dungeon Room (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
@@ -6643,7 +6643,7 @@ List of unconfirmed retail cartridge roms
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="CGB-BP2J-JPN"/>
 		<info name="release" value="20000602"/>
-		<info name="alt_title" value="大貝獣物語 ポヨンのダンジョンルーム2"/>
+		<info name="alt_title" value="大貝獣物語 ポヨンのダンジョンルーム2 ~ Daikaijuu Monogatari - Poyon no Dungeon Room 2 (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
@@ -6709,7 +6709,7 @@ List of unconfirmed retail cartridge roms
 	
 	<software name="daikatanp" cloneof="daikatan">
 		<!-- Notes: GBC only -->
-		<description>Daikatana (Euro, Prototype)</description>
+		<description>Daikatana (Prototype 20000419)</description>
 		<year>2000</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -7794,7 +7794,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="dquest3" cloneof="dwarr3">
 		<!-- Notes: GBC only -->
-		<description>Dragon Quest III - Soshite Densetsu he... (Jpn)</description>
+		<description>Dragon Quest III - Soshite Densetsu e... (Jpn)</description>
 		<year>2000</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="CGB-BD3J-JPN"/>
@@ -8170,6 +8170,7 @@ List of unconfirmed retail cartridge roms
 		<year>2002</year>
 		<publisher>NewKidCo</publisher>
 		<info name="serial" value="CGB-BEOP-EUR"/>
+		<info name="alt_title" value="E.T. The Extra Terrestrial and the Cosmic Garden (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
@@ -8187,6 +8188,7 @@ List of unconfirmed retail cartridge roms
 		<year>2002</year>
 		<publisher>NewKidCo</publisher>
 		<info name="serial" value="CGB-BEOE-USA"/>
+		<info name="alt_title" value="E.T. The Extra Terrestrial and the Cosmic Garden (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
@@ -9075,7 +9077,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="ggoemdyn">
 		<!-- Notes: GBC only, also released by NP in 2001-07 -->
-		<description>Ganbare Goemon - Hoshizorashi Dynamites Arawaru!! (Jpn)</description>
+		<description>Ganbare Goemon - Seikuushi Dynamites Arawaru!! (Jpn)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BEKJ-JPN (RK234-J1)"/>
@@ -9094,7 +9096,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="ggoemnab">
 		<!-- Notes: SGB enhanced -->
-		<description>Ganbare Goemon - Mononoke Douchuu Tobisuise Nabebugyou! (Jpn)</description>
+		<description>Ganbare Goemon - Mononoke Douchuu Tobidase Nabebugyou! (Jpn)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AEFJ-JPN (RK192-J1)"/>
@@ -9221,7 +9223,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="gmsayuki">
 		<!-- Notes: GBC only -->
-		<description>Gensou Maden Saiyuuki - Sabaku no Shikami (Jpn)</description>
+		<description>Gensou Maden Saiyuuki - Sabaku no Shishin (Jpn)</description>
 		<year>2001</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="CGB-BGSJ-JPN"/>
@@ -9876,7 +9878,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="hamstmon">
 		<!-- Notes: GBC only -->
-		<description>Hamster Monogatari GB + Magi Ham Mahou no Shoujo (Jpn)</description>
+		<description>Hamster Monogatari GB + Magi Ham no Mahou Shoujo (Jpn)</description>
 		<year>2002</year>
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="CGB-B8MJ-JPN"/>
@@ -10681,7 +10683,7 @@ List of unconfirmed retail cartridge roms
 	</software>
 
 	<software name="hugo2hlf">
-		<description>Hugo 2 1/2 (Ger)</description>
+		<description>Hugo 2½ (Ger)</description>
 		<year>1999</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="DMG-AHOP-NOE"/>
@@ -11226,7 +11228,7 @@ List of unconfirmed retail cartridge roms
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="DMG-A55J-JPN"/>
 		<info name="release" value="19991217"/>
-		<info name="alt_title" value="女流雀士に挑戦GB 〜私達に挑戦してネ!〜"/>
+		<info name="alt_title" value="女流雀士に挑戦GB 〜私達に挑戦してネ!〜 ~ Joryuu Janshi ni Chousen GB - Watashi-tachi ni Chousen Shitene! (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
@@ -11521,7 +11523,7 @@ List of unconfirmed retail cartridge roms
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="CGB-AHFJ-JPN"/>
 		<info name="release" value="20000728"/>
-		<info name="alt_title" value="華蘭虎龍学園 〜花札・麻雀〜"/>
+		<info name="alt_title" value="GB華蘭虎龍学園 〜花札・麻雀〜 ~ GB Karan Koron Gakuen - Hanafuda Mahjong (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -11711,7 +11713,7 @@ List of unconfirmed retail cartridge roms
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AB7J-JPN"/>
 		<info name="release" value="19990319"/>
-		<info name="alt_title" value="決闘ビーストウォーズ ビースト戦士最強決定戦"/>
+		<info name="alt_title" value="決闘トランスフォーマービーストウォーズ ビースト戦士最強決定戦 ~ Kettou Transformers Beast Wars - Beast Senshi Saikyou Ketteisen (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -12057,7 +12059,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="kotobatt">
 		<!-- Notes: GBC only -->
-		<description>Koto Battle - Tengai no Morihito (Jpn)</description>
+		<description>Koto Battle - Tengai no Moribito (Jpn)</description>
 		<year>2001</year>
 		<publisher>Alphadream</publisher>
 		<info name="serial" value="CGB-BAJJ-JPN"/>
@@ -15862,7 +15864,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="ottifant">
 		<!-- Notes: GBC only -->
-		<description>Ottifanten - Kommando Stoertebeker (Ger)</description>
+		<description>Ottifanten - Kommando Störtebeker (Ger)</description>
 		<year>2001</year>
 		<publisher>JoWooD Entertainment</publisher>
 		<info name="serial" value="??"/>
@@ -16911,7 +16913,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="pokepinbu" cloneof="pokepinb">
 		<!-- Notes: GBC only, Rumble support -->
-		<description>Pokémon Pinball (Aus, USA)</description>
+		<description>Pokémon Pinball (Aus, USA)</description><!-- Only AUS confirmed -->
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-VPHE-USA, DMG-VPHU-AUS"/>
@@ -18772,7 +18774,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="sakura">
 		<!-- Notes: GBC only, 10 variant packs got released! -->
-		<description>Sakura Taisen GB - Geki Hana Kumi Nyuutai! (Jpn)</description>
+		<description>Sakura Taisen GB - Geki Hana Gumi Nyuutai! (Jpn)</description>
 		<year>2000</year>
 		<publisher>Media Factory</publisher>
 		<info name="serial" value="CGB-BRJJ-JPN"/>
@@ -19291,7 +19293,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="snobochm">
 		<!-- Notes: GBC only -->
-		<description>Snobo Champion (Jpn)</description>
+		<description>Snobow Champion (Jpn)</description>
 		<year>2000</year>
 		<publisher>Bottom Up</publisher>
 		<info name="serial" value="CGB-B5CJ-JPN"/>
@@ -19972,7 +19974,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="sgals2">
 		<!-- Notes: GBC only -->
-		<description>Super Gals! Kotobuki Ran 2 (Jpn)</description>
+		<description>Super Gals! Kotobuki Ran 2 - Miracle → Getting (Jpn)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BGUJ-JPN (RK283-J1)"/>
@@ -20201,12 +20203,12 @@ List of unconfirmed retail cartridge roms
 
 	<software name="survkid2">
 		<!-- Notes: SGB enhanced -->
-		<description>Survival Kids 2 - Dasshutsu!! Futago Shima! (Jpn)</description>
+		<description>Survival Kids 2 - Dasshutsu!! Futagojima! (Jpn)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-B2VJ-JPN (RK210-J1)"/>
 		<info name="release" value="20000719"/>
-		<info name="alt_title" value="サバイバルキッズ2 脱出!双子島"/>
+		<info name="alt_title" value="サバイバルキッズ2 脱出!双子島!"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
@@ -20341,7 +20343,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="sylvmel">
 		<!-- Notes: SGB enhanced -->
-		<description>Sylvanian Melodies - Mori no Nakama to Odori Mashi! (Jpn)</description>
+		<description>Sylvanian Melodies - Mori no Nakama to Odori Masho! (Jpn)</description>
 		<year>2000</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="DMG-BMKJ-JPN"/>
@@ -20387,7 +20389,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="ttshogi">
 		<!-- Notes: NP only -->
-		<description>Taisen Tsume Shougi (Jpn, NP)</description>
+		<description>Taisen Tsumeshougi (Jpn, NP)</description>
 		<year>2000</year>
 		<publisher>Athena</publisher>
 		<info name="serial" value="DMG-BTSJ-JPN"/>
@@ -21618,7 +21620,7 @@ List of unconfirmed retail cartridge roms
 
 	<software name="rpgtsuk2">
 		<!-- Notes: GBC only -->
-		<description>Uchuu Nin Tanaka Tarou de RPG Tsukuru GB2 (Jpn)</description>
+		<description>Uchuujin Tanaka Tarou de RPG Tsukuru GB2 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Enterbrain</publisher>
 		<info name="serial" value="CGB-B3QJ-JPN"/>
@@ -23148,8 +23150,8 @@ List of unconfirmed non retail roms
 
 	<software name="pocknaka">
 		<!-- Notes: GBC only -->
-		<description>Poketto no Naka no Ookoku (Jpn, Prototype)</description>
-		<year>2000</year><!-- scheduled to be released January 2001 (3/11/2000 Famitsu) -->
+		<description>Pocket no Naka no Ookoku (Jpn, Prototype)</description>
+		<year>2000</year>	<!-- scheduled to be released January 2001 (3/11/2000 Famitsu) -->
 		<publisher>Hector</publisher>
 		<info name="alt_title" value="ポケットの中の王国"/>
 		<part name="cart" interface="gameboy_cart">
@@ -23553,31 +23555,6 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="4in1_01c">
-		<description>4 in 1 (4B-001)</description>
-		<year>20??</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_sachen2" />
-			<dataarea name="rom" size="524288">
-				<rom name="4b-001.bin" size="524288" crc="42a2fdf8" sha1="79a4faddfd1aca397e56d7895e45b1bc12900dab" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mc_8in1">
-		<description>8 in 1 (Tw)</description>
-		<year>19??</year>
-		<publisher>Sachen</publisher>
-		<info name="serial" value="??"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="524288">
-				<rom name="8-in-1 (sachen) (unl).bin" size="524288" crc="e3c8b0c0" sha1="19ea88d489d60782a99c7518a4138812d1f3cd90" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 
 	<!-- also data from ThunderBlast Man -->
 	<software name="jboy2a" cloneof="jboy2">
@@ -23629,8 +23606,32 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-
-
+	
+	<software name="mc_8in1">
+		<description>8 in 1 (Tw)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="??"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="524288">
+				<rom name="8-in-1 (sachen) (unl).bin" size="524288" crc="e3c8b0c0" sha1="19ea88d489d60782a99c7518a4138812d1f3cd90" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mc_sac01" supported="no">
+		<description>4 in 1 + 8 in 1 (World, 4B-001)</description>
+		<year>20??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="524288">
+				<rom name="4b-001.bin" size="524288" crc="42a2fdf8" sha1="79a4faddfd1aca397e56d7895e45b1bc12900dab" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="mc_sac02" supported="no">
 		<description>4 in 1 + 8 in 1 (World, 4B-002)</description>
 		<year>19??</year>
