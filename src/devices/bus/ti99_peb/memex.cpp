@@ -14,11 +14,8 @@
 
 #include "memex.h"
 
-#define MEMEX_SIZE 0x200000
-#define RAMREGION "ram"
-
-#define VERBOSE 1
-#define LOG logerror
+#define RAMREGION "ram2M"
+#define TRACE_CONFIG 0
 
 enum
 {
@@ -34,7 +31,7 @@ enum
 
 geneve_memex_device::geneve_memex_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI99_MEMEX, "Geneve memory expansion card", tag, owner, clock, "ti99_memex", __FILE__),
-	m_ram(nullptr),
+	m_ram(*this, RAMREGION),
 	m_genmod(0)
 {
 }
@@ -56,7 +53,7 @@ bool geneve_memex_device::access_enabled(offs_t offset)
 	if (page == 0xba) return false;
 	if ((page & 0xc7)==0x82 && m_dip_switch[1]==false)
 	{
-		if (VERBOSE>8) LOG("geneve: memex blocks page %02x; dip1=%d\n", page,  m_dip_switch[1]);
+		if (TRACE_CONFIG) logerror("memex blocks page %02x; dip1=%d\n", page,  m_dip_switch[1]);
 		return false;
 	}
 
@@ -95,7 +92,7 @@ READ8Z_MEMBER( geneve_memex_device::readz )
 	// The card is accessed for all addresses in the address space
 	if (access_enabled(offset))
 	{
-		*value = m_ram[offset];
+		*value = m_ram->pointer()[offset];
 	}
 }
 
@@ -110,7 +107,7 @@ WRITE8_MEMBER( geneve_memex_device::write )
 	// The card is accessed for all addresses in the address space
 	if (access_enabled(offset))
 	{
-		m_ram[offset] = data;
+		m_ram->pointer()[offset] = data;
 	}
 }
 
@@ -118,13 +115,12 @@ WRITE8_MEMBER( geneve_memex_device::write )
 
 void geneve_memex_device::device_start()
 {
-	m_ram = memregion(RAMREGION)->base();
 }
 
 void geneve_memex_device::device_reset()
 {
 	UINT8 dips = ioport("MEMEXDIPS")->read();
-	if (VERBOSE>5) LOG("geneve: memex dips = %02x\n", dips);
+	if (TRACE_CONFIG) logerror("memex dips = %02x\n", dips);
 	for (auto & elem : m_dip_switch)
 	{
 		elem = ((dips & 0x01)!=0x00);
@@ -160,19 +156,20 @@ INPUT_PORTS_START( memex )
 		PORT_DIPSETTING( MDIP8, "Lock out pages FC-FF")
 INPUT_PORTS_END
 
-ROM_START( memex )
-	ROM_REGION(MEMEX_SIZE, RAMREGION, 0)
-	ROM_FILL(0x000000, MEMEX_SIZE, 0x00)
-ROM_END
+MACHINE_CONFIG_FRAGMENT( memex )
+	MCFG_RAM_ADD(RAMREGION)
+	MCFG_RAM_DEFAULT_SIZE("2M")
+	MCFG_RAM_DEFAULT_VALUE(0)
+MACHINE_CONFIG_END
+
+machine_config_constructor geneve_memex_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( memex );
+}
 
 ioport_constructor geneve_memex_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( memex );
-}
-
-const rom_entry *geneve_memex_device::device_rom_region() const
-{
-	return ROM_NAME( memex );
 }
 
 const device_type TI99_MEMEX = &device_creator<geneve_memex_device>;

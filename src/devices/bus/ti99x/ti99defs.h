@@ -13,27 +13,22 @@
 #define __TI99DEFS__
 
 // TI-99/4(A)
-#define region_grom     "cons_grom"
-#define region_grom_cart    "cart_grom"
-#define TMS9901_TAG     "tms9901"
-#define TIBOARD_TAG     "ti_board"
-#define DATAMUX_TAG     "datamux_16_8"
-#define SCREEN_TAG      "screen"
 #define TISOUNDCHIP_TAG "soundchip"
-#define TISOUND_TAG     "tisound"
 #define GROMPORT_TAG    "gromport"
+#define PERIBOX_TAG     "peb"
+#define VDP_TAG         "vdp"
+#define TMS9901_TAG     "tms9901"
+#define SCREEN_TAG      "screen"
 #define GROM0_TAG       "console_grom_0"
 #define GROM1_TAG       "console_grom_1"
 #define GROM2_TAG       "console_grom_2"
-#define PERIBOX_TAG     "peb"
-#define MECMOUSE_TAG    "mecmouse"
-#define HANDSET_TAG     "handset"
 #define JOYPORT_TAG     "joyport"
-#define VDP_TAG         "vdp"
 #define EVPC_CONN_TAG   "evpc_conn"
+#define DATAMUX_TAG     "datamux_16_8"
 
 #define DSRROM          "dsrrom"
-#define CONSOLEROM      "consolerom"
+#define CONSOLEROM      "console_rom"
+#define CONSOLEGROM     "cons_grom"
 
 #define VDPFREQ XTAL_10_738635MHz
 #define GROMFREQ VDPFREQ/24

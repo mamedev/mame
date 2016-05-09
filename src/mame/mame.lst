@@ -27328,7 +27328,7 @@ murogmbl                        // ???
 mustache                        // (c) 1987 March
 
 @source:mvme350.cpp
-mvme350                         // 
+mvme350                         //
 
 @source:mw18w.cpp
 18w                             // 653 (c) 1979 Midway
@@ -28564,7 +28564,7 @@ whp                             // 0090 (c) 1995 ADK / SNK
 wjammers                        // 0065 (c) 1994 Data East Corporation
 zedblade                        // 0076 (c) 1994 NMK
 zintrckb                        // 0211 hack - this is not a genuine MVS proto, its a bootleg made from the CD version
-crswd2bl						// 0054 bootleg made from CD version
+crswd2bl                        // 0054 bootleg made from CD version
 zupapa                          // 0070 Zupapa - released in 2001, 1994 prototype probably exists
 lasthope
 
@@ -34996,7 +34996,7 @@ ti99_224                        // 1983 TI 99/2 (24kb ROMs)
 ti99_232                        // 1983 TI 99/2 (32kb ROMs)
 
 @source:ti99_4p.cpp
-ti99_4p                         // 1996 SNUG 99/4P (a.k.a. SGCPU)
+ti99_4p                         // 1996 SNUG SGCPU (aka TI-99/4P)
 
 @source:ti99_4x.cpp
 ti99_4                          // 1979 TI-99/4
@@ -35004,8 +35004,7 @@ ti99_4a                         // 1981 TI-99/4A
 ti99_4ae                        // 1981 TI-99/4A with 50Hz video
 ti99_4e                         // 1980 TI-99/4 with 50Hz video
 ti99_4ev                        // 1994 TI-99/4A with EVPC video card
-ti99_4qe                        // 1983 TI-99/4QI with 50Hz video
-ti99_4qi                        // 1983 TI-99/4QI
+ti99_4qi                        // 1983 TI-99/4QI (US only)
 
 @source:ti99_8.cpp
 ti99_8                          // 1983 TI-99/8
@@ -35255,7 +35254,7 @@ drtoppelu                       // B19 (c) 1987 Taito Corporation (US)
 extrmatn                        // B06 (c) 1987 Taito Corporation Japan (World)
 extrmatnj                       // B06 (c) 1987 Taito Corporation (Japan)
 extrmatnu                       // B06 (c) 1987 World Games (US)
-extrmatnur						// B06 (c) 1987 Taito America Corporation + Romstar license (US)
+extrmatnur                      // B06 (c) 1987 Taito America Corporation + Romstar license (US)
 insectx                         // B97 (c) 1989 Taito Corporation Japan (World)
 insectxj                        // B97 (c) 1989 Taito Corporation (Japan)
 jpopnics                        // (c)1992 NICs, based on Plump Pop code

@@ -465,6 +465,7 @@ MACHINE_CONFIG_FRAGMENT( horizon )
 
 	MCFG_RAM_ADD(RAMREGION)
 	MCFG_RAM_DEFAULT_SIZE("32k")
+	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 
 machine_config_constructor horizon_ramdisk_device::device_mconfig_additions() const
