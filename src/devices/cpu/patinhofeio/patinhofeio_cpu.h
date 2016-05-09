@@ -7,7 +7,6 @@
 
 #define MCFG_PATINHO_RC_READ_CB(_devcb) \
 	devcb = &patinho_feio_cpu_device::set_rc_read_callback(*device, DEVCB_##_devcb);
-
 #define MCFG_PATINHO_IODEV_READ_CB(devnumber, _devcb) \
 	devcb = &patinho_feio_cpu_device::set_iodev_read_callback(*device, devnumber, DEVCB_##_devcb);
 #define MCFG_PATINHO_IODEV_WRITE_CB(devnumber, _devcb) \
@@ -45,6 +44,9 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	address_space_config m_program_config;
+
+        offs_t m_addr;
+        unsigned char m_opcode;
 
 	/* processor registers */
 	unsigned char m_acc; /* accumulator (8 bits) */
@@ -101,7 +103,7 @@ protected:
 
 private:
 	void execute_instruction();
-	unsigned int compute_effective_address(unsigned int addr);
+	void compute_effective_address(unsigned int addr);
 	UINT16 read_panel_keys_register();
 	devcb_read16 m_rc_read_cb;
         devcb_read8 m_iodev_read_cb[16];

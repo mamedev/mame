@@ -6,9 +6,10 @@
 
 #include "emu.h"
 #include "debugger.h"
-#include "patinho_feio.h"
+#include "patinhofeio_cpu.h"
+#include "includes/patinhofeio.h"
 
-#define PC       m_pc //The program counter is called "contador de instrucoes" in portuguese
+#define PC       m_pc //The program counter is called "contador de instrucoes" (IC) in portuguese
 #define ACC      m_acc
 #define EXT      m_ext
 #define RC       read_panel_keys_register()
@@ -31,15 +32,13 @@
 #define ADDRESS_MASK_4K    0xFFF
 #define INCREMENT_PC_4K    (PC = (PC+1) & ADDRESS_MASK_4K)
 
-unsigned int patinho_feio_cpu_device::compute_effective_address(unsigned int addr){
-	unsigned int retval = addr;
+void patinho_feio_cpu_device::compute_effective_address(unsigned int addr){
+	m_addr = addr;
 	if (m_indirect_addressing){
-		retval = READ_WORD_PATINHO(addr);
-		if (retval & 0x1000)
-			return compute_effective_address(retval & 0xFFF);
+		m_addr = READ_WORD_PATINHO(m_addr);
+		if (m_addr & 0x1000)
+			compute_effective_address(m_addr & 0xFFF);
 	}
-
-	return retval;
 }
 
 const device_type PATINHO_FEIO  = &device_creator<patinho_feio_cpu_device>;
@@ -100,6 +99,8 @@ void patinho_feio_cpu_device::device_start()
 	save_item(NAME(m_rc));
 	save_item(NAME(m_idx));
 	save_item(NAME(m_flags));
+	save_item(NAME(m_addr));
+	save_item(NAME(m_opcode));
 
 	// Register state for debugger
 	state_add( PATINHO_FEIO_CI,         "CI",       m_pc         ).mask(0xFFF);
@@ -139,6 +140,9 @@ void patinho_feio_cpu_device::device_reset()
 	m_run = true;
 	m_scheduled_IND_bit_reset = false;
 	m_indirect_addressing = false;
+	m_addr = 0;
+	m_opcode = 0;
+	((patinho_feio_state*) owner())->update_panel(ACC, m_opcode, READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC);
 }
 
 /* execute instructions on this CPU until icount expires */
@@ -146,14 +150,18 @@ void patinho_feio_cpu_device::execute_run()
 {
 	do
 	{
+		read_panel_keys_register();
+		((patinho_feio_state*) owner())->update_panel(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC);
+
 		if ((! m_run)){
 			m_icount = 0;   /* if processor is stopped, just burn cycles */
 		} else {
 			m_ext = READ_ACC_EXTENSION_REG();
 			m_idx = READ_INDEX_REG();
-			read_panel_keys_register();
 
+			debugger_instruction_hook(this, PC);
 			execute_instruction();
+
 			m_icount --;
 		}
 	}
@@ -163,12 +171,10 @@ void patinho_feio_cpu_device::execute_run()
 /* execute one instruction */
 void patinho_feio_cpu_device::execute_instruction()
 {
-	debugger_instruction_hook(this, PC);
-	offs_t addr;
 	bool skip;
 	unsigned int tmp;
 	unsigned char value, channel, function;
-	unsigned char opcode = READ_BYTE_PATINHO(PC);
+	m_opcode = READ_BYTE_PATINHO(PC);
 	INCREMENT_PC_4K;
 
 	if (m_scheduled_IND_bit_reset)
@@ -177,7 +183,7 @@ void patinho_feio_cpu_device::execute_instruction()
 	if (m_indirect_addressing)
 		m_scheduled_IND_bit_reset = true;
 
-	switch (opcode){
+	switch (m_opcode){
 		case 0xD2:
 			//XOR: Computes the bitwise XOR of an immediate into the accumulator
 			ACC ^= READ_BYTE_PATINHO(PC);
@@ -490,7 +496,7 @@ void patinho_feio_cpu_device::execute_instruction()
 							ACC = (ACC & (1 << 7)) | ACC >> 1;
 							break;
 						default:
-							printf("Illegal instruction: %02X %02X\n", opcode, value);
+							printf("Illegal instruction: %02X %02X\n", m_opcode, value);
 							return;
 					}
 				}
@@ -498,84 +504,85 @@ void patinho_feio_cpu_device::execute_instruction()
 			return;
 	}
 
-	switch (opcode & 0xF0){
+	switch (m_opcode & 0xF0){
 		case 0x00:
 			//PLA = "Pula": Jump to address
-			addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
+			compute_effective_address((m_opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
 			INCREMENT_PC_4K;
-			PC = addr;
+			PC = m_addr;
 			return;
 		case 0x10:
 			//PLAX = "Pula indexado": Jump to indexed address
-			tmp = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+			tmp = (m_opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
 			INCREMENT_PC_4K;
 			m_idx = READ_INDEX_REG();
-			PC = compute_effective_address(m_idx + tmp);
+			compute_effective_address(m_idx + tmp);
+			PC = m_addr;
 			return;
 		case 0x20:
 			//ARM = "Armazena": Store the value of the accumulator into a given memory position
-			addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
+			compute_effective_address((m_opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
 			INCREMENT_PC_4K;
-			WRITE_BYTE_PATINHO(addr, ACC);
+			WRITE_BYTE_PATINHO(m_addr, ACC);
 			return;
 		case 0x30:
 			//ARMX = "Armazena indexado": Store the value of the accumulator into a given indexed memory position
-			tmp = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+			tmp = (m_opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
 			INCREMENT_PC_4K;
 			m_idx = READ_INDEX_REG();
-			addr = compute_effective_address(m_idx + tmp);
-			WRITE_BYTE_PATINHO(addr, ACC);
+			compute_effective_address(m_idx + tmp);
+			WRITE_BYTE_PATINHO(m_addr, ACC);
 			return;
 		case 0x40:
 			//CAR = "Carrega": Load a value from a given memory position into the accumulator
-			addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
+			compute_effective_address((m_opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
 			INCREMENT_PC_4K;
-			ACC = READ_BYTE_PATINHO(addr);
+			ACC = READ_BYTE_PATINHO(m_addr);
 			return;
 		case 0x50:
 			//CARX = "Carga indexada": Load a value from a given indexed memory position into the accumulator
-			tmp = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+			tmp = (m_opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
 			INCREMENT_PC_4K;
 			m_idx = READ_INDEX_REG();
-			addr = compute_effective_address(m_idx + tmp);
-			ACC = READ_BYTE_PATINHO(addr);
+			compute_effective_address(m_idx + tmp);
+			ACC = READ_BYTE_PATINHO(m_addr);
 			return;
 		case 0x60:
 			//SOM = "Soma": Add a value from a given memory position into the accumulator
-			addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
+			compute_effective_address((m_opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
 			INCREMENT_PC_4K;
-			ACC += READ_BYTE_PATINHO(addr);
+			ACC += READ_BYTE_PATINHO(m_addr);
 			//TODO: update V and T flags
 			return;
 		case 0x70:
 			//SOMX = "Soma indexada": Add a value from a given indexed memory position into the accumulator
-			tmp = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+			tmp = (m_opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
 			INCREMENT_PC_4K;
 			m_idx = READ_INDEX_REG();
-			addr = compute_effective_address(m_idx + tmp);
-			ACC += READ_BYTE_PATINHO(addr);
+			compute_effective_address(m_idx + tmp);
+			ACC += READ_BYTE_PATINHO(m_addr);
 			//TODO: update V and T flags
 			return;
 		case 0xA0:
 			//PLAN = "Pula se ACC negativo": Jump to a given address if ACC is negative
-			addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
+			compute_effective_address((m_opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
 			INCREMENT_PC_4K;
 			if ((signed char) ACC < 0)
-				PC = addr;
+				PC = m_addr;
 			return;
 		case 0xB0:
 			//PLAZ = "Pula se ACC for zero": Jump to a given address if ACC is zero
-			addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
+			compute_effective_address((m_opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
 			INCREMENT_PC_4K;
 			if (ACC == 0)
-				PC = addr;
+				PC = m_addr;
 			return;
 		case 0xC0:
 			//Executes I/O functions
 			//TODO: Implement-me!
 			value = READ_BYTE_PATINHO(PC);
 			INCREMENT_PC_4K;
-			channel = opcode & 0x0F;
+			channel = m_opcode & 0x0F;
 			function = value & 0x0F;
 			switch(value & 0xF0){
 				case 0x10:
@@ -712,11 +719,11 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0xE0:
 			//SUS = "Subtrai um ou Salta": Subtract one from the data in the given address
 			//                             or, if the data is zero, then simply skip a couple bytes.
-			addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
+			compute_effective_address((m_opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
 			INCREMENT_PC_4K;
-			value = READ_BYTE_PATINHO(addr);
+			value = READ_BYTE_PATINHO(m_addr);
 			if (value > 0){
-				WRITE_BYTE_PATINHO(addr, value-1);
+				WRITE_BYTE_PATINHO(m_addr, value-1);
 			} else {
 				INCREMENT_PC_4K;
 				INCREMENT_PC_4K;
@@ -726,14 +733,14 @@ void patinho_feio_cpu_device::execute_instruction()
 			//PUG = "Pula e guarda": Jump and store.
 			//      It stores the return address to addr and addr+1
 			//      And then jumps to addr+2
-			addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
+			compute_effective_address((m_opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
 			INCREMENT_PC_4K;
-			WRITE_BYTE_PATINHO(addr, (PC >> 8) & 0x0F);
-			WRITE_BYTE_PATINHO(addr+1, PC & 0xFF);
-			PC = addr+2;
+			WRITE_BYTE_PATINHO(m_addr, (PC >> 8) & 0x0F);
+			WRITE_BYTE_PATINHO(m_addr+1, PC & 0xFF);
+			PC = m_addr+2;
 			return;
 	}
-	printf("unimplemented opcode: 0x%02X\n", opcode);
+	printf("unimplemented opcode: 0x%02X\n", m_opcode);
 }
 
 offs_t patinho_feio_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)

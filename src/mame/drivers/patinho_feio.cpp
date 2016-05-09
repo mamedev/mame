@@ -8,57 +8,106 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "softlist.h"
-#include "cpu/patinhofeio/patinho_feio.h"
-#include "machine/teleprinter.h"
-
-class patinho_feio_state : public driver_device
-{
-public:
-	patinho_feio_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-                , m_maincpu(*this, "maincpu")
-		, m_decwriter(*this, "decwriter")
-		, m_tty(*this, "teletype")
-	{ }
-
-	DECLARE_DRIVER_INIT(patinho_feio);
-	DECLARE_READ16_MEMBER(rc_r);
-
-	DECLARE_WRITE8_MEMBER(decwriter_data_w);
-	DECLARE_WRITE8_MEMBER(decwriter_kbd_input);
-	TIMER_CALLBACK_MEMBER(decwriter_callback);
-
-	DECLARE_WRITE8_MEMBER(teletype_data_w);
-	DECLARE_WRITE8_MEMBER(teletype_kbd_input);
-	TIMER_CALLBACK_MEMBER(teletype_callback);
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( patinho_tape );
-	void load_tape(const char* name);
-	void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
-	virtual void machine_start() override;
-
-	required_device<patinho_feio_cpu_device> m_maincpu;
-	required_device<teleprinter_device> m_decwriter;
-	required_device<teleprinter_device> m_tty;
-private:
-        UINT8* paper_tape_data;
-        UINT32 paper_tape_length;
-        UINT32 paper_tape_address;
-
-	emu_timer *m_decwriter_timer;
-	emu_timer *m_teletype_timer;
-};
+#include "cpu/patinhofeio/patinhofeio_cpu.h"
+#include "includes/patinhofeio.h"
+#include "patinho.lh"
 
 /*
     driver init function
 */
 DRIVER_INIT_MEMBER(patinho_feio_state, patinho_feio)
 {
+	m_out = &output();
+	m_prev_ACC = 0;
+	m_prev_opcode = 0;
+	m_prev_mem_data = 0;
+	m_prev_mem_addr = 0;
+	m_prev_PC = 0;
+	m_prev_FLAGS = 0;
+	m_prev_RC = 0;
 }
 
 READ16_MEMBER(patinho_feio_state::rc_r)
 {
 	return ioport("RC_HIGH")->read() << 8 | ioport("RC_LOW")->read();
+}
+
+void patinho_feio_state::update_panel(UINT8 ACC, UINT8 opcode, UINT8 mem_data, UINT16 mem_addr, UINT16 PC, UINT8 FLAGS, UINT16 RC){
+	if ((m_prev_ACC ^ ACC) & (1 << 0)) m_out->set_value("acc0", (ACC >> 0) & 1);
+	if ((m_prev_ACC ^ ACC) & (1 << 1)) m_out->set_value("acc1", (ACC >> 1) & 1);
+	if ((m_prev_ACC ^ ACC) & (1 << 2)) m_out->set_value("acc2", (ACC >> 2) & 1);
+	if ((m_prev_ACC ^ ACC) & (1 << 3)) m_out->set_value("acc3", (ACC >> 3) & 1);
+	if ((m_prev_ACC ^ ACC) & (1 << 4)) m_out->set_value("acc4", (ACC >> 4) & 1);
+	if ((m_prev_ACC ^ ACC) & (1 << 5)) m_out->set_value("acc5", (ACC >> 5) & 1);
+	if ((m_prev_ACC ^ ACC) & (1 << 6)) m_out->set_value("acc6", (ACC >> 6) & 1);
+	if ((m_prev_ACC ^ ACC) & (1 << 7)) m_out->set_value("acc7", (ACC >> 7) & 1);
+        m_prev_ACC = ACC;
+
+	if ((m_prev_opcode ^ opcode) & (1 << 0)) m_out->set_value("opcode0", (opcode >> 0) & 1);
+	if ((m_prev_opcode ^ opcode) & (1 << 1)) m_out->set_value("opcode1", (opcode >> 1) & 1);
+	if ((m_prev_opcode ^ opcode) & (1 << 2)) m_out->set_value("opcode2", (opcode >> 2) & 1);
+	if ((m_prev_opcode ^ opcode) & (1 << 3)) m_out->set_value("opcode3", (opcode >> 3) & 1);
+	if ((m_prev_opcode ^ opcode) & (1 << 4)) m_out->set_value("opcode4", (opcode >> 4) & 1);
+	if ((m_prev_opcode ^ opcode) & (1 << 5)) m_out->set_value("opcode5", (opcode >> 5) & 1);
+	if ((m_prev_opcode ^ opcode) & (1 << 6)) m_out->set_value("opcode6", (opcode >> 6) & 1);
+	if ((m_prev_opcode ^ opcode) & (1 << 7)) m_out->set_value("opcode7", (opcode >> 7) & 1);
+	m_prev_opcode = opcode;
+
+	if ((m_prev_mem_data ^ mem_data) & (1 << 0)) m_out->set_value("mem_data0", (mem_data >> 0) & 1);
+	if ((m_prev_mem_data ^ mem_data) & (1 << 1)) m_out->set_value("mem_data1", (mem_data >> 1) & 1);
+	if ((m_prev_mem_data ^ mem_data) & (1 << 2)) m_out->set_value("mem_data2", (mem_data >> 2) & 1);
+	if ((m_prev_mem_data ^ mem_data) & (1 << 3)) m_out->set_value("mem_data3", (mem_data >> 3) & 1);
+	if ((m_prev_mem_data ^ mem_data) & (1 << 4)) m_out->set_value("mem_data4", (mem_data >> 4) & 1);
+	if ((m_prev_mem_data ^ mem_data) & (1 << 5)) m_out->set_value("mem_data5", (mem_data >> 5) & 1);
+	if ((m_prev_mem_data ^ mem_data) & (1 << 6)) m_out->set_value("mem_data6", (mem_data >> 6) & 1);
+	if ((m_prev_mem_data ^ mem_data) & (1 << 7)) m_out->set_value("mem_data7", (mem_data >> 7) & 1);
+	m_prev_mem_data = mem_data;
+
+	if ((m_prev_mem_addr ^ mem_addr) & (1 << 0)) m_out->set_value("mem_addr0", (mem_addr >> 0) & 1);
+	if ((m_prev_mem_addr ^ mem_addr) & (1 << 1)) m_out->set_value("mem_addr1", (mem_addr >> 1) & 1);
+	if ((m_prev_mem_addr ^ mem_addr) & (1 << 2)) m_out->set_value("mem_addr2", (mem_addr >> 2) & 1);
+	if ((m_prev_mem_addr ^ mem_addr) & (1 << 3)) m_out->set_value("mem_addr3", (mem_addr >> 3) & 1);
+	if ((m_prev_mem_addr ^ mem_addr) & (1 << 4)) m_out->set_value("mem_addr4", (mem_addr >> 4) & 1);
+	if ((m_prev_mem_addr ^ mem_addr) & (1 << 5)) m_out->set_value("mem_addr5", (mem_addr >> 5) & 1);
+	if ((m_prev_mem_addr ^ mem_addr) & (1 << 6)) m_out->set_value("mem_addr6", (mem_addr >> 6) & 1);
+	if ((m_prev_mem_addr ^ mem_addr) & (1 << 7)) m_out->set_value("mem_addr7", (mem_addr >> 7) & 1);
+	if ((m_prev_mem_addr ^ mem_addr) & (1 << 8)) m_out->set_value("mem_addr8", (mem_addr >> 8) & 1);
+	if ((m_prev_mem_addr ^ mem_addr) & (1 << 9)) m_out->set_value("mem_addr9", (mem_addr >> 9) & 1);
+	if ((m_prev_mem_addr ^ mem_addr) & (1 << 10)) m_out->set_value("mem_addr10", (mem_addr >> 10) & 1);
+	if ((m_prev_mem_addr ^ mem_addr) & (1 << 11)) m_out->set_value("mem_addr11", (mem_addr >> 11) & 1);
+	m_prev_mem_addr = mem_addr;
+
+	if ((m_prev_PC ^ PC) & (1 << 0)) m_out->set_value("pc0", (PC >> 0) & 1);
+	if ((m_prev_PC ^ PC) & (1 << 1)) m_out->set_value("pc1", (PC >> 1) & 1);
+	if ((m_prev_PC ^ PC) & (1 << 2)) m_out->set_value("pc2", (PC >> 2) & 1);
+	if ((m_prev_PC ^ PC) & (1 << 3)) m_out->set_value("pc3", (PC >> 3) & 1);
+	if ((m_prev_PC ^ PC) & (1 << 4)) m_out->set_value("pc4", (PC >> 4) & 1);
+	if ((m_prev_PC ^ PC) & (1 << 5)) m_out->set_value("pc5", (PC >> 5) & 1);
+	if ((m_prev_PC ^ PC) & (1 << 6)) m_out->set_value("pc6", (PC >> 6) & 1);
+	if ((m_prev_PC ^ PC) & (1 << 7)) m_out->set_value("pc7", (PC >> 7) & 1);
+	if ((m_prev_PC ^ PC) & (1 << 8)) m_out->set_value("pc8", (PC >> 8) & 1);
+	if ((m_prev_PC ^ PC) & (1 << 9)) m_out->set_value("pc9", (PC >> 9) & 1);
+	if ((m_prev_PC ^ PC) & (1 << 10)) m_out->set_value("pc10", (PC >> 10) & 1);
+	if ((m_prev_PC ^ PC) & (1 << 11)) m_out->set_value("pc11", (PC >> 11) & 1);
+	m_prev_PC = PC;
+
+	if ((m_prev_FLAGS ^ FLAGS) & (1 << 0)) m_out->set_value("flags0", (FLAGS >> 0) & 1);
+	if ((m_prev_FLAGS ^ FLAGS) & (1 << 1)) m_out->set_value("flags1", (FLAGS >> 1) & 1);
+	m_prev_FLAGS = FLAGS;
+
+	if ((m_prev_RC ^ RC) & (1 << 0)) m_out->set_value("rc0", (RC >> 0) & 1);
+	if ((m_prev_RC ^ RC) & (1 << 1)) m_out->set_value("rc1", (RC >> 1) & 1);
+	if ((m_prev_RC ^ RC) & (1 << 2)) m_out->set_value("rc2", (RC >> 2) & 1);
+	if ((m_prev_RC ^ RC) & (1 << 3)) m_out->set_value("rc3", (RC >> 3) & 1);
+	if ((m_prev_RC ^ RC) & (1 << 4)) m_out->set_value("rc4", (RC >> 4) & 1);
+	if ((m_prev_RC ^ RC) & (1 << 5)) m_out->set_value("rc5", (RC >> 5) & 1);
+	if ((m_prev_RC ^ RC) & (1 << 6)) m_out->set_value("rc6", (RC >> 6) & 1);
+	if ((m_prev_RC ^ RC) & (1 << 7)) m_out->set_value("rc7", (RC >> 7) & 1);
+	if ((m_prev_RC ^ RC) & (1 << 8)) m_out->set_value("rc8", (RC >> 8) & 1);
+	if ((m_prev_RC ^ RC) & (1 << 9)) m_out->set_value("rc9", (RC >> 9) & 1);
+	if ((m_prev_RC ^ RC) & (1 << 10)) m_out->set_value("rc10", (RC >> 10) & 1);
+	if ((m_prev_RC ^ RC) & (1 << 11)) m_out->set_value("rc11", (RC >> 11) & 1);
+	m_prev_RC = RC;
 }
 
 WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
@@ -246,6 +295,9 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "patinho_tape")
 	MCFG_GENERIC_EXTENSIONS("bin")
 	MCFG_GENERIC_LOAD(patinho_feio_state, patinho_tape)
+
+
+	MCFG_DEFAULT_LAYOUT(layout_patinho)
 
 	// software lists
 //	MCFG_SOFTWARE_LIST_ADD("tape_list", "patinho")
