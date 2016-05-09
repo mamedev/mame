@@ -131,6 +131,11 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::flag_w)
 		}
 }
 
+UINT8 hp_hybrid_cpu_device::pa_r(void) const
+{
+        return CURRENT_PA;
+}
+
 hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname , UINT8 addrwidth)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 			m_pa_changed_func(*this),
