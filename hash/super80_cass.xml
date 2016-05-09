@@ -194,6 +194,119 @@
 			</dataarea>
 		</part>
 	</software>
+	<software name="thisisbu">
+		<description>This is a Budget</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="022L1" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="5295248">
+				<rom name="thisisbu.wav" size="5295248" crc="d23cffbe" sha1="abc2df8063639c8e849eaa05588106fe3687437f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="lwriter">
+		<description>Letterwriter</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Glyn Shepherd"/>
+		<info name="serial" value="023L1" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="6154936">
+				<rom name="lwriter.wav" size="6154936" crc="e25e04ef" sha1="029bdcc98f295e0c2a71e0db664b385ff1161eca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="pi">
+		<description>PI network calculator</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="025L3" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="1374354">
+				<rom name="pi.wav" size="1374354" crc="960a8223" sha1="06ee62f261f48b48a772f44040cf0256053d22e0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="aim">
+		<description>Aim</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="041L1" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="4435552">
+				<rom name="aim.wav" size="4435552" crc="3d6e37b8" sha1="22e9aaf03220f1aa7926d2f488c6859847e92402" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="cavepit">
+		<description>Caves and Pitfalls</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="045L2" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="5294856">
+				<rom name="cavepit.wav" size="5294856" crc="3e595a1f" sha1="d437b3b2db7ddf826af3b779002c266d352241a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="cvoicei">
+		<description>Compuvoice Demonstration</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Jim Traeger"/>
+		<info name="serial" value="049L2" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="5295374">
+				<rom name="cvoicei.wav" size="5295374" crc="eace9e6e" sha1="a5b6f7e0c09d7b33102d21915d0d626746f1f7e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="cvoicec">
+		<description>Compuvoice conversion to ascii</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Jim Traeger"/>
+		<info name="serial" value="050L2" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="6156050">
+				<rom name="cvoicec.wav" size="6156050" crc="448a0fa7" sha1="8401acee8324bb8259869fc0c7b8545057d3905c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="loancalc">
+		<description>Loan and Interest Calculator</description>
+		<year>1982</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="K. Gorie"/>
+		<info name="serial" value="054L1" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="9593860">
+				<rom name="loancalc.wav" size="9593860" crc="97752ff4" sha1="6e998a0515b89d6fea0e3f745157b56f0dca6ee1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="invanal">
+		<description>Investment Analysis</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Brian Morris"/>
+		<info name="serial" value="055L1" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="4436386">
+				<rom name="invanal.wav" size="4436386" crc="2c886d64" sha1="71526fa129b4e101b893a5cd339a75a078c45712" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 	<software name="vonshrin">
 		<description>Von Shrink</description>
 		<year>198?</year>
@@ -538,18 +651,6 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="thisisbu">
-		<description>This is a Budget</description>
-		<year>198?</year>
-		<publisher>unknown</publisher>
-		<info name="serial" value="022L1" />
-		<info name="usage" value="LOAD while in BASIC, then RUN" />
-		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="5295248">
-				<rom name="thisisbu.wav" size="5295248" crc="d23cffbe" sha1="abc2df8063639c8e849eaa05588106fe3687437f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 	<software name="thisisbu4" cloneof="thisisbu">
 		<description>This is a Budget (L4)</description>
 		<year>198?</year>
@@ -559,19 +660,6 @@
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="2845236">
 				<rom name="thisisbu4.wav" size="2845236" crc="ee8d774d" sha1="a37f70fc2e196ae1c5058f369e5f7cc2f41d3e13" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="lwriter">
-		<description>Letterwriter</description>
-		<year>198?</year>
-		<publisher>unknown</publisher>
-		<info name="developer" value="Glyn Shepherd"/>
-		<info name="serial" value="023L1" />
-		<info name="usage" value="LOAD while in BASIC, then RUN" />
-		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="6154936">
-				<rom name="lwriter.wav" size="6154936" crc="e25e04ef" sha1="029bdcc98f295e0c2a71e0db664b385ff1161eca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -611,18 +699,6 @@
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="3282374">
 				<rom name="sinvj.wav" size="3282374" crc="7727880a" sha1="243c68121ac6c876e3b17e8185eb2a81d14bc759" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="pi">
-		<description>PI network calculator</description>
-		<year>198?</year>
-		<publisher>unknown</publisher>
-		<info name="serial" value="025L3" />
-		<info name="usage" value="LOAD while in BASIC, then RUN" />
-		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="1374354">
-				<rom name="pi.wav" size="1374354" crc="960a8223" sha1="06ee62f261f48b48a772f44040cf0256053d22e0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -774,18 +850,6 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="aim">
-		<description>Aim</description>
-		<year>198?</year>
-		<publisher>unknown</publisher>
-		<info name="serial" value="041L1" />
-		<info name="usage" value="LOAD while in BASIC, then RUN" />
-		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="4435552">
-				<rom name="aim.wav" size="4435552" crc="3d6e37b8" sha1="22e9aaf03220f1aa7926d2f488c6859847e92402" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 	<software name="russroul">
 		<description>Russian Roulette (L4)</description>
 		<year>198?</year>
@@ -824,15 +888,52 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="cavepit">
-		<description>Caves and Pitfalls</description>
+	<software name="camel">
+		<description>Camel (L4)</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
-		<info name="serial" value="045L2" />
+		<info name="serial" value="046" />
 		<info name="usage" value="LOAD while in BASIC, then RUN" />
 		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="5294856">
-				<rom name="cavepit.wav" size="5294856" crc="3e595a1f" sha1="d437b3b2db7ddf826af3b779002c266d352241a1" offset="0" />
+			<dataarea name="cass" size="8088192">
+				<rom name="camel.wav" size="8088192" crc="c9957820" sha1="dea3666b244b225c7005a83315b5eb5a118b05db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="chase">
+		<description>Chase (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="048L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="6344272">
+				<rom name="chase.wav" size="6344272" crc="222d7483" sha1="da4c41cc87908a8db21a1b4d3b9614b552b51ca2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="crosfire">
+		<description>Crossfire (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="056" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="2409248">
+				<rom name="crosfire.wav" size="2409248" crc="25b53d05" sha1="eed65a92502cc441ea38b4197dea7d3112473499" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="rotate">
+		<description>Rotate (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Colin Howard"/>
+		<info name="serial" value="059" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="4594540">
+				<rom name="rotate.wav" size="4594540" crc="196a7734" sha1="fcb39596ef4de6ccff6ef33ec89fb49f20ffd98e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
