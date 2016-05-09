@@ -411,8 +411,8 @@ const char *sc499_device::cpu_context()
 
 	device_t *cpu = machine().firstcpu;
 	osd_ticks_t t = osd_ticks();
-	int s = t / osd_ticks_per_second();
-	int ms = (t % osd_ticks_per_second()) / 1000;
+	int s = (t / osd_ticks_per_second()) % 3600;
+	int ms = (t / (osd_ticks_per_second() / 1000)) % 1000;
 
 	/* if we have an executing CPU, output data */
 	if (cpu != nullptr)
