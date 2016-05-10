@@ -27285,12 +27285,12 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="ultraman">
-		<description>Ultraman (Jpn)</description>
+		<description>Ultraman - Kuusou Tokusatsu Shiriizu (Jpn)</description>
 		<year>1993</year>
 		<publisher>Ma-Ba</publisher>
 		<info name="serial" value="T-16023"/>
 		<info name="release" value="19930409"/>
-		<info name="alt_title" value="ウルトラマン"/>
+		<info name="alt_title" value="ウルトラマン 空想特撮シリーズ / ウルトラマン ~ Ultraman (Box)" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="ultraman (jpn).bin" size="524288" crc="83b4d5fb" sha1="7af1b66555c636664a73ca2091ef92ac800dc5d8" offset="0x000000"/>

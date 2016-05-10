@@ -16245,8 +16245,8 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="gojira" cloneof="godzilla">
-		<description>Gojira - Kaijuu Dairantou Advance (Jpn)</description>
+	<software name="godzillaj" cloneof="godzilla">
+		<description>Godzilla - Kaijuu Dairantou Advance (Jpn)</description>
 		<year>2003</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="AGB-AG4J-JPN"/>
