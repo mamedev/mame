@@ -76,7 +76,7 @@ Text video RAM is situated at $D000-$D7FF.
 The 68705 MCU handles the two coin inputs and drives the MSM5205 ADPCM chip.
 It also appears to serve as a simple protection device. During initialization,
 the main Z80 writes a special ADPCM code to the MCU and then spins in a loop.
-The MCU reponds by asserting the Z80's /NMI line, and thus the init process
+The MCU responds by asserting the Z80's /NMI line, and thus the init process
 continues. The protection ADPCM code varies between versions of each game.
 
 3) MAIN CPU MEMORY MAP.
@@ -203,7 +203,7 @@ colour 15 corresponds to the transparent colour, except in a few cases.
 
 The foreground and background layers comprise static virtual layers which
 are 8 screens wide and 16 screens deep. The hardware scrolls around the
-layers by reading registers which are updated by sofware every VBlank.
+layers by reading registers which are updated by software every VBlank.
 The text layer is fixed and cannot scroll.
 
 The maps that define the foreground and background layers are stored in
@@ -963,7 +963,7 @@ ROM_START( stfightgb )
 	ROM_LOAD( "C5",  0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "stfightgb_68705.3J",  0x0000,  0x0800, NO_DUMP )
+	ROM_LOAD( "stfightgb_68705.3J",  0x0000,  0x0800, BAD_DUMP  CRC(3b1b2660) SHA1(8d5d853a0861ff9cdea27eb3588586b441cc77b1) ) //hand-crafted, to be dumped
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* character data */
 	ROM_LOAD( "17.2N",  0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
@@ -1104,8 +1104,8 @@ GAME( 1986, empcityj, empcity, stfight, stfight, stfight_state, stfight, ROT0,  
 GAME( 1986, empcityi, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, stfight,  empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, stfighta, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfightgb,empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Germany-Benelux license)", "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfightgb,empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 
 /* Cross Shooter runs on a slightly modified PCB, with a different text tilemap and gfx blobs (see also cshooter.c) */
-GAME( 1987, cshooter,  0,      cshooter,cshooter, stfight_state, cshooter,ROT270,"Seibu Kaihatsu (Taito license)",           "Cross Shooter (not encrypted)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, cshooter,  0,      cshooter, cshooter, stfight_state, cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (not encrypted)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
