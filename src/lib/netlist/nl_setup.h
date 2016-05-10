@@ -102,30 +102,7 @@ namespace netlist
 		private:
 		};
 
-		struct link_t
-		{
-			link_t() { }
-			link_t(void *) { }
-			// Copy constructor
-			link_t(const link_t &from)
-			{
-				e1 = from.e1;
-				e2 = from.e2;
-			}
-
-			link_t(const pstring &ae1, const pstring &ae2)
-			{
-				e1 = ae1;
-				e2 = ae2;
-			}
-			pstring e1;
-			pstring e2;
-
-			bool operator==(const link_t &rhs) const { return (e1 == rhs.e1) && (e2 == rhs.e2); }
-			link_t &operator=(const link_t &rhs) { e1 = rhs.e1; e2 = rhs.e2; return *this; }
-
-			const pstring &name() const { return e1; }
-		};
+		using link_t = std::pair<pstring, pstring>;
 
 		setup_t(netlist_t *netlist);
 		~setup_t();
@@ -221,7 +198,7 @@ namespace netlist
 
 		phashmap_t<pstring, pstring> m_alias;
 		phashmap_t<pstring, param_t *>  m_params;
-		phashmap_t<pstring, pstring> m_params_temp;
+		phashmap_t<pstring, pstring> m_param_values;
 		phashmap_t<pstring, core_terminal_t *> m_terminals;
 
 		pvector_t<link_t> m_links;
@@ -233,7 +210,7 @@ namespace netlist
 		int m_proxy_cnt;
 		int m_frontier_cnt;
 
-		std::stack<pstring> m_stack;
+		std::stack<pstring> m_namespace_stack;
 		source_t::list_t m_sources;
 		pvector_t<pstring> m_lib;
 

@@ -72,7 +72,7 @@ setup_t::~setup_t()
 	m_alias.clear();
 	m_params.clear();
 	m_terminals.clear();
-	m_params_temp.clear();
+	m_param_values.clear();
 
 	netlist().set_setup(nullptr);
 	pfree(m_factory);
@@ -83,23 +83,23 @@ setup_t::~setup_t()
 
 ATTR_COLD pstring setup_t::build_fqn(const pstring &obj_name) const
 {
-	if (m_stack.empty())
+	if (m_namespace_stack.empty())
 		return netlist().name() + "." + obj_name;
 	else
-		return m_stack.top() + "." + obj_name;
+		return m_namespace_stack.top() + "." + obj_name;
 }
 
 void setup_t::namespace_push(const pstring &aname)
 {
-	if (m_stack.empty())
-		m_stack.push(netlist().name() + "." + aname);
+	if (m_namespace_stack.empty())
+		m_namespace_stack.push(netlist().name() + "." + aname);
 	else
-		m_stack.push(m_stack.top() + "." + aname);
+		m_namespace_stack.push(m_namespace_stack.top() + "." + aname);
 }
 
 void setup_t::namespace_pop()
 {
-	m_stack.pop();
+	m_namespace_stack.pop();
 }
 
 
@@ -248,9 +248,9 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 		case terminal_t::PARAM:
 			{
 				param_t &param = dynamic_cast<param_t &>(obj);
-				if (m_params_temp.contains(name))
+				if (m_param_values.contains(name))
 				{
-					const pstring val = m_params_temp[name];
+					const pstring val = m_param_values[name];
 					switch (param.param_type())
 					{
 						case param_t::DOUBLE:
@@ -330,9 +330,9 @@ void setup_t::remove_connections(const pstring pin)
 	for (int i = m_links.size() - 1; i >= 0; i--)
 	{
 		auto &link = m_links[i];
-		if ((link.e1 == pinfn) || (link.e2 == pinfn))
+		if ((link.first == pinfn) || (link.second == pinfn))
 		{
-			log().verbose("removing connection: {1} <==> {2}\n", link.e1, link.e2);
+			log().verbose("removing connection: {1} <==> {2}\n", link.first, link.second);
 			m_links.remove_at(i);
 			found = true;
 		}
@@ -355,14 +355,14 @@ void setup_t::register_frontier(const pstring attach, const double r_IN, const d
 	bool found = false;
 	for (auto & link  : m_links)
 	{
-		if (link.e1 == attfn)
+		if (link.first == attfn)
 		{
-			link.e1 = front_fqn + ".I";
+			link.first = front_fqn + ".I";
 			found = true;
 		}
-		else if (link.e2 == attfn)
+		else if (link.second == attfn)
 		{
-			link.e2 = front_fqn + ".I";
+			link.second = front_fqn + ".I";
 			found = true;
 		}
 	}
@@ -382,16 +382,16 @@ void setup_t::register_param(const pstring &param, const pstring &value)
 {
 	pstring fqn = build_fqn(param);
 
-	int idx = m_params_temp.index_of(fqn);
+	int idx = m_param_values.index_of(fqn);
 	if (idx < 0)
 	{
-		if (!m_params_temp.add(fqn, value))
+		if (!m_param_values.add(fqn, value))
 			log().fatal("Unexpected error adding parameter {1} to parameter list\n", param);
 	}
 	else
 	{
-		log().warning("Overwriting {1} old <{2}> new <{3}>\n", fqn, m_params_temp.value_at(idx), value);
-		m_params_temp[fqn] = value;
+		log().warning("Overwriting {1} old <{2}> new <{3}>\n", fqn, m_param_values.value_at(idx), value);
+		m_param_values[fqn] = value;
 	}
 }
 
@@ -747,8 +747,8 @@ void setup_t::resolve_inputs()
 		unsigned li = 0;
 		while (li < m_links.size())
 		{
-			const pstring t1s = m_links[li].e1;
-			const pstring t2s = m_links[li].e2;
+			const pstring t1s = m_links[li].first;
+			const pstring t2s = m_links[li].second;
 			core_terminal_t *t1 = find_terminal(t1s);
 			core_terminal_t *t2 = find_terminal(t2s);
 
@@ -762,7 +762,7 @@ void setup_t::resolve_inputs()
 	if (tries == 0)
 	{
 		for (std::size_t i = 0; i < m_links.size(); i++ )
-			log().warning("Error connecting {1} to {2}\n", m_links[i].e1, m_links[i].e2);
+			log().warning("Error connecting {1} to {2}\n", m_links[i].first, m_links[i].second);
 
 		log().fatal("Error connecting -- bailing out\n");
 	}
