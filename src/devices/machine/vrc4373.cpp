@@ -75,8 +75,8 @@ void vrc4373_device::device_start()
 
 	// DMA timer
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrc4373_device::dma_transfer), this));
-	m_dma_timer->adjust(attotime::zero, 0, DMA_TIMER_PERIOD);
-	m_dma_timer->enable(false);
+	// Leave the timer disabled.
+	m_dma_timer->adjust(attotime::never, 0, DMA_TIMER_PERIOD);
 }
 
 void vrc4373_device::device_reset()
@@ -84,7 +84,7 @@ void vrc4373_device::device_reset()
 	pci_device::device_reset();
 	memset(m_cpu_regs, 0, sizeof(m_cpu_regs));
 	regenerate_config_mapping();
-	m_dma_timer->enable(false);
+	m_dma_timer->adjust(attotime::never);
 }
 
 void vrc4373_device::map_cpu_space()
@@ -330,7 +330,7 @@ TIMER_CALLBACK_MEMBER (vrc4373_device::dma_transfer)
 			}
 		}
 		// Turn off the timer
-		m_dma_timer->enable(false);
+		m_dma_timer->adjust(attotime::never);
 	}
 }
 
@@ -421,8 +421,6 @@ WRITE32_MEMBER(vrc4373_device::cpu_if_w)
 				m_cpu_regs[NREG_DMACR1 + which * 0xc] |= DMA_BUSY;
 				// Start the transfer
 				m_dma_timer->set_param(which);
-				m_dma_timer->enable(true);
-				//m_dma_timer->adjust(machine().time(), 0, DMA_TIMER_PERIOD);
 				m_dma_timer->adjust(attotime::zero, 0, DMA_TIMER_PERIOD);
 				if (LOG_NILE)
 					logerror("%08X:nile Start DMA Lane %i PCI: %08X MEM: %08X Words: %X\n", m_cpu->space(AS_PROGRAM).device().safe_pc(), which, m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
