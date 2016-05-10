@@ -84,7 +84,8 @@ setup_t::~setup_t()
 ATTR_COLD pstring setup_t::build_fqn(const pstring &obj_name) const
 {
 	if (m_namespace_stack.empty())
-		return netlist().name() + "." + obj_name;
+		//return netlist().name() + "." + obj_name;
+		return obj_name;
 	else
 		return m_namespace_stack.top() + "." + obj_name;
 }
@@ -92,7 +93,8 @@ ATTR_COLD pstring setup_t::build_fqn(const pstring &obj_name) const
 void setup_t::namespace_push(const pstring &aname)
 {
 	if (m_namespace_stack.empty())
-		m_namespace_stack.push(netlist().name() + "." + aname);
+		//m_namespace_stack.push(netlist().name() + "." + aname);
+		m_namespace_stack.push(aname);
 	else
 		m_namespace_stack.push(m_namespace_stack.top() + "." + aname);
 }
