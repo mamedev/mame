@@ -1369,7 +1369,7 @@ void raiden2cop_device::execute_8100(address_space &space, int offset, UINT16 da
 	double angle = raw_angle * M_PI / 128;
 	double amp = (65536 >> 5)*(cop_read_word(space, cop_regs[0] + (0x36)) & 0xff);
 	int res;
-	/* TODO: up direction needs double, why? */
+	// TODO: up direction needs to be doubled, happens on bootleg too, why is that?
 	if (raw_angle == 0xc0)
 		amp *= 2;
 	res = int(amp*sin(angle)) << cop_scale;
@@ -1386,7 +1386,7 @@ void raiden2cop_device::execute_8900(address_space &space, int offset, UINT16 da
 	double angle = raw_angle * M_PI / 128;
 	double amp = (65536 >> 5)*(cop_read_word(space, cop_regs[0] + (0x36)) & 0xff);
 	int res;
-	/* TODO: up direction needs double, why? */
+	// TODO: left direction needs to be doubled, happens on bootleg too, why is that?
 	if (raw_angle == 0x80)
 		amp *= 2;
 	res = int(amp*cos(angle)) << cop_scale;
