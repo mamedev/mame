@@ -1092,12 +1092,7 @@ void hp_hybrid_cpu_device::handle_dma(void)
 								m_icount -= 9;
 				}
 
-				// This is the one of the biggest question marks: is the DMA automatically disabled on TC?
-				// Here we assume it is. After all it would make no difference because there is no way
-				// to read the DMA enable flag back, so each time the DMA is needed it has to be enabled again.
-				if (tc) {
-								BIT_CLR(m_flags , HPHYBRID_DMAEN_BIT);
-				}
+                                // Mystery solved: DMA is not automatically disabled at TC
 }
 
 UINT16 hp_hybrid_cpu_device::RIO(UINT8 pa , UINT8 ic)
@@ -1559,7 +1554,7 @@ UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
 				break;
 
 		case AEC_CASE_D:
-				bsc_reg = HP_REG_R37_ADDR;
+				bsc_reg = top_half ? HP_REG_R32_ADDR : HP_REG_R37_ADDR;
 				break;
 
 				case AEC_CASE_I:
