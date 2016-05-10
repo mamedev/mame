@@ -114,7 +114,6 @@ namespace netlist
 
 		void register_dev(device_t *dev);
 		void register_dev(const pstring &classname, const pstring &name);
-		void remove_dev(const pstring &name);
 
 		void register_lib_entry(const pstring &name);
 
@@ -139,9 +138,6 @@ namespace netlist
 		bool connect(core_terminal_t &t1, core_terminal_t &t2);
 
 		bool device_exists(const pstring name) const;
-
-		core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
-		core_terminal_t *find_terminal(const pstring &outname_in, object_t::type_t atype, bool required = true);
 
 		param_t *find_param(const pstring &param_in, bool required = true);
 
@@ -182,6 +178,9 @@ namespace netlist
 	protected:
 
 	private:
+
+		core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
+		core_terminal_t *find_terminal(const pstring &outname_in, object_t::type_t atype, bool required = true);
 
 		void connect_terminals(core_terminal_t &in, core_terminal_t &out);
 		void connect_input_output(core_terminal_t &in, core_terminal_t &out);
