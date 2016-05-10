@@ -692,8 +692,11 @@ void hp9845b_state::advance_gv_fsm(bool ds , bool trigger)
 
                 switch (m_gv_fsm_state) {
                 case GV_STAT_WAIT_DS_0:
-                        // Wait for data strobe (r/w on r4 or r6)
-                        if (ds) {
+                        if ((m_gv_cmd & 0xc) == 0xc) {
+                                // Read command (11xx)
+                                m_gv_fsm_state = GV_STAT_WAIT_MEM_0;
+                        } else if (ds) {
+                                // Wait for data strobe (r/w on r4 or r6)
                                 m_gv_fsm_state = GV_STAT_WAIT_TRIG_0;
                         } else {
                                 get_out = true;
@@ -707,13 +710,8 @@ void hp9845b_state::advance_gv_fsm(bool ds , bool trigger)
                                         // Not a cursor command
                                         // Load memory address
                                         m_gv_io_counter = ~m_gv_data_w & GVIDEO_ADDR_MASK;
-                                        if (BIT(m_gv_cmd , 2)) {
-                                                // Read command (11xx)
-                                                m_gv_fsm_state = GV_STAT_WAIT_MEM_0;
-                                        } else {
-                                                // Write commands (10xx)
-                                                m_gv_fsm_state = GV_STAT_WAIT_DS_2;
-                                        }
+                                        // Write commands (10xx)
+                                        m_gv_fsm_state = GV_STAT_WAIT_DS_2;
                                 } else {
                                         // Cursor command (0xxx)
                                         if (BIT(m_gv_cmd , 2)) {
