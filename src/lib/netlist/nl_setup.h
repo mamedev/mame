@@ -9,6 +9,7 @@
 #define NLSETUP_H_
 
 #include "nl_base.h"
+#include "nl_factory.h"
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -28,9 +29,6 @@
 /* to be used to reference new library truthtable devices */
 #define NET_REGISTER_DEV(_type, _name)                                            \
 		setup.register_dev(# _type, # _name);
-
-#define NET_REGISTER_SIGNAL(_type, _name)                                           \
-		NET_REGISTER_DEV(_type ## _ ## sig, _name)
 
 #define NET_CONNECT(_name, _input, _output)                                         \
 		setup.register_link(# _name "." # _input, # _output);
@@ -134,10 +132,13 @@ namespace netlist
 		void register_param(const pstring &param, const double value);
 
 		void register_frontier(const pstring attach, const double r_IN, const double r_OUT);
+
 		void remove_connections(const pstring attach);
 
 		void register_object(device_t &dev, const pstring &name, object_t &obj);
 		bool connect(core_terminal_t &t1, core_terminal_t &t2);
+
+		bool device_exists(const pstring name) const;
 
 		core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
 		core_terminal_t *find_terminal(const pstring &outname_in, object_t::type_t atype, bool required = true);
@@ -202,6 +203,7 @@ namespace netlist
 		phashmap_t<pstring, core_terminal_t *> m_terminals;
 
 		pvector_t<link_t> m_links;
+		pvector_t<std::pair<pstring, base_factory_t *>> m_device_factory;
 
 		factory_list_t *m_factory;
 

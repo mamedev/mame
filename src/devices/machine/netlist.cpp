@@ -172,8 +172,7 @@ void netlist_mame_stream_input_t::device_start()
 
 void netlist_mame_stream_input_t::custom_netlist_additions(netlist::setup_t &setup)
 {
-	NETLIB_NAME(sound_in) *snd_in = setup.netlist().get_first_device<NETLIB_NAME(sound_in)>();
-	if (snd_in == nullptr)
+	if (!setup.device_exists("STREAM_INPUT"))
 		setup.register_dev("NETDEV_SOUND_IN", "STREAM_INPUT");
 
 	pstring sparam = pfmt("STREAM_INPUT.CHAN{1}")(m_channel);

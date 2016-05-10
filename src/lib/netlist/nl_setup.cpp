@@ -132,13 +132,30 @@ void setup_t::register_dev(const pstring &classname, const pstring &name)
 	}
 	else
 	{
+#if 0
 		device_t *dev = factory().new_device_by_name(classname, netlist(), build_fqn(name));
-		//device_t *dev = factory().new_device_by_classname(classname);
 		if (dev == nullptr)
 			log().fatal("Class {1} not found!\n", classname);
 		register_dev(dev);
+#else
+		auto f = factory().factory_by_name(classname);
+		if (f == nullptr)
+			log().fatal("Class {1} not found!\n", classname);
+		m_device_factory.push_back(std::pair<pstring, base_factory_t *>(build_fqn(name), f));
+#endif
 	}
 }
+
+bool setup_t::device_exists(const pstring name) const
+{
+	for (auto e : m_device_factory)
+	{
+		if (e.first == name)
+			return true;
+	}
+	return false;
+}
+
 
 void setup_t::register_model(const pstring &model_in)
 {
@@ -850,6 +867,14 @@ void setup_t::start_devices()
 			register_link(name + ".I", ll);
 			log().debug("    dynamic link {1}: <{2}>\n",ll, name);
 		}
+	}
+
+	/* create devices */
+
+	for (auto & e : m_device_factory)
+	{
+		device_t *dev = e.second->Create(netlist(), e.first);
+		register_dev(dev);
 	}
 
 	netlist().start();
