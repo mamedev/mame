@@ -560,7 +560,7 @@
 		<info name="usage" value="LOAD while in BASIC, then RUN" />
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="5029226">
-				<rom name="aonearm.wav" size="5029226" crc="4dcc967" sha1="1cd11b07cf9b448f6e35d09cd59b329639b78aa6" offset="0" />
+				<rom name="aonearm.wav" size="5029226" crc="4dcc9670" sha1="1cd11b07cf9b448f6e35d09cd59b329639b78aa6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -658,8 +658,8 @@
 		<info name="serial" value="022L4" />
 		<info name="usage" value="LOAD while in BASIC, then RUN" />
 		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="2845236">
-				<rom name="thisisbu4.wav" size="2845236" crc="ee8d774d" sha1="a37f70fc2e196ae1c5058f369e5f7cc2f41d3e13" offset="0" />
+			<dataarea name="cass" size="1969778">
+				<rom name="thisisbu4.wav" size="1969778" crc="ee8d774d" sha1="a37f70fc2e196ae1c5058f369e5f7cc2f41d3e13" offset="0" />
 			</dataarea>
 		</part>
 	</software>
