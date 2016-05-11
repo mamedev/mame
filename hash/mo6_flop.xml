@@ -1,0 +1,623 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- Thanks to DCMOTO (http://dcmoto.free.fr) for info! -->
+<softwarelist name="mo6_flop" description="Thomson MO6 floppy disks">
+
+<!-- Applications -->
+
+	<software name="music3v">
+		<description>Music 3 Voix</description>
+		<year>1987</year>
+		<publisher>Loriciels</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="163840">
+				<rom name="music 3v (loriciels) (p.o. richez) (1987).fd" size="163840" crc="07c91d68" sha1="17dd284f8200592339203973782a11692da8cfc6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Compilations (Games) -->
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="action1">
+		<description>Action Volume 1</description>
+		<year>1989</year>
+		<publisher>Microids</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="x-ray (microids) (m beziat) (1986) (to8).fd" size="327680" crc="c1b69b17" sha1="cbb1a5e92ece49710e9ef7e9d530f3b3ea2f24ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="action1a" cloneof="action1">
+		<description>Action Volume 1 (SAP Format)</description>
+		<year>1989</year>
+		<publisher>Microids</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="335426">
+				<rom name="unknown microids pack (198x)(microids)(fr)[boot with microsoft basic 1.0].sap" size="335426" crc="1434de44" sha1="60147e3781eefd377ea1b9bbee65ab9454f5ad46" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="bactmgt">
+		<description>Bactron &amp; MGT</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="bactron &amp; mgt (198x)(-)[boot with microsoft basic 1.0].fd" size="327680" crc="5e1d8af7" sha1="0293c908881c5e39275facd79057adae7bc2d5e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="bactmgta" cloneof="bactmgt">
+		<description>Bactron &amp; MGT (Alt)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="bactron-mgt_mo6to8.fd" size="327680" crc="00c99dba" sha1="e49eb12f5b605627cb86feb86ec4ab4683705a75" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="bactmgtb" cloneof="bactmgt">
+		<description>Bactron &amp; MGT (SAP Format)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="335426">
+				<rom name="bactron &amp; mgt (198x)(-)[boot with microsoft basic 1.0].sap" size="335426" crc="16284fa1" sha1="fba2bf0ca6a87da01cc8abfced9992e440709a3d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="lori1988">
+		<description>MGT - Sapiens - Mach 3</description>
+		<year>1988</year>
+		<publisher>Loriciels</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="mgt-sapiens-mach3_1_moto.fd" size="327680" crc="c439b1f1" sha1="345833df1b0bc68781e03b87654f7849eacee111" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="mgt-sapiens-mach3_2_moto.fd" size="327680" crc="3036977f" sha1="883a7e9e435b701833e49eb81f3c80fc8c8d6860" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="lori1988a" cloneof="lori1988" supported="no">
+		<description>MGT - Sapiens - Mach 3 (640K Disk)</description>
+		<year>1988</year>
+		<publisher>Loriciels</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="655360">
+				<rom name="mgt-sapiens-mach3_moto.fd" size="655360" crc="bee93a61" sha1="1fbe231cb8e5d9c590b6dcb1d564c620b6d76871" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="simpack">
+		<description>Simulation Pack</description>
+		<year>1988</year>
+		<publisher>Microids</publisher>
+
+		<part name="flop1" interface="thom_flop">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="327680">
+				<rom name="simulation pack (microids) (c. bertrand, elliot grassiano, b. masson, a. bonsignore) (1988) (moto)[disk 1].fd" size="327680" crc="7bf09235" sha1="a9cd6df78ed898dd7fb5b91a0a1dd81f350eb394" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="thom_flop">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="327680">
+				<rom name="simulation pack (microids) (c. bertrand, elliot grassiano, b. masson, a. bonsignore) (1988) (moto)[disk 2].fd" size="327680" crc="8362fc7e" sha1="22464674d827a63f6bba96af76e9a0f84f7c79a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="simpacka" cloneof="simpack">
+		<description>Simulation Pack (SAP Format)</description>
+		<year>1988</year>
+		<publisher>Microids</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="335426">
+				<rom name="simulation pack (1988)(microids)(fr)[boot with microsoft basic 1.0].sap" size="335426" crc="02347251" sha1="ba5c18985053e1ec8bd634e591aac6ed8d21c62a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="simpackb" cloneof="simpack" supported="no">
+		<description>Simulation Pack (640K Disk)</description>
+		<year>1988</year>
+		<publisher>Microids</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="655360">
+				<rom name="simulation pack (microids) (c. bertrand, elliot grassiano, b. masson, a. bonsignore) (1988) (moto).fd" size="655360" crc="1384e4f9" sha1="928ef175b3ea88282f62b87310321543914b9dcc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Demos -->
+
+	<software name="gameshow">
+		<description>Games Show</description>
+		<year>2014</year>
+		<publisher>6502man</publisher>
+
+		<part name="flop1" interface="thom_flop">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="327680">
+				<rom name="games show (6502man) (2014) (mo6 fd) disk 1.fd" size="327680" crc="3a877e94" sha1="b624da8c77906825fc1218962d8c60b53f430a6c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="thom_flop">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="327680">
+				<rom name="games show (6502man) (2014) (mo6 fd) disk 2.fd" size="327680" crc="6445a8e3" sha1="56d4e4f55b56ee85319d30aa93fa9c0ec137738a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gameshowa" cloneof="gameshow" supported="partial">
+		<description>Games Show (640K)</description>
+		<year>2014</year>
+		<publisher>6502man</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="655360">
+				<rom name="games show (6502man) (2014) (mo6 fd).fd" size="655360" crc="2c49169f" sha1="268ec784f893b57f8a82d4aece4fc8c79afa735f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+    <software name="gameshowb" cloneof="gameshow" supported="partial">
+        <description>Games Show (Oversize)</description>
+        <year>2014</year>
+        <publisher>6502man</publisher>
+
+        <part name="flop1" interface="thom_flop">
+            <dataarea name="flop" size="657408">
+                <rom name="games_show_mo6.fd" size="657408" crc="a48a88e3" sha1="14b5184c5f22e384389df01f52a4939c8d89c73c" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+-->
+
+	<software name="nyancat">
+		<description>Nyan Cat</description>
+		<year>2016</year>
+		<publisher>OliverP</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="335426">
+				<rom name="nyancatmo6.sap" size="335426" crc="02ec1475" sha1="c5a500d3c82f3ea4ad95584bdf3c78c6870f411a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zxart">
+		<description>ZX Art</description>
+		<year>2014</year>
+		<publisher>6502man</publisher>
+
+		<part name="flop1" interface="thom_flop">
+		<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="327680">
+				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk1a).fd" size="327680" crc="41fdc3bc" sha1="ad8ca9a0c64e6e7ff2e30ac9d9915bfcb740a787" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="thom_flop">
+		<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="327680">
+				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk1b).fd" size="327680" crc="4e187f88" sha1="c36145395837964a450f9a53629da9f96ef1710b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="thom_flop">
+		<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="327680">
+				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk2a).fd" size="327680" crc="53d2ac34" sha1="5aadbe674a191d6094a7ab0c2a5e29c2c66c3fb7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="thom_flop">
+		<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="327680">
+				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk2b).fd" size="327680" crc="782e32e7" sha1="f1850a2b5abd7d63c842897fd9e312c7f381bcb1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zxarta" cloneof="zxart" supported="no">
+		<description>ZX Art (640K)</description>
+		<year>2014</year>
+		<publisher>6502man</publisher>
+
+		<part name="flop1" interface="thom_flop">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="655360">
+				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk1).fd" size="655360" crc="a0747287" sha1="fe5e4e0c3e3ba125794ac1ec87cc7b7a5c5a9b2f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="thom_flop">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="655360">
+				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk2).fd" size="655360" crc="43fdb60a" sha1="491878883f3d97885e1865b90fab9d4f6e9dd938" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zxartb" cloneof="zxart" supported="no">
+		<description>ZX Art (1280K)</description>
+		<year>2014</year>
+		<publisher>6502man</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="1310720">
+				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk1 a 2 (for dcmoto)).fd" size="1310720" crc="2aec5c49" sha1="eb7975a01e41df1923d898afe8627d12bcf56e84" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Games -->
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="20kavant">
+		<description>20000 Avant J.C.</description>
+		<year>1987</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="20000 avant j.c. (1987)(chip)(fr)[includes mo6 version].fd" size="327680" crc="8b0a7b35" sha1="1b59565b63febe3802731b76a6688bb303f53b4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="20kavanta" cloneof="20kavant">
+		<description>20000 Avant J.C. (Alt)</description>
+		<year>1987</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="20000 avant j.c. (1987)(chip)(fr)[a][includes mo6 version].fd" size="327680" crc="983459aa" sha1="7126329367f0c8a07e169e90ad5dc7b0129869b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="20kavantb" cloneof="20kavant">
+		<description>20000 Avant J.C. (SAP Format)</description>
+		<year>1987</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="335426">
+				<rom name="20000 avant j.c. (1987)(chip)(fr)[includes mo6 version].sap" size="335426" crc="0b69d103" sha1="b18d0bce72f507b654cb13aa57de7644eb4f1377" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="chicago">
+		<description>Chicago 90</description>
+		<year>1989</year>
+		<publisher>Microids</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="chicago 90 (1989)(microids)(fr)[boot with microsoft basic 1.0].fd" size="327680" crc="d481639c" sha1="a7c1dd562548337d6db4addc7903c7e10ed3b133" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="crepuscu">
+		<description>Le Crepuscule du Naja</description>
+		<year>198?</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="crepuscule du naja, le (198x)(chip)(fr)[includes mo6 version].fd" size="327680" crc="d82ae3ad" sha1="a8bd9c396b18ae9a3e7f824db6987a3a51905903" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="crepuscua" cloneof="crepuscu">
+		<description>Le Crepuscule du Naja (Alt)</description>
+		<year>198?</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="crepuscule du naja, le (198x)(chip)(fr)[a][includes mo6 version].fd" size="327680" crc="093fb473" sha1="7c0239cae5c29254a22c7f332d221d1587af9b00" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="crepuscub" cloneof="crepuscu">
+		<description>Le Crepuscule du Naja (SAP Format)</description>
+		<year>198?</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="335426">
+				<rom name="crepuscule du naja, le (198x)(chip)(fr)[includes mo6 version].sap" size="335426" crc="8deda14b" sha1="37bc5b35484cc02616ed899486543e057d26e29f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="gp500cc">
+		<description>Grand Prix 500cc</description>
+		<year>1986</year>
+		<publisher>Microids</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="grand prix 500cc (1986)(microids)(fr)[boot with microsoft basic 1.0].fd" size="327680" crc="feb6f3be" sha1="1212a71207e8daabdb19efaf839f1130f18a23f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="malefatl">
+		<description>Le Malefice des Atlantes</description>
+		<year>1987</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="malefice des atlantes, le (1987)(chip)(fr)[includes mo6 version].fd" size="327680" crc="11c0862b" sha1="b8826dc1308706314e55dea009b8bdb73eef999c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="malefatla" cloneof="malefatl">
+		<description>Le Malefice des Atlantes (Compilation Top Arcade)</description>
+		<year>1987</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="malefice des atlantes, le (1987)(chip)(fr)[compilation top arcade][includes mo6 version].fd" size="327680" crc="d2dc73ef" sha1="bc8f483c23f54f84de18c86b7ce15bf61215d590" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="menacarc">
+		<description>Menace sur l'Arctique</description>
+		<year>1987</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="menace sur l'arctique (1987)(chip)(fr)[includes mo6 version].fd" size="327680" crc="4e28bf43" sha1="09ffecc722243d5ab5e13bcc80cbd72d760b8b95" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="menacarca" cloneof="menacarc">
+		<description>Menace sur l'Arctique (Alt)</description>
+		<year>1987</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="menace sur l'arctique (chip) (inconnus) (1987) (mo6 to8).fd" size="327680" crc="1510dc96" sha1="d3c3bc925461ecf736dfbb9ee12c2bc0befc3808" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="menacarcb" cloneof="menacarc">
+		<description>Menace sur l'Arctique (SAP Format)</description>
+		<year>1987</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="335426">
+				<rom name="menace sur l'arctique (1987)(chip)(fr)[includes mo6 version].sap" size="335426" crc="8545d7ac" sha1="8268344325f6814d4aa24f4ccd80de570d6e4a47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="quad">
+		<description>Quad</description>
+		<year>1987</year>
+		<publisher>Microids</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="quad (1987)(microids)(fr)[boot with microsoft basic 1.0].fd" size="327680" crc="95c68b3d" sha1="51e34f395804d76c2b00f5c4bb2ed1723cf826bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="quada" cloneof="quad">
+		<description>Quad (Alt)</description>
+		<year>1987</year>
+		<publisher>Microids</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="quad (1987)(microids)(fr)[a][boot with microsoft basic 1.0].fd" size="327680" crc="5d0a6661" sha1="d2bc7e22a42113d8f5efb6bba81043ed814d7910" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="quadb" cloneof="quad">
+		<description>Quad (SAP Format)</description>
+		<year>1987</year>
+		<publisher>Microids</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="335426">
+				<rom name="quad (1987)(microids)(fr)[boot with microsoft basic 1.0].sap" size="335426" crc="9b01aa0f" sha1="9f65ffc415d066ab704e7484ad1707d76b4e4612" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="superski">
+		<description>Super Ski</description>
+		<year>1987</year>
+		<publisher>Microids</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="super ski (microids) (c. bertrand, elliot grassiano) (1987) (moto).fd" size="327680" crc="eb726265" sha1="00bee271563754af8f43a120908c2a4c334a7f13" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- second half blank -->
+	<!-- can also be found in to_flop.xml -->
+	<software name="superskia" cloneof="superski">
+		<description>Super Ski (640K Disk)</description>
+		<year>1987</year>
+		<publisher>Microids</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="655360">
+				<rom name="super ski (microids) (c. bertrand, elliot grassiano) (1987) (moto)[640k].fd" size="655360" crc="34ed1b75" sha1="81e308b9b1783c329e32e25841909c95eab5ada9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="talisman">
+		<description>Le Talisman d'Osiris</description>
+		<year>1986</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="talisman d'osiris, le (1986)(chip)(fr)[includes mo6 version].fd" size="327680" crc="45b840b1" sha1="706ca22e0e0f3e2f215a6fc2d243a14113dbfda8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="talismana" cloneof="talisman">
+		<description>Le Talisman d'Osiris (Non-Bootable)</description>
+		<year>1986</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="talisman d'osiris, le (1986)(chip)(fr)[a nonboot][includes mo6 version].fd" size="327680" crc="78ebf713" sha1="96bbc18737b75593344439cbc2e49ac05e1026df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="traitbzz">
+		<description>Traitement Bzzz</description>
+		<year>1987</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="327680">
+				<rom name="traitement bzzz (1987)(chip)(fr)[includes mo6 version].fd" size="327680" crc="ecc27728" sha1="4a244ecb46497db31ade42f2a5b1d41b3fd01734" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="traitbzza" cloneof="traitbzz">
+		<description>Traitement Bzzz (SAP Format)</description>
+		<year>1987</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="335426">
+				<rom name="traitement bzzz (198x)(chip)(fr)[includes mo6 version].sap" size="335426" crc="87e2bfad" sha1="4926a3acf78b8dcec6018e468ad98af720484147" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in to_flop.xml -->
+	<software name="traitbzzb" cloneof="traitbzz">
+		<description>Traitement Bzzz (Compilation Top Arcade)</description>
+		<year>1987</year>
+		<publisher>Chip</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="traitement bzzz (1987)(chip)(fr)[compilation top arcade][includes mo6 version].fd" size="327680" crc="e0d5c7d4" sha1="d4c338d43cedd96591be3fb58cbf4d68645eab53" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tresrats">
+		<description>Le Tresor des Rats d'Egout</description>
+		<year>1986</year>
+		<publisher>Cedic/Nathan</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="le tresor des rats d'egout (nathan) (inconnus) (1986).fd" size="327680" crc="b81a6f31" sha1="3a098acdd7d6e116cd6a9b77d500b622bf1355ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volsolo">
+		<description>Vol Solo</description>
+		<year>198?</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="163840">
+				<rom name="vol solo (fil) (joel sana) (1985) (mo6 fd).fd" size="163840" crc="02ce2ab9" sha1="c8d275d88f0be780db62a4fcba68d9ab09673eef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

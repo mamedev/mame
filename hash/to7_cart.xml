@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- Info from http://dcmoto.free.fr/ -->
-
+<!-- Thanks to DCMOTO (http://dcmoto.free.fr) for info! -->
 <softwarelist name="to7_cart" description="Thomson TO7 cartridges">
 
+<!-- Applications -->
 
 	<software name="6809lang">
 		<description>6809 Language Module (v2.0)</description>
 		<year>1986</year>
-		<publisher>FIL</publisher>
+		<publisher>France Image Logiciel (FIL)</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="6809 language module v2.0 (1984)(microsoft).bin" size="16384" crc="5111ba68" sha1="763490f6d8a3cea6a842d68be34a6e63051d89fd" offset="0x0000" />
+				<rom name="6809 language module v2.0 (1984)(microsoft).bin" size="16384" crc="5111ba68" sha1="763490f6d8a3cea6a842d68be34a6e63051d89fd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20,11 +20,11 @@
 	<software name="6809langa" cloneof="6809lang">
 		<description>6809 Language Module (v1.1)</description>
 		<year>1984</year>
-		<publisher>To Tek International</publisher>
+		<publisher>TO TEK International</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="assembleur 6809 version 1.1 (totek) (m. chamberlin, w. yates) (1984) (memo7) (1.1).bin" size="16384" crc="4a0daa3e" sha1="7b345c4bea51fefb220de621b35d90ed4bff61a5" offset="0x0000" />
+				<rom name="assembleur 6809 version 1.1 (totek) (m. chamberlin, w. yates) (1984) (memo7) (1.1).bin" size="16384" crc="4a0daa3e" sha1="7b345c4bea51fefb220de621b35d90ed4bff61a5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -32,348 +32,11 @@
 	<software name="6809langb" cloneof="6809lang">
 		<description>6809 Language Module (v1.0)</description>
 		<year>1984</year>
-		<publisher>To Tek International</publisher>
+		<publisher>TO TEK International</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="as 5011.bin" size="16384" crc="52e84c9c" sha1="c6eda7d05f297e052e0de393be9d0f4acc34de31" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="agenda">
-		<description>Agenda</description>
-		<year>1983</year>
-		<publisher>Answare</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="ag.7006.bin" size="16384" crc="7e123bff" sha1="593d843b6fcb2baeaac741497468977250fc0b5c" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="airbus">
-		<description>Airbus</description>
-		<year>1984</year>
-		<publisher>VIFI - Nathan</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="450023.bin" size="16384" crc="54752fa7" sha1="82016f9184d9be49d876bd1c5c9f51af6377598f" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="atomium">
-		<description>Atomium</description>
-		<year>1982</year>
-		<publisher>VIFI - Nathan</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="4096">
-				<rom name="4v.0001.bin" size="4096" crc="acf42bf6" sha1="a71b15041afb098a9fba69efa8c0bea8894ccbdf" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="basic">
-		<description>BASIC (v1.0)</description>
-		<year>1982</year>
-		<publisher>Thomson</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="mb 90.001.bin" size="16384" crc="56d03129" sha1="1a23f87c7f7ec6cb132f0b73a5c6710d3653d1ef" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="blitz">
-		<description>Blitz!</description>
-		<year>1984</year>
-		<publisher>To Tek International</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="blitz (1984)(intelligent software)(fr).bin" size="16384" crc="768eac04" sha1="ea6f03ee868f6b273e928ba85c9328a603a5a622" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="budgfami">
-		<description>Budget Familial</description>
-		<year>1982</year>
-		<publisher>Answare</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="bf.7001.bin" size="16384" crc="193a8b14" sha1="82d3f56cd9c27ee80decf722a9e107761b42851e" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="caractr2">
-		<description>Caractor II</description>
-		<year>1984</year>
-		<publisher>To Tek International</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="ca7024.bin" size="16384" crc="3702a615" sha1="83b2cb47b1317cb1ad72af517107470cd37b71d8" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="caractor">
-		<description>Caractor</description>
-		<year>1983</year>
-		<publisher>To Tek Editions</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="caractor (1983)(to tek)(fr).bin" size="16384" crc="9a6a700e" sha1="1f70f47d850f4ec3c6140b4b6989e50b5d4f483e" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="choplift">
-		<description>Choplifter</description>
-		<year>1985</year>
-		<publisher>FIL</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="ch 7026.bin" size="16384" crc="9fe4cc4c" sha1="d70caf48017639a0d562ca7753dab8d9e83c1cdf" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clrcalc">
-		<description>Colorcalc</description>
-		<year>1985</year>
-		<publisher>FIL</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="co 7052.bin" size="32768" crc="b47d2775" sha1="5f7130fbfc47eba80f351c1198238ac96deb2201" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clrpaint">
-		<description>Colorpaint</description>
-		<year>1985</year>
-		<publisher>FIL</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="cp 7068.bin" size="32768" crc="2495e2f1" sha1="6d9ea8aab49c15b54ad780e7e958a58f67c727f7" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clrpaintde" cloneof="clrpaint">
-		<description>Colorpaint (Ger)</description>
-		<year>1986</year>
-		<publisher>Thomson</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="colorpaint (germany).bin" size="32768" crc="7fd16129" sha1="7fafa7e8c2eaa3afda8b3bd4b6f823056454da32" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="controle">
-		<description>Controle Aerien</description>
-		<year>1984</year>
-		<publisher>VIFI - Nathan</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="controle aerien.bin" size="16384" crc="dc042cf5" sha1="efaba2dede2936398ae4e41b7611961b2a777bb7" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crypto">
-		<description>Crypto</description>
-		<year>1982</year>
-		<publisher>VIFI - Nathan</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="4096">
-				<rom name="4 v 0006.bin" size="4096" crc="20e454bc" sha1="7e7367fbc83b52fea4f831d7c84f0acbc9d170d4" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="echo">
-		<description>Echo</description>
-		<year>1982</year>
-		<publisher>VIFI - Nathan</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="4 v 0002.bin" size="16384" crc="2f2886b9" sha1="d5219941f72611b382cfe20f46343c0f9aefd128" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="enigmati">
-	<!-- Programs Stored on Cassette-->
-		<description>Enigmatika</description>
-		<year>1984</year>
-		<publisher>Answare</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="enigmatika (answare) (inconnus) (1984) (memo7).bin" size="8192" crc="a8227d56" sha1="5f3601fb55dbc2101287ad0b2c04ecd0b6070f22" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="forth79">
-		<description>FORTH-79 (v1.0)</description>
-		<year>1983</year>
-		<publisher>To Tek Editions</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="forth-to7 v1.0 (1983)(to tek)(fr).bin" size="16384" crc="2e58933b" sha1="1fd66b5b40012a8ae9caef0aeb3fce1cde6db5f3" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gemini">
-		<description>Gemini</description>
-		<year>1982</year>
-		<publisher>VIFI - Nathan</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="4096">
-				<rom name="gemini (1982)(vifi-nathan)(fr).bin" size="4096" crc="c20c1d82" sha1="92ee16ef7d14b241e8df390b0e6192810a8eda40" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gerfiche">
-		<description>Gerez vos Fiches</description>
-		<year>1984</year>
-		<publisher>Answare</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="gerez vos fiches (1983)(answare)(fr).bin" size="8192" crc="e9dacb6b" sha1="a83ffd9e28387e57aaf5acf4e7294c045c1e4c7f" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gerfichea" cloneof="gerfiche">
-		<description>Gerez vos Fiches (Alt)</description>
-		<year>1984</year>
-		<publisher>Answare</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="gerez vos fiches (answare) (inconnus) (1984) (memo7).bin" size="16384" crc="f3ad6a2c" sha1="396427d6fcf22a69c5de6a4873e20a5b3b7062f9" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gerteque">
-		<description>Gerez Votre Bibliotheque-Discotheque-Videotheque</description>
-		<year>1983</year>
-		<publisher>Answare</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="gerez votre bibliotheque-discotheque-videotheque (1983)(answare)(fr).bin" size="8192" crc="cb6f0f85" sha1="56ce86e414a7debdadac4a416bad4c70d289be95" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chiflett">
-		<description>Les Chiffres et les Lettres</description>
-		<year>1984</year>
-		<publisher>VIFI - Nathan</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="les chiffres et les lettres (198x)(vifi-nathan)(fr).bin" size="16384" crc="fedbebfb" sha1="a7f8e1e43a01e6a4ed838fa4021cb12dfba458e3" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="logicod">
-		<description>Logicod</description>
-		<year>1982</year>
-		<publisher>VIFI - Nathan</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="logicod (1982)(vifi-nathan)(fr).bin" size="16384" crc="97409d06" sha1="1e2ab0c80bf08618d61d49540df4abc3e402e98f" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="logo">
-		<description>LOGO (v1.0)</description>
-		<year>1984</year>
-		<publisher>VIFI - Nathan + To Tek International</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="logo v1.0 (1984)(to tek)(fr).bin" size="16384" crc="1eea3dba" sha1="8593c2bdc6cd5bb6c16643978585e620ecaf32e6" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="logoa" cloneof="logo">
-		<description>LOGO (v1.0, Alt)</description>
-		<year>1984</year>
-		<publisher>VIFI - Nathan + To Tek International</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="logo (totek) (inconnus) (1984) (memo7).bin" size="16384" crc="4f59cf8b" sha1="167a3aa72a21d71a7fd0a703bc10cb4c2bc79237" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="logode" cloneof="logo">
-		<description>LOGO-TO7 (Ger, v2.8E)</description>
-		<year>1986</year>
-		<publisher>Thomson</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="logo en allemand (thomson micro gmbh) (inconnus) (1986) (memo7).bin" size="16384" crc="1b786d8e" sha1="7272c2b45d538fc61e3b8354ac26c112809b85c3" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lsegedl">
-		<description>LSEG-EDL (v3.51)</description>
-		<year>1985</year>
-		<publisher>ASELEC</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="49152">
-				<rom name="lseg - edl (aselec) (act informatique) (1985) (memo7) (3.51).bin" size="49152" crc="f62164d6" sha1="0a8ffc2d58e7be48f82bc9d9543e58fea42f3582" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lsegedl311" cloneof="lsegedl">
-		<description>LSEG-EDL (v3.11)</description>
-		<year>1985</year>
-		<publisher>ASELEC</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="lseg - edl (aselec) (act informatique) (1985) (memo7) (3.11).bin" size="32768" crc="9a06c83c" sha1="c358edaedc171dd87e4a3d09716ff80f3b7d3a2c" offset="0x0000" />
+				<rom name="as 5011.bin" size="16384" crc="52e84c9c" sha1="c6eda7d05f297e052e0de393be9d0f4acc34de31" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -383,9 +46,537 @@
 		<year>2006</year>
 		<publisher>Puls</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="6809 macroassembler v3.6 (puls) (prehisto) (2006) (memo7).bin" size="16384" crc="a0cee050" sha1="1ddab716f5d7b8cb4d1373d69257e827dcfe02bb" offset="0x0000" />
+				<rom name="6809 macroassembler v3.6.bin" size="16384" crc="a0cee050" sha1="1ddab716f5d7b8cb4d1373d69257e827dcfe02bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="agenda">
+		<description>Agenda</description>
+		<year>1983</year>
+		<publisher>Answare</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ag.7006.bin" size="16384" crc="7e123bff" sha1="593d843b6fcb2baeaac741497468977250fc0b5c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic">
+		<description>BASIC (v1.0)</description>
+		<year>1982</year>
+		<publisher>Thomson</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="mb 90.001.bin" size="16384" crc="56d03129" sha1="1a23f87c7f7ec6cb132f0b73a5c6710d3653d1ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="budgfami">
+		<description>Budget Familial</description>
+		<year>1982</year>
+		<publisher>Answare</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="bf.7001.bin" size="16384" crc="193a8b14" sha1="82d3f56cd9c27ee80decf722a9e107761b42851e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calctric">
+		<description>Calculatrice</description>
+		<year>1983</year>
+		<publisher>Answare</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="calculatrice.bin" size="16384" crc="948afe51" sha1="7547e597f7da259ffa8f5e68955c1f9484baf756" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caractor">
+		<description>Caractor</description>
+		<year>1983</year>
+		<publisher>TO TEK Editions</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="caractor.bin" size="16384" crc="9a6a700e" sha1="1f70f47d850f4ec3c6140b4b6989e50b5d4f483e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caractr2">
+		<description>Caractor II</description>
+		<year>1984</year>
+		<publisher>TO TEK International</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ca7024.bin" size="16384" crc="3702a615" sha1="83b2cb47b1317cb1ad72af517107470cd37b71d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colorclc">
+		<description>Colorcalc</description>
+		<year>1985</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="co 7052.bin" size="32768" crc="b47d2775" sha1="5f7130fbfc47eba80f351c1198238ac96deb2201" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colorpnt">
+		<description>Colorpaint</description>
+		<year>1985</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="cp 7068.bin" size="32768" crc="2495e2f1" sha1="6d9ea8aab49c15b54ad780e7e958a58f67c727f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="colorpnta" cloneof="colorpnt" supported="no">
+		<description>Colorpaint (Bad)</description>
+		<year>1985</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="colorpeint_memo7.rom" size="32768" crc="e1234738" sha1="3f170f1b7bc39e32edc8fa9b4a02d70d4d0a8ee2" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+	<software name="colorpnt_de" cloneof="colorpnt">
+		<description>Colorpaint (Ger)</description>
+		<year>1986</year>
+		<publisher>Thomson</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="colorpnt_de.bin" size="32768" crc="7fd16129" sha1="7fafa7e8c2eaa3afda8b3bd4b6f823056454da32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- originally released in 1983 by TO TEK Editions, original version is undumped -->
+	<software name="compactr">
+		<description>Compactor (title screen hack)</description>
+		<year>1989</year>
+		<publisher>&lt;hack (J.L. Pronost)&gt;</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="compactor_memo7.bin" size="16384" crc="23f9b8de" sha1="0b09ea22b5e08234f41745d5b28aaa76a7757dc5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forthto7">
+		<description>FORTH-TO7 (v1.0)</description>
+		<year>1983</year>
+		<publisher>TO TEK Editions</publisher>
+		<info name="alt_title" value="FORTH-79 S.E.F.I. 1.0"/>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="forth-to7.bin" size="16384" crc="2e58933b" sha1="1fd66b5b40012a8ae9caef0aeb3fce1cde6db5f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gerezfic">
+		<description>Gerez vos Fiches</description>
+		<year>1984</year>
+		<publisher>Answare</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="gerez vos fiches.bin" size="8192" crc="e9dacb6b" sha1="a83ffd9e28387e57aaf5acf4e7294c045c1e4c7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gerezfica" cloneof="gerezfic">
+		<description>Gerez vos Fiches (Alt)</description>
+		<year>1984</year>
+		<publisher>Answare</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="gerez vos fiches (alt).bin" size="16384" crc="f3ad6a2c" sha1="396427d6fcf22a69c5de6a4873e20a5b3b7062f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gerezbib">
+		<description>Gerez votre Bibliotheque-Discotheque-Videotheque</description>
+		<year>1983</year>
+		<publisher>Answare</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="gerez votre bibliotheque-discotheque-videotheque (1983)(answare)(fr).bin" size="8192" crc="cb6f0f85" sha1="56ce86e414a7debdadac4a416bad4c70d289be95" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gestpriv">
+		<description>Gestion Privee</description>
+		<year>1984</year>
+		<publisher>Answare</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="gestion privee.bin" size="16384" crc="a0c129d8" sha1="a6d0d866b5621aabfcda7770776abf951858c88e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logo">
+		<description>LOGO (v1.0)</description>
+		<year>1984</year>
+		<publisher>VIFI-Nathan + TO TEK International</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="logo.bin" size="16384" crc="1eea3dba" sha1="8593c2bdc6cd5bb6c16643978585e620ecaf32e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logoa" cloneof="logo">
+		<description>LOGO (v1.0, Alt)</description>
+		<year>1984</year>
+		<publisher>VIFI-Nathan + TO TEK International</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="logo (alt).bin" size="16384" crc="4f59cf8b" sha1="167a3aa72a21d71a7fd0a703bc10cb4c2bc79237" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logode" cloneof="logo">
+		<description>LOGO-TO7 (Ger, v2.8E)</description>
+		<year>1986</year>
+		<publisher>Thomson</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="logo en allemand.bin" size="16384" crc="1b786d8e" sha1="7272c2b45d538fc61e3b8354ac26c112809b85c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsegedl">
+		<description>LSEG-EDL (v3.51)</description>
+		<year>1985</year>
+		<publisher>ASELEC</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="49152">
+				<rom name="lseg-edl v3.51.bin" size="49152" crc="f62164d6" sha1="0a8ffc2d58e7be48f82bc9d9543e58fea42f3582" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsegedl311" cloneof="lsegedl">
+		<description>LSEG-EDL (v3.11)</description>
+		<year>1985</year>
+		<publisher>ASELEC</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="lseg - edl (3.11).bin" size="32768" crc="9a06c83c" sha1="c358edaedc171dd87e4a3d09716ff80f3b7d3a2c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="melodia">
+		<description>Melodia</description>
+		<year>1982</year>
+		<publisher>VIFI-Nathan</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="4 v 0011.bin" size="8192" crc="fafd12a0" sha1="87dbc3a6b4b2cb0f14c738215d390e61e0380d93" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phonemia">
+		<description>Phonemia</description>
+		<year>1985</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="phonemia.bin" size="16384" crc="ba7e7eab" sha1="de48a97129bb56a03ece801c2140d23e19328514" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pictor">
+		<description>Pictor</description>
+		<year>1983</year>
+		<publisher>VIFI-Nathan</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="4 v 0010.bin" size="8192" crc="83ef3f9d" sha1="3538bdc69f102d899384101b4aecc7d8fb879b44" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polyphon">
+		<description>Polyphonia</description>
+		<year>1984</year>
+		<publisher>TO TEK International</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="polyphonia.bin" size="16384" crc="a38e60e0" sha1="a69569db7ca416159fc7e1921a60b38d40da8c8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="praxitel">
+		<description>Praxitele</description>
+		<year>1985</year>
+		<publisher>TO TEK International</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="praxitele.bin" size="16384" crc="72aff701" sha1="ffe9473123eae18711a6105bc2b5b6fbe06e809c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prolog">
+		<description>Prolog (v1.0)</description>
+		<year>1986</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="prolog.bin" size="16384" crc="c4a1991e" sha1="dcf303a7042340c26c9866063fc5b61e3f796c08" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scriptor">
+		<description>Scriptor</description>
+		<year>1984</year>
+		<publisher>TO TEK International</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="sc7020.bin" size="16384" crc="552c7daf" sha1="7e8de2ecf506ea8c70665c46b895bfd35c9ec725" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="scriptora" cloneof="scriptor">
+		<description>Scriptor (Extra Data)</description>
+		<year>1984</year>
+		<publisher>TO TEK International</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16394">
+				<rom name="scriptor (totek) (inconnus) (1986) (memo7).bin" size="16394" crc="46d4e43a" sha1="90c1e35468f7d629babbd529cd22116e086adb44" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+	<software name="studio">
+		<description>Studio</description>
+		<year>1986</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="su 7070.bin" size="32768" crc="ae40e3f2" sha1="8880e56fd921560d1ae89e182b116e54de7d31d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="synthet">
+		<description>Synthetia</description>
+		<year>1984</year>
+		<publisher>VIFI-Nathan</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="410019.bin" size="16384" crc="9aeea127" sha1="86d644ed82f1675dd99c5e9f4465219f40e6afd1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="videotex">
+		<description>Videotex Interactif</description>
+		<year>1984</year>
+		<publisher>TO TEK International</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="videotex interactif.bin" size="16384" crc="a887814a" sha1="1bac88a14b762b63fea5b309849d9ee0e9b518f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Educational -->
+
+	<software name="chiflett">
+		<description>Les Chiffres et les Lettres</description>
+		<year>1984</year>
+		<publisher>VIFI-Nathan</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="les chiffres et les lettres (198x)(vifi-nathan)(fr).bin" size="16384" crc="fedbebfb" sha1="a7f8e1e43a01e6a4ed838fa4021cb12dfba458e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Games -->
+
+	<software name="airbus">
+		<description>Airbus</description>
+		<year>1984</year>
+		<publisher>VIFI-Nathan</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="450023.bin" size="16384" crc="54752fa7" sha1="82016f9184d9be49d876bd1c5c9f51af6377598f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atomium">
+		<description>Atomium</description>
+		<year>1982</year>
+		<publisher>VIFI-Nathan</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="4v.0001.bin" size="4096" crc="acf42bf6" sha1="a71b15041afb098a9fba69efa8c0bea8894ccbdf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blitz">
+		<description>Blitz!</description>
+		<year>1984</year>
+		<publisher>TO TEK International</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="blitz (1984)(intelligent software)(fr).bin" size="16384" crc="768eac04" sha1="ea6f03ee868f6b273e928ba85c9328a603a5a622" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="choplift">
+		<description>Choplifter</description>
+		<year>1985</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ch 7026.bin" size="16384" crc="9fe4cc4c" sha1="d70caf48017639a0d562ca7753dab8d9e83c1cdf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="controle">
+		<description>Controle Aerien</description>
+		<year>1984</year>
+		<publisher>VIFI-Nathan</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="controle.bin" size="16384" crc="dc042cf5" sha1="efaba2dede2936398ae4e41b7611961b2a777bb7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crypto">
+		<description>Crypto</description>
+		<year>1982</year>
+		<publisher>VIFI-Nathan</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="4 v 0006.bin" size="4096" crc="20e454bc" sha1="7e7367fbc83b52fea4f831d7c84f0acbc9d170d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="echo">
+		<description>Echo</description>
+		<year>1982</year>
+		<publisher>VIFI-Nathan</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="4 v 0002.bin" size="16384" crc="2f2886b9" sha1="d5219941f72611b382cfe20f46343c0f9aefd128" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Programs Stored on Cassette-->
+	<software name="enigmati">
+		<description>Enigmatika</description>
+		<year>1984</year>
+		<publisher>Answare</publisher>
+		<sharedfeat name="requirement" value="to_cass:enigmati"/>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="enigmatika.bin" size="8192" crc="a8227d56" sha1="5f3601fb55dbc2101287ad0b2c04ecd0b6070f22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gemini">
+		<description>Gemini</description>
+		<year>1982</year>
+		<publisher>VIFI-Nathan</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="gemini.bin" size="4096" crc="c20c1d82" sha1="92ee16ef7d14b241e8df390b0e6192810a8eda40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logicod">
+		<description>Logicod</description>
+		<year>1982</year>
+		<publisher>VIFI-Nathan</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="logicod (1982)(vifi-nathan)(fr).bin" size="16384" crc="97409d06" sha1="1e2ab0c80bf08618d61d49540df4abc3e402e98f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -395,21 +586,9 @@
 		<year>1983</year>
 		<publisher>VIFI Nathan</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="41 0013.bin" size="16384" crc="ed6908aa" sha1="22581a7aae679d0160525a39f4322ab6ba8c1fb7" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="melodia">
-		<description>Melodia</description>
-		<year>1982</year>
-		<publisher>VIFI - Nathan</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="4 v 0011.bin" size="8192" crc="fafd12a0" sha1="87dbc3a6b4b2cb0f14c738215d390e61e0380d93" offset="0x0000" />
+				<rom name="41 0013.bin" size="16384" crc="ed6908aa" sha1="22581a7aae679d0160525a39f4322ab6ba8c1fb7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -417,12 +596,12 @@
 	<software name="mine2049">
 		<description>Miner 2049er</description>
 		<year>1985</year>
-		<publisher>FIL</publisher>
+		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="usage" value="Press Accent key to get through the pre-game menus" />
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="mn 0727.bin" size="16384" crc="4c47cd9a" sha1="8b44e082ffa5861071980f959f2b670a11ba26b3" offset="0x0000" />
+				<rom name="mn 0727.bin" size="16384" crc="4c47cd9a" sha1="8b44e082ffa5861071980f959f2b670a11ba26b3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -430,73 +609,23 @@
 	<software name="motus">
 		<description>Motus</description>
 		<year>1982</year>
-		<publisher>VIFI - Nathan</publisher>
+		<publisher>VIFI-Nathan</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="motus.bin" size="16384" crc="1be1fcfa" sha1="885db585778471270c544c26b1facc378885ea24" offset="0x0000" />
+				<rom name="motus.bin" size="16384" crc="1be1fcfa" sha1="885db585778471270c544c26b1facc378885ea24" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="phonemia">
-		<description>Phonemia</description>
-		<year>1985</year>
-		<publisher>FIL</publisher>
+	<software name="motusa" cloneof="motus">
+		<description>Motus (Alt)</description>
+		<year>1982</year>
+		<publisher>VIFI-Nathan</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="phonemia.bin" size="16384" crc="ba7e7eab" sha1="de48a97129bb56a03ece801c2140d23e19328514" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pictor">
-		<description>Pictor</description>
-		<year>1983</year>
-		<publisher>VIFI - Nathan</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="4 v 0010.bin" size="8192" crc="83ef3f9d" sha1="3538bdc69f102d899384101b4aecc7d8fb879b44" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-<!--
-    <software name="polyphon">
-        <description>Polyphonia</description>
-        <year>19??</year>
-        <publisher>&lt;unknown&gt;</publisher>
-
-        <part name="cart" interface="to7_cart">
-            <dataarea name="rom" size="16384">
-                <rom name="polyphonia.bin" size="16384" crc="a38e60e0" sha1="a69569db7ca416159fc7e1921a60b38d40da8c8d" offset="0x0000" />
-            </dataarea>
-        </part>
-    </software>
--->
-
-	<software name="praxitel">
-		<description>Praxitele</description>
-		<year>1985</year>
-		<publisher>To Tek International</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="praxitele.bin" size="16384" crc="72aff701" sha1="ffe9473123eae18711a6105bc2b5b6fbe06e809c" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="prolog">
-		<description>Prolog (v1.0)</description>
-		<year>1986</year>
-		<publisher>FIL</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="prolog.bin" size="16384" crc="c4a1991e" sha1="dcf303a7042340c26c9866063fc5b61e3f796c08" offset="0x0000" />
+				<rom name="motus (alt).bin" size="16384" crc="9b228aae" sha1="69ad5895d06c6711febd851783e33535473fa11d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -504,35 +633,11 @@
 	<software name="quest">
 		<description>Quest</description>
 		<year>1983</year>
-		<publisher>VIFI - Nathan</publisher>
+		<publisher>VIFI-Nathan</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="47 0015.bin" size="4096" crc="cccdbf99" sha1="47c1c00fe56584efae0996e91dad39e03618a64d" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="scriptor">
-		<description>Scriptor</description>
-		<year>1984</year>
-		<publisher>To Tek International</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="sc7020.bin" size="16384" crc="552c7daf" sha1="7e8de2ecf506ea8c70665c46b895bfd35c9ec725" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="studio">
-		<description>Studio</description>
-		<year>1986</year>
-		<publisher>FIL</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="su 7070.bin" size="32768" crc="ae40e3f2" sha1="8880e56fd921560d1ae89e182b116e54de7d31d2" offset="0x0000" />
+				<rom name="47 0015.bin" size="4096" crc="cccdbf99" sha1="47c1c00fe56584efae0996e91dad39e03618a64d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -540,35 +645,23 @@
 	<software name="survivor">
 		<description>Survivor</description>
 		<year>1982</year>
-		<publisher>VIFI - Nathan</publisher>
+		<publisher>VIFI-Nathan</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="4 v 0003.bin" size="16384" crc="9ec27c58" sha1="40d01c664f86508692fad68a66c2d421a5a9cd22" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="synthet">
-		<description>Synthetia</description>
-		<year>1984</year>
-		<publisher>VIFI - Nathan</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="410019.bin" size="16384" crc="9aeea127" sha1="86d644ed82f1675dd99c5e9f4465219f40e6afd1" offset="0x0000" />
+				<rom name="4 v 0003.bin" size="16384" crc="9ec27c58" sha1="40d01c664f86508692fad68a66c2d421a5a9cd22" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="threshld">
-		<description>Threshold</description>
+		<description>Threshold (French/English)</description>
 		<year>1984</year>
-		<publisher>To Tek International</publisher>
+		<publisher>TO TEK International</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="threshold.bin" size="16384" crc="45c8f04e" sha1="64a33d21baf5d479a3c2c36788e4ca5038dfd6ee" offset="0x0000" />
+				<rom name="threshold.bin" size="16384" crc="45c8f04e" sha1="64a33d21baf5d479a3c2c36788e4ca5038dfd6ee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -576,11 +669,11 @@
 	<software name="threshlde" cloneof="threshld">
 		<description>Threshold (English)</description>
 		<year>1984</year>
-		<publisher>To Tek International</publisher>
+		<publisher>TO TEK International</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="threshold english.bin" size="16384" crc="ed6865cf" sha1="4c2bda5ad23b936395b160532951747a173aa5a8" offset="0x0000" />
+				<rom name="threshold english.bin" size="16384" crc="ed6865cf" sha1="4c2bda5ad23b936395b160532951747a173aa5a8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -588,11 +681,11 @@
 	<software name="threshldea" cloneof="threshld">
 		<description>Threshold (English, Alt)</description>
 		<year>1984</year>
-		<publisher>To Tek International</publisher>
+		<publisher>TO TEK International</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="threshold english alt.bin" size="16384" crc="21c6fed5" sha1="1724ff4737802acaef479642c7a8d0e8d4c15adc" offset="0x0000" />
+				<rom name="threshold english alt.bin" size="16384" crc="21c6fed5" sha1="1724ff4737802acaef479642c7a8d0e8d4c15adc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -600,11 +693,11 @@
 	<software name="trap">
 		<description>Trap</description>
 		<year>1982</year>
-		<publisher>VIFI - Nathan</publisher>
+		<publisher>VIFI-Nathan</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="4 v 0009.bin" size="4096" crc="4a4d5b6b" sha1="e904c1c73efff216d3a38d0699affbb9266609d8" offset="0x0000" />
+				<rom name="4 v 0009.bin" size="4096" crc="4a4d5b6b" sha1="e904c1c73efff216d3a38d0699affbb9266609d8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -612,23 +705,11 @@
 	<software name="tridi444">
 		<description>Tridi444</description>
 		<year>1982</year>
-		<publisher>VIFI - Nathan</publisher>
+		<publisher>VIFI-Nathan</publisher>
 
-		<part name="cart" interface="to7_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="tridi444.bin" size="4096" crc="7746de9b" sha1="c549b35b1d04fe3d51cbd8579671721c5a014001" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="videotex">
-		<description>Videotex Interactif</description>
-		<year>1984</year>
-		<publisher>To Tek International</publisher>
-
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="videotex interactif (1984)(to tek)(fr).bin" size="16384" crc="a887814a" sha1="1bac88a14b762b63fea5b309849d9ee0e9b518f1" offset="0x0000" />
+				<rom name="tridi444.bin" size="4096" crc="7746de9b" sha1="c549b35b1d04fe3d51cbd8579671721c5a014001" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -1,0 +1,205 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- Thanks to DCMOTO (http://dcmoto.free.fr) for info! -->
+<softwarelist name="to8_cass" description="Thomson TO8 cassetes">
+
+	<software name="bactron">
+		<description>Bactron</description>
+		<year>1986</year>
+		<publisher>Loriciels</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="70416">
+				<rom name="bactron.k7" size="70416" crc="23ab9b84" sha1="ef3c21ac58222da495dbfdbb32de42cc4850d30d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chicago">
+		<description>Chicago 90</description>
+		<year>1989</year>
+		<publisher>Microids</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="141466">
+				<rom name="chicago.k7" size="141466" crc="5f41cf2a" sha1="ae93d4ab923a55f300d5c9b38432893526dc340b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copieur">
+		<description>Copieur</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="4663">
+				<rom name="copieur.k7" size="4663" crc="117f89aa" sha1="bf6adb106375b5d8ea0b40608c0942698f5e4b62" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dctrans">
+		<description>DC Transferts</description>
+		<year>2006</year>
+		<publisher>DCsoft</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="9023161">
+				<rom name="dctrans.wav" size="9023161" crc="eb4660ca" sha1="0b94a00719a8301a29b57186ea9b15558213ec12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dctransa" cloneof="dctrans">
+		<description>DC Transferts (Alt)</description>
+		<year>2006</year>
+		<publisher>DCsoft</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="12522">
+				<rom name="dctrans.k7" size="12522" crc="9103c255" sha1="e9f2b5c3212fb1a481018a85f8e3f2cac0e87bad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gp500cc">
+		<description>Grand Prix 500cc</description>
+		<year>1986</year>
+		<publisher>Microids</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="76605">
+				<rom name="gp500cc.k7" size="76605" crc="b082a964" sha1="3beafb2d556e3b35190c13fda5673eefb120c2ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="malefatl">
+		<description>Le Malefice des Atlantes</description>
+		<year>1987</year>
+		<publisher>Chip</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="58221">
+				<rom name="malefatl.k7" size="58221" crc="6d01a4d3" sha1="d42c4cc26429d2cdf698ef8d2140c4f6af51442b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mgt">
+		<description>MGT</description>
+		<year>1986</year>
+		<publisher>Loriciels</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="65780">
+				<rom name="mgt.k7" size="65780" crc="482ea9fb" sha1="39929f22b5fe0d4be4c12c078289a70ebfb4f6f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="music3v">
+		<description>Music 3 Voix</description>
+		<year>1987</year>
+		<publisher>Loriciels</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="42339">
+				<rom name="music3v.k7" size="42339" crc="36b17687" sha1="bb5bad017d97a2e68808ef697cd174687931e4b9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="piquefic">
+		<description>Pique-Fiche</description>
+		<year>198?</year>
+		<publisher>Hatier</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="36874">
+				<rom name="piquefic.k7" size="36874" crc="47715cda" sha1="a1e2f3709c14d6be6e31e423d39a0b38873a2200" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sservice">
+		<description>Silent Service</description>
+		<year>1987</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="48300">
+				<rom name="sservice.k7" size="48300" crc="570a7e9b" sha1="4d001c51cc58f9cfdd1c7a26daf10d143571c9ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacerac">
+		<description>Space Racer</description>
+		<year>1988</year>
+		<publisher>Loriciels</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="91549">
+				<rom name="spacerac.k7" size="91549" crc="6af77f6f" sha1="757cd8bce2356eac51f6690fcc8feb1a0c2a2e87" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superski">
+		<description>Super Ski</description>
+		<year>1987</year>
+		<publisher>Microids</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="110461">
+				<rom name="superski.k7" size="110461" crc="0ace409c" sha1="9c35a837d43201612711433fdbde39bec2f896f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trivialp">
+		<description>Trivial Pursuit</description>
+		<year>198?</year>
+		<publisher>Ubisoft</publisher>
+
+		<part name="cass1" interface="to_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="84279">
+				<rom name="trivialp1.k7" size="84279" crc="bad716ad" sha1="eb5df3bd272f6294055366a2f8f7db1eb4b8c6b9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="to_cass">
+		<feature name="part_id" value="Tape 2"/>
+			<dataarea name="cass" size="70238">
+				<rom name="trivialp2.k7" size="70238" crc="d4a05cd6" sha1="0b814e4715711e3d88d3d19d1e38d6128b88acdc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="to_cass">
+		<feature name="part_id" value="Tape 3"/>
+			<dataarea name="cass" size="68394">
+				<rom name="trivialp3.k7" size="68394" crc="836bfec2" sha1="000fb6273ca2d0c3d43577f1b362432080451e26" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="to_cass">
+		<feature name="part_id" value="Tape 4"/>
+			<dataarea name="cass" size="62086">
+				<rom name="trivialp4.k7" size="62086" crc="6e570923" sha1="2667a0531b9ca34c7de03f7646c5d946bcd0068e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volsolo">
+		<description>Vol Solo</description>
+		<year>198?</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="cass1" interface="to_cass">
+			<dataarea name="cass" size="24781">
+				<rom name="volsolo.k7" size="24781" crc="4f107130" sha1="4ff709a8b9ba9103c768fe068921d77c004d3960" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
