@@ -1564,12 +1564,12 @@
 	</software>
 
 	<software name="tdfeverj" cloneof="tdfever">
-		<description>American Football - Touchdown Fever (Jpn)</description>
+		<description>Touchdown Fever (Jpn)</description>
 		<year>1988</year>
 		<publisher>KAC</publisher>
 		<info name="serial" value="KAC-T7"/>
 		<info name="release" value="19881111"/>
-		<info name="alt_title" value="タッチダウンフェーバー"/>
+		<info name="alt_title" value="タッチダウンフェーバー ~ American Football - Touchdown Fever (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom_a" />
 			<feature name="pcb" value="HVC-SFROM" />
@@ -3064,12 +3064,12 @@
 	</software>
 
 	<software name="bstarsj" cloneof="bstars">
-		<description>Baseball Star - Mezase Sankanou (Jpn)</description>
+		<description>Baseball Star - Mezase Sankanou!! (Jpn)</description>
 		<year>1989</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="SFX-B9"/>
 		<info name="release" value="19890519"/>
-		<info name="alt_title" value="ベースボールスター めざせ三冠王"/>
+		<info name="alt_title" value="ベースボールスター めざせ三冠王!!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom_a" />
 			<feature name="pcb" value="HVC-SKROM" />
@@ -9915,7 +9915,7 @@
 	</software>
 
 	<software name="dquest4" cloneof="dwarr4">
-		<description>Dragon Quest IV - Michibikareshi Mono-tachi (Jpn, Rev. A)</description>
+		<description>Dragon Quest IV - Michibikareshi Monotachi (Jpn, Rev. A)</description>
 		<year>1990</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="EFC-D4"/>
@@ -10610,7 +10610,7 @@
 	</software>
 
 	<software name="dynabowl">
-		<description>Dynamite Bowl (Jpn)</description>
+		<description>Dynamite Bowl (Jpn, Rev. A)</description>
 		<year>1987</year>
 		<publisher>Toemiland</publisher>
 		<info name="serial" value="TFS-DL"/>
@@ -10621,10 +10621,10 @@
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
-				<rom name="0.prg" size="32768" crc="21621797" sha1="802230fd5269a76886bed6c345df33250fdac96e" offset="00000" />
+				<rom name="1.prg" size="32768" crc="21621797" sha1="802230fd5269a76886bed6c345df33250fdac96e" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="0.chr" size="32768" crc="70625cd5" sha1="6c4520ebe3c85aa6466b4038e63b3b686259f8c1" offset="00000" />
+				<rom name="1.chr" size="32768" crc="70625cd5" sha1="6c4520ebe3c85aa6466b4038e63b3b686259f8c1" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11194,7 +11194,7 @@
 	</software>
 
 	<software name="f15cw1" cloneof="f15cw">
-		<description>F-15 City War (USA)</description>
+		<description>F15 City War (USA)</description>
 		<year>1990</year>
 		<publisher>American Video Entertainment</publisher>
 		<info name="serial" value="AVE-FC"/>
@@ -11212,7 +11212,7 @@
 	</software>
 
 	<software name="f15cw">
-		<description>F-15 City War (USA, v1.1)</description>
+		<description>F15 City War (USA, v1.1)</description>
 		<year>1990</year>
 		<publisher>American Video Entertainment</publisher>
 		<info name="serial" value="AVE-FC"/>
@@ -11230,7 +11230,7 @@
 	</software>
 
 	<software name="f15cws" cloneof="f15cw">
-		<description>F-15 City War (Spa)</description>
+		<description>F15 City War (Spa)</description>
 		<year>1990</year>
 		<publisher>Gluk Video</publisher>
 		<part name="cart" interface="nes_cart">
@@ -11384,7 +11384,7 @@
 	</software>
 
 	<software name="f1race">
-		<description>F1 Race (Jpn)</description>
+		<description>F-1 Race (Jpn)</description>
 		<year>1984</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-FR"/>
@@ -17095,7 +17095,7 @@
 	</software>
 
 	<software name="hyokkohj">
-		<description>Hyokkori Hyoutan-jima - Nazo no Kaizokusen (Jpn)</description>
+		<description>Hyokkori Hyoutanjima - Nazo no Kaizokusen (Jpn)</description>
 		<year>1992</year>
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="SHI-HV"/>
@@ -19340,7 +19340,7 @@
 	</software>
 
 	<software name="kamenrsd">
-		<description>Kamen Rider SD - Guranshokkaa no Yabou (Jpn)</description>
+		<description>Kamen Rider SD - GranShocker no Yabou (Jpn)</description>
 		<year>1993</year>
 		<publisher>Angel</publisher>
 		<info name="serial" value="ANG-KA"/>
@@ -19585,7 +19585,7 @@
 	</software>
 
 	<software name="kerosplb">
-		<description>Keroppi to Keroriinu no Splash Bomb! (Jpn)</description>
+		<description>Keroppi to Keroleen no Splash Bomb! (Jpn)</description>
 		<year>1993</year>
 		<publisher>Character Soft</publisher>
 		<info name="serial" value="CTS-SY"/>
@@ -20730,6 +20730,7 @@
 		</part>
 	</software>
 
+<!-- Possibly coming from a proto / sample cart? PCB has wires that are not present in the other verified PCBs... -->
 	<software name="kyonshi2a" cloneof="kyonshi2">
 		<description>Kyonshiizu 2 (Jpn)</description>
 		<year>1987</year>
@@ -23648,7 +23649,7 @@
 		</part>
 	</software>
 
-	<software name="megamit2">
+	<software name="megamit2a" cloneof="megamit2">
 		<description>Megami Tensei II - Digital Devil Story (Jpn)</description>
 		<year>1990</year>
 		<publisher>Namcot</publisher>
@@ -24812,13 +24813,13 @@
 		</part>
 	</software>
 
-	<software name="mitokom2">
-		<description>Mito Koumon II - Sekai Manyuu Ki (Jpn)</description>
+	<software name="mitokom">
+		<description>Mito Koumon - Sekai Manyuu Ki (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-MKII-5500 (SS11)"/>
 		<info name="release" value="19880811"/>
-		<info name="alt_title" value="水戸黄門Ⅱ 世界漫遊記"/>
+		<info name="alt_title" value="水戸黄門Ⅱ 世界漫遊記 ~ Mito Koumon II - Sekai Manyuu Ki (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sunsoft3" />
 			<feature name="pcb" value="SUNSOFT-3" />
@@ -26948,13 +26949,13 @@
 		</part>
 	</software>
 
-	<software name="puzltonj">
-		<description>Ochin ni Toshi Puzzle Tonjan!? (Jpn)</description>
+	<software name="tonjan">
+		<description>Tonjan!? (Jpn)</description>
 		<year>1989</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NMK-JT"/>
 		<info name="release" value="19890929"/>
-		<info name="alt_title" value="落っことしパズルとんじゃん!?"/>
+		<info name="alt_title" value="落っことしパズルとんじゃん!? ~ Okkotoshi Puzzle Tonjan!? (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
@@ -26994,7 +26995,7 @@
 		<publisher>Shinsei</publisher>
 		<info name="serial" value="SHI-OS"/>
 		<info name="release" value="19890725"/>
-		<info name="alt_title" value="美味しんぼ 究極のメニュー三本勝負"/>
+		<info name="alt_title" value="美味しんぼ 究極のメニュー三本勝負 ~ Oishinbo - Kyuukyoku no Menu Sanbon Shoubu (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom_a" />
 			<feature name="pcb" value="HVC-SL1ROM" />
@@ -29705,8 +29706,27 @@
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="racermt2b" cloneof="racermt2" supported="no">
+		<description>RacerMate Challenge 2 (USA, v5.01.033)</description>
+		<year>1996</year>
+		<publisher>RacerMate</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="racermate" />
+			<feature name="pcb" value="UNL-RACERMATE" />
+			<dataarea name="prg" size="65536">
+				<rom name="racermate challenge ii (usa) (v5.01.033) (unl).prg" size="65536" crc="aaef2264" sha1="b8a0b3a92e47da8a8968260e242c248bcacb122d" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram2" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racermt2c" cloneof="racermt2" supported="no">
 		<description>RacerMate Challenge 2 (USA, v3.11.088)</description>
 		<year>1996</year>
 		<publisher>RacerMate</publisher>
@@ -31271,7 +31291,7 @@
 	</software>
 
 	<software name="route16">
-		<description>Route 16 Turbo (Jpn)</description>
+		<description>Route-16 Turbo (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-R16-4900 (SS2)"/>
@@ -31728,7 +31748,7 @@
 	</software>
 
 	<software name="sseiya2">
-		<description>Saint Seiya - Ougon Densetsu Kanketsu-hen (Jpn)</description>
+		<description>Saint Seiya - Ougon Densetsu Kanketsu Hen (Jpn)</description>
 		<year>1988</year>
 		<publisher>Shinsei</publisher>
 		<info name="serial" value="SHI-OK"/>
@@ -31977,7 +31997,7 @@
 	</software>
 
 	<software name="sangoku2" cloneof="roman3k2">
-		<description>Sangokushi II (Jpn, Rev. B)</description>
+		<description>Sangokushi II (Jpn, Rev. AB)</description>
 		<year>1990</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="KOE-XL"/>
@@ -32321,7 +32341,7 @@
 	</software>
 
 	<software name="sectionzu" cloneof="sectionz">
-		<description>Section Z (USA)</description>
+		<description>Section-Z (USA)</description>
 		<year>1987</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-SZ-USA"/>
@@ -32340,7 +32360,7 @@
 	</software>
 
 	<software name="sectionz">
-		<description>Section Z (Euro)</description>
+		<description>Section-Z (Euro)</description>
 		<year>1989</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-SZ-EEC"/>
@@ -40135,12 +40155,12 @@
 	</software>
 
 	<software name="ultima3j" cloneof="ultima3">
-		<description>Ultima - Kyoufu no Exodus (Jpn)</description>
+		<description>Ultima - Exodus (Jpn)</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-UL (R59V5910)"/>
 		<info name="release" value="19871009"/>
-		<info name="alt_title" value="ウルティマ ～恐怖のエクソダス～"/>
+		<info name="alt_title" value="ウルティマ ～恐怖のエクソダス～ ~ Ultima - Kyoufu no Exodus (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
@@ -40690,12 +40710,12 @@
 	</software>
 
 	<software name="venussnk">
-		<description>Venus Senki (Jpn)</description>
+		<description>The Venus Wars - Venus Senki - Back The City "IO" (Jpn)</description>
 		<year>1989</year>
 		<publisher>Varie</publisher>
 		<info name="serial" value="VRE-R2"/>
 		<info name="release" value="19891014"/>
-		<info name="alt_title" value="ヴィナス戦記"/>
+		<info name="alt_title" value="ヴィナス戦記 ~ Venus Senki (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
@@ -40778,7 +40798,7 @@
 	</software>
 
 	<software name="vivalv" cloneof="vegasdrm">
-		<description>Viva Las Vegas (Jpn)</description>
+		<description>Viva! Las Vegas (Jpn)</description>
 		<year>1988</year>
 		<publisher>Epic / Sony Records</publisher>
 		<info name="serial" value="ESF-LV/59·6R-2"/>
@@ -41597,7 +41617,7 @@
 	</software>
 
 	<software name="rogerrab">
-		<description>Who Framed Roger Rabbit? (USA)</description>
+		<description>Who Framed Roger Rabbit (USA)</description>
 		<year>1989</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="NES-WL-USA"/>
@@ -42134,11 +42154,12 @@
 	</software>
 
 	<software name="worldchmu" cloneof="worldchm">
-		<description>World Champ (USA)</description>
+		<description>World Champ - Super Boxing Great Fight (USA)</description>
 		<year>1991</year>
 		<publisher>Romstar</publisher>
 		<info name="serial" value="NES-5E-USA"/>
 		<info name="release" value="199104xx"/>
+		<info name="alt_title" value="World Champ (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -42153,10 +42174,11 @@
 	</software>
 
 	<software name="worldchm">
-		<description>World Champ (Euro)</description>
+		<description>World Champ - Super Boxing Great Fight (Euro)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-5E (NOE/ESP)"/>
+		<info name="alt_title" value="World Champ (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -45405,7 +45427,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="dynabowla" cloneof="dynabowl">
-		<description>Dynamite Bowl (Jpn, Alt)</description>
+		<description>Dynamite Bowl (Jpn)</description>
 		<year>1987</year>
 		<publisher>Toemiland</publisher>
 		<info name="serial" value="TFS-DL"/>
@@ -45555,7 +45577,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="famidobu">
-		<description>Famicom Doubutsu Seitai Zukan! - Katte Ni Shirokuma - Mori O Sukue no Maki! (Jpn)</description>
+		<description>Famicom Doubutsu Seitai Zukan! - Katte Ni Shirokuma - Mori o Sukue no Maki! (Jpn)</description>
 		<year>1989</year>
 		<publisher>CBS Sony Group</publisher>
 		<info name="serial" value="CBS-WB"/>
@@ -47424,6 +47446,32 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="megamit2">
+		<description>Megami Tensei II - Digital Devil Story (Jpn, Rev. A)</description>
+		<year>1990</year>
+		<publisher>Namcot</publisher>
+		<info name="serial" value="NAM-FMT-7800"/>
+		<info name="release" value="19900406"/>
+		<info name="alt_title" value=""/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="namcot_163" />
+			<feature name="pcb" value="NAMCOT-163" />
+			<dataarea name="chr" size="262144">
+				<rom name="digital devil story - megami tensei ii (japan) (rev a).chr" size="262144" crc="b41ee15a" sha1="a9803872c5e820ac4b0192929252f8eef3313600" offset="00000" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="digital devil story - megami tensei ii (japan) (rev a).prg" size="262144" crc="761ccfb5" sha1="096d80b02e1d61d6882c57914f5d779c0d46cdc8" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+			<!-- 8k Internal RAM in the 163 chip -->
+			<dataarea name="mapper_ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="meijishn">
 		<description>Meiji Ishin (Jpn)</description>
 		<year>1989</year>
@@ -47588,7 +47636,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HAL-ML"/>
 		<info name="release" value="19871001"/>
-		<info name="alt_title" value="ミリピード 巨大昆虫の逆襲"/>
+		<info name="alt_title" value="ミリピード 巨大昆虫の逆襲 ~ Millipede - Kyodai Konchuu no Gyakushuu (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
@@ -47678,7 +47726,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="moetwinb" cloneof="stinger">
-		<description>Moero TwinBee - Cinnamon Hakase O Sukue! (Jpn)</description>
+		<description>Moero TwinBee - Cinnamon Hakase o Sukue! (Jpn)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC813"/>
@@ -50259,6 +50307,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="wallybngp" cloneof="wallybng">
+		<description>Wally Bear and the No! Gang (USA, Prototype)</description>
+		<year>1990</year>
+		<publisher>American Video Entertainment</publisher>
+		<info name="serial" value="AVE-WB"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="discrete_74x377" />
+			<feature name="pcb" value="AVE-NINA-07" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="rom" size="65536">
+				<rom name="wally bear and the no! gang (usa) (beta) (unl).chr" size="65536" crc="a0f170f1" sha1="813567db923c71f01c416da0086a768778a6142c" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="wally bear and the no! gang (usa) (beta) (unl).prg" size="65536" crc="1f94131c" sha1="5a3e69d29802cf1bc6d2ce89ae0180943c941e35" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="warwheel">
 		<description>War on Wheels (USA, Prototype)</description>
 		<year>1991</year>
@@ -50859,6 +50925,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="jovial race (asia) (pal) (unl).prg" size="65536" crc="eb3a7e9c" sha1="84ddf82ff8d9f48d2f8d0d969cb83717ab487354" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joviala" cloneof="jovial">
+		<description>Jovial Race (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="TC-001"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sa72008" />
+			<feature name="pcb" value="UNL-SA-72008" />
+			<dataarea name="chr" size="32768">
+				<rom name="jovial race (unknown) (unl).chr" size="32768" crc="88a41769" sha1="aaef626c9f447118b65676e1ce8ae2f7c1b1fb94" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="jovial race (unknown) (unl).prg" size="65536" crc="55089f7e" sha1="181b05d6ba12871059b16239039154837185690a" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -52616,7 +52699,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="monstglb" cloneof="balloonm">
+	<software name="balloonms" cloneof="balloonm">
 		<description>Balloon Monster (Spa)</description>
 		<year>1992</year>
 		<publisher>Gluk Video</publisher>
@@ -52646,6 +52729,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="NTDEC-N715061" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
+				<!-- There exists also an overdumped iNES file, with 16K of CHR [chr 30f997ea] -->
 				<rom name="balloon monster (unknown) (ntdec, gluk video) (unl).chr" size="8192" crc="e9be1c58" sha1="b85e8cc6175f0186df817423c3dc088b40059f30" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
@@ -53048,10 +53132,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Also verified on a Spanish cart by Gluk Video -->
 	<software name="creatom">
-		<description>Creatom (Tw)</description>
+		<description>Creatom (Tw, Spa)</description>
 		<year>199?</year>
-		<publisher>TXC Corp</publisher>
+		<publisher>TXC Corp / Gluk Video</publisher>
 		<info name="serial" value="MGC-003"/>
 		<info name="alt_title" value="智力方块"/>
 		<part name="cart" interface="nes_cart">
@@ -61121,7 +61206,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<description>Contra Spirits (Asia)</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="Super Contra 3?!? check"/>
+		<info name="alt_title" value="Super Contra 3?!?"/> <!-- check -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jyc_a" />
 			<feature name="pcb" value="JYCOMPANY-A" />
@@ -62295,10 +62380,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- nointro -->
 	<software name="menghuan" supported="partial">
-		<description>Meng Huan (Chi)</description>
+		<description>Meng Huan - Xiang Shuai Chuan Qi Zhi Xue Hai (Chi)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
-		<info name="alt_title" value="梦幻"/>
+		<info name="alt_title" value="梦幻 香帅传奇之血海飘零"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -62699,10 +62784,12 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 <!-- nointro -->
+<!-- Also verified on a Spanish cart by Gluk Video -->
 	<software name="seadream">
-		<description>Sea of Dreamland (Asia)</description>
+		<description>Sea of Dreamland (Asia, Spa)</description>
 		<year>1992</year>
-		<publisher>Mega Soft</publisher>
+		<publisher>Mega Soft / Gluk Video</publisher>
+		<info name="alt_title" value="La Gran Aventura Submarina (Spa Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
@@ -64704,24 +64791,6 @@ All musics were removed in this game.
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="daodan tanke (unl) (yanshan).prg" size="32768" crc="c4d3b9dd" sha1="7a4275cffcb2d2b632662e21d9f237efab51e602" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- CHECK if overdump -->
-	<software name="monstglb1" cloneof="balloonm">
-		<description>El Monstruo De Los Globos (Unl)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="16384">
-				<rom name="el monstruo de los globos (unl).chr" size="16384" crc="30f997ea" sha1="b4e0f739264669c630e9ba9ca2e1cd58e7034857" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="el monstruo de los globos (unl).prg" size="32768" crc="99d1f385" sha1="23025edb8ef70787d147f6930d39dd9fce568105" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -67342,7 +67411,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 	<software name="f1raceh" cloneof="f1race">
-		<description>F1 Race (FMG pirate)</description>
+		<description>F-1 Race (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
@@ -73120,7 +73189,7 @@ resulting in tons of glitches? -->
 	</software>
 
 	<software name="smsplash" cloneof="kerosplb">
-		<description>Super Mali Bros Splash Bomb (Keroppi to Keroriinu no Splash Bomb! pirate)</description>
+		<description>Super Mali Bros Splash Bomb (Keroppi to Keroleen no Splash Bomb! pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
