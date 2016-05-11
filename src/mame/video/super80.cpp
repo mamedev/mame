@@ -16,7 +16,6 @@
 PALETTE_INIT_MEMBER( super80_state, super80m )
 {
 	// RGB
-	//palette_set_colors_rgb(super80_rgb_palette);
 	m_palette->set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   /*  0 Black     */
 	m_palette->set_pen_color(1, rgb_t(0x00, 0x00, 0x00));   /*  1 Black     */
 	m_palette->set_pen_color(2, rgb_t(0x00, 0x00, 0x7f));   /*  2 Blue      */
@@ -91,7 +90,13 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 			for (x = 0; x < 32; x++)    // done this way to avoid x overflowing on page FF
 			{
 				if (screen_on)
-					chr = m_p_ram[ma | x] & 0x3f;
+				{
+					chr = m_p_ram[ma | x] & 0x7f;
+					if ((chr >= 0x61) && (chr <= 0x7a))
+						chr &= 0x1f;
+					else
+						chr &= 0x3f;
+				}
 
 				/* get pattern of pixels for that character scanline */
 				gfx = m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
