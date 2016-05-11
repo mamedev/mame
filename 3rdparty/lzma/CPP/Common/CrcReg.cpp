@@ -34,7 +34,7 @@ class CCrcHasher:
 public:
   CCrcHasher(): _crc(CRC_INIT_VAL) { SetFunctions(0); }
 
-  MY_UNKNOWN_IMP1(ICompressSetCoderProperties)
+  MY_UNKNOWN_IMP2(IHasher, ICompressSetCoderProperties)
   INTERFACE_IHasher(;)
   STDMETHOD(SetCoderProperties)(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps);
 };

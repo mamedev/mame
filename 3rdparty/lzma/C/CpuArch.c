@@ -1,5 +1,5 @@
 /* CpuArch.c -- CPU specific code
-2015-03-25: Igor Pavlov : Public domain */
+2016-02-25: Igor Pavlov : Public domain */
 
 #include "Precomp.h"
 
@@ -45,7 +45,8 @@ static UInt32 CheckFlag(UInt32 flag)
     "push %%EDX\n\t"
     "popf\n\t"
     "andl %%EAX, %0\n\t":
-    "=c" (flag) : "c" (flag));
+    "=c" (flag) : "c" (flag) :
+    "%eax", "%edx");
   #endif
   return flag;
 }
@@ -79,7 +80,13 @@ void MyCPUID(UInt32 function, UInt32 *a, UInt32 *b, UInt32 *c, UInt32 *d)
   #else
 
   __asm__ __volatile__ (
-  #if defined(MY_CPU_X86) && defined(__PIC__)
+  #if defined(MY_CPU_AMD64) && defined(__PIC__)
+    "mov %%rbx, %%rdi;"
+    "cpuid;"
+    "xchg %%rbx, %%rdi;"
+    : "=a" (*a) ,
+      "=D" (*b) ,
+  #elif defined(MY_CPU_X86) && defined(__PIC__)
     "mov %%ebx, %%edi;"
     "cpuid;"
     "xchgl %%ebx, %%edi;"

@@ -10,8 +10,13 @@
 #include "PpmdEncoder.h"
 #endif
 
+namespace NCompress {
+namespace NPpmd {
+
 REGISTER_CODEC_E(PPMD,
-    NCompress::NPpmd::CDecoder(),
-    NCompress::NPpmd::CEncoder(),
+    CDecoder(),
+    CEncoder(),
     0x30401,
     "PPMD")
+
+}}

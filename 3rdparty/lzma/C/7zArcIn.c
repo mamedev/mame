@@ -1,5 +1,5 @@
 /* 7zArcIn.c -- 7z Input functions
-2015-11-18 : Igor Pavlov : Public domain */
+2016-03-31 : Igor Pavlov : Public domain */
 
 #include "Precomp.h"
 
@@ -788,13 +788,9 @@ static SRes ReadUnpackInfo(CSzAr *p,
       numCodersOutStreams += numCoders;
       if (numCodersOutStreams < numCoders)
         return SZ_ERROR_UNSUPPORTED;
-      
-      packStreamIndex += numPackStreams;
-      if (packStreamIndex < numPackStreams)
-        return SZ_ERROR_UNSUPPORTED;
-      
-      if (packStreamIndex > p->NumPackStreams)
+      if (numPackStreams > p->NumPackStreams - packStreamIndex)
         return SZ_ERROR_ARCHIVE;
+      packStreamIndex += numPackStreams;
     }
   }
 

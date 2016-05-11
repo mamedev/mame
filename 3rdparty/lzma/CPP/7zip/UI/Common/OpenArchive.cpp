@@ -1632,6 +1632,36 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
     #endif
     
     {
+      #ifndef _SFX
+      
+      bool isZip = false;
+      bool isRar = false;
+      
+      const wchar_t c = extension[0];
+      if (c == 'z' || c == 'Z' || c == 'r' || c == 'R')
+      {
+        bool isNumber = false;
+        for (unsigned k = 1;; k++)
+        {
+          const wchar_t d = extension[k];
+          if (d == 0)
+            break;
+          if (d < '0' || d > '9')
+          {
+            isNumber = false;
+            break;
+          }
+          isNumber = true;
+        }
+        if (isNumber)
+          if (c == 'z' || c == 'Z')
+            isZip = true;
+          else
+            isRar = true;
+      }
+      
+      #endif
+
       FOR_VECTOR (i, op.codecs->Formats)
       {
         const CArcInfoEx &ai = op.codecs->Formats[i];
@@ -1647,7 +1677,12 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
           isPrearcExt = true;
         #endif
 
-        if (ai.FindExtension(extension) >= 0)
+        if (ai.FindExtension(extension) >= 0
+            #ifndef _SFX
+            || isZip && StringsAreEqualNoCase_Ascii(ai.Name, "zip")
+            || isRar && StringsAreEqualNoCase_Ascii(ai.Name, "rar")
+            #endif
+            )
         {
           // PrintNumber("orderIndices.Insert", i);
           orderIndices.Insert(numFinded++, i);

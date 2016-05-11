@@ -5,16 +5,19 @@
 #include <string.h>
 
 #include "LimitedStreams.h"
-#include "../../Common/Defs.h"
 
 STDMETHODIMP CLimitedSequentialInStream::Read(void *data, UInt32 size, UInt32 *processedSize)
 {
   UInt32 realProcessedSize = 0;
-  UInt32 sizeToRead = (UInt32)MyMin((_size - _pos), (UInt64)size);
-  HRESULT result = S_OK;
-  if (sizeToRead > 0)
   {
-    result = _stream->Read(data, sizeToRead, &realProcessedSize);
+    const UInt64 rem = _size - _pos;
+    if (size > rem)
+      size = (UInt32)rem;
+  }
+  HRESULT result = S_OK;
+  if (size != 0)
+  {
+    result = _stream->Read(data, size, &realProcessedSize);
     _pos += realProcessedSize;
     if (realProcessedSize == 0)
       _wasFinished = true;
@@ -34,9 +37,11 @@ STDMETHODIMP CLimitedInStream::Read(void *data, UInt32 size, UInt32 *processedSi
     return S_OK;
     // return (_virtPos == _size) ? S_OK: E_FAIL; // ERROR_HANDLE_EOF
   }
-  UInt64 rem = _size - _virtPos;
-  if (rem < size)
-    size = (UInt32)rem;
+  {
+    const UInt64 rem = _size - _virtPos;
+    if (size > rem)
+      size = (UInt32)rem;
+  }
   UInt64 newPos = _startOffset + _virtPos;
   if (newPos != _physPos)
   {

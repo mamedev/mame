@@ -187,11 +187,15 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *callback)
   
   UInt64 size;
   {
+    /*
     NCOM::CPropVariant prop;
     RINOK(volumeCallback->GetProperty(kpidSize, &prop));
     if (prop.vt != VT_UI8)
       return E_INVALIDARG;
     size = prop.uhVal.QuadPart;
+    */
+    RINOK(stream->Seek(0, STREAM_SEEK_END, &size));
+    RINOK(stream->Seek(0, STREAM_SEEK_SET, NULL));
   }
   
   _totalSize += size;
@@ -217,11 +221,15 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *callback)
     if (!stream)
       break;
     {
+      /*
       NCOM::CPropVariant prop;
       RINOK(volumeCallback->GetProperty(kpidSize, &prop));
       if (prop.vt != VT_UI8)
         return E_INVALIDARG;
       size = prop.uhVal.QuadPart;
+      */
+      RINOK(stream->Seek(0, STREAM_SEEK_END, &size));
+      RINOK(stream->Seek(0, STREAM_SEEK_SET, NULL));
     }
     _totalSize += size;
     _sizes.Add(size);

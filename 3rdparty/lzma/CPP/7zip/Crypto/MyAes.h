@@ -30,7 +30,7 @@ class CAesCbcCoder:
 public:
   CAesCbcCoder(bool encodeMode, unsigned keySize);
   
-  MY_UNKNOWN_IMP2(ICryptoProperties, ICompressSetCoderProperties)
+  MY_UNKNOWN_IMP3(ICompressFilter, ICryptoProperties, ICompressSetCoderProperties)
   
   INTERFACE_ICompressFilter(;)
   

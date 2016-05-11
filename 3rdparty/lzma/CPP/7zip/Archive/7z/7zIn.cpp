@@ -93,6 +93,8 @@ void CStreamSwitch::Set(CInArchive *archive, const CObjectVector<CByteBuffer> *d
   Byte external = archive->ReadByte();
   if (external != 0)
   {
+    if (!dataVector)
+      ThrowIncorrect();
     CNum dataIndex = archive->ReadNum();
     if (dataIndex >= dataVector->Size())
       ThrowIncorrect();
@@ -761,6 +763,8 @@ void CInArchive::ReadUnpackInfo(
       folders.FoToCoderUnpackSizes[fo] = numCodersOutStreams;
       numCodersOutStreams += numCoders;
       folders.FoStartPackStreamIndex[fo] = packStreamIndex;
+      if (numPackStreams > folders.NumPackStreams - packStreamIndex)
+        ThrowIncorrect();
       packStreamIndex += numPackStreams;
       folders.FoToMainUnpackSizeIndex[fo] = (Byte)indexOfMainStream;
     }
@@ -770,6 +774,8 @@ void CInArchive::ReadUnpackInfo(
     folders.FoStartPackStreamIndex[fo] = packStreamIndex;
     folders.FoCodersDataOffset[fo] = _inByteBack->GetPtr() - startBufPtr;
     folders.CodersData.CopyFrom(startBufPtr, dataSize);
+
+    // if (folders.NumPackStreams != packStreamIndex) ThrowUnsupported();
   }
 
   WaitId(NID::kCodersUnpackSize);
