@@ -50,21 +50,16 @@ NETLIST_END()
 
 namespace netlist
 {
-setup_t::setup_t(netlist_t *netlist)
+setup_t::setup_t(netlist_t &netlist)
 	: m_netlist(netlist)
+	, m_factory(*this)
 	, m_proxy_cnt(0)
 	, m_frontier_cnt(0)
 {
-	netlist->set_setup(this);
-	m_factory = palloc(factory_list_t(*this));
-}
-
-void setup_t::init()
-{
-	initialize_factory(factory());
+	netlist.set_setup(this);
+	initialize_factory(m_factory);
 	NETLIST_NAME(base)(*this);
 }
-
 
 setup_t::~setup_t()
 {
@@ -75,7 +70,6 @@ setup_t::~setup_t()
 	m_param_values.clear();
 
 	netlist().set_setup(nullptr);
-	pfree(m_factory);
 	m_sources.clear_and_free();
 
 	pstring::resetmem();
@@ -878,21 +872,6 @@ void setup_t::start_devices()
 	}
 
 	netlist().start();
-}
-
-void setup_t::print_stats() const
-{
-#if (NL_KEEP_STATISTICS)
-	{
-		for (std::size_t i = 0; i < netlist().m_started_devices.size(); i++)
-		{
-			core_device_t *entry = netlist().m_started_devices[i];
-			printf("Device %20s : %12d %12d %15ld\n", entry->name(), entry->stat_call_count, entry->stat_update_count, (long int) entry->stat_total_time / (entry->stat_update_count + 1));
-		}
-		printf("Queue Pushes %15d\n", netlist().queue().m_prof_call);
-		printf("Queue Moves  %15d\n", netlist().queue().m_prof_sortmove);
-	}
-#endif
 }
 
 // ----------------------------------------------------------------------------------------

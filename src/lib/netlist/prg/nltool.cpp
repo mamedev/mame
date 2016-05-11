@@ -103,8 +103,7 @@ public:
 
 	void init()
 	{
-		m_setup = palloc(netlist::setup_t(this));
-		m_setup->init();
+		m_setup = palloc(netlist::setup_t(*this));
 	}
 
 	void read_netlist(const pstring &filename, const pstring &name)

@@ -102,16 +102,15 @@ namespace netlist
 
 		using link_t = std::pair<pstring, pstring>;
 
-		setup_t(netlist_t *netlist);
+		setup_t(netlist_t &netlist);
 		~setup_t();
 
-		void init();
-
-		netlist_t &netlist() { return *m_netlist; }
-		const netlist_t &netlist() const { return *m_netlist; }
+		netlist_t &netlist() { return m_netlist; }
+		const netlist_t &netlist() const { return m_netlist; }
 
 		pstring build_fqn(const pstring &obj_name) const;
 
+		void register_object(device_t &dev, const pstring &name, object_t &obj);
 		void register_dev(device_t *dev);
 		void register_dev(const pstring &classname, const pstring &name);
 
@@ -134,7 +133,6 @@ namespace netlist
 
 		void remove_connections(const pstring attach);
 
-		void register_object(device_t &dev, const pstring &name, object_t &obj);
 		bool connect(core_terminal_t &t1, core_terminal_t &t2);
 
 		bool device_exists(const pstring name) const;
@@ -157,12 +155,10 @@ namespace netlist
 
 		void register_source(source_t *src) { m_sources.push_back(src); }
 
-		factory_list_t &factory() { return *m_factory; }
-		const factory_list_t &factory() const { return *m_factory; }
+		factory_list_t &factory() { return m_factory; }
+		const factory_list_t &factory() const { return m_factory; }
 
 		bool is_library_item(const pstring &name) const { return m_lib.contains(name); }
-
-		void print_stats() const;
 
 		/* model / family related */
 
@@ -194,7 +190,7 @@ namespace netlist
 		const pstring resolve_alias(const pstring &name) const;
 		devices::nld_base_proxy *get_d_a_proxy(core_terminal_t &out);
 
-		netlist_t *m_netlist;
+		netlist_t &m_netlist;
 
 		phashmap_t<pstring, pstring> m_alias;
 		phashmap_t<pstring, param_t *>  m_params;
@@ -204,7 +200,7 @@ namespace netlist
 		pvector_t<link_t> m_links;
 		pvector_t<std::pair<pstring, base_factory_t *>> m_device_factory;
 
-		factory_list_t *m_factory;
+		factory_list_t m_factory;
 
 		phashmap_t<pstring, pstring> m_models;
 

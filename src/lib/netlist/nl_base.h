@@ -1269,7 +1269,7 @@ namespace netlist
 		pvector_t<device_t *> m_devices;
 		net_t::list_t m_nets;
 	#if (NL_KEEP_STATISTICS)
-		pnamedlist_t<core_device_t *> m_started_devices;
+		pvector_t<core_device_t *> m_started_devices;
 	#endif
 
 		ATTR_COLD plog_base<NL_DEBUG> &log() { return m_log; }
@@ -1278,6 +1278,8 @@ namespace netlist
 		virtual void reset();
 
 		ATTR_COLD pdynlib &lib() { return *m_lib; }
+
+		void print_stats() const;
 
 protected:
 

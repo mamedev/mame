@@ -379,6 +379,21 @@ ATTR_HOT void netlist_t::process_queue(const netlist_time &delta)
 	}
 }
 
+void netlist_t::print_stats() const
+{
+#if (NL_KEEP_STATISTICS)
+	{
+		for (std::size_t i = 0; i < m_started_devices.size(); i++)
+		{
+			core_device_t *entry = m_started_devices[i];
+			printf("Device %20s : %12d %12d %15ld\n", entry->name().cstr(), entry->stat_call_count, entry->stat_update_count, (long int) entry->stat_total_time / (entry->stat_update_count + 1));
+		}
+		printf("Queue Pushes %15d\n", queue().m_prof_call);
+		printf("Queue Moves  %15d\n", queue().m_prof_sortmove);
+	}
+#endif
+}
+
 // ----------------------------------------------------------------------------------------
 // Default netlist elements ...
 // ----------------------------------------------------------------------------------------
@@ -409,7 +424,7 @@ ATTR_COLD core_device_t::~core_device_t()
 ATTR_COLD void core_device_t::start_dev()
 {
 #if (NL_KEEP_STATISTICS)
-	netlist().m_started_devices.add(this, false);
+	netlist().m_started_devices.push_back(this);
 #endif
 #if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
 	void (core_device_t::* pFunc)() = &core_device_t::update;
@@ -656,7 +671,7 @@ ATTR_HOT /* inline */ void net_t::update_devs()
 
 	for (core_terminal_t *p = m_list_active.first(); p != nullptr; p = p->next())
 	{
-		inc_stat(p->netdev().stat_call_count);
+		inc_stat(p->device().stat_call_count);
 		if ((p->state() & mask) != 0)
 			p->device().update_dev();
 	}
