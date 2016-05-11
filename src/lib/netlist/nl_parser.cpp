@@ -352,7 +352,6 @@ void parser_t::device(const pstring &dev_type)
 	else
 	{
 		base_factory_t *f = m_setup.factory().factory_by_name(dev_type);
-		device_t *dev;
 		pstring_vector_t termlist = f->term_param_list();
 		pstring_vector_t def_params = f->def_params();
 
@@ -360,8 +359,7 @@ void parser_t::device(const pstring &dev_type)
 
 		pstring devname = get_identifier();
 
-		dev = f->Create(m_setup.netlist(), m_setup.build_fqn(devname));
-		m_setup.register_dev(dev);
+		m_setup.register_dev(dev_type, m_setup.build_fqn(devname));
 
 		m_setup.log().debug("Parser: IC: {1}\n", devname);
 

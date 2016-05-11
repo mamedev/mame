@@ -482,8 +482,8 @@ namespace netlist
 
 		ATTR_COLD core_terminal_t(const type_t atype, const family_t afamily);
 
-		ATTR_COLD void set_net(net_t &anet);
-		ATTR_COLD  void clear_net() { m_net = nullptr; }
+		ATTR_COLD void set_net(net_t *anet);
+		ATTR_COLD void clear_net();
 		ATTR_HOT  bool has_net() const { return (m_net != nullptr); }
 
 		ATTR_HOT  const net_t & net() const { return *m_net;}
@@ -505,7 +505,7 @@ namespace netlist
 		}
 
 	private:
-		net_t *  m_net;
+		net_t * m_net;
 		state_e m_state;
 	};
 
@@ -692,16 +692,16 @@ namespace netlist
 		P_PREVENT_COPYING(net_t)
 	public:
 
-		using list_t = pvector_t<net_t *>;
+		using ptr_t = net_t *;
+		using list_t = pvector_t<std::shared_ptr<net_t>>;
 
 		ATTR_COLD net_t(const family_t afamily);
 		virtual ~net_t();
 
-		ATTR_COLD void init_object(netlist_t &nl, const pstring &aname);
+		ATTR_COLD void init_object(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 
 		ATTR_COLD void register_con(core_terminal_t &terminal);
 		ATTR_COLD void merge_net(net_t *othernet);
-		ATTR_COLD void register_railterminal(core_terminal_t &mr);
 
 		ATTR_HOT  logic_net_t & as_logic();
 		ATTR_HOT  const logic_net_t &  as_logic() const;
@@ -835,6 +835,8 @@ namespace netlist
 		using list_t =  pvector_t<analog_net_t *>;
 
 		ATTR_COLD analog_net_t();
+		ATTR_COLD analog_net_t(netlist_t &nl, const pstring &aname);
+
 		virtual ~analog_net_t() { };
 
 		ATTR_HOT const nl_double &Q_Analog() const
@@ -1269,7 +1271,7 @@ namespace netlist
 		pvector_t<device_t *> m_devices;
 		net_t::list_t m_nets;
 	#if (NL_KEEP_STATISTICS)
-		pnamedlist_t<core_device_t *> m_started_devices;
+		pvector_t<core_device_t *> m_started_devices;
 	#endif
 
 		ATTR_COLD plog_base<NL_DEBUG> &log() { return m_log; }
@@ -1278,6 +1280,8 @@ namespace netlist
 		virtual void reset();
 
 		ATTR_COLD pdynlib &lib() { return *m_lib; }
+
+		void print_stats() const;
 
 protected:
 
