@@ -476,7 +476,7 @@ void netlist_mame_cpu_device_t::device_start()
 
 	for (int i=0; i < netlist().m_nets.size(); i++)
 	{
-		netlist::net_t *n = netlist().m_nets[i];
+		netlist::net_t *n = netlist().m_nets[i].get();
 		if (n->isFamily(netlist::object_t::LOGIC))
 		{
 			state_add(i*2, n->name().cstr(), downcast<netlist::logic_net_t *>(n)->Q_state_ptr());

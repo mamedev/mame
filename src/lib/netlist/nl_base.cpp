@@ -211,13 +211,6 @@ netlist_t::netlist_t(const pstring &aname)
 
 netlist_t::~netlist_t()
 {
-	for (net_t *net : m_nets)
-	{
-		if (!net->isRailNet())
-		{
-			pfree(net);
-		}
-	}
 
 	m_nets.clear();
 	m_devices.clear_and_free();
@@ -278,16 +271,16 @@ ATTR_COLD void netlist_t::stop()
 
 ATTR_COLD net_t *netlist_t::find_net(const pstring &name)
 {
-	for (net_t *net : m_nets)
+	for (auto & net : m_nets)
 		if (net->name() == name)
-			return net;
+			return net.get();
 
 	return nullptr;
 }
 
 ATTR_COLD void netlist_t::rebuild_lists()
 {
-	for (net_t *net : m_nets)
+	for (auto & net : m_nets)
 		net->rebuild_list();
 }
 
@@ -581,10 +574,20 @@ ATTR_COLD net_t::~net_t()
 		netlist().remove_save_items(this);
 }
 
-ATTR_COLD void net_t::init_object(netlist_t &nl, const pstring &aname)
+// FIXME: move somewhere central
+
+struct do_nothing_deleter{
+    template<typename T> void operator()(T*){}
+};
+
+ATTR_COLD void net_t::init_object(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 {
 	object_t::init_object(nl, aname);
-	nl.m_nets.push_back(this);
+	m_railterminal = mr;
+	if (mr != nullptr)
+		nl.m_nets.push_back(std::shared_ptr<net_t>(this, do_nothing_deleter()));
+	else
+		nl.m_nets.push_back(std::shared_ptr<net_t>(this));
 }
 
 ATTR_HOT void net_t::inc_active(core_terminal_t &term)
@@ -624,12 +627,6 @@ ATTR_HOT void net_t::dec_active(core_terminal_t &term)
 	m_list_active.remove(term);
 	if (m_active == 0 && netlist().use_deactivate())
 			railterminal().device().dec_active();
-}
-
-ATTR_COLD void net_t::register_railterminal(core_terminal_t &mr)
-{
-	nl_assert(m_railterminal == nullptr);
-	m_railterminal = &mr;
 }
 
 ATTR_COLD void net_t::rebuild_list()
@@ -703,7 +700,7 @@ ATTR_COLD void net_t::reset()
 
 ATTR_COLD void net_t::register_con(core_terminal_t &terminal)
 {
-	terminal.set_net(*this);
+	terminal.set_net(this);
 
 	m_core_terms.push_back(&terminal);
 
@@ -776,6 +773,13 @@ ATTR_COLD analog_net_t::analog_net_t()
 {
 }
 
+ATTR_COLD analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname)
+	: net_t(ANALOG)
+	, m_solver(nullptr)
+{
+	init_object(nl, aname);
+}
+
 ATTR_COLD void analog_net_t::reset()
 {
 	net_t::reset();
@@ -829,10 +833,16 @@ ATTR_COLD core_terminal_t::core_terminal_t(const type_t atype, const family_t af
 {
 }
 
-ATTR_COLD void core_terminal_t::set_net(net_t &anet)
+ATTR_COLD void core_terminal_t::set_net(net_t::ptr_t anet)
 {
-	m_net = &anet;
+	m_net = anet;
 }
+
+ATTR_COLD  void core_terminal_t::clear_net()
+{
+	m_net = nullptr;
+}
+
 
 // ----------------------------------------------------------------------------------------
 // terminal_t
@@ -895,14 +905,13 @@ ATTR_COLD logic_output_t::logic_output_t()
 	: logic_t(OUTPUT)
 {
 	set_state(STATE_OUT);
-	this->set_net(m_my_net);
+	this->set_net(&m_my_net);
 }
 
 ATTR_COLD void logic_output_t::init_object(core_device_t &dev, const pstring &aname)
 {
 	core_terminal_t::init_object(dev, aname);
-	net().init_object(dev.netlist(), aname + ".net");
-	net().register_railterminal(*this);
+	net().init_object(dev.netlist(), aname + ".net", this);
 }
 
 ATTR_COLD void logic_output_t::initial(const netlist_sig_t val)
@@ -915,33 +924,31 @@ ATTR_COLD void logic_output_t::initial(const netlist_sig_t val)
 // analog_output_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD analog_output_t::analog_output_t()
-	: analog_t(OUTPUT), m_proxied_net(nullptr)
-{
-	this->set_net(m_my_net);
-	set_state(STATE_OUT);
-
-	net().m_cur_Analog = NL_FCONST(0.99);
-}
-
 ATTR_COLD analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
 	: analog_t(OUTPUT), m_proxied_net(nullptr)
 {
-	this->set_net(m_my_net);
+	this->set_net(&m_my_net);
 	set_state(STATE_OUT);
 
 	net().m_cur_Analog = NL_FCONST(0.99);
 
 	analog_t::init_object(dev, aname);
-	net().init_object(dev.netlist(), aname + ".net");
-	net().register_railterminal(*this);
+	net().init_object(dev.netlist(), aname + ".net", this);
+}
+
+ATTR_COLD analog_output_t::analog_output_t()
+	: analog_t(OUTPUT), m_proxied_net(nullptr)
+{
+	this->set_net(&m_my_net);
+	set_state(STATE_OUT);
+
+	net().m_cur_Analog = NL_FCONST(0.99);
 }
 
 ATTR_COLD void analog_output_t::init_object(core_device_t &dev, const pstring &aname)
 {
 	analog_t::init_object(dev, aname);
-	net().init_object(dev.netlist(), aname + ".net");
-	net().register_railterminal(*this);
+	net().init_object(dev.netlist(), aname + ".net", this);
 }
 
 ATTR_COLD void analog_output_t::initial(const nl_double val)

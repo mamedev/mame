@@ -636,13 +636,12 @@ void setup_t::connect_terminals(core_terminal_t &t1, core_terminal_t &t2)
 	}
 	else
 	{
-		log().debug("adding net ...\n");
-		analog_net_t *anet =  palloc(analog_net_t);
-		t1.set_net(*anet);
+		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
-		t1.net().init_object(netlist(),"net." + t1.name() );
-		t1.net().register_con(t2);
-		t1.net().register_con(t1);
+		analog_net_t::ptr_t anet = palloc(analog_net_t(netlist(),"net." + t1.name()));
+		t1.set_net(anet);
+		anet->register_con(t2);
+		anet->register_con(t1);
 	}
 }
 
@@ -786,7 +785,7 @@ void setup_t::resolve_inputs()
 
 	net_t::list_t todelete;
 
-	for (net_t *net : netlist().m_nets)
+	for (auto & net : netlist().m_nets)
 	{
 		if (net->num_cons() == 0)
 			todelete.push_back(net);
@@ -794,12 +793,10 @@ void setup_t::resolve_inputs()
 			net->rebuild_list();
 	}
 
-	for (net_t *net : todelete)
+	for (auto & net : todelete)
 	{
 		log().verbose("Deleting net {1} ...", net->name());
 		netlist().m_nets.remove(net);
-		if (!net->isRailNet())
-			pfree(net);
 	}
 
 	pstring errstr("");
