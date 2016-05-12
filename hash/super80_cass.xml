@@ -429,6 +429,30 @@
 			</dataarea>
 		</part>
 	</software>
+	<software name="carrace">
+		<description>Car Race</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="084L1" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="8732510">
+				<rom name="carrace.wav" size="8732510" crc="11f185ea" sha1="3d135defb3f51e8dc454a4fb698edac9697d4750" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="bio">
+		<description>Biorhythm</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="086L2" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="7013616">
+				<rom name="bio.wav" size="7013616" crc="4ad81416" sha1="9ee6e217147aa2073c11301f54112d57832a8622" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 <!--
      Various homebrew programs for use with super80m, recorded at 600 baud.
      Most of these have been partially rewritten by myself to take advantage of the features of the super80m.
@@ -1182,4 +1206,96 @@
 			</dataarea>
 		</part>
 	</software>
+	<software name="morse">
+		<description>Morse Code Trainer 1R2 (incomplete) (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="079L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="1972882">
+				<rom name="morse.wav" size="1972882" crc="e4820ee7" sha1="8e0021be0a771d9ebb52ba64ac3fc592f3be6342" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="moneytst">
+		<description>Money Test (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Glyn Shepherd"/>
+		<info name="serial" value="085L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="2846460">
+				<rom name="moneytst.wav" size="2846460" crc="b3143635" sha1="3ae4a1dba5e9c395937f5e0417e395ee205787fb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="share">
+		<description>Share Trust (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="087L4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="12891884">
+				<rom name="share.wav" size="12891884" crc="fa5c01d1" sha1="3fdb2de58588a36be9c6fb3c2a1449dc695f2665" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="shootgal">
+		<description>Shooting Gallery (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="088" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="2408998">
+				<rom name="shootgal.wav" size="2408998" crc="22f2073d" sha1="f18be3261e13315029851312730ad319ef111d5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="shootgal1" cloneof="shootgal">
+		<description>Shooting Gallery (R1)(L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="088R1" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="2408490">
+				<rom name="shootgal1.wav" size="2408490" crc="f968bc8a" sha1="c195fcc90adcd554ae1be210b44157ba8f65354f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="puzzle">
+		<description>Puzzle (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="089" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="1972784">
+				<rom name="puzzle.wav" size="1972784" crc="a87f643c" sha1="00834781e0dc25fb2d3ad201338877f94c181ba4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="3dxo">
+		<description>3-D Noughts and Crosses (L4)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="090" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="6775112">
+				<rom name="3dxo.wav" size="6775112" crc="64c27c38" sha1="40dffabf6a2d25440f9f579d548b2739a92baab2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+<!--
+     Various homebrew programs for use with super80v (80 column display), recorded at 600 baud.
+     Most of these have been partially rewritten by myself to take advantage of the features of the super80v.
+     Some may work with super80r.
+     The "developer" field has the name of the original author.
+     Meaning of codes: L2 = super80r; L3 = super80v; J = arrow keys can be used; R1,2 = revision numbers
+ -->
 </softwarelist>
