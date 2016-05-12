@@ -33778,8 +33778,8 @@ List of unclassified roms
 		<description>The Adventures of Tintin - Prisoners of the Sun (Euro)</description>
 		<year>1997</year>
 		<publisher>Infogrames</publisher>
-		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="alt_title" value="Tintin - Prisoners of the Sun (Box)" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
@@ -33844,7 +33844,7 @@ List of unclassified roms
 	</software>
 	
 	<software name="akagawanp" cloneof="akagawa">
-		<description>Akagawa Jirou Majo-tachi no Nemuri (Jpn, Rev. A, NP))</description>
+		<description>Akagawa Jirou Majo-tachi no Nemuri (Jpn, Rev. A, NP)</description>
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="SHVC-AAMJ" />
