@@ -63401,21 +63401,24 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<!--software name="venicebvb" cloneof="venicebv">
-	    <description>Volleyball (Spa)</description>
-	    <year>19??</year>
-	    <publisher>Gluk Video</publisher>
-	    <info name="serial" value="MGC10-B"/>
-	    <part name="cart" interface="nes_cart">
-	        <feature name="pcb" value="TXC-74*138/175" />
-	        <dataarea name="chr" size="32768">
-	            <rom name="04-01021-010" size="32768" crc="42812dae" sha1="9c344a8ced4073a95ef35e10dfc49a38389d2b11" offset="00000" />
-	        </dataarea>
-	        <dataarea name="prg" size="32768">
-	            <rom name="04-01021-000" size="32768" crc="382e6a7b" sha1="99c14bf5b80eafc0d94d966d4de21cea7b6df1d3" offset="00000" />
-	        </dataarea>
-	    </part>
-	</software-->
+	<software name="venicebvs" cloneof="venicebv">
+		<description>Venice Beach Volleyball (Spa)</description>
+		<year>19??</year>
+		<publisher>Gluk Video</publisher>
+		<info name="serial" value="MGC10-B"/>
+		<info name="alt_title" value="Volleyball (on the cart label)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nina006" />
+			<feature name="pcb" value="TXC-74*138/175" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="04-01021-010" size="32768" crc="42812dae" sha1="99c14bf5b80eafc0d94d966d4de21cea7b6df1d3" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="04-01021-000" size="32768" crc="382e6a7b" sha1="9c344a8ced4073a95ef35e10dfc49a38389d2b11" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="gluk" cloneof="thundwar">
 		<description>Gluk The Thunder Warrior (Spa)</description>
