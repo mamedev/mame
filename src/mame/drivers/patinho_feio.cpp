@@ -32,6 +32,11 @@ READ16_MEMBER(patinho_feio_state::rc_r)
 	return ioport("RC_HIGH")->read() << 8 | ioport("RC_LOW")->read();
 }
 
+READ8_MEMBER(patinho_feio_state::buttons_r)
+{
+	return ioport("BUTTONS")->read();
+}
+
 void patinho_feio_state::update_panel(UINT8 ACC, UINT8 opcode, UINT8 mem_data, UINT16 mem_addr, UINT16 PC, UINT8 FLAGS, UINT16 RC){
 	if ((m_prev_ACC ^ ACC) & (1 << 0)) m_out->set_value("acc0", (ACC >> 0) & 1);
 	if ((m_prev_ACC ^ ACC) & (1 << 1)) m_out->set_value("acc1", (ACC >> 1) & 1);
@@ -250,6 +255,12 @@ static INPUT_PORTS_START( patinho_feio )
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 7") PORT_CODE(KEYCODE_3) PORT_TOGGLE
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 10") PORT_CODE(KEYCODE_2) PORT_TOGGLE
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 11") PORT_CODE(KEYCODE_1) PORT_TOGGLE
+
+		PORT_START("BUTTONS")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PARTIDA") PORT_CODE(KEYCODE_Z)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INTERRUPÇÃO") PORT_CODE(KEYCODE_X)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESPERA") PORT_CODE(KEYCODE_C)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PREPARAÇÃO") PORT_CODE(KEYCODE_V)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
@@ -257,6 +268,7 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 	/* CPU @ approx. 500 kHz (memory cycle time is 2usec) */
 	MCFG_CPU_ADD("maincpu", PATINHO_FEIO, 500000)
 	MCFG_PATINHO_RC_READ_CB(READ16(patinho_feio_state, rc_r))
+	MCFG_PATINHO_BUTTONS_READ_CB(READ8(patinho_feio_state, buttons_r))
 
 	/* Printer */
 //	MCFG_PATINHO_IODEV_WRITE_CB(0x5, WRITE8(patinho_feio_state, printer_data_w))

@@ -7,6 +7,8 @@
 
 #define MCFG_PATINHO_RC_READ_CB(_devcb) \
 	devcb = &patinho_feio_cpu_device::set_rc_read_callback(*device, DEVCB_##_devcb);
+#define MCFG_PATINHO_BUTTONS_READ_CB(_devcb) \
+	devcb = &patinho_feio_cpu_device::set_buttons_read_callback(*device, DEVCB_##_devcb);
 #define MCFG_PATINHO_IODEV_READ_CB(devnumber, _devcb) \
 	devcb = &patinho_feio_cpu_device::set_iodev_read_callback(*device, devnumber, DEVCB_##_devcb);
 #define MCFG_PATINHO_IODEV_WRITE_CB(devnumber, _devcb) \
@@ -30,6 +32,7 @@ public:
 	patinho_feio_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 	template<class _Object> static devcb_base &set_rc_read_callback(device_t &device, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_rc_read_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_buttons_read_callback(device_t &device, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_buttons_read_cb.set_callback(object); }
         template<class _Object> static devcb_base &set_iodev_read_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_read_cb[devnumber].set_callback(object); }
         template<class _Object> static devcb_base &set_iodev_write_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_write_cb[devnumber].set_callback(object); }
         template<class _Object> static devcb_base &set_iodev_status_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_status_cb[devnumber].set_callback(object); }
@@ -106,6 +109,7 @@ private:
 	void compute_effective_address(unsigned int addr);
 	UINT16 read_panel_keys_register();
 	devcb_read16 m_rc_read_cb;
+	devcb_read8 m_buttons_read_cb;
         devcb_read8 m_iodev_read_cb[16];
         devcb_write8 m_iodev_write_cb[16];
         devcb_read8 m_iodev_status_cb[16];

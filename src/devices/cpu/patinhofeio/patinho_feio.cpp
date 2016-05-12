@@ -54,6 +54,7 @@ patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, 
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(prog_8bit)),
 		m_icount(0),
 		m_rc_read_cb(*this),
+		m_buttons_read_cb(*this),
                 /* These arrays of *this are very ugly. I wonder if there's a better way of coding this... */
 		m_iodev_read_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this},
 		m_iodev_write_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this},
@@ -117,6 +118,10 @@ void patinho_feio_cpu_device::device_start()
 		m_rc_read_cb.resolve();
 	}
 
+	if (!m_buttons_read_cb.isnull()){
+		m_buttons_read_cb.resolve();
+	}
+
 	for (int i=0; i<16; i++){
 		if (!m_iodev_read_cb[i].isnull())
 			m_iodev_read_cb[i].resolve();        
@@ -154,10 +159,17 @@ void patinho_feio_cpu_device::execute_run()
 		((patinho_feio_state*) owner())->update_panel(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC);
 
 		if ((! m_run)){
-			m_icount = 0;   /* if processor is stopped, just burn cycles */
+			if (!m_buttons_read_cb.isnull() && (m_buttons_read_cb(0) & 0x01)){
+				//if PARTIDA ("startup") button is pressed:
+				m_run = true;
+			} else {
+				m_icount = 0;   /* if processor is stopped, just burn cycles */
+			}
 		} else {
 			m_ext = READ_ACC_EXTENSION_REG();
 			m_idx = READ_INDEX_REG();
+
+
 
 			debugger_instruction_hook(this, PC);
 			execute_instruction();
@@ -176,6 +188,7 @@ void patinho_feio_cpu_device::execute_instruction()
 	unsigned char value, channel, function;
 	m_opcode = READ_BYTE_PATINHO(PC);
 	INCREMENT_PC_4K;
+
 
 	if (m_scheduled_IND_bit_reset)
 		m_indirect_addressing = false;
