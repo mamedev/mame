@@ -13967,6 +13967,8 @@ ROM_END
 
   Set: Hollywood Nights.
 
+  Issues: At boot, spits "E6" on screen (5th row, 7th column).
+          Seems an error code.
 */
 ROM_START( fl7_hn )
 	ROM_REGION( 0x8000, "maincpu", 0 )
