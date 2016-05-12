@@ -13958,7 +13958,66 @@ ROM_END
 
 
 /********************** Flaming 7, from Cyberdyne Systems, Inc. ***********************
-  Looks W-4 derivative...
+
+  Flaming 7.
+  Cyberdyne Systems, Inc.
+  Looks a W-4 derivative...
+
+  Graphics: CGA
+  Reels: 3 spinning reels.
+  Lines: 8.
+  Bonus Games: Yes.
+  Harness Type: Standard 36/10 Pin Cherry Master Harness.
+
+  Titles:
+
+  - Big Bull Frog.
+  - Buffalo Bills.
+  - Cash Cabaret.
+  - Cash Cow.
+  - Cherry 50 Bonus.
+  - Cherry 500 Bonus.
+  - Cherry 1000 Bonus.
+  - Christmas.
+  - Deuces Wild.
+  - Diamond Delight.
+  - Diamond Doubles.
+  - Diamond Treasure.
+  - Dream Catcher.
+  - Dynamite Diamonds 1.
+  - Dynamite Diamonds 2.
+  - Egyptian Gold.
+  - Gold Country.
+  - Golden Treasure.
+  - Greenbacks.
+  - Harley Davidson.
+  - Hollywood Nights.
+  - Independence Day / July 4th.
+  - Jokers Wild.
+  - Midnight Sevens.
+  - Mighty Buffalo.
+  - Money.
+  - Moola.
+  - New Year's.
+  - Prospector's Gold.
+  - Red Hot Ice.
+  - Red, White & Blue 7's.
+  - Rising Star.
+  - Rockin' Reels.
+  - Rolling Thunder.
+  - Soboba Gold.
+  - Star Sevens / American Gold.
+  - Sun God.
+  - Super Stars & Stripes / American Glory Alternative.
+  - Sweet Dreams.
+  - Sweethearts & Sevens.
+  - Tropical Treasure.
+  - Vegas Classic.
+  - White Buffalo.
+  - Wild Thing.
+  - Wild Watermelons.
+  - Wild West.
+
 */
 
 /*
