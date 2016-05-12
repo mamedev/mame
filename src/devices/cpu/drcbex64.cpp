@@ -4725,22 +4725,24 @@ void drcbe_x64::op_muls(x86code *&dst, const instruction &inst)
 		// 32-bit destination with memory/immediate or register/immediate
 		if (!compute_hi && !src1p.is_immediate() && src2p.is_immediate())
 		{
+			int dstreg = dstp.is_int_register() ? dstp.ireg() : REG_EAX;
 			if (src1p.is_memory())
-				emit_imul_r32_m32_imm(dst, REG_EAX, MABS(src1p.memory()), src2p.immediate()); // imul  eax,[src1p],src2p
+				emit_imul_r32_m32_imm(dst, dstreg, MABS(src1p.memory()), src2p.immediate()); // imul  dstreg,[src1p],src2p
 			else if (src1p.is_int_register())
-				emit_imul_r32_r32_imm(dst, REG_EAX, src1p.ireg(), src2p.immediate());   // imul  eax,src1p,src2p
-			emit_mov_p32_r32(dst, dstp, REG_EAX);                                       // mov   dstp,eax
+				emit_imul_r32_r32_imm(dst, dstreg, src1p.ireg(), src2p.immediate());   // imul  dstreg,src1p,src2p
+			emit_mov_p32_r32(dst, dstp, dstreg);                                       // mov   dstp,eax
 		}
 
 		// 32-bit destination, general case
 		else if (!compute_hi)
 		{
-			emit_mov_r32_p32(dst, REG_EAX, src1p);                                      // mov   eax,src1p
+			int dstreg = dstp.is_int_register() ? dstp.ireg() : REG_EAX;
+			emit_mov_r32_p32(dst, dstreg, src1p);                                       // mov   dstreg,src1p
 			if (src2p.is_memory())
-				emit_imul_r32_m32(dst, REG_EAX, MABS(src2p.memory()));                  // imul  eax,[src2p]
+				emit_imul_r32_m32(dst, dstreg, MABS(src2p.memory()));                   // imul  dstreg,[src2p]
 			else if (src2p.is_int_register())
-				emit_imul_r32_r32(dst, REG_EAX, src2p.ireg());                          // imul  eax,src2p
-			emit_mov_p32_r32(dst, dstp, REG_EAX);                                       // mov   dstp,eax
+				emit_imul_r32_r32(dst, dstreg, src2p.ireg());                           // imul  dstreg,src2p
+			emit_mov_p32_r32(dst, dstp, dstreg);                                        // mov   dstp,dstreg
 		}
 
 		// 64-bit destination, general case
@@ -4803,22 +4805,24 @@ void drcbe_x64::op_muls(x86code *&dst, const instruction &inst)
 		// 64-bit destination with memory/immediate or register/immediate
 		if (!compute_hi && !src1p.is_immediate() && src2p.is_immediate() && short_immediate(src2p.immediate()))
 		{
+			int dstreg = dstp.is_int_register() ? dstp.ireg() : REG_RAX;
 			if (src1p.is_memory())
-				emit_imul_r64_m64_imm(dst, REG_RAX, MABS(src1p.memory()), src2p.immediate());// imul  rax,[src1p],src2p
+				emit_imul_r64_m64_imm(dst, dstreg, MABS(src1p.memory()), src2p.immediate());// imul  dstreg,[src1p],src2p
 			else if (src1p.is_int_register())
-				emit_imul_r64_r64_imm(dst, REG_RAX, src1p.ireg(), src2p.immediate());   // imul  rax,src1p,src2p
-			emit_mov_p64_r64(dst, dstp, REG_RAX);                                       // mov   dstp,rax
+				emit_imul_r64_r64_imm(dst, dstreg, src1p.ireg(), src2p.immediate());    // imul  rax,src1p,src2p
+			emit_mov_p64_r64(dst, dstp, dstreg);                                        // mov   dstp,rax
 		}
 
 		// 64-bit destination, general case
 		else if (!compute_hi)
 		{
-			emit_mov_r64_p64(dst, REG_RAX, src1p);                                      // mov   rax,src1p
+			int dstreg = dstp.is_int_register() ? dstp.ireg() : REG_RAX;
+			emit_mov_r64_p64(dst, dstreg, src1p);                                       // mov   dstreg,src1p
 			if (src2p.is_memory())
-				emit_imul_r64_m64(dst, REG_RAX, MABS(src2p.memory()));                  // imul  rax,[src2p]
+				emit_imul_r64_m64(dst, dstreg, MABS(src2p.memory()));                   // imul  dstreg,[src2p]
 			else if (src2p.is_int_register())
-				emit_imul_r64_r64(dst, REG_RAX, src2p.ireg());                          // imul  rax,src2p
-			emit_mov_p64_r64(dst, dstp, REG_RAX);                                       // mov   dstp,rax
+				emit_imul_r64_r64(dst, dstreg, src2p.ireg());                           // imul  dstreg,src2p
+			emit_mov_p64_r64(dst, dstp, dstreg);                                        // mov   dstp,dstreg
 		}
 
 		// 128-bit destination, general case
@@ -5259,6 +5263,10 @@ void drcbe_x64::op_xor(x86code *&dst, const instruction &inst)
 		else if (dstp.is_memory() && dstp == src2p)
 			emit_xor_m32_p32(dst, MABS(dstp.memory()), src1p, inst);					// xor   [dstp],src1p
 
+		// dstp == src1p register
+		else if (dstp.is_int_register() && dstp == src1p)
+			emit_xor_r32_p32(dst, dstp.ireg(), src2p, inst);							// xor   dstp,src2p
+
 		// general case
 		else
 		{
@@ -5278,6 +5286,10 @@ void drcbe_x64::op_xor(x86code *&dst, const instruction &inst)
 		// dstp == src2p in memory
 		else if (dstp.is_memory() && dstp == src2p)
 			emit_xor_m64_p64(dst, MABS(dstp.memory()), src1p, inst);					// xor   [dstp],src1p
+
+		// dstp == src1p register
+		else if (dstp.is_int_register() && dstp == src1p)
+			emit_xor_r64_p64(dst, dstp.ireg(), src2p, inst);							// xor   dstp,src2p
 
 		// general case
 		else
