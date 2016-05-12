@@ -32,6 +32,14 @@
 #define ADDRESS_MASK_4K    0xFFF
 #define INCREMENT_PC_4K    (PC = (PC+1) & ADDRESS_MASK_4K)
 
+void patinho_feio_cpu_device::set_flag(UINT8 flag, bool state){
+	if (state){
+		FLAGS |= flag;
+	} else {
+		FLAGS &= ~flag;
+	}
+}
+
 void patinho_feio_cpu_device::compute_effective_address(unsigned int addr){
 	m_addr = addr;
 	if (m_indirect_addressing){
@@ -212,9 +220,10 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0xD8:
 			//SOMI="Soma Imediato":
 			//     Add an immediate into the accumulator
+			set_flag(V, ((((INT16) ACC) + ((INT16) READ_BYTE_PATINHO(PC))) >> 8));
+			set_flag(T, ((((INT8) (ACC & 0x7F)) + ((INT8) (READ_BYTE_PATINHO(PC) & 0x7F))) >> 7) == V);
 			ACC += READ_BYTE_PATINHO(PC);
 			INCREMENT_PC_4K;
-			//TODO: update T and V flags
 			return;
 		case 0xDA:
 			//CARI="Carrega Imediato":

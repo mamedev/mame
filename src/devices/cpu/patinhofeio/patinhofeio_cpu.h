@@ -107,6 +107,7 @@ protected:
 private:
 	void execute_instruction();
 	void compute_effective_address(unsigned int addr);
+	void set_flag(UINT8 flag, bool state);
 	UINT16 read_panel_keys_register();
 	devcb_read16 m_rc_read_cb;
 	devcb_read8 m_buttons_read_cb;
