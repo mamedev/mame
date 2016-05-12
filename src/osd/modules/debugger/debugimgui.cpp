@@ -1190,8 +1190,8 @@ void debug_imgui::update()
 	bool opened;
 	int count = 0;
 	ImGui::PushStyleColor(ImGuiCol_WindowBg,ImVec4(1.0f,1.0f,1.0f,0.9f));
-	ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(0.0f,0.0f,0.0f,1.0f));
-	ImGui::PushStyleColor(ImGuiCol_TextDisabled,ImVec4(0.0f,0.0f,1.0f,1.0f));
+	//ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(0.0f,0.0f,0.0f,1.0f));
+	//ImGui::PushStyleColor(ImGuiCol_TextDisabled,ImVec4(0.0f,0.0f,1.0f,1.0f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBg,ImVec4(0.5f,0.5f,0.5f,0.9f));
 	ImGui::PushStyleColor(ImGuiCol_PopupBg,ImVec4(0.8f,0.8f,0.8f,0.9f));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab,ImVec4(0.6f,0.6f,0.6f,0.9f));
@@ -1238,7 +1238,7 @@ void debug_imgui::update()
 		view_list_remove(to_delete);
 		global_free(to_delete);
 	}
-	ImGui::PopStyleColor(8);
+	ImGui::PopStyleColor(6);
 }
 
 void debug_imgui::init_debugger(running_machine &machine)
