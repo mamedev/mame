@@ -20,7 +20,7 @@ header = '''<?xml version="1.0"?>
 
         <element name="rectangle">
           <rect>
-            <color red="0.2" green="0.8" blue="0.8" />
+            <color red="0.3" green="0.9" blue="0.6" />
           </rect>
         </element>
 
