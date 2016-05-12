@@ -137,6 +137,13 @@ static void BM_MultiThreaded(benchmark::State& state) {
   }
 }
 BENCHMARK(BM_MultiThreaded)->Threads(4);
+
+
+If a benchmark runs a few milliseconds it may be hard to visually compare the
+measured times, since the output data is given in nanoseconds per default. In
+order to manually set the time unit, you can specify it manually:
+
+BENCHMARK(BM_test)->Unit(benchmark::kMillisecond);
 */
 
 #ifndef BENCHMARK_BENCHMARK_API_H_
@@ -216,6 +223,13 @@ inline BENCHMARK_ALWAYS_INLINE void DoNotOptimize(Tp const& value) {
 }
 #endif
 
+// TimeUnit is passed to a benchmark in order to specify the order of magnitude
+// for the measured time.
+enum TimeUnit {
+  kNanosecond,
+  kMicrosecond,
+  kMillisecond
+};
 
 // State is passed to a running Benchmark and contains state for the
 // benchmark to use.
@@ -269,6 +283,17 @@ public:
   // within each benchmark iteration, if possible.
   void ResumeTiming();
 
+  // REQUIRES: called exactly once per iteration of the KeepRunning loop.
+  // Set the manually measured time for this benchmark iteration, which
+  // is used instead of automatically measured time if UseManualTime() was
+  // specified.
+  //
+  // For threaded benchmarks the SetIterationTime() function acts
+  // like a barrier.  I.e., the ith call by a particular thread to this
+  // function will block until all threads have made their ith call.
+  // The time will be set by the last thread to call this function.
+  void SetIterationTime(double seconds);
+
   // Set the number of bytes processed by the current benchmark
   // execution.  This routine is typically called once at the end of a
   // throughput oriented benchmark.  If this routine is called with a
@@ -305,10 +330,10 @@ public:
   // If this routine is called, the specified label is printed at the
   // end of the benchmark report line for the currently executing
   // benchmark.  Example:
-  //  static void BM_Compress(int iters) {
+  //  static void BM_Compress(benchmark::State& state) {
   //    ...
   //    double compress = input_size / output_size;
-  //    benchmark::SetLabel(StringPrintf("compress:%.1f%%", 100.0*compression));
+  //    state.SetLabel(StringPrintf("compress:%.1f%%", 100.0*compression));
   //  }
   // Produces output that looks like:
   //  BM_Compress   50         50   14115038  compress:27.3%
@@ -390,6 +415,9 @@ public:
   // REQUIRES: The function passed to the constructor must accept an arg1.
   Benchmark* Arg(int x);
 
+  // Run this benchmark with the given time unit for the generated output report
+  Benchmark* Unit(TimeUnit unit);
+
   // Run this benchmark once for a number of values picked from the
   // range [start..limit].  (start and limit are always picked.)
   // REQUIRES: The function passed to the constructor must accept an arg1.
@@ -426,6 +454,13 @@ public:
   // run, and in the printing of items/second or MB/seconds values.  If not
   // called, the cpu time used by the benchmark will be used.
   Benchmark* UseRealTime();
+
+  // If a benchmark must measure time manually (e.g. if GPU execution time is being
+  // measured), call this method. If called, each benchmark iteration should call
+  // SetIterationTime(seconds) to report the measured time, which will be used
+  // to control how many iterations are run, and in the printing of items/second
+  // or MB/second values.
+  Benchmark* UseManualTime();
 
   // Support for running multiple copies of the same benchmark concurrently
   // in multiple threads.  This may be useful when measuring the scaling
@@ -534,6 +569,7 @@ protected:
 // Old-style macros
 #define BENCHMARK_WITH_ARG(n, a) BENCHMARK(n)->Arg((a))
 #define BENCHMARK_WITH_ARG2(n, a1, a2) BENCHMARK(n)->ArgPair((a1), (a2))
+#define BENCHMARK_WITH_UNIT(n, t) BENCHMARK(n)->Unit((t))
 #define BENCHMARK_RANGE(n, lo, hi) BENCHMARK(n)->Range((lo), (hi))
 #define BENCHMARK_RANGE2(n, l1, h1, l2, h2) \
   BENCHMARK(n)->RangePair((l1), (h1), (l2), (h2))

@@ -64,9 +64,9 @@ DEFINE_int32(benchmark_repetitions, 1,
              "The number of runs of each benchmark. If greater than 1, the "
              "mean and standard deviation of the runs will be reported.");
 
-DEFINE_string(benchmark_format, "tabular",
+DEFINE_string(benchmark_format, "console",
               "The format to use for console output. Valid values are "
-              "'tabular', 'json', or 'csv'.");
+              "'console', 'json', or 'csv'.");
 
 DEFINE_bool(color_print, true, "Enables colorized logging.");
 
@@ -130,6 +130,7 @@ class TimerManager {
         running_(false),
         real_time_used_(0),
         cpu_time_used_(0),
+        manual_time_used_(0),
         num_finalized_(0),
         phase_number_(0),
         entered_(0) {
@@ -170,6 +171,21 @@ class TimerManager {
   }
 
   // Called by each thread
+  void SetIterationTime(double seconds) EXCLUDES(lock_) {
+    bool last_thread = false;
+    {
+      MutexLock ml(lock_);
+      last_thread = Barrier(ml);
+      if (last_thread) {
+        manual_time_used_ += seconds;
+      }
+    }
+    if (last_thread) {
+      phase_condition_.notify_all();
+    }
+  }
+
+  // Called by each thread
   void Finalize() EXCLUDES(lock_) {
     MutexLock l(lock_);
     num_finalized_++;
@@ -194,6 +210,13 @@ class TimerManager {
     return cpu_time_used_;
   }
 
+  // REQUIRES: timer is not running
+  double manual_time_used() EXCLUDES(lock_) {
+    MutexLock l(lock_);
+    CHECK(!running_);
+    return manual_time_used_;
+  }
+
  private:
   Mutex lock_;
   Condition phase_condition_;
@@ -207,6 +230,8 @@ class TimerManager {
   // Accumulated time so far (does not contain current slice if running_)
   double real_time_used_;
   double cpu_time_used_;
+  // Manually set iteration time. User sets this with SetIterationTime(seconds).
+  double manual_time_used_;
 
   // How many threads have called Finalize()
   int num_finalized_;
@@ -261,7 +286,9 @@ struct Benchmark::Instance {
   int            arg1;
   bool           has_arg2;
   int            arg2;
+  TimeUnit       time_unit;
   bool           use_real_time;
+  bool           use_manual_time;
   double         min_time;
   int            threads;    // Number of concurrent threads to use
   bool           multithreaded;  // Is benchmark multi-threaded?
@@ -294,12 +321,14 @@ public:
   ~BenchmarkImp();
 
   void Arg(int x);
+  void Unit(TimeUnit unit);
   void Range(int start, int limit);
   void DenseRange(int start, int limit);
   void ArgPair(int start, int limit);
   void RangePair(int lo1, int hi1, int lo2, int hi2);
   void MinTime(double n);
   void UseRealTime();
+  void UseManualTime();
   void Threads(int t);
   void ThreadRange(int min_threads, int max_threads);
   void ThreadPerCpu();
@@ -313,8 +342,10 @@ private:
   std::string name_;
   int arg_count_;
   std::vector< std::pair<int, int> > args_;  // Args for all benchmark runs
+  TimeUnit time_unit_;
   double min_time_;
   bool use_real_time_;
+  bool use_manual_time_;
   std::vector<int> thread_counts_;
 
   BenchmarkImp& operator=(BenchmarkImp const&);
@@ -372,8 +403,10 @@ bool BenchmarkFamilies::FindBenchmarks(
         instance.arg1 = args.first;
         instance.has_arg2 = family->arg_count_ == 2;
         instance.arg2 = args.second;
+        instance.time_unit = family->time_unit_;
         instance.min_time = family->min_time_;
         instance.use_real_time = family->use_real_time_;
+        instance.use_manual_time = family->use_manual_time_;
         instance.threads = num_threads;
         instance.multithreaded = !(family->thread_counts_.empty());
 
@@ -387,7 +420,9 @@ bool BenchmarkFamilies::FindBenchmarks(
         if (!IsZero(family->min_time_)) {
           instance.name +=  StringPrintF("/min_time:%0.3f",  family->min_time_);
         }
-        if (family->use_real_time_) {
+        if (family->use_manual_time_) {
+          instance.name +=  "/manual_time";
+        } else if (family->use_real_time_) {
           instance.name +=  "/real_time";
         }
 
@@ -406,8 +441,9 @@ bool BenchmarkFamilies::FindBenchmarks(
 }
 
 BenchmarkImp::BenchmarkImp(const char* name)
-    : name_(name), arg_count_(-1),
-      min_time_(0.0), use_real_time_(false) {
+    : name_(name), arg_count_(-1), time_unit_(kNanosecond),
+      min_time_(0.0), use_real_time_(false),
+      use_manual_time_(false) {
 }
 
 BenchmarkImp::~BenchmarkImp() {
@@ -417,6 +453,10 @@ void BenchmarkImp::Arg(int x) {
   CHECK(arg_count_ == -1 || arg_count_ == 1);
   arg_count_ = 1;
   args_.emplace_back(x, -1);
+}
+
+void BenchmarkImp::Unit(TimeUnit unit) {
+  time_unit_ = unit;
 }
 
 void BenchmarkImp::Range(int start, int limit) {
@@ -466,7 +506,13 @@ void BenchmarkImp::MinTime(double t) {
 }
 
 void BenchmarkImp::UseRealTime() {
+  CHECK(!use_manual_time_) << "Cannot set UseRealTime and UseManualTime simultaneously.";
   use_real_time_ = true;
+}
+
+void BenchmarkImp::UseManualTime() {
+  CHECK(!use_real_time_) << "Cannot set UseRealTime and UseManualTime simultaneously.";
+  use_manual_time_ = true;
 }
 
 void BenchmarkImp::Threads(int t) {
@@ -531,6 +577,11 @@ Benchmark* Benchmark::Arg(int x) {
   return this;
 }
 
+Benchmark* Benchmark::Unit(TimeUnit unit) {
+  imp_->Unit(unit);
+  return this;
+}
+
 Benchmark* Benchmark::Range(int start, int limit) {
   imp_->Range(start, limit);
   return this;
@@ -563,6 +614,11 @@ Benchmark* Benchmark::MinTime(double t) {
 
 Benchmark* Benchmark::UseRealTime() {
   imp_->UseRealTime();
+  return this;
+}
+
+Benchmark* Benchmark::UseManualTime() {
+  imp_->UseManualTime();
   return this;
 }
 
@@ -647,7 +703,7 @@ void RunBenchmark(const benchmark::internal::Benchmark::Instance& b,
             thread.join();
         }
         for (std::size_t ti = 0; ti < pool.size(); ++ti) {
-            pool[ti] = std::thread(&RunInThread, &b, iters, ti, &total);
+            pool[ti] = std::thread(&RunInThread, &b, iters, static_cast<int>(ti), &total);
         }
       } else {
         // Run directly in this thread
@@ -658,6 +714,7 @@ void RunBenchmark(const benchmark::internal::Benchmark::Instance& b,
 
       const double cpu_accumulated_time = timer_manager->cpu_time_used();
       const double real_accumulated_time = timer_manager->real_time_used();
+      const double manual_accumulated_time = timer_manager->manual_time_used();
       timer_manager.reset();
 
       VLOG(2) << "Ran in " << cpu_accumulated_time << "/"
@@ -665,7 +722,9 @@ void RunBenchmark(const benchmark::internal::Benchmark::Instance& b,
 
       // Base decisions off of real time if requested by this benchmark.
       double seconds = cpu_accumulated_time;
-      if (b.use_real_time) {
+      if (b.use_manual_time) {
+          seconds = manual_accumulated_time;
+      } else if (b.use_real_time) {
           seconds = real_accumulated_time;
       }
 
@@ -699,7 +758,12 @@ void RunBenchmark(const benchmark::internal::Benchmark::Instance& b,
         report.report_label = label;
         // Report the total iterations across all threads.
         report.iterations = static_cast<int64_t>(iters) * b.threads;
-        report.real_accumulated_time = real_accumulated_time;
+        report.time_unit = b.time_unit;
+        if (b.use_manual_time) {
+          report.real_accumulated_time = manual_accumulated_time;
+        } else {
+          report.real_accumulated_time = real_accumulated_time;
+        }
         report.cpu_accumulated_time = cpu_accumulated_time;
         report.bytes_per_second = bytes_per_second;
         report.items_per_second = items_per_second;
@@ -760,6 +824,12 @@ void State::ResumeTiming() {
   timer_manager->StartTimer();
 }
 
+void State::SetIterationTime(double seconds)
+{
+  CHECK(running_benchmark);
+  timer_manager->SetIterationTime(seconds);
+}
+
 void State::SetLabel(const char* label) {
   CHECK(running_benchmark);
   MutexLock l(GetBenchmarkLock());
@@ -814,7 +884,7 @@ void RunMatchingBenchmarks(const std::string& spec,
 
 std::unique_ptr<BenchmarkReporter> GetDefaultReporter() {
   typedef std::unique_ptr<BenchmarkReporter> PtrType;
-  if (FLAGS_benchmark_format == "tabular") {
+  if (FLAGS_benchmark_format == "console") {
     return PtrType(new ConsoleReporter);
   } else if (FLAGS_benchmark_format == "json") {
     return PtrType(new JSONReporter);
@@ -860,7 +930,7 @@ void PrintUsageAndExit() {
           "          [--benchmark_filter=<regex>]\n"
           "          [--benchmark_min_time=<min_time>]\n"
           "          [--benchmark_repetitions=<num_repetitions>]\n"
-          "          [--benchmark_format=<tabular|json|csv>]\n"
+          "          [--benchmark_format=<console|json|csv>]\n"
           "          [--color_print={true|false}]\n"
           "          [--v=<verbosity>]\n");
   exit(0);
@@ -891,7 +961,8 @@ void ParseCommandLineFlags(int* argc, char** argv) {
       PrintUsageAndExit();
     }
   }
-  if (FLAGS_benchmark_format != "tabular" &&
+
+  if (FLAGS_benchmark_format != "console" &&
       FLAGS_benchmark_format != "json" &&
       FLAGS_benchmark_format != "csv") {
     PrintUsageAndExit();

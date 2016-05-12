@@ -14,6 +14,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <chrono>
+#include <thread>
 
 #if defined(__GNUC__)
 # define BENCHMARK_NOINLINE __attribute__((noinline))
@@ -173,6 +175,32 @@ static void BM_ParallelMemset(benchmark::State& state) {
   }
 }
 BENCHMARK(BM_ParallelMemset)->Arg(10 << 20)->ThreadRange(1, 4);
+
+static void BM_ManualTiming(benchmark::State& state) {
+  size_t slept_for = 0;
+  int microseconds = state.range_x();
+  std::chrono::duration<double, std::micro> sleep_duration {
+    static_cast<double>(microseconds)
+  };
+
+  while (state.KeepRunning()) {
+    auto start   = std::chrono::high_resolution_clock::now();
+    // Simulate some useful workload with a sleep
+    std::this_thread::sleep_for(std::chrono::duration_cast<
+      std::chrono::nanoseconds>(sleep_duration));
+    auto end     = std::chrono::high_resolution_clock::now();
+
+    auto elapsed =
+      std::chrono::duration_cast<std::chrono::duration<double>>(
+        end - start);
+
+    state.SetIterationTime(elapsed.count());
+    slept_for += microseconds;
+  }
+  state.SetItemsProcessed(slept_for);
+}
+BENCHMARK(BM_ManualTiming)->Range(1, 1 << 14)->UseRealTime();
+BENCHMARK(BM_ManualTiming)->Range(1, 1 << 14)->UseManualTime();
 
 BENCHMARK_MAIN()
 

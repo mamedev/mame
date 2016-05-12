@@ -386,6 +386,23 @@ namespace bx
 		va_end(argList);
 	}
 
+	/// Replace all instances of substring.
+	template <typename Ty>
+	inline Ty replaceAll(const Ty& _str, const char* _from, const char* _to)
+	{
+		Ty str = _str;
+		size_t startPos = 0;
+		const size_t fromLen = strlen(_from);
+		const size_t toLen   = strlen(_to);
+		while ( (startPos = str.find(_from, startPos) ) != Ty::npos)
+		{
+			str.replace(startPos, fromLen, _to);
+			startPos += toLen;
+		}
+
+		return str;
+	}
+
 	/// Extract base file name from file path.
 	inline const char* baseName(const char* _filePath)
 	{

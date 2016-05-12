@@ -22,6 +22,8 @@
 
 namespace benchmark {
 
+typedef std::pair<const char*,double> TimeUnitMultiplier;
+
 // Interface for custom benchmark result printers.
 // By default, benchmark reports are printed to stdout. However an application
 // can control the destination of the reports by calling
@@ -41,6 +43,7 @@ class BenchmarkReporter {
   struct Run {
     Run() :
       iterations(1),
+      time_unit(kNanosecond),
       real_accumulated_time(0),
       cpu_accumulated_time(0),
       bytes_per_second(0),
@@ -50,6 +53,7 @@ class BenchmarkReporter {
     std::string benchmark_name;
     std::string report_label;  // Empty if not set by benchmark.
     int64_t iterations;
+    TimeUnit time_unit;
     double real_accumulated_time;
     double cpu_accumulated_time;
 
@@ -81,7 +85,8 @@ class BenchmarkReporter {
 
   virtual ~BenchmarkReporter();
 protected:
-    static void ComputeStats(std::vector<Run> const& reports, Run* mean, Run* stddev);
+  static void ComputeStats(std::vector<Run> const& reports, Run* mean, Run* stddev);
+  static TimeUnitMultiplier GetTimeUnitAndMultiplier(TimeUnit unit);
 };
 
 // Simple reporter that outputs benchmark data to the console. This is the
@@ -90,7 +95,8 @@ class ConsoleReporter : public BenchmarkReporter {
  public:
   virtual bool ReportContext(const Context& context);
   virtual void ReportRuns(const std::vector<Run>& reports);
-protected:
+
+ protected:
   virtual void PrintRunData(const Run& report);
 
   size_t name_field_width_;

@@ -168,9 +168,9 @@ function toolchain(_buildDir, _libDir)
 				print("Set EMSCRIPTEN enviroment variable.")
 			end
 
-			premake.gcc.cc   = "$(EMSCRIPTEN)/emcc"
-			premake.gcc.cxx  = "$(EMSCRIPTEN)/em++"
-			premake.gcc.ar   = "$(EMSCRIPTEN)/emar"
+			premake.gcc.cc   = "\"$(EMSCRIPTEN)/emcc\""
+			premake.gcc.cxx  = "\"$(EMSCRIPTEN)/em++\""
+			premake.gcc.ar   = "\"$(EMSCRIPTEN)/emar\""
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-asmjs"))
 
@@ -428,6 +428,7 @@ function toolchain(_buildDir, _libDir)
 		"NoRTTI",
 		"NoExceptions",
 		"NoEditAndContinue",
+		"NoFramePointer",
 		"Symbols",
 	}
 
@@ -466,8 +467,9 @@ function toolchain(_buildDir, _libDir)
 			"_CRT_SECURE_NO_DEPRECATE",
 		}
 		buildoptions {
-			"/Oy-", -- Suppresses creation of frame pointers on the call stack.
-			"/Ob2", -- The Inline Function Expansion
+			"/wd4201", -- warning C4201: nonstandard extension used: nameless struct/union
+			"/wd4324", -- warning C4324: '': structure was padded due to alignment specifier
+			"/Ob2",    -- The Inline Function Expansion
 		}
 		linkoptions {
 			"/ignore:4221", -- LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
@@ -840,8 +842,8 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "asmjs/obj"))
 		libdirs { path.join(_libDir, "lib/asmjs") }
 		buildoptions {
-			"-isystem$(EMSCRIPTEN)/system/include",
-			"-isystem$(EMSCRIPTEN)/system/include/libc",
+			"-i\"system$(EMSCRIPTEN)/system/include\"",
+			"-i\"system$(EMSCRIPTEN)/system/include/libc\"",
 			"-Wunused-value",
 			"-Wundef",
 		}
@@ -1223,7 +1225,7 @@ function strip()
 	configuration { "asmjs" }
 		postbuildcommands {
 			"$(SILENT) echo Running asmjs finalize.",
-			"$(SILENT) $(EMSCRIPTEN)/emcc -O2 "
+			"$(SILENT) \"$(EMSCRIPTEN)/emcc\" -O2 "
 --				.. "-s EMTERPRETIFY=1 "
 --				.. "-s EMTERPRETIFY_ASYNC=1 "
 				.. "-s TOTAL_MEMORY=268435456 "
