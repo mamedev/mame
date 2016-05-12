@@ -14743,7 +14743,7 @@ GAME(  1991, megaline,  0,        megaline, megaline, driver_device,  0,        
 GAMEL( 1993, bingowng,  0,        bingowng, bingowng, driver_device,  0,         ROT0, "Wing Co., Ltd.",    "Bingo (set 1)",                                            0,                     layout_bingowng )
 GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,driver_device,  0,         ROT0, "Wing Co., Ltd.",    "Bingo (set 2)",                                            0,                     layout_bingowng )
 
-GAME(  199?, fl7_hn,    0       , lucky8,   flaming7, driver_device,  0,         ROT0, "<unknown>",         "Flaming 7 - Hollywood Nights",                             MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )
+GAME(  199?, fl7_hn,    0       , lucky8,   flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 - Hollywood Nights",                             MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )
 
 
 // --- Wing W-8 hardware ---
