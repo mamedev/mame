@@ -8,13 +8,13 @@ IBM 3153 Terminal.
 
 A green-screen terminal with a beeper.
 Chip complement:
-U1    K6T0808C10-0870 (32k static ram)
+U1    K6T0808C10-DB70 (32k static ram)
 U2    D-80C32-16 (cpu)
 U3    DM74LS373N
 U5    LM339N
 U6    DM74LS125AN
-U7    K6T0808C10-0870 (ram)
-U8    K6T0808C10-0870 (ram)
+U7    K6T0808C10-DB70 (ram)
+U8    K6T0808C10-DB70 (ram)
 U9    598-0013040 6491 3.19 (boot rom)
 U10   DS1488N
 U11   74LS377N
