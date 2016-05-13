@@ -15,7 +15,8 @@ class metlfrzr_state : public driver_device
 public:
 	metlfrzr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
 		{ }
 
 	virtual void machine_start() override;
@@ -23,6 +24,7 @@ public:
 	virtual void video_start() override;
 	UINT32 screen_update_metlfrzr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	DECLARE_DRIVER_INIT(metlfrzr);
 };
@@ -40,6 +42,10 @@ UINT32 metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_ind1
 
 static ADDRESS_MAP_START( metlfrzr_map, AS_PROGRAM, 8, metlfrzr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, metlfrzr_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
 
@@ -96,6 +102,7 @@ static MACHINE_CONFIG_START(metlfrzr, metlfrzr_state)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(metlfrzr_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	//  MCFG_CPU_VBLANK_INT_DRIVER("screen", metlfrzr_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
@@ -164,24 +171,32 @@ ROM_END
 
 DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	// same as cshooter.cpp
+	UINT8 *rom = memregion("maincpu")->base();
 
-	for (int i = 0;i < 0x8000;i++)
+	for (int A = 0x0000;A < 0x8000;A++)
 	{
+		/* decode the opcodes */
+		m_decrypted_opcodes[A] = rom[A];
 
+		if (BIT(A,5) && !BIT(A,3))
+			m_decrypted_opcodes[A] ^= 0x40;
 
-		if ( (i & 0x20) == 0x20)
-		{
-			ROM[i] ^= 0x40;
+		if (BIT(A,10) && !BIT(A,9) && BIT(A,3))
+			m_decrypted_opcodes[A] ^= 0x20;
 
-		}
-		else
-		{
-			//		61 70 45 44 49 54
-			//      to
-			//		43 52 45 44 49 54
-			ROM[i] = BITSWAP8(ROM[i], 7, 6, 1, 4, 3, 2, 5, 0);
-		}			
+		if ((BIT(A,10) ^ BIT(A,9)) && BIT(A,1))
+			m_decrypted_opcodes[A] ^= 0x02;
+
+		if (BIT(A,9) || !BIT(A,5) || BIT(A,3))
+			m_decrypted_opcodes[A] = BITSWAP8(m_decrypted_opcodes[A],7,6,1,4,3,2,5,0);
+
+		/* decode the data */
+		if (BIT(A,5))
+			rom[A] ^= 0x40;
+
+		if (BIT(A,9) || !BIT(A,5))
+			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
 	}
 }
 
