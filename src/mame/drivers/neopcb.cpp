@@ -65,7 +65,6 @@ INPUT_PORTS_END
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 
 
-#define NO_DELTAT_REGION
 
 
 
@@ -101,8 +100,6 @@ ROM_START( ms5pcb ) /* Encrypted Set, JAMMA PCB */
 	ROM_REGION( 0x1000000, "ymsnd", 0 )
 	/* Encrypted */
 	ROM_LOAD( "268-v1.v1", 0x000000, 0x1000000, CRC(8458afe5) SHA1(62b4c6e7db763e9ff2697bbcdb43dc5a56b48c68) )
-
-	NO_DELTAT_REGION
 
 	ROM_REGION( 0x4000000, "sprites", 0 )
 	/* Encrypted */
@@ -219,8 +216,6 @@ ROM_START( kf2k3pcb ) /* Encrypted Set, JAMMA PCB */
 	ROM_REGION( 0x1000000, "ymsnd", 0 )
 	/* Encrypted */
 	ROM_LOAD( "271-v1.v1", 0x000000, 0x1000000, CRC(1d96154b) SHA1(1d4e262b0d30cee79a4edc83bb9706023c736668) )
-
-	NO_DELTAT_REGION
 
 	ROM_REGION( 0x6000000, "sprites", 0 )
 	/* Encrypted */
