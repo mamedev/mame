@@ -14031,10 +14031,12 @@ ROM_END
   Flaming 7
   Cyberdyne Systems, Inc.
 
-  Set: Hollywood Nights.
+  GFX sets:
+  1) Red, White & Blue 7's
+  2) Hollywood Nights.
 
-  Issues: At boot, spits "E6" on screen (5th row, 7th column).
-          Seems an error code.
+  Issues: At boot, writes "E6" on screen (5th row, 7th column).
+          Looks like an error code.
 
   To boot the first time, press the BET button, and then STATS/SETUP twice.
   For further boots, just press BET button. (the real hardware boots straight)
@@ -14813,7 +14815,7 @@ GAME(  1991, megaline,  0,        megaline, megaline, driver_device,  0,        
 GAMEL( 1993, bingowng,  0,        bingowng, bingowng, driver_device,  0,         ROT0, "Wing Co., Ltd.",    "Bingo (set 1)",                                            0,                     layout_bingowng )
 GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,driver_device,  0,         ROT0, "Wing Co., Ltd.",    "Bingo (set 2)",                                            0,                     layout_bingowng )
 
-GAME(  199?, fl7_hn,    0       , lucky8,   flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 - Hollywood Nights",                             MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )
+GAME(  199?, fl7_hn,    0       , lucky8,   flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 - Red, White & Blue 7's / Hollywood Nights",     MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )
 
 
 // --- Wing W-8 hardware ---
