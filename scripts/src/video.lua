@@ -306,18 +306,6 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/hd63484.h,VIDEOS["HD63484"] = true
---------------------------------------------------
-
-if (VIDEOS["HD63484"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/hd63484.cpp",
-		MAME_DIR .. "src/devices/video/hd63484.h",
-	}
-end
-
---------------------------------------------------
---
 --@src/devices/video/hd66421.h,VIDEOS["HD66421"] = true
 --------------------------------------------------
 
