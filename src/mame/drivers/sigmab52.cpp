@@ -16,10 +16,6 @@
   * Super 8 Ways FC (DB98103-011, Fruit combination),                   1989, Sigma.
 
 
-  The HD63484 ACRTC support is a bit hacky and incomplete,
-  due to its preliminary emulation state.
-
-
 *******************************************************************************
 
   Hardware Notes:
@@ -133,7 +129,7 @@
 #include "machine/6850acia.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
-#include "video/h63484.h"
+#include "video/hd63484.h"
 
 #include "sigmab52.lh"
 
@@ -320,8 +316,8 @@ static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 
 	AM_RANGE(0xf720, 0xf727) AM_DEVREADWRITE("6840ptm_1", ptm6840_device, read, write)
 
-	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", h63484_device, status_r, address_w)
-	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", h63484_device, data_r, data_w)
+	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
+	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 
 	AM_RANGE(0xf740, 0xf740) AM_READ(in0_r)
 	AM_RANGE(0xf741, 0xf741) AM_READ_PORT("IN1")
@@ -600,10 +596,10 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 544-1, 0, 436-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", h63484_device, update_screen)
+	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_H63484_ADD("hd63484", SEC_CLOCK, jwildb52_hd63484_map)
+	MCFG_HD63484_ADD("hd63484", SEC_CLOCK, jwildb52_hd63484_map)
 
 	MCFG_PALETTE_ADD("palette", 16)
 

@@ -9,48 +9,48 @@
 
 #pragma once
 
-#ifndef __H63484__
-#define __H63484__
+#ifndef __HD63484__
+#define __HD63484__
 
 
 #include "emu.h"
 
 
-typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, UINT16 data)> h63484_display_delegate;
+typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, UINT16 data)> hd63484_display_delegate;
 
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_H63484_ADD(_tag, _clock, _map) \
-	MCFG_DEVICE_ADD(_tag, H63484, _clock) \
+#define MCFG_HD63484_ADD(_tag, _clock, _map) \
+	MCFG_DEVICE_ADD(_tag, HD63484, _clock) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
 
-#define MCFG_H63484_ADDRESS_MAP(_map) \
+#define MCFG_HD63484_ADDRESS_MAP(_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
 
-#define MCFG_H63484_DISPLAY_CALLBACK_OWNER(_class, _method) \
-	h63484_device::static_set_display_callback(*device, h63484_display_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+#define MCFG_HD63484_DISPLAY_CALLBACK_OWNER(_class, _method) \
+	hd63484_device::static_set_display_callback(*device, hd63484_display_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
-#define MCFG_H63484_AUTO_CONFIGURE_SCREEN(_val) \
-	h63484_device::static_set_auto_configure_screen(*device, _val);
+#define MCFG_HD63484_AUTO_CONFIGURE_SCREEN(_val) \
+	hd63484_device::static_set_auto_configure_screen(*device, _val);
 
-#define H63484_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, UINT16 data)
+#define HD63484_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, UINT16 data)
 
 
-// ======================> h63484_device
+// ======================> hd63484_device
 
-class h63484_device :   public device_t,
+class hd63484_device :   public device_t,
 						public device_memory_interface,
 						public device_video_interface
 {
 public:
 	// construction/destruction
-	h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_display_callback(device_t &device, h63484_display_delegate callback) { downcast<h63484_device &>(device).m_display_cb = callback; }
-	static void static_set_auto_configure_screen(device_t &device, bool auto_configure_screen) { downcast<h63484_device &>(device).m_auto_configure_screen = auto_configure_screen; }
+	static void static_set_display_callback(device_t &device, hd63484_display_delegate callback) { downcast<hd63484_device &>(device).m_display_cb = callback; }
+	static void static_set_auto_configure_screen(device_t &device, bool auto_configure_screen) { downcast<hd63484_device &>(device).m_auto_configure_screen = auto_configure_screen; }
 
 	DECLARE_WRITE16_MEMBER( address_w );
 	DECLARE_WRITE16_MEMBER( data_w );
@@ -116,7 +116,7 @@ private:
 
 	void register_save_state();
 
-	h63484_display_delegate  m_display_cb;
+	hd63484_display_delegate  m_display_cb;
 	bool m_auto_configure_screen;
 
 	UINT8 m_ar;
@@ -189,6 +189,6 @@ private:
 };
 
 // device type definition
-extern const device_type H63484;
+extern const device_type HD63484;
 
-#endif /* __H63484_H__ */
+#endif /* __HD63484_H__ */

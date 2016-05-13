@@ -2,34 +2,27 @@
 // copyright-holders:Angelo Salese, Sandro Ronco
 /***************************************************************************
 
-    HD63484 ACRTC (rewrite in progress)
+    HD63484 ACRTC
 
     TODO:
-    - 8-bit support for FIFO, parameters and command values
     - execution cycles;
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "h63484.h"
+#include "hd63484.h"
 
 #define LOG 0
 #define FIFO_LOG 0
 #define CMD_LOG 0
 
-// default address map
-static ADDRESS_MAP_START( h63484_vram, AS_0, 16, h63484_device )
-//  AM_RANGE(0x00000, 0x7ffff) AM_RAM
-//  AM_RANGE(0x80000, 0xfffff) AM_NOP
-ADDRESS_MAP_END
-
 
 //-------------------------------------------------
-//  h63484_device - constructor
+//  hd63484_device - constructor
 //-------------------------------------------------
 
-h63484_device::h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, H63484, "HD63484 CRTC", tag, owner, clock, "hd63484", __FILE__),
+hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, HD63484, "HD63484 CRTC", tag, owner, clock, "hd63484", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_auto_configure_screen(true),
@@ -46,7 +39,7 @@ h63484_device::h63484_device(const machine_config &mconfig, const char *tag, dev
 	m_cl0(0),
 	m_cl1(0), m_ccmp(0), m_mask(0), m_cpx(0),
 	m_dcr(0),
-	m_space_config("videoram", ENDIANNESS_BIG, 16, 20, -1, nullptr, *ADDRESS_MAP_NAME(h63484_vram))
+	m_space_config("videoram", ENDIANNESS_BIG, 16, 20, -1)
 {
 }
 
@@ -63,14 +56,14 @@ enum
 	FIFO_COMMAND
 };
 
-#define H63484_SR_CER 0x80 // Command Error
-#define H63484_SR_ARD 0x40 // Area Detect
-#define H63484_SR_CED 0x20 // Command End
-#define H63484_SR_LPD 0x10 // Light Pen Strobe Detect
-#define H63484_SR_RFF 0x08 // Read FIFO Full
-#define H63484_SR_RFR 0x04 // Read FIFO Ready
-#define H63484_SR_WFR 0x02 // Write FIFO Ready
-#define H63484_SR_WFE 0x01 // Write FIFO Empty
+#define HD63484_SR_CER 0x80 // Command Error
+#define HD63484_SR_ARD 0x40 // Area Detect
+#define HD63484_SR_CED 0x20 // Command End
+#define HD63484_SR_LPD 0x10 // Light Pen Strobe Detect
+#define HD63484_SR_RFF 0x08 // Read FIFO Full
+#define HD63484_SR_RFR 0x04 // Read FIFO Ready
+#define HD63484_SR_WFR 0x02 // Write FIFO Ready
+#define HD63484_SR_WFE 0x01 // Write FIFO Empty
 
 
 static const char *const acrtc_regnames[0x100/2] =
@@ -290,57 +283,57 @@ enum
 	COMMAND_RGCPY
 };
 
-#define H63484_COMMAND_ORG      0x0400  //              p: 2
-#define H63484_COMMAND_WPR      0x0800  // & ~0x1f      p: 1
-#define H63484_COMMAND_RPR      0x0c00  // & ~0x1f      p: 0
-#define H63484_COMMAND_WPTN     0x1800  // & ~0xf       p: 1 + n
-#define H63484_COMMAND_RPTN     0x1c00  // & ~0xf       p: 1
-#define H63484_COMMAND_DRD      0x2400  //              p: 2
-#define H63484_COMMAND_DWT      0x2800  //              p: 2
-#define H63484_COMMAND_DMOD     0x2c00  // & ~3         p: 2
-#define H63484_COMMAND_RD       0x4400  //              p: 0
-#define H63484_COMMAND_WT       0x4800  //              p: 1
-#define H63484_COMMAND_MOD      0x4c00  // & ~3         p: 1
-#define H63484_COMMAND_CLR      0x5800  //              p: 3
-#define H63484_COMMAND_SCLR     0x5c00  // & ~3         p: 3
-#define H63484_COMMAND_CPY      0x6000  // & ~0x0f03    p: 4
-#define H63484_COMMAND_SCPY     0x7000  // & ~0x0f03    p: 4
-#define H63484_COMMAND_AMOVE    0x8000  //              p: 2
-#define H63484_COMMAND_RMOVE    0x8400  //              p: 2
-#define H63484_COMMAND_ALINE    0x8800  // & ~0x00ff    p: 2
-#define H63484_COMMAND_RLINE    0x8c00  // & ~0x00ff    p: 2
-#define H63484_COMMAND_ARCT     0x9000  // & ~0x00ff    p: 2
-#define H63484_COMMAND_RRCT     0x9400  // & ~0x00ff    p: 2
-#define H63484_COMMAND_APLL     0x9800  // & ~0x00ff    p: 1 + n
-#define H63484_COMMAND_RPLL     0x9c00  // & ~0x00ff    p: 1 + n
-#define H63484_COMMAND_APLG     0xa000  // & ~0x00ff    p: 1 + n
-#define H63484_COMMAND_RPLG     0xa400  // & ~0x00ff    p: 1 + n
-#define H63484_COMMAND_CRCL     0xa800  // & ~0x01ff    p: 1
-#define H63484_COMMAND_ELPS     0xac00  // & ~0x01ff    p: 3
-#define H63484_COMMAND_AARC     0xb000  // & ~0x01ff    p: 4
-#define H63484_COMMAND_RARC     0xb400  // & ~0x01ff    p: 4
-#define H63484_COMMAND_AEARC    0xb800  // & ~0x01ff    p: 6
-#define H63484_COMMAND_REARC    0xbc00  // & ~0x01ff    p: 6
-#define H63484_COMMAND_AFRCT    0xc000  // & ~0x00ff    p: 2
-#define H63484_COMMAND_RFRCT    0xc400  // & ~0x00ff    p: 2
-#define H63484_COMMAND_PAINT    0xc800  // & ~0x01ff    p: 0
-#define H63484_COMMAND_DOT      0xcc00  // & ~0x00ff    p: 0
-#define H63484_COMMAND_PTN      0xd000  // & ~0x0fff    p: 1
-#define H63484_COMMAND_AGCPY    0xe000  // & ~0x0fff    p: 4
-#define H63484_COMMAND_RGCPY    0xf000  // & ~0x0fff    p: 4
+#define HD63484_COMMAND_ORG      0x0400  //              p: 2
+#define HD63484_COMMAND_WPR      0x0800  // & ~0x1f      p: 1
+#define HD63484_COMMAND_RPR      0x0c00  // & ~0x1f      p: 0
+#define HD63484_COMMAND_WPTN     0x1800  // & ~0xf       p: 1 + n
+#define HD63484_COMMAND_RPTN     0x1c00  // & ~0xf       p: 1
+#define HD63484_COMMAND_DRD      0x2400  //              p: 2
+#define HD63484_COMMAND_DWT      0x2800  //              p: 2
+#define HD63484_COMMAND_DMOD     0x2c00  // & ~3         p: 2
+#define HD63484_COMMAND_RD       0x4400  //              p: 0
+#define HD63484_COMMAND_WT       0x4800  //              p: 1
+#define HD63484_COMMAND_MOD      0x4c00  // & ~3         p: 1
+#define HD63484_COMMAND_CLR      0x5800  //              p: 3
+#define HD63484_COMMAND_SCLR     0x5c00  // & ~3         p: 3
+#define HD63484_COMMAND_CPY      0x6000  // & ~0x0f03    p: 4
+#define HD63484_COMMAND_SCPY     0x7000  // & ~0x0f03    p: 4
+#define HD63484_COMMAND_AMOVE    0x8000  //              p: 2
+#define HD63484_COMMAND_RMOVE    0x8400  //              p: 2
+#define HD63484_COMMAND_ALINE    0x8800  // & ~0x00ff    p: 2
+#define HD63484_COMMAND_RLINE    0x8c00  // & ~0x00ff    p: 2
+#define HD63484_COMMAND_ARCT     0x9000  // & ~0x00ff    p: 2
+#define HD63484_COMMAND_RRCT     0x9400  // & ~0x00ff    p: 2
+#define HD63484_COMMAND_APLL     0x9800  // & ~0x00ff    p: 1 + n
+#define HD63484_COMMAND_RPLL     0x9c00  // & ~0x00ff    p: 1 + n
+#define HD63484_COMMAND_APLG     0xa000  // & ~0x00ff    p: 1 + n
+#define HD63484_COMMAND_RPLG     0xa400  // & ~0x00ff    p: 1 + n
+#define HD63484_COMMAND_CRCL     0xa800  // & ~0x01ff    p: 1
+#define HD63484_COMMAND_ELPS     0xac00  // & ~0x01ff    p: 3
+#define HD63484_COMMAND_AARC     0xb000  // & ~0x01ff    p: 4
+#define HD63484_COMMAND_RARC     0xb400  // & ~0x01ff    p: 4
+#define HD63484_COMMAND_AEARC    0xb800  // & ~0x01ff    p: 6
+#define HD63484_COMMAND_REARC    0xbc00  // & ~0x01ff    p: 6
+#define HD63484_COMMAND_AFRCT    0xc000  // & ~0x00ff    p: 2
+#define HD63484_COMMAND_RFRCT    0xc400  // & ~0x00ff    p: 2
+#define HD63484_COMMAND_PAINT    0xc800  // & ~0x01ff    p: 0
+#define HD63484_COMMAND_DOT      0xcc00  // & ~0x00ff    p: 0
+#define HD63484_COMMAND_PTN      0xd000  // & ~0x0fff    p: 1
+#define HD63484_COMMAND_AGCPY    0xe000  // & ~0x0fff    p: 4
+#define HD63484_COMMAND_RGCPY    0xf000  // & ~0x0fff    p: 4
 
 
 /*-------------------------------------------------
-    ROM( h63484 )
+    ROM( hd63484 )
 -------------------------------------------------*/
 
 // devices
-const device_type H63484 = &device_creator<h63484_device>;
+const device_type HD63484 = &device_creator<hd63484_device>;
 
 
-ROM_START( h63484 )
-	ROM_REGION( 0x100, "h63484", 0 )
-	ROM_LOAD( "h63484.bin", 0x000, 0x100, NO_DUMP ) /* internal control ROM */
+ROM_START( hd63484 )
+	ROM_REGION( 0x100, "hd63484", 0 )
+	ROM_LOAD( "hd63484.bin", 0x000, 0x100, NO_DUMP ) /* internal control ROM */
 ROM_END
 
 //-------------------------------------------------
@@ -348,7 +341,7 @@ ROM_END
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *h63484_device::memory_space_config(address_spacenum spacenum) const
+const address_space_config *hd63484_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
@@ -358,16 +351,16 @@ const address_space_config *h63484_device::memory_space_config(address_spacenum 
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *h63484_device::device_rom_region() const
+const rom_entry *hd63484_device::device_rom_region() const
 {
-	return ROM_NAME( h63484 );
+	return ROM_NAME( hd63484 );
 }
 
 //-------------------------------------------------
 //  readword - read a word at the given address
 //-------------------------------------------------
 
-inline UINT16 h63484_device::readword(offs_t address)
+inline UINT16 hd63484_device::readword(offs_t address)
 {
 	return space().read_word(address << 1);
 }
@@ -377,13 +370,13 @@ inline UINT16 h63484_device::readword(offs_t address)
 //  writeword - write a word at the given address
 //-------------------------------------------------
 
-inline void h63484_device::writeword(offs_t address, UINT16 data)
+inline void hd63484_device::writeword(offs_t address, UINT16 data)
 {
 	space().write_word(address << 1, data);
 }
 
 
-inline void h63484_device::inc_ar(int value)
+inline void hd63484_device::inc_ar(int value)
 {
 	if(m_ar & 0x80)
 	{
@@ -394,7 +387,7 @@ inline void h63484_device::inc_ar(int value)
 	}
 }
 
-inline void h63484_device::fifo_w_clear()
+inline void hd63484_device::fifo_w_clear()
 {
 	int i;
 
@@ -403,11 +396,11 @@ inline void h63484_device::fifo_w_clear()
 
 	m_fifo_ptr = -1;
 
-	m_sr |= H63484_SR_WFR;
-	m_sr |= H63484_SR_WFE;
+	m_sr |= HD63484_SR_WFR;
+	m_sr |= HD63484_SR_WFE;
 }
 
-inline void h63484_device::queue_w(UINT8 data)
+inline void hd63484_device::queue_w(UINT8 data)
 {
 	if (m_fifo_ptr < 15)
 	{
@@ -416,9 +409,9 @@ inline void h63484_device::queue_w(UINT8 data)
 		m_fifo[m_fifo_ptr] = data;
 
 		if (m_fifo_ptr == 16)
-			m_sr &= ~H63484_SR_WFR;
+			m_sr &= ~HD63484_SR_WFR;
 
-		m_sr &= ~H63484_SR_WFE;
+		m_sr &= ~HD63484_SR_WFE;
 	}
 	else
 	{
@@ -427,7 +420,7 @@ inline void h63484_device::queue_w(UINT8 data)
 	}
 }
 
-inline void h63484_device::dequeue_w(UINT8 *data)
+inline void hd63484_device::dequeue_w(UINT8 *data)
 {
 	int i;
 
@@ -442,15 +435,15 @@ inline void h63484_device::dequeue_w(UINT8 *data)
 
 		m_fifo_ptr--;
 
-		m_sr |= H63484_SR_WFR;
+		m_sr |= HD63484_SR_WFR;
 
 		if (m_fifo_ptr == -1)
-			m_sr |= H63484_SR_WFE;
+			m_sr |= HD63484_SR_WFE;
 
 	}
 }
 
-inline void h63484_device::fifo_r_clear()
+inline void hd63484_device::fifo_r_clear()
 {
 	int i;
 
@@ -459,11 +452,11 @@ inline void h63484_device::fifo_r_clear()
 
 	m_fifo_r_ptr = -1;
 
-	m_sr &= ~H63484_SR_RFR;
-	m_sr &= ~H63484_SR_RFF;
+	m_sr &= ~HD63484_SR_RFR;
+	m_sr &= ~HD63484_SR_RFF;
 }
 
-inline void h63484_device::queue_r(UINT8 data)
+inline void hd63484_device::queue_r(UINT8 data)
 {
 	if (m_fifo_r_ptr < 15)
 	{
@@ -472,9 +465,9 @@ inline void h63484_device::queue_r(UINT8 data)
 		m_fifo_r[m_fifo_r_ptr] = data;
 
 		if (m_fifo_r_ptr == 16)
-			m_sr |= H63484_SR_RFF;
+			m_sr |= HD63484_SR_RFF;
 
-		m_sr |= H63484_SR_RFR;
+		m_sr |= HD63484_SR_RFR;
 	}
 	else
 	{
@@ -483,7 +476,7 @@ inline void h63484_device::queue_r(UINT8 data)
 	}
 }
 
-inline void h63484_device::dequeue_r(UINT8 *data)
+inline void hd63484_device::dequeue_r(UINT8 *data)
 {
 	int i;
 
@@ -498,10 +491,10 @@ inline void h63484_device::dequeue_r(UINT8 *data)
 
 		m_fifo_r_ptr--;
 
-		m_sr &= ~H63484_SR_RFF;
+		m_sr &= ~HD63484_SR_RFF;
 
 		if (m_fifo_r_ptr == -1)
-			m_sr &= ~H63484_SR_RFR;
+			m_sr &= ~HD63484_SR_RFR;
 	}
 }
 
@@ -509,7 +502,7 @@ inline void h63484_device::dequeue_r(UINT8 *data)
 //  recompute_parameters -
 //-------------------------------------------------
 
-inline void h63484_device::recompute_parameters()
+inline void hd63484_device::recompute_parameters()
 {
 	if(!m_auto_configure_screen || m_hdw < 3 || m_hc == 0 || m_vc == 0) //bail out if screen params aren't valid
 		return;
@@ -541,91 +534,91 @@ inline void h63484_device::recompute_parameters()
     IMPLEMENTATION
 *****************************************************************************/
 
-int h63484_device::translate_command(UINT16 data)
+int hd63484_device::translate_command(UINT16 data)
 {
 	/* annoying switch-case sequence, but it's the only way to get invalid commands ... */
 	switch (data)
 	{
-		case H63484_COMMAND_ORG:    return COMMAND_ORG;
-		case H63484_COMMAND_DRD:    return COMMAND_DRD;
-		case H63484_COMMAND_DWT:    return COMMAND_DWT;
-		case H63484_COMMAND_RD:     return COMMAND_RD;
-		case H63484_COMMAND_WT:     return COMMAND_WT;
-		case H63484_COMMAND_CLR:    return COMMAND_CLR;
-		case H63484_COMMAND_AMOVE:  return COMMAND_AMOVE;
-		case H63484_COMMAND_RMOVE:  return COMMAND_RMOVE;
+		case HD63484_COMMAND_ORG:    return COMMAND_ORG;
+		case HD63484_COMMAND_DRD:    return COMMAND_DRD;
+		case HD63484_COMMAND_DWT:    return COMMAND_DWT;
+		case HD63484_COMMAND_RD:     return COMMAND_RD;
+		case HD63484_COMMAND_WT:     return COMMAND_WT;
+		case HD63484_COMMAND_CLR:    return COMMAND_CLR;
+		case HD63484_COMMAND_AMOVE:  return COMMAND_AMOVE;
+		case HD63484_COMMAND_RMOVE:  return COMMAND_RMOVE;
 	}
 
 	switch(data & ~0x3)
 	{
-		case H63484_COMMAND_DMOD:   return COMMAND_DMOD;
-		case H63484_COMMAND_MOD:    return COMMAND_MOD;
-		case H63484_COMMAND_SCLR:   return COMMAND_SCLR;
+		case HD63484_COMMAND_DMOD:   return COMMAND_DMOD;
+		case HD63484_COMMAND_MOD:    return COMMAND_MOD;
+		case HD63484_COMMAND_SCLR:   return COMMAND_SCLR;
 	}
 
 	switch(data & ~0xf)
 	{
-		case H63484_COMMAND_WPTN:   return COMMAND_WPTN;
-		case H63484_COMMAND_RPTN:   return COMMAND_RPTN;
+		case HD63484_COMMAND_WPTN:   return COMMAND_WPTN;
+		case HD63484_COMMAND_RPTN:   return COMMAND_RPTN;
 	}
 
 	switch(data & ~0x1f)
 	{
-		case H63484_COMMAND_WPR:    return COMMAND_WPR;
-		case H63484_COMMAND_RPR:    return COMMAND_RPR;
+		case HD63484_COMMAND_WPR:    return COMMAND_WPR;
+		case HD63484_COMMAND_RPR:    return COMMAND_RPR;
 	}
 
 	switch(data & ~0x0f03)
 	{
-		case H63484_COMMAND_CPY:    return COMMAND_CPY;
-		case H63484_COMMAND_SCPY:   return COMMAND_SCPY;
+		case HD63484_COMMAND_CPY:    return COMMAND_CPY;
+		case HD63484_COMMAND_SCPY:   return COMMAND_SCPY;
 	}
 
 	switch(data & ~0x00ff)
 	{
-		case H63484_COMMAND_ALINE:  return COMMAND_ALINE;
-		case H63484_COMMAND_RLINE:  return COMMAND_RLINE;
-		case H63484_COMMAND_ARCT:   return COMMAND_ARCT;
-		case H63484_COMMAND_RRCT:   return COMMAND_RRCT;
-		case H63484_COMMAND_APLL:   return COMMAND_APLL;
-		case H63484_COMMAND_RPLL:   return COMMAND_RPLL;
-		case H63484_COMMAND_APLG:   return COMMAND_APLG;
-		case H63484_COMMAND_RPLG:   return COMMAND_RPLG;
-		case H63484_COMMAND_AFRCT:  return COMMAND_AFRCT;
-		case H63484_COMMAND_RFRCT:  return COMMAND_RFRCT;
-		case H63484_COMMAND_DOT:    return COMMAND_DOT;
+		case HD63484_COMMAND_ALINE:  return COMMAND_ALINE;
+		case HD63484_COMMAND_RLINE:  return COMMAND_RLINE;
+		case HD63484_COMMAND_ARCT:   return COMMAND_ARCT;
+		case HD63484_COMMAND_RRCT:   return COMMAND_RRCT;
+		case HD63484_COMMAND_APLL:   return COMMAND_APLL;
+		case HD63484_COMMAND_RPLL:   return COMMAND_RPLL;
+		case HD63484_COMMAND_APLG:   return COMMAND_APLG;
+		case HD63484_COMMAND_RPLG:   return COMMAND_RPLG;
+		case HD63484_COMMAND_AFRCT:  return COMMAND_AFRCT;
+		case HD63484_COMMAND_RFRCT:  return COMMAND_RFRCT;
+		case HD63484_COMMAND_DOT:    return COMMAND_DOT;
 	}
 
 	switch(data & ~0x01ff)
 	{
-		case H63484_COMMAND_CRCL:   return COMMAND_CRCL;
-		case H63484_COMMAND_ELPS:   return COMMAND_ELPS;
-		case H63484_COMMAND_AARC:   return COMMAND_AARC;
-		case H63484_COMMAND_RARC:   return COMMAND_RARC;
-		case H63484_COMMAND_AEARC:  return COMMAND_AEARC;
-		case H63484_COMMAND_REARC:  return COMMAND_REARC;
-		case H63484_COMMAND_PAINT:  return COMMAND_PAINT;
+		case HD63484_COMMAND_CRCL:   return COMMAND_CRCL;
+		case HD63484_COMMAND_ELPS:   return COMMAND_ELPS;
+		case HD63484_COMMAND_AARC:   return COMMAND_AARC;
+		case HD63484_COMMAND_RARC:   return COMMAND_RARC;
+		case HD63484_COMMAND_AEARC:  return COMMAND_AEARC;
+		case HD63484_COMMAND_REARC:  return COMMAND_REARC;
+		case HD63484_COMMAND_PAINT:  return COMMAND_PAINT;
 	}
 
 	switch(data & ~0x0fff)
 	{
-		case H63484_COMMAND_PTN:    return COMMAND_PTN;
-		case H63484_COMMAND_AGCPY:  return COMMAND_AGCPY;
-		case H63484_COMMAND_RGCPY:  return COMMAND_RGCPY;
+		case HD63484_COMMAND_PTN:    return COMMAND_PTN;
+		case HD63484_COMMAND_AGCPY:  return COMMAND_AGCPY;
+		case HD63484_COMMAND_RGCPY:  return COMMAND_RGCPY;
 	}
 
 	return COMMAND_INVALID;
 }
 
-inline void h63484_device::command_end_seq()
+inline void hd63484_device::command_end_seq()
 {
-	//h63484->param_ptr = 0;
-	m_sr |= H63484_SR_CED;
+	//hd63484->param_ptr = 0;
+	m_sr |= HD63484_SR_CED;
 
 	/* TODO: we might need to be more aggressive and clear the params in there */
 }
 
-int h63484_device::get_bpp()
+int hd63484_device::get_bpp()
 {
 	int gbm = (m_ccr >> 8) & 0x07;
 
@@ -636,7 +629,7 @@ int h63484_device::get_bpp()
 	return 1;
 }
 
-void h63484_device::calc_offset(INT16 x, INT16 y, UINT32 &offset, UINT8 &bit_pos)
+void hd63484_device::calc_offset(INT16 x, INT16 y, UINT32 &offset, UINT8 &bit_pos)
 {
 	int bpp = get_bpp();
 	int ppw = 16 / bpp;
@@ -662,7 +655,7 @@ void h63484_device::calc_offset(INT16 x, INT16 y, UINT32 &offset, UINT8 &bit_pos
 	bit_pos *= bpp;
 }
 
-UINT16 h63484_device::get_dot(INT16 x, INT16 y)
+UINT16 hd63484_device::get_dot(INT16 x, INT16 y)
 {
 	UINT8 bpp = get_bpp();
 	UINT32 offset = 0;
@@ -673,7 +666,7 @@ UINT16 h63484_device::get_dot(INT16 x, INT16 y)
 	return (readword(offset) >> bit_pos) & ((1 << bpp) - 1);
 }
 
-bool h63484_device::set_dot(INT16 x, INT16 y, INT16 px, INT16 py)
+bool hd63484_device::set_dot(INT16 x, INT16 y, INT16 px, INT16 py)
 {
 	int xs = m_pex - m_psx + 1;
 	int ys = m_pey - m_psy + 1;
@@ -717,7 +710,7 @@ bool h63484_device::set_dot(INT16 x, INT16 y, INT16 px, INT16 py)
 	return false;
 }
 
-bool h63484_device::set_dot(INT16 x, INT16 y, UINT16 color)
+bool hd63484_device::set_dot(INT16 x, INT16 y, UINT16 color)
 {
 	UINT8 bpp = get_bpp();
 	UINT32 offset = 0;
@@ -773,7 +766,7 @@ bool h63484_device::set_dot(INT16 x, INT16 y, UINT16 color)
 	return false;   // TODO: return area detection status
 }
 
-void h63484_device::draw_line(INT16 sx, INT16 sy, INT16 ex, INT16 ey)
+void hd63484_device::draw_line(INT16 sx, INT16 sy, INT16 ex, INT16 ey)
 {
 	UINT16 delta_x = abs(ex - sx) * 2;
 	UINT16 delta_y = abs(ey - sy) * 2;
@@ -817,7 +810,7 @@ void h63484_device::draw_line(INT16 sx, INT16 sy, INT16 ex, INT16 ey)
 	}
 }
 
-void h63484_device::draw_ellipse(INT16 cx, INT16 cy, double dx, double dy, double s_angol, double e_angol, bool c)
+void hd63484_device::draw_ellipse(INT16 cx, INT16 cy, double dx, double dy, double s_angol, double e_angol, bool c)
 {
 	double inc = 1.0 / (MAX(dx, dy) * 100);
 	for (double angol = s_angol; fabs(angol - e_angol) >= inc*2; angol += inc * (c ? -1 : +1))
@@ -831,7 +824,7 @@ void h63484_device::draw_ellipse(INT16 cx, INT16 cy, double dx, double dy, doubl
 	}
 }
 
-void h63484_device::paint(INT16 sx, INT16 sy)
+void hd63484_device::paint(INT16 sx, INT16 sy)
 {
 /*
     This is not accurate since real hardware can only paint 4 'unpaintable' areas,
@@ -887,7 +880,7 @@ void h63484_device::paint(INT16 sx, INT16 sy)
 		}
 }
 
-UINT16 h63484_device::command_rpr_exec()
+UINT16 hd63484_device::command_rpr_exec()
 {
 	switch(m_cr & 0x1f)
 	{
@@ -925,7 +918,7 @@ UINT16 h63484_device::command_rpr_exec()
 	}
 }
 
-void h63484_device::command_wpr_exec()
+void hd63484_device::command_wpr_exec()
 {
 	switch(m_cr & 0x1f)
 	{
@@ -985,7 +978,7 @@ void h63484_device::command_wpr_exec()
 	}
 }
 
-void h63484_device::command_clr_exec()
+void hd63484_device::command_clr_exec()
 {
 	UINT8 mm = m_cr & 0x03;
 	UINT16 d = m_pr[0];
@@ -1032,7 +1025,7 @@ void h63484_device::command_clr_exec()
 	m_rwp[m_rwp_dn] &= 0xfffff;
 }
 
-void h63484_device::command_cpy_exec()
+void hd63484_device::command_cpy_exec()
 {
 	UINT8 mm = m_cr & 0x03;
 	UINT8 dsd = (m_cr >> 8) & 0x07;
@@ -1103,7 +1096,7 @@ void h63484_device::command_cpy_exec()
 	m_rwp[m_rwp_dn] &= 0xfffff;
 }
 
-void h63484_device::command_line_exec()
+void hd63484_device::command_line_exec()
 {
 	INT16 x = (INT16)m_pr[0];
 	INT16 y = (INT16)m_pr[1];
@@ -1120,7 +1113,7 @@ void h63484_device::command_line_exec()
 	m_cpy = y;
 }
 
-void h63484_device::command_rct_exec()
+void hd63484_device::command_rct_exec()
 {
 	INT16 dX = m_pr[0];
 	INT16 dY = m_pr[1];
@@ -1151,7 +1144,7 @@ void h63484_device::command_rct_exec()
 	draw_line(m_cpx, dY, m_cpx, m_cpy);
 }
 
-void h63484_device::command_gcpy_exec()
+void hd63484_device::command_gcpy_exec()
 {
 	UINT8 dsd = (m_cr >> 8) & 0x07;
 	UINT8 s = BIT(m_cr, 11);
@@ -1204,7 +1197,7 @@ void h63484_device::command_gcpy_exec()
 
 }
 
-void h63484_device::command_frct_exec()
+void hd63484_device::command_frct_exec()
 {
 	INT16 X = (INT16)m_pr[0];
 	INT16 Y = (INT16)m_pr[1];
@@ -1227,7 +1220,7 @@ void h63484_device::command_frct_exec()
 	m_cpy += (Y + d1_inc);
 }
 
-void h63484_device::command_ptn_exec()
+void hd63484_device::command_ptn_exec()
 {
 	INT16 szx = ((m_pr[0] >> 0) & 0xff);
 	INT16 szy = ((m_pr[0] >> 8) & 0xff);
@@ -1304,7 +1297,7 @@ void h63484_device::command_ptn_exec()
 	}
 }
 
-void h63484_device::command_plg_exec()
+void hd63484_device::command_plg_exec()
 {
 	int sx = m_cpx;
 	int sy = m_cpy;
@@ -1343,7 +1336,7 @@ void h63484_device::command_plg_exec()
 	}
 }
 
-void h63484_device::command_arc_exec()
+void hd63484_device::command_arc_exec()
 {
 	INT16 xc = (INT16)m_pr[0];
 	INT16 yc = (INT16)m_pr[1];
@@ -1370,7 +1363,7 @@ void h63484_device::command_arc_exec()
 	m_cpy = ye;
 }
 
-void h63484_device::command_earc_exec()
+void hd63484_device::command_earc_exec()
 {
 	UINT16 a = m_pr[0];
 	UINT16 b = m_pr[1];
@@ -1401,19 +1394,19 @@ void h63484_device::command_earc_exec()
 	m_cpy = ye;
 }
 
-void h63484_device::process_fifo()
+void hd63484_device::process_fifo()
 {
 	UINT8 data;
 
 	dequeue_w(&data);
 
-	if (m_sr & H63484_SR_CED)
+	if (m_sr & HD63484_SR_CED)
 	{
 		m_cr = (data & 0xff) << 8;
 		dequeue_w(&data);
 		m_cr |= data & 0xff;
 		m_param_ptr = 0;
-		m_sr &= ~H63484_SR_CED;
+		m_sr &= ~HD63484_SR_CED;
 	}
 	else
 	{
@@ -1427,8 +1420,8 @@ void h63484_device::process_fifo()
 	{
 		case COMMAND_INVALID:
 			if (CMD_LOG)    logerror("HD63484 '%s': <invalid %04x>\n", tag(), m_cr);
-			printf("H63484 '%s' Invalid Command Byte %02x\n", tag(), m_cr);
-			m_sr |= H63484_SR_CER; // command error
+			printf("HD63484 '%s' Invalid Command Byte %02x\n", tag(), m_cr);
+			m_sr |= HD63484_SR_CER; // command error
 			command_end_seq();
 			break;
 
@@ -1769,14 +1762,14 @@ void h63484_device::process_fifo()
 	}
 }
 
-void h63484_device::exec_abort_sequence()
+void hd63484_device::exec_abort_sequence()
 {
 	fifo_w_clear();
 	fifo_r_clear();
-	m_sr = H63484_SR_WFR | H63484_SR_WFE | H63484_SR_CED; // hard-set to 0x23
+	m_sr = HD63484_SR_WFR | HD63484_SR_WFE | HD63484_SR_CED; // hard-set to 0x23
 }
 
-UINT16 h63484_device::video_registers_r(int offset)
+UINT16 hd63484_device::video_registers_r(int offset)
 {
 	UINT16 res = (m_vreg[offset] << 8) | (m_vreg[offset+1] & 0xff);
 
@@ -1798,7 +1791,7 @@ UINT16 h63484_device::video_registers_r(int offset)
 	return res;
 }
 
-void h63484_device::video_registers_w(int offset)
+void hd63484_device::video_registers_w(int offset)
 {
 	UINT16 vreg_data;
 
@@ -1912,13 +1905,13 @@ void h63484_device::video_registers_w(int offset)
 	}
 }
 
-READ16_MEMBER( h63484_device::status_r )
+READ16_MEMBER( hd63484_device::status_r )
 {
 	// kothello is coded so that upper byte of this should be 0xff (tests with jc opcode). Maybe it's just unconnected?
 	return m_sr | 0xff00;
 }
 
-READ16_MEMBER( h63484_device::data_r )
+READ16_MEMBER( hd63484_device::data_r )
 {
 	UINT16 res;
 
@@ -1939,13 +1932,13 @@ READ16_MEMBER( h63484_device::data_r )
 	return res;
 }
 
-WRITE16_MEMBER( h63484_device::address_w )
+WRITE16_MEMBER( hd63484_device::address_w )
 {
 	if(ACCESSING_BITS_0_7)
 		m_ar = data & 0xfe;
 }
 
-WRITE16_MEMBER( h63484_device::data_w )
+WRITE16_MEMBER( hd63484_device::data_w )
 {
 	if(ACCESSING_BITS_8_15)
 		m_vreg[m_ar] = (data & 0xff00) >> 8;
@@ -1958,17 +1951,17 @@ WRITE16_MEMBER( h63484_device::data_w )
 	inc_ar(2);
 }
 
-READ8_MEMBER( h63484_device::status_r )
+READ8_MEMBER( hd63484_device::status_r )
 {
 	return m_sr;
 }
 
-WRITE8_MEMBER( h63484_device::address_w )
+WRITE8_MEMBER( hd63484_device::address_w )
 {
 	m_ar = data;
 }
 
-READ8_MEMBER( h63484_device::data_r )
+READ8_MEMBER( hd63484_device::data_r )
 {
 	UINT8 res = 0xff;
 
@@ -1982,7 +1975,7 @@ READ8_MEMBER( h63484_device::data_r )
 	return res;
 }
 
-WRITE8_MEMBER( h63484_device::data_w )
+WRITE8_MEMBER( hd63484_device::data_w )
 {
 	m_vreg[m_ar] = data;
 
@@ -2000,7 +1993,7 @@ WRITE8_MEMBER( h63484_device::data_w )
 	inc_ar(1);
 }
 
-void h63484_device::device_start()
+void hd63484_device::device_start()
 {
 	m_display_cb.bind_relative_to(*owner());
 
@@ -2011,9 +2004,9 @@ void h63484_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void h63484_device::device_reset()
+void hd63484_device::device_reset()
 {
-	m_sr = H63484_SR_CED | H63484_SR_WFR | H63484_SR_WFE;
+	m_sr = HD63484_SR_CED | HD63484_SR_WFR | HD63484_SR_WFE;
 	m_ccr = m_omr = m_edg = m_dcr = m_hsw = 0;
 	m_hc = m_hds = m_hdw = m_hws = m_hww = 0;
 	m_vc = m_vws = m_vww = m_vds = m_vsw = 0;
@@ -2049,7 +2042,7 @@ void h63484_device::device_reset()
 //  draw_graphics_line -
 //-------------------------------------------------
 
-void h63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n, bool active, bool ins_window)
+void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n, bool active, bool ins_window)
 {
 	int bpp = get_bpp();
 	int ppw = 16 / bpp;
@@ -2106,7 +2099,7 @@ void h63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cl
 //  update_screen -
 //-------------------------------------------------
 
-UINT32 h63484_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 hd63484_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int l0 = cliprect.min_y + (BIT(m_dcr, 13) ? m_sp[0] : 0);
 	int l1 = l0 + m_sp[1];
@@ -2129,7 +2122,7 @@ UINT32 h63484_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-void h63484_device::register_save_state()
+void hd63484_device::register_save_state()
 {
 	save_item(NAME(m_ar));
 	save_item(NAME(m_vreg));

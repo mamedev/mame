@@ -32,7 +32,7 @@ Also seem to be running on the same/similar hardware:
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/2612intf.h"
-#include "video/h63484.h"
+#include "video/hd63484.h"
 #include "video/ramdac.h"
 
 #include "segajw.lh"
@@ -186,8 +186,8 @@ CUSTOM_INPUT_MEMBER( segajw_state::coin_sensors_r )
 static ADDRESS_MAP_START( segajw_map, AS_PROGRAM, 16, segajw_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
-	AM_RANGE(0x080000, 0x080001) AM_DEVREADWRITE("hd63484", h63484_device, status_r, address_w)
-	AM_RANGE(0x080002, 0x080003) AM_DEVREADWRITE("hd63484", h63484_device, data_r, data_w)
+	AM_RANGE(0x080000, 0x080001) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
+	AM_RANGE(0x080002, 0x080003) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW0")
 	AM_RANGE(0x180004, 0x180005) AM_READWRITE8(soundlatch2_byte_r, audiocpu_cmd_w, 0x00ff)
@@ -404,7 +404,7 @@ static MACHINE_CONFIG_START( segajw, segajw_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", h63484_device, update_screen)
+	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_SIZE(720, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 448-1)
 	MCFG_SCREEN_PALETTE("palette")
@@ -412,7 +412,7 @@ static MACHINE_CONFIG_START( segajw, segajw_state )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
-	MCFG_H63484_ADD("hd63484", 8000000, segajw_hd63484_map) // unknown clock
+	MCFG_HD63484_ADD("hd63484", 8000000, segajw_hd63484_map) // unknown clock
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
