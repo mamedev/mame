@@ -14031,6 +14031,21 @@ ROM_END
   Will name the sets using the internal code of both custom
   graphics sets in their respective order...
 
+  -------------------------------------------------------------------
+  
+  Tech Notes:
+
+  PCB has some hacks...
+
+  1) PPI 8255 pin 10 (PC7) is wired to pin 22 (PB4)...
+     Maybe the boot protection?
+
+  2) Pin 39 from solder side (speaker GND) and pin 04 from components side (PPI 8255 pin 11, PC6)
+     are wired with a DS2401 (sillicon serial number) device, to pins 1 & 2 (GND & DATA).
+
+  3) Z80 /INT line (pin 16) is out of socket and wired to a 74161.
+
+
 */
 
 /*
