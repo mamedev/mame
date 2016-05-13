@@ -2378,22 +2378,21 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 				for (int j = 0; j < 4; j++)
 					v[i] += matrix.projection[i][j] * t[j];
 			};
-			/*if (matrix.scale[3] != 0)
-				for (int i = 0; i < 4; i++) {
-					v[i] *= matrix.scale[i];
-				}
-			for (int i = 0; i < 4; i++) {
+			/*for (int i = 0; i < 3; i++) {
+				v[i] *= matrix.scale[i];
+			}
+			for (int i = 0; i < 3; i++) {
 				v[i] += matrix.translate[i];
 			}*/
 			destination[m].x = (v[0] / v[3])*supersample_factor_x; // source[m].attribute[0].fv[0];
 			destination[m].y = (v[1] / v[3])*supersample_factor_y; // source[m].attribute[0].fv[1];
+			destination[m].p[(int)VERTEX_PARAMETER::PARAM_Z] = v[2] / v[3];
 			for (u = (int)VERTEX_PARAMETER::PARAM_COLOR_B; u <= (int)VERTEX_PARAMETER::PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
 				destination[m].p[u] = source[m].attribute[3].fv[u];
 			for (u = 0; u < 4; u++) {
 				destination[m].p[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + u * 2] = source[m].attribute[9 + u].fv[0];
 				destination[m].p[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + u * 2] = source[m].attribute[9 + u].fv[1];
 			}
-			destination[m].p[(int)VERTEX_PARAMETER::PARAM_Z] = v[2] / v[3];
 		}
 	}
 	else {
@@ -2669,8 +2668,8 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 			if (vertex_accumulated == 4) {
 				primitives_count++;
 				vertex_accumulated = 0;
-				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_count], vertex_xy[vertex_count + 1], vertex_xy[vertex_count + 2]);
-				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_count], vertex_xy[vertex_count + 2], vertex_xy[vertex_count + 3]);
+				render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[vertex_count + 1], vertex_xy[vertex_count + 2]);
+				render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[vertex_count + 2], vertex_xy[vertex_count + 3]);
 				vertex_count = (vertex_count + 4) & 1023;
 				wait();
 			}
@@ -2681,7 +2680,7 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 			if (vertex_accumulated == 3) {
 				primitives_count++;
 				vertex_accumulated = 0;
-				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_count], vertex_xy[(vertex_count + 1) & 1023], vertex_xy[(vertex_count + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
+				render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[(vertex_count + 1) & 1023], vertex_xy[(vertex_count + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
 				vertex_count = (vertex_count + 3) & 1023;
 				wait();
 			}
@@ -2704,7 +2703,7 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 				// if software sends the vertices 0 1 2 3 4 5 6
 				// hardware will draw triangles made by (0,1,2) (0,2,3) (0,3,4) (0,4,5) (0,5,6)
 				convert_vertices_poly(source, vertex_xy + vertex_count, 1);
-				render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_count - 1) & 1023], vertex_xy[vertex_count]);
+				render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_count - 1) & 1023], vertex_xy[vertex_count]);
 				vertex_count = (vertex_count + 1) & 1023;
 				wait();
 			}
@@ -2728,9 +2727,9 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 				// hardware will draw triangles made by (0,1,2) (1,3,2) (2,3,4) (3,5,4) (4,5,6)
 				convert_vertices_poly(source, vertex_xy + vertex_count, 1);
 				if ((vertex_count & 1) == 0)
-					render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_count - 2) & 1023], vertex_xy[(vertex_count - 1) & 1023], vertex_xy[vertex_count]);
+					render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[(vertex_count - 2) & 1023], vertex_xy[(vertex_count - 1) & 1023], vertex_xy[vertex_count]);
 				else
-					render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_count - 2) & 1023], vertex_xy[vertex_count], vertex_xy[(vertex_count - 1) & 1023]);
+					render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[(vertex_count - 2) & 1023], vertex_xy[vertex_count], vertex_xy[(vertex_count - 1) & 1023]);
 				vertex_count = (vertex_count + 1) & 1023;
 				wait();
 			}
@@ -2755,8 +2754,8 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 				{
 					primitives_count++;
 					// quad is made of vertices vertex count +0 +1 +3 +2
-					render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[vertex_count + 0], vertex_xy[vertex_count + 1], vertex_xy[(vertex_count + 3) & 1023]);
-					render_triangle_culling(limits_rendertarget, renderspans, 4 + 4 * 2, vertex_xy[(vertex_count + 3) & 1023], vertex_xy[(vertex_count + 2) & 1023], vertex_xy[vertex_count + 0]);
+					render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count + 0], vertex_xy[vertex_count + 1], vertex_xy[(vertex_count + 3) & 1023]);
+					render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[(vertex_count + 3) & 1023], vertex_xy[(vertex_count + 2) & 1023], vertex_xy[vertex_count + 0]);
 					vertex_accumulated = 2;
 					vertex_count = (vertex_count + 2) & 1023;
 					wait();
