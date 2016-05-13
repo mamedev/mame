@@ -1212,7 +1212,7 @@ DIRECT_UPDATE_MEMBER(atarigen_state::slapstic_setdirect)
 //  slapstic and sets the chip number.
 //-------------------------------------------------
 
-void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror)
+void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, UINT8 *mem)
 {
 	if (!m_slapstic_device.found())
 		fatalerror("Slapstic device is missing\n");
@@ -1223,8 +1223,9 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 
 	// install the memory handlers
 	address_space &program = device.space(AS_PROGRAM);
-	m_slapstic = program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
+	program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
 	program.set_direct_update_handler(direct_update_delegate(FUNC(atarigen_state::slapstic_setdirect), this));
+	m_slapstic = (UINT16 *)mem;
 
 	// allocate memory for a copy of bank 0
 	m_slapstic_bank0.resize(0x2000);

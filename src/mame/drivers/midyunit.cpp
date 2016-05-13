@@ -179,7 +179,7 @@ CUSTOM_INPUT_MEMBER(midyunit_state::adpcm_irq_state_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midyunit_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_READWRITE(midyunit_vram_r, midyunit_vram_w)
-	AM_RANGE(0x01000000, 0x010fffff) AM_RAM
+	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x01400000, 0x0140ffff) AM_READWRITE(midyunit_cmos_r, midyunit_cmos_w)
 	AM_RANGE(0x01800000, 0x0181ffff) AM_RAM_WRITE(midyunit_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x01a80000, 0x01a8009f) AM_MIRROR(0x00080000) AM_READWRITE(midyunit_dma_r, midyunit_dma_w)

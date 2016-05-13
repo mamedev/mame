@@ -494,7 +494,7 @@ void cps_state::fcrash_render_sprites( screen_device &screen, bitmap_ind16 &bitm
 	UINT16 tileno,flipx,flipy,colour,xpos,ypos;
 
 	/* if we have separate sprite ram, use it */
-	if (m_bootleg_sprite_ram) sprite_ram = m_bootleg_sprite_ram;
+	if (m_bootleg_sprite_ram) sprite_ram = m_bootleg_sprite_ram.get();
 
 	/* get end of sprite list marker */
 	for (pos = 0x1ffc - base; pos >= 0x0000; pos -= 4)
@@ -1929,8 +1929,9 @@ DRIVER_INIT_MEMBER(cps_state, kodb)
 
 	/* the original game alternates between 2 sprite ram areas to achieve flashing sprites - the bootleg doesn't do the write to the register to achieve this
 	mapping both sprite ram areas to the same bootleg sprite ram - similar to how sf2mdt works */
-	m_bootleg_sprite_ram = (UINT16*)m_maincpu->space(AS_PROGRAM).install_ram(0x900000, 0x903fff);
-	m_maincpu->space(AS_PROGRAM).install_ram(0x904000, 0x907fff, m_bootleg_sprite_ram); /* both of these need to be mapped */
+	m_bootleg_sprite_ram = std::make_unique<UINT16[]>(0x2000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x900000, 0x903fff, m_bootleg_sprite_ram.get());
+	m_maincpu->space(AS_PROGRAM).install_ram(0x904000, 0x907fff, m_bootleg_sprite_ram.get()); /* both of these need to be mapped */
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -2230,7 +2231,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cps_state, dinopic)
 {
-	m_bootleg_sprite_ram = (UINT16*)m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff);
+	m_bootleg_sprite_ram = std::make_unique<UINT16[]>(0x2000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
 	DRIVER_INIT_CALL(cps1);
 }
 
@@ -2808,8 +2810,9 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdtb)
 	}
 
 	/* bootleg sprite ram */
-	m_bootleg_sprite_ram = (UINT16*)m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff);
-	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram); /* both of these need to be mapped  */
+	m_bootleg_sprite_ram = std::make_unique<UINT16[]>(0x2000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff, m_bootleg_sprite_ram.get());
+	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram.get()); /* both of these need to be mapped  */
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -2818,10 +2821,12 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdtb)
 DRIVER_INIT_MEMBER(cps_state, sf2mdta)
 {
 	/* bootleg sprite ram */
-	m_bootleg_sprite_ram = (UINT16*)m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff);
-	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram); /* both of these need to be mapped - see the "Magic Delta Turbo" text on the title screen */
+	m_bootleg_sprite_ram = std::make_unique<UINT16[]>(0x2000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff, m_bootleg_sprite_ram.get());
+	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram.get()); /* both of these need to be mapped - see the "Magic Delta Turbo" text on the title screen */
 
-	m_bootleg_work_ram = (UINT16*)m_maincpu->space(AS_PROGRAM).install_ram(0xfc0000, 0xfcffff); /* this has moved */
+	m_bootleg_work_ram = std::make_unique<UINT16[]>(0x8000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0xfc0000, 0xfcffff, m_bootleg_work_ram.get()); /* this has moved */
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -2829,8 +2834,9 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdta)
 DRIVER_INIT_MEMBER(cps_state, sf2b)
 {
 	/* bootleg sprite ram */
-	m_bootleg_sprite_ram = (UINT16*)m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff);
-	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram);
+	m_bootleg_sprite_ram = std::make_unique<UINT16[]>(0x2000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff, m_bootleg_sprite_ram.get());
+	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram.get());
 
 	DRIVER_INIT_CALL(cps1);
 }

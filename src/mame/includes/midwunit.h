@@ -15,11 +15,13 @@ public:
 		: midtunit_state(mconfig, type, tag),
 			m_midway_serial_pic(*this, "serial_pic"),
 			m_nvram(*this, "nvram"),
+			m_mainram(*this, "mainram"),
 			m_ports(*this, wunit_ports)
 			{ }
 
 	required_device<midway_serial_pic_device> m_midway_serial_pic;
 	required_shared_ptr<UINT16> m_nvram;
+	required_shared_ptr<UINT16> m_mainram;
 	required_ioport_array<4> m_ports;
 
 	DECLARE_IOPORT_ARRAY(wunit_ports);

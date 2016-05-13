@@ -219,8 +219,8 @@ public:
 	int          m_sprite_base;
 	int          m_sprite_list_end_marker;
 	int          m_sprite_x_offset;
-	UINT16       *m_bootleg_sprite_ram;
-	UINT16       *m_bootleg_work_ram;
+	std::unique_ptr<UINT16[]> m_bootleg_sprite_ram;
+	std::unique_ptr<UINT16[]> m_bootleg_work_ram;
 
 	/* devices */
 	required_device<m68000_base_device> m_maincpu;

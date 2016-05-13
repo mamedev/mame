@@ -170,7 +170,8 @@ READ16_MEMBER(atarig1_state::pitfightb_cheap_slapstic_r)
 void atarig1_state::pitfightb_cheap_slapstic_init()
 {
 	/* install a read handler */
-	m_bslapstic_base = m_maincpu->space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16_delegate(FUNC(atarig1_state::pitfightb_cheap_slapstic_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16_delegate(FUNC(atarig1_state::pitfightb_cheap_slapstic_r),this));
+	m_bslapstic_base = (UINT16 *)(memregion("maincpu")->base() + 0x38000);
 
 	/* allocate memory for a copy of bank 0 */
 	m_bslapstic_bank0 = std::make_unique<UINT8[]>(0x2000);
@@ -1284,7 +1285,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(atarig1_state,hydra)
 {
-	slapstic_configure(*m_maincpu, 0x078000, 0);
+	slapstic_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
 	m_is_pitfight = 0;
 }
 
@@ -1295,7 +1296,7 @@ DRIVER_INIT_MEMBER(atarig1_state,hydrap)
 
 DRIVER_INIT_MEMBER(atarig1_state,pitfight)
 {
-	slapstic_configure(*m_maincpu, 0x038000, 0);
+	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
 	m_is_pitfight = 1;
 }
 

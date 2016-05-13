@@ -114,12 +114,14 @@ const device_type ATARI_CAGE = &device_creator<atari_cage_device>;
 
 atari_cage_device::atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ATARI_CAGE, "Atari CAGE", tag, owner, clock, "atari_cage", __FILE__),
+	m_cageram(*this, "cageram"),
 	m_irqhandler(*this)
 {
 }
 
 atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_cageram(*this, "cageram"),
 	m_irqhandler(*this)
 {
 }
@@ -147,8 +149,10 @@ void atari_cage_device::device_start()
 	m_timer[0] = subdevice<timer_device>("cage_timer0");
 	m_timer[1] = subdevice<timer_device>("cage_timer1");
 
-	if (m_speedup)
-		m_speedup_ram = m_cpu->space(AS_PROGRAM).install_write_handler(m_speedup, m_speedup, write32_delegate(FUNC(atari_cage_device::speedup_w),this));
+	if (m_speedup) {
+		m_cpu->space(AS_PROGRAM).install_write_handler(m_speedup, m_speedup, write32_delegate(FUNC(atari_cage_device::speedup_w),this));
+		m_speedup_ram = m_cageram + m_speedup;
+	}
 
 	for (chan = 0; chan < DAC_BUFFER_CHANNELS; chan++)
 	{
@@ -594,7 +598,7 @@ WRITE32_MEMBER( atari_cage_device::speedup_w )
  *************************************/
 
 static ADDRESS_MAP_START( cage_map, AS_PROGRAM, 32, atari_cage_device )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("cageram")
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
 	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
 	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE(tms32031_io_r, tms32031_io_w)
@@ -605,7 +609,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cage_map_seattle, AS_PROGRAM, 32, atari_cage_seattle_device )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("cageram")
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
 	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
 	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE(tms32031_io_r, tms32031_io_w)

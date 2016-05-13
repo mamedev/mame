@@ -61,6 +61,7 @@ protected:
 	virtual void device_start() override;
 
 private:
+	required_shared_ptr<UINT32> m_cageram;
 	cpu_device *m_cpu;
 	attotime m_cpu_h1_clock_period;
 

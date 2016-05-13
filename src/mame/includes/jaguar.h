@@ -44,6 +44,7 @@ public:
 			m_gpu_ram(*this, "gpuram"),
 			m_gpu_clut(*this, "gpuclut"),
 			m_romboard_region(*this, "romboard"),
+			m_mainram(*this, "mainram"),
 			m_is_r3000(false),
 			m_is_cojag(false),
 			m_hacks_enabled(false),
@@ -85,6 +86,7 @@ public:
 	required_shared_ptr<UINT32> m_gpu_ram;
 	required_shared_ptr<UINT32> m_gpu_clut;
 	optional_memory_region      m_romboard_region;
+	optional_shared_ptr<UINT32> m_mainram;
 
 	// configuration
 	bool m_is_r3000;
