@@ -478,6 +478,8 @@ public:
 	DECLARE_WRITE32_MEMBER(audio_ac93_w);
 	DECLARE_READ32_MEMBER(dummy_r);
 	DECLARE_WRITE32_MEMBER(dummy_w);
+	DECLARE_READ32_MEMBER(ohci_usb_r);
+	DECLARE_WRITE32_MEMBER(ohci_usb_w);
 
 	void smbus_register_device(int address, int(*handler)(xbox_base_state &chs, int command, int rw, int data));
 	int smbus_pic16lc(int command, int rw, int data);
