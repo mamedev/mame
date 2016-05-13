@@ -56,10 +56,12 @@ Languages:
  * [C#/VB/F# language API bindings](https://github.com/MikePopoloski/SharpBgfx)
  * [D language API bindings](https://github.com/DerelictOrg/DerelictBgfx)
  * [Go language API bindings](https://github.com/james4k/go-bgfx)
- * [Java language API bindings](https://github.com/enleeten/twilight-bgfx)
  * [Haskell language API bindings](https://github.com/haskell-game/bgfx)
+ * [Java language API bindings](https://github.com/enleeten/twilight-bgfx)
+ * [Lua language API bindings](https://github.com/excessive/lua-bgfx)
  * [Python language API bindings](https://github.com/jnadro/pybgfx#pybgf)
  * [Rust language API bindings](https://github.com/rhoot/bgfx-rs)
+ * [Swift language API bindings](https://github.com/stuartcarnie/SwiftBGFX)
 
 [Building](https://bkaradzic.github.io/bgfx/build.html)
 ----------------------------------------------------

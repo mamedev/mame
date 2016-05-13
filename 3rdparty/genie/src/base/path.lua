@@ -191,6 +191,35 @@
 		return result:sub(1, -2)
 	end
 
+--
+-- Returns the common base directory of two paths.
+--
+
+	function path.getcommonbasedir(a, b)
+		a = path.getdirectory(a)..'/'
+		b = path.getdirectory(b)..'/'
+
+		-- find the common leading directories
+		local idx = 0
+		while (true) do
+			local tst = a:find('/', idx + 1, true)
+			if tst then
+				if a:sub(1,tst) == b:sub(1,tst) then
+					idx = tst
+				else
+					break
+				end
+			else
+				break
+			end
+		end
+		-- idx is the index of the last sep before path string 'a' ran out or didn't match.
+		local result = ''
+		if idx > 1 then
+			result = a:sub(1, idx - 1)	-- Remove the trailing slash to be consistent with other functions.
+		end
+		return result
+	end
 
 --
 -- Returns true if the filename represents a C/C++ source code file. This check

@@ -10,8 +10,13 @@
 #include "LzmaEncoder.h"
 #endif
 
+namespace NCompress {
+namespace NLzma {
+
 REGISTER_CODEC_E(LZMA,
-    NCompress::NLzma::CDecoder(),
-    NCompress::NLzma::CEncoder(),
+    CDecoder(),
+    CEncoder(),
     0x30101,
     "LZMA")
+
+}}

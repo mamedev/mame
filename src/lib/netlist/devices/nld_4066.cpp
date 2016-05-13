@@ -11,7 +11,8 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(CD4066_GATE)
 {
-	register_input("CTL", m_control);
+	set_logic_family(family_CD4XXX);
+	enregister("CTL", m_control);
 	register_sub("PS", m_supply);
 	register_sub("R", m_R);
 	register_param("BASER", m_base_r, 270.0);

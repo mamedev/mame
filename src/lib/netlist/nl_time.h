@@ -33,10 +33,10 @@ namespace netlist
 	public:
 
 #if (PHAS_INT128)
-		typedef UINT128 INTERNALTYPE;
+		using INTERNALTYPE = UINT128;
 		static const pstate_data_type_e STATETYPE = DT_INT128;
 #else
-		typedef UINT64 INTERNALTYPE;
+		using INTERNALTYPE = UINT64;
 		static const pstate_data_type_e STATETYPE = DT_INT64;
 #endif
 		static const INTERNALTYPE RESOLUTION = NETLIST_INTERNAL_RES;

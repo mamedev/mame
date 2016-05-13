@@ -142,8 +142,8 @@ const char *apollo_kbd_device::cpu_context()
 
 	device_t *cpu = machine().firstcpu;
 	osd_ticks_t t = osd_ticks();
-	int s = t / osd_ticks_per_second();
-	int ms = (t % osd_ticks_per_second()) / 1000;
+	int s = (t / osd_ticks_per_second()) % 3600;
+	int ms = (t / (osd_ticks_per_second() / 1000)) % 1000;
 
 	/* if we have an executing CPU, output data */
 	if (cpu != nullptr)
@@ -156,6 +156,16 @@ const char *apollo_kbd_device::cpu_context()
 		sprintf(statebuf, "%d.%03d", s, ms);
 	}
 	return statebuf;
+}
+
+//**************************************************************************
+// logerror - log an error message (w/o device tags)
+//**************************************************************************
+
+template <typename Format, typename... Params>
+void apollo_kbd_device::logerror(Format &&fmt, Params &&... args) const
+{
+	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
 }
 
 //**************************************************************************
@@ -430,6 +440,7 @@ void apollo_kbd_device::kgetchar(UINT8 data)
 			m_mode = KBD_MODE_0_COMPATIBILITY;
 			m_loopback_mode = 0;
 			m_rx_message = 0;
+			break;
 		case 0xff01:
 			putdata(&data, 1);
 			m_mode = KBD_MODE_1_KEYSTATE;
@@ -586,7 +597,7 @@ int apollo_kbd_device::push_scancode(UINT8 code, UINT8 repeat)
 
 	if (key_code != 0)
 	{
-		LOG2(("scan_code = 0x%02x key_code = 0x%04x",code, key_code));
+		LOG1(("scan_code = 0x%02x key_code = 0x%04x",code, key_code));
 		if (m_mode > KBD_MODE_1_KEYSTATE)
 		{
 			set_mode(KBD_MODE_1_KEYSTATE);
@@ -971,14 +982,10 @@ INPUT_PORTS_START( apollo_kbd )
 	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON3)
 	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Center mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 
-// FIXME:
-// PORT_SENSITIVITY(50) would be perfect for SDL2
-// PORT_SENSITIVITY(200) would be perfect for SDL1.2
-
 	PORT_START("mouse2")  // X-axis
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START("mouse3")  // Y-axis
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 INPUT_PORTS_END

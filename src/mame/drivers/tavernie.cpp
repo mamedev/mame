@@ -304,7 +304,7 @@ static MACHINE_CONFIG_START( cpu09, tavernie_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )

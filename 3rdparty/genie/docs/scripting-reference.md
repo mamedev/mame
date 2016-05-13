@@ -43,6 +43,7 @@
     * [location](#locationpath)
     * [newaction](#newactiondescription)
     * [newoption](#newoptionsdescription)
+    * [nopch](#nopch)
     * [objdir](#objdirpath)
     * [os.chdir](#oschdirpath)
     * [os.copyfile](#oscopyfilesource-destination)
@@ -516,15 +517,17 @@ Specifies build flags to modify the compiling or linking process. Multiple calls
 #### Arguments
 _flags_ - List of flag names from list below. Names are case-insensitive and ignored if not supported on a platform.
 
-* _EnableSSE, EnableSSE2_ - Enable SSE instruction sets
+* _EnableSSE, EnableSSE2, EnableAVX, EnableAVX2_ - Enable SSE/AVX instruction sets
 * _ExtraWarnings_ - Sets compiler's max warning level.
 * _FatalWarnings_ - Treat warnings as errors.
 * _FloatFast_ - Enable floating point optimizations at the expense of accuracy.
 * _FloatStrict_ - Improve floating point consistency at the expense of performance.
 * _Managed_ - Enable Managed C++ (.NET).
+* _MinimumWarnings_ - - Sets compiler's minimum warning level (Visual Studio only).
 * _MFC_ - Enable support for Microsoft Foundation Classes.
 * _NativeWChar, NoNativeWChar_ - Toggle support for the wchar data type.
 * _No64BitChecks_ - Disable 64-bit portability warnings.
+* _NoBufferSecurityCheck_ - Turns off Visual Studio 'Security Check' option. Can give up to 10% performance improvement.
 * _NoEditAndContinue_ - Disable support for Visual Studio's Edit-and-Continue feature.
 * _NoExceptions_ - Disable C++ exception support.
 * _NoFramePointer_ - Disable the generation of stack frame pointers.
@@ -534,6 +537,8 @@ _flags_ - List of flag names from list below. Names are case-insensitive and ign
 * _NoMinimalRebuild_ - Disable Visual Studio's minimal rebuild feature.
 * _NoPCH_ - Disable precompiled headers.
 * _NoRTTI_ - Disable C++ runtime type information.
+* _NoWinMD_ - Disables Generation of Windows Metadata.
+* _NoWinRT_ - Disables Windows RunTime Extension for project.
 * _Optimize_ - Perform a balanced set of optimizations.
 * _OptimizeSize_ - Optimize for the smallest file size.
 * _OptimizeSpeed_ - Optimize for the best performance.
@@ -955,6 +960,31 @@ newoption {
         { "software", "Software Renderer" }
     }
 }
+```
+[Back to top](#table-of-contents)
+
+---
+### nopch({_files_...})
+Sets sources files added with the [`files`](#files) function, to not use the precompiled header. Multiple calls are concatenated.
+
+**Note:** May be set on the solution, project, or configuration, but only project-level file lists are currently supported.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_files_ - List of files to not use the precompiled header. Paths should be relative to the currently-executing script file and may contain [wildcards](#wildcards).
+
+#### Examples
+Add all c files in a directory, then set a specific file to not use precompiled headers.
+```lua
+files { "*.c" }
+nopch { "a_file.c" }
+```
+
+Add an entire directory of C files, then set one directory to not use precompiled headers
+```lua
+files { "*.c" }
+nopch { "tests/*.c" }
 ```
 [Back to top](#table-of-contents)
 

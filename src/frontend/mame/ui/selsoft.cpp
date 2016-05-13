@@ -538,7 +538,7 @@ void ui_menu_select_software::build_software_list()
 		for (software_info &swinfo : swlist.get_info())
 		{
 			software_part *part = swinfo.first_part();
-			if (part->is_compatible(swlist))
+			if (part->is_compatible(swlist) == SOFTWARE_IS_COMPATIBLE)
 			{
 				const char *instance_name = nullptr;
 				const char *type_name = nullptr;

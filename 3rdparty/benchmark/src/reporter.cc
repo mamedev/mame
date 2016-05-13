@@ -77,6 +77,18 @@ void BenchmarkReporter::ComputeStats(
   stddev_data->items_per_second = items_per_second_stat.StdDev();
 }
 
+TimeUnitMultiplier BenchmarkReporter::GetTimeUnitAndMultiplier(TimeUnit unit) {
+  switch (unit) {
+    case kMillisecond:
+      return std::make_pair("ms", 1e3);
+    case kMicrosecond:
+      return std::make_pair("us", 1e6);
+    case kNanosecond:
+    default:
+      return std::make_pair("ns", 1e9);
+  }
+}
+
 void BenchmarkReporter::Finalize() {
 }
 

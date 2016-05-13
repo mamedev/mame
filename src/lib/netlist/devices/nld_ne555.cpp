@@ -34,11 +34,11 @@ NETLIB_START(NE555)
 	register_sub("RDIS", m_RDIS);
 
 	register_subalias("GND",  m_R3->m_N);    // Pin 1
-	register_input("TRIG",    m_TRIG);      // Pin 2
-	register_output("OUT",    m_OUT);       // Pin 3
-	register_input("RESET",   m_RESET);     // Pin 4
+	enregister("TRIG",    m_TRIG);      // Pin 2
+	enregister("OUT",    m_OUT);       // Pin 3
+	enregister("RESET",   m_RESET);     // Pin 4
 	register_subalias("CONT", m_R1->m_N);    // Pin 5
-	register_input("THRESH",  m_THRES);     // Pin 6
+	enregister("THRESH",  m_THRES);     // Pin 6
 	register_subalias("DISCH", m_RDIS->m_P); // Pin 7
 	register_subalias("VCC",  m_R1->m_P);    // Pin 8
 

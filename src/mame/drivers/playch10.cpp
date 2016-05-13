@@ -1758,7 +1758,7 @@ GAME( 1990, pc_ngai2, playch10, playch10, playch10, playch10_state, pcgboard, RO
 GAME( 1991, pc_ngai3, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode III: The Ancient Ship of Doom (PlayChoice-10)", 0 )
 GAME( 1991, pc_pwbld, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Taito (Nintendo of America license)",      "Power Blade (PlayChoice-10)", 0 )
 GAME( 1991, pc_rkats, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Atlus (Nintendo of America license)",      "Rockin' Kats (PlayChoice-10)", 0 )
-GAME( 1991, pc_ttoon, playch10, playch10, playch10, playch10_state, ttoon,    ROT0, "Capcom USA (Nintendo of America license)", "Tiny Toon Adventures (prototype) (PlayChoice-10)", 0 ) // Code is final USA NES version of the game, (which is MMC3C according to nes.xml, but this cart has MMC3B)
+GAME( 1991, pc_ttoon, playch10, playch10, playch10, playch10_state, ttoon,    ROT0, "Konami (Nintendo of America license)",     "Tiny Toon Adventures (prototype) (PlayChoice-10)", 0 ) // Code is final USA NES version of the game, (which is MMC3C according to nes.xml, but this cart has MMC3B)
 
 /* variant with 4 screen mirror */
 GAME( 1990, pc_radr2, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", 0 )

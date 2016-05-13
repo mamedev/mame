@@ -29,7 +29,8 @@ DEVICE_ADDRESS_MAP_START(target2_map, 32, vrc4373_device)
 ADDRESS_MAP_END
 
 vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pci_host_device(mconfig, VRC4373, "NEC VRC4373 System Controller", tag, owner, clock, "vrc4373", __FILE__), m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr),
+	: pci_host_device(mconfig, VRC4373, "NEC VRC4373 System Controller", tag, owner, clock, "vrc4373", __FILE__),
+		m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr), m_irq_num(-1),
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
 		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32), m_ram_size(0), m_ram_base(0), m_simm_size(0), m_simm_base(0), m_pci1_laddr(0), m_pci2_laddr(0), m_pci_io_laddr(0), m_target1_laddr(0), m_target2_laddr(0),
 		m_region(*this, DEVICE_SELF)
@@ -71,6 +72,11 @@ void vrc4373_device::device_start()
 
 	// MIPS drc
 	m_cpu->add_fastram(0x1fc00000, 0x1fcfffff, TRUE, m_region->base());
+
+	// DMA timer
+	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrc4373_device::dma_transfer), this));
+	// Leave the timer disabled.
+	m_dma_timer->adjust(attotime::never, 0, DMA_TIMER_PERIOD);
 }
 
 void vrc4373_device::device_reset()
@@ -78,6 +84,7 @@ void vrc4373_device::device_reset()
 	pci_device::device_reset();
 	memset(m_cpu_regs, 0, sizeof(m_cpu_regs));
 	regenerate_config_mapping();
+	m_dma_timer->adjust(attotime::never);
 }
 
 void vrc4373_device::map_cpu_space()
@@ -264,10 +271,17 @@ WRITE32_MEMBER (vrc4373_device::target2_w)
 }
 
 // DMA Transfer
-void vrc4373_device::dma_transfer(int which)
+TIMER_CALLBACK_MEMBER (vrc4373_device::dma_transfer)
 {
-	if (LOG_NILE)
-		logerror("%08X:nile Start dma PCI: %08X MEM: %08X Words: %X\n", m_cpu->space(AS_PROGRAM).device().safe_pc(), m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
+	int which = param;
+
+	// Check for dma suspension
+	if (m_cpu_regs[NREG_DMACR1 + which * 0xc] & DMA_SUS) {
+		if (LOG_NILE)
+			logerror("%08X:nile DMA Suspended PCI: %08X MEM: %08X Words: %X\n", m_cpu->space(AS_PROGRAM).device().safe_pc(), m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
+		return;
+	}
+
 	int pciSel = (m_cpu_regs[NREG_DMACR1+which*0xC] & DMA_MIO) ? AS_DATA : AS_IO;
 	address_space *src, *dst;
 	UINT32 srcAddr, dstAddr;
@@ -285,12 +299,14 @@ void vrc4373_device::dma_transfer(int which)
 		srcAddr = m_cpu_regs[NREG_DMA_CMAR];
 		dstAddr = m_cpu_regs[NREG_DMA_CPAR];
 	}
-	int count = m_cpu_regs[NREG_DMA_REM];
-	while (count>0) {
+	int dataCount = m_cpu_regs[NREG_DMA_REM];
+	int burstCount = DMA_BURST_SIZE;
+	while (dataCount>0 && burstCount>0) {
 		dst->write_dword(dstAddr, src->read_dword(srcAddr));
 		dstAddr += 0x4;
 		srcAddr += 0x4;
-		--count;
+		--dataCount;
+		--burstCount;
 	}
 	if (m_cpu_regs[NREG_DMACR1+which*0xC]&DMA_RW) {
 		m_cpu_regs[NREG_DMA_CPAR] = srcAddr;
@@ -299,7 +315,23 @@ void vrc4373_device::dma_transfer(int which)
 		m_cpu_regs[NREG_DMA_CMAR] = srcAddr;
 		m_cpu_regs[NREG_DMA_CPAR] = dstAddr;
 	}
-	m_cpu_regs[NREG_DMA_REM] = 0;
+	m_cpu_regs[NREG_DMA_REM] = dataCount;
+	// Check for end of DMA
+	if (dataCount == 0) {
+		// Clear the busy and go flags
+		m_cpu_regs[NREG_DMACR1 + which * 0xc] &= ~DMA_BUSY;
+		m_cpu_regs[NREG_DMACR1 + which * 0xc] &= ~DMA_GO;
+		// Set the interrupt
+		if (m_cpu_regs[NREG_DMACR1 + which * 0xc] & DMA_INT_EN) {
+			if (m_irq_num != -1) {
+				m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
+			} else {
+				logerror("vrc4373_device::dma_transfer Error: DMA configured to trigger interrupt but no interrupt line configured\n");
+			}
+		}
+		// Turn off the timer
+		m_dma_timer->adjust(attotime::never);
+	}
 }
 
 // CPU I/F
@@ -312,15 +344,6 @@ READ32_MEMBER (vrc4373_device::cpu_if_r)
 			break;
 		case NREG_PCICDR:
 			result = config_data_r(space, offset);
-			break;
-		case NREG_DMACR1:
-		case NREG_DMACR2:
-			// Clear busy and go on read
-			if (m_cpu_regs[NREG_DMA_REM]==0) {
-					int which = (offset-NREG_DMACR1)>>3;
-					m_cpu_regs[NREG_DMACR1+which*0xc] &= ~DMA_BUSY;
-					m_cpu_regs[NREG_DMACR1+which*0xc] &= ~DMA_GO;
-			}
 			break;
 		default:
 			break;
@@ -388,17 +411,19 @@ WRITE32_MEMBER(vrc4373_device::cpu_if_w)
 		case NREG_DMACR2:
 			// Start when DMA_GO bit is set
 			if (!(oldData & DMA_GO) && (data & DMA_GO)) {
-				int which = (offset-NREG_DMACR1)>>3;
-				// Check to see DMA is not already started
-				if (!(data&DMA_BUSY)) {
-					// Set counts and address
-					m_cpu_regs[NREG_DMA_CPAR] = m_cpu_regs[NREG_DMAPCI1+which*0xC];
-					m_cpu_regs[NREG_DMA_CMAR] = m_cpu_regs[NREG_DMAMAR1+which*0xC];
-					m_cpu_regs[NREG_DMA_REM] = (data & DMA_BLK_SIZE)>>2;
-					m_cpu_regs[NREG_DMACR1+which*0xc] |= DMA_BUSY;
-					// Start the transfer
-					dma_transfer(which);
-				}
+				int which = (offset - NREG_DMACR1) >> 3;
+				// Set counts and address
+				m_cpu_regs[NREG_DMA_CPAR] = m_cpu_regs[NREG_DMAPCI1 + which * 0xC];
+				m_cpu_regs[NREG_DMA_CMAR] = m_cpu_regs[NREG_DMAMAR1 + which * 0xC];
+				// Set number of words remaining
+				m_cpu_regs[NREG_DMA_REM] = (data & DMA_BLK_SIZE) >> 2;
+				// Set busy flag
+				m_cpu_regs[NREG_DMACR1 + which * 0xc] |= DMA_BUSY;
+				// Start the transfer
+				m_dma_timer->set_param(which);
+				m_dma_timer->adjust(attotime::zero, 0, DMA_TIMER_PERIOD);
+				if (LOG_NILE)
+					logerror("%08X:nile Start DMA Lane %i PCI: %08X MEM: %08X Words: %X\n", m_cpu->space(AS_PROGRAM).device().safe_pc(), which, m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
 			}
 			break;
 		case NREG_BMCR:

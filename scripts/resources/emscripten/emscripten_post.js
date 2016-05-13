@@ -7,4 +7,5 @@ JSMAME.ui_set_show_fps = Module.cwrap('_ZN15mame_ui_manager12set_show_fpsEb', ''
 JSMAME.ui_get_show_fps = Module.cwrap('_ZNK15mame_ui_manager8show_fpsEv', 'number', ['number']);
 JSMAME.sound_manager_mute = Module.cwrap('_ZN13sound_manager4muteEbh', '', ['number', 'number', 'number']);
 JSMAME.sdl_pauseaudio = Module.cwrap('SDL_PauseAudio', '', ['number']);
+JSMAME.sdl_sendkeyboardkey = Module.cwrap('SDL_SendKeyboardKey', '', ['number', 'number']);
 var JSMESS = JSMAME;

@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "peribox.h"
+#include "machine/ram.h"
 
 extern const device_type TI99_MEMEX;
 
@@ -29,15 +30,15 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite) override { };
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	void device_start() override;
+	void device_reset() override;
+	machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual const rom_entry *device_rom_region() const override;
 
 private:
 	bool    access_enabled(offs_t offset);
 
-	UINT8*  m_ram;
+	required_device<ram_device> m_ram;
 	UINT8   m_dip_switch[8];
 	int     m_genmod;
 };

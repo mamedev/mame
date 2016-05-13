@@ -10,6 +10,9 @@
 
 #include "../Common/RegisterCodec.h"
 
+namespace NCompress {
+namespace NDelta {
+
 struct CDelta
 {
   unsigned _delta;
@@ -22,7 +25,7 @@ struct CDelta
 
 #ifndef EXTRACT_ONLY
 
-class CDeltaEncoder:
+class CEncoder:
   public ICompressFilter,
   public ICompressSetCoderProperties,
   public ICompressWriteCoderProperties,
@@ -30,25 +33,25 @@ class CDeltaEncoder:
   public CMyUnknownImp
 {
 public:
-  MY_UNKNOWN_IMP2(ICompressSetCoderProperties, ICompressWriteCoderProperties)
+  MY_UNKNOWN_IMP3(ICompressFilter, ICompressSetCoderProperties, ICompressWriteCoderProperties)
   INTERFACE_ICompressFilter(;)
   STDMETHOD(SetCoderProperties)(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps);
   STDMETHOD(WriteCoderProperties)(ISequentialOutStream *outStream);
 };
 
-STDMETHODIMP CDeltaEncoder::Init()
+STDMETHODIMP CEncoder::Init()
 {
   DeltaInit();
   return S_OK;
 }
 
-STDMETHODIMP_(UInt32) CDeltaEncoder::Filter(Byte *data, UInt32 size)
+STDMETHODIMP_(UInt32) CEncoder::Filter(Byte *data, UInt32 size)
 {
   Delta_Encode(_state, _delta, data, size);
   return size;
 }
 
-STDMETHODIMP CDeltaEncoder::SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps)
+STDMETHODIMP CEncoder::SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps)
 {
   UInt32 delta = _delta;
   for (UInt32 i = 0; i < numProps; i++)
@@ -75,7 +78,7 @@ STDMETHODIMP CDeltaEncoder::SetCoderProperties(const PROPID *propIDs, const PROP
   return S_OK;
 }
 
-STDMETHODIMP CDeltaEncoder::WriteCoderProperties(ISequentialOutStream *outStream)
+STDMETHODIMP CEncoder::WriteCoderProperties(ISequentialOutStream *outStream)
 {
   Byte prop = (Byte)(_delta - 1);
   return outStream->Write(&prop, 1, NULL);
@@ -84,31 +87,31 @@ STDMETHODIMP CDeltaEncoder::WriteCoderProperties(ISequentialOutStream *outStream
 #endif
 
 
-class CDeltaDecoder:
+class CDecoder:
   public ICompressFilter,
   public ICompressSetDecoderProperties2,
   CDelta,
   public CMyUnknownImp
 {
 public:
-  MY_UNKNOWN_IMP1(ICompressSetDecoderProperties2)
+  MY_UNKNOWN_IMP2(ICompressFilter, ICompressSetDecoderProperties2)
   INTERFACE_ICompressFilter(;)
   STDMETHOD(SetDecoderProperties2)(const Byte *data, UInt32 size);
 };
 
-STDMETHODIMP CDeltaDecoder::Init()
+STDMETHODIMP CDecoder::Init()
 {
   DeltaInit();
   return S_OK;
 }
 
-STDMETHODIMP_(UInt32) CDeltaDecoder::Filter(Byte *data, UInt32 size)
+STDMETHODIMP_(UInt32) CDecoder::Filter(Byte *data, UInt32 size)
 {
   Delta_Decode(_state, _delta, data, size);
   return size;
 }
 
-STDMETHODIMP CDeltaDecoder::SetDecoderProperties2(const Byte *props, UInt32 size)
+STDMETHODIMP CDecoder::SetDecoderProperties2(const Byte *props, UInt32 size)
 {
   if (size != 1)
     return E_INVALIDARG;
@@ -118,6 +121,8 @@ STDMETHODIMP CDeltaDecoder::SetDecoderProperties2(const Byte *props, UInt32 size
 
 
 REGISTER_FILTER_E(Delta,
-    CDeltaDecoder(),
-    CDeltaEncoder(),
+    CDecoder(),
+    CEncoder(),
     3, "Delta")
+
+}}

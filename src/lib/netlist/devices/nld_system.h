@@ -165,7 +165,7 @@ protected:
 
 	void start() override
 	{
-		register_output("Q", m_Q);
+		enregister("Q", m_Q);
 	}
 
 	void reset() override
@@ -198,7 +198,7 @@ protected:
 
 	void start() override
 	{
-		register_input("I", m_I);
+		enregister("I", m_I);
 	}
 
 	void reset() override
@@ -236,14 +236,14 @@ protected:
 		register_param("RIN", m_p_RIN, 1.0e6);
 		register_param("ROUT", m_p_ROUT, 50.0);
 
-		register_input("_I", m_I);
-		register_terminal("I",m_RIN.m_P);
-		register_terminal("G",m_RIN.m_N);
+		enregister("_I", m_I);
+		enregister("I",m_RIN.m_P);
+		enregister("G",m_RIN.m_N);
 		connect_late(m_I, m_RIN.m_P);
 
-		register_output("_Q", m_Q);
-		register_terminal("_OP",m_ROUT.m_P);
-		register_terminal("Q",m_ROUT.m_N);
+		enregister("_Q", m_Q);
+		enregister("_OP",m_ROUT.m_P);
+		enregister("Q",m_ROUT.m_N);
 		connect_late(m_Q, m_ROUT.m_P);
 	}
 
@@ -396,8 +396,8 @@ public:
 protected:
 	void start() override
 	{
-		register_input("I", m_I);
-		register_output("Q", m_Q);
+		enregister("I", m_I);
+		enregister("Q", m_Q);
 	}
 
 	void reset() override
@@ -437,7 +437,7 @@ protected:
 
 	virtual void start() override
 	{
-		register_input("I", m_I);
+		enregister("I", m_I);
 	}
 
 	logic_input_t m_I;
@@ -500,7 +500,7 @@ public:
 		pstring m_dev_name;
 	};
 
-	ATTR_COLD device_t *Create(netlist_t &anetlist, const pstring &name) override
+	device_t *Create(netlist_t &anetlist, const pstring &name) override
 	{
 		return palloc(wrapper(this->name(), anetlist, name));
 	}

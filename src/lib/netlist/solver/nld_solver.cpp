@@ -184,8 +184,7 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 							//net_proxy_output = palloc(analog_output_t(*this,
 							//      this->name() + "." + pfmt("m{1}")(m_inps.size())));
 
-							net_proxy_output = palloc(analog_output_t);
-							net_proxy_output->init_object(*this, this->name() + "." + pfmt("m{1}")(m_inps.size()));
+							net_proxy_output = palloc(analog_output_t(*this, this->name() + "." + pfmt("m{1}")(m_inps.size())));
 							m_inps.push_back(net_proxy_output);
 							net_proxy_output->m_proxied_net = &p->net().as_analog();
 						}
@@ -405,9 +404,9 @@ void matrix_solver_t::update_dynamic()
 
 ATTR_COLD void matrix_solver_t::start()
 {
-	register_output("Q_sync", m_Q_sync);
-	register_input("FB_sync", m_fb_sync);
-	connect_direct(m_fb_sync, m_Q_sync);
+	enregister("Q_sync", m_Q_sync);
+	enregister("FB_sync", m_fb_sync);
+	connect_post_start(m_fb_sync, m_Q_sync);
 
 	save(NLNAME(m_last_step));
 	save(NLNAME(m_cur_ts));
@@ -605,7 +604,7 @@ void matrix_solver_t::log_stats()
 
 NETLIB_START(solver)
 {
-	register_output("Q_step", m_Q_step);
+	enregister("Q_step", m_Q_step);
 
 	register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(10).as_double());
 
@@ -634,7 +633,7 @@ NETLIB_START(solver)
 
 	// internal staff
 
-	register_input("FB_step", m_fb_step);
+	enregister("FB_step", m_fb_step);
 	connect_late(m_fb_step, m_Q_step);
 
 }

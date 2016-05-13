@@ -114,12 +114,12 @@ static MACHINE_CONFIG_START( pockchalv1, pockchalv1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pockchalv1_state, screen_update_pockchalv1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pockchalv1_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pockchalw_cart")
 	MCFG_GENERIC_EXTENSIONS("bin")
 	MCFG_GENERIC_LOAD(pockchalv1_state, pockchalv1_cart)
 	MCFG_GENERIC_MANDATORY
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc1_list","pockchalv1")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc1_list","pockchalw")
 
 MACHINE_CONFIG_END
 
@@ -128,4 +128,4 @@ MACHINE_CONFIG_END
 ROM_START( pockchal )
 ROM_END
 
-GAME( 199?, pockchal,  0,    pockchalv1, pockchalv1, driver_device,  0, ROT0, "Benesse Corporation", "Pocket Challenge (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, pockchal,  0,    pockchalv1, pockchalv1, driver_device,  0, ROT0, "Benesse Corporation", "Pocket Challenge W (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

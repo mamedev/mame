@@ -79,6 +79,7 @@ public:
 	void internal_header_logging(UINT8 *ROM, UINT32 len);
 
 	void save_nvram()   { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
+	UINT32 get_rom_size()   { if (m_cart) return m_cart->get_rom_size(); return 0; }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 	virtual bool is_readable()  const override { return 1; }

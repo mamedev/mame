@@ -52,9 +52,9 @@ public:
 
 	unsigned m_railstart;
 
-	pvector_t<int> m_nz;   /* all non zero for multiplication */
-	pvector_t<int> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
-	pvector_t<int> m_nzbd; /* non zero below of the diagonal for elimination */
+	pvector_t<unsigned> m_nz;   /* all non zero for multiplication */
+	pvector_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
+	pvector_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
 
 	/* state */
 	nl_double m_last_V;
@@ -74,8 +74,8 @@ private:
 class matrix_solver_t : public device_t
 {
 public:
-	typedef pvector_t<matrix_solver_t *> list_t;
-	typedef core_device_t::list_t dev_list_t;
+	using list_t = pvector_t<matrix_solver_t *>;
+	using dev_list_t = core_device_t::list_t;
 
 	enum eSortType
 	{

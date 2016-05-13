@@ -36,7 +36,7 @@
 #ifndef NLD_74175_H_
 #define NLD_74175_H_
 
-#include "nld_signal.h"
+#include "nl_base.h"
 
 #define TTL_74175(_name)                                     \
 		NET_REGISTER_DEV(TTL_74175, _name)

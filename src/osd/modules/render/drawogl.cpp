@@ -24,7 +24,7 @@
 #ifndef OSD_WINDOWS
 // standard SDL headers
 #define TOBEMIGRATED 1
-#include "sdlinc.h"
+#include <SDL2/SDL.h>
 #endif
 
 #include "modules/lib/osdlib.h"

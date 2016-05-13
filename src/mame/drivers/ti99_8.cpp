@@ -837,24 +837,24 @@ MACHINE_CONFIG_END
 ROM_START(ti99_8)
 	// Logical (CPU) memory space: ROM0
 	ROM_REGION(0x2000, ROM0_REG, 0)
-	ROM_LOAD("u4_rom0.bin", 0x0000, 0x2000, CRC(901eb8d6) SHA1(13190c5e834baa9c0a70066b566cfcef438ed88a))
+	ROM_LOAD("rom0.u4", 0x0000, 0x2000, CRC(901eb8d6) SHA1(13190c5e834baa9c0a70066b566cfcef438ed88a))
 
 	// Physical memory space (mapped): ROM1
 	ROM_REGION(0x8000, ROM1_REG, 0)
-	ROM_LOAD("u25_rom1.bin", 0x0000, 0x8000, CRC(b574461a) SHA1(42c6aed44802cfabdd26b565d6e5ddfcd689f11e))
+	ROM_LOAD("rom1.u25", 0x0000, 0x8000, CRC(b574461a) SHA1(42c6aed44802cfabdd26b565d6e5ddfcd689f11e))
 
 	// Physical memory space (mapped): P-Code ROM
 	// This circuit is only available in later versions of the console and seems
-	// to be picky-backed on ROM1.
+	// to be piggy-backed on ROM1.
 	// To make things worse, the decoding logic of the custom chips do not show
 	// the required select line for this ROM on the available schematics, so
 	// they seem to be from the earlier version. The location in the address
 	// space was determined by ROM disassembly.
 	ROM_REGION(0x8000, PASCAL_REG, 0)
-	ROM_LOAD("u25a_pas.bin", 0x0000, 0x4000, CRC(d7ed6dd6) SHA1(32212ce6426ceccbff73d342d4a3ef699c0ae1e4))
+	ROM_LOAD("pascal.u25a", 0x0000, 0x4000, CRC(d7ed6dd6) SHA1(32212ce6426ceccbff73d342d4a3ef699c0ae1e4))
 
 	// System GROMs. 3 chips @ f830
-	// The schematics do not enumerate the circuits but only talk about
+	// The schematics do not enumerate the circuits but only say
 	// "circuits on board" (COB) so we name the GROMs as gM_N.bin where M is the
 	// ID (0-7) and N is the access port in the logical address space.
 	ROM_REGION(0x6000, SYSGROM_REG, 0)

@@ -14,7 +14,7 @@
 #if (defined(OSD_SDL) || defined(USE_SDL_SOUND))
 
 // standard sdl header
-#include "../../sdl/sdlinc.h"
+#include <SDL2/SDL.h>
 
 // MAME headers
 #include "emu.h"

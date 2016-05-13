@@ -32,6 +32,7 @@ h63484_device::h63484_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, H63484, "HD63484 CRTC", tag, owner, clock, "hd63484", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
+	m_auto_configure_screen(true),
 	m_ar(0),
 	m_sr(0),
 	m_fifo_ptr(-1),
@@ -510,7 +511,7 @@ inline void h63484_device::dequeue_r(UINT8 *data)
 
 inline void h63484_device::recompute_parameters()
 {
-	if(m_hdw < 3 || m_hc == 0 || m_vc == 0) //bail out if screen params aren't valid
+	if(!m_auto_configure_screen || m_hdw < 3 || m_hc == 0 || m_vc == 0) //bail out if screen params aren't valid
 		return;
 
 	if (LOG)
@@ -882,8 +883,8 @@ void h63484_device::paint(INT16 sx, INT16 sy)
 
 					limit = false;
 				}
-				if (limit)     break;
-			}
+			if (limit)     break;
+		}
 }
 
 UINT16 h63484_device::command_rpr_exec()

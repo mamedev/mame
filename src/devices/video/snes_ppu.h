@@ -180,6 +180,7 @@ public:
 		UINT8 select_pri[5];
 	};
 	struct DEBUGOPTS m_debug_options;
+	UINT8 dbg_video( UINT16 curline );
 #endif
 
 	UINT8 m_mosaic_size;

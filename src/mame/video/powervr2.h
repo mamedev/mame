@@ -61,11 +61,13 @@ public:
 		UINT32 address, vqbase;
 		UINT32 nontextured_pal_int;
 		UINT8 nontextured_fpal_a,nontextured_fpal_r,nontextured_fpal_g,nontextured_fpal_b;
-		int textured, sizex, sizey, stride, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode, flip_u, flip_v;
+		int textured, sizex, sizey, stride, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode;
 		int coltype;
 
 		UINT32 (powervr2_device::*r)(struct texinfo *t, float x, float y);
 		UINT32 (*blend)(UINT32 s, UINT32 d);
+		int (*u_func)(float uv, int size);
+		int (*v_func)(float uv, int size);
 		int palbase, cd;
 	};
 
@@ -312,6 +314,10 @@ private:
 	UINT32 sb_pdstap, sb_pdstar, sb_pdlen, sb_pddir, sb_pdtsel, sb_pden, sb_pdst, sb_pdapro;
 
 	static UINT32 (*const blend_functions[64])(UINT32 s, UINT32 d);
+
+	static int uv_wrap(float uv, int size);
+	static int uv_flip(float uv, int size);
+	static int uv_clamp(float uv, int size);
 
 	static inline INT32 clamp(INT32 in, INT32 min, INT32 max);
 	static inline UINT32 bilinear_filter(UINT32 c0, UINT32 c1, UINT32 c2, UINT32 c3, float u, float v);

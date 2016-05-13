@@ -30,6 +30,7 @@ public:
 
   STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
   UInt64 GetSize() const { return _pos; }
+  UInt64 GetRem() const { return _size - _pos; }
   bool WasFinished() const { return _wasFinished; }
 };
 

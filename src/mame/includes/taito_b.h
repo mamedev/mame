@@ -2,7 +2,7 @@
 // copyright-holders:Jarek Burczynski
 #include "machine/mb87078.h"
 #include "machine/taitoio.h"
-#include "video/hd63484.h"
+#include "video/h63484.h"
 #include "video/tc0180vcu.h"
 
 class taitob_state : public driver_device
@@ -64,7 +64,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	device_t *m_ym;
-	optional_device<hd63484_device> m_hd63484;
+	optional_device<h63484_device> m_hd63484;
 	required_device<tc0180vcu_device> m_tc0180vcu;
 	optional_device<tc0640fio_device> m_tc0640fio;
 	optional_device<tc0220ioc_device> m_tc0220ioc;

@@ -35,11 +35,24 @@
         then read Cn00 to map C800-CFFF first.
 
         PC RAM from 0xA0000-0xAFFFF is where the V30 BIOS is downloaded,
-        plus used for general storage by the system.  This is mirrored at
+        plus used for general storage by the system.  This is mirrored at 
         Fxxxx on the V30 so that it can boot.
-        RAM from 0xB0000-0xBFFFF is the CGA framebuffer as usual.
+        RAM from 0xB8000-0xBFFFF is the CGA framebuffer as usual.
 
-        C800-CBFF?: RAM, used as scratchpad space by the software
+		C800-CFFE: RAM / registers, locations as follows
+		C828-C82A: bi-directional mailslots used to allow the PC to make ProDOS MLI calls,
+		           likely for the HDD emulation (which uses a file on a ProDOS volume
+		           as the PC).  
+		           $C828 = hi 8 bits of ptr to ProDOS call info, $C829 = middle 8 bits, $C82A = lower 8 bits
+		           If bit 7 of $C828 is set, then the 6502 will take action.
+	    C832: current CGA mode index, used by 6502 @ $6869 to setup 6845, or 6845 reg index
+	    C833: 6845 data to write in the case where C832 is the reg index rather than a mode offset
+		C860-C864: PC ports 60h-64h, used for keyboard comms
+		CAC1: year for PC real-time clock
+		CAC2: month for PC real-time clock
+		CAC3: day for PC real-time clock
+		CAC4: hour for PC real-time clock
+		CAC5: minute for PC real-time clock
         CF00: PC memory pointer (bits 0-7)
         CF01: PC memory pointer (bits 8-15)
         CF02: PC memory pointer (bits 16-23)
@@ -50,14 +63,18 @@
         CF2E: CGA mode select (port 3D8)
         CF2F: CGA color select (port 3D9)
         CF30: control/flags: bit 4 = 1 to release reset on V30, 5 = 1 to release halt on V30
+                             bit 7: read for card IRQ status, write 1 to clear/disable? card IRQ
         CF31: control/flags: bit 4 = 1 to assert reset on V30, 5 = 1 to assert halt on V30
+			   if bit 3 is set on an IRQ, the 6502 will force color 80x25 CGA text mode.
+			   bit 7: write 1 to enable card IRQ
 
     TODO:
-        - Code at $70b0-$70c5 waits for the V30 to answer FPU presence.
-        - What's going on at CF0E/CF0F?
-        - The manual indicates there is no ROM; special drivers installed into ProDOS 8
-          provide the RAMdisk and A2-accessing-PC-drives functionality.
-
+    	- Code at $70b0-$70c5 waits for the V30 to answer FPU presence.
+        - What's going on at CF0E/CF0F?  One value set for normal operation, another during
+          ProDOS calls.  Probably safe to ignore.
+    	- The manual indicates there is no ROM; special drivers installed into ProDOS 8
+    	  provide the RAMdisk and A2-accessing-PC-drives functionality.
+          
 *********************************************************************/
 
 #include "pc_xporter.h"
@@ -81,13 +98,13 @@ static ADDRESS_MAP_START(pc_io, AS_IO, 16, a2bus_pcxporter_device )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xffff)
-	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
+	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(kbd_6502_r, kbd_6502_w, 0xffff)
 	AM_RANGE(0x0080, 0x008f) AM_WRITE8(pc_page_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(nmi_enable_w, 0xffff)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( pcxporter )
-	MCFG_CPU_ADD("v30", V30, XTAL_14_31818MHz/2)    // 7.16 MHz as per manual
+	MCFG_CPU_ADD("v30", V30, XTAL_14_31818MHz/2)	// 7.16 MHz as per manual
 	MCFG_CPU_PROGRAM_MAP(pc_map)
 	MCFG_CPU_IO_MAP(pc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
@@ -120,11 +137,6 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("v30", 0), VCC, NOOP)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(a2bus_pcxporter_device, pc_ppi_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(a2bus_pcxporter_device, pc_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(a2bus_pcxporter_device, pc_ppi_portc_r))
-
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU("^v30")
 	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
@@ -141,7 +153,7 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(a2bus_pcxporter_device, keyboard_clock_w))
 	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(a2bus_pcxporter_device, keyboard_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
-
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -176,7 +188,6 @@ a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, de
 	m_pic8259(*this, "pic8259"),
 	m_dma8237(*this, "dma8237"),
 	m_pit8253(*this, "pit8253"),
-	m_ppi8255(*this, "ppi8255"),
 	m_speaker(*this, "speaker"),
 	m_isabus(*this, "isa"),
 	m_pc_kbdc(*this, "pc_kbdc")
@@ -190,7 +201,6 @@ a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, co
 	m_pic8259(*this, "pic8259"),
 	m_dma8237(*this, "dma8237"),
 	m_pit8253(*this, "pit8253"),
-	m_ppi8255(*this, "ppi8255"),
 	m_speaker(*this, "speaker"),
 	m_isabus(*this, "isa"),
 	m_pc_kbdc(*this, "pc_kbdc")
@@ -214,10 +224,10 @@ void a2bus_pcxporter_device::device_start()
 	save_item(NAME(m_ram));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_offset));
-
+	
 	m_v30->space(AS_PROGRAM).install_ram(0, 0xaffff, m_ram);
 	m_v30->space(AS_PROGRAM).install_rom(0xf0000, 0xfffff, &m_ram[0xa0000]);
-
+	
 	m_pcmem_space = &m_v30->space(AS_PROGRAM);
 	m_pcio_space = &m_v30->space(AS_IO);
 }
@@ -313,11 +323,11 @@ UINT8 a2bus_pcxporter_device::read_c800(address_space &space, UINT16 offset)
 
 			case 0x704: // read w/o increment
 				rv = m_ram[m_offset];
-				return rv;
-
+				return rv;			
+				
 			default:
 				//printf("Read $C800 at %x\n", offset + 0xc800);
-				break;
+				break;					
 		}
 
 		return m_regs[offset];
@@ -371,13 +381,13 @@ void a2bus_pcxporter_device::write_c800(address_space &space, UINT16 offset, UIN
 				else if (m_offset >= 0xb8000 && m_offset <= 0xbbfff) m_pcmem_space->write_byte(m_offset, data);
 				else if (m_offset >= 0xbc000 && m_offset <= 0xbffff) m_pcmem_space->write_byte(m_offset-0x4000, data);
 				break;
-
-			case 0x72c: // CGA 6845 register select
+				
+			case 0x72c:	// CGA 6845 register select
 				m_pcio_space->write_byte(0x3d6, data);
 				m_6845_reg = data;
 				break;
-
-			case 0x72d: // CGA 6845 data read/write
+			
+			case 0x72d:	// CGA 6845 data read/write
 				// HACK: adjust the 40 column mode the 6502 sets to
 				// be more within specs.
 				switch (m_6845_reg)
@@ -406,37 +416,37 @@ void a2bus_pcxporter_device::write_c800(address_space &space, UINT16 offset, UIN
 
 				m_pcio_space->write_byte(0x3d7, data);
 				break;
-
-			case 0x72e: // CGA mode select
+			
+			case 0x72e:	// CGA mode select
 				m_pcio_space->write_byte(0x3d8, data);
 				break;
 
 			case 0x72f: // CGA color select
 				m_pcio_space->write_byte(0x3d9, data);
 				break;
-
-			case 0x730: // control 1
+				
+			case 0x730:	// control 1
 				if (data & 0x10) { m_v30->set_input_line(INPUT_LINE_RESET, CLEAR_LINE); m_reset_during_halt = true; }
 				if (data & 0x20)
-				{
+				{ 
 					if (m_reset_during_halt)
 					{
 						m_v30->reset();
 						m_reset_during_halt = false;
 					}
-
+				
 					m_v30->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 					m_v30->resume(SUSPEND_REASON_HALT | SUSPEND_REASON_DISABLE);
 				}
 				break;
-
-			case 0x731: // control 2
+				
+			case 0x731:	// control 2
 				if (data & 0x10) m_v30->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 				if (data & 0x20) m_v30->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 				break;
-
+				
 			default:
-//              printf("%02x to C800 at %x\n", data, offset + 0xc800);
+//				printf("%02x to C800 at %x\n", data, offset + 0xc800);
 				m_regs[offset] = data;
 				break;
 		}
@@ -446,6 +456,16 @@ void a2bus_pcxporter_device::write_c800(address_space &space, UINT16 offset, UIN
 READ16_MEMBER(a2bus_pcxporter_device::pc_bios_r)
 {
 	return m_ram[offset+0xa0000] | (m_ram[offset+0xa0001]<<8);
+}
+
+READ8_MEMBER( a2bus_pcxporter_device::kbd_6502_r )
+{
+	return m_c800_ram[offset+0x60];
+}
+
+WRITE8_MEMBER( a2bus_pcxporter_device::kbd_6502_w )
+{
+	m_c800_ram[offset+0x60] = data;
 }
 
 /*************************************************************************
@@ -606,161 +626,14 @@ WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_pit8253_out2_changed )
 }
 
 
-/**********************************************************
- *
- * PPI8255 interface
- *
- *
- * PORT A (input)
- *
- * Directly attached to shift register which stores data
- * received from the keyboard.
- *
- * PORT B (output)
- * 0 - PB0 - TIM2GATESPK - Enable/disable counting on timer 2 of the 8253
- * 1 - PB1 - SPKRDATA    - Speaker data
- * 2 - PB2 -             - Enable receiving data from the keyboard when keyboard is not locked.
- * 3 - PB3 -             - Dipsswitch set selector
- * 4 - PB4 - ENBRAMPCK   - Enable ram parity check
- * 5 - PB5 - ENABLEI/OCK - Enable expansion I/O check
- * 6 - PB6 -             - Connected to keyboard clock signal
- *                         0 = ignore keyboard signals
- *                         1 = accept keyboard signals
- * 7 - PB7 -             - Clear/disable shift register and IRQ1 line
- *                         0 = normal operation
- *                         1 = clear and disable shift register and clear IRQ1 flip flop
- *
- * PORT C
- * 0 - PC0 -         - Dipswitch 0/4 SW1
- * 1 - PC1 -         - Dipswitch 1/5 SW1
- * 2 - PC2 -         - Dipswitch 2/6 SW1
- * 3 - PC3 -         - Dipswitch 3/7 SW1
- * 4 - PC4 - SPK     - Speaker/cassette data
- * 5 - PC5 - I/OCHCK - Expansion I/O check result
- * 6 - PC6 - T/C2OUT - Output of 8253 timer 2
- * 7 - PC7 - PCK     - Parity check result
- *
- * IBM5150 SW1:
- * 0   - OFF - One or more floppy drives
- *       ON  - Diskless operation
- * 1   - OFF - 8087 present
- *       ON  - No 8087 present
- * 2+3 - Used to determine on board memory configuration
- *       OFF OFF - 64KB
- *       ON  OFF - 48KB
- *       OFF ON  - 32KB
- *       ON  ON  - 16KB
- * 4+5 - Used to select display
- *       OFF OFF - Monochrome
- *       ON  OFF - CGA, 80 column
- *       OFF ON  - CGA, 40 column
- *       ON  ON  - EGA/VGA display
- * 6+7 - Used to select number of disk drives
- *       OFF OFF - four disk drives
- *       ON  OFF - three disk drives
- *       OFF ON  - two disk drives
- *       ON  ON  - one disk drive
- *
- **********************************************************/
 WRITE_LINE_MEMBER( a2bus_pcxporter_device::keyboard_clock_w )
 {
-	if (!m_ppi_keyboard_clear && !state && !m_ppi_shift_enable)
-	{
-		m_ppi_shift_enable = m_ppi_shift_register & 0x01;
-
-		m_ppi_shift_register >>= 1;
-		m_ppi_shift_register |= m_ppi_data_signal << 7;
-
-		m_pic8259->ir1_w(m_ppi_shift_enable);
-		m_pc_kbdc->data_write_from_mb(!BIT(m_ppi_portb, 2) && !m_ppi_shift_enable);
-	}
 }
 
 
 WRITE_LINE_MEMBER( a2bus_pcxporter_device::keyboard_data_w )
 {
-	m_ppi_data_signal = state;
 }
-
-READ8_MEMBER (a2bus_pcxporter_device::pc_ppi_porta_r)
-{
-	int data = 0xFF;
-	/* KB port A */
-	if (m_ppi_keyboard_clear)
-	{
-		/*   0  0 - no floppy drives
-		 *   1  Not used
-		 * 2-3  The number of memory banks on the system board
-		 * 4-5  Display mode
-		 *      11 = monochrome
-		 *      10 - color 80x25
-		 *      01 - color 40x25
-		 * 6-7  The number of floppy disk drives
-		 */
-		data = 0x30;
-	}
-	else
-	{
-		data = m_ppi_shift_register;
-	}
-//  PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
-	return data;
-}
-
-
-READ8_MEMBER ( a2bus_pcxporter_device::pc_ppi_portc_r )
-{
-	int data=0xff;
-
-	data&=~0x80; // no parity error
-	data&=~0x40; // no error on expansion board
-	/* KB port C: equipment flags */
-	if (m_ppi_portc_switch_high)
-	{
-		/* read hi nibble of S2 */
-		data = (data & 0xf0) | ((0x3) & 0x0f);
-//      PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
-	}
-	else
-	{
-		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (0x0 & 0x0f);
-//      PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
-	}
-
-	if ( m_ppi_portb & 0x01 )
-	{
-		data = ( data & ~0x10 ) | ( m_pit_out2 ? 0x10 : 0x00 );
-	}
-	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
-
-	return data;
-}
-
-
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_ppi_portb_w )
-{
-	/* PPI controller port B*/
-	m_ppi_portb = data;
-	m_ppi_portc_switch_high = data & 0x08;
-	m_ppi_keyboard_clear = data & 0x80;
-	m_ppi_keyb_clock = data & 0x40;
-	m_pit8253->write_gate2(BIT(data, 0));
-	pc_speaker_set_spkrdata( data & 0x02 );
-
-	/* If PB7 is set clear the shift register and reset the IRQ line */
-	if ( m_ppi_keyboard_clear )
-	{
-		m_ppi_shift_register = 0;
-		m_ppi_shift_enable = 0;
-		m_pic8259->ir1_w(m_ppi_shift_enable);
-	}
-
-	m_pc_kbdc->data_write_from_mb(!BIT(m_ppi_portb, 2) && !m_ppi_shift_enable);
-	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
-	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
-}
-
 
 /**********************************************************
  *
@@ -773,3 +646,6 @@ WRITE8_MEMBER( a2bus_pcxporter_device::nmi_enable_w )
 	m_nmi_enabled = BIT(data,7);
 	m_isabus->set_nmi_state(m_nmi_enabled);
 }
+
+
+

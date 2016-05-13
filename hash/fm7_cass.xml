@@ -1527,7 +1527,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="portpia">
+	<software name="portopia" supported="no">
 		<description>Portopia Renzoku Satsujin Jiken</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -1535,17 +1535,17 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="ポートピア連続殺人事件"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="55320">
-				<rom name="portpia1.t77" size="55320" crc="c828949f" sha1="5a45ca2c832eb41122816bed92f76af0bac605b7" offset="0" />
+				<rom name="portopia1.t77" size="55320" crc="c828949f" sha1="5a45ca2c832eb41122816bed92f76af0bac605b7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="184340">
-				<rom name="portpia2.t77" size="184340" crc="6f37dae0" sha1="91cf9c2969309c94f95dce0c7dfe79f693904fed" offset="0" />
+				<rom name="portopia2.t77" size="184340" crc="6f37dae0" sha1="91cf9c2969309c94f95dce0c7dfe79f693904fed" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="fm7_cass">
 			<dataarea name="cass" size="1467646">
-				<rom name="portpia3.t77" size="1467646" crc="0d9ffa8a" sha1="9f31ae89d2f54c9eb8615d73a60156022683e882" offset="0" />
+				<rom name="portopia3.t77" size="1467646" crc="0d9ffa8a" sha1="9f31ae89d2f54c9eb8615d73a60156022683e882" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -17,23 +17,23 @@ NETLIB_NAMESPACE_DEVICES_START()
 NETLIB_START(MM5837_dip)
 {
 	/* clock */
-	register_output("Q", m_Q);
-	register_input("FB", m_feedback);
+	enregister("Q", m_Q);
+	enregister("FB", m_feedback);
 	m_inc = netlist_time::from_hz(56000);
 	connect_late(m_feedback, m_Q);
 
 	/* output */
 	register_sub("RV", m_RV);
-	register_terminal("_RV1", m_RV->m_P);
-	register_terminal("_RV2", m_RV->m_N);
-	register_output("_Q", m_V0);
+	enregister("_RV1", m_RV->m_P);
+	enregister("_RV2", m_RV->m_N);
+	enregister("_Q", m_V0);
 	connect_late(m_RV->m_N, m_V0);
 
 	/* device */
-	register_input("1", m_VDD);
-	register_input("2", m_VGG);
+	enregister("1", m_VDD);
+	enregister("2", m_VGG);
 	register_subalias("3", m_RV->m_P);
-	register_input("4", m_VSS);
+	enregister("4", m_VSS);
 
 	save(NLNAME(m_shift));
 }

@@ -11,11 +11,11 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(7450)
 {
-	register_input("A", m_A);
-	register_input("B", m_B);
-	register_input("C", m_C);
-	register_input("D", m_D);
-	register_output("Q", m_Q);
+	enregister("A", m_A);
+	enregister("B", m_B);
+	enregister("C", m_C);
+	enregister("D", m_D);
+	enregister("Q", m_Q);
 }
 
 NETLIB_RESET(7450)

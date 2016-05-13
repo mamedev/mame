@@ -380,29 +380,33 @@ static inline bool IsExeFilter(CMethodId m)
   return false;
 }
 
-static unsigned Get_FilterGroup_for_Folder(CRecordVector<CFilterMode2> &filters, const CFolderEx &f)
+static unsigned Get_FilterGroup_for_Folder(
+    CRecordVector<CFilterMode2> &filters, const CFolderEx &f, bool extractFilter)
 {
   CFilterMode2 m;
   m.Id = 0;
   m.Delta = 0;
   m.Encrypted = f.IsEncrypted();
 
-  const CCoderInfo &coder = f.Coders[f.UnpackCoder];
+  if (extractFilter)
+  {
+    const CCoderInfo &coder = f.Coders[f.UnpackCoder];
   
-  if (coder.MethodID == k_Delta)
-  {
-    if (coder.Props.Size() == 1)
+    if (coder.MethodID == k_Delta)
     {
-      m.Delta = (unsigned)coder.Props[0] + 1;
-      m.Id = k_Delta;
+      if (coder.Props.Size() == 1)
+      {
+        m.Delta = (unsigned)coder.Props[0] + 1;
+        m.Id = k_Delta;
+      }
     }
-  }
-  else if (IsExeFilter(coder.MethodID))
-  {
-    m.Id = (UInt32)coder.MethodID;
-    if (m.Id == k_BCJ2)
-      m.Id = k_BCJ;
-    m.SetDelta();
+    else if (IsExeFilter(coder.MethodID))
+    {
+      m.Id = (UInt32)coder.MethodID;
+      if (m.Id == k_BCJ2)
+        m.Id = k_BCJ;
+      m.SetDelta();
+    }
   }
   
   return GetGroup(filters, m);
@@ -1577,7 +1581,7 @@ HRESULT Update(
     return E_NOTIMPL;
   */
 
-  UInt64 startBlockSize = db != 0 ? db->ArcInfo.StartPosition: 0;
+  UInt64 startBlockSize = db ? db->ArcInfo.StartPosition: 0;
   if (startBlockSize > 0 && !options.RemoveSfxBlock)
   {
     RINOK(WriteRange(inStream, seqOutStream, 0, startBlockSize, NULL));
@@ -1591,8 +1595,21 @@ HRESULT Update(
   CRecordVector<CFilterMode2> filters;
   CObjectVector<CSolidGroup> groups;
   bool thereAreRepacks = false;
+
+  bool useFilters = options.UseFilters;
+  if (useFilters)
+  {
+    const CCompressionMethodMode &method = *options.Method;
+
+    FOR_VECTOR (i, method.Methods)
+      if (IsFilterMethod(method.Methods[i].Id))
+      {
+        useFilters = false;
+        break;
+      }
+  }
   
-  if (db != 0)
+  if (db)
   {
     fileIndexToUpdateIndexMap.Alloc(db->Files.Size());
     unsigned i;
@@ -1638,16 +1655,18 @@ HRESULT Update(
       CFolderEx f;
       db->ParseFolderEx(i, f);
 
-      bool isEncrypted = f.IsEncrypted();
-      
-      unsigned groupIndex = Get_FilterGroup_for_Folder(filters, f);
+      const bool isEncrypted = f.IsEncrypted();
+      const bool needCopy = (numCopyItems == numUnpackStreams);
+      const bool extractFilter = (useFilters || needCopy);
+
+      unsigned groupIndex = Get_FilterGroup_for_Folder(filters, f, extractFilter);
       
       while (groupIndex >= groups.Size())
         groups.AddNew();
 
       groups[groupIndex].folderRefs.Add(rep);
       
-      if (numCopyItems == numUnpackStreams)
+      if (needCopy)
         complexity += db->GetFolderFullPackSize(i);
       else
       {
@@ -1732,21 +1751,7 @@ HRESULT Update(
 
     // ---------- Split files to groups ----------
 
-    bool useFilters = options.UseFilters;
     const CCompressionMethodMode &method = *options.Method;
-    
-    if (useFilters)
-      for (i = 0; i < method.Methods.Size(); i++)
-        if (IsFilterMethod(method.Methods[i].Id))
-        {
-          useFilters = false;
-          break;
-        }
-
-    /*
-    if (!method.Bonds.IsEmpty())
-      useFilters = false;
-    */
     
     for (i = 0; i < updateItems.Size(); i++)
     {
@@ -2156,7 +2161,13 @@ HRESULT Update(
           #ifndef _7ZIP_ST
           if (options.MultiThreadMixer)
           {
+            // 16.00: hang was fixed : for case if decoding was not finished.
+            // We close CBinderInStream and it calls CStreamBinder::CloseRead()
+            inStreamSizeCount.Release();
+            sbInStream.Release();
+            
             threadDecoder.WaitExecuteFinish();
+            
             HRESULT decodeRes = threadDecoder.Result;
             // if (res == k_My_HRESULT_CRC_ERROR)
             if (decodeRes == S_FALSE)

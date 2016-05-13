@@ -37,7 +37,6 @@
 #ifndef NLD_9312_H_
 #define NLD_9312_H_
 
-#include "nld_signal.h"
 #include "nld_truthtable.h"
 
 #define TTL_9312(_name)                                                \

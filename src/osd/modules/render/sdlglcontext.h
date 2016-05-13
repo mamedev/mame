@@ -13,7 +13,7 @@
 #ifndef __SDL_GL_CONTEXT__
 #define __SDL_GL_CONTEXT__
 
-#include "sdlinc.h"
+#include <SDL2/SDL.h>
 #include "modules/opengl/osd_opengl.h"
 
 class sdl_gl_context : public osd_gl_context

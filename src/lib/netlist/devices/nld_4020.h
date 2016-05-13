@@ -45,7 +45,6 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_SUBDEVICE(CD4020_sub,
 
-	NETLIB_LOGIC_FAMILY(CD4XXX)
 	ATTR_HOT void update_outputs(const UINT16 cnt);
 
 	logic_input_t m_IP;
@@ -56,7 +55,6 @@ NETLIB_SUBDEVICE(CD4020_sub,
 );
 
 NETLIB_DEVICE(CD4020,
-	NETLIB_LOGIC_FAMILY(CD4XXX)
 	NETLIB_SUB(CD4020_sub) sub;
 	NETLIB_SUB(vdd_vss) m_supply;
 	logic_input_t m_RESET;

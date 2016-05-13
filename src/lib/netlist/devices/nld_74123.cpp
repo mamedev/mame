@@ -20,16 +20,16 @@ NETLIB_START(74123)
 	register_sub("RP", m_RP);
 	register_sub("RN", m_RN);
 
-	register_input("A", m_A);
-	register_input("B", m_B);
-	register_input("CLRQ", m_CLRQ);
-	register_output("Q", m_Q);
-	register_output("QQ", m_QQ);
+	enregister("A", m_A);
+	enregister("B", m_B);
+	enregister("CLRQ", m_CLRQ);
+	enregister("Q", m_Q);
+	enregister("QQ", m_QQ);
 
-	register_output("_RP_Q", m_RP_Q); // internal
-	register_output("_RN_Q", m_RN_Q); // internal
+	enregister("_RP_Q", m_RP_Q); // internal
+	enregister("_RN_Q", m_RN_Q); // internal
 
-	register_input("_CV", m_CV); // internal
+	enregister("_CV", m_CV); // internal
 
 	register_subalias("GND", m_RN->m_R->m_N);
 	register_subalias("VCC", m_RP->m_R->m_P);
@@ -226,11 +226,13 @@ NETLIB_RESET(9602_dip)
 
 NETLIB_START(4538_dip)
 {
-	m_1->m_dev_type = 4538;
-	m_2->m_dev_type = 4538;
+	set_logic_family(family_CD4XXX);
 
 	register_sub("1", m_1);
 	register_sub("2", m_2);
+
+	m_1->m_dev_type = 4538;
+	m_2->m_dev_type = 4538;
 
 	register_subalias("1", m_1->m_RN->m_R->m_N); // C1
 	register_subalias("2", m_1->m_RN->m_R->m_P); // RC1

@@ -88,8 +88,8 @@ NETLIB_UPDATE(twoterm)
 NETLIB_START(R_base)
 {
 	NETLIB_NAME(twoterm)::start();
-	register_terminal("1", m_P);
-	register_terminal("2", m_N);
+	enregister("1", m_P);
+	enregister("2", m_N);
 }
 
 NETLIB_RESET(R_base)
@@ -223,8 +223,8 @@ NETLIB_UPDATE_PARAM(POT2)
 
 NETLIB_START(C)
 {
-	register_terminal("1", m_P);
-	register_terminal("2", m_N);
+	enregister("1", m_P);
+	enregister("2", m_N);
 
 	register_param("C", m_C, 1e-6);
 
@@ -264,8 +264,8 @@ ATTR_HOT void NETLIB_NAME(C)::step_time(const nl_double st)
 
 NETLIB_START(D)
 {
-	register_terminal("A", m_P);
-	register_terminal("K", m_N);
+	enregister("A", m_P);
+	enregister("K", m_N);
 	register_param("MODEL", m_model, "");
 
 	m_D.save("m_D", *this);
@@ -303,8 +303,8 @@ NETLIB_START(VS)
 	register_param("R", m_R, 0.1);
 	register_param("V", m_V, 0.0);
 
-	register_terminal("P", m_P);
-	register_terminal("N", m_N);
+	enregister("P", m_P);
+	enregister("N", m_N);
 }
 
 NETLIB_RESET(VS)
@@ -328,8 +328,8 @@ NETLIB_START(CS)
 
 	register_param("I", m_I, 1.0);
 
-	register_terminal("P", m_P);
-	register_terminal("N", m_N);
+	enregister("P", m_P);
+	enregister("N", m_N);
 }
 
 NETLIB_RESET(CS)

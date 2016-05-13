@@ -330,8 +330,8 @@ Game                                          on cart    IC22#   # of SOP56  IC3
 ----------------------------------------------------------------------------------------------------------------------------------
 Club Kart: European Session (2003, prototype)   no cart  *       21 (64Mb)   present  315-6206  not present   * instead of EPROM have tiny PCB with 2 flashroms on it
 Crackin' DJ part 2                            840-0068C  23674   20 (64Mb)   present  315-6206  317-0311-COM  PCB have label 840-0068B-01 837-14124, requires regular 837-13551 and 837-13938 rotary JVS boards, and turntable simulation
-Ferrari F355 Challenge (twin, prototype)        no cart  22848P* 21 (64Mb)   present  315-6206  317-0267-COM  * flash-PCB have CRC 330B A417, the rest is the same as regular cart, not dumped but known to exist
-Ferrari F355 Challenge 2 (twin)                 no cart  23399   21 (64Mb)   present  315-6206  317-0287-COM  content is the same as regular 171-7919A cart
+Ferrari F355 Challenge (twin/deluxe, prototype) no cart  22848P* 21 (64Mb)   present  315-6206  317-0267-COM  * flash-PCB have CRC 330B A417, the rest is the same as regular cart, not dumped but known to exist
+Ferrari F355 Challenge 2 (twin/deluxe)          no cart  23399   21 (64Mb)   present  315-6206  317-0287-COM  content is the same as regular 171-7919A cart
 House of the Dead 2 (prototype)                 no cart  A1E2    21 (64Mb)   present  315-6206  present       no label on IC42
 Inu No Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with DIPSW 1 ON
 Samba de Amigo (prototype)                      no cart  *       21*(64Mb)   present  315-6206  317-0270-COM  * only first 14 flash roms contain game data, instead of EPROM have tiny PCB with 2 flashroms on it
@@ -393,9 +393,9 @@ Derby Owners Club (Japan) (Rev B)               840-0016C    22099B  14 (64Mb)  
 Derby Owners Club 2000 Ver.2 (Japan) (Rev A)    840-0052C    22284A  16 (64Mb)   present     315-6213  not present
 Dynamite Baseball '99 / World Series'99 (Rev B) 840-0019C    22141B  19 (64Mb)   ?           315-6213  317-0269-JPN   requires special panel (joystick + 2 buttons + bat controller for each player)
 Dynamite Baseball Naomi                         840-0001C    21575   21 (64Mb)   ?           315-6213  317-0246-JPN   requires special panel (joystick + 2 buttons + bat controller for each player)
-Ferrari F355 Challenge (deluxe)                 834-13842    21902   21 (64Mb)   present     315-6213  317-0254-COM   BIOS 21863 (USA), also known  to exists Japanese BIOS, not dumped
-Ferrari F355 Challenge (twin)                   834-13950    22848   21 (64Mb)   present     315-6213  317-0267-COM   2 known BIOS 22850 (USA), 22851 (EXP)
-Ferrari F355 Challenge 2 (twin)                 840-0042C    23399   21 (64Mb)   present     315-6213  317-0287-COM   2 known BIOS 22850 (USA), 22851 (EXP)
+Ferrari F355 Challenge (deluxe, no link)        834-13842    21902   21 (64Mb)   present     315-6213  317-0254-COM   BIOS 21863 (USA), also known  to exists Japanese BIOS, not dumped
+Ferrari F355 Challenge (twin/deluxe)            834-13950    22848   21 (64Mb)   present     315-6213  317-0267-COM   2 known BIOS 22850 (USA), 22851 (EXP)
+Ferrari F355 Challenge 2 (twin/deluxe)          840-0042C    23399   21 (64Mb)   present     315-6213  317-0287-COM   2 known BIOS 22850 (USA), 22851 (EXP)
 Giant Gram: All Japan Pro Wrestling 2           840-0007C    21820    9 (64Mb)   ?           315-6213  317-0253-JPN   joystick + 3 buttons
 Guilty Gear X                                   841-0013C    23356   14 (64Mb)   ?           315-6213  317-5063-COM
 Gun Spike / Cannon Spike                        841-0012C    23210   12 (64Mb)   present     315-6213  317-5060-COM
@@ -9462,7 +9462,7 @@ ROM_END
 /* Naomi */ GAME( 1998, naomi,    0, naomi, naomi, naomi_state,   naomi, ROT0, "Sega", "Naomi Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 /* game  */ GAME( 1998, hod2bios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi House of the Dead 2 Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 /* game  */ GAME( 1999, f355dlx,  0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Ferrari F355 Challenge (deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, f355bios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Ferrari F355 Challenge (twin) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, f355bios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Ferrari F355 Challenge (twin/deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 /* game  */ GAME( 1999, airlbios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Airline Pilots (deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 /* Naomi2*/ GAME( 2001, naomi2,   0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi 2 Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 /* GDROM */ GAME( 2001, naomigd,  0, naomi, naomi, naomi_state,   naomi, ROT0, "Sega", "Naomi GD-ROM Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
@@ -9471,9 +9471,9 @@ ROM_END
 /* 13636-01 */ GAME( 1998, hotd2,  hod2bios, naomim2, hotd2, naomi_state,   hotd2, ROT0, "Sega", "House of the Dead 2", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
 /* 13636  */ GAME( 1998, hotd2o,   hotd2,    naomim2, hotd2, naomi_state,   hotd2, ROT0, "Sega", "House of the Dead 2 (original)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
 /* none   */ GAME( 1998, hotd2p,   hotd2,    naomim2, hotd2, naomi_state,   hotd2, ROT0, "Sega", "House of the Dead 2 (prototype)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
-/* 13842  */ GAME( 1999, f355,     f355dlx,  naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge (deluxe)", GAME_FLAGS ) /* specific BIOS "f355dlx" needed */
-/* 13950  */ GAME( 1999, f355twin, f355bios, naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge (twin)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
-/* ?????  */ GAME( 2001, f355twn2, f355bios, naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge 2 (twin)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
+/* 13842  */ GAME( 1999, f355,     f355dlx,  naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge (deluxe, no link)", GAME_FLAGS ) /* specific BIOS "f355dlx" needed */
+/* 13950  */ GAME( 1999, f355twin, f355bios, naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
+/* ?????  */ GAME( 2001, f355twn2, f355bios, naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge 2 - International Course Edition (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
 /* ?????  */ GAME( 1999, alpiltdx, airlbios, naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Airline Pilots (deluxe) (Rev B)", GAME_FLAGS ) /* specific BIOS "airlbios" needed */
 
 /* 840-xxxxx (Sega Naomi cart games)*/

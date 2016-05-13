@@ -151,6 +151,7 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
+	offs_t              m_fetch_xor;
 	offs_t              m_start_pc;
 	UINT32              m_reg[68];
 	struct {

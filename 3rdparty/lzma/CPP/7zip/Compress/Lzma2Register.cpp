@@ -10,8 +10,13 @@
 #include "Lzma2Encoder.h"
 #endif
 
+namespace NCompress {
+namespace NLzma2 {
+
 REGISTER_CODEC_E(LZMA2,
-    NCompress::NLzma2::CDecoder(),
-    NCompress::NLzma2::CEncoder(),
+    CDecoder(),
+    CEncoder(),
     0x21,
     "LZMA2")
+
+}}

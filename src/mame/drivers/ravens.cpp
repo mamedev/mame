@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( ravens, ravens_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ravens2, ravens_state )
@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( ravens2, ravens_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
 /* ROM definition */

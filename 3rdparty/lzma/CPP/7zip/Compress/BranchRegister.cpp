@@ -8,9 +8,12 @@
 
 #include "BranchMisc.h"
 
+namespace NCompress {
+namespace NBranch {
+
 #define CREATE_BRA(n) \
-    REGISTER_FILTER_CREATE(CreateBra_Decoder_ ## n, CBranchCoder(n ## _Convert, false)) \
-    REGISTER_FILTER_CREATE(CreateBra_Encoder_ ## n, CBranchCoder(n ## _Convert, true)) \
+    REGISTER_FILTER_CREATE(CreateBra_Decoder_ ## n, CCoder(n ## _Convert, false)) \
+    REGISTER_FILTER_CREATE(CreateBra_Encoder_ ## n, CCoder(n ## _Convert, true)) \
 
 CREATE_BRA(PPC)
 CREATE_BRA(IA64)
@@ -34,3 +37,5 @@ REGISTER_CODECS_VAR
 };
 
 REGISTER_CODECS(Branch)
+
+}}

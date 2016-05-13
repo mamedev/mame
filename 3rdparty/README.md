@@ -16,6 +16,8 @@ expat - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 genie - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
+glm - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
+
 googletest - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
 http-parser - [The MIT License (MIT)](http://opensource.org/licenses/MIT)

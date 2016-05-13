@@ -59,9 +59,9 @@ NETLIB_START(7474)
 	register_sub("sub", sub);
 
 	register_subalias("CLK",    sub->m_CLK);
-	register_input("D",         m_D);
-	register_input("CLRQ",      m_CLRQ);
-	register_input("PREQ",      m_PREQ);
+	enregister("D",         m_D);
+	enregister("CLRQ",      m_CLRQ);
+	enregister("PREQ",      m_PREQ);
 
 	register_subalias("Q",      sub->m_Q);
 	register_subalias("QQ",     sub->m_QQ);
@@ -75,10 +75,10 @@ NETLIB_RESET(7474)
 
 NETLIB_START(7474sub)
 {
-	register_input("CLK",  m_CLK);
+	enregister("CLK",  m_CLK);
 
-	register_output("Q",   m_Q);
-	register_output("QQ",  m_QQ);
+	enregister("Q",   m_Q);
+	enregister("QQ",  m_QQ);
 
 	save(NLNAME(m_nextD));
 }

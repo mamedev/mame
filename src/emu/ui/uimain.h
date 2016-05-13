@@ -89,6 +89,8 @@ public:
 
 	virtual void image_display(const device_type &type, device_image_interface *image) { }
 
+	virtual void menu_reset() { }
+
 	template <typename Format, typename... Params> void popup_time(int seconds, Format &&fmt, Params &&... args);
 
 protected:

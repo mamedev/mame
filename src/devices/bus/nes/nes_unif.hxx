@@ -137,10 +137,20 @@ static const unif unif_list[] =
 	{ "BMC-70IN1",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236?
 	{ "BMC-70IN1B",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236?
 	{ "BMC-42IN1RESETSWITCH",       0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 60?
-	{ "PEC-586",                     0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
+	{ "BMC-F-15",                   0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// 150-in-1 Unchained Melody
+	{ "BMC-HP898F",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// Primasoft 9999999-in-1
+	{ "BMC-8-IN-1",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// Super 8-in-1 (Incl. Rockin' Kats)
+	{ "UNL-EH8813A",                0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// Dr. Mario II
+	{ "UNL-158B",                   0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// Blood of Jurassic
+	{ "UNL-DRAGONFIGHTER",          0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// Dragon Fighter by Flying Star
+	{ "UNL-KS7016",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// Exciting Basketball FDS
+	{ "UNL-KS7037",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// Metroid FDS Chinese
+	{ "UNL-RT-01",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// Russian Test Cart
+	{ "PEC-586",                    0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
 	{ "UNL-DANCE",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
 	{ "UNL-DRIPGAME",               0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // [by Quietust - we need more info]
 	{ "UNL-CITYFIGHT",              0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
+	{ "COOLBOY",                    0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
 	{ "UNL-OneBus",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
 	{ "UNL-DANCE2000",              0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}
 };

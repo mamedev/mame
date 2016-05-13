@@ -53,7 +53,7 @@ private:
 
 	void csc_private(postream &strm);
 
-	typedef void extsolver(double * RESTRICT m_A, double * RESTRICT RHS);
+	using extsolver = void (*)(double * RESTRICT m_A, double * RESTRICT RHS);
 
 	pstring static_compile_name()
 	{
@@ -69,7 +69,7 @@ private:
 	mat_cr_t<_storage_N> mat;
 	nl_double m_A[_storage_N * _storage_N];
 
-	extsolver *m_proc;
+	extsolver m_proc;
 
 };
 

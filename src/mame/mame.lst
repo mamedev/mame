@@ -2155,6 +2155,7 @@ hydra                           // 136079           (c) 1990
 hydrap                          // (proto)          (c) 1990
 hydrap2                         // (proto)          (c) 1990
 pitfight                        // 136081           (c) 1990
+pitfight2                       // 136081           (c) 1990
 pitfight3                       // 136081           (c) 1990
 pitfight4                       // 136081           (c) 1990
 pitfight5                       // 136081           (c) 1990
@@ -9594,6 +9595,7 @@ commandou                       // 5/1985 (c) 1985 + Data East license (US)
 commandou2                      // 5/1985 (c) 1985 + Data East license (US)
 sinvasn                         // Europe original?
 sinvasnb                        // bootleg
+mercenario			// bootleg
 
 @source:compgolf.cpp
 compgolf                        // (c) 1985 Data East Corporation (Japan)
@@ -12075,6 +12077,9 @@ fb01                            // 1986 FB-01
 @source:fc100.cpp
 fc100                           //
 
+@source:fcscsi.cpp
+fcscsi1                         //
+
 @source:fcombat.cpp
 fcombat                         // (c) 1985 Jaleco
 
@@ -13439,6 +13444,7 @@ cmv801                          // (c) 198? Corsica
 cmwm                            // (c) 199? Dyna Electronics
 crazybon                        // (c) 199? Sang Ho
 fb2010                          // (c) 2009 Amcoe
+fl7_3121                        // (c) 199? Cyberdyne Systems, Inc.
 goldfrui                        // bootleg
 goldstar                        // (c) 198? IGS
 goldstbl                        // (c) 198? IGS
@@ -13484,6 +13490,8 @@ nfb96txt                        // (c) 2000 Amcoe
 nfm                             // bootleg
 ns8lines                        // unknown
 ns8linew                        // unknown
+ns8linewa                       // unknown
+ns8linesa                       // (c) 1985 Yamate (bootleg)
 pkrmast                         // (c) 199? unknown
 pkrmasta                        // (c) 199? unknown
 pokonl97                        // (c) 1997 Amcoe
@@ -14299,6 +14307,9 @@ magerror                        // (c) 1994 Technosoft (Japan) (Arcade TV Game L
 @source:i7000.cpp
 i7000                           //
 
+@source:ibm3153.cpp
+ibm3153                         //
+
 @source:ibm6580.cpp
 ibm6580                         //
 
@@ -14713,6 +14724,7 @@ jack2                           // (c) 1982 Cinematronics
 jack3                           // (c) 1982 Cinematronics
 joinem                          // (c) 1983 Global
 loverboy                        // (c) 1983 G.T
+trikitri                        // (c) 1993 DDT
 striv                           // (c) 1985 Nova du Canada
 sucasino                        // (c) 1982 Data Amusement
 treahunt                        // (c) 1982 Hara Industries
@@ -27318,7 +27330,7 @@ murogmbl                        // ???
 mustache                        // (c) 1987 March
 
 @source:mvme350.cpp
-mvme350                         // 
+mvme350                         //
 
 @source:mw18w.cpp
 18w                             // 653 (c) 1979 Midway
@@ -27907,11 +27919,11 @@ drbyocwc                        // 2001.?? Derby Owners Club World Edition (Rev 
 dybb99                          // 1999.11 Dynamite Baseball '99 (Rev B)
 dybbnao                         // 1998.12 Dynamite Baseball NAOMI
 dygolf                          // 2001.04.27 Dynamic Golf / Virtua Golf (Rev A)
-f355                            // 1999.07 F355 Challenge Deluxe
-f355bios                        // 1999.08 F355 Challenge Twin (BIOS)
+f355                            // 1999.07 Ferrari F355 Challenge (deluxe, no link)
+f355bios                        // 1999.08 F355 Challenge Twin/Deluxe (BIOS)
 f355dlx                         // 1999.07 F355 Challenge Deluxe (BIOS)
-f355twin                        // 1999.07 F355 Challenge Twin
-f355twn2                        // 2001.01 F355 Challenge 2 Twin
+f355twin                        // 1999.07 Ferrari F355 Challenge (twin/deluxe)
+f355twn2                        // 2001.01 Ferrari F355 Challenge 2 - International Course Edition (twin/deluxe)
 fotns                           // 2005.12 Hokuto no Ken
 ftspeed                         // 2004.09 Faster than Speed
 ggisuka                         // 2003.12 Guilty Gear Isuka
@@ -28554,7 +28566,7 @@ whp                             // 0090 (c) 1995 ADK / SNK
 wjammers                        // 0065 (c) 1994 Data East Corporation
 zedblade                        // 0076 (c) 1994 NMK
 zintrckb                        // 0211 hack - this is not a genuine MVS proto, its a bootleg made from the CD version
-crswd2bl						// 0054 bootleg made from CD version
+crswd2bl                        // 0054 bootleg made from CD version
 zupapa                          // 0070 Zupapa - released in 2001, 1994 prototype probably exists
 lasthope
 
@@ -32394,7 +32406,8 @@ ga2u                            // 1992.09 Golden Axe II (US)
 harddunk                        // 1994.?? Hard Dunk 3on3 (World)
 harddunkj                       // 1994.04 Hard Dunk 3on3 (Japan)
 holo                            // 1992.?? Hologram Holosseum (US)
-jleague                         // 1994.07 The J League 1994 (Japan)
+jleague                         // 1994.07 The J League 1994 (Japan) Rev A
+jleagueo                        // 1994.07 The J League 1994 (Japan)
 jpark                           // 1994.?? Jurassic Park (World)
 jparkj                          // 1994.02 Jurassic Park (Japan) - Deluxe with moving cabinet, Rev A
 jparkja                         // 1994.02 Jurassic Park (Japan) - Deluxe with moving cabinet
@@ -33754,6 +33767,7 @@ empcityj                        // (c) 1986 Taito Corporation (Japan)
 empcityu                        // (c) 1986 Taito (Romstar License)
 stfight                         // (c) 1986 Seibu Kaihatsu (Germany) (bootleg?)
 stfighta                        // (c) 1986 Seibu Kaihatsu (bootleg?)
+stfightgb                       // (c) 1986 Seibu Kaihatsu (Germany-Benelux)
 
 @source:stlforce.cpp
 stlforce                        // (c) 1994 Electronic Devices (Italy) / Ecogames S.L. (Spain)
@@ -34984,7 +34998,7 @@ ti99_224                        // 1983 TI 99/2 (24kb ROMs)
 ti99_232                        // 1983 TI 99/2 (32kb ROMs)
 
 @source:ti99_4p.cpp
-ti99_4p                         // 1996 SNUG 99/4P (a.k.a. SGCPU)
+ti99_4p                         // 1996 SNUG SGCPU (aka TI-99/4P)
 
 @source:ti99_4x.cpp
 ti99_4                          // 1979 TI-99/4
@@ -34992,8 +35006,7 @@ ti99_4a                         // 1981 TI-99/4A
 ti99_4ae                        // 1981 TI-99/4A with 50Hz video
 ti99_4e                         // 1980 TI-99/4 with 50Hz video
 ti99_4ev                        // 1994 TI-99/4A with EVPC video card
-ti99_4qe                        // 1983 TI-99/4QI with 50Hz video
-ti99_4qi                        // 1983 TI-99/4QI
+ti99_4qi                        // 1983 TI-99/4QI (US only)
 
 @source:ti99_8.cpp
 ti99_8                          // 1983 TI-99/8
@@ -35016,6 +35029,7 @@ sosterm                         // (c) 1988 Terminal
 dataman                         //
 lilprof                         //
 lilprof78                       //
+mathmarv                        //
 ti1000                          //
 ti1250                          //
 ti125076                        //
@@ -35243,7 +35257,7 @@ drtoppelu                       // B19 (c) 1987 Taito Corporation (US)
 extrmatn                        // B06 (c) 1987 Taito Corporation Japan (World)
 extrmatnj                       // B06 (c) 1987 Taito Corporation (Japan)
 extrmatnu                       // B06 (c) 1987 World Games (US)
-extrmatnur						// B06 (c) 1987 Taito America Corporation + Romstar license (US)
+extrmatnur                      // B06 (c) 1987 Taito America Corporation + Romstar license (US)
 insectx                         // B97 (c) 1989 Taito Corporation Japan (World)
 insectxj                        // B97 (c) 1989 Taito Corporation (Japan)
 jpopnics                        // (c)1992 NICs, based on Plump Pop code
@@ -35882,6 +35896,7 @@ nbagold                         // (c) 2000 Midway Games
 nbanfl                          // (c) 1999 Midway Games
 nbashowt                        // (c) 1998 Midway Games
 roadburn                        // (c) 1999 Atari Games
+roadburn1                       // (c) 1999 Atari Games
 sf2049                          // (c) 1999 Atari Games
 sf2049se                        // (c) 1999 Atari Games
 sf2049te                        // (c) 1999 Atari Games

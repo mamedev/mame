@@ -13,21 +13,21 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(74193)
 {
-	register_input("A", m_A);
-	register_input("B", m_B);
-	register_input("C", m_C);
-	register_input("D", m_D);
-	register_input("CLEAR",  m_CLEAR);
-	register_input("LOADQ",  m_LOADQ);
-	register_input("CU", m_CU);
-	register_input("CD", m_CD);
+	enregister("A", m_A);
+	enregister("B", m_B);
+	enregister("C", m_C);
+	enregister("D", m_D);
+	enregister("CLEAR",  m_CLEAR);
+	enregister("LOADQ",  m_LOADQ);
+	enregister("CU", m_CU);
+	enregister("CD", m_CD);
 
-	register_output("QA", m_Q[0]);
-	register_output("QB", m_Q[1]);
-	register_output("QC", m_Q[2]);
-	register_output("QD", m_Q[3]);
-	register_output("BORROWQ", m_BORROWQ);
-	register_output("CARRYQ", m_CARRYQ);
+	enregister("QA", m_Q[0]);
+	enregister("QB", m_Q[1]);
+	enregister("QC", m_Q[2]);
+	enregister("QD", m_Q[3]);
+	enregister("BORROWQ", m_BORROWQ);
+	enregister("CARRYQ", m_CARRYQ);
 
 	save(NLNAME(m_cnt));
 	save(NLNAME(m_last_CU));

@@ -25,6 +25,7 @@
 #define NLD_7448_H_
 
 #include "nl_base.h"
+#include "nld_truthtable.h"
 
 #define TTL_7448(_name, _A0, _A1, _A2, _A3, _LTQ, _BIQ, _RBIQ)                      \
 		NET_REGISTER_DEV(TTL_7448, _name)                                               \
@@ -39,16 +40,19 @@
 #define TTL_7448_DIP(_name)                                                         \
 		NET_REGISTER_DEV(TTL_7448_DIP, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 /*
  * FIXME: Using truthtable is a lot slower than the explicit device
  */
-#if (0 && USE_TRUTHTABLE)
-#include "nld_truthtable.h"
+
+#define USE_TRUTHTABLE_7448	(0)
+
+#if (USE_TRUTHTABLE_7448 && USE_TRUTHTABLE)
 
 NETLIB_TRUTHTABLE(7448, 7, 7, 0);
-#else
 
-NETLIB_NAMESPACE_DEVICES_START()
+#else
 
 NETLIB_SUBDEVICE(7448_sub,
 	ATTR_HOT void update_outputs(UINT8 v);

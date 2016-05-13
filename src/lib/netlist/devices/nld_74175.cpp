@@ -14,16 +14,16 @@ static const netlist_time delay_clear[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(
 
 NETLIB_START(74175_sub)
 {
-	register_input("CLK",   m_CLK);
+	enregister("CLK",   m_CLK);
 
-	register_output("Q1",   m_Q[0]);
-	register_output("Q1Q",  m_QQ[0]);
-	register_output("Q2",   m_Q[1]);
-	register_output("Q2Q",  m_QQ[1]);
-	register_output("Q3",   m_Q[2]);
-	register_output("Q3Q",  m_QQ[2]);
-	register_output("Q4",   m_Q[3]);
-	register_output("Q4Q",  m_QQ[3]);
+	enregister("Q1",   m_Q[0]);
+	enregister("Q1Q",  m_QQ[0]);
+	enregister("Q2",   m_Q[1]);
+	enregister("Q2Q",  m_QQ[1]);
+	enregister("Q3",   m_Q[2]);
+	enregister("Q3Q",  m_QQ[2]);
+	enregister("Q4",   m_Q[3]);
+	enregister("Q4Q",  m_QQ[3]);
 
 	save(NLNAME(m_clrq));
 	save(NLNAME(m_data));
@@ -79,21 +79,21 @@ NETLIB_START(74175)
 
 	register_subalias("CLK",   m_sub->m_CLK);
 
-	register_input("CLRQ",  m_CLRQ);
+	enregister("CLRQ",  m_CLRQ);
 
-	register_input("D1",    m_D[0]);
+	enregister("D1",    m_D[0]);
 	register_subalias("Q1",   m_sub->m_Q[0]);
 	register_subalias("Q1Q",  m_sub->m_QQ[0]);
 
-	register_input("D2",    m_D[1]);
+	enregister("D2",    m_D[1]);
 	register_subalias("Q2",   m_sub->m_Q[1]);
 	register_subalias("Q2Q",  m_sub->m_QQ[1]);
 
-	register_input("D3",    m_D[2]);
+	enregister("D3",    m_D[2]);
 	register_subalias("Q3",   m_sub->m_Q[2]);
 	register_subalias("Q3Q",  m_sub->m_QQ[2]);
 
-	register_input("D4",    m_D[3]);
+	enregister("D4",    m_D[3]);
 	register_subalias("Q4",   m_sub->m_Q[3]);
 	register_subalias("Q4Q",  m_sub->m_QQ[3]);
 
@@ -109,21 +109,21 @@ NETLIB_START(74175_dip)
 	register_sub("sub", m_sub);
 
 	register_subalias("9", m_sub->m_CLK);
-	register_input("1",  m_CLRQ);
+	enregister("1",  m_CLRQ);
 
-	register_input("4",    m_D[0]);
+	enregister("4",    m_D[0]);
 	register_subalias("2",   m_sub->m_Q[0]);
 	register_subalias("3",  m_sub->m_QQ[0]);
 
-	register_input("5",    m_D[1]);
+	enregister("5",    m_D[1]);
 	register_subalias("7",   m_sub->m_Q[1]);
 	register_subalias("6",  m_sub->m_QQ[1]);
 
-	register_input("12",    m_D[2]);
+	enregister("12",    m_D[2]);
 	register_subalias("10",   m_sub->m_Q[2]);
 	register_subalias("11",  m_sub->m_QQ[2]);
 
-	register_input("13",    m_D[3]);
+	enregister("13",    m_D[3]);
 	register_subalias("15",   m_sub->m_Q[3]);
 	register_subalias("14",  m_sub->m_QQ[3]);
 

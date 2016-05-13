@@ -90,18 +90,18 @@ netlist_mame_analog_output_t::netlist_mame_analog_output_t(const machine_config 
 
 void netlist_mame_analog_output_t::static_set_params(device_t &device, const char *in_name, netlist_analog_output_delegate adelegate)
 {
-	netlist_mame_analog_output_t &netlist = downcast<netlist_mame_analog_output_t &>(device);
-	netlist.m_in = in_name;
-	netlist.m_delegate = adelegate;
+	netlist_mame_analog_output_t &mame_output = downcast<netlist_mame_analog_output_t &>(device);
+	mame_output.m_in = in_name;
+	mame_output.m_delegate = adelegate;
 }
 
 void netlist_mame_analog_output_t::custom_netlist_additions(netlist::setup_t &setup)
 {
 	pstring dname = "OUT_" + m_in;
 	m_delegate.bind_relative_to(owner()->machine().root_device());
-	NETLIB_NAME(analog_callback) *dev = downcast<NETLIB_NAME(analog_callback) *>(
-			setup.register_dev("NETDEV_CALLBACK", dname));
 
+	NETLIB_NAME(analog_callback) *dev = palloc(NETLIB_NAME(analog_callback)(setup.netlist(), setup.build_fqn(dname)));
+	setup.register_dev(dev);
 	dev->register_callback(m_delegate);
 	setup.register_link(dname + ".IN", m_in);
 }
@@ -172,9 +172,8 @@ void netlist_mame_stream_input_t::device_start()
 
 void netlist_mame_stream_input_t::custom_netlist_additions(netlist::setup_t &setup)
 {
-	NETLIB_NAME(sound_in) *snd_in = setup.netlist().get_first_device<NETLIB_NAME(sound_in)>();
-	if (snd_in == nullptr)
-		snd_in = dynamic_cast<NETLIB_NAME(sound_in) *>(setup.register_dev("NETDEV_SOUND_IN", "STREAM_INPUT"));
+	if (!setup.device_exists("STREAM_INPUT"))
+		setup.register_dev("NETDEV_SOUND_IN", "STREAM_INPUT");
 
 	pstring sparam = pfmt("STREAM_INPUT.CHAN{1}")(m_channel);
 	setup.register_param(sparam, m_param_name);
@@ -296,13 +295,12 @@ void netlist_mame_device_t::device_config_complete()
 
 void netlist_mame_device_t::device_start()
 {
-	LOG_DEV_CALLS(("device_start %s\n", tag()));
+	LOG_DEV_CALLS(("device_start entry %s\n", tag()));
 
 	//printf("clock is %d\n", clock());
 
 	m_netlist = global_alloc(netlist_mame_t(*this, "netlist"));
-	m_setup = global_alloc(netlist::setup_t(m_netlist));
-	m_setup->init();
+	m_setup = global_alloc(netlist::setup_t(*m_netlist));
 
 	// register additional devices
 
@@ -333,6 +331,7 @@ void netlist_mame_device_t::device_start()
 	m_old = netlist::netlist_time::zero;
 	m_rem = netlist::netlist_time::zero;
 
+	LOG_DEV_CALLS(("device_start exit %s\n", tag()));
 }
 
 void netlist_mame_device_t::device_clock_changed()
@@ -353,9 +352,9 @@ void netlist_mame_device_t::device_reset()
 void netlist_mame_device_t::device_stop()
 {
 	LOG_DEV_CALLS(("device_stop\n"));
-	m_setup->print_stats();
+	netlist().print_stats();
 
-	m_netlist->stop();
+	netlist().stop();
 
 	global_free(m_setup);
 	m_setup = nullptr;
@@ -477,7 +476,7 @@ void netlist_mame_cpu_device_t::device_start()
 
 	for (int i=0; i < netlist().m_nets.size(); i++)
 	{
-		netlist::net_t *n = netlist().m_nets[i];
+		netlist::net_t *n = netlist().m_nets[i].get();
 		if (n->isFamily(netlist::object_t::LOGIC))
 		{
 			state_add(i*2, n->name().cstr(), downcast<netlist::logic_net_t *>(n)->Q_state_ptr());

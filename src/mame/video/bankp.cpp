@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  video.c
+  bankp.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -80,36 +80,36 @@ PALETTE_INIT_MEMBER(bankp_state, bankp)
 	/* the bottom half of the PROM seems to be not used */
 }
 
-WRITE8_MEMBER(bankp_state::bankp_scroll_w)
+WRITE8_MEMBER(bankp_state::scroll_w)
 {
 	m_scroll_x = data;
 }
 
-WRITE8_MEMBER(bankp_state::bankp_videoram_w)
+WRITE8_MEMBER(bankp_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bankp_state::bankp_colorram_w)
+WRITE8_MEMBER(bankp_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bankp_state::bankp_videoram2_w)
+WRITE8_MEMBER(bankp_state::videoram2_w)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bankp_state::bankp_colorram2_w)
+WRITE8_MEMBER(bankp_state::colorram2_w)
 {
 	m_colorram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bankp_state::bankp_out_w)
+WRITE8_MEMBER(bankp_state::out_w)
 {
 	/* bits 0-1 are playfield priority */
 	/* TODO: understand how this works */
@@ -156,14 +156,15 @@ void bankp_state::video_start()
 
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_priority));
+	save_item(NAME(m_nmi_mask));
 }
 
-UINT32 bankp_state::screen_update_bankp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 bankp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (flip_screen())
 	{
-		m_fg_tilemap->set_scrollx(0, -m_scroll_x);
-		m_bg_tilemap->set_scrollx(0, 0);
+		m_fg_tilemap->set_scrollx(0, 240-m_scroll_x);
+		m_bg_tilemap->set_scrollx(0, 240);
 	}
 	else
 	{

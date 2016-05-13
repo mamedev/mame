@@ -13,31 +13,12 @@ Supported project generators:
  * GNU Makefile
  * XCode
 
-Who is using it?
-----------------
-
-https://github.com/bkaradzic/bgfx bgfx - Cross-platform, graphics API
-agnostic, "Bring Your Own Engine/Framework" style rendering library.
-
-https://github.com/Psybrus/Psybrus Psybrus Engine & Toolchain
-
-https://github.com/dariomanesku/cmftstudio cmftStudio - cubemap filtering tool
-
-https://github.com/mamedev/mame MAME - Multiple Arcade Machine Emulator
-
-http://sol.gfxile.net/soloud SoLoud is an easy to use, free, 
-portable c/c++ audio engine for games.
-
-https://github.com/andr3wmac/Torque6 Torque 6 is an MIT licensed 3D engine
-loosely based on Torque2D. Being neither Torque2D or Torque3D it is the 6th
-derivative of the original Torque Engine.
-
 Download (stable)
 -----------------
 
 [![Build Status](https://travis-ci.org/bkaradzic/GENie.svg?branch=master)](https://travis-ci.org/bkaradzic/GENie)
 
-	version 430 (commit f803df449cb0e0d9c3d7d23821bbb89900f383ad)
+	version 445 (commit 6798f93ba8ee029b629cfc340e90c653e780d8b1)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -59,6 +40,25 @@ Documentation
 -------------
 
 [Scripting Reference](https://github.com/bkaradzic/genie/blob/master/docs/scripting-reference.md#scripting-reference)
+
+Who is using it?
+----------------
+
+https://github.com/bkaradzic/bgfx bgfx - Cross-platform, graphics API
+agnostic, "Bring Your Own Engine/Framework" style rendering library.
+
+https://github.com/Psybrus/Psybrus Psybrus Engine & Toolchain
+
+https://github.com/dariomanesku/cmftstudio cmftStudio - cubemap filtering tool
+
+https://github.com/mamedev/mame MAME - Multiple Arcade Machine Emulator
+
+http://sol.gfxile.net/soloud SoLoud is an easy to use, free, 
+portable c/c++ audio engine for games.
+
+https://github.com/andr3wmac/Torque6 Torque 6 is an MIT licensed 3D engine
+loosely based on Torque2D. Being neither Torque2D or Torque3D it is the 6th
+derivative of the original Torque Engine.
 
 History
 -------
@@ -107,6 +107,10 @@ intention to keep it compatible with it.
  - Added edit & continue support for 64-bit builds in VS2013 upwards.
  - Added `windowstargetplatformversion` to specify VS Windows target version.
  - Added vs15 support.
+ - Added `NoWinRT` flag to disable WinRT CX builds.
+ - Added `NoBufferSecurityCheck` flag to disable security checks in VS.
+ - Added `nopch` file list to exclude files from using PCH.
+ - Added `EnableAVX` and `EnableAVX2` flags to enable enhanced instruction set.
 
 [License](https://github.com/bkaradzic/genie/blob/master/LICENSE)
 -----------------------------------------------------------------
@@ -114,7 +118,7 @@ intention to keep it compatible with it.
 	GENie
 	Copyright (c) 2014-2016 Branimir Karadžić, Neil Richardson, Mike Popoloski,
 	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers, Bill Freist,
-	Terry Hendrix II, Ryan Juckett, Andrew Johnson, Johan Sköld
+	Terry Hendrix II, Ryan Juckett, Andrew Johnson, Johan Sköld, Alastair Murray
 	All rights reserved.
 
 	https://github.com/bkaradzic/genie

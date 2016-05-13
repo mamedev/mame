@@ -63,6 +63,7 @@ const device_type NES_BMC_GC6IN1 = &device_creator<nes_bmc_gc6in1_device>;
 const device_type NES_BMC_411120C = &device_creator<nes_bmc_411120c_device>;
 const device_type NES_BMC_830118C = &device_creator<nes_bmc_830118c_device>;
 const device_type NES_PJOY84 = &device_creator<nes_pjoy84_device>;
+const device_type NES_COOLBOY = &device_creator<nes_coolboy_device>;
 
 
 nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -237,6 +238,11 @@ nes_bmc_830118c_device::nes_bmc_830118c_device(const machine_config &mconfig, co
 
 nes_pjoy84_device::nes_pjoy84_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_txrom_device(mconfig, NES_PJOY84, "NES Cart Powerjoy 84 PCB", tag, owner, clock, "nes_pjoy84", __FILE__)
+{
+}
+
+nes_coolboy_device::nes_coolboy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: nes_txrom_device(mconfig, NES_COOLBOY, "NES Cart CoolBoy PCB", tag, owner, clock, "nes_coolboy", __FILE__)
 {
 }
 
@@ -2493,6 +2499,38 @@ WRITE8_MEMBER(nes_pjoy84_device::write_m)
 			set_prg(m_prg_base, m_prg_mask);
 			break;
 	}
+}
+
+/*-------------------------------------------------
+ 
+ COOLBOY
+ 
+ Games: several multigame carts
+ 
+ In MESS: Not Supported.
+ 
+ -------------------------------------------------*/
+
+void nes_coolboy_device::prg_cb(int start, int bank)
+{
+	bank = (bank & 3) | ((bank & 8) >> 1) | ((bank & 4) << 1);
+	prg8_x(start, bank);
+}
+
+void nes_coolboy_device::chr_cb(int start, int bank, int source)
+{
+	bank = (bank & 0xdd) | ((bank & 0x20) >> 4) | ((bank & 2) << 4);
+	chr1_x(start, bank, source);
+}
+
+WRITE8_MEMBER(nes_coolboy_device::write_m)
+{
+	LOG_MMC(("coolboy write_m, offset: %04x, data: %02x\n", offset, data));
+	
+	m_reg[offset & 0x03] = data;
+	//set_base_mask();
+	set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	set_prg(m_prg_base, m_prg_mask);
 }
 
 #ifdef UNUSED_FUNCTION

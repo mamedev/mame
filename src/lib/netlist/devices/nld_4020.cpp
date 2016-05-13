@@ -11,10 +11,11 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(CD4020)
 {
+	set_logic_family(family_CD4XXX);
 	register_sub("sub", sub);
 	register_sub("supply", m_supply);
 
-	register_input("RESET", m_RESET);
+	enregister("RESET", m_RESET);
 	register_subalias("IP", sub->m_IP);
 	register_subalias("Q1", sub->m_Q[0]);
 	register_subalias("Q4", sub->m_Q[3]);
@@ -40,20 +41,20 @@ NETLIB_RESET(CD4020)
 
 NETLIB_START(CD4020_sub)
 {
-	register_input("IP", m_IP);
+	enregister("IP", m_IP);
 
-	register_output("Q1", m_Q[0]);
-	register_output("Q4", m_Q[3]);
-	register_output("Q5", m_Q[4]);
-	register_output("Q6", m_Q[5]);
-	register_output("Q7", m_Q[6]);
-	register_output("Q8", m_Q[7]);
-	register_output("Q9", m_Q[8]);
-	register_output("Q10", m_Q[9]);
-	register_output("Q11", m_Q[10]);
-	register_output("Q12", m_Q[11]);
-	register_output("Q13", m_Q[12]);
-	register_output("Q14", m_Q[13]);
+	enregister("Q1", m_Q[0]);
+	enregister("Q4", m_Q[3]);
+	enregister("Q5", m_Q[4]);
+	enregister("Q6", m_Q[5]);
+	enregister("Q7", m_Q[6]);
+	enregister("Q8", m_Q[7]);
+	enregister("Q9", m_Q[8]);
+	enregister("Q10", m_Q[9]);
+	enregister("Q11", m_Q[10]);
+	enregister("Q12", m_Q[11]);
+	enregister("Q13", m_Q[12]);
+	enregister("Q14", m_Q[13]);
 
 	save(NLNAME(m_cnt));
 }

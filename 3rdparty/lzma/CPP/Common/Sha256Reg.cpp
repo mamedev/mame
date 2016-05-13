@@ -18,7 +18,7 @@ class CSha256Hasher:
 public:
   CSha256Hasher() { Sha256_Init(&_sha); }
 
-  MY_UNKNOWN_IMP
+  MY_UNKNOWN_IMP1(IHasher)
   INTERFACE_IHasher(;)
 };
 
