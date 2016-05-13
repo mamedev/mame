@@ -13978,52 +13978,59 @@ ROM_END
 
   Titles / GFX upgrades:
 
-  - Big Bull Frog.
-  - Buffalo Bills.
-  - Cash Cabaret.
-  - Cash Cow.
-  - Cherry 50 Bonus.
-  - Cherry 500 Bonus.
-  - Cherry 1000 Bonus.
-  - Christmas.
-  - Deuces Wild.
-  - Diamond Delight.
-  - Diamond Doubles.
-  - Diamond Treasure.
-  - Dream Catcher.
-  - Dynamite Diamonds 1.
-  - Dynamite Diamonds 2.
-  - Egyptian Gold.
-  - Gold Country.
-  - Golden Treasure.
-  - Greenbacks.
-  - Harley Davidson.
-  - Hollywood Nights.
-  - Independence Day / July 4th.
-  - Jokers Wild.
-  - Midnight Sevens.
-  - Mighty Buffalo.
-  - Money.
-  - Moola.
-  - New Year's.
-  - Prospector's Gold.
-  - Red Hot Ice.
-  - Red, White & Blue 7's.
-  - Rising Star.
-  - Rockin' Reels.
-  - Rolling Thunder.
-  - Soboba Gold.
-  - Star Sevens / American Gold.
-  - Sun God.
-  - Super Stars & Stripes / American Glory Alternative.
-  - Sweet Dreams.
-  - Sweethearts & Sevens.
-  - Tropical Treasure.
-  - Vegas Classic.
-  - White Buffalo.
-  - Wild Thing.
-  - Wild Watermelons.
-  - Wild West.
+  +----+------------------------------+---------+----------+
+  | N# |      Title:                  | Dumped  | Emulated |
+  +----+------------------------------+---------+----------+
+  | 01 | Big Bull Frog.               | NO      | NO       |
+  | 02 | Buffalo Bills.               | NO      | NO       |
+  | 03 | Cash Cabaret.                | NO      | NO       |
+  | 04 | Cash Cow.                    | NO      | NO       |
+  | 05 | Cherry 50 Bonus.             | NO      | NO       |
+  | 06 | Cherry 500 Bonus.            | NO      | NO       |
+  | 07 | Cherry 1000 Bonus.           | NO      | NO       |
+  | 08 | Christmas.                   | NO      | NO       |
+  | 09 | Deuces Wild.                 | NO      | NO       |
+  | 10 | Diamond Delight.             | NO      | NO       |
+  | 11 | Diamond Doubles.             | NO      | NO       |
+  | 12 | Diamond Treasure.            | NO      | NO       |
+  | 13 | Dream Catcher.               | NO      | NO       |
+  | 14 | Dynamite Diamonds 1.         | NO      | NO       |
+  | 15 | Dynamite Diamonds 2.         | NO      | NO       |
+  | 16 | Egyptian Gold.               | NO      | NO       |
+  | 17 | Gold Country.                | NO      | NO       |
+  | 18 | Golden Treasure.             | NO      | NO       |
+  | 19 | Greenbacks.                  | NO      | NO       |
+  | 20 | Harley Davidson.             | NO      | NO       |
+  | 21 | Hollywood Nights.            | YES     | YES      |
+  | 22 | Independence Day.            | NO      | NO       |
+  | 23 | Jokers Wild.                 | NO      | NO       |
+  | 24 | Midnight Sevens.             | NO      | NO       |
+  | 25 | Mighty Buffalo.              | NO      | NO       |
+  | 26 | Money.                       | NO      | NO       |
+  | 27 | Moola.                       | NO      | NO       |
+  | 28 | New Year's.                  | NO      | NO       |
+  | 29 | Prospector's Gold.           | NO      | NO       |
+  | 30 | Red Hot Ice.                 | NO      | NO       |
+  | 31 | Red, White & Blue 7's.       | YES     | YES      |
+  | 32 | Rising Star.                 | NO      | NO       |
+  | 33 | Rockin' Reels.               | NO      | NO       |
+  | 34 | Rolling Thunder.             | NO      | NO       |
+  | 35 | Soboba Gold.                 | NO      | NO       |
+  | 36 | Star Sevens / American Gold. | NO      | NO       |
+  | 37 | Sun God.                     | NO      | NO       |
+  | 38 | Super Stars & Stripes.       | NO      | NO       |
+  | 39 | Sweet Dreams.                | NO      | NO       |
+  | 40 | Sweethearts & Sevens.        | NO      | NO       |
+  | 41 | Tropical Treasure.           | NO      | NO       |
+  | 42 | Vegas Classic.               | NO      | NO       |
+  | 43 | White Buffalo.               | NO      | NO       |
+  | 44 | Wild Thing.                  | NO      | NO       |
+  | 45 | Wild Watermelons.            | NO      | NO       |
+  | 46 | Wild West.                   | NO      | NO       |
+  +----+------------------------------+---------+----------+
+
+  Will name the sets using the internal code of both custom
+  graphics sets in their respective order...
 
 */
 
@@ -14042,7 +14049,7 @@ ROM_END
   For further boots, just press BET button. (the real hardware boots straight)
 
 */
-ROM_START( fl7_hn )
+ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "main.14b",  0x0000, 0x8000, CRC(cab76770) SHA1(4f2c17a0e077f3d9017e44977a3cb7a4aa9e4009) )
 
@@ -14815,7 +14822,7 @@ GAME(  1991, megaline,  0,        megaline, megaline, driver_device,  0,        
 GAMEL( 1993, bingowng,  0,        bingowng, bingowng, driver_device,  0,         ROT0, "Wing Co., Ltd.",    "Bingo (set 1)",                                            0,                     layout_bingowng )
 GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,driver_device,  0,         ROT0, "Wing Co., Ltd.",    "Bingo (set 2)",                                            0,                     layout_bingowng )
 
-GAME(  199?, fl7_hn,    0       , lucky8,   flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 - Red, White & Blue 7's / Hollywood Nights",     MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )
+GAME(  199?, fl7_3121,  0       , lucky8,   flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Red, White & Blue 7's + Hollywood Nights)",     MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )
 
 
 // --- Wing W-8 hardware ---
