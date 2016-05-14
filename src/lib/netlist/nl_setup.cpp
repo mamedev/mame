@@ -99,7 +99,7 @@ void setup_t::namespace_pop()
 }
 
 
-void setup_t::register_dev(device_t *dev)
+void setup_t::register_dev(std::shared_ptr<device_t> dev)
 {
 	for (auto & d : netlist().m_devices)
 		if (d->name() == dev->name())
@@ -126,17 +126,10 @@ void setup_t::register_dev(const pstring &classname, const pstring &name)
 	}
 	else
 	{
-#if 0
-		device_t *dev = factory().new_device_by_name(classname, netlist(), build_fqn(name));
-		if (dev == nullptr)
-			log().fatal("Class {1} not found!\n", classname);
-		register_dev(dev);
-#else
 		auto f = factory().factory_by_name(classname);
 		if (f == nullptr)
 			log().fatal("Class {1} not found!\n", classname);
 		m_device_factory.push_back(std::pair<pstring, base_factory_t *>(build_fqn(name), f));
-#endif
 	}
 }
 
@@ -503,11 +496,11 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 	{
 		// create a new one ...
 		pstring x = pfmt("proxy_da_{1}_{2}")(out.name())(m_proxy_cnt);
-		devices::nld_base_d_to_a_proxy *new_proxy =
+		auto new_proxy =
 				out_cast.logic_family()->create_d_a_proxy(netlist(), x, &out_cast);
 		m_proxy_cnt++;
 
-		register_dev(new_proxy);
+		register_dev_s(new_proxy);
 		new_proxy->start_dev();
 
 		/* connect all existing terminals to new net */
@@ -521,8 +514,8 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 		out.net().m_core_terms.clear(); // clear the list
 
 		out.net().register_con(new_proxy->in());
-		out_cast.set_proxy(new_proxy);
-		proxy = new_proxy;
+		out_cast.set_proxy(new_proxy.get());
+		proxy = new_proxy.get();
 	}
 	return proxy;
 }
@@ -533,11 +526,11 @@ void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
 	{
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(in);
 		pstring x = pfmt("proxy_ad_{1}_{2}")(in.name())( m_proxy_cnt);
-		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy(netlist(), x, &incast));
-		incast.set_proxy(proxy);
+		auto proxy = std::make_shared<devices::nld_a_to_d_proxy>(netlist(), x, &incast);
+		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
 
-		register_dev(proxy);
+		register_dev_s(proxy);
 		proxy->start_dev();
 
 		proxy->m_Q.net().register_con(in);
@@ -572,11 +565,11 @@ void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
 		log().debug("connect_terminal_input: connecting proxy\n");
 		pstring x = pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
-		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy(netlist(), x, &incast));
-		incast.set_proxy(proxy);
+		auto proxy = std::make_shared<devices::nld_a_to_d_proxy>(netlist(), x, &incast);
+		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
 
-		register_dev(proxy);
+		register_dev_s(proxy);
 		proxy->start_dev();
 
 		connect_terminals(term, proxy->m_I);
@@ -820,7 +813,7 @@ void setup_t::resolve_inputs()
 	// FIXME: doesn't find internal devices. This needs to be more clever
 	for (std::size_t i=0; i < netlist().m_devices.size(); i++)
 	{
-		devices::NETLIB_NAME(twoterm) *t = dynamic_cast<devices::NETLIB_NAME(twoterm) *>(netlist().m_devices[i]);
+		devices::NETLIB_NAME(twoterm) *t = dynamic_cast<devices::NETLIB_NAME(twoterm) *>(netlist().m_devices[i].get());
 		if (t != nullptr)
 		{
 			has_twoterms = true;
@@ -853,8 +846,8 @@ void setup_t::start_devices()
 		for (pstring ll : loglist)
 		{
 			pstring name = "log_" + ll;
-			device_t *nc = factory().new_device_by_name("LOG", netlist(), name);
-			register_dev(nc);
+			auto nc = factory().new_device_by_name("LOG", netlist(), name);
+			register_dev_s(nc);
 			register_link(name + ".I", ll);
 			log().debug("    dynamic link {1}: <{2}>\n",ll, name);
 		}
@@ -864,8 +857,8 @@ void setup_t::start_devices()
 
 	for (auto & e : m_device_factory)
 	{
-		device_t *dev = e.second->Create(netlist(), e.first);
-		register_dev(dev);
+		auto dev = std::shared_ptr<device_t>(e.second->Create(netlist(), e.first));
+		register_dev_s(dev);
 	}
 
 	netlist().start();
@@ -879,10 +872,10 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 {
 public:
 	logic_family_std_proxy_t() { }
-	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_t &anetlist,
+	virtual std::shared_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
 			const pstring &name, logic_output_t *proxied) const override
 	{
-		return palloc(devices::nld_d_to_a_proxy(anetlist, name, proxied));
+		return std::make_shared<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 };
 

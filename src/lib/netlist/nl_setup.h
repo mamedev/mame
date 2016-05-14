@@ -8,6 +8,7 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
+#include <memory>
 #include "nl_base.h"
 #include "nl_factory.h"
 
@@ -111,7 +112,15 @@ namespace netlist
 		pstring build_fqn(const pstring &obj_name) const;
 
 		void register_object(device_t &dev, const pstring &name, object_t &obj);
-		void register_dev(device_t *dev);
+
+		template<class C>
+		void register_dev_s(std::shared_ptr<C> dev)
+		{
+			register_dev(std::static_pointer_cast<device_t>(dev));
+		}
+
+
+		void register_dev(std::shared_ptr<device_t> dev);
 		void register_dev(const pstring &classname, const pstring &name);
 
 		void register_lib_entry(const pstring &name);

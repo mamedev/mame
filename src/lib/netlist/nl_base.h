@@ -319,7 +319,7 @@ namespace netlist
 	public:
 		logic_family_desc_t() : m_is_static(false) {}
 		virtual ~logic_family_desc_t() {}
-		virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_t &anetlist, const pstring &name,
+		virtual std::shared_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
 
 		nl_double m_low_thresh_V;
@@ -1229,9 +1229,9 @@ namespace netlist
 		ATTR_COLD pvector_t<_device_class *> get_device_list()
 		{
 			pvector_t<_device_class *> tmp;
-			for (std::size_t i = 0; i < m_devices.size(); i++)
+			for (auto &d : m_devices)
 			{
-				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
+				_device_class *dev = dynamic_cast<_device_class *>(d.get());
 				if (dev != nullptr)
 					tmp.push_back(dev);
 			}
@@ -1241,9 +1241,9 @@ namespace netlist
 		template<class _device_class>
 		ATTR_COLD _device_class *get_first_device()
 		{
-			for (std::size_t i = 0; i < m_devices.size(); i++)
+			for (auto &d : m_devices)
 			{
-				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
+				_device_class *dev = dynamic_cast<_device_class *>(d.get());
 				if (dev != nullptr)
 					return dev;
 			}
@@ -1254,9 +1254,9 @@ namespace netlist
 		ATTR_COLD _device_class *get_single_device(const char *classname)
 		{
 			_device_class *ret = nullptr;
-			for (std::size_t i = 0; i < m_devices.size(); i++)
+			for (auto &d : m_devices)
 			{
-				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
+				_device_class *dev = dynamic_cast<_device_class *>(d.get());
 				if (dev != nullptr)
 				{
 					if (ret != nullptr)
@@ -1268,7 +1268,7 @@ namespace netlist
 			return ret;
 		}
 
-		pvector_t<device_t *> m_devices;
+		pvector_t<std::shared_ptr<device_t>> m_devices;
 		net_t::list_t m_nets;
 	#if (NL_KEEP_STATISTICS)
 		pvector_t<core_device_t *> m_started_devices;

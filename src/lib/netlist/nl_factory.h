@@ -83,7 +83,7 @@ namespace netlist
 
 		//ATTR_COLD device_t *new_device_by_classname(const pstring &classname) const;
 		// FIXME: legacy, should use factory_by_name
-		device_t *new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name);
+		std::shared_ptr<device_t> new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name);
 		base_factory_t * factory_by_name(const pstring &devname);
 
 	private:

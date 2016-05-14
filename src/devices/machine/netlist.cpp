@@ -100,7 +100,7 @@ void netlist_mame_analog_output_t::custom_netlist_additions(netlist::setup_t &se
 	pstring dname = "OUT_" + m_in;
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 
-	NETLIB_NAME(analog_callback) *dev = palloc(NETLIB_NAME(analog_callback)(setup.netlist(), setup.build_fqn(dname)));
+	auto dev = std::make_shared<NETLIB_NAME(analog_callback)>(setup.netlist(), setup.build_fqn(dname));
 	setup.register_dev(dev);
 	dev->register_callback(m_delegate);
 	setup.register_link(dname + ".IN", m_in);
@@ -399,9 +399,8 @@ ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::check_mame_abort_slice()
 
 ATTR_COLD void netlist_mame_device_t::save_state()
 {
-	for (int i=0; i< netlist().save_list().size(); i++)
+	for (auto const & s : netlist().save_list())
 	{
-		pstate_entry_t *s = netlist().save_list()[i];
 		netlist().log().debug("saving state for {1}\n", s->m_name.cstr());
 		switch (s->m_dt)
 		{

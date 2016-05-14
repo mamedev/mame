@@ -38,9 +38,9 @@ public:
 		m_R_high = 130.0;
 		m_is_static = true;
 	}
-	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
+	virtual std::shared_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
-		return palloc(devices::nld_d_to_a_proxy(anetlist, name, proxied));
+		return std::make_shared<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 };
 
@@ -59,9 +59,9 @@ public:
 		m_R_high = 10.0;
 		m_is_static = true;
 	}
-	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
+	virtual std::shared_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
-		return palloc(devices::nld_d_to_a_proxy(anetlist, name, proxied));
+		return std::make_shared<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 };
 
@@ -213,7 +213,8 @@ netlist_t::~netlist_t()
 {
 
 	m_nets.clear();
-	m_devices.clear_and_free();
+	m_devices.clear();
+	//m_devices.clear_and_free();
 
 	pfree(m_lib);
 	pstring::resetmem();
@@ -254,8 +255,8 @@ ATTR_COLD void netlist_t::start()
 	m_use_deactivate = (m_params->m_use_deactivate.Value() ? true : false);
 
 	log().debug("Initializing devices ...\n");
-	for (device_t *dev : m_devices)
-		if (dev != m_solver && dev != m_params)
+	for (auto &dev : m_devices)
+		if (dev.get() != m_solver && dev.get() != m_params)
 			dev->start_dev();
 
 }
@@ -265,7 +266,7 @@ ATTR_COLD void netlist_t::stop()
 	/* find the main clock and solver ... */
 
 	log().debug("Stopping all devices ...\n");
-	for (device_t *dev : m_devices)
+	for (auto & dev : m_devices)
 		dev->stop_dev();
 }
 
@@ -312,7 +313,7 @@ ATTR_COLD void netlist_t::reset()
 
 	// FIXME: some const devices rely on this
 	/* make sure params are set now .. */
-	for (device_t *dev : m_devices)
+	for (auto & dev : m_devices)
 	{
 		dev->update_param();
 	}
