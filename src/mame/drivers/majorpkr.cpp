@@ -980,7 +980,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(map)
 	MCFG_CPU_IO_MAP(portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", majorpkr_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", majorpkr_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("palette_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(palettebanks)
@@ -1046,7 +1046,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(majorpkr_state,majorpkr)
+DRIVER_INIT_MEMBER(majorpkr_state, majorpkr)
 {
 	UINT8 * ROM = (UINT8 *)memregion("maincpu")->base();
 	m_rom_bank->configure_entries(0, 4, &ROM[0xe000], 0x800);
@@ -1057,5 +1057,5 @@ DRIVER_INIT_MEMBER(majorpkr_state,majorpkr)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY       FULLNAME             FLAGS  LAYOUT */
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY       FULLNAME             FLAGS  LAYOUT */
 GAMEL( 1994, majorpkr, 0,      majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System", "Major Poker (v2.0)", 0,     layout_majorpkr )
