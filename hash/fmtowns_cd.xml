@@ -1262,7 +1262,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Sofcom</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="free will / knight of argent" sha1="ad5646cf46d8b0243220dd783e96f556e9a85467" />
+				<disk name="free will - knight of argent" sha1="ad5646cf46d8b0243220dd783e96f556e9a85467" />
 			</diskarea>
 		</part>
 	</software>
