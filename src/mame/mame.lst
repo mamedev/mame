@@ -29340,6 +29340,7 @@ tg16                            // Turbo Grafix-16  NEC 1989-1993
 
 @source:pce220.cpp
 pce220                          // Pocket Computer E220
+pcg815                          // Pocket Computer G815
 pcg850v                         // Pocket Computer G850V
 
 @source:pcfx.cpp
