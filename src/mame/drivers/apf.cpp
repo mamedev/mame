@@ -560,6 +560,7 @@ static MACHINE_CONFIG_DERIVED( apfimag, apfm1000 )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(apf_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
+	MCFG_CASSETTE_INTERFACE("apf_cass")
 
 	MCFG_FD1771_ADD("fdc", 1000000) // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -567,7 +568,10 @@ static MACHINE_CONFIG_DERIVED( apfimag, apfm1000 )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "apfimag_cart")
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "apfimag_cass")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("m1k_cart_list", "apfm1000")
 MACHINE_CONFIG_END
 
 

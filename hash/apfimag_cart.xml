@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="apfimag_cart" description="APF Imagination Machine cartridges">
+
+<!-- BASIC Carts -->
+
+	<software name="basic">
+		<description>APF Basic</description>
+		<year>1979</year>
+		<publisher>APF</publisher>
+		<info name="serial" value="AL100A" />
+
+		<part name="cart" interface="apfm1000_cart">
+			<feature name="slot" value="basic"/>
+			<dataarea name="rom" size="12288">
+				<rom name="basic_80.bin" size="8192" crc="a4c69fae" sha1="7f98aa482589bf7c5a26d338fec105e797ba43f6" offset="0" />
+				<rom name="basic_68.bin" size="4096" crc="5f30370b" sha1="cf11bd975749b88df4d82cd460035cb92563ceff" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exbasic">
+		<description>Extended Basic</description>
+		<year>1983</year>
+		<publisher>R.L. Recker</publisher>
+
+		<part name="cart" interface="apfm1000_cart">
+			<feature name="slot" value="basic"/>
+			<dataarea name="rom" size="14336">
+				<rom name="exbasic_80.bin" size="8192" crc="3fefbd81" sha1="d8c3ea8a152da50f71b98c464f47919e16743d29" offset="0" />
+				<rom name="exbasic_68.bin" size="4096" crc="e99b5102" sha1="62a79dc5f25a60d9007c90adf778fba432dfb900" offset="0x2000" />
+				<rom name="exbasic_78.bin" size="2048" crc="fdcf7782" sha1="aa0b94182920a232c1e2fb7e3a4d9042511572c4" offset="0x3000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Homebrew -->
+
+	<software name="targets">
+		<description>Targets / Columns / Bacteria / Autopista</description>
+		<year>1995</year>
+		<publisher>Enrique Collado</publisher>
+		<info name="usage" value="Targets and Bacteria require 16K RAM" />
+
+		<part name="cart" interface="apfm1000_cart">
+			<feature name="ram" value="16"/>
+			<dataarea name="rom" size="4096">
+				<rom name="columns.bin" size="3733" crc="71c2955c" sha1="7e571e32ff05c92c7be7d2e42a0868538a7c5800" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
