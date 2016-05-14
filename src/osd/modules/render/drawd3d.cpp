@@ -1034,7 +1034,6 @@ void renderer_d3d9::device_delete()
 	// free the device itself
 	if (m_device != nullptr)
 	{
-		(*d3dintf->device.reset)(m_device, &m_presentation);
 		(*d3dintf->device.release)(m_device);
 		m_device = nullptr;
 	}
