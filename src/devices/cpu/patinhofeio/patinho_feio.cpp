@@ -142,7 +142,8 @@ void patinho_feio_cpu_device::device_start()
 
 void patinho_feio_cpu_device::device_reset()
 {
-	m_pc = 0x006; //"PATINHO FEIO" hello-world
+	m_pc = 0;
+	//m_pc = 0x006; //"PATINHO FEIO" hello-world
 	//m_pc = 0x010; //micro-pre-loader
 	//m_pc = 0xE00; //HEXAM
 	m_rc = 0;
@@ -150,11 +151,12 @@ void patinho_feio_cpu_device::device_reset()
 	m_ext = READ_ACC_EXTENSION_REG();
 	m_idx = READ_INDEX_REG();
 	m_flags = 0;
-	m_run = true;
+	m_run = false;
 	m_scheduled_IND_bit_reset = false;
 	m_indirect_addressing = false;
 	m_addr = 0;
 	m_opcode = 0;
+	m_mode = ADDRESSING_MODE;
 	((patinho_feio_state*) owner())->update_panel(ACC, m_opcode, READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC);
 }
 
@@ -164,24 +166,36 @@ void patinho_feio_cpu_device::execute_run()
 	do
 	{
 		read_panel_keys_register();
+		m_ext = READ_ACC_EXTENSION_REG();
+		m_idx = READ_INDEX_REG();
 		((patinho_feio_state*) owner())->update_panel(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC);
+		debugger_instruction_hook(this, PC);
 
-		if ((! m_run)){
-			if (!m_buttons_read_cb.isnull() && (m_buttons_read_cb(0) & 0x01)){
-				//if PARTIDA ("startup") button is pressed:
-				m_run = true;
-			} else {
-				m_icount = 0;   /* if processor is stopped, just burn cycles */
+		if (!m_run){
+			if (!m_buttons_read_cb.isnull()){
+				UINT16 buttons = m_buttons_read_cb(0);
+//				printf("WAIT! mode: %d buttons: 0x%03X\n", m_mode, buttons);
+				if (buttons & BUTTON_PARTIDA){
+					/* "startup" button */
+					switch (m_mode){
+						case ADDRESSING_MODE: PC = RC; break;
+						case NORMAL_MODE: m_run = true; break;
+						case DATA_STORE_MODE: WRITE_BYTE_PATINHO(PC, RC & 0xFF); break; //TODO: we also need RE (address register, instead of using PC directly)
+						/*TODO: case DATA_VIEW_MODE: RD = READ_BYTE_PATINHO(RC); break; //we need to implement RD (the 'data register') */
+						default: break;
+					}
+				}
+				if (buttons & BUTTON_NORMAL) m_mode = NORMAL_MODE;
+				if (buttons & BUTTON_ENDERECAMENTO) m_mode = ADDRESSING_MODE;
+				if (buttons & BUTTON_EXPOSICAO) m_mode = DATA_VIEW_MODE;
+				if (buttons & BUTTON_ARMAZENAMENTO) m_mode = DATA_STORE_MODE;
+				if (buttons & BUTTON_CICLO_UNICO) m_mode = CYCLE_STEP_MODE;
+				if (buttons & BUTTON_INSTRUCAO_UNICA) m_mode = INSTRUCTION_STEP_MODE;
+				if (buttons & BUTTON_PREPARACAO) device_reset();
 			}
+			m_icount = 0;   /* if processor is stopped, just burn cycles */
 		} else {
-			m_ext = READ_ACC_EXTENSION_REG();
-			m_idx = READ_INDEX_REG();
-
-
-
-			debugger_instruction_hook(this, PC);
 			execute_instruction();
-
 			m_icount --;
 		}
 	}

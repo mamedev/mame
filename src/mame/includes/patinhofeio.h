@@ -14,7 +14,7 @@ public:
 
         DECLARE_DRIVER_INIT(patinho_feio);
         DECLARE_READ16_MEMBER(rc_r);
-        DECLARE_READ8_MEMBER(buttons_r);
+        DECLARE_READ16_MEMBER(buttons_r);
 
         DECLARE_WRITE8_MEMBER(decwriter_data_w);
         DECLARE_WRITE8_MEMBER(decwriter_kbd_input);

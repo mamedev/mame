@@ -20,10 +20,33 @@ enum
 	PATINHO_FEIO_CI=1, PATINHO_FEIO_ACC, PATINHO_FEIO_EXT, PATINHO_FEIO_IDX, PATINHO_FEIO_RC
 };
 
+enum
+{
+        NORMAL_MODE,
+        ADDRESSING_MODE,
+	DATA_VIEW_MODE,
+	DATA_STORE_MODE,
+	CYCLE_STEP_MODE,
+	INSTRUCTION_STEP_MODE
+};
+
 #define IODEV_READY true
 #define IODEV_BUSY false
 #define REQUEST true
 #define NO_REQUEST false
+
+#define	BUTTON_ESPERA                (1 << 0)  /* wait */
+#define	BUTTON_INTERRUPCAO           (1 << 1)  /* interrupt */
+#define	BUTTON_PARTIDA               (1 << 2)  /* startup */
+#define	BUTTON_PREPARACAO            (1 << 3)  /* reset */
+#define	BUTTON_NORMAL                (1 << 4)  /* normal CPU execution */
+#define	BUTTON_CICLO_UNICO           (1 << 5)  /* single-cycle step */
+#define	BUTTON_INSTRUCAO_UNICA       (1 << 6)  /* single-instruction step */
+#define	BUTTON_ENDERECAMENTO         (1 << 7)  /* addressing action */
+#define	BUTTON_ARMAZENAMENTO         (1 << 8)  /* storage action */
+#define	BUTTON_EXPOSICAO             (1 << 9)  /* memory viewing action */
+#define	BUTTON_TIPO_DE_ENDERECAMENTO (1 << 10) /* Addressing mode (0: Fixed / 1: Sequential) */
+#define	BUTTON_PROTECAO_DE_MEMORIA   (1 << 11) /* Memory protection (in the address range 0xF80-0xFFF (1: write-only / 0: read-write) */
 
 class patinho_feio_cpu_device : public cpu_device
 {
@@ -110,10 +133,11 @@ private:
 	void set_flag(UINT8 flag, bool state);
 	UINT16 read_panel_keys_register();
 	devcb_read16 m_rc_read_cb;
-	devcb_read8 m_buttons_read_cb;
+	devcb_read16 m_buttons_read_cb;
         devcb_read8 m_iodev_read_cb[16];
         devcb_write8 m_iodev_write_cb[16];
         devcb_read8 m_iodev_status_cb[16];
+	UINT8 m_mode;
 };
 
 
