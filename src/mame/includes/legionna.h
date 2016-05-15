@@ -34,6 +34,7 @@ public:
 	std::unique_ptr<UINT16[]> m_textram;
 	std::unique_ptr<UINT16[]> m_scrollram16;
 	UINT16 m_layer_disable;
+	std::unique_ptr<UINT16[]> m_layer_config;
 	int m_sprite_xoffs;
 	int m_sprite_yoffs;
 	tilemap_t *m_background_layer;
@@ -61,6 +62,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_comms_w);
 	DECLARE_WRITE16_MEMBER(denjinmk_setgfxbank);
 	DECLARE_WRITE16_MEMBER(heatbrl_setgfxbank);
+	DECLARE_WRITE16_MEMBER(grainbow_layer_config_w);
 
 	DECLARE_DRIVER_INIT(legiongfx);
 	DECLARE_DRIVER_INIT(cupsoc_debug);
