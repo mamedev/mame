@@ -37,8 +37,7 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	pal_brightness_val(0),
 	pal_brightness_mode(0),
 	cop_itoa(0),
-	cop_itoa_digit_count(0),
-	m_cop_itoa_unused_digit_value(0x30),
+	cop_itoa_mode(0),
 
 	cop_status(0),
 	cop_scale(0),
@@ -61,9 +60,12 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	m_cop_sprite_dma_src(0),
 	m_cop_sprite_dma_size(0),
 
+	m_cop_unk_param_a(0),
+	m_cop_unk_param_b(0),
+
 	m_cop_rom_addr_lo(0),
 	m_cop_rom_addr_hi(0),
-	m_cop_rom_addr_unk(0),
+	m_cop_precmd(0),
 
 	m_cop_sprite_dma_abs_x(0),
 	m_cop_sprite_dma_abs_y(0),
@@ -121,7 +123,7 @@ void raiden2cop_device::device_start()
 	save_item(NAME(cop_dma_size));
 
 	save_item(NAME(cop_itoa));
-	save_item(NAME(cop_itoa_digit_count));
+	save_item(NAME(cop_itoa_mode));
 	save_item(NAME(cop_itoa_digits));
 
 	save_item(NAME(cop_status));
@@ -168,9 +170,12 @@ void raiden2cop_device::device_start()
 	save_item(NAME(m_cop_sprite_dma_size));
 	save_item(NAME(m_cop_sprite_dma_src));
 
+	save_item(NAME(m_cop_unk_param_a));
+	save_item(NAME(m_cop_unk_param_b));
+
 	save_item(NAME(m_cop_rom_addr_lo));
 	save_item(NAME(m_cop_rom_addr_hi));
-	save_item(NAME(m_cop_rom_addr_unk));
+	save_item(NAME(m_cop_precmd));
 
 	save_item(NAME(m_cop_sprite_dma_abs_x));
 	save_item(NAME(m_cop_sprite_dma_abs_y));
@@ -180,9 +185,6 @@ void raiden2cop_device::device_start()
 	save_item(NAME(m_LEGACY_r1));
 
 	m_videoramout_cb.resolve_safe();
-
-	cop_itoa_digit_count = 4; //TODO: Raiden 2 never inits the BCD register, value here is a guess (8 digits, as WR is 10.000.000 + a)
-
 }
 
 UINT16 raiden2cop_device::cop_read_word(address_space &space, int address)
@@ -391,6 +393,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 					triggerval == 0x42c2 || // distance?
 					triggerval == 0xa180 || triggerval == 0xa980 || triggerval == 0xb100 || triggerval == 0xb900) /* collisions */
 					otherlog = 0;
+				// An unused routine writes to 0x9180 and 0x9980 (arguments written to 0x100442 and 0x100440 first)
 			}
 			else if (!strcmp(machine().system().name, "cupsoc"))
 			{
@@ -406,10 +409,18 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 					triggerval == 0xf105 ||
 					triggerval == 0x8100 || triggerval == 0x8900) /* sin / cos */
 					otherlog = 0;
+				// Unused M68000 code in some (earlier?) sets also writes these trigger values:
+				// - 0x9180, 0x9980 (arguments written to 0x100442 and 0x100440 first)
+				// - 0xa180, 0xa980, 0x1905 (twice at successive offsets)
+				// - 0x2a05 (twice or three times at successive offsets)
+				// - 0x2288 (may set bit 15 of status), 0x138e, 0x3bb0
+				// - 0x338e (may set bit 15 of status), 0x3bb0, 0x4aa0
+				// - 0xa180, 0xb100, 0xa980, 0xb100
+				// - 0xa180, 0x6880 (to second offset), 0xc480 (to second offset; one of these may set bit 1 of status)
 			}
 			else if (!strcmp(machine().system().name, "heatbrl"))
 			{
-				// note, stage 2 end boss (fire breather) will sometimes glitch, also shows 'divide by zero' from MAME when it fires (and homing missile stg3 - they don't home in properly either?)
+				// note, stage 2 end boss (fire breather) will sometimes glitch (and homing missile stg3 - they don't home in properly either?)
 				// stage 2+3 priority of boaters is wrong
 				// game eventually crashes with address error (happened in stage 4 for me)
 
@@ -420,6 +431,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 					triggerval == 0x42c2 ||
 					triggerval == 0xa100 || triggerval == 0xa900 || triggerval == 0xb080 || triggerval == 0xb880) /* collisions */
 					otherlog = 0;
+				// Program code also includes the unused routine from Legionnaire
 			}
 			else if (!strcmp(machine().system().name, "godzilla"))
 			{
@@ -431,10 +443,8 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 			else if (!strcmp(machine().system().name, "grainbow"))
 			{
 				// path 3 (caves) midboss has wrong tiles
-				// doesn't like our BCD / Number conversion - not command related
 				// stage 4 (after 3 selectable stages) has sprite glitches bottom left
 				// fade logic is wrong (palettes for some layers shouldn't fade) - DMA operation related, not command related
-
 
 				if (triggerval == 0x0205 ||
 					triggerval == 0x8100 || triggerval == 0x8900 || /* sin / cos */
@@ -446,11 +456,11 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 					triggerval == 0x6200 ||
 					triggerval == 0x6980)
 					otherlog = 0;
-
+				// Program code also includes many of the unused routines from Olympic Soccer '92
 			}
 			else if (!strcmp(machine().system().name, "denjinmk"))
 			{
-				// never calls any programs
+				// never calls any programs (M68000 code handles sine and cosine lookups on its own)
 			}
 			else if (!strcmp(machine().system().name, "zeroteam"))
 			{
@@ -477,8 +487,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 					triggerval == 0x4aa0)
 
 					otherlog = 0;
-
-
+				// An unused routine in the program code triggers 0x6980 and 0x7100 after writing zero to the word at 0x426
 			}
 			else if (!strcmp(machine().system().name, "xsedae"))
 			{
@@ -510,6 +519,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 					triggerval == 0xa100 || triggerval == 0xa900 || triggerval == 0xb100 || triggerval == 0xb900 /* collisions */
 					)
 					otherlog = 0;
+				// An unused routine in the program code triggers 0x9100 and 0x9900
 			}
 			else
 			{
@@ -878,25 +888,25 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 
 /* Number Conversion */
 
-// according to score display in  https://www.youtube.com/watch?v=T1M8sxYgt9A
-// we should return 0x30 for unused digits? according to Raiden 2 and Zero
-// Team the value should be 0x20, can this be configured?
-// grainbow doesn't like this implementation at all (21 credits, 2 digit high scores etc.)
 WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
 {
 	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
 
-	int digits = 1 << cop_itoa_digit_count*2;
+	//int digits = 1 << cop_itoa_mode*2;
 	UINT32 val = cop_itoa;
 
-	if(digits > 9)
-		digits = 9;
+	//if(digits > 9)
+		int digits = 9;
 
 	for (int i = 0; i < digits; i++)
 	{
 		if (!val && i)
 		{
-			cop_itoa_digits[i] = m_cop_itoa_unused_digit_value;
+			// according to score display in  https://www.youtube.com/watch?v=T1M8sxYgt9A
+			// we should return 0x30 for unused digits in Godzilla
+			// however, Raiden II, Zero Team and SD Gundam all want 0x20 (SD Gundam even corrects 0x20 to 0x30 in the credits counter)
+			// this is guesswork based on comparing M68000 code, using the most likely parameter that Godzilla configures differently
+			cop_itoa_digits[i] = (cop_itoa_mode == 3) ? 0x30 : 0x20;
 		}
 		else
 		{
@@ -913,9 +923,14 @@ WRITE16_MEMBER(raiden2cop_device::cop_itoa_high_w)
 	cop_itoa = (cop_itoa & ~(mem_mask << 16)) | ((data & mem_mask) << 16);
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_itoa_digit_count_w)
+WRITE16_MEMBER(raiden2cop_device::cop_itoa_mode_w)
 {
-	COMBINE_DATA(&cop_itoa_digit_count);
+	// BCD / Number conversion related parameter
+	// The former working hypothesis that this value is some sort of digit count is almost certainly incorrect
+	// SD Gundam writes 0 here at startup, whereas Godzilla and Heated Barrel write 3
+	// Denjin Makai writes either 2 or 3 at various times
+	// Raiden II and Zero Team also write 2 here, but only in unused routines
+	COMBINE_DATA(&cop_itoa_mode);
 }
 
 READ16_MEMBER(raiden2cop_device::cop_itoa_digits_r)
@@ -929,7 +944,7 @@ READ16_MEMBER(raiden2cop_device::cop_itoa_digits_r)
 // (TABLENOTE1)
 // in all but one case the upload table position (5-bits) is the SAME as the upper 5-bits of the 'trigger value'
 // the exception to this rule is program 0x18 uploads on zeroteam
-//  in this case you can see that the 'trigger' value upper bits are 0x0f, this makes it a potentially interesting case (if it gets used)
+//  in this case you can see that the 'trigger' value upper bits are 0x0f, this would be potentially interesting if it were used (but it isn't)
 //  18 - c480 ( 18) (  480) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk)
 //  18 - 7c80 ( 0f) (  480) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (zeroteam, xsedae)
 
@@ -1150,7 +1165,11 @@ void raiden2cop_device::execute_42c2(address_space &space, int offset, UINT16 da
 {
 	int div = space.read_word(cop_regs[0] + (0x36));
 	if (!div)
-		div = 1;
+	{
+		cop_status |= 0x8000;
+		space.write_word(cop_regs[0] + (0x38), 0);
+		return;
+	}
 
 	/* TODO: bits 5-6-15 */
 	cop_status = 7;
@@ -1166,28 +1185,31 @@ void raiden2cop_device::LEGACY_execute_42c2(address_space &space, int offset, UI
 	int res;
 	int cop_dist_raw;
 
+	// divide by zero?
 	if (!div)
 	{
-		printf("divide by zero?\n");
-		div = 1;
+		// No emulation error here: heatbrl specifically tests this
+		cop_status |= 0x8000;
+		res = 0;
+	}
+	else
+	{
+		/* TODO: calculation of this one should occur at 0x3b30/0x3bb0 I *think* */
+		/* TODO: recheck if cop_scale still masks at 3 with this command */
+		dx >>= 11 + cop_scale;
+		dy >>= 11 + cop_scale;
+		cop_dist_raw = sqrt((double)(dx*dx + dy*dy));
+
+		res = cop_dist_raw;
+		res /= div;
+
+		cop_dist = (1 << (5 - cop_scale)) / div;
+
+		/* TODO: bits 5-6-15 */
+		cop_status = 7;
 	}
 
-	/* TODO: calculation of this one should occur at 0x3b30/0x3bb0 I *think* */
-	/* TODO: recheck if cop_scale still masks at 3 with this command */
-	dx >>= 11 + cop_scale;
-	dy >>= 11 + cop_scale;
-	cop_dist_raw = sqrt((double)(dx*dx + dy*dy));
-
-	res = cop_dist_raw;
-	res /= div;
-
-	cop_dist = (1 << (5 - cop_scale)) / div;
-
-	/* TODO: bits 5-6-15 */
-	cop_status = 7;
-
 	space.write_word(cop_regs[0] + (0x38 ^ 2), res);
-
 }
 
 /*
@@ -1399,6 +1421,7 @@ void raiden2cop_device::execute_8900(address_space &space, int offset, UINT16 da
 12 - 9100 ( 12) (  100) :  (b80, b94, 894, 000, 000, 000, 000, 000)  7     fefb   (raiden2, raidendx)
 12 - 9100 ( 12) (  100) :  (b80, b94, b94, 894, 000, 000, 000, 000)  7     f8f7   (zeroteam, xsedae)
 */
+// Unused code suggests this may be an alternate sine function: the longword result at cop_regs[0] + 0x28 is doubled when the angle is 0xC0.
 
 /*
 ## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
@@ -1407,6 +1430,7 @@ void raiden2cop_device::execute_8900(address_space &space, int offset, UINT16 da
 13 - 9900 ( 13) (  100) :  (b80, b94, 896, 000, 000, 000, 000, 000)  7     fefb   (raiden2, raidendx)
 13 - 9900 ( 13) (  100) :  (b80, b94, b94, 896, 000, 000, 000, 000)  7     f8f7   (zeroteam, xsedae)
 */
+// Unused code suggests this may be an alternate cosine function: the longword result at cop_regs[0] + 0x2C is doubled when the angle is 0x80.
 
 /*
 ## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
@@ -1494,7 +1518,7 @@ void raiden2cop_device::LEGACY_execute_d104(address_space &space, int offset, UI
 	/* writes to some unemulated COP registers, then puts the result in here, adding a parameter taken from ROM */
 	//space.write_word(cop_regs[0]+(0x44 + offset * 4), rom_data);
 
-	logerror("%04x%04x %04x %04x\n", m_cop_rom_addr_hi, m_cop_rom_addr_lo, m_cop_rom_addr_unk, rom_data);
+	logerror("%04x%04x %04x %04x\n", m_cop_rom_addr_hi, m_cop_rom_addr_lo, m_cop_precmd, rom_data);
 }
 /*
 ## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
@@ -2024,11 +2048,27 @@ WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_inc_w)
 
 // more misc
 
-WRITE16_MEMBER( raiden2cop_device::cop_rom_addr_unk_w)
+// Involved with 0x9100/0x9180 and 0x9900/0x9980
+// Some angle results seem to be stored here as well; legionna writes here when 0x138e raises the divide by zero flag
+WRITE16_MEMBER( raiden2cop_device::cop_unk_param_a_w)
 {
-	COMBINE_DATA(&m_cop_rom_addr_unk);
+	COMBINE_DATA(&m_cop_unk_param_a);
 }
 
+// Involved with 0x9100/0x9180 and 0x9900/0x9980
+WRITE16_MEMBER( raiden2cop_device::cop_unk_param_b_w)
+{
+	COMBINE_DATA(&m_cop_unk_param_b);
+}
+
+// cupsoc always writes 0xF before commands 0x5105, 0x5905, 0xD104 and 0xF105 and 0xE before 0xD104, then resets this to zero
+// zeroteam writes 0xE here before 0xEDE5, then resets it to zero
+WRITE16_MEMBER( raiden2cop_device::cop_precmd_w)
+{
+	COMBINE_DATA(&m_cop_precmd);
+}
+
+// cupsoc writes a longword before 0x5105 or 0xF105 (always 0xC000 for the latter)
 WRITE16_MEMBER( raiden2cop_device::cop_rom_addr_lo_w)
 {
 	COMBINE_DATA(&m_cop_rom_addr_lo);
