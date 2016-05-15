@@ -29,17 +29,48 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_DEVICE_WITH_PARAMS(switch1,
+NETLIB_OBJECT(switch1)
+{
+	NETLIB_CONSTRUCTOR(switch1)
+	, m_R(*this, "R")
+	{
+		register_param("POS", m_POS, 0);
+		register_subalias("1", m_R.m_P);
+		register_subalias("2", m_R.m_N);
+	}
+
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
+	NETLIB_UPDATE_PARAMI();
+
 	NETLIB_SUB(R_base) m_R;
-
 	param_int_t m_POS;
-);
+};
 
-NETLIB_DEVICE_WITH_PARAMS(switch2,
-	NETLIB_SUB(R_base) m_R[2];
+NETLIB_OBJECT(switch2)
+{
+	NETLIB_CONSTRUCTOR(switch2)
+	, m_R1(*this, "R1")
+	, m_R2(*this, "R2")
+	{
+		register_param("POS", m_POS, 0);
 
+		connect_late(m_R1.m_N, m_R2.m_N);
+
+		register_subalias("1", m_R1.m_P);
+		register_subalias("2", m_R2.m_P);
+
+		register_subalias("Q", m_R1.m_N);
+	}
+
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
+	NETLIB_UPDATE_PARAMI();
+
+	NETLIB_SUB(R_base) m_R1;
+	NETLIB_SUB(R_base) m_R2;
 	param_int_t m_POS;
-);
+};
 
 NETLIB_NAMESPACE_DEVICES_END()
 

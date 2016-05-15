@@ -92,7 +92,7 @@ NETLIB_SUBDEVICE(74107Asub,
 
 NETLIB_DEVICE(74107A,
 public:
-	NETLIB_SUB(74107Asub) sub;
+	NETLIB_SUBXX(74107Asub) sub;
 
 	logic_input_t m_J;
 	logic_input_t m_K;
@@ -100,18 +100,17 @@ public:
 
 );
 
-class NETLIB_NAME(74107) : public NETLIB_NAME(74107A)
+NETLIB_OBJECT_DERIVED(74107, 74107A)
 {
 public:
-	NETLIB_NAME(74107) (netlist_t &anetlist, const pstring &name)
-	:   NETLIB_NAME(74107A) (anetlist, name) {}
+	NETLIB_CONSTRUCTOR_DERIVED(74107, 74107A) { }
 
 };
 
 NETLIB_DEVICE(74107_dip,
 
-	NETLIB_SUB(74107) m_1;
-	NETLIB_SUB(74107) m_2;
+	NETLIB_SUBXX(74107) m_1;
+	NETLIB_SUBXX(74107) m_2;
 );
 
 NETLIB_NAMESPACE_DEVICES_END()

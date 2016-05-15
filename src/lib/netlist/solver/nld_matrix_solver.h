@@ -94,8 +94,8 @@ public:
 
 	netlist_time solve();
 
-	inline bool is_dynamic() const { return m_dynamic_devices.size() > 0; }
-	inline bool is_timestep() const { return m_step_devices.size() > 0; }
+	inline bool has_dynamic_devices() const { return m_dynamic_devices.size() > 0; }
+	inline bool has_timestep_devices() const { return m_step_devices.size() > 0; }
 
 	void update_forced();
 	void update_after(const netlist_time after)

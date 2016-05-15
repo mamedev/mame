@@ -146,28 +146,17 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 			switch (p->type())
 			{
 				case terminal_t::TERMINAL:
-					switch (p->device().family())
-					{
-						case device_t::CAPACITOR:
-							if (!m_step_devices.contains(&p->device()))
-								m_step_devices.push_back(&p->device());
-							break;
-						case device_t::BJT_EB:
-						case device_t::DIODE:
-						case device_t::LVCCS:
-						case device_t::BJT_SWITCH:
-							log().debug("found BJT/Diode/LVCCS\n");
-							if (!m_dynamic_devices.contains(&p->device()))
-								m_dynamic_devices.push_back(&p->device());
-							break;
-						default:
-							break;
-					}
+					if (p->device().is_timestep())
+						if (!m_step_devices.contains(&p->device()))
+							m_step_devices.push_back(&p->device());
+					if (p->device().is_dynamic1())
+						if (!m_dynamic_devices.contains(&p->device()))
+							m_dynamic_devices.push_back(&p->device());
 					{
 						terminal_t *pterm = dynamic_cast<terminal_t *>(p);
 						add_term(k, pterm);
 					}
-					log().debug("Added terminal\n");
+					log().debug("Added terminal {1}\n", p->name());
 					break;
 				case terminal_t::INPUT:
 					{
@@ -427,7 +416,7 @@ ATTR_COLD void matrix_solver_t::update()
 {
 	const netlist_time new_timestep = solve();
 
-	if (m_params.m_dynamic && is_timestep() && new_timestep > netlist_time::zero)
+	if (m_params.m_dynamic && has_timestep_devices() && new_timestep > netlist_time::zero)
 		m_Q_sync.net().reschedule_in_queue(new_timestep);
 }
 
@@ -435,7 +424,7 @@ ATTR_COLD void matrix_solver_t::update_forced()
 {
 	ATTR_UNUSED const netlist_time new_timestep = solve();
 
-	if (m_params.m_dynamic && is_timestep())
+	if (m_params.m_dynamic && has_timestep_devices())
 		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
 }
 
@@ -449,7 +438,7 @@ void matrix_solver_t::step(const netlist_time &delta)
 netlist_time matrix_solver_t::solve_base()
 {
 	m_stat_vsolver_calls++;
-	if (is_dynamic())
+	if (has_dynamic_devices())
 	{
 		int this_resched;
 		int newton_loops = 0;
@@ -578,8 +567,8 @@ void matrix_solver_t::log_stats()
 		log().verbose("==============================================");
 		log().verbose("Solver {1}", this->name());
 		log().verbose("       ==> {1} nets", this->m_nets.size()); //, (*(*groups[i].first())->m_core_terms.first())->name());
-		log().verbose("       has {1} elements", this->is_dynamic() ? "dynamic" : "no dynamic");
-		log().verbose("       has {1} elements", this->is_timestep() ? "timestep" : "no timestep");
+		log().verbose("       has {1} elements", this->has_dynamic_devices() ? "dynamic" : "no dynamic");
+		log().verbose("       has {1} elements", this->has_timestep_devices() ? "timestep" : "no timestep");
 		log().verbose("       {1:6.3} average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
 		log().verbose("       {1:10} invocations ({2:6} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
 				this->m_stat_calculations,
@@ -677,7 +666,7 @@ NETLIB_UPDATE(solver)
 		{
 			#pragma omp for
 			for (int i = 0; i <  t_cnt; i++)
-				if (m_mat_solvers[i]->is_timestep())
+				if (m_mat_solvers[i]->has_timestep_devices())
 				{
 					// Ignore return value
 					ATTR_UNUSED const netlist_time ts = m_mat_solvers[i]->solve();
@@ -686,14 +675,14 @@ NETLIB_UPDATE(solver)
 	}
 	else
 		for (int i = 0; i < t_cnt; i++)
-			if (m_mat_solvers[i]->is_timestep())
+			if (m_mat_solvers[i]->has_timestep_devices())
 			{
 				// Ignore return value
 				ATTR_UNUSED const netlist_time ts = m_mat_solvers[i]->solve();
 			}
 #else
 	for (auto & solver : m_mat_solvers)
-		if (solver->is_timestep())
+		if (solver->has_timestep_devices())
 			// Ignore return value
 			ATTR_UNUSED const netlist_time ts = solver->solve();
 #endif
@@ -910,8 +899,8 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 		netlist().log().verbose("Solver {1}", ms->name());
 		netlist().log().verbose("       ==> {2} nets", grp.size());
-		netlist().log().verbose("       has {1} elements", ms->is_dynamic() ? "dynamic" : "no dynamic");
-		netlist().log().verbose("       has {1} elements", ms->is_timestep() ? "timestep" : "no timestep");
+		netlist().log().verbose("       has {1} elements", ms->has_dynamic_devices() ? "dynamic" : "no dynamic");
+		netlist().log().verbose("       has {1} elements", ms->has_timestep_devices() ? "timestep" : "no timestep");
 		for (net_t *n : grp)
 		{
 			netlist().log().verbose("Net {1}", n->name());

@@ -213,7 +213,7 @@ void nld_d_to_a_proxy::reset()
 	m_Q.initial(0.0);
 	m_last_state = -1;
 	m_RV.do_reset();
-	m_is_timestep = m_RV.m_P.net().solver()->is_timestep();
+	m_is_timestep = m_RV.m_P.net().solver()->has_timestep_devices();
 	m_RV.set(NL_FCONST(1.0) / logic_family().m_R_low, logic_family().m_low_V, 0.0);
 }
 
@@ -241,24 +241,6 @@ ATTR_HOT void nld_d_to_a_proxy::update()
 // nld_res_sw
 // -----------------------------------------------------------------------------
 
-NETLIB_START(res_sw)
-{
-	register_sub("R", m_R);
-	enregister("I", m_I);
-	register_param("RON", m_RON, 1.0);
-	register_param("ROFF", m_ROFF, 1.0E20);
-
-	register_subalias("1", m_R->m_P);
-	register_subalias("2", m_R->m_N);
-
-	save(NLNAME(m_last_state));
-}
-
-NETLIB_RESET(res_sw)
-{
-	m_last_state = 0;
-	m_R->set_R(m_ROFF.Value());
-}
 
 NETLIB_UPDATE(res_sw)
 {
@@ -271,14 +253,14 @@ NETLIB_UPDATE(res_sw)
 		// We only need to update the net first if this is a time stepping net
 		if (0) // m_R->m_P.net().as_analog().solver()->is_timestep())
 		{
-			m_R->update_dev();
-			m_R->set_R(R);
-			m_R->m_P.schedule_after(NLTIME_FROM_NS(1));
+			m_R.update_dev();
+			m_R.set_R(R);
+			m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
 		}
 		else
 		{
-			m_R->set_R(R);
-			m_R->m_P.schedule_after(NLTIME_FROM_NS(1));
+			m_R.set_R(R);
+			m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
 			//m_R->update_dev();
 		}
 	}

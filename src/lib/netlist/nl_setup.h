@@ -180,6 +180,8 @@ namespace netlist
 		plog_base<NL_DEBUG> &log() { return netlist().log(); }
 		const plog_base<NL_DEBUG> &log() const { return netlist().log(); }
 
+		pvector_t<std::pair<pstring, base_factory_t *>> m_device_factory;
+
 	protected:
 
 	private:
@@ -207,7 +209,6 @@ namespace netlist
 		phashmap_t<pstring, core_terminal_t *> m_terminals;
 
 		pvector_t<link_t> m_links;
-		pvector_t<std::pair<pstring, base_factory_t *>> m_device_factory;
 
 		factory_list_t m_factory;
 

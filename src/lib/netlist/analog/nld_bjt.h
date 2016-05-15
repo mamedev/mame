@@ -32,7 +32,7 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 // Have a common start for transistors
 
-class NETLIB_NAME(Q) : public device_t
+NETLIB_OBJECT(Q)
 {
 public:
 	enum q_type {
@@ -40,8 +40,11 @@ public:
 		BJT_PNP
 	};
 
-	NETLIB_NAME(Q)(const family_t afamily, netlist_t &anetlist, const pstring &name);
-	virtual ~NETLIB_NAME(Q)();
+	NETLIB_CONSTRUCTOR(Q)
+	, m_qtype(BJT_NPN)
+	{ }
+
+	NETLIB_DYNAMIC()
 
 	inline q_type qtype() const { return m_qtype; }
 	inline bool is_qtype(q_type atype) const { return m_qtype == atype; }
@@ -56,14 +59,11 @@ private:
 	q_type m_qtype;
 };
 
-class NETLIB_NAME(QBJT) : public NETLIB_NAME(Q)
+NETLIB_OBJECT_DERIVED(QBJT, Q)
 {
 public:
-
-	NETLIB_NAME(QBJT)(const family_t afamily, netlist_t &anetlist, const pstring &name)
-	: NETLIB_NAME(Q)(afamily, anetlist, name) { }
-
-	virtual ~NETLIB_NAME(QBJT)() { }
+	NETLIB_CONSTRUCTOR_DERIVED(QBJT, Q)
+		{ }
 
 protected:
 
@@ -91,19 +91,17 @@ private:
  *                     E
  */
 
-class NETLIB_NAME(QBJT_switch) : public NETLIB_NAME(QBJT)
+NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 {
 public:
-	ATTR_COLD NETLIB_NAME(QBJT_switch)(netlist_t &anetlist, const pstring &name)
-	: NETLIB_NAME(QBJT)(BJT_SWITCH, anetlist, name),
-		m_RB(object_t::ANALOG, anetlist, "m_RB"),
-		m_RC(object_t::ANALOG, anetlist, "m_RC"),
-		m_BC_dummy(object_t::ANALOG, anetlist, "m_BC"),
-		m_gB(NETLIST_GMIN_DEFAULT),
-		m_gC(NETLIST_GMIN_DEFAULT),
-		m_V(0.0),
-		m_state_on(0) { }
-
+	NETLIB_CONSTRUCTOR_DERIVED(QBJT_switch, QBJT)
+		, m_RB(owner, "m_RB")
+		, m_RC(owner, "m_RC")
+		, m_BC_dummy(owner, "m_BC")
+		, m_gB(NETLIST_GMIN_DEFAULT)
+		, m_gC(NETLIST_GMIN_DEFAULT)
+		, m_V(0.0)
+		, m_state_on(0) { }
 
 	ATTR_HOT void virtual update() override;
 
@@ -134,16 +132,15 @@ private:
 // -----------------------------------------------------------------------------
 
 
-class NETLIB_NAME(QBJT_EB) : public NETLIB_NAME(QBJT)
+NETLIB_OBJECT_DERIVED(QBJT_EB, QBJT)
 {
 public:
-	ATTR_COLD NETLIB_NAME(QBJT_EB)(netlist_t &anetlist, const pstring &name)
-	: NETLIB_NAME(QBJT)(BJT_EB, anetlist, name),
-		m_D_CB(object_t::ANALOG, anetlist, "m_D_CB"),
-		m_D_EB(object_t::ANALOG, anetlist, "m_D_EB"),
-		m_D_EC(object_t::ANALOG, anetlist, "m_D_EC"),
-		m_alpha_f(0),
-		m_alpha_r(0)
+	NETLIB_CONSTRUCTOR_DERIVED(QBJT_EB, QBJT)
+	  ,	m_D_CB(owner, "m_D_CB")
+	  ,	m_D_EB(owner, "m_D_EB")
+	  ,	m_D_EC(owner, "m_D_EC")
+	  ,	m_alpha_f(0)
+	  ,	m_alpha_r(0)
 		{ }
 
 protected:

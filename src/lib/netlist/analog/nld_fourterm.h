@@ -51,22 +51,26 @@ NETLIB_NAMESPACE_DEVICES_START()
  *
  */
 
-class NETLIB_NAME(VCCS) : public device_t
+NETLIB_OBJECT(VCCS)
 {
 public:
-	ATTR_COLD NETLIB_NAME(VCCS)(netlist_t &anetlist, const pstring &name)
-	: device_t(VCCS, anetlist, name), m_gfac(1.0) {  }
-	ATTR_COLD NETLIB_NAME(VCCS)(const family_t afamily, netlist_t &anetlist, const pstring &name)
-	: device_t(afamily, anetlist, name), m_gfac(1.0) {  }
+	NETLIB_CONSTRUCTOR(VCCS)
+	, m_gfac(1.0)
+	{
+		start_internal(NL_FCONST(1.0) / netlist().gmin());
+		m_gfac = NL_FCONST(1.0);
+	}
 
 	param_double_t m_G;
 	param_double_t m_RI;
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	virtual void update_param() override;
-	ATTR_HOT virtual void update() override;
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
+	NETLIB_UPDATE_PARAMI()
+	{
+		NETLIB_NAME(VCCS)::reset();
+	}
 
 	ATTR_COLD void start_internal(const nl_double def_RI);
 
@@ -84,13 +88,14 @@ protected:
 
 /* Limited Current source*/
 
-class NETLIB_NAME(LVCCS) : public NETLIB_NAME(VCCS)
+NETLIB_OBJECT_DERIVED(LVCCS, VCCS)
 {
 public:
-	ATTR_COLD NETLIB_NAME(LVCCS)(netlist_t &anetlist, const pstring &name)
-	: NETLIB_NAME(VCCS)(LVCCS, anetlist, name), m_vi(0.0) {  }
-	ATTR_COLD NETLIB_NAME(LVCCS)(const family_t afamily, netlist_t &anetlist, const pstring &name)
-	: NETLIB_NAME(VCCS)(afamily, anetlist, name), m_vi(0.0) {  }
+	NETLIB_CONSTRUCTOR_DERIVED(LVCCS, VCCS)
+	, m_vi(0.0)
+	{  }
+
+	NETLIB_DYNAMIC()
 
 	param_double_t m_cur_limit; /* current limit */
 
@@ -127,11 +132,12 @@ protected:
  *
  */
 
-class NETLIB_NAME(CCCS) : public NETLIB_NAME(VCCS)
+NETLIB_OBJECT_DERIVED(CCCS, VCCS)
 {
 public:
-	ATTR_COLD NETLIB_NAME(CCCS)(netlist_t &anetlist, const pstring &name)
-	: NETLIB_NAME(VCCS)(CCCS, anetlist, name), m_gfac(1.0) {  }
+	NETLIB_CONSTRUCTOR_DERIVED(CCCS, VCCS)
+	, m_gfac(1.0)
+	{  }
 
 protected:
 	virtual void start() override;
@@ -171,11 +177,10 @@ protected:
  */
 
 
-class NETLIB_NAME(VCVS) : public NETLIB_NAME(VCCS)
+NETLIB_OBJECT_DERIVED(VCVS, VCCS)
 {
 public:
-	ATTR_COLD NETLIB_NAME(VCVS)(netlist_t &anetlist, const pstring &name)
-	: NETLIB_NAME(VCCS)(VCVS, anetlist, name) { }
+	NETLIB_CONSTRUCTOR_DERIVED(VCVS, VCCS) { }
 
 	param_double_t m_RO;
 

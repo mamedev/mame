@@ -48,20 +48,6 @@ ATTR_COLD void generic_diode::save(pstring name, object_t &parent)
 // nld_twoterm
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD NETLIB_NAME(twoterm)::NETLIB_NAME(twoterm)(const family_t afamily, netlist_t &anetlist, const pstring &name)
-		: device_t(afamily, anetlist, name)
-{
-	m_P.m_otherterm = &m_N;
-	m_N.m_otherterm = &m_P;
-}
-
-ATTR_COLD NETLIB_NAME(twoterm)::NETLIB_NAME(twoterm)(netlist_t &anetlist, const pstring &name)
-		: device_t(TWOTERM, anetlist, name)
-{
-	m_P.m_otherterm = &m_N;
-	m_N.m_otherterm = &m_P;
-}
-
 NETLIB_START(twoterm)
 {
 }
@@ -82,83 +68,19 @@ NETLIB_UPDATE(twoterm)
 }
 
 // ----------------------------------------------------------------------------------------
-// nld_R
-// ----------------------------------------------------------------------------------------
-
-NETLIB_START(R_base)
-{
-	NETLIB_NAME(twoterm)::start();
-	enregister("1", m_P);
-	enregister("2", m_N);
-}
-
-NETLIB_RESET(R_base)
-{
-	NETLIB_NAME(twoterm)::reset();
-	set_R(1.0 / netlist().gmin());
-}
-
-NETLIB_UPDATE(R_base)
-{
-	NETLIB_NAME(twoterm)::update();
-}
-
-NETLIB_START(R)
-{
-	NETLIB_NAME(R_base)::start();
-	register_param("R", m_R, 1.0 / netlist().gmin());
-}
-
-NETLIB_RESET(R)
-{
-	NETLIB_NAME(R_base)::reset();
-}
-
-NETLIB_UPDATE(R)
-{
-	NETLIB_NAME(twoterm)::update();
-}
-
-NETLIB_UPDATE_PARAM(R)
-{
-	update_dev();
-	if (m_R.Value() > 1e-9)
-		set_R(m_R.Value());
-	else
-		set_R(1e-9);
-}
-
-// ----------------------------------------------------------------------------------------
 // nld_POT
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(POT)
-{
-	register_sub("R1", m_R1);
-	register_sub("R2", m_R2);
-
-	register_subalias("1", m_R1->m_P);
-	register_subalias("2", m_R1->m_N);
-	register_subalias("3", m_R2->m_N);
-
-	connect_late(m_R2->m_P, m_R1->m_N);
-
-	register_param("R", m_R, 1.0 / netlist().gmin());
-	register_param("DIAL", m_Dial, 0.5);
-	register_param("DIALLOG", m_DialIsLog, 0);
-
-}
-
 NETLIB_RESET(POT)
 {
-	m_R1->do_reset();
-	m_R2->do_reset();
+	m_R1.do_reset();
+	m_R2.do_reset();
 }
 
 NETLIB_UPDATE(POT)
 {
-	m_R1->update_dev();
-	m_R2->update_dev();
+	m_R1.update_dev();
+	m_R2.update_dev();
 }
 
 NETLIB_UPDATE_PARAM(POT)
@@ -167,11 +89,11 @@ NETLIB_UPDATE_PARAM(POT)
 	if (m_DialIsLog.Value())
 		v = (nl_math::exp(v) - 1.0) / (nl_math::exp(1.0) - 1.0);
 
-	m_R1->update_dev();
-	m_R2->update_dev();
+	m_R1.update_dev();
+	m_R2.update_dev();
 
-	m_R1->set_R(std::max(m_R.Value() * v, netlist().gmin()));
-	m_R2->set_R(std::max(m_R.Value() * (NL_FCONST(1.0) - v), netlist().gmin()));
+	m_R1.set_R(std::max(m_R.Value() * v, netlist().gmin()));
+	m_R2.set_R(std::max(m_R.Value() * (NL_FCONST(1.0) - v), netlist().gmin()));
 
 }
 
@@ -179,28 +101,14 @@ NETLIB_UPDATE_PARAM(POT)
 // nld_POT2
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(POT2)
-{
-	register_sub("R1", m_R1);
-
-	register_subalias("1", m_R1->m_P);
-	register_subalias("2", m_R1->m_N);
-
-	register_param("R", m_R, 1.0 / netlist().gmin());
-	register_param("DIAL", m_Dial, 0.5);
-	register_param("REVERSE", m_Reverse, 0);
-	register_param("DIALLOG", m_DialIsLog, 0);
-
-}
-
 NETLIB_RESET(POT2)
 {
-	m_R1->do_reset();
+	m_R1.do_reset();
 }
 
 NETLIB_UPDATE(POT2)
 {
-	m_R1->update_dev();
+	m_R1.update_dev();
 }
 
 NETLIB_UPDATE_PARAM(POT2)
@@ -212,9 +120,9 @@ NETLIB_UPDATE_PARAM(POT2)
 	if (m_Reverse.Value())
 		v = 1.0 - v;
 
-	m_R1->update_dev();
+	m_R1.update_dev();
 
-	m_R1->set_R(std::max(m_R.Value() * v, netlist().gmin()));
+	m_R1.set_R(std::max(m_R.Value() * v, netlist().gmin()));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -248,14 +156,6 @@ NETLIB_UPDATE_PARAM(C)
 NETLIB_UPDATE(C)
 {
 	NETLIB_NAME(twoterm)::update();
-}
-
-ATTR_HOT void NETLIB_NAME(C)::step_time(const nl_double st)
-{
-	/* Gpar should support convergence */
-	const nl_double G = m_C.Value() / st +  m_GParallel;
-	const nl_double I = -G * deltaV();
-	set(G, 0.0, I);
 }
 
 // ----------------------------------------------------------------------------------------
