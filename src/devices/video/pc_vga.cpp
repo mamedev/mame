@@ -624,7 +624,7 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	start_shift = (!(vga.sequencer.data[4] & 0x08)) ? 2 : 0;
 	{
-		for (addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
+		for (addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=(vga.crtc.offset << 3), curr_addr+=(vga.crtc.offset << 3))
 		{
 			for(yi = 0;yi < height; yi++)
 			{
@@ -712,7 +712,7 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  mask_comp = 0xff | (TLINES & 0x300);
 	curr_addr = 0;
 	yi=0;
-	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=(vga.crtc.offset << 3), curr_addr+=(vga.crtc.offset << 3))
 	{
 		bitmapline = &bitmap.pix32(line);
 		addr %= vga.svga_intf.vram_size;
@@ -797,7 +797,7 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  mask_comp = 0xff | (TLINES & 0x300);
 	curr_addr = 0;
 	yi=0;
-	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=(offset()), curr_addr+=(offset()))
+	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=(vga.crtc.offset << 3), curr_addr+=(vga.crtc.offset << 3))
 	{
 		bitmapline = &bitmap.pix32(line);
 		addr %= vga.svga_intf.vram_size;
