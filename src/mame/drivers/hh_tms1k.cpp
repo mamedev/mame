@@ -111,6 +111,7 @@
     brighter: tc4/h2hfootb(offense), bankshot(cue ball), ...
   - stopthiep: unable to start a game (may be intentional?)
   - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
+  - finish bship SN76477 sound
 
 ***************************************************************************/
 
@@ -3626,6 +3627,9 @@ MACHINE_CONFIG_END
   * TMS1000NLL MP3208 (die label 1000C, MP3208)
   * SN75494N (acting as inverters), SN76477 sound
   * 4 sliding buttons, light bulb
+  
+  This is a 2-player electronic board game. It still needs game pieces like the
+  original Battleship board game.
 
 ***************************************************************************/
 
@@ -3651,13 +3655,40 @@ WRITE16_MEMBER(bship_state::write_r)
 	// R0-R10: input mux
 	m_inp_mux = data;
 	
-	// R4: 75494 to SN76477 pin 20 through R12 33K
+	// R4: 75494 to R12 33K to SN76477 pin 20
 	m_sn->slf_res_w((data & 0x10) ? RES_INF : RES_K(33));
 }
 
 WRITE16_MEMBER(bship_state::write_o)
 {
-	//printf("%X ",m_maincpu->debug_peek_o_index());
+	//printf("%X ", m_maincpu->debug_peek_o_index() & 0xf);
+
+	// O0: SN76477 pin 9
+	m_sn->enable_w(data & 1);
+	
+	// O1: 75494 to R4 100K to SN76477 pin 18
+	// O2: 75494 to R3 150K to SN76477 pin 18
+	double o12 = RES_INF;
+	switch (~data >> 1 & 3)
+	{
+		case 0: o12 = RES_INF; break;
+		case 1: o12 = RES_K(100); break;
+		case 2: o12 = RES_K(150); break;
+		case 3: o12 = RES_2_PARALLEL(RES_K(100), RES_K(150)); break;
+	}
+	m_sn->vco_res_w(o12);
+	
+	// O2,O6: (TODO) to SN76477 pin 21
+	//m_sn->slf_cap_w(x);
+	
+	// O4: SN76477 pin 22
+	m_sn->vco_w(data >> 4 & 1);
+	
+	// O5: R11 27K to SN76477 pin 23
+	m_sn->one_shot_cap_w((data & 0x20) ? RES_K(27) : RES_INF);
+	
+	// O6: SN76477 pin 25
+	m_sn->mixer_b_w(data >> 6 & 1);
 	
 	// O7: 75494 to light bulb
 	display_matrix(1, 1, data >> 7 & 1, 1);
