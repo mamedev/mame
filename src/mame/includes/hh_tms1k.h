@@ -34,7 +34,7 @@ public:
 	{ }
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<tms1k_base_device> m_maincpu;
 	optional_ioport_array<18> m_inp_matrix; // max 18
 	optional_device<speaker_sound_device> m_speaker;
 
