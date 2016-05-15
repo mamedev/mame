@@ -35,16 +35,16 @@ enum
 #define REQUEST true
 #define NO_REQUEST false
 
-#define	BUTTON_ESPERA                (1 << 0)  /* wait */
-#define	BUTTON_INTERRUPCAO           (1 << 1)  /* interrupt */
-#define	BUTTON_PARTIDA               (1 << 2)  /* startup */
-#define	BUTTON_PREPARACAO            (1 << 3)  /* reset */
-#define	BUTTON_NORMAL                (1 << 4)  /* normal CPU execution */
-#define	BUTTON_CICLO_UNICO           (1 << 5)  /* single-cycle step */
-#define	BUTTON_INSTRUCAO_UNICA       (1 << 6)  /* single-instruction step */
-#define	BUTTON_ENDERECAMENTO         (1 << 7)  /* addressing action */
-#define	BUTTON_ARMAZENAMENTO         (1 << 8)  /* storage action */
-#define	BUTTON_EXPOSICAO             (1 << 9)  /* memory viewing action */
+#define	BUTTON_NORMAL                (1 << 0)  /* normal CPU execution */
+#define	BUTTON_CICLO_UNICO           (1 << 1)  /* single-cycle step */
+#define	BUTTON_INSTRUCAO_UNICA       (1 << 2)  /* single-instruction step */
+#define	BUTTON_ENDERECAMENTO         (1 << 3)  /* addressing action */
+#define	BUTTON_ARMAZENAMENTO         (1 << 4)  /* storage action */
+#define	BUTTON_EXPOSICAO             (1 << 5)  /* memory viewing action */
+#define	BUTTON_ESPERA                (1 << 6)  /* wait */
+#define	BUTTON_INTERRUPCAO           (1 << 7)  /* interrupt */
+#define	BUTTON_PARTIDA               (1 << 8)  /* startup */
+#define	BUTTON_PREPARACAO            (1 << 9)  /* reset */
 #define	BUTTON_TIPO_DE_ENDERECAMENTO (1 << 10) /* Addressing mode (0: Fixed / 1: Sequential) */
 #define	BUTTON_PROTECAO_DE_MEMORIA   (1 << 11) /* Memory protection (in the address range 0xF80-0xFFF (1: write-only / 0: read-write) */
 
