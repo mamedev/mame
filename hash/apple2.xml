@@ -4836,18 +4836,6 @@
 		</part>
 	</software>
 
-	<software name="gremlins">
-		<description>Gremlins</description>
-		<year>1984</year>
-		<publisher>Atari</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="gremlins.dsk" size="143360" crc="cca73906" sha1="96bddbfc3575dcce2031b47d0e7a5033faf20dc9" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hhgg">
 		<description>Hitchhiker's Guide to the Galaxy</description>
 		<year>1984</year>
