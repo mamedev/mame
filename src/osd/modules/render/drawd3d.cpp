@@ -838,7 +838,7 @@ try_again:
 	m_presentation.MultiSampleType               = D3DMULTISAMPLE_NONE;
 	m_presentation.SwapEffect                    = D3DSWAPEFFECT_DISCARD;
 	m_presentation.hDeviceWindow                 = win->platform_window<HWND>();
-	m_presentation.Windowed                      = true; // !win->fullscreen() || win->win_has_menu();
+	m_presentation.Windowed                      = !win->fullscreen() || !video_config.switchres || win->win_has_menu();
 	m_presentation.EnableAutoDepthStencil        = FALSE;
 	m_presentation.AutoDepthStencilFormat        = D3DFMT_D16;
 	m_presentation.Flags                         = 0;
