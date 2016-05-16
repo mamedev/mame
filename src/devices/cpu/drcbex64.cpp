@@ -5040,6 +5040,10 @@ void drcbe_x64::op_and(x86code *&dst, const instruction &inst)
 		if (dstp.is_memory() && dstp == src1p)
 			emit_and_m32_p32(dst, MABS(dstp.memory()), src2p, inst);                    // and   [dstp],src2p
 
+		// dstp == src2p in memory
+		else if (dstp.is_memory() && dstp == src2p)
+			emit_and_m32_p32(dst, MABS(dstp.memory()), src1p, inst);                    // and   [dstp],src1p
+
 		// AND with immediate 0xff
 		else if (src2p.is_immediate_value(0xff) && inst.flags() == 0)
 		{
@@ -5075,6 +5079,10 @@ void drcbe_x64::op_and(x86code *&dst, const instruction &inst)
 		// dstp == src1p in memory
 		if (dstp.is_memory() && dstp == src1p)
 			emit_and_m64_p64(dst, MABS(dstp.memory()), src2p, inst);                    // and   [dstp],src2p
+
+		// dstp == src2p in memory
+		else if (dstp.is_memory() && dstp == src2p)
+			emit_and_m64_p64(dst, MABS(dstp.memory()), src1p, inst);                    // and   [dstp],src1p
 
 		// AND with immediate 0xff
 		else if (src2p.is_immediate_value(0xff) && inst.flags() == 0)
