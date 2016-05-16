@@ -14,6 +14,7 @@
 //============================================================
 
 #define MAX_BLOOM_COUNT 15 // shader model 3.0 support up to 16 samplers, but we need the last for the original texture
+#define HALF_BLOOM_COUNT 8
 
 //============================================================
 //  FORWARD DECLARATIONS

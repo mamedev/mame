@@ -1383,13 +1383,12 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	float yscale = 1.0f / screen_container.yscale();
 	float xoffset = -screen_container.xoffset();
 	float yoffset = -screen_container.yoffset();
-
 	float screen_scale[2] = { xscale, yscale };
 	float screen_offset[2] = { xoffset, yoffset };
 
-	rgb_t back_color_rgb = !machine->first_screen()->has_palette()
-		? rgb_t(0, 0, 0)
-		: machine->first_screen()->palette().palette()->entry_color(0);
+	rgb_t back_color_rgb = screen->has_palette()
+		? screen->palette().palette()->entry_color(0)
+		: rgb_t(0, 0, 0);
 	back_color_rgb = apply_color_convolution(back_color_rgb);
 	float back_color[3] = {
 		static_cast<float>(back_color_rgb.r()) / 255.0f,
@@ -1802,11 +1801,6 @@ bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* texture, int so
 //============================================================
 d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_info *texture)
 {
-	if (!vector_enable)
-	{
-		return nullptr;
-	}
-
 	auto win = d3d->assert_window();
 
 	bool swap_xy = win->swap_xy();
@@ -2504,11 +2498,16 @@ std::vector<ui_menu_item> shaders::init_slider_list()
 	}
 	internal_sliders.clear();
 
+	auto first_screen = machine->first_screen();
+	if (first_screen == nullptr)
+	{
+		return sliders;
+	}
+	int screen_type = first_screen->screen_type();
+
 	for (int i = 0; s_sliders[i].name != nullptr; i++)
 	{
 		slider_desc *desc = &s_sliders[i];
-
-		int screen_type = machine->first_screen()->screen_type();
 		if ((screen_type == SCREEN_TYPE_VECTOR && (desc->screen_type & SLIDER_SCREEN_TYPE_VECTOR) == SLIDER_SCREEN_TYPE_VECTOR) ||
 			(screen_type == SCREEN_TYPE_RASTER && (desc->screen_type & SLIDER_SCREEN_TYPE_RASTER) == SLIDER_SCREEN_TYPE_RASTER) ||
 			(screen_type == SCREEN_TYPE_LCD    && (desc->screen_type & SLIDER_SCREEN_TYPE_LCD)    == SLIDER_SCREEN_TYPE_LCD))
@@ -2625,6 +2624,11 @@ void uniform::update()
 	renderer_d3d9 *d3d = shadersys->d3d;
 
 	auto win = d3d->assert_window();
+	auto first_screen = win->machine().first_screen();
+
+	bool vector_screen =
+		first_screen != nullptr &&
+		first_screen->screen_type() == SCREEN_TYPE_VECTOR;
 
 	switch (m_id)
 	{
@@ -2636,8 +2640,6 @@ void uniform::update()
 		}
 		case CU_SOURCE_DIMS:
 		{
-			bool vector_screen =
-				win->machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 			if (vector_screen)
 			{
 				if (shadersys->curr_render_target)
@@ -2690,8 +2692,6 @@ void uniform::update()
 		}
 		case CU_VECTOR_SCREEN:
 		{
-			bool vector_screen =
-				win->machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 			m_shader->set_bool("VectorScreen", vector_screen);
 			break;
 		}
