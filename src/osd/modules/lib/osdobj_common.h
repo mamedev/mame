@@ -24,8 +24,7 @@
 #include "modules/midi/midi_module.h"
 #include "modules/output/output_module.h"
 #include "emuopts.h"
-
-class ui_menu_item;
+#include "../frontend/mame/ui/menuitem.h"
 
 //============================================================
 //  Defines

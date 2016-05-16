@@ -14,7 +14,7 @@
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "ui/sliders.h"
-
+#include "ui/slider.h"
 
 ui_menu_sliders::ui_menu_sliders(mame_ui_manager &mui, render_container *container, bool menuless_mode) : ui_menu(mui, container)
 {

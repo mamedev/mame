@@ -16,7 +16,7 @@
 
 #include <string>
 
-#include "ui/uimain.h"
+#include "../frontend/mame/ui/menuitem.h"
 
 class bgfx_effect;
 class chain_manager;

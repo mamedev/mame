@@ -19,6 +19,8 @@
 #include "moptions.h"
 #include "language.h"
 #include "ui/uimain.h"
+#include "ui/menuitem.h"
+#include "ui/slider.h"
 
 class ui_menu_item;
 
@@ -171,7 +173,7 @@ public:
 	virtual void popup_time_string(int seconds, std::string message) override;
 
 	virtual void image_display(const device_type &type, device_image_interface *image) override;
-	
+
 	virtual void menu_reset() override;
 private:
 	// instance variables

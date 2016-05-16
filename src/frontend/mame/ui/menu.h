@@ -16,7 +16,7 @@
 #include "render.h"
 #include "language.h"
 #include "ui/ui.h"
-
+#include "ui/menuitem.h"
 
 /***************************************************************************
     CONSTANTS

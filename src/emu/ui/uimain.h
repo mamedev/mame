@@ -14,57 +14,10 @@
 #define __BASIC_UI_H__
 
 #include "emu.h"
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-// special menu item for separators
-#define MENU_SEPARATOR_ITEM         "---"
-
-
-#define SLIDER_NOCHANGE     0x12345678
-
-
-typedef INT32(*slider_update)(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-
-struct slider_state
-{
-	slider_state *  next;               /* pointer to next slider */
-	slider_update   update;             /* callback */
-	void *          arg;                /* argument */
-	INT32           minval;             /* minimum value */
-	INT32           defval;             /* default value */
-	INT32           maxval;             /* maximum value */
-	INT32           incval;             /* increment value */
-	int             id;
-	char            description[1];     /* textual description */
-};
-
-// types of menu items (TODO: please expand)
-enum class ui_menu_item_type
-{
-	UNKNOWN,
-	SLIDER,
-	SEPARATOR
-};
-
-
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-class ui_menu_item
-{
-public:
-	const char          *text;
-	const char          *subtext;
-	UINT32              flags;
-	void                *ref;
-	ui_menu_item_type   type;   // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
-
-	inline bool is_selectable() const;
-};
 
 class ui_manager
 {

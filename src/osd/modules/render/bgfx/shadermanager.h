@@ -16,7 +16,7 @@
 
 #include <bgfx/bgfx.h>
 
-#include <modules/lib/osdobj_common.h>
+#include "modules/lib/osdobj_common.h"
 
 #include <map>
 #include <string>

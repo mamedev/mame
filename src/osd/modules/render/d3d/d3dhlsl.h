@@ -11,6 +11,7 @@
 
 #include <vector>
 #include "aviio.h"
+#include "../frontend/mame/ui/menuitem.h"
 
 //============================================================
 //  CONSTANTS
@@ -20,8 +21,6 @@
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
-
-struct slider_state;
 
 class effect;
 class shaders;

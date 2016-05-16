@@ -9,7 +9,7 @@
 //
 //============================================================
 
-#include "ui/uimain.h"
+#include "../frontend/mame/ui/slider.h"
 
 #include "emucore.h"
 

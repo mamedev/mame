@@ -15,6 +15,7 @@
 #include "bgfx/chain.h"
 #include "bgfx/chainmanager.h"
 #include "sliderdirtynotifier.h"
+#include "../frontend/mame/ui/menuitem.h"
 
 class texture_manager;
 class target_manager;

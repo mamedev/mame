@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "drivenum.h"
 #include "render.h"
-#include "ui/uimain.h"
 #include "rendutil.h"
 #include "emuopts.h"
 #include "aviio.h"
@@ -32,6 +31,7 @@
 #include "d3dcomm.h"
 #include "strconv.h"
 #include "d3dhlsl.h"
+#include "../frontend/mame/ui/slider.h"
 
 
 //============================================================

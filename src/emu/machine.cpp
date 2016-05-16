@@ -80,6 +80,7 @@
 #include "debug/debugvw.h"
 #include "image.h"
 #include "network.h"
+#include "ui/uimain.h"
 #include <time.h>
 
 #if defined(EMSCRIPTEN)

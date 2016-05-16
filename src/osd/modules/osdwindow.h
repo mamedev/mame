@@ -10,9 +10,9 @@
 #define __OSDWINDOW__
 
 #include "emu.h"
-#include "ui/uimain.h"
 #include "render.h"
 #include "osdhelper.h"
+#include "../frontend/mame/ui/menuitem.h"
 
 // standard windows headers
 #ifdef OSD_WINDOWS
