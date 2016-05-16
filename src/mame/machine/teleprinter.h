@@ -4,6 +4,7 @@
 #define __TELEPRINTER_H__
 
 #include "machine/terminal.h"
+#include "sound/samples.h"
 
 #define TELEPRINTER_WIDTH 80
 #define TELEPRINTER_HEIGHT 50
@@ -27,6 +28,8 @@ class teleprinter_device : public generic_terminal_device
 public:
 	teleprinter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	UINT32 tp_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	optional_device<samples_device> m_samples;
 protected:
 	virtual void term_write(UINT8 data) override;
 	virtual void device_reset() override;

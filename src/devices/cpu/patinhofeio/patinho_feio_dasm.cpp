@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Felipe Sanches
 #include "emu.h"
-#include "cpu/patinhofeio/patinho_feio.h"
+#include "cpu/patinhofeio/patinhofeio_cpu.h"
 
 CPU_DISASSEMBLE( patinho_feio )
 {
