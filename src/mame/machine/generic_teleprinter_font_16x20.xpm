@@ -1,5 +1,5 @@
 /* XPM */
-static const char * asr33_16x20_xpm[] = {
+static const char * generic_teleprinter_font_16x20_xpm[] = {
 "992 20 249 2",
 "  	c None",
 ". 	c #FEF0CC",

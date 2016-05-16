@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic, Felipe Sanches
+
+/* Generic typeface extracted from text
+   samples of teletype printouts. */
+#include "generic_teleprinter_font_16x20.xpm"
 #include "teleprinter.h"
-#include "asr33_16x20.xpm"
 #define KEYBOARD_TAG "keyboard"
 #define PAPER_COLOR 0xFEF0CC
 
@@ -112,10 +115,10 @@ UINT32 teleprinter_device::tp_update(screen_device &device, bitmap_rgb32 &bitmap
 
 					for (b = 0; b < 16; b++)
 					{
-						code = asr33_16x20_xpm[num_colors + 1 + c][2*(glyph_id*16 + b)];
-						code += asr33_16x20_xpm[num_colors + 1 + c][2*(glyph_id*16 + b) + 1] << 8;
+						code = generic_teleprinter_font_16x20_xpm[num_colors + 1 + c][2*(glyph_id*16 + b)];
+						code += generic_teleprinter_font_16x20_xpm[num_colors + 1 + c][2*(glyph_id*16 + b) + 1] << 8;
 						for (int idx=0; idx<num_colors;idx++){
-							abgr = get_color_if_code_matches(code, asr33_16x20_xpm[idx+1]);
+							abgr = get_color_if_code_matches(code, generic_teleprinter_font_16x20_xpm[idx+1]);
 							if (abgr) break;
 						}
 						bitmap.pix32(y*20 + c, horpos++) =  abgr;
