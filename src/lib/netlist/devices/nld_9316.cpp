@@ -11,45 +11,10 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_START(9316)
-{
-	register_sub("sub", sub);
-	register_sub("subABCD", subABCD);
-	sub->m_ABCD = &(*subABCD);
-
-	register_subalias("CLK", sub->m_CLK);
-
-	enregister("ENP", m_ENP);
-	enregister("ENT", m_ENT);
-	enregister("CLRQ", m_CLRQ);
-	enregister("LOADQ", m_LOADQ);
-
-	register_subalias("A", subABCD->m_A);
-	register_subalias("B", subABCD->m_B);
-	register_subalias("C", subABCD->m_C);
-	register_subalias("D", subABCD->m_D);
-
-	register_subalias("QA", sub->m_QA);
-	register_subalias("QB", sub->m_QB);
-	register_subalias("QC", sub->m_QC);
-	register_subalias("QD", sub->m_QD);
-	register_subalias("RC", sub->m_RC);
-
-}
-
 NETLIB_RESET(9316)
 {
-	sub->do_reset();
-	subABCD->do_reset();
-}
-
-NETLIB_START(9316_subABCD)
-{
-	enregister("A", m_A);
-	enregister("B", m_B);
-	enregister("C", m_C);
-	enregister("D", m_D);
-
+	sub.do_reset();
+	subABCD.do_reset();
 }
 
 NETLIB_RESET(9316_subABCD)
@@ -60,25 +25,6 @@ NETLIB_RESET(9316_subABCD)
 	m_C.inactivate();
 	m_D.inactivate();
 #endif
-}
-
-NETLIB_UPDATE(9316_subABCD)
-{
-}
-
-NETLIB_START(9316_sub)
-{
-	enregister("CLK", m_CLK);
-
-	enregister("QA", m_QA);
-	enregister("QB", m_QB);
-	enregister("QC", m_QC);
-	enregister("QD", m_QD);
-	enregister("RC", m_RC);
-
-	save(NLNAME(m_cnt));
-	save(NLNAME(m_loadq));
-	save(NLNAME(m_ent));
 }
 
 NETLIB_RESET(9316_sub)
@@ -121,25 +67,25 @@ NETLIB_UPDATE(9316_sub)
 
 NETLIB_UPDATE(9316)
 {
-	sub->m_loadq = INPLOGIC(m_LOADQ);
-	sub->m_ent = INPLOGIC(m_ENT);
+	sub.m_loadq = INPLOGIC(m_LOADQ);
+	sub.m_ent = INPLOGIC(m_ENT);
 	const netlist_sig_t clrq = INPLOGIC(m_CLRQ);
 
-	if (((sub->m_loadq ^ 1) | (sub->m_ent & INPLOGIC(m_ENP))) & clrq)
+	if (((sub.m_loadq ^ 1) | (sub.m_ent & INPLOGIC(m_ENP))) & clrq)
 	{
-		sub->m_CLK.activate_lh();
-		OUTLOGIC(sub->m_RC, sub->m_ent & (sub->m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+		sub.m_CLK.activate_lh();
+		OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 	}
 	else
 	{
-		sub->m_CLK.inactivate();
-		if (!clrq && (sub->m_cnt>0))
+		sub.m_CLK.inactivate();
+		if (!clrq && (sub.m_cnt>0))
 		{
-			sub->update_outputs_all(0, NLTIME_FROM_NS(36));
-			sub->m_cnt = 0;
+			sub.update_outputs_all(0, NLTIME_FROM_NS(36));
+			sub.m_cnt = 0;
 			//return;
 		}
-		OUTLOGIC(sub->m_RC, sub->m_ent & (sub->m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+		OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 	}
 }
 
@@ -194,39 +140,6 @@ inline NETLIB_FUNC_VOID(9316_sub, update_outputs, (const UINT8 cnt))
 
 	}
 #endif
-}
-
-NETLIB_START(9316_dip)
-{
-	NETLIB_NAME(9316)::start();
-
-	register_subalias("1", m_CLRQ);
-	register_subalias("2", sub->m_CLK);
-	register_subalias("3", subABCD->m_A);
-	register_subalias("4", subABCD->m_B);
-	register_subalias("5", subABCD->m_C);
-	register_subalias("6", subABCD->m_D);
-	register_subalias("7", m_ENP);
-	// register_subalias("8", ); --> GND
-
-	register_subalias("9", m_LOADQ);
-	register_subalias("10", m_ENT);
-	register_subalias("11", sub->m_QD);
-	register_subalias("12", sub->m_QC);
-	register_subalias("13", sub->m_QB);
-	register_subalias("14", sub->m_QA);
-	register_subalias("15", sub->m_RC);
-	// register_subalias("16", ); --> VCC
-}
-
-NETLIB_UPDATE(9316_dip)
-{
-	NETLIB_NAME(9316)::update();
-}
-
-NETLIB_RESET(9316_dip)
-{
-	NETLIB_NAME(9316)::reset();
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

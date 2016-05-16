@@ -42,7 +42,10 @@ namespace netlist
 		static const INTERNALTYPE RESOLUTION = NETLIST_INTERNAL_RES;
 
 		ATTR_HOT netlist_time() : m_time(0) {}
-		ATTR_HOT netlist_time(const netlist_time &rhs) : m_time(rhs.m_time) {}
+		//ATTR_HOT netlist_time(const netlist_time &rhs) NOEXCEPT : m_time(rhs.m_time) {}
+		//ATTR_HOT netlist_time(netlist_time &&rhs) NOEXCEPT : m_time(rhs.m_time) {}
+		ATTR_HOT netlist_time(const netlist_time &rhs) NOEXCEPT = default;
+		ATTR_HOT netlist_time(netlist_time &&rhs) NOEXCEPT = default;
 
 		ATTR_HOT friend const netlist_time operator-(const netlist_time &left, const netlist_time &right);
 		ATTR_HOT friend const netlist_time operator+(const netlist_time &left, const netlist_time &right);

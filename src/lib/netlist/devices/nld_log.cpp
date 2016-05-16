@@ -12,18 +12,6 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 //FIXME: what to do with save states?
 
-NETLIB_START(log)
-{
-	enregister("I", m_I);
-
-	pstring filename = pfmt("{1}.log")(name());
-	m_strm = std::make_unique<pofilestream>(filename);
-}
-
-NETLIB_RESET(log)
-{
-}
-
 NETLIB_UPDATE(log)
 {
 	/* use pstring::sprintf, it is a LOT faster */
@@ -33,16 +21,6 @@ NETLIB_UPDATE(log)
 NETLIB_NAME(log)::~NETLIB_NAME(log)()
 {
 	m_strm->close();
-}
-
-NETLIB_START(logD)
-{
-	NETLIB_NAME(log)::start();
-	enregister("I2", m_I2);
-}
-
-NETLIB_RESET(logD)
-{
 }
 
 NETLIB_UPDATE(logD)

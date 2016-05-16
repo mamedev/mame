@@ -14,20 +14,6 @@ NETLIB_NAMESPACE_DEVICES_START()
  *        Convert this to sub-devices at some time.
  */
 
-NETLIB_START(74153sub)
-{
-	enregister("C0", m_C[0]);
-	enregister("C1", m_C[1]);
-	enregister("C2", m_C[2]);
-	enregister("C3", m_C[3]);
-	enregister("G", m_G);
-
-	enregister("AY", m_Y); //FIXME: Change netlists
-
-	m_chan = 0;
-
-	save(NLNAME(m_chan));
-}
 
 NETLIB_RESET(74153sub)
 {
@@ -49,68 +35,18 @@ NETLIB_UPDATE(74153sub)
 }
 
 
-NETLIB_START(74153)
-{
-	register_sub("sub", m_sub);
-
-	register_subalias("C0", m_sub->m_C[0]);
-	register_subalias("C1",  m_sub->m_C[1]);
-	register_subalias("C2",  m_sub->m_C[2]);
-	register_subalias("C3",  m_sub->m_C[3]);
-	enregister("A", m_A);
-	enregister("B", m_B);
-	register_subalias("G",  m_sub->m_G);
-
-	register_subalias("AY",  m_sub->m_Y); //FIXME: Change netlists
-}
-
-NETLIB_RESET(74153)
-{
-}
-
-
-
 NETLIB_UPDATE(74153)
 {
-	m_sub->m_chan = (INPLOGIC(m_A) | (INPLOGIC(m_B)<<1));
-	m_sub->update();
+	m_sub.m_chan = (INPLOGIC(m_A) | (INPLOGIC(m_B)<<1));
+	m_sub.do_update();
 }
 
-
-NETLIB_START(74153_dip)
-{
-	register_sub("1", m_1);
-	register_sub("2", m_2);
-
-	register_subalias("1", m_1->m_G);
-	enregister("2", m_B);    // m_2->m_B
-	register_subalias("3", m_1->m_C[3]);
-	register_subalias("4", m_1->m_C[2]);
-	register_subalias("5", m_1->m_C[1]);
-	register_subalias("6", m_1->m_C[0]);
-	register_subalias("7", m_1->m_Y);
-
-	register_subalias("9", m_2->m_Y);
-	register_subalias("10", m_2->m_C[0]);
-	register_subalias("11", m_2->m_C[1]);
-	register_subalias("12", m_2->m_C[2]);
-	register_subalias("13", m_2->m_C[3]);
-
-	enregister("14", m_A);   // m_2->m_B
-	register_subalias("15", m_2->m_G);
-}
 
 NETLIB_UPDATE(74153_dip)
 {
-	m_2->m_chan = m_1->m_chan = (INPLOGIC(m_A) | (INPLOGIC(m_B)<<1));
-	m_1->update();
-	m_2->update();
-}
-
-NETLIB_RESET(74153_dip)
-{
-	m_1->do_reset();
-	m_2->do_reset();
+	m_2.m_chan = m_1.m_chan = (INPLOGIC(m_A) | (INPLOGIC(m_B)<<1));
+	m_1.do_update();
+	m_2.do_update();
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

@@ -14,6 +14,8 @@
 //  SETUP
 //============================================================
 
+#define NOEXCEPT noexcept
+
 /*
  * The following options determine how object::update is called.
  * NL_PMF_TYPE_VIRTUAL
@@ -52,7 +54,7 @@
  */
 
 // This will be autodetected
-#define NL_PMF_TYPE 0
+//#define NL_PMF_TYPE 0
 
 #define NL_PMF_TYPE_VIRTUAL         0
 #define NL_PMF_TYPE_GNUC_PMF        1

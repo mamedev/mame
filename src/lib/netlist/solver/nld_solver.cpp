@@ -94,20 +94,6 @@ ATTR_COLD void terms_t::set_pointers()
 // matrix_solver
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD matrix_solver_t::matrix_solver_t(netlist_t &anetlist, const pstring &name,
-		const eSortType sort, const solver_parameters_t *params)
-: device_t(anetlist, name),
-    m_stat_calculations(0),
-	m_stat_newton_raphson(0),
-	m_stat_vsolver_calls(0),
-	m_iterative_fail(0),
-	m_iterative_total(0),
-	m_params(*params),
-	m_cur_ts(0),
-	m_sort(sort)
-{
-}
-
 ATTR_COLD matrix_solver_t::~matrix_solver_t()
 {
 	m_inps.clear_and_free();
@@ -391,28 +377,12 @@ void matrix_solver_t::update_dynamic()
 		m_dynamic_devices[i]->update_terminals();
 }
 
-ATTR_COLD void matrix_solver_t::start()
-{
-	enregister("Q_sync", m_Q_sync);
-	enregister("FB_sync", m_fb_sync);
-	connect_post_start(m_fb_sync, m_Q_sync);
-
-	save(NLNAME(m_last_step));
-	save(NLNAME(m_cur_ts));
-	save(NLNAME(m_stat_calculations));
-	save(NLNAME(m_stat_newton_raphson));
-	save(NLNAME(m_stat_vsolver_calls));
-	save(NLNAME(m_iterative_fail));
-	save(NLNAME(m_iterative_total));
-
-}
-
 ATTR_COLD void matrix_solver_t::reset()
 {
 	m_last_step = netlist_time::zero;
 }
 
-ATTR_COLD void matrix_solver_t::update()
+ATTR_COLD void matrix_solver_t::update() NOEXCEPT
 {
 	const netlist_time new_timestep = solve();
 
@@ -435,7 +405,7 @@ void matrix_solver_t::step(const netlist_time &delta)
 		m_step_devices[k]->step_time(dd);
 }
 
-netlist_time matrix_solver_t::solve_base()
+const netlist_time matrix_solver_t::solve_base()
 {
 	m_stat_vsolver_calls++;
 	if (has_dynamic_devices())
@@ -465,7 +435,7 @@ netlist_time matrix_solver_t::solve_base()
 	return this->compute_next_timestep();
 }
 
-netlist_time matrix_solver_t::solve()
+const netlist_time matrix_solver_t::solve()
 {
 	const netlist_time now = netlist().time();
 	const netlist_time delta = now - m_last_step;
@@ -591,46 +561,10 @@ void matrix_solver_t::log_stats()
 
 
 
-NETLIB_START(solver)
-{
-	enregister("Q_step", m_Q_step);
-
-	register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(10).as_double());
-
-	register_param("FREQ", m_freq, 48000.0);
-
-
-	/* iteration parameters */
-	register_param("SOR_FACTOR", m_sor, 1.059);
-	register_param("ITERATIVE", m_iterative_solver, "SOR");
-	register_param("ACCURACY", m_accuracy, 1e-7);
-	register_param("GS_THRESHOLD", m_gs_threshold, 6);      // below this value, gaussian elimination is used
-	register_param("GS_LOOPS", m_gs_loops, 9);              // Gauss-Seidel loops
-
-	/* general parameters */
-	register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
-	register_param("PIVOT", m_pivot, 0);                    // use pivoting - on supported solvers
-	register_param("NR_LOOPS", m_nr_loops, 250);            // Newton-Raphson loops
-	register_param("PARALLEL", m_parallel, 0);
-
-	/* automatic time step */
-	register_param("DYNAMIC_TS", m_dynamic, 0);
-	register_param("DYNAMIC_LTE", m_lte, 5e-5);                     // diff/timestep
-	register_param("MIN_TIMESTEP", m_min_timestep, 1e-6);   // nl_double timestep resolution
-
-	register_param("LOG_STATS", m_log_stats, 1);   // nl_double timestep resolution
-
-	// internal staff
-
-	enregister("FB_step", m_fb_step);
-	connect_late(m_fb_step, m_Q_step);
-
-}
-
 NETLIB_RESET(solver)
 {
 	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)
-		m_mat_solvers[i]->reset();
+		m_mat_solvers[i]->do_reset();
 }
 
 
@@ -891,8 +825,8 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 				break;
 		}
 
-		register_sub(*ms);
-
+		// FIXME ...
+		ms->set_delegate_pointer();
 		ms->setup(grp);
 
 		m_mat_solvers.push_back(ms);

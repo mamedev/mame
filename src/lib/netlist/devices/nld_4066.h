@@ -43,10 +43,7 @@ NETLIB_OBJECT(CD4066_GATE)
 		enregister("CTL", m_control);
 	}
 
-	NETLIB_RESETI()
-	{
-		m_R.do_reset();
-	}
+	NETLIB_RESETI() { }
 	NETLIB_UPDATEI();
 
 public:

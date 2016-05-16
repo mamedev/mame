@@ -51,11 +51,42 @@ struct solver_parameters_t
 
 class matrix_solver_t;
 
-class NETLIB_NAME(solver) : public device_t
+NETLIB_OBJECT(solver)
 {
-public:
-	NETLIB_NAME(solver)(netlist_t &anetlist, const pstring &name)
-	: device_t(anetlist, name)    { }
+	NETLIB_CONSTRUCTOR(solver)
+	{
+		enregister("Q_step", m_Q_step);
+
+		register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(10).as_double());
+
+		register_param("FREQ", m_freq, 48000.0);
+
+
+		/* iteration parameters */
+		register_param("SOR_FACTOR", m_sor, 1.059);
+		register_param("ITERATIVE", m_iterative_solver, "SOR");
+		register_param("ACCURACY", m_accuracy, 1e-7);
+		register_param("GS_THRESHOLD", m_gs_threshold, 6);      // below this value, gaussian elimination is used
+		register_param("GS_LOOPS", m_gs_loops, 9);              // Gauss-Seidel loops
+
+		/* general parameters */
+		register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
+		register_param("PIVOT", m_pivot, 0);                    // use pivoting - on supported solvers
+		register_param("NR_LOOPS", m_nr_loops, 250);            // Newton-Raphson loops
+		register_param("PARALLEL", m_parallel, 0);
+
+		/* automatic time step */
+		register_param("DYNAMIC_TS", m_dynamic, 0);
+		register_param("DYNAMIC_LTE", m_lte, 5e-5);                     // diff/timestep
+		register_param("MIN_TIMESTEP", m_min_timestep, 1e-6);   // nl_double timestep resolution
+
+		register_param("LOG_STATS", m_log_stats, 1);   // nl_double timestep resolution
+
+		// internal staff
+
+		enregister("FB_step", m_fb_step);
+		connect_late(m_fb_step, m_Q_step);
+	}
 
 	virtual ~NETLIB_NAME(solver)();
 
@@ -66,12 +97,11 @@ public:
 
 	void create_solver_code(postream &strm);
 
-protected:
-	void update() override;
-	void start() override;
-	void reset() override;
-	void update_param() override;
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
+	NETLIB_UPDATE_PARAMI();
 
+protected:
 	logic_input_t m_fb_step;
 	logic_output_t m_Q_step;
 

@@ -121,7 +121,7 @@ public:
 	ATTR_HOT inline netlist::setup_t &setup() { return *m_setup; }
 	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
 
-	ATTR_HOT inline netlist::netlist_time last_time_update() { return m_old; }
+	ATTR_HOT inline const netlist::netlist_time last_time_update() { return m_old; }
 	ATTR_HOT void update_time_x();
 	ATTR_HOT void check_mame_abort_slice();
 
@@ -504,9 +504,7 @@ class NETLIB_NAME(analog_callback) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(analog_callback)(netlist::netlist_t &anetlist, const pstring &name)
-		: device_t(anetlist, name), m_cpu_device(nullptr), m_last(0) { }
-
-	ATTR_COLD void start() override
+		: device_t(anetlist, name), m_cpu_device(nullptr), m_last(0)
 	{
 		enregister("IN", m_in);
 		m_cpu_device = downcast<netlist_mame_cpu_device_t *>(&downcast<netlist_mame_t &>(netlist()).parent());
@@ -523,7 +521,7 @@ public:
 		m_callback = callback;
 	}
 
-	ATTR_HOT void update() override
+	NETLIB_UPDATEI()
 	{
 		nl_double cur = INPANALOG(m_in);
 
@@ -553,11 +551,7 @@ class NETLIB_NAME(sound_out) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(sound_out)(netlist::netlist_t &anetlist, const pstring &name)
-		: netlist::device_t(anetlist, name) { }
-
-	static const int BUFSIZE = 2048;
-
-	ATTR_COLD void start() override
+		: netlist::device_t(anetlist, name)
 	{
 		enregister("IN", m_in);
 		register_param("CHAN", m_channel, 0);
@@ -567,6 +561,8 @@ public:
 		save(NAME(m_last_buffer));
 	}
 
+	static const int BUFSIZE = 2048;
+
 	ATTR_COLD void reset() override
 	{
 		m_cur = 0.0;
@@ -574,7 +570,7 @@ public:
 		m_last_buffer = netlist::netlist_time::zero;
 	}
 
-	ATTR_HOT void sound_update(const netlist::netlist_time upto)
+	ATTR_HOT void sound_update(const netlist::netlist_time &upto)
 	{
 		int pos = (upto - m_last_buffer) / m_sample;
 		if (pos >= BUFSIZE)
@@ -585,7 +581,7 @@ public:
 		}
 	}
 
-	ATTR_HOT void update() override
+	NETLIB_UPDATEI()
 	{
 		nl_double val = INPANALOG(m_in) * m_mult.Value() + m_offset.Value();
 		sound_update(netlist().time());
@@ -599,7 +595,8 @@ public:
 
 	}
 
-	ATTR_HOT void buffer_reset(netlist::netlist_time upto)
+public:
+	ATTR_HOT void buffer_reset(const netlist::netlist_time &upto)
 	{
 		m_last_pos = 0;
 		m_last_buffer = upto;
@@ -627,11 +624,7 @@ class NETLIB_NAME(sound_in) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(sound_in)(netlist::netlist_t &anetlist, const pstring &name)
-		: netlist::device_t(anetlist, name) { }
-
-	static const int MAX_INPUT_CHANNELS = 10;
-
-	ATTR_COLD void start() override
+		: netlist::device_t(anetlist, name)
 	{
 		// clock part
 		enregister("Q", m_Q);
@@ -649,6 +642,8 @@ public:
 		}
 		m_num_channel = 0;
 	}
+
+	static const int MAX_INPUT_CHANNELS = 10;
 
 	ATTR_COLD void reset() override
 	{
@@ -673,7 +668,7 @@ public:
 		return m_num_channel;
 	}
 
-	ATTR_HOT void update() override
+	NETLIB_UPDATEI()
 	{
 		for (int i=0; i<m_num_channel; i++)
 		{
@@ -686,6 +681,7 @@ public:
 		OUTLOGIC(m_Q, !m_Q.net().as_logic().new_Q(), m_inc  );
 	}
 
+public:
 	ATTR_HOT void buffer_reset()
 	{
 		m_pos = 0;

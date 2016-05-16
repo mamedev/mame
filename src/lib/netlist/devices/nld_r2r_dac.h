@@ -57,12 +57,28 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_DEVICE_WITH_PARAMS_DERIVED(r2r_dac, twoterm,
+NETLIB_OBJECT_DERIVED(r2r_dac, twoterm)
+{
+	NETLIB_CONSTRUCTOR_DERIVED(r2r_dac, twoterm)
+	{
+		enregister("VOUT", m_P);
+		enregister("VGND", m_N);
+		register_param("R", m_R, 1.0);
+		register_param("VIN", m_VIN, 1.0);
+		register_param("N", m_num, 1);
+		register_param("VAL", m_val, 1);
+	}
+
+	NETLIB_UPDATE_PARAMI();
+	//NETLIB_RESETI();
+	//NETLIB_UPDATEI();
+
+protected:
 	param_double_t m_VIN;
 	param_double_t m_R;
 	param_int_t m_num;
 	param_int_t m_val;
-);
+};
 
 NETLIB_NAMESPACE_DEVICES_END()
 

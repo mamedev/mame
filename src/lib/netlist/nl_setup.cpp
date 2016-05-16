@@ -501,8 +501,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 				out_cast.logic_family()->create_d_a_proxy(netlist(), x, &out_cast);
 		m_proxy_cnt++;
 
-		proxy = new_proxy.get();
-		new_proxy->start_dev();
+		//new_proxy->start_dev();
 
 		/* connect all existing terminals to new net */
 
@@ -515,9 +514,10 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 		out.net().m_core_terms.clear(); // clear the list
 
 		out.net().register_con(new_proxy->in());
-		out_cast.set_proxy(new_proxy.get());
+		out_cast.set_proxy(proxy);
 
 		proxy = new_proxy.get();
+
 		register_dev_s(std::move(new_proxy));
 	}
 	return proxy;
@@ -532,8 +532,6 @@ void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
 		auto proxy = powned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
 		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
-
-		proxy->start_dev();
 
 		proxy->m_Q.net().register_con(in);
 		out.net().register_con(proxy->m_I);
@@ -573,7 +571,6 @@ void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
 
-		proxy->start_dev();
 		connect_terminals(term, proxy->m_I);
 
 		if (inp.has_net())
@@ -837,6 +834,12 @@ void setup_t::resolve_inputs()
 	else
 		netlist().solver()->post_start();
 
+	/* finally, set the pointers */
+
+	log().debug("Initializing devices ...\n");
+	for (auto &dev : netlist().m_devices)
+		dev->set_delegate_pointer();
+
 }
 
 void setup_t::start_devices()
@@ -901,8 +904,6 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 
 	auto retp = ret.get();
 
-	printf("placing %s in cache\n", model.cstr());
-	//netlist().m_family_cache.push_back(std::pair<pstring, std::unique_ptr<logic_family_desc_t>>(model, std::move(ret)));
 	netlist().m_family_cache.emplace_back(model, std::move(ret));
 
 	return retp;

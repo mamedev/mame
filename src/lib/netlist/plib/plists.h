@@ -156,7 +156,7 @@ public:
 	plinkedlist_element_t() : m_next(nullptr) {}
 
 	_ListClass *next() const { return m_next; }
-private:
+//private:
 	_ListClass * m_next;
 };
 
@@ -166,13 +166,13 @@ class plinkedlist_t
 public:
 
 	plinkedlist_t() : m_head(nullptr) {}
-
+#if 0
 	ATTR_HOT  void insert(const _ListClass &before, _ListClass &elem)
 	{
 		if (m_head == &before)
 		{
 			elem.m_next = m_head;
-			m_head = elem;
+			m_head = &elem;
 		}
 		else
 		{
@@ -190,7 +190,7 @@ public:
 			//throw pexception("element not found");
 		}
 	}
-
+#endif
 	ATTR_HOT  void insert(_ListClass &elem)
 	{
 		elem.m_next = m_head;
@@ -222,7 +222,7 @@ public:
 	ATTR_HOT  void clear() { m_head = nullptr; }
 	ATTR_HOT  bool is_empty() const { return (m_head == nullptr); }
 
-private:
+//private:
 	_ListClass *m_head;
 };
 #else

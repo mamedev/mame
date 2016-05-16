@@ -48,40 +48,23 @@ ATTR_COLD void generic_diode::save(pstring name, object_t &parent)
 // nld_twoterm
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(twoterm)
-{
-}
-
-NETLIB_RESET(twoterm)
-{
-}
-
-
 NETLIB_UPDATE(twoterm)
 {
+	/* FIXME: some proxies created seem to be disconnected again
+	 * or not even properly connected.
+	 * Example: pong proxy_da_c9c.Q_1.RV
+	 */
 	/* only called if connected to a rail net ==> notify the solver to recalculate */
 	/* we only need to call the non-rail terminal */
-	if (!m_P.net().isRailNet())
+	if (m_P.has_net() && !m_P.net().isRailNet())
 		m_P.schedule_solve();
-	else
+	else if (m_N.has_net() && !m_N.net().isRailNet())
 		m_N.schedule_solve();
 }
 
 // ----------------------------------------------------------------------------------------
 // nld_POT
 // ----------------------------------------------------------------------------------------
-
-NETLIB_RESET(POT)
-{
-	m_R1.do_reset();
-	m_R2.do_reset();
-}
-
-NETLIB_UPDATE(POT)
-{
-	m_R1.update_dev();
-	m_R2.update_dev();
-}
 
 NETLIB_UPDATE_PARAM(POT)
 {
@@ -101,16 +84,6 @@ NETLIB_UPDATE_PARAM(POT)
 // nld_POT2
 // ----------------------------------------------------------------------------------------
 
-NETLIB_RESET(POT2)
-{
-	m_R1.do_reset();
-}
-
-NETLIB_UPDATE(POT2)
-{
-	m_R1.update_dev();
-}
-
 NETLIB_UPDATE_PARAM(POT2)
 {
 	nl_double v = m_Dial.Value();
@@ -128,18 +101,6 @@ NETLIB_UPDATE_PARAM(POT2)
 // ----------------------------------------------------------------------------------------
 // nld_C
 // ----------------------------------------------------------------------------------------
-
-NETLIB_START(C)
-{
-	enregister("1", m_P);
-	enregister("2", m_N);
-
-	register_param("C", m_C, 1e-6);
-
-	// set up the element
-	//set(netlist().gmin(), 0.0, -5.0 / netlist().gmin());
-	//set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
-}
 
 NETLIB_RESET(C)
 {
@@ -161,17 +122,6 @@ NETLIB_UPDATE(C)
 // ----------------------------------------------------------------------------------------
 // nld_D
 // ----------------------------------------------------------------------------------------
-
-NETLIB_START(D)
-{
-	enregister("A", m_P);
-	enregister("K", m_N);
-	register_param("MODEL", m_model, "");
-
-	m_D.save("m_D", *this);
-
-}
-
 
 NETLIB_UPDATE_PARAM(D)
 {
@@ -196,17 +146,6 @@ NETLIB_UPDATE_TERMINALS(D)
 // nld_VS
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(VS)
-{
-	NETLIB_NAME(twoterm)::start();
-
-	register_param("R", m_R, 0.1);
-	register_param("V", m_V, 0.0);
-
-	enregister("P", m_P);
-	enregister("N", m_N);
-}
-
 NETLIB_RESET(VS)
 {
 	NETLIB_NAME(twoterm)::reset();
@@ -221,16 +160,6 @@ NETLIB_UPDATE(VS)
 // ----------------------------------------------------------------------------------------
 // nld_CS
 // ----------------------------------------------------------------------------------------
-
-NETLIB_START(CS)
-{
-	NETLIB_NAME(twoterm)::start();
-
-	register_param("I", m_I, 1.0);
-
-	enregister("P", m_P);
-	enregister("N", m_N);
-}
 
 NETLIB_RESET(CS)
 {

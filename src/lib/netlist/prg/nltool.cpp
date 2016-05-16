@@ -304,7 +304,6 @@ static void listdevices()
 		pstring terms("");
 
 		auto d = f->Create(nt.setup().netlist(), pfmt("dummy{1}")(i));
-		d->start_dev();
 
 		// get the list of terminals ...
 		for (unsigned j=0; j < d->m_terminals.size(); j++)

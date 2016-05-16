@@ -9,6 +9,7 @@
 #define PALLOC_H_
 
 #include <exception>
+#include <vector>
 
 #include "pconfig.h"
 #include "pstring.h"
@@ -116,5 +117,39 @@ inline void pfree_array_t(T *p)
 #define pfree_array(_ptr)     global_free_array(_ptr)
 
 #endif
+
+class pmempool
+{
+private:
+	struct block
+	{
+		block() : m_num_alloc(0), m_free(0), cur_ptr(nullptr), data(nullptr) { }
+		int m_num_alloc;
+		int m_free;
+		char *cur_ptr;
+		char *data;
+	};
+
+	int new_block();
+
+	struct info
+	{
+		info() : m_block(0) { }
+		size_t m_block;
+	};
+
+public:
+	pmempool(int min_alloc, int min_align);
+	~pmempool();
+
+	void *alloc(size_t size);
+	void free(void *ptr);
+
+	int m_min_alloc;
+	int m_min_align;
+
+	std::vector<block> m_blocks;
+};
+
 
 #endif /* NLCONFIG_H_ */

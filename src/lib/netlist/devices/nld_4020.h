@@ -109,10 +109,7 @@ NETLIB_OBJECT(CD4020)
 		register_subalias("VDD", m_supply.m_vdd);
 		register_subalias("VSS", m_supply.m_vss);
 	}
-	NETLIB_RESETI()
-	{
-		m_sub.do_reset();
-	}
+	NETLIB_RESETI() { }
 	NETLIB_UPDATEI();
 
 private:

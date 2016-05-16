@@ -135,38 +135,6 @@ const UINT8 NETLIB_NAME(7448_sub)::tab7448[16][7] =
 		{   0, 0, 0, 1, 1, 1, 1 },  /* 14 */
 		{   0, 0, 0, 0, 0, 0, 0 },  /* 15 */
 };
-
-NETLIB_START(7448_dip)
-{
-	NETLIB_NAME(7448)::start();
-
-	register_subalias("1", m_sub.m_B);
-	register_subalias("2", m_sub.m_C);
-	register_subalias("3", m_LTQ);
-	register_subalias("4", m_BIQ);
-	register_subalias("5",m_sub.m_RBIQ);
-	register_subalias("6", m_sub.m_D);
-	register_subalias("7", m_sub.m_A);
-
-	register_subalias("9",  m_sub.m_Q[4]); // e
-	register_subalias("10", m_sub.m_Q[3]); // d
-	register_subalias("11", m_sub.m_Q[2]); // c
-	register_subalias("12", m_sub.m_Q[1]); // b
-	register_subalias("13", m_sub.m_Q[0]); // a
-	register_subalias("14", m_sub.m_Q[6]); // g
-	register_subalias("15", m_sub.m_Q[5]); // f
-}
-
 #endif
-
-NETLIB_UPDATE(7448_dip)
-{
-	NETLIB_NAME(7448)::update();
-}
-
-NETLIB_RESET(7448_dip)
-{
-	NETLIB_NAME(7448)::reset();
-}
 
 NETLIB_NAMESPACE_DEVICES_END()

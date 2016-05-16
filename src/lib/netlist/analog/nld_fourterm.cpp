@@ -73,12 +73,6 @@ NETLIB_UPDATE(VCCS)
 // nld_LVCCS
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(LVCCS)
-{
-	NETLIB_NAME(VCCS)::start();
-	register_param("CURLIM", m_cur_limit, 1000.0);
-}
-
 NETLIB_RESET(LVCCS)
 {
 	NETLIB_NAME(VCCS)::reset();
@@ -121,12 +115,6 @@ NETLIB_UPDATE_TERMINALS(LVCCS)
 // nld_CCCS
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(CCCS)
-{
-	start_internal(1.0);
-	m_gfac = NL_FCONST(1.0) / m_RI.Value();
-}
-
 NETLIB_RESET(CCCS)
 {
 	NETLIB_NAME(VCCS)::reset();
@@ -146,22 +134,6 @@ NETLIB_UPDATE(CCCS)
 // nld_VCVS
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(VCVS)
-{
-	NETLIB_NAME(VCCS)::start();
-
-	register_param("RO", m_RO, 1.0);
-
-	enregister("_OP2", m_OP2);
-	enregister("_ON2", m_ON2);
-
-	m_OP2.m_otherterm = &m_ON2;
-	m_ON2.m_otherterm = &m_OP2;
-
-	connect_late(m_OP2, m_OP1);
-	connect_late(m_ON2, m_ON1);
-}
-
 NETLIB_RESET(VCVS)
 {
 	m_gfac = NL_FCONST(1.0) / m_RO.Value();
@@ -169,10 +141,6 @@ NETLIB_RESET(VCVS)
 
 	m_OP2.set(NL_FCONST(1.0) / m_RO.Value());
 	m_ON2.set(NL_FCONST(1.0) / m_RO.Value());
-}
-
-NETLIB_UPDATE_PARAM(VCVS)
-{
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

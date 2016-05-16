@@ -85,29 +85,52 @@ public:
 	};
 
 	matrix_solver_t(netlist_t &anetlist, const pstring &name,
-			const eSortType sort, const solver_parameters_t *params);
+			const eSortType sort, const solver_parameters_t *params)
+	: device_t(anetlist, name),
+    m_stat_calculations(0),
+	m_stat_newton_raphson(0),
+	m_stat_vsolver_calls(0),
+	m_iterative_fail(0),
+	m_iterative_total(0),
+	m_params(*params),
+	m_cur_ts(0),
+	m_sort(sort)
+	{
+		enregister("Q_sync", m_Q_sync);
+		enregister("FB_sync", m_fb_sync);
+		connect_post_start(m_fb_sync, m_Q_sync);
+
+		save(NLNAME(m_last_step));
+		save(NLNAME(m_cur_ts));
+		save(NLNAME(m_stat_calculations));
+		save(NLNAME(m_stat_newton_raphson));
+		save(NLNAME(m_stat_vsolver_calls));
+		save(NLNAME(m_iterative_fail));
+		save(NLNAME(m_iterative_total));
+	}
+
 	virtual ~matrix_solver_t();
 
 	void setup(analog_net_t::list_t &nets) { vsetup(nets); }
 
-	netlist_time solve_base();
+	const netlist_time solve_base();
 
-	netlist_time solve();
+	const netlist_time solve();
 
 	inline bool has_dynamic_devices() const { return m_dynamic_devices.size() > 0; }
 	inline bool has_timestep_devices() const { return m_step_devices.size() > 0; }
 
 	void update_forced();
-	void update_after(const netlist_time after)
+	void update_after(const netlist_time &after)
 	{
 		m_Q_sync.net().reschedule_in_queue(after);
 	}
 
 	/* netdevice functions */
-	virtual void update() override;
-	virtual void start() override;
-	virtual void reset() override;
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
 
+public:
 	ATTR_COLD int get_net_idx(net_t *net);
 
 	plog_base<NL_DEBUG> &log() { return netlist().log(); }

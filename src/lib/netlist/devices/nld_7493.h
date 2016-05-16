@@ -115,7 +115,7 @@ NETLIB_OBJECT(7493)
 		connect_late(D.m_I, C.m_Q);
 	}
 
-	NETLIB_RESETI();
+	NETLIB_RESETI() { }
 	NETLIB_UPDATEI();
 
 	logic_input_t m_R1;
@@ -127,7 +127,28 @@ NETLIB_OBJECT(7493)
 	NETLIB_SUB(7493ff) D;
 };
 
-NETLIB_DEVICE_DERIVED_PURE(7493_dip, 7493);
+NETLIB_OBJECT_DERIVED(7493_dip, 7493)
+{
+	NETLIB_CONSTRUCTOR_DERIVED(7493_dip, 7493)
+	{
+		register_subalias("1", B.m_I);
+		register_subalias("2", m_R1);
+		register_subalias("3", m_R2);
+
+		// register_subalias("4", ); --> NC
+		// register_subalias("5", ); --> VCC
+		// register_subalias("6", ); --> NC
+		// register_subalias("7", ); --> NC
+
+		register_subalias("8", C.m_Q);
+		register_subalias("9", B.m_Q);
+		// register_subalias("10", ); -. GND
+		register_subalias("11", D.m_Q);
+		register_subalias("12", A.m_Q);
+		// register_subalias("13", ); -. NC
+		register_subalias("14", A.m_I);
+	}
+};
 
 NETLIB_NAMESPACE_DEVICES_END()
 

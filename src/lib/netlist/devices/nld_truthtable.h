@@ -128,7 +128,7 @@ public:
 				m_desc.push_back(*desc);
 				desc++;
 			}
-
+		startxx();
 	}
 
 	template <class C>
@@ -142,9 +142,10 @@ public:
 	, m_ttp(ttbl)
 	{
 		m_desc = desc;
+		startxx();
 	}
 
-	virtual void start() override
+	void startxx()
 	{
 		pstring header = m_desc[0];
 
@@ -199,7 +200,7 @@ public:
 		save(NLNAME(m_active));
 	}
 
-	void reset() override
+	NETLIB_RESETI()
 	{
 		m_active = 0;
 		m_ign = 0;
@@ -211,24 +212,69 @@ public:
 		m_last_state = 0;
 	}
 
+	NETLIB_UPDATEI()
+	{
+		process<true>();
+	}
+
+public:
+	ATTR_HOT void inc_active() override
+	{
+		nl_assert(netlist().use_deactivate());
+		if (has_state == 0)
+			if (++m_active == 1)
+			{
+				process<false>();
+			}
+	}
+
+	ATTR_HOT void dec_active() override
+	{
+		nl_assert(netlist().use_deactivate());
+		/* FIXME:
+		 * Based on current measurements there is no point to disable
+		 * 1 input devices. This should actually be a parameter so that we
+		 * can decide for each individual gate whether it is benefitial to
+		 * ignore deactivation.
+		 */
+		if (m_NI > 1 && has_state == 0)
+			if (--m_active == 0)
+			{
+				for (unsigned i = 0; i< m_NI; i++)
+					m_I[i].inactivate();
+				m_ign = (1<<m_NI)-1;
+			}
+	}
+
+	logic_input_t m_I[m_NI];
+	logic_output_t m_Q[m_NO];
+
+protected:
+
+private:
+
 	template<bool doOUT>
 	inline void process()
 	{
 		netlist_time mt = netlist_time::zero;
 
 		UINT32 state = 0;
-		for (unsigned i = 0; i < m_NI; i++)
-		{
-			if (!doOUT || (m_ign & (1<<i)))
-				m_I[i].activate();
-		}
-		for (unsigned i = 0; i < m_NI; i++)
-		{
-			state |= (INPLOGIC(m_I[i]) << i);
-			if (!doOUT)
-				if (this->m_I[i].net().time() > mt)
-					mt = this->m_I[i].net().time();
-		}
+		if (m_NI > 1 && !has_state)
+			for (unsigned i = 0; i < m_NI; i++)
+			{
+				if (!doOUT || (m_ign & (1<<i)))
+					m_I[i].activate();
+			}
+
+		if (!doOUT)
+			for (unsigned i = 0; i < m_NI; i++)
+			{
+				state |= (INPLOGIC(m_I[i]) << i);
+				mt = std::max(this->m_I[i].net().time(), mt);
+			}
+		else
+			for (unsigned i = 0; i < m_NI; i++)
+				state |= (INPLOGIC(m_I[i]) << i);
 
 		const UINT32 nstate = state | (has_state ? (m_last_state << m_NI) : 0);
 		const UINT32 outstate = m_ttp->m_outs[nstate];
@@ -252,55 +298,13 @@ public:
 			for (unsigned i = 0; i < m_NO; i++)
 				m_Q[i].net().set_Q_time((out >> i) & 1, mt + m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
 
-		if (m_NI > 1 || has_state)
+		if (m_NI > 1 && !has_state)
 		{
 			for (unsigned i = 0; i < m_NI; i++)
 				if (m_ign & (1 << i))
 					m_I[i].inactivate();
 		}
 	}
-
-	ATTR_HOT void update() override
-	{
-		process<true>();
-	}
-
-	ATTR_HOT void inc_active() override
-	{
-		nl_assert(netlist().use_deactivate());
-		if (has_state == 0)
-			if (++m_active == 1)
-			{
-				process<false>();
-			}
-	}
-
-	ATTR_HOT void dec_active() override
-	{
-		nl_assert(netlist().use_deactivate());
-		/* FIXME:
-		 * Based on current measurements there is no point to disable
-		 * 1 input devices. This should actually be a parameter so that we
-		 * can decide for each individual gate whether it is benefitial to
-		 * ignore deactivation.
-		 */
-		if (m_NI < 2)
-			return;
-		else if (has_state == 0)
-		{
-			if (--m_active == 0)
-			{
-				for (unsigned i = 0; i< m_NI; i++)
-					m_I[i].inactivate();
-				m_ign = (1<<m_NI)-1;
-			}
-		}
-	}
-
-	logic_input_t m_I[m_NI];
-	logic_output_t m_Q[m_NO];
-
-private:
 
 	UINT32 m_last_state;
 	UINT32 m_ign;

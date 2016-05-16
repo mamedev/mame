@@ -93,17 +93,18 @@ NETLIB_OBJECT_DERIVED(LVCCS, VCCS)
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(LVCCS, VCCS)
 	, m_vi(0.0)
-	{  }
+	{
+		register_param("CURLIM", m_cur_limit, 1000.0);
+	}
 
 	NETLIB_DYNAMIC()
 
 	param_double_t m_cur_limit; /* current limit */
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	virtual void update_param() override;
-	ATTR_HOT virtual void update() override;
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
+	NETLIB_UPDATE_PARAMI();
 	NETLIB_UPDATE_TERMINALSI();
 
 	nl_double m_vi;
@@ -137,13 +138,14 @@ NETLIB_OBJECT_DERIVED(CCCS, VCCS)
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(CCCS, VCCS)
 	, m_gfac(1.0)
-	{  }
+	{
+		m_gfac = NL_FCONST(1.0) / m_RI.Value();
+	}
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	virtual void update_param() override;
-	ATTR_HOT void update() override;
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
+	NETLIB_UPDATE_PARAMI();
 
 	nl_double m_gfac;
 };
@@ -180,15 +182,26 @@ protected:
 NETLIB_OBJECT_DERIVED(VCVS, VCCS)
 {
 public:
-	NETLIB_CONSTRUCTOR_DERIVED(VCVS, VCCS) { }
+	NETLIB_CONSTRUCTOR_DERIVED(VCVS, VCCS)
+	{
+		register_param("RO", m_RO, 1.0);
+
+		enregister("_OP2", m_OP2);
+		enregister("_ON2", m_ON2);
+
+		m_OP2.m_otherterm = &m_ON2;
+		m_ON2.m_otherterm = &m_OP2;
+
+		connect_late(m_OP2, m_OP1);
+		connect_late(m_ON2, m_ON1);
+	}
 
 	param_double_t m_RO;
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	virtual void update_param() override;
-	//ATTR_HOT void update();
+	//NETLIB_UPDATEI();
+	NETLIB_RESETI();
+	//NETLIB_UPDATE_PARAMI();
 
 	terminal_t m_OP2;
 	terminal_t m_ON2;

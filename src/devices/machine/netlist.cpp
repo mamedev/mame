@@ -383,8 +383,8 @@ void netlist_mame_device_t::device_timer(emu_timer &timer, device_timer_id id, i
 
 ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::update_time_x()
 {
-	const netlist::netlist_time newt = netlist().time();
-	const netlist::netlist_time delta = newt - m_old + m_rem;
+	const netlist::netlist_time newt(netlist().time());
+	const netlist::netlist_time delta(newt - m_old + m_rem);
 	const UINT64 d = delta / m_div;
 	m_old = newt;
 	m_rem = delta - (m_div * d);
@@ -629,7 +629,7 @@ void netlist_mame_sound_device_t::sound_stream_update(sound_stream &stream, stre
 		m_in->m_buffer[i] = inputs[i];
 	}
 
-	netlist::netlist_time cur = netlist().time();
+	netlist::netlist_time cur(netlist().time());
 
 	netlist().process_queue(m_div * samples);
 

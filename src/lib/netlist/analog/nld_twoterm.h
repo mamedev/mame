@@ -112,10 +112,11 @@ public:
 	terminal_t m_P;
 	terminal_t m_N;
 
-	NETLIB_UPDATE_TERMINALSI()
-	{
-	}
+	NETLIB_UPDATE_TERMINALSI() { }
+	NETLIB_RESETI() { }
+	NETLIB_UPDATEI();
 
+public:
 	ATTR_HOT /* inline */ void set(const nl_double G, const nl_double V, const nl_double I)
 	{
 		/*      GO, GT, I                */
@@ -135,14 +136,8 @@ public:
 		m_N.set(-a21, a22, -r2);
 	}
 
-protected:
-	ATTR_HOT virtual void start() override;
-	ATTR_HOT virtual void reset() override;
-	ATTR_HOT void update() override;
-
 private:
 };
-
 
 // -----------------------------------------------------------------------------
 // nld_R
@@ -188,8 +183,8 @@ NETLIB_OBJECT_DERIVED(R, R_base)
 
 protected:
 
-	NETLIB_RESETI() { NETLIB_NAME(R_base)::reset(); }
-	NETLIB_UPDATEI() { NETLIB_NAME(twoterm)::update(); }
+	//NETLIB_RESETI() { }
+	//NETLIB_UPDATEI() { }
 	NETLIB_UPDATE_PARAMI()
 	{
 		update_dev();
@@ -222,8 +217,8 @@ NETLIB_OBJECT(POT)
 		register_param("DIALLOG", m_DialIsLog, 0);
 	}
 
-	NETLIB_UPDATEI();
-	NETLIB_RESETI();
+	//NETLIB_UPDATEI();
+	//NETLIB_RESETI();
 	NETLIB_UPDATE_PARAMI();
 
 private:
@@ -249,8 +244,8 @@ NETLIB_OBJECT(POT2)
 		register_param("DIALLOG", m_DialIsLog, 0);
 	}
 
-	NETLIB_UPDATEI();
-	NETLIB_RESETI();
+	//NETLIB_UPDATEI();
+	//NETLIB_RESETI();
 	NETLIB_UPDATE_PARAMI();
 
 private:
@@ -272,7 +267,13 @@ NETLIB_OBJECT_DERIVED(C, twoterm)
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(C, twoterm)
 	, m_GParallel(0.0)
-	{ }
+	{
+		enregister("1", m_P);
+		enregister("2", m_N);
+
+		register_param("C", m_C, 1e-6);
+
+	}
 
 	NETLIB_TIMESTEP()
 	{
@@ -286,10 +287,9 @@ public:
 	param_double_t m_C;
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	virtual void update_param() override;
-	ATTR_HOT void update() override;
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
+	NETLIB_UPDATE_PARAMI();
 
 private:
 	nl_double m_GParallel;
@@ -377,7 +377,13 @@ NETLIB_OBJECT_DERIVED(D, twoterm)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(D, twoterm)
-	{ }
+	{
+		enregister("A", m_P);
+		enregister("K", m_N);
+		register_param("MODEL", m_model, "");
+
+		m_D.save("m_D", *this);
+	}
 
 	NETLIB_DYNAMIC()
 
@@ -386,9 +392,9 @@ public:
 	param_model_t m_model;
 
 protected:
-	virtual void start() override;
-	virtual void update_param() override;
-	ATTR_HOT void update() override;
+	//NETLIB_RESETI();
+	NETLIB_UPDATEI();
+	NETLIB_UPDATE_PARAMI();
 
 	generic_diode m_D;
 };
@@ -403,12 +409,18 @@ protected:
 NETLIB_OBJECT_DERIVED(VS, twoterm)
 {
 public:
-	NETLIB_CONSTRUCTOR_DERIVED(VS, twoterm) { }
+	NETLIB_CONSTRUCTOR_DERIVED(VS, twoterm)
+	{
+		register_param("R", m_R, 0.1);
+		register_param("V", m_V, 0.0);
+
+		enregister("P", m_P);
+		enregister("N", m_N);
+	}
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	ATTR_HOT void update() override;
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
 
 	param_double_t m_R;
 	param_double_t m_V;
@@ -421,12 +433,17 @@ protected:
 NETLIB_OBJECT_DERIVED(CS, twoterm)
 {
 public:
-	NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm) { }
+	NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
+	{
+		register_param("I", m_I, 1.0);
 
+		enregister("P", m_P);
+		enregister("N", m_N);
+	}
+
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	ATTR_HOT void update() override;
 
 	param_double_t m_I;
 };
