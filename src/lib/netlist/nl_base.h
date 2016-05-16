@@ -197,18 +197,18 @@ class NETLIB_NAME(_name) : public device_t
 		: device_t(owner, name)
 
 #define NETLIB_DYNAMIC() 														\
-	ATTR_HOT virtual bool is_dynamic1() const override { return true; }
+	ATTR_HOT public: virtual bool is_dynamic1() const override { return true; }
 
 #define NETLIB_TIMESTEP() 														\
-	ATTR_HOT virtual bool is_timestep() const override { return true; }         \
-	ATTR_HOT void step_time(const nl_double step) override
+	ATTR_HOT public: virtual bool is_timestep() const override { return true; }         \
+	ATTR_HOT public: void step_time(const nl_double step) override
 
-#define NETLIB_FAMILY(_family) m_famsetter(*this, _family)
+#define NETLIB_FAMILY(_family) , m_famsetter(*this, _family)
 
-#define NETLIB_UPDATE_TERMINALSI() ATTR_HOT virtual void update_terminals(void) override
-#define NETLIB_UPDATEI() ATTR_HOT virtual void update(void) override
-#define NETLIB_UPDATE_PARAMI() ATTR_HOT virtual void update_param(void) override
-#define NETLIB_RESETI() ATTR_COLD virtual void reset(void) override
+#define NETLIB_UPDATE_TERMINALSI() public: ATTR_HOT virtual void update_terminals(void) override
+#define NETLIB_UPDATEI() protected: ATTR_HOT virtual void update(void) override
+#define NETLIB_UPDATE_PARAMI() public: ATTR_HOT virtual void update_param(void) override
+#define NETLIB_RESETI() protected: ATTR_COLD virtual void reset(void) override
 
 #define NETLIB_SUB(_chip) nld_ ## _chip
 
@@ -354,7 +354,7 @@ namespace netlist
 	public:
 		logic_family_desc_t() : m_is_static(false) {}
 		virtual ~logic_family_desc_t() {}
-		virtual std::shared_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
+		virtual powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
 
 		nl_double m_low_thresh_V;
@@ -374,11 +374,11 @@ namespace netlist
 		logic_family_t() : m_logic_family(nullptr) {}
 		~logic_family_t() { }
 
-		ATTR_HOT  logic_family_desc_t *logic_family() const { return m_logic_family; }
-		ATTR_COLD void set_logic_family(logic_family_desc_t *fam) { m_logic_family = fam; }
+		ATTR_HOT  const logic_family_desc_t *logic_family() const { return m_logic_family; }
+		ATTR_COLD void set_logic_family(const logic_family_desc_t *fam) { m_logic_family = fam; }
 
 	protected:
-		logic_family_desc_t *m_logic_family;
+		const logic_family_desc_t *m_logic_family;
 	};
 
 	/* Terminals inherit the family description from the device
@@ -389,8 +389,8 @@ namespace netlist
 	 */
 
 
-	extern logic_family_desc_t *family_TTL;
-	extern logic_family_desc_t *family_CD4XXX;
+	const logic_family_desc_t *family_TTL();
+	const logic_family_desc_t *family_CD4XXX();
 
 
 	// -----------------------------------------------------------------------------
@@ -1048,16 +1048,21 @@ namespace netlist
 		{
 			begin_timing(stat_total_time);
 			inc_stat(stat_update_count);
-
-	#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
-			(this->*m_static_update)();
-	#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
-			m_static_update(this);
-	#else
-			update();
-	#endif
+			do_update();
 			end_timing(stat_total_time);
 		}
+
+		ATTR_HOT void do_update()
+		{
+			#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
+				(this->*m_static_update)();
+			#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
+				m_static_update(this);
+			#else
+				update();
+			#endif
+		}
+
 		ATTR_COLD void start_dev();
 		ATTR_COLD void stop_dev();
 
@@ -1187,7 +1192,7 @@ namespace netlist
 	{
 		family_setter_t() { }
 		family_setter_t(core_device_t &dev, const char *desc);
-		family_setter_t(core_device_t &dev, logic_family_desc_t *desc);
+		family_setter_t(core_device_t &dev, const logic_family_desc_t *desc);
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1310,7 +1315,7 @@ namespace netlist
 
 		void print_stats() const;
 
-		pvector_t<std::shared_ptr<device_t>> m_devices;
+		pvector_t<powned_ptr<device_t>> m_devices;
 		net_t::list_t m_nets;
 
 protected:

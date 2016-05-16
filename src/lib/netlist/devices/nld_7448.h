@@ -54,7 +54,32 @@ NETLIB_TRUTHTABLE(7448, 7, 7, 0);
 
 #else
 
-NETLIB_SUBDEVICE(7448_sub,
+NETLIB_OBJECT(7448_sub)
+{
+	NETLIB_CONSTRUCTOR(7448_sub)
+	, m_state(0)
+	{
+		enregister("A0", m_A);
+		enregister("A1", m_B);
+		enregister("A2", m_C);
+		enregister("A3", m_D);
+		enregister("RBIQ", m_RBIQ);
+
+		enregister("a", m_Q[0]);
+		enregister("b", m_Q[1]);
+		enregister("c", m_Q[2]);
+		enregister("d", m_Q[3]);
+		enregister("e", m_Q[4]);
+		enregister("f", m_Q[5]);
+		enregister("g", m_Q[6]);
+
+		save(NLNAME(m_state));
+	}
+
+	NETLIB_RESETI() { m_state = 0; }
+	NETLIB_UPDATEI();
+
+public:
 	ATTR_HOT void update_outputs(UINT8 v);
 	static const UINT8 tab7448[16][7];
 
@@ -68,15 +93,40 @@ NETLIB_SUBDEVICE(7448_sub,
 
 	logic_output_t m_Q[7];  /* a .. g */
 
-);
+};
 
-NETLIB_DEVICE(7448,
+NETLIB_OBJECT(7448)
+{
+	NETLIB_CONSTRUCTOR(7448)
+	, m_sub(*this, "sub")
+	{
+
+		register_subalias("A", m_sub.m_A);
+		register_subalias("B", m_sub.m_B);
+		register_subalias("C", m_sub.m_C);
+		register_subalias("D", m_sub.m_D);
+		enregister("LTQ", m_LTQ);
+		enregister("BIQ", m_BIQ);
+		register_subalias("RBIQ",m_sub.m_RBIQ);
+
+		register_subalias("a", m_sub.m_Q[0]);
+		register_subalias("b", m_sub.m_Q[1]);
+		register_subalias("c", m_sub.m_Q[2]);
+		register_subalias("d", m_sub.m_Q[3]);
+		register_subalias("e", m_sub.m_Q[4]);
+		register_subalias("f", m_sub.m_Q[5]);
+		register_subalias("g", m_sub.m_Q[6]);
+	}
+
+	NETLIB_RESETI() { m_sub.do_reset(); }
+	NETLIB_UPDATEI();
+
 public:
-	NETLIB_SUBXX(7448_sub) sub;
+	NETLIB_SUB(7448_sub) m_sub;
 
 	logic_input_t m_LTQ;
 	logic_input_t m_BIQ;
-);
+};
 #endif
 
 NETLIB_DEVICE_DERIVED_PURE(7448_dip, 7448);

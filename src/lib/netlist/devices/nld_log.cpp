@@ -17,7 +17,7 @@ NETLIB_START(log)
 	enregister("I", m_I);
 
 	pstring filename = pfmt("{1}.log")(name());
-	m_strm = palloc(pofilestream(filename));
+	m_strm = std::make_unique<pofilestream>(filename);
 }
 
 NETLIB_RESET(log)
@@ -33,7 +33,6 @@ NETLIB_UPDATE(log)
 NETLIB_NAME(log)::~NETLIB_NAME(log)()
 {
 	m_strm->close();
-	pfree(m_strm);
 }
 
 NETLIB_START(logD)

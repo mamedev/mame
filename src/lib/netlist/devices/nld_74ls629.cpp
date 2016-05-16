@@ -44,27 +44,6 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_START(SN74LS629clk)
-{
-	enregister("FB",    m_FB);
-	enregister("Y",    m_Y);
-
-	connect_late(m_FB, m_Y);
-
-	reset();
-
-	save(NLNAME(m_enableq));
-	save(NLNAME(m_inc));
-	save(NLNAME(m_out));
-}
-
-NETLIB_RESET(SN74LS629clk)
-{
-	m_enableq = 1;
-	m_out = 0;
-	m_inc = netlist_time::zero;
-}
-
 NETLIB_UPDATE(SN74LS629clk)
 {
 	if (!m_enableq)
@@ -76,32 +55,6 @@ NETLIB_UPDATE(SN74LS629clk)
 	{
 		OUTLOGIC(m_Y, 1, m_inc);
 	}
-}
-
-NETLIB_START(SN74LS629)
-{
-	register_sub("OSC", m_clock);
-	register_sub("R_FC", m_R_FC);
-	register_sub("R_RNG", m_R_RNG);
-
-	enregister("ENQ", m_ENQ);
-	enregister("RNG",    m_RNG);
-	enregister("FC",     m_FC);
-	register_subalias("GND",    m_R_FC->m_N);
-
-	connect_late(m_FC, m_R_FC->m_P);
-	connect_late(m_RNG, m_R_RNG->m_P);
-	connect_late(m_R_FC->m_N, m_R_RNG->m_N);
-
-	register_subalias("Y", m_clock->m_Y);
-	register_param("CAP", m_CAP, 1e-6);
-}
-
-NETLIB_RESET(SN74LS629)
-{
-	m_R_FC->set_R(90000.0);
-	m_R_RNG->set_R(90000.0);
-	m_clock->reset();
 }
 
 NETLIB_UPDATE(SN74LS629)
@@ -147,64 +100,24 @@ NETLIB_UPDATE(SN74LS629)
 
 		// FIXME: we need a possibility to remove entries from queue ...
 		//        or an exact model ...
-		m_clock->m_inc = netlist_time::from_double(0.5 / (double) freq);
+		m_clock.m_inc = netlist_time::from_double(0.5 / (double) freq);
 		//m_clock.update();
 
 		//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));
 	}
 
-	if (!m_clock->m_enableq && INPLOGIC(m_ENQ))
+	if (!m_clock.m_enableq && INPLOGIC(m_ENQ))
 	{
-		m_clock->m_enableq = 1;
-		m_clock->m_out = m_clock->m_out ^ 1;
-		OUTLOGIC(m_clock->m_Y, m_clock->m_out, netlist_time::from_nsec(1));
+		m_clock.m_enableq = 1;
+		m_clock.m_out = m_clock.m_out ^ 1;
+		OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
 	}
-	else if (m_clock->m_enableq && !INPLOGIC(m_ENQ))
+	else if (m_clock.m_enableq && !INPLOGIC(m_ENQ))
 	{
-		m_clock->m_enableq = 0;
-		m_clock->m_out = m_clock->m_out ^ 1;
-		OUTLOGIC(m_clock->m_Y, m_clock->m_out, netlist_time::from_nsec(1));
+		m_clock.m_enableq = 0;
+		m_clock.m_out = m_clock.m_out ^ 1;
+		OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
 	}
-}
-
-NETLIB_UPDATE_PARAM(SN74LS629)
-{
-	update_dev();
-}
-
-
-
-NETLIB_START(SN74LS629_dip)
-{
-	register_sub("1", m_1);
-	register_sub("2", m_2);
-
-	register_subalias("1",  m_2->m_FC);
-	register_subalias("2",  m_1->m_FC);
-	register_subalias("3",  m_1->m_RNG);
-
-	register_subalias("6",  m_1->m_ENQ);
-	register_subalias("7",  m_1->m_clock->m_Y);
-
-	register_subalias("8",  m_1->m_R_FC->m_N);
-	register_subalias("9",  m_1->m_R_FC->m_N);
-	connect_late(m_1->m_R_FC->m_N, m_2->m_R_FC->m_N);
-
-	register_subalias("10",  m_2->m_clock->m_Y);
-
-	register_subalias("11",  m_2->m_ENQ);
-	register_subalias("14",  m_2->m_RNG);
-
-}
-
-NETLIB_UPDATE(SN74LS629_dip)
-{
-}
-
-NETLIB_RESET(SN74LS629_dip)
-{
-	m_1->do_reset();
-	m_2->do_reset();
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

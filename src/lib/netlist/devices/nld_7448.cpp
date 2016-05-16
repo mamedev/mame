@@ -63,85 +63,34 @@ NETLIB_START(7448_dip)
 }
 
 #else
-NETLIB_START(7448)
-{
-	register_sub("sub", sub);
-
-	register_subalias("A", sub->m_A);
-	register_subalias("B", sub->m_B);
-	register_subalias("C", sub->m_C);
-	register_subalias("D", sub->m_D);
-	enregister("LTQ", m_LTQ);
-	enregister("BIQ", m_BIQ);
-	register_subalias("RBIQ",sub->m_RBIQ);
-
-	register_subalias("a", sub->m_Q[0]);
-	register_subalias("b", sub->m_Q[1]);
-	register_subalias("c", sub->m_Q[2]);
-	register_subalias("d", sub->m_Q[3]);
-	register_subalias("e", sub->m_Q[4]);
-	register_subalias("f", sub->m_Q[5]);
-	register_subalias("g", sub->m_Q[6]);
-
-}
-
-
-NETLIB_RESET(7448)
-{
-	sub->do_reset();
-}
 
 NETLIB_UPDATE(7448)
 {
 	if (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ))
 	{
-		sub->update_outputs(8);
+		m_sub.update_outputs(8);
 	}
 	else if (!INPLOGIC(m_BIQ))
 	{
-		sub->update_outputs(15);
+		m_sub.update_outputs(15);
 	}
 
 	if (!INPLOGIC(m_BIQ) || (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ)))
 	{
-		sub->m_A.inactivate();
-		sub->m_B.inactivate();
-		sub->m_C.inactivate();
-		sub->m_D.inactivate();
-		sub->m_RBIQ.inactivate();
+		m_sub.m_A.inactivate();
+		m_sub.m_B.inactivate();
+		m_sub.m_C.inactivate();
+		m_sub.m_D.inactivate();
+		m_sub.m_RBIQ.inactivate();
 	} else {
-		sub->m_RBIQ.activate();
-		sub->m_D.activate();
-		sub->m_C.activate();
-		sub->m_B.activate();
-		sub->m_A.activate();
-		sub->update();
+		m_sub.m_RBIQ.activate();
+		m_sub.m_D.activate();
+		m_sub.m_C.activate();
+		m_sub.m_B.activate();
+		m_sub.m_A.activate();
+		m_sub.do_update();
 	}
 
-}
-
-NETLIB_START(7448_sub)
-{
-	enregister("A0", m_A);
-	enregister("A1", m_B);
-	enregister("A2", m_C);
-	enregister("A3", m_D);
-	enregister("RBIQ", m_RBIQ);
-
-	enregister("a", m_Q[0]);
-	enregister("b", m_Q[1]);
-	enregister("c", m_Q[2]);
-	enregister("d", m_Q[3]);
-	enregister("e", m_Q[4]);
-	enregister("f", m_Q[5]);
-	enregister("g", m_Q[6]);
-
-	save(NLNAME(m_state));
-}
-
-NETLIB_RESET(7448_sub)
-{
-	m_state = 0;
 }
 
 NETLIB_UPDATE(7448_sub)
@@ -191,21 +140,21 @@ NETLIB_START(7448_dip)
 {
 	NETLIB_NAME(7448)::start();
 
-	register_subalias("1", sub->m_B);
-	register_subalias("2", sub->m_C);
+	register_subalias("1", m_sub.m_B);
+	register_subalias("2", m_sub.m_C);
 	register_subalias("3", m_LTQ);
 	register_subalias("4", m_BIQ);
-	register_subalias("5",sub->m_RBIQ);
-	register_subalias("6", sub->m_D);
-	register_subalias("7", sub->m_A);
+	register_subalias("5",m_sub.m_RBIQ);
+	register_subalias("6", m_sub.m_D);
+	register_subalias("7", m_sub.m_A);
 
-	register_subalias("9",  sub->m_Q[4]); // e
-	register_subalias("10", sub->m_Q[3]); // d
-	register_subalias("11", sub->m_Q[2]); // c
-	register_subalias("12", sub->m_Q[1]); // b
-	register_subalias("13", sub->m_Q[0]); // a
-	register_subalias("14", sub->m_Q[6]); // g
-	register_subalias("15", sub->m_Q[5]); // f
+	register_subalias("9",  m_sub.m_Q[4]); // e
+	register_subalias("10", m_sub.m_Q[3]); // d
+	register_subalias("11", m_sub.m_Q[2]); // c
+	register_subalias("12", m_sub.m_Q[1]); // b
+	register_subalias("13", m_sub.m_Q[0]); // a
+	register_subalias("14", m_sub.m_Q[6]); // g
+	register_subalias("15", m_sub.m_Q[5]); // f
 }
 
 #endif

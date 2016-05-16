@@ -158,7 +158,7 @@ void parser_t::net_truthtable_start()
 	pstring def_param = get_string();
 	require_token(m_tok_param_right);
 
-	netlist::devices::netlist_base_factory_truthtable_t *ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
+	powned_ptr<netlist::devices::netlist_base_factory_truthtable_t> ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
 			name, name, "+" + def_param);
 
 	while (true)
@@ -188,7 +188,7 @@ void parser_t::net_truthtable_start()
 			require_token(token, m_tok_TRUTHTABLE_END);
 			require_token(m_tok_param_left);
 			require_token(m_tok_param_right);
-			m_setup.factory().register_device(ttd);
+			m_setup.factory().register_device(std::move(ttd));
 			return;
 		}
 	}

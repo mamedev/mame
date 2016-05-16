@@ -12,7 +12,6 @@
 #include <type_traits>
 
 #include "nl_config.h"
-#include "plib/palloc.h"
 #include "plib/plists.h"
 #include "nl_base.h"
 
@@ -33,7 +32,7 @@ namespace netlist
 
 		virtual ~base_factory_t() {}
 
-		virtual device_t *Create(netlist_t &anetlist, const pstring &name) = 0;
+		virtual powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) = 0;
 
 		const pstring &name() const { return m_name; }
 		const pstring &classname() const { return m_classname; }
@@ -56,15 +55,14 @@ namespace netlist
 				const pstring &def_param)
 		: base_factory_t(name, classname, def_param) { }
 
-		device_t *Create(netlist_t &anetlist, const pstring &name) override
+		powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 		{
-			device_t *r = palloc(_device_class(anetlist, name));
-			return r;
+			return powned_ptr<device_t>::Create<_device_class>(anetlist, name);
 		}
 
 	};
 
-	class factory_list_t : public phashmap_t<pstring, base_factory_t *>
+	class factory_list_t : public pvector_t<powned_ptr<base_factory_t>>
 	{
 	public:
 		factory_list_t(setup_t &m_setup);
@@ -74,19 +72,20 @@ namespace netlist
 		void register_device(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		{
-			if (!add(name, palloc(factory_t< _device_class >(name, classname, def_param))))
-				error("factory already contains " + name);
+			register_device(powned_ptr<base_factory_t>::Create<factory_t<_device_class>>(name, classname, def_param));
 		}
 
-		void register_device(base_factory_t *factory)
+		void register_device(powned_ptr<base_factory_t> factory)
 		{
-			if (!add(factory->name(), factory))
-				error("factory already contains " + factory->name());
+			for (auto & e : *this)
+				if (e->name() == factory->name())
+					error("factory already contains " + factory->name());
+			push_back(std::move(factory));
 		}
 
 		//ATTR_COLD device_t *new_device_by_classname(const pstring &classname) const;
 		// FIXME: legacy, should use factory_by_name
-		std::shared_ptr<device_t> new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name);
+		powned_ptr<device_t> new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name);
 		base_factory_t * factory_by_name(const pstring &devname);
 
 		template <class _class>

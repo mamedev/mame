@@ -74,7 +74,7 @@ private:
 };
 
 #define MEMREGION_SOURCE(_name) \
-		setup.register_source(palloc(netlist_source_memregion_t(_name)));
+		setup.register_source(std::make_shared<netlist_source_memregion_t>(_name));
 
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
 	void _name(const double data, const attotime &time)

@@ -16,7 +16,7 @@
 #include "devices/nld_system.h"
 #include "nl_util.h"
 
-const netlist::netlist_time netlist::netlist_time::zero = netlist::netlist_time::from_raw(0);
+const netlist::netlist_time netlist::netlist_time::zero = netlist::netlist_time(0);
 
 namespace netlist
 {
@@ -38,9 +38,9 @@ public:
 		m_R_high = 130.0;
 		m_is_static = true;
 	}
-	virtual std::shared_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
+	virtual powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
-		return std::make_shared<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+		return powned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 };
 
@@ -59,14 +59,22 @@ public:
 		m_R_high = 10.0;
 		m_is_static = true;
 	}
-	virtual std::shared_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
+	virtual powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
-		return std::make_shared<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+		return powned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 };
 
-logic_family_desc_t *family_TTL = palloc(logic_family_ttl_t);
-logic_family_desc_t *family_CD4XXX = palloc(logic_family_cd4xxx_t);
+const logic_family_desc_t *family_TTL()
+{
+	static logic_family_ttl_t obj;
+	return &obj;
+}
+const logic_family_desc_t *family_CD4XXX()
+{
+	static logic_family_cd4xxx_t obj;
+	return &obj;
+}
 
 // ----------------------------------------------------------------------------------------
 // queue_t
@@ -237,8 +245,8 @@ ATTR_COLD void netlist_t::start()
 				|| setup().factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
 				|| setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			auto dev = std::shared_ptr<device_t>(e.second->Create(*this, e.first));
-			setup().register_dev_s(dev);
+			auto dev = powned_ptr<device_t>(e.second->Create(*this, e.first));
+			setup().register_dev_s(std::move(dev));
 		}
 	}
 
@@ -268,8 +276,8 @@ ATTR_COLD void netlist_t::start()
 				&& !setup().factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
 				&& !setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			auto dev = std::shared_ptr<device_t>(e.second->Create(*this, e.first));
-			setup().register_dev_s(dev);
+			auto dev = powned_ptr<device_t>(e.second->Create(*this, e.first));
+			setup().register_dev_s(std::move(dev));
 		}
 	}
 
@@ -426,7 +434,7 @@ ATTR_COLD core_device_t::core_device_t(netlist_t &owner, const pstring &name)
 #endif
 {
 	if (logic_family() == nullptr)
-		set_logic_family(family_TTL);
+		set_logic_family(family_TTL());
 	init_object(owner, name);
 }
 
@@ -440,7 +448,7 @@ ATTR_COLD core_device_t::core_device_t(core_device_t &owner, const pstring &name
 {
 	set_logic_family(owner.logic_family());
 	if (logic_family() == nullptr)
-		set_logic_family(family_TTL);
+		set_logic_family(family_TTL());
 	init_object(owner.netlist(), owner.name() +"." + name);
 }
 
@@ -582,7 +590,7 @@ family_setter_t::family_setter_t(core_device_t &dev, const char *desc)
 	dev.set_logic_family(dev.netlist().setup().family_from_model(desc));
 }
 
-family_setter_t::family_setter_t(core_device_t &dev, logic_family_desc_t *desc)
+family_setter_t::family_setter_t(core_device_t &dev, const logic_family_desc_t *desc)
 {
 	dev.set_logic_family(desc);
 }

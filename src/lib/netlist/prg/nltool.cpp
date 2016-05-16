@@ -110,7 +110,7 @@ public:
 	{
 		// read the netlist ...
 
-		m_setup->register_source(palloc(netlist::source_file_t(filename)));
+		m_setup->register_source(std::make_shared<netlist::source_file_t>(filename));
 		m_setup->include(name);
 		log_setup();
 
@@ -289,9 +289,9 @@ static void listdevices()
 {
 	netlist_tool_t nt("netlist");
 	nt.init();
-	const netlist::factory_list_t &list = nt.setup().factory();
+	netlist::factory_list_t &list = nt.setup().factory();
 
-	nt.setup().register_source(palloc(netlist::source_proc_t("dummy", &netlist_dummy)));
+	nt.setup().register_source(std::make_shared<netlist::source_proc_t>("dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 	nt.setup().start_devices();
@@ -299,11 +299,11 @@ static void listdevices()
 
 	for (unsigned i=0; i < list.size(); i++)
 	{
-		netlist::base_factory_t *f = list.value_at(i);
+		auto &f = list[i];
 		pstring out = pfmt("{1} {2}(<id>")(f->classname(),"-20")(f->name());
 		pstring terms("");
 
-		netlist::device_t *d = f->Create(nt.setup().netlist(), pfmt("dummy{1}")(i));
+		auto d = f->Create(nt.setup().netlist(), pfmt("dummy{1}")(i));
 		d->start_dev();
 
 		// get the list of terminals ...

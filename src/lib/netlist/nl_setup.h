@@ -54,7 +54,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup)                    \
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(_name)                                                    \
-		setup.register_source(palloc(netlist::source_proc_t(# _name, &NETLIST_NAME(_name))));
+		setup.register_source(std::make_shared<netlist::source_proc_t>(# _name, &NETLIST_NAME(_name)));
 
 #define LOCAL_LIB_ENTRY(_name)                                                 \
 		LOCAL_SOURCE(_name)                                                    \
@@ -90,7 +90,7 @@ namespace netlist
 		class source_t
 		{
 		public:
-			using list_t = pvector_t<source_t *>;
+			using list_t = pvector_t<std::shared_ptr<source_t>>;
 
 			source_t()
 			{}
@@ -113,14 +113,14 @@ namespace netlist
 
 		void register_object(device_t &dev, const pstring &name, object_t &obj);
 
-		template<class C>
-		void register_dev_s(std::shared_ptr<C> dev)
+		template<class _X>
+		void register_dev_s(powned_ptr<_X> dev)
 		{
-			register_dev(std::static_pointer_cast<device_t>(dev));
+			register_dev(std::move(dev));
 		}
 
 
-		void register_dev(std::shared_ptr<device_t> dev);
+		void register_dev(powned_ptr<device_t> dev);
 		void register_dev(const pstring &classname, const pstring &name);
 
 		void register_lib_entry(const pstring &name);
@@ -162,7 +162,11 @@ namespace netlist
 
 		/* register a source */
 
-		void register_source(source_t *src) { m_sources.push_back(src); }
+		template <class C>
+		void register_source(std::shared_ptr<C> src)
+		{
+			m_sources.push_back(std::static_pointer_cast<source_t>(src));
+		}
 
 		factory_list_t &factory() { return m_factory; }
 		const factory_list_t &factory() const { return m_factory; }
@@ -171,7 +175,7 @@ namespace netlist
 
 		/* model / family related */
 
-		logic_family_desc_t *family_from_model(const pstring &model);
+		const logic_family_desc_t *family_from_model(const pstring &model);
 		const pstring model_value_str(model_map_t &map, const pstring &entity);
 		nl_double model_value(model_map_t &map, const pstring &entity);
 

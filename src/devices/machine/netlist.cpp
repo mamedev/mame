@@ -100,9 +100,9 @@ void netlist_mame_analog_output_t::custom_netlist_additions(netlist::setup_t &se
 	pstring dname = "OUT_" + m_in;
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 
-	auto dev = std::make_shared<NETLIB_NAME(analog_callback)>(setup.netlist(), setup.build_fqn(dname));
-	setup.register_dev(dev);
-	dev->register_callback(m_delegate);
+	powned_ptr<netlist::device_t> dev = powned_ptr<netlist::device_t>::Create<NETLIB_NAME(analog_callback)>(setup.netlist(), setup.build_fqn(dname));
+	static_cast<NETLIB_NAME(analog_callback) *>(dev.get())->register_callback(m_delegate);
+	setup.register_dev(std::move(dev));
 	setup.register_link(dname + ".IN", m_in);
 }
 

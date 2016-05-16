@@ -243,13 +243,13 @@ void truthtable_desc_t::setup(const pstring_vector_t &truthtable, UINT32 disable
 
 #define ENTRYX(_n,_m,_h)    case (_n * 1000 + _m * 10 + _h): \
 	{ using xtype = netlist_factory_truthtable_t<_n,_m,_h>; \
-		return palloc(xtype(name,classname,def_param)); } break
+		return powned_ptr<netlist_base_factory_truthtable_t>::Create<xtype>(name,classname,def_param); } break
 
 #define ENTRYY(_n,_m)   ENTRYX(_n,_m,0); ENTRYX(_n,_m,1)
 
 #define ENTRY(_n) ENTRYY(_n, 1); ENTRYY(_n, 2); ENTRYY(_n, 3); ENTRYY(_n, 4); ENTRYY(_n, 5); ENTRYY(_n, 6)
 
-netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const unsigned no,
+powned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
 		const unsigned has_state,
 		const pstring &name, const pstring &classname,
 		const pstring &def_param)
@@ -270,7 +270,7 @@ netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const
 			pstring msg = pfmt("unable to create truthtable<{1},{2},{3}>")(ni)(no)(has_state);
 			nl_assert_always(false, msg);
 	}
-	return nullptr;
+	//return nullptr;
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

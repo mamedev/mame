@@ -500,9 +500,9 @@ public:
 		pstring m_dev_name;
 	};
 
-	device_t *Create(netlist_t &anetlist, const pstring &name) override
+	powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 	{
-		return palloc(wrapper(this->name(), anetlist, name));
+		return powned_ptr<device_t>::Create<wrapper>(this->name(), anetlist, name);
 	}
 
 private:

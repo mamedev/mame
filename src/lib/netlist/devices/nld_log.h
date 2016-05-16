@@ -31,7 +31,7 @@ NETLIB_DEVICE(log,
 	~NETLIB_NAME(log)();
 	analog_input_t m_I;
 protected:
-	pofilestream *m_strm;
+	std::unique_ptr<pofilestream> m_strm;
 );
 
 #define LOGD(_name, _I, _I2)                                                 \

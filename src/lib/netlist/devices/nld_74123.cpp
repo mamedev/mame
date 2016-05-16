@@ -226,7 +226,7 @@ NETLIB_RESET(9602_dip)
 
 NETLIB_START(4538_dip)
 {
-	set_logic_family(family_CD4XXX);
+	set_logic_family(family_CD4XXX());
 
 	register_sub("1", m_1);
 	register_sub("2", m_2);

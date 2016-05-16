@@ -27,7 +27,7 @@
 
 #define TRUTHTABLE_START(_name, _in, _out, _has_state, _def_params) \
 	{ \
-	netlist::devices::netlist_base_factory_truthtable_t *ttd = netlist::devices::nl_tt_factory_create(_in, _out, _has_state, \
+	auto ttd = netlist::devices::nl_tt_factory_create(_in, _out, _has_state, \
 			# _name, # _name, "+" _def_params);
 
 #define TT_HEAD(_x) \
@@ -40,7 +40,7 @@
 	ttd->m_family = setup.family_from_model(_x);
 
 #define TRUTHTABLE_END() \
-	setup.factory().register_device(ttd); \
+	setup.factory().register_device(std::move(ttd)); \
 	}
 
 NETLIB_NAMESPACE_DEVICES_START()
@@ -114,7 +114,7 @@ public:
 	};
 
 	template <class C>
-	nld_truthtable_t(C &owner, const pstring &name, logic_family_desc_t *fam,
+	nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
 			truthtable_t *ttbl, const char *desc[])
 	: device_t(owner, name)
 	, m_fam(*this, fam)
@@ -132,7 +132,7 @@ public:
 	}
 
 	template <class C>
-	nld_truthtable_t(C &owner, const pstring &name, logic_family_desc_t *fam,
+	nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
 			truthtable_t *ttbl, const pstring_vector_t &desc)
 	: device_t(owner, name)
 	, m_fam(*this, fam)
@@ -316,7 +316,7 @@ class netlist_base_factory_truthtable_t : public base_factory_t
 public:
 	netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
-	: base_factory_t(name, classname, def_param), m_family(family_TTL)
+	: base_factory_t(name, classname, def_param), m_family(family_TTL())
 	{}
 
 	virtual ~netlist_base_factory_truthtable_t()
@@ -326,7 +326,7 @@ public:
 	}
 
 	pstring_vector_t m_desc;
-	logic_family_desc_t *m_family;
+	const logic_family_desc_t *m_family;
 };
 
 
@@ -339,18 +339,16 @@ public:
 			const pstring &def_param)
 	: netlist_base_factory_truthtable_t(name, classname, def_param) { }
 
-	device_t *Create(netlist_t &anetlist, const pstring &name) override
+	powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 	{
 		typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
-		device_t *r = palloc(tt_type(anetlist, name, m_family, &m_ttbl, m_desc));
-		//r->init(setup, name);
-		return r;
+		return powned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, &m_ttbl, m_desc);
 	}
 private:
 	typename nld_truthtable_t<m_NI, m_NO, has_state>::truthtable_t m_ttbl;
 };
 
-netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const unsigned no,
+powned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
 		const unsigned has_state,
 		const pstring &name, const pstring &classname,
 		const pstring &def_param);

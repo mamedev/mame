@@ -72,6 +72,7 @@ NETLIB_OBJECT(7474sub)
 	NETLIB_RESETI();
 	NETLIB_UPDATEI();
 
+public:
 	logic_input_t m_CLK;
 	logic_output_t m_Q;
 	logic_output_t m_QQ;
