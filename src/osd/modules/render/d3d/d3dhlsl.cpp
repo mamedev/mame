@@ -1782,10 +1782,9 @@ bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* texture, int so
 		return false;
 	}
 
+	target->screen_index = screen_index;
 	target->next = cachehead;
 	target->prev = nullptr;
-
-	target->screen_index = screen_index;
 
 	if (cachehead != nullptr)
 	{
@@ -1803,27 +1802,31 @@ d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_i
 {
 	auto win = d3d->assert_window();
 
-	bool swap_xy = win->swap_xy();
-	int target_width = swap_xy
-		? static_cast<int>(prim->get_quad_height() + 0.5f)
-		: static_cast<int>(prim->get_quad_width() + 0.5f);
-	int target_height = swap_xy
-		? static_cast<int>(prim->get_quad_width() + 0.5f)
-		: static_cast<int>(prim->get_quad_height() + 0.5f);
-
+	int target_width = int(prim->get_quad_width() + 0.5f);
+	int target_height = int(prim->get_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
+	if (win->swap_xy())
+	{
+		std::swap(target_width, target_height);
+	}
 
 	// find render target and check if the size of the target quad has changed
 	d3d_render_target *target = find_render_target(texture);
-	if (target != nullptr && target->target_width == target_width && target->target_height == target_height)
+	if (target != nullptr)
 	{
-		return target;
+		if (PRIMFLAG_GET_SCREENTEX(prim->flags))
+		{
+			// check if the size of the screen quad has changed
+			if (target->target_width != target_width || target->target_height != target_height)
+			{
+				osd_printf_verbose("get_texture_target() - invalid size\n");
+				return nullptr;
+			}
+		}
 	}
 
-	osd_printf_verbose("get_texture_target() - invalid size\n");
-
-	return nullptr;
+	return target;
 }
 
 d3d_render_target* shaders::get_vector_target(render_primitive *prim)
@@ -1835,50 +1838,54 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 
 	auto win = d3d->assert_window();
 
-	bool swap_xy = win->swap_xy();
-	int target_width = swap_xy
-		? static_cast<int>(prim->get_quad_height() + 0.5f)
-		: static_cast<int>(prim->get_quad_width() + 0.5f);
-	int target_height = swap_xy
-		? static_cast<int>(prim->get_quad_width() + 0.5f)
-		: static_cast<int>(prim->get_quad_height() + 0.5f);
-	int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
-	int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
-
+	int source_width = float(d3d->get_width());
+	int source_height = float(d3d->get_height());
+	int target_width = int(prim->get_quad_width() + 0.5f);
+	int target_height = int(prim->get_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
-
-	// find render target and check of the size of the target quad has changed
-	d3d_render_target *target = find_render_target(source_width, source_height, 0, 0);
-	if (target != nullptr && target->target_width == target_width && target->target_height == target_height)
+	if (win->swap_xy())
 	{
-		return target;
+		std::swap(source_width, source_height);
+		std::swap(target_width, target_height);
 	}
 
-	osd_printf_verbose("get_vector_target() - invalid size\n");
+	// find render target
+	d3d_render_target *target = find_render_target(source_width, source_height, 0, 0);
+	if (target != nullptr)
+	{
+		if (PRIMFLAG_GET_VECTORBUF(prim->flags))
+		{
+			// check if the size of the screen quad has changed
+			if (target->target_width != target_width || target->target_height != target_height)
+			{
+				osd_printf_verbose("get_vector_target() - invalid size\n");
+				return nullptr;
+			}
+		}
+	}
 
-	return nullptr;
+	return target;
 }
 
 void shaders::create_vector_target(render_primitive *prim)
 {
 	auto win = d3d->assert_window();
 
-	bool swap_xy = win->swap_xy();
-	int target_width = swap_xy
-		? static_cast<int>(prim->get_quad_height() + 0.5f)
-		: static_cast<int>(prim->get_quad_width() + 0.5f);
-	int target_height = swap_xy
-		? static_cast<int>(prim->get_quad_width() + 0.5f)
-		: static_cast<int>(prim->get_quad_height() + 0.5f);
-	int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
-	int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
-
+	int source_width = float(d3d->get_width());
+	int source_height = float(d3d->get_height());
+	int target_width = int(prim->get_quad_width() + 0.5f);
+	int target_height = int(prim->get_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
+	if (win->swap_xy())
+	{
+		std::swap(source_width, source_height);
+		std::swap(target_width, target_height);
+	}
 
 	osd_printf_verbose("create_vector_target() - %d, %d\n", target_width, target_height);
-	if (!add_render_target(d3d, nullptr, source_width, source_height, target_width, target_height))
+	if (!add_render_target(d3d, prim, nullptr, source_width, source_height, target_width, target_height))
 	{
 		vector_enable = false;
 	}
@@ -1889,7 +1896,7 @@ void shaders::create_vector_target(render_primitive *prim)
 //  shaders::add_render_target - register a render target
 //============================================================
 
-bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height)
+bool shaders::add_render_target(renderer_d3d9* d3d, render_primitive *prim, texture_info* texture, int source_width, int source_height, int target_width, int target_height)
 {
 	UINT32 screen_index = 0;
 	UINT32 page_index = 0;
@@ -1924,24 +1931,6 @@ bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* texture, int s
 
 	target->screen_index = screen_index;
 	target->page_index = page_index;
-
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, target->target_surface[0]);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-
-	cache_target* cache = find_cache_target(target->screen_index, source_width, source_height);
-	if (cache == nullptr)
-	{
-		if (!add_cache_target(d3d, texture, source_width, source_height, target_width, target_height, target->screen_index))
-		{
-			global_free(target);
-			return false;
-		}
-	}
-
 	target->next = targethead;
 	target->prev = nullptr;
 
@@ -1950,6 +1939,20 @@ bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* texture, int s
 		targethead->prev = target;
 	}
 	targethead = target;
+
+	// cached target only for screen texture and vector buffer
+	if (PRIMFLAG_GET_SCREENTEX(prim->flags) || PRIMFLAG_GET_VECTORBUF(prim->flags))
+	{
+		cache_target* cache = find_cache_target(target->screen_index, source_width, source_height);
+		if (cache == nullptr)
+		{
+			if (!add_cache_target(d3d, texture, source_width, source_height, target_width, target_height, target->screen_index))
+			{
+				global_free(target);
+				return false;
+			}
+		}
+	}
 
 	return true;
 }
@@ -1978,19 +1981,17 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 
 	auto win = d3d->assert_window();
 
-	bool swap_xy = win->swap_xy();
-	int target_width = swap_xy
-		? static_cast<int>(prim->get_quad_height() + 0.5f)
-		: static_cast<int>(prim->get_quad_width() + 0.5f);
-	int target_height = swap_xy
-		? static_cast<int>(prim->get_quad_width() + 0.5f)
-		: static_cast<int>(prim->get_quad_height() + 0.5f);
-
+	int target_width = int(prim->get_quad_width() + 0.5f);
+	int target_height = int(prim->get_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
+	if (win->swap_xy())
+	{
+		std::swap(target_width, target_height);
+	}
 
 	osd_printf_verbose("register_texture() - %d, %d\n", target_width, target_height);
-	if (!add_render_target(d3d, texture, texture->get_width(), texture->get_height(), target_width, target_height))
+	if (!add_render_target(d3d, prim, texture, texture->get_width(), texture->get_height(), target_width, target_height))
 	{
 		return false;
 	}

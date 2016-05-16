@@ -320,7 +320,7 @@ public:
 
 	bool register_texture(render_primitive *prim, texture_info *texture);
 	d3d_render_target* get_texture_target(render_primitive *prim, texture_info *texture);
-	bool add_render_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height);
+	bool add_render_target(renderer_d3d9* d3d, render_primitive *prim, texture_info* texture, int source_width, int source_height, int target_width, int target_height);
 	bool add_cache_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height, int screen_index);
 
 	void window_save();
