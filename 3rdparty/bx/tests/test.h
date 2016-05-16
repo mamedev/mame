@@ -7,7 +7,10 @@
 #define __TEST_H__
 
 #include <bx/bx.h>
-#include <UnitTest++.h>
+#include <catch/catch.hpp>
+#define TEST(_x) TEST_CASE(#_x, "")
+#define CHECK_EQUAL(_x, _y) REQUIRE(_x == _y)
+
 #include "dbg.h"
 
 #if !BX_COMPILER_MSVC

@@ -32,7 +32,6 @@ function copyLib()
 end
 
 dofile "bx.lua"
-dofile "unittest++.lua"
 dofile "bin2c.lua"
 
 project "bx.test"
@@ -46,11 +45,7 @@ project "bx.test"
 
 	includedirs {
 		path.join(BX_DIR, "include"),
-		path.join(BX_THIRD_PARTY_DIR, "UnitTest++/src"),
-	}
-
-	links {
-		"UnitTest++",
+		BX_THIRD_PARTY_DIR,
 	}
 
 	files {
