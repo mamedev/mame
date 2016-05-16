@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 // ImGui based debugger
 
 #include "emu.h"
@@ -119,6 +121,7 @@ private:
 	void draw_memory(debug_area* view_ptr, bool* opened);
 	void draw_bpoints(debug_area* view_ptr, bool* opened);
 	void draw_log(debug_area* view_ptr, bool* opened);
+	void draw_view(debug_area* view_ptr);
 	void update_cpu_view(device_t* device);
 	static bool get_view_source(void* data, int idx, const char** out_text);
 
@@ -173,12 +176,12 @@ static inline void map_attr_to_fg_bg(unsigned char attr, rgb_t *fg, rgb_t *bg)
 	*fg = rgb_t(0xff,0x00,0x00,0x00);
 
 	if(attr & DCA_ANCILLARY)
-		*bg = rgb_t(0xe6,0xd0,0xd0,0xd0);
+		*bg = rgb_t(0xcc,0xd0,0xd0,0xd0);
 	if(attr & DCA_SELECTED) {
-		*bg = rgb_t(0xe6,0xff,0x80,0x80);
+		*bg = rgb_t(0xcc,0xff,0x80,0x80);
 	}
 	if(attr & DCA_CURRENT) {
-		*bg = rgb_t(0xe6,0xff,0xff,0x00);
+		*bg = rgb_t(0xcc,0xff,0xff,0x00);
 	}
 	if(attr & DCA_CHANGED) {
 		*fg = rgb_t(0xff,0xff,0x00,0x00);
@@ -478,68 +481,77 @@ void debug_imgui::update_cpu_view(device_t* device)
 	view_main_regs->view->set_source(*source);
 }
 
+void debug_imgui::draw_view(debug_area* view_ptr)
+{
+	const debug_view_char *viewdata;
+	ImDrawList* drawlist;
+	debug_view_xy vsize;
+	unsigned char v;
+	int x,y;
+	ImVec2 xy1,xy2;
+	ImVec2 fsize = ImGui::CalcTextSize("A"); // any character will do, we should be using a monospaced font
+	rgb_t bg, fg;
+	rgb_t base(0xe6, 0xff, 0xff, 0xff);
+
+	vsize = view_ptr->view->visible_size();
+	viewdata = view_ptr->view->viewdata();
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
+	// update view location, while the cursor is at 0,0.
+	view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
+	view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
+	view_ptr->view_width = ImGui::GetContentRegionMax().x;
+	view_ptr->view_height = ImGui::GetContentRegionMax().y;
+	view_ptr->has_focus = ImGui::IsWindowFocused();
+	drawlist = ImGui::GetWindowDrawList();
+	xy1.x = view_ptr->ofs_x;
+	xy1.y = view_ptr->ofs_y;
+	xy2 = fsize;
+	xy2.x += view_ptr->ofs_x;
+	xy2.y += view_ptr->ofs_y;
+	for(y=0;y<vsize.y;y++)
+	{
+		for(x=0;x<vsize.x;x++)
+		{
+			char str[2];
+			map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
+			ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
+			str[0] = v = viewdata->byte;
+			str[1] = '\0';
+			if(bg != base)
+			{
+				ImU32 bg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(bg.r()/255.0f,bg.g()/255.0f,bg.b()/255.0f,bg.a()/255.0f));
+				xy1.x++; xy2.x++;
+				drawlist->AddRectFilled(xy1,xy2,bg_col);
+				xy1.x--; xy2.x--;
+			}
+			drawlist->AddText(xy1,fg_col,str);
+			xy1.x += fsize.x;
+			xy2.x += fsize.x;
+			viewdata++;
+		}
+		xy1.x = view_ptr->ofs_x;
+		xy2.x = view_ptr->ofs_x + fsize.x;
+		xy1.y += fsize.y;
+		xy2.y += fsize.y;
+	}
+	ImGui::SetCursorPos(ImVec2(xy1.x - view_ptr->ofs_x, xy1.y - view_ptr->ofs_y));
+	ImGui::PopStyleVar(2);
+}
+
 void debug_imgui::draw_bpoints(debug_area* view_ptr, bool* opened)
 {
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened))
 	{
-		rgb_t bg, fg;
-		rgb_t base(0xe6, 0xff, 0xff, 0xff);
-		const debug_view_char *viewdata;
-		debug_view_xy vsize,totalsize;
-		unsigned char v;
-		int x,y;
-		ImVec2 xy1,xy2;
-		ImVec2 fsize = ImGui::CalcTextSize("A"); // any character will do, we should be using a monospaced font
-		ImDrawList* drawlist;
+		debug_view_xy totalsize;
 
-		viewdata = view_ptr->view->viewdata();
 		totalsize = view_ptr->view->total_size();
 		view_ptr->view->set_visible_size(totalsize);
-		vsize = view_ptr->view->visible_size();
 
 		ImGui::BeginChild("##break_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
-		// update view location, while the cursor is at 0,0.
-		view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
-		view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
-		view_ptr->has_focus = ImGui::IsWindowFocused();
-		drawlist = ImGui::GetWindowDrawList();
-		xy1.x = view_ptr->ofs_x;
-		xy1.y = view_ptr->ofs_y;
-		xy2 = fsize;
-		xy2.x += view_ptr->ofs_x;
-		xy2.y += view_ptr->ofs_y;
-		for(y=0;y<vsize.y;y++)
-		{
-			for(x=0;x<vsize.x;x++)
-			{
-				char str[2];
-				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
-				ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
-				str[0] = v = viewdata->byte;
-				str[1] = '\0';
-				if(bg != base)
-				{
-					ImU32 bg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(bg.r()/255.0f,bg.g()/255.0f,bg.b()/255.0f,bg.a()/255.0f));
-					xy1.x++; xy2.x++;
-					drawlist->AddRectFilled(xy1,xy2,bg_col);
-					xy1.x--; xy2.x--;
-				}
-				drawlist->AddText(xy1,fg_col,str);
-				xy1.x += fsize.x;
-				xy2.x += fsize.x;
-				viewdata++;
-			}
-			xy1.x = view_ptr->ofs_x;
-			xy2.x = view_ptr->ofs_x + fsize.x;
-			xy1.y += fsize.y;
-			xy2.y += fsize.y;
-		}
-		ImGui::SetCursorPos(ImVec2(xy1.x - view_ptr->ofs_x, xy1.y - view_ptr->ofs_y));
-		ImGui::PopStyleVar(2);
-		ImGui::EndChild();
+		draw_view(view_ptr);
 
 		ImGui::End();
 	}
@@ -580,52 +592,15 @@ void debug_imgui::draw_log(debug_area* view_ptr, bool* opened)
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened))
 	{
-		rgb_t bg, fg;
-		const debug_view_char *viewdata;
-		debug_view_xy vsize,totalsize;
-		unsigned char v;
-		int x,y;
-		ImVec2 xy1;
-		ImVec2 fsize = ImGui::CalcTextSize("A"); // any character will do, we should be using a monospaced font
-		ImDrawList* drawlist;
+		debug_view_xy totalsize;
 
-		viewdata = view_ptr->view->viewdata();
 		totalsize = view_ptr->view->total_size();
 		if(totalsize.y > 100)
 			totalsize.y = 100;
 		view_ptr->view->set_visible_size(totalsize);
-		vsize = view_ptr->view->visible_size();
 
 		ImGui::BeginChild("##log_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
-		// update view location, while the cursor is at 0,0.
-		view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
-		view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
-		view_ptr->view_width = ImGui::GetContentRegionMax().x;
-		view_ptr->view_height = ImGui::GetContentRegionMax().y;
-		view_ptr->has_focus = ImGui::IsWindowFocused();
-		xy1.x = view_ptr->ofs_x;
-		xy1.y = view_ptr->ofs_y;
-		drawlist = ImGui::GetWindowDrawList();
-		for(y=0;y<vsize.y;y++)
-		{
-			for(x=0;x<vsize.x;x++)
-			{
-				char str[2];
-				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
-				ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
-				str[0] = v = viewdata->byte;
-				str[1] = '\0';
-				drawlist->AddText(xy1,fg_col,str);
-				xy1.x += fsize.x;
-				viewdata++;
-			}
-			xy1.x = view_ptr->ofs_x;
-			xy1.y += fsize.y;
-		}
-		ImGui::SetCursorPos(ImVec2(xy1.x - view_ptr->ofs_x, xy1.y - view_ptr->ofs_y));
-		ImGui::PopStyleVar(2);
+		draw_view(view_ptr);
 		ImGui::EndChild();
 
 		ImGui::End();
@@ -654,16 +629,9 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened,ImGuiWindowFlags_MenuBar))
 	{
-		rgb_t bg, fg;
-		rgb_t base(0xe6, 0xff, 0xff, 0xff);
-		const debug_view_char *viewdata;
-		debug_view_xy vsize,totalsize;
-		unsigned char v;
-		int x,y,idx;
+		debug_view_xy totalsize;
+		int idx;
 		bool done = false;
-		ImVec2 xy1,xy2;
-		ImVec2 fsize = ImGui::CalcTextSize("A"); // any character will do, we should be using a monospaced font
-		ImDrawList* drawlist;
 
 		if(ImGui::BeginMenuBar())
 		{
@@ -698,13 +666,10 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		ImGui::Separator();
 
 		// disassembly portion
-		viewdata = view_ptr->view->viewdata();
 		totalsize = view_ptr->view->total_size();
 		totalsize.y = 50;
 		view_ptr->view->set_visible_size(totalsize);
-		vsize = view_ptr->view->visible_size();
 
-		ImGui::BeginChild("##disasm_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		src = view_ptr->view->first_source();
 		idx = 0;
 		while (!done)
@@ -716,50 +681,11 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 			if(src == nullptr)
 				done = true;
 		}
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
-		// update view location, while the cursor is at 0,0.
-		view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
-		view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
-		view_ptr->view_width = ImGui::GetContentRegionMax().x;
-		view_ptr->view_height = ImGui::GetContentRegionMax().y;
-		view_ptr->has_focus = ImGui::IsWindowFocused();
-		drawlist = ImGui::GetWindowDrawList();
-		xy1.x = view_ptr->ofs_x;
-		xy1.y = view_ptr->ofs_y;
-		xy2 = fsize;
-		xy2.x += view_ptr->ofs_x;
-		xy2.y += view_ptr->ofs_y;
-		for(y=0;y<vsize.y;y++)
-		{
-			for(x=0;x<vsize.x;x++)
-			{
-				char str[2];
-				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
-				ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
-				str[0] = v = viewdata->byte;
-				str[1] = '\0';
-				if(bg != base)
-				{
-					ImU32 bg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(bg.r()/255.0f,bg.g()/255.0f,bg.b()/255.0f,bg.a()/255.0f));
-					xy1.x++; xy2.x++;
-					ImGui::GetWindowDrawList()->AddRectFilled(xy1,xy2,bg_col);
-					xy1.x--; xy2.x--;
-				}
-				drawlist->AddText(xy1,fg_col,str);
-				xy1.x += fsize.x;
-				xy2.x += fsize.x;
-				viewdata++;
-			}
-			xy1.x = view_ptr->ofs_x;
-			xy2.x = view_ptr->ofs_x + fsize.x;
-			xy1.y += fsize.y;
-			xy2.y += fsize.y;
-		}
-		ImGui::SetCursorPos(ImVec2(xy1.x - view_ptr->ofs_x, xy1.y - view_ptr->ofs_y));
-		ImGui::PopStyleVar(2);
-		ImGui::EndChild();
 
+		ImGui::BeginChild("##disasm_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
+		draw_view(view_ptr);
+		ImGui::EndChild();
+		
 		ImGui::End();
 	}
 }
@@ -788,16 +714,9 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened,ImGuiWindowFlags_MenuBar))
 	{
-		rgb_t bg, fg;
-		rgb_t base(0xe6, 0xff, 0xff, 0xff);
-		const debug_view_char *viewdata;
-		debug_view_xy vsize,totalsize;
-		unsigned char v;
-		int x,y,idx;
+		debug_view_xy totalsize;
+		int idx;
 		bool done = false;
-		ImVec2 xy1,xy2;
-		ImVec2 fsize = ImGui::CalcTextSize("A"); // any character will do, we should be using a monospaced font
-		ImDrawList* drawlist;
 
 		if(ImGui::BeginMenuBar())
 		{
@@ -856,14 +775,10 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		ImGui::Separator();
 
 		// memory editor portion
-		viewdata = view_ptr->view->viewdata();
 		totalsize = view_ptr->view->total_size();
 		if(totalsize.y > 256)
 			totalsize.y = 256;
 		view_ptr->view->set_visible_size(totalsize);
-		vsize = view_ptr->view->visible_size();
-
-		ImGui::BeginChild("##memory_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		src = view_ptr->view->first_source();
 		idx = 0;
 		while (!done)
@@ -875,50 +790,11 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 			if(src == nullptr)
 				done = true;
 		}
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
-		// update view location, while the cursor is at 0,0.
-		view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
-		view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
-		view_ptr->view_width = ImGui::GetContentRegionMax().x;
-		view_ptr->view_height = ImGui::GetContentRegionMax().y;
-		view_ptr->has_focus = ImGui::IsWindowFocused();
-		drawlist = ImGui::GetWindowDrawList();
-		xy1.x = view_ptr->ofs_x;
-		xy1.y = view_ptr->ofs_y;
-		xy2 = fsize;
-		xy2.x += view_ptr->ofs_x;
-		xy2.y += view_ptr->ofs_y;
-		for(y=0;y<vsize.y;y++)
-		{
-			for(x=0;x<vsize.x;x++)
-			{
-				char str[2];
-				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
-				ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
-				str[0] = v = viewdata->byte;
-				str[1] = '\0';
-				if(bg != base)
-				{
-					ImU32 bg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(bg.r()/255.0f,bg.g()/255.0f,bg.b()/255.0f,bg.a()/255.0f));
-					xy1.x++; xy2.x++;
-					drawlist->AddRectFilled(xy1,xy2,bg_col);
-					xy1.x--; xy2.x--;
-				}
-				drawlist->AddText(xy1,fg_col,str);
-				xy1.x += fsize.x;
-				xy2.x += fsize.x;
-				viewdata++;
-			}
-			xy1.x = view_ptr->ofs_x;
-			xy2.x = view_ptr->ofs_x + fsize.x;
-			xy1.y += fsize.y;
-			xy2.y += fsize.y;
-		}
-		ImGui::SetCursorPos(ImVec2(xy1.x - view_ptr->ofs_x, xy1.y - view_ptr->ofs_y));
-		ImGui::PopStyleVar(2);
-		ImGui::EndChild();
 
+		ImGui::BeginChild("##memory_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
+		draw_view(view_ptr);
+		ImGui::EndChild();
+		
 		ImGui::End();
 	}
 }
@@ -949,13 +825,7 @@ void debug_imgui::draw_console()
 	ImGui::SetNextWindowSize(ImVec2(view_main_regs->width + view_main_disasm->width,view_main_disasm->height + view_main_console->height + ImGui::GetTextLineHeight()*3),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_main_console->title.c_str(), nullptr,flags))
 	{
-		const debug_view_char *viewdata;
-		debug_view_xy vsize,totalsize;
-		unsigned char v;
-		int x,y;
-		ImDrawList* drawlist;
-		ImVec2 xy1,xy2;
-		ImVec2 fsize = ImGui::CalcTextSize("A");
+		debug_view_xy totalsize;
 		std::string str;
 
 		if(ImGui::BeginMenuBar())
@@ -1037,135 +907,35 @@ void debug_imgui::draw_console()
 		}
 
 		// CPU state portion
-		viewdata = view_main_regs->view->viewdata();
 		totalsize = view_main_regs->view->total_size();
 		view_main_regs->view->set_visible_size(totalsize);
-		vsize = view_main_regs->view->visible_size();
 
 		ImGui::BeginChild("##state_output", ImVec2(180,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*2));  // account for title bar and menu
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
-		// update view location, while the cursor is at 0,0.
-		view_main_regs->ofs_x = ImGui::GetCursorScreenPos().x;
-		view_main_regs->ofs_y = ImGui::GetCursorScreenPos().y;
-		view_main_regs->view_width = ImGui::GetContentRegionMax().x;
-		view_main_regs->view_height = ImGui::GetContentRegionMax().y;
-		view_main_regs->has_focus = ImGui::IsWindowFocused();
-		xy1.x = view_main_regs->ofs_x;
-		xy1.y = view_main_regs->ofs_y;
-		drawlist = ImGui::GetWindowDrawList();
-		for(y=0;y<vsize.y;y++)
-		{
-			for(x=0;x<vsize.x;x++)
-			{
-				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
-				ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
-				v = viewdata->byte;
-				str = v;
-				drawlist->AddText(xy1,fg_col,str.c_str());
-				viewdata++;
-				xy1.x += fsize.x;
-			}
-			xy1.x = view_main_regs->ofs_x;
-			xy1.y += fsize.y;
-		}
-		ImGui::SetCursorPos(ImVec2(xy1.x - view_main_regs->ofs_x, xy1.y - view_main_regs->ofs_y));
-		ImGui::PopStyleVar(2);
+		draw_view(view_main_regs);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
 
 		ImGui::BeginChild("##right_side", ImVec2(ImGui::GetWindowWidth() - ImGui::GetCursorPosX() - 8,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*2));
 		// disassembly portion
-		viewdata = view_main_disasm->view->viewdata();
 		totalsize = view_main_disasm->view->total_size();
 		totalsize.y = 20;
 		view_main_disasm->view->set_visible_size(totalsize);
-//      height = ImGui::GetTextLineHeight();
-		vsize = view_main_disasm->view->visible_size();
 
 		ImGui::BeginChild("##disasm_output", ImVec2(ImGui::GetWindowWidth() - ImGui::GetCursorPosX() - 8,(ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*4)/2));
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
-		// update view location, while the cursor is at 0,0.
-		view_main_disasm->ofs_x = ImGui::GetCursorScreenPos().x;
-		view_main_disasm->ofs_y = ImGui::GetCursorScreenPos().y;
-		view_main_disasm->view_width = ImGui::GetContentRegionMax().x;
-		view_main_disasm->view_height = ImGui::GetContentRegionMax().y;
-		view_main_disasm->has_focus = ImGui::IsWindowFocused();
-		xy1.x = view_main_disasm->ofs_x;
-		xy1.y = view_main_disasm->ofs_y;
-		xy2.x = view_main_disasm->ofs_x + fsize.x;
-		xy2.y = view_main_disasm->ofs_y + fsize.y;
-		drawlist = ImGui::GetWindowDrawList();
-		for(y=0;y<vsize.y;y++)
-		{
-			for(x=0;x<vsize.x;x++)
-			{
-				char str[2];
-				map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
-				ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
-				str[0] = v = viewdata->byte;
-				str[1] = '\0';
-				if(bg != base)
-				{
-					ImU32 bg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(bg.r()/255.0f,bg.g()/255.0f,bg.b()/255.0f,bg.a()/255.0f));
-					xy1.x++; xy2.x++;
-					ImGui::GetWindowDrawList()->AddRectFilled(xy1,xy2,bg_col);
-					xy1.x--; xy2.x--;
-				}
-				drawlist->AddText(xy1,fg_col,str);
-				viewdata++;
-				xy1.x += fsize.x;
-				xy2.x += fsize.x;
-			}
-			xy1.x = view_main_disasm->ofs_x;
-			xy1.y += fsize.y;
-			xy2.x = view_main_disasm->ofs_x + fsize.x;
-			xy2.y += fsize.y;
-		}
-		ImGui::SetCursorPos(ImVec2(xy1.x - view_main_disasm->ofs_x, xy1.y - view_main_disasm->ofs_y));
-		ImGui::PopStyleVar(2);
+		draw_view(view_main_disasm);
 		ImGui::EndChild();
 
 		ImGui::Separator();
 
 		// console portion
-		viewdata = view_main_console->view->viewdata();
 		totalsize = view_main_console->view->total_size();
 		if(totalsize.y > 100)
 			totalsize.y = 100;
 		view_main_console->view->set_visible_size(totalsize);
-//      height = ImGui::GetTextLineHeight();
-		vsize = view_main_console->view->visible_size();
 
 		ImGui::BeginChild("##console_output", ImVec2(ImGui::GetWindowWidth() - ImGui::GetCursorPosX() - 8,(ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*4)/2 - ImGui::GetTextLineHeight()));
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
-		// update view location, while the cursor is at 0,0.
-		view_main_console->ofs_x = ImGui::GetCursorScreenPos().x;
-		view_main_console->ofs_y = ImGui::GetCursorScreenPos().y;
-		view_main_console->view_width = ImGui::GetContentRegionMax().x;
-		view_main_console->view_height = ImGui::GetContentRegionMax().y;
-		view_main_console->has_focus = ImGui::IsWindowFocused();
-		xy1.x = view_main_console->ofs_x;
-		xy1.y = view_main_console->ofs_y;
-		drawlist = ImGui::GetWindowDrawList();
-		for(y=0;y<vsize.y;y++)
-		{
-			for(x=0;x<vsize.x;x++)
-			{
-				v = viewdata->byte;
-				str = v;
-				drawlist->AddText(xy1,ImGui::ColorConvertFloat4ToU32(ImVec4(0,0,0,255)),str.c_str());
-				xy1.x += fsize.x;
-				viewdata++;
-			}
-			xy1.x = view_main_console->ofs_x;
-			xy1.y += fsize.y;
-		}
-		ImGui::SetCursorPos(ImVec2(xy1.x - view_main_console->ofs_x, xy1.y - view_main_console->ofs_y));
-		ImGui::PopStyleVar(2);
+		draw_view(view_main_console);
 		ImGui::EndChild();
 		ImGui::Separator();
 		//if(ImGui::IsWindowFocused())
@@ -1200,6 +970,7 @@ void debug_imgui::update()
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab,ImVec4(0.6f,0.6f,0.6f,0.8f));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered,ImVec4(0.7f,0.7f,0.7f,0.8f));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,ImVec4(0.9f,0.9f,0.9f,0.8f));
+	ImGui::PushStyleColor(ImGuiCol_Border,ImVec4(0.7f,0.7f,0.7f,0.8f));
 
 	m_text_size = ImGui::CalcTextSize("A");  // hopefully you're using a monospaced font...
 	draw_console();  // We'll always have a console window
@@ -1241,7 +1012,7 @@ void debug_imgui::update()
 		view_list_remove(to_delete);
 		global_free(to_delete);
 	}
-	ImGui::PopStyleColor(11);
+	ImGui::PopStyleColor(12);
 }
 
 void debug_imgui::init_debugger(running_machine &machine)

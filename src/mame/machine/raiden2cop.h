@@ -16,9 +16,6 @@
 #define MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(_devcb) \
 	devcb = &raiden2cop_device::set_m_videoramout_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_ITOA_UNUSED_DIGIT_VALUE(value) \
-	raiden2cop_device::set_itoa_unused_digit_value(*device, value);
-
 #define MCFG_CPU_IS_68K(value) \
 	raiden2cop_device::set_cpu_is_68k(*device, value);
 
@@ -87,15 +84,12 @@ public:
 
 	DECLARE_WRITE16_MEMBER( cop_itoa_low_w );
 	DECLARE_WRITE16_MEMBER( cop_itoa_high_w );
-	DECLARE_WRITE16_MEMBER( cop_itoa_digit_count_w );
+	DECLARE_WRITE16_MEMBER( cop_itoa_mode_w );
 	DECLARE_READ16_MEMBER ( cop_itoa_digits_r );
 
 	UINT32 cop_itoa;
-	UINT16 cop_itoa_digit_count;
+	UINT16 cop_itoa_mode;
 	UINT8 cop_itoa_digits[10];
-	UINT8 m_cop_itoa_unused_digit_value;
-
-	static void set_itoa_unused_digit_value(device_t &device, int value) { downcast<raiden2cop_device &>(device).m_cop_itoa_unused_digit_value = value; }
 
 	// Main COP functionality
 
@@ -228,8 +222,12 @@ public:
 	int m_cop_sprite_dma_size;
 
 	// misc 68k
-	UINT16 m_cop_rom_addr_lo,m_cop_rom_addr_hi,m_cop_rom_addr_unk;
-	DECLARE_WRITE16_MEMBER(cop_rom_addr_unk_w);
+	UINT16 m_cop_unk_param_a,m_cop_unk_param_b;
+	DECLARE_WRITE16_MEMBER(cop_unk_param_a_w);
+	DECLARE_WRITE16_MEMBER(cop_unk_param_b_w);
+
+	UINT16 m_cop_rom_addr_lo,m_cop_rom_addr_hi,m_cop_precmd;
+	DECLARE_WRITE16_MEMBER(cop_precmd_w);
 	DECLARE_WRITE16_MEMBER(cop_rom_addr_lo_w);
 	DECLARE_WRITE16_MEMBER(cop_rom_addr_hi_w);
 

@@ -578,7 +578,7 @@ int renderer_d3d9::initialize()
 		return false;
 	}
 
-	// create the device immediately for the full screen case (defer for window mode)
+	// create the device immediately for the full screen case (defer for window mode in update_window_size())
 	auto win = assert_window();
 	if (win->fullscreen() && device_create(win->main_window()->platform_window<HWND>()))
 	{
@@ -838,7 +838,7 @@ try_again:
 	m_presentation.MultiSampleType               = D3DMULTISAMPLE_NONE;
 	m_presentation.SwapEffect                    = D3DSWAPEFFECT_DISCARD;
 	m_presentation.hDeviceWindow                 = win->platform_window<HWND>();
-	m_presentation.Windowed                      = !win->fullscreen() || win->win_has_menu();
+	m_presentation.Windowed                      = !win->fullscreen() || !video_config.switchres || win->win_has_menu();
 	m_presentation.EnableAutoDepthStencil        = FALSE;
 	m_presentation.AutoDepthStencilFormat        = D3DFMT_D16;
 	m_presentation.Flags                         = 0;
@@ -1034,7 +1034,6 @@ void renderer_d3d9::device_delete()
 	// free the device itself
 	if (m_device != nullptr)
 	{
-		(*d3dintf->device.reset)(m_device, &m_presentation);
 		(*d3dintf->device.release)(m_device);
 		m_device = nullptr;
 	}

@@ -14021,8 +14021,9 @@ amaztron                        // Coleco
 astro                           // Kosmos
 bankshot                        // Parker Bros
 bigtrak                         // Milton Bradley
+bship                           // Milton Bradley
 copycat                         // Tiger Electronics
-copycatm2                        // Tiger Electronics
+copycatm2                       // Tiger Electronics
 cnfball                         // Conic
 cnfball2                        // Conic
 cnsector                        // Parker Bros
@@ -27332,6 +27333,9 @@ mustache                        // (c) 1987 March
 @source:mvme350.cpp
 mvme350                         //
 
+@source:mvme147.cpp
+mvme147                         // (c) 1989 Motorola
+
 @source:mw18w.cpp
 18w                             // 653 (c) 1979 Midway
 18w2                            // 653 (c) 1979 Midway
@@ -29340,6 +29344,7 @@ tg16                            // Turbo Grafix-16  NEC 1989-1993
 
 @source:pce220.cpp
 pce220                          // Pocket Computer E220
+pcg815                          // Pocket Computer G815
 pcg850v                         // Pocket Computer G850V
 
 @source:pcfx.cpp

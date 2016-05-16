@@ -1,0 +1,283 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- Thanks to DCMOTO (http://dcmoto.free.fr) for info! -->
+<softwarelist name="to7_qd" description="Thomson TO7 &amp; TO7/70 QD disks">
+
+<!-- Applications -->
+
+	<software name="transfer">
+		<description>Transfer</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="transfer.qd" size="51200" crc="28b91794" sha1="a82e85de2c1d5e83827a5d9d40ef54450bc7eac9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Games -->
+
+	<software name="sydney">
+		<description>L'Affaire Sydney</description>
+		<year>1986</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="flop1" interface="thom_flop">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="51200">
+				<rom name="sydney1.qd" size="51200" crc="7e8f6e02" sha1="a6dba6ecc7d352b1226a0ed0663dccc93fc10938" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="thom_flop">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="51200">
+				<rom name="sydney2.qd" size="51200" crc="0474c138" sha1="73fa47083029c9db46e5c37c0d957c7e69d7f482" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aigleor" supported="no">
+		<description>L'Aigle d'Or (Bad?)</description>
+		<year>1985</year>
+		<publisher>Loriciels</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="aigleor.qd" size="51200" crc="9bd93158" sha1="71802bcfa261ff32016ab664d9bb39a6ca423822" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beachead">
+		<description>Beach Head</description>
+		<year>1985</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="beachead.qd" size="51200" crc="a74a5003" sha1="b786d6182af7dda71b8ef89d262d97c7ff300948" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluewar">
+		<description>Blue War</description>
+		<year>1986</year>
+		<publisher>Free Game Blot</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="bluewar.qd" size="51200" crc="1e4ef5f7" sha1="27d6336b660a20f514125f1133b7caf14bd35057" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- can also be found in mo5_qd.xml -->
+	<software name="erebus">
+		<description>Erebus</description>
+		<year>1986</year>
+		<publisher>EH Services</publisher>
+
+		<part name="flop1" interface="thom_flop">
+		<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="51200">
+				<rom name="erebus1a.qd" size="51200" crc="8bd3f65c" sha1="2c0d9e3abdb0003bd9341a2bcc439517c4a574ab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="thom_flop">
+		<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="51200">
+				<rom name="erebus1b.qd" size="51200" crc="c3c0a0a6" sha1="ffa8696cfbefdfaf497ca3694fbea0c32747982f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="thom_flop">
+		<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="51200">
+				<rom name="erebus2a.qd" size="51200" crc="804f4d94" sha1="1be13476dd5f203c2c89ac035d99455ee2a4790c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="thom_flop">
+		<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="51200">
+				<rom name="erebus2b.qd" size="51200" crc="0a97ab6f" sha1="704e57de58c4663b26d424fa95270d7076bf48e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="histheat">
+		<description>Histoire de Theatre</description>
+		<year>1985</year>
+		<publisher>Free Game Blot</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="histheat.qd" size="51200" crc="ee4f562d" sha1="f3f48023c0293d7c2d67df983951489fd7e0aa4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="histheata" cloneof="histheat">
+		<description>Histoire de Theatre (Alt)</description>
+		<year>1985</year>
+		<publisher>Free Game Blot</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="histheata.qd" size="51200" crc="c2549a06" sha1="ceb6c707f415a2c04d3d0b6f24e30184e838746f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karate">
+		<description>Karate</description>
+		<year>1985</year>
+		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="karate.qd" size="51200" crc="64d50122" sha1="c740c5ea101ea0e7ee0a73838644322a27dd2d99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karatea" cloneof="karate">
+		<description>Karate (Alt)</description>
+		<year>1985</year>
+		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="karatea.qd" size="51200" crc="802f4d9d" sha1="7ed3274bd7f6209814ae138150ff0cdd2fbeb262" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasvegas">
+		<description>Las Vegas</description>
+		<year>1985</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="flop1" interface="thom_flop">
+		<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="51200">
+				<rom name="lasvegas1a.qd" size="51200" crc="5d8dec98" sha1="ff5a3d75fdbea267ad70387bf578e546a6048748" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="thom_flop">
+		<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="51200">
+				<rom name="lasvegas1b.qd" size="51200" crc="5bf3ae67" sha1="691683069b450ebf98ac6db5e2de7bc31cbc77db" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="thom_flop">
+		<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="51200">
+				<rom name="lasvegas2a.qd" size="51200" crc="45b4bafa" sha1="79399bd9dabe54c25a644d0c7784106feb18c738" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="thom_flop">
+		<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="51200">
+				<rom name="lasvegas2b.qd" size="51200" crc="ef0d8f9e" sha1="cf5cc651fc2dbb87d14b551fb4ed67fcc954f6c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="malthaar">
+		<description>La Malediction de Thaar</description>
+		<year>1986</year>
+		<publisher>Coktel Vision</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="malthaar.qd" size="51200" crc="efd93c89" sha1="f4639a4a6202ef97f59f471c89f823e120edaf0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meurtatl">
+		<description>Meurtres sur l'Atlantique</description>
+		<year>1986</year>
+		<publisher>Cobrasoft</publisher>
+
+		<part name="flop1" interface="thom_flop">
+		<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="51200">
+				<rom name="meurtatl1a.qd" size="51200" crc="c55d6ae7" sha1="0be2e312bee30bb1b44ae278c263adcab5535dee" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="thom_flop">
+		<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="51200">
+				<rom name="meurtatl1b.qd" size="51200" crc="37f261bd" sha1="9ccecf4eef1384f3f4c3d0b5009a38ad22ef4fd8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minediam">
+		<description>La Mine aux Diamants</description>
+		<year>1986</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="minediam.qd" size="51200" crc="462df387" sha1="52351f30119d17d4b385b18a79ae8489a4070bea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbridge">
+		<description>Mini Bridge</description>
+		<year>1986</year>
+		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="mbridge.qd" size="51200" crc="2eef446b" sha1="babbb621e6b227fb5c249afd804e976a327c9a87" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbridgea" cloneof="mbridge">
+		<description>Mini Bridge (Alt)</description>
+		<year>1986</year>
+		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="mbridgea.qd" size="51200" crc="02f48840" sha1="4a84044a9cece29ceeb940257060c0eed82527a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- how to run the game? -->
+	<software name="poseidon" supported="no">
+		<description>Poseidon</description>
+		<year>1985</year>
+		<publisher>Coktel Vision</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="poseidon.qd" size="51200" crc="fa5ef752" sha1="9cafeaf09230945c5c5686958a5e0633422e8a1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanpablo">
+		<description>San Pablo</description>
+		<year>1985</year>
+		<publisher>Coktel Vision</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="sanpablo.qd" size="51200" crc="bdb21fe6" sha1="5b290a45ae698795bfd7934d61cad727d87dc17e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

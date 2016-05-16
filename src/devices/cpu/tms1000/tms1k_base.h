@@ -110,6 +110,8 @@ public:
 	template<class _Object> static devcb_base &set_write_r_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_write_r.set_callback(object); }
 	template<class _Object> static devcb_base &set_power_off_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_power_off.set_callback(object); }
 	static void set_output_pla(device_t &device, const UINT16 *output_pla) { downcast<tms1k_base_device &>(device).m_output_pla_table = output_pla; }
+	
+	UINT8 debug_peek_o_index() { return m_o_index; } // get output PLA index, for debugging (don't use in emulation)
 
 	// microinstructions
 	enum
@@ -267,6 +269,7 @@ protected:
 	UINT32  m_micro;
 	int     m_subcycle;
 	int     m_icount;
+	UINT8   m_o_index;
 
 	UINT8   m_o_pins;    // how many O pins
 	UINT8   m_r_pins;    // how many R pins

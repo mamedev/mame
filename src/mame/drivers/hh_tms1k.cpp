@@ -46,7 +46,7 @@
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
- *MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
+ @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
  *MP3300   TMS1000   1980, Estrela Genius (from Brazil, looks and plays identical to Simon)
@@ -111,18 +111,21 @@
     brighter: tc4/h2hfootb(offense), bankshot(cue ball), ...
   - stopthiep: unable to start a game (may be intentional?)
   - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
+  - finish bship SN76477 sound
 
 ***************************************************************************/
 
 #include "includes/hh_tms1k.h"
 #include "machine/tms1024.h"
 #include "sound/beep.h"
+#include "sound/sn76477.h"
 
 // internal artwork
 #include "amaztron.lh" // clickable
 #include "astro.lh"
 #include "bankshot.lh"
 #include "bigtrak.lh"
+#include "bship.lh" // clickable
 #include "cnfball.lh"
 #include "cnfball2.lh"
 #include "cnsector.lh" // clickable
@@ -3619,6 +3622,184 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Milton Bradley Electronic Battleship (1977/1979 version)
+  * PCB label MB 4750B
+  * TMS1000NLL MP3208 (die label 1000C, MP3208)
+  * SN75494N (acting as inverters), SN76477 sound
+  * 4 sliding buttons, light bulb
+  
+  This is a 2-player electronic board game. It still needs game pieces like the
+  original Battleship board game.
+
+***************************************************************************/
+
+class bship_state : public hh_tms1k_state
+{
+public:
+	bship_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_sn(*this, "sn76477")
+	{ }
+
+	required_device<sn76477_device> m_sn;
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(bship_state::write_r)
+{
+	// R0-R10: input mux
+	m_inp_mux = data;
+	
+	// R4: 75494 to R12 33K to SN76477 pin 20
+	m_sn->slf_res_w((data & 0x10) ? RES_INF : RES_K(33));
+}
+
+WRITE16_MEMBER(bship_state::write_o)
+{
+	//printf("%X ", m_maincpu->debug_peek_o_index() & 0xf);
+
+	// O0: SN76477 pin 9
+	m_sn->enable_w(data & 1);
+	
+	// O1: 75494 to R4 100K to SN76477 pin 18
+	// O2: 75494 to R3 150K to SN76477 pin 18
+	double o12 = RES_INF;
+	switch (~data >> 1 & 3)
+	{
+		case 0: o12 = RES_INF; break;
+		case 1: o12 = RES_K(100); break;
+		case 2: o12 = RES_K(150); break;
+		case 3: o12 = RES_2_PARALLEL(RES_K(100), RES_K(150)); break;
+	}
+	m_sn->vco_res_w(o12);
+	
+	// O2,O6: (TODO) to SN76477 pin 21
+	//m_sn->slf_cap_w(x);
+	
+	// O4: SN76477 pin 22
+	m_sn->vco_w(data >> 4 & 1);
+	
+	// O5: R11 27K to SN76477 pin 23
+	m_sn->one_shot_cap_w((data & 0x20) ? RES_K(27) : RES_INF);
+	
+	// O6: SN76477 pin 25
+	m_sn->mixer_b_w(data >> 6 & 1);
+	
+	// O7: 75494 to light bulb
+	display_matrix(1, 1, data >> 7 & 1, 1);
+}
+
+READ8_MEMBER(bship_state::read_k)
+{
+	// K: multiplexed inputs (note: the Vss row is always on)
+	return m_inp_matrix[11]->read() | read_inputs(11);
+}
+
+
+// config
+
+static INPUT_PORTS_START( bship )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("P1 A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 A")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("P1 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("P1 B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 B")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("P1 3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("P1 C")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 C")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("P1 4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("P1 D")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 D")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("P1 5")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("P1 E")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 E")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("P1 6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("P1 F")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 F")
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("P1 7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("P1 G")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 7")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 G")
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("P1 8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("P1 H")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 8")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 H")
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("P1 9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("P1 I")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 I")
+
+	PORT_START("IN.9") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("P1 10")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P1 J")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 10")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 J")
+
+	PORT_START("IN.10") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("P1 Fire")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Fire")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_TOGGLE PORT_CODE(KEYCODE_F1) PORT_NAME("Load/Go") // switch
+
+	PORT_START("IN.11") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("P1 Clear Memory") // CM
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("P1 Clear Last Entry") // CLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Clear Memory")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Clear Last Entry")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( bship, bship_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 225000) // approximation - RC osc. R=47K, C=100pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(bship_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bship_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bship_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_bship)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76477", SN76477, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Milton Bradley Simon, created by Ralph Baer
 
   Revision A hardware:
@@ -5750,6 +5931,17 @@ ROM_START( comp4 )
 ROM_END
 
 
+ROM_START( bship )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3208", 0x0000, 0x0400, CRC(982fa720) SHA1(1c6dbbe7b9e55d62a510225a88cd2de55fe9b181) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_bship_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_bship_output.pla", 0, 365, BAD_DUMP CRC(74a9a244) SHA1(479c1f1e37cf8f75352e10226b20322906bee813) ) // part of decap photo was obscured
+ROM_END
+
+
 ROM_START( simon )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tms1000.u1", 0x0000, 0x0400, CRC(9961719d) SHA1(35dddb018a8a2b31f377ab49c1f0cb76951b81c0) )
@@ -5972,6 +6164,7 @@ COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kos
 CONS( 1980, mdndclab,  0,        0, mdndclab,  mdndclab,  driver_device, 0, "Mattel", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+CONS( 1977, bship,     0,        0, bship,     bship,     driver_device, 0, "Milton Bradley", "Electronic Battleship (1977/1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, bigtrak,   0,        0, bigtrak,   bigtrak,   driver_device, 0, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***

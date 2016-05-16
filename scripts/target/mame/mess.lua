@@ -2057,6 +2057,7 @@ createMESSProjects(_target, _subtarget, "motorola")
 files {
 	MAME_DIR .. "src/mame/drivers/m6805evs.cpp",
 	MAME_DIR .. "src/mame/drivers/mekd2.cpp",
+	MAME_DIR .. "src/mame/drivers/mvme147.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "multitch")
