@@ -887,16 +887,16 @@ static ADDRESS_MAP_START( flaming7_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
 
 	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0x9a00, 0x9fff) AM_RAM
+//	AM_RANGE(0x9a00, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xa200, 0xa7ff) AM_RAM
+//	AM_RANGE(0xa200, 0xa7ff) AM_RAM
 	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xaa00, 0xafff) AM_RAM
-	
-	AM_RANGE(0xb000, 0xb03f) AM_RAM
+//	AM_RANGE(0xaa00, 0xafff) AM_RAM
+
+//	AM_RANGE(0xb000, 0xb03f) AM_RAM
 	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xb0c0, 0xb0ff) AM_RAM
+//	AM_RANGE(0xb0c0, 0xb0ff) AM_RAM
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
 	AM_RANGE(0xb180, 0xb7ff) AM_RAM
 
@@ -908,7 +908,7 @@ static ADDRESS_MAP_START( flaming7_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0xb860, 0xb860) AM_WRITE(p2_lamps_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* sound */
-	AM_RANGE(0xc000, 0xd3ff) AM_RAM
+//	AM_RANGE(0xc000, 0xd3ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 /*
@@ -6910,7 +6910,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( flaming7 )
 	PORT_START("IN0")   /* d800 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("Button Lockout")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Double-Up")
