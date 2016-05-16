@@ -14882,7 +14882,7 @@ GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,driver_device,  0,        
 
 
 // --- Flaming 7's hardware (W-4 derivative) ---
-GAME(  199?, fl7_3121,  0,        flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Red, White & Blue 7's + Hollywood Nights)",     MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )
+GAME(  199?, fl7_3121,  0,        flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Red, White & Blue 7's + Hollywood Nights)",     MACHINE_NOT_WORKING )
 
 
 // --- Wing W-8 hardware ---
