@@ -367,6 +367,17 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
+
+	<software name="ayayo123">
+		<description>Hatchake Ayayo-san 1-2-3</description>
+		<year>1993</year>
+		<publisher>Hard</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Hatchake ayayo-san 1-2-3" sha1="b9d11ce0cdcb144cbda9f9fdb2c9b7b02b8400a5" />
+			</diskarea>
+		</part>
+	</software>
 	
 	<software name="ayumi">
 		<description>Ayumi-chan Monogatari</description>
@@ -1504,6 +1515,17 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 	
+	<software name="gnutowns">
+		<description>GNU for Towns Release 2</description>
+		<year>1991</year>
+		<publisher>FM Users Group</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="[os] gnu for towns release 2" sha1="88cd789cc6b608c554b9421488e2baf4e986385c" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="goh2">
 		<description>Goh II Towns Special</description>
 		<year>1993</year>
@@ -1538,6 +1560,147 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="gunship - the helicopter simulation" sha1="27c9e702097d1663302dc10fd5dccdd9ba8d6fc8" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="hanakiok">
+		<description>Hana no Kioku</description>
+		<year>1995</year>
+		<publisher>Foster</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hana no kioku" sha1="d0ade7a3f7f36fa8a5f8bd6016643823a913b866" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="hanapon">
+		<description>Hanafuda de Pon!</description>
+		<year>1996</year>
+		<publisher>Active</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="hanafuda de pon! (boot disk).hdm" size="1261568" crc="cad3cfe6" sha1="3d4eb251057b7a82cabb683114731013ced571ad" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hanafuda de pon!" sha1="e6c9322b57da82c08ac7a7d91e50771214820806" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="heartron">
+		<description>Heart de Ron!!</description>
+		<year>1995</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="heart de ron!!" sha1="1c95cf153e055068b71f8fd6fffe760d1ddd2ac0" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="highccom">
+		<description>High C Compiler Multimedia Development Kit v1.7 L13</description>
+		<year>1995</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="high c compiler multimedia development kit v1.7 l13" sha1="1755383d812fe07b4ad2cd0b44c111cb14b25ae7" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="highlt20">
+		<description>Highlight CD 20</description>
+		<year>1993</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom1" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="highlight cd 20 (disc 1)" sha1="50be2720db6e121f744d12641a09168a80e330b5" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="highlight cd 20 (disc 2)" sha1="b7251d8531bf3a18e32beec3e9d836de203052ac" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="hoshis1">
+		<description>Hoshi no Suna Monogatari</description>
+		<year>1992</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hoshi no suna monogatari" sha1="3484f993ecabe99049522ca7cb67334609982269" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="hoshis2">
+		<description>Hoshi no Suna Monogatari 2</description>
+		<year>1992</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hoshi no suna monogatari 2" sha1="6fba473c7964bdd99b932d570af86a0115bcc798" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="hoshis3">
+		<description>Hoshi no Suna Monogatari 3</description>
+		<year>1995</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hoshi no suna monogatari 3" sha1="6526c4192fcfb73dbf32f4d2a2575ae6a554d376" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="hypraddr">
+		<description>Hyper Address</description>
+		<year>1990</year>
+		<publisher>Datt Japan</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="hyper address (system disk).hdm" size="1261568" crc="9f587fde" sha1="4344771e7f36b8a3461c9d69ea8cb6057fab19f4" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hyper address" sha1="0b71c0bea2d66cf60f6c37cabc9284be794ff5cb" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="hyprocea">
+		<description>Hyper Ocean</description>
+		<year>1993</year>
+		<publisher>Datt Japan</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hyper ocean" sha1="4aeb8ac2f4432832d46668e2a5572260a946724c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="idolproj">
+		<description>Idol Project</description>
+		<year>1995</year>
+		<publisher>KSS</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="idol project (system disk).hdm" size="1261568" crc="59d7e80e" sha1="91c06dc48b2b25bae7050066e115694729efd861" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="idol project" sha1="3de1bb37efe32d490c32acc9211765ce6f578779" />
 			</diskarea>
 		</part>
 	</software>
@@ -1579,6 +1742,127 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 	
+	<software name="indy3">
+		<description>Indiana Jones and the Last Crusade</description>
+		<year>1990</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="indiana jones and the last crusade" sha1="c5572d475a0dfc215a4dd7da99de1da3641b906f" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="indy4">
+		<description>Indiana Jones and the Fate of Atlantis</description>
+		<year>1993</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="indiana jones and the fate of atlantis" sha1="e60dff85f2932966f28732c91165dc4e483756de" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="infest">
+		<description>Infestation: Chinmoku no Wakusei</description>
+		<year>1992</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="infestation" sha1="08cb569b0227db10f938adc42c92987634714787" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="injuugak">
+		<description>Injuu Gakuen: La Blue Girl</description>
+		<year>1994</year>
+		<publisher>DEZ</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="injuu gakuen - la blue girl" sha1="5e9d0e7657f8834277ec7f2833fe3d3cc889b6e2" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="ishidou">
+		<description>Ishidou</description>
+		<year>1990</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ishidou" sha1="141cb39d019581436a7ea6e99dd0411b4f7ef30a" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="janjaka">
+		<description>Jan Jaka Jan</description>
+		<year>1992</year>
+		<publisher>Elf</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="jan jaka jan" sha1="eff72281e9c2867ddc2940386f4bcca2c1d1af54" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="jango4">
+		<description>Jango 4</description>
+		<year>1994</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="jango 4" sha1="c3c47c867fff8869f53bc7afb5f3dd944146c27e" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="jankirou">
+		<description>Jankirou</description>
+		<year>1994</year>
+		<publisher>Fairytale</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="jankirou" sha1="b299d72db8a36c196f6795d450c9541244b1b208" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="jealousy">
+		<description>Jealousy</description>
+		<year>1995</year>
+		<publisher>Interheart</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="jealousy" sha1="49244a1e50fc4300f4ead328d4b43c8449042d53" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="joshikou">
+		<description>Joshikousei Shoujo Hatsunetsu</description>
+		<year>1993</year>
+		<publisher>Byakuya-Shobo</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="joshikousei shoujo hakunetsu" sha1="e8d9cb254a16d113544a2e3dba6b73a93003b915" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="joshua">
+		<description>Joshua</description>
+		<year>1992</year>
+		<publisher>Panther Software</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="joshua" sha1="038de795c9f4bd6eef3758d94187c9c0855a1a44" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="links386">
 		<description>Golf Links 386 Pro</description>
 		<year>1995</year>
@@ -1587,6 +1871,28 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="golf links 386 pro" sha1="c0eb847d7168e6209482b19a270bd81d40383137" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="mode7dmo">
+		<description>Mode 7 Demo</description>
+		<year>2008</year>
+		<publisher>Rastersoft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mode 7 demo" sha1="50d915eb7e5373e9095792af964a46a6a4f70a5e" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="mbomber">
+		<description>Muscle Bomber: The Body Explosion</description>
+		<year>1993</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="muscle bomber" sha1="c10e04ed66acd02d9e383e948625091bb8c37cd9" />
 			</diskarea>
 		</part>
 	</software>
@@ -1608,6 +1914,17 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom3" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="fushigi no umi no nadia (disc c - the fortress)" sha1="f1a9b0432087712e6ba6b73a1120008012de1e5b" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="necronom">
+		<description>Necronomicon</description>
+		<year>1994</year>
+		<publisher>Fairytale</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="necronomicon" sha1="82672ceafa32c0e9975aeda8f3f578c1c204ff52" />
 			</diskarea>
 		</part>
 	</software>
@@ -1696,6 +2013,50 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="raiden densetsu (1991)(kid corp)(jp-en)" sha1="d7484fac0fa8d0fff06c70af341b25d8b4f21ab2" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="raidy">
+		<description>Ikazuchi no Senshi Raidy</description>
+		<year>1994</year>
+		<publisher>ZyX</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ikazuchi no senshi raidy" sha1="da27ad369e6a084c2b9b17401c9ccd7b7f5370cf" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="raidy2">
+		<description>Ikazuchi no Senshi Raidy 2</description>
+		<year>1996</year>
+		<publisher>ZyX</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ikazuchi no senshi raidy ii" sha1="798073ac9329aaf2a956ca30490914d46424a28d" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="rayxanbr">
+		<description>Rayxanber</description>
+		<year>1990</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rayxanber" sha1="5e7c36227d61be81f8a4cf4ef79889d12a72549c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="simcity">
+		<description>SimCity</description>
+		<year>1990</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="simcity" sha1="4f161a7cd9d5fb27f2ebd6d544310e2c42d26da6" />
 			</diskarea>
 		</part>
 	</software>
