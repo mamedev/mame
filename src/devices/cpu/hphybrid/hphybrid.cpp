@@ -1092,7 +1092,7 @@ void hp_hybrid_cpu_device::handle_dma(void)
 								m_icount -= 9;
 				}
 
-                                // Mystery solved: DMA is not automatically disabled at TC
+                                // Mystery solved: DMA is not automatically disabled at TC (test of 9845's graphic memory relies on this to work)
 }
 
 UINT16 hp_hybrid_cpu_device::RIO(UINT8 pa , UINT8 ic)

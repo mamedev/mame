@@ -16,12 +16,12 @@
 // - LPU & PPU ROMs
 // - LPU & PPU RAMs
 // - Text mode screen
+// - Graphic screen
 // - Keyboard
 // - T15 tape drive
 // - Software list to load optional ROMs
 // What's not yet in:
 // - Beeper
-// - Graphic screen
 // - Better naming of tape drive image (it's now "magt", should be "t15")
 // - Better documentation of this file
 // What's wrong:
@@ -49,6 +49,7 @@
 // from 2nd row on. This in turn prevents "BAD" text to be visible on screen.
 #define MAX_WORD_PER_ROW        220
 
+// Constants of alpha video
 #define VIDEO_PIXEL_CLOCK       20849400
 #define VIDEO_CHAR_WIDTH        9
 #define VIDEO_CHAR_HEIGHT       15
@@ -56,6 +57,7 @@
 #define VIDEO_CHAR_TOTAL        99
 #define VIDEO_CHAR_ROWS         25
 #define VIDEO_ROWS_TOTAL        26
+#define VIDEO_HBSTART           (VIDEO_CHAR_WIDTH * VIDEO_CHAR_COLUMNS)
 #define VIDEO_HTOTAL            (VIDEO_CHAR_WIDTH * VIDEO_CHAR_TOTAL)
 #define VIDEO_VTOTAL            (VIDEO_CHAR_HEIGHT * VIDEO_ROWS_TOTAL)
 #define VIDEO_ACTIVE_SCANLINES  (VIDEO_CHAR_HEIGHT * VIDEO_CHAR_ROWS)
@@ -104,6 +106,7 @@ public:
 				m_ppu(*this , "ppu"),
                 m_screen(*this , "screen"),
 				m_palette(*this , "palette"),
+                m_gv_timer(*this , "gv_timer"),
 		m_io_key0(*this , "KEY0"),
 		m_io_key1(*this , "KEY1"),
 		m_io_key2(*this , "KEY2"),
@@ -117,6 +120,7 @@ public:
 		virtual void machine_reset() override;
 
 		TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
+        TIMER_DEVICE_CALLBACK_MEMBER(gv_timer);
 
 		void vblank_w(screen_device &screen, bool state);
 
@@ -146,6 +150,7 @@ private:
 		required_device<hp_5061_3001_cpu_device> m_ppu;
         required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+        required_device<timer_device> m_gv_timer;
 	required_ioport m_io_key0;
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
@@ -491,7 +496,7 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 
 		if (m_video_blanked) {
                         // Blank scanline
-                        for (unsigned i = 0; i < (80 * 9); i++) {
+                        for (unsigned i = 0; i < VIDEO_HBSTART; i++) {
                                 m_bitmap.pix32(video_scanline , i) = pen[ 0 ];
                         }
 		} else {
@@ -554,6 +559,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::scanline_timer)
         }
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::gv_timer)
+{
+        advance_gv_fsm(false , false);
+}
+
 void hp9845b_state::vblank_w(screen_device &screen, bool state)
 {
                 // VBlank signal is fed into HALT flag of PPU
@@ -579,7 +589,7 @@ void hp9845b_state::set_graphic_mode(bool graphic)
                 if (m_graphic_sel) {
                         m_screen->configure(GVIDEO_HTOTAL , GVIDEO_VTOTAL , rectangle(GVIDEO_HBEND , GVIDEO_HBSTART - 1 , GVIDEO_VBEND , GVIDEO_VBSTART - 1) , HZ_TO_ATTOSECONDS(VIDEO_PIXEL_CLOCK) * GVIDEO_HTOTAL * GVIDEO_VTOTAL);
                 } else {
-                        m_screen->configure(VIDEO_HTOTAL , VIDEO_VTOTAL , rectangle(0 , (VIDEO_CHAR_WIDTH * VIDEO_CHAR_COLUMNS) - 1 , 0 , VIDEO_ACTIVE_SCANLINES - 1) , HZ_TO_ATTOSECONDS(VIDEO_PIXEL_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
+                        m_screen->configure(VIDEO_HTOTAL , VIDEO_VTOTAL , rectangle(0 , VIDEO_HBSTART - 1 , 0 , VIDEO_ACTIVE_SCANLINES - 1) , HZ_TO_ATTOSECONDS(VIDEO_PIXEL_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
                 }
         }
 }
@@ -663,8 +673,19 @@ WRITE16_MEMBER(hp9845b_state::graphic_w)
 
 attotime hp9845b_state::time_to_gv_mem_availability(void) const
 {
-        // TODO:
-        return attotime::zero;
+        if (m_graphic_sel) {
+                int hpos = m_screen->hpos();
+                if (hpos < (34 - GVIDEO_HCNT_OFF) || hpos >= (628 - GVIDEO_HCNT_OFF)) {
+                        // Access to graphic memory available now
+                        return attotime::zero;
+                } else {
+                        // Wait until start of hblank
+                        return m_screen->time_until_pos(m_screen->vpos() , 628);
+                }
+        } else {
+                // TODO:
+                return attotime::zero;
+        }
 }
 
 void hp9845b_state::advance_gv_fsm(bool ds , bool trigger)
@@ -727,6 +748,7 @@ void hp9845b_state::advance_gv_fsm(bool ds , bool trigger)
                                 m_gv_io_counter = (m_gv_io_counter + 1) & GVIDEO_ADDR_MASK;
                                 m_gv_fsm_state = GV_STAT_WAIT_DS_1;
                         } else {
+                                m_gv_timer->adjust(time_mem_av);
                                 get_out = true;
                         }
                         break;
@@ -776,6 +798,7 @@ void hp9845b_state::advance_gv_fsm(bool ds , bool trigger)
                                 m_gv_io_counter = (m_gv_io_counter + 1) & GVIDEO_ADDR_MASK;
                                 m_gv_fsm_state = GV_STAT_WAIT_DS_2;
                         } else {
+                                m_gv_timer->adjust(time_mem_av);
                                 get_out = true;
                         }
                         break;
@@ -797,6 +820,7 @@ void hp9845b_state::advance_gv_fsm(bool ds , bool trigger)
                                 m_gv_io_counter = (m_gv_io_counter + 1) & GVIDEO_ADDR_MASK;
                                 m_gv_fsm_state = GV_STAT_WAIT_DS_0;
                         } else {
+                                m_gv_timer->adjust(time_mem_av);
                                 get_out = true;
                         }
                         break;
@@ -985,7 +1009,6 @@ WRITE16_MEMBER(hp9845b_state::kb_irq_clear_w)
 
 WRITE8_MEMBER(hp9845b_state::pa_w)
 {
-		// TODO: handle sts & flg
 		if (data == T15_PA) {
 						// RHS tape drive (T15)
 						m_ppu->status_w(m_t15->sts_r());
@@ -1059,7 +1082,9 @@ static ADDRESS_MAP_START(global_mem_map , AS_PROGRAM , 16 , hp9845b_state)
 		ADDRESS_MAP_UNMAP_LOW
 		AM_RANGE(0x000000 , 0x007fff) AM_RAM AM_SHARE("lpu_ram")
 		AM_RANGE(0x014000 , 0x017fff) AM_RAM AM_SHARE("ppu_ram")
+                AM_RANGE(0x020000 , 0x027fff) AM_RAM AM_SHARE("lpu_02_ram")
 		AM_RANGE(0x030000 , 0x037fff) AM_ROM AM_REGION("lpu" , 0)
+                AM_RANGE(0x040000 , 0x047fff) AM_RAM AM_SHARE("lpu_04_ram")
 		AM_RANGE(0x050000 , 0x057fff) AM_ROM AM_REGION("ppu" , 0)
 ADDRESS_MAP_END
 
@@ -1094,11 +1119,12 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
         // These parameters are for alpha video
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_CHAR_WIDTH * VIDEO_CHAR_COLUMNS , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES)
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_HBSTART , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES)
 		MCFG_SCREEN_VBLANK_DRIVER(hp9845b_state, vblank_w)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp9845b_state, scanline_timer, "screen", 0, 1)
+        MCFG_TIMER_DRIVER_ADD("gv_timer", hp9845b_state, gv_timer)
 
 	// Actual keyboard refresh rate should be KEY_SCAN_OSCILLATOR / 128 (2560 Hz)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp9845b_state , kb_scan , attotime::from_hz(100))
