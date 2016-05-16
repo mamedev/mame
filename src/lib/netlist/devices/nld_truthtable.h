@@ -321,8 +321,6 @@ public:
 
 	virtual ~netlist_base_factory_truthtable_t()
 	{
-		if (!m_family->m_is_static)
-			pfree(m_family);
 	}
 
 	pstring_vector_t m_desc;

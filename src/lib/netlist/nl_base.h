@@ -352,7 +352,7 @@ namespace netlist
 	class logic_family_desc_t
 	{
 	public:
-		logic_family_desc_t() : m_is_static(false) {}
+		logic_family_desc_t() {}
 		virtual ~logic_family_desc_t() {}
 		virtual powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
@@ -363,8 +363,6 @@ namespace netlist
 		nl_double m_high_V;
 		nl_double m_R_low;
 		nl_double m_R_high;
-
-		bool m_is_static;
 	};
 
 	class logic_family_t
@@ -1316,7 +1314,12 @@ namespace netlist
 		void print_stats() const;
 
 		pvector_t<powned_ptr<device_t>> m_devices;
+
+		/* sole use is to manage lifetime of net objects */
 		net_t::list_t m_nets;
+
+		/* sole use is to manage lifetime of family objects */
+		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 
 protected:
 

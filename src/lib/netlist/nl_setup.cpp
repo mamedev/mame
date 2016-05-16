@@ -886,7 +886,11 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 	if (setup_t::model_value_str(map, "TYPE") == "CD4XXX")
 		return family_CD4XXX();
 
-	logic_family_std_proxy_t *ret = palloc(logic_family_std_proxy_t);
+	for (auto & e : netlist().m_family_cache)
+		if (e.first == model)
+			return e.second.get();
+
+	auto ret = make_unique_base<logic_family_desc_t, logic_family_std_proxy_t>();
 
 	ret->m_low_thresh_V = setup_t::model_value(map, "IVL");
 	ret->m_high_thresh_V = setup_t::model_value(map, "IVH");
@@ -895,7 +899,13 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 	ret->m_R_low = setup_t::model_value(map, "ORL");
 	ret->m_R_high = setup_t::model_value(map, "ORH");
 
-	return ret;
+	auto retp = ret.get();
+
+	printf("placing %s in cache\n", model.cstr());
+	//netlist().m_family_cache.push_back(std::pair<pstring, std::unique_ptr<logic_family_desc_t>>(model, std::move(ret)));
+	netlist().m_family_cache.emplace_back(model, std::move(ret));
+
+	return retp;
 }
 
 static pstring model_string(model_map_t &map)

@@ -36,7 +36,6 @@ public:
 		m_high_V = 4.0;
 		m_R_low = 1.0;
 		m_R_high = 130.0;
-		m_is_static = true;
 	}
 	virtual powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
@@ -57,7 +56,6 @@ public:
 		m_high_V = 4.95;
 		m_R_low = 10.0;
 		m_R_high = 10.0;
-		m_is_static = true;
 	}
 	virtual powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{

@@ -199,5 +199,12 @@ private:
 	bool m_is_owned;
 };
 
+template<typename _BC, typename _DC, typename... _Args>
+static std::unique_ptr<_BC> make_unique_base(_Args&&... __args)
+{
+	std::unique_ptr<_BC> ret(new _DC(std::forward<_Args>(__args)...));
+	return ret;
+}
+
 
 #endif /* NL_UTIL_H_ */
