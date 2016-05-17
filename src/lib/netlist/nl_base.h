@@ -188,12 +188,12 @@ class NETLIB_NAME(_name) : public device_t
 
 #define NETLIB_CONSTRUCTOR_DERIVED(_name, _pclass)                              \
 	private: family_setter_t m_famsetter;                                       \
-	public: template <class _C> ATTR_COLD NETLIB_NAME(_name)(_C &owner, const pstring name) \
+	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name) \
 	: NETLIB_NAME(_pclass)(owner, name)
 
 #define NETLIB_CONSTRUCTOR(_name)                                               \
 	private: family_setter_t m_famsetter;                                       \
-	public: template <class _C> ATTR_COLD NETLIB_NAME(_name)(_C &owner, const pstring name) \
+	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name) \
 		: device_t(owner, name)
 
 #define NETLIB_DYNAMIC() 														\
