@@ -30210,8 +30210,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="zoop (usa).bin" size="524288" crc="a899befa" sha1="e6669f16902caf35337de60027ed2013deed0d40" offset="0x000000"/>
+			<feature name="pcb" value="171-5978BA"/>
+			<feature name="u1" value="MPR-18431-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<!-- USA dump is confirmed to be 1MB with second 512KB padded with 0xff -->
+				<rom name="mpr-18431-f.u1" size="1048576" crc="faa490dc" sha1="ce34408f98769b03e0f8d62c3dc1261a072691aa" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
