@@ -1636,6 +1636,8 @@ void renderer_d3d9::batch_vector(const render_primitive &prim, float line_time)
 		// set the color, Z parameters to standard values
 		for (int i = 0; i < 6; i++)
 		{
+			m_vectorbatch[m_batchindex + i].x -= 0.5f;
+			m_vectorbatch[m_batchindex + i].y -= 0.5f;
 			m_vectorbatch[m_batchindex + i].z = 0.0f;
 			m_vectorbatch[m_batchindex + i].rhw = 1.0f;
 			m_vectorbatch[m_batchindex + i].color = color;
