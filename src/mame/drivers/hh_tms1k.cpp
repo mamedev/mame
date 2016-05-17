@@ -3791,6 +3791,19 @@ static MACHINE_CONFIG_START( bship, bship_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn76477", SN76477, 0)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(100), CAP_P(47)) // R18, R17, C8
+	MCFG_SN76477_DECAY_RES(RES_M(3.3))                          // R16
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.47), RES_K(15))          // C7, R20
+	MCFG_SN76477_AMP_RES(RES_K(100))                            // R19
+	MCFG_SN76477_FEEDBACK_RES(RES_K(39))                        // R7
+	MCFG_SN76477_VCO_PARAMS(5.0 * RES_VOLTAGE_DIVIDER(RES_K(47), RES_K(33)), CAP_U(0.01), RES_K(270)) // R15/R14, C5, switchable R5/R3/R4
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)
+	MCFG_SN76477_SLF_PARAMS(CAP_U(22), RES_K(750))  // switchable C4, switchable R13/R12
+	MCFG_SN76477_ONESHOT_PARAMS(0, RES_INF)         // NC, switchable R11
+	MCFG_SN76477_VCO_MODE(0)                        // switchable
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)              // switchable, GND, GND
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)              // Vreg, GND
+	MCFG_SN76477_ENABLE(0)                          // switchable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
