@@ -11,6 +11,8 @@
 #ifndef __SDLWINDOW__
 #define __SDLWINDOW__
 
+#include "render.h"
+
 #include "osdsdl.h"
 #include "video.h"
 

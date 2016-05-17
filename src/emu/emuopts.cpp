@@ -150,6 +150,8 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_NATURAL_KEYBOARD ";nat",                    "0",         OPTION_BOOLEAN,    "specifies whether to use a natural keyboard or not" },
 	{ OPTION_JOYSTICK_CONTRADICTORY ";joy_contradictory","0",         OPTION_BOOLEAN,    "enable contradictory direction digital joystick input at the same time" },
 	{ OPTION_COIN_IMPULSE,                               "0",         OPTION_INTEGER,    "set coin impulse time (n<0 disable impulse, n==0 obey driver, 0<n set time n)" },
+	{ OPTION_BOOT_PRESSED,                               nullptr,     OPTION_STRING,     "inputs to be automatically pressed for a short time after booting machine" },
+	{ OPTION_BOOT_PRESSED_TIME,                          "750",       OPTION_INTEGER,    "time to keep inputs pressed after booting (in milliseconds)" },
 
 	// input autoenable options
 	{ nullptr,                                              nullptr,        OPTION_HEADER,     "CORE INPUT AUTOMATIC ENABLE OPTIONS" },

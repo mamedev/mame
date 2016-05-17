@@ -167,20 +167,19 @@ void ui_menu_input_specific::populate()
 		port_count++;
 		for (ioport_field &field : port.fields())
 		{
-			const char *name = field.name();
+			ioport_type_class type_class = field.type_class();
 
 			/* add if we match the group and we have a valid name */
-			if (name != nullptr && field.enabled() &&
-				((field.type() == IPT_OTHER && field.name() != nullptr) || machine().ioport().type_group(field.type(), field.player()) != IPG_INVALID))
+			if (field.enabled() && (type_class == INPUT_CLASS_CONTROLLER || type_class == INPUT_CLASS_MISC))
 			{
 				input_seq_type seqtype;
 				UINT32 sortorder;
 
 				/* determine the sorting order */
-				if (field.type() >= IPT_START1 && field.type() < IPT_ANALOG_LAST)
+				if (type_class == INPUT_CLASS_CONTROLLER)
 				{
 					sortorder = (field.type() << 2) | (field.player() << 12);
-					if (strcmp(field.device().tag(), ":"))
+					if (field.device().owner() != nullptr)
 						sortorder |= (port_count & 0xfff) * 0x10000;
 				}
 				else
@@ -200,7 +199,7 @@ void ui_menu_input_specific::populate()
 					item->defseq = &field.defseq(seqtype);
 					item->sortorder = sortorder + suborder[seqtype];
 					item->type = field.is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
-					item->name = name;
+					item->name = field.name();
 					item->owner_name = field.device().tag();
 					item->next = itemlist;
 					itemlist = item;

@@ -4,6 +4,7 @@
 
 #include "emu.h"
 #include "imgui/imgui.h"
+#include "render.h"
 #include "uiinput.h"
 
 #include "debug/debugvw.h"

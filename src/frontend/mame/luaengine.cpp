@@ -664,7 +664,7 @@ luabridge::LuaRef lua_engine::l_ioports_port_get_fields(const ioport_port *i)
 	luabridge::LuaRef f_table = luabridge::LuaRef::newTable(L);
 
 	for (ioport_field &field : p->fields()) {
-		if(field.name())
+		if (field.type_class() != INPUT_CLASS_INTERNAL)
 			f_table[field.name()] = &field;
 	}
 
@@ -1985,7 +1985,7 @@ void lua_engine::update_machine()
 		{
 			for (ioport_field &field : port.fields())
 			{
-				if (field.name())
+				if (field.type_class() != INPUT_CLASS_INTERNAL)
 				{
 					push(m_lua_state, &field, tname_ioport);
 					lua_setfield(m_lua_state, -2, field.name());

@@ -136,6 +136,8 @@
 #define OPTION_NATURAL_KEYBOARD     "natural"
 #define OPTION_JOYSTICK_CONTRADICTORY   "joystick_contradictory"
 #define OPTION_COIN_IMPULSE         "coin_impulse"
+#define OPTION_BOOT_PRESSED         "boot_pressed"
+#define OPTION_BOOT_PRESSED_TIME    "boot_pressed_time"
 
 // input autoenable options
 #define OPTION_PADDLE_DEVICE        "paddle_device"
@@ -325,6 +327,8 @@ public:
 	bool natural_keyboard() const { return bool_value(OPTION_NATURAL_KEYBOARD); }
 	bool joystick_contradictory() const { return m_joystick_contradictory; }
 	int coin_impulse() const { return m_coin_impulse; }
+	const char *boot_pressed() const { return value(OPTION_BOOT_PRESSED); }
+	int boot_pressed_time() const { return int_value(OPTION_BOOT_PRESSED_TIME); }
 
 	// core debugging options
 	bool log() const { return bool_value(OPTION_LOG); }
