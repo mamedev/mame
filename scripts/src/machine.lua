@@ -1737,6 +1737,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/pci-usb.h",
 		MAME_DIR .. "src/devices/machine/pci-sata.cpp",
 		MAME_DIR .. "src/devices/machine/pci-sata.h",
+		MAME_DIR .. "src/devices/machine/pci-ide.cpp",
+		MAME_DIR .. "src/devices/machine/pci-ide.h",
 		MAME_DIR .. "src/devices/machine/pci-apic.cpp",
 		MAME_DIR .. "src/devices/machine/pci-apic.h",
 		MAME_DIR .. "src/devices/machine/pci-smbus.cpp",
