@@ -25668,7 +25668,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Street Smart (Prototype, 19900629)</description>
 		<year>1991</year>
 		<publisher>Treco</publisher>
-		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="street smart (jun 29, 1990 prototype).bin" size="524288" crc="d1de6a2e" sha1="d8f0b2695adf4653b463c6a52ac6b6d41cdb771d" offset="0x000000" />

@@ -127,13 +127,13 @@
 		<publisher>Microids</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="simulation pack (microids) (c. bertrand, elliot grassiano, b. masson, a. bonsignore) (1988) (moto)[disk 1].fd" size="327680" crc="7bf09235" sha1="a9cd6df78ed898dd7fb5b91a0a1dd81f350eb394" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="simulation pack (microids) (c. bertrand, elliot grassiano, b. masson, a. bonsignore) (1988) (moto)[disk 2].fd" size="327680" crc="8362fc7e" sha1="22464674d827a63f6bba96af76e9a0f84f7c79a4" offset="0" />
 			</dataarea>
@@ -175,13 +175,13 @@
 		<publisher>6502man</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="games show (6502man) (2014) (mo6 fd) disk 1.fd" size="327680" crc="3a877e94" sha1="b624da8c77906825fc1218962d8c60b53f430a6c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="games show (6502man) (2014) (mo6 fd) disk 2.fd" size="327680" crc="6445a8e3" sha1="56d4e4f55b56ee85319d30aa93fa9c0ec137738a" offset="0" />
 			</dataarea>
@@ -232,25 +232,25 @@
 		<publisher>6502man</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk1a).fd" size="327680" crc="41fdc3bc" sha1="ad8ca9a0c64e6e7ff2e30ac9d9915bfcb740a787" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk1b).fd" size="327680" crc="4e187f88" sha1="c36145395837964a450f9a53629da9f96ef1710b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk2a).fd" size="327680" crc="53d2ac34" sha1="5aadbe674a191d6094a7ab0c2a5e29c2c66c3fb7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk2b).fd" size="327680" crc="782e32e7" sha1="f1850a2b5abd7d63c842897fd9e312c7f381bcb1" offset="0" />
 			</dataarea>
@@ -263,13 +263,13 @@
 		<publisher>6502man</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="655360">
 				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk1).fd" size="655360" crc="a0747287" sha1="fe5e4e0c3e3ba125794ac1ec87cc7b7a5c5a9b2f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="655360">
 				<rom name="zx art (6502man) (2014) (mo6 fd) (zxart_disk2).fd" size="655360" crc="43fdb60a" sha1="491878883f3d97885e1865b90fab9d4f6e9dd938" offset="0" />
 			</dataarea>
@@ -563,7 +563,7 @@
 		<publisher>Chip</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="traitement bzzz (1987)(chip)(fr)[includes mo6 version].fd" size="327680" crc="ecc27728" sha1="4a244ecb46497db31ade42f2a5b1d41b3fd01734" offset="0" />
 			</dataarea>

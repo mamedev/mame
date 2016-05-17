@@ -275,13 +275,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="31980">
 				<rom name="anglais - volume 1 (nathan) (cegos - alpha langues) (1984) (to7) (side 1).k7" size="31980" crc="3e40f28e" sha1="bb2e36cb2d56dfef3a2e70b2f71d5c75d9b7f567" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="31229">
 				<rom name="anglais - volume 1 (nathan) (cegos - alpha langues) (1984) (to7) (side 2).k7" size="31229" crc="dab20ddc" sha1="8f67e4d2ec026fb3ad16487b909ef6b300d4003e" offset="0" />
 			</dataarea>
@@ -294,13 +294,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="31554">
 				<rom name="anglais-vol1.1_to7.k7" size="31554" crc="32df1a21" sha1="fbc5e0ca7bc158503b84a9cbc9bb57230cbf7f1a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="30803">
 				<rom name="anglais-vol1.2_to7.k7" size="30803" crc="741a05bd" sha1="b5c039aa4b389f5e0dc0c05e31833cf598b56176" offset="0" />
 			</dataarea>
@@ -313,13 +313,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="74262">
 				<rom name="anglais - volume 2 (nathan) (cegos - alpha langues) (1984) (to7) (side 1).k7" size="74262" crc="a7964323" sha1="1b0e61bf3859a5860d58def847a1a6d494f62717" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="51797">
 				<rom name="anglais - volume 2 (nathan) (cegos - alpha langues) (1984) (to7) (side 2).k7" size="51797" crc="3482ee72" sha1="a72972e41016cebbda21a2c9723da35d7fb42b8c" offset="0" />
 			</dataarea>
@@ -332,13 +332,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="73676">
 				<rom name="anglais-vol2.1_to7.k7" size="73676" crc="9acaf016" sha1="9e897bfa4409e30157993a2ea11c5d61e678fc31" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="51385">
 				<rom name="anglais-vol2.2_to7.k7" size="51385" crc="34a9b5e0" sha1="b1d9dcfc835e06e24ec5e9267745e9c201e63ce3" offset="0" />
 			</dataarea>
@@ -351,13 +351,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="51673">
 				<rom name="anglais - volume 3 (nathan) (cegos - alpha langues) (1984) (to7) (side 1).k7" size="51673" crc="00effe08" sha1="805cc76910b77570db829fef69e1820d2f00c206" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="63249">
 				<rom name="anglais - volume 3 (nathan) (cegos - alpha langues) (1984) (to7) (side 2).k7" size="63249" crc="073efc22" sha1="8b3282c6a6fb2585b3bc09e2246be8681900af8d" offset="0" />
 			</dataarea>
@@ -370,13 +370,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="48997">
 				<rom name="anglais - volume 4 (nathan) (cegos - alpha langues) (1984) (to7) (side 1).k7" size="48997" crc="744988c9" sha1="5715f0ac1fddca7f875fd84fb867e8fc07db2e73" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="51701">
 				<rom name="anglais - volume 4 (nathan) (cegos - alpha langues) (1984) (to7) (side 2).k7" size="51701" crc="892057fa" sha1="ec94f94023df95ab3611376f0de2af1d523df153" offset="0" />
 			</dataarea>
@@ -413,13 +413,13 @@
 		<publisher>Cedic/Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="26138">
 				<rom name="apprends-moi a ecrire (nathan) (michel bussac) (1986) (to7) (side 1).k7" size="26138" crc="95054fa7" sha1="5063811ad7160a440cee1510d33b235fa7880bff" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="28232">
 				<rom name="apprends-moi a ecrire (nathan) (michel bussac) (1986) (to7) (side 2).k7" size="28232" crc="0a44d486" sha1="636acba301d493e3d20427d9889d970a35943608" offset="0" />
 			</dataarea>
@@ -552,13 +552,13 @@
 		<publisher>Cedic/Nathan - TO TEK International</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="57904">
 				<rom name="auto-initiation au basic to7 (totek) (inconnus) (1984) (to7) (side 1).k7" size="57904" crc="09ee3bea" sha1="ae8b6dd8833f4cf2ee51335b2f38f7b29db95216" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="80820">
 				<rom name="auto-initiation au basic to7 (totek) (inconnus) (1984) (to7) (side 2).k7" size="80820" crc="6ae0f022" sha1="3890d3580d8062f8606170b3164834f5440b1360" offset="0" />
 			</dataarea>
@@ -571,13 +571,13 @@
 		<publisher>Cedic/Nathan - TO TEK International</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="57462">
 				<rom name="auto-initiation-basic-1_to7.k7" size="57462" crc="76f52b57" sha1="bd1d74c8c256a5fd81f3855b608d80ad210f08e8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="80204">
 				<rom name="auto-initiation-basic-2_to7.k7" size="80204" crc="26652a81" sha1="a4eee345e8dfdb258d84652ef774e40685ba8325" offset="0" />
 			</dataarea>
@@ -590,13 +590,13 @@
 		<publisher>Cedic/Nathan - TO TEK International</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="57904">
 				<rom name="auto-initiation basic to7-70 (totek) (inconnus) (1984) (to7 k7) (auto-initiation-basic-to770-1_to7).k7" size="57904" crc="b374ab3c" sha1="a2695740e95fe7189d0e241f2a6647c6e761b420" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="80820">
 				<rom name="auto-initiation au basic to7 (totek) (inconnus) (1984) (to7) (side 2).k7" size="80820" crc="6ae0f022" sha1="3890d3580d8062f8606170b3164834f5440b1360" offset="0" />
 			</dataarea>
@@ -609,13 +609,13 @@
 		<publisher>Cedic/Nathan - TO TEK International</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="39134">
 				<rom name="auto-initiation au logo (nathan) (inconnus) (1985) (to7) (side 1).k7" size="39134" crc="f65a7d10" sha1="28b79d5c54775f8d51dd0053524cd7e798140973" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="35623">
 				<rom name="auto-initiation au logo (nathan) (inconnus) (1985) (to7) (side 2).k7" size="35623" crc="f60f6600" sha1="8199b76f4b1431fd92b4294302c99b5ddaedfb5a" offset="0" />
 			</dataarea>
@@ -664,25 +664,25 @@
 		<publisher>Coktel Vision</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side 1"/>
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="35427">
 				<rom name="balade au pays de big ben (coktel vision) (beatrice franzi) (1988) (to7) (side 1).k7" size="35427" crc="010d9344" sha1="70eaaa92303c471f8aaf7fe1911d84f2a3b11ef0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side 2"/>
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="30887">
 				<rom name="balade au pays de big ben (coktel vision) (beatrice franzi) (1988) (to7) (side 2).k7" size="30887" crc="00f5d6eb" sha1="1082257f93d555547c793076b2d4617a5935b0e6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Side 3"/>
+			<feature name="part_id" value="Side 3"/>
 			<dataarea name="cass" size="35605">
 				<rom name="balade au pays de big ben (coktel vision) (beatrice franzi) (1988) (to7) (side 3).k7" size="35605" crc="5bc33348" sha1="467bbad41c23988b82fe6919a516f791277bd65c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Side 4"/>
+			<feature name="part_id" value="Side 4"/>
 			<dataarea name="cass" size="33679">
 				<rom name="balade au pays de big ben (coktel vision) (beatrice franzi) (1988) (to7) (side 4).k7" size="33679" crc="825a7750" sha1="1a3acf47775be6dd9a2f7b26916abe3001158f23" offset="0" />
 			</dataarea>
@@ -743,13 +743,13 @@
 		<publisher>Banque Nationale de Paris</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="46254">
 				<rom name="la banque pour les jeunes (bnp) (epygone) (1985) (to7) (side 1).k7" size="46254" crc="06caa57a" sha1="20ef065b90bd2d5189dca508055588171b61e4a7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="21717">
 				<rom name="la banque pour les jeunes (bnp) (epygone) (1985) (to7) (side 2).k7" size="21717" crc="6bc40730" sha1="7a4cccda1d7668392899f5f7af1367daabd9cdfe" offset="0" />
 			</dataarea>
@@ -954,31 +954,31 @@
 		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1 Side A"/>
+			<feature name="part_id" value="Tape 1 Side A"/>
 			<dataarea name="cass" size="35282">
 				<rom name="le cadavre exquis de la grammaire (edil) (henri michaux) (1983) (to7) (side 1a).k7" size="35282" crc="b85576f8" sha1="21ab7ec12909ff393c25103a9ab93607f5ea8184" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 1 Side B"/>
+			<feature name="part_id" value="Tape 1 Side B"/>
 			<dataarea name="cass" size="11810">
 				<rom name="le cadavre exquis de la grammaire (edil) (henri michaux) (1983) (to7) (side 1b).k7" size="11810" crc="dd700072" sha1="c3135a60e480c43726de5a1ebd36d78be4fc0fec" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 2 Side A"/>
+			<feature name="part_id" value="Tape 2 Side A"/>
 			<dataarea name="cass" size="24915">
 				<rom name="le cadavre exquis de la grammaire (edil) (henri michaux) (1983) (to7) (side 2a).k7" size="24915" crc="510985c1" sha1="85c7d571127a93ab60f85f09defd0651217696b0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Tape 2 Side B"/>
+			<feature name="part_id" value="Tape 2 Side B"/>
 			<dataarea name="cass" size="15930">
 				<rom name="le cadavre exquis de la grammaire (edil) (henri michaux) (1983) (to7) (side 2b).k7" size="15930" crc="e33dcafa" sha1="2ca66ed113ee9675a7b97d35b6b45e1c8e012adc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="to_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="21231">
 				<rom name="le cadavre exquis de la grammaire (edil) (henri michaux) (1983) (to7) (side 3).k7" size="21231" crc="33db97f5" sha1="079229438c792f083eb1c67beb8fae5546595827" offset="0" />
 			</dataarea>
@@ -991,31 +991,31 @@
 		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1 Side A"/>
+			<feature name="part_id" value="Tape 1 Side A"/>
 			<dataarea name="cass" size="35282">
 				<rom name="le cadavre exquis de la grammaire (edil) (henri michaux) (1983) (to7) (side 1a).k7" size="35282" crc="b85576f8" sha1="21ab7ec12909ff393c25103a9ab93607f5ea8184" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 1 Side B"/>
+			<feature name="part_id" value="Tape 1 Side B"/>
 			<dataarea name="cass" size="11810">
 				<rom name="le cadavre exquis de la grammaire (edil) (henri michaux) (1983) (to7) (side 1b).k7" size="11810" crc="dd700072" sha1="c3135a60e480c43726de5a1ebd36d78be4fc0fec" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 2 Side A"/>
+			<feature name="part_id" value="Tape 2 Side A"/>
 			<dataarea name="cass" size="24915">
 				<rom name="le cadavre exquis de la grammaire (edil) (henri michaux) (1983) (to7) (side 2a).k7" size="24915" crc="510985c1" sha1="85c7d571127a93ab60f85f09defd0651217696b0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Tape 2 Side B"/>
+			<feature name="part_id" value="Tape 2 Side B"/>
 			<dataarea name="cass" size="15930">
 				<rom name="le cadavre exquis de la grammaire (edil) (henri michaux) (1983) (to7) (side 2b).k7" size="15930" crc="e33dcafa" sha1="2ca66ed113ee9675a7b97d35b6b45e1c8e012adc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="to_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="21231">
 				<rom name="le-cadavre-exquis_to7.k7" size="21035" crc="abbf651e" sha1="385a0e1bbc19483edde5a60c6b4f2c3904ab18c9" offset="0" />
 			</dataarea>
@@ -1112,13 +1112,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="26386">
 				<rom name="cartable francais (infogrames) (inconnus) (1984) (to7) (side 1).k7" size="26386" crc="ab45d57c" sha1="888f2996487b04095fa9b348a010044586e95247" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="29028">
 				<rom name="cartable francais (infogrames) (inconnus) (1984) (to7) (side 2).k7" size="29028" crc="91b1e63b" sha1="3b40047e378b7ddcc3baa3ead42739d033644cde" offset="0" />
 			</dataarea>
@@ -1143,13 +1143,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="33422">
 				<rom name="carte de france (nathan) (michel oury) (1983) (to7) (side a).k7" size="33422" crc="ab3da6b9" sha1="7abd50f6654ad4af851a4ee09d9fd700f20afffe" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="41376">
 				<rom name="carte de france (nathan) (michel oury) (1983) (to7) (side b).k7" size="41376" crc="32f125f3" sha1="7787460276e27676a6a1498eff24877969ffe535" offset="0" />
 			</dataarea>
@@ -1162,13 +1162,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="33131">
 				<rom name="la-carte-de-france-to7.k7" size="33131" crc="af78133c" sha1="ef6b7fe08616b3ebdf78d06cc1bbccf2cba6b303" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="41376">
 				<rom name="carte de france (nathan) (michel oury) (1983) (to7) (side b).k7" size="41376" crc="32f125f3" sha1="7787460276e27676a6a1498eff24877969ffe535" offset="0" />
 			</dataarea>
@@ -1541,13 +1541,13 @@
 		<publisher>France Image Logiciel (FIL)</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1?"/>
+			<feature name="part_id" value="Tape 1?"/>
 			<dataarea name="cass" size="1271">
 				<rom name="conte (198x)(lambert, alain)(fr)(pd)[b].k7" size="1271" crc="e2c998eb" sha1="c5fa35145e31a7c998ad1f6e2ab5a416fb3e85d9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2?"/>
+			<feature name="part_id" value="Tape 2?"/>
 			<dataarea name="cass" size="17294">
 				<rom name="conte (198x)(lambert, alain)(to7-70)(fr)(pd)[b].k7" size="17294" crc="bfeb1efc" sha1="3118681935fa65ea3602e0815d494414c02d0476" offset="0" />
 			</dataarea>
@@ -1889,13 +1889,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="38014">
 				<rom name="dietetique (nathan) (jacques mateos) (1983) (to7) (side a).k7" size="38014" crc="fe7b3428" sha1="f3a0aa55e607d6d1cdfe7698067f7eb7f6c4d44b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="27631">
 				<rom name="dietetique (nathan) (jacques mateos) (1983) (to7) (side b).k7" size="27631" crc="b74c68ad" sha1="aabe3f29e28307a41b53e785b566171762b3f8e1" offset="0" />
 			</dataarea>
@@ -2065,55 +2065,55 @@
 		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side 1"/>
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="36952">
 				<rom name="educatifs c.n.d.p. pour to7 (cndp) (auteurs divers) (1984) (to7) (side 01).k7" size="36952" crc="9a89c045" sha1="fce191259068cb4d7feac9cc9a77b81798bb6bba" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side 2"/>
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="24463">
 				<rom name="educatifs c.n.d.p. pour to7 (cndp) (auteurs divers) (1984) (to7) (side 02).k7" size="24463" crc="94179f0a" sha1="5338b1e1e7200277427ebc0339891241c51cad9c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Side 3"/>
+			<feature name="part_id" value="Side 3"/>
 			<dataarea name="cass" size="27740">
 				<rom name="educatifs c.n.d.p. pour to7 (cndp) (auteurs divers) (1984) (to7) (side 03).k7" size="27740" crc="c0912f34" sha1="ee1092d4d82d0e23516b5e01f3ef35e8b0e1a75b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Side 4"/>
+			<feature name="part_id" value="Side 4"/>
 			<dataarea name="cass" size="44810">
 				<rom name="educatifs c.n.d.p. pour to7 (cndp) (auteurs divers) (1984) (to7) (side 04).k7" size="44810" crc="b269784e" sha1="6d1a07e7abf0b04091b14e3b9c8cd915d2fbb4e3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="to_cass">
-		<feature name="part_id" value="Side 5"/>
+			<feature name="part_id" value="Side 5"/>
 			<dataarea name="cass" size="19562">
 				<rom name="educatifs c.n.d.p. pour to7 (cndp) (auteurs divers) (1984) (to7) (side 05).k7" size="19562" crc="5953f38a" sha1="2f47a17b7f924ccf8284d41442d3cf1072cf41a8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass6" interface="to_cass">
-		<feature name="part_id" value="Side 6"/>
+			<feature name="part_id" value="Side 6"/>
 			<dataarea name="cass" size="17800">
 				<rom name="educatifs c.n.d.p. pour to7 (cndp) (auteurs divers) (1984) (to7) (side 06).k7" size="17800" crc="35fa0e34" sha1="c544352fe5f8caf860d8c4edbc89cf7d2a6a8324" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass7" interface="to_cass">
-		<feature name="part_id" value="Side 8"/>
+			<feature name="part_id" value="Side 8"/>
 			<dataarea name="cass" size="25510">
 				<rom name="educatifs c.n.d.p. pour to7 (cndp) (auteurs divers) (1984) (to7) (side 08).k7" size="25510" crc="3b2c49c2" sha1="4705bb23762ebed35fa3f98d2c0cab8fe738a103" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass8" interface="to_cass">
-		<feature name="part_id" value="Side 10"/>
+			<feature name="part_id" value="Side 10"/>
 			<dataarea name="cass" size="23626">
 				<rom name="educatifs c.n.d.p. pour to7 (cndp) (auteurs divers) (1984) (to7) (side 10).k7" size="23626" crc="ed353300" sha1="eacc2ad530a289da755fc254e6b25fb10a32dfb7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass9" interface="to_cass">
-		<feature name="part_id" value="Side 11"/>
+			<feature name="part_id" value="Side 11"/>
 			<dataarea name="cass" size="32823">
 				<rom name="educatifs c.n.d.p. pour to7 (cndp) (auteurs divers) (1984) (to7) (side 11).k7" size="32823" crc="c65831e4" sha1="2846f76c680074de6eab2c1b9ff44be512a6a6be" offset="0" />
 			</dataarea>
@@ -2163,103 +2163,103 @@
 		<publisher>Association Francaise pour la Lecture (AFL)</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="bibli"/>
+			<feature name="part_id" value="bibli"/>
 			<dataarea name="cass" size="7137">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (bibli).k7" size="7137" crc="229ba8a1" sha1="1b1380118147f0ef86e5ef3d2c725c9685bf3ae9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="e1a"/>
+			<feature name="part_id" value="e1a"/>
 			<dataarea name="cass" size="14951">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (e1a).k7" size="14951" crc="3d43076a" sha1="6104f0f2eb54fe4126ed536685b428fd5f2d5a17" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="e1b"/>
+			<feature name="part_id" value="e1b"/>
 			<dataarea name="cass" size="17862">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (e1b).k7" size="17862" crc="c0b444c0" sha1="3f923482b3158640ec7ef897f957e433226ce703" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="e2a"/>
+			<feature name="part_id" value="e2a"/>
 			<dataarea name="cass" size="17259">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (e2a).k7" size="17259" crc="36ce30fd" sha1="34f8b7f74258ba4aad40b651b661155f827ea8ad" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="to_cass">
-		<feature name="part_id" value="e2b"/>
+			<feature name="part_id" value="e2b"/>
 			<dataarea name="cass" size="14984">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (e2b).k7" size="14984" crc="7830e857" sha1="fdafe7244e800cf7204f759e082c82133dfd855e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass6" interface="to_cass">
-		<feature name="part_id" value="e3a"/>
+			<feature name="part_id" value="e3a"/>
 			<dataarea name="cass" size="16113">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (e3a).k7" size="16113" crc="d1b6a67d" sha1="07ea5fbb35032a6a246d8ee900c10bea83614d31" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass7" interface="to_cass">
-		<feature name="part_id" value="e3b"/>
+			<feature name="part_id" value="e3b"/>
 			<dataarea name="cass" size="16169">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (e3b).k7" size="16169" crc="e175459a" sha1="c7323c8e8d9c00a34e4520a6c404df394bbb70ae" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass8" interface="to_cass">
-		<feature name="part_id" value="e4a"/>
+			<feature name="part_id" value="e4a"/>
 			<dataarea name="cass" size="12040">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (e4a).k7" size="12040" crc="0ecd0f2f" sha1="555b0f5e551d2757e870f0cfd59bbc4e75e390f1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass9" interface="to_cass">
-		<feature name="part_id" value="e4b"/>
+			<feature name="part_id" value="e4b"/>
 			<dataarea name="cass" size="18431">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (e4b).k7" size="18431" crc="75250942" sha1="7576b5f51980574685c3c6973c91515985be947f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass10" interface="to_cass">
-		<feature name="part_id" value="j1a"/>
+			<feature name="part_id" value="j1a"/>
 			<dataarea name="cass" size="10139">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (j1a).k7" size="10139" crc="90e8758b" sha1="ea2bc2cbe4e26abeb0d2abd41cd6340eb57694f9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass11" interface="to_cass">
-		<feature name="part_id" value="j1b"/>
+			<feature name="part_id" value="j1b"/>
 			<dataarea name="cass" size="8795">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (j1b).k7" size="8795" crc="c700418c" sha1="13bb8543d846abbe1b633895cc619006334e1882" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass12" interface="to_cass">
-		<feature name="part_id" value="j2a"/>
+			<feature name="part_id" value="j2a"/>
 			<dataarea name="cass" size="7223">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (j2a).k7" size="7223" crc="0148ebd0" sha1="ed0033f888726882e26468fa44bb9f00fd463ee9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass13" interface="to_cass">
-		<feature name="part_id" value="j2b"/>
+			<feature name="part_id" value="j2b"/>
 			<dataarea name="cass" size="9013">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (j2b).k7" size="9013" crc="178f1b8f" sha1="b5ad0388710af168f41a995721e09e1867262c48" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass14" interface="to_cass">
-		<feature name="part_id" value="j3a"/>
+			<feature name="part_id" value="j3a"/>
 			<dataarea name="cass" size="9261">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (j3a).k7" size="9261" crc="0e237980" sha1="e72b2af157051bc546c8128d42659653dc8c574d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass15" interface="to_cass">
-		<feature name="part_id" value="j3b"/>
+			<feature name="part_id" value="j3b"/>
 			<dataarea name="cass" size="12849">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (j3b).k7" size="12849" crc="a0d05f09" sha1="b15069de0d69781c34a0eac20b90f78d68f5372a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass16" interface="to_cass">
-		<feature name="part_id" value="pra"/>
+			<feature name="part_id" value="pra"/>
 			<dataarea name="cass" size="9528">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (pra).k7" size="9528" crc="e4599eb8" sha1="c39834d16254251fe9ef2c236c5bde0430ec8b1a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass17" interface="to_cass">
-		<feature name="part_id" value="prb"/>
+			<feature name="part_id" value="prb"/>
 			<dataarea name="cass" size="13601">
 				<rom name="elmo 0 (afl) (f.m. blondel, j.c. le touze) (1984) (to7) (prb).k7" size="13601" crc="b655eb5f" sha1="ed0befaeaadf3dc3e5bd9ccbdfe6b3624eeec4ae" offset="0" />
 			</dataarea>
@@ -2320,13 +2320,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="28573">
 				<rom name="encadrement (nathan) (claude brunet) (1983) (to7) (side a).k7" size="28573" crc="efe8c2dd" sha1="4ae8b33886832c693e7f428c92e11466347e9cb4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="28573">
 				<rom name="encadrement (nathan) (claude brunet) (1983) (to7) (side b).k7" size="28573" crc="4c3c62fc" sha1="f81451f460316f4d72a98ceac09ae789542ecd3e" offset="0" />
 			</dataarea>
@@ -2339,31 +2339,31 @@
 		<publisher>Answare</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="20244">
 				<rom name="enigmatika (answare) (inconnus) (1984) (to7) (side 1a).k7" size="20244" crc="636c3253" sha1="273097bd20720a13e0d575e59606899180ef02e9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="19127">
 				<rom name="enigmatika (answare) (inconnus) (1984) (to7) (side 2a).k7" size="19127" crc="1a47ed20" sha1="31b2d3f2bd36ae65a234dbfe4a1e866d5a64cb23" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="20769">
 				<rom name="enigmatika (answare) (inconnus) (1984) (to7) (side 3a).k7" size="20769" crc="645dcf49" sha1="829d5c63aee29140ae036485374d7739ece53409" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Tape 4"/>
+			<feature name="part_id" value="Tape 4"/>
 			<dataarea name="cass" size="19387">
 				<rom name="enigmatika (answare) (inconnus) (1984) (to7) (side 4a).k7" size="19387" crc="0012021a" sha1="f07f7d6a07724329588efd28a7c628000b6ee50e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="to_cass">
-		<feature name="part_id" value="Tape 5"/>
+			<feature name="part_id" value="Tape 5"/>
 			<dataarea name="cass" size="19472">
 				<rom name="enigmatika (answare) (inconnus) (1984) (to7) (side 5a).k7" size="19472" crc="94abce52" sha1="e84348bd8359d6ce1ce1357b7583c69391621b62" offset="0" />
 			</dataarea>
@@ -2376,31 +2376,31 @@
 		<publisher>Answare</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="19938">
 				<rom name="enigmatika1-to7.k7" size="19938" crc="4fd09e21" sha1="0e7e97e6abf048e0f2bf458e0616ea48030a1a49" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="18835">
 				<rom name="enigmatika2-to7.k7" size="18835" crc="f60e8cb4" sha1="3def4750392644335241fe3b03e9a48b8d1bec96" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="20453">
 				<rom name="enigmatika3-to7.k7" size="20453" crc="ff71cff1" sha1="adce1be18a703adbb37e6d36a36cbe06dc5b1526" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Tape 4"/>
+			<feature name="part_id" value="Tape 4"/>
 			<dataarea name="cass" size="19091">
 				<rom name="enigmatika4-to7.k7" size="19091" crc="13a7635b" sha1="9e622e23f764dea588d32f3a4b904b40ad5c6b59" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="to_cass">
-		<feature name="part_id" value="Tape 5"/>
+			<feature name="part_id" value="Tape 5"/>
 			<dataarea name="cass" size="19472">
 				<rom name="enigmatika (answare) (inconnus) (1984) (to7) (side 5a).k7" size="19472" crc="94abce52" sha1="e84348bd8359d6ce1ce1357b7583c69391621b62" offset="0" />
 			</dataarea>
@@ -2413,13 +2413,13 @@
 		<publisher>Coktel Vision</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="57030">
 				<rom name="enigme a oxford (coktel vision) (beatrice franzi) (1986) (to7) (side 1a).k7" size="57030" crc="38232b86" sha1="4e60a546003ae001b76e36ce07efce56962020cb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="57034">
 				<rom name="enigme a oxford (coktel vision) (beatrice franzi) (1986) (to7) (side 1b).k7" size="57034" crc="cec310c1" sha1="f12cd6f84b81c8cee57f02c86dd2d0a0aaedb7be" offset="0" />
 			</dataarea>
@@ -2612,13 +2612,13 @@
 		<publisher>Ediciel</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="40485">
 				<rom name="faire le point bac maths 1 (ediciel) (m.f. gibert, c. jacob) (1985) (to7) (side 1).k7" size="40485" crc="243a0afb" sha1="75ef7b4b2aa7de6430239687b781402e060d6b04" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="60395">
 				<rom name="faire le point bac maths 1 (ediciel) (m.f. gibert, c. jacob) (1985) (to7) (side 2).k7" size="60395" crc="2092944f" sha1="8bd817c5ee41ebec6247751c34758ec1214a27ae" offset="0" />
 			</dataarea>
@@ -2631,13 +2631,13 @@
 		<publisher>Ediciel</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="45702">
 				<rom name="faire le point bac maths 2 (ediciel) (m.f. gibert) (1985) (to7) (side 1).k7" size="45702" crc="66a77a78" sha1="5667a14897b5a3ba4febb72ac26d4f79d059e934" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="44527">
 				<rom name="faire le point bac maths 2 (ediciel) (m.f. gibert) (1985) (to7) (side 2).k7" size="44527" crc="fd08f3b1" sha1="d9de225c29862b85f6018c6e3b4d3cad1a83d906" offset="0" />
 			</dataarea>
@@ -2734,13 +2734,13 @@
 		<publisher>Ediciel</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="15324">
 				<rom name="forget me not (ediciel) (louis chouvet) (1985) (to7) (side 1).k7" size="15324" crc="4c8d7ce0" sha1="fa15614d88c1e06a465248004db044bf2a8caac1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="12280">
 				<rom name="forget me not (ediciel) (louis chouvet) (1985) (to7) (side 2).k7" size="12280" crc="8292e0ee" sha1="acf0eb177d967d52f4b6c5ee3554442dc05b015e" offset="0" />
 			</dataarea>
@@ -2814,13 +2814,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="33887">
 				<rom name="francais - grammaire et orthographe (1) - ce (nathan) (inconnus) (1985) (to7) (side 1).k7" size="33887" crc="a1d86313" sha1="d86b3edf8d26a22e982a51176fa39c8948ae5b44" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="50223">
 				<rom name="francais - grammaire et orthographe (1) - ce (nathan) (inconnus) (1985) (to7) (side 2).k7" size="50223" crc="7d553f0d" sha1="f3c13e4629f1c4db4c7828c8721e0fe8860e1e64" offset="0" />
 			</dataarea>
@@ -3145,25 +3145,25 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Liminaire Side A"/>
+			<feature name="part_id" value="Liminaire Side A"/>
 			<dataarea name="cass" size="21357">
 				<rom name="la geste d'artillac (infogrames) (francois leger, philippe rabergeau, thierry souques) (1985) (to7 k7) (liminaire) (side 1).k7" size="21357" crc="65d4bbd0" sha1="6976f3833e73296040abb3772e063d0751c35ea0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Liminaire Side B"/>
+			<feature name="part_id" value="Liminaire Side B"/>
 			<dataarea name="cass" size="21357">
 				<rom name="la geste d'artillac (infogrames) (francois leger, philippe rabergeau, thierry souques) (1985) (to7 k7) (liminaire) (side 2).k7" size="21357" crc="b23ab0d2" sha1="7316d8ad39cbe8341c11d874b66c21a69fc60384" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Chants Side A"/>
+			<feature name="part_id" value="Chants Side A"/>
 			<dataarea name="cass" size="116766">
 				<rom name="la geste d'artillac (infogrames) (francois leger, philippe rabergeau, thierry souques) (1985) (to7 k7) (chants) (side 1).k7" size="116766" crc="9a697d7d" sha1="0a4ccf6ab4213705ab5012f4c5d1d4a1338e9995" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Chants Side B"/>
+			<feature name="part_id" value="Chants Side B"/>
 			<dataarea name="cass" size="114535">
 				<rom name="la geste d'artillac (infogrames) (francois leger, philippe rabergeau, thierry souques) (1985) (to7 k7) (chants) (side 2).k7" size="114535" crc="9e361bdb" sha1="2abba6db0214c2382049bfc98891a5eda0debc80" offset="0" />
 			</dataarea>
@@ -3308,25 +3308,25 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1 Side A"/>
+			<feature name="part_id" value="Tape 1 Side A"/>
 			<dataarea name="cass" size="19327">
 				<rom name="guten tag ! (nathan) (dominique miermont, jacques vergne) (1983) (to7) (side 1).k7" size="19327" crc="40aa281a" sha1="47eb99b50db0c8aa72b6d5c7ee393e30743c4de2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 1 Side B"/>
+			<feature name="part_id" value="Tape 1 Side B"/>
 			<dataarea name="cass" size="19364">
 				<rom name="guten tag ! (nathan) (dominique miermont, jacques vergne) (1983) (to7) (side 2).k7" size="19364" crc="f7b76173" sha1="566f19aa1eae072a8163b3c02b40282100ecc5ce" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 2 Side A"/>
+			<feature name="part_id" value="Tape 2 Side A"/>
 			<dataarea name="cass" size="21895">
 				<rom name="guten tag ! (nathan) (dominique miermont, jacques vergne) (1983) (to7) (side 3).k7" size="21895" crc="577301c3" sha1="66311048f86a76859121b555ca7d56a9635c609a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Tape 2 Side B"/>
+			<feature name="part_id" value="Tape 2 Side B"/>
 			<dataarea name="cass" size="22242">
 				<rom name="guten tag ! (nathan) (dominique miermont, jacques vergne) (1983) (to7) (side 4).k7" size="22242" crc="ba744ea9" sha1="7508316d2cb558e40d09636fcf3d8ba0223b6486" offset="0" />
 			</dataarea>
@@ -3412,13 +3412,13 @@
 		<publisher>MPS Diffusion</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="30035">
 				<rom name="histoire de france (mps diffusion) (gerard tramier) (1985) (to7) (side 1).k7" size="30035" crc="b7d4fdbb" sha1="332d74586a4fe47d75ae49ea49cc61223a7460c3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="26354">
 				<rom name="histoire de france (mps diffusion) (gerard tramier) (1985) (to7) (side 2).k7" size="26354" crc="bae7408b" sha1="f339183b93d81fcf34612bfc8da21a6e65ed1b83" offset="0" />
 			</dataarea>
@@ -3479,13 +3479,13 @@
 		<publisher>Cedic/Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="28768">
 				<rom name="image-et-signes-1_to7.k7" size="28768" crc="c56ebc2f" sha1="799d5c39a651f759e0538368772da5939ba4e63f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="0">
 				<rom name="image-et-signes-2_to7.k7" size="0" crc="00000000" offset="0" status="nodump" />
 			</dataarea>
@@ -3522,13 +3522,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="20480">
 				<rom name="inflexi1.k7" size="20480" crc="f71365ac" sha1="43062ce26c147deffc6d0c12c751f3b2a1ec9ad7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="38187">
 				<rom name="inflexi2.k7" size="38187" crc="52529412" sha1="af582b87273646690869905725a781771d262c8d" offset="0" />
 			</dataarea>
@@ -3541,13 +3541,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="65012">
 				<rom name="initiation au basic (cegos) (nathan) (inconnus) (1983) (to7) (vol1.1).k7" size="65012" crc="8bd06ed2" sha1="44a356116f4f17540b476e2547e055d711ee38ec" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="66234">
 				<rom name="initiation au basic (cegos) (nathan) (inconnus) (1983) (to7) (vol1.2).k7" size="66234" crc="5ca2bb43" sha1="4f64ab4c514376447f70ceac28b38911e645d712" offset="0" />
 			</dataarea>
@@ -3560,13 +3560,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="28627">
 				<rom name="initiation au basic (cegos) (nathan) (inconnus) (1983) (to7) (vol3.1).k7" size="28627" crc="36ec2da7" sha1="e35c11f0a5ac807d92e43e36f4a6bb0b74a986ba" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="37255">
 				<rom name="initiation au basic (cegos) (nathan) (inconnus) (1983) (to7) (vol3.2).k7" size="37255" crc="cb73c731" sha1="fe8ddc6ef4aea36ea92ca1e3ed32f00a64640b0b" offset="0" />
 			</dataarea>
@@ -3579,25 +3579,25 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="42421">
 				<rom name="initiation au basic (le cube informatique) (infogrames) (inconnus) (1984) (to7) (side 1).k7" size="42421" crc="4d249f90" sha1="5805dfef7e5bc6e3c3c2feab42b66b8b2b91171e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="19419">
 				<rom name="initiation au basic (le cube informatique) (infogrames) (inconnus) (1984) (to7) (side 2).k7" size="19419" crc="1bc4c338" sha1="af3c09a496cafc8f03fd4fcacbad794d6f39db6d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="43946">
 				<rom name="initiation au basic (le cube informatique) (infogrames) (inconnus) (1984) (to7) (side 3).k7" size="43946" crc="dd3e4798" sha1="c19b8e6f33a17653dd3cc968291e5e3bc9110fa2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Tape 4"/>
+			<feature name="part_id" value="Tape 4"/>
 			<dataarea name="cass" size="20860">
 				<rom name="initiation au basic (le cube informatique) (infogrames) (inconnus) (1984) (to7) (side 4).k7" size="20860" crc="a16abde9" sha1="2eeaa145a7f5dd09362aae7c2b2a62e05a00ae1a" offset="0" />
 			</dataarea>
@@ -3610,25 +3610,25 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="50421">
 				<rom name="einfuehrung in basic (infogrames) (inconnus) (1985) (to7 k7) (side 1).k7" size="50421" crc="987d3308" sha1="a23b7f265d3d15afd5f7156081536b7cab8d3a59" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="20709">
 				<rom name="einfuehrung in basic (infogrames) (inconnus) (1985) (to7 k7) (side 2).k7" size="20709" crc="945d2845" sha1="f9b9ea02fc92eaa506922a9a8bb47ab8c668b148" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="45895">
 				<rom name="einfuehrung in basic (infogrames) (inconnus) (1985) (to7 k7) (side 3).k7" size="45895" crc="ebd7d514" sha1="3f16a6f5c5882923f83840f650a2182e2d6130f0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Tape 4"/>
+			<feature name="part_id" value="Tape 4"/>
 			<dataarea name="cass" size="22658">
 				<rom name="einfuehrung in basic (infogrames) (inconnus) (1985) (to7 k7) (side 4).k7" size="22658" crc="af796b0c" sha1="7f9a81f09f7a0229dc32a43230530691dd6739c9" offset="0" />
 			</dataarea>
@@ -3730,13 +3730,13 @@
 		<publisher>Ediciel</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="34557">
 				<rom name="j'entends (ediciel) (jean-charles humblot, michele monnier) (1984) (to7 k7) (side 1).k7" size="34557" crc="08e3784b" sha1="45ebff98fe66704b2d23783b279ea951e1cdd90c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="34715">
 				<rom name="j'entends (ediciel) (jean-charles humblot, michele monnier) (1984) (to7 k7) (side 2).k7" size="34715" crc="c7ded4b1" sha1="5b2fc35fab13223609fbf0e66120237cedec3092" offset="0" />
 			</dataarea>
@@ -3749,13 +3749,13 @@
 		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="24941">
 				<rom name="jacquard v1.0 niveau 1 (cndp) (c. andrieux) (to7) (side a).k7" size="24941" crc="3d178074" sha1="87881510ef45ce5ee12ed2fb2c892e7653300700" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="3933">
 				<rom name="jacquard v1.0 niveau 1 (cndp) (c. andrieux) (to7) (side b).k7" size="3933" crc="155c25c4" sha1="a503567d94a20c283d17c0700b97a7c23c0c3390" offset="0" />
 			</dataarea>
@@ -3792,13 +3792,13 @@
 		<publisher>Ediciel</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="29483">
 				<rom name="je lis, j'ecris (ediciel) (jean-charles humblot) (1984) (to7) (side 1).k7" size="29483" crc="1294d9ad" sha1="92a4525c2c3127edecb331708f9e08958a518021" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="29726">
 				<rom name="je lis, j'ecris (ediciel) (jean-charles humblot) (1984) (to7) (side 2).k7" size="29726" crc="a4ba8c67" sha1="c49a3fbd1aa3a13c8c86292b3190d2c2eb7d5ced" offset="0" />
 			</dataarea>
@@ -3883,313 +3883,313 @@
 		<publisher>dcmoto.free.fr</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="4 pions"/>
+			<feature name="part_id" value="4 pions"/>
 			<dataarea name="cass" size="4624">
 				<rom name="jeux basic to (amateurs) (to7 k7) (4 pions).k7" size="4624" crc="eef48153" sha1="3c775fb4cc94339a93eb69af151dd6a8a0e62c4a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="animaux"/>
+			<feature name="part_id" value="animaux"/>
 			<dataarea name="cass" size="11793">
 				<rom name="jeux basic to (amateurs) (to7 k7) (animaux).k7" size="11793" crc="222671e1" sha1="1b65926cc62ba0f81c53c61f07073b95e9ae59c5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="assmots"/>
+			<feature name="part_id" value="assmots"/>
 			<dataarea name="cass" size="4789">
 				<rom name="jeux basic to (amateurs) (to7 k7) (assmots).k7" size="4789" crc="595ef796" sha1="5702d6915b5b68948de7a218b4438f4cebedf6d3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="bombard"/>
+			<feature name="part_id" value="bombard"/>
 			<dataarea name="cass" size="2450">
 				<rom name="jeux basic to (amateurs) (to7 k7) (bombard).k7" size="2450" crc="faaed693" sha1="1b253b9cde9573c4d4b12564fb4c468a03322699" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="to_cass">
-		<feature name="part_id" value="bowling"/>
+			<feature name="part_id" value="bowling"/>
 			<dataarea name="cass" size="4972">
 				<rom name="jeux basic to (amateurs) (to7 k7) (bowling).k7" size="4972" crc="108c867f" sha1="2590f95c17cd344859d44da00a7388eb823fd8e6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass6" interface="to_cass">
-		<feature name="part_id" value="calcul"/>
+			<feature name="part_id" value="calcul"/>
 			<dataarea name="cass" size="3100">
 				<rom name="jeux basic to (amateurs) (to7 k7) (calcul).k7" size="3100" crc="dcfeab6a" sha1="8f01ee44bfaed06de0064f42ad768199c9407e55" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass7" interface="to_cass">
-		<feature name="part_id" value="calment"/>
+			<feature name="part_id" value="calment"/>
 			<dataarea name="cass" size="9661">
 				<rom name="jeux basic to (amateurs) (to7 k7) (calment).k7" size="9661" crc="c079547c" sha1="87d79ece96584b94eb1449072bdf0815a933a3fc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass8" interface="to_cass">
-		<feature name="part_id" value="camental"/>
+			<feature name="part_id" value="camental"/>
 			<dataarea name="cass" size="923">
 				<rom name="jeux basic to (amateurs) (to7 k7) (camental).k7" size="923" crc="5c89a811" sha1="064f77af3347b5efedb0e99f1d0e8038df84c7ed" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass9" interface="to_cass">
-		<feature name="part_id" value="capitale"/>
+			<feature name="part_id" value="capitale"/>
 			<dataarea name="cass" size="10063">
 				<rom name="jeux basic to (amateurs) (to7 k7) (capitale).k7" size="10063" crc="fd7b84e1" sha1="2ad4391125f25b2e8fab4c1c84e7f5e1b8e53765" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass10" interface="to_cass">
-		<feature name="part_id" value="chase"/>
+			<feature name="part_id" value="chase"/>
 			<dataarea name="cass" size="2346">
 				<rom name="jeux basic to (amateurs) (to7 k7) (chase).k7" size="2346" crc="eb3758ee" sha1="d2433fb33aa2169a4d33026d782936569032e5d1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass11" interface="to_cass">
-		<feature name="part_id" value="cheflieu"/>
+			<feature name="part_id" value="cheflieu"/>
 			<dataarea name="cass" size="7815">
 				<rom name="jeux basic to (amateurs) (to7 k7) (cheflieu).k7" size="7815" crc="db66857b" sha1="ae4de69a436bfe1bee525cee5788a0f06654200a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass12" interface="to_cass">
-		<feature name="part_id" value="chenille"/>
+			<feature name="part_id" value="chenille"/>
 			<dataarea name="cass" size="2527">
 				<rom name="jeux basic to (amateurs) (to7 k7) (chenille).k7" size="2527" crc="1bc1c86d" sha1="258dc989e94cc161b2a9241f2a75e2a3c5472f5e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass13" interface="to_cass">
-		<feature name="part_id" value="chiffre"/>
+			<feature name="part_id" value="chiffre"/>
 			<dataarea name="cass" size="1295">
 				<rom name="jeux basic to (amateurs) (to7 k7) (chiffre).k7" size="1295" crc="5fb62e87" sha1="f714e1c6eb90a9773134b11f6f8583ad3a1a7eb0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass14" interface="to_cass">
-		<feature name="part_id" value="combspat"/>
+			<feature name="part_id" value="combspat"/>
 			<dataarea name="cass" size="7382">
 				<rom name="jeux basic to (amateurs) (to7 k7) (combspat).k7" size="7382" crc="ac2330d0" sha1="69a4d7a90fc4d04c4c1c17fb3929b6be1e3aec74" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass15" interface="to_cass">
-		<feature name="part_id" value="comptbon"/>
+			<feature name="part_id" value="comptbon"/>
 			<dataarea name="cass" size="3320">
 				<rom name="jeux basic to (amateurs) (to7 k7) (comptbon).k7" size="3320" crc="983ae65c" sha1="638fb9f063b85d75aaecf80b90fc6fa6f74341e0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass16" interface="to_cass">
-		<feature name="part_id" value="conjug1"/>
+			<feature name="part_id" value="conjug1"/>
 			<dataarea name="cass" size="6497">
 				<rom name="jeux basic to (amateurs) (to7 k7) (conjug1).k7" size="6497" crc="3154e1a0" sha1="0e862c39d20af7fcd0eff1cc184501707c0f28ab" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass17" interface="to_cass">
-		<feature name="part_id" value="damier"/>
+			<feature name="part_id" value="damier"/>
 			<dataarea name="cass" size="1800">
 				<rom name="jeux basic to (amateurs) (to7 k7) (damier).k7" size="1800" crc="c9ec9e3d" sha1="11fc60a4bac026576f33843b0a6710b217118be3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass18" interface="to_cass">
-		<feature name="part_id" value="dca"/>
+			<feature name="part_id" value="dca"/>
 			<dataarea name="cass" size="3533">
 				<rom name="jeux basic to (amateurs) (to7 k7) (dca).k7" size="3533" crc="733b4dee" sha1="0b54c214153d933d5cb5a477271a0227b022b5c8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass19" interface="to_cass">
-		<feature name="part_id" value="dedal"/>
+			<feature name="part_id" value="dedal"/>
 			<dataarea name="cass" size="5035">
 				<rom name="jeux basic to (amateurs) (to7 k7) (dedal).k7" size="5035" crc="7638ce02" sha1="dc0e596862e12968b825bd715c05008a2031f220" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass20" interface="to_cass">
-		<feature name="part_id" value="diamant"/>
+			<feature name="part_id" value="diamant"/>
 			<dataarea name="cass" size="19542">
 				<rom name="jeux basic to (amateurs) (to7 k7) (diamant).k7" size="19542" crc="170e7892" sha1="dd82028e3cf2b171460948c1acb89c0d43c0a2e8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass21" interface="to_cass">
-		<feature name="part_id" value="foirelet"/>
+			<feature name="part_id" value="foirelet"/>
 			<dataarea name="cass" size="2719">
 				<rom name="jeux basic to (amateurs) (to7 k7) (foirelet).k7" size="2719" crc="55e189c3" sha1="d71af7c52ec34317dcfa8d220b12fc9d676fcbe7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass22" interface="to_cass">
-		<feature name="part_id" value="geo-test"/>
+			<feature name="part_id" value="geo-test"/>
 			<dataarea name="cass" size="20069">
 				<rom name="jeux basic to (amateurs) (to7 k7) (geo-test).k7" size="20069" crc="e136f70e" sha1="1f88f042062410459a1bb9be79e631620c0c8603" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass23" interface="to_cass">
-		<feature name="part_id" value="geometri"/>
+			<feature name="part_id" value="geometri"/>
 			<dataarea name="cass" size="2737">
 				<rom name="jeux basic to (amateurs) (to7 k7) (geometri).k7" size="2737" crc="40748cdc" sha1="59845536a6f74aa0eb50726e23a8cc01d9d17570" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass24" interface="to_cass">
-		<feature name="part_id" value="guillo"/>
+			<feature name="part_id" value="guillo"/>
 			<dataarea name="cass" size="18572">
 				<rom name="jeux basic to (amateurs) (to7 k7) (guillo).k7" size="18572" crc="0fd9dddf" sha1="1f5dc67bee42c8133c5efcae34f2e07d5a471011" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass25" interface="to_cass">
-		<feature name="part_id" value="horticul"/>
+			<feature name="part_id" value="horticul"/>
 			<dataarea name="cass" size="5297">
 				<rom name="jeux basic to (amateurs) (to7 k7) (horticul).k7" size="5297" crc="f14de58a" sha1="42499c0cfaa1261110b91ddd38c302d141b463a5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass26" interface="to_cass">
-		<feature name="part_id" value="jeu 21"/>
+			<feature name="part_id" value="jeu 21"/>
 			<dataarea name="cass" size="1535">
 				<rom name="jeux basic to (amateurs) (to7 k7) (jeu 21).k7" size="1535" crc="41c43828" sha1="41a6fe53309439bab90a3117b4de51018ce853c8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass27" interface="to_cass">
-		<feature name="part_id" value="jeu 421"/>
+			<feature name="part_id" value="jeu 421"/>
 			<dataarea name="cass" size="5805">
 				<rom name="jeux basic to (amateurs) (to7 k7) (jeu 421).k7" size="5805" crc="e221cf62" sha1="a8af21fcf8913bd29f1edcc3603ec015925513c4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass28" interface="to_cass">
-		<feature name="part_id" value="le pendu"/>
+			<feature name="part_id" value="le pendu"/>
 			<dataarea name="cass" size="12412">
 				<rom name="jeux basic to (amateurs) (to7 k7) (le pendu).k7" size="12412" crc="2b53a051" sha1="aacd178b0d930c2b595d6e22bfe7b199cd082f34" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass29" interface="to_cass">
-		<feature name="part_id" value="lectrapi"/>
+			<feature name="part_id" value="lectrapi"/>
 			<dataarea name="cass" size="5634">
 				<rom name="jeux basic to (amateurs) (to7 k7) (lectrapi).k7" size="5634" crc="62ee4d5b" sha1="614cbadd6191a53013d4b050f1a3de2572dfdc5a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass30" interface="to_cass">
-		<feature name="part_id" value="lecture"/>
+			<feature name="part_id" value="lecture"/>
 			<dataarea name="cass" size="7574">
 				<rom name="jeux basic to (amateurs) (to7 k7) (lecture).k7" size="7574" crc="1900a86a" sha1="2501d29ba852a6229244da3753956d4ed049dab4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass31" interface="to_cass">
-		<feature name="part_id" value="mafepet"/>
+			<feature name="part_id" value="mafepet"/>
 			<dataarea name="cass" size="2247">
 				<rom name="jeux basic to (amateurs) (to7 k7) (mafepet).k7" size="2247" crc="14cc81c4" sha1="68e325c3e44ed2cb4a032abeac4c7a36fbee7220" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass32" interface="to_cass">
-		<feature name="part_id" value="mastmind"/>
+			<feature name="part_id" value="mastmind"/>
 			<dataarea name="cass" size="3246">
 				<rom name="jeux basic to (amateurs) (to7 k7) (mastmind).k7" size="3246" crc="43edc1f4" sha1="2ffc4ae30d4e940df1d76468cff0b623f19f5919" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass33" interface="to_cass">
-		<feature name="part_id" value="metallur"/>
+			<feature name="part_id" value="metallur"/>
 			<dataarea name="cass" size="9734">
 				<rom name="jeux basic to (amateurs) (to7 k7) (metallur).k7" size="9734" crc="2ebead10" sha1="1ee00ba896705fbade390e07f2ebcd7914cb04dc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass34" interface="to_cass">
-		<feature name="part_id" value="meteor"/>
+			<feature name="part_id" value="meteor"/>
 			<dataarea name="cass" size="2314">
 				<rom name="jeux basic to (amateurs) (to7 k7) (meteor).k7" size="2314" crc="0e197df9" sha1="bddb97069ddb22dad84147a12b959542c84e23ba" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass35" interface="to_cass">
-		<feature name="part_id" value="mur"/>
+			<feature name="part_id" value="mur"/>
 			<dataarea name="cass" size="2424">
 				<rom name="jeux basic to (amateurs) (to7 k7) (mur).k7" size="2424" crc="0c7fb754" sha1="9548d8ce231eab53bd559eed2354d1a36720af1e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass36" interface="to_cass">
-		<feature name="part_id" value="musique"/>
+			<feature name="part_id" value="musique"/>
 			<dataarea name="cass" size="2106">
 				<rom name="jeux basic to (amateurs) (to7 k7) (musique).k7" size="2106" crc="6dff351c" sha1="dec7f331a6256ea594ccc93e202f3c558aa3fa1a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass37" interface="to_cass">
-		<feature name="part_id" value="obstacle"/>
+			<feature name="part_id" value="obstacle"/>
 			<dataarea name="cass" size="931">
 				<rom name="jeux basic to (amateurs) (to7 k7) (obstacle).k7" size="931" crc="f664a619" sha1="17a51987fd35ea9650da1bd3a1363ac4e424f4b8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass38" interface="to_cass">
-		<feature name="part_id" value="peche"/>
+			<feature name="part_id" value="peche"/>
 			<dataarea name="cass" size="14031">
 				<rom name="jeux basic to (amateurs) (to7 k7) (peche).k7" size="14031" crc="c06856a3" sha1="273db5459d4555602f3f55017f72ac0ebbbb6b57" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass39" interface="to_cass">
-		<feature name="part_id" value="pickman"/>
+			<feature name="part_id" value="pickman"/>
 			<dataarea name="cass" size="4789">
 				<rom name="jeux basic to (amateurs) (to7 k7) (pickman).k7" size="4789" crc="bca29c4b" sha1="2b49023232cbc59dc2865fc309c46d777693b19c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass40" interface="to_cass">
-		<feature name="part_id" value="poker"/>
+			<feature name="part_id" value="poker"/>
 			<dataarea name="cass" size="5506">
 				<rom name="jeux basic to (amateurs) (to7 k7) (poker).k7" size="5506" crc="4e627b30" sha1="83bcff9d291c288f9eade9ede24eb658b0d51bc2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass41" interface="to_cass">
-		<feature name="part_id" value="posi"/>
+			<feature name="part_id" value="posi"/>
 			<dataarea name="cass" size="18919">
 				<rom name="jeux basic to (amateurs) (to7 k7) (posi).k7" size="18919" crc="91f864d1" sha1="919defb15a52566aa653a97e22b637f26bdee7a9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass42" interface="to_cass">
-		<feature name="part_id" value="regions"/>
+			<feature name="part_id" value="regions"/>
 			<dataarea name="cass" size="12806">
 				<rom name="jeux basic to (amateurs) (to7 k7) (regions).k7" size="12806" crc="f69f4571" sha1="e8af4aafa02519db76b500717e62a215bca4f952" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass43" interface="to_cass">
-		<feature name="part_id" value="reverse"/>
+			<feature name="part_id" value="reverse"/>
 			<dataarea name="cass" size="1291">
 				<rom name="jeux basic to (amateurs) (to7 k7) (reverse).k7" size="1291" crc="c2e53a8d" sha1="4c82ad616051b59c6b63dc839ba2c6231a69ca08" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass44" interface="to_cass">
-		<feature name="part_id" value="s-m"/>
+			<feature name="part_id" value="s-m"/>
 			<dataarea name="cass" size="21891">
 				<rom name="jeux basic to (amateurs) (to7 k7) (s-m).k7" size="21891" crc="c309c764" sha1="f2b2c196170c8893291c20e742f3e7164de05dd9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass45" interface="to_cass">
-		<feature name="part_id" value="simon"/>
+			<feature name="part_id" value="simon"/>
 			<dataarea name="cass" size="1848">
 				<rom name="jeux basic to (amateurs) (to7 k7) (simon).k7" size="1848" crc="e4158e45" sha1="ae27bc447d5eccd1afccb2864abe8cea31380cc5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass46" interface="to_cass">
-		<feature name="part_id" value="snake"/>
+			<feature name="part_id" value="snake"/>
 			<dataarea name="cass" size="1754">
 				<rom name="jeux basic to (amateurs) (to7 k7) (snake).k7" size="1754" crc="fb8020f6" sha1="b92c6300b8ef172611fe0b60bbc6a407c14219c7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass47" interface="to_cass">
-		<feature name="part_id" value="solitair"/>
+			<feature name="part_id" value="solitair"/>
 			<dataarea name="cass" size="3158">
 				<rom name="jeux basic to (amateurs) (to7 k7) (solitair).k7" size="3158" crc="4f4c2110" sha1="729f10331f04b78ff1feceadb19cc45ce60c27fb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass48" interface="to_cass">
-		<feature name="part_id" value="stockcar"/>
+			<feature name="part_id" value="stockcar"/>
 			<dataarea name="cass" size="5843">
 				<rom name="jeux basic to (amateurs) (to7 k7) (stockcar).k7" size="5843" crc="63a2f019" sha1="e3918e4b5bab029400db9c6a2f188f22705dc7e3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass49" interface="to_cass">
-		<feature name="part_id" value="syllabe"/>
+			<feature name="part_id" value="syllabe"/>
 			<dataarea name="cass" size="1998">
 				<rom name="jeux basic to (amateurs) (to7 k7) (syllabe).k7" size="1998" crc="098d89c4" sha1="24fcc5b5dc082872b329d5826ed6205fae8938d9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass50" interface="to_cass">
-		<feature name="part_id" value="tank"/>
+			<feature name="part_id" value="tank"/>
 			<dataarea name="cass" size="2052">
 				<rom name="jeux basic to (amateurs) (to7 k7) (tank).k7" size="2052" crc="d2fc71aa" sha1="dd47ce8e6b1f09859c49e8c834e630e7cc208487" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass51" interface="to_cass">
-		<feature name="part_id" value="thief"/>
+			<feature name="part_id" value="thief"/>
 			<dataarea name="cass" size="55893">
 				<rom name="jeux basic to (amateurs) (to7 k7) (thief).k7" size="55893" crc="cd3a1af4" sha1="6642b416ebef35c41438f049f0a0352da09885eb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass52" interface="to_cass">
-		<feature name="part_id" value="tirmulti"/>
+			<feature name="part_id" value="tirmulti"/>
 			<dataarea name="cass" size="1658">
 				<rom name="jeux basic to (amateurs) (to7 k7) (tirmulti).k7" size="1658" crc="e9cd5247" sha1="e3c542694a4fb866d274b55b05c782814ed66f24" offset="0" />
 			</dataarea>
@@ -4214,13 +4214,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="45773">
 				<rom name="jeux de mots (inconnus) (to7) (side 1).k7" size="45773" crc="690ef060" sha1="72408d9d4fd3edabda5fa13db0e1d1743a8fd377" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="52282">
 				<rom name="jeux de mots (inconnus) (to7) (side 2).k7" size="52282" crc="22d6dd24" sha1="8293ce4a15a711a5b06d80dea08e48ae619f50ad" offset="0" />
 			</dataarea>
@@ -4485,13 +4485,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="41782478">
 				<rom name="las vegas (infogrames) (pierre bayle, roger granier) (1985) (to7 wav) (las-vegas-a_to7).wav" size="41782478" crc="e1b2e18c" sha1="e5acbc8d4fdb723505c5f6914ce9fe3eba5c6b6b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="25930015">
 				<rom name="las vegas (infogrames) (pierre bayle, roger granier) (1985) (to7 wav) (las-vegas-b-to7).wav" size="25930015" crc="7ad7349e" sha1="7444fd3b2b8459b644cb2902d3940e64ee8fb12a" offset="0" />
 			</dataarea>
@@ -4504,13 +4504,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="70301">
 				<rom name="las vegas (infogrames) (1985) (pierre bayle, roger granier) (side a) (to7).k7" size="70301" crc="2ea9e610" sha1="82ca4e0c6222ae75638996dc5772f65fde19d721" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="43379">
 				<rom name="las vegas (infogrames) (1985) (pierre bayle, roger granier) (side b) (to7).k7" size="43379" crc="bab90418" sha1="ba95f9978f183adf3467e21a0f22af5b4ea110fa" offset="0" />
 			</dataarea>
@@ -4559,19 +4559,19 @@
 		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="63991">
 				<rom name="lis, lisons, lisez... (edil) (j.c. fontaine, r. richard) (1985) (to7) (side 1).k7" size="63991" crc="543a0b0e" sha1="df8d8db140afa207561f9176f29ed321e974a39c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="41110">
 				<rom name="lis, lisons, lisez... (edil) (j.c. fontaine, r. richard) (1985) (to7) (side 2).k7" size="41110" crc="b8704e71" sha1="1ebac010e048357d5a0e62a41bea6763845c83db" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="69864">
 				<rom name="lis, lisons, lisez... (edil) (j.c. fontaine, r. richard) (1985) (to7) (side 3).k7" size="69864" crc="7275a6ac" sha1="ba3ad15d5f58278666c3d396af9a82c7e35cfdaa" offset="0" />
 			</dataarea>
@@ -4584,13 +4584,13 @@
 		<publisher>Cedic/Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="39728">
 				<rom name="logo sans peine (nathan) (1985) (to7).k7" size="39728" crc="061cdc24" sha1="a37eea7948823729a384ac67903114cc0ee637e4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="36139">
 				<rom name="logo-sans-peine-2_to7.k7" size="36139" crc="3815ab96" sha1="2e5be146fa4841aad63426830ddae73bce7fe656" offset="0" />
 			</dataarea>
@@ -4711,25 +4711,25 @@
 		<publisher>France Image Logiciel (FIL)</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1 (Arkanoid)"/>
+			<feature name="part_id" value="Tape 1 (Arkanoid)"/>
 			<dataarea name="cass" size="28061">
 				<rom name="mallette de jeu thomson (fil) (inconnus) (1987) (to7 k7) (arkanoid_to7).k7" size="28061" crc="ba78ec63" sha1="294fb1b30b34dd1bea5a796fd279166f861d48ca" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2 (Formule 1)"/>
+			<feature name="part_id" value="Tape 2 (Formule 1)"/>
 			<dataarea name="cass" size="66182">
 				<rom name="mallette de jeu thomson (fil) (inconnus) (1987) (to7 k7) (formule1_to7).k7" size="66182" crc="60773e10" sha1="4a7a3685281f4acd0925f6cf0c3aa9113a0d3d75" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 3 (Game Over)"/>
+			<feature name="part_id" value="Tape 3 (Game Over)"/>
 			<dataarea name="cass" size="56157">
 				<rom name="mallette de jeu thomson (fil) (inconnus) (1987) (to7 k7) (game-over_to7).k7" size="56157" crc="7c28d944" sha1="93fdc64ca37c3e1b608d0c97aea58072aba2f0bb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Tape 4 (Sorcery)"/>
+			<feature name="part_id" value="Tape 4 (Sorcery)"/>
 			<dataarea name="cass" size="39738">
 				<rom name="mallette de jeu thomson (fil) (inconnus) (1987) (to7 k7) (sorcery_to7).k7" size="39738" crc="a11fecd9" sha1="8d97455aecda0004dcf7f20f48e6a8f86184db05" offset="0" />
 			</dataarea>
@@ -4742,13 +4742,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1 (Jeu)"/>
+			<feature name="part_id" value="Tape 1 (Jeu)"/>
 			<dataarea name="cass" size="41525">
 				<rom name="mandragore (infogrames) (marc cecchi, christian ballandras) (1984) (to7) (jeu).k7" size="41525" crc="599f1624" sha1="fb89361eba219519874d72f85f3ea7d7b4f3048e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2 (Donjons)"/>
+			<feature name="part_id" value="Tape 2 (Donjons)"/>
 			<dataarea name="cass" size="106815">
 				<rom name="mandragore (infogrames) (marc cecchi, christian ballandras) (1984) (to7) (donjons).k7" size="106815" crc="442b6af0" sha1="50ab841c593c2c2d47518329d4ef6389b9d56eec" offset="0" />
 			</dataarea>
@@ -4761,25 +4761,25 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Spielkassette Side A"/>
+			<feature name="part_id" value="Spielkassette Side A"/>
 			<dataarea name="cass" size="41671">
 				<rom name="mandragore version allemande (infogrames) (marc cecchi, christian ballandras) (1985) (to7 k7) (spielkassette) (side 1).k7" size="41671" crc="3b2fca52" sha1="b34f8c5db904ef270c839e8a251d32dd2ee4eb49" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Spielkassette Side B"/>
+			<feature name="part_id" value="Spielkassette Side B"/>
 			<dataarea name="cass" size="41671">
 				<rom name="mandragore version allemande (infogrames) (marc cecchi, christian ballandras) (1985) (to7 k7) (spielkassette) (side 2).k7" size="41671" crc="76c8a02e" sha1="2c0a498807ee3327ebd59c467f661bb810ebfa5f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Festungskassette Side A"/>
+			<feature name="part_id" value="Festungskassette Side A"/>
 			<dataarea name="cass" size="58200">
 				<rom name="mandragore version allemande (infogrames) (marc cecchi, christian ballandras) (1985) (to7 k7) (festungskassette) (side 1).k7" size="58200" crc="91c7240a" sha1="c45069abfd552e3bb20c0dbacea12704c890c67a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Festungskassette Side B"/>
+			<feature name="part_id" value="Festungskassette Side B"/>
 			<dataarea name="cass" size="48661">
 				<rom name="mandragore version allemande (infogrames) (marc cecchi, christian ballandras) (1985) (to7 k7) (festungskassette) (side 2).k7" size="48661" crc="dcf13011" sha1="fb4a56f4eda2d4fded99a11044138de81e623853" offset="0" />
 			</dataarea>
@@ -4852,13 +4852,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="37534">
 				<rom name="mathematiques - geometrie ce cm (nathan) (inconnus) (1985) (to7) (side 1).k7" size="37534" crc="462fbc09" sha1="cf269d62f658279f4ddd81b97ad39ceeb6f35568" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="38360">
 				<rom name="mathematiques - geometrie ce cm (nathan) (inconnus) (1985) (to7) (side 2).k7" size="38360" crc="b2e5e64c" sha1="96dff2bee18d205641c79b4a2ca20f9bfda37599" offset="0" />
 			</dataarea>
@@ -4955,13 +4955,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="39824">
 				<rom name="mathematiques cm - mesures et grandeurs - aires et volumes (nathan) (inconnus) (1985) (to7) (side 1).k7" size="39824" crc="4f101f08" sha1="dc96951c2a74a0d2b9116a3a3f3ea62a6512532b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="32286">
 				<rom name="mathematiques cm - mesures et grandeurs - aires et volumes (nathan) (inconnus) (1985) (to7) (side 2).k7" size="32286" crc="1ac36f34" sha1="d91895f8996b78339b9e7e89f05245d9c56643a4" offset="0" />
 			</dataarea>
@@ -5082,19 +5082,19 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1 Side A"/>
+			<feature name="part_id" value="Tape 1 Side A"/>
 			<dataarea name="cass" size="20915">
 				<rom name="mes premiers mots croises (nathan) (bernard delarue, jean-paul dupre) (1983) (to7) (side 1a).k7" size="20915" crc="741c1788" sha1="368c0b730ffa956fa9ab36a1499e6bc5ee0c027e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 1 Side B"/>
+			<feature name="part_id" value="Tape 1 Side B"/>
 			<dataarea name="cass" size="20915">
 				<rom name="mes premiers mots croises (nathan) (bernard delarue, jean-paul dupre) (1983) (to7) (side 1b).k7" size="20915" crc="bd9655ef" sha1="bc24d61a86f478eff5cc486760bd3f81d35304af" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="18984">
 				<rom name="mes premiers mots croises (nathan) (bernard delarue, jean-paul dupre) (1983) (to7) (side 2a).k7" size="18984" crc="8eaaa356" sha1="eb3f1d5c3dc608165c7c9c9dce7a6228f8340e1c" offset="0" />
 			</dataarea>
@@ -5397,13 +5397,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="32184">
 				<rom name="mots en fleurs (nathan) (viviane et claude barbier) (1983) (to7) (side 1).k7" size="32184" crc="cd6290f5" sha1="fe471c157d469cfc6ab776d96fba7d1c19f8df6d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="21409">
 				<rom name="mots en fleurs (nathan) (viviane et claude barbier) (1983) (to7) (side 2).k7" size="21409" crc="ad6aa71d" sha1="43f8facd701e712b2b3ab92616fad81dced8dc9d" offset="0" />
 			</dataarea>
@@ -5649,13 +5649,13 @@
 		<publisher>Larousse</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="23948">
 				<rom name="les ordifables (larousse) (r. granier, p. bayle) (1985) (to7) (side 1).k7" size="23948" crc="4ded159a" sha1="2ac82b7d24039c98daca2931245dcdc01fb16995" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="25770">
 				<rom name="les ordifables (larousse) (r. granier, p. bayle) (1985) (to7) (side 2).k7" size="25770" crc="265cadde" sha1="6e02229f05eab9d2318bc4cc04393d23a05b3c74" offset="0" />
 			</dataarea>
@@ -5838,25 +5838,25 @@
 		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1 Side A"/>
+			<feature name="part_id" value="Tape 1 Side A"/>
 			<dataarea name="cass" size="32193">
 				<rom name="participes passes - accordez-vous ! (edil) (catherine perrot) (1983) (to7) (side 1a).k7" size="32193" crc="cab1b195" sha1="20a8268b0276bbe0f661664e69ec912bd33ff818" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 1 Side B"/>
+			<feature name="part_id" value="Tape 1 Side B"/>
 			<dataarea name="cass" size="18669">
 				<rom name="participes passes - accordez-vous ! (edil) (catherine perrot) (1983) (to7) (side 1b).k7" size="18669" crc="dda0de81" sha1="bab4cd29ee71ed47509012c197277d49dc484985" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 2 Side A"/>
+			<feature name="part_id" value="Tape 2 Side A"/>
 			<dataarea name="cass" size="22929">
 				<rom name="participes passes - accordez-vous ! (edil) (catherine perrot) (1983) (to7) (side 2a).k7" size="22929" crc="492a9be7" sha1="41775e8f5216f522905d92ea164ac08448d3b7ce" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Tape 2 Side B"/>
+			<feature name="part_id" value="Tape 2 Side B"/>
 			<dataarea name="cass" size="31930">
 				<rom name="participes passes - accordez-vous ! (edil) (catherine perrot) (1983) (to7) (side 2b).k7" size="31930" crc="19ae6657" sha1="aaad2c9b5d21c335c832f1b532d991a75ecd900c" offset="0" />
 			</dataarea>
@@ -5869,37 +5869,37 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1 Side A"/>
+			<feature name="part_id" value="Tape 1 Side A"/>
 			<dataarea name="cass" size="52140">
 				<rom name="les passagers du vent (infogrames) (daniel charpy, richard bottet, gerard courouble, tuan do cao) (1986) (to7) (side 1a).k7" size="52140" crc="7eaccd93" sha1="b80ae1bf1889ba872ec84c5559a8673b7b0c3d1d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 1 Side B"/>
+			<feature name="part_id" value="Tape 1 Side B"/>
 			<dataarea name="cass" size="70018">
 				<rom name="les passagers du vent (infogrames) (daniel charpy, richard bottet, gerard courouble, tuan do cao) (1986) (to7) (side 1b).k7" size="70018" crc="8822c0ad" sha1="52bc618d98a9e9d0fd79af5dc66583aba87ba3ce" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 2 Side A"/>
+			<feature name="part_id" value="Tape 2 Side A"/>
 			<dataarea name="cass" size="78884">
 				<rom name="les passagers du vent (infogrames) (daniel charpy, richard bottet, gerard courouble, tuan do cao) (1986) (to7) (side 2a).k7" size="78884" crc="355f1329" sha1="4e95f77f49dfa620b7498a65570194a21a064b91" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Tape 2 Side B"/>
+			<feature name="part_id" value="Tape 2 Side B"/>
 			<dataarea name="cass" size="78103">
 				<rom name="les passagers du vent (infogrames) (daniel charpy, richard bottet, gerard courouble, tuan do cao) (1986) (to7) (side 2b).k7" size="78103" crc="0f297db1" sha1="face9df961d6388e36bb37b5665e041a4a768b47" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="to_cass">
-		<feature name="part_id" value="Tape 3 Side A"/>
+			<feature name="part_id" value="Tape 3 Side A"/>
 			<dataarea name="cass" size="11933">
 				<rom name="les passagers du vent (infogrames) (daniel charpy, richard bottet, gerard courouble, tuan do cao) (1986) (to7) (side 3a).k7" size="11933" crc="46196706" sha1="3a9456e09b6ca64e5358eaed7aa5349167b5a928" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass6" interface="to_cass">
-		<feature name="part_id" value="Tape 3 Side B"/>
+			<feature name="part_id" value="Tape 3 Side B"/>
 			<dataarea name="cass" size="11374">
 				<rom name="les passagers du vent (infogrames) (daniel charpy, richard bottet, gerard courouble, tuan do cao) (1986) (to7) (side 3b).k7" size="11374" crc="6633709e" sha1="177e637bf1c1a233147c601c087fba4734df3c5f" offset="0" />
 			</dataarea>
@@ -6416,13 +6416,13 @@
 		<publisher>TO TEK Editions</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="15236">
 				<rom name="pousspan (totek) (philippe descamps) (1983) (to7) (side 1).k7" size="15236" crc="aed4835c" sha1="4fe919883588b53c4a6f733ad0879ff3dc066e97" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="13042">
 				<rom name="pousspan (totek) (philippe descamps) (1983) (to7) (side 2).k7" size="13042" crc="56257c3d" sha1="565548be0eadab51fd6d229ed479c5543f59599c" offset="0" />
 			</dataarea>
@@ -6699,13 +6699,13 @@
 		<publisher>VIFI-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="33879">
 				<rom name="la ronde des formes (nathan) (patrice et bruno couronne) (1984) (to7) (side 1).k7" size="33879" crc="d98f01bf" sha1="78129e6343e38fc256e752e2dd3803dc4751de2a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="33879">
 				<rom name="la ronde des formes (nathan) (patrice et bruno couronne) (1984) (to7) (side 2).k7" size="33879" crc="ae0522f8" sha1="268ed6f9a429f2d75db227f85ebd088bb1e19429" offset="0" />
 			</dataarea>
@@ -6792,13 +6792,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1 (Jeu)"/>
+			<feature name="part_id" value="Tape 1 (Jeu)"/>
 			<dataarea name="cass" size="39288">
 				<rom name="saphir + editeur (infogrames) (eric szymkowiak) (1986) (to7) (jeu).k7" size="39288" crc="2e5a5146" sha1="78f9968fb7495966deaa0350530f85e95e5df649" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2 (Editeur)"/>
+			<feature name="part_id" value="Tape 2 (Editeur)"/>
 			<dataarea name="cass" size="24821">
 				<rom name="saphir + editeur (infogrames) (eric szymkowiak) (1986) (to7).k7" size="24821" crc="c63e2a4c" sha1="0d75d23882ebc4f58b889972dc1d364aa91439ee" offset="0" />
 			</dataarea>
@@ -7315,13 +7315,13 @@
 		<publisher>Carraz Editions</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="29374031">
 				<rom name="sujet complement (carraz) (francois borderie, emmanuel forsans) (1987) (to7) (side 2a).wav" size="29374031" crc="c728d24c" sha1="5d6abe401435a961d26a080145e0bdd626655b98" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="31526624">
 				<rom name="sujet complement (carraz) (francois borderie, emmanuel forsans) (1987) (to7) (side 2b).wav" size="31526624" crc="0b0c1f55" sha1="8b4cb31566f04ff107e26ae4a4060c977242aeaa" offset="0" />
 			</dataarea>
@@ -7334,13 +7334,13 @@
 		<publisher>Carraz Editions</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="45978">
 				<rom name="sujet complement (carraz) (francois borderie, emmanuel forsans) (1987) (to7) (side 2a).k7" size="45978" crc="3dda1465" sha1="e4cbc9d1039dd0d06b856f00cb203173b38d77ff" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="49843">
 				<rom name="sujet complement (carraz) (francois borderie, emmanuel forsans) (1987) (to7) (side 2b).k7" size="49843" crc="f96572bd" sha1="fab078a4120d5d1e4270831f8da0e94cdc0a551e" offset="0" />
 			</dataarea>
@@ -7557,19 +7557,19 @@
 		<publisher>Jeulin</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side 2A"/>
+			<feature name="part_id" value="Side 2A"/>
 			<dataarea name="cass" size="31909">
 				<rom name="tortue jeulin (jeulin) (t. savatier, y. ollivier) (1985-1988) (to7) (side 2a).k7" size="31909" crc="0627298f" sha1="c5f39f14142d820ea93d85f6a86c4567d66fd610" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side 2B"/>
+			<feature name="part_id" value="Side 2B"/>
 			<dataarea name="cass" size="4800">
 				<rom name="tortue jeulin (jeulin) (t. savatier, y. ollivier) (1985-1988) (to7) (side 2b).k7" size="4800" crc="bfd41af5" sha1="ade2fbebc867eafff819bd6186bd230b087e0dd8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Side 3"/>
+			<feature name="part_id" value="Side 3"/>
 			<dataarea name="cass" size="12176">
 				<rom name="tortue jeulin (jeulin) (t. savatier, y. ollivier) (1985-1988) (to7) (side 3).k7" size="12176" crc="be279535" sha1="4753412f44ba1bc9446bec011ced6e2fb08794a2" offset="0" />
 			</dataarea>
@@ -7692,13 +7692,13 @@
 		<publisher>Norsoft</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="39967">
 				<rom name="tyrann (norsoft) (inconnus) (1985) (to7) (side a).k7" size="39967" crc="277f54ca" sha1="43daf1c310e5e6f62783d1493e031770b7c3da86" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="32284">
 				<rom name="tyrann (norsoft) (inconnus) (1985) (to7) (side b).k7" size="32284" crc="c9431c1a" sha1="109876706de4775c14c278f1d59b12741d39aa2e" offset="0" />
 			</dataarea>

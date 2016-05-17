@@ -7935,7 +7935,7 @@
 			<feature name="pcb" value="DMG-BEAN-20" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1" />
-		<feature name="slot" value="rom_mbc1" />
+			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-ak8j-0.u1" size="262144" crc="87f0cfad" sha1="edfc194f9f58ef97dfe87092eebd4c73359925e1" offset="0" />
 			</dataarea>

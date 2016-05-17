@@ -142,25 +142,25 @@
 		<info name="usage" value="Insert Chargeur disk first, then load Systeme disk when prompted" />
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Chargeur"/>
+			<feature name="part_id" value="Chargeur"/>
 			<dataarea name="flop" size="163840">
 				<rom name="jane (thomson) (arktronics) (1985) (mo5) (chargeur).fd" size="163840" crc="a116ff4f" sha1="c49546a79b448f3e3b5263f08c5471fde7da0490" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Systeme"/>
+			<feature name="part_id" value="Systeme"/>
 			<dataarea name="flop" size="163840">
 				<rom name="jane (thomson) (arktronics) (1985) (mo5) (systeme).fd" size="163840" crc="3bfdccd3" sha1="972a7fd814f720326fd048eab0daa600d25149e1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Donnees"/>
+			<feature name="part_id" value="Donnees"/>
 			<dataarea name="flop" size="163840">
 				<rom name="jane (thomson) (arktronics) (1985) (mo5) (donnees).fd" size="163840" crc="7882c323" sha1="335ee62747b542cb577826cd5242423ce673beee" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Aide"/>
+			<feature name="part_id" value="Aide"/>
 			<dataarea name="flop" size="163840">
 				<rom name="jane (thomson) (arktronics) (1985) (mo5) (aide).fd" size="163840" crc="186ce086" sha1="94cbfa62914aeaed74695aa58d452d8484bec8e7" offset="0" />
 			</dataarea>
@@ -440,13 +440,13 @@
 		<publisher>DSSoft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="memo5-chargeur_mo5 disk1.fd" size="327680" crc="7c0cbbe8" sha1="c18d2242743ef71ac0c6c78c9f20e43d78e720e0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="memo5-chargeur_mo5 disk2.fd" size="327680" crc="fdcfc6ec" sha1="ed31a176180696c979a21d4c99647403a0dd73e2" offset="0" />
 			</dataarea>

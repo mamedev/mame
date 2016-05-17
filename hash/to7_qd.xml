@@ -26,13 +26,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="51200">
 				<rom name="sydney1.qd" size="51200" crc="7e8f6e02" sha1="a6dba6ecc7d352b1226a0ed0663dccc93fc10938" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="51200">
 				<rom name="sydney2.qd" size="51200" crc="0474c138" sha1="73fa47083029c9db46e5c37c0d957c7e69d7f482" offset="0" />
 			</dataarea>
@@ -82,25 +82,25 @@
 		<publisher>EH Services</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="51200">
 				<rom name="erebus1a.qd" size="51200" crc="8bd3f65c" sha1="2c0d9e3abdb0003bd9341a2bcc439517c4a574ab" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="51200">
 				<rom name="erebus1b.qd" size="51200" crc="c3c0a0a6" sha1="ffa8696cfbefdfaf497ca3694fbea0c32747982f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="51200">
 				<rom name="erebus2a.qd" size="51200" crc="804f4d94" sha1="1be13476dd5f203c2c89ac035d99455ee2a4790c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="51200">
 				<rom name="erebus2b.qd" size="51200" crc="0a97ab6f" sha1="704e57de58c4663b26d424fa95270d7076bf48e5" offset="0" />
 			</dataarea>
@@ -163,25 +163,25 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="51200">
 				<rom name="lasvegas1a.qd" size="51200" crc="5d8dec98" sha1="ff5a3d75fdbea267ad70387bf578e546a6048748" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="51200">
 				<rom name="lasvegas1b.qd" size="51200" crc="5bf3ae67" sha1="691683069b450ebf98ac6db5e2de7bc31cbc77db" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="51200">
 				<rom name="lasvegas2a.qd" size="51200" crc="45b4bafa" sha1="79399bd9dabe54c25a644d0c7784106feb18c738" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="51200">
 				<rom name="lasvegas2b.qd" size="51200" crc="ef0d8f9e" sha1="cf5cc651fc2dbb87d14b551fb4ed67fcc954f6c3" offset="0" />
 			</dataarea>
@@ -206,13 +206,13 @@
 		<publisher>Cobrasoft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="51200">
 				<rom name="meurtatl1a.qd" size="51200" crc="c55d6ae7" sha1="0be2e312bee30bb1b44ae278c263adcab5535dee" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="51200">
 				<rom name="meurtatl1b.qd" size="51200" crc="37f261bd" sha1="9ccecf4eef1384f3f4c3d0b5009a38ad22ef4fd8" offset="0" />
 			</dataarea>

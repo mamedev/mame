@@ -121,25 +121,25 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="mo_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="14572256">
 				<rom name="super jeux mo6 (infogrames) (divers) (1987) (mo6 wav) (fbi-football_mo6).wav" size="14572256" crc="2af535cf" sha1="6df9b0eb82783fbc8a840f28a50742cf224e4b4b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mo_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="11649988">
 				<rom name="super jeux mo6 (infogrames) (divers) (1987) (mo6 wav) (invasion-scarfinger_mo6).wav" size="11649988" crc="db2ff568" sha1="b8901dd414116bb6524247923eb15ab79417d06f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="mo_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="11343100">
 				<rom name="super jeux mo6 (infogrames) (divers) (1987) (mo6 wav) (karate_mo6).wav" size="11343100" crc="8c3520a3" sha1="9e082c649cee151eb1753a42e74a33be99e93b3d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="mo_cass">
-		<feature name="part_id" value="Tape 4"/>
+			<feature name="part_id" value="Tape 4"/>
 			<dataarea name="cass" size="9768990">
 				<rom name="super jeux mo6 (infogrames) (divers) (1987) (mo6 wav) (sortileges_mo6).wav" size="9768990" crc="014260fc" sha1="056bfbf07ca74b96050e73f82eba6b035dfb9e8f" offset="0" />
 			</dataarea>
@@ -152,25 +152,25 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="mo_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="44134">
 				<rom name="super jeux mo6 (infogrames) (divers) (1987) (mo6 k7) (fbi-football_mo6).k7" size="44134" crc="f16436af" sha1="64fadb387158d1fe542fd33619d8ce0ed4c82b61" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mo_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="32552">
 				<rom name="super jeux mo6 (infogrames) (divers) (1987) (mo6 k7) (invasion-scarfinger_mo6).k7" size="32552" crc="f1ef631e" sha1="4607284c53a36e07461684ebf3ba097014fcfcb9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="mo_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="38165">
 				<rom name="super jeux mo6 (infogrames) (divers) (1987) (mo6 k7) (karate_mo6).k7" size="38165" crc="c323dcb0" sha1="396077408a681f393adac02d9d89ce41ddb7a799" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="mo_cass">
-		<feature name="part_id" value="Tape 4"/>
+			<feature name="part_id" value="Tape 4"/>
 			<dataarea name="cass" size="31727">
 				<rom name="super jeux mo6 (infogrames) (divers) (1987) (mo6 k7) (sortileges_mo6).k7" size="31727" crc="e576da0d" sha1="2cfb55aacb0a083909f1b020508cd08f85dfbfb3" offset="0" />
 			</dataarea>

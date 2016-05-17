@@ -81079,21 +81079,21 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-<software name="mc_gx121" supported="no">
-	<description>Games Xplosion 121 in 1</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="cart" interface="nes_cart">
-		<feature name="slot" value="bmc_hik8in1" />
-		<feature name="pcb" value="BMC-SUPERHIK8IN1" />
-		<dataarea name="chr" size="4194304">
-			<rom name="gamesxplosion.chr" size="4194304" crc="788ae9fe" sha1="c0081db29f62c51cff7943682493c4d17fc1419d" offset="00000" status="baddump" />
-		</dataarea>
-		<dataarea name="prg" size="4194304">
-			<rom name="gamesxplosion.prg" size="4194304" crc="0282d975" sha1="9ead7505b99a60834724a5818ee120e03c8bf975" offset="00000" status="baddump" />
-		</dataarea>
-	</part>
-</software>
+	<software name="mc_gx121" supported="no">
+		<description>Games Xplosion 121 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_hik8in1" />
+			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
+			<dataarea name="chr" size="4194304">
+				<rom name="gamesxplosion.chr" size="4194304" crc="788ae9fe" sha1="c0081db29f62c51cff7943682493c4d17fc1419d" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="4194304">
+				<rom name="gamesxplosion.prg" size="4194304" crc="0282d975" sha1="9ead7505b99a60834724a5818ee120e03c8bf975" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
 
 
 

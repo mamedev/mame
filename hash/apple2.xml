@@ -6829,7 +6829,7 @@
 		<description>Alge-Blaster Plus!</description>
 		<year>1989</year>
 		<publisher>Davidson &amp; Associates, Inc.</publisher>
-        <info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
+		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -6927,7 +6927,7 @@
 		<description>Arkanoid</description>
 		<year>1988</year>
 		<publisher>Taito America</publisher>
-        <info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
+		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -7063,7 +7063,7 @@
 		<description>Blazing Paddles</description>
 		<year>1985</year>
 		<publisher>Baudville</publisher>
-        <info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
+		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="blazing paddles (4am crack).dsk" size="143360" crc="db4aa57d" sha1="152cc04080e100822bf919879232d175c64e9610" offset="0x0000" />
@@ -7806,7 +7806,7 @@
 		<description>Electric Crayon Fun On The Farm</description>
 		<year>1986</year>
 		<publisher>Polarware</publisher>
-        <info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
+		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">

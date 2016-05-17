@@ -12,25 +12,25 @@
 		<publisher>Thomson</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="51200">
 				<rom name="initb5121a.qd" size="51200" crc="f9410541" sha1="1557fa03336ef8b7c5916c06b0c61011ef72c02e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="51200">
 				<rom name="initb5121b.qd" size="51200" crc="00165db4" sha1="8eb93709b228ef42a52739434635117ba89532a8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="51200">
 				<rom name="initb5122a.qd" size="51200" crc="d443f87b" sha1="fdd9f0ffaf6b395199b5a18e13da35c3d1c19dd3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="51200">
 				<rom name="initb5122b.qd" size="51200" crc="b7a3cd64" sha1="f4727a10c2707e3ee5261996f66cf2b5223d869c" offset="0" />
 			</dataarea>

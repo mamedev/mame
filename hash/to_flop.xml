@@ -97,13 +97,13 @@
 		<publisher>Prehis-To - ContacThoms</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="amiga-thomson v3.0 (2000-05)(prehis-to)(fr)(pd)(disk 1 of 2).sap" size="335426" crc="10c5f032" sha1="9adb78dd7d7b934e5d4668d84a319c95edd4fc8d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="amiga-thomson v3.0 (2000-05)(prehis-to)(fr)(pd)(disk 2 of 2).sap" size="335426" crc="6c63833b" sha1="56f40d6beca44a16a25b187b59730fa51f613a18" offset="0" />
 			</dataarea>
@@ -1082,13 +1082,13 @@
 		<publisher>Emmanuel Boulanger</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="journal de votre naissance, le (1999)(boulanger, emmanuel)(fr)(pd)(disk 1 of 2).sap" size="335426" crc="9d763002" sha1="b46cabf44b29989b432c1eb23228ad26f505b24b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="journal de votre naissance, le (1999)(boulanger, emmanuel)(fr)(pd)(disk 2 of 2).sap" size="335426" crc="c97b12da" sha1="2c89bc1b230a1ed0ba4bc5e0ccaeb2cbe2c545ed" offset="0" />
 			</dataarea>
@@ -1101,13 +1101,13 @@
 		<publisher>Emmanuel Boulanger</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="journal de votre naissance, le (1999)(boulanger, emmanuel)(fr)(pd)(disk 1 of 2)[a].sap" size="335426" crc="e13d85ce" sha1="bbcc8c72a5face1f07aa9dc6d24428f920665462" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="journal de votre naissance, le (1999)(boulanger, emmanuel)(fr)(pd)(disk 2 of 2).sap" size="335426" crc="c97b12da" sha1="2c89bc1b230a1ed0ba4bc5e0ccaeb2cbe2c545ed" offset="0" />
 			</dataarea>
@@ -1121,25 +1121,25 @@
 		<info name="usage" value="Press 4 key and load file &quot;JOURNAL&quot;"/>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="journaliste, le (1988)(cedic - nathan)(fr)(disk 1 of 2 side a)[chg file].fd" size="327680" crc="eab07335" sha1="34020f7ac37dda46bf75e6c38c2d50c7d02c2b2b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="journaliste, le (1988)(cedic - nathan)(fr)(disk 1 of 2 side b).fd" size="327680" crc="a52d09b1" sha1="2fc1fb61a29a77c557da871d531b6ad06de28681" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="journaliste, le (1988)(cedic - nathan)(fr)(disk 2 of 2 side a).fd" size="327680" crc="64f196d5" sha1="8913863054ae22b93f1e997c7bc0158f9f3d1c99" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="journaliste, le (1988)(cedic - nathan)(fr)(disk 2 of 2 side b).fd" size="327680" crc="53548650" sha1="d5b267ddf29ea11d32ba1d7541fc13ff98b38bad" offset="0" />
 			</dataarea>
@@ -1153,25 +1153,25 @@
 		<info name="usage" value="Press 4 key and load file &quot;JOURNAL&quot;"/>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="335426">
 				<rom name="journaliste, le (1988)(cedic - nathan)(fr)(disk 1 of 2 side a)[chg file].sap" size="335426" crc="d46ccbf9" sha1="ed8848c4335a412e61d860cf50e2cb5e5c04842f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="335426">
 				<rom name="journaliste, le (1988)(cedic - nathan)(fr)(disk 1 of 2 side b).sap" size="335426" crc="648e00ba" sha1="68b0c345769297d79c172cce96a419fd82dbadec" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="335426">
 				<rom name="journaliste, le (1988)(cedic - nathan)(fr)(disk 2 of 2 side a).sap" size="335426" crc="037ed068" sha1="44b93232ab56b9d784858ad4ecc59ce74847167e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="335426">
 				<rom name="journaliste, le (1988)(cedic - nathan)(fr)(disk 2 of 2 side b).sap" size="335426" crc="cfcb5a7c" sha1="f9439da85ee28d355a8372a39201033ebb7364bb" offset="0" />
 			</dataarea>
@@ -1395,13 +1395,13 @@
 		<publisher>Claude Lietard</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="orthographie (19xx)(lietard, claude)(fr)(disk 1 of 2).sap" size="335426" crc="a02fd043" sha1="b3838d80ecd67c49aecce0676f7d4e516b722aec" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="orthographie (19xx)(lietard, claude)(fr)(disk 2 of 2).sap" size="335426" crc="28b2f92d" sha1="e0292c53e99cc10cda2e365acbe76f39477d8bc4" offset="0" />
 			</dataarea>
@@ -1707,13 +1707,13 @@
 		<publisher>L'Egypte Antique?</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="scribe royal (19xx)(-)(fr)(disk 1 of 2).sap" size="335426" crc="e694da63" sha1="3f2c54d15cb9a61580c4fc668a0514eab79670cb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="scribe royal (19xx)(-)(fr)(disk 2 of 2).sap" size="335426" crc="d5068e8f" sha1="3adb18b98c4473e52d30e99c215c71b8127d998b" offset="0" />
 			</dataarea>
@@ -1811,13 +1811,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="serveur sti (19xx)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="0ea6ea47" sha1="423d2c4b4717360ac02e664a7e9df0065f34ec2e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="serveur sti (19xx)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="8ad22b4a" sha1="a1e3fb1881794b5134add3ea69a5a3eee5001544" offset="0" />
 			</dataarea>
@@ -1954,25 +1954,25 @@
 		<publisher>Bledor-Soft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="sppm80-a-1.fd" size="327680" crc="f6a65a1b" sha1="b0760f8f9a84b63e4eb989c80ff1c5362043c617" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="sppm80-a-2.fd" size="327680" crc="8346e669" sha1="196e2d25fe49828f3d8a1cac99afea5b78e0cbde" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="sppm80-b-1.fd" size="327680" crc="b0c205fb" sha1="1a10b8399faf87e53de607aa18fa25506b54ad63" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="sppm80-b-2.fd" size="327680" crc="72cb80d7" sha1="15bc8ebc8f69920d17c2b87f4513977fae72493f" offset="0" />
 			</dataarea>
@@ -1985,25 +1985,25 @@
 		<publisher>Bledor-Soft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="335426">
 				<rom name="systeme p.p.m. v8.0 (2002)(bledor-soft)(fr)(disk 1 of 2 side a).sap" size="335426" crc="f76d30b6" sha1="99ad37d6147c90fd45a70753d94606328631bc02" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="335426">
 				<rom name="systeme p.p.m. v8.0 (2002)(bledor-soft)(fr)(disk 1 of 2 side b).sap" size="335426" crc="687e55e6" sha1="cce2b3bbf9d2d69fd469dd04a276c97203d5adf5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="335426">
 				<rom name="systeme p.p.m. v8.0 (2002)(bledor-soft)(fr)(disk 2 of 2 side a).sap" size="335426" crc="e475f18f" sha1="fa2c3606e6cc804e6a948abdad135a76f313dc07" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="335426">
 				<rom name="systeme p.p.m. v8.0 (2002)(bledor-soft)(fr)(disk 2 of 2 side b).sap" size="335426" crc="c5b80d7b" sha1="347443dc9f324e7d4de91d542a7c528bab357e6a" offset="0" />
 			</dataarea>
@@ -2016,13 +2016,13 @@
 		<publisher>Bledor-Soft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="655360">
 				<rom name="sppm80-a.fd" size="655360" crc="a55d91a0" sha1="99883c221513beb288b625afb2f8040067e5af4d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="655360">
 				<rom name="sppm80-b.fd" size="655360" crc="05f43d13" sha1="c966005c3fba53fc936f43abf7bd54eff0b8219f" offset="0" />
 			</dataarea>
@@ -2035,19 +2035,19 @@
 		<publisher>Bledor-Soft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1, Boot"/>
+			<feature name="part_id" value="Disk 1, Boot"/>
 			<dataarea name="flop" size="335426">
 				<rom name="systeme p.p.m. v7.0 (2000)(bledor-soft)(pd)(disk 1 of 3)[boot disk].sap" size="335426" crc="7ddb32f4" sha1="a1bc269f061d0b9678a04725166351d549abc1a9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="systeme p.p.m. v7.0 (2000)(bledor-soft)(pd)(disk 2 of 3).sap" size="335426" crc="20f385ef" sha1="4dbbdd610b8bbfa487d20f15b281abf69accc1d1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="335426">
 				<rom name="systeme p.p.m. v7.0 (2000)(bledor-soft)(pd)(disk 3 of 3).sap" size="335426" crc="2f4de5c9" sha1="eaede57fc8654f67bc7cd851de87d99fb2596c81" offset="0" />
 			</dataarea>
@@ -2060,13 +2060,13 @@
 		<publisher>Bledor-Soft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Boot Disk"/>
+			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="335426">
 				<rom name="systeme p.p.m. v6.9 (2000)(bledor-soft)(pd)(disk 1 of 2)[boot disk].sap" size="335426" crc="ed6881f8" sha1="064136a19de07a3c8fe38faf3de22429314e4176" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="systeme p.p.m. v6.9 (2000)(bledor-soft)(pd)(disk 2 of 2).sap" size="335426" crc="1a954a0b" sha1="ee9a6b5dfd47af0778530dbae50b6b6545a8d67b" offset="0" />
 			</dataarea>
@@ -2079,7 +2079,7 @@
 		<publisher>Bledor-Soft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="systeme p.p.m. v6.8 (2000)(bledor-soft)(pd)(disk 2 of 2).sap" size="335426" crc="82d4bb6d" sha1="9e879a4b909dce2c1eb6020ae1fe7fd164329328" offset="0" />
 			</dataarea>
@@ -2292,13 +2292,13 @@
 		<publisher>Thomson</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="applications-to9p-1.fd" size="327680" crc="10045ef1" sha1="41fa1d2f4d8b170640e9fb6ea62def297d357b8a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="applications-to9p-2.fd" size="327680" crc="c160160b" sha1="410abdaac674fe8604a4606d774a3b8ad55ade16" offset="0" />
 			</dataarea>
@@ -2311,13 +2311,13 @@
 		<publisher>Thomson</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="appli_0.sap" size="335426" crc="5e2763c6" sha1="ccefaff9603386c2edffc6eb31de7c2022b6d0a8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="appli_1.sap" size="335426" crc="591f609e" sha1="abf01f8b51d209a675c0e1c209ea6be5a4040331" offset="0" />
 			</dataarea>
@@ -2330,13 +2330,13 @@
 		<publisher>Thomson</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="to9+ applications (1986)(fil).sap" size="335426" crc="f4f42ae2" sha1="f6415516e98a2edc7c470a0e35d2d933833284f2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="appli_1.sap" size="335426" crc="591f609e" sha1="abf01f8b51d209a675c0e1c209ea6be5a4040331" offset="0" />
 			</dataarea>
@@ -2361,13 +2361,13 @@
 		<publisher>Thomson</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="initiations-to9p-1.fd" size="327680" crc="a44346a4" sha1="745b1091f7151e30795f9758796c21e8cfa160c4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="initiations-to9p-2.fd" size="327680" crc="1a4c61a4" sha1="a90addd69c892904f90dad291947fc8af42c7a8f" offset="0" />
 			</dataarea>
@@ -2380,13 +2380,13 @@
 		<publisher>Thomson</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="to9+ initiation (1986)(fil).sap" size="335426" crc="40fc2a47" sha1="94f08866ea222a06370c316f51f38bf0efb7a6ab" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="init_1.sap" size="335426" crc="f2e10f4c" sha1="889e591bd7f2334f8ceb72e200e2cc60efb11426" offset="0" />
 			</dataarea>
@@ -2461,31 +2461,31 @@
 		<info name="usage" value="Press 4 key and load file &quot;PASCAL&quot;"/>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ucsd pascal (19xx)(ucsd)(disk 1 of 2)[b][chg file].sap" size="335426" crc="1db3593e" sha1="0eada0f76d7fb13c781f7a455017ecd39887036a" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ucsd pascal (19xx)(ucsd)(disk 2 of 2)[b].sap" size="335426" crc="8a05ad77" sha1="77422b8bcca82a867043d86da92a7e1301af81eb" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="disk_2 alt?"/>
+			<feature name="part_id" value="disk_2 alt?"/>
 			<dataarea name="flop" size="335426">
 				<rom name="pascal ucsd_disk_2.sap" size="335426" crc="6df1204a" sha1="f6670d22460bc18342f6226459d17202cd07d949" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="applic2"/>
+			<feature name="part_id" value="applic2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="pascalucsd_applic2.sap" size="335426" crc="176ed19b" sha1="2ff2f43ce82f566e363c0c9f681072c63d19cdca" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="thom_flop">
-		<feature name="part_id" value="ucsd1"/>
+			<feature name="part_id" value="ucsd1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="pascalucsd_ucsd1.sap" size="335426" crc="39c97c01" sha1="e75dd439b1e37dc65fdfeb1dc2dda4f8ddc5e3d1" offset="0" />
 			</dataarea>
@@ -2525,13 +2525,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="compilation no. 2 (19xx)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="fc684589" sha1="8da078f2c2418141b5d11a9f3af6cd8eb54e7e58" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="compilation no. 2 (19xx)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="eb6dcc48" sha1="bd60be7fdb5ed1408ee5e9ff4e523202b2c51717" offset="0" />
 			</dataarea>
@@ -2556,13 +2556,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="compression des fichiers (1997-02-20)(-)(fr)(disk 1 of 2)[req ram disk].sap" size="335426" crc="eedba781" sha1="4d24140ccb2aff6b9c893c0dd27b519b1009f2e8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="compression des fichiers (1997-02-20)(-)(fr)(disk 2 of 2)[req ram disk].sap" size="335426" crc="00710079" sha1="36abc8c3a8e74e79f34ecb90bcc0a8db79c6ae81" offset="0" />
 			</dataarea>
@@ -2624,13 +2624,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="trucs &amp; astuces (19xx)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="f593c99c" sha1="031616375493f65e1213670505f76bf20d14a8fd" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="trucs &amp; astuces (19xx)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="c2af815f" sha1="b28fd1b8201eb4a32b380593b4f87d33bdd9576f" offset="0" />
 			</dataarea>
@@ -2756,13 +2756,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="compile francais 1 (19xx)(-)(fr)(disk 1 of 2).sap" size="335426" crc="c018a0bf" sha1="cfe55ba9efc1305369a871aad135a4b0a3801b31" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="compile francais 1 (19xx)(-)(fr)(disk 2 of 2).sap" size="335426" crc="164fa7fc" sha1="97cbeec7b80abcef5ede61b1b975a08a65874702" offset="0" />
 			</dataarea>
@@ -2775,13 +2775,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="compile francais 2 (19xx)(-)(fr)(disk 1 of 2).sap" size="335426" crc="c6a13b05" sha1="a6be45d45f8061ab7f27050611cd73fe10c978cc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="compile francais 2 (19xx)(-)(fr)(disk 2 of 2).sap" size="335426" crc="3254576a" sha1="71f7ca5cfff2b2227e689bec23a6d94b5b09fe58" offset="0" />
 			</dataarea>
@@ -2794,13 +2794,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="compile mathematiques (19xx)(-)(disk 1 of 2).sap" size="335426" crc="16bd5da9" sha1="25b3a21eefd13b62c6e31180ad50ad3743d1396d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="compile mathematiques (19xx)(-)(disk 2 of 2).sap" size="335426" crc="ab7576dd" sha1="bdcb6fce4812d48b56fe11dfdb90b97c757cf4c4" offset="0" />
 			</dataarea>
@@ -2813,13 +2813,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="compile mathematiques &amp; logique (19xx)(-)(disk 1 of 2).sap" size="335426" crc="6cf40b50" sha1="dc31ae8c2c7131cdb2cbe3b5dcc4c31ad8772b4a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="compile mathematiques &amp; logique (19xx)(-)(disk 2 of 2).sap" size="335426" crc="8c96ca13" sha1="b39fc5a280a0a19e4b7d1b33df8642022f5a329f" offset="0" />
 			</dataarea>
@@ -3068,13 +3068,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="athletes no.2 - 1ere partie, les (198x)(infogrames)(fr)(disk 1 of 2).fd" size="327680" crc="6284931e" sha1="d47a70c463c3e3eb7b6ea190b5812c8a058be51f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="athletes no.2 - 1ere partie, les (198x)(infogrames)(fr)(disk 2 of 2).fd" size="327680" crc="4437c737" sha1="fb906c80a36c84adbdd67bd09c46b362076d16d0" offset="0" />
 			</dataarea>
@@ -3087,13 +3087,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="athletes no.2 - 1ere partie, les (198x)(infogrames)(fr)(disk 1 of 2).sap" size="335426" crc="eff4efc2" sha1="e3a43072736cd5af92a0403143390945b7fd89ff" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="athletes no.2 - 1ere partie, les (198x)(infogrames)(fr)(disk 2 of 2).sap" size="335426" crc="5af9b1bb" sha1="76af29c58c7c165fa06e6e9f858709c6241df8d4" offset="0" />
 			</dataarea>
@@ -3106,13 +3106,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="athletes no.2 - 1ere partie, les (198x)(infogrames)(fr)(disk 1 of 2)[a].sap" size="335426" crc="91f4518a" sha1="d3d803a57fddeb047f99eeae470fe8827617dd69" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="athletes no.2 - 1ere partie, les (198x)(infogrames)(fr)(disk 2 of 2)[a].sap" size="335426" crc="48d7e88d" sha1="062ada9bdd9d3be4b0eac86a618b7f506df62c98" offset="0" />
 			</dataarea>
@@ -3125,13 +3125,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="athletes no.2 - 1ere partie, les (198x)(infogrames)(fr)(disk 1 of 2)[a2].sap" size="335426" crc="07da7de7" sha1="891165cc60c60f83ebf5da4bb2842b7fa577d69d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="athletes no.2 - 1ere partie, les (198x)(infogrames)(fr)(disk 2 of 2)[a2].sap" size="335426" crc="d97db069" sha1="21d191246d9034db2bfdfd6dc520260f16c9fee4" offset="0" />
 			</dataarea>
@@ -3144,13 +3144,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="aventuriers - 1ere partie, les (1988)(infogrames)(fr)(disk 1 of 2).fd" size="327680" crc="945441ce" sha1="5ba2d431d0e64b14b14a2bc246121ba4684a4dc9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="aventuriers - 1ere partie, les (1988)(infogrames)(fr)(disk 2 of 2).fd" size="327680" crc="93455c61" sha1="945aff15b0f51bdb2d1f081a7306df0cc9689272" offset="0" />
 			</dataarea>
@@ -3163,13 +3163,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="aventuriers - 1ere partie, les (1988)(infogrames)(fr)(disk 1 of 2).sap" size="335426" crc="6a77d706" sha1="9cefcd9014d480e69d03662a08faf74621d33965" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="aventuriers - 1ere partie, les (1988)(infogrames)(fr)(disk 2 of 2).sap" size="335426" crc="f37e7a0b" sha1="e3bc3a9a7819180c619d395c29e275539b40e3d3" offset="0" />
 			</dataarea>
@@ -3183,25 +3183,25 @@
 		<info name="alt_title" value="Les Bandes Dessinees"/>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="bd - 1ere partie, les (198x)(infogrames)(fr)(disk 1 of 2).fd" size="327680" crc="d7b3d1eb" sha1="70f309fa159a9aa322617895704dec6cd8a64dad" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="bd - 1ere partie, les (198x)(infogrames)(fr)(disk 2 of 2).fd" size="327680" crc="081236cf" sha1="5d528c3b86e0dfde5480ca4d999bfae1e197cee6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="bd - 2eme partie, les (198x)(infogrames)(fr)(disk 1 of 2).fd" size="327680" crc="d82bfc5f" sha1="72247adc85ab7fa388fc2099f46ced98f7954b12" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="bd - 2eme partie, les (198x)(infogrames)(fr)(disk 2 of 2).fd" size="327680" crc="be6d3d38" sha1="693fc0ae68dfa4f6c0213830cf1421e64b965540" offset="0" />
 			</dataarea>
@@ -3215,25 +3215,25 @@
 		<info name="alt_title" value="Les Bandes Dessinees"/>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="les bandes dessinees (infogrames) (nombreux auteurs) (1988) (to8 fd) (side 1) disk 1.fd" size="327680" crc="376c135a" sha1="9868f53a292d75b576a575cc2f00f2ab705bed17" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="bd - 1ere partie, les (198x)(infogrames)(fr)(disk 2 of 2).fd" size="327680" crc="081236cf" sha1="5d528c3b86e0dfde5480ca4d999bfae1e197cee6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="bd - 2eme partie, les (198x)(infogrames)(fr)(disk 1 of 2).fd" size="327680" crc="d82bfc5f" sha1="72247adc85ab7fa388fc2099f46ced98f7954b12" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="les bandes dessinees (infogrames) (nombreux auteurs) (1988) (to8 fd) (side 2) disk 2.fd" size="327680" crc="47d7427a" sha1="1368a585d2d28133b57e97ff47efbf7c6db5ba2e" offset="0" />
 			</dataarea>
@@ -3247,25 +3247,25 @@
 		<info name="alt_title" value="Les Bandes Dessinees"/>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="335426">
 				<rom name="bd - 1ere partie, les (198x)(infogrames)(fr)(disk 1 of 2).sap" size="335426" crc="beb191e3" sha1="a0756800c4d21a3700a9a124a8cff6e4914e7a05" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="335426">
 				<rom name="bd - 1ere partie, les (198x)(infogrames)(fr)(disk 2 of 2).sap" size="335426" crc="a12abf45" sha1="6e06734d0b78c099e4d03a001d7948237c9efc57" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="335426">
 				<rom name="bd - 2eme partie, les (198x)(infogrames)(fr)(disk 1 of 2).sap" size="335426" crc="1f0020f3" sha1="e8f106b329f031dfa9cbaf954879d51223910ec0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="335426">
 				<rom name="bd - 2eme partie, les (198x)(infogrames)(fr)(disk 2 of 2).sap" size="335426" crc="093d79c5" sha1="6ab99fe67d36a149e25a7fd240f38dbb5fefd898" offset="0" />
 			</dataarea>
@@ -3279,25 +3279,25 @@
 		<info name="alt_title" value="Les Bandes Dessinees"/>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="335426">
 				<rom name="bd - 1ere partie, les (198x)(infogrames)(fr)(disk 1 of 2)[a].sap" size="335426" crc="76603bb9" sha1="9039c7927b68a1fdf5fb90ad34f30f4f57f3ba54" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="335426">
 				<rom name="bd - 1ere partie, les (198x)(infogrames)(fr)(disk 2 of 2).sap" size="335426" crc="a12abf45" sha1="6e06734d0b78c099e4d03a001d7948237c9efc57" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="335426">
 				<rom name="bd - 2eme partie, les (198x)(infogrames)(fr)(disk 1 of 2)[a].sap" size="335426" crc="bf641c08" sha1="a8e1d5d3292fa6c7091039aa4b29567e0a1b0ee6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="335426">
 				<rom name="bd - 2eme partie, les (198x)(infogrames)(fr)(disk 2 of 2).sap" size="335426" crc="093d79c5" sha1="6ab99fe67d36a149e25a7fd240f38dbb5fefd898" offset="0" />
 			</dataarea>
@@ -3311,13 +3311,13 @@
 		<info name="alt_title" value="Les Bandes Dessinees"/>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="655360">
 				<rom name="les bandes dessinees (infogrames) (nombreux auteurs) (1988) (to8 fd) (side 1).fd" size="655360" crc="28c8f24b" sha1="e09e7f34bdba343d015b7c42b7df9c0af77f5860" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="655360">
 				<rom name="les bandes dessinees (infogrames) (nombreux auteurs) (1988) (to8 fd) (side 2).fd" size="655360" crc="3d953d7d" sha1="a337112b62c68b298322c7853ef8b175014f7f61" offset="0" />
 			</dataarea>
@@ -3330,13 +3330,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="captain blood &amp; bivouac (198x)(infogrames)(fr)(disk 1 of 2).fd" size="327680" crc="c1173dc0" sha1="e6255eb6125454b6721b352a0bff4d269d38bd10" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="captain blood &amp; bivouac (198x)(infogrames)(fr)(disk 2 of 2).fd" size="327680" crc="981c60fa" sha1="d8049c4c3db543320f5072b2fabdd1b61617c62d" offset="0" />
 			</dataarea>
@@ -3391,13 +3391,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="captain blood &amp; bivouac (198x)(infogrames)(fr)(disk 1 of 2).sap" size="335426" crc="b758a8e9" sha1="0494474b21a275fba0b3996db873e53f47e1b1de" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="captain blood &amp; bivouac (198x)(infogrames)(fr)(disk 2 of 2).sap" size="335426" crc="dcfde56c" sha1="7fe083690fcd77a126176c916e5325649c56ba41" offset="0" />
 			</dataarea>
@@ -3446,13 +3446,13 @@
 		<publisher>Coktel Vision</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="carre d'as (coktel vision) (inconnus) (1987) (to8 fd) (carre-d-as-1_to8).fd" size="327680" crc="2d74de62" sha1="8ae12c5ef0d7bf989f9410773850a354ef36f2e0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="carre d'as (coktel vision) (inconnus) (1987) (to8 fd) (carre-d-as-2_to8).fd" size="327680" crc="87d94873" sha1="30eb34267f5640087241dd1ce516c6b094f0900d" offset="0" />
 			</dataarea>
@@ -3862,13 +3862,13 @@
 		<publisher>Emmanuel Boulanger</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="emmanuel boulanger pack (19xx)(boulanger, emmanuel)(fr)(disk 1 of 2).sap" size="335426" crc="bb1b801e" sha1="f4f5f44b6d3aeb5ad7427ad9b7dcc2be625107a3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="emmanuel boulanger pack (19xx)(boulanger, emmanuel)(fr)(disk 2 of 2).sap" size="335426" crc="ac487364" sha1="f0507e4b61d4c01d3fc748496b6ed170e7b07bbe" offset="0" />
 			</dataarea>
@@ -3958,19 +3958,19 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="futuristes2_f1.sap" size="335426" crc="7ae2ef1d" sha1="0554f71d0c61f5a4fc1ebaf5fbebcc06e160f7b2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="futuristes2_f2_raid_manche.sap" size="335426" crc="7c121d56" sha1="a923251b8bf0dccef6c91a7648404410495483cc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="335426">
 				<rom name="futuristes2_f3_thenebe.sap" size="335426" crc="41ae1985" sha1="61570a73b9034beddcdbbfd654c814ce1d0d8d14" offset="0" />
 			</dataarea>
@@ -3995,13 +3995,13 @@
 		<publisher>Free Game Blot</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="greatest collection, the (1987)(free game blot)(fr)(disk 1 of 2).fd" size="327680" crc="e2e802dd" sha1="152900fd773906b1d4fb507926a60d0a41bc7be9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="greatest collection, the (1987)(free game blot)(fr)(disk 2 of 2).fd" size="327680" crc="509fe4d1" sha1="4a94a8cdde9a848cc89c6af9840546ad35ea5fa3" offset="0" />
 			</dataarea>
@@ -4014,13 +4014,13 @@
 		<publisher>Free Game Blot</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="greatest collection, the (1987)(free game blot)(fr)(disk 1 of 2).sap" size="335426" crc="276225ee" sha1="b92d07c52daef8c948f9058b8ec49f21c6d522c2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="greatest collection, the (1987)(free game blot)(fr)(disk 2 of 2).sap" size="335426" crc="23c6eea4" sha1="e08792a4a3a35978a6ab88668ed7863dfa227df2" offset="0" />
 			</dataarea>
@@ -4099,25 +4099,25 @@
 		<publisher>SFMI Micromania</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="les _hits_ de gremlin (micromania) (divers) (1986) (to8 fd) (les-hits-de-gremlin-1_to8) disk 1.fd" size="327680" crc="fe241d0d" sha1="d98815022500c2e47a01d14dbe12721b0b4cce78" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="les _hits_ de gremlin (micromania) (divers) (1986) (to8 fd) (les-hits-de-gremlin-1_to8) disk 2.fd" size="327680" crc="e1ac3534" sha1="2edf1eeb40e67ec31e1a735b2e8b35fd3808f07f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="les _hits_ de gremlin (micromania) (divers) (1986) (to8 fd) (les-hits-de-gremlin-2_to8) disk 1.fd" size="327680" crc="3a164a73" sha1="6f0315e958ce314d39fb657bfccc8b6a9daacf94" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="les _hits_ de gremlin (micromania) (divers) (1986) (to8 fd) (les-hits-de-gremlin-2_to8) disk 2.fd" size="327680" crc="83e6a5d7" sha1="2c49636b793e4d51006eb3377d433b22937fb205" offset="0" />
 			</dataarea>
@@ -4130,13 +4130,13 @@
 		<publisher>SFMI Micromania</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="655360">
 				<rom name="les _hits_ de gremlin (micromania) (divers) (1986) (to8 fd) (les-hits-de-gremlin-1_to8).fd" size="655360" crc="a58ae36a" sha1="69dda9faf62a765aa924a0e10ed351ab33b1cae5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="655360">
 				<rom name="les _hits_ de gremlin (micromania) (divers) (1986) (to8 fd) (les-hits-de-gremlin-2_to8).fd" size="655360" crc="bc9b8f1e" sha1="2b04ade360fc34653f3aa2f774c7d8ff5c266f78" offset="0" />
 			</dataarea>
@@ -4174,19 +4174,19 @@
 		<publisher>SFMI Micromania</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="les _hits_ d'ocean (micromania) (divers) (1986) (to8 fd) (les-hits-d-ocean-1_to8).fd" size="327680" crc="cfad0c37" sha1="e6229143465c4d12393e051148eeaff0cfa0494b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="les _hits_ d'ocean (micromania) (divers) (1986) (to8 fd) (les-hits-d-ocean-2_to8) disk 1.fd" size="327680" crc="8a1e2f30" sha1="09a8ca2533c7c36c68a4ab42c315afe8f162428f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="les _hits_ d'ocean (micromania) (divers) (1986) (to8 fd) (les-hits-d-ocean-2_to8) disk 2.fd" size="327680" crc="a0ef266e" sha1="cb757eb13b92427ec30a8947fc2384f4aa230ba5" offset="0" />
 			</dataarea>
@@ -4199,13 +4199,13 @@
 		<publisher>SFMI Micromania</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="les _hits_ d'ocean (micromania) (divers) (1986) (to8 fd) (les-hits-d-ocean-1_to8).fd" size="327680" crc="cfad0c37" sha1="e6229143465c4d12393e051148eeaff0cfa0494b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="655360">
 				<rom name="les _hits_ d'ocean (micromania) (divers) (1986) (to8 fd) (les-hits-d-ocean-2_to8).fd" size="655360" crc="0d21086c" sha1="9e74ea000a7526d3ae359f81a88aa6771f66e48b" offset="0" />
 			</dataarea>
@@ -4254,13 +4254,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="jeux basic to (amateurs) (to fd) disk 1.fd" size="327680" crc="23045cab" sha1="fc0f54cd6d3d85b9796facad7ffe79c4fd81d138" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="jeux basic to (amateurs) (to fd) disk 2.fd" size="327680" crc="2abc30a1" sha1="37c27d0c3ed78b05cfeb164a590b37f69b3d6858" offset="0" />
 			</dataarea>
@@ -4574,61 +4574,61 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="655360">
 				<rom name="megasofts01.fd" size="655360" crc="3130c2ab" sha1="4100c5787635c0316c81e09543583ae671f40bcc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="655360">
 				<rom name="megasofts02.fd" size="655360" crc="fc90cd09" sha1="0dee02dfeb8713e68b353ceb5654ff0a9dafc255" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="655360">
 				<rom name="megasofts03.fd" size="655360" crc="749779e1" sha1="cf083bb56a4567c4c158ec434e014a631c190540" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="655360">
 				<rom name="megasofts04.fd" size="655360" crc="ddf5b49f" sha1="67b513cb7ee19888c399e981febc5457fe0d0822" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="thom_flop">
-		<feature name="part_id" value="Disk 5"/>
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="655360">
 				<rom name="megasofts05.fd" size="655360" crc="3f5f5793" sha1="747892457af3ede440ee1c2fc0f2d2e0542dc560" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="thom_flop">
-		<feature name="part_id" value="Disk 6"/>
+			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="655360">
 				<rom name="megasofts06.fd" size="655360" crc="3325a9da" sha1="9d183c687a2cc688981818278a1d7e3fe6d34cb9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="thom_flop">
-		<feature name="part_id" value="Disk 7"/>
+			<feature name="part_id" value="Disk 7"/>
 			<dataarea name="flop" size="655360">
 				<rom name="megasofts07.fd" size="655360" crc="c42f423f" sha1="80bc474178031b2d50469c38070a50dbf642a019" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="thom_flop">
-		<feature name="part_id" value="Disk 8"/>
+			<feature name="part_id" value="Disk 8"/>
 			<dataarea name="flop" size="655360">
 				<rom name="megasofts08.fd" size="655360" crc="c8c9dc1c" sha1="b3755d9dd63cd3277b39af07f662ed0ee0e36422" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop9" interface="thom_flop">
-		<feature name="part_id" value="Disk 9"/>
+			<feature name="part_id" value="Disk 9"/>
 			<dataarea name="flop" size="655360">
 				<rom name="megasofts09.fd" size="655360" crc="c98b7d07" sha1="31da83676e1b12ef8212e58deb7cb6b54c35f775" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop10" interface="thom_flop">
-		<feature name="part_id" value="Disk 10"/>
+			<feature name="part_id" value="Disk 10"/>
 			<dataarea name="flop" size="655360">
 				<rom name="megasofts10.fd" size="655360" crc="57e0f3ea" sha1="965efceedf477a7861624f5e03322fc19c30b9fa" offset="0" />
 			</dataarea>
@@ -4732,13 +4732,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="prives, les (1988)(infogrames)(fr)(disk 1 of 2).fd" size="327680" crc="4bf6ac9f" sha1="6423ba2a7fe68f09eccb927b468f3a6acee546d1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="prives, les (1988)(infogrames)(fr)(disk 2 of 2).fd" size="327680" crc="1b96ba70" sha1="1acceb57cacccbc1a577569c51709705081f6b5e" offset="0" />
 			</dataarea>
@@ -4751,13 +4751,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="prives, les (1988)(infogrames)(fr)(disk 1 of 2)[a].fd" size="327680" crc="dbac76b1" sha1="0af89ec2377ec0802e8aeb64dfc85547f335d5eb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="prives, les (1988)(infogrames)(fr)(disk 2 of 2)[a].fd" size="327680" crc="1b96ba70" sha1="1acceb57cacccbc1a577569c51709705081f6b5e" offset="0" />
 			</dataarea>
@@ -4770,13 +4770,13 @@
 		<publisher>Infogrames</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="prives, les (1988)(infogrames)(fr)(disk 1 of 2).sap" size="335426" crc="3890df80" sha1="0eafe6e09337dc1600e0f9efb62e31a3befd067c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="prives, les (1988)(infogrames)(fr)(disk 2 of 2).sap" size="335426" crc="aaaaa9b4" sha1="3e994446992326bd8cea6bcfef440d195e6cbf13" offset="0" />
 			</dataarea>
@@ -4813,13 +4813,13 @@
 		<publisher>SFMI Micromania</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sfmi micromania compilation 1 (19xx)(-)(fr)(disk 1 of 2).sap" size="335426" crc="944442e6" sha1="ba9a6502e479bfa71da7af08d6a610b5153f6f5c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sfmi micromania compilation 1 (19xx)(-)(fr)(disk 2 of 2).sap" size="335426" crc="60ac4b07" sha1="d459ff3415d2ad9370820a2ddfd6f17fa25cdfd4" offset="0" />
 			</dataarea>
@@ -4844,13 +4844,13 @@
 		<publisher>Loriciels</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="simulation hits (1989)(loriciels)(fr)(disk 1 of 2).fd" size="327680" crc="a83431a1" sha1="8802105103bb4ff04cdd61b91ce3826f2370e788" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="simulation hits (1989)(loriciels)(fr)(disk 2 of 2).fd" size="327680" crc="8f075a6e" sha1="f063879eee7e1ad898bd1d73a1c9d8ff5f53ef0a" offset="0" />
 			</dataarea>
@@ -4876,13 +4876,13 @@
 		<publisher>Microids</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="simulation pack (microids) (c. bertrand, elliot grassiano, b. masson, a. bonsignore) (1988) (moto)[disk 1].fd" size="327680" crc="7bf09235" sha1="a9cd6df78ed898dd7fb5b91a0a1dd81f350eb394" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="simulation pack (microids) (c. bertrand, elliot grassiano, b. masson, a. bonsignore) (1988) (moto)[disk 2].fd" size="327680" crc="8362fc7e" sha1="22464674d827a63f6bba96af76e9a0f84f7c79a4" offset="0" />
 			</dataarea>
@@ -4951,13 +4951,13 @@
 		<publisher>SFMI Micromania</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="les _super hits_ de thomson (micromania) (divers) (1986) (to8 fd) disk 1.fd" size="327680" crc="4f3885e1" sha1="8bb73634b68dc6286772f7b1e2a228a4114284f6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="les _super hits_ de thomson (micromania) (divers) (1986) (to8 fd) disk 2.fd" size="327680" crc="bc3bfe60" sha1="c4bb95cc8bb452feeb192b44761366ddbe779b4f" offset="0" />
 			</dataarea>
@@ -4983,13 +4983,13 @@
 		<publisher>John Breaker?</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="tetris ii &amp; sokoban (19xx)(-)(disk 1 of 2).fd" size="327680" crc="ab92057f" sha1="9ac93ec99ec509004503718d06e245533663a34f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="tetris ii &amp; sokoban (19xx)(-)(disk 2 of 2).fd" size="327680" crc="7a44b629" sha1="539212c1c48e8168e46d9a4ae9258b667f6a4e5c" offset="0" />
 			</dataarea>
@@ -5225,13 +5225,13 @@
 		<publisher>Micromedia Systemes</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="thom_plus1_0.sap" size="335426" crc="8edc52fc" sha1="04708aaf489e85e4d9767139b4c337f3e14d80c9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="thom_plus1_1.sap" size="335426" crc="2f15e1aa" sha1="fdb173daeeea5ba2f718702e8e342719181e1d41" offset="0" />
 			</dataarea>
@@ -5304,13 +5304,13 @@
 		<publisher>HMEL</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sources 1 (199x)(hmel)(fr)(disk 1 of 2).sap" size="335426" crc="3000bac8" sha1="6ed02ca0c080e6f3819558a66b08010126ce07e5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sources 1 (199x)(hmel)(fr)(disk 2 of 2).sap" size="335426" crc="796626f9" sha1="98013fea8fd074c3526b9d58797a01b3397be0fe" offset="0" />
 			</dataarea>
@@ -5323,13 +5323,13 @@
 		<publisher>HMEL</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sources 2 (199x)(hmel)(fr)(disk 1 of 2).sap" size="335426" crc="841e40e4" sha1="d041b5c680d7df463ea20d408c39b684e828da67" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sources 2 (199x)(hmel)(fr)(disk 2 of 2).sap" size="335426" crc="66276204" sha1="fcfc431d2db66a174145bef7fe82dd0ba8477e98" offset="0" />
 			</dataarea>
@@ -5342,13 +5342,13 @@
 		<publisher>HMEL</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sources 3 (199x)(hmel)(fr)(disk 1 of 2).sap" size="335426" crc="41eebf2a" sha1="06729bb12147a221c46cb97ba14e115419904c80" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sources 3 (199x)(hmel)(fr)(disk 2 of 2).sap" size="335426" crc="63cd8281" sha1="1d885a758089eb86c3dc74703c6e5557fd776f4d" offset="0" />
 			</dataarea>
@@ -5361,13 +5361,13 @@
 		<publisher>HMEL</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sources 4 (199x)(hmel)(fr)(disk 1 of 2).sap" size="335426" crc="41b3440c" sha1="4036049db9ecbe3e6cfcee6f124bfb83ba2f280f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sources 4 (199x)(hmel)(fr)(disk 2 of 2).sap" size="335426" crc="502fbc5a" sha1="3caaaef4952c43807df94be2bbad141aa4651166" offset="0" />
 			</dataarea>
@@ -5380,13 +5380,13 @@
 		<publisher>HMEL</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sources 5 (199x)(hmel)(fr)(disk 1 of 2).sap" size="335426" crc="827a5c51" sha1="4c02b9510cda6b850766aae5af412609d898410c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sources 5 (199x)(hmel)(fr)(disk 2 of 2).sap" size="335426" crc="6247537b" sha1="035908b880d3382003453826ce5cb8f5bb3557c9" offset="0" />
 			</dataarea>
@@ -5399,13 +5399,13 @@
 		<publisher>HMEL</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sources 6 (199x)(hmel)(fr)(disk 1 of 2).sap" size="335426" crc="f0f3004f" sha1="15461b4a8edd37121f7f578406c21b65080a70ee" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="sources 6 (199x)(hmel)(fr)(disk 2 of 2).sap" size="335426" crc="d6bd28fd" sha1="e91f57cfab101a8309c46911738751f7f56cd0fc" offset="0" />
 			</dataarea>
@@ -5466,13 +5466,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.2 (1991)(a.s.c.i.)(fr)(disk 1 of 2).fd" size="327680" crc="c5546495" sha1="ffa09fdfbfd7cc68d24062340059f2ccc121e9c0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.2 (1991)(a.s.c.i.)(fr)(disk 2 of 2).fd" size="327680" crc="c6dcbeb2" sha1="4aed694f3f0a137e88a007682ff72ef3e5c4aded" offset="0" />
 			</dataarea>
@@ -5485,13 +5485,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-games no.2 (1991)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="0d2d6dbd" sha1="0193c9088b3d37ab4084306fc6cfdbc1b2c5d73b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-games no.2 (1991)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="ad0f3150" sha1="84ff9466d085f9133f8889ec88a6ec1bbadfb4c2" offset="0" />
 			</dataarea>
@@ -5516,13 +5516,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.3 (1991)(a.s.c.i.)(fr)(disk 1 of 2).fd" size="327680" crc="3e7c8529" sha1="3b9e49270af93cdf223e04bcec9166ee6e4b8574" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.3 (1991)(a.s.c.i.)(fr)(disk 2 of 2).fd" size="327680" crc="0266783b" sha1="c6171f8869f71713fbfeb65ca454a136d9211feb" offset="0" />
 			</dataarea>
@@ -5535,13 +5535,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-games no.3 (1991)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="3899975c" sha1="b9e4df38c0781f3ced7a2ade190a4ddce45645be" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-games no.3 (1991)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="3d7b34b4" sha1="59083b5354563dae364816aaf897254c05849126" offset="0" />
 			</dataarea>
@@ -5590,25 +5590,25 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.5 (1991)(a.s.c.i.)(fr).fd" size="327680" crc="1e009d24" sha1="973db0196ebdbfce3274e9721ddf0438c57d6e81" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk A"/>
+			<feature name="part_id" value="RAM Disk A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.5 (1991)(a.s.c.i.)(fr)[ram disk a].fd" size="327680" crc="58ce24bc" sha1="b8ddae336ae9e6943ec8bde6348f70fdc6135924" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk B"/>
+			<feature name="part_id" value="RAM Disk B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.5 (1991)(a.s.c.i.)(fr)[ram disk b].fd" size="327680" crc="2023f400" sha1="a596d878a8074f2ee5139f0142dc5a905db98142" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk C"/>
+			<feature name="part_id" value="RAM Disk C"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.5 (1991)(a.s.c.i.)(fr)[ram disk c].fd" size="327680" crc="b7b4c59a" sha1="7451d5e6bbbf3abacf88451fd74f89e1b7f0cd0f" offset="0" />
 			</dataarea>
@@ -5621,25 +5621,25 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-games no.5 (1991)(a.s.c.i.)(fr).sap" size="335426" crc="65408e33" sha1="f659343f542b1b4c46471e5a8667cc1c3e74dd46" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk A"/>
+			<feature name="part_id" value="RAM Disk A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.5 (1991)(a.s.c.i.)(fr)[ram disk a].fd" size="327680" crc="58ce24bc" sha1="b8ddae336ae9e6943ec8bde6348f70fdc6135924" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk B"/>
+			<feature name="part_id" value="RAM Disk B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.5 (1991)(a.s.c.i.)(fr)[ram disk b].fd" size="327680" crc="2023f400" sha1="a596d878a8074f2ee5139f0142dc5a905db98142" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk C"/>
+			<feature name="part_id" value="RAM Disk C"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.5 (1991)(a.s.c.i.)(fr)[ram disk c].fd" size="327680" crc="b7b4c59a" sha1="7451d5e6bbbf3abacf88451fd74f89e1b7f0cd0f" offset="0" />
 			</dataarea>
@@ -5652,25 +5652,25 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.6 (1991)(a.s.c.i.)(fr).fd" size="327680" crc="7d4b9788" sha1="343eca41d26fdb66e66ddb3479d748e2157672a0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk A"/>
+			<feature name="part_id" value="RAM Disk A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.6 (1991)(a.s.c.i.)(fr)[ram disk a].fd" size="327680" crc="558a010b" sha1="4760aa068251de15468e17a96bbe722cd6fa1183" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk B"/>
+			<feature name="part_id" value="RAM Disk B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.6 (1991)(a.s.c.i.)(fr)[ram disk b].fd" size="327680" crc="18553ef9" sha1="3411c1abc9c0a42a6bd34caa7184cf92fda3dac2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk C"/>
+			<feature name="part_id" value="RAM Disk C"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.6 (1991)(a.s.c.i.)(fr)[ram disk c].fd" size="327680" crc="468fddef" sha1="8fdc51f6e8d5d3a36d5817e4a421666d513dc346" offset="0" />
 			</dataarea>
@@ -5683,25 +5683,25 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop5" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-games no.6 (1991)(a.s.c.i.)(fr).sap" size="335426" crc="e19184b2" sha1="805636cc8aa5223649fbf59aaea3d883f4de3483" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk A"/>
+			<feature name="part_id" value="RAM Disk A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.6 (1991)(a.s.c.i.)(fr)[ram disk a].fd" size="327680" crc="558a010b" sha1="4760aa068251de15468e17a96bbe722cd6fa1183" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk B"/>
+			<feature name="part_id" value="RAM Disk B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.6 (1991)(a.s.c.i.)(fr)[ram disk b].fd" size="327680" crc="18553ef9" sha1="3411c1abc9c0a42a6bd34caa7184cf92fda3dac2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk C"/>
+			<feature name="part_id" value="RAM Disk C"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-games no.6 (1991)(a.s.c.i.)(fr)[ram disk c].fd" size="327680" crc="468fddef" sha1="8fdc51f6e8d5d3a36d5817e4a421666d513dc346" offset="0" />
 			</dataarea>
@@ -6030,13 +6030,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="chinese stack (2004)(puls)(fr)(disk 1 of 2).fd" size="327680" crc="3cfe5994" sha1="044c7b6a23153149cc12f4791a5d0aae6aeef10b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="chinese stack (2004)(puls)(fr)(disk 2 of 2).fd" size="327680" crc="7f67177a" sha1="69e0a302dbe3d971b625d554ccfdbecca84664e8" offset="0" />
 			</dataarea>
@@ -6049,13 +6049,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="chinese stack (2004)(puls)(fr)(disk 1 of 2).sap" size="335426" crc="96efc45a" sha1="7c0010d3a70165ccecf7e88be8d481a5400f6e78" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="chinese stack (2004)(puls)(fr)(disk 2 of 2).sap" size="335426" crc="73c678dc" sha1="a95d89e74b1c416a0ff8bce52a9a73f7366c7e90" offset="0" />
 			</dataarea>
@@ -6212,13 +6212,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="unknown girls slideshow (19xx)(-)(fr)(disk 1 of 2).sap" size="335426" crc="b17f9724" sha1="94f9c98fe7cbc7f503bfd0341c4a9a8b2a6e443f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="unknown girls slideshow (19xx)(-)(fr)(disk 2 of 2).sap" size="335426" crc="64fb2569" sha1="8c1a62035d0d4d46876c11160abb7554ca22d8ef" offset="0" />
 			</dataarea>
@@ -6255,13 +6255,13 @@
 		<publisher>HCL</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="megademo_f0.sap" size="335426" crc="a9ce7549" sha1="61beae11bb0a127346d21a46a5a0ed0f4f30995d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="megademo_f1.sap" size="335426" crc="0e12ea8c" sha1="5813e88edf6ae28d3da614982cde64e46a0d16a2" offset="0" />
 			</dataarea>
@@ -6310,13 +6310,13 @@
 		<publisher>BC 109 Soft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="lotus esprit turbo challenge (19xx)(bc 109)(fr)(disk 1 of 2).fd" size="327680" crc="c9158cc1" sha1="8ae643a841ec3389a3b9037726ef371fefb156f7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="lotus esprit turbo challenge (19xx)(bc 109)(fr)(disk 2 of 2).fd" size="327680" crc="14ef7c6a" sha1="74760803c42aa588e8676e9380b7bb39cfd7d440" offset="0" />
 			</dataarea>
@@ -6365,13 +6365,13 @@
 		<publisher>Megar</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="megar demo #1 (2007)(megar)(fr)(disk 1 of 2).fd" size="327680" crc="0cebf586" sha1="9da732698485cf22fcb516f62c81d37648249029" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="megar demo #1 (2007)(megar)(fr)(disk 2 of 2).fd" size="327680" crc="0b3c28dc" sha1="508b2c32a996ebd97cd09a805825d0e097a28a90" offset="0" />
 			</dataarea>
@@ -6505,13 +6505,13 @@
 		<publisher>Samuel Devulder</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="skyrim (samuel devulder) (2012) (to8)-1.fd" size="327680" crc="2e747394" sha1="78cb134a7c0025fbe62b5567699d3e825187fffd" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="skyrim (samuel devulder) (2012) (to8)-2.fd" size="327680" crc="7f46a821" sha1="394ac8d6a4bb14105f71a1e943cf0ec56d66173d" offset="0" />
 			</dataarea>
@@ -6611,49 +6611,49 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="space project (2007)(puls)(fr)(disk 1 of 4 side a).fd" size="327680" crc="d867eb40" sha1="486d1f244b0782b963e41bf9980d9c08235ccedc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="space project (2007)(puls)(fr)(disk 1 of 4 side b).fd" size="327680" crc="91de129f" sha1="dace96e78847ac82e54a3060cf8d85cdf4c7978a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="space project (2007)(puls)(fr)(disk 2 of 4 side a).fd" size="327680" crc="64792118" sha1="cd0a1e513a33916ab05314ee2878c19af94e9627" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="space project (2007)(puls)(fr)(disk 2 of 4 side b).fd" size="327680" crc="184ad6d3" sha1="b319a2380a7ddc8ec813c0d786e1ed2fdfbf007b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="thom_flop">
-		<feature name="part_id" value="Disk 3 Side A"/>
+			<feature name="part_id" value="Disk 3 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="space project (2007)(puls)(fr)(disk 3 of 4 side a).fd" size="327680" crc="2ce56300" sha1="57cda15980b63859417b24ada4bd1bde2018c031" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="thom_flop">
-		<feature name="part_id" value="Disk 3 Side B"/>
+			<feature name="part_id" value="Disk 3 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="space project (2007)(puls)(fr)(disk 3 of 4 side b).fd" size="327680" crc="3c48e37a" sha1="de915029683c2ce67fc5ed30dc1fff441625567e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="thom_flop">
-		<feature name="part_id" value="Disk 4 Side A"/>
+			<feature name="part_id" value="Disk 4 Side A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="space project (2007)(puls)(fr)(disk 4 of 4 side a).fd" size="327680" crc="5673c857" sha1="00bf938d56e55c18d474020086d2fcc1dcd70c73" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="thom_flop">
-		<feature name="part_id" value="Disk 4 Side B"/>
+			<feature name="part_id" value="Disk 4 Side B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="space project (2007)(puls)(fr)(disk 4 of 4 side b).fd" size="327680" crc="a49b086a" sha1="e3c361402d1a37e7c3e9680916cf9d42ada3720d" offset="0" />
 			</dataarea>
@@ -6666,49 +6666,49 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side A"/>
+			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="335426">
 				<rom name="space project (2007)(puls)(fr)(disk 1 of 4 side a).sap" size="335426" crc="b9fb6141" sha1="d78567ea84228afbdb3f3528932ebc7d430582e2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 Side B"/>
+			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="335426">
 				<rom name="space project (2007)(puls)(fr)(disk 1 of 4 side b).sap" size="335426" crc="9b66d510" sha1="396715890899c190339dfa524100877a8d402047" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side A"/>
+			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="335426">
 				<rom name="space project (2007)(puls)(fr)(disk 2 of 4 side a).sap" size="335426" crc="c9abbec5" sha1="e7954507171f5a74886c6399ea20003466ef476e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 2 Side B"/>
+			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="335426">
 				<rom name="space project (2007)(puls)(fr)(disk 2 of 4 side b).sap" size="335426" crc="b37c4ad2" sha1="39184fadb670eb6e789fd20e82f60df993a78261" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="thom_flop">
-		<feature name="part_id" value="Disk 3 Side A"/>
+			<feature name="part_id" value="Disk 3 Side A"/>
 			<dataarea name="flop" size="335426">
 				<rom name="space project (2007)(puls)(fr)(disk 3 of 4 side a).sap" size="335426" crc="d8913a38" sha1="ce09395b6a05a430c2ff6dcb6741b01fbaabb5c9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="thom_flop">
-		<feature name="part_id" value="Disk 3 Side B"/>
+			<feature name="part_id" value="Disk 3 Side B"/>
 			<dataarea name="flop" size="335426">
 				<rom name="space project (2007)(puls)(fr)(disk 3 of 4 side b).sap" size="335426" crc="fbcaf269" sha1="ab9c7128d591d0b4e7f5af81f7132116cabad56c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="thom_flop">
-		<feature name="part_id" value="Disk 4 Side A"/>
+			<feature name="part_id" value="Disk 4 Side A"/>
 			<dataarea name="flop" size="335426">
 				<rom name="space project (2007)(puls)(fr)(disk 4 of 4 side a).sap" size="335426" crc="83fc76e9" sha1="9dd63c9a08224e6ed7e3cefab5f199f1907ef117" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="thom_flop">
-		<feature name="part_id" value="Disk 4 Side B"/>
+			<feature name="part_id" value="Disk 4 Side B"/>
 			<dataarea name="flop" size="335426">
 				<rom name="space project (2007)(puls)(fr)(disk 4 of 4 side b).sap" size="335426" crc="68e5d635" sha1="9be7392d223769abf0db20cbf592ed7b8eafb4d6" offset="0" />
 			</dataarea>
@@ -6721,25 +6721,25 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="655360">
 				<rom name="space project (2007)(puls)(fr)(disk 1 of 4)[640k].fd" size="655360" crc="cc827379" sha1="71d1da322c621f4325e2c640859450fe4b16633b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="655360">
 				<rom name="space project (2007)(puls)(fr)(disk 2 of 4)[640k].fd" size="655360" crc="23372f28" sha1="db36697024f0813d324f4fe817c8aee1473e1d00" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="655360">
 				<rom name="space project (2007)(puls)(fr)(disk 3 of 4)[640k].fd" size="655360" crc="16ae4f4d" sha1="65ae18aebd554d0786e5d3556e61bd83dc99b4ae" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="655360">
 				<rom name="space project (2007)(puls)(fr)(disk 4 of 4)[640k].fd" size="655360" crc="9c3cd074" sha1="219a786e2ab214fe1f268ec6b8fa23f335085ac6" offset="0" />
 			</dataarea>
@@ -6752,13 +6752,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1310720">
 				<rom name="space project (2007)(puls)(fr)(disk 1 of 2)[1280k].fd" size="1310720" crc="b9d4bd04" sha1="03500499d24c45026083d2795f6c58c0b9c3780d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1310720">
 				<rom name="space project (2007)(puls)(fr)(disk 2 of 2)[1280k].fd" size="1310720" crc="a8ef82ce" sha1="b91722dc7a7aaea74dba122ed8e34b1cc8e4e566" offset="0" />
 			</dataarea>
@@ -6771,13 +6771,13 @@
 		<publisher>Thomtest</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="thomtest socery (19xx)(thomtest)(fr)(disk 1 of 2).fd" size="327680" crc="0de7bef0" sha1="761242cf36077fa593efbd9e9572f66effb51061" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="thomtest socery (19xx)(thomtest)(fr)(disk 2 of 2).fd" size="327680" crc="38d067b3" sha1="13858740e855fc2279bac353371462fa9df4d446" offset="0" />
 			</dataarea>
@@ -6914,13 +6914,13 @@
 		<info name="usage" value="Follow usage instructions from TO-SNAP parent set"/>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="TO-SNAP"/>
+			<feature name="part_id" value="TO-SNAP"/>
 			<dataarea name="flop" size="335426">
 				<rom name="to-snap &amp; demo v1.1 (1992)(hmel)(fr).sap" size="335426" crc="fac93de3" sha1="54c8a3b1e92232ac4cbd967a69c923ed9675772b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="TPC Online Demo"/>
+			<feature name="part_id" value="TPC Online Demo"/>
 			<dataarea name="flop" size="335426">
 				<rom name="tpc online demo (2003)(yoann riou)[req. to-snap].sap" size="335426" crc="ad30bc2a" sha1="0c01254828ad01951cc7a072b2522499c2f2019b" offset="0" />
 			</dataarea>
@@ -6933,13 +6933,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="truc216i (2010-09)(puls)(fr)(disk 1 of 2)[tele].fd" size="327680" crc="b4595506" sha1="295d7bef55eb7dd90aa5fe0b4fe40b5a1b48ba47" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="truc216i (2010-09)(puls)(fr)(disk 2 of 2)[tele].fd" size="327680" crc="e0f89416" sha1="fbbf4e7fc1684864ac2709248707320ac4db1484" offset="0" />
 			</dataarea>
@@ -6952,13 +6952,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="truc216i-0 tele.sap" size="335426" crc="17be904a" sha1="b84738bdd9d08366f54431b3aeb95faac3767fd3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="truc216i-1 tele.sap" size="335426" crc="1826985a" sha1="6e9e02e632467e1a184391ecbca13606a5634a8f" offset="0" />
 			</dataarea>
@@ -6983,13 +6983,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="truc216i (2010-09)(puls)(fr)(disk 1 of 2)[emul].fd" size="327680" crc="2371d71d" sha1="3351bcc8d99bec12da22093565b3b1cece099ee6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="truc216i (2010-09)(puls)(fr)(disk 2 of 2)[emul].fd" size="327680" crc="6ad23009" sha1="cdb247da856b00fb973b090a75a82df547c37cdc" offset="0" />
 			</dataarea>
@@ -7002,13 +7002,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="truc216i-0.sap" size="335426" crc="03ce2df1" sha1="0228a44b7fd776ee3fa63e7a7afd9e8a3c59e5d0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="truc216i-1.sap" size="335426" crc="69a8c3be" sha1="1ebe6d894f9150e095ee27b287f0f00f48eba9d4" offset="0" />
 			</dataarea>
@@ -7033,13 +7033,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="truc40 (2010-09)(puls)(fr)(disk 1 of 2)[tele].fd" size="327680" crc="aadc382d" sha1="30dc1cc8857faf0bdab51f7e56c499c8429e5ec9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="truc40 (2010-09)(puls)(fr)(disk 2 of 2)[tele].fd" size="327680" crc="91244436" sha1="f8ab0c7d5a49d741fb6e3dd8d635b044eaf3b652" offset="0" />
 			</dataarea>
@@ -7052,13 +7052,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="truc40-0 tele.sap" size="335426" crc="463ee851" sha1="1ad902582c6ab8742b231762c44dc99601abad44" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="truc40-1 tele.sap" size="335426" crc="6fa5d9d0" sha1="e8b758e304d1804f0179c326ea8d31c2cd6950ab" offset="0" />
 			</dataarea>
@@ -7083,13 +7083,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="truc40 (2010-09)(puls)(fr)(disk 1 of 2)[emul].fd" size="327680" crc="0b61e8c5" sha1="5b5f9e8ca40775fc7c4bf9fc4d33f1afbb54c764" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="truc40 (2010-09)(puls)(fr)(disk 2 of 2)[emul].fd" size="327680" crc="be205e5c" sha1="fa245dc0c2eadc8dca076a96e5843e3f7123399d" offset="0" />
 			</dataarea>
@@ -7102,13 +7102,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="truc40-0.sap" size="335426" crc="813395dc" sha1="1a5c22d7ba3985a0233b2fe862d22fc59bc08eca" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="truc40-1.sap" size="335426" crc="a8a1ef7e" sha1="3a5baea06278f6ba41cb8edd5e1e19afaf95ac90" offset="0" />
 			</dataarea>
@@ -7133,13 +7133,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="truc70 (2010-09)(puls)(fr)(disk 1 of 2).fd" size="327680" crc="e3985727" sha1="d7a30eaa44fc3f5a9229a6b9a1c70df2d5d59171" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="truc70 (2010-09)(puls)(fr)(disk 2 of 2).fd" size="327680" crc="ca831882" sha1="2ddbbb6d15586ef3030865aae94f56d6657b9e70" offset="0" />
 			</dataarea>
@@ -7152,13 +7152,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="truc70-0.sap" size="335426" crc="343a603d" sha1="f74e79bff2026af3b89ab8860c9792bba70f183a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="truc70-1.sap" size="335426" crc="a114463c" sha1="4fc0debf8fa888759b55611092a1008bc876aa38" offset="0" />
 			</dataarea>
@@ -7183,13 +7183,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="truc80i (2010-09)(puls)(fr)(disk 1 of 2).fd" size="327680" crc="4e3d9bcf" sha1="d2dbcfd007e903ed34609bfad66ee74d46188c28" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="truc80i (2010-09)(puls)(fr)(disk 2 of 2).fd" size="327680" crc="0ad5f1ee" sha1="08c431149a034a98ae75a418b776394edd506068" offset="0" />
 			</dataarea>
@@ -7202,13 +7202,13 @@
 		<publisher>Puls</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="truc80i-0.sap" size="335426" crc="ba830507" sha1="f1a3e8e99977ae36decc39b1955af2a63b993eef" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="truc80i-1.sap" size="335426" crc="b006ee57" sha1="fe7e90ce97c4573be8ec0c399c1ca5182a78e44f" offset="0" />
 			</dataarea>
@@ -7300,13 +7300,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.1 (1992)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="2addb2ad" sha1="052cd9fd8175cbdbb4ca46334c2d1eeff6c4b075" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.1 (1992)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="2f3e4920" sha1="f6765ba10f3ad3c91a75df8af67402e931a23f90" offset="0" />
 			</dataarea>
@@ -7372,13 +7372,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.3 (1993)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="c575de69" sha1="9f106368e60b05eb23858795d64896361a589b02" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.3 (1993)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="6292043b" sha1="04412294b09a0d11664a71dfc48b2a91391ce481" offset="0" />
 			</dataarea>
@@ -7420,13 +7420,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.4 (1993)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="581f0ffd" sha1="84358221e24528d8601409641f3b356b46b31f86" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.4 (1993)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="249cef3c" sha1="015cfb14197a0eb007a35236e536609824fb4595" offset="0" />
 			</dataarea>
@@ -7468,13 +7468,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.5 (1993)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="d0b2a7e4" sha1="3b2ed9cb5e80f967e14883d55122f2f90259b659" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.5 (1993)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="ad179a96" sha1="f483b31d114a546cf0ef2f1a45171de5a2992822" offset="0" />
 			</dataarea>
@@ -7516,13 +7516,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.6 (1993)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="bd086431" sha1="7fc28bc59a270bc95029496a9f3693a42bd9e0c7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.6 (1993)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="90dc1e55" sha1="1a328895006aae5e2614ab311b59c1feb29909ff" offset="0" />
 			</dataarea>
@@ -7564,13 +7564,13 @@
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.7 (199x)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="f54b473a" sha1="c187959d21c916cc388d4bbbac855b8db66051f1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.7 (199x)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="88544849" sha1="4317eb96a006c21f81164cd7f7f157a0bcc677b2" offset="0" />
 			</dataarea>
@@ -7612,13 +7612,13 @@
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.8 (199x)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="9b35edfb" sha1="37d45e628cd0bd64390f3e038856c83303b58047" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.8 (199x)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="4dfaef15" sha1="f72d88e043a8d1a6bda68385d88899170fe106e4" offset="0" />
 			</dataarea>
@@ -7660,13 +7660,13 @@
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.9 (199x)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="4b4b94b9" sha1="9143071268983a463c3dba1296a6bc8bd183605a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.9 (199x)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="81c498eb" sha1="6da93392c7ea2c984a55461fae7f935ad7774051" offset="0" />
 			</dataarea>
@@ -7708,13 +7708,13 @@
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.10 (199x)(a.s.c.i.)(fr)(disk 1 of 2).sap" size="335426" crc="b005affb" sha1="e6445419ebbaeb5931ade3b1d7f128b9ef6b21bb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="ascinews no.10 (199x)(a.s.c.i.)(fr)(disk 2 of 2).sap" size="335426" crc="3d026671" sha1="7f1a5ba44ede017341a3c0b77d5ca648074bc2eb" offset="0" />
 			</dataarea>
@@ -7739,13 +7739,13 @@
 		<publisher>Decisions Business Innovations (DBI) - New Age Software</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="diskoid no.1, the (1993)(dbi)(fr)(disk 1 of 2).sap" size="335426" crc="2cea9a76" sha1="e8905f5797d69df83803a68ce3a26881935d148f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="diskoid no.1, the (1993)(dbi)(fr)(disk 2 of 2).sap" size="335426" crc="e0cbe525" sha1="c0138466a9d734ba21724ba47a99f02b4acc1c9a" offset="0" />
 			</dataarea>
@@ -7758,13 +7758,13 @@
 		<publisher>Decisions Business Innovations (DBI) - New Age Software</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="diskoid no.2, the (1993)(dbi)(fr)(disk 1 of 2).sap" size="335426" crc="751dea28" sha1="efd45cc283b6accfe19cd39717f6f3a31386bbb5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="diskoid no.2, the (1993)(dbi)(fr)(disk 2 of 2).sap" size="335426" crc="25a1a283" sha1="94564072cc240e32e550dba138f68a36c5c13c3e" offset="0" />
 			</dataarea>
@@ -7777,13 +7777,13 @@
 		<publisher>Decisions Business Innovations (DBI) - New Age Software</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="diskoid no.3, the (1993)(dbi)(fr)(disk 1 of 2).sap" size="335426" crc="4bfffb04" sha1="cdce373976666f8a61ad2d2a642018979b64b8d6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="diskoid no.3, the (1993)(dbi)(fr)(disk 2 of 2).sap" size="335426" crc="816dc208" sha1="bb9ca78dd9c8f37e67fc8b89ee53dcdc799ea8a7" offset="0" />
 			</dataarea>
@@ -7892,13 +7892,13 @@
 		<publisher>Bledor-Soft - Serveur87</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1 (Boot)"/>
+			<feature name="part_id" value="Disk 1 (Boot)"/>
 			<dataarea name="flop" size="335426">
 				<rom name="journal du club thomson, le (1996)(bledor-soft - serveur87)(fr)(pd)(disk 1 of 2)[boot].sap" size="335426" crc="c3af7103" sha1="7ec5c730f2278d160be6d38048c335b7ebc0fe97" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="journal du club thomson, le (1996)(bledor-soft - serveur87)(fr)(pd)(disk 2 of 2).sap" size="335426" crc="f211478a" sha1="c2a01f78349a43268cd688547abd6fefe5fbdcd0" offset="0" />
 			</dataarea>
@@ -7935,13 +7935,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.2 (1991)(a.s.c.i.)(disk 1 of 2).fd" size="327680" crc="9097b655" sha1="9d370b227ffd1fe731b360470ff60e4742cca7b6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.2 (1991)(a.s.c.i.)(disk 2 of 2).fd" size="327680" crc="f7ae2103" sha1="bcc927bf68297256250f4b86d39e8ab7b875ad24" offset="0" />
 			</dataarea>
@@ -7954,13 +7954,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-drive no.2 (1991)(a.s.c.i.)(disk 1 of 2).sap" size="335426" crc="93043fa4" sha1="59e732e402055178d7a4cfec440c4043f6c6119a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-drive no.2 (1991)(a.s.c.i.)(disk 2 of 2).sap" size="335426" crc="46f2db26" sha1="743e73b38e03c8516fe377c64d85187b501b254a" offset="0" />
 			</dataarea>
@@ -7985,13 +7985,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.3 (1991)(a.s.c.i.)(disk 1 of 2).fd" size="327680" crc="75c2f079" sha1="040b49c803ff75b13a9d62ebb0c6c44a00071f2b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.3 (1991)(a.s.c.i.)(disk 2 of 2).fd" size="327680" crc="199a73ef" sha1="a14f9a40489995f349fe65a4a39a19c732b0f721" offset="0" />
 			</dataarea>
@@ -8004,13 +8004,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-drive no.3 (1991)(a.s.c.i.)(disk 1 of 2).sap" size="335426" crc="cd4a9380" sha1="282efdf285c8a1bd096cfdd632777ba0c0ff00dc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-drive no.3 (1991)(a.s.c.i.)(disk 2 of 2).sap" size="335426" crc="f7184b9f" sha1="41234d6161f8e57eb7d1635d525b29c4189abe13" offset="0" />
 			</dataarea>
@@ -8035,13 +8035,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.4 (1991)(a.s.c.i.)(disk 1 of 2).fd" size="327680" crc="1c1f11b3" sha1="581838da7a897d9c079ccfa8c987c6fd5a9db522" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.4 (1991)(a.s.c.i.)(disk 2 of 2).fd" size="327680" crc="6f9f5791" sha1="77b31a770ffa330d635584332703664b51fa9190" offset="0" />
 			</dataarea>
@@ -8054,13 +8054,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-drive no.4 (1991)(a.s.c.i.)(disk 1 of 2).sap" size="335426" crc="4f320337" sha1="b20d939a2919a0c9f1bd469658d8a644cba23cec" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-drive no.4 (1991)(a.s.c.i.)(disk 2 of 2).sap" size="335426" crc="68ba39d7" sha1="41da35e5b8f5d8bcfdddca8ba44eed2cf28e3ee5" offset="0" />
 			</dataarea>
@@ -8085,13 +8085,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.5 (1991)(a.s.c.i.)(disk 1 of 2).fd" size="327680" crc="6f07eb1e" sha1="be63a63fb18c92750d984a55d104941a93d80b74" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.5 (1991)(a.s.c.i.)(disk 2 of 2).fd" size="327680" crc="f02a1b24" sha1="f197882d9f5a7adcb0e7d7268f1221f66ffe5976" offset="0" />
 			</dataarea>
@@ -8104,13 +8104,13 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-drive no.5 (1991)(a.s.c.i.)(disk 1 of 2).sap" size="335426" crc="7e609527" sha1="a92768dca5a83c1ae6170b15744b7efbc073beae" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-drive no.5 (1991)(a.s.c.i.)(disk 2 of 2).sap" size="335426" crc="3ce68ef4" sha1="7e3554bdc71f6f34b550e7f60c6a6304f075fb61" offset="0" />
 			</dataarea>
@@ -8135,25 +8135,25 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.6 (1991)(a.s.c.i.).fd" size="327680" crc="27b3f52a" sha1="2eae97600137f9f1e1135ded426bf75ceb411704" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk A"/>
+			<feature name="part_id" value="RAM Disk A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.6 (1991)(a.s.c.i.)[ram disk a].fd" size="327680" crc="21c656f4" sha1="63361065ed64f4c114df443b5bd7052f61d8c7d6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk B"/>
+			<feature name="part_id" value="RAM Disk B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.6 (1991)(a.s.c.i.)[ram disk b].fd" size="327680" crc="07c13e07" sha1="c33fc6a6b50cca0738afaa65d8f2a244292d609d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk C"/>
+			<feature name="part_id" value="RAM Disk C"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.6 (1991)(a.s.c.i.)[ram disk c].fd" size="327680" crc="a6c1e7d8" sha1="e3ee4654cb5f5a13c6960a0afcc9e5fcd6b713aa" offset="0" />
 			</dataarea>
@@ -8166,25 +8166,25 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="teo-drive no.6 (1991)(a.s.c.i.).sap" size="335426" crc="eb7462f5" sha1="a8867700557bf947df323ec9e55f0ec23868e2ac" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk A"/>
+			<feature name="part_id" value="RAM Disk A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.6 (1991)(a.s.c.i.)[ram disk a].fd" size="327680" crc="21c656f4" sha1="63361065ed64f4c114df443b5bd7052f61d8c7d6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk B"/>
+			<feature name="part_id" value="RAM Disk B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.6 (1991)(a.s.c.i.)[ram disk b].fd" size="327680" crc="07c13e07" sha1="c33fc6a6b50cca0738afaa65d8f2a244292d609d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk C"/>
+			<feature name="part_id" value="RAM Disk C"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.6 (1991)(a.s.c.i.)[ram disk c].fd" size="327680" crc="a6c1e7d8" sha1="e3ee4654cb5f5a13c6960a0afcc9e5fcd6b713aa" offset="0" />
 			</dataarea>
@@ -8198,25 +8198,25 @@
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="655360">
 				<rom name="teo-drive n6 (asci) (michel saint-briant) (1991) (to8).fd" size="655360" crc="fa0fe99f" sha1="111c3d64bb30f3fe1986918c684452fad8a8f59a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk A"/>
+			<feature name="part_id" value="RAM Disk A"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.6 (1991)(a.s.c.i.)[ram disk a].fd" size="327680" crc="21c656f4" sha1="63361065ed64f4c114df443b5bd7052f61d8c7d6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk B"/>
+			<feature name="part_id" value="RAM Disk B"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.6 (1991)(a.s.c.i.)[ram disk b].fd" size="327680" crc="07c13e07" sha1="c33fc6a6b50cca0738afaa65d8f2a244292d609d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="RAM Disk C"/>
+			<feature name="part_id" value="RAM Disk C"/>
 			<dataarea name="flop" size="327680">
 				<rom name="teo-drive no.6 (1991)(a.s.c.i.)[ram disk c].fd" size="327680" crc="a6c1e7d8" sha1="e3ee4654cb5f5a13c6960a0afcc9e5fcd6b713aa" offset="0" />
 			</dataarea>
@@ -8231,13 +8231,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="doc jeux (19xx)(-)(disk 1 of 2).sap" size="335426" crc="16123c3a" sha1="c2acab804e88cba43ba9027327ef0499feb3e376" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="doc jeux (19xx)(-)(disk 2 of 2).sap" size="335426" crc="f051e6e1" sha1="33f8528a163a4d0046d23ab55a1b99fd5de6b635" offset="0" />
 			</dataarea>
@@ -8250,13 +8250,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="doc jeux (19xx)(-)(disk 1 of 2)[a].sap" size="335426" crc="52e1d977" sha1="329f720ef2bc7653f64abb7e7478882ff828c08e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="doc jeux (19xx)(-)(disk 2 of 2)[a].sap" size="335426" crc="e4e452a2" sha1="201c92d93d9c7a38bd5838c63a9f08d51a121e7c" offset="0" />
 			</dataarea>
@@ -8469,7 +8469,7 @@
 		<publisher>Coktel Vision</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="bosse des maths 3eme, la (1987)(coktel vision)(fr).fd" size="327680" crc="b3fa5b72" sha1="748f75fc8261c0157cf1a746307bb7ba558281d9" offset="0" />
 			</dataarea>
@@ -8506,13 +8506,13 @@
 		<publisher>Claude Lietard</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="calcul rapide (1987)(c. lietard)(fr)(disk 1 of 2).sap" size="335426" crc="8155224b" sha1="6f9545dd202da802df169b93cf2897c13f028a8e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="calcul rapide (1987)(c. lietard)(fr)(disk 2 of 2).sap" size="335426" crc="f2eb2b76" sha1="1de3c8df2333ac8f0585f7f87bde67f4bbff5cd0" offset="0" />
 			</dataarea>
@@ -8646,13 +8646,13 @@
 		<publisher>Bledor-Soft - Serveur87</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - mammiferes vol 3-1 (1998)(bledor-soft - serveur87)(pd)(disk 1 of 2).sap" size="335426" crc="b758dbaf" sha1="22d68a297107f6624fdcba19e260c4582a64614c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - mammiferes vol 3-1 (1998)(bledor-soft - serveur87)(pd)(disk 2 of 2).sap" size="335426" crc="fc68ead1" sha1="7ee1659d34aee4b4ae9719d7b84bc761e26bc8ad" offset="0" />
 			</dataarea>
@@ -8665,13 +8665,13 @@
 		<publisher>Bledor-Soft - Serveur87</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - mammiferes vol. 2 - canides 1 (1999)(bledor-soft - serveur87)(fr)(pd)(disk 1 of 2).sap" size="335426" crc="2101f179" sha1="ffeed2f929cd4b238df8837480c0f580efd8ed6a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - mammiferes vol. 2 - canides 1 (1999)(bledor-soft - serveur87)(fr)(pd)(disk 2 of 2).sap" size="335426" crc="f0a45437" sha1="bfea6bd279d6595aa0eba416ba527920d6b68688" offset="0" />
 			</dataarea>
@@ -8684,13 +8684,13 @@
 		<publisher>Bledor-Soft - Serveur87</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - mammiferes vol. 2 - canides 1 (1999)(bledor-soft - serveur87)(fr)(pd)(disk 1 of 2)[a].sap" size="335426" crc="d31be36f" sha1="2c5b83b43470268173ed6c3bf5530d6eea1e069b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - mammiferes vol. 2 - canides 1 (1999)(bledor-soft - serveur87)(fr)(pd)(disk 2 of 2).sap" size="335426" crc="f0a45437" sha1="bfea6bd279d6595aa0eba416ba527920d6b68688" offset="0" />
 			</dataarea>
@@ -8703,13 +8703,13 @@
 		<publisher>Bledor-Soft - Serveur87</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - mammiferes vol. 3 - special loup (2000)(bledor-soft - serveur87)(fr)(pd)(disk 1 of 2).sap" size="335426" crc="3407c711" sha1="71c13011d552924a809f9de22444ea3019165b3d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - mammiferes vol. 3 - special loup (2000)(bledor-soft - serveur87)(fr)(pd)(disk 2 of 2).sap" size="335426" crc="49e4e7a8" sha1="d819130624e7ce3e456291abadf44a8a69e0f813" offset="0" />
 			</dataarea>
@@ -8722,13 +8722,13 @@
 		<publisher>Bledor-Soft - Serveur87</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - mammiferes vol. 3 - special loup (2000)(bledor-soft - serveur87)(fr)(pd)(disk 1 of 2)[a].sap" size="335426" crc="0121e2ad" sha1="7f47e6d0f0b8a510fb9eab90c69521303ae6188b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - mammiferes vol. 3 - special loup (2000)(bledor-soft - serveur87)(fr)(pd)(disk 2 of 2)[a].sap" size="335426" crc="c1f177d5" sha1="cc421dfe6354fdaa6dd771a1fd13389e21127c09" offset="0" />
 			</dataarea>
@@ -8741,13 +8741,13 @@
 		<publisher>Bledor-Soft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - les papillons vol. 1 (1996)(bledor-soft)(fr)(pd)(disk 1 of 2).sap" size="335426" crc="f1814a32" sha1="3c88a0ab435e28a08c984943597bf6afec487fe8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - les papillons vol. 1 (1996)(bledor-soft)(fr)(pd)(disk 2 of 2).sap" size="335426" crc="0fe2e126" sha1="190f4bd1f9e27ecd830b14d699e2ffc2034c452e" offset="0" />
 			</dataarea>
@@ -8760,13 +8760,13 @@
 		<publisher>Bledor-Soft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - les papillons vol. 2 (1996)(bledor-soft)(fr)(pd)(disk 1 of 2).sap" size="335426" crc="10c9692a" sha1="82939515aa056a1aaac40bf3fbe28b5e48a622a9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - les papillons vol. 2 (1996)(bledor-soft)(fr)(pd)(disk 2 of 2).sap" size="335426" crc="ac2c4817" sha1="dd1268c9198780fc8f32b949a1babaa125a2b8a4" offset="0" />
 			</dataarea>
@@ -8779,13 +8779,13 @@
 		<publisher>Bledor-Soft - Serveur87</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - les papillons vol.3 - heteroceres 1 (1999)(bledor-soft - serveur87)(fr)(pd)(disk 1 of 2).sap" size="335426" crc="ec416841" sha1="9199d19885c8621186798fcd7ea3efc977f00afc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - les papillons vol.3 - heteroceres 1 (1999)(bledor-soft - serveur87)(fr)(pd)(disk 2 of 2).sap" size="335426" crc="fe3a9e42" sha1="e6c86a0a0e6c7ee5a35476a42cf6b7b3a62a9a5b" offset="0" />
 			</dataarea>
@@ -8798,13 +8798,13 @@
 		<publisher>Bledor-Soft - Serveur87</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - les papillons vol.3 - heteroceres 2 (1999)(bledor-soft - serveur87)(fr)(pd)(disk 1 of 2).sap" size="335426" crc="0d057f5f" sha1="c1ee74b8a272fc3085f053a5a2485d02afdb9c2f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="encyclopaedia thomsonis - les papillons vol.3 - heteroceres 2 (1999)(bledor-soft - serveur87)(fr)(pd)(disk 2 of 2).sap" size="335426" crc="6694ff08" sha1="619f3410ff19b828ff837c2897d0e05879219094" offset="0" />
 			</dataarea>
@@ -8817,13 +8817,13 @@
 		<publisher>Bledor-Soft - ContacThoms - Serveur87</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="insectes v1.0.sap" size="335426" crc="4bf6d47e" sha1="27dfaa4f0476e0b1024c6bf8ba0a5bc9fac95186" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="insectes v1.1.sap" size="335426" crc="82ebff6a" sha1="2d29a9ce0e6c16eca2a5c17a291ac0257730b598" offset="0" />
 			</dataarea>
@@ -9008,13 +9008,13 @@
 		<publisher>Nathan Logiciels</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="langue francaise ce1 (nathan) (inconnus) (1989) (to8) (disk1).fd" size="327680" crc="9f462d7d" sha1="6a02e48dd400b0bc26ff2a5ecf4b027038e20621" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="langue francaise ce1 (nathan) (inconnus) (1989) (to8) (disk2).fd" size="327680" crc="71b71ed0" sha1="a1151609d6a88f13b57738508d8f52b0310c17d7" offset="0" />
 			</dataarea>
@@ -9027,13 +9027,13 @@
 		<publisher>Nathan Logiciels</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="langue francaise cm1 (nathan) (inconnus) (1989) (to8) (disk1).fd" size="327680" crc="66c2e3e3" sha1="a1cf588c8fe128577019b4777260da3fc2989a91" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="langue francaise cm1 (nathan) (inconnus) (1989) (to8) (disk2).fd" size="327680" crc="fbabab5f" sha1="3bd19ddf1bf21c16180b228f98b4ec9ab8fa889b" offset="0" />
 			</dataarea>
@@ -9131,25 +9131,25 @@
 		<publisher>Cedic/Nathan</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Set 1 Disk 1 (CE/CM Aide a l'Orthographe)"/>
+			<feature name="part_id" value="Set 1 Disk 1 (CE/CM Aide a l'Orthographe)"/>
 			<dataarea name="flop" size="327680">
 				<rom name="620 044 336 411 r disquette 1.fd" size="327680" crc="378eb8ea" sha1="423866e99afd14da24133538cb15c1f9882e99a9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Set 1 Disk 2 (CM1 Grammaire et Vocabulaire)"/>
+			<feature name="part_id" value="Set 1 Disk 2 (CM1 Grammaire et Vocabulaire)"/>
 			<dataarea name="flop" size="327680">
 				<rom name="620 044 336 411 r disquette 2.fd" size="327680" crc="f87431aa" sha1="e1721e83fa4d206f7c745c72a8311a0086634961" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Set 2 Disk 1 (CM2/6e Grammaire et Vocabulaire)"/>
+			<feature name="part_id" value="Set 2 Disk 1 (CM2/6e Grammaire et Vocabulaire)"/>
 			<dataarea name="flop" size="327680">
 				<rom name="620 064 336 412 n disquette 1.fd" size="327680" crc="da47d71f" sha1="ee3e4e01c59be6c2ce38a0af9e1e6bdd9c56e892" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Set 2 Disk 2 (CM2 Vocabulaire et Orthographe)"/>
+			<feature name="part_id" value="Set 2 Disk 2 (CM2 Vocabulaire et Orthographe)"/>
 			<dataarea name="flop" size="327680">
 				<rom name="620 064 336 412 n disquette 2.fd" size="327680" crc="612bd602" sha1="2d4264fc1d831adcd00a2313534ba2d623c37b07" offset="0" />
 			</dataarea>
@@ -10386,13 +10386,13 @@
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="bob winner (1987)(loriciels)(fr)(disk 1 of 2)[boot with microsoft basic 1.0].fd" size="327680" crc="aab29024" sha1="200ea484131db97735237f08bdac7bb928c38285" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="bob winner (1987)(loriciels)(fr)(disk 2 of 2).fd" size="327680" crc="41ae476e" sha1="53073f68a424b39aa6193a8c04c859318543111a" offset="0" />
 			</dataarea>
@@ -10406,13 +10406,13 @@
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="bob winner (1987)(loriciels)(fr)(disk 1 of 2)[b].sap" size="335426" crc="b82e7706" sha1="a7f84b942e9944929da7e557bb5d0b9fb60c4731" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="bob winner (1987)(loriciels)(fr)(disk 2 of 2)[b].sap" size="335426" crc="b13eafbe" sha1="16b39c02a2d8f6d53ae3cdfb1aee87c094a8005c" offset="0" />
 			</dataarea>
@@ -10630,13 +10630,13 @@
 		<publisher>Ubisoft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="chevaliers de l'an mil, les (1989)(ubisoft)(fr)(disk 1 of 2).fd" size="327680" crc="8e42e1d3" sha1="9ee8c4aeb361f2288f01a4391b7f9d075b4d2b85" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="chevaliers de l'an mil, les (1989)(ubisoft)(fr)(disk 2 of 2).fd" size="327680" crc="380d5697" sha1="ffb9ec2aa150975a5f636a99a7dd372151ac56ee" offset="0" />
 			</dataarea>
@@ -10649,13 +10649,13 @@
 		<publisher>Ubisoft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="chevaliers de l'an mil, les (1989)(ubisoft)(fr)(disk 1 of 2).sap" size="335426" crc="9de8c788" sha1="569074f7ffbc258c54e46c753c545679854ba42a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="chevaliers de l'an mil, les (1989)(ubisoft)(fr)(disk 2 of 2).sap" size="335426" crc="f135a97c" sha1="d7bf56d4f477945a103c70356ff9a701e5c52347" offset="0" />
 			</dataarea>
@@ -11088,7 +11088,7 @@
 		<publisher>Loriciels</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="flipper (1984)(loriciels)(fr).fd" size="327680" crc="66ee4e70" sha1="7d7ddf9dd4e1162562a2185dd3862a18e3b23323" offset="0" />
 			</dataarea>
@@ -11768,13 +11768,13 @@
 		<publisher>YRprod</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="lemmings (2006)(yrprod)(fr)(disk 1 of 2).fd" size="327680" crc="26175051" sha1="2b3e06b76dd1e3d3d38874b156e2ce42f33c7e7d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="lemmings (2006)(yrprod)(fr)(disk 2 of 2).fd" size="327680" crc="eae4a1ef" sha1="7462afb56c49ae8844393bdd899ec2b70198aadd" offset="0" />
 			</dataarea>
@@ -11787,13 +11787,13 @@
 		<publisher>YRprod</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="lemmings (2006)(yrprod)(fr)(disk 1 of 2).sap" size="335426" crc="66efbf4c" sha1="0d71210fb0c65d700d306bf5376e916e19134c18" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="lemmings (2006)(yrprod)(fr)(disk 2 of 2).sap" size="335426" crc="1e831aa3" sha1="0257ee40f885b58b12cfbc278d1812b9682239d7" offset="0" />
 			</dataarea>
@@ -13323,13 +13323,13 @@
 		<publisher>Retrocoding Production</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="la secte noire (retrocoding production) (6502man, sam) (2014) (to8 fd) disk 1.fd" size="327680" crc="791496e3" sha1="66eda67d4101506b53f425ca85262b1b9c7e8f23" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="la secte noire (retrocoding production) (6502man, sam) (2014) (to8 fd) disk 2.fd" size="327680" crc="4d5a47f4" sha1="d4eeb4e010b1af335cf4ddbee6f40840c65579d8" offset="0" />
 			</dataarea>
@@ -14020,25 +14020,25 @@
 		<publisher>Bledor-Soft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="to-karaoke (2002)(bledor-soft)(fr)(disk 1 of 4).fd" size="327680" crc="b24f289f" sha1="3c197279ad3708b07d7402b293be3769ae0bd98c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="to-karaoke (2002)(bledor-soft)(fr)(disk 2 of 4).fd" size="327680" crc="ab97277f" sha1="5c83f9078539e42dc8345730479b075d42319403" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="327680">
 				<rom name="to-karaoke (2002)(bledor-soft)(fr)(disk 3 of 4).fd" size="327680" crc="7dac702b" sha1="3218eb0d57f6e62fbe0fc06c71d7efd11ed61788" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="327680">
 				<rom name="to-karaoke (2002)(bledor-soft)(fr)(disk 4 of 4).fd" size="327680" crc="f057e32a" sha1="1222a89d04c69628f02d108ff23e0750053d0c79" offset="0" />
 			</dataarea>
@@ -14051,25 +14051,25 @@
 		<publisher>Bledor-Soft</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="335426">
 				<rom name="to-karaoke (2002)(bledor-soft)(fr)(disk 1 of 4).sap" size="335426" crc="90f0c9fa" sha1="bbd6c9735b0954ecd664a1e3ed6427e1bdcdfada" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="335426">
 				<rom name="to-karaoke (2002)(bledor-soft)(fr)(disk 2 of 4).sap" size="335426" crc="69aa46fa" sha1="147705d7ec0573f462a910cdc879a52f003e7f47" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
-		<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="335426">
 				<rom name="to-karaoke (2002)(bledor-soft)(fr)(disk 3 of 4).sap" size="335426" crc="f1272f2a" sha1="0422180eb7aee00cfc4d699eca24a6837657e59d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
-		<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="335426">
 				<rom name="to-karaoke (2002)(bledor-soft)(fr)(disk 4 of 4).sap" size="335426" crc="7c34a1f5" sha1="e19cf07ac24df19e09fb6b845eb70f86caef334f" offset="0" />
 			</dataarea>
@@ -14145,7 +14145,7 @@
 		<publisher>Chip</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="traitement bzzz (1987)(chip)(fr)[includes mo6 version].fd" size="327680" crc="ecc27728" sha1="4a244ecb46497db31ade42f2a5b1d41b3fd01734" offset="0" />
 			</dataarea>
@@ -14330,13 +14330,13 @@
 		<publisher>Loriciels</publisher>
 
 		<part name="flop1" interface="thom_flop">
-		<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="327680">
 				<rom name="turbo cup (loriciels) (vincent baillet) (1988) (mo6 to8)-1.fd" size="327680" crc="ccc68ffd" sha1="660f9cad0b40f22d753dac46994c559e5a124499" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
-		<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="327680">
 				<rom name="turbo cup (loriciels) (vincent baillet) (1988) (mo6 to8)-2.fd" size="327680" crc="05162ac3" sha1="e90927dfddf4961a66260f8e8c9fe525a5f2abc5" offset="0" />
 			</dataarea>

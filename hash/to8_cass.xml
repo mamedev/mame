@@ -165,25 +165,25 @@
 		<publisher>Ubisoft</publisher>
 
 		<part name="cass1" interface="to_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="84279">
 				<rom name="trivialp1.k7" size="84279" crc="bad716ad" sha1="eb5df3bd272f6294055366a2f8f7db1eb4b8c6b9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="70238">
 				<rom name="trivialp2.k7" size="70238" crc="d4a05cd6" sha1="0b814e4715711e3d88d3d19d1e38d6128b88acdc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="68394">
 				<rom name="trivialp3.k7" size="68394" crc="836bfec2" sha1="000fb6273ca2d0c3d43577f1b362432080451e26" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
-		<feature name="part_id" value="Tape 4"/>
+			<feature name="part_id" value="Tape 4"/>
 			<dataarea name="cass" size="62086">
 				<rom name="trivialp4.k7" size="62086" crc="6e570923" sha1="2667a0531b9ca34c7de03f7646c5d946bcd0068e" offset="0" />
 			</dataarea>
