@@ -26,6 +26,7 @@ enum
 	XINQIG,                   /* Xin Qigai Wangzi uses different sram start address and has no valid header */
 	BEGGARP,                     /* Beggar Prince uses different sram start address + bankswitch tricks */
 	WUKONG,                      /* Legend of Wukong uses different sram start address + bankswitch trick for last 128K of ROM */
+	STARODYS,                    /* Star Odyssey */
 
 	// EEPROM
 	SEGA_EEPROM,                 /* Wonder Boy V / Evander Holyfield's Boxing / Greatest Heavyweights of the Ring / Sports Talk Baseball / Megaman */

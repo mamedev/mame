@@ -21821,6 +21821,57 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="psolar">
+		<description>Pier Solar and the Great Architects (World, Rev. C)</description>
+		<year>2010</year>
+		<publisher>WaterMelon</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_stm95"/>
+			<dataarea name="rom" width="16" endianness="big" size="8388608">
+				<rom name="pier solar and the great architects (world) (en,es,pt) (rev c) (unl).bin" size="8388608" crc="dfb94f1b" sha1="2e7710b1956514c27be24db000e60d3c3a1dc2d8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="psolara" cloneof="psolar">
+		<description>Pier Solar and the Great Architects (World, Rev. B)</description>
+		<year>2010</year>
+		<publisher>WaterMelon</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_stm95"/>
+			<dataarea name="rom" width="16" endianness="big" size="8388608">
+				<rom name="pier solar and the great architects (world) (en,fr,de) (rev b) (unl).bin" size="8388608" crc="25b7063e" sha1="2e2b03cdf58662b450ac09e9883d5767ce2be350" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="psolarb" cloneof="psolar">
+		<description>Pier Solar and the Great Architects (World, Rev. A)</description>
+		<year>2010</year>
+		<publisher>WaterMelon</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_stm95"/>
+			<dataarea name="rom" width="16" endianness="big" size="8388608">
+				<rom name="pier solar and the great architects (world) (en,fr,de) (rev a) (unl).bin" size="8388608" crc="4261ea9b" sha1="59f7557725a740322fa92402e13c98823f795aa9" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="psolarp" cloneof="psolar">
+		<description>Pier Solar and the Great Architects (World, Prototype)</description>
+		<year>2010</year>
+		<publisher>WaterMelon</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
+				<rom name="pier solar and the great architects (world) (beta) (unl).bin" size="3407872" crc="55ffb501" sha1="d672e456f1af120d1fa7137c3fbee1d9f62d9296" offset="0x000000" />
+			</dataarea>
+			<!-- What is the correct amount?!? -->
+			<dataarea name="sram" size="4096">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="pinkp" cloneof="pink">
 		<description>Pink Goes to Hollywood (USA, Prototype)</description>
@@ -25157,6 +25208,20 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 	
 	<software name="starodys">
+		<description>Star Odyssey (USA)</description>
+		<year>2011</year>
+		<publisher>Super Fighter Team</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sf004"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="star odyssey (world) (unl).bin" size="2097152" crc="0b670a3e" sha1="791ee690b2929d4edfda22ff23d7cfd74376299e" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="starodysp" cloneof="starodys">
 		<description>Star Odyssey (USA, Prototype 19920116)</description>
 		<year>1990</year>
 		<publisher>Sage's Creation</publisher>
@@ -29589,7 +29654,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>2008</year>
 		<publisher>Super Fighter Team</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_wukong"/>
+			<feature name="slot" value="rom_sf002"/>
 			<dataarea name="rom" width="16" endianness="big" size="2228224">
 				<rom name="legend of wukong (unl).bin" size="2228224" crc="72f11771" sha1="4ef41e4caccab118014abb8e079c7e5668a4f468" offset="0x000000"/>
 			</dataarea>
@@ -29938,7 +30003,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>2005</year>
 		<publisher>Super Fighter Team</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_beggarp"/>
+			<feature name="slot" value="rom_sf001"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="beggar prince (unl).bin" size="4194304" crc="f3af46cd" sha1="f481b970756c482d8f408c4bab8902172837e7d8" offset="0x000000"/>
 			</dataarea>
