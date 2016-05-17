@@ -6960,23 +6960,23 @@ static INPUT_PORTS_START( flaming7 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Books / Stats / Setup") PORT_TOGGLE
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Payout" )
+	PORT_DIPNAME( 0x03, 0x03, "Payout" )               PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "Amusement (no credits out)" )
 	PORT_DIPSETTING(    0x02, "Ticket Printer" )
 	PORT_DIPSETTING(    0x01, "Hopper Payout" )
 	PORT_DIPSETTING(    0x00, "Remote Clear" )
-	PORT_DIPNAME( 0x04, 0x04, "Game Speed" )
+	PORT_DIPNAME( 0x04, 0x04, "Game Speed" )           PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, "Fast Game" )
 	PORT_DIPSETTING(    0x00, "Slow Game" )
-	PORT_DIPNAME( 0x08, 0x08, "Double-Up" )
+	PORT_DIPNAME( 0x08, 0x08, "Double-Up" )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x30, 0x30, "Graphics Type" )
+	PORT_DIPNAME( 0x30, 0x30, "Graphics Type" )        PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x30, "Regular Fruit" )
 	PORT_DIPSETTING(    0x20, "Graphics Option 1" )  // Numbers.
 	PORT_DIPSETTING(    0x10, "Graphics Option 2" )  // Red, White & Blue 7's.
 	PORT_DIPSETTING(    0x00, "Graphics Option 3" )  // Hollywood Nights.
-	PORT_DIPNAME( 0xc0, 0xc0, "Paytable" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Paytable" )             PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0xc0, "9322" )
 	PORT_DIPSETTING(    0x80, "9323" )
 	PORT_DIPSETTING(    0x40, "9324" )
