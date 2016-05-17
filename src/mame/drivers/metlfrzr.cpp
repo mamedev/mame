@@ -54,8 +54,8 @@ void metlfrzr_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 		int x = count / 32;
 
 		UINT16 tile = m_vram[count*2+0] + ((m_vram[count*2+1] & 0xf0) << 4);
-		UINT8 color = 0;//(m_fgattr[count] & 0x3f) + (m_pal_bank<<6);
-
+		UINT8 color = m_vram[count*2+1] & 0xf;
+		
 		gfx_0->transpen(bitmap,cliprect,tile,color,0,0,x*8,y*8,0xf);
 	}
 
@@ -72,6 +72,8 @@ UINT32 metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_ind1
 WRITE8_MEMBER(metlfrzr_state::output_w)
 {
 	// bit 7: flip screen
+	membank("bank1")->set_entry((data & 0xc) >> 2);
+
 	if(data & 0x7f)
 		printf("%02x\n",data);
 }
