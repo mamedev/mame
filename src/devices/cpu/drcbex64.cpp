@@ -4300,6 +4300,10 @@ void drcbe_x64::op_add(x86code *&dst, const instruction &inst)
 		if (dstp.is_memory() && dstp == src1p)
 			emit_add_m32_p32(dst, MABS(dstp.memory()), src2p, inst);                    // add   [dstp],src2p
 
+		// dstp == src2p in memory
+		else if (dstp.is_memory() && dstp == src2p)
+			emit_add_m32_p32(dst, MABS(dstp.memory()), src1p, inst);					// add   [dstp],src1p
+
 		// reg = reg + imm
 		else if (dstp.is_int_register() && src1p.is_int_register() && src2p.is_immediate() && inst.flags() == 0)
 			emit_lea_r32_m32(dst, dstp.ireg(), MBD(src1p.ireg(), src2p.immediate()));   // lea   dstp,[src1p+src2p]
@@ -4323,6 +4327,10 @@ void drcbe_x64::op_add(x86code *&dst, const instruction &inst)
 		// dstp == src1p in memory
 		if (dstp.is_memory() && dstp == src1p)
 			emit_add_m64_p64(dst, MABS(dstp.memory()), src2p, inst);                    // add   [dstp],src2p
+
+		// dstp == src2p in memory
+		else if (dstp.is_memory() && dstp == src2p)
+			emit_add_m64_p64(dst, MABS(dstp.memory()), src1p, inst);					// add   [dstp],src1p
 
 		// reg = reg + imm
 		else if (dstp.is_int_register() && src1p.is_int_register() && src2p.is_immediate() && short_immediate(src2p.immediate()) && inst.flags() == 0)
