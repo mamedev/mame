@@ -1,9 +1,20 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
-/*
+// copyright-holders:Angelo Salese
+/****************************************
 
+	Metal Freezer (c) 1989 Seibu
+	
+	preliminary driver by Angelo Salese
+	
+	HW seems the natural evolution of Dark Mist type HW.
+	
+	TODO:
+	- T5182 hookup, controls sound and coins;
+	- Sprites, 0xfe00-0xffff? (And why game doesn't actually write at 0xff80-0xffff?)
+	- Foreground rowscroll / per-tile scroll;
+	- Writes at 0xb800-0xbfff at attract mode gameplay demo transition?
 
-*/
+****************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -73,17 +84,18 @@ UINT32 metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_ind1
 WRITE8_MEMBER(metlfrzr_state::output_w)
 {
 	// bit 7: flip screen
+	// bit 1-0: unknown purpose, both 1s too generally
 	m_fg_tilebank = (data & 0x10) >> 4;
 	membank("bank1")->set_entry((data & 0xc) >> 2);
 
-	if(data & 0x7f)
+	if(data & 0x63)
 		printf("%02x\n",data);
 }
 
 static ADDRESS_MAP_START( metlfrzr_map, AS_PROGRAM, 8, metlfrzr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
 	AM_RANGE(0xd200, 0xd3ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect_ext) AM_SHARE("palette_ext")
 
@@ -96,11 +108,13 @@ static ADDRESS_MAP_START( metlfrzr_map, AS_PROGRAM, 8, metlfrzr_state )
 	AM_RANGE(0xd700, 0xd700) AM_WRITE(output_w)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("wram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, metlfrzr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("wram") // executes code at 0xf5d5
 ADDRESS_MAP_END
 
 
