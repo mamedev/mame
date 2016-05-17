@@ -36,6 +36,7 @@ public:
 	DECLARE_DRIVER_INIT(metlfrzr);
 	DECLARE_WRITE8_MEMBER(output_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	UINT8 m_fg_tilebank;
 };
 
 
@@ -45,7 +46,7 @@ void metlfrzr_state::video_start()
 
 void metlfrzr_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	gfx_element *gfx_0 = m_gfxdecode->gfx(0);
+	gfx_element *gfx_0 = m_gfxdecode->gfx(m_fg_tilebank);
 	int count;
 
 	for (count=0;count<32*32;count++)
@@ -72,6 +73,7 @@ UINT32 metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_ind1
 WRITE8_MEMBER(metlfrzr_state::output_w)
 {
 	// bit 7: flip screen
+	m_fg_tilebank = (data & 0x10) >> 4;
 	membank("bank1")->set_entry((data & 0xc) >> 2);
 
 	if(data & 0x7f)
@@ -237,8 +239,8 @@ static const gfx_layout tiles16x16_layout =
 
 
 static GFXDECODE_START(metlfrzr)
-	GFXDECODE_ENTRY("gfx1", 0, tiles8x8_layout, 0, 16)
-	GFXDECODE_ENTRY("gfx2", 0, tiles8x8_layout, 0, 16)
+	GFXDECODE_ENTRY("gfx1", 0, tiles8x8_layout, 0x100, 16)
+	GFXDECODE_ENTRY("gfx2", 0, tiles8x8_layout, 0x100, 16)
 	GFXDECODE_ENTRY("gfx3", 0, tiles16x16_layout, 0, 16)
 	GFXDECODE_ENTRY("gfx4", 0, tiles16x16_layout, 0, 16)
 GFXDECODE_END
@@ -266,7 +268,7 @@ static MACHINE_CONFIG_START(metlfrzr, metlfrzr_state)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256*2)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", metlfrzr)
 
