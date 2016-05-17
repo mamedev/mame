@@ -106,11 +106,17 @@ void voodoo_pci_device::device_start()
 	pci_device::device_start();
 	if (m_type<=TYPE_VOODOO_2) {
 		add_map(16*1024*1024, M_MEM | M_PREF, FUNC(voodoo_pci_device::voodoo_reg_map));
+		bank_infos[0].adr = 0xff000000;
 	} else {
 		add_map(32*1024*1024, M_MEM, FUNC(voodoo_pci_device::banshee_reg_map));
 		add_map(32*1024*1024, M_MEM, FUNC(voodoo_pci_device::lfb_map));
 		add_map(256, M_IO, FUNC(voodoo_pci_device::io_map));
+		bank_infos[0].adr = 0xf8000000;
+		bank_infos[1].adr = 0xf8000008;
+		bank_infos[2].adr = 0xfffffff0;
 	}
+
+	save_item(NAME(m_pcictrl_reg));
 }
 
 void voodoo_pci_device::device_reset()
