@@ -35,6 +35,7 @@ public:
 
 	DECLARE_DRIVER_INIT(metlfrzr);
 	DECLARE_WRITE8_MEMBER(output_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 };
 
 
@@ -52,7 +53,7 @@ void metlfrzr_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 		int y = (count % 32);
 		int x = count / 32;
 
-		UINT16 tile = m_vram[count*2+0];
+		UINT16 tile = m_vram[count*2+0] + ((m_vram[count*2+1] & 0xf0) << 4);
 		UINT8 color = 0;//(m_fgattr[count] & 0x3f) + (m_pal_bank<<6);
 
 		gfx_0->transpen(bitmap,cliprect,tile,color,0,0,x*8,y*8,0xf);
@@ -240,13 +241,24 @@ static GFXDECODE_START(metlfrzr)
 	GFXDECODE_ENTRY("gfx4", 0, tiles16x16_layout, 0, 16)
 GFXDECODE_END
 
+TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
+{
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
+
+	if(scanline == 0) // vblank-in irq
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
+}
+
 static MACHINE_CONFIG_START(metlfrzr, metlfrzr_state)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(metlfrzr_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
-	//  MCFG_CPU_VBLANK_INT_DRIVER("screen", metlfrzr_state,  irq0_line_hold)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metlfrzr_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
 
