@@ -585,13 +585,19 @@ void video_manager::exit()
 	machine().render().target_free(m_snap_target);
 	m_snap_bitmap.reset();
 
-	// print a final result if we have at least 2 seconds' worth of data
-	if (!emulator_info::standalone() && m_overall_emutime.seconds() >= 1)
-	{
+	// print a final result if we have at least 2 seconds' worth of data, otherwise let user know you exited cleanly
+	if (!emulator_info::standalone()) {
+
+                if (m_overall_emutime.seconds() >= 1) {
 		osd_ticks_t tps = osd_ticks_per_second();
 		double final_real_time = (double)m_overall_real_seconds + (double)m_overall_real_ticks / (double)tps;
 		double final_emu_time = m_overall_emutime.as_double();
 		osd_printf_info("Average speed: %.2f%% (%d seconds)\n", 100 * final_emu_time / final_real_time, (m_overall_emutime + attotime(0, ATTOSECONDS_PER_SECOND / 2)).seconds());
+                } 
+
+                else {
+		osd_printf_info("MAME ended cleanly\n");
+                }
 	}
 }
 
