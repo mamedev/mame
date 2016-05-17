@@ -1860,8 +1860,8 @@ void ioport_field::frame_update(ioport_value &result)
 		return;
 
 	// if the state changed, look for switch down/switch up
-	bool special_press = manager().is_specially_pressed(*this);
-	bool curstate = special_press || machine().input().seq_pressed(seq()) || m_digital_value;
+	bool mouse_down = this == manager().mouse_field();
+	bool curstate = mouse_down || machine().input().seq_pressed(seq()) || m_digital_value;
 	if (m_live->autofire && !manager().get_autofire_toggle())
 	{
 		if (curstate)
@@ -1928,7 +1928,7 @@ void ioport_field::frame_update(ioport_value &result)
 		curstate = false;
 
 	// additional logic to restrict digital joysticks
-	if (curstate && !m_digital_value && !special_press && m_live->joystick != nullptr && m_way != 16 && !machine().options().joystick_contradictory())
+	if (curstate && !m_digital_value && !mouse_down && m_live->joystick != nullptr && m_way != 16 && !machine().options().joystick_contradictory())
 	{
 		UINT8 mask = (m_way == 4) ? m_live->joystick->current4way() : m_live->joystick->current();
 		if (!(mask & (1 << m_live->joydir)))
@@ -2707,6 +2707,8 @@ void ioport_manager::init_boot_presses()
 
 void ioport_manager::boot_presses_expired(void *ptr, INT32 param)
 {
+	for (ioport_field *fieldptr : m_pressed_fields)
+		fieldptr->set_value(0);
 	m_pressed_fields.clear();
 	machine().options().set_default_value(OPTION_BOOT_PRESSED, "");
 }
@@ -2900,28 +2902,6 @@ digital_joystick &ioport_manager::digjoystick(int player, int number)
 
 
 //-------------------------------------------------
-//  is_specially_pressed - return true if the
-//  given field is being held down by some special
-//  input that is not specifically bound to it
-//-------------------------------------------------
-
-bool ioport_manager::is_specially_pressed(ioport_field &field)
-{
-	// mouse hit testing
-	if (&field == m_mouse_field)
-		return true;
-
-	// force certain fields to be pressed down
-	for (ioport_field *fieldptr : m_pressed_fields)
-		if (fieldptr == &field)
-			return true;
-
-	// not specially pressed
-	return false;
-}
-
-
-//-------------------------------------------------
 //  reset_callback - callback for machine reset
 //-------------------------------------------------
 
@@ -2929,7 +2909,19 @@ void ioport_manager::reset_callback()
 {
 	// delay this until reset since timers are time-sensitive
 	if (!m_pressed_fields.empty())
+	{
+		for (ioport_field *fieldptr : m_pressed_fields)
+		{
+			// mark each field as pressed
+			fieldptr->set_value(1);
+
+			// update the port's digital value now
+			fieldptr->port().frame_update();
+		}
+
+		// start the timer to make these go away
 		m_boot_pressed_timer->adjust(attotime::from_msec(machine().options().boot_pressed_time()));
+	}
 }
 
 

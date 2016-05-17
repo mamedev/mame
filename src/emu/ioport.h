@@ -1499,8 +1499,8 @@ public:
 	INT32 frame_interpolate(INT32 oldval, INT32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
 	std::string input_type_to_token(ioport_type type, int player);
-	bool is_specially_pressed(ioport_field &field);
 	void set_mouse_field(ioport_field *field) { m_mouse_field = field; }
+	ioport_field *mouse_field() const { return m_mouse_field; }
 
 	// autofire
 	bool get_autofire_toggle() { return m_autofire_toggle; }
