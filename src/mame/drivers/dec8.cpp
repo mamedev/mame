@@ -2576,12 +2576,13 @@ ROM_START( lastmisnj )
 ROM_END
 
 ROM_START( shackled )
-	ROM_REGION( 0x48000, "maincpu", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "dk-02.13h", 0x08000, 0x08000, CRC(87f8fa85) SHA1(1cb93a60eefdb453a3cc6ec9c5cc2e367fb8aeb0) )
 	ROM_LOAD( "dk-06.7h",  0x10000, 0x10000, CRC(69ad62d1) SHA1(1aa23b12ab4f1908cddd25f091e1f9bd70a5113c) )
 	ROM_LOAD( "dk-05.8h",  0x20000, 0x10000, CRC(598dd128) SHA1(10843c5352eef03c8675df6abaf23c9c9c795aa3) )
 	ROM_LOAD( "dk-04.10h", 0x30000, 0x10000, CRC(36d305d4) SHA1(17586c316aff405cf20c1467d69c98fa2a3c2630) )
 	ROM_LOAD( "dk-03.11h", 0x40000, 0x08000, CRC(6fd90fd1) SHA1(2f8db17e5545c82d243a7e23e7bda2c2a9101360) )
+	ROM_RELOAD(            0x48000, 0x08000 )
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
 	ROM_LOAD( "dk-01.18h", 0x00000, 0x10000, CRC(71fe3bda) SHA1(959cce01362b2c670c2e15b03a78a1ff9cea4ee9) )
@@ -2616,12 +2617,13 @@ ROM_START( shackled )
 ROM_END
 
 ROM_START( breywood )
-	ROM_REGION( 0x48000, "maincpu", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "dj02-2.13h", 0x08000, 0x08000, CRC(c19856b9) SHA1(766994703bb59879c311675353d7231ad27c7c16) )
 	ROM_LOAD( "dj06-2.7h",  0x10000, 0x10000, CRC(2860ea02) SHA1(7ac090c3ae9d71baa6227ec9555f1c9f2d25ea0d) )
 	ROM_LOAD( "dj05-2.8h",  0x20000, 0x10000, CRC(0fdd915e) SHA1(262df956dfc727c710ade28af7f33fddaafd7ee2) )
 	ROM_LOAD( "dj04-2.10h", 0x30000, 0x10000, CRC(71036579) SHA1(c58ff3222b5bcd75d58c5f282554e92103e80916) )
 	ROM_LOAD( "dj03-2.11h", 0x40000, 0x08000, CRC(308f4893) SHA1(539c138ff01c5718cc8a982482b989468d532699) )
+	ROM_RELOAD(             0x48000, 0x08000 )
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
 	ROM_LOAD( "dj1-2y.18h", 0x0000, 0x10000, CRC(3d9fb623) SHA1(6e5eaad9bb0a432e2da5da5b18a2ed36617bdde2) )
@@ -3534,7 +3536,7 @@ DRIVER_INIT_MEMBER(dec8_state,lastmisn)
 DRIVER_INIT_MEMBER(dec8_state,shackled)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
