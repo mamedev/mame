@@ -54,7 +54,10 @@ void device_gba_cart_interface::rom_alloc(UINT32 size, const char *tag)
 		// we always alloc 32MB of rom region!
 			m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
 		else
+		{
 			m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x4000000, 4, ENDIANNESS_LITTLE)->base();
+			m_romhlp = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBAHELP_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+		}
 		m_rom_size = size;
 	}
 }
@@ -137,6 +140,7 @@ static const gba_slot slot_list[] =
 	{ GBA_FLASH, "gba_flash" },
 	{ GBA_FLASH512, "gba_flash_512" },
 	{ GBA_FLASH1M, "gba_flash_1m" },
+	{ GBA_3DMATRIX, "gba_3dmatrix" },
 };
 
 static int gba_get_pcb_id(const char *slot)
@@ -219,6 +223,8 @@ bool gba_cart_slot_device::call_load()
 				memcpy(ROM + 0x1000000, ROM, 0x1000000);
 				break;
 		}
+		if (size == 0x4000000)
+			memcpy((UINT8 *)m_cart->get_romhlp_base(), ROM, 0x2000000);
 
 		if (m_cart->get_nvram_size())
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
@@ -396,6 +402,9 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		default:
 			break;
 	}
+
+	if (len == 0x4000000)
+		type = GBA_3DMATRIX;
 
 	return type;
 }
