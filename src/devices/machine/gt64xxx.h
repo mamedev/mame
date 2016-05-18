@@ -209,6 +209,8 @@ public:
 	void set_irq_num(const int irq_num) {m_irq_num = irq_num;}
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
+	DECLARE_WRITE_LINE_MEMBER(pci_stall);
+
 	// pci bus
 	DECLARE_READ32_MEMBER(  pci_config_r);
 	DECLARE_WRITE32_MEMBER( pci_config_w);
@@ -256,6 +258,13 @@ private:
 	UINT32 m_clock;
 	int m_be, m_autoconfig;
 	int m_irq_num;
+
+	int m_pci_stall_state;
+	int m_retry_count;
+	int m_pci_cpu_stalled;
+	UINT32 m_cpu_stalled_offset;
+	UINT32 m_cpu_stalled_data;
+	UINT32 m_cpu_stalled_mem_mask;
 
 	address_space_config m_mem_config, m_io_config;
 

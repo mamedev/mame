@@ -3671,9 +3671,12 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 			return;
 		}
 
-		/* if this is a non-FIFO command, let it go to the FIFO, but stall until it completes */
-		if (!(access & REGISTER_FIFO))
-			stall = TRUE;
+		// if this is non-FIFO command, execute immediately
+		if (!(access & REGISTER_FIFO)) {
+			register_w(this, offset, data);
+			g_profiler.stop();
+			return;
+		}
 
 		/* track swap buffers */
 		if ((offset & 0xff) == swapbufferCMD)
