@@ -139,6 +139,13 @@ void gt64xxx_device::device_reset()
 	map_cpu_space();
 	regenerate_config_mapping();
 
+	m_pci_stall_state = 0;
+	m_retry_count = 0;
+	m_pci_cpu_stalled = 0;
+	m_cpu_stalled_offset = 0;
+	m_cpu_stalled_data = 0;
+	m_cpu_stalled_mem_mask = 0;
+
 	m_dma_active = 0;
 	m_dma_timer->adjust(attotime::never);
 	m_last_dma = 0;
@@ -303,6 +310,28 @@ void gt64xxx_device::reset_all_mappings()
 	pci_device::reset_all_mappings();
 }
 
+// PCI Stalling
+WRITE_LINE_MEMBER(gt64xxx_device::pci_stall)
+{
+	// Reset the retry count once unstalled
+	if (state==0 && m_pci_stall_state==1) {
+		m_retry_count = 0;
+		// Check if it is a stalled cpu access and re-issue
+		if (m_pci_cpu_stalled) {
+			m_pci_cpu_stalled = 0;
+			// master_mem0_w -- Should actually be checking for master_mem1_w as well
+			this->space(AS_DATA).write_dword((m_reg[GREG_PCI_MEM0_LO] << 21) | (m_cpu_stalled_offset * 4), m_cpu_stalled_data, m_cpu_stalled_mem_mask);
+			/* resume CPU execution */
+			machine().scheduler().trigger(45678);
+			if (LOG_GALILEO)
+				logerror("Resuming CPU on PCI Stall offset=0x%08X data=0x%08X\n", m_cpu_stalled_offset * 4, m_cpu_stalled_data);
+		}
+	}
+
+	/* set the new state */
+	m_pci_stall_state = state;
+}
+
 // PCI bus control
 READ32_MEMBER (gt64xxx_device::pci_config_r)
 {
@@ -326,6 +355,18 @@ READ32_MEMBER (gt64xxx_device::master_mem0_r)
 }
 WRITE32_MEMBER (gt64xxx_device::master_mem0_w)
 {
+	if (m_pci_stall_state) {
+		// Save the write data and stall the cpu
+		m_pci_cpu_stalled = 1;
+		m_cpu_stalled_offset = offset;
+		m_cpu_stalled_data = data;
+		m_cpu_stalled_mem_mask = mem_mask;
+		// Stall cpu until trigger
+		m_cpu_space->device().execute().spin_until_trigger(45678);
+		if (LOG_GALILEO || LOG_PCI)
+			logerror("%08X:Stalling CPU on PCI Stall\n", m_cpu_space->device().safe_pc());
+		return;
+	}
 	this->space(AS_DATA).write_dword((m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), data, mem_mask);
 	if (LOG_PCI)
 		logerror("%06X:galileo pci mem0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), data, mem_mask);
@@ -483,7 +524,8 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 			break;
 
 		default:
-			logerror("%08X:Galileo read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
+			if (LOG_GALILEO)
+				logerror("%08X:Galileo read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
 			break;
 	}
 
@@ -505,21 +547,21 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 	/* switch off the offset for special cases */
 	switch (offset)
 	{
-		//case GREG_RAS_1_0_LO:
-		//case GREG_RAS_1_0_HI:
-		//case GREG_RAS_3_2_LO:
-		//case GREG_RAS_3_2_HI:
-		//case GREG_CS_2_0_LO:
-		//case GREG_CS_2_0_HI:
-		//case GREG_CS_3_BOOT_LO:
-		//case GREG_CS_3_BOOT_HI:
-		//case GREG_PCI_IO_LO:
-		//case GREG_PCI_IO_HI:
-		//case GREG_PCI_MEM0_LO:
-		//case GREG_PCI_MEM0_HI:
+		case GREG_RAS_1_0_LO:
+		case GREG_RAS_1_0_HI:
+		case GREG_RAS_3_2_LO:
+		case GREG_RAS_3_2_HI:
+		case GREG_CS_2_0_LO:
+		case GREG_CS_2_0_HI:
+		case GREG_CS_3_BOOT_LO:
+		case GREG_CS_3_BOOT_HI:
+		case GREG_PCI_IO_LO:
+		case GREG_PCI_IO_HI:
+		case GREG_PCI_MEM0_LO:
+		case GREG_PCI_MEM0_HI:
 		case GREG_INTERNAL_SPACE:
-		//case GREG_PCI_MEM1_LO:
-		//case GREG_PCI_MEM1_HI:
+		case GREG_PCI_MEM1_LO:
+		case GREG_PCI_MEM1_HI:
 		case GREG_CS3_HI:
 			map_cpu_space();
 			remap_cb();
@@ -661,7 +703,8 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 			break;
 
 		default:
-			logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			if (LOG_GALILEO)
+				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			break;
 	}
 }
@@ -818,9 +861,30 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 		/* standard transfer */
 		while (bytesleft > 0 && burstCount < DMA_BURST_SIZE)
 		{
+			if (m_pci_stall_state) {
+				if (LOG_DMA && m_retry_count<4)
+					logerror("%08X:Stalling DMA on voodoo retry_count: %i\n", m_cpu_space->device().safe_pc(), m_retry_count);
+				// Save info
+				m_reg[GREG_DMA0_SOURCE + which] = srcaddr;
+				m_reg[GREG_DMA0_DEST + which] = dstaddr;
+				m_reg[GREG_DMA0_COUNT + which] = (m_reg[GREG_DMA0_COUNT + which] & ~0xffff) | bytesleft;
+
+				m_retry_count++;
+				UINT32 configRetryCount = (m_reg[GREG_PCI_TIMEOUT] >> 16) & 0xff;
+				if (m_retry_count >= configRetryCount && configRetryCount > 0) {
+					logerror("gt64xxx_device::perform_dma Error! Too many PCI retries. DMA%d: src=%08X dst=%08X bytes=%04X sinc=%d dinc=%d\n", which, srcaddr, dstaddr, bytesleft, srcinc, dstinc);
+					// Signal error and abort DMA
+					m_dma_active &= ~(1 << which);
+					m_retry_count = 0;
+					return;
+				}
+				else {
+					// Come back later
+					return;
+				}
+			}
 			if (bytesleft < 4)
 			{
-				//space.write_byte(dstaddr, space.read_byte(srcaddr));
 				dstSpace->write_byte(dstaddr, srcSpace->read_byte(srcaddr));
 				srcaddr += srcinc;
 				dstaddr += dstinc;
