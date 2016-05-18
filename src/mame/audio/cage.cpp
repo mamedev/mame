@@ -115,6 +115,7 @@ const device_type ATARI_CAGE = &device_creator<atari_cage_device>;
 atari_cage_device::atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ATARI_CAGE, "Atari CAGE", tag, owner, clock, "atari_cage", __FILE__),
 	m_cageram(*this, "cageram"),
+	m_soundlatch(*this, "soundlatch"),
 	m_irqhandler(*this)
 {
 }
@@ -122,6 +123,7 @@ atari_cage_device::atari_cage_device(const machine_config &mconfig, const char *
 atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_cageram(*this, "cageram"),
+	m_soundlatch(*this, "soundlatch"),
 	m_irqhandler(*this)
 {
 }
@@ -480,8 +482,7 @@ WRITE32_MEMBER( atari_cage_device::cage_to_main_w )
 {
 	if (LOG_COMM)
 		logerror("%06X:Data from CAGE = %04X\n", space.device().safe_pc(), data);
-	driver_device *drvstate = space.machine().driver_data<driver_device>();
-	drvstate->soundlatch_word_w(space, 0, data, mem_mask);
+	m_soundlatch->write(space, 0, data, mem_mask);
 	m_cage_to_cpu_ready = 1;
 	update_control_lines();
 }
@@ -502,10 +503,10 @@ UINT16 atari_cage_device::main_r()
 {
 	driver_device *drvstate = machine().driver_data<driver_device>();
 	if (LOG_COMM)
-		logerror("%s:main read data = %04X\n", machine().describe_context(), drvstate->soundlatch_word_r(drvstate->generic_space(), 0, 0));
+		logerror("%s:main read data = %04X\n", machine().describe_context(), m_soundlatch->read(drvstate->generic_space(), 0, 0));
 	m_cage_to_cpu_ready = 0;
 	update_control_lines();
-	return drvstate->soundlatch_word_r(drvstate->generic_space(), 0, 0xffff);
+	return m_soundlatch->read(drvstate->generic_space(), 0, 0xffff);
 }
 
 
@@ -641,6 +642,8 @@ MACHINE_CONFIG_FRAGMENT( cage )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 #if (DAC_BUFFER_CHANNELS == 4)
 	MCFG_SOUND_ADD("dac1", DMADAC, 0)

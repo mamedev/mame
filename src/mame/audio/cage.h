@@ -9,6 +9,7 @@
 #ifndef __ATARI_CAGE__
 #define __ATARI_CAGE__
 
+#include "machine/gen_latch.h"
 #include "sound/dmadac.h"
 
 #define CAGE_IRQ_REASON_DATA_READY      (1)
@@ -63,6 +64,7 @@ protected:
 private:
 	required_shared_ptr<UINT32> m_cageram;
 	cpu_device *m_cpu;
+	required_device<generic_latch_16_device> m_soundlatch;
 	attotime m_cpu_h1_clock_period;
 
 	UINT8 m_cpu_to_cage_ready;

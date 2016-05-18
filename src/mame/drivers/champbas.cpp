@@ -80,6 +80,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/champbas.h"
@@ -205,7 +206,7 @@ static ADDRESS_MAP_START( champbas_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP // no MCU
 
 	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
@@ -259,9 +260,9 @@ ADDRESS_MAP_END
 // champbas/champbb2 (note: talbot doesn't have audiocpu)
 static ADDRESS_MAP_START( champbas_sound_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_WRITENOP // 4-bit return code to main CPU (not used)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(soundlatch_clear_byte_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_WRITE(dac1_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
@@ -272,8 +273,8 @@ static ADDRESS_MAP_START( exctsccr_sound_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xc008, 0xc008) AM_WRITE(dac1_w)
 	AM_RANGE(0xc009, 0xc009) AM_WRITE(dac2_w)
-	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(soundlatch_clear_byte_w)
-	AM_RANGE(0xc00d, 0xc00d) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc00c, 0xc00c) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
+	AM_RANGE(0xc00d, 0xc00d) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 //  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ?
 ADDRESS_MAP_END
 
@@ -548,6 +549,9 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
@@ -582,6 +586,8 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -653,6 +659,8 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	/* AY (melody) clock is specified by a VR (0.9 - 3.9 MHz) */
 	MCFG_SOUND_ADD("ay1", AY8910, 1940000) /* VR has a factory mark and this is the value read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
@@ -706,6 +714,8 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
