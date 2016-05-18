@@ -1,10 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders:David Haywood, Angelo Salese
 /****************************************
 
 	Metal Freezer (c) 1989 Seibu
-	
-	preliminary driver by Angelo Salese
 	
 	HW seems the natural evolution of Dark Mist type HW.
 	
@@ -18,7 +16,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-
 #include "audio/t5182.h"
 
 class metlfrzr_state : public driver_device
