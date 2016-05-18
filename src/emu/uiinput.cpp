@@ -68,6 +68,21 @@ void ui_input_manager::frame_update()
 		if (!pressed || m_seqpressed[code] != SEQ_PRESSED_RESET)
 			m_seqpressed[code] = pressed;
 	}
+
+	// if the mouse button is pressed, map the point and determine what was hit
+	ioport_field *mouse_field = nullptr;
+	if (m_current_mouse_down && m_current_mouse_target != nullptr)
+	{
+		ioport_port *port = nullptr;
+		ioport_value mask;
+		float x, y;
+		if (m_current_mouse_target->map_point_input(m_current_mouse_x, m_current_mouse_y, port, mask, x, y))
+		{
+			if (port != nullptr)
+				mouse_field = port->field(mask);
+		}
+	}
+	machine().ioport().set_mouse_field(mouse_field);
 }
 
 

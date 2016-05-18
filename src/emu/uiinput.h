@@ -12,7 +12,7 @@
 #ifndef __UIINPUT_H__
 #define __UIINPUT_H__
 
-#include "render.h"
+class render_target;
 
 
 /***************************************************************************

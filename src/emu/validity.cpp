@@ -872,12 +872,20 @@ void validity_checker::validate_inputs()
 				// verify dip switches
 				if (field.type() == IPT_DIPSWITCH)
 				{
-					// dip switch fields must have a name
-					if (field.name() == nullptr)
-						osd_printf_error("DIP switch has a nullptr name\n");
+					// dip switch fields must have a specific name
+					if (field.specific_name() == nullptr)
+						osd_printf_error("DIP switch has no specific name\n");
 
 					// verify the settings list
 					validate_dip_settings(field);
+				}
+
+				// verify config settings
+				if (field.type() == IPT_CONFIG)
+				{
+					// config fields must have a specific name
+					if (field.specific_name() == nullptr)
+						osd_printf_error("Config switch has no specific name\n");
 				}
 
 				// verify names

@@ -96,7 +96,6 @@
 #include "xmlfile.h"
 #include "profiler.h"
 #include "ui/uimain.h"
-#include "uiinput.h"
 
 #include "osdepend.h"
 
@@ -1516,7 +1515,7 @@ ioport_field::~ioport_field()
 
 //-------------------------------------------------
 //  name - return the field name for a given input
-//  field
+//  field (this must never return nullptr)
 //-------------------------------------------------
 
 const char *ioport_field::name() const
@@ -1584,7 +1583,7 @@ const input_seq &ioport_field::defseq(input_seq_type seqtype) const
 ioport_type_class ioport_field::type_class() const
 {
 	ioport_group group = manager().type_group(m_type, m_player);
-	if (group >= IPG_PLAYER1 && group <= IPG_PLAYER8)
+	if (group >= IPG_PLAYER1 && group <= IPG_PLAYER10)
 		return INPUT_CLASS_CONTROLLER;
 
 	if (m_type == IPT_KEYPAD || m_type == IPT_KEYBOARD)
@@ -1843,7 +1842,7 @@ void ioport_field::select_next_setting()
 //  digital field
 //-------------------------------------------------
 
-void ioport_field::frame_update(ioport_value &result, bool mouse_down)
+void ioport_field::frame_update(ioport_value &result)
 {
 	// skip if not enabled
 	if (!enabled())
@@ -1861,14 +1860,15 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 		return;
 
 	// if the state changed, look for switch down/switch up
+	bool mouse_down = this == manager().mouse_field();
 	bool curstate = mouse_down || machine().input().seq_pressed(seq()) || m_digital_value;
-	if (m_live->autofire && !machine().ioport().get_autofire_toggle())
+	if (m_live->autofire && !manager().get_autofire_toggle())
 	{
 		if (curstate)
 		{
-			if (m_live->autopressed > machine().ioport().get_autofire_delay())
+			if (m_live->autopressed > manager().get_autofire_delay())
 				m_live->autopressed = 0;
-			else if (m_live->autopressed > machine().ioport().get_autofire_delay() / 2)
+			else if (m_live->autopressed > manager().get_autofire_delay() / 2)
 				curstate = false;
 			m_live->autopressed++;
 		}
@@ -2273,14 +2273,14 @@ void ioport_port::write(ioport_value data, ioport_value mem_mask)
 //  frame_update - once/frame update
 //-------------------------------------------------
 
-void ioport_port::frame_update(ioport_field *mouse_field)
+void ioport_port::frame_update()
 {
 	// start with 0 values for the digital bits
 	m_live->digital = 0;
 
 	// now loop back and modify based on the inputs
 	for (ioport_field &field : fields())
-		field.frame_update(m_live->digital, &field == mouse_field);
+		field.frame_update(m_live->digital);
 
 	// hook for MESS's natural keyboard support
 	manager().natkeyboard().frame_update(*this, m_live->digital);
@@ -2372,6 +2372,24 @@ void ioport_port::init_live_state()
 }
 
 
+//-------------------------------------------------
+//  update_defaults - force an update to the input
+//  port values based on current conditions
+//-------------------------------------------------
+
+void ioport_port::update_defaults(bool flush_defaults)
+{
+	// only clear on the first pass
+	if (flush_defaults)
+		m_live->defvalue = 0;
+
+	// recompute the default value for the entire port
+	for (ioport_field &field : m_fieldlist)
+		if (field.enabled())
+			m_live->defvalue = (m_live->defvalue & ~field.mask()) | (field.live().value & field.mask());
+}
+
+
 
 //**************************************************************************
 //  I/O PORT LIVE STATE
@@ -2420,6 +2438,7 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 ioport_manager::ioport_manager(running_machine &machine)
 	: m_machine(machine),
 		m_safe_to_read(false),
+		m_mouse_field(nullptr),
 		m_natkeyboard(machine),
 		m_last_frame_time(attotime::zero),
 		m_last_delta_nsec(0),
@@ -2451,6 +2470,9 @@ time_t ioport_manager::initialize()
 	// add an exit callback and a frame callback
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ioport_manager::exit), this));
 	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(ioport_manager::frame_update_callback), this));
+
+	// add a reset callback
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(ioport_manager::reset_callback), this));
 
 	// initialize the default port info from the OSD
 	init_port_types();
@@ -2510,6 +2532,8 @@ time_t ioport_manager::initialize()
 					break;
 				}
 
+	m_boot_pressed_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ioport_manager::boot_presses_expired), this));
+	init_boot_presses();
 	m_natkeyboard.initialize();
 	// register callbacks for when we load configurations
 	machine().configuration().config_register("input", config_saveload_delegate(FUNC(ioport_manager::load_config), this), config_saveload_delegate(FUNC(ioport_manager::save_config), this));
@@ -2626,6 +2650,71 @@ void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, co
 
 
 //-------------------------------------------------
+//  init_boot_presses - prepare the list of fields
+//  to be kept pressed at boot time
+//-------------------------------------------------
+
+void ioport_manager::init_boot_presses()
+{
+	const char *pressed_codes = machine().options().boot_pressed();
+
+	m_pressed_fields.clear();
+
+	while (*pressed_codes != '\0')
+	{
+		// copy up to the next comma
+		const char *comma = strchr(pressed_codes, ',');
+		if (comma == nullptr)
+			comma = pressed_codes + strlen(pressed_codes);
+		std::string token(pressed_codes, comma - pressed_codes);
+		pressed_codes = (*comma == '\0') ? comma : comma + 1;
+
+		// eliminate any leading space
+		if (token.length() > 1 && token[0] == ' ')
+			token.erase(0, 1);
+
+		int player;
+		ioport_type type = token_to_input_type(token.c_str(), player);
+
+		// go through the ports and fields defined by the machine
+		bool found = false;
+		for (ioport_port &port : m_portlist)
+		{
+			for (ioport_field &field : port.fields())
+			{
+				// search by input type if we have one
+				// otherwise, try to match on field name (generic or specific)
+				if ((type != IPT_UNKNOWN)
+					? (field.type() == type && field.player() == player)
+					: (token == field.name()))
+				{
+					found = true;
+					m_pressed_fields.push_back(&field);
+				}
+			}
+		}
+
+		if (!found)
+			osd_printf_warning("Could not press %s: field not found\n", token.c_str());
+	}
+}
+
+
+//-------------------------------------------------
+//  boot_presses_expired - remove the boot presses
+//  after a short time
+//-------------------------------------------------
+
+void ioport_manager::boot_presses_expired(void *ptr, INT32 param)
+{
+	for (ioport_field *fieldptr : m_pressed_fields)
+		fieldptr->set_value(0);
+	m_pressed_fields.clear();
+	machine().options().set_default_value(OPTION_BOOT_PRESSED, "");
+}
+
+
+//-------------------------------------------------
 //  exit - exit callback to ensure we clean up
 //  and close our files
 //-------------------------------------------------
@@ -2648,10 +2737,10 @@ const char *ioport_manager::type_name(ioport_type type, UINT8 player)
 {
 	// if we have a machine, use the live state and quick lookup
 	input_type_entry *entry = m_type_to_entry[type][player];
-	if (entry != nullptr)
+	if (entry != nullptr && entry->name() != nullptr)
 		return entry->name();
 
-	// if we find nothing, return an invalid group
+	// if we find nothing, return a default string (nullptr is not acceptable)
 	return "???";
 }
 
@@ -2796,32 +2885,6 @@ bool ioport_manager::crosshair_position(int player, float &x, float &y)
 
 
 //-------------------------------------------------
-//  update_defaults - force an update to the input
-//  port values based on current conditions
-//-------------------------------------------------
-
-void ioport_manager::update_defaults()
-{
-	// two passes to catch conditionals properly
-	for (int loopnum = 0; loopnum < 2; loopnum++)
-	{
-		// loop over all input ports
-		for (ioport_port &port : m_portlist)
-		{
-			// only clear on the first pass
-			if (loopnum == 0)
-				port.live().defvalue = 0;
-
-			// first compute the default value for the entire port
-			for (ioport_field &field : port.fields())
-				if (field.enabled())
-					port.live().defvalue = (port.live().defvalue & ~field.mask()) | (field.live().value & field.mask());
-		}
-	}
-}
-
-
-//-------------------------------------------------
 //  frame_update - core logic for per-frame input
 //  port updating
 //-------------------------------------------------
@@ -2835,6 +2898,30 @@ digital_joystick &ioport_manager::digjoystick(int player, int number)
 
 	// create a new one
 	return m_joystick_list.append(*global_alloc(digital_joystick(player, number)));
+}
+
+
+//-------------------------------------------------
+//  reset_callback - callback for machine reset
+//-------------------------------------------------
+
+void ioport_manager::reset_callback()
+{
+	// delay this until reset since timers are time-sensitive
+	if (!m_pressed_fields.empty())
+	{
+		for (ioport_field *fieldptr : m_pressed_fields)
+		{
+			// mark each field as pressed
+			fieldptr->set_value(1);
+
+			// update the port's digital value now
+			fieldptr->port().frame_update();
+		}
+
+		// start the timer to make these go away
+		m_boot_pressed_timer->adjust(attotime::from_msec(machine().options().boot_pressed_time()));
+	}
 }
 
 
@@ -2873,31 +2960,16 @@ g_profiler.start(PROFILER_INPUT);
 		joystick.frame_update();
 
 	// compute default values for all the ports
-	update_defaults();
-
-	// perform mouse hit testing
-	INT32 mouse_target_x, mouse_target_y;
-	bool mouse_button;
-	render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
-
-	// if the button is pressed, map the point and determine what was hit
-	ioport_field *mouse_field = nullptr;
-	if (mouse_button && mouse_target != nullptr)
-	{
-		ioport_port *port = nullptr;
-		ioport_value mask;
-		float x, y;
-		if (mouse_target->map_point_input(mouse_target_x, mouse_target_y, port, mask, x, y))
-		{
-			if (port != nullptr)
-				mouse_field = port->field(mask);
-		}
-	}
+	// two passes to catch conditionals properly
+	for (ioport_port &port : m_portlist)
+		port.update_defaults(true);
+	for (ioport_port &port : m_portlist)
+		port.update_defaults(false);
 
 	// loop over all input ports
 	for (ioport_port &port : m_portlist)
 	{
-		port.frame_update(mouse_field);
+		port.frame_update();
 
 		// handle playback/record
 		playback_port(port);

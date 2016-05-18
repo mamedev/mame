@@ -1171,7 +1171,7 @@ public:
 	void select_next_setting();
 	void crosshair_position(float &x, float &y, bool &gotx, bool &goty);
 	void init_live_state(analog_field *analog);
-	void frame_update(ioport_value &result, bool mouse_down);
+	void frame_update(ioport_value &result);
 	void reduce_mask(ioport_value bits_to_remove) { m_mask &= ~bits_to_remove; }
 
 	// user-controllable settings for a field
@@ -1308,8 +1308,9 @@ public:
 	// other operations
 	ioport_field *field(ioport_value mask) const;
 	void collapse_fields(std::string &errorbuf);
-	void frame_update(ioport_field *mouse_field);
+	void frame_update();
 	void init_live_state();
+	void update_defaults(bool flush_defaults);
 
 private:
 	void insert_field(ioport_field &newfield, ioport_value &disallowedbits, std::string &errorbuf);
@@ -1498,6 +1499,8 @@ public:
 	INT32 frame_interpolate(INT32 oldval, INT32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
 	std::string input_type_to_token(ioport_type type, int player);
+	void set_mouse_field(ioport_field *field) { m_mouse_field = field; }
+	ioport_field *mouse_field() const { return m_mouse_field; }
 
 	// autofire
 	bool get_autofire_toggle() { return m_autofire_toggle; }
@@ -1509,14 +1512,16 @@ private:
 	// internal helpers
 	void init_port_types();
 	void init_autoselect_devices(int type1, int type2, int type3, const char *option, const char *ananame);
+	void init_boot_presses();
+	void boot_presses_expired(void *ptr, INT32 param);
 
+	void reset_callback();
 	void frame_update_callback();
 	void frame_update();
 
 	ioport_port *port(const char *tag) const { return m_portlist.find(tag); }
 	void exit();
 	input_seq_type token_to_seq_type(const char *string);
-	void update_defaults();
 
 	void load_config(config_type cfg_type, xml_data_node *parentnode);
 	void load_remap_table(xml_data_node *parentnode);
@@ -1549,6 +1554,11 @@ private:
 	running_machine &       m_machine;              // reference to owning machine
 	bool                    m_safe_to_read;         // clear at start; set after state is loaded
 	ioport_list             m_portlist;             // list of input port configurations
+
+	// special fields
+	ioport_field *          m_mouse_field;          // field that is currently being pressed by the mouse
+	std::vector<ioport_field *> m_pressed_fields;   // fields to be automatically held down
+	emu_timer *             m_boot_pressed_timer;
 
 	// types
 	simple_list<input_type_entry> m_typelist;       // list of live type states
