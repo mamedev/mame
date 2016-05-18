@@ -12,10 +12,6 @@
 		<disk state="1"><color red="1.0" green="0.20" blue="0.22" /></disk>
 	</element>
 
-	<element name="text_goal"><text string="GOAL"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_home"><text string="HOME"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_away"><text string="AWAY"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-
 
 <!-- build screen -->
 
