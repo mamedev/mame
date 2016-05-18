@@ -47,7 +47,6 @@ private:
 	const char *m_cpu_tag;
 	cpu_device *m_cpu;
 	int m_irq_num;
-	int m_irq_status;
 
 	UINT32 m_config_data[0x10];
 	DECLARE_ADDRESS_MAP(chan1_data_command_map, 32);
