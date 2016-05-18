@@ -189,6 +189,7 @@ private:
 	UINT16 m_eeprom_slave_mask;	// dev addr
 	UINT16 m_eeprom_word_address;  // memory addr
 	UINT16 m_eeprom_devsel;  // selected device
+	UINT16 m_eeprom_byte;  // byte to be written
 	int m_eeprom_cur_state;  // current state
 	// EEPROM physical characteristics (configured at init)
 	UINT16 m_eeprom_mask;       // size of the memory - 1
