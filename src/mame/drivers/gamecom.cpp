@@ -19,9 +19,6 @@ Game Status:
 - - Henry: crash just after "HENRY" button clicked
 - - Lost World: freeze just after entering Stage 2 (the nest)
 - - Sonic Jam: player's character can fall out of a dip in the path and die.
-- Not sure about some carts:
-- - Resident Evil 2: can't fight enemies?
-- - Duke Nukem: can't leave the room?
 - Most carts have some flicker, but some are terrible (Monopoly, MK Trilogy, Fighters Megamix, Jeopardy)
 - Weblink and Internet are of no use as there is nothing to connect to.
 

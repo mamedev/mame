@@ -1273,7 +1273,7 @@ case 0x59:  /* Invalid - 2? cycles - Flags affected: --------? */
 	mycycles += 2;
 	break;
 case 0x5A:  /* unk5A - 7,8,12,9,8 cycles */
-/* NOTE: This unknown command is used in the calculator, and in a number of carts.
+/* NOTE: This unknown command is used in the game.com calculator, and in a number of carts.
        It appears to compare the contents of the register number contained in the first
        parameter, against a literal in the second parameter.
         Example:
