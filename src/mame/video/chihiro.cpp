@@ -1306,7 +1306,7 @@ inline UINT8 *nv2a_renderer::read_pixel(int x, int y, INT32 c[4])
 	return nullptr;
 }
 
-void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
+void nv2a_renderer::write_pixel(int x, int y, UINT32 color, int depth)
 {
 	UINT8 *addr;
 	UINT32 *daddr32;
@@ -1317,6 +1317,8 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 	bool stencil_passed;
 	bool depth_passed;
 
+	if ((depth > 0xffffff) || (depth < 0))
+		return;
 	fb[3] = fb[2] = fb[1] = fb[0] = 0;
 	addr = nullptr;
 	if (color_mask != 0)
@@ -1341,8 +1343,6 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 		dep = 0xffffff;
 		sten = 0;
 	}
-	if (depth > 0xffffff)
-		depth = 0xffffff;
 	c[3] = color >> 24;
 	c[2] = (color >> 16) & 255;
 	c[1] = (color >> 8) & 255;
@@ -1914,7 +1914,7 @@ void nv2a_renderer::render_color(INT32 scanline, const extent_t &extent, const n
 	x = extent.stopx - extent.startx - 1; // number of pixels to draw
 	while (x >= 0) {
 		UINT32 a8r8g8b8;
-		UINT32 z;
+		int z;
 		int ca, cr, cg, cb;
 		int xp = extent.startx + x; // x coordinate of current pixel
 
@@ -1933,7 +1933,7 @@ void nv2a_renderer::render_texture_simple(INT32 scanline, const extent_t &extent
 {
 	int x;
 	UINT32 a8r8g8b8;
-	UINT32 z;
+	int z;
 
 	if (!objectdata.data->texture[0].enabled) {
 		return;
@@ -1967,8 +1967,8 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 	int ca, cr, cg, cb;
 	UINT32 color[6];
 	UINT32 a8r8g8b8;
-	UINT32 z;
-	int n;//,m,i,j,k;
+	int z;
+	int n;
 
 	color[0] = color[1] = color[2] = color[3] = color[4] = color[5] = 0;
 
@@ -2356,7 +2356,7 @@ void nv2a_renderer::compute_supersample_factors(float &horizontal, float &vertic
 	vertical = my;
 }
 
-void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destination, int count)
+void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *destination, int count)
 {
 	vertex_nv vert[4];
 	int m, u;
@@ -2384,6 +2384,7 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 			for (int i = 0; i < 3; i++) {
 				v[i] += matrix.translate[i];
 			}*/
+			destination[m].w = v[3];
 			destination[m].x = (v[0] / v[3])*supersample_factor_x; // source[m].attribute[0].fv[0];
 			destination[m].y = (v[1] / v[3])*supersample_factor_y; // source[m].attribute[0].fv[1];
 			destination[m].p[(int)VERTEX_PARAMETER::PARAM_Z] = v[2] / v[3];
@@ -2401,6 +2402,7 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 		vertexprogram.exec.process(vertexprogram.start_instruction, source, vert, count);
 		// copy data for poly.c
 		for (m = 0; m < count; m++) {
+			destination[m].w = vert[m].attribute[0].fv[3];
 			destination[m].x = vert[m].attribute[0].fv[0] * supersample_factor_x;
 			destination[m].y = vert[m].attribute[0].fv[1] * supersample_factor_y;
 			for (u = (int)VERTEX_PARAMETER::PARAM_COLOR_B; u <= (int)VERTEX_PARAMETER::PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
@@ -2627,11 +2629,13 @@ void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
 		}
 }
 
-UINT32 nv2a_renderer::render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t &_v1, const vertex_t &_v2, const vertex_t &_v3)
+UINT32 nv2a_renderer::render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, const nv2avertex_t &_v1, const nv2avertex_t &_v2, const nv2avertex_t &_v3)
 {
 	float areax2;
 	NV2A_GL_CULL_FACE face = NV2A_GL_CULL_FACE::FRONT;
 
+	if ((_v1.w <= 0) || (_v2.w <= 0) || (_v3.w <= 0)) // remove, for now
+		return 0;
 	if (backface_culling_enabled == false)
 		return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
 	if (backface_culling_culled == NV2A_GL_CULL_FACE::FRONT_AND_BACK)

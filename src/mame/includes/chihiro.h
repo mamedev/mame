@@ -356,6 +356,11 @@ public:
 		FRONT_AND_BACK = 0x0408
 	};
 
+	struct nv2avertex_t : public vertex_t
+	{
+		float w;
+	};
+
 	nv2a_renderer(running_machine &machine) : poly_manager<float, nvidia_object_data, 13, 8192>(machine)
 	{
 		memset(channel, 0, sizeof(channel));
@@ -444,7 +449,7 @@ public:
 	int geforce_exec_method(address_space &space, UINT32 channel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen);
 	UINT32 texture_get_texel(int number, int x, int y);
 	UINT8 *read_pixel(int x, int y, INT32 c[4]);
-	void write_pixel(int x, int y, UINT32 color, UINT32 depth);
+	void write_pixel(int x, int y, UINT32 color, int depth);
 	void combiner_initialize_registers(UINT32 argb8[6]);
 	void combiner_initialize_stage(int stage_number);
 	void combiner_initialize_final();
@@ -483,9 +488,9 @@ public:
 	int read_vertices_0x1808(address_space & space, vertex_nv *destination, UINT32 address, int limit);
 	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, UINT32 address, int limit);
-	void convert_vertices_poly(vertex_nv *source, vertex_t *destination, int count);
+	void convert_vertices_poly(vertex_nv *source, nv2avertex_t *destination, int count);
 	void assemble_primitive(vertex_nv *source, int count, render_delegate &renderspans);
-	UINT32 render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t &_v1, const vertex_t &_v2, const vertex_t &_v3);
+	UINT32 render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, const nv2avertex_t &_v1, const nv2avertex_t &_v2, const nv2avertex_t &_v3);
 	void clear_render_target(int what, UINT32 value);
 	void clear_depth_buffer(int what, UINT32 value);
 	inline UINT8 *direct_access_ptr(offs_t address);
@@ -566,7 +571,7 @@ public:
 	unsigned int vertex_first;
 	int vertex_accumulated;
 	vertex_nv vertex_software[1024+2]; // vertex attributes sent by the software to the 3d accelerator
-	vertex_t vertex_xy[1024+2]; // vertex attributes computed by the 3d accelerator
+	nv2avertex_t vertex_xy[1024+2]; // vertex attributes computed by the 3d accelerator
 	vertex_nv persistvertexattr; // persistent vertex attributes
 	render_delegate render_spans_callback;
 
