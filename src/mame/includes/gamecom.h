@@ -240,6 +240,8 @@ public:
 	DECLARE_PALETTE_INIT(gamecom);
 	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
 	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);
+	TIMER_CALLBACK_MEMBER(gamecom_sound0_timer_callback);
+	TIMER_CALLBACK_MEMBER(gamecom_sound1_timer_callback);
 	TIMER_CALLBACK_MEMBER(gamecom_scanline);
 	DECLARE_WRITE8_MEMBER( gamecom_handle_dma );
 	DECLARE_WRITE8_MEMBER( gamecom_update_timers );
@@ -252,11 +254,15 @@ private:
 	UINT8 m_lcdc_reg;
 	UINT8 m_lch_reg;
 	UINT8 m_lcv_reg;
+	UINT8 m_sound0_cnt;
+	UINT8 m_sound1_cnt;
 	UINT16 m_scanline;
 	UINT16 m_base_address;
 	memory_region *m_cart1_rom;
 	memory_region *m_cart2_rom;
 	emu_timer *m_clock_timer;
+	emu_timer *m_sound0_timer;
+	emu_timer *m_sound1_timer;
 	emu_timer *m_scanline_timer;
 	GAMECOM_DMA m_dma;
 	GAMECOM_TIMER m_timer[2];

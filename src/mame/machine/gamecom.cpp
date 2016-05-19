@@ -14,6 +14,46 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_clock_timer_callback)
 	m_maincpu->set_input_line(sm8500_cpu_device::CK_INT, ASSERT_LINE );
 }
 
+TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound0_timer_callback)
+{
+	if (m_sound0_cnt > 0x3f)
+	{
+		if (m_sound.sg0t > 0)
+		{
+			m_sound0_timer->adjust(attotime::from_hz(2764800/m_sound.sg0t), 0, attotime::from_hz(2764800/m_sound.sg0t));
+			if ((m_sound.sgc & 0x81) == 0x81)
+				m_sound0_cnt = 0;
+		}
+	}
+	if (m_sound0_cnt < 0x40)
+	{
+		bool which_half = BIT(m_sound0_cnt, 0);
+		UINT8 sb = m_sound.sg0w[m_sound0_cnt >> 1];
+		m_dac->write_unsigned8((which_half ? sb >> 4 : sb & 15)^8);
+		m_sound0_cnt++;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound1_timer_callback)
+{
+	if (m_sound1_cnt > 0x3f)
+	{
+		if (m_sound.sg1t > 0)
+		{
+			m_sound1_timer->adjust(attotime::from_hz(2764800/m_sound.sg1t), 0, attotime::from_hz(2764800/m_sound.sg1t));
+			if ((m_sound.sgc & 0x82) == 0x82)
+				m_sound1_cnt = 0;
+		}
+	}
+	if (m_sound1_cnt < 0x40)
+	{
+		bool which_half = BIT(m_sound1_cnt, 0);
+		UINT8 sb = m_sound.sg1w[m_sound1_cnt >> 1];
+		m_dac->write_unsigned8((which_half ? sb >> 4 : sb & 15)^8);
+		m_sound1_cnt++;
+	}
+}
+
 void gamecom_state::machine_reset()
 {
 	UINT8 *rom = m_region_kernel->base();
@@ -26,6 +66,8 @@ void gamecom_state::machine_reset()
 	m_lch_reg = 0x07;
 	m_lcv_reg = 0x27;
 	m_lcdc_reg = 0xb0;
+	m_sound0_cnt = 0x40;
+	m_sound1_cnt = 0x40;
 
 	std::string region_tag;
 	m_cart1_rom = memregion(region_tag.assign(m_cart1->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
@@ -561,7 +603,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
 			if ( m_p_ram[SM8521_TM0D] >= m_timer[0].check_value )
 			{
 				m_p_ram[SM8521_TM0D] = 0;
-				m_maincpu->set_input_line(sm8500_cpu_device::TIM0_INT, ASSERT_LINE );
+//				m_maincpu->set_input_line(sm8500_cpu_device::TIM0_INT, ASSERT_LINE ); // this causes crazy flickering
 			}
 		}
 	}
@@ -584,6 +626,10 @@ WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
 DRIVER_INIT_MEMBER(gamecom_state,gamecom)
 {
 	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_clock_timer_callback),this));
+	m_sound0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_sound0_timer_callback),this));
+	m_sound1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_sound1_timer_callback),this));
+	m_sound0_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	m_sound1_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 	m_p_ram = m_region_maincpu->base(); // required here because pio_w gets called before machine_reset
 }
 
