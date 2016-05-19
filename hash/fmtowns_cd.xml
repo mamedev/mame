@@ -1008,6 +1008,17 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 	
+	<software name="dragflam">
+		<description>Dragons of Flame</description>
+		<year>1992</year>
+		<publisher>Pony Canyon</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ad&amp;d dragons of flame" sha1="0e0fed376b4882c338e9d4510b377c8f9318df67" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="drakkhen">
 		<description>Drakkhen</description>
 		<year>1990</year>
@@ -1863,6 +1874,165 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 	
+	<software name="kidpix">
+		<description>Kid Pix</description>
+		<year>1992</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="kid pix" sha1="090939e80a209292d6b606e3e7b2b44bbd3585be" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="kigen">
+		<description>Kigen: Kagayaki no Hasha</description>
+		<year>1992</year>
+		<publisher>Riverhill Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="kigen" sha1="3df8b6bb0c3ee6797f784c349a1ca40efb13dac8" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="kindan">
+		<description>Kindan no Ketsuzoku</description>
+		<year>1993</year>
+		<publisher>C's Ware</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="kindan no ketsuzoku" sha1="589dfff7b733335530a19f3a88a7cdda91826187" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="kbounty">
+		<description>King's Bounty</description>
+		<year>1994</year>
+		<publisher>Starcraft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="king's bounty" sha1="3bf83f353aee51986e0e73b581feb4a7cc0ad850" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="kquest5">
+		<description>King's Quest V: Absence Makes the Heart Go Yonder</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line Japan</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="king's quest v" sha1="fa5aaa4c63ca1c3d5f162d0110840bcfdd06d891" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="kiwame">
+		<description>Kiwame</description>
+		<year>1992</year>
+		<publisher>Log</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="kiwame" sha1="9a906bb69fb7eca6bc1b5da7164fcb869660fb2b" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="kiwame2">
+		<description>Kiwame II</description>
+		<year>1994</year>
+		<publisher>Log</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="kiwame ii" sha1="b3bcb4e8f1de660e8669b5d34b3802d238e7bc9f" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="kokoraku">
+		<description>Koko wa Rakuensou</description>
+		<year>1996</year>
+		<publisher>Foster</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="koko wa rakuensou" sha1="711d590b172c5c496d1f14f825dbc7b8a10e71fb" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="kokorak2">
+		<description>Koko wa Rakuensou 2</description>
+		<year>1996</year>
+		<publisher>Foster</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="koko wa rakuensou 2" sha1="d7879482b9f644f09c6324688fe4d3a2898ed137" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="kyankyan">
+		<description>Kyan Kyan Collection</description>
+		<year>1989</year>
+		<publisher>I-Cell</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="kyan kyan collection" sha1="14c8567dffc8e1e986d266be84c357ad22aa8132" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Originally labeled as "mp3 source". It probably needs a redump. -->
+	<software name="ktiger">
+		<description>Kyuukyoku Tiger</description>
+		<year>1994</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="kyuukyoku tiger" sha1="187e052a9e699571bcd904a1e5cf18e3f0fcd9aa" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="lemmings">
+		<description>Lemmings</description>
+		<year>1992</year>
+		<publisher>Imagineer</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="lemmings" sha1="a6c7ea928d9fd409d2055fd83df54a734d4ff3e3" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- 
+	Is the English version official? The intro is still in Japanese, and there's
+	very little information available about this release.
+	-->
+	<software name="lemmin2e">
+		<description>Lemmings 2: The Tribes (English)</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="lemmings 2 - the tribes (en)" sha1="4f186b4c85cdfb474b852ed65debb786b0ba39ea" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="lemmin2j">
+		<description>Lemmings 2: The Tribes (Japanese)</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="lemmings 2 - the tribes" sha1="cf5e532b00f9f94ccf9d7f71f949f018714c5b2c" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="links386">
 		<description>Golf Links 386 Pro</description>
 		<year>1995</year>
@@ -1871,6 +2041,17 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="golf links 386 pro" sha1="c0eb847d7168e6209482b19a270bd81d40383137" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="marble">
+		<description>Marble Madness</description>
+		<year>1991</year>
+		<publisher>Home Data</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="marble madness" sha1="896d2e9c51af563f9676f29473ed1108f39dd4ab" />
 			</diskarea>
 		</part>
 	</software>
@@ -1936,6 +2117,28 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="operation wolf" sha1="7d102b8918c67f8eafe841fc3ecb52e5eb760caa" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="panzrdiv">
+		<description>Panzer Division / Kikou Shidan</description>
+		<year>1990</year>
+		<publisher>Artdink</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="panzer division [kikou shidan]" sha1="fae75398775e7f01d760e0e7c87c2e937a14ad87" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="populous">
+		<description>Populous &amp; The Promised Lands</description>
+		<year>1990</year>
+		<publisher>Imagineer</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="populous &amp; the promised lands" sha1="5e32724bd10a871146b38ecf1991b3f42f91f984" />
 			</diskarea>
 		</part>
 	</software>
@@ -2050,6 +2253,28 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 	
+	<software name="ssf2">
+		<description>Super Street Fighter II: The New Challengers</description>
+		<year>1994</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super street fighter ii" sha1="97ddbbc746d7b7f6fb72e57a6b443efab384b30c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="ssf2samp">
+		<description>Super Street Fighter II: The New Challengers (Sample Disc)</description>
+		<year>1994</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super street fighter ii (sample disc)" sha1="6eae776377e80ae43950f47c4f930df36b63c6d6" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="simcity">
 		<description>SimCity</description>
 		<year>1990</year>
@@ -2057,6 +2282,29 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="simcity" sha1="4f161a7cd9d5fb27f2ebd6d544310e2c42d26da6" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="sotb">
+		<description>Shadow of the Beast: Mashou no Okite</description>
+		<year>1991</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shadow of the beast" sha1="0a87b1db41996c77b6552a598dc698f32c9a72df" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Original image from the redump.org database -->
+	<software name="sotb2">
+		<description>Shadow of the Beast II: Juushin no Jubaku</description>
+		<year>1993</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shadow of the beast ii - juushin no jubaku (japan)" sha1="39c34e8c2bc89404431c1be99144a3cd32998664" />
 			</diskarea>
 		</part>
 	</software>
@@ -2079,6 +2327,18 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="volfied" sha1="353db36abf89433dfc2f63659f471fd9edfbaf8d" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Missing a floppy disk -->
+	<software name="win31">
+		<description>Windows 3.1 L11</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="[os] windows 3.1 l11" sha1="94c9b88833a6ea2f39167981cdc45ed0ce407ecd" />
 			</diskarea>
 		</part>
 	</software>
