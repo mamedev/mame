@@ -7,7 +7,6 @@
     driver by Angelo Salese, based off "wiped off due of not anymore licenseable" driver by insideoutboy.
 
     TODO:
-    - complete rewrite;
     - scanline renderer;
     - understand irq 0 source;
     - output bit 0 might be watchdog armed bit/sprite start DMA instead of irq enable;
