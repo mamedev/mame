@@ -10,7 +10,7 @@
 		<publisher>APF</publisher>
 		<info name="serial" value="AL100A" />
 
-		<part name="cart" interface="apfm1000_cart">
+		<part name="cart" interface="apf_cart">
 			<feature name="slot" value="basic"/>
 			<dataarea name="rom" size="12288">
 				<rom name="basic_80.bin" size="8192" crc="a4c69fae" sha1="7f98aa482589bf7c5a26d338fec105e797ba43f6" offset="0" />
@@ -19,12 +19,12 @@
 		</part>
 	</software>
 
-	<software name="exbasic">
+	<software name="ebasic">
 		<description>Extended Basic</description>
 		<year>1983</year>
 		<publisher>R.L. Recker</publisher>
 
-		<part name="cart" interface="apfm1000_cart">
+		<part name="cart" interface="apf_cart">
 			<feature name="slot" value="basic"/>
 			<dataarea name="rom" size="14336">
 				<rom name="exbasic_80.bin" size="8192" crc="3fefbd81" sha1="d8c3ea8a152da50f71b98c464f47919e16743d29" offset="0" />
@@ -34,15 +34,15 @@
 		</part>
 	</software>
 
-<!-- Homebrew -->
+<!-- This is here because it uses extra RAM, unavailable on the M-1000-->
 
-	<software name="targets">
+	<software name="columns">
 		<description>Targets / Columns / Bacteria / Autopista</description>
 		<year>1995</year>
 		<publisher>Enrique Collado</publisher>
 		<info name="usage" value="Targets and Bacteria require 16K RAM" />
 
-		<part name="cart" interface="apfm1000_cart">
+		<part name="cart" interface="apf_cart">
 			<feature name="ram" value="16"/>
 			<dataarea name="rom" size="4096">
 				<rom name="columns.bin" size="3733" crc="71c2955c" sha1="7e571e32ff05c92c7be7d2e42a0868538a7c5800" offset="0" />

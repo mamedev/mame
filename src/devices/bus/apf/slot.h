@@ -80,7 +80,7 @@ public:
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
-	virtual const char *image_interface() const override { return "apfm1000_cart"; }
+	virtual const char *image_interface() const override { return "apf_cart"; }
 	virtual const char *file_extensions() const override { return "bin"; }
 
 	// slot interface overrides
