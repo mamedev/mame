@@ -243,6 +243,7 @@ const drcbe_x86::opcode_table_entry drcbe_x86::s_opcode_table_source[] =
 	{ uml::OP_OR,      &drcbe_x86::op_or },         // OR      dst,src1,src2[,f]
 	{ uml::OP_XOR,     &drcbe_x86::op_xor },        // XOR     dst,src1,src2[,f]
 	{ uml::OP_LZCNT,   &drcbe_x86::op_lzcnt },      // LZCNT   dst,src[,f]
+	{ uml::OP_TZCNT,   &drcbe_x86::op_tzcnt },      // TZCNT   dst,src[,f]
 	{ uml::OP_BSWAP,   &drcbe_x86::op_bswap },      // BSWAP   dst,src
 	{ uml::OP_SHL,     &drcbe_x86::op_shl },        // SHL     dst,src,count[,f]
 	{ uml::OP_SHR,     &drcbe_x86::op_shr },        // SHR     dst,src,count[,f]
@@ -5471,6 +5472,51 @@ void drcbe_x86::op_lzcnt(x86code *&dst, const instruction &inst)
 		emit_xor_r32_r32(dst, REG_EDX, REG_EDX);                                        // xor   edx,edx
 		emit_xor_r32_imm(dst, dstreg, 31);                                              // xor   dstreg,31
 		emit_mov_p64_r64(dst, dstp, dstreg, REG_EDX);                           // mov   dstp,edx:dstreg
+	}
+}
+
+
+//-------------------------------------------------
+//  op_tzcnt - process a TZCNT opcode
+//-------------------------------------------------
+
+void drcbe_x86::op_tzcnt(x86code *&dst, const instruction &inst)
+{
+	// validate instruction
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_flags(inst, FLAG_Z | FLAG_S);
+
+	// normalize parameters
+	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
+
+	int dstreg = dstp.select_register(REG_EAX);
+	
+	// 32-bit form
+	if (inst.size() == 4)
+	{
+		emit_mov_r32_p32(dst, dstreg, srcp);											// mov   dstreg,src1p
+		emit_mov_r32_imm(dst, REG_ECX, 32);												// mov   ecx,32
+		emit_bsf_r32_r32(dst, dstreg, dstreg);											// bsf   dstreg,dstreg
+		emit_cmovcc_r32_r32(dst, x86emit::COND_Z, dstreg, REG_ECX);						// cmovz dstreg,ecx
+		emit_mov_p32_r32(dst, dstp, dstreg);											// mov   dstp,dstreg
+	}
+
+	// 64-bit form
+	else if (inst.size() == 8)
+	{
+		emit_link skip;
+		emit_mov_r64_p64(dst, REG_EDX, dstreg, srcp);									// mov   dstreg:edx,srcp
+		emit_bsf_r32_r32(dst, dstreg, dstreg);											// bsf   dstreg,dstreg		
+		emit_jcc_short_link(dst, x86emit::COND_NZ, skip);								// jnz   skip
+		emit_mov_r32_imm(dst, REG_ECX, 32);												// mov   ecx,32
+		emit_bsf_r32_r32(dst, dstreg, REG_EDX);											// bsf   dstreg,edx
+		emit_cmovcc_r32_r32(dst, x86emit::COND_Z, dstreg, REG_ECX);						// cmovz dstreg,ecx
+		emit_add_r32_imm(dst, dstreg, 32);												// add   dstreg,32
+		track_resolve_link(dst, skip);													// skip:
+		emit_xor_r32_r32(dst, REG_EDX, REG_EDX);										// xor   edx,edx
+		emit_mov_p64_r64(dst, dstp, dstreg, REG_EDX);									// mov   dstp,edx:dstreg
 	}
 }
 

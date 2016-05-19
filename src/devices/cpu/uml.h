@@ -189,6 +189,7 @@ namespace uml
 		OP_OR,                      // OR      dst,src1,src2[,f]
 		OP_XOR,                     // XOR     dst,src1,src2[,f]
 		OP_LZCNT,                   // LZCNT   dst,src
+		OP_TZCNT,                   // TZCNT   dst,src
 		OP_BSWAP,                   // BSWAP   dst,src
 		OP_SHL,                     // SHL     dst,src,count[,f]
 		OP_SHR,                     // SHR     dst,src,count[,f]
@@ -479,6 +480,7 @@ namespace uml
 		void _or(parameter dst, parameter src1, parameter src2) { configure(OP_OR, 4, dst, src1, src2); }
 		void _xor(parameter dst, parameter src1, parameter src2) { configure(OP_XOR, 4, dst, src1, src2); }
 		void lzcnt(parameter dst, parameter src) { configure(OP_LZCNT, 4, dst, src); }
+		void tzcnt(parameter dst, parameter src) { configure(OP_TZCNT, 4, dst, src); }
 		void bswap(parameter dst, parameter src) { configure(OP_BSWAP, 4, dst, src); }
 		void shl(parameter dst, parameter src, parameter count) { configure(OP_SHL, 4, dst, src, count); }
 		void shr(parameter dst, parameter src, parameter count) { configure(OP_SHR, 4, dst, src, count); }
@@ -517,6 +519,7 @@ namespace uml
 		void dor(parameter dst, parameter src1, parameter src2) { configure(OP_OR, 8, dst, src1, src2); }
 		void dxor(parameter dst, parameter src1, parameter src2) { configure(OP_XOR, 8, dst, src1, src2); }
 		void dlzcnt(parameter dst, parameter src) { configure(OP_LZCNT, 8, dst, src); }
+		void dtzcnt(parameter dst, parameter src) { configure(OP_TZCNT, 8, dst, src); }
 		void dbswap(parameter dst, parameter src) { configure(OP_BSWAP, 8, dst, src); }
 		void dshl(parameter dst, parameter src, parameter count) { configure(OP_SHL, 8, dst, src, count); }
 		void dshr(parameter dst, parameter src, parameter count) { configure(OP_SHR, 8, dst, src, count); }

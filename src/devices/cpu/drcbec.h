@@ -44,6 +44,8 @@ private:
 	void fixup_label(void *parameter, drccodeptr labelcodeptr);
 	int dmulu(UINT64 &dstlo, UINT64 &dsthi, UINT64 src1, UINT64 src2, int flags);
 	int dmuls(UINT64 &dstlo, UINT64 &dsthi, INT64 src1, INT64 src2, int flags);
+	UINT32 tzcount32(UINT32 value);
+	UINT64 tzcount64(UINT64 value);
 
 	// internal state
 	drc_hash_table          m_hash;                 // hash table state
