@@ -187,7 +187,7 @@ void tcp_connection::write(const uint8_t* data, size_t len)
 	// Error. Should not happen.
 	else if (written < 0)
 	{
-		osd_printf_warning("uv_try_write() failed, closing the connection: %s", uv_strerror(written));
+		osd_printf_warning("uv_try_write() failed, closing the connection: %s\n", uv_strerror(written));
 
 		close();
 		return;
@@ -245,7 +245,7 @@ void tcp_connection::write(const uint8_t* data1, size_t len1, const uint8_t* dat
 	// Error. Should not happen.
 	else if (written < 0)
 	{
-		osd_printf_warning("uv_try_write() failed, closing the connection: %s", uv_strerror(written));
+		osd_printf_warning("uv_try_write() failed, closing the connection: %s\n", uv_strerror(written));
 
 		close();
 		return;
@@ -301,7 +301,7 @@ bool tcp_connection::set_peer_address()
 	err = uv_tcp_getpeername(m_uv_handle, (struct sockaddr*)&m_peer_addr, &len);
 	if (err)
 	{
-		osd_printf_error("uv_tcp_getpeername() failed: %s", uv_strerror(err));
+		osd_printf_error("uv_tcp_getpeername() failed: %s\n", uv_strerror(err));
 
 		return false;
 	}
@@ -329,7 +329,7 @@ void tcp_connection::on_uv_read_alloc(size_t suggested_size, uv_buf_t* buf)
 	{
 		buf->len = 0;
 
-		osd_printf_warning("no available space in the buffer");
+		osd_printf_warning("no available space in the buffer\n");
 	}
 }
 
@@ -353,7 +353,7 @@ void tcp_connection::on_uv_read(::ssize_t nread, const uv_buf_t* buf)
 	// Client disconneted.
 	else if (nread == UV_EOF || nread == UV_ECONNRESET)
 	{
-		osd_printf_info("connection closed by peer, closing server side");
+		osd_printf_verbose("connection closed by peer, closing server side\n");
 
 		m_is_closed_by_peer = true;
 
@@ -363,7 +363,7 @@ void tcp_connection::on_uv_read(::ssize_t nread, const uv_buf_t* buf)
 	// Some error.
 	else
 	{
-		osd_printf_info("read error, closing the connection: %s", uv_strerror(nread));
+		osd_printf_verbose("read error, closing the connection: %s\n", uv_strerror(nread));
 
 		m_has_error = true;
 
@@ -379,11 +379,11 @@ void tcp_connection::on_uv_write_error(int error)
 
 	if (error == UV_EPIPE || error == UV_ENOTCONN)
 	{
-		osd_printf_info("write error, closing the connection: %s", uv_strerror(error));
+		osd_printf_verbose("write error, closing the connection: %s\n", uv_strerror(error));
 	}
 	else
 	{
-		osd_printf_info("write error, closing the connection: %s", uv_strerror(error));
+		osd_printf_verbose("write error, closing the connection: %s\n", uv_strerror(error));
 
 		m_has_error = true;
 	}
@@ -396,9 +396,9 @@ void tcp_connection::on_uv_shutdown(uv_shutdown_t* req, int status)
 	delete req;
 
 	if (status == UV_EPIPE || status == UV_ENOTCONN || status == UV_ECANCELED)
-		osd_printf_info("shutdown error: %s", uv_strerror(status));
+		osd_printf_verbose("shutdown error: %s\n", uv_strerror(status));
 	else if (status)
-		osd_printf_info("shutdown error: %s", uv_strerror(status));
+		osd_printf_verbose("shutdown error: %s\n", uv_strerror(status));
 
 	// Now do close the handle.
 	uv_close((uv_handle_t*)m_uv_handle, (uv_close_cb)on_close);

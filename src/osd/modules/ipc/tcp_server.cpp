@@ -94,7 +94,7 @@ void tcp_server::close()
 	// Otherwise close all the connections (but not the TCP server).
 	else
 	{
-		osd_printf_info("closing %d active connections", (int)m_connections.size());
+		osd_printf_verbose("closing %d active connections\n", (int)m_connections.size());
 
 		for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
 		{
@@ -119,7 +119,7 @@ void tcp_server::terminate()
 	// Otherwise close all the connections (but not the TCP server).
 	else
 	{
-		osd_printf_info("closing %d active connections", (int)m_connections.size());
+		osd_printf_verbose("closing %d active connections\n", (int)m_connections.size());
 
 		for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
 		{
@@ -144,7 +144,7 @@ void tcp_server::send_to_all(const uint8_t* data, size_t len)
 
 void tcp_server::dump()
 {
-	osd_printf_info("[TCP, local:%s :%d, status:%s, connections:%d]",
+	osd_printf_verbose("[TCP, local:%s :%d, status:%s, connections:%d]",
 		m_local_ip.c_str(), (uint16_t)m_local_port,
 		(!m_is_closing) ? "open" : "closed",
 		(int)m_connections.size());
@@ -173,7 +173,7 @@ bool tcp_server::set_local_address()
 	err = uv_tcp_getsockname(m_uv_handle, (struct sockaddr*)&m_local_addr, &len);
 	if (err)
 	{
-		osd_printf_error("uv_tcp_getsockname() failed: %s", uv_strerror(err));
+		osd_printf_error("uv_tcp_getsockname() failed: %s\n", uv_strerror(err));
 
 		return false;
 	}
@@ -193,7 +193,7 @@ inline void tcp_server::on_uv_connection(int status)
 
 	if (status)
 	{
-		osd_printf_error("error while receiving a new TCP connection: %s", uv_strerror(status));
+		osd_printf_error("error while receiving a new TCP connection: %s\n", uv_strerror(status));
 
 		return;
 	}
@@ -201,8 +201,8 @@ inline void tcp_server::on_uv_connection(int status)
 	// Notify the subclass so it provides an allocated derived class of TCPConnection.
 	tcp_connection* connection = nullptr;
 	user_on_tcp_connection_alloc(&connection);
-	if (connection != nullptr)
-		osd_printf_error("tcp_server pointer was not allocated by the user");
+	if (connection == nullptr)
+		osd_printf_error("tcp_server pointer was not allocated by the user\n");
 
 	try
 	{
@@ -217,7 +217,7 @@ inline void tcp_server::on_uv_connection(int status)
 	// Accept the connection.
 	err = uv_accept((uv_stream_t*)m_uv_handle, (uv_stream_t*)connection->get_uv_handle());
 	if (err)
-		throw emu_fatalerror("uv_accept() failed: %s", uv_strerror(err));
+		throw emu_fatalerror("uv_accept() failed: %s\n", uv_strerror(err));
 
 	// Insert the TCPConnection in the set.
 	m_connections.insert(connection);
@@ -229,13 +229,13 @@ inline void tcp_server::on_uv_connection(int status)
 	}
 	catch (emu_exception &error)
 	{
-		osd_printf_error("cannot run the TCP connection, closing the connection: %s", error.what());
+		osd_printf_error("cannot run the TCP connection, closing the connection: %s\n", error.what());
 		connection->close();
 		// NOTE: Don't return here so the user won't be notified about a "onclose" for a TCP connection
 		// for which there was not a previous "onnew" event.
 	}
 
-	osd_printf_info("new TCP connection:");
+	osd_printf_verbose("new TCP connection:\n");
 	connection->dump();
 
 	// Notify the subclass.
@@ -263,7 +263,7 @@ void tcp_server::on_tcp_connection_closed(tcp_connection* connection, bool is_cl
 
 	bool wasClosing = m_is_closing;
 
-	osd_printf_info("TCP connection closed:");
+	osd_printf_verbose("TCP connection closed:\n");
 	connection->dump();
 
 	// Remove the TCPConnection from the set.
