@@ -1343,7 +1343,7 @@ static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, jaguar_state )
 
 	AM_RANGE(0x06000000, 0x06000003) AM_READWRITE(misc_control_r, misc_control_w)
 	AM_RANGE(0x10000000, 0x1007ffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x12000000, 0x120fffff) AM_RAM     // tested in self-test only?
+	AM_RANGE(0x12000000, 0x120fffff) AM_RAM AM_SHARE("mainram2")    // tested in self-test only?
 	AM_RANGE(0x14000004, 0x14000007) AM_DEVWRITE("watchdog", watchdog_timer_device, reset32_w)
 	AM_RANGE(0x16000000, 0x16000003) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
@@ -2677,6 +2677,7 @@ DRIVER_INIT_MEMBER(jaguar_state,vcircle)
 	m_main_speedup_max_cycles = 50;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x12005b34, 0x12005b37, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
 	m_main_speedup = m_mainram + 0x5b34/4;
+	m_main_speedup = m_mainram2 + 0x5b34/4;
 #endif
 }
 
