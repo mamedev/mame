@@ -96,7 +96,6 @@
 #include "xmlfile.h"
 #include "profiler.h"
 #include "ui/uimain.h"
-#include "uiinput.h"
 
 #include "osdepend.h"
 
@@ -1516,7 +1515,7 @@ ioport_field::~ioport_field()
 
 //-------------------------------------------------
 //  name - return the field name for a given input
-//  field
+//  field (this must never return nullptr)
 //-------------------------------------------------
 
 const char *ioport_field::name() const
@@ -1583,22 +1582,28 @@ const input_seq &ioport_field::defseq(input_seq_type seqtype) const
 
 ioport_type_class ioport_field::type_class() const
 {
+	// inputs associated with specific players
 	ioport_group group = manager().type_group(m_type, m_player);
-	if (group >= IPG_PLAYER1 && group <= IPG_PLAYER8)
+	if (group >= IPG_PLAYER1 && group <= IPG_PLAYER10)
 		return INPUT_CLASS_CONTROLLER;
 
+	// keys (names derived from character codes)
 	if (m_type == IPT_KEYPAD || m_type == IPT_KEYBOARD)
 		return INPUT_CLASS_KEYBOARD;
 
+	// configuration settings (specific names required)
 	if (m_type == IPT_CONFIG)
 		return INPUT_CLASS_CONFIG;
 
+	// DIP switches (specific names required)
 	if (m_type == IPT_DIPSWITCH)
 		return INPUT_CLASS_DIPSWITCH;
 
+	// miscellaneous non-player inputs (named and user-mappable)
 	if (group == IPG_OTHER || (group == IPG_INVALID && m_name != nullptr))
 		return INPUT_CLASS_MISC;
 
+	// internal inputs (these may be anonymous)
 	return INPUT_CLASS_INTERNAL;
 }
 
@@ -1843,7 +1848,7 @@ void ioport_field::select_next_setting()
 //  digital field
 //-------------------------------------------------
 
-void ioport_field::frame_update(ioport_value &result, bool mouse_down)
+void ioport_field::frame_update(ioport_value &result)
 {
 	// skip if not enabled
 	if (!enabled())
@@ -1861,7 +1866,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 		return;
 
 	// if the state changed, look for switch down/switch up
-	bool curstate = mouse_down || machine().input().seq_pressed(seq()) || m_digital_value;
+	bool curstate = m_digital_value || machine().input().seq_pressed(seq());
 	if (m_live->autofire && !machine().ioport().get_autofire_toggle())
 	{
 		if (curstate)
@@ -1928,7 +1933,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 		curstate = false;
 
 	// additional logic to restrict digital joysticks
-	if (curstate && !m_digital_value && !mouse_down && m_live->joystick != nullptr && m_way != 16 && !machine().options().joystick_contradictory())
+	if (curstate && !m_digital_value && m_live->joystick != nullptr && m_way != 16 && !machine().options().joystick_contradictory())
 	{
 		UINT8 mask = (m_way == 4) ? m_live->joystick->current4way() : m_live->joystick->current();
 		if (!(mask & (1 << m_live->joydir)))
@@ -2273,14 +2278,14 @@ void ioport_port::write(ioport_value data, ioport_value mem_mask)
 //  frame_update - once/frame update
 //-------------------------------------------------
 
-void ioport_port::frame_update(ioport_field *mouse_field)
+void ioport_port::frame_update()
 {
 	// start with 0 values for the digital bits
 	m_live->digital = 0;
 
 	// now loop back and modify based on the inputs
 	for (ioport_field &field : fields())
-		field.frame_update(m_live->digital, &field == mouse_field);
+		field.frame_update(m_live->digital);
 
 	// hook for MESS's natural keyboard support
 	manager().natkeyboard().frame_update(*this, m_live->digital);
@@ -2369,6 +2374,24 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 void ioport_port::init_live_state()
 {
 	m_live = std::make_unique<ioport_port_live>(*this);
+}
+
+
+//-------------------------------------------------
+//  update_defvalue - force an update to the input
+//  port values based on current conditions
+//-------------------------------------------------
+
+void ioport_port::update_defvalue(bool flush_defaults)
+{
+	// only clear on the first pass
+	if (flush_defaults)
+		m_live->defvalue = 0;
+
+	// recompute the default value for the entire port
+	for (ioport_field &field : m_fieldlist)
+		if (field.enabled())
+			m_live->defvalue = (m_live->defvalue & ~field.mask()) | (field.live().value & field.mask());
 }
 
 
@@ -2648,10 +2671,10 @@ const char *ioport_manager::type_name(ioport_type type, UINT8 player)
 {
 	// if we have a machine, use the live state and quick lookup
 	input_type_entry *entry = m_type_to_entry[type][player];
-	if (entry != nullptr)
+	if (entry != nullptr && entry->name() != nullptr)
 		return entry->name();
 
-	// if we find nothing, return an invalid group
+	// if we find nothing, return a default string (not a null pointer)
 	return "???";
 }
 
@@ -2796,32 +2819,6 @@ bool ioport_manager::crosshair_position(int player, float &x, float &y)
 
 
 //-------------------------------------------------
-//  update_defaults - force an update to the input
-//  port values based on current conditions
-//-------------------------------------------------
-
-void ioport_manager::update_defaults()
-{
-	// two passes to catch conditionals properly
-	for (int loopnum = 0; loopnum < 2; loopnum++)
-	{
-		// loop over all input ports
-		for (ioport_port &port : m_portlist)
-		{
-			// only clear on the first pass
-			if (loopnum == 0)
-				port.live().defvalue = 0;
-
-			// first compute the default value for the entire port
-			for (ioport_field &field : port.fields())
-				if (field.enabled())
-					port.live().defvalue = (port.live().defvalue & ~field.mask()) | (field.live().value & field.mask());
-		}
-	}
-}
-
-
-//-------------------------------------------------
 //  frame_update - core logic for per-frame input
 //  port updating
 //-------------------------------------------------
@@ -2873,31 +2870,16 @@ g_profiler.start(PROFILER_INPUT);
 		joystick.frame_update();
 
 	// compute default values for all the ports
-	update_defaults();
-
-	// perform mouse hit testing
-	INT32 mouse_target_x, mouse_target_y;
-	bool mouse_button;
-	render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
-
-	// if the button is pressed, map the point and determine what was hit
-	ioport_field *mouse_field = nullptr;
-	if (mouse_button && mouse_target != nullptr)
-	{
-		ioport_port *port = nullptr;
-		ioport_value mask;
-		float x, y;
-		if (mouse_target->map_point_input(mouse_target_x, mouse_target_y, port, mask, x, y))
-		{
-			if (port != nullptr)
-				mouse_field = port->field(mask);
-		}
-	}
+	// two passes to catch conditionals properly
+	for (ioport_port &port : m_portlist)
+		port.update_defvalue(true);
+	for (ioport_port &port : m_portlist)
+		port.update_defvalue(false);
 
 	// loop over all input ports
 	for (ioport_port &port : m_portlist)
 	{
-		port.frame_update(mouse_field);
+		port.frame_update();
 
 		// handle playback/record
 		playback_port(port);

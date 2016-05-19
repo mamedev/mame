@@ -28,6 +28,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "render.h"
 #include "ui/uimain.h"
 
 // OSD headers
