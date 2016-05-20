@@ -218,6 +218,8 @@ public:
 		, m_p_nvram(*this,"nvram")
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
+		, m_dac0(*this, "dac0")
+		, m_dac1(*this, "dac1")
 		, m_cart1(*this, "cartslot1")
 		, m_cart2(*this, "cartslot2")
 		, m_bank1(*this, "bank1")
@@ -279,6 +281,8 @@ private:
 	required_shared_ptr<UINT8> m_p_nvram;
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
+	required_device<dac_device> m_dac0;
+	required_device<dac_device> m_dac1;
 	required_device<generic_slot_device> m_cart1;
 	required_device<generic_slot_device> m_cart2;
 	required_memory_bank m_bank1;

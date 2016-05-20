@@ -8,8 +8,9 @@ Various improvements by Robbbert.
 Todo:
 - Fix cpu and system problems that prevent the games from working fully.
 - RS232 port
-- Sound ports 1,2,3 (DAC sound partially works)
-- CPU speed can be adjusted by the games.
+- Sound ports 1,2 do not sound anything like the real thing
+- Sound port 3 (noise channel)
+- Sound dac port (mostly works but is the wrong speed in some places)
 
 Game Status:
 - Inbuilt ROM and PDA functions all work
@@ -272,6 +273,12 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("dac0", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_linear_slot, "gamecom_cart")
