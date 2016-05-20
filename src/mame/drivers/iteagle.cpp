@@ -109,6 +109,7 @@ www.multitech.com
 #include "video/voodoo_pci.h"
 #include "sound/es1373.h"
 #include "machine/iteagle_fpga.h"
+#include "machine/pci-ide.h"
 
 
 //*************************************
@@ -142,8 +143,8 @@ void iteagle_state::machine_reset()
 {
 }
 
-#define PCI_ID_IDE      ":pci:06.0"
-// Primary IDE Control  ":pci:06.1"
+#define PCI_ID_PERIPH   ":pci:06.0"
+#define PCI_ID_IDE      ":pci:06.1"
 // Seconday IDE Control ":pci:06.2"
 #define PCI_ID_SOUND    ":pci:07.0"
 #define PCI_ID_FPGA     ":pci:08.0"
@@ -159,8 +160,10 @@ static MACHINE_CONFIG_START( iteagle, iteagle_state )
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_VRC4373_ADD(                 ":pci:00.0", ":maincpu")
-	MCFG_ITEAGLE_IDE_ADD(             PCI_ID_IDE)
-	MCFG_ITEAGLE_IDE_IRQ_ADD(         ":maincpu", MIPS3_IRQ2)
+	MCFG_ITEAGLE_PERIPH_ADD(          PCI_ID_PERIPH)
+	MCFG_IDE_PCI_ADD(                 PCI_ID_IDE, 0x1080C693, 0x00, 0x0)
+	MCFG_IDE_PCI_IRQ_ADD(             ":maincpu", MIPS3_IRQ2)
+
 	MCFG_ITEAGLE_FPGA_ADD(            PCI_ID_FPGA, ":maincpu", MIPS3_IRQ1, MIPS3_IRQ4)
 	MCFG_ES1373_ADD(                  PCI_ID_SOUND)
 	MCFG_SOUND_ROUTE(0, PCI_ID_SOUND":lspeaker", 1.0)
