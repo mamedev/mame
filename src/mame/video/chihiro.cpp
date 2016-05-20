@@ -6,7 +6,7 @@
 #include "machine/pic8259.h"
 #include "includes/chihiro.h"
 
-// #define LOG_NV2A
+//#define LOG_NV2A
 
 const char *vertex_program_disassembler::srctypes[] = { "??", "Rn", "Vn", "Cn" };
 const char *vertex_program_disassembler::scaops[] = { "NOP", "IMV", "RCP", "RCC", "RSQ", "EXP", "LOG", "LIT", "???", "???", "???", "???", "???", "???", "???", "???", "???" };
@@ -2843,7 +2843,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		offset = data & 0xffffff;
 		count = (data >> 24) & 0xff;
 #ifdef LOG_NV2A
-		printf("vertex %d %d %d\n\r", type, offset, count);
+		printf("vertex %d %d\n\r", offset, count);
 #endif
 		for (n = 0; n <= count; n++) {
 			read_vertices_0x1810(space, vertex_software + vertex_first, n + offset, 1);
@@ -4281,7 +4281,7 @@ void nv2a_renderer::geforce_assign_object(address_space & space, UINT32 chanel, 
 	handle = space.read_dword(address);
 	handle = geforce_object_offset(handle);
 #ifdef LOG_NV2A
-	machine().logerror("  assign to subchannel %d object at %d", subch, handle);
+	machine().logerror("  assign to subchannel %d object at %d", subchannel, handle);
 #endif
 	channel[chanel][subchannel].object.objhandle = handle;
 	handle = ramin[handle / 4];
