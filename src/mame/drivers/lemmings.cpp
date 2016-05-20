@@ -50,7 +50,7 @@ READ16_MEMBER(lemmings_state::lemmings_trackball_r)
 
 void lemmings_state::lemmings_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(1, HOLD_LINE);
 }
 
@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lemmings_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_byte_r) AM_WRITE(lemmings_sound_ack_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(lemmings_sound_ack_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -271,6 +271,8 @@ static MACHINE_CONFIG_START( lemmings, lemmings_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

@@ -5,6 +5,7 @@
 #include "video/decospr.h"
 #include "video/deco16ic.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
@@ -33,6 +34,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_ram(*this, "ram"),
 		m_pf1_rowscroll32(*this, "pf1_rowscroll32"),
 		m_pf2_rowscroll32(*this, "pf2_rowscroll32"),
@@ -60,6 +62,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT32> m_ram;
 	// we use the pointers below to store a 32-bit copy..

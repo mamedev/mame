@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/bankdev.h"
+#include "machine/gen_latch.h"
 
 #define BW_DEBUG 0
 
@@ -21,6 +22,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_vrambank(*this, "vrambank"),
+		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
@@ -35,6 +37,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_vrambank;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;

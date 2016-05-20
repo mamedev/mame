@@ -25,6 +25,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "includes/gng.h"
 
@@ -54,7 +55,7 @@ static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x3004, 0x3004) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3800, 0x38ff) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x3900, 0x39ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x3b08, 0x3b09) AM_WRITE(gng_bgscrollx_w)
 	AM_RANGE(0x3b0a, 0x3b0b) AM_WRITE(gng_bgscrolly_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_NOP /* watchdog? */
@@ -71,7 +72,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE("ym2", ym2203_device, write)
 ADDRESS_MAP_END
@@ -369,6 +370,8 @@ static MACHINE_CONFIG_START( gng, gng_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)     /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)

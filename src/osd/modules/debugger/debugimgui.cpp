@@ -69,8 +69,8 @@ public:
 	int                 width;
 	int                 height;  // initial view size
 	std::string         title;
-	int                 view_width;
-	int                 view_height;
+	float               view_width;
+	float               view_height;
 	bool                has_focus;
 	bool                exec_cmd;  // console only
 	int                 src_sel;
@@ -122,7 +122,7 @@ private:
 	void draw_memory(debug_area* view_ptr, bool* opened);
 	void draw_bpoints(debug_area* view_ptr, bool* opened);
 	void draw_log(debug_area* view_ptr, bool* opened);
-	void draw_view(debug_area* view_ptr);
+	void draw_view(debug_area* view_ptr, bool exp_change);
 	void update_cpu_view(device_t* device);
 	static bool get_view_source(void* data, int idx, const char** out_text);
 
@@ -482,11 +482,11 @@ void debug_imgui::update_cpu_view(device_t* device)
 	view_main_regs->view->set_source(*source);
 }
 
-void debug_imgui::draw_view(debug_area* view_ptr)
+void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 {
 	const debug_view_char *viewdata;
 	ImDrawList* drawlist;
-	debug_view_xy vsize;
+	debug_view_xy vsize,totalsize,pos;
 	unsigned char v;
 	int x,y;
 	ImVec2 xy1,xy2;
@@ -494,23 +494,43 @@ void debug_imgui::draw_view(debug_area* view_ptr)
 	rgb_t bg, fg;
 	rgb_t base(0xe6, 0xff, 0xff, 0xff);
 
-	vsize = view_ptr->view->visible_size();
-	viewdata = view_ptr->view->viewdata();
+	totalsize = view_ptr->view->total_size();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
+	
+	// if the view has changed its expression (disasm, memory), then update scroll bar
+	if(exp_change)
+		ImGui::SetScrollY(view_ptr->view->visible_position().y * fsize.y);
+	
 	// update view location, while the cursor is at 0,0.
 	view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
 	view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
-	view_ptr->view_width = ImGui::GetContentRegionMax().x;
-	view_ptr->view_height = ImGui::GetContentRegionMax().y;
+	view_ptr->view_width = ImGui::GetContentRegionAvail().x;
+	view_ptr->view_height = ImGui::GetContentRegionAvail().y;
 	view_ptr->has_focus = ImGui::IsWindowFocused();
 	drawlist = ImGui::GetWindowDrawList();
+
+	// temporarily set cursor to the last line, this will set the scroll bar range
+	ImGui::SetCursorPosY((totalsize.y) * fsize.y);
+
+	// set the visible area to be displayed
+	vsize.x = view_ptr->view_width / fsize.x;
+	vsize.y = (view_ptr->view_height / fsize.y) + 1;
+	view_ptr->view->set_visible_size(vsize);
+
+	// set the visible position
+	pos.x = 0;
+	pos.y = ImGui::GetScrollY() / fsize.y;
+	view_ptr->view->set_visible_position(pos);
+		
+	viewdata = view_ptr->view->viewdata();
+
 	xy1.x = view_ptr->ofs_x;
-	xy1.y = view_ptr->ofs_y;
+	xy1.y = view_ptr->ofs_y + ImGui::GetScrollY();
 	xy2 = fsize;
 	xy2.x += view_ptr->ofs_x;
-	xy2.y += view_ptr->ofs_y;
+	xy2.y += view_ptr->ofs_y + ImGui::GetScrollY();
 	for(y=0;y<vsize.y;y++)
 	{
 		for(x=0;x<vsize.x;x++)
@@ -537,7 +557,6 @@ void debug_imgui::draw_view(debug_area* view_ptr)
 		xy1.y += fsize.y;
 		xy2.y += fsize.y;
 	}
-	ImGui::SetCursorPos(ImVec2(xy1.x - view_ptr->ofs_x, xy1.y - view_ptr->ofs_y));
 	ImGui::PopStyleVar(2);
 }
 
@@ -546,13 +565,9 @@ void debug_imgui::draw_bpoints(debug_area* view_ptr, bool* opened)
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened))
 	{
-		debug_view_xy totalsize;
-
-		totalsize = view_ptr->view->total_size();
-		view_ptr->view->set_visible_size(totalsize);
-
 		ImGui::BeginChild("##break_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
-		draw_view(view_ptr);
+		draw_view(view_ptr,false);
+		ImGui::EndChild();
 
 		ImGui::End();
 	}
@@ -593,15 +608,8 @@ void debug_imgui::draw_log(debug_area* view_ptr, bool* opened)
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened))
 	{
-		debug_view_xy totalsize;
-
-		totalsize = view_ptr->view->total_size();
-		if(totalsize.y > 100)
-			totalsize.y = 100;
-		view_ptr->view->set_visible_size(totalsize);
-
 		ImGui::BeginChild("##log_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
-		draw_view(view_ptr);
+		draw_view(view_ptr,false);
 		ImGui::EndChild();
 
 		ImGui::End();
@@ -630,9 +638,9 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened,ImGuiWindowFlags_MenuBar))
 	{
-		debug_view_xy totalsize;
 		int idx;
 		bool done = false;
+		bool exp_change = false;
 
 		if(ImGui::BeginMenuBar())
 		{
@@ -662,15 +670,14 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1.0f);
 		if(ImGui::InputText("##addr",view_ptr->console_input,512,flags))
+		{
 			downcast<debug_view_disasm *>(view_ptr->view)->set_expression(view_ptr->console_input);
+			exp_change = true;
+		}
 		ImGui::PopItemWidth();
 		ImGui::Separator();
 
 		// disassembly portion
-		totalsize = view_ptr->view->total_size();
-		totalsize.y = 50;
-		view_ptr->view->set_visible_size(totalsize);
-
 		src = view_ptr->view->first_source();
 		idx = 0;
 		while (!done)
@@ -684,7 +691,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		}
 
 		ImGui::BeginChild("##disasm_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
-		draw_view(view_ptr);
+		draw_view(view_ptr,exp_change);
 		ImGui::EndChild();
 		
 		ImGui::End();
@@ -715,9 +722,9 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened,ImGuiWindowFlags_MenuBar))
 	{
-		debug_view_xy totalsize;
 		int idx;
 		bool done = false;
+		bool exp_change = false;
 
 		if(ImGui::BeginMenuBar())
 		{
@@ -767,7 +774,10 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
 		if(ImGui::InputText("##addr",view_ptr->console_input,512,flags))
+		{
 			downcast<debug_view_memory *>(view_ptr->view)->set_expression(view_ptr->console_input);
+			exp_change = true;
+		}
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1.0f);
@@ -776,10 +786,6 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		ImGui::Separator();
 
 		// memory editor portion
-		totalsize = view_ptr->view->total_size();
-		if(totalsize.y > 256)
-			totalsize.y = 256;
-		view_ptr->view->set_visible_size(totalsize);
 		src = view_ptr->view->first_source();
 		idx = 0;
 		while (!done)
@@ -793,7 +799,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		}
 
 		ImGui::BeginChild("##memory_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
-		draw_view(view_ptr);
+		draw_view(view_ptr,exp_change);
 		ImGui::EndChild();
 		
 		ImGui::End();
@@ -826,7 +832,6 @@ void debug_imgui::draw_console()
 	ImGui::SetNextWindowSize(ImVec2(view_main_regs->width + view_main_disasm->width,view_main_disasm->height + view_main_console->height + ImGui::GetTextLineHeight()*3),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_main_console->title.c_str(), nullptr,flags))
 	{
-		debug_view_xy totalsize;
 		std::string str;
 
 		if(ImGui::BeginMenuBar())
@@ -908,35 +913,23 @@ void debug_imgui::draw_console()
 		}
 
 		// CPU state portion
-		totalsize = view_main_regs->view->total_size();
-		view_main_regs->view->set_visible_size(totalsize);
-
-		ImGui::BeginChild("##state_output", ImVec2(180,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*2));  // account for title bar and menu
-		draw_view(view_main_regs);
+		ImGui::BeginChild("##state_output", ImVec2(180,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*4));  // account for title bar and menu
+		draw_view(view_main_regs,false);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
 
 		ImGui::BeginChild("##right_side", ImVec2(ImGui::GetWindowWidth() - ImGui::GetCursorPosX() - 8,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*2));
 		// disassembly portion
-		totalsize = view_main_disasm->view->total_size();
-		totalsize.y = 20;
-		view_main_disasm->view->set_visible_size(totalsize);
-
 		ImGui::BeginChild("##disasm_output", ImVec2(ImGui::GetWindowWidth() - ImGui::GetCursorPosX() - 8,(ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*4)/2));
-		draw_view(view_main_disasm);
+		draw_view(view_main_disasm,false);
 		ImGui::EndChild();
 
 		ImGui::Separator();
 
 		// console portion
-		totalsize = view_main_console->view->total_size();
-		if(totalsize.y > 100)
-			totalsize.y = 100;
-		view_main_console->view->set_visible_size(totalsize);
-
 		ImGui::BeginChild("##console_output", ImVec2(ImGui::GetWindowWidth() - ImGui::GetCursorPosX() - 8,(ImGui::GetWindowHeight() - ImGui::GetTextLineHeight()*4)/2 - ImGui::GetTextLineHeight()));
-		draw_view(view_main_console);
+		draw_view(view_main_console,false);
 		ImGui::EndChild();
 		ImGui::Separator();
 		//if(ImGui::IsWindowFocused())
@@ -1069,9 +1062,11 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 		view_main_console->ofs_x = 0;
 		view_main_console->ofs_y = 0;
 		view_main_disasm = dview_alloc(device.machine(), DVT_DISASSEMBLY);
+		view_main_disasm->title = "Main Disassembly";
 		view_main_disasm->width = 500;
 		view_main_disasm->height = 200;
 		view_main_regs = dview_alloc(device.machine(), DVT_STATE);
+		view_main_regs->title = "Main State";
 		view_main_regs->width = 180;
 		view_main_regs->height = 440;
 		strcpy(view_main_console->console_input,"");  // clear console input

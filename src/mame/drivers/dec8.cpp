@@ -480,7 +480,7 @@ WRITE8_MEMBER(dec8_state::csilver_control_w)
 
 WRITE8_MEMBER(dec8_state::dec8_sound_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -853,7 +853,7 @@ static ADDRESS_MAP_START( dec8_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3812_device, write)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -862,7 +862,7 @@ static ADDRESS_MAP_START( oscar_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3526_device, write)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -871,7 +871,7 @@ static ADDRESS_MAP_START( ym3526_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_device, write)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -882,7 +882,7 @@ static ADDRESS_MAP_START( csilver_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_device, write)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(csilver_adpcm_data_w) /* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(csilver_sound_bank_w)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x3400, 0x3400) AM_READ(csilver_adpcm_reset_r) /* ? not sure */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -2023,6 +2023,8 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
@@ -2074,6 +2076,8 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2127,6 +2131,8 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
@@ -2178,6 +2184,8 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2236,6 +2244,8 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
@@ -2292,6 +2302,8 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2360,6 +2372,8 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.23)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
@@ -2397,6 +2411,8 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2453,6 +2469,8 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.53)

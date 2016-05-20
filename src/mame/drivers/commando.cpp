@@ -46,6 +46,7 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "includes/commando.h"
 
@@ -59,7 +60,7 @@ static ADDRESS_MAP_START( commando_map, AS_PROGRAM, 8, commando_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(commando_c804_w)
 	AM_RANGE(0xc808, 0xc809) AM_WRITE(commando_scrollx_w)
 	AM_RANGE(0xc80a, 0xc80b) AM_WRITE(commando_scrolly_w)
@@ -79,7 +80,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, commando_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ym2", ym2203_device, write)
 ADDRESS_MAP_END
@@ -274,6 +275,8 @@ static MACHINE_CONFIG_START( commando, commando_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, PHI_B/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

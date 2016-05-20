@@ -112,6 +112,7 @@ Sound processor - 6502
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "machine/ldv1000.h"
+#include "machine/gen_latch.h"
 
 
 class deco_ld_state : public driver_device
@@ -122,25 +123,30 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_laserdisc(*this, "laserdisc"),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_screen(*this, "screen"),
+			m_palette(*this, "palette"),
+			m_soundlatch(*this, "soundlatch"),
+			m_soundlatch2(*this, "soundlatch2"),
 			m_vram0(*this, "vram0"),
 			m_attr0(*this, "attr0"),
 			m_vram1(*this, "vram1"),
-			m_attr1(*this, "attr1"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
+			m_attr1(*this, "attr1")
+
 			{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 	required_shared_ptr<UINT8> m_vram0;
 	required_shared_ptr<UINT8> m_attr0;
 	required_shared_ptr<UINT8> m_vram1;
 	required_shared_ptr<UINT8> m_attr1;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 
 	UINT8 m_laserdisc_data;
 	int m_nmimask;
@@ -257,7 +263,7 @@ WRITE8_MEMBER(deco_ld_state::laserdisc_w)
 
 WRITE8_MEMBER(deco_ld_state::decold_sound_cmd_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -279,7 +285,7 @@ static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("IN1")
-	AM_RANGE(0x1004, 0x1004) AM_READ(soundlatch2_byte_r) AM_WRITE(decold_sound_cmd_w)
+	AM_RANGE(0x1004, 0x1004) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(decold_sound_cmd_w)
 	AM_RANGE(0x1005, 0x1005) AM_READ(sound_status_r)
 	AM_RANGE(0x1006, 0x1006) AM_NOP // 6850 status
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // 6850 data
@@ -315,7 +321,7 @@ static ADDRESS_MAP_START( rblaster_sound_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READWRITE(soundlatch_byte_r,soundlatch2_byte_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -488,6 +494,10 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 	/* sound hardware */
 	/* TODO: mixing */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)

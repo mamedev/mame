@@ -29,7 +29,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound0_timer_callback)
 	{
 		bool which_half = BIT(m_sound0_cnt, 0);
 		UINT8 sb = m_sound.sg0w[m_sound0_cnt >> 1];
-		m_dac->write_unsigned8((which_half ? sb >> 4 : sb & 15)^8);
+		m_dac0->write_signed8(which_half ? sb & 0xf0 : sb << 4);
 		m_sound0_cnt++;
 	}
 }
@@ -49,7 +49,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound1_timer_callback)
 	{
 		bool which_half = BIT(m_sound1_cnt, 0);
 		UINT8 sb = m_sound.sg1w[m_sound1_cnt >> 1];
-		m_dac->write_unsigned8((which_half ? sb >> 4 : sb & 15)^8);
+		m_dac1->write_signed8(which_half ? sb & 0xf0 : sb << 4);
 		m_sound1_cnt++;
 	}
 }

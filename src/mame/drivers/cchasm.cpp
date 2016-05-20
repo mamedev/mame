@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 8, cchasm_state )
 	AM_RANGE(0x6001, 0x6001) AM_MIRROR(0xf9e) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x6020, 0x6021) AM_MIRROR(0xf9e) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x6021, 0x6021) AM_MIRROR(0xf9e) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0xf9e) AM_READWRITE(soundlatch_byte_r, soundlatch3_byte_w)
+	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0xf9e) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
 	AM_RANGE(0x6041, 0x6041) AM_MIRROR(0xf9e) AM_READWRITE(soundlatch2_r, soundlatch4_w)
 	AM_RANGE(0x6061, 0x6061) AM_MIRROR(0xf9e) AM_WRITE(reset_coin_flag_w)
 	AM_RANGE(0x7041, 0x7041) AM_NOP // TODO
@@ -170,6 +170,11 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1818182)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)

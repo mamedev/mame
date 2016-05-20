@@ -700,7 +700,7 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(tumbleb_state::jumpkids_sound_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -738,7 +738,7 @@ WRITE16_MEMBER(tumbleb_state::semicom_soundcmd_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		// needed for Super Trio which reads the sound with polling
 		// space.device().execute().spin_until_time(attotime::from_usec(100));
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
@@ -758,7 +758,7 @@ static ADDRESS_MAP_START( semicom_sound_map, AS_PROGRAM, 8, tumbleb_state )
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	//AM_RANGE(0xf006, 0xf006) ??
-	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf008, 0xf008) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(oki_sound_bank_w)
 ADDRESS_MAP_END
 
@@ -767,7 +767,7 @@ static ADDRESS_MAP_START( suprtrio_sound_map, AS_PROGRAM, 8, tumbleb_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	//AM_RANGE(0xf006, 0xf006) ??
-	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf008, 0xf008) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(oki_sound_bank_w)
 ADDRESS_MAP_END
 
@@ -806,7 +806,7 @@ static ADDRESS_MAP_START( jumpkids_sound_map, AS_PROGRAM, 8, tumbleb_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(jumpkids_oki_bank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -2152,6 +2152,8 @@ static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_OKIM6295_ADD("oki", 8000000/8, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
@@ -2251,6 +2253,8 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 
 	/* sound hardware - same as hyperpac */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* on at least hatch catch, cookie & bibi and choky choky the YM2151 clock is connected
 	       directly to the Z80 clock so the speed should match */
@@ -2361,6 +2365,8 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", 875000, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

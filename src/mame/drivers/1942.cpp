@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( c1942_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSWA")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSWB")
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc802, 0xc803) AM_WRITE(c1942_scroll_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1942_c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(c1942_palette_bank_w)
@@ -212,7 +212,7 @@ WRITE8_MEMBER(_1942_state::c1942p_palette_w)
 
 WRITE8_MEMBER(_1942_state::c1942p_soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -248,8 +248,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(c1942p_sound_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c1942p_sound_io, AS_IO, 8, _1942_state )
@@ -264,7 +263,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 ADDRESS_MAP_END
@@ -586,6 +585,8 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
 	MCFG_AY8910_RES_LOADS(10000.0, 10000.0, 10000.0)
@@ -654,6 +655,8 @@ static MACHINE_CONFIG_START( 1942p, _1942_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CLOCK_1942P) /* 1.25 MHz - verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
