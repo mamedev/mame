@@ -30,11 +30,14 @@
 	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_PERIPH, 0x1080C693, 0x00, 0x060100, 0x00)
 
 
-class iteagle_fpga_device : public pci_device,
-				public device_nvram_interface
+class iteagle_fpga_device : public pci_device
 {
 public:
 	iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+
+	required_device<nvram_device> m_rtc;
+
 	void set_init_info(int version, int seq_init) {m_version=version; m_seq_init=seq_init;}
 	void set_irq_info(const char *tag, const int irq_num, const int serial_num) {
 		m_cpu_tag = tag; m_irq_num = irq_num; m_serial_irq_num = serial_num;}
@@ -44,11 +47,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	// device_nvram_interface overrides
-	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
-
 private:
 	emu_timer *     m_timer;
 	const char *m_cpu_tag;
@@ -57,7 +55,7 @@ private:
 	int m_serial_irq_num;
 
 	UINT32 m_fpga_regs[0x20/4];
-	UINT32 m_rtc_regs[0x800/4];
+	std::vector<UINT32> m_rtc_regs;
 	UINT32 m_ram[0x20000/4];
 	UINT32 m_prev_reg;
 
@@ -109,6 +107,8 @@ private:
 	address_space *m_memory_space;
 	UINT16 m_sw_version;
 	UINT8 m_hw_version;
+
+	std::vector<UINT16> iteagle_default_eeprom; // 0x40
 
 	DECLARE_ADDRESS_MAP(eeprom_map, 32);
 	DECLARE_READ32_MEMBER( eeprom_r );
