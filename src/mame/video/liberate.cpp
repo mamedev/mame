@@ -126,7 +126,7 @@ WRITE8_MEMBER(liberate_state::deco16_io_w)
 			m_maincpu->set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
-			soundlatch_byte_w(space, 0, data);
+			m_soundlatch->write(space, 0, data);
 			m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
@@ -154,7 +154,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_w)
 			m_maincpu->set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
-			soundlatch_byte_w(space, 0, data);
+			m_soundlatch->write(space, 0, data);
 			m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
@@ -173,7 +173,7 @@ WRITE8_MEMBER(liberate_state::prosport_io_w)
 			m_back_tilemap->mark_all_dirty();
 			break;
 		case 2: /* Sound */
-			soundlatch_byte_w(space, 0, data);
+			m_soundlatch->write(space, 0, data);
 			m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 			break;
 		case 4: /* Irq ack */

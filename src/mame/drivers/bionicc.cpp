@@ -98,7 +98,7 @@ WRITE16_MEMBER(bionicc_state::bionicc_mpu_trigger_w)
 WRITE16_MEMBER(bionicc_state::hacked_soundcommand_w)
 {
 	COMBINE_DATA(&m_soundcommand);
-	soundlatch_byte_w(space, 0, m_soundcommand & 0xff);
+	m_soundlatch->write(space, 0, m_soundcommand & 0xff);
 }
 
 READ16_MEMBER(bionicc_state::hacked_soundcommand_r)
@@ -159,7 +159,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bionicc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -378,6 +378,8 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz / 4)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)

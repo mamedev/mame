@@ -68,7 +68,6 @@ IO ports and memory map changes. Dip switches differ too.
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/msm5205.h"
 #include "includes/kchamp.h"
 
 
@@ -95,7 +94,7 @@ WRITE8_MEMBER(kchamp_state::sound_control_w)
 
 WRITE8_MEMBER(kchamp_state::sound_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
@@ -137,7 +136,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kchampvs_sound_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_msm_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(sound_control_w)
@@ -191,7 +190,7 @@ static ADDRESS_MAP_START( kchamp_sound_io_map, AS_IO, 8, kchamp_state )
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x05, 0x05) AM_WRITE(kc_sound_control_w)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( kchampvs )
@@ -431,6 +430,8 @@ static MACHINE_CONFIG_START( kchampvs, kchamp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)    /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -480,6 +481,8 @@ static MACHINE_CONFIG_START( kchamp, kchamp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/12) /* Guess based on actual pcb recordings of karatedo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

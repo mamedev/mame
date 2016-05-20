@@ -94,17 +94,17 @@ WRITE8_MEMBER(quasar_state::quasar_sh_command_w)
 	// lower nibble = command to I8035
 	// not necessarily like this, but it seems to work better than direct mapping
 	// (although schematics has it as direct - but then the schematics are wrong elsewhere to!)
-	soundlatch_byte_w(space, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
+	m_soundlatch->write(space, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
 }
 
 READ8_MEMBER(quasar_state::quasar_sh_command_r)
 {
-	return soundlatch_byte_r(space, 0) + (ioport("DSW2")->read() & 0x30);
+	return m_soundlatch->read(space, 0) + (ioport("DSW2")->read() & 0x30);
 }
 
 READ8_MEMBER(quasar_state::audio_t1_r)
 {
-	return (soundlatch_byte_r(space, 0) == 0);
+	return (m_soundlatch->read(space, 0) == 0);
 }
 
 // memory map taken from the manual
@@ -339,6 +339,8 @@ static MACHINE_CONFIG_START( quasar, quasar_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#include "machine/gen_latch.h"
+
 class btime_state : public driver_device
 {
 public:
@@ -25,6 +27,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
 		, m_prom_region(*this, "proms")
 	{
 	}
@@ -65,6 +68,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_memory_region m_prom_region;
 
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);

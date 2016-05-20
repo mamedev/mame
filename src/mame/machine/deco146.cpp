@@ -1320,7 +1320,8 @@ UINT16 deco_146_base_device::read_data(UINT16 address, UINT16 mem_mask, UINT8 &c
 
 
 deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_sound_latch(*this, ":soundlatch")
 {
 	m_port_a_r =  deco146_port_read_cb(FUNC(deco_146_base_device::port_a_default), this);
 	m_port_b_r =  deco146_port_read_cb(FUNC(deco_146_base_device::port_b_default), this);
@@ -1371,8 +1372,7 @@ UINT16 deco_146_base_device::port_c_default(int unused)
 
 void deco_146_base_device::soundlatch_default(address_space &space, UINT16 data, UINT16 mem_mask)
 {
-	driver_device *drvstate = machine().driver_data<driver_device>();
-	drvstate->soundlatch_byte_w(space, 0, data & 0xff);
+	m_sound_latch->write(space, 0, data & 0xff);
 	cpu_device* cpudev = (cpu_device*)machine().device(":audiocpu");
 	if (cpudev) cpudev->set_input_line(0, HOLD_LINE);
 }

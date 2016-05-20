@@ -40,6 +40,8 @@ public:
 	DECLARE_WRITE8_MEMBER( clear_w );
 	DECLARE_WRITE_LINE_MEMBER( preset_w );
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
+	
+	void preset_w(UINT16 value) { m_latched_value = value; }
 
 protected:
 	virtual void device_start() override;
