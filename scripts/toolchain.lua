@@ -31,6 +31,7 @@ newoption {
 		{ "mingw64-gcc",   "MinGW64"                },
 		{ "mingw-clang",   "MinGW (clang compiler)" },
 		{ "netbsd",        "NetBSD"                },
+		{ "openbsd",       "OpenBSD"                },
 		{ "osx",           "OSX (GCC compiler)"     },
 		{ "osx-clang",     "OSX (Clang compiler)"   },
 		{ "pnacl",         "Native Client - PNaCl"  },
@@ -209,6 +210,10 @@ function toolchain(_buildDir, _subDir)
 
 		if "netbsd" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-netbsd")
+		end
+
+		if "openbsd" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-openbsd")
 		end
 
 		if "ios-arm" == _OPTIONS["gcc"] then
@@ -784,6 +789,28 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "netbsd", "x64", "Debug" }
 		targetdir (_buildDir .. "netbsd" .. "/bin/x64/Debug")
+
+	configuration { "openbsd", "x32" }
+		objdir (_buildDir .. "openbsd" .. "/obj")
+		buildoptions {
+			"-m32",
+		}
+	configuration { "openbsd", "x32", "Release" }
+		targetdir (_buildDir .. "openbsd" .. "/bin/x32/Release")
+
+	configuration { "openbsd", "x32", "Debug" }
+		targetdir (_buildDir .. "openbsd" .. "/bin/x32/Debug")
+
+	configuration { "openbsd", "x64" }
+		objdir (_buildDir .. "openbsd" .. "/obj")
+		buildoptions {
+			"-m64",
+		}
+	configuration { "openbsd", "x64", "Release" }
+		targetdir (_buildDir .. "openbsd" .. "/bin/x64/Release")
+
+	configuration { "openbsd", "x64", "Debug" }
+		targetdir (_buildDir .. "openbsd" .. "/bin/x64/Debug")
 
 	configuration { "android-*" }
 		includedirs {
