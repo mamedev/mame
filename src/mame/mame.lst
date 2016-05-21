@@ -28349,6 +28349,7 @@ bstarsh                         // 0002 (c) 1990 SNK
 burningf                        // 0018 (c) 1991 SNK
 burningfh                       // 0018 (c) 1991 SNK
 burningfp                       // 0018 (c) 1991 SNK (prototype)
+crswd2bl                        // 0054 bootleg made from CD version
 crsword                         // 0037 (c) 1991 Alpha Denshi Co.
 ct2k3sa                         // bootleg of kof2001
 ct2k3sp                         // bootleg of kof2001
@@ -28368,6 +28369,7 @@ fbfrenzy                        // 0034 (c) 1992 SNK
 fightfev                        // 0060 (c) 1994 Viccom
 fightfeva                       // 0060 (c) 1994 Viccom
 flipshot                        // 0247 (c) 1998 Visco
+fr2
 fswords                         // 0187 Korean hack of samsho3
 galaxyfg                        // 0078 (c) 1995 Sunsoft
 ganryu                          // 0252 (c) 1999 Visco
@@ -28442,6 +28444,7 @@ lans2004                        // bootleg of shocktr2
 lastblad                        // 0234 (c) 1997 SNK
 lastbladh                       // 0234 (c) 1997 SNK
 lastbld2                        // 0243 (c) 1998 SNK
+lasthope
 lastsold                        // 0196 Censored Korean release of lastblad
 lbowling                        // 0019 (c) 1990 SNK
 legendos                        // 0029 (c) 1991 SNK
@@ -28575,9 +28578,7 @@ whp                             // 0090 (c) 1995 ADK / SNK
 wjammers                        // 0065 (c) 1994 Data East Corporation
 zedblade                        // 0076 (c) 1994 NMK
 zintrckb                        // 0211 hack - this is not a genuine MVS proto, its a bootleg made from the CD version
-crswd2bl                        // 0054 bootleg made from CD version
 zupapa                          // 0070 Zupapa - released in 2001, 1994 prototype probably exists
-lasthope
 
 @source:neopcb.cpp
 kf2k3pcb                        // 0271 (c) 2003 Playmore - JAMMA PCB

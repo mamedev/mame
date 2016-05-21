@@ -3897,6 +3897,23 @@ ROM_END
  Idol Mahjong - final romance 2 (CD only? not confirmed, MVS might exist)
 ****************************************/
 
+// 098 : Idol Mahjong Final Romance 2 (from HBMAME), added for completeness. Origin unknown, most likely a hack from the CD.
+ROM_START( fr2 )
+	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_WORD_SWAP( "098.p1", 0x000000, 0x80000, CRC(09675541) SHA1(6afb89d43e67f93e40f3877cbedfec9566e3ff0f) )
+
+	NEO_SFIX_128K( "098.s1", CRC(0e6a7c73) SHA1(31b1194524dcc80ec4d63bac088b6fb4909f496c) )
+
+	NEO_BIOS_AUDIO_128K( "098.m1", CRC(da4878cf) SHA1(ce13d18a4c5d01974df8542c67c4df00dbc6e7c1) )
+
+	ROM_REGION( 0x100000, "cslot1:ymsnd", 0 )
+	ROM_LOAD( "098.v1", 0x000000, 0x100000, CRC(6f8ccddc) SHA1(696df2d0f416c2374b0eb7c858486054688c5bca) )
+
+	ROM_REGION( 0x800000, "cslot1:sprites", 0 )
+	ROM_LOAD16_BYTE( "098.c1", 0x0000000, 0x400000, CRC(29148bf7) SHA1(75097fbe8877720afbcbe4dbe30bc600466d759f) )
+	ROM_LOAD16_BYTE( "098.c2", 0x0000001, 0x400000, CRC(226b1263) SHA1(dee6a4a0a727c1d8a6d298cb38ed1b9901992d5b) )
+ROM_END
+
 /****************************************
  ID-0099
  Neo Pool Masters
@@ -8796,6 +8813,7 @@ GAME( 1994, fightfeva,  fightfev, neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1994, pspikes2,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Power Spikes II (NGM-068)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, sonicwi2,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Aero Fighters 2 / Sonic Wings 2", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sonicwi3,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Aero Fighters 3 / Sonic Wings 3", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fr2,        neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Idol Mahjong Final Romance 2", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, popbounc,   neogeo,   popbounc,  neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Pop 'n Bounce / Gapporin", MACHINE_SUPPORTS_SAVE )
 
 /* Visco */
