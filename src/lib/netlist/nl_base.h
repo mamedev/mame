@@ -203,9 +203,9 @@ class NETLIB_NAME(_name) : public device_t
 
 #define NETLIB_DESTRUCTOR(_name) public: ATTR_HOT virtual ~NETLIB_NAME(_name)()
 
-#define NETLIB_CONSTRUCTOR_EX(_name, _args...)                                  \
+#define NETLIB_CONSTRUCTOR_EX(_name, ...)                                  \
 	private: family_setter_t m_famsetter;                                       \
-	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name, _args) \
+	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name, __VA_ARGS__) \
 		: device_t(owner, name)
 
 #define NETLIB_DYNAMIC() 														\
