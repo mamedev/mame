@@ -239,7 +239,7 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<i8041_device> m_kbdmcu;
+	required_device<i8741_device> m_kbdmcu;
 	required_device<ram_device> m_ram;
 	required_device<crt5027_device> m_crtc;
 	required_device<address_map_bank_device> m_48kbank;
@@ -266,17 +266,15 @@ protected:
 public:
 
 	DECLARE_READ8_MEMBER(vsync_r);
-	DECLARE_READ8_MEMBER(i8078_r);
-	DECLARE_WRITE8_MEMBER(i8078_w);
 	DECLARE_WRITE8_MEMBER( beep_w );
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(bankl_r);
 	DECLARE_WRITE8_MEMBER(bankl_w);
 	DECLARE_READ8_MEMBER(bankh_r);
 	DECLARE_WRITE8_MEMBER(bankh_w);
-	DECLARE_READ8_MEMBER(kbd_fifo_r);
 	DECLARE_READ8_MEMBER(kbd_matrix_r);
 	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
+	DECLARE_WRITE8_MEMBER(kbd_port2_w);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(fdc_stat_r);
@@ -290,7 +288,7 @@ public:
 private:
 	UINT8 m_unk;
 	UINT8 m_bank;
-	UINT8 m_kbdrow, m_kbdcol, m_kbdclk, m_kbdread;
+	UINT8 m_kbdrow, m_kbdcol, m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	floppy_image_device *m_curfloppy;
@@ -319,44 +317,6 @@ READ8_MEMBER(itt3030_state::vsync_r)
 	}
 
 	return ret;
-}
-
-// TODO: make this a correct device once we figure out how everything goes together in this system
-READ8_MEMBER(itt3030_state::i8078_r)
-{
-	if (offset)
-	{
-//      printf("Read 8078 status\n");
-		if (!m_keyskip)
-		{
-			return 0x10;
-		}
-	}
-	else
-	{
-//      printf("Read 8078 data\n");
-		if (!m_keyskip)
-		{
-			m_keyskip = true;   // don't keep reporting the 'b' key, just the once to trick the boot ROM
-			return 0x0c;
-		}
-	}
-
-	return 0;
-}
-
-WRITE8_MEMBER(itt3030_state::i8078_w)
-{
-	#if 0
-	if (offset)
-	{
-		printf("%02x to 8078 command\n", data);
-	}
-	else
-	{
-		printf("%02x to 8078 data\n", data);
-	}
-	#endif
 }
 
 WRITE8_MEMBER( itt3030_state::beep_w )
@@ -540,19 +500,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( itt3030_io, AS_IO, 8, itt3030_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x26) AM_DEVREADWRITE("crt5027", crt5027_device, read, write)
-	AM_RANGE(0x30, 0x31) AM_READWRITE(i8078_r, i8078_w)
+	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("kbdmcu", i8741_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0x32, 0x32) AM_WRITE(beep_w)
 	AM_RANGE(0x35, 0x35) AM_READ(vsync_r)
-	AM_RANGE(0x40, 0x40) AM_READ(kbd_fifo_r)
 	AM_RANGE(0x50, 0x53) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x54, 0x54) AM_READWRITE(fdc_stat_r, fdc_cmd_w)
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(bank_w)
 ADDRESS_MAP_END
-
-READ8_MEMBER(itt3030_state::kbd_fifo_r)
-{
-	return m_kbdmcu->upi41_master_r(space, 0);  // offset 0 is data, 1 is status
-}
 
 READ8_MEMBER(itt3030_state::kbd_matrix_r)
 {
@@ -563,30 +517,38 @@ WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
 {
 	ioport_port *ports[16] = { m_keyrow1, m_keyrow2, m_keyrow3, m_keyrow4, m_keyrow5, m_keyrow6, m_keyrow7, m_keyrow8, m_keyrow9,
 								m_keyrow10, m_keyrow11, m_keyrow12, m_keyrow13, m_keyrow14, m_keyrow15, m_keyrow16 };
-	int col_masks[8] = { 1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80 };
+	int rd_masks[8] = { 1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80 };
 	int tmp_read;
 
-	m_kbdrow = data & 0xf;
-	m_kbdcol = (data >> 4) & 0x7;
+	m_kbdrow = data & 0x7;			// keyboard input line multiplex
+	m_kbdcol = (data >> 3) & 0xf;	// keyboard col select
+
+//	printf("matrix_w: %02x (col %d row %d clk %d)\n", data, m_kbdcol, m_kbdrow, (data & 0x80) ? 1 : 0);
 
 	if ((data & 0x80) && (!m_kbdclk))
 	{
-		tmp_read = ports[m_kbdrow]->read() & col_masks[m_kbdcol];
+		tmp_read = ports[m_kbdcol]->read() & rd_masks[m_kbdrow];
 		m_kbdread = (tmp_read != 0) ? 1 : 0;
 	}
 
 	m_kbdclk = (data & 0x80) ? 1 : 0;
 }
 
-// Schematics say:
+// bit 2 is UPI-41 host IRQ to Z80
+WRITE8_MEMBER(itt3030_state::kbd_port2_w)
+{
+	m_kbdport2 = data;
+}
+
+// Schematics + i8278 datasheet says:
 // Port 1 goes to the keyboard matrix.
-// bits 0-3 select matrix rows, bits 4-6 choose column to read, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
+// bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
 // T0 is the key matrix return
-// Port 2 bit 2 is shown as "IRQ" on the schematics, and the code does a lot with it as well (debug?)
+// pin 23 is the UPI-41 host IRQ line, it's unknown how it's connected to the Z80
 static ADDRESS_MAP_START( kbdmcu_io, AS_IO, 8, itt3030_state )
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(kbd_matrix_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kbd_matrix_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_NOP AM_WRITENOP
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_NOP AM_WRITE(kbd_port2_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( itt3030 )
@@ -755,7 +717,7 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_CPU_PROGRAM_MAP(itt3030_map)
 	MCFG_CPU_IO_MAP(itt3030_io)
 
-	MCFG_CPU_ADD("kbdmcu", I8041, XTAL_6MHz)
+	MCFG_CPU_ADD("kbdmcu", I8741, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(kbdmcu_io)
 
 	/* video hardware */
