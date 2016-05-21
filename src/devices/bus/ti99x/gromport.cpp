@@ -111,7 +111,7 @@
 
 #define TRACE_RPK 0
 #define TRACE_CHANGE 0
-#define TRACE_ILLWRITE 0
+#define TRACE_ILLWRITE 1
 #define TRACE_CONFIG 0
 #define TRACE_READ 0
 #define TRACE_WRITE 0
@@ -648,9 +648,15 @@ machine_config_constructor multi_conn_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( multi_slot );
 }
 
+INPUT_CHANGED_MEMBER( multi_conn_device::switch_changed )
+{
+	if (TRACE_CHANGE) logerror("Slot changed %d - %d\n", (int)((UINT64)param & 0x07), newval);
+	m_active_slot = m_fixed_slot = newval - 1;
+}
+
 INPUT_PORTS_START(multi_slot)
 	PORT_START( "CARTSLOT" )
-	PORT_DIPNAME( 0x0f, 0x00, "Multi-cartridge slot" )
+	PORT_DIPNAME( 0x0f, 0x00, "Multi-cartridge slot" ) PORT_CHANGED_MEMBER(DEVICE_SELF, multi_conn_device, switch_changed, 0)
 		PORT_DIPSETTING(    0x00, "Auto" )
 		PORT_DIPSETTING(    0x01, "Slot 1" )
 		PORT_DIPSETTING(    0x02, "Slot 2" )
@@ -1123,7 +1129,8 @@ ioport_constructor gkracker_device::device_input_ports() const
 enum
 {
 	PCB_STANDARD=1,
-	PCB_PAGED,
+	PCB_PAGED12K,
+	PCB_PAGED16K,
 	PCB_MINIMEM,
 	PCB_SUPER,
 	PCB_MBX,
@@ -1137,7 +1144,8 @@ enum
 static const pcb_type pcbdefs[] =
 {
 	{ PCB_STANDARD, "standard" },
-	{ PCB_PAGED, "paged" },
+	{ PCB_PAGED12K, "paged12k" },
+	{ PCB_PAGED16K, "paged" },
 	{ PCB_MINIMEM, "minimem" },
 	{ PCB_SUPER, "super" },
 	{ PCB_MBX, "mbx" },
@@ -1153,7 +1161,8 @@ static const pcb_type pcbdefs[] =
 static const pcb_type sw_pcbdefs[] =
 {
 	{ PCB_STANDARD, "standard" },
-	{ PCB_PAGED, "paged" },
+	{ PCB_PAGED12K, "paged12k" },
+	{ PCB_PAGED16K, "paged16k" },
 	{ PCB_MINIMEM, "minimem" },
 	{ PCB_SUPER, "super" },
 	{ PCB_MBX, "mbx" },
@@ -1192,13 +1201,13 @@ void ti99_cartridge_device::prepare_cartridge()
 
 	for (int i=0; i < 5; i++) m_pcb->m_grom[i] = nullptr;
 
-	m_pcb->m_grom_size = m_softlist? get_software_region_length("grom_socket") : m_rpk->get_resource_length("grom_socket");
+	m_pcb->m_grom_size = m_softlist? get_software_region_length("grom") : m_rpk->get_resource_length("grom_socket");
 	if (TRACE_CONFIG) logerror("grom_socket.size=0x%04x\n", m_pcb->m_grom_size);
 
 	if (m_pcb->m_grom_size > 0)
 	{
 		regg = memregion(CARTGROM_TAG);
-		grom_ptr = m_softlist? get_software_region("grom_socket") : m_rpk->get_contents_of_socket("grom_socket");
+		grom_ptr = m_softlist? get_software_region("grom") : m_rpk->get_contents_of_socket("grom_socket");
 		memcpy(regg->base(), grom_ptr, m_pcb->m_grom_size);
 		m_pcb->m_grom_ptr = regg->base();   // for gromemu
 		m_pcb->m_grom_address = 0;          // for gromemu
@@ -1211,25 +1220,29 @@ void ti99_cartridge_device::prepare_cartridge()
 		if (m_pcb->m_grom_size > 0x8000) m_pcb->set_grom_pointer(4, subdevice(GROM7_TAG));
 	}
 
-	m_pcb->m_rom_size = m_softlist? get_software_region_length("rom_socket") : m_rpk->get_resource_length("rom_socket");
+	m_pcb->m_rom_size = m_softlist? get_software_region_length("rom") : m_rpk->get_resource_length("rom_socket");
 	if (m_pcb->m_rom_size > 0)
 	{
-		if (TRACE_CONFIG) logerror("rom_socket.size=0x%04x\n", m_pcb->m_rom_size);
+		if (TRACE_CONFIG) logerror("rom size=0x%04x\n", m_pcb->m_rom_size);
 		regr = memregion(CARTROM_TAG);
-		rom_ptr = m_softlist? get_software_region("rom_socket") : m_rpk->get_contents_of_socket("rom_socket");
+		rom_ptr = m_softlist? get_software_region("rom") : m_rpk->get_contents_of_socket("rom_socket");
 		memcpy(regr->base(), rom_ptr, m_pcb->m_rom_size);
 		// Set both pointers to the same region for now
 		m_pcb->m_rom_ptr = regr->base();
 	}
 
-	rom2_length = m_softlist? get_software_region_length("rom2_socket") : m_rpk->get_resource_length("rom2_socket");
-	if (rom2_length > 0)
+	// Softlist uses only one ROM area, no second socket
+	if (!m_softlist)
 	{
-		// sizes do not differ between rom and rom2
-		// We use the large cartrom space for the second bank as well
-		regr = memregion(CARTROM_TAG);
-		rom_ptr = m_softlist? get_software_region("rom2_socket") : m_rpk->get_contents_of_socket("rom2_socket");
-		memcpy(regr->base() + 0x2000, rom_ptr, rom2_length);
+		rom2_length = m_rpk->get_resource_length("rom2_socket");
+		if (rom2_length > 0)
+		{
+			// sizes do not differ between rom and rom2
+			// We use the large cartrom space for the second bank as well
+			regr = memregion(CARTROM_TAG);
+			rom_ptr = m_rpk->get_contents_of_socket("rom2_socket");
+			memcpy(regr->base() + 0x2000, rom_ptr, rom2_length);
+		}
 	}
 
 	// (NV)RAM cartridges
@@ -1326,9 +1339,13 @@ bool ti99_cartridge_device::call_load()
 		if (TRACE_CONFIG) logerror("Standard PCB\n");
 		m_pcb = new ti99_standard_cartridge();
 		break;
-	case PCB_PAGED:
-		if (TRACE_CONFIG) logerror("Paged PCB\n");
-		m_pcb = new ti99_paged_cartridge();
+	case PCB_PAGED12K:
+		if (TRACE_CONFIG) logerror("Paged PCB 12K\n");
+		m_pcb = new ti99_paged12k_cartridge();
+		break;
+	case PCB_PAGED16K:
+		if (TRACE_CONFIG) logerror("Paged PCB 16K\n");
+		m_pcb = new ti99_paged16k_cartridge();
 		break;
 	case PCB_MINIMEM:
 		if (TRACE_CONFIG) logerror("Minimem PCB\n");
@@ -1505,7 +1522,18 @@ const device_type TI99CART = &device_creator<ti99_cartridge_device>;
     Some cartridges also have RAM, and some allow for switching between
     ROMs.
 
-    Unlike in the previous implementation we do not model it as a full device.
+    Standard cartridge
+
+    GROM space
+    6000     77ff   8000     97ff   a000     b7ff   c000     d7ff   e000     f7ff
+    |== GROM3 ==|...|== GROM4 ==|...|== GROM5 ==|...|== GROM6 ==|...|== GROM7 ==|
+
+
+    ROM space
+    6000          7000        7fff
+    |             |              |
+    |========== ROM1 ============|
+
 ***************************************************************************/
 
 ti99_cartridge_pcb::ti99_cartridge_pcb()
@@ -1623,15 +1651,83 @@ WRITE_LINE_MEMBER(ti99_cartridge_pcb::gclock_in)
 
 
 /*****************************************************************************
-  Cartridge type: Paged (Extended Basic)
-    This cartridge consists of GROM memory and 2 pages of standard ROM.
+  Cartridge type: Paged (12K, Extended Basic)
+
+  The Extended Basic cartridge consists of several GROMs which are
+  treated in the usual way, and two ROMs (4K and 8K).
+
+  GROM space
+  6000     77ff   8000     97ff   a000     b7ff   c000     d7ff   e000     f7ff
+  |== GROM3 ==|...|== GROM4 ==|...|== GROM5 ==|...|== GROM6 ==|...|== GROM7 ==|
+
+  ROM space
+  6000          7000        7fff
+  |             |              |
+  |             |==== ROM2a ===|     Bank 0    write to 6000, 6004, ... 7ffc
+  |=== ROM1 ====|              |
+                |==== ROM2b ===|     Bank 1    write to 6002, 6006, ... 7ffe
+
+  The 4K ROM is mapped into the 6000-6FFF space.
+  The 8K ROM is actually composed of two banks of 4K which are mapped into
+  the 7000-7FFF space. Bank 0 is visible after a write access to 6000 / 6004 /
+  6008 ... , while bank 1 is visible after writing to 6002 / 6006 / 600A / ...
+
+******************************************************************************/
+
+READ8Z_MEMBER(ti99_paged12k_cartridge::readz)
+{
+	if (m_romspace_selected)
+	{
+		// rom_ptr: 0000-0fff = rom1
+		//          2000-2fff = rom2a
+		//          3000-3fff = rom2b
+		if ((offset & 0x1000)==0)
+			*value = m_rom_ptr[offset & 0x0fff];
+		else
+			*value = m_rom_ptr[(offset & 0x0fff) | 0x2000 | (m_rom_page << 12)];
+	}
+	else
+	{
+		// Will not return anything when not selected (preceding gsq=ASSERT)
+		gromreadz(space, offset, value, mem_mask);
+	}
+}
+
+WRITE8_MEMBER(ti99_paged12k_cartridge::write)
+{
+	if (m_romspace_selected)
+	{
+		m_rom_page = (offset >> 1) & 1;
+	}
+	else
+	{
+		// Will not change anything when not selected (preceding gsq=ASSERT)
+		gromwrite(space, offset, data, mem_mask);
+	}
+}
+
+/*****************************************************************************
+  Cartridge type: Paged (16K)
+
+  GROM space
+  6000     77ff   8000     97ff   a000     b7ff   c000     d7ff   e000     f7ff
+  |== GROM3 ==|...|== GROM4 ==|...|== GROM5 ==|...|== GROM6 ==|...|== GROM7 ==|
+
+  ROM space
+  6000         7000        7fff
+  |             |             |
+  |========== ROM1 ===========|     Bank 0    write to 6000, 6004, ... 7ffc
+  |             |             |
+  |========== ROM2 ===========|     Bank 1    write to 6002, 6006, ... 7ffe
+
+  This cartridge consists of GROM memory and 2 pages of standard ROM.
     The page is set by writing any value to a location in
     the address area, where an even word offset sets the page to 0 and an
     odd word offset sets the page to 1 (e.g. 6000 = bank 0, and
     6002 = bank 1).
 ******************************************************************************/
 
-READ8Z_MEMBER(ti99_paged_cartridge::readz)
+READ8Z_MEMBER(ti99_paged16k_cartridge::readz)
 {
 	if (m_romspace_selected)
 	{
@@ -1644,7 +1740,7 @@ READ8Z_MEMBER(ti99_paged_cartridge::readz)
 	}
 }
 
-WRITE8_MEMBER(ti99_paged_cartridge::write)
+WRITE8_MEMBER(ti99_paged16k_cartridge::write)
 {
 	if (m_romspace_selected)
 	{
@@ -1659,9 +1755,20 @@ WRITE8_MEMBER(ti99_paged_cartridge::write)
 
 /*****************************************************************************
   Cartridge type: Mini Memory
-    GROM: 6 KiB (occupies G>6000 to G>7800)
-    ROM: 4 KiB (romfile is actually 8 K long, second half with zeros, 0x6000-0x6fff)
-    persistent RAM: 4 KiB (0x7000-0x7fff)
+    GROM: 6 KiB (occupies G>6000 to G>77ff)
+    ROM: 4 KiB (6000-6fff)
+    RAM: 4 KiB (7000-7fff, battery-backed)
+
+    GROM space
+    6000     77ff
+    |== GROM3 ==|
+
+    ROM space
+    6000         7000        7fff
+    |             |             |
+    |=== ROM1 ====|             |
+                  |=== NVRAM ===|
+
 ******************************************************************************/
 
 /* Read function for the minimem cartridge. */
@@ -1717,10 +1824,26 @@ WRITE8_MEMBER(ti99_minimem_cartridge::write)
     assigns a number in the selection screen. Switching the RAM banks in this
     cartridge is achieved by setting CRU bits (the system serial interface).
 
-    GROM:           Editor/Assembler GROM
-    ROM:            none
-    persistent RAM: 32 KiB (0x6000-0x7fff, 4 banks)
-    Banking:        via CRU write
+    GROM:    Editor/Assembler GROM
+    ROM:     none
+    RAM:     32 KiB (0x6000-0x7fff, 4 banks)
+    Banking: via CRU write
+
+    GROM space
+    6000                       77ff
+    |==== GROM3 (Editor/Assm) ====|
+
+    ROM space
+    6000         7000        7fff
+    |             |             |
+    |======== NVRAM 0 ==========|      Bank 0       CRU>0802
+    |             |             |
+    |======== NVRAM 1 ==========|      Bank 1       CRU>0806
+    |             |             |
+    |======== NVRAM 2 ==========|      Bank 2       CRU>080a
+    |             |             |
+    |======== NVRAM 3 ==========|      Bank 3       CRU>080e
+
 ******************************************************************************/
 
 /* Read function for the super cartridge. */
@@ -1802,7 +1925,7 @@ WRITE8_MEMBER(ti99_super_cartridge::cruwrite)
 
 /*****************************************************************************
   Cartridge type: MBX
-    GROM: up to 40 KiB
+    GROM: up to 5 GROMs (sockets for a maximum of 3 GROMs, but may be stacked)
     ROM: up to 16 KiB (in up to 2 banks of 8KiB each)
     RAM: 1022 B (0x6c00-0x6ffd, overrides ROM in that area)
     ROM mapper: 6ffe
@@ -1810,6 +1933,34 @@ WRITE8_MEMBER(ti99_super_cartridge::cruwrite)
     TODO: Some MBX cartridges assume the presence of the MBX system
     (special user interface box with speech input/output)
     and will not run without it. This MBX hardware is not emulated yet.
+
+    GROM space
+    6000     77ff   8000     97ff   a000     b7ff   c000     d7ff   e000     f7ff
+    |== GROM3 ==|...|== GROM4 ==|...|== GROM5 ==|...|== GROM6 ==|...|== GROM7 ==|
+
+    ROM space
+    6000             6c00    7000                 7fff
+    |                 |       |                     |
+    |                 |       |===== ROM bank 0 ====|       6ffe = 00
+    |                 |= RAM =|                     |
+    |=== ROM bank 0 ==|       |===== ROM bank 1 ====|       6ffe = 01
+                              |                     |
+                              |===== ROM bank 3 ====|       6ffe = 02
+                              |                     |
+                              |===== ROM bank 3 ====|       6ffe = 03
+
+    The 16K ROM is composed of four 4K banks, which can be selected by writing
+    the bank number to address 6ffe. This also affects the RAM so that the
+    bank number is stored in RAM and may also be read from there.
+
+    The mapper does not decode the LSB of the address, so it changes value when
+    a write operation is done on 6FFF. Since the TI console always writes the
+    odd byte first, then the even byte, the last byte written is actually 6FFE.
+
+    ROM bank 0 (ROM area 0000-0fff) is always visible in the space 6000-6bff.
+
+    RAM is implemented by two 1024x4 RAM circuits and is not affected by banking.
+
 ******************************************************************************/
 
 /* Read function for the mbx cartridge. */
@@ -1817,18 +1968,23 @@ READ8Z_MEMBER(ti99_mbx_cartridge::readz)
 {
 	if (m_romspace_selected)
 	{
-		if ((offset & 0x1c00)==0x0c00)
+		if (m_ram_ptr != nullptr && (offset & 0x1c00)==0x0c00)
 		{
-			// This is the RAM area which overrides any ROM. There is no
-			// known banking behavior for the RAM, so we must assume that
-			// there is only one bank.
-			if (m_ram_ptr != nullptr)
-				*value = m_ram_ptr[offset & 0x03ff];
+			// Also reads the value of 6ffe
+			*value = m_ram_ptr[offset & 0x03ff];
+			if (TRACE_READ) space.device().logerror("%04x (RAM) -> %02x\n", offset + 0x6000, *value);
 		}
 		else
 		{
 			if (m_rom_ptr!=nullptr)
-				*value = m_rom_ptr[(offset & 0x1fff) | (m_rom_page<<13)];
+			{
+				if ((offset & 0x1000)==0)  // 6000 area
+					*value = m_rom_ptr[offset];
+				else  // 7000 area
+					*value = m_rom_ptr[(offset & 0x0fff) | (m_rom_page << 12)];
+
+				if (TRACE_READ) space.device().logerror("%04x(%04x) -> %02x\n", offset + 0x6000, offset | (m_rom_page<<13), *value);
+			}
 		}
 	}
 	else
@@ -1842,16 +1998,19 @@ WRITE8_MEMBER(ti99_mbx_cartridge::write)
 {
 	if (m_romspace_selected)
 	{
-		if (offset == 0x6ffe)
+		if ((offset & 0x1c00)==0x0c00)  // RAM area
 		{
-			m_rom_page = data & 1;
-			return;
-		}
+			if ((offset & 0x0ffe) == 0x0ffe)   // Mapper, backed by RAM; reacts to bots 6fff and 6ffe
+			{
+				// Valid values are 0, 1, 2, 3
+				m_rom_page = data & 3;
+				if (TRACE_WRITE) if ((offset & 1)==0) space.device().logerror("Set ROM page = %d\n", data);
+			}
 
-		if ((offset & 0x1c00)==0x0c00)
-		{
-			if (m_ram_ptr == nullptr) return;
-			m_ram_ptr[offset & 0x03ff] = data;
+			if (m_ram_ptr != nullptr)
+				m_ram_ptr[offset & 0x03ff] = data;
+			else
+				if (TRACE_ILLWRITE) space.device().logerror("Write access to %04x but no RAM present\n", offset+0x6000);
 		}
 	}
 	else
@@ -1890,6 +2049,19 @@ WRITE8_MEMBER(ti99_mbx_cartridge::write)
     >601E            0 / 0 / 0 / 0
 
     The paged379i cartrige does not have any GROMs.
+
+    ROM space
+    6000         7000        7fff
+    |             |             |
+    |========== ROM 1 ==========|      Bank 0      Write to 601e
+    |             |             |
+    |========== ROM 2 ==========|      Bank 1      Write to 601c
+    |             |             |
+    |            ...            |
+    |             |             |
+    |========== ROM 16 =========|      Bank 15     Write to 6000
+
+
 ******************************************************************************/
 
 /* Read function for the paged379i cartridge. */
@@ -1928,6 +2100,17 @@ WRITE8_MEMBER(ti99_paged379i_cartridge::write)
 
   The cartridge may also be used without GROM.
 
+    ROM space
+    6000         7000        7fff
+    |             |             |
+    |========== ROM 1 ==========|      Bank 0      Write to 6000
+    |             |             |
+    |========== ROM 2 ==========|      Bank 1      Write to 6002
+    |             |             |
+    |            ...            |
+    |             |             |
+    |========== ROM 64 =========|      Bank 63     Write to 607e
+
 ******************************************************************************/
 
 /* Read function for the paged378 cartridge. */
@@ -1953,6 +2136,19 @@ WRITE8_MEMBER(ti99_paged378_cartridge::write)
   This type is intended for high-capacity cartridges of up to 2 MiB
 
   The paged379i cartrige does not have any GROMs.
+
+    ROM space
+    6000         7000        7fff
+    |             |             |
+    |========== ROM 1 ==========|      Bank 0      Write to 6000
+    |             |             |
+    |========== ROM 2 ==========|      Bank 1      Write to 6002
+    |             |             |
+    |            ...            |
+    |             |             |
+    |========== ROM 256 ========|      Bank 255    Write to 61fe
+
+
 ******************************************************************************/
 
 /* Read function for the paged377 cartridge. */
@@ -1991,6 +2187,18 @@ WRITE8_MEMBER(ti99_paged377_cartridge::write)
     7      >8000  = 1000 0000 0000 0000
 
     No GROMs used in this type.
+
+    ROM space
+    6000         7000        7fff
+    |             |             |
+    |=========  ROM 1 ==========|      Bank 0       CRU>0802
+    |             |             |
+    |=========  ROM 2 ==========|      Bank 1       CRU>0806
+    |             |             |
+                 ...
+    |             |             |
+    |=========  ROM 8 ==========|      Bank 7       CRU>081e
+
 ******************************************************************************/
 
 /* Read function for the pagedcru cartridge. */
@@ -2062,13 +2270,29 @@ WRITE8_MEMBER(ti99_pagedcru_cartridge::cruwrite)
   Super-MiniMemory is also included here. We assume a RAM area at addresses
   7000-7fff for this cartridge.
 
+
+  GROM space
+  6000     77ff   8000     97ff   a000     b7ff   c000     d7ff   e000    ffff
+  |=========================== emulated GROM ================================|
+
+  ROM space
+  6000         7000        7fff
+  |             |             |
+  |========== ROM1 ===========|     Bank 0    write to 6000, 6004, ... 7ffc
+  |             |             |
+  |========== ROM2 ===========|     Bank 1    write to 6002, 6006, ... 7ffe
+
+
 ******************************************************************************/
 
 WRITE8_MEMBER(ti99_gromemu_cartridge::set_gromlines)
 {
-	m_grom_selected = (data != CLEAR_LINE);
-	m_grom_read_mode = ((offset & GROM_M_LINE)!=0);
-	m_grom_address_mode = ((offset & GROM_MO_LINE)!=0);
+	if (m_grom_ptr != nullptr)
+	{
+		m_grom_selected = (data != CLEAR_LINE);
+		m_grom_read_mode = ((offset & GROM_M_LINE)!=0);
+		m_grom_address_mode = ((offset & GROM_MO_LINE)!=0);
+	}
 }
 
 READ8Z_MEMBER(ti99_gromemu_cartridge::readz)

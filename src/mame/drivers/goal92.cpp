@@ -335,7 +335,7 @@ MACHINE_CONFIG_END
 
 /*
 
-Goal '92 (bootleg of Seibu Cup Soccer)
+Goal '92 (bootleg of Olympic Soccer '92 on non-Seibu board)
 
 
 PCB Layout
@@ -373,7 +373,7 @@ Z80 clock: 2.51MHz
 */
 
 ROM_START( goal92 )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code - first 0x20000 bytes are a heavily patched copy of olysoc92a */
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x80000, CRC(db0a6c7c) SHA1(b609db7806b99bc921806d8b3e5e515b4651c375) )
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x80000, CRC(e4c45dee) SHA1(542749bd1ff51220a151fe66acdadac83df8f0ee) )
 

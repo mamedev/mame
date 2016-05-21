@@ -10,6 +10,7 @@
 #ifndef NL_CONVERT_H_
 #define NL_CONVERT_H_
 
+#include <memory>
 #include "plib/pstring.h"
 #include "plib/plists.h"
 #include "plib/pparser.h"
@@ -25,12 +26,8 @@ public:
 	nl_convert_base_t() : out(m_buf) {};
 	virtual ~nl_convert_base_t()
 	{
-		for (std::size_t i = 0; i < m_nets.size(); i++)
-			pfree(m_nets.value_at(i));
 		m_nets.clear();
-		m_devs.clear_and_free();
-		for (std::size_t i = 0; i < m_pins.size(); i++)
-			pfree(m_pins.value_at(i));
+		m_devs.clear();
 		m_pins.clear();
 	}
 
@@ -129,14 +126,14 @@ private:
 
 private:
 
-	void add_device(dev_t *dev);
+	void add_device(std::shared_ptr<dev_t> dev);
 
 	postringstream m_buf;
 
-	pvector_t<dev_t *> m_devs;
-	phashmap_t<pstring, net_t *> m_nets;
+	pvector_t<std::shared_ptr<dev_t>> m_devs;
+	phashmap_t<pstring, std::shared_ptr<net_t> > m_nets;
 	pvector_t<pstring> m_ext_alias;
-	phashmap_t<pstring, pin_alias_t *> m_pins;
+	phashmap_t<pstring, std::shared_ptr<pin_alias_t>> m_pins;
 
 	static unit_t m_units[];
 

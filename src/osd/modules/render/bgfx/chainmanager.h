@@ -21,6 +21,7 @@
 #include "texturemanager.h"
 #include "targetmanager.h"
 #include "effectmanager.h"
+#include "../frontend/mame/ui/menuitem.h"
 
 class running_machine;
 class osd_window;

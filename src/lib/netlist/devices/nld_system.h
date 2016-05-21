@@ -153,13 +153,10 @@ NETLIB_DEVICE_WITH_PARAMS(analog_input,
 // nld_gnd
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(gnd) : public device_t
+NETLIB_OBJECT(gnd)
 {
 public:
-	NETLIB_NAME(gnd)(netlist_t &anetlist, const pstring &name)
-			: device_t(GND, anetlist, name) { }
-
-	virtual ~NETLIB_NAME(gnd)() {}
+	NETLIB_CONSTRUCTOR(gnd) {}
 
 protected:
 
@@ -186,13 +183,10 @@ private:
 // nld_dummy_input
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(dummy_input) : public device_t
+NETLIB_OBJECT_DERIVED(dummy_input, base_dummy)
 {
 public:
-	NETLIB_NAME(dummy_input)(netlist_t &anetlist, const pstring &name)
-			: device_t(DUMMY, anetlist, name) { }
-
-	virtual ~NETLIB_NAME(dummy_input)() {}
+	NETLIB_CONSTRUCTOR_DERIVED(dummy_input, base_dummy) { }
 
 protected:
 
@@ -218,16 +212,13 @@ private:
 // nld_frontier
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(frontier) : public device_t
+NETLIB_OBJECT_DERIVED(frontier, base_dummy)
 {
 public:
-	NETLIB_NAME(frontier)(netlist_t &anetlist, const pstring &name)
-	: device_t(DUMMY, anetlist, name),
-	  m_RIN(netlist(), "m_RIN"),
-	  m_ROUT(netlist(), "m_ROUT")
-	  { }
-
-	virtual ~NETLIB_NAME(frontier)() {}
+	NETLIB_CONSTRUCTOR_DERIVED(frontier, base_dummy)
+	, m_RIN(netlist(), "m_RIN")
+	, m_ROUT(netlist(), "m_ROUT")
+	{ }
 
 protected:
 
@@ -274,13 +265,11 @@ private:
  * FIXME: Currently a proof of concept to get congo bongo working
  * ----------------------------------------------------------------------------- */
 
-class NETLIB_NAME(function) : public device_t
+NETLIB_OBJECT(function)
 {
 public:
-	NETLIB_NAME(function)(netlist_t &anetlist, const pstring &name)
-			: device_t(anetlist, name) { }
-
-	virtual ~NETLIB_NAME(function)() {}
+	NETLIB_CONSTRUCTOR(function)
+	{ }
 
 protected:
 
@@ -319,25 +308,36 @@ private:
 // nld_res_sw
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(res_sw) : public device_t
+NETLIB_OBJECT(res_sw)
 {
 public:
-	NETLIB_NAME(res_sw)(netlist_t &anetlist, const pstring &name)
-			: device_t(anetlist, name) { }
+	NETLIB_CONSTRUCTOR(res_sw)
+	, m_R(*this, "R")
+	{
+		enregister("I", m_I);
+		register_param("RON", m_RON, 1.0);
+		register_param("ROFF", m_ROFF, 1.0E20);
 
-	virtual ~NETLIB_NAME(res_sw)() {}
+		register_subalias("1", m_R.m_P);
+		register_subalias("2", m_R.m_N);
 
+		save(NLNAME(m_last_state));
+	}
+
+	NETLIB_SUB(R) m_R;
 	param_double_t m_RON;
 	param_double_t m_ROFF;
 	logic_input_t m_I;
-	NETLIB_SUB(R) m_R;
 
 protected:
 
-	void start() override;
-	void reset() override;
-	ATTR_HOT void update() override;
-	ATTR_HOT void update_param() override;
+	NETLIB_RESETI()
+	{
+		m_last_state = 0;
+		m_R.set_R(m_ROFF.Value());
+	}
+	NETLIB_UPDATE_PARAMI();
+	NETLIB_UPDATEI();
 
 private:
 	UINT8 m_last_state;
@@ -347,7 +347,7 @@ private:
 // nld_base_proxy
 // -----------------------------------------------------------------------------
 
-class nld_base_proxy : public device_t
+NETLIB_OBJECT(base_proxy)
 {
 public:
 	nld_base_proxy(netlist_t &anetlist, const pstring &name, logic_t *inout_proxied, core_terminal_t *proxy_inout)
@@ -380,7 +380,7 @@ private:
 // nld_a_to_d_proxy
 // -----------------------------------------------------------------------------
 
-class nld_a_to_d_proxy : public nld_base_proxy
+NETLIB_OBJECT_DERIVED(a_to_d_proxy, base_proxy)
 {
 public:
 	nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied)
@@ -422,7 +422,7 @@ private:
 // nld_base_d_to_a_proxy
 // -----------------------------------------------------------------------------
 
-class nld_base_d_to_a_proxy : public nld_base_proxy
+NETLIB_OBJECT_DERIVED(base_d_to_a_proxy, base_proxy)
 {
 public:
 	virtual ~nld_base_d_to_a_proxy() {}
@@ -445,12 +445,12 @@ protected:
 private:
 };
 
-class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
+NETLIB_OBJECT_DERIVED(d_to_a_proxy, base_d_to_a_proxy)
 {
 public:
 	nld_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(anetlist, name, out_proxied, m_RV.m_P)
-	, m_RV(TWOTERM, anetlist,"RV")
+	, m_RV(anetlist, "RV")
 	, m_last_state(-1)
 	, m_is_timestep(false)
 	{

@@ -9,6 +9,7 @@
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
 class mitchell_state : public driver_device
@@ -16,16 +17,17 @@ class mitchell_state : public driver_device
 public:
 	mitchell_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_oki(*this, "oki") ,
-			m_nvram(*this, "nvram"),
-		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki") ,
+		m_nvram(*this, "nvram"),
 		m_eeprom(*this, "eeprom"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
 		m_bank1(*this, "bank1"),
 		m_bank0d(*this, "bank0d"),
 		m_bank1d(*this, "bank1d") { }
@@ -35,14 +37,15 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
 	optional_device<nvram_device> m_nvram;
-	/* memory pointers */
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
+	/* memory pointers */
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;

@@ -107,7 +107,7 @@ Notes:
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midwunit_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_READWRITE(midtunit_vram_r, midtunit_vram_w)
-	AM_RANGE(0x01000000, 0x013fffff) AM_RAM
+	AM_RANGE(0x01000000, 0x013fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x01400000, 0x0145ffff) AM_READWRITE(midwunit_cmos_r, midwunit_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x01480000, 0x014fffff) AM_WRITE(midwunit_cmos_enable_w)
 	AM_RANGE(0x01600000, 0x0160001f) AM_READWRITE(midwunit_security_r, midwunit_security_w)

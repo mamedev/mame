@@ -2109,7 +2109,7 @@ void gba_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x08000000, 0x09ffffff, 0, 0, "rom1");
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0a000000, 0x0bffffff, 0, 0, "rom2");
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0c000000, 0x0cffffff, 0, 0, "rom3");
-
+		
 		std::string region_tag;
 		memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GBASLOT_ROM_REGION_TAG).c_str());
 
@@ -2118,6 +2118,7 @@ void gba_state::machine_start()
 		membank("rom2")->set_base(cart_rom->base());
 		membank("rom3")->set_base(cart_rom->base());
 
+		
 		// add nvram to save state
 		m_cart->save_nvram();
 
@@ -2144,6 +2145,13 @@ void gba_state::machine_start()
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe01ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe01ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
 		}
+		if (m_cart->get_type() == GBA_3DMATRIX)
+		{
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x08800000, 0x088001ff, write32_delegate(FUNC(gba_cart_slot_device::write_mapper),(gba_cart_slot_device*)m_cart));
+			memory_region *cart_romhlp = memregion(region_tag.assign(m_cart->tag()).append(GBAHELP_ROM_REGION_TAG).c_str());
+			membank("rom1")->set_base(cart_romhlp->base());
+		}
+		
 	}
 
 	save_item(NAME(m_DISPSTAT));
@@ -2245,6 +2253,7 @@ static SLOT_INTERFACE_START(gba_cart)
 	SLOT_INTERFACE_INTERNAL("gba_flash",       GBA_ROM_FLASH)   // Panasonic
 	SLOT_INTERFACE_INTERNAL("gba_flash_512",   GBA_ROM_FLASH)   // Panasonic
 	SLOT_INTERFACE_INTERNAL("gba_flash_1m",    GBA_ROM_FLASH1M) // Sanyo
+	SLOT_INTERFACE_INTERNAL("gba_3dmatrix",    GBA_ROM_3DMATRIX)
 SLOT_INTERFACE_END
 
 

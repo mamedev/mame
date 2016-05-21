@@ -21,6 +21,9 @@
       http://wwwhomes.uni-bielefeld.de/achim/pc-e220.html
       http://www.akiyan.com/pc-g850_technical_data (in Japanese)
 
+    PC-G815 added 2016-05-14, not working at all. Needs new IO map.
+    Looks like base.rom runs first, then rom00 is at 0x8000 and rom01 is at 0xc000.
+
 ****************************************************************************/
 
 
@@ -956,6 +959,42 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( pcg815, pcg850v_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz ) // 3.54MHz
+	MCFG_CPU_PROGRAM_MAP(pce220_mem)
+	MCFG_CPU_IO_MAP(pcg850v_io)
+
+	/* video hardware */
+	// 4 lines x 24 characters, resp. 144 x 32 pixel
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(pcg850v_state, screen_update)
+	MCFG_SCREEN_SIZE(144, 32)
+	MCFG_SCREEN_VISIBLE_AREA(0, 144-1, 0, 32-1)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+
+	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz ) // CMOS-SC7852
@@ -1013,6 +1052,25 @@ ROM_START( pce220 )
 	ROM_REGION( 0x200, "lcd_vram", ROMREGION_ERASE00)   //HD61202 internal RAM (4096 bits)
 ROM_END
 
+ROM_START( pcg815 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x58000, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD( "rom00.bin",    0x000000, 0x004000, CRC(43767d51) SHA1(0d8b8b88a5d084f750daffc0abbb6b868fd3f144) )
+	ROM_LOAD( "rom01.bin",    0x004000, 0x004000, CRC(b0e32ace) SHA1(e84c84c18c09dd2920fa38e77d8049b980692d29) )
+	ROM_LOAD( "rom02.bin",    0x008000, 0x004000, CRC(f5cb78ba) SHA1(dfb2e415a5603a820b960d810995dd1109d84547) )
+	ROM_LOAD( "rom03.bin",    0x00c000, 0x004000, CRC(5eff142b) SHA1(71d8d0a1bd0bcdef43f951036d9e1da0377d6a33) )
+	ROM_LOAD( "rom04.bin",    0x010000, 0x004000, CRC(cb91bab5) SHA1(5b354ba6fc48043f03b573ad470518e9bb48cf99) )
+	ROM_LOAD( "rom05.bin",    0x014000, 0x004000, CRC(ccaa1876) SHA1(404bf36c3832ee1a4602fa6a917d1ef2db5411c1) )
+	ROM_LOAD( "rom06.bin",    0x018000, 0x004000, CRC(9d80802f) SHA1(aec989b8763d1346313a13c761ed0306b4f84257) )
+	ROM_LOAD( "rom07.bin",    0x01c000, 0x004000, CRC(618a7be8) SHA1(5f16e47eeeb9c153bb95c6d6e3af276576b8274e) )
+	ROM_LOAD( "rom08.bin",    0x020000, 0x004000, CRC(d8ba21a9) SHA1(a5580f22864afee8d4a8f1ecf6231acbde16b612) )
+	ROM_LOAD( "rom09.bin",    0x024000, 0x004000, CRC(f6f49677) SHA1(e0d70a11b7dd21662cb444ac93d4b43f584909b5) )
+	ROM_LOAD( "rom0a.bin",    0x028000, 0x004000, CRC(ecbabb64) SHA1(14beef60dfd1f18375459e9acb9527589e09e3ce) )
+	ROM_LOAD( "base.bin",     0x02c000, 0x000040, CRC(1a8b2044) SHA1(8576c69532d138eb78ff7a59f668a1a62a670447) )
+
+	ROM_REGION( 0x1000, "lcd_vram", ROMREGION_ERASE00)
+ROM_END
+
 ROM_START( pcg850v )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_REGION( 0x58000, "user1", ROMREGION_ERASEFF )
@@ -1044,6 +1102,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1991, pce220,  0,       0,    pce220,     pce220, driver_device,  0,   "Sharp",   "PC-E220",      MACHINE_NOT_WORKING )
-COMP( 2001, pcg850v, 0,       0,    pcg850v,    pcg850v, driver_device, 0,   "Sharp",   "PC-G850V", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT COMPANY      FULLNAME       FLAGS */
+COMP( 1991, pce220,  0,       0,    pce220,     pce220,  driver_device,  0,   "Sharp",   "PC-E220",      MACHINE_NOT_WORKING )
+COMP( 1992, pcg815,  0,       0,    pcg815,     pcg850v, driver_device,  0,   "Sharp",   "PC-G815",      MACHINE_NOT_WORKING )
+COMP( 2001, pcg850v, 0,       0,    pcg850v,    pcg850v, driver_device,  0,   "Sharp",   "PC-G850V",     MACHINE_NOT_WORKING )

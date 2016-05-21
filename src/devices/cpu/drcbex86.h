@@ -180,6 +180,7 @@ private:
 	void op_or(x86code *&dst, const uml::instruction &inst);
 	void op_xor(x86code *&dst, const uml::instruction &inst);
 	void op_lzcnt(x86code *&dst, const uml::instruction &inst);
+	void op_tzcnt(x86code *&dst, const uml::instruction &inst);
 	void op_bswap(x86code *&dst, const uml::instruction &inst);
 	void op_shl(x86code *&dst, const uml::instruction &inst);
 	void op_shr(x86code *&dst, const uml::instruction &inst);

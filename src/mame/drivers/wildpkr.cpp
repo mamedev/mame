@@ -384,7 +384,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(wildpkr_state,wildpkr)
 {
-	//HD63484_start(machine());
 }
 
 

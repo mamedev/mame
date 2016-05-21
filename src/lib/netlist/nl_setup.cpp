@@ -18,6 +18,7 @@
 #include "devices/net_lib.h"
 #include "devices/nld_system.h"
 #include "analog/nld_twoterm.h"
+#include "solver/nld_solver.h"
 
 static NETLIST_START(base)
 	TTL_INPUT(ttlhigh, 1)
@@ -99,7 +100,7 @@ void setup_t::namespace_pop()
 }
 
 
-void setup_t::register_dev(device_t *dev)
+void setup_t::register_dev(std::shared_ptr<device_t> dev)
 {
 	for (auto & d : netlist().m_devices)
 		if (d->name() == dev->name())
@@ -126,17 +127,10 @@ void setup_t::register_dev(const pstring &classname, const pstring &name)
 	}
 	else
 	{
-#if 0
-		device_t *dev = factory().new_device_by_name(classname, netlist(), build_fqn(name));
-		if (dev == nullptr)
-			log().fatal("Class {1} not found!\n", classname);
-		register_dev(dev);
-#else
 		auto f = factory().factory_by_name(classname);
 		if (f == nullptr)
 			log().fatal("Class {1} not found!\n", classname);
 		m_device_factory.push_back(std::pair<pstring, base_factory_t *>(build_fqn(name), f));
-#endif
 	}
 }
 
@@ -222,22 +216,22 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 		case terminal_t::OUTPUT:
 			{
 				core_terminal_t &term = dynamic_cast<core_terminal_t &>(obj);
-				if (obj.isType(terminal_t::OUTPUT))
+				if (term.isType(terminal_t::OUTPUT))
 				{
-					if (obj.isFamily(terminal_t::LOGIC))
+					if (term.is_logic())
 					{
 						logic_output_t &port = dynamic_cast<logic_output_t &>(term);
 						port.set_logic_family(dev.logic_family());
 						dynamic_cast<logic_output_t &>(term).init_object(dev, dev.name() + "." + name);
 					}
-					else if (obj.isFamily(terminal_t::ANALOG))
+					else if (term.is_analog())
 						dynamic_cast<analog_output_t &>(term).init_object(dev, dev.name() + "." + name);
 					else
 						log().fatal("Error adding {1} {2} to terminal list, neither LOGIC nor ANALOG\n", objtype_as_astr(term), term.name());
 				}
-				else if (obj.isType(terminal_t::INPUT))
+				else if (term.isType(terminal_t::INPUT))
 				{
-					if (obj.isFamily(terminal_t::LOGIC))
+					if (term.is_logic())
 					{
 						logic_input_t &port = dynamic_cast<logic_input_t &>(term);
 						port.set_logic_family(dev.logic_family());
@@ -494,7 +488,7 @@ param_t *setup_t::find_param(const pstring &param_in, bool required)
 // FIXME avoid dynamic cast here
 devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 {
-	nl_assert(out.isFamily(terminal_t::LOGIC));
+	nl_assert(out.is_logic());
 
 	logic_output_t &out_cast = dynamic_cast<logic_output_t &>(out);
 	devices::nld_base_proxy *proxy = out_cast.get_proxy();
@@ -503,11 +497,11 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 	{
 		// create a new one ...
 		pstring x = pfmt("proxy_da_{1}_{2}")(out.name())(m_proxy_cnt);
-		devices::nld_base_d_to_a_proxy *new_proxy =
+		auto new_proxy =
 				out_cast.logic_family()->create_d_a_proxy(netlist(), x, &out_cast);
 		m_proxy_cnt++;
 
-		register_dev(new_proxy);
+		register_dev_s(new_proxy);
 		new_proxy->start_dev();
 
 		/* connect all existing terminals to new net */
@@ -521,30 +515,30 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 		out.net().m_core_terms.clear(); // clear the list
 
 		out.net().register_con(new_proxy->in());
-		out_cast.set_proxy(new_proxy);
-		proxy = new_proxy;
+		out_cast.set_proxy(new_proxy.get());
+		proxy = new_proxy.get();
 	}
 	return proxy;
 }
 
 void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
 {
-	if (out.isFamily(terminal_t::ANALOG) && in.isFamily(terminal_t::LOGIC))
+	if (out.is_analog() && in.is_logic())
 	{
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(in);
 		pstring x = pfmt("proxy_ad_{1}_{2}")(in.name())( m_proxy_cnt);
-		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy(netlist(), x, &incast));
-		incast.set_proxy(proxy);
+		auto proxy = std::make_shared<devices::nld_a_to_d_proxy>(netlist(), x, &incast);
+		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
 
-		register_dev(proxy);
+		register_dev_s(proxy);
 		proxy->start_dev();
 
 		proxy->m_Q.net().register_con(in);
 		out.net().register_con(proxy->m_I);
 
 	}
-	else if (out.isFamily(terminal_t::LOGIC) && in.isFamily(terminal_t::ANALOG))
+	else if (out.is_logic() && in.is_analog())
 	{
 		devices::nld_base_proxy *proxy = get_d_a_proxy(out);
 
@@ -563,20 +557,20 @@ void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
 
 void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 {
-	if (inp.isFamily(terminal_t::ANALOG))
+	if (inp.is_analog())
 	{
 		connect_terminals(inp, term);
 	}
-	else if (inp.isFamily(terminal_t::LOGIC))
+	else if (inp.is_logic())
 	{
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
 		log().debug("connect_terminal_input: connecting proxy\n");
 		pstring x = pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
-		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy(netlist(), x, &incast));
-		incast.set_proxy(proxy);
+		auto proxy = std::make_shared<devices::nld_a_to_d_proxy>(netlist(), x, &incast);
+		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
 
-		register_dev(proxy);
+		register_dev_s(proxy);
 		proxy->start_dev();
 
 		connect_terminals(term, proxy->m_I);
@@ -595,7 +589,7 @@ void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 
 void setup_t::connect_terminal_output(terminal_t &in, core_terminal_t &out)
 {
-	if (out.isFamily(terminal_t::ANALOG))
+	if (out.is_analog())
 	{
 		log().debug("connect_terminal_output: {1} {2}\n", in.name(), out.name());
 		/* no proxy needed, just merge existing terminal net */
@@ -604,7 +598,7 @@ void setup_t::connect_terminal_output(terminal_t &in, core_terminal_t &out)
 		else
 			out.net().register_con(in);
 	}
-	else if (out.isFamily(terminal_t::LOGIC))
+	else if (out.is_logic())
 	{
 		log().debug("connect_terminal_output: connecting proxy\n");
 		devices::nld_base_proxy *proxy = get_d_a_proxy(out);
@@ -647,7 +641,7 @@ void setup_t::connect_terminals(core_terminal_t &t1, core_terminal_t &t2)
 
 static core_terminal_t &resolve_proxy(core_terminal_t &term)
 {
-	if (term.isFamily(core_terminal_t::LOGIC))
+	if (term.is_logic())
 	{
 		logic_t &out = dynamic_cast<logic_t &>(term);
 		if (out.has_proxy())
@@ -820,7 +814,7 @@ void setup_t::resolve_inputs()
 	// FIXME: doesn't find internal devices. This needs to be more clever
 	for (std::size_t i=0; i < netlist().m_devices.size(); i++)
 	{
-		devices::NETLIB_NAME(twoterm) *t = dynamic_cast<devices::NETLIB_NAME(twoterm) *>(netlist().m_devices[i]);
+		devices::NETLIB_NAME(twoterm) *t = dynamic_cast<devices::NETLIB_NAME(twoterm) *>(netlist().m_devices[i].get());
 		if (t != nullptr)
 		{
 			has_twoterms = true;
@@ -853,20 +847,13 @@ void setup_t::start_devices()
 		for (pstring ll : loglist)
 		{
 			pstring name = "log_" + ll;
-			device_t *nc = factory().new_device_by_name("LOG", netlist(), name);
-			register_dev(nc);
+			auto nc = factory().new_device_by_name("LOG", netlist(), name);
+			register_dev_s(nc);
 			register_link(name + ".I", ll);
 			log().debug("    dynamic link {1}: <{2}>\n",ll, name);
 		}
 	}
 
-	/* create devices */
-
-	for (auto & e : m_device_factory)
-	{
-		device_t *dev = e.second->Create(netlist(), e.first);
-		register_dev(dev);
-	}
 
 	netlist().start();
 }
@@ -879,10 +866,10 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 {
 public:
 	logic_family_std_proxy_t() { }
-	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_t &anetlist,
+	virtual std::shared_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
 			const pstring &name, logic_output_t *proxied) const override
 	{
-		return palloc(devices::nld_d_to_a_proxy(anetlist, name, proxied));
+		return std::make_shared<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 };
 

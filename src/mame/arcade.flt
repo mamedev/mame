@@ -687,6 +687,7 @@ meritm.cpp
 mermaid.cpp
 metalmx.cpp
 metlclsh.cpp
+metlfrzr.cpp
 metro.cpp
 mexico86.cpp
 meyc8080.cpp
@@ -1069,6 +1070,7 @@ sprint2.cpp
 sprint4.cpp
 sprint8.cpp
 spy.cpp
+spyhuntertec.cpp
 srmp2.cpp
 srmp5.cpp
 srmp6.cpp
@@ -1335,11 +1337,13 @@ zr107.cpp
 //jaguar.cpp
 -jaguar
 -jaguarcd
-//vectrex.cpp
--vectrex
+//neogeo.cpp
+-aes
 //saturn.cpp
 -saturn
 -saturnjp
 -saturneu
 -vsaturn
 -hisaturn
+//vectrex.cpp
+-vectrex

@@ -12,8 +12,6 @@
 #ifndef __UIINPUT_H__
 #define __UIINPUT_H__
 
-#include "render.h"
-
 
 /***************************************************************************
     CONSTANTS
@@ -24,6 +22,8 @@
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+class render_target;
 
 enum ui_event_type
 {
@@ -71,7 +71,8 @@ public:
 	void reset();
 
 	/* retrieves the current location of the mouse */
-	render_target *find_mouse(INT32 *x, INT32 *y, bool *button);
+	render_target *find_mouse(INT32 *x, INT32 *y, bool *button) const;
+	ioport_field *find_mouse_field() const;
 
 	/* return TRUE if a key down for the given user interface sequence is detected */
 	bool pressed(int code);
@@ -110,6 +111,7 @@ private:
 	INT32                       m_current_mouse_x;
 	INT32                       m_current_mouse_y;
 	bool                        m_current_mouse_down;
+	ioport_field *              m_current_mouse_field;
 
 	/* popped states; ring buffer of ui_events */
 	ui_event                    m_events[EVENT_QUEUE_SIZE];

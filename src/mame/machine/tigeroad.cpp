@@ -113,7 +113,7 @@ void tigeroad_state::f1dream_protection_w(address_space &space)
 	else if ((prevpc == 0x27f8) || (prevpc == 0x511a) || (prevpc == 0x5142) || (prevpc == 0x516a))
 	{
 		/* The main CPU stuffs the byte for the soundlatch into 0xfffffd.*/
-		soundlatch_byte_w(space,2,m_ram16[0x3ffc/2]);
+		m_soundlatch->write(space,2,m_ram16[0x3ffc/2]);
 	}
 }
 

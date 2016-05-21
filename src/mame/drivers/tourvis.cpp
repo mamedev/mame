@@ -31,7 +31,7 @@
     Columns (90)
     Coryoon (43)
   * Cross Wiber
-  * Cyber Core
+    Cyber Core (13)
     Daisempuu (3)
     Dead Moon (?)
     Devil Crash (47)
@@ -39,7 +39,7 @@
     Dodge Ball (194)
     Doraemon Meikyuu Daisakusen (20)
   * Doraemon II
-  * Down Load
+    Down Load (43)
     Dragon Saber (65)
     Dragon Spirit (?)
     Dungeon Explorer (?)
@@ -99,7 +99,7 @@
   * TV Sports
     USA Pro Basketball (?)
     Veigues (40)
-  * Vigilante
+    Vigilante (8)
     Volfied (68)
     W-Ring (21)
     Winning Shot (28)

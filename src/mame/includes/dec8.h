@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "video/bufsprite.h"
 #include "video/decbac06.h"
@@ -26,10 +27,11 @@ public:
 		m_tilegen2(*this, "tilegen2"),
 		m_spritegen_krn(*this, "spritegen_krn"),
 		m_spritegen_mxc(*this, "spritegen_mxc"),
-		m_videoram(*this, "videoram"),
-		m_bg_data(*this, "bg_data"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_videoram(*this, "videoram"),
+		m_bg_data(*this, "bg_data") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -42,13 +44,13 @@ public:
 	optional_device<deco_bac06_device> m_tilegen2;
 	optional_device<deco_karnovsprites_device> m_spritegen_krn;
 	optional_device<deco_mxc06_device> m_spritegen_mxc;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_bg_data;
-
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	UINT8 *  m_pf1_data;
 	UINT8 *  m_row;

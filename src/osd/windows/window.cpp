@@ -22,6 +22,7 @@
 // MAME headers
 #include "emu.h"
 #include "uiinput.h"
+#include "ui/uimain.h"
 
 // MAMEOS headers
 #include "winmain.h"

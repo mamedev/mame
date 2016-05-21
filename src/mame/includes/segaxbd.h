@@ -106,6 +106,7 @@ protected:
 	required_device<sega_xboard_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
+	required_shared_ptr<UINT16> m_subram0;
 
 	// configuration
 	bool            m_adc_reverse[8];

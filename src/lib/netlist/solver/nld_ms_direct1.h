@@ -36,7 +36,7 @@ inline int matrix_solver_direct1_t::vsolve_non_dynamic(ATTR_UNUSED const bool ne
 
 	nl_double new_val[1] = { RHS(0) / A(0,0) };
 
-	if (is_dynamic())
+	if (has_dynamic_devices())
 	{
 		nl_double err = this->delta(new_val);
 		store(new_val);

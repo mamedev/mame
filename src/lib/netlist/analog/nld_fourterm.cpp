@@ -15,12 +15,6 @@ NETLIB_NAMESPACE_DEVICES_START()
 // nld_VCCS
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(VCCS)
-{
-	start_internal(NL_FCONST(1.0) / netlist().gmin());
-	m_gfac = NL_FCONST(1.0);
-}
-
 void NETLIB_NAME(VCCS)::start_internal(const nl_double def_RI)
 {
 	register_param("G", m_G, 1.0);
@@ -60,11 +54,6 @@ NETLIB_RESET(VCCS)
 
 	m_ON.set(-m_mult, NL_FCONST(0.0));
 	m_ON1.set(m_mult, NL_FCONST(0.0));
-}
-
-NETLIB_UPDATE_PARAM(VCCS)
-{
-	NETLIB_NAME(VCCS)::reset();
 }
 
 NETLIB_UPDATE(VCCS)

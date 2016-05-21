@@ -12,6 +12,7 @@
 #include "ui/ui.h"
 #include "ui/submenu.h"
 #include "ui/utils.h"
+#include "ui/menuitem.h"
 #include <limits>
 
 //-------------------------------------------------

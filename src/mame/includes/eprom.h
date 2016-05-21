@@ -28,7 +28,7 @@ public:
 	required_device<atari_jsa_base_device> m_jsa;
 	int             m_screen_intensity;
 	int             m_video_disable;
-	UINT16 *        m_sync_data;
+	UINT16          m_sync_data;
 	int         m_last_offset;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;

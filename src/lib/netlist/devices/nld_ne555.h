@@ -27,7 +27,38 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_DEVICE(NE555,
+NETLIB_OBJECT(NE555)
+{
+	NETLIB_CONSTRUCTOR(NE555)
+	, m_R1(*this, "R1")
+	, m_R2(*this, "R2")
+	, m_R3(*this, "R3")
+	, m_RDIS(*this, "RDIS")
+	, m_last_out(false)
+	, m_ff(false)
+	{
+
+		register_subalias("GND",  m_R3.m_N);    // Pin 1
+		enregister("TRIG",    m_TRIG);      // Pin 2
+		enregister("OUT",    m_OUT);       // Pin 3
+		enregister("RESET",   m_RESET);     // Pin 4
+		register_subalias("CONT", m_R1.m_N);    // Pin 5
+		enregister("THRESH",  m_THRES);     // Pin 6
+		register_subalias("DISCH", m_RDIS.m_P); // Pin 7
+		register_subalias("VCC",  m_R1.m_P);    // Pin 8
+
+		connect_late(m_R1.m_N, m_R2.m_P);
+		connect_late(m_R2.m_N, m_R3.m_P);
+		connect_late(m_RDIS.m_N, m_R3.m_N);
+
+		save(NLNAME(m_last_out));
+		save(NLNAME(m_ff));
+	}
+
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
+
+protected:
 	NETLIB_SUB(R) m_R1;
 	NETLIB_SUB(R) m_R2;
 	NETLIB_SUB(R) m_R3;
@@ -38,12 +69,13 @@ NETLIB_DEVICE(NE555,
 	analog_input_t m_TRIG;
 	analog_output_t m_OUT;
 
+private:
 	bool m_last_out;
 	bool m_ff;
 
 	inline nl_double clamp(const nl_double v, const nl_double a, const nl_double b);
 
-);
+};
 
 #define NE555_DIP(_name)                                                         \
 		NET_REGISTER_DEV(NE555_DIP, _name)

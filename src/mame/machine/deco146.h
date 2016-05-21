@@ -4,6 +4,8 @@
 #ifndef __DECO146_H__
 #define __DECO146_H__
 
+#include "machine/gen_latch.h"
+
 typedef device_delegate<UINT16 (int unused)> deco146_port_read_cb;
 typedef device_delegate<void (address_space &space, UINT16 data, UINT16 mem_mask)> deco146_port_write_cb;
 
@@ -156,6 +158,7 @@ protected:
 	int m_latchflag;
 private:
 	UINT8 region_selects[6];
+	optional_device<generic_latch_8_device> m_sound_latch;
 
 };
 

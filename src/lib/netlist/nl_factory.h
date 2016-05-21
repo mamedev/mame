@@ -9,6 +9,8 @@
 #ifndef NLFACTORY_H_
 #define NLFACTORY_H_
 
+#include <type_traits>
+
 #include "nl_config.h"
 #include "plib/palloc.h"
 #include "plib/plists.h"
@@ -59,6 +61,7 @@ namespace netlist
 			device_t *r = palloc(_device_class(anetlist, name));
 			return r;
 		}
+
 	};
 
 	class factory_list_t : public phashmap_t<pstring, base_factory_t *>
@@ -83,8 +86,14 @@ namespace netlist
 
 		//ATTR_COLD device_t *new_device_by_classname(const pstring &classname) const;
 		// FIXME: legacy, should use factory_by_name
-		device_t *new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name);
+		std::shared_ptr<device_t> new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name);
 		base_factory_t * factory_by_name(const pstring &devname);
+
+		template <class _class>
+		bool is_class(base_factory_t *f)
+		{
+			return dynamic_cast<factory_t<_class> *>(f) != nullptr;
+		}
 
 	private:
 		void error(const pstring &s);

@@ -51,7 +51,7 @@ WRITE8_MEMBER(shootout_state::bankswitch_w)
 
 WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 {
-	soundlatch_byte_w( space, offset, data );
+	m_soundlatch->write( space, offset, data );
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
@@ -102,7 +102,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shootout_sound_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // unknown, NOT irq/nmi mask
 ADDRESS_MAP_END
@@ -258,6 +258,8 @@ static MACHINE_CONFIG_START( shootout, shootout_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -285,6 +287,8 @@ static MACHINE_CONFIG_START( shootouj, shootout_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))

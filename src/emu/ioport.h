@@ -1117,6 +1117,7 @@ public:
 	ioport_condition &condition() { return m_condition; }
 	ioport_type type() const { return m_type; }
 	UINT8 player() const { return m_player; }
+	bool digital_value() const { return m_digital_value; }
 	void set_value(ioport_value value);
 
 	bool unused() const { return ((m_flags & FIELD_FLAG_UNUSED) != 0); }
@@ -1171,7 +1172,7 @@ public:
 	void select_next_setting();
 	void crosshair_position(float &x, float &y, bool &gotx, bool &goty);
 	void init_live_state(analog_field *analog);
-	void frame_update(ioport_value &result, bool mouse_down);
+	void frame_update(ioport_value &result);
 	void reduce_mask(ioport_value bits_to_remove) { m_mask &= ~bits_to_remove; }
 
 	// user-controllable settings for a field
@@ -1308,8 +1309,9 @@ public:
 	// other operations
 	ioport_field *field(ioport_value mask) const;
 	void collapse_fields(std::string &errorbuf);
-	void frame_update(ioport_field *mouse_field);
+	void frame_update();
 	void init_live_state();
+	void update_defvalue(bool flush_defaults);
 
 private:
 	void insert_field(ioport_field &newfield, ioport_value &disallowedbits, std::string &errorbuf);
@@ -1516,7 +1518,6 @@ private:
 	ioport_port *port(const char *tag) const { return m_portlist.find(tag); }
 	void exit();
 	input_seq_type token_to_seq_type(const char *string);
-	void update_defaults();
 
 	void load_config(config_type cfg_type, xml_data_node *parentnode);
 	void load_remap_table(xml_data_node *parentnode);

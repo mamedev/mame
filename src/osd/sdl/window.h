@@ -25,6 +25,8 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+class render_target;
+
 // forward of SDL_DisplayMode not possible (typedef struct) - define wrapper
 
 class SDL_DM_Wrapper;

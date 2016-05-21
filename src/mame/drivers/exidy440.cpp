@@ -429,7 +429,7 @@ READ8_MEMBER(exidy440_state::topsecex_input_port_5_r)
 
 WRITE8_MEMBER(exidy440_state::topsecex_yscroll_w)
 {
-	*m_topsecex_yscroll = data;
+	m_topsecex_yscroll = data;
 }
 
 
@@ -2014,7 +2014,7 @@ DRIVER_INIT_MEMBER(exidy440_state,topsecex)
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2ec6, 0x2ec6, "AN0");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2ec7, 0x2ec7, "IN4");
 
-	m_topsecex_yscroll = m_maincpu->space(AS_PROGRAM).install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(exidy440_state::topsecex_yscroll_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(exidy440_state::topsecex_yscroll_w),this));
 }
 
 

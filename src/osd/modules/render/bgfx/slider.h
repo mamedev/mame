@@ -17,7 +17,7 @@
 #include <vector>
 
 #include "emu.h"
-#include "ui/uimain.h"
+#include "../frontend/mame/ui/slider.h"
 
 class bgfx_slider
 {

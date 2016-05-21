@@ -686,8 +686,8 @@ static ADDRESS_MAP_START( realpunc_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x18c000, 0x18c001) AM_WRITE(realpunc_output_w)
 	TC0180VCU_MEMRW( 0x200000 )
 	AM_RANGE(0x280000, 0x281fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE("hd63484", h63484_device, status_r, address_w)
-	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE("hd63484", h63484_device, data_r, data_w)
+	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
+	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 //  AM_RANGE(0x320000, 0x320001) AM_NOP // ?
 	AM_RANGE(0x320002, 0x320003) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_comm_w, 0xff00)
 ADDRESS_MAP_END
@@ -2912,8 +2912,8 @@ static MACHINE_CONFIG_START( realpunc, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,realpunc)
 
-	MCFG_H63484_ADD("hd63484", 0, realpunc_hd63484_map)
-	MCFG_H63484_AUTO_CONFIGURE_SCREEN(false)
+	MCFG_HD63484_ADD("hd63484", 0, realpunc_hd63484_map)
+	MCFG_HD63484_AUTO_CONFIGURE_SCREEN(false)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)

@@ -31,10 +31,10 @@ NETLIB_START(74123)
 
 	enregister("_CV", m_CV); // internal
 
-	register_subalias("GND", m_RN->m_R->m_N);
-	register_subalias("VCC", m_RP->m_R->m_P);
-	register_subalias("C",   m_RN->m_R->m_N);
-	register_subalias("RC",  m_RN->m_R->m_P);
+	register_subalias("GND", m_RN->m_R.m_N);
+	register_subalias("VCC", m_RP->m_R.m_P);
+	register_subalias("C",   m_RN->m_R.m_N);
+	register_subalias("RC",  m_RN->m_R.m_P);
 
 	if (m_dev_type == 4538)
 		register_param("K", m_K, 0.4);
@@ -46,8 +46,8 @@ NETLIB_START(74123)
 	connect_late(m_RP_Q, m_RP->m_I);
 	connect_late(m_RN_Q, m_RN->m_I);
 
-	connect_late(m_RN->m_R->m_P, m_RP->m_R->m_N);
-	connect_late(m_CV, m_RN->m_R->m_P);
+	connect_late(m_RN->m_R.m_P, m_RP->m_R.m_N);
+	connect_late(m_CV, m_RN->m_R.m_P);
 
 	save(NLNAME(m_last_trig));
 	save(NLNAME(m_state));
@@ -107,7 +107,7 @@ NETLIB_UPDATE(74123)
 
 	if (m_state == 1)
 	{
-		const nl_double vLow = m_KP * TERMANALOG(m_RP->m_R->m_P);
+		const nl_double vLow = m_KP * TERMANALOG(m_RP->m_R.m_P);
 		if (INPANALOG(m_CV) < vLow)
 		{
 			OUTLOGIC(m_RN_Q, 0, NLTIME_FROM_NS(10)); // R_OFF
@@ -116,7 +116,7 @@ NETLIB_UPDATE(74123)
 	}
 	if (m_state == 2)
 	{
-		const nl_double vHigh = TERMANALOG(m_RP->m_R->m_P) * (1.0 - m_KP);
+		const nl_double vHigh = TERMANALOG(m_RP->m_R.m_P) * (1.0 - m_KP);
 		if (INPANALOG(m_CV) > vHigh)
 		{
 			OUTLOGIC(m_RP_Q, 0, NLTIME_FROM_NS(10)); // R_OFF
@@ -152,20 +152,20 @@ NETLIB_START(74123_dip)
 	register_subalias("3", m_1->m_CLRQ);
 	register_subalias("4", m_1->m_QQ);
 	register_subalias("5", m_2->m_Q);
-	register_subalias("6", m_2->m_RN->m_R->m_N);
-	register_subalias("7", m_2->m_RN->m_R->m_P);
-	register_subalias("8", m_1->m_RN->m_R->m_N);
-	connect_late(m_1->m_RN->m_R->m_N, m_2->m_RN->m_R->m_N);
+	register_subalias("6", m_2->m_RN->m_R.m_N);
+	register_subalias("7", m_2->m_RN->m_R.m_P);
+	register_subalias("8", m_1->m_RN->m_R.m_N);
+	connect_late(m_1->m_RN->m_R.m_N, m_2->m_RN->m_R.m_N);
 
 	register_subalias("9", m_2->m_A);
 	register_subalias("10", m_2->m_B);
 	register_subalias("11", m_2->m_CLRQ);
 	register_subalias("12", m_2->m_QQ);
 	register_subalias("13", m_1->m_Q);
-	register_subalias("14", m_1->m_RN->m_R->m_N);
-	register_subalias("15", m_1->m_RN->m_R->m_P);
-	register_subalias("16", m_1->m_RP->m_R->m_P);
-	connect_late(m_1->m_RP->m_R->m_P, m_2->m_RP->m_R->m_P);
+	register_subalias("14", m_1->m_RN->m_R.m_N);
+	register_subalias("15", m_1->m_RN->m_R.m_P);
+	register_subalias("16", m_1->m_RP->m_R.m_P);
+	connect_late(m_1->m_RP->m_R.m_P, m_2->m_RP->m_R.m_P);
 }
 
 NETLIB_UPDATE(74123_dip)
@@ -190,25 +190,25 @@ NETLIB_START(9602_dip)
 	m_1->m_dev_type = 9602;
 	m_2->m_dev_type = 9602;
 
-	register_subalias("1", m_1->m_RN->m_R->m_N); // C1
-	register_subalias("2", m_1->m_RN->m_R->m_P); // RC1
+	register_subalias("1", m_1->m_RN->m_R.m_N); // C1
+	register_subalias("2", m_1->m_RN->m_R.m_P); // RC1
 	register_subalias("3", m_1->m_CLRQ);
 	register_subalias("4", m_1->m_B);
 	register_subalias("5", m_1->m_A);
 	register_subalias("6", m_1->m_Q);
 	register_subalias("7", m_1->m_QQ);
-	register_subalias("8", m_1->m_RN->m_R->m_N);
-	connect_late(m_1->m_RN->m_R->m_N, m_2->m_RN->m_R->m_N);
+	register_subalias("8", m_1->m_RN->m_R.m_N);
+	connect_late(m_1->m_RN->m_R.m_N, m_2->m_RN->m_R.m_N);
 
 	register_subalias("9", m_2->m_QQ);
 	register_subalias("10", m_2->m_Q);
 	register_subalias("11", m_2->m_A);
 	register_subalias("12", m_2->m_B);
 	register_subalias("13", m_2->m_CLRQ);
-	register_subalias("14", m_2->m_RN->m_R->m_P); // RC2
-	register_subalias("15", m_2->m_RN->m_R->m_N); // C2
-	register_subalias("16", m_1->m_RP->m_R->m_P);
-	connect_late(m_1->m_RP->m_R->m_P, m_2->m_RP->m_R->m_P);
+	register_subalias("14", m_2->m_RN->m_R.m_P); // RC2
+	register_subalias("15", m_2->m_RN->m_R.m_N); // C2
+	register_subalias("16", m_1->m_RP->m_R.m_P);
+	connect_late(m_1->m_RP->m_R.m_P, m_2->m_RP->m_R.m_P);
 }
 
 NETLIB_UPDATE(9602_dip)
@@ -234,25 +234,25 @@ NETLIB_START(4538_dip)
 	m_1->m_dev_type = 4538;
 	m_2->m_dev_type = 4538;
 
-	register_subalias("1", m_1->m_RN->m_R->m_N); // C1
-	register_subalias("2", m_1->m_RN->m_R->m_P); // RC1
+	register_subalias("1", m_1->m_RN->m_R.m_N); // C1
+	register_subalias("2", m_1->m_RN->m_R.m_P); // RC1
 	register_subalias("3", m_1->m_CLRQ);
 	register_subalias("4", m_1->m_A);
 	register_subalias("5", m_1->m_B);
 	register_subalias("6", m_1->m_Q);
 	register_subalias("7", m_1->m_QQ);
-	register_subalias("8", m_1->m_RN->m_R->m_N);
-	connect_late(m_1->m_RN->m_R->m_N, m_2->m_RN->m_R->m_N);
+	register_subalias("8", m_1->m_RN->m_R.m_N);
+	connect_late(m_1->m_RN->m_R.m_N, m_2->m_RN->m_R.m_N);
 
 	register_subalias("9", m_2->m_QQ);
 	register_subalias("10", m_2->m_Q);
 	register_subalias("11", m_2->m_B);
 	register_subalias("12", m_2->m_A);
 	register_subalias("13", m_2->m_CLRQ);
-	register_subalias("14", m_2->m_RN->m_R->m_P); // RC2
-	register_subalias("15", m_2->m_RN->m_R->m_N); // C2
-	register_subalias("16", m_1->m_RP->m_R->m_P);
-	connect_late(m_1->m_RP->m_R->m_P, m_2->m_RP->m_R->m_P);
+	register_subalias("14", m_2->m_RN->m_R.m_P); // RC2
+	register_subalias("15", m_2->m_RN->m_R.m_N); // C2
+	register_subalias("16", m_1->m_RP->m_R.m_P);
+	connect_late(m_1->m_RP->m_R.m_P, m_2->m_RP->m_R.m_P);
 }
 
 NETLIB_UPDATE(4538_dip)

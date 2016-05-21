@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 #include "machine/bankdev.h"
+#include "machine/gen_latch.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
 #include "sound/msm5205.h"
@@ -21,6 +22,7 @@ public:
 		m_tilegen3(*this, "tilegen3"),
 		m_spritegen(*this, "spritegen"),
 		m_pfprotect(*this, "pfprotect"),
+		m_soundlatch(*this, "soundlatch"),
 		m_ram(*this, "ram"),
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "palette"),
@@ -38,6 +40,7 @@ public:
 	optional_device<deco_bac06_device> m_tilegen3;
 	optional_device<deco_mxc06_device> m_spritegen;
 	optional_device<address_map_bank_device> m_pfprotect;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_spriteram;

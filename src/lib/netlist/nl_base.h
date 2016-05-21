@@ -176,6 +176,43 @@
  */
 using netlist_sig_t = std::uint32_t;
 
+ //============================================================
+ //  MACROS / New Syntax
+ //============================================================
+
+#define NETLIB_OBJECT_DERIVED(_name, _pclass)                                   \
+class NETLIB_NAME(_name) : public NETLIB_NAME(_pclass)
+
+#define NETLIB_OBJECT(_name)                                                    \
+class NETLIB_NAME(_name) : public device_t
+
+#define NETLIB_CONSTRUCTOR_DERIVED(_name, _pclass)                              \
+	private: family_setter_t m_famsetter;                                       \
+	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name) \
+	: NETLIB_NAME(_pclass)(owner, name)
+
+#define NETLIB_CONSTRUCTOR(_name)                                               \
+	private: family_setter_t m_famsetter;                                       \
+	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name) \
+		: device_t(owner, name)
+
+#define NETLIB_DYNAMIC() 														\
+	ATTR_HOT virtual bool is_dynamic1() const override { return true; }
+
+#define NETLIB_TIMESTEP() 														\
+	ATTR_HOT virtual bool is_timestep() const override { return true; }         \
+	ATTR_HOT void step_time(const nl_double step) override
+
+#define NETLIB_FAMILY(_family) m_famsetter(*this, _family)
+
+#define NETLIB_UPDATE_TERMINALSI() ATTR_HOT virtual void update_terminals(void) override
+#define NETLIB_UPDATEI() ATTR_HOT virtual void update(void) override
+#define NETLIB_UPDATE_PARAMI() ATTR_HOT virtual void update_param(void) override
+#define NETLIB_RESETI() ATTR_COLD virtual void reset(void) override
+
+#define NETLIB_SUB(_chip) nld_ ## _chip
+
+
 //============================================================
 //  MACROS / netlist devices
 //============================================================
@@ -184,7 +221,7 @@ using netlist_sig_t = std::uint32_t;
 #define NETLIB_NAMESPACE_DEVICES_END()  }}
 
 #define NETLIB_NAME(_chip) nld_ ## _chip
-#define NETLIB_SUB(_chip) std::unique_ptr< nld_ ## _chip >
+#define NETLIB_SUBXX(_chip) std::unique_ptr< nld_ ## _chip >
 
 #define NETLIB_NAME_STR_S(_s) # _s
 #define NETLIB_NAME_STR(_chip) NETLIB_NAME_STR_S(nld_ ## _chip)
@@ -200,15 +237,14 @@ using netlist_sig_t = std::uint32_t;
 #define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT void NETLIB_NAME(_chip) :: _name _params
 
 #define NETLIB_UPDATE_TERMINALS(_chip) ATTR_HOT void NETLIB_NAME(_chip) :: update_terminals(void)
-#define NETLIB_UPDATE_TERMINALSI() ATTR_HOT void update_terminals(void) override
-#define NETLIB_UPDATEI() ATTR_HOT void update(void)
 
 #define NETLIB_DEVICE_BASE(_name, _pclass, _extra, _priv)                       \
 	class _name : public _pclass                                                \
 	{                                                                           \
 	public:                                                                     \
-		_name(netlist_t &anetlist, const pstring &name)                         \
-		: _pclass(anetlist, name)    { }                                        \
+		template <class C>                                                      \
+		_name(C &owner, const pstring &name)                                    \
+		: _pclass(owner, name)    { }                                           \
 	protected:                                                                  \
 		_extra                                                                  \
 		ATTR_HOT void update() override;                                        \
@@ -230,8 +266,7 @@ using netlist_sig_t = std::uint32_t;
 	class NETLIB_NAME(_name) : public device_t                                  \
 	{                                                                           \
 	public:                                                                     \
-		NETLIB_NAME(_name) (netlist_t &anetlist, const pstring &name)           \
-		: device_t(anetlist, name)                                              \
+		NETLIB_CONSTRUCTOR(_name)                                               \
 			{ }                                                                 \
 	/*protected:*/                                                              \
 		ATTR_HOT void update() override;                                        \
@@ -319,7 +354,7 @@ namespace netlist
 	public:
 		logic_family_desc_t() : m_is_static(false) {}
 		virtual ~logic_family_desc_t() {}
-		virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_t &anetlist, const pstring &name,
+		virtual std::shared_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
 
 		nl_double m_low_thresh_V;
@@ -375,32 +410,10 @@ namespace netlist
 			DEVICE   = 5,
 			QUEUE    = 6
 		};
-		enum family_t {
-			// Terminal families
-			LOGIC,
-			ANALOG,
-			// Device families
-			GENERIC,    // <== devices usually fall into this category
-			TWOTERM,    // Generic twoterm ...
-			RESISTOR,   // Resistor
-			CAPACITOR,  // Capacitor
-			DIODE,      // Diode
-			DUMMY,      // DUMMY device without function
-			FRONTIER,   // Net frontier
-			BJT_EB,     // BJT(Ebers-Moll)
-			BJT_SWITCH, // BJT(Switch)
-			VCVS,       // Voltage controlled voltage source
-			VCCS,       // Voltage controlled current source
-			LVCCS,      // Voltage controlled current source (Current limited)
-			CCCS,       // Current controlled current source
-			VS,         // Voltage Source
-			CS,         // Current Source
-			GND         // GND device
-		};
 
-		ATTR_COLD object_t(const type_t atype, const family_t afamily);
-		ATTR_COLD object_t(netlist_t &nl, const type_t atype, const family_t afamily);
-		ATTR_COLD object_t(netlist_t &nl, const pstring &aname, const type_t atype, const family_t afamily);
+		ATTR_COLD object_t(const type_t atype);
+		ATTR_COLD object_t(netlist_t &nl, const type_t atype);
+		ATTR_COLD object_t(netlist_t &nl, const pstring &aname, const type_t atype);
 
 		virtual ~object_t();
 
@@ -413,10 +426,8 @@ namespace netlist
 		ATTR_COLD inline pstate_manager_t *state_manager();
 
 		ATTR_HOT  type_t type() const { return m_objtype; }
-		ATTR_HOT  family_t family() const { return m_family; }
 
 		ATTR_HOT  bool isType(const type_t atype) const { return (m_objtype == atype); }
-		ATTR_HOT  bool isFamily(const family_t afamily) const { return (m_family == afamily); }
 
 		ATTR_HOT  netlist_t & netlist() { return *m_netlist; }
 		ATTR_HOT  const netlist_t & netlist() const { return *m_netlist; }
@@ -435,7 +446,6 @@ namespace netlist
 	private:
 		pstring m_name;
 		const type_t m_objtype;
-		const family_t m_family;
 		netlist_t * m_netlist;
 	};
 
@@ -447,7 +457,7 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(device_object_t)
 	public:
-		ATTR_COLD device_object_t(const type_t atype, const family_t afamily);
+		ATTR_COLD device_object_t(const type_t atype);
 
 		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
 
@@ -480,10 +490,13 @@ namespace netlist
 		};
 
 
-		ATTR_COLD core_terminal_t(const type_t atype, const family_t afamily);
+		ATTR_COLD core_terminal_t(const type_t atype);
 
 		ATTR_COLD void set_net(net_t *anet);
 		ATTR_COLD void clear_net();
+		ATTR_COLD bool is_logic() const;
+		ATTR_COLD bool is_analog() const;
+
 		ATTR_HOT  bool has_net() const { return (m_net != nullptr); }
 
 		ATTR_HOT  const net_t & net() const { return *m_net;}
@@ -519,7 +532,7 @@ namespace netlist
 
 
 		ATTR_COLD analog_t(const type_t atype)
-			: core_terminal_t(atype, ANALOG)
+			: core_terminal_t(atype)
 		{
 		}
 
@@ -611,7 +624,7 @@ namespace netlist
 
 
 		ATTR_COLD logic_t(const type_t atype)
-			: core_terminal_t(atype, LOGIC), logic_family_t(),
+			: core_terminal_t(atype), logic_family_t(),
 				m_proxy(nullptr)
 		{
 		}
@@ -695,13 +708,16 @@ namespace netlist
 		using ptr_t = net_t *;
 		using list_t = pvector_t<std::shared_ptr<net_t>>;
 
-		ATTR_COLD net_t(const family_t afamily);
+		ATTR_COLD net_t();
 		virtual ~net_t();
 
 		ATTR_COLD void init_object(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 
 		ATTR_COLD void register_con(core_terminal_t &terminal);
 		ATTR_COLD void merge_net(net_t *othernet);
+
+		ATTR_COLD bool is_logic() const;
+		ATTR_COLD bool is_analog() const;
 
 		ATTR_HOT  logic_net_t & as_logic();
 		ATTR_HOT  const logic_net_t &  as_logic() const;
@@ -1021,7 +1037,8 @@ namespace netlist
 
 		using list_t = pvector_t<core_device_t *>;
 
-		ATTR_COLD core_device_t(const family_t afamily, netlist_t &anetlist, const pstring &name);
+		ATTR_COLD core_device_t(netlist_t &owner, const pstring &name);
+		ATTR_COLD core_device_t(core_device_t &owner, const pstring &name);
 
 		virtual ~core_device_t();
 
@@ -1070,9 +1087,6 @@ namespace netlist
 
 		ATTR_HOT virtual void dec_active() {  }
 
-		ATTR_HOT virtual void step_time(ATTR_UNUSED const nl_double st) { }
-		ATTR_HOT virtual void update_terminals() { }
-
 	#if (NL_KEEP_STATISTICS)
 		/* stats */
 		osd_ticks_t stat_total_time;
@@ -1085,6 +1099,12 @@ namespace netlist
 		ATTR_HOT virtual void update() { }
 		virtual void start() { }
 		virtual void stop() { }
+
+	public:
+		ATTR_HOT virtual void step_time(ATTR_UNUSED const nl_double st) { }
+		ATTR_HOT virtual void update_terminals() { }
+		ATTR_HOT virtual bool is_dynamic1() const { return false; }
+		ATTR_HOT virtual bool is_timestep() const { return false; }
 
 	private:
 
@@ -1108,8 +1128,9 @@ namespace netlist
 		P_PREVENT_COPYING(device_t)
 	public:
 
-		ATTR_COLD device_t(netlist_t &anetlist, const pstring &name);
-		ATTR_COLD device_t(const family_t afamily, netlist_t &anetlist, const pstring &name);
+		template <class C>
+		ATTR_COLD device_t(C &owner, const pstring &name)
+			: core_device_t(owner, name) { }
 
 		virtual ~device_t();
 
@@ -1118,7 +1139,7 @@ namespace netlist
 		template<class C>
 		void register_sub(const pstring &name, std::unique_ptr<C> &dev)
 		{
-			dev.reset(new C(this->netlist(), this->name() + "." + name));
+			dev.reset(new C(*this, name));
 
 			register_sub_p(*dev);
 		}
@@ -1158,6 +1179,26 @@ namespace netlist
 		ATTR_COLD void register_sub_p(device_t &dev);
 	};
 
+	// -----------------------------------------------------------------------------
+	// family_setter_t
+	// -----------------------------------------------------------------------------
+
+	struct family_setter_t
+	{
+		family_setter_t() { }
+		family_setter_t(core_device_t &dev, const char *desc);
+		family_setter_t(core_device_t &dev, logic_family_desc_t *desc);
+	};
+
+	// -----------------------------------------------------------------------------
+	// nld_base_dummy : basis for dummy devices
+	// -----------------------------------------------------------------------------
+
+	NETLIB_OBJECT(base_dummy)
+	{
+	public:
+		NETLIB_CONSTRUCTOR(base_dummy) { }
+	};
 
 	// -----------------------------------------------------------------------------
 	// queue_t
@@ -1190,7 +1231,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 
-	class netlist_t : public pstate_manager_t, public plog_dispatch_intf
+	class netlist_t : public pstate_manager_t, public plog_dispatch_intf //, public device_owner_t
 	{
 		P_PREVENT_COPYING(netlist_t)
 	public:
@@ -1229,9 +1270,9 @@ namespace netlist
 		ATTR_COLD pvector_t<_device_class *> get_device_list()
 		{
 			pvector_t<_device_class *> tmp;
-			for (std::size_t i = 0; i < m_devices.size(); i++)
+			for (auto &d : m_devices)
 			{
-				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
+				_device_class *dev = dynamic_cast<_device_class *>(d.get());
 				if (dev != nullptr)
 					tmp.push_back(dev);
 			}
@@ -1239,24 +1280,12 @@ namespace netlist
 		}
 
 		template<class _device_class>
-		ATTR_COLD _device_class *get_first_device()
-		{
-			for (std::size_t i = 0; i < m_devices.size(); i++)
-			{
-				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
-				if (dev != nullptr)
-					return dev;
-			}
-			return nullptr;
-		}
-
-		template<class _device_class>
 		ATTR_COLD _device_class *get_single_device(const char *classname)
 		{
 			_device_class *ret = nullptr;
-			for (std::size_t i = 0; i < m_devices.size(); i++)
+			for (auto &d : m_devices)
 			{
-				_device_class *dev = dynamic_cast<_device_class *>(m_devices[i]);
+				_device_class *dev = dynamic_cast<_device_class *>(d.get());
 				if (dev != nullptr)
 				{
 					if (ret != nullptr)
@@ -1268,8 +1297,6 @@ namespace netlist
 			return ret;
 		}
 
-		pvector_t<device_t *> m_devices;
-		net_t::list_t m_nets;
 	#if (NL_KEEP_STATISTICS)
 		pvector_t<core_device_t *> m_started_devices;
 	#endif
@@ -1282,6 +1309,9 @@ namespace netlist
 		ATTR_COLD pdynlib &lib() { return *m_lib; }
 
 		void print_stats() const;
+
+		pvector_t<std::shared_ptr<device_t>> m_devices;
+		net_t::list_t m_nets;
 
 protected:
 
@@ -1331,27 +1361,47 @@ protected:
 		}
 	}
 
+	ATTR_COLD inline bool core_terminal_t::is_logic() const
+	{
+		return dynamic_cast<const logic_t *>(this) != nullptr;
+	}
+
+	ATTR_COLD inline bool core_terminal_t::is_analog() const
+	{
+		return dynamic_cast<const analog_t *>(this) != nullptr;
+	}
+
+	ATTR_COLD inline bool net_t::is_logic() const
+	{
+		return dynamic_cast<const logic_net_t *>(this) != nullptr;
+	}
+
+	ATTR_COLD inline bool net_t::is_analog() const
+	{
+		return dynamic_cast<const analog_net_t *>(this) != nullptr;
+	}
+
 	ATTR_HOT inline logic_net_t & net_t::as_logic()
 	{
-		nl_assert(family() == LOGIC);
+		nl_assert(is_logic());
 		return static_cast<logic_net_t &>(*this);
 	}
 
 	ATTR_HOT inline const logic_net_t & net_t::as_logic() const
 	{
-		nl_assert(family() == LOGIC);
+		nl_assert(is_logic());
 		return static_cast<const logic_net_t &>(*this);
 	}
 
 	ATTR_HOT inline analog_net_t & net_t::as_analog()
 	{
-		nl_assert(family() == ANALOG);
+		nl_assert(is_analog());
 		return static_cast<analog_net_t &>(*this);
 	}
 
 	ATTR_HOT inline const analog_net_t & net_t::as_analog() const
 	{
-		nl_assert(family() == ANALOG);
+		nl_assert(is_analog());
 		return static_cast<const analog_net_t &>(*this);
 	}
 

@@ -43,7 +43,7 @@
 			<bounds x="176" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.12" inputmask="0x01" >
-			<bounds x="192" y="0" width="16" height="16" />
+			<bounds x="192" y="0" width="8" height="16" />
 		</backdrop>
 
 		<backdrop element="grid" inputtag="GRID.0" inputmask="0x02" >
@@ -83,7 +83,7 @@
 			<bounds x="176" y="16" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.12" inputmask="0x02" >
-			<bounds x="192" y="16" width="16" height="16" />
+			<bounds x="192" y="16" width="8" height="16" />
 		</backdrop>
 
 		<backdrop element="grid" inputtag="GRID.0" inputmask="0x04" >
@@ -123,7 +123,7 @@
 			<bounds x="176" y="32" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.12" inputmask="0x04" >
-			<bounds x="192" y="32" width="16" height="16" />
+			<bounds x="192" y="32" width="8" height="16" />
 		</backdrop>
 
 		<backdrop element="grid" inputtag="GRID.0" inputmask="0x08" >
@@ -163,7 +163,7 @@
 			<bounds x="176" y="48" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.12" inputmask="0x08" >
-			<bounds x="192" y="48" width="16" height="16" />
+			<bounds x="192" y="48" width="8" height="16" />
 		</backdrop>
 
 		<backdrop element="grid" inputtag="GRID.0" inputmask="0x10" >
@@ -203,7 +203,7 @@
 			<bounds x="176" y="64" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.12" inputmask="0x10" >
-			<bounds x="192" y="64" width="16" height="16" />
+			<bounds x="192" y="64" width="8" height="16" />
 		</backdrop>
 
 		<backdrop element="grid" inputtag="GRID.0" inputmask="0x20" >
@@ -243,7 +243,7 @@
 			<bounds x="176" y="80" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.12" inputmask="0x20" >
-			<bounds x="192" y="80" width="16" height="16" />
+			<bounds x="192" y="80" width="8" height="16" />
 		</backdrop>
 
 		<backdrop element="grid" inputtag="GRID.0" inputmask="0x40" >
@@ -283,7 +283,7 @@
 			<bounds x="176" y="96" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.12" inputmask="0x40" >
-			<bounds x="192" y="96" width="16" height="16" />
+			<bounds x="192" y="96" width="8" height="16" />
 		</backdrop>
 
 		<backdrop element="grid" inputtag="GRID.0" inputmask="0x80" >
@@ -323,7 +323,7 @@
 			<bounds x="176" y="112" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.12" inputmask="0x80" >
-			<bounds x="192" y="112" width="16" height="16" />
+			<bounds x="192" y="112" width="8" height="16" />
 		</backdrop>
 
 		<backdrop element="grid" inputtag="GRID.0" inputmask="0x100" >
@@ -363,7 +363,7 @@
 			<bounds x="176" y="128" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.12" inputmask="0x100" >
-			<bounds x="192" y="128" width="16" height="16" />
+			<bounds x="192" y="128" width="8" height="16" />
 		</backdrop>
 
 		<backdrop element="grid" inputtag="GRID.0" inputmask="0x200" >
@@ -403,10 +403,10 @@
 			<bounds x="176" y="144" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.12" inputmask="0x200" >
-			<bounds x="192" y="144" width="16" height="16" />
+			<bounds x="192" y="144" width="8" height="16" />
 		</backdrop>
 		<screen index="0">
-			<bounds left="0" top="0" right="208" bottom="160" />
+			<bounds left="0" top="0" right="200" bottom="160" />
 		</screen>
 
 	</view>

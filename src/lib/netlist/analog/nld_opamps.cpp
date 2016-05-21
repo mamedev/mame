@@ -48,64 +48,6 @@ NETLIB_NAMESPACE_DEVICES_START()
  *        4: opamp with input stage, first pole + output limit
  */
 
-NETLIB_START(OPAMP)
-{
-	register_param("MODEL", m_model, "");
-
-	m_type = m_model.model_value("TYPE");
-
-	enregister("VCC", m_VCC);
-	enregister("GND", m_GND);
-
-	enregister("VL", m_VL);
-	enregister("VH", m_VH);
-	enregister("VREF", m_VREF);
-
-	register_sub("G1", m_G1);
-	register_sub("RP1", m_RP);
-
-	if (m_type == 1)
-	{
-		register_subalias("PLUS", "G1.IP");
-		register_subalias("MINUS", "G1.IN");
-		register_subalias("OUT", "G1.OP");
-
-		connect_late("G1.ON", "VREF");
-		connect_late("RP1.2", "VREF");
-		connect_late("RP1.1", "G1.OP");
-
-	}
-	else if (m_type == 3)
-	{
-		register_sub("CP1", m_CP);
-		register_sub("EBUF", m_EBUF);
-		register_sub("DN", m_DN);
-		register_sub("DP", m_DP);
-
-		register_subalias("PLUS", "G1.IP");
-		register_subalias("MINUS", "G1.IN");
-		register_subalias("OUT", "EBUF.OP");
-
-		connect_late("EBUF.ON", "VREF");
-
-		connect_late("G1.ON", "VREF");
-		connect_late("RP1.2", "VREF");
-		connect_late("CP1.2", "VREF");
-		connect_late("EBUF.IN", "VREF");
-
-		connect_late("RP1.1", "G1.OP");
-		connect_late("CP1.1", "RP1.1");
-
-		connect_late("DP.K", "VH");
-		connect_late("VL", "DN.A");
-		connect_late("DP.A", "DN.K");
-		connect_late("DN.K", "RP1.1");
-		connect_late("EBUF.IP", "RP1.1");
-	}
-	else
-		netlist().log().fatal("Unknown opamp type: {1}", m_type);
-}
-
 /* .model abc OPAMP(VLH=2.0 VLL=0.2 FPF=5 UGF=10k SLEW=0.6u RI=1000k RO=50 DAB=0.002)
  *
  * Differential Amp Bias ~ op amp's total quiescent current.
@@ -123,15 +65,15 @@ NETLIB_UPDATE(OPAMP)
 
 NETLIB_RESET(OPAMP)
 {
-	m_G1->do_reset();
-	m_G1->m_RI.setTo(m_model.model_value("RI"));
+	m_G1.do_reset();
+	m_G1.m_RI.setTo(m_model.model_value("RI"));
 
 	if (m_type == 1)
 	{
 		double RO = m_model.model_value("RO");
 		double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RO;
-		m_RP->set_R(RO);
-		m_G1->m_G.setTo(G);
+		m_RP.set_R(RO);
+		m_G1.m_G.setTo(G);
 	}
 	else if (m_type == 3)
 	{
@@ -139,7 +81,7 @@ NETLIB_RESET(OPAMP)
 		m_DP->do_reset();
 		m_DN->do_reset();
 		m_CP->do_reset();
-		m_RP->do_reset();
+		m_RP.do_reset();
 
 		m_EBUF->m_G.setTo(1.0);
 		m_EBUF->m_RO.setTo(m_model.model_value("RO"));
@@ -151,16 +93,10 @@ NETLIB_RESET(OPAMP)
 		double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RP;
 
 		m_CP->m_C.setTo(CP);
-		m_RP->set_R(RP);
-		m_G1->m_G.setTo(G);
+		m_RP.set_R(RP);
+		m_G1.m_G.setTo(G);
 
 	}
-
-
-}
-
-NETLIB_UPDATE_PARAM(OPAMP)
-{
 }
 
 /*

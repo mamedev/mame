@@ -438,7 +438,7 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 
 		case 7: // c0ff: sound command latch clear
 			// Note: solder pad CP1 on the pcb would allow to disable this
-			soundlatch_clear_byte_w(space, 0, 0);
+			m_soundlatch->clear_w(space, 0, 0);
 			break;
 	}
 }
@@ -662,7 +662,7 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
 	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE8(mcu_ram_r, mcu_ram_w, 0x00ff)
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_WRITE8(soundlatch_byte_w, 0x00ff)
+	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x184000, 0x184001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(equites_flipw_w)
 	AM_RANGE(0x188000, 0x188001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_start_w)
 	AM_RANGE(0x18c000, 0x18c001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_switch_w)
@@ -690,7 +690,7 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x0c8000, 0x0c8001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_switch_w)
 	AM_RANGE(0x0cc000, 0x0cc001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(splndrbt_selchar_w)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(splndrbt_bg_scrollx_w)
-	AM_RANGE(0x140000, 0x140001) AM_WRITE8(soundlatch_byte_w, 0x00ff)
+	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)
 	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE8(mcu_ram_r, mcu_ram_w, 0x00ff)
 	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x001000) AM_READWRITE8(equites_fg_videoram_r, equites_fg_videoram_w, 0x00ff)
@@ -703,7 +703,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
@@ -1052,6 +1052,8 @@ static MACHINE_CONFIG_FRAGMENT( common_sound )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("msm", MSM5232, MSM5232_MAX_CLOCK)   // will be adjusted at runtime through PORT_ADJUSTER
 	MCFG_MSM5232_SET_CAPACITORS(0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6) // verified

@@ -366,6 +366,10 @@ ifeq ($(TARGETOS),netbsd)
 OSD := sdl
 endif
 
+ifeq ($(TARGETOS),openbsd)
+OSD := sdl
+endif
+
 ifeq ($(TARGETOS),solaris)
 OSD := sdl
 endif
@@ -817,7 +821,7 @@ PROJECT_NAME := $(SUBTARGET_FULL)
 else ifeq ($(SUBTARGET_FULL),mess)
 PROJECT_NAME := $(SUBTARGET_FULL)
 else
-PROJECT_NAME := $(TARGET)$(SUBTARGET_FULL))
+PROJECT_NAME := $(TARGET)$(SUBTARGET_FULL)
 endif
 
 
@@ -1328,6 +1332,26 @@ netbsd: netbsd_x86
 netbsd_x86: generate $(PROJECTDIR)/gmake-netbsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-netbsd config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-netbsd config=$(CONFIG)32
+
+#-------------------------------------------------
+# gmake-openbsd
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-openbsd/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=openbsd --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: openbsd_x64
+openbsd_x64: generate $(PROJECTDIR)/gmake-openbsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-openbsd config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-openbsd config=$(CONFIG)64
+
+.PHONY: openbsd
+openbsd: openbsd_x86
+
+.PHONY: openbsd_x86
+openbsd_x86: generate $(PROJECTDIR)/gmake-openbsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-openbsd config=$(CONFIG)32 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-openbsd config=$(CONFIG)32
 
 #-------------------------------------------------
 # gmake-steamlink

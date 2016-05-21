@@ -501,7 +501,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* guess */
+	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
 	MCFG_CPU_PROGRAM_MAP(miniboy7_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -526,7 +526,7 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(miniboy7_state, miniboy7)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/12) /* guess */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 12) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(miniboy7_state, crtc_update_row)
@@ -534,7 +534,7 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* guess */
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK / 8)    /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(miniboy7_state, ay_pa_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(miniboy7_state, ay_pb_w))

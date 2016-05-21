@@ -16,7 +16,7 @@
 *****************************************************************************************
 
   You can find more about this game and the emulation evolution at
-  http://www.robertofresca.com.ar/
+  http://www.robertofresca.com/
 
 *****************************************************************************************
 

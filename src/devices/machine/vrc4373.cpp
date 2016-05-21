@@ -10,7 +10,7 @@ const device_type VRC4373      = &device_creator<vrc4373_device>;
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, vrc4373_device)
 	AM_RANGE(0x40, 0x43) AM_READWRITE  (pcictrl_r,  pcictrl_w)
-	AM_INHERIT_FROM(pci_host_device::config_map)
+	AM_INHERIT_FROM(pci_bridge_device::config_map)
 ADDRESS_MAP_END
 
 // cpu i/f map

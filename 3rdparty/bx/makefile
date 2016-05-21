@@ -174,6 +174,7 @@ docs:
 clean:
 	@echo Cleaning...
 	-@rm -rf .build
+	@mkdir .build
 
 ###
 

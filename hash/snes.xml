@@ -64266,7 +64266,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 <!-- Notes: this is the dump of the BIOS of a snes modem device and it should be moved to a device -->
 	<software name="xbandj" cloneof="xband">
-	<description>X Band (Jpn)</description>
+		<description>X Band (Jpn)</description>
 		<year>1995</year>
 		<publisher>Catapult Entertainment</publisher>
 		<part name="cart" interface="snes_cart">

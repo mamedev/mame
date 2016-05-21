@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 #include "video/deckarn.h"
 
@@ -18,25 +19,26 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_spriteram(*this, "spriteram") ,
 		m_spritegen(*this, "spritegen"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_ram(*this, "ram"),
 		m_videoram(*this, "videoram"),
-		m_pf_data(*this, "pf_data"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_pf_data(*this, "pf_data") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<deco_karnovsprites_device> m_spritegen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_pf_data;
-
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_bitmap_f;

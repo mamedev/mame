@@ -47,7 +47,11 @@ static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_int
 //  dinput_set_dword_property
 //============================================================
 
+#if DIRECTINPUT_VERSION >= 0x0800
+static HRESULT dinput_set_dword_property(ComPtr<IDirectInputDevice8> device, REFGUID property_guid, DWORD object, DWORD how, DWORD value)
+#else
 static HRESULT dinput_set_dword_property(ComPtr<IDirectInputDevice> device, REFGUID property_guid, DWORD object, DWORD how, DWORD value)
+#endif
 {
 	DIPROPDWORD dipdw;
 
@@ -81,8 +85,12 @@ HRESULT dinput_device::poll_dinput(LPVOID pState) const
 	HRESULT result;
 
 	// first poll the device, then get the state
+#if DIRECTINPUT_VERSION >= 0x0800
+	dinput.device->Poll();
+#else
 	if (dinput.device2 != nullptr)
 		dinput.device2->Poll();
+#endif
 
 	// GetDeviceState returns the immediate state
 	result = dinput.device->GetDeviceState(dinput.format->dwDataSize, pState);
@@ -142,6 +150,7 @@ int dinput_api_helper::initialize()
 {
 	HRESULT result;
 
+#if DIRECTINPUT_VERSION >= 0x0800
 	if (m_dinput_version >= 0x0800)
 	{
 		result = DirectInput8Create(GetModuleHandleUni(), m_dinput_version, IID_IDirectInput8, reinterpret_cast<void **>(m_dinput.GetAddressOf()), nullptr);
@@ -152,6 +161,7 @@ int dinput_api_helper::initialize()
 		}
 	}
 	else
+#endif
 	{
 		result = m_pfn_DirectInputCreate.initialize();
 		if (result != DI_OK)
@@ -285,7 +295,7 @@ public:
 
 	int dinput_devclass() override
 	{
-#if DIRECTINPUT_VERSION >= 0x800
+#if DIRECTINPUT_VERSION >= 0x0800
 		return DI8DEVCLASS_KEYBOARD;
 #else
 		return DIDEVTYPE_KEYBOARD;
@@ -356,7 +366,7 @@ public:
 
 	int dinput_devclass() override
 	{
-#if DIRECTINPUT_VERSION >= 0x800
+#if DIRECTINPUT_VERSION >= 0x0800
 		return DI8DEVCLASS_POINTER;
 #else
 		return DIDEVTYPE_MOUSE;
@@ -550,7 +560,7 @@ public:
 
 	int dinput_devclass() override
 	{
-#if DIRECTINPUT_VERSION >= 0x800
+#if DIRECTINPUT_VERSION >= 0x0800
 		return DI8DEVCLASS_GAMECTRL;
 #else
 		return DIDEVTYPE_JOYSTICK;

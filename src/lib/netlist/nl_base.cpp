@@ -38,9 +38,9 @@ public:
 		m_R_high = 130.0;
 		m_is_static = true;
 	}
-	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
+	virtual std::shared_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
-		return palloc(devices::nld_d_to_a_proxy(anetlist, name, proxied));
+		return std::make_shared<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 };
 
@@ -59,9 +59,9 @@ public:
 		m_R_high = 10.0;
 		m_is_static = true;
 	}
-	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
+	virtual std::shared_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
-		return palloc(devices::nld_d_to_a_proxy(anetlist, name, proxied));
+		return std::make_shared<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 };
 
@@ -74,7 +74,7 @@ logic_family_desc_t *family_CD4XXX = palloc(logic_family_cd4xxx_t);
 
 queue_t::queue_t(netlist_t &nl)
 	: timed_queue<net_t *, netlist_time>(512)
-	, object_t(nl, "QUEUE", QUEUE, GENERIC)
+	, object_t(nl, "QUEUE", QUEUE)
 	, pstate_callback_t()
 	, m_qsize(0)
 	, m_times(512)
@@ -124,22 +124,19 @@ void queue_t::on_post_load()
 // object_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD object_t::object_t(const type_t atype, const family_t afamily)
+ATTR_COLD object_t::object_t(const type_t atype)
 : m_objtype(atype)
-, m_family(afamily)
 , m_netlist(nullptr)
 {}
 
-ATTR_COLD object_t::object_t(netlist_t &nl, const type_t atype, const family_t afamily)
+ATTR_COLD object_t::object_t(netlist_t &nl, const type_t atype)
 : m_objtype(atype)
-, m_family(afamily)
 , m_netlist(&nl)
 {}
 
-ATTR_COLD object_t::object_t(netlist_t &nl, const pstring &aname, const type_t atype, const family_t afamily)
+ATTR_COLD object_t::object_t(netlist_t &nl, const pstring &aname, const type_t atype)
 : m_name(aname)
 , m_objtype(atype)
-, m_family(afamily)
 , m_netlist(&nl)
 {
 }
@@ -172,9 +169,8 @@ ATTR_COLD const pstring &object_t::name() const
 // device_object_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD device_object_t::device_object_t(const type_t atype,
-		const family_t afamily)
-: object_t(atype, afamily)
+ATTR_COLD device_object_t::device_object_t(const type_t atype)
+: object_t(atype)
 , m_device(nullptr)
 {
 }
@@ -213,7 +209,7 @@ netlist_t::~netlist_t()
 {
 
 	m_nets.clear();
-	m_devices.clear_and_free();
+	m_devices.clear();
 
 	pfree(m_lib);
 	pstring::resetmem();
@@ -232,16 +228,26 @@ ATTR_COLD void netlist_t::start()
 
 	m_lib = palloc(pdynlib(libpath));
 
-	/* find the main clock and solver ... */
+	/* make sure the solver and parameters are started first! */
+
+	for (auto & e : setup().m_device_factory)
+	{
+		if ( setup().factory().is_class<devices::NETLIB_NAME(mainclock)>(e.second)
+				|| setup().factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
+				|| setup().factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
+				|| setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
+		{
+			auto dev = std::shared_ptr<device_t>(e.second->Create(*this, e.first));
+			setup().register_dev_s(dev);
+		}
+	}
 
 	log().debug("Searching for mainclock and solver ...\n");
 
-	m_mainclock = get_single_device<devices:: NETLIB_NAME(mainclock)>("mainclock");
+	m_mainclock = get_single_device<devices::NETLIB_NAME(mainclock)>("mainclock");
 	m_solver = get_single_device<devices::NETLIB_NAME(solver)>("solver");
 	m_gnd = get_single_device<devices::NETLIB_NAME(gnd)>("gnd");
 	m_params = get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
-
-	/* make sure the solver and parameters are started first! */
 
 	if (m_solver != nullptr)
 		m_solver->start_dev();
@@ -253,9 +259,23 @@ ATTR_COLD void netlist_t::start()
 
 	m_use_deactivate = (m_params->m_use_deactivate.Value() ? true : false);
 
+	/* create devices */
+
+	for (auto & e : setup().m_device_factory)
+	{
+		if ( !setup().factory().is_class<devices::NETLIB_NAME(mainclock)>(e.second)
+				&& !setup().factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
+				&& !setup().factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
+				&& !setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
+		{
+			auto dev = std::shared_ptr<device_t>(e.second->Create(*this, e.first));
+			setup().register_dev_s(dev);
+		}
+	}
+
 	log().debug("Initializing devices ...\n");
-	for (device_t *dev : m_devices)
-		if (dev != m_solver && dev != m_params)
+	for (auto &dev : m_devices)
+		if (dev.get() != m_solver && dev.get() != m_params)
 			dev->start_dev();
 
 }
@@ -265,7 +285,7 @@ ATTR_COLD void netlist_t::stop()
 	/* find the main clock and solver ... */
 
 	log().debug("Stopping all devices ...\n");
-	for (device_t *dev : m_devices)
+	for (auto & dev : m_devices)
 		dev->stop_dev();
 }
 
@@ -312,7 +332,7 @@ ATTR_COLD void netlist_t::reset()
 
 	// FIXME: some const devices rely on this
 	/* make sure params are set now .. */
-	for (device_t *dev : m_devices)
+	for (auto & dev : m_devices)
 	{
 		dev->update_param();
 	}
@@ -397,8 +417,8 @@ void netlist_t::print_stats() const
 // net_core_device_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD core_device_t::core_device_t(const family_t afamily, netlist_t &anetlist, const pstring &name)
-: object_t(DEVICE, afamily), logic_family_t()
+ATTR_COLD core_device_t::core_device_t(netlist_t &owner, const pstring &name)
+: object_t(DEVICE), logic_family_t()
 #if (NL_KEEP_STATISTICS)
 	, stat_total_time(0)
 	, stat_update_count(0)
@@ -407,7 +427,21 @@ ATTR_COLD core_device_t::core_device_t(const family_t afamily, netlist_t &anetli
 {
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL);
-	init_object(anetlist, name);
+	init_object(owner, name);
+}
+
+ATTR_COLD core_device_t::core_device_t(core_device_t &owner, const pstring &name)
+: object_t(DEVICE), logic_family_t()
+#if (NL_KEEP_STATISTICS)
+	, stat_total_time(0)
+	, stat_update_count(0)
+	, stat_call_count(0)
+#endif
+{
+	set_logic_family(owner.logic_family());
+	if (logic_family() == nullptr)
+		set_logic_family(family_TTL);
+	init_object(owner.netlist(), owner.name() +"." + name);
 }
 
 ATTR_COLD core_device_t::~core_device_t()
@@ -456,18 +490,6 @@ ATTR_HOT netlist_sig_t core_device_t::INPLOGIC_PASSIVE(logic_input_t &inp)
 // device_t
 // ----------------------------------------------------------------------------------------
 
-device_t::device_t(netlist_t &anetlist, const pstring &name)
-	: core_device_t(GENERIC, anetlist, name),
-		m_terminals()
-{
-}
-
-device_t::device_t(const family_t afamily, netlist_t &anetlist, const pstring &name)
-	: core_device_t(afamily, anetlist, name),
-		m_terminals()
-{
-}
-
 device_t::~device_t()
 {
 	//log().debug("~net_device_t\n");
@@ -481,7 +503,7 @@ ATTR_COLD setup_t &device_t::setup()
 ATTR_COLD void device_t::register_sub_p(device_t &dev)
 {
 	// subdevices always first inherit the logic family of the parent
-	dev.set_logic_family(this->logic_family());
+	//dev.set_logic_family(this->logic_family());
 	dev.start_dev();
 }
 
@@ -551,13 +573,26 @@ template ATTR_COLD void device_t::register_param(const pstring &sname, param_str
 template ATTR_COLD void device_t::register_param(const pstring &sname, param_str_t &param, const pstring &initialVal);
 template ATTR_COLD void device_t::register_param(const pstring &sname, param_model_t &param, const char * const initialVal);
 
+// -----------------------------------------------------------------------------
+// family_setter_t
+// -----------------------------------------------------------------------------
+
+family_setter_t::family_setter_t(core_device_t &dev, const char *desc)
+{
+	dev.set_logic_family(dev.netlist().setup().family_from_model(desc));
+}
+
+family_setter_t::family_setter_t(core_device_t &dev, logic_family_desc_t *desc)
+{
+	dev.set_logic_family(desc);
+}
 
 // ----------------------------------------------------------------------------------------
 // net_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD net_t::net_t(const family_t afamily)
-	: object_t(NET, afamily)
+ATTR_COLD net_t::net_t()
+	: object_t(NET)
 	, m_new_Q(0)
 	, m_cur_Q (0)
 	, m_railterminal(nullptr)
@@ -748,7 +783,7 @@ ATTR_COLD void net_t::merge_net(net_t *othernet)
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD logic_net_t::logic_net_t()
-	: net_t(LOGIC)
+	: net_t()
 {
 }
 
@@ -768,13 +803,13 @@ ATTR_COLD void logic_net_t::save_register()
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD analog_net_t::analog_net_t()
-	: net_t(ANALOG)
+	: net_t()
 	, m_solver(nullptr)
 {
 }
 
 ATTR_COLD analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname)
-	: net_t(ANALOG)
+	: net_t()
 	, m_solver(nullptr)
 {
 	init_object(nl, aname);
@@ -825,8 +860,8 @@ ATTR_COLD void analog_net_t::process_net(pvector_t<list_t> &groups)
 // core_terminal_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD core_terminal_t::core_terminal_t(const type_t atype, const family_t afamily)
-: device_object_t(atype, afamily)
+ATTR_COLD core_terminal_t::core_terminal_t(const type_t atype)
+: device_object_t(atype)
 , plinkedlist_element_t()
 , m_net(nullptr)
 , m_state(STATE_NONEX)
@@ -961,7 +996,7 @@ ATTR_COLD void analog_output_t::initial(const nl_double val)
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD param_t::param_t(const param_type_t atype)
-	: device_object_t(PARAM, ANALOG)
+	: device_object_t(PARAM)
 	, m_param_type(atype)
 {
 }

@@ -2815,5 +2815,5 @@ void mame_ui_manager::save_main_option()
 
 void mame_ui_manager::menu_reset()
 {
-	ui_menu::stack_reset(machine()); 
+	ui_menu::stack_reset(machine());
 }

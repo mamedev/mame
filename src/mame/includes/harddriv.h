@@ -287,6 +287,8 @@ protected:
 	optional_shared_ptr<UINT32> m_ds3sdsp_pgm_memory;
 	optional_shared_ptr<UINT32> m_ds3xdsp_pgm_memory;
 
+	optional_shared_ptr<UINT32> m_dsp32_ram;
+
 	UINT16 *                m_gsp_protection;
 
 	UINT16 *                m_gsp_speedup_addr[2];
@@ -306,7 +308,7 @@ protected:
 	UINT32                  m_adsp_speedup_count[4];
 
 	UINT8                   m_gsp_multisync;
-	optional_shared_ptr<UINT8> m_gsp_vram;
+	optional_shared_ptr<UINT8>  m_gsp_vram;
 	optional_shared_ptr<UINT16> m_gsp_control_lo;
 	optional_shared_ptr<UINT16> m_gsp_control_hi;
 	optional_shared_ptr<UINT16> m_gsp_paletteram_lo;

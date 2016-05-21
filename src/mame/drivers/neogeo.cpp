@@ -1944,7 +1944,6 @@ MACHINE_CONFIG_END
 	ROM_LOAD( name,      0x00000, 0x80000, hash ) \
 	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
 
-#define NO_DELTAT_REGION
 
 
 #define NEO_SFIX_64K(name, hash) \
@@ -1987,8 +1986,6 @@ ROM_START( neogeo )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
 	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
-
-	NO_DELTAT_REGION
 
 	ROM_REGION( 0x100000, "sprites", ROMREGION_ERASEFF )
 ROM_END

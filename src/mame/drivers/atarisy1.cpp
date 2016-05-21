@@ -2430,7 +2430,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(atarisy1_state,marble)
 {
-	slapstic_configure(*m_maincpu, 0x080000, 0);
+	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
 	m_joystick_type = 0;    /* none */
 	m_trackball_type = 1;   /* rotated */
@@ -2439,7 +2439,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,marble)
 
 DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
 {
-	slapstic_configure(*m_maincpu, 0x080000, 0);
+	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
 	m_joystick_type = 1;    /* digital */
 	m_trackball_type = 0;   /* none */
@@ -2448,7 +2448,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
 
 DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
 {
-	slapstic_configure(*m_maincpu, 0x080000, 0);
+	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
 	m_joystick_type = 1;    /* digital */
 	m_trackball_type = 0;   /* none */
@@ -2457,7 +2457,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
 
 DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
 {
-	slapstic_configure(*m_maincpu, 0x080000, 0);
+	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
 	m_joystick_type = 2;    /* analog */
 	m_trackball_type = 0;   /* none */
@@ -2466,7 +2466,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
 
 DRIVER_INIT_MEMBER(atarisy1_state,roadblst)
 {
-	slapstic_configure(*m_maincpu, 0x080000, 0);
+	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
 	m_joystick_type = 3;    /* pedal */
 	m_trackball_type = 2;   /* steering wheel */

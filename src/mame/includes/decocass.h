@@ -8,6 +8,7 @@
 #define LOG(n,x)  do { if (LOGLEVEL >= n) logerror x; } while (0)
 
 #include "machine/decocass_tape.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "cpu/mcs48/mcs48.h"
 
@@ -26,16 +27,18 @@ public:
 			m_mcu(*this, "mcu"),
 			m_watchdog(*this, "watchdog"),
 			m_cassette(*this, "cassette"),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_screen(*this, "screen"),
+			m_palette(*this, "palette"),
+			m_soundlatch(*this, "soundlatch"),
+			m_soundlatch2(*this, "soundlatch2"),
 			m_rambase(*this, "rambase"),
 			m_charram(*this, "charram"),
 			m_fgvideoram(*this, "fgvideoram"),
 			m_colorram(*this, "colorram"),
 			m_tileram(*this, "tileram"),
 			m_objectram(*this, "objectram"),
-			m_paletteram(*this, "paletteram"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
+			m_paletteram(*this, "paletteram")
 	{
 		m_type1_map = nullptr;
 	}
@@ -46,6 +49,11 @@ public:
 	required_device<upi41_cpu_device> m_mcu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<decocass_tape_device> m_cassette;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_rambase;
@@ -56,9 +64,7 @@ public:
 	required_shared_ptr<UINT8> m_tileram;
 	required_shared_ptr<UINT8> m_objectram;
 	required_shared_ptr<UINT8> m_paletteram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+
 	size_t    m_bgvideoram_size;
 
 	/* video-related */

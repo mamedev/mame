@@ -98,6 +98,7 @@ Optional (on expansion card) (Viper)
 #include "sound/ay8910.h"
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "machine/bfm_comn.h"
 
@@ -674,7 +675,7 @@ static ADDRESS_MAP_START( sc1_base, AS_PROGRAM, 8, bfm_sc1_state )
 
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)            // irq latch
 
-	AM_RANGE(0x3001, 0x3001) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x3001, 0x3001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 
@@ -1074,6 +1075,7 @@ static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_SOUND_ADD("aysnd",AY8912, MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

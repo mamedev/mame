@@ -1070,6 +1070,16 @@ int drcbe_c::execute(code_handle &entry)
 				PARAM0 = temp32;
 				break;
 
+			case MAKE_OPCODE_SHORT(OP_TZCNT, 4, 0):		// TZCNT   dst,src
+				PARAM0 = tzcount32(PARAM1);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_TZCNT, 4, 1):
+				temp32 = tzcount32(PARAM1);
+				flags = (temp32 == 32) ? FLAG_Z : 0;
+				PARAM0 = temp32;
+				break;
+
 			case MAKE_OPCODE_SHORT(OP_BSWAP, 4, 0):     // BSWAP   dst,src
 				temp32 = PARAM1;
 				PARAM0 = FLIPENDIAN_INT32(temp32);
@@ -1676,6 +1686,16 @@ int drcbe_c::execute(code_handle &entry)
 				else
 					temp64 = 32 + count_leading_zeros(DPARAM1);
 				flags = FLAGS64_NZ(temp64);
+				DPARAM0 = temp64;
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_TZCNT, 8, 0):		// DTZCNT  dst,src
+				DPARAM0 = tzcount64(DPARAM1);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_TZCNT, 8, 1):
+				temp64 = tzcount64(DPARAM1);
+				flags = (temp64 == 64) ? FLAG_Z : 0;
 				DPARAM0 = temp64;
 				break;
 
@@ -2288,4 +2308,24 @@ int drcbe_c::dmuls(UINT64 &dstlo, UINT64 &dsthi, INT64 src1, INT64 src2, int fla
 	dsthi = hi;
 	dstlo = lo;
 	return ((hi >> 60) & FLAG_S) | ((dsthi != ((INT64)lo >> 63)) << 1);
+}
+
+UINT32 drcbe_c::tzcount32(UINT32 value)
+{
+	for (int i = 0; i < 32; i++)
+	{
+		if (value & (1 << i))
+			return i;
+	}
+	return 32;
+}
+
+UINT64 drcbe_c::tzcount64(UINT64 value)
+{
+	for (int i = 0; i < 64; i++)
+	{
+		if (value & ((UINT64)(1) << i))
+			return i;
+	}
+	return 64;
 }

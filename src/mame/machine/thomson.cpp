@@ -373,6 +373,8 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 		m_thom_cart_nb_banks = 1;
 	else if ( size == 0x08000 )
 		m_thom_cart_nb_banks = 2;
+	else if ( size == 0x0c000 )
+		m_thom_cart_nb_banks = 3;
 	else if ( size == 0x10000 )
 		m_thom_cart_nb_banks = 4;
 	else
@@ -1502,6 +1504,8 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 		m_thom_cart_nb_banks = 1;
 	else if ( size == 0x08000 )
 		m_thom_cart_nb_banks = 2;
+	else if ( size == 0x0c000 )
+		m_thom_cart_nb_banks = 3;
 	else if ( size == 0x10000 )
 		m_thom_cart_nb_banks = 4;
 	else

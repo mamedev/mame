@@ -55938,23 +55938,23 @@ ExtractDisk  [02]"DATA          " -> "musium 3_02.d88"
 		</part>
 	</software>
 
-<software name="musium3a" cloneof="musium3">
-	<description>Musium 3 (Alt)</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
+	<software name="musium3a" cloneof="musium3">
+		<description>Musium 3 (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
 	
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="348848">
-			<rom name="musium3_01.d88" size="348848" crc="691cb9d6" sha1="de57c4cdddcd71042fa00c88f2e107fc6024b50e" offset="0" />
-		</dataarea>
-	</part>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="musium3_01.d88" size="348848" crc="691cb9d6" sha1="de57c4cdddcd71042fa00c88f2e107fc6024b50e" offset="0" />
+			</dataarea>
+		</part>
 	
-	<part name="flop2" interface="floppy_5_25">
-		<dataarea name="flop" size="348848">
-			<rom name="musium3_02.d88" size="348848" crc="cf4179af" sha1="79121bbec7e30408a9cb1f19f33ab260479d4636" offset="0" />
-		</dataarea>
-	</part>
-</software>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="musium3_02.d88" size="348848" crc="cf4179af" sha1="79121bbec7e30408a9cb1f19f33ab260479d4636" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="musium31">
 		<description>Musium 3 Data Shu</description>

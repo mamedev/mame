@@ -8,6 +8,7 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
+#include <memory>
 #include "nl_base.h"
 #include "nl_factory.h"
 
@@ -111,7 +112,15 @@ namespace netlist
 		pstring build_fqn(const pstring &obj_name) const;
 
 		void register_object(device_t &dev, const pstring &name, object_t &obj);
-		void register_dev(device_t *dev);
+
+		template<class C>
+		void register_dev_s(std::shared_ptr<C> dev)
+		{
+			register_dev(std::static_pointer_cast<device_t>(dev));
+		}
+
+
+		void register_dev(std::shared_ptr<device_t> dev);
 		void register_dev(const pstring &classname, const pstring &name);
 
 		void register_lib_entry(const pstring &name);
@@ -171,6 +180,8 @@ namespace netlist
 		plog_base<NL_DEBUG> &log() { return netlist().log(); }
 		const plog_base<NL_DEBUG> &log() const { return netlist().log(); }
 
+		pvector_t<std::pair<pstring, base_factory_t *>> m_device_factory;
+
 	protected:
 
 	private:
@@ -198,7 +209,6 @@ namespace netlist
 		phashmap_t<pstring, core_terminal_t *> m_terminals;
 
 		pvector_t<link_t> m_links;
-		pvector_t<std::pair<pstring, base_factory_t *>> m_device_factory;
 
 		factory_list_t m_factory;
 

@@ -263,7 +263,7 @@ void ui_menu_autofire::populate()
 		bool is_first_button = true;
 		for (ioport_field &field : port.fields())
 		{
-			if ((field.name()) && ((field.type() >= IPT_BUTTON1 && field.type() <= IPT_BUTTON16))) // IPT_BUTTON1 + 15)))
+			if (field.type() >= IPT_BUTTON1 && field.type() <= IPT_BUTTON16)
 			{
 				menu_items++;
 				ioport_field::user_settings settings;

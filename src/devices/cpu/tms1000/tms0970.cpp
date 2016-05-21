@@ -139,6 +139,7 @@ void tms0970_cpu_device::device_reset()
 // i/o handling
 void tms0970_cpu_device::write_o_output(UINT8 index)
 {
+	m_o_index = index;
 	m_o = m_spla->read(index);
 	m_write_o(0, m_o & m_o_mask, 0xffff);
 }

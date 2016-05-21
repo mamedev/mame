@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( master_map_program, AS_PROGRAM, 8, leland_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(leland_battery_ram_w) AM_SHARE("battery")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(leland_gated_paletteram_r, leland_gated_paletteram_w) AM_SHARE("palette")
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_master_video_addr_w)
 ADDRESS_MAP_END
@@ -2047,7 +2047,8 @@ DRIVER_INIT_MEMBER(leland_state,alleymas)
 	/* kludge warning: the game uses location E0CA to determine if the joysticks are available */
 	/* it gets cleared by the code, but there is no obvious way for the value to be set to a */
 	/* non-zero value. If the value is zero, the joystick is never read. */
-	m_alleymas_kludge_mem = m_master->space(AS_PROGRAM).install_write_handler(0xe0ca, 0xe0ca, write8_delegate(FUNC(leland_state::alleymas_joystick_kludge),this));
+	m_master->space(AS_PROGRAM).install_write_handler(0xe0ca, 0xe0ca, write8_delegate(FUNC(leland_state::alleymas_joystick_kludge),this));
+	m_alleymas_kludge_mem = m_mainram + (0xe0ca - 0xe000);
 }
 
 

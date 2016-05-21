@@ -15503,13 +15503,13 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 	
-<!-- This uses an unemulated mapper -->
-	<software name="v_dccol2" supported="no">
+	<software name="v_dccol2">
 		<description>Game Boy Advance Video - Disney Channel Collection - Volume 2 (USA)</description>
 		<year>2004?</year>
 		<publisher>Majesco</publisher>
 		<info name="serial" value="AGB-MDSE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_3dmatrix" />
 			<dataarea name="rom" size="67108864">
 				<rom name="disney channel collection - volume 2 (agb-mdse-usa).bin" size="67108864" crc="60dfd79c" sha1="864ce0db324b1252df923804f8c6e812d5ebcbba" offset="0" />
 			</dataarea>
@@ -15612,52 +15612,52 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-<!-- This uses an unemulated mapper -->
 	<software name="v_shrek" supported="no">
 		<description>Game Boy Advance Video - Shrek (USA)</description>
 		<year>2004?</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-MSKE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_3dmatrix" />
 			<dataarea name="rom" size="67108864">
 				<rom name="shrek-mske.bin" size="67108864" crc="690176e5" sha1="2dedea86ec289a0e31089299613d9f74cca03609" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- This uses an unemulated mapper -->
 	<software name="v_shrek2" supported="no">
 		<description>Game Boy Advance Video - Shrek 2 (USA)</description>
 		<year>2004?</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-M2SE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_3dmatrix" />
 			<dataarea name="rom" size="67108864">
 				<rom name="shrek2-m2se.bin" size="67108864" crc="0d353654" sha1="5cd627e205020297b25d707131883be5850515fe" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- This uses an unemulated mapper -->
 	<software name="v_sharkt" supported="no">
 		<description>Game Boy Advance Video - Shark Tale (USA, Rev. 6)</description>
 		<year>2004?</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-MSAE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_3dmatrix" />
 			<dataarea name="rom" size="67108864">
 				<rom name="sharkstale-msae.bin" size="67108864" crc="d2cf417a" sha1="9bc5b60793b8a6de3b80eb2c213cd125e1fa468e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 	
-<!-- This uses an unemulated mapper -->
 	<software name="v_sharkta" cloneof="v_sharkt" supported="no">
 		<description>Game Boy Advance Video - Shark Tale (USA, Rev. 5)</description>
 		<year>2004?</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-MSAE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_3dmatrix" />
 			<dataarea name="rom" size="67108864">
 				<rom name="shark tale (agb-msae-usa).bin" size="67108864" crc="01468820" sha1="6128a476edb10e6839ac5bd2697e83b9b7a9b234" offset="0" />
 			</dataarea>

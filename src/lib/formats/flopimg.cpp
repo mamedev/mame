@@ -1051,7 +1051,7 @@ bool floppy_image_format_t::extension_matches(const char *file_name) const
 		if(rlen == elen && !memcmp(ext, rext, rlen))
 			return true;
 		if(next_ext)
-			next_ext = next_ext +1;
+			rext = next_ext +1;
 		else
 			break;
 	}

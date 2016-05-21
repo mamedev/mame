@@ -2310,7 +2310,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Casio</publisher>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="casio_basic.rom" size="32768" crc="2181a21d" sha1="c48a68db822d9bded56ee1df55d18b81fbe135b7" offset="0x400x40000" />
+				<rom name="casio_basic.rom" size="32768" crc="2181a21d" sha1="c48a68db822d9bded56ee1df55d18b81fbe135b7" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>

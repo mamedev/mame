@@ -79,7 +79,7 @@
      Mini Typewriter has bugs.
      There was quite a lot of commercially-available software available, however 99 percent of it has been lost forever.
  -->
- 	<software name="eldraw">
+	<software name="eldraw">
 		<description>El Draw 3.6.3</description>
 		<year>198?</year>
 		<publisher>El Graphix</publisher>
@@ -450,6 +450,175 @@
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="7013616">
 				<rom name="bio.wav" size="7013616" crc="4ad81416" sha1="9ee6e217147aa2073c11301f54112d57832a8622" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="l2basic">
+		<description>TRS80 Level II Basic</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Microsoft and Bill Gluyas"/>
+		<info name="serial" value="401" />
+		<info name="usage" value="L to load, then G0 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="43947670">
+				<rom name="l2basic.wav" size="43947670" crc="2ae4d1cf" sha1="3efb407d6cc291b8cc4e9e2ac170d1778b80cefd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="zipzapa" cloneof="zipzap">
+		<description>Zip Zap (sound fixed)</description>
+		<year>198?</year>
+		<publisher>Bemak</publisher>
+		<info name="serial" value="403a" />
+		<info name="usage" value="super80d only. L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="15618506">
+				<rom name="zipzapa.wav" size="15618506" crc="bb16ab34" sha1="6dc6209af690ccad61eb8aef0bb0509ab9743813" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="zipzap1" cloneof="zipzap">
+		<description>Zip Zap (R1)</description>
+		<year>198?</year>
+		<publisher>Bemak</publisher>
+		<info name="serial" value="403R1" />
+		<info name="usage" value="super80d only. L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="15618496">
+				<rom name="zipzap1.wav" size="15618496" crc="5b98c625" sha1="871e278c0da48c236689fa7d20017d6f2ceb9c9b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="zipzap2j" cloneof="zipzap">
+		<description>Zip Zap (R2)(with arrows)</description>
+		<year>198?</year>
+		<publisher>Bemak</publisher>
+		<info name="serial" value="403R2J" />
+		<info name="usage" value="super80d only. L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="15621606">
+				<rom name="zipzap2j.wav" size="15621606" crc="89258a7f" sha1="c1e8eeed52ce98e65c35a12e65207aef681b2ac4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="inva">
+		<description>Invaders</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="404" />
+		<info name="usage" value="L to load, then G400 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="24197766">
+				<rom name="inva.wav" size="24197766" crc="1a8199af" sha1="5beea086a53c7ce348d65b75ac177349f9a08948" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="inva1" cloneof="inva">
+		<description>Invaders (R1)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="404R1" />
+		<info name="usage" value="L to load, then G400 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="24197766">
+				<rom name="inva1.wav" size="24197766" crc="b66a62e8" sha1="30f036cecb596d8adebbdd5837723995b2fff987" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="inva1j" cloneof="inva">
+		<description>Invaders (R1)(with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="404R1J" />
+		<info name="usage" value="L to load, then G400 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="24197756">
+				<rom name="inva1j.wav" size="24197756" crc="838bc91c" sha1="9c83c4cb439fc8f101c7191cbf0253cadea9ca3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="inva2" cloneof="inva">
+		<description>Invaders (R2)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="404R2" />
+		<info name="usage" value="L to load, then G400 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="24197756">
+				<rom name="inva2.wav" size="24197756" crc="bb43577b" sha1="874472efe0be974abbb74b250b049eee20133ad5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="inva2j" cloneof="inva">
+		<description>Invaders (R2)(with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="404R2J" />
+		<info name="usage" value="L to load, then G400 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="24197940">
+				<rom name="inva2j.wav" size="24197940" crc="5710e93c" sha1="d4f1b421cf530aa16d1e54b53b81cf35f8a892d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="smart">
+		<description>Smart Bomb</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="405" />
+		<info name="usage" value="L to load, then G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="10453720">
+				<rom name="smart.wav" size="10453720" crc="4ae7ec5b" sha1="eede9783b57dac351ecfb654566a2c8a3db86a0d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="life">
+		<description>Life</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="406" />
+		<info name="usage" value="L to load, then G0 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="2716194">
+				<rom name="life.wav" size="2716194" crc="8b277807" sha1="c20fab75f08df6e5cc3e47231b2f5d78b6e10073" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="minit1" cloneof="minitype">
+		<description>Mini Typewriter (L1)</description>
+		<year>198?</year>
+		<publisher>Bemak</publisher>
+		<info name="serial" value="417L1" />
+		<info name="usage" value="L to load, GB700 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="5294254">
+				<rom name="minit1.wav" size="5294254" crc="bfdabf51" sha1="927e8254af091452633e62fad486487ee63b0cde" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="minit3" cloneof="minitype">
+		<description>Mini Typewriter (L3)</description>
+		<year>198?</year>
+		<publisher>Bemak</publisher>
+		<info name="serial" value="417L3" />
+		<info name="usage" value="L to load, G8000 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="2246966">
+				<rom name="minit3.wav" size="2246966" crc="41298d8e" sha1="6c68db7f659912b6bdc1009d1a21ed0ee24eba8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="basic1" cloneof="basic">
+		<description>Tape Basic (fixed)</description>
+		<year>198?</year>
+		<publisher>Dick Smith Electronics</publisher>
+		<info name="serial" value="421R1" />
+		<info name="usage" value="L to load, then G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="31922598">
+				<rom name="basic1.wav" size="31922598" crc="53340728" sha1="c7d5ff8abe238da1b5d278b06c4bd7924dfcc729" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1315,6 +1484,18 @@
 			</dataarea>
 		</part>
 	</software>
+	<software name="debug4">
+		<description>Debug (L4)</description>
+		<year>198?</year>
+		<publisher>Dick Smith Electronics</publisher>
+		<info name="serial" value="438L4" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="7050924">
+				<rom name="debug4.wav" size="7050924" crc="8a43807f" sha1="241fa19b7940ba1a06f251d1c7f0505ba8e3dd08" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 <!--
      Various homebrew programs for use with super80v (80 column display), recorded at 600 baud.
      Most of these have been partially rewritten by myself to take advantage of the features of the super80v.
@@ -1512,6 +1693,32 @@
 			</dataarea>
 		</part>
 	</software>
+	<software name="xmerlin">
+		<description>Merlin</description>
+		<year>198?</year>
+		<publisher>Dreamcards</publisher>
+		<info name="developer" value="Lindsay R. Ford and V.J.R. Morin"/>
+		<info name="serial" value="110L2" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="59435768">
+				<rom name="xmerlin.wav" size="59435768" crc="c70585ab" sha1="b2d5ec48b8d7d5e9a54952f8261fc9d3b468119d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xmerlin2" cloneof="xmerlin">
+		<description>Merlin (R2)</description>
+		<year>198?</year>
+		<publisher>Dreamcards</publisher>
+		<info name="developer" value="Lindsay R. Ford and V.J.R. Morin"/>
+		<info name="serial" value="110L2R2" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="59435590">
+				<rom name="xmerlin2.wav" size="59435590" crc="a8f28490" sha1="3724868526b15215b0d2e949c9fb7d50694b9d44" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 	<software name="x6845p">
 		<description>6845 Programmer</description>
 		<year>198?</year>
@@ -1534,6 +1741,220 @@
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="3993198">
 				<rom name="xcharp.wav" size="3993198" crc="32c9f241" sha1="7ecfdeb112c5399746c000a42672799ca06ca2ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xbeez80">
+		<description>BEE-Z80</description>
+		<year>1983</year>
+		<publisher>Mytek</publisher>
+		<info name="serial" value="182" />
+		<info name="usage" value="L to load, GA00 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="7924504">
+				<rom name="xbeez80.wav" size="7924504" crc="cc10ad3e" sha1="9d8f58c0f3a2bd4a02295b88324281c4b48036c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xbemon">
+		<description>Bemon</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="186" />
+		<info name="usage" value="L to load, G6000 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="7915586">
+				<rom name="xbemon.wav" size="7915586" crc="9d51f95b" sha1="69f70b13c3044d3bf0f938a7305924c5bcd2c495" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xwbee">
+		<description>WordBee</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="199L2" />
+		<info name="usage" value="L to load, G9000 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="15771980">
+				<rom name="xwbee.wav" size="15771980" crc="6ed39e7e" sha1="4161f2561caef238a6b8083f426ea444d31592dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xwbee2" cloneof="xwbee">
+		<description>WordBee (L3)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="199L3R2" />
+		<info name="usage" value="L to load, G9000 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="15772104">
+				<rom name="xwbee2.wav" size="15772104" crc="8abe9d89" sha1="c267e868fd65f4fe3a9eb54c28d107d9605a70ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xmsinv">
+		<description>Microspace Invaders</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Tim Morris-Yates"/>
+		<info name="serial" value="242R1" />
+		<info name="usage" value="L to load, G1000 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="13594488">
+				<rom name="xmsinv.wav" size="13594488" crc="8d8b0eb2" sha1="9709eb883513d75dc2213c571e79fadff4f98b51" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xmsinvj" cloneof="xmsinv">
+		<description>Microspace Invaders (with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Tim Morris-Yates"/>
+		<info name="serial" value="242R1J" />
+		<info name="usage" value="L to load, G1000 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="13594394">
+				<rom name="xmsinvj.wav" size="13594394" crc="12e8a9e0" sha1="37cd4db1f0b9fe208d3b4b11ff504792a7e6a556" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xmsinv2" cloneof="xmsinv">
+		<description>Microspace Invaders (R2)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Tim Morris-Yates"/>
+		<info name="serial" value="242R2" />
+		<info name="usage" value="L to load, G1000 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="13593974">
+				<rom name="xmsinv2.wav" size="13593974" crc="3ea62952" sha1="1f5b2c0d2667f7c2369ebe3c139e52db39bb8974" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xmsinv2j" cloneof="xmsinv">
+		<description>Microspace Invaders (L2)(with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Tim Morris-Yates"/>
+		<info name="serial" value="242R2J" />
+		<info name="usage" value="L to load, G1000 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="13593876">
+				<rom name="xmsinv2j.wav" size="13593876" crc="b4a74d1c" sha1="6cec67c82499d62d65fbbc111071e4727b2d6cb9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xkilo">
+		<description>Kilopede</description>
+		<year>1983</year>
+		<publisher>Mytek</publisher>
+		<info name="developer" value="Matthew Hickey"/>
+		<info name="serial" value="254" />
+		<info name="usage" value="L to load, G1C0A to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="12734362">
+				<rom name="xkilo.wav" size="12734362" crc="49f4d2df" sha1="09b5bce6679942cc4ef538ee35c5a05165596b80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xkiloj" cloneof="xkilo">
+		<description>Kilopede (with arrows)</description>
+		<year>1983</year>
+		<publisher>Mytek</publisher>
+		<info name="developer" value="Matthew Hickey"/>
+		<info name="serial" value="254J" />
+		<info name="usage" value="L to load, G1C0A to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="12734342">
+				<rom name="xkiloj.wav" size="12734342" crc="8bb81ded" sha1="3b151c71d5ac977ffe2b127dbc6935fe7ec7ea40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xkilo1" cloneof="xkilo">
+		<description>Kilopede (R1)</description>
+		<year>1983</year>
+		<publisher>Mytek</publisher>
+		<info name="developer" value="Matthew Hickey"/>
+		<info name="serial" value="254R1" />
+		<info name="usage" value="L to load, G1C0A to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="12734206">
+				<rom name="xkilo1.wav" size="12734206" crc="ab4a7ba6" sha1="cf3e780fd8028110ef0a48e7081f5995a74c98bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xkilo1j" cloneof="xkilo">
+		<description>Kilopede (R1)(with arrows)</description>
+		<year>1983</year>
+		<publisher>Mytek</publisher>
+		<info name="developer" value="Matthew Hickey"/>
+		<info name="serial" value="254R1J" />
+		<info name="usage" value="L to load, G1C0A to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="12734186">
+				<rom name="xkilo1j.wav" size="12734186" crc="b8d35ef2" sha1="290db24766016be5ba4d106e4fd9eab310e9671e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xastp">
+		<description>Asteroids Plus (R2)</description>
+		<year>198?</year>
+		<publisher>Mytek</publisher>
+		<info name="serial" value="258R2" />
+		<info name="usage" value="L to load, G349B to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="19722172">
+				<rom name="xastp.wav" size="19722172" crc="43fc39cd" sha1="8e9d6daf2e0788c0edc787695c68a9ab42ebd9c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xastp3" cloneof="xastp">
+		<description>Asteroids Plus (R3)</description>
+		<year>198?</year>
+		<publisher>Mytek</publisher>
+		<info name="serial" value="258R3" />
+		<info name="usage" value="L to load, G349B to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="20160170">
+				<rom name="xastp3.wav" size="20160170" crc="57511ae7" sha1="3b13a935f60df563251e4efe50eeb631cb56f416" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xastp3j" cloneof="xastp">
+		<description>Asteroids Plus (R3)(with arrows)</description>
+		<year>198?</year>
+		<publisher>Mytek</publisher>
+		<info name="serial" value="258R3J" />
+		<info name="usage" value="L to load, G349B to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="20160138">
+				<rom name="xastp3j.wav" size="20160138" crc="613e1d54" sha1="59c3b4015ae5ebc548d0e64360df8863e9722f93" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xmart">
+		<description>Martian Attack</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Frank W. Smith"/>
+		<info name="serial" value="450" />
+		<info name="usage" value="L to load, G0 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="3557448">
+				<rom name="xmart.wav" size="3557448" crc="a81c45b5" sha1="28eb58eab4f6d141413c1223bcc459bd962c3090" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xmart1j" cloneof="xmart">
+		<description>Martian Attack (R1)(with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Frank W. Smith"/>
+		<info name="serial" value="450R1J" />
+		<info name="usage" value="L to load, G0 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="3557048">
+				<rom name="xmart1j.wav" size="3557048" crc="d846b785" sha1="d90e305bfc964736294f000dc6d19893d0d4ff43" offset="0" />
 			</dataarea>
 		</part>
 	</software>

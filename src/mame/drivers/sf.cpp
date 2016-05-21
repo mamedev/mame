@@ -15,7 +15,6 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
-#include "sound/msm5205.h"
 #include "includes/sf.h"
 
 
@@ -132,7 +131,7 @@ WRITE8_MEMBER(sf_state::coin_w)
 
 WRITE8_MEMBER(sf_state::soundcmd_w)
 {
-	soundlatch_byte_w(space, offset, data & 0xff);
+	m_soundlatch->write(space, offset, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -231,8 +230,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, sf_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
+	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 ADDRESS_MAP_END
 
 /* Yes, _no_ ram */
@@ -246,7 +245,7 @@ static ADDRESS_MAP_START( sound2_io_map, AS_IO, 8, sf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(msm1_5205_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm2_5205_w)
-	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound2_bank_w)
 ADDRESS_MAP_END
 
@@ -563,6 +562,8 @@ static MACHINE_CONFIG_START( sfan, sf_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
