@@ -1147,17 +1147,19 @@ case 0x4B:  /* MOVW RRr,ww - 9 cycles - Flags affected: -------- */
 		mycycles += 9;
 	break;
 case 0x4C:  /* MULT Rrr,Rs - 24 cycles - Flags affected: -Z-0---- */
+	// operation is not known if r1 is odd, assuming same as even for now
 	ARG_RR;
-	res = mem_readword( r1 ) * mem_readbyte( r2 );
-	mem_writeword( r1, res & 0xFFFF );
+	res = mem_readbyte( r1 | 1 ) * mem_readbyte( r2 );
+	mem_writeword( r1 & 0xfe, res & 0xFFFF );
 	m_PS1 = m_PS1 & ~ ( FLAG_Z | FLAG_V );
 	m_PS1 |= ( ( res & 0xFFFF ) == 0x00 ? FLAG_Z : 0 );
 	mycycles += 24;
 	break;
 case 0x4D:  /* MULT RRr,i - 24 cycles - Flags affected: -Z-0---- */
+	// operation is not known if r1 is odd, assuming same as even for now
 	ARG_iR;
-	res = mem_readbyte( r1 + 1 ) * r2;
-	mem_writeword( r1, res & 0xFFFF );
+	res = mem_readbyte( r1 | 1 ) * r2;
+	mem_writeword( r1 & 0xfe, res & 0xFFFF );
 	m_PS1 = m_PS1 & ~ ( FLAG_Z | FLAG_V );
 	m_PS1 |= ( ( res & 0xFFFF ) == 0x00 ? FLAG_Z : 0 );
 	mycycles += 24;
