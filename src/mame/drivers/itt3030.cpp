@@ -274,6 +274,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bankh_w);
 	DECLARE_READ8_MEMBER(kbd_matrix_r);
 	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
+	DECLARE_READ8_MEMBER(kbd_port2_r);
 	DECLARE_WRITE8_MEMBER(kbd_port2_w);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
@@ -370,7 +371,7 @@ UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		for(int x = 0; x < 80; x++ )
 		{
 			UINT8 code = m_vram[x + y*128];
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*16);
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*12);
 		}
 	}
 
@@ -540,6 +541,11 @@ WRITE8_MEMBER(itt3030_state::kbd_port2_w)
 	m_kbdport2 = data;
 }
 
+READ8_MEMBER(itt3030_state::kbd_port2_r)
+{
+	return m_kbdport2;
+}
+
 // Schematics + i8278 datasheet says:
 // Port 1 goes to the keyboard matrix.
 // bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
@@ -548,7 +554,7 @@ WRITE8_MEMBER(itt3030_state::kbd_port2_w)
 static ADDRESS_MAP_START( kbdmcu_io, AS_IO, 8, itt3030_state )
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(kbd_matrix_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kbd_matrix_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_NOP AM_WRITE(kbd_port2_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(kbd_port2_r, kbd_port2_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( itt3030 )
@@ -685,7 +691,7 @@ void itt3030_state::machine_start()
 
 void itt3030_state::machine_reset()
 {
-	m_bank = 9;
+	m_bank = 0;
 	m_48kbank->set_bank(8);
 	m_kbdread = 1;
 	m_kbdrow = m_kbdcol = 0;
@@ -725,8 +731,8 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
 	MCFG_SCREEN_UPDATE_DRIVER(itt3030_state, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 24*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*16-1)
+	MCFG_SCREEN_SIZE(80*8, 24*12)
+	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* devices */
@@ -734,10 +740,11 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_DEVICE_PROGRAM_MAP(lower48_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(20)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_DEVICE_ADD("crt5027", CRT5027, XTAL_6MHz)
-	MCFG_TMS9927_CHAR_WIDTH(16)
+	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	MCFG_FD1791_ADD("fdc", XTAL_20MHz / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(itt3030_state, fdcirq_w))
