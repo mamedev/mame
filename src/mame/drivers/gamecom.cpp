@@ -19,8 +19,6 @@ Game Status:
 - All carts appear to work except:
 - - Henry: crash just after "HENRY" button clicked
 - - Lost World: freeze just after entering Stage 2 (the nest)
-- - Sonic Jam: player's character can fall out of a dip in the path and die.
-- Most carts have some flicker, but some are terrible (Monopoly, MK Trilogy, Fighters Megamix, Jeopardy)
 - Weblink and Internet are of no use as there is nothing to connect to.
 
 ***************************************************************************/
