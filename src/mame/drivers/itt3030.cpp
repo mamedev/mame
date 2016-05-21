@@ -415,9 +415,9 @@ READ8_MEMBER(itt3030_state::fdc_stat_r)
 	res = m_fdc_drq ? 0x80 : 0x00;
 	res |= m_fdc_irq ? 0x40 : 0x00;
 	res |= m_fdc_hld ? 0x00 : 0x20;
-	if (floppy3) res |= floppy3->ready_r() ? 0x10 : 0;
-	if (floppy2) res |= floppy2->ready_r() ? 0x08 : 0;
-	if (floppy1) res |= floppy1->ready_r() ? 0x04 : 0;
+	if (floppy3) res |= !floppy3->ready_r() ? 0x10 : 0;
+	if (floppy2) res |= !floppy2->ready_r() ? 0x08 : 0;
+	if (floppy1) res |= !floppy1->ready_r() ? 0x04 : 0;
 	if (m_curfloppy) res |= m_curfloppy->wpt_r() ? 0x02 : 0;
 
 	return res;
