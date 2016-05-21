@@ -170,7 +170,7 @@ void ui_menu_input_specific::populate()
 			ioport_type_class type_class = field.type_class();
 
 			/* add if we match the group and we have a valid name */
-			if (field.enabled() && (type_class == INPUT_CLASS_CONTROLLER || type_class == INPUT_CLASS_MISC))
+			if (field.enabled() && (type_class == INPUT_CLASS_CONTROLLER || type_class == INPUT_CLASS_MISC || type_class == INPUT_CLASS_KEYBOARD))
 			{
 				input_seq_type seqtype;
 				UINT32 sortorder;
