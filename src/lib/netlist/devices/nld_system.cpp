@@ -43,7 +43,8 @@ NETLIB_RESET(extclock)
 
 NETLIB_UPDATE(extclock)
 {
-	if (m_cnt != 0)
+#if 0
+	if (m_off == netlist_time::zero)
 	{
 		OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[m_cnt]);
 		m_cnt = (m_cnt + 1) % m_size;
@@ -54,6 +55,11 @@ NETLIB_UPDATE(extclock)
 		m_cnt = 1;
 		m_off = netlist_time::zero;
 	}
+#else
+	OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
+	m_cnt = (m_cnt + 1) % m_size;
+	m_off = netlist_time::zero;
+#endif
 }
 
 // ----------------------------------------------------------------------------------------

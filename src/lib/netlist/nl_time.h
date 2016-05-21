@@ -56,6 +56,7 @@ namespace netlist
 		ATTR_HOT friend bool operator>=(const netlist_time &left, const netlist_time &right);
 		ATTR_HOT friend bool operator<=(const netlist_time &left, const netlist_time &right);
 		ATTR_HOT friend bool operator!=(const netlist_time &left, const netlist_time &right);
+		ATTR_HOT friend bool operator==(const netlist_time &left, const netlist_time &right);
 
 		ATTR_HOT const netlist_time &operator=(const netlist_time &right) { m_time = right.m_time; return *this; }
 
@@ -127,6 +128,11 @@ namespace netlist
 	ATTR_HOT inline bool operator!=(const netlist_time &left, const netlist_time &right)
 	{
 		return (left.m_time != right.m_time);
+	}
+
+	ATTR_HOT inline bool operator==(const netlist_time &left, const netlist_time &right)
+	{
+		return (left.m_time == right.m_time);
 	}
 
 }
