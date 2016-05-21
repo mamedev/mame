@@ -58,6 +58,7 @@ VIDEOS["FIXFREQ"] = true
 
 MACHINES["NETLIST"] = true
 MACHINES["Z80DMA"] = true
+MACHINES["GEN_LATCH"] = true
 --MACHINES["6821PIA"] = true
 --MACHINES["TTL74148"] = true
 --MACHINES["TTL74153"] = true
