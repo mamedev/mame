@@ -8813,7 +8813,7 @@ GAME( 1994, fightfeva,  fightfev, neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1994, pspikes2,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Power Spikes II (NGM-068)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, sonicwi2,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Aero Fighters 2 / Sonic Wings 2", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sonicwi3,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Aero Fighters 3 / Sonic Wings 3", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fr2,        neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Idol Mahjong Final Romance 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fr2,        neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Idol Mahjong Final Romance 2 (Neo-Geo)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, popbounc,   neogeo,   popbounc,  neogeo, neogeo_state,   neogeo,   ROT0, "Video System Co.", "Pop 'n Bounce / Gapporin", MACHINE_SUPPORTS_SAVE )
 
 /* Visco */
