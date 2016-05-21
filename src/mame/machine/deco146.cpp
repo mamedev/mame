@@ -1372,7 +1372,8 @@ UINT16 deco_146_base_device::port_c_default(int unused)
 
 void deco_146_base_device::soundlatch_default(address_space &space, UINT16 data, UINT16 mem_mask)
 {
-	m_sound_latch->write(space, 0, data & 0xff);
+	if (m_sound_latch != nullptr)
+		m_sound_latch->write(space, 0, data & 0xff);
 	cpu_device* cpudev = (cpu_device*)machine().device(":audiocpu");
 	if (cpudev) cpudev->set_input_line(0, HOLD_LINE);
 }
