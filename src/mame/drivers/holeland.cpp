@@ -17,6 +17,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "sound/sp0256.h"
 #include "machine/nvram.h"
 #include "includes/holeland.h"
 
@@ -25,6 +26,7 @@ static ADDRESS_MAP_START( holeland_map, AS_PROGRAM, 8, holeland_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
+	//AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("speech", sp0256_device, ald_w)
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(holeland_pal_offs_w)
 	AM_RANGE(0xc006, 0xc007) AM_WRITE(holeland_flipscreen_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(holeland_colorram_w) AM_SHARE("colorram")
@@ -289,6 +291,10 @@ static MACHINE_CONFIG_START( holeland, holeland_state )
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/*MCFG_SOUND_ADD("speech", SP0256, 3120000) // ? MHz
+	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)*/
 MACHINE_CONFIG_END
 
 /*
@@ -388,6 +394,10 @@ ROM_START( holeland )
 	ROM_LOAD( "holeland.8",  0x2000, 0x2000, CRC(4b6eec16) SHA1(4c5da89c2babeb33951d101703e6699fbcb886b4) )
 	ROM_LOAD( "holeland.9",  0x4000, 0x2000, CRC(6fe7fcc0) SHA1(fa982551285f728cee0055a0c473f6c74d802d2e) )
 	ROM_LOAD( "holeland.10", 0x6000, 0x2000, CRC(e1e11e8f) SHA1(56082fe497d8ee8ecfe1b89c0c5ada4ddfa4740f) )
+
+	ROM_REGION( 0x10000, "speech", 0 )
+	/* SP0256 mask rom */
+	ROM_LOAD( "sp0256.bin",   0x1000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "3m",          0x0000, 0x0100, CRC(9d6fef5a) SHA1(e2b62909fecadfc9e0eb1ad72c8b7712a26d184e) )  /* Red component */
