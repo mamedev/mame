@@ -8025,6 +8025,8 @@ ROM_END
 //  Wonder Boy III, Sega System 16B
 //  CPU: FD1094 (317-0087)
 //  ROM Board type: 171-5704
+// Sega ID# for Game Nunmber: 833-6851-01  MONSTER LAIR
+// Sega ID# for ROM board: 834-6854-01
 //
 ROM_START( wb34 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
