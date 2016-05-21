@@ -57,13 +57,13 @@
 		<publisher>Matra Datasysteme</publisher>
 
 		<part name="cass1" interface="mc10_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="10598">
 				<rom name="incv40.k7" size="10598" crc="ed0f60dc" sha1="01bad4777519de9bc4bf4c1cbd80c883ace6bdfa" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc10_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="8950">
 				<rom name="incv80.k7" size="8950" crc="11ecea51" sha1="c2edac43dc6437a03f78ed4076497bb41e1d29c6" offset="0"/>
 			</dataarea>

@@ -179,6 +179,20 @@
 	</software>
 
 
+	<!--Cyber Core -->
+	<software name="cybrcore">
+		<description>Cyber Core (Tourvision PCE bootleg)</description>
+		<year>1990</year>
+		<publisher>bootleg (Tourvision) / IGS</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+		<!-- 0x40000 the same of PCE - cybrcore -->
+				<rom name="cyber_core.bin" size="1048576" crc="e1bfac8f" sha1="8c346edf8251710a3dcddf4bd1f870de0661e5c9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	
 	<!--Daisenpu -->
 	<software name="daisenpu">
 		<description>Daisenpu (Tourvision PCE bootleg)</description>
@@ -244,6 +258,20 @@
 			<dataarea name="rom" size="262144">
 		<!-- verified identical -->
 				<rom name="doraemon - meikyuu dai sakusen (japan).pce" size="262144" crc="dc760a07" sha1="81769dc4e2e669f6ae98872d22c52ac290530a28" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!--Down Load -->
+	<software name="download">
+		<description>Down Load (Tourvision PCE bootleg)</description>
+		<year>1990</year>
+		<publisher>bootleg (Tourvision) / NEC Avenue</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+		<!-- 0x80000 matches PCE download -->
+				<rom name="down_load.bin" size="1048576" crc="cd4e0142" sha1="8324e0699c41c5af524889a9df2f4d45d8683d4e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -930,6 +958,20 @@ Notes:
 			<dataarea name="rom" size="393216">
 		<!-- verified identical -->
 				<rom name="veigues - tactical gladiator (japan).pce" size="393216" crc="04188c5c" sha1="da66c085ecbb317cb160cb192142a3d2c044f26f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!--Vigilante -->
+	<software name="vigilant">
+		<description>Vigilante (Tourvision PCE bootleg)</description>
+		<year>1988</year>
+		<publisher>bootleg (Tourvision) / Irem</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+		<!-- 0x40000 matches PCE vigilant -->
+				<rom name="vigilante.bin" size="1048576" crc="00eaafcc" sha1="a082ef8ba1ffb9abc8296eadba1e9e70ba7b6812" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

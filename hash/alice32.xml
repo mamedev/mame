@@ -85,13 +85,13 @@ TODO: split Alice 4k tapes into their own softlist
 		<publisher>Matra Datasysteme</publisher>
 
 		<part name="cass1" interface="mc10_cass">
-		<feature name="part_id" value="Tape 1 (Coloric)"/>
+			<feature name="part_id" value="Tape 1 (Coloric)"/>
 			<dataarea name="cass" size="14326">
 				<rom name="coloric.k7" size="14326" crc="79fc3639" sha1="8257d0016bae78d65d153bf8e7a9bc30cbd68477" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc10_cass">
-		<feature name="part_id" value="Tape 2 (La Marelle)"/>
+			<feature name="part_id" value="Tape 2 (La Marelle)"/>
 			<dataarea name="cass" size="35788">
 				<rom name="marelle.k7" size="35788" crc="d3ebabb9" sha1="94fff6c4983af5163e0c60f371c903eb331ba4b6" offset="0"/>
 			</dataarea>
@@ -224,13 +224,13 @@ TODO: split Alice 4k tapes into their own softlist
 		<publisher>Ediciel</publisher>
 
 		<part name="cass1" interface="mc10_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="79023">
 				<rom name="maths1_a.k7" size="79023" crc="6201e166" sha1="56dfc93b81aa47f8b5c0336b66ebba4486d2149e" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc10_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="79023">
 				<rom name="maths1_b.k7" size="98152" crc="0a68e9c4" sha1="263c82d01e5883cf78c591b598f5fa5bf4d0c585" offset="0"/>
 			</dataarea>
@@ -243,13 +243,13 @@ TODO: split Alice 4k tapes into their own softlist
 		<publisher>Ediciel</publisher>
 
 		<part name="cass1" interface="mc10_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="79023">
 				<rom name="maths2_a.k7" size="48261" crc="c1393f3e" sha1="9f758c048f98817f26a5943b415786c25ab76174" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc10_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="79023">
 				<rom name="maths2_b.k7" size="68317" crc="87e841df" sha1="4edcf1aa149852fd4dd55d8d4dc271deac42e9da" offset="0"/>
 			</dataarea>
@@ -298,19 +298,19 @@ TODO: split Alice 4k tapes into their own softlist
 		<publisher>Patrice Lapierre</publisher>
 
 		<part name="cass1" interface="mc10_cass">
-		<feature name="part_id" value="Cont Bank v320"/>
+			<feature name="part_id" value="Cont Bank v320"/>
 			<dataarea name="cass" size="6890">
 				<rom name="gestion de compte-cheques (patrice lapierre) (2005) (alice) (cont bank v320).k7" size="6890" crc="5f96745d" sha1="ad1d9c858521bf36d442671ee4f7b897611a9a0f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc10_cass">
-		<feature name="part_id" value="Cont Bank Donnees"/>
+			<feature name="part_id" value="Cont Bank Donnees"/>
 			<dataarea name="cass" size="12327">
 				<rom name="gestion de compte-cheques (patrice lapierre) (2005) (alice) (cont bank donnees).k7" size="12327" crc="85a98dea" sha1="0e4009616b6dda8854e4d4296ec3892b09e53ea9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="mc10_cass">
-		<feature name="part_id" value="Ncontbnk"/>
+			<feature name="part_id" value="Ncontbnk"/>
 			<dataarea name="cass" size="19155">
 				<rom name="gestion de compte-cheques (patrice lapierre) (2005) (alice) (ncontbnk).k7" size="19155" crc="628c4260" sha1="687a5e0616d971275effef3ca4d2cf8d96fe0a86" offset="0" />
 			</dataarea>
@@ -335,25 +335,25 @@ TODO: split Alice 4k tapes into their own softlist
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="mc10_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="41490">
 				<rom name="ibasic1.k7" size="41490" crc="9aa60a36" sha1="eb10cafdd03dec1d4914fc1d67281f03ac34151d" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc10_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="39657">
 				<rom name="ibasic2.k7" size="39657" crc="fd764f4a" sha1="83d0bca98a5458e78e4eea24994f4221868a0751" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="mc10_cass">
-		<feature name="part_id" value="Tape 3"/>
+			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="33705">
 				<rom name="ibasic3.k7" size="33705" crc="a7f3468c" sha1="ad10fd219b55d1a5620733c4a882b179eeee5ef5" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="mc10_cass">
-		<feature name="part_id" value="Tape 4"/>
+			<feature name="part_id" value="Tape 4"/>
 			<dataarea name="cass" size="12358">
 				<rom name="ibasic4.k7" size="12358" crc="3d1e46a3" sha1="c51f29c54e91419598feeb00f5ece3affc50f272" offset="0"/>
 			</dataarea>
@@ -402,19 +402,19 @@ TODO: split Alice 4k tapes into their own softlist
 		<publisher>Ediciel</publisher>
 
 		<part name="cass1" interface="mc10_cass">
-		<feature name="part_id" value="Tape 1 (Mur de Briques)"/>
+			<feature name="part_id" value="Tape 1 (Mur de Briques)"/>
 			<dataarea name="cass" size="4813">
 				<rom name="murbri.k7" size="4813" crc="475f43ff" sha1="8b3fcf882eb886fbe5c3dd225d317338546c1ba5" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc10_cass">
-		<feature name="part_id" value="Tape 2 (Sous-Marin)"/>
+			<feature name="part_id" value="Tape 2 (Sous-Marin)"/>
 			<dataarea name="cass" size="4051">
 				<rom name="sousmar.k7" size="4051" crc="a0a1a1ad" sha1="363ae04cdccad69bdf29e6e0ba79107db0b3a320" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="mc10_cass">
-		<feature name="part_id" value="Tape 3 (Color-Mind)"/>
+			<feature name="part_id" value="Tape 3 (Color-Mind)"/>
 			<dataarea name="cass" size="3779">
 				<rom name="colorm.k7" size="3779" crc="5ca66e27" sha1="4b29a72224bc6abefe0a8f96f96ae5c7b052d9ac" offset="0"/>
 			</dataarea>
@@ -499,25 +499,25 @@ TODO: split Alice 4k tapes into their own softlist
 		<publisher>Infogrames</publisher>
 
 		<part name="cass1" interface="mc10_cass">
-		<feature name="part_id" value="Maths 1"/>
+			<feature name="part_id" value="Maths 1"/>
 			<dataarea name="cass" size="19482">
 				<rom name="cmaths1.k7" size="19482" crc="04647faf" sha1="b9166495a7df95b146ed3ef81fdba828c4761734" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc10_cass">
-		<feature name="part_id" value="Maths 2"/>
+			<feature name="part_id" value="Maths 2"/>
 			<dataarea name="cass" size="19027">
 				<rom name="cmaths2.k7" size="19027" crc="92e5e402" sha1="a48ae7878f77780721e54ce6663a9101b0b4cdd9" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="mc10_cass">
-		<feature name="part_id" value="Francais 1"/>
+			<feature name="part_id" value="Francais 1"/>
 			<dataarea name="cass" size="18428">
 				<rom name="cfran1.k7" size="18428" crc="920b9ac5" sha1="0c884d87cd08c65b54a4242c2a9d80457b4939f8" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="mc10_cass">
-		<feature name="part_id" value="Francais 2"/>
+			<feature name="part_id" value="Francais 2"/>
 			<dataarea name="cass" size="18607">
 				<rom name="cfran2.k7" size="18607" crc="eb5f5309" sha1="7581b3167d4ea436cfa16b4ea6aedc5ca3a225ac" offset="0"/>
 			</dataarea>
@@ -652,13 +652,13 @@ TODO: split Alice 4k tapes into their own softlist
 		<publisher>Patrice Lapierre</publisher>
 
 		<part name="cass1" interface="mc10_cass">
-		<feature name="part_id" value="Tape 1"/>
+			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="599">
 				<rom name="modecls.cas" size="599" crc="142dfb23" sha1="0756c4dd6ad36501ff5746cf393dc315454b9017" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc10_cass">
-		<feature name="part_id" value="Tape 2"/>
+			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="803">
 				<rom name="modecls2.cas" size="803" crc="9bc5e1b5" sha1="050811c3b66787bf90dd461c998922cde902b998" offset="0" />
 			</dataarea>
@@ -791,13 +791,13 @@ TODO: split Alice 4k tapes into their own softlist
 		<publisher>Matra Datasysteme</publisher>
 
 		<part name="cass1" interface="mc10_cass">
-		<feature name="part_id" value="Tape 1 (World War 3)"/>
+			<feature name="part_id" value="Tape 1 (World War 3)"/>
 			<dataarea name="cass" size="20989">
 				<rom name="wwar3.k7" size="20989" crc="a7e839c3" sha1="9c40fc007a603f44e5ca95a43cc4c65676a9aef8" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc10_cass">
-		<feature name="part_id" value="Tape 2 (Tank)"/>
+			<feature name="part_id" value="Tape 2 (Tank)"/>
 			<dataarea name="cass" size="16108">
 				<rom name="tank.k7" size="16108" crc="38319244" sha1="93c1d9d7030c079e5780fb917d4da596190924f1" offset="0"/>
 			</dataarea>
