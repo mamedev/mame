@@ -1664,10 +1664,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		lines_pending = true;
 
-		bool swap_xy = win->swap_xy();
-		int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
-		int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
-
+		int source_width = int(poly->get_prim_width() + 0.5f);
+		int source_height = int(poly->get_prim_height() + 0.5f);
+		if (win->swap_xy())
+		{
+			std::swap(source_width, source_height);
+		}
 		curr_render_target = find_render_target(source_width, source_height, 0, 0);
 
 		d3d_render_target *rt = curr_render_target;
@@ -1691,10 +1693,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_screen = curr_screen < num_screens ? curr_screen : 0;
 
-		bool swap_xy = win->swap_xy();
-		int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
-		int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
-
+		int source_width = int(poly->get_prim_width() + 0.5f);
+		int source_height = int(poly->get_prim_height() + 0.5f);
+		if (win->swap_xy())
+		{
+			std::swap(source_width, source_height);
+		}
 		curr_render_target = find_render_target(source_width, source_height, 0, 0);
 
 		d3d_render_target *rt = curr_render_target;
@@ -1838,10 +1842,11 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 
 	auto win = d3d->assert_window();
 
-	int source_width = float(d3d->get_width());
-	int source_height = float(d3d->get_height());
-	int target_width = int(prim->get_quad_width() + 0.5f);
-	int target_height = int(prim->get_quad_height() + 0.5f);
+	// source and target size are the same for vector targets
+	int source_width = int(prim->get_quad_width() + 0.5f);
+	int source_height = int(prim->get_quad_height() + 0.5f);
+	int target_width = source_width;
+	int target_height = source_height;
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 	if (win->swap_xy())
@@ -1872,10 +1877,11 @@ void shaders::create_vector_target(render_primitive *prim)
 {
 	auto win = d3d->assert_window();
 
-	int source_width = float(d3d->get_width());
-	int source_height = float(d3d->get_height());
-	int target_width = int(prim->get_quad_width() + 0.5f);
-	int target_height = int(prim->get_quad_height() + 0.5f);
+	// source and target size are the same for vector targets
+	int source_width = int(prim->get_quad_width() + 0.5f);
+	int source_height = int(prim->get_quad_height() + 0.5f);
+	int target_width = source_width;
+	int target_height = source_height;
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 	if (win->swap_xy())
@@ -1981,17 +1987,20 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 
 	auto win = d3d->assert_window();
 
+	int source_width = texture->get_width();
+	int source_height = texture->get_height();
 	int target_width = int(prim->get_quad_width() + 0.5f);
 	int target_height = int(prim->get_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 	if (win->swap_xy())
 	{
+		// source texture is already swapped
 		std::swap(target_width, target_height);
 	}
 
 	osd_printf_verbose("register_texture() - %d, %d\n", target_width, target_height);
-	if (!add_render_target(d3d, prim, texture, texture->get_width(), texture->get_height(), target_width, target_height))
+	if (!add_render_target(d3d, prim, texture, source_width, source_height, target_width, target_height))
 	{
 		return false;
 	}
