@@ -298,11 +298,11 @@ WRITE8_MEMBER( itt3030_state::beep_w )
 
 WRITE8_MEMBER(itt3030_state::bank_w)
 {
-	int bank = data >> 5;
+	int bank = 8;
 
-	if (!(data & 0x10)) // bank 8
+	if (BIT(data, 4))
 	{
-		bank = 8;
+		bank = (BIT(data, 5) << 2) | (BIT(data, 6) << 1) | BIT(data, 7);
 	}
 
 	//  printf("bank_w: new value %02x, m_bank %x, bank %x\n", data, m_bank, bank);
