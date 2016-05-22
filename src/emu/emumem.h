@@ -684,7 +684,7 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	memory_region *next() const { return m_next; }
-	UINT8 *base() { return &m_buffer[0]; }
+	UINT8 *base() { return (m_buffer.size() > 0) ? &m_buffer[0] : nullptr; }
 	UINT8 *end() { return base() + m_buffer.size(); }
 	UINT32 bytes() const { return m_buffer.size(); }
 	const char *name() const { return m_name.c_str(); }
