@@ -51,7 +51,6 @@ class wav_t
 public:
 	wav_t(postream &strm, unsigned sr) : m_f(strm)
 	{
-//      m_f = strm;
 		initialize(sr);
 		m_f.write(&m_fh, sizeof(m_fh));
 		m_f.write(&m_fmt, sizeof(m_fmt));

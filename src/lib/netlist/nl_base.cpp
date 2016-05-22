@@ -337,10 +337,19 @@ ATTR_COLD void netlist_t::reset()
 	}
 
 	// Step all devices once !
+#if 0
 	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		m_devices[i]->update_dev();
 	}
+#else
+	/* FIXME: this makes breakout attract mode working again.
+	 * It is however not acceptable that this depends on the startup order.
+	 * Best would be, if reset would call update_dev for devices which need it.
+	 */
+	for (int i = m_devices.size() - 1; i >= 0; i--)
+		m_devices[i]->update_dev();
+#endif
 
 	// FIXME: some const devices rely on this
 	/* make sure params are set now .. */

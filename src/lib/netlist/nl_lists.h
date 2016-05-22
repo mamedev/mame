@@ -64,12 +64,13 @@ namespace netlist
 		ATTR_HOT  bool is_empty() const { return (m_end == &m_list[1]); }
 		ATTR_HOT  bool is_not_empty() const { return (m_end > &m_list[1]); }
 
-		ATTR_HOT void push(const entry_t &e) NOEXCEPT
+		ATTR_HOT void push(const entry_t e) NOEXCEPT
 		{
 	#if HAS_OPENMP && USE_OPENMP
 			/* Lock */
 			while (m_lock.exchange(1)) { }
 	#endif
+#if 0
 			const _Time t = e.exec_time();
 			entry_t * i = m_end++;
 			for (; t > (i - 1)->exec_time(); i--)
@@ -79,6 +80,16 @@ namespace netlist
 				inc_stat(m_prof_sortmove);
 			}
 			*i = e;
+#else
+			entry_t * i = m_end++;
+			while (e.exec_time() > (i - 1)->exec_time())
+			{
+				*(i) = *(i-1);
+				--i;
+				inc_stat(m_prof_sortmove);
+			}
+			*i = e;
+#endif
 			inc_stat(m_prof_call);
 	#if HAS_OPENMP && USE_OPENMP
 			m_lock = 0;
