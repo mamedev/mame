@@ -1518,13 +1518,12 @@ int shaders::vector_pass(d3d_render_target *rt, int source_index, poly_info *pol
 {
 	int next_index = source_index;
 
-	float time_params[2] = { 0.0f, 0.0f };
-	float length_params[3] = { poly->get_line_length(), options->vector_length_scale, options->vector_length_ratio };
-
 	curr_effect = vector_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_vector("TimeParams", 2, time_params);
-	curr_effect->set_vector("LengthParams", 3, length_params);
+	// curr_effect->set_float("TimeRatio", options->vector_time_ratio);
+	// curr_effect->set_float("TimeScale", options->vector_time_scale);
+	curr_effect->set_float("LengthRatio", options->vector_length_ratio);
+	curr_effect->set_float("LengthScale", options->vector_length_scale);
 
 	blit(rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());
 
@@ -2283,8 +2282,8 @@ hlsl_options shaders::last_options = { false };
 
 enum slider_option
 {
-	SLIDER_VECTOR_ATTENUATION = 0,
-	SLIDER_VECTOR_LENGTH_MAX,
+	SLIDER_VECTOR_ATT_MAX = 0,
+	SLIDER_VECTOR_ATT_LEN_MIN,
 	SLIDER_SHADOW_MASK_TILE_MODE,
 	SLIDER_SHADOW_MASK_ALPHA,
 	SLIDER_SHADOW_MASK_X_COUNT,
@@ -2360,8 +2359,8 @@ enum slider_screen_type
 
 slider_desc shaders::s_sliders[] =
 {
-	{ "Vector Length Attenuation",          0,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATTENUATION,      0.01f,    "%1.2f", {} },
-	{ "Vector Attenuation Length Limit",    1,   500,  1000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_LENGTH_MAX,       1.0f,     "%4f",   {} },
+	{ "Vector Attenuation Maximum",         0,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATT_MAX,          0.01f,    "%1.2f", {} },
+	{ "Vector Attenuation Length Minimum",  1,   500,  1000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATT_LEN_MIN,      0.001f,   "%1.3f", {} },
 	{ "Shadow Mask Tile Mode",              0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_TILE_MODE,   0,        "%s",    { "Screen", "Source" } },
 	{ "Shadow Mask Amount",                 0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_ALPHA,       0.01f,    "%1.2f", {} },
 	{ "Shadow Mask Pixel X Count",          1,     1,  1024, 1, SLIDER_INT,      SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_X_COUNT,     0,        "%d",    {} },
@@ -2431,8 +2430,8 @@ void *shaders::get_slider_option(int id, int index)
 {
 	switch (id)
 	{
-		case SLIDER_VECTOR_ATTENUATION: return &(options->vector_length_scale);
-		case SLIDER_VECTOR_LENGTH_MAX: return &(options->vector_length_ratio);
+		case SLIDER_VECTOR_ATT_MAX: return &(options->vector_length_scale);
+		case SLIDER_VECTOR_ATT_LEN_MIN: return &(options->vector_length_ratio);
 		case SLIDER_SHADOW_MASK_TILE_MODE: return &(options->shadow_mask_tile_mode);
 		case SLIDER_SHADOW_MASK_ALPHA: return &(options->shadow_mask_alpha);
 		case SLIDER_SHADOW_MASK_X_COUNT: return &(options->shadow_mask_count_x);
