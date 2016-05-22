@@ -74,14 +74,11 @@ using namespace Windows::UI::Core;
 #define MIN_WINDOW_DIM                  200
 
 // custom window messages
-#define WM_USER_FINISH_CREATE_WINDOW    (WM_USER + 0)
 #define WM_USER_SELF_TERMINATE          (WM_USER + 1)
 #define WM_USER_REDRAW                  (WM_USER + 2)
 #define WM_USER_SET_FULLSCREEN          (WM_USER + 3)
 #define WM_USER_SET_MAXSIZE             (WM_USER + 4)
 #define WM_USER_SET_MINSIZE             (WM_USER + 5)
-#define WM_USER_UI_TEMP_PAUSE           (WM_USER + 6)
-#define WM_USER_EXEC_FUNC               (WM_USER + 7)
 
 
 
@@ -576,20 +573,6 @@ void winwindow_dispatch_message(running_machine &machine, MSG *message)
 		// special case for quit
 		case WM_QUIT:
 			machine.schedule_exit();
-			break;
-
-		// temporary pause from the window thread
-		case WM_USER_UI_TEMP_PAUSE:
-			winwindow_ui_pause_from_main_thread(machine, message->wParam);
-			break;
-
-		// execute arbitrary function
-		case WM_USER_EXEC_FUNC:
-			{
-				void (*func)(void *) = (void (*)(void *)) message->wParam;
-				void *param = (void *) message->lParam;
-				func(param);
-			}
 			break;
 
 		// everything else dispatches normally
@@ -1180,15 +1163,6 @@ unsigned __stdcall win_window_info::thread_entry(void *param)
 					PostQuitMessage(0);
 					dispatch = FALSE;
 					break;
-
-				// handle the "complete create" message
-				case WM_USER_FINISH_CREATE_WINDOW:
-				{
-					win_window_info *window = (win_window_info *)message.lParam;
-					window->m_init_state = window->complete_create() ? -1 : 1;
-					dispatch = FALSE;
-					break;
-				}
 			}
 		}
 
