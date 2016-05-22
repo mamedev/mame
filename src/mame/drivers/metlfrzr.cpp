@@ -9,8 +9,7 @@
 	HW seems the natural evolution of Dark Mist type.
 	
 	TODO:
-	- T5182 hookup, controls sound and coin inputs. With current hookup it accepts coins but not fully, and sound isn't working at all ...
-	- Still various unused bits. 
+	- Video registers needs better understanding.
 	- Nuke legacy video code and re-do it by using tilemap system.
 	- sprites are ahead of 1/2 frames;
 	- Writes at 0xb800-0xbfff at attract mode gameplay demo transition?
@@ -151,14 +150,16 @@ UINT32 metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_ind1
 WRITE8_MEMBER(metlfrzr_state::output_w)
 {
 	// bit 7: flip screen
-	// bit 5: on title screen after coin is inserted.
+	// bit 6-5: coin lockouts
+	// bit 4: tilemap ROM banking
+	// bit 3-2: z80 ROM banking
 	// bit 1-0: unknown purpose, both 1s too generally
+	machine().bookkeeping().coin_lockout_w(1, BIT(data,6) );
+	machine().bookkeeping().coin_lockout_w(0, BIT(data,5) );
 	m_fg_tilebank = (data & 0x10) >> 4;
 	membank("bank1")->set_entry((data & 0xc) >> 2);
 
-	//popmessage("%02x",data & 3);
-	if(data & 0x60)
-		printf("%02x\n",data);
+//	popmessage("%02x",data & 3);
 }
 
 static ADDRESS_MAP_START( metlfrzr_map, AS_PROGRAM, 8, metlfrzr_state )
@@ -180,8 +181,9 @@ static ADDRESS_MAP_START( metlfrzr_map, AS_PROGRAM, 8, metlfrzr_state )
 	AM_RANGE(0xd700, 0xd700) AM_WRITE(output_w)
 	AM_RANGE(0xd710, 0xd710) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
 	AM_RANGE(0xd711, 0xd711) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
-	AM_RANGE(0xd712, 0xd712) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
-	AM_RANGE(0xd713, 0xd713) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
+	// following two do swapped access compared to darkmist
+	AM_RANGE(0xd712, 0xd712) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
+	AM_RANGE(0xd713, 0xd713) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
 	
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
