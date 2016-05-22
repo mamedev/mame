@@ -657,7 +657,7 @@ SLOT_INTERFACE_END
 PALETTE_INIT_MEMBER(itt3030_state, itt3030)
 {
 	palette.set_pen_color(0,rgb_t::black);
-	palette.set_pen_color(1,rgb_t::white);
+	palette.set_pen_color(1,rgb_t(215,229,82));
 	palette.set_pen_color(2,rgb_t::black);
 }
 
