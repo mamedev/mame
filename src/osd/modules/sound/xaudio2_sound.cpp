@@ -277,6 +277,7 @@ bool sound_xaudio2::probe()
 int sound_xaudio2::init(osd_options const &options)
 {
 	HRESULT result;
+	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 	// Make sure our XAudio2Create entrypoint is bound
 	int status = XAudio2Create.initialize();
@@ -341,6 +342,8 @@ void sound_xaudio2::exit()
 	m_xAudio2.reset();
 	m_buffer.reset();
 	m_buffer_pool.reset();
+	
+	CoUninitialize();
 
 	if (m_overflows != 0 || m_underflows != 0)
 		osd_printf_verbose("Sound: overflows=%u, underflows=%u\n", m_overflows, m_underflows);
