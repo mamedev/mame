@@ -245,17 +245,11 @@ protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	virtual void video_start() override;
 public:
 
 	DECLARE_READ8_MEMBER(vsync_r);
 	DECLARE_WRITE8_MEMBER( beep_w );
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(bankl_r);
-	DECLARE_WRITE8_MEMBER(bankl_w);
-	DECLARE_READ8_MEMBER(bankh_r);
-	DECLARE_WRITE8_MEMBER(bankh_w);
 	DECLARE_READ8_MEMBER(kbd_matrix_r);
 	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
 	DECLARE_READ8_MEMBER(kbd_port2_r);
@@ -269,23 +263,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
+	DECLARE_PALETTE_INIT(itt3030);
 
 private:
-	UINT8 m_unk;
-	UINT8 m_bank;
-	UINT8 m_kbdrow, m_kbdcol, m_kbdclk, m_kbdread, m_kbdport2;
+	UINT8 m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	floppy_image_device *m_curfloppy;
 	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
 	floppy_connector *m_con1, *m_con2, *m_con3;
-	bool m_keyskip;
 };
-
-void itt3030_state::video_start()
-{
-	m_unk = 0x80;
-}
 
 READ8_MEMBER(itt3030_state::vsync_r)
 {
@@ -306,46 +293,21 @@ READ8_MEMBER(itt3030_state::vsync_r)
 
 WRITE8_MEMBER( itt3030_state::beep_w )
 {
-	m_beep->set_state(data&0x32);
+	m_beep->set_state(data&1);
 }
 
 WRITE8_MEMBER(itt3030_state::bank_w)
 {
-	int bank = 0;
-	m_bank = data>>4;
+	int bank = data >> 5;
 
-	if (!(m_bank & 1)) // bank 8
+	if (!(data & 0x10)) // bank 8
 	{
 		bank = 8;
 	}
-	else
-	{
-		bank = m_bank >> 1;
-	}
 
-//  printf("bank_w: new value %02x, m_bank %x, bank %x\n", data, m_bank, bank);
+	//  printf("bank_w: new value %02x, m_bank %x, bank %x\n", data, m_bank, bank);
 
 	m_48kbank->set_bank(bank);
-}
-
-READ8_MEMBER(itt3030_state::bankl_r)
-{
-	return m_ram->read(offset);
-}
-
-WRITE8_MEMBER(itt3030_state::bankl_w)
-{
-	m_ram->write(offset, data);
-}
-
-READ8_MEMBER(itt3030_state::bankh_r)
-{
-	return m_ram->read(((m_bank>>1)*0x10000) + offset + 0xc000);
-}
-
-WRITE8_MEMBER(itt3030_state::bankh_w)
-{
-	m_ram->write(((m_bank>>1)*0x10000) + offset + 0xc000, data);
 }
 
 UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -357,7 +319,9 @@ UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		for(int x = 0; x < 80; x++ )
 		{
 			UINT8 code = m_vram[x + vramy*128];
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*12);
+			int invert = code & 0x80 ? 1 : 0;
+			code &= 0x7f;
+			m_gfxdecode->gfx(invert)->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*12);
 		}
 	}
 
@@ -467,21 +431,19 @@ WRITE8_MEMBER(itt3030_state::fdc_cmd_w)
 	}
 }
 
-// The lower 48K is switchable among the first 48K of each of 8 64K banks numbered 0-7 or "bank 8" which is the internal ROM and VRAM
-// The upper 16K is always the top 16K of the selected bank 0-7, which allows bank/bank copies and such
+// The lower 48K is switchable among the first 48K of each of 8 48K banks numbered 0-7 or "bank 8" which is the internal ROM and VRAM
+// The upper 16K is always the top 16K of the first bank, F5 can set this to 32K
 // Port F6 bits 7-5 select banks 0-7, bit 4 enables bank 8
 
 static ADDRESS_MAP_START( itt3030_map, AS_PROGRAM, 8, itt3030_state )
 	AM_RANGE(0x0000, 0xbfff) AM_DEVICE("lowerbank", address_map_bank_device, amap8)
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(bankh_r, bankh_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lower48_map, AS_PROGRAM, 8, itt3030_state )
-	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(bankl_r, bankl_w)   // pages 0-7
-	AM_RANGE(0x80000, 0x807ff) AM_ROM AM_REGION("maincpu", 0)   // begin "page 8"
-	AM_RANGE(0x80800, 0x80fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x81000, 0x810ff) AM_RAM AM_MIRROR(0x100)  // only 256 bytes, but ROM also clears 11xx?
-	AM_RANGE(0x83000, 0x83fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x60000, 0x607ff) AM_ROM AM_REGION("maincpu", 0)   // begin "page 8"
+	AM_RANGE(0x60800, 0x60fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x61000, 0x610ff) AM_RAM AM_MIRROR(0x100)  // only 256 bytes, but ROM also clears 11xx?
+	AM_RANGE(0x63000, 0x63fff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itt3030_io, AS_IO, 8, itt3030_state )
@@ -505,14 +467,11 @@ WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
 	int rd_masks[8] = { 1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80 };
 	int tmp_read;
 
-	m_kbdrow = data & 0x7;			// keyboard input line multiplex
-	m_kbdcol = (data >> 3) & 0xf;	// keyboard col select
-
 //	printf("matrix_w: %02x (col %d row %d clk %d)\n", data, m_kbdcol, m_kbdrow, (data & 0x80) ? 1 : 0);
 
 	if ((data & 0x80) && (!m_kbdclk))
 	{
-		tmp_read = m_keyrows[m_kbdcol]->read() & rd_masks[m_kbdrow];
+		tmp_read = m_keyrows[(data >> 3) & 0xf]->read() & rd_masks[data & 0x7];
 		m_kbdread = (tmp_read != 0) ? 1 : 0;
 	}
 
@@ -658,31 +617,27 @@ static const gfx_layout charlayout =
 
 static GFXDECODE_START( itt3030 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
 
 void itt3030_state::machine_start()
 {
-	save_item(NAME(m_unk));
-	save_item(NAME(m_bank));
-	save_item(NAME(m_kbdrow));
-	save_item(NAME(m_kbdcol));
-	save_item(NAME(m_kbdclk));
 	save_item(NAME(m_kbdread));
+	m_48kbank->space(AS_PROGRAM).install_ram(0, m_ram->size() - 16384, m_ram->pointer());
+	m_maincpu->space(AS_PROGRAM).install_ram(0xc000, 0xffff, m_ram->pointer() + m_ram->size() - 16384);
+	m_gfxdecode->gfx(1)->set_colorbase(1);
 
 	m_kbdclk = 0;   // must be initialized here b/c mcs48_reset() causes write of 0xff to all ports
 }
 
 void itt3030_state::machine_reset()
 {
-	m_bank = 0;
 	m_48kbank->set_bank(8);
 	m_kbdread = 1;
-	m_kbdrow = m_kbdcol = 0;
 	m_kbdclk = 1;
 	m_fdc_irq = m_fdc_drq = m_fdc_hld = 0;
 	m_curfloppy = nullptr;
-	m_keyskip = false;
 
 	// look up floppies in advance
 	m_con1 = machine().device<floppy_connector>("fdc:0");
@@ -699,6 +654,12 @@ static SLOT_INTERFACE_START( itt3030_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
+PALETTE_INIT_MEMBER(itt3030_state, itt3030)
+{
+	palette.set_pen_color(0,rgb_t::black);
+	palette.set_pen_color(1,rgb_t::white);
+	palette.set_pen_color(2,rgb_t::black);
+}
 
 static MACHINE_CONFIG_START( itt3030, itt3030_state )
 
@@ -725,7 +686,7 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0xc000)
 
 	MCFG_DEVICE_ADD("crt5027", CRT5027, XTAL_6MHz)
 	MCFG_TMS9927_CHAR_WIDTH(8)
@@ -740,11 +701,12 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itt3030)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(itt3030_state, itt3030)
 
 	/* internal ram */
 	MCFG_RAM_ADD("mainram")
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_DEFAULT_SIZE("256K")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
