@@ -557,8 +557,9 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 //          printf("Li Cheng %d\n", count);
 			type = GB_MBC_LICHENG;
 		}
-		if (count == 4138 || count == 4125)
+		if ((count == 4138 || count == 4125) && len >= 2097152)
 		{
+			// All known sintax (raw) dumps are at least 2097152 bytes in size
 			// Zhi Huan Wang uses 4138
 			// most sintax use 4125
 //          printf("Sintax %d!\n", count);
