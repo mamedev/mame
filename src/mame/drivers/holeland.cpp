@@ -27,21 +27,21 @@ static ADDRESS_MAP_START( holeland_map, AS_PROGRAM, 8, holeland_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	//AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("speech", sp0256_device, ald_w)
-	AM_RANGE(0xc000, 0xc001) AM_WRITE(holeland_pal_offs_w)
-	AM_RANGE(0xc006, 0xc007) AM_WRITE(holeland_flipscreen_w)
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(holeland_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(holeland_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xc000, 0xc001) AM_WRITE(pal_offs_w)
+	AM_RANGE(0xc006, 0xc007) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crzrally_map, AS_PROGRAM, 8, holeland_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(holeland_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(holeland_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(holeland_scroll_w)
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(holeland_pal_offs_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(scroll_w)
+	AM_RANGE(0xf800, 0xf801) AM_WRITE(pal_offs_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, holeland_state )
@@ -405,6 +405,33 @@ ROM_START( holeland )
 	ROM_LOAD( "3n",          0x0200, 0x0100, CRC(3d7b3af6) SHA1(0c4f95b26e9fe25a5d8c79f06e7ceab78a07d35c) )  /* Blue component */
 ROM_END
 
+ROM_START( holeland2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2.2a",  0x0000, 0x2000, CRC(b26212a9) SHA1(93ac3910b22e29f66a8ecbc9f7df8aa6b405ca9a) )
+	ROM_LOAD( "3.2b",  0x2000, 0x2000, CRC(623bca75) SHA1(a3406077271229a3a4f253d238aece369b0120d9) )
+	ROM_LOAD( "0.1d",  0x4000, 0x2000, CRC(a3bafdae) SHA1(cda2adf2a3eeab0301505cbd3bea9e9450b42b0a) )
+	ROM_LOAD( "4.2d",  0x6000, 0x2000, CRC(88a8ba11) SHA1(ce810c8ea0a78f94025f1ac40d5641a9287df4f0) )
+	ROM_LOAD( "1.1e",  0xa000, 0x2000, CRC(ec338f4b) SHA1(ae78a40f85b489e57377e4c60181895f781efe16) )
+
+	ROM_REGION( 0x4000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "5.4d",  0x0000, 0x2000, CRC(7f19e1f9) SHA1(75026da91e0cff262e5f6e32f836907a786aef42) )
+	ROM_LOAD( "6.4f",  0x2000, 0x2000, CRC(844400e3) SHA1(d306b26f838b043b71c5f9d2d240228986b695fa) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "7.4m",  0x0000, 0x2000, CRC(d7feb25b) SHA1(581e20b07d33ba350601fc56074c43aaf13078b4) )
+	ROM_LOAD( "8.4n",  0x2000, 0x2000, CRC(4b6eec16) SHA1(4c5da89c2babeb33951d101703e6699fbcb886b4) )
+	ROM_LOAD( "9.4p",  0x4000, 0x2000, CRC(6fe7fcc0) SHA1(fa982551285f728cee0055a0c473f6c74d802d2e) )
+	ROM_LOAD( "10.4r", 0x6000, 0x2000, CRC(e1e11e8f) SHA1(56082fe497d8ee8ecfe1b89c0c5ada4ddfa4740f) )
+
+	ROM_REGION( 0x10000, "speech", 0 )
+	/* SP0256 mask rom */
+	ROM_LOAD( "sp0256a_al2.1b",   0x1000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "82s129.m",          0x0000, 0x0100, CRC(9d6fef5a) SHA1(e2b62909fecadfc9e0eb1ad72c8b7712a26d184e) )  /* Red component */
+	ROM_LOAD( "82s129.l",          0x0100, 0x0100, CRC(f6682705) SHA1(1ab952c1e2a45e9b0dc9144f50711f99f6b1ebc4) )  /* Green component */
+	ROM_LOAD( "82s129.n",          0x0200, 0x0100, CRC(3d7b3af6) SHA1(0c4f95b26e9fe25a5d8c79f06e7ceab78a07d35c) )  /* Blue component */
+ROM_END
 
 ROM_START( crzrally )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -495,6 +522,7 @@ ROM_END
 
 
 GAME( 1984, holeland,  0,        holeland, holeland, driver_device, 0, ROT0,   "Tecfri", "Hole Land",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, holeland2, holeland, holeland, holeland, driver_device, 0, ROT0,   "Tecfri", "Hole Land (set 2)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //attract is different
 GAME( 1985, crzrally,  0,        crzrally, crzrally, driver_device, 0, ROT270, "Tecfri", "Crazy Rally (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, crzrallya, crzrally, crzrally, crzrally, driver_device, 0, ROT270, "Tecfri", "Crazy Rally (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, crzrallyg, crzrally, crzrally, crzrally, driver_device, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
