@@ -246,6 +246,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mga2064w.h,VIDEOS["MGA2064W"] = true
+--------------------------------------------------
+
+if (VIDEOS["MGA2064W"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mga2064w.cpp",
+		MAME_DIR .. "src/devices/video/mga2064w.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/hd44102.h,VIDEOS["HD44102"] = true
 --------------------------------------------------
 

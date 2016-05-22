@@ -29547,6 +29547,9 @@ pcg850v                         // Pocket Computer G850V
 pcfx                            // PC-FX NEC 1994
 pcfxga                          // PC-FX NEC 199? (PC-FX on a PC ISA Card)
 
+@source:pcipc.cpp
+pcipc                           //
+
 @source:pcktgal.cpp
 pcktgal                         // (c) 1987 Data East Corporation (Japan)
 pcktgal2                        // (c) 1989 Data East Corporation (World?)

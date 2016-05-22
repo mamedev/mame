@@ -334,6 +334,7 @@ VIDEOS["VIC4567"] = true
 VIDEOS["SCN2674"] = true
 VIDEOS["GB_LCD"] = true
 VIDEOS["GBA_LCD"] = true
+VIDEOS["MGA2064W"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -2445,6 +2446,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ibmpc.cpp",
 	MAME_DIR .. "src/mame/drivers/ibmpcjr.cpp",
 	MAME_DIR .. "src/mame/drivers/pc.cpp",
+	MAME_DIR .. "src/mame/drivers/pcipc.cpp",
 	MAME_DIR .. "src/mame/drivers/tandy1t.cpp",
 	MAME_DIR .. "src/mame/video/pc_t1t.cpp",
 	MAME_DIR .. "src/mame/video/pc_t1t.h",
