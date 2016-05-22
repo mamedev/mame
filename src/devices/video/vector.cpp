@@ -27,6 +27,18 @@
  *        added two new tables Tinten and Tmerge (for 256 color support)
  *        added find_color routine to build above tables .ac
  *
+ * Vector Team
+ *
+ *        Brad Oliver
+ *        Aaron Giles
+ *        Bernd Wiebelt
+ *        Allard van der Bas
+ *        Al Kossow (VECSIM)
+ *        Hedley Rainnie (VECSIM)
+ *        Eric Smith (VECSIM)
+ *        Neil Bradley (technical advice)
+ *        Andrew Caldwell (anti-aliasing)
+ *
  **************************************************************************** */
 
 #include "emu.h"
@@ -35,24 +47,9 @@
 #include "vector.h"
 
 
-#define FLT_EPSILON 1E-5
-
 #define VECTOR_WIDTH_DENOM 512
 
 #define MAX_POINTS 10000
-
-#define VECTOR_TEAM \
-	"-* Vector Heads *-\n" \
-	"Brad Oliver\n" \
-	"Aaron Giles\n" \
-	"Bernd Wiebelt\n" \
-	"Allard van der Bas\n" \
-	"Al Kossow (VECSIM)\n" \
-	"Hedley Rainnie (VECSIM)\n" \
-	"Eric Smith (VECSIM)\n" \
-	"Neil Bradley (technical advice)\n" \
-	"Andrew Caldwell (anti-aliasing)\n" \
-	"- *** -\n"
 
 float vector_options::s_flicker = 0.0f;
 float vector_options::s_beam_width_min = 0.0f;
@@ -154,10 +151,6 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	float yscale = 1.0f / (65536 * visarea.height());
 	float xoffs = (float)visarea.min_x;
 	float yoffs = (float)visarea.min_y;
-	float xratio = xscale / yscale;
-	float yratio = yscale / xscale;
-	xratio = (xratio < 1.0f) ? xratio : 1.0f;
-	yratio = (yratio < 1.0f) ? yratio : 1.0f;
 
 	point *curpoint;
 	int lastx = 0;
@@ -187,31 +180,6 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		coords.y0 = ((float)lasty - yoffs) * yscale;
 		coords.x1 = ((float)curpoint->x - xoffs) * xscale;
 		coords.y1 = ((float)curpoint->y - yoffs) * yscale;
-
-		float xdistance = coords.x0 - coords.x1;
-		float ydistance = coords.y0 - coords.y1;
-
-		// extend zero-length vector line (vector point) by 3/8 beam_width on both sides
-		if (fabs(xdistance) < FLT_EPSILON &&
-			fabs(ydistance) < FLT_EPSILON)
-		{
-			coords.x0 += xratio * beam_width * 0.375f;
-			coords.y0 += yratio * beam_width * 0.375f;
-			coords.x1 -= xratio * beam_width * 0.375f;
-			coords.y1 -= yratio * beam_width * 0.375f;
-		}
-		// extend vector line by 3/8 beam_width on both sides
-		else
-		{
-			float length = sqrt(xdistance * xdistance + ydistance * ydistance);
-			float xdirection = xdistance / length;
-			float ydirection = ydistance / length;
-
-			coords.x0 += xratio * beam_width * 0.375f * (xdirection / xratio);
-			coords.y0 += yratio * beam_width * 0.375f * (ydirection / yratio);
-			coords.x1 -= xratio * beam_width * 0.375f * (xdirection / xratio);
-			coords.y1 -= yratio * beam_width * 0.375f * (ydirection / yratio);
-		}
 
 		if (curpoint->intensity != 0)
 		{
