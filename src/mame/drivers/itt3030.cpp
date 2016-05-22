@@ -350,11 +350,13 @@ WRITE8_MEMBER(itt3030_state::bankh_w)
 
 UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	int start = m_crtc->upscroll_offset();
 	for(int y = 0; y < 24; y++ )
 	{
+		int vramy = (start + y) % 24;
 		for(int x = 0; x < 80; x++ )
 		{
-			UINT8 code = m_vram[x + y*128];
+			UINT8 code = m_vram[x + vramy*128];
 			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*12);
 		}
 	}
@@ -484,7 +486,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itt3030_io, AS_IO, 8, itt3030_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x26) AM_DEVREADWRITE("crt5027", crt5027_device, read, write)
+	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("crt5027", crt5027_device, read, write)
 	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("kbdmcu", i8741_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0x32, 0x32) AM_WRITE(beep_w)
 	AM_RANGE(0x35, 0x35) AM_READ(vsync_r)
