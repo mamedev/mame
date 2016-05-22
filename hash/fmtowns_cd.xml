@@ -1996,6 +1996,65 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 	
+	<software name="landlore">
+		<description>Lands of Lore: The Throne of Chaos</description>
+		<year>1993</year>
+		<publisher>Starcraft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="lands of lore" sha1="849e7ec5c5844ec8b774328513b6c6b5d52106e0" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="lastarmag">
+		<description>Last Armageddon CD Special</description>
+		<year>1989</year>
+		<publisher>Brain Grey</publisher>
+		<part name="cdrom1" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="last armageddon cd special (disc a)" sha1="bc7c8f3535bbd095ca65c50bbad55cea726d952c" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="last armageddon cd special (disc b)" sha1="f5828654e32a810f1ba1b743180b55e9f02e1df1" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="last armageddon cd special (disc c)" sha1="b300dccabeab74d9aa7277f0d04a6d89200cd1a9" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="lastsurv">
+		<description>Last Survivor</description>
+		<year>1990</year>
+		<publisher>CRI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="last survivor" sha1="d853e7cc1be3d5b10d67f81c9c92ec0b2b360ddd" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="ldawn2">
+		<description>Lunatic Dawn II</description>
+		<year>1994</year>
+		<publisher>Artdink</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="lunatic dawn ii (user disk).hdm" size="1261568" crc="11d95883" sha1="d973bcaa7d3cc9dee18161bff08e88cd01a45cae" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="lunatic dawn ii" sha1="2e724da365c6d53e2d94f8bfb1e348a2f5b709d4" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="lemmings">
 		<description>Lemmings</description>
 		<year>1992</year>
@@ -2033,6 +2092,67 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 	
+	<software name="lesserm">
+		<description>Lesser Mern</description>
+		<year>1992</year>
+		<publisher>Panther Software</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="lesser mern" sha1="e9e9e42e26db1afbeb6f111d9ee4068fd09c3c3d" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- The floppy image seems to have 19712 extra bytes filled with 0xE5 - bad dump? -->
+	<software name="lettuce">
+		<description>Lettuce Cooking</description>
+		<year>1989</year>
+		<publisher>Seibu Time</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1281280">
+				<rom name="lettuce cooking.bin" size="1281280" crc="0644e504" sha1="808144356f94b03a495a5824ecd47255a5475b47" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="lettuce cooking" sha1="fd7e913b6536d4a8c03eac9bd472e1c995519bc9" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="libido7">
+		<description>Libido7</description>
+		<year>1994</year>
+		<publisher>Libido</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="libido7" sha1="c760d1af4344e80605da52aad9baf2ea5fd57d44" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="lifedth">
+		<description>Life &amp; Death</description>
+		<year>1992</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="life &amp; death" sha1="b98fa24ed264d033935795a5cf9a391a1e6abf40" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="lifedth2">
+		<description>Life &amp; Death II: The Brain</description>
+		<year>1992</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="life &amp; death ii" sha1="d6033ef7353aea1ccec61786aa93f943d1474b8a" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="links386">
 		<description>Golf Links 386 Pro</description>
 		<year>1995</year>
@@ -2041,6 +2161,87 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="golf links 386 pro" sha1="c0eb847d7168e6209482b19a270bd81d40383137" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="linuxje3">
+		<description>Linux + JE3</description>
+		<year>1994</year>
+		<publisher>Laser 5</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="[os] linux + je3" sha1="1b4378ab060b809d1a6c174902826495961e2f03" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="linuxje4">
+		<description>Linux + JE4 1995/12</description>
+		<year>1995</year>
+		<publisher>Laser 5</publisher>
+		<part name="cdrom1" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="[os] linux + je4 1995-12 (disc 1)" sha1="37d5984ed5ec2f4a3cae87ed616f619439b1972b" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="[os] linux + je4 1995-12 (disc 2)" sha1="70e4390837341719b09138559c44201470e1c2f3" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="[os] linux + je4 1995-12 (disc 3)" sha1="e002b3e5f25311132cbd5d5459e593a79593be50" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="loom">
+		<description>Loom</description>
+		<year>1991</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom1" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="loom" sha1="b0bcaec3960fb0923a41d74e89665243a033864b" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="loom (drama cd)" sha1="7c1351a2159f02f507823748542471be722dd1d0" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="lrabble">
+		<description>Libble Rabble</description>
+		<year>1994</year>
+		<publisher>Dempa</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="libble rabble" sha1="5f3fef308eb0f59e7b6d8b4f6e87a9653ccfaa7b" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="lupin3">
+		<description>Lupin Sansei: Hong Kong no Mashu: Fukushuu wa Meikyuu no Hate ni</description>
+		<year>1990</year>
+		<publisher>CRI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="lupin iii - hong kong no mashu" sha1="c42ff4f7d772bf8a7d5b33ae64e5b8d0dfa7e956" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="lvalour">
+		<description>Legends of Valour</description>
+		<year>1994</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="legends of valour" sha1="e2387d19e479618ecf2885006f0a20c48242bd43" />
 			</diskarea>
 		</part>
 	</software>
@@ -2074,6 +2275,61 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="muscle bomber" sha1="c10e04ed66acd02d9e383e948625091bb8c37cd9" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="mcosm">
+		<description>Microcosm</description>
+		<year>1993</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="microcosm" sha1="ae3c07cb50704391e613ce10c64b0bb79c9923c1" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="mirage">
+		<description>Mirage</description>
+		<year>1992</year>
+		<publisher>Discovery</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mirage" sha1="b1536b6de52c10315b54a665a82cf83906c32f4a" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="mmagic4">
+		<description>Might and Magic: Clouds of Xeen</description>
+		<year>1993</year>
+		<publisher>Starcraft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="might and magic iv - clouds of xeen" sha1="11a65c5cab772e3315b4c09e22caaf47eced0a2b" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="mmagic5">
+		<description>Might and Magic: Darkside of Xeen</description>
+		<year>1994</year>
+		<publisher>Starcraft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="might and magic v - darkside of xeen" sha1="5c1ad8661f637e57af130b23a9427ee855daf63f" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="mustowns">
+		<description>Musium Towns</description>
+		<year>1993</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="musium towns" sha1="350c5c1f5e36ef48875fc9abbdecf3fc82c50dbf" />
 			</diskarea>
 		</part>
 	</software>
@@ -2128,6 +2384,17 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="panzer division [kikou shidan]" sha1="fae75398775e7f01d760e0e7c87c2e937a14ad87" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="pegasus">
+		<description>Pegasus</description>
+		<year>1995</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pegasus" sha1="294bb21d28e4d40f94a6b18ca3b0cf205f394b58" />
 			</diskarea>
 		</part>
 	</software>
@@ -2208,6 +2475,17 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 	
+	<software name="racrally">
+		<description>RAC Rally</description>
+		<year>1995</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rac rally" sha1="7298bfc4a5bc0c4eb7744337619f9321300a13b6" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- works well on fmtmarty, keyboard seems to interfere with movements on fmtowns -->
 	<software name="raiden">
 		<description>Raiden Densetsu / Raiden Trad</description>
@@ -2242,6 +2520,29 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 	
+	<!-- Missing a floppy disk -->
+	<software name="railtyc">
+		<description>Railroad Tycoon</description>
+		<year>1993</year>
+		<publisher>MicroProse Japan</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="railroad tycoon" sha1="175a06c227bb9c61a86e808d45a976e9892155d1" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="ravnloft">
+		<description>Ravenloft</description>
+		<year>1995</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ravenloft" sha1="30ddd15c78dd03abbd91799256ba884548b54abb" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="rayxanbr">
 		<description>Rayxanber</description>
 		<year>1990</year>
@@ -2249,6 +2550,17 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="rayxanber" sha1="5e7c36227d61be81f8a4cf4ef79889d12a72549c" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="splatter">
+		<description>Splatterhouse</description>
+		<year>1992</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="splatterhouse" sha1="ddd73172589f840d6feb5f55c17a011f2aa87c77" />
 			</diskarea>
 		</part>
 	</software>
