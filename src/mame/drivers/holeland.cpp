@@ -7,10 +7,10 @@
     driver by Mathis Rosenhauer
 
     TODO:
-    - tile/sprite priority in holeland (fixed? Needs further testing)
-    - missing high bit of sprite X coordinate? (see round 2 and 3 of attract mode
-      in crzrally)
-
+    - tile/sprite priority in holeland - sprites appearing on top of text for
+      example GAME OVER, is still incorrect
+    - missing high bit of sprite X coordinate? (see round 2 and 3 of attract
+      mode in crzrally)
 ***************************************************************************/
 
 #include "emu.h"
@@ -26,7 +26,7 @@ static ADDRESS_MAP_START( holeland_map, AS_PROGRAM, 8, holeland_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	//AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("speech", sp0256_device, ald_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("speech", sp0256_device, ald_w)
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(pal_offs_w)
 	AM_RANGE(0xc006, 0xc007) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
@@ -259,7 +259,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( holeland, holeland_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80, 3355700) /* measured 298ns on PCB */
 	MCFG_CPU_PROGRAM_MAP(holeland_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
@@ -282,19 +282,19 @@ static MACHINE_CONFIG_START( holeland, holeland_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1818182)
+	MCFG_SOUND_ADD("ay1", AY8910, 20000000/32) /* verified on PCB */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1818182)
+	MCFG_SOUND_ADD("ay2", AY8910, 20000000/16) /* verified on PCB */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/*MCFG_SOUND_ADD("speech", SP0256, 3120000) // ? MHz
+	MCFG_SOUND_ADD("speech", SP0256, 3355700) /* measured 298ns on PCB */
 	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)*/
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /*
@@ -379,30 +379,30 @@ MACHINE_CONFIG_END
 
 ROM_START( holeland )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "holeland.0",  0x0000, 0x2000, CRC(b640e12b) SHA1(68d091a92747d2f4534386aff3ddb07c0d79384c) )
-	ROM_LOAD( "holeland.1",  0x2000, 0x2000, CRC(2f180851) SHA1(c21bcd3e9ff31a5cc415eb53d77a9cc9ebdd862d) )
-	ROM_LOAD( "holeland.2",  0x4000, 0x2000, CRC(35cfde75) SHA1(0a03c0464c771d049ae8706793ec43da5372fa58) )
-	ROM_LOAD( "holeland.3",  0x6000, 0x2000, CRC(5537c22e) SHA1(030f34d3cbc5eea30a3ede77008eba394ef37e8f) )
-	ROM_LOAD( "holeland.4",  0xa000, 0x2000, CRC(c95c355d) SHA1(44984108b6a3dab05855da4c4a3ff58d849559b8) )
+	ROM_LOAD( "0.2a",  0x0000, 0x2000, CRC(b640e12b) SHA1(68d091a92747d2f4534386aff3ddb07c0d79384c) )
+	ROM_LOAD( "1.2b",  0x2000, 0x2000, CRC(2f180851) SHA1(c21bcd3e9ff31a5cc415eb53d77a9cc9ebdd862d) )
+	ROM_LOAD( "2.1d",  0x4000, 0x2000, CRC(35cfde75) SHA1(0a03c0464c771d049ae8706793ec43da5372fa58) )
+	ROM_LOAD( "3.2d",  0x6000, 0x2000, CRC(5537c22e) SHA1(030f34d3cbc5eea30a3ede77008eba394ef37e8f) )
+	ROM_LOAD( "4.1e",  0xa000, 0x2000, CRC(c95c355d) SHA1(44984108b6a3dab05855da4c4a3ff58d849559b8) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "holeland.5",  0x0000, 0x2000, CRC(7f19e1f9) SHA1(75026da91e0cff262e5f6e32f836907a786aef42) )
-	ROM_LOAD( "holeland.6",  0x2000, 0x2000, CRC(844400e3) SHA1(d306b26f838b043b71c5f9d2d240228986b695fa) )
+	ROM_LOAD( "5.4d",  0x0000, 0x2000, CRC(7f19e1f9) SHA1(75026da91e0cff262e5f6e32f836907a786aef42) )
+	ROM_LOAD( "6.4e",  0x2000, 0x2000, CRC(844400e3) SHA1(d306b26f838b043b71c5f9d2d240228986b695fa) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "holeland.7",  0x0000, 0x2000, CRC(d7feb25b) SHA1(581e20b07d33ba350601fc56074c43aaf13078b4) )
-	ROM_LOAD( "holeland.8",  0x2000, 0x2000, CRC(4b6eec16) SHA1(4c5da89c2babeb33951d101703e6699fbcb886b4) )
-	ROM_LOAD( "holeland.9",  0x4000, 0x2000, CRC(6fe7fcc0) SHA1(fa982551285f728cee0055a0c473f6c74d802d2e) )
-	ROM_LOAD( "holeland.10", 0x6000, 0x2000, CRC(e1e11e8f) SHA1(56082fe497d8ee8ecfe1b89c0c5ada4ddfa4740f) )
+	ROM_LOAD( "7.4m",  0x0000, 0x2000, CRC(d7feb25b) SHA1(581e20b07d33ba350601fc56074c43aaf13078b4) )
+	ROM_LOAD( "8.4n",  0x2000, 0x2000, CRC(4b6eec16) SHA1(4c5da89c2babeb33951d101703e6699fbcb886b4) )
+	ROM_LOAD( "9.4p",  0x4000, 0x2000, CRC(6fe7fcc0) SHA1(fa982551285f728cee0055a0c473f6c74d802d2e) )
+	ROM_LOAD( "10.4r", 0x6000, 0x2000, CRC(e1e11e8f) SHA1(56082fe497d8ee8ecfe1b89c0c5ada4ddfa4740f) )
 
 	ROM_REGION( 0x10000, "speech", 0 )
 	/* SP0256 mask rom */
-	ROM_LOAD( "sp0256.bin",   0x1000, 0x0800, NO_DUMP )
+	ROM_LOAD( "sp0256a-al2.1b",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "3m",          0x0000, 0x0100, CRC(9d6fef5a) SHA1(e2b62909fecadfc9e0eb1ad72c8b7712a26d184e) )  /* Red component */
-	ROM_LOAD( "3l",          0x0100, 0x0100, CRC(f6682705) SHA1(1ab952c1e2a45e9b0dc9144f50711f99f6b1ebc4) )  /* Green component */
-	ROM_LOAD( "3n",          0x0200, 0x0100, CRC(3d7b3af6) SHA1(0c4f95b26e9fe25a5d8c79f06e7ceab78a07d35c) )  /* Blue component */
+	ROM_LOAD( "82s129.3m", 0x0000, 0x0100, CRC(9d6fef5a) SHA1(e2b62909fecadfc9e0eb1ad72c8b7712a26d184e) )  /* Red component */
+	ROM_LOAD( "82s129.3l", 0x0100, 0x0100, CRC(f6682705) SHA1(1ab952c1e2a45e9b0dc9144f50711f99f6b1ebc4) )  /* Green component */
+	ROM_LOAD( "82s129.3n", 0x0200, 0x0100, CRC(3d7b3af6) SHA1(0c4f95b26e9fe25a5d8c79f06e7ceab78a07d35c) )  /* Blue component */
 ROM_END
 
 ROM_START( holeland2 )
@@ -415,7 +415,7 @@ ROM_START( holeland2 )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "5.4d",  0x0000, 0x2000, CRC(7f19e1f9) SHA1(75026da91e0cff262e5f6e32f836907a786aef42) )
-	ROM_LOAD( "6.4f",  0x2000, 0x2000, CRC(844400e3) SHA1(d306b26f838b043b71c5f9d2d240228986b695fa) )
+	ROM_LOAD( "6.4e",  0x2000, 0x2000, CRC(844400e3) SHA1(d306b26f838b043b71c5f9d2d240228986b695fa) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "7.4m",  0x0000, 0x2000, CRC(d7feb25b) SHA1(581e20b07d33ba350601fc56074c43aaf13078b4) )
@@ -425,12 +425,12 @@ ROM_START( holeland2 )
 
 	ROM_REGION( 0x10000, "speech", 0 )
 	/* SP0256 mask rom */
-	ROM_LOAD( "sp0256a_al2.1b",   0x1000, 0x0800, NO_DUMP )
+	ROM_LOAD( "sp0256a_al2.1b",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "82s129.m",          0x0000, 0x0100, CRC(9d6fef5a) SHA1(e2b62909fecadfc9e0eb1ad72c8b7712a26d184e) )  /* Red component */
-	ROM_LOAD( "82s129.l",          0x0100, 0x0100, CRC(f6682705) SHA1(1ab952c1e2a45e9b0dc9144f50711f99f6b1ebc4) )  /* Green component */
-	ROM_LOAD( "82s129.n",          0x0200, 0x0100, CRC(3d7b3af6) SHA1(0c4f95b26e9fe25a5d8c79f06e7ceab78a07d35c) )  /* Blue component */
+	ROM_LOAD( "82s129.3m", 0x0000, 0x0100, CRC(9d6fef5a) SHA1(e2b62909fecadfc9e0eb1ad72c8b7712a26d184e) )  /* Red component */
+	ROM_LOAD( "82s129.3l", 0x0100, 0x0100, CRC(f6682705) SHA1(1ab952c1e2a45e9b0dc9144f50711f99f6b1ebc4) )  /* Green component */
+	ROM_LOAD( "82s129.3n", 0x0200, 0x0100, CRC(3d7b3af6) SHA1(0c4f95b26e9fe25a5d8c79f06e7ceab78a07d35c) )  /* Blue component */
 ROM_END
 
 ROM_START( crzrally )
