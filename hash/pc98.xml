@@ -64032,6 +64032,25 @@ doujin?!?
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="yumeyare">
+		<description>Yume de Yaretara</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="author" value="ソフトさーくる　クレージュ ~ Soft Circle Courreges" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="yume de yaretara disk a.fdi" size="1265664" crc="368bbe1b" sha1="cab3763ebd8e258c4865c810a1be3d79a0f7f4bd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="yume de yaretara disk b.fdi" size="1265664" crc="4077888c" sha1="d8588f87536174f7280b408f020d53daa22e2807" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="zettmj">
 		<description>Zettai Mahjong</description>
