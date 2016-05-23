@@ -127,17 +127,6 @@ WRITE16_MEMBER(atarig42_state::mo_command_w)
  *
  *************************************/
 
-DIRECT_UPDATE_MEMBER( atarig42_state::atarig42_sloop_direct_handler )
-{
-	if (address < 0x80000)
-	{
-		direct.explicit_configure(0x00000, 0x7ffff, 0x7ffff, m_sloop_base);
-		return (offs_t)-1;
-	}
-	return address;
-}
-
-
 void atarig42_state::roadriot_sloop_tweak(int offset)
 {
 /*
@@ -782,7 +771,6 @@ DRIVER_INIT_MEMBER(atarig42_state,roadriot)
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::roadriot_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::roadriot_sloop_data_w),this));
-	main.set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), this));
 	m_sloop_base = (UINT16 *)memregion("maincpu")->base();
 
 	/*
@@ -818,7 +806,6 @@ DRIVER_INIT_MEMBER(atarig42_state,guardian)
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::guardians_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::guardians_sloop_data_w),this));
-	main.set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), this));
 	m_sloop_base = (UINT16 *)memregion("maincpu")->base();
 
 	/*
