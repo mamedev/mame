@@ -8357,7 +8357,7 @@
 	-->
 
 	<software name="rotd">
-		<description>Rage of the Dragons (NGM-264?)</description>
+		<description>Rage of the Dragons (NGM-2640?)</description>
 		<year>2002</year>
 		<publisher>Evoga / Playmore</publisher>
 		<info name="serial" value="NGM-2640?"/>
@@ -8375,6 +8375,48 @@
 				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
 			</dataarea>
 				<!-- Encrypted -->
+			<dataarea name="audiocrypt" size="0x80000">
+				<rom offset="0x00000" size="0x20000" name="264-m1.m1" crc="4dbd7b43" sha1="6b63756b0d2d30bbf13fbd219833c81fd060ef96" />	<!-- mask rom 27c010 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x1000000">
+				<!-- Encrypted -->
+				<rom name="264-v1.v1" offset="0x000000" size="0x800000" crc="fa005812" sha1="73723126dab5a640ac11955ed6da1bf7a91394f5" />	<!-- mask rom TC5364205 -->
+				<rom name="264-v2.v2" offset="0x800000" size="0x800000" crc="c3dc8bf0" sha1="a105e37262d9500a30fb8a5dac05aa4fab2562a3" />	<!-- mask rom TC5364205 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x4000000">
+				<!-- Encrypted -->
+				<rom loadflag="load16_byte" name="264-c1.c1" offset="0x000000" size="0x800000" crc="4f148fee" sha1="0821463765fad8fbd0dfbbabb7807337d0333719" />	<!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="264-c2.c2" offset="0x000001" size="0x800000" crc="7cf5ff72" sha1="ccb2f94bce943576d224cb326806942426d25584" />	<!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="264-c3.c3" offset="0x1000000" size="0x800000" crc="64d84c98" sha1="8faf153f465ce6fb7770b27a7ce63caf11dd4086" />	<!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="264-c4.c4" offset="0x1000001" size="0x800000" crc="2f394a95" sha1="82347e8f2b48b0522d7d91fd3f372d5768934ab2" />	<!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="264-c5.c5" offset="0x2000000" size="0x800000" crc="6b99b978" sha1="8fd0a60029b41668f9e1e3056edd3c90f62efa83" />	<!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="264-c6.c6" offset="0x2000001" size="0x800000" crc="847d5c7d" sha1="a2ce03f6302edf81f2645de9ec61df1a281ddd78" />	<!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="264-c7.c7" offset="0x3000000" size="0x800000" crc="231d681e" sha1="87836e64dc816f8bf1c834641535ea96baacc024" />	<!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="264-c8.c8" offset="0x3000001" size="0x800000" crc="c5edb5c4" sha1="253378c8739daa5da4edb15eff7050820b2b3755" />	<!-- mask rom TC5364205 -->
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="rotdh" cloneof="rotd">
+		<description>Rage of the Dragons (NGH-2640?)</description>
+		<year>2002</year>
+		<publisher>Evoga / Playmore</publisher>
+		<info name="serial" value="NGH-2640?"/>
+		<info name="release" value="20020926"/>
+		<info name="alt_title" value="レイジ・オブ・ザ・ドラゴンズ"/>
+		<sharedfeat name="release" value="AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<feature name="slot" value="pcm2_rotd" />
+			<dataarea name="maincpu" width="16" endianness="big" size="0x300000">
+				<rom loadflag="load16_word_swap" name="264-pk1.p1" offset="0x000000" size="0x100000" crc="ff2fa719" sha1="03009e3693648ac0d892390c3bba2ceac6c9564b" />
+				<rom loadflag="load16_word_swap" name="264-pk2.sp2" offset="0x100000" size="0x200000" crc="0df2e112" sha1="c521783483117859a2b250190be77f6d49412ae8" />
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
+				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
+			</dataarea>
+			<!-- Encrypted -->
 			<dataarea name="audiocrypt" size="0x80000">
 				<rom offset="0x00000" size="0x20000" name="264-m1.m1" crc="4dbd7b43" sha1="6b63756b0d2d30bbf13fbd219833c81fd060ef96" />	<!-- mask rom 27c010 -->
 			</dataarea>
