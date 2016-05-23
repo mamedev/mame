@@ -9166,7 +9166,63 @@
 		</part>
 	</software>
 
-		<!-- The King of Fighters '97 bootlegs -->
+	<!-- Idol Mahjong Final Romance 2 -->
+	<!-- This set has been added from HBMAME (formerly MisfitMAME) for completeness, being analogous to the Zintrick one. -->
+	
+	<software name="froman2b">
+		<description>Idol Mahjong Final Romance 2 (Neo-Geo, bootleg of CD version)</description>
+		<year>1995</year>
+		<publisher>bootleg</publisher>
+		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="098.p1" offset="0x000000" size="0x80000" crc="09675541" sha1="6afb89d43e67f93e40f3877cbedfec9566e3ff0f" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="098.s1" crc="0e6a7c73" sha1="31b1194524dcc80ec4d63bac088b6fb4909f496c" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="098.m1" crc="da4878cf" sha1="ce13d18a4c5d01974df8542c67c4df00dbc6e7c1" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x100000">
+				<rom name="098.v1" offset="0x000000" size="0x100000" crc="6f8ccddc" sha1="696df2d0f416c2374b0eb7c858486054688c5bca" />
+			</dataarea>
+			<dataarea name="sprites" size="0x800000">
+				<rom loadflag="load16_byte" name="098.c1" offset="0x000000" size="0x400000" crc="29148bf7" sha1="75097fbe8877720afbcbe4dbe30bc600466d759f" />
+				<rom loadflag="load16_byte" name="098.c2" offset="0x000001" size="0x400000" crc="226b1263" sha1="dee6a4a0a727c1d8a6d298cb38ed1b9901992d5b" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="crswd2bl">
+		<description>Crossed Swords 2 (bootleg of CD version)</description>
+		<year>1995</year>
+		<publisher>bootleg</publisher>
+		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="054-p1.p1" offset="0x100000" size="0x100000" crc="64836147" sha1="083cb1626885893e736fc9998036c952cd4d503b" />
+				<rom size="0x100000" offset="0x000000" loadflag="continue" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="054-s1.s1" crc="22e02ddd" sha1="ebd834affc763cc5854abf1c6c42f43f3f3755fd" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="054-m1.m1" crc="63e28343" sha1="f46dbc2f1d6033b11047cca31a9a7d715dc69cb2" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x200000">
+				<rom name="054-v1.v1" offset="0x000000" size="0x200000" crc="22d4b93b" sha1="0515f2ee5d9a8ce424c80721e06f746ac6a543a8" />
+			</dataarea>
+			<dataarea name="sprites" size="0x800000">
+				<rom loadflag="load16_byte" name="054-c1.c1" offset="0x000000" size="0x400000" crc="8221b712" sha1="7e68871f1bfc402ef27c8fa088c680cbd133f71a" />
+				<rom loadflag="load16_byte" name="054-c2.c2" offset="0x000001" size="0x400000" crc="d6c6183d" sha1="cc546ff063fae2c01c109fabcd5b2d29ec3299db" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The King of Fighters '97 bootlegs -->
 
 	<software name="kof97oro" cloneof="kof97">
 		<description>The King of Fighters '97 Oroshi Plus 2003 (bootleg)</description>
