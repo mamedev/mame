@@ -20972,7 +20972,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="legorcr2p" cloneof="legorcr2">
+	<software name="legorac2p" cloneof="legorac2">
 		<description>LEGO Racers 2 (Euro, Prototype)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts</publisher>
@@ -20984,7 +20984,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="legorcr2">
+	<software name="legorac2">
 		<description>LEGO Racers 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts</publisher>
@@ -20997,7 +20997,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="legorcr2u" cloneof="legorcr2">
+	<software name="legorac2u" cloneof="legorac2">
 		<description>LEGO Racers 2 (USA)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts</publisher>
@@ -24427,7 +24427,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="monstfrm" cloneof="mnstrnch">
+	<software name="mfarm" cloneof="mrancher">
 		<description>Monster Farm Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>Tecmo</publisher>
@@ -24442,7 +24442,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="monstfr2" cloneof="mnstrnc2">
+	<software name="mfarm2" cloneof="mranchr2">
 		<description>Monster Farm Advance 2 (Jpn)</description>
 		<year>2002</year>
 		<publisher>Tecmo</publisher>
@@ -24622,7 +24622,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="mnstrnch">
+	<software name="mrancher">
 		<description>Monster Rancher Advance (USA)</description>
 		<year>2001</year>
 		<publisher>Tecmo</publisher>
@@ -24635,7 +24635,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="mnstrnc2">
+	<software name="mranchr2">
 		<description>Monster Rancher Advance 2 (USA)</description>
 		<year>2002</year>
 		<publisher>Tecmo</publisher>
@@ -29265,7 +29265,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="r2rumble">
+	<software name="r2rumbl2">
 		<description>Ready 2 Rumble Boxing - Round 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Midway</publisher>
@@ -29277,7 +29277,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="r2rumbleu" cloneof="r2rumble">
+	<software name="r2rumbl2u" cloneof="r2rumbl2">
 		<description>Ready 2 Rumble Boxing - Round 2 (USA)</description>
 		<year>2001</year>
 		<publisher>Midway</publisher>

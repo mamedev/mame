@@ -1158,7 +1158,7 @@
 		</part>
 	</software>
 
-	<software name="akagawa">
+	<software name="ajyureir">
 		<description>Akagawa Jirou no Yuurei Ressha (Jpn)</description>
 		<year>1991</year>
 		<publisher>King Records</publisher>
@@ -55024,7 +55024,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="rongyu" cloneof="akagawa">
+	<software name="rongyu" cloneof="ajyureir">
 		<description>Rong Yu Xun Zhang (Chi)</description>
 		<year>2005?</year>
 		<publisher>Waixing</publisher>
@@ -55046,7 +55046,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="youlinlc" cloneof="akagawa">
+	<software name="youlinlc" cloneof="ajyureir">
 		<description>You Ling Lie Che (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -55068,7 +55068,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="liecheqa" cloneof="akagawa">
+	<software name="liecheqa" cloneof="ajyureir">
 		<description>Lie Che Qi An (Chi)</description>
 		<year>19??</year>
 		<publisher>CoolBoy</publisher>
@@ -59497,7 +59497,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="shconan" cloneof="akagawa">
+	<software name="shconan" cloneof="ajyureir">
 		<description>Shentan Conan (Chi)</description>
 		<year>19??</year>
 		<publisher>XingXing</publisher>

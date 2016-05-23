@@ -5505,7 +5505,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="a3sv">
+	<software name="aressh3">
 		<description>AIII S.V. - A Ressha de Ikou 3 - Super Version (Jpn)</description>
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
@@ -23772,7 +23772,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="starocea">
+	<software name="starocn">
 		<description>Star Ocean (Jpn)</description>
 		<year>1996</year>
 		<publisher>Enix</publisher>
@@ -33843,7 +33843,7 @@ List of unclassified roms
 		</part>
 	</software>
 	
-	<software name="akagawanp" cloneof="akagawa">
+	<software name="ajmajonmnp" cloneof="ajmajonm">
 		<description>Akagawa Jirou Majo-tachi no Nemuri (Jpn, Rev. A, NP)</description>
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
@@ -33861,7 +33861,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="akagawa">
+	<software name="ajmajonm">
 		<description>Akagawa Jirou Majo-tachi no Nemuri (Jpn)</description>
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>

@@ -1252,7 +1252,7 @@ List of verified retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="jmcgrath">
+	<software name="jmg2k">
 		<!-- Notes: GBC only -->
 		<description>Jeremy McGrath Supercross 2000 (Euro, USA)</description><!-- only Euro confirmed -->
 		<year>2000</year>
@@ -1305,7 +1305,7 @@ List of verified retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="kkings">
+	<software name="kokings">
 		<!-- Notes: GBC only -->
 		<description>Knockout Kings (Euro, USA)</description><!-- only Euro confirmed -->
 		<year>1999</year>
@@ -2866,7 +2866,7 @@ List of verified retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="wormarmg">
+	<software name="wormsarm">
 		<!-- Notes: GBC only -->
 		<description>Worms Armageddon (Euro)</description>
 		<year>2000</year>
@@ -12426,7 +12426,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="legoracr">
+	<software name="legorace">
 		<!-- Notes: GBC only -->
 		<description>LEGO Racers (Euro)</description>
 		<year>2000</year>
@@ -12443,7 +12443,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="legoracru" cloneof="legoracr">
+	<software name="legoraceu" cloneof="legorace">
 		<!-- Notes: GBC only -->
 		<description>LEGO Racers (USA)</description>
 		<year>2000</year>
@@ -14536,7 +14536,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="monstfrm" cloneof="monstrnc">
+	<software name="mfarmbc" cloneof="mranchbc">
 		<!-- Notes: SGB enhanced -->
 		<description>Monster Farm Battle Card GB (Jpn)</description>
 		<year>1999</year>
@@ -14574,7 +14574,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="monstrnc">
+	<software name="mranchbc">
 		<!-- Notes: SGB enhanced -->
 		<description>Monster Rancher Battle Card GB (USA)</description>
 		<year>2000</year>
@@ -14591,7 +14591,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="monstrex">
+	<software name="mranchex">
 		<!-- Notes: GBC only -->
 		<description>Monster Rancher Explorer (USA)</description>
 		<year>2000</year>
@@ -14771,7 +14771,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="mxmania2" cloneof="crazybik">
+	<software name="motoxmn2" cloneof="crazybik">
 		<!-- Notes: GBC only -->
 		<description>Motocross Maniacs 2 (USA)</description>
 		<year>1999</year>
@@ -15573,7 +15573,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="nickrace">
+	<software name="nicktrcg">
 		<!-- Notes: GBC only -->
 		<description>Nicktoons Racing (USA)</description>
 		<year>2000</year>
@@ -18151,7 +18151,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="razorfs">
+	<software name="freestyl">
 		<!-- Notes: GBC only -->
 		<description>Freestyle Scooter (Euro)</description>
 		<year>2001</year>
@@ -18165,7 +18165,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="razorfsu" cloneof="razorfs">
+	<software name="razorfs" cloneof="freestyl">
 		<!-- Notes: GBC only -->
 		<description>Razor Freestyle Scooter (USA)</description>
 		<year>2001</year>
@@ -18464,11 +18464,11 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="rocketp">
+	<software name="rcktpw">
 		<!-- Notes: GBC only -->
 		<description>Rocket Power - Gettin' Air (Euro, USA)</description>
 		<year>2001</year>
-		<publisher>THQ;</publisher>
+		<publisher>THQ</publisher>
 		<info name="serial" value="CGB-BRUP-EUR, CGB-BRUE-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
@@ -18478,11 +18478,11 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="rocketpf" cloneof="rocketp">
+	<software name="rcktpwf" cloneof="rcktpw">
 		<!-- Notes: GBC only -->
 		<description>Rocket Power - La Glisse de l'Extreme (Fra)</description>
 		<year>2001</year>
-		<publisher>THQ;</publisher>
+		<publisher>THQ</publisher>
 		<info name="serial" value="??"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
@@ -19410,7 +19410,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="solomon" cloneof="monstrex">
+	<software name="solomon" cloneof="mranchex">
 		<!-- Notes: GBC only -->
 		<description>Solomon (Jpn)</description>
 		<year>2000</year>
@@ -19715,7 +19715,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="starocea">
+	<software name="starocbs">
 		<description>Star Ocean - Blue Sphere (Jpn)</description>
 		<year>2001</year>
 		<publisher>Enix</publisher>
@@ -22018,7 +22018,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="warriors">
+	<software name="womm">
 		<!-- Notes: GBC only -->
 		<description>Warriors of Might and Magic (USA)</description>
 		<year>2000</year>
@@ -22455,7 +22455,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="wormarmgu" cloneof="wormarmg">
+	<software name="wormsarmu" cloneof="wormsarm">
 		<!-- Notes: GBC only -->
 		<description>Worms Armageddon (USA)</description>
 		<year>2000</year>
