@@ -1542,10 +1542,6 @@ const input_seq &ioport_field::seq(input_seq_type seqtype) const
 	if (m_live == nullptr)
 		return defseq(seqtype);
 
-	// if the field is disabled, return no key
-	if (unused())
-		return input_seq::empty_seq;
-
 	// if the sequence is the special default code, return the expanded default value
 	if (m_live->seq[seqtype].is_default())
 		return manager().type_seq(m_type, m_player, seqtype);
@@ -1562,10 +1558,6 @@ const input_seq &ioport_field::seq(input_seq_type seqtype) const
 
 const input_seq &ioport_field::defseq(input_seq_type seqtype) const
 {
-	// if the field is disabled, return no key
-	if (unused())
-		return input_seq::empty_seq;
-
 	// if the sequence is the special default code, return the expanded default value
 	if (m_seq[seqtype].is_default())
 		return manager().type_seq(m_type, m_player, seqtype);
@@ -2148,7 +2140,8 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 	}
 
 	// Name keyboard key names
-	if (field.type_class() == INPUT_CLASS_KEYBOARD && field.specific_name() == nullptr)
+	ioport_type_class inputclass = field.type_class();
+	if (inputclass == INPUT_CLASS_KEYBOARD && field.specific_name() == nullptr)
 	{
 		// loop through each character on the field
 		for (int which = 0; ; which++)
