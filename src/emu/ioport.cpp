@@ -2140,8 +2140,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 	}
 
 	// Name keyboard key names
-	ioport_type_class inputclass = field.type_class();
-	if (inputclass == INPUT_CLASS_KEYBOARD && field.specific_name() == nullptr)
+	if (field.type_class() == INPUT_CLASS_KEYBOARD && field.specific_name() == nullptr)
 	{
 		// loop through each character on the field
 		for (int which = 0; ; which++)
