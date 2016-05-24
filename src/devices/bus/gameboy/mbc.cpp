@@ -44,14 +44,14 @@ gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type 
 }
 
 gb_rom_mbc1_device::gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source), m_mode(0),
+					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source), m_mode(MODE_16M_64k),
 						m_mask(0x1f),
 						m_shift(0)
 {
 }
 
 gb_rom_mbc1_device::gb_rom_mbc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MBC1, "GB MBC1 Carts", tag, owner, clock, "gb_rom_mbc1", __FILE__), m_mode(0),
+					: gb_rom_mbc_device(mconfig, GB_ROM_MBC1, "GB MBC1 Carts", tag, owner, clock, "gb_rom_mbc1", __FILE__), m_mode(MODE_16M_64k),
 						m_mask(0x1f),
 						m_shift(0)
 {
