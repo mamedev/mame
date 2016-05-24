@@ -26992,7 +26992,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="piacarro">
+	<software name="picarro3">
 		<description>Pia Carrot e Youkoso!! 3.3 (Jpn)</description>
 		<year>2004</year>
 		<publisher>NEC Interchannel</publisher>

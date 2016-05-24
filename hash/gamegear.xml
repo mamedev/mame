@@ -4144,7 +4144,7 @@ a certain item) -->
 		</part>
 	</software>
 
-	<software name="madoumna">
+	<software name="madouma">
 		<description>Madou Monogatari A - Dokidoki Vacation (Jpn)</description>
 		<year>1995</year>
 		<publisher>Compile</publisher>
@@ -4161,7 +4161,7 @@ a certain item) -->
 		</part>
 	</software>
 
-	<software name="madoumon">
+	<software name="madoum1">
 		<description>Madou Monogatari I - 3-Tsu no Madoukyuu (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -4178,7 +4178,7 @@ a certain item) -->
 		</part>
 	</software>
 
-	<software name="madoumn2">
+	<software name="madoum2">
 		<description>Madou Monogatari II - Arle 16-Sai (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4201,7 +4201,7 @@ a certain item) -->
 		</part>
 	</software>
 
-	<software name="madoumn3">
+	<software name="madoum3">
 		<description>Madou Monogatari III - Kyuukyoku Joou-sama (Jpn, v1)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4218,7 +4218,7 @@ a certain item) -->
 		</part>
 	</software>
 
-	<software name="madoumn3a" cloneof="madoumn3">
+	<software name="madoum3a" cloneof="madoum3">
 		<description>Madou Monogatari III - Kyuukyoku Joou-sama (Jpn, v0)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>

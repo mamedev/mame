@@ -292,7 +292,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="commconq">
+	<software name="cnc">
 		<description>Command &amp; Conquer (Euro)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -310,7 +310,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="commconqu" cloneof="commconq">
+	<software name="cncu" cloneof="cnc">
 		<description>Command &amp; Conquer (USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -3051,7 +3051,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="commconqg" cloneof="commconq">
+	<software name="cncg" cloneof="cnc">
 		<description>Command &amp; Conquer (Ger)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>

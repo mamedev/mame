@@ -23900,7 +23900,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madou1">
+	<software name="madoum1">
 		<description>Madou Monogatari 1</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -23920,7 +23920,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madou2">
+	<software name="madoum2">
 		<description>Madou Monogatari 2</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -23940,7 +23940,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madou3">
+	<software name="madoum3">
 		<description>Madou Monogatari 3</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -64537,7 +64537,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<software name="madoumi">
+	<software name="madoummi">
 		<description>Madou Monogatari - Michikusa Ibun</description>
 		<year>19??</year>
 		<publisher>コンパイル (Compile)</publisher>
