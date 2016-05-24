@@ -171,6 +171,7 @@ INPUT_PORTS_END
  *  Machine driver
  *
  *************************************/
+#define PCI_ID_NILE     ":pci:00.0"
 
 static MACHINE_CONFIG_START( mwskins, atlantis_state )
 
@@ -180,7 +181,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
-	MCFG_VRC4373_ADD(                 ":pci:00.0", ":maincpu")
+	MCFG_VRC4373_ADD(                 PCI_ID_NILE, ":maincpu")
 	MCFG_PCI9050_ADD(                 ":pci:0b.0")
 	MCFG_PCI9050_SET_MAP(0, map0)
 	MCFG_PCI9050_SET_MAP(1, map1) // 2 skipped for testing
@@ -214,7 +215,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( mwskins )
-	ROM_REGION32_LE( 0x80000, ":pci:00.0", 0 )  /* 512k for R4310 code */
+	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
 	DISK_REGION( "ide:0:hdd:image" )
@@ -222,7 +223,7 @@ ROM_START( mwskins )
 ROM_END
 
 ROM_START( mwskinsa )
-	ROM_REGION32_LE( 0x80000, ":pci:00.0", 0 )  /* 512k for R4310 code */
+	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
 	DISK_REGION( "ide:0:hdd:image" )
@@ -230,7 +231,7 @@ ROM_START( mwskinsa )
 ROM_END
 
 ROM_START( mwskinso )
-	ROM_REGION32_LE( 0x80000, ":pci:00.0", 0 )  /* 512k for R4310 code */
+	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
 	DISK_REGION( "ide:0:hdd:image" )

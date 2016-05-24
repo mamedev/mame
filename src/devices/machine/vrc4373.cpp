@@ -32,8 +32,8 @@ vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, d
 	: pci_host_device(mconfig, VRC4373, "NEC VRC4373 System Controller", tag, owner, clock, "vrc4373", __FILE__),
 		m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr), m_irq_num(-1),
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
-		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32), m_ram_size(0), m_ram_base(0), m_simm_size(0), m_simm_base(0), m_pci1_laddr(0), m_pci2_laddr(0), m_pci_io_laddr(0), m_target1_laddr(0), m_target2_laddr(0),
-		m_region(*this, DEVICE_SELF)
+		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32), m_pci1_laddr(0), m_pci2_laddr(0), m_pci_io_laddr(0), m_target1_laddr(0), m_target2_laddr(0),
+		m_romRegion(*this, "rom")
 {
 }
 
@@ -59,19 +59,21 @@ void vrc4373_device::device_start()
 	io_window_end   = 0xffffffff;
 	io_offset       = 0x00000000;
 	status = 0x0280;
-	m_ram_size = 1<<22;
-	m_ram_base = 0;
-	m_simm_size = 1<<21;
-	m_simm_base = 0;
+	// Reserve 8M for ram
+	m_ram.reserve(0x00800000 / 4);
+	// Reserve 32M for simm[0]
+	m_simm[0].reserve(0x02000000 / 4);
 
-	// ROM size = 1 MB
-	m_cpu_space->install_rom   (0x1fc00000, 0x1fcfffff, m_region->base());
+	// ROM
+	UINT32 romSize = m_romRegion->bytes();
+	m_cpu_space->install_rom(0x1fc00000, 0x1fc00000 + romSize - 1, m_romRegion->base());
+	// Nile register mapppings
 	m_cpu_space->install_device(0x0f000000, 0x0f0000ff, *static_cast<vrc4373_device *>(this), &vrc4373_device::cpu_map);
 	// PCI Configuration also mapped at 0x0f000100
 	m_cpu_space->install_device(0x0f000100, 0x0f0001ff, *static_cast<vrc4373_device *>(this), &vrc4373_device::config_map);
 
 	// MIPS drc
-	m_cpu->add_fastram(0x1fc00000, 0x1fcfffff, TRUE, m_region->base());
+	m_cpu->add_fastram(0x1fc00000, 0x1fcfffff, TRUE, m_romRegion->base());
 
 	// DMA timer
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrc4373_device::dma_transfer), this));
@@ -90,6 +92,7 @@ void vrc4373_device::device_reset()
 void vrc4373_device::map_cpu_space()
 {
 	UINT32 winStart, winEnd, winSize;
+	UINT32 regConfig;
 
 	// VRC4373 is at 0x0f000000 to 0x0f0001ff
 	// ROM region starts at 0x1f000000
@@ -99,17 +102,41 @@ void vrc4373_device::map_cpu_space()
 	// Clear fastram regions in cpu after rom
 	m_cpu->clear_fastram(1);
 
-	if (m_cpu_regs[NREG_BMCR]&0x8) {
-		m_cpu_space->install_ram(m_ram_base, m_ram_base+m_ram_size-1, &m_ram[0]);
-		m_cpu->add_fastram(m_ram_base, m_ram_size-1, FALSE, &m_ram[0]);
+	regConfig = m_cpu_regs[NREG_BMCR];
+	if (regConfig & 0x8) {
+		winSize = 1 << 22;  // 4MB
+		for (int i = 14; i <= 15; i++) {
+			if (!((regConfig >> i) & 0x1)) winSize <<= 1;
+			else break;
+		}
+		winStart = (regConfig & 0x0fc00000);
+		winEnd = winStart + winSize - 1;
+
+		m_ram.resize(winSize / 4);
+		m_cpu_space->install_ram(winStart, winEnd, m_ram.data());
+		m_cpu->add_fastram(winStart, winEnd, FALSE, m_ram.data());
 		if (LOG_NILE)
-			logerror("%s: map_cpu_space ram_size=%08X ram_base=%08X\n", tag(),m_ram_size,m_ram_base);
+			logerror("map_cpu_space ram_size=%08X ram_base=%08X\n", winSize, winStart);
 	}
-	if (m_cpu_regs[NREG_SIMM1]&0x8) {
-		m_cpu_space->install_ram(m_simm_base, m_simm_base+m_simm_size-1, &m_simm[0]);
-		//m_cpu->add_fastram(m_simm_base, m_simm_size-1, FALSE, &m_simm[0]);
-		if (LOG_NILE)
-			logerror("%s: map_cpu_space simm_size=%08X simm_base=%08X\n", tag(),m_simm_size,m_simm_base);
+
+	// Map SIMMs
+	for (int simIndex = 0; simIndex < 4; simIndex++) {
+		regConfig = m_cpu_regs[NREG_SIMM1 + simIndex];
+		if (regConfig & 0x8) {
+			winSize = 1 << 21;  // 2MB
+			for (int i = 13; i <= 17; i++) {
+				if (!((regConfig >> i) & 0x1)) winSize <<= 1;
+				else break;
+			}
+			winStart = (regConfig & 0x0fe00000);
+			winEnd = winStart + winSize - 1;
+
+			m_simm[simIndex].resize(winSize / 4);
+			m_cpu_space->install_ram(winStart, winEnd, m_simm[simIndex].data());
+			m_cpu->add_fastram(winStart, winEnd, FALSE, m_simm[simIndex].data());
+			if (LOG_NILE)
+				logerror("map_cpu_space simm_size[%i]=%08X simm_base=%08X\n", simIndex, winSize, winStart);
+		}
 	}
 
 	// PCI Master Window 1
@@ -427,27 +454,10 @@ WRITE32_MEMBER(vrc4373_device::cpu_if_w)
 			}
 			break;
 		case NREG_BMCR:
-			if ((data>>3)&0x1) {
-				m_ram_size = 1<<22;  // 4MB
-				for (int i=14; i<=15; i++) {
-					if (!((data>>i)&0x1)) m_ram_size<<=1;
-					else break;
-				}
-				m_ram.resize(m_ram_size/4);
-				m_ram_base = (data & 0x0fc00000);
-			}
-			map_cpu_space();
-			break;
 		case NREG_SIMM1:
-			if ((data>>3)&0x1) {
-				m_simm_size = 1<<21;  // 2MB
-				for (int i=13; i<=17; i++) {
-					if (!((data>>i)&0x1)) m_simm_size<<=1;
-					else break;
-				}
-				m_simm.resize(m_simm_size/4);
-				m_simm_base = (data & 0x0fe00000);
-			}
+		case NREG_SIMM2:
+		case NREG_SIMM3:
+		case NREG_SIMM4:
 			map_cpu_space();
 			break;
 		default:

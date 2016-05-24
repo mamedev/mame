@@ -117,20 +117,16 @@ private:
 
 	void map_cpu_space();
 
-	UINT32 m_ram_size;
-	UINT32 m_ram_base;
 	std::vector<UINT32> m_ram;
 
-	UINT32 m_simm_size;
-	UINT32 m_simm_base;
-	std::vector<UINT32> m_simm;
+	std::vector<UINT32> m_simm[4];
 
 	UINT32 m_cpu_regs[0x7c];
 
 	UINT32 m_pci1_laddr, m_pci2_laddr, m_pci_io_laddr;
 	UINT32 m_target1_laddr, m_target2_laddr;
 
-	required_memory_region m_region;
+	required_memory_region m_romRegion;
 
 	emu_timer* m_dma_timer;
 };
