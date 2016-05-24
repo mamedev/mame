@@ -378,7 +378,7 @@ extern const device_type GB_ROM_MBC4;
 extern const device_type GB_ROM_MBC5;
 extern const device_type GB_ROM_MBC6;
 extern const device_type GB_ROM_MBC7;
-extern const device_type GB_ROM_M161_M12;
+extern const device_type GB_ROM_M161;
 extern const device_type GB_ROM_MMM01;
 extern const device_type GB_ROM_SACHEN1;
 extern const device_type GB_ROM_SACHEN2;

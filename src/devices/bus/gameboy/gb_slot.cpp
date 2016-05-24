@@ -209,7 +209,7 @@ static const gb_slot slot_list[] =
 	{ GB_MBC_MBC7, "rom_mbc7" },
 	{ GB_MBC_TAMA5, "rom_tama5" },
 	{ GB_MBC_MMM01, "rom_mmm01" },
-	{ GB_MBC_M161, "rom_m161_m12" },
+	{ GB_MBC_M161, "rom_m161" },
 	{ GB_MBC_MBC3, "rom_huc1" },    // for now treat this as alias for MBC3
 	{ GB_MBC_MBC3, "rom_huc3" },    // for now treat this as alias for MBC3
 	{ GB_MBC_SACHEN1, "rom_sachen1" },

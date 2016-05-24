@@ -11923,7 +11923,7 @@
 		<publisher>Mani</publisher>
 		<info name="serial" value="DMG-601-CHN"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_m161_m12" />
+			<feature name="slot" value="rom_m161" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-601-chn.bin" size="262144" crc="0c38a775" sha1="dfe46e066c599c17e684ddda3fd74c5357910630" offset="0" />
 			</dataarea>

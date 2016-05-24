@@ -24,7 +24,7 @@ const device_type GB_ROM_MBC3 = &device_creator<gb_rom_mbc3_device>;
 const device_type GB_ROM_MBC5 = &device_creator<gb_rom_mbc5_device>;
 const device_type GB_ROM_MBC6 = &device_creator<gb_rom_mbc6_device>;
 const device_type GB_ROM_MBC7 = &device_creator<gb_rom_mbc7_device>;
-const device_type GB_ROM_M161_M12 = &device_creator<gb_rom_m161_device>;
+const device_type GB_ROM_M161 = &device_creator<gb_rom_m161_device>;
 const device_type GB_ROM_MMM01 = &device_creator<gb_rom_mmm01_device>;
 const device_type GB_ROM_SACHEN1 = &device_creator<gb_rom_sachen_mmc1_device>;
 const device_type GB_ROM_SACHEN2 = &device_creator<gb_rom_sachen_mmc2_device>;
@@ -88,7 +88,7 @@ gb_rom_mbc7_device::gb_rom_mbc7_device(const machine_config &mconfig, const char
 }
 
 gb_rom_m161_device::gb_rom_m161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_M161_M12, "GB M161-M12 Carts", tag, owner, clock, "gb_rom_m161m12", __FILE__), m_base_bank(0)
+					: gb_rom_mbc_device(mconfig, GB_ROM_M161, "GB M161 Carts", tag, owner, clock, "gb_rom_m161", __FILE__), m_base_bank(0)
 				{
 }
 
@@ -664,7 +664,7 @@ WRITE8_MEMBER(gb_rom_mbc7_device::write_ram)
 }
 
 
-// M161-M12
+// M161
 
 READ8_MEMBER(gb_rom_m161_device::read_rom)
 {
