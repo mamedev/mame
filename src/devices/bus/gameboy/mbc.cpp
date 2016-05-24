@@ -93,7 +93,7 @@ gb_rom_m161_device::gb_rom_m161_device(const machine_config &mconfig, const char
 }
 
 gb_rom_mmm01_device::gb_rom_mmm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MMM01, "GB MMM01 Carts", tag, owner, clock, "gb_rom_mmm01", __FILE__), m_bank_mask(0), m_bank(0), m_reg(0)
+					: gb_rom_mbc_device(mconfig, GB_ROM_MMM01, "GB MMM01 Carts", tag, owner, clock, "gb_rom_mmm01", __FILE__), m_romb(0), m_romb_nwe(0), m_ramb(0), m_ramb_nwe(0), m_mode(0), m_mode_nwe(0), m_map(0), m_mux(0)
 				{
 }
 
@@ -230,19 +230,25 @@ void gb_rom_m161_device::device_reset()
 void gb_rom_mmm01_device::device_start()
 {
 	shared_start();
-	save_item(NAME(m_bank_mask));
-	save_item(NAME(m_bank));
-	save_item(NAME(m_reg));
+	save_item(NAME(m_romb));
+	save_item(NAME(m_romb_nwe));
+	save_item(NAME(m_ramb));
+	save_item(NAME(m_ramb_nwe));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_mode_nwe));
+	save_item(NAME(m_map));
+	save_item(NAME(m_mux));
 }
 
 void gb_rom_mmm01_device::device_reset()
 {
-	m_latch_bank = 0x200 - 2;
-	m_latch_bank2 = 0x200 - 1;
-	m_ram_bank = 0;
-	m_bank_mask = 0xff;
-	m_bank = 0;
-	m_reg = 0;
+	m_romb = 0x000;
+	m_romb_nwe = 0x00;
+	m_ramb = 0x00;
+	m_ramb_nwe = 0x00;
+	m_mode = 0x00;
+	m_map = 0x00;
+	m_mux = 0x00;
 }
 
 void gb_rom_sachen_mmc1_device::device_start()
@@ -693,55 +699,112 @@ WRITE8_MEMBER(gb_rom_m161_device::write_bank)
 
 
 // MMM01
-// This mmm01 implementation is mostly guess work, no clue how correct it all is
-/* TODO: This implementation is wrong. Tauwasser
- *
- * Register 0: Map Latch, AA Mask, RAM Enable
- * Register 1: EA1..EA0, RA18..RA14
- * Register 2: ??, AA18..AA15, AA14..AA13
- * Register 3: AA Multiplex, RA Mask, ???, MBC1 Mode
- *
- */
 
 READ8_MEMBER(gb_rom_mmm01_device::read_rom)
 {
-	if (offset < 0x4000)
-		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + offset];
-	else
-		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+
+	UINT16 romb = m_romb & ~m_romb_nwe;
+	UINT16 romb_base = m_romb & (0x1E0 | m_romb_nwe);
+	UINT8 ramb_masked = ((offset & 0x4000) | m_mode ? m_ramb : m_ramb & ~0x03);
+	
+	// zero-adjust RA18..RA14
+	romb = (romb ? romb : 0x01);
+	// if unmapped, force
+	romb = (m_map ? romb : 0x01);
+	
+	// RB 0 logic
+	if (!(offset & 0x4000))
+		romb = 0x00;
+	
+	// combine with base
+	romb |= romb_base;
+	
+	// multiplex with AA14..AA13
+	if (m_mux)
+		romb = (romb & ~0x60) | ((ramb_masked & 0x03) << 5);
+	
+	// if unmapped, force
+	if (!m_map)
+		romb |= 0x1fe;
+	
+	return m_rom[rom_bank_map[romb] * 0x4000 + (offset & 0x3fff)];
 }
 
 WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 {
-	if (offset < 0x2000)
+	// the mapper only has data lines D6..D0
+	data &= 0x7f;
+	
+	// the mapper only uses inputs A15..A13
+	switch (offset & 0xe000)
 	{
-		if (data & 0x40)
-		{
-			m_latch_bank = m_reg;
-			m_latch_bank2 = m_latch_bank + m_bank;
-		}
+		case 0x0000: // Map Latch, AA #WE, RAM Enable
+			m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
+			
+			if (!m_map) {
+				m_ramb_nwe = (data & (0x30)) >> 4;
+				m_map = (data & 0x40);
+			}
+			break;
+		case 0x2000: // RA20..RA19 RA18..RA14
+			if (!m_map)
+				m_romb = (m_romb & ~0x60) | (data & 0x60);
+			
+			m_romb = (m_romb & (~0x1f | m_romb_nwe)) | (data & (0x1f & ~m_romb_nwe));
+			break;
+		case 0x4000: // Mode #WE, RA22..RA21, AA16..AA15, AA14..AA13
+			if (!m_map) {
+				m_mode_nwe = data & 0x40;
+				m_romb = (m_romb & ~0x180) | ((data & 0x30) << 3);
+				m_ramb = (m_ramb & ~0x0C) | (data & 0x0C);
+			}
+			
+			m_ramb = (m_ramb & (~0x03 | m_ramb_nwe)) | (data & (0x03 & ~m_ramb_nwe));
+			break;
+		case 0x6000: // Mux, RA18..RA15 #WE/Mask, ???, MBC1 Mode
+			if (!m_map) {
+				m_mux = data & 0x40;
+				// m_romb_nwe is aligned to RA14, hence >> 1 instead of >> 2
+				m_romb_nwe = (data & 0x3c) >> 1;
+			}
+			
+			if (!m_mode_nwe)
+				m_mode = data & 0x01;
+			break;
+		default:
+			break;
 	}
-	else if (offset < 0x4000)
+}
+
+READ8_MEMBER(gb_rom_mmm01_device::read_ram)
+{
+	UINT8 ramb_masked = ((offset & 0x4000) | m_mode ? m_ramb : m_ramb & ~0x03);
+	UINT8 ramb = ramb_masked;
+	
+	// multiplex with RA20..RA19
+	if (m_mux)
+		ramb = (ramb & ~0x03) | ((m_romb & 0x60) >> 5);
+	
+	if (!m_ram.empty() && m_ram_enable)
 	{
-		m_reg = data & ((m_rom_size / 0x4000) - 1);
-		m_bank = m_reg & m_bank_mask;
-		if (m_bank == 0)
-			m_bank = 1;
-		m_latch_bank2 = m_latch_bank + m_bank;
+		return m_ram[ram_bank_map[ramb] * 0x2000 + (offset & 0x1fff)];
 	}
-	else if (offset < 0x6000)
-		logerror("0x%04X: write 0x%02X to 0x%04X\n", space.device().safe_pc(), data, offset);
 	else
+		return 0xff;
+}
+
+WRITE8_MEMBER(gb_rom_mmm01_device::write_ram)
+{
+	UINT8 ramb_masked = ((offset & 0x4000) | m_mode ? m_ramb : m_ramb & ~0x03);
+	UINT8 ramb = ramb_masked;
+	
+	// multiplex with RA20..RA19
+	if (m_mux)
+		ramb = (ramb & ~0x03) | ((m_romb & 0x60) >> 5);
+	
+	if (!m_ram.empty() && m_ram_enable)
 	{
-		logerror("0x%04X: write 0x%02X to 0x%04X\n", space.device().safe_pc(), data, offset);
-		/* Not sure if this is correct, Taito Variety Pack sets these values */
-		/* Momotarou Collection 2 writes 01 and 21 here */
-		switch (data)
-		{
-			case 0x30:  m_bank_mask = 0x07;   break;
-			case 0x38:  m_bank_mask = 0x03;   break;
-			default:    m_bank_mask = 0xff; break;
-		}
+		m_ram[ram_bank_map[ramb] * 0x2000 + (offset & 0x1fff)] = data;
 	}
 }
 

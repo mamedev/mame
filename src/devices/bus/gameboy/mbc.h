@@ -189,7 +189,17 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom) override;
 	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	UINT8 m_bank_mask, m_bank, m_reg;
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	
+	UINT16 m_romb;
+	UINT8  m_romb_nwe;
+	UINT8  m_ramb;
+	UINT8  m_ramb_nwe;
+	UINT8  m_mode;
+	UINT8  m_mode_nwe;
+	UINT8  m_map;
+	UINT8  m_mux;
 };
 
 // ======================> gb_rom_sachen_mmc1_device
