@@ -7197,7 +7197,7 @@ ROM_END
 
 /* Idol Mahjong Final Romance 2 */
 
-/* This set has been added from HBMAME (formerly MisfitMAME) for completeness, being analogous to the Zintrick one. */
+/* This set has been added from HBMAME for completeness, being analogous to the Zintrick one. */
 
 ROM_START( froman2b )
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
