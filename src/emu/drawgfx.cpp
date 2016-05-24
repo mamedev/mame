@@ -1653,8 +1653,6 @@ void gfx_element::alphastore(bitmap_rgb32 &dest, const rectangle &cliprect,
 	DECLARE_NO_PRIORITY;
 	const pen_t *paldata;
 
-	assert(dest.bpp() == 32);
-	assert(dest.format() == BITMAP_FORMAT_ARGB32);
 	assert(alphatable != nullptr);
 
 	/* if we have a fixed alpha, call the standard drawgfx_transpen */
