@@ -247,7 +247,7 @@ private:
 
 		if (m_dinput_helper == nullptr)
 		{
-			m_dinput_helper = std::make_unique<dinput_api_helper>(DIRECTINPUT_VERSION);
+			m_dinput_helper = std::make_unique<dinput_api_helper>();
 			status = m_dinput_helper->initialize();
 			if (status != DI_OK)
 			{
