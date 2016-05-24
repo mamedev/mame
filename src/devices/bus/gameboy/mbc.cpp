@@ -432,7 +432,7 @@ WRITE8_MEMBER(gb_rom_mbc2_device::write_bank)
 READ8_MEMBER(gb_rom_mbc2_device::read_ram)
 {
 	if (!m_ram.empty() && m_ram_enable)
-		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x01ff)] | 0xF0;
+		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x01ff)] | 0xf0;
 	else
 		return 0xff;
 }
@@ -440,7 +440,7 @@ READ8_MEMBER(gb_rom_mbc2_device::read_ram)
 WRITE8_MEMBER(gb_rom_mbc2_device::write_ram)
 {
 	if (!m_ram.empty() && m_ram_enable)
-		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x01ff)] = data & 0x0F;
+		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x01ff)] = data & 0x0f;
 }
 
 
@@ -704,7 +704,7 @@ READ8_MEMBER(gb_rom_mmm01_device::read_rom)
 {
 
 	UINT16 romb = m_romb & ~m_romb_nwe;
-	UINT16 romb_base = m_romb & (0x1E0 | m_romb_nwe);
+	UINT16 romb_base = m_romb & (0x1e0 | m_romb_nwe);
 	UINT8 ramb_masked = ((offset & 0x4000) | m_mode ? m_ramb : m_ramb & ~0x03);
 	
 	// zero-adjust RA18..RA14
@@ -739,12 +739,11 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 	switch (offset & 0xe000)
 	{
 		case 0x0000: // Map Latch, AA #WE, RAM Enable
-			m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
-			
 			if (!m_map) {
 				m_ramb_nwe = (data & (0x30)) >> 4;
 				m_map = (data & 0x40);
 			}
+			m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
 			break;
 		case 0x2000: // RA20..RA19 RA18..RA14
 			if (!m_map)
@@ -756,7 +755,7 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 			if (!m_map) {
 				m_mode_nwe = data & 0x40;
 				m_romb = (m_romb & ~0x180) | ((data & 0x30) << 3);
-				m_ramb = (m_ramb & ~0x0C) | (data & 0x0C);
+				m_ramb = (m_ramb & ~0x0c) | (data & 0x0c);
 			}
 			
 			m_ramb = (m_ramb & (~0x03 | m_ramb_nwe)) | (data & (0x03 & ~m_ramb_nwe));
@@ -826,8 +825,8 @@ READ8_MEMBER(gb_rom_sachen_mmc1_device::read_rom)
 		off_edit |= 0x80;
 
 	/* Header Un-Scramble */
-	if ((off_edit & 0xFF00) == 0x0100) {
-		off_edit &= 0xFFAC;
+	if ((off_edit & 0xff00) == 0x0100) {
+		off_edit &= 0xffac;
 		off_edit |= ((offset >> 6) & 0x01) << 0;
 		off_edit |= ((offset >> 4) & 0x01) << 1;
 		off_edit |= ((offset >> 1) & 0x01) << 4;
@@ -845,7 +844,7 @@ WRITE8_MEMBER(gb_rom_sachen_mmc1_device::write_bank)
 {
 	/* Only A15..A6, A4, A1..A0 are connected */
 	/* We only decode upper three bits */
-	switch ((offset & 0xFFD3) & 0xE000)
+	switch ((offset & 0xffd3) & 0xe000)
 	{
 		case 0x0000: /* Base ROM Bank Register */
 
@@ -905,8 +904,8 @@ READ8_MEMBER(gb_rom_sachen_mmc2_device::read_rom)
 		off_edit |= 0x80;
 
 	/* Header Un-Scramble */
-	if ((off_edit & 0xFF00) == 0x0100) {
-		off_edit &= 0xFFAC;
+	if ((off_edit & 0xff00) == 0x0100) {
+		off_edit &= 0xffac;
 		off_edit |= ((offset >> 6) & 0x01) << 0;
 		off_edit |= ((offset >> 4) & 0x01) << 1;
 		off_edit |= ((offset >> 1) & 0x01) << 4;
@@ -926,7 +925,7 @@ READ8_MEMBER(gb_rom_sachen_mmc2_device::read_ram)
 		m_unlock_cnt = 0x00;
 		m_mode = MODE_LOCKED_CGB;
 	}
-	return 0xFF;
+	return 0xff;
 
 }
 
