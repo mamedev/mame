@@ -13,6 +13,7 @@
 	- Nuke legacy video code and re-do it by using tilemap system.
 	- sprites are ahead of 1/2 frames;
 	- Writes at 0xb800-0xbfff at attract mode gameplay demo transition?
+	- DIPs need work - Flip Screen does not function.  Still playable
 
 ****************************************/
 
@@ -453,4 +454,4 @@ DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 
 
 
-GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu", "Metal Freezer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu", "Metal Freezer", MACHINE_NO_COCKTAIL )
