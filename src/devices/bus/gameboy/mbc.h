@@ -172,6 +172,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram) override { }
 
 	UINT8 m_base_bank;
+	UINT8 m_load_disable;
 };
 
 // ======================> gb_rom_mmm01_device

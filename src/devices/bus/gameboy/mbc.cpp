@@ -88,7 +88,7 @@ gb_rom_mbc7_device::gb_rom_mbc7_device(const machine_config &mconfig, const char
 }
 
 gb_rom_m161_device::gb_rom_m161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_M161, "GB M161 Carts", tag, owner, clock, "gb_rom_m161", __FILE__), m_base_bank(0)
+					: gb_rom_mbc_device(mconfig, GB_ROM_M161, "GB M161 Carts", tag, owner, clock, "gb_rom_m161", __FILE__), m_base_bank(0), m_load_disable(0)
 				{
 }
 
@@ -217,12 +217,14 @@ void gb_rom_m161_device::device_start()
 {
 	shared_start();
 	save_item(NAME(m_base_bank));
+	save_item(NAME(m_load_disable));
 }
 
 void gb_rom_m161_device::device_reset()
 {
 	shared_reset();
 	m_base_bank = 0;
+	m_load_disable = 0;
 }
 
 void gb_rom_mmm01_device::device_start()
@@ -668,20 +670,22 @@ WRITE8_MEMBER(gb_rom_mbc7_device::write_ram)
 
 READ8_MEMBER(gb_rom_m161_device::read_rom)
 {
-	if (offset < 0x4000)
-		return m_rom[rom_bank_map[m_base_bank] * 0x4000 + offset];
-	else
-		return m_rom[rom_bank_map[m_base_bank] * 0x4000 + (offset & 0x3fff)];
+	return m_rom[rom_bank_map[m_base_bank] * 0x4000 + (offset & 0x7fff)];
 }
 
 WRITE8_MEMBER(gb_rom_m161_device::write_bank)
 {
-	switch (offset & 0xe000)
+	// the mapper (74HC161A) only has data lines D2..D0
+	data &= 0x07;
+	
+	// A15 is connected to #LOAD and overwritten by QD (m_load_disable)
+	switch (offset & 0x8000)
 	{
-		case 0x4000:    // Base Bank Register
-			m_base_bank = data << 1;
+		case 0x0000:    // Base Bank Register
+			if (!m_load_disable)
+				m_base_bank = data << 1;
+			m_load_disable = 0x01;
 			break;
-		case 0x2000:    // Tetris writes 1 here when selected...
 		default:
 			break;
 	}
