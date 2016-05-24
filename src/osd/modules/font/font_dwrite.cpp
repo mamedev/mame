@@ -88,7 +88,7 @@ typedef lazy_loaded_function_p3<HRESULT, DWRITE_FACTORY_TYPE, REFIID, IUnknown**
 //  Save image to file
 //-------------------------------------------------
 
-void SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
+HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 {
 	HRESULT result = S_OK;
 	ComPtr<IWICStream> stream;
@@ -98,11 +98,11 @@ void SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 
 	d2d_create_factory_fn pfn_D2D1CreateFactory("D2D1CreateFactory", L"D2d1.dll");
 	dwrite_create_factory_fn pfn_DWriteCreateFactory("DWriteCreateFactory", L"Dwrite.dll");
-	HR_RET(pfn_D2D1CreateFactory.initialize());
-	HR_RET(pfn_DWriteCreateFactory.initialize());
+	HR_RETHR(pfn_D2D1CreateFactory.initialize());
+	HR_RETHR(pfn_DWriteCreateFactory.initialize());
 
 	// Create a Direct2D factory
-	HR_RET(pfn_D2D1CreateFactory(
+	HR_RETHR(pfn_D2D1CreateFactory(
 		D2D1_FACTORY_TYPE_SINGLE_THREADED,
 		__uuidof(ID2D1Factory1),
 		nullptr,
@@ -112,41 +112,43 @@ void SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 	// Create a DirectWrite factory.
-	HR_RET(pfn_DWriteCreateFactory(
+	HR_RETHR(pfn_DWriteCreateFactory(
 		DWRITE_FACTORY_TYPE_SHARED,
 		__uuidof(IDWriteFactory),
 		reinterpret_cast<IUnknown **>(dwriteFactory.GetAddressOf())));
 
-	HR_RET(CoCreateInstance(
+	HR_RETHR(CoCreateInstance(
 		CLSID_WICImagingFactory,
 		nullptr,
 		CLSCTX_INPROC_SERVER,
 		__uuidof(IWICImagingFactory),
 		(void**)&wicFactory));
 
-	HR_RET(wicFactory->CreateStream(&stream));
-	HR_RET(stream->InitializeFromFilename(filename, GENERIC_WRITE));
+	HR_RETHR(wicFactory->CreateStream(&stream));
+	HR_RETHR(stream->InitializeFromFilename(filename, GENERIC_WRITE));
 
 	ComPtr<IWICBitmapEncoder> encoder;
-	HR_RET(wicFactory->CreateEncoder(GUID_ContainerFormatBmp, nullptr, &encoder));
-	HR_RET(encoder->Initialize(stream.Get(), WICBitmapEncoderNoCache));
+	HR_RETHR(wicFactory->CreateEncoder(GUID_ContainerFormatBmp, nullptr, &encoder));
+	HR_RETHR(encoder->Initialize(stream.Get(), WICBitmapEncoderNoCache));
 
 	ComPtr<IWICBitmapFrameEncode> frameEncode;
-	HR_RET(encoder->CreateNewFrame(&frameEncode, nullptr));
-	HR_RET(frameEncode->Initialize(nullptr));
+	HR_RETHR(encoder->CreateNewFrame(&frameEncode, nullptr));
+	HR_RETHR(frameEncode->Initialize(nullptr));
 
 	UINT width, height;
-	HR_RET(bitmap->GetSize(&width, &height));
-	HR_RET(frameEncode->SetSize(width, height));
-	HR_RET(frameEncode->SetPixelFormat(&pixelFormat));
+	HR_RETHR(bitmap->GetSize(&width, &height));
+	HR_RETHR(frameEncode->SetSize(width, height));
+	HR_RETHR(frameEncode->SetPixelFormat(&pixelFormat));
 
-	HR_RET(frameEncode->WriteSource(bitmap, nullptr));
+	HR_RETHR(frameEncode->WriteSource(bitmap, nullptr));
 
-	HR_RET(frameEncode->Commit());
-	HR_RET(encoder->Commit());
+	HR_RETHR(frameEncode->Commit());
+	HR_RETHR(encoder->Commit());
+	
+	return S_OK;
 }
 
-void SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
+HRESULT SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 {
 	HRESULT result;
 
@@ -158,12 +160,12 @@ void SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 		for (int x = 0; x < bitmap.width(); x++)
 		{
 			UINT32 pixel = bitmap.pix32(y, x);
-			pRow[x] = (pixel == 0xFFFFFFFF) ? rgb_t(0xFF, 0x00, 0x00, 0x00) : pRow[x] = rgb_t(0xFF, 0xFF, 0xFF, 0xFF);
+			pRow[x] = (pixel == 0xFFFFFFFF) ? rgb_t(0xFF, 0x00, 0x00, 0x00) : rgb_t(0xFF, 0xFF, 0xFF, 0xFF);
 		}
 	}
 
 	ComPtr<IWICImagingFactory> wicFactory;
-	HR_RET(CoCreateInstance(
+	HR_RETHR(CoCreateInstance(
 		CLSID_WICImagingFactory,
 		nullptr,
 		CLSCTX_INPROC_SERVER,
@@ -182,6 +184,8 @@ void SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 		&bmp2);
 
 	SaveBitmap(bmp2.Get(), GUID_WICPixelFormat32bppRGBA, filename);
+
+	return S_OK;
 }
 
 #endif
