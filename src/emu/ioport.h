@@ -1088,7 +1088,7 @@ class ioport_field
 	friend class dynamic_field;
 
 	// flags for ioport_fields
-	static const int FIELD_FLAG_UNUSED =   0x0001;    // set if this field is unused but relevant to other games on the same hw
+	static const int FIELD_FLAG_OPTIONAL = 0x0001;    // set if this field is not required but recognized by hw
 	static const int FIELD_FLAG_COCKTAIL = 0x0002;    // set if this field is relevant only for cocktail cabinets
 	static const int FIELD_FLAG_TOGGLE =   0x0004;    // set if this field should behave as a toggle
 	static const int FIELD_FLAG_ROTATED =  0x0008;    // set if this field represents a rotated control
@@ -1120,7 +1120,7 @@ public:
 	bool digital_value() const { return m_digital_value; }
 	void set_value(ioport_value value);
 
-	bool unused() const { return ((m_flags & FIELD_FLAG_UNUSED) != 0); }
+	bool optional() const { return ((m_flags & FIELD_FLAG_OPTIONAL) != 0); }
 	bool cocktail() const { return ((m_flags & FIELD_FLAG_COCKTAIL) != 0); }
 	bool toggle() const { return ((m_flags & FIELD_FLAG_TOGGLE) != 0); }
 	bool rotated() const { return ((m_flags & FIELD_FLAG_ROTATED) != 0); }
@@ -1613,7 +1613,7 @@ public:
 	void field_set_impulse(UINT8 impulse) const { m_curfield->m_impulse = impulse; }
 	void field_set_analog_reverse() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_REVERSE; }
 	void field_set_analog_reset() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_RESET; }
-	void field_set_unused() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_UNUSED; }
+	void field_set_optional() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_OPTIONAL; }
 	void field_set_min_max(ioport_value minval, ioport_value maxval) const { m_curfield->m_min = minval; m_curfield->m_max = maxval; }
 	void field_set_sensitivity(INT32 sensitivity) const { m_curfield->m_sensitivity = sensitivity; }
 	void field_set_delta(INT32 delta) const { m_curfield->m_centerdelta = m_curfield->m_delta = delta; }
@@ -1759,8 +1759,8 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 #define PORT_RESET \
 	configurer.field_set_analog_reset();
 
-#define PORT_UNUSED \
-	configurer.field_set_unused();
+#define PORT_OPTIONAL \
+	configurer.field_set_optional();
 
 // analog settings
 // if this macro is not used, the minimum defaults to 0 and maximum defaults to the mask value
