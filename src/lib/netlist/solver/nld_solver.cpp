@@ -567,12 +567,6 @@ NETLIB_RESET(solver)
 		m_mat_solvers[i]->do_reset();
 }
 
-
-NETLIB_UPDATE_PARAM(solver)
-{
-	//m_inc = time::from_hz(m_freq.Value());
-}
-
 NETLIB_STOP(solver)
 {
 	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)

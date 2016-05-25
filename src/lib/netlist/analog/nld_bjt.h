@@ -41,9 +41,9 @@ public:
 	};
 
 	NETLIB_CONSTRUCTOR(Q)
+	, m_model(*this, "MODEL", "")
 	, m_qtype(BJT_NPN)
 	{
-		register_param("MODEL", m_model, "");
 	}
 
 	NETLIB_DYNAMIC()

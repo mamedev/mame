@@ -33,8 +33,8 @@ NETLIB_OBJECT(switch1)
 {
 	NETLIB_CONSTRUCTOR(switch1)
 	, m_R(*this, "R")
+	, m_POS(*this, "POS", 0)
 	{
-		register_param("POS", m_POS, 0);
 		register_subalias("1", m_R.m_P);
 		register_subalias("2", m_R.m_N);
 	}
@@ -52,9 +52,8 @@ NETLIB_OBJECT(switch2)
 	NETLIB_CONSTRUCTOR(switch2)
 	, m_R1(*this, "R1")
 	, m_R2(*this, "R2")
+	, m_POS(*this, "POS", 0)
 	{
-		register_param("POS", m_POS, 0);
-
 		connect_late(m_R1.m_N, m_R2.m_N);
 
 		register_subalias("1", m_R1.m_P);

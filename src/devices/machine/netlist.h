@@ -552,11 +552,11 @@ class NETLIB_NAME(sound_out) : public netlist::device_t
 public:
 	NETLIB_NAME(sound_out)(netlist::netlist_t &anetlist, const pstring &name)
 		: netlist::device_t(anetlist, name)
+		, m_channel(*this, "CHAN", 0)
+		, m_mult(*this, "MULT", 1000.0)
+		, m_offset(*this, "OFFSET", 0.0)
 	{
 		enregister("IN", m_in);
-		register_param("CHAN", m_channel, 0);
-		register_param("MULT", m_mult, 1000.0);
-		register_param("OFFSET", m_offset, 0.0);
 		m_sample = netlist::netlist_time::from_hz(1); //sufficiently big enough
 		save(NAME(m_last_buffer));
 	}
@@ -636,9 +636,9 @@ public:
 
 		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
 		{
-			register_param(pfmt("CHAN{1}")(i), m_param_name[i], "");
-			register_param(pfmt("MULT{1}")(i), m_param_mult[i], 1.0);
-			register_param(pfmt("OFFSET{1}")(i), m_param_offset[i], 0.0);
+			m_param_name[i] = std::make_unique<netlist::param_str_t>(*this, pfmt("CHAN{1}")(i), "");
+			m_param_mult[i] = std::make_unique<netlist::param_double_t>(*this, pfmt("MULT{1}")(i), 1.0);
+			m_param_offset[i] = std::make_unique<netlist::param_double_t>(*this, pfmt("OFFSET{1}")(i), 0.0);
 		}
 		m_num_channel = 0;
 	}
@@ -657,12 +657,12 @@ public:
 		m_pos = 0;
 		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
 		{
-			if (m_param_name[i].Value() != "")
+			if (m_param_name[i]->Value() != "")
 			{
 				if (i != m_num_channel)
 					netlist().log().fatal("sound input numbering has to be sequential!");
 				m_num_channel++;
-				m_param[i] = dynamic_cast<netlist::param_double_t *>(setup().find_param(m_param_name[i].Value(), true));
+				m_param[i] = dynamic_cast<netlist::param_double_t *>(setup().find_param(m_param_name[i]->Value(), true));
 			}
 		}
 		return m_num_channel;
@@ -675,7 +675,7 @@ public:
 			if (m_buffer[i] == nullptr)
 				break; // stop, called outside of stream_update
 			const nl_double v = m_buffer[i][m_pos];
-			m_param[i]->setTo(v * m_param_mult[i].Value() + m_param_offset[i].Value());
+			m_param[i]->setTo(v * m_param_mult[i]->Value() + m_param_offset[i]->Value());
 		}
 		m_pos++;
 		OUTLOGIC(m_Q, !m_Q.net().as_logic().new_Q(), m_inc  );
@@ -687,11 +687,11 @@ public:
 		m_pos = 0;
 	}
 
-	netlist::param_str_t m_param_name[MAX_INPUT_CHANNELS];
+	std::unique_ptr<netlist::param_str_t> m_param_name[MAX_INPUT_CHANNELS];
 	netlist::param_double_t *m_param[MAX_INPUT_CHANNELS];
 	stream_sample_t *m_buffer[MAX_INPUT_CHANNELS];
-	netlist::param_double_t m_param_mult[MAX_INPUT_CHANNELS];
-	netlist::param_double_t m_param_offset[MAX_INPUT_CHANNELS];
+	std::unique_ptr<netlist::param_double_t> m_param_mult[MAX_INPUT_CHANNELS];
+	std::unique_ptr<netlist::param_double_t> m_param_offset[MAX_INPUT_CHANNELS];
 	netlist::netlist_time m_inc;
 
 private:

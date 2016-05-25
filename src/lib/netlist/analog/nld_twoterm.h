@@ -175,8 +175,8 @@ protected:
 NETLIB_OBJECT_DERIVED(R, R_base)
 {
 	NETLIB_CONSTRUCTOR_DERIVED(R, R_base)
+	, m_R(*this, "R", 1.0 / netlist().gmin())
 	{
-		register_param("R", m_R, 1.0 / netlist().gmin());
 	}
 
 	param_double_t m_R;
@@ -205,6 +205,9 @@ NETLIB_OBJECT(POT)
 	NETLIB_CONSTRUCTOR(POT)
 	, m_R1(*this, "R1")
 	, m_R2(*this, "R2")
+	, m_R(*this, "R", 1.0 / netlist().gmin())
+	, m_Dial(*this, "DIAL", 0.5)
+	, m_DialIsLog(*this, "DIALLOG", 0)
 	{
 		register_subalias("1", m_R1.m_P);
 		register_subalias("2", m_R1.m_N);
@@ -212,9 +215,6 @@ NETLIB_OBJECT(POT)
 
 		connect_late(m_R2.m_P, m_R1.m_N);
 
-		register_param("R", m_R, 1.0 / netlist().gmin());
-		register_param("DIAL", m_Dial, 0.5);
-		register_param("DIALLOG", m_DialIsLog, 0);
 	}
 
 	//NETLIB_UPDATEI();
@@ -234,14 +234,14 @@ NETLIB_OBJECT(POT2)
 {
 	NETLIB_CONSTRUCTOR(POT2)
 	, m_R1(*this, "R1")
+	, m_R(*this, "R", 1.0 / netlist().gmin())
+	, m_Dial(*this, "DIAL", 0.5)
+	, m_DialIsLog(*this, "DIALLOG", 0)
+	, m_Reverse(*this, "REVERSE", 0)
 	{
 		register_subalias("1", m_R1.m_P);
 		register_subalias("2", m_R1.m_N);
 
-		register_param("R", m_R, 1.0 / netlist().gmin());
-		register_param("DIAL", m_Dial, 0.5);
-		register_param("REVERSE", m_Reverse, 0);
-		register_param("DIALLOG", m_DialIsLog, 0);
 	}
 
 	//NETLIB_UPDATEI();
@@ -266,13 +266,11 @@ NETLIB_OBJECT_DERIVED(C, twoterm)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(C, twoterm)
+	, m_C(*this, "C", 1e-6)
 	, m_GParallel(0.0)
 	{
 		enregister("1", m_P);
 		enregister("2", m_N);
-
-		register_param("C", m_C, 1e-6);
-
 	}
 
 	NETLIB_TIMESTEP()
@@ -377,10 +375,10 @@ NETLIB_OBJECT_DERIVED(D, twoterm)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(D, twoterm)
+	, m_model(*this, "MODEL", "")
 	{
 		enregister("A", m_P);
 		enregister("K", m_N);
-		register_param("MODEL", m_model, "");
 
 		m_D.save("m_D", *this);
 	}
@@ -410,9 +408,9 @@ NETLIB_OBJECT_DERIVED(VS, twoterm)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(VS, twoterm)
+	, m_R(*this, "R", 0.1)
+	, m_V(*this, "V", 0.0)
 	{
-		register_param("R", m_R, 0.1);
-		register_param("V", m_V, 0.0);
 
 		enregister("P", m_P);
 		enregister("N", m_N);
@@ -434,9 +432,8 @@ NETLIB_OBJECT_DERIVED(CS, twoterm)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
+	, m_I(*this, "I", 1.0)
 	{
-		register_param("I", m_I, 1.0);
-
 		enregister("P", m_P);
 		enregister("N", m_N);
 	}

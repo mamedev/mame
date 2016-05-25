@@ -60,13 +60,13 @@ NETLIB_NAMESPACE_DEVICES_START()
 NETLIB_OBJECT_DERIVED(r2r_dac, twoterm)
 {
 	NETLIB_CONSTRUCTOR_DERIVED(r2r_dac, twoterm)
+	, m_VIN(*this, "VIN", 1.0)
+	, m_R(*this, "R", 1.0)
+	, m_num(*this, "N", 1)
+	, m_val(*this, "VAL", 1)
 	{
 		enregister("VOUT", m_P);
 		enregister("VGND", m_N);
-		register_param("R", m_R, 1.0);
-		register_param("VIN", m_VIN, 1.0);
-		register_param("N", m_num, 1);
-		register_param("VAL", m_val, 1);
 	}
 
 	NETLIB_UPDATE_PARAMI();

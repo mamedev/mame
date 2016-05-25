@@ -111,6 +111,8 @@ namespace netlist
 
 		pstring build_fqn(const pstring &obj_name) const;
 
+		void register_and_set_param(pstring name, param_t &param);
+
 		void register_object(device_t &dev, const pstring &name, object_t &obj);
 
 		template<class NETLIST_X>
@@ -208,7 +210,7 @@ namespace netlist
 		netlist_t &m_netlist;
 
 		phashmap_t<pstring, pstring> m_alias;
-		phashmap_t<pstring, param_t *>  m_params;
+		phashmap_t<pstring, param_ref_t>  m_params;
 		phashmap_t<pstring, pstring> m_param_values;
 		phashmap_t<pstring, core_terminal_t *> m_terminals;
 

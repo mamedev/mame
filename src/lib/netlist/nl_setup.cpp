@@ -206,6 +206,44 @@ pstring setup_t::objtype_as_astr(object_t &in) const
 	return "Error";
 }
 
+void setup_t::register_and_set_param(pstring name, param_t &param)
+{
+	if (m_param_values.contains(name))
+	{
+		const pstring val = m_param_values[name];
+		log().debug("Found parameter ... {1} : {1}\n", name, val);
+		switch (param.param_type())
+		{
+			case param_t::DOUBLE:
+			{
+				double vald = 0;
+				if (sscanf(val.cstr(), "%lf", &vald) != 1)
+					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
+				dynamic_cast<param_double_t &>(param).initial(vald);
+			}
+			break;
+			case param_t::INTEGER:
+			case param_t::LOGIC:
+			{
+				double vald = 0;
+				if (sscanf(val.cstr(), "%lf", &vald) != 1)
+					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
+				dynamic_cast<param_int_t &>(param).initial((int) vald);
+			}
+			break;
+			case param_t::STRING:
+			case param_t::MODEL:
+			{
+				dynamic_cast<param_str_t &>(param).initial(val);
+			}
+			break;
+			default:
+				log().fatal("Parameter is not supported {1} : {2}\n", name, val);
+		}
+	}
+	if (!m_params.add(param.name(), param_ref_t(param.name(), param.device(), param)))
+		log().fatal("Error adding parameter {1} to parameter list\n", name);
+}
 
 void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 {
@@ -254,46 +292,8 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 			break;
 		case terminal_t::PARAM:
 			{
-				param_t &param = dynamic_cast<param_t &>(obj);
-				if (m_param_values.contains(name))
-				{
-					const pstring val = m_param_values[name];
-					switch (param.param_type())
-					{
-						case param_t::DOUBLE:
-						{
-							log().debug("Found parameter ... {1} : {1}\n", name, val);
-							double vald = 0;
-							if (sscanf(val.cstr(), "%lf", &vald) != 1)
-								log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-							dynamic_cast<param_double_t &>(param).initial(vald);
-						}
-						break;
-						case param_t::INTEGER:
-						case param_t::LOGIC:
-						{
-							log().debug("Found parameter ... {1} : {2}\n", name, val);
-							double vald = 0;
-							if (sscanf(val.cstr(), "%lf", &vald) != 1)
-								log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-							dynamic_cast<param_int_t &>(param).initial((int) vald);
-						}
-						break;
-						case param_t::STRING:
-						{
-							dynamic_cast<param_str_t &>(param).initial(val);
-						}
-						break;
-						case param_t::MODEL:
-							//dynamic_cast<param_model_t &>(param).initial(val);
-							dynamic_cast<param_model_t &>(param).initial(val);
-							break;
-						default:
-							log().fatal("Parameter is not supported {1} : {2}\n", name, val);
-					}
-				}
-				if (!m_params.add(param.name(), &param))
-					log().fatal("Error adding parameter {1} to parameter list\n", name);
+				//register_and_set_param(name, dynamic_cast<param_t &>(obj));
+				log().fatal("should use register_param");
 			}
 			break;
 		case terminal_t::DEVICE:
@@ -482,7 +482,7 @@ param_t *setup_t::find_param(const pstring &param_in, bool required)
 		log().fatal("parameter {1}({2}) not found!\n", param_in_fqn, outname);
 	if (ret != -1)
 		log().debug("Found parameter {1}\n", outname);
-	return (ret == -1 ? nullptr : m_params.value_at(ret));
+	return (ret == -1 ? nullptr : &m_params.value_at(ret).m_param);
 }
 
 // FIXME avoid dynamic cast here

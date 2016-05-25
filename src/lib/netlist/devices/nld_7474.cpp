@@ -68,7 +68,7 @@ NETLIB_RESET(7474sub)
 
 NETLIB_RESET(7474_dip)
 {
-//  m_1.do_reset();
+//	m_1.do_reset();
 	//m_2.do_reset();
 }
 

@@ -20,6 +20,7 @@ const netlist::netlist_time netlist::netlist_time::zero = netlist::netlist_time(
 
 namespace netlist
 {
+
 #if 0
 static pmempool p(65536, 16);
 
@@ -30,8 +31,8 @@ void * object_t::operator new (size_t size)
 
 void object_t::operator delete (void * mem)
 {
-	if (mem)
-		p.free(mem);
+    if (mem)
+    	p.free(mem);
 }
 #else
 void * object_t::operator new (size_t size)
@@ -41,8 +42,8 @@ void * object_t::operator new (size_t size)
 
 void object_t::operator delete (void * mem)
 {
-	if (mem)
-		::operator delete(mem);
+    if (mem)
+    	::operator delete(mem);
 }
 #endif
 
@@ -233,6 +234,7 @@ netlist_t::netlist_t(const pstring &aname)
 
 netlist_t::~netlist_t()
 {
+
 	m_nets.clear();
 	m_devices.clear();
 
@@ -323,18 +325,20 @@ ATTR_COLD void netlist_t::reset()
 	m_queue.clear();
 	if (m_mainclock != nullptr)
 		m_mainclock->m_Q.net().set_time(netlist_time::zero);
-	if (m_solver != nullptr)
-		m_solver->do_reset();
+	//if (m_solver != nullptr)
+	//	m_solver->do_reset();
 
 	// Reset all nets once !
 	for (std::size_t i = 0; i < m_nets.size(); i++)
 		m_nets[i]->do_reset();
 
 	// Reset all devices once !
-	for (std::size_t i = 0; i < m_devices.size(); i++)
-	{
-		m_devices[i]->do_reset();
-	}
+	for (auto & dev : m_devices)
+		dev->do_reset();
+
+	// Make sure everything depending on parameters is set
+	for (auto & dev : m_devices)
+		dev->update_param();
 
 	// Step all devices once !
 #if 0
@@ -350,13 +354,6 @@ ATTR_COLD void netlist_t::reset()
 	for (int i = m_devices.size() - 1; i >= 0; i--)
 		m_devices[i]->update_dev();
 #endif
-
-	// FIXME: some const devices rely on this
-	/* make sure params are set now .. */
-	for (auto & dev : m_devices)
-	{
-		dev->update_param();
-	}
 }
 
 
@@ -429,9 +426,44 @@ void netlist_t::print_stats() const
 }
 
 // ----------------------------------------------------------------------------------------
-// Default netlist elements ...
+// Parameters ...
 // ----------------------------------------------------------------------------------------
 
+template <typename C, param_t::param_type_t T>
+param_template_t<C, T>::param_template_t(device_t &device, const pstring name, const C val)
+: param_t(T, device, device.name() + "." + name)
+, m_param(val)
+{
+	/* pstrings not yet supported, these need special logic */
+	if (T != param_t::STRING && T != param_t::MODEL)
+		save(NLNAME(m_param));
+	device.setup().register_and_set_param(device.name() + "." + name, *this);
+}
+
+template class param_template_t<double, param_t::DOUBLE>;
+template class param_template_t<int, param_t::INTEGER>;
+template class param_template_t<int, param_t::LOGIC>;
+template class param_template_t<pstring, param_t::STRING>;
+template class param_template_t<pstring, param_t::MODEL>;
+
+#if 0
+template <class C, class T>
+ATTR_COLD void device_t::register_param(const pstring &sname, C &param, const T initialVal)
+{
+	pstring fullname = this->name() + "." + sname;
+	param.init_object(*this, fullname);
+	param.initial(initialVal);
+	setup().register_object(*this, fullname, param);
+}
+
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_double_t &param, const double initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_double_t &param, const float initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_int_t &param, const int initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_logic_t &param, const int initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_str_t &param, const char * const initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_str_t &param, const pstring &initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_model_t &param, const char * const initialVal);
+#endif
 
 
 // ----------------------------------------------------------------------------------------
@@ -462,7 +494,7 @@ ATTR_COLD core_device_t::core_device_t(core_device_t &owner, const pstring &name
 	set_logic_family(owner.logic_family());
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
-	init_object(owner.netlist(), owner.name() +"." + name);
+	init_object(owner.netlist(), owner.name() + "." + name);
 	owner.netlist().m_devices.push_back(powned_ptr<core_device_t>(this, false));
 }
 
@@ -570,23 +602,6 @@ ATTR_COLD void device_t::connect_post_start(core_terminal_t &t1, core_terminal_t
 }
 
 
-template <class C, class T>
-ATTR_COLD void device_t::register_param(const pstring &sname, C &param, const T initialVal)
-{
-	pstring fullname = this->name() + "." + sname;
-	param.init_object(*this, fullname);
-	param.initial(initialVal);
-	setup().register_object(*this, fullname, param);
-}
-
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_double_t &param, const double initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_double_t &param, const float initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_int_t &param, const int initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_logic_t &param, const int initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_str_t &param, const char * const initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_str_t &param, const pstring &initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_model_t &param, const char * const initialVal);
-
 // -----------------------------------------------------------------------------
 // family_setter_t
 // -----------------------------------------------------------------------------
@@ -626,7 +641,7 @@ ATTR_COLD net_t::~net_t()
 // FIXME: move somewhere central
 
 struct do_nothing_deleter{
-	template<typename T> void operator()(T*){}
+    template<typename T> void operator()(T*){}
 };
 
 ATTR_COLD void net_t::init_object(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
@@ -991,7 +1006,8 @@ ATTR_COLD analog_output_t::analog_output_t(core_device_t &dev, const pstring &an
 	this->set_net(&m_my_net);
 	set_state(STATE_OUT);
 
-	net().m_cur_Analog = NL_FCONST(0.99);
+	//net().m_cur_Analog = NL_FCONST(0.99);
+	net().m_cur_Analog = NL_FCONST(0.0);
 
 	analog_t::init_object(dev, aname);
 	net().init_object(dev.netlist(), aname + ".net", this);
@@ -1003,7 +1019,8 @@ ATTR_COLD analog_output_t::analog_output_t()
 	this->set_net(&m_my_net);
 	set_state(STATE_OUT);
 
-	net().m_cur_Analog = NL_FCONST(0.99);
+	//net().m_cur_Analog = NL_FCONST(0.99);
+	net().m_cur_Analog = NL_FCONST(0.0);
 }
 
 ATTR_COLD void analog_output_t::init_object(core_device_t &dev, const pstring &aname)
@@ -1021,10 +1038,11 @@ ATTR_COLD void analog_output_t::initial(const nl_double val)
 // param_t & friends
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD param_t::param_t(const param_type_t atype)
+ATTR_COLD param_t::param_t(const param_type_t atype, device_t &device, const pstring &name)
 	: device_object_t(PARAM)
 	, m_param_type(atype)
 {
+	init_object(device, name);
 }
 
 ATTR_COLD const pstring param_model_t::model_type()
@@ -1065,3 +1083,4 @@ ATTR_HOT /* inline */ void NETLIB_NAME(mainclock)::mc_update(logic_net_t &net)
 
 
 NETLIB_NAMESPACE_DEVICES_END()
+

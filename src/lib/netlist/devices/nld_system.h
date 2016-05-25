@@ -84,12 +84,12 @@ NETLIB_NAMESPACE_DEVICES_START()
 NETLIB_OBJECT(netlistparams)
 {
 	NETLIB_CONSTRUCTOR(netlistparams)
+	, m_use_deactivate(*this, "USE_DEACTIVATE", 0)
 	{
-		register_param("USE_DEACTIVATE", m_use_deactivate, 0);
 	}
 	NETLIB_UPDATEI() { }
 	//NETLIB_RESETI() { }
-	NETLIB_UPDATE_PARAMI() { }
+	//NETLIB_UPDATE_PARAMI() { }
 public:
 	param_logic_t m_use_deactivate;
 };
@@ -101,10 +101,10 @@ public:
 NETLIB_OBJECT(mainclock)
 {
 	NETLIB_CONSTRUCTOR(mainclock)
+	, m_freq(*this, "FREQ", 7159000.0 * 5)
 	{
 		enregister("Q", m_Q);
 
-		register_param("FREQ", m_freq, 7159000.0 * 5);
 		m_inc = netlist_time::from_hz(m_freq.Value()*2);
 	}
 
@@ -142,11 +142,12 @@ public:
 NETLIB_OBJECT(clock)
 {
 	NETLIB_CONSTRUCTOR(clock)
+	, m_freq(*this, "FREQ", 7159000.0 * 5.0)
+
 	{
 		enregister("Q", m_Q);
 		enregister("FB", m_feedback);
 
-		register_param("FREQ", m_freq, 7159000.0 * 5.0);
 		m_inc = netlist_time::from_hz(m_freq.Value()*2);
 
 		connect_late(m_feedback, m_Q);
@@ -170,13 +171,13 @@ protected:
 NETLIB_OBJECT(extclock)
 {
 	NETLIB_CONSTRUCTOR(extclock)
+	, m_freq(*this, "FREQ", 7159000.0 * 5.0)
+	, m_pattern(*this, "PATTERN", "1,1")
+	, m_offset(*this, "OFFSET", 0.0)
 	{
 		enregister("Q", m_Q);
 		enregister("FB", m_feedback);
 
-		register_param("FREQ", m_freq, 7159000.0 * 5.0);
-		register_param("PATTERN", m_pattern, "1,1");
-		register_param("OFFSET", m_offset, 0.0);
 		m_inc[0] = netlist_time::from_hz(m_freq.Value()*2);
 
 		connect_late(m_feedback, m_Q);
@@ -228,16 +229,18 @@ protected:
 NETLIB_OBJECT(logic_input)
 {
 	NETLIB_CONSTRUCTOR(logic_input)
+	, m_IN(*this, "IN", 0)
+	/* make sure we get the family first */
+	, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 	{
-		/* make sure we get the family first */
-		register_param("FAMILY", m_FAMILY, "FAMILY(TYPE=TTL)");
 		set_logic_family(netlist().setup().family_from_model(m_FAMILY.Value()));
 
 		enregister("Q", m_Q);
-		register_param("IN", m_IN, 0);
 	}
+	NETLIB_UPDATE_AFTER_PARAM_CHANGE()
+
 	NETLIB_UPDATEI();
-	//NETLIB_RESETI();
+	NETLIB_RESETI();
 	NETLIB_UPDATE_PARAMI();
 
 protected:
@@ -250,12 +253,14 @@ protected:
 NETLIB_OBJECT(analog_input)
 {
 	NETLIB_CONSTRUCTOR(analog_input)
+	, m_IN(*this, "IN", 0.0)
 	{
 		enregister("Q", m_Q);
-		register_param("IN", m_IN, 0.0);
 	}
+	NETLIB_UPDATE_AFTER_PARAM_CHANGE()
+
 	NETLIB_UPDATEI();
-	//NETLIB_RESETI();
+	NETLIB_RESETI();
 	NETLIB_UPDATE_PARAMI();
 protected:
 	analog_output_t m_Q;
@@ -313,10 +318,10 @@ public:
 	NETLIB_CONSTRUCTOR_DERIVED(frontier, base_dummy)
 	, m_RIN(netlist(), "m_RIN")
 	, m_ROUT(netlist(), "m_ROUT")
-	{
-		register_param("RIN", m_p_RIN, 1.0e6);
-		register_param("ROUT", m_p_ROUT, 50.0);
+	, m_p_RIN(*this, "RIN", 1.0e6)
+	, m_p_ROUT(*this, "ROUT", 50.0)
 
+	{
 		enregister("_I", m_I);
 		enregister("I",m_RIN.m_P);
 		enregister("G",m_RIN.m_N);
@@ -358,9 +363,9 @@ private:
 NETLIB_OBJECT(function)
 {
 	NETLIB_CONSTRUCTOR(function)
+	, m_N(*this, "N", 2)
+	, m_func(*this, "FUNC", "")
 	{
-		register_param("N", m_N, 2);
-		register_param("FUNC", m_func, "");
 		enregister("Q", m_Q);
 
 		for (int i=0; i < m_N; i++)
@@ -441,10 +446,11 @@ NETLIB_OBJECT(res_sw)
 public:
 	NETLIB_CONSTRUCTOR(res_sw)
 	, m_R(*this, "R")
+	, m_RON(*this, "RON", 1.0)
+	, m_ROFF(*this, "ROFF", 1.0E20)
+	, m_last_state(0)
 	{
 		enregister("I", m_I);
-		register_param("RON", m_RON, 1.0);
-		register_param("ROFF", m_ROFF, 1.0E20);
 
 		register_subalias("1", m_R.m_P);
 		register_subalias("2", m_R.m_N);
@@ -453,21 +459,20 @@ public:
 	}
 
 	NETLIB_SUB(R) m_R;
+	logic_input_t m_I;
 	param_double_t m_RON;
 	param_double_t m_ROFF;
-	logic_input_t m_I;
-
-protected:
 
 	NETLIB_RESETI()
 	{
 		m_last_state = 0;
 		m_R.set_R(m_ROFF.Value());
 	}
-	NETLIB_UPDATE_PARAMI();
+	//NETLIB_UPDATE_PARAMI();
 	NETLIB_UPDATEI();
 
 private:
+
 	UINT8 m_last_state;
 };
 
@@ -525,7 +530,7 @@ public:
 
 protected:
 
-	NETLIB_RESETI() { }
+	NETLIB_RESETI()	{ }
 
 	NETLIB_UPDATEI()
 	{

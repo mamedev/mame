@@ -39,8 +39,8 @@ NETLIB_OBJECT(OPAMP)
 	NETLIB_CONSTRUCTOR(OPAMP)
 	, m_RP(*this, "RP1")
 	, m_G1(*this, "G1")
+	, m_model(*this, "MODEL", "")
 	{
-		register_param("MODEL", m_model, "");
 
 		m_type = m_model.model_value("TYPE");
 

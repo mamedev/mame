@@ -83,6 +83,7 @@ NETLIB_OBJECT(SN74LS629)
 	, m_clock(*this, "OSC")
 	, m_R_FC(*this, "R_FC")
 	, m_R_RNG(*this, "R_RNG")
+	, m_CAP(*this, "CAP", 1e-6)
 	{
 		enregister("ENQ", m_ENQ);
 		enregister("RNG",    m_RNG);
@@ -94,7 +95,6 @@ NETLIB_OBJECT(SN74LS629)
 		connect_late(m_R_FC.m_N, m_R_RNG.m_N);
 
 		register_subalias("Y", m_clock.m_Y);
-		register_param("CAP", m_CAP, 1e-6);
 	}
 
 	NETLIB_RESETI()

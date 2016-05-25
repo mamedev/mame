@@ -176,9 +176,9 @@
  */
 using netlist_sig_t = std::uint32_t;
 
-	//============================================================
-	//  MACROS / New Syntax
-	//============================================================
+ //============================================================
+ //  MACROS / New Syntax
+ //============================================================
 
 #define NETLIB_NAMESPACE_DEVICES_START()    namespace netlist { namespace devices {
 #define NETLIB_NAMESPACE_DEVICES_END()  }}
@@ -203,17 +203,20 @@ class NETLIB_NAME(_name) : public device_t
 
 #define NETLIB_DESTRUCTOR(_name) public: ATTR_HOT virtual ~NETLIB_NAME(_name)()
 
-#define NETLIB_CONSTRUCTOR_EX(_name, ...)                                  \
+#define NETLIB_CONSTRUCTOR_EX(_name, ...)                                       \
 	private: family_setter_t m_famsetter;                                       \
 	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name, __VA_ARGS__) \
 		: device_t(owner, name)
 
-#define NETLIB_DYNAMIC()                                                        \
+#define NETLIB_DYNAMIC() 														\
 	public: ATTR_HOT virtual bool is_dynamic1() const override { return true; }
 
-#define NETLIB_TIMESTEP()                                                       \
-	public: ATTR_HOT virtual bool is_timestep() const override { return true; }         \
+#define NETLIB_TIMESTEP() 														\
+	public: ATTR_HOT virtual bool is_timestep() const override { return true; } \
 	public: ATTR_HOT virtual void step_time(const nl_double step) override
+
+#define NETLIB_UPDATE_AFTER_PARAM_CHANGE() 						     			\
+	public: ATTR_HOT virtual bool needs_update_after_param_change() const override { return true; }
 
 #define NETLIB_FAMILY(_family) , m_famsetter(*this, _family)
 
@@ -403,8 +406,8 @@ namespace netlist
 
 #if 1
 	public:
-		void * operator new (size_t size);
-		void operator delete (void * mem);
+	    void * operator new (size_t size);
+	    void operator delete (void * mem);
 #endif
 	};
 
@@ -896,8 +899,10 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
-	// net_param_t
+	// param_t
 	// -----------------------------------------------------------------------------
+
+	class device_t;
 
 	class param_t : public device_object_t
 	{
@@ -912,7 +917,7 @@ namespace netlist
 			LOGIC
 		};
 
-		ATTR_COLD param_t(const param_type_t atype);
+		ATTR_COLD param_t(const param_type_t atype, device_t &device, const pstring &name);
 
 		ATTR_HOT  param_type_t param_type() const { return m_param_type; }
 
@@ -924,16 +929,12 @@ namespace netlist
 		const param_type_t m_param_type;
 	};
 
-	template <class C, param_t::param_type_t T>
+	template <typename C, param_t::param_type_t T>
 	class param_template_t : public param_t
 	{
 		P_PREVENT_COPYING(param_template_t)
 	public:
-		ATTR_COLD param_template_t()
-		: param_t(T)
-		, m_param(C(0))
-		{
-		}
+		param_template_t(device_t &device, const pstring name, const C val);
 
 		operator const C() const { return Value(); }
 
@@ -942,14 +943,6 @@ namespace netlist
 		ATTR_HOT  C Value() const { return m_param;   }
 
 	protected:
-		virtual void save_register() override
-		{
-			/* pstrings not yet supported, these need special logic */
-			if (T != param_t::STRING && T != param_t::MODEL)
-				save(NLNAME(m_param));
-			param_t::save_register();
-		}
-
 		virtual void changed() { }
 		C m_param;
 	private:
@@ -959,18 +952,13 @@ namespace netlist
 	using param_int_t = param_template_t<int, param_t::INTEGER>;
 	using param_str_t = param_template_t<pstring, param_t::STRING>;
 
-	class param_logic_t : public param_int_t
-	{
-		P_PREVENT_COPYING(param_logic_t)
-	public:
-		ATTR_COLD param_logic_t() : param_int_t() { };
-	};
+	using param_logic_t = param_template_t<int, param_t::INTEGER>;
 
-	class param_model_t : public param_template_t<pstring, param_t::MODEL>
+	class param_model_t : public param_str_t
 	{
-		P_PREVENT_COPYING(param_model_t)
 	public:
-		ATTR_COLD param_model_t() : param_template_t<pstring, param_t::MODEL>() { }
+		ATTR_COLD param_model_t(device_t &device, const pstring name, const pstring val)
+		: param_str_t(device, name, val) { }
 
 		/* these should be cached! */
 		ATTR_COLD nl_double model_value(const pstring &entity);
@@ -1000,8 +988,6 @@ namespace netlist
 		ATTR_COLD core_device_t(core_device_t &owner, const pstring &name);
 
 		virtual ~core_device_t();
-
-		ATTR_HOT virtual void update_param() {}
 
 		ATTR_HOT  void update_dev()
 		{
@@ -1060,14 +1046,17 @@ namespace netlist
 
 	protected:
 
-		/*ATTR_HOT*/ virtual void update() NOEXCEPT { }
+		ATTR_HOT virtual void update() NOEXCEPT { }
 		ATTR_HOT virtual void stop() { }
 
 	public:
 		ATTR_HOT virtual void step_time(ATTR_UNUSED const nl_double st) { }
 		ATTR_HOT virtual void update_terminals() { }
+
+		ATTR_HOT virtual void update_param() {}
 		ATTR_HOT virtual bool is_dynamic1() const { return false; }
 		ATTR_HOT virtual bool is_timestep() const { return false; }
+		ATTR_HOT virtual bool needs_update_after_param_change() const { return false; }
 
 	private:
 
@@ -1080,6 +1069,22 @@ namespace netlist
 	#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
 		net_update_delegate m_static_update;
 	#endif
+	};
+
+	// -----------------------------------------------------------------------------
+	// param_ref_t
+	// -----------------------------------------------------------------------------
+
+	struct param_ref_t
+	{
+		param_ref_t(const pstring name, core_device_t &device, param_t &param)
+		: m_name(name)
+		, m_device(device)
+		, m_param(param)
+		{ }
+		pstring m_name;
+		core_device_t &m_device;
+		param_t &m_param;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1318,6 +1323,8 @@ protected:
 			m_param = param;
 			changed();
 			device().update_param();
+			if (device().needs_update_after_param_change())
+				device().update_dev();
 		}
 	}
 

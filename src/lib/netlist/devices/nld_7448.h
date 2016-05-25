@@ -46,7 +46,7 @@ NETLIB_NAMESPACE_DEVICES_START()
  * FIXME: Using truthtable is a lot slower than the explicit device
  */
 
-#define USE_TRUTHTABLE_7448 (0)
+#define USE_TRUTHTABLE_7448	(0)
 
 #if (USE_TRUTHTABLE_7448 && USE_TRUTHTABLE)
 
@@ -100,6 +100,7 @@ NETLIB_OBJECT(7448)
 	NETLIB_CONSTRUCTOR(7448)
 	, m_sub(*this, "sub")
 	{
+
 		register_subalias("A", m_sub.m_A);
 		register_subalias("B", m_sub.m_B);
 		register_subalias("C", m_sub.m_C);

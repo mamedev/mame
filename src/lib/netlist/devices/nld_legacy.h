@@ -56,13 +56,12 @@ protected:
 NETLIB_OBJECT(nicDelay)
 {
 	NETLIB_CONSTRUCTOR(nicDelay)
+	, m_L_to_H(*this, "L_TO_H", 10)
+	, m_H_to_L(*this, "H_TO_L", 10)
 	, m_last(0)
 	{
 		enregister("1", m_I);
 		enregister("2", m_Q);
-
-		register_param("L_TO_H", m_L_to_H, 10);
-		register_param("H_TO_L", m_H_to_L, 10);
 
 		save(NLNAME(m_last));
 	}

@@ -64,6 +64,8 @@ NETLIB_OBJECT(74123)
 	, m_dev_type(dev_type)
 	, m_RP(*this, "RP")
 	, m_RN(*this, "RN")
+	, m_K(*this, "K", (m_dev_type == 4538) ? 0.4 : 0.4)
+	, m_RI(*this, "RI", 400.0) // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
 	{
 		if ((m_dev_type != 9602) && (m_dev_type != 4538) )
 			m_dev_type = 74123;
@@ -84,12 +86,6 @@ NETLIB_OBJECT(74123)
 		register_subalias("C",   m_RN.m_R.m_N);
 		register_subalias("RC",  m_RN.m_R.m_P);
 
-		if (m_dev_type == 4538)
-			register_param("K", m_K, 0.4);
-		else
-			register_param("K", m_K, 0.4);
-
-		register_param("RI", m_RI, 400.0); // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
 
 		connect_late(m_RP_Q, m_RP.m_I);
 		connect_late(m_RN_Q, m_RN.m_I);

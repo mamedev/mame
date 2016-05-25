@@ -182,7 +182,7 @@ public:
 	}
 
 	bool is_owned() const { return m_is_owned; }
-
+	
 	template<typename _DC>
 	powned_ptr<_DC> & operator =(powned_ptr<_DC> &r)
 	{

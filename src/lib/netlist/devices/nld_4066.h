@@ -38,8 +38,8 @@ NETLIB_OBJECT(CD4066_GATE)
 	NETLIB_FAMILY("CD4XXX")
 	, m_supply(*this, "PS")
 	, m_R(*this, "R")
+	, m_base_r(*this, "BASER", 270.0)
 	{
-		register_param("BASER", m_base_r, 270.0);
 		enregister("CTL", m_control);
 	}
 
