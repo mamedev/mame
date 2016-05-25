@@ -38,7 +38,7 @@ static pvector_t<int> bubble(const pvector_t<Class> &sl)
 void nl_convert_base_t::add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias)
 {
 	pstring pname = devname + "." + name;
-	m_pins.add(pname, std::make_unique<pin_alias_t>(pname, devname + "." + alias));
+	m_pins.add(pname, pmake_unique<pin_alias_t>(pname, devname + "." + alias));
 }
 
 void nl_convert_base_t::add_ext_alias(const pstring &alias)
