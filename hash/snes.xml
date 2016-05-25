@@ -3192,7 +3192,7 @@ Beyond that last category are the roms waiting to be classified.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="contra3p2" cloneof="sprobot">
 		<description>Contra III - The Alien Wars (USA, Prototype, Alt)</description>
 		<year>1992</year>
@@ -33842,7 +33842,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ajmajonmnp" cloneof="ajmajonm">
 		<description>Akagawa Jirou Majo-tachi no Nemuri (Jpn, Rev. A, NP)</description>
 		<year>1995</year>
@@ -34569,7 +34569,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="3jigens" cloneof="ballz3d">
 		<description>Ballz 3D - 3-jigen Kakutou Ballz (Jpn, Sample)</description>
 		<year>1995</year>
@@ -36095,7 +36095,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="chibimmes" cloneof="chibimme">
 		<description>Chibi Maruko-chan - Mezase! Minami no Island!! (Jpn, Sample)</description>
 		<year>1995</year>
@@ -36748,7 +36748,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="daibakjznp" cloneof="daibakjz">
 		<description>Daibakushou Jinsei Gekijou - Zukkoke Salaryman Hen (Jpn, Rev. A, NP)</description>
 		<year>1995</year>
@@ -37365,7 +37365,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dokap321">
 		<description>Dokapon 3-2-1 - Arashi o Yobu Yuujou (Jpn, Rev. A)</description>
 		<year>1994</year>
@@ -40176,7 +40176,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ggoemkira" cloneof="ggoemkir">
 		<description>Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Wake (Jpn, Rev. A)</description>
 		<year>1995</year>
@@ -40686,7 +40686,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gokuparos" cloneof="gokuparo">
 		<description>Gokujou Parodius (Jpn, Sample)</description>
 		<year>1994</year>
@@ -40883,7 +40883,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="granhists" cloneof="granhist">
 		<description>Granhistoria - Genshi Sekaiki (Jpn, Sample)</description>
 		<year>1995</year>
@@ -42098,7 +42098,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ddanpeis" cloneof="ddanpei">
 		<description>Honoo no Toukyuuji - Dodge Danpei (Jpn, Sample)</description>
 		<year>1992</year>
@@ -42334,7 +42334,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hypririas" cloneof="hypriria">
 		<description>Hyper Iria (Jpn, Sample)</description>
 		<year>1995</year>
@@ -43276,7 +43276,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jikkscr2">
 		<description>Jikkyou World Soccer 2 - Fighting Eleven (Jpn, Rev. A, NP)</description>
 		<year>1995</year>
@@ -46168,7 +46168,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lufiap" cloneof="lufia">
 		<description>Lufia &amp; The Fortress of Doom (USA, Prototype)</description>
 		<year>1993</year>
@@ -46908,7 +46908,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="marmalads" cloneof="marmalad">
 		<description>Marmalade Boy (Jpn, Sample)</description>
 		<year>1995</year>
@@ -50526,7 +50526,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pga96u" cloneof="pga96">
 		<description>PGA Tour 96 (USA, Rev. A)</description>
 		<year>1996</year>
@@ -50590,7 +50590,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pgau" cloneof="pga">
 		<description>PGA Tour Golf (USA, Rev. A)</description>
 		<year>1992</year>
@@ -50712,7 +50712,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="picrosv1">
 		<description>Picross NP Vol. 1 (Jpn, Rev. A, NP)</description>
 		<year>1999</year>
@@ -50797,7 +50797,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="picrosv4">
 		<description>Picross NP Vol. 4 (Jpn, Rev. A, NP)</description>
 		<year>1999</year>
@@ -52977,7 +52977,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ryukoken" cloneof="aof">
 		<description>Ryuuko no Ken (Jpn, Rev. A)</description>
 		<year>1993</year>
@@ -54180,7 +54180,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!-- Can we consider this board confirmed? -->
 	<software name="shodanek">
 		<description>Shodai Nekketsu Kouha Kunio-kun (Jpn, Rev. A)</description>
@@ -54326,7 +54326,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ninjasasp" cloneof="ninjasas">
 		<description>Shounen Ninja Sasuke (Jpn, Prototype)</description>
 		<year>1994</year>
@@ -55260,7 +55260,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spawnp" cloneof="spawn">
 		<description>Spawn (Prototype?)</description>
 		<year>1995</year>
@@ -56556,7 +56556,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sbombmanus" cloneof="sbombman">
 		<description>Super Bomberman (USA, Sample)</description>
 		<year>1993</year>
@@ -56888,7 +56888,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="daikokai" cloneof="unchartd">
 		<description>Super Daikoukai Jidai (Jpn, Rev. A, NP)</description>
 		<year>1992</year>
@@ -56944,7 +56944,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sddragonp" cloneof="sddragon">
 		<description>Super Double Dragon (Euro, Prototype)</description>
 		<year>1992</year>
@@ -57885,7 +57885,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="supermjtc" cloneof="supermjt">
 		<description>Super Mahjong Taikai (Jpn, Rev. B)</description>
 		<year>1992</year>
@@ -58238,7 +58238,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="superozup" cloneof="superozu">
 		<description>Super Oozumou - Nessen Ooichiban (Jpn, Prototype)</description>
 		<year>1992</year>
@@ -58363,7 +58363,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sprobots" cloneof="sprobot">
 		<description>Super Probotector - Alien Rebels (Euro, Sample)</description>
 		<year>1992</year>
@@ -58588,7 +58588,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sshangha" cloneof="shangh2">
 		<description>Super Shanghai - Dragon's Eye (Activision) (Jpn)</description>
 		<year>1994</year>
@@ -64315,7 +64315,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sgboyup" cloneof="sgboy">
 		<description>Super Game Boy (USA, Prototype)</description>
 		<year>199?</year>
@@ -64363,7 +64363,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-		 
+
 	<!-- we shall emulate the additional hardware here... -->
 	<software name="nus64cc" supported="partial">
 		<description>NUS-64 Cassette Checker (Jpn)</description>
@@ -64377,7 +64377,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- we shall emulate the additional hardware here... -->
 	<software name="scd" supported="partial">
 		<description>Super Disc (Jpn, v0.95, Prototype)</description>

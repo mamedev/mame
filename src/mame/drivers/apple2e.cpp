@@ -1946,34 +1946,34 @@ READ8_MEMBER(apple2e_state::c300_int_r)  { return read_int_rom(space, 0x300, off
 READ8_MEMBER(apple2e_state::c300_int_bank_r)  { return read_int_rom(space, 0x4300, offset); }
 WRITE8_MEMBER(apple2e_state::c300_w) { write_slot_rom(space, 3, offset, data); }
 READ8_MEMBER(apple2e_state::c400_r)  { return read_slot_rom(space, 4, offset); }
-READ8_MEMBER(apple2e_state::c400_int_r)  
-{ 
+READ8_MEMBER(apple2e_state::c400_int_r)
+{
 	if ((offset < 0x100) && (m_mockingboard4c))
 	{
 		return read_slot_rom(space, 4, offset);
 	}
 
-	return read_int_rom(space, 0x400, offset); 	
+	return read_int_rom(space, 0x400, offset);
 }
 
-READ8_MEMBER(apple2e_state::c400_int_bank_r)  
-{ 
+READ8_MEMBER(apple2e_state::c400_int_bank_r)
+{
 	if ((offset < 0x100) && (m_mockingboard4c))
 	{
 		return read_slot_rom(space, 4, offset);
 	}
 
-	return read_int_rom(space, 0x4400, offset); 
+	return read_int_rom(space, 0x4400, offset);
 }
 
-WRITE8_MEMBER(apple2e_state::c400_w) 
-{ 
+WRITE8_MEMBER(apple2e_state::c400_w)
+{
 	if ((m_isiic) && (offset < 0x100))
 	{
 		m_mockingboard4c = true;
 	}
 
-	write_slot_rom(space, 4, offset, data); 
+	write_slot_rom(space, 4, offset, data);
 }
 
 READ8_MEMBER(apple2e_state::c800_r)
@@ -3457,7 +3457,7 @@ static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_cts))
 
 	// TODO: populate the IIc's other virtual slots with ONBOARD_ADD
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_MOCKINGBOARD, NOOP )	// Mockingboard 4C
+	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_MOCKINGBOARD, NOOP )   // Mockingboard 4C
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_DISKIING, NOOP)
 
 	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")

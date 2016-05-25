@@ -342,7 +342,7 @@ void sound_xaudio2::exit()
 	m_xAudio2.reset();
 	m_buffer.reset();
 	m_buffer_pool.reset();
-	
+
 	CoUninitialize();
 
 	if (m_overflows != 0 || m_underflows != 0)

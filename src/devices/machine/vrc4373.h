@@ -50,7 +50,7 @@
 
 #define PCI_BUS_CLOCK        33000000
 // Number of dma words to transfer at a time, real hardware bursts 8
-#define DMA_BURST_SIZE		 128
+#define DMA_BURST_SIZE       128
 #define DMA_TIMER_PERIOD     attotime::from_hz(PCI_BUS_CLOCK / 32)
 
 #define DMA_BUSY                0x80000000

@@ -87,7 +87,7 @@ public:
 	matrix_solver_t(netlist_t &anetlist, const pstring &name,
 			const eSortType sort, const solver_parameters_t *params)
 	: device_t(anetlist, name),
-    m_stat_calculations(0),
+	m_stat_calculations(0),
 	m_stat_newton_raphson(0),
 	m_stat_vsolver_calls(0),
 	m_iterative_fail(0),

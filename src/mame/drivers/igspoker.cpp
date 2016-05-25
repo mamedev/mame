@@ -2332,9 +2332,9 @@ ROM_END
   CPUs
   1x Z0840006PSC-Z80 CPU (u13) - 8-bit Microprocessor - main.
   1x PIC16C65A-20/P (u1) - 8bit CMOS Microcontroller (internal ROM not dumped).
-  1x CP82C55A (u29)	- Programmable Peripheral Interface.
+  1x CP82C55A (u29) - Programmable Peripheral Interface.
   1x YM2413 (u3) - FM Operator Type-M (OPM) - sound.
-  1x LM358 (u4)	- Dual Operational Amplifier - sound.
+  1x LM358 (u4) - Dual Operational Amplifier - sound.
   1x TDA2003 (u6) - Audio Amplifier - sound.
 
   1x 24.000000 MHz oscillator (x2).
@@ -2420,7 +2420,7 @@ ROM_END
   4x 8 DIP switches banks (DSW1-4).
   1x 4 DIP switches bank (DSW5).
   1x 3.6V battery.
-  
+
 */
 ROM_START( chleagxb )
 	ROM_REGION( 0x40000, "maincpu", 0 )  // Each half contains a different set of data+program.  The game needs banking.

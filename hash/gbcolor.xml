@@ -6706,7 +6706,7 @@ List of unconfirmed retail cartridge roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="daikatanp" cloneof="daikatan">
 		<!-- Notes: GBC only -->
 		<description>Daikatana (Prototype 20000419)</description>
@@ -23151,7 +23151,7 @@ List of unconfirmed non retail roms
 	<software name="pocknaka">
 		<!-- Notes: GBC only -->
 		<description>Pocket no Naka no Ookoku (Jpn, Prototype)</description>
-		<year>2000</year>	<!-- scheduled to be released January 2001 (3/11/2000 Famitsu) -->
+		<year>2000</year>   <!-- scheduled to be released January 2001 (3/11/2000 Famitsu) -->
 		<publisher>Hector</publisher>
 		<info name="alt_title" value="ポケットの中の王国"/>
 		<part name="cart" interface="gameboy_cart">
@@ -23606,7 +23606,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_8in1">
 		<description>8 in 1 (Tw)</description>
 		<year>19??</year>
@@ -23619,7 +23619,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_sac01" supported="no">
 		<description>4 in 1 + 8 in 1 (World, 4B-001)</description>
 		<year>20??</year>
@@ -23631,7 +23631,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_sac02" supported="no">
 		<description>4 in 1 + 8 in 1 (World, 4B-002)</description>
 		<year>19??</year>
@@ -23644,7 +23644,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_sac05" supported="no">
 		<description>4 in 1 + 8 in 1 + 16 in 1 (World, 4B-005)</description>
 		<year>19??</year>
@@ -23657,7 +23657,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_sac07" supported="no">
 		<description>4 in 1 + 8 in 1 (World, 4B-007)</description>
 		<year>19??</year>
@@ -23670,7 +23670,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_6in1">
 		<description>Super 6 in 1 (Tw)</description>
 		<year>19??</year>
@@ -23683,7 +23683,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_16in1">
 		<description>Super 16 in 1 (Tw)</description>
 		<year>19??</year>
@@ -23925,7 +23925,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="digid3">
 		<description>Chao Jin Hua - Shu Ma Bao Long - Zuan Shi Ban (Chi)</description>
 		<year>200?</year>
@@ -23977,7 +23977,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="taikonzs">
 		<description>Taikong Zhan Shi - Jing Dian Ban (Chi)</description>
 		<year>200?</year>
@@ -24209,7 +24209,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="xinshdyx">
 		<description>Xin Shediao Ying Xiong Chuan (Chi)</description>
 		<year>200?</year>
@@ -24244,7 +24244,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="xinguam2">
 		<description>Xin Guangming Yu Hei'an 2 - Zhushen De Yichan (Chi)</description>
 		<year>200?</year>
@@ -24278,7 +24278,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="teshu2k1" cloneof="mslug2k1">
 		<!-- probably developed by BDD -->
 		<description>Teshu Budui 2001 (Chi, Li Cheng)</description>
@@ -24296,7 +24296,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="taikond3">
 		<description>Taikong Zhanshi DX3 - Zui Zhong Huan Xiang (Chi)</description>
 		<year>200?</year>

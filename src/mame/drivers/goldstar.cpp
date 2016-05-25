@@ -887,16 +887,16 @@ static ADDRESS_MAP_START( flaming7_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
 
 	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-//	AM_RANGE(0x9a00, 0x9fff) AM_RAM
+//  AM_RANGE(0x9a00, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-//	AM_RANGE(0xa200, 0xa7ff) AM_RAM
+//  AM_RANGE(0xa200, 0xa7ff) AM_RAM
 	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-//	AM_RANGE(0xaa00, 0xafff) AM_RAM
+//  AM_RANGE(0xaa00, 0xafff) AM_RAM
 
-//	AM_RANGE(0xb000, 0xb03f) AM_RAM
+//  AM_RANGE(0xb000, 0xb03f) AM_RAM
 	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
-//	AM_RANGE(0xb0c0, 0xb0ff) AM_RAM
+//  AM_RANGE(0xb0c0, 0xb0ff) AM_RAM
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
 	AM_RANGE(0xb180, 0xb7ff) AM_RAM
 
@@ -908,12 +908,12 @@ static ADDRESS_MAP_START( flaming7_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0xb860, 0xb860) AM_WRITE(p2_lamps_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* sound */
-//	AM_RANGE(0xc000, 0xd3ff) AM_RAM
+//  AM_RANGE(0xc000, 0xd3ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 /*
   W 9A00-B7FF FF
- RW B000-B7FF 00 
+ RW B000-B7FF 00
 
 */
 
@@ -8179,7 +8179,7 @@ static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
-//	MCFG_CPU_IO_MAP(flaming7_readport)
+//  MCFG_CPU_IO_MAP(flaming7_readport)
 MACHINE_CONFIG_END
 
 
@@ -10827,7 +10827,7 @@ ROM_END
 
 /*
   New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)
-  
+
   CPUs
   1x Z80        (11b) - 8-bit Microprocessor - main (missing).
   3x iD8255A-5  (7b, 8b, 9b) - Programmable Peripheral Interface.
@@ -10836,7 +10836,7 @@ ROM_END
   1x uPC1181    (0a) - Audio Amplifier - sound.
 
   ROMs
-  4x AM27C64    (1-4)	dumped.
+  4x AM27C64    (1-4)   dumped.
   4x M27C256B   (5-8) dumped.
   3x AM27S21APC (1, 2, 3) dumped.
   3x N82S123AN  (4, 5) dumped.
@@ -10991,11 +10991,11 @@ ROM_END
   Silkscreened: LUCKY97-1.
                 06/07/1993.
                 TAIWAN.
-				
+
   GFX ROMs 1, 2, 3, 4 are double size. Each half matches the set ns8lines.
   GFX ROMs 5, 6, 7 match the ns8lines set.
 
-  Program ROM is different. 
+  Program ROM is different.
 */
 ROM_START( ns8linesa )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -14072,7 +14072,7 @@ ROM_END
   graphics sets in their respective order...
 
   -------------------------------------------------------------------
-  
+
   Tech Notes:
 
   PCB has some hacks...

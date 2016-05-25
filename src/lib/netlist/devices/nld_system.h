@@ -525,7 +525,7 @@ public:
 
 protected:
 
-	NETLIB_RESETI()	{ }
+	NETLIB_RESETI() { }
 
 	NETLIB_UPDATEI()
 	{

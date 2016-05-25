@@ -176,9 +176,9 @@
  */
 using netlist_sig_t = std::uint32_t;
 
- //============================================================
- //  MACROS / New Syntax
- //============================================================
+	//============================================================
+	//  MACROS / New Syntax
+	//============================================================
 
 #define NETLIB_NAMESPACE_DEVICES_START()    namespace netlist { namespace devices {
 #define NETLIB_NAMESPACE_DEVICES_END()  }}
@@ -208,10 +208,10 @@ class NETLIB_NAME(_name) : public device_t
 	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name, __VA_ARGS__) \
 		: device_t(owner, name)
 
-#define NETLIB_DYNAMIC() 														\
+#define NETLIB_DYNAMIC()                                                        \
 	public: ATTR_HOT virtual bool is_dynamic1() const override { return true; }
 
-#define NETLIB_TIMESTEP() 														\
+#define NETLIB_TIMESTEP()                                                       \
 	public: ATTR_HOT virtual bool is_timestep() const override { return true; }         \
 	public: ATTR_HOT virtual void step_time(const nl_double step) override
 
@@ -403,8 +403,8 @@ namespace netlist
 
 #if 1
 	public:
-	    void * operator new (size_t size);
-	    void operator delete (void * mem);
+		void * operator new (size_t size);
+		void operator delete (void * mem);
 #endif
 	};
 

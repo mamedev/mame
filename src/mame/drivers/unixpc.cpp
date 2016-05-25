@@ -5,13 +5,13 @@
     AT&T Unix PC series
 
     Skeleton driver by Dirk Best and R. Belmont
- 
- 	DIVS instruction at 0x801112 (the second time) causes a divide-by-zero
- 	exception the system isn't ready for due to word at 0x5EA6 being zero.
- 
- 	Code might not get there if the attempted FDC boot succeeds; FDC hookup
- 	probably needs help.  2797 isn't asserting DRQ?
- 
+
+    DIVS instruction at 0x801112 (the second time) causes a divide-by-zero
+    exception the system isn't ready for due to word at 0x5EA6 being zero.
+
+    Code might not get there if the attempted FDC boot succeeds; FDC hookup
+    probably needs help.  2797 isn't asserting DRQ?
+
 ***************************************************************************/
 
 
@@ -66,13 +66,13 @@ public:
 	DECLARE_READ16_MEMBER( diskdma_size_r );
 	DECLARE_WRITE16_MEMBER( diskdma_size_w );
 	DECLARE_WRITE16_MEMBER( diskdma_ptr_w );
-	
+
 	DECLARE_WRITE_LINE_MEMBER( wd2797_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( wd2797_drq_w );
 
 	required_shared_ptr<UINT16> m_mapram;
 	required_shared_ptr<UINT16> m_videoram;
-	
+
 private:
 	UINT16 *m_ramptr;
 	UINT32 m_ramsize;
@@ -183,7 +183,7 @@ WRITE16_MEMBER( unixpc_state::misc_control_w )
 	// bit 14 = 0 for disk DMA write, 1 for disk DMA read
 	// bit 13 = Centronics strobe
 	// bit 12 = 0 = modem baud rate from UART clock inputs, 1 = baud from programmable timer
-	
+
 	output().set_value("led_0", !BIT(data,  8));
 	output().set_value("led_1", !BIT(data,  9));
 	output().set_value("led_2", !BIT(data, 10));
@@ -218,7 +218,7 @@ WRITE16_MEMBER( unixpc_state::diskdma_ptr_w )
 		m_diskdmaptr &= 0xffff00;
 		m_diskdmaptr |= (offset & 0xff);
 	}
-	
+
 	logerror("diskdma_ptr_w: wrote at %x, ptr now %x\n", offset<<1, m_diskdmaptr);
 }
 

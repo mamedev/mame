@@ -37,7 +37,6 @@ NETLIB_OBJECT(NE555)
 	, m_last_out(false)
 	, m_ff(false)
 	{
-
 		register_subalias("GND",  m_R3.m_N);    // Pin 1
 		enregister("TRIG",    m_TRIG);      // Pin 2
 		enregister("OUT",    m_OUT);       // Pin 3

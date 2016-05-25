@@ -381,7 +381,7 @@ static INPUT_PORTS_START( tourvision )
 	PORT_DIPSETTING(    0x10, "120" )
 	PORT_DIPSETTING(    0x08, "90" )
 	PORT_DIPSETTING(    0x00, "60" )
-        PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+		PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 
 	PORT_START( "DSW2" )
 	PORT_DIPNAME( 0x03, 0x03, "Coins needed 2" )

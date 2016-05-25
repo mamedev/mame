@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="fmtowns_cd" description="FM Towns CD-ROMs">
-<!-- 
+<!--
 Preliminary list for FM Towns CDs.
 
-Most images come from the Neo Kobe Collection, dated 2016-02-25. 
+Most images come from the Neo Kobe Collection, dated 2016-02-25.
 
 Software with a CUE file was converted directly with CHDMAN. The rest were
 converted to CUE+BIN with IsoBuster+EAC (preserving the pregaps if present)
@@ -24,7 +24,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="4dboxing">
 		<description>4D Boxing</description>
 		<year>1992</year>
@@ -35,7 +35,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Converted from MDS/MDF -->
 	<software name="4ddriv">
 		<description>4D Driving</description>
@@ -47,7 +47,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="4dtennis">
 		<description>4D Tennis</description>
 		<year>1993</year>
@@ -58,7 +58,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="38mank">
 		<description>38-man Kilo no Kokuu</description>
 		<year>1989</year>
@@ -74,7 +74,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="atrain3">
 		<description>A Ressha de Ikou III</description>
 		<year>1991</year>
@@ -85,7 +85,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="atrain4">
 		<description>A Ressha de Ikou IV</description>
 		<year>1992</year>
@@ -101,7 +101,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="abel">
 		<description>Abel: Shin Mokushiroku Taisen</description>
 		<year>1995</year>
@@ -123,7 +123,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aeternam">
 		<description>Aeternam</description>
 		<year>1992</year>
@@ -134,7 +134,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aburner">
 		<description>After Burner</description>
 		<year>1989</year>
@@ -145,7 +145,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aburner3">
 		<description>After Burner III</description>
 		<year>1992</year>
@@ -156,7 +156,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aircmb2s">
 		<description>Air Combat II Special</description>
 		<year>1993</year>
@@ -167,7 +167,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Seems to be missing a floppy disk -->
 	<software name="airwar">
 		<description>Air Warrior</description>
@@ -179,7 +179,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="alice1">
 		<description>Alice no Yakata CD</description>
 		<year>1992</year>
@@ -190,7 +190,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="alice2">
 		<description>Alice no Yakata II</description>
 		<year>1992</year>
@@ -201,7 +201,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- probably a bad dump -->
 	<software name="alice3">
 		<description>Alice no Yakata III</description>
@@ -213,7 +213,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aitd">
 		<description>Alone in the Dark</description>
 		<year>1993</year>
@@ -224,7 +224,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aitd2">
 		<description>Alone in the Dark 2</description>
 		<year>1994</year>
@@ -236,7 +236,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="alshark">
 		<description>Alshark</description>
 		<year>1993</year>
@@ -247,7 +247,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="amarant3">
 		<description>Amaranth III</description>
 		<year>1994</year>
@@ -258,7 +258,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ambival">
 		<description>Ambivalenz</description>
 		<year>1994</year>
@@ -274,7 +274,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aouq">
 		<description>America Oudan Ultra Quiz</description>
 		<year>1994</year>
@@ -285,7 +285,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="angel">
 		<description>Angel</description>
 		<year>1993</year>
@@ -296,7 +296,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="anghalo">
 		<description>Angel Halo</description>
 		<year>1996</year>
@@ -307,7 +307,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aokiooka">
 		<description>Aoki Ookami to Shiroki Mejika: Genchou Hishi</description>
 		<year>1993</year>
@@ -318,7 +318,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="arabesq">
 		<description>Arabesque</description>
 		<year>1994</year>
@@ -329,7 +329,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aska">
 		<description>Aska Towns</description>
 		<year>1989</year>
@@ -340,7 +340,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="asukabfe">
 		<description>Asuka 120% Burning Fest. Excellent</description>
 		<year>1994</year>
@@ -356,7 +356,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="awesome">
 		<description>Awesome</description>
 		<year>1992</year>
@@ -378,7 +378,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ayumi">
 		<description>Ayumi-chan Monogatari</description>
 		<year>1993</year>
@@ -394,7 +394,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ayumijb">
 		<description>Ayumi-chan Monogatari Jissha-ban</description>
 		<year>1995</year>
@@ -405,7 +405,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="azure">
 		<description>Azure</description>
 		<year>1993</year>
@@ -416,7 +416,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="bacta12v">
 		<description>Bacta 1 &amp; 2 + Voice</description>
 		<year>1996</year>
@@ -427,7 +427,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="bfmaria">
 		<description>Ballade for Maria / Maria ni Sasageru Ballade</description>
 		<year>1995</year>
@@ -443,7 +443,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="beast3">
 		<description>Beast 3</description>
 		<year>1994</year>
@@ -454,7 +454,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="biblemas">
 		<description>Bible Master</description>
 		<year>1993</year>
@@ -481,7 +481,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="blue">
 		<description>Blue: Will to Power</description>
 		<year>1992</year>
@@ -492,7 +492,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="panicbom">
 		<description>Bomberman: Panic Bomber</description>
 		<year>1995</year>
@@ -503,7 +503,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="branmark">
 		<description>Branmarker</description>
 		<year>1991</year>
@@ -514,7 +514,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="branmar2">
 		<description>Branmarker 2</description>
 		<year>1995</year>
@@ -525,7 +525,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="bublbobl">
 		<description>Bubble Bobble</description>
 		<year>1990</year>
@@ -536,7 +536,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="buraij">
 		<description>Burai Joukan</description>
 		<year>1990</year>
@@ -547,7 +547,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="buraik">
 		<description>Burai Kanketsu-hen</description>
 		<year>1991</year>
@@ -558,7 +558,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="cal">
 		<description>Cal Towns</description>
 		<year>1992</year>
@@ -569,7 +569,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="cancanb">
 		<description>Can Can Bunny Extra</description>
 		<year>1993</year>
@@ -580,7 +580,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="castles">
 		<description>Castles</description>
 		<year>1992</year>
@@ -591,7 +591,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="centurio">
 		<description>Centurion</description>
 		<year>1993</year>
@@ -602,7 +602,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="classcrd">
 		<description>Classic Road</description>
 		<year>1994</year>
@@ -613,7 +613,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="crystrnl">
 		<description>Crystal Rinal</description>
 		<year>1994</year>
@@ -624,7 +624,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="cm2itsuk">
 		<description>Custom Mate 2 &amp; Itsuka dokoka de</description>
 		<year>1995</year>
@@ -640,7 +640,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="cybercty">
 		<description>Cybercity</description>
 		<year>1989</year>
@@ -656,7 +656,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-		
+
 	<software name="cyberia">
 		<description>Cyberia</description>
 		<year>1995</year>
@@ -668,7 +668,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dokanshu">
 		<description>D.O. Kanshuu Premium Box: Touch My Heart</description>
 		<year>1995</year>
@@ -679,7 +679,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dpszenbu">
 		<description>D.P.S. Zenbu</description>
 		<year>1995</year>
@@ -690,7 +690,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="daikouk">
 		<description>Daikoukai Jidai</description>
 		<year>1990</year>
@@ -706,7 +706,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="daikouk2">
 		<description>Daikoukai Jidai II</description>
 		<year>1993</year>
@@ -722,7 +722,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="daisenr3">
 		<description>Daisenryaku III '90</description>
 		<year>1990</year>
@@ -738,14 +738,14 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
-	<!-- 
+
+	<!--
 	The collection includes two Dalk images, one marked as "Trurip" and one marked as
-	"freeware".	Analysis of the tracks shows that the data track is exactly the same, and
+	"freeware". Analysis of the tracks shows that the data track is exactly the same, and
 	audio tracks are the same but shifted forwards by 5980 bytes in the "freeware"
 	image. This difference is probably due to the read offset of the drive used
-	to dump the disk. 
-	
+	to dump the disk.
+
 	The only difference is in the last track. The image marked as freeware had its
 	data shifted beyond the boundaries of the disc, so it's missing some bytes at the
 	end. Trurip images are always offset-corrected, so we can assume that one is the
@@ -766,7 +766,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dangel">
 		<description>Dangel</description>
 		<year>1996</year>
@@ -777,7 +777,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="defana">
 		<description>De.FaNa</description>
 		<year>1995</year>
@@ -788,7 +788,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="deadforc">
 		<description>Dead Force</description>
 		<year>1995</year>
@@ -799,7 +799,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dotb">
 		<description>Dead of the Brain</description>
 		<year>1993</year>
@@ -810,7 +810,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="deathbrd">
 		<description>Death Brade</description>
 		<year>1992</year>
@@ -821,7 +821,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="deep">
 		<description>Deep</description>
 		<year>1995</year>
@@ -837,7 +837,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="deja2">
 		<description>De-Ja II</description>
 		<year>1992</year>
@@ -848,7 +848,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dengekin">
 		<description>Dengeki Nurse</description>
 		<year>1992</year>
@@ -859,7 +859,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="derbysta">
 		<description>Derby Stallion</description>
 		<year>1993</year>
@@ -870,7 +870,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="desire">
 		<description>Desire: Haitoku no Rasen</description>
 		<year>1994</year>
@@ -881,7 +881,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="diegekir">
 		<description>Die Gekirin</description>
 		<year>1995</year>
@@ -892,7 +892,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="digipin1">
 		<description>Digital Pinup Girls Vol. 1</description>
 		<year>1993</year>
@@ -903,7 +903,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dokidok1">
 		<description>Doki Doki Disk CD-ban Dai-1-kan: Club D.O. Jimukyoku</description>
 		<year>1994</year>
@@ -914,7 +914,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dorbestj">
 		<description>DOR Best Selection Joukan</description>
 		<year>1993</year>
@@ -930,7 +930,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dorse93">
 		<description>DOR Special Edition '93</description>
 		<year>1993</year>
@@ -941,7 +941,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dorsesak">
 		<description>DOR Special Edition Sakigake</description>
 		<year>1993</year>
@@ -952,7 +952,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="doukyuu">
 		<description>Doukyuusei</description>
 		<year>1992</year>
@@ -963,7 +963,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="doukyuu2">
 		<description>Doukyuusei 2</description>
 		<year>1995</year>
@@ -974,7 +974,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dhalf">
 		<description>Dragon Half</description>
 		<year>1994</year>
@@ -996,7 +996,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dknight4">
 		<description>Dragon Knight 4</description>
 		<year>1994</year>
@@ -1007,7 +1007,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dragflam">
 		<description>Dragons of Flame</description>
 		<year>1992</year>
@@ -1018,7 +1018,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="drakkhen">
 		<description>Drakkhen</description>
 		<year>1990</year>
@@ -1029,7 +1029,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dmaster">
 		<description>Dungeon Master</description>
 		<year>1989</year>
@@ -1040,7 +1040,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dmaster2">
 		<description>Dungeon Master II: Skullkeep</description>
 		<year>1994</year>
@@ -1051,7 +1051,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="eimmy">
 		<description>Eimmy to Yobanaide</description>
 		<year>1995</year>
@@ -1062,7 +1062,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="elfish">
 		<description>Elfish</description>
 		<year>1994</year>
@@ -1074,7 +1074,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="elfishlt">
 		<description>Elfish Lite</description>
 		<year>1993</year>
@@ -1085,7 +1085,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="elmknght">
 		<description>Elm Knight</description>
 		<year>1992</year>
@@ -1096,7 +1096,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="emdragon">
 		<description>Emerald Dragon</description>
 		<year>1992</year>
@@ -1112,7 +1112,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="etsuraku">
 		<description>Etsuraku no Gakuen</description>
 		<year>1994</year>
@@ -1123,7 +1123,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="evolutn">
 		<description>Evolution</description>
 		<year>1989</year>
@@ -1134,7 +1134,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="excel10">
 		<description>Excellent 10</description>
 		<year>1990</year>
@@ -1145,7 +1145,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="excitcd">
 		<description>Exciting CD</description>
 		<year>1994</year>
@@ -1161,7 +1161,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="excd94s">
 		<description>Exciting CD '94 Summer</description>
 		<year>1994</year>
@@ -1177,7 +1177,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="eyeotb2">
 		<description>Eye of the Beholder II: The Legend of Darkmoon</description>
 		<year>1993</year>
@@ -1188,7 +1188,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fbas1120">
 		<description>F-BASIC386 v1.1 L20</description>
 		<year>1989</year>
@@ -1199,7 +1199,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fbas2110">
 		<description>F-BASIC386 v2.1 L10</description>
 		<year>1992</year>
@@ -1210,7 +1210,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="f29retal">
 		<description>F29 Retaliator</description>
 		<year>1993</year>
@@ -1221,7 +1221,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fblow">
 		<description>Final Blow</description>
 		<year>1990</year>
@@ -1232,7 +1232,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="flashbck">
 		<description>Flashback</description>
 		<year>1994</year>
@@ -1243,7 +1243,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Seems to be a coverdisc for Oh!FM magazine, would be nice to have more info -->
 	<software name="fmthcdd1">
 		<description>FM Towns Hyper CD Demo Futoppara No. 1</description>
@@ -1255,7 +1255,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fmtstdem">
 		<description>FM Towns Super Technology Demo 1993</description>
 		<year>1993</year>
@@ -1266,7 +1266,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-		
+
 	<software name="fractal">
 		<description>Fractal Engine Demo</description>
 		<year>1991</year>
@@ -1277,7 +1277,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="freewill">
 		<description>Free Will: Knight of Argent</description>
 		<year>1992</year>
@@ -1288,7 +1288,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="frogfstd">
 		<description>Frog Feast Demo</description>
 		<year>2005</year>
@@ -1299,7 +1299,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc4">
 		<description>Free Software Collection 4</description>
 		<year>1991</year>
@@ -1315,7 +1315,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc5">
 		<description>Free Software Collection 5</description>
 		<year>1992</year>
@@ -1326,7 +1326,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc6">
 		<description>Free Software Collection 6</description>
 		<year>1993</year>
@@ -1337,7 +1337,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc7">
 		<description>Free Software Collection 7</description>
 		<year>1993</year>
@@ -1348,7 +1348,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc8">
 		<description>Free Software Collection 8</description>
 		<year>1994</year>
@@ -1359,7 +1359,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc9">
 		<description>Free Software Collection 9</description>
 		<year>1994</year>
@@ -1370,7 +1370,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc10">
 		<description>Free Software Collection 10</description>
 		<year>1995</year>
@@ -1381,7 +1381,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc11">
 		<description>Free Software Collection 11</description>
 		<year>1995</year>
@@ -1392,7 +1392,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fshark">
 		<description>Hishouzame / Flying Shark</description>
 		<year>1993</year>
@@ -1403,7 +1403,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fwc1">
 		<description>Freeware Collection 1</description>
 		<year>1989</year>
@@ -1414,7 +1414,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fwc2">
 		<description>Freeware Collection 2</description>
 		<year>1990</year>
@@ -1425,7 +1425,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fwc3">
 		<description>Freeware Collection 3</description>
 		<year>1991</year>
@@ -1436,7 +1436,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gakuking">
 		<description>Gakuen King: Hidehiko Gakkou wo Tsukuru</description>
 		<year>1996</year>
@@ -1448,7 +1448,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="galaxyf2">
 		<description>Galaxy Force II</description>
 		<year>1991</year>
@@ -1459,7 +1459,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gametec1">
 		<description>Game Technopolis Super Collection 1</description>
 		<year>1992</year>
@@ -1470,7 +1470,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gametec2">
 		<description>Game Technopolis Super Collection 2</description>
 		<year>1993</year>
@@ -1481,7 +1481,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gekirin">
 		<description>Gekirin: Ushinawareshi Houken</description>
 		<year>1994</year>
@@ -1492,7 +1492,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gendaiex">
 		<description>Gendai Daisenryaku EX Special</description>
 		<year>1994</year>
@@ -1503,7 +1503,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="genocsq">
 		<description>Genocide Square</description>
 		<year>1993</year>
@@ -1514,7 +1514,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gigamort">
 		<description>Giga Mortion</description>
 		<year>1995</year>
@@ -1525,7 +1525,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gnutowns">
 		<description>GNU for Towns Release 2</description>
 		<year>1991</year>
@@ -1536,7 +1536,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="goh2">
 		<description>Goh II Towns Special</description>
 		<year>1993</year>
@@ -1552,7 +1552,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gunblaze">
 		<description>Gunblaze</description>
 		<year>1994</year>
@@ -1563,7 +1563,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gunship">
 		<description>Gunship: The Helicopter Simulation</description>
 		<year>1990</year>
@@ -1574,7 +1574,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hanakiok">
 		<description>Hana no Kioku</description>
 		<year>1995</year>
@@ -1585,7 +1585,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hanapon">
 		<description>Hanafuda de Pon!</description>
 		<year>1996</year>
@@ -1601,7 +1601,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="heartron">
 		<description>Heart de Ron!!</description>
 		<year>1995</year>
@@ -1612,7 +1612,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="highccom">
 		<description>High C Compiler Multimedia Development Kit v1.7 L13</description>
 		<year>1995</year>
@@ -1623,7 +1623,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="highlt20">
 		<description>Highlight CD 20</description>
 		<year>1993</year>
@@ -1639,7 +1639,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hoshis1">
 		<description>Hoshi no Suna Monogatari</description>
 		<year>1992</year>
@@ -1650,7 +1650,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hoshis2">
 		<description>Hoshi no Suna Monogatari 2</description>
 		<year>1992</year>
@@ -1661,7 +1661,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hoshis3">
 		<description>Hoshi no Suna Monogatari 3</description>
 		<year>1995</year>
@@ -1672,7 +1672,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hypraddr">
 		<description>Hyper Address</description>
 		<year>1990</year>
@@ -1688,7 +1688,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hyprocea">
 		<description>Hyper Ocean</description>
 		<year>1993</year>
@@ -1699,7 +1699,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="idolproj">
 		<description>Idol Project</description>
 		<year>1995</year>
@@ -1715,7 +1715,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="igo2">
 		<description>Igo II</description>
 		<year>1989</year>
@@ -1726,8 +1726,8 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-		
-	<!-- 
+
+	<!--
 	This is named "Go Dojo Yaburi" in the Neo Kobe Collection. That name actually
 	corresponds to a different Go game, also published by Fujitsu.
 	-->
@@ -1741,7 +1741,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="imgfight">
 		<description>Image Fight</description>
 		<year>1990</year>
@@ -1752,7 +1752,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="indy3">
 		<description>Indiana Jones and the Last Crusade</description>
 		<year>1990</year>
@@ -1763,7 +1763,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="indy4">
 		<description>Indiana Jones and the Fate of Atlantis</description>
 		<year>1993</year>
@@ -1774,7 +1774,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="infest">
 		<description>Infestation: Chinmoku no Wakusei</description>
 		<year>1992</year>
@@ -1785,7 +1785,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="injuugak">
 		<description>Injuu Gakuen: La Blue Girl</description>
 		<year>1994</year>
@@ -1796,7 +1796,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ishidou">
 		<description>Ishidou</description>
 		<year>1990</year>
@@ -1807,7 +1807,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="janjaka">
 		<description>Jan Jaka Jan</description>
 		<year>1992</year>
@@ -1818,7 +1818,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="jango4">
 		<description>Jango 4</description>
 		<year>1994</year>
@@ -1829,7 +1829,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="jankirou">
 		<description>Jankirou</description>
 		<year>1994</year>
@@ -1840,7 +1840,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="jealousy">
 		<description>Jealousy</description>
 		<year>1995</year>
@@ -1851,7 +1851,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="joshikou">
 		<description>Joshikousei Shoujo Hatsunetsu</description>
 		<year>1993</year>
@@ -1862,7 +1862,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="joshua">
 		<description>Joshua</description>
 		<year>1992</year>
@@ -1873,7 +1873,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kidpix">
 		<description>Kid Pix</description>
 		<year>1992</year>
@@ -1884,7 +1884,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kigen">
 		<description>Kigen: Kagayaki no Hasha</description>
 		<year>1992</year>
@@ -1895,7 +1895,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kindan">
 		<description>Kindan no Ketsuzoku</description>
 		<year>1993</year>
@@ -1906,7 +1906,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kbounty">
 		<description>King's Bounty</description>
 		<year>1994</year>
@@ -1917,7 +1917,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kquest5">
 		<description>King's Quest V: Absence Makes the Heart Go Yonder</description>
 		<year>1991</year>
@@ -1928,7 +1928,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kiwame">
 		<description>Kiwame</description>
 		<year>1992</year>
@@ -1939,7 +1939,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kiwame2">
 		<description>Kiwame II</description>
 		<year>1994</year>
@@ -1950,7 +1950,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kokoraku">
 		<description>Koko wa Rakuensou</description>
 		<year>1996</year>
@@ -1961,7 +1961,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kokorak2">
 		<description>Koko wa Rakuensou 2</description>
 		<year>1996</year>
@@ -1972,7 +1972,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kyankyan">
 		<description>Kyan Kyan Collection</description>
 		<year>1989</year>
@@ -1983,7 +1983,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Originally labeled as "mp3 source". It probably needs a redump. -->
 	<software name="ktiger">
 		<description>Kyuukyoku Tiger</description>
@@ -1995,7 +1995,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="landlore">
 		<description>Lands of Lore: The Throne of Chaos</description>
 		<year>1993</year>
@@ -2006,7 +2006,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lastarmg">
 		<description>Last Armageddon CD Special</description>
 		<year>1989</year>
@@ -2027,7 +2027,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lastsurv">
 		<description>Last Survivor</description>
 		<year>1990</year>
@@ -2038,7 +2038,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ldawn2">
 		<description>Lunatic Dawn II</description>
 		<year>1994</year>
@@ -2054,7 +2054,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lemmings">
 		<description>Lemmings</description>
 		<year>1992</year>
@@ -2065,8 +2065,8 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
-	<!-- 
+
+	<!--
 	Is the English version official? The intro is still in Japanese, and there's
 	very little information available about this release.
 	-->
@@ -2080,7 +2080,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lemmin2j">
 		<description>Lemmings 2: The Tribes (Japanese)</description>
 		<year>1994</year>
@@ -2091,7 +2091,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lesserm">
 		<description>Lesser Mern</description>
 		<year>1992</year>
@@ -2102,7 +2102,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- The floppy image seems to have 19712 extra bytes filled with 0xE5 - bad dump? -->
 	<software name="lettuce">
 		<description>Lettuce Cooking</description>
@@ -2119,7 +2119,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="libido7">
 		<description>Libido7</description>
 		<year>1994</year>
@@ -2130,7 +2130,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lifedth">
 		<description>Life &amp; Death</description>
 		<year>1992</year>
@@ -2141,7 +2141,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lifedth2">
 		<description>Life &amp; Death II: The Brain</description>
 		<year>1992</year>
@@ -2152,7 +2152,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="links386">
 		<description>Golf Links 386 Pro</description>
 		<year>1995</year>
@@ -2164,7 +2164,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="linuxje3">
 		<description>Linux + JE3</description>
 		<year>1994</year>
@@ -2175,7 +2175,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="linuxje4">
 		<description>Linux + JE4 1995/12</description>
 		<year>1995</year>
@@ -2212,7 +2212,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lrabble">
 		<description>Libble Rabble</description>
 		<year>1994</year>
@@ -2223,7 +2223,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lupin3">
 		<description>Lupin Sansei: Hong Kong no Mashu: Fukushuu wa Meikyuu no Hate ni</description>
 		<year>1990</year>
@@ -2234,7 +2234,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lvalour">
 		<description>Legends of Valour</description>
 		<year>1994</year>
@@ -2245,7 +2245,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="marble">
 		<description>Marble Madness</description>
 		<year>1991</year>
@@ -2256,7 +2256,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mode7dmo">
 		<description>Mode 7 Demo</description>
 		<year>2008</year>
@@ -2267,7 +2267,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mbomber">
 		<description>Muscle Bomber: The Body Explosion</description>
 		<year>1993</year>
@@ -2278,7 +2278,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mcosm">
 		<description>Microcosm</description>
 		<year>1993</year>
@@ -2289,7 +2289,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mirage">
 		<description>Mirage</description>
 		<year>1992</year>
@@ -2300,7 +2300,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mmagic4">
 		<description>Might and Magic: Clouds of Xeen</description>
 		<year>1993</year>
@@ -2311,7 +2311,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mmagic5">
 		<description>Might and Magic: Darkside of Xeen</description>
 		<year>1994</year>
@@ -2322,7 +2322,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mustowns">
 		<description>Musium Towns</description>
 		<year>1993</year>
@@ -2333,7 +2333,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="nadia">
 		<description>Fushigi no Umi no Nadia</description>
 		<year>1993</year>
@@ -2354,7 +2354,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="necronom">
 		<description>Necronomicon</description>
 		<year>1994</year>
@@ -2376,7 +2376,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="panzrdiv">
 		<description>Panzer Division / Kikou Shidan</description>
 		<year>1990</year>
@@ -2387,7 +2387,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="pegasus">
 		<description>Pegasus</description>
 		<year>1995</year>
@@ -2398,7 +2398,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="populous">
 		<description>Populous &amp; The Promised Lands</description>
 		<year>1990</year>
@@ -2409,7 +2409,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="powermon">
 		<description>Powermonger</description>
 		<year>1992</year>
@@ -2430,7 +2430,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="prinpers">
 		<description>Prince of Persia</description>
 		<year>1992</year>
@@ -2441,7 +2441,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="prinper2">
 		<description>Prince of Persia 2: The Shadow and the Flame</description>
 		<year>1994</year>
@@ -2463,7 +2463,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="puzznic">
 		<description>Puzznic</description>
 		<year>1990</year>
@@ -2474,7 +2474,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="racrally">
 		<description>RAC Rally</description>
 		<year>1995</year>
@@ -2485,7 +2485,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- works well on fmtmarty, keyboard seems to interfere with movements on fmtowns -->
 	<software name="raiden">
 		<description>Raiden Densetsu / Raiden Trad</description>
@@ -2497,7 +2497,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="raidy">
 		<description>Ikazuchi no Senshi Raidy</description>
 		<year>1994</year>
@@ -2508,7 +2508,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="raidy2">
 		<description>Ikazuchi no Senshi Raidy 2</description>
 		<year>1996</year>
@@ -2519,7 +2519,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Missing a floppy disk -->
 	<software name="railtyc">
 		<description>Railroad Tycoon</description>
@@ -2531,7 +2531,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ravnloft">
 		<description>Ravenloft</description>
 		<year>1995</year>
@@ -2542,7 +2542,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="rayxanbr">
 		<description>Rayxanber</description>
 		<year>1990</year>
@@ -2553,7 +2553,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="splatter">
 		<description>Splatterhouse</description>
 		<year>1992</year>
@@ -2564,7 +2564,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ssf2">
 		<description>Super Street Fighter II: The New Challengers</description>
 		<year>1994</year>
@@ -2575,7 +2575,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ssf2samp">
 		<description>Super Street Fighter II: The New Challengers (Sample Disc)</description>
 		<year>1994</year>
@@ -2586,7 +2586,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="simcity">
 		<description>SimCity</description>
 		<year>1990</year>
@@ -2597,7 +2597,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="sotb">
 		<description>Shadow of the Beast: Mashou no Okite</description>
 		<year>1991</year>
@@ -2608,7 +2608,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Original image from the redump.org database -->
 	<software name="sotb2">
 		<description>Shadow of the Beast II: Juushin no Jubaku</description>
@@ -2620,7 +2620,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ultima4">
 		<description>Ultima IV: Quest of the Avatar</description>
 		<year>1992</year>
@@ -2631,7 +2631,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="volfied">
 		<description>Volfied</description>
 		<year>1991</year>
@@ -2642,7 +2642,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Missing a floppy disk -->
 	<software name="win31">
 		<description>Windows 3.1 L11</description>
@@ -2654,7 +2654,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="win95">
 		<description>Windows 95</description>
 		<year>1996</year>
@@ -2665,7 +2665,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-		
+
 	<software name="wingcmar">
 		<description>Wing Commander Armada</description>
 		<year>1995</year>
@@ -2676,7 +2676,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wingcmdr">
 		<description>Wing Commander</description>
 		<year>1992</year>
@@ -2687,7 +2687,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wingcmsm">
 		<description>Wing Commander: Secret Missions</description>
 		<year>1994</year>
@@ -2698,7 +2698,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wingcm2s">
 		<description>Wing Commander II and Special Operations</description>
 		<year>1995</year>
@@ -2709,7 +2709,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wiz5">
 		<description>Wizardry V: Heart of the Maelstrom</description>
 		<year>1990</year>
@@ -2725,7 +2725,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wiz6">
 		<description>Wizardry VI: Bane of the Cosmic Forge</description>
 		<year>1991</year>
@@ -2741,7 +2741,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wiz7">
 		<description>Wizardry VII: Crusaders of the Dark Savant</description>
 		<year>1994</year>
@@ -2752,7 +2752,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wwcarmen">
 		<description>Where in the World is Carmen Sandiego?</description>
 		<year>1993</year>
@@ -2763,7 +2763,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="xak2">
 		<description>Xak II: Rising of the Redmoon</description>
 		<year>1991</year>
@@ -2774,7 +2774,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="xak3">
 		<description>Xak III: The Eternal Recurrence</description>
 		<year>1993</year>
@@ -2785,7 +2785,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="xenon">
 		<description>Xenon</description>
 		<year>1995</year>
@@ -2796,7 +2796,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="zak">
 		<description>Zak McKracken and The Alien Mindbenders</description>
 		<year>1990</year>
@@ -2807,7 +2807,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="zenith">
 		<description>Zenith</description>
 		<year>1995</year>
@@ -2818,7 +2818,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="zokudm">
 		<description>Zoku Dungeon Master: Chaos no Gyakushuu</description>
 		<year>1990</year>

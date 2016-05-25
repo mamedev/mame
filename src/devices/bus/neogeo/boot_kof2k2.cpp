@@ -106,5 +106,3 @@ void neogeo_kf2k2mp2_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_prot->sx_decrypt(fix_region, fix_region_size, 1);
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2002_GFX_KEY);
 }
-
-

@@ -41,7 +41,7 @@ pdynlib::pdynlib(const pstring libname)
 pdynlib::pdynlib(const pstring path, const pstring libname)
 : m_isLoaded(false), m_lib(nullptr)
 {
-	//	printf("win: loading <%s>\n", libname.cstr());
+	//  printf("win: loading <%s>\n", libname.cstr());
 #ifdef _WIN32
 	if (libname != "")
 		m_lib = LoadLibrary(libname.cstr());

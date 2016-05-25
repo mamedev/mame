@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- 
+<!--
 
      Dumps are not yet verified as good, although most have been confirmed to run on a flash cart
-     
+
      the 3-in-1 internal ROM of the system is not yet dumped: it contains the games
 
-	* 2003
-	* Drifter
-	* Miner
+    * 2003
+    * Drifter
+    * Miner
 -->
 
 <softwarelist name="gameking" description="TimeTop GameKing cartridges">

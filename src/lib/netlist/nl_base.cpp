@@ -20,7 +20,6 @@ const netlist::netlist_time netlist::netlist_time::zero = netlist::netlist_time(
 
 namespace netlist
 {
-
 #if 0
 static pmempool p(65536, 16);
 
@@ -31,8 +30,8 @@ void * object_t::operator new (size_t size)
 
 void object_t::operator delete (void * mem)
 {
-    if (mem)
-    	p.free(mem);
+	if (mem)
+		p.free(mem);
 }
 #else
 void * object_t::operator new (size_t size)
@@ -42,8 +41,8 @@ void * object_t::operator new (size_t size)
 
 void object_t::operator delete (void * mem)
 {
-    if (mem)
-    	::operator delete(mem);
+	if (mem)
+		::operator delete(mem);
 }
 #endif
 
@@ -234,7 +233,6 @@ netlist_t::netlist_t(const pstring &aname)
 
 netlist_t::~netlist_t()
 {
-
 	m_nets.clear();
 	m_devices.clear();
 
@@ -619,7 +617,7 @@ ATTR_COLD net_t::~net_t()
 // FIXME: move somewhere central
 
 struct do_nothing_deleter{
-    template<typename T> void operator()(T*){}
+	template<typename T> void operator()(T*){}
 };
 
 ATTR_COLD void net_t::init_object(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
@@ -1058,4 +1056,3 @@ ATTR_HOT /* inline */ void NETLIB_NAME(mainclock)::mc_update(logic_net_t &net)
 
 
 NETLIB_NAMESPACE_DEVICES_END()
-

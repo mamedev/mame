@@ -65,7 +65,6 @@ NETLIB_OBJECT(7450_dip)
 	, m_1(*this, "1")
 	, m_2(*this, "2")
 	{
-
 		register_subalias("1", m_1.m_A);
 		register_subalias("2", m_2.m_A);
 		register_subalias("3", m_2.m_B);

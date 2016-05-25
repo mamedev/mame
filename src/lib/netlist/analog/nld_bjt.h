@@ -152,11 +152,11 @@ NETLIB_OBJECT_DERIVED(QBJT_EB, QBJT)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(QBJT_EB, QBJT)
-	  ,	m_D_CB(owner, "m_D_CB")
-	  ,	m_D_EB(owner, "m_D_EB")
-	  ,	m_D_EC(owner, "m_D_EC")
-	  ,	m_alpha_f(0)
-	  ,	m_alpha_r(0)
+		,   m_D_CB(owner, "m_D_CB")
+		,   m_D_EB(owner, "m_D_EB")
+		,   m_D_EC(owner, "m_D_EC")
+		,   m_alpha_f(0)
+		,   m_alpha_r(0)
 	{
 		enregister("E", m_D_EB.m_P);   // Cathode
 		enregister("B", m_D_EB.m_N);   // Anode

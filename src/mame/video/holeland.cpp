@@ -61,7 +61,7 @@ VIDEO_START_MEMBER(holeland_state,holeland)
 
 	m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x01, 0xfe); /* split type 1 has pen 0? transparent in front half */
-	
+
 	save_item(NAME(m_po));
 	save_item(NAME(m_palette_offset));
 }

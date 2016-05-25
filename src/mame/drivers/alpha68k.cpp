@@ -2140,7 +2140,7 @@ static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3000000)

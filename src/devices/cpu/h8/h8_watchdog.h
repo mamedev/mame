@@ -43,7 +43,7 @@
 #include "h8.h"
 #include "h8_intc.h"
 
-#define MCFG_H8_WATCHDOG_ADD( _tag, intc, irq, type )	\
+#define MCFG_H8_WATCHDOG_ADD( _tag, intc, irq, type )   \
 	MCFG_DEVICE_ADD( _tag, H8_WATCHDOG, 0 ) \
 	downcast<h8_watchdog_device *>(device)->set_info(intc, irq, type);
 

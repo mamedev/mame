@@ -54999,7 +54999,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="magicopy33a" cloneof="magicopy">
 		<description>Magic Copy II ver 3.3 (Alt)</description>
 		<year>1985</year>
@@ -55021,7 +55021,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="magicopy34a" cloneof="magicopy">
 		<description>Magic Copy II ver 3.4 (Alt)</description>
 		<year>1986</year>
@@ -55942,13 +55942,13 @@ ExtractDisk  [02]"DATA          " -> "musium 3_02.d88"
 		<description>Musium 3 (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="musium3_01.d88" size="348848" crc="691cb9d6" sha1="de57c4cdddcd71042fa00c88f2e107fc6024b50e" offset="0" />
 			</dataarea>
 		</part>
-	
+
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="musium3_02.d88" size="348848" crc="cf4179af" sha1="79121bbec7e30408a9cb1f19f33ab260479d4636" offset="0" />
@@ -57217,7 +57217,7 @@ ExtractDisk  [14]"EXPRESS 14      " -> "hot file_14.d88"
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hotfil34">
 		<description>Hot File Disk No.5</description>
 		<year>19??</year>

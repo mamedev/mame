@@ -150,17 +150,17 @@
 	</software>
 
 <!--
-	<software name="colorpnta" cloneof="colorpnt" supported="no">
-		<description>Colorpaint (Bad)</description>
-		<year>1985</year>
-		<publisher>France Image Logiciel (FIL)</publisher>
+    <software name="colorpnta" cloneof="colorpnt" supported="no">
+        <description>Colorpaint (Bad)</description>
+        <year>1985</year>
+        <publisher>France Image Logiciel (FIL)</publisher>
 
-		<part name="cart" interface="to_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="colorpeint_memo7.rom" size="32768" crc="e1234738" sha1="3f170f1b7bc39e32edc8fa9b4a02d70d4d0a8ee2" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cart" interface="to_cart">
+            <dataarea name="rom" size="32768">
+                <rom name="colorpeint_memo7.rom" size="32768" crc="e1234738" sha1="3f170f1b7bc39e32edc8fa9b4a02d70d4d0a8ee2" offset="0" status="baddump" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="colorpnt_de" cloneof="colorpnt">
@@ -394,17 +394,17 @@
 	</software>
 
 <!--
-	<software name="scriptora" cloneof="scriptor">
-		<description>Scriptor (Extra Data)</description>
-		<year>1984</year>
-		<publisher>TO TEK International</publisher>
+    <software name="scriptora" cloneof="scriptor">
+        <description>Scriptor (Extra Data)</description>
+        <year>1984</year>
+        <publisher>TO TEK International</publisher>
 
-		<part name="cart" interface="to_cart">
-			<dataarea name="rom" size="16394">
-				<rom name="scriptor (totek) (inconnus) (1986) (memo7).bin" size="16394" crc="46d4e43a" sha1="90c1e35468f7d629babbd529cd22116e086adb44" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cart" interface="to_cart">
+            <dataarea name="rom" size="16394">
+                <rom name="scriptor (totek) (inconnus) (1986) (memo7).bin" size="16394" crc="46d4e43a" sha1="90c1e35468f7d629babbd529cd22116e086adb44" offset="0" status="baddump" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="studio">

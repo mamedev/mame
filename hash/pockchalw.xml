@@ -6,31 +6,31 @@
  List of software from ja.wikipedia.org
  Notice that this list might be missing different variants (for different ages),
  and it was indeed missing the existence of two Chuugaku Koumin carts.
- 
+
  * Shinkenzemi Koukou Kouza ~ 進研ゼミ 高校講座
  頻出英単語
- 頻出英熟語			[dumped]
+ 頻出英熟語            [dumped]
  重要英語構文
- 重要古文攻略			[dumped]
+ 重要古文攻略         [dumped]
  頻出世界史攻略
  頻出日本史攻略
- 
- 
+
+
  * Shinkenzemi Chuugaku Kouza ~ 進研ゼミ 中学講座
  中一英語
  中二英語
  中三英語
  中学理科(1分野)
  中学理科(2分野)
- 中学理科パック			[dumped]
+ 中学理科パック          [dumped]
  中学歴史
- 中学地理					[dumped]
- 中学地理・歴史パック		[dumped]
- 中学公民					[dumped x2]
- 高校受験(国・数)			[dumped]
- 高校受験(英・社・理)		[dumped]
- 実技4教科				[dumped]
- 
+ 中学地理                   [dumped]
+ 中学地理・歴史パック     [dumped]
+ 中学公民                   [dumped x2]
+ 高校受験(国・数)            [dumped]
+ 高校受験(英・社・理)      [dumped]
+ 実技4教科              [dumped]
+
  -->
 
 
@@ -57,7 +57,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="chukomnn" supported="no" >
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Koumin (NK)</description>
 		<year>2000?</year>
@@ -78,7 +78,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="chuchi" supported="no" >
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Chiri (9C)</description>
 		<year>2000?</year>
@@ -112,12 +112,12 @@
 			<feature name="u2" value="74HC139A" />
 			<feature name="u3" value="7W32F" />
 			<feature name="u4" value="7W00F" />
-			<feature name="u5" value="[unpopulated]" />	<!-- space for a TC7W04 -->
-			<feature name="u6" value="[unpopulated]" />	<!-- space for a 74HC125 -->
-			<feature name="u7" value="[unpopulated]" />	<!-- space for a TC7W08 -->
+			<feature name="u5" value="[unpopulated]" /> <!-- space for a TC7W04 -->
+			<feature name="u6" value="[unpopulated]" /> <!-- space for a 74HC125 -->
+			<feature name="u7" value="[unpopulated]" /> <!-- space for a TC7W08 -->
 			<feature name="u8" value="74HC573A" />
-			<feature name="u9" value="PS 0BD400 00REPCS C1D1" />	<!-- mask ROM -->
-			<feature name="u10" value="[unpopulated]" />	<!-- space for a second mask ROM? -->
+			<feature name="u9" value="PS 0BD400 00REPCS C1D1" />    <!-- mask ROM -->
+			<feature name="u10" value="[unpopulated]" />    <!-- space for a second mask ROM? -->
 			<feature name="u11" value="LH52256CN-70LL" />
 			<feature name="u12" value="7W00F" />
 			<feature name="u13" value="946 80B" />
@@ -127,7 +127,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="churika" supported="no" >
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika Pack (PL)</description>
 		<year>2000?</year>
@@ -140,12 +140,12 @@
 			<feature name="u2" value="74HC139A" />
 			<feature name="u3" value="7W32F" />
 			<feature name="u4" value="7W00F" />
-			<feature name="u5" value="[unpopulated]" />	<!-- space for a TC7W04 -->
-			<feature name="u6" value="[unpopulated]" />	<!-- space for a 74HC125 -->
-			<feature name="u7" value="[unpopulated]" />	<!-- space for a TC7W08 -->
+			<feature name="u5" value="[unpopulated]" /> <!-- space for a TC7W04 -->
+			<feature name="u6" value="[unpopulated]" /> <!-- space for a 74HC125 -->
+			<feature name="u7" value="[unpopulated]" /> <!-- space for a TC7W08 -->
 			<feature name="u8" value="74HC573A" />
-			<feature name="u9" value="PL 0BF400 00PCR C1/D1" />	<!-- mask ROM -->
-			<feature name="u10" value="[unpopulated]" />	<!-- space for a second mask ROM? -->
+			<feature name="u9" value="PL 0BF400 00PCR C1/D1" /> <!-- mask ROM -->
+			<feature name="u10" value="[unpopulated]" />    <!-- space for a second mask ROM? -->
 			<feature name="u11" value="LH52256CN-70LL" />
 			<feature name="u12" value="7W00F" />
 			<feature name="u13" value="012 80B" />
@@ -155,7 +155,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="chukkjuk" supported="no" >
 		<description>Shinkenzemi Chuugaku Kouza - Koukou Juken (Kuni - Suu) (0G2)</description>
 		<year>2000?</year>
@@ -201,7 +201,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jitsugi4" supported="no" >
 		<description>Shinkenzemi Chuugaku Kouza - Jitsugi 4 Kyouka (BG)</description>
 		<year>2000?</year>
@@ -243,7 +243,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jukokor" supported="no" >
 		<description>Shinkenzemi Koukou Kouza - Juuyou Kobun Kouryaku (A)</description>
 		<year>2000?</year>
@@ -265,7 +265,7 @@
 		</part>
 	</software>
 
-	
+
 </softwarelist>
 
 

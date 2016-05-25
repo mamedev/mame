@@ -49,7 +49,7 @@
 		for num, col in pairs(walls) do
 			if col[1] &lt; x and (col[1] + 2.5) &gt; x then
 				for num2, wall in pairs(col[2]) do
-					 if wall &lt; y and (wall + 7.5) &gt; y then
+						if wall &lt; y and (wall + 7.5) &gt; y then
 						local state = machine:outputs():get_indexed_value("colwall", (num * 10) + num2)
 						machine:outputs():set_indexed_value("colwall", (num * 10) + num2, (~state) &amp; 1)
 						return
@@ -60,7 +60,7 @@
 		for num, row in pairs(walls) do
 			if row[1] &lt; y and (row[1] + 2.5) &gt; y then
 				for num2, wall in pairs(row[2]) do
-					 if wall &lt; x and (wall + 7.5) &gt; x then
+						if wall &lt; x and (wall + 7.5) &gt; x then
 						local state = machine:outputs():get_indexed_value("rowwall", (num * 10) + num2)
 						machine:outputs():set_indexed_value("rowwall", (num * 10) + num2, (~state) &amp; 1)
 						return
@@ -392,7 +392,7 @@
 		<bezel name="rowwall76" element="wall"><bounds x="50" y="67.5" width="7.5" height="2.5" /></bezel>
 		<bezel name="rowwall77" element="wall"><bounds x="60" y="67.5" width="7.5" height="2.5" /></bezel>
 		<bezel name="rowwall78" element="wall"><bounds x="70" y="67.5" width="7.5" height="2.5" /></bezel>
-		
+
 		<!-- left side -->
 
 		<bezel element="static_red"><bounds x="-12.5" y="0" width="7.5" height="7.5" /></bezel>

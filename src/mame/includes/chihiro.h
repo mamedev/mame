@@ -212,7 +212,7 @@ public:
 	enum class NV2A_VERTEX_ATTR {
 		POS = 0, // position
 		WEIGHT = 1, // blend weigth
-		NORMAL = 2, 
+		NORMAL = 2,
 		COLOR0 = 3, // diffuse
 		COLOR1 = 4, // specular
 		FOG = 5,

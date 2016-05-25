@@ -27,7 +27,7 @@ UINT64 h8_watchdog_device::internal_update(UINT64 current_time)
 		int shift = (type == S ? div_s : div_bh)[tcsr & TCSR_CKS];
 		UINT64 spos = tcnt_cycle_base >> shift;
 		return (spos + 0x100 - tcnt) << shift;
-		
+
 	} else
 		return 0;
 }
@@ -44,7 +44,7 @@ void h8_watchdog_device::tcnt_update(UINT64 cur_time)
 		int next_tcnt = tcnt + int(epos - spos);
 		tcnt = next_tcnt;
 		tcnt_cycle_base = cur_time;
-		//		logerror("%10lld tcnt %02x -> %03x shift=%d\n", cur_time, tcnt, next_tcnt, shift);
+		//      logerror("%10lld tcnt %02x -> %03x shift=%d\n", cur_time, tcnt, next_tcnt, shift);
 
 		if(next_tcnt >= 0x100) {
 			logerror("watchdog triggered\n");
@@ -57,7 +57,7 @@ void h8_watchdog_device::tcnt_update(UINT64 cur_time)
 				if(!(tcsr & TCSR_OVF)) {
 					tcsr |= TCSR_OVF;
 					intc->internal_interrupt(irq);
-				}				
+				}
 			}
 		}
 	} else
@@ -91,7 +91,7 @@ WRITE16_MEMBER(h8_watchdog_device::wd_w)
 		if(tcsr & TCSR_TME) {
 			tcnt = data & 0xff;
 			tcnt_cycle_base = cpu->total_cycles();
-			//			logerror("%10lld tcnt = %02x\n", tcnt_cycle_base, tcnt);
+			//          logerror("%10lld tcnt = %02x\n", tcnt_cycle_base, tcnt);
 		}
 		cpu->internal_update();
 	}

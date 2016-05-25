@@ -75,7 +75,7 @@
 		<publisher>Interplay</publisher>
 		<info name="serial" value="DMG-F4-USA, DMG-F4-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EURO cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EURO cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -160,7 +160,7 @@
 		<info name="serial" value="DMG-T3-USA, DMG-T3-FRG"/>
 		<info name="alt_title" value="Adventure Island (Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- FRG cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FRG cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -177,7 +177,7 @@
 		<info name="serial" value="DMG-GQ-USA, DMG-GQ-NOE"/>
 		<info name="alt_title" value="Adventure Island II - Aliens in Paradise (Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -277,7 +277,7 @@
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="DMG-AE-USA, DMG-AE-(ITA/AUS)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- ITA cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- ITA cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -463,7 +463,7 @@
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-L3-USA, DMG-L3-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -605,7 +605,7 @@
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-PN-USA, DMG-PN-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -621,7 +621,7 @@
 		<publisher>LJN</publisher> <!-- Nintendo in Europe? -->
 		<info name="serial" value="DMG-SM-(NOE/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-01" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-01" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -637,7 +637,7 @@
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-ZS-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -653,7 +653,7 @@
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-LQ-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -865,7 +865,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AMCE-USA, DMG-AMCP-(NOE/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- UKV & USA carts -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- UKV & USA carts -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -882,7 +882,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ACPE-USA, DMG-ACPP-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -933,7 +933,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ADJE-USA, DMG-ADJP-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- UKV & USA carts -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- UKV & USA carts -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -1139,7 +1139,7 @@
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-AK-USA, DMG-AK-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -1155,7 +1155,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="DMG-P8-USA, DMG-P8-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -1193,7 +1193,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-GK-(NOE/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -1378,7 +1378,7 @@
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="DMG-GU-USA, DMG-GU-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -1408,7 +1408,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-TS-USA, DMG-TS-(NOE/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -1426,7 +1426,7 @@
 		<info name="release" value="19890421 (JPN)"/>
 		<info name="alt_title" value="ベースボール"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -1558,7 +1558,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-A3BE-USA, DMG-A3BP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -1809,7 +1809,7 @@
 		<publisher>Tradewest</publisher>
 		<info name="serial" value="DMG-BV-USA, DMG-BV-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -1891,7 +1891,7 @@
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="DMG-AVIE-USA, DMG-AVIP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-20" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-20" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -1976,7 +1976,7 @@
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-LB-USA, DMG-LB-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV & USA carts -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV & USA carts -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -2018,7 +2018,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-BO-(FAH, UKV), DMG-202 CHN"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- DMG-BEAN-M11 for the Chinese cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- DMG-BEAN-M11 for the Chinese cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -2358,7 +2358,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AB2E-USA, DMG-AB2P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -2751,7 +2751,7 @@
 		<publisher>FCI</publisher>
 		<info name="serial" value="DMG-BG-USA, DMG-BG-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-AAA-03" />	<!-- Both USA & UKV cart -->
+			<feature name="pcb" value="DMG-AAA-03" />   <!-- Both USA & UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
 				<rom name="dmg-bge-0.u1" size="32768" crc="843068fd" sha1="b08b8a9bf742f7ca4b355a866b4167741252dcf6" offset="0" />
@@ -2842,7 +2842,7 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-BB-USA, DMG-BB-(FAH/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- FRA cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FRA cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -2907,7 +2907,7 @@
 		<info name="release" value="19910215 (JPN)"/>
 		<info name="alt_title" value="バーガータイム・デラックス"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -3147,7 +3147,7 @@
 		<publisher>Interplay</publisher>
 		<info name="serial" value="DMG-ACFE-USA, DMG-ACFP-GPS"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- GPS cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- GPS cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -3322,7 +3322,7 @@
 		<publisher>Accolade</publisher>
 		<info name="serial" value="DMG-CZ-USA, DMG-CZ-FRG"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-AAA-03" />	<!-- Both FRG & USA cart -->
+			<feature name="pcb" value="DMG-AAA-03" />   <!-- Both FRG & USA cart -->
 			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
 				<rom name="dmg-cze-0.u1" size="32768" crc="245afcdc" sha1="0106c3dc8016398e9d24e2472c867487c3bd376f" offset="0" />
@@ -3399,7 +3399,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-HQ-USA, DMG-HQ-AUS, DMG-HQ-(NOE/ESP)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -3727,7 +3727,7 @@
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="DMG-QC-USA, DMG-QC-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -3743,7 +3743,7 @@
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="DMG-Q5-USA, DMG-Q5-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -4086,7 +4086,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AC8E-USA, DMG-AC8P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -4159,7 +4159,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-YS-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
@@ -4438,7 +4438,7 @@
 		<publisher>SNK</publisher>
 		<info name="serial" value="DMG-FU-USA, DMG-FU-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
@@ -4665,7 +4665,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-YT-USA, DMG-YT-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN(K)-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-DECN(K)-02" />   <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="u3" value="U3 RAM" />
@@ -4688,7 +4688,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ADDE-USA, DMG-ADDP-(EUR/EUR-1)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-02" />	<!-- USA cart, EUR-1 on DMG-DECN(K)-02 pcb -->
+			<feature name="pcb" value="DMG-DECN-02" />  <!-- USA cart, EUR-1 on DMG-DECN(K)-02 pcb -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B1]" />
 			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />
@@ -4728,10 +4728,10 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AD3E-USA, DMG-AD3P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-10" />	<!-- EUR carts -->
+			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR carts -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
-			<feature name="u3" value="U3 RAM [LH5164AN-10L]" />	<!-- Sharp RAM -->
+			<feature name="u3" value="U3 RAM [LH5164AN-10L]" /> <!-- Sharp RAM -->
 			<feature name="u4" value="U4 26A [6129A 7408]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
@@ -4962,7 +4962,7 @@
 		<publisher>Tradewest</publisher> <!-- Nintendo in Europe -->
 		<info name="serial" value="DMG-DD-USA, DMG-DD-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -4979,7 +4979,7 @@
 		<info name="serial" value="DMG-DX-USA, DMG-DX-NOE"/>
 		<info name="alt_title" value="Double Dragon 3 - The Arcade Game (Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -5349,7 +5349,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-ADHE-USA , DMG-ADHP-(EUR/FAH)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- EURO cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- EURO cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -5608,7 +5608,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-EA-USA, DMG-EA-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -5667,7 +5667,7 @@
 		<info name="release" value="19901109 (JPN)"/>
 		<info name="alt_title" value="F1レース"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-GDAN-10" />	<!-- EUR cart, also on DMG-GDAN-02 pcb -->
+			<feature name="pcb" value="DMG-GDAN-10" />  <!-- EUR cart, also on DMG-GDAN-02 pcb -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A [DMG MBC2-A]" />
 			<feature name="u3" value="U3 26A [6129A 8R42]" />
@@ -5908,7 +5908,7 @@
 		<publisher>Electro Brain</publisher>
 		<info name="serial" value="DMG-C6-USA, DMG-C6-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -5968,7 +5968,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="DMG-F6-USA, DMG-F6-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -6207,7 +6207,7 @@
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-EF-USA, DMG-EF-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -6324,7 +6324,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AFEE-USA, DMG-AFEP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -6885,7 +6885,7 @@
 		<info name="serial" value="DMG-RA-USA, DMG-RA-NOE"/>
 		<info name="alt_title" value="Gargoyle's Quest (Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -6901,7 +6901,7 @@
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="DMG-G2-USA, DMG-G2-(UKV/ESP)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-01" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-01" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -7020,7 +7020,7 @@
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="DMG-G8-USA, DMG-G8-(FAH/NOE)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -7186,7 +7186,7 @@
 		<publisher>Activision</publisher>
 		<info name="serial" value="DMG-GB-USA, DMG-GB-(NOE/SCN)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -7467,7 +7467,7 @@
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
-			<feature name="u3" value="U3 64K-SRAM [W2465S-70LL]" />	<!-- Winbond RAM -->
+			<feature name="u3" value="U3 64K-SRAM [W2465S-70LL]" /> <!-- Winbond RAM -->
 			<feature name="u4" value="U4 MM1134A [126 134A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
@@ -7509,7 +7509,7 @@
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
-			<feature name="u3" value="U3 64K-SRAM [W2465S-70LL]" />	<!-- Winbond RAM -->
+			<feature name="u3" value="U3 64K-SRAM [W2465S-70LL]" /> <!-- Winbond RAM -->
 			<feature name="u4" value="U4 MM1134A [6735]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
@@ -7533,7 +7533,7 @@
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
-			<feature name="u3" value="U3 64K-SRAM [W2465S-70LL]" />	<!-- Winbond RAM -->
+			<feature name="u3" value="U3 64K-SRAM [W2465S-70LL]" /> <!-- Winbond RAM -->
 			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
@@ -8001,7 +8001,7 @@
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
-			<feature name="u3" value="U3 64K-SRAM [LH5164AN-10L]" />	<!-- Sharp RAM -->
+			<feature name="u3" value="U3 64K-SRAM [LH5164AN-10L]" />    <!-- Sharp RAM -->
 			<feature name="u4" value="U4 MM1134A [6735 0875]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
@@ -8447,7 +8447,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-HC-USA, DMG-HC-FRG"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- FRG cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FRG cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -8523,7 +8523,7 @@
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-HM-USA, DMG-HM-(NOE/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE & UKV carts -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE & UKV carts -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -8539,7 +8539,7 @@
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-AH-USA, DMG-AH-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -8809,7 +8809,7 @@
 		<info name="serial" value="DMG-ANDE-USA, DMG-ANDP-(NOE/UKV)"/>
 		<info name="alt_title" value="Disney's The Hunchback of Notre Dame - 5 Foolishly Fun Topsy Turvy Games (Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -8825,7 +8825,7 @@
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="DMG-HF-USA, DMG-HF-(ESP/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- ESP cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- ESP cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -8889,7 +8889,7 @@
 		<info name="release" value="19890921 (JPN)"/>
 		<info name="alt_title" value="ハイパーロードランナー"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-AAA-03" />	<!-- UKV cart, JPN cart using DMG-AAA-01 pcb -->
+			<feature name="pcb" value="DMG-AAA-03" />   <!-- UKV cart, JPN cart using DMG-AAA-01 pcb -->
 			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
 				<rom name="dmg-hla-1.u1" size="32768" crc="b3a86164" sha1="261da795c7b4155f1b8083acc55da78699c8a0de" offset="0" />
@@ -8946,7 +8946,7 @@
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-C8-USA, DMG-C8-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -8978,7 +8978,7 @@
 		<info name="serial" value="DMG-J5-USA, DMG-J5-FRG"/>
 		<info name="alt_title" value="Indiana Jones un der Letzte Kreuzzug (German Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- FRG cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FRG cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9009,7 +9009,7 @@
 		<info name="serial" value="DMG-FH-USA, DMG-FH-UKV"/>
 		<info name="alt_title" value="InfoGenius Productivity Pak - Berlitz French Translator (Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9026,7 +9026,7 @@
 		<info name="serial" value="DMG-NL-USA, DMG-NL-UKV"/>
 		<info name="alt_title" value="InfoGenius Productivity Pak - Berlitz Spanish Translator (Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9083,7 +9083,7 @@
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B]" />
-			<feature name="u3" value="U3 RAM [LH5168NFA-10L]" />	<!-- Sharp RAM -->
+			<feature name="u3" value="U3 RAM [LH5168NFA-10L]" />    <!-- Sharp RAM -->
 			<feature name="u4" value="U4 26A [195 26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9134,7 +9134,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AIGE-USA, DMG-AIGP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9168,7 +9168,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AXIE-USA, DMG-AXIP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9230,7 +9230,7 @@
 		<info name="serial" value="DMG-YH-USA, DMG-YH-EUR"/>
 		<info name="alt_title" value="The Simpsons Itchy &amp; Scratchy - Miniature Golf Madness (Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9345,7 +9345,7 @@
 		<publisher>Tradewest</publisher>
 		<info name="serial" value="DMG-JN-USA, DMG-JN-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9390,7 +9390,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AW7E-USA-1, DMG-AW7P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-10" />	<!-- EUR & USA carts -->
+			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR & USA carts -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [MBC1-B]" />
 			<feature name="u3" value="U3 RAM [LH5164AN-10L]" />
@@ -9553,7 +9553,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-JS-USA, DMG-JS-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9604,7 +9604,7 @@
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="DMG-JC-USA, DMG-JC-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9739,7 +9739,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AJDE-USA, DMG-AJDP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9755,7 +9755,7 @@
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="DMG-J7-USA, DMG-J7-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9788,7 +9788,7 @@
 		<publisher>Ocean</publisher> <!-- Malibu Games in USA -->
 		<info name="serial" value="DMG-AJGE-USA, DMG-AJGP-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -9851,7 +9851,7 @@
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-A2JE-USA, DMG-A2JP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -10139,7 +10139,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKGE-USA, DMG-AKGP-AUS"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-10" />	<!-- AUS cart -->
+			<feature name="pcb" value="DMG-DECN-10" />  <!-- AUS cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [MBC1B1]" />
 			<feature name="u3" value="U3 RAM [BR6265BF-10SL]" />
@@ -10204,7 +10204,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-KA-USA, DMG-KA-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-GDAN-03" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-GDAN-03" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A [DMG MBC2-A]" />
 			<feature name="u3" value="U3 26A [26A]" />
@@ -10255,7 +10255,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKLE-USA, DMG-AKLP-(EUR/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -10512,7 +10512,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-KY-USA, DMG-KY-(NOE/ESP-1/EUR/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- Euro carts, also found on DMG-BEAN-10 pcbs -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- Euro carts, also found on DMG-BEAN-10 pcbs -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -10529,7 +10529,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKBE-USA, DMG-AKBP-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-DECN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1-B]" />
 			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />
@@ -10551,7 +10551,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-K9-USA, DMG-K9-(NOE/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-GDAN-03" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-GDAN-03" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A [DMG MBC2-A]" />
 			<feature name="u3" value="U3 26A [6129 3816]" />
@@ -10572,7 +10572,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKCE-USA, DMG-AKCP-(AUS/EUR)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
 			<feature name="u3" value="U3 RAM [BR6265BF-10SL]" />
@@ -10937,7 +10937,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-FK-USA, DMG-FK-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -10969,7 +10969,7 @@
 		<publisher>Irem</publisher>
 		<info name="serial" value="DMG-SX-USA, DMG-SX-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -11020,7 +11020,7 @@
 		<info name="serial" value="DMG-AP-USA, DMG-AP-UKV"/>
 		<info name="alt_title" value="Kwirk - He's A-maze-ing! (Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-AAA-03" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-AAA-03" />   <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
 				<rom name="dmg-ape-0.u1" size="32768" crc="21c98af2" sha1="6ef48e912a47c774048456aa870c7e810fd45685" offset="0" />
@@ -11048,7 +11048,7 @@
 		<publisher>Titus</publisher>
 		<info name="serial" value="DMG-L7-USA, DMG-L7-(FRG/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- FRG cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- FRG cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -11201,10 +11201,10 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-USA, DMG-ZL-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-02" />	<!-- USA cart -->
+			<feature name="pcb" value="DMG-DECN-02" />  <!-- USA cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1-B]" />
-			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />	<!-- Hyundai RAM -->
+			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />    <!-- Hyundai RAM -->
 			<feature name="u4" value="U4 26A [325 26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
@@ -11226,7 +11226,7 @@
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B]" />
-			<feature name="u3" value="U3 RAM [HY6264ALL-10]" />	<!-- Hyundai RAM -->
+			<feature name="u3" value="U3 RAM [HY6264ALL-10]" /> <!-- Hyundai RAM -->
 			<feature name="u4" value="U4 26A [6129 3809]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
@@ -11248,7 +11248,7 @@
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B1]" />
-			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />	<!-- Hyundai RAM -->
+			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />    <!-- Hyundai RAM -->
 			<feature name="u4" value="U4 26A [6129 3809]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
@@ -11359,7 +11359,7 @@
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-LT-USA, DMG-LT-FAH"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- FAH cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FAH cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -11502,7 +11502,7 @@
 		<info name="release" value="19900511 (JPN)"/>
 		<info name="alt_title" value="ロックンチェイス ~ Lock 'n' Chase (Jpn Box), Lock n' Chase (Western Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -11563,7 +11563,7 @@
 		<info name="release" value="19910315 (JPN)"/>
 		<info name="alt_title" value="ループス"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-AAA-10" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-AAA-10" />   <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
 				<rom name="dmg-lpa-0.u1" size="32768" crc="531a3e16" sha1="dd2ddac2310409287299c287f1959196e0b4d14e" offset="0" />
@@ -11578,7 +11578,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ALWE-USA, DMG-ALWP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -11641,7 +11641,7 @@
 		<info name="release" value="19940325 (JPN)"/>
 		<info name="alt_title" value="ルクル"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-DECN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="u3" value="U3 RAM" />
@@ -11950,7 +11950,7 @@
 		<info name="serial" value="DMG-603-CHN"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-MMM-BEAN-M11" />
-			<feature name="u1" value="U1 PRG-ROM" />	<!-- epoxy block -->
+			<feature name="u1" value="U1 PRG-ROM" />    <!-- epoxy block -->
 			<feature name="u2" value="U2 [MMM01]" />
 			<feature name="slot" value="rom_mmm01" />
 			<dataarea name="rom" size="524288">
@@ -11991,7 +11991,7 @@
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="DMG-MB-USA, DMG-MB-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -12007,7 +12007,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-YO-(EUR/ITA)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- ITA cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- ITA cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -12043,7 +12043,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APCE-USA, DMG-APCP-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-DECN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1-B]" />
 			<feature name="u3" value="U3 RAM [LH5268ANF-10YLL]" />
@@ -12351,7 +12351,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-MZ-USA, DMG-MZ-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- USA cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- USA cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -12581,7 +12581,7 @@
 		<publisher>Meldac</publisher>
 		<info name="serial" value="DMG-TK-USA, DMG-TK-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -12758,7 +12758,7 @@
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="DMG-UV-USA, DMG-UV-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -12820,7 +12820,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ZW-USA, DMG-ZW-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -12894,7 +12894,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-M8-USA, DMG-M8-FAH"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- FAH cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FAH cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -13094,7 +13094,7 @@
 		<info name="release" value="19960721"/>
 		<info name="alt_title" value="モグラーニャ"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-10" />	<!-- Also found on DMG-DECN(K)-02 pcb -->
+			<feature name="pcb" value="DMG-DECN-10" />  <!-- Also found on DMG-DECN(K)-02 pcb -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
 			<feature name="u3" value="U3 RAM" />
@@ -13117,7 +13117,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AMOE-USA, DMG-AMOP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-10" />	<!-- EUR & USA carts -->
+			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR & USA carts -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" />
 			<feature name="u3" value="U3 RAM [XLJ6265BF-10SL]" />
@@ -13430,7 +13430,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-ATWE-USA, DMG-ATWP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -13474,9 +13474,9 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-C9-USA, DMG-C9-(NOE-1/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV & NOE-1 carts -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV & NOE-1 carts -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />	<!-- MBC1B1 in NOE-1 cart -->
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" /> <!-- MBC1B1 in NOE-1 cart -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-c9e-0.u1" size="262144" crc="90eb0929" sha1="59752879efaf2f271ce4b8a9d4a455056a2985d0" offset="0" />
@@ -13490,7 +13490,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-A3MP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- Also found on DMG-BEAN(K)-02 pcb -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- Also found on DMG-BEAN(K)-02 pcb -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -13550,7 +13550,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AMKE-USA, DMG-AMKE-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR & USA carts -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR & USA carts -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -13759,7 +13759,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-AMLE-USA, DMG-AMLP-EUR-1"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -14133,7 +14133,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-A8NE-USA, DMG-A8NP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -14164,7 +14164,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AJTE-USA, DMG-AJTP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -14524,7 +14524,7 @@
 		<info name="serial" value="DMG-N5-USA, DMG-N5-FAH"/>
 		<info name="alt_title" value="The Chessmaster Special Edition (Box?)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- French cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- French cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -14607,7 +14607,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A6HE-USA, DMG-A6HP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -15016,7 +15016,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AO9E-USA, DMG-AO9P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -15841,7 +15841,7 @@
 		<publisher>Palcom</publisher>
 		<info name="serial" value="DMG-PV-(FAH/NOE)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- FAH & NOE carts -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FAH & NOE carts -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -15963,7 +15963,7 @@
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-APRE-USA, DMG-APRP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -15980,7 +15980,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A3GE-USA, DMG-A3GP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -16104,7 +16104,7 @@
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-D8-USA, DMG-D8-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -16120,7 +16120,7 @@
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-APFE-USA, DMG-APFP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -16219,7 +16219,7 @@
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-QF-USA, DMG-QF-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -16263,7 +16263,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AHQE-USA, DMG-AHQP-FRG"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- FRG cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FRG cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -16969,7 +16969,7 @@
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
-			<feature name="u3" value="U3 256K-SRAM [LH52256CN-10LL]" />	<!-- Sharp RAM -->
+			<feature name="u3" value="U3 256K-SRAM [LH52256CN-10LL]" /> <!-- Sharp RAM -->
 			<feature name="u4" value="U4 MM1134A [6735 0318]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
@@ -17332,7 +17332,7 @@
 		<publisher>Time Warner Interactive</publisher>
 		<info name="serial" value="DMG-AR9E-USA, DMG-AR9P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -17478,7 +17478,7 @@
 		<publisher>Palcom</publisher>
 		<info name="serial" value="DMG-CN-(ESP/NOE/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -17773,7 +17773,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="DMG-QT-USA, DMG-QT-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -17806,7 +17806,7 @@
 		<info name="release" value="19900413 (JPN)"/>
 		<info name="alt_title" value="クイックス"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart, JPN version on DMG-BBA-02 pcb -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart, JPN version on DMG-BBA-02 pcb -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -17880,7 +17880,7 @@
 		<publisher>Irem</publisher>
 		<info name="serial" value="DMG-RE-USA, DMG-RE-(NOE/AUS)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -17964,7 +17964,7 @@
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-RV-USA, DMG-RV-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -18027,7 +18027,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-OB-USA, DMG-OB-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -19665,7 +19665,7 @@
 		<info name="release" value="19900921 (JPN)"/>
 		<info name="alt_title" value="サイドポケット"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -19708,7 +19708,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-JU-USA, DMG-JU-(NOE/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -19764,7 +19764,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ASIE-USA, DMG-ASIP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -19823,7 +19823,7 @@
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="DMG-UF-USA, DMG-UF-(FAH-1/NOE-1)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- USA cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- USA cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -19950,7 +19950,7 @@
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-YK-(NOE-1/UKV-1/ESP-1/AUS/FAH/EUR)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- Also found on DMG-BEAN-10 pcb -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- Also found on DMG-BEAN-10 pcb -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -20012,7 +20012,7 @@
 		<info name="release" value="19900126 (JPN)"/>
 		<info name="alt_title" value="ソーラーストライカー"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-01" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-01" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -20060,7 +20060,7 @@
 		<publisher>Interplay</publisher>
 		<info name="serial" value="DMG-UX-USA, DMX-UX-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -20296,7 +20296,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-G6-USA, DMG-G6-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -20313,7 +20313,7 @@
 		<info name="serial" value="DMG-XG-USA, DMG-XG-NOE"/>
 		<info name="alt_title" value="Spider-Man - X-Men (Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -20779,7 +20779,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AGTE-USA, DMG-AGTP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -20825,7 +20825,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ASFE-USA, DMG-ASFP-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -20874,7 +20874,7 @@
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="DMG-ASRE-USA, DMG-ASRP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -21278,7 +21278,7 @@
 		<info name="release" value="19890421 (JPN)"/>
 		<info name="alt_title" value="スーパーマリオランド"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BBA-02" />	<!-- JPN cart, also found on DMG-BBA-03 and DMG-BEAN-02 pcbs -->
+			<feature name="pcb" value="DMG-BBA-02" />   <!-- JPN cart, also found on DMG-BBA-03 and DMG-BEAN-02 pcbs -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -21370,7 +21370,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sml2ja" cloneof="sml2">
 		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Super Mario Land 2 - 6-tsu no Kinka (Jpn, Rev. A)</description>
@@ -21468,7 +21468,7 @@
 		<publisher>Tradewest</publisher>
 		<info name="serial" value="DMG-OR-USA, DMG-OR-(NOE/EUR)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -21560,7 +21560,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-ARJE-USA, DMG-ARJP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -21611,7 +21611,7 @@
 		<publisher>Titus</publisher>
 		<info name="serial" value="DMG-ASME-USA, DMG-ASMP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -21642,7 +21642,7 @@
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-WG-USA, DMG-WG-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -21772,7 +21772,7 @@
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-TG-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -21930,10 +21930,10 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ATAE-USA, DMG-ATAP-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
-			<feature name="u3" value="U3 RAM [LH5164AN-10L]" />	<!-- Sharp RAM -->
+			<feature name="u3" value="U3 RAM [LH5164AN-10L]" /> <!-- Sharp RAM -->
 			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
@@ -22297,7 +22297,7 @@
 		<info name="release" value="19890529 (JPN)"/>
 		<info name="alt_title" value="テニス"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-AAA-03" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-AAA-03" />   <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
 				<rom name="dmg-tna-0.u1" size="32768" crc="5009215f" sha1="ec45a932fb3fc21394fef5e27e7fe9eccd0c7f70" offset="0" />
@@ -22385,7 +22385,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-EH-USA-1, DMG-EH-(ESP-1/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />	<!-- USA-1 cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- USA-1 cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -22489,10 +22489,10 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ATRE-USA, DMG-ATRP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" />
-			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />	<!-- Sharp RAM -->
+			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />    <!-- Sharp RAM -->
 			<feature name="u4" value="U4 26A [6129A 7862]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
@@ -22581,7 +22581,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-T8-USA, DMG-T8-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -22654,7 +22654,7 @@
 		<publisher>Titus</publisher>
 		<info name="serial" value="DMG-FO-USA, DMG-FO-FRG"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- FRG cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FRG cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -22751,7 +22751,7 @@
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="DMG-J8-USA, DMG-J8-NOE-1"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -22797,7 +22797,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-GN-USA, DMG-GN-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -23094,7 +23094,7 @@
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-ATLE-USA, DMG-ATLP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -23264,7 +23264,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-T6-USA, DMG-T6-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -23293,7 +23293,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-ATUE-USA, DMG-ATUP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -23324,7 +23324,7 @@
 		<publisher>Accolade</publisher>
 		<info name="serial" value="DMG-TQ-USA, DMG-TQ-(NOE/ESP/AUS)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -23712,7 +23712,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AVSE-USA, DMG-AVSP-GPS"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-02" />	<!-- GPS cart -->
+			<feature name="pcb" value="DMG-DECN-02" />  <!-- GPS cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B]" />
 			<feature name="u3" value="U3 RAM [BR6265BF-10SL]" />
@@ -23848,7 +23848,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-EE-USA, DMG-EE-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -23867,10 +23867,10 @@
 		<info name="release" value="19940121 (JPN)"/>
 		<info name="alt_title" value="スーパーマリオランド3 ワリオランド"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-10" />	<!-- EUR cart, JPN cart on DECN(K)-02 pcb -->
+			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR cart, JPN cart on DECN(K)-02 pcb -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
-			<feature name="u3" value="U3 RAM [LH5164AN-10L]" />	<!-- Sharp RAM -->
+			<feature name="u3" value="U3 RAM [LH5164AN-10L]" /> <!-- Sharp RAM -->
 			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
@@ -23890,7 +23890,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AW2E-USA, DMG-AW2P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-LFDN-01" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-LFDN-01" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3 [MBC3]" />
 			<feature name="u3" value="U3 RAM [BR82256P-70LL]" />
@@ -23953,7 +23953,7 @@
 		<publisher>FCI</publisher>
 		<info name="serial" value="DMG-W8-USA, DMG-W8-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -23969,7 +23969,7 @@
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="DMG-A6-USA, DMG-A6-ITA"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- ITA cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- ITA cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -24176,7 +24176,7 @@
 		<info name="serial" value="DMG-WW-USA, DMG-WW-(NOE/ESP-1/UKV)"/>
 		<info name="alt_title" value="Wizards &amp; Warriors X - The Fortress of Fear (Box)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-01" />	<!-- NOE & UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-01" />  <!-- NOE & UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -24428,7 +24428,7 @@
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-WP-USA, DMG-WP-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -24444,7 +24444,7 @@
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-AWFE-USA, DMG-AWFP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -24475,7 +24475,7 @@
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-LW-USA, DMG-LW-(FAH/NOE)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- FAH & USA carts -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FAH & USA carts -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -24506,7 +24506,7 @@
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-WX-USA, DMG-WX-NOE"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -24588,7 +24588,7 @@
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="DMG-X2-USA, DMG-X2-(NOE/FRG)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- FRG cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FRG cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -24719,7 +24719,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-CI-USA, DMG-CI-UKV"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />	<!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -25636,7 +25636,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="datenlog">
 		<description>Game Boy Datenlogger 1 (Ger, v1.0)</description>
 		<year>200?</year>
@@ -25648,7 +25648,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="digitosc">
 		<description>Game Boy Digital Sampling Oscilloscope (Euro, v3.6)</description>
 		<year>200?</year>

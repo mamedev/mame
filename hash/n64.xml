@@ -3657,7 +3657,7 @@ patched out (+ a fix for internal checksum)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dukenk64p" cloneof="dukenk64">
 		<description>Duke Nukem 64 (Euro, Prototype)</description>
 		<year>1997</year>
@@ -6491,7 +6491,7 @@ patched out (+ a fix for internal checksum)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="megamanp" cloneof="megaman">
 		<description>Mega Man 64 (USA, Prototype)</description>
 		<year>2000</year>

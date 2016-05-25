@@ -4303,7 +4303,7 @@ void drcbe_x64::op_add(x86code *&dst, const instruction &inst)
 
 		// dstp == src2p in memory
 		else if (dstp.is_memory() && dstp == src2p)
-			emit_add_m32_p32(dst, MABS(dstp.memory()), src1p, inst);					// add   [dstp],src1p
+			emit_add_m32_p32(dst, MABS(dstp.memory()), src1p, inst);                    // add   [dstp],src1p
 
 		// reg = reg + imm
 		else if (dstp.is_int_register() && src1p.is_int_register() && src2p.is_immediate() && inst.flags() == 0)
@@ -4331,7 +4331,7 @@ void drcbe_x64::op_add(x86code *&dst, const instruction &inst)
 
 		// dstp == src2p in memory
 		else if (dstp.is_memory() && dstp == src2p)
-			emit_add_m64_p64(dst, MABS(dstp.memory()), src1p, inst);					// add   [dstp],src1p
+			emit_add_m64_p64(dst, MABS(dstp.memory()), src1p, inst);                    // add   [dstp],src1p
 
 		// reg = reg + imm
 		else if (dstp.is_int_register() && src1p.is_int_register() && src2p.is_immediate() && short_immediate(src2p.immediate()) && inst.flags() == 0)
@@ -5216,7 +5216,7 @@ void drcbe_x64::op_or(x86code *&dst, const instruction &inst)
 
 		// dstp == src2p in memory
 		else if (dstp.is_memory() && dstp == src2p)
-			emit_or_m32_p32(dst, MABS(dstp.memory()), src1p, inst);						// or    [dstp],src1p
+			emit_or_m32_p32(dst, MABS(dstp.memory()), src1p, inst);                     // or    [dstp],src1p
 
 		// general case
 		else
@@ -5236,7 +5236,7 @@ void drcbe_x64::op_or(x86code *&dst, const instruction &inst)
 
 		// dstp == src2p in memory
 		else if (dstp.is_memory() && dstp == src2p)
-			emit_or_m64_p64(dst, MABS(dstp.memory()), src1p, inst);						// or    [dstp],src1p
+			emit_or_m64_p64(dst, MABS(dstp.memory()), src1p, inst);                     // or    [dstp],src1p
 
 		// general case
 		else
@@ -5278,11 +5278,11 @@ void drcbe_x64::op_xor(x86code *&dst, const instruction &inst)
 
 		// dstp == src2p in memory
 		else if (dstp.is_memory() && dstp == src2p)
-			emit_xor_m32_p32(dst, MABS(dstp.memory()), src1p, inst);					// xor   [dstp],src1p
+			emit_xor_m32_p32(dst, MABS(dstp.memory()), src1p, inst);                    // xor   [dstp],src1p
 
 		// dstp == src1p register
 		else if (dstp.is_int_register() && dstp == src1p)
-			emit_xor_r32_p32(dst, dstp.ireg(), src2p, inst);							// xor   dstp,src2p
+			emit_xor_r32_p32(dst, dstp.ireg(), src2p, inst);                            // xor   dstp,src2p
 
 		// general case
 		else
@@ -5302,11 +5302,11 @@ void drcbe_x64::op_xor(x86code *&dst, const instruction &inst)
 
 		// dstp == src2p in memory
 		else if (dstp.is_memory() && dstp == src2p)
-			emit_xor_m64_p64(dst, MABS(dstp.memory()), src1p, inst);					// xor   [dstp],src1p
+			emit_xor_m64_p64(dst, MABS(dstp.memory()), src1p, inst);                    // xor   [dstp],src1p
 
 		// dstp == src1p register
 		else if (dstp.is_int_register() && dstp == src1p)
-			emit_xor_r64_p64(dst, dstp.ireg(), src2p, inst);							// xor   dstp,src2p
+			emit_xor_r64_p64(dst, dstp.ireg(), src2p, inst);                            // xor   dstp,src2p
 
 		// general case
 		else
@@ -5374,16 +5374,16 @@ void drcbe_x64::op_tzcnt(x86code *&dst, const instruction &inst)
 
 	// normalize parameters
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
-	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);	
+	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 
 	// 32-bit form
 	if (inst.size() == 4)
 	{
 		int dstreg = dstp.select_register(REG_EAX);
-		emit_mov_r32_p32(dst, dstreg, srcp);											// mov   dstreg,srcp
-		emit_mov_r32_imm(dst, REG_ECX, 32);												// mov   ecx,32
-		emit_bsf_r32_r32(dst, dstreg, dstreg);											// bsf   dstreg,dstreg
-		emit_cmovcc_r32_r32(dst, x64emit::COND_Z, dstreg, REG_ECX);						// cmovz dstreg,ecx
+		emit_mov_r32_p32(dst, dstreg, srcp);                                            // mov   dstreg,srcp
+		emit_mov_r32_imm(dst, REG_ECX, 32);                                             // mov   ecx,32
+		emit_bsf_r32_r32(dst, dstreg, dstreg);                                          // bsf   dstreg,dstreg
+		emit_cmovcc_r32_r32(dst, x64emit::COND_Z, dstreg, REG_ECX);                     // cmovz dstreg,ecx
 		emit_mov_p32_r32(dst, dstp, dstreg);                                            // mov   dstp,dstreg
 	}
 
@@ -5391,11 +5391,11 @@ void drcbe_x64::op_tzcnt(x86code *&dst, const instruction &inst)
 	else if (inst.size() == 8)
 	{
 		int dstreg = dstp.select_register(REG_RAX);
-		emit_mov_r64_p64(dst, dstreg, srcp);											// mov   dstreg,srcp
-		emit_mov_r64_imm(dst, REG_RCX, 64);												// mov   rcx,64
-		emit_bsf_r64_r64(dst, dstreg, dstreg);											// bsf   dstreg,dstreg
-		emit_cmovcc_r64_r64(dst, x64emit::COND_Z, dstreg, REG_RCX);						// cmovz dstreg,rcx
-		emit_mov_p64_r64(dst, dstp, dstreg);											// mov   dstp,dstreg
+		emit_mov_r64_p64(dst, dstreg, srcp);                                            // mov   dstreg,srcp
+		emit_mov_r64_imm(dst, REG_RCX, 64);                                             // mov   rcx,64
+		emit_bsf_r64_r64(dst, dstreg, dstreg);                                          // bsf   dstreg,dstreg
+		emit_cmovcc_r64_r64(dst, x64emit::COND_Z, dstreg, REG_RCX);                     // cmovz dstreg,rcx
+		emit_mov_p64_r64(dst, dstp, dstreg);                                            // mov   dstp,dstreg
 	}
 }
 

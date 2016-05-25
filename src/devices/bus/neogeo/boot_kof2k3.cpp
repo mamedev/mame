@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 /***********************************************************************************************************
- 
+
  Neo Geo cart emulation
  The King of Fighters 2003 Bootleg cart type
 
@@ -52,7 +52,7 @@ void neogeo_kf2k3bl_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2003_GFX_KEY);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 5);
 	m_prot->sx_decrypt(fix_region, fix_region_size, 1);
-	
+
 }
 
 /*************************************************

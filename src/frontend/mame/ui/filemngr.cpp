@@ -184,7 +184,7 @@ void ui_menu_file_manager::handle()
 				if (floppy_device != nullptr)
 				{
 					ui_menu::stack_push(global_alloc_clear<ui_menu_control_floppy_image>(ui(), container, floppy_device));
-				} 
+				}
 				else
 				{
 					ui_menu::stack_push(global_alloc_clear<ui_menu_control_device_image>(ui(), container, selected_device));

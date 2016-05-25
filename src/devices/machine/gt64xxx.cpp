@@ -241,7 +241,7 @@ void gt64xxx_device::map_cpu_space()
 			dma_addr_map[index].low_addr = (m_reg[GREG_PCI_MEM1_LO] << 21);
 			dma_addr_map[index].high_addr = (dma_addr_map[index].low_addr & 0xf0000000) | (m_reg[GREG_PCI_MEM1_HI] << 21) | 0x1fffff;
 		}
-	
+
 	switch (index) {
 		case proc_addr_bank::ADDR_PCI_IO:
 			dma_addr_map[index].space = &this->space(AS_IO);
@@ -262,7 +262,7 @@ void gt64xxx_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_
 {
 	int ramIndex;
 	UINT32 winStart, winEnd, winSize;
-	
+
 	// Not sure if GREG_RAS_1_0_LO should be added on PCI address map side.
 	// RAS0
 	ramIndex = 0;
@@ -273,7 +273,7 @@ void gt64xxx_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_
 	memory_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(gt64xxx_device::ras_0_w), this));
 	if (LOG_GALILEO)
 		logerror("%s: map_extra RAS0 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
-	
+
 	// RAS1
 	ramIndex = 1;
 	winStart = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
@@ -283,7 +283,7 @@ void gt64xxx_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_
 	memory_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(gt64xxx_device::ras_1_w), this));
 	if (LOG_GALILEO)
 		logerror("%s: map_extra RAS1 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
-	
+
 	// RAS2
 	ramIndex = 2;
 	winStart = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
@@ -293,7 +293,7 @@ void gt64xxx_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_
 	memory_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(gt64xxx_device::ras_2_w), this));
 	if (LOG_GALILEO)
 		logerror("%s: map_extra RAS2 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
-	
+
 	// RAS3
 	ramIndex = 3;
 	winStart = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
@@ -818,7 +818,7 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 		which = (m_last_dma + i) % 4;
 		if ((m_dma_active & (1 << which)) && (m_reg[GREG_DMA0_CONTROL + which] & 0x1000))
 			break;
-			
+
 	}
 	// Save which dma is processed for arbitration next time
 	m_last_dma = which;

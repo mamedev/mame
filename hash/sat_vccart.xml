@@ -2,27 +2,27 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="sat_vccart" description="Sega Saturn VideoCD cartridges">
 
-<!-- 
- 
+<!--
+
  These carts plug into a separate slot of the Sega Saturn and allow to watch VideoCDs in the system
  Apparently at least three more versions exist and are currently undumped
 
  Note from zyrobs (the dumper):
 
-	Note that the standard Saturn ROM header is preceded by
-	20 kbyte of encrypted SH1 code. This code is uploaded to
-	the CD Block and provides the commands necessary for the
-	cart to work.
-	Special Thanks to James Laird for figuring out what
-	this very important piece of code was.
+    Note that the standard Saturn ROM header is preceded by
+    20 kbyte of encrypted SH1 code. This code is uploaded to
+    the CD Block and provides the commands necessary for the
+    cart to work.
+    Special Thanks to James Laird for figuring out what
+    this very important piece of code was.
 
-	The Saturn sees the ROM with a 20kbyte offset shift, putting
-	the standard Saturn ROM header at position 0 and the
-	encrypted code looping back to the end of the ROM data.
+    The Saturn sees the ROM with a 20kbyte offset shift, putting
+    the standard Saturn ROM header at position 0 and the
+    encrypted code looping back to the end of the ROM data.
 
-	If you are dumping your MPEG cart through the Saturn, make
-	sure to take account of this offset shift when calculating
-	checksums.
+    If you are dumping your MPEG cart through the Saturn, make
+    sure to take account of this offset shift when calculating
+    checksums.
 
 -->
 

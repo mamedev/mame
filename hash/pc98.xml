@@ -4480,7 +4480,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="aress">
 		<description>Aress Ou no Monogatari - The Story of King Aress</description>
 		<year>1994</year>
@@ -41601,7 +41601,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="vga" cloneof="vg">
 		<description>V.G. - Variable Geo (Alt)</description>
 		<year>1993</year>
@@ -64032,7 +64032,7 @@ doujin?!?
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="yumeyare">
 		<description>Yume de Yaretara</description>
 		<year>19??</year>

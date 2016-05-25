@@ -48,41 +48,41 @@
     Pin 19 - Pin 22 of F1 (2764 on cpu/sound board), Output
     Pin 20 - VCC
 
-	-------------------------------------------------------------------
+    -------------------------------------------------------------------
 
-	Master's Golf is a different PCB, but appears to operate in a similar way
-
-	
-			PCB X-081-PC-A
-
-			contains a large box marked
+    Master's Golf is a different PCB, but appears to operate in a similar way
 
 
-		|-----------------------\_/--------------------|
-		|                                   NASCO-9000 |
-		|                                              |
-		|                  /-  NASCO  -\               |
-		|       /\         |  ORIGINAL |               |
-		|  NASCO\/YUVO     \- 0001941 -/               |
-		|                                              |
-		|                      PAT.P                   |
-		|   |---------------------------------------|  |
-		|   |        MASTER'S GOLF vers JAPAN       |  |
-		|   |                                       |  |
-		|   |            CUSTOM BOARD               |  |
-		|   |---------------------------------------|  |
-		|                                              |
-		|                 YUVO CO., LTD                |
-		|-----------------------------------------------
+            PCB X-081-PC-A
 
-		 next to rom M-GF_A10.12K
-		 the box must contain at least a Z80
+            contains a large box marked
+
+
+        |-----------------------\_/--------------------|
+        |                                   NASCO-9000 |
+        |                                              |
+        |                  /-  NASCO  -\               |
+        |       /\         |  ORIGINAL |               |
+        |  NASCO\/YUVO     \- 0001941 -/               |
+        |                                              |
+        |                      PAT.P                   |
+        |   |---------------------------------------|  |
+        |   |        MASTER'S GOLF vers JAPAN       |  |
+        |   |                                       |  |
+        |   |            CUSTOM BOARD               |  |
+        |   |---------------------------------------|  |
+        |                                              |
+        |                 YUVO CO., LTD                |
+        |-----------------------------------------------
+
+         next to rom M-GF_A10.12K
+         the box must contain at least a Z80
 
 DASM Notes:
-- main CPU currently stalls with a RAM buffer check ($63fe), then it 
-tries to see if $612c onward has a "MASTERJ" string on it, resets itself 
+- main CPU currently stalls with a RAM buffer check ($63fe), then it
+tries to see if $612c onward has a "MASTERJ" string on it, resets itself
 otherwise.
-During irq routines it also checks if bit 7 is active for $640a-$6415, 
+During irq routines it also checks if bit 7 is active for $640a-$6415,
 modifies this area if condition is true.
 Neither of above matches what we have in the rom data banks, so it's either
 protected or a snippet should do the aforementioned string copy.
@@ -289,7 +289,7 @@ WRITE8_MEMBER(crgolf_state::crgolfhi_sample_w)
 
 WRITE8_MEMBER(crgolf_state::screen_select_w)
 {
-//	if (data & 0xfe) printf("vram_page_select_w %02x\n", data);
+//  if (data & 0xfe) printf("vram_page_select_w %02x\n", data);
 	m_vrambank->set_bank(data & 0x1);
 }
 
@@ -354,14 +354,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastrglf_io, AS_IO, 8, crgolf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	
+
 	AM_RANGE(0x03, 0x03) AM_WRITEONLY AM_SHARE("color_select")
 	AM_RANGE(0x04, 0x04) AM_WRITEONLY AM_SHARE("screen_flip")
 	AM_RANGE(0x05, 0x05) AM_WRITE( screen_select_w )
 	AM_RANGE(0x06, 0x06) AM_WRITEONLY AM_SHARE("screenb_enable")
 	AM_RANGE(0x07, 0x07) AM_WRITEONLY AM_SHARE("screena_enable")
 
-//	AM_RANGE(0x20, 0x20) AM_WRITE( main_to_sound_w )
+//  AM_RANGE(0x20, 0x20) AM_WRITE( main_to_sound_w )
 	AM_RANGE(0x40, 0x40) AM_WRITE( main_to_sound_w )
 	AM_RANGE(0xa0, 0xa0) AM_READ( sound_to_main_r )
 ADDRESS_MAP_END
@@ -391,7 +391,6 @@ READ8_MEMBER(crgolf_state::unk_sub_07_r)
 
 WRITE8_MEMBER(crgolf_state::unk_sub_0c_w)
 {
-
 }
 
 
@@ -571,7 +570,7 @@ ROM_START( crgolf ) // 834-5419-04
 	ROM_LOAD( "crwnc1.1c",  0x00000, 0x2000, CRC(3246e405) SHA1(f6018029317ac96df5866ca6a2bb2135edbd7e77) )
 	ROM_LOAD( "crwna1.1a",  0x02000, 0x2000, CRC(b9a936e2) SHA1(cebf67d9c42627fbb39648674012a6cf8cb287b5) )
 
-	ROM_REGION( 0x20000, "maindata", 0 )		
+	ROM_REGION( 0x20000, "maindata", 0 )
 	ROM_LOAD( "epr-5880.6b", 0x00000, 0x2000, CRC(4d6d8dad) SHA1(1530f81ad0097eadc75884ff8690b60b85ae451b) )
 	ROM_LOAD( "epr-5885.5e", 0x0e000, 0x2000, CRC(fac6d56c) SHA1(67dc1918d5ab2443e967359e51d49dd134cdf25d) )
 	ROM_LOAD( "epr-5881.6f", 0x10000, 0x2000, CRC(dd48dc1f) SHA1(d4560a88d872bd5f401344e3adb25f8486caca11) )
@@ -601,7 +600,7 @@ ROM_START( crgolfa ) // 834-5419-03
 	ROM_LOAD( "epr-6143.1c", 0x00000, 0x2000, CRC(4b301360) SHA1(2a7dd4876f4448b4b59b6dd02e55eb2d0126b777) )
 	ROM_LOAD( "epr-6142.1a", 0x02000, 0x2000, CRC(8fc5e67f) SHA1(6563db94c55cfc7d2270daccaab57fc7b422b9f9) )
 
-	ROM_REGION( 0x20000, "maindata", 0 )		
+	ROM_REGION( 0x20000, "maindata", 0 )
 	ROM_LOAD( "epr-5880.6b", 0x00000, 0x2000, CRC(4d6d8dad) SHA1(1530f81ad0097eadc75884ff8690b60b85ae451b) )
 	ROM_LOAD( "epr-5885.5e", 0x0e000, 0x2000, CRC(fac6d56c) SHA1(67dc1918d5ab2443e967359e51d49dd134cdf25d) )
 	ROM_LOAD( "epr-5881.6f", 0x10000, 0x2000, CRC(dd48dc1f) SHA1(d4560a88d872bd5f401344e3adb25f8486caca11) )
@@ -632,7 +631,7 @@ ROM_START( crgolfb )
 	ROM_LOAD( "epr-5879b.1c", 0x00000, 0x2000, CRC(927be359) SHA1(d534f7e3ef4ced8eea882ae2b8425df4c5842833) ) // 5879b.
 	ROM_LOAD( "epr-5878.1a",  0x02000, 0x2000, CRC(65fd0fa0) SHA1(de95ff95c9f981cd9eadf8b028ee5373bc69007b) ) // 5878.
 
-	ROM_REGION( 0x20000, "maindata", 0 )	
+	ROM_REGION( 0x20000, "maindata", 0 )
 	ROM_LOAD( "epr-5880.6b",  0x00000, 0x2000, CRC(4d6d8dad) SHA1(1530f81ad0097eadc75884ff8690b60b85ae451b) ) // crnsgolf.c
 	ROM_LOAD( "epr-5885.5e",  0x0e000, 0x2000, CRC(fac6d56c) SHA1(67dc1918d5ab2443e967359e51d49dd134cdf25d) ) // crnsgolf.h
 	ROM_LOAD( "epr-5881.6f",  0x10000, 0x2000, CRC(dd48dc1f) SHA1(d4560a88d872bd5f401344e3adb25f8486caca11) ) // crnsgolf.d
@@ -660,7 +659,7 @@ ROM_START( crgolfc )
 	ROM_LOAD( "15.1a",      0x00000, 0x2000, CRC(e6194356) SHA1(78eec53a0658b552e6a8af109d9c9754e4ddadcb) )
 	ROM_LOAD( "16.1c",      0x02000, 0x2000, CRC(f50412e2) SHA1(5a50fb1edfc26072e921447bd157fe996f707e05) )
 
-	ROM_REGION( 0x20000, "maindata", 0 )	
+	ROM_REGION( 0x20000, "maindata", 0 )
 	ROM_LOAD( "cg.1",        0x00000, 0x2000, CRC(ad7d537a) SHA1(deff74074a8b16ea91a0fa72d97ec36336c87b97) ) //  1.6a
 	ROM_LOAD( "epr-5885.5e", 0x0e000, 0x2000, CRC(fac6d56c) SHA1(67dc1918d5ab2443e967359e51d49dd134cdf25d) ) //  6.5a
 	ROM_LOAD( "epr-5881.6f", 0x10000, 0x2000, CRC(dd48dc1f) SHA1(d4560a88d872bd5f401344e3adb25f8486caca11) ) //  2.6b
@@ -688,7 +687,7 @@ ROM_START( crgolfbt )
 	ROM_LOAD( "epr-5879b.1c", 0x00000, 0x2000, CRC(927be359) SHA1(d534f7e3ef4ced8eea882ae2b8425df4c5842833) )
 	ROM_LOAD( "epr-5878.1a",  0x02000, 0x2000, CRC(65fd0fa0) SHA1(de95ff95c9f981cd9eadf8b028ee5373bc69007b) )
 
-	ROM_REGION( 0x20000, "maindata", 0 )	
+	ROM_REGION( 0x20000, "maindata", 0 )
 	ROM_LOAD( "cg.1",         0x00000, 0x2000, CRC(ad7d537a) SHA1(deff74074a8b16ea91a0fa72d97ec36336c87b97) )
 	ROM_LOAD( "epr-5885.5e",  0x0e000, 0x2000, CRC(fac6d56c) SHA1(67dc1918d5ab2443e967359e51d49dd134cdf25d) ) // cg.6
 	ROM_LOAD( "epr-5881.6f",  0x10000, 0x2000, CRC(dd48dc1f) SHA1(d4560a88d872bd5f401344e3adb25f8486caca11) ) // cg.2
@@ -716,7 +715,7 @@ ROM_START( crgolfhi )
 	ROM_LOAD( "cpu.c1",  0x00000, 0x2000, CRC(8b101085) SHA1(a59c369be3e7e645d8b20032998a778a2056b7d7) )
 	ROM_LOAD( "cpu.a1",  0x02000, 0x2000, CRC(f48a8ee8) SHA1(cc07c7258caf251e9cb52f12be779cb02fca0b0a) )
 
-	ROM_REGION( 0x20000, "maindata", 0 )	
+	ROM_REGION( 0x20000, "maindata", 0 )
 	ROM_LOAD( "main.b6", 0x00000, 0x2000, CRC(5b0336c6) SHA1(86e2c197f23a2f2f7666448b74611150ca15a2af) )
 	ROM_LOAD( "main.b5", 0x02000, 0x2000, CRC(7b80149a) SHA1(c802a79b1430b15d166f5fca11d2ed4e65bc65a9) )
 	ROM_LOAD( "main.c6", 0x04000, 0x2000, CRC(7804cb1c) SHA1(487f979f47a0f40fa35331c71a66dc8428387a26) )
@@ -757,7 +756,7 @@ ROM_START( mastrglf )
 	ROM_LOAD( "M-GF_A5.10A.27256.ROM2",  0x18000, 0x08000, CRC(4397c8a0) SHA1(deb9de1cf7ce6ddc69addf18ff5bf2f25ed11602) )
 	ROM_LOAD( "M-GF_A6.12A.27256.ROM1",  0x20000, 0x08000, CRC(b1fccecf) SHA1(8fb5e40f34596d9faa73255afc2c2635e9008954) )
 	ROM_LOAD( "M-GF_A7.13A.27256.ROM0",  0x28000, 0x08000, CRC(06075e41) SHA1(3426f4ede8449288519e25bc8a1d679bb5137279) )
-	
+
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // next to large module
 	ROM_LOAD( "M-GF_A10.12K.27256", 0x00000, 0x08000, CRC(d145b144) SHA1(52370d56106f0280c52266b5a727493a3396a8e3) )
 
@@ -765,7 +764,7 @@ ROM_START( mastrglf )
 	ROM_LOAD( "M-GF_A8.15A.27256",  0x00000, 0x08000, CRC(9ea9183b) SHA1(55f54575cd662b6194f69532baa25c9b2272760f) )
 	ROM_LOAD( "M-GF_A9.16A.27256",  0x08000, 0x08000, CRC(61ab715f) SHA1(6b9cccaa83a9a9e44a46bae796e2f9eaa9f9c951) )
 
-	ROM_REGION( 0x0300,  "proms", 0 ) 
+	ROM_REGION( 0x0300,  "proms", 0 )
 	ROM_LOAD( "tbp24s10n.1", 0x0000, 0x0100, NO_DUMP )
 	ROM_LOAD( "tbp24s10n.2", 0x0100, 0x0100, NO_DUMP )
 	ROM_LOAD( "tbp24s10n.2", 0x0200, 0x0100, NO_DUMP )

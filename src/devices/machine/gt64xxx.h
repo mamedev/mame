@@ -47,7 +47,7 @@
 #define TIMER_PERIOD            attotime::from_hz(m_clock)
 #define PCI_BUS_CLOCK        33000000
 // Number of dma words to transfer at a time, real hardware configurable between 8-32
-#define DMA_BURST_SIZE		 32
+#define DMA_BURST_SIZE       32
 #define DMA_TIMER_PERIOD     attotime::from_hz(PCI_BUS_CLOCK / 48)
 
 /* Galileo registers - 0x000-0x3ff */

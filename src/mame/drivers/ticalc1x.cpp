@@ -913,7 +913,7 @@ MACHINE_CONFIG_END
   TI Math Marvel
   * TMS1980 MCU label TMC1986A-NL (die label 1980A 86A)
   * 9-digit cyan VFD display(2 digits are custom), 1-bit sound
-  
+
   This is the same hardware as DataMan, with R8 connected to a piezo.
 
 ***************************************************************************/
@@ -934,7 +934,7 @@ WRITE16_MEMBER(mathmarv_state::write_r)
 {
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
-	
+
 	// rest is same as dataman
 	dataman_state::write_r(space, offset, data);
 }

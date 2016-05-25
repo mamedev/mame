@@ -1179,12 +1179,12 @@ void deco_146_base_device::write_data(address_space &space, UINT16 address, UINT
 
 			if (i==0) // the first cs is our internal protection area
 			{
-//				logerror("write matches cs table (protection) %01x %04x %04x %04x\n", i, real_address, data, mem_mask);
+//              logerror("write matches cs table (protection) %01x %04x %04x %04x\n", i, real_address, data, mem_mask);
 				write_protport(space, real_address, data, mem_mask);
 			}
 			else
 			{
-//				logerror("write matches cs table (external connection) %01x %04x %04x %04x\n", i, real_address, data, mem_mask);
+//              logerror("write matches cs table (external connection) %01x %04x %04x %04x\n", i, real_address, data, mem_mask);
 			}
 		}
 	}
@@ -1249,7 +1249,7 @@ void deco_146_base_device::write_protport(address_space &space, UINT16 address, 
 	}
 	else if ((address&0xff) == m_mask_port)
 	{
-//			logerror("LOAD NAND REGISTER %04x %04x\n", data, mem_mask);
+//          logerror("LOAD NAND REGISTER %04x %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_nand);
 	}
 	else if ((address&0xff) == m_soundlatch_port)

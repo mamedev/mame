@@ -115,7 +115,6 @@ NETLIB_OBJECT(74107A)
 	NETLIB_CONSTRUCTOR(74107A)
 	, m_sub(*this, "sub")
 	{
-
 		register_subalias("CLK", m_sub.m_clk);
 		enregister("J", m_J);
 		enregister("K", m_K);
@@ -148,7 +147,6 @@ NETLIB_OBJECT(74107_dip)
 	, m_1(*this, "1")
 	, m_2(*this, "2")
 	{
-
 		register_subalias("1", m_1.m_J);
 		register_subalias("2", m_1.m_sub.m_QQ);
 		register_subalias("3", m_1.m_sub.m_Q);

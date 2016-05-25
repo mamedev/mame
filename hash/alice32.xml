@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- 
+<!--
 Thanks to DCALICE (http://alice32.free.fr) for info!
- 
+
 TODO: split Alice 4k tapes into their own softlist
 -->
 <softwarelist name="alice32" description="Matra Alice 32 cassettes">

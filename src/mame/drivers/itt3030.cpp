@@ -467,7 +467,7 @@ WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
 	int rd_masks[8] = { 1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80 };
 	int tmp_read;
 
-//	printf("matrix_w: %02x (col %d row %d clk %d)\n", data, m_kbdcol, m_kbdrow, (data & 0x80) ? 1 : 0);
+//  printf("matrix_w: %02x (col %d row %d clk %d)\n", data, m_kbdcol, m_kbdrow, (data & 0x80) ? 1 : 0);
 
 	if ((data & 0x80) && (!m_kbdclk))
 	{

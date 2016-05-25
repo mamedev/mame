@@ -2,9 +2,9 @@
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 
 /***************************************************************************
- 
+
  Neo-Geo hardware encryption and protection used on bootleg cartridges
- 
+
  Many of the NeoGeo bootlegs use their own form of encryption and
  protection, presumably to make them harder for other bootleggers to
  copy.  This encryption often involves non-trivial scrambling of the
@@ -12,11 +12,11 @@
  provides some kind of rom overlay, patching parts of the code.
  The graphics roms are usually scrambled in a different way to the
  official SNK cartridges too.
- 
+
  Here we collect functions to emulate some of the protection devices used.
- 
+
  TODO: split different devices according to the chip responsible for them!
- 
+
  ***************************************************************************/
 
 #include "emu.h"
@@ -197,10 +197,10 @@ void neoboot_prot_device::lans2004_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size
 
 	static const int sec[] = { 0x3, 0x8, 0x7, 0xc, 0x1, 0xa, 0x6, 0xd };
 	dynamic_buffer dst(0x600000);
-	
+
 	for (int i = 0; i < 8; i++)
 		memcpy (&dst[i * 0x20000], src + sec[i] * 0x20000, 0x20000);
-	
+
 	memcpy (&dst[0x0bbb00], src + 0x045b00, 0x001710);
 	memcpy (&dst[0x02fff0], src + 0x1a92be, 0x000010);
 	memcpy (&dst[0x100000], src + 0x200000, 0x400000);
@@ -233,20 +233,20 @@ void neoboot_prot_device::samsho5b_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	int px_size = cpurom_size;
 	UINT8 *rom = cpurom;
 	dynamic_buffer buf(px_size);
-	
+
 	memcpy(&buf[0], rom, px_size);
-	
+
 	for (int i = 0; i < px_size / 2; i++)
 	{
 		int ofst = BITSWAP8((i & 0x000ff), 7, 6, 5, 4, 3, 0, 1, 2);
 		ofst += (i & 0xfffff00);
 		ofst ^= 0x060005;
-		
+
 		memcpy(&rom[i * 2], &buf[ofst * 2], 0x02);
 	}
-	
+
 	memcpy(&buf[0], rom, px_size);
-	
+
 	memcpy(&rom[0x000000], &buf[0x700000], 0x100000);
 	memcpy(&rom[0x100000], &buf[0x000000], 0x700000);
 }
@@ -256,7 +256,7 @@ void neoboot_prot_device::samsho5b_vx_decrypt(UINT8* ymsndrom, UINT32 ymsndrom_s
 {
 	int vx_size = ymsndrom_size;
 	UINT8 *rom = ymsndrom;
-	
+
 	for (int i = 0; i < vx_size; i++)
 		rom[i] = BITSWAP8(rom[i], 0, 1, 5, 4, 3, 2, 6, 7);
 }
@@ -276,22 +276,22 @@ READ16_MEMBER( neoboot_prot_device::mslug5p_prot_r )
 /*
 WRITE16_MEMBER( neoboot_prot_device::ms5plus_bankswitch_w )
 {
-	int bankaddress;
-	logerror("offset: %06x PC %06x: set banking %04x\n",offset,space.device().safe_pc(),data);
-	if ((offset == 0) && (data == 0xa0))
-	{
-		bankaddress = 0xa0;
-		m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
-		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space.device().safe_pc(),bankaddress);
-	}
-	else if(offset == 2)
-	{
-		data = data >> 4;
-		//data = data & 7;
-		bankaddress = data * 0x100000;
-		m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
-		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space.device().safe_pc(),bankaddress);
-	}
+    int bankaddress;
+    logerror("offset: %06x PC %06x: set banking %04x\n",offset,space.device().safe_pc(),data);
+    if ((offset == 0) && (data == 0xa0))
+    {
+        bankaddress = 0xa0;
+        m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
+        logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space.device().safe_pc(),bankaddress);
+    }
+    else if(offset == 2)
+    {
+        data = data >> 4;
+        //data = data & 7;
+        bankaddress = data * 0x100000;
+        m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
+        logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space.device().safe_pc(),bankaddress);
+    }
 }
 */
 
@@ -314,26 +314,26 @@ void neoboot_prot_device::kog_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	dynamic_buffer dst(0x600000);
 	UINT16 *rom = (UINT16 *)cpurom;
 	static const int sec[] = { 0x3, 0x8, 0x7, 0xc, 0x1, 0xa, 0x6, 0xd };
-	
+
 	for (int i = 0; i < 8; i++)
 		memcpy (&dst[i * 0x20000], src + sec[i] * 0x20000, 0x20000);
-	
+
 	memcpy (&dst[0x0007a6], src + 0x0407a6, 0x000006);
 	memcpy (&dst[0x0007c6], src + 0x0407c6, 0x000006);
 	memcpy (&dst[0x0007e6], src + 0x0407e6, 0x000006);
 	memcpy (&dst[0x090000], src + 0x040000, 0x004000);
 	memcpy (&dst[0x100000], src + 0x200000, 0x400000);
 	memcpy (src, &dst[0], 0x600000);
-	
+
 	for (int i = 0x90000/2; i < 0x94000/2; i++)
 	{
 		if (((rom[i] & 0xffbf) == 0x4eb9 || rom[i] == 0x43f9) && !rom[i + 1])
 			rom[i + 1] = 0x0009;
-		
+
 		if (rom[i] == 0x4eb8)
 			rom[i] = 0x6100;
 	}
-	
+
 	rom[0x007a8/2] = 0x0009;
 	rom[0x007c8/2] = 0x0009;
 	rom[0x007e8/2] = 0x0009;
@@ -363,7 +363,7 @@ void neoboot_prot_device::kog_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	rom[0x93a58/2] = 0xfd08;
 	rom[0x93a66/2] = 0xf9ca;
 	rom[0x93a72/2] = 0xf9be;
-	
+
 }
 
 /* SNK vs. CAPCOM SVC CHAOS (bootleg) */
@@ -374,10 +374,10 @@ void neoboot_prot_device::svcboot_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	int size = cpurom_size;
 	UINT8 *src = cpurom;
 	dynamic_buffer dst(size);
-	
+
 	for (int i = 0; i < size / 0x100000; i++)
 		memcpy(&dst[i * 0x100000], &src[sec[i] * 0x100000], 0x100000);
-	
+
 	for (int i = 0; i < size / 2; i++)
 	{
 		int ofst = BITSWAP8((i & 0x0000ff), 7, 6, 1, 0, 3, 2, 5, 4);
@@ -400,7 +400,7 @@ void neoboot_prot_device::svcboot_cx_decrypt(UINT8* sprrom, UINT32 sprrom_size)
 	int size = sprrom_size;
 	UINT8 *src = sprrom;
 	dynamic_buffer dst(size);
-	
+
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 0x80; i++)
 	{
@@ -424,18 +424,18 @@ void neoboot_prot_device::svcplus_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	int size = cpurom_size;
 	UINT8 *src = cpurom;
 	dynamic_buffer dst(size);
-	
+
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 2; i++)
 	{
 		int ofst = BITSWAP24((i & 0xfffff), 0x17, 0x16, 0x15, 0x14, 0x13, 0x00, 0x01, 0x02,
-							 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08,
-							 0x07, 0x06, 0x05, 0x04, 0x03, 0x10, 0x11, 0x12);
+								0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08,
+								0x07, 0x06, 0x05, 0x04, 0x03, 0x10, 0x11, 0x12);
 		ofst ^= 0x0f0007;
 		ofst += (i & 0xff00000);
 		memcpy(&src[i * 0x02], &dst[ofst * 0x02], 0x02);
 	}
-	
+
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < 6; i++)
 		memcpy(&src[i * 0x100000], &dst[sec[i] * 0x100000], 0x100000);
@@ -458,7 +458,7 @@ void neoboot_prot_device::svcplusa_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	int size = cpurom_size;
 	UINT8 *src = cpurom;
 	dynamic_buffer dst(size);
-	
+
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < 6; i++)
 		memcpy(&src[i * 0x100000], &dst[sec[i] * 0x100000], 0x100000);
@@ -473,13 +473,13 @@ void neoboot_prot_device::svcsplus_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	int size = cpurom_size;
 	UINT8 *src = cpurom;
 	dynamic_buffer dst(size);
-	
+
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 2; i++)
 	{
 		int ofst = BITSWAP16((i & 0x007fff), 0x0f, 0x00, 0x08, 0x09, 0x0b, 0x0a, 0x0c, 0x0d,
-							 0x04, 0x03, 0x01, 0x07, 0x06, 0x02, 0x05, 0x0e);
-		
+								0x04, 0x03, 0x01, 0x07, 0x06, 0x02, 0x05, 0x0e);
+
 		ofst += (i & 0x078000);
 		ofst += sec[(i & 0xf80000) >> 19] << 19;
 		memcpy(&src[i * 2], &dst[ofst * 2], 0x02);
@@ -513,13 +513,13 @@ void neoboot_prot_device::kof2002b_gfx_decrypt(UINT8 *src, int size)
 		{ 2, 1, 0, 6, 7, 8 },
 		{ 8, 0, 7, 6, 2, 1 },
 	};
-	
+
 	dynamic_buffer dst(0x10000);
-	
+
 	for (int i = 0; i < size; i += 0x10000)
 	{
 		memcpy(&dst[0], src + i, 0x10000);
-		
+
 		for (int j = 0; j < 0x200; j++)
 		{
 			int n = (j & 0x38) >> 3;
@@ -536,9 +536,9 @@ void neoboot_prot_device::kf2k2mp_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 {
 	UINT8 *src = cpurom;
 	UINT8 dst[0x80];
-	
+
 	memmove(src, src + 0x300000, 0x500000);
-	
+
 	for (int i = 0; i < 0x800000; i+=0x80)
 	{
 		for (int j = 0; j < 0x80 / 2; j++)
@@ -557,7 +557,7 @@ void neoboot_prot_device::kf2k2mp2_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 {
 	UINT8 *src = cpurom;
 	dynamic_buffer dst(0x600000);
-	
+
 	memcpy(&dst[0x000000], &src[0x1C0000], 0x040000);
 	memcpy(&dst[0x040000], &src[0x140000], 0x080000);
 	memcpy(&dst[0x0C0000], &src[0x100000], 0x040000);
@@ -573,22 +573,21 @@ void neoboot_prot_device::kof10th_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 {
 	dynamic_buffer dst(0x900000);
 	UINT8 *src = cpurom;
-	
+
 	memcpy(&dst[0x000000], src + 0x700000, 0x100000); // Correct (Verified in Uni-bios)
 	memcpy(&dst[0x100000], src + 0x000000, 0x800000);
-	
+
 	for (int i = 0; i < 0x900000; i++)
 	{
 		int j = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,2,9,8,7,1,5,4,3,10,6,0);
 		src[j] = dst[i];
 	}
-	
+
 	// Altera protection chip patches these over P ROM
 	((UINT16*)src)[0x0124/2] = 0x000d; // Enables XOR for RAM moves, forces SoftDIPs, and USA region
 	((UINT16*)src)[0x0126/2] = 0xf7a8;
-	
+
 	((UINT16*)src)[0x8bf4/2] = 0x4ef9; // Run code to change "S" data
 	((UINT16*)src)[0x8bf6/2] = 0x000d;
 	((UINT16*)src)[0x8bf8/2] = 0xf980;
 }
-

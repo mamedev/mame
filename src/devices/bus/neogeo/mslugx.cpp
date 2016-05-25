@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 /***********************************************************************************************************
- 
+
  Neo Geo cart emulation
  Metal Slug X cart type
 
@@ -50,4 +50,3 @@ machine_config_constructor neogeo_mslugx_cart::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( mslugx_cart );
 }
-

@@ -149,7 +149,7 @@ public:
 	neogeo_mslug3b6_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
-	
+
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
@@ -168,7 +168,7 @@ public:
 	neogeo_ms5plus_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 1; }
-	
+
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_prot->mslug5p_prot_r(space, offset, mem_mask); }
@@ -190,7 +190,7 @@ class neogeo_kog_cart : public neogeo_bootleg_cart
 {
 public:
 	neogeo_kog_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual DECLARE_READ16_MEMBER(protection_r) override;

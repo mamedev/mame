@@ -15,7 +15,7 @@
  * Whilst the book proposes to invert the matrix R=(I+transpose(V)*Z) we define
  *
  *       w = transpose(V)*y
- *       a = R⁻¹ * w
+ *       a = R^-1 * w
  *
  * and consequently
  *

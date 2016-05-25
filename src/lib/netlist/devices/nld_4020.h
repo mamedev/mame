@@ -91,7 +91,6 @@ NETLIB_OBJECT(CD4020)
 	, m_sub(*this, "sub")
 	, m_supply(*this, "supply")
 	{
-
 		enregister("RESET", m_RESET);
 		register_subalias("IP", m_sub.m_IP);
 		register_subalias("Q1", m_sub.m_Q[0]);
