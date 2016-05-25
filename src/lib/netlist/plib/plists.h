@@ -73,7 +73,7 @@ protected:
 		if (m_list != nullptr)
 			pfree_array(m_list);
 		if (new_capacity > 0)
-			m_list = palloc_array(_ListClass, new_capacity);
+			m_list = palloc_array<_ListClass>(new_capacity);
 		else
 			m_list = nullptr;
 		m_capacity = new_capacity;

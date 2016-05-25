@@ -26,19 +26,6 @@
 #include "devices/net_lib.h"
 #include "tools/nl_convert.h"
 
-
-#ifdef PSTANDALONE_PROVIDED
-
-#include <ctime>
-
-#define osd_ticks_t clock_t
-
-inline osd_ticks_t osd_ticks_per_second() { return CLOCKS_PER_SEC; }
-
-osd_ticks_t osd_ticks(void) { return clock(); }
-#endif
-
-
 class tool_options_t : public poptions
 {
 public:
@@ -103,7 +90,7 @@ public:
 
 	void init()
 	{
-		m_setup = palloc(netlist::setup_t(*this));
+		m_setup = palloc<netlist::setup_t>(*this);
 	}
 
 	void read_netlist(const pstring &filename, const pstring &name)
@@ -205,7 +192,7 @@ struct input_t
 
 pvector_t<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
 {
-	pvector_t<input_t> *ret = palloc(pvector_t<input_t>());
+	pvector_t<input_t> *ret = palloc<pvector_t<input_t>>();
 	if (fname != "")
 	{
 		pifilestream f(fname);
@@ -225,7 +212,7 @@ pvector_t<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
 static void run(tool_options_t &opts)
 {
 	netlist_tool_t nt("netlist");
-	osd_ticks_t t = osd_ticks();
+	pticks_t t = pticks();
 
 	nt.m_opts = &opts;
 	nt.init();
@@ -241,9 +228,9 @@ static void run(tool_options_t &opts)
 
 	double ttr = opts.opt_ttr();
 
-	pout("startup time ==> {1:5.3f}\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );
+	pout("startup time ==> {1:5.3f}\n", (double) (pticks() - t) / (double) pticks_per_second() );
 	pout("runnning ...\n");
-	t = osd_ticks();
+	t = pticks();
 
 	unsigned pos = 0;
 	netlist::netlist_time nlt = netlist::netlist_time::zero;
@@ -259,7 +246,7 @@ static void run(tool_options_t &opts)
 	nt.stop();
 	pfree(inps);
 
-	double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
+	double emutime = (double) (pticks() - t) / (double) pticks_per_second();
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n", ttr, emutime, ttr/emutime*100.0);
 }
 

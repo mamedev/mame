@@ -373,12 +373,12 @@ template<typename F>
 pstr_t *pstring_t<F>::salloc(int n)
 {
 	if (stk == nullptr)
-		stk = palloc_array(std::stack<pstr_t *>, 17);
+		stk = palloc_array<std::stack<pstr_t *>>(17);
 	pstr_t *p;
 	unsigned sn= ((32 - countleadbits(n)) + 1) / 2;
 	unsigned size = sizeof(pstr_t) + ((UINT64) 1<<(sn * 2)) + 1;
 	if (stk[sn].empty())
-		p = (pstr_t *) palloc_array(char, size);
+		p = (pstr_t *) palloc_array<char>(size);
 	else
 	{
 		p = stk[sn].top();
@@ -543,7 +543,7 @@ void pstringbuffer::resize(const std::size_t size)
 		m_size = DEFAULT_SIZE;
 		while (m_size <= size)
 			m_size *= 2;
-		m_ptr = palloc_array(char, m_size);
+		m_ptr = palloc_array<char>(m_size);
 		*m_ptr = 0;
 		m_len = 0;
 	}
@@ -551,7 +551,7 @@ void pstringbuffer::resize(const std::size_t size)
 	{
 		while (m_size < size)
 			m_size *= 2;
-		char *new_buf = palloc_array(char, m_size);
+		char *new_buf = palloc_array<char>(m_size);
 		std::memcpy(new_buf, m_ptr, m_len + 1);
 		pfree_array(m_ptr);
 		m_ptr = new_buf;

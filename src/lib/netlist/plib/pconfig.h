@@ -9,6 +9,8 @@
 #define PCONFIG_H_
 
 #include <cstdint>
+#include <thread>
+#include <chrono>
 
 #ifndef PSTANDALONE
 	#define PSTANDALONE (0)
@@ -25,6 +27,8 @@ typedef __uint128_t UINT128;
 typedef __int128_t INT128;
 #endif
 
+#define PLIB_NAMESPACE_START() namespace plib {
+#define PLIB_NAMESPACE_END() }
 
 #if !(PSTANDALONE)
 #include "osdcomm.h"
@@ -133,6 +137,29 @@ typedef int64_t      INT64;
 #define S64(val) val
 #endif
 
+#endif
+
+using pticks_t = INT64;
+
+inline pticks_t pticks()
+{
+	return std::chrono::high_resolution_clock::now().time_since_epoch().count();
+}
+inline pticks_t pticks_per_second()
+{
+	return std::chrono::high_resolution_clock::period::den / std::chrono::high_resolution_clock::period::num;
+}
+
+#if 1 && defined(__x86_64__)
+
+static inline pticks_t pprofile_ticks()
+{
+    unsigned hi, lo;
+    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+    return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
+}
+#else
+inline pticks_t pprofile_ticks() { return pticks(); }
 #endif
 
 /*

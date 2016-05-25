@@ -13,16 +13,18 @@
 #include "pconfig.h"
 #include "pstring.h"
 
+PLIB_NAMESPACE_START()
+
 // ----------------------------------------------------------------------------------------
 // pdynlib: dynamic loading of libraries  ...
 // ----------------------------------------------------------------------------------------
 
-class pdynlib
+class dynlib
 {
 public:
-	pdynlib(const pstring libname);
-	pdynlib(const pstring path, const pstring libname);
-	~pdynlib();
+	dynlib(const pstring libname);
+	dynlib(const pstring path, const pstring libname);
+	~dynlib();
 
 	bool isLoaded() const;
 
@@ -37,5 +39,7 @@ private:
 	bool m_isLoaded;
 	void *m_lib;
 };
+
+PLIB_NAMESPACE_END()
 
 #endif /* _PSTRING_H_ */

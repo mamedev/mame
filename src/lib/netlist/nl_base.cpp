@@ -253,7 +253,7 @@ ATTR_COLD void netlist_t::start()
 
 	pstring libpath = nl_util::environment("NL_BOOSTLIB", nl_util::buildpath({".", "nlboost.so"}));
 
-	m_lib = palloc(pdynlib(libpath));
+	m_lib = palloc<plib::dynlib>(libpath);
 
 	/* make sure the solver and parameters are started first! */
 

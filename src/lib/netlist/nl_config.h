@@ -112,7 +112,7 @@
 //============================================================
 
 #define NL_DEBUG                    (false)
-#define NL_KEEP_STATISTICS          (0)
+#define NL_KEEP_STATISTICS          (1)
 
 //============================================================
 //  General Macros
@@ -132,8 +132,8 @@
 #include "eminline.h"
 #define add_to_stat(v,x)        do { v += (x); } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)
-#define begin_timing(v)         do { v -= get_profile_ticks(); } while (0)
-#define end_timing(v)           do { v += get_profile_ticks(); } while (0)
+#define begin_timing(v)         do { v -= pprofile_ticks(); } while (0)
+#define end_timing(v)           do { v += pprofile_ticks(); } while (0)
 #else
 #define add_to_stat(v,x)        do { } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)

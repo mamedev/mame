@@ -161,9 +161,9 @@
 #include "nl_lists.h"
 #include "nl_time.h"
 #include "nl_util.h"
+#include "plib/pdynlib.h"
 #include "plib/pstate.h"
 #include "plib/pfmtlog.h"
-#include "plib/pdynlib.h"
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
@@ -1039,7 +1039,7 @@ namespace netlist
 
 	#if (NL_KEEP_STATISTICS)
 		/* stats */
-		osd_ticks_t stat_total_time;
+		pticks_t stat_total_time;
 		INT32 stat_update_count;
 		INT32 stat_call_count;
 	#endif
@@ -1266,7 +1266,7 @@ namespace netlist
 
 		virtual void reset();
 
-		ATTR_COLD pdynlib &lib() { return *m_lib; }
+		ATTR_COLD plib::dynlib &lib() { return *m_lib; }
 
 		void print_stats() const;
 
@@ -1303,7 +1303,7 @@ protected:
 		pstring m_name;
 		setup_t *m_setup;
 		plog_base<NL_DEBUG> m_log;
-		pdynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
+		plib::dynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
 	};
 
 	// -----------------------------------------------------------------------------

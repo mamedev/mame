@@ -632,7 +632,7 @@ void setup_t::connect_terminals(core_terminal_t &t1, core_terminal_t &t2)
 	{
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
-		analog_net_t::ptr_t anet = palloc(analog_net_t(netlist(),"net." + t1.name()));
+		analog_net_t::ptr_t anet = palloc<analog_net_t>(netlist(),"net." + t1.name());
 		t1.set_net(anet);
 		anet->register_con(t2);
 		anet->register_con(t1);
