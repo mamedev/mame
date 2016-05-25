@@ -387,7 +387,25 @@ READ8_MEMBER(sms_state::sms_audio_control_r)
 	if (m_has_fm)
 	{
 		if (m_is_smsj)
+		{
+			/* Charles MacDonald discovered an internal 12-bit counter that is
+			   incremented on each pulse of the C-Sync line that connects the VDP
+			   with the 315-5297. Only 3 bits of the counter are returned when
+			   read this port:
+
+			   D7 : Counter bit 11
+			   D6 : Counter bit 7
+			   D5 : Counter bit 3
+			   D4 : Always zero
+			   D3 : Always zero
+			   D2 : Always zero
+			   D1 : Mute control bit 1
+			   D0 : Mute control bit 0
+
+			   For the moment, only the mute bits are handled by this code.
+			*/
 			return m_audio_control & 0x03;
+		}
 		else
 			return m_audio_control & 0x01;
 	}
@@ -452,7 +470,13 @@ READ8_MEMBER(sms_state::gg_input_port_00_r)
 		return 0xff;
 	else
 	{
+		// bit 6 is NJAP (0=domestic/1=overseas); bit 7 is STT (START button)
 		UINT8 data = (m_is_gg_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80);
+
+		// According to GG official docs, bits 0-4 are meaningless and bit 5
+		// is NNTS (0=NTSC, 1=PAL). All games run in NTSC and no original GG
+		// allows the user to change that mode, but there are NTSC and PAL
+		// versions of the TV Tuner.
 
 		//logerror("port $00 read, val: %02x, pc: %04x\n", data, activecpu_get_pc());
 		return data;

@@ -25,9 +25,9 @@
  - SMS drivers for other versions (one has a 10.746168MHz XTAL)
  - Software compatibility flags, by region and/or BIOS
  - Samsung modem for Gam*Boy Securities Information Service System
- - Sega Demo Unit II (kiosk expansion device)
- - SMS 8 slot game changer (kiosk expansion device)
- - SMS Disk System (floppy disk drive expansion device) - unreleased
+ - Sega Demo Unit II (SMS kiosk-like expansion device)
+ - SMS 8 slot game changer (kiosk-like expansion device)
+ - Sega Floppy Disc Unit (SMS expansion device) - unreleased
  - Emulate SRAM cartridges? (for use with Bock's dump tool)
 
  The Game Gear SIO hardware is not emulated but has some
