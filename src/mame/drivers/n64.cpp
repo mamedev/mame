@@ -16,7 +16,7 @@
 #include "includes/n64.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "imagedev/snapquik.h"
+#include "imagedev/harddriv.h"
 #include "softlist.h"
 
 class n64_mess_state : public n64_state
@@ -31,8 +31,10 @@ public:
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(n64_cart);
 	void mempak_format(UINT8* pak);
-	int quickload(device_image_interface &image, const char *file_type, int quickload_size);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( n64dd );
+	int disk_load(device_image_interface &image);
+	void disk_unload(device_image_interface &image);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( n64dd );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( n64dd );
 };
 
 READ32_MEMBER(n64_mess_state::dd_null_r)
@@ -384,19 +386,28 @@ MACHINE_START_MEMBER(n64_mess_state,n64dd)
 	}
 }
 
-QUICKLOAD_LOAD_MEMBER(n64_mess_state,n64dd)
+DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64dd)
 {
-	return quickload(image, file_type, quickload_size);
+	return disk_load(image);
 }
 
-int n64_mess_state::quickload(device_image_interface &image, const char *file_type, int quickload_size)
+DEVICE_IMAGE_UNLOAD_MEMBER(n64_mess_state,n64dd)
+{
+	disk_unload(image);
+}
+
+int n64_mess_state::disk_load(device_image_interface &image)
 {
 	image.fseek(0, SEEK_SET);
-	image.fread(memregion("disk")->base(), quickload_size);
+	image.fread(memregion("disk")->base(), image.length());
 	machine().device<n64_periphs>("rcp")->disk_present = true;
 	return IMAGE_INIT_PASS;
 }
 
+void n64_mess_state::disk_unload(device_image_interface &image)
+{
+	machine().device<n64_periphs>("rcp")->disk_present = false;
+}
 
 INTERRUPT_GEN_MEMBER(n64_mess_state::n64_reset_poll)
 {
@@ -470,8 +481,10 @@ static MACHINE_CONFIG_DERIVED( n64dd, n64 )
 	MCFG_GENERIC_EXTENSIONS("v64,z64,rom,n64,bin")
 	MCFG_GENERIC_LOAD(n64_mess_state, n64_cart)
 
-	MCFG_QUICKLOAD_ADD("quickload", n64_mess_state, n64dd, "bin,dsk", 0)
-	MCFG_QUICKLOAD_INTERFACE("n64dd_disk")
+	MCFG_HARDDISK_ADD("n64disk")
+	MCFG_HARDDISK_LOAD(n64_mess_state,n64dd)
+	MCFG_HARDDISK_UNLOAD(n64_mess_state,n64dd)
+	MCFG_HARDDISK_INTERFACE("n64dd_disk")
 
 	MCFG_SOFTWARE_LIST_ADD("dd_list", "n64dd")
 MACHINE_CONFIG_END
@@ -502,7 +515,7 @@ ROM_START( n64dd )
 	ROM_REGION32_BE( 0x400000, "ddipl", ROMREGION_ERASEFF)
 	ROM_LOAD( "64ddipl.bin", 0x000000, 0x400000, CRC(7f933ce2) SHA1(bf861922dcb78c316360e3e742f4f70ff63c9bc3) )
 
-	ROM_REGION32_LE( 0x4400000, "disk", ROMREGION_ERASEFF)
+	ROM_REGION32_BE( 0x4400000, "disk", ROMREGION_ERASEFF)
 
 	ROM_REGION16_BE( 0x80, "normpoint", 0 )
 	ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
