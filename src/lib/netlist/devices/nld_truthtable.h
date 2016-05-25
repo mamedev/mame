@@ -66,11 +66,11 @@ struct truthtable_desc_t
 	{
 	}
 
-	void setup(const pstring_vector_t &desc, UINT32 disabled_ignore);
+	void setup(const plib::pstring_vector_t &desc, UINT32 disabled_ignore);
 
 private:
-	void help(unsigned cur, pstring_vector_t list,
-			UINT64 state,UINT16 val, parray_t<UINT8> &timing_index);
+	void help(unsigned cur, plib::pstring_vector_t list,
+			UINT64 state,UINT16 val, plib::array_t<UINT8> &timing_index);
 	static unsigned count_bits(UINT32 v);
 	static UINT32 set_bits(UINT32 v, UINT32 b);
 	UINT32 get_ignored_simple(UINT32 i);
@@ -133,7 +133,7 @@ public:
 
 	template <class C>
 	nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
-			truthtable_t *ttbl, const pstring_vector_t &desc)
+			truthtable_t *ttbl, const plib::pstring_vector_t &desc)
 	: device_t(owner, name)
 	, m_fam(*this, fam)
 	, m_last_state(0)
@@ -149,12 +149,12 @@ public:
 	{
 		pstring header = m_desc[0];
 
-		pstring_vector_t io(header,"|");
+		plib::pstring_vector_t io(header,"|");
 		// checks
 		nl_assert_always(io.size() == 2, "too many '|'");
-		pstring_vector_t inout(io[0], ",");
+		plib::pstring_vector_t inout(io[0], ",");
 		nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
-		pstring_vector_t out(io[1], ",");
+		plib::pstring_vector_t out(io[1], ",");
 		nl_assert_always(out.size() == m_NO, "output count wrong");
 
 		for (unsigned i=0; i < m_NI; i++)
@@ -311,7 +311,7 @@ private:
 	INT32 m_active;
 
 	truthtable_t *m_ttp;
-	pstring_vector_t m_desc;
+	plib::pstring_vector_t m_desc;
 };
 
 class netlist_base_factory_truthtable_t : public base_factory_t
@@ -327,7 +327,7 @@ public:
 	{
 	}
 
-	pstring_vector_t m_desc;
+	plib::pstring_vector_t m_desc;
 	const logic_family_desc_t *m_family;
 };
 
@@ -341,16 +341,16 @@ public:
 			const pstring &def_param)
 	: netlist_base_factory_truthtable_t(name, classname, def_param) { }
 
-	powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
+	plib::powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 	{
 		typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
-		return powned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, &m_ttbl, m_desc);
+		return plib::powned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, &m_ttbl, m_desc);
 	}
 private:
 	typename nld_truthtable_t<m_NI, m_NO, has_state>::truthtable_t m_ttbl;
 };
 
-powned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
+plib::powned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
 		const unsigned has_state,
 		const pstring &name, const pstring &classname,
 		const pstring &def_param);

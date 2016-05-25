@@ -90,7 +90,7 @@ namespace netlist
 		class source_t
 		{
 		public:
-			using list_t = pvector_t<std::shared_ptr<source_t>>;
+			using list_t = plib::pvector_t<std::shared_ptr<source_t>>;
 
 			source_t()
 			{}
@@ -116,13 +116,13 @@ namespace netlist
 		void register_object(device_t &dev, const pstring &name, object_t &obj);
 
 		template<class NETLIST_X>
-		void register_dev_s(powned_ptr<NETLIST_X> dev)
+		void register_dev_s(plib::powned_ptr<NETLIST_X> dev)
 		{
 			register_dev(std::move(dev));
 		}
 
 
-		void register_dev(powned_ptr<device_t> dev);
+		void register_dev(plib::powned_ptr<device_t> dev);
 		void register_dev(const pstring &classname, const pstring &name);
 
 		void register_lib_entry(const pstring &name);
@@ -183,10 +183,10 @@ namespace netlist
 
 		void model_parse(const pstring &model, model_map_t &map);
 
-		plog_base<NL_DEBUG> &log() { return netlist().log(); }
-		const plog_base<NL_DEBUG> &log() const { return netlist().log(); }
+		plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
+		const plib::plog_base<NL_DEBUG> &log() const { return netlist().log(); }
 
-		pvector_t<std::pair<pstring, base_factory_t *>> m_device_factory;
+		plib::pvector_t<std::pair<pstring, base_factory_t *>> m_device_factory;
 
 	protected:
 
@@ -209,23 +209,23 @@ namespace netlist
 
 		netlist_t &m_netlist;
 
-		phashmap_t<pstring, pstring> m_alias;
-		phashmap_t<pstring, param_ref_t>  m_params;
-		phashmap_t<pstring, pstring> m_param_values;
-		phashmap_t<pstring, core_terminal_t *> m_terminals;
+		plib::hashmap_t<pstring, pstring> m_alias;
+		plib::hashmap_t<pstring, param_ref_t>  m_params;
+		plib::hashmap_t<pstring, pstring> m_param_values;
+		plib::hashmap_t<pstring, core_terminal_t *> m_terminals;
 
-		pvector_t<link_t> m_links;
+		plib::pvector_t<link_t> m_links;
 
 		factory_list_t m_factory;
 
-		phashmap_t<pstring, pstring> m_models;
+		plib::hashmap_t<pstring, pstring> m_models;
 
 		int m_proxy_cnt;
 		int m_frontier_cnt;
 
 		std::stack<pstring> m_namespace_stack;
 		source_t::list_t m_sources;
-		pvector_t<pstring> m_lib;
+		plib::pvector_t<pstring> m_lib;
 
 	};
 

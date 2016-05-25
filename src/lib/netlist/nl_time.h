@@ -37,7 +37,7 @@ namespace netlist
 		static const pstate_data_type_e STATETYPE = DT_INT128;
 #else
 		using INTERNALTYPE = UINT64;
-		static const pstate_data_type_e STATETYPE = DT_INT64;
+		static const pstate_data_type_e STATETYPE = pstate_data_type_e::DT_INT64;
 #endif
 		static const INTERNALTYPE RESOLUTION = NETLIST_INTERNAL_RES;
 
@@ -137,10 +137,11 @@ namespace netlist
 
 }
 
+PLIB_NAMESPACE_START()
 template<> ATTR_COLD inline void pstate_manager_t::save_item(netlist::netlist_time &nlt, const void *owner, const pstring &stname)
 {
 	save_state_ptr(stname, netlist::netlist_time::STATETYPE, owner, sizeof(netlist::netlist_time::INTERNALTYPE), 1, nlt.get_internaltype_ptr(), false);
 }
-
+PLIB_NAMESPACE_END()
 
 #endif /* NLTIME_H_ */

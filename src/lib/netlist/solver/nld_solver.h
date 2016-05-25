@@ -92,7 +92,7 @@ NETLIB_OBJECT(solver)
 
 	inline nl_double gmin() { return m_gmin.Value(); }
 
-	void create_solver_code(postream &strm);
+	void create_solver_code(plib::postream &strm);
 
 	NETLIB_UPDATEI();
 	NETLIB_RESETI();
@@ -120,7 +120,7 @@ protected:
 
 	param_logic_t  m_log_stats;
 
-	pvector_t<matrix_solver_t *> m_mat_solvers;
+	plib::pvector_t<matrix_solver_t *> m_mat_solvers;
 private:
 
 	solver_parameters_t m_params;

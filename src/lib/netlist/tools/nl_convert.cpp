@@ -12,9 +12,9 @@
 
 
 template<typename Class>
-static pvector_t<int> bubble(const pvector_t<Class> &sl)
+static plib::pvector_t<int> bubble(const plib::pvector_t<Class> &sl)
 {
-	pvector_t<int> ret;
+	plib::pvector_t<int> ret;
 	for (unsigned i=0; i<sl.size(); i++)
 		ret.push_back(i);
 
@@ -38,7 +38,7 @@ static pvector_t<int> bubble(const pvector_t<Class> &sl)
 void nl_convert_base_t::add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias)
 {
 	pstring pname = devname + "." + name;
-	m_pins.add(pname, pmake_unique<pin_alias_t>(pname, devname + "." + alias));
+	m_pins.add(pname, plib::pmake_unique<pin_alias_t>(pname, devname + "." + alias));
 }
 
 void nl_convert_base_t::add_ext_alias(const pstring &alias)
@@ -102,7 +102,7 @@ void nl_convert_base_t::dump_nl()
 		if (net->terminals().size() == 1)
 			net->set_no_export();
 	}
-	pvector_t<int> sorted = bubble(m_devs);
+	plib::pvector_t<int> sorted = bubble(m_devs);
 	for (std::size_t i=0; i<m_devs.size(); i++)
 	{
 		std::size_t j = sorted[i];
@@ -148,7 +148,7 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 				break;
 			i++;
 		}
-		return pfmt(m_units[i].m_func.cstr())(val / m_units[i].m_mult);
+		return plib::pfmt(m_units[i].m_func.cstr())(val / m_units[i].m_mult);
 	}
 }
 double nl_convert_base_t::get_sp_unit(const pstring &unit)
@@ -199,7 +199,7 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 
 void nl_convert_spice_t::convert(const pstring &contents)
 {
-	pstring_vector_t spnl(contents, "\n");
+	plib::pstring_vector_t spnl(contents, "\n");
 
 	// Add gnd net
 
@@ -231,7 +231,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 {
 	if (line != "")
 	{
-		pstring_vector_t tt(line, " ", true);
+		plib::pstring_vector_t tt(line, " ", true);
 		double val = 0.0;
 		switch (tt[0].code_at(0))
 		{
@@ -270,7 +270,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					model = tt[5];
 				else
 					model = tt[4];
-				pstring_vector_t m(model,"{");
+				plib::pstring_vector_t m(model,"{");
 				if (m.size() == 2)
 				{
 					if (m[1].len() != 4)
@@ -343,7 +343,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				add_device(tname, xname);
 				for (std::size_t i=1; i < tt.size() - 1; i++)
 				{
-					pstring term = pfmt("{1}.{2}")(xname)(i);
+					pstring term = plib::pfmt("{1}.{2}")(xname)(i);
 					add_term(tt[i], term);
 				}
 				break;
@@ -357,7 +357,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 //FIXME: should accept a stream as well
 void nl_convert_eagle_t::convert(const pstring &contents)
 {
-	pistringstream istrm(contents);
+	plib::pistringstream istrm(contents);
 	eagle_tokenizer tok(*this, istrm);
 
 	out("NETLIST_START(dummy)\n");

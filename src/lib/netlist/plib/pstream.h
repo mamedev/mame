@@ -16,6 +16,8 @@
 #include "palloc.h"
 #include "pfmtlog.h"
 
+PLIB_NAMESPACE_START()
+
 // -----------------------------------------------------------------------------
 // pstream: things common to all streams
 // -----------------------------------------------------------------------------
@@ -357,7 +359,7 @@ private:
 // pstream_fmt_writer_t: writer on top of ostream
 // -----------------------------------------------------------------------------
 
-class pstream_fmt_writer_t : public pfmt_writer_t<>
+class pstream_fmt_writer_t : public plib::pfmt_writer_t<>
 {
 	P_PREVENT_COPYING(pstream_fmt_writer_t)
 public:
@@ -374,5 +376,7 @@ protected:
 private:
 	postream &m_strm;
 };
+
+PLIB_NAMESPACE_END()
 
 #endif /* _PSTREAM_H_ */

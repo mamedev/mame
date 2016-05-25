@@ -183,7 +183,7 @@ NETLIB_OBJECT(extclock)
 		connect_late(m_feedback, m_Q);
 		{
 			netlist_time base = netlist_time::from_hz(m_freq.Value()*2);
-			pstring_vector_t pat(m_pattern.Value(),",");
+			plib::pstring_vector_t pat(m_pattern.Value(),",");
 			m_off = netlist_time::from_double(m_offset.Value());
 
 			int pati[256];
@@ -369,9 +369,9 @@ NETLIB_OBJECT(function)
 		enregister("Q", m_Q);
 
 		for (int i=0; i < m_N; i++)
-			enregister(pfmt("A{1}")(i), m_I[i]);
+			enregister(plib::pfmt("A{1}")(i), m_I[i]);
 
-		pstring_vector_t cmds(m_func.Value(), " ");
+		plib::pstring_vector_t cmds(m_func.Value(), " ");
 		m_precompiled.clear();
 
 		for (std::size_t i=0; i < cmds.size(); i++)
@@ -434,7 +434,7 @@ private:
 	analog_output_t m_Q;
 	analog_input_t m_I[10];
 
-	pvector_t<rpn_inst> m_precompiled;
+	plib::pvector_t<rpn_inst> m_precompiled;
 };
 
 // -----------------------------------------------------------------------------
@@ -631,9 +631,9 @@ public:
 		pstring m_dev_name;
 	};
 
-	powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
+	plib::powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 	{
-		return powned_ptr<device_t>::Create<wrapper>(this->name(), anetlist, name);
+		return plib::powned_ptr<device_t>::Create<wrapper>(this->name(), anetlist, name);
 	}
 
 private:

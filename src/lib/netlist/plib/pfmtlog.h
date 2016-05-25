@@ -14,6 +14,8 @@
 #include "pstring.h"
 #include "ptypes.h"
 
+PLIB_NAMESPACE_START()
+
 template <typename T>
 struct ptype_treats
 {
@@ -292,5 +294,8 @@ void plog_channel<L, build_enabled>::vdowrite(const pstring &ls) const
 {
 	m_base->vlog(L, ls);
 }
+
+PLIB_NAMESPACE_END()
+
 
 #endif /* _PSTRING_H_ */

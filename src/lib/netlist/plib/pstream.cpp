@@ -13,6 +13,8 @@
 #include "pstream.h"
 #include "palloc.h"
 
+PLIB_NAMESPACE_START()
+
 // -----------------------------------------------------------------------------
 // pistream: input stream
 // -----------------------------------------------------------------------------
@@ -360,3 +362,5 @@ pstream::pos_type pomemstream::vtell()
 {
 	return m_pos;
 }
+
+PLIB_NAMESPACE_END()

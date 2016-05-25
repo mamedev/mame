@@ -9,6 +9,7 @@
 
 #include "pparser.h"
 
+PLIB_NAMESPACE_START()
 // ----------------------------------------------------------------------------------------
 // A simple tokenizer
 // ----------------------------------------------------------------------------------------
@@ -468,3 +469,5 @@ postream & ppreprocessor::process_i(pistream &istrm, postream &ostrm)
 	}
 	return ostrm;
 }
+
+PLIB_NAMESPACE_END()

@@ -97,7 +97,7 @@ public:
 
 protected:
 
-	void vlog(const plog_level &l, const pstring &ls) const override;
+	void vlog(const plib::plog_level &l, const pstring &ls) const override;
 
 private:
 	netlist_mame_device_t &m_parent;
@@ -636,9 +636,9 @@ public:
 
 		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
 		{
-			m_param_name[i] = std::make_unique<netlist::param_str_t>(*this, pfmt("CHAN{1}")(i), "");
-			m_param_mult[i] = std::make_unique<netlist::param_double_t>(*this, pfmt("MULT{1}")(i), 1.0);
-			m_param_offset[i] = std::make_unique<netlist::param_double_t>(*this, pfmt("OFFSET{1}")(i), 0.0);
+			m_param_name[i] = std::make_unique<netlist::param_str_t>(*this, plib::pfmt("CHAN{1}")(i), "");
+			m_param_mult[i] = std::make_unique<netlist::param_double_t>(*this, plib::pfmt("MULT{1}")(i), 1.0);
+			m_param_offset[i] = std::make_unique<netlist::param_double_t>(*this, plib::pfmt("OFFSET{1}")(i), 0.0);
 		}
 		m_num_channel = 0;
 	}

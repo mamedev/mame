@@ -211,7 +211,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 
 	for (unsigned k = 0; k < N(); k++)
 	{
-		pstring num = pfmt("{1}")(k);
+		pstring num = plib::pfmt("{1}")(k);
 
 		save(RHS(k), "RHS." + num);
 	}

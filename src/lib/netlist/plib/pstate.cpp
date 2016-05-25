@@ -7,6 +7,8 @@
 
 #include "pstate.h"
 
+PLIB_NAMESPACE_START()
+
 pstate_manager_t::pstate_manager_t()
 {
 }
@@ -74,3 +76,5 @@ template<> ATTR_COLD void pstate_manager_t::save_item(pstate_callback_t &state, 
 	m_save.push_back(std::move(p));
 	state.register_state(*this, stname);
 }
+
+PLIB_NAMESPACE_END()

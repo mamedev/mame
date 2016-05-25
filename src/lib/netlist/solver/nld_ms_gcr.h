@@ -47,25 +47,25 @@ public:
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 
-	virtual void create_solver_code(postream &strm) override;
+	virtual void create_solver_code(plib::postream &strm) override;
 
 private:
 
-	void csc_private(postream &strm);
+	void csc_private(plib::postream &strm);
 
 	using extsolver = void (*)(double * RESTRICT m_A, double * RESTRICT RHS);
 
 	pstring static_compile_name()
 	{
-		postringstream t;
+		plib::postringstream t;
 		csc_private(t);
-		phash_functor<pstring> h(t.str());
+		plib::hash_functor<pstring> h(t.str());
 
-		return pfmt("nl_gcr_{1:x}_{2}")(h())(mat.nz_num);
+		return plib::pfmt("nl_gcr_{1:x}_{2}")(h())(mat.nz_num);
 	}
 
 	unsigned m_dim;
-	pvector_t<int> m_term_cr[_storage_N];
+	plib::pvector_t<int> m_term_cr[_storage_N];
 	mat_cr_t<_storage_N> mat;
 	nl_double m_A[_storage_N * _storage_N];
 
@@ -179,7 +179,7 @@ void matrix_solver_GCR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 }
 
 template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_GCR_t<m_N, _storage_N>::csc_private(postream &strm)
+void matrix_solver_GCR_t<m_N, _storage_N>::csc_private(plib::postream &strm)
 {
 	const unsigned iN = N();
 	for (unsigned i = 0; i < iN - 1; i++)
@@ -191,7 +191,7 @@ void matrix_solver_GCR_t<m_N, _storage_N>::csc_private(postream &strm)
 			unsigned pi = mat.diag[i];
 
 			//const nl_double f = 1.0 / m_A[pi++];
-			strm.writeline(pfmt("const double f{1} = 1.0 / m_A[{2}];")(i)(pi));
+			strm.writeline(plib::pfmt("const double f{1} = 1.0 / m_A[{2}];")(i)(pi));
 			pi++;
 			const unsigned piie = mat.ia[i+1];
 
@@ -204,7 +204,7 @@ void matrix_solver_GCR_t<m_N, _storage_N>::csc_private(postream &strm)
 					pj++;
 
 				//const nl_double f1 = - m_A[pj++] * f;
-				strm.writeline(pfmt("\tconst double f{1}_{2} = -f{3} * m_A[{4}];")(i)(j)(i)(pj));
+				strm.writeline(plib::pfmt("\tconst double f{1}_{2} = -f{3} * m_A[{4}];")(i)(j)(i)(pj));
 				pj++;
 
 				// subtract row i from j */
@@ -213,22 +213,22 @@ void matrix_solver_GCR_t<m_N, _storage_N>::csc_private(postream &strm)
 					while (mat.ja[pj] < mat.ja[pii])
 						pj++;
 					//m_A[pj++] += m_A[pii++] * f1;
-					strm.writeline(pfmt("\tm_A[{1}] += m_A[{2}] * f{3}_{4};")(pj)(pii)(i)(j));
+					strm.writeline(plib::pfmt("\tm_A[{1}] += m_A[{2}] * f{3}_{4};")(pj)(pii)(i)(j));
 					pj++; pii++;
 				}
 				//RHS[j] += f1 * RHS[i];
-				strm.writeline(pfmt("\tRHS[{1}] += f{2}_{3} * RHS[{4}];")(j)(i)(j)(i));
+				strm.writeline(plib::pfmt("\tRHS[{1}] += f{2}_{3} * RHS[{4}];")(j)(i)(j)(i));
 			}
 		}
 	}
 }
 
 template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_GCR_t<m_N, _storage_N>::create_solver_code(postream &strm)
+void matrix_solver_GCR_t<m_N, _storage_N>::create_solver_code(plib::postream &strm)
 {
 	//const unsigned iN = N();
 
-	strm.writeline(pfmt("extern \"C\" void {1}(double * __restrict m_A, double * __restrict RHS)")(static_compile_name()));
+	strm.writeline(plib::pfmt("extern \"C\" void {1}(double * __restrict m_A, double * __restrict RHS)")(static_compile_name()));
 	strm.writeline("{");
 	csc_private(strm);
 	strm.writeline("}");

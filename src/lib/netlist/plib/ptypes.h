@@ -11,11 +11,13 @@
 #include "pconfig.h"
 #include "pstring.h"
 
+PLIB_NAMESPACE_START()
+
 //============================================================
 //  penum - strongly typed enumeration
 //============================================================
 
-struct penum_base
+struct enum_base
 {
 protected:
 	static int from_string_int(const char *str, const char *x)
@@ -74,8 +76,10 @@ protected:
 	}
 };
 
+PLIB_NAMESPACE_END()
+
 #define P_ENUM(_name, ...) \
-	struct _name : public penum_base { \
+	struct _name : public plib::enum_base { \
 		enum e { __VA_ARGS__ }; \
 		_name (e v) : m_v(v) { } \
 		bool set_from_string (const pstring &s) { \

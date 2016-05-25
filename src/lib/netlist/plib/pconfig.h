@@ -139,27 +139,30 @@ typedef int64_t      INT64;
 
 #endif
 
-using pticks_t = INT64;
+PLIB_NAMESPACE_START()
 
-inline pticks_t pticks()
+using ticks_t = INT64;
+
+static inline ticks_t ticks()
 {
 	return std::chrono::high_resolution_clock::now().time_since_epoch().count();
 }
-inline pticks_t pticks_per_second()
+static inline ticks_t ticks_per_second()
 {
 	return std::chrono::high_resolution_clock::period::den / std::chrono::high_resolution_clock::period::num;
 }
 
-#if 1 && defined(__x86_64__)
+#if defined(__x86_64__) &&  !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
 
-static inline pticks_t pprofile_ticks()
+static inline ticks_t profile_ticks()
 {
     unsigned hi, lo;
     __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
     return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
 }
+
 #else
-inline pticks_t pprofile_ticks() { return pticks(); }
+static inline ticks_t profile_ticks() { return ticks(); }
 #endif
 
 /*
@@ -168,7 +171,7 @@ inline pticks_t pprofile_ticks() { return pticks(); }
  */
 
 #if (PHAS_PMF_INTERNAL)
-class pmfp
+class mfp
 {
 public:
 	// construct from any member function pointer
@@ -176,10 +179,10 @@ public:
 	using generic_function = void (*)();
 
 	template<typename _MemberFunctionType>
-	pmfp(_MemberFunctionType mfp)
+	mfp(_MemberFunctionType mftp)
 	: m_function(0), m_this_delta(0)
 	{
-		*reinterpret_cast<_MemberFunctionType *>(this) = mfp;
+		*reinterpret_cast<_MemberFunctionType *>(this) = mftp;
 	}
 
 	// binding helper
@@ -190,9 +193,9 @@ public:
 				convert_to_generic(reinterpret_cast<generic_class *>(object)));
 	}
 	template<typename _FunctionType, typename _MemberFunctionType, typename _ObjectType>
-	static _FunctionType get_mfp(_MemberFunctionType mfp, _ObjectType *object)
+	static _FunctionType get_mfp(_MemberFunctionType mftp, _ObjectType *object)
 	{
-		pmfp mfpo(mfp);
+		mfp mfpo(mftp);
 		return mfpo.update_after_bind<_FunctionType>(object);
 	}
 
@@ -218,6 +221,9 @@ private:
 												//    if odd, it's the byte offset into the vtable
 	int                     m_this_delta;       // delta to apply to the 'this' pointer
 };
+
+PLIB_NAMESPACE_END()
+
 #endif
 
 #endif /* PCONFIG_H_ */

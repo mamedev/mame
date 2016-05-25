@@ -13,6 +13,8 @@
 #include "plists.h"
 #include "pstream.h"
 
+PLIB_NAMESPACE_START()
+
 class ptokenizer
 {
 	P_PREVENT_COPYING(ptokenizer)
@@ -186,7 +188,7 @@ private:
 
 	pstring process_line(const pstring &line);
 
-	phashmap_t<pstring, define_t> m_defines;
+	hashmap_t<pstring, define_t> m_defines;
 	pstring_vector_t m_expr_sep;
 
 	//pstringbuffer m_ret;
@@ -194,5 +196,7 @@ private:
 	int m_level;
 	int m_lineno;
 };
+
+PLIB_NAMESPACE_END()
 
 #endif /* PPARSER_H_ */

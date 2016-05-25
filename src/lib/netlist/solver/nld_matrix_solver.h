@@ -52,9 +52,9 @@ public:
 
 	unsigned m_railstart;
 
-	pvector_t<unsigned> m_nz;   /* all non zero for multiplication */
-	pvector_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
-	pvector_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
+	plib::pvector_t<unsigned> m_nz;   /* all non zero for multiplication */
+	plib::pvector_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
+	plib::pvector_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
 
 	/* state */
 	nl_double m_last_V;
@@ -62,19 +62,19 @@ public:
 	nl_double m_h_n_m_1;
 
 private:
-	pvector_t<int> m_net_other;
-	pvector_t<nl_double> m_go;
-	pvector_t<nl_double> m_gt;
-	pvector_t<nl_double> m_Idr;
-	pvector_t<nl_double *> m_other_curanalog;
-	pvector_t<terminal_t *> m_term;
+	plib::pvector_t<int> m_net_other;
+	plib::pvector_t<nl_double> m_go;
+	plib::pvector_t<nl_double> m_gt;
+	plib::pvector_t<nl_double> m_Idr;
+	plib::pvector_t<nl_double *> m_other_curanalog;
+	plib::pvector_t<terminal_t *> m_term;
 
 };
 
 class matrix_solver_t : public device_t
 {
 public:
-	using list_t = pvector_t<matrix_solver_t *>;
+	using list_t = plib::pvector_t<matrix_solver_t *>;
 	using dev_list_t = core_device_t::list_t;
 
 	enum eSortType
@@ -133,13 +133,13 @@ public:
 public:
 	ATTR_COLD int get_net_idx(net_t *net);
 
-	plog_base<NL_DEBUG> &log() { return netlist().log(); }
+	plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
 
 	virtual void log_stats();
 
-	virtual void create_solver_code(postream &strm)
+	virtual void create_solver_code(plib::postream &strm)
 	{
-		strm.writeline(pfmt("/* {1} doesn't support static compile */"));
+		strm.writeline(plib::pfmt("/* {1} doesn't support static compile */"));
 	}
 
 protected:
@@ -163,11 +163,11 @@ protected:
 	template <typename T>
 	void build_LE_RHS();
 
-	pvector_t<terms_t *> m_terms;
-	pvector_t<analog_net_t *> m_nets;
-	pvector_t<analog_output_t *> m_inps;
+	plib::pvector_t<terms_t *> m_terms;
+	plib::pvector_t<analog_net_t *> m_nets;
+	plib::pvector_t<analog_output_t *> m_inps;
 
-	pvector_t<terms_t *> m_rails_temp;
+	plib::pvector_t<terms_t *> m_rails_temp;
 
 	int m_stat_calculations;
 	int m_stat_newton_raphson;
