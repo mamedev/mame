@@ -2894,7 +2894,6 @@ files {
 createMESSProjects(_target, _subtarget, "usp")
 files {
 	MAME_DIR .. "src/mame/drivers/patinho_feio.cpp",
-	MAME_DIR .. "src/mame/includes/patinho_feio.h",
 }
 
 createMESSProjects(_target, _subtarget, "veb")
