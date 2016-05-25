@@ -53,7 +53,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, holeland_state )
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
-
+/* Note - manual states cocktail mode should be default */
 static INPUT_PORTS_START( holeland )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -80,7 +80,7 @@ static INPUT_PORTS_START( holeland )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x04, "Nihongo" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
@@ -121,6 +121,15 @@ static INPUT_PORTS_START( holeland )
 	PORT_DIPNAME( 0x80, 0x80, "Mode" ) /* seems to have no effect */
 	PORT_DIPSETTING(    0x00, "Stop" )
 	PORT_DIPSETTING(    0x80, "Play" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( holeland2 )
+        PORT_INCLUDE( holeland )
+
+        PORT_MODIFY("DSW1")
+        PORT_DIPNAME( 0x04, 0x04, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+        PORT_DIPSETTING(    0x04, DEF_STR( Spanish ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( crzrally )
@@ -521,8 +530,8 @@ ROM_START( crzrallyg )
 ROM_END
 
 
-GAME( 1984, holeland,  0,        holeland, holeland, driver_device, 0, ROT0,   "Tecfri", "Hole Land",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, holeland2, holeland, holeland, holeland, driver_device, 0, ROT0,   "Tecfri", "Hole Land (set 2)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //attract is different
+GAME( 1984, holeland,  0,        holeland, holeland, driver_device, 0, ROT0,   "Tecfri", "Hole Land (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, holeland2, holeland, holeland, holeland2, driver_device, 0, ROT0,   "Tecfri", "Hole Land (Spain)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //attract is different
 GAME( 1985, crzrally,  0,        crzrally, crzrally, driver_device, 0, ROT270, "Tecfri", "Crazy Rally (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, crzrallya, crzrally, crzrally, crzrally, driver_device, 0, ROT270, "Tecfri", "Crazy Rally (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, crzrallyg, crzrally, crzrally, crzrally, driver_device, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
