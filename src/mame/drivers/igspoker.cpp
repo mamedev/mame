@@ -1724,9 +1724,9 @@ static const gfx_layout charlayout =
 	8, 8,   /* 8*8 characters */
 	RGN_FRAC(1, 3),
 	6,      /* 6 bits per pixel */
-	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
-		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
-		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
+	{ RGN_FRAC(0,3)+8, RGN_FRAC(0,3)+0,
+		RGN_FRAC(1,3)+8, RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8, RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP8(0,2*8) },
 	8*8*2   /* every char takes 32 consecutive bytes */
@@ -1737,11 +1737,11 @@ static const gfx_layout charlayout2 =
 	8, 32,   /* 8*32 characters */
 	RGN_FRAC(1, 3*4),
 	6,      /* 6 bits per pixel */
-	{ RGN_FRAC(0, 3) + 8, RGN_FRAC(0, 3) + 0,
-		RGN_FRAC(1, 3) + 8, RGN_FRAC(1, 3) + 0,
-		RGN_FRAC(2, 3) + 8, RGN_FRAC(2, 3) + 0 },
-	{ STEP8(0, 1) },
-	{ STEP32(0, 2*8) },
+	{ RGN_FRAC(0,3)+8, RGN_FRAC(0,3)+0,
+		RGN_FRAC(1,3)+8, RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8, RGN_FRAC(2,3)+0 },
+	{ STEP8(0,1) },
+	{ STEP32(0,2*8) },
 	8*32*2
 };
 
@@ -2300,6 +2300,9 @@ ROM_END
   Seems that there's no way to switch between them. They are harcoded through the
   involved PLD's. Addressing lines lower than A12 are driven normally.
 
+  Even when the game has IGS copyright strings inside the program ROM, this set was
+  manufactured/released by PlayMark SRL in 1998 to deal with the italian 1995 laws.
+
 
   Main program ROM banking through PLDs...
 
@@ -2360,7 +2363,7 @@ ROM_END
 
 */
 ROM_START( chleagxa )
-	ROM_REGION( 0x40000, "maincpu", 0 )  // Each half contains a different set of data+program. Maybe the game needs banking.
+	ROM_REGION( 0x40000, "maincpu", 0 )  // Each half contains a different set of data+program. The game needs banking.
 	ROM_LOAD( "26.u15", 0x10000, 0x10000, CRC(84bf82db) SHA1(725ca115955cc68bc9a8b70fcf3b15ea47b6ffa2) )  // chleagxa, low combination. Cards GFX.
 	ROM_CONTINUE(       0x00000, 0x10000)
 	ROM_CONTINUE(       0x30000, 0x10000)  // chleagxa, high combination. Cans GFX.
@@ -2420,7 +2423,7 @@ ROM_END
   
 */
 ROM_START( chleagxb )
-	ROM_REGION( 0x40000, "maincpu", 0 )  // Each half contains a different set of data+program. Maybe the game needs banking.
+	ROM_REGION( 0x40000, "maincpu", 0 )  // Each half contains a different set of data+program.  The game needs banking.
 	ROM_LOAD( "26.u15", 0x10000, 0x10000, CRC(e9555257) SHA1(8a20d8faf8520b928f1979239343bd9de9e66e70) )  // chleagxb, low combination. Cards GFX.
 	ROM_CONTINUE(       0x00000, 0x10000)
 	ROM_CONTINUE(       0x30000, 0x10000)  // chleagxb, high combination. Cans GFX.
@@ -2680,8 +2683,8 @@ GAMEL( 1993?,cpokert,   cpoker,   igspoker, cpoker,   igspoker_state, cpokert,  
 GAMEL( 1993, cpokerx,   cpoker,   igspoker, cpokerx,  igspoker_state, cpokert,  ROT0, "IGS",                  "Champion Poker (v100)",                        0, layout_igspoker )
 GAMEL( 2000, chleague,  0,        igspoker, chleague, igspoker_state, chleague, ROT0, "IGS",                  "Champion League (v220I, Poker)",               0, layout_igspoker )
 GAMEL( 2000, chleagul,  chleague, igspoker, chleague, igspoker_state, chleague, ROT0, "IGS",                  "Champion League (v220I, Lattine)",             0, layout_igspoker )
-GAMEL( 1998, chleagxa,  chleague, igspoker, chleague, igspoker_state, chleague, ROT0, "IGS",                  "Champion League (v220I, dual program, set 1)", 0, layout_igspoker )
-GAMEL( 1998, chleagxb,  chleague, igspoker, chleague, igspoker_state, chleague, ROT0, "IGS",                  "Champion League (v220I, dual program, set 2)", 0, layout_igspoker )
+GAMEL( 1998, chleagxa,  chleague, igspoker, chleague, igspoker_state, chleague, ROT0, "PlayMark SRL",         "Champion League (v220I, dual program, set 1)", 0, layout_igspoker )
+GAMEL( 1998, chleagxb,  chleague, igspoker, chleague, igspoker_state, chleague, ROT0, "PlayMark SRL",         "Champion League (v220I, dual program, set 2)", 0, layout_igspoker )
 GAMEL( 198?, csk227it,  0,        csk227it, csk227,   igspoker_state, cska,     ROT0, "IGS",                  "Champion Skill (with Ability)",                0, layout_igspoker ) /* SU 062 */
 GAMEL( 198?, csk234it,  csk227it, csk234it, csk234,   igspoker_state, cska,     ROT0, "IGS",                  "Champion Skill (Ability, Poker & Symbols)",    0, layout_igspoker ) /* SU 062 */
 GAMEL( 2000, number10,  0,        number10, number10, igspoker_state, number10, ROT0, "PlayMark SRL",         "Number Dieci (Poker)",                         0, layout_igspoker )
