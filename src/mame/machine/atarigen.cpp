@@ -1242,8 +1242,6 @@ READ16_MEMBER(atarigen_state::slapstic_r)
 	if (!m_slapstic_device.found())
 		fatalerror("Slapstic device is missing?\n");
 
-	fprintf(stderr, "slapstic_r %04x\n", offset);
-
 	// fetch the result from the current bank first
 	int result = m_slapstic[offset & 0xfff];
 
