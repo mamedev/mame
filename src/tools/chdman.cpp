@@ -1790,6 +1790,10 @@ static void do_create_hd(parameters_t &params)
 		cylinders = (identdata[3] << 8) | identdata[2];
 		heads = (identdata[7] << 8) | identdata[6];
 		sectors = (identdata[13] << 8) | identdata[12];
+
+		// ignore CHS for > 8GB drives
+		if (input_file && filesize > 0x200000000)
+			cylinders = 0;
 	}
 
 	// extract geometry from the parent if we have one

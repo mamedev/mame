@@ -8139,6 +8139,7 @@ ROM_END
 //  Wonder Boy III, Sega System 16B
 //  CPU: FD1094 (317-0085)
 //  ROM Board type: 171-5358
+// Sega ID# for ROM board: 834-6854
 //
 //  Pos.   Silk        Type        Part                Pos.   Silk        Type        Part
 //  A1     EPR-12198   27C512      68000 program       B1     EPR-12190   27C512      Sprite data
