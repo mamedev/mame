@@ -1452,7 +1452,7 @@ end
 if (CPUS["PATINHOFEIO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio.cpp",
-		MAME_DIR .. "src/devices/cpu/patinhofeio/patinhofeio_cpu.h",
+		MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio.h",
 	}
 end
 
