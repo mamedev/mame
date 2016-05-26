@@ -14000,7 +14000,6 @@ ROM_END
 
   Flaming 7.
   Cyberdyne Systems, Inc.
-  Looks a W-4 derivative...
 
   Graphics: CGA
   Reels: 3 spinning reels.
@@ -14008,12 +14007,15 @@ ROM_END
   Bonus Games: Yes.
   Harness Type: Standard 36/10 Pin Cherry Master Harness.
 
+  Looks like a Wing W-4 derivative. There are at least 3 different hardwares:
+  Cyberdyne original PCB, Taiwanese custom PCB, and one close to Wing W-4.
+
   Graphics: 4 different types, selectable through DIP switches.
 
   1) Regular Fruits.
-  2) Numbers.
-  3) Custom Set 1
-  4) Custom Set 2
+  2) Numbers.     (Custom Option 1 in W-4 HW) 
+  3) Custom Set 1 (Custom Option 2 in W-4 HW)
+  4) Custom Set 2 (Custom Option 3 in W-4 HW)
 
   Titles / GFX upgrades:
 
@@ -14075,7 +14077,7 @@ ROM_END
 
   Tech Notes:
 
-  PCB has some hacks...
+  W-4 PCB type has some hacks...
 
   1) PPI 8255 pin 10 (PC7) is wired to pin 22 (PB4)...
      Maybe the boot protection?
@@ -14084,7 +14086,6 @@ ROM_END
      are wired with a DS2401 (sillicon serial number) device, to pins 1 & 2 (GND & DATA).
 
   3) Z80 /INT line (pin 16) is out of socket and wired to a 74161.
-
 
 */
 
@@ -14096,11 +14097,12 @@ ROM_END
   1) Red, White & Blue 7's
   2) Hollywood Nights.
 
-  Issues: At boot, writes "E6" on screen (5th row, 7th column).
-          Looks like an error code.
+  To boot the first time, press the BET 1 button (key M), and then BOOKS/STATS/SETUP (Key 0) twice.
+  For further boots, just press BET 1 button. (the real hardware boots straight due to electronic
+  serial number protection)
 
-  To boot the first time, press the BET button, and then STATS/SETUP twice.
-  For further boots, just press BET button. (the real hardware boots straight)
+  To enter the Bookkeeping/Setup mode, press BOOKS/STATS/SETUP (key 0). Use RESET key (key R) to
+  navigate between pages. Press BOOKS/STATS/SETUP (key 0) to exit the Bookkeeping mode.
 
 */
 ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights.
@@ -14149,7 +14151,7 @@ DRIVER_INIT_MEMBER(goldstar_state,goldstar)
 	}
 }
 
-// this block swapping is the same for chry10, chrygld and cb3
+//  this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
 void cb3_state::do_blockswaps(UINT8* ROM)
 {
