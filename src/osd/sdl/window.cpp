@@ -171,7 +171,7 @@ void sdl_osd_interface::build_slider_list()
 
 	for (auto window : sdl_window_list)
 	{
-		std::vector<ui_menu_item> window_sliders = window->renderer().get_slider_list();
+		std::vector<ui::menu_item> window_sliders = window->renderer().get_slider_list();
 		m_sliders.insert(m_sliders.end(), window_sliders.begin(), window_sliders.end());
 	}
 }

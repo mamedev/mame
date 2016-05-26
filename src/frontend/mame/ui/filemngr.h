@@ -10,10 +10,13 @@
 
 #pragma once
 
-#ifndef __UI_FILEMNGR_H__
-#define __UI_FILEMNGR_H__
+#ifndef MAME_FRONTEND_UI_FILEMNGR_H
+#define MAME_FRONTEND_UI_FILEMNGR_H
 
-class ui_menu_file_manager : public ui_menu {
+namespace ui {
+
+class menu_file_manager : public menu
+{
 public:
 	std::string current_directory;
 	std::string current_file;
@@ -21,8 +24,8 @@ public:
 
 	static void force_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings);
 
-	ui_menu_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings);
-	virtual ~ui_menu_file_manager();
+	menu_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings);
+	virtual ~menu_file_manager();
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -34,4 +37,6 @@ private:
 	bool m_curr_selected;
 };
 
-#endif  /* __UI_FILEMNGR_H__ */
+} // namespace ui
+
+#endif  /* MAME_FRONTEND_UI_FILEMNGR_H */

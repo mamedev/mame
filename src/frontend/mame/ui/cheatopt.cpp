@@ -16,14 +16,29 @@
 #include "ui/menu.h"
 #include "ui/cheatopt.h"
 
+
+namespace ui {
+
+// itemrefs for key menu items
+#define ITEMREF_CHEATS_RESET_ALL            ((void *) 0x0001)
+#define ITEMREF_CHEATS_RELOAD_ALL           ((void *) 0x0002)
+#define ITEMREF_CHEATS_AUTOFIRE_SETTINGS    ((void *) 0x0003)
+#define ITEMREF_CHEATS_FIRST_ITEM           ((void *) 0x0004)
+
+// itemrefs for key menu items
+#define ITEMREF_AUTOFIRE_STATUS       ((void *) 0x0001)
+#define ITEMREF_AUTOFIRE_DELAY        ((void *) 0x0002)
+#define ITEMREF_AUTOFIRE_FIRST_BUTTON ((void *) 0x0003)
+
+
 /*-------------------------------------------------
     menu_cheat - handle the cheat menu
 -------------------------------------------------*/
 
-void ui_menu_cheat::handle()
+void menu_cheat::handle()
 {
 	/* process the menu */
-	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
+	const event *menu_event = process(PROCESS_LR_REPEAT);
 
 
 	/* handle events */
@@ -87,19 +102,19 @@ void ui_menu_cheat::handle()
 			mame_machine_manager::instance()->cheat().reload();
 
 			/* display the reloaded cheats */
-			reset(UI_MENU_RESET_REMEMBER_REF);
+			reset(reset_options::REMEMBER_REF);
 			machine().popmessage(_("All cheats reloaded"));
 		}
 
 		/* handle autofire menu */
 		if (menu_event->itemref == ITEMREF_CHEATS_AUTOFIRE_SETTINGS && menu_event->iptkey == IPT_UI_SELECT)
 		{
-			ui_menu::stack_push(global_alloc_clear<ui_menu_autofire>(ui(), container));
+			menu::stack_push<menu_autofire>(ui(), container);
 		}
 
 		/* if things changed, update */
 		if (changed)
-			reset(UI_MENU_RESET_REMEMBER_REF);
+			reset(reset_options::REMEMBER_REF);
 	}
 }
 
@@ -108,11 +123,11 @@ void ui_menu_cheat::handle()
     menu_cheat_populate - populate the cheat menu
 -------------------------------------------------*/
 
-ui_menu_cheat::ui_menu_cheat(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
+menu_cheat::menu_cheat(mame_ui_manager &mui, render_container *container) : menu(mui, container)
 {
 }
 
-void ui_menu_cheat::populate()
+void menu_cheat::populate()
 {
 	/* iterate over cheats */
 	std::string text;
@@ -122,7 +137,7 @@ void ui_menu_cheat::populate()
 	item_append(_("Autofire Settings"), nullptr, 0, (void *)ITEMREF_CHEATS_AUTOFIRE_SETTINGS);
 
 	/* add a separator */
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 
 	// add other cheats
 	if (!mame_machine_manager::instance()->cheat().entries().empty()) {
@@ -134,7 +149,7 @@ void ui_menu_cheat::populate()
 		}
 
 		/* add a separator */
-		item_append(ui_menu_item_type::SEPARATOR);
+		item_append(menu_item_type::SEPARATOR);
 
 		/* add a reset all option */
 		item_append(_("Reset All"), nullptr, 0, (void *)ITEMREF_CHEATS_RESET_ALL);
@@ -144,7 +159,7 @@ void ui_menu_cheat::populate()
 	}
 }
 
-ui_menu_cheat::~ui_menu_cheat()
+menu_cheat::~menu_cheat()
 {
 }
 
@@ -157,7 +172,7 @@ ui_menu_cheat::~ui_menu_cheat()
     menu
 -------------------------------------------------*/
 
-ui_menu_autofire::ui_menu_autofire(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container), last_toggle(false)
+menu_autofire::menu_autofire(mame_ui_manager &mui, render_container *container) : menu(mui, container), last_toggle(false)
 {
 	const screen_device *screen = mui.machine().first_screen();
 
@@ -171,17 +186,17 @@ ui_menu_autofire::ui_menu_autofire(mame_ui_manager &mui, render_container *conta
 	}
 }
 
-ui_menu_autofire::~ui_menu_autofire()
+menu_autofire::~menu_autofire()
 {
 }
 
-void ui_menu_autofire::handle()
+void menu_autofire::handle()
 {
 	ioport_field *field;
 	bool changed = false;
 
 	/* process the menu */
-	const ui_menu_event *menu_event = process(0);
+	const event *menu_event = process(0);
 
 	/* handle events */
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
@@ -237,7 +252,7 @@ void ui_menu_autofire::handle()
 	/* if something changed, rebuild the menu */
 	if (changed)
 	{
-		reset(UI_MENU_RESET_REMEMBER_REF);
+		reset(reset_options::REMEMBER_REF);
 	}
 }
 
@@ -247,14 +262,14 @@ void ui_menu_autofire::handle()
     menu
 -------------------------------------------------*/
 
-void ui_menu_autofire::populate()
+void menu_autofire::populate()
 {
 	char temp_text[64];
 
 	/* add autofire toggle item */
 	bool autofire_toggle = machine().ioport().get_autofire_toggle();
 	item_append(_("Autofire Status"), (autofire_toggle ? _("Disabled") : _("Enabled")),
-			(autofire_toggle ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW), (void *)ITEMREF_AUTOFIRE_STATUS);
+			(autofire_toggle ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW), (void *)ITEMREF_AUTOFIRE_STATUS);
 
 	/* iterate over the input ports and add autofire toggle items */
 	int menu_items = 0;
@@ -272,7 +287,7 @@ void ui_menu_autofire::populate()
 				if (is_first_button)
 				{
 					/* add a separator for each player */
-					item_append(ui_menu_item_type::SEPARATOR);
+					item_append(menu_item_type::SEPARATOR);
 					is_first_button = false;
 				}
 				/* add an autofire item */
@@ -280,13 +295,13 @@ void ui_menu_autofire::populate()
 				{
 					// item is enabled and can be switched to values on/off
 					item_append(field.name(), (settings.autofire ? _("On") : _("Off")),
-							(settings.autofire ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW), (void *)&field);
+							(settings.autofire ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW), (void *)&field);
 				}
 				else
 				{
 					// item is disabled
 					item_append(field.name(), (settings.autofire ? _("On") : _("Off")),
-							MENU_FLAG_DISABLE | MENU_FLAG_INVERT, nullptr);
+							FLAG_DISABLE | FLAG_INVERT, nullptr);
 				}
 			}
 		}
@@ -295,27 +310,29 @@ void ui_menu_autofire::populate()
 	/* add text item if no buttons found */
 	if (menu_items==0)
 	{
-		item_append(ui_menu_item_type::SEPARATOR);
-		item_append(_("No buttons found on this machine!"), nullptr, MENU_FLAG_DISABLE, nullptr);
+		item_append(menu_item_type::SEPARATOR);
+		item_append(_("No buttons found on this machine!"), nullptr, FLAG_DISABLE, nullptr);
 	}
 
 	/* add a separator */
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 
 	/* add autofire delay item */
 	int value = machine().ioport().get_autofire_delay();
 	snprintf(temp_text, ARRAY_LENGTH(temp_text), "%d = %.2f Hz", value, (float)refresh/value);
 	if (!autofire_toggle)
 	{
-		item_append(_("Autofire Delay"), temp_text, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)ITEMREF_AUTOFIRE_DELAY);
+		item_append(_("Autofire Delay"), temp_text, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)ITEMREF_AUTOFIRE_DELAY);
 	}
 	else
 	{
-		item_append(_("Autofire Delay"), temp_text, MENU_FLAG_DISABLE | MENU_FLAG_INVERT, nullptr);
+		item_append(_("Autofire Delay"), temp_text, FLAG_DISABLE | FLAG_INVERT, nullptr);
 	}
 
 	/* add a separator */
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 
 	last_toggle = autofire_toggle;
 }
+
+} // namespace ui

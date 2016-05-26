@@ -11,21 +11,29 @@
 
 #pragma once
 
-#ifndef __UI_DATMENU_H__
-#define __UI_DATMENU_H__
+#ifndef MAME_FRONTEND_UI_DATMENU_H
+#define MAME_FRONTEND_UI_DATMENU_H
+
+#include "ui/menu.h"
+
+#include <string>
+#include <vector>
+
 
 struct ui_software_info;
+
+namespace ui {
 
 //-------------------------------------------------
 //  class dats menu
 //-------------------------------------------------
 
-class ui_menu_dats_view : public ui_menu
+class menu_dats_view : public menu
 {
 public:
-	ui_menu_dats_view(mame_ui_manager &mui, render_container *container, ui_software_info *swinfo, const game_driver *driver = nullptr);
-	ui_menu_dats_view(mame_ui_manager &mui, render_container *container, const game_driver *driver = nullptr);
-	virtual ~ui_menu_dats_view();
+	menu_dats_view(mame_ui_manager &mui, render_container *container, ui_software_info *swinfo, const game_driver *driver = nullptr);
+	menu_dats_view(mame_ui_manager &mui, render_container *container, const game_driver *driver = nullptr);
+	virtual ~menu_dats_view() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -49,4 +57,6 @@ private:
 	std::vector<list_items> m_items_list;
 };
 
-#endif  /* __UI_DATMENU_H__ */
+} // namespace ui
+
+#endif  /* MAME_FRONTEND_UI_DATMENU_H */

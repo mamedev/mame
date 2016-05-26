@@ -10,22 +10,27 @@
 
 #pragma once
 
-#ifndef __UI_VIDEOOPT_H__
-#define __UI_VIDEOOPT_H__
+#ifndef MAME_FRONTEND_UI_VIDEOOPT_H
+#define MAME_FRONTEND_UI_VIDEOOPT_H
 
+#include "ui/menu.h"
 
-class ui_menu_video_targets : public ui_menu {
+namespace ui {
+
+class menu_video_targets : public menu
+{
 public:
-	ui_menu_video_targets(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_video_targets();
+	menu_video_targets(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_video_targets() override;
 	virtual void populate() override;
 	virtual void handle() override;
 };
 
-class ui_menu_video_options : public ui_menu {
+class menu_video_options : public menu
+{
 public:
-	ui_menu_video_options(mame_ui_manager &mui, render_container *container, render_target *target);
-	virtual ~ui_menu_video_options();
+	menu_video_options(mame_ui_manager &mui, render_container *container, render_target *target);
+	virtual ~menu_video_options() override;
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -44,5 +49,6 @@ private:
 	render_target *target;
 };
 
+} // namespace ui
 
-#endif  /* __UI_VIDEOOPT_H__ */
+#endif  /* MAME_FRONTEND_UI_VIDEOOPT_H */

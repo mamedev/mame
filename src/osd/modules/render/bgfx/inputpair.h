@@ -33,7 +33,7 @@ public:
 	chain_manager& chains() const { return m_chains; }
 	std::string sampler() const { return m_sampler; }
 	std::string texture() const { return m_texture; }
-	std::vector<ui_menu_item> get_slider_list();
+	std::vector<ui::menu_item> get_slider_list();
 
 private:
 	void create_selection_slider(uint32_t screen_index);
@@ -46,7 +46,7 @@ private:
 	std::string               m_selection;
 	chain_manager&            m_chains;
 	int32_t                   m_current_texture;
-	ui_menu_item              m_selection_slider;
+	ui::menu_item             m_selection_slider;
 };
 
 #endif // __DRAWBGFX_INPUT_PAIR__

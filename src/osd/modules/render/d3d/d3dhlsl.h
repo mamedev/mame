@@ -303,7 +303,7 @@ public:
 	void init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *renderer);
 
 	bool enabled() { return master_enable; }
-	void toggle(std::vector<ui_menu_item>& sliders);
+	void toggle(std::vector<ui::menu_item>& sliders);
 
 	bool vector_enabled() { return master_enable && vector_enable; }
 	d3d_render_target* get_vector_target(render_primitive *prim);
@@ -338,11 +338,11 @@ public:
 	void                    remove_render_target(int source_width, int source_height, UINT32 screen_index, UINT32 page_index);
 	void                    remove_render_target(d3d_render_target *rt);
 
-	int create_resources(bool reset, std::vector<ui_menu_item>& sliders);
+	int create_resources(bool reset, std::vector<ui::menu_item>& sliders);
 	void delete_resources(bool reset);
 
 	// slider-related functions
-	std::vector<ui_menu_item> init_slider_list();
+	std::vector<ui::menu_item> init_slider_list();
 	void *get_slider_option(int id, int index = 0);
 
 private:

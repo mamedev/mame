@@ -121,7 +121,7 @@ std::string mame_ui_manager::messagebox_poptext;
 rgb_t mame_ui_manager::messagebox_backcolor;
 
 // slider info
-std::vector<ui_menu_item> mame_ui_manager::slider_list;
+std::vector<ui::menu_item> mame_ui_manager::slider_list;
 slider_state *mame_ui_manager::slider_current;
 
 
@@ -268,7 +268,7 @@ void mame_ui_manager::init()
 {
 	load_ui_options();
 	// initialize the other UI bits
-	ui_menu::init(machine(), options());
+	ui::menu::init(machine(), options());
 	ui_gfx_init(machine());
 
 	get_font_rows(&machine());
@@ -368,7 +368,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 	// loop over states
 	set_handler(handler_ingame, 0);
-	for (state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui_menu::stack_has_special_main_menu(); state++)
+	for (state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(); state++)
 	{
 		// default to standard colors
 		messagebox_backcolor = UI_BACKGROUND_COLOR;
@@ -397,7 +397,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				{
 					std::string warning;
 					warning.assign(_("This driver requires images to be loaded in the following device(s): ")).append(messagebox_text.substr(0, messagebox_text.length() - 2));
-					ui_menu_file_manager::force_file_manager(*this, &machine().render().ui_container(), warning.c_str());
+					ui::menu_file_manager::force_file_manager(*this, &machine().render().ui_container(), warning.c_str());
 				}
 				break;
 		}
@@ -407,7 +407,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		while (machine().input().poll_switches() != INPUT_CODE_INVALID) { }
 
 		// loop while we have a handler
-		while (m_handler_callback != handler_ingame && !machine().scheduled_event_pending() && !ui_menu::stack_has_special_main_menu())
+		while (m_handler_callback != handler_ingame && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu())
 		{
 			machine().video().frame_update();
 		}
@@ -418,8 +418,8 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	}
 
 	// if we're the empty driver, force the menus on
-	if (ui_menu::stack_has_special_main_menu())
-		set_handler(ui_menu::ui_handler, 0);
+	if (ui::menu::stack_has_special_main_menu())
+		set_handler(ui::menu::ui_handler, 0);
 }
 
 
@@ -460,7 +460,7 @@ void mame_ui_manager::update_and_render(render_container *container)
 	if (machine().phase() >= MACHINE_PHASE_RESET && (single_step() || machine().paused()))
 	{
 		int alpha = (1.0f - machine().options().pause_brightness()) * 255.0f;
-		if (ui_menu::stack_has_special_main_menu())
+		if (ui::menu::stack_has_special_main_menu())
 			alpha = 255;
 		if (alpha > 255)
 			alpha = 255;
@@ -979,7 +979,7 @@ bool mame_ui_manager::show_profiler() const
 
 void mame_ui_manager::show_menu()
 {
-	set_handler(ui_menu::ui_handler, 0);
+	set_handler(ui::menu::ui_handler, 0);
 }
 
 
@@ -1000,7 +1000,7 @@ void mame_ui_manager::show_mouse(bool status)
 
 bool mame_ui_manager::is_menu_active(void)
 {
-	return (m_handler_callback == ui_menu::ui_handler);
+	return (m_handler_callback == ui::menu::ui_handler);
 }
 
 
@@ -1300,7 +1300,7 @@ UINT32 mame_ui_manager::handler_messagebox_anykey(mame_ui_manager &mui, render_c
 }
 
 
-//-------------------------------------------------
+//-------------------------------------------------3
 //  process_natural_keyboard - processes any
 //  natural keyboard input
 //-------------------------------------------------
@@ -1597,11 +1597,11 @@ UINT32 mame_ui_manager::handler_ingame(mame_ui_manager &mui, render_container *c
 
 	// turn on menus if requested
 	if (mui.machine().ui_input().pressed(IPT_UI_CONFIGURE))
-		return mui.set_handler(ui_menu::ui_handler, 0);
+		return mui.set_handler(ui::menu::ui_handler, 0);
 
 	// if the on-screen display isn't up and the user has toggled it, turn it on
 	if ((mui.machine().debug_flags & DEBUG_FLAG_ENABLED) == 0 && mui.machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
-		return mui.set_handler(ui_menu_sliders::ui_handler, 1);
+		return mui.set_handler(ui::menu_sliders::ui_handler, 1);
 
 	// handle a reset request
 	if (mui.machine().ui_input().pressed(IPT_UI_RESET_MACHINE))
@@ -1886,7 +1886,7 @@ UINT32 mame_ui_manager::handler_confirm_quit(mame_ui_manager &mui, render_contai
 //  ui_get_slider_list - get the list of sliders
 //-------------------------------------------------
 
-std::vector<ui_menu_item>& mame_ui_manager::get_slider_list(void)
+std::vector<ui::menu_item>& mame_ui_manager::get_slider_list(void)
 {
 	return slider_list;
 }
@@ -1919,7 +1919,7 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 //  controls
 //----------------------------------------------------------
 
-std::vector<ui_menu_item> mame_ui_manager::slider_init(running_machine &machine)
+std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine)
 {
 	std::vector<slider_state *> sliders;
 
@@ -2051,15 +2051,15 @@ std::vector<ui_menu_item> mame_ui_manager::slider_init(running_machine &machine)
 	}
 #endif
 
-	std::vector<ui_menu_item> items;
+	std::vector<ui::menu_item> items;
 	for (slider_state *slider : sliders)
 	{
-		ui_menu_item item;
+		ui::menu_item item;
 		item.text = slider->description;
 		item.subtext = "";
 		item.flags = 0;
 		item.ref = slider;
-		item.type = ui_menu_item_type::SLIDER;
+		item.type = ui::menu_item_type::SLIDER;
 		items.push_back(item);
 	}
 
@@ -2815,5 +2815,5 @@ void mame_ui_manager::save_main_option()
 
 void mame_ui_manager::menu_reset()
 {
-	ui_menu::stack_reset(machine());
+	ui::menu::stack_reset(machine());
 }

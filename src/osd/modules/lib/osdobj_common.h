@@ -194,7 +194,7 @@ public:
 
 	// video overridables
 	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
-	virtual std::vector<ui_menu_item> get_slider_list() override;
+	virtual std::vector<ui::menu_item> get_slider_list() override;
 
 	// command option overrides
 	virtual bool execute_command(const char *command) override;
@@ -285,7 +285,7 @@ protected:
 	input_module*  m_joystick_input;
 	output_module* m_output;
 	std::unique_ptr<osd_watchdog> m_watchdog;
-	std::vector<ui_menu_item> m_sliders;
+	std::vector<ui::menu_item> m_sliders;
 
 private:
 	std::vector<const char *> m_video_names;

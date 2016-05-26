@@ -10,21 +10,28 @@
 
 #pragma once
 
-#ifndef __UI_INPUTMAP_H__
-#define __UI_INPUTMAP_H__
+#ifndef MAME_FRONTEND_UI_INPUTMAP_H
+#define MAME_FRONTEND_UI_INPUTMAP_H
 
-class ui_menu_input_groups : public ui_menu {
+#include "ui/menu.h"
+
+
+namespace ui {
+
+class menu_input_groups : public menu
+{
 public:
-	ui_menu_input_groups(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_input_groups();
+	menu_input_groups(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_input_groups() override;
 	virtual void populate() override;
 	virtual void handle() override;
 };
 
-class ui_menu_input : public ui_menu {
+class menu_input : public menu
+{
 public:
-	ui_menu_input(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_input();
+	menu_input(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_input() override;
 	virtual void handle() override;
 
 protected:
@@ -37,7 +44,8 @@ protected:
 	};
 
 	/* internal input menu item data */
-	struct input_item_data {
+	struct input_item_data
+	{
 		input_item_data *   next;               /* pointer to next item in the list */
 		const void *        ref;                /* reference to type description for global inputs or field for game inputs */
 		input_seq_type      seqtype;            /* sequence type */
@@ -66,10 +74,11 @@ private:
 	static int compare_items(const void *i1, const void *i2);
 };
 
-class ui_menu_input_general : public ui_menu_input {
+class menu_input_general : public menu_input
+{
 public:
-	ui_menu_input_general(mame_ui_manager &mui, render_container *container, int group);
-	virtual ~ui_menu_input_general();
+	menu_input_general(mame_ui_manager &mui, render_container *container, int group);
+	virtual ~menu_input_general() override;
 	virtual void populate() override;
 
 protected:
@@ -77,26 +86,29 @@ protected:
 	virtual void update_input(struct input_item_data *seqchangeditem) override;
 };
 
-class ui_menu_input_specific : public ui_menu_input {
+class menu_input_specific : public menu_input
+{
 public:
-	ui_menu_input_specific(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_input_specific();
+	menu_input_specific(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_input_specific() override;
 	virtual void populate() override;
 
 protected:
 	virtual void update_input(struct input_item_data *seqchangeditem) override;
 };
 
-class ui_menu_settings : public ui_menu {
+class menu_settings : public menu
+{
 public:
-	ui_menu_settings(mame_ui_manager &mui, render_container *container, UINT32 type);
-	virtual ~ui_menu_settings();
+	menu_settings(mame_ui_manager &mui, render_container *container, UINT32 type);
+	virtual ~menu_settings() override;
 	virtual void populate() override;
 	virtual void handle() override;
 
 protected:
 	/* DIP switch descriptor */
-	struct dip_descriptor {
+	struct dip_descriptor
+	{
 		dip_descriptor *    next;
 		const char *        name;
 		UINT32              mask;
@@ -108,26 +120,29 @@ protected:
 	int type;
 };
 
-class ui_menu_settings_dip_switches : public ui_menu_settings {
+class menu_settings_dip_switches : public menu_settings
+{
 public:
-	ui_menu_settings_dip_switches(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_settings_dip_switches();
+	menu_settings_dip_switches(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_settings_dip_switches() override;
 
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 private:
 	void custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, UINT32 selectedmask);
 };
 
-class ui_menu_settings_driver_config : public ui_menu_settings {
+class menu_settings_driver_config : public menu_settings
+{
 public:
-	ui_menu_settings_driver_config(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_settings_driver_config();
+	menu_settings_driver_config(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_settings_driver_config();
 };
 
-class ui_menu_analog : public ui_menu {
+class menu_analog : public menu
+{
 public:
-	ui_menu_analog(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_analog();
+	menu_analog(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_analog() override;
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -150,4 +165,6 @@ private:
 	};
 };
 
-#endif  /* __UI_INPUTMAP_H__ */
+} // namesapce ui
+
+#endif  /* MAME_FRONTEND_UI_INPUTMAP_H */

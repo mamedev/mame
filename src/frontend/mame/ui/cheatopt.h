@@ -10,33 +10,28 @@
 
 #pragma once
 
-#ifndef __UI_CHEATOPT_H__
-#define __UI_CHEATOPT_H__
+#ifndef MAME_FRONTEND_UI_CHEATOPT_H
+#define MAME_FRONTEND_UI_CHEATOPT_H
 
-// itemrefs for key menu items
-#define ITEMREF_CHEATS_RESET_ALL            ((void *) 0x0001)
-#define ITEMREF_CHEATS_RELOAD_ALL           ((void *) 0x0002)
-#define ITEMREF_CHEATS_AUTOFIRE_SETTINGS    ((void *) 0x0003)
-#define ITEMREF_CHEATS_FIRST_ITEM           ((void *) 0x0004)
+#include "ui/menu.h"
 
-class ui_menu_cheat : public ui_menu {
+namespace ui {
+
+class menu_cheat : public menu
+{
 public:
-	ui_menu_cheat(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_cheat();
+	menu_cheat(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_cheat() override;
 	virtual void populate() override;
 	virtual void handle() override;
 };
 
 
-// itemrefs for key menu items
-#define ITEMREF_AUTOFIRE_STATUS       ((void *) 0x0001)
-#define ITEMREF_AUTOFIRE_DELAY        ((void *) 0x0002)
-#define ITEMREF_AUTOFIRE_FIRST_BUTTON ((void *) 0x0003)
-
-class ui_menu_autofire : public ui_menu {
+class menu_autofire : public menu
+{
 public:
-	ui_menu_autofire(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_autofire();
+	menu_autofire(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_autofire() override;
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -45,5 +40,6 @@ private:
 	bool last_toggle;
 };
 
+} // namespace ui
 
-#endif  /* __UI_CHEATOPT_H__ */
+#endif  /* MAME_FRONTEND_UI_CHEATOPT_H */

@@ -10,16 +10,19 @@
 
 #pragma once
 
-#ifndef __UI_TAPECTRL_H__
-#define __UI_TAPECTRL_H__
+#ifndef MAME_FRONTEND_UI_TAPECTRL_H
+#define MAME_FRONTEND_UI_TAPECTRL_H
 
 #include "imagedev/cassette.h"
 #include "ui/devctrl.h"
 
-class ui_menu_tape_control : public ui_menu_device_control<cassette_image_device> {
+namespace ui {
+
+class menu_tape_control : public menu_device_control<cassette_image_device>
+{
 public:
-	ui_menu_tape_control(mame_ui_manager &mui, render_container *container, cassette_image_device *device);
-	virtual ~ui_menu_tape_control();
+	menu_tape_control(mame_ui_manager &mui, render_container *container, cassette_image_device *device);
+	virtual ~menu_tape_control() override;
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -27,4 +30,6 @@ private:
 	static void get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos);
 };
 
-#endif /* __UI_TAPECTRL_H__ */
+} // namespace ui
+
+#endif /* MAME_FRONTEND_UI_TAPECTRL_H */

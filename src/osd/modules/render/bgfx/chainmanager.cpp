@@ -404,12 +404,12 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 	state->id = screen_index;
 	strcpy(state->description, description.c_str());
 
-	ui_menu_item item;
+	ui::menu_item item;
 	item.text = state->description;
 	item.subtext = "";
 	item.flags = 0;
 	item.ref = state;
-	item.type = ui_menu_item_type::SLIDER;
+	item.type = ui::menu_item_type::SLIDER;
 	m_selection_sliders.push_back(item);
 }
 
@@ -519,9 +519,9 @@ std::vector<std::vector<float>> chain_manager::slider_settings()
 	return curr;
 }
 
-std::vector<ui_menu_item> chain_manager::get_slider_list()
+std::vector<ui::menu_item> chain_manager::get_slider_list()
 {
-	std::vector<ui_menu_item> sliders;
+	std::vector<ui::menu_item> sliders;
 
 	if (!needs_sliders())
 	{
@@ -544,8 +544,8 @@ std::vector<ui_menu_item> chain_manager::get_slider_list()
 			std::vector<bgfx_input_pair*> entry_inputs = entry->inputs();
 			for (bgfx_input_pair* input : entry_inputs)
 			{
-				std::vector<ui_menu_item> input_sliders = input->get_slider_list();
-				for (ui_menu_item slider : input_sliders)
+				std::vector<ui::menu_item> input_sliders = input->get_slider_list();
+				for (ui::menu_item slider : input_sliders)
 				{
 					sliders.push_back(slider);
 				}
@@ -557,12 +557,12 @@ std::vector<ui_menu_item> chain_manager::get_slider_list()
 		{
 			slider_state* core_slider = slider->core_slider();
 
-			ui_menu_item item;
+			ui::menu_item item;
 			item.text = core_slider->description;
 			item.subtext = "";
 			item.flags = 0;
 			item.ref = core_slider;
-			item.type = ui_menu_item_type::SLIDER;
+			item.type = ui::menu_item_type::SLIDER;
 			m_selection_sliders.push_back(item);
 
 			sliders.push_back(item);
@@ -570,12 +570,12 @@ std::vector<ui_menu_item> chain_manager::get_slider_list()
 
 		if (chain_sliders.size() > 0)
 		{
-			ui_menu_item item;
+			ui::menu_item item;
 			item.text = MENU_SEPARATOR_ITEM;
 			item.subtext = "";
 			item.flags = 0;
 			item.ref = nullptr;
-			item.type = ui_menu_item_type::SEPARATOR;
+			item.type = ui::menu_item_type::SEPARATOR;
 
 			sliders.push_back(item);
 		}

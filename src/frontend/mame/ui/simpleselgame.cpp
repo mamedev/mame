@@ -9,24 +9,29 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "mame.h"
-#include "emuopts.h"
-#include "ui/ui.h"
-#include "ui/menu.h"
-#include "uiinput.h"
+
 #include "ui/simpleselgame.h"
+
+#include "ui/ui.h"
 #include "ui/miscmenu.h"
 #include "ui/optsmenu.h"
-#include "drivenum.h"
+
 #include "audit.h"
+#include "drivenum.h"
+#include "emuopts.h"
+#include "mame.h"
+#include "uiinput.h"
+
 #include <ctype.h>
 
+
+namespace ui {
 
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
-ui_simple_menu_select_game::ui_simple_menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename) : ui_menu(mui, container), m_driverlist(driver_list::total() + 1)
+simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename) : menu(mui, container), m_driverlist(driver_list::total() + 1)
 {
 	build_driver_list();
 	if(gamename)
@@ -39,7 +44,7 @@ ui_simple_menu_select_game::ui_simple_menu_select_game(mame_ui_manager &mui, ren
 //  dtor
 //-------------------------------------------------
 
-ui_simple_menu_select_game::~ui_simple_menu_select_game()
+simple_menu_select_game::~simple_menu_select_game()
 {
 }
 
@@ -50,7 +55,7 @@ ui_simple_menu_select_game::~ui_simple_menu_select_game()
 //  drivers
 //-------------------------------------------------
 
-void ui_simple_menu_select_game::build_driver_list()
+void simple_menu_select_game::build_driver_list()
 {
 	// start with an empty list
 	m_drivlist = std::make_unique<driver_enumerator>(machine().options());
@@ -93,13 +98,13 @@ void ui_simple_menu_select_game::build_driver_list()
 //  handle - handle the game select menu
 //-------------------------------------------------
 
-void ui_simple_menu_select_game::handle()
+void simple_menu_select_game::handle()
 {
 	// ignore pause keys by swallowing them before we process the menu
 	machine().ui_input().pressed(IPT_UI_PAUSE);
 
 	// process the menu
-	const ui_menu_event *menu_event = process(0);
+	const event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		// reset the error on any future menu_event
@@ -140,13 +145,13 @@ void ui_simple_menu_select_game::handle()
 //  inkey_select
 //-------------------------------------------------
 
-void ui_simple_menu_select_game::inkey_select(const ui_menu_event *menu_event)
+void simple_menu_select_game::inkey_select(const event *menu_event)
 {
 	const game_driver *driver = (const game_driver *)menu_event->itemref;
 
 	// special case for configure inputs
 	if ((FPTR)driver == 1)
-		ui_menu::stack_push(global_alloc_clear<ui_menu_game_options>(ui(), container));
+		menu::stack_push<menu_game_options>(ui(), container);
 	// anything else is a driver
 	else
 	{
@@ -161,13 +166,13 @@ void ui_simple_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 		{
 			mame_machine_manager::instance()->schedule_new_driver(*driver);
 			machine().schedule_hard_reset();
-			ui_menu::stack_reset(machine());
+			menu::stack_reset(machine());
 		}
 
 		// otherwise, display an error
 		else
 		{
-			reset(UI_MENU_RESET_REMEMBER_REF);
+			reset(reset_options::REMEMBER_REF);
 			m_error = true;
 		}
 	}
@@ -178,13 +183,13 @@ void ui_simple_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 //  inkey_cancel
 //-------------------------------------------------
 
-void ui_simple_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
+void simple_menu_select_game::inkey_cancel(const event *menu_event)
 {
 	// escape pressed with non-empty text clears the text
 	if (m_search[0] != 0)
 	{
 		m_search[0] = '\0';
-		reset(UI_MENU_RESET_SELECT_FIRST);
+		reset(reset_options::SELECT_FIRST);
 	}
 }
 
@@ -193,7 +198,7 @@ void ui_simple_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
 //  inkey_special - typed characters append to the buffer
 //-------------------------------------------------
 
-void ui_simple_menu_select_game::inkey_special(const ui_menu_event *menu_event)
+void simple_menu_select_game::inkey_special(const event *menu_event)
 {
 	// typed characters append to the buffer
 	int buflen = strlen(m_search);
@@ -203,7 +208,7 @@ void ui_simple_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 	{
 		*(char *)utf8_previous_char(&m_search[buflen]) = 0;
 		m_rerandomize = true;
-		reset(UI_MENU_RESET_SELECT_FIRST);
+		reset(reset_options::SELECT_FIRST);
 	}
 
 	// if it's any other key and we're not maxed out, update
@@ -211,7 +216,7 @@ void ui_simple_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 	{
 		buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
 		m_search[buflen] = 0;
-		reset(UI_MENU_RESET_SELECT_FIRST);
+		reset(reset_options::SELECT_FIRST);
 	}
 }
 
@@ -220,7 +225,7 @@ void ui_simple_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 //  populate - populate the game select menu
 //-------------------------------------------------
 
-void ui_simple_menu_select_game::populate()
+void simple_menu_select_game::populate()
 {
 	int matchcount;
 	int curitem;
@@ -238,7 +243,7 @@ void ui_simple_menu_select_game::populate()
 				"the docs directory for information on configuring %2$s."),
 				emulator_info::get_configname(),
 				emulator_info::get_appname());
-		item_append(txt.c_str(), nullptr, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, nullptr);
+		item_append(txt.c_str(), nullptr, FLAG_MULTILINE | FLAG_REDTEXT, nullptr);
 		return;
 	}
 
@@ -255,14 +260,14 @@ void ui_simple_menu_select_game::populate()
 		if (curmatch != -1)
 		{
 			int cloneof = m_drivlist->non_bios_clone(curmatch);
-			item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).description, (cloneof == -1) ? 0 : MENU_FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
+			item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).description, (cloneof == -1) ? 0 : FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
 		}
 	}
 
 	// if we're forced into this, allow general input configuration as well
-	if (ui_menu::stack_has_special_main_menu())
+	if (menu::stack_has_special_main_menu())
 	{
-		item_append(ui_menu_item_type::SEPARATOR);
+		item_append(menu_item_type::SEPARATOR);
 		item_append(_("Configure Options"), nullptr, 0, (void *)1);
 		skip_main_items = 1;
 	}
@@ -277,7 +282,7 @@ void ui_simple_menu_select_game::populate()
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
-void ui_simple_menu_select_game::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void simple_menu_select_game::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	const game_driver *driver;
 	float width, maxwidth;
@@ -425,18 +430,16 @@ void ui_simple_menu_select_game::custom_render(void *selectedref, float top, flo
 //  select menu to be visible and inescapable
 //-------------------------------------------------
 
-void ui_simple_menu_select_game::force_game_select(mame_ui_manager &mui, render_container *container)
+void simple_menu_select_game::force_game_select(mame_ui_manager &mui, render_container *container)
 {
 	char *gamename = (char *)mui.machine().options().system_name();
 
 	// reset the menu stack
-	ui_menu::stack_reset(mui.machine());
+	menu::stack_reset(mui.machine());
 
 	// add the quit entry followed by the game select entry
-	ui_menu *quit = global_alloc_clear<ui_menu_quit_game>(mui, container);
-	quit->set_special_main_menu(true);
-	ui_menu::stack_push(quit);
-	ui_menu::stack_push(global_alloc_clear<ui_simple_menu_select_game>(mui, container, gamename));
+	menu::stack_push_special_main<menu_quit_game>(mui, container);
+	menu::stack_push<simple_menu_select_game>(mui, container, gamename);
 
 	// force the menus on
 	mui.show_menu();
@@ -444,3 +447,5 @@ void ui_simple_menu_select_game::force_game_select(mame_ui_manager &mui, render_
 	// make sure MAME is paused
 	mui.machine().pause();
 }
+
+} // namespace ui

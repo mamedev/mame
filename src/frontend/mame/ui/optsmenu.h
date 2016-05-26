@@ -10,14 +10,18 @@
 
 #pragma once
 
-#ifndef __UI_OPTSMENU_H__
-#define __UI_OPTSMENU_H__
+#ifndef MAME_FRONTEND_UI_OPTSMENU_H
+#define MAME_FRONTEND_UI_OPTSMENU_H
 
-class ui_menu_game_options : public ui_menu
+#include "ui/menu.h"
+
+namespace ui {
+
+class menu_game_options : public menu
 {
 public:
-	ui_menu_game_options(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_game_options();
+	menu_game_options(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_game_options() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -46,4 +50,6 @@ private:
 	};
 };
 
-#endif /* __UI_OPTSMENU_H__ */
+} // namespace ui
+
+#endif /* MAME_FRONTEND_UI_OPTSMENU_H */

@@ -314,9 +314,9 @@ void emulator_info::display_ui_chooser(running_machine& machine)
 	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 	render_container *container = &machine.render().ui_container();
 	if (strcmp(machine.options().ui(), "simple") == 0)
-		ui_simple_menu_select_game::force_game_select(mui, container);
+		ui::simple_menu_select_game::force_game_select(mui, container);
 	else
-		ui_menu_select_game::force_game_select(mui, container);
+		ui::menu_select_game::force_game_select(mui, container);
 }
 
 int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[])

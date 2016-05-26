@@ -111,12 +111,12 @@ void bgfx_input_pair::create_selection_slider(uint32_t screen_index)
 	state->id = screen_index;
 	strcpy(state->description, description.c_str());
 
-	ui_menu_item item;
+	ui::menu_item item;
 	item.text = state->description;
 	item.subtext = "";
 	item.flags = 0;
 	item.ref = state;
-	item.type = ui_menu_item_type::SLIDER;
+	item.type = ui::menu_item_type::SLIDER;
 	m_selection_slider = item;
 }
 
@@ -125,9 +125,9 @@ bool bgfx_input_pair::needs_sliders()
 	return chains().screen_count() > 0 && m_available_textures.size() > 1;
 }
 
-std::vector<ui_menu_item> bgfx_input_pair::get_slider_list()
+std::vector<ui::menu_item> bgfx_input_pair::get_slider_list()
 {
-	std::vector<ui_menu_item> sliders;
+	std::vector<ui::menu_item> sliders;
 
 	if (!needs_sliders())
 	{

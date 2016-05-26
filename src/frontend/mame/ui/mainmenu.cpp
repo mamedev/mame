@@ -35,19 +35,21 @@
 #include "ui/pluginopt.h"
 
 
+namespace ui {
+
 /***************************************************************************
     MENU HANDLERS
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ui_menu_main constructor - populate the main menu
+    menu_main constructor - populate the main menu
 -------------------------------------------------*/
 
-ui_menu_main::ui_menu_main(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
+menu_main::menu_main(mame_ui_manager &mui, render_container *container) : menu(mui, container)
 {
 }
 
-void ui_menu_main::populate()
+void menu_main::populate()
 {
 	/* add input menu items */
 	item_append(_("Input (general)"), nullptr, 0, (void *)INPUT_GROUPS);
@@ -131,7 +133,7 @@ void ui_menu_main::populate()
 	if (ui().options().enabled_dats() && mame_machine_manager::instance()->datfile().has_data())
 		item_append(_("External DAT View"), nullptr, 0, (void *)EXTERNAL_DATS);
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 
 	/* add favorite menu */
 	if (!mame_machine_manager::instance()->favorite().isgame_favorite())
@@ -139,7 +141,7 @@ void ui_menu_main::populate()
 	else
 		item_append(_("Remove From Favorites"), nullptr, 0, (void *)REMOVE_FAVORITE);
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 
 //  item_append(_("Quit from Machine"), nullptr, 0, (void *)QUIT_GAME);
 
@@ -147,7 +149,7 @@ void ui_menu_main::populate()
 	item_append(_("Select New Machine"), nullptr, 0, (void *)SELECT_GAME);
 }
 
-ui_menu_main::~ui_menu_main()
+menu_main::~menu_main()
 {
 }
 
@@ -155,129 +157,130 @@ ui_menu_main::~ui_menu_main()
     menu_main - handle the main menu
 -------------------------------------------------*/
 
-void ui_menu_main::handle()
+void menu_main::handle()
 {
 	/* process the menu */
-	const ui_menu_event *menu_event = process(0);
+	const event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT) {
 		switch((long long)(menu_event->itemref)) {
 		case INPUT_GROUPS:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_input_groups>(ui(), container));
+			menu::stack_push<menu_input_groups>(ui(), container);
 			break;
 
 		case INPUT_SPECIFIC:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_input_specific>(ui(), container));
+			menu::stack_push<menu_input_specific>(ui(), container);
 			break;
 
 		case SETTINGS_DIP_SWITCHES:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_settings_dip_switches>(ui(), container));
+			menu::stack_push<menu_settings_dip_switches>(ui(), container);
 			break;
 
 		case SETTINGS_DRIVER_CONFIG:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_settings_driver_config>(ui(), container));
+			menu::stack_push<menu_settings_driver_config>(ui(), container);
 			break;
 
 		case ANALOG:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_analog>(ui(), container));
+			menu::stack_push<menu_analog>(ui(), container);
 			break;
 
 		case BOOKKEEPING:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_bookkeeping>(ui(), container));
+			menu::stack_push<menu_bookkeeping>(ui(), container);
 			break;
 
 		case GAME_INFO:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_game_info>(ui(), container));
+			menu::stack_push<menu_game_info>(ui(), container);
 			break;
 
 		case IMAGE_MENU_IMAGE_INFO:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_image_info>(ui(), container));
+			menu::stack_push<menu_image_info>(ui(), container);
 			break;
 
 		case IMAGE_MENU_FILE_MANAGER:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_file_manager>(ui(), container, nullptr));
+			menu::stack_push<menu_file_manager>(ui(), container, nullptr);
 			break;
 
 		case TAPE_CONTROL:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_tape_control>(ui(), container, nullptr));
+			menu::stack_push<menu_tape_control>(ui(), container, nullptr);
 			break;
 
 		case PTY_INFO:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_pty_info>(ui(), container));
+			menu::stack_push<menu_pty_info>(ui(), container);
 			break;
 
 		case SLOT_DEVICES:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_slot_devices>(ui(), container));
+			menu::stack_push<menu_slot_devices>(ui(), container);
 			break;
 
 		case NETWORK_DEVICES:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_network_devices>(ui(), container));
+			menu::stack_push<menu_network_devices>(ui(), container);
 			break;
 
 		case KEYBOARD_MODE:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_keyboard_mode>(ui(), container));
+			menu::stack_push<menu_keyboard_mode>(ui(), container);
 			break;
 
 		case SLIDERS:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_sliders>(ui(), container, false));
+			menu::stack_push<menu_sliders>(ui(), container, false);
 			break;
 
 		case VIDEO_TARGETS:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_video_targets>(ui(), container));
+			menu::stack_push<menu_video_targets>(ui(), container);
 			break;
 
 		case VIDEO_OPTIONS:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_video_options>(ui(), container, machine().render().first_target()));
+			menu::stack_push<menu_video_options>(ui(), container, machine().render().first_target());
 			break;
 
 		case CROSSHAIR:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_crosshair>(ui(), container));
+			menu::stack_push<menu_crosshair>(ui(), container);
 			break;
 
 		case CHEAT:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_cheat>(ui(), container));
+			menu::stack_push<menu_cheat>(ui(), container);
 			break;
 
 		case PLUGINS:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_plugin>(ui(), container));
+			menu::stack_push<menu_plugin>(ui(), container);
 			break;
 
 		case SELECT_GAME:
-			if (strcmp(machine().options().ui(),"simple")==0) {
-				ui_menu::stack_push(global_alloc_clear<ui_simple_menu_select_game>(ui(), container, nullptr));
-			} else {
-				ui_menu::stack_push(global_alloc_clear<ui_menu_select_game>(ui(), container, nullptr));
-			}
+			if (strcmp(machine().options().ui(),"simple")==0)
+				menu::stack_push<simple_menu_select_game>(ui(), container, nullptr);
+			else
+				menu::stack_push<menu_select_game>(ui(), container, nullptr);
 			break;
 
 		case BIOS_SELECTION:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_bios_selection>(ui(), container));
+			menu::stack_push<menu_bios_selection>(ui(), container);
 			break;
 
 		case BARCODE_READ:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_barcode_reader>(ui(), container, nullptr));
+			menu::stack_push<menu_barcode_reader>(ui(), container, nullptr);
 			break;
 
 		case EXTERNAL_DATS:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_dats_view>(ui(), container));
+			menu::stack_push<menu_dats_view>(ui(), container);
 			break;
 
 		case ADD_FAVORITE:
 			mame_machine_manager::instance()->favorite().add_favorite_game();
-			reset(UI_MENU_RESET_REMEMBER_POSITION);
+			reset(reset_options::REMEMBER_POSITION);
 			break;
 
 		case REMOVE_FAVORITE:
 			mame_machine_manager::instance()->favorite().remove_favorite_game();
-			reset(UI_MENU_RESET_REMEMBER_POSITION);
+			reset(reset_options::REMEMBER_POSITION);
 			break;
 
 		case QUIT_GAME:
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 			ui().request_quit();
 			break;
 
 		default:
-			fatalerror("ui_menu_main::handle - unknown reference\n");
+			fatalerror("ui::menu_main::handle - unknown reference\n");
 		}
 	}
 }
+
+} // namespace ui

@@ -9,31 +9,34 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ui/menu.h"
+
 #include "ui/info.h"
 #include "ui/ui.h"
+
 #include "softlist.h"
+
+namespace ui {
 
 /*-------------------------------------------------
   menu_game_info - handle the game information
   menu
  -------------------------------------------------*/
 
-ui_menu_game_info::ui_menu_game_info(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
+menu_game_info::menu_game_info(mame_ui_manager &mui, render_container *container) : menu(mui, container)
 {
 }
 
-ui_menu_game_info::~ui_menu_game_info()
+menu_game_info::~menu_game_info()
 {
 }
 
-void ui_menu_game_info::populate()
+void menu_game_info::populate()
 {
 	std::string tempstring;
-	item_append(ui().game_info_astring(tempstring).c_str(), nullptr, MENU_FLAG_MULTILINE, nullptr);
+	item_append(ui().game_info_astring(tempstring).c_str(), nullptr, FLAG_MULTILINE, nullptr);
 }
 
-void ui_menu_game_info::handle()
+void menu_game_info::handle()
 {
 	// process the menu
 	process(0);
@@ -41,28 +44,28 @@ void ui_menu_game_info::handle()
 
 
 /*-------------------------------------------------
-  ui_menu_image_info - handle the image information
+  menu_image_info - handle the image information
   menu
  -------------------------------------------------*/
 
-ui_menu_image_info::ui_menu_image_info(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
+menu_image_info::menu_image_info(mame_ui_manager &mui, render_container *container) : menu(mui, container)
 {
 }
 
-ui_menu_image_info::~ui_menu_image_info()
+menu_image_info::~menu_image_info()
 {
 }
 
-void ui_menu_image_info::populate()
+void menu_image_info::populate()
 {
-	item_append(machine().system().description, nullptr, MENU_FLAG_DISABLE, nullptr);
-	item_append("", nullptr, MENU_FLAG_DISABLE, nullptr);
+	item_append(machine().system().description, nullptr, FLAG_DISABLE, nullptr);
+	item_append("", nullptr, FLAG_DISABLE, nullptr);
 
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 		image_info(&image);
 }
 
-void ui_menu_image_info::handle()
+void menu_image_info::handle()
 {
 	// process the menu
 	process(0);
@@ -74,7 +77,7 @@ void ui_menu_image_info::handle()
   image interface device
 -------------------------------------------------*/
 
-void ui_menu_image_info::image_info(device_image_interface *image)
+void menu_image_info::image_info(device_image_interface *image)
 {
 	if (image->exists())
 	{
@@ -85,19 +88,19 @@ void ui_menu_image_info::image_info(device_image_interface *image)
 		if (image->software_entry())
 		{
 			// display long filename
-			item_append(image->longname(), "", MENU_FLAG_DISABLE, nullptr);
+			item_append(image->longname(), "", FLAG_DISABLE, nullptr);
 
 			// display manufacturer and year
-			item_append(string_format("%s, %s", image->manufacturer(), image->year()).c_str(), "", MENU_FLAG_DISABLE, nullptr);
+			item_append(string_format("%s, %s", image->manufacturer(), image->year()).c_str(), "", FLAG_DISABLE, nullptr);
 
 			// display supported information, if available
 			switch (image->supported())
 			{
 				case SOFTWARE_SUPPORTED_NO:
-					item_append(_("Not supported"), "", MENU_FLAG_DISABLE, nullptr);
+					item_append(_("Not supported"), "", FLAG_DISABLE, nullptr);
 					break;
 				case SOFTWARE_SUPPORTED_PARTIAL:
-					item_append(_("Partially supported"), "", MENU_FLAG_DISABLE, nullptr);
+					item_append(_("Partially supported"), "", FLAG_DISABLE, nullptr);
 					break;
 				default:
 					break;
@@ -106,5 +109,7 @@ void ui_menu_image_info::image_info(device_image_interface *image)
 	}
 	else
 		item_append(image->brief_instance_name(), _("[empty]"), 0, nullptr);
-	item_append("", nullptr, MENU_FLAG_DISABLE, nullptr);
+	item_append("", nullptr, FLAG_DISABLE, nullptr);
 }
+
+} // namespace ui

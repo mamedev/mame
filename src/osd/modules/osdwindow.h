@@ -238,7 +238,7 @@ public:
 	virtual render_primitive_list *get_primitives() = 0;
 
 	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) { }
-	virtual std::vector<ui_menu_item> get_slider_list() { return m_sliders; }
+	virtual std::vector<ui::menu_item> get_slider_list() { return m_sliders; }
 	virtual int draw(const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) { return 0; };
 	virtual void save() { };
@@ -254,7 +254,7 @@ protected:
 	/* Internal flags */
 	static const int FI_CHANGED                 = 0x010000;
 	bool                        m_sliders_dirty;
-	std::vector<ui_menu_item>   m_sliders;
+	std::vector<ui::menu_item>   m_sliders;
 
 private:
 	std::weak_ptr<osd_window>  m_window;
