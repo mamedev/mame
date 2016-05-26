@@ -72,7 +72,6 @@ private:
 	dynamic_bind<BOOL(WINAPI *)(HANDLE, LPCTSTR, BOOL)> m_sym_initialize;
 	dynamic_bind<PVOID(WINAPI *)(HANDLE, DWORD64)> m_sym_function_table_access_64;
 	dynamic_bind<DWORD64(WINAPI *)(HANDLE, DWORD64)> m_sym_get_module_base_64;
-	dynamic_bind<VOID(WINAPI *)(PCONTEXT)> m_rtl_capture_context;
 
 	static bool     s_initialized;
 };
@@ -180,8 +179,7 @@ stack_walker::stack_walker()
 	m_stack_walk_64(TEXT("dbghelp.dll"), "StackWalk64"),
 	m_sym_initialize(TEXT("dbghelp.dll"), "SymInitialize"),
 	m_sym_function_table_access_64(TEXT("dbghelp.dll"), "SymFunctionTableAccess64"),
-	m_sym_get_module_base_64(TEXT("dbghelp.dll"), "SymGetModuleBase64"),
-	m_rtl_capture_context(TEXT("kernel32.dll"), "RtlCaptureContext")
+	m_sym_get_module_base_64(TEXT("dbghelp.dll"), "SymGetModuleBase64")
 {
 	// zap the structs
 	memset(&m_stackframe, 0, sizeof(m_stackframe));
@@ -203,9 +201,7 @@ stack_walker::stack_walker()
 bool stack_walker::reset()
 {
 	// set up the initial state
-	if (!m_rtl_capture_context)
-		return false;
-	(*m_rtl_capture_context)(&m_context);
+	RtlCaptureContext(&m_context);
 	m_thread = GetCurrentThread();
 	m_first = true;
 

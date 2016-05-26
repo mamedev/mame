@@ -360,17 +360,11 @@ static void loadgl_functions(osd_gl_context *context)
 osd_gl_dispatch *gl_dispatch;
 #endif
 
-#ifdef OSD_WINDOWS
-HMODULE win_gl_context::m_module;
-#endif
-
 void renderer_ogl::load_gl_lib(running_machine &machine)
 {
 	if (!s_dll_loaded)
 	{
-#ifdef OSD_WINDOWS
-		win_gl_context::load_library();
-#else
+#ifndef OSD_WINDOWS
 #ifdef USE_DISPATCH_GL
 		/*
 		 *  directfb and and x11 use this env var
