@@ -9,7 +9,7 @@
 /*
  *  DM7400: Quad 2-Input NAND Gates
  *
- *                  __
+ *                  _
  *              Y = AB
  *          +---+---++---+
  *          | A | B || Y |
@@ -85,7 +85,7 @@ NETLIST_END()
 
 /*
  *   DM7404: Hex Inverting Gates
- *                 _
+ *                 
  *             Y = A
  *          +---++---+
  *          | A || Y |
@@ -162,7 +162,7 @@ NETLIST_END()
 
 /*
  *  DM7410: Triple 3-Input NAND Gates
- *                  ___
+ *                  __
  *              Y = ABC
  *          +---+---+---++---+
  *          | A | B | C || Y |
@@ -266,7 +266,7 @@ NETLIST_END()
 /*
  *  DM7420: Dual 4-Input NAND Gates
  *
- *                  ____
+ *                  ___
  *              Y = ABCD
  *          +---+---+---+---++---+
  *          | A | B | C | D || Y |
@@ -304,7 +304,7 @@ NETLIST_END()
 /*
  *  DM7425: Dual 4-Input NOR Gates
  *
- *                  _______
+ *                  ______
  *              Y = A+B+C+D
  *          +---+---+---+---+---++---+
  *          | A | B | C | D | X || Y |
@@ -346,7 +346,7 @@ NETLIST_END()
 /*
  *  DM7427: Triple 3-Input NOR Gates
  *
- *                  _____
+ *                  ____
  *              Y = A+B+C
  *          +---+---+---++---+
  *          | A | B | C || Y |
@@ -384,7 +384,7 @@ NETLIST_END()
 /*
  *  DM7430: 8-Input NAND Gate
  *
- *                  ________
+ *                  _______
  *              Y = ABCDEFGH
  *          +---+---+---+---+---+---+---+---++---+
  *          | A | B | C | D | E | F | G | H || Y |
@@ -424,7 +424,7 @@ NETLIST_END()
 /*
  *  DM7432: Quad 2-Input OR Gates
  *
- *                  ___
+ *                  __
  *              Y = A+B
  *          +---+---++---+
  *          | A | B || Y |
@@ -464,7 +464,7 @@ NETLIST_END()
 /*
  *  DM7437: Quad 2-Input NAND Gates
  *
- *                  __
+ *                  _
  *              Y = AB
  *          +---+---++---+
  *          | A | B || Y |

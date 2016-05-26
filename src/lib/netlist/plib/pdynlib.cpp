@@ -6,7 +6,7 @@
  */
 
 #include <plib/pdynlib.h>
-#ifdef _WIN32
+#ifdef WIN32
 #include "windows.h"
 #else
 #include <dlfcn.h>
@@ -17,7 +17,7 @@ PLIB_NAMESPACE_START()
 dynlib::dynlib(const pstring libname)
 : m_isLoaded(false), m_lib(nullptr)
 {
-#ifdef _WIN32
+#ifdef WIN32
 	//fprintf(stderr, "win: loading <%s>\n", libname.cstr());
 	if (libname != "")
 		m_lib = LoadLibrary(libname.cstr());
@@ -44,7 +44,7 @@ dynlib::dynlib(const pstring path, const pstring libname)
 : m_isLoaded(false), m_lib(nullptr)
 {
 	//	printf("win: loading <%s>\n", libname.cstr());
-#ifdef _WIN32
+#ifdef WIN32
 	if (libname != "")
 		m_lib = LoadLibrary(libname.cstr());
 	else
@@ -74,7 +74,7 @@ dynlib::~dynlib()
 {
 	if (m_lib != nullptr)
 	{
-#ifdef _WIN32
+#ifdef WIN32
 #else
 		dlclose(m_lib);
 		//printf("Closed %s\n", dlerror());
@@ -89,7 +89,7 @@ bool dynlib::isLoaded() const
 
 void *dynlib::getsym_p(const pstring name)
 {
-#ifdef _WIN32
+#ifdef WIN32
 	return (void *) GetProcAddress((HMODULE) m_lib, name.cstr());
 #else
 	return dlsym(m_lib, name.cstr());

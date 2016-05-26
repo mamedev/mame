@@ -23,14 +23,14 @@
 #include "plib/pstream.h"
 #include "plib/pfmtlog.h"
 
-#define LOG(_name, _I)                                                        \
-		NET_REGISTER_DEV(??PG, _name)                                         \
-		NET_CONNECT(_name, I, _I)
+#define LOG(name, cI)                                                        \
+		NET_REGISTER_DEV(??PG, name)                                         \
+		NET_CONNECT(name, I, cI)
 
-#define LOGD(_name, _I, _I2)                                                 \
-		NET_REGISTER_DEV(LOGD, _name)                                        \
-		NET_CONNECT(_name, I, _I)                                            \
-		NET_CONNECT(_name, I2, _I2)
+#define LOGD(name, cI, cI2)                                                 \
+		NET_REGISTER_DEV(LOGD, name)                                        \
+		NET_CONNECT(name, I, cI)                                            \
+		NET_CONNECT(name, I2, cI2)
 
 
 NETLIB_NAMESPACE_DEVICES_START()

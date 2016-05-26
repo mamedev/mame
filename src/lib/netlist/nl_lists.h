@@ -22,7 +22,7 @@
 
 namespace netlist
 {
-	template <class _Element, class _Time>
+	template <class Element, class Time>
 	class timed_queue
 	{
 		P_PREVENT_COPYING(timed_queue)
@@ -39,10 +39,10 @@ namespace netlist
 			ATTR_HOT  entry_t(const entry_t &right) NOEXCEPT
 			:  m_exec_time(right.m_exec_time), m_object(right.m_object) {}
 #endif
-			ATTR_HOT  entry_t(const _Time &atime, const _Element &elem) NOEXCEPT
+			ATTR_HOT  entry_t(const Time &atime, const Element &elem) NOEXCEPT
 			: m_exec_time(atime), m_object(elem)  {}
-			ATTR_HOT  const _Time &exec_time() const { return m_exec_time; }
-			ATTR_HOT  const _Element &object() const { return m_object; }
+			ATTR_HOT  const Time &exec_time() const { return m_exec_time; }
+			ATTR_HOT  const Element &object() const { return m_object; }
 #if 0
 			ATTR_HOT  entry_t &operator=(const entry_t &right) NOEXCEPT {
 				m_exec_time = right.m_exec_time;
@@ -51,8 +51,8 @@ namespace netlist
 			}
 #endif
 		private:
-			_Time m_exec_time;
-			_Element m_object;
+			Time m_exec_time;
+			Element m_object;
 		};
 
 		timed_queue(unsigned list_size)
@@ -75,7 +75,7 @@ namespace netlist
 			while (m_lock.exchange(1)) { }
 	#endif
 #if 1
-			const _Time t = e.exec_time();
+			const Time t = e.exec_time();
 			entry_t * i = m_end++;
 			for (; t > (i - 1)->exec_time(); i--)
 			{
@@ -98,7 +98,7 @@ namespace netlist
 	#if HAS_OPENMP && USE_OPENMP
 			m_lock = 0;
 	#endif
-			//nl_assert(m_end - m_list < _Size);
+			//nl_assert(m_end - m_list < Size);
 		}
 
 		ATTR_HOT  const entry_t & pop() NOEXCEPT
@@ -111,7 +111,7 @@ namespace netlist
 			return *(m_end-1);
 		}
 
-		ATTR_HOT  void remove(const _Element &elem) NOEXCEPT
+		ATTR_HOT  void remove(const Element &elem) NOEXCEPT
 		{
 			/* Lock */
 	#if HAS_OPENMP && USE_OPENMP
@@ -145,7 +145,7 @@ namespace netlist
 			 * the insert algo above will run into this element and doesn't
 			 * need a comparison with queue start.
 			 */
-			m_list[0] = entry_t(_Time::from_raw(~0), _Element(0));
+			m_list[0] = entry_t(Time::from_raw(~0), Element(0));
 			m_end++;
 		}
 

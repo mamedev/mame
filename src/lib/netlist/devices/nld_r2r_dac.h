@@ -49,11 +49,11 @@
 #include "nl_base.h"
 #include "analog/nld_twoterm.h"
 
-#define R2R_DAC(_name, _VIN, _R, _N)                                            \
-		NET_REGISTER_DEV(R2R_DAC, _name)                                       \
-		NETDEV_PARAMI(_name, VIN, _VIN)                                        \
-		NETDEV_PARAMI(_name, R,   _R)                                          \
-		NETDEV_PARAMI(_name, N,   _N)
+#define R2R_DAC(name, p_VIN, p_R, p_N)                                            \
+		NET_REGISTER_DEV(R2R_DAC, name)                                       \
+		NETDEV_PARAMI(name, VIN, p_VIN)                                        \
+		NETDEV_PARAMI(name, R,   p_R)                                          \
+		NETDEV_PARAMI(name, N,   p_N)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

@@ -19,9 +19,9 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define SOLVER(_name, _freq)                                                 \
-		NET_REGISTER_DEV(SOLVER, _name)                                      \
-		PARAM(_name.FREQ, _freq)
+#define SOLVER(name, freq)                                                 \
+		NET_REGISTER_DEV(SOLVER, name)                                      \
+		PARAM(name.FREQ, freq)
 
 // ----------------------------------------------------------------------------------------
 // solver
@@ -125,7 +125,7 @@ private:
 
 	solver_parameters_t m_params;
 
-	template <int m_N, int _storage_N>
+	template <int m_N, int storage_N>
 	matrix_solver_t *create_solver(int size, bool use_specific);
 };
 

@@ -118,8 +118,8 @@
 //  General Macros
 //============================================================
 
-#if defined(_OPENMP)
-#define HAS_OPENMP ( _OPENMP >= 200805 )
+#if defined(OPENMP)
+#define HAS_OPENMP ( OPENMP >= 200805 )
 #else
 #define HAS_OPENMP (0)
 #endif

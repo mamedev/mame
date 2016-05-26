@@ -4,8 +4,8 @@
  * pfmtlog.h
  */
 
-#ifndef _PFMT_H_
-#define _PFMT_H_
+#ifndef PFMT_H_
+#define PFMT_H_
 
 //#include <cstdarg>
 //#include <cstddef>
@@ -298,4 +298,4 @@ void plog_channel<L, build_enabled>::vdowrite(const pstring &ls) const
 PLIB_NAMESPACE_END()
 
 
-#endif /* _PSTRING_H_ */
+#endif /* PSTRING_H_ */

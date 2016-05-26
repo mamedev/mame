@@ -31,15 +31,15 @@
 #include "nld_cmos.h"
 
 /* FIXME: only used in mario.c */
-#define CD4020_WI(_name, _IP, _RESET, _VDD, _VSS)                              \
-		NET_REGISTER_DEV(CD4020_WI, _name)                                        \
-		NET_CONNECT(_name, IP, _IP)                                            \
-		NET_CONNECT(_name, RESET,  _RESET)                                     \
-		NET_CONNECT(_name, VDD,  _VDD)                                         \
-		NET_CONNECT(_name, VSS,  _VSS)
+#define CD4020_WI(name, cIP, cRESET, cVDD, cVSS)                              \
+		NET_REGISTER_DEV(CD4020_WI, name)                                        \
+		NET_CONNECT(name, IP, cIP)                                            \
+		NET_CONNECT(name, RESET,  cRESET)                                     \
+		NET_CONNECT(name, VDD,  cVDD)                                         \
+		NET_CONNECT(name, VSS,  cVSS)
 
-#define CD4020(_name)                                                          \
-		NET_REGISTER_DEV(CD4020, _name)
+#define CD4020(name)                                                          \
+		NET_REGISTER_DEV(CD4020, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

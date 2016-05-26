@@ -53,8 +53,8 @@
 #include "nld_system.h"
 #include "analog/nld_twoterm.h"
 
-#define TTL_74123(_name)                                                        \
-		NET_REGISTER_DEV(TTL_74123, _name)
+#define TTL_74123(name)                                                        \
+		NET_REGISTER_DEV(TTL_74123, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -126,8 +126,8 @@ public:
 	param_double_t m_RI;
 };
 
-#define TTL_74123_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_74123_DIP, _name)
+#define TTL_74123_DIP(name)                                                         \
+		NET_REGISTER_DEV(TTL_74123_DIP, name)
 
 NETLIB_OBJECT(74123_dip)
 {
@@ -166,8 +166,8 @@ private:
  * THe 9602 uses an OR gate instead of an AND gate.
  */
 
-#define TTL_9602_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_9602_DIP, _name)
+#define TTL_9602_DIP(name)                                                         \
+		NET_REGISTER_DEV(TTL_9602_DIP, name)
 
 NETLIB_OBJECT(9602_dip)
 {
@@ -206,8 +206,8 @@ private:
  * The CD4538 is pretty similar to the 9602
  */
 
-#define CD4538_DIP(_name)                                                         \
-		NET_REGISTER_DEV(CD4538_DIP, _name)
+#define CD4538_DIP(name)                                                         \
+		NET_REGISTER_DEV(CD4538_DIP, name)
 
 NETLIB_OBJECT(4538_dip)
 {

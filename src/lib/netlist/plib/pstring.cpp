@@ -385,7 +385,7 @@ pstr_t *pstring_t<F>::salloc(int n)
 		stk[sn].pop();
 	}
 
-	//  str_t *p = (str_t *) _mm_malloc(size, 8);
+	//  str_t *p = (str_t *) mm_malloc(size, 8);
 	p->init(n);
 	return p;
 }
@@ -425,7 +425,7 @@ pstr_t *pstring_t<F>::salloc(int n)
 {
 	int size = sizeof(pstr_t) + n + 1;
 	pstr_t *p = (pstr_t *) palloc_array(char, size);
-	//  str_t *p = (str_t *) _mm_malloc(size, 8);
+	//  str_t *p = (str_t *) mm_malloc(size, 8);
 	p->init(n);
 	return p;
 }

@@ -17,11 +17,11 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define SWITCH(_name)                                                              \
-		NET_REGISTER_DEV(SWITCH, _name)
+#define SWITCH(name)                                                              \
+		NET_REGISTER_DEV(SWITCH, name)
 
-#define SWITCH2(_name)                                                              \
-		NET_REGISTER_DEV(SWITCH2, _name)
+#define SWITCH2(name)                                                              \
+		NET_REGISTER_DEV(SWITCH2, name)
 
 // ----------------------------------------------------------------------------------------
 // Devices ...

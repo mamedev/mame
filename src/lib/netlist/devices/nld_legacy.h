@@ -21,11 +21,11 @@ NETLIB_NAMESPACE_DEVICES_START()
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_RSFF(_name)                                                          \
-		NET_REGISTER_DEV(NETDEV_RSFF, _name)
+#define NETDEV_RSFF(name)                                                          \
+		NET_REGISTER_DEV(NETDEV_RSFF, name)
 
-#define NETDEV_DELAY(_name)                                                         \
-		NET_REGISTER_DEV(NETDEV_DELAY, _name)
+#define NETDEV_DELAY(name)                                                         \
+		NET_REGISTER_DEV(NETDEV_DELAY, name)
 
 // ----------------------------------------------------------------------------------------
 // Devices ...

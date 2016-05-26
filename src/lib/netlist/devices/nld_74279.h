@@ -38,8 +38,8 @@
 
 #include "nld_truthtable.h"
 
-#define TTL_74279_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_74279_DIP, _name)
+#define TTL_74279_DIP(name)                                                         \
+		NET_REGISTER_DEV(TTL_74279_DIP, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

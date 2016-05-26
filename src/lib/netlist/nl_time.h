@@ -14,9 +14,9 @@
 //  MACROS
 //============================================================
 
-#define NLTIME_FROM_NS(_t)  netlist_time::from_nsec(_t)
-#define NLTIME_FROM_US(_t)  netlist_time::from_usec(_t)
-#define NLTIME_FROM_MS(_t)  netlist_time::from_msec(_t)
+#define NLTIME_FROM_NS(t)  netlist_time::from_nsec(t)
+#define NLTIME_FROM_US(t)  netlist_time::from_usec(t)
+#define NLTIME_FROM_MS(t)  netlist_time::from_msec(t)
 #define NLTIME_IMMEDIATE    netlist_time::from_nsec(1)
 
 // ----------------------------------------------------------------------------------------

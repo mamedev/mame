@@ -15,13 +15,13 @@
 // Macros
 // -----------------------------------------------------------------------------
 
-#define QBJT_SW(_name, _model)                                                 \
-		NET_REGISTER_DEV(QBJT_SW, _name)                                       \
-		NETDEV_PARAMI(_name,  MODEL,   _model)
+#define QBJT_SW(name, model)                                                 \
+		NET_REGISTER_DEV(QBJT_SW, name)                                       \
+		NETDEV_PARAMI(name,  MODEL, model)
 
-#define QBJT_EB(_name, _model)                                                 \
-		NET_REGISTER_DEV(QBJT_EB, _name)                                       \
-		NETDEV_PARAMI(_name,  MODEL,   _model)
+#define QBJT_EB(name, model)                                                 \
+		NET_REGISTER_DEV(QBJT_EB, name)                                       \
+		NETDEV_PARAMI(name,  MODEL, model)
 
 
 NETLIB_NAMESPACE_DEVICES_START()

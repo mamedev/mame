@@ -944,7 +944,7 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 		if (m_models.contains(xmodel))
 			model_parse(xmodel, map);
 		else
-			log().fatal("Model doesn't exist {1}\n", xmodel);
+			log().fatal("Model doesn't exist: <{1}>\n", model_in);
 	}
 
 	pstring remainder=model.substr(pos+1).trim();

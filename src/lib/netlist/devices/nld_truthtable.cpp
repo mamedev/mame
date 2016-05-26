@@ -241,13 +241,13 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, UINT32 d
 
 }
 
-#define ENTRYX(_n,_m,_h)    case (_n * 1000 + _m * 10 + _h): \
-	{ using xtype = netlist_factory_truthtable_t<_n,_m,_h>; \
+#define ENTRYX(n, m, h)    case (n * 1000 + m * 10 + h): \
+	{ using xtype = netlist_factory_truthtable_t<n, m, h>; \
 		return plib::powned_ptr<netlist_base_factory_truthtable_t>::Create<xtype>(name,classname,def_param); } break
 
-#define ENTRYY(_n,_m)   ENTRYX(_n,_m,0); ENTRYX(_n,_m,1)
+#define ENTRYY(n, m)   ENTRYX(n, m, 0); ENTRYX(n, m, 1)
 
-#define ENTRY(_n) ENTRYY(_n, 1); ENTRYY(_n, 2); ENTRYY(_n, 3); ENTRYY(_n, 4); ENTRYY(_n, 5); ENTRYY(_n, 6)
+#define ENTRY(n) ENTRYY(n, 1); ENTRYY(n, 2); ENTRYY(n, 3); ENTRYY(n, 4); ENTRYY(n, 5); ENTRYY(n, 6)
 
 plib::powned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
 		const unsigned has_state,

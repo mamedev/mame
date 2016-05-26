@@ -23,8 +23,8 @@
 #endif
 
 #if (PHAS_INT128)
-typedef __uint128_t UINT128;
-typedef __int128_t INT128;
+typedef _uint128_t UINT128;
+typedef _int128_t INT128;
 #endif
 
 #define PLIB_NAMESPACE_START() namespace plib {
@@ -51,10 +51,10 @@ typedef __int128_t INT128;
 //============================================================
 
 // prevent implicit copying
-#define P_PREVENT_COPYING(_name)                \
-	private:                                    \
-		_name(const _name &);                   \
-		_name &operator=(const _name &);
+#define P_PREVENT_COPYING(name)               \
+	private:                                  \
+		name(const name &);                   \
+		name &operator=(const name &);
 
 //============================================================
 //  Compiling standalone
@@ -77,7 +77,7 @@ typedef __int128_t INT128;
 	/* does not work in versions over 4.7.x of 32bit MINGW  */
 	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
 		#define PHAS_PMF_INTERNAL 1
-		#define MEMBER_ABI __thiscall
+		#define MEMBER_ABI _thiscall
 	#elif defined(EMSCRIPTEN)
 		#define PHAS_PMF_INTERNAL 0
 	#elif defined(__arm__) || defined(__ARMEL__)
@@ -112,16 +112,16 @@ typedef unsigned short                      UINT16;
 typedef signed short                        INT16;
 
 /* 32-bit values */
-#ifndef _WINDOWS_H
+#ifndef WINDOWS_H
 typedef unsigned int                        UINT32;
 typedef signed int                          INT32;
 #endif
 
 /* 64-bit values */
-#ifndef _WINDOWS_H
+#ifndef WINDOWS_H
 #ifdef _MSC_VER
-typedef signed __int64                      INT64;
-typedef unsigned __int64                    UINT64;
+typedef signed _int64                      INT64;
+typedef unsigned _int64                    UINT64;
 #else
 typedef uint64_t    UINT64;
 typedef int64_t      INT64;
@@ -152,7 +152,7 @@ static inline ticks_t ticks_per_second()
 	return std::chrono::high_resolution_clock::period::den / std::chrono::high_resolution_clock::period::num;
 }
 
-#if defined(__x86_64__) &&  !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
+#if defined(__x86_64__) &&  !defined(_clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
 
 static inline ticks_t profile_ticks()
 {
@@ -178,25 +178,25 @@ public:
 	class generic_class;
 	using generic_function = void (*)();
 
-	template<typename _MemberFunctionType>
-	mfp(_MemberFunctionType mftp)
+	template<typename MemberFunctionType>
+	mfp(MemberFunctionType mftp)
 	: m_function(0), m_this_delta(0)
 	{
-		*reinterpret_cast<_MemberFunctionType *>(this) = mftp;
+		*reinterpret_cast<MemberFunctionType *>(this) = mftp;
 	}
 
 	// binding helper
-	template<typename _FunctionType, typename _ObjectType>
-	_FunctionType update_after_bind(_ObjectType *object)
+	template<typename FunctionType, typename ObjectType>
+	FunctionType update_after_bind(ObjectType *object)
 	{
-		return reinterpret_cast<_FunctionType>(
+		return reinterpret_cast<FunctionType>(
 				convert_to_generic(reinterpret_cast<generic_class *>(object)));
 	}
-	template<typename _FunctionType, typename _MemberFunctionType, typename _ObjectType>
-	static _FunctionType get_mfp(_MemberFunctionType mftp, _ObjectType *object)
+	template<typename FunctionType, typename MemberFunctionType, typename ObjectType>
+	static FunctionType get_mfp(MemberFunctionType mftp, ObjectType *object)
 	{
 		mfp mfpo(mftp);
-		return mfpo.update_after_bind<_FunctionType>(object);
+		return mfpo.update_after_bind<FunctionType>(object);
 	}
 
 private:

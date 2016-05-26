@@ -27,8 +27,8 @@
 #include "nl_base.h"
 #include "nld_cmos.h"
 
-#define CD4066_GATE(_name)                                                     \
-		NET_REGISTER_DEV(CD4066_GATE, _name)
+#define CD4066_GATE(name)                                                     \
+		NET_REGISTER_DEV(CD4066_GATE, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

@@ -4,8 +4,8 @@
  * pstream.h
  */
 
-#ifndef _PSTREAM_H_
-#define _PSTREAM_H_
+#ifndef PSTREAM_H_
+#define PSTREAM_H_
 
 #include <cstdarg>
 #include <cstddef>
@@ -379,4 +379,4 @@ private:
 
 PLIB_NAMESPACE_END()
 
-#endif /* _PSTREAM_H_ */
+#endif /* PSTREAM_H_ */

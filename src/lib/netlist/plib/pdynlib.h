@@ -4,8 +4,8 @@
  * pstring.h
  */
 
-#ifndef _PDYNLIB_H_
-#define _PDYNLIB_H_
+#ifndef PDYNLIB_H_
+#define PDYNLIB_H_
 
 #include <cstdarg>
 #include <cstddef>
@@ -42,4 +42,4 @@ private:
 
 PLIB_NAMESPACE_END()
 
-#endif /* _PSTRING_H_ */
+#endif /* PSTRING_H_ */

@@ -33,7 +33,7 @@ public:
 			if (ret == "")
 				ret = elem;
 			else
-#ifdef _WIN32
+#ifdef WIN32
 				ret = ret + '\\' + elem;
 #else
 				ret = ret + '/' + elem;
@@ -70,7 +70,7 @@ public:
 	template <typename T>
 	static T log(const T &x) { return std::log(x); }
 
-	#if defined(_MSC_VER) && _MSC_VER < 1800
+	#if defined(MSC_VER) && MSC_VER < 1800
 	ATTR_HOT inline static double e_log1p(const double &x) { return nl_math::log(1.0 + x); }
 	ATTR_HOT inline static float e_log1p(const float &x) { return nl_math::log(1.0 + x); }
 #else

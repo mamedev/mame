@@ -13,31 +13,31 @@
 #include "nl_base.h"
 #include "nl_factory.h"
 
-#define NETLIB_TRUTHTABLE(_name, _nIN, _nOUT, _state)                               \
-	class NETLIB_NAME(_name) : public nld_truthtable_t<_nIN, _nOUT, _state>         \
-	{                                                                               \
-	public:                                                                         \
-		template <class C>                                                          \
-		NETLIB_NAME(_name)(C &owner, const pstring &name)                           \
-		: nld_truthtable_t<_nIN, _nOUT, _state>(owner, name, nullptr, &m_ttbl, m_desc) { }   \
-	private:                                                                        \
-		static truthtable_t m_ttbl;                                                 \
-		static const char *m_desc[];                                                \
+#define NETLIB_TRUTHTABLE(cname, nIN, nOUT, state)                               \
+	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT, state>         \
+	{                                                                           \
+	public:                                                                     \
+		template <class C>                                                      \
+		NETLIB_NAME(cname)(C &owner, const pstring &name)                        \
+		: nld_truthtable_t<nIN, nOUT, state>(owner, name, nullptr, &m_ttbl, m_desc) { }   \
+	private:                                                                    \
+		static truthtable_t m_ttbl;                                             \
+		static const char *m_desc[];                                            \
 	}
 
-#define TRUTHTABLE_START(_name, _in, _out, _has_state, _def_params) \
+#define TRUTHTABLE_START(cname, in, out, has_state, def_params) \
 	{ \
-	auto ttd = netlist::devices::nl_tt_factory_create(_in, _out, _has_state, \
-			# _name, # _name, "+" _def_params);
+	auto ttd = netlist::devices::nl_tt_factory_create(in, out, has_state, \
+			# cname, # cname, "+" def_params);
 
-#define TT_HEAD(_x) \
-	ttd->m_desc.push_back(_x);
+#define TT_HEAD(x) \
+	ttd->m_desc.push_back(x);
 
-#define TT_LINE(_x) \
-	ttd->m_desc.push_back(_x);
+#define TT_LINE(x) \
+	ttd->m_desc.push_back(x);
 
-#define TT_FAMILY(_x) \
-	ttd->m_family = setup.family_from_model(_x);
+#define TT_FAMILY(x) \
+	ttd->m_family = setup.family_from_model(x);
 
 #define TRUTHTABLE_END() \
 	setup.factory().register_device(std::move(ttd)); \

@@ -39,11 +39,11 @@
 
 #include "nld_truthtable.h"
 
-#define TTL_9312(_name)                                                \
-		NET_REGISTER_DEV(TTL_9312, _name)
+#define TTL_9312(name)                                                \
+		NET_REGISTER_DEV(TTL_9312, name)
 
-#define TTL_9312_DIP(_name)                                            \
-		NET_REGISTER_DEV(TTL_9312_DIP, _name)
+#define TTL_9312_DIP(name)                                            \
+		NET_REGISTER_DEV(TTL_9312_DIP, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

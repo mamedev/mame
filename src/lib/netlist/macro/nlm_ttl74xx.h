@@ -11,179 +11,179 @@
  *  Netlist Macros
  * ---------------------------------------------------------------------------*/
 
-#define TTL_7400_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7400_GATE, _name)
+#define TTL_7400_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7400_GATE, name)
 
-#define TTL_7400_NAND(_name, _A, _B)                                           \
-		NET_REGISTER_DEV(TTL_7400_NAND, _name)                         		   \
-		NET_CONNECT(_name, A, _A)                                      		   \
-		NET_CONNECT(_name, B, _B)
+#define TTL_7400_NAND(name, cA, cB)                                           \
+		NET_REGISTER_DEV(TTL_7400_NAND, name)                         		   \
+		NET_CONNECT(name, A, cA)                                      		   \
+		NET_CONNECT(name, B, cB)
 
-#define TTL_7400_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7400_DIP, _name)
-
-
-#define TTL_7402_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7402_GATE, _name)
-
-#define TTL_7402_NOR(_name, _I1, _I2)                                          \
-		NET_REGISTER_DEV(TTL_7402_NOR, _name)                                  \
-		NET_CONNECT(_name, A, _I1)                                             \
-		NET_CONNECT(_name, B, _I2)
-
-#define TTL_7402_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7402_DIP, _name)
+#define TTL_7400_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7400_DIP, name)
 
 
-#define TTL_7404_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7404_GATE, _name)
+#define TTL_7402_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7402_GATE, name)
 
-#define TTL_7404_INVERT(_name, _A)                                             \
-		NET_REGISTER_DEV(TTL_7404_INVERT, _name)                               \
-		NET_CONNECT(_name, A, _A)
+#define TTL_7402_NOR(name, cI1, cI2)                                          \
+		NET_REGISTER_DEV(TTL_7402_NOR, name)                                  \
+		NET_CONNECT(name, A, cI1)                                             \
+		NET_CONNECT(name, B, cI2)
 
-#define TTL_7404_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7404_DIP, _name)
-
-
-#define TTL_7408_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7408_GATE, _name)
-
-#define TTL_7408_AND(_name, _A, _B)                                            \
-		NET_REGISTER_DEV(TTL_7408_AND, _name)                         		   \
-		NET_CONNECT(_name, A, _A)                                      		   \
-		NET_CONNECT(_name, B, _B)
-
-#define TTL_7408_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7408_DIP, _name)
+#define TTL_7402_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7402_DIP, name)
 
 
-#define TTL_7410_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7410_GATE, _name)
+#define TTL_7404_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7404_GATE, name)
 
-#define TTL_7410_NAND(_name, _I1, _I2, _I3)                                    \
-		NET_REGISTER_DEV(TTL_7410_NAND, _name)                                 \
-		NET_CONNECT(_name, A, _I1)                                             \
-		NET_CONNECT(_name, B, _I2)                                             \
-		NET_CONNECT(_name, C, _I3)
+#define TTL_7404_INVERT(name, cA)                                             \
+		NET_REGISTER_DEV(TTL_7404_INVERT, name)                               \
+		NET_CONNECT(name, A, cA)
 
-#define TTL_7410_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7410_DIP, _name)
+#define TTL_7404_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7404_DIP, name)
 
 
-#define TTL_7411_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7411_GATE, _name)
+#define TTL_7408_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7408_GATE, name)
 
-#define TTL_7411_AND(_name, _I1, _I2, _I3)                                     \
-		NET_REGISTER_DEV(TTL_7411_AND, _name)                                  \
-		NET_CONNECT(_name, A, _I1)                                             \
-		NET_CONNECT(_name, B, _I2)                                             \
-		NET_CONNECT(_name, C, _I3)
+#define TTL_7408_AND(name, cA, cB)                                            \
+		NET_REGISTER_DEV(TTL_7408_AND, name)                         		   \
+		NET_CONNECT(name, A, cA)                                      		   \
+		NET_CONNECT(name, B, cB)
 
-#define TTL_7411_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7411_DIP, _name)
-
-
-#define TTL_7416_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7416_GATE, _name)
-
-#define TTL_7416_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL7416_DIP, _name)
+#define TTL_7408_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7408_DIP, name)
 
 
-#define TTL_7420_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7420_GATE, _name)
+#define TTL_7410_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7410_GATE, name)
 
-#define TTL_7420_NAND(_name, _I1, _I2, _I3, _I4)                               \
-		NET_REGISTER_DEV(TTL_7420_NAND, _name)                                 \
-		NET_CONNECT(_name, A, _I1)                                             \
-		NET_CONNECT(_name, B, _I2)                                             \
-		NET_CONNECT(_name, C, _I3)                                             \
-		NET_CONNECT(_name, D, _I4)
+#define TTL_7410_NAND(name, cI1, cI2, cI3)                                    \
+		NET_REGISTER_DEV(TTL_7410_NAND, name)                                 \
+		NET_CONNECT(name, A, cI1)                                             \
+		NET_CONNECT(name, B, cI2)                                             \
+		NET_CONNECT(name, C, cI3)
 
-#define TTL_7420_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7420_DIP, _name)
-
-
-#define TTL_7425_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7425_GATE, _name)
-
-#define TTL_7425_NOR(_name, _I1, _I2, _I3, _I4)                                \
-		NET_REGISTER_DEV(TTL_7425_NOR, _name)                                  \
-		NET_CONNECT(_name, A, _I1)                                             \
-		NET_CONNECT(_name, B, _I2)                                             \
-		NET_CONNECT(_name, C, _I3)                                             \
-		NET_CONNECT(_name, D, _I4)
-
-#define TTL_7425_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7425_DIP, _name)
+#define TTL_7410_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7410_DIP, name)
 
 
-#define TTL_7427_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7427_GATE, _name)
+#define TTL_7411_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7411_GATE, name)
 
-#define TTL_7427_NOR(_name, _I1, _I2, _I3)                                     \
-		NET_REGISTER_DEV(TTL_7427_NOR, _name)                                  \
-		NET_CONNECT(_name, A, _I1)                                             \
-		NET_CONNECT(_name, B, _I2)                                             \
-		NET_CONNECT(_name, C, _I3)
+#define TTL_7411_AND(name, cI1, cI2, cI3)                                     \
+		NET_REGISTER_DEV(TTL_7411_AND, name)                                  \
+		NET_CONNECT(name, A, cI1)                                             \
+		NET_CONNECT(name, B, cI2)                                             \
+		NET_CONNECT(name, C, cI3)
 
-#define TTL_7427_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7427_DIP, _name)
-
-
-#define TTL_7430_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7430_GATE, _name)
-
-#define TTL_7430_NAND(_name, _I1, _I2, _I3, _I4, _I5, _I6, _I7, _I8)           \
-		NET_REGISTER_DEV(TTL_7430_NAND, _name)                                 \
-		NET_CONNECT(_name, A, _I1)                                             \
-		NET_CONNECT(_name, B, _I2)                                             \
-		NET_CONNECT(_name, C, _I3)                                             \
-		NET_CONNECT(_name, D, _I4)                                             \
-		NET_CONNECT(_name, E, _I5)                                             \
-		NET_CONNECT(_name, F, _I6)                                             \
-		NET_CONNECT(_name, G, _I7)                                             \
-		NET_CONNECT(_name, H, _I8)
-
-#define TTL_7430_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7430_DIP, _name)
+#define TTL_7411_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7411_DIP, name)
 
 
-#define TTL_7432_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7432_OR, _name)
+#define TTL_7416_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7416_GATE, name)
 
-#define TTL_7432_OR(_name, _I1, _I2)                                           \
-		NET_REGISTER_DEV(TTL_7432_OR, _name)                                   \
-		NET_CONNECT(_name, A, _I1)                                             \
-		NET_CONNECT(_name, B, _I2)
-
-#define TTL_7432_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7432_DIP, _name)
+#define TTL_7416_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL7416_DIP, name)
 
 
-#define TTL_7437_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7437_GATE, _name)
+#define TTL_7420_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7420_GATE, name)
 
-#define TTL_7437_NAND(_name, _A, _B)                                           \
-		NET_REGISTER_DEV(TTL_7437_NAND, _name)                         		   \
-		NET_CONNECT(_name, A, _A)                                      		   \
-		NET_CONNECT(_name, B, _B)
+#define TTL_7420_NAND(name, cI1, cI2, cI3, cI4)                               \
+		NET_REGISTER_DEV(TTL_7420_NAND, name)                                 \
+		NET_CONNECT(name, A, cI1)                                             \
+		NET_CONNECT(name, B, cI2)                                             \
+		NET_CONNECT(name, C, cI3)                                             \
+		NET_CONNECT(name, D, cI4)
 
-#define TTL_7437_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7437_DIP, _name)
+#define TTL_7420_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7420_DIP, name)
 
 
-#define TTL_7486_GATE(_name)                                                   \
-		NET_REGISTER_DEV(TTL_7486_GATE, _name)
+#define TTL_7425_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7425_GATE, name)
 
-#define TTL_7486_XOR(_name, _A, _B)                                            \
-		NET_REGISTER_DEV(TTL_7486_XOR, _name)                                  \
-		NET_CONNECT(_name, A, _A)                                              \
-		NET_CONNECT(_name, B, _B)
+#define TTL_7425_NOR(name, cI1, cI2, cI3, cI4)                                \
+		NET_REGISTER_DEV(TTL_7425_NOR, name)                                  \
+		NET_CONNECT(name, A, cI1)                                             \
+		NET_CONNECT(name, B, cI2)                                             \
+		NET_CONNECT(name, C, cI3)                                             \
+		NET_CONNECT(name, D, cI4)
 
-#define TTL_7486_DIP(_name)                                                    \
-		NET_REGISTER_DEV(TTL_7486_DIP, _name)
+#define TTL_7425_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7425_DIP, name)
+
+
+#define TTL_7427_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7427_GATE, name)
+
+#define TTL_7427_NOR(name, cI1, cI2, cI3)                                     \
+		NET_REGISTER_DEV(TTL_7427_NOR, name)                                  \
+		NET_CONNECT(name, A, cI1)                                             \
+		NET_CONNECT(name, B, cI2)                                             \
+		NET_CONNECT(name, C, cI3)
+
+#define TTL_7427_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7427_DIP, name)
+
+
+#define TTL_7430_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7430_GATE, name)
+
+#define TTL_7430_NAND(name, cI1, cI2, cI3, cI4, cI5, cI6, cI7, cI8)           \
+		NET_REGISTER_DEV(TTL_7430_NAND, name)                                 \
+		NET_CONNECT(name, A, cI1)                                             \
+		NET_CONNECT(name, B, cI2)                                             \
+		NET_CONNECT(name, C, cI3)                                             \
+		NET_CONNECT(name, D, cI4)                                             \
+		NET_CONNECT(name, E, cI5)                                             \
+		NET_CONNECT(name, F, cI6)                                             \
+		NET_CONNECT(name, G, cI7)                                             \
+		NET_CONNECT(name, H, cI8)
+
+#define TTL_7430_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7430_DIP, name)
+
+
+#define TTL_7432_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7432_OR, name)
+
+#define TTL_7432_OR(name, cI1, cI2)                                           \
+		NET_REGISTER_DEV(TTL_7432_OR, name)                                   \
+		NET_CONNECT(name, A, cI1)                                             \
+		NET_CONNECT(name, B, cI2)
+
+#define TTL_7432_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7432_DIP, name)
+
+
+#define TTL_7437_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7437_GATE, name)
+
+#define TTL_7437_NAND(name, cA, cB)                                           \
+		NET_REGISTER_DEV(TTL_7437_NAND, name)                         		   \
+		NET_CONNECT(name, A, cA)                                      		   \
+		NET_CONNECT(name, B, cB)
+
+#define TTL_7437_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7437_DIP, name)
+
+
+#define TTL_7486_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7486_GATE, name)
+
+#define TTL_7486_XOR(name, cA, cB)                                            \
+		NET_REGISTER_DEV(TTL_7486_XOR, name)                                  \
+		NET_CONNECT(name, A, cA)                                              \
+		NET_CONNECT(name, B, cB)
+
+#define TTL_7486_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7486_DIP, name)
 
 /* ----------------------------------------------------------------------------
  *  External declarations

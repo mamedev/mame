@@ -122,8 +122,8 @@ protected:
 private:
 	void skipeol();
 
-	pstring::code_t _getc();
-	void _ungetc();
+	pstring::code_t getc();
+	void ungetc();
 
 	bool eof() { return m_strm.eof(); }
 

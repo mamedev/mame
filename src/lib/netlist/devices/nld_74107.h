@@ -61,18 +61,18 @@
 
 #include "nl_base.h"
 
-#define TTL_74107A(_name, _CLK, _J, _K, _CLRQ)                                      \
-		NET_REGISTER_DEV(TTL_74107A, _name)                                             \
-		NET_CONNECT(_name, CLK, _CLK)                                               \
-		NET_CONNECT(_name, J,  _J)                                                  \
-		NET_CONNECT(_name, K,  _K)                                                  \
-		NET_CONNECT(_name, CLRQ,  _CLRQ)
+#define TTL_74107A(name, cCLK, cJ, cK, cCLRQ)                                      \
+		NET_REGISTER_DEV(TTL_74107A, name)                                             \
+		NET_CONNECT(name, CLK, cCLK)                                               \
+		NET_CONNECT(name, J, cJ)                                                  \
+		NET_CONNECT(name, K, cK)                                                  \
+		NET_CONNECT(name, CLRQ, cCLRQ)
 
-#define TTL_74107(_name, _CLK, _J, _K, _CLRQ)                                       \
-		TTL_74107A(_name, _CLK, _J, _K, _CLRQ)
+#define TTL_74107(name, cCLK, cJ, cK, cCLRQ)                                       \
+		TTL_74107A(name, cCLK, cJ, cK, cCLRQ)
 
-#define TTL_74107_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_74107_DIP, _name)
+#define TTL_74107_DIP(name)                                                         \
+		NET_REGISTER_DEV(TTL_74107_DIP, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

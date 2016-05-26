@@ -18,62 +18,62 @@
 // Macros
 // -----------------------------------------------------------------------------
 
-#define TTL_INPUT(_name, _v)                                                   \
-		NET_REGISTER_DEV(TTL_INPUT, _name)                                   \
-		PARAM(_name.IN, _v)
+#define TTL_INPUT(name, v)                                                   \
+		NET_REGISTER_DEV(TTL_INPUT, name)                                   \
+		PARAM(name.IN, v)
 
-#define LOGIC_INPUT(_name, _v, _family)                                        \
-		NET_REGISTER_DEV(LOGIC_INPUT, _name)                                   \
-		PARAM(_name.IN, _v)                                                    \
-		PARAM(_name.FAMILY, _family)
+#define LOGIC_INPUT(name, v, family)                                        \
+		NET_REGISTER_DEV(LOGIC_INPUT, name)                                   \
+		PARAM(name.IN, v)                                                    \
+		PARAM(name.FAMILY, family)
 
-#define ANALOG_INPUT(_name, _v)                                                \
-		NET_REGISTER_DEV(ANALOG_INPUT, _name)                                  \
-		PARAM(_name.IN, _v)
+#define ANALOG_INPUT(name, v)                                                \
+		NET_REGISTER_DEV(ANALOG_INPUT, name)                                  \
+		PARAM(name.IN, v)
 
-#define MAINCLOCK(_name, _freq)                                                \
-		NET_REGISTER_DEV(MAINCLOCK, _name)                                     \
-		PARAM(_name.FREQ, _freq)
+#define MAINCLOCK(name, freq)                                                \
+		NET_REGISTER_DEV(MAINCLOCK, name)                                     \
+		PARAM(name.FREQ, freq)
 
-#define CLOCK(_name, _freq)                                                    \
-		NET_REGISTER_DEV(CLOCK, _name)                                         \
-		PARAM(_name.FREQ, _freq)
+#define CLOCK(name, freq)                                                    \
+		NET_REGISTER_DEV(CLOCK, name)                                         \
+		PARAM(name.FREQ, freq)
 
-#define EXTCLOCK(_name, _freq, _pattern)                                       \
-		NET_REGISTER_DEV(EXTCLOCK, _name)                                      \
-		PARAM(_name.FREQ, _freq)                                               \
-		PARAM(_name.PATTERN, _pattern)
+#define EXTCLOCK(name, freq, pattern)                                       \
+		NET_REGISTER_DEV(EXTCLOCK, name)                                      \
+		PARAM(name.FREQ, freq)                                               \
+		PARAM(name.PATTERN, pattern)
 
 #define GNDA()                                                                 \
 		NET_REGISTER_DEV(GNDA, GND)
 
-#define DUMMY_INPUT(_name)                                                     \
-		NET_REGISTER_DEV(DUMMY_INPUT, _name)
+#define DUMMY_INPUT(name)                                                     \
+		NET_REGISTER_DEV(DUMMY_INPUT, name)
 
 //FIXME: Usage discouraged, use OPTIMIZE_FRONTIER instead
-#define FRONTIER_DEV(_name, _IN, _G, _OUT)                                     \
-		NET_REGISTER_DEV(FRONTIER_DEV, _name)                                      \
-		NET_C(_IN, _name.I)                                                    \
-		NET_C(_G,  _name.G)                                                    \
-		NET_C(_OUT, _name.Q)
+#define FRONTIER_DEV(name, cIN, cG, cOUT)                                     \
+		NET_REGISTER_DEV(FRONTIER_DEV, name)                                      \
+		NET_C(cIN, name.I)                                                    \
+		NET_C(cG,  name.G)                                                    \
+		NET_C(cOUT, name.Q)
 
-#define OPTIMIZE_FRONTIER(_attach, _r_in, _r_out)                              \
-		setup.register_frontier(# _attach, _r_in, _r_out);
+#define OPTIMIZE_FRONTIER(attach, r_in, r_out)                              \
+		setup.register_frontier(# attach, r_in, r_out);
 
-#define RES_SWITCH(_name, _IN, _P1, _P2)                                       \
-		NET_REGISTER_DEV(RES_SWITCH, _name)                                        \
-		NET_C(_IN, _name.I)                                                    \
-		NET_C(_P1, _name.1)                                                    \
-		NET_C(_P2, _name.2)
+#define RES_SWITCH(name, cIN, cP1, cP2)                                       \
+		NET_REGISTER_DEV(RES_SWITCH, name)                                        \
+		NET_C(cIN, name.I)                                                    \
+		NET_C(cP1, name.1)                                                    \
+		NET_C(cP2, name.2)
 
 /* Default device to hold netlist parameters */
-#define PARAMETERS(_name)                                                      \
-		NET_REGISTER_DEV(PARAMETERS, _name)
+#define PARAMETERS(name)                                                      \
+		NET_REGISTER_DEV(PARAMETERS, name)
 
-#define AFUNC(_name, _N, _F)                                                   \
-		NET_REGISTER_DEV(AFUNC, _name)                                      \
-		PARAM(_name.N, _N)                                                     \
-		PARAM(_name.FUNC, _F)
+#define AFUNC(name, p_N, p_F)                                                   \
+		NET_REGISTER_DEV(AFUNC, name)                                      \
+		PARAM(name.N, p_N)                                                     \
+		PARAM(name.FUNC, p_F)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -617,18 +617,18 @@ public:
 	class wrapper : public device_t
 	{
 	public:
-		wrapper(const pstring &dev_name, netlist_t &anetlist, const pstring &name)
-		: device_t(anetlist, name), m_dev_name(dev_name)
+		wrapper(const pstring &devname, netlist_t &anetlist, const pstring &name)
+		: device_t(anetlist, name), m_devname(devname)
 		{
 			anetlist.setup().namespace_push(name);
-			anetlist.setup().include(m_dev_name);
+			anetlist.setup().include(m_devname);
 			anetlist.setup().namespace_pop();
 		}
 	protected:
 		NETLIB_RESETI() { }
 		NETLIB_UPDATEI() { }
 
-		pstring m_dev_name;
+		pstring m_devname;
 	};
 
 	plib::powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override

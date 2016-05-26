@@ -39,36 +39,36 @@
 // Macros
 // -----------------------------------------------------------------------------
 
-#define RES(_name, _R)                                                         \
-		NET_REGISTER_DEV(RES, _name)                                           \
-		NETDEV_PARAMI(_name, R, _R)
+#define RES(name, p_R)                                                         \
+		NET_REGISTER_DEV(RES, name)                                           \
+		NETDEV_PARAMI(name, R, p_R)
 
-#define POT(_name, _R)                                                         \
-		NET_REGISTER_DEV(POT, _name)                                           \
-		NETDEV_PARAMI(_name, R, _R)
+#define POT(name, p_R)                                                         \
+		NET_REGISTER_DEV(POT, name)                                           \
+		NETDEV_PARAMI(name, R, p_R)
 
 /* Does not have pin 3 connected */
-#define POT2(_name, _R)                                                        \
-		NET_REGISTER_DEV(POT2, _name)                                          \
-		NETDEV_PARAMI(_name, R, _R)
+#define POT2(name, p_R)                                                        \
+		NET_REGISTER_DEV(POT2, name)                                          \
+		NETDEV_PARAMI(name, R, p_R)
 
 
-#define CAP(_name, _C)                                                         \
-		NET_REGISTER_DEV(CAP, _name)                                           \
-		NETDEV_PARAMI(_name, C, _C)
+#define CAP(name, p_C)                                                         \
+		NET_REGISTER_DEV(CAP, name)                                           \
+		NETDEV_PARAMI(name, C, p_C)
 
 /* Generic Diode */
-#define DIODE(_name,  _model)                                                  \
-		NET_REGISTER_DEV(DIODE, _name)                                         \
-		NETDEV_PARAMI(_name, MODEL, _model)
+#define DIODE(name,  model)                                                  \
+		NET_REGISTER_DEV(DIODE, name)                                         \
+		NETDEV_PARAMI(name, MODEL, model)
 
-#define VS(_name, _V)                                                          \
-		NET_REGISTER_DEV(VS, _name)                                            \
-		NETDEV_PARAMI(_name, V, _V)
+#define VS(name, pV)                                                          \
+		NET_REGISTER_DEV(VS, name)                                            \
+		NETDEV_PARAMI(name, V, pV)
 
-#define CS(_name, _I)                                                          \
-		NET_REGISTER_DEV(CS, _name)                                            \
-		NETDEV_PARAMI(_name, I, _I)
+#define CS(name, pI)                                                          \
+		NET_REGISTER_DEV(CS, name)                                            \
+		NETDEV_PARAMI(name, I, pI)
 
 // -----------------------------------------------------------------------------
 // Generic macros

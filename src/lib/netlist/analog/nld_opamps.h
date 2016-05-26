@@ -19,12 +19,12 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define OPAMP(_name, _model)                                                   \
-		NET_REGISTER_DEV(OPAMP, _name)                                         \
-		NETDEV_PARAMI(_name, MODEL, _model)
+#define OPAMP(name, model)                                                   \
+		NET_REGISTER_DEV(OPAMP, name)                                         \
+		NETDEV_PARAMI(name, MODEL, model)
 
-#define LM3900(_name)                                                          \
-	SUBMODEL(opamp_lm3900, _name)
+#define LM3900(name)                                                          \
+	SUBMODEL(opamp_lm3900, name)
 
 // ----------------------------------------------------------------------------------------
 // Devices ...

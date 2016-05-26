@@ -16,17 +16,17 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define VCCS(_name)                                                            \
-		NET_REGISTER_DEV(VCCS, _name)
+#define VCCS(name)                                                            \
+		NET_REGISTER_DEV(VCCS, name)
 
-#define CCCS(_name)                                                            \
-		NET_REGISTER_DEV(CCCS, _name)
+#define CCCS(name)                                                            \
+		NET_REGISTER_DEV(CCCS, name)
 
-#define VCVS(_name)                                                            \
-		NET_REGISTER_DEV(VCVS, _name)
+#define VCVS(name)                                                            \
+		NET_REGISTER_DEV(VCVS, name)
 
-#define LVCCS(_name)                                                           \
-		NET_REGISTER_DEV(LVCCS, _name)
+#define LVCCS(name)                                                           \
+		NET_REGISTER_DEV(LVCCS, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

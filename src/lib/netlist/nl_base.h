@@ -183,29 +183,29 @@ using netlist_sig_t = std::uint32_t;
 #define NETLIB_NAMESPACE_DEVICES_START()    namespace netlist { namespace devices {
 #define NETLIB_NAMESPACE_DEVICES_END()  }}
 
-#define NETLIB_NAME(_chip) nld_ ## _chip
+#define NETLIB_NAME(chip) nld_ ## chip
 
-#define NETLIB_OBJECT_DERIVED(_name, _pclass)                                   \
-class NETLIB_NAME(_name) : public NETLIB_NAME(_pclass)
+#define NETLIB_OBJECT_DERIVED(name, pclass)                                   \
+class NETLIB_NAME(name) : public NETLIB_NAME(pclass)
 
-#define NETLIB_OBJECT(_name)                                                    \
-class NETLIB_NAME(_name) : public device_t
+#define NETLIB_OBJECT(name)                                                    \
+class NETLIB_NAME(name) : public device_t
 
-#define NETLIB_CONSTRUCTOR_DERIVED(_name, _pclass)                              \
+#define NETLIB_CONSTRUCTOR_DERIVED(cname, pclass)                              \
 	private: family_setter_t m_famsetter;                                       \
-	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name) \
-	: NETLIB_NAME(_pclass)(owner, name)
+	public: template <class CLASS> ATTR_COLD NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
+	: NETLIB_NAME(pclass)(owner, name)
 
-#define NETLIB_CONSTRUCTOR(_name)                                               \
+#define NETLIB_CONSTRUCTOR(cname)                                               \
 	private: family_setter_t m_famsetter;                                       \
-	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name) \
+	public: template <class CLASS> ATTR_COLD NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
 		: device_t(owner, name)
 
-#define NETLIB_DESTRUCTOR(_name) public: ATTR_HOT virtual ~NETLIB_NAME(_name)()
+#define NETLIB_DESTRUCTOR(name) public: ATTR_HOT virtual ~NETLIB_NAME(name)()
 
-#define NETLIB_CONSTRUCTOR_EX(_name, ...)                                       \
+#define NETLIB_CONSTRUCTOR_EX(cname, ...)                                       \
 	private: family_setter_t m_famsetter;                                       \
-	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name, __VA_ARGS__) \
+	public: template <class CLASS> ATTR_COLD NETLIB_NAME(cname)(CLASS &owner, const pstring name, __VA_ARGS__) \
 		: device_t(owner, name)
 
 #define NETLIB_DYNAMIC() 														\
@@ -218,26 +218,26 @@ class NETLIB_NAME(_name) : public device_t
 #define NETLIB_UPDATE_AFTER_PARAM_CHANGE() 						     			\
 	public: ATTR_HOT virtual bool needs_update_after_param_change() const override { return true; }
 
-#define NETLIB_FAMILY(_family) , m_famsetter(*this, _family)
+#define NETLIB_FAMILY(family) , m_famsetter(*this, family)
 
 #define NETLIB_UPDATE_TERMINALSI() public: ATTR_HOT virtual void update_terminals() override
 #define NETLIB_UPDATEI() protected: ATTR_HOT virtual void update() NOEXCEPT override
 #define NETLIB_UPDATE_PARAMI() public: ATTR_HOT virtual void update_param() override
 #define NETLIB_RESETI() protected: ATTR_HOT virtual void reset() override
 
-#define NETLIB_SUB(_chip) nld_ ## _chip
-#define NETLIB_SUBXX(_chip) std::unique_ptr< nld_ ## _chip >
+#define NETLIB_SUB(chip) nld_ ## chip
+#define NETLIB_SUBXX(chip) std::unique_ptr< nld_ ## chip >
 
-#define NETLIB_UPDATE(_chip) ATTR_HOT void NETLIB_NAME(_chip) :: update(void) NOEXCEPT
+#define NETLIB_UPDATE(chip) ATTR_HOT void NETLIB_NAME(chip) :: update(void) NOEXCEPT
 
-#define NETLIB_RESET(_chip) ATTR_COLD void NETLIB_NAME(_chip) :: reset(void)
+#define NETLIB_RESET(chip) ATTR_COLD void NETLIB_NAME(chip) :: reset(void)
 
-#define NETLIB_STOP(_chip) ATTR_COLD void NETLIB_NAME(_chip) :: stop(void)
+#define NETLIB_STOP(chip) ATTR_COLD void NETLIB_NAME(chip) :: stop(void)
 
-#define NETLIB_UPDATE_PARAM(_chip) ATTR_HOT void NETLIB_NAME(_chip) :: update_param(void)
-#define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT void NETLIB_NAME(_chip) :: _name _params
+#define NETLIB_UPDATE_PARAM(chip) ATTR_HOT void NETLIB_NAME(chip) :: update_param(void)
+#define NETLIB_FUNC_VOID(chip, name, params) ATTR_HOT void NETLIB_NAME(chip) :: name params
 
-#define NETLIB_UPDATE_TERMINALS(_chip) ATTR_HOT void NETLIB_NAME(_chip) :: update_terminals(void)
+#define NETLIB_UPDATE_TERMINALS(chip) ATTR_HOT void NETLIB_NAME(chip) :: update_terminals(void)
 
 
 //============================================================
@@ -1226,26 +1226,26 @@ namespace netlist
 
 		ATTR_COLD net_t *find_net(const pstring &name);
 
-		template<class _device_class>
-		ATTR_COLD plib::pvector_t<_device_class *> get_device_list()
+		template<class device_class>
+		ATTR_COLD plib::pvector_t<device_class *> get_device_list()
 		{
-			plib::pvector_t<_device_class *> tmp;
+			plib::pvector_t<device_class *> tmp;
 			for (auto &d : m_devices)
 			{
-				_device_class *dev = dynamic_cast<_device_class *>(d.get());
+				device_class *dev = dynamic_cast<device_class *>(d.get());
 				if (dev != nullptr)
 					tmp.push_back(dev);
 			}
 			return tmp;
 		}
 
-		template<class _device_class>
-		ATTR_COLD _device_class *get_single_device(const char *classname)
+		template<class device_class>
+		ATTR_COLD device_class *get_single_device(const char *classname)
 		{
-			_device_class *ret = nullptr;
+			device_class *ret = nullptr;
 			for (auto &d : m_devices)
 			{
-				_device_class *dev = dynamic_cast<_device_class *>(d.get());
+				device_class *dev = dynamic_cast<device_class *>(d.get());
 				if (dev != nullptr)
 				{
 					if (ret != nullptr)
