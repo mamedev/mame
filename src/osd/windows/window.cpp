@@ -300,7 +300,7 @@ win_window_info::win_window_info(
 	running_machine &machine,
 	int index,
 	osd_monitor_info *monitor,
-	const osd_window_config *config) : osd_window(),
+	const osd_window_config *config) : osd_window(*config),
 		m_next(nullptr),
 		m_init_state(0),
 		m_startmaximized(0),
@@ -325,8 +325,6 @@ win_window_info::win_window_info(
 	m_non_fullscreen_bounds.right  = 0;
 	m_non_fullscreen_bounds.bottom = 0;
 	m_prescale = video_config.prescale;
-
-
 }
 
 win_window_info::~win_window_info()

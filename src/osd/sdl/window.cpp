@@ -1094,14 +1094,13 @@ osd_dim sdl_window_info::get_max_bounds(int constrain)
 
 sdl_window_info::sdl_window_info(running_machine &a_machine, int index, osd_monitor_info *a_monitor,
 		const osd_window_config *config)
-: osd_window(), m_next(nullptr), m_startmaximized(0),
+: osd_window(*config), m_next(nullptr), m_startmaximized(0),
 	// Following three are used by input code to defer resizes
 	m_minimum_dim(0,0),
 	m_windowed_dim(0,0),
 	m_rendered_event(0, 1), m_target(nullptr), m_extra_flags(0),
 	m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0)
 {
-	m_win_config = *config;
 	m_index = index;
 
 	//FIXME: these should be per_window in config-> or even better a bit set

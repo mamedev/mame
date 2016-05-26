@@ -111,12 +111,13 @@ class osd_renderer;
 class osd_window : public std::enable_shared_from_this<osd_window>
 {
 public:
-	osd_window()
+	osd_window(const osd_window_config &config)
 	:
 #ifndef OSD_SDL
 		m_dc(nullptr), m_resize_state(0),
 #endif
 		m_primlist(nullptr),
+		m_win_config(config),
 		m_index(0),
 		m_prescale(1),
 		m_platform_window(nullptr),
