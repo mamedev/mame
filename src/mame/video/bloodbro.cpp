@@ -197,8 +197,7 @@ void bloodbro_state::weststry_draw_sprites(screen_device &screen, bitmap_ind16 &
 	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 
-	/* TODO: the last two entries are not sprites - control registers? */
-	for (offs = 0;offs < m_spriteram.bytes()/2 - 8;offs += 4)
+	for (offs = m_spriteram.bytes()/2 - 4; offs >= 0; offs -= 4)
 	{
 		int data = spriteram16[offs+2];
 		int data0 = spriteram16[offs+0];
@@ -251,10 +250,9 @@ UINT32 bloodbro_state::screen_update_bloodbro(screen_device &screen, bitmap_ind1
 
 UINT32 bloodbro_state::screen_update_weststry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  m_bg_tilemap->set_scrollx(0,m_scroll[0x10]);    /* ? */
-//  m_bg_tilemap->set_scrolly(0,m_scroll[0x11]);    /* ? */
-//  m_fg_tilemap->set_scrollx(0,m_scroll[0x12]);
-//  m_fg_tilemap->set_scrolly(0,m_scroll[0x13]);
+	// The bootleg video hardware probably also allows BG scrolling, but weststry doesn't use it
+	m_fg_tilemap->set_scrollx(0, (INT8)m_scrollram[1] - 13);
+	m_fg_tilemap->set_scrolly(0, (INT8)m_scrollram[0] + 1);
 
 	screen.priority().fill(0, cliprect);
 
