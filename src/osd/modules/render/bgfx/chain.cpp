@@ -34,10 +34,11 @@ bgfx_chain::bgfx_chain(std::string name, std::string author, bool transform, tar
 	, m_current_time(0)
 	, m_screen_index(screen_index)
 {
-	for (bgfx_slider* slider : m_sliders)
-	{
-		m_slider_map[slider->name()] = slider;
-	}
+    for (bgfx_target* target : m_target_list)
+    {
+        m_target_map[target->name()] = target;
+        m_target_names.push_back(target->name());
+    }
 }
 
 bgfx_chain::~bgfx_chain()
@@ -58,6 +59,17 @@ bgfx_chain::~bgfx_chain()
 	{
 		m_targets.destroy_target(target->name(), m_screen_index);
 	}
+}
+
+void bgfx_chain::repopulate_targets()
+{
+    for (size_t i = 0; i < m_target_names.size(); i++)
+    {
+        bgfx_target* target = m_targets.target(m_screen_index, m_target_names[i]);
+        if (target != nullptr) {
+            m_target_list[i] = target;
+        }
+    }
 }
 
 void bgfx_chain::process(render_primitive* prim, int view, int screen, texture_manager& textures, osd_window& window, uint64_t blend)
