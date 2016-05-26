@@ -224,7 +224,7 @@ int thread_adjust_priority(std::thread *thread, int adjust)
 	else
 		SetThreadPriority((HANDLE)thread->native_handle(), GetThreadPriority(GetCurrentThread()));
 #endif
-#if defined(SDLMAME_LINUX) || defined(SDLMAME_BSD) || defined(SDLMAME_HAIKU) || defined(SDLMAME_EMSCRIPTEN) || defined(SDLMAME_DARWIN)
+#if defined(SDLMAME_LINUX) || defined(SDLMAME_BSD) || defined(SDLMAME_HAIKU) || defined(SDLMAME_DARWIN)
 	struct sched_param  sched;
 	int                 policy;
 
