@@ -27,9 +27,6 @@ typedef _uint128_t UINT128;
 typedef _int128_t INT128;
 #endif
 
-#define PLIB_NAMESPACE_START() namespace plib {
-#define PLIB_NAMESPACE_END() }
-
 #if !(PSTANDALONE)
 #include "osdcomm.h"
 //#include "eminline.h"
@@ -139,7 +136,7 @@ typedef int64_t      INT64;
 
 #endif
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 using ticks_t = INT64;
 
@@ -171,59 +168,59 @@ static inline ticks_t profile_ticks() { return ticks(); }
  */
 
 #if (PHAS_PMF_INTERNAL)
-class mfp
-{
-public:
-	// construct from any member function pointer
-	class generic_class;
-	using generic_function = void (*)();
-
-	template<typename MemberFunctionType>
-	mfp(MemberFunctionType mftp)
-	: m_function(0), m_this_delta(0)
+	class mfp
 	{
-		*reinterpret_cast<MemberFunctionType *>(this) = mftp;
-	}
+	public:
+		// construct from any member function pointer
+		class generic_class;
+		using generic_function = void (*)();
 
-	// binding helper
-	template<typename FunctionType, typename ObjectType>
-	FunctionType update_after_bind(ObjectType *object)
-	{
-		return reinterpret_cast<FunctionType>(
-				convert_to_generic(reinterpret_cast<generic_class *>(object)));
-	}
-	template<typename FunctionType, typename MemberFunctionType, typename ObjectType>
-	static FunctionType get_mfp(MemberFunctionType mftp, ObjectType *object)
-	{
-		mfp mfpo(mftp);
-		return mfpo.update_after_bind<FunctionType>(object);
-	}
+		template<typename MemberFunctionType>
+		mfp(MemberFunctionType mftp)
+		: m_function(0), m_this_delta(0)
+		{
+			*reinterpret_cast<MemberFunctionType *>(this) = mftp;
+		}
 
-private:
-	// extract the generic function and adjust the object pointer
-	generic_function convert_to_generic(generic_class * object) const
-	{
-		// apply the "this" delta to the object first
-		generic_class * o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
+		// binding helper
+		template<typename FunctionType, typename ObjectType>
+		FunctionType update_after_bind(ObjectType *object)
+		{
+			return reinterpret_cast<FunctionType>(
+					convert_to_generic(reinterpret_cast<generic_class *>(object)));
+		}
+		template<typename FunctionType, typename MemberFunctionType, typename ObjectType>
+		static FunctionType get_mfp(MemberFunctionType mftp, ObjectType *object)
+		{
+			mfp mfpo(mftp);
+			return mfpo.update_after_bind<FunctionType>(object);
+		}
 
-		// if the low bit of the vtable index is clear, then it is just a raw function pointer
-		if (!(m_function & 1))
-			return reinterpret_cast<generic_function>(m_function);
+	private:
+		// extract the generic function and adjust the object pointer
+		generic_function convert_to_generic(generic_class * object) const
+		{
+			// apply the "this" delta to the object first
+			generic_class * o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 
-		// otherwise, it is the byte index into the vtable where the actual function lives
-		std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(o_p_delta);
-		return *reinterpret_cast<generic_function *>(vtable_base + m_function - 1);
-	}
+			// if the low bit of the vtable index is clear, then it is just a raw function pointer
+			if (!(m_function & 1))
+				return reinterpret_cast<generic_function>(m_function);
 
-	// actual state
-	uintptr_t               m_function;         // first item can be one of two things:
-												//    if even, it's a pointer to the function
-												//    if odd, it's the byte offset into the vtable
-	int                     m_this_delta;       // delta to apply to the 'this' pointer
-};
+			// otherwise, it is the byte index into the vtable where the actual function lives
+			std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(o_p_delta);
+			return *reinterpret_cast<generic_function *>(vtable_base + m_function - 1);
+		}
+
+		// actual state
+		uintptr_t               m_function;         // first item can be one of two things:
+													//    if even, it's a pointer to the function
+													//    if odd, it's the byte offset into the vtable
+		int                     m_this_delta;       // delta to apply to the 'this' pointer
+	};
 
 #endif
 
-PLIB_NAMESPACE_END()
+}
 
 #endif /* PCONFIG_H_ */

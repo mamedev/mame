@@ -36,7 +36,7 @@
 
 #endif
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 //============================================================
 //  exception base
@@ -198,6 +198,6 @@ public:
 	std::vector<block> m_blocks;
 };
 
-PLIB_NAMESPACE_END()
+}
 
 #endif /* PALLOC_H_ */

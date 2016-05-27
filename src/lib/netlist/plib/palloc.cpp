@@ -10,7 +10,7 @@
 #include "pconfig.h"
 #include "palloc.h"
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 //============================================================
 //  Exceptions
@@ -95,4 +95,4 @@ void mempool::free(void *ptr)
 	b->m_num_alloc--;
 }
 
-PLIB_NAMESPACE_END()
+}

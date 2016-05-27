@@ -17,7 +17,7 @@
 #include "palloc.h"
 #include "pstring.h"
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 // ----------------------------------------------------------------------------------------
 // parray_t: dynamic array
@@ -661,6 +661,6 @@ static inline void sort_list(T &sl)
 	}
 }
 
-PLIB_NAMESPACE_END()
+}
 
 #endif /* PLISTS_H_ */

@@ -13,7 +13,7 @@
 #include "plists.h"
 #include "pstream.h"
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 class ptokenizer
 {
@@ -197,6 +197,6 @@ private:
 	int m_lineno;
 };
 
-PLIB_NAMESPACE_END()
+}
 
 #endif /* PPARSER_H_ */

@@ -11,7 +11,7 @@
 #include "pconfig.h"
 #include "pstring.h"
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 //============================================================
 //  penum - strongly typed enumeration
@@ -76,7 +76,7 @@ protected:
 	}
 };
 
-PLIB_NAMESPACE_END()
+}
 
 #define P_ENUM(ename, ...) \
 	struct ename : public plib::enum_base { \

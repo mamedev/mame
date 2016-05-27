@@ -181,7 +181,7 @@ using netlist_sig_t = std::uint32_t;
  //============================================================
 
 #define NETLIB_NAMESPACE_DEVICES_START()    namespace netlist { namespace devices {
-#define NETLIB_NAMESPACE_DEVICES_END()  }}
+#define NETLIB_NAMESPACE_DEVICES_END()  }} // netlist::devices
 
 #define NETLIB_NAME(chip) nld_ ## chip
 

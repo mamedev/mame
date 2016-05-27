@@ -13,7 +13,7 @@
 #include "pconfig.h"
 #include "pstring.h"
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 // ----------------------------------------------------------------------------------------
 // pdynlib: dynamic loading of libraries  ...
@@ -40,6 +40,6 @@ private:
 	void *m_lib;
 };
 
-PLIB_NAMESPACE_END()
+}
 
 #endif /* PSTRING_H_ */

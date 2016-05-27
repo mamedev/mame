@@ -68,7 +68,7 @@ NETLIST_SAVE_TYPE(UINT16, DT_INT16);
 NETLIST_SAVE_TYPE(INT16, DT_INT16);
 //NETLIST_SAVE_TYPE(std::size_t, DT_INT64);
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 class pstate_manager_t;
 
@@ -187,6 +187,6 @@ public:
 	}
 };
 
-PLIB_NAMESPACE_END()
+}
 
 #endif /* PSTATE_H_ */
