@@ -113,12 +113,14 @@ public:
 		}
 	}
 
-	ATTR_HOT  C& operator[](const std::size_t index)
+	size_t size() { return N; }
+
+	C& operator[](const std::size_t &index)
 	{
 		return *reinterpret_cast<C *>(reinterpret_cast<char *>(m_buf) + index * sizeof(C));
 	}
 
-	ATTR_HOT  const C& operator[](const std::size_t index) const
+	const C& operator[](const std::size_t &index) const
 	{
 		return *reinterpret_cast<C *>(reinterpret_cast<char *>(m_buf) + index * sizeof(C));
 	}
