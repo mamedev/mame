@@ -2308,16 +2308,6 @@ stuntcyc                        // (c) 1976 Atari
 tank                            // (c) 1974 Atari / Kee
 tankii                          // (c) 1975 Atari / Kee
 
-@source:ataxx.cpp
-asylum                          // (c) 1991 Leland
-ataxx                           // (c) 1990 Leland
-ataxxa                          // (c) 1990 Leland
-ataxxe                          // (c) 1990 Leland
-ataxxj                          // (c) 1990 Leland
-brutforc                        // (c) 1991 Leland
-indyheat                        // (c) 1991 Leland
-wsf                             // (c) 1990 Leland
-
 @source:atetris.cpp
 atetris                         // 136066           (c) 1988
 atetrisa                        // 136066           (c) 1988
@@ -16846,6 +16836,14 @@ teamqb2                         // (c) 1988 Leland
 upyoural                        // (c) 1987 Cinematronics
 viper                           // (c) 1988 Leland
 wseries                         // (c) 1985 Cinematronics
+asylum                          // (c) 1991 Leland
+ataxx                           // (c) 1990 Leland
+ataxxa                          // (c) 1990 Leland
+ataxxe                          // (c) 1990 Leland
+ataxxj                          // (c) 1990 Leland
+brutforc                        // (c) 1991 Leland
+indyheat                        // (c) 1991 Leland
+wsf                             // (c) 1990 Leland
 
 @source:lemmings.cpp
 lemmings                        // prototype (c) 1991 Data East USA (US)

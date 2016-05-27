@@ -1349,7 +1349,6 @@ files {
 
 createMAMEProjects(_target, _subtarget, "cinemat")
 files {
-	MAME_DIR .. "src/mame/drivers/ataxx.cpp",
 	MAME_DIR .. "src/mame/drivers/cinemat.cpp",
 	MAME_DIR .. "src/mame/includes/cinemat.h",
 	MAME_DIR .. "src/mame/audio/cinemat.cpp",
