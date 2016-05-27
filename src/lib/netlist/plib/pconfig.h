@@ -222,8 +222,8 @@ private:
 	int                     m_this_delta;       // delta to apply to the 'this' pointer
 };
 
-PLIB_NAMESPACE_END()
-
 #endif
+
+PLIB_NAMESPACE_END()
 
 #endif /* PCONFIG_H_ */
