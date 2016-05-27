@@ -678,6 +678,15 @@ static SLOT_INTERFACE_START( super80_floppies )
 SLOT_INTERFACE_END
 
 
+static const char *const relay_sample_names[] =
+{
+	"*relay",
+	"relayoff",
+	"relayon",
+	nullptr
+};
+
+
 static MACHINE_CONFIG_START( super80, super80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
@@ -710,6 +719,10 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(relay_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
@@ -798,6 +811,10 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(relay_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
