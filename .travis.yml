@@ -32,7 +32,7 @@ script:
 sudo: required
 before_install:
   - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo add-apt-repository ppa:zoogie/sdl2-snapshots -y; fi"
-  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo add-apt-repository ppa:beineri/opt-qt55 -y; fi"
+  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo add-apt-repository ppa:beineri/opt-qt551 -y; fi"
   - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo apt-get update -qq; fi"
   - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo apt-get install -y --force-yes libsdl2-dev libsdl2-ttf-dev libasound2-dev qt55base qt55quickcontrols qt55declarative qt55tools qt55svg; fi"
   - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then source /opt/qt55/bin/qt55-env.sh; fi"
