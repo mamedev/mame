@@ -51,16 +51,16 @@
 
 #include "nl_base.h"
 
-#define TTL_9316(name, cCLK, cENP, cENT, cCLRQ, cLOADQ, cA, cB, cC, cD)            \
-		NET_REGISTER_DEV(TTL_9316, name)                                               \
-		NET_CONNECT(name, CLK, cCLK)                                               \
-		NET_CONNECT(name, ENP,  cENP)                                              \
-		NET_CONNECT(name, ENT,  cENT)                                              \
-		NET_CONNECT(name, CLRQ, cCLRQ)                                             \
-		NET_CONNECT(name, LOADQ,_LOADQ)                                            \
-		NET_CONNECT(name, A,    cA)                                                \
-		NET_CONNECT(name, B,    cB)                                                \
-		NET_CONNECT(name, C,    cC)                                                \
+#define TTL_9316(name, cCLK, cENP, cENT, cCLRQ, cLOADQ, cA, cB, cC, cD)         \
+		NET_REGISTER_DEV(TTL_9316, name)                                        \
+		NET_CONNECT(name, CLK, cCLK)                                            \
+		NET_CONNECT(name, ENP,  cENP)                                           \
+		NET_CONNECT(name, ENT,  cENT)                                           \
+		NET_CONNECT(name, CLRQ, cCLRQ)                                          \
+		NET_CONNECT(name, LOADQ, cLOADQ)                                        \
+		NET_CONNECT(name, A,    cA)                                             \
+		NET_CONNECT(name, B,    cB)                                             \
+		NET_CONNECT(name, C,    cC)                                             \
 		NET_CONNECT(name, D,    cD)
 
 #define TTL_9316_DIP(name)                                                         \
