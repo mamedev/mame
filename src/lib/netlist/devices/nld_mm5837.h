@@ -25,7 +25,10 @@
 #define MM5837_DIP(name)                                                        \
 		NET_REGISTER_DEV(MM5837_DIP, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(MM5837_dip)
 {
@@ -78,6 +81,7 @@ protected:
 	bool m_is_timestep;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_MM5837_H_ */

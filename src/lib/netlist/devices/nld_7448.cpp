@@ -7,7 +7,10 @@
 
 #include "nld_7448.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 #if (USE_TRUTHTABLE_7448 && USE_TRUTHTABLE)
 nld_7448::truthtable_t nld_7448::m_ttbl;
@@ -137,4 +140,5 @@ const UINT8 NETLIB_NAME(7448_sub)::tab7448[16][7] =
 };
 #endif
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

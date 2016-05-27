@@ -7,7 +7,10 @@
 
 #include "nld_74175.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 static const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(25) };
 static const netlist_time delay_clear[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
@@ -62,4 +65,5 @@ NETLIB_RESET(74175)
 	//m_sub.do_reset();
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

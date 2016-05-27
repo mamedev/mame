@@ -41,7 +41,10 @@
 #define TTL_74279_DIP(name)                                                         \
 		NET_REGISTER_DEV(TTL_74279_DIP, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 #if 0
 NETLIB_TRUTHTABLE(74279A, 2, 1, 1);
@@ -91,6 +94,7 @@ protected:
 	NETLIB_SUB(74279A) m_4;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_74279_H_ */

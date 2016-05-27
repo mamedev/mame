@@ -8,7 +8,10 @@
 #include "nld_truthtable.h"
 #include "plib/plists.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 unsigned truthtable_desc_t::count_bits(UINT32 v)
 {
@@ -273,4 +276,5 @@ plib::owned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const un
 	//return nullptr;
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

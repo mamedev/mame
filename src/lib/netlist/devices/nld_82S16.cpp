@@ -7,7 +7,10 @@
 
 #include "nld_82S16.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 // FIXME: timing!
 // FIXME: optimize device (separate address decoder!)
@@ -45,4 +48,5 @@ NETLIB_RESET(82S16)
 	}
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

@@ -9,7 +9,10 @@
 
 #include "nld_74192.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_RESET(74192)
 {
@@ -72,4 +75,5 @@ NETLIB_UPDATE(74192)
 	OUTLOGIC(m_CARRYQ, tCarry, NLTIME_FROM_NS(20)); //FIXME
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

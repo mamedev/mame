@@ -55,7 +55,10 @@
 		NETDEV_PARAMI(name, R,   p_R)                                          \
 		NETDEV_PARAMI(name, N,   p_N)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT_DERIVED(r2r_dac, twoterm)
 {
@@ -80,7 +83,8 @@ protected:
 	param_int_t m_val;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 
 #endif /* NLD_R2R_DAC_H_ */

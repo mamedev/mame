@@ -61,7 +61,10 @@ NETLIST_END()
 #define ENTRY1(nic, name, defparam) factory.register_device<nic>( # name, xstr(nic), defparam );
 #define ENTRY(nic, name, defparam) ENTRY1(NETLIB_NAME(nic), name, defparam)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 void initialize_factory(factory_list_t &factory)
 {
@@ -148,7 +151,8 @@ void initialize_factory(factory_list_t &factory)
 	ENTRY(MM5837_dip,           MM5837_DIP,             "-")
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 namespace netlist
 {

@@ -7,7 +7,10 @@
 
 #include "nld_7490.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_RESET(7490)
 {
@@ -63,4 +66,5 @@ NETLIB_FUNC_VOID(7490, update_outputs, (void))
 		OUTLOGIC(m_Q[i], (m_cnt >> i) & 1, delay[i]);
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

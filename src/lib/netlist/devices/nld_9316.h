@@ -66,7 +66,10 @@
 #define TTL_9316_DIP(name)                                                         \
 		NET_REGISTER_DEV(TTL_9316_DIP, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(9316_subABCD)
 {
@@ -199,6 +202,7 @@ NETLIB_OBJECT_DERIVED(9316_dip, 9316)
 	}
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_9316_H_ */

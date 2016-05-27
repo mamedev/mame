@@ -28,7 +28,10 @@
 #define LVCCS(name)                                                           \
 		NET_REGISTER_DEV(LVCCS, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 // ----------------------------------------------------------------------------------------
 // nld_VCCS
@@ -227,7 +230,8 @@ protected:
 
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 
 #endif /* NLD_FOURTERM_H_ */

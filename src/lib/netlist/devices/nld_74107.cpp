@@ -7,7 +7,10 @@
 
 #include "nld_74107.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_RESET(74107Asub)
 {
@@ -77,4 +80,5 @@ NETLIB_UPDATE(74107A)
 }
 
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

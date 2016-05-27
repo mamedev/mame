@@ -180,9 +180,6 @@ using netlist_sig_t = std::uint32_t;
  //  MACROS / New Syntax
  //============================================================
 
-#define NETLIB_NAMESPACE_DEVICES_START()    namespace netlist { namespace devices {
-#define NETLIB_NAMESPACE_DEVICES_END()  }} // netlist::devices
-
 #define NETLIB_NAME(chip) nld_ ## chip
 
 #define NETLIB_OBJECT_DERIVED(name, pclass)                                   \

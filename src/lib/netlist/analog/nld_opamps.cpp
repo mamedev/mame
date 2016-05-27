@@ -38,7 +38,10 @@ NETLIST_START(opamp_lm3900)
 
 NETLIST_END()
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 /*
  * Type = 0: Impedance changer
@@ -113,4 +116,5 @@ NETLIB_DEVICE_WITH_PARAMS(OPAMPx,
 );
 */
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

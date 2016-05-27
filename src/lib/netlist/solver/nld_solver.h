@@ -27,7 +27,10 @@
 // solver
 // ----------------------------------------------------------------------------------------
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 class NETLIB_NAME(solver);
 
@@ -129,6 +132,7 @@ private:
 	matrix_solver_t *create_solver(int size, bool use_specific);
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_SOLVER_H_ */

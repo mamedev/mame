@@ -24,7 +24,10 @@
 		NETDEV_PARAMI(name,  MODEL, model)
 
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 // -----------------------------------------------------------------------------
 // nld_Q - Base classes
@@ -195,6 +198,7 @@ protected:
 private:
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_BJT_H_ */

@@ -7,7 +7,10 @@
 
 #include "nld_7474.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 ATTR_HOT inline void NETLIB_NAME(7474sub)::newstate(const UINT8 stateQ, const UINT8 stateQQ)
 {
@@ -78,4 +81,5 @@ NETLIB_UPDATE(7474_dip)
 	//m_2.update_dev();
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

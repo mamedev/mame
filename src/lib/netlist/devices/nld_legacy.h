@@ -15,7 +15,10 @@
 
 #include "nl_base.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 // ----------------------------------------------------------------------------------------
 // Macros
@@ -81,6 +84,7 @@ protected:
 	UINT8 m_last;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_LEGACY_H_ */

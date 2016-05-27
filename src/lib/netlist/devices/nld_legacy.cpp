@@ -8,7 +8,10 @@
 #include "nld_legacy.h"
 #include "nl_setup.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_RESET(nicRSFF)
 {
@@ -51,4 +54,5 @@ NETLIB_UPDATE(nicDelay)
 	m_last = nval;
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

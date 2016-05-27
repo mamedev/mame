@@ -9,7 +9,10 @@
 #include "nld_fourterm.h"
 #include "nl_setup.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 // ----------------------------------------------------------------------------------------
 // nld_VCCS
@@ -117,4 +120,5 @@ NETLIB_RESET(VCVS)
 	m_ON2.set(NL_FCONST(1.0) / m_RO.Value());
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

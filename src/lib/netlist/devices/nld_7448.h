@@ -40,7 +40,10 @@
 #define TTL_7448_DIP(name)                                                         \
 		NET_REGISTER_DEV(TTL_7448_DIP, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 /*
  * FIXME: Using truthtable is a lot slower than the explicit device
@@ -151,6 +154,7 @@ NETLIB_OBJECT_DERIVED(7448_dip, 7448)
 	}
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_7448_H_ */

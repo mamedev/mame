@@ -9,7 +9,10 @@
 #include <solver/nld_matrix_solver.h>
 #include "nld_system.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 // ----------------------------------------------------------------------------------------
 // netlistparams
@@ -210,4 +213,5 @@ NETLIB_UPDATE(function)
 }
 
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

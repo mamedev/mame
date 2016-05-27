@@ -56,7 +56,10 @@
 #define TTL_74123(name)                                                        \
 		NET_REGISTER_DEV(TTL_74123, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(74123)
 {
@@ -243,7 +246,8 @@ private:
 	NETLIB_SUB(74123) m_2;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 
 #endif /* NLD_74123_H_ */

@@ -41,7 +41,10 @@
 #define CD4020(name)                                                          \
 		NET_REGISTER_DEV(CD4020, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(CD4020_sub)
 {
@@ -118,6 +121,7 @@ private:
 	logic_input_t m_RESET;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_4020_H_ */

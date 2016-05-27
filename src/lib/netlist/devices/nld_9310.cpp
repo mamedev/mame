@@ -9,7 +9,10 @@
 
 #define MAXCNT 9
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_RESET(9310)
 {
@@ -147,4 +150,5 @@ inline NETLIB_FUNC_VOID(9310_sub, update_outputs, (const UINT8 cnt))
 #endif
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

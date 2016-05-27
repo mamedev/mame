@@ -45,7 +45,10 @@
 #define TTL_9312_DIP(name)                                            \
 		NET_REGISTER_DEV(TTL_9312_DIP, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 #if (USE_TRUTHTABLE)
 /* The truthtable implementation is a lot faster than
@@ -125,6 +128,7 @@ protected:
 	NETLIB_SUB(9312) m_sub;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_9312_H_ */

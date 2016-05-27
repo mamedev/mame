@@ -60,7 +60,10 @@
 #define TTL_74153_DIP(name)                                                         \
 		NET_REGISTER_DEV(TTL_74153_DIP, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(74153sub)
 {
@@ -149,6 +152,7 @@ protected:
 	logic_input_t m_B;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_74153_H_ */

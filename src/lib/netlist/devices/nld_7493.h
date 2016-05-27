@@ -69,7 +69,10 @@
 #define TTL_7493_DIP(name)                                                         \
 		NET_REGISTER_DEV(TTL_7493_DIP, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(7493ff)
 {
@@ -150,7 +153,8 @@ NETLIB_OBJECT_DERIVED(7493_dip, 7493)
 	}
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 
 #endif /* NLD_7493_H_ */

@@ -75,7 +75,10 @@
 		PARAM(name.N, p_N)                                                     \
 		PARAM(name.FUNC, p_F)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 // -----------------------------------------------------------------------------
 // netlistparams
@@ -641,6 +644,7 @@ private:
 };
 
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_SYSTEM_H_ */

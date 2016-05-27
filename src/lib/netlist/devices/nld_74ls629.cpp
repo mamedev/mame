@@ -42,7 +42,10 @@
 #include "nld_74ls629.h"
 #include "nl_setup.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_UPDATE(SN74LS629clk)
 {
@@ -120,4 +123,5 @@ NETLIB_UPDATE(SN74LS629)
 	}
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

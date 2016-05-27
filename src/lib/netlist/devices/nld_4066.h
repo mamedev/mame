@@ -30,7 +30,10 @@
 #define CD4066_GATE(name)                                                     \
 		NET_REGISTER_DEV(CD4066_GATE, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(CD4066_GATE)
 {
@@ -54,6 +57,7 @@ public:
 	param_double_t m_base_r;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_4066_H_ */

@@ -7,7 +7,10 @@
 
 #include "nld_74153.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 /* FIXME: timing is not 100% accurate, Strobe and Select inputs have a
  *        slightly longer timing.
@@ -49,4 +52,5 @@ NETLIB_UPDATE(74153_dip)
 	m_2.do_update();
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

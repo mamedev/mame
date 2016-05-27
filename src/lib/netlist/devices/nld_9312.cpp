@@ -22,7 +22,10 @@
 */
 #include "nld_9312.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 #if (1 && USE_TRUTHTABLE)
 nld_9312::truthtable_t nld_9312::m_ttbl;
@@ -124,4 +127,5 @@ NETLIB_RESET(9312)
 }
 #endif
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

@@ -11,7 +11,10 @@
 #include "nl_base.h"
 #include "analog/nld_twoterm.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(vdd_vss)
 {
@@ -32,6 +35,7 @@ public:
 	analog_input_t m_vss;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_CMOS_H_ */

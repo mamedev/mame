@@ -7,7 +7,10 @@
 
 #include "nld_4020.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 
 NETLIB_UPDATE(CD4020_sub)
@@ -50,4 +53,5 @@ inline NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const UINT16 cnt))
 		OUTLOGIC(m_Q[i], (cnt >> i) & 1, out_delayQn[i]);
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

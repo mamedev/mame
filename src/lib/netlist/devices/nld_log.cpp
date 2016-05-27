@@ -8,7 +8,10 @@
 #include "nld_log.h"
 //#include "sound/wavwrite.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 //FIXME: what to do with save states?
 
@@ -50,4 +53,5 @@ NETLIB_NAME(log)::~NETLIB_NAME(wav)()
 }
 #endif
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

@@ -10,7 +10,10 @@
 
 #include "nld_twoterm.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 // ----------------------------------------------------------------------------------------
 // generic_diode
@@ -172,4 +175,5 @@ NETLIB_UPDATE(CS)
 	NETLIB_NAME(twoterm)::update();
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

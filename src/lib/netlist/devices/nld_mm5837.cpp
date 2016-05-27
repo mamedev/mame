@@ -12,7 +12,10 @@
 #define R_LOW (1000)
 #define R_HIGH (1000)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_RESET(MM5837_dip)
 {
@@ -55,4 +58,5 @@ NETLIB_UPDATE(MM5837_dip)
 
 
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

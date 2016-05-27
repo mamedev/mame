@@ -55,7 +55,10 @@
 #include "nld_ms_sor_mat.h"
 #include "nld_ms_gmres.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 ATTR_COLD void terms_t::add(terminal_t *term, int net_other, bool sorted)
 {
@@ -847,4 +850,5 @@ void NETLIB_NAME(solver)::create_solver_code(plib::postream &strm)
 }
 
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

@@ -12,7 +12,10 @@
 #define R_OFF (1E20)
 #define R_ON (25)   // Datasheet states a maximum discharge of 200mA, R = 5V / 0.2
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 inline nl_double NETLIB_NAME(NE555)::clamp(const nl_double v, const nl_double a, const nl_double b)
 {
@@ -77,4 +80,5 @@ NETLIB_UPDATE(NE555)
 }
 
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

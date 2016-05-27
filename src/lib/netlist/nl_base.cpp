@@ -1066,7 +1066,10 @@ ATTR_COLD nl_double param_model_t::model_value(const pstring &entity)
 
 } // namespace
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 // ----------------------------------------------------------------------------------------
 // mainclock
@@ -1079,5 +1082,6 @@ ATTR_HOT /* inline */ void NETLIB_NAME(mainclock)::mc_update(logic_net_t &net)
 }
 
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 

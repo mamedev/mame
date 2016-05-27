@@ -19,7 +19,10 @@
 #include "solver/nld_solver.h"
 #include "solver/vector_base.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 template <unsigned m_N, unsigned storage_N>
 class matrix_solver_GMRES_t: public matrix_solver_direct_t<m_N, storage_N>
@@ -381,6 +384,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double * RESTRICT
 
 
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_MS_GMRES_H_ */

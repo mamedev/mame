@@ -40,7 +40,10 @@
 		NETDEV_PARAMI(name, 1.CAP, p_cap1)                                        \
 		NETDEV_PARAMI(name, 2.CAP, p_cap2)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(SN74LS629clk)
 {
@@ -155,7 +158,8 @@ private:
 	NETLIB_SUB(SN74LS629) m_2;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 
 #endif /* NLD_74LS629_H_ */

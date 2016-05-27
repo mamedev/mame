@@ -33,7 +33,10 @@
 		NET_CONNECT(name, I2, cI2)
 
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(log)
 {
@@ -73,6 +76,7 @@ private:
 );
 #endif
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_LOG_H_ */

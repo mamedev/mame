@@ -46,7 +46,10 @@
 	setup.factory().register_device(std::move(ttd)); \
 	}
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 #if 0
 static inline UINT32 remove_first_bit(UINT32 v)
@@ -362,7 +365,8 @@ plib::owned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const un
 		const pstring &name, const pstring &classname,
 		const pstring &def_param);
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 
 

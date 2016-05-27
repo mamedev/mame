@@ -10,7 +10,10 @@
 #define R_OFF (1E20)
 #define R_ON (m_RI.Value())
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_UPDATE(74123)
 {
@@ -138,4 +141,5 @@ NETLIB_RESET(4538_dip)
 	m_2.do_reset();
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

@@ -13,7 +13,10 @@
 #include "solver/nld_solver.h"
 #include "plib/pstream.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 class terms_t
 {
@@ -281,6 +284,7 @@ void matrix_solver_t::build_LE_RHS()
 	}
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_MS_DIRECT_H_ */

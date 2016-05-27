@@ -62,7 +62,10 @@
 #define TTL_9310_DIP(name)                                                         \
 		NET_REGISTER_DEV(TTL_9310_DIP, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(9310_subABCD)
 {
@@ -191,6 +194,7 @@ NETLIB_OBJECT_DERIVED(9310_dip, 9310)
 		// register_subalias("16", ); -. VCC
 	}
 };
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_9310_H_ */

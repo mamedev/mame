@@ -7,7 +7,10 @@
 
 #include "nld_4066.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_UPDATE(CD4066_GATE)
 {
@@ -44,4 +47,5 @@ NETLIB_UPDATE(CD4066_GATE)
 }
 
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

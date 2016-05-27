@@ -46,7 +46,10 @@
 #include "solver/nld_matrix_solver.h"
 #include "solver/vector_base.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 //#define nl_ext_double _float128 // slow, very slow
 //#define nl_ext_double long double // slightly slower
@@ -401,6 +404,7 @@ matrix_solver_w_t<m_N, storage_N>::matrix_solver_w_t(netlist_t &anetlist, const 
 	}
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_MS_DIRECT_H_ */

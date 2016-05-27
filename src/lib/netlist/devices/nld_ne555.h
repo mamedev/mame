@@ -25,7 +25,10 @@
 #define NE555(name)                                                        \
 		NET_REGISTER_DEV(NE555, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(NE555)
 {
@@ -95,6 +98,7 @@ NETLIB_OBJECT_DERIVED(NE555_dip, NE555)
 	}
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_NE555_H_ */
