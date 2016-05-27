@@ -2,8 +2,9 @@
 // copyright-holders:Angelo Salese, Roberto Fresca, David Haywood
 /*********************************************************************************
 
-  Merit Industries Match Games (1981)
-  -----------------------------------
+  Match Games.
+  CRT 100 + CRT 810 boards system.
+  Merit Industries, 1981.
 
   Driver by Angelo Salese, David Haywood & Roberto Fresca.
 
@@ -80,7 +81,7 @@
   ---------------
 
   1x OSC = 18.000 MHz.
-  1x CPU = Zilog Z80 (Z0840006PSC / 9512 / 2K).
+  1x CPU = Zilog Z80 (Z0840006PSC).
   4x 74LS253N (multiplexers).
   4x MM2114N-3 (4096-Bit Static RAM).
   2x SCM5101E (256x4 Static RAM).
@@ -88,7 +89,7 @@
   The PCB has a socket for two standard AA batteries
 
 
-  MAIN BOARD:
+  MAIN BOARD CRT 100:
   .------------------------. .-------------------. .---------------------------.
   |                        | ||||||||||||||||||||| |           .------------.  |
   |                        '-'        J2         '-'          -|4.7 Ohm 10% |- |
@@ -139,7 +140,6 @@
   |    '-----'  '-----'        '-----'                                 '-----' |
   '----------------------------------------------------------------------------'
 
-
   U13 = MLTI 0    U68 = CGM 0
   U14 = MLTI 1    U67 = CGM 1
   U15 = MLTI 2    U66 = CGM 2
@@ -151,48 +151,32 @@
   J1 = Jumpers bank? (see multiplexed port)
 
 
-  VIDEO I/O BOARD CRT810:
+  VIDEO I/O BOARD CRT 810:
                           .-------------------.
-                          |||||||||||||||||||||
-  .-----------------------'                   '----------------------.
+  .-----------------------|||||||||||||||||||||----------------------.
   |                                                                  |
   |                                                          LM380N  |
+  |                                       DISCRETE                   |
+  |                                       CIRCUITRY          MC1455P |
   |                                                                  |
-  |                                                          MC1455P |
   |                                                                  |
+  |                                                           ML7805 |
+  | SW 7407-N    SW 7407-N    SW 7407-N    SW 7407-N           +5V.  |
   |                                                                  |
-  | SW 7407-N    SW 7407-N    SW 7407-N    SW 7407-N                 |
-  | 21430 7301   21430 7301   21430 7301   21430 7301                |
+  | 74LS259N     74LS259N     74LS259N                        MC7812 |
+  |                                                            +12V. |
   |                                                                  |
-  | 74LS259N     74LS259N     74LS259N     74LS259N                  |
-  |                                                                  |
-  '----------------.                                .----------------'
-                   ||||||||||||||||||||||||||||||||||
+  '----------------||||||||||||||||||||||||||||||||||----------------'
                    '--------------------------------'
-                           To J4 on Main Board
+                          To J4 on Main Board
 
   LM380N = 2.5W Audio Power Amplifier.
   MC1455P = Direct Replacement for NE555 Timers.
 
-  (Audio seems to be discrete).
+  (Audio IS discrete).
 
   4x 7407N (Buffer Gates Non-Inverting).
   4x 74LS259N (8-Bit Addressable Latches).
-
-  4x 7301 (HDSP?)(RED Seven Segment Displays).
-
-  +---------+  Pin | Description
-  |    A    |  ----+------------
-  |   ---   |   01 | Anode (4).
-  | F|   |B |   02 | Cathode F.
-  |   -G-   |   03 | Cathode G.
-  | E|   |C |   04 | Cathode E.
-  |   ---   |   05 | Cathode D.
-  |    D .DP|   06 | Anode (4).
-  +---------+   07 | Cathode DP.
-                08 | Cathode C.
-                09 | Cathode B.
-                10 | Cathode A.
 
 
 **********************************************************************************
@@ -224,6 +208,7 @@
 
   - Color system (no bipolar PROMs in the system), needs a reference
 
+  - Discrete sound.
 
 **********************************************************************************/
 
@@ -231,7 +216,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-//#include "sound/dac.h"
 #include "machine/nvram.h"
 #include "mgames.lh"
 
