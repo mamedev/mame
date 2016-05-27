@@ -7,6 +7,7 @@
 
 #include "font_module.h"
 #include "modules/osdmodule.h"
+#include "modules/lib/osdlib.h"
 
 // We take dependencies on WRL client headers and
 // we can only build with a high enough version
@@ -78,8 +79,8 @@ struct osd_deleter
 typedef std::unique_ptr<char, osd_deleter> osd_utf8_ptr;
 
 // Typedefs for dynamically loaded functions
-typedef lazy_loaded_function_p4<HRESULT, D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS*, void**> d2d_create_factory_fn;
-typedef lazy_loaded_function_p3<HRESULT, DWRITE_FACTORY_TYPE, REFIID, IUnknown**> dwrite_create_factory_fn;
+typedef HRESULT WINAPI (*d2d_create_factory_fn)(D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
+typedef HRESULT (*dwrite_create_factory_fn)(DWRITE_FACTORY_TYPE, REFIID, IUnknown **);
 
 // Debugging functions
 #ifdef DWRITE_DEBUGGING
@@ -88,7 +89,7 @@ typedef lazy_loaded_function_p3<HRESULT, DWRITE_FACTORY_TYPE, REFIID, IUnknown**
 //  Save image to file
 //-------------------------------------------------
 
-void SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
+HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 {
 	HRESULT result = S_OK;
 	ComPtr<IWICStream> stream;
@@ -96,13 +97,14 @@ void SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	ComPtr<IDWriteFactory> dwriteFactory;
 	ComPtr<IWICImagingFactory> wicFactory;
 
-	d2d_create_factory_fn pfn_D2D1CreateFactory("D2D1CreateFactory", L"D2d1.dll");
-	dwrite_create_factory_fn pfn_DWriteCreateFactory("DWriteCreateFactory", L"Dwrite.dll");
-	HR_RET(pfn_D2D1CreateFactory.initialize());
-	HR_RET(pfn_DWriteCreateFactory.initialize());
+	osd_dynamic_bind<d2d_create_factory_fn> pfn_D2D1CreateFactory("D2D1CreateFactory", { TEXT("D2d1.dll") });
+	osd_dynamic_bind<dwrite_create_factory_fn> pfn_DWriteCreateFactory("DWriteCreateFactory", { TEXT("Dwrite.dll") });
+
+	if (!pfn_D2D1CreateFactory || !pfn_DWriteCreateFactory)
+		return ERROR_DLL_NOT_FOUND;
 
 	// Create a Direct2D factory
-	HR_RET(pfn_D2D1CreateFactory(
+	HR_RETHR((*pfn_D2D1CreateFactory)(
 		D2D1_FACTORY_TYPE_SINGLE_THREADED,
 		__uuidof(ID2D1Factory1),
 		nullptr,
@@ -112,41 +114,43 @@ void SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 	// Create a DirectWrite factory.
-	HR_RET(pfn_DWriteCreateFactory(
+	HR_RETHR((*pfn_DWriteCreateFactory)(
 		DWRITE_FACTORY_TYPE_SHARED,
 		__uuidof(IDWriteFactory),
 		reinterpret_cast<IUnknown **>(dwriteFactory.GetAddressOf())));
 
-	HR_RET(CoCreateInstance(
+	HR_RETHR(CoCreateInstance(
 		CLSID_WICImagingFactory,
 		nullptr,
 		CLSCTX_INPROC_SERVER,
 		__uuidof(IWICImagingFactory),
 		(void**)&wicFactory));
 
-	HR_RET(wicFactory->CreateStream(&stream));
-	HR_RET(stream->InitializeFromFilename(filename, GENERIC_WRITE));
+	HR_RETHR(wicFactory->CreateStream(&stream));
+	HR_RETHR(stream->InitializeFromFilename(filename, GENERIC_WRITE));
 
 	ComPtr<IWICBitmapEncoder> encoder;
-	HR_RET(wicFactory->CreateEncoder(GUID_ContainerFormatBmp, nullptr, &encoder));
-	HR_RET(encoder->Initialize(stream.Get(), WICBitmapEncoderNoCache));
+	HR_RETHR(wicFactory->CreateEncoder(GUID_ContainerFormatBmp, nullptr, &encoder));
+	HR_RETHR(encoder->Initialize(stream.Get(), WICBitmapEncoderNoCache));
 
 	ComPtr<IWICBitmapFrameEncode> frameEncode;
-	HR_RET(encoder->CreateNewFrame(&frameEncode, nullptr));
-	HR_RET(frameEncode->Initialize(nullptr));
+	HR_RETHR(encoder->CreateNewFrame(&frameEncode, nullptr));
+	HR_RETHR(frameEncode->Initialize(nullptr));
 
 	UINT width, height;
-	HR_RET(bitmap->GetSize(&width, &height));
-	HR_RET(frameEncode->SetSize(width, height));
-	HR_RET(frameEncode->SetPixelFormat(&pixelFormat));
+	HR_RETHR(bitmap->GetSize(&width, &height));
+	HR_RETHR(frameEncode->SetSize(width, height));
+	HR_RETHR(frameEncode->SetPixelFormat(&pixelFormat));
 
-	HR_RET(frameEncode->WriteSource(bitmap, nullptr));
+	HR_RETHR(frameEncode->WriteSource(bitmap, nullptr));
 
-	HR_RET(frameEncode->Commit());
-	HR_RET(encoder->Commit());
+	HR_RETHR(frameEncode->Commit());
+	HR_RETHR(encoder->Commit());
+	
+	return S_OK;
 }
 
-void SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
+HRESULT SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 {
 	HRESULT result;
 
@@ -158,12 +162,12 @@ void SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 		for (int x = 0; x < bitmap.width(); x++)
 		{
 			UINT32 pixel = bitmap.pix32(y, x);
-			pRow[x] = (pixel == 0xFFFFFFFF) ? rgb_t(0xFF, 0x00, 0x00, 0x00) : pRow[x] = rgb_t(0xFF, 0xFF, 0xFF, 0xFF);
+			pRow[x] = (pixel == 0xFFFFFFFF) ? rgb_t(0xFF, 0x00, 0x00, 0x00) : rgb_t(0xFF, 0xFF, 0xFF, 0xFF);
 		}
 	}
 
 	ComPtr<IWICImagingFactory> wicFactory;
-	HR_RET(CoCreateInstance(
+	HR_RETHR(CoCreateInstance(
 		CLSID_WICImagingFactory,
 		nullptr,
 		CLSCTX_INPROC_SERVER,
@@ -182,6 +186,8 @@ void SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 		&bmp2);
 
 	SaveBitmap(bmp2.Get(), GUID_WICPixelFormat32bppRGBA, filename);
+
+	return S_OK;
 }
 
 #endif
@@ -648,18 +654,18 @@ private:
 class font_dwrite : public osd_module, public font_module
 {
 private:
-	d2d_create_factory_fn           m_pfnD2D1CreateFactory;
-	dwrite_create_factory_fn        m_pfnDWriteCreateFactory;
-	ComPtr<ID2D1Factory>            m_d2dfactory;
-	ComPtr<IDWriteFactory>          m_dwriteFactory;
-	ComPtr<IWICImagingFactory>      m_wicFactory;
+	osd_dynamic_bind<d2d_create_factory_fn>    m_pfnD2D1CreateFactory;
+	osd_dynamic_bind<dwrite_create_factory_fn> m_pfnDWriteCreateFactory;
+	ComPtr<ID2D1Factory>                       m_d2dfactory;
+	ComPtr<IDWriteFactory>                     m_dwriteFactory;
+	ComPtr<IWICImagingFactory>                 m_wicFactory;
 
 public:
 	font_dwrite() :
 		osd_module(OSD_FONT_PROVIDER, "dwrite"),
 		font_module(),
-		m_pfnD2D1CreateFactory("D2D1CreateFactory", L"D2d1.dll"),
-		m_pfnDWriteCreateFactory("DWriteCreateFactory", L"Dwrite.dll"),
+		m_pfnD2D1CreateFactory("D2D1CreateFactory", { TEXT("D2d1.dll") }),
+		m_pfnDWriteCreateFactory("DWriteCreateFactory", { TEXT("Dwrite.dll") }),
 		m_d2dfactory(nullptr),
 		m_dwriteFactory(nullptr),
 		m_wicFactory(nullptr)
@@ -669,11 +675,8 @@ public:
 	virtual bool probe() override
 	{
 		// This module is available if it can load the expected API Functions
-		if (m_pfnD2D1CreateFactory.initialize() != 0
-			|| m_pfnDWriteCreateFactory.initialize() != 0)
-		{
+		if (!m_pfnD2D1CreateFactory || !m_pfnDWriteCreateFactory)
 			return false;
-		}
 
 		return true;
 	}
@@ -685,15 +688,14 @@ public:
 		osd_printf_verbose("FontProvider: Initializing DirectWrite\n");
 
 		// Make sure we can initialize our api functions
-		if (m_pfnD2D1CreateFactory.initialize()
-			|| m_pfnDWriteCreateFactory.initialize())
+		if (!m_pfnD2D1CreateFactory || !m_pfnDWriteCreateFactory)
 		{
 			osd_printf_error("ERROR: FontProvider: Failed to load DirectWrite functions.\n");
 			return -1;
 		}
 
 		// Create a Direct2D factory.
-		HR_RET1(m_pfnD2D1CreateFactory(
+		HR_RET1((*m_pfnD2D1CreateFactory)(
 			D2D1_FACTORY_TYPE_SINGLE_THREADED,
 			__uuidof(ID2D1Factory),
 			nullptr,
@@ -703,7 +705,7 @@ public:
 		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 		// Create a DirectWrite factory.
-		HR_RET1(m_pfnDWriteCreateFactory(
+		HR_RET1((*m_pfnDWriteCreateFactory)(
 			DWRITE_FACTORY_TYPE_SHARED,
 			__uuidof(IDWriteFactory),
 			reinterpret_cast<IUnknown **>(m_dwriteFactory.GetAddressOf())));

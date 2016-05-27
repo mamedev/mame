@@ -25,7 +25,6 @@
 
 # USE_DISPATCH_GL = 0
 # MODERN_WIN_API = 0
-# DIRECTINPUT = 7
 # USE_SDL = 1
 # SDL_INI_PATH = .;$HOME/.mame/;ini;
 # SDL2_MULTIAPI = 1
@@ -619,10 +618,6 @@ endif
 
 ifdef MODERN_WIN_API
 PARAMS += --MODERN_WIN_API='$(MODERN_WIN_API)'
-endif
-
-ifdef DIRECTINPUT
-PARAMS += --DIRECTINPUT='$(DIRECTINPUT)'
 endif
 
 ifdef USE_SDL

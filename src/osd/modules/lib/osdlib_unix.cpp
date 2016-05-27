@@ -13,12 +13,15 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <dlfcn.h>
 
 // MAME headers
 #include "osdcore.h"
 #include "osdlib.h"
+#include "strconv.h"
 
 #include <SDL2/SDL.h>
+
 //============================================================
 //  osd_getenv
 //============================================================
@@ -159,3 +162,41 @@ char *osd_get_clipboard_text(void)
 }
 
 #endif
+
+//============================================================
+//  osd_dynamic_bind
+//============================================================
+
+osd_dynamic_bind_base::osd_dynamic_bind_base(const char *symbol, const std::vector<std::wstring> libraries)
+	: m_module(nullptr), m_function(nullptr)
+{
+	for (int i = 0; i < libraries.size(); i++)
+	{
+		char *utf8_name = utf8_from_wstring(libraries[i].c_str());
+	
+		void *module = dlopen(utf8_name, RTLD_LAZY);
+
+		osd_free(utf8_name);
+
+		if (module != nullptr)
+		{
+			m_function = reinterpret_cast<void *>(dlsym(module, symbol));
+
+			if (m_function != nullptr)
+			{
+				m_module = reinterpret_cast<void *>(module);		
+				break;
+			}
+			else
+			{
+				dlclose(module);
+			}
+		}
+	}
+}
+
+osd_dynamic_bind_base::~osd_dynamic_bind_base()
+{
+	if (m_module != nullptr)
+		dlclose(module);
+}

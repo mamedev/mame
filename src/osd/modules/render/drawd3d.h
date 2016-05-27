@@ -13,8 +13,17 @@
 
 #ifdef OSD_WINDOWS
 
-#include "d3d/d3dintf.h"
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <tchar.h>
+#include <mmsystem.h>
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <math.h>
+#undef interface
+
 #include "d3d/d3dcomm.h"
+#include "modules/lib/osdlib.h"
 
 //============================================================
 //  CONSTANTS
@@ -27,14 +36,25 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-struct vertex;
-class texture_info;
-class texture_manager;
-struct device;
-struct vertex_buffer;
+// Typedefs for dynamically loaded functions
+typedef IDirect3D9* (*d3d9_create_fn)(UINT);
+
+struct d3d_base
+{
+	d3d_base()
+		: d3d9_create_ptr("Direct3DCreate9", { TEXT("d3d9.dll") })
+	{
+	}
+
+	// internal objects
+	IDirect3D9 *d3dobj;
+	bool        post_fx_available;
+
+	osd_dynamic_bind<d3d9_create_fn> d3d9_create_ptr;
+};
+
 class shaders;
 struct hlsl_options;
-class poly_info;
 
 /* renderer is the information about Direct3D for the current screen */
 class renderer_d3d9 : public osd_renderer
@@ -97,10 +117,10 @@ public:
 	int                     get_height() const { return m_height; }
 	int                     get_refresh() const { return m_refresh; }
 
-	device *                get_device() const { return m_device; }
-	present_parameters *    get_presentation() { return &m_presentation; }
+	IDirect3DDevice9 *      get_device() const { return m_device; }
+	D3DPRESENT_PARAMETERS * get_presentation() { return &m_presentation; }
 
-	vertex_buffer *         get_vertex_buffer() const { return m_vertexbuf; }
+	IDirect3DVertexBuffer9 *get_vertex_buffer() const { return m_vertexbuf; }
 	vertex *                get_locked_buffer() const { return m_lockedbuf; }
 	VOID **                 get_locked_buffer_ptr()const { return (VOID **)&m_lockedbuf; }
 	void                    set_locked_buffer(vertex *lockedbuf) { m_lockedbuf = lockedbuf; }
@@ -129,13 +149,13 @@ private:
 	int                     m_refresh;                  // current refresh rate
 	int                     m_create_error_count;       // number of consecutive create errors
 
-	device *                m_device;                   // pointer to the Direct3DDevice object
+	IDirect3DDevice9 *      m_device;                   // pointer to the Direct3DDevice object
 	int                     m_gamma_supported;          // is full screen gamma supported?
-	present_parameters      m_presentation;             // set of presentation parameters
+	D3DPRESENT_PARAMETERS   m_presentation;             // set of presentation parameters
 	D3DDISPLAYMODE          m_origmode;                 // original display mode for the adapter
 	D3DFORMAT               m_pixformat;                // pixel format we are using
 
-	vertex_buffer *         m_vertexbuf;                // pointer to the vertex buffer object
+	IDirect3DVertexBuffer9 *m_vertexbuf;                // pointer to the vertex buffer object
 	vertex *                m_lockedbuf;                // pointer to the locked vertex buffer
 	int                     m_numverts;                 // number of accumulated vertices
 

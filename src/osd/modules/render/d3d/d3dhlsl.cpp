@@ -2,17 +2,9 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  d3dhlsl.c - Win32 Direct3D HLSL implementation
+//  d3dhlsl.cpp - Win32 Direct3D HLSL implementation
 //
 //============================================================
-
-// Useful info:
-//  Windows XP/2003 shipped with DirectX 8.1
-//  Windows 2000 shipped with DirectX 7a
-//  Windows 98SE shipped with DirectX 6.1a
-//  Windows 98 shipped with DirectX 5
-//  Windows NT shipped with DirectX 3.0a
-//  Windows 95 shipped with DirectX 2
 
 // MAME headers
 #include "emu.h"
@@ -47,14 +39,6 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 
 
 //============================================================
-//  TYPE DEFINITIONS
-//============================================================
-
-typedef HRESULT (WINAPI *direct3dx9_loadeffect_ptr)(LPDIRECT3DDEVICE9 pDevice, LPCTSTR pSrcFile, const D3DXMACRO *pDefines, LPD3DXINCLUDE pInclude, DWORD Flags, LPD3DXEFFECTPOOL pPool, LPD3DXEFFECT *ppEffect, LPD3DXBUFFER *ppCompilationErrors);
-static direct3dx9_loadeffect_ptr g_load_effect = nullptr;
-
-
-//============================================================
 //  shader manager constructor
 //============================================================
 
@@ -64,7 +48,8 @@ shaders::shaders() :
 	black_surface(nullptr), black_texture(nullptr), render_snap(false), snap_rendered(false), snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
 	snap_width(0), snap_height(0), lines_pending(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr), distortion_effect(nullptr),
 	focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr),
-	downsample_effect(nullptr), vector_effect(nullptr), fsfx_vertices(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr)
+	downsample_effect(nullptr), vector_effect(nullptr), fsfx_vertices(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr),
+	d3dx_create_effect_from_file_ptr("D3DXCreateEffectFromFileW", { TEXT("d3dx9_43.dll") })
 {
 	master_enable = false;
 	vector_enable = true;
@@ -119,21 +104,21 @@ void shaders::window_save()
 		return;
 	}
 
-	HRESULT result = (*d3dintf->device.create_texture)(d3d->get_device(), snap_width, snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &snap_copy_texture);
-	if (result != D3D_OK)
+	HRESULT result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &snap_copy_texture, nullptr);
+	if (FAILED(result))
 	{
 		osd_printf_verbose("Direct3D: Unable to init system-memory target for HLSL snapshot (%08x), bailing\n", (UINT32)result);
 		return;
 	}
-	(*d3dintf->texture.get_surface_level)(snap_copy_texture, 0, &snap_copy_target);
+	snap_copy_texture->GetSurfaceLevel(0, &snap_copy_target);
 
-	result = (*d3dintf->device.create_texture)(d3d->get_device(), snap_width, snap_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &snap_texture);
-	if (result != D3D_OK)
+	result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &snap_texture, nullptr);
+	if (FAILED(result))
 	{
 		osd_printf_verbose("Direct3D: Unable to init video-memory target for HLSL snapshot (%08x), bailing\n", (UINT32)result);
 		return;
 	}
-	(*d3dintf->texture.get_surface_level)(snap_texture, 0, &snap_target);
+	snap_texture->GetSurfaceLevel(0, &snap_target);
 
 	render_snap = true;
 	snap_rendered = false;
@@ -169,7 +154,7 @@ void shaders::window_record()
 //  shaders::avi_update_snap
 //============================================================
 
-void shaders::avi_update_snap(surface *surface)
+void shaders::avi_update_snap(IDirect3DSurface9 *surface)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
@@ -185,15 +170,15 @@ void shaders::avi_update_snap(surface *surface)
 	}
 
 	// copy the texture
-	HRESULT result = (*d3dintf->device.get_render_target_data)(d3d->get_device(), surface, avi_copy_surface);
-	if (result != D3D_OK)
+	HRESULT result = d3d->get_device()->GetRenderTargetData(surface, avi_copy_surface);
+	if (FAILED(result))
 	{
 		return;
 	}
 
 	// lock the texture
-	result = (*d3dintf->surface.lock_rect)(avi_copy_surface, &rect, nullptr, D3DLOCK_DISCARD);
-	if (result != D3D_OK)
+	result = avi_copy_surface->LockRect(&rect, nullptr, D3DLOCK_DISCARD);
+	if (FAILED(result))
 	{
 		return;
 	}
@@ -211,11 +196,9 @@ void shaders::avi_update_snap(surface *surface)
 	}
 
 	// unlock
-	result = (*d3dintf->surface.unlock_rect)(avi_copy_surface);
-	if (result != D3D_OK)
-	{
-		osd_printf_verbose("Direct3D: Error %08X during texture unlock_rect call\n", (int)result);
-	}
+	result = avi_copy_surface->UnlockRect();
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during texture UnlockRect call\n", result);
 }
 
 
@@ -224,7 +207,7 @@ void shaders::avi_update_snap(surface *surface)
 //  hlsl_render_snapshot
 //============================================================
 
-void shaders::render_snapshot(surface *surface)
+void shaders::render_snapshot(IDirect3DSurface9 *surface)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
@@ -242,15 +225,15 @@ void shaders::render_snapshot(surface *surface)
 	}
 
 	// copy the texture
-	HRESULT result = (*d3dintf->device.get_render_target_data)(d3d->get_device(), surface, snap_copy_target);
-	if (result != D3D_OK)
+	HRESULT result = d3d->get_device()->GetRenderTargetData(surface, snap_copy_target);
+	if (FAILED(result))
 	{
 		return;
 	}
 
 	// lock the texture
-	result = (*d3dintf->surface.lock_rect)(snap_copy_target, &rect, nullptr, D3DLOCK_DISCARD);
-	if (result != D3D_OK)
+	result = snap_copy_target->LockRect(&rect, nullptr, D3DLOCK_DISCARD);
+	if (FAILED(result))
 	{
 		return;
 	}
@@ -292,30 +275,31 @@ void shaders::render_snapshot(surface *surface)
 	png_free(&pnginfo);
 
 	// unlock
-	result = (*d3dintf->surface.unlock_rect)(snap_copy_target);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during texture unlock_rect call\n", (int)result);
+	result = snap_copy_target->UnlockRect();
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during texture UnlockRect call\n", result);
 
 	if (snap_texture != nullptr)
 	{
-		(*d3dintf->texture.release)(snap_texture);
+		snap_texture->Release();
 		snap_texture = nullptr;
 	}
 
 	if (snap_target != nullptr)
 	{
-		(*d3dintf->surface.release)(snap_target);
+		snap_target->Release();
 		snap_target = nullptr;
 	}
 
 	if (snap_copy_texture != nullptr)
 	{
-		(*d3dintf->texture.release)(snap_copy_texture);
+		snap_copy_texture->Release();
 		snap_copy_texture = nullptr;
 	}
 
 	if (snap_copy_target != nullptr)
 	{
-		(*d3dintf->surface.release)(snap_copy_target);
+		snap_copy_target->Release();
 		snap_copy_target = nullptr;
 	}
 }
@@ -332,7 +316,7 @@ void shaders::record_texture()
 		return;
 	}
 
-	surface *surface = avi_final_target;
+	IDirect3DSurface9 *surface = avi_final_target;
 
 	// ignore if nothing to do
 	if (avi_output_file == nullptr || surface == nullptr)
@@ -621,13 +605,7 @@ void shaders::set_texture(texture_info *texture)
 
 void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *renderer)
 {
-	if (!d3dintf->post_fx_available)
-	{
-		return;
-	}
-
-	g_load_effect = (direct3dx9_loadeffect_ptr)GetProcAddress(d3dintf->libhandle, "D3DXCreateEffectFromFileW");
-	if (g_load_effect == nullptr)
+	if (!d3dx_create_effect_from_file_ptr)
 	{
 		printf("Direct3D: Unable to find D3DXCreateEffectFromFileW\n");
 		d3dintf->post_fx_available = false;
@@ -635,6 +613,7 @@ void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		return;
 	}
 
+	d3dintf->post_fx_available = true;
 	this->d3dintf = d3dintf;
 	this->machine = machine;
 	this->d3d = renderer;
@@ -836,41 +815,44 @@ int shaders::create_resources(bool reset, std::vector<ui::menu_item>& sliders)
 		options = &last_options;
 	}
 
-	HRESULT result = (*d3dintf->device.get_render_target)(d3d->get_device(), 0, &backbuffer);
-	if (result != D3D_OK)
+	HRESULT result = d3d->get_device()->GetRenderTarget(0, &backbuffer);
+	if (FAILED(result))
 	{
-		osd_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
+		osd_printf_verbose("Direct3D: Error %08lX during device GetRenderTarget call\n", result);
 	}
 
-	result = (*d3dintf->device.create_texture)(d3d->get_device(), 4, 4, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &black_texture);
-	if (result != D3D_OK)
+	result = d3d->get_device()->CreateTexture(4, 4, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &black_texture, nullptr);
+	if (FAILED(result))
 	{
 		osd_printf_verbose("Direct3D: Unable to init video-memory target for black texture (%08x)\n", (UINT32)result);
 		return 1;
 	}
-	(*d3dintf->texture.get_surface_level)(black_texture, 0, &black_surface);
-	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, black_surface);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+	black_texture->GetSurfaceLevel(0, &black_surface);
+	result = d3d->get_device()->SetRenderTarget(0, black_surface);
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
+	result = d3d->get_device()->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during device clear call\n", result);
+	result = d3d->get_device()->SetRenderTarget(0, backbuffer);
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 
-	result = (*d3dintf->device.create_texture)(d3d->get_device(), (int)snap_width, (int)snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &avi_copy_texture);
-	if (result != D3D_OK)
+	result = d3d->get_device()->CreateTexture((int)snap_width, (int)snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &avi_copy_texture, nullptr);
+	if (FAILED(result))
 	{
 		osd_printf_verbose("Direct3D: Unable to init system-memory target for HLSL AVI dumping (%08x)\n", (UINT32)result);
 		return 1;
 	}
-	(*d3dintf->texture.get_surface_level)(avi_copy_texture, 0, &avi_copy_surface);
+	avi_copy_texture->GetSurfaceLevel(0, &avi_copy_surface);
 
-	result = (*d3dintf->device.create_texture)(d3d->get_device(), (int)snap_width, (int)snap_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &avi_final_texture);
-	if (result != D3D_OK)
+	result = d3d->get_device()->CreateTexture((int)snap_width, (int)snap_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &avi_final_texture, nullptr);
+	if (FAILED(result))
 	{
 		osd_printf_verbose("Direct3D: Unable to init video-memory target for HLSL AVI dumping (%08x)\n", (UINT32)result);
 		return 1;
 	}
-	(*d3dintf->texture.get_surface_level)(avi_final_texture, 0, &avi_final_target);
+	avi_final_texture->GetSurfaceLevel(0, &avi_final_target);
 
 	emu_file file(machine->options().art_path(), OPEN_FLAG_READ);
 	render_load_png(shadow_bitmap, file, nullptr, options->shadow_mask_texture);
@@ -889,7 +871,7 @@ int shaders::create_resources(bool reset, std::vector<ui::menu_item>& sliders)
 		texture.seqid = 0;
 
 		// now create it (no prescale, no wrap)
-		shadow_texture = new texture_info(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		shadow_texture = global_alloc(texture_info(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
 	}
 
 	const char *fx_dir = downcast<windows_options &>(machine->options()).screen_post_fx_dir();
@@ -1034,10 +1016,10 @@ void shaders::begin_draw()
 	downsample_effect->set_technique("DefaultTechnique");
 	vector_effect->set_technique("DefaultTechnique");
 
-	HRESULT result = (*d3dintf->device.get_render_target)(d3d->get_device(), 0, &backbuffer);
-	if (result != D3D_OK)
+	HRESULT result = d3d->get_device()->GetRenderTarget(0, &backbuffer);
+	if (FAILED(result))
 	{
-		osd_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
+		osd_printf_verbose("Direct3D: Error %08lX during device GetRenderTarget call\n", result);
 	}
 }
 
@@ -1057,7 +1039,7 @@ void shaders::begin_frame()
 //============================================================
 
 void shaders::blit(
-	surface *dst,
+	IDirect3DSurface9 *dst,
 	bool clear_dst,
 	D3DPRIMITIVETYPE prim_type,
 	UINT32 prim_index,
@@ -1067,18 +1049,18 @@ void shaders::blit(
 
 	if (dst != nullptr)
 	{
-		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, dst);
-		if (result != D3D_OK)
+		result = d3d->get_device()->SetRenderTarget(0, dst);
+		if (FAILED(result))
 		{
-			osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 		}
 
 		if (clear_dst)
 		{
-			result = (*d3dintf->device.clear)(d3d->get_device(), 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
-			if (result != D3D_OK)
+			result = d3d->get_device()->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
+			if (FAILED(result))
 			{
-				osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
+				osd_printf_verbose("Direct3D: Error %08lX during device clear call\n", result);
 			}
 		}
 	}
@@ -1091,10 +1073,10 @@ void shaders::blit(
 		curr_effect->begin_pass(pass);
 
 		// add the primitives
-		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), prim_type, prim_index, prim_count);
-		if (result != D3D_OK)
+		result = d3d->get_device()->DrawPrimitive(prim_type, prim_index, prim_count);
+		if (FAILED(result))
 		{
-			osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+			osd_printf_verbose("Direct3D: Error %08lX during device DrawPrimitive call\n", result);
 		}
 
 		curr_effect->end_pass();
@@ -1563,10 +1545,10 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 	{
 		blit(avi_final_target, false, poly->get_type(), vertnum, poly->get_count());
 
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
-		if (result != D3D_OK)
+		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
+		if (FAILED(result))
 		{
-			osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 		}
 	}
 
@@ -1574,10 +1556,10 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 	{
 		blit(snap_target, false, poly->get_type(), vertnum, poly->get_count());
 
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
-		if (result != D3D_OK)
+		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
+		if (FAILED(result))
 		{
-			osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 		}
 
 		snap_rendered = true;
@@ -1682,10 +1664,10 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		next_index = vector_pass(rt, next_index, poly, vertnum);
 
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
-		if (result != D3D_OK)
+		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
+		if (FAILED(result))
 		{
-			osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 		}
 	}
 	else if (PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable)
@@ -1734,10 +1716,10 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		next_index = screen_pass(rt, next_index, poly, vertnum);
 		d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(curr_texture->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
-		if (result != D3D_OK)
+		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
+		if (FAILED(result))
 		{
-			osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 		}
 
 		lines_pending = false;
@@ -1768,13 +1750,14 @@ void shaders::end_draw()
 		return;
 	}
 
-	(*d3dintf->surface.release)(backbuffer);
+	backbuffer->Release();
 }
 
 
 //============================================================
 //  shaders::add_cache_target - register a cache target
 //============================================================
+
 bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height, int screen_index)
 {
 	cache_target* target = (cache_target*)global_alloc_clear<cache_target>();
@@ -1801,6 +1784,7 @@ bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* texture, int so
 //============================================================
 //  shaders::get_texture_target(render_primitive::prim, texture_info::texture)
 //============================================================
+
 d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_info *texture)
 {
 	auto win = d3d->assert_window();
@@ -2106,42 +2090,42 @@ void shaders::delete_resources(bool reset)
 
 	if (backbuffer != nullptr)
 	{
-		(*d3dintf->surface.release)(backbuffer);
+		backbuffer->Release();
 		backbuffer = nullptr;
 	}
 
 	if (black_surface != nullptr)
 	{
-		(*d3dintf->surface.release)(black_surface);
+		black_surface->Release();
 		black_surface = nullptr;
 	}
 	if (black_texture != nullptr)
 	{
-		(*d3dintf->texture.release)(black_texture);
+		black_texture->Release();
 		black_texture = nullptr;
 	}
 
 	if (avi_copy_texture != nullptr)
 	{
-		(*d3dintf->texture.release)(avi_copy_texture);
+		avi_copy_texture->Release();
 		avi_copy_texture = nullptr;
 	}
 
 	if (avi_copy_surface != nullptr)
 	{
-		(*d3dintf->surface.release)(avi_copy_surface);
+		avi_copy_surface->Release();
 		avi_copy_surface = nullptr;
 	}
 
 	if (avi_final_texture != nullptr)
 	{
-		(*d3dintf->texture.release)(avi_final_texture);
+		avi_final_texture->Release();
 		avi_final_texture = nullptr;
 	}
 
 	if (avi_final_target != nullptr)
 	{
-		(*d3dintf->surface.release)(avi_final_target);
+		avi_final_target->Release();
 		avi_final_target = nullptr;
 	}
 
@@ -2901,12 +2885,12 @@ void uniform::set(bool x)
 	m_bval = x;
 }
 
-void uniform::set(matrix *mat)
+void uniform::set(D3DMATRIX *mat)
 {
 	m_mval = mat;
 }
 
-void uniform::set(texture *tex)
+void uniform::set(IDirect3DTexture9 *tex)
 {
 	m_texture = tex;
 }
@@ -2943,9 +2927,8 @@ void uniform::upload()
 //  effect functions
 //============================================================
 
-effect::effect(shaders *shadersys, device *dev, const char *name, const char *path)
+effect::effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, const char *path)
 {
-	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	LPD3DXBUFFER buffer_errors = nullptr;
 
 	m_shaders = shadersys;
@@ -2958,7 +2941,7 @@ effect::effect(shaders *shadersys, device *dev, const char *name, const char *pa
 	sprintf(name_cstr, "%s\\%s", path, name);
 	TCHAR *effect_name = tstring_from_utf8(name_cstr);
 
-	HRESULT hr = (*g_load_effect)(device, effect_name, nullptr, nullptr, 0, nullptr, &m_effect, &buffer_errors);
+	HRESULT hr = (*shadersys->d3dx_create_effect_from_file_ptr)(dev, effect_name, nullptr, nullptr, 0, nullptr, &m_effect, &buffer_errors);
 	if (FAILED(hr))
 	{
 		if (buffer_errors != nullptr)
@@ -3085,14 +3068,14 @@ void effect::set_bool(D3DXHANDLE param, bool value)
 	m_effect->SetBool(param, value);
 }
 
-void effect::set_matrix(D3DXHANDLE param, matrix *matrix)
+void effect::set_matrix(D3DXHANDLE param, D3DMATRIX *matrix)
 {
 	m_effect->SetMatrix(param, (D3DXMATRIX*)matrix);
 }
 
-void effect::set_texture(D3DXHANDLE param, texture *tex)
+void effect::set_texture(D3DXHANDLE param, IDirect3DTexture9 *tex)
 {
-	m_effect->SetTexture(param, (IDirect3DTexture9*)tex);
+	m_effect->SetTexture(param, tex);
 }
 
 D3DXHANDLE effect::get_parameter(D3DXHANDLE param, const char *name)
