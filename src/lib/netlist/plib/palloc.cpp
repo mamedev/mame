@@ -22,11 +22,11 @@ pexception::pexception(const pstring &text)
 	fprintf(stderr, "%s\n", m_text.cstr());
 }
 
-pmempool::pmempool(int min_alloc, int min_align)
+mempool::mempool(int min_alloc, int min_align)
 : m_min_alloc(min_alloc), m_min_align(min_align)
 {
 }
-pmempool::~pmempool()
+mempool::~mempool()
 {
 	for (auto & b : m_blocks)
 	{
@@ -37,7 +37,7 @@ pmempool::~pmempool()
 	m_blocks.clear();
 }
 
-int pmempool::new_block()
+int mempool::new_block()
 {
 	block b;
 	b.data = new char[m_min_alloc];
@@ -49,7 +49,7 @@ int pmempool::new_block()
 }
 
 
-void *pmempool::alloc(size_t size)
+void *mempool::alloc(size_t size)
 {
 	size_t rs = (size + sizeof(info) + m_min_align - 1) & ~(m_min_align - 1);
 	for (int bn=0; bn < m_blocks.size(); bn++)
@@ -79,7 +79,7 @@ void *pmempool::alloc(size_t size)
 	}
 }
 
-void pmempool::free(void *ptr)
+void mempool::free(void *ptr)
 {
 	char *p = (char *) ptr;
 

@@ -67,7 +67,7 @@ void factory_list_t::error(const pstring &s)
 	m_setup.log().fatal("{1}", s);
 }
 
-plib::powned_ptr<device_t> factory_list_t::new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name)
+plib::owned_ptr<device_t> factory_list_t::new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name)
 {
 	base_factory_t *f = factory_by_name(devname);
 	return f->Create(anetlist, name);

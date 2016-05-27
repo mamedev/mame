@@ -87,6 +87,50 @@ private:
 	int m_capacity;
 };
 
+/* ----------------------------------------------------------------------------------------
+ * uninitialised_array_t:
+ * 		fixed size array allowing to override constructor and initialize
+ * 		members by placement new.
+ *
+ * 		Use with care. This template is provided to improve locality of storage
+ * 		in high frequency applications. It should not be used for anything else.
+ * ---------------------------------------------------------------------------------------- */
+
+template <class C, std::size_t N>
+class uninitialised_array_t
+{
+public:
+	uninitialised_array_t()
+	{
+	}
+
+	~uninitialised_array_t()
+	{
+		for (std::size_t i=0; i<N; i++)
+		{
+			C &r = (*this)[i];
+			r.~C();
+		}
+	}
+
+	ATTR_HOT  C& operator[](const std::size_t index)
+	{
+		return *reinterpret_cast<C *>(reinterpret_cast<char *>(m_buf) + index * sizeof(C));
+	}
+
+	ATTR_HOT  const C& operator[](const std::size_t index) const
+	{
+		return *reinterpret_cast<C *>(reinterpret_cast<char *>(m_buf) + index * sizeof(C));
+	}
+
+protected:
+
+private:
+
+	/* ensure proper alignment */
+	UINT64 m_buf[(N * sizeof(C) + sizeof(UINT64) - 1) / sizeof(UINT64)];
+};
+
 // ----------------------------------------------------------------------------------------
 // plist_t: a simple list
 // ----------------------------------------------------------------------------------------

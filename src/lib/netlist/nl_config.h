@@ -73,7 +73,6 @@
 #pragma GCC diagnostic ignored "-Wpmf-conversions"
 #endif
 
-#define USE_TRUTHTABLE          (1)
 
 // The following adds about 10% performance ...
 
@@ -95,6 +94,12 @@
 #define nl_double double
 #define NL_FCONST(x) x
 
+//============================================================
+//  GENERAL
+//============================================================
+
+#define NL_USE_MEMPOOL			(0)
+#define USE_TRUTHTABLE          (1)
 
 //============================================================
 //  Solver defines

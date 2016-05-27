@@ -313,7 +313,7 @@ namespace netlist
 	public:
 		logic_family_desc_t() {}
 		virtual ~logic_family_desc_t() {}
-		virtual plib::powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
+		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
 
 		nl_double m_low_thresh_V;
@@ -404,11 +404,10 @@ namespace netlist
 		const type_t m_objtype;
 		netlist_t * m_netlist;
 
-#if 1
 	public:
+	    void * operator new (size_t size, void *ptr) { return ptr; }
 	    void * operator new (size_t size);
 	    void operator delete (void * mem);
-#endif
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1270,7 +1269,7 @@ namespace netlist
 
 		void print_stats() const;
 
-		plib::pvector_t<plib::powned_ptr<core_device_t>> m_devices;
+		plib::pvector_t<plib::owned_ptr<core_device_t>> m_devices;
 
 		/* sole use is to manage lifetime of net objects */
 		net_t::list_t m_nets;

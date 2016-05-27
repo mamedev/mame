@@ -631,9 +631,9 @@ public:
 		pstring m_devname;
 	};
 
-	plib::powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
+	plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 	{
-		return plib::powned_ptr<device_t>::Create<wrapper>(this->name(), anetlist, name);
+		return plib::owned_ptr<device_t>::Create<wrapper>(this->name(), anetlist, name);
 	}
 
 private:

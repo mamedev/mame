@@ -21,8 +21,8 @@ const netlist::netlist_time netlist::netlist_time::zero = netlist::netlist_time(
 namespace netlist
 {
 
-#if 0
-static pmempool p(65536, 16);
+#if (NL_USE_MEMPOOL)
+static plib::pmempool p(65536, 16);
 
 void * object_t::operator new (size_t size)
 {
@@ -64,9 +64,9 @@ public:
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
-	virtual plib::powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
+	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
-		return plib::powned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 };
 
@@ -84,9 +84,9 @@ public:
 		m_R_low = 10.0;
 		m_R_high = 10.0;
 	}
-	virtual plib::powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
+	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
-		return plib::powned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 };
 
@@ -264,7 +264,7 @@ ATTR_COLD void netlist_t::start()
 				|| setup().factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
 				|| setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			auto dev = plib::powned_ptr<device_t>(e.second->Create(*this, e.first));
+			auto dev = plib::owned_ptr<device_t>(e.second->Create(*this, e.first));
 			setup().register_dev_s(std::move(dev));
 		}
 	}
@@ -287,7 +287,7 @@ ATTR_COLD void netlist_t::start()
 				&& !setup().factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
 				&& !setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			auto dev = plib::powned_ptr<device_t>(e.second->Create(*this, e.first));
+			auto dev = plib::owned_ptr<device_t>(e.second->Create(*this, e.first));
 			setup().register_dev_s(std::move(dev));
 		}
 	}
@@ -495,7 +495,7 @@ ATTR_COLD core_device_t::core_device_t(core_device_t &owner, const pstring &name
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
 	init_object(owner.netlist(), owner.name() + "." + name);
-	owner.netlist().m_devices.push_back(plib::powned_ptr<core_device_t>(this, false));
+	owner.netlist().m_devices.push_back(plib::owned_ptr<core_device_t>(this, false));
 }
 
 ATTR_COLD core_device_t::~core_device_t()

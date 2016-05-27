@@ -38,7 +38,7 @@ ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pst
 			"DT_FLOAT"
 	};
 
-	auto p = pmake_unique<pstate_entry_t>(stname, dt, owner, size, count, ptr, is_ptr);
+	auto p = plib::make_unique<pstate_entry_t>(stname, dt, owner, size, count, ptr, is_ptr);
 	m_save.push_back(std::move(p));
 }
 
@@ -72,7 +72,7 @@ template<> ATTR_COLD void pstate_manager_t::save_item(pstate_callback_t &state, 
 {
 	//save_state_ptr(stname, DT_CUSTOM, 0, 1, &state);
 	pstate_callback_t *state_p = &state;
-	auto p = pmake_unique<pstate_entry_t>(stname, owner, state_p);
+	auto p = plib::make_unique<pstate_entry_t>(stname, owner, state_p);
 	m_save.push_back(std::move(p));
 	state.register_state(*this, stname);
 }

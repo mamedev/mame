@@ -158,7 +158,7 @@ void parser_t::net_truthtable_start()
 	pstring def_param = get_string();
 	require_token(m_tok_param_right);
 
-	plib::powned_ptr<netlist::devices::netlist_base_factory_truthtable_t> ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
+	plib::owned_ptr<netlist::devices::netlist_base_factory_truthtable_t> ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
 			name, name, "+" + def_param);
 
 	while (true)

@@ -42,7 +42,7 @@ NETLIB_OBJECT(log)
 		enregister("I", m_I);
 
 		pstring filename = plib::pfmt("{1}.log")(this->name());
-		m_strm = plib::pmake_unique<plib::pofilestream>(filename);
+		m_strm = plib::make_unique<plib::pofilestream>(filename);
 	}
 	NETLIB_DESTRUCTOR(log);
 	NETLIB_UPDATEI();

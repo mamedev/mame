@@ -100,7 +100,7 @@ void setup_t::namespace_pop()
 }
 
 
-void setup_t::register_dev(plib::powned_ptr<device_t> dev)
+void setup_t::register_dev(plib::owned_ptr<device_t> dev)
 {
 	for (auto & d : netlist().m_devices)
 		if (d->name() == dev->name())
@@ -529,7 +529,7 @@ void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
 	{
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(in);
 		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(in.name())( m_proxy_cnt);
-		auto proxy = plib::powned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
+		auto proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
 		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
 
@@ -567,7 +567,7 @@ void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
 		log().debug("connect_terminal_input: connecting proxy\n");
 		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
-		auto proxy = plib::powned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
+		auto proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
 		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
 
@@ -872,10 +872,10 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 {
 public:
 	logic_family_std_proxy_t() { }
-	virtual plib::powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
+	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
 			const pstring &name, logic_output_t *proxied) const override
 	{
-		return plib::powned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 };
 
