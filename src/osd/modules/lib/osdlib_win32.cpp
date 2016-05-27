@@ -314,3 +314,45 @@ char *osd_get_clipboard_text(void)
 
 	return result;
 }
+
+//============================================================
+//  osd_dynamic_bind
+//============================================================
+
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+// for classic desktop applications
+#define load_library(filename) LoadLibrary(filename)
+#else
+// for Windows Store universal applications
+#define load_library(filename) LoadPackagedLibrary(filename, 0)
+#endif
+
+osd_dynamic_bind_base::osd_dynamic_bind_base(const char *symbol, const std::vector<std::wstring> libraries)
+	: m_module(nullptr), m_function(nullptr)
+{
+	for (int i = 0; i < libraries.size(); i++)
+	{
+		HMODULE module = LoadLibrary(libraries[i].c_str());
+		if (module != nullptr)
+		{
+			m_function = reinterpret_cast<void *>(GetProcAddress(module, symbol));
+
+			if (m_function != nullptr)
+			{
+				m_module = reinterpret_cast<void *>(module);		
+				break;
+			}
+			else
+			{
+				FreeLibrary(module);
+			}
+		}
+	}
+}
+
+osd_dynamic_bind_base::~osd_dynamic_bind_base()
+{
+	HMODULE module = reinterpret_cast<HMODULE>(m_module);
+	if (module != nullptr)
+		FreeLibrary(module);
+}

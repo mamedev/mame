@@ -19,6 +19,9 @@
 #ifndef __OSDLIB__
 #define __OSDLIB__
 
+#include <string>
+#include <vector>
+
 /*-----------------------------------------------------------------------------
     osd_process_kill: kill the current process
 
@@ -30,7 +33,9 @@
 
         None.
 -----------------------------------------------------------------------------*/
+
 void osd_process_kill(void);
+
 
 /*-----------------------------------------------------------------------------
     osd_setenv: set environment variable
@@ -48,14 +53,53 @@ void osd_process_kill(void);
 
 int osd_setenv(const char *name, const char *value, int overwrite);
 
+
 /*-----------------------------------------------------------------------------
     osd_get_clipboard_text: retrieves text from the clipboard
 
     Return value:
 
         the returned string needs to be osd_free()-ed!
-
 -----------------------------------------------------------------------------*/
+
 char *osd_get_clipboard_text(void);
+
+
+/*-----------------------------------------------------------------------------
+    osd_dynamic_bind: load functions from optional shared libraries
+
+    Notes:
+
+        - Supports Mac OS X, Unix and Windows (both desktop and Windows
+          Store universal applications)
+        - A symbol can be searched in a list of libraries (e.g. more
+          revisions of a same library)
+-----------------------------------------------------------------------------*/
+
+class osd_dynamic_bind_base
+{
+public:
+	osd_dynamic_bind_base(const char *symbol, const std::vector<std::wstring> libraries);
+	~osd_dynamic_bind_base();
+
+protected:
+	void *m_module;
+	void *m_function;
+};
+
+template<typename TFunctionPtr>
+class osd_dynamic_bind : private osd_dynamic_bind_base
+{
+public:
+	// constructor which looks up the function
+	osd_dynamic_bind(const char *symbol, const std::vector<std::wstring> libraries)
+		: osd_dynamic_bind_base(symbol, libraries) { }
+
+	// bool to test if the function is nullptr or not
+	operator bool() const { return (m_function != nullptr); }
+
+	// dereference to get the underlying pointer
+	TFunctionPtr operator *() const { return reinterpret_cast<TFunctionPtr>(m_function); }
+};
 
 #endif  /* __OSDLIB__ */

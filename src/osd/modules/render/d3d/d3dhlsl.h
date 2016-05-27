@@ -12,6 +12,7 @@
 #include <vector>
 #include "aviio.h"
 #include "../frontend/mame/ui/menuitem.h"
+#include "modules/lib/osdlib.h"
 
 //============================================================
 //  CONSTANTS
@@ -21,6 +22,9 @@
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
+
+// Typedefs for dynamically loaded functions
+typedef HRESULT (*d3dx_create_effect_from_file_fn)(LPDIRECT3DDEVICE9, LPCTSTR, const D3DXMACRO *, LPD3DXINCLUDE, DWORD, LPD3DXEFFECTPOOL, LPD3DXEFFECT *, LPD3DXBUFFER *);
 
 class effect;
 class shaders;
@@ -443,6 +447,8 @@ private:
 	static slider_desc      s_sliders[];
 	static hlsl_options     last_options;               // last used options
 	static char             last_system_name[16];       // last used system
+
+	osd_dynamic_bind<d3dx_create_effect_from_file_fn> d3dx_create_effect_from_file_ptr;
 };
 
 #endif

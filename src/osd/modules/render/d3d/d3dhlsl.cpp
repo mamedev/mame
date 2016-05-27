@@ -47,14 +47,6 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 
 
 //============================================================
-//  TYPE DEFINITIONS
-//============================================================
-
-typedef HRESULT (WINAPI *direct3dx9_loadeffect_ptr)(LPDIRECT3DDEVICE9 pDevice, LPCTSTR pSrcFile, const D3DXMACRO *pDefines, LPD3DXINCLUDE pInclude, DWORD Flags, LPD3DXEFFECTPOOL pPool, LPD3DXEFFECT *ppEffect, LPD3DXBUFFER *ppCompilationErrors);
-static direct3dx9_loadeffect_ptr g_load_effect = nullptr;
-
-
-//============================================================
 //  shader manager constructor
 //============================================================
 
@@ -64,7 +56,8 @@ shaders::shaders() :
 	black_surface(nullptr), black_texture(nullptr), render_snap(false), snap_rendered(false), snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
 	snap_width(0), snap_height(0), lines_pending(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr), distortion_effect(nullptr),
 	focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr),
-	downsample_effect(nullptr), vector_effect(nullptr), fsfx_vertices(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr)
+	downsample_effect(nullptr), vector_effect(nullptr), fsfx_vertices(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr),
+	d3dx_create_effect_from_file_ptr("D3DXCreateEffectFromFileW", { TEXT("d3dx9_43.dll") })
 {
 	master_enable = false;
 	vector_enable = true;
@@ -621,13 +614,7 @@ void shaders::set_texture(texture_info *texture)
 
 void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *renderer)
 {
-	if (!d3dintf->post_fx_available)
-	{
-		return;
-	}
-
-	g_load_effect = (direct3dx9_loadeffect_ptr)GetProcAddress(d3dintf->libhandle, "D3DXCreateEffectFromFileW");
-	if (g_load_effect == nullptr)
+	if (!d3dx_create_effect_from_file_ptr)
 	{
 		printf("Direct3D: Unable to find D3DXCreateEffectFromFileW\n");
 		d3dintf->post_fx_available = false;
@@ -635,6 +622,7 @@ void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		return;
 	}
 
+	d3dintf->post_fx_available = true;
 	this->d3dintf = d3dintf;
 	this->machine = machine;
 	this->d3d = renderer;
@@ -2958,7 +2946,7 @@ effect::effect(shaders *shadersys, device *dev, const char *name, const char *pa
 	sprintf(name_cstr, "%s\\%s", path, name);
 	TCHAR *effect_name = tstring_from_utf8(name_cstr);
 
-	HRESULT hr = (*g_load_effect)(device, effect_name, nullptr, nullptr, 0, nullptr, &m_effect, &buffer_errors);
+	HRESULT hr = (*shadersys->d3dx_create_effect_from_file_ptr)(device, effect_name, nullptr, nullptr, 0, nullptr, &m_effect, &buffer_errors);
 	if (FAILED(hr))
 	{
 		if (buffer_errors != nullptr)

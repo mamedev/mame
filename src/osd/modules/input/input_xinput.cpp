@@ -32,49 +32,28 @@
 #include "input_windows.h"
 #include "input_xinput.h"
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#define XINPUT_LIBRARIES { TEXT("xinput1_4.dll"), TEXT("xinput9_1_0.dll") }
+#else
+#define XINPUT_LIBRARIES { TEXT("xinput1_4.dll") }
+#endif
 
 xinput_api_helper::xinput_api_helper()
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-		: XInputGetState("XInputGetState", xinput_dll_names, ARRAY_LENGTH(xinput_dll_names))
-		, XInputGetCapabilities("XInputGetCapabilities", xinput_dll_names, ARRAY_LENGTH(xinput_dll_names))
-#endif
+		: XInputGetState       ("XInputGetState",        XINPUT_LIBRARIES)
+		, XInputGetCapabilities("XInputGetCapabilities", XINPUT_LIBRARIES)
 {
 }
 
 int xinput_api_helper::initialize()
 {
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-	int status;
-	status = XInputGetState.initialize();
-	if (status != 0)
+	if (!XInputGetState || !XInputGetCapabilities)
 	{
-		osd_printf_error("Failed to initialize function pointer for %s. Error: %d\n", XInputGetState.name(), status);
+		osd_printf_error("Could not find XInput. Please try to reinstall DirectX runtime package.\n");
 		return -1;
 	}
-
-	status = XInputGetCapabilities.initialize();
-	if (status != 0)
-	{
-		osd_printf_error("Failed to initialize function pointer for %s. Error: %d\n", XInputGetCapabilities.name(), status);
-		return -1;
-	}
-#endif
 
 	return 0;
 }
-
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-// Pass-through functions for Universal Windows
-inline DWORD xinput_api_helper::XInputGetState(DWORD dwUserindex, XINPUT_STATE *pState)
-{
-	return ::XInputGetState(dwUserindex, pState);
-}
-
-inline DWORD xinput_api_helper::XInputGetCapabilities(DWORD dwUserindex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities)
-{
-	return ::XInputGetCapabilities(dwUserindex, dwFlags, pCapabilities);
-}
-#endif
 
 //============================================================
 //  create_xinput_device
@@ -85,7 +64,7 @@ xinput_joystick_device * xinput_api_helper::create_xinput_device(running_machine
 	xinput_joystick_device *devinfo;
 
 	XINPUT_CAPABILITIES caps = { 0 };
-	if (FAILED(XInputGetCapabilities(index, 0, &caps)))
+	if (FAILED(xinput_get_capabilities(index, 0, &caps)))
 	{
 		// If we can't get the capabilities skip this device
 		return nullptr;
@@ -125,7 +104,7 @@ void xinput_joystick_device::poll()
 		return;
 
 	// poll the device first
-	HRESULT result = m_xinput_helper->XInputGetState(xinput_state.player_index, &xinput_state.xstate);
+	HRESULT result = m_xinput_helper->xinput_get_state(xinput_state.player_index, &xinput_state.xstate);
 
 	// If we can't poll the device, skip
 	if (FAILED(result))
@@ -262,7 +241,7 @@ protected:
 		{
 			XINPUT_STATE state = {0};
 
-			if (m_xinput_helper->XInputGetState(i, &state) == ERROR_SUCCESS)
+			if (m_xinput_helper->xinput_get_state(i, &state) == ERROR_SUCCESS)
 			{
 				// allocate and link in a new device
 				devinfo = m_xinput_helper->create_xinput_device(machine, i, *this);
