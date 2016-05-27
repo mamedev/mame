@@ -8,10 +8,10 @@
 #ifndef NLD_MATRIX_SOLVER_H_
 #define NLD_MATRIX_SOLVER_H_
 
+#include <type_traits>
+
 #include "solver/nld_solver.h"
 #include "plib/pstream.h"
-
-#include <type_traits>
 
 NETLIB_NAMESPACE_DEVICES_START()
 

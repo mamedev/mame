@@ -5,10 +5,7 @@
  *
  */
 
-#include <solver/nld_matrix_solver.h>
-
-#include <cstring>
-#include <algorithm>
+#include "solver/nld_matrix_solver.h"
 
 #include "plib/palloc.h"
 

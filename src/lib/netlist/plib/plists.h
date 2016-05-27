@@ -10,9 +10,7 @@
 #ifndef PLISTS_H_
 #define PLISTS_H_
 
-#include <cstring>
 #include <algorithm>
-#include <cmath>
 #include <stack>
 #include <vector>
 
