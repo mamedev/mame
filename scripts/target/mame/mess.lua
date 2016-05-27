@@ -2678,6 +2678,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/tek405x.cpp",
 	MAME_DIR .. "src/mame/includes/tek405x.h",
 	MAME_DIR .. "src/mame/drivers/tek410x.cpp",
+	MAME_DIR .. "src/mame/drivers/tek440x.cpp",
 	MAME_DIR .. "src/mame/drivers/tekxp33x.cpp",
 }
 
