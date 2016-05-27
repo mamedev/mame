@@ -271,7 +271,7 @@ void menu_file_create::handle()
 		case IPT_SPECIAL:
 			if (get_selection() == ITEMREF_NEW_IMAGE_NAME)
 			{
-				input_character(m_filename_buffer,event->unichar, is_valid_filename_char);
+				input_character(m_filename_buffer,event->unichar, &is_valid_filename_char);
 				reset(reset_options::REMEMBER_POSITION);
 			}
 			break;
