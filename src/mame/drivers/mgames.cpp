@@ -262,13 +262,13 @@ UINT32 mgames_state::screen_update_mgames(screen_device &screen, bitmap_ind16 &b
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	count = 0;
-	for (y=0;y<32;y++)
+	for (y = 0; y < 32; y++)
 	{
-		for (x=0;x<32;x++)
+		for (x = 0; x < 32; x++)
 		{
 			UINT16 dat = m_video[count];
-			UINT16 col = m_video[count+0x400] & 0x7f;
-			gfx->opaque(bitmap,cliprect,dat,col,0,0,x*16,y*16);
+			UINT16 col = m_video[count + 0x400] & 0x7f;
+			gfx->opaque(bitmap, cliprect, dat, col, 0, 0, x * 16, y * 16);
 			count++;
 		}
 
@@ -285,7 +285,7 @@ PALETTE_INIT_MEMBER(mgames_state, mgames)
 		rgb_t color;
 
 		if (i & 0x01)
-			color = rgb_t(pal2bit((i & 0x6) >> 1),pal2bit((i & 0x18) >> 3),pal2bit((i & 0x60) >> 5));
+			color = rgb_t(pal2bit((i & 0x6) >> 1), pal2bit((i & 0x18) >> 3), pal2bit((i & 0x60) >> 5));
 		else
 			color = rgb_t::black;
 
@@ -516,10 +516,8 @@ WRITE8_MEMBER(mgames_state::outport7_w)
    05   | ---- | ---- | ---- | bit2
 
 
-WRITE8_MEMBER(mgames_state::sound_w)
-//{
-//  m_dac->write_unsigned8(data);
-//}
+  We're tracing the discrete circuitry...
+
 */
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mgames_state )
@@ -572,8 +570,8 @@ static INPUT_PORTS_START( mgames )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, "5 Coins/2 Credits" )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
-//  PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) ) --> damn check... you can't set 2 different bits pointing to the same coinage.
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) ) // Yes, again...
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_5C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
@@ -621,9 +619,9 @@ static const gfx_layout tiles16x16_layout =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16,10*16,11*16,12*16,13*16,14*16,15*16},
+		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16},
 	16*16
 };
 
@@ -636,7 +634,7 @@ static MACHINE_CONFIG_START( mgames, mgames_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mgames_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mgames_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -654,9 +652,8 @@ static MACHINE_CONFIG_START( mgames, mgames_state )
 	MCFG_PALETTE_INIT_OWNER(mgames_state, mgames)
 
 	/* sound hardware */
-//  MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_DAC_ADD("dac")
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+    //  to do...
+
 MACHINE_CONFIG_END
 
 
