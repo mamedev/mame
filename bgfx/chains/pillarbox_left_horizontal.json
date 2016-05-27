@@ -79,7 +79,7 @@
 			"output": "internal"
 		},
 		{
-			"effect": "misc/saturation",
+			"effect": "pillarbox_left_horizontal/offset_sat",
 			"name": "Saturation Pass",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "name": "saturation", "value": 100 }

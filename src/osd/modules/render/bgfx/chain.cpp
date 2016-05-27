@@ -76,7 +76,6 @@ void bgfx_chain::process(render_primitive* prim, int view, int screen, texture_m
 {
 	screen_device_iterator screen_iterator(window.machine().root_device());
 	screen_device* screen_device = screen_iterator.byindex(screen);
-	render_container &screen_container = screen_device->container();
 
 	int current_view = view;
 	uint16_t screen_width(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f));
@@ -88,10 +87,19 @@ void bgfx_chain::process(render_primitive* prim, int view, int screen, texture_m
 	bool orientation_swap_xy = (window.machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
 	bool rotation_swap_xy = (window.target()->orientation() & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
 	bool swap_xy = orientation_swap_xy ^ rotation_swap_xy;
-	float screen_scale_x = 1.0f / screen_container.xscale();
-	float screen_scale_y = 1.0f / screen_container.yscale();
-	float screen_offset_x = -screen_container.xoffset();
-	float screen_offset_y = -screen_container.yoffset();
+    
+    float screen_scale_x =  1.0f;
+    float screen_scale_y = 1.0f;
+    float screen_offset_x = 0.0f;
+    float screen_offset_y = 0.0f;
+    if (screen_device != nullptr)
+    {
+        render_container &screen_container = screen_device->container();
+        screen_scale_x = 1.0f / screen_container.xscale();
+        screen_scale_y = 1.0f / screen_container.yscale();
+        screen_offset_x = -screen_container.xoffset();
+        screen_offset_y = -screen_container.yoffset();
+    }
 
 	for (bgfx_chain_entry* entry : m_entries)
 	{

@@ -448,8 +448,10 @@ uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *st
 		}
 
         const bool any_targets_rebuilt = m_targets.update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE);
-        if (any_targets_rebuilt) {
-            for (bgfx_chain* chain : m_screen_chains) {
+        if (any_targets_rebuilt)
+        {
+            for (bgfx_chain* chain : m_screen_chains)
+            {
                 chain->repopulate_targets();
             }
         }
