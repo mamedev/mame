@@ -300,7 +300,10 @@ void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, render_p
     {
         for (bgfx_chain* chain : m_screen_chains)
         {
-            chain->repopulate_targets();
+            if (chain != nullptr)
+            {
+                chain->repopulate_targets();
+            }
         }
     }
 
@@ -452,7 +455,10 @@ uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *st
         {
             for (bgfx_chain* chain : m_screen_chains)
             {
-                chain->repopulate_targets();
+                if (chain != nullptr)
+                {
+                    chain->repopulate_targets();
+                }
             }
         }
         
