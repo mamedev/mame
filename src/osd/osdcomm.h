@@ -129,7 +129,7 @@ using FPTR = uintptr_t;
 #define EXTRACT_64LO(val)   ((UINT32)(val))
 
 // Highly useful template for compile-time knowledge of an array size
-template <typename T, size_t N> constexpr inline std::size_t ARRAY_LENGTH(T (&)[N]) { return N;}
+template <typename T, size_t N> constexpr inline size_t ARRAY_LENGTH(T (&)[N]) { return N;}
 
 
 /* Macros for normalizing data into big or little endian formats */

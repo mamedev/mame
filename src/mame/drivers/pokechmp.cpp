@@ -33,7 +33,7 @@ ROM 11 = Main CPU code?
 -Sound = Yamaha YM2203C + Y3014B
 
 -Also, there are some GALs on the board (not dumped) a
- 8-dips bank and two oscilators (4 MHz and 24 MHz, both near
+ 8-dips bank and two oscillators (4 MHz and 24 MHz, both near
  the sound parts).
 
 ClawGrip, Jul 2006
@@ -69,7 +69,7 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_sound_bank_w)
 
 WRITE8_MEMBER(pokechmp_state::pokechmp_sound_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( pokechmp_sound_map, AS_PROGRAM, 8, pokechmp_state )
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP    /* MSM5205 chip on Pocket Gal, not connected here? */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(pokechmp_sound_bank_w) /* sound rom bank seems to be replaced with OKI bank */
 	AM_RANGE(0x2800, 0x2800) AM_DEVREADWRITE("oki", okim6295_device, read, write) // extra
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 //  AM_RANGE(0x3400, 0x3400) AM_READ(pokechmp_adpcm_reset_r) /* not on here */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -237,6 +237,8 @@ static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_4MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

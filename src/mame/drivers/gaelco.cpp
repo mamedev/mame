@@ -37,7 +37,7 @@ WRITE16_MEMBER(gaelco_state::bigkarnk_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( bigkarnk_snd_map, AS_PROGRAM, 8, gaelco_state )
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("oki", okim6295_device, read, write)   /* OKI6295 */
 //  AM_RANGE(0x0900, 0x0900) AM_WRITENOP                                    /* enable sound output? */
 	AM_RANGE(0x0a00, 0x0a01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)        /* YM3812 */
-	AM_RANGE(0x0b00, 0x0b00) AM_READ(soundlatch_byte_r)                         /* Sound latch */
+	AM_RANGE(0x0b00, 0x0b00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)      /* Sound latch */
 	AM_RANGE(0x0c00, 0xffff) AM_ROM                                         /* ROM */
 ADDRESS_MAP_END
 
@@ -532,6 +532,8 @@ static MACHINE_CONFIG_START( bigkarnk, gaelco_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3580000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

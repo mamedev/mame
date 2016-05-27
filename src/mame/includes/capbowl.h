@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "video/tms34061.h"
@@ -25,6 +26,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_tms34061(*this, "tms34061"),
 		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
 		m_rowaddress(*this, "rowaddress") { }
 
 	/* devices */
@@ -33,6 +35,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<tms34061_device> m_tms34061;
 	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_rowaddress;

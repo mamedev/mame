@@ -55,6 +55,7 @@ $842f = lives
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 
 
@@ -67,10 +68,11 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_bgram(*this, "bgram"),
-		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_mainram;
@@ -91,7 +93,12 @@ public:
 	UINT8    m_prot_addr;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	DECLARE_WRITE8_MEMBER(prot_w);
 	DECLARE_WRITE8_MEMBER(char_bank_w);
 	DECLARE_WRITE8_MEMBER(ddayjlc_bgram_w);
@@ -114,9 +121,6 @@ public:
 	UINT32 screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddayjlc_interrupt);
 	INTERRUPT_GEN_MEMBER(ddayjlc_snd_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 
@@ -224,7 +228,7 @@ WRITE8_MEMBER(ddayjlc_state::bg2_w)
 
 WRITE8_MEMBER(ddayjlc_state::sound_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
@@ -533,8 +537,10 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/6)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 12000000/6)

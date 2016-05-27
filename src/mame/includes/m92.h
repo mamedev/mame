@@ -8,6 +8,7 @@
 
 #include "video/bufsprite.h"
 #include "sound/okim6295.h"
+#include "machine/gen_latch.h"
 #include "machine/pic8259.h"
 
 struct M92_pf_layer_info
@@ -37,7 +38,8 @@ public:
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
-			m_upd71059c(*this, "upd71059c")
+			m_upd71059c(*this, "upd71059c"),
+			m_soundlatch(*this, "soundlatch")
 	{ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -50,6 +52,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<pic8259_device> m_upd71059c;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	UINT16 m_sound_status;
 	UINT32 m_raster_irq_position;

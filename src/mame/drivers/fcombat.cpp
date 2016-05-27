@@ -33,6 +33,7 @@ inputs + notes by stephh
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "includes/fcombat.h"
 
@@ -126,14 +127,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, fcombat_state )
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(ec00_w)
 	AM_RANGE(0xed00, 0xed00) AM_WRITE(ed00_w)
 	AM_RANGE(0xee00, 0xee00) AM_WRITE(ee00_w)   // related to protection ? - doesn't seem to have any effect
-	AM_RANGE(0xef00, 0xef00) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xef00, 0xef00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, fcombat_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay2", ay8910_device, data_r)
@@ -305,6 +306,8 @@ static MACHINE_CONFIG_START( fcombat, fcombat_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)

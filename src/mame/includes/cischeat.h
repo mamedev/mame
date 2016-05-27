@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+
 /* TODO: some variables are per-game specifics */
+
 #include "sound/okim6295.h"
+#include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
 
@@ -26,6 +29,8 @@ public:
 		m_oki2(*this, "oki2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_captflag_hopper(*this, "hopper"),
 		m_captflag_motor_left(*this, "motor_left"),
 		m_captflag_motor_right(*this, "motor_right"),
@@ -128,6 +133,8 @@ public:
 	required_device<okim6295_device> m_oki2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_16_device> m_soundlatch;
+	optional_device<generic_latch_16_device> m_soundlatch2;
 
 	// captflag
 	optional_device<ticket_dispenser_device> m_captflag_hopper;

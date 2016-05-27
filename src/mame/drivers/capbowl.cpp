@@ -195,7 +195,7 @@ WRITE8_MEMBER(capbowl_state::track_reset_w)
 WRITE8_MEMBER(capbowl_state::sndcmd_w)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 }
 
 
@@ -244,7 +244,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
-	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -342,6 +342,8 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK/2)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
