@@ -264,6 +264,7 @@ namespace bgfx
 {
 	extern InternalData g_internalData;
 	extern PlatformData g_platformData;
+	extern bool g_platformDataChangedSinceReset;
 
 #if BGFX_CONFIG_MAX_DRAW_CALLS < (64<<10)
 	typedef uint16_t RenderItemCount;
@@ -2134,7 +2135,11 @@ namespace bgfx
 			BX_WARN(0 != _width && 0 != _height, "Frame buffer resolution width or height cannot be 0 (width %d, height %d).", _width, _height);
 			m_resolution.m_width  = bx::uint32_max(1, _width);
 			m_resolution.m_height = bx::uint32_max(1, _height);
-			m_resolution.m_flags  = _flags;
+			m_resolution.m_flags  = 0
+				| _flags
+				| (g_platformDataChangedSinceReset ? BGFX_RESET_INTERNAL_FORCE : 0)
+				;
+			g_platformDataChangedSinceReset = false;
 
 			m_flipAfterRender = !!(_flags & BGFX_RESET_FLIP_AFTER_RENDER);
 
