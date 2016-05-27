@@ -811,6 +811,8 @@ end
 		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
 			buildoptions {
 				"-Wno-switch",
+			}
+			buildoptions_cpp {
 				"-Wno-unknown-pragmas",
 			}
 		end
