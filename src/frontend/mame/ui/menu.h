@@ -13,10 +13,11 @@
 #ifndef MAME_FRONTEND_UI_MENU_H
 #define MAME_FRONTEND_UI_MENU_H
 
-#include "render.h"
-#include "language.h"
 #include "ui/ui.h"
 #include "ui/menuitem.h"
+
+#include "language.h"
+#include "render.h"
 
 #include <memory>
 
@@ -149,16 +150,6 @@ private:
 	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
 public:
-	// tab navigation
-	enum class focused_menu
-	{
-		main,
-		left,
-		righttop,
-		rightbottom
-	};
-
-	focused_menu m_focus;
 	void *m_prev_selected;
 
 	int  visible_items;
@@ -215,6 +206,15 @@ protected:
 		REMEMBER_REF
 	};
 
+	// tab navigation
+	enum class focused_menu
+	{
+		main,
+		left,
+		righttop,
+		rightbottom
+	};
+
 	// menu-related events
 	struct event
 	{
@@ -223,6 +223,31 @@ protected:
 		int                 iptkey;     // one of the IPT_* values from inptport.h
 		unicode_char        unichar;    // unicode character if iptkey == IPT_SPECIAL
 		render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
+
+		bool is_char_printable() const
+		{
+			return
+				!(0x0001f >= unichar) &&                            // C0 control
+				!((0x0007f <= unichar) && (0x0009f >= unichar)) &&  // DEL and C1 control
+				!((0x0fdd0 <= unichar) && (0x0fddf >= unichar)) &&  // noncharacters
+				!(0x0fffe == (unichar & 0x0ffff)) &&                // byte-order detection noncharacter
+				!(0x0ffff == (unichar & 0x0ffff));                  // the other noncharacter
+		}
+
+		template <std::size_t N>
+		bool append_char(char (&buffer)[N], std::size_t offset) const
+		{
+			auto const chlen = utf8_from_uchar(&buffer[offset], N - offset - 1, unichar);
+			if (0 < chlen)
+			{
+				buffer[offset + chlen] = '\0';
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 	};
 
 	int topline_datsview;      // right box top line
@@ -242,6 +267,9 @@ protected:
 	// process a menu, drawing it and returning any interesting events
 	const event *process(UINT32 flags, float x0 = 0.0f, float y0 = 0.0f);
 	void process_parent() { m_parent->process(PROCESS_NOINPUT); }
+
+	bool is_focus(focused_menu focus) const { return m_focus == focus; }
+	void set_focus(focused_menu focus) { m_focus = focus; }
 
 	// draw right box
 	float draw_right_box_title(float x1, float y1, float x2, float y2);
@@ -324,6 +352,7 @@ private:
 	osd_ticks_t             m_repeat;
 	event                   m_event;   // the UI event that occurred
 	pool                    *m_pool;   // list of memory pools
+	focused_menu            m_focus;
 
 	static std::unique_ptr<menu> menu_stack;
 	static std::unique_ptr<menu> menu_free;

@@ -173,83 +173,75 @@ void menu_select_software::handle()
 	// process the menu
 	const event *menu_event = process(PROCESS_LR_REPEAT);
 
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	if (menu_event && menu_event->itemref)
 	{
-		// reset the error on any future event
 		if (ui_error)
 		{
+			// reset the error on any future event
 			ui_error = false;
 			machine().ui_input().reset();
 		}
-
-		// handle selections
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			if (m_focus == focused_menu::main)
+			// handle selections
+			if (is_focus(focused_menu::main))
 			{
 				inkey_select(menu_event);
 			}
-			else if (m_focus == focused_menu::left)
+			else if (is_focus(focused_menu::left))
 			{
 				l_sw_hover = highlight;
 				check_filter = true;
 				m_prev_selected = nullptr;
 			}
 		}
-
-		// handle UI_LEFT
 		else if (menu_event->iptkey == IPT_UI_LEFT)
 		{
-			// Images
+			// handle UI_LEFT
 			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
 			{
+				// Images
 				ui_globals::curimage_view--;
 				ui_globals::switch_image = true;
 				ui_globals::default_image = false;
 			}
-
-			// Infos
 			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view > 0)
 			{
+				// Infos
 				ui_globals::cur_sw_dats_view--;
 				topline_datsview = 0;
 			}
 		}
-
-		// handle UI_RIGHT
 		else if (menu_event->iptkey == IPT_UI_RIGHT)
 		{
-			// Images
+			// handle UI_RIGHT
 			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
 			{
+				// Images
 				ui_globals::curimage_view++;
 				ui_globals::switch_image = true;
 				ui_globals::default_image = false;
 			}
-
-			// Infos
 			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < 1)
 			{
+				// Infos
 				ui_globals::cur_sw_dats_view++;
 				topline_datsview = 0;
 			}
 		}
-
-		// handle UI_UP_FILTER
 		else if (menu_event->iptkey == IPT_UI_UP_FILTER && highlight > UI_SW_FIRST)
 		{
+			// handle UI_UP_FILTER
 			highlight--;
 		}
-
-		// handle UI_DOWN_FILTER
 		else if (menu_event->iptkey == IPT_UI_DOWN_FILTER && highlight < UI_SW_LAST)
 		{
+			// handle UI_DOWN_FILTER
 			highlight++;
 		}
-
-		// handle UI_DATS
 		else if (menu_event->iptkey == IPT_UI_DATS && ui().options().enabled_dats())
 		{
+			// handle UI_DATS
 			ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
 			datfile_manager &mdat = mame_machine_manager::instance()->datfile();
 
@@ -258,25 +250,25 @@ void menu_select_software::handle()
 			else if (mdat.has_software(ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->parentname) || !ui_swinfo->usage.empty())
 				menu::stack_push<menu_dats_view>(ui(), container, ui_swinfo);
 		}
-
-		// handle UI_LEFT_PANEL
 		else if (menu_event->iptkey == IPT_UI_LEFT_PANEL)
+		{
+			// handle UI_LEFT_PANEL
 			ui_globals::rpanel = RP_IMAGES;
-
-		// handle UI_RIGHT_PANEL
+		}
 		else if (menu_event->iptkey == IPT_UI_RIGHT_PANEL)
+		{
+			// handle UI_RIGHT_PANEL
 			ui_globals::rpanel = RP_INFOS;
-
-		// escape pressed with non-empty text clears the text
+		}
 		else if (menu_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
 		{
+			// escape pressed with non-empty text clears the text
 			m_search[0] = '\0';
 			reset(reset_options::SELECT_FIRST);
 		}
-
-		// handle UI_FAVORITES
 		else if (menu_event->iptkey == IPT_UI_FAVORITES)
 		{
+			// handle UI_FAVORITES
 			ui_software_info *swinfo = (ui_software_info *)menu_event->itemref;
 
 			if ((FPTR)swinfo > 2)
@@ -295,11 +287,11 @@ void menu_select_software::handle()
 				}
 			}
 		}
-
-		// typed characters append to the buffer
 		else if (menu_event->iptkey == IPT_SPECIAL)
+		{
+			// typed characters append to the buffer
 			inkey_special(menu_event);
-
+		}
 		else if (menu_event->iptkey == IPT_OTHER)
 		{
 			highlight = l_sw_hover;
@@ -314,72 +306,69 @@ void menu_select_software::handle()
 	if (menu_event && !menu_event->itemref)
 	{
 		if (menu_event->iptkey == IPT_UI_CONFIGURE)
+		{
 			inkey_configure(menu_event);
-
-		// handle UI_LEFT
+		}
 		else if (menu_event->iptkey == IPT_UI_LEFT)
 		{
-			// Images
+			// handle UI_LEFT
 			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
 			{
+				// Images
 				ui_globals::curimage_view--;
 				ui_globals::switch_image = true;
 				ui_globals::default_image = false;
 			}
-
-			// Infos
 			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view > 0)
 			{
+				// Infos
 				ui_globals::cur_sw_dats_view--;
 				topline_datsview = 0;
 			}
 		}
-
-		// handle UI_RIGHT
 		else if (menu_event->iptkey == IPT_UI_RIGHT)
 		{
-			// Images
+			// handle UI_RIGHT
 			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
 			{
+				// Images
 				ui_globals::curimage_view++;
 				ui_globals::switch_image = true;
 				ui_globals::default_image = false;
 			}
-
-			// Infos
 			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < 1)
 			{
+				// Infos
 				ui_globals::cur_sw_dats_view++;
 				topline_datsview = 0;
 			}
 		}
-
-		// handle UI_LEFT_PANEL
 		else if (menu_event->iptkey == IPT_UI_LEFT_PANEL)
+		{
+			// handle UI_LEFT_PANEL
 			ui_globals::rpanel = RP_IMAGES;
-
-		// handle UI_RIGHT_PANEL
+		}
 		else if (menu_event->iptkey == IPT_UI_RIGHT_PANEL)
+		{
+			// handle UI_RIGHT_PANEL
 			ui_globals::rpanel = RP_INFOS;
-
-		// handle UI_UP_FILTER
+		}
 		else if (menu_event->iptkey == IPT_UI_UP_FILTER && highlight > UI_SW_FIRST)
 		{
+			// handle UI_UP_FILTER
 			highlight--;
 		}
-
-		// handle UI_DOWN_FILTER
 		else if (menu_event->iptkey == IPT_UI_DOWN_FILTER && highlight < UI_SW_LAST)
 		{
+			// handle UI_DOWN_FILTER
 			highlight++;
 		}
-		else if (menu_event->iptkey == IPT_OTHER && m_focus == focused_menu::left)
+		else if (menu_event->iptkey == IPT_OTHER && is_focus(focused_menu::left))
 		{
 			l_sw_hover = highlight;
 			check_filter = true;
 			m_prev_selected = nullptr;
 		}
-
 	}
 
 	// if we're in an error state, overlay an error message
@@ -784,7 +773,6 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 
 		if ((driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
 			color = UI_RED_COLOR;
-
 	}
 
 	else if (swinfo != nullptr)
@@ -823,7 +811,6 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 		// last line is romset name
 		tempbuf[4] = string_format(_("romset: %1$-.100s"), swinfo->shortname.c_str());
 	}
-
 	else
 	{
 		std::string copyright(emulator_info::get_copyright());
@@ -950,6 +937,7 @@ void menu_select_software::inkey_select(const event *menu_event)
 				menu::stack_push<software_parts>(ui(), container, parts, ui_swinfo);
 				return;
 			}
+
 			std::string error_string;
 			std::string string_list = std::string(ui_swinfo->listname).append(":").append(ui_swinfo->shortname).append(":").append(ui_swinfo->part).append(":").append(ui_swinfo->instance);
 			machine().options().set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
@@ -979,52 +967,61 @@ void menu_select_software::inkey_select(const event *menu_event)
 
 void menu_select_software::inkey_special(const event *menu_event)
 {
-	int buflen = strlen(m_search);
+	auto const buflen = std::strlen(m_search);
 
-	// if it's a backspace and we can handle it, do so
-	if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
+	if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
 	{
-		*(char *)utf8_previous_char(&m_search[buflen]) = 0;
-		reset(reset_options::SELECT_FIRST);
+		// if it's a backspace and we can handle it, do so
+		if (0 < buflen)
+		{
+			*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
+			reset(reset_options::SELECT_FIRST);
+		}
 	}
-
-	// if it's any other key and we're not maxed out, update
-	else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
+	else if (menu_event->is_char_printable())
 	{
-		buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
-		m_search[buflen] = 0;
-		reset(reset_options::SELECT_FIRST);
+		// if it's any other key and we're not maxed out, update
+		if (menu_event->append_char(m_search, buflen))
+			reset(reset_options::SELECT_FIRST);
 	}
 }
 
+
 void menu_select_software::inkey_configure(const event *menu_event)
 {
-	if (selected <= visible_items && m_focus == focused_menu::main)
+	if (is_focus(focused_menu::main))
 	{
-		m_prev_selected = item[selected].ref;
-		selected = visible_items + 1;
-	}
-	else if (selected > visible_items && m_focus == focused_menu::main)
-	{
-		if (ui_globals::panels_status != HIDE_LEFT_PANEL)
-			m_focus = focused_menu::left;
-
-		else if (ui_globals::panels_status == HIDE_BOTH)
+		if (selected <= visible_items)
 		{
-			for (int x = 0; x < item.size(); ++x)
-				if (item[x].ref == m_prev_selected)
-					selected = x;
+			m_prev_selected = item[selected].ref;
+			selected = visible_items + 1;
 		}
 		else
-			m_focus = focused_menu::righttop;
+		{
+			if (ui_globals::panels_status != HIDE_LEFT_PANEL)
+				set_focus(focused_menu::left);
+
+			else if (ui_globals::panels_status == HIDE_BOTH)
+			{
+				for (int x = 0; x < item.size(); ++x)
+					if (item[x].ref == m_prev_selected)
+						selected = x;
+			}
+			else
+			{
+				set_focus(focused_menu::righttop);
+			}
+		}
 	}
-	else if (m_focus == focused_menu::left)
+	else if (is_focus(focused_menu::left))
 	{
 		if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
-			m_focus = focused_menu::righttop;
+		{
+			set_focus(focused_menu::righttop);
+		}
 		else
 		{
-			m_focus = focused_menu::main;
+			set_focus(focused_menu::main);
 			if (m_prev_selected == nullptr)
 			{
 				selected = 0;
@@ -1036,11 +1033,13 @@ void menu_select_software::inkey_configure(const event *menu_event)
 					selected = x;
 		}
 	}
-	else if (m_focus == focused_menu::righttop)
-		m_focus = focused_menu::rightbottom;
-	else if (m_focus == focused_menu::rightbottom)
+	else if (is_focus(focused_menu::righttop))
 	{
-		m_focus = focused_menu::main;
+		set_focus(focused_menu::rightbottom);
+	}
+	else if (is_focus(focused_menu::rightbottom))
+	{
+		set_focus(focused_menu::main);
 		if (m_prev_selected == nullptr)
 		{
 			selected = 0;
@@ -1447,7 +1446,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 				hover = phover + filter;
 			}
 
-			if (highlight == filter && m_focus == focused_menu::left)
+			if (highlight == filter && is_focus(focused_menu::left))
 			{
 				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -1488,7 +1487,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 			}
 
 			ui().draw_text_full(container, str.c_str(), x1t, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
-								DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
+				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
 			y1 += line_height;
 		}
 
@@ -1572,7 +1571,7 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		if (m_focus == focused_menu::rightbottom)
+		if (is_focus(focused_menu::rightbottom))
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -1606,7 +1605,7 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		if (m_focus == focused_menu::rightbottom)
+		if (is_focus(focused_menu::rightbottom))
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -1787,6 +1786,7 @@ void menu_select_software::arts_render(void *selectedref, float origx1, float or
 	else if (soft != nullptr)
 	{
 		std::string fullname, pathname;
+
 		if (ui_globals::default_image)
 			(soft->startempty == 0) ? ui_globals::curimage_view = SNAPSHOT_VIEW : ui_globals::curimage_view = CABINETS_VIEW;
 

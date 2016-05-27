@@ -54,18 +54,24 @@ namespace ui {
 //  into a buffer
 //-------------------------------------------------
 
-static void input_character(char *buffer, size_t buffer_length, unicode_char unichar, int (*filter)(unicode_char))
+template <std::size_t N, typename F>
+static void input_character(char (&buffer)[N], unicode_char unichar, F &&filter)
 {
-	size_t buflen = strlen(buffer);
+	auto buflen = std::strlen(buffer);
 
-	if ((unichar == 8 || unichar == 0x7f) && (buflen > 0))
+	if ((unichar == 8) || (unichar == 0x7f))
 	{
-		*(char *)utf8_previous_char(&buffer[buflen]) = 0;
+		if (0 < buflen)
+			*const_cast<char *>(utf8_previous_char(&buffer[buflen])) = 0;
 	}
-	else if ((unichar > ' ') && ((filter == nullptr) || (*filter)(unichar)))
+	else if ((unichar >= ' ') && (!filter || filter(unichar)))
 	{
-		buflen += utf8_from_uchar(&buffer[buflen], buffer_length - buflen, unichar);
-		buffer[buflen] = 0;
+		auto const chlen = utf8_from_uchar(&buffer[buflen], N - buflen - 1, unichar);
+		if (0 <= chlen)
+		{
+			buflen += chlen;
+			buffer[buflen] = 0;
+		}
 	}
 }
 
@@ -140,7 +146,7 @@ void menu_confirm_save_as::handle()
 
 static int is_valid_filename_char(unicode_char unichar)
 {
-	// this should really be in the OSD layer
+	// this should really be in the OSD layer, and it shouldn't be 7-bit bullshit
 	static const char valid_filename_char[] =
 	{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     // 00-0f
@@ -243,39 +249,35 @@ void menu_file_create::handle()
 	const event *event = process(0);
 
 	// process the event
-	if (event != nullptr)
+	if (event)
 	{
 		// handle selections
-		switch(event->iptkey)
+		switch (event->iptkey)
 		{
-			case IPT_UI_SELECT:
-				if ((event->itemref == ITEMREF_CREATE) || (event->itemref == ITEMREF_NEW_IMAGE_NAME))
+		case IPT_UI_SELECT:
+			if ((event->itemref == ITEMREF_CREATE) || (event->itemref == ITEMREF_NEW_IMAGE_NAME))
+			{
+				std::string tmp_file(m_filename_buffer);
+				if (tmp_file.find(".") != -1 && tmp_file.find(".") < tmp_file.length() - 1)
 				{
-					std::string tmp_file(m_filename_buffer);
-					if (tmp_file.find(".") != -1 && tmp_file.find(".") < tmp_file.length() - 1)
-					{
-						m_current_file = m_filename_buffer;
-						menu::stack_pop(machine());
-					}
-					else
-						ui().popup_time(1, "%s", _("Please enter a file extension too"));
+					m_current_file = m_filename_buffer;
+					menu::stack_pop(machine());
 				}
-				break;
+				else
+					ui().popup_time(1, "%s", _("Please enter a file extension too"));
+			}
+			break;
 
-			case IPT_SPECIAL:
-				if (get_selection() == ITEMREF_NEW_IMAGE_NAME)
-				{
-					input_character(
-						m_filename_buffer,
-						ARRAY_LENGTH(m_filename_buffer),
-						event->unichar,
-						is_valid_filename_char);
-					reset(reset_options::REMEMBER_POSITION);
-				}
-				break;
-			case IPT_UI_CANCEL:
-				*m_ok = false;
-				break;
+		case IPT_SPECIAL:
+			if (get_selection() == ITEMREF_NEW_IMAGE_NAME)
+			{
+				input_character(m_filename_buffer,event->unichar, is_valid_filename_char);
+				reset(reset_options::REMEMBER_POSITION);
+			}
+			break;
+		case IPT_UI_CANCEL:
+			*m_ok = false;
+			break;
 		}
 	}
 }
@@ -581,45 +583,45 @@ void menu_file_selector::handle()
 		if (event->iptkey == IPT_UI_SELECT)
 		{
 			entry = (const file_selector_entry *) event->itemref;
-			switch(entry->type)
+			switch (entry->type)
 			{
-				case SELECTOR_ENTRY_TYPE_EMPTY:
-					// empty slot - unload
-					*m_result = R_EMPTY;
-					menu::stack_pop(machine());
-					break;
+			case SELECTOR_ENTRY_TYPE_EMPTY:
+				// empty slot - unload
+				*m_result = R_EMPTY;
+				menu::stack_pop(machine());
+				break;
 
-				case SELECTOR_ENTRY_TYPE_CREATE:
-					// create
-					*m_result = R_CREATE;
-					menu::stack_pop(machine());
-					break;
+			case SELECTOR_ENTRY_TYPE_CREATE:
+				// create
+				*m_result = R_CREATE;
+				menu::stack_pop(machine());
+				break;
 
-				case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
-					*m_result = R_SOFTLIST;
-					menu::stack_pop(machine());
-					break;
+			case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
+				*m_result = R_SOFTLIST;
+				menu::stack_pop(machine());
+				break;
 
-				case SELECTOR_ENTRY_TYPE_DRIVE:
-				case SELECTOR_ENTRY_TYPE_DIRECTORY:
-					// drive/directory - first check the path
-					err = util::zippath_opendir(entry->fullpath, nullptr);
-					if (err != osd_file::error::NONE)
-					{
-						// this path is problematic; present the user with an error and bail
-						ui().popup_time(1, "Error accessing %s", entry->fullpath);
-						break;
-					}
-					m_current_directory.assign(entry->fullpath);
-					reset(reset_options::SELECT_FIRST);
+			case SELECTOR_ENTRY_TYPE_DRIVE:
+			case SELECTOR_ENTRY_TYPE_DIRECTORY:
+				// drive/directory - first check the path
+				err = util::zippath_opendir(entry->fullpath, nullptr);
+				if (err != osd_file::error::NONE)
+				{
+					// this path is problematic; present the user with an error and bail
+					ui().popup_time(1, "Error accessing %s", entry->fullpath);
 					break;
+				}
+				m_current_directory.assign(entry->fullpath);
+				reset(reset_options::SELECT_FIRST);
+				break;
 
-				case SELECTOR_ENTRY_TYPE_FILE:
-					// file
-					m_current_file.assign(entry->fullpath);
-					*m_result = R_FILE;
-					menu::stack_pop(machine());
-					break;
+			case SELECTOR_ENTRY_TYPE_FILE:
+				// file
+				m_current_file.assign(entry->fullpath);
+				*m_result = R_FILE;
+				menu::stack_pop(machine());
+				break;
 			}
 
 			// reset the char buffer when pressing IPT_UI_SELECT
@@ -628,27 +630,29 @@ void menu_file_selector::handle()
 		}
 		else if (event->iptkey == IPT_SPECIAL)
 		{
-			int buflen = strlen(m_filename_buffer);
+			auto const buflen = std::strlen(m_filename_buffer);
 			bool update_selected = FALSE;
 
-			// if it's a backspace and we can handle it, do so
-			if ((event->unichar == 8 || event->unichar == 0x7f) && buflen > 0)
+			if ((event->unichar == 8) || (event->unichar == 0x7f))
 			{
-				*(char *)utf8_previous_char(&m_filename_buffer[buflen]) = 0;
-				update_selected = TRUE;
+				// if it's a backspace and we can handle it, do so
+				if (0 < buflen)
+				{
+					*const_cast<char *>(utf8_previous_char(&m_filename_buffer[buflen])) = 0;
+					update_selected = TRUE;
 
-				if (ARRAY_LENGTH(m_filename_buffer) > 0)
 					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+				}
 			}
-			// if it's any other key and we're not maxed out, update
-			else if (event->unichar >= ' ' && event->unichar < 0x7f)
+			else if (event->is_char_printable())
 			{
-				buflen += utf8_from_uchar(&m_filename_buffer[buflen], ARRAY_LENGTH(m_filename_buffer) - buflen, event->unichar);
-				m_filename_buffer[buflen] = 0;
-				update_selected = TRUE;
+				// if it's any other key and we're not maxed out, update
+				if (event->append_char(m_filename_buffer, buflen))
+				{
+					update_selected = TRUE;
 
-				if (ARRAY_LENGTH(m_filename_buffer) > 0)
 					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+				}
 			}
 
 			if (update_selected)

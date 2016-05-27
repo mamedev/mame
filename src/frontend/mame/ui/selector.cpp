@@ -100,21 +100,21 @@ void menu_selector::handle()
 		}
 		else if (menu_event->iptkey == IPT_SPECIAL)
 		{
-			int buflen = strlen(m_search);
-
-			// if it's a backspace and we can handle it, do so
-			if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
+			auto const buflen = strlen(m_search);
+			if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
 			{
-				*(char *)utf8_previous_char(&m_search[buflen]) = 0;
-				reset(reset_options::SELECT_FIRST);
+				// if it's a backspace and we can handle it, do so
+				if (0 < buflen)
+				{
+					*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
+					reset(reset_options::SELECT_FIRST);
+				}
 			}
-
-			// if it's any other key and we're not maxed out, update
-			else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
+			else if (menu_event->is_char_printable())
 			{
-				buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
-				m_search[buflen] = 0;
-				reset(reset_options::SELECT_FIRST);
+				// if it's any other key and we're not maxed out, update
+				if (menu_event->append_char(m_search, buflen))
+					reset(reset_options::SELECT_FIRST);
 			}
 		}
 

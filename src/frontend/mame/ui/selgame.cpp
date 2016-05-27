@@ -58,7 +58,7 @@ int menu_select_game::m_isabios = 0;
 
 menu_select_game::menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename) : menu(mui, container)
 {
-	m_focus = focused_menu::main;
+	set_focus(focused_menu::main);
 	highlight = 0;
 	std::string error_string, last_filter, sub_filter;
 	ui_options &moptions = mui.options();
@@ -206,54 +206,51 @@ void menu_select_game::handle()
 
 	// process the menu
 	const event *menu_event = process(PROCESS_LR_REPEAT);
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	if (menu_event && menu_event->itemref)
 	{
-		// reset the error on any future menu_event
 		if (ui_error)
 		{
+			// reset the error on any future menu_event
 			ui_error = false;
 			machine().ui_input().reset();
 		}
-
-		// handle selections
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			if (m_focus == focused_menu::main)
+			// handle selections
+			if (is_focus(focused_menu::main))
 			{
 				if (isfavorite())
 					inkey_select_favorite(menu_event);
 				else
 					inkey_select(menu_event);
 			}
-			else if (m_focus == focused_menu::left)
+			else if (is_focus(focused_menu::left))
 			{
 				l_hover = highlight;
 				check_filter = true;
 				m_prev_selected = nullptr;
 			}
 		}
-
-		// handle IPT_CUSTOM (mouse right click)
 		else if (menu_event->iptkey == IPT_CUSTOM)
 		{
+			// handle IPT_CUSTOM (mouse right click)
 			if (!isfavorite())
 				menu::stack_push<menu_machine_configure>(ui(), container, (const game_driver *)m_prev_selected, menu_event->mouse.x0, menu_event->mouse.y0);
 		}
-
-		// handle UI_LEFT
 		else if (menu_event->iptkey == IPT_UI_LEFT)
 		{
-			// Images
+			// handle UI_LEFT
+
 			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
 			{
+				// Images
 				ui_globals::curimage_view--;
 				ui_globals::switch_image = true;
 				ui_globals::default_image = false;
 			}
-
-			// Infos
 			else if (ui_globals::rpanel == RP_INFOS)
 			{
+				// Infos
 				if (!isfavorite())
 				{
 					const game_driver *drv = (const game_driver *)menu_event->itemref;
@@ -279,21 +276,19 @@ void menu_select_game::handle()
 				}
 			}
 		}
-
-		// handle UI_RIGHT
 		else if (menu_event->iptkey == IPT_UI_RIGHT)
 		{
-			// Images
+			// handle UI_RIGHT
 			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
 			{
+				// Images
 				ui_globals::curimage_view++;
 				ui_globals::switch_image = true;
 				ui_globals::default_image = false;
 			}
-
-			// Infos
 			else if (ui_globals::rpanel == RP_INFOS)
 			{
+				// Infos
 				if (!isfavorite())
 				{
 					const game_driver *drv = (const game_driver *)menu_event->itemref;
@@ -319,37 +314,35 @@ void menu_select_game::handle()
 				}
 			}
 		}
-
-		// handle UI_UP_FILTER
 		else if (menu_event->iptkey == IPT_UI_UP_FILTER && highlight > FILTER_FIRST)
 		{
+			// handle UI_UP_FILTER
 			highlight--;
 		}
-
-		// handle UI_DOWN_FILTER
 		else if (menu_event->iptkey == IPT_UI_DOWN_FILTER && highlight < FILTER_LAST)
 		{
+			// handle UI_DOWN_FILTER
 			highlight++;
 		}
-
-		// handle UI_LEFT_PANEL
 		else if (menu_event->iptkey == IPT_UI_LEFT_PANEL)
+		{
+			// handle UI_LEFT_PANEL
 			ui_globals::rpanel = RP_IMAGES;
-
-		// handle UI_RIGHT_PANEL
+		}
 		else if (menu_event->iptkey == IPT_UI_RIGHT_PANEL)
+		{
+			// handle UI_RIGHT_PANEL
 			ui_globals::rpanel = RP_INFOS;
-
-		// escape pressed with non-empty text clears the text
+		}
 		else if (menu_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
 		{
+			// escape pressed with non-empty text clears the text
 			m_search[0] = '\0';
 			reset(reset_options::SELECT_FIRST);
 		}
-
-		// handle UI_DATS
 		else if (menu_event->iptkey == IPT_UI_DATS && enabled_dats)
 		{
+			// handle UI_DATS
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)menu_event->itemref;
@@ -370,10 +363,9 @@ void menu_select_game::handle()
 				}
 			}
 		}
-
-		// handle UI_FAVORITES
 		else if (menu_event->iptkey == IPT_UI_FAVORITES)
 		{
+			// handle UI_FAVORITES
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)menu_event->itemref;
@@ -404,23 +396,26 @@ void menu_select_game::handle()
 				}
 			}
 		}
-
-		// handle UI_EXPORT
 		else if (menu_event->iptkey == IPT_UI_EXPORT && !isfavorite())
+		{
+			// handle UI_EXPORT
 			inkey_export();
-
-		// handle UI_AUDIT_FAST
+		}
 		else if (menu_event->iptkey == IPT_UI_AUDIT_FAST && !m_unavailsortedlist.empty())
+		{
+			// handle UI_AUDIT_FAST
 			menu::stack_push<menu_audit>(ui(), container, m_availsortedlist, m_unavailsortedlist, 1);
-
-		// handle UI_AUDIT_ALL
+		}
 		else if (menu_event->iptkey == IPT_UI_AUDIT_ALL)
+		{
+			// handle UI_AUDIT_ALL
 			menu::stack_push<menu_audit>(ui(), container, m_availsortedlist, m_unavailsortedlist, 2);
-
-		// typed characters append to the buffer
+		}
 		else if (menu_event->iptkey == IPT_SPECIAL)
+		{
+			// typed characters append to the buffer
 			inkey_special(menu_event);
-
+		}
 		else if (menu_event->iptkey == IPT_UI_CONFIGURE)
 			inkey_configure(menu_event);
 
@@ -432,28 +427,31 @@ void menu_select_game::handle()
 		}
 	}
 
-	if (menu_event != nullptr && menu_event->itemref == nullptr)
+	if (menu_event && !menu_event->itemref)
 	{
 		if (menu_event->iptkey == IPT_SPECIAL)
+		{
 			inkey_special(menu_event);
+		}
 		else if (menu_event->iptkey == IPT_UI_CONFIGURE)
+		{
 			inkey_configure(menu_event);
+		}
 		else if (menu_event->iptkey == IPT_OTHER)
 		{
-			m_focus = focused_menu::left;
+			set_focus(focused_menu::left);
 			m_prev_selected = nullptr;
 			l_hover = highlight;
 			check_filter = true;
 		}
-		// handle UI_UP_FILTER
 		else if (menu_event->iptkey == IPT_UI_UP_FILTER && highlight > FILTER_FIRST)
 		{
+			// handle UI_UP_FILTER
 			highlight--;
 		}
-
-		// handle UI_DOWN_FILTER
 		else if (menu_event->iptkey == IPT_UI_DOWN_FILTER && highlight < FILTER_LAST)
 		{
+			// handle UI_DOWN_FILTER
 			highlight++;
 		}
 	}
@@ -931,6 +929,7 @@ void menu_select_game::custom_render(void *selectedref, float top, float bottom,
 	{
 		std::string copyright(emulator_info::get_copyright());
 		size_t found = copyright.find("\n");
+
 		tempbuf[0].clear();
 		tempbuf[1] = string_format(_("%1$s %2$s"), emulator_info::get_appname(), build_version);
 		tempbuf[2] = copyright.substr(0, found);
@@ -1152,7 +1151,9 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		drv.next();
 		software_list_device *swlist = software_list_device::find_by_name(drv.config(), ui_swinfo->listname.c_str());
 		software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+
 		media_auditor::summary summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
+
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
 			s_bios biosname;
@@ -1190,6 +1191,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 			machine().schedule_hard_reset();
 			menu::stack_reset(machine());
 		}
+
 		// otherwise, display an error
 		else
 		{
@@ -1214,52 +1216,64 @@ inline bool menu_select_game::isfavorite()
 
 void menu_select_game::inkey_special(const event *menu_event)
 {
-	int buflen = strlen(m_search);
+	if (!isfavorite())
+	{
+		auto const buflen = std::strlen(m_search);
 
-	// if it's a backspace and we can handle it, do so
-	if (((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0) && !isfavorite())
-	{
-		*(char *)utf8_previous_char(&m_search[buflen]) = 0;
-		reset(reset_options::SELECT_FIRST);
-	}
-	else if ((menu_event->unichar >= ' ' && menu_event->unichar < 0x7f) && !isfavorite())
-	{
-		// if it's any other key and we're not maxed out, update
-		buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
-		m_search[buflen] = 0;
-		reset(reset_options::SELECT_FIRST);
+		if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
+		{
+			// if it's a backspace and we can handle it, do so
+			if (0 < buflen)
+			{
+				*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
+				reset(reset_options::SELECT_FIRST);
+			}
+		}
+		else if (menu_event->is_char_printable())
+		{
+			// if it's any other key and we're not maxed out, update
+			if (menu_event->append_char(m_search, buflen))
+				reset(reset_options::SELECT_FIRST);
+		}
 	}
 }
 
 
 void menu_select_game::inkey_configure(const event *menu_event)
 {
-	if (selected <= visible_items && m_focus == focused_menu::main)
+	if (is_focus(focused_menu::main))
 	{
-		m_prev_selected = item[selected].ref;
-		selected = visible_items + 1;
-	}
-	else if (selected > visible_items && m_focus == focused_menu::main)
-	{
-		if (ui_globals::panels_status != HIDE_LEFT_PANEL)
-			m_focus = focused_menu::left;
-
-		else if (ui_globals::panels_status == HIDE_BOTH)
+		if (selected <= visible_items)
 		{
-			for (int x = 0; x < item.size(); ++x)
-				if (item[x].ref == m_prev_selected)
-					selected = x;
+			m_prev_selected = item[selected].ref;
+			selected = visible_items + 1;
 		}
 		else
-			m_focus = focused_menu::righttop;
+		{
+			if (ui_globals::panels_status != HIDE_LEFT_PANEL)
+				set_focus(focused_menu::left);
+
+			else if (ui_globals::panels_status == HIDE_BOTH)
+			{
+				for (int x = 0; x < item.size(); ++x)
+					if (item[x].ref == m_prev_selected)
+						selected = x;
+			}
+			else
+			{
+				set_focus(focused_menu::righttop);
+			}
+		}
 	}
-	else if (m_focus == focused_menu::left)
+	else if (is_focus(focused_menu::left))
 	{
 		if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
-			m_focus = focused_menu::righttop;
+		{
+			set_focus(focused_menu::righttop);
+		}
 		else
 		{
-			m_focus = focused_menu::main;
+			set_focus(focused_menu::main);
 			if (m_prev_selected == nullptr)
 			{
 				selected = 0;
@@ -1271,11 +1285,13 @@ void menu_select_game::inkey_configure(const event *menu_event)
 					selected = x;
 		}
 	}
-	else if (m_focus == focused_menu::righttop)
-		m_focus = focused_menu::rightbottom;
-	else if (m_focus == focused_menu::rightbottom)
+	else if (is_focus(focused_menu::righttop))
 	{
-		m_focus = focused_menu::main;
+		set_focus(focused_menu::rightbottom);
+	}
+	else if (is_focus(focused_menu::rightbottom))
+	{
+		set_focus(focused_menu::main);
 		if (m_prev_selected == nullptr)
 		{
 			selected = 0;
@@ -1844,7 +1860,7 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 				menu::highlight(container, x1, y1, x2, y1+ line_height_max, bgcolor);
 			}
 
-			if (highlight == filter && m_focus == focused_menu::left)
+			if (highlight == filter && is_focus(focused_menu::left))
 			{
 				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -1999,7 +2015,7 @@ void menu_select_game::infos_render(void *selectedref, float origx1, float origy
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		if (m_focus == focused_menu::rightbottom)
+		if (is_focus(focused_menu::rightbottom))
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -2178,7 +2194,7 @@ void menu_select_game::infos_render(void *selectedref, float origx1, float origy
 
 			rgb_t fgcolor = UI_TEXT_COLOR;
 			rgb_t bgcolor = UI_TEXT_BG_COLOR;
-			if (m_focus == focused_menu::rightbottom)
+			if (is_focus(focused_menu::rightbottom))
 			{
 				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -2461,7 +2477,7 @@ void menu_select_game::arts_render(void *selectedref, float origx1, float origy1
 				if (!tmp_bitmap->valid())
 				{
 					// Second attempt from driver name + part name
-					pathname.assign(soft->driver->name).append(soft->part.c_str());
+					pathname.assign(soft->driver->name).append(soft->part);
 					fullname.assign(soft->shortname).append(".png");
 					render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
 

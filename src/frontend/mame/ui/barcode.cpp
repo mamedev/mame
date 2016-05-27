@@ -96,7 +96,7 @@ void menu_barcode_reader::handle()
 	const event *event = process(PROCESS_LR_REPEAT);
 
 	// process the event
-	if (event != nullptr)
+	if (event)
 	{
 		// handle selections
 		switch (event->iptkey)
@@ -132,15 +132,17 @@ void menu_barcode_reader::handle()
 		case IPT_SPECIAL:
 			if (get_selection() == ITEMREF_NEW_BARCODE)
 			{
-				int buflen = strlen(m_barcode_buffer);
+				auto const buflen = std::strlen(m_barcode_buffer);
 
 				// if it's a backspace and we can handle it, do so
-				if ((event->unichar == 8 || event->unichar == 0x7f) && buflen > 0)
-					*(char *)utf8_previous_char(&m_barcode_buffer[buflen]) = 0;
-				else if (event->unichar >= '0' && event->unichar <= '9')
+				if ((event->unichar == 8) || (event->unichar == 0x7f))
 				{
-					buflen += utf8_from_uchar(&m_barcode_buffer[buflen], ARRAY_LENGTH(m_barcode_buffer) - buflen, event->unichar);
-					m_barcode_buffer[buflen] = 0;
+					if (0 < buflen)
+						*const_cast<char *>(utf8_previous_char(&m_barcode_buffer[buflen])) = 0;
+				}
+				else if ((event->unichar >= '0') && (event->unichar <= '9'))
+				{
+					event->append_char(m_barcode_buffer, buflen);
 				}
 				reset(reset_options::REMEMBER_POSITION);
 			}

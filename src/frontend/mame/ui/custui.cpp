@@ -955,21 +955,21 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 
 			switch ((FPTR)menu_event->itemref)
 			{
-				case RGB_ALPHA:
-					m_color->set_a(val);
-					break;
+			case RGB_ALPHA:
+				m_color->set_a(val);
+				break;
 
-				case RGB_RED:
-					m_color->set_r(val);
-					break;
+			case RGB_RED:
+				m_color->set_r(val);
+				break;
 
-				case RGB_GREEN:
-					m_color->set_g(val);
-					break;
+			case RGB_GREEN:
+				m_color->set_g(val);
+				break;
 
-				case RGB_BLUE:
-					m_color->set_b(val);
-					break;
+			case RGB_BLUE:
+				m_color->set_b(val);
+				break;
 			}
 
 			m_search[0] = 0;
@@ -984,18 +984,22 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 		return;
 	}
 
-	int buflen = strlen(m_search);
-
-	// if it's a backspace and we can handle it, do so
-	if (((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0))
-		*(char *)utf8_previous_char(&m_search[buflen]) = 0;
+	auto const buflen = std::strlen(m_search);
+	if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
+	{
+		// if it's a backspace and we can handle it, do so
+		if (0 < buflen)
+			*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
+	}
 	else if (buflen >= 3)
+	{
 		return;
-	// if it's any other key and we're not maxed out, update
+	}
 	else if ((menu_event->unichar >= '0' && menu_event->unichar <= '9'))
-		buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
-
-	m_search[buflen] = 0;
+	{
+		// if it's any other key and we're not maxed out, update
+		menu_event->append_char(m_search, buflen);
+	}
 }
 
 menu_palette_sel::palcolor menu_palette_sel::m_palette[] = {

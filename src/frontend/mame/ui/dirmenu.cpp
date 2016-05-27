@@ -340,31 +340,26 @@ void menu_add_change_folder::handle()
 			}
 
 			// reset the char buffer also in this case
-			if (m_search[0] != 0)
-				m_search[0] = '\0';
+			m_search[0] = '\0';
 			reset(reset_options::SELECT_FIRST);
 		}
 		else if (menu_event->iptkey == IPT_SPECIAL)
 		{
-			int buflen = strlen(m_search);
-			bool update_selected = FALSE;
+			auto const buflen = std::strlen(m_search);
+			bool update_selected = false;
 
-			// if it's a backspace and we can handle it, do so
-			if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
+			if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
 			{
-				*(char *)utf8_previous_char(&m_search[buflen]) = 0;
-				update_selected = TRUE;
+				// if it's a backspace and we can handle it, do so
+				if (0 < buflen)
+				{
+					*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
+					update_selected = true;
+				}
 			}
-			// if it's any other key and we're not maxed out, update
-			else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
-			{
-				buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
-				m_search[buflen] = 0;
-				update_selected = TRUE;
-			}
-			// Tab key, save current path
 			else if (menu_event->unichar == 0x09)
 			{
+				// Tab key, save current path
 				std::string error_string;
 				if (m_change)
 				{
@@ -399,6 +394,12 @@ void menu_add_change_folder::handle()
 
 				reset_parent(reset_options::SELECT_FIRST);
 				menu::stack_pop(machine());
+			}
+			else if (menu_event->is_char_printable())
+			{
+				// if it's any other key and we're not maxed out, update
+				if (menu_event->append_char(m_search, buflen))
+					update_selected = true;
 			}
 
 			// check for entries which matches our search buffer

@@ -11,8 +11,8 @@
 
 #pragma once
 
-#ifndef __OSDCOMM_H__
-#define __OSDCOMM_H__
+#ifndef MAME_OSD_OSDCOMM_H
+#define MAME_OSD_OSDCOMM_H
 
 #include <stdio.h>
 #include <string.h>
@@ -128,8 +128,8 @@ using FPTR = uintptr_t;
 #define EXTRACT_64HI(val)   ((UINT32)((val) >> 32))
 #define EXTRACT_64LO(val)   ((UINT32)(val))
 
-/* Highly useful macro for compile-time knowledge of an array size */
-#define ARRAY_LENGTH(x)     (sizeof(x) / sizeof(x[0]))
+// Highly useful template for compile-time knowledge of an array size
+template <typename T, size_t N> constexpr inline std::size_t ARRAY_LENGTH(T (&)[N]) { return N;}
 
 
 /* Macros for normalizing data into big or little endian formats */
@@ -184,4 +184,4 @@ typedef ptrdiff_t ssize_t;
 #endif
 #endif
 
-#endif  /* __OSDCOMM_H__ */
+#endif  /* MAME_OSD_OSDCOMM_H */

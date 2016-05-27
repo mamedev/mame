@@ -9,12 +9,10 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "rendutil.h"
-#include "cheat.h"
-#include "mame.h"
-#include "uiinput.h"
-#include "ui/ui.h"
+
 #include "ui/menu.h"
+
+#include "ui/ui.h"
 #include "ui/mainmenu.h"
 #include "ui/utils.h"
 #include "ui/defimg.h"
@@ -22,7 +20,12 @@
 #include "ui/icorender.h"
 #include "ui/toolbar.h"
 #include "ui/miscmenu.h"
+
+#include "cheat.h"
 #include "drivenum.h"
+#include "mame.h"
+#include "rendutil.h"
+#include "uiinput.h"
 
 
 namespace ui {
@@ -208,6 +211,7 @@ menu::menu(mame_ui_manager &mui, render_container *_container)
 	, m_repeat(0)
 	, m_event()
 	, m_pool(nullptr)
+	, m_focus(focused_menu::main)
 {
 	container = _container;
 

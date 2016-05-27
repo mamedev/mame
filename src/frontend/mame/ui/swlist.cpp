@@ -256,7 +256,7 @@ void menu_software_list::handle()
 	// process the menu
 	const event *event = process(0);
 
-	if (event != nullptr && event->itemref != nullptr)
+	if (event && event->itemref)
 	{
 		if ((FPTR)event->itemref == 1 && event->iptkey == IPT_UI_SELECT)
 		{
@@ -279,27 +279,29 @@ void menu_software_list::handle()
 		}
 		else if (event->iptkey == IPT_SPECIAL)
 		{
-			int buflen = strlen(m_filename_buffer);
+			auto const buflen = std::strlen(m_filename_buffer);
 			bool update_selected = false;
 
-			// if it's a backspace and we can handle it, do so
-			if ((event->unichar == 8 || event->unichar == 0x7f) && buflen > 0)
+			if ((event->unichar == 8) || (event->unichar == 0x7f))
 			{
-				*(char *)utf8_previous_char(&m_filename_buffer[buflen]) = 0;
-				update_selected = true;
+				// if it's a backspace and we can handle it, do so
+				if (0 < buflen)
+				{
+					*const_cast<char *>(utf8_previous_char(&m_filename_buffer[buflen])) = 0;
+					update_selected = true;
 
-				if (ARRAY_LENGTH(m_filename_buffer) > 0)
 					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+				}
 			}
-			// if it's any other key and we're not maxed out, update
-			else if (event->unichar >= ' ' && event->unichar < 0x7f)
+			else if (event->is_char_printable())
 			{
-				buflen += utf8_from_uchar(&m_filename_buffer[buflen], ARRAY_LENGTH(m_filename_buffer) - buflen, event->unichar);
-				m_filename_buffer[buflen] = 0;
-				update_selected = true;
+				// if it's any other key and we're not maxed out, update
+				if (event->append_char(m_filename_buffer, buflen))
+				{
+					update_selected = true;
 
-				if (ARRAY_LENGTH(m_filename_buffer) > 0)
 					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+				}
 			}
 
 			if (update_selected)

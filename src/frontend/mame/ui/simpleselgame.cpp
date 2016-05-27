@@ -105,29 +105,28 @@ void simple_menu_select_game::handle()
 
 	// process the menu
 	const event *menu_event = process(0);
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	if (menu_event && menu_event->itemref)
 	{
-		// reset the error on any future menu_event
 		if (m_error)
 		{
+			// reset the error on any future menu_event
 			m_error = false;
 			machine().ui_input().reset();
 		}
-
-		// handle selections
 		else
 		{
+			// handle selections
 			switch(menu_event->iptkey)
 			{
-				case IPT_UI_SELECT:
-					inkey_select(menu_event);
-					break;
-				case IPT_UI_CANCEL:
-					inkey_cancel(menu_event);
-					break;
-				case IPT_SPECIAL:
-					inkey_special(menu_event);
-					break;
+			case IPT_UI_SELECT:
+				inkey_select(menu_event);
+				break;
+			case IPT_UI_CANCEL:
+				inkey_cancel(menu_event);
+				break;
+			case IPT_SPECIAL:
+				inkey_special(menu_event);
+				break;
 			}
 		}
 	}
@@ -201,22 +200,23 @@ void simple_menu_select_game::inkey_cancel(const event *menu_event)
 void simple_menu_select_game::inkey_special(const event *menu_event)
 {
 	// typed characters append to the buffer
-	int buflen = strlen(m_search);
+	auto const buflen = std::strlen(m_search);
 
-	// if it's a backspace and we can handle it, do so
-	if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
+	if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
 	{
-		*(char *)utf8_previous_char(&m_search[buflen]) = 0;
-		m_rerandomize = true;
-		reset(reset_options::SELECT_FIRST);
+		// if it's a backspace and we can handle it, do so
+		if (0 < buflen)
+		{
+			*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
+			m_rerandomize = true;
+			reset(reset_options::SELECT_FIRST);
+		}
 	}
-
-	// if it's any other key and we're not maxed out, update
-	else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
+	else if (menu_event->is_char_printable())
 	{
-		buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
-		m_search[buflen] = 0;
-		reset(reset_options::SELECT_FIRST);
+		// if it's any other key and we're not maxed out, update
+		if (menu_event->append_char(m_search, buflen))
+			reset(reset_options::SELECT_FIRST);
 	}
 }
 
