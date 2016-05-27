@@ -15,11 +15,6 @@
 #include "modules/lib/osdlib.h"
 
 //============================================================
-//  CONSTANTS
-//============================================================
-
-
-//============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
@@ -118,8 +113,8 @@ public:
 	void        set(float x);
 	void        set(int x);
 	void        set(bool x);
-	void        set(matrix *mat);
-	void        set(texture *tex);
+	void        set(D3DMATRIX *mat);
+	void        set(IDirect3DTexture9 *tex);
 
 	void        upload();
 	void        update();
@@ -130,10 +125,10 @@ protected:
 	float       m_vec[4];
 	int         m_ival;
 	bool        m_bval;
-	matrix      *m_mval;
-	texture     *m_texture;
+	D3DMATRIX   *m_mval;
+	IDirect3DTexture9 *m_texture;
 	int         m_count;
-	uniform_type    m_type;
+	uniform_type m_type;
 	int         m_id;
 
 	effect      *m_shader;
@@ -145,7 +140,7 @@ class effect
 	friend class uniform;
 
 public:
-	effect(shaders *shadersys, device *dev, const char *name, const char *path);
+	effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, const char *path);
 	~effect();
 
 	void        begin(UINT *passes, DWORD flags);
@@ -160,8 +155,8 @@ public:
 	void        set_float(D3DXHANDLE param, float value);
 	void        set_int(D3DXHANDLE param, int value);
 	void        set_bool(D3DXHANDLE param, bool value);
-	void        set_matrix(D3DXHANDLE param, matrix *matrix);
-	void        set_texture(D3DXHANDLE param, texture *tex);
+	void        set_matrix(D3DXHANDLE param, D3DMATRIX *matrix);
+	void        set_texture(D3DXHANDLE param, IDirect3DTexture9 *tex);
 
 	void        add_uniform(const char *name, uniform::uniform_type type, int id);
 	void        update_uniforms();
@@ -331,8 +326,8 @@ public:
 	void window_record();
 	bool recording() const { return avi_output_file != nullptr; }
 
-	void avi_update_snap(surface *surface);
-	void render_snapshot(surface *surface);
+	void avi_update_snap(IDirect3DSurface9 *surface);
+	void render_snapshot(IDirect3DSurface9 *surface);
 	void record_texture();
 	void init_fsfx_quad(void *vertbuf);
 
@@ -350,7 +345,7 @@ public:
 	void *get_slider_option(int id, int index = 0);
 
 private:
-	void                    blit(surface *dst, bool clear_dst, D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
+	void                    blit(IDirect3DSurface9 *dst, bool clear_dst, D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
 	void                    enumerate_screens();
 
 	void                    end_avi_recording();
@@ -399,28 +394,28 @@ private:
 	int                     avi_frame;                  // AVI frame
 	attotime                avi_frame_period;           // AVI frame period
 	attotime                avi_next_frame_time;        // AVI next frame time
-	surface *               avi_copy_surface;           // AVI destination surface in system memory
-	texture *               avi_copy_texture;           // AVI destination texture in system memory
-	surface *               avi_final_target;           // AVI upscaled surface
-	texture *               avi_final_texture;          // AVI upscaled texture
+	IDirect3DSurface9 *     avi_copy_surface;           // AVI destination surface in system memory
+	IDirect3DTexture9 *     avi_copy_texture;           // AVI destination texture in system memory
+	IDirect3DSurface9 *     avi_final_target;           // AVI upscaled surface
+	IDirect3DTexture9 *     avi_final_texture;          // AVI upscaled texture
 
-	surface *               black_surface;              // black dummy surface
-	texture *               black_texture;              // black dummy texture
+	IDirect3DSurface9 *     black_surface;              // black dummy surface
+	IDirect3DTexture9 *     black_texture;              // black dummy texture
 
 	bool                    render_snap;                // whether or not to take HLSL post-render snapshot
 	bool                    snap_rendered;              // whether we just rendered our HLSL post-render shot or not
-	surface *               snap_copy_target;           // snapshot destination surface in system memory
-	texture *               snap_copy_texture;          // snapshot destination surface in system memory
-	surface *               snap_target;                // snapshot upscaled surface
-	texture *               snap_texture;               // snapshot upscaled texture
+	IDirect3DSurface9 *     snap_copy_target;           // snapshot destination surface in system memory
+	IDirect3DTexture9 *     snap_copy_texture;          // snapshot destination surface in system memory
+	IDirect3DSurface9 *     snap_target;                // snapshot upscaled surface
+	IDirect3DTexture9 *     snap_texture;               // snapshot upscaled texture
 	int                     snap_width;                 // snapshot width
 	int                     snap_height;                // snapshot height
 	bool                    lines_pending;              // whether or not we have lines to flush on the next quad
 
-	bool                    initialized;                // whether or not we're initialize
+	bool                    initialized;                // whether or not we're initialized
 
 	// HLSL effects
-	surface *               backbuffer;                 // pointer to our device's backbuffer
+	IDirect3DSurface9 *     backbuffer;                 // pointer to our device's backbuffer
 	effect *                curr_effect;                // pointer to the currently active effect object
 	effect *                default_effect;             // pointer to the primary-effect object
 	effect *                prescale_effect;            // pointer to the prescale-effect object
