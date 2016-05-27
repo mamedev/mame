@@ -58,7 +58,7 @@ WRITE16_MEMBER(m90_state::dynablsb_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, offset, data);
+		m_soundlatch->write(space, offset, data);
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -131,7 +131,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m90_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, rtype2_sample_addr_w)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
 	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
@@ -141,7 +141,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dynablsb_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", dac_device, write_signed8)
 ADDRESS_MAP_END
 
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( m99_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, poundfor_sample_addr_w)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x42, 0x42) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x42, 0x42) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
 ADDRESS_MAP_END
 
@@ -743,6 +743,8 @@ static MACHINE_CONFIG_START( m90, m90_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("m72", M72, 0)
 

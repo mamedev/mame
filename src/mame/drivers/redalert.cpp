@@ -81,7 +81,7 @@
     the MAME soundrom (red alert) it is marked exactly the same "w3s1"(IC5).
     The Bprom matched the Red Alert set also... marked "W3" i think?
     it's hard to see because the sticker has been damaged.
-    The other eproms exept one did not match anything in MAME,
+    The other eproms except one did not match anything in MAME,
     and only one of those had the eprom type markings on it... I read all
     like that type.
 

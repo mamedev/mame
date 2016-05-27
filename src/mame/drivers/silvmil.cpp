@@ -26,6 +26,7 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/decospr.h"
 #include "sound/2151intf.h"
@@ -39,6 +40,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_sprgen(*this, "spritegen"),
+			m_soundlatch(*this, "soundlatch"),
 			m_bg_videoram(*this, "bg_videoram"),
 			m_fg_videoram(*this, "fg_videoram"),
 			m_spriteram(*this, "spriteram") { }
@@ -48,6 +50,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<decospr_device> m_sprgen;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -111,7 +114,7 @@ public:
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			soundlatch_byte_w(space, 0, data & 0xff);
+			m_soundlatch->write(space, 0, data & 0xff);
 			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 
 		}
@@ -385,7 +388,7 @@ static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
-	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc006, 0xc006) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ??
 ADDRESS_MAP_END
 
@@ -422,6 +425,8 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

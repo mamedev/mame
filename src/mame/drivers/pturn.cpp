@@ -78,6 +78,7 @@ ROMS: All ROM labels say only "PROM" and a number.
 */
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 
 
@@ -89,12 +90,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -325,7 +328,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pturn_state )
 
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(fgpalette_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("spriteram")
 
@@ -353,7 +356,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, pturn_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) AM_WRITE(nmi_sub_enable_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(nmi_sub_enable_w)
 	AM_RANGE(0x4000, 0x4000) AM_RAM
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
@@ -490,7 +493,7 @@ void pturn_state::machine_start()
 void pturn_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	soundlatch_clear_byte_w(space,0,0);
+	m_soundlatch->clear_w(space,0,0);
 }
 
 static MACHINE_CONFIG_START( pturn, pturn_state )
@@ -517,6 +520,8 @@ static MACHINE_CONFIG_START( pturn, pturn_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

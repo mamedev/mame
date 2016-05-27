@@ -9,7 +9,7 @@
 #include "cpu/arm7/arm7core.h"
 #include "machine/nvram.h"
 #include "machine/pgmcrypt.h"
-
+#include "machine/gen_latch.h"
 #include "machine/igs025.h"
 #include "machine/igs022.h"
 #include "machine/igs028.h"
@@ -28,7 +28,9 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_soundlatch(*this, "soundlatch"),
+			m_soundlatch3(*this, "soundlatch3")
 		{
 			m_irq4_disabled = 0;
 		}
@@ -56,6 +58,8 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch3;
 	device_t *m_ics;
 
 	/* used by rendering */

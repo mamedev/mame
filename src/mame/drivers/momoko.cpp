@@ -47,6 +47,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "includes/momoko.h"
@@ -66,7 +67,7 @@ static ADDRESS_MAP_START( momoko_map, AS_PROGRAM, 8, momoko_state )
 	AM_RANGE(0xd400, 0xd400) AM_READ_PORT("IN0") AM_WRITENOP /* interrupt ack? */
 	AM_RANGE(0xd402, 0xd402) AM_READ_PORT("IN1") AM_WRITE(momoko_flipscreen_w)
 	AM_RANGE(0xd404, 0xd404) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xd406, 0xd406) AM_READ_PORT("DSW0") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xd406, 0xd406) AM_READ_PORT("DSW0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd407, 0xd407) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(momoko_fg_scrolly_w)
@@ -278,6 +279,8 @@ static MACHINE_CONFIG_START( momoko, momoko_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
@@ -285,7 +288,7 @@ static MACHINE_CONFIG_START( momoko, momoko_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ym2", YM2203, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
