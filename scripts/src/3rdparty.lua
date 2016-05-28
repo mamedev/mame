@@ -1051,6 +1051,8 @@ project "uv"
 			"-Wno-missing-braces",
 			"-Wno-undef",
 			"-Wno-unused-variable",
+			"-Wno-format-security",
+			"-Wno-format",
 		}
 
 
