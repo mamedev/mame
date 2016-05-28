@@ -55,13 +55,9 @@ void bgfx_input_pair::bind(bgfx_effect *effect, const int32_t screen) const
 	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), chains().textures().handle(name));
 }
 
-static INT32 update_trampoline(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+INT32 bgfx_input_pair::slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
 {
-	if (arg != nullptr)
-	{
-		return reinterpret_cast<bgfx_input_pair*>(arg)->texture_changed(id, str, newval);
-	}
-	return 0;
+	return texture_changed(id, str, newval);
 }
 
 int32_t bgfx_input_pair::texture_changed(int32_t id, std::string *str, int32_t newval)
@@ -106,7 +102,9 @@ void bgfx_input_pair::create_selection_slider(uint32_t screen_index)
 	state->defval = m_current_texture;
 	state->maxval = m_available_textures.size() - 1;
 	state->incval = 1;
-	state->update = update_trampoline;
+
+	using namespace std::placeholders;
+	state->update = std::bind(&bgfx_input_pair::slider_changed, this, _1, _2, _3, _4, _5);
 	state->arg = this;
 	state->id = screen_index;
 	strcpy(state->description, description.c_str());

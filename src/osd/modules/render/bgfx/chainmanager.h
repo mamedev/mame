@@ -22,6 +22,7 @@
 #include "targetmanager.h"
 #include "effectmanager.h"
 #include "../frontend/mame/ui/menuitem.h"
+#include "../frontend/mame/ui/sliderchangednotifier.h"
 
 class running_machine;
 class osd_window;
@@ -44,14 +45,13 @@ public:
 	const std::string m_path;
 };
 
-class chain_manager
+class chain_manager : public slider_changed_notifier
 {
 public:
 	chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index, slider_dirty_notifier& slider_notifier);
 	~chain_manager();
 
 	uint32_t handle_screen_chains(uint32_t view, render_primitive *starting_prim, osd_window& window);
-	int32_t chain_changed(int32_t index, std::string *str, int32_t newval);
 
 	// Getters
 	running_machine& machine() const { return m_machine; }
@@ -83,6 +83,8 @@ private:
 	std::vector<std::string> split_option_string(std::string chain_str) const;
 
 	void update_screen_count(uint32_t screen_count);
+
+	virtual INT32 slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval) override;
 	void create_selection_slider(uint32_t screen_index);
 	bool needs_sliders();
 

@@ -27,7 +27,7 @@ script:
     else make -j4 OPTIMIZE=0 OVERRIDE_CC="gcc-5" OVERRIDE_CXX="g++-5" && ./$MAME -validate;
     fi
     elif [ $TRAVIS_OS_NAME == 'osx' ]; then
-    unset LDOPTS && make -j2 OPTIMIZE=0 MACOSX_USE_LIBSDL=1 && ./$MAME -validate;
+    unset LDOPTS && make -j2 OPTIMIZE=0 USE_LIBSDL=1 && ./$MAME -validate;
     fi
 sudo: required
 before_install:

@@ -364,16 +364,7 @@ void chain_manager::update_screen_count(uint32_t screen_count)
 	}
 }
 
-static INT32 update_trampoline(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
-{
-	if (arg != nullptr)
-	{
-		return reinterpret_cast<chain_manager*>(arg)->chain_changed(id, str, newval);
-	}
-	return 0;
-}
-
-int32_t chain_manager::chain_changed(int32_t id, std::string *str, int32_t newval)
+INT32 chain_manager::slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 	{
@@ -409,7 +400,9 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 	state->defval = m_current_chain[screen_index];
 	state->maxval = m_available_chains.size() - 1;
 	state->incval = 1;
-	state->update = update_trampoline;
+
+	using namespace std::placeholders;
+	state->update = std::bind(&chain_manager::slider_changed, this, _1, _2, _3, _4, _5);
 	state->arg = this;
 	state->id = screen_index;
 	strcpy(state->description, description.c_str());
@@ -461,7 +454,7 @@ uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *st
                 }
             }
         }
-        
+
         process_screen_quad(view + used_views, screen_index, prim, window);
 		used_views += screen_chain(screen_index)->applicable_passes();
 

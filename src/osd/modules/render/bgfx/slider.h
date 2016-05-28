@@ -19,7 +19,7 @@
 #include "emu.h"
 #include "../frontend/mame/ui/slider.h"
 
-class bgfx_slider
+class bgfx_slider : public slider_changed_notifier
 {
 public:
 	enum slider_type
@@ -44,7 +44,7 @@ public:
 	};
 
 	bgfx_slider(running_machine& machine, std::string name, float min, float def, float max, float step, slider_type type, screen_type screen, std::string format, std::string description, std::vector<std::string>& strings);
-	~bgfx_slider();
+	virtual ~bgfx_slider();
 
 	int32_t update(std::string *str, int32_t newval);
 
@@ -61,6 +61,7 @@ public:
 	void import(float val);
 
 protected:
+	virtual INT32 slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, INT32 newval) override;
 	slider_state* create_core_slider(running_machine &machine);
 	int32_t as_int() const { return int32_t(floor(m_value / m_step + 0.5f)); }
 
