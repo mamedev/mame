@@ -399,7 +399,7 @@ namespace netlist
 
 	public:
 	    void * operator new (size_t size, void *ptr) { return ptr; }
-	    void operator delete (void *ptr, size_t size) {  }
+	    void operator delete (void *ptr, void *) {  }
 	    void * operator new (size_t size);
 	    void operator delete (void * mem);
 	};
@@ -1008,6 +1008,8 @@ namespace netlist
 
 		ATTR_HOT  netlist_sig_t INPLOGIC(const logic_input_t &inp) const
 		{
+			//if (inp.state() == logic_t::STATE_INP_PASSIVE)
+			//	printf("argh input %s\n", inp.name().cstr());
 			nl_assert(inp.state() != logic_t::STATE_INP_PASSIVE);
 			return inp.Q();
 		}
