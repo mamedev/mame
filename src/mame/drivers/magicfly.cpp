@@ -253,23 +253,23 @@
 *******************************************************************************
 
 
-    After check the last bit of $1800, code jump into a loop ($DA30)...
+    After check the last bit of $1800, the code jumps into a loop ($DA30)...
 
     BEHAVIOUR OF BOOT CHECK (magicfly):
 
-    1) Fill the video RAM with spaces (0x20), and color RAM with 0x15.
-    2) Check bit 7 of $1800 (video RAM, 1st offset) if activated.
+    1) Fills the video RAM with spaces (0x20), and color RAM with 0x15.
+    2) Checks bit 7 of $1800 (video RAM, 1st offset) if it's active.
     3) If true, go to $DA30 (incremented fill infinite loop).
-    4) If not, fill the video RAM with spaces (0x20), and color RAM with 0x1F.
-    5) Check bit 7 of $1800 (video RAM, 1st offset) if activated.
+    4) If not, fills the video RAM with spaces (0x20), and color RAM with 0x1F.
+    5) Checks bit 7 of $1800 (video RAM, 1st offset) if it's active.
     6) If not, go to $DA30 (incremented fill infinite loop).
-    7) If true, returns and continue to NORMAL GAME.
+    7) If true, returns and continues to NORMAL GAME.
 
     Since bits 0-2 are for regular colors, seems that bit 3 in color RAM
     (bit 2 for 7mezzo) is mirrored to bit 7 through a kind of device.
 
     This is the only explanation I found to allow a normal boot, and seems to be
-    created as a protection method that don't allow owners to use a ROM-swap on
+    created as a protection method that doesn't allow owners to do a ROM-swap on
     their boards, converting from one game to another.
 
 
