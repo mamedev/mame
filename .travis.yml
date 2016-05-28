@@ -27,7 +27,7 @@ script:
     else make -j4 OPTIMIZE=0 OVERRIDE_CC="gcc-5" OVERRIDE_CXX="g++-5" && ./$MAME -validate;
     fi
     elif [ $TRAVIS_OS_NAME == 'osx' ]; then
-    unset LDOPTS && make -j2 OPTIMIZE=0 MACOSX_USE_LIBSDL=1 && ./$MAME -validate;
+    unset LDOPTS && make -j2 OPTIMIZE=0 USE_LIBSDL=1 && ./$MAME -validate;
     fi
 sudo: required
 before_install:
@@ -37,7 +37,7 @@ before_install:
   - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo apt-get install -y --force-yes libsdl2-dev libsdl2-ttf-dev libasound2-dev qt55base qt55quickcontrols qt55declarative qt55tools qt55svg; fi"
   - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then source /opt/qt55/bin/qt55-env.sh; fi"
   - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'osx' ]; then brew update; fi"
-  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'osx' ]; then brew install sdl2 sdl2_ttf; fi"
+  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'osx' ]; then brew install sdl2 sdl2_ttf pkg-config; fi"
 branches:
   only:
     - master
