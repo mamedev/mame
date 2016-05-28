@@ -236,6 +236,7 @@ class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_UPDATE_TERMINALS(chip) ATTR_HOT void NETLIB_NAME(chip) :: update_terminals(void)
 
+#define NETLIB_DEVICE_IMPL(chip) device_creator_ptr_t decl_ ## chip = device_creator_t< NETLIB_NAME(chip) >;
 
 //============================================================
 //  Asserts
@@ -398,6 +399,7 @@ namespace netlist
 
 	public:
 	    void * operator new (size_t size, void *ptr) { return ptr; }
+	    void operator delete (void *ptr, size_t size) {  }
 	    void * operator new (size_t size);
 	    void operator delete (void * mem);
 	};
@@ -1296,6 +1298,18 @@ protected:
 		plib::plog_base<NL_DEBUG> m_log;
 		plib::dynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
 	};
+
+	// -----------------------------------------------------------------------------
+	// base_device_creator_t
+	// -----------------------------------------------------------------------------
+
+	using device_creator_ptr_t = plib::owned_ptr<device_t> (*)(netlist_t &anetlist, const pstring &name);
+
+	template <typename T>
+	plib::owned_ptr<device_t> device_creator_t(netlist_t &anetlist, const pstring &name)
+	{
+		return plib::owned_ptr<device_t>::Create<T>(anetlist, name);
+	}
 
 	// -----------------------------------------------------------------------------
 	// inline implementations

@@ -17,6 +17,7 @@
 
 namespace netlist
 {
+
 	// -----------------------------------------------------------------------------
 	// net_dev class factory
 	// -----------------------------------------------------------------------------
@@ -59,7 +60,23 @@ namespace netlist
 		{
 			return plib::owned_ptr<device_t>::Create<device_class>(anetlist, name);
 		}
+	};
 
+	class factoryx_t : public base_factory_t
+	{
+		P_PREVENT_COPYING(factoryx_t)
+	public:
+		factoryx_t(const pstring &name, const pstring &classname,
+				const pstring &def_param, device_creator_ptr_t ptr)
+		: base_factory_t(name, classname, def_param)
+		, m_ptr(ptr) { }
+
+		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
+		{
+			return m_ptr(anetlist, name);
+		}
+	private:
+		device_creator_ptr_t m_ptr;
 	};
 
 	class factory_list_t : public plib::pvector_t<plib::owned_ptr<base_factory_t>>
@@ -81,6 +98,12 @@ namespace netlist
 				if (e->name() == factory->name())
 					error("factory already contains " + factory->name());
 			push_back(std::move(factory));
+		}
+
+		void register_device(const pstring &name, const pstring &classname,
+				const pstring &def_param, device_creator_ptr_t ptr)
+		{
+			register_device(plib::owned_ptr<base_factory_t>::Create<factoryx_t>(name, classname, def_param, ptr));
 		}
 
 		//ATTR_COLD device_t *new_device_by_classname(const pstring &classname) const;
