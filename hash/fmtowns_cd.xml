@@ -2705,6 +2705,111 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="nihonrki">
+		<description>Nihon no Rekishi: Kizoku-hen</description>
+		<year>1990</year>
+		<publisher>CRI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nihon no rekishi - kizoku-hen" sha1="1bf433fc57cba5d452088b69c3b63d1be8ff9e1c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nihonrko">
+		<description>Nihon no Rekishi: Kodai-hen</description>
+		<year>1990</year>
+		<publisher>CRI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nihon no rekishi - kodai-hen" sha1="994b5f62b4c1ff2cd439948f12c52fa6d63cb8dc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nihonya">
+		<description>Nihon no Yachou</description>
+		<year>1990</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nihon no yachou" sha1="561a61de28e33c514f7e661632cdb58c5dc2eddf" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ningyou">
+		<description>Ningyou Tsukai</description>
+		<year>1993</year>
+		<publisher>Forest</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ningyou tsukai" sha1="d2e93204d3cc2557f26ee72c07d0ab1109bf5846" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nobunagh">
+		<description>Nobunaga no Yabou: Haouden</description>
+		<year>1993</year>
+		<publisher>Koei</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="nobunaga no yabou - haou-den.hdm" size="1261568" crc="d426a880" sha1="4194c61909c37fdf83daae77dcd84ad996237b0c" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nobunaga no yabou - haou-den" sha1="0e2f9b942ba4f72961fc7dd5c3c9678eaa24b12d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Originally labeled as "mp3 source". It probably needs a redump. -->
+	<software name="nobunagt">
+		<description>Nobunaga no Yabou: Tenshouki</description>
+		<year>1995</year>
+		<publisher>Koei</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nobunaga no yabou - tenshouki" sha1="fe1ca3991c5a1399cd720ae177644ca314b5d004" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nova">
+		<description>Nova</description>
+		<year>1993</year>
+		<publisher>Cat's Pro</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nova" sha1="1e9dad67f2b4c242f655976e05abafc97c804bd6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="oasyswin">
+		<description>OASYS/Win v2.0</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="oasys-win" sha1="6db75f509d91ffe754f5188cd7a03f646631a6ba" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="okitgear">
+		<description>Okiraku TownsGEAR</description>
+		<year>1994</year>
+		<publisher>Softbank</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="okiraku towns gear" sha1="a614a4471c91a19fe33bf903a5f699907bad813e" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="opwolf">
 		<description>Operation Wolf</description>
 		<year>1990</year>
@@ -2712,6 +2817,28 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="operation wolf" sha1="7d102b8918c67f8eafe841fc3ecb52e5eb760caa" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="oshacook">
+		<description>Oshare Cooking</description>
+		<year>1989</year>
+		<publisher>Misawa Home</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="oshare cooking" sha1="d6175d9a81760fbd9e497e6a396dbaf2aad6d57c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ourashin">
+		<description>Ougon no Rashinban</description>
+		<year>1990</year>
+		<publisher>Riverhill Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ougon no rashimban" sha1="192ab79d6cd44db18a8410d35891fe4bc1f74528" />
 			</diskarea>
 		</part>
 	</software>
@@ -2738,6 +2865,39 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="planedge">
+		<description>Planet's Edge</description>
+		<year>1993</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="planet's edge" sha1="41c000e9a1f73d76437ab56bee363d481f56b58f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pmaker2">
+		<description>Princess Maker 2</description>
+		<year>1994</year>
+		<publisher>Gainax</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="princess maker 2" sha1="a0ed8d1a394ccfc109c3afdc6fdc6fd6a095643d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ponkan">
+		<description>Ponkan</description>
+		<year>1994</year>
+		<publisher>Ponytail Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ponkan" sha1="2e02fbd3cafbfc385d21c97c8b91d771fdd22cc2" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="populous">
 		<description>Populous &amp; The Promised Lands</description>
 		<year>1990</year>
@@ -2745,6 +2905,45 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="populous &amp; the promised lands" sha1="5e32724bd10a871146b38ecf1991b3f42f91f984" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- 
+	It should be possible to recreate the user disk by running the ユーザーディスク作成 program
+	on the CD, but it doesn't seem to work. Not sure if it's an emulation issue or
+	something else.
+	
+	The system disk is needed only for installing the game into a hard disk.
+	-->		
+	<software name="powrdoll">
+		<description>Power Dolls</description>
+		<year>1994</year>
+		<publisher>Kogado</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="power dolls (user disk).hdm" size="1261568" crc="7b90b036" sha1="8cc2d7cdf2ffde4133cddd039f6620ba17b1e553" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="power dolls (system disk).hdm" size="1261568" crc="5f6c44c7" sha1="721dd113dc6bedfb2d212e3a4de15260c41805f7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="power dolls" sha1="22c895ef1b29fe4f01b1956d323657fe67a9c832" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="powrdol2">
+		<description>Power Dolls 2</description>
+		<year>1995</year>
+		<publisher>Kogado</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="power dolls 2" sha1="248ec3f239e8d069490867d437ac0465dbf878b4" />
 			</diskarea>
 		</part>
 	</software>
@@ -2788,6 +2987,141 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="prince of persia 2" sha1="7e46f99eb028afc8f955e5d4d7d3e38b6fefbc73" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="prostudg">
+		<description>Pro Student G</description>
+		<year>1993</year>
+		<publisher>Alice Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="pro student g (boot disk).hdm" size="1261568" crc="a068feeb" sha1="fa5e5b185cc452e9fa252eac61eb6f8a133cc080" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pro student g" sha1="a7675c732045804fbaf292a191eb1967f98894a4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="provvdnz">
+		<description>Provvidenza: Legenda la Spada di Alfa</description>
+		<year>1991</year>
+		<publisher>Sofcom</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="provvidenza" sha1="a104b48ade5fbe34b324f0c7f3a3fa0de7b482fc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydet1">
+		<description>Psychic Detective Series Vol. 1: Invitation</description>
+		<year>1989</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 1 - invitation" sha1="4d53507fe063ae02cb1db77a0bf591dd62d5a014" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydet2">
+		<description>Psychic Detective Series Vol. 2: Memories</description>
+		<year>1989</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 2 - memories" sha1="dc3d92414e77cf0220e10f46a92e2c24d07daa82" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydet3">
+		<description>Psychic Detective Series Vol. 3: Aya</description>
+		<year>1990</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 3 - aya" sha1="2ee820e859d4a6120ed6940a318d45c1101b4140" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydet4">
+		<description>Psychic Detective Series Vol. 4: Orgel</description>
+		<year>1991</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic detective series vol. 4 - orgel.hdm" size="1261568" crc="81a557bf" sha1="e32d7a6b60a2265a7035a05f8272ac7938cf82bf" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 4 - orgel" sha1="f1bef6f55415b869685c157acae67f8afb9dfdd3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydet5">
+		<description>Psychic Detective Series Vol. 5: Nightmare</description>
+		<year>1991</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic detective series vol. 5 - nightmare (system disk).hdm" size="1261568" crc="10de4174" sha1="9222ef4d56b96879dc26bcd99d4b61777556aeee" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 5 - nightmare" sha1="ec31d635bb4cbdb7f8b4b4dfc48d690a61ab602e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydetf1">
+		<description>Psychic Detective Series Final: Solitude Joukan</description>
+		<year>1992</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic detective series final - solitude joukan.hdm" size="1261568" crc="9dd1bf09" sha1="36f9557b45a606f54cebb180f88e37207a854e37" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series final - solitude joukan" sha1="66736198f2507efba5967f7af0b7f98255a38cca" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydetf2">
+		<description>Psychic Detective Series Final: Solitude Gekan</description>
+		<year>1993</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic detective series final - solitude gekan.hdm" size="1261568" crc="1e6f92b3" sha1="a0c3e96599e546c0c212091f52d42adbb2dbbb5b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series final - solitude gekan" sha1="7268bbc2f30212f658a52442db1cdd860c47bba6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pulirula">
+		<description>Pu-Li-Ru-La</description>
+		<year>1994</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pu-li-ru-la" sha1="eb21c2d89c6a01570af580985b1b3771d0f151d0" />
 			</diskarea>
 		</part>
 	</software>
