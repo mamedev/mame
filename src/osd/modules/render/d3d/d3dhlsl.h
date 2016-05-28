@@ -12,6 +12,7 @@
 #include <vector>
 #include "aviio.h"
 #include "../frontend/mame/ui/menuitem.h"
+#include "../frontend/mame/ui/slider.h"
 
 //============================================================
 //  CONSTANTS
@@ -290,7 +291,7 @@ private:
 	bool *          m_dirty;
 };
 
-class shaders
+class shaders : public slider_changed_notifier
 {
 	friend class effect;
 	friend class uniform;
@@ -342,6 +343,8 @@ public:
 	void delete_resources(bool reset);
 
 	// slider-related functions
+	virtual INT32 slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, INT32 newval) override;
+	slider_state* slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, void *arg);
 	std::vector<ui::menu_item> init_slider_list();
 	void *get_slider_option(int id, int index = 0);
 
