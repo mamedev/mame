@@ -215,7 +215,7 @@ protected:
 			{
 				XINPUT_STATE state = { 0 };
 
-				if (m_xinput_helper->XInputGetState(i, &state) == ERROR_SUCCESS)
+				if (m_xinput_helper->xinput_get_state(i, &state) == ERROR_SUCCESS)
 				{
 					// allocate and link in a new device
 					devinfo = m_xinput_helper->create_xinput_device(machine, i, *this);
@@ -247,7 +247,7 @@ private:
 
 		if (m_dinput_helper == nullptr)
 		{
-			m_dinput_helper = std::make_unique<dinput_api_helper>(DIRECTINPUT_VERSION);
+			m_dinput_helper = std::make_unique<dinput_api_helper>();
 			status = m_dinput_helper->initialize();
 			if (status != DI_OK)
 			{

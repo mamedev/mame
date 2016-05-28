@@ -22,30 +22,20 @@
 
 #include <memory>
 #include <vector>
+
+#include "modules/lib/osdlib.h"
+
 #include <windows/winutil.h>
 
-template<typename _FunctionPtr>
-class dynamic_bind
-{
-public:
-	// constructor which looks up the function
-	dynamic_bind(const TCHAR *dll, const char *symbol)
-		: m_function(nullptr)
-	{
-		HMODULE module = LoadLibrary(dll);
-		if (module != nullptr)
-			m_function = reinterpret_cast<_FunctionPtr>(GetProcAddress(module, symbol));
-	}
-
-	// bool to test if the function is nullptr or not
-	operator bool() const { return (m_function != nullptr); }
-
-	// dereference to get the underlying pointer
-	_FunctionPtr operator *() const { return m_function; }
-
-private:
-	_FunctionPtr    m_function;
-};
+// Typedefs for dynamically loaded functions
+typedef BOOL WINAPI (*StackWalk64_fn)(DWORD, HANDLE, HANDLE, LPSTACKFRAME64, PVOID, PREAD_PROCESS_MEMORY_ROUTINE64, PFUNCTION_TABLE_ACCESS_ROUTINE64, PGET_MODULE_BASE_ROUTINE64, PTRANSLATE_ADDRESS_ROUTINE64);
+typedef BOOL WINAPI (*SymInitialize_fn)(HANDLE, LPCTSTR, BOOL);
+typedef PVOID WINAPI (*SymFunctionTableAccess64_fn)(HANDLE, DWORD64);
+typedef DWORD64 WINAPI (*SymGetModuleBase64_fn)(HANDLE, DWORD64);
+typedef BOOL WINAPI (*SymFromAddr_fn)(HANDLE, DWORD64, PDWORD64, PSYMBOL_INFO);
+typedef BOOL WINAPI (*SymGetLineFromAddr64_fn)(HANDLE, DWORD64, PDWORD, PIMAGEHLP_LINE64);
+typedef PIMAGE_SECTION_HEADER WINAPI (*ImageRvaToSection_fn)(PIMAGE_NT_HEADERS, PVOID, ULONG);
+typedef PIMAGE_NT_HEADERS WINAPI (*ImageNtHeader_fn)(PVOID);
 
 class stack_walker
 {
@@ -67,12 +57,10 @@ private:
 	CONTEXT         m_context;
 	bool            m_first;
 
-	dynamic_bind<BOOL(WINAPI *)(DWORD, HANDLE, HANDLE, LPSTACKFRAME64, PVOID, PREAD_PROCESS_MEMORY_ROUTINE64, PFUNCTION_TABLE_ACCESS_ROUTINE64, PGET_MODULE_BASE_ROUTINE64, PTRANSLATE_ADDRESS_ROUTINE64)>
-		m_stack_walk_64;
-	dynamic_bind<BOOL(WINAPI *)(HANDLE, LPCTSTR, BOOL)> m_sym_initialize;
-	dynamic_bind<PVOID(WINAPI *)(HANDLE, DWORD64)> m_sym_function_table_access_64;
-	dynamic_bind<DWORD64(WINAPI *)(HANDLE, DWORD64)> m_sym_get_module_base_64;
-	dynamic_bind<VOID(WINAPI *)(PCONTEXT)> m_rtl_capture_context;
+	osd_dynamic_bind<StackWalk64_fn> m_stack_walk_64;
+	osd_dynamic_bind<SymInitialize_fn> m_sym_initialize;
+	osd_dynamic_bind<SymFunctionTableAccess64_fn> m_sym_function_table_access_64;
+	osd_dynamic_bind<SymGetModuleBase64_fn> m_sym_get_module_base_64;
 
 	static bool     s_initialized;
 };
@@ -126,8 +114,8 @@ private:
 	FPTR            m_last_base;
 	FPTR            m_text_base;
 
-	dynamic_bind<BOOL(WINAPI *)(HANDLE, DWORD64, PDWORD64, PSYMBOL_INFO)> m_sym_from_addr;
-	dynamic_bind<BOOL(WINAPI *)(HANDLE, DWORD64, PDWORD, PIMAGEHLP_LINE64)> m_sym_get_line_from_addr_64;
+	osd_dynamic_bind<SymFromAddr_fn> m_sym_from_addr;
+	osd_dynamic_bind<SymGetLineFromAddr64_fn> m_sym_get_line_from_addr_64;
 };
 
 class sampling_profiler
@@ -177,11 +165,10 @@ stack_walker::stack_walker()
 	: m_process(GetCurrentProcess()),
 	m_thread(GetCurrentThread()),
 	m_first(true),
-	m_stack_walk_64(TEXT("dbghelp.dll"), "StackWalk64"),
-	m_sym_initialize(TEXT("dbghelp.dll"), "SymInitialize"),
-	m_sym_function_table_access_64(TEXT("dbghelp.dll"), "SymFunctionTableAccess64"),
-	m_sym_get_module_base_64(TEXT("dbghelp.dll"), "SymGetModuleBase64"),
-	m_rtl_capture_context(TEXT("kernel32.dll"), "RtlCaptureContext")
+	m_stack_walk_64               ("StackWalk64",              { L"dbghelp.dll" }),
+	m_sym_initialize              ("SymInitialize",            { L"dbghelp.dll" }),
+	m_sym_function_table_access_64("SymFunctionTableAccess64", { L"dbghelp.dll" }),
+	m_sym_get_module_base_64      ("SymGetModuleBase64",       { L"dbghelp.dll" })
 {
 	// zap the structs
 	memset(&m_stackframe, 0, sizeof(m_stackframe));
@@ -203,9 +190,7 @@ stack_walker::stack_walker()
 bool stack_walker::reset()
 {
 	// set up the initial state
-	if (!m_rtl_capture_context)
-		return false;
-	(*m_rtl_capture_context)(&m_context);
+	RtlCaptureContext(&m_context);
 	m_thread = GetCurrentThread();
 	m_first = true;
 
@@ -295,8 +280,8 @@ symbol_manager::symbol_manager(const char *argv0)
 	m_process(GetCurrentProcess()),
 	m_last_base(0),
 	m_text_base(0),
-	m_sym_from_addr(TEXT("dbghelp.dll"), "SymFromAddr"),
-	m_sym_get_line_from_addr_64(TEXT("dbghelp.dll"), "SymGetLineFromAddr64")
+	m_sym_from_addr            ("SymFromAddr",          { L"dbghelp.dll" }),
+	m_sym_get_line_from_addr_64("SymGetLineFromAddr64", { L"dbghelp.dll" })
 {
 #ifdef __GNUC__
 	// compute the name of the mapfile
@@ -603,8 +588,8 @@ void symbol_manager::format_symbol(const char *name, UINT32 displacement, const 
 
 FPTR symbol_manager::get_text_section_base()
 {
-	dynamic_bind<PIMAGE_SECTION_HEADER(WINAPI *)(PIMAGE_NT_HEADERS, PVOID, ULONG)> image_rva_to_section(TEXT("dbghelp.dll"), "ImageRvaToSection");
-	dynamic_bind<PIMAGE_NT_HEADERS(WINAPI *)(PVOID)> image_nt_header(TEXT("dbghelp.dll"), "ImageNtHeader");
+	osd_dynamic_bind<ImageRvaToSection_fn> image_rva_to_section("ImageRvaToSection", { L"dbghelp.dll" });
+	osd_dynamic_bind<ImageNtHeader_fn> image_nt_header         ("ImageNtHeader",     { L"dbghelp.dll" });
 
 	// start with the image base
 	PVOID base = reinterpret_cast<PVOID>(GetModuleHandleUni());

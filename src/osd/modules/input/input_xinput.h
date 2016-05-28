@@ -3,6 +3,8 @@
 
 #include <mutex>
 
+#include "modules/lib/osdlib.h"
+
 #define XINPUT_MAX_POV 4
 #define XINPUT_MAX_BUTTONS 10
 #define XINPUT_MAX_AXIS 4
@@ -88,34 +90,31 @@ struct xinput_api_state
 	XINPUT_CAPABILITIES     caps;
 };
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-// Typedef for pointers to XInput Functions
-typedef lazy_loaded_function_p2<DWORD, DWORD, XINPUT_STATE*> xinput_get_state_fn;
-typedef lazy_loaded_function_p3<DWORD, DWORD, DWORD, XINPUT_CAPABILITIES*> xinput_get_caps_fn;
-#endif
+// Typedefs for dynamically loaded functions
+typedef DWORD (*xinput_get_state_fn)(DWORD, XINPUT_STATE *);
+typedef DWORD (*xinput_get_caps_fn)(DWORD, DWORD, XINPUT_CAPABILITIES *);
 
 class xinput_api_helper : public std::enable_shared_from_this<xinput_api_helper>
 {
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-private:
-	const wchar_t* xinput_dll_names[2] = { L"xinput1_4.dll", L"xinput9_1_0.dll" };
-
-public:
-	xinput_get_state_fn   XInputGetState;
-	xinput_get_caps_fn    XInputGetCapabilities;
-#endif
-
 public:
 	xinput_api_helper();
 
 	int initialize();
 	xinput_joystick_device * create_xinput_device(running_machine &machine, UINT index, wininput_module &module);
 
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-	// Pass-through functions for Universal Windows
-	inline DWORD XInputGetState(DWORD dwUserindex, XINPUT_STATE *pState);
-	inline DWORD XInputGetCapabilities(DWORD dwUserindex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities);
-#endif
+	inline DWORD xinput_get_state(DWORD dwUserindex, XINPUT_STATE *pState)
+	{
+		return (*XInputGetState)(dwUserindex, pState);
+	}
+
+	inline DWORD xinput_get_capabilities(DWORD dwUserindex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities)
+	{
+		return (*XInputGetCapabilities)(dwUserindex, dwFlags, pCapabilities);
+	}
+
+private:
+	osd_dynamic_bind<xinput_get_state_fn> XInputGetState;
+	osd_dynamic_bind<xinput_get_caps_fn> XInputGetCapabilities;
 };
 
 class xinput_joystick_device : public device_info

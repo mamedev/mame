@@ -2,7 +2,6 @@
 #define INPUT_DINPUT_H_
 
 #include "input_common.h"
-#include "winutil.h"
 
 //============================================================
 //  dinput_device - base directinput device
@@ -11,12 +10,7 @@
 // DirectInput-specific information about a device
 struct dinput_api_state
 {
-#if DIRECTINPUT_VERSION >= 0x0800
 	Microsoft::WRL::ComPtr<IDirectInputDevice8>  device;
-#else
-	Microsoft::WRL::ComPtr<IDirectInputDevice>   device;
-	Microsoft::WRL::ComPtr<IDirectInputDevice2>  device2;
-#endif
 	DIDEVCAPS                                    caps;
 	LPCDIDATAFORMAT                              format;
 };
@@ -43,25 +37,13 @@ public:
 	virtual BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref) = 0;
 };
 
-#if DIRECTINPUT_VERSION >= 0x0800
-typedef lazy_loaded_function_p4<HRESULT, HMODULE, int, IDirectInput8 **, LPUNKNOWN> pfn_dinput_create;
-#else
-typedef lazy_loaded_function_p4<HRESULT, HMODULE, int, IDirectInput **, LPUNKNOWN> pfn_dinput_create;
-#endif
-
 class dinput_api_helper
 {
 private:
-#if DIRECTINPUT_VERSION >= 0x0800
 	Microsoft::WRL::ComPtr<IDirectInput8> m_dinput;
-#else
-	Microsoft::WRL::ComPtr<IDirectInput>  m_dinput;
-#endif
-	int                                   m_dinput_version;
-	pfn_dinput_create                     m_pfn_DirectInputCreate;
 
 public:
-	dinput_api_helper(int version);
+	dinput_api_helper();
 	virtual ~dinput_api_helper();
 	int initialize();
 
@@ -87,13 +69,6 @@ public:
 		result = m_dinput->CreateDevice(instance->guidInstance, devinfo->dinput.device.GetAddressOf(), nullptr);
 		if (result != DI_OK)
 			goto error;
-
-#if DIRECTINPUT_VERSION < 0x0800
-		// try to get a version 2 device for it so we can use the poll method
-		result = devinfo->dinput.device.CopyTo(IID_IDirectInputDevice2, reinterpret_cast<void**>(devinfo->dinput.device2.GetAddressOf()));
-		if (result != DI_OK)
-			devinfo->dinput.device2 = nullptr;
-#endif
 
 		// get the caps
 		devinfo->dinput.caps.dwSize = sizeof(devinfo->dinput.caps);
