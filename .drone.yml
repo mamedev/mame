@@ -1,0 +1,7 @@
+# Build configure for https://www.tea-ci.org (fork of Drone CI with Msys2 support)
+build:
+  image: teaci/msys64
+  shell: mingw64
+  pull: true
+  commands:
+    - make SUBTARGET=tiny MINGW64=/c/msys64/mingw64
