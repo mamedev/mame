@@ -37,7 +37,7 @@ bgfx_slider::~bgfx_slider()
 {
 }
 
-static INT32 update_trampoline(running_machine &machine, void *arg, int /*id*/, std::string *str, INT32 newval)
+INT32 bgfx_slider::slider_changed(running_machine& /*machine*/, void *arg, int /*id*/, std::string *str, INT32 newval)
 {
 	if (arg != nullptr)
 	{
@@ -49,7 +49,7 @@ static INT32 update_trampoline(running_machine &machine, void *arg, int /*id*/, 
 void bgfx_slider::import(float val)
 {
 	m_value = val;
-	update_trampoline(m_machine, this, m_slider_state->id, nullptr, int32_t(floor(m_value / m_step + 0.5f)));
+	slider_changed(m_machine, this, m_slider_state->id, nullptr, int32_t(floor(m_value / m_step + 0.5f)));
 }
 
 slider_state* bgfx_slider::create_core_slider(running_machine& machine)
@@ -61,7 +61,10 @@ slider_state* bgfx_slider::create_core_slider(running_machine& machine)
 	state->defval = int32_t(floor(m_default / m_step + 0.5f));
 	state->maxval = int32_t(floor(m_max / m_step + 0.5f));
 	state->incval = int32_t(floor(m_step / m_step + 0.5f));
-	state->update = update_trampoline;
+
+	using namespace std::placeholders;
+	state->update = std::bind(&bgfx_slider::slider_changed, this, _1, _2, _3, _4, _5);
+
 	state->arg = this;
 	state->id = 0;
 	strcpy(state->description, m_description.c_str());
