@@ -13,6 +13,10 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <dlfcn.h>
+
+#include <codecvt>
+#include <iomanip>
 
 #include <mach/mach.h>
 #include <mach/mach_time.h>
@@ -214,4 +218,41 @@ char *osd_get_clipboard_text(void)
 	CFRelease(pasteboard_ref);
 
 	return result;
+}
+
+//============================================================
+//  osd_dynamic_bind
+//============================================================
+
+osd_dynamic_bind_base::osd_dynamic_bind_base(const char *symbol, const std::vector<std::wstring> libraries)
+	: m_module(nullptr), m_function(nullptr)
+{
+	for (int i = 0; i < libraries.size(); i++)
+	{
+		// wide to UTF-8
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
+	
+		void *module = dlopen(convert.to_bytes(libraries[i]).c_str(), RTLD_LAZY);
+
+		if (module != nullptr)
+		{
+			m_function = reinterpret_cast<void *>(dlsym(module, symbol));
+
+			if (m_function != nullptr)
+			{
+				m_module = reinterpret_cast<void *>(module);		
+				break;
+			}
+			else
+			{
+				dlclose(module);
+			}
+		}
+	}
+}
+
+osd_dynamic_bind_base::~osd_dynamic_bind_base()
+{
+	if (m_module != nullptr)
+		dlclose(m_module);
 }

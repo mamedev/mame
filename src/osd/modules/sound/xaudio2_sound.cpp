@@ -31,6 +31,8 @@
 
 #include "winutil.h"
 
+#include "modules/lib/osdlib.h"
+
 //============================================================
 //  Constants
 //============================================================
@@ -125,7 +127,7 @@ typedef std::unique_ptr<IXAudio2MasteringVoice, xaudio2_custom_deleter> masterin
 typedef std::unique_ptr<IXAudio2SourceVoice, xaudio2_custom_deleter> src_voice_ptr;
 
 // Typedef for pointer to XAudio2Create
-typedef lazy_loaded_function_p3<HRESULT, IXAudio2**, UINT32, XAUDIO2_PROCESSOR> xaudio2_create_ptr;
+typedef HRESULT (*xaudio2_create_ptr)(IXAudio2 **, UINT32, XAUDIO2_PROCESSOR);
 
 //============================================================
 //  Helper classes
@@ -188,27 +190,25 @@ public:
 class sound_xaudio2 : public osd_module, public sound_module, public IXAudio2VoiceCallback
 {
 private:
-	const wchar_t* XAUDIO_DLLS[2] = { L"XAudio2_9.dll", L"XAudio2_8.dll" };
-
-	xaudio2_ptr                                 m_xAudio2;
-	mastering_voice_ptr                         m_masterVoice;
-	src_voice_ptr                               m_sourceVoice;
-	DWORD                                       m_sample_bytes;
-	std::unique_ptr<BYTE[]>                     m_buffer;
-	DWORD                                       m_buffer_size;
-	DWORD                                       m_buffer_count;
-	DWORD                                       m_writepos;
-	std::mutex                                  m_buffer_lock;
-	HANDLE                                      m_hEventBufferCompleted;
-	HANDLE                                      m_hEventDataAvailable;
-	HANDLE                                      m_hEventExiting;
-	std::thread                                 m_audioThread;
-	std::queue<xaudio2_buffer>                  m_queue;
-	std::unique_ptr<bufferpool>                 m_buffer_pool;
-	UINT32                                      m_overflows;
-	UINT32                                      m_underflows;
-	BOOL                                        m_in_underflow;
-	xaudio2_create_ptr                          XAudio2Create;
+	xaudio2_ptr                          m_xAudio2;
+	mastering_voice_ptr                  m_masterVoice;
+	src_voice_ptr                        m_sourceVoice;
+	DWORD                                m_sample_bytes;
+	std::unique_ptr<BYTE[]>              m_buffer;
+	DWORD                                m_buffer_size;
+	DWORD                                m_buffer_count;
+	DWORD                                m_writepos;
+	std::mutex                           m_buffer_lock;
+	HANDLE                               m_hEventBufferCompleted;
+	HANDLE                               m_hEventDataAvailable;
+	HANDLE                               m_hEventExiting;
+	std::thread                          m_audioThread;
+	std::queue<xaudio2_buffer>           m_queue;
+	std::unique_ptr<bufferpool>          m_buffer_pool;
+	UINT32                               m_overflows;
+	UINT32                               m_underflows;
+	BOOL                                 m_in_underflow;
+	osd_dynamic_bind<xaudio2_create_ptr> XAudio2Create;
 
 public:
 	sound_xaudio2() :
@@ -229,7 +229,7 @@ public:
 		m_overflows(0),
 		m_underflows(0),
 		m_in_underflow(FALSE),
-		XAudio2Create("XAudio2Create", XAUDIO_DLLS, ARRAY_LENGTH(XAUDIO_DLLS))
+		XAudio2Create("XAudio2Create", { L"XAudio2_9.dll", L"XAudio2_8.dll" })
 	{
 	}
 
@@ -266,8 +266,7 @@ private:
 
 bool sound_xaudio2::probe()
 {
-	int status = XAudio2Create.initialize();
-	return status == 0;
+	return (XAudio2Create ? true : false);
 }
 
 //============================================================
@@ -280,16 +279,15 @@ int sound_xaudio2::init(osd_options const &options)
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 	// Make sure our XAudio2Create entrypoint is bound
-	int status = XAudio2Create.initialize();
-	if (status != 0)
+	if (!XAudio2Create)
 	{
-		osd_printf_error("Could not find XAudio2 library\n");
+		osd_printf_error("Could not find XAudio2. Please try to reinstall DirectX runtime package.\n");		
 		return 1;
 	}
 
 	// Create the IXAudio2 object
 	IXAudio2 *temp_xaudio2 = nullptr;
-	HR_RET1(this->XAudio2Create(&temp_xaudio2, 0, XAUDIO2_DEFAULT_PROCESSOR));
+	HR_RET1((*XAudio2Create)(&temp_xaudio2, 0, XAUDIO2_DEFAULT_PROCESSOR));
 	m_xAudio2 = xaudio2_ptr(temp_xaudio2);
 
 	// make a format description for what we want

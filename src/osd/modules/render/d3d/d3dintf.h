@@ -19,6 +19,8 @@
 #include <math.h>
 #undef interface
 
+#include "modules/lib/osdlib.h"
+
 //============================================================
 //  CONSTANTS
 //============================================================
@@ -45,6 +47,9 @@
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
+
+// Typedefs for dynamically loaded functions
+typedef IDirect3D9* (*d3d9_create_fn)(UINT);
 
 struct d3d_base;
 struct device;
@@ -214,12 +219,15 @@ struct vertex_buffer_interface
 
 struct d3d_base
 {
+	d3d_base()
+		: d3d9_create_ptr("Direct3DCreate9", TEXT("d3d9.dll"))
+	{
+	}
+
 	// internal objects
 	int                         version;
 	void *                      d3dobj;
-	HINSTANCE                   dllhandle;
 	bool                        post_fx_available;
-	HINSTANCE                   libhandle;
 
 	// interface pointers
 	interface               d3d;
@@ -227,6 +235,8 @@ struct d3d_base
 	surface_interface       surface;
 	texture_interface       texture;
 	vertex_buffer_interface vertexbuf;
+
+	osd_dynamic_bind<d3d9_create_fn> d3d9_create_ptr;
 };
 
 

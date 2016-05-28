@@ -7,6 +7,7 @@
 
 #include "font_module.h"
 #include "modules/osdmodule.h"
+#include "modules/lib/osdlib.h"
 
 // We take dependencies on WRL client headers and
 // we can only build with a high enough version
@@ -78,8 +79,8 @@ struct osd_deleter
 typedef std::unique_ptr<char, osd_deleter> osd_utf8_ptr;
 
 // Typedefs for dynamically loaded functions
-typedef lazy_loaded_function_p4<HRESULT, D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS*, void**> d2d_create_factory_fn;
-typedef lazy_loaded_function_p3<HRESULT, DWRITE_FACTORY_TYPE, REFIID, IUnknown**> dwrite_create_factory_fn;
+typedef HRESULT WINAPI (*d2d_create_factory_fn)(D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
+typedef HRESULT (*dwrite_create_factory_fn)(DWRITE_FACTORY_TYPE, REFIID, IUnknown **);
 
 // Debugging functions
 #ifdef DWRITE_DEBUGGING
@@ -96,13 +97,14 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	ComPtr<IDWriteFactory> dwriteFactory;
 	ComPtr<IWICImagingFactory> wicFactory;
 
-	d2d_create_factory_fn pfn_D2D1CreateFactory("D2D1CreateFactory", L"D2d1.dll");
-	dwrite_create_factory_fn pfn_DWriteCreateFactory("DWriteCreateFactory", L"Dwrite.dll");
-	HR_RETHR(pfn_D2D1CreateFactory.initialize());
-	HR_RETHR(pfn_DWriteCreateFactory.initialize());
+	osd_dynamic_bind<d2d_create_factory_fn> pfn_D2D1CreateFactory     ("D2D1CreateFactory",   { L"D2d1.dll" });
+	osd_dynamic_bind<dwrite_create_factory_fn> pfn_DWriteCreateFactory("DWriteCreateFactory", { L"Dwrite.dll" });
+
+	if (!pfn_D2D1CreateFactory || !pfn_DWriteCreateFactory)
+		return ERROR_DLL_NOT_FOUND;
 
 	// Create a Direct2D factory
-	HR_RETHR(pfn_D2D1CreateFactory(
+	HR_RETHR((*pfn_D2D1CreateFactory)(
 		D2D1_FACTORY_TYPE_SINGLE_THREADED,
 		__uuidof(ID2D1Factory1),
 		nullptr,
@@ -112,7 +114,7 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 	// Create a DirectWrite factory.
-	HR_RETHR(pfn_DWriteCreateFactory(
+	HR_RETHR((*pfn_DWriteCreateFactory)(
 		DWRITE_FACTORY_TYPE_SHARED,
 		__uuidof(IDWriteFactory),
 		reinterpret_cast<IUnknown **>(dwriteFactory.GetAddressOf())));
@@ -652,18 +654,18 @@ private:
 class font_dwrite : public osd_module, public font_module
 {
 private:
-	d2d_create_factory_fn           m_pfnD2D1CreateFactory;
-	dwrite_create_factory_fn        m_pfnDWriteCreateFactory;
-	ComPtr<ID2D1Factory>            m_d2dfactory;
-	ComPtr<IDWriteFactory>          m_dwriteFactory;
-	ComPtr<IWICImagingFactory>      m_wicFactory;
+	osd_dynamic_bind<d2d_create_factory_fn>    m_pfnD2D1CreateFactory;
+	osd_dynamic_bind<dwrite_create_factory_fn> m_pfnDWriteCreateFactory;
+	ComPtr<ID2D1Factory>                       m_d2dfactory;
+	ComPtr<IDWriteFactory>                     m_dwriteFactory;
+	ComPtr<IWICImagingFactory>                 m_wicFactory;
 
 public:
 	font_dwrite() :
 		osd_module(OSD_FONT_PROVIDER, "dwrite"),
 		font_module(),
-		m_pfnD2D1CreateFactory("D2D1CreateFactory", L"D2d1.dll"),
-		m_pfnDWriteCreateFactory("DWriteCreateFactory", L"Dwrite.dll"),
+		m_pfnD2D1CreateFactory  ("D2D1CreateFactory",   { L"D2d1.dll" }),
+		m_pfnDWriteCreateFactory("DWriteCreateFactory", { L"Dwrite.dll" }),
 		m_d2dfactory(nullptr),
 		m_dwriteFactory(nullptr),
 		m_wicFactory(nullptr)
@@ -673,11 +675,8 @@ public:
 	virtual bool probe() override
 	{
 		// This module is available if it can load the expected API Functions
-		if (m_pfnD2D1CreateFactory.initialize() != 0
-			|| m_pfnDWriteCreateFactory.initialize() != 0)
-		{
+		if (!m_pfnD2D1CreateFactory || !m_pfnDWriteCreateFactory)
 			return false;
-		}
 
 		return true;
 	}
@@ -689,15 +688,14 @@ public:
 		osd_printf_verbose("FontProvider: Initializing DirectWrite\n");
 
 		// Make sure we can initialize our api functions
-		if (m_pfnD2D1CreateFactory.initialize()
-			|| m_pfnDWriteCreateFactory.initialize())
+		if (!m_pfnD2D1CreateFactory || !m_pfnDWriteCreateFactory)
 		{
 			osd_printf_error("ERROR: FontProvider: Failed to load DirectWrite functions.\n");
 			return -1;
 		}
 
 		// Create a Direct2D factory.
-		HR_RET1(m_pfnD2D1CreateFactory(
+		HR_RET1((*m_pfnD2D1CreateFactory)(
 			D2D1_FACTORY_TYPE_SINGLE_THREADED,
 			__uuidof(ID2D1Factory),
 			nullptr,
@@ -707,7 +705,7 @@ public:
 		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 		// Create a DirectWrite factory.
-		HR_RET1(m_pfnDWriteCreateFactory(
+		HR_RET1((*m_pfnDWriteCreateFactory)(
 			DWRITE_FACTORY_TYPE_SHARED,
 			__uuidof(IDWriteFactory),
 			reinterpret_cast<IUnknown **>(m_dwriteFactory.GetAddressOf())));

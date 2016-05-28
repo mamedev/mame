@@ -64,65 +64,26 @@ static inline void convert_present_params(const present_parameters *params, D3DP
 
 d3d_base *drawd3d9_init(void)
 {
-	bool post_available = true;
+	// allocate an object to hold our data
+	d3d_base *d3dptr = global_alloc(d3d_base);
 
-	// dynamically grab the create function from d3d9.dll
-	HINSTANCE dllhandle = LoadLibrary(TEXT("d3d9.dll"));
-	if (dllhandle == nullptr)
+	if (!d3dptr->d3d9_create_ptr)
 	{
-		osd_printf_verbose("Direct3D: Unable to access d3d9.dll\n");
-		return nullptr;
-	}
-
-	// import the create function
-	direct3dcreate9_ptr direct3dcreate9 = (direct3dcreate9_ptr)GetProcAddress(dllhandle, "Direct3DCreate9");
-	if (direct3dcreate9 == nullptr)
-	{
-		osd_printf_verbose("Direct3D: Unable to find Direct3DCreate9\n");
-		FreeLibrary(dllhandle);
-		return nullptr;
+		osd_printf_verbose("Direct3D: Unable to find Direct3D 9 runtime library\n");
+		return nullptr;		
 	}
 
 	// create our core direct 3d object
-	IDirect3D9 *d3d9 = (*direct3dcreate9)(D3D_SDK_VERSION);
+	IDirect3D9 *d3d9 = (*d3dptr->d3d9_create_ptr)(D3D_SDK_VERSION);
 	if (d3d9 == nullptr)
 	{
 		osd_printf_verbose("Direct3D: Error attempting to initialize Direct3D9\n");
-		FreeLibrary(dllhandle);
 		return nullptr;
 	}
 
-	// dynamically grab the shader load function from d3dx9.dll
-	HINSTANCE fxhandle = nullptr;
-	for (int idx = 99; idx >= 0; idx--) // a shameful moogle
-	{
-		#ifdef UNICODE
-		wchar_t dllbuf[13];
-		wsprintf(dllbuf, TEXT("d3dx9_%d.dll"), idx);
-		fxhandle = LoadLibrary(dllbuf);
-		#else
-		char dllbuf[13];
-		sprintf(dllbuf, "d3dx9_%d.dll", idx);
-		fxhandle = LoadLibraryA(dllbuf);
-		#endif
-		if (fxhandle != nullptr)
-		{
-			break;
-		}
-	}
-	if (fxhandle == nullptr)
-	{
-		osd_printf_verbose("Direct3D: Warning - Unable find any D3D9 DLLs; disabling post-effect rendering\n");
-		post_available = false;
-	}
-
-	// allocate an object to hold our data
-	auto d3dptr = global_alloc(d3d_base);
 	d3dptr->version = 9;
 	d3dptr->d3dobj = d3d9;
-	d3dptr->dllhandle = dllhandle;
-	d3dptr->post_fx_available = post_available;
-	d3dptr->libhandle = fxhandle;
+	d3dptr->post_fx_available = true;
 	set_interfaces(d3dptr);
 
 	osd_printf_verbose("Direct3D: Using Direct3D 9\n");
@@ -239,7 +200,6 @@ static ULONG release(d3d_base *d3dptr)
 {
 	IDirect3D9 *d3d9 = (IDirect3D9 *)d3dptr->d3dobj;
 	ULONG result = IDirect3D9_Release(d3d9);
-	FreeLibrary(d3dptr->dllhandle);
 	global_free(d3dptr);
 	return result;
 }
