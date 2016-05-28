@@ -471,7 +471,7 @@ public:
 
 				// loop over channels and read the samples
 				int channels = MIN(m_info.channels, ARRAY_LENGTH(m_audio));
-				INT16 *samplesptr[ARRAY_LENGTH(m_audio)];
+				EQUIVALENT_ARRAY(m_audio, INT16 *) samplesptr;
 				for (int chnum = 0; chnum < channels; chnum++)
 				{
 					// read the sound samples
