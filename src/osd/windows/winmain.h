@@ -85,7 +85,6 @@
 #define WINOPTION_YIQ_PHASE_COUNT           "yiq_phase_count"
 #define WINOPTION_VECTOR_LENGTH_SCALE       "vector_length_scale"
 #define WINOPTION_VECTOR_LENGTH_RATIO       "vector_length_ratio"
-#define WINOPTION_VECTOR_TIME_PERIOD        "vector_time_period"
 #define WINOPTION_BLOOM_BLEND_MODE          "bloom_blend_mode"
 #define WINOPTION_BLOOM_SCALE               "bloom_scale"
 #define WINOPTION_BLOOM_OVERDRIVE           "bloom_overdrive"
@@ -180,7 +179,6 @@ public:
 	int screen_yiq_phase_count() const { return int_value(WINOPTION_YIQ_PHASE_COUNT); }
 	float screen_vector_length_scale() const { return float_value(WINOPTION_VECTOR_LENGTH_SCALE); }
 	float screen_vector_length_ratio() const { return float_value(WINOPTION_VECTOR_LENGTH_RATIO); }
-	float screen_vector_time_period() const { return float_value(WINOPTION_VECTOR_TIME_PERIOD); }
 	int screen_bloom_blend_mode() const { return int_value(WINOPTION_BLOOM_BLEND_MODE); }
 	float screen_bloom_scale() const { return float_value(WINOPTION_BLOOM_SCALE); }
 	const char *screen_bloom_overdrive() const { return value(WINOPTION_BLOOM_OVERDRIVE); }
