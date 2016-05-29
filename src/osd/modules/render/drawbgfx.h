@@ -105,6 +105,7 @@ private:
 	void render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
 
 	void put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertex);
+	void put_packed_line(render_primitive *prim, ScreenVertex* vertex);
 	void put_polygon(const float* coords, UINT32 num_coords, float r, UINT32 rgba, ScreenVertex* vertex);
 	void put_line(float x0, float y0, float x1, float y1, float r, UINT32 rgba, ScreenVertex* vertex, float fth = 1.0f);
 
