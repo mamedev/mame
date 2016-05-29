@@ -13,9 +13,6 @@
 #define REG_USED(desc,x)			do { (desc).regin[0] |= 1 << (x); } while(0)
 #define REG_MODIFIED(desc,x)		do { (desc).regout[0] |= 1 << (x); } while(0)
 
-//#define ASTAT_USED(desc)			do { (desc).regin[0] |= 1 << 16; } while(0)
-//#define ASTAT_MODIFIED(desc)		do { (desc).regout[0] |= 1 << 16; } while(0)
-
 #define AZ_USED(desc)				do { (desc).regin[0] |= 1 << 16; } while(0)
 #define AZ_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 16; } while(0)
 #define AV_USED(desc)				do { (desc).regin[0] |= 1 << 17; } while(0)
@@ -104,7 +101,7 @@ void sharc_frontend::add_loop_entry(UINT32 pc, UINT8 type, UINT32 start_pc, UINT
 			map[l1].looptype != looptype ||
 			map[l1].condition != condition)
 		{
-			fatalerror("sharc_frontend::add_loop_entry: existing entry does match: start_pc %08X/%08X, looptype %02X/%02X, cond %02X/%02X", start_pc, map[l1].start_pc, looptype, map[l1].looptype, condition, map[l1].condition);
+			fatalerror("sharc_frontend::add_loop_entry: existing entry does not match: start_pc %08X/%08X, looptype %02X/%02X, cond %02X/%02X", start_pc, map[l1].start_pc, looptype, map[l1].looptype, condition, map[l1].condition);
 		}
 	}
 
@@ -172,58 +169,12 @@ bool sharc_frontend::is_astat_delay_check(UINT32 pc)
 
 bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 {
-	//UINT64 opcode = desc.opptr.q[0] = m_sharc.m_direct->read_qword(desc.physpc, 0);
 	UINT64 opcode = desc.opptr.q[0] = m_sharc->pm_read48(desc.physpc);
 
 	desc.length = 1;
 	desc.cycles = 1;
 
 	// handle looping
-	/*
-	if (m_loop.size() > 0)
-	{
-		for (int i = 0; i < m_loop.size(); i++)
-		{
-			LOOP_DESCRIPTOR &loop = m_loop.at(i);
-			if (loop.start_pc == desc.pc)
-			{
-				desc.flags |= OPFLAG_IS_BRANCH_TARGET;
-			}
-			if (loop.astat_check_pc == desc.pc)
-			{
-				if (loop.type == LOOP_TYPE_CONDITIONAL)
-				{
-					UINT32 flags = m_sharc->do_condition_astat_bits(loop.condition);
-					if (flags & adsp21062_device::ASTAT_FLAGS::AZ) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AZ;
-					if (flags & adsp21062_device::ASTAT_FLAGS::AN) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AN;
-					if (flags & adsp21062_device::ASTAT_FLAGS::AV) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AV;
-					if (flags & adsp21062_device::ASTAT_FLAGS::AC) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AC;
-					if (flags & adsp21062_device::ASTAT_FLAGS::MN) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MN;
-					if (flags & adsp21062_device::ASTAT_FLAGS::MV) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MV;
-					if (flags & adsp21062_device::ASTAT_FLAGS::SV) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SV;
-					if (flags & adsp21062_device::ASTAT_FLAGS::SZ) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SZ;
-					if (flags & adsp21062_device::ASTAT_FLAGS::BTF) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_BTF;
-				}
-			}
-			if (loop.end_pc == desc.pc)
-			{
-				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
-				desc.targetpc = loop.start_pc;
-				if (loop.type == LOOP_TYPE_COUNTER)
-				{
-					desc.userflags |= OP_USERFLAG_COUNTER_LOOP;
-				}
-				else if (loop.type == LOOP_TYPE_CONDITIONAL)
-				{
-					desc.userflags |= OP_USERFLAG_COND_LOOP;
-					desc.userflags |= (loop.condition << 2) & OP_USERFLAG_COND_FIELD;
-				}
-				m_loop.erase(m_loop.begin()+i);
-				break;
-			}
-		}
-	}*/
-
 	if (is_astat_delay_check(desc.pc))
 	{
 		LOOP_ENTRY* map = m_loopmap.get();

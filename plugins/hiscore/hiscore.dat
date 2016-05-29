@@ -82,8 +82,8 @@ berzerkf:
 gprider:
 gprideru:
 gpriderj:
-@:maincpu,program,280192,aa,34,30
-@:maincpu,program,9c708,8,01,20
+@:mainpcb:maincpu,program,280192,aa,34,30
+@:mainpcb:maincpu,program,9c708,8,01,20
 
 spider:
 @:maincpu,program,6f6c,13,50,00
@@ -2188,8 +2188,8 @@ smgpu1:
 smgpu:
 smgp5:
 smgp6:
-@:maincpu,program,fff500,7e,21,02
-@:maincpu,program,fffe85,1,08,08
+@:mainpcb:maincpu,program,fff500,7e,21,02
+@:mainpcb:maincpu,program,fffe85,1,08,08
 
 wrally:  ;******world rally (set1)
 wrallya:  ;******world rally (set 2)
@@ -3974,7 +3974,7 @@ kaitein:  ;******kaitei takara sagashi
 loffire:  ;******line of fire / bakudan yarou (world, fd1094 317-0136)
 loffireu:  ;******Line of Fire / Bakudan Yarou (US, FD1094 317-0135)
 loffirej:  ;******Line of Fire / Bakudan Yarou (japan, FD1094 317-0134)
-@:maincpu,program,a3800,18f,01,49
+@:mainpcb:maincpu,program,a3800,18f,01,49
 
 ;******lethal enforcers II,gun fighters (ver uaa)
 le2u:
@@ -4862,7 +4862,7 @@ riot:
 ;******thunder blade (fd1094 317-0056)
 thndrbld:
 thndrbld1:  ;******thunder blade (japan)
-@:maincpu,program,a3b00,64,01,01
+@:mainpcb:maincpu,program,a3b00,64,01,01
 
 ;********segac2.c (bloxeed (c system))
 bloxeedc:
@@ -4904,8 +4904,8 @@ dbrkr:
 
 ;******Racing Hero (FD1094 317-0144)
 rachero:
-@:maincpu,program,ff89be,51,10,01
-@:maincpu,program,ff89ae,4,10,00
+@:mainpcb:maincpu,program,ff89be,51,10,01
+@:mainpcb:maincpu,program,ff89ae,4,10,00
 
 ;********bloodbro.c
 bloodbro:
@@ -13219,13 +13219,13 @@ wbmlb:
 
 ;********system16.c
 aburner:
-@:maincpu,program,ff846e,117,00,00
-@:maincpu,program,ff857f,1,4f,4f
+@:mainpcb:maincpu,program,ff846e,117,00,00
+@:mainpcb:maincpu,program,ff857f,1,4f,4f
 
 aburner2:
 aburner2g:
-@:maincpu,program,ff846e,117,00,00
-@:maincpu,program,ff846f,1,70,70
+@:mainpcb:maincpu,program,ff846e,117,00,00
+@:mainpcb:maincpu,program,ff846f,1,70,70
 
 fantzone:
 fantzoneta:

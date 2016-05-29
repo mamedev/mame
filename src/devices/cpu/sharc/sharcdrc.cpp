@@ -2189,7 +2189,6 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 				case 0x04:			// compute / modify						|000|00100|
 				{
 					int cond = (opcode >> 33) & 0x1f;
-//					int compute = opcode & 0x7fffff;
 					int g = (opcode >> 38) & 0x1;
 					int m = (opcode >> 27) & 0x7;
 					int i = (opcode >> 30) & 0x7;
@@ -2292,7 +2291,6 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 					int pmi = (opcode >> 30) & 0x7;
 					int pmm = (opcode >> 27) & 0x7;
 					int cond = (opcode >> 33) & 0x1f;
-//					int compute = opcode & 0x7fffff;
 
 					if (e)
 					{
@@ -2354,7 +2352,6 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 					int j = (opcode >> 26) & 0x1;
 					int e = (opcode >> 25) & 0x1;
 					int cond = (opcode >> 33) & 0x1f;
-//					int compute = opcode & 0x7fffff;
 
 					if (e)
 					{
@@ -2410,7 +2407,6 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 					int j = (opcode >> 26) & 0x1;
 					int e = (opcode >> 25) & 0x1;
 					//int lr = (opcode >> 24) & 0x1;  
-//					int compute = opcode & 0x7fffff;
 
 					// TODO: loop re-entry
 
@@ -2455,7 +2451,6 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 					int cond = (opcode >> 33) & 0x1f;
 					int j = (opcode >> 26) & 0x1;
 					int e = (opcode >> 25) & 0x1;
-//					int compute = opcode & 0x7fffff;
 
 
 					code_label skip_pop = compiler->labelnum++;
