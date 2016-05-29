@@ -1071,15 +1071,15 @@ namespace netlist
 	namespace devices
 	{
 
-// ----------------------------------------------------------------------------------------
-// mainclock
-// ----------------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------------
+	// mainclock
+	// ----------------------------------------------------------------------------------------
 
-ATTR_HOT /* inline */ void NETLIB_NAME(mainclock)::mc_update(logic_net_t &net)
-{
-	net.toggle_new_Q();
-	net.update_devs();
-}
+	ATTR_HOT /* inline */ void NETLIB_NAME(mainclock)::mc_update(logic_net_t &net)
+	{
+		net.toggle_new_Q();
+		net.update_devs();
+	}
 
 
 	} //namespace devices

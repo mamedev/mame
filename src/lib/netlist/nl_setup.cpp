@@ -853,7 +853,7 @@ void setup_t::start_devices()
 		for (pstring ll : loglist)
 		{
 			pstring name = "log_" + ll;
-			auto nc = factory().new_device_by_name("LOG", netlist(), name);
+			auto nc = factory().factory_by_name("LOG")->Create(netlist(), name);
 			register_link(name + ".I", ll);
 			log().debug("    dynamic link {1}: <{2}>\n",ll, name);
 			register_dev_s(std::move(nc));

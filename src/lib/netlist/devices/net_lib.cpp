@@ -61,9 +61,9 @@ NETLIST_END()
 #define ENTRY1(nic, name, defparam) factory.register_device<nic>( # name, xstr(nic), defparam );
 #define ENTRY(nic, name, defparam) ENTRY1(NETLIB_NAME(nic), name, defparam)
 
-#define NETLIB_DEVICE_DECL(chip) extern device_creator_ptr_t decl_ ## chip;
+#define NETLIB_DEVICE_DECL(chip) extern factory_creator_ptr_t decl_ ## chip;
 
-#define ENTRYX1(nic, name, defparam, decl) factory.register_device( # name, xstr(nic), defparam, decl );
+#define ENTRYX1(nic, name, defparam, decl) factory.register_device( decl (# name, xstr(nic), defparam) );
 #define ENTRYX(nic, name, defparam) { NETLIB_DEVICE_DECL(nic) ENTRYX1(NETLIB_NAME(nic), name, defparam, decl_ ## nic) }
 
 namespace netlist
