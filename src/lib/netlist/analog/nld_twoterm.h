@@ -102,12 +102,12 @@ namespace netlist
 // -----------------------------------------------------------------------------
 // nld_twoterm
 // -----------------------------------------------------------------------------
-#if 1
+
 NETLIB_OBJECT(twoterm)
 {
-	NETLIB_CONSTRUCTOR(twoterm)
-	, m_P(*this, "1")
-	, m_N(*this, "2")
+	NETLIB_CONSTRUCTOR_EX(twoterm, bool terminals_owned = false)
+	, m_P(bselect(terminals_owned, owner, *this), (terminals_owned ? name + "." : "") + "1")
+	, m_N(bselect(terminals_owned, owner, *this), (terminals_owned ? name + "." : "") + "2")
 	{
 		m_P.m_otherterm = &m_N;
 		m_N.m_otherterm = &m_P;
@@ -116,8 +116,8 @@ NETLIB_OBJECT(twoterm)
 	terminal_t m_P;
 	terminal_t m_N;
 
-	NETLIB_UPDATE_TERMINALSI() { }
-	NETLIB_RESETI() { }
+	//NETLIB_UPDATE_TERMINALSI() { }
+	//NETLIB_RESETI() { }
 	NETLIB_UPDATEI();
 
 public:
@@ -141,45 +141,14 @@ public:
 	}
 
 private:
+	template <class C>
+	static core_device_t &bselect(bool b, C &d1, core_device_t &d2)
+	{
+		core_device_t *h = dynamic_cast<core_device_t *>(&d1);
+		return b ? *h : d2;
+	}
 };
-#endif
-NETLIB_OBJECT(twotermx)
-{
-	NETLIB_CONSTRUCTOR(twotermx)
-	{
-		m_P.m_otherterm = &m_N;
-		m_N.m_otherterm = &m_P;
-	}
 
-	terminal_t m_P;
-	terminal_t m_N;
-
-	NETLIB_UPDATE_TERMINALSI() { }
-	NETLIB_RESETI() { }
-	NETLIB_UPDATEI();
-
-public:
-	ATTR_HOT /* inline */ void set(const nl_double G, const nl_double V, const nl_double I)
-	{
-		/*      GO, GT, I                */
-		m_P.set( G,  G, (  V) * G - I);
-		m_N.set( G,  G, ( -V) * G + I);
-	}
-
-	ATTR_HOT /* inline */ nl_double deltaV() const
-	{
-		return m_P.net().as_analog().Q_Analog() - m_N.net().as_analog().Q_Analog();
-	}
-
-	ATTR_HOT void set_mat(nl_double a11, nl_double a12, nl_double a21, nl_double a22, nl_double r1, nl_double r2)
-	{
-		/*      GO, GT, I                */
-		m_P.set(-a12, a11, -r1);
-		m_N.set(-a21, a22, -r2);
-	}
-
-private:
-};
 
 // -----------------------------------------------------------------------------
 // nld_R

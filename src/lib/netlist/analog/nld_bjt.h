@@ -99,21 +99,21 @@ private:
 NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 {
 	NETLIB_CONSTRUCTOR_DERIVED(QBJT_switch, QBJT)
-		, m_RB(*this, "m_RB")
-		, m_RC(*this, "m_RC")
-		, m_BC_dummy(*this, "m_BC")
+		, m_RB(*this, "m_RB", true)
+		, m_RC(*this, "m_RC", true)
+		, m_BC_dummy(*this, "m_BC", true)
 		, m_gB(NETLIST_GMIN_DEFAULT)
 		, m_gC(NETLIST_GMIN_DEFAULT)
 		, m_V(0.0)
 		, m_state_on(0)
 	{
-		register_term("B", m_RB.m_P);
-		register_term("E", m_RB.m_N);
-		register_term("C", m_RC.m_P);
-		register_term("_E1", m_RC.m_N);
+		register_subalias("B", m_RB.m_P);
+		register_subalias("E", m_RB.m_N);
+		register_subalias("C", m_RC.m_P);
+		//register_term("_E1", m_RC.m_N);
 
-		register_term("_B1", m_BC_dummy.m_P);
-		register_term("_C1", m_BC_dummy.m_N);
+		//register_term("_B1", m_BC_dummy.m_P);
+		//register_term("_C1", m_BC_dummy.m_N);
 
 		connect_late(m_RB.m_N, m_RC.m_N);
 
@@ -128,12 +128,12 @@ NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 	NETLIB_UPDATE_PARAMI();
 	NETLIB_UPDATE_TERMINALSI();
 
-	nld_twotermx m_RB;
-	nld_twotermx m_RC;
+	nld_twoterm m_RB;
+	nld_twoterm m_RC;
 
 	// FIXME: this is needed so we have all terminals belong to one net list
 
-	nld_twotermx m_BC_dummy;
+	nld_twoterm m_BC_dummy;
 
 protected:
 
@@ -155,20 +155,20 @@ NETLIB_OBJECT_DERIVED(QBJT_EB, QBJT)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(QBJT_EB, QBJT)
-		,   m_D_CB(*this, "m_D_CB")
-		,   m_D_EB(*this, "m_D_EB")
-		,   m_D_EC(*this, "m_D_EC")
+		,   m_D_CB(*this, "m_D_CB", true)
+		,   m_D_EB(*this, "m_D_EB", true)
+		,   m_D_EC(*this, "m_D_EC", true)
 		,   m_alpha_f(0)
 		,   m_alpha_r(0)
 	{
-		register_term("E", m_D_EB.m_P);   // Cathode
-		register_term("B", m_D_EB.m_N);   // Anode
+		register_subalias("E", m_D_EB.m_P);   // Cathode
+		register_subalias("B", m_D_EB.m_N);   // Anode
 
-		register_term("C", m_D_CB.m_P);   // Cathode
-		register_term("_B1", m_D_CB.m_N); // Anode
+		register_subalias("C", m_D_CB.m_P);   // Cathode
+		//register_term("_B1", m_D_CB.m_N); // Anode
 
-		register_term("_E1", m_D_EC.m_P);
-		register_term("_C1", m_D_EC.m_N);
+		//register_term("_E1", m_D_EC.m_P);
+		//register_term("_C1", m_D_EC.m_N);
 
 		connect_late(m_D_EB.m_P, m_D_EC.m_P);
 		connect_late(m_D_EB.m_N, m_D_CB.m_N);
@@ -189,9 +189,9 @@ protected:
 	generic_diode m_gD_BE;
 
 private:
-	nld_twotermx m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
-	nld_twotermx m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
-	nld_twotermx m_D_EC;  // 0, -gec, -gcc, 0 | 0
+	nld_twoterm m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
+	nld_twoterm m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
+	nld_twoterm m_D_EC;  // 0, -gec, -gcc, 0 | 0
 
 	nl_double m_alpha_f;
 	nl_double m_alpha_r;

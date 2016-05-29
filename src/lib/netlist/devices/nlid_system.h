@@ -261,7 +261,7 @@ namespace netlist
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(frontier, base_dummy)
 		, m_RIN(*this, "m_RIN")
-		, m_ROUT(*this, "m_ROUT")
+		, m_ROUT(*this, "m_ROUT", true)
 		, m_p_RIN(*this, "RIN", 1.0e6)
 		, m_p_ROUT(*this, "ROUT", 50.0)
 
@@ -272,8 +272,8 @@ namespace netlist
 			connect_late(m_I, m_RIN.m_P);
 
 			enregister("_Q", m_Q);
-			register_term("_OP", m_ROUT.m_P);
-			register_term("Q", m_ROUT.m_N);
+			register_subalias("_OP", m_ROUT.m_P);
+			register_subalias("Q", m_ROUT.m_N);
 			connect_late(m_Q, m_ROUT.m_P);
 		}
 
@@ -290,8 +290,8 @@ namespace netlist
 
 	private:
 		NETLIB_NAME(twoterm) m_RIN;
-		/* Fixme: only works if the device is timestepped */
-		NETLIB_NAME(twotermx) m_ROUT;
+		/* Fixme: only works if the device is time-stepped - need to rework */
+		NETLIB_NAME(twoterm) m_ROUT;
 		analog_input_t m_I;
 		analog_output_t m_Q;
 
