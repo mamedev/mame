@@ -42,108 +42,16 @@
 #ifndef NLD_7474_H_
 #define NLD_7474_H_
 
-#include "nl_base.h"
+#include "nl_setup.h"
 
-#define TTL_7474(name, cCLK, cD, cCLRQ, cPREQ)                                     \
-		NET_REGISTER_DEV(TTL_7474, name)                                               \
-		NET_CONNECT(name, CLK, cCLK)                                               \
-		NET_CONNECT(name, D,  cD)                                                  \
-		NET_CONNECT(name, CLRQ,  cCLRQ)                                            \
+#define TTL_7474(name, cCLK, cD, cCLRQ, cPREQ)                                  \
+		NET_REGISTER_DEV(TTL_7474, name)                                        \
+		NET_CONNECT(name, CLK, cCLK)                                            \
+		NET_CONNECT(name, D,  cD)                                               \
+		NET_CONNECT(name, CLRQ,  cCLRQ)                                         \
 		NET_CONNECT(name, PREQ,  cPREQ)
 
-#define TTL_7474_DIP(name)                                                         \
+#define TTL_7474_DIP(name)                                                      \
 		NET_REGISTER_DEV(TTL_7474_DIP, name)
-
-namespace netlist
-{
-	namespace devices
-	{
-
-NETLIB_OBJECT(7474sub)
-{
-	NETLIB_CONSTRUCTOR(7474sub)
-	, m_nextD(0)
-	{
-		enregister("CLK",  m_CLK);
-
-		enregister("Q",   m_Q);
-		enregister("QQ",  m_QQ);
-
-		save(NLNAME(m_nextD));
-	}
-
-	NETLIB_RESETI();
-	NETLIB_UPDATEI();
-
-public:
-	logic_input_t m_CLK;
-	logic_output_t m_Q;
-	logic_output_t m_QQ;
-	INT8 m_nextD;
-
-	ATTR_HOT inline void newstate(const UINT8 stateQ, const UINT8 stateQQ);
-
-private:
-
-};
-
-NETLIB_OBJECT(7474)
-{
-	NETLIB_CONSTRUCTOR(7474)
-	, sub(*this, "sub")
-	{
-		register_subalias("CLK",    sub.m_CLK);
-		enregister("D",         m_D);
-		enregister("CLRQ",      m_CLRQ);
-		enregister("PREQ",      m_PREQ);
-
-		register_subalias("Q",      sub.m_Q);
-		register_subalias("QQ",     sub.m_QQ);
-	}
-
-	NETLIB_RESETI();
-	NETLIB_UPDATEI();
-
-public:
-	NETLIB_SUB(7474sub) sub;
-
-	logic_input_t m_D;
-	logic_input_t m_CLRQ;
-	logic_input_t m_PREQ;
-};
-
-NETLIB_OBJECT(7474_dip)
-{
-	NETLIB_CONSTRUCTOR(7474_dip)
-	, m_1(*this, "1")
-	, m_2(*this, "2")
-	{
-
-		register_subalias("1", m_1.m_CLRQ);
-		register_subalias("2", m_1.m_D);
-		register_subalias("3", m_1.sub.m_CLK);
-		register_subalias("4", m_1.m_PREQ);
-		register_subalias("5", m_1.sub.m_Q);
-		register_subalias("6", m_1.sub.m_QQ);
-		// register_subalias("7", ); ==> GND
-
-		register_subalias("8", m_2.sub.m_QQ);
-		register_subalias("9", m_2.sub.m_Q);
-		register_subalias("10", m_2.m_PREQ);
-		register_subalias("11", m_2.sub.m_CLK);
-		register_subalias("12", m_2.m_D);
-		register_subalias("13", m_2.m_CLRQ);
-		// register_subalias("14", ); ==> VCC
-	}
-	NETLIB_UPDATEI();
-	NETLIB_RESETI();
-
-private:
-	NETLIB_SUB(7474) m_1;
-	NETLIB_SUB(7474) m_2;
-};
-
-	} //namespace devices
-} // namespace netlist
 
 #endif /* NLD_7474_H_ */
