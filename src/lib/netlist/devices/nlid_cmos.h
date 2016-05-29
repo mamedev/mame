@@ -9,7 +9,6 @@
 #define NLID_CMOS_H_
 
 #include "nl_base.h"
-#include "analog/nld_twoterm.h"
 
 namespace netlist
 {
@@ -19,9 +18,9 @@ namespace netlist
 	NETLIB_OBJECT(vdd_vss)
 	{
 		NETLIB_CONSTRUCTOR(vdd_vss)
+		, m_vdd(*this, "VDD")
+		, m_vss(*this, "VSS")
 		{
-			enregister("VDD", m_vdd);
-			enregister("VSS", m_vss);
 		}
 
 		NETLIB_UPDATEI() {};

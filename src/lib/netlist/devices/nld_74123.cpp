@@ -24,22 +24,19 @@ namespace netlist
 		, m_dev_type(dev_type)
 		, m_RP(*this, "RP")
 		, m_RN(*this, "RN")
+		, m_RP_Q(*this, "_RP_Q")
+		, m_RN_Q(*this, "_RN_Q")
+		, m_A(*this, "A")
+		, m_B(*this, "B")
+		, m_CLRQ(*this, "CLRQ")
+		, m_Q(*this, "Q")
+		, m_QQ(*this, "QQ")
+		, m_CV(*this, "_CV") // internal
 		, m_K(*this, "K", (m_dev_type == 4538) ? 0.4 : 0.4)
 		, m_RI(*this, "RI", 400.0) // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
 		{
 			if ((m_dev_type != 9602) && (m_dev_type != 4538) )
 				m_dev_type = 74123;
-
-			enregister("A", m_A);
-			enregister("B", m_B);
-			enregister("CLRQ", m_CLRQ);
-			enregister("Q", m_Q);
-			enregister("QQ", m_QQ);
-
-			enregister("_RP_Q", m_RP_Q); // internal
-			enregister("_RN_Q", m_RN_Q); // internal
-
-			enregister("_CV", m_CV); // internal
 
 			register_subalias("GND", m_RN.m_R.m_N);
 			register_subalias("VCC", m_RP.m_R.m_P);

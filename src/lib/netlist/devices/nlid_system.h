@@ -45,9 +45,9 @@ namespace netlist
 	NETLIB_OBJECT(mainclock)
 	{
 		NETLIB_CONSTRUCTOR(mainclock)
+		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5)
 		{
-			enregister("Q", m_Q);
 
 			m_inc = netlist_time::from_hz(m_freq.Value()*2);
 		}
@@ -86,11 +86,10 @@ namespace netlist
 	NETLIB_OBJECT(clock)
 	{
 		NETLIB_CONSTRUCTOR(clock)
+		, m_feedback(*this, "FB")
+		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
-
 		{
-			enregister("Q", m_Q);
-			enregister("FB", m_feedback);
 
 			m_inc = netlist_time::from_hz(m_freq.Value()*2);
 
@@ -118,10 +117,9 @@ namespace netlist
 		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
 		, m_pattern(*this, "PATTERN", "1,1")
 		, m_offset(*this, "OFFSET", 0.0)
+		, m_feedback(*this, "FB")
+		, m_Q(*this, "Q")
 		{
-			enregister("Q", m_Q);
-			enregister("FB", m_feedback);
-
 			m_inc[0] = netlist_time::from_hz(m_freq.Value()*2);
 
 			connect_late(m_feedback, m_Q);
@@ -173,14 +171,14 @@ namespace netlist
 	NETLIB_OBJECT(logic_input)
 	{
 		NETLIB_CONSTRUCTOR(logic_input)
+		, m_Q(*this, "Q")
 		, m_IN(*this, "IN", 0)
 		/* make sure we get the family first */
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
 			set_logic_family(netlist().setup().family_from_model(m_FAMILY.Value()));
-
-			enregister("Q", m_Q);
 		}
+
 		NETLIB_UPDATE_AFTER_PARAM_CHANGE()
 
 		NETLIB_UPDATEI();
@@ -197,9 +195,9 @@ namespace netlist
 	NETLIB_OBJECT(analog_input)
 	{
 		NETLIB_CONSTRUCTOR(analog_input)
+		, m_Q(*this, "Q")
 		, m_IN(*this, "IN", 0.0)
 		{
-			enregister("Q", m_Q);
 		}
 		NETLIB_UPDATE_AFTER_PARAM_CHANGE()
 
@@ -218,8 +216,8 @@ namespace netlist
 	NETLIB_OBJECT(gnd)
 	{
 		NETLIB_CONSTRUCTOR(gnd)
+		, m_Q(*this, "Q")
 		{
-			enregister("Q", m_Q);
 		}
 		NETLIB_UPDATEI()
 		{
@@ -238,8 +236,8 @@ namespace netlist
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(dummy_input, base_dummy)
+		, m_I(*this, "I")
 		{
-			enregister("I", m_I);
 		}
 
 	protected:
@@ -260,20 +258,20 @@ namespace netlist
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(frontier, base_dummy)
-		, m_RIN(netlist(), "m_RIN")
-		, m_ROUT(netlist(), "m_ROUT")
+		, m_RIN(*this, "m_RIN")
+		, m_ROUT(*this, "m_ROUT", true)
+		, m_I(*this, "_I")
+		, m_Q(*this, "_Q")
 		, m_p_RIN(*this, "RIN", 1.0e6)
 		, m_p_ROUT(*this, "ROUT", 50.0)
 
 		{
-			enregister("_I", m_I);
-			enregister("I",m_RIN.m_P);
-			enregister("G",m_RIN.m_N);
+			register_subalias("I", m_RIN.m_P);
+			register_subalias("G", m_RIN.m_N);
 			connect_late(m_I, m_RIN.m_P);
 
-			enregister("_Q", m_Q);
-			enregister("_OP",m_ROUT.m_P);
-			enregister("Q",m_ROUT.m_N);
+			register_subalias("_OP", m_ROUT.m_P);
+			register_subalias("Q", m_ROUT.m_N);
 			connect_late(m_Q, m_ROUT.m_P);
 		}
 
@@ -290,6 +288,7 @@ namespace netlist
 
 	private:
 		NETLIB_NAME(twoterm) m_RIN;
+		/* Fixme: only works if the device is time-stepped - need to rework */
 		NETLIB_NAME(twoterm) m_ROUT;
 		analog_input_t m_I;
 		analog_output_t m_Q;
@@ -309,11 +308,11 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(function)
 		, m_N(*this, "N", 2)
 		, m_func(*this, "FUNC", "")
+		, m_Q(*this, "Q")
 		{
-			enregister("Q", m_Q);
 
 			for (int i=0; i < m_N; i++)
-				enregister(plib::pfmt("A{1}")(i), m_I[i]);
+				m_I.emplace(i, *this, plib::pfmt("A{1}")(i));
 
 			plib::pstring_vector_t cmds(m_func.Value(), " ");
 			m_precompiled.clear();
@@ -376,7 +375,7 @@ namespace netlist
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
-		analog_input_t m_I[10];
+		plib::uninitialised_array_t<analog_input_t, 10> m_I;
 
 		plib::pvector_t<rpn_inst> m_precompiled;
 	};
@@ -390,12 +389,11 @@ namespace netlist
 	public:
 		NETLIB_CONSTRUCTOR(res_sw)
 		, m_R(*this, "R")
+		, m_I(*this, "I")
 		, m_RON(*this, "RON", 1.0)
 		, m_ROFF(*this, "ROFF", 1.0E20)
 		, m_last_state(0)
 		{
-			enregister("I", m_I);
-
 			register_subalias("1", m_R.m_P);
 			register_subalias("2", m_R.m_N);
 
@@ -462,9 +460,9 @@ namespace netlist
 	public:
 		nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied)
 				: nld_base_proxy(anetlist, name, in_proxied, &m_I)
+		, m_I(*this, "I")
+		, m_Q(*this, "Q")
 		{
-			enregister("I", m_I);
-			enregister("Q", m_Q);
 		}
 
 		virtual ~nld_a_to_d_proxy() {}
@@ -503,9 +501,9 @@ namespace netlist
 
 	protected:
 		nld_base_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied, core_terminal_t &proxy_out)
-				: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
+		: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
+		, m_I(*this, "I")
 		{
-			enregister("I", m_I);
 		}
 
 		logic_input_t m_I;
@@ -518,18 +516,18 @@ namespace netlist
 	public:
 		nld_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied)
 		: nld_base_d_to_a_proxy(anetlist, name, out_proxied, m_RV.m_P)
+		, m_GNDHack(*this, "_Q")
 		, m_RV(*this, "RV")
 		, m_last_state(-1)
 		, m_is_timestep(false)
 		{
 			//register_sub(m_RV);
-			enregister("1", m_RV.m_P);
-			enregister("2", m_RV.m_N);
+			//register_term("1", m_RV.m_P);
+			//register_term("2", m_RV.m_N);
 
-			enregister("_Q", m_Q);
 			register_subalias("Q", m_RV.m_P);
 
-			connect_late(m_RV.m_N, m_Q);
+			connect_late(m_RV.m_N, m_GNDHack);
 
 			save(NLNAME(m_last_state));
 		}
@@ -542,7 +540,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	private:
-		analog_output_t m_Q;
+		analog_output_t m_GNDHack;  // FIXME: LOng term, we need to connect proxy gnd to device gnd
 		NETLIB_SUB(twoterm) m_RV;
 		int m_last_state;
 		bool m_is_timestep;

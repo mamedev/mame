@@ -15,19 +15,11 @@ namespace netlist
 	NETLIB_OBJECT(74175_sub)
 	{
 		NETLIB_CONSTRUCTOR(74175_sub)
+		, m_CLK(*this, "CLK")
+		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4"})
+		, m_QQ(*this, {"Q1Q", "Q2Q", "Q3Q", "Q4Q"})
 		, m_data(0)
 		{
-			enregister("CLK",   m_CLK);
-
-			enregister("Q1",   m_Q[0]);
-			enregister("Q1Q",  m_QQ[0]);
-			enregister("Q2",   m_Q[1]);
-			enregister("Q2Q",  m_QQ[1]);
-			enregister("Q3",   m_Q[2]);
-			enregister("Q3Q",  m_QQ[2]);
-			enregister("Q4",   m_Q[3]);
-			enregister("Q4Q",  m_QQ[3]);
-
 			save(NLNAME(m_clrq));
 			save(NLNAME(m_data));
 		}
@@ -37,8 +29,8 @@ namespace netlist
 
 	public:
 		logic_input_t m_CLK;
-		logic_output_t m_Q[4];
-		logic_output_t m_QQ[4];
+		object_array_t<logic_output_t, 4> m_Q;
+		object_array_t<logic_output_t, 4> m_QQ;
 
 		netlist_sig_t m_clrq;
 		UINT8 m_data;
@@ -48,24 +40,21 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(74175)
 		, m_sub(*this, "sub")
+		, m_D(*this, {"D1", "D2", "D3", "D4"})
+		, m_CLRQ(*this, "CLRQ")
 		{
 			register_subalias("CLK",   m_sub.m_CLK);
 
-			enregister("CLRQ",  m_CLRQ);
 
-			enregister("D1",    m_D[0]);
 			register_subalias("Q1",   m_sub.m_Q[0]);
 			register_subalias("Q1Q",  m_sub.m_QQ[0]);
 
-			enregister("D2",    m_D[1]);
 			register_subalias("Q2",   m_sub.m_Q[1]);
 			register_subalias("Q2Q",  m_sub.m_QQ[1]);
 
-			enregister("D3",    m_D[2]);
 			register_subalias("Q3",   m_sub.m_Q[2]);
 			register_subalias("Q3Q",  m_sub.m_QQ[2]);
 
-			enregister("D4",    m_D[3]);
 			register_subalias("Q4",   m_sub.m_Q[3]);
 			register_subalias("Q4Q",  m_sub.m_QQ[3]);
 		}
@@ -75,7 +64,7 @@ namespace netlist
 
 	protected:
 		NETLIB_SUB(74175_sub) m_sub;
-		logic_input_t m_D[4];
+		object_array_t<logic_input_t, 4> m_D;
 		logic_input_t m_CLRQ;
 	};
 

@@ -359,14 +359,9 @@ namespace netlist
 			QUEUE    = 6
 		};
 
-		ATTR_COLD object_t(const type_t atype);
-		ATTR_COLD object_t(netlist_t &nl, const type_t atype);
 		ATTR_COLD object_t(netlist_t &nl, const pstring &aname, const type_t atype);
 
 		virtual ~object_t();
-
-		ATTR_COLD void init_object(netlist_t &nl, const pstring &aname);
-		ATTR_COLD bool isInitialized() { return (m_netlist != nullptr); }
 
 		ATTR_COLD const pstring &name() const;
 
@@ -388,7 +383,7 @@ namespace netlist
 
 		virtual void reset() { }
 		// must call parent save_register !
-		virtual void save_register() { }
+		//virtual void save_register() { }
 
 	private:
 		pstring m_name;
@@ -410,10 +405,7 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(device_object_t)
 	public:
-		ATTR_COLD device_object_t(const type_t atype);
-
-		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
-
+		ATTR_COLD device_object_t(core_device_t &dev, const pstring &aname, const type_t atype);
 		ATTR_HOT core_device_t &device() const { return *m_device; }
 	private:
 		core_device_t * m_device;
@@ -442,8 +434,7 @@ namespace netlist
 			STATE_NONEX = 256
 		};
 
-
-		ATTR_COLD core_terminal_t(const type_t atype);
+		ATTR_COLD core_terminal_t(core_device_t &dev, const pstring &aname, const type_t atype);
 
 		ATTR_COLD void set_net(net_t *anet);
 		ATTR_COLD void clear_net();
@@ -463,13 +454,6 @@ namespace netlist
 			m_state = astate;
 		}
 
-	protected:
-		virtual void save_register() override
-		{
-			save(NLNAME(m_state));
-			device_object_t::save_register();
-		}
-
 	private:
 		net_t * m_net;
 		state_e m_state;
@@ -483,9 +467,8 @@ namespace netlist
 	{
 	public:
 
-
-		ATTR_COLD analog_t(const type_t atype)
-			: core_terminal_t(atype)
+		ATTR_COLD analog_t(core_device_t &dev, const pstring &aname, const type_t atype)
+		: core_terminal_t(dev, aname, atype)
 		{
 		}
 
@@ -512,7 +495,7 @@ namespace netlist
 
 		using list_t = plib::pvector_t<terminal_t *>;
 
-		ATTR_COLD terminal_t();
+		ATTR_COLD terminal_t(core_device_t &dev, const pstring &aname);
 
 		terminal_t *m_otherterm;
 
@@ -548,8 +531,6 @@ namespace netlist
 		}
 
 	protected:
-		virtual void save_register() override;
-
 		virtual void reset() override;
 	private:
 		ATTR_HOT void set_ptr(nl_double *ptr, const nl_double val)
@@ -574,10 +555,8 @@ namespace netlist
 	class logic_t : public core_terminal_t, public logic_family_t
 	{
 	public:
-
-
-		ATTR_COLD logic_t(const type_t atype)
-			: core_terminal_t(atype), logic_family_t(),
+		ATTR_COLD logic_t(core_device_t &dev, const pstring &aname, const type_t atype)
+			: core_terminal_t(dev, aname, atype), logic_family_t(),
 				m_proxy(nullptr)
 		{
 		}
@@ -603,14 +582,9 @@ namespace netlist
 	class logic_input_t : public logic_t
 	{
 	public:
-		ATTR_COLD logic_input_t()
-			: logic_t(INPUT)
-		{
-			set_state(STATE_INP_ACTIVE);
-		}
+		ATTR_COLD logic_input_t(core_device_t &dev, const pstring &aname);
 
 		ATTR_HOT  netlist_sig_t Q() const;
-		ATTR_HOT  netlist_sig_t last_Q() const;
 
 		ATTR_HOT  void inactivate();
 		ATTR_HOT  void activate();
@@ -633,12 +607,7 @@ namespace netlist
 	class analog_input_t : public analog_t
 	{
 	public:
-		ATTR_COLD analog_input_t()
-			: analog_t(INPUT)
-		{
-			set_state(STATE_INP_ACTIVE);
-		}
-
+		ATTR_COLD analog_input_t(core_device_t &dev, const pstring &aname);
 		ATTR_HOT  nl_double Q_Analog() const;
 
 	protected:
@@ -650,7 +619,7 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
-	// net_net_t
+	// net_t
 	// -----------------------------------------------------------------------------
 
 	class net_t : public object_t
@@ -661,10 +630,8 @@ namespace netlist
 		using ptr_t = net_t *;
 		using list_t = plib::pvector_t<std::shared_ptr<net_t>>;
 
-		ATTR_COLD net_t();
+		ATTR_COLD net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~net_t();
-
-		ATTR_COLD void init_object(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 
 		ATTR_COLD void register_con(core_terminal_t &terminal);
 		ATTR_COLD void merge_net(net_t *othernet);
@@ -713,7 +680,6 @@ namespace netlist
 
 	protected:  //FIXME: needed by current solver code
 
-		virtual void save_register() override;
 		virtual void reset() override;
 
 		netlist_sig_t m_new_Q;
@@ -743,7 +709,7 @@ namespace netlist
 
 		using list_t = plib::pvector_t<logic_net_t *>;
 
-		ATTR_COLD logic_net_t();
+		ATTR_COLD logic_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t() { };
 
 		ATTR_HOT  netlist_sig_t Q() const
@@ -786,9 +752,7 @@ namespace netlist
 
 	protected:  //FIXME: needed by current solver code
 
-		virtual void save_register() override;
 		virtual void reset() override;
-
 
 	private:
 
@@ -803,8 +767,7 @@ namespace netlist
 
 		using list_t =  plib::pvector_t<analog_net_t *>;
 
-		ATTR_COLD analog_net_t();
-		ATTR_COLD analog_net_t(netlist_t &nl, const pstring &aname);
+		ATTR_COLD analog_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 
 		virtual ~analog_net_t() { };
 
@@ -825,7 +788,6 @@ namespace netlist
 
 	protected:
 
-		virtual void save_register() override;
 		virtual void reset() override;
 
 
@@ -846,9 +808,8 @@ namespace netlist
 		P_PREVENT_COPYING(logic_output_t)
 	public:
 
-		ATTR_COLD logic_output_t();
+		ATTR_COLD logic_output_t(core_device_t &dev, const pstring &aname);
 
-		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
 		virtual void reset() override
 		{
 			set_state(STATE_OUT);
@@ -871,9 +832,7 @@ namespace netlist
 	public:
 
 		ATTR_COLD analog_output_t(core_device_t &dev, const pstring &aname);
-		ATTR_COLD analog_output_t();
 
-		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
 		virtual void reset() override
 		{
 			set_state(STATE_OUT);
@@ -1006,8 +965,6 @@ namespace netlist
 
 		ATTR_HOT  netlist_sig_t INPLOGIC(const logic_input_t &inp) const
 		{
-			//if (inp.state() == logic_t::STATE_INP_PASSIVE)
-			//	printf("argh input %s\n", inp.name().cstr());
 			nl_assert(inp.state() != logic_t::STATE_INP_PASSIVE);
 			return inp.Q();
 		}
@@ -1107,11 +1064,11 @@ namespace netlist
 
 		ATTR_COLD void register_subalias(const pstring &name, core_terminal_t &term);
 		ATTR_COLD void register_subalias(const pstring &name, const pstring &aliased);
-		ATTR_COLD void enregister(const pstring &name, terminal_t &port) { register_p(name, port); }
-		ATTR_COLD void enregister(const pstring &name, analog_output_t &out) { register_p(name, out); };
-		ATTR_COLD void enregister(const pstring &name, logic_output_t &out) { register_p(name, out); };
-		ATTR_COLD void enregister(const pstring &name, analog_input_t &in) { register_p(name, in); };
-		ATTR_COLD void enregister(const pstring &name, logic_input_t &in) { register_p(name, in); };
+		//ATTR_COLD void register_term(const pstring &name, terminal_t &port) { register_p(name, port); }
+		//ATTR_COLD void enregister(const pstring &name, analog_output_t &out) { register_p(name, out); };
+		//ATTR_COLD void enregister(const pstring &name, logic_output_t &out) { register_p(name, out); };
+		//ATTR_COLD void enregister(const pstring &name, analog_input_t &in) { register_p(name, in); };
+		//ATTR_COLD void enregister(const pstring &name, logic_input_t &in) { register_p(name, in); };
 
 		ATTR_COLD void connect_late(const pstring &t1, const pstring &t2);
 		ATTR_COLD void connect_late(core_terminal_t &t1, core_terminal_t &t2);
@@ -1299,6 +1256,24 @@ protected:
 		plib::dynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
 	};
 
+	// -----------------------------------------------------------------------------
+	// Support classes for devices
+	// -----------------------------------------------------------------------------
+
+	template<class C, int N>
+	class object_array_t : public plib::uninitialised_array_t<C, N>
+	{
+	public:
+		struct init
+		{
+			const char *p[N];
+		};
+		object_array_t(core_device_t &dev, init names)
+		{
+			for (std::size_t i = 0; i<N; i++)
+				this->emplace(i, dev, names.p[i]);
+		}
+	};
 
 	// -----------------------------------------------------------------------------
 	// inline implementations

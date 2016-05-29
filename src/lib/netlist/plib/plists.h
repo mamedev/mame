@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <stack>
 #include <vector>
+#include <type_traits>
 
 #include "palloc.h"
 #include "pstring.h"
@@ -105,22 +106,25 @@ public:
 	~uninitialised_array_t()
 	{
 		for (std::size_t i=0; i<N; i++)
-		{
-			C &r = (*this)[i];
-			r.~C();
-		}
+			(*this)[i].~C();
 	}
 
 	size_t size() { return N; }
 
 	C& operator[](const std::size_t &index)
 	{
-		return *reinterpret_cast<C *>(reinterpret_cast<char *>(m_buf) + index * sizeof(C));
+		return *reinterpret_cast<C *>(&m_buf[index]);
 	}
 
 	const C& operator[](const std::size_t &index) const
 	{
-		return *reinterpret_cast<C *>(reinterpret_cast<char *>(m_buf) + index * sizeof(C));
+		return *reinterpret_cast<C *>(&m_buf[index]);
+	}
+
+	template<typename... Args>
+	void emplace(const std::size_t index, Args&&... args)
+	{
+		new (&m_buf[index]) C(std::forward<Args>(args)...);
 	}
 
 protected:
@@ -128,7 +132,7 @@ protected:
 private:
 
 	/* ensure proper alignment */
-	UINT64 m_buf[(N * sizeof(C) + sizeof(UINT64) - 1) / sizeof(UINT64)];
+	typename std::aligned_storage<sizeof(C), alignof(C)>::type m_buf[N];
 };
 
 // ----------------------------------------------------------------------------------------

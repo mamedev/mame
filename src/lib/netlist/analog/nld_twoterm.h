@@ -105,8 +105,9 @@ namespace netlist
 
 NETLIB_OBJECT(twoterm)
 {
-public:
-	NETLIB_CONSTRUCTOR(twoterm)
+	NETLIB_CONSTRUCTOR_EX(twoterm, bool terminals_owned = false)
+	, m_P(bselect(terminals_owned, owner, *this), (terminals_owned ? name + "." : "") + "1")
+	, m_N(bselect(terminals_owned, owner, *this), (terminals_owned ? name + "." : "") + "2")
 	{
 		m_P.m_otherterm = &m_N;
 		m_N.m_otherterm = &m_P;
@@ -115,8 +116,8 @@ public:
 	terminal_t m_P;
 	terminal_t m_N;
 
-	NETLIB_UPDATE_TERMINALSI() { }
-	NETLIB_RESETI() { }
+	//NETLIB_UPDATE_TERMINALSI() { }
+	//NETLIB_RESETI() { }
 	NETLIB_UPDATEI();
 
 public:
@@ -140,7 +141,14 @@ public:
 	}
 
 private:
+	template <class C>
+	static core_device_t &bselect(bool b, C &d1, core_device_t &d2)
+	{
+		core_device_t *h = dynamic_cast<core_device_t *>(&d1);
+		return b ? *h : d2;
+	}
 };
+
 
 // -----------------------------------------------------------------------------
 // nld_R
@@ -150,8 +158,6 @@ NETLIB_OBJECT_DERIVED(R_base, twoterm)
 {
 	NETLIB_CONSTRUCTOR_DERIVED(R_base, twoterm)
 	{
-		enregister("1", m_P);
-		enregister("2", m_N);
 	}
 
 public:
@@ -272,8 +278,8 @@ public:
 	, m_C(*this, "C", 1e-6)
 	, m_GParallel(0.0)
 	{
-		enregister("1", m_P);
-		enregister("2", m_N);
+		//register_term("1", m_P);
+		//register_term("2", m_N);
 	}
 
 	NETLIB_TIMESTEP()
@@ -380,8 +386,8 @@ public:
 	NETLIB_CONSTRUCTOR_DERIVED(D, twoterm)
 	, m_model(*this, "MODEL", "")
 	{
-		enregister("A", m_P);
-		enregister("K", m_N);
+		register_subalias("A", m_P);
+		register_subalias("K", m_N);
 
 		m_D.save("m_D", *this);
 	}
@@ -415,8 +421,8 @@ public:
 	, m_V(*this, "V", 0.0)
 	{
 
-		enregister("P", m_P);
-		enregister("N", m_N);
+		register_subalias("P", m_P);
+		register_subalias("N", m_N);
 	}
 
 protected:
@@ -437,8 +443,8 @@ public:
 	NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
 	, m_I(*this, "I", 1.0)
 	{
-		enregister("P", m_P);
-		enregister("N", m_N);
+		register_subalias("P", m_P);
+		register_subalias("N", m_N);
 	}
 
 	NETLIB_UPDATEI();

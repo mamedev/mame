@@ -165,15 +165,16 @@ public:
 
 		for (unsigned i=0; i < m_NI; i++)
 		{
-			new (&m_I[i]) logic_input_t();
+			//new (&m_I[i]) logic_input_t();
 			inout[i] = inout[i].trim();
-			enregister(inout[i], m_I[i]);
+			m_I.emplace(i, *this, inout[i]);
 		}
 		for (unsigned i=0; i < m_NO; i++)
 		{
-			new (&m_Q[i]) logic_output_t();
+			//new (&m_Q[i]) logic_output_t();
 			out[i] = out[i].trim();
-			enregister(out[i], m_Q[i]);
+			m_Q.emplace(i, *this, out[i]);
+			//enregister(out[i], m_Q[i]);
 		}
 		// Connect output "Q" to input "_Q" if this exists
 		// This enables timed state without having explicit state ....

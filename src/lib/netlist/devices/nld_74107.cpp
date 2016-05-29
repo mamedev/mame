@@ -15,15 +15,14 @@ namespace netlist
 	NETLIB_OBJECT(74107Asub)
 	{
 		NETLIB_CONSTRUCTOR(74107Asub)
+		, m_clk(*this, "CLK")
+		, m_Q(*this, "Q")
+		, m_QQ(*this, "QQ")
 		, m_Q1(0)
 		, m_Q2(0)
 		, m_F(0)
 
 		{
-			enregister("CLK", m_clk);
-			enregister("Q", m_Q);
-			enregister("QQ", m_QQ);
-
 			save(NLNAME(m_Q1));
 			save(NLNAME(m_Q2));
 			save(NLNAME(m_F));
@@ -50,12 +49,11 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(74107A)
 		, m_sub(*this, "sub")
+		, m_J(*this, "J")
+		, m_K(*this, "K")
+		, m_clrQ(*this, "CLRQ")
 		{
-
 			register_subalias("CLK", m_sub.m_clk);
-			enregister("J", m_J);
-			enregister("K", m_K);
-			enregister("CLRQ", m_clrQ);
 			register_subalias("Q", m_sub.m_Q);
 			register_subalias("QQ", m_sub.m_QQ);
 		}

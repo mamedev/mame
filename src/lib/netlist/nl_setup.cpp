@@ -105,7 +105,6 @@ void setup_t::register_dev(plib::owned_ptr<device_t> dev)
 	for (auto & d : netlist().m_devices)
 		if (d->name() == dev->name())
 			log().fatal("Error adding {1} to device list. Duplicate name \n", d->name());
-
 	netlist().m_devices.push_back(std::move(dev));
 }
 
@@ -245,7 +244,7 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 		log().fatal("Error adding parameter {1} to parameter list\n", name);
 }
 
-void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
+void setup_t::register_object(object_t &obj)
 {
 	switch (obj.type())
 	{
@@ -256,36 +255,18 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 				core_terminal_t &term = dynamic_cast<core_terminal_t &>(obj);
 				if (term.isType(terminal_t::OUTPUT))
 				{
-					if (term.is_logic())
-					{
-						logic_output_t &port = dynamic_cast<logic_output_t &>(term);
-						port.set_logic_family(dev.logic_family());
-						dynamic_cast<logic_output_t &>(term).init_object(dev, dev.name() + "." + name);
-					}
-					else if (term.is_analog())
-						dynamic_cast<analog_output_t &>(term).init_object(dev, dev.name() + "." + name);
-					else
-						log().fatal("Error adding {1} {2} to terminal list, neither LOGIC nor ANALOG\n", objtype_as_astr(term), term.name());
 				}
 				else if (term.isType(terminal_t::INPUT))
 				{
-					if (term.is_logic())
-					{
-						logic_input_t &port = dynamic_cast<logic_input_t &>(term);
-						port.set_logic_family(dev.logic_family());
-					}
-					term.init_object(dev, dev.name() + "." + name);
-					dev.m_terminals.push_back(obj.name());
+					static_cast<device_t &>(term.device()).m_terminals.push_back(obj.name());
 				}
 				else
 				{
-					term.init_object(dev, dev.name() + "." + name);
-					dev.m_terminals.push_back(obj.name());
+					static_cast<device_t &>(term.device()).m_terminals.push_back(obj.name());
 				}
-
 				if (!m_terminals.add(term.name(), &term))
-					log().fatal("Error adding {1} {2} to terminal list\n", objtype_as_astr(term), term.name());
-				log().debug("{1} {2}\n", objtype_as_astr(term), name);
+					log().fatal("Error adding {1} {2} to terminal list\n", objtype_as_astr(obj), obj.name());
+				log().debug("{1} {2}\n", objtype_as_astr(obj), obj.name());
 			}
 			break;
 		case terminal_t::NET:
@@ -297,10 +278,10 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 			}
 			break;
 		case terminal_t::DEVICE:
-			log().fatal("Device registration not yet supported - {1}\n", name);
+			log().fatal("Device registration not yet supported - {1}\n", obj.name());
 			break;
 		case terminal_t::QUEUE:
-			log().fatal("QUEUE registration not yet supported - {1}\n", name);
+			log().fatal("QUEUE registration not yet supported - {1}\n", obj.name());
 			break;
 	}
 }

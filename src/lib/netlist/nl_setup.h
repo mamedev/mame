@@ -113,7 +113,7 @@ namespace netlist
 
 		void register_and_set_param(pstring name, param_t &param);
 
-		void register_object(device_t &dev, const pstring &name, object_t &obj);
+		void register_object(object_t &obj);
 
 		template<class NETLIST_X>
 		void register_dev_s(plib::owned_ptr<NETLIST_X> dev)

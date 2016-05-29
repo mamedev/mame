@@ -20,8 +20,8 @@ namespace netlist
 	NETLIB_OBJECT(log)
 	{
 		NETLIB_CONSTRUCTOR(log)
+		, m_I(*this, "I")
 		{
-			enregister("I", m_I);
 
 			pstring filename = plib::pfmt("{1}.log")(this->name());
 			m_strm = plib::make_unique<plib::pofilestream>(filename);
@@ -42,8 +42,8 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(logD, log)
 	{
 		NETLIB_CONSTRUCTOR_DERIVED(logD, log)
+		, m_I2(*this, "I2")
 		{
-			enregister("I2", m_I2);
 		}
 
 		NETLIB_UPDATEI()

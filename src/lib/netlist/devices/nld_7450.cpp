@@ -15,12 +15,12 @@ namespace netlist
 	NETLIB_OBJECT(7450)
 	{
 		NETLIB_CONSTRUCTOR(7450)
+		, m_A(*this, "A")
+		, m_B(*this, "B")
+		, m_C(*this, "C")
+		, m_D(*this, "D")
+		, m_Q(*this, "Q")
 		{
-			enregister("A", m_A);
-			enregister("B", m_B);
-			enregister("C", m_C);
-			enregister("D", m_D);
-			enregister("Q", m_Q);
 		}
 		//NETLIB_RESETI();
 		NETLIB_UPDATEI();

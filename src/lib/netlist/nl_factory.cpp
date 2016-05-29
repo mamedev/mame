@@ -45,23 +45,6 @@ factory_list_t::~factory_list_t()
 	clear();
 }
 
-#if 0
-device_t *factory_list_t::new_device_by_classname(const pstring &classname) const
-{
-	for (std::size_t i=0; i < m_list.size(); i++)
-	{
-		base_factory_t *p = m_list[i];
-		if (p->classname() == classname)
-		{
-			device_t *ret = p->Create();
-			return ret;
-		}
-		p++;
-	}
-	return nullptr; // appease code analysis
-}
-#endif
-
 void factory_list_t::error(const pstring &s)
 {
 	m_setup.log().fatal("{1}", s);

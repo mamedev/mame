@@ -50,13 +50,12 @@ namespace netlist
 	NETLIB_OBJECT(SN74LS629clk)
 	{
 		NETLIB_CONSTRUCTOR(SN74LS629clk)
+		, m_FB(*this, "FB")
+		, m_Y(*this, "Y")
 		, m_enableq(1)
 		, m_out(0)
 		, m_inc(netlist_time::zero)
 		{
-			enregister("FB",    m_FB);
-			enregister("Y",    m_Y);
-
 			connect_late(m_FB, m_Y);
 
 			save(NLNAME(m_enableq));
@@ -88,11 +87,11 @@ namespace netlist
 		, m_clock(*this, "OSC")
 		, m_R_FC(*this, "R_FC")
 		, m_R_RNG(*this, "R_RNG")
+		, m_ENQ(*this, "ENQ")
+		, m_RNG(*this, "RNG")
+		, m_FC(*this, "FC")
 		, m_CAP(*this, "CAP", 1e-6)
 		{
-			enregister("ENQ", m_ENQ);
-			enregister("RNG",    m_RNG);
-			enregister("FC",     m_FC);
 			register_subalias("GND",    m_R_FC.m_N);
 
 			connect_late(m_FC, m_R_FC.m_P);
