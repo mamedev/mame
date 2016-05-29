@@ -13961,11 +13961,20 @@ ROM_END
   Probably tracing pin connections to the HX881 will confirm it.
 
 
-  You can switch the games pulsing their respective hidden buttons.
-
   Hidden Switch:
 
-  Unknown, yet...
+  You can enter Cherry Master mode in same way like other Tetris versions.
+
+  One wire goes to edge connector 35 + 36 (solder side), putting PPI (u34)
+  pin 14 (PC0) to GND (needed to get the switch working).
+
+  One button adds GND to the edge connector 8 (solder side):
+  PPI pin 18 (PB0), to switch to Tetris game.
+
+  The other button, adds GND to the edge connector 7 (solder side):
+  PPI pin 19 (PB1), to switch to Cherry Master game.
+
+  Need proper implementation.
 
 */
 ROM_START( cmtetrsb )
