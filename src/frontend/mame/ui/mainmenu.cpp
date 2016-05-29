@@ -244,7 +244,7 @@ void menu_main::handle()
 			break;
 
 		case SELECT_GAME:
-			if (strcmp(machine().options().ui(),"simple")==0)
+			if (machine().options().ui() == emu_options::UI_SIMPLE)
 				menu::stack_push<simple_menu_select_game>(ui(), container, nullptr);
 			else
 				menu::stack_push<menu_select_game>(ui(), container, nullptr);

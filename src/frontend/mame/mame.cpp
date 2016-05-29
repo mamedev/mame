@@ -313,7 +313,7 @@ void emulator_info::display_ui_chooser(running_machine& machine)
 	// force the UI to show the game select screen
 	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 	render_container *container = &machine.render().ui_container();
-	if (strcmp(machine.options().ui(), "simple") == 0)
+	if (machine.options().ui() == emu_options::UI_SIMPLE)
 		ui::simple_menu_select_game::force_game_select(mui, container);
 	else
 		ui::menu_select_game::force_game_select(mui, container);

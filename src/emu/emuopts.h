@@ -194,6 +194,12 @@
 class emu_options : public core_options
 {
 public:
+	enum ui_option
+	{
+		UI_CABINET,
+		UI_SIMPLE
+	};
+	
 	// construction/destruction
 	emu_options();
 
@@ -343,7 +349,7 @@ public:
 	bool cheat() const { return bool_value(OPTION_CHEAT); }
 	bool skip_gameinfo() const { return bool_value(OPTION_SKIP_GAMEINFO); }
 	const char *ui_font() const { return value(OPTION_UI_FONT); }
-	const char *ui() const { return value(OPTION_UI); }
+	ui_option ui() const { return m_ui; }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
 
 	// core comm options
@@ -382,6 +388,7 @@ private:
 	bool m_joystick_contradictory;
 	bool m_sleep;
 	bool m_refresh_speed;
+	ui_option m_ui;
 };
 
 

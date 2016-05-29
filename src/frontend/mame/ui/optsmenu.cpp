@@ -59,7 +59,7 @@ void menu_game_options::handle()
 
 	// process the menu
 	const event *menu_event;
-	if (strcmp(machine().options().ui(), "simple") == 0)
+	if (machine().options().ui() == emu_options::UI_SIMPLE)
 	{
 		menu_event = process(PROCESS_LR_REPEAT);
 	}
@@ -223,7 +223,7 @@ void menu_game_options::handle()
 
 void menu_game_options::populate()
 {
-	if (strcmp(machine().options().ui(),"simple")!=0)
+	if (machine().options().ui() != emu_options::UI_SIMPLE)
 	{
 		// set filter arrow
 		std::string fbuff;
