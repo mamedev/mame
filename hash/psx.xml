@@ -1,4 +1,3 @@
-
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="psx" description="Sony Playstation CD-ROMs">
@@ -30760,7 +30759,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 	<software name="ar2_230">
 		<!-- Original images (Redump)
 		<rom name="Action Replay 2 Version 2.30 (USA) (En,Fr,Es,Pt) (Disc 2) (Bonus PSone Codes!) (Unl).cue" size="150" crc="e3e71055" sha1="760c689770defe349eb13f4b64b0463c4fef005d"/>
-		<rom name="Action Replay 2 Version 2.30 (USA) (En,Fr,Es,Pt) (Disc 2) (Bonus PSone Codes!) (Unl).bin" size="80316096" crc="6ce2e590" sha1="4f8f2bad26c9981f57d79bbcb2fecdb6ec6c8dc4"/>>
+		<rom name="Action Replay 2 Version 2.30 (USA) (En,Fr,Es,Pt) (Disc 2) (Bonus PSone Codes!) (Unl).bin" size="80316096" crc="6ce2e590" sha1="4f8f2bad26c9981f57d79bbcb2fecdb6ec6c8dc4"/>
 		-->
 		<description>Action Replay 2 Version 2.30 (USA, Bonus PSone Codes!)</description>
 		<year>2002</year>
