@@ -102,11 +102,50 @@ namespace netlist
 // -----------------------------------------------------------------------------
 // nld_twoterm
 // -----------------------------------------------------------------------------
-
+#if 1
 NETLIB_OBJECT(twoterm)
 {
-public:
 	NETLIB_CONSTRUCTOR(twoterm)
+	, m_P(*this, "1")
+	, m_N(*this, "2")
+	{
+		m_P.m_otherterm = &m_N;
+		m_N.m_otherterm = &m_P;
+	}
+
+	terminal_t m_P;
+	terminal_t m_N;
+
+	NETLIB_UPDATE_TERMINALSI() { }
+	NETLIB_RESETI() { }
+	NETLIB_UPDATEI();
+
+public:
+	ATTR_HOT /* inline */ void set(const nl_double G, const nl_double V, const nl_double I)
+	{
+		/*      GO, GT, I                */
+		m_P.set( G,  G, (  V) * G - I);
+		m_N.set( G,  G, ( -V) * G + I);
+	}
+
+	ATTR_HOT /* inline */ nl_double deltaV() const
+	{
+		return m_P.net().as_analog().Q_Analog() - m_N.net().as_analog().Q_Analog();
+	}
+
+	ATTR_HOT void set_mat(nl_double a11, nl_double a12, nl_double a21, nl_double a22, nl_double r1, nl_double r2)
+	{
+		/*      GO, GT, I                */
+		m_P.set(-a12, a11, -r1);
+		m_N.set(-a21, a22, -r2);
+	}
+
+private:
+};
+#endif
+NETLIB_OBJECT(twotermx)
+{
+	NETLIB_CONSTRUCTOR(twotermx)
 	{
 		m_P.m_otherterm = &m_N;
 		m_N.m_otherterm = &m_P;
@@ -150,8 +189,6 @@ NETLIB_OBJECT_DERIVED(R_base, twoterm)
 {
 	NETLIB_CONSTRUCTOR_DERIVED(R_base, twoterm)
 	{
-		enregister("1", m_P);
-		enregister("2", m_N);
 	}
 
 public:
@@ -272,8 +309,8 @@ public:
 	, m_C(*this, "C", 1e-6)
 	, m_GParallel(0.0)
 	{
-		enregister("1", m_P);
-		enregister("2", m_N);
+		//register_term("1", m_P);
+		//register_term("2", m_N);
 	}
 
 	NETLIB_TIMESTEP()
@@ -380,8 +417,8 @@ public:
 	NETLIB_CONSTRUCTOR_DERIVED(D, twoterm)
 	, m_model(*this, "MODEL", "")
 	{
-		enregister("A", m_P);
-		enregister("K", m_N);
+		register_subalias("A", m_P);
+		register_subalias("K", m_N);
 
 		m_D.save("m_D", *this);
 	}
@@ -415,8 +452,8 @@ public:
 	, m_V(*this, "V", 0.0)
 	{
 
-		enregister("P", m_P);
-		enregister("N", m_N);
+		register_subalias("P", m_P);
+		register_subalias("N", m_N);
 	}
 
 protected:
@@ -437,8 +474,8 @@ public:
 	NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
 	, m_I(*this, "I", 1.0)
 	{
-		enregister("P", m_P);
-		enregister("N", m_N);
+		register_subalias("P", m_P);
+		register_subalias("N", m_N);
 	}
 
 	NETLIB_UPDATEI();

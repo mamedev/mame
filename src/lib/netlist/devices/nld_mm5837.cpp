@@ -30,8 +30,8 @@ namespace netlist
 			connect_late(m_feedback, m_Q);
 
 			/* output */
-			enregister("_RV1", m_RV.m_P);
-			enregister("_RV2", m_RV.m_N);
+			//register_term("_RV1", m_RV.m_P);
+			//register_term("_RV2", m_RV.m_N);
 			enregister("_Q", m_V0);
 			connect_late(m_RV.m_N, m_V0);
 

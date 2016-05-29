@@ -9,7 +9,6 @@
 #define NLID_CMOS_H_
 
 #include "nl_base.h"
-#include "analog/nld_twoterm.h"
 
 namespace netlist
 {

@@ -260,20 +260,20 @@ namespace netlist
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(frontier, base_dummy)
-		, m_RIN(netlist(), "m_RIN")
-		, m_ROUT(netlist(), "m_ROUT")
+		, m_RIN(*this, "m_RIN")
+		, m_ROUT(*this, "m_ROUT")
 		, m_p_RIN(*this, "RIN", 1.0e6)
 		, m_p_ROUT(*this, "ROUT", 50.0)
 
 		{
 			enregister("_I", m_I);
-			enregister("I",m_RIN.m_P);
-			enregister("G",m_RIN.m_N);
+			register_subalias("I", m_RIN.m_P);
+			register_subalias("G", m_RIN.m_N);
 			connect_late(m_I, m_RIN.m_P);
 
 			enregister("_Q", m_Q);
-			enregister("_OP",m_ROUT.m_P);
-			enregister("Q",m_ROUT.m_N);
+			register_term("_OP", m_ROUT.m_P);
+			register_term("Q", m_ROUT.m_N);
 			connect_late(m_Q, m_ROUT.m_P);
 		}
 
@@ -290,7 +290,8 @@ namespace netlist
 
 	private:
 		NETLIB_NAME(twoterm) m_RIN;
-		NETLIB_NAME(twoterm) m_ROUT;
+		/* Fixme: only works if the device is timestepped */
+		NETLIB_NAME(twotermx) m_ROUT;
 		analog_input_t m_I;
 		analog_output_t m_Q;
 
@@ -523,13 +524,13 @@ namespace netlist
 		, m_is_timestep(false)
 		{
 			//register_sub(m_RV);
-			enregister("1", m_RV.m_P);
-			enregister("2", m_RV.m_N);
+			//register_term("1", m_RV.m_P);
+			//register_term("2", m_RV.m_N);
 
-			enregister("_Q", m_Q);
+			enregister("_Q", m_GNDHack);
 			register_subalias("Q", m_RV.m_P);
 
-			connect_late(m_RV.m_N, m_Q);
+			connect_late(m_RV.m_N, m_GNDHack);
 
 			save(NLNAME(m_last_state));
 		}
@@ -542,7 +543,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	private:
-		analog_output_t m_Q;
+		analog_output_t m_GNDHack;  // FIXME: LOng term, we need to connect proxy gnd to device gnd
 		NETLIB_SUB(twoterm) m_RV;
 		int m_last_state;
 		bool m_is_timestep;

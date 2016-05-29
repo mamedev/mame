@@ -416,6 +416,11 @@ namespace netlist
 
 		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
 
+		ATTR_COLD void set_device(core_device_t &dev)
+		{
+			m_device = &dev;
+		}
+
 		ATTR_HOT core_device_t &device() const { return *m_device; }
 	private:
 		core_device_t * m_device;
@@ -446,6 +451,8 @@ namespace netlist
 
 
 		ATTR_COLD core_terminal_t(const type_t atype);
+		ATTR_COLD core_terminal_t(core_device_t &dev, const type_t atype);
+		ATTR_COLD core_terminal_t(core_device_t &dev, const pstring &aname, const type_t atype);
 
 		ATTR_COLD void set_net(net_t *anet);
 		ATTR_COLD void clear_net();
@@ -487,7 +494,17 @@ namespace netlist
 
 
 		ATTR_COLD analog_t(const type_t atype)
-			: core_terminal_t(atype)
+		: core_terminal_t(atype)
+		{
+		}
+
+		ATTR_COLD analog_t(core_device_t &dev, const type_t atype)
+		: core_terminal_t(dev, atype)
+		{
+		}
+
+		ATTR_COLD analog_t(core_device_t &dev, const pstring &aname, const type_t atype)
+		: core_terminal_t(dev, aname, atype)
 		{
 		}
 
@@ -514,7 +531,9 @@ namespace netlist
 
 		using list_t = plib::pvector_t<terminal_t *>;
 
+		// FIXME: Remove default again
 		ATTR_COLD terminal_t();
+		ATTR_COLD terminal_t(core_device_t &dev, const pstring &aname);
 
 		terminal_t *m_otherterm;
 
@@ -1109,7 +1128,7 @@ namespace netlist
 
 		ATTR_COLD void register_subalias(const pstring &name, core_terminal_t &term);
 		ATTR_COLD void register_subalias(const pstring &name, const pstring &aliased);
-		ATTR_COLD void enregister(const pstring &name, terminal_t &port) { register_p(name, port); }
+		ATTR_COLD void register_term(const pstring &name, terminal_t &port) { register_p(name, port); }
 		ATTR_COLD void enregister(const pstring &name, analog_output_t &out) { register_p(name, out); };
 		ATTR_COLD void enregister(const pstring &name, logic_output_t &out) { register_p(name, out); };
 		ATTR_COLD void enregister(const pstring &name, analog_input_t &in) { register_p(name, in); };

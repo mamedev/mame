@@ -31,7 +31,6 @@
 
 #include <iostream>
 #include <algorithm>
-//#include "nld_twoterm.h"
 #include "nl_lists.h"
 
 #if HAS_OPENMP

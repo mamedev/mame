@@ -50,13 +50,19 @@ ATTR_COLD void generic_diode::save(pstring name, object_t &parent)
 // ----------------------------------------------------------------------------------------
 // nld_twoterm
 // ----------------------------------------------------------------------------------------
-
+#if 1
 NETLIB_UPDATE(twoterm)
 {
-	/* FIXME: some proxies created seem to be disconnected again
-	 * or not even properly connected.
-	 * Example: pong proxy_da_c9c.Q_1.RV
-	 */
+	/* only called if connected to a rail net ==> notify the solver to recalculate */
+	/* we only need to call the non-rail terminal */
+	if (m_P.has_net() && !m_P.net().isRailNet())
+		m_P.schedule_solve();
+	else if (m_N.has_net() && !m_N.net().isRailNet())
+		m_N.schedule_solve();
+}
+#endif
+NETLIB_UPDATE(twotermx)
+{
 	/* only called if connected to a rail net ==> notify the solver to recalculate */
 	/* we only need to call the non-rail terminal */
 	if (m_P.has_net() && !m_P.net().isRailNet())

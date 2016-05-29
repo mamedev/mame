@@ -279,13 +279,13 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 				}
 				else
 				{
-					term.init_object(dev, dev.name() + "." + name);
+					if (!term.isInitialized())
+						term.init_object(dev, dev.name() + "." + name);
 					dev.m_terminals.push_back(obj.name());
 				}
-
 				if (!m_terminals.add(term.name(), &term))
 					log().fatal("Error adding {1} {2} to terminal list\n", objtype_as_astr(term), term.name());
-				log().debug("{1} {2}\n", objtype_as_astr(term), name);
+				log().debug("{1} {2}\n", objtype_as_astr(term), term.name());
 			}
 			break;
 		case terminal_t::NET:

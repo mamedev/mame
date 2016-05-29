@@ -169,6 +169,7 @@ ATTR_COLD object_t::object_t(netlist_t &nl, const pstring &aname, const type_t a
 , m_objtype(atype)
 , m_netlist(&nl)
 {
+	save_register();
 }
 
 ATTR_COLD object_t::~object_t()
@@ -201,13 +202,13 @@ ATTR_COLD device_object_t::device_object_t(const type_t atype)
 
 ATTR_COLD device_object_t::device_object_t(core_device_t &dev, const type_t atype)
 : object_t(dev.netlist(), atype)
-, m_device(dev)
+, m_device(&dev)
 {
 }
 
 ATTR_COLD device_object_t::device_object_t(core_device_t &dev, const pstring &aname, const type_t atype)
 : object_t(dev.netlist(), aname, atype)
-, m_device(dev)
+, m_device(&dev)
 {
 }
 
@@ -919,6 +920,22 @@ ATTR_COLD core_terminal_t::core_terminal_t(const type_t atype)
 {
 }
 
+ATTR_COLD core_terminal_t::core_terminal_t(core_device_t &dev, const type_t atype)
+: device_object_t(dev, atype)
+, plinkedlist_element_t()
+, m_net(nullptr)
+, m_state(STATE_NONEX)
+{
+}
+
+ATTR_COLD core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname, const type_t atype)
+: device_object_t(dev, dev.name() + "." + aname, atype)
+, plinkedlist_element_t()
+, m_net(nullptr)
+, m_state(STATE_NONEX)
+{
+}
+
 ATTR_COLD void core_terminal_t::set_net(net_t::ptr_t anet)
 {
 	m_net = anet;
@@ -934,6 +951,7 @@ ATTR_COLD  void core_terminal_t::clear_net()
 // terminal_t
 // ----------------------------------------------------------------------------------------
 
+#if 1
 ATTR_COLD terminal_t::terminal_t()
 : analog_t(TERMINAL)
 , m_otherterm(nullptr)
@@ -941,6 +959,17 @@ ATTR_COLD terminal_t::terminal_t()
 , m_go1(nullptr)
 , m_gt1(nullptr)
 {
+}
+#endif
+
+ATTR_COLD terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
+: analog_t(dev, aname, TERMINAL)
+, m_otherterm(nullptr)
+, m_Idr1(nullptr)
+, m_go1(nullptr)
+, m_gt1(nullptr)
+{
+	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
 }
 
 

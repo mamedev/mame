@@ -6,6 +6,7 @@
  */
 
 #include <devices/nlid_cmos.h>
+#include "analog/nld_twoterm.h"
 #include "nld_4066.h"
 
 namespace netlist

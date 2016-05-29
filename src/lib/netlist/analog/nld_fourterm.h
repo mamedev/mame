@@ -60,17 +60,14 @@ public:
 	NETLIB_CONSTRUCTOR(VCCS)
 	, m_G(*this, "G", 1.0)
 	, m_RI(*this, "RI", NL_FCONST(1.0) / netlist().gmin())
+	, m_OP(*this, "OP")
+	, m_ON(*this, "ON")
+	, m_IP(*this, "IP")
+	, m_IN(*this, "IN")
+	, m_OP1(*this, "_OP1")
+	, m_ON1(*this, "_ON1")
 	, m_gfac(1.0)
 	{
-
-		enregister("IP", m_IP);
-		enregister("IN", m_IN);
-		enregister("OP", m_OP);
-		enregister("ON", m_ON);
-
-		enregister("_OP1", m_OP1);
-		enregister("_ON1", m_ON1);
-
 		m_IP.m_otherterm = &m_IN; // <= this should be NULL and terminal be filtered out prior to solving...
 		m_IN.m_otherterm = &m_IP; // <= this should be NULL and terminal be filtered out prior to solving...
 
@@ -205,11 +202,10 @@ NETLIB_OBJECT_DERIVED(VCVS, VCCS)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(VCVS, VCCS)
-	, m_RO(*this, "RO",1.0)
+	, m_RO(*this, "RO", 1.0)
+	, m_OP2(*this, "_OP2")
+	, m_ON2(*this, "_ON2")
 	{
-
-		enregister("_OP2", m_OP2);
-		enregister("_ON2", m_ON2);
 
 		m_OP2.m_otherterm = &m_ON2;
 		m_ON2.m_otherterm = &m_OP2;
