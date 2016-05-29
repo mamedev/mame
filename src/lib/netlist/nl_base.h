@@ -411,6 +411,8 @@ namespace netlist
 		P_PREVENT_COPYING(device_object_t)
 	public:
 		ATTR_COLD device_object_t(const type_t atype);
+		ATTR_COLD device_object_t(core_device_t &dev, const type_t atype);
+		ATTR_COLD device_object_t(core_device_t &dev, const pstring &aname, const type_t atype);
 
 		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
 

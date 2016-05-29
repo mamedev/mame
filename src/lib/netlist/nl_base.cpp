@@ -199,6 +199,19 @@ ATTR_COLD device_object_t::device_object_t(const type_t atype)
 {
 }
 
+ATTR_COLD device_object_t::device_object_t(core_device_t &dev, const type_t atype)
+: object_t(dev.netlist(), atype)
+, m_device(dev)
+{
+}
+
+ATTR_COLD device_object_t::device_object_t(core_device_t &dev, const pstring &aname, const type_t atype)
+: object_t(dev.netlist(), aname, atype)
+, m_device(dev)
+{
+}
+
+
 ATTR_COLD void device_object_t::init_object(core_device_t &dev,
 		const pstring &aname)
 {
@@ -1036,10 +1049,9 @@ ATTR_COLD void analog_output_t::initial(const nl_double val)
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD param_t::param_t(const param_type_t atype, device_t &device, const pstring &name)
-	: device_object_t(PARAM)
+	: device_object_t(device, name, PARAM)
 	, m_param_type(atype)
 {
-	init_object(device, name);
 }
 
 ATTR_COLD const pstring param_model_t::model_type()
