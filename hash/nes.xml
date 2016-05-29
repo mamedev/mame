@@ -34387,7 +34387,7 @@
 		</part>
 	</software>
 
-	<software name="anpaman">
+	<software name="anpanman">
 		<description>Soreike! Anpanman - Minna de Hiking Game! (Jpn)</description>
 		<year>1992</year>
 		<publisher>Bandai</publisher>
@@ -37444,7 +37444,7 @@
 		</part>
 	</software>
 
-	<software name="tantjsts">
+	<software name="tjstnsmn">
 		<description>Tantei Jinguuji Saburou - Toki no Sugiyuku Mama ni (Jpn)</description>
 		<year>1990</year>
 		<publisher>Data East</publisher>
@@ -49701,7 +49701,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tantjsyr">
+	<software name="tjsyrsj">
 		<description>Tantei Jinguuji Saburou - Yokohamakou Renzoku Satsujin Jiken (Jpn)</description>
 		<year>1988</year>
 		<publisher>Data East</publisher>
@@ -49721,7 +49721,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tashimp">
-		<description>Tashiro Masashi no Princess Ga Ippai (Jpn)</description>
+		<description>Tashiro Masashi no Princess ga Ippai (Jpn)</description>
 		<year>1989</year>
 		<publisher>Epic / Sony Records</publisher>
 		<info name="serial" value="ESF-P0/55・6R-4"/>
