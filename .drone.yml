@@ -14,7 +14,22 @@ build:
   commands:
     - make
     - ./$MAME_EXE -validate || echo "Validation successful"
-  
+ 
+notify:
+  irc:
+    prefix: build
+    nick: $$IRC_USER
+    channel: #mame-dev
+    server:
+      host: $$IRC_HOST
+      port: $$IRC_PORT
+      password: $$IRC_PASS
+      tls: true
+	when:
+      success: false
+      failure: true
+      change: true	 
+
 # Need to create secrets file from within tea-ci.org
 #notify:
 #  email:
