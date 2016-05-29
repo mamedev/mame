@@ -10,7 +10,7 @@
 #include "plib/palloc.h"
 
 #include "nl_base.h"
-#include "devices/nld_system.h"
+#include "devices/nlid_system.h"
 #include "nl_util.h"
 
 const netlist::netlist_time netlist::netlist_time::zero = netlist::netlist_time(0);

@@ -16,7 +16,7 @@
 #include "nl_util.h"
 #include "nl_factory.h"
 #include "devices/net_lib.h"
-#include "devices/nld_system.h"
+#include "devices/nlid_system.h"
 #include "analog/nld_twoterm.h"
 #include "solver/nld_solver.h"
 

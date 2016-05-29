@@ -7,7 +7,7 @@
 
 #include "nld_74123.h"
 
-#include "nld_system.h"
+#include "nlid_system.h"
 #include "analog/nld_twoterm.h"
 
 #define R_OFF (1E20)
