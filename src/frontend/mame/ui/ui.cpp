@@ -2051,76 +2051,52 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 
 INT32 mame_ui_manager::slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
 {
-	switch (id)
-	{
-		case SLIDER_ID_VOLUME:
-			return slider_volume(machine, arg, id, str, newval);
-
-		case SLIDER_ID_MIXERVOL ... SLIDER_ID_MIXERVOL_LAST:
-			return slider_mixervol(machine, arg, id, str, newval);
-
-		case SLIDER_ID_ADJUSTER ... SLIDER_ID_ADJUSTER_LAST:
+	if (id == SLIDER_ID_VOLUME)
+		return slider_volume(machine, arg, id, str, newval);
+	else if (id >= SLIDER_ID_MIXERVOL && id <= SLIDER_ID_MIXERVOL_LAST)
+		return slider_mixervol(machine, arg, id, str, newval);
+	else if (id >= SLIDER_ID_ADJUSTER && id <= SLIDER_ID_ADJUSTER_LAST)
 			return slider_adjuster(machine, arg, id, str, newval);
-
-		case SLIDER_ID_OVERCLOCK ... SLIDER_ID_OVERCLOCK_LAST:
+	else if (id >= SLIDER_ID_OVERCLOCK && id <= SLIDER_ID_OVERCLOCK_LAST)
 			return slider_overclock(machine, arg, id, str, newval);
-
-		case SLIDER_ID_REFRESH ... SLIDER_ID_REFRESH_LAST:
+	else if (id >= SLIDER_ID_REFRESH && id <= SLIDER_ID_REFRESH_LAST)
 			return slider_refresh(machine, arg, id, str, newval);
-
-		case SLIDER_ID_BRIGHTNESS ... SLIDER_ID_BRIGHTNESS_LAST:
+	else if (id >= SLIDER_ID_BRIGHTNESS && id <= SLIDER_ID_BRIGHTNESS_LAST)
 			return slider_brightness(machine, arg, id, str, newval);
-
-		case SLIDER_ID_CONTRAST ... SLIDER_ID_CONTRAST_LAST:
+	else if (id >= SLIDER_ID_CONTRAST && id <= SLIDER_ID_CONTRAST_LAST)
 			return slider_contrast(machine, arg, id, str, newval);
-
-		case SLIDER_ID_GAMMA ... SLIDER_ID_GAMMA_LAST:
+	else if (id >= SLIDER_ID_GAMMA && id <= SLIDER_ID_GAMMA_LAST)
 			return slider_gamma(machine, arg, id, str, newval);
-
-		case SLIDER_ID_XSCALE ... SLIDER_ID_XSCALE_LAST:
+	else if (id >= SLIDER_ID_XSCALE && id <= SLIDER_ID_XSCALE_LAST)
 			return slider_xscale(machine, arg, id, str, newval);
-
-		case SLIDER_ID_YSCALE ... SLIDER_ID_YSCALE_LAST:
+	else if (id >= SLIDER_ID_YSCALE && id <= SLIDER_ID_YSCALE_LAST)
 			return slider_yscale(machine, arg, id, str, newval);
-
-		case SLIDER_ID_XOFFSET ... SLIDER_ID_XOFFSET_LAST:
+	else if (id >= SLIDER_ID_XOFFSET && id <= SLIDER_ID_XOFFSET_LAST)
 			return slider_xoffset(machine, arg, id, str, newval);
-
-		case SLIDER_ID_YOFFSET ... SLIDER_ID_YOFFSET_LAST:
+	else if (id >= SLIDER_ID_YOFFSET && id <= SLIDER_ID_YOFFSET_LAST)
 			return slider_yoffset(machine, arg, id, str, newval);
-
-		case SLIDER_ID_OVERLAY_XSCALE ... SLIDER_ID_OVERLAY_XSCALE_LAST:
+	else if (id >= SLIDER_ID_OVERLAY_XSCALE && id <= SLIDER_ID_OVERLAY_XSCALE_LAST)
 			return slider_overxscale(machine, arg, id, str, newval);
-
-		case SLIDER_ID_OVERLAY_YSCALE ... SLIDER_ID_OVERLAY_YSCALE_LAST:
+	else if (id >= SLIDER_ID_OVERLAY_YSCALE && id <= SLIDER_ID_OVERLAY_YSCALE_LAST)
 			return slider_overyscale(machine, arg, id, str, newval);
-
-		case SLIDER_ID_OVERLAY_XOFFSET ... SLIDER_ID_OVERLAY_XOFFSET_LAST:
+	else if (id >= SLIDER_ID_OVERLAY_XOFFSET && id <= SLIDER_ID_OVERLAY_XOFFSET_LAST)
 			return slider_overxoffset(machine, arg, id, str, newval);
-
-		case SLIDER_ID_OVERLAY_YOFFSET ... SLIDER_ID_OVERLAY_YOFFSET_LAST:
+	else if (id >= SLIDER_ID_OVERLAY_YOFFSET && id <= SLIDER_ID_OVERLAY_YOFFSET_LAST)
 			return slider_overyoffset(machine, arg, id, str, newval);
-
-		case SLIDER_ID_FLICKER ... SLIDER_ID_FLICKER_LAST:
+	else if (id >= SLIDER_ID_FLICKER && id <= SLIDER_ID_FLICKER_LAST)
 			return slider_flicker(machine, arg, id, str, newval);
-
-		case SLIDER_ID_BEAM_WIDTH_MIN ... SLIDER_ID_BEAM_WIDTH_MIN_LAST:
+	else if (id >= SLIDER_ID_BEAM_WIDTH_MIN && id <= SLIDER_ID_BEAM_WIDTH_MIN_LAST)
 			return slider_beam_width_min(machine, arg, id, str, newval);
-
-		case SLIDER_ID_BEAM_WIDTH_MAX ... SLIDER_ID_BEAM_WIDTH_MAX_LAST:
+	else if (id >= SLIDER_ID_BEAM_WIDTH_MAX && id <= SLIDER_ID_BEAM_WIDTH_MAX_LAST)
 			return slider_beam_width_max(machine, arg, id, str, newval);
-
-		case SLIDER_ID_BEAM_INTENSITY ... SLIDER_ID_BEAM_INTENSITY_LAST:
+	else if (id >= SLIDER_ID_BEAM_INTENSITY && id <= SLIDER_ID_BEAM_INTENSITY_LAST)
 			return slider_beam_intensity_weight(machine, arg, id, str, newval);
-
 #ifdef MAME_DEBUG
-		case SLIDER_ID_CROSSHAIR_SCALE ... SLIDER_ID_CROSSHAIR_SCALE_LAST:
+	else if (id >= SLIDER_ID_CROSSHAIR_SCALE && id <= SLIDER_ID_CROSSHAIR_SCALE_LAST)
 			return slider_crossscale(machine, arg, id, str, newval);
-
-		case SLIDER_ID_CROSSHAIR_OFFSET ... SLIDER_ID_CROSSHAIR_OFFSET_LAST:
+	else if (id >= SLIDER_ID_CROSSHAIR_OFFSET && id <= SLIDER_ID_CROSSHAIR_OFFSET_LAST)
 			return slider_crossoffset(machine, arg, id, str, newval);
 #endif
-	}
 
 	return 0;
 }
