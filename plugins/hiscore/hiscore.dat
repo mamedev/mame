@@ -16,20 +16,11 @@
 ; in the first byte/word>,<value to wait for in the last byte/word>
 ; [repeat the above as many times as necessary]
 ;
-; *** All Entries Without Name Done By Me !! ( Leezer ) ;0) leezer@leezer.karoo.co.uk ***
+; *** All Entries Without Name Done By Me !! ( Leezer ) ;0) ***
 ;
-; contact firebrand at :- firebrand75@hotmail.com
-; Unofficial hiscore.dat file official website :- http://highscore.mameworld.info/
-; This hiscore.dat is for use with mame version 0.133u1 and newer builds (aug 15th 09)
-; Mameplus also supports hiscore.dat :- http://mameicons.free.fr/mame32p/
-
-;***************************************************************************
-;*    latest unofficial highscore_v_infinity additions below - by leezer   *
-;*            hiscore.dat discontinued as from mame v0.107u2.              *
-;*                 [ for Leezer's personal use only ]                      * 
-;* (to use this .dat file after the release of mame v0.107u2 you must use) *
-;*          (a hacked mame that enables hiscore.dat saves.)                *
-;***************************************************************************
+; Based on the Unofficial hiscore.dat file from http://highscore.mameworld.info/
+;
+; This hiscore.dat is only usable with lua enabled versions of mame since 0.172
 
 ;******paradise
 paradise:
