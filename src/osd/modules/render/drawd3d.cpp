@@ -535,7 +535,7 @@ renderer_d3d9::renderer_d3d9(std::shared_ptr<osd_window> window)
 	: osd_renderer(window, FLAG_NONE), m_adapter(0), m_width(0), m_height(0), m_refresh(0), m_create_error_count(0), m_device(nullptr), m_gamma_supported(0), m_pixformat(),
 	m_vertexbuf(nullptr), m_lockedbuf(nullptr), m_numverts(0), m_vectorbatch(nullptr), m_batchindex(0), m_numpolys(0), m_restarting(false), m_mod2x_supported(0), m_mod4x_supported(0),
 	m_screen_format(), m_last_texture(nullptr), m_last_texture_flags(0), m_last_blendenable(0), m_last_blendop(0), m_last_blendsrc(0), m_last_blenddst(0), m_last_filter(0),
-	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(nullptr), m_shaders(nullptr), m_shaders_options(nullptr), m_texture_manager(nullptr), m_line_count(0)
+	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(nullptr), m_shaders(nullptr), m_shaders_options(nullptr), m_texture_manager(nullptr)
 {
 }
 
@@ -679,21 +679,21 @@ void renderer_d3d9::begin_frame()
 		m_hlsl_buf = (void*)mesh_alloc(6);
 		m_shaders->init_fsfx_quad(m_hlsl_buf);
 	}
-
-	// loop over line primitives
-	m_line_count = 0;
-	for (render_primitive &prim : *win->m_primlist)
-	{
-		if (prim.type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim.flags))
-		{
-			m_line_count++;
-		}
-	}
 }
 
 void renderer_d3d9::process_primitives()
 {
 	auto win = assert_window();
+
+	// loop over line primitives
+	int vector_count = 0;
+	for (render_primitive &prim : *win->m_primlist)
+	{
+		if (prim.type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim.flags))
+		{
+			vector_count++;
+		}
+	}
 
 	// Rotating index for vector time offsets
 	for (render_primitive &prim : *win->m_primlist)
@@ -703,10 +703,11 @@ void renderer_d3d9::process_primitives()
 			case render_primitive::LINE:
 				if (PRIMFLAG_GET_VECTOR(prim.flags))
 				{
-					if (m_line_count > 0)
-						batch_vectors();
-					else
-						continue;
+					if (vector_count > 0)
+					{
+						batch_vectors(vector_count);
+						vector_count = 0;
+					}
 				}
 				else
 				{
@@ -1383,7 +1384,7 @@ int renderer_d3d9::update_window_size()
 //  batch_vectors
 //============================================================
 
-void renderer_d3d9::batch_vectors()
+void renderer_d3d9::batch_vectors(int vector_count)
 {
 	auto win = assert_window();
 
@@ -1392,8 +1393,9 @@ void renderer_d3d9::batch_vectors()
 	float quad_width = 0.0f;
 	float quad_height = 0.0f;
 
-	int vector_size = (options.antialias() ? 24 : 6);
-	m_vectorbatch = mesh_alloc(m_line_count * vector_size);
+	int vertex_count = vector_count * (options.antialias() ? 24 : 6);
+	int triangle_count = vector_count * (options.antialias() ? 8 : 2);
+	m_vectorbatch = mesh_alloc(vertex_count);
 	m_batchindex = 0;
 
 	UINT32 cached_flags = 0;
@@ -1491,11 +1493,8 @@ void renderer_d3d9::batch_vectors()
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, m_line_count * (options.antialias() ? 8 : 2), vector_size * m_line_count, cached_flags,
-		nullptr, D3DTOP_MODULATE, 0.0f, 1.0f, quad_width, quad_height);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, triangle_count, vertex_count, cached_flags, nullptr, D3DTOP_MODULATE, 0.0f, 1.0f, quad_width, quad_height);
 	m_numpolys++;
-
-	m_line_count = 0;
 }
 
 void renderer_d3d9::batch_vector(const render_primitive &prim)
