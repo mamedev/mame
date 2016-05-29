@@ -279,8 +279,6 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 				}
 				else
 				{
-					if (!term.isInitialized())
-						term.init_object(dev, dev.name() + "." + name);
 					dev.m_terminals.push_back(obj.name());
 				}
 				if (!m_terminals.add(term.name(), &term))

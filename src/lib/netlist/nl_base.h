@@ -531,8 +531,6 @@ namespace netlist
 
 		using list_t = plib::pvector_t<terminal_t *>;
 
-		// FIXME: Remove default again
-		ATTR_COLD terminal_t();
 		ATTR_COLD terminal_t(core_device_t &dev, const pstring &aname);
 
 		terminal_t *m_otherterm;
@@ -1128,7 +1126,7 @@ namespace netlist
 
 		ATTR_COLD void register_subalias(const pstring &name, core_terminal_t &term);
 		ATTR_COLD void register_subalias(const pstring &name, const pstring &aliased);
-		ATTR_COLD void register_term(const pstring &name, terminal_t &port) { register_p(name, port); }
+		//ATTR_COLD void register_term(const pstring &name, terminal_t &port) { register_p(name, port); }
 		ATTR_COLD void enregister(const pstring &name, analog_output_t &out) { register_p(name, out); };
 		ATTR_COLD void enregister(const pstring &name, logic_output_t &out) { register_p(name, out); };
 		ATTR_COLD void enregister(const pstring &name, analog_input_t &in) { register_p(name, in); };

@@ -21,8 +21,8 @@ namespace netlist
 		, m_num(*this, "N", 1)
 		, m_val(*this, "VAL", 1)
 		{
-			register_term("VOUT", m_P);
-			register_term("VGND", m_N);
+			register_subalias("VOUT", m_P);
+			register_subalias("VGND", m_N);
 		}
 
 		NETLIB_UPDATE_PARAMI();

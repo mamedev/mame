@@ -951,17 +951,6 @@ ATTR_COLD  void core_terminal_t::clear_net()
 // terminal_t
 // ----------------------------------------------------------------------------------------
 
-#if 1
-ATTR_COLD terminal_t::terminal_t()
-: analog_t(TERMINAL)
-, m_otherterm(nullptr)
-, m_Idr1(nullptr)
-, m_go1(nullptr)
-, m_gt1(nullptr)
-{
-}
-#endif
-
 ATTR_COLD terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
 : analog_t(dev, aname, TERMINAL)
 , m_otherterm(nullptr)
