@@ -18111,7 +18111,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="hunterxh">
+	<software name="hxhmintd">
 		<description>Hunter X Hunter - Minna Tomodachi Daisakusen!! (Jpn)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
@@ -35062,7 +35062,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
-	<software name="tantjssk">
+	<software name="tjsskns">
 		<description>Tantei Jinguuji Saburou - Shiroi Kage no Shoujo (Jpn)</description>
 		<year>2005</year>
 		<publisher>Marvelous Interactive</publisher>

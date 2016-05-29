@@ -10695,7 +10695,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="hxhunthk">
+	<software name="hxhhunke">
 		<!-- Notes: GBC only -->
 		<description>Hunter X Hunter - Hunter no Keifu (Jpn)</description>
 		<year>2000</year>
@@ -10714,7 +10714,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="hxhuntkh">
+	<software name="hxhkindn">
 		<!-- Notes: GBC only -->
 		<description>Hunter X Hunter - Kindan no Hihou (Jpn)</description>
 		<year>2001</year>
@@ -10785,7 +10785,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="ideyosuk">
+	<software name="ideyumjk">
 		<!-- Notes: GBC only -->
 		<description>Ide Yousuke no Mahjong Kyoushitsu GB (Jpn)</description>
 		<year>2000</year>
@@ -13437,7 +13437,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="majokko">
+	<software name="majomari">
 		<!-- Notes: SGB enhanced -->
 		<description>Majokko Mari-chan no Kisekae Monogatari (Jpn, Rev. A)</description>
 		<year>1999</year>
@@ -13456,7 +13456,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="majokkoa" cloneof="majokko">
+	<software name="majomaria" cloneof="majomari">
 		<!-- Notes: SGB enhanced -->
 		<description>Majokko Mari-chan no Kisekae Monogatari (Jpn)</description>
 		<year>1999</year>
@@ -19429,7 +19429,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="anpaman5">
+	<software name="anpan5to">
 		<!-- Notes: GBC only -->
 		<description>Soreike! Anpanman - 5-tsu no Tou no Ousama (Jpn)</description>
 		<year>2000</year>
@@ -19448,7 +19448,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="anpamanf">
+	<software name="anpanfna">
 		<!-- Notes: SGB enhanced -->
 		<description>Soreike! Anpanman - Fushigi na Nikoniko Album (Jpn)</description>
 		<year>1999</year>
@@ -20959,7 +20959,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="tokimekc">
+	<software name="tokimclt">
 		<!-- Notes: SGB enhanced -->
 		<description>Tokimeki Memorial Pocket - Culture Hen - Komorebi no Melody (Jpn)</description>
 		<year>1999</year>
@@ -20978,7 +20978,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="tokimeks">
+	<software name="tokimspt">
 		<!-- Notes: SGB enhanced -->
 		<description>Tokimeki Memorial Pocket - Sport Hen - Koutei no Photograph (Jpn)</description>
 		<year>1999</year>

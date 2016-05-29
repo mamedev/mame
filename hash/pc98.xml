@@ -28086,7 +28086,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="ningyout">
+	<software name="ningytsu">
 		<description>Ningyou Tsukai</description>
 		<year>1992</year>
 		<publisher>フォレスト (Forest)</publisher>
@@ -28112,7 +28112,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="ningyou2">
+	<software name="ningyts2">
 		<description>Ningyou Tsukai 2</description>
 		<year>1996</year>
 		<publisher>フォレスト (Forest)</publisher>
@@ -44214,7 +44214,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="yuugiri">
+	<software name="yugiri">
 		<description>Yuugiri - Ningyoushi no Isan</description>
 		<year>1996</year>
 		<publisher>デザイアー (Desire)</publisher>
@@ -49157,7 +49157,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="prinmakr" supported="no">
+	<software name="prinmak" supported="no">
 		<description>Princess Maker</description>
 		<year>1991</year>
 		<publisher>ガイナックス (Gainax)</publisher>
@@ -64194,7 +64194,7 @@ doujin?!?
 	</software>
 
 <!-- this should contain 4 disks. it was accompanied by an HDI image -->
-	<software name="kouryuu" supported="no">
+	<software name="koryuki" supported="no">
 		<description>Kouryuuki (Incomplete)</description>
 		<year>1993</year>
 		<publisher>光栄 (Koei)</publisher>

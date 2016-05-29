@@ -16402,7 +16402,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="kouryuuk" cloneof="risephnx">
+	<software name="koryuki" cloneof="risephnx">
 		<description>Kouryuuki (Jpn)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
@@ -51700,7 +51700,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="princess">
+	<software name="prinmak">
 		<description>Princess Maker - Legend of Another World (Jpn)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
