@@ -82,6 +82,9 @@ void ide_pci_device::device_start()
 void ide_pci_device::device_reset()
 {
 	pci_device::device_reset();
+	// PCI0646U allow BAR
+	if (main_id == 0x10950646)
+		m_config_data[0x10 / 4] |= 0x0C40;
 }
 
 READ32_MEMBER(ide_pci_device::ide_read_cs1)
@@ -89,6 +92,8 @@ READ32_MEMBER(ide_pci_device::ide_read_cs1)
 	// PCI offset starts at 0x3f4, idectrl expects 0x3f0
 	UINT32 data = 0;
 	data = m_ide->read_cs1(space, ++offset, mem_mask);
+	if (0)
+		logerror("%s:ide_read_cs1 offset=%08X data=%08X mask=%08X\n", machine().describe_context(), offset, data, mem_mask);
 	return data;
 }
 
@@ -117,6 +122,9 @@ WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
 	if (m_irq_num != -1) {
 		m_cpu->set_input_line(m_irq_num, state);
 	}
+	// PCI646U2 Offset 0x50 is interrupt status
+	if (main_id == 0x10950646 && state)
+		m_config_data[0x10/4] |= 0x4;
 	if (0)
 		logerror("%s:ide_interrupt %i set to %i\n", machine().describe_context(), m_irq_num, state);
 }
@@ -129,11 +137,15 @@ READ32_MEMBER(ide_pci_device::pcictrl_r)
 WRITE32_MEMBER(ide_pci_device::pcictrl_w)
 {
 	COMBINE_DATA(&m_config_data[offset]);
+	// PCI646U2 Offset 0x50 is interrupt status
+	if (main_id == 0x10950646 && offset == 0x10/4 && (data & 0x4))
+		m_config_data[0x10/4] &= ~0x4;
 }
 
 WRITE32_MEMBER(ide_pci_device::address_base_w)
 {
-	if (1) {
+	// data==0xffffffff is used to identify required memory space
+	if (data != 0xffffffff) {
 		// Bits 0 (ide) and 2 (ide2) control if the mapping is legacy or BAR
 		switch (offset) {
 		case 0:

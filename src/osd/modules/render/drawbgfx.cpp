@@ -600,6 +600,18 @@ void renderer_bgfx::put_polygon(const float* coords, UINT32 num_coords, float r,
 	}
 }
 
+void renderer_bgfx::put_packed_line(render_primitive *prim, ScreenVertex* vertex)
+{
+	float width = prim->width < 0.5f ? 0.5f : prim->width;
+	float x0 = prim->bounds.x0;
+	float y0 = prim->bounds.y0;
+	float x1 = prim->bounds.x1;
+	float y1 = prim->bounds.y1;
+	UINT32 rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
+
+	put_line(x0, y0, x1, y1, width, rgba, vertex, 1.0f);
+}
+
 void renderer_bgfx::put_line(float x0, float y0, float x1, float y1, float r, UINT32 rgba, ScreenVertex* vertex, float fth)
 {
 	float dx = x1 - x0;
@@ -919,7 +931,7 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, 
 		{
 			case render_primitive::LINE:
 				init_ui_view();
-				put_line((*prim)->bounds.x0, (*prim)->bounds.y0, (*prim)->bounds.x1, (*prim)->bounds.y1, 1.0f, u32Color((*prim)->color.r * 255, (*prim)->color.g * 255, (*prim)->color.b * 255, (*prim)->color.a * 255), (ScreenVertex*)buffer->data + vertices, 1.0f);
+				put_packed_line(*prim, (ScreenVertex*)buffer->data + vertices);
 				vertices += 30;
 				break;
 
