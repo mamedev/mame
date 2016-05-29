@@ -12,25 +12,26 @@ build:
     - MAME_EXE=mametiny.exe
 #    - SOURCES=src/mame/drivers/pacman.cpp
   commands:
+#    - pacman -S -q --noprogressbar --noconfirm winpty
     - make
-    - ./$MAME_EXE -validate || echo "Validation successful"
+    - ./$MAME_EXE -validate && echo "Validation successful"
  
 notify:
   irc:
     prefix: build
     nick: $$IRC_USER
-    channel: #mame-dev
+    channel: mame-dev
     server:
       host: $$IRC_HOST
       port: $$IRC_PORT
       password: $$IRC_PASS
       tls: true
-	when:
+    when:
       success: false
       failure: true
-      change: true	 
+      change: true
 
-# Need to create secrets file from within tea-ci.org
+# Need to regen secrets file (.drone.sec) from within tea-ci.org to enable
 #notify:
 #  email:
 #    from: git@mamedev.org
