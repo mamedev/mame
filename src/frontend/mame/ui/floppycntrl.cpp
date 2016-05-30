@@ -7,17 +7,20 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "zippath.h"
-#include "ui/menu.h"
-#include "ui/imgcntrl.h"
+
 #include "ui/filesel.h"
 #include "ui/floppycntrl.h"
+
+#include "zippath.h"
+
+
+namespace ui {
 
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
-ui_menu_control_floppy_image::ui_menu_control_floppy_image(mame_ui_manager &mui, render_container *container, device_image_interface *_image) : ui_menu_control_device_image(mui, container, _image)
+menu_control_floppy_image::menu_control_floppy_image(mame_ui_manager &mui, render_container *container, device_image_interface *_image) : menu_control_device_image(mui, container, _image)
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
 	const floppy_image_format_t *fif_list = fd->get_formats();
@@ -30,12 +33,12 @@ ui_menu_control_floppy_image::ui_menu_control_floppy_image(mame_ui_manager &mui,
 	input_filename = output_filename = "";
 }
 
-ui_menu_control_floppy_image::~ui_menu_control_floppy_image()
+menu_control_floppy_image::~menu_control_floppy_image()
 {
 	global_free_array(format_array);
 }
 
-void ui_menu_control_floppy_image::do_load_create()
+void menu_control_floppy_image::do_load_create()
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
 	if(input_filename.compare("")==0) {
@@ -58,13 +61,13 @@ void ui_menu_control_floppy_image::do_load_create()
 	}
 }
 
-void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist)
+void menu_control_floppy_image::hook_load(std::string filename, bool softlist)
 {
 	if (softlist)
 	{
 		machine().popmessage("When loaded from software list, the disk is Read-only.\n");
 		image->load(filename.c_str());
-		ui_menu::stack_pop(machine());
+		menu::stack_pop(machine());
 		return;
 	}
 
@@ -74,7 +77,7 @@ void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist
 	if (!input_format)
 	{
 		machine().popmessage("Error: %s\n", image->error());
-		ui_menu::stack_pop(machine());
+		menu::stack_pop(machine());
 		return;
 	}
 
@@ -91,11 +94,11 @@ void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist
 			can_in_place = false;
 	}
 	submenu_result = -1;
-	ui_menu::stack_push(global_alloc_clear<ui_menu_select_rw>(ui(), container, can_in_place, &submenu_result));
+	menu::stack_push<menu_select_rw>(ui(), container, can_in_place, &submenu_result);
 	state = SELECT_RW;
 }
 
-void ui_menu_control_floppy_image::handle()
+void menu_control_floppy_image::handle()
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
 	switch (state) {
@@ -117,7 +120,7 @@ void ui_menu_control_floppy_image::handle()
 				format_array[total_usable++] = i;
 		}
 		submenu_result = -1;
-		ui_menu::stack_push(global_alloc_clear<ui_menu_select_format>(ui(), container, format_array, ext_match, total_usable, &submenu_result));
+		menu::stack_push<menu_select_format>(ui(), container, format_array, ext_match, total_usable, &submenu_result);
 
 		state = SELECT_FORMAT;
 		break;
@@ -131,30 +134,30 @@ void ui_menu_control_floppy_image::handle()
 			util::zippath_combine(output_filename, current_directory.c_str(), current_file.c_str());
 			output_format = format_array[submenu_result];
 			do_load_create();
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 		}
 		break;
 
 	case SELECT_RW:
 		switch(submenu_result) {
-		case ui_menu_select_rw::READONLY:
+		case menu_select_rw::READONLY:
 			do_load_create();
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 			break;
 
-		case ui_menu_select_rw::READWRITE:
+		case menu_select_rw::READWRITE:
 			output_format = input_format;
 			do_load_create();
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 			break;
 
-		case ui_menu_select_rw::WRITE_DIFF:
+		case menu_select_rw::WRITE_DIFF:
 			machine().popmessage("Sorry, diffs are not supported yet\n");
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 			break;
 
-		case ui_menu_select_rw::WRITE_OTHER:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_file_create>(ui(), container, image, current_directory, current_file, &create_ok));
+		case menu_select_rw::WRITE_OTHER:
+			menu::stack_push<menu_file_create>(ui(), container, image, current_directory, current_file, &create_ok);
 			state = CHECK_CREATE;
 			break;
 
@@ -165,6 +168,8 @@ void ui_menu_control_floppy_image::handle()
 		break;
 
 	default:
-		ui_menu_control_device_image::handle();
+		menu_control_device_image::handle();
 	}
 }
+
+} // namespace ui

@@ -208,7 +208,7 @@ void psikyosh_state::cache_bitmap(int scanline, gfx_element *gfx, int size, int 
 	// test if the tile row is the cached one or not
 	int sy = scanline / 16;
 
-	assert(sy > 0 && sy < 32);
+	assert(sy >= 0 && sy < 32);
 
 	if(tilebank != last_bank[sy])
 	{

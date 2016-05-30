@@ -25,7 +25,7 @@ struct h8_dma_state {
 #define MCFG_H8_DMA_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, H8_DMA, 0 )
 
-#define MCFG_H8_DMA_CHANNEL_ADD( _tag, intc, irq_base, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, va, vb, vc, vd, ve, vf )	\
+#define MCFG_H8_DMA_CHANNEL_ADD( _tag, intc, irq_base, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, va, vb, vc, vd, ve, vf ) \
 	MCFG_DEVICE_ADD( _tag, H8_DMA_CHANNEL, 0 )  \
 	downcast<h8_dma_channel_device *>(device)->set_info(intc, irq_base, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, va, vb, vc, vd, ve, vf);
 

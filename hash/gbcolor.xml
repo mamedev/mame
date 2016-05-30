@@ -1252,7 +1252,7 @@ List of verified retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="jmcgrath">
+	<software name="jmg2k">
 		<!-- Notes: GBC only -->
 		<description>Jeremy McGrath Supercross 2000 (Euro, USA)</description><!-- only Euro confirmed -->
 		<year>2000</year>
@@ -1305,7 +1305,7 @@ List of verified retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="kkings">
+	<software name="kokings">
 		<!-- Notes: GBC only -->
 		<description>Knockout Kings (Euro, USA)</description><!-- only Euro confirmed -->
 		<year>1999</year>
@@ -2866,7 +2866,7 @@ List of verified retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="wormarmg">
+	<software name="wormsarm">
 		<!-- Notes: GBC only -->
 		<description>Worms Armageddon (Euro)</description>
 		<year>2000</year>
@@ -6706,7 +6706,7 @@ List of unconfirmed retail cartridge roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="daikatanp" cloneof="daikatan">
 		<!-- Notes: GBC only -->
 		<description>Daikatana (Prototype 20000419)</description>
@@ -10695,7 +10695,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="hxhunthk">
+	<software name="hxhhunke">
 		<!-- Notes: GBC only -->
 		<description>Hunter X Hunter - Hunter no Keifu (Jpn)</description>
 		<year>2000</year>
@@ -10714,7 +10714,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="hxhuntkh">
+	<software name="hxhkindn">
 		<!-- Notes: GBC only -->
 		<description>Hunter X Hunter - Kindan no Hihou (Jpn)</description>
 		<year>2001</year>
@@ -10785,7 +10785,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="ideyosuk">
+	<software name="ideyumjk">
 		<!-- Notes: GBC only -->
 		<description>Ide Yousuke no Mahjong Kyoushitsu GB (Jpn)</description>
 		<year>2000</year>
@@ -12426,7 +12426,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="legoracr">
+	<software name="legorace">
 		<!-- Notes: GBC only -->
 		<description>LEGO Racers (Euro)</description>
 		<year>2000</year>
@@ -12443,7 +12443,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="legoracru" cloneof="legoracr">
+	<software name="legoraceu" cloneof="legorace">
 		<!-- Notes: GBC only -->
 		<description>LEGO Racers (USA)</description>
 		<year>2000</year>
@@ -13437,7 +13437,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="majokko">
+	<software name="majomari">
 		<!-- Notes: SGB enhanced -->
 		<description>Majokko Mari-chan no Kisekae Monogatari (Jpn, Rev. A)</description>
 		<year>1999</year>
@@ -13456,7 +13456,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="majokkoa" cloneof="majokko">
+	<software name="majomaria" cloneof="majomari">
 		<!-- Notes: SGB enhanced -->
 		<description>Majokko Mari-chan no Kisekae Monogatari (Jpn)</description>
 		<year>1999</year>
@@ -14536,7 +14536,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="monstfrm" cloneof="monstrnc">
+	<software name="mfarmbc" cloneof="mranchbc">
 		<!-- Notes: SGB enhanced -->
 		<description>Monster Farm Battle Card GB (Jpn)</description>
 		<year>1999</year>
@@ -14574,7 +14574,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="monstrnc">
+	<software name="mranchbc">
 		<!-- Notes: SGB enhanced -->
 		<description>Monster Rancher Battle Card GB (USA)</description>
 		<year>2000</year>
@@ -14591,7 +14591,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="monstrex">
+	<software name="mranchex">
 		<!-- Notes: GBC only -->
 		<description>Monster Rancher Explorer (USA)</description>
 		<year>2000</year>
@@ -14771,7 +14771,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="mxmania2" cloneof="crazybik">
+	<software name="motoxmn2" cloneof="crazybik">
 		<!-- Notes: GBC only -->
 		<description>Motocross Maniacs 2 (USA)</description>
 		<year>1999</year>
@@ -15573,7 +15573,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="nickrace">
+	<software name="nicktrcg">
 		<!-- Notes: GBC only -->
 		<description>Nicktoons Racing (USA)</description>
 		<year>2000</year>
@@ -16076,7 +16076,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="piacarro">
+	<software name="picarro2">
 		<!-- Notes: GBC only -->
 		<description>Pia Carrot e Youkoso!! 2.2 (Jpn)</description>
 		<year>2000</year>
@@ -18151,7 +18151,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="razorfs">
+	<software name="freestyl">
 		<!-- Notes: GBC only -->
 		<description>Freestyle Scooter (Euro)</description>
 		<year>2001</year>
@@ -18165,7 +18165,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="razorfsu" cloneof="razorfs">
+	<software name="razorfs" cloneof="freestyl">
 		<!-- Notes: GBC only -->
 		<description>Razor Freestyle Scooter (USA)</description>
 		<year>2001</year>
@@ -18464,11 +18464,11 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="rocketp">
+	<software name="rcktpw">
 		<!-- Notes: GBC only -->
 		<description>Rocket Power - Gettin' Air (Euro, USA)</description>
 		<year>2001</year>
-		<publisher>THQ;</publisher>
+		<publisher>THQ</publisher>
 		<info name="serial" value="CGB-BRUP-EUR, CGB-BRUE-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
@@ -18478,11 +18478,11 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="rocketpf" cloneof="rocketp">
+	<software name="rcktpwf" cloneof="rcktpw">
 		<!-- Notes: GBC only -->
 		<description>Rocket Power - La Glisse de l'Extreme (Fra)</description>
 		<year>2001</year>
-		<publisher>THQ;</publisher>
+		<publisher>THQ</publisher>
 		<info name="serial" value="??"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
@@ -19410,7 +19410,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="solomon" cloneof="monstrex">
+	<software name="solomon" cloneof="mranchex">
 		<!-- Notes: GBC only -->
 		<description>Solomon (Jpn)</description>
 		<year>2000</year>
@@ -19429,7 +19429,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="anpaman5">
+	<software name="anpan5to">
 		<!-- Notes: GBC only -->
 		<description>Soreike! Anpanman - 5-tsu no Tou no Ousama (Jpn)</description>
 		<year>2000</year>
@@ -19448,7 +19448,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="anpamanf">
+	<software name="anpanfna">
 		<!-- Notes: SGB enhanced -->
 		<description>Soreike! Anpanman - Fushigi na Nikoniko Album (Jpn)</description>
 		<year>1999</year>
@@ -19715,7 +19715,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="starocea">
+	<software name="starocbs">
 		<description>Star Ocean - Blue Sphere (Jpn)</description>
 		<year>2001</year>
 		<publisher>Enix</publisher>
@@ -20959,7 +20959,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="tokimekc">
+	<software name="tokimclt">
 		<!-- Notes: SGB enhanced -->
 		<description>Tokimeki Memorial Pocket - Culture Hen - Komorebi no Melody (Jpn)</description>
 		<year>1999</year>
@@ -20978,7 +20978,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="tokimeks">
+	<software name="tokimspt">
 		<!-- Notes: SGB enhanced -->
 		<description>Tokimeki Memorial Pocket - Sport Hen - Koutei no Photograph (Jpn)</description>
 		<year>1999</year>
@@ -22018,7 +22018,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="warriors">
+	<software name="womm">
 		<!-- Notes: GBC only -->
 		<description>Warriors of Might and Magic (USA)</description>
 		<year>2000</year>
@@ -22455,7 +22455,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="wormarmgu" cloneof="wormarmg">
+	<software name="wormsarmu" cloneof="wormsarm">
 		<!-- Notes: GBC only -->
 		<description>Worms Armageddon (USA)</description>
 		<year>2000</year>
@@ -23151,7 +23151,7 @@ List of unconfirmed non retail roms
 	<software name="pocknaka">
 		<!-- Notes: GBC only -->
 		<description>Pocket no Naka no Ookoku (Jpn, Prototype)</description>
-		<year>2000</year>	<!-- scheduled to be released January 2001 (3/11/2000 Famitsu) -->
+		<year>2000</year>   <!-- scheduled to be released January 2001 (3/11/2000 Famitsu) -->
 		<publisher>Hector</publisher>
 		<info name="alt_title" value="ポケットの中の王国"/>
 		<part name="cart" interface="gameboy_cart">
@@ -23606,7 +23606,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_8in1">
 		<description>8 in 1 (Tw)</description>
 		<year>19??</year>
@@ -23619,7 +23619,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_sac01" supported="no">
 		<description>4 in 1 + 8 in 1 (World, 4B-001)</description>
 		<year>20??</year>
@@ -23631,7 +23631,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_sac02" supported="no">
 		<description>4 in 1 + 8 in 1 (World, 4B-002)</description>
 		<year>19??</year>
@@ -23644,7 +23644,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_sac05" supported="no">
 		<description>4 in 1 + 8 in 1 + 16 in 1 (World, 4B-005)</description>
 		<year>19??</year>
@@ -23657,7 +23657,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_sac07" supported="no">
 		<description>4 in 1 + 8 in 1 (World, 4B-007)</description>
 		<year>19??</year>
@@ -23670,7 +23670,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_6in1">
 		<description>Super 6 in 1 (Tw)</description>
 		<year>19??</year>
@@ -23683,7 +23683,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_16in1">
 		<description>Super 16 in 1 (Tw)</description>
 		<year>19??</year>
@@ -23925,7 +23925,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="digid3">
 		<description>Chao Jin Hua - Shu Ma Bao Long - Zuan Shi Ban (Chi)</description>
 		<year>200?</year>
@@ -23977,7 +23977,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="taikonzs">
 		<description>Taikong Zhan Shi - Jing Dian Ban (Chi)</description>
 		<year>200?</year>
@@ -24209,7 +24209,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="xinshdyx">
 		<description>Xin Shediao Ying Xiong Chuan (Chi)</description>
 		<year>200?</year>
@@ -24244,7 +24244,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="xinguam2">
 		<description>Xin Guangming Yu Hei'an 2 - Zhushen De Yichan (Chi)</description>
 		<year>200?</year>
@@ -24278,7 +24278,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="teshu2k1" cloneof="mslug2k1">
 		<!-- probably developed by BDD -->
 		<description>Teshu Budui 2001 (Chi, Li Cheng)</description>
@@ -24296,7 +24296,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="taikond3">
 		<description>Taikong Zhanshi DX3 - Zui Zhong Huan Xiang (Chi)</description>
 		<year>200?</year>

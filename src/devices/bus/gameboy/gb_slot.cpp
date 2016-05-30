@@ -209,7 +209,7 @@ static const gb_slot slot_list[] =
 	{ GB_MBC_MBC7, "rom_mbc7" },
 	{ GB_MBC_TAMA5, "rom_tama5" },
 	{ GB_MBC_MMM01, "rom_mmm01" },
-	{ GB_MBC_M161, "rom_m161_m12" },
+	{ GB_MBC_M161, "rom_m161" },
 	{ GB_MBC_MBC3, "rom_huc1" },    // for now treat this as alias for MBC3
 	{ GB_MBC_MBC3, "rom_huc3" },    // for now treat this as alias for MBC3
 	{ GB_MBC_SACHEN1, "rom_sachen1" },
@@ -557,8 +557,9 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 //          printf("Li Cheng %d\n", count);
 			type = GB_MBC_LICHENG;
 		}
-		if (count == 4138 || count == 4125)
+		if ((count == 4138 || count == 4125) && len >= 2097152)
 		{
+			// All known sintax (raw) dumps are at least 2097152 bytes in size
 			// Zhi Huan Wang uses 4138
 			// most sintax use 4125
 //          printf("Sintax %d!\n", count);

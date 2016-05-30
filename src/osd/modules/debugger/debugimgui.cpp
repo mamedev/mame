@@ -498,11 +498,11 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
-	
+
 	// if the view has changed its expression (disasm, memory), then update scroll bar
 	if(exp_change)
 		ImGui::SetScrollY(view_ptr->view->visible_position().y * fsize.y);
-	
+
 	// update view location, while the cursor is at 0,0.
 	view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
 	view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
@@ -523,7 +523,7 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 	pos.x = 0;
 	pos.y = ImGui::GetScrollY() / fsize.y;
 	view_ptr->view->set_visible_position(pos);
-		
+
 	viewdata = view_ptr->view->viewdata();
 
 	xy1.x = view_ptr->ofs_x;
@@ -693,7 +693,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		ImGui::BeginChild("##disasm_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		draw_view(view_ptr,exp_change);
 		ImGui::EndChild();
-		
+
 		ImGui::End();
 	}
 }
@@ -801,7 +801,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		ImGui::BeginChild("##memory_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		draw_view(view_ptr,exp_change);
 		ImGui::EndChild();
-		
+
 		ImGui::End();
 	}
 }

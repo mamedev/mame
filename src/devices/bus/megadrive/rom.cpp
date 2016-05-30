@@ -1443,7 +1443,7 @@ WRITE16_MEMBER(md_rom_wukong_device::write_a13)
 /*-------------------------------------------------
  STAR ODYSSEY
  This game uses a slightly more complex mapper:
- not only RAM can be enabled / disabled, but also 
+ not only RAM can be enabled / disabled, but also
  ROM can be mapped in three different modes.
  In what we call Mode0 the first 256K are mirrored
  into area 0x000000-0x1fffff; in Mode1 cart gives
@@ -1457,7 +1457,7 @@ READ16_MEMBER(md_rom_starodys_device::read)
 {
 	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active && m_ram_enable)
 		return m_nvram[offset & 0x3fff];
-	
+
 	if (offset < 0x200000/2)
 	{
 		if (m_mode == 0)
@@ -1497,7 +1497,7 @@ WRITE16_MEMBER(md_rom_starodys_device::write)
 				else
 					m_mode = 0;
 				//printf("ROM mode %d!\n", m_mode);
-				
+
 				if (!BIT(data, 7))
 				{
 					//printf("LOCK BANKSWITCH!\n");
@@ -1512,7 +1512,7 @@ WRITE16_MEMBER(md_rom_starodys_device::write)
 			}
 		}
 	}
-	
+
 }
 
 READ16_MEMBER(md_rom_starodys_device::read_a13)
@@ -1527,9 +1527,8 @@ WRITE16_MEMBER(md_rom_starodys_device::write_a13)
 	{
 		m_nvram_active = BIT(data, 0);
 		m_nvram_readonly = BIT(data, 1);
-		
+
 		if (m_nvram_active)
 			m_nvram_handlers_installed = 1;
 	}
 }
-

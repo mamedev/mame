@@ -126,8 +126,8 @@ WRITE16_MEMBER(m107_state::bankswitch_w)
 WRITE16_MEMBER(m107_state::soundlatch_w)
 {
 	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
-	soundlatch_byte_w(space, 0, data & 0xff);
-//      logerror("soundlatch_byte_w %02x\n",data);
+	m_soundlatch->write(space, 0, data & 0xff);
+//      logerror("m_soundlatch->write %02x\n",data);
 }
 
 READ16_MEMBER(m107_state::sound_status_r)
@@ -138,7 +138,7 @@ READ16_MEMBER(m107_state::sound_status_r)
 READ16_MEMBER(m107_state::soundlatch_r)
 {
 	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
-	return soundlatch_byte_r(space, offset) | 0xff00;
+	return m_soundlatch->read(space, offset) | 0xff00;
 }
 
 WRITE16_MEMBER(m107_state::sound_irq_ack_w)
@@ -823,6 +823,8 @@ static MACHINE_CONFIG_START( firebarr, m107_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))

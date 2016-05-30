@@ -71,7 +71,7 @@ setup_t::~setup_t()
 	m_param_values.clear();
 
 	netlist().set_setup(nullptr);
-	m_sources.clear_and_free();
+	m_sources.clear();
 
 	pstring::resetmem();
 }
@@ -100,13 +100,13 @@ void setup_t::namespace_pop()
 }
 
 
-void setup_t::register_dev(std::shared_ptr<device_t> dev)
+void setup_t::register_dev(plib::powned_ptr<device_t> dev)
 {
 	for (auto & d : netlist().m_devices)
 		if (d->name() == dev->name())
 			log().fatal("Error adding {1} to device list. Duplicate name \n", d->name());
 
-	netlist().m_devices.push_back(dev);
+	netlist().m_devices.push_back(std::move(dev));
 }
 
 void setup_t::register_lib_entry(const pstring &name)
@@ -171,14 +171,14 @@ void setup_t::register_alias(const pstring &alias, const pstring &out)
 
 void setup_t::register_dippins_arr(const pstring &terms)
 {
-	pstring_vector_t list(terms,", ");
+	plib::pstring_vector_t list(terms,", ");
 	if (list.size() == 0 || (list.size() % 2) == 1)
 		log().fatal("You must pass an equal number of pins to DIPPINS");
 	unsigned n = list.size();
 	for (unsigned i = 0; i < n / 2; i++)
 	{
-		register_alias(pfmt("{1}")(i+1), list[i * 2]);
-		register_alias(pfmt("{1}")(n-i), list[i * 2 + 1]);
+		register_alias(plib::pfmt("{1}")(i+1), list[i * 2]);
+		register_alias(plib::pfmt("{1}")(n-i), list[i * 2 + 1]);
 	}
 }
 
@@ -206,6 +206,44 @@ pstring setup_t::objtype_as_astr(object_t &in) const
 	return "Error";
 }
 
+void setup_t::register_and_set_param(pstring name, param_t &param)
+{
+	if (m_param_values.contains(name))
+	{
+		const pstring val = m_param_values[name];
+		log().debug("Found parameter ... {1} : {1}\n", name, val);
+		switch (param.param_type())
+		{
+			case param_t::DOUBLE:
+			{
+				double vald = 0;
+				if (sscanf(val.cstr(), "%lf", &vald) != 1)
+					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
+				dynamic_cast<param_double_t &>(param).initial(vald);
+			}
+			break;
+			case param_t::INTEGER:
+			case param_t::LOGIC:
+			{
+				double vald = 0;
+				if (sscanf(val.cstr(), "%lf", &vald) != 1)
+					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
+				dynamic_cast<param_int_t &>(param).initial((int) vald);
+			}
+			break;
+			case param_t::STRING:
+			case param_t::MODEL:
+			{
+				dynamic_cast<param_str_t &>(param).initial(val);
+			}
+			break;
+			default:
+				log().fatal("Parameter is not supported {1} : {2}\n", name, val);
+		}
+	}
+	if (!m_params.add(param.name(), param_ref_t(param.name(), param.device(), param)))
+		log().fatal("Error adding parameter {1} to parameter list\n", name);
+}
 
 void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 {
@@ -254,46 +292,8 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 			break;
 		case terminal_t::PARAM:
 			{
-				param_t &param = dynamic_cast<param_t &>(obj);
-				if (m_param_values.contains(name))
-				{
-					const pstring val = m_param_values[name];
-					switch (param.param_type())
-					{
-						case param_t::DOUBLE:
-						{
-							log().debug("Found parameter ... {1} : {1}\n", name, val);
-							double vald = 0;
-							if (sscanf(val.cstr(), "%lf", &vald) != 1)
-								log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-							dynamic_cast<param_double_t &>(param).initial(vald);
-						}
-						break;
-						case param_t::INTEGER:
-						case param_t::LOGIC:
-						{
-							log().debug("Found parameter ... {1} : {2}\n", name, val);
-							double vald = 0;
-							if (sscanf(val.cstr(), "%lf", &vald) != 1)
-								log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-							dynamic_cast<param_int_t &>(param).initial((int) vald);
-						}
-						break;
-						case param_t::STRING:
-						{
-							dynamic_cast<param_str_t &>(param).initial(val);
-						}
-						break;
-						case param_t::MODEL:
-							//dynamic_cast<param_model_t &>(param).initial(val);
-							dynamic_cast<param_model_t &>(param).initial(val);
-							break;
-						default:
-							log().fatal("Parameter is not supported {1} : {2}\n", name, val);
-					}
-				}
-				if (!m_params.add(param.name(), &param))
-					log().fatal("Error adding parameter {1} to parameter list\n", name);
+				//register_and_set_param(name, dynamic_cast<param_t &>(obj));
+				log().fatal("should use register_param");
 			}
 			break;
 		case terminal_t::DEVICE:
@@ -307,7 +307,7 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 
 void setup_t::register_link_arr(const pstring &terms)
 {
-	pstring_vector_t list(terms,", ");
+	plib::pstring_vector_t list(terms,", ");
 	if (list.size() < 2)
 		log().fatal("You must pass at least 2 terminals to NET_C");
 	for (std::size_t i = 1; i < list.size(); i++)
@@ -351,7 +351,7 @@ void setup_t::remove_connections(const pstring pin)
 
 void setup_t::register_frontier(const pstring attach, const double r_IN, const double r_OUT)
 {
-	pstring frontier_name = pfmt("frontier_{1}")(m_frontier_cnt);
+	pstring frontier_name = plib::pfmt("frontier_{1}")(m_frontier_cnt);
 	m_frontier_cnt++;
 	register_dev("FRONTIER_DEV", frontier_name);
 	register_param(frontier_name + ".RIN", r_IN);
@@ -382,7 +382,7 @@ void setup_t::register_frontier(const pstring attach, const double r_IN, const d
 void setup_t::register_param(const pstring &param, const double value)
 {
 	// FIXME: there should be a better way
-	register_param(param, pfmt("{1}").e(value,".9"));
+	register_param(param, plib::pfmt("{1}").e(value,".9"));
 }
 
 void setup_t::register_param(const pstring &param, const pstring &value)
@@ -482,7 +482,7 @@ param_t *setup_t::find_param(const pstring &param_in, bool required)
 		log().fatal("parameter {1}({2}) not found!\n", param_in_fqn, outname);
 	if (ret != -1)
 		log().debug("Found parameter {1}\n", outname);
-	return (ret == -1 ? nullptr : m_params.value_at(ret));
+	return (ret == -1 ? nullptr : &m_params.value_at(ret).m_param);
 }
 
 // FIXME avoid dynamic cast here
@@ -496,13 +496,12 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 	if (proxy == nullptr)
 	{
 		// create a new one ...
-		pstring x = pfmt("proxy_da_{1}_{2}")(out.name())(m_proxy_cnt);
+		pstring x = plib::pfmt("proxy_da_{1}_{2}")(out.name())(m_proxy_cnt);
 		auto new_proxy =
 				out_cast.logic_family()->create_d_a_proxy(netlist(), x, &out_cast);
 		m_proxy_cnt++;
 
-		register_dev_s(new_proxy);
-		new_proxy->start_dev();
+		//new_proxy->start_dev();
 
 		/* connect all existing terminals to new net */
 
@@ -515,8 +514,11 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 		out.net().m_core_terms.clear(); // clear the list
 
 		out.net().register_con(new_proxy->in());
-		out_cast.set_proxy(new_proxy.get());
+		out_cast.set_proxy(proxy);
+
 		proxy = new_proxy.get();
+
+		register_dev_s(std::move(new_proxy));
 	}
 	return proxy;
 }
@@ -526,16 +528,15 @@ void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
 	if (out.is_analog() && in.is_logic())
 	{
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(in);
-		pstring x = pfmt("proxy_ad_{1}_{2}")(in.name())( m_proxy_cnt);
-		auto proxy = std::make_shared<devices::nld_a_to_d_proxy>(netlist(), x, &incast);
+		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(in.name())( m_proxy_cnt);
+		auto proxy = plib::powned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
 		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
 
-		register_dev_s(proxy);
-		proxy->start_dev();
-
 		proxy->m_Q.net().register_con(in);
 		out.net().register_con(proxy->m_I);
+
+		register_dev_s(std::move(proxy));
 
 	}
 	else if (out.is_logic() && in.is_analog())
@@ -565,13 +566,10 @@ void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 	{
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
 		log().debug("connect_terminal_input: connecting proxy\n");
-		pstring x = pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
-		auto proxy = std::make_shared<devices::nld_a_to_d_proxy>(netlist(), x, &incast);
+		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
+		auto proxy = plib::powned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
 		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
-
-		register_dev_s(proxy);
-		proxy->start_dev();
 
 		connect_terminals(term, proxy->m_I);
 
@@ -580,6 +578,8 @@ void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 			proxy->m_Q.net().merge_net(&inp.net());
 		else
 			proxy->m_Q.net().register_con(inp);
+
+		register_dev_s(std::move(proxy));
 	}
 	else
 	{
@@ -632,7 +632,7 @@ void setup_t::connect_terminals(core_terminal_t &t1, core_terminal_t &t2)
 	{
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
-		analog_net_t::ptr_t anet = palloc(analog_net_t(netlist(),"net." + t1.name()));
+		analog_net_t::ptr_t anet = plib::palloc<analog_net_t>(netlist(),"net." + t1.name());
 		t1.set_net(anet);
 		anet->register_con(t2);
 		anet->register_con(t1);
@@ -802,7 +802,7 @@ void setup_t::resolve_inputs()
 		if (!term->has_net() && dynamic_cast< devices::NETLIB_NAME(dummy_input) *>(&term->device()) != nullptr)
 			log().warning("Found dummy terminal {1} without connections", term->name());
 		else if (!term->has_net())
-			errstr += pfmt("Found terminal {1} without a net\n")(term->name());
+			errstr += plib::pfmt("Found terminal {1} without a net\n")(term->name());
 		else if (term->net().num_cons() == 0)
 			log().warning("Found terminal {1} without connections", term->name());
 	}
@@ -834,6 +834,12 @@ void setup_t::resolve_inputs()
 	else
 		netlist().solver()->post_start();
 
+	/* finally, set the pointers */
+
+	log().debug("Initializing devices ...\n");
+	for (auto &dev : netlist().m_devices)
+		dev->set_delegate_pointer();
+
 }
 
 void setup_t::start_devices()
@@ -843,14 +849,14 @@ void setup_t::start_devices()
 	if (env != "")
 	{
 		log().debug("Creating dynamic logs ...\n");
-		pstring_vector_t loglist(env, ":");
+		plib::pstring_vector_t loglist(env, ":");
 		for (pstring ll : loglist)
 		{
 			pstring name = "log_" + ll;
 			auto nc = factory().new_device_by_name("LOG", netlist(), name);
-			register_dev_s(nc);
 			register_link(name + ".I", ll);
 			log().debug("    dynamic link {1}: <{2}>\n",ll, name);
+			register_dev_s(std::move(nc));
 		}
 	}
 
@@ -866,24 +872,28 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 {
 public:
 	logic_family_std_proxy_t() { }
-	virtual std::shared_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
+	virtual plib::powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
 			const pstring &name, logic_output_t *proxied) const override
 	{
-		return std::make_shared<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+		return plib::powned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 };
 
-logic_family_desc_t *setup_t::family_from_model(const pstring &model)
+const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 {
 	model_map_t map;
 	model_parse(model, map);
 
 	if (setup_t::model_value_str(map, "TYPE") == "TTL")
-		return family_TTL;
+		return family_TTL();
 	if (setup_t::model_value_str(map, "TYPE") == "CD4XXX")
-		return family_CD4XXX;
+		return family_CD4XXX();
 
-	logic_family_std_proxy_t *ret = palloc(logic_family_std_proxy_t);
+	for (auto & e : netlist().m_family_cache)
+		if (e.first == model)
+			return e.second.get();
+
+	auto ret = plib::make_unique_base<logic_family_desc_t, logic_family_std_proxy_t>();
 
 	ret->m_low_thresh_V = setup_t::model_value(map, "IVL");
 	ret->m_high_thresh_V = setup_t::model_value(map, "IVH");
@@ -892,7 +902,11 @@ logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 	ret->m_R_low = setup_t::model_value(map, "ORL");
 	ret->m_R_high = setup_t::model_value(map, "ORH");
 
-	return ret;
+	auto retp = ret.get();
+
+	netlist().m_family_cache.emplace_back(model, std::move(ret));
+
+	return retp;
 }
 
 static pstring model_string(model_map_t &map)
@@ -930,7 +944,7 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 		if (m_models.contains(xmodel))
 			model_parse(xmodel, map);
 		else
-			log().fatal("Model doesn't exist {1}\n", xmodel);
+			log().fatal("Model doesn't exist: <{1}>\n", model_in);
 	}
 
 	pstring remainder=model.substr(pos+1).trim();
@@ -938,7 +952,7 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 		log().fatal("Model error {1}\n", model);
 	remainder = remainder.left(remainder.len() - 1);
 
-	pstring_vector_t pairs(remainder," ", true);
+	plib::pstring_vector_t pairs(remainder," ", true);
 	for (pstring &pe : pairs)
 	{
 		int pose = pe.find("=");
@@ -980,7 +994,7 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 		case 'a': factor = 1e-18; break;
 		default:
 			if (numfac < "0" || numfac > "9")
-				fatalerror_e(pfmt("Unknown number factor <{1}> in: {2}")(numfac)(entity));
+				fatalerror_e(plib::pfmt("Unknown number factor <{1}> in: {2}")(numfac)(entity));
 	}
 	if (factor != NL_FCONST(1.0))
 		tmp = tmp.left(tmp.len() - 1);
@@ -993,7 +1007,7 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 
 void setup_t::include(const pstring &netlist_name)
 {
-	for (source_t *source : m_sources)
+	for (auto source : m_sources)
 	{
 		if (source->parse(*this, netlist_name))
 			return;
@@ -1007,28 +1021,28 @@ void setup_t::include(const pstring &netlist_name)
 
 bool source_string_t::parse(setup_t &setup, const pstring &name)
 {
-	pimemstream istrm(m_str.cstr(), m_str.len());
-	pomemstream ostrm;
+	plib::pimemstream istrm(m_str.cstr(), m_str.len());
+	plib::pomemstream ostrm;
 
-	pimemstream istrm2(ppreprocessor().process(istrm, ostrm));
+	plib::pimemstream istrm2(plib::ppreprocessor().process(istrm, ostrm));
 	return parser_t(istrm2, setup).parse(name);
 }
 
 bool source_mem_t::parse(setup_t &setup, const pstring &name)
 {
-	pimemstream istrm(m_str.cstr(), m_str.len());
-	pomemstream ostrm;
+	plib::pimemstream istrm(m_str.cstr(), m_str.len());
+	plib::pomemstream ostrm;
 
-	pimemstream istrm2(ppreprocessor().process(istrm, ostrm));
+	plib::pimemstream istrm2(plib::ppreprocessor().process(istrm, ostrm));
 	return parser_t(istrm2, setup).parse(name);
 }
 
 bool source_file_t::parse(setup_t &setup, const pstring &name)
 {
-	pifilestream istrm(m_filename);
-	pomemstream ostrm;
+	plib::pifilestream istrm(m_filename);
+	plib::pomemstream ostrm;
 
-	pimemstream istrm2(ppreprocessor().process(istrm, ostrm));
+	plib::pimemstream istrm2(plib::ppreprocessor().process(istrm, ostrm));
 	return parser_t(istrm2, setup).parse(name);
 }
 

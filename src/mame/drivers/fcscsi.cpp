@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edstrom
 /***************************************************************************
- * Interrupt scheme and dmac hookup shamelessly based on esq5505.cpp 
+ * Interrupt scheme and dmac hookup shamelessly based on esq5505.cpp
  *
  *  11/04/2016
  *  Force SYS68K ISCSI-1 driver - This driver will be converted into a slot device once the VME bus driver exists.
@@ -15,7 +15,7 @@
  * ----------------------------------------------------------
  * 00 0000 - 00 0007 Initialisation vectors from system EPROM
  * 00 0008 - 00 1FFF Local SRAM
- * 00 2000 - 01 FFFF Dynamic Dual Port RAM 
+ * 00 2000 - 01 FFFF Dynamic Dual Port RAM
  * C4 0000 - C4 001F SCSIbus controller
  * C8 0000 - C8 00FF DMAC
  * CC 0000 - CC 0007 FDC
@@ -160,7 +160,7 @@ READ16_MEMBER (fcscsi1_state::bootvect_r){
 	return m_sysrom [offset];
 }
 
-/* The Control Register - descretelly implemented on the PCB 
+/* The Control Register - descretelly implemented on the PCB
 Bit #: 7 6 5 4 3 2 1 0
        \ \ \ \ \ \ \ \ Floppy Disk Side Select
         \ \ \ \ \ \ \ Floppy Disk Drive Select 0
@@ -169,7 +169,7 @@ Bit #: 7 6 5 4 3 2 1 0
            \ \ \ \ Floppy Disk Drive Select 3
             \ \ \ ISCSI-l I.D. Bit #0
              \ \ ISCSI-l I.D. Bit #1
-              \ ISCSI-l 1.D. Bit #2 
+              \ ISCSI-l 1.D. Bit #2
 */
 
 READ8_MEMBER (fcscsi1_state::tcr_r){
@@ -257,7 +257,7 @@ WRITE8_MEMBER (fcscsi1_state::not_implemented_w){
 
 /*
 ----------------------------------------------------
- IRQ  IRQ 
+ IRQ  IRQ
 Level Source       B4l inserted     B4l removed (Def)
 -----------------------------------------------------
  1     P3 Pin #13   AV1 Autovector   AV1 Autovector
@@ -265,10 +265,10 @@ Level Source       B4l inserted     B4l removed (Def)
  3     SCSIBC       AV3 Autovector   AV3 Autovector
  4     FDC          AV4 Autovector   AV4 Autovector
  5     PI/T Timer   PI/T Timer Vect  PI/T Timer Vect
- 6     --           --               --           
+ 6     --           --               --
  7     PI/T Port    PI/T Port Vect   PI/T Port Vect
 ------------------------------------------------------
-Default configuration: B41 jumper removed 
+Default configuration: B41 jumper removed
 
 The PI/T port interrupt can be used under software control to
 cause non-maskable (Level 7) interrupts if the watchdog timer

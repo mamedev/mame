@@ -78,8 +78,6 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/6532riot.h"
-#include "machine/6522via.h"
 #include "sound/ay8910.h"
 #include "includes/gameplan.h"
 
@@ -168,7 +166,7 @@ WRITE_LINE_MEMBER(gameplan_state::r6532_irq)
 WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
 {
 	address_space &progspace = m_maincpu->space(AS_PROGRAM);
-	soundlatch_byte_w(progspace, 0, data);
+	m_soundlatch->write(progspace, 0, data);
 }
 
 
@@ -978,6 +976,8 @@ static MACHINE_CONFIG_START( gameplan, gameplan_state )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, GAMEPLAN_AY8910_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
@@ -996,7 +996,7 @@ static MACHINE_CONFIG_START( gameplan, gameplan_state )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(gameplan_state, coin_w))
 
 	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
-	MCFG_VIA6522_READPB_HANDLER(READ8(driver_device, soundlatch_byte_r))
+	MCFG_VIA6522_READPB_HANDLER(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(gameplan_state, audio_cmd_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, audio_trigger_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(gameplan_state, audio_reset_w))

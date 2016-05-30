@@ -2765,7 +2765,7 @@ MACHINE_CONFIG_END
 #include "mpu4crystal.hxx"
 #include "mpu4empire.hxx"
 #include "mpu4mdm.hxx"
-#include "mpu4misc.hxx" 
+#include "mpu4misc.hxx"
 #include "mpu4mod2sw.hxx"
 #include "mpu4mod4yam.hxx"
 #include "mpu4sw.hxx"

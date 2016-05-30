@@ -10,34 +10,41 @@
 
 #pragma once
 
-#ifndef __UI_MISCMENU_H__
-#define __UI_MISCMENU_H__
+#ifndef MAME_FRONTEND_UI_MISCMENU_H
+#define MAME_FRONTEND_UI_MISCMENU_H
 
 #include "crsshair.h"
 #include "emuopts.h"
 
-using s_bios = std::vector<std::pair<std::string, int>>;
+#include <utility>
+#include <vector>
 
-class ui_menu_keyboard_mode : public ui_menu {
+
+namespace ui {
+
+class menu_keyboard_mode : public menu
+{
 public:
-	ui_menu_keyboard_mode(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_keyboard_mode();
+	menu_keyboard_mode(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_keyboard_mode();
 	virtual void populate() override;
 	virtual void handle() override;
 };
 
-class ui_menu_network_devices : public ui_menu {
+class menu_network_devices : public menu
+{
 public:
-	ui_menu_network_devices(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_network_devices();
+	menu_network_devices(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_network_devices();
 	virtual void populate() override;
 	virtual void handle() override;
 };
 
-class ui_menu_bookkeeping : public ui_menu {
+class menu_bookkeeping : public menu
+{
 public:
-	ui_menu_bookkeeping(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_bookkeeping();
+	menu_bookkeeping(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_bookkeeping();
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -45,10 +52,11 @@ private:
 	attotime prevtime;
 };
 
-class ui_menu_crosshair : public ui_menu {
+class menu_crosshair : public menu
+{
 public:
-	ui_menu_crosshair(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_crosshair();
+	menu_crosshair(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_crosshair();
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -71,18 +79,20 @@ private:
 	};
 };
 
-class ui_menu_quit_game : public ui_menu {
+class menu_quit_game : public menu
+{
 public:
-	ui_menu_quit_game(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_quit_game();
+	menu_quit_game(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_quit_game();
 	virtual void populate() override;
 	virtual void handle() override;
 };
 
-class ui_menu_bios_selection : public ui_menu {
+class menu_bios_selection : public menu
+{
 public:
-	ui_menu_bios_selection(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_bios_selection();
+	menu_bios_selection(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_bios_selection();
 	virtual void populate() override;
 	virtual void handle() override;
 };
@@ -92,11 +102,11 @@ public:
 //  export menu
 //-------------------------------------------------
 
-class ui_menu_export : public ui_menu
+class menu_export : public menu
 {
 public:
-	ui_menu_export(mame_ui_manager &mui, render_container *container, std::vector<const game_driver*> list);
-	virtual ~ui_menu_export();
+	menu_export(mame_ui_manager &mui, render_container *container, std::vector<const game_driver*> list);
+	virtual ~menu_export();
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -108,16 +118,18 @@ private:
 //  machine configure menu
 //-------------------------------------------------
 
-class ui_menu_machine_configure : public ui_menu
+class menu_machine_configure : public menu
 {
 public:
-	ui_menu_machine_configure(mame_ui_manager &mui, render_container *container, const game_driver *prev, float x0 = 0.0f, float y0 = 0.0f);
-	virtual ~ui_menu_machine_configure();
+	menu_machine_configure(mame_ui_manager &mui, render_container *container, const game_driver *prev, float x0 = 0.0f, float y0 = 0.0f);
+	virtual ~menu_machine_configure();
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
+	using s_bios = std::vector<std::pair<std::string, int>>;
+
 	enum
 	{
 		ADDFAV = 1,
@@ -141,14 +153,16 @@ private:
 //  plugins configure menu
 //-------------------------------------------------
 
-class ui_menu_plugins_configure : public ui_menu
+class menu_plugins_configure : public menu
 {
 public:
-	ui_menu_plugins_configure(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_plugins_configure();
+	menu_plugins_configure(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_plugins_configure();
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 };
 
-#endif  /* __UI_MISCMENU_H__ */
+} // namespace ui
+
+#endif  /* MAME_FRONTEND_UI_MISCMENU_H */

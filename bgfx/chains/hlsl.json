@@ -93,7 +93,7 @@
 		{ "type": "float", "name": "scanline_height",        "text": "Individual Scanline Scale",  "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_variation",     "text": "Scanline Variation",         "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
  		{ "type": "float", "name": "scanline_bright_scale",  "text": "Scanline Brightness Scale",  "default": 2.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
-		{ "type": "float", "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 4.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
+		{ "type": "float", "name": "scanline_bright_offset", "text": "Scanline Brightness Offset", "default": 1.50, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_jitter_amount", "text": "Scanline Jitter Amount",     "default": 0.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
 		{ "type": "float", "name": "scanline_variation",     "text": "Scanline Variation",         "default": 1.00, "max": 4.00, "min": 0.0, "step": 0.01, "format": "%1.2f", "screen": "crt" },
  

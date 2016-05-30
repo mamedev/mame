@@ -794,9 +794,9 @@ ROM_END
 /* set contained only three program ROMs, other ROMs should be checked against a real PCB */
 ROM_START( 1942h )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 3*16k for the banked ROMs images */
-	ROM_LOAD( "Supercharger_1942_#3.m3",  0x00000, 0x4000, CRC(ec70785f) SHA1(2010a945e1d5c984a14cf7f47a883d04bd71567d) )	/* label confirmed from auction post */
-	ROM_LOAD( "Supercharger_1942_#4.m4",  0x04000, 0x4000, CRC(cc11355f) SHA1(44fceb449f406f657494eeee4e6b43bf063f2013) )	/* label confirmed from auction post */
-	ROM_LOAD( "Supercharger_1942_#5.m5",  0x10000, 0x4000, CRC(42746d75) SHA1(ede6919b84653b94fddeb40b3004e44336880ba2) )	/* label confirmed from auction post */
+	ROM_LOAD( "Supercharger_1942_#3.m3",  0x00000, 0x4000, CRC(ec70785f) SHA1(2010a945e1d5c984a14cf7f47a883d04bd71567d) )   /* label confirmed from auction post */
+	ROM_LOAD( "Supercharger_1942_#4.m4",  0x04000, 0x4000, CRC(cc11355f) SHA1(44fceb449f406f657494eeee4e6b43bf063f2013) )   /* label confirmed from auction post */
+	ROM_LOAD( "Supercharger_1942_#5.m5",  0x10000, 0x4000, CRC(42746d75) SHA1(ede6919b84653b94fddeb40b3004e44336880ba2) )   /* label confirmed from auction post */
 	ROM_LOAD( "srb-06.m6", 0x14000, 0x2000, CRC(466f8248) SHA1(2ccc8fc59962d3001fbc10e8d2f20a254a74f251) )
 	ROM_LOAD( "srb-07.m7", 0x18000, 0x4000, CRC(0d31038c) SHA1(b588eaf6fddd66ecb2d9832dc197f286f1ccd846) )
 

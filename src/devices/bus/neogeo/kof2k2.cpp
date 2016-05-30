@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 /***********************************************************************************************************
- 
+
  Neo Geo cart emulation
  The King of Fighers 2002 cart type (CMC + PCM2 + Additional CPU encryption)
- 
+
  ***********************************************************************************************************/
 
 

@@ -60,7 +60,7 @@ public:
 class d3d_texture_manager
 {
 public:
-	d3d_texture_manager(): m_renderer(nullptr), m_texlist(nullptr), m_dynamic_supported(0), m_stretch_supported(0), m_yuv_format(), m_texture_caps(0), m_texture_max_aspect(0), m_texture_max_width(0), m_texture_max_height(0), m_vector_texture(nullptr), m_default_texture(nullptr)
+	d3d_texture_manager(): m_renderer(nullptr), m_texlist(nullptr), m_dynamic_supported(0), m_stretch_supported(0), m_yuv_format(), m_texture_caps(0), m_texture_max_aspect(0), m_texture_max_width(0), m_texture_max_height(0), m_default_texture(nullptr)
 	{ }
 
 	d3d_texture_manager(renderer_d3d9 *d3d);
@@ -87,7 +87,6 @@ public:
 	DWORD                   get_max_texture_height() const { return m_texture_max_height; }
 
 	texture_info *          get_default_texture() const { return m_default_texture; }
-	texture_info *          get_vector_texture() const { return m_vector_texture; }
 
 	renderer_d3d9 *         get_d3d() const { return m_renderer; }
 
@@ -103,9 +102,6 @@ private:
 	DWORD                   m_texture_max_aspect;       // texture maximum aspect ratio
 	DWORD                   m_texture_max_width;        // texture maximum width
 	DWORD                   m_texture_max_height;       // texture maximum height
-
-	bitmap_argb32           m_vector_bitmap;            // experimental: bitmap for vectors
-	texture_info *          m_vector_texture;           // experimental: texture for vectors
 
 	bitmap_rgb32            m_default_bitmap;           // experimental: default bitmap
 	texture_info *          m_default_texture;          // experimental: default texture

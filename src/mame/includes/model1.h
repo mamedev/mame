@@ -137,25 +137,25 @@ public:
 
 	class view_t
 	{
-    public:
-        view_t() { }
+	public:
+		view_t() { }
 
-        void init_translation_matrix();
+		void init_translation_matrix();
 
-        void set_viewport(float xcenter, float ycenter, float xl, float xr, float yb, float yt);
-        void set_lightparam(int index, float diffuse, float ambient, float specular, int power);
-        void set_zoom(float x, float y);
-        void set_light_direction(float x, float y, float z);
-        void set_translation_matrix(float* mat);
-        void set_view_translation(float x, float y);
+		void set_viewport(float xcenter, float ycenter, float xl, float xr, float yb, float yt);
+		void set_lightparam(int index, float diffuse, float ambient, float specular, int power);
+		void set_zoom(float x, float y);
+		void set_light_direction(float x, float y, float z);
+		void set_translation_matrix(float* mat);
+		void set_view_translation(float x, float y);
 
-        void project_point(point_t *p) const;
-        void project_point_direct(point_t *p) const;
+		void project_point(point_t *p) const;
+		void project_point_direct(point_t *p) const;
 
-        void transform_vector(glm::vec3& p) const;
-        void transform_point(point_t *p) const;
+		void transform_vector(glm::vec3& p) const;
+		void transform_point(point_t *p) const;
 
-        void recompute_frustum();
+		void recompute_frustum();
 
 		int xc, yc, x1, y1, x2, y2;
 		float zoomx, zoomy, viewx, viewy;
@@ -176,10 +176,10 @@ private:
 	bool m_swa;
 
 	// Devices
-	required_device<v60_device> m_maincpu;			// V60
-	required_device<segam1audio_device> m_m1audio;	// Model 1 standard sound board
-	optional_device<m1comm_device> m_m1comm;		// Model 1 communication board
-	optional_device<dsbz80_device> m_dsbz80;		// Digital Sound Board
+	required_device<v60_device> m_maincpu;          // V60
+	required_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
+	optional_device<m1comm_device> m_m1comm;        // Model 1 communication board
+	optional_device<dsbz80_device> m_dsbz80;        // Digital Sound Board
 	optional_device<mb86233_cpu_device> m_tgp;
 	required_device<screen_device> m_screen;
 
@@ -195,32 +195,32 @@ private:
 	int m_snd_cmd_state;
 
 	// TGP FIFO
-	UINT32	fifoout_pop();
-	void	fifoout_push(UINT32 data);
-	void	fifoout_push_f(float data);
-	UINT32	fifoin_pop();
-	void	fifoin_push(UINT32 data);
-	float	fifoin_pop_f();
-	UINT16	ram_get_i();
-	float	ram_get_f();
-	void	copro_fifoin_push(UINT32 data);
-	UINT32	copro_fifoout_pop();
-	void	next_fn();
+	UINT32  fifoout_pop();
+	void    fifoout_push(UINT32 data);
+	void    fifoout_push_f(float data);
+	UINT32  fifoin_pop();
+	void    fifoin_push(UINT32 data);
+	float   fifoin_pop_f();
+	UINT16  ram_get_i();
+	float   ram_get_f();
+	void    copro_fifoin_push(UINT32 data);
+	UINT32  copro_fifoout_pop();
+	void    next_fn();
 
-	UINT32	m_copro_r;
-	UINT32	m_copro_w;
-	int		m_copro_fifoout_rpos;
-	int		m_copro_fifoout_wpos;
-	UINT32	m_copro_fifoout_data[FIFO_SIZE];
-	int		m_copro_fifoout_num;
-	int		m_copro_fifoin_rpos;
-	int		m_copro_fifoin_wpos;
-	UINT32	m_copro_fifoin_data[FIFO_SIZE];
-	int		m_copro_fifoin_num;
+	UINT32  m_copro_r;
+	UINT32  m_copro_w;
+	int     m_copro_fifoout_rpos;
+	int     m_copro_fifoout_wpos;
+	UINT32  m_copro_fifoout_data[FIFO_SIZE];
+	int     m_copro_fifoout_num;
+	int     m_copro_fifoin_rpos;
+	int     m_copro_fifoin_wpos;
+	UINT32  m_copro_fifoin_data[FIFO_SIZE];
+	int     m_copro_fifoin_num;
 
 	// TGP
-	void	vr_tgp_reset();
-	void	tgp_reset(bool swa);
+	void    vr_tgp_reset();
+	void    tgp_reset(bool swa);
 
 	DECLARE_TGP_FUNCTION( fadd );
 	DECLARE_TGP_FUNCTION( fsub );
@@ -339,19 +339,19 @@ private:
 		std::function<void(view_t*, point_t*, point_t*, point_t*)> m_clip;
 	};
 
-	view_t		*m_view;
-	point_t	*m_pointdb;
-	point_t	*m_pointpt;
-	quad_t		*m_quaddb;
-	quad_t		*m_quadpt;
-	quad_t		**m_quadind;
-	offs_t		m_pushpc;
-	int			m_fifoin_rpos;
-	int			m_fifoin_wpos;
-	UINT32		m_fifoin_data[FIFO_SIZE];
-	int			m_fifoin_cbcount;
+	view_t      *m_view;
+	point_t *m_pointdb;
+	point_t *m_pointpt;
+	quad_t      *m_quaddb;
+	quad_t      *m_quadpt;
+	quad_t      **m_quadind;
+	offs_t      m_pushpc;
+	int         m_fifoin_rpos;
+	int         m_fifoin_wpos;
+	UINT32      m_fifoin_data[FIFO_SIZE];
+	int         m_fifoin_cbcount;
 	typedef void (model1_state::*tgp_func)();
-	tgp_func	m_fifoin_cb;
+	tgp_func    m_fifoin_cb;
 
 	struct function
 	{
@@ -361,95 +361,95 @@ private:
 
 	static const struct function ftab_vf[];
 	static const struct function ftab_swa[];
-	INT32	m_fifoout_rpos;
-	INT32	m_fifoout_wpos;
-	UINT32	m_fifoout_data[FIFO_SIZE];
-	UINT32	m_list_length;
-	float	m_cmat[12];
-	float	m_mat_stack[MAT_STACK_SIZE][12];
-	float	m_mat_vector[21][12];
-	INT32	m_mat_stack_pos;
-	float	m_acc;
-	float	m_tgp_vf_xmin;
-	float	m_tgp_vf_xmax;
-	float	m_tgp_vf_zmin;
-	float	m_tgp_vf_zmax;
-	float	m_tgp_vf_ygnd;
-	float	m_tgp_vf_yflr;
-	float	m_tgp_vf_yjmp;
-	float	m_tgp_vr_circx;
-	float	m_tgp_vr_circy;
-	float	m_tgp_vr_circrad;
-	float	m_tgp_vr_cbox[12];
-	int		m_tgp_vr_select;
+	INT32   m_fifoout_rpos;
+	INT32   m_fifoout_wpos;
+	UINT32  m_fifoout_data[FIFO_SIZE];
+	UINT32  m_list_length;
+	float   m_cmat[12];
+	float   m_mat_stack[MAT_STACK_SIZE][12];
+	float   m_mat_vector[21][12];
+	INT32   m_mat_stack_pos;
+	float   m_acc;
+	float   m_tgp_vf_xmin;
+	float   m_tgp_vf_xmax;
+	float   m_tgp_vf_zmin;
+	float   m_tgp_vf_zmax;
+	float   m_tgp_vf_ygnd;
+	float   m_tgp_vf_yflr;
+	float   m_tgp_vf_yjmp;
+	float   m_tgp_vr_circx;
+	float   m_tgp_vr_circy;
+	float   m_tgp_vr_circrad;
+	float   m_tgp_vr_cbox[12];
+	int     m_tgp_vr_select;
 
-	float	m_tgp_int_px;
-	float	m_tgp_int_py;
-	float	m_tgp_int_pz;
-	UINT32	m_tgp_int_adr;
-	UINT16	m_ram_adr;
-	UINT16	m_ram_latch[2];
-	UINT16	m_ram_scanadr;
+	float   m_tgp_int_px;
+	float   m_tgp_int_py;
+	float   m_tgp_int_pz;
+	UINT32  m_tgp_int_adr;
+	UINT16  m_ram_adr;
+	UINT16  m_ram_latch[2];
+	UINT16  m_ram_scanadr;
 	std::unique_ptr<UINT32[]> m_ram_data;
-	float	m_tgp_vr_base[4];
-	int		m_puuu;
-	int		m_ccount;
-	UINT32	m_vr_r;
-	UINT32	m_vr_w;
-	UINT16	m_listctl[2];
-	UINT16	*m_glist;
-	bool	m_render_done;
+	float   m_tgp_vr_base[4];
+	int     m_puuu;
+	int     m_ccount;
+	UINT32  m_vr_r;
+	UINT32  m_vr_w;
+	UINT16  m_listctl[2];
+	UINT16  *m_glist;
+	bool    m_render_done;
 
 	std::unique_ptr<UINT16[]> m_tgp_ram;
 	UINT32 *m_poly_rom;
 	std::unique_ptr<UINT32[]> m_poly_ram;
 
 	// Rendering helper functions
-	UINT32	readi(const UINT16 *adr) const;
-	INT16	readi16(const UINT16 *adr) const;
-	float	readf(const UINT16 *adr) const;
-	void	cross_product(point_t* o, const point_t* p, const point_t* q) const;
-	float	view_determinant(const point_t *p1, const point_t *p2, const point_t *p3) const;
+	UINT32  readi(const UINT16 *adr) const;
+	INT16   readi16(const UINT16 *adr) const;
+	float   readf(const UINT16 *adr) const;
+	void    cross_product(point_t* o, const point_t* p, const point_t* q) const;
+	float   view_determinant(const point_t *p1, const point_t *p2, const point_t *p3) const;
 
-    static bool	fclip_isc_bottom(view_t*, point_t*);
-    static bool	fclip_isc_top(view_t*, point_t*);
-    static bool	fclip_isc_left(view_t*, point_t*);
-    static bool	fclip_isc_right(view_t*, point_t*);
-    static void	fclip_clip_bottom(view_t*, point_t*, point_t*, point_t*);
-    static void	fclip_clip_top(view_t*, point_t*, point_t*, point_t*);
-    static void	fclip_clip_left(view_t*, point_t*, point_t*, point_t*);
-    static void	fclip_clip_right(view_t*, point_t*, point_t*, point_t*);
+	static bool fclip_isc_bottom(view_t*, point_t*);
+	static bool fclip_isc_top(view_t*, point_t*);
+	static bool fclip_isc_left(view_t*, point_t*);
+	static bool fclip_isc_right(view_t*, point_t*);
+	static void fclip_clip_bottom(view_t*, point_t*, point_t*, point_t*);
+	static void fclip_clip_top(view_t*, point_t*, point_t*, point_t*);
+	static void fclip_clip_left(view_t*, point_t*, point_t*, point_t*);
+	static void fclip_clip_right(view_t*, point_t*, point_t*, point_t*);
 
 	// Rendering
-	void	tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void	tgp_scan();
+	void    tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void    tgp_scan();
 
-	void	    sort_quads() const;
-	void	    unsort_quads() const;
-	void	    draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	static void	recompute_frustum(view_t *view);
-	static void	draw_hline(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color);
-	static void	draw_hline_moired(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color);
-	static void	fill_slope(bitmap_rgb32 &bitmap, view_t *view, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2);
-	static void	fill_line(bitmap_rgb32 &bitmap, view_t *view, int color, INT32 y, INT32 x1, INT32 x2);
-	void	    fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q) const;
+	void        sort_quads() const;
+	void        unsort_quads() const;
+	void        draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	static void recompute_frustum(view_t *view);
+	static void draw_hline(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color);
+	static void draw_hline_moired(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color);
+	static void fill_slope(bitmap_rgb32 &bitmap, view_t *view, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2);
+	static void fill_line(bitmap_rgb32 &bitmap, view_t *view, int color, INT32 y, INT32 x1, INT32 x2);
+	void        fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q) const;
 
-	void	fclip_push_quad_next(int level, quad_t& q, point_t *p1, point_t *p2, point_t *p3, point_t *p4);
-	void	fclip_push_quad(int level, quad_t& q);
+	void    fclip_push_quad_next(int level, quad_t& q, point_t *p1, point_t *p2, point_t *p3, point_t *p4);
+	void    fclip_push_quad(int level, quad_t& q);
 
-    static float	min4f(float a, float b, float c, float d);
-    static float	max4f(float a, float b, float c, float d);
-	static float	compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse,int lmode);
+	static float    min4f(float a, float b, float c, float d);
+	static float    max4f(float a, float b, float c, float d);
+	static float    compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse,int lmode);
 
-	void	push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size);
-	UINT16*	push_direct(UINT16 *list);
-    UINT16*	skip_direct(UINT16 *list) const;
-	void	draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT16*	draw_direct(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 *list);
+	void    push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size);
+	UINT16* push_direct(UINT16 *list);
+	UINT16* skip_direct(UINT16 *list) const;
+	void    draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT16* draw_direct(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 *list);
 
-	UINT16*	get_list();
-	int		get_list_number();
-	void	end_frame();
+	UINT16* get_list();
+	int     get_list_number();
+	void    end_frame();
 
 	clipper_t m_clipfn[4];
 
@@ -458,7 +458,7 @@ private:
 	required_device<segas24_tile> m_tiles;
 
 	// I/O related
-	UINT16	m_lamp_state;
+	UINT16  m_lamp_state;
 	optional_ioport_array<8> m_analog_ports;
 	required_ioport_array<3> m_digital_ports;
 };

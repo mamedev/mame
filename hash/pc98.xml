@@ -2348,7 +2348,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain2">
+	<software name="aressh2">
 		<description>A Ressha de Ikou II</description>
 		<year>1988</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2368,7 +2368,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain2g" cloneof="atrain2">
+	<software name="aressh2g" cloneof="aressh2">
 		<description>A Ressha de Ikou II - 5 Shuunen Kinen Tokubetsu Gentei Version</description>
 		<year>1990</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2400,7 +2400,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain3">
+	<software name="aressh3">
 		<description>A Ressha de Ikou III</description>
 		<year>1990</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2420,7 +2420,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain3log" cloneof="atrain3">
+	<software name="aressh3log" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Login Tokubetsu Map Shuu</description>
 		<year>199?</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2432,7 +2432,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain3mc" cloneof="atrain3">
+	<software name="aressh3mc" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Map Construction</description>
 		<year>1991</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2452,7 +2452,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain3oms" cloneof="atrain3">
+	<software name="aressh3oms" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Original Meitetsu Sharyou Disk</description>
 		<year>1991</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2464,7 +2464,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atran3mv">
+	<software name="aresh3mv">
 		<description>A Ressha de Ikou III - Memorial Version</description>
 		<year>1993</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2484,7 +2484,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrain4">
+	<software name="aressh4">
 		<description>A Ressha de Ikou 4 ~ Take the A-Train IV</description>
 		<year>1993</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2510,7 +2510,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atrainf">
+	<software name="aresshaf">
 		<description>A Ressha de Ikou Fukkokuban</description>
 		<year>1994</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -4480,7 +4480,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="aress">
 		<description>Aress Ou no Monogatari - The Story of King Aress</description>
 		<year>1994</year>
@@ -23900,7 +23900,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madou1">
+	<software name="madoum1">
 		<description>Madou Monogatari 1</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -23920,7 +23920,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madou2">
+	<software name="madoum2">
 		<description>Madou Monogatari 2</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -23940,7 +23940,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madou3">
+	<software name="madoum3">
 		<description>Madou Monogatari 3</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -28086,7 +28086,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="ningyout">
+	<software name="ningytsu">
 		<description>Ningyou Tsukai</description>
 		<year>1992</year>
 		<publisher>フォレスト (Forest)</publisher>
@@ -28112,7 +28112,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="ningyou2">
+	<software name="ningyts2">
 		<description>Ningyou Tsukai 2</description>
 		<year>1996</year>
 		<publisher>フォレスト (Forest)</publisher>
@@ -41601,7 +41601,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="vga" cloneof="vg">
 		<description>V.G. - Variable Geo (Alt)</description>
 		<year>1993</year>
@@ -44214,7 +44214,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="yuugiri">
+	<software name="yugiri">
 		<description>Yuugiri - Ningyoushi no Isan</description>
 		<year>1996</year>
 		<publisher>デザイアー (Desire)</publisher>
@@ -44982,7 +44982,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="atrain" supported="no">
+	<software name="aressha" supported="no">
 		<description>A Ressha de Ikou 98 ~ Take the A Train.</description>
 		<year>1987</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -49157,7 +49157,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="prinmakr" supported="no">
+	<software name="prinmak" supported="no">
 		<description>Princess Maker</description>
 		<year>1991</year>
 		<publisher>ガイナックス (Gainax)</publisher>
@@ -64033,6 +64033,25 @@ doujin?!?
 		</part>
 	</software>
 
+	<software name="yumeyare">
+		<description>Yume de Yaretara</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="author" value="ソフトさーくる　クレージュ ~ Soft Circle Courreges" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="yume de yaretara disk a.fdi" size="1265664" crc="368bbe1b" sha1="cab3763ebd8e258c4865c810a1be3d79a0f7f4bd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="yume de yaretara disk b.fdi" size="1265664" crc="4077888c" sha1="d8588f87536174f7280b408f020d53daa22e2807" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zettmj">
 		<description>Zettai Mahjong</description>
 		<year>1994?</year>
@@ -64175,7 +64194,7 @@ doujin?!?
 	</software>
 
 <!-- this should contain 4 disks. it was accompanied by an HDI image -->
-	<software name="kouryuu" supported="no">
+	<software name="koryuki" supported="no">
 		<description>Kouryuuki (Incomplete)</description>
 		<year>1993</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -64518,7 +64537,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<software name="madoumi">
+	<software name="madoummi">
 		<description>Madou Monogatari - Michikusa Ibun</description>
 		<year>19??</year>
 		<publisher>コンパイル (Compile)</publisher>

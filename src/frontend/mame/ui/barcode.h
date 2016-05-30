@@ -10,16 +10,18 @@
 
 #pragma once
 
-#ifndef __UI_BARCODE_H__
-#define __UI_BARCODE_H__
+#ifndef MAME_FRONTEND_UI_BARCODE_H
+#define MAME_FRONTEND_UI_BARCODE_H
 
 #include "machine/bcreader.h"
 #include "ui/devctrl.h"
 
-class ui_menu_barcode_reader : public ui_menu_device_control<barcode_reader_device> {
+namespace ui {
+
+class menu_barcode_reader : public menu_device_control<barcode_reader_device> {
 public:
-	ui_menu_barcode_reader(mame_ui_manager &mui, render_container *container, barcode_reader_device *device);
-	virtual ~ui_menu_barcode_reader();
+	menu_barcode_reader(mame_ui_manager &mui, render_container *container, barcode_reader_device *device);
+	virtual ~menu_barcode_reader() override;
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -27,5 +29,6 @@ private:
 	char  m_barcode_buffer[20];
 };
 
+} // namespace ui
 
-#endif // __UI_BARCODE_H__
+#endif // MAME_FRONTEND_UI_BARCODE_H

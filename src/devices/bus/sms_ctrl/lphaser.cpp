@@ -14,10 +14,7 @@ Release data from the Sega Retro project:
 
 Notes:
 
-  The Light Phaser gun doesn't work with the Japanese SMS and Sega Mark III.
-  There are reports about Light Phaser working on the second Korean SMS
-  version, and a Korean advert shows support on the first version (Gam*Boy I,
-  although based on Japanese SMS).
+  The Light Phaser gun doesn't work with the Sega Mark III.
 
 **********************************************************************/
 

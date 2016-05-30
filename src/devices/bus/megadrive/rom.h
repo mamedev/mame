@@ -552,17 +552,17 @@ class md_rom_starodys_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_starodys_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
 	virtual DECLARE_WRITE16_MEMBER(write) override;
 	virtual DECLARE_READ16_MEMBER(read_a13) override;
 	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
-	
+
 private:
 	UINT8 m_mode, m_lock, m_ram_enable, m_base;
 };

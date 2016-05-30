@@ -554,7 +554,7 @@ void osd_common_t::customize_input_type_list(simple_list<input_type_entry> &type
 //  list of OS-dependent slider values.
 //-------------------------------------------------
 
-std::vector<ui_menu_item> osd_common_t::get_slider_list()
+std::vector<ui::menu_item> osd_common_t::get_slider_list()
 {
 	return m_sliders;
 }
@@ -713,10 +713,14 @@ void osd_common_t::window_exit()
 
 void osd_common_t::input_exit()
 {
-	m_keyboard_input->exit();
-	m_mouse_input->exit();
-	m_lightgun_input->exit();
-	m_joystick_input->exit();
+	if (m_keyboard_input)
+		m_keyboard_input->exit();
+	if (m_mouse_input)
+		m_mouse_input->exit();
+	if (m_lightgun_input)
+		m_lightgun_input->exit();
+	if (m_joystick_input)
+		m_joystick_input->exit();
 }
 
 void osd_common_t::osd_exit()

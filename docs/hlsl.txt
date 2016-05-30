@@ -60,13 +60,13 @@ saturation              0.0 to 4.0      This parameter defines the amount each c
                                         oversaturated equally beyond that.
 offset                  [r,g,b]         These parameters define a value for each color channel
                                         that is added to said channel after scaling and after
-                                        matrix convolution. (-2.0 to 2.0)
+                                        matrix convolution.  (-2.0 to 2.0)
 scale                   [r,g,b]         These parameters define a value for each color channel
                                         that is multiplied with said channel after matrix
                                         convolution.  (-2.0 to 2.0)
 power                   [r,g,b]         These parameters define the exponent for each color
                                         channel that is applied after scaling, offsetting,
-                                        saturation and matrix convolution. (-4.0 to 4.0)
+                                        saturation and matrix convolution.  (-4.0 to 4.0)
 floor                   [r,g,b]         These parameters define the lower limit of each final
                                         color channel value; 0.05, for example, raises the
                                         minimum to 0.05 but re-scales to leave the max at 1.0.
@@ -80,43 +80,43 @@ NTSC Processing Parameters
 --------------------------
 
 Name                    Default Values  Description
-yiq_jitter              0.0             Jitter for the NTSC signal processing. (0.0 to 1.0)
-yiq_cc                  3.57954545      Color Carrier frequency for NTSC signal processing. (0.0 to 6.0)
-yiq_a                   0.5             A value for NTSC signal processing. (-1.0 to 1.0)
-yiq_b                   0.5             B value for NTSC signal processing. (-1.0 to 1.0)
-yiq_o                   0.0             Outgoing Color Carrier phase offset for NTSC signal processing. (-3.0 to 3.0)
-yiq_p                   1.0             Incoming Pixel Clock scaling value for NTSC signal processing. (-3.0 to 3.0)
-yiq_n                   1.0             Y filter notch width for NTSC signal processing. (0.0 to 6.0)
-yiq_y                   6.0             Y filter cutoff frequency for NTSC signal processing. (0.0 to 6.0)
-yiq_i                   1.2             I filter cutoff frequency for NTSC signal processing. (0.0 to 6.0)
-yiq_q                   0.6             Q filter cutoff frequency for NTSC signal processing. (0.0 to 6.0)
-yiq_scan_time           52.6            Horizontal scanline duration for NTSC signal processing. (usec)
-yiq_phase_count         2               Phase Count value for NTSC signal processing. (3 for NES, else 2)
+yiq_jitter              0.0             Jitter for the NTSC signal processing.  (0.0 to 1.0)
+yiq_cc                  3.57954545      Color Carrier frequency for NTSC signal processing.  (0.0 to 6.0)
+yiq_a                   0.5             A value for NTSC signal processing.  (-1.0 to 1.0)
+yiq_b                   0.5             B value for NTSC signal processing.  (-1.0 to 1.0)
+yiq_o                   0.0             Outgoing Color Carrier phase offset for NTSC signal processing.  (-3.0 to 3.0)
+yiq_p                   1.0             Incoming Pixel Clock scaling value for NTSC signal processing.  (-3.0 to 3.0)
+yiq_n                   1.0             Y filter notch width for NTSC signal processing.  (0.0 to 6.0)
+yiq_y                   6.0             Y filter cutoff frequency for NTSC signal processing.  (0.0 to 6.0)
+yiq_i                   1.2             I filter cutoff frequency for NTSC signal processing.  (0.0 to 6.0)
+yiq_q                   0.6             Q filter cutoff frequency for NTSC signal processing.  (0.0 to 6.0)
+yiq_scan_time           52.6            Horizontal scanline duration for NTSC signal processing.  (usec)
+yiq_phase_count         2               Phase Count value for NTSC signal processing.  (3 for NES, else 2)
 
 
 Vector Post-Processing Options
 ------------------------------
 Name                    Default Values  Description
-vector_length_scale     0.8             How much length affects vector fade.  (0.00-1.00)
-vector_length_ratio     500.0           Vector fade length (4.0 - vectors fade the most at and above 4
-                                        pixels, etc.)  (0.000 - 1000.000)
+vector_length_scale     0.5             The maximum vector attenuation.  (0.00 to 1.00)
+vector_length_ratio     0.5             The minimum vector length (vector length to screen size ratio)
+                                        that is affected by the attenuation  (0.000 to 1.000)
 
 
 Bloom Post-Processing Options
 -----------------------------
 Name                    Default Values  Description
 bloom_blend_mode        0 or 1          0 for brighten blend mode or 1 for darken blend mode.
-bloom_scale             0.0             Bloom intensity factor.  (0.000-2.000)
-bloom_overdrive         0.0,0.0,0.0     Bloom overdrive factor to bright full saturated colors.  (0.000-2.000)
-bloom_lvl0_weight       1.00            Bloom level 0  (full-size target) weight.  (0.00-1.00)
-bloom_lvl1_weight       0.64            Bloom level 1  (1/2-size target) weight.  (0.00-1.00)
-bloom_lvl2_weight       0.32            Bloom level 2  (1/4-size target) weight.  (0.00-1.00)
-bloom_lvl3_weight       0.16            Bloom level 3  (1/8-size target) weight.  (0.00-1.00)
-bloom_lvl4_weight       0.08            Bloom level 4  (1/16-size target) weight.  (0.00-1.00)
-bloom_lvl5_weight       0.06            Bloom level 5  (1/32-size target) weight.  (0.00-1.00)
-bloom_lvl6_weight       0.04            Bloom level 6  (1/64-size target) weight.  (0.00-1.00)
-bloom_lvl7_weight       0.02            Bloom level 7  (1/128-size target) weight.  (0.00-1.00)
-bloom_lvl8_weight       0.01            Bloom level 8  (1/256-size target) weight.  (0.00-1.00)
+bloom_scale             0.0             Bloom intensity factor.  (0.000 to 2.000)
+bloom_overdrive         0.0,0.0,0.0     Bloom overdrive factor to bright full saturated colors.  (0.000 to 2.000)
+bloom_lvl0_weight       1.00            Bloom level 0 weight. (full-size target)  (0.00 to 1.00)
+bloom_lvl1_weight       0.64            Bloom level 1 weight. (1/4 smaller that level 0 target)  (0.00 to 1.00)
+bloom_lvl2_weight       0.32            Bloom level 2 weight. (1/4 smaller that level 1 target)  (0.00 to 1.00)
+bloom_lvl3_weight       0.16            Bloom level 3 weight. (1/4 smaller that level 2 target)  (0.00 to 1.00)
+bloom_lvl4_weight       0.08            Bloom level 4 weight. (1/4 smaller that level 3 target)  (0.00 to 1.00)
+bloom_lvl5_weight       0.06            Bloom level 5 weight. (1/4 smaller that level 4 target)  (0.00 to 1.00)
+bloom_lvl6_weight       0.04            Bloom level 6 weight. (1/4 smaller that level 5 target)  (0.00 to 1.00)
+bloom_lvl7_weight       0.02            Bloom level 7 weight. (1/4 smaller that level 6 target)
+bloom_lvl8_weight       0.01            Bloom level 8 weight. (1/4 smaller that level 7 target)  (0.00 to 1.00)
 
 
 Presets

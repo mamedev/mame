@@ -31,12 +31,12 @@
 //**************************************************************************
 
 // global allocation helpers -- use these instead of new and delete
-#define global_alloc(_type)                         new _type
-#define global_alloc_nothrow(_type)                 new (std::nothrow) _type
-#define global_alloc_array(_type, _num)             new _type[_num]
-#define global_alloc_array_nothrow(_type, _num)     new (std::nothrow) _type[_num]
-#define global_free(_ptr)                           do { delete _ptr; } while (0)
-#define global_free_array(_ptr)                     do { delete[] _ptr; } while (0)
+#define global_alloc(Type)                          new Type
+#define global_alloc_nothrow(Type)                  new (std::nothrow) Type
+#define global_alloc_array(Type, Num)               new Type[Num]
+#define global_alloc_array_nothrow(Type, Num)       new (std::nothrow) Type[Num]
+#define global_free(Ptr)                            do { delete Ptr; } while (0)
+#define global_free_array(Ptr)                      do { delete[] Ptr; } while (0)
 
 
 
@@ -59,54 +59,42 @@ inline T* global_alloc_array_clear(std::size_t num)
 
 
 
-template<typename _Tp>
-struct _MakeUniqClear
-{
-	typedef std::unique_ptr<_Tp> __single_object;
-};
+template<typename Tp> struct MakeUniqClearT { typedef std::unique_ptr<Tp> single_object; };
 
-template<typename _Tp>
-struct _MakeUniqClear<_Tp[]>
-{
-	typedef std::unique_ptr<_Tp[]> __array;
-};
+template<typename Tp> struct MakeUniqClearT<Tp[]> { typedef std::unique_ptr<Tp[]> array; };
 
-template<typename _Tp, size_t _Bound>
-struct _MakeUniqClear<_Tp[_Bound]>
-{
-	struct __invalid_type { };
-};
+template<typename Tp, size_t Bound> struct MakeUniqClearT<Tp[Bound]> { struct invalid_type { }; };
 
 /// make_unique_clear for single objects
-template<typename _Tp, typename... _Args>
-inline typename _MakeUniqClear<_Tp>::__single_object make_unique_clear(_Args&&... __args)
+template<typename Tp, typename... Params>
+inline typename MakeUniqClearT<Tp>::single_object make_unique_clear(Params&&... args)
 {
-	unsigned char* ptr = new unsigned char[sizeof(_Tp)]; // allocate memory
-	memset(ptr, 0, sizeof(_Tp));
-	return std::unique_ptr<_Tp>(new(ptr) _Tp(std::forward<_Args>(__args)...));
+	void *const ptr = ::operator new(sizeof(Tp)); // allocate memory
+	std::memset(ptr, 0, sizeof(Tp));
+	return std::unique_ptr<Tp>(new(ptr) Tp(std::forward<Params>(args)...));
 }
 
 /// make_unique_clear for arrays of unknown bound
-template<typename _Tp>
-inline typename _MakeUniqClear<_Tp>::__array make_unique_clear(size_t __num)
+template<typename Tp>
+inline typename MakeUniqClearT<Tp>::array make_unique_clear(size_t num)
 {
-	auto size = sizeof(std::remove_extent_t<_Tp>) * __num;
+	auto size = sizeof(std::remove_extent_t<Tp>) * num;
 	unsigned char* ptr = new unsigned char[size]; // allocate memory
-	memset(ptr, 0, size);
-	return std::unique_ptr<_Tp>(new(ptr) std::remove_extent_t<_Tp>[__num]());
+	std::memset(ptr, 0, size);
+	return std::unique_ptr<Tp>(new(ptr) std::remove_extent_t<Tp>[num]());
 }
 
-template<typename _Tp, unsigned char _F>
-inline typename _MakeUniqClear<_Tp>::__array make_unique_clear(size_t __num)
+template<typename Tp, unsigned char F>
+inline typename MakeUniqClearT<Tp>::array make_unique_clear(size_t num)
 {
-	auto size = sizeof(std::remove_extent_t<_Tp>) * __num;
+	auto size = sizeof(std::remove_extent_t<Tp>) * num;
 	unsigned char* ptr = new unsigned char[size]; // allocate memory
-	memset(ptr, _F, size);
-	return std::unique_ptr<_Tp>(new(ptr) std::remove_extent_t<_Tp>[__num]());
+	std::memset(ptr, F, size);
+	return std::unique_ptr<Tp>(new(ptr) std::remove_extent_t<Tp>[num]());
 }
 
 /// Disable make_unique_clear for arrays of known bound
-template<typename _Tp, typename... _Args>
-inline typename _MakeUniqClear<_Tp>::__invalid_type make_unique_clear(_Args&&...) = delete;
+template<typename Tp, typename... Params>
+inline typename MakeUniqClearT<Tp>::invalid_type make_unique_clear(Params&&...) = delete;
 
 #endif  // MAME_LIB_UTIL_COREALLOC_H

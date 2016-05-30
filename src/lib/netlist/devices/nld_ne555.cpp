@@ -77,29 +77,4 @@ NETLIB_UPDATE(NE555)
 }
 
 
-NETLIB_START(NE555_dip)
-{
-	NETLIB_NAME(NE555)::start();
-
-	register_subalias("1",  m_R3.m_N);      // Pin 1
-	register_subalias("2",    m_TRIG);      // Pin 2
-	register_subalias("3",    m_OUT);       // Pin 3
-	register_subalias("4",   m_RESET);      // Pin 4
-	register_subalias("5", m_R1.m_N);       // Pin 5
-	register_subalias("6",  m_THRES);       // Pin 6
-	register_subalias("7", m_RDIS.m_P);     // Pin 7
-	register_subalias("8",  m_R1.m_P);      // Pin 8
-
-}
-
-NETLIB_UPDATE(NE555_dip)
-{
-	NETLIB_NAME(NE555)::update();
-}
-
-NETLIB_RESET(NE555_dip)
-{
-	NETLIB_NAME(NE555)::reset();
-}
-
 NETLIB_NAMESPACE_DEVICES_END()

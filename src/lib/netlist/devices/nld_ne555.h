@@ -22,8 +22,8 @@
 #include "nl_base.h"
 #include "analog/nld_twoterm.h"
 
-#define NE555(_name)                                                        \
-		NET_REGISTER_DEV(NE555, _name)
+#define NE555(name)                                                        \
+		NET_REGISTER_DEV(NE555, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -77,10 +77,23 @@ private:
 
 };
 
-#define NE555_DIP(_name)                                                         \
-		NET_REGISTER_DEV(NE555_DIP, _name)
+#define NE555_DIP(name)                                                         \
+		NET_REGISTER_DEV(NE555_DIP, name)
 
-NETLIB_DEVICE_DERIVED_PURE(NE555_dip, NE555);
+NETLIB_OBJECT_DERIVED(NE555_dip, NE555)
+{
+	NETLIB_CONSTRUCTOR_DERIVED(NE555_dip, NE555)
+	{
+		register_subalias("1",  m_R3.m_N);      // Pin 1
+		register_subalias("2",    m_TRIG);      // Pin 2
+		register_subalias("3",    m_OUT);       // Pin 3
+		register_subalias("4",   m_RESET);      // Pin 4
+		register_subalias("5", m_R1.m_N);       // Pin 5
+		register_subalias("6",  m_THRES);       // Pin 6
+		register_subalias("7", m_RDIS.m_P);     // Pin 7
+		register_subalias("8",  m_R1.m_P);      // Pin 8
+	}
+};
 
 NETLIB_NAMESPACE_DEVICES_END()
 

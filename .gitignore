@@ -27,6 +27,7 @@
 !/tests/
 !/doxygen/
 !/web/
+!/.drone.yml
 !/.gitattributes
 !/.gitignore
 !/.travis.yml

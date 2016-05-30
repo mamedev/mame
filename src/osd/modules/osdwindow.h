@@ -111,12 +111,13 @@ class osd_renderer;
 class osd_window : public std::enable_shared_from_this<osd_window>
 {
 public:
-	osd_window()
+	osd_window(const osd_window_config &config)
 	:
 #ifndef OSD_SDL
 		m_dc(nullptr), m_resize_state(0),
 #endif
 		m_primlist(nullptr),
+		m_win_config(config),
 		m_index(0),
 		m_prescale(1),
 		m_platform_window(nullptr),
@@ -238,7 +239,7 @@ public:
 	virtual render_primitive_list *get_primitives() = 0;
 
 	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) { }
-	virtual std::vector<ui_menu_item> get_slider_list() { return m_sliders; }
+	virtual std::vector<ui::menu_item> get_slider_list() { return m_sliders; }
 	virtual int draw(const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) { return 0; };
 	virtual void save() { };
@@ -254,7 +255,7 @@ protected:
 	/* Internal flags */
 	static const int FI_CHANGED                 = 0x010000;
 	bool                        m_sliders_dirty;
-	std::vector<ui_menu_item>   m_sliders;
+	std::vector<ui::menu_item>   m_sliders;
 
 private:
 	std::weak_ptr<osd_window>  m_window;

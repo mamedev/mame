@@ -36,7 +36,7 @@ public:
 		m_ram(*this, "ram"),
 		m_shared_ram(*this, "shared_ram"),
 		m_ram2(*this, "ram2")
-		
+
 	{ }
 
 	/* devices */

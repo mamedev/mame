@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 /***********************************************************************************************************
- 
+
  Neo Geo cart emulation
  CMC42 & CMC50 encrypted cart type
- 
+
  ***********************************************************************************************************/
 
 
@@ -264,4 +264,3 @@ void neogeo_cmc_jockeygp_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, JOCKEYGP_GFX_KEY);
 	m_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 }
-

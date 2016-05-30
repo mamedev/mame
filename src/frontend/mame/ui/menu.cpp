@@ -9,12 +9,10 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "rendutil.h"
-#include "cheat.h"
-#include "mame.h"
-#include "uiinput.h"
-#include "ui/ui.h"
+
 #include "ui/menu.h"
+
+#include "ui/ui.h"
 #include "ui/mainmenu.h"
 #include "ui/utils.h"
 #include "ui/defimg.h"
@@ -22,8 +20,15 @@
 #include "ui/icorender.h"
 #include "ui/toolbar.h"
 #include "ui/miscmenu.h"
-#include "drivenum.h"
 
+#include "cheat.h"
+#include "drivenum.h"
+#include "mame.h"
+#include "rendutil.h"
+#include "uiinput.h"
+
+
+namespace ui {
 
 /***************************************************************************
     CONSTANTS
@@ -32,12 +37,12 @@
 #define UI_MENU_POOL_SIZE  65536
 #define MAX_ICONS_RENDER   40
 
-struct ui_arts_info
+struct arts_info
 {
 	const char *title, *path;
 };
 
-static const ui_arts_info arts_info[] =
+static const arts_info arts_info[] =
 {
 	{ __("Snapshots"), OPTION_SNAPSHOT_DIRECTORY },
 	{ __("Cabinets"), OPTION_CABINETS_PATH },
@@ -69,26 +74,26 @@ static const char *hover_msg[] = {
     GLOBAL VARIABLES
 ***************************************************************************/
 
-ui_menu *ui_menu::menu_stack;
-ui_menu *ui_menu::menu_free;
-std::unique_ptr<bitmap_rgb32> ui_menu::hilight_bitmap;
-render_texture *ui_menu::hilight_texture;
-render_texture *ui_menu::arrow_texture;
-render_texture *ui_menu::snapx_texture;
-render_texture *ui_menu::hilight_main_texture;
-render_texture *ui_menu::bgrnd_texture;
-render_texture *ui_menu::star_texture;
-render_texture *ui_menu::toolbar_texture[UI_TOOLBAR_BUTTONS];
-render_texture *ui_menu::sw_toolbar_texture[UI_TOOLBAR_BUTTONS];
-render_texture *ui_menu::icons_texture[MAX_ICONS_RENDER];
-std::unique_ptr<bitmap_argb32> ui_menu::snapx_bitmap;
-std::unique_ptr<bitmap_argb32> ui_menu::no_avail_bitmap;
-std::unique_ptr<bitmap_argb32> ui_menu::star_bitmap;
-std::unique_ptr<bitmap_argb32> ui_menu::bgrnd_bitmap;
-bitmap_argb32 *ui_menu::icons_bitmap[MAX_ICONS_RENDER];
-std::unique_ptr<bitmap_rgb32> ui_menu::hilight_main_bitmap;
-bitmap_argb32 *ui_menu::toolbar_bitmap[UI_TOOLBAR_BUTTONS];
-bitmap_argb32 *ui_menu::sw_toolbar_bitmap[UI_TOOLBAR_BUTTONS];
+std::unique_ptr<menu> menu::menu_stack;
+std::unique_ptr<menu> menu::menu_free;
+std::unique_ptr<bitmap_rgb32> menu::hilight_bitmap;
+render_texture *menu::hilight_texture;
+render_texture *menu::arrow_texture;
+render_texture *menu::snapx_texture;
+render_texture *menu::hilight_main_texture;
+render_texture *menu::bgrnd_texture;
+render_texture *menu::star_texture;
+render_texture *menu::toolbar_texture[UI_TOOLBAR_BUTTONS];
+render_texture *menu::sw_toolbar_texture[UI_TOOLBAR_BUTTONS];
+render_texture *menu::icons_texture[MAX_ICONS_RENDER];
+std::unique_ptr<bitmap_argb32> menu::snapx_bitmap;
+std::unique_ptr<bitmap_argb32> menu::no_avail_bitmap;
+std::unique_ptr<bitmap_argb32> menu::star_bitmap;
+std::unique_ptr<bitmap_argb32> menu::bgrnd_bitmap;
+bitmap_argb32 *menu::icons_bitmap[MAX_ICONS_RENDER];
+std::unique_ptr<bitmap_rgb32> menu::hilight_main_bitmap;
+bitmap_argb32 *menu::toolbar_bitmap[UI_TOOLBAR_BUTTONS];
+bitmap_argb32 *menu::sw_toolbar_bitmap[UI_TOOLBAR_BUTTONS];
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -99,9 +104,9 @@ bitmap_argb32 *ui_menu::sw_toolbar_bitmap[UI_TOOLBAR_BUTTONS];
 //  item is selectable
 //-------------------------------------------------
 
-inline bool ui_menu_item::is_selectable() const
+inline bool is_selectable(menu_item const &item)
 {
-	return ((flags & (MENU_FLAG_MULTILINE | MENU_FLAG_DISABLE)) == 0 && strcmp(text, MENU_SEPARATOR_ITEM) != 0);
+	return ((item.flags & (menu::FLAG_MULTILINE | menu::FLAG_DISABLE)) == 0 && strcmp(item.text, MENU_SEPARATOR_ITEM) != 0);
 }
 
 
@@ -111,11 +116,11 @@ inline bool ui_menu_item::is_selectable() const
 //  reported a key
 //-------------------------------------------------
 
-inline bool ui_menu::exclusive_input_pressed(int key, int repeat)
+inline bool menu::exclusive_input_pressed(int key, int repeat)
 {
-	if (menu_event.iptkey == IPT_INVALID && machine().ui_input().pressed_repeat(key, repeat))
+	if (m_event.iptkey == IPT_INVALID && machine().ui_input().pressed_repeat(key, repeat))
 	{
-		menu_event.iptkey = key;
+		m_event.iptkey = key;
 		return true;
 	}
 	return false;
@@ -131,10 +136,10 @@ inline bool ui_menu::exclusive_input_pressed(int key, int repeat)
 //  init - initialize the menu system
 //-------------------------------------------------
 
-void ui_menu::init(running_machine &machine, ui_options &mopt)
+void menu::init(running_machine &machine, ui_options &mopt)
 {
 	// initialize the menu stack
-	ui_menu::stack_reset(machine);
+	menu::stack_reset(machine);
 
 	// create a texture for hilighting items
 	hilight_bitmap = std::make_unique<bitmap_rgb32>(256, 1);
@@ -155,7 +160,7 @@ void ui_menu::init(running_machine &machine, ui_options &mopt)
 	init_ui(machine, mopt);
 
 	// add an exit callback to free memory
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_menu::exit), &machine));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(menu::exit), &machine));
 }
 
 
@@ -163,11 +168,11 @@ void ui_menu::init(running_machine &machine, ui_options &mopt)
 //  exit - clean up after ourselves
 //-------------------------------------------------
 
-void ui_menu::exit(running_machine &machine)
+void menu::exit(running_machine &machine)
 {
 	// free menus
-	ui_menu::stack_reset(machine);
-	ui_menu::clear_free_list(machine);
+	menu::stack_reset(machine);
+	menu::clear_free_list(machine);
 
 	// free textures
 	render_manager &mre = machine.render();
@@ -195,31 +200,38 @@ void ui_menu::exit(running_machine &machine)
 ***************************************************************************/
 
 //-------------------------------------------------
-//  ui_menu - menu constructor
+//  menu - menu constructor
 //-------------------------------------------------
 
-ui_menu::ui_menu(mame_ui_manager &mui, render_container *_container) : m_ui(mui)
+menu::menu(mame_ui_manager &mui, render_container *_container)
+	: m_special_main_menu(false)
+	, m_ui(mui)
+	, m_parent()
+	, m_pressed(false)
+	, m_repeat(0)
+	, m_event()
+	, m_pool(nullptr)
+	, m_focus(focused_menu::main)
 {
-	m_special_main_menu = false;
 	container = _container;
 
-	reset(UI_MENU_RESET_SELECT_FIRST);
+	reset(reset_options::SELECT_FIRST);
 
 	top_line = 0;
 }
 
 
 //-------------------------------------------------
-//  ~ui_menu - menu destructor
+//  ~menu - menu destructor
 //-------------------------------------------------
 
-ui_menu::~ui_menu()
+menu::~menu()
 {
 	// free the pools
-	while (pool)
+	while (m_pool)
 	{
-		ui_menu_pool *ppool = pool;
-		pool = pool->next;
+		pool *const ppool = m_pool;
+		m_pool = m_pool->next;
 		global_free(ppool);
 	}
 }
@@ -230,37 +242,39 @@ ui_menu::~ui_menu()
 //  and all memory allocated from the memory pool
 //-------------------------------------------------
 
-void ui_menu::reset(ui_menu_reset_options options)
+void menu::reset(reset_options options)
 {
 	// based on the reset option, set the reset info
 	resetpos = 0;
 	resetref = nullptr;
-	if (options == UI_MENU_RESET_REMEMBER_POSITION)
+	if (options == reset_options::REMEMBER_POSITION)
 		resetpos = selected;
-	else if (options == UI_MENU_RESET_REMEMBER_REF)
+	else if (options == reset_options::REMEMBER_REF)
 		resetref = item[selected].ref;
 
 	// reset all the pools and the item.size() back to 0
-	for (ui_menu_pool *ppool = pool; ppool != nullptr; ppool = ppool->next)
+	for (pool *ppool = m_pool; ppool != nullptr; ppool = ppool->next)
 		ppool->top = (UINT8 *)(ppool + 1);
 	item.clear();
 	visitems = 0;
 	selected = 0;
 
 	// add an item to return
-	if (parent == nullptr)
-		item_append(_("Return to Machine"), nullptr, 0, nullptr);
-	else if (parent->is_special_main_menu())
+	if (!m_parent)
 	{
-		if (strcmp(machine().options().ui(), "simple") == 0)
+		item_append(_("Return to Machine"), nullptr, 0, nullptr);
+	}
+	else if (m_parent->is_special_main_menu())
+	{
+		if (machine().options().ui() == emu_options::UI_SIMPLE)
 			item_append(_("Exit"), nullptr, 0, nullptr);
 		else
-			item_append(_("Exit"), nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
+			item_append(_("Exit"), nullptr, FLAG_UI | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
 	}
 	else
 	{
-		if (strcmp(machine().options().ui(), "simple") != 0 && ui_menu::stack_has_special_main_menu())
-			item_append(_("Return to Previous Menu"), nullptr, MENU_FLAG_UI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, nullptr);
+		if (machine().options().ui() != emu_options::UI_SIMPLE && menu::stack_has_special_main_menu())
+			item_append(_("Return to Previous Menu"), nullptr, FLAG_UI | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
 		else
 			item_append(_("Return to Previous Menu"), nullptr, 0, nullptr);
 	}
@@ -273,7 +287,7 @@ void ui_menu::reset(ui_menu_reset_options options)
 //  menu has special needs
 //-------------------------------------------------
 
-bool ui_menu::is_special_main_menu() const
+bool menu::is_special_main_menu() const
 {
 	return m_special_main_menu;
 }
@@ -284,7 +298,7 @@ bool ui_menu::is_special_main_menu() const
 //  menu has special needs
 //-------------------------------------------------
 
-void ui_menu::set_special_main_menu(bool special)
+void menu::set_special_main_menu(bool special)
 {
 	m_special_main_menu = special;
 }
@@ -295,7 +309,7 @@ void ui_menu::set_special_main_menu(bool special)
 //  end of the menu
 //-------------------------------------------------
 
-void ui_menu::item_append(ui_menu_item item)
+void menu::item_append(menu_item item)
 {
 	item_append(item.text, item.subtext, item.flags, item.ref, item.type);
 }
@@ -305,9 +319,9 @@ void ui_menu::item_append(ui_menu_item item)
 //  end of the menu
 //-------------------------------------------------
 
-void ui_menu::item_append(ui_menu_item_type type)
+void menu::item_append(menu_item_type type)
 {
-	if (type == ui_menu_item_type::SEPARATOR)
+	if (type == menu_item_type::SEPARATOR)
 		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 }
 
@@ -316,18 +330,18 @@ void ui_menu::item_append(ui_menu_item_type type)
 //  end of the menu
 //-------------------------------------------------
 
-void ui_menu::item_append(const char *text, const char *subtext, UINT32 flags, void *ref, ui_menu_item_type type)
+void menu::item_append(const char *text, const char *subtext, UINT32 flags, void *ref, menu_item_type type)
 {
 	// only allow multiline as the first item
-	if ((flags & MENU_FLAG_MULTILINE) != 0)
+	if ((flags & FLAG_MULTILINE) != 0)
 		assert(item.size() == 1);
 
 	// only allow a single multi-line item
 	else if (item.size() >= 2)
-		assert((item[0].flags & MENU_FLAG_MULTILINE) == 0);
+		assert((item[0].flags & FLAG_MULTILINE) == 0);
 
 	// allocate a new item and populate it
-	ui_menu_item pitem;
+	menu_item pitem;
 	pitem.text = (text != nullptr) ? pool_strdup(text) : nullptr;
 	pitem.subtext = (subtext != nullptr) ? pool_strdup(subtext) : nullptr;
 	pitem.flags = flags;
@@ -357,51 +371,51 @@ void ui_menu::item_append(const char *text, const char *subtext, UINT32 flags, v
 //  and returning any interesting events
 //-------------------------------------------------
 
-const ui_menu_event *ui_menu::process(UINT32 flags, float x0, float y0)
+const menu::event *menu::process(UINT32 flags, float x0, float y0)
 {
-	// reset the menu_event
-	menu_event.iptkey = IPT_INVALID;
+	// reset the event
+	m_event.iptkey = IPT_INVALID;
 
 	// first make sure our selection is valid
 	validate_selection(1);
 
 	// draw the menu
-	if (item.size() > 1 && (item[0].flags & MENU_FLAG_MULTILINE) != 0)
+	if (item.size() > 1 && (item[0].flags & FLAG_MULTILINE) != 0)
 		draw_text_box();
-	else if ((item[0].flags & MENU_FLAG_UI) != 0 || (item[0].flags & MENU_FLAG_UI_SWLIST) != 0)
-		draw_select_game((flags & UI_MENU_PROCESS_NOINPUT));
-	else if ((item[0].flags & MENU_FLAG_UI_PALETTE) != 0)
+	else if ((item[0].flags & FLAG_UI) != 0 || (item[0].flags & FLAG_UI_SWLIST) != 0)
+		draw_select_game((flags & PROCESS_NOINPUT));
+	else if ((item[0].flags & FLAG_UI_PALETTE) != 0)
 		draw_palette_menu();
-	else if ((item[0].flags & MENU_FLAG_UI_DATS) != 0)
+	else if ((item[0].flags & FLAG_UI_DATS) != 0)
 		draw_dats_menu();
 	else
 		draw(flags, x0, y0);
 
 	// process input
-	if (!(flags & UI_MENU_PROCESS_NOKEYS) && !(flags & UI_MENU_PROCESS_NOINPUT))
+	if (!(flags & PROCESS_NOKEYS) && !(flags & PROCESS_NOINPUT))
 	{
 		// read events
-		if ((item[0].flags & MENU_FLAG_UI ) != 0 || (item[0].flags & MENU_FLAG_UI_SWLIST ) != 0)
+		if ((item[0].flags & FLAG_UI ) != 0 || (item[0].flags & FLAG_UI_SWLIST ) != 0)
 			handle_main_events(flags);
 		else
 			handle_events(flags);
 
-		// handle the keys if we don't already have an menu_event
-		if (menu_event.iptkey == IPT_INVALID)
+		// handle the keys if we don't already have an event
+		if (m_event.iptkey == IPT_INVALID)
 		{
-			if ((item[0].flags & MENU_FLAG_UI ) != 0 || (item[0].flags & MENU_FLAG_UI_SWLIST ) != 0)
+			if ((item[0].flags & FLAG_UI) != 0 || (item[0].flags & FLAG_UI_SWLIST) != 0)
 				handle_main_keys(flags);
 			else
 				handle_keys(flags);
 		}
 	}
 
-	// update the selected item in the menu_event
-	if (menu_event.iptkey != IPT_INVALID && selected >= 0 && selected < item.size())
+	// update the selected item in the event
+	if (m_event.iptkey != IPT_INVALID && selected >= 0 && selected < item.size())
 	{
-		menu_event.itemref = item[selected].ref;
-		menu_event.type = item[selected].type;
-		return &menu_event;
+		m_event.itemref = item[selected].ref;
+		m_event.type = item[selected].type;
+		return &m_event;
 	}
 	return nullptr;
 }
@@ -412,27 +426,27 @@ const ui_menu_event *ui_menu::process(UINT32 flags, float x0, float y0)
 //  from the menu's memory pool
 //-------------------------------------------------
 
-void *ui_menu::m_pool_alloc(size_t size)
+void *menu::m_pool_alloc(size_t size)
 {
-	ui_menu_pool *ppool;
-
 	assert(size < UI_MENU_POOL_SIZE);
 
 	// find a pool with enough room
-	for (ppool = pool; ppool != nullptr; ppool = ppool->next)
+	for (pool *ppool = m_pool; ppool != nullptr; ppool = ppool->next)
+	{
 		if (ppool->end - ppool->top >= size)
 		{
 			void *result = ppool->top;
 			ppool->top += size;
 			return result;
 		}
+	}
 
 	// allocate a new pool
-	ppool = (ui_menu_pool *)global_alloc_array_clear<UINT8>(sizeof(*ppool) + UI_MENU_POOL_SIZE);
+	pool *ppool = (pool *)global_alloc_array_clear<UINT8>(sizeof(*ppool) + UI_MENU_POOL_SIZE);
 
 	// wire it up
-	ppool->next = pool;
-	pool = ppool;
+	ppool->next = m_pool;
+	m_pool = ppool;
 	ppool->top = (UINT8 *)(ppool + 1);
 	ppool->end = ppool->top + UI_MENU_POOL_SIZE;
 	return m_pool_alloc(size);
@@ -444,7 +458,7 @@ void *ui_menu::m_pool_alloc(size_t size)
 //  copy in the menu's memory pool
 //-------------------------------------------------
 
-const char *ui_menu::pool_strdup(const char *string)
+const char *menu::pool_strdup(const char *string)
 {
 	return strcpy((char *)m_pool_alloc(strlen(string) + 1), string);
 }
@@ -455,7 +469,7 @@ const char *ui_menu::pool_strdup(const char *string)
 //  of the currently selected menu item
 //-------------------------------------------------
 
-void *ui_menu::get_selection()
+void *menu::get_selection()
 {
 	return (selected >= 0 && selected < item.size()) ? item[selected].ref : nullptr;
 }
@@ -466,7 +480,7 @@ void *ui_menu::get_selection()
 //  of the currently selected menu item
 //-------------------------------------------------
 
-void ui_menu::set_selection(void *selected_itemref)
+void menu::set_selection(void *selected_itemref)
 {
 	selected = -1;
 	for (int itemnum = 0; itemnum < item.size(); itemnum++)
@@ -487,18 +501,18 @@ void ui_menu::set_selection(void *selected_itemref)
 //  draw - draw a menu
 //-------------------------------------------------
 
-void ui_menu::draw(UINT32 flags, float origx0, float origy0)
+void menu::draw(UINT32 flags, float origx0, float origy0)
 {
 	// first draw the FPS counter
 	if (ui().show_fps_counter())
 	{
 		ui().draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
-			JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
+				JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
 	}
 
-	bool customonly = (flags & UI_MENU_PROCESS_CUSTOM_ONLY);
-	bool noimage = (flags & UI_MENU_PROCESS_NOIMAGE);
-	bool noinput = (flags & UI_MENU_PROCESS_NOINPUT);
+	bool const customonly = (flags & PROCESS_CUSTOM_ONLY);
+	bool const noimage = (flags & PROCESS_NOIMAGE);
+	bool const noinput = (flags & PROCESS_NOINPUT);
 	float line_height = ui().get_line_height();
 	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
@@ -517,7 +531,7 @@ void ui_menu::draw(UINT32 flags, float origx0, float origy0)
 	float visible_main_menu_height = 0;
 	for (itemnum = 0; itemnum < item.size(); itemnum++)
 	{
-		const ui_menu_item &pitem = item[itemnum];
+		const menu_item &pitem = item[itemnum];
 		float total_width;
 
 		// compute width of left hand side
@@ -647,7 +661,7 @@ void ui_menu::draw(UINT32 flags, float origx0, float origy0)
 		{
 			float line_y = visible_top + (float)linenum * line_height;
 			itemnum = top_line + linenum;
-			const ui_menu_item &pitem = item[itemnum];
+			const menu_item &pitem = item[itemnum];
 			const char *itemtext = pitem.text;
 			rgb_t fgcolor = UI_TEXT_COLOR;
 			rgb_t bgcolor = UI_TEXT_BG_COLOR;
@@ -657,7 +671,7 @@ void ui_menu::draw(UINT32 flags, float origx0, float origy0)
 			float line_y1 = line_y + line_height;
 
 			// set the hover if this is our item
-			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && pitem.is_selectable())
+			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && is_selectable(pitem))
 				hover = itemnum;
 
 			// if we're selected, draw with a different background
@@ -717,7 +731,7 @@ void ui_menu::draw(UINT32 flags, float origx0, float origy0)
 			// if we don't have a subitem, just draw the string centered
 			else if (pitem.subtext == nullptr)
 			{
-				if (pitem.flags & MENU_FLAG_UI_HEADING)
+				if (pitem.flags & FLAG_UI_HEADING)
 				{
 					float heading_width = ui().get_string_width(itemtext);
 					container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + ((visible_width - heading_width) / 2) - UI_BOX_LR_BORDER, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -730,7 +744,7 @@ void ui_menu::draw(UINT32 flags, float origx0, float origy0)
 			// otherwise, draw the item on the left and the subitem text on the right
 			else
 			{
-				int subitem_invert = pitem.flags & MENU_FLAG_INVERT;
+				int subitem_invert = pitem.flags & FLAG_INVERT;
 				const char *subitem_text = pitem.subtext;
 				float item_width, subitem_width;
 
@@ -764,7 +778,7 @@ void ui_menu::draw(UINT32 flags, float origx0, float origy0)
 							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, nullptr);
 
 				// apply arrows
-				if (itemnum == selected && (pitem.flags & MENU_FLAG_LEFT_ARROW))
+				if (itemnum == selected && (pitem.flags & FLAG_LEFT_ARROW))
 				{
 					draw_arrow(container,
 										effective_left + effective_width - subitem_width - gutter_width,
@@ -774,7 +788,7 @@ void ui_menu::draw(UINT32 flags, float origx0, float origy0)
 										fgcolor,
 										ROT90 ^ ORIENTATION_FLIP_X);
 				}
-				if (itemnum == selected && (pitem.flags & MENU_FLAG_RIGHT_ARROW))
+				if (itemnum == selected && (pitem.flags & FLAG_RIGHT_ARROW))
 				{
 					draw_arrow(container,
 										effective_left + effective_width + gutter_width - lr_arrow_width,
@@ -791,8 +805,8 @@ void ui_menu::draw(UINT32 flags, float origx0, float origy0)
 	// if the selected subitem is too big, display it in a separate offset box
 	if (selected_subitem_too_big)
 	{
-		const ui_menu_item &pitem = item[selected];
-		int subitem_invert = pitem.flags & MENU_FLAG_INVERT;
+		const menu_item &pitem = item[selected];
+		int subitem_invert = pitem.flags & FLAG_INVERT;
 		linenum = selected - top_line;
 		float line_y = visible_top + (float)linenum * line_height;
 		float target_width, target_height;
@@ -810,19 +824,19 @@ void ui_menu::draw(UINT32 flags, float origx0, float origy0)
 
 		// add a box around that
 		ui().draw_outlined_box(container, target_x - UI_BOX_LR_BORDER,
-			target_y - UI_BOX_TB_BORDER,
-			target_x + target_width + UI_BOX_LR_BORDER,
-			target_y + target_height + UI_BOX_TB_BORDER,
-			subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
+				target_y - UI_BOX_TB_BORDER,
+				target_x + target_width + UI_BOX_LR_BORDER,
+				target_y + target_height + UI_BOX_TB_BORDER,
+				subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
 		ui().draw_text_full(container, pitem.subtext, target_x, target_y, target_width,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
+				JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
 	}
 
 	// if there is something special to add, do it by calling the virtual method
 	custom_render((selected >= 0 && selected < item.size()) ? item[selected].ref : nullptr, customtop, custombottom, x1, y1, x2, y2);
 }
 
-void ui_menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
+void menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
 {
 }
 
@@ -832,7 +846,7 @@ void ui_menu::custom_render(void *selectedref, float top, float bottom, float x,
 //  bottom
 //-------------------------------------------------
 
-void ui_menu::draw_text_box()
+void menu::draw_text_box()
 {
 	const char *text = item[0].text;
 	const char *backtext = item[1].text;
@@ -872,7 +886,7 @@ void ui_menu::draw_text_box()
 										target_y - UI_BOX_TB_BORDER,
 										target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
 										target_y + target_height + UI_BOX_TB_BORDER,
-										(item[0].flags & MENU_FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
+										(item[0].flags & FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
 	ui().draw_text_full(container, text, target_x, target_y, target_width,
 				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
@@ -896,7 +910,7 @@ void ui_menu::draw_text_box()
 //  input events for a menu
 //-------------------------------------------------
 
-void ui_menu::handle_events(UINT32 flags)
+void menu::handle_events(UINT32 flags)
 {
 	bool stop = false;
 	ui_event local_menu_event;
@@ -908,13 +922,13 @@ void ui_menu::handle_events(UINT32 flags)
 		{
 			// if we are hovering over a valid item, select it with a single click
 			case UI_EVENT_MOUSE_DOWN:
-				if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
+				if ((flags & PROCESS_ONLYCHAR) == 0)
 				{
 					if (hover >= 0 && hover < item.size())
 						selected = hover;
 					else if (hover == HOVER_ARROW_UP)
 					{
-						if ((flags & MENU_FLAG_UI_DATS) != 0)
+						if ((flags & FLAG_UI_DATS) != 0)
 						{
 							top_line -= visitems - (top_line + visible_lines == item.size() - 1);
 							return;
@@ -926,7 +940,7 @@ void ui_menu::handle_events(UINT32 flags)
 					}
 					else if (hover == HOVER_ARROW_DOWN)
 					{
-						if ((flags & MENU_FLAG_UI_DATS) != 0)
+						if ((flags & FLAG_UI_DATS) != 0)
 						{
 							top_line += visible_lines - 2;
 							return;
@@ -941,14 +955,14 @@ void ui_menu::handle_events(UINT32 flags)
 
 			// if we are hovering over a valid item, fake a UI_SELECT with a double-click
 			case UI_EVENT_MOUSE_DOUBLE_CLICK:
-				if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0 && hover >= 0 && hover < item.size())
+				if ((flags & PROCESS_ONLYCHAR) == 0 && hover >= 0 && hover < item.size())
 				{
 					selected = hover;
-					menu_event.iptkey = IPT_UI_SELECT;
+					m_event.iptkey = IPT_UI_SELECT;
 					if (selected == item.size() - 1)
 					{
-						menu_event.iptkey = IPT_UI_CANCEL;
-						ui_menu::stack_pop(machine());
+						m_event.iptkey = IPT_UI_CANCEL;
+						menu::stack_pop(machine());
 					}
 					stop = true;
 				}
@@ -956,11 +970,11 @@ void ui_menu::handle_events(UINT32 flags)
 
 			// caught scroll event
 			case UI_EVENT_MOUSE_WHEEL:
-				if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
+				if ((flags & PROCESS_ONLYCHAR) == 0)
 				{
 					if (local_menu_event.zdelta > 0)
 					{
-						if ((flags & MENU_FLAG_UI_DATS) != 0)
+						if ((flags & FLAG_UI_DATS) != 0)
 						{
 							top_line -= local_menu_event.num_lines;
 							return;
@@ -973,7 +987,7 @@ void ui_menu::handle_events(UINT32 flags)
 					}
 					else
 					{
-						if ((flags & MENU_FLAG_UI_DATS) != 0)
+						if ((flags & FLAG_UI_DATS) != 0)
 						{
 							top_line += local_menu_event.num_lines;
 							return;
@@ -989,8 +1003,8 @@ void ui_menu::handle_events(UINT32 flags)
 
 			// translate CHAR events into specials
 			case UI_EVENT_CHAR:
-				menu_event.iptkey = IPT_SPECIAL;
-				menu_event.unichar = local_menu_event.ch;
+				m_event.iptkey = IPT_SPECIAL;
+				m_event.unichar = local_menu_event.ch;
 				stop = true;
 				break;
 
@@ -1007,9 +1021,9 @@ void ui_menu::handle_events(UINT32 flags)
 //  keys for a menu
 //-------------------------------------------------
 
-void ui_menu::handle_keys(UINT32 flags)
+void menu::handle_keys(UINT32 flags)
 {
-	bool ignorepause = ui_menu::stack_has_special_main_menu();
+	bool ignorepause = menu::stack_has_special_main_menu();
 	int code;
 
 	// bail if no items
@@ -1021,21 +1035,21 @@ void ui_menu::handle_keys(UINT32 flags)
 	{
 		if (selected == item.size() - 1)
 		{
-			menu_event.iptkey = IPT_UI_CANCEL;
-			ui_menu::stack_pop(machine());
+			m_event.iptkey = IPT_UI_CANCEL;
+			menu::stack_pop(machine());
 		}
 		return;
 	}
 
 	// bail out
-	if ((flags & UI_MENU_PROCESS_ONLYCHAR) != 0)
+	if ((flags & PROCESS_ONLYCHAR) != 0)
 		return;
 
 	// hitting cancel also pops the stack
 	if (exclusive_input_pressed(IPT_UI_CANCEL, 0))
 	{
 		if (!menu_has_search_active())
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 		return;
 	}
 
@@ -1043,22 +1057,22 @@ void ui_menu::handle_keys(UINT32 flags)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool ignoreleft = ((item[selected].flags & MENU_FLAG_LEFT_ARROW) == 0);
-	bool ignoreright = ((item[selected].flags & MENU_FLAG_RIGHT_ARROW) == 0);
+	bool ignoreleft = ((item[selected].flags & FLAG_LEFT_ARROW) == 0);
+	bool ignoreright = ((item[selected].flags & FLAG_RIGHT_ARROW) == 0);
 
-	if ((item[0].flags & MENU_FLAG_UI_DATS) != 0)
+	if ((item[0].flags & FLAG_UI_DATS) != 0)
 		ignoreleft = ignoreright = false;
 
 	// accept left/right keys as-is with repeat
-	if (!ignoreleft && exclusive_input_pressed(IPT_UI_LEFT, (flags & UI_MENU_PROCESS_LR_REPEAT) ? 6 : 0))
+	if (!ignoreleft && exclusive_input_pressed(IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 		return;
-	if (!ignoreright && exclusive_input_pressed(IPT_UI_RIGHT, (flags & UI_MENU_PROCESS_LR_REPEAT) ? 6 : 0))
+	if (!ignoreright && exclusive_input_pressed(IPT_UI_RIGHT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 		return;
 
 	// up backs up by one item
 	if (exclusive_input_pressed(IPT_UI_UP, 6))
 	{
-		if ((item[0].flags & MENU_FLAG_UI_DATS) != 0)
+		if ((item[0].flags & FLAG_UI_DATS) != 0)
 		{
 			top_line--;
 			return;
@@ -1073,7 +1087,7 @@ void ui_menu::handle_keys(UINT32 flags)
 	// down advances by one item
 	if (exclusive_input_pressed(IPT_UI_DOWN, 6))
 	{
-		if ((item[0].flags & MENU_FLAG_UI_DATS) != 0)
+		if ((item[0].flags & FLAG_UI_DATS) != 0)
 		{
 			top_line++;
 			return;
@@ -1134,7 +1148,7 @@ void ui_menu::handle_keys(UINT32 flags)
 		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
 
 	// see if any other UI keys are pressed
-	if (menu_event.iptkey == IPT_INVALID)
+	if (m_event.iptkey == IPT_INVALID)
 		for (code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
 		{
 			if (code == IPT_UI_CONFIGURE || (code == IPT_UI_LEFT && ignoreleft) || (code == IPT_UI_RIGHT && ignoreright) || (code == IPT_UI_PAUSE && ignorepause))
@@ -1151,7 +1165,7 @@ void ui_menu::handle_keys(UINT32 flags)
 //  correct item
 //-------------------------------------------------
 
-void ui_menu::validate_selection(int scandir)
+void menu::validate_selection(int scandir)
 {
 	// clamp to be in range
 	if (selected < 0)
@@ -1160,7 +1174,7 @@ void ui_menu::validate_selection(int scandir)
 		selected = item.size() - 1;
 
 	// skip past unselectable items
-	while (!item[selected].is_selectable())
+	while (!is_selectable(item[selected]))
 		selected = (selected + item.size() + scandir) % item.size();
 }
 
@@ -1171,14 +1185,10 @@ void ui_menu::validate_selection(int scandir)
 //  accumulated in the free list
 //-------------------------------------------------
 
-void ui_menu::clear_free_list(running_machine &machine)
+void menu::clear_free_list(running_machine &machine)
 {
-	while (menu_free != nullptr)
-	{
-		ui_menu *menu = menu_free;
-		menu_free = menu->parent;
-		global_free(menu);
-	}
+	while (menu_free)
+		menu_free = std::move(menu_free->m_parent);
 }
 
 
@@ -1188,13 +1198,13 @@ void ui_menu::clear_free_list(running_machine &machine)
 ***************************************************************************/
 
 //-------------------------------------------------
-//  ui_menu::stack_reset - reset the menu stack
+//  menu::stack_reset - reset the menu stack
 //-------------------------------------------------
 
-void ui_menu::stack_reset(running_machine &machine)
+void menu::stack_reset(running_machine &machine)
 {
-	while (menu_stack != nullptr)
-		ui_menu::stack_pop(machine);
+	while (menu_stack)
+		menu::stack_pop(machine);
 }
 
 
@@ -1203,12 +1213,12 @@ void ui_menu::stack_reset(running_machine &machine)
 //  stack
 //-------------------------------------------------
 
-void ui_menu::stack_push(ui_menu *menu)
+void menu::stack_push(std::unique_ptr<menu> &&menu)
 {
-	menu->parent = menu_stack;
-	menu_stack = menu;
-	menu->reset(UI_MENU_RESET_SELECT_FIRST);
-	menu->machine().ui_input().reset();
+	menu->m_parent = std::move(menu_stack);
+	menu_stack = std::move(menu);
+	menu_stack->reset(reset_options::SELECT_FIRST);
+	menu_stack->machine().ui_input().reset();
 }
 
 
@@ -1216,36 +1226,34 @@ void ui_menu::stack_push(ui_menu *menu)
 //  stack_pop - pop a menu from the stack
 //-------------------------------------------------
 
-void ui_menu::stack_pop(running_machine &machine)
+void menu::stack_pop(running_machine &machine)
 {
-	if (menu_stack != nullptr)
+	if (menu_stack)
 	{
-		ui_menu *menu = menu_stack;
-		menu_stack = menu->parent;
-		menu->parent = menu_free;
-		menu_free = menu;
+		std::unique_ptr<menu> menu(std::move(menu_stack));
+		menu_stack = std::move(menu->m_parent);
+		menu->m_parent = std::move(menu_free);
+		menu_free = std::move(menu);
 		machine.ui_input().reset();
 	}
 }
 
 
 //-------------------------------------------------
-//  ui_menu::stack_has_special_main_menu -
+//  menu::stack_has_special_main_menu -
 //  check in the special main menu is in the stack
 //-------------------------------------------------
 
-bool ui_menu::stack_has_special_main_menu()
+bool menu::stack_has_special_main_menu()
 {
-	ui_menu *menu;
-
-	for (menu = menu_stack; menu != nullptr; menu = menu->parent)
+	for (auto menu = menu_stack.get(); menu != nullptr; menu = menu->m_parent.get())
 		if (menu->is_special_main_menu())
 			return true;
 
 	return false;
 }
 
-void ui_menu::do_handle()
+void menu::do_handle()
 {
 	if(item.size() < 2)
 		populate();
@@ -1262,14 +1270,14 @@ void ui_menu::do_handle()
 //  and calls the menu handler
 //-------------------------------------------------
 
-UINT32 ui_menu::ui_handler(mame_ui_manager &mui, render_container *container, UINT32 state)
+UINT32 menu::ui_handler(mame_ui_manager &mui, render_container *container, UINT32 state)
 {
 	// if we have no menus stacked up, start with the main menu
-	if (menu_stack == nullptr)
-		stack_push(global_alloc_clear<ui_menu_main>(mui, container));
+	if (!menu_stack)
+		stack_push(std::unique_ptr<menu>(global_alloc_clear<menu_main>(mui, container)));
 
 	// update the menu state
-	if (menu_stack != nullptr)
+	if (menu_stack)
 		menu_stack->do_handle();
 
 	// clear up anything pending to be released
@@ -1292,7 +1300,7 @@ UINT32 ui_menu::ui_handler(mame_ui_manager &mui, render_container *container, UI
 //  indicators
 //-------------------------------------------------
 
-void ui_menu::render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param)
+void menu::render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param)
 {
 	int halfwidth = dest.width() / 2;
 	int height = dest.height();
@@ -1345,7 +1353,7 @@ void ui_menu::render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const 
 //  highlight
 //-------------------------------------------------
 
-void ui_menu::highlight(render_container *container, float x0, float y0, float x1, float y1, rgb_t bgcolor)
+void menu::highlight(render_container *container, float x0, float y0, float x1, float y1, rgb_t bgcolor)
 {
 	container->add_quad(x0, y0, x1, y1, bgcolor, hilight_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE) | PRIMFLAG_PACKABLE);
 }
@@ -1355,7 +1363,7 @@ void ui_menu::highlight(render_container *container, float x0, float y0, float x
 //  draw_arrow
 //-------------------------------------------------
 
-void ui_menu::draw_arrow(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, UINT32 orientation)
+void menu::draw_arrow(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, UINT32 orientation)
 {
 	container->add_quad(x0, y0, x1, y1, fgcolor, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(orientation) | PRIMFLAG_PACKABLE);
 }
@@ -1364,7 +1372,7 @@ void ui_menu::draw_arrow(render_container *container, float x0, float y0, float 
 //  init - initialize the ui menu system
 //-------------------------------------------------
 
-void ui_menu::init_ui(running_machine &machine, ui_options &mopt)
+void menu::init_ui(running_machine &machine, ui_options &mopt)
 {
 	render_manager &mrender = machine.render();
 	// create a texture for hilighting items in main menu
@@ -1459,9 +1467,9 @@ void ui_menu::init_ui(running_machine &machine, ui_options &mopt)
 //  draw main menu
 //-------------------------------------------------
 
-void ui_menu::draw_select_game(UINT32 flags)
+void menu::draw_select_game(UINT32 flags)
 {
-	bool noinput = (flags & UI_MENU_PROCESS_NOINPUT);
+	bool noinput = (flags & PROCESS_NOINPUT);
 	float line_height = ui().get_line_height();
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float gutter_width = 0.52f * ud_arrow_width;
@@ -1470,8 +1478,8 @@ void ui_menu::draw_select_game(UINT32 flags)
 	float visible_width = 1.0f - 4.0f * UI_BOX_LR_BORDER;
 	float primary_left = (1.0f - visible_width) * 0.5f;
 	float primary_width = visible_width;
-	bool is_swlist = ((item[0].flags & MENU_FLAG_UI_SWLIST) != 0);
-	bool is_favorites = ((item[0].flags & MENU_FLAG_UI_FAVORITE) != 0);
+	bool is_swlist = ((item[0].flags & FLAG_UI_SWLIST) != 0);
+	bool is_favorites = ((item[0].flags & FLAG_UI_FAVORITE) != 0);
 
 	// draw background image if available
 	if (ui().options().use_background_image() && bgrnd_bitmap->valid())
@@ -1545,7 +1553,7 @@ void ui_menu::draw_select_game(UINT32 flags)
 	{
 		float line_y = visible_top + (float)linenum * line_height;
 		int itemnum = top_line + linenum;
-		const ui_menu_item &pitem = item[itemnum];
+		const menu_item &pitem = item[itemnum];
 		const char *itemtext = pitem.text;
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
@@ -1556,7 +1564,7 @@ void ui_menu::draw_select_game(UINT32 flags)
 		float line_y1 = line_y + line_height;
 
 		// set the hover if this is our item
-		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && pitem.is_selectable())
+		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && is_selectable(pitem))
 			hover = itemnum;
 
 		// if we're selected, draw with a different background
@@ -1608,7 +1616,7 @@ void ui_menu::draw_select_game(UINT32 flags)
 		// draw the item centered
 		else if (pitem.subtext == nullptr)
 		{
-			int item_invert = pitem.flags & MENU_FLAG_INVERT;
+			int item_invert = pitem.flags & FLAG_INVERT;
 			float space = 0.0f;
 
 			if (ui_globals::has_icons && !is_swlist)
@@ -1629,7 +1637,7 @@ void ui_menu::draw_select_game(UINT32 flags)
 		}
 		else
 		{
-			int item_invert = pitem.flags & MENU_FLAG_INVERT;
+			int item_invert = pitem.flags & FLAG_INVERT;
 			const char *subitem_text = pitem.subtext;
 			float item_width, subitem_width;
 
@@ -1650,7 +1658,7 @@ void ui_menu::draw_select_game(UINT32 flags)
 
 	for (size_t count = visible_items; count < item.size(); count++)
 	{
-		const ui_menu_item &pitem = item[count];
+		const menu_item &pitem = item[count];
 		const char *itemtext = pitem.text;
 		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 		float line_y0 = line;
@@ -1659,7 +1667,7 @@ void ui_menu::draw_select_game(UINT32 flags)
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
 
-		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && pitem.is_selectable())
+		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && is_selectable(pitem))
 			hover = count;
 
 		// if we're selected, draw with a different background
@@ -1720,7 +1728,7 @@ void ui_menu::draw_select_game(UINT32 flags)
 //  get title and search path for right panel
 //-------------------------------------------------
 
-void ui_menu::get_title_search(std::string &snaptext, std::string &searchstr)
+void menu::get_title_search(std::string &snaptext, std::string &searchstr)
 {
 	// get arts title text
 	snaptext.assign(_(arts_info[ui_globals::curimage_view].title));
@@ -1758,9 +1766,9 @@ void ui_menu::get_title_search(std::string &snaptext, std::string &searchstr)
 //  handle keys for main menu
 //-------------------------------------------------
 
-void ui_menu::handle_main_keys(UINT32 flags)
+void menu::handle_main_keys(UINT32 flags)
 {
-	bool ignorepause = ui_menu::stack_has_special_main_menu();
+	bool ignorepause = menu::stack_has_special_main_menu();
 
 	// bail if no items
 	if (item.size() == 0)
@@ -1771,8 +1779,8 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	{
 		if (selected == item.size() - 1 && m_focus == focused_menu::main)
 		{
-			menu_event.iptkey = IPT_UI_CANCEL;
-			ui_menu::stack_pop(machine());
+			m_event.iptkey = IPT_UI_CANCEL;
+			menu::stack_pop(machine());
 		}
 		return;
 	}
@@ -1781,7 +1789,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_CANCEL, 0))
 	{
 		if (!ui_error && !menu_has_search_active())
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 		return;
 	}
 
@@ -1789,25 +1797,25 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool ignoreleft = ((item[selected].flags & MENU_FLAG_LEFT_ARROW) == 0);
-	bool ignoreright = ((item[selected].flags & MENU_FLAG_RIGHT_ARROW) == 0);
+	bool ignoreleft = ((item[selected].flags & FLAG_LEFT_ARROW) == 0);
+	bool ignoreright = ((item[selected].flags & FLAG_RIGHT_ARROW) == 0);
 	bool leftclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
 	bool rightclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
 
 	// accept left/right keys as-is with repeat
-	if (!ignoreleft && exclusive_input_pressed(IPT_UI_LEFT, (flags & UI_MENU_PROCESS_LR_REPEAT) ? 6 : 0))
+	if (!ignoreleft && exclusive_input_pressed(IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 	{
 		// Swap the right panel
 		if (m_focus == focused_menu::righttop)
-			menu_event.iptkey = IPT_UI_LEFT_PANEL;
+			m_event.iptkey = IPT_UI_LEFT_PANEL;
 		return;
 	}
 
-	if (!ignoreright && exclusive_input_pressed(IPT_UI_RIGHT, (flags & UI_MENU_PROCESS_LR_REPEAT) ? 6 : 0))
+	if (!ignoreright && exclusive_input_pressed(IPT_UI_RIGHT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 	{
 		// Swap the right panel
 		if (m_focus == focused_menu::righttop)
-			menu_event.iptkey = IPT_UI_RIGHT_PANEL;
+			m_event.iptkey = IPT_UI_RIGHT_PANEL;
 		return;
 	}
 
@@ -1817,14 +1825,14 @@ void ui_menu::handle_main_keys(UINT32 flags)
 		// Filter
 		if (!leftclose && m_focus == focused_menu::left)
 		{
-			menu_event.iptkey = IPT_UI_UP_FILTER;
+			m_event.iptkey = IPT_UI_UP_FILTER;
 			return;
 		}
 
 		// Infos
 		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
-			menu_event.iptkey = IPT_UI_UP_PANEL;
+			m_event.iptkey = IPT_UI_UP_PANEL;
 			topline_datsview--;
 			return;
 		}
@@ -1844,14 +1852,14 @@ void ui_menu::handle_main_keys(UINT32 flags)
 		// Filter
 		if (!leftclose && m_focus == focused_menu::left)
 		{
-			menu_event.iptkey = IPT_UI_DOWN_FILTER;
+			m_event.iptkey = IPT_UI_DOWN_FILTER;
 			return;
 		}
 
 		// Infos
 		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
-			menu_event.iptkey = IPT_UI_DOWN_PANEL;
+			m_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview++;
 			return;
 		}
@@ -1871,7 +1879,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 		// Infos
 		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
-			menu_event.iptkey = IPT_UI_DOWN_PANEL;
+			m_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview -= right_visible_lines - 1;
 			return;
 		}
@@ -1893,7 +1901,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 		// Infos
 		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
-			menu_event.iptkey = IPT_UI_DOWN_PANEL;
+			m_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview += right_visible_lines - 1;
 			return;
 		}
@@ -1915,7 +1923,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 		// Infos
 		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
-			menu_event.iptkey = IPT_UI_DOWN_PANEL;
+			m_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview = 0;
 			return;
 		}
@@ -1933,7 +1941,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 		// Infos
 		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
-			menu_event.iptkey = IPT_UI_DOWN_PANEL;
+			m_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview = totallines;
 			return;
 		}
@@ -1956,7 +1964,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
 
 	// see if any other UI keys are pressed
-	if (menu_event.iptkey == IPT_INVALID)
+	if (m_event.iptkey == IPT_INVALID)
 		for (int code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
 		{
 			if (ui_error || code == IPT_UI_CONFIGURE || (code == IPT_UI_LEFT && ignoreleft) || (code == IPT_UI_RIGHT && ignoreright) || (code == IPT_UI_PAUSE && ignorepause))
@@ -1971,7 +1979,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 //  handle input events for main menu
 //-------------------------------------------------
 
-void ui_menu::handle_main_events(UINT32 flags)
+void menu::handle_main_events(UINT32 flags)
 {
 	bool stop = false;
 	ui_event local_menu_event;
@@ -2001,7 +2009,7 @@ void ui_menu::handle_main_events(UINT32 flags)
 			{
 				if (ui_error)
 				{
-					menu_event.iptkey = IPT_OTHER;
+					m_event.iptkey = IPT_OTHER;
 					stop = true;
 				}
 				else
@@ -2030,9 +2038,9 @@ void ui_menu::handle_main_events(UINT32 flags)
 						set_pressed();
 					}
 					else if (hover == HOVER_UI_RIGHT)
-						menu_event.iptkey = IPT_UI_RIGHT;
+						m_event.iptkey = IPT_UI_RIGHT;
 					else if (hover == HOVER_UI_LEFT)
-						menu_event.iptkey = IPT_UI_LEFT;
+						m_event.iptkey = IPT_UI_LEFT;
 					else if (hover == HOVER_DAT_DOWN)
 						topline_datsview += right_visible_lines - 1;
 					else if (hover == HOVER_DAT_UP)
@@ -2061,17 +2069,17 @@ void ui_menu::handle_main_events(UINT32 flags)
 					}
 					else if (hover == HOVER_B_FAV)
 					{
-						menu_event.iptkey = IPT_UI_FAVORITES;
+						m_event.iptkey = IPT_UI_FAVORITES;
 						stop = true;
 					}
 					else if (hover == HOVER_B_EXPORT)
 					{
-						menu_event.iptkey = IPT_UI_EXPORT;
+						m_event.iptkey = IPT_UI_EXPORT;
 						stop = true;
 					}
 					else if (hover == HOVER_B_DATS)
 					{
-						menu_event.iptkey = IPT_UI_DATS;
+						m_event.iptkey = IPT_UI_DATS;
 						stop = true;
 					}
 					else if (hover >= HOVER_RP_FIRST && hover <= HOVER_RP_LAST)
@@ -2082,13 +2090,13 @@ void ui_menu::handle_main_events(UINT32 flags)
 					else if (hover >= HOVER_SW_FILTER_FIRST && hover <= HOVER_SW_FILTER_LAST)
 					{
 						l_sw_hover = (HOVER_SW_FILTER_FIRST - hover) * (-1);
-						menu_event.iptkey = IPT_OTHER;
+						m_event.iptkey = IPT_OTHER;
 						stop = true;
 					}
 					else if (hover >= HOVER_FILTER_FIRST && hover <= HOVER_FILTER_LAST)
 					{
 						l_hover = (HOVER_FILTER_FIRST - hover) * (-1);
-						menu_event.iptkey = IPT_OTHER;
+						m_event.iptkey = IPT_OTHER;
 						stop = true;
 					}
 				}
@@ -2100,13 +2108,13 @@ void ui_menu::handle_main_events(UINT32 flags)
 				if (hover >= 0 && hover < item.size())
 				{
 					selected = hover;
-					menu_event.iptkey = IPT_UI_SELECT;
+					m_event.iptkey = IPT_UI_SELECT;
 				}
 
 				if (selected == item.size() - 1)
 				{
-					menu_event.iptkey = IPT_UI_CANCEL;
-					ui_menu::stack_pop(machine());
+					m_event.iptkey = IPT_UI_CANCEL;
+					menu::stack_pop(machine());
 				}
 				stop = true;
 				break;
@@ -2140,13 +2148,13 @@ void ui_menu::handle_main_events(UINT32 flags)
 			case UI_EVENT_CHAR:
 				if (exclusive_input_pressed(IPT_UI_CONFIGURE, 0))
 				{
-					menu_event.iptkey = IPT_UI_CONFIGURE;
+					m_event.iptkey = IPT_UI_CONFIGURE;
 					stop = true;
 				}
 				else
 				{
-					menu_event.iptkey = IPT_SPECIAL;
-					menu_event.unichar = local_menu_event.ch;
+					m_event.iptkey = IPT_SPECIAL;
+					m_event.unichar = local_menu_event.ch;
 					stop = true;
 				}
 				break;
@@ -2157,9 +2165,9 @@ void ui_menu::handle_main_events(UINT32 flags)
 					selected = hover;
 					m_prev_selected = item[selected].ref;
 					m_focus = focused_menu::main;
-					menu_event.iptkey = IPT_CUSTOM;
-					menu_event.mouse.x0 = local_menu_event.mouse_x;
-					menu_event.mouse.y0 = local_menu_event.mouse_y;
+					m_event.iptkey = IPT_CUSTOM;
+					m_event.mouse.x0 = local_menu_event.mouse_x;
+					m_event.mouse.y0 = local_menu_event.mouse_y;
 					stop = true;
 				}
 				break;
@@ -2175,7 +2183,7 @@ void ui_menu::handle_main_events(UINT32 flags)
 //  draw right box title
 //-------------------------------------------------
 
-float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
+float menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 {
 	float line_height = ui().get_line_height();
 	float midl = (x2 - x1) * 0.5f;
@@ -2245,7 +2253,7 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 //  common function for images render
 //-------------------------------------------------
 
-std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2, float origy2)
+std::string menu::arts_render_common(float origx1, float origy1, float origx2, float origy2)
 {
 	float line_height = ui().get_line_height();
 	std::string snaptext, searchstr;
@@ -2289,7 +2297,7 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 //  draw favorites star
 //-------------------------------------------------
 
-void ui_menu::draw_star(float x0, float y0)
+void menu::draw_star(float x0, float y0)
 {
 	float y1 = y0 + ui().get_line_height();
 	float x1 = x0 + ui().get_line_height() * container->manager().ui_aspect();
@@ -2300,7 +2308,7 @@ void ui_menu::draw_star(float x0, float y0)
 //  draw toolbar
 //-------------------------------------------------
 
-void ui_menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software)
+void menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software)
 {
 	// draw a box
 	ui().draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
@@ -2353,7 +2361,7 @@ void ui_menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software
 //  perform rendering of image
 //-------------------------------------------------
 
-void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float origy1, float origx2, float origy2, bool software)
+void menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float origy1, float origx2, float origy2, bool software)
 {
 	bool no_available = false;
 	float line_height = ui().get_line_height();
@@ -2441,7 +2449,7 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 //  draw common arrows
 //-------------------------------------------------
 
-void ui_menu::draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title_size)
+void menu::draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title_size)
 {
 	float line_height = ui().get_line_height();
 	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
@@ -2493,7 +2501,7 @@ void ui_menu::draw_common_arrow(float origx1, float origy1, float origx2, float 
 //  draw icons
 //-------------------------------------------------
 
-void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
+void menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 {
 	static const game_driver *olddriver[MAX_ICONS_RENDER] = { nullptr };
 	float x1 = x0 + ui().get_line_height() * container->manager().ui_aspect(container);
@@ -2598,7 +2606,7 @@ void ui_menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 //  draw info arrow
 //-------------------------------------------------
 
-void ui_menu::info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width)
+void menu::info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width)
 {
 	rgb_t fgcolor = UI_TEXT_COLOR;
 	UINT32 orientation = (!ub) ? ROT0 : ROT0 ^ ORIENTATION_FLIP_Y;
@@ -2619,7 +2627,7 @@ void ui_menu::info_arrow(int ub, float origx1, float origx2, float oy1, float li
 //  draw - draw palette menu
 //-------------------------------------------------
 
-void ui_menu::draw_palette_menu()
+void menu::draw_palette_menu()
 {
 	float line_height = ui().get_line_height();
 	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
@@ -2635,7 +2643,7 @@ void ui_menu::draw_palette_menu()
 	float visible_main_menu_height = 0;
 	for (itemnum = 0; itemnum < item.size(); itemnum++)
 	{
-		const ui_menu_item &pitem = item[itemnum];
+		const menu_item &pitem = item[itemnum];
 
 		// compute width of left hand side
 		float total_width = gutter_width + ui().get_string_width(pitem.text) + gutter_width;
@@ -2712,7 +2720,7 @@ void ui_menu::draw_palette_menu()
 	{
 		float line_y = visible_top + (float)linenum * line_height;
 		itemnum = top_line + linenum;
-		const ui_menu_item &pitem = item[itemnum];
+		const menu_item &pitem = item[itemnum];
 		const char *itemtext = pitem.text;
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
@@ -2720,7 +2728,7 @@ void ui_menu::draw_palette_menu()
 		float line_y1 = line_y + line_height;
 
 		// set the hover if this is our item
-		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && pitem.is_selectable())
+		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && is_selectable(pitem))
 			hover = itemnum;
 
 		// if we're selected, draw with a different background
@@ -2807,7 +2815,7 @@ void ui_menu::draw_palette_menu()
 //  draw - draw dats menu
 //-------------------------------------------------
 
-void ui_menu::draw_dats_menu()
+void menu::draw_dats_menu()
 {
 	float line_height = ui().get_line_height();
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
@@ -2870,7 +2878,7 @@ void ui_menu::draw_dats_menu()
 	{
 		float line_y = visible_top + (float)linenum * line_height;
 		int itemnum = top_line + linenum;
-		const ui_menu_item &pitem = item[itemnum];
+		const menu_item &pitem = item[itemnum];
 		const char *itemtext = pitem.text;
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
@@ -2918,7 +2926,7 @@ void ui_menu::draw_dats_menu()
 
 	for (size_t count = visible_items; count < item.size(); count++)
 	{
-		const ui_menu_item &pitem = item[count];
+		const menu_item &pitem = item[count];
 		const char *itemtext = pitem.text;
 		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 		float line_y0 = line;
@@ -2927,7 +2935,7 @@ void ui_menu::draw_dats_menu()
 		rgb_t fgcolor = UI_SELECTED_COLOR;
 		rgb_t bgcolor = UI_SELECTED_BG_COLOR;
 
-		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && pitem.is_selectable())
+		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && is_selectable(pitem))
 			hover = count;
 
 		if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
@@ -2949,7 +2957,7 @@ void ui_menu::draw_dats_menu()
 	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != visible_items);
 }
 
-void ui_menu::set_pressed()
+void menu::set_pressed()
 {
 	(m_repeat == 0) ? m_repeat = osd_ticks() + osd_ticks_per_second() / 2 : m_repeat = osd_ticks() + osd_ticks_per_second() / 4;
 	m_pressed = true;
@@ -2961,7 +2969,7 @@ void ui_menu::set_pressed()
 //  or footer text
 //-------------------------------------------------
 
-void ui_menu::extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction)
+void menu::extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction)
 {
 	float text_width, text_height;
 	float width, maxwidth;
@@ -3004,7 +3012,7 @@ void ui_menu::extra_text_draw_box(float origx1, float origx2, float origy, float
 //  and footer text
 //-------------------------------------------------
 
-void ui_menu::extra_text_render(float top, float bottom,
+void menu::extra_text_render(float top, float bottom,
 	float origx1, float origy1, float origx2, float origy2,
 	const char *header, const char *footer)
 {
@@ -3016,3 +3024,5 @@ void ui_menu::extra_text_render(float top, float bottom,
 	if (footer != nullptr)
 		extra_text_draw_box(origx1, origx2, origy2, bottom, footer, +1);
 }
+
+} // namespace ui

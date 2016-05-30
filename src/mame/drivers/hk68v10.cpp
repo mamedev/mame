@@ -366,13 +366,13 @@ ROM_LOAD16_BYTE ("hk68kv10U12.bin", 0xFC0000, 0x2000, CRC (f2d688e9) SHA1 (e6869
  * Setup sequence channel B
  *  00
  *  04 4C - x16 clock, 2 stop bits, no parity
- *  05 EA - 
+ *  05 EA -
  *  03 E1 - 8 bit, receiver enable, auto enable on
  *  09 00 - no reset
- *  01 00 
+ *  01 00
  *  0B 56
- *  0C 0B - low baudrate divider 
- *  0D 00 - hi baudrate divider 
+ *  0C 0B - low baudrate divider
+ *  0D 00 - hi baudrate divider
  *  0E 03 - Baud Rate Generator enabled, PCLK is source
  */
 ROM_END

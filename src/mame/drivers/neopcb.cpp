@@ -11,7 +11,7 @@ void neopcb_state::machine_start()
 {
 	m_type = NEOGEO_MVS;
 	common_machine_start();
-	
+
 	// enable rtc and serial mode
 	m_upd4990a->cs_w(1);
 	m_upd4990a->oe_w(1);
@@ -243,7 +243,7 @@ void neopcb_state::svcpcb_gfx_decrypt()
 	int rom_size = memregion("sprites")->bytes();
 	UINT8 *rom = memregion("sprites")->base();
 	dynamic_buffer buf(rom_size);
-	
+
 	for (int i = 0; i < rom_size; i++)
 		rom[i] ^= xorval[(i % 4)];
 
@@ -287,7 +287,7 @@ void neopcb_state::kf2k3pcb_gfx_decrypt()
 	int rom_size = memregion("sprites")->bytes();
 	UINT8 *rom = memregion("sprites")->base();
 	dynamic_buffer buf(rom_size);
-	
+
 	for (int i = 0; i < rom_size; i++)
 		rom[ i ] ^= xorval[ (i % 4) ];
 
@@ -320,18 +320,18 @@ void neopcb_state::kf2k3pcb_decrypt_s1data()
 	int srom_size = memregion("sprites")->bytes();
 	src = memregion("sprites")->base() + srom_size - 0x1000000 - 0x80000; // Decrypt S
 	dst = memregion("fixed")->base();
-	
+
 	for (int i = 0; i < tx_size / 2; i++)
 		dst[i] = src[(i & ~0x1f) + ((i & 7) << 2) + ((~i & 8) >> 2) + ((i & 0x10) >> 4)];
-	
+
 	src = memregion("sprites")->base() + srom_size - 0x80000;
 	dst = memregion("fixed")->base() + 0x80000;
-	
- 	for (int i = 0; i < tx_size / 2; i++)
+
+	for (int i = 0; i < tx_size / 2; i++)
 		dst[i] = src[(i & ~0x1f) + ((i & 7) << 2) + ((~i & 8) >> 2) + ((i & 0x10) >> 4)];
-	
+
 	dst = memregion("fixed")->base();
-	
+
 	for (int i = 0; i < tx_size; i++)
 		dst[i] = BITSWAP8(dst[i] ^ 0xd2, 4, 0, 7, 2, 5, 1, 6, 3);
 }
@@ -350,10 +350,10 @@ void neopcb_state::kf2k3pcb_sp1_decrypt()
 		0x03,0x05,0x0b,0x0d,0x03,0x05,0x0b,0x0d,
 		0x04,0x00,0x04,0x00,0x0e,0x0a,0x0e,0x0a
 	};
-	
+
 	UINT16 *rom = (UINT16 *)memregion("mainbios")->base();
 	std::vector<UINT16> buf(0x80000/2);
-	
+
 	for (int i = 0; i < 0x80000/2; i++)
 	{
 		// address xor
@@ -367,13 +367,13 @@ void neopcb_state::kf2k3pcb_sp1_decrypt()
 		if ( i & 0x02000) addr ^= 0x8000;
 		addr ^= address[((i >> 1) & 0x38) | (i & 7)];
 		buf[i] = rom[addr];
-		
+
 		// data xor
 		if (buf[i] & 0x0004) buf[i] ^= 0x0001;
 		if (buf[i] & 0x0010) buf[i] ^= 0x0002;
 		if (buf[i] & 0x0020) buf[i] ^= 0x0008;
 	}
-	
+
 	memcpy(rom, &buf[0], 0x80000);
 }
 
@@ -406,7 +406,7 @@ WRITE16_MEMBER(neopcb_state::write_bankpvc)
 {
 	// write to cart ram
 	m_pvc_prot->protection_w(space, offset, data, mem_mask);
-	
+
 	// actual bankswitch
 	if (offset >= 0xff8)
 	{
@@ -424,7 +424,7 @@ void neopcb_state::install_common()
 
 	// install protection handlers + bankswitch handler
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(pvc_prot_device::protection_r),(pvc_prot_device*)m_pvc_prot), write16_delegate(FUNC(neopcb_state::write_bankpvc),this));
-	
+
 	// perform basic memory initialization that are usually done on-cart
 	m_curr_slot = 0;
 	m_bank_base = 0;
@@ -439,7 +439,7 @@ void neopcb_state::install_banked_bios()
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc00000, 0xc1ffff, 0, 0x0e0000, "bios_bank");
 	membank("bios_bank")->configure_entries(0, 2, memregion("mainbios")->base(), 0x20000);
 	membank("bios_bank")->set_entry(1);
-	
+
 }
 
 DRIVER_INIT_MEMBER(neopcb_state, ms5pcb)
@@ -513,4 +513,3 @@ GAME( 2003, ms5pcb,     0,        neopcb,   dualbios, neopcb_state, ms5pcb,   RO
 GAME( 2003, svcpcb,     0,        neopcb,   dualbios, neopcb_state, svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, svcpcba,    svcpcb,   neopcb,   dualbios, neopcb_state, svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 2)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code */
 GAME( 2003, kf2k3pcb,   0,        neopcb,   neogeo,   neopcb_state, kf2k3pcb, ROT0, "SNK Playmore", "The King of Fighters 2003 (Japan, JAMMA PCB)", MACHINE_SUPPORTS_SAVE )
-

@@ -60,7 +60,7 @@ ToDo:
 static ADDRESS_MAP_START( cybikov1_mem, AS_PROGRAM, 16, cybiko_state )
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w )
-//	AM_RANGE( 0xe00000, 0xe07fff ) AM_READ( cybikov1_key_r )
+//  AM_RANGE( 0xe00000, 0xe07fff ) AM_READ( cybikov1_key_r )
 ADDRESS_MAP_END
 
 /*

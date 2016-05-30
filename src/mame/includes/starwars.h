@@ -28,8 +28,6 @@ public:
 	UINT8 *m_slapstic_source;
 	UINT8 *m_slapstic_base;
 	UINT8 m_slapstic_current_bank;
-	offs_t m_slapstic_last_pc;
-	offs_t m_slapstic_last_address;
 	UINT8 m_is_esb;
 	required_shared_ptr<UINT8> m_mathram;
 	UINT8 m_control_num;
@@ -67,7 +65,6 @@ public:
 	DECLARE_WRITE8_MEMBER(starwars_main_wr_w);
 	DECLARE_WRITE8_MEMBER(starwars_soundrst_w);
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
-	DECLARE_DIRECT_UPDATE_MEMBER(esb_setdirect);
 	DECLARE_DRIVER_INIT(esb);
 	DECLARE_DRIVER_INIT(starwars);
 	virtual void machine_reset() override;

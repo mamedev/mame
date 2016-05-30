@@ -4986,8 +4986,8 @@ void segas32_state::radm_sw2_output( int which, UINT16 data )
 {
 	if (which == 0)
 	{
-		machine().output().set_value("Wiper_lamp", BIT(data, 0));
-		machine().output().set_value("Lights_lamp", BIT(data, 1));
+		machine().output().set_value("Lights_lamp", BIT(data, 0));
+		machine().output().set_value("Wiper_lamp", BIT(data, 1));
 	}
 }
 

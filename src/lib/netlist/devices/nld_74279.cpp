@@ -119,48 +119,21 @@ const char *nld_74279B::m_desc[] = {
 #endif
 #endif
 
-
-NETLIB_START(74279_dip)
-{
-	register_sub("1", m_1);
-	register_sub("2", m_2);
-	register_sub("3", m_3);
-	register_sub("4", m_4);
-
-	register_subalias("1", m_1->m_I[2]);  //R
-	register_subalias("2", m_1->m_I[0]);
-	register_subalias("3", m_1->m_I[1]);
-	register_subalias("4", m_1->m_Q[0]);
-
-	register_subalias("5", m_2->m_I[1]);  //R
-	register_subalias("6", m_2->m_I[0]);
-	register_subalias("7", m_2->m_Q[0]);
-
-	register_subalias("9", m_3->m_Q[0]);
-	register_subalias("10", m_3->m_I[2]); //R
-	register_subalias("11", m_3->m_I[0]);
-	register_subalias("12", m_3->m_I[1]);
-
-	register_subalias("13", m_4->m_Q[0]);
-	register_subalias("14", m_4->m_I[1]); //R
-	register_subalias("15", m_4->m_I[0]);
-}
-
 NETLIB_UPDATE(74279_dip)
 {
 	/* only called during startup */
-	m_1->update_dev();
-	m_2->update_dev();
-	m_3->update_dev();
-	m_4->update_dev();
+	//m_1.update_dev();
+	//m_2.update_dev();
+	//m_3.update_dev();
+	//m_4.update_dev();
 }
 
 NETLIB_RESET(74279_dip)
 {
-	m_1->do_reset();
-	m_2->do_reset();
-	m_3->do_reset();
-	m_4->do_reset();
+	//m_1.do_reset();
+	//m_2.do_reset();
+	//m_3.do_reset();
+	//m_4.do_reset();
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

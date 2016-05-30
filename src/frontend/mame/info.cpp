@@ -106,6 +106,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t\t<!ATTLIST control type CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST control player CDATA #IMPLIED>\n"
 "\t\t\t\t<!ATTLIST control buttons CDATA #IMPLIED>\n"
+"\t\t\t\t<!ATTLIST control reqbuttons CDATA #IMPLIED>\n"
 "\t\t\t\t<!ATTLIST control minimum CDATA #IMPLIED>\n"
 "\t\t\t\t<!ATTLIST control maximum CDATA #IMPLIED>\n"
 "\t\t\t\t<!ATTLIST control sensitivity CDATA #IMPLIED>\n"
@@ -869,6 +870,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 		const char *    type;           // general type of input
 		int             player;         // player which the input belongs to
 		int             nbuttons;       // total number of buttons
+		int             reqbuttons;     // total number of non-optional buttons
 		int             maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
 		int             ways;           // directions for joystick
 		bool            analog;         // is analog input?
@@ -1091,6 +1093,8 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 					}
 					control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons = MAX(control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons, field.type() - IPT_BUTTON1 + 1);
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+					if (!field.optional())
+						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 					break;
 
 				// track maximum coin index
@@ -1115,6 +1119,8 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "keypad";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+					if (!field.optional())
+						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 					break;
 
 				case IPT_KEYBOARD:
@@ -1122,6 +1128,8 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "keyboard";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+					if (!field.optional())
+						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 					break;
 
 				// additional types
@@ -1140,6 +1148,8 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 						control_info[field.player() * CTRL_COUNT + ctrl_type].type = "mahjong";
 						control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 						control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+						if (!field.optional())
+							control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 					}
 					else if (field.type() > IPT_HANAFUDA_FIRST && field.type() < IPT_HANAFUDA_LAST)
 					{
@@ -1147,6 +1157,8 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 						control_info[field.player() * CTRL_COUNT + ctrl_type].type = "hanafuda";
 						control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 						control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+						if (!field.optional())
+							control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 					}
 					else if (field.type() > IPT_GAMBLING_FIRST && field.type() < IPT_GAMBLING_LAST)
 					{
@@ -1154,6 +1166,8 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 						control_info[field.player() * CTRL_COUNT + ctrl_type].type = "gambling";
 						control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 						control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+						if (!field.optional())
+							control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 					}
 					break;
 			}
@@ -1187,6 +1201,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 			if (control_info[i * CTRL_COUNT].type != nullptr && control_info[i * CTRL_COUNT + j].type != nullptr && !fix_done)
 			{
 				control_info[i * CTRL_COUNT + j].nbuttons += control_info[i * CTRL_COUNT].nbuttons;
+				control_info[i * CTRL_COUNT + j].reqbuttons += control_info[i * CTRL_COUNT].reqbuttons;
 				control_info[i * CTRL_COUNT + j].maxbuttons = MAX(control_info[i * CTRL_COUNT + j].maxbuttons, control_info[i * CTRL_COUNT].maxbuttons);
 
 				memset(&control_info[i * CTRL_COUNT], 0, sizeof(control_info[0]));
@@ -1217,7 +1232,11 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 				if (nplayer > 1)
 					fprintf(m_output, " player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
+				{
 					fprintf(m_output, " buttons=\"%d\"", strcmp(elem.type, "stick") ? elem.nbuttons : elem.maxbuttons);
+					if (elem.reqbuttons < elem.nbuttons)
+						fprintf(m_output, " reqbuttons=\"%d\"", elem.reqbuttons);
+				}
 				if (elem.min != 0 || elem.max != 0)
 				{
 					fprintf(m_output, " minimum=\"%d\"", elem.min);
@@ -1242,7 +1261,11 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 				if (nplayer > 1)
 					fprintf(m_output, " player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
+				{
 					fprintf(m_output, " buttons=\"%d\"", strcmp(elem.type, "joy") ? elem.nbuttons : elem.maxbuttons);
+					if (elem.reqbuttons < elem.nbuttons)
+						fprintf(m_output, " reqbuttons=\"%d\"", elem.reqbuttons);
+				}
 				for (int lp = 0; lp < 3 && elem.helper[lp] != 0; lp++)
 				{
 					const char *plural = (lp==2) ? "3" : (lp==1) ? "2" : "";

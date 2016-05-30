@@ -10,27 +10,31 @@
 
 #pragma once
 
-#ifndef __UI_SELECTOR_H__
-#define __UI_SELECTOR_H__
+#ifndef MAME_FRONTEND_UI_SELECTOR_H
+#define MAME_FRONTEND_UI_SELECTOR_H
 
-enum
-{
-	SELECTOR_INIFILE = 1,
-	SELECTOR_CATEGORY,
-	SELECTOR_GAME,
-	SELECTOR_SOFTWARE
-};
+#include "ui/menu.h"
+
+namespace ui {
 
 //-------------------------------------------------
 //  class selector menu
 //-------------------------------------------------
 
-class ui_menu_selector : public ui_menu
+class menu_selector : public menu
 {
 public:
-	ui_menu_selector(mame_ui_manager &mui, render_container *container, std::vector<std::string> const &_sel, UINT16 &_actual, int _category = 0, int _hover = 0);
-	ui_menu_selector(mame_ui_manager &mui, render_container *container, std::vector<std::string> &&_sel, UINT16 &_actual, int _category = 0, int _hover = 0);
-	virtual ~ui_menu_selector();
+	enum
+	{
+		INIFILE = 1,
+		CATEGORY,
+		GAME,
+		SOFTWARE
+	};
+
+	menu_selector(mame_ui_manager &mui, render_container *container, std::vector<std::string> const &_sel, UINT16 &_actual, int _category = 0, int _hover = 0);
+	menu_selector(mame_ui_manager &mui, render_container *container, std::vector<std::string> &&_sel, UINT16 &_actual, int _category = 0, int _hover = 0);
+	virtual ~menu_selector() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -49,4 +53,6 @@ private:
 	void find_matches(const char *str);
 };
 
-#endif /* __UI_SELECTOR_H__ */
+} // namespace ui
+
+#endif /* MAME_FRONTEND_UI_SELECTOR_H */

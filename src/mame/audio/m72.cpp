@@ -55,6 +55,7 @@ m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *ta
 	, m_sample_addr(0)
 	, m_samples(*this, "^samples")
 	, m_samples_size(0)
+	, m_soundlatch(*this, "^soundlatch")
 {
 }
 
@@ -137,16 +138,14 @@ WRITE16_MEMBER( m72_audio_device::sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		driver_device *drvstate = space.machine().driver_data<driver_device>();
-		drvstate->soundlatch_byte_w(*m_space, offset, data);
+		m_soundlatch->write(*m_space, offset, data);
 		space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), Z80_ASSERT);
 	}
 }
 
 WRITE8_MEMBER( m72_audio_device::sound_command_byte_w )
 {
-	driver_device *drvstate = space.machine().driver_data<driver_device>();
-	drvstate->soundlatch_byte_w(*m_space, offset, data);
+	m_soundlatch->write(*m_space, offset, data);
 	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), Z80_ASSERT);
 }
 

@@ -368,6 +368,7 @@ private:
 	bool m_lcram, m_lcram2, m_lcwriteenable;
 	bool m_ioudis;
 	bool m_romswitch;
+	bool m_mockingboard4c;
 
 	bool m_isiic, m_isiicplus;
 	UINT8 m_iicplus_ce00[0x200];
@@ -641,6 +642,7 @@ void apple2e_state::machine_start()
 
 	m_inh_slot = -1;
 	m_cnxx_slot = CNXX_UNCLAIMED;
+	m_mockingboard4c = false;
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -695,6 +697,7 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_lcram));
 	save_item(NAME(m_lcram2));
 	save_item(NAME(m_lcwriteenable));
+	save_item(NAME(m_mockingboard4c));
 }
 
 void apple2e_state::machine_reset()
@@ -713,6 +716,7 @@ void apple2e_state::machine_reset()
 	m_y0edge = false;
 	m_xirq = false;
 	m_yirq = false;
+	m_mockingboard4c = false;
 
 	// IIe prefers INTCXROM default to off, IIc has it always on
 	if (m_rom_ptr[0x3bc0] == 0x00)
@@ -1070,6 +1074,7 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 					m_xy = true; break;
 
 				case 0x5a:  // DisVBL
+					lower_irq(IRQ_VBL);
 					m_vblmask = false; break;
 
 				case 0x5b:  // EnVBL
@@ -1941,9 +1946,35 @@ READ8_MEMBER(apple2e_state::c300_int_r)  { return read_int_rom(space, 0x300, off
 READ8_MEMBER(apple2e_state::c300_int_bank_r)  { return read_int_rom(space, 0x4300, offset); }
 WRITE8_MEMBER(apple2e_state::c300_w) { write_slot_rom(space, 3, offset, data); }
 READ8_MEMBER(apple2e_state::c400_r)  { return read_slot_rom(space, 4, offset); }
-READ8_MEMBER(apple2e_state::c400_int_r)  { return read_int_rom(space, 0x400, offset); }
-READ8_MEMBER(apple2e_state::c400_int_bank_r)  { return read_int_rom(space, 0x4400, offset); }
-WRITE8_MEMBER(apple2e_state::c400_w) { write_slot_rom(space, 4, offset, data); }
+READ8_MEMBER(apple2e_state::c400_int_r)
+{
+	if ((offset < 0x100) && (m_mockingboard4c))
+	{
+		return read_slot_rom(space, 4, offset);
+	}
+
+	return read_int_rom(space, 0x400, offset);
+}
+
+READ8_MEMBER(apple2e_state::c400_int_bank_r)
+{
+	if ((offset < 0x100) && (m_mockingboard4c))
+	{
+		return read_slot_rom(space, 4, offset);
+	}
+
+	return read_int_rom(space, 0x4400, offset);
+}
+
+WRITE8_MEMBER(apple2e_state::c400_w)
+{
+	if ((m_isiic) && (offset < 0x100))
+	{
+		m_mockingboard4c = true;
+	}
+
+	write_slot_rom(space, 4, offset, data);
+}
 
 READ8_MEMBER(apple2e_state::c800_r)
 {
@@ -2415,8 +2446,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c400bank_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(c400_r, c400_w)
-	AM_RANGE(0x0400, 0x07ff) AM_READ(c400_int_r) AM_WRITENOP
-	AM_RANGE(0x0800, 0x0bff) AM_READ(c400_int_bank_r) AM_WRITENOP
+	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(c400_int_r, c400_w)
+	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(c400_int_bank_r, c400_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c800bank_map, AS_PROGRAM, 8, apple2e_state )
@@ -3426,6 +3457,7 @@ static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_cts))
 
 	// TODO: populate the IIc's other virtual slots with ONBOARD_ADD
+	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_MOCKINGBOARD, NOOP )   // Mockingboard 4C
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_DISKIING, NOOP)
 
 	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
@@ -3454,6 +3486,7 @@ static const floppy_interface apple2cp_floppy35_floppy_interface =
 };
 
 static MACHINE_CONFIG_DERIVED( apple2cp, apple2c )
+	MCFG_A2BUS_SLOT_REMOVE("sl4")
 	MCFG_A2BUS_SLOT_REMOVE("sl6")
 	MCFG_IWM_ADD(IICP_IWM_TAG, a2cp_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(apple2cp_floppy35_floppy_interface)
@@ -3501,6 +3534,7 @@ static MACHINE_CONFIG_DERIVED( laser128, apple2c )
 	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
+	MCFG_A2BUS_SLOT_REMOVE("sl4")
 	MCFG_A2BUS_SLOT_REMOVE("sl6")
 
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl1", A2BUS_LASER128, NOOP)
@@ -3523,6 +3557,7 @@ static MACHINE_CONFIG_DERIVED( laser128ex2, apple2c )
 	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
+	MCFG_A2BUS_SLOT_REMOVE("sl4")
 	MCFG_A2BUS_SLOT_REMOVE("sl6")
 
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl1", A2BUS_LASER128, NOOP)

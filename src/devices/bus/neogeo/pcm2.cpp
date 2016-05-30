@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 /***********************************************************************************************************
- 
+
  Neo Geo cart emulation
  PCM2 encrypted cart type
 
@@ -132,4 +132,3 @@ void neogeo_pcm2_pnyaa_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 	m_pcm2_prot->decrypt(ym_region, ym_region_size, 4);
 }
-

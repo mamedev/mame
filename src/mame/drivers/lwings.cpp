@@ -1036,7 +1036,7 @@ static MACHINE_CONFIG_DERIVED( trojan, lwings )
 	/* sound hardware */
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	
+
 	MCFG_SOUND_ADD("5205", MSM5205, XTAL_384kHz)    /* verified on PCB */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* slave mode */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

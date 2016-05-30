@@ -34,7 +34,7 @@ public:
 	void destroy_target(std::string name, uint32_t screen = -1);
 	bgfx_target* create_backbuffer(void *handle, uint16_t width, uint16_t height);
 
-	void update_target_sizes(uint32_t screen, uint16_t width, uint16_t height, uint32_t style);
+	bool update_target_sizes(uint32_t screen, uint16_t width, uint16_t height, uint32_t style);
 	void update_screen_count(uint32_t count);
 
 	// Getters

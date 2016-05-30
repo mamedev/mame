@@ -103,13 +103,13 @@ WRITE8_MEMBER(h8_timer16_channel_device::tier_w)
 	tier = data;
 	tier_update();
 	if(V>=1) logerror("irq %c%c%c%c%c%c trigger=%d\n",
-					  ier & IRQ_A ? 'a' : '.',
-					  ier & IRQ_B ? 'b' : '.',
-					  ier & IRQ_C ? 'c' : '.',
-					  ier & IRQ_D ? 'd' : '.',
-					  ier & IRQ_V ? 'v' : '.',
-					  ier & IRQ_U ? 'u' : '.',
-					  ier & IRQ_TRIG ? 1 : 0);
+						ier & IRQ_A ? 'a' : '.',
+						ier & IRQ_B ? 'b' : '.',
+						ier & IRQ_C ? 'c' : '.',
+						ier & IRQ_D ? 'd' : '.',
+						ier & IRQ_V ? 'v' : '.',
+						ier & IRQ_U ? 'u' : '.',
+						ier & IRQ_TRIG ? 1 : 0);
 	recalc_event();
 }
 

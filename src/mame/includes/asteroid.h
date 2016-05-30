@@ -63,4 +63,3 @@ public:
 
 DISCRETE_SOUND_EXTERN( asteroid );
 DISCRETE_SOUND_EXTERN( astdelux );
-

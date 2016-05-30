@@ -28,21 +28,21 @@ public:
 	void kf2k5uni_px_decrypt(UINT8* cpurom, UINT32 cpurom_size);
 	void kf2k5uni_sx_decrypt(UINT8* fixedrom, UINT32 fixedrom_size);
 	void kf2k5uni_mx_decrypt(UINT8* audiorom, UINT32 audiorom_size);
-	
+
 	void decrypt_kof2k4se_68k(UINT8* cpurom, UINT32 cpurom_size);
-	
+
 	void lans2004_vx_decrypt(UINT8* ymsndrom, UINT32 ymsndrom_size);
 	void lans2004_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size);
-	
+
 	void samsho5b_px_decrypt(UINT8* cpurom, UINT32 cpurom_size);
 	void samsho5b_vx_decrypt(UINT8* ymsndrom, UINT32 ymsndrom_size);
-	
+
 	DECLARE_READ16_MEMBER(mslug5p_prot_r);
 	//DECLARE_WRITE16_MEMBER(ms5plus_bankswitch_w);
 	UINT32 mslug5p_bank_base(UINT16 sel);
 
 	void kog_px_decrypt(UINT8* cpurom, UINT32 cpurom_size);
-	
+
 	void svcboot_px_decrypt(UINT8* cpurom, UINT32 cpurom_size);
 	void svcboot_cx_decrypt(UINT8*sprrom, UINT32 sprrom_size);
 	void svcplus_px_decrypt(UINT8* cpurom, UINT32 cpurom_size);

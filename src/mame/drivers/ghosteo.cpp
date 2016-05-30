@@ -59,6 +59,7 @@ ToDo: verify QS1000 hook-up
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "machine/gen_latch.h"
 #include "machine/s3c2410.h"
 //#include "machine/smartmed.h"
 #include "machine/i2cmem.h"
@@ -86,14 +87,18 @@ class ghosteo_state : public driver_device
 public:
 	ghosteo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") ,
+		m_maincpu(*this, "maincpu"),
+		m_qs1000(*this, "qs1000"),
 		m_i2cmem(*this, "i2cmem"),
 		m_s3c2410(*this, "s3c2410"),
+		m_soundlatch(*this, "soundlatch"),
 		m_system_memory(*this, "systememory") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<qs1000_device> m_qs1000;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<s3c2410_device> m_s3c2410;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<UINT32> m_system_memory;
 
 	int m_security_count;
@@ -154,7 +159,7 @@ NAND Flash Controller (4KB internal buffer)
 
 READ8_MEMBER( ghosteo_state::qs1000_p1_r )
 {
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 WRITE8_MEMBER( ghosteo_state::qs1000_p1_w )
@@ -171,12 +176,10 @@ WRITE8_MEMBER( ghosteo_state::qs1000_p3_w )
 	// ...x .... - ?
 	// ..x. .... - /IRQ clear
 
-	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
-
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
-		qs1000->set_irq(CLEAR_LINE);
+		m_qs1000->set_irq(CLEAR_LINE);
 }
 
 
@@ -586,10 +589,8 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 
 WRITE32_MEMBER(ghosteo_state::soundlatch_w)
 {
-	qs1000_device *qs1000 = space.machine().device<qs1000_device>("qs1000");
-
-	soundlatch_byte_w(space, 0, data);
-	qs1000->set_irq(ASSERT_LINE);
+	m_soundlatch->write(space, 0, data);
+	m_qs1000->set_irq(ASSERT_LINE);
 
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
@@ -644,6 +645,8 @@ static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
 	MCFG_QS1000_EXTERNAL_ROM(true)

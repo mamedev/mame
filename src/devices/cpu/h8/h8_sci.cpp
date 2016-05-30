@@ -44,13 +44,13 @@ WRITE8_MEMBER(h8_sci_device::smr_w)
 {
 	smr = data;
 	if(V>=2) logerror("smr_w %02x %s %c%c%c%s /%d (%06x)\n", data,
-					  data & SMR_CA ? "sync" : "async",
-					  data & SMR_CHR ? '7' : '8',
-					  data & SMR_PE ? data & SMR_OE ? 'o' : 'e' : 'n',
-					  data & SMR_STOP ? '2' : '1',
-					  data & SMR_MP ? " mp" : "",
-					  1 << 2*(data & SMR_CKS),
-					  cpu->pc());
+						data & SMR_CA ? "sync" : "async",
+						data & SMR_CHR ? '7' : '8',
+						data & SMR_PE ? data & SMR_OE ? 'o' : 'e' : 'n',
+						data & SMR_STOP ? '2' : '1',
+						data & SMR_MP ? " mp" : "",
+						1 << 2*(data & SMR_CKS),
+						cpu->pc());
 	clock_update();
 }
 
@@ -86,14 +86,14 @@ bool h8_sci_device::has_recv_error() const
 WRITE8_MEMBER(h8_sci_device::scr_w)
 {
 	if(V>=2) logerror("scr_w %02x%s%s%s%s%s%s clk=%d (%06x)\n", data,
-					  data & SCR_TIE  ? " txi" : "",
-					  data & SCR_RIE  ? " rxi" : "",
-					  data & SCR_TE   ? " tx" : "",
-					  data & SCR_RE   ? " rx" : "",
-					  data & SCR_MPIE ? " mpi" : "",
-					  data & SCR_TEIE ? " tei" : "",
-					  data & SCR_CKE,
-					  cpu->pc());
+						data & SCR_TIE  ? " txi" : "",
+						data & SCR_RIE  ? " rxi" : "",
+						data & SCR_TE   ? " tx" : "",
+						data & SCR_RE   ? " rx" : "",
+						data & SCR_MPIE ? " mpi" : "",
+						data & SCR_TEIE ? " tei" : "",
+						data & SCR_CKE,
+						cpu->pc());
 
 	UINT8 delta = scr ^ data;
 	scr = data;

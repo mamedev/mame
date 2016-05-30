@@ -33,5 +33,3 @@ public:
 	DECLARE_MACHINE_START(md_bootleg) { MACHINE_START_CALL_MEMBER(megadriv); m_vdp->stop_timers(); }
 	DECLARE_MACHINE_START(md_6button);
 };
-
-

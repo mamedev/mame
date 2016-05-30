@@ -133,6 +133,7 @@ Dip locations added based on the notes above.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/2413intf.h"
 #include "sound/dac.h"
 
@@ -211,7 +212,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppmast93_cpu1_io, AS_IO, 8, ppmast93_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM") AM_WRITE(port4_w)
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW1")
@@ -220,7 +221,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppmast93_cpu2_map, AS_PROGRAM, 8, ppmast93_state )
 	AM_RANGE(0x0000, 0xfbff) AM_ROM AM_REGION("sub", 0x10000)
-	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xfc00, 0xfc00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xfd00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -398,6 +399,8 @@ static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, 5000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

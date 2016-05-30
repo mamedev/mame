@@ -460,11 +460,11 @@ WRITE32_MEMBER(gba_rom_eeprom64_device::write_ram)
 
 /*-------------------------------------------------
  Carts with 3D Matrix Memory controller
- 
+
  Used by Video carts with 64MB ROM chips
  Emulation based on the reverse engineering efforts
  by endrift
- 
+
  The Memory controller basically behaves like a DMA
  chip by writing first source and destination address,
  then the number of 512K blocks to copy and finally
@@ -473,12 +473,12 @@ WRITE32_MEMBER(gba_rom_eeprom64_device::write_ram)
  the transfer, other carts might use 0x11 but currently
  they die before getting to the mapper communication
  (CPU emulation issue? cart mapping issue? still unknown)
- 
+
  To investigate:
  - why the other carts fail
  - which addresses might be used by the mapper
    (Disney Collection 2 uses 0x08800180-0x0880018f
-   but it might well be possible to issue commands 
+   but it might well be possible to issue commands
    in an extended range...)
  - which bus addresses can be used by the mapper
    (currently we restrict the mapping in the range
@@ -492,7 +492,7 @@ WRITE32_MEMBER(gba_rom_3dmatrix_device::write_mapper)
 	switch (offset & 3)
 	{
 		case 0:
-			if (data == 0x1)	// transfer data
+			if (data == 0x1)    // transfer data
 				memcpy((UINT8 *)m_romhlp + m_dst, (UINT8 *)m_rom + m_src, m_nblock * 0x200);
 			else
 				printf("Unknown mapper command 0x%X\n", data);

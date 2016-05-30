@@ -10,15 +10,20 @@
 
 #pragma once
 
-#ifndef __UI_IMGCNTRL_H__
-#define __UI_IMGCNTRL_H__
+#ifndef MAME_FRONTEND_UI_IMAGECNTRL_H
+#define MAME_FRONTEND_UI_IMAGECNTRL_H
 
-// ======================> ui_menu_control_device_image
+#include "ui/menu.h"
 
-class ui_menu_control_device_image : public ui_menu {
+namespace ui {
+
+// ======================> menu_control_device_image
+
+class menu_control_device_image : public menu
+{
 public:
-	ui_menu_control_device_image(mame_ui_manager &mui, render_container *container, device_image_interface *image);
-	virtual ~ui_menu_control_device_image();
+	menu_control_device_image(mame_ui_manager &mui, render_container *container, device_image_interface *image);
+	virtual ~menu_control_device_image() override;
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -56,5 +61,6 @@ private:
 	void load_software_part();
 };
 
+} // namespace ui
 
-#endif /* __UI_IMGCNTRL_H__ */
+#endif /* MAME_FRONTEND_UI_IMAGECNTRL_H */

@@ -403,7 +403,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="b1bomber">
 		<description>B1-Nuclear Bomber</description>
 		<year>1981</year>
@@ -415,7 +415,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ccchomp">
 		<description>Crush, Crumble and Chomp!</description>
 		<year>1981</year>
@@ -428,7 +428,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mbasic2x">
 		<description>Microsoft BASIC II Programming Language (Extensions)</description>
 		<year>1982</year>
@@ -441,7 +441,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="basxe41x">
 		<description>Basic XE Programming Language v4.1 (Extensions)</description>
 		<year>1986</year>
@@ -455,7 +455,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="writer">
 		<description>The Writer's Tool</description>
 		<year>1985</year>

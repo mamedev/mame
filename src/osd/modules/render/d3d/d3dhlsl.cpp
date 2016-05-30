@@ -389,7 +389,7 @@ void shaders::end_avi_recording()
 //  shaders::toggle
 //============================================================
 
-void shaders::toggle(std::vector<ui_menu_item>& sliders)
+void shaders::toggle(std::vector<ui::menu_item>& sliders)
 {
 	if (master_enable)
 	{
@@ -824,7 +824,7 @@ void shaders::init_fsfx_quad(void *vertbuf)
 //  shaders::create_resources
 //============================================================
 
-int shaders::create_resources(bool reset, std::vector<ui_menu_item>& sliders)
+int shaders::create_resources(bool reset, std::vector<ui::menu_item>& sliders)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
@@ -1000,7 +1000,7 @@ int shaders::create_resources(bool reset, std::vector<ui_menu_item>& sliders)
 
 	initialized = true;
 
-	std::vector<ui_menu_item> my_sliders = init_slider_list();
+	std::vector<ui::menu_item> my_sliders = init_slider_list();
 	sliders.insert(sliders.end(), my_sliders.begin(), my_sliders.end());
 
 	return 0;
@@ -1518,13 +1518,12 @@ int shaders::vector_pass(d3d_render_target *rt, int source_index, poly_info *pol
 {
 	int next_index = source_index;
 
-	float time_params[2] = { 0.0f, 0.0f };
-	float length_params[3] = { poly->get_line_length(), options->vector_length_scale, options->vector_length_ratio };
-
 	curr_effect = vector_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_vector("TimeParams", 2, time_params);
-	curr_effect->set_vector("LengthParams", 3, length_params);
+	// curr_effect->set_float("TimeRatio", options->vector_time_ratio);
+	// curr_effect->set_float("TimeScale", options->vector_time_scale);
+	curr_effect->set_float("LengthRatio", options->vector_length_ratio);
+	curr_effect->set_float("LengthScale", options->vector_length_scale);
 
 	blit(rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());
 
@@ -1664,10 +1663,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		lines_pending = true;
 
-		bool swap_xy = win->swap_xy();
-		int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
-		int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
-
+		int source_width = int(poly->get_prim_width() + 0.5f);
+		int source_height = int(poly->get_prim_height() + 0.5f);
+		if (win->swap_xy())
+		{
+			std::swap(source_width, source_height);
+		}
 		curr_render_target = find_render_target(source_width, source_height, 0, 0);
 
 		d3d_render_target *rt = curr_render_target;
@@ -1691,10 +1692,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_screen = curr_screen < num_screens ? curr_screen : 0;
 
-		bool swap_xy = win->swap_xy();
-		int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
-		int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
-
+		int source_width = int(poly->get_prim_width() + 0.5f);
+		int source_height = int(poly->get_prim_height() + 0.5f);
+		if (win->swap_xy())
+		{
+			std::swap(source_width, source_height);
+		}
 		curr_render_target = find_render_target(source_width, source_height, 0, 0);
 
 		d3d_render_target *rt = curr_render_target;
@@ -1838,10 +1841,11 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 
 	auto win = d3d->assert_window();
 
-	int source_width = float(d3d->get_width());
-	int source_height = float(d3d->get_height());
-	int target_width = int(prim->get_quad_width() + 0.5f);
-	int target_height = int(prim->get_quad_height() + 0.5f);
+	// source and target size are the same for vector targets
+	int source_width = int(prim->get_quad_width() + 0.5f);
+	int source_height = int(prim->get_quad_height() + 0.5f);
+	int target_width = source_width;
+	int target_height = source_height;
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 	if (win->swap_xy())
@@ -1872,10 +1876,11 @@ void shaders::create_vector_target(render_primitive *prim)
 {
 	auto win = d3d->assert_window();
 
-	int source_width = float(d3d->get_width());
-	int source_height = float(d3d->get_height());
-	int target_width = int(prim->get_quad_width() + 0.5f);
-	int target_height = int(prim->get_quad_height() + 0.5f);
+	// source and target size are the same for vector targets
+	int source_width = int(prim->get_quad_width() + 0.5f);
+	int source_height = int(prim->get_quad_height() + 0.5f);
+	int target_width = source_width;
+	int target_height = source_height;
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 	if (win->swap_xy())
@@ -1981,17 +1986,20 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 
 	auto win = d3d->assert_window();
 
+	int source_width = texture->get_width();
+	int source_height = texture->get_height();
 	int target_width = int(prim->get_quad_width() + 0.5f);
 	int target_height = int(prim->get_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
 	if (win->swap_xy())
 	{
+		// source texture is already swapped
 		std::swap(target_width, target_height);
 	}
 
 	osd_printf_verbose("register_texture() - %d, %d\n", target_width, target_height);
-	if (!add_render_target(d3d, prim, texture, texture->get_width(), texture->get_height(), target_width, target_height))
+	if (!add_render_target(d3d, prim, texture, source_width, source_height, target_width, target_height))
 	{
 		return false;
 	}
@@ -2176,7 +2184,7 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //  be done in a more ideal way.
 //============================================================
 
-static slider_state *slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
+slider_state* shaders::slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, void *arg)
 {
 	int size = sizeof(slider_state) + strlen(title);
 	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(machine, UINT8, size));
@@ -2185,7 +2193,10 @@ static slider_state *slider_alloc(running_machine &machine, int id, const char *
 	state->defval = defval;
 	state->maxval = maxval;
 	state->incval = incval;
-	state->update = update;
+
+	using namespace std::placeholders;
+	state->update = std::bind(&shaders::slider_changed, this, _1, _2, _3, _4, _5);
+
 	state->arg = arg;
 	state->id = id;
 	strcpy(state->description, title);
@@ -2259,7 +2270,7 @@ INT32 slider::update(std::string *str, INT32 newval)
 	return 0;
 }
 
-static INT32 slider_update_trampoline(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+INT32 shaders::slider_changed(running_machine& /*machine*/, void *arg, int /*id*/, std::string *str, INT32 newval)
 {
 	if (arg != nullptr)
 	{
@@ -2274,8 +2285,8 @@ hlsl_options shaders::last_options = { false };
 
 enum slider_option
 {
-	SLIDER_VECTOR_ATTENUATION = 0,
-	SLIDER_VECTOR_LENGTH_MAX,
+	SLIDER_VECTOR_ATT_MAX = 0,
+	SLIDER_VECTOR_ATT_LEN_MIN,
 	SLIDER_SHADOW_MASK_TILE_MODE,
 	SLIDER_SHADOW_MASK_ALPHA,
 	SLIDER_SHADOW_MASK_X_COUNT,
@@ -2351,8 +2362,8 @@ enum slider_screen_type
 
 slider_desc shaders::s_sliders[] =
 {
-	{ "Vector Length Attenuation",          0,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATTENUATION,      0.01f,    "%1.2f", {} },
-	{ "Vector Attenuation Length Limit",    1,   500,  1000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_LENGTH_MAX,       1.0f,     "%4f",   {} },
+	{ "Vector Attenuation Maximum",         0,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATT_MAX,          0.01f,    "%1.2f", {} },
+	{ "Vector Attenuation Length Minimum",  1,   500,  1000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATT_LEN_MIN,      0.001f,   "%1.3f", {} },
 	{ "Shadow Mask Tile Mode",              0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_TILE_MODE,   0,        "%s",    { "Screen", "Source" } },
 	{ "Shadow Mask Amount",                 0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_ALPHA,       0.01f,    "%1.2f", {} },
 	{ "Shadow Mask Pixel X Count",          1,     1,  1024, 1, SLIDER_INT,      SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_X_COUNT,     0,        "%d",    {} },
@@ -2422,8 +2433,8 @@ void *shaders::get_slider_option(int id, int index)
 {
 	switch (id)
 	{
-		case SLIDER_VECTOR_ATTENUATION: return &(options->vector_length_scale);
-		case SLIDER_VECTOR_LENGTH_MAX: return &(options->vector_length_ratio);
+		case SLIDER_VECTOR_ATT_MAX: return &(options->vector_length_scale);
+		case SLIDER_VECTOR_ATT_LEN_MIN: return &(options->vector_length_ratio);
 		case SLIDER_SHADOW_MASK_TILE_MODE: return &(options->shadow_mask_tile_mode);
 		case SLIDER_SHADOW_MASK_ALPHA: return &(options->shadow_mask_alpha);
 		case SLIDER_SHADOW_MASK_X_COUNT: return &(options->shadow_mask_count_x);
@@ -2489,9 +2500,9 @@ void *shaders::get_slider_option(int id, int index)
 	return nullptr;
 }
 
-std::vector<ui_menu_item> shaders::init_slider_list()
+std::vector<ui::menu_item> shaders::init_slider_list()
 {
-	std::vector<ui_menu_item> sliders;
+	std::vector<ui::menu_item> sliders;
 
 	for (slider* slider : internal_sliders)
 	{
@@ -2550,14 +2561,14 @@ std::vector<ui_menu_item> shaders::init_slider_list()
 						break;
 				}
 
-				slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_update_trampoline, slider_arg);
+				slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
 
-				ui_menu_item item;
+				ui::menu_item item;
 				item.text = core_slider->description;
 				item.subtext = "";
 				item.flags = 0;
 				item.ref = core_slider;
-				item.type = ui_menu_item_type::SLIDER;
+				item.type = ui::menu_item_type::SLIDER;
 				sliders.push_back(item);
 			}
 		}

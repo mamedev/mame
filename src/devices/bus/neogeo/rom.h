@@ -39,15 +39,15 @@ class neogeo_vliner_cart : public neogeo_rom_device
 {
 public:
 	neogeo_vliner_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual DECLARE_READ16_MEMBER(ram_r) override { return m_cart_ram[offset]; }
 	virtual DECLARE_WRITE16_MEMBER(ram_w) override { COMBINE_DATA(&m_cart_ram[offset]); }
 
 	virtual int get_fixed_bank_type(void) override { return 0; }
-	
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 private:
 	UINT16 m_cart_ram[0x1000];
 };

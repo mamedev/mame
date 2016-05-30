@@ -44,15 +44,15 @@
 
 #include "nl_base.h"
 
-#define TTL_7474(_name, _CLK, _D, _CLRQ, _PREQ)                                     \
-		NET_REGISTER_DEV(TTL_7474, _name)                                               \
-		NET_CONNECT(_name, CLK, _CLK)                                               \
-		NET_CONNECT(_name, D,  _D)                                                  \
-		NET_CONNECT(_name, CLRQ,  _CLRQ)                                            \
-		NET_CONNECT(_name, PREQ,  _PREQ)
+#define TTL_7474(name, cCLK, cD, cCLRQ, cPREQ)                                     \
+		NET_REGISTER_DEV(TTL_7474, name)                                               \
+		NET_CONNECT(name, CLK, cCLK)                                               \
+		NET_CONNECT(name, D,  cD)                                                  \
+		NET_CONNECT(name, CLRQ,  cCLRQ)                                            \
+		NET_CONNECT(name, PREQ,  cPREQ)
 
-#define TTL_7474_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_7474_DIP, _name)
+#define TTL_7474_DIP(name)                                                         \
+		NET_REGISTER_DEV(TTL_7474_DIP, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -72,6 +72,7 @@ NETLIB_OBJECT(7474sub)
 	NETLIB_RESETI();
 	NETLIB_UPDATEI();
 
+public:
 	logic_input_t m_CLK;
 	logic_output_t m_Q;
 	logic_output_t m_QQ;

@@ -143,6 +143,7 @@ void iteagle_state::machine_reset()
 {
 }
 
+#define PCI_ID_NILE     ":pci:00.0"
 #define PCI_ID_PERIPH   ":pci:06.0"
 #define PCI_ID_IDE      ":pci:06.1"
 // Seconday IDE Control ":pci:06.2"
@@ -159,7 +160,7 @@ static MACHINE_CONFIG_START( iteagle, iteagle_state )
 	MCFG_MIPS3_DCACHE_SIZE(8192)
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
-	MCFG_VRC4373_ADD(                 ":pci:00.0", ":maincpu")
+	MCFG_VRC4373_ADD(                 PCI_ID_NILE, ":maincpu")
 	MCFG_ITEAGLE_PERIPH_ADD(          PCI_ID_PERIPH)
 	MCFG_IDE_PCI_ADD(                 PCI_ID_IDE, 0x1080C693, 0x00, 0x0)
 	MCFG_IDE_PCI_IRQ_ADD(             ":maincpu", MIPS3_IRQ2)
@@ -369,7 +370,7 @@ INPUT_PORTS_END
  *
  *************************************/
 #define EAGLE_BIOS \
-	ROM_REGION( 0x100000, ":pci:00.0", 0 ) /* MIPS code */ \
+	ROM_REGION( 0x100000, PCI_ID_NILE":rom", 0 ) /* MIPS code */ \
 	ROM_SYSTEM_BIOS(  0, "209", "bootrom 2.09" ) \
 	ROMX_LOAD( "eagle209.u15", 0x000000, 0x100000, CRC(e0fc1a16) SHA1(c9524f7ee6b95bd484a3b75bcbe2243cb273f84c), ROM_BIOS(1) ) \
 	ROM_SYSTEM_BIOS(  1, "208", "bootrom 2.08" ) \
@@ -409,7 +410,7 @@ ROM_START( iteagle )
 ROM_END
 
 ROM_START( virtpool ) /* On earlier Eagle 1 PCB, possibly a prototype version - later boards are known as Eagle 2 */
-	ROM_REGION( 0x100000, ":pci:00.0", 0 ) /* MIPS code */
+	ROM_REGION( 0x100000, PCI_ID_NILE":rom", 0 ) /* MIPS code */
 	ROM_SYSTEM_BIOS( 0, "pool", "Virtual Pool bootrom" )
 	ROMX_LOAD( "eagle1_bootrom_v1p01", 0x000000, 0x080000, CRC(6c8c1593) SHA1(707d5633388f8dd4e9252f4d8d6f27c98c2cb35a), ROM_BIOS(1) )
 

@@ -883,8 +883,8 @@ Compiled by K1W1
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="microsoft basic ii programming language.rom" size="16384" crc="24391ffb" sha1="9f0ee797e07bbc74d5d7b664157a80019634172d" offset="0" /> <!-- Verified -->
-			</dataarea>	
-		</part>	
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="aartist">
@@ -1069,7 +1069,7 @@ Compiled by K1W1
 			<feature name="slot" value="a800_ossm091" />
 			<dataarea name="rom" size="16384">
 				<rom name="basic xe programming language v7.2.rom" size="16384" crc="3f06b111" sha1="ac80e12fcd7e228e0329ba1a2f3408b37af0b7ff" offset="0" />
-			</dataarea>		
+			</dataarea>
 		</part>
 	</software>
 
@@ -1877,7 +1877,7 @@ Compiled by K1W1
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="defendr2" cloneof="defender">
 		<description>Defender Rev. 2</description>
 		<!-- Appears to be an ealier prototype version. -->
@@ -2730,7 +2730,7 @@ Compiled by K1W1
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="is5000" cloneof="is7000">
 		<description>INFO/soft 5000 Graphic Generator v5.3</description>
 		<year>1986</year>
@@ -5041,7 +5041,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_oss034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="spectraview-ii v201 (198x)(display systems international).rom" size="16384" crc="77c75598" sha1="e7e8d8919c420770bde5da39cbb47d9d1e89a40b" offset="0" /> 
+				<rom name="spectraview-ii v201 (198x)(display systems international).rom" size="16384" crc="77c75598" sha1="e7e8d8919c420770bde5da39cbb47d9d1e89a40b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5331,7 +5331,7 @@ Compiled by K1W1
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="synass" cloneof="synassxl">
 		<description>Synassembler v4.0</description>
 		<!-- This cartridge was a special order product and available on EPROM only -->
@@ -5577,7 +5577,7 @@ Compiled by K1W1
 			<feature name="slot" value="a800_oss8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="the writer's tool.rom" size="8192" crc="13bcf201" sha1="7de7b160c60f162b19f45789db07ddfd13836da2" offset="0" />
-			</dataarea>		
+			</dataarea>
 		</part>
 	</software>
 

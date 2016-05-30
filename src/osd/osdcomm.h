@@ -11,12 +11,14 @@
 
 #pragma once
 
-#ifndef __OSDCOMM_H__
-#define __OSDCOMM_H__
+#ifndef MAME_OSD_OSDCOMM_H
+#define MAME_OSD_OSDCOMM_H
 
 #include <stdio.h>
 #include <string.h>
 #include <cstdint>
+#include <type_traits>
+
 
 /***************************************************************************
     COMPILER-SPECIFIC NASTINESS
@@ -128,8 +130,17 @@ using FPTR = uintptr_t;
 #define EXTRACT_64HI(val)   ((UINT32)((val) >> 32))
 #define EXTRACT_64LO(val)   ((UINT32)(val))
 
-/* Highly useful macro for compile-time knowledge of an array size */
-#define ARRAY_LENGTH(x)     (sizeof(x) / sizeof(x[0]))
+// Highly useful template for compile-time knowledge of an array size
+template <typename T, size_t N> constexpr inline size_t ARRAY_LENGTH(T (&)[N]) { return N;}
+
+// For declaring an array of the same dimensions as another array (including multi-dimensional arrays)
+template <typename T, typename U> struct equivalent_array_or_type { typedef T type; };
+template <typename T, typename U, std::size_t N> struct equivalent_array_or_type<T, U[N]> { typedef typename equivalent_array_or_type<T, U>::type type[N]; };
+template <typename T, typename U> using equivalent_array_or_type_t = typename equivalent_array_or_type<T, U>::type;
+template <typename T, typename U> struct equivalent_array { };
+template <typename T, typename U, std::size_t N> struct equivalent_array<T, U[N]> { typedef equivalent_array_or_type_t<T, U> type[N]; };
+template <typename T, typename U> using equivalent_array_t = typename equivalent_array<T, U>::type;
+#define EQUIVALENT_ARRAY(a, T) equivalent_array_t<T, std::remove_reference_t<decltype(a)> >
 
 
 /* Macros for normalizing data into big or little endian formats */
@@ -184,4 +195,4 @@ typedef ptrdiff_t ssize_t;
 #endif
 #endif
 
-#endif  /* __OSDCOMM_H__ */
+#endif  /* MAME_OSD_OSDCOMM_H */

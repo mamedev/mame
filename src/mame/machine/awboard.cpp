@@ -301,7 +301,7 @@ READ16_MEMBER(aw_rom_board::pio_r)
 	UINT32 roffset = epr_offset & 0x3ffffff;
 	if (roffset >= (mpr_offset / 2))
 		roffset += mpr_bank * 0x4000000;
-        UINT16 retval = (m_region->bytes() > (roffset * 2)) ? m_region->u16(roffset) : 0; // not endian-safe?
+		UINT16 retval = (m_region->bytes() > (roffset * 2)) ? m_region->u16(roffset) : 0; // not endian-safe?
 	return retval;
 }
 

@@ -95,7 +95,7 @@ public:
 	DECLARE_WRITE8_MEMBER( mmt8_p3_w );
 	DECLARE_WRITE8_MEMBER( sr16_lcd_w );
 	HD44780_PIXEL_UPDATE(sr16_pixel_update);
-	
+
 private:
 	UINT8       m_kb_matrix;
 	UINT8       m_leds;

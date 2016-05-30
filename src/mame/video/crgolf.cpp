@@ -57,7 +57,6 @@ PALETTE_INIT_MEMBER(crgolf_state, crgolf)
 
 PALETTE_INIT_MEMBER(crgolf_state, mastrglf)
 {
-
 }
 
 /*************************************
@@ -135,4 +134,3 @@ UINT32 crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 &b
 
 	return 0;
 }
-

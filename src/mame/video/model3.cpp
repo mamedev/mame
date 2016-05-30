@@ -825,13 +825,13 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
             -------- -------- -------- ------x- ?
             -------- -------- -------- -------x ?
 
-	0x01,0x02 only present on Step 2+
+    0x01,0x02 only present on Step 2+
 
     0x01:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx Model scale (float)
     0x02:   -------- -------- x------- -------- Texture replace
-			-------- -------- -x------ -------- Switch bank
-			-------- -------- --xxxxxx x------- X offset
-			-------- -------- -------- -xxxxxxx Y offset
+            -------- -------- -x------ -------- Switch bank
+            -------- -------- --xxxxxx x------- X offset
+            -------- -------- -------- -xxxxxxx Y offset
 
     0x03:   --x----- -------- -------- -------- ?
             -------- -xxxxxxx xxxx---- -------- LOD?
@@ -850,47 +850,47 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
     Polygon Data
 
     0x00:   xxxxxx-- -------- -------- -------- Specular
-			------x- -------- -------- -------- Clockwise data
+            ------x- -------- -------- -------- Clockwise data
             -------x xxxxxxxx xxxxxx-- -------- Polygon ID
-			-------- -------- ------xx -------- Discard this polygon
-			-------- -------- -------- x------- Specular enable
+            -------- -------- ------xx -------- Discard this polygon
+            -------- -------- -------- x------- Specular enable
             -------- -------- -------- -x------ 0 = Triangle, 1 = Quad
-			-------- -------- -------- --x----- Polygon is points
-			-------- -------- -------- ---x---- Smoothing enable
+            -------- -------- -------- --x----- Polygon is points
+            -------- -------- -------- ---x---- Smoothing enable
             -------- -------- -------- ----x--- Vertex 3 shared from previous polygon
             -------- -------- -------- -----x-- Vertex 2 shared from previous polygon
             -------- -------- -------- ------x- Vertex 1 shared from previous polygon
             -------- -------- -------- -------x Vertex 0 shared from previous polygon
-            
+
 
     0x01:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal X coordinate (2.22 fixed point)
-			-------- -------- -------- x------- Edge on translucency
+            -------- -------- -------- x------- Edge on translucency
             -------- -------- -------- -x------ UV format (0 = 13.3, 1 = 16.0)
-			-------- -------- -------- --x----- Enable fixed shading
+            -------- -------- -------- --x----- Enable fixed shading
             -------- -------- -------- ---x---- Enable double-sided polygon
-			-------- -------- -------- ----x--- Enable smooth shading
+            -------- -------- -------- ----x--- Enable smooth shading
             -------- -------- -------- -----x-- If set, this is the last polygon
             -------- -------- -------- ------x- Poly color, 1 = RGB, 0 = color table
-			-------- -------- -------- -------x No LOS return
+            -------- -------- -------- -------x No LOS return
 
 
     0x02:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal Y coordinate (2.22 fixed point)
-			-------- -------- -------- xxx----- Microtexture select
-			-------- -------- -------- ---x---- Microtexture enable
-			-------- -------- -------- ----xx-- Microtexture min LOD
+            -------- -------- -------- xxx----- Microtexture select
+            -------- -------- -------- ---x---- Microtexture enable
+            -------- -------- -------- ----xx-- Microtexture min LOD
             -------- -------- -------- ------x- Texture U mirror enable
             -------- -------- -------- -------x Texture V mirror enable
 
     0x03:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal Z coordinate (2.22 fixed point)
-			-------- -------- -------- x------- X wrap smoothing
-			-------- -------- -------- -x------ Y wrap smoothing
+            -------- -------- -------- x------- X wrap smoothing
+            -------- -------- -------- -x------ Y wrap smoothing
             -------- -------- -------- --xxx--- Texture width (in 8-pixel tiles)
             -------- -------- -------- -----xxx Texture height (in 8-pixel tiles)
 
     0x04:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Color (RGB888)
             -------- -------- -------- x------- Translator map select
-			-------- -------- -------- -x------ Texture page
-            -------- -------- -------- --xxxxxx Upper 6 bits of texture U coordinate            
+            -------- -------- -------- -x------ Texture page
+            -------- -------- -------- --xxxxxx Upper 6 bits of texture U coordinate
 
     0x05:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Texture NP scale
             -------- -------- -------- x------- Low bit of texture U coordinate
@@ -900,17 +900,17 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
     0x06:   x------- -------- -------- -------- Texture contour enable
             -xxxxxxx -------- -------- -------- Translator map offset
             -------- xxxxxx-- -------- -------- Polygon translucency
-			-------- ------x- -------- -------- Translucency pattern select
+            -------- ------x- -------- -------- Translucency pattern select
             -------- -------x -------- -------- 1 = disable lighting
             -------- -------- xxxxx--- -------- Polygon light modifier (Amount that a luminous polygon will burn through fog.
                                                                         Valid range is 0.0 to 1.0. 0.0 is completely fogged;
                                                                         1.0 has no fog.)
             -------- -------- -----x-- -------- Texture enable
             -------- -------- ------xx x------- Texture format
-			-------- -------- -------- -xx----- Shininess
-			-------- -------- -------- ---x---- High priority polygon
-			-------- -------- -------- ----x--- Layered polygon (stencil)
-			-------- -------- -------- -----xxx Translucency mode
+            -------- -------- -------- -xx----- Shininess
+            -------- -------- -------- ---x---- High priority polygon
+            -------- -------- -------- ----x--- Layered polygon (stencil)
+            -------- -------- -------- -----xxx Translucency mode
 
 
     Vertex entry

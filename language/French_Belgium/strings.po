@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-15 17:42+0200\n"
-"PO-Revision-Date: 2016-03-28 23:49+0200\n"
+"PO-Revision-Date: 2016-05-24 23:42+0200\n"
 "Last-Translator: Mevi <mevi.mame@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: fr_BE\n"
@@ -417,11 +417,11 @@ msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:32
 msgid "UI"
-msgstr "UI (Interface utilisateur)"
+msgstr "UI / Interface utilisateur"
 
 #: src/emu/ui/dirmenu.cpp:34
 msgid "Samples"
-msgstr "Samples (Échantillons sonores)"
+msgstr "Samples / Échantillons sonores"
 
 #: src/emu/ui/dirmenu.cpp:35
 msgid "DATs"
@@ -441,31 +441,31 @@ msgstr "Icônes"
 
 #: src/emu/ui/dirmenu.cpp:39
 msgid "Cheats"
-msgstr "Cheats (Codes de triche)"
+msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:40 src/emu/ui/menu.cpp:44
 msgid "Snapshots"
-msgstr "Snapshots (Captures d'écran)"
+msgstr "Snapshots / Captures d'écran"
 
 #: src/emu/ui/dirmenu.cpp:41 src/emu/ui/menu.cpp:45
 msgid "Cabinets"
-msgstr "Cabinets (Bornes)"
+msgstr "Cabinets / Bornes"
 
 #: src/emu/ui/dirmenu.cpp:42 src/emu/ui/menu.cpp:48
 msgid "Flyers"
-msgstr "Flyers (Prospectus)"
+msgstr "Flyers / Prospectus"
 
 #: src/emu/ui/dirmenu.cpp:43 src/emu/ui/menu.cpp:49
 msgid "Titles"
-msgstr "Titles (Écrans-titre)"
+msgstr "Titles / Écrans-titre"
 
 #: src/emu/ui/dirmenu.cpp:44 src/emu/ui/menu.cpp:50
 msgid "Ends"
-msgstr "Ends (Fins de jeu)"
+msgstr "Ends / Fins de jeu"
 
 #: src/emu/ui/dirmenu.cpp:45 src/emu/ui/menu.cpp:47
 msgid "PCBs"
-msgstr "PCBs (Circuits imprimés)"
+msgstr "PCBs / Circuits imprimés"
 
 #: src/emu/ui/dirmenu.cpp:46 src/emu/ui/menu.cpp:59 src/emu/ui/videoopt.cpp:223
 msgid "Marquees"
@@ -473,35 +473,35 @@ msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:47
 msgid "Controls Panels"
-msgstr "Control Panels (Panneaux de contrôle)"
+msgstr "Control Panels / Panneaux de contrôle"
 
 #: src/emu/ui/dirmenu.cpp:48
 msgid "Crosshairs"
-msgstr "Crosshairs (Viseurs)"
+msgstr "Crosshairs / Viseurs"
 
 #: src/emu/ui/dirmenu.cpp:49
 msgid "Artworks"
-msgstr "Artworks (Illustrations)"
+msgstr "Artworks / Illustrations"
 
 #: src/emu/ui/dirmenu.cpp:50 src/emu/ui/menu.cpp:52
 msgid "Bosses"
-msgstr "Bosses (Ennemis et adversaires)"
+msgstr "Bosses / Ennemis et adversaires"
 
 #: src/emu/ui/dirmenu.cpp:51
 msgid "Artworks Preview"
-msgstr "Artworks Preview (Aperçu des illustrations)"
+msgstr "Artworks Preview / Aperçu des illustrations"
 
 #: src/emu/ui/dirmenu.cpp:52 src/emu/ui/menu.cpp:58
 msgid "Select"
-msgstr "Select (Écrans de sélection)"
+msgstr "Select / Écrans de sélection"
 
 #: src/emu/ui/dirmenu.cpp:53
 msgid "GameOver"
-msgstr "GameOver (Écrans GAME OVER)"
+msgstr "GameOver / Écrans GAME OVER)"
 
 #: src/emu/ui/dirmenu.cpp:54 src/emu/ui/menu.cpp:56
 msgid "HowTo"
-msgstr "HowTo (Comment faire)"
+msgstr "HowTo / Comment faire"
 
 #: src/emu/ui/dirmenu.cpp:55 src/emu/ui/menu.cpp:53
 msgid "Logos"
@@ -517,7 +517,7 @@ msgstr ""
 
 #: src/emu/ui/dirmenu.cpp:58 src/emu/ui/menu.cpp:60
 msgid "Covers"
-msgstr "Covers (Boîtiers et emballages)"
+msgstr "Covers / Boîtiers et emballages"
 
 #: src/emu/ui/dirmenu.cpp:116 src/emu/ui/dirmenu.cpp:136
 msgid "Folders Setup"
@@ -543,7 +543,7 @@ msgstr "Supprimer le dossier"
 #: src/emu/ui/dirmenu.cpp:496
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr "Modifier le dossier %1$s - Recherche: %2$s_"
+msgstr "Changer le dossier %1$s - Recherche: %2$s_"
 
 #: src/emu/ui/dirmenu.cpp:497
 #, c-format
@@ -665,7 +665,7 @@ msgstr "[échoué]"
 
 #: src/emu/ui/inputmap.cpp:52
 msgid "User Interface"
-msgstr "Interface"
+msgstr "Interface utilisateur"
 
 #: src/emu/ui/inputmap.cpp:59
 msgid "Other Controls"
@@ -722,7 +722,7 @@ msgstr "Sélection du BIOS"
 
 #: src/emu/ui/mainmenu.cpp:104
 msgid "Slot Devices"
-msgstr "Slot Devices (Périphériques d'emplacement)"
+msgstr "Slot Devices / Périphériques d'emplacement"
 
 #: src/emu/ui/mainmenu.cpp:109
 msgid "Barcode Reader"
@@ -750,11 +750,11 @@ msgstr "Options du viseur"
 
 #: src/emu/ui/mainmenu.cpp:132
 msgid "Cheat"
-msgstr "Codes de triche"
+msgstr ""
 
 #: src/emu/ui/mainmenu.cpp:135
 msgid "Plugin Options"
-msgstr ""
+msgstr "Plugin / Options du module d'extension"
 
 #: src/emu/ui/mainmenu.cpp:139
 msgid "External DAT View"
@@ -774,7 +774,7 @@ msgstr "Sélectionner une nouvelle machine"
 
 #: src/emu/ui/menu.cpp:46
 msgid "Control Panels"
-msgstr "Control Panels (Commandes)"
+msgstr "Control Panels / Commandes"
 
 #: src/emu/ui/menu.cpp:51
 msgid "Artwork Preview"
@@ -892,15 +892,15 @@ msgstr "%s.txt sauvegardé dans le dossier ui."
 
 #: src/emu/ui/miscmenu.cpp:677
 msgid "Export list in XML format (like -listxml)"
-msgstr ""
+msgstr "Exporter la liste au format XML (comme -listxml)"
 
 #: src/emu/ui/miscmenu.cpp:678
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr ""
+msgstr "Exporter la liste au format XML (comme -listxml, mais en excluant les périphériques)"
 
 #: src/emu/ui/miscmenu.cpp:679
 msgid "Export list in TXT format (like -listfull)"
-msgstr ""
+msgstr "Exporter la liste au format TXT (comme -listfull)"
 
 #: src/emu/ui/miscmenu.cpp:729 src/emu/ui/optsmenu.cpp:376
 msgid ""
@@ -914,7 +914,7 @@ msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:774
 msgid "Bios"
-msgstr ""
+msgstr "BIOS"
 
 #: src/emu/ui/miscmenu.cpp:776
 msgid "Driver"
@@ -926,7 +926,7 @@ msgstr "Sauvegarder la configuration de la machine"
 
 #: src/emu/ui/miscmenu.cpp:806
 msgid "Configure machine:"
-msgstr ""
+msgstr "Configurer la machine :"
 
 #: src/emu/ui/miscmenu.cpp:868 src/emu/ui/selsoft.cpp:109
 msgid " (default)"
@@ -935,7 +935,7 @@ msgstr " (par défaut)"
 #: src/emu/ui/miscmenu.cpp:953 src/emu/ui/miscmenu.cpp:973
 #: src/emu/ui/selgame.cpp:600
 msgid "Plugins"
-msgstr "Plugins (modules d'extension)"
+msgstr "Plugins / Modules d'extension"
 
 #: src/emu/ui/optsmenu.cpp:217
 msgid "Filter"
@@ -1026,6 +1026,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Il manque un ou plusieurs fichiers de ROMs ou d'images CHD pour utiliser "
+"cette machine. Veuillez en sélectionner une autre.\n"
+"\n"
+"Appuyez sur une touche pour continuer."
 
 #: src/emu/ui/selgame.cpp:595 src/emu/ui/simpleselgame.cpp:265
 msgid "Configure Options"
@@ -1033,7 +1037,7 @@ msgstr "Configurer les options"
 
 #: src/emu/ui/selgame.cpp:596
 msgid "Configure Machine"
-msgstr ""
+msgstr "Configurer la machine"
 
 #: src/emu/ui/selgame.cpp:758
 #, c-format
@@ -1304,11 +1308,15 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Il manque un ou plusieurs fichiers nécessaires à l'utilisation de ce "
+"logiciel. Veuillez en sélectionner un autre.\n"
+"\n"
+"Appuyez sur une touche pour continuer."
 
 #: src/emu/ui/selsoft.cpp:683
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s ( %3$d / %4$d packages logiciels )"
 
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
@@ -1688,7 +1696,7 @@ msgstr "Interface : Activée"
 
 #: src/emu/ui/ui.cpp:1543 src/emu/ui/ui.cpp:1553
 msgid "**Use ScrLock to toggle**"
-msgstr "**Utiliser ScrLock pour basculer**"
+msgstr "**Utiliser <ScrLock> pour basculer**"
 
 #: src/emu/ui/ui.cpp:1550
 msgid "Mode: FULL Emulation"
@@ -1923,19 +1931,19 @@ msgstr "Rotation"
 
 #: src/emu/ui/videoopt.cpp:207
 msgid "Backdrops"
-msgstr "Backdrops (Fonds)"
+msgstr "Backdrops / Fonds"
 
 #: src/emu/ui/videoopt.cpp:211
 msgid "Overlays"
-msgstr "Overlays (Calques)"
+msgstr "Overlays / Calques"
 
 #: src/emu/ui/videoopt.cpp:215
 msgid "Bezels"
-msgstr "Bezels (Cadres)"
+msgstr "Bezels / Cadres"
 
 #: src/emu/ui/videoopt.cpp:219
 msgid "CPanels"
-msgstr "CPanels (Commandes)"
+msgstr "CPanels / Commandes"
 
 #: src/emu/ui/videoopt.cpp:227
 msgid "View"
@@ -1956,124 +1964,3 @@ msgstr " COULEURS"
 #: src/emu/ui/viewgfx.cpp:391
 msgid " PENS"
 msgstr " MARQUEURS"
-
-#~ msgid "Export XML format (like -listxml)"
-#~ msgstr "Exporter au format XML (comme -listxml)"
-
-#~ msgid "Export TXT format (like -listfull)"
-#~ msgstr "Exporter au format TXT (comme -listfull)"
-
-#~ msgid "Dummy"
-#~ msgstr "Fictif - Non chargé"
-
-#~ msgid "%1$s %2$s ( %3$d / %4$d softwares )"
-#~ msgstr "%1$s %2$s ( %3$d / %4$d logiciels )"
-
-#~ msgid "Lightgun Device Assignment"
-#~ msgstr "Affecter au périphérique Pistolet"
-
-#~ msgid "Trackball Device Assignment"
-#~ msgstr "Affecter au périphérique Trackball"
-
-#~ msgid "Pedal Device Assignment"
-#~ msgstr "Affecter au périphérique Pédale"
-
-#~ msgid "Adstick Device Assignment"
-#~ msgstr "Affecter au périphérique Adstick"
-
-#~ msgid "Paddle Device Assignment"
-#~ msgstr "Affecter au périphérique Paddle"
-
-#~ msgid "Dial Device Assignment"
-#~ msgstr "Affecter au périphérique Dial"
-
-#~ msgid "Positional Device Assignment"
-#~ msgstr "Affecter au périphérique Positional"
-
-#~ msgid "Mouse Device Assignment"
-#~ msgstr "Affecter au périphérique Souris"
-
-#~ msgid "Device Mapping"
-#~ msgstr "Mappage des périphériques"
-
-#~ msgid "Video Mode"
-#~ msgstr "Mode vidéo"
-
-#~ msgid "Bilinear Filtering"
-#~ msgstr "Filtrage bilinéaire"
-
-#~ msgid "Bitmap Prescaling"
-#~ msgstr "Prescaling de l'image"
-
-#~ msgid "Window Mode"
-#~ msgstr "Mode fenêtré"
-
-#~ msgid "Enforce Aspect Ratio"
-#~ msgstr "Respecter le ratio d'affichage"
-
-#~ msgid "Start Out Maximized"
-#~ msgstr "Démarrer en mode plein écran"
-
-#~ msgid "Synchronized Refresh"
-#~ msgstr "Synchroniser le rafraîchissement de l'écran"
-
-#~ msgid "Wait Vertical Sync"
-#~ msgstr "Attendre V-Sync"
-
-#~ msgid "Display Options"
-#~ msgstr "Options d'affichage"
-
-#~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
-#~ "\n"
-#~ "Press any key (except ESC) to continue."
-#~ msgstr ""
-#~ "Il manque un ou plusieurs fichiers de ROMs ou d'images CHD pour utiliser "
-#~ "cette machine. Veuillez en sélectionner une autre.\n"
-#~ "\n"
-#~ "Appuyez sur une touche (excepté ESC) pour continuer."
-
-#~ msgid ""
-#~ "The selected software is missing one or more required files. Please "
-#~ "select a different software.\n"
-#~ "\n"
-#~ "Press any key (except ESC) to continue."
-#~ msgstr ""
-#~ "Il manque un ou plusieurs fichiers nécessaires à l'utilisation de ce "
-#~ "logiciel. Veuillez en sélectionner un autre.\n"
-#~ "\n"
-#~ "Appuyez sur une touche (excepté ESC) pour continuer."
-
-#~ msgid "Re-select last machine played"
-#~ msgstr "Resélectionner la dernière machine utilisée"
-
-#~ msgid "Enlarge images in the right panel"
-#~ msgstr "Agrandir les images dans l'onglet de droite"
-
-#~ msgid "DATs info"
-#~ msgstr "Info sur les DATs"
-
-#~ msgid "Show mouse pointer"
-#~ msgstr "Montrer le pointeur de la souris"
-
-#~ msgid "Confirm quit from machines"
-#~ msgstr "Confirmer l'arrêt depuis les machines"
-
-#~ msgid "Skip displaying information's screen at startup"
-#~ msgstr "Passer l'affichage des infos au démarrage"
-
-#~ msgid "Force 4:3 appearance for software snapshot"
-#~ msgstr "Forcer l'aspect 4:3 pour la capture d'écran"
-
-#~ msgid "Use image as background"
-#~ msgstr "Utiliser l'image comme fond d'écran"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "Passer le menu de sélection du BIOS"
-
-#~ msgid "Skip software parts selection menu"
-#~ msgstr "Passer le menu de sélection des logiciels"
-
-#~ msgid "Miscellaneous Options"
-#~ msgstr "Autres options"

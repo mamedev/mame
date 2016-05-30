@@ -19,8 +19,6 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_RESET(switch1)
 {
-	m_R.do_reset();
-
 	m_R.set_R(R_OFF);
 }
 
@@ -50,9 +48,6 @@ NETLIB_UPDATE_PARAM(switch1)
 
 NETLIB_RESET(switch2)
 {
-	m_R1.do_reset();
-	m_R2.do_reset();
-
 	m_R1.set_R(R_ON);
 	m_R2.set_R(R_OFF);
 }

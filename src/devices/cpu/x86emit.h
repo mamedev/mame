@@ -2948,6 +2948,10 @@ inline void emit_movq_m64_r128(x86code *&emitptr, x86_memref memref, UINT8 sreg)
 
 #endif
 
+inline void emit_movdqa_r128_m128(x86code *&emitptr, UINT8 dreg, x86_memref memref) { emit_op_modrm_mem(emitptr, OP_MOVDQA_Vdq_Wdq, OP_32BIT, dreg, memref); }
+inline void emit_movdqa_m128_r128(x86code *&emitptr, x86_memref memref, UINT8 sreg) { emit_op_modrm_mem(emitptr, OP_MOVDQA_Wdq_Vdq, OP_32BIT, sreg, memref); }
+inline void emit_movdqu_r128_m128(x86code *&emitptr, UINT8 dreg, x86_memref memref) { emit_op_modrm_mem(emitptr, OP_MOVDQU_Vdq_Wdq, OP_32BIT, dreg, memref); }
+inline void emit_movdqu_m128_r128(x86code *&emitptr, x86_memref memref, UINT8 sreg) { emit_op_modrm_mem(emitptr, OP_MOVDQU_Wdq_Vdq, OP_32BIT, sreg, memref); }
 
 
 //**************************************************************************

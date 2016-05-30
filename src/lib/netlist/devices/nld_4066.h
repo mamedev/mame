@@ -27,20 +27,32 @@
 #include "nl_base.h"
 #include "nld_cmos.h"
 
-#define CD4066_GATE(_name)                                                     \
-		NET_REGISTER_DEV(CD4066_GATE, _name)
+#define CD4066_GATE(name)                                                     \
+		NET_REGISTER_DEV(CD4066_GATE, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_DEVICE(CD4066_GATE,
+NETLIB_OBJECT(CD4066_GATE)
+{
+	NETLIB_CONSTRUCTOR(CD4066_GATE)
+	NETLIB_FAMILY("CD4XXX")
+	, m_supply(*this, "PS")
+	, m_R(*this, "R")
+	, m_base_r(*this, "BASER", 270.0)
+	{
+		enregister("CTL", m_control);
+	}
+
+	NETLIB_RESETI() { }
+	NETLIB_UPDATEI();
+
 public:
+	NETLIB_SUB(vdd_vss) m_supply;
+	NETLIB_SUB(R) m_R;
 
 	analog_input_t m_control;
-	NETLIB_SUBXX(R) m_R;
-
-	NETLIB_SUBXX(vdd_vss) m_supply;
 	param_double_t m_base_r;
-);
+};
 
 NETLIB_NAMESPACE_DEVICES_END()
 

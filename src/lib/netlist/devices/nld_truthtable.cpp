@@ -64,7 +64,7 @@ UINT32 truthtable_desc_t::get_ignored_extended(UINT32 i)
 	 * may change the output
 	 */
 	UINT32 bits = (1<<count_bits(nign));
-	parray_t<int> t(bits);
+	plib::array_t<int> t(bits);
 
 	for (UINT32 j=1; j<bits; j++)
 	{
@@ -99,8 +99,8 @@ UINT32 truthtable_desc_t::get_ignored_extended(UINT32 i)
 // desc
 // ----------------------------------------------------------------------------------------
 
-void truthtable_desc_t::help(unsigned cur, pstring_vector_t list,
-		UINT64 state,UINT16 val, parray_t<UINT8> &timing_index)
+void truthtable_desc_t::help(unsigned cur, plib::pstring_vector_t list,
+		UINT64 state,UINT16 val, plib::array_t<UINT8> &timing_index)
 {
 	pstring elem = list[cur].trim();
 	int start = 0;
@@ -135,7 +135,7 @@ void truthtable_desc_t::help(unsigned cur, pstring_vector_t list,
 		{
 			// cutoff previous inputs and outputs for ignore
 			if (m_outs[nstate] != ~0U &&  m_outs[nstate] != val)
-				fatalerror_e(pfmt("Error in truthtable: State {1} already set, {2} != {3}\n")
+				fatalerror_e(plib::pfmt("Error in truthtable: State {1} already set, {2} != {3}\n")
 						.x(nstate,"04")(m_outs[nstate])(val) );
 			m_outs[nstate] = val;
 			for (unsigned j=0; j<m_NO; j++)
@@ -144,7 +144,7 @@ void truthtable_desc_t::help(unsigned cur, pstring_vector_t list,
 	}
 }
 
-void truthtable_desc_t::setup(const pstring_vector_t &truthtable, UINT32 disabled_ignore)
+void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, UINT32 disabled_ignore)
 {
 	unsigned line = 0;
 
@@ -164,18 +164,18 @@ void truthtable_desc_t::setup(const pstring_vector_t &truthtable, UINT32 disable
 
 	while (!ttline.equals(""))
 	{
-		pstring_vector_t io(ttline,"|");
+		plib::pstring_vector_t io(ttline,"|");
 		// checks
 		nl_assert_always(io.size() == 3, "io.count mismatch");
-		pstring_vector_t inout(io[0], ",");
+		plib::pstring_vector_t inout(io[0], ",");
 		nl_assert_always(inout.size() == m_num_bits, "number of bits not matching");
-		pstring_vector_t out(io[1], ",");
+		plib::pstring_vector_t out(io[1], ",");
 		nl_assert_always(out.size() == m_NO, "output count not matching");
-		pstring_vector_t times(io[2], ",");
+		plib::pstring_vector_t times(io[2], ",");
 		nl_assert_always(times.size() == m_NO, "timing count not matching");
 
 		UINT16 val = 0;
-		parray_t<UINT8> tindex(m_NO);
+		plib::array_t<UINT8> tindex(m_NO);
 
 		for (unsigned j=0; j<m_NO; j++)
 		{
@@ -201,7 +201,7 @@ void truthtable_desc_t::setup(const pstring_vector_t &truthtable, UINT32 disable
 	}
 
 	// determine ignore
-	parray_t<UINT32> ign(m_size);
+	plib::array_t<UINT32> ign(m_size);
 
 	for (UINT32 j=0; j < m_size; j++)
 		ign[j] = ~0U;
@@ -234,22 +234,22 @@ void truthtable_desc_t::setup(const pstring_vector_t &truthtable, UINT32 disable
 	for (UINT32 i=0; i<m_size; i++)
 	{
 		if (m_outs[i] == ~0U)
-			throw fatalerror_e(pfmt("truthtable: found element not set {1}\n").x(i) );
+			throw fatalerror_e(plib::pfmt("truthtable: found element not set {1}\n").x(i) );
 		m_outs[i] |= ((ign[i] & ~disabled_ignore)  << m_NO);
 	}
 	*m_initialized = true;
 
 }
 
-#define ENTRYX(_n,_m,_h)    case (_n * 1000 + _m * 10 + _h): \
-	{ using xtype = netlist_factory_truthtable_t<_n,_m,_h>; \
-		return palloc(xtype(name,classname,def_param)); } break
+#define ENTRYX(n, m, h)    case (n * 1000 + m * 10 + h): \
+	{ using xtype = netlist_factory_truthtable_t<n, m, h>; \
+		return plib::powned_ptr<netlist_base_factory_truthtable_t>::Create<xtype>(name,classname,def_param); } break
 
-#define ENTRYY(_n,_m)   ENTRYX(_n,_m,0); ENTRYX(_n,_m,1)
+#define ENTRYY(n, m)   ENTRYX(n, m, 0); ENTRYX(n, m, 1)
 
-#define ENTRY(_n) ENTRYY(_n, 1); ENTRYY(_n, 2); ENTRYY(_n, 3); ENTRYY(_n, 4); ENTRYY(_n, 5); ENTRYY(_n, 6)
+#define ENTRY(n) ENTRYY(n, 1); ENTRYY(n, 2); ENTRYY(n, 3); ENTRYY(n, 4); ENTRYY(n, 5); ENTRYY(n, 6)
 
-netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const unsigned no,
+plib::powned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
 		const unsigned has_state,
 		const pstring &name, const pstring &classname,
 		const pstring &def_param)
@@ -267,10 +267,10 @@ netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const
 		ENTRY(9);
 		ENTRY(10);
 		default:
-			pstring msg = pfmt("unable to create truthtable<{1},{2},{3}>")(ni)(no)(has_state);
+			pstring msg = plib::pfmt("unable to create truthtable<{1},{2},{3}>")(ni)(no)(has_state);
 			nl_assert_always(false, msg);
 	}
-	return nullptr;
+	//return nullptr;
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

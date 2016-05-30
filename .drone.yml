@@ -1,0 +1,46 @@
+# Build configure for https://www.tea-ci.org (fork of Drone CI with Msys2 support)
+# 32-bit until release including https://sourceware.org/git/gitweb.cgi?p=newlib-cygwin.git;a=commitdiff;h=0aa738220bb9dea2ad479e484560767b36701947
+build:
+  image: teaci/msys32
+  shell: mingw32
+  pull: true
+  branches:
+    -master
+  environment:
+    - SUBTARGET=tiny
+    - MINGW32=/c/msys32/mingw32
+    - MAME_EXE=mametiny.exe
+#    - SOURCES=src/mame/drivers/pacman.cpp
+  commands:
+#    - pacman -S -q --noprogressbar --noconfirm winpty
+    - make
+    - ./$MAME_EXE -validate && echo "Validation successful"
+ 
+notify:
+  irc:
+    prefix: build
+    nick: $$IRC_USER
+    channel: mame-dev
+    server:
+      host: $$IRC_HOST
+      port: $$IRC_PORT
+      password: $$IRC_PASS
+      tls: true
+  when:
+    success: false
+    failure: true
+    change: true
+
+# Need to regen secrets file (.drone.sec) from within tea-ci.org to enable
+#notify:
+#  email:
+#    from: git@mamedev.org
+#    host: $$EMAIL_SERVER
+#    username: $$EMAIL_USERNAME
+#    password: $$EMAIL_PASSWORD
+#    recipients:
+#      - $$EMAIL_LISTADDR
+#    when:
+#      success: false
+#      failure: false
+#      change: true

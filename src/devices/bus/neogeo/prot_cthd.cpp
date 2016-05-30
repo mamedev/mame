@@ -25,9 +25,9 @@ void cthd_prot_device::device_reset()
 
 
 /**************************
- 
+
  decryption helpers
- 
+
 **************************/
 
 // descrambling information from razoola
@@ -86,9 +86,9 @@ void cthd_prot_device::cthd2003_c(UINT8* sprrom, UINT32 sprrom_size, int pow)
 }
 
 /**************************
- 
+
  protection / encryption
- 
+
  **************************/
 
 void cthd_prot_device::decrypt_cthd2003(UINT8* sprrom, UINT32 sprrom_size, UINT8* audiorom, UINT32 audiorom_size, UINT8* fixedrom, UINT32 fixedrom_size)
@@ -119,16 +119,16 @@ void cthd_prot_device::decrypt_cthd2003(UINT8* sprrom, UINT32 sprrom_size, UINT8
 /*
 WRITE16_MEMBER( ngbootleg_prot_device::cthd2003_bankswitch_w )
 {
-	int bankaddress;
-	static const int cthd2003_banks[8] =
-	{
-		1,0,1,0,1,0,3,2,
-	};
-	if (offset == 0)
-	{
-		bankaddress = 0x100000 + cthd2003_banks[data&7]*0x100000;
-		m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
-	}
+    int bankaddress;
+    static const int cthd2003_banks[8] =
+    {
+        1,0,1,0,1,0,3,2,
+    };
+    if (offset == 0)
+    {
+        bankaddress = 0x100000 + cthd2003_banks[data&7]*0x100000;
+        m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
+    }
 }
 */
 
@@ -313,7 +313,7 @@ void cthd_prot_device::matrimbl_decrypt(UINT8* sprrom, UINT32 sprrom_size, UINT8
 		rom[j] = buf[i];
 	}
 	memcpy(rom - 0x10000, rom, 0x10000);
-	
+
 	// decrypt gfx
 	cthd2003_c(sprrom,sprrom_size, 0 );
 }

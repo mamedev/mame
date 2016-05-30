@@ -63,7 +63,6 @@ public:
 	DECLARE_WRITE16_MEMBER(guardians_sloop_data_w);
 	void roadriot_sloop_tweak(int offset);
 	void guardians_sloop_tweak(int offset);
-	DECLARE_DIRECT_UPDATE_MEMBER(atarig42_sloop_direct_handler);
 	DECLARE_DRIVER_INIT(roadriot);
 	DECLARE_DRIVER_INIT(guardian);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);

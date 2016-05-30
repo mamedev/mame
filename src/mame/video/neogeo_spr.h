@@ -26,7 +26,7 @@ public:
 
 	virtual void optimize_sprite_data();
 	virtual void set_optimized_sprite_data(UINT8* sprdata, UINT32 mask);
-	
+
 	virtual void draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens);
 	void draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline);
 	void set_videoram_offset(UINT16 data);
@@ -114,7 +114,7 @@ public:
 	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens) override;
 	std::vector<UINT8> m_sprite_gfx;
 	UINT8* m_spritegfx8;
-	
+
 private:
 	UINT32 optimize_helper(std::vector<UINT8> &spritegfx, UINT8* region_sprites, UINT32 region_sprites_size);
 };

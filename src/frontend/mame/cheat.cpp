@@ -956,7 +956,7 @@ void cheat_entry::menu_text(std::string &description, std::string &state, UINT32
 			if (description.empty())
 				description.assign(MENU_SEPARATOR_ITEM);
 		}
-		flags = MENU_FLAG_DISABLE;
+		flags = ui::menu::FLAG_DISABLE;
 	}
 
 	// if we have no parameter and no run or off script, it's a oneshot cheat
@@ -967,7 +967,7 @@ void cheat_entry::menu_text(std::string &description, std::string &state, UINT32
 	else if (is_onoff())
 	{
 		state.assign((m_state == SCRIPT_STATE_RUN) ? "On" : "Off");
-		flags = (m_state != 0) ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW;
+		flags = (m_state != 0) ? ui::menu::FLAG_LEFT_ARROW : ui::menu::FLAG_RIGHT_ARROW;
 	}
 
 	// if we have a value parameter, compute it
@@ -976,14 +976,14 @@ void cheat_entry::menu_text(std::string &description, std::string &state, UINT32
 		if (m_state == SCRIPT_STATE_OFF)
 		{
 			state.assign(is_oneshot_parameter() ? "Set" : "Off");
-			flags = MENU_FLAG_RIGHT_ARROW;
+			flags = ui::menu::FLAG_RIGHT_ARROW;
 		}
 		else
 		{
 			state.assign(m_parameter->text());
-			flags = MENU_FLAG_LEFT_ARROW;
+			flags = ui::menu::FLAG_LEFT_ARROW;
 			if (!m_parameter->is_maximum())
-				flags |= MENU_FLAG_RIGHT_ARROW;
+				flags |= ui::menu::FLAG_RIGHT_ARROW;
 		}
 	}
 }

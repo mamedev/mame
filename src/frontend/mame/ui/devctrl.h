@@ -20,17 +20,21 @@
 
 #pragma once
 
-#ifndef __UI_DEVCTRL_H__
-#define __UI_DEVCTRL_H__
+#ifndef MAME_FRONTEND_UI_DEVCTRL_H
+#define MAME_FRONTEND_UI_DEVCTRL_H
 
-template<class _DeviceType>
-class ui_menu_device_control : public ui_menu
+#include "ui/menu.h"
+
+namespace ui {
+
+template<class DeviceType>
+class menu_device_control : public menu
 {
 public:
-	ui_menu_device_control(mame_ui_manager &mui, render_container *container, _DeviceType *device);
+	menu_device_control(mame_ui_manager &mui, render_container *container, DeviceType *device);
 
 protected:
-	_DeviceType *current_device() { return m_device; }
+	DeviceType *current_device() { return m_device; }
 	int count() { return m_count; }
 
 	int current_index();
@@ -41,9 +45,9 @@ protected:
 
 private:
 	// device iterator
-	typedef device_type_iterator<&device_creator<_DeviceType>, _DeviceType> iterator;
+	typedef device_type_iterator<&device_creator<DeviceType>, DeviceType> iterator;
 
-	_DeviceType *   m_device;
+	DeviceType *    m_device;
 	int             m_count;
 };
 
@@ -52,9 +56,9 @@ private:
 //  ctor
 //-------------------------------------------------
 
-template<class _DeviceType>
-ui_menu_device_control<_DeviceType>::ui_menu_device_control(mame_ui_manager &mui, render_container *container, _DeviceType *device)
-	: ui_menu(mui, container)
+template<class DeviceType>
+menu_device_control<DeviceType>::menu_device_control(mame_ui_manager &mui, render_container *container, DeviceType *device)
+	: menu(mui, container)
 {
 	iterator iter(mui.machine().root_device());
 	m_count = iter.count();
@@ -66,8 +70,8 @@ ui_menu_device_control<_DeviceType>::ui_menu_device_control(mame_ui_manager &mui
 //  current_index
 //-------------------------------------------------
 
-template<class _DeviceType>
-int ui_menu_device_control<_DeviceType>::current_index()
+template<class DeviceType>
+int menu_device_control<DeviceType>::current_index()
 {
 	iterator iter(machine().root_device());
 	return iter.indexof(*m_device);
@@ -78,8 +82,8 @@ int ui_menu_device_control<_DeviceType>::current_index()
 //  previous
 //-------------------------------------------------
 
-template<class _DeviceType>
-void ui_menu_device_control<_DeviceType>::previous()
+template<class DeviceType>
+void menu_device_control<DeviceType>::previous()
 {
 	// left arrow - rotate left through cassette devices
 	if (m_device != nullptr)
@@ -99,8 +103,8 @@ void ui_menu_device_control<_DeviceType>::previous()
 //  next
 //-------------------------------------------------
 
-template<class _DeviceType>
-void ui_menu_device_control<_DeviceType>::next()
+template<class DeviceType>
+void menu_device_control<DeviceType>::next()
 {
 	// right arrow - rotate right through cassette devices
 	if (m_device != nullptr)
@@ -120,8 +124,8 @@ void ui_menu_device_control<_DeviceType>::next()
 //  current_display_name
 //-------------------------------------------------
 
-template<class _DeviceType>
-std::string ui_menu_device_control<_DeviceType>::current_display_name()
+template<class DeviceType>
+std::string menu_device_control<DeviceType>::current_display_name()
 {
 	std::string display_name;
 	display_name.assign(current_device()->name());
@@ -135,19 +139,20 @@ std::string ui_menu_device_control<_DeviceType>::current_display_name()
 //  current_display_flags
 //-------------------------------------------------
 
-template<class _DeviceType>
-UINT32 ui_menu_device_control<_DeviceType>::current_display_flags()
+template<class DeviceType>
+UINT32 menu_device_control<DeviceType>::current_display_flags()
 {
 	UINT32 flags = 0;
 	if (count() > 1)
 	{
 		if (current_index() > 0)
-			flags |= MENU_FLAG_LEFT_ARROW;
+			flags |= FLAG_LEFT_ARROW;
 		if (current_index() < count() - 1)
-			flags |= MENU_FLAG_RIGHT_ARROW;
+			flags |= FLAG_RIGHT_ARROW;
 	}
 	return flags;
 }
 
+} // namespace ui
 
-#endif /* __UI_DEVCTRL_H__ */
+#endif /* MAME_FRONTEND_UI_DEVCTRL_H */

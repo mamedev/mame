@@ -225,6 +225,7 @@
 #include "sound/sn76496.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/ds2401.h"
 #include "video/ramdac.h"
 #include "includes/goldstar.h"
 
@@ -887,16 +888,16 @@ static ADDRESS_MAP_START( flaming7_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
 
 	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-//	AM_RANGE(0x9a00, 0x9fff) AM_RAM
+//  AM_RANGE(0x9a00, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-//	AM_RANGE(0xa200, 0xa7ff) AM_RAM
+//  AM_RANGE(0xa200, 0xa7ff) AM_RAM
 	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-//	AM_RANGE(0xaa00, 0xafff) AM_RAM
+//  AM_RANGE(0xaa00, 0xafff) AM_RAM
 
-//	AM_RANGE(0xb000, 0xb03f) AM_RAM
+//  AM_RANGE(0xb000, 0xb03f) AM_RAM
 	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
-//	AM_RANGE(0xb0c0, 0xb0ff) AM_RAM
+//  AM_RANGE(0xb0c0, 0xb0ff) AM_RAM
 	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
 	AM_RANGE(0xb180, 0xb7ff) AM_RAM
 
@@ -908,12 +909,12 @@ static ADDRESS_MAP_START( flaming7_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0xb860, 0xb860) AM_WRITE(p2_lamps_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* sound */
-//	AM_RANGE(0xc000, 0xd3ff) AM_RAM
+//  AM_RANGE(0xc000, 0xd3ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 /*
   W 9A00-B7FF FF
- RW B000-B7FF 00 
+ RW B000-B7FF 00
 
 */
 
@@ -8179,7 +8180,9 @@ static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
-//	MCFG_CPU_IO_MAP(flaming7_readport)
+//  MCFG_CPU_IO_MAP(flaming7_readport)
+
+	MCFG_DS2401_ADD("fl7w4_serial_id")
 MACHINE_CONFIG_END
 
 
@@ -10827,7 +10830,7 @@ ROM_END
 
 /*
   New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)
-  
+
   CPUs
   1x Z80        (11b) - 8-bit Microprocessor - main (missing).
   3x iD8255A-5  (7b, 8b, 9b) - Programmable Peripheral Interface.
@@ -10836,7 +10839,7 @@ ROM_END
   1x uPC1181    (0a) - Audio Amplifier - sound.
 
   ROMs
-  4x AM27C64    (1-4)	dumped.
+  4x AM27C64    (1-4)   dumped.
   4x M27C256B   (5-8) dumped.
   3x AM27S21APC (1, 2, 3) dumped.
   3x N82S123AN  (4, 5) dumped.
@@ -10991,11 +10994,11 @@ ROM_END
   Silkscreened: LUCKY97-1.
                 06/07/1993.
                 TAIWAN.
-				
+
   GFX ROMs 1, 2, 3, 4 are double size. Each half matches the set ns8lines.
   GFX ROMs 5, 6, 7 match the ns8lines set.
 
-  Program ROM is different. 
+  Program ROM is different.
 */
 ROM_START( ns8linesa )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -13961,11 +13964,20 @@ ROM_END
   Probably tracing pin connections to the HX881 will confirm it.
 
 
-  You can switch the games pulsing their respective hidden buttons.
-
   Hidden Switch:
 
-  Unknown, yet...
+  You can enter Cherry Master mode in same way like other Tetris versions.
+
+  One wire goes to edge connector 35 + 36 (solder side), putting PPI (u34)
+  pin 14 (PC0) to GND (needed to get the switch working).
+
+  One button adds GND to the edge connector 8 (solder side):
+  PPI pin 18 (PB0), to switch to Tetris game.
+
+  The other button, adds GND to the edge connector 7 (solder side):
+  PPI pin 19 (PB1), to switch to Cherry Master game.
+
+  Need proper implementation.
 
 */
 ROM_START( cmtetrsb )
@@ -14000,7 +14012,6 @@ ROM_END
 
   Flaming 7.
   Cyberdyne Systems, Inc.
-  Looks a W-4 derivative...
 
   Graphics: CGA
   Reels: 3 spinning reels.
@@ -14008,12 +14019,15 @@ ROM_END
   Bonus Games: Yes.
   Harness Type: Standard 36/10 Pin Cherry Master Harness.
 
+  Looks like a Wing W-4 derivative. There are at least 3 different hardwares:
+  Cyberdyne original PCB, Taiwanese custom PCB, and one close to Wing W-4.
+
   Graphics: 4 different types, selectable through DIP switches.
 
   1) Regular Fruits.
-  2) Numbers.
-  3) Custom Set 1
-  4) Custom Set 2
+  2) Numbers.     (Custom Option 1 in W-4 HW) 
+  3) Custom Set 1 (Custom Option 2 in W-4 HW)
+  4) Custom Set 2 (Custom Option 3 in W-4 HW)
 
   Titles / GFX upgrades:
 
@@ -14072,19 +14086,22 @@ ROM_END
   graphics sets in their respective order...
 
   -------------------------------------------------------------------
-  
+
   Tech Notes:
 
-  PCB has some hacks...
+  W-4 PCB type has some hacks...
 
   1) PPI 8255 pin 10 (PC7) is wired to pin 22 (PB4)...
-     Maybe the boot protection?
 
   2) Pin 39 from solder side (speaker GND) and pin 04 from components side (PPI 8255 pin 11, PC6)
      are wired with a DS2401 (sillicon serial number) device, to pins 1 & 2 (GND & DATA).
+	 
+	 DS2401 has 64bits of internal data: 8 bits for family type + 48 bits for serial + 8 bits for CRC.
+
+	 Maxim/Dallas 1-Wire devices use what is called Dow CRC to check that the data bytes were received correctly.
+     This returns an 8-bit CRC value as the last byte and uses a polynomial of X^8 + X^5 + X^4 + X^0.
 
   3) Z80 /INT line (pin 16) is out of socket and wired to a 74161.
-
 
 */
 
@@ -14096,14 +14113,15 @@ ROM_END
   1) Red, White & Blue 7's
   2) Hollywood Nights.
 
-  Issues: At boot, writes "E6" on screen (5th row, 7th column).
-          Looks like an error code.
+  To boot the first time, press the BET 1 button (key M), and then BOOKS/STATS/SETUP (Key 0) twice.
+  For further boots, just press BET 1 button. (the real hardware boots straight due to electronic
+  serial number protection)
 
-  To boot the first time, press the BET button, and then STATS/SETUP twice.
-  For further boots, just press BET button. (the real hardware boots straight)
+  To enter the Bookkeeping/Setup mode, press BOOKS/STATS/SETUP (key 0). Use RESET key (key R) to
+  navigate between pages. Press BOOKS/STATS/SETUP (key 0) to exit the Bookkeeping mode.
 
 */
-ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights.
+ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights. Serial 7D063B800000.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "main.14b",  0x0000, 0x8000, CRC(5756e927) SHA1(5448e1ca4ae060b086145eee10b8dc6eb05acc56) )
 
@@ -14130,6 +14148,10 @@ ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights.
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+
+	ROM_REGION(0x8, "serial_id", 0)     /* Electronic Serial DS2401 */
+	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, BAD_DUMP CRC(747b40b1) SHA1(3336d8de5333057beb5f55873b9410cc7bf73fbb) ) // Hand built... Last byte is CRC-8. Need to be checked.
+
 ROM_END
 
 
@@ -14149,7 +14171,7 @@ DRIVER_INIT_MEMBER(goldstar_state,goldstar)
 	}
 }
 
-// this block swapping is the same for chry10, chrygld and cb3
+//  this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
 void cb3_state::do_blockswaps(UINT8* ROM)
 {

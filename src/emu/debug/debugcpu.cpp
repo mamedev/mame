@@ -1470,66 +1470,66 @@ static void expression_write_memory_region(running_machine &machine, const char 
 
 static expression_error::error_code expression_validate(void *param, const char *name, expression_space space)
 {
-	running_machine &machine = *(running_machine *)param;
+	running_machine &machine = *reinterpret_cast<running_machine *>(param);
 	device_t *device = nullptr;
 
 	switch (space)
 	{
-		case EXPSPACE_PROGRAM_LOGICAL:
-		case EXPSPACE_DATA_LOGICAL:
-		case EXPSPACE_IO_LOGICAL:
-		case EXPSPACE_SPACE3_LOGICAL:
-			if (name != nullptr)
-			{
-				device = expression_get_device(machine, name);
-				if (device == nullptr)
-					return expression_error::INVALID_MEMORY_NAME;
-			}
-			if (device == nullptr)
-				device = debug_cpu_get_visible_cpu(machine);
-			if (!device->memory().has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)))
-				return expression_error::NO_SUCH_MEMORY_SPACE;
-			break;
-
-		case EXPSPACE_PROGRAM_PHYSICAL:
-		case EXPSPACE_DATA_PHYSICAL:
-		case EXPSPACE_IO_PHYSICAL:
-		case EXPSPACE_SPACE3_PHYSICAL:
-			if (name != nullptr)
-			{
-				device = expression_get_device(machine, name);
-				if (device == nullptr)
-					return expression_error::INVALID_MEMORY_NAME;
-			}
-			if (device == nullptr)
-				device = debug_cpu_get_visible_cpu(machine);
-			if (!device->memory().has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)))
-				return expression_error::NO_SUCH_MEMORY_SPACE;
-			break;
-
-		case EXPSPACE_OPCODE:
-		case EXPSPACE_RAMWRITE:
-			if (name != nullptr)
-			{
-				device = expression_get_device(machine, name);
-				if (device == nullptr)
-					return expression_error::INVALID_MEMORY_NAME;
-			}
-			if (device == nullptr)
-				device = debug_cpu_get_visible_cpu(machine);
-			if (!device->memory().has_space(AS_PROGRAM))
-				return expression_error::NO_SUCH_MEMORY_SPACE;
-			break;
-
-		case EXPSPACE_REGION:
-			if (name == nullptr)
-				return expression_error::MISSING_MEMORY_NAME;
-			if (machine.root_device().memregion(name)->base() == nullptr)
+	case EXPSPACE_PROGRAM_LOGICAL:
+	case EXPSPACE_DATA_LOGICAL:
+	case EXPSPACE_IO_LOGICAL:
+	case EXPSPACE_SPACE3_LOGICAL:
+		if (name)
+		{
+			device = expression_get_device(machine, name);
+			if (!device)
 				return expression_error::INVALID_MEMORY_NAME;
-			break;
-
-		default:
+		}
+		if (!device)
+			device = debug_cpu_get_visible_cpu(machine);
+		if (!device->memory().has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)))
 			return expression_error::NO_SUCH_MEMORY_SPACE;
+		break;
+
+	case EXPSPACE_PROGRAM_PHYSICAL:
+	case EXPSPACE_DATA_PHYSICAL:
+	case EXPSPACE_IO_PHYSICAL:
+	case EXPSPACE_SPACE3_PHYSICAL:
+		if (name)
+		{
+			device = expression_get_device(machine, name);
+			if (!device)
+				return expression_error::INVALID_MEMORY_NAME;
+		}
+		if (!device)
+			device = debug_cpu_get_visible_cpu(machine);
+		if (!device->memory().has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)))
+			return expression_error::NO_SUCH_MEMORY_SPACE;
+		break;
+
+	case EXPSPACE_OPCODE:
+	case EXPSPACE_RAMWRITE:
+		if (name)
+		{
+			device = expression_get_device(machine, name);
+			if (!device)
+				return expression_error::INVALID_MEMORY_NAME;
+		}
+		if (!device)
+			device = debug_cpu_get_visible_cpu(machine);
+		if (!device->memory().has_space(AS_PROGRAM))
+			return expression_error::NO_SUCH_MEMORY_SPACE;
+		break;
+
+	case EXPSPACE_REGION:
+		if (!name)
+			return expression_error::MISSING_MEMORY_NAME;
+		if (!machine.root_device().memregion(name) || !machine.root_device().memregion(name)->base())
+			return expression_error::INVALID_MEMORY_NAME;
+		break;
+
+	default:
+		return expression_error::NO_SUCH_MEMORY_SPACE;
 	}
 	return expression_error::NONE;
 }

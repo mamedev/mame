@@ -2,6 +2,7 @@
 // copyright-holders:Couriersud
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "machine/gen_latch.h"
 #include "machine/netlist.h"
 #include "audio/nl_kidniki.h"
 
@@ -36,6 +37,7 @@ private:
 	UINT8           m_port1;
 	UINT8           m_port2;
 
+	required_device<generic_latch_8_device> m_soundlatch;
 	/* FIXME: using required / optional device would be better */
 	// required_device<ay8910_device> m_ay_45L;
 	// required_device<ay8910_device> m_ay_45M;

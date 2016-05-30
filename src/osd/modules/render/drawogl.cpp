@@ -1239,7 +1239,7 @@ int renderer_ogl::draw(const int update)
 						effwidth = 0.5f;
 
 					// determine the bounds of a quad to draw this line
-					render_line_to_quad(&prim.bounds, effwidth, &b0, &b1);
+					render_line_to_quad(&prim.bounds, effwidth, 0.0f, &b0, &b1);
 
 					// fix window position
 					b0.x0 += hofs;

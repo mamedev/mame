@@ -44,15 +44,6 @@ private:
 // nld_Q
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(Q)
-{
-	register_param("MODEL", m_model, "");
-}
-
-NETLIB_RESET(Q)
-{
-}
-
 NETLIB_UPDATE(Q)
 {
 //    netlist().solver()->schedule1();
@@ -62,26 +53,6 @@ NETLIB_UPDATE(Q)
 // nld_QBJT_switch
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(QBJT_switch)
-{
-	NETLIB_NAME(Q)::start();
-
-	enregister("B", m_RB.m_P);
-	enregister("E", m_RB.m_N);
-	enregister("C", m_RC.m_P);
-	enregister("_E1", m_RC.m_N);
-
-	enregister("_B1", m_BC_dummy.m_P);
-	enregister("_C1", m_BC_dummy.m_N);
-
-	connect_late(m_RB.m_N, m_RC.m_N);
-
-	connect_late(m_RB.m_P, m_BC_dummy.m_P);
-	connect_late(m_RC.m_P, m_BC_dummy.m_N);
-
-	save(NLNAME(m_state_on));
-
-}
 
 NETLIB_RESET(QBJT_switch)
 {
@@ -160,27 +131,6 @@ NETLIB_UPDATE_TERMINALS(QBJT_switch)
 // nld_Q - Ebers Moll
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(QBJT_EB)
-{
-	NETLIB_NAME(Q)::start();
-
-	enregister("E", m_D_EB.m_P);   // Cathode
-	enregister("B", m_D_EB.m_N);   // Anode
-
-	enregister("C", m_D_CB.m_P);   // Cathode
-	enregister("_B1", m_D_CB.m_N); // Anode
-
-	enregister("_E1", m_D_EC.m_P);
-	enregister("_C1", m_D_EC.m_N);
-
-	connect_late(m_D_EB.m_P, m_D_EC.m_P);
-	connect_late(m_D_EB.m_N, m_D_CB.m_N);
-	connect_late(m_D_CB.m_P, m_D_EC.m_N);
-
-	m_gD_BE.save("m_D_BE", *this);
-	m_gD_BC.save("m_D_BC", *this);
-
-}
 
 NETLIB_UPDATE(QBJT_EB)
 {

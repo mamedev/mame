@@ -726,13 +726,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( iowapp )
 	PORT_INCLUDE( meritpoker )
-	
+
 	PORT_MODIFY("IN0") /* Pins #65 through #58 of J3 in decending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 
-//	PORT_MODIFY("IN1") /* Pins #57 through #51 of J3 in decending order */
-//	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* If HIGH triggers a "TOKEN LOW" error - Hopper releated */
+//  PORT_MODIFY("IN1") /* Pins #57 through #51 of J3 in decending order */
+//  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* If HIGH triggers a "TOKEN LOW" error - Hopper releated */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "Auto Hold" )     PORT_DIPLOCATION("SW1:1")

@@ -29,7 +29,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sraider_misc_w);
 	DECLARE_WRITE8_MEMBER(sraider_io_w);
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);	
+	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 	DECLARE_DRIVER_INIT(redclash);
 	DECLARE_MACHINE_START(sraider);
 	DECLARE_MACHINE_RESET(sraider);

@@ -41,10 +41,12 @@ function hiscore.startplugin()
 		cputag, space, offs, len, chk_st, chk_ed = string.match(line, '^@([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)');
 		cpu = manager:machine().devices[cputag];
 		if not cpu then
-		  return nil;
+		  emu.print_verbose("hiscore: " .. cputag .. " device not found")
+		  return nil
 		end
 		mem = cpu.spaces[space];
 		if not mem then
+		  emu.print_verbose("hiscore: " .. space .. " space not found")
 		  return nil;
 		end
 		_table[ #_table + 1 ] = {
@@ -129,14 +131,14 @@ function hiscore.startplugin()
 
 
 	local function write_scores ( posdata )
-	  emu.print_verbose("write_scores")
+	  emu.print_verbose("hiscore: write_scores")
 	  local output = io.open(get_file_name(), "wb");
 	  if not output then
 		-- attempt to create the directory, and try again
 		lfs.mkdir( hiscore_path );
 		output = io.open(get_file_name(), "wb");
 	  end
-	  emu.print_verbose("write_scores output")
+	  emu.print_verbose("hiscore: write_scores output")
 	  if output then
 		for ri,row in ipairs(posdata) do
 		  t = {};
@@ -147,7 +149,7 @@ function hiscore.startplugin()
 		end
 		output:close();
 	  end
-	  emu.print_verbose("write_scores end")
+	  emu.print_verbose("hiscore: write_scores end")
 	end
 
 
@@ -184,10 +186,10 @@ function hiscore.startplugin()
 		if check_mem( positions ) then
 		  default_checksum = check_scores( positions );
 		  if read_scores( positions ) then
-			emu.print_verbose( "scores read", "OK" );
+			emu.print_verbose( "hiscore: scores read", "OK" );
 		  else
 			-- likely there simply isn't a .hi file around yet
-			emu.print_verbose( "scores read", "FAIL" );
+			emu.print_verbose( "hiscore: scores read", "FAIL" );
 		  end
 		  scores_have_been_read = true;
 		  current_checksum = check_scores( positions );
@@ -246,10 +248,10 @@ function hiscore.startplugin()
 	  	emu.print_verbose("Starting " .. emu.gamename())
 		local dat = read_hiscore_dat()
 		if dat and dat ~= "" then
-			emu.print_verbose( "found hiscore.dat entry for " .. emu.romname() );
+			emu.print_verbose( "hiscore: found hiscore.dat entry for " .. emu.romname() );
 			positions = parse_table( dat );
 			if not positions then
-				emu.print_error("hiscore.dat parse error");
+				emu.print_error("hiscore: hiscore.dat parse error");
 				return;
 			end
 			found_hiscore_entry = true

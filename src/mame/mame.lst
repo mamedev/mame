@@ -1638,7 +1638,6 @@ foxred
 frogwld
 gwnn
 gldgong
-gldgong2
 gldincas
 hlntry
 hlsunmon
@@ -1657,7 +1656,6 @@ mysteyec
 opsesam
 parilius
 pelpetus
-pelpetu2
 pennyar
 penpayus
 pompus2
@@ -1666,7 +1664,6 @@ sealdeal
 shorthng
 silkrdus
 stardrfu
-stardrf2
 statsymb
 sunmon2
 sunqndol
@@ -2310,16 +2307,6 @@ steeplec                        // (c) 1975 Atari
 stuntcyc                        // (c) 1976 Atari
 tank                            // (c) 1974 Atari / Kee
 tankii                          // (c) 1975 Atari / Kee
-
-@source:ataxx.cpp
-asylum                          // (c) 1991 Leland
-ataxx                           // (c) 1990 Leland
-ataxxa                          // (c) 1990 Leland
-ataxxe                          // (c) 1990 Leland
-ataxxj                          // (c) 1990 Leland
-brutforc                        // (c) 1991 Leland
-indyheat                        // (c) 1991 Leland
-wsf                             // (c) 1990 Leland
 
 @source:atetris.cpp
 atetris                         // 136066           (c) 1988
@@ -9595,7 +9582,7 @@ commandou                       // 5/1985 (c) 1985 + Data East license (US)
 commandou2                      // 5/1985 (c) 1985 + Data East license (US)
 sinvasn                         // Europe original?
 sinvasnb                        // bootleg
-mercenario			// bootleg
+mercenario          // bootleg
 
 @source:compgolf.cpp
 compgolf                        // (c) 1985 Data East Corporation (Japan)
@@ -10127,7 +10114,8 @@ ssf2tad                         //
 ssf2tb                          // 19/11/1993 (c) 1993 (World)
 ssf2tbd                         //
 ssf2tbh                         // 05/10/1993 (c) 1993 (Hispanic)
-ssf2tbj                         // 11/09/1993 (c) 1993 (Japan)
+ssf2tbj                         // 05/10/1993 (c) 1993 (Japan)
+ssf2tbj1                        // 11/09/1993 (c) 1993 (Japan)
 ssf2tbr1                        // 11/09/1993 (c) 1993 (World)
 ssf2th                          // 23/02/1994 (c) 1994 (Hispanic)
 ssf2tu                          // 23/03/1994 (c) 1994 (USA)
@@ -10649,6 +10637,7 @@ lah_l108                        //
 lw3_200                         //
 lw3_205                         //
 lw3_207                         //
+lw3_207c                        //
 lw3_208                         //
 rab_103                         //
 rab_130                         //
@@ -12693,7 +12682,7 @@ tazmania                        // (c) 1982 Stern
 tdpgal                          // 1983 Design Labs / Thomas Automatics
 tenspot                         // (c) 1982 Thomas Automatics
 theend                          // (c) 1980 Konami
-theendb                         // (c) 1980 Bootleg
+takeoff                         // (c) 1980 Sidam (bootleg)
 theends                         // (c) 1980 Stern
 thepitm                         // bootleg
 timefgtr                        // (c) Taito (Brazil) - rewrite of Time Pilot
@@ -13959,6 +13948,7 @@ hexion                          // GX122 (c) 1992
 hexionb                         // bootleg
 
 @source:hh_cop400.cpp
+bship82                         // Milton Bradley
 ctstein                         // Castle Toy
 einvaderc                       // Entex
 funjacks                        // Mattel
@@ -14156,6 +14146,7 @@ crzrally                        // (c) 1985
 crzrallya                       // (c) 1985
 crzrallyg                       // (c) 1985
 holeland                        // (c) 1984
+holeland2                       // (c) 1984
 
 @source:homedata.cpp
 battlcry                        // (c) 1991 Home Data
@@ -16343,6 +16334,7 @@ mgcrystlo                       // (c) 1991 Kaneko (World)
 oedfight                        // (c) 1994 Kaneko
 packbang                        // (c) 1994 Kaneko (prototype)
 shogwarr                        // (c) 1992 Kaneko
+shogwarrk                       // (c) 1992 Kaneko
 shogwarru                       // (c) 1992 Kaneko
 wingforc                        // (c) 1993 Atlus (Japan, prototype)
 
@@ -16847,6 +16839,14 @@ teamqb2                         // (c) 1988 Leland
 upyoural                        // (c) 1987 Cinematronics
 viper                           // (c) 1988 Leland
 wseries                         // (c) 1985 Cinematronics
+asylum                          // (c) 1991 Leland
+ataxx                           // (c) 1990 Leland
+ataxxa                          // (c) 1990 Leland
+ataxxe                          // (c) 1990 Leland
+ataxxj                          // (c) 1990 Leland
+brutforc                        // (c) 1991 Leland
+indyheat                        // (c) 1991 Leland
+wsf                             // (c) 1990 Leland
 
 @source:lemmings.cpp
 lemmings                        // prototype (c) 1991 Data East USA (US)
@@ -28369,7 +28369,7 @@ fbfrenzy                        // 0034 (c) 1992 SNK
 fightfev                        // 0060 (c) 1994 Viccom
 fightfeva                       // 0060 (c) 1994 Viccom
 flipshot                        // 0247 (c) 1998 Visco
-fr2
+froman2b                        // 098 hack - this is not a genuine MVS cart, its a bootleg made from the CD version
 fswords                         // 0187 Korean hack of samsho3
 galaxyfg                        // 0078 (c) 1995 Sunsoft
 ganryu                          // 0252 (c) 1999 Visco
@@ -28515,6 +28515,7 @@ ridhero                         // 0006 (c) 1990 SNK
 ridheroh                        // 0006 (c) 1990 SNK
 roboarmy                        // 0032 (c) 1991 SNK
 rotd                            // 0264 (c) 2002 Evoga
+rotdh                           // 0264 (c) 2002 Evoga
 s1945p                          // 0254 (c) 1999 Psikyo
 samsh5sp                        // 0272 (c) 2004 Playmore
 samsh5sph                       // 0272 (c) 2004 Playmore
@@ -34857,6 +34858,9 @@ tek4052a                        //
 tek4107a                        //
 tek4109a                        //
 
+@source:tek440x.cpp
+tek4404                         // (c) 1984 Tektronix
+
 @source:tekxp33x.cpp
 tekxp330                        //
 
@@ -36033,6 +36037,9 @@ vii                             // Chintendo / KenSingTon / Jungle Soft / Siatro
 vsmile                          //
 vsmilef                         //
 walle                           //
+
+@source:vsmilepro.cpp
+vsmilpro
 
 @source:vindictr.cpp
 vindictr                        // 136059           (c) 1988

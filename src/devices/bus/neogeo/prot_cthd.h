@@ -32,7 +32,7 @@ public:
 
 	void patch_ct2k3sa(UINT8* cpurom, UINT32 cpurom_size);
 	void decrypt_ct2k3sa(UINT8* sprrom, UINT32 sprrom_size, UINT8* audiorom, UINT32 audiorom_size);
-	
+
 	void matrimbl_decrypt(UINT8* sprrom, UINT32 sprrom_size, UINT8* audiorom, UINT32 audiorom_size);
 
 protected:
