@@ -340,7 +340,7 @@
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="8515">
-				<rom name="adventure-Micro Power_e.uef" size="8515" crc="8eabc302" sha1="3073bb57401655b711c679f93ab10fcac037f3f4" offset="0"/>
+				<rom name="adventure-micropower_e.uef" size="8515" crc="8eabc302" sha1="3073bb57401655b711c679f93ab10fcac037f3f4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1302,7 +1302,7 @@
 
 	<software name="cascad50">
 		<description>Cascade 50</description>
-		<year>1984</year>
+		<year>1983</year>
 		<publisher>Cascade</publisher>
 		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -1462,11 +1462,11 @@
 
 	<software name="chessmp">
 		<description>Chess (Micro Power)</description>
-		<year>1984</year>
+		<year>1983</year>
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="5959">
-				<rom name="chess-Micro Power_e.uef" size="5959" crc="fa4b456e" sha1="34f86f5d22888c38e2d3bacba9b5845b89a31529" offset="0"/>
+				<rom name="chess-micropower_e.uef" size="5959" crc="fa4b456e" sha1="34f86f5d22888c38e2d3bacba9b5845b89a31529" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1484,7 +1484,7 @@
 
 	<software name="chipbust">
 		<description>Chip Buster</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Software Invasion</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="12848">
@@ -1628,7 +1628,7 @@
 
 	<software name="colos4ch">
 		<description>Colossus Chess 4</description>
-		<year>1988</year>
+		<year>1986</year>
 		<publisher>CDS</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="15702">
@@ -1689,7 +1689,7 @@
 	</software>
 
 	<software name="commandopias" cloneof="commando">
-		<description>Commando (Play It Again Sam-3)</description>
+		<description>Commando (Play It Again Sam 3)</description>
 		<year>1989</year>
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="electron_cass">
@@ -2029,7 +2029,7 @@
 
 	<software name="dddenis">
 		<description>Dare Devil Dennis</description>
-		<year>1984</year>
+		<year>1983</year>
 		<publisher>Visions</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="7441">
@@ -3348,7 +3348,7 @@
 
 	<software name="elites" cloneof="elite">
 		<description>Elite (Superior Software)</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="24515">
@@ -3636,8 +3636,8 @@
 	</software>
 
 	<software name="firetrak">
-		<description>Fire Track</description>
-		<year>198?</year>
+		<description>FireTrack</description>
+		<year>1989</year>
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="19805">
@@ -5680,16 +5680,16 @@
 		<description>Mexico 86</description>
 		<year>1986</year>
 		<publisher>Qualsoft</publisher>
-		<part name="cass" interface="electron_cass">
-			<feature name="part_id" value="Finals"/>
-			<dataarea name="cass" size="8478">
-				<rom name="mexico86finals_e.uef" size="8478" crc="a70af89d" sha1="3ba32b540cd0c422406ed49e6054bea9cc9000ec" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="cass" interface="electron_cass">
+		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Qualifiers"/>
 			<dataarea name="cass" size="8557">
 				<rom name="mexico86qualifiers_e.uef" size="8557" crc="2398c3a2" sha1="9610c80168d7ac65a56531ab940aecc58d013d0e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="electron_cass">
+			<feature name="part_id" value="Finals"/>
+			<dataarea name="cass" size="8478">
+				<rom name="mexico86finals_e.uef" size="8478" crc="a70af89d" sha1="3ba32b540cd0c422406ed49e6054bea9cc9000ec" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6101,7 +6101,7 @@
 
 	<software name="omegaorb">
 		<description>Omega Orb</description>
-		<year>1986</year>
+		<year>1987</year>
 		<publisher>Audiogenic</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="22736">
@@ -6302,7 +6302,7 @@
 
 	<software name="pengwyn">
 		<description>Pengwyn</description>
-		<year>1984</year>
+		<year>1983</year>
 		<publisher>Postern</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="6915">
@@ -6818,7 +6818,7 @@
 
 	<software name="ravskull">
 		<description>Ravenskull</description>
-		<year>1987</year>
+		<year>1986</year>
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="24836">
@@ -6878,7 +6878,7 @@
 
 	<software name="redcoats">
 		<description>Red Coats</description>
-		<year>1985</year>
+		<year>1984</year>
 		<publisher>Lothlorien</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="10181">
@@ -7524,7 +7524,7 @@
 	</software>
 
 	<software name="skirmishpias" cloneof="skirmish">
-		<description>Skirmish (Play It Again Sam-12)</description>
+		<description>Skirmish (Play It Again Sam 12)</description>
 		<year>1990</year>
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="electron_cass">
@@ -7847,7 +7847,7 @@
 
 	<software name="sphdest">
 		<description>Sphere of Destiny</description>
-		<year>1986</year>
+		<year>1987</year>
 		<publisher>Audiogenic</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="21816">
@@ -9155,7 +9155,7 @@
 
 	<software name="themine">
 		<description>The Mine</description>
-		<year>1984</year>
+		<year>1983</year>
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="10185">
@@ -10295,8 +10295,8 @@
 	</software>
 
 	<software name="yiear">
-		<description>Yie Ar Kung Fu</description>
-		<year>1984</year>
+		<description>Yie Ar Kung-Fu</description>
+		<year>1985</year>
 		<publisher>Imagine</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="19064">
@@ -10306,7 +10306,7 @@
 	</software>
 
 	<software name="yiear2">
-		<description>Yie Ar Kung Fu 2</description>
+		<description>Yie Ar Kung-Fu 2</description>
 		<year>198?</year>
 		<publisher>Imagine</publisher>
 		<part name="cass" interface="electron_cass">
