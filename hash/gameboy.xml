@@ -4398,9 +4398,11 @@
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-YD-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dennis the menace (usa).bin" size="131072" crc="7eb0cd32" sha1="4695b50738add92926dc5d4b48568b037df7cdb9" offset="0" />
+				<rom name="dmg-yde-0.u1" size="131072" crc="7eb0cd32" sha1="4695b50738add92926dc5d4b48568b037df7cdb9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15304,9 +15306,12 @@
 		<publisher>Namco</publisher>
 		<info name="serial" value="DMG-APTE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="pac-in-time (europe).bin" size="262144" crc="50a15dc8" sha1="282f9bbabd5a57d5e7755e5d00f4d65094f816d5" offset="0" />
+				<rom name="dmg-apte-0.u1" size="262144" crc="50a15dc8" sha1="282f9bbabd5a57d5e7755e5d00f4d65094f816d5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
