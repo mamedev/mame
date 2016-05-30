@@ -4372,8 +4372,6 @@ pbaction5:
 @:maincpu,program,c093,51,07,00
 @:maincpu,program,c12f,27,48,4b
 
-rainbow:
-rainbowo:  ;******rainbow islands (old version)
 rbisland:
 @:maincpu,program,10d0cc,32,00,32 
 @:maincpu,program,10e1f2,04,00,00 
@@ -4383,7 +4381,6 @@ jumpinga:
 @:maincpu,program,10d0cc,32,00,41 
 @:maincpu,program,10e1f2,04,00,00 
 
-rainbowe:
 rbislande:
 @:maincpu,program,10d0d2,32,00,33 
 @:maincpu,program,10e1b6,04,00,00
