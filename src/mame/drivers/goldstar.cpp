@@ -225,6 +225,7 @@
 #include "sound/sn76496.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/ds2401.h"
 #include "video/ramdac.h"
 #include "includes/goldstar.h"
 
@@ -8180,6 +8181,8 @@ static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
 //  MCFG_CPU_IO_MAP(flaming7_readport)
+
+	MCFG_DS2401_ADD("fl7w4_serial_id")
 MACHINE_CONFIG_END
 
 
