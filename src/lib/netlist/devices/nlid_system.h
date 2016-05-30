@@ -197,9 +197,9 @@ namespace netlist
 	NETLIB_OBJECT(analog_input)
 	{
 		NETLIB_CONSTRUCTOR(analog_input)
+		, m_Q(*this, "Q")
 		, m_IN(*this, "IN", 0.0)
 		{
-			enregister("Q", m_Q);
 		}
 		NETLIB_UPDATE_AFTER_PARAM_CHANGE()
 
@@ -218,8 +218,8 @@ namespace netlist
 	NETLIB_OBJECT(gnd)
 	{
 		NETLIB_CONSTRUCTOR(gnd)
+		, m_Q(*this, "Q")
 		{
-			enregister("Q", m_Q);
 		}
 		NETLIB_UPDATEI()
 		{
@@ -262,6 +262,7 @@ namespace netlist
 		NETLIB_CONSTRUCTOR_DERIVED(frontier, base_dummy)
 		, m_RIN(*this, "m_RIN")
 		, m_ROUT(*this, "m_ROUT", true)
+		, m_Q(*this, "_Q")
 		, m_p_RIN(*this, "RIN", 1.0e6)
 		, m_p_ROUT(*this, "ROUT", 50.0)
 
@@ -271,7 +272,6 @@ namespace netlist
 			register_subalias("G", m_RIN.m_N);
 			connect_late(m_I, m_RIN.m_P);
 
-			enregister("_Q", m_Q);
 			register_subalias("_OP", m_ROUT.m_P);
 			register_subalias("Q", m_ROUT.m_N);
 			connect_late(m_Q, m_ROUT.m_P);
@@ -310,8 +310,8 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(function)
 		, m_N(*this, "N", 2)
 		, m_func(*this, "FUNC", "")
+		, m_Q(*this, "Q")
 		{
-			enregister("Q", m_Q);
 
 			for (int i=0; i < m_N; i++)
 				enregister(plib::pfmt("A{1}")(i), m_I[i]);
@@ -519,6 +519,7 @@ namespace netlist
 	public:
 		nld_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied)
 		: nld_base_d_to_a_proxy(anetlist, name, out_proxied, m_RV.m_P)
+		, m_GNDHack(*this, "_Q")
 		, m_RV(*this, "RV")
 		, m_last_state(-1)
 		, m_is_timestep(false)
@@ -527,7 +528,6 @@ namespace netlist
 			//register_term("1", m_RV.m_P);
 			//register_term("2", m_RV.m_N);
 
-			enregister("_Q", m_GNDHack);
 			register_subalias("Q", m_RV.m_P);
 
 			connect_late(m_RV.m_N, m_GNDHack);

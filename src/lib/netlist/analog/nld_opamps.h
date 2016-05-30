@@ -43,16 +43,15 @@ NETLIB_OBJECT(OPAMP)
 	, m_RP(*this, "RP1")
 	, m_G1(*this, "G1")
 	, m_model(*this, "MODEL", "")
+	, m_VH(*this, "VH")
+	, m_VL(*this, "VL")
+	, m_VREF(*this, "VREF")
 	{
 
 		m_type = m_model.model_value("TYPE");
 
 		enregister("VCC", m_VCC);
 		enregister("GND", m_GND);
-
-		enregister("VL", m_VL);
-		enregister("VH", m_VH);
-		enregister("VREF", m_VREF);
 
 		if (m_type == 1)
 		{

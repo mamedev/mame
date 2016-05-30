@@ -886,11 +886,11 @@ namespace netlist
 
 	class analog_output_t : public analog_t
 	{
-		P_PREVENT_COPYING(analog_output_t)
+		//P_PREVENT_COPYING(analog_output_t)
 	public:
 
 		ATTR_COLD analog_output_t(core_device_t &dev, const pstring &aname);
-		ATTR_COLD analog_output_t();
+		//ATTR_COLD analog_output_t();
 
 		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
 		virtual void reset() override
@@ -1127,7 +1127,7 @@ namespace netlist
 		ATTR_COLD void register_subalias(const pstring &name, core_terminal_t &term);
 		ATTR_COLD void register_subalias(const pstring &name, const pstring &aliased);
 		//ATTR_COLD void register_term(const pstring &name, terminal_t &port) { register_p(name, port); }
-		ATTR_COLD void enregister(const pstring &name, analog_output_t &out) { register_p(name, out); };
+		//ATTR_COLD void enregister(const pstring &name, analog_output_t &out) { register_p(name, out); };
 		ATTR_COLD void enregister(const pstring &name, logic_output_t &out) { register_p(name, out); };
 		ATTR_COLD void enregister(const pstring &name, analog_input_t &in) { register_p(name, in); };
 		ATTR_COLD void enregister(const pstring &name, logic_input_t &in) { register_p(name, in); };

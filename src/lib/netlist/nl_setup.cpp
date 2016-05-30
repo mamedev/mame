@@ -263,7 +263,10 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 						dynamic_cast<logic_output_t &>(term).init_object(dev, dev.name() + "." + name);
 					}
 					else if (term.is_analog())
-						dynamic_cast<analog_output_t &>(term).init_object(dev, dev.name() + "." + name);
+					{
+						//log().fatal("Error adding {1} {2} to terminal list, analog output shouldn't get here\n", objtype_as_astr(term), term.name());
+						//dynamic_cast<analog_output_t &>(term).init_object(dev, dev.name() + "." + name);
+					}
 					else
 						log().fatal("Error adding {1} {2} to terminal list, neither LOGIC nor ANALOG\n", objtype_as_astr(term), term.name());
 				}

@@ -24,13 +24,13 @@ namespace netlist
 		, m_R2(*this, "R2")
 		, m_R3(*this, "R3")
 		, m_RDIS(*this, "RDIS")
+		, m_OUT(*this, "OUT")       // Pin 3
 		, m_last_out(false)
 		, m_ff(false)
 		{
 
 			register_subalias("GND",  m_R3.m_N);    // Pin 1
 			enregister("TRIG",    m_TRIG);      // Pin 2
-			enregister("OUT",    m_OUT);       // Pin 3
 			enregister("RESET",   m_RESET);     // Pin 4
 			register_subalias("CONT", m_R1.m_N);    // Pin 5
 			enregister("THRESH",  m_THRES);     // Pin 6

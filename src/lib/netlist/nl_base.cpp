@@ -169,6 +169,7 @@ ATTR_COLD object_t::object_t(netlist_t &nl, const pstring &aname, const type_t a
 , m_objtype(atype)
 , m_netlist(&nl)
 {
+	//printf("reg %s\n", this->name().cstr());
 	save_register();
 }
 
@@ -1029,18 +1030,17 @@ ATTR_COLD void logic_output_t::initial(const netlist_sig_t val)
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
-	: analog_t(OUTPUT), m_proxied_net(nullptr)
+	: analog_t(dev, aname, OUTPUT), m_proxied_net(nullptr)
 {
 	this->set_net(&m_my_net);
 	set_state(STATE_OUT);
 
-	//net().m_cur_Analog = NL_FCONST(0.99);
 	net().m_cur_Analog = NL_FCONST(0.0);
-
-	analog_t::init_object(dev, aname);
-	net().init_object(dev.netlist(), aname + ".net", this);
+	net().init_object(dev.netlist(), name() + ".net", this);
+	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
 }
 
+#if 0
 ATTR_COLD analog_output_t::analog_output_t()
 	: analog_t(OUTPUT), m_proxied_net(nullptr)
 {
@@ -1050,6 +1050,7 @@ ATTR_COLD analog_output_t::analog_output_t()
 	//net().m_cur_Analog = NL_FCONST(0.99);
 	net().m_cur_Analog = NL_FCONST(0.0);
 }
+#endif
 
 ATTR_COLD void analog_output_t::init_object(core_device_t &dev, const pstring &aname)
 {
