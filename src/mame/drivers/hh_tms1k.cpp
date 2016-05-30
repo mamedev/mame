@@ -3629,6 +3629,12 @@ MACHINE_CONFIG_END
 
   This is a 2-player electronic board game. It still needs game pieces like the
   original Battleship board game.
+  
+  It went through 3 hardware revisions:
+  1977: model 4750A or B, see notes above
+  1980: model 4750C: cost-reduced single chip design, lesser quality game board.
+        The chip is assumed to be custom, no MCU: 28-pin DIP, label 4750, SCUS 0462
+  1982: back to MCU, COP420 instead of choosing TI, see hh_cop400.cpp
 
 ***************************************************************************/
 
