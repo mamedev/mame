@@ -206,7 +206,7 @@ raiden2eu:
 
 arescue:
 arescuej:
-@:maincpu,program,20fb00,9f,a0,49
+@:mainpcb:maincpu,program,20fb00,9f,a0,49
 
 fixeightbl:
 fixeight:
@@ -1050,10 +1050,10 @@ karnova:
 @:maincpu,program,063D00,28,00,4A
 
 hvyunit:
-hvyunito:
+hvyunitjo:
 hvyunitu:
 hvyunitj:
-@:maincpu,program,e190,28,00,50
+@:master,program,e190,28,00,50
 
 rumba:  ;****** not working - mame 040u3 debug prob ???
 @:maincpu,program,e18a,3,40,01
@@ -1067,8 +1067,8 @@ rumba:  ;****** not working - mame 040u3 debug prob ???
 
 skykiddx:
 skykiddxo:
-@:maincpu,program,5000,45,00,2f
-@:maincpu,program,5001,1,03,03
+@:cpu1,program,5000,45,00,2f
+@:cpu1,program,5001,1,03,03
 
 bygone:  ;***** GAME NOT 100% working yet !! *****
 @:maincpu,program,e0c0,3c,00,47
@@ -1086,8 +1086,8 @@ berenstn:
 orunners:
 orunnersu:
 orunnersj:
-@:maincpu,program,20e301,3b,53,75
-@:maincpu,program,20e212,1,78,78
+@:mainpcb:maincpu,program,20e301,3b,53,75
+@:mainpcb:maincpu,program,20e212,1,78,78
 
 hotshock:
 hotshockb:
@@ -1188,7 +1188,7 @@ ssf2mdb:
 spidman:
 spidmanu:
 spidmanj:
-@:maincpu,program,208c00,7f,a0,57
+@:mainpcb:maincpu,program,208c00,7f,a0,57
 
 ;** hiscore & top score don`t update until you lose your first life, pretty **
 ;** lame way for doing a hiscore - but who am i to complain!! ;0)            **
@@ -1242,7 +1242,7 @@ galsnewk:
 @:maincpu,program,c825b6,64,30,31
 
 destryer:
-@:maincpu,program,20e5,2,ff,ff
+@:cdp1802,program,20e5,2,ff,ff
 
 blockgal:
 blockgalb:
@@ -1288,8 +1288,8 @@ anteaterg:
 @:maincpu,program,4ef,3c,00,20
 
 altair:
-@:maincpu,program,30e5,2,00,00
-@:maincpu,program,3008,1,58,58
+@:cdp1802,program,30e5,2,00,00
+@:cdp1802,program,3008,1,58,58
 
 sundance: ;[Special thanks to Cananas for creating this entry]
 @:maincpu,program,0151,01,12,12
@@ -1598,13 +1598,13 @@ turbosba:  ;******Turbo Sub (prototype rev. TSC6)
 @:maincpu,program,3c7a,46,00,56
 
 stratvox:
-stratvxb:
+stratvoxb:
 speakres:
 spacecho2:  ;******space echo (set 1)
 spacecho:  ;******space echo (set 2)
 speakresb:
-@:maincpu,program,4001,3,00,00
-@:maincpu,program,4010,3,00,00
+@:cpu1,program,4001,3,00,00
+@:cpu1,program,4010,3,00,00
 
 rtype:
 rtypeu:
@@ -2830,8 +2830,8 @@ dynabomb:  ;******Dynamite Bomber (Korea) (Rev 1.5)
 airbustr:
 airbustrj:  ;******Air Buster: Trouble Specialty Raid Unit (japan)
 airbustrb:  ;******Air Buster: Trouble Specialty Raid Unit (bootleg)
-@:maincpu,program,e160,40,01,01
-@:maincpu,program,e19e,01,4f,4f
+@:master,program,e160,40,01,01
+@:master,program,e19e,01,4f,4f
 
 troangel:
 newtangl:  ;******New Tropical Angel
@@ -3458,7 +3458,7 @@ mgcrystlj:
 
 alien3:
 alien3u:  ;*******alien 3: the gun (us)  
-@:maincpu,program,20f2bc,78,80,00
+@:mainpcb:maincpu,program,20f2bc,78,80,00
 
 shuttlei:  ;******shuttle invader
 @:maincpu,program,4008,3,00,00
@@ -3504,12 +3504,12 @@ madballn:
 
 tp84:
 tp84a:  ;******time pilot '84 (set 2)
-@:maincpu,program,57a0,1e,00,54
-@:maincpu,program,5736,03,00,00
+@:cpu1,program,57a0,1e,00,54
+@:cpu1,program,5736,03,00,00
 
 tp84b:  ;******time pilot '84 (set 3)
-@:maincpu,program,17a0,1e,00,54
-@:maincpu,program,1736,3,00,00
+@:cpu1,program,17a0,1e,00,54
+@:cpu1,program,1736,3,00,00
 
 ;******Multi Champ Deluxe
 mchampdx:
@@ -3519,8 +3519,8 @@ mchampdxa:  ;******Multi Champ Deluxe (ver. 1126, 26/11/1999)
 arabfgt:
 arabfgtj: 
 arabfgtu:  ;******Arabian Fight (us)
-@:maincpu,program,208300,49,53,00
-@:maincpu,program,208345,1,17,17
+@:mainpcb:maincpu,program,208300,49,53,00
+@:mainpcb:maincpu,program,208345,1,17,17
 
 powerbal:  
 powerbals:  ;******power balls (super slam conversion)
@@ -4009,8 +4009,8 @@ tenkomorj:
 ;******slipstream
 slipstrm:
 slipstrmh:
-@:maincpu,program,2095e1,4e3,60,4d
-@:maincpu,program,2037cf,5c,01,4d
+@:mainpcb:maincpu,program,2095e1,4e3,60,4d
+@:mainpcb:maincpu,program,2037cf,5c,01,4d
 
 mechatt:
 mechattu:  ;******Mechanized Attack (US)
@@ -4184,7 +4184,7 @@ rdft2ja:
 
 brival:
 brivalj:  ;*******(burning rival (japan)
-@:maincpu,program,208300,4a,42,04
+@:mainpcb:maincpu,program,208300,4a,42,04
 
 kikcubic:
 kikcubicb:  ;******Kickle Cubele
@@ -4603,9 +4603,9 @@ alphamis:
 ;********sprcros2.c 
 sprcros2:
 sprcros2a:  ;******Super Cross 2 (Japan set 2)
-@:maincpu,program,fa00,78,00,4a
-@:maincpu,program,f012,6,00,00
-@:maincpu,program,f013,1,03,03
+@:master_cpu,program,fa00,78,00,4a
+@:master_cpu,program,f012,6,00,00
+@:master_cpu,program,f013,1,03,03
 
 ;******ufo senshi yohko chan
 ufosensi:
@@ -5484,12 +5484,12 @@ nprinceso:
 
 ;*******Renju Kizoku
 renju:
-@:maincpu,program,f2aa,28,b8,01
-@:maincpu,program,f2ea,2,70,17
+@:maincpu,regs,f2aa,28,b8,01
+@:maincpu,regs,f2ea,2,70,17
 
 ;*******Neratte Chu
 nratechu:
-@:maincpu,program,e568,28,00,08
+@:maincpu,regs,e568,28,00,08
 
 ;*******pirate treasure
 piratetr:
@@ -6165,7 +6165,7 @@ cairblad:
 scross:
 scrossu:
 scrossa:
-@:maincpu,program,701fb0,3f,53,03
+@:mainpcb:maincpu,program,701fb0,3f,53,03
 
 ;*******r2d tank
 r2dtank:
@@ -6587,8 +6587,8 @@ olibochu:
 
 ;*******(birdie king 2)(By Firebrand)
 bking2:
-@:maincpu,program,8166,9,0,0
-@:maincpu,program,8187,1,0,0
+@:main_cpu,program,8166,9,0,0
+@:main_cpu,program,8187,1,0,0
 
 ;*******(world rally 2: twin racing)(By Firebrand)
 wrally2:
@@ -6714,7 +6714,7 @@ dassault:
 ; - Only works if you delete the nvram after you turn off the game. Making 
 ;the nvram read-only will not work.
 mayhem:
-@:maincpu,program,e081,ba,10,45
+@:master,program,e081,ba,10,45
 
 ;*******super triv II(By Firebrand)
 ; - Only saves "Experts Only" scores, can save other slots but the games are 
@@ -6821,7 +6821,7 @@ birdtry:
 f1en:
 f1enu:
 f1enj:
-@:maincpu,program,20f20e,38,42,02
+@:mainpcb:maincpu,program,20f20e,38,42,02
 
 ;mars matrix (usa/japan)(by tamphax)
 mmatrix:
@@ -7458,7 +7458,7 @@ spyu:
 
 ;(scud hammer) (by GeoMan)
 scudhamm:
-@:maincpu,program,fd1ea,3c,00,01
+@:cpu1,program,fd1ea,3c,00,01
 
 ;(super cup finals (world)) and clones (by GeoMan)
 scfinals:
@@ -8750,7 +8750,7 @@ endurobl:
 
 ;********cicsheat.c (big run (11th rallye version))
 bigrun:
-@:maincpu,program,f61da,2bc,50,05
+@:cpu1,program,f61da,2bc,50,05
 
 ;(crude buster (world fx version)) and clones (by GeoMan)
 cbuster:
@@ -8931,7 +8931,7 @@ cameltrya:
 
 ;Wonder Momo (by GeoMan)
 wndrmomo:
-@:maincpu,program,4e00,45,0,2f
+@:cpu1,program,4e00,45,0,2f
 
 ;Youjyudn (Japan) (by GeoMan)
 youjyudn:
@@ -8960,14 +8960,11 @@ mainevto:
 markham:
 @:maincpu,program,c0c4,3c,2a,00
 
+route16:
 route16b:
 route16a:
 routex:
-@:maincpu,program,4032,9,0,0
-
-;********route16.c
-route16:
-@:maincpu,program,4032,9,00,00
+@:cpu1,program,4032,9,0,0
 
 ;Moguchan (by GeoMan)
 moguchan:
@@ -9079,8 +9076,8 @@ regulusu:
 ;********leland.c (cerberus)
 ;** only seems to save top score **
 cerberus:
-@:maincpu,program,e83b,ba,27,00
-@:maincpu,program,e004,1,1b,1b
+@:master,program,e83b,ba,27,00
+@:master,program,e004,1,1b,1b
 
 ;********galaxian.c (omega)
 omega:
@@ -9913,8 +9910,8 @@ tunhuntc:
 
 ;*******mhavoc.c (major havoc (rev 3))
 mhavoc:
-@:maincpu,program,184,46,0b,00
-@:maincpu,program,95,1,02,02
+@:alpha,program,184,46,0b,00
+@:alpha,program,95,1,02,02
 
 ;*******segac2.c (zunzunkyou no yabou (japan))
 zunkyou:
@@ -9953,7 +9950,7 @@ moegonta:
 exzisus:
 exzisusa:
 exzisust:
-@:maincpu,program,f840,3c,00,4f
+@:cpua,program,f840,3c,00,4f
 ;0,c9c6,1,20,20
 ;0,c9ca,1,20,20
 ;0,c9ce,1,05,05
@@ -11201,12 +11198,12 @@ smash:
 
 ;********cischeat.c (cisco heat)
 cischeat:
-@:maincpu,program,f0c00,24f,00,00
-@:maincpu,program,f0e42,1,49,49
-@:maincpu,program,f0b00,28,00,00
+@:cpu1,program,f0c00,24f,00,00
+@:cpu1,program,f0e42,1,49,49
+@:cpu1,program,f0b00,28,00,00
 
 f1gpstar:
-@:maincpu,program,f2803,5e3,04,4d
+@:cpu1,program,f2803,5e3,04,4d
 
 ;********citycon.c
 citycon:
@@ -12525,20 +12522,20 @@ rthun2j:
 
 ;********namcos86.c
 hopmappy:
-@:maincpu,program,4c41,3,00,00
-@:maincpu,program,4ca0,81,00,62
-@:maincpu,program,209e,1,2e,2e
-@:maincpu,program,20a0,1,2e,2e
-@:maincpu,program,20a2,1,08,08
-@:maincpu,program,20a4,1,00,00
-@:maincpu,program,20a6,1,00,00
-@:maincpu,program,20a8,1,00,00
+@:cpu1,program,4c41,3,00,00
+@:cpu1,program,4ca0,81,00,62
+@:cpu1,program,209e,1,2e,2e
+@:cpu1,program,20a0,1,2e,2e
+@:cpu1,program,20a2,1,08,08
+@:cpu1,program,20a4,1,00,00
+@:cpu1,program,20a6,1,00,00
+@:cpu1,program,20a8,1,00,00
 
 rthunder:
 rthunder1:
 rthunder2:
-@:maincpu,program,5400,23,00,12
-@:maincpu,program,5450,3,00,00
+@:cpu1,program,5400,23,00,12
+@:cpu1,program,5450,3,00,00
 
 ;********nemesis.c
 citybomb:
