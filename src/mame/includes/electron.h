@@ -16,6 +16,7 @@
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 
+#include "bus/electron/exp.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 

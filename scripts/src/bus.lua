@@ -576,6 +576,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/electron/exp.h,BUSES["ELECTRON"] = true
+---------------------------------------------------
+
+if (BUSES["ELECTRON"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/electron/exp.cpp",
+		MAME_DIR .. "src/devices/bus/electron/exp.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/ep64/exp.h,BUSES["EP64"] = true
 ---------------------------------------------------
 
