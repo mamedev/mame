@@ -14089,10 +14089,14 @@ ROM_END
   W-4 PCB type has some hacks...
 
   1) PPI 8255 pin 10 (PC7) is wired to pin 22 (PB4)...
-     Maybe the boot protection?
 
   2) Pin 39 from solder side (speaker GND) and pin 04 from components side (PPI 8255 pin 11, PC6)
      are wired with a DS2401 (sillicon serial number) device, to pins 1 & 2 (GND & DATA).
+	 
+	 DS2401 has 64bits of internal data: 8 bits for family type + 48 bits for serial + 8 bits for CRC.
+
+	 Maxim/Dallas 1-Wire devices use what is called Dow CRC to check that the data bytes were received correctly.
+     This returns an 8-bit CRC value as the last byte and uses a polynomial of X^8 + X^5 + X^4 + X^0.
 
   3) Z80 /INT line (pin 16) is out of socket and wired to a 74161.
 
@@ -14114,7 +14118,7 @@ ROM_END
   navigate between pages. Press BOOKS/STATS/SETUP (key 0) to exit the Bookkeeping mode.
 
 */
-ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights.
+ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights. Serial 7D063B800000.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "main.14b",  0x0000, 0x8000, CRC(5756e927) SHA1(5448e1ca4ae060b086145eee10b8dc6eb05acc56) )
 
@@ -14141,6 +14145,10 @@ ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights.
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+
+	ROM_REGION(0x8, "serial_id", 0)     /* Electronic Serial DS2401 */
+	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, BAD_DUMP CRC(747b40b1) SHA1(3336d8de5333057beb5f55873b9410cc7bf73fbb) ) // Hand built... Last byte is CRC-8. Need to be checked.
+
 ROM_END
 
 
