@@ -652,11 +652,14 @@ namespace netlist
 	class analog_input_t : public analog_t
 	{
 	public:
+#if 0
 		ATTR_COLD analog_input_t()
 			: analog_t(INPUT)
 		{
 			set_state(STATE_INP_ACTIVE);
 		}
+#endif
+		ATTR_COLD analog_input_t(core_device_t &dev, const pstring &aname);
 
 		ATTR_HOT  nl_double Q_Analog() const;
 
@@ -1129,7 +1132,7 @@ namespace netlist
 		//ATTR_COLD void register_term(const pstring &name, terminal_t &port) { register_p(name, port); }
 		//ATTR_COLD void enregister(const pstring &name, analog_output_t &out) { register_p(name, out); };
 		ATTR_COLD void enregister(const pstring &name, logic_output_t &out) { register_p(name, out); };
-		ATTR_COLD void enregister(const pstring &name, analog_input_t &in) { register_p(name, in); };
+		//ATTR_COLD void enregister(const pstring &name, analog_input_t &in) { register_p(name, in); };
 		ATTR_COLD void enregister(const pstring &name, logic_input_t &in) { register_p(name, in); };
 
 		ATTR_COLD void connect_late(const pstring &t1, const pstring &t2);

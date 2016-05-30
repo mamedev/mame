@@ -276,8 +276,9 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 					{
 						logic_input_t &port = dynamic_cast<logic_input_t &>(term);
 						port.set_logic_family(dev.logic_family());
+						term.init_object(dev, dev.name() + "." + name);
 					}
-					term.init_object(dev, dev.name() + "." + name);
+					//term.init_object(dev, dev.name() + "." + name);
 					dev.m_terminals.push_back(obj.name());
 				}
 				else

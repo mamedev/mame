@@ -1024,6 +1024,16 @@ ATTR_COLD void logic_output_t::initial(const netlist_sig_t val)
 	net().as_logic().initial(val);
 }
 
+// ----------------------------------------------------------------------------------------
+// analog_input_t
+// ----------------------------------------------------------------------------------------
+
+ATTR_COLD analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname)
+: analog_t(dev, aname, INPUT)
+{
+	set_state(STATE_INP_ACTIVE);
+	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
+}
 
 // ----------------------------------------------------------------------------------------
 // analog_output_t

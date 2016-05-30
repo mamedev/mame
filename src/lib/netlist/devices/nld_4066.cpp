@@ -20,9 +20,9 @@ namespace netlist
 		NETLIB_FAMILY("CD4XXX")
 		, m_supply(*this, "PS")
 		, m_R(*this, "R")
+		, m_control(*this, "CTL")
 		, m_base_r(*this, "BASER", 270.0)
 		{
-			enregister("CTL", m_control);
 		}
 
 		NETLIB_RESETI() { }

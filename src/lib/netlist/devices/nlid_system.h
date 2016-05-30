@@ -238,8 +238,8 @@ namespace netlist
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(dummy_input, base_dummy)
+		, m_I(*this, "I")
 		{
-			enregister("I", m_I);
 		}
 
 	protected:
@@ -262,12 +262,12 @@ namespace netlist
 		NETLIB_CONSTRUCTOR_DERIVED(frontier, base_dummy)
 		, m_RIN(*this, "m_RIN")
 		, m_ROUT(*this, "m_ROUT", true)
+		, m_I(*this, "_I")
 		, m_Q(*this, "_Q")
 		, m_p_RIN(*this, "RIN", 1.0e6)
 		, m_p_ROUT(*this, "ROUT", 50.0)
 
 		{
-			enregister("_I", m_I);
 			register_subalias("I", m_RIN.m_P);
 			register_subalias("G", m_RIN.m_N);
 			connect_late(m_I, m_RIN.m_P);
@@ -314,7 +314,7 @@ namespace netlist
 		{
 
 			for (int i=0; i < m_N; i++)
-				enregister(plib::pfmt("A{1}")(i), m_I[i]);
+				m_I.emplace<analog_input_t>(i, *this, plib::pfmt("A{1}")(i));
 
 			plib::pstring_vector_t cmds(m_func.Value(), " ");
 			m_precompiled.clear();
@@ -377,7 +377,7 @@ namespace netlist
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
-		analog_input_t m_I[10];
+		plib::uninitialised_array_t<analog_input_t, 10> m_I;
 
 		plib::pvector_t<rpn_inst> m_precompiled;
 	};
@@ -463,8 +463,8 @@ namespace netlist
 	public:
 		nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied)
 				: nld_base_proxy(anetlist, name, in_proxied, &m_I)
+		, m_I(*this, "I")
 		{
-			enregister("I", m_I);
 			enregister("Q", m_Q);
 		}
 

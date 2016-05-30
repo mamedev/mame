@@ -21,6 +21,9 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(MM5837_dip)
 		, m_RV(*this, "RV")
+		, m_VDD(*this, "1")
+		, m_VGG(*this, "2")
+		, m_VSS(*this, "4")
 		, m_V0(*this, "_Q")
 		, m_is_timestep(false)
 		{
@@ -36,10 +39,7 @@ namespace netlist
 			connect_late(m_RV.m_N, m_V0);
 
 			/* device */
-			enregister("1", m_VDD);
-			enregister("2", m_VGG);
 			register_subalias("3", m_RV.m_P);
-			enregister("4", m_VSS);
 
 			save(NLNAME(m_shift));
 

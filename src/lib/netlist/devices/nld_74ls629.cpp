@@ -88,11 +88,11 @@ namespace netlist
 		, m_clock(*this, "OSC")
 		, m_R_FC(*this, "R_FC")
 		, m_R_RNG(*this, "R_RNG")
+		, m_RNG(*this, "RNG")
+		, m_FC(*this, "FC")
 		, m_CAP(*this, "CAP", 1e-6)
 		{
 			enregister("ENQ", m_ENQ);
-			enregister("RNG",    m_RNG);
-			enregister("FC",     m_FC);
 			register_subalias("GND",    m_R_FC.m_N);
 
 			connect_late(m_FC, m_R_FC.m_P);

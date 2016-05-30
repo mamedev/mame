@@ -123,6 +123,12 @@ public:
 		return *reinterpret_cast<C *>(reinterpret_cast<char *>(m_buf) + index * sizeof(C));
 	}
 
+	template<typename D, typename... Args>
+	void emplace(std::size_t index, Args&&... args)
+	{
+		new (&this[index]) D(std::forward<Args>(args)...);
+	}
+
 protected:
 
 private:

@@ -504,9 +504,11 @@ class NETLIB_NAME(analog_callback) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(analog_callback)(netlist::netlist_t &anetlist, const pstring &name)
-		: device_t(anetlist, name), m_cpu_device(nullptr), m_last(0)
+	: device_t(anetlist, name)
+	, m_in(*this, "IN")
+	, m_cpu_device(nullptr)
+	, m_last(0)
 	{
-		enregister("IN", m_in);
 		m_cpu_device = downcast<netlist_mame_cpu_device_t *>(&downcast<netlist_mame_t &>(netlist()).parent());
 		save(NLNAME(m_last));
 	}
@@ -555,8 +557,8 @@ public:
 		, m_channel(*this, "CHAN", 0)
 		, m_mult(*this, "MULT", 1000.0)
 		, m_offset(*this, "OFFSET", 0.0)
+		, m_in(*this, "IN")
 	{
-		enregister("IN", m_in);
 		m_sample = netlist::netlist_time::from_hz(1); //sufficiently big enough
 		save(NAME(m_last_buffer));
 	}
