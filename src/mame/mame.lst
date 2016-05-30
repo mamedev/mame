@@ -36038,6 +36038,9 @@ vsmile                          //
 vsmilef                         //
 walle                           //
 
+@source:vsmilepro.cpp
+vsmilpro
+
 @source:vindictr.cpp
 vindictr                        // 136059           (c) 1988
 vindictr1                       // 136059           (c) 1988
