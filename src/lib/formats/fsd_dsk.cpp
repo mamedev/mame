@@ -92,6 +92,7 @@ int fsd_format::identify(io_generic *io, UINT32 form_factor)
 	if (memcmp(h, "FSD", 3) == 0) {
 		return 100;
 	}
+	LOG_FORMATS("fsd: no match\n");
 	return 0;
 }
 
@@ -112,18 +113,18 @@ bool fsd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	//popmessage("Loading image of '%s'\n", title);
 
-	desc_pc_sector sects[10];
+	desc_pc_sector sects[256];
 	UINT8 total_tracks = img[pos++];
 	UINT8 tnum, hnum, snum, ssize, error;
 
 	hnum = 0;
-	//osd_printf_verbose("%d Tracks\n", total_tracks+1);
-	//osd_printf_verbose("Tr.#  No.S  Sec.# Tr.ID Head# SecID IDsiz REsiz Error\n");
+	LOG_FORMATS("%02d Tracks\n", total_tracks+1);
+	LOG_FORMATS("Tr.#  No.S  Sec.# Tr.ID Head# SecID IDsiz REsiz Error\n");
 	for(int curr_track=0; curr_track <= total_tracks; curr_track++)
 	{
 		UINT8 track = img[pos++];
 		UINT8 spt = img[pos++];
-		//osd_printf_verbose("%x    %x\n", track, spt);
+		LOG_FORMATS("%02X    %02X\n", track, spt);
 		if (spt > 0) // formatted
 		{
 			UINT8 readable = img[pos++];
@@ -145,22 +146,16 @@ bool fsd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					sects[i].bad_crc = (error & 0x0e) == 0x0e;
 					sects[i].data = &img[pos];
 					pos += sects[i].actual_size;
-					//osd_printf_verbose("Read        %x    %x    %x    %x    %x  %x  %x\n", i, sects[i].track, sects[i].head, sects[i].sector, sects[i].size, sects[i].actual_size, error);
+					LOG_FORMATS("Read        %02X    %02X    %02X    %02X    %02X    %02X   %02X\n", i, sects[i].track, sects[i].head, sects[i].sector, sects[i].size, sects[i].actual_size, error);
 				}
 				else
 				{
-					throw emu_fatalerror("fsd_format: Unsupported unreadable sector on track %d sector %d head %d", track, i, hnum);
-
-					// Unreadable sectors not supported!!
-					//sects[i].track = track;
-					//sects[i].head = 0;
-					//sects[i].sector = i;
-					//sects[i].size = 0;
-					//sects[i].actual_size = 0;
-					//sects[i].deleted = false;
-					//sects[i].bad_crc = false;
-					//sects[i].data = nullptr;
-					//osd_printf_verbose("Unread      %x    %x    %x    %x    %x  %x  %x\n", i, sects[i].track, sects[i].head, sects[i].sector, sects[i].size, sects[i].actual_size, 0);
+					LOG_FORMATS("Unreadable sector on track %02d sector %02X head %02d", track, i, hnum);
+					sects[i].actual_size = 0;
+					sects[i].deleted = false;
+					sects[i].bad_crc = false;
+					sects[i].data = nullptr;
+					LOG_FORMATS("Unread      %02X    %02X    %02X    %02X    %02X    %02X   %02X\n", i, sects[i].track, sects[i].head, sects[i].sector, sects[i].size, sects[i].actual_size, 0);
 				}
 			}
 		}
@@ -170,7 +165,7 @@ bool fsd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			sects[0].head = hnum;
 			sects[0].sector = 0;
 			sects[0].size = 0;
-			//osd_printf_verbose("Unform      %x    %x    %x    %x    %x  %x  %x\n", 0, sects[0].track, sects[0].head, sects[0].sector, sects[0].size, sects[0].actual_size, 0);
+			LOG_FORMATS("Unform      %02X    %02X    %02X    %02X    %02X    %02X   %02X\n", 0, sects[0].track, sects[0].head, sects[0].sector, sects[0].size, sects[0].actual_size, 0);
 		}
 		build_wd_track_fm(curr_track, hnum, image, 50000, spt, sects, 10, 40, 10);
 	}
