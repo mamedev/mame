@@ -171,9 +171,10 @@ public:
 		}
 		for (unsigned i=0; i < m_NO; i++)
 		{
-			new (&m_Q[i]) logic_output_t();
+			//new (&m_Q[i]) logic_output_t();
 			out[i] = out[i].trim();
-			enregister(out[i], m_Q[i]);
+			m_Q.emplace(i, *this, out[i]);
+			//enregister(out[i], m_Q[i]);
 		}
 		// Connect output "Q" to input "_Q" if this exists
 		// This enables timed state without having explicit state ....

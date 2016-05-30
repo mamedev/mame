@@ -626,10 +626,10 @@ class NETLIB_NAME(sound_in) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(sound_in)(netlist::netlist_t &anetlist, const pstring &name)
-		: netlist::device_t(anetlist, name)
+	: netlist::device_t(anetlist, name)
+	, m_Q(*this, "Q")
 	{
 		// clock part
-		enregister("Q", m_Q);
 		enregister("FB", m_feedback);
 
 		connect_late(m_feedback, m_Q);

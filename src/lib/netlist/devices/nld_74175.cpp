@@ -15,18 +15,11 @@ namespace netlist
 	NETLIB_OBJECT(74175_sub)
 	{
 		NETLIB_CONSTRUCTOR(74175_sub)
+		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4"})
+		, m_QQ(*this, {"Q1Q", "Q2Q", "Q3Q", "Q4Q"})
 		, m_data(0)
 		{
 			enregister("CLK",   m_CLK);
-
-			enregister("Q1",   m_Q[0]);
-			enregister("Q1Q",  m_QQ[0]);
-			enregister("Q2",   m_Q[1]);
-			enregister("Q2Q",  m_QQ[1]);
-			enregister("Q3",   m_Q[2]);
-			enregister("Q3Q",  m_QQ[2]);
-			enregister("Q4",   m_Q[3]);
-			enregister("Q4Q",  m_QQ[3]);
 
 			save(NLNAME(m_clrq));
 			save(NLNAME(m_data));
@@ -37,8 +30,8 @@ namespace netlist
 
 	public:
 		logic_input_t m_CLK;
-		logic_output_t m_Q[4];
-		logic_output_t m_QQ[4];
+		object_array_t<logic_output_t, 4> m_Q;
+		object_array_t<logic_output_t, 4> m_QQ;
 
 		netlist_sig_t m_clrq;
 		UINT8 m_data;

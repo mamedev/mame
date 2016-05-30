@@ -17,9 +17,9 @@ namespace netlist
 	NETLIB_OBJECT(7493ff)
 	{
 		NETLIB_CONSTRUCTOR(7493ff)
+		, m_Q(*this, "Q")
 		{
 			enregister("CLK", m_I);
-			enregister("Q", m_Q);
 
 			save(NLNAME(m_reset));
 			save(NLNAME(m_state));

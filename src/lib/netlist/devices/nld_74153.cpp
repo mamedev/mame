@@ -20,6 +20,7 @@ namespace netlist
 	NETLIB_OBJECT(74153sub)
 	{
 		NETLIB_CONSTRUCTOR(74153sub)
+		, m_Y(*this, "AY") //FIXME: Change netlists
 		, m_chan(0)
 		{
 			enregister("C0", m_C[0]);
@@ -27,8 +28,6 @@ namespace netlist
 			enregister("C2", m_C[2]);
 			enregister("C3", m_C[3]);
 			enregister("G", m_G);
-
-			enregister("AY", m_Y); //FIXME: Change netlists
 
 			save(NLNAME(m_chan));
 		}

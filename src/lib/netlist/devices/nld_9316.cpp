@@ -51,18 +51,17 @@ namespace netlist
 	NETLIB_OBJECT(9316_sub)
 	{
 		NETLIB_CONSTRUCTOR(9316_sub)
+		, m_QA(*this, "QA")
+		, m_QB(*this, "QB")
+		, m_QC(*this, "QC")
+		, m_QD(*this, "QD")
+		, m_RC(*this, "RC")
 		, m_cnt(0)
 		, m_ABCD(nullptr)
 		, m_loadq(0)
 		, m_ent(0)
 		{
 			enregister("CLK", m_CLK);
-
-			enregister("QA", m_QA);
-			enregister("QB", m_QB);
-			enregister("QC", m_QC);
-			enregister("QD", m_QD);
-			enregister("RC", m_RC);
 
 			save(NLNAME(m_cnt));
 			save(NLNAME(m_loadq));

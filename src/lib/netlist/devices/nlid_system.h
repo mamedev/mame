@@ -45,9 +45,9 @@ namespace netlist
 	NETLIB_OBJECT(mainclock)
 	{
 		NETLIB_CONSTRUCTOR(mainclock)
+		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5)
 		{
-			enregister("Q", m_Q);
 
 			m_inc = netlist_time::from_hz(m_freq.Value()*2);
 		}
@@ -86,10 +86,9 @@ namespace netlist
 	NETLIB_OBJECT(clock)
 	{
 		NETLIB_CONSTRUCTOR(clock)
+		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
-
 		{
-			enregister("Q", m_Q);
 			enregister("FB", m_feedback);
 
 			m_inc = netlist_time::from_hz(m_freq.Value()*2);
@@ -118,8 +117,8 @@ namespace netlist
 		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
 		, m_pattern(*this, "PATTERN", "1,1")
 		, m_offset(*this, "OFFSET", 0.0)
+		, m_Q(*this, "Q")
 		{
-			enregister("Q", m_Q);
 			enregister("FB", m_feedback);
 
 			m_inc[0] = netlist_time::from_hz(m_freq.Value()*2);
@@ -173,14 +172,14 @@ namespace netlist
 	NETLIB_OBJECT(logic_input)
 	{
 		NETLIB_CONSTRUCTOR(logic_input)
+		, m_Q(*this, "Q")
 		, m_IN(*this, "IN", 0)
 		/* make sure we get the family first */
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
 			set_logic_family(netlist().setup().family_from_model(m_FAMILY.Value()));
-
-			enregister("Q", m_Q);
 		}
+
 		NETLIB_UPDATE_AFTER_PARAM_CHANGE()
 
 		NETLIB_UPDATEI();
@@ -314,7 +313,7 @@ namespace netlist
 		{
 
 			for (int i=0; i < m_N; i++)
-				m_I.emplace<analog_input_t>(i, *this, plib::pfmt("A{1}")(i));
+				m_I.emplace(i, *this, plib::pfmt("A{1}")(i));
 
 			plib::pstring_vector_t cmds(m_func.Value(), " ");
 			m_precompiled.clear();
@@ -464,8 +463,8 @@ namespace netlist
 		nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied)
 				: nld_base_proxy(anetlist, name, in_proxied, &m_I)
 		, m_I(*this, "I")
+		, m_Q(*this, "Q")
 		{
-			enregister("Q", m_Q);
 		}
 
 		virtual ~nld_a_to_d_proxy() {}

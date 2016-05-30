@@ -57,6 +57,7 @@ class matrix_solver_t;
 NETLIB_OBJECT(solver)
 {
 	NETLIB_CONSTRUCTOR(solver)
+	, m_Q_step(*this, "Q_step")
 	, m_sync_delay(*this, "SYNC_DELAY", NLTIME_FROM_NS(10).as_double())
 	, m_freq(*this, "FREQ", 48000.0)
 
@@ -80,8 +81,6 @@ NETLIB_OBJECT(solver)
 
 	, m_log_stats(*this, "LOG_STATS", 1)   // nl_double timestep resolution
 	{
-		enregister("Q_step", m_Q_step);
-
 		// internal staff
 
 		enregister("FB_step", m_fb_step);

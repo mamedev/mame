@@ -8,8 +8,27 @@
 #include <devices/nlid_cmos.h>
 #include "nld_4020.h"
 
+struct a
+{
+	const char *p[3];
+};
+
+void test(a p)
+{
+	for (int i=1; i<3; i++)
+		printf("%s\n", p.p[i]);
+}
+
+void tt()
+{
+	//const char *p[3] = {"a", "b", "c"};
+	test({"a", "b", "c"});
+}
+
 namespace netlist
 {
+
+
 	namespace devices
 	{
 
@@ -17,23 +36,11 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(CD4020_sub)
 		NETLIB_FAMILY("CD4XXX")
+		, m_Q(*this, {"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
+				"Q10", "Q11", "Q12", "Q13", "Q14"})
 		, m_cnt(0)
 		{
 			enregister("IP", m_IP);
-
-			enregister("Q1", m_Q[0]);
-			enregister("Q4", m_Q[3]);
-			enregister("Q5", m_Q[4]);
-			enregister("Q6", m_Q[5]);
-			enregister("Q7", m_Q[6]);
-			enregister("Q8", m_Q[7]);
-			enregister("Q9", m_Q[8]);
-			enregister("Q10", m_Q[9]);
-			enregister("Q11", m_Q[10]);
-			enregister("Q12", m_Q[11]);
-			enregister("Q13", m_Q[12]);
-			enregister("Q14", m_Q[13]);
-
 			save(NLNAME(m_cnt));
 		}
 
@@ -49,7 +56,7 @@ namespace netlist
 		ATTR_HOT void update_outputs(const UINT16 cnt);
 
 		logic_input_t m_IP;
-		logic_output_t m_Q[14];
+		object_array_t<logic_output_t, 14> m_Q;
 
 		UINT16 m_cnt;
 	};
@@ -124,7 +131,7 @@ namespace netlist
 				NLTIME_FROM_NS(1380), NLTIME_FROM_NS(1480),
 		};
 
-		OUTLOGIC(m_Q[0], 0, out_delayQn[0]);
+		OUTLOGIC(m_Q[0], cnt & 1, out_delayQn[0]);
 		for (int i=3; i<14; i++)
 			OUTLOGIC(m_Q[i], (cnt >> i) & 1, out_delayQn[i]);
 	}

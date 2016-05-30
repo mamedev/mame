@@ -29,6 +29,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(7448)
 		, m_state(0)
+		, m_Q(*this, {"a", "b", "c", "d", "e", "f", "g"})
 		{
 			enregister("A", m_A);
 			enregister("B", m_B);
@@ -37,14 +38,6 @@ namespace netlist
 			enregister("LTQ", m_LTQ);
 			enregister("BIQ", m_BIQ);
 			enregister("RBIQ", m_RBIQ);
-
-			enregister("a", m_Q[0]);
-			enregister("b", m_Q[1]);
-			enregister("c", m_Q[2]);
-			enregister("d", m_Q[3]);
-			enregister("e", m_Q[4]);
-			enregister("f", m_Q[5]);
-			enregister("g", m_Q[6]);
 
 			save(NLNAME(m_state));
 		}
@@ -66,7 +59,7 @@ namespace netlist
 
 		UINT8 m_state;
 
-		logic_output_t m_Q[7];  /* a .. g */
+		object_array_t<logic_output_t, 7> m_Q;  /* a .. g */
 
 	};
 

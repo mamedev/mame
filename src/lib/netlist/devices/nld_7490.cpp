@@ -18,6 +18,7 @@ namespace netlist
 		, m_cnt(0)
 		, m_last_A(0)
 		, m_last_B(0)
+		, m_Q(*this, {"QA", "QB", "QC", "QD"})
 		{
 			enregister("A", m_A);
 			enregister("B", m_B);
@@ -25,11 +26,6 @@ namespace netlist
 			enregister("R2",  m_R2);
 			enregister("R91", m_R91);
 			enregister("R92", m_R92);
-
-			enregister("QA", m_Q[0]);
-			enregister("QB", m_Q[1]);
-			enregister("QC", m_Q[2]);
-			enregister("QD", m_Q[3]);
 
 			save(NLNAME(m_cnt));
 			save(NLNAME(m_last_A));
@@ -53,7 +49,7 @@ namespace netlist
 		UINT8 m_last_A;
 		UINT8 m_last_B;
 
-		logic_output_t m_Q[4];
+		object_array_t<logic_output_t, 4> m_Q;
 	};
 
 	NETLIB_OBJECT_DERIVED(7490_dip, 7490)

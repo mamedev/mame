@@ -47,14 +47,13 @@ namespace netlist
 		, m_ABCD(nullptr)
 		, m_loadq(0)
 		, m_ent(0)
+		, m_QA(*this, "QA")
+		, m_QB(*this, "QB")
+		, m_QC(*this, "QC")
+		, m_QD(*this, "QD")
+		, m_RC(*this, "RC")
 		{
 			enregister("CLK", m_CLK);
-
-			enregister("QA", m_QA);
-			enregister("QB", m_QB);
-			enregister("QC", m_QC);
-			enregister("QD", m_QD);
-			enregister("RC", m_RC);
 
 			save(NLNAME(m_cnt));
 			save(NLNAME(m_loadq));

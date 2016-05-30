@@ -15,6 +15,7 @@ namespace netlist
 	NETLIB_OBJECT(82S16)
 	{
 		NETLIB_CONSTRUCTOR(82S16)
+		, m_DOUTQ(*this, "DOUTQ")
 		{
 			enregister("A0",    m_A[0]);
 			enregister("A1",    m_A[1]);
@@ -31,8 +32,6 @@ namespace netlist
 
 			enregister("WEQ",   m_WEQ);
 			enregister("DIN",   m_DIN);
-
-			enregister("DOUTQ",m_DOUTQ);
 
 			save(NLNAME(m_ram));
 
@@ -74,7 +73,7 @@ namespace netlist
 			enregister("12",    m_WEQ);
 			enregister("13",    m_DIN);
 
-			enregister("6",    m_DOUTQ);
+			register_subalias("6",    m_DOUTQ);
 		}
 	};
 

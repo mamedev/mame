@@ -15,14 +15,14 @@ namespace netlist
 	NETLIB_OBJECT(74107Asub)
 	{
 		NETLIB_CONSTRUCTOR(74107Asub)
+		, m_Q(*this, "Q")
+		, m_QQ(*this, "QQ")
 		, m_Q1(0)
 		, m_Q2(0)
 		, m_F(0)
 
 		{
 			enregister("CLK", m_clk);
-			enregister("Q", m_Q);
-			enregister("QQ", m_QQ);
 
 			save(NLNAME(m_Q1));
 			save(NLNAME(m_Q2));

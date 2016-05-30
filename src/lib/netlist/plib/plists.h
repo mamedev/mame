@@ -100,6 +100,7 @@ class uninitialised_array_t
 public:
 	uninitialised_array_t()
 	{
+		printf("array size %d align %d - %d %d\n", (int) sizeof(C[N]), (int) alignof(C[N]), (int) sizeof(*this), (int) alignof(*this));
 	}
 
 	~uninitialised_array_t()
@@ -115,24 +116,28 @@ public:
 
 	C& operator[](const std::size_t &index)
 	{
-		return *reinterpret_cast<C *>(reinterpret_cast<char *>(m_buf) + index * sizeof(C));
+		return *reinterpret_cast<C *>(addr(index));
 	}
 
 	const C& operator[](const std::size_t &index) const
 	{
-		return *reinterpret_cast<C *>(reinterpret_cast<char *>(m_buf) + index * sizeof(C));
+		return *reinterpret_cast<C *>(addr(index));
 	}
 
-	template<typename D, typename... Args>
+	template<typename... Args>
 	void emplace(std::size_t index, Args&&... args)
 	{
-		new (&this[index]) D(std::forward<Args>(args)...);
+		new (addr(index)) C(std::forward<Args>(args)...);
 	}
 
 protected:
 
 private:
 
+	void *addr(const std::size_t &index)
+	{
+		return reinterpret_cast<char *>(&m_buf[0]) + index * sizeof(C);
+	}
 	/* ensure proper alignment */
 	UINT64 m_buf[(N * sizeof(C) + sizeof(UINT64) - 1) / sizeof(UINT64)];
 };

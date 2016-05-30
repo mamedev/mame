@@ -169,8 +169,6 @@ ATTR_COLD object_t::object_t(netlist_t &nl, const pstring &aname, const type_t a
 , m_objtype(atype)
 , m_netlist(&nl)
 {
-	//printf("reg %s\n", this->name().cstr());
-	save_register();
 }
 
 ATTR_COLD object_t::~object_t()
@@ -181,7 +179,6 @@ ATTR_COLD void object_t::init_object(netlist_t &nl, const pstring &aname)
 {
 	m_netlist = &nl;
 	m_name = aname;
-	save_register();
 }
 
 ATTR_COLD const pstring &object_t::name() const
@@ -664,6 +661,13 @@ ATTR_COLD void net_t::init_object(netlist_t &nl, const pstring &aname, core_term
 		nl.m_nets.push_back(std::shared_ptr<net_t>(this, do_nothing_deleter()));
 	else
 		nl.m_nets.push_back(std::shared_ptr<net_t>(this));
+
+	save(NLNAME(m_time));
+	save(NLNAME(m_active));
+	save(NLNAME(m_in_queue));
+	save(NLNAME(m_cur_Analog));
+	save(NLNAME(m_cur_Q));
+	save(NLNAME(m_new_Q));
 }
 
 ATTR_HOT void net_t::inc_active(core_terminal_t &term)
@@ -718,17 +722,6 @@ ATTR_COLD void net_t::rebuild_list()
 			cnt++;
 		}
 	m_active = cnt;
-}
-
-ATTR_COLD void net_t::save_register()
-{
-	save(NLNAME(m_time));
-	save(NLNAME(m_active));
-	save(NLNAME(m_in_queue));
-	save(NLNAME(m_cur_Analog));
-	save(NLNAME(m_cur_Q));
-	save(NLNAME(m_new_Q));
-	object_t::save_register();
 }
 
 ATTR_HOT /* inline */ void net_t::update_devs()
@@ -846,11 +839,6 @@ ATTR_COLD void logic_net_t::reset()
 	net_t::reset();
 }
 
-ATTR_COLD void logic_net_t::save_register()
-{
-	net_t::save_register();
-}
-
 // ----------------------------------------------------------------------------------------
 // analog_net_t
 // ----------------------------------------------------------------------------------------
@@ -871,11 +859,6 @@ ATTR_COLD analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname)
 ATTR_COLD void analog_net_t::reset()
 {
 	net_t::reset();
-}
-
-ATTR_COLD void analog_net_t::save_register()
-{
-	net_t::save_register();
 }
 
 ATTR_COLD bool analog_net_t::already_processed(plib::pvector_t<list_t> &groups)
@@ -935,6 +918,7 @@ ATTR_COLD core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &an
 , m_net(nullptr)
 , m_state(STATE_NONEX)
 {
+	save(NLNAME(m_state));
 }
 
 ATTR_COLD void core_terminal_t::set_net(net_t::ptr_t anet)
@@ -960,6 +944,9 @@ ATTR_COLD terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
 , m_gt1(nullptr)
 {
 	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
+	save(NLNAME(m_Idr1));
+	save(NLNAME(m_go1));
+	save(NLNAME(m_gt1));
 }
 
 
@@ -985,14 +972,6 @@ ATTR_COLD void terminal_t::reset()
 	set_ptr(m_gt1, netlist().gmin());
 }
 
-ATTR_COLD void terminal_t::save_register()
-{
-	save(NLNAME(m_Idr1));
-	save(NLNAME(m_go1));
-	save(NLNAME(m_gt1));
-	core_terminal_t::save_register();
-}
-
 
 // ----------------------------------------------------------------------------------------
 // net_input_t
@@ -1006,11 +985,23 @@ ATTR_COLD void terminal_t::save_register()
 // logic_output_t
 // ----------------------------------------------------------------------------------------
 
+#if 0
 ATTR_COLD logic_output_t::logic_output_t()
 	: logic_t(OUTPUT)
 {
 	set_state(STATE_OUT);
 	this->set_net(&m_my_net);
+}
+#endif
+
+ATTR_COLD logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
+	: logic_t(dev, aname, OUTPUT)
+{
+	set_state(STATE_OUT);
+	this->set_net(&m_my_net);
+	set_logic_family(dev.logic_family());
+	net().init_object(dev.netlist(), name() + ".net", this);
+	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
 }
 
 ATTR_COLD void logic_output_t::init_object(core_device_t &dev, const pstring &aname)

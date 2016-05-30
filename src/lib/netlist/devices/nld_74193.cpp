@@ -20,6 +20,9 @@ namespace netlist
 		, m_cnt(0)
 		, m_last_CU(0)
 		, m_last_CD(0)
+		, m_Q(*this, {"QA", "QB", "QC", "QD"})
+		, m_BORROWQ(*this, "BORROWQ")
+		, m_CARRYQ(*this, "CARRYQ")
 		{
 			enregister("A", m_A);
 			enregister("B", m_B);
@@ -29,13 +32,6 @@ namespace netlist
 			enregister("LOADQ",  m_LOADQ);
 			enregister("CU", m_CU);
 			enregister("CD", m_CD);
-
-			enregister("QA", m_Q[0]);
-			enregister("QB", m_Q[1]);
-			enregister("QC", m_Q[2]);
-			enregister("QD", m_Q[3]);
-			enregister("BORROWQ", m_BORROWQ);
-			enregister("CARRYQ", m_CARRYQ);
 
 			save(NLNAME(m_cnt));
 			save(NLNAME(m_last_CU));
@@ -59,7 +55,7 @@ namespace netlist
 		UINT8 m_last_CU;
 		UINT8 m_last_CD;
 
-		logic_output_t m_Q[4];
+		object_array_t<logic_output_t, 4> m_Q;
 		logic_output_t m_BORROWQ;
 		logic_output_t m_CARRYQ;
 	};

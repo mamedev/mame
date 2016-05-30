@@ -16,6 +16,11 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(7483)
 		, m_lastr(0)
+		, m_S1(*this, "S1")
+		, m_S2(*this, "S2")
+		, m_S3(*this, "S3")
+		, m_S4(*this, "S4")
+		, m_C4(*this, "C4")
 		{
 			enregister("A1", m_A1);
 			enregister("A2", m_A2);
@@ -26,12 +31,6 @@ namespace netlist
 			enregister("B3", m_B3);
 			enregister("B4", m_B4);
 			enregister("C0", m_C0);
-
-			enregister("S1", m_S1);
-			enregister("S2", m_S2);
-			enregister("S3", m_S3);
-			enregister("S4", m_S4);
-			enregister("C4", m_C4);
 
 			save(NLNAME(m_lastr));
 		}

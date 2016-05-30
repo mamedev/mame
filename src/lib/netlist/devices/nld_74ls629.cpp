@@ -50,12 +50,12 @@ namespace netlist
 	NETLIB_OBJECT(SN74LS629clk)
 	{
 		NETLIB_CONSTRUCTOR(SN74LS629clk)
+		, m_Y(*this, "Y")
 		, m_enableq(1)
 		, m_out(0)
 		, m_inc(netlist_time::zero)
 		{
 			enregister("FB",    m_FB);
-			enregister("Y",    m_Y);
 
 			connect_late(m_FB, m_Y);
 

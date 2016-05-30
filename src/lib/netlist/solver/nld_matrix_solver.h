@@ -97,9 +97,9 @@ public:
 	m_iterative_total(0),
 	m_params(*params),
 	m_cur_ts(0),
+	m_Q_sync(*this, "Q_sync"),
 	m_sort(sort)
 	{
-		enregister("Q_sync", m_Q_sync);
 		enregister("FB_sync", m_fb_sync);
 		connect_post_start(m_fb_sync, m_Q_sync);
 
