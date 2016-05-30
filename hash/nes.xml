@@ -50741,6 +50741,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="pipe5">
+		<description>Pipe 5 (Aus)</description>
+		<year>19??</year>
+		<publisher>HES</publisher>
+		<info name="alt_title" value="PipeMania (Box)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nina006" />
+			<feature name="pcb" value="AVE-NINA-06" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="16384">
+				<rom name="pipemania (hes).chr" size="16384" crc="eac077bd" sha1="31c9163aeff2f301fedb31537d239e6a7d6852c7" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="pipemania (hes).prg" size="32768" crc="713d51cc" sha1="7f46340433dc63ec40c11f8ea3560c2917d6ca83" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="funblast">
 		<description>Fun Blaster Pak (Aus)</description>
 		<year>19??</year>
@@ -52259,7 +52277,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="pipe5">
+	<software name="pipe5t" cloneof="pipe5">
 		<description>Pipe 5 (Tw)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -53289,9 +53307,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="policemn">
-		<description>Policeman (Tw)</description>
+		<description>Policeman (Spa, Tw)</description>
 		<year>19??</year>
-		<publisher>TXC Corp</publisher>
+		<publisher>Gluk Video / TXC Corp</publisher>
 		<info name="serial" value="MGC-015"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_strikew" />
@@ -53303,24 +53321,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="policeman (mgc-015).prg" size="65536" crc="65fe1590" sha1="be06c1c9c76bf270e83e98f6c5a79ff4d5589c59" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="policemns" cloneof="policemn">
-		<description>Policeman (Spa)</description>
-		<year>19??</year>
-		<publisher>Gluk Video</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_strikew" />
-			<feature name="pcb" value="TXC-STRIKEWOLF" />
-			<feature name="mirroring" value="vertical" />
-			<feature name="bus_conflict" value="no" />
-			<dataarea name="chr" size="65536">
-				<rom name="policeman (spain) (gluk video) (unl).chr" size="65536" crc="f73ee39e" sha1="0142d357b7a8e38c720bef9a13250da76dbc0738" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="65536">
-				<rom name="policeman (spain) (gluk video) (unl).prg" size="65536" crc="65fe1590" sha1="be06c1c9c76bf270e83e98f6c5a79ff4d5589c59" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
