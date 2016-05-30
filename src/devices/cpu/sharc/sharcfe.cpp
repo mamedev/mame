@@ -183,15 +183,15 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		if (map[index].looptype == LOOP_TYPE_CONDITIONAL)
 		{
 			UINT32 flags = m_sharc->do_condition_astat_bits(map[index].condition);
-			if (flags & adsp21062_device::ASTAT_FLAGS::AZ) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AZ;
-			if (flags & adsp21062_device::ASTAT_FLAGS::AN) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AN;
-			if (flags & adsp21062_device::ASTAT_FLAGS::AV) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AV;
-			if (flags & adsp21062_device::ASTAT_FLAGS::AC) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AC;
-			if (flags & adsp21062_device::ASTAT_FLAGS::MN) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MN;
-			if (flags & adsp21062_device::ASTAT_FLAGS::MV) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MV;
-			if (flags & adsp21062_device::ASTAT_FLAGS::SV) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SV;
-			if (flags & adsp21062_device::ASTAT_FLAGS::SZ) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SZ;
-			if (flags & adsp21062_device::ASTAT_FLAGS::BTF) desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_BTF;
+			if (flags & adsp21062_device::ASTAT_FLAGS::AZ) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AZ; AZ_USED(desc); }
+			if (flags & adsp21062_device::ASTAT_FLAGS::AN) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AN; AN_USED(desc); }
+			if (flags & adsp21062_device::ASTAT_FLAGS::AV) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AV; AV_USED(desc); }
+			if (flags & adsp21062_device::ASTAT_FLAGS::AC) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AC; AC_USED(desc); }
+			if (flags & adsp21062_device::ASTAT_FLAGS::MN) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MN; MN_USED(desc); }
+			if (flags & adsp21062_device::ASTAT_FLAGS::MV) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MV; MV_USED(desc); }
+			if (flags & adsp21062_device::ASTAT_FLAGS::SV) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SV; SV_USED(desc); }
+			if (flags & adsp21062_device::ASTAT_FLAGS::SZ) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SZ; SZ_USED(desc); }
+			if (flags & adsp21062_device::ASTAT_FLAGS::BTF) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_BTF; BTF_USED(desc); }
 		}
 	}
 

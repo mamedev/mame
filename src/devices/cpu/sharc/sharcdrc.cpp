@@ -4331,7 +4331,6 @@ void adsp21062_device::generate_compute(drcuml_block *block, compiler_state *com
 					case 0xc4:		// Rn = BCLR Rx BY Ry | <data8>
 					case 0x44:		// Rn = FDEP Rx BY Ry | <bit6>:<len6>
 					case 0x4c:		// Rn = FDEP Rx BY Ry | <bit6>:<len6> (SE)
-					case 0x48:		// Rn = FEXT Rx BY Ry | <bit6>:<len6> (SE)
 					case 0x24:		// Rn = Rn OR ASHIFT Rx BY Ry | <data8>
 					case 0x64:		// Rn = Rn OR FDEP Rx BY Ry | <bit6>:<len6>
 					case 0x6c:		// Rn = Rn OR FDEP Rx BY Ry | <bit6>:<len6> (SE)
@@ -4404,6 +4403,35 @@ void adsp21062_device::generate_compute(drcuml_block *block, compiler_state *com
 
 						UML_AND(block, I2, REG(rx), I3);
 						UML_SHR(block, REG(rn), I2, I0);
+						if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
+						if (SV_CALC_REQUIRED)
+						{
+							UML_ADD(block, I0, I0, I1);
+							UML_CMP(block, I0, 32);
+							UML_SETc(block, COND_G, ASTAT_SV);
+						}
+						if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
+						return;
+
+					case 0x48:		// Rn = FEXT Rx BY Ry | <bit6>:<len6> (SE)
+						// extraction mask
+						UML_MOV(block, I0, REG(ry));
+						UML_SHR(block, I1, I0, 6);
+						UML_AND(block, I1, I1, 0x3f);	// i1 = len6
+						UML_AND(block, I0, I0, 0x3f);	// i0 = bit6
+						UML_MOV(block, I3, 0xffffffff);
+						UML_SUB(block, I2, 32, I1);
+						UML_SHR(block, I3, I3, I2);
+						UML_SHL(block, I3, I3, I0);
+
+						UML_AND(block, I3, REG(rx), I3);
+
+						UML_ADD(block, I2, I0, I1);
+						UML_SUB(block, I2, 32, I2);
+						UML_SHL(block, I3, I3, I2);
+						UML_ADD(block, I2, I2, I0);
+						UML_SAR(block, REG(rn), I3, I2);
+
 						if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
 						if (SV_CALC_REQUIRED)
 						{
@@ -4610,52 +4638,49 @@ void adsp21062_device::generate_do_condition(drcuml_block *block, compiler_state
 	// Jump to skip_label if condition is true
 	code_label not_skip;
 
-	UML_JMP(block, skip_label);
-	return;
-
 	switch (condition)
 	{
 		case 0x00:                                    /* EQ */
-			UML_TEST(block, ASTAT_AZ, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.az), 1);
 			UML_JMPc(block, COND_NZ, skip_label);
 			break;
 		case 0x01:                                    /* LT */
 			not_skip = compiler->labelnum++;
-			UML_TEST(block, ASTAT_AZ, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.az), 1);
 			UML_JMPc(block, COND_NZ, not_skip);
-			UML_TEST(block, ASTAT_AN, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.an), 1);
 			UML_JMPc(block, COND_Z, not_skip);
 			UML_JMP(block, skip_label);
 			UML_LABEL(block, not_skip);
 			break;
 		case 0x02:                                    /* LE */
-			UML_TEST(block, ASTAT_AZ, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.az), 1);
 			UML_JMPc(block, COND_NZ, skip_label);
-			UML_TEST(block, ASTAT_AN, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.an), 1);
 			UML_JMPc(block, COND_NZ, skip_label);
 			break;
 		case 0x03:                                    /* AC */
-			UML_TEST(block, ASTAT_AC, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.ac), 1);
 			UML_JMPc(block, COND_NZ, skip_label);
 			break;
 		case 0x04:                                    /* AV */
-			UML_TEST(block, ASTAT_AV, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.av), 1);
 			UML_JMPc(block, COND_NZ, skip_label);
 			break;
 		case 0x05:                                    /* MV */
-			UML_TEST(block, ASTAT_MV, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.mv), 1);
 			UML_JMPc(block, COND_NZ, skip_label);
 			break;
 		case 0x06:                                    /* MS */
-			UML_TEST(block, ASTAT_MN, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.mn), 1);
 			UML_JMPc(block, COND_NZ, skip_label);
 			break;
 		case 0x07:                                    /* SV */
-			UML_TEST(block, ASTAT_SV, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.sv), 1);
 			UML_JMPc(block, COND_NZ, skip_label);
 			break;
 		case 0x08:                                    /* SZ */
-			UML_TEST(block, ASTAT_SZ, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.sz), 1);
 			UML_JMPc(block, COND_NZ, skip_label);
 			break;
 		case 0x09:                                    /* FLAG0 */
@@ -4675,7 +4700,7 @@ void adsp21062_device::generate_do_condition(drcuml_block *block, compiler_state
 			UML_JMPc(block, COND_NE, skip_label);
 			break;
 		case 0x0d:                                    /* TF */
-			UML_TEST(block, ASTAT_BTF, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.btf), 1);
 			UML_JMPc(block, COND_NZ, skip_label);
 			break;
 		case 0x0e:                                    /* BM */
@@ -4685,46 +4710,46 @@ void adsp21062_device::generate_do_condition(drcuml_block *block, compiler_state
 			fatalerror("generate_do_condition 0x0f");	// this should only be used with counter loops
 			break;
 		case 0x10:                                    /* NOT EQUAL */
-			UML_TEST(block, ASTAT_AZ, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.az), 1);
 			UML_JMPc(block, COND_Z, skip_label);
 			break;
 		case 0x11:                                    /* GE */
-			UML_TEST(block, ASTAT_AZ, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.az), 1);
 			UML_JMPc(block, COND_NZ, skip_label);
-			UML_TEST(block, ASTAT_AN, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.an), 1);
 			UML_JMPc(block, COND_Z, skip_label);
 			break;
 		case 0x12:                                    /* GT */
 			not_skip = compiler->labelnum++;
-			UML_TEST(block, ASTAT_AZ, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.az), 1);
 			UML_JMPc(block, COND_NZ, not_skip);
-			UML_TEST(block, ASTAT_AN, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.an), 1);
 			UML_JMPc(block, COND_NZ, not_skip);
 			UML_JMP(block, skip_label);
 			UML_LABEL(block, not_skip);
 			break;
 		case 0x13:                                    /* NOT AC */
-			UML_TEST(block, ASTAT_AC, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.ac), 1);
 			UML_JMPc(block, COND_Z, skip_label);
 			break;
 		case 0x14:                                    /* NOT AV */
-			UML_TEST(block, ASTAT_AV, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.av), 1);
 			UML_JMPc(block, COND_Z, skip_label);
 			break;
 		case 0x15:                                    /* NOT MV */
-			UML_TEST(block, ASTAT_MV, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.mv), 1);
 			UML_JMPc(block, COND_Z, skip_label);
 			break;
 		case 0x16:                                    /* NOT MS */
-			UML_TEST(block, ASTAT_MN, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.mn), 1);
 			UML_JMPc(block, COND_Z, skip_label);
 			break;
 		case 0x17:                                    /* NOT SV */
-			UML_TEST(block, ASTAT_SV, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.sv), 1);
 			UML_JMPc(block, COND_Z, skip_label);
 			break;
 		case 0x18:                                    /* NOT SZ */
-			UML_TEST(block, ASTAT_SZ, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.sz), 1);
 			UML_JMPc(block, COND_Z, skip_label);
 			break;
 		case 0x19:                                    /* NOT FLAG0 */
@@ -4744,7 +4769,7 @@ void adsp21062_device::generate_do_condition(drcuml_block *block, compiler_state
 			UML_JMPc(block, COND_E, skip_label);
 			break;
 		case 0x1d:                                    /* NOT TF */
-			UML_TEST(block, ASTAT_BTF, 1);
+			UML_TEST(block, mem(&m_core->astat_delay_copy.btf), 1);
 			UML_JMPc(block, COND_Z, skip_label);
 			break;
 		case 0x1e:                                    /* NOT BM */
