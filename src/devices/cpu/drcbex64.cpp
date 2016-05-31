@@ -173,8 +173,20 @@
 #include "drcuml.h"
 #include "drcbex64.h"
 
+// This is a trick to make it build on Android where the ARM SDK declares ::REG_Rn
+namespace drc {
+
 using namespace uml;
 using namespace x64emit;
+
+using x64emit::REG_R8;
+using x64emit::REG_R9;
+using x64emit::REG_R10;
+using x64emit::REG_R11;
+using x64emit::REG_R12;
+using x64emit::REG_R13;
+using x64emit::REG_R14;
+using x64emit::REG_R15;
 
 
 
@@ -6935,3 +6947,5 @@ void drcbe_x64::op_icopyf(x86code *&dst, const instruction &inst)
 		}
 	}
 }
+
+} // namespace drc
