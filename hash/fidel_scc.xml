@@ -11,8 +11,7 @@
 		<publisher>Fidelity Electronics</publisher>
 		<part name="cart" interface="fidel_scc">
 			<dataarea name="rom" size="0x2000">
-				<!-- ROM taken from Super Sensory 9, should be same -->
-				<rom name="cb9.bin" size="0x2000" status="baddump" crc="421147e8" sha1="ccf62f6f218e8992baf30973fe41b35e14a1cc1a" offset="0x0000" />
+				<rom name="cb9.bin" size="0x2000" crc="421147e8" sha1="ccf62f6f218e8992baf30973fe41b35e14a1cc1a" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
