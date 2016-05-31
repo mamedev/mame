@@ -176,7 +176,7 @@ ATTR_COLD const pstring &object_t::name() const
 
 ATTR_COLD device_object_t::device_object_t(core_device_t &dev, const pstring &aname, const type_t atype)
 : object_t(dev.netlist(), aname, atype)
-, m_device(&dev)
+, m_device(dev)
 {
 }
 
@@ -237,7 +237,7 @@ ATTR_COLD void netlist_t::start()
 				|| setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
 			auto dev = plib::owned_ptr<device_t>(e.second->Create(*this, e.first));
-			setup().register_dev_s(std::move(dev));
+			setup().register_dev(std::move(dev));
 		}
 	}
 
@@ -260,7 +260,7 @@ ATTR_COLD void netlist_t::start()
 				&& !setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
 			auto dev = plib::owned_ptr<device_t>(e.second->Create(*this, e.first));
-			setup().register_dev_s(std::move(dev));
+			setup().register_dev(std::move(dev));
 		}
 	}
 
@@ -302,7 +302,7 @@ ATTR_COLD void netlist_t::reset()
 
 	// Reset all nets once !
 	for (std::size_t i = 0; i < m_nets.size(); i++)
-		m_nets[i]->do_reset();
+		m_nets[i]->reset();
 
 	// Reset all devices once !
 	for (auto & dev : m_devices)
@@ -528,11 +528,6 @@ ATTR_COLD void device_t::register_subalias(const pstring &name, const pstring &a
 	//  m_terminals.add(name);
 }
 
-ATTR_COLD void device_t::register_p(const pstring &name, object_t &obj)
-{
-	setup().register_object(obj);
-}
-
 ATTR_COLD void device_t::connect_late(core_terminal_t &t1, core_terminal_t &t2)
 {
 	setup().register_link_fqn(t1.name(), t2.name());
@@ -709,7 +704,7 @@ ATTR_COLD void net_t::reset()
 		m_list_active.add(*ct);
 
 	for (core_terminal_t *ct : m_core_terms)
-		ct->do_reset();
+		ct->reset();
 
 	for (core_terminal_t *ct : m_core_terms)
 		if (ct->state() != logic_t::STATE_INP_PASSIVE)
@@ -771,11 +766,6 @@ ATTR_COLD logic_net_t::logic_net_t(netlist_t &nl, const pstring &aname, core_ter
 }
 
 
-ATTR_COLD void logic_net_t::reset()
-{
-	net_t::reset();
-}
-
 // ----------------------------------------------------------------------------------------
 // analog_net_t
 // ----------------------------------------------------------------------------------------
@@ -784,11 +774,6 @@ ATTR_COLD analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname, core_t
 	: net_t(nl, aname, mr)
 	, m_solver(nullptr)
 {
-}
-
-ATTR_COLD void analog_net_t::reset()
-{
-	net_t::reset();
 }
 
 ATTR_COLD bool analog_net_t::already_processed(plib::pvector_t<list_t> &groups)
@@ -857,7 +842,7 @@ ATTR_COLD terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
 , m_go1(nullptr)
 , m_gt1(nullptr)
 {
-	netlist().setup().register_object(*this);
+	netlist().setup().register_term(*this);
 	save(NLNAME(m_Idr1));
 	save(NLNAME(m_go1));
 	save(NLNAME(m_gt1));
@@ -906,7 +891,7 @@ ATTR_COLD logic_output_t::logic_output_t(core_device_t &dev, const pstring &anam
 	set_state(STATE_OUT);
 	this->set_net(&m_my_net);
 	set_logic_family(dev.logic_family());
-	netlist().setup().register_object(*this);
+	netlist().setup().register_term(*this);
 }
 
 ATTR_COLD void logic_output_t::initial(const netlist_sig_t val)
@@ -922,7 +907,7 @@ ATTR_COLD analog_input_t::analog_input_t(core_device_t &dev, const pstring &anam
 : analog_t(dev, aname, INPUT)
 {
 	set_state(STATE_INP_ACTIVE);
-	netlist().setup().register_object(*this);
+	netlist().setup().register_term(*this);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -937,7 +922,7 @@ ATTR_COLD analog_output_t::analog_output_t(core_device_t &dev, const pstring &an
 	set_state(STATE_OUT);
 
 	net().m_cur_Analog = NL_FCONST(0.0);
-	netlist().setup().register_object(*this);
+	netlist().setup().register_term(*this);
 }
 
 ATTR_COLD void analog_output_t::initial(const nl_double val)
@@ -954,7 +939,7 @@ ATTR_COLD logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname)
 {
 	set_state(STATE_INP_ACTIVE);
 	set_logic_family(dev.logic_family());
-	netlist().setup().register_object(*this);
+	netlist().setup().register_term(*this);
 }
 
 // ----------------------------------------------------------------------------------------

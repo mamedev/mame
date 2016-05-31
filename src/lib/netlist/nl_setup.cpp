@@ -181,7 +181,7 @@ void setup_t::register_dippins_arr(const pstring &terms)
 	}
 }
 
-pstring setup_t::objtype_as_astr(object_t &in) const
+pstring setup_t::objtype_as_str(object_t &in) const
 {
 	switch (in.type())
 	{
@@ -218,7 +218,7 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 				double vald = 0;
 				if (sscanf(val.cstr(), "%lf", &vald) != 1)
 					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-				dynamic_cast<param_double_t &>(param).initial(vald);
+				static_cast<param_double_t &>(param).initial(vald);
 			}
 			break;
 			case param_t::INTEGER:
@@ -227,13 +227,13 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 				double vald = 0;
 				if (sscanf(val.cstr(), "%lf", &vald) != 1)
 					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-				dynamic_cast<param_int_t &>(param).initial((int) vald);
+				static_cast<param_int_t &>(param).initial((int) vald);
 			}
 			break;
 			case param_t::STRING:
 			case param_t::MODEL:
 			{
-				dynamic_cast<param_str_t &>(param).initial(val);
+				static_cast<param_str_t &>(param).initial(val);
 			}
 			break;
 			default:
@@ -244,46 +244,22 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 		log().fatal("Error adding parameter {1} to parameter list\n", name);
 }
 
-void setup_t::register_object(object_t &obj)
+void setup_t::register_term(core_terminal_t &term)
 {
-	switch (obj.type())
+	if (term.isType(terminal_t::OUTPUT))
 	{
-		case terminal_t::TERMINAL:
-		case terminal_t::INPUT:
-		case terminal_t::OUTPUT:
-			{
-				core_terminal_t &term = dynamic_cast<core_terminal_t &>(obj);
-				if (term.isType(terminal_t::OUTPUT))
-				{
-				}
-				else if (term.isType(terminal_t::INPUT))
-				{
-					static_cast<device_t &>(term.device()).m_terminals.push_back(obj.name());
-				}
-				else
-				{
-					static_cast<device_t &>(term.device()).m_terminals.push_back(obj.name());
-				}
-				if (!m_terminals.add(term.name(), &term))
-					log().fatal("Error adding {1} {2} to terminal list\n", objtype_as_astr(obj), obj.name());
-				log().debug("{1} {2}\n", objtype_as_astr(obj), obj.name());
-			}
-			break;
-		case terminal_t::NET:
-			break;
-		case terminal_t::PARAM:
-			{
-				//register_and_set_param(name, dynamic_cast<param_t &>(obj));
-				log().fatal("should use register_param");
-			}
-			break;
-		case terminal_t::DEVICE:
-			log().fatal("Device registration not yet supported - {1}\n", obj.name());
-			break;
-		case terminal_t::QUEUE:
-			log().fatal("QUEUE registration not yet supported - {1}\n", obj.name());
-			break;
 	}
+	else if (term.isType(terminal_t::INPUT))
+	{
+		static_cast<device_t &>(term.device()).m_terminals.push_back(term.name());
+	}
+	else
+	{
+		static_cast<device_t &>(term.device()).m_terminals.push_back(term.name());
+	}
+	if (!m_terminals.add(term.name(), &term))
+		log().fatal("Error adding {1} {2} to terminal list\n", objtype_as_str(term), term.name());
+	log().debug("{1} {2}\n", objtype_as_str(term), term.name());
 }
 
 void setup_t::register_link_arr(const pstring &terms)
@@ -499,7 +475,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 
 		proxy = new_proxy.get();
 
-		register_dev_s(std::move(new_proxy));
+		register_dev(std::move(new_proxy));
 	}
 	return proxy;
 }
@@ -517,7 +493,7 @@ void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
 		proxy->m_Q.net().register_con(in);
 		out.net().register_con(proxy->m_I);
 
-		register_dev_s(std::move(proxy));
+		register_dev(std::move(proxy));
 
 	}
 	else if (out.is_logic() && in.is_analog())
@@ -560,7 +536,7 @@ void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 		else
 			proxy->m_Q.net().register_con(inp);
 
-		register_dev_s(std::move(proxy));
+		register_dev(std::move(proxy));
 	}
 	else
 	{
@@ -837,10 +813,9 @@ void setup_t::start_devices()
 			auto nc = factory().factory_by_name("LOG")->Create(netlist(), name);
 			register_link(name + ".I", ll);
 			log().debug("    dynamic link {1}: <{2}>\n",ll, name);
-			register_dev_s(std::move(nc));
+			register_dev(std::move(nc));
 		}
 	}
-
 
 	netlist().start();
 }

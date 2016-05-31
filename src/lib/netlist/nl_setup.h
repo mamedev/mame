@@ -113,14 +113,7 @@ namespace netlist
 
 		void register_and_set_param(pstring name, param_t &param);
 
-		void register_object(object_t &obj);
-
-		template<class NETLIST_X>
-		void register_dev_s(plib::owned_ptr<NETLIST_X> dev)
-		{
-			register_dev(std::move(dev));
-		}
-
+		void register_term(core_terminal_t &obj);
 
 		void register_dev(plib::owned_ptr<device_t> dev);
 		void register_dev(const pstring &classname, const pstring &name);
@@ -202,7 +195,7 @@ namespace netlist
 		bool connect_input_input(core_terminal_t &t1, core_terminal_t &t2);
 
 		// helpers
-		pstring objtype_as_astr(object_t &in) const;
+		pstring objtype_as_str(object_t &in) const;
 
 		const pstring resolve_alias(const pstring &name) const;
 		devices::nld_base_proxy *get_d_a_proxy(core_terminal_t &out);

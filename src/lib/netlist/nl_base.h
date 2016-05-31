@@ -360,7 +360,7 @@ namespace netlist
 		};
 
 		ATTR_COLD object_t(netlist_t &nl, const pstring &aname, const type_t atype);
-		virtual ~object_t();
+		~object_t();
 
 		ATTR_COLD const pstring &name() const;
 
@@ -371,11 +371,6 @@ namespace netlist
 
 		ATTR_HOT  netlist_t & netlist() { return m_netlist; }
 		ATTR_HOT  const netlist_t & netlist() const { return m_netlist; }
-
-		ATTR_COLD void  do_reset() { reset(); }
-
-	protected:
-		virtual void reset() { }
 
 	private:
 		netlist_t & m_netlist;
@@ -398,9 +393,9 @@ namespace netlist
 		P_PREVENT_COPYING(device_object_t)
 	public:
 		ATTR_COLD device_object_t(core_device_t &dev, const pstring &aname, const type_t atype);
-		ATTR_HOT core_device_t &device() const { return *m_device; }
+		ATTR_HOT core_device_t &device() const { return m_device; }
 	private:
-		core_device_t * m_device;
+		core_device_t & m_device;
 	};
 
 
@@ -427,6 +422,7 @@ namespace netlist
 		};
 
 		ATTR_COLD core_terminal_t(core_device_t &dev, const pstring &aname, const type_t atype);
+		virtual ~core_terminal_t() { }
 
 		ATTR_COLD void set_net(net_t *anet);
 		ATTR_COLD void clear_net();
@@ -446,6 +442,9 @@ namespace netlist
 			m_state = astate;
 		}
 
+		// FIXME: need to get rid at some point
+		virtual void reset() { }
+
 	private:
 		net_t * m_net;
 		state_e m_state;
@@ -461,10 +460,6 @@ namespace netlist
 
 		ATTR_COLD analog_t(core_device_t &dev, const pstring &aname, const type_t atype)
 		: core_terminal_t(dev, aname, atype)
-		{
-		}
-
-		virtual void reset() override
 		{
 		}
 
@@ -523,7 +518,7 @@ namespace netlist
 		}
 
 	protected:
-		virtual void reset() override;
+		void reset() override;
 	private:
 		ATTR_HOT void set_ptr(nl_double *ptr, const nl_double val)
 		{
@@ -550,10 +545,6 @@ namespace netlist
 		ATTR_COLD logic_t(core_device_t &dev, const pstring &aname, const type_t atype)
 			: core_terminal_t(dev, aname, atype), logic_family_t(),
 				m_proxy(nullptr)
-		{
-		}
-
-		virtual void reset() override
 		{
 		}
 
@@ -586,7 +577,6 @@ namespace netlist
 	protected:
 		virtual void reset() override
 		{
-			logic_t::reset();
 			set_state(STATE_INP_ACTIVE);
 		}
 
@@ -623,6 +613,8 @@ namespace netlist
 
 		ATTR_COLD net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~net_t();
+
+		void reset();
 
 		ATTR_COLD void register_con(core_terminal_t &terminal);
 		ATTR_COLD void merge_net(net_t *othernet);
@@ -670,8 +662,6 @@ namespace netlist
 		}
 
 	protected:  //FIXME: needed by current solver code
-
-		virtual void reset() override;
 
 		netlist_sig_t m_new_Q;
 		netlist_sig_t m_cur_Q;
@@ -743,11 +733,9 @@ namespace netlist
 
 	protected:  //FIXME: needed by current solver code
 
-		virtual void reset() override;
+		//virtual void reset() override;
 
 	private:
-
-	public:
 
 	};
 
@@ -776,11 +764,6 @@ namespace netlist
 
 		ATTR_COLD bool already_processed(plib::pvector_t<list_t> &groups);
 		ATTR_COLD void process_net(plib::pvector_t<list_t> &groups);
-
-	protected:
-
-		virtual void reset() override;
-
 
 	private:
 
@@ -824,13 +807,7 @@ namespace netlist
 
 		ATTR_COLD analog_output_t(core_device_t &dev, const pstring &aname);
 
-		virtual void reset() override
-		{
-			set_state(STATE_OUT);
-		}
-
 		ATTR_COLD void initial(const nl_double val);
-
 		ATTR_HOT  void set_Q(const nl_double newQ);
 
 		analog_net_t *m_proxied_net; // only for proxy nets in analog input logic
@@ -859,12 +836,9 @@ namespace netlist
 		};
 
 		ATTR_COLD param_t(const param_type_t atype, device_t &device, const pstring &name);
+		virtual ~param_t() {}
 
-		ATTR_HOT  param_type_t param_type() const { return m_param_type; }
-
-	protected:
-
-		virtual void reset() override { }
+		ATTR_HOT param_type_t param_type() const { return m_param_type; }
 
 	private:
 		const param_type_t m_param_type;
@@ -974,9 +948,7 @@ namespace netlist
 			out.set_Q(val);
 		}
 
-		ATTR_HOT virtual void inc_active() {  }
-
-		ATTR_HOT virtual void dec_active() {  }
+		ATTR_COLD void  do_reset() { reset(); }
 
 	#if (NL_KEEP_STATISTICS)
 		/* stats */
@@ -989,8 +961,11 @@ namespace netlist
 
 		ATTR_HOT virtual void update() NOEXCEPT { }
 		ATTR_HOT virtual void stop() { }
+		ATTR_HOT virtual void reset() { }
 
 	public:
+		ATTR_HOT virtual void inc_active() {  }
+		ATTR_HOT virtual void dec_active() {  }
 		ATTR_HOT virtual void step_time(ATTR_UNUSED const nl_double st) { }
 		ATTR_HOT virtual void update_terminals() { }
 
@@ -1055,11 +1030,6 @@ namespace netlist
 
 		ATTR_COLD void register_subalias(const pstring &name, core_terminal_t &term);
 		ATTR_COLD void register_subalias(const pstring &name, const pstring &aliased);
-		//ATTR_COLD void register_term(const pstring &name, terminal_t &port) { register_p(name, port); }
-		//ATTR_COLD void enregister(const pstring &name, analog_output_t &out) { register_p(name, out); };
-		//ATTR_COLD void enregister(const pstring &name, logic_output_t &out) { register_p(name, out); };
-		//ATTR_COLD void enregister(const pstring &name, analog_input_t &in) { register_p(name, in); };
-		//ATTR_COLD void enregister(const pstring &name, logic_input_t &in) { register_p(name, in); };
 
 		ATTR_COLD void connect_late(const pstring &t1, const pstring &t2);
 		ATTR_COLD void connect_late(core_terminal_t &t1, core_terminal_t &t2);
@@ -1071,9 +1041,6 @@ namespace netlist
 
 		NETLIB_UPDATEI() { }
 		NETLIB_UPDATE_TERMINALSI() { }
-
-		template <class C, class T>
-		ATTR_COLD void register_param(const pstring &sname, C &param, const T initialVal);
 
 	private:
 		ATTR_COLD void register_p(const pstring &name, object_t &obj);
@@ -1113,8 +1080,6 @@ namespace netlist
 		queue_t(netlist_t &nl);
 
 	protected:
-
-		void reset() override {}
 
 		void register_state(plib::pstate_manager_t &manager, const pstring &module) override;
 		void on_pre_save() override;
