@@ -7357,8 +7357,8 @@ bbustersu:
 
 ;(birdie king) (by GeoMan)
 bking:
-@:maincpu,program,8161,9,0,0
-@:maincpu,program,8175,1,0,0
+@:main_cpu,program,8161,9,0,0
+@:main_cpu,program,8175,1,0,0
 
 ;********(red robin)
 redrobin:
