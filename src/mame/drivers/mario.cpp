@@ -227,8 +227,8 @@ static INPUT_PORTS_START( mario )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) /* doesn't work in game, but does in service mode */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
@@ -243,9 +243,9 @@ static INPUT_PORTS_START( mario )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5,!6")
-	PORT_DIPSETTING(    0x00, "20k only" )
-	PORT_DIPSETTING(    0x10, "30k only" )
-	PORT_DIPSETTING(    0x20, "40k only" )
+	PORT_DIPSETTING(    0x00, "20k 40k 20k+" )
+	PORT_DIPSETTING(    0x10, "30k 50k 20k+" )
+	PORT_DIPSETTING(    0x20, "40k 60k 20k+" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!7,!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
@@ -263,13 +263,25 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( marioo )
 	PORT_INCLUDE( mario )
 
-	PORT_MODIFY( "IN1" )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_MODIFY( "DSW" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPSETTING(    0x00, "20k only" )
+	PORT_DIPSETTING(    0x10, "30k only" )
+	PORT_DIPSETTING(    0x20, "40k only" )
+	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( marioe )
+	PORT_INCLUDE( marioo )
+
+	PORT_MODIFY ( "IN1" )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )  /* doesn't work in game, but does in service mode */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( marioj )
-	PORT_INCLUDE( mario )
+	PORT_INCLUDE( marioe )
 
 	PORT_MODIFY( "DSW" )
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!1,!2")
@@ -294,17 +306,6 @@ static INPUT_PORTS_START( marioj )
 	PORT_DIPSETTING(    0x40, "30k 60k 30k+" )
 	PORT_DIPSETTING(    0x80, "40k 70k 30k+" )
 	PORT_DIPSETTING(    0xc0, DEF_STR( None ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( masao )
-	PORT_INCLUDE( marioo )
-
-	PORT_MODIFY( "DSW" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5,!6")
-	PORT_DIPSETTING(    0x00, "20k 40k 20k+" )
-	PORT_DIPSETTING(    0x10, "30k 50k 20k+" )
-	PORT_DIPSETTING(    0x20, "40k 60k 20k+" )
-	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 INPUT_PORTS_END
 
 
@@ -831,11 +832,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,    0,       mario,   marioo, driver_device,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioe,   mario,   mario,   mario, driver_device,   0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mario,    0,       mario,   mario, driver_device,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioe,   mario,   mario,   marioe, driver_device,   0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, marioo,   mario,   mario,   marioo, driver_device,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Unknown Rev)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, marioj,   mario,   mario,   marioj, driver_device,  0, ROT0, "Nintendo", "Mario Bros. (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, masao,    mario,   masao,   masao, driver_device,   0, ROT0, "bootleg", "Masao", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, masao,    mario,   masao,   mario, driver_device,   0, ROT0, "bootleg", "Masao", MACHINE_SUPPORTS_SAVE )
 
 // todo, these might have a better home than in here
 GAME( 1983, mariobl,  mario,   mariobl, mariobl,driver_device,  0, ROT180, "bootleg", "Mario Bros. (Japan, bootleg)", MACHINE_SUPPORTS_SAVE ) // was listed as 'on extended Ambush hardware' but doesn't seem similar apart from the sound system?
