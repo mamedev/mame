@@ -260,20 +260,6 @@ static INPUT_PORTS_START( mario )
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( marioe )
-	PORT_INCLUDE( mario )
-
-	PORT_MODIFY ( "IN1" )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )  /* doesn't work in game, but does in service mode */
-	PORT_MODIFY( "DSW" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5,!6")
-	PORT_DIPSETTING(    0x00, "20k only" )
-	PORT_DIPSETTING(    0x10, "30k only" )
-	PORT_DIPSETTING(    0x20, "40k only" )
-	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( marioo )
 	PORT_INCLUDE( mario )
 
@@ -283,6 +269,15 @@ static INPUT_PORTS_START( marioo )
 	PORT_DIPSETTING(    0x10, "30k only" )
 	PORT_DIPSETTING(    0x20, "40k only" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( marioe )
+	PORT_INCLUDE( marioo )
+
+	PORT_MODIFY ( "IN1" )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )  /* doesn't work in game, but does in service mode */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( marioj )
