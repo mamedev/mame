@@ -1111,7 +1111,6 @@ polepos2:
 ;********polepos.c (pole position 2)
 polepos2b:
 polepos2a:
-poleps2c:
 @:maincpu,program,3000,7f2,d0,a2
 
 ;********polepos.c (pole position)
@@ -1582,9 +1581,6 @@ vamphalf:  ;******Vamf x1/2 (Europe)
 
 vamphalfk:  ;******Vamf x1/2 (korea)
 @:maincpu,program,5ae6c,3a,00,03
-
-turbosb6:  ;******Turbo Sub (prototype rev. TSC6)
-@:maincpu,program,3c7a,46,00,56
 
 stratvox:
 stratvoxb:
@@ -2175,7 +2171,6 @@ ghoxj:  ;******Ghox (set 2)
 
 demonwld:
 demonwld1:  
-demonwld4:  
 demonwld3:  
 demonwld2:
 @:maincpu,program,c001c2,c8,00,2d
@@ -2496,7 +2491,6 @@ sboblboblb:
 
 tehkanwc:
 tehkanwcb:  ;******Tehkan World Cup (set 2, bootleg?)
-tehkenwcc:
 @:maincpu,program,c600,60,03,17
 
 ;tantr (& clones) hiscores update after hiscore table is displayed in attract mode
@@ -2555,7 +2549,6 @@ hunchbkg:
 @:maincpu,program,1c0d,1,20,20
 
 shinobi:
-shinobl:
 shinobi1:
 shinobi2:
 shinobi3:
@@ -2653,7 +2646,6 @@ mooncrsto:
 galaxian:
 galaxianm:
 superg:
-galaxb:
 galapx:
 galap1:
 galap4:
@@ -3009,15 +3001,11 @@ cawingb2:
 
 ;*** puckman/pacman (and clones) for pacmame & regular mame builds **
 hangly3:
-zolamaze:
-mspatkx:
-mspacx:
 msmini:
 mspacat2:
 msatk2ad:
 msatkad:
 chtmsatk:
-fastplus:
 mspacatb:
 mshearts:
 mssilad:
@@ -3035,7 +3023,6 @@ msf1pac:
 mselton:
 faststrm:
 msdstorm:
-msbaby1:
 msbaby:
 mrpacman:
 pacmanf:
@@ -3047,10 +3034,8 @@ hangly2x:
 hanglyx:
 hanglyad:
 fasthang:
-chthang:
 eltonpac:
 dizzy:
-pacstrm:
 crazypac:
 caterpil:
 baby2:
@@ -3333,7 +3318,6 @@ thunderxb:  ;******thunder cross (set 3)
 @:maincpu,program,414e,1,10,10
 
 sharrier:
-sharrir1:  ;******Space Harrier (8751 317-0063?)
 @:maincpu,program,40488,4,01,00
 @:maincpu,program,43400,3dc,01,20
 @:maincpu,program,437dc,2,00,00
@@ -3442,9 +3426,6 @@ hvysmshj:
 hvysmsha:
 @:maincpu,program,100400,50,01,00
 @:maincpu,program,10000c,04,00,00
-
-powernjb:  ;******gouketsuji ichizoku(japan, bootleg)
-@:maincpu,program,18e800,28,00,05
 
 plegends:  ;******Power Instinct Legends (USA)
 plegendsj:  ;******Gouketsuji Ichizoku Saikyou Densetsu (Japan)
@@ -3995,7 +3976,6 @@ finalap3j:  ;******Final Lap 3 (Japan)
 @:maincpu,program,106000,d0,4d,19
 
 eaglshot:  ;******eagle shot golf
-eaglshta:  ;******eagle shot golf (alt)
 @:maincpu,program,20,62,48,18
 
 rdft:
@@ -5894,7 +5874,6 @@ paclandp:  ;*****not working/saving driver issue i think
 
 ;********jrpacman.c
 jrpacman:
-fastjr:
 jrpacad:
 jrhearts:
 jrvectr:
@@ -5941,7 +5920,6 @@ vecbtime:
 @:maincpu,program,0033,27,00,FF
 
 ;*******centiped.c by Ziller 
-centidux:
 pacipede:
 vectiped:
 vectrped:
@@ -6962,7 +6940,6 @@ samuraia:
 
 ;********(flower)
 flower:
-flowersj:
 @:maincpu,program,d060,37,00,20
 @:maincpu,program,c00f,3,00,00
 @:maincpu,program,c010,1,30,30
@@ -8370,7 +8347,6 @@ wb34:
 wb3:
 wb33:
 wb35:
-wb35a:
 @:maincpu,program,ffc8b8,28,4c,00
 @:maincpu,program,ffc8de,1,30,30
 
@@ -8710,7 +8686,6 @@ warriorb:
 
 ;********cps2.c (rockman 2 : the power fighters (japan 960708))
 rockman2j:
-rckman2jregion:
 @:maincpu,program,ffefc0,118,00,02
 @:maincpu,program,fff047,1,01,01
 
@@ -10613,7 +10588,6 @@ lagunar:
 @:maincpu,program,2005,3,00,00
 
 lrescue:
-warl:
 desterth:
 lrescuem:  
 lrescuem2:
@@ -11058,7 +11032,6 @@ joemac:
 cninja1:
 stoneage:
 cninjabl:
-cninjaa:
 @:maincpu,program,1877f7,1,30,30
 @:maincpu,program,1877f6,ae,00,00
 
@@ -11129,7 +11102,6 @@ panic3:
 1941:
 1941j:
 1941u:
-1941r:
 1941r1:
 @:maincpu,program,ff9680,78,ff,00
 @:maincpu,program,ff0d98,04,00,00
@@ -11219,7 +11191,6 @@ qtono2j:
 sf2:
 sf2b:
 sf2j:
-sf2jb:
 sf2ua:
 sf2ub:
 sf2ue:
@@ -12307,7 +12278,6 @@ dspirit2:
 @:maincpu,program,40d0,3,00,00
 
 galaga88:
-galag88b:
 galaga88j:
 galaga88a:
 @:maincpu,program,4a0d,6,00,00
@@ -12464,7 +12434,6 @@ pingpong:
 
 strider: ;*Missing: Stage completion information (Player name + Score)
 striderj: 
-stridrjr: 
 striderua:
 @:maincpu,program,ff89aa,78,ff,20
 @:maincpu,program,ff0ca4,04,00,00
