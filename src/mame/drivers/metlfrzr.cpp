@@ -9,10 +9,11 @@
     HW seems the natural evolution of Dark Mist type.
 
     TODO:
-    - Video registers needs better understanding.
+    - A few video register bits still needs sorting out (needs HW tests perhaps?)
     - Nuke legacy video code and re-do it by using tilemap system.
     - sprites are ahead of 1/2 frames;
-    - Writes at 0xb800-0xbfff at attract mode gameplay demo transition?
+    - Writes at 0xb800-0xbfff or 0x8000-0x9fff during gameplays? Debug?
+	- Flip screen support;
     - Why service mode returns all inputs as high? And why sound test doesn't seem to function at all, both BTANBs perhaps?
 
 **************************************************************************************************************************/
@@ -55,6 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	UINT8 m_fg_tilebank;
+	bool m_rowscroll_enable;
 };
 
 
@@ -86,7 +88,7 @@ void metlfrzr_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 	{
 		int tile_base = count;
 		int y = (count % 32);
-		if(y > 7 || m_video_regs[0x06] & 3) // TODO: this condition breaks on level 5 halfway thru.
+		if(y > 7 || m_rowscroll_enable == false)
 		{
 			tile_base+= x_scroll_base;
 			x_scroll_shift = (x_scroll_value & 7);
@@ -144,7 +146,7 @@ void metlfrzr_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 UINT32 metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
-
+	
 	legacy_bg_draw(bitmap,cliprect);
 	legacy_obj_draw(bitmap,cliprect);
 	return 0;
@@ -156,13 +158,15 @@ WRITE8_MEMBER(metlfrzr_state::output_w)
 	// bit 6-5: coin lockouts
 	// bit 4: tilemap ROM banking
 	// bit 3-2: z80 ROM banking
-	// bit 1-0: unknown purpose, both 1s too generally
+	// bit 1: enabled during gameplay, rowscroll enable?
+	// bit 0: enabled , unknown purpose (lamp?)
 	machine().bookkeeping().coin_lockout_w(1, BIT(data,6) );
 	machine().bookkeeping().coin_lockout_w(0, BIT(data,5) );
 	m_fg_tilebank = (data & 0x10) >> 4;
 	membank("bank1")->set_entry((data & 0xc) >> 2);
-
-//  popmessage("%02x",data & 3);
+	m_rowscroll_enable = bool(BIT(data,1));
+	
+//  popmessage("%02x %02x",m_fg_tilebank,data & 3);
 }
 
 static ADDRESS_MAP_START( metlfrzr_map, AS_PROGRAM, 8, metlfrzr_state )
@@ -282,7 +286,8 @@ static INPUT_PORTS_START( metlfrzr )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Level_Select ) )  PORT_DIPLOCATION("SW2:7") 
+	// disabling following enables intro / how to play screens
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Level_Select ) )  PORT_DIPLOCATION("SW2:7") 
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8") 
@@ -451,4 +456,4 @@ DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 
 
 
-GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu", "Metal Freezer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu", "Metal Freezer (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
