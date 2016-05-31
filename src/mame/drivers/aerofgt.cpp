@@ -1560,7 +1560,7 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(spinlbrk_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* there are vectors for 3 and 4 too */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold) /* there are vectors for 3 and 4 too, analog related? */
 
 	MCFG_CPU_ADD("audiocpu",Z80,XTAL_20MHz/4)   /* 5mhz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1580,7 +1580,7 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
-	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024) // doesn't fully initialize palette at start-up ...
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
