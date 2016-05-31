@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __DRCUML_H__
-#define __DRCUML_H__
+#ifndef MAME_DEVICES_CPU_DRCUML_H
+#define MAME_DEVICES_CPU_DRCUML_H
 
 #include "drccache.h"
 #include "uml.h"
@@ -28,16 +28,6 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// determine the type of the native DRC, falling back to C
-#ifndef NATIVE_DRC
-class drcbe_c;
-typedef drcbe_c drcbe_native;
-#else
-class NATIVE_DRC;
-typedef NATIVE_DRC drcbe_native;
-#endif
-
 
 // opaque structure describing UML generation state
 class drcuml_state;
@@ -263,4 +253,4 @@ inline void drcuml_block::append_comment(Format &&fmt, Params &&... args)
 }
 
 
-#endif /* __DRCUML_H__ */
+#endif /* MAME_DEVICES_CPU_DRCUML_H */
