@@ -198,12 +198,6 @@ ATTR_COLD device_object_t::device_object_t(const type_t atype)
 {
 }
 
-ATTR_COLD device_object_t::device_object_t(core_device_t &dev, const type_t atype)
-: object_t(dev.netlist(), atype)
-, m_device(&dev)
-{
-}
-
 ATTR_COLD device_object_t::device_object_t(core_device_t &dev, const pstring &aname, const type_t atype)
 : object_t(dev.netlist(), aname, atype)
 , m_device(&dev)
@@ -454,26 +448,6 @@ template class param_template_t<int, param_t::INTEGER>;
 template class param_template_t<int, param_t::LOGIC>;
 template class param_template_t<pstring, param_t::STRING>;
 template class param_template_t<pstring, param_t::MODEL>;
-
-#if 0
-template <class C, class T>
-ATTR_COLD void device_t::register_param(const pstring &sname, C &param, const T initialVal)
-{
-	pstring fullname = this->name() + "." + sname;
-	param.init_object(*this, fullname);
-	param.initial(initialVal);
-	setup().register_object(*this, fullname, param);
-}
-
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_double_t &param, const double initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_double_t &param, const float initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_int_t &param, const int initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_logic_t &param, const int initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_str_t &param, const char * const initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_str_t &param, const pstring &initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, param_model_t &param, const char * const initialVal);
-#endif
-
 
 // ----------------------------------------------------------------------------------------
 // core_device_t
@@ -904,14 +878,6 @@ ATTR_COLD core_terminal_t::core_terminal_t(const type_t atype)
 {
 }
 
-ATTR_COLD core_terminal_t::core_terminal_t(core_device_t &dev, const type_t atype)
-: device_object_t(dev, atype)
-, plinkedlist_element_t()
-, m_net(nullptr)
-, m_state(STATE_NONEX)
-{
-}
-
 ATTR_COLD core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname, const type_t atype)
 : device_object_t(dev, dev.name() + "." + aname, atype)
 , plinkedlist_element_t()
@@ -985,15 +951,6 @@ ATTR_COLD void terminal_t::reset()
 // logic_output_t
 // ----------------------------------------------------------------------------------------
 
-#if 0
-ATTR_COLD logic_output_t::logic_output_t()
-	: logic_t(OUTPUT)
-{
-	set_state(STATE_OUT);
-	this->set_net(&m_my_net);
-}
-#endif
-
 ATTR_COLD logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
 	: logic_t(dev, aname, OUTPUT)
 {
@@ -1002,12 +959,6 @@ ATTR_COLD logic_output_t::logic_output_t(core_device_t &dev, const pstring &anam
 	set_logic_family(dev.logic_family());
 	net().init_object(dev.netlist(), name() + ".net", this);
 	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
-}
-
-ATTR_COLD void logic_output_t::init_object(core_device_t &dev, const pstring &aname)
-{
-	core_terminal_t::init_object(dev, aname);
-	net().init_object(dev.netlist(), aname + ".net", this);
 }
 
 ATTR_COLD void logic_output_t::initial(const netlist_sig_t val)
@@ -1039,24 +990,6 @@ ATTR_COLD analog_output_t::analog_output_t(core_device_t &dev, const pstring &an
 	net().m_cur_Analog = NL_FCONST(0.0);
 	net().init_object(dev.netlist(), name() + ".net", this);
 	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
-}
-
-#if 0
-ATTR_COLD analog_output_t::analog_output_t()
-	: analog_t(OUTPUT), m_proxied_net(nullptr)
-{
-	this->set_net(&m_my_net);
-	set_state(STATE_OUT);
-
-	//net().m_cur_Analog = NL_FCONST(0.99);
-	net().m_cur_Analog = NL_FCONST(0.0);
-}
-#endif
-
-ATTR_COLD void analog_output_t::init_object(core_device_t &dev, const pstring &aname)
-{
-	analog_t::init_object(dev, aname);
-	net().init_object(dev.netlist(), aname + ".net", this);
 }
 
 ATTR_COLD void analog_output_t::initial(const nl_double val)

@@ -411,15 +411,9 @@ namespace netlist
 		P_PREVENT_COPYING(device_object_t)
 	public:
 		ATTR_COLD device_object_t(const type_t atype);
-		ATTR_COLD device_object_t(core_device_t &dev, const type_t atype);
 		ATTR_COLD device_object_t(core_device_t &dev, const pstring &aname, const type_t atype);
 
 		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
-
-		ATTR_COLD void set_device(core_device_t &dev)
-		{
-			m_device = &dev;
-		}
 
 		ATTR_HOT core_device_t &device() const { return *m_device; }
 	private:
@@ -451,7 +445,6 @@ namespace netlist
 
 
 		ATTR_COLD core_terminal_t(const type_t atype);
-		ATTR_COLD core_terminal_t(core_device_t &dev, const type_t atype);
 		ATTR_COLD core_terminal_t(core_device_t &dev, const pstring &aname, const type_t atype);
 
 		ATTR_COLD void set_net(net_t *anet);
@@ -484,17 +477,6 @@ namespace netlist
 	class analog_t : public core_terminal_t
 	{
 	public:
-
-
-		ATTR_COLD analog_t(const type_t atype)
-		: core_terminal_t(atype)
-		{
-		}
-
-		ATTR_COLD analog_t(core_device_t &dev, const type_t atype)
-		: core_terminal_t(dev, atype)
-		{
-		}
 
 		ATTR_COLD analog_t(core_device_t &dev, const pstring &aname, const type_t atype)
 		: core_terminal_t(dev, aname, atype)
@@ -626,7 +608,6 @@ namespace netlist
 		}
 
 		ATTR_HOT  netlist_sig_t Q() const;
-		ATTR_HOT  netlist_sig_t last_Q() const;
 
 		ATTR_HOT  void inactivate();
 		ATTR_HOT  void activate();
@@ -853,10 +834,8 @@ namespace netlist
 		P_PREVENT_COPYING(logic_output_t)
 	public:
 
-		//ATTR_COLD logic_output_t();
 		ATTR_COLD logic_output_t(core_device_t &dev, const pstring &aname);
 
-		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
 		virtual void reset() override
 		{
 			set_state(STATE_OUT);
@@ -875,13 +854,11 @@ namespace netlist
 
 	class analog_output_t : public analog_t
 	{
-		//P_PREVENT_COPYING(analog_output_t)
+		P_PREVENT_COPYING(analog_output_t)
 	public:
 
 		ATTR_COLD analog_output_t(core_device_t &dev, const pstring &aname);
-		//ATTR_COLD analog_output_t();
 
-		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
 		virtual void reset() override
 		{
 			set_state(STATE_OUT);
@@ -1014,8 +991,6 @@ namespace netlist
 
 		ATTR_HOT  netlist_sig_t INPLOGIC(const logic_input_t &inp) const
 		{
-			//if (inp.state() == logic_t::STATE_INP_PASSIVE)
-			//	printf("argh input %s\n", inp.name().cstr());
 			nl_assert(inp.state() != logic_t::STATE_INP_PASSIVE);
 			return inp.Q();
 		}

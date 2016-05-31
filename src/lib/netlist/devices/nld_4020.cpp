@@ -8,23 +8,6 @@
 #include <devices/nlid_cmos.h>
 #include "nld_4020.h"
 
-struct a
-{
-	const char *p[3];
-};
-
-void test(a p)
-{
-	for (int i=1; i<3; i++)
-		printf("%s\n", p.p[i]);
-}
-
-void tt()
-{
-	//const char *p[3] = {"a", "b", "c"};
-	test({"a", "b", "c"});
-}
-
 namespace netlist
 {
 

@@ -105,7 +105,6 @@ void setup_t::register_dev(plib::owned_ptr<device_t> dev)
 	for (auto & d : netlist().m_devices)
 		if (d->name() == dev->name())
 			log().fatal("Error adding {1} to device list. Duplicate name \n", d->name());
-	printf("dev %s\n", dev->name().cstr());
 	netlist().m_devices.push_back(std::move(dev));
 }
 
