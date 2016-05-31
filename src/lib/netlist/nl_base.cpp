@@ -154,16 +154,6 @@ void queue_t::on_post_load()
 // object_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD object_t::object_t(const type_t atype)
-: m_objtype(atype)
-, m_netlist(nullptr)
-{}
-
-ATTR_COLD object_t::object_t(netlist_t &nl, const type_t atype)
-: m_objtype(atype)
-, m_netlist(&nl)
-{}
-
 ATTR_COLD object_t::object_t(netlist_t &nl, const pstring &aname, const type_t atype)
 : m_name(aname)
 , m_objtype(atype)
@@ -175,16 +165,8 @@ ATTR_COLD object_t::~object_t()
 {
 }
 
-ATTR_COLD void object_t::init_object(netlist_t &nl, const pstring &aname)
-{
-	m_netlist = &nl;
-	m_name = aname;
-}
-
 ATTR_COLD const pstring &object_t::name() const
 {
-	if (m_name == "")
-		netlist().log().fatal("object not initialized");
 	return m_name;
 }
 
@@ -192,25 +174,12 @@ ATTR_COLD const pstring &object_t::name() const
 // device_object_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD device_object_t::device_object_t(const type_t atype)
-: object_t(atype)
-, m_device(nullptr)
-{
-}
-
 ATTR_COLD device_object_t::device_object_t(core_device_t &dev, const pstring &aname, const type_t atype)
 : object_t(dev.netlist(), aname, atype)
 , m_device(&dev)
 {
 }
 
-
-ATTR_COLD void device_object_t::init_object(core_device_t &dev,
-		const pstring &aname)
-{
-	object_t::init_object(dev.netlist(), aname);
-	m_device = &dev;
-}
 
 // ----------------------------------------------------------------------------------------
 // netlist_t
@@ -454,7 +423,7 @@ template class param_template_t<pstring, param_t::MODEL>;
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD core_device_t::core_device_t(netlist_t &owner, const pstring &name)
-: object_t(DEVICE), logic_family_t()
+: object_t(owner, name, DEVICE), logic_family_t()
 #if (NL_KEEP_STATISTICS)
 	, stat_total_time(0)
 	, stat_update_count(0)
@@ -463,11 +432,11 @@ ATTR_COLD core_device_t::core_device_t(netlist_t &owner, const pstring &name)
 {
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
-	init_object(owner, name);
 }
 
 ATTR_COLD core_device_t::core_device_t(core_device_t &owner, const pstring &name)
-: object_t(DEVICE), logic_family_t()
+	: object_t(owner.netlist(), owner.name() + "." + name, DEVICE)
+	, logic_family_t()
 #if (NL_KEEP_STATISTICS)
 	, stat_total_time(0)
 	, stat_update_count(0)
@@ -477,7 +446,6 @@ ATTR_COLD core_device_t::core_device_t(core_device_t &owner, const pstring &name
 	set_logic_family(owner.logic_family());
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
-	init_object(owner.netlist(), owner.name() + "." + name);
 	owner.netlist().m_devices.push_back(plib::owned_ptr<core_device_t>(this, false));
 }
 
@@ -562,7 +530,7 @@ ATTR_COLD void device_t::register_subalias(const pstring &name, const pstring &a
 
 ATTR_COLD void device_t::register_p(const pstring &name, object_t &obj)
 {
-	setup().register_object(*this, name, obj);
+	setup().register_object(obj);
 }
 
 ATTR_COLD void device_t::connect_late(core_terminal_t &t1, core_terminal_t &t2)
@@ -603,8 +571,15 @@ family_setter_t::family_setter_t(core_device_t &dev, const logic_family_desc_t *
 // net_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD net_t::net_t()
-	: object_t(NET)
+// FIXME: move somewhere central
+
+struct do_nothing_deleter{
+    template<typename T> void operator()(T*){}
+};
+
+
+ATTR_COLD net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
+	: object_t(nl, aname, NET)
 	, m_new_Q(0)
 	, m_cur_Q (0)
 	, m_railterminal(nullptr)
@@ -613,23 +588,6 @@ ATTR_COLD net_t::net_t()
 	, m_in_queue(2)
 	, m_cur_Analog(0.0)
 {
-}
-
-ATTR_COLD net_t::~net_t()
-{
-	if (isInitialized())
-		netlist().remove_save_items(this);
-}
-
-// FIXME: move somewhere central
-
-struct do_nothing_deleter{
-    template<typename T> void operator()(T*){}
-};
-
-ATTR_COLD void net_t::init_object(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
-{
-	object_t::init_object(nl, aname);
 	m_railterminal = mr;
 	if (mr != nullptr)
 		nl.m_nets.push_back(std::shared_ptr<net_t>(this, do_nothing_deleter()));
@@ -642,6 +600,11 @@ ATTR_COLD void net_t::init_object(netlist_t &nl, const pstring &aname, core_term
 	save(NLNAME(m_cur_Analog));
 	save(NLNAME(m_cur_Q));
 	save(NLNAME(m_new_Q));
+}
+
+ATTR_COLD net_t::~net_t()
+{
+	netlist().remove_save_items(this);
 }
 
 ATTR_HOT void net_t::inc_active(core_terminal_t &term)
@@ -802,8 +765,8 @@ ATTR_COLD void net_t::merge_net(net_t *othernet)
 // logic_net_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD logic_net_t::logic_net_t()
-	: net_t()
+ATTR_COLD logic_net_t::logic_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
+	: net_t(nl, aname, mr)
 {
 }
 
@@ -817,17 +780,10 @@ ATTR_COLD void logic_net_t::reset()
 // analog_net_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD analog_net_t::analog_net_t()
-	: net_t()
+ATTR_COLD analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
+	: net_t(nl, aname, mr)
 	, m_solver(nullptr)
 {
-}
-
-ATTR_COLD analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname)
-	: net_t()
-	, m_solver(nullptr)
-{
-	init_object(nl, aname);
 }
 
 ATTR_COLD void analog_net_t::reset()
@@ -870,14 +826,6 @@ ATTR_COLD void analog_net_t::process_net(plib::pvector_t<list_t> &groups)
 // core_terminal_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD core_terminal_t::core_terminal_t(const type_t atype)
-: device_object_t(atype)
-, plinkedlist_element_t()
-, m_net(nullptr)
-, m_state(STATE_NONEX)
-{
-}
-
 ATTR_COLD core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname, const type_t atype)
 : device_object_t(dev, dev.name() + "." + aname, atype)
 , plinkedlist_element_t()
@@ -909,7 +857,7 @@ ATTR_COLD terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
 , m_go1(nullptr)
 , m_gt1(nullptr)
 {
-	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
+	netlist().setup().register_object(*this);
 	save(NLNAME(m_Idr1));
 	save(NLNAME(m_go1));
 	save(NLNAME(m_gt1));
@@ -953,12 +901,12 @@ ATTR_COLD void terminal_t::reset()
 
 ATTR_COLD logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
 	: logic_t(dev, aname, OUTPUT)
+	, m_my_net(dev.netlist(), name() + ".net", this)
 {
 	set_state(STATE_OUT);
 	this->set_net(&m_my_net);
 	set_logic_family(dev.logic_family());
-	net().init_object(dev.netlist(), name() + ".net", this);
-	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
+	netlist().setup().register_object(*this);
 }
 
 ATTR_COLD void logic_output_t::initial(const netlist_sig_t val)
@@ -974,7 +922,7 @@ ATTR_COLD analog_input_t::analog_input_t(core_device_t &dev, const pstring &anam
 : analog_t(dev, aname, INPUT)
 {
 	set_state(STATE_INP_ACTIVE);
-	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
+	netlist().setup().register_object(*this);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -983,13 +931,13 @@ ATTR_COLD analog_input_t::analog_input_t(core_device_t &dev, const pstring &anam
 
 ATTR_COLD analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
 	: analog_t(dev, aname, OUTPUT), m_proxied_net(nullptr)
+	, m_my_net(dev.netlist(), name() + ".net", this)
 {
 	this->set_net(&m_my_net);
 	set_state(STATE_OUT);
 
 	net().m_cur_Analog = NL_FCONST(0.0);
-	net().init_object(dev.netlist(), name() + ".net", this);
-	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
+	netlist().setup().register_object(*this);
 }
 
 ATTR_COLD void analog_output_t::initial(const nl_double val)
@@ -1006,8 +954,7 @@ ATTR_COLD logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname)
 {
 	set_state(STATE_INP_ACTIVE);
 	set_logic_family(dev.logic_family());
-	//init_object(dev, dev.name() + "." + name);
-	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
+	netlist().setup().register_object(*this);
 }
 
 // ----------------------------------------------------------------------------------------

@@ -359,14 +359,9 @@ namespace netlist
 			QUEUE    = 6
 		};
 
-		ATTR_COLD object_t(const type_t atype);
-		ATTR_COLD object_t(netlist_t &nl, const type_t atype);
 		ATTR_COLD object_t(netlist_t &nl, const pstring &aname, const type_t atype);
 
 		virtual ~object_t();
-
-		ATTR_COLD void init_object(netlist_t &nl, const pstring &aname);
-		ATTR_COLD bool isInitialized() { return (m_netlist != nullptr); }
 
 		ATTR_COLD const pstring &name() const;
 
@@ -410,11 +405,7 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(device_object_t)
 	public:
-		ATTR_COLD device_object_t(const type_t atype);
 		ATTR_COLD device_object_t(core_device_t &dev, const pstring &aname, const type_t atype);
-
-		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
-
 		ATTR_HOT core_device_t &device() const { return *m_device; }
 	private:
 		core_device_t * m_device;
@@ -443,8 +434,6 @@ namespace netlist
 			STATE_NONEX = 256
 		};
 
-
-		ATTR_COLD core_terminal_t(const type_t atype);
 		ATTR_COLD core_terminal_t(core_device_t &dev, const pstring &aname, const type_t atype);
 
 		ATTR_COLD void set_net(net_t *anet);
@@ -566,14 +555,6 @@ namespace netlist
 	class logic_t : public core_terminal_t, public logic_family_t
 	{
 	public:
-
-
-		ATTR_COLD logic_t(const type_t atype)
-			: core_terminal_t(atype), logic_family_t(),
-				m_proxy(nullptr)
-		{
-		}
-
 		ATTR_COLD logic_t(core_device_t &dev, const pstring &aname, const type_t atype)
 			: core_terminal_t(dev, aname, atype), logic_family_t(),
 				m_proxy(nullptr)
@@ -638,7 +619,7 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
-	// net_net_t
+	// net_t
 	// -----------------------------------------------------------------------------
 
 	class net_t : public object_t
@@ -649,10 +630,8 @@ namespace netlist
 		using ptr_t = net_t *;
 		using list_t = plib::pvector_t<std::shared_ptr<net_t>>;
 
-		ATTR_COLD net_t();
+		ATTR_COLD net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~net_t();
-
-		ATTR_COLD void init_object(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 
 		ATTR_COLD void register_con(core_terminal_t &terminal);
 		ATTR_COLD void merge_net(net_t *othernet);
@@ -730,7 +709,7 @@ namespace netlist
 
 		using list_t = plib::pvector_t<logic_net_t *>;
 
-		ATTR_COLD logic_net_t();
+		ATTR_COLD logic_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t() { };
 
 		ATTR_HOT  netlist_sig_t Q() const
@@ -788,8 +767,7 @@ namespace netlist
 
 		using list_t =  plib::pvector_t<analog_net_t *>;
 
-		ATTR_COLD analog_net_t();
-		ATTR_COLD analog_net_t(netlist_t &nl, const pstring &aname);
+		ATTR_COLD analog_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 
 		virtual ~analog_net_t() { };
 
