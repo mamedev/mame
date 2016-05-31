@@ -75,7 +75,8 @@ public:
 	required_device<dcs2_audio_denver_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
 	required_device<nvram_device> m_rtc;
-	std::vector<UINT8> m_rtc_data;
+	UINT8 m_rtc_data[0x800];
+
 	UINT32 m_last_offset;
 	READ8_MEMBER(cmos_r);
 	WRITE8_MEMBER(cmos_w);
@@ -89,11 +90,11 @@ public:
 
 	DECLARE_WRITE32_MEMBER(zeus_w);
 	DECLARE_READ32_MEMBER(zeus_r);
-	std::vector<UINT32> m_zeus_data;
+	UINT32 m_zeus_data[0x80];
 
 	READ8_MEMBER (red_r);
 	WRITE8_MEMBER(red_w);
-	std::vector<UINT8> m_red_data;
+	UINT8 m_red_data[0x1000];
 	int m_red_count;
 
 	READ32_MEMBER (green_r);
@@ -372,12 +373,8 @@ READ32_MEMBER(atlantis_state::cmos_protect_r)
 
 void atlantis_state::machine_start()
 {
-	m_zeus_data.resize(0x80);
+	m_rtc->set_base(m_rtc_data, sizeof(m_rtc_data));
 
-	m_rtc_data.resize(0x800);
-	m_rtc->set_base(m_rtc_data.data(), m_rtc_data.size());
-
-	m_red_data.resize(0x1000);
 	/* set the fastest DRC options */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 }
@@ -396,7 +393,7 @@ void atlantis_state::machine_reset()
 	m_dcs->reset_w(0);
 	m_user_io_state = 0;
 	m_cmos_write_enabled = FALSE;
-	memset(m_zeus_data.data(), 0, sizeof(UINT32)*m_zeus_data.size());
+	memset(m_zeus_data, 0, sizeof(m_zeus_data));
 	m_red_count = 0;
 }
 

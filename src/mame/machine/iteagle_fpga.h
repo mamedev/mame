@@ -54,9 +54,9 @@ private:
 	int m_irq_num;
 	int m_serial_irq_num;
 
-	UINT32 m_fpga_regs[0x20/4];
-	std::vector<UINT32> m_rtc_regs;
-	UINT32 m_ram[0x20000/4];
+	UINT32 m_fpga_regs[0x20 / 4];
+	UINT32 m_rtc_regs[0x800 / 4];
+	UINT32 m_ram[0x20000 / 4];
 	UINT32 m_prev_reg;
 
 	std::string m_serial_str;
@@ -108,7 +108,7 @@ private:
 	UINT16 m_sw_version;
 	UINT8 m_hw_version;
 
-	std::vector<UINT16> iteagle_default_eeprom; // 0x40
+	std::array<UINT16, 0x40> m_iteagle_default_eeprom;
 
 	DECLARE_ADDRESS_MAP(eeprom_map, 32);
 	DECLARE_READ32_MEMBER( eeprom_r );
@@ -128,7 +128,7 @@ private:
 	optional_device<nvram_device> m_rtc;
 
 	UINT32 m_ctrl_regs[0xd0/4];
-	std::vector<UINT8> m_rtc_regs;
+	UINT8 m_rtc_regs[0x100];
 
 	DECLARE_ADDRESS_MAP(ctrl_map, 32);
 

@@ -29,7 +29,7 @@ gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, d
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
 		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32),
 		m_romRegion(*this, "rom"),
-		m_updateRegion(*this, "update"), m_cs_map(4)
+		m_updateRegion(*this, "update")
 {
 }
 
@@ -61,9 +61,6 @@ void gt64xxx_device::device_start()
 	io_window_end   = 0xffffffff;
 	io_offset       = 0x00000000;
 	status = 0x0;
-
-	//dma_addr_map.reserve(static_cast<size_t>(proc_addr_bank::ADDR_NUM));
-	dma_addr_map.resize(static_cast<size_t>(proc_addr_bank::ADDR_NUM));
 
 	// DMA timer
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::perform_dma), this));
