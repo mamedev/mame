@@ -19,11 +19,11 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(CD4020_sub)
 		NETLIB_FAMILY("CD4XXX")
+		, m_IP(*this, "IP")
 		, m_Q(*this, {"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
 				"Q10", "Q11", "Q12", "Q13", "Q14"})
 		, m_cnt(0)
 		{
-			enregister("IP", m_IP);
 			save(NLNAME(m_cnt));
 		}
 
@@ -50,9 +50,8 @@ namespace netlist
 		NETLIB_FAMILY("CD4XXX")
 		, m_sub(*this, "sub")
 		, m_supply(*this, "supply")
+		, m_RESET(*this, "RESET")
 		{
-
-			enregister("RESET", m_RESET);
 			register_subalias("IP", m_sub.m_IP);
 			register_subalias("Q1", m_sub.m_Q[0]);
 			register_subalias("Q4", m_sub.m_Q[3]);

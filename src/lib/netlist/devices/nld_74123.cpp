@@ -26,6 +26,9 @@ namespace netlist
 		, m_RN(*this, "RN")
 		, m_RP_Q(*this, "_RP_Q")
 		, m_RN_Q(*this, "_RN_Q")
+		, m_A(*this, "A")
+		, m_B(*this, "B")
+		, m_CLRQ(*this, "CLRQ")
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_CV(*this, "_CV") // internal
@@ -34,10 +37,6 @@ namespace netlist
 		{
 			if ((m_dev_type != 9602) && (m_dev_type != 4538) )
 				m_dev_type = 74123;
-
-			enregister("A", m_A);
-			enregister("B", m_B);
-			enregister("CLRQ", m_CLRQ);
 
 			register_subalias("GND", m_RN.m_R.m_N);
 			register_subalias("VCC", m_RP.m_R.m_P);

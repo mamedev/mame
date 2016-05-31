@@ -16,11 +16,11 @@ namespace netlist
 	NETLIB_OBJECT(nicRSFF)
 	{
 		NETLIB_CONSTRUCTOR(nicRSFF)
+		, m_S(*this, "S")
+		, m_R(*this, "R")
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		{
-			enregister("S", m_S);
-			enregister("R", m_R);
 		}
 
 		NETLIB_RESETI();
@@ -38,13 +38,12 @@ namespace netlist
 	NETLIB_OBJECT(nicDelay)
 	{
 		NETLIB_CONSTRUCTOR(nicDelay)
+		, m_I(*this, "1")
 		, m_Q(*this, "2")
 		, m_L_to_H(*this, "L_TO_H", 10)
 		, m_H_to_L(*this, "H_TO_L", 10)
 		, m_last(0)
 		{
-			enregister("1", m_I);
-
 			save(NLNAME(m_last));
 		}
 

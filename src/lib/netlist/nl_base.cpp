@@ -997,6 +997,19 @@ ATTR_COLD void analog_output_t::initial(const nl_double val)
 	net().m_cur_Analog = val;
 }
 
+// -----------------------------------------------------------------------------
+// logic_input_t
+// -----------------------------------------------------------------------------
+
+ATTR_COLD logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname)
+		: logic_t(dev, aname, INPUT)
+{
+	set_state(STATE_INP_ACTIVE);
+	set_logic_family(dev.logic_family());
+	//init_object(dev, dev.name() + "." + name);
+	netlist().setup().register_object(dynamic_cast<device_t &>(dev), aname, *this);
+}
+
 // ----------------------------------------------------------------------------------------
 // param_t & friends
 // ----------------------------------------------------------------------------------------

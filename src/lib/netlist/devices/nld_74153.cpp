@@ -20,15 +20,11 @@ namespace netlist
 	NETLIB_OBJECT(74153sub)
 	{
 		NETLIB_CONSTRUCTOR(74153sub)
+		, m_C(*this, {"C0", "C1", "C2", "C3"})
+		, m_G(*this, "G")
 		, m_Y(*this, "AY") //FIXME: Change netlists
 		, m_chan(0)
 		{
-			enregister("C0", m_C[0]);
-			enregister("C1", m_C[1]);
-			enregister("C2", m_C[2]);
-			enregister("C3", m_C[3]);
-			enregister("G", m_G);
-
 			save(NLNAME(m_chan));
 		}
 
@@ -36,7 +32,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		logic_input_t m_C[4];
+		object_array_t<logic_input_t, 4> m_C;
 		logic_input_t m_G;
 
 		logic_output_t m_Y;
@@ -48,14 +44,14 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(74153)
 		, m_sub(*this, "sub")
+		, m_A(*this, "A")
+		, m_B(*this, "B")
 		{
 
 			register_subalias("C0", m_sub.m_C[0]);
 			register_subalias("C1",  m_sub.m_C[1]);
 			register_subalias("C2",  m_sub.m_C[2]);
 			register_subalias("C3",  m_sub.m_C[3]);
-			enregister("A", m_A);
-			enregister("B", m_B);
 			register_subalias("G",  m_sub.m_G);
 
 			register_subalias("AY",  m_sub.m_Y); //FIXME: Change netlists
@@ -73,10 +69,11 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(74153_dip)
 		, m_1(*this, "1")
 		, m_2(*this, "2")
+		, m_A(*this, "14")   // m_2.m_B
+		, m_B(*this, "2")    // m_2.m_B
 		{
 
 			register_subalias("1", m_1.m_G);
-			enregister("2", m_B);    // m_2.m_B
 			register_subalias("3", m_1.m_C[3]);
 			register_subalias("4", m_1.m_C[2]);
 			register_subalias("5", m_1.m_C[1]);
@@ -89,7 +86,6 @@ namespace netlist
 			register_subalias("12", m_2.m_C[2]);
 			register_subalias("13", m_2.m_C[3]);
 
-			enregister("14", m_A);   // m_2.m_B
 			register_subalias("15", m_2.m_G);
 
 		}

@@ -165,9 +165,9 @@ public:
 
 		for (unsigned i=0; i < m_NI; i++)
 		{
-			new (&m_I[i]) logic_input_t();
+			//new (&m_I[i]) logic_input_t();
 			inout[i] = inout[i].trim();
-			enregister(inout[i], m_I[i]);
+			m_I.emplace(i, *this, inout[i]);
 		}
 		for (unsigned i=0; i < m_NO; i++)
 		{

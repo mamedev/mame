@@ -86,10 +86,10 @@ namespace netlist
 	NETLIB_OBJECT(clock)
 	{
 		NETLIB_CONSTRUCTOR(clock)
+		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
 		{
-			enregister("FB", m_feedback);
 
 			m_inc = netlist_time::from_hz(m_freq.Value()*2);
 
@@ -117,10 +117,9 @@ namespace netlist
 		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
 		, m_pattern(*this, "PATTERN", "1,1")
 		, m_offset(*this, "OFFSET", 0.0)
+		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
 		{
-			enregister("FB", m_feedback);
-
 			m_inc[0] = netlist_time::from_hz(m_freq.Value()*2);
 
 			connect_late(m_feedback, m_Q);
@@ -390,12 +389,11 @@ namespace netlist
 	public:
 		NETLIB_CONSTRUCTOR(res_sw)
 		, m_R(*this, "R")
+		, m_I(*this, "I")
 		, m_RON(*this, "RON", 1.0)
 		, m_ROFF(*this, "ROFF", 1.0E20)
 		, m_last_state(0)
 		{
-			enregister("I", m_I);
-
 			register_subalias("1", m_R.m_P);
 			register_subalias("2", m_R.m_N);
 
@@ -503,9 +501,9 @@ namespace netlist
 
 	protected:
 		nld_base_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied, core_terminal_t &proxy_out)
-				: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
+		: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
+		, m_I(*this, "I")
 		{
-			enregister("I", m_I);
 		}
 
 		logic_input_t m_I;

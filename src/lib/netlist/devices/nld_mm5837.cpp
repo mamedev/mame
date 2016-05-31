@@ -25,11 +25,11 @@ namespace netlist
 		, m_VGG(*this, "2")
 		, m_VSS(*this, "4")
 		, m_V0(*this, "_Q")
+		/* clock */
+		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
 		, m_is_timestep(false)
 		{
-			/* clock */
-			enregister("FB", m_feedback);
 			m_inc = netlist_time::from_hz(56000);
 			connect_late(m_feedback, m_Q);
 

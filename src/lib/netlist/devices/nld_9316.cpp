@@ -17,11 +17,11 @@ namespace netlist
 	NETLIB_OBJECT(9316_subABCD)
 	{
 		NETLIB_CONSTRUCTOR(9316_subABCD)
+		, m_A(*this, "A")
+		, m_B(*this, "B")
+		, m_C(*this, "C")
+		, m_D(*this, "D")
 		{
-			enregister("A", m_A);
-			enregister("B", m_B);
-			enregister("C", m_C);
-			enregister("D", m_D);
 		}
 
 		NETLIB_RESETI()
@@ -51,6 +51,7 @@ namespace netlist
 	NETLIB_OBJECT(9316_sub)
 	{
 		NETLIB_CONSTRUCTOR(9316_sub)
+		, m_CLK(*this, "CLK")
 		, m_QA(*this, "QA")
 		, m_QB(*this, "QB")
 		, m_QC(*this, "QC")
@@ -61,7 +62,6 @@ namespace netlist
 		, m_loadq(0)
 		, m_ent(0)
 		{
-			enregister("CLK", m_CLK);
 
 			save(NLNAME(m_cnt));
 			save(NLNAME(m_loadq));
@@ -94,15 +94,14 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(9316)
 		, sub(*this, "sub")
 		, subABCD(*this, "subABCD")
+		, m_ENP(*this, "ENP")
+		, m_ENT(*this, "ENT")
+		, m_CLRQ(*this, "CLRQ")
+		, m_LOADQ(*this, "LOADQ")
 		{
 			sub.m_ABCD = &(subABCD);
 
 			register_subalias("CLK", sub.m_CLK);
-
-			enregister("ENP", m_ENP);
-			enregister("ENT", m_ENT);
-			enregister("CLRQ", m_CLRQ);
-			enregister("LOADQ", m_LOADQ);
 
 			register_subalias("A", subABCD.m_A);
 			register_subalias("B", subABCD.m_B);

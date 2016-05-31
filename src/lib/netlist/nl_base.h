@@ -601,11 +601,7 @@ namespace netlist
 	class logic_input_t : public logic_t
 	{
 	public:
-		ATTR_COLD logic_input_t()
-			: logic_t(INPUT)
-		{
-			set_state(STATE_INP_ACTIVE);
-		}
+		ATTR_COLD logic_input_t(core_device_t &dev, const pstring &aname);
 
 		ATTR_HOT  netlist_sig_t Q() const;
 
@@ -1094,7 +1090,7 @@ namespace netlist
 		//ATTR_COLD void enregister(const pstring &name, analog_output_t &out) { register_p(name, out); };
 		//ATTR_COLD void enregister(const pstring &name, logic_output_t &out) { register_p(name, out); };
 		//ATTR_COLD void enregister(const pstring &name, analog_input_t &in) { register_p(name, in); };
-		ATTR_COLD void enregister(const pstring &name, logic_input_t &in) { register_p(name, in); };
+		//ATTR_COLD void enregister(const pstring &name, logic_input_t &in) { register_p(name, in); };
 
 		ATTR_COLD void connect_late(const pstring &t1, const pstring &t2);
 		ATTR_COLD void connect_late(core_terminal_t &t1, core_terminal_t &t2);

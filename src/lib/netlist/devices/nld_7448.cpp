@@ -28,17 +28,16 @@ namespace netlist
 	NETLIB_OBJECT(7448)
 	{
 		NETLIB_CONSTRUCTOR(7448)
+		, m_A(*this, "A")
+		, m_B(*this, "B")
+		, m_C(*this, "C")
+		, m_D(*this, "D")
+		, m_LTQ(*this, "LTQ")
+		, m_BIQ(*this, "BIQ")
+		, m_RBIQ(*this, "RBIQ")
 		, m_state(0)
 		, m_Q(*this, {"a", "b", "c", "d", "e", "f", "g"})
 		{
-			enregister("A", m_A);
-			enregister("B", m_B);
-			enregister("C", m_C);
-			enregister("D", m_D);
-			enregister("LTQ", m_LTQ);
-			enregister("BIQ", m_BIQ);
-			enregister("RBIQ", m_RBIQ);
-
 			save(NLNAME(m_state));
 		}
 

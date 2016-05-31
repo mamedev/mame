@@ -15,18 +15,17 @@ namespace netlist
 	NETLIB_OBJECT(7490)
 	{
 		NETLIB_CONSTRUCTOR(7490)
+		, m_A(*this, "A")
+		, m_B(*this, "B")
+		, m_R1(*this, "R1")
+		, m_R2(*this, "R2")
+		, m_R91(*this, "R91")
+		, m_R92(*this, "R92")
 		, m_cnt(0)
 		, m_last_A(0)
 		, m_last_B(0)
 		, m_Q(*this, {"QA", "QB", "QC", "QD"})
 		{
-			enregister("A", m_A);
-			enregister("B", m_B);
-			enregister("R1",  m_R1);
-			enregister("R2",  m_R2);
-			enregister("R91", m_R91);
-			enregister("R92", m_R92);
-
 			save(NLNAME(m_cnt));
 			save(NLNAME(m_last_A));
 			save(NLNAME(m_last_B));
@@ -38,12 +37,12 @@ namespace netlist
 	protected:
 		ATTR_HOT void update_outputs();
 
+		logic_input_t m_A;
+		logic_input_t m_B;
 		logic_input_t m_R1;
 		logic_input_t m_R2;
 		logic_input_t m_R91;
 		logic_input_t m_R92;
-		logic_input_t m_A;
-		logic_input_t m_B;
 
 		UINT8 m_cnt;
 		UINT8 m_last_A;
