@@ -30,7 +30,7 @@ namespace netlist
 
 	NETLIB_UPDATE(clock)
 	{
-		OUTLOGIC(m_Q, !m_Q.net().as_logic().new_Q(), m_inc  );
+		OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -40,29 +40,15 @@ namespace netlist
 	NETLIB_RESET(extclock)
 	{
 		m_cnt = 0;
-		m_off = netlist_time::from_double(m_offset.Value());
+		m_off = netlist_time(m_offset.Value());
 		//m_Q.initial(0);
 	}
 
 	NETLIB_UPDATE(extclock)
 	{
-	#if 0
-		if (m_off == netlist_time::zero)
-		{
-			OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[m_cnt]);
-			m_cnt = (m_cnt + 1) % m_size;
-		}
-		else
-		{
-			OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[0] + m_off);
-			m_cnt = 1;
-			m_off = netlist_time::zero;
-		}
-	#else
 		OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
 		m_cnt = (m_cnt + 1) % m_size;
-		m_off = netlist_time::zero;
-	#endif
+		m_off = netlist_time::zero();
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -71,8 +57,7 @@ namespace netlist
 
 	NETLIB_RESET(logic_input)
 	{
-		//FIXME: causes issues in breakout (lots of pings after first player 1 start)
-		//m_Q.initial(m_IN.Value() & 1);
+		m_Q.initial(0);
 	}
 
 	NETLIB_UPDATE(logic_input)
@@ -90,7 +75,7 @@ namespace netlist
 
 	NETLIB_RESET(analog_input)
 	{
-	//	m_Q.initial(m_IN.Value() * 0.999);
+		m_Q.initial(0.0);
 	}
 
 	NETLIB_UPDATE(analog_input)

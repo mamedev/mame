@@ -10,6 +10,7 @@
 
 #include "nl_factory.h"
 #include "nl_setup.h"
+#include "plib/putil.h"
 
 namespace netlist
 {
@@ -18,7 +19,7 @@ namespace netlist
 // net_device_t_base_factory
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD const plib::pstring_vector_t base_factory_t::term_param_list()
+const plib::pstring_vector_t base_factory_t::term_param_list()
 {
 	if (m_def_param.startsWith("+"))
 		return plib::pstring_vector_t(m_def_param.substr(1), ",");
@@ -26,7 +27,7 @@ ATTR_COLD const plib::pstring_vector_t base_factory_t::term_param_list()
 		return plib::pstring_vector_t();
 }
 
-ATTR_COLD const plib::pstring_vector_t base_factory_t::def_params()
+const plib::pstring_vector_t base_factory_t::def_params()
 {
 	if (m_def_param.startsWith("+") || m_def_param.equals("-"))
 		return plib::pstring_vector_t();

@@ -27,8 +27,8 @@ namespace netlist
 		NETLIB_RESETI() {};
 
 	public:
-		ATTR_HOT inline nl_double vdd() { return INPANALOG(m_vdd); }
-		ATTR_HOT inline nl_double vss() { return INPANALOG(m_vss); }
+		inline nl_double vdd() { return INPANALOG(m_vdd); }
+		inline nl_double vss() { return INPANALOG(m_vss); }
 
 		analog_input_t m_vdd;
 		analog_input_t m_vss;

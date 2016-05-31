@@ -157,8 +157,8 @@ public:
 		r.m_ptr = nullptr;
 		return *this;
 	}
-	SC * operator ->() { return m_ptr; }
-	SC & operator *() { return *m_ptr; }
+	SC * operator ->() const { return m_ptr; }
+	SC & operator *() const { return *m_ptr; }
 	SC * get() const { return m_ptr; }
 private:
 	SC *m_ptr;

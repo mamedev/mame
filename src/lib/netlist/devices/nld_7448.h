@@ -25,7 +25,6 @@
 #define NLD_7448_H_
 
 #include "nl_base.h"
-#include "nld_truthtable.h"
 
 #define TTL_7448(name, cA0, cA1, cA2, cA3, cLTQ, cBIQ, cRBIQ)                   \
 		NET_REGISTER_DEV(TTL_7448, name)                                        \

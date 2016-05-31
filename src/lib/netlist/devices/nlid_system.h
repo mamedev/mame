@@ -54,7 +54,7 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_Q.net().set_time(netlist_time::zero);
+			m_Q.net().set_time(netlist_time::zero());
 		}
 
 		NETLIB_UPDATE_PARAMI()
@@ -64,7 +64,7 @@ namespace netlist
 
 		NETLIB_UPDATEI()
 		{
-			logic_net_t &net = m_Q.net().as_logic();
+			logic_net_t &net = m_Q.net();
 			// this is only called during setup ...
 			net.toggle_new_Q();
 			net.set_time(netlist().time() + m_inc);
@@ -76,7 +76,7 @@ namespace netlist
 		param_double_t m_freq;
 		netlist_time m_inc;
 
-		ATTR_HOT inline static void mc_update(logic_net_t &net);
+		inline static void mc_update(logic_net_t &net);
 	};
 
 	// -----------------------------------------------------------------------------
@@ -126,18 +126,18 @@ namespace netlist
 			{
 				netlist_time base = netlist_time::from_hz(m_freq.Value()*2);
 				plib::pstring_vector_t pat(m_pattern.Value(),",");
-				m_off = netlist_time::from_double(m_offset.Value());
+				m_off = netlist_time(m_offset.Value());
 
 				int pati[256];
 				m_size = pat.size();
 				int total = 0;
-				for (int i=0; i<m_size; i++)
+				for (unsigned i=0; i<m_size; i++)
 				{
 					pati[i] = pat[i].as_long();
 					total += pati[i];
 				}
-				netlist_time ttotal = netlist_time::zero;
-				for (int i=0; i<m_size - 1; i++)
+				netlist_time ttotal = netlist_time::zero();
+				for (unsigned i=0; i<m_size - 1; i++)
 				{
 					m_inc[i] = base * pati[i];
 					ttotal += m_inc[i];
@@ -158,8 +158,8 @@ namespace netlist
 
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
-		UINT32 m_cnt;
-		UINT32 m_size;
+		unsigned m_cnt;
+		unsigned m_size;
 		netlist_time m_inc[32];
 		netlist_time m_off;
 	};
@@ -311,7 +311,7 @@ namespace netlist
 		, m_Q(*this, "Q")
 		{
 
-			for (int i=0; i < m_N; i++)
+			for (std::size_t i=0; i < m_N; i++)
 				m_I.emplace(i, *this, plib::pfmt("A{1}")(i));
 
 			plib::pstring_vector_t cmds(m_func.Value(), " ");
@@ -540,7 +540,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	private:
-		analog_output_t m_GNDHack;  // FIXME: LOng term, we need to connect proxy gnd to device gnd
+		analog_output_t m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
 		NETLIB_SUB(twoterm) m_RV;
 		int m_last_state;
 		bool m_is_timestep;
@@ -552,7 +552,7 @@ namespace netlist
 		P_PREVENT_COPYING(factory_lib_entry_t)
 	public:
 
-		ATTR_COLD factory_lib_entry_t(setup_t &setup, const pstring &name, const pstring &classname,
+		factory_lib_entry_t(setup_t &setup, const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		: base_factory_t(name, classname, def_param), m_setup(setup) {  }
 

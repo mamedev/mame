@@ -24,15 +24,7 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI()
-		{
-		#if 0
-			m_A.inactivate();
-			m_B.inactivate();
-			m_C.inactivate();
-			m_D.inactivate();
-		#endif
-		}
+		//NETLIB_RESETI()
 		//NETLIB_UPDATEI();
 
 	public:
@@ -41,7 +33,7 @@ namespace netlist
 		logic_input_t m_C;
 		logic_input_t m_D;
 
-		ATTR_HOT inline UINT8 read_ABCD() const
+		inline UINT8 read_ABCD() const
 		{
 			//return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
 			return (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
@@ -56,7 +48,7 @@ namespace netlist
 		, m_LOADQ(*this, "LOADQ")
 		, m_CU(*this, "CU")
 		, m_CD(*this, "CD")
-		, m_Q(*this, {"QA", "QB", "QC", "QD"})
+		, m_Q(*this, {{"QA", "QB", "QC", "QD"}})
 		, m_BORROWQ(*this, "BORROWQ")
 		, m_CARRYQ(*this, "CARRYQ")
 		{
@@ -119,7 +111,7 @@ namespace netlist
 	}
 
 	// FIXME: Timing
-	/* static */ const netlist_time delay[4] =
+	static const netlist_time delay[4] =
 	{
 			NLTIME_FROM_NS(40),
 			NLTIME_FROM_NS(40),

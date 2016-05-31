@@ -10,7 +10,8 @@
 
 #include <type_traits>
 
-#include "solver/nld_solver.h"
+//#include "solver/nld_solver.h"
+#include "nl_base.h"
 #include "plib/pstream.h"
 
 namespace netlist
@@ -18,19 +19,37 @@ namespace netlist
 	namespace devices
 	{
 
+	/* FIXME: these should become proper devices */
+
+	struct solver_parameters_t
+	{
+		int m_pivot;
+		nl_double m_accuracy;
+		nl_double m_lte;
+		nl_double m_min_timestep;
+		nl_double m_max_timestep;
+		nl_double m_sor;
+		bool m_dynamic;
+		int m_gs_loops;
+		int m_nr_loops;
+		netlist_time m_nt_sync_delay;
+		bool m_log_stats;
+	};
+
+
 class terms_t
 {
 	P_PREVENT_COPYING(terms_t)
 
 public:
-	ATTR_COLD terms_t()
+	terms_t()
 	: m_railstart(0)
 	, m_last_V(0.0)
 	, m_DD_n_m_1(0.0)
 	, m_h_n_m_1(1e-6)
 	{}
 
-	ATTR_COLD void clear()
+	void clear()
 	{
 		m_term.clear();
 		m_net_other.clear();
@@ -40,7 +59,7 @@ public:
 		m_other_curanalog.clear();
 	}
 
-	ATTR_COLD void add(terminal_t *term, int net_other, bool sorted);
+	void add(terminal_t *term, int net_other, bool sorted);
 
 	inline unsigned count() { return m_term.size(); }
 
@@ -51,7 +70,7 @@ public:
 	inline nl_double *Idr() { return m_Idr.data(); }
 	inline nl_double **other_curanalog() { return m_other_curanalog.data(); }
 
-	ATTR_COLD void set_pointers();
+	void set_pointers();
 
 	unsigned m_railstart;
 
@@ -73,6 +92,19 @@ private:
 	plib::pvector_t<terminal_t *> m_term;
 
 };
+
+class proxied_analog_output_t : public analog_output_t
+{
+public:
+
+	proxied_analog_output_t(core_device_t &dev, const pstring &aname)
+	: analog_output_t(dev, aname)
+	, m_proxied_net(nullptr)
+	{ }
+
+	analog_net_t *m_proxied_net; // only for proxy nets in analog input logic
+};
+
 
 class matrix_solver_t : public device_t
 {
@@ -96,6 +128,7 @@ public:
 	m_iterative_fail(0),
 	m_iterative_total(0),
 	m_params(*params),
+	m_last_step(0, 1),
 	m_cur_ts(0),
 	m_fb_sync(*this, "FB_sync"),
 	m_Q_sync(*this, "Q_sync"),
@@ -126,6 +159,7 @@ public:
 	void update_forced();
 	void update_after(const netlist_time &after)
 	{
+		m_Q_sync.net().toggle_new_Q();
 		m_Q_sync.net().reschedule_in_queue(after);
 	}
 
@@ -134,7 +168,7 @@ public:
 	NETLIB_RESETI();
 
 public:
-	ATTR_COLD int get_net_idx(net_t *net);
+	int get_net_idx(net_t *net);
 
 	plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
 
@@ -147,7 +181,7 @@ public:
 
 protected:
 
-	ATTR_COLD void setup_base(analog_net_t::list_t &nets);
+	void setup_base(analog_net_t::list_t &nets);
 	void update_dynamic();
 
 	virtual void vsetup(analog_net_t::list_t &nets) = 0;
@@ -168,7 +202,7 @@ protected:
 
 	plib::pvector_t<terms_t *> m_terms;
 	plib::pvector_t<analog_net_t *> m_nets;
-	plib::pvector_t<analog_output_t *> m_inps;
+	std::vector<std::unique_ptr<proxied_analog_output_t>> m_inps;
 
 	plib::pvector_t<terms_t *> m_rails_temp;
 
@@ -212,7 +246,7 @@ T matrix_solver_t::delta(const T * RESTRICT V)
 	const unsigned iN = this->m_terms.size();
 	T cerr = 0;
 	for (unsigned i = 0; i < iN; i++)
-		cerr = nl_math::max(cerr, nl_math::abs(V[i] - (T) this->m_nets[i]->m_cur_Analog));
+		cerr = std::max(cerr, std::abs(V[i] - (T) this->m_nets[i]->m_cur_Analog));
 	return cerr;
 }
 

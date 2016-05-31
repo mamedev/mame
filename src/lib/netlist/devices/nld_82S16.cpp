@@ -15,7 +15,7 @@ namespace netlist
 	NETLIB_OBJECT(82S16)
 	{
 		NETLIB_CONSTRUCTOR(82S16)
-		, m_A(*this, { "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7" })
+		, m_A(*this, {{"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7" }})
 		, m_CE1Q(*this, "CE1Q")
 		, m_CE2Q(*this, "CE2Q")
 		, m_CE3Q(*this, "CE3Q")

@@ -6,6 +6,7 @@
  */
 
 #include "nld_7448.h"
+#include "nld_truthtable.h"
 
 namespace netlist
 {
@@ -15,6 +16,7 @@ namespace netlist
 
 	/*
 	 * FIXME: Using truthtable is a lot slower than the explicit device
+	 * 		  in breakout. Performance drops by 20%.
 	 */
 
 	#define USE_TRUTHTABLE_7448	(0)
@@ -36,7 +38,7 @@ namespace netlist
 		, m_BIQ(*this, "BIQ")
 		, m_RBIQ(*this, "RBIQ")
 		, m_state(0)
-		, m_Q(*this, {"a", "b", "c", "d", "e", "f", "g"})
+		, m_Q(*this, {{"a", "b", "c", "d", "e", "f", "g"}})
 		{
 			save(NLNAME(m_state));
 		}
@@ -45,7 +47,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		ATTR_HOT void update_outputs(UINT8 v);
+		void update_outputs(UINT8 v);
 		static const UINT8 tab7448[16][7];
 
 		logic_input_t m_A;
@@ -61,8 +63,6 @@ namespace netlist
 		object_array_t<logic_output_t, 7> m_Q;  /* a .. g */
 
 	};
-
-	#endif
 
 	NETLIB_OBJECT_DERIVED(7448_dip, 7448)
 	{
@@ -85,6 +85,8 @@ namespace netlist
 			register_subalias("15", m_Q[5]); // f
 		}
 	};
+	#endif
+
 
 	#if (USE_TRUTHTABLE_7448 && USE_TRUTHTABLE)
 	nld_7448::truthtable_t nld_7448::m_ttbl;
@@ -108,7 +110,7 @@ namespace netlist
 			"  1,  1,  X,   0,  1,  1,  1 | 0, 0, 0, 1, 1, 1, 1|100,100,100,100,100,100,100",
 			"  1,  1,  X,   1,  1,  1,  1 | 0, 0, 0, 0, 0, 0, 0|100,100,100,100,100,100,100",
 
-			// BI/RBO is input output. In the next case it is used as an output will go low.
+			// BI/RBO is input output. In the next case it is used as an input will go low.
 			"  1,  1,  0,   0,  0,  0,  0 | 0, 0, 0, 0, 0, 0, 0|100,100,100,100,100,100,100", // RBI
 
 			"  0,  1,  X,   X,  X,  X,  X | 1, 1, 1, 1, 1, 1, 1|100,100,100,100,100,100,100", // LT
@@ -118,26 +120,27 @@ namespace netlist
 			""
 	};
 
-	NETLIB_START(7448_dip)
+	NETLIB_OBJECT_DERIVED(7448_dip, 7448)
 	{
-		NETLIB_NAME(7448)::start();
+		NETLIB_CONSTRUCTOR_DERIVED(7448_dip, 7448)
+		{
+			register_subalias("1", m_I[4]); // B
+			register_subalias("2", m_I[5]); // C
+			register_subalias("3", m_I[0]); // LTQ
+			register_subalias("4", m_I[1]); // BIQ
+			register_subalias("5", m_I[2]); // RBIQ
+			register_subalias("6", m_I[6]); // D
+			register_subalias("7", m_I[3]); // A
 
-		register_subalias("1", m_I[4]); // B
-		register_subalias("2", m_I[5]); // C
-		register_subalias("3", m_I[0]); // LTQ
-		register_subalias("4", m_I[1]); // BIQ
-		register_subalias("5", m_I[2]); // RBIQ
-		register_subalias("6", m_I[6]); // D
-		register_subalias("7", m_I[3]); // A
-
-		register_subalias("9",  m_Q[4]); // e
-		register_subalias("10", m_Q[3]); // d
-		register_subalias("11", m_Q[2]); // c
-		register_subalias("12", m_Q[1]); // b
-		register_subalias("13", m_Q[0]); // a
-		register_subalias("14", m_Q[6]); // g
-		register_subalias("15", m_Q[5]); // f
-	}
+			register_subalias("9",  m_Q[4]); // e
+			register_subalias("10", m_Q[3]); // d
+			register_subalias("11", m_Q[2]); // c
+			register_subalias("12", m_Q[1]); // b
+			register_subalias("13", m_Q[0]); // a
+			register_subalias("14", m_Q[6]); // g
+			register_subalias("15", m_Q[5]); // f
+		}
+	};
 
 	#else
 

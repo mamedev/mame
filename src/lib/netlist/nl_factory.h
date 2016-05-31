@@ -13,6 +13,7 @@
 
 #include "nl_config.h"
 #include "plib/plists.h"
+#include "plib/putil.h"
 #include "nl_base.h"
 
 #define NETLIB_DEVICE_IMPL(chip) factory_creator_ptr_t decl_ ## chip = factory_creator_t< NETLIB_NAME(chip) >;

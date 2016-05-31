@@ -36,18 +36,7 @@
 #ifndef NLD_74279_H_
 #define NLD_74279_H_
 
-#include "nld_truthtable.h"
-
 #define TTL_74279_DIP(name)                                                         \
 		NET_REGISTER_DEV(TTL_74279_DIP, name)
-
-namespace netlist
-{
-	namespace devices
-	{
-
-
-	} //namespace devices
-} // namespace netlist
 
 #endif /* NLD_74279_H_ */

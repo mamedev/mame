@@ -14,13 +14,13 @@ SRC = ..
 
 #-fuse-ld=gold -Wpedantic -march=native -march=native
 
-# LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
+LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
 CDEFS = -DPSTANDALONE=1 -DPTR64=1
 #-Werror
 #CFLAGS =  $(LTO) -g -O3 -std=c++98 -Doverride="" -march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra -Wno-long-long -Wno-unused-parameter -Wno-unused-result -Wno-variadic-macros -I..
 #LDFLAGS = $(LTO) -g -O3 -std=c++98 
-CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter 
+CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter
 LDFLAGS = $(LTO) -g -O3 -std=c++11 -lpthread -ldl
 
 CC = @g++-5
@@ -49,11 +49,12 @@ OBJS = $(POBJS) $(NLOBJS)
 POBJS := \
 	$(POBJ)/pstring.o \
 	$(POBJ)/palloc.o \
+	$(POBJ)/pdynlib.o \
+	$(POBJ)/pfmtlog.o \
 	$(POBJ)/pparser.o \
 	$(POBJ)/pstate.o \
 	$(POBJ)/pstream.o \
-	$(POBJ)/pfmtlog.o \
-	$(POBJ)/pdynlib.o \
+	$(POBJ)/putil.o \
 
 NLOBJS := \
 	$(NLOBJ)/nl_base.o \

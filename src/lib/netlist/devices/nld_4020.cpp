@@ -20,8 +20,8 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(CD4020_sub)
 		NETLIB_FAMILY("CD4XXX")
 		, m_IP(*this, "IP")
-		, m_Q(*this, {"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
-				"Q10", "Q11", "Q12", "Q13", "Q14"})
+		, m_Q(*this, {{"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
+				"Q10", "Q11", "Q12", "Q13", "Q14"}})
 		, m_cnt(0)
 		{
 			save(NLNAME(m_cnt));
@@ -36,7 +36,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		ATTR_HOT void update_outputs(const UINT16 cnt);
+		void update_outputs(const UINT16 cnt);
 
 		logic_input_t m_IP;
 		object_array_t<logic_output_t, 14> m_Q;

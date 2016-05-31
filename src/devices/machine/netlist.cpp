@@ -264,7 +264,7 @@ ADDRESS_MAP_END
 netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NETLIST_CORE, "Netlist core device", tag, owner, clock, "netlist_core", __FILE__),
 		m_icount(0),
-		m_old(netlist::netlist_time::zero),
+		m_old(netlist::netlist_time::zero()),
 		m_netlist(nullptr),
 		m_setup(nullptr),
 		m_setup_func(nullptr)
@@ -274,7 +274,7 @@ netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, cons
 netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *file)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, file),
 		m_icount(0),
-		m_old(netlist::netlist_time::zero),
+		m_old(netlist::netlist_time::zero()),
 		m_netlist(nullptr),
 		m_setup(nullptr),
 		m_setup_func(nullptr)
@@ -322,14 +322,14 @@ void netlist_mame_device_t::device_start()
 	m_setup->start_devices();
 	m_setup->resolve_inputs();
 
-	netlist().save_item(m_rem, this, "m_rem");
-	netlist().save_item(m_div, this, "m_div");
-	netlist().save_item(m_old, this, "m_old");
+	netlist().save_item(this, m_rem, "m_rem");
+	netlist().save_item(this, m_div, "m_div");
+	netlist().save_item(this, m_old, "m_old");
 
 	save_state();
 
-	m_old = netlist::netlist_time::zero;
-	m_rem = netlist::netlist_time::zero;
+	m_old = netlist::netlist_time::zero();
+	m_rem = netlist::netlist_time::zero();
 
 	LOG_DEV_CALLS(("device_start exit %s\n", tag()));
 }
@@ -344,8 +344,8 @@ void netlist_mame_device_t::device_clock_changed()
 void netlist_mame_device_t::device_reset()
 {
 	LOG_DEV_CALLS(("device_reset\n"));
-	m_old = netlist::netlist_time::zero;
-	m_rem = netlist::netlist_time::zero;
+	m_old = netlist::netlist_time::zero();
+	m_rem = netlist::netlist_time::zero();
 	netlist().reset();
 }
 
@@ -511,12 +511,12 @@ ATTR_COLD offs_t netlist_mame_cpu_device_t::disasm_disassemble(char *buffer, off
 	//char tmp[16];
 	unsigned startpc = pc;
 	int relpc = pc - m_genPC;
-	if (relpc >= 0 && relpc < netlist().queue().count())
+	if (relpc >= 0 && relpc < netlist().queue().size())
 	{
-		int dpc = netlist().queue().count() - relpc - 1;
+		int dpc = netlist().queue().size() - relpc - 1;
 		// FIXME: 50 below fixes crash in mame-debugger. It's based on try on error.
-		snprintf(buffer, 50, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].object()->name().cstr(),
-				netlist().queue()[dpc].exec_time().as_double());
+		snprintf(buffer, 50, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].m_object->name().cstr(),
+				netlist().queue()[dpc].m_exec_time.as_double());
 	}
 	else
 		sprintf(buffer, "%s", "");

@@ -12,30 +12,10 @@
 #define FAST_CLOCK  (1)
 
 #ifndef __PLIB_PREPROCESSOR__
-#if 0
-#define TTL_7400A_NAND(_name, _A, _B) TTL_7400_NAND(_name, _A, _B)
-#else
-#define TTL_7400A_NAND(_name, _A, _B)                                          \
-		NET_REGISTER_DEV(TTL_7400A_NAND, _name)                              \
-		NET_CONNECT(_name, A, _A)                                              \
-		NET_CONNECT(_name, B, _B)
 #endif
-#endif
-
-NETLIST_START(lib)
-	TRUTHTABLE_START(TTL_7400A_NAND, 2, 1, 0, "A,B")
-		TT_HEAD(" A , B | Q ")
-		TT_LINE(" 0 , X | 1 |22")
-		TT_LINE(" X , 0 | 1 |22")
-		TT_LINE(" 1 , 1 | 0 |15")
-	TRUTHTABLE_END()
-NETLIST_END()
 
 NETLIST_START(pong_fast)
 
-	LOCAL_SOURCE(lib)
-
-	INCLUDE(lib)
 	SOLVER(Solver, 48000)
 	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
@@ -144,7 +124,7 @@ NETLIST_START(pong_fast)
 	/* hit logic */
 
 	TTL_7404_INVERT(hitQ, hit)
-	TTL_7400A_NAND(hit, hit1Q, hit2Q)
+	TTL_7400_NAND(hit, hit1Q, hit2Q)
 
 	TTL_7402_NOR(attractQ, StopG, runQ)
 	TTL_7404_INVERT(attract, attractQ)
@@ -152,22 +132,22 @@ NETLIST_START(pong_fast)
 	TTL_7420_NAND(ic_h6a, hvidQ, hvidQ, hvidQ, hvidQ)
 	ALIAS(hvid, ic_h6a.Q)
 
-	TTL_7400A_NAND(ic_e6c, hvid, hblank)
+	TTL_7400_NAND(ic_e6c, hvid, hblank)
 	ALIAS(MissQ, ic_e6c.Q)
 
 	TTL_7404_INVERT(ic_d1e, MissQ)
-	TTL_7400A_NAND(ic_e1a, ic_d1e.Q, attractQ)
+	TTL_7400_NAND(ic_e1a, ic_d1e.Q, attractQ)
 	ALIAS(Missed, ic_e1a.Q)
 
-	TTL_7400A_NAND(rstspeed, SRSTQ, MissQ)
-	TTL_7400A_NAND(StopG, StopG1Q, StopG2Q)
+	TTL_7400_NAND(rstspeed, SRSTQ, MissQ)
+	TTL_7400_NAND(StopG, StopG1Q, StopG2Q)
 	ALIAS(L, ic_h3b.Q)
 	ALIAS(R, ic_h3b.QQ)
 
-	TTL_7400A_NAND(hit1Q, pad1, ic_g1b.Q)
-	TTL_7400A_NAND(hit2Q, pad2, ic_g1b.Q)
+	TTL_7400_NAND(hit1Q, pad1, ic_g1b.Q)
+	TTL_7400_NAND(hit2Q, pad2, ic_g1b.Q)
 
-	TTL_7400A_NAND(ic_g3c, 128H, ic_h3a.QQ)
+	TTL_7400_NAND(ic_g3c, 128H, ic_h3a.QQ)
 	TTL_7427_NOR(ic_g2c, ic_g3c.Q, 256H, vpad1Q)
 	ALIAS(pad1, ic_g2c.Q)
 	TTL_7427_NOR(ic_g2a, ic_g3c.Q, 256HQ, vpad2Q)
@@ -217,15 +197,15 @@ NETLIST_START(pong_fast)
 	// hblank flip flop
 	// ----------------------------------------------------------------------------------------
 
-	TTL_7400A_NAND(ic_g5b, 16H, 64H)
+	TTL_7400_NAND(ic_g5b, 16H, 64H)
 
 	// the time critical one
-	TTL_7400A_NAND(ic_h5c, ic_h5b.Q, hresetQ)
-	TTL_7400A_NAND(ic_h5b, ic_h5c.Q, ic_g5b.Q)
+	TTL_7400_NAND(ic_h5c, ic_h5b.Q, hresetQ)
+	TTL_7400_NAND(ic_h5b, ic_h5c.Q, ic_g5b.Q)
 
 	ALIAS(hblank,  ic_h5c.Q)
 	ALIAS(hblankQ,  ic_h5b.Q)
-	TTL_7400A_NAND(hsyncQ, hblank, 32H)
+	TTL_7400_NAND(hsyncQ, hblank, 32H)
 
 	// ----------------------------------------------------------------------------------------
 	// vblank flip flop
@@ -236,7 +216,7 @@ NETLIST_START(pong_fast)
 	ALIAS(vblank,  ic_f5d.Q)
 	ALIAS(vblankQ, ic_f5c.Q)
 
-	TTL_7400A_NAND(ic_h5a, 8V, 8V)
+	TTL_7400_NAND(ic_h5a, 8V, 8V)
 	TTL_7410_NAND(ic_g5a, vblank, 4V, ic_h5a.Q)
 	ALIAS(vsyncQ, ic_g5a.Q)
 
@@ -244,31 +224,31 @@ NETLIST_START(pong_fast)
 	// move logic
 	// ----------------------------------------------------------------------------------------
 
-	TTL_7400A_NAND(ic_e1d, hit_sound, ic_e1c.Q)
-	TTL_7400A_NAND(ic_e1c, ic_f1.QC, ic_f1.QD)
+	TTL_7400_NAND(ic_e1d, hit_sound, ic_e1c.Q)
+	TTL_7400_NAND(ic_e1c, ic_f1.QC, ic_f1.QD)
 	TTL_7493(ic_f1, ic_e1d.Q, ic_f1.QA, rstspeed, rstspeed)
 
 	TTL_7402_NOR(ic_g1d, ic_f1.QC, ic_f1.QD)
-	TTL_7400A_NAND(ic_h1a, ic_g1d.Q, ic_g1d.Q)
-	TTL_7400A_NAND(ic_h1d, ic_e1c.Q, ic_h1a.Q)
+	TTL_7400_NAND(ic_h1a, ic_g1d.Q, ic_g1d.Q)
+	TTL_7400_NAND(ic_h1d, ic_e1c.Q, ic_h1a.Q)
 
-	TTL_7400A_NAND(ic_h1c, ic_h1d.Q, vreset)
-	TTL_7400A_NAND(ic_h1b, ic_h1a.Q, vreset)
+	TTL_7400_NAND(ic_h1c, ic_h1d.Q, vreset)
+	TTL_7400_NAND(ic_h1b, ic_h1a.Q, vreset)
 	TTL_7402_NOR(ic_g1c, 256HQ, vreset)
 
 	TTL_74107(ic_h2a, ic_g1c.Q, ic_h2b.Q, low, ic_h1b.Q)
 	TTL_74107(ic_h2b, ic_g1c.Q, high, move, ic_h1c.Q)
 
-	TTL_7400A_NAND(ic_h4a, ic_h2b.Q, ic_h2a.Q)
+	TTL_7400_NAND(ic_h4a, ic_h2b.Q, ic_h2a.Q)
 	ALIAS(move, ic_h4a.Q)
 
-	TTL_7400A_NAND(ic_c1d, SC, attract)
+	TTL_7400_NAND(ic_c1d, SC, attract)
 	TTL_7404_INVERT(ic_d1a, ic_c1d.Q)
 	TTL_7474(ic_h3b, ic_d1a.Q, ic_h3b.QQ, hit1Q, hit2Q)
 
-	TTL_7400A_NAND(ic_h4d, ic_h3b.Q, move)
-	TTL_7400A_NAND(ic_h4b, ic_h3b.QQ, move)
-	TTL_7400A_NAND(ic_h4c, ic_h4d.Q, ic_h4b.Q)
+	TTL_7400_NAND(ic_h4d, ic_h3b.Q, move)
+	TTL_7400_NAND(ic_h4b, ic_h3b.QQ, move)
+	TTL_7400_NAND(ic_h4c, ic_h4d.Q, ic_h4b.Q)
 	ALIAS(Aa, ic_h4c.Q)
 	ALIAS(Ba, ic_h4b.Q)
 
@@ -276,7 +256,7 @@ NETLIST_START(pong_fast)
 	// hvid circuit
 	// ----------------------------------------------------------------------------------------
 
-	TTL_7400A_NAND(hball_resetQ, Serve, attractQ)
+	TTL_7400_NAND(hball_resetQ, Serve, attractQ)
 
 	TTL_9316(ic_g7, clk, high, hblankQ, hball_resetQ, ic_g5c.Q, Aa, Ba, low, high)
 	TTL_9316(ic_h7, clk, ic_g7.RC, high, hball_resetQ, ic_g5c.Q, low, low, low, high)
@@ -291,7 +271,7 @@ NETLIST_START(pong_fast)
 
 	TTL_9316(ic_b3, hsyncQ, high, vblankQ, high, ic_b2b.Q, a6, b6, c6, d6)
 	TTL_9316(ic_a3, hsyncQ, ic_b3.RC, high, high, ic_b2b.Q, low, low, low, low)
-	TTL_7400A_NAND(ic_b2b, ic_a3.RC, ic_b3.RC)
+	TTL_7400_NAND(ic_b2b, ic_a3.RC, ic_b3.RC)
 	TTL_7410_NAND(ic_e2b, ic_a3.RC, ic_b3.QC, ic_b3.QD)
 	ALIAS(vvidQ, ic_e2b.Q)
 	TTL_7404_INVERT(vvid, vvidQ)    // D2D
@@ -383,12 +363,12 @@ NETLIST_START(pong_fast)
 	NET_C(GND, ic_g4_C.2)
 
 	ALIAS(hit_sound_en, ic_c2a.QQ)
-	TTL_7400A_NAND(hit_sound, hit_sound_en, vpos16)
-	TTL_7400A_NAND(score_sound, SC, vpos32)
-	TTL_7400A_NAND(topbothitsound, ic_f3_topbot.Q, vpos32)
+	TTL_7400_NAND(hit_sound, hit_sound_en, vpos16)
+	TTL_7400_NAND(score_sound, SC, vpos32)
+	TTL_7400_NAND(topbothitsound, ic_f3_topbot.Q, vpos32)
 
 	TTL_7410_NAND(ic_c4b, topbothitsound, hit_sound, score_sound)
-	TTL_7400A_NAND(ic_c1b, ic_c4b.Q, attractQ)
+	TTL_7400_NAND(ic_c1b, ic_c4b.Q, attractQ)
 	ALIAS(sound, ic_c1b.Q)
 
 
@@ -422,9 +402,9 @@ NETLIST_START(pong_fast)
 	NET_C(GND, ic_b9_C.2)
 
 	TTL_7404_INVERT(ic_c9b, ic_b9.OUT)
-	TTL_7400A_NAND(ic_b7b, ic_a7b.Q, hsyncQ)
+	TTL_7400_NAND(ic_b7b, ic_a7b.Q, hsyncQ)
 	TTL_7493(ic_b8, ic_b7b.Q, ic_b8.QA, ic_b9.OUT, ic_b9.OUT)
-	TTL_7400A_NAND(ic_b7a, ic_c9b.Q, ic_a7b.Q)
+	TTL_7400_NAND(ic_b7a, ic_c9b.Q, ic_a7b.Q)
 	TTL_7420_NAND(ic_a7b, ic_b8.QA, ic_b8.QB, ic_b8.QC, ic_b8.QD)
 	ALIAS(vpad1Q, ic_b7a.Q)
 
@@ -462,9 +442,9 @@ NETLIST_START(pong_fast)
 	NET_C(GND, ic_a9_C.2)
 
 	TTL_7404_INVERT(ic_c9a, ic_a9.OUT)
-	TTL_7400A_NAND(ic_b7c, ic_a7a.Q, hsyncQ)
+	TTL_7400_NAND(ic_b7c, ic_a7a.Q, hsyncQ)
 	TTL_7493(ic_a8, ic_b7c.Q, ic_a8.QA, ic_a9.OUT, ic_a9.OUT)
-	TTL_7400A_NAND(ic_b7d, ic_c9a.Q, ic_a7a.Q)
+	TTL_7400_NAND(ic_b7d, ic_c9a.Q, ic_a7a.Q)
 	TTL_7420_NAND(ic_a7a, ic_a8.QA, ic_a8.QB, ic_a8.QC, ic_a8.QD)
 	ALIAS(vpad2Q, ic_b7d.Q)
 
@@ -544,8 +524,8 @@ NETLIST_START(pong_fast)
 	TTL_7427_NOR(ic_e5c, ic_e4b.Q, 8H, 4H)
 	ALIAS(scoreFE, ic_e5c.Q)
 
-	TTL_7400A_NAND(ic_c3d, 8H, 4H)
-	//TTL_7400A_NAND(ic_c3d, 4H, 8H)
+	TTL_7400_NAND(ic_c3d, 8H, 4H)
+	//TTL_7400_NAND(ic_c3d, 4H, 8H)
 	TTL_7402_NOR(ic_d2b, ic_e4b.Q, ic_c3d.Q)
 	ALIAS(scoreBC, ic_d2b.Q)
 
@@ -571,7 +551,7 @@ NETLIST_START(pong_fast)
 
 	// net
 	TTL_74107(ic_f3b, clk, 256H, 256HQ, high)
-	TTL_7400A_NAND(ic_g3b, ic_f3b.QQ, 256H)
+	TTL_7400_NAND(ic_g3b, ic_f3b.QQ, 256H)
 	TTL_7427_NOR(ic_g2b, ic_g3b.Q, vblank, 4V)
 	ALIAS(net, ic_g2b.Q)
 

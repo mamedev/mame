@@ -243,7 +243,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 
 }
 
-ATTR_COLD void ptokenizer::error(const pstring &errs)
+void ptokenizer::error(const pstring &errs)
 {
 	verror("Error: " + errs, currentline_no(), currentline_str());
 	//throw error;
@@ -360,13 +360,13 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 {
 	pstring_vector_t elems(line, m_expr_sep);
 	pstringbuffer ret = "";
-	for (std::size_t i=0; i<elems.size(); i++)
+	for (auto & elem : elems)
 	{
-		define_t *def = get_define(elems[i]);
+		define_t *def = get_define(elem);
 		if (def != nullptr)
 			ret.cat(def->m_replace);
 		else
-			ret.cat(elems[i]);
+			ret.cat(elem);
 	}
 	return ret;
 }
@@ -374,9 +374,9 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 static pstring catremainder(const pstring_vector_t &elems, std::size_t start, pstring sep)
 {
 	pstringbuffer ret = "";
-	for (std::size_t i=start; i<elems.size(); i++)
+	for (auto & elem : elems)
 	{
-		ret.cat(elems[i]);
+		ret.cat(elem);
 		ret.cat(sep);
 	}
 	return ret;

@@ -20,7 +20,7 @@ namespace netlist
 	NETLIB_OBJECT(74153sub)
 	{
 		NETLIB_CONSTRUCTOR(74153sub)
-		, m_C(*this, {"C0", "C1", "C2", "C3"})
+		, m_C(*this, {{"C0", "C1", "C2", "C3"}})
 		, m_G(*this, "G")
 		, m_Y(*this, "AY") //FIXME: Change netlists
 		, m_chan(0)

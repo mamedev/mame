@@ -37,6 +37,7 @@
 #include "omp.h"
 #endif
 
+#include "plib/putil.h"
 #include "nld_solver.h"
 #include "nld_matrix_solver.h"
 
@@ -59,7 +60,7 @@ namespace netlist
 	namespace devices
 	{
 
-ATTR_COLD void terms_t::add(terminal_t *term, int net_other, bool sorted)
+void terms_t::add(terminal_t *term, int net_other, bool sorted)
 {
 	if (sorted)
 		for (unsigned i=0; i < m_net_other.size(); i++)
@@ -83,7 +84,7 @@ ATTR_COLD void terms_t::add(terminal_t *term, int net_other, bool sorted)
 	m_other_curanalog.push_back(nullptr);
 }
 
-ATTR_COLD void terms_t::set_pointers()
+void terms_t::set_pointers()
 {
 	for (unsigned i = 0; i < count(); i++)
 	{
@@ -96,9 +97,8 @@ ATTR_COLD void terms_t::set_pointers()
 // matrix_solver
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD matrix_solver_t::~matrix_solver_t()
+matrix_solver_t::~matrix_solver_t()
 {
-	m_inps.clear_and_free();
 	for (unsigned k = 0; k < m_terms.size(); k++)
 	{
 		plib::pfree(m_terms[k]);
@@ -106,7 +106,7 @@ ATTR_COLD matrix_solver_t::~matrix_solver_t()
 
 }
 
-ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
+void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 {
 	log().debug("New solver setup\n");
 
@@ -122,11 +122,11 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 	for (std::size_t k = 0; k < nets.size(); k++)
 	{
-		log().debug("setting up net\n");
-
 		analog_net_t *net = nets[k];
 
-		net->m_solver = this;
+		log().debug("setting up net\n");
+
+		net->set_solver(this);
 
 		for (core_terminal_t *p : net->m_core_terms)
 		{
@@ -137,7 +137,7 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					if (p->device().is_timestep())
 						if (!m_step_devices.contains(&p->device()))
 							m_step_devices.push_back(&p->device());
-					if (p->device().is_dynamic1())
+					if (p->device().is_dynamic())
 						if (!m_dynamic_devices.contains(&p->device()))
 							m_dynamic_devices.push_back(&p->device());
 					{
@@ -148,11 +148,11 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					break;
 				case terminal_t::INPUT:
 					{
-						analog_output_t *net_proxy_output = nullptr;
+						proxied_analog_output_t *net_proxy_output = nullptr;
 						for (auto & input : m_inps)
-							if (input->m_proxied_net == &p->net().as_analog())
+							if (input->m_proxied_net == &p->net())
 							{
-								net_proxy_output = input;
+								net_proxy_output = input.get();
 								break;
 							}
 
@@ -161,9 +161,11 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 							//net_proxy_output = palloc(analog_output_t(*this,
 							//      this->name() + "." + plib::pfmt("m{1}")(m_inps.size())));
 
-							net_proxy_output = plib::palloc<analog_output_t>(*this, this->name() + "." + plib::pfmt("m{1}")(m_inps.size()));
-							m_inps.push_back(net_proxy_output);
-							net_proxy_output->m_proxied_net = &p->net().as_analog();
+							auto net_proxy_output_u = plib::make_unique<proxied_analog_output_t>(*this, this->name() + "." + plib::pfmt("m{1}")(m_inps.size()));
+							net_proxy_output = net_proxy_output_u.get();
+							m_inps.push_back(std::move(net_proxy_output_u));
+							nl_assert(p->net().is_analog());
+							net_proxy_output->m_proxied_net = static_cast<analog_net_t *>(&p->net());
 						}
 						net_proxy_output->net().register_con(*p);
 						// FIXME: repeated
@@ -183,7 +185,7 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 	setup_matrix();
 }
 
-ATTR_COLD void matrix_solver_t::setup_matrix()
+void matrix_solver_t::setup_matrix()
 {
 	const unsigned iN = m_nets.size();
 
@@ -379,25 +381,31 @@ void matrix_solver_t::update_dynamic()
 		m_dynamic_devices[i]->update_terminals();
 }
 
-ATTR_COLD void matrix_solver_t::reset()
+void matrix_solver_t::reset()
 {
-	m_last_step = netlist_time::zero;
+	m_last_step = netlist_time::zero();
 }
 
-ATTR_COLD void matrix_solver_t::update() NOEXCEPT
+void matrix_solver_t::update() NOEXCEPT
 {
 	const netlist_time new_timestep = solve();
 
-	if (m_params.m_dynamic && has_timestep_devices() && new_timestep > netlist_time::zero)
+	if (m_params.m_dynamic && has_timestep_devices() && new_timestep > netlist_time::zero())
+	{
+		m_Q_sync.net().toggle_new_Q();
 		m_Q_sync.net().reschedule_in_queue(new_timestep);
+	}
 }
 
-ATTR_COLD void matrix_solver_t::update_forced()
+void matrix_solver_t::update_forced()
 {
 	ATTR_UNUSED const netlist_time new_timestep = solve();
 
 	if (m_params.m_dynamic && has_timestep_devices())
-		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
+	{
+		m_Q_sync.net().toggle_new_Q();
+		m_Q_sync.net().reschedule_in_queue(netlist_time(m_params.m_min_timestep));
+	}
 }
 
 void matrix_solver_t::step(const netlist_time &delta)
@@ -427,6 +435,7 @@ const netlist_time matrix_solver_t::solve_base()
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
 			log().warning("NEWTON_LOOPS exceeded on net {1}... reschedule", this->name());
+			m_Q_sync.net().toggle_new_Q();
 			m_Q_sync.net().reschedule_in_queue(m_params.m_nt_sync_delay);
 		}
 	}
@@ -459,7 +468,7 @@ const netlist_time matrix_solver_t::solve()
 	return next_time_step;
 }
 
-ATTR_COLD int matrix_solver_t::get_net_idx(net_t *net)
+int matrix_solver_t::get_net_idx(net_t *net)
 {
 	for (std::size_t k = 0; k < m_nets.size(); k++)
 		if (m_nets[k] == net)
@@ -467,7 +476,7 @@ ATTR_COLD int matrix_solver_t::get_net_idx(net_t *net)
 	return -1;
 }
 
-ATTR_COLD void matrix_solver_t::add_term(int k, terminal_t *term)
+void matrix_solver_t::add_term(int k, terminal_t *term)
 {
 	if (term->m_otherterm->net().isRailNet())
 	{
@@ -512,8 +521,8 @@ netlist_time matrix_solver_t::compute_next_timestep()
 
 			t->m_h_n_m_1 = hn;
 			t->m_DD_n_m_1 = DD_n;
-			if (nl_math::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
-				new_net_timestep = nl_math::sqrt(m_params.m_lte / nl_math::abs(NL_FCONST(0.5)*DD2));
+			if (std::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
+				new_net_timestep = std::sqrt(m_params.m_lte / std::abs(NL_FCONST(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 
@@ -527,7 +536,7 @@ netlist_time matrix_solver_t::compute_next_timestep()
 	}
 	//if (new_solver_timestep > 10.0 * hn)
 	//    new_solver_timestep = 10.0 * hn;
-	return netlist_time::from_double(new_solver_timestep);
+	return netlist_time(new_solver_timestep);
 }
 
 
@@ -577,7 +586,6 @@ NETLIB_STOP(solver)
 
 NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 {
-	m_mat_solvers.clear_and_free();
 }
 
 NETLIB_UPDATE(solver)
@@ -620,18 +628,19 @@ NETLIB_UPDATE(solver)
 	/* step circuit */
 	if (!m_Q_step.net().is_queued())
 	{
-		m_Q_step.net().push_to_queue(netlist_time::from_double(m_params.m_max_timestep));
+		m_Q_step.net().toggle_new_Q();
+		m_Q_step.net().push_to_queue(netlist_time(m_params.m_max_timestep));
 	}
 }
 
 template <int m_N, int storage_N>
-matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_specific)
+std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(int size, const bool use_specific)
 {
 	pstring solvername = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 	if (use_specific && m_N == 1)
-		return plib::palloc<matrix_solver_direct1_t>(netlist(), solvername, &m_params);
+		return plib::make_unique<matrix_solver_direct1_t>(netlist(), solvername, &m_params);
 	else if (use_specific && m_N == 2)
-		return plib::palloc<matrix_solver_direct2_t>(netlist(), solvername, &m_params);
+		return plib::make_unique<matrix_solver_direct2_t>(netlist(), solvername, &m_params);
 	else
 	{
 		if (size >= m_gs_threshold)
@@ -639,39 +648,39 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 			if (pstring("SOR_MAT").equals(m_iterative_solver))
 			{
 				typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
-				return plib::palloc<solver_sor_mat>(netlist(), solvername, &m_params, size);
+				return plib::make_unique<solver_sor_mat>(netlist(), solvername, &m_params, size);
 			}
 			else if (pstring("MAT_CR").equals(m_iterative_solver))
 			{
 				typedef matrix_solver_GCR_t<m_N,storage_N> solver_mat;
-				return plib::palloc<solver_mat>(netlist(), solvername, &m_params, size);
+				return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 			}
 			else if (pstring("MAT").equals(m_iterative_solver))
 			{
 				typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
-				return plib::palloc<solver_mat>(netlist(), solvername, &m_params, size);
+				return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 			}
 			else if (pstring("SM").equals(m_iterative_solver))
 			{
 				/* Sherman-Morrison Formula */
 				typedef matrix_solver_sm_t<m_N,storage_N> solver_mat;
-				return plib::palloc<solver_mat>(netlist(), solvername, &m_params, size);
+				return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 			}
 			else if (pstring("W").equals(m_iterative_solver))
 			{
 				/* Woodbury Formula */
 				typedef matrix_solver_w_t<m_N,storage_N> solver_mat;
-				return plib::palloc<solver_mat>(netlist(), solvername, &m_params, size);
+				return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 			}
 			else if (pstring("SOR").equals(m_iterative_solver))
 			{
 				typedef matrix_solver_SOR_t<m_N,storage_N> solver_GS;
-				return plib::palloc<solver_GS>(netlist(), solvername, &m_params, size);
+				return plib::make_unique<solver_GS>(netlist(), solvername, &m_params, size);
 			}
 			else if (pstring("GMRES").equals(m_iterative_solver))
 			{
 				typedef matrix_solver_GMRES_t<m_N,storage_N> solver_GMRES;
-				return plib::palloc<solver_GMRES>(netlist(), solvername, &m_params, size);
+				return plib::make_unique<solver_GMRES>(netlist(), solvername, &m_params, size);
 			}
 			else
 			{
@@ -682,12 +691,12 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 		else
 		{
 			typedef matrix_solver_direct_t<m_N,storage_N> solver_D;
-			return plib::palloc<solver_D>(netlist(), solvername, &m_params, size);
+			return plib::make_unique<solver_D>(netlist(), solvername, &m_params, size);
 		}
 	}
 }
 
-ATTR_COLD void NETLIB_NAME(solver)::post_start()
+void NETLIB_NAME(solver)::post_start()
 {
 	plib::pvector_t<analog_net_t::list_t> groups;
 	const bool use_specific = true;
@@ -696,7 +705,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	m_params.m_accuracy = m_accuracy.Value();
 	m_params.m_gs_loops = m_gs_loops.Value();
 	m_params.m_nr_loops = m_nr_loops.Value();
-	m_params.m_nt_sync_delay = netlist_time::from_double(m_sync_delay.Value());
+	m_params.m_nt_sync_delay = netlist_time(m_sync_delay.Value());
 	m_params.m_lte = m_lte.Value();
 	m_params.m_sor = m_sor.Value();
 
@@ -714,7 +723,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	}
 
 	// Override log statistics
-	pstring p = nl_util::environment("NL_STATS");
+	pstring p = plib::util::environment("NL_STATS");
 	if (p != "")
 		m_params.m_log_stats = (bool) p.as_long();
 	else
@@ -728,7 +737,8 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 		if (!net->isRailNet())
 		{
 			netlist().log().debug("   ==> not a rail net\n");
-			analog_net_t *n = &net->as_analog();
+			/* Must be an analog net */
+			analog_net_t *n = static_cast<analog_net_t *>(net.get());
 			if (!n->already_processed(groups))
 			{
 				groups.push_back(analog_net_t::list_t());
@@ -741,7 +751,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	netlist().log().verbose("Found {1} net groups in {2} nets\n", groups.size(), netlist().m_nets.size());
 	for (auto & grp : groups)
 	{
-		matrix_solver_t *ms;
+		std::unique_ptr<matrix_solver_t> ms;
 		std::size_t net_count = grp.size();
 
 		switch (net_count)
@@ -825,8 +835,6 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 		ms->set_delegate_pointer();
 		ms->setup(grp);
 
-		m_mat_solvers.push_back(ms);
-
 		netlist().log().verbose("Solver {1}", ms->name());
 		netlist().log().verbose("       ==> {2} nets", grp.size());
 		netlist().log().verbose("       has {1} elements", ms->has_dynamic_devices() ? "dynamic" : "no dynamic");
@@ -839,6 +847,8 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 				netlist().log().verbose("   {1}", pcore->name());
 			}
 		}
+
+		m_mat_solvers.push_back(std::move(ms));
 	}
 }
 

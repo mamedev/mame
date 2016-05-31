@@ -6,6 +6,7 @@
  */
 
 #include "nld_74279.h"
+#include "nld_truthtable.h"
 
 namespace netlist
 {

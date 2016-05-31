@@ -40,7 +40,7 @@
  *
  *  The whole exercise was done to avoid virtual calls. In prior versions of
  *  netlist, the INTERNAL and GNUC_PMF_CONV approach provided significant improvement.
- *  Since than, ATTR_COLD was removed from functions declared as virtual.
+ *  Since than, was removed from functions declared as virtual.
  *  This may explain that the recent benchmarks show no difference at all.
  *
  *  Disappointing is the GNUC_PMF performance.

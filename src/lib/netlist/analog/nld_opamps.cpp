@@ -60,7 +60,7 @@ NETLIB_UPDATE(OPAMP)
 {
 	const double cVt = 0.0258 * 1.0; // * m_n;
 	const double cId = m_model.model_value("DAB"); // 3 mA
-	const double cVd = cVt * nl_math::log(cId / 1e-15 + 1.0);
+	const double cVd = cVt * std::log(cId / 1e-15 + 1.0);
 	m_VH.set_Q(INPANALOG(m_VCC) - m_model.model_value("VLH") - cVd);
 	m_VL.set_Q(INPANALOG(m_GND) + m_model.model_value("VLL") + cVd);
 	m_VREF.set_Q((INPANALOG(m_VCC) + INPANALOG(m_GND)) / 2.0);

@@ -28,6 +28,7 @@ namespace netlist
 		/* clock */
 		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
+		, m_inc(0, 1)
 		, m_is_timestep(false)
 		{
 			m_inc = netlist_time::from_hz(56000);
@@ -81,7 +82,7 @@ namespace netlist
 
 	NETLIB_UPDATE(MM5837_dip)
 	{
-		OUTLOGIC(m_Q, !m_Q.net().as_logic().new_Q(), m_inc  );
+		OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
 
 		/* shift register
 		 *

@@ -569,7 +569,7 @@ public:
 	{
 		m_cur = 0.0;
 		m_last_pos = 0;
-		m_last_buffer = netlist::netlist_time::zero;
+		m_last_buffer = netlist::netlist_time::zero();
 	}
 
 	ATTR_HOT void sound_update(const netlist::netlist_time &upto)
@@ -680,7 +680,7 @@ public:
 			m_param[i]->setTo(v * m_param_mult[i]->Value() + m_param_offset[i]->Value());
 		}
 		m_pos++;
-		OUTLOGIC(m_Q, !m_Q.net().as_logic().new_Q(), m_inc  );
+		OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
 	}
 
 public:

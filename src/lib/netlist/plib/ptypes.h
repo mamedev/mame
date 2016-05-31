@@ -13,68 +13,16 @@
 
 namespace plib {
 
-//============================================================
-//  penum - strongly typed enumeration
-//============================================================
+	//============================================================
+	//  penum - strongly typed enumeration
+	//============================================================
 
-struct enum_base
-{
-protected:
-	static int from_string_int(const char *str, const char *x)
+	struct enum_base
 	{
-		int cnt = 0;
-		const char *cur = str;
-		int lx = strlen(x);
-		while (*str)
-		{
-			if (*str == ',')
-			{
-				int l = str-cur;
-				if (l == lx)
-					if (strncmp(cur, x, lx) == 0)
-						return cnt;
-			}
-			else if (*str == ' ')
-			{
-				cur = str + 1;
-				cnt++;
-			}
-			str++;
-		}
-		int l = str-cur;
-		if (l == lx)
-			if (strncmp(cur, x, lx) == 0)
-				return cnt;
-		return -1;
-	}
-	static pstring nthstr(int n, const char *str)
-	{
-		char buf[64];
-		char *bufp = buf;
-		int cur = 0;
-		while (*str)
-		{
-			if (cur == n)
-			{
-				if (*str == ',')
-				{
-					*bufp = 0;
-					return pstring(buf);
-				}
-				else if (*str != ' ')
-					*bufp++ = *str;
-			}
-			else
-			{
-				if (*str == ',')
-					cur++;
-			}
-			str++;
-		}
-		*bufp = 0;
-		return pstring(buf);
-	}
-};
+	protected:
+		static int from_string_int(const char *str, const char *x);
+		static pstring nthstr(int n, const char *str);
+	};
 
 }
 

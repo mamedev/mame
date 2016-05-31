@@ -11,80 +11,15 @@
 #define PLISTS_H_
 
 #include <algorithm>
-#include <stack>
 #include <vector>
 #include <type_traits>
+//#include <cstring>
+//#include <array>
 
 #include "palloc.h"
 #include "pstring.h"
 
 namespace plib {
-
-// ----------------------------------------------------------------------------------------
-// parray_t: dynamic array
-// ----------------------------------------------------------------------------------------
-
-template <class LC>
-class array_t
-{
-public:
-
-	ATTR_COLD array_t(std::size_t numElements)
-	: m_list(0), m_capacity(0)
-	{
-		set_capacity(numElements);
-	}
-
-	ATTR_COLD array_t(const array_t &rhs)
-	: m_list(0), m_capacity(0)
-	{
-		set_capacity(rhs.size());
-		for (std::size_t i=0; i<m_capacity; i++)
-			m_list[i] = rhs[i];
-	}
-
-	ATTR_COLD array_t &operator=(const array_t &rhs)
-	{
-		set_capacity(rhs.size());
-		for (std::size_t i=0; i<m_capacity; i++)
-			m_list[i] = rhs[i];
-		return *this;
-	}
-
-	~array_t()
-	{
-		if (m_list != nullptr)
-			pfree_array(m_list);
-		m_list = nullptr;
-	}
-
-	ATTR_HOT  LC& operator[](const std::size_t index) { return m_list[index]; }
-	ATTR_HOT  const LC& operator[](const std::size_t index) const { return m_list[index]; }
-
-	ATTR_HOT  std::size_t size() const { return m_capacity; }
-
-	void resize(const std::size_t new_size)
-	{
-		set_capacity(new_size);
-	}
-
-protected:
-	ATTR_COLD void set_capacity(const std::size_t new_capacity)
-	{
-		if (m_list != nullptr)
-			pfree_array(m_list);
-		if (new_capacity > 0)
-			m_list = palloc_array<LC>(new_capacity);
-		else
-			m_list = nullptr;
-		m_capacity = new_capacity;
-	}
-
-private:
-
-	LC * m_list;
-	int m_capacity;
-};
 
 /* ----------------------------------------------------------------------------------------
  * uninitialised_array_t:
@@ -145,15 +80,6 @@ class pvector_t : public std::vector<LC>
 public:
 	pvector_t() : std::vector<LC>() {}
 
-	void clear_and_free()
-	{
-		for (LC i : *this)
-		{
-			pfree(i);
-		}
-		this->clear();
-	}
-
 	bool contains(const LC &elem) const
 	{
 		return (std::find(this->begin(), this->end(), elem) != this->end());
@@ -164,19 +90,19 @@ public:
 		this->erase(std::remove(this->begin(), this->end(), elem), this->end());
 	}
 
-	ATTR_HOT void insert_at(const std::size_t index, const LC &elem)
+	void insert_at(const std::size_t index, const LC &elem)
 	{
 		this->insert(this->begin() + index, elem);
 	}
 
-	ATTR_HOT  void remove_at(const std::size_t pos)
+	 void remove_at(const std::size_t pos)
 	{
 		this->erase(this->begin() + pos);
 	}
 
 	int indexof(const LC &elem) const
 	{
-		for (unsigned i = 0; i < this->size(); i++)
+		for (std::size_t i = 0; i < this->size(); i++)
 		{
 			if (this->at(i) == elem)
 				return i;
@@ -192,240 +118,78 @@ public:
 // ----------------------------------------------------------------------------------------
 
 template <class LC>
-class linkedlist_t;
-
-#if 1
-
-template <class LC>
-struct plinkedlist_element_t
-{
-public:
-
-	friend class linkedlist_t<LC>;
-
-	plinkedlist_element_t() : m_next(nullptr) {}
-
-	LC *next() const { return m_next; }
-//private:
-	LC * m_next;
-};
-
-template <class LC>
 class linkedlist_t
 {
 public:
 
+	struct element_t
+	{
+	public:
+
+		friend class linkedlist_t<LC>;
+
+		element_t() : m_next(nullptr) {}
+
+		LC *next() const { return m_next; }
+	private:
+		LC * m_next;
+	};
+
+	struct iter_t final : public std::iterator<std::forward_iterator_tag, LC>
+	{
+		LC* p;
+	public:
+		constexpr iter_t(LC* x) noexcept : p(x) {}
+		iter_t(const iter_t &rhs) noexcept = default;
+		iter_t(iter_t &&rhs) noexcept = default;
+		iter_t& operator++() noexcept {p = p->next();return *this;}
+		iter_t operator++(int) noexcept {iter_t tmp(*this); operator++(); return tmp;}
+		bool operator==(const iter_t& rhs) noexcept {return p==rhs.p;}
+		bool operator!=(const iter_t& rhs) noexcept {return p!=rhs.p;}
+		LC& operator*() noexcept {return *p;}
+		LC* operator->() noexcept {return p;}
+	};
+
 	linkedlist_t() : m_head(nullptr) {}
-#if 0
-	ATTR_HOT  void insert(const LC &before, LC &elem)
+
+	iter_t begin() const { return iter_t(m_head); }
+	constexpr iter_t end() const { return iter_t(nullptr); }
+
+	void push_front(LC *elem)
 	{
-		if (m_head == &before)
-		{
-			elem.m_next = m_head;
-			m_head = &elem;
-		}
-		else
-		{
-			LC *p = m_head;
-			while (p != nullptr)
-			{
-				if (p->m_next == &before)
-				{
-					elem->m_next = &before;
-					p->m_next = &elem;
-					return;
-				}
-				p = p->m_next;
-			}
-			//throw pexception("element not found");
-		}
-	}
-#endif
-	ATTR_HOT  void insert(LC &elem)
-	{
-		elem.m_next = m_head;
-		m_head = &elem;
+		elem->m_next = m_head;
+		m_head = elem;
 	}
 
-	ATTR_HOT  void add(LC &elem)
+	void push_back(LC *elem)
 	{
 		LC **p = &m_head;
 		while (*p != nullptr)
 		{
 			p = &((*p)->m_next);
 		}
-		*p = &elem;
-		elem.m_next = nullptr;
+		*p = elem;
+		elem->m_next = nullptr;
 	}
 
-	ATTR_HOT  void remove(const LC &elem)
+	void remove(const LC *elem)
 	{
-		LC **p;
-		for (p = &m_head; *p != &elem; p = &((*p)->m_next))
+		auto p = &m_head;
+		for ( ; *p != elem; p = &((*p)->m_next))
 		{
 			//nl_assert(*p != nullptr);
 		}
-		(*p) = elem.m_next;
+		(*p) = elem->m_next;
 	}
 
-	ATTR_HOT  LC *first() const { return m_head; }
-	ATTR_HOT  void clear() { m_head = nullptr; }
-	ATTR_HOT  bool is_empty() const { return (m_head == nullptr); }
+	LC *front() const { return m_head; }
+	void clear() { m_head = nullptr; }
+	bool empty() const { return (m_head == nullptr); }
 
 //private:
 	LC *m_head;
 };
-#else
 
-template <class LC>
-struct plinkedlist_element_t
-{
-public:
-
-	friend class linkedlist_t<LC>;
-
-	plinkedlist_element_t() : m_next(nullptr), m_prev(nullptr) {}
-
-	LC *next() const { return m_next; }
-private:
-	LC * m_next;
-	LC * m_prev;
-};
-
-template <class LC>
-class linkedlist_t
-{
-public:
-
-	linkedlist_t() : m_head(nullptr), m_tail(nullptr) {}
-
-	ATTR_HOT  void insert(LC &elem)
-	{
-		if (m_head != nullptr)
-			m_head->m_prev = &elem;
-		elem.m_next = m_head;
-		elem.m_prev = nullptr;
-		m_head = &elem;
-		if (m_tail == nullptr)
-			m_tail = &elem;
-	}
-
-	ATTR_HOT  void add(LC &elem)
-	{
-		if (m_tail != nullptr)
-			m_tail->m_next = &elem;
-		elem.m_prev = m_tail;
-		m_tail = &elem;
-		elem.m_next = nullptr;
-		if (m_head == nullptr)
-			m_head = &elem;
-	}
-
-	ATTR_HOT  void remove(const LC &elem)
-	{
-		if (prev(elem) == nullptr)
-		{
-			m_head = next(elem);
-			if (m_tail == &elem)
-				m_tail = nullptr;
-		}
-		else
-			prev(elem)->m_next = next(elem);
-
-		if (next(elem) == nullptr)
-		{
-			m_tail = prev(elem);
-			if (m_head == &elem)
-				m_head = nullptr;
-		}
-		else
-			next(elem)->m_prev = prev(elem);
-	}
-
-
-	ATTR_HOT static  LC *next(const LC &elem) { return static_cast<LC *>(elem.m_next); }
-	ATTR_HOT static  LC *next(const LC *elem) { return static_cast<LC *>(elem->m_next); }
-	ATTR_HOT static  LC *prev(const LC &elem) { return static_cast<LC *>(elem.m_prev); }
-	ATTR_HOT static  LC *prev(const LC *elem) { return static_cast<LC *>(elem->m_prev); }
-	ATTR_HOT  LC *first() const { return m_head; }
-	ATTR_HOT  void clear() { m_head = m_tail = nullptr; }
-	ATTR_HOT  bool is_empty() const { return (m_head == nullptr); }
-
-private:
-	LC *m_head;
-	LC *m_tail;
-};
-#endif
-
-// ----------------------------------------------------------------------------------------
-// string list
-// ----------------------------------------------------------------------------------------
-
-class pstring_vector_t : public pvector_t<pstring>
-{
-public:
-	pstring_vector_t() : pvector_t<pstring>() { }
-
-	pstring_vector_t(const pstring &str, const pstring &onstr, bool ignore_empty = false)
-	: pvector_t<pstring>()
-	{
-		int p = 0;
-		int pn;
-
-		pn = str.find(onstr, p);
-		while (pn>=0)
-		{
-			pstring t = str.substr(p, pn - p);
-			if (!ignore_empty || t.len() != 0)
-				this->push_back(t);
-			p = pn + onstr.len();
-			pn = str.find(onstr, p);
-		}
-		if (p < (int) str.len())
-		{
-			pstring t = str.substr(p);
-			if (!ignore_empty || t.len() != 0)
-				this->push_back(t);
-		}
-	}
-
-	pstring_vector_t(const pstring &str, const pstring_vector_t &onstrl)
-	: pvector_t<pstring>()
-	{
-		pstring col = "";
-
-		unsigned i = 0;
-		while (i<str.blen())
-		{
-			int p = -1;
-			for (std::size_t j=0; j < onstrl.size(); j++)
-			{
-				if (std::memcmp(onstrl[j].cstr(), &(str.cstr()[i]), onstrl[j].blen())==0)
-				{
-					p = j;
-					break;
-				}
-			}
-			if (p>=0)
-			{
-				if (col != "")
-					this->push_back(col);
-
-				col = "";
-				this->push_back(onstrl[p]);
-				i += onstrl[p].blen();
-			}
-			else
-			{
-				pstring::traits::code_t c = pstring::traits::code(str.cstr() + i);
-				col += c;
-				i+=pstring::traits::codelen(c);
-			}
-		}
-		if (col != "")
-			this->push_back(col);
-	}
-};
 
 // ----------------------------------------------------------------------------------------
 // hashmap list
@@ -645,7 +409,7 @@ private:
 
 	}
 	pvector_t<element_t> m_values;
-	array_t<int> m_hash;
+	std::vector<int> m_hash;
 };
 
 // ----------------------------------------------------------------------------------------
