@@ -65,7 +65,7 @@ void metlfrzr_state::video_start()
 /*
  - video regs format:
     [0x06] ---- --x- used during title screen transition, unknown purpose
-    [0x06] ---- ---x X scrolling 9th bit
+    [0x06] ---- ---x X scrolling 8th bit
     [0x15] always 0?
     [0x16] always 0?
     [0x17] xxxx xxxx X scrolling base value
@@ -112,7 +112,7 @@ void metlfrzr_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
     Sprite seems to traverse from top to bottom priority-wise, other than that format is almost 1:1 with darkmist.cpp.
  sprite format:
     [0] tttt tttt tile number
-    [1] x--- ---- if 1 sprite is disabled
+    [1] x--- ---- X 8th bit
     [1] -ttt ---- tile bank
     [1] ---- cccc palette number
     [2] yyyy yyyy Y offset
@@ -127,8 +127,6 @@ void metlfrzr_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 
 	for(count=0x200-4;count>-1;count-=4)
 	{
-		if(base_spriteram[count+1] & 0x80)
-			continue;
 
 		gfx_element *cur_gfx = base_spriteram[count+1] & 0x40 ? gfx_3 : gfx_2;
 		UINT8 tile_bank = (base_spriteram[count+1] & 0x30) >> 4;
@@ -136,7 +134,9 @@ void metlfrzr_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		UINT8 color = base_spriteram[count+1] & 0xf;
 		int y = base_spriteram[count+2];
 		int x = base_spriteram[count+3];
-
+		if(base_spriteram[count+1] & 0x80)
+			x-=256;
+		
 		cur_gfx->transpen(bitmap,cliprect,tile,color,0,0,x,y,0xf);
 	}
 }
