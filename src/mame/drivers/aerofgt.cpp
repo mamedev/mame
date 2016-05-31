@@ -233,6 +233,8 @@ static ADDRESS_MAP_START( spinlbrk_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1") AM_WRITE(aerofgt_bg2scrollx_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfff006, 0xfff007) AM_WRITE(sound_command_w)
+//	AM_RANGE(0xfff008, 0xfff009) - read when analog inputs are enabled
+//	AM_RANGE(0xfff00a, 0xfff00b) /
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( turbofrc_map, AS_PROGRAM, 16, aerofgt_state )
