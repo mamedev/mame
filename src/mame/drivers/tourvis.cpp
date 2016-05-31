@@ -111,6 +111,9 @@
 
 * Denotes Not Dumped
 
+    Rumored games:
+    Parasol Stars - often been mentioned, but still not confirmed, for Tourvision. For now it's been added from its NEC PC-Engine dump, which it would be likely identical.
+
  _______________________________________________________________________________________________________________________________________________
 |                                                                                                                                               |
 |                                           ____________               ____________               ____________               ____________       |
