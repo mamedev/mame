@@ -21,7 +21,7 @@
  @CP0904A  TMS0970   1977, Milton Bradley Comp IV
  @MP0905B  TMS0970   1977, Parker Brothers Codename Sector
  *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
- *MP0158   TMS1000   1979, Entex Soccer
+ @MP0158   TMS1000   1979, Entex Soccer
  *MP0168   TMS1000   1979, Conic Basketball
  @MP0170   TMS1000   1979, Conic Football
  @MP0914   TMS1000   1979, Entex Baseball 1
@@ -34,7 +34,7 @@
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  @MP1211   TMS1100   1980, Entex Space Invader
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
- *MP1219   TMS1100   1980, U.S. Games Super Sports 4
+ @MP1219   TMS1100   1980, U.S. Games Super Sports 4
  @MP1221   TMS1100   1980, Entex Raise The Devil
  *MP1296   TMS1100?  1982, Entex Black Knight
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Tandy Radio Shack Science Fair Microcomputer Trainer
@@ -140,6 +140,7 @@
 #include "efootb4.lh"
 #include "einvader.lh" // test-layout(but still playable)
 #include "elecdet.lh"
+#include "esoccer.lh"
 #include "fxmcr165.lh" // clickable
 #include "gjackpot.lh"
 #include "gpoker.lh"
@@ -152,8 +153,9 @@
 #include "mmerlin.lh" // clickable
 #include "raisedvl.lh"
 #include "simon.lh" // clickable
-#include "ssimon.lh" // clickable
 #include "splitsec.lh"
+#include "ssimon.lh" // clickable
+#include "ssports4.lh"
 #include "starwbc.lh" // clickable
 #include "stopthie.lh" // clickable
 #include "tandy12.lh" // clickable
@@ -1614,6 +1616,73 @@ static MACHINE_CONFIG_START( cnfball2, cnfball2_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_cnfball2)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Entex (Electronic) Soccer
+  * TMS1000NL MP0158 (die label same)
+  * 2 7seg LEDs, 30 other LEDs, 1-bit sound
+
+***************************************************************************/
+
+class esoccer_state : public hh_tms1k_state
+{
+public:
+	esoccer_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void esoccer_state::prepare_display()
+{
+}
+
+WRITE16_MEMBER(esoccer_state::write_r)
+{
+}
+
+WRITE16_MEMBER(esoccer_state::write_o)
+{
+}
+
+READ8_MEMBER(esoccer_state::read_k)
+{
+	return 0;
+}
+
+
+// config
+
+static INPUT_PORTS_START( esoccer )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( esoccer, esoccer_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=47K, C=33pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(esoccer_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(esoccer_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(esoccer_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_esoccer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -5663,6 +5732,82 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  U.S. Games Super Sports 4
+  * TMS1100 MP1219 (no decap)
+  * x
+
+***************************************************************************/
+
+class ssports4_state : public hh_tms1k_state
+{
+public:
+	ssports4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void ssports4_state::prepare_display()
+{
+}
+
+WRITE16_MEMBER(ssports4_state::write_r)
+{
+}
+
+WRITE16_MEMBER(ssports4_state::write_o)
+{
+}
+
+READ8_MEMBER(ssports4_state::read_k)
+{
+	return 0;
+}
+
+
+// config
+
+static INPUT_PORTS_START( ssports4 )
+INPUT_PORTS_END
+
+
+// output PLA is not decapped, dumped electronically
+static const UINT16 ssports4_output_pla[0x20] =
+{
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x40, 0x40, 0x40, 0x40, 0x40,
+	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+};
+
+static MACHINE_CONFIG_START( ssports4, ssports4_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pf
+	MCFG_TMS1XXX_OUTPUT_PLA(ssports4_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(ssports4_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ssports4_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ssports4_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ssports4)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
@@ -5763,6 +5908,17 @@ ROM_START( cnfball2 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_cnfball2_output.pla", 0, 365, NO_DUMP )
+ROM_END
+
+
+ROM_START( esoccer )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0158", 0x0000, 0x0400, CRC(ae4581ea) SHA1(5f6881f8247094abf8cffb17f6e6586e94cff38c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_esoccer_output.pla", 0, 365, CRC(c6eeabbd) SHA1(99d07902126b5a1c1abf43340f30d3390da5fa92) )
 ROM_END
 
 
@@ -6146,6 +6302,17 @@ ROM_START( phpball )
 ROM_END
 
 
+ROM_START( ssports4 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1219", 0x0000, 0x0800, CRC(865c06d6) SHA1(12a625a13bdb57b82b35c42b175d38756a1e2e04) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ssports4_output.pla", 0, 365, NO_DUMP )
+ROM_END
+
+
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
@@ -6160,6 +6327,7 @@ CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Col
 CONS( 1979, cnfball,   0,        0, cnfball,   cnfball,   driver_device, 0, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, cnfball2,  0,        0, cnfball2,  cnfball2,  driver_device, 0, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
 
+CONS( 1979, esoccer,   0,        0, esoccer,   esoccer,   driver_device, 0, "Entex", "Electronic Soccer (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, ebball2,   0,        0, ebball2,   ebball2,   driver_device, 0, "Entex", "Electronic Baseball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", MACHINE_SUPPORTS_SAVE )
@@ -6203,6 +6371,8 @@ CONS( 1989, copycatm2, copycat,  0, copycatm2, copycatm2, driver_device, 0, "Tig
 
 CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,   0,        0, phpball,   phpball,   driver_device, 0, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+CONS( 1980, ssports4,  0,        0, ssports4,  ssports4,  driver_device, 0, "U.S. Games", "Super Sports 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.
