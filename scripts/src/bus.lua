@@ -1047,6 +1047,8 @@ if (BUSES["PET"]~=null) then
 		MAME_DIR .. "src/devices/bus/pet/petuja.h",
 		MAME_DIR .. "src/devices/bus/pet/cb2snd.cpp",
 		MAME_DIR .. "src/devices/bus/pet/cb2snd.h",
+		MAME_DIR .. "src/devices/bus/pet/2joysnd.h",
+		MAME_DIR .. "src/devices/bus/pet/2joysnd.cpp",
 	}
 end
 

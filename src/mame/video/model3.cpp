@@ -710,76 +710,108 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
     - Limit of 15 child nodes (nesting), not including polygon nodes
     - Color table (is this featured in Model 3?)
 
-    0x00:   -------- -------- ------xx -------- Viewport number 0-3
+    0x00:   xxxxxxxx xxxxxxxx xxxxxx-- -------- Viewport number
+			-------- -------- ------xx -------- Viewport select 0-3
+			-------- -------- -------- x------- Display select
+			-------- -------- -------- -x------ Fix point centroid
+			-------- -------- -------- --x----- Viewport off
             -------- -------- -------- ---xx--- Viewport priority
+			-------- -------- -------- -----x-- "clr_xlator_tbl_sel"
+			-------- -------- -------- ------xx Node type
 
-    0x01:   Child node pointer (inherits parameters from this node)
-    0x02:   Sibling node pointer
-    0x03:   (float) Focal length? Affected by frustum angles and viewport size
-    0x04:   Sun light vector Z-component (float)
-    0x05:   Sun light vector X-component (float)
-    0x06:   Sun light vector Y-component (float)
+    0x01:   -------x -------- -------- -------- Sibling null
+			-------- xxxxxxxx xxxxxxxx xxxxxxxx Sibling pointer
+
+    0x02:   -----x-- -------- -------- -------- Child is sibling table
+			-------x -------- -------- -------- Leaf node
+			-------- xxxxxxxx xxxxxxxx xxxxxxxx Child pointer
+
+    0x03:   "cota" (float) Affected by frustum angles and viewport size
+    0x04:   Sun light vector X-component (float)
+    0x05:   Sun light vector Y-component (float)
+    0x06:   Sun light vector Z-component (float)
     0x07:   Sun light intensity (float)
-    0x08:   ? (float) Affected by left and right angle
-    0x09:   ? (float) Affected by top and bottom angle
-    0x0a:   ? (float) Affected by top and bottom angle
-    0x0b:   ? (float) Affected by left and right angle
-    0x0c:   (float) Frustum Left Angle Y (these angles are defined in polar coordinates)
-    0x0d:   (float) Frustum Left Angle X
-    0x0e:   (float) Frustum Top Angle Y
-    0x0f:   (float) Frustum Top Angle X
-    0x10:   (float) Frustum Right Angle Y
-    0x11:   (float) Frustum Right Angle X
-    0x12:   (float) Frustum Bottom Angle Y
-    0x13:   (float) Frustum Bottom Angle X
+    0x08:   "Cv" ? (float) Affected by left and right angle
+    0x09:   "Cw" ? (float) Affected by top and bottom angle
+    0x0a:   "Io" ? (float) Affected by top and bottom angle
+    0x0b:   "Jo" ? (float) Affected by left and right angle
+    0x0c:   (float) Left clip plane U
+    0x0d:   (float) Left clip plane V
+    0x0e:   (float) Top clip plane U
+    0x0f:   (float) Top clip plane W
+    0x10:   (float) Right clip plane U
+    0x11:   (float) Right clip plane V
+    0x12:   (float) Bottom clip plane U
+    0x13:   (float) Bottom clip plane W
 
     0x14:   xxxxxxxx xxxxxxxx -------- -------- Viewport height (14.2 fixed-point)
             -------- -------- xxxxxxxx xxxxxxxx Viewport width (14.2 fixed-point)
 
-    0x15:   ?
-    0x16:   Matrix base pointer
-    0x17:   LOD blend type table pointer?       (seems to be 8x float per entry)
-    0x18:   ?
-    0x19:   ?
+    0x15:   xxxxxxxx xxxxxxxx -------- -------- "env_to_chan_matrix_index"
+
+    0x16:   -------- xxxxxxxx xxxxxxxx xxxxxxxx Matrix base pointer
+
+    0x17:   -------- xxxxxxxx xxxxxxxx xxxxxxxx LOD pointer
+
+    0x18:   -------- xxxxxxxx xxxxxxxx xxxxxxxx Culling offset
+
+    0x19:   -------- xxxxxxxx xxxxxxxx xxxxxxxx Polygon offset
 
     0x1a:   xxxxxxxx xxxxxxxx -------- -------- Viewport Y coordinate (12.4 fixed-point)
             -------- -------- xxxxxxxx xxxxxxxx Viewport X coordinate (12.4 fixed-point)
 
     0x1b:   Copy of word 0x00
-    0x1c:   ?
 
-    0x1d:   xxxxxxxx xxxxxxxx -------- -------- Spotlight Y size
+    0x1c:   xxxxxxxx xxxxxxxx -------- -------- "lj"
+			-------- -------- xxxxxxxx xxxxxxxx "li"
+
+    0x1d:   -------- xxxxxxxx -------- -------- Spotlight Y size
             -------- -------- xxxxxxxx xxxxxxxx Spotlight Y position (13.3 fixed-point?)
 
-    0x1e:   xxxxxxxx xxxxxxxx -------- -------- Spotlight X size
+    0x1e:   -------- xxxxxxxx -------- -------- Spotlight X size
             -------- -------- xxxxxxxx xxxxxxxx Spotlight X position (13.3 fixed-point?)
 
     0x1f:   Light extent (float)
 
     0x20:   xxxxxxxx -------- -------- -------- ?
             -------- xxxxxxxx -------- -------- ?
+			-------- -------- -x------ -------- Parallel projection
             -------- -------- --xxx--- -------- Light RGB (RGB111?)
             -------- -------- -----xxx -------- Light RGB Fog (RGB111?)
             -------- -------- -------- xxxxxxxx Scroll Fog (0.8 fixed-point?) What is this???
 
-    0x21:   ? seen 8.0, 0.125, 1000000000.0
+    0x21:   "inv_light_start_range" (float)
     0x22:   Fog Color (RGB888)
     0x23:   Fog Density (float)
 
-    0x24:   xxxxxxxx xxxxxxxx -------- -------- ?
+    0x24:   -------- xxxxxxxx -------- -------- Fog attenuation
             -------- -------- xxxxxxxx -------- Sun light ambient (0.8 fixed-point)
             -------- -------- -------- xxxxxxxx Scroll attenuation (0.8 fixed-point) What is this???
 
-    0x25:   Fog offset
-    0x26:   ?
-    0x27:   ?
-    0x28:   ?
-    0x29:   ?
-    0x2a:   ?
-    0x2b:   ?
-    0x2c:   ?
-    0x2d:   ?
-    0x2e:   ?
+    0x25:   -------- xxxxxxxx -------- -------- Ambient fog
+			-------- -------- xxxxxxxx xxxxxxxx Fog offset
+
+    0x26:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Spot light
+			-------- -------- -------- x------- Clear viewport
+			-------- -------- -------- -x------ New sun parameters
+
+    0x27:   x------- -------- -------- -------- Valid spot light
+			-x------ -------- -------- -------- Pro 1000 dummy
+			-------- --xxxxxx xxxxxxxx xxxxxxxx "upgrade_wd_10"
+
+    0x28:   Fog layer altitude (float)
+
+    0x29:   Top fog density (float)
+
+    0x2a:   Bottom fog density (float)
+
+    0x2b:   Near clipping plane (float)
+	
+    0x2c:   Far clipping plane (float)
+
+    0x2d:   Pfog offset top
+
+    0x2e:   Pfog offset bottom
     0x2f:   ?
 
 
@@ -818,12 +850,23 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 
     Instance Node?
 
-    0x00:   xxxxxxxx xxxxxxxx xxxxxx-- -------- Node number/ID?, num of bits unknown
-            -------- -------- -------- ---x---- This node applies translation, else matrix
-            -------- -------- -------- ----x--- LOD enable?
-            -------- -------- -------- -----x-- ?
-            -------- -------- -------- ------x- ?
-            -------- -------- -------- -------x ?
+    0x00:   x------- -------- -------- -------- Is UF ref
+			-x------ -------- -------- -------- Is 3D model
+			--x----- -------- -------- -------- Is point
+			---x---- -------- -------- -------- Is point ref
+			----x--- -------- -------- -------- Is animation
+			-----x-- -------- -------- -------- Is billboard
+			------x- -------- -------- -------- Child is billboard
+			-------x -------- -------- -------- Extra child pointer needed
+			-------- -----xxx xxxxxx-- -------- Node ID
+
+			-------- -------- -------- x------- Reset matrix
+			-------- -------- -------- -x------ Use child pointer
+			-------- -------- -------- --x----- Use sibling pointer
+			-------- -------- -------- ---x---- No matrix
+			-------- -------- -------- ----x--- Indirect child
+			-------- -------- -------- -----x-- Valid color table
+			-------- -------- -------- ------xx Node type (0 = viewport, 1 = root node, 2 = culling node)
 
     0x01,0x02 only present on Step 2+
 
@@ -833,18 +876,26 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
             -------- -------- --xxxxxx x------- X offset
             -------- -------- -------- -xxxxxxx Y offset
 
-    0x03:   --x----- -------- -------- -------- ?
-            -------- -xxxxxxx xxxx---- -------- LOD?
+    0x03:   xxxxxxxx xxxxx--- -------- -------- Color table address 1
+            -------- -----xxx xxxx---- -------- LOD table pointer
             -------- -------- ----xxxx xxxxxxxx Node matrix
 
     0x04:   Translation X coordinate
     0x05:   Translation Y coordinate
     0x06:   Translation Z coordinate
-    0x07:   Child node pointer
-    0x08:   Sibling node pointer
 
-    0x09:   xxxxxxxx xxxxxxxx -------- -------- Culling or sorting related?
-            -------- -------- xxxxxxxx xxxxxxxx Culling or sorting related?
+    0x07:   xxxx---- -------- -------- -------- Color table address 2
+			-----x-- -------- -------- -------- Sibling table
+			------x- -------- -------- -------- Point
+			-------x -------- -------- -------- Leaf node
+			-------- xxxxxxxx xxxxxxxx xxxxxxxx Child pointer
+    
+	0x08:   xxxxxxx- -------- -------- -------- Color table address 3
+			-------x -------- -------- -------- Null sibling
+			-------- xxxxxxxx xxxxxxxx xxxxxxxx Sibling pointer
+
+    0x09:   xxxxxxxx xxxxxxxx -------- -------- Blend radius
+            -------- -------- xxxxxxxx xxxxxxxx Culling radius
 
 
     Polygon Data

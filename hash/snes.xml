@@ -1357,7 +1357,7 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="u1" value="U1 EPROM" />
 			<feature name="u2" value="U2 EPROM" />
 			<feature name="u3" value="U3 EPROM" />
-			<feature name="u4" value="U4 EPROM" />
+			<feature name="u4" value="U4 EPROM" />	<!-- empty socket -->
 			<feature name="u5" value="U5 SRAM" />
 			<feature name="u6" value="U6 PLD" />
 			<feature name="u7" value="U7 74LS157" />
@@ -34238,6 +34238,20 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="arabianp" cloneof="arabian">
+		<description>Arabian Nights - Sabaku no Seirei Ou (Jpn, Prototype)</description>
+		<year>1996</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2621440">
+				<rom name="arabian nights - sabaku no seirei ou (japan) (beta).sfc" size="2621440" crc="db17dcfa" sha1="79883a2816bad5afe68a93f8679190dc1995b4e7" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="araiguma">
 		<description>Araiguma Rascal (Jpn)</description>
@@ -37650,6 +37664,33 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="downwrldd" cloneof="downwrld">
+		<description>Down the World - Mervil's Ambition (Jpn, Rolling Demo)</description>
+		<year>1994</year>
+		<publisher>ASCII Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" />
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2097152">
+				<!-- Actual labels were D/W 1, D/W 2, D/W 3 and D/W 4 -->
+				<rom name="dw 1.u1" size="524288" crc="1b50d606" sha1="562a025dc8e851602192940bf6a3ed5961b0935e" offset="0x000000" />
+				<rom name="dw 2.u2" size="524288" crc="84d8af02" sha1="0222bc05fef66899b308619883adc9f2d23e8002" offset="0x080000" />
+				<rom name="dw 3.u3" size="524288" crc="71d22a60" sha1="f2c4632a49a07f09e7f1a93352c52175da59d4d2" offset="0x100000" />
+				<rom name="dw 4.u4" size="524288" crc="2d7659e5" sha1="456111c20f80b187ee6e1da77d7bfc89df4218eb" offset="0x180000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="downtown">
 		<description>Downtown Nekketsu Baseball Monogatari - Yakyuu de Shoubu da! Kunio-kun (Jpn)</description>
@@ -40237,6 +40278,20 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="3145728">
 				<rom name="ganpuru - gunman's proof (japan).sfc" size="3145728" crc="af415c24" sha1="dad73d2c0b1a3c916d40c4a208566ee4193333b2" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ganpurup" cloneof="ganpuru">
+		<description>Ganpuru - Gunman's Proof (Jpn, Prototype)</description>
+		<year>1997</year>
+		<publisher>ASCII Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="ganpuru - gunman's proof (japan) (beta).sfc" size="3145728" crc="72feb165" sha1="cb753da21f0e98d16ee282d2e9029b907534bdf1" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -60960,6 +61015,20 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="tougedenp" cloneof="tougeden">
+		<description>Touge Densetsu - Saisoku Battle (Jpn, Prototype)</description>
+		<year>1996</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="touge densetsu - saisoku battle (japan) (beta).sfc" size="3145728" crc="cba34e28" sha1="e7ee469fb440552a276645c8214b14f438dfa1f7" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="towerdrm">
 		<description>Tower Dream (Jpn)</description>
@@ -61837,6 +61906,21 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="umizuri meijin - suzuki hen (japan).sfc" size="1048576" crc="ba2a817c" sha1="79d9dc9db69f46fcddbe9afb42fc9b3cf69881b5" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="umizurimp" cloneof="umizurim">
+		<description>Umizuri Meijin - Suzuki Hen (Jpn, Prototype)</description>
+		<year>1994</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="umizuri meijin - suzuki hen (japan) (beta).sfc" size="1048576" crc="c7939dbf" sha1="f932a6d3f051835c5f6b8687e61023b0a47fdfc6" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>

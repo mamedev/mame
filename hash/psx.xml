@@ -10376,7 +10376,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		</part>
 	</software>
 	
-	<software name="gt">
+	<software name="gt1">
 		<!-- Original images (Redump)
 		<rom name="Gran Turismo (USA) (v1.1).cue" size="91" crc="2ef772f6" sha1="4472af24ff9536b5550d0c887050669347b94902"/>
 		<rom name="Gran Turismo (USA) (v1.1).bin" size="693668304" crc="2b3845aa" sha1="5433c55806f7cd5ca2e42a6c39ff816d442ed6b6"/>
@@ -10392,6 +10392,23 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>		
+	
+	<software name="gt1a" cloneof="gt1">
+		<!-- Original images (Redump)
+		 <rom name="Gran Turismo (USA) (v1.0).cue" size="91" crc="98ec9286" sha1="6ab60478420438ef8ea39dfe858c521d296bd87e"/>
+		 <rom name="Gran Turismo (USA) (v1.0).bin" size="693668304" crc="f76f5118" sha1="999f4fccddb330171d1d018fbc5347531f4c9645"/>
+		 -->
+		<description>Gran Turismo (USA, v1.0)</description>
+		<year>1998</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94194"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gran turismo (usa) (v1.0)" sha1="79113d7eb3a5e9dc397f73597e187365a6d2a061"/>
+			</diskarea>
+		</part>
+	</software>
 	
 	<software name="gt2">
 		<!-- Original images (Redump)
@@ -10412,13 +10429,13 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 				<disk name="gran turismo 2 (usa) (arcade mode) (v1.1)" sha1="a30b84274435e2cac3b5232980d7217977e46c85"/>
 			</diskarea>
 		</part>
-			<part name="cdrom2" interface="psx_cdrom">
-				<feature name="part_id" value="Simulation Mode"/>
-				<diskarea name="cdrom">
-					<disk name="gran turismo 2 (usa) (simulation mode) (v1.2)" sha1="0f0a024624507ff5b79205f0f91c5cd7bd0f6d69"/>
-				</diskarea>
-			</part>
-		</software>
+		<part name="cdrom2" interface="psx_cdrom">
+			<feature name="part_id" value="Simulation Mode"/>
+			<diskarea name="cdrom">
+				<disk name="gran turismo 2 (usa) (simulation mode) (v1.2)" sha1="0f0a024624507ff5b79205f0f91c5cd7bd0f6d69"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="gt2a" cloneof="gt2">
 		<!-- Original images (Redump)
@@ -10568,23 +10585,6 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 			</diskarea>
 		</part>
 	</software>
-	
-	<software name="gt1" cloneof="gt">
-		<!-- Original images (Redump)
-		<rom name="Gran Turismo (USA) (v1.0).cue" size="91" crc="98ec9286" sha1="6ab60478420438ef8ea39dfe858c521d296bd87e"/>
-		<rom name="Gran Turismo (USA) (v1.0).bin" size="693668304" crc="f76f5118" sha1="999f4fccddb330171d1d018fbc5347531f4c9645"/>
-		-->
-		<description>Gran Turismo (USA, v1.0)</description>
-		<year>1998</year>
-		<publisher>Sony Computer Entertainment America</publisher>
-		<info name="serial" value="SCUS-94194"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="gran turismo (usa) (v1.0)" sha1="79113d7eb3a5e9dc397f73597e187365a6d2a061"/>
-			</diskarea>
-		</part>
-	</software>	
 
 	<software name="gtrac98">
 		<!-- Original images (Redump)
@@ -32475,7 +32475,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		</part>
 	</software>
 	
-	<software name="gtd" cloneof="gt">
+	<software name="gtd" cloneof="gt1">
 		<!-- Original images (Redump)
 		<rom name="Gran Turismo (USA) (Demo).cue" size="91" crc="dbe9eb9c" sha1="b0e46e8c44bae1ba7baa4dc58b26eb22d72d22fc"/>
 		<rom name="Gran Turismo (USA) (Demo).bin" size="615365520" crc="9d5454d8" sha1="edb9076dadc372c150e17559a6b1b5ea58f9c1fa"/>
@@ -35218,7 +35218,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 
 
 	
-<!-- WIP: redump.org Asia PS1 discs (4 of 3575), based on 'Sony - PlayStation (20160515 00-54-32).dat'
+<!-- WIP: redump.org Asia PS1 discs (7 of 3575), based on 'Sony - PlayStation (20160515 00-54-32).dat'
 
 The entries in this section are intended to replace the existing "low-grade" Japanese softlist entries with proper redump.org dumps.
 

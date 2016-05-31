@@ -266,14 +266,14 @@ void menu::reset(reset_options options)
 	}
 	else if (m_parent->is_special_main_menu())
 	{
-		if (strcmp(machine().options().ui(), "simple") == 0)
+		if (machine().options().ui() == emu_options::UI_SIMPLE)
 			item_append(_("Exit"), nullptr, 0, nullptr);
 		else
 			item_append(_("Exit"), nullptr, FLAG_UI | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
 	}
 	else
 	{
-		if (strcmp(machine().options().ui(), "simple") != 0 && menu::stack_has_special_main_menu())
+		if (machine().options().ui() != emu_options::UI_SIMPLE && menu::stack_has_special_main_menu())
 			item_append(_("Return to Previous Menu"), nullptr, FLAG_UI | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
 		else
 			item_append(_("Return to Previous Menu"), nullptr, 0, nullptr);

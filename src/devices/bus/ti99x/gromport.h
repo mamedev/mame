@@ -130,7 +130,7 @@ private:
 	int     m_slot;
 	int     get_index_from_tagname();
 
-	ti99_cartridge_pcb*                 m_pcb;          // inbound
+	std::unique_ptr<ti99_cartridge_pcb> m_pcb;          // inbound
 	ti99_cartridge_connector_device*    m_connector;    // outbound
 
 	// RPK which is associated to this cartridge

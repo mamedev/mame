@@ -19,9 +19,10 @@
     1943 Kai (65)
     Aero Blaster (32)
     After Burner II (46)
-  * Ankoku Densetu
+  * Ankoku Densetu (Legendary Axe II)
     Armed-F (?)
     Ballistix (186)
+  * Batman
     Be Ball (93)
   * Blodia
     Bomberman (71)
@@ -40,6 +41,7 @@
     Doraemon Meikyuu Daisakusen (20)
   * Doraemon II
     Down Load (43)
+  * Dragon Egg!
     Dragon Saber (65)
     Dragon Spirit (?)
     Dungeon Explorer (?)
@@ -51,12 +53,13 @@
     Gomola Speed (27)
     Gunhed (148)
     Hana Taka Daka (Super Long Nose Goblin) (6)
+  * Hatris
     Jackie Chan (54)
     Jinmu Densho (19)
     Kiki Kaikai (120)
     Legend Of Hero Tomna (56)
     Makyo Densetsu - The Legenary Axe (?)
-    Mizubaku Daibouken Liquid Kids (10)
+    Mizubaku Daibouken Liquid Kids (10) (marketed as "Parasol Stars II")
     Mr. Heli (23)
     Ninja Ryukenden (10)
     Operation Wolf (26)
@@ -94,6 +97,7 @@
     Terra Cresta II (27)
     Thunder Blade (?)
   * Tiger Road
+  * Titan
     Toy Shop Boys (51)
   * Tricky
   * TV Sports
@@ -104,6 +108,9 @@
     W-Ring (21)
     Winning Shot (28)
     Xevious (?)
+
+    Rumored games:
+  * Parasol Stars - often been mentioned, but still not confirmed, for Tourvision. For now it's been added from its NEC PC-Engine dump, which it would be likely identical.
 
 * Denotes Not Dumped
 

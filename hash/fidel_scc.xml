@@ -5,6 +5,18 @@
 
 <!-- Sensory Chess Challenger: 9, 12, A/S, .. -->
 
+	<software name="cb9">
+		<description>Challenger Book Openings 1</description>
+		<year>1982</year>
+		<publisher>Fidelity Electronics</publisher>
+		<part name="cart" interface="fidel_scc">
+			<dataarea name="rom" size="0x2000">
+				<!-- ROM taken from Super Sensory 9, should be same -->
+				<rom name="cb9.bin" size="0x2000" status="baddump" crc="421147e8" sha1="ccf62f6f218e8992baf30973fe41b35e14a1cc1a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cb16">
 		<description>Challenger Book Openings 2</description>
 		<year>1982</year>

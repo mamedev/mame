@@ -74,34 +74,11 @@ Language:
 
 -->
 <softwarelist name="vsmile_cd" description="VTech V.Flash/V.Smile Pro V.Disc images">
-	<!-- disk mounted as 93020 -->
-	<software name="incredib">
-		<description>The Incredibles - Mission Incredible (USA)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093020" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093020"  sha1="84ba80f67d136cd742989dceebda1c8881d0f393"/>
-			</diskarea>
-		</part>
-	</software>
 
-	<!-- disk mounted as 93080_001 -->
-	<software name="scoobyaa">
-		<description>Scooby-Doo! Ancient Adventure (USA)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093080" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093080"  sha1="3ec7e1ac4435666c3cc1b1844eac5f271b5357e8"/>
-			</diskarea>
-		</part>
-	</software>
 
 	<!-- disk mounted as 93060_001 -->
-	<software name="spidey93">
+	<!-- CHD v4? -->
+	<software name="spidermn">
 		<description>The Amazing Spider-Man - Countdown to Doom (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -113,8 +90,71 @@ Language:
 		</part>
 	</software>
 
+	<software name="spidermng" cloneof="spidermn">
+		<!--
+		Original files (from TeamEurope)
+		<rom name="93064_000.bin" size="378956592" crc="5039f062" sha1="80a0ae321273a4b7190ba79854b21fdfb96b75f4" />
+		<rom name="93064_000.cue" size="75" crc="625117d5" sha1="bf84b7e572d27fffa7b32a760a02fb3a1718832d" />
+		-->
+		<description>Spider-Man - Angriff der Super-Schurken (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093064" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="93064_000"  sha1="b0455f89a4ca9abd0351b7307a9b0702cc1344c3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- disk mounted as 93020 -->
+	<!-- CHD v4? -->
+	<software name="incredib">
+		<description>The Incredibles - Mission Incredible (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093020" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093020"  sha1="84ba80f67d136cd742989dceebda1c8881d0f393"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="incredibg" cloneof="incredib">
+		<!--
+		Original files (from TeamEurope)
+		<rom name="93024.bin" size="365481984" crc="4ac35678" sha1="6745971dab69942f85d32a4e1484b9d79c2163ee" />
+		<rom name="93024.cue" size="71" crc="bdb0bf7c" sha1="c88846f050ef65c9e8655e7d47c07f3f11a9c493" />
+		-->
+		<description>Die Unglaublichen - In unglaublicher Mission (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093024" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="93024"  sha1="09b80c8899a3c18776626225d662d7f084a44d2d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- disk mounted as 93080_001 -->
+	<!-- CHD v4? -->
+	<software name="scooby">
+		<description>Scooby-Doo! Ancient Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093080" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="093080"  sha1="3ec7e1ac4435666c3cc1b1844eac5f271b5357e8"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- disk mounted as 93120_003 -->
-	<software name="wacky931">
+	<!-- CHD v4? -->
+	<software name="wackyrac">
 		<description>Wacky Race on Jumpin' Bean Island (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -127,39 +167,89 @@ Language:
 	</software>
 
 	<software name="carsg">
+		<!--
+		Original files (from TeamEurope)
+		<rom name="93104_000.bin" size="562353792" crc="e487ef85" sha1="2794bb37d03435c1318ee632d067d64aaecbbebf" />
+		<rom name="93104_000.cue" size="75" crc="80141b8e" sha1="c2c1e974ee5e063ff320034a7ea82da346f303a9" />
+		-->
 		<description>Cars - Auf der Überholspur (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093104" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093104" sha1="3b627613a40e22028902e1569099bc67a5ed97be" />
+				<disk name="093104_000"  sha1="7347c93144f06648973a60f0fef74c74db69ddf9" />
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="shrekg">
-		<description>Shrek - Der Dritte (Ger)</description>
+	<software name="shrek3g">
+		<!--
+		Original files (from TeamEurope)
+		<rom name="93144_000.bin" size="623663376" crc="968ff493" sha1="28c486e6b5b9c6e4e79aa3151be82534f0f1245f" />
+		<rom name="93144_000.cue" size="75" crc="7cc3a9b3" sha1="3741a362931c0aa19b110490fd368c862fdc334f" />
+		-->
+		<description>Shrek Der Dritte - Die Suche nach Arthus (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093144" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093144" sha1="4d5b671f26a8ed4ab58444848428210c44b81c45" />
+				<disk name="093144_000"  sha1="ab7f8d57e235a12c23cc2e72dc263530d0deb016" />
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="msportg">
+		<!--
+		Original files (from TeamEurope)
+		<rom name="93204_000.bin" size="295248912" crc="fd73e33a" sha1="091567e473d996182c5157f2f34b729f2bc7dcff" />
+		<rom name="93204_000.cue" size="75" crc="cca73127" sha1="faf73ec0967f7811a58293e7eac8c29e52ca06e4" />
+		-->
 		<description>Multisports (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093204" />
 		<part name="cdrom" interface="vsmile_vdisk">
 			<diskarea name="cdrom">
-				<disk name="093204" sha1="ddabd616d8d00bd02c6313a524a2dcef299362b3" />
+				<disk name="093204_000"  sha1="eb89c8b5cacb619c1fbcb700b971ad2791f1c5b6" />
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="princesg">
+		<!--
+		Original files (from TeamEurope)
+		<rom name="93004.bin" size="467570544" crc="f919071f" sha1="d50f91fb7c79b8851cb3b6fbb80b66d78def511e" />
+		<rom name="93004.cue" size="71" crc="0af679dd" sha1="7e7e773aac1f9f8d2102cacbe5367340ac5198ba" />
+		-->
+		<description>Disney Princess - Das zauberhafte Märchen-Abenteuer (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093004" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="93004"  sha1="62d5ed13ddf7ccb2b32613e4ef44399957535355"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="hupfbohn">
+		<!--
+		Original files (from TeamEurope)
+		<rom name="93124_000.bin" size="457901472" crc="92a0ebe0" sha1="a3a8e54d5f12094bfc0c89954987cc793d83d3f9" />
+		<rom name="93124_000.cue" size="75" crc="13c741b0" sha1="7a5b6a928922cee744fc579a7f8a785c0537a5ac" />
+		-->
+		<description>Das verrückte Rennen der Hüpf-Bohnel Insel (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-093124" />
+		<part name="cdrom" interface="vsmile_vdisk">
+			<diskarea name="cdrom">
+				<disk name="93124_000"  sha1="90b2723c68da81de677b82d565c7e0364a7cbb53"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 </softwarelist>
