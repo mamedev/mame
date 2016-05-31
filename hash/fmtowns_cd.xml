@@ -3473,7 +3473,7 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>Fujitsu</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sherlock holmes no tantei kouza" sha1="df4dac06bc19ff169d9bdc958bfc25907aa7072ev" />
+				<disk name="sherlock holmes no tantei kouza" sha1="df4dac06bc19ff169d9bdc958bfc25907aa7072e" />
 			</diskarea>
 		</part>
 	</software>
