@@ -155,9 +155,9 @@ void queue_t::on_post_load()
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD object_t::object_t(netlist_t &nl, const pstring &aname, const type_t atype)
-: m_name(aname)
-, m_objtype(atype)
-, m_netlist(&nl)
+	: m_netlist(nl)
+	, m_name(aname)
+	, m_objtype(atype)
 {
 }
 

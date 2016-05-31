@@ -360,35 +360,27 @@ namespace netlist
 		};
 
 		ATTR_COLD object_t(netlist_t &nl, const pstring &aname, const type_t atype);
-
 		virtual ~object_t();
 
 		ATTR_COLD const pstring &name() const;
 
-		ATTR_COLD inline plib::pstate_manager_t *state_manager();
+		ATTR_COLD inline plib::pstate_manager_t &state_manager();
 
 		ATTR_HOT  type_t type() const { return m_objtype; }
-
 		ATTR_HOT  bool isType(const type_t atype) const { return (m_objtype == atype); }
 
-		ATTR_HOT  netlist_t & netlist() { return *m_netlist; }
-		ATTR_HOT  const netlist_t & netlist() const { return *m_netlist; }
+		ATTR_HOT  netlist_t & netlist() { return m_netlist; }
+		ATTR_HOT  const netlist_t & netlist() const { return m_netlist; }
 
-		ATTR_COLD void  do_reset()
-		{
-			reset();
-		}
+		ATTR_COLD void  do_reset() { reset(); }
 
 	protected:
-
 		virtual void reset() { }
-		// must call parent save_register !
-		//virtual void save_register() { }
 
 	private:
+		netlist_t & m_netlist;
 		pstring m_name;
 		const type_t m_objtype;
-		netlist_t * m_netlist;
 
 	public:
 	    void * operator new (size_t size, void *ptr) { return ptr; }
@@ -613,7 +605,6 @@ namespace netlist
 	protected:
 		virtual void reset() override
 		{
-			analog_t::reset();
 			set_state(STATE_INP_ACTIVE);
 		}
 	};
@@ -1279,7 +1270,7 @@ protected:
 	// inline implementations
 	// -----------------------------------------------------------------------------
 
-	ATTR_COLD inline plib::pstate_manager_t *object_t::state_manager()
+	ATTR_COLD inline plib::pstate_manager_t &object_t::state_manager()
 	{
 		return m_netlist;
 	}

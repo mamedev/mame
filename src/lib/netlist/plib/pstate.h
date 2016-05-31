@@ -169,21 +169,21 @@ public:
 
 	template<typename C> void save(C &state, const pstring &stname)
 	{
-		pstate_manager_t *manager = static_cast<T*>(this)->state_manager();
+		pstate_manager_t &manager = static_cast<T*>(this)->state_manager();
 		pstring module = static_cast<T*>(this)->name();
-		manager->save_item(state, this, module + "." + stname);
+		manager.save_item(state, this, module + "." + stname);
 	}
 	template<typename C, std::size_t N> ATTR_COLD void save(C (&state)[N], const pstring &stname)
 	{
-		pstate_manager_t *manager = static_cast<T*>(this)->state_manager();
+		pstate_manager_t &manager = static_cast<T*>(this)->state_manager();
 		pstring module = static_cast<T*>(this)->name();
-		manager->save_state_ptr(module + "." + stname, pstate_datatype<C>::type, this, sizeof(state[0]), N, &(state[0]), false);
+		manager.save_state_ptr(module + "." + stname, pstate_datatype<C>::type, this, sizeof(state[0]), N, &(state[0]), false);
 	}
 	template<typename C> ATTR_COLD void save(C *state, const pstring &stname, const int count)
 	{
-		pstate_manager_t *manager = static_cast<T*>(this)->state_manager();
+		pstate_manager_t &manager = static_cast<T*>(this)->state_manager();
 		pstring module = static_cast<T*>(this)->name();
-		manager->save_state_ptr(module + "." + stname, pstate_datatype<C>::type, this, sizeof(C), count, state, false);
+		manager.save_state_ptr(module + "." + stname, pstate_datatype<C>::type, this, sizeof(C), count, state, false);
 	}
 };
 
