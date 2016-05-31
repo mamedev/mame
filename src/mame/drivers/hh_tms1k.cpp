@@ -1633,6 +1633,10 @@ MACHINE_CONFIG_END
   * TMS1000NL MP0158 (die label same)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
+  known releases:
+  - USA: Electronic Soccer, 2 versions (green bezel, transparent bezel)
+  - Germany: Fussball, with skill switch
+
 ***************************************************************************/
 
 class esoccer_state : public hh_tms1k_state
@@ -1652,25 +1656,59 @@ public:
 
 void esoccer_state::prepare_display()
 {
+	// R8,R9 are 7segs
+	m_display_segmask[8] = m_display_segmask[9] = 0x7f;
+	display_matrix(7, 10, m_o, m_r);
 }
 
 WRITE16_MEMBER(esoccer_state::write_r)
 {
+	// R0-R2: input mux
+	m_inp_mux = data & 7;
+
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R0-R9: led select
+	m_r = data;
+	prepare_display();
 }
 
 WRITE16_MEMBER(esoccer_state::write_o)
 {
+	// O0-O6: led state
+	m_o = data;
+	prepare_display();
 }
 
 READ8_MEMBER(esoccer_state::read_k)
 {
-	return 0;
+	// K: multiplexed inputs
+	return read_inputs(3);
 }
 
 
 // config
 
 static INPUT_PORTS_START( esoccer )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+
+	PORT_START("IN.2") // R2
+	PORT_CONFNAME( 0x03, 0x01, "Players" )
+	PORT_CONFSETTING(    0x01, "1" ) // Auto
+	PORT_CONFSETTING(    0x02, "2" ) // Manual
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( esoccer, esoccer_state )
