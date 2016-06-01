@@ -20,7 +20,7 @@ pstate_manager_t::~pstate_manager_t()
 
 
 
-ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pstate_data_type_e dt, const void *owner, const int size, const int count, void *ptr, bool is_ptr)
+ATTR_COLD void pstate_manager_t::save_state_ptr(const void *owner, const pstring &stname, const pstate_data_type_e dt, const int size, const int count, void *ptr, bool is_ptr)
 {
 	pstring fullname = stname;
 	ATTR_UNUSED  pstring ts[] = {
@@ -68,7 +68,7 @@ ATTR_COLD void pstate_manager_t::post_load()
 			m_save[i]->m_callback->on_post_load();
 }
 
-template<> ATTR_COLD void pstate_manager_t::save_item(pstate_callback_t &state, const void *owner, const pstring &stname)
+template<> ATTR_COLD void pstate_manager_t::save_item(const void *owner, pstate_callback_t &state, const pstring &stname)
 {
 	//save_state_ptr(stname, DT_CUSTOM, 0, 1, &state);
 	pstate_callback_t *state_p = &state;

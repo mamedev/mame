@@ -608,6 +608,8 @@ namespace netlist
 		P_PREVENT_COPYING(net_t)
 	public:
 
+		friend class core_device_t; // FIXME
+
 		using ptr_t = net_t *;
 		using list_t = plib::pvector_t<std::shared_ptr<net_t>>;
 
@@ -782,6 +784,8 @@ namespace netlist
 		P_PREVENT_COPYING(logic_output_t)
 	public:
 
+		friend class core_device_t; //FIXME
+
 		ATTR_COLD logic_output_t(core_device_t &dev, const pstring &aname);
 
 		virtual void reset() override
@@ -934,10 +938,7 @@ namespace netlist
 			return inp.Q();
 		}
 
-		ATTR_HOT  void OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time &delay) NOEXCEPT
-		{
-			out.set_Q(val, delay);
-		}
+		ATTR_HOT  void OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time &delay) NOEXCEPT;
 
 		ATTR_HOT  nl_double INPANALOG(const analog_input_t &inp) const { return inp.Q_Analog(); }
 
@@ -1334,7 +1335,6 @@ protected:
 		}
 	}
 
-
 	ATTR_HOT inline void net_t::push_to_queue(const netlist_time &delay) NOEXCEPT
 	{
 		if (!is_queued() && (num_cons() > 0))
@@ -1400,6 +1400,31 @@ protected:
 	{
 		m_queue.remove(&out);
 	}
+
+#if 0
+	ATTR_HOT  void OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time &delay) NOEXCEPT
+	{
+		out.set_Q(val, delay);
+	}
+#else
+	ATTR_HOT inline void core_device_t::OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time &delay) NOEXCEPT
+	{
+		if (val !=  out.m_my_net.m_new_Q)
+		{
+			out.m_my_net.m_new_Q = val;
+			if (!out.m_my_net.is_queued() && (out.m_my_net.num_cons() > 0))
+			{
+				out.m_my_net.m_time = netlist().time() + delay;
+				out.m_my_net.m_in_queue = (out.m_my_net.m_active > 0);     /* queued ? */
+				if (out.m_my_net.m_in_queue)
+				{
+					netlist().push_to_queue(out.m_my_net, out.m_my_net.m_time);
+				}
+			}
+		}
+	}
+#endif
+
 
 }
 

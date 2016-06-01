@@ -115,9 +115,9 @@ queue_t::queue_t(netlist_t &nl)
 void queue_t::register_state(plib::pstate_manager_t &manager, const pstring &module)
 {
 	netlist().log().debug("register_state\n");
-	manager.save_item(m_qsize, this, module + "." + "qsize");
-	manager.save_item(&m_times[0], this, module + "." + "times", m_times.size());
-	manager.save_item(&(m_names[0].m_buf[0]), this, module + "." + "names", m_names.size() * sizeof(names_t));
+	manager.save_item(this, m_qsize, module + "." + "qsize");
+	manager.save_item(this, &m_times[0], module + "." + "times", m_times.size());
+	manager.save_item(this, &(m_names[0].m_buf[0]), module + "." + "names", m_names.size() * sizeof(names_t));
 }
 
 void queue_t::on_pre_save()
@@ -200,8 +200,8 @@ netlist_t::netlist_t(const pstring &aname)
 		m_log(this),
 		m_lib(nullptr)
 {
-	save_item(static_cast<plib::pstate_callback_t &>(m_queue), this,  "m_queue");
-	save_item(m_time, this, "m_time");
+	save_item(this, static_cast<plib::pstate_callback_t &>(m_queue), "m_queue");
+	save_item(this, m_time, "m_time");
 }
 
 netlist_t::~netlist_t()

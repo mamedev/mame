@@ -322,9 +322,9 @@ void netlist_mame_device_t::device_start()
 	m_setup->start_devices();
 	m_setup->resolve_inputs();
 
-	netlist().save_item(m_rem, this, "m_rem");
-	netlist().save_item(m_div, this, "m_div");
-	netlist().save_item(m_old, this, "m_old");
+	netlist().save_item(this, m_rem, "m_rem");
+	netlist().save_item(this, m_div, "m_div");
+	netlist().save_item(this, m_old, "m_old");
 
 	save_state();
 
