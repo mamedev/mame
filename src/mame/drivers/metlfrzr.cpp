@@ -11,9 +11,9 @@
     TODO:
     - A few video register bits still needs sorting out (needs HW tests perhaps?)
     - Nuke legacy video code and re-do it by using tilemap system.
-    - sprites are ahead of 1/2 frames;
-    - Writes at 0xb800-0xbfff or 0x8000-0x9fff during gameplays? Debug?
-	- Flip screen support;
+    - sprites are ahead of 1/2 frames, needs sprite DMA fixed;
+    - Writes at 0xb800-0xbfff or 0x8000-0x9fff during gameplays? (Check by allowing ROM write)
+    - Flip screen support;
     - Why service mode returns all inputs as high? And why sound test doesn't seem to function at all, both BTANBs perhaps?
 
 **************************************************************************************************************************/
@@ -160,6 +160,7 @@ WRITE8_MEMBER(metlfrzr_state::output_w)
 	// bit 3-2: z80 ROM banking
 	// bit 1: enabled during gameplay, rowscroll enable?
 	// bit 0: enabled , unknown purpose (lamp?)
+	// TODO: bits 1-0 might actually be sprite DMA enable mask/request
 	machine().bookkeeping().coin_lockout_w(1, BIT(data,6) );
 	machine().bookkeeping().coin_lockout_w(0, BIT(data,5) );
 	m_fg_tilebank = (data & 0x10) >> 4;
@@ -343,10 +344,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 {
 	int scanline = param;
 
-
 	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
 
+	// TODO: check this irq.
 	if(scanline == 0) // vblank-in irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
 }
@@ -456,4 +457,4 @@ DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 
 
 
-GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu", "Metal Freezer (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )
