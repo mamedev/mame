@@ -347,7 +347,7 @@ ATTR_HOT void netlist_t::process_queue(const netlist_time &delta)
 			m_time = m_stop;
 
 	} else {
-		logic_net_t &mc_net = m_mainclock->m_Q.net().as_logic();
+		logic_net_t &mc_net = m_mainclock->m_Q.net();
 		const netlist_time inc = m_mainclock->m_inc;
 		netlist_time mc_time(mc_net.time());
 
@@ -577,10 +577,10 @@ ATTR_COLD net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	: object_t(nl, aname, NET)
 	, m_new_Q(0)
 	, m_cur_Q (0)
-	, m_railterminal(nullptr)
 	, m_time(netlist_time::zero)
 	, m_active(0)
 	, m_in_queue(2)
+	, m_railterminal(nullptr)
 	, m_cur_Analog(0.0)
 {
 	m_railterminal = mr;
@@ -896,7 +896,7 @@ ATTR_COLD logic_output_t::logic_output_t(core_device_t &dev, const pstring &anam
 
 ATTR_COLD void logic_output_t::initial(const netlist_sig_t val)
 {
-	net().as_logic().initial(val);
+	net().initial(val);
 }
 
 // ----------------------------------------------------------------------------------------

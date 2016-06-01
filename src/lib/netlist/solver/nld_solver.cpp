@@ -122,11 +122,11 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 	for (std::size_t k = 0; k < nets.size(); k++)
 	{
-		log().debug("setting up net\n");
-
 		analog_net_t *net = nets[k];
 
-		net->m_solver = this;
+		log().debug("setting up net\n");
+
+		net->set_solver(this);
 
 		for (core_terminal_t *p : net->m_core_terms)
 		{
@@ -150,7 +150,7 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					{
 						analog_output_t *net_proxy_output = nullptr;
 						for (auto & input : m_inps)
-							if (input->m_proxied_net == &p->net().as_analog())
+							if (input->m_proxied_net == &p->net())
 							{
 								net_proxy_output = input;
 								break;
@@ -163,7 +163,8 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 							net_proxy_output = plib::palloc<analog_output_t>(*this, this->name() + "." + plib::pfmt("m{1}")(m_inps.size()));
 							m_inps.push_back(net_proxy_output);
-							net_proxy_output->m_proxied_net = &p->net().as_analog();
+							nl_assert(p->net().is_analog());
+							net_proxy_output->m_proxied_net = static_cast<analog_net_t *>(&p->net());
 						}
 						net_proxy_output->net().register_con(*p);
 						// FIXME: repeated
@@ -728,7 +729,8 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 		if (!net->isRailNet())
 		{
 			netlist().log().debug("   ==> not a rail net\n");
-			analog_net_t *n = &net->as_analog();
+			/* Must be an analog net */
+			analog_net_t *n = static_cast<analog_net_t *>(net.get());
 			if (!n->already_processed(groups))
 			{
 				groups.push_back(analog_net_t::list_t());

@@ -30,7 +30,7 @@ namespace netlist
 
 	NETLIB_UPDATE(clock)
 	{
-		OUTLOGIC(m_Q, !m_Q.net().as_logic().new_Q(), m_inc  );
+		OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -46,23 +46,9 @@ namespace netlist
 
 	NETLIB_UPDATE(extclock)
 	{
-	#if 0
-		if (m_off == netlist_time::zero)
-		{
-			OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[m_cnt]);
-			m_cnt = (m_cnt + 1) % m_size;
-		}
-		else
-		{
-			OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[0] + m_off);
-			m_cnt = 1;
-			m_off = netlist_time::zero;
-		}
-	#else
 		OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
 		m_cnt = (m_cnt + 1) % m_size;
 		m_off = netlist_time::zero;
-	#endif
 	}
 
 	// ----------------------------------------------------------------------------------------

@@ -680,7 +680,7 @@ public:
 			m_param[i]->setTo(v * m_param_mult[i]->Value() + m_param_offset[i]->Value());
 		}
 		m_pos++;
-		OUTLOGIC(m_Q, !m_Q.net().as_logic().new_Q(), m_inc  );
+		OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
 	}
 
 public:

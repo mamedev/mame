@@ -81,7 +81,7 @@ namespace netlist
 
 	NETLIB_UPDATE(MM5837_dip)
 	{
-		OUTLOGIC(m_Q, !m_Q.net().as_logic().new_Q(), m_inc  );
+		OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
 
 		/* shift register
 		 *

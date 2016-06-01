@@ -64,7 +64,7 @@ namespace netlist
 
 		NETLIB_UPDATEI()
 		{
-			logic_net_t &net = m_Q.net().as_logic();
+			logic_net_t &net = m_Q.net();
 			// this is only called during setup ...
 			net.toggle_new_Q();
 			net.set_time(netlist().time() + m_inc);

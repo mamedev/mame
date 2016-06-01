@@ -130,7 +130,7 @@ public:
 
 	ATTR_HOT /* inline */ nl_double deltaV() const
 	{
-		return m_P.net().as_analog().Q_Analog() - m_N.net().as_analog().Q_Analog();
+		return m_P.net().Q_Analog() - m_N.net().Q_Analog();
 	}
 
 	ATTR_HOT void set_mat(nl_double a11, nl_double a12, nl_double a21, nl_double a22, nl_double r1, nl_double r2)

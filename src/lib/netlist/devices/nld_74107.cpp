@@ -133,7 +133,7 @@ namespace netlist
 
 	NETLIB_UPDATE(74107Asub)
 	{
-		const netlist_sig_t t = m_Q.net().as_logic().Q();
+		const netlist_sig_t t = m_Q.net().Q();
 		newstate(((t ^ 1) & m_Q1) | (t & m_Q2) | m_F);
 		if (m_Q1 ^ 1)
 			m_clk.inactivate();

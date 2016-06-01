@@ -24,15 +24,7 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI()
-		{
-		#if 0
-			m_A.inactivate();
-			m_B.inactivate();
-			m_C.inactivate();
-			m_D.inactivate();
-		#endif
-		}
+		//NETLIB_RESETI()
 		//NETLIB_UPDATEI();
 
 	public:
