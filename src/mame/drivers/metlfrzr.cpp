@@ -276,7 +276,7 @@ static INPUT_PORTS_START( metlfrzr )
 	PORT_DIPSETTING(    0x00, "D" )
 	// service mode returns these values divided by 10 (so 02/05/10 effectively means 20k, 50k, 100k)
 	// TODO: check if it extends
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4") 
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4") 
 	PORT_DIPSETTING(    0x08, "20k, 50k, 100k" )
 	PORT_DIPSETTING(    0x0c, "30k, 80k, 150k" )
 	PORT_DIPSETTING(    0x04, "50k, 100k, 200k" )
