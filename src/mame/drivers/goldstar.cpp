@@ -225,7 +225,6 @@
 #include "sound/sn76496.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
-#include "machine/ds2401.h"
 #include "video/ramdac.h"
 #include "includes/goldstar.h"
 
@@ -937,6 +936,11 @@ WRITE8_MEMBER(wingco_state::magodds_outb850_w)
 WRITE8_MEMBER(wingco_state::magodds_outb860_w)
 {
 //  popmessage("magodds_outb860_w %02x\n", data);
+}
+
+WRITE8_MEMBER(wingco_state::fl7w4_outb801_w)
+{
+	m_fl7w4_id->write((data & 0x40) ? 1 : 0);
 }
 
 static ADDRESS_MAP_START( magodds_map, AS_PROGRAM, 8, wingco_state )
@@ -6927,7 +6931,7 @@ static INPUT_PORTS_START( flaming7 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "fl7w4_id", ds2401_device, read )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")   /* b802 */
@@ -8188,7 +8192,10 @@ static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
 //  MCFG_CPU_IO_MAP(flaming7_readport)
 
-	MCFG_DS2401_ADD("fl7w4_serial_id")
+	MCFG_DEVICE_MODIFY("ppi8255_0")
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, fl7w4_outb801_w))
+
+	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
 

@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
 #include "emu.h"
 
+#include "machine/ds2401.h"
 #include "machine/ticket.h"
 
 
@@ -154,12 +155,14 @@ class wingco_state : public goldstar_state
 {
 public:
 	wingco_state(const machine_config &mconfig, device_type type, const char *tag) :
-		goldstar_state(mconfig, type, tag)
+		goldstar_state(mconfig, type, tag),
+		m_fl7w4_id(*this, "fl7w4_id")
 	{
 	}
 
 	DECLARE_WRITE8_MEMBER(magodds_outb850_w);
 	DECLARE_WRITE8_MEMBER(magodds_outb860_w);
+	DECLARE_WRITE8_MEMBER(fl7w4_outb801_w);
 	DECLARE_WRITE8_MEMBER(system_outputa_w);
 	DECLARE_WRITE8_MEMBER(system_outputb_w);
 	DECLARE_WRITE8_MEMBER(system_outputc_w);
@@ -179,6 +182,8 @@ protected:
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
 
 private:
+	optional_device<ds2401_device> m_fl7w4_id;
+
 	UINT8 m_nmi_enable;
 	UINT8 m_vidreg;
 
