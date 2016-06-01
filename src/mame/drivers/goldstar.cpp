@@ -938,7 +938,7 @@ WRITE8_MEMBER(wingco_state::magodds_outb860_w)
 //  popmessage("magodds_outb860_w %02x\n", data);
 }
 
-WRITE8_MEMBER(wingco_state::fl7w4_outb801_w)
+WRITE8_MEMBER(wingco_state::fl7w4_outb802_w)
 {
 	m_fl7w4_id->write((data & 0x40) ? 1 : 0);
 }
@@ -6931,7 +6931,7 @@ static INPUT_PORTS_START( flaming7 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "fl7w4_id", ds2401_device, read )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")   /* b802 */
@@ -6941,7 +6941,7 @@ static INPUT_PORTS_START( flaming7 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "fl7w4_id", ds2401_device, read )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")   /* b810 */
@@ -8193,7 +8193,7 @@ static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
 //  MCFG_CPU_IO_MAP(flaming7_readport)
 
 	MCFG_DEVICE_MODIFY("ppi8255_0")
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, fl7w4_outb801_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, fl7w4_outb802_w))
 
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
@@ -14162,7 +14162,7 @@ ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights. Serial 7D063
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 
-	ROM_REGION(0x8, "serial_id", 0)     /* Electronic Serial DS2401 */
+	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
 	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, BAD_DUMP CRC(747b40b1) SHA1(3336d8de5333057beb5f55873b9410cc7bf73fbb) ) // Hand built... Last byte is CRC-8. Need to be checked.
 
 ROM_END
