@@ -30,17 +30,8 @@
 
 
 //============================================================
-//  DEBUGGING
-//============================================================
-
-extern void mtlog_add(const char *event);
-
-
-//============================================================
 //  CONSTANTS
 //============================================================
-
-#define ENABLE_BORDER_PIX   (1)
 
 enum
 {
@@ -375,7 +366,6 @@ d3d_texture_manager::d3d_texture_manager(renderer_d3d9 *d3d)
 	m_renderer = d3d;
 
 	m_texlist = nullptr;
-	m_vector_texture = nullptr;
 	m_default_texture = nullptr;
 
 	// check for dynamic texture support
@@ -428,16 +418,6 @@ void d3d_texture_manager::create_resources()
 {
 	auto win = m_renderer->assert_window();
 
-	// experimental: load a PNG to use for vector rendering; it is treated
-	// as a brightness map
-	emu_file file(win->machine().options().art_path(), OPEN_FLAG_READ);
-	render_load_png(m_vector_bitmap, file, nullptr, "vector.png");
-	if (m_vector_bitmap.valid())
-	{
-		m_vector_bitmap.fill(rgb_t(0xff,0xff,0xff,0xff));
-		render_load_png(m_vector_bitmap, file, nullptr, "vector.png", true);
-	}
-
 	m_default_bitmap.allocate(8, 8);
 	m_default_bitmap.fill(rgb_t(0xff,0xff,0xff,0xff));
 
@@ -456,23 +436,6 @@ void d3d_texture_manager::create_resources()
 		// now create it
 		m_default_texture = global_alloc(texture_info(this, &texture, win->prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
 	}
-
-	// experimental: if we have a vector bitmap, create a texture for it
-	if (m_vector_bitmap.valid())
-	{
-		render_texinfo texture;
-
-		// fake in the basic data so it looks like it came from render.c
-		texture.base = &m_vector_bitmap.pix32(0);
-		texture.rowpixels = m_vector_bitmap.rowpixels();
-		texture.width = m_vector_bitmap.width();
-		texture.height = m_vector_bitmap.height();
-		texture.palette = nullptr;
-		texture.seqid = 0;
-
-		// now create it
-		m_vector_texture = global_alloc(texture_info(this, &texture, win->prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
-	}
 }
 
 void d3d_texture_manager::delete_resources()
@@ -480,9 +443,6 @@ void d3d_texture_manager::delete_resources()
 	// is part of m_texlist and will be free'd there
 	//global_free(m_default_texture);
 	m_default_texture = nullptr;
-
-	//global_free(m_vector_texture);
-	m_vector_texture = nullptr;
 
 	// free all textures
 	while (m_texlist != nullptr)
@@ -575,7 +535,7 @@ renderer_d3d9::renderer_d3d9(std::shared_ptr<osd_window> window)
 	: osd_renderer(window, FLAG_NONE), m_adapter(0), m_width(0), m_height(0), m_refresh(0), m_create_error_count(0), m_device(nullptr), m_gamma_supported(0), m_pixformat(),
 	m_vertexbuf(nullptr), m_lockedbuf(nullptr), m_numverts(0), m_vectorbatch(nullptr), m_batchindex(0), m_numpolys(0), m_restarting(false), m_mod2x_supported(0), m_mod4x_supported(0),
 	m_screen_format(), m_last_texture(nullptr), m_last_texture_flags(0), m_last_blendenable(0), m_last_blendop(0), m_last_blendsrc(0), m_last_blenddst(0), m_last_filter(0),
-	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(nullptr), m_shaders(nullptr), m_shaders_options(nullptr), m_texture_manager(nullptr), m_line_count(0)
+	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(nullptr), m_shaders(nullptr), m_shaders_options(nullptr), m_texture_manager(nullptr)
 {
 }
 
@@ -681,11 +641,14 @@ void d3d_texture_manager::update_textures()
 				}
 			}
 		}
-		else if(m_renderer->get_shaders()->vector_enabled() && PRIMFLAG_GET_VECTORBUF(prim.flags))
+		else if(PRIMFLAG_GET_VECTORBUF(prim.flags))
 		{
-			if (!m_renderer->get_shaders()->get_vector_target(&prim))
+			if (m_renderer->get_shaders()->vector_enabled())
 			{
-				m_renderer->get_shaders()->create_vector_target(&prim);
+				if (!m_renderer->get_shaders()->get_vector_target(&prim))
+				{
+					m_renderer->get_shaders()->create_vector_target(&prim);
+				}
 			}
 		}
 	}
@@ -706,7 +669,6 @@ void renderer_d3d9::begin_frame()
 	m_texture_manager->update_textures();
 
 	// begin the scene
-	mtlog_add("drawd3d_window_draw: begin_scene");
 	result = (*d3dintf->device.begin_scene)(m_device);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device begin_scene call\n", (int)result);
 
@@ -717,21 +679,21 @@ void renderer_d3d9::begin_frame()
 		m_hlsl_buf = (void*)mesh_alloc(6);
 		m_shaders->init_fsfx_quad(m_hlsl_buf);
 	}
-
-	// loop over line primitives
-	m_line_count = 0;
-	for (render_primitive &prim : *win->m_primlist)
-	{
-		if (prim.type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim.flags))
-		{
-			m_line_count++;
-		}
-	}
 }
 
 void renderer_d3d9::process_primitives()
 {
 	auto win = assert_window();
+
+	// loop over line primitives
+	int vector_count = 0;
+	for (render_primitive &prim : *win->m_primlist)
+	{
+		if (prim.type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim.flags))
+		{
+			vector_count++;
+		}
+	}
 
 	// Rotating index for vector time offsets
 	for (render_primitive &prim : *win->m_primlist)
@@ -741,10 +703,11 @@ void renderer_d3d9::process_primitives()
 			case render_primitive::LINE:
 				if (PRIMFLAG_GET_VECTOR(prim.flags))
 				{
-					if (m_line_count > 0)
-						batch_vectors();
-					else
-						continue;
+					if (vector_count > 0)
+					{
+						batch_vectors(vector_count);
+						vector_count = 0;
+					}
 				}
 				else
 				{
@@ -1044,7 +1007,6 @@ void renderer_d3d9::device_delete()
 	// free the device itself
 	if (m_device != nullptr)
 	{
-		(*d3dintf->device.reset)(m_device, &m_presentation);
 		(*d3dintf->device.release)(m_device);
 		m_device = nullptr;
 	}
@@ -1422,7 +1384,7 @@ int renderer_d3d9::update_window_size()
 //  batch_vectors
 //============================================================
 
-void renderer_d3d9::batch_vectors()
+void renderer_d3d9::batch_vectors(int vector_count)
 {
 	auto win = assert_window();
 
@@ -1431,13 +1393,11 @@ void renderer_d3d9::batch_vectors()
 	float quad_width = 0.0f;
 	float quad_height = 0.0f;
 
-	int vector_size = (options.antialias() ? 24 : 6);
-	m_vectorbatch = mesh_alloc(m_line_count * vector_size);
+	int vertex_count = vector_count * (options.antialias() ? 24 : 6);
+	int triangle_count = vector_count * (options.antialias() ? 8 : 2);
+	m_vectorbatch = mesh_alloc(vertex_count);
 	m_batchindex = 0;
 
-	static int start_index = 0;
-	int line_index = 0;
-	float period = options.screen_vector_time_period();
 	UINT32 cached_flags = 0;
 	for (render_primitive &prim : *win->m_primlist)
 	{
@@ -1446,15 +1406,7 @@ void renderer_d3d9::batch_vectors()
 			case render_primitive::LINE:
 				if (PRIMFLAG_GET_VECTOR(prim.flags))
 				{
-					if (period == 0.0f || m_line_count == 0)
-					{
-						batch_vector(prim, 1.0f);
-					}
-					else
-					{
-						batch_vector(prim, (float)(start_index + line_index) / ((float)m_line_count * period));
-						line_index++;
-					}
+					batch_vector(prim);
 					cached_flags = prim.flags;
 				}
 				break;
@@ -1541,20 +1493,11 @@ void renderer_d3d9::batch_vectors()
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, m_line_count * (options.antialias() ? 8 : 2), vector_size * m_line_count, cached_flags,
-		m_texture_manager->get_vector_texture(), D3DTOP_MODULATE, 0.0f, 1.0f, quad_width, quad_height);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, triangle_count, vertex_count, cached_flags, nullptr, D3DTOP_MODULATE, 0.0f, 1.0f, quad_width, quad_height);
 	m_numpolys++;
-
-	start_index += (int)((float)line_index * period);
-	if (m_line_count > 0)
-	{
-		start_index %= m_line_count;
-	}
-
-	m_line_count = 0;
 }
 
-void renderer_d3d9::batch_vector(const render_primitive &prim, float line_time)
+void renderer_d3d9::batch_vector(const render_primitive &prim)
 {
 	// compute the effective width based on the direction of the line
 	float effwidth = prim.width;
@@ -1565,14 +1508,11 @@ void renderer_d3d9::batch_vector(const render_primitive &prim, float line_time)
 
 	// determine the bounds of a quad to draw this line
 	render_bounds b0, b1;
-	render_line_to_quad(&prim.bounds, effwidth, &b0, &b1);
+	render_line_to_quad(&prim.bounds, effwidth, effwidth, &b0, &b1);
 
 	float dx = b1.x1 - b0.x1;
 	float dy = b1.y1 - b0.y1;
 	float line_length = sqrtf(dx * dx + dy * dy);
-
-	vec2f& start = (get_vector_texture() ? get_vector_texture()->get_uvstart() : get_default_texture()->get_uvstart());
-	vec2f& stop = (get_vector_texture() ? get_vector_texture()->get_uvstop() : get_default_texture()->get_uvstop());
 
 	// iterate over AA steps
 	for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim.flags) ? line_aa_4step : line_aa_1step;
@@ -1603,50 +1543,23 @@ void renderer_d3d9::batch_vector(const render_primitive &prim, float line_time)
 		INT32 g = (INT32)(prim.color.g * step->weight * 255.0f);
 		INT32 b = (INT32)(prim.color.b * step->weight * 255.0f);
 		INT32 a = (INT32)(prim.color.a * 255.0f);
-		if (r > 255 || g > 255 || b > 255)
-		{
-			if (r > 2*255 || g > 2*255 || b > 2*255)
-			{
-				r >>= 2; g >>= 2; b >>= 2;
-			}
-			else
-			{
-				r >>= 1; g >>= 1; b >>= 1;
-			}
-		}
-		if (r > 255) r = 255;
-		if (g > 255) g = 255;
-		if (b > 255) b = 255;
-		if (a > 255) a = 255;
 		DWORD color = D3DCOLOR_ARGB(a, r, g, b);
-
-		m_vectorbatch[m_batchindex + 0].u0 = start.c.x;
-		m_vectorbatch[m_batchindex + 0].v0 = start.c.y;
-		m_vectorbatch[m_batchindex + 1].u0 = start.c.x;
-		m_vectorbatch[m_batchindex + 1].v0 = stop.c.y;
-		m_vectorbatch[m_batchindex + 2].u0 = stop.c.x;
-		m_vectorbatch[m_batchindex + 2].v0 = start.c.y;
-
-		m_vectorbatch[m_batchindex + 3].u0 = start.c.x;
-		m_vectorbatch[m_batchindex + 3].v0 = stop.c.y;
-		m_vectorbatch[m_batchindex + 4].u0 = stop.c.x;
-		m_vectorbatch[m_batchindex + 4].v0 = start.c.y;
-		m_vectorbatch[m_batchindex + 5].u0 = stop.c.x;
-		m_vectorbatch[m_batchindex + 5].v0 = stop.c.y;
-
-		m_vectorbatch[m_batchindex + 0].u1 = line_length;
-		m_vectorbatch[m_batchindex + 1].u1 = line_length;
-		m_vectorbatch[m_batchindex + 2].u1 = line_length;
-		m_vectorbatch[m_batchindex + 3].u1 = line_length;
-		m_vectorbatch[m_batchindex + 4].u1 = line_length;
-		m_vectorbatch[m_batchindex + 5].u1 = line_length;
 
 		// set the color, Z parameters to standard values
 		for (int i = 0; i < 6; i++)
 		{
+			m_vectorbatch[m_batchindex + i].x -= 0.5f;
+			m_vectorbatch[m_batchindex + i].y -= 0.5f;
 			m_vectorbatch[m_batchindex + i].z = 0.0f;
 			m_vectorbatch[m_batchindex + i].rhw = 1.0f;
 			m_vectorbatch[m_batchindex + i].color = color;
+
+			// no texture mapping
+			m_vectorbatch[m_batchindex + i].u0 = 0.0f;
+			m_vectorbatch[m_batchindex + i].v0 = 0.0f;
+
+			// line length
+			m_vectorbatch[m_batchindex + i].u1 = line_length;
 		}
 
 		m_batchindex += 6;
@@ -1669,72 +1582,51 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 
 	// determine the bounds of a quad to draw this line
 	render_bounds b0, b1;
-	render_line_to_quad(&prim.bounds, effwidth, &b0, &b1);
+	render_line_to_quad(&prim.bounds, effwidth, 0.0f, &b0, &b1);
 
-	// iterate over AA steps
-	for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim.flags) ? line_aa_4step : line_aa_1step;
-		step->weight != 0; step++)
+	// get a pointer to the vertex buffer
+	vertex *vertex = mesh_alloc(4);
+	if (vertex == nullptr)
+		return;
+
+	// rotate the unit vector by 135 degrees and add to point 0
+	vertex[0].x = b0.x0;
+	vertex[0].y = b0.y0;
+
+	// rotate the unit vector by -135 degrees and add to point 0
+	vertex[1].x = b0.x1;
+	vertex[1].y = b0.y1;
+
+	// rotate the unit vector by 45 degrees and add to point 1
+	vertex[2].x = b1.x0;
+	vertex[2].y = b1.y0;
+
+	// rotate the unit vector by -45 degrees and add to point 1
+	vertex[3].x = b1.x1;
+	vertex[3].y = b1.y1;
+
+	// determine the color of the line
+	INT32 r = (INT32)(prim.color.r * 255.0f);
+	INT32 g = (INT32)(prim.color.g * 255.0f);
+	INT32 b = (INT32)(prim.color.b * 255.0f);
+	INT32 a = (INT32)(prim.color.a * 255.0f);
+	DWORD color = D3DCOLOR_ARGB(a, r, g, b);
+
+	// set the color, Z parameters to standard values
+	for (int i = 0; i < 4; i++)
 	{
-		// get a pointer to the vertex buffer
-		vertex *vertex = mesh_alloc(4);
-		if (vertex == nullptr)
-			return;
+		vertex[i].z = 0.0f;
+		vertex[i].rhw = 1.0f;
+		vertex[i].color = color;
 
-		// rotate the unit vector by 135 degrees and add to point 0
-		vertex[0].x = b0.x0 + step->xoffs;
-		vertex[0].y = b0.y0 + step->yoffs;
-
-		// rotate the unit vector by -135 degrees and add to point 0
-		vertex[1].x = b0.x1 + step->xoffs;
-		vertex[1].y = b0.y1 + step->yoffs;
-
-		// rotate the unit vector by 45 degrees and add to point 1
-		vertex[2].x = b1.x0 + step->xoffs;
-		vertex[2].y = b1.y0 + step->yoffs;
-
-		// rotate the unit vector by -45 degrees and add to point 1
-		vertex[3].x = b1.x1 + step->xoffs;
-		vertex[3].y = b1.y1 + step->yoffs;
-
-		// determine the color of the line
-		INT32 r = (INT32)(prim.color.r * step->weight * 255.0f);
-		INT32 g = (INT32)(prim.color.g * step->weight * 255.0f);
-		INT32 b = (INT32)(prim.color.b * step->weight * 255.0f);
-		INT32 a = (INT32)(prim.color.a * 255.0f);
-		if (r > 255) r = 255;
-		if (g > 255) g = 255;
-		if (b > 255) b = 255;
-		if (a > 255) a = 255;
-		DWORD color = D3DCOLOR_ARGB(a, r, g, b);
-
-		vec2f& start = (get_vector_texture() ? get_vector_texture()->get_uvstart() : get_default_texture()->get_uvstart());
-		vec2f& stop = (get_vector_texture() ? get_vector_texture()->get_uvstop() : get_default_texture()->get_uvstop());
-
-		vertex[0].u0 = start.c.x;
-		vertex[0].v0 = start.c.y;
-
-		vertex[2].u0 = stop.c.x;
-		vertex[2].v0 = start.c.y;
-
-		vertex[1].u0 = start.c.x;
-		vertex[1].v0 = stop.c.y;
-
-		vertex[3].u0 = stop.c.x;
-		vertex[3].v0 = stop.c.y;
-
-		// set the color, Z parameters to standard values
-		for (int i = 0; i < 4; i++)
-		{
-			vertex[i].z = 0.0f;
-			vertex[i].rhw = 1.0f;
-			vertex[i].color = color;
-		}
-
-		// now add a polygon entry
-		m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, get_vector_texture(),
-								D3DTOP_MODULATE, 0.0f, 1.0f, 0.0f, 0.0f);
-		m_numpolys++;
+		// no texture mapping
+		vertex[i].u0 = 0.0f;
+		vertex[i].v0 = 0.0f;
 	}
+
+	// now add a polygon entry
+	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, nullptr,	D3DTOP_MODULATE, 0.0f, 1.0f, 0.0f, 0.0f);
+	m_numpolys++;
 }
 
 
@@ -1790,27 +1682,6 @@ void renderer_d3d9::draw_quad(const render_primitive &prim)
 	INT32 g = (INT32)(prim.color.g * 255.0f);
 	INT32 b = (INT32)(prim.color.b * 255.0f);
 	INT32 a = (INT32)(prim.color.a * 255.0f);
-	DWORD modmode = D3DTOP_MODULATE;
-	if (texture != nullptr)
-	{
-		if (m_mod2x_supported && (r > 255 || g > 255 || b > 255))
-		{
-			if (m_mod4x_supported && (r > 2*255 || g > 2*255 || b > 2*255))
-			{
-				r >>= 2; g >>= 2; b >>= 2;
-				modmode = D3DTOP_MODULATE4X;
-			}
-			else
-			{
-				r >>= 1; g >>= 1; b >>= 1;
-				modmode = D3DTOP_MODULATE2X;
-			}
-		}
-	}
-	if (r > 255) r = 255;
-	if (g > 255) g = 255;
-	if (b > 255) b = 255;
-	if (a > 255) a = 255;
 	DWORD color = D3DCOLOR_ARGB(a, r, g, b);
 
 	// adjust half pixel X/Y offset, set the color, Z parameters to standard values
@@ -1824,7 +1695,7 @@ void renderer_d3d9::draw_quad(const render_primitive &prim)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, texture, modmode, width, height);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, texture, D3DTOP_MODULATE, width, height);
 	m_numpolys++;
 }
 
@@ -2265,14 +2136,12 @@ void texture_info::compute_size(int texwidth, int texheight)
 
 	bool shaders_enabled = m_renderer->get_shaders()->enabled();
 	bool wrap_texture = (m_flags & PRIMFLAG_TEXWRAP_MASK) == PRIMFLAG_TEXWRAP_MASK;
-	bool border_texture = ENABLE_BORDER_PIX && !wrap_texture;
-	bool surface_texture = m_type == TEXTURE_TYPE_SURFACE;
 
-	// skip border when shaders are enabled and we're not creating a surface (UI) texture
-	if (!shaders_enabled || surface_texture)
+	// skip border when shaders are enabled
+	if (!shaders_enabled)
 	{
 		// if we're not wrapping, add a 1-2 pixel border on all sides
-		if (border_texture)
+		if (!wrap_texture)
 		{
 			// note we need 2 pixels in X for YUY textures
 			m_xborderpix = (PRIMFLAG_GET_TEXFORMAT(m_flags) == TEXFORMAT_YUY16) ? 2 : 1;
@@ -2283,8 +2152,8 @@ void texture_info::compute_size(int texwidth, int texheight)
 	finalwidth += 2 * m_xborderpix;
 	finalheight += 2 * m_yborderpix;
 
-	// take texture size as given when shaders are enabled and we're not creating a surface (UI) texture, still update wrapped textures
-	if (!shaders_enabled || surface_texture || wrap_texture)
+	// take texture size as given when shaders are enabled
+	if (!shaders_enabled)
 	{
 		compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
 
@@ -2972,11 +2841,15 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_w
 		(*d3dintf->texture.get_surface_level)(target_texture[index], 0, &target_surface[index]);
 	}
 
+	auto win = d3d->assert_window();
+
+	auto first_screen = win->machine().first_screen();
 	bool vector_screen =
-		d3d->assert_window()->machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
+		first_screen != nullptr &&
+		first_screen->screen_type() == SCREEN_TYPE_VECTOR;
 
 	float scale_factor = 0.75f;
-	int scale_count = vector_screen ? MAX_BLOOM_COUNT : MAX_BLOOM_COUNT / 2;
+	int scale_count = vector_screen ? MAX_BLOOM_COUNT : HALF_BLOOM_COUNT;
 
 	float bloom_width = (float)source_width;
 	float bloom_height = (float)source_height;
@@ -3007,9 +2880,4 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_w
 texture_info *renderer_d3d9::get_default_texture()
 {
 	return m_texture_manager->get_default_texture();
-}
-
-texture_info *renderer_d3d9::get_vector_texture()
-{
-	return m_texture_manager->get_vector_texture();
 }

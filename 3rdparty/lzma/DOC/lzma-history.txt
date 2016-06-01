@@ -1,6 +1,11 @@
 HISTORY of the LZMA SDK
 -----------------------
 
+16.00          2016-05-10
+-------------------------	
+- Some bugs were fixed,
+
+
 15.12          2015-11-19
 -------------------------	
 - The BUG in C version of 7z decoder was fixed:

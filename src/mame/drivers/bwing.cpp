@@ -85,7 +85,7 @@ WRITE8_MEMBER(bwing_state::bwp1_ctrl_w)
 				m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE); // SNMI
 			else
 			{
-				soundlatch_byte_w(space, 0, data);
+				m_soundlatch->write(space, 0, data);
 				m_audiocpu->set_input_line(DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
 		break;
@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( bwp3_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(bwp3_nmimask_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
@@ -393,6 +393,8 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

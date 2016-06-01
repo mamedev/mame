@@ -8,6 +8,8 @@
 #ifndef PSTATE_H_
 #define PSTATE_H_
 
+#include <memory>
+
 #include "plists.h"
 #include "pstring.h"
 
@@ -30,19 +32,19 @@ enum pstate_data_type_e {
 	DT_FLOAT
 };
 
-template<typename _ItemType> struct pstate_datatype
+template<typename ItemType> struct pstate_datatype
 {
 	static const pstate_data_type_e type = pstate_data_type_e(NOT_SUPPORTED);
 	static const bool is_ptr = false;
 };
 
-template<typename _ItemType> struct pstate_datatype<_ItemType *>
+template<typename ItemType> struct pstate_datatype<ItemType *>
 {
 	static const pstate_data_type_e type = pstate_data_type_e(NOT_SUPPORTED);
 	static const bool is_ptr = true;
 };
 
-//template<typename _ItemType> struct type_checker<_ItemType*> { static const bool is_atom = false; static const bool is_pointer = true; };
+//template<typename ItemType> struct type_checker<ItemType*> { static const bool is_atom = false; static const bool is_pointer = true; };
 
 #define NETLIST_SAVE_TYPE(TYPE, TYPEDESC) \
 		template<> struct pstate_datatype<TYPE>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = false;}; \
@@ -66,12 +68,14 @@ NETLIST_SAVE_TYPE(UINT16, DT_INT16);
 NETLIST_SAVE_TYPE(INT16, DT_INT16);
 //NETLIST_SAVE_TYPE(std::size_t, DT_INT64);
 
+PLIB_NAMESPACE_START()
+
 class pstate_manager_t;
 
 class pstate_callback_t
 {
 public:
-	typedef pvector_t<pstate_callback_t *> list_t;
+	using list_t = pvector_t<pstate_callback_t *>;
 
 	virtual ~pstate_callback_t() { };
 
@@ -83,7 +87,7 @@ protected:
 
 struct pstate_entry_t
 {
-	typedef pvector_t<pstate_entry_t *> list_t;
+	using list_t = pvector_t<std::unique_ptr<pstate_entry_t>>;
 
 	pstate_entry_t(const pstring &stname, const pstate_data_type_e dt, const void *owner,
 			const int size, const int count, void *ptr, bool is_ptr)
@@ -183,5 +187,6 @@ public:
 	}
 };
 
+PLIB_NAMESPACE_END()
 
 #endif /* PSTATE_H_ */

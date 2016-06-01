@@ -46,7 +46,6 @@ public:
 	required_device<pic8259_device>  m_pic8259;
 	required_device<am9517a_device>  m_dma8237;
 	required_device<pit8253_device>  m_pit8253;
-	optional_device<i8255_device>  m_ppi8255;
 	required_device<speaker_sound_device>  m_speaker;
 	required_device<isa8_device>  m_isabus;
 	optional_device<pc_kbdc_device>  m_pc_kbdc;
@@ -69,23 +68,9 @@ public:
 
 	UINT8 m_nmi_enabled;
 
-	int                     m_ppi_portc_switch_high;
-	int                     m_ppi_speaker;
-	int                     m_ppi_keyboard_clear;
-	UINT8                   m_ppi_keyb_clock;
-	UINT8                   m_ppi_portb;
-	UINT8                   m_ppi_clock_signal;
-	UINT8                   m_ppi_data_signal;
-	UINT8                   m_ppi_shift_register;
-	UINT8                   m_ppi_shift_enable;
-
 	// interface to the keyboard
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
-
-	DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
-	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
-	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
 
 	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out1_changed );
 	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
@@ -105,6 +90,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
+	DECLARE_READ8_MEMBER( kbd_6502_r );
+	DECLARE_WRITE8_MEMBER( kbd_6502_w );
 
 	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
 

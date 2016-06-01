@@ -66,7 +66,7 @@ WRITE8_MEMBER(flkatck_state::flkatck_ls138_w)
 			flkatck_bankswitch_w(space, 0, data);
 			break;
 		case 0x05:  /* sound code number */
-			soundlatch_byte_w(space, 0, data);
+			m_soundlatch->write(space, 0, data);
 			break;
 		case 0x06:  /* Cause interrupt on audio CPU */
 			m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( flkatck_sound_map, AS_PROGRAM, 8, flkatck_state )
 //  AM_RANGE(0x9001, 0x9001) AM_RAM                                             /* ??? */
 	AM_RANGE(0x9004, 0x9004) AM_READNOP                                         /* ??? */
 	AM_RANGE(0x9006, 0x9006) AM_WRITENOP                                        /* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)                             /* soundlatch_byte_r */
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write) /* 007232 registers */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)           /* YM2151 */
 ADDRESS_MAP_END
@@ -237,6 +237,8 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

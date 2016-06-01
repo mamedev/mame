@@ -59,37 +59,96 @@
 
 #include "nl_base.h"
 
-#define TTL_7493(_name, _CLKA, _CLKB, _R1, _R2)                                     \
-		NET_REGISTER_DEV(TTL_7493, _name)                                               \
-		NET_CONNECT(_name, CLKA, _CLKA)                                             \
-		NET_CONNECT(_name, CLKB, _CLKB)                                             \
-		NET_CONNECT(_name, R1,  _R1)                                                \
-		NET_CONNECT(_name, R2,  _R2)
+#define TTL_7493(name, cCLKA, cCLKB, cR1, cR2)                                     \
+		NET_REGISTER_DEV(TTL_7493, name)                                               \
+		NET_CONNECT(name, CLKA, cCLKA)                                             \
+		NET_CONNECT(name, CLKB, cCLKB)                                             \
+		NET_CONNECT(name, R1,  cR1)                                                \
+		NET_CONNECT(name, R2,  cR2)
 
-#define TTL_7493_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_7493_DIP, _name)
+#define TTL_7493_DIP(name)                                                         \
+		NET_REGISTER_DEV(TTL_7493_DIP, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_SUBDEVICE(7493ff,
+NETLIB_OBJECT(7493ff)
+{
+	NETLIB_CONSTRUCTOR(7493ff)
+	{
+		enregister("CLK", m_I);
+		enregister("Q", m_Q);
+
+		save(NLNAME(m_reset));
+		save(NLNAME(m_state));
+	}
+
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
+
+public:
 	logic_input_t m_I;
 	logic_output_t m_Q;
 
 	UINT8 m_reset;
 	UINT8 m_state;
-);
+};
 
-NETLIB_DEVICE(7493,
+NETLIB_OBJECT(7493)
+{
+	NETLIB_CONSTRUCTOR(7493)
+	, A(*this, "A")
+	, B(*this, "B")
+	, C(*this, "C")
+	, D(*this, "D")
+	{
+		register_subalias("CLKA", A.m_I);
+		register_subalias("CLKB", B.m_I);
+		enregister("R1",  m_R1);
+		enregister("R2",  m_R2);
+
+		register_subalias("QA", A.m_Q);
+		register_subalias("QB", B.m_Q);
+		register_subalias("QC", C.m_Q);
+		register_subalias("QD", D.m_Q);
+
+		connect_late(C.m_I, B.m_Q);
+		connect_late(D.m_I, C.m_Q);
+	}
+
+	NETLIB_RESETI() { }
+	NETLIB_UPDATEI();
+
 	logic_input_t m_R1;
 	logic_input_t m_R2;
 
-	NETLIB_NAME(7493ff) A;
-	NETLIB_NAME(7493ff) B;
-	NETLIB_NAME(7493ff) C;
-	NETLIB_NAME(7493ff) D;
-);
+	NETLIB_SUB(7493ff) A;
+	NETLIB_SUB(7493ff) B;
+	NETLIB_SUB(7493ff) C;
+	NETLIB_SUB(7493ff) D;
+};
 
-NETLIB_DEVICE_DERIVED_PURE(7493_dip, 7493);
+NETLIB_OBJECT_DERIVED(7493_dip, 7493)
+{
+	NETLIB_CONSTRUCTOR_DERIVED(7493_dip, 7493)
+	{
+		register_subalias("1", B.m_I);
+		register_subalias("2", m_R1);
+		register_subalias("3", m_R2);
+
+		// register_subalias("4", ); --> NC
+		// register_subalias("5", ); --> VCC
+		// register_subalias("6", ); --> NC
+		// register_subalias("7", ); --> NC
+
+		register_subalias("8", C.m_Q);
+		register_subalias("9", B.m_Q);
+		// register_subalias("10", ); -. GND
+		register_subalias("11", D.m_Q);
+		register_subalias("12", A.m_Q);
+		// register_subalias("13", ); -. NC
+		register_subalias("14", A.m_I);
+	}
+};
 
 NETLIB_NAMESPACE_DEVICES_END()
 

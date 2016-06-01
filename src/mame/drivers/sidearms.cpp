@@ -46,6 +46,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
@@ -80,7 +81,7 @@ static ADDRESS_MAP_START( sidearms_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("SYSTEM") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("SYSTEM") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1") AM_WRITE(bankswitch_w)
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("P2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("DSW0")
@@ -104,7 +105,7 @@ static ADDRESS_MAP_START( turtship_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xe800, 0xe807) AM_READ(turtship_ports_r)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xe801, 0xe801) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xe802, 0xe802) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xe804, 0xe804) AM_WRITE(c804_w)
@@ -120,7 +121,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sidearms_sound_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 ADDRESS_MAP_END
@@ -145,7 +146,7 @@ static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW0") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("DSW1") AM_WRITE(whizz_bankswitch_w)
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("IN0") AM_WRITENOP
@@ -173,7 +174,7 @@ static ADDRESS_MAP_START( whizz_io_map, AS_IO, 8, sidearms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -623,6 +624,8 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -669,6 +672,8 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -719,6 +724,8 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

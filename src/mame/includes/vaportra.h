@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 #include "video/deco16ic.h"
 #include "video/decmxc06.h"
@@ -22,6 +23,7 @@ public:
 		m_spritegen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_generic_paletteram_16(*this, "paletteram"),
 		m_generic_paletteram2_16(*this, "paletteram2") { }
 
@@ -33,6 +35,7 @@ public:
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	required_shared_ptr<UINT16> m_generic_paletteram2_16;

@@ -3,10 +3,7 @@
 // Galileo GT-64xxx System Controller
 // Skeleton code based off seattle machine driver.
 // TODO:
-// Testing
-// Need PCI to be able to have a target delay a dma transfer
-// Add PCI target maps
-// Add PCI Func 1 calls
+// Need PCI to be able to have a target delay (pci bus stall) a dma transfer
 // Configurable byte swapping on cpu and pci busses.
 
 #ifndef GT64XXX_H
@@ -16,25 +13,30 @@
 #include "cpu/mips/mips3.h"
 
 // Supports R4600/4650/4700/R5000 CPUs
-#define MCFG_GT64010_ADD(_tag,  _cpu_tag, _clock) \
+#define MCFG_GT64010_ADD(_tag,  _cpu_tag, _clock, _irq_num) \
 	MCFG_PCI_HOST_ADD(_tag, GT64XXX, 0x014611ab, 0x03, 0x00000000) \
 	downcast<gt64xxx_device *>(device)->set_cpu_tag(_cpu_tag); \
-	downcast<gt64xxx_device *>(device)->set_clock(_clock);
+	downcast<gt64xxx_device *>(device)->set_clock(_clock); \
+	downcast<gt64xxx_device *>(device)->set_irq_num(_irq_num);
 
 // Supports the following 32-bit bus CPUs:
 // IDT RC4640 and RC4650 (in 32-bit mode)
 // QED RM523X
 // NEC/Toshiba VR4300
-#define MCFG_GT64111_ADD(_tag,  _cpu_tag, _clock) \
+#define MCFG_GT64111_ADD(_tag,  _cpu_tag, _clock, _irq_num) \
 	MCFG_PCI_DEVICE_ADD(_tag, GT64XXX, 0x414611ab, 0x10, 0x058000, 0x00000000) \
 	downcast<gt64xxx_device *>(device)->set_cpu_tag(_cpu_tag); \
-	downcast<gt64xxx_device *>(device)->set_clock(_clock);
+	downcast<gt64xxx_device *>(device)->set_clock(_clock); \
+	downcast<gt64xxx_device *>(device)->set_irq_num(_irq_num);
 
 #define MCFG_GT64XXX_SET_BE_CPU(_be) \
 	downcast<gt64xxx_device *>(device)->set_be(_be);
 
-#define MCFG_GT64XXX__IRQ_ADD(_irq_num) \
+#define MCFG_GT64XXX_IRQ_ADD(_irq_num) \
 	downcast<gt64xxx_device *>(device)->set_irq_info(_irq_num);
+
+#define MCFG_GT64XXX_SET_CS(_cs_num, _map) \
+	downcast<gt64xxx_device *>(device)->set_cs_map(_cs_num, ADDRESS_MAP_NAME(_map), #_map, owner);
 
 /*************************************
  *
@@ -42,8 +44,11 @@
  *
  *************************************/
 
-//#define SYSTEM_CLOCK            50000000
 #define TIMER_PERIOD            attotime::from_hz(m_clock)
+#define PCI_BUS_CLOCK        33000000
+// Number of dma words to transfer at a time, real hardware configurable between 8-32
+#define DMA_BURST_SIZE       32
+#define DMA_TIMER_PERIOD     attotime::from_hz(PCI_BUS_CLOCK / 48)
 
 /* Galileo registers - 0x000-0x3ff */
 #define GREG_CPU_CONFIG     (0x000/4)
@@ -161,6 +166,7 @@
 #define GINT_TARABORT_SHIFT (19)
 #define GINT_RETRYCTR_SHIFT (20)
 
+
 /*************************************
  *  Structures
  *************************************/
@@ -171,6 +177,22 @@ struct galileo_timer
 	UINT8           active;
 };
 
+struct galileo_addr_map
+{
+	UINT32 low_addr;
+	UINT32 high_addr;
+	address_space* space;
+	galileo_addr_map() : low_addr(0xffffffff), high_addr(0x0) {}
+};
+
+struct galileo_device_map
+{
+	bool enable;
+	const char *name;
+	device_t *device;
+	address_map_constructor map;
+	galileo_device_map() : enable(false), device(nullptr) {}
+};
 
 class gt64xxx_device : public pci_host_device {
 public:
@@ -181,13 +203,13 @@ public:
 							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
 
 	void set_cpu_tag(const char *tag) { cpu_tag = tag;}
-	void set_cpu_tag(const UINT32 clock) { m_clock = clock;}
 	void set_clock(const UINT32 clock) {m_clock = clock;}
 	void set_be(const int be) {m_be = be;}
 	void set_autoconfig(const int autoconfig) {m_autoconfig = autoconfig;}
-	void set_irq_info(const int irq_num) {m_irq_num = irq_num;}
-
+	void set_irq_num(const int irq_num) {m_irq_num = irq_num;}
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+
+	DECLARE_WRITE_LINE_MEMBER(pci_stall);
 
 	// pci bus
 	DECLARE_READ32_MEMBER(  pci_config_r);
@@ -207,20 +229,28 @@ public:
 	DECLARE_WRITE32_MEMBER(master_io_w);
 
 	// devices
-	DECLARE_READ32_MEMBER (ras_1_0_r);
-	DECLARE_WRITE32_MEMBER(ras_1_0_w);
-	DECLARE_READ32_MEMBER (ras_3_2_r);
-	DECLARE_WRITE32_MEMBER(ras_3_2_w);
-	DECLARE_READ32_MEMBER (cs_2_0_r);
-	DECLARE_WRITE32_MEMBER(cs_2_0_w);
-	DECLARE_READ32_MEMBER (cs_boot_3_r);
-	DECLARE_WRITE32_MEMBER(cs_boot_3_w);
+	DECLARE_READ32_MEMBER (ras_0_r);
+	DECLARE_WRITE32_MEMBER(ras_0_w);
+	DECLARE_READ32_MEMBER(ras_1_r);
+	DECLARE_WRITE32_MEMBER(ras_1_w);
+	DECLARE_READ32_MEMBER(ras_2_r);
+	DECLARE_WRITE32_MEMBER(ras_2_w);
+	DECLARE_READ32_MEMBER(ras_3_r);
+	DECLARE_WRITE32_MEMBER(ras_3_w);
+	DECLARE_READ32_MEMBER (cs_0_r);
+	DECLARE_WRITE32_MEMBER(cs_0_w);
+
+	// Enums
+	enum proc_addr_bank {ADDR_RAS1_0, ADDR_RAS3_2, ADDR_CS2_0, ADDR_CS3_BCS, ADDR_PCI_IO, ADDR_PCI_MEM0, ADDR_PCI_MEM1, ADDR_NUM};
+
+	void set_cs_map(int id, address_map_constructor map, const char *name, device_t *device);
 
 protected:
 	address_space *m_cpu_space;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 
 private:
 	mips3_device *m_cpu;
@@ -229,19 +259,29 @@ private:
 	int m_be, m_autoconfig;
 	int m_irq_num;
 
+	int m_pci_stall_state;
+	int m_retry_count;
+	int m_pci_cpu_stalled;
+	UINT32 m_cpu_stalled_offset;
+	UINT32 m_cpu_stalled_data;
+	UINT32 m_cpu_stalled_mem_mask;
+
 	address_space_config m_mem_config, m_io_config;
 
-	required_memory_region m_region;
+	required_memory_region m_romRegion;
+	optional_memory_region m_updateRegion;
 
 	DECLARE_ADDRESS_MAP(cpu_map, 32);
 
 	void map_cpu_space();
 
+	UINT32 m_prev_addr;
 	/* raw register data */
 	UINT32          m_reg[0xd00/4];
 
 	/* timer info */
 	galileo_timer   m_timer[4];
+	TIMER_CALLBACK_MEMBER(timer_callback);
 
 	/* DMA info */
 	INT8            m_dma_active;
@@ -249,10 +289,26 @@ private:
 	// Ram
 	std::vector<UINT32> m_ram[4];
 
-	TIMER_CALLBACK_MEMBER(timer_callback);
+	// Chip Select
+	galileo_device_map m_cs_map[4];
+
+	template<int id> void map_trampoline(::address_map &map, device_t &device) {
+		m_cs_map[id].map(map, *m_cs_map[id].device);
+	}
+	template <typename T> void install_cs_map(offs_t addrstart, offs_t addrend, void (T::*map)(::address_map &map, device_t &device), const char *name) {
+		//address_map_delegate delegate(map, name, static_cast<T *>(this));
+		address_map_delegate delegate(map, name, static_cast<T *>(this));
+		m_cpu_space->install_device_delegate(addrstart, addrend, *this, delegate);
+	}
+
 	void update_irqs();
+
+	int m_last_dma;
+	emu_timer* m_dma_timer;
+	galileo_addr_map dma_addr_map[proc_addr_bank::ADDR_NUM];
 	int dma_fetch_next(address_space &space, int which);
-	void perform_dma(address_space &space, int which);
+	TIMER_CALLBACK_MEMBER(perform_dma);
+	address_space* dma_decode_address(UINT32 &addr);
 
 };
 

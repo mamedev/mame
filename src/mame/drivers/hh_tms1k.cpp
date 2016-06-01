@@ -21,7 +21,7 @@
  @CP0904A  TMS0970   1977, Milton Bradley Comp IV
  @MP0905B  TMS0970   1977, Parker Brothers Codename Sector
  *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
- *MP0158   TMS1000   1979, Entex Soccer
+ @MP0158   TMS1000   1979, Entex Soccer
  *MP0168   TMS1000   1979, Conic Basketball
  @MP0170   TMS1000   1979, Conic Football
  @MP0914   TMS1000   1979, Entex Baseball 1
@@ -34,7 +34,7 @@
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  @MP1211   TMS1100   1980, Entex Space Invader
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
- *MP1219   TMS1100   1980, U.S. Games Super Sports 4
+ @MP1219   TMS1100   1980, U.S. Games Super Sports-4
  @MP1221   TMS1100   1980, Entex Raise The Devil
  *MP1296   TMS1100?  1982, Entex Black Knight
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Tandy Radio Shack Science Fair Microcomputer Trainer
@@ -46,7 +46,7 @@
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
- *MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
+ @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
  *MP3300   TMS1000   1980, Estrela Genius (from Brazil, looks and plays identical to Simon)
@@ -111,18 +111,21 @@
     brighter: tc4/h2hfootb(offense), bankshot(cue ball), ...
   - stopthiep: unable to start a game (may be intentional?)
   - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
+  - finish bship SN76477 sound
 
 ***************************************************************************/
 
 #include "includes/hh_tms1k.h"
 #include "machine/tms1024.h"
 #include "sound/beep.h"
+#include "sound/sn76477.h"
 
 // internal artwork
 #include "amaztron.lh" // clickable
 #include "astro.lh"
 #include "bankshot.lh"
 #include "bigtrak.lh"
+#include "bship.lh" // clickable
 #include "cnfball.lh"
 #include "cnfball2.lh"
 #include "cnsector.lh" // clickable
@@ -137,6 +140,7 @@
 #include "efootb4.lh"
 #include "einvader.lh" // test-layout(but still playable)
 #include "elecdet.lh"
+#include "esoccer.lh"
 #include "fxmcr165.lh" // clickable
 #include "gjackpot.lh"
 #include "gpoker.lh"
@@ -147,9 +151,11 @@
 #include "mdndclab.lh" // clickable
 #include "merlin.lh" // clickable
 #include "mmerlin.lh" // clickable
+#include "raisedvl.lh"
 #include "simon.lh" // clickable
-#include "ssimon.lh" // clickable
 #include "splitsec.lh"
+#include "ssimon.lh" // clickable
+#include "ssports4.lh"
 #include "starwbc.lh" // clickable
 #include "stopthie.lh" // clickable
 #include "tandy12.lh" // clickable
@@ -1220,8 +1226,7 @@ MACHINE_CONFIG_END
   This is a head to head electronic tabletop LED-display sports console.
   One cartridge(Football) was included with the console, the other three were
   sold in a pack. Gameplay has emphasis on strategy, read the official manual
-  on how to play. Remember that you can rotate the view in MAME: rotate left
-  for Home(P1) orientation, rotate right for Visitor(P2) orientation.
+  on how to play. MAME external artwork is needed for the switchable overlays.
 
   Cartridge socket:
   1 N/C
@@ -1261,11 +1266,9 @@ public:
 void tc4_state::prepare_display()
 {
 	// R5,R7-R9 are 7segs
-	for (int y = 5; y < 10; y++)
-		if (y != 6)
-			m_display_segmask[y] = 0x7f;
+	set_display_segmask(0x3a0, 0x7f);
 
-	// update current state (note: R6 as extra column!)
+	// note: R6 is an extra column
 	display_matrix(9, 10, (m_o | (m_r << 2 & 0x100)), m_r);
 }
 
@@ -1623,6 +1626,111 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Entex (Electronic) Soccer
+  * TMS1000NL MP0158 (die label same)
+  * 2 7seg LEDs, 30 other LEDs, 1-bit sound
+
+  known releases:
+  - USA: Electronic Soccer, 2 versions (leds on green bezel, or leds under bezel)
+  - Germany: Fussball, with skill switch
+
+***************************************************************************/
+
+class esoccer_state : public hh_tms1k_state
+{
+public:
+	esoccer_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void esoccer_state::prepare_display()
+{
+	// R8,R9 are 7segs
+	set_display_segmask(0x300, 0x7f);
+	display_matrix(7, 10, m_o, m_r);
+}
+
+WRITE16_MEMBER(esoccer_state::write_r)
+{
+	// R0-R2: input mux
+	m_inp_mux = data & 7;
+
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R0-R9: led select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(esoccer_state::write_o)
+{
+	// O0-O6: led state
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(esoccer_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(3);
+}
+
+
+// config
+
+static INPUT_PORTS_START( esoccer )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+
+	PORT_START("IN.2") // R2
+	PORT_CONFNAME( 0x03, 0x01, "Players" )
+	PORT_CONFSETTING(    0x01, "1" ) // Auto
+	PORT_CONFSETTING(    0x02, "2" ) // Manual
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( esoccer, esoccer_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=47K, C=33pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(esoccer_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(esoccer_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(esoccer_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_esoccer)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Entex (Electronic) Baseball (1)
   * TMS1000NLP MP0914 (die label MP0914A)
   * 1 7seg LED, and other LEDs behind bezel, 1-bit sound
@@ -1670,8 +1778,7 @@ public:
 void ebball_state::prepare_display()
 {
 	// R8 is a 7seg
-	m_display_segmask[8] = 0x7f;
-
+	set_display_segmask(0x100, 0x7f);
 	display_matrix(7, 9, ~m_o, m_r);
 }
 
@@ -1801,9 +1908,7 @@ public:
 void ebball2_state::prepare_display()
 {
 	// R0-R2 are 7segs
-	for (int y = 0; y < 3; y++)
-		m_display_segmask[y] = 0x7f;
-
+	set_display_segmask(7, 0x7f);
 	display_matrix(8, 10, ~m_o, m_r ^ 0x7f);
 }
 
@@ -1941,7 +2046,7 @@ void ebball3_state::prepare_display()
 		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
 
 	// R0,R1 are normal 7segs
-	m_display_segmask[0] = m_display_segmask[1] = 0x7f;
+	set_display_segmask(3, 0x7f);
 
 	// R4,R7 contain segments(only F and B) for the two other digits
 	m_display_state[10] = (m_display_state[4] & 0x20) | (m_display_state[7] & 0x02);
@@ -2099,9 +2204,7 @@ protected:
 void einvader_state::prepare_display()
 {
 	// R7-R9 are 7segs
-	for (int y = 7; y < 10; y++)
-		m_display_segmask[y] = 0x7f;
-
+	set_display_segmask(0x380, 0x7f);
 	display_matrix(8, 10, m_o, m_r);
 }
 
@@ -2202,9 +2305,7 @@ public:
 void efootb4_state::prepare_display()
 {
 	// R10-R15 are 7segs
-	for (int y = 10; y < 16; y++)
-		m_display_segmask[y] = 0x7f;
-
+	set_display_segmask(0xfc00, 0x7f);
 	display_matrix(7, 16, m_o, m_r);
 }
 
@@ -2331,9 +2432,7 @@ public:
 void ebaskb2_state::prepare_display()
 {
 	// R0-R3 are 7segs
-	for (int y = 0; y < 4; y++)
-		m_display_segmask[y] = 0x7f;
-
+	set_display_segmask(0xf, 0x7f);
 	display_matrix(7, 10, m_o, m_r);
 }
 
@@ -2435,8 +2534,6 @@ MACHINE_CONFIG_END
     8 = lamp42     18 = lamp73     28 = lamp84     38 = lamp82
     9 = lamp43     19 = -          29 = lamp94     39 = lamp83
 
-  NOTE!: MAME external artwork is required
-
 ***************************************************************************/
 
 class raisedvl_state : public hh_tms1k_state
@@ -2463,9 +2560,7 @@ protected:
 void raisedvl_state::prepare_display()
 {
 	// R0-R2 are 7segs
-	for (int y = 0; y < 3; y++)
-		m_display_segmask[y] = 0x7f;
-
+	set_display_segmask(7, 0x7f);
 	display_matrix(7, 10, m_o, m_r);
 }
 
@@ -2546,7 +2641,7 @@ static MACHINE_CONFIG_START( raisedvl, raisedvl_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(raisedvl_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_raisedvl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3114,7 +3209,7 @@ public:
 void starwbc_state::prepare_display()
 {
 	// R6,R8 are 7segs
-	m_display_segmask[6] = m_display_segmask[8] = 0x7f;
+	set_display_segmask(0x140, 0x7f);
 	display_matrix(8, 10, m_o, m_r);
 }
 
@@ -3611,6 +3706,203 @@ static MACHINE_CONFIG_START( comp4, comp4_state )
 	MCFG_DEFAULT_LAYOUT(layout_comp4)
 
 	/* no sound! */
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Milton Bradley Electronic Battleship (1977 version)
+  * PCB label MB 4750B
+  * TMS1000NLL MP3208 (die label 1000C, MP3208)
+  * SN75494N (acting as inverters), SN76477 sound
+  * 4 sliding buttons, light bulb
+
+  This is a 2-player electronic board game. It still needs game pieces like the
+  original Battleship board game.
+  
+  It went through 3 hardware revisions:
+  1977: model 4750A or B, see notes above
+  1979: model 4750C: cost-reduced single chip design, lesser quality game board.
+        The chip is assumed to be custom, no MCU: 28-pin DIP, label 4750, SCUS 0462
+  1982: back to MCU, COP420 instead of choosing TI, emulated in hh_cop400.cpp
+
+***************************************************************************/
+
+class bship_state : public hh_tms1k_state
+{
+public:
+	bship_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_sn(*this, "sn76477")
+	{ }
+
+	required_device<sn76477_device> m_sn;
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(bship_state::write_r)
+{
+	// R0-R10: input mux
+	m_inp_mux = data;
+
+	// R4: 75494 to R12 33K to SN76477 pin 20
+	m_sn->slf_res_w((data & 0x10) ? RES_INF : RES_K(33));
+}
+
+WRITE16_MEMBER(bship_state::write_o)
+{
+	//printf("%X ", m_maincpu->debug_peek_o_index() & 0xf);
+
+	// O0: SN76477 pin 9
+	m_sn->enable_w(data & 1);
+
+	// O1: 75494 to R4 100K to SN76477 pin 18
+	// O2: 75494 to R3 150K to SN76477 pin 18
+	double o12 = RES_INF;
+	switch (~data >> 1 & 3)
+	{
+		case 0: o12 = RES_INF; break;
+		case 1: o12 = RES_K(100); break;
+		case 2: o12 = RES_K(150); break;
+		case 3: o12 = RES_2_PARALLEL(RES_K(100), RES_K(150)); break;
+	}
+	m_sn->vco_res_w(o12);
+
+	// O2,O6: (TODO) to SN76477 pin 21
+	//m_sn->slf_cap_w(x);
+
+	// O4: SN76477 pin 22
+	m_sn->vco_w(data >> 4 & 1);
+
+	// O5: R11 27K to SN76477 pin 23
+	m_sn->one_shot_cap_w((data & 0x20) ? RES_K(27) : RES_INF);
+
+	// O6: SN76477 pin 25
+	m_sn->mixer_b_w(data >> 6 & 1);
+
+	// O7: 75494 to light bulb
+	display_matrix(1, 1, data >> 7 & 1, 1);
+}
+
+READ8_MEMBER(bship_state::read_k)
+{
+	// K: multiplexed inputs (note: the Vss row is always on)
+	return m_inp_matrix[11]->read() | read_inputs(11);
+}
+
+
+// config
+
+static INPUT_PORTS_START( bship )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("P1 A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 A")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("P1 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("P1 B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 B")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("P1 3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("P1 C")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 C")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("P1 4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("P1 D")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 D")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("P1 5")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("P1 E")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 E")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("P1 6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("P1 F")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 F")
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("P1 7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("P1 G")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 7")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 G")
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("P1 8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("P1 H")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 8")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 H")
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("P1 9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("P1 I")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 I")
+
+	PORT_START("IN.9") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("P1 10")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P1 J")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 10")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 J")
+
+	PORT_START("IN.10") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("P1 Fire")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Fire")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_TOGGLE PORT_CODE(KEYCODE_F1) PORT_NAME("Load/Go") // switch
+
+	PORT_START("IN.11") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("P1 Clear Memory") // CM
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("P1 Clear Last Entry") // CLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Clear Memory")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Clear Last Entry")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( bship, bship_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 225000) // approximation - RC osc. R=47K, C=100pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(bship_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bship_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bship_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_bship)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76477", SN76477, 0)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(100), CAP_P(47)) // R18, R17, C8
+	MCFG_SN76477_DECAY_RES(RES_M(3.3))                          // R16
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.47), RES_K(15))          // C7, R20
+	MCFG_SN76477_AMP_RES(RES_K(100))                            // R19
+	MCFG_SN76477_FEEDBACK_RES(RES_K(39))                        // R7
+	MCFG_SN76477_VCO_PARAMS(5.0 * RES_VOLTAGE_DIVIDER(RES_K(47), RES_K(33)), CAP_U(0.01), RES_K(270)) // R15/R14, C5, switchable R5/R3/R4
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)
+	MCFG_SN76477_SLF_PARAMS(CAP_U(22), RES_K(750))  // switchable C4, switchable R13/R12
+	MCFG_SN76477_ONESHOT_PARAMS(0, RES_INF)         // NC, switchable R11
+	MCFG_SN76477_VCO_MODE(0)                        // switchable
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)              // switchable, GND, GND
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)              // Vreg, GND
+	MCFG_SN76477_ENABLE(0)                          // switchable
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
 
@@ -5464,6 +5756,143 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  U.S. Games Super Sports-4
+  * TMS1100 MP1219 (no decap)
+  * 9-digit 7seg LEDs(not fully used), 47 more LEDs, 1-bit sound
+  
+  This handheld includes 4 games: Basketball, Football, Soccer, Hockey.
+  MAME external artwork is needed for the switchable overlays.
+  
+  The later Coleco Total Control 4 is clearly based on this.
+
+***************************************************************************/
+
+class ssports4_state : public hh_tms1k_state
+{
+public:
+	ssports4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void ssports4_state::prepare_display()
+{
+	// R0,R1 and R8,R9 are 7segs
+	set_display_segmask(0x303, 0x7f);
+	
+	// note: R2 is an extra column
+	display_matrix(9, 10, m_o | (m_r << 6 & 0x100), m_r);
+}
+
+WRITE16_MEMBER(ssports4_state::write_r)
+{
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+	
+	// R0-R9: led select/data
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(ssports4_state::write_o)
+{
+	// O0-O7: led data
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(ssports4_state::read_k)
+{
+	// input mux is from R0,1,5,8,9 and O7
+	m_inp_mux = (m_r & 3) | (m_r >> 3 & 4) | (m_r >> 5 & 0x18) | (m_o >> 2 & 0x20);
+	return read_inputs(6);
+}
+
+
+// config
+
+static INPUT_PORTS_START( ssports4 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+
+	PORT_START("IN.2") // R5
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x04, 0x00, "Speed" )
+	PORT_CONFSETTING(    0x00, "Low" )
+	PORT_CONFSETTING(    0x04, "High" )
+	PORT_CONFNAME( 0x08, 0x08, "Players" )
+	PORT_CONFSETTING(    0x08, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+
+	PORT_START("IN.3") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_16WAY PORT_NAME("P1 Kick") // or diagonal up-left
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_16WAY PORT_NAME("P1 Info") // or diagonal up-right
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_16WAY PORT_NAME("P1 Pass")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_16WAY PORT_NAME("P1 O.P.") // offensive player (modifier button)
+
+	PORT_START("IN.4") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Kick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Info")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Pass")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 O.P.")
+
+	PORT_START("IN.5") // O7
+	PORT_CONFNAME( 0x03, 0x00, "Game Select" )
+	PORT_CONFSETTING(    0x02, "Basketball" )
+	PORT_CONFSETTING(    0x00, "Football" )
+	PORT_CONFSETTING(    0x01, "Soccer" )
+	PORT_CONFSETTING(    0x03, "Hockey" )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+// output PLA is not decapped, dumped electronically
+static const UINT16 ssports4_output_pla[0x20] =
+{
+	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x40, 0x40, 0x40, 0x40, 0x40
+};
+
+static MACHINE_CONFIG_START( ssports4, ssports4_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pf
+	MCFG_TMS1XXX_OUTPUT_PLA(ssports4_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(ssports4_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ssports4_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ssports4_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ssports4)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
@@ -5564,6 +5993,17 @@ ROM_START( cnfball2 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_cnfball2_output.pla", 0, 365, NO_DUMP )
+ROM_END
+
+
+ROM_START( esoccer )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0158", 0x0000, 0x0400, CRC(ae4581ea) SHA1(5f6881f8247094abf8cffb17f6e6586e94cff38c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_esoccer_output.pla", 0, 365, CRC(c6eeabbd) SHA1(99d07902126b5a1c1abf43340f30d3390da5fa92) )
 ROM_END
 
 
@@ -5747,6 +6187,17 @@ ROM_START( comp4 )
 	ROM_LOAD( "tms0980_comp4_output.pla", 0, 352, CRC(144ce2d5) SHA1(459b92ad62421932df61b7e3965f1821f9636a2c) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_comp4_segment.pla", 0, 157, CRC(73426b07) SHA1(311be3f95a97936b6d1a4dcfa7746da26318ce54) )
+ROM_END
+
+
+ROM_START( bship )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3208", 0x0000, 0x0400, CRC(982fa720) SHA1(1c6dbbe7b9e55d62a510225a88cd2de55fe9b181) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_bship_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_bship_output.pla", 0, 365, BAD_DUMP CRC(74a9a244) SHA1(479c1f1e37cf8f75352e10226b20322906bee813) ) // part of decap photo was obscured
 ROM_END
 
 
@@ -5936,6 +6387,17 @@ ROM_START( phpball )
 ROM_END
 
 
+ROM_START( ssports4 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1219", 0x0000, 0x0800, CRC(865c06d6) SHA1(12a625a13bdb57b82b35c42b175d38756a1e2e04) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ssports4_output.pla", 0, 365, NO_DUMP )
+ROM_END
+
+
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
@@ -5945,18 +6407,19 @@ COMP( 1979, zodiac,    0,        0, zodiac,    zodiac,    driver_device, 0, "Col
 CONS( 1978, cqback,    0,        0, cqback,    cqback,    driver_device, 0, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hfootb,  0,        0, h2hfootb,  h2hfootb,  driver_device, 0, "Coleco", "Head to Head Football", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Coleco", "Head to Head Baseball", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1979, cnfball,   0,        0, cnfball,   cnfball,   driver_device, 0, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, cnfball2,  0,        0, cnfball2,  cnfball2,  driver_device, 0, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
 
+CONS( 1979, esoccer,   0,        0, esoccer,   esoccer,   driver_device, 0, "Entex", "Electronic Soccer (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, ebball2,   0,        0, ebball2,   ebball2,   driver_device, 0, "Entex", "Electronic Baseball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, einvader,  0,        0, einvader,  einvader,  driver_device, 0, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1980, efootb4 ,  0,        0, efootb4,   efootb4,   driver_device, 0, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebaskb2 ,  0,        0, ebaskb2,   ebaskb2,   driver_device, 0, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, raisedvl,  0,        0, raisedvl,  raisedvl,  driver_device, 0, "Entex", "Raise The Devil", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, raisedvl,  0,        0, raisedvl,  raisedvl,  driver_device, 0, "Entex", "Raise The Devil", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, gpoker,    0,        0, gpoker,    gpoker,    driver_device, 0, "Gakken", "Poker (Gakken, 1979 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gjackpot,  0,        0, gjackpot,  gjackpot,  driver_device, 0, "Gakken", "Jackpot: Gin Rummy & Black Jack", MACHINE_SUPPORTS_SAVE )
@@ -5972,6 +6435,7 @@ COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kos
 CONS( 1980, mdndclab,  0,        0, mdndclab,  mdndclab,  driver_device, 0, "Mattel", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+CONS( 1977, bship,     0,        0, bship,     bship,     driver_device, 0, "Milton Bradley", "Electronic Battleship (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, bigtrak,   0,        0, bigtrak,   bigtrak,   driver_device, 0, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
@@ -5992,6 +6456,8 @@ CONS( 1989, copycatm2, copycat,  0, copycatm2, copycatm2, driver_device, 0, "Tig
 
 CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,   0,        0, phpball,   phpball,   driver_device, 0, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+CONS( 1980, ssports4,  0,        0, ssports4,  ssports4,  driver_device, 0, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

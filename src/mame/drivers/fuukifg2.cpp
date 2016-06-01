@@ -50,7 +50,6 @@ To Do:
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
-#include "sound/okim6295.h"
 #include "includes/fuukifg2.h"
 
 
@@ -78,7 +77,7 @@ WRITE16_MEMBER(fuuki16_state::sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space,0,data & 0xff);
+		m_soundlatch->write(space,0,data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 //      space.device().execute().spin_until_time(attotime::from_usec(50));   // Allow the other CPU to reply
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
@@ -139,7 +138,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fuuki16_sound_io_map, AS_IO, 8, fuuki16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_rombank_w)  // ROM Bank
-	AM_RANGE(0x11, 0x11) AM_READ(soundlatch_byte_r) AM_WRITENOP // From Main CPU / ? To Main CPU ?
+	AM_RANGE(0x11, 0x11) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP // From Main CPU / ? To Main CPU ?
 	AM_RANGE(0x20, 0x20) AM_WRITE(oki_banking_w)    // Oki Banking
 	AM_RANGE(0x30, 0x30) AM_WRITENOP    // ? In the NMI routine
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym1", ym2203_device, write)
@@ -468,6 +467,8 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_28_64MHz / 8) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.15)

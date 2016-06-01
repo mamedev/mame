@@ -82,8 +82,8 @@ UINT32 mw8080bw_state::screen_update_mw8080bw(screen_device &screen, bitmap_rgb3
         * (guess) pin 8 low for trench floor
         * thus, trench side: 1.4 or 2.2 V
         * trench floor: 1.3 or 2.0 V
-        * trech top: 1.8 or 3 V 
-		* scaled to 3.2 V = 255, 1.2 V = 0 (arbitrary values chosen to match video)
+        * trech top: 1.8 or 3 V
+        * scaled to 3.2 V = 255, 1.2 V = 0 (arbitrary values chosen to match video)
 */
 
 #define SPCENCTR_TOP_TRENCH_DARK_RGB32_PEN       rgb_t(0x4d, 0x4d, 0x4d)
@@ -111,7 +111,7 @@ UINT32 mw8080bw_state::screen_update_spcenctr(screen_device &screen, bitmap_rgb3
 
 	memset(line_buf, 0, 256);
 
-	if(m_spcenctr_bright_control) 
+	if(m_spcenctr_bright_control)
 		m_spcenctr_brightness = 255;
 	else if(m_spcenctr_brightness > SPCENCTR_BRIGHTNESS_DECAY)
 		m_spcenctr_brightness -= SPCENCTR_BRIGHTNESS_DECAY;

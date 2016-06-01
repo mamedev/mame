@@ -2,7 +2,7 @@
 // copyright-holders:Mathis Rosenhauer
 /***************************************************************************
 
-  video.c
+  holeland.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -61,26 +61,32 @@ VIDEO_START_MEMBER(holeland_state,holeland)
 
 	m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x01, 0xfe); /* split type 1 has pen 0? transparent in front half */
+
+	save_item(NAME(m_po));
+	save_item(NAME(m_palette_offset));
 }
 
 VIDEO_START_MEMBER(holeland_state,crzrally)
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(holeland_state::crzrally_get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+
+	save_item(NAME(m_po));
+	save_item(NAME(m_palette_offset));
 }
 
-WRITE8_MEMBER(holeland_state::holeland_videoram_w)
+WRITE8_MEMBER(holeland_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::holeland_colorram_w)
+WRITE8_MEMBER(holeland_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::holeland_pal_offs_w)
+WRITE8_MEMBER(holeland_state::pal_offs_w)
 {
 	if ((data & 1) != m_po[offset])
 	{
@@ -90,12 +96,12 @@ WRITE8_MEMBER(holeland_state::holeland_pal_offs_w)
 	}
 }
 
-WRITE8_MEMBER(holeland_state::holeland_scroll_w)
+WRITE8_MEMBER(holeland_state::scroll_w)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(holeland_state::holeland_flipscreen_w)
+WRITE8_MEMBER(holeland_state::flipscreen_w)
 {
 	if (offset)
 		flip_screen_y_set(data);

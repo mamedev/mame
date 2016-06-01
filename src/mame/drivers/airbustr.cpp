@@ -293,30 +293,27 @@ READ8_MEMBER(airbustr_state::soundcommand_status_r)
 READ8_MEMBER(airbustr_state::soundcommand_r)
 {
 	m_soundlatch_status = 0;    // soundlatch has been read
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 READ8_MEMBER(airbustr_state::soundcommand2_r)
 {
 	m_soundlatch2_status = 0;   // soundlatch2 has been read
-	return soundlatch2_byte_r(space, 0);
+	return m_soundlatch2->read(space, 0);
 }
 
 WRITE8_MEMBER(airbustr_state::soundcommand_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_soundlatch_status = 1;    // soundlatch has been written
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // cause a nmi to sub cpu
 }
 
 WRITE8_MEMBER(airbustr_state::soundcommand2_w)
 {
-	soundlatch2_byte_w(space, 0, data);
+	m_soundlatch2->write(space, 0, data);
 	m_soundlatch2_status = 1;   // soundlatch2 has been written
 }
-
-
-
 
 
 WRITE8_MEMBER(airbustr_state::airbustr_coin_counter_w)
@@ -624,6 +621,9 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)   /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))       // DSW-1 connected to port A

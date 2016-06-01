@@ -10,13 +10,16 @@
 
 #pragma once
 
-#ifndef __UI_MAINMENU_H__
-#define __UI_MAINMENU_H__
+#ifndef MAME_FRONTEND_UI_MAINMENU_H
+#define MAME_FRONTEND_UI_MAINMENU_H
 
-class ui_menu_main : public ui_menu {
+namespace ui {
+
+class menu_main : public menu
+{
 public:
-	ui_menu_main(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_main();
+	menu_main(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_main();
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -50,8 +53,8 @@ private:
 		REMOVE_FAVORITE,
 		QUIT_GAME
 	};
-
-	//bool submenu;
 };
 
-#endif  /* __UI_MAINMENU_H__ */
+} // namespace ui
+
+#endif  /* MAME_FRONTEND_UI_MAINMENU_H */

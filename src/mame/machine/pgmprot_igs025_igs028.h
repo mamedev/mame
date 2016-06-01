@@ -12,7 +12,7 @@ public:
 
 	{
 	}
-	
+
 	required_shared_ptr<UINT16> m_sharedprotram;
 	required_device<igs025_device> m_igs025;
 	required_device<igs028_device> m_igs028;

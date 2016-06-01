@@ -87,6 +87,8 @@ public:
 				DECLARE_WRITE_LINE_MEMBER(status_w);
 				DECLARE_WRITE_LINE_MEMBER(flag_w);
 
+		UINT8 pa_r(void) const;
+
 		template<class _Object> static devcb_base &set_pa_changed_func(device_t &device, _Object object) { return downcast<hp_hybrid_cpu_device &>(device).m_pa_changed_func.set_callback(object); }
 
 protected:

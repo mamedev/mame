@@ -157,7 +157,7 @@ Quick Jack administration/service mode:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ay8910.h"
-#include "video/h63484.h"
+#include "video/hd63484.h"
 #include "machine/microtch.h"
 #include "machine/mc68681.h"
 #include "machine/msm6242.h"
@@ -288,8 +288,8 @@ WRITE16_MEMBER(adp_state::input_w)
 
 static ADDRESS_MAP_START( skattv_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
+	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
+	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 	AM_RANGE(0x800100, 0x800101) AM_READWRITE(input_r, input_w)
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
@@ -299,8 +299,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( skattva_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc",msm6242_device, read, write, 0x00ff)
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
+	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
+	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 	AM_RANGE(0x800100, 0x800101) AM_READ_PORT("IN0")
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
@@ -310,8 +310,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( quickjac_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc",msm6242_device, read, write, 0x00ff)
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w) // bad
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w) // bad
+	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w) // bad
+	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w) // bad
 	AM_RANGE(0x800100, 0x800101) AM_READ_PORT("IN0")
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
@@ -330,8 +330,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( funland_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc",msm6242_device, read, write, 0x00ff)
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
+	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
+	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 	AM_RANGE(0x800088, 0x800089) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
 	AM_RANGE(0x80008a, 0x80008b) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
 	AM_RANGE(0x80008c, 0x80008d) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
@@ -343,8 +343,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fstation_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w)
-	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
+	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
+	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 	AM_RANGE(0x800100, 0x800101) AM_READWRITE(input_r, input_w)
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
@@ -516,17 +516,17 @@ INTERRUPT_GEN_MEMBER(adp_state::adp_int)
 }
 */
 
-static ADDRESS_MAP_START( adp_h63484_map, AS_0, 16, adp_state )
+static ADDRESS_MAP_START( adp_hd63484_map, AS_0, 16, adp_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x60000) AM_RAM
 	AM_RANGE(0x80000, 0x9ffff) AM_MIRROR(0x60000) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fashiong_h63484_map, AS_0, 16, adp_state )
+static ADDRESS_MAP_START( fashiong_hd63484_map, AS_0, 16, adp_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x60000) AM_RAM
 	AM_RANGE(0x80000, 0xfffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fstation_h63484_map, AS_0, 16, adp_state )
+static ADDRESS_MAP_START( fstation_hd63484_map, AS_0, 16, adp_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0x80000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
@@ -557,14 +557,14 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE_DEVICE("h63484", h63484_device, update_screen)
+	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x10)
 
 	MCFG_PALETTE_INIT_OWNER(adp_state,adp)
 
-	MCFG_H63484_ADD("h63484", 0, adp_h63484_map)
+	MCFG_HD63484_ADD("hd63484", 0, adp_hd63484_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 3686400/2)
@@ -595,8 +595,8 @@ static MACHINE_CONFIG_DERIVED( backgamn, skattv )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fashiong, skattv )
-	MCFG_DEVICE_MODIFY("h63484")
-	MCFG_H63484_ADDRESS_MAP(fashiong_h63484_map)
+	MCFG_DEVICE_MODIFY("hd63484")
+	MCFG_HD63484_ADDRESS_MAP(fashiong_hd63484_map)
 MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, adp_state )
@@ -611,8 +611,8 @@ static MACHINE_CONFIG_DERIVED( funland, quickjac )
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
-	MCFG_DEVICE_MODIFY("h63484")
-	MCFG_H63484_ADDRESS_MAP(fstation_h63484_map)
+	MCFG_DEVICE_MODIFY("hd63484")
+	MCFG_HD63484_ADDRESS_MAP(fstation_hd63484_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fstation, funland )

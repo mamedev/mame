@@ -1649,7 +1649,7 @@ void gauntlet_state::swap_memory(void *ptr1, void *ptr2, int bytes)
 void gauntlet_state::common_init(int vindctr2)
 {
 	UINT8 *rom = memregion("maincpu")->base();
-	slapstic_configure(*m_maincpu, 0x038000, 0);
+	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
 	swap_memory(rom + 0x000000, rom + 0x008000, 0x8000);

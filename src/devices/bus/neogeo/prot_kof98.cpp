@@ -125,4 +125,3 @@ WRITE16_MEMBER( kof98_prot_device::protection_w )
 		break;
 	}
 }
-

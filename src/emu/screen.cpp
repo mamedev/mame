@@ -134,7 +134,7 @@ screen_device_svg_renderer::screen_device_svg_renderer(memory_region *region)
 		w = 1920;
 		h = (w / ar) + 0.5;
 	}
-	
+
 	printf("\n\nMCFG_SCREEN_SIZE(%d, %d)\nMCFG_SCREEN_VISIBLE_AREA(0, %d-1, 0, %d-1)\n", w, h, w, h);
 #endif
 }
@@ -353,7 +353,7 @@ void screen_device_svg_renderer::compute_diff_image(const std::vector<UINT32> &r
 			dst++;
 		}
 	}
-	
+
 }
 
 bool screen_device_svg_renderer::compute_mask_intersection_bbox(int key1, int key2, bbox &bb) const
@@ -361,9 +361,9 @@ bool screen_device_svg_renderer::compute_mask_intersection_bbox(int key1, int ke
 	const cached_bitmap &c1 = m_cache[key1];
 	const cached_bitmap &c2 = m_cache[key2];
 	if(c1.x >= c2.x + c2.sx ||
-	   c1.x + c1.sx <= c2.x ||
-	   c1.y >= c2.y + c2.sy ||
-	   c1.y + c1.sy <= c2.y)
+		c1.x + c1.sx <= c2.x ||
+		c1.y >= c2.y + c2.sy ||
+		c1.y + c1.sy <= c2.y)
 		return false;
 	int cx0 = c1.x > c2.x ? c1.x : c2.x;
 	int cy0 = c1.y > c2.y ? c1.y : c2.y;
@@ -412,7 +412,7 @@ void screen_device_svg_renderer::compute_dual_diff_image(const std::vector<UINT3
 	dest.sx = bb.x1 - bb.x0 + 1;
 	dest.sy = bb.y1 - bb.y0 + 1;
 	dest.image.resize(dest.sx*dest.sy);
-	for(int y = 0; y != dest.sy; y++) {		
+	for(int y = 0; y != dest.sy; y++) {
 		const UINT32 *psrc1 = &src1.image[(dest.x - src1.x) + src1.sx * (y + dest.y - src1.y)];
 		const UINT32 *psrc2 = &src2.image[(dest.x - src2.x) + src2.sx * (y + dest.y - src2.y)];
 		const UINT32 *psrcr = &rend      [ dest.x           +    m_sx * (y + dest.y         )];
@@ -457,9 +457,9 @@ void screen_device_svg_renderer::rebuild_cache()
 			for(int okey : doing) {
 				// The bounding boxes include x1/y1, so the comparisons must be strict
 				if(!(bboxes[key].x0 > bboxes[okey].x1 ||
-					 bboxes[key].x1 < bboxes[okey].x0 ||
-					 bboxes[key].y0 > bboxes[okey].y1 ||
-					 bboxes[key].y1 < bboxes[okey].y0))
+						bboxes[key].x1 < bboxes[okey].x0 ||
+						bboxes[key].y0 > bboxes[okey].y1 ||
+						bboxes[key].y1 < bboxes[okey].y0))
 					goto conflict;
 			}
 			doing.push_back(key);
@@ -511,9 +511,9 @@ void screen_device_svg_renderer::rebuild_cache()
 				for(int okey : doing) {
 					// The bounding boxes include x1/y1, so the comparisons must be strict
 					if(!(bboxes[key].x0 > bboxes[okey].x1 ||
-						 bboxes[key].x1 < bboxes[okey].x0 ||
-						 bboxes[key].y0 > bboxes[okey].y1 ||
-						 bboxes[key].y1 < bboxes[okey].y0))
+							bboxes[key].x1 < bboxes[okey].x0 ||
+							bboxes[key].y0 > bboxes[okey].y1 ||
+							bboxes[key].y1 < bboxes[okey].y0))
 						goto conflict2;
 				}
 				doing.push_back(key);

@@ -158,7 +158,7 @@ void parser_t::net_truthtable_start()
 	pstring def_param = get_string();
 	require_token(m_tok_param_right);
 
-	netlist::devices::netlist_base_factory_truthtable_t *ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
+	plib::powned_ptr<netlist::devices::netlist_base_factory_truthtable_t> ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
 			name, name, "+" + def_param);
 
 	while (true)
@@ -188,7 +188,7 @@ void parser_t::net_truthtable_start()
 			require_token(token, m_tok_TRUTHTABLE_END);
 			require_token(m_tok_param_left);
 			require_token(m_tok_param_right);
-			m_setup.factory().register_device(ttd);
+			m_setup.factory().register_device(std::move(ttd));
 			return;
 		}
 	}
@@ -287,14 +287,14 @@ void parser_t::net_c()
 		if (n.is(m_tok_param_right))
 			break;
 		if (!n.is(m_tok_comma))
-			error(pfmt("expected a comma, found <{1}>")(n.str()) );
+			error(plib::pfmt("expected a comma, found <{1}>")(n.str()) );
 	}
 
 }
 
 void parser_t::dippins()
 {
-	pstring_vector_t pins;
+	plib::pstring_vector_t pins;
 
 	pins.push_back(get_identifier());
 	require_token(m_tok_comma);
@@ -307,15 +307,15 @@ void parser_t::dippins()
 		if (n.is(m_tok_param_right))
 			break;
 		if (!n.is(m_tok_comma))
-			error(pfmt("expected a comma, found <{1}>")(n.str()) );
+			error(plib::pfmt("expected a comma, found <{1}>")(n.str()) );
 	}
 	if ((pins.size() % 2) == 1)
 		error("You must pass an equal number of pins to DIPPINS");
 	unsigned n = pins.size();
 	for (unsigned i = 0; i < n / 2; i++)
 	{
-		m_setup.register_alias(pfmt("{1}")(i+1), pins[i*2]);
-		m_setup.register_alias(pfmt("{1}")(n-i), pins[i*2 + 1]);
+		m_setup.register_alias(plib::pfmt("{1}")(i+1), pins[i*2]);
+		m_setup.register_alias(plib::pfmt("{1}")(n-i), pins[i*2 + 1]);
 	}
 }
 
@@ -352,16 +352,14 @@ void parser_t::device(const pstring &dev_type)
 	else
 	{
 		base_factory_t *f = m_setup.factory().factory_by_name(dev_type);
-		device_t *dev;
-		pstring_vector_t termlist = f->term_param_list();
-		pstring_vector_t def_params = f->def_params();
+		plib::pstring_vector_t termlist = f->term_param_list();
+		plib::pstring_vector_t def_params = f->def_params();
 
 		std::size_t cnt;
 
 		pstring devname = get_identifier();
 
-		dev = f->Create();
-		m_setup.register_dev(dev, devname);
+		m_setup.register_dev(dev_type, m_setup.build_fqn(devname));
 
 		m_setup.log().debug("Parser: IC: {1}\n", devname);
 

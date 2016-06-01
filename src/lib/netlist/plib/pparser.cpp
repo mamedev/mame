@@ -9,6 +9,7 @@
 
 #include "pparser.h"
 
+PLIB_NAMESPACE_START()
 // ----------------------------------------------------------------------------------------
 // A simple tokenizer
 // ----------------------------------------------------------------------------------------
@@ -21,22 +22,22 @@ pstring ptokenizer::currentline_str()
 
 void ptokenizer::skipeol()
 {
-	pstring::code_t c = _getc();
+	pstring::code_t c = getc();
 	while (c)
 	{
 		if (c == 10)
 		{
-			c = _getc();
+			c = getc();
 			if (c != 13)
-				_ungetc();
+				ungetc();
 			return;
 		}
-		c = _getc();
+		c = getc();
 	}
 }
 
 
-pstring::code_t ptokenizer::_getc()
+pstring::code_t ptokenizer::getc()
 {
 	if (m_px >= m_cur_line.len())
 	{
@@ -51,7 +52,7 @@ pstring::code_t ptokenizer::_getc()
 	return m_cur_line.code_at(m_px++);
 }
 
-void ptokenizer::_ungetc()
+void ptokenizer::ungetc()
 {
 	m_px--;
 }
@@ -159,10 +160,10 @@ ptokenizer::token_t ptokenizer::get_token()
 ptokenizer::token_t ptokenizer::get_token_internal()
 {
 	/* skip ws */
-	pstring::code_t c = _getc();
+	pstring::code_t c = getc();
 	while (m_whitespace.find(c)>=0)
 	{
-		c = _getc();
+		c = getc();
 		if (eof())
 		{
 			return token_t(ENDOFFILE);
@@ -182,9 +183,9 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			else if (m_number_chars.find(c)<0)
 				break;
 			tokstr += c;
-			c = _getc();
+			c = getc();
 		}
-		_ungetc();
+		ungetc();
 		return token_t(ret, tokstr);
 	}
 	else if (m_identifier_chars.find(c)>=0)
@@ -193,9 +194,9 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 		pstring tokstr = "";
 		while (m_identifier_chars.find(c)>=0) {
 			tokstr += c;
-			c = _getc();
+			c = getc();
 		}
-		_ungetc();
+		ungetc();
 		token_id_t id = token_id_t(m_tokens.indexof(tokstr));
 		if (id.id() >= 0)
 			return token_t(id, tokstr);
@@ -207,11 +208,11 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 	else if (c == m_string)
 	{
 		pstring tokstr = "";
-		c = _getc();
+		c = getc();
 		while (c != m_string)
 		{
 			tokstr += c;
-			c = _getc();
+			c = getc();
 		}
 		return token_t(STRING, tokstr);
 	}
@@ -228,9 +229,9 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 				if (id.id() >= 0)
 					return token_t(id, tokstr);
 			}
-			c = _getc();
+			c = getc();
 		}
-		_ungetc();
+		ungetc();
 		token_id_t id = token_id_t(m_tokens.indexof(tokstr));
 		if (id.id() >= 0)
 			return token_t(id, tokstr);
@@ -468,3 +469,5 @@ postream & ppreprocessor::process_i(pistream &istrm, postream &ostrm)
 	}
 	return ostrm;
 }
+
+PLIB_NAMESPACE_END()

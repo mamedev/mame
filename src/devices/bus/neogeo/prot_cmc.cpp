@@ -606,7 +606,7 @@ void cmc_prot_device::sfix_decrypt(UINT8* rom, UINT32 rom_size, UINT8* fixed, UI
 	int tx_size = fixed_size;
 	UINT8 *src = rom + rom_size - tx_size;
 	UINT8 *dst = fixed;
-	
+
 	for (int i = 0; i < tx_size; i++)
 		dst[i] = src[(i & ~0x1f) + ((i & 7) << 2) + ((~i & 8) >> 2) + ((i & 0x10) >> 4)];
 }

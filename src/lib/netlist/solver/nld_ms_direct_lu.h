@@ -13,15 +13,15 @@
 #include "solver/nld_solver.h"
 #include "solver/nld_matrix_solver.h"
 
-//#define A(_r, _c) m_A[_r][_c]
+//#define A(r, c) m_A[_r][_c]
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-//#define nl_ext_double __float128 // slow, very slow
+//#define nl_ext_double _float128 // slow, very slow
 //#define nl_ext_double long double // slightly slower
 #define nl_ext_double double
 
-template <unsigned m_N, unsigned _storage_N>
+template <unsigned m_N, unsigned storage_N>
 class matrix_solver_direct_t: public matrix_solver_t
 {
 public:
@@ -54,7 +54,7 @@ protected:
 		const unsigned * const p = m_terms[k]->m_nzrd.data();
 		const unsigned e = m_terms[k]->m_nzrd.size();
 
-		for (int i = k+1; i < _storage_N;i++)
+		for (int i = k+1; i < storage_N;i++)
 		{
 			const double alpha = A(i,k) * akki;
 			A(i,k) = alpha;
@@ -72,7 +72,7 @@ protected:
 		const unsigned kN = N();
 		unsigned sk = 1;
 
-		if (1 && kN == _storage_N)
+		if (1 && kN == storage_N)
 		{
 			if (kN> 0 ) LEk<0>();
 			if (kN> 1 ) LEk<1>();
@@ -139,15 +139,15 @@ protected:
 	template <typename T1, typename T2>
 	inline nl_ext_double &A(const T1 r, const T2 c) { return m_A[r][c]; }
 
-	//ATTR_ALIGN nl_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
-	ATTR_ALIGN nl_double m_RHS[_storage_N];
-	ATTR_ALIGN nl_double m_last_RHS[_storage_N]; // right hand side - contains currents
-	ATTR_ALIGN nl_double m_last_V[_storage_N];
+	//ATTR_ALIGN nl_double m_A[storage_N][((storage_N + 7) / 8) * 8];
+	ATTR_ALIGN nl_double m_RHS[storage_N];
+	ATTR_ALIGN nl_double m_last_RHS[storage_N]; // right hand side - contains currents
+	ATTR_ALIGN nl_double m_last_V[storage_N];
 
 	terms_t *m_rails_temp;
 
 private:
-	ATTR_ALIGN nl_ext_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
+	ATTR_ALIGN nl_ext_double m_A[storage_N][((storage_N + 7) / 8) * 8];
 
 	const unsigned m_dim;
 	nl_double m_lp_fact;
@@ -157,14 +157,14 @@ private:
 // matrix_solver_direct
 // ----------------------------------------------------------------------------------------
 
-template <unsigned m_N, unsigned _storage_N>
-matrix_solver_direct_t<m_N, _storage_N>::~matrix_solver_direct_t()
+template <unsigned m_N, unsigned storage_N>
+matrix_solver_direct_t<m_N, storage_N>::~matrix_solver_direct_t()
 {
 	pfree_array(m_rails_temp);
 }
 
-template <unsigned m_N, unsigned _storage_N>
-nl_double matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep()
+template <unsigned m_N, unsigned storage_N>
+nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
 {
 	nl_double new_solver_timestep = m_params.m_max_timestep;
 
@@ -202,8 +202,8 @@ nl_double matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep()
 	return new_solver_timestep;
 }
 
-template <unsigned m_N, unsigned _storage_N>
-ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, terminal_t *term)
+template <unsigned m_N, unsigned storage_N>
+ATTR_COLD void matrix_solver_direct_t<m_N, storage_N>::add_term(int k, terminal_t *term)
 {
 	if (term->m_otherterm->net().isRailNet())
 	{
@@ -226,8 +226,8 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, terminal
 }
 
 
-template <unsigned m_N, unsigned _storage_N>
-ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
+template <unsigned m_N, unsigned storage_N>
+ATTR_COLD void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	if (m_dim < nets.size())
 		netlist().error("Dimension {1} less than {2}", m_dim,nets.size());
@@ -355,7 +355,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 
 	for (unsigned k = 0; k < N(); k++)
 	{
-		pstring num = pfmt("{1}")(k);
+		pstring num = plib::pfmt("{1}")(k);
 
 		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
 		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
@@ -365,8 +365,8 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 }
 
 
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
+template <unsigned m_N, unsigned storage_N>
+void matrix_solver_direct_t<m_N, storage_N>::build_LE_A()
 {
 	const unsigned iN = N();
 	for (unsigned k = 0; k < iN; k++)
@@ -391,8 +391,8 @@ void matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
 	}
 }
 
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS(nl_double * RESTRICT rhs)
+template <unsigned m_N, unsigned storage_N>
+void matrix_solver_direct_t<m_N, storage_N>::build_LE_RHS(nl_double * RESTRICT rhs)
 {
 	const unsigned iN = N();
 	for (unsigned k = 0; k < iN; k++)
@@ -419,8 +419,8 @@ void matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS(nl_double * RESTRICT 
 #if 1
 #else
 // Crout algo
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
+template <unsigned m_N, unsigned storage_N>
+void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 {
 	const unsigned kN = N();
 
@@ -428,7 +428,7 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 	ATTR_UNUSED double big,temp;
 
 #if 0
-	double vv[_storage_N];
+	double vv[storage_N];
 
 	for (i=0;i<kN;i++)
 	{
@@ -501,8 +501,8 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 }
 #endif
 
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
+template <unsigned m_N, unsigned storage_N>
+void matrix_solver_direct_t<m_N, storage_N>::LE_back_subst(
 		nl_double * RESTRICT x)
 {
 	const unsigned kN = N();
@@ -535,8 +535,8 @@ void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 
 }
 
-template <unsigned m_N, unsigned _storage_N>
-nl_double matrix_solver_direct_t<m_N, _storage_N>::delta(
+template <unsigned m_N, unsigned storage_N>
+nl_double matrix_solver_direct_t<m_N, storage_N>::delta(
 		const nl_double * RESTRICT V)
 {
 	/* FIXME: Ideally we should also include currents (RHS) here. This would
@@ -551,8 +551,8 @@ nl_double matrix_solver_direct_t<m_N, _storage_N>::delta(
 	return cerr;
 }
 
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_direct_t<m_N, _storage_N>::store(
+template <unsigned m_N, unsigned storage_N>
+void matrix_solver_direct_t<m_N, storage_N>::store(
 		const nl_double * RESTRICT V)
 {
 	for (unsigned i = 0, iN=N(); i < iN; i++)
@@ -562,10 +562,10 @@ void matrix_solver_direct_t<m_N, _storage_N>::store(
 }
 
 
-template <unsigned m_N, unsigned _storage_N>
-int matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
+template <unsigned m_N, unsigned storage_N>
+int matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
-	nl_double new_V[_storage_N]; // = { 0.0 };
+	nl_double new_V[storage_N]; // = { 0.0 };
 
 	this->LE_back_subst(new_V);
 
@@ -584,8 +584,8 @@ int matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const
 	}
 }
 
-template <unsigned m_N, unsigned _storage_N>
-inline int matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+template <unsigned m_N, unsigned storage_N>
+inline int matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	this->build_LE_A();
 	this->build_LE_RHS(m_last_RHS);
@@ -596,8 +596,8 @@ inline int matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const boo
 	return this->solve_non_dynamic(newton_raphson);
 }
 
-template <unsigned m_N, unsigned _storage_N>
-matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const solver_parameters_t *params, const int size)
+template <unsigned m_N, unsigned storage_N>
+matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const solver_parameters_t *params, const int size)
 : matrix_solver_t(GAUSSIAN_ELIMINATION, params)
 , m_dim(size)
 , m_lp_fact(0)
@@ -610,8 +610,8 @@ matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const solver_par
 	}
 }
 
-template <unsigned m_N, unsigned _storage_N>
-matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const eSolverType type, const solver_parameters_t *params, const int size)
+template <unsigned m_N, unsigned storage_N>
+matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const eSolverType type, const solver_parameters_t *params, const int size)
 : matrix_solver_t(type, params)
 , m_dim(size)
 , m_lp_fact(0)

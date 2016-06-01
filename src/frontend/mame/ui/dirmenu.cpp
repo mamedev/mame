@@ -9,14 +9,18 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "mame.h"
+
 #include "ui/ui.h"
-#include "ui/menu.h"
 #include "ui/dirmenu.h"
 #include "ui/datfile.h"
 #include "ui/utils.h"
 #include "ui/optsmenu.h"
+
+#include "emuopts.h"
+#include "mame.h"
+
+
+namespace ui {
 
 static int ADDING = 1;
 static int CHANGE = 2;
@@ -68,11 +72,11 @@ static const folders_entry s_folders[] =
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_directory::ui_menu_directory(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
+menu_directory::menu_directory(mame_ui_manager &mui, render_container *container) : menu(mui, container)
 {
 }
 
-ui_menu_directory::~ui_menu_directory()
+menu_directory::~menu_directory()
 {
 	ui().save_ui_options();
 	ui_globals::reset = true;
@@ -83,25 +87,25 @@ ui_menu_directory::~ui_menu_directory()
 //  handle
 //-------------------------------------------------
 
-void ui_menu_directory::handle()
+void menu_directory::handle()
 {
 	// process the menu
-	const ui_menu_event *m_event = process(0);
+	const event *menu_event = process(0);
 
-	if (m_event != nullptr && m_event->itemref != nullptr && m_event->iptkey == IPT_UI_SELECT)
-		ui_menu::stack_push(global_alloc_clear<ui_menu_display_actual>(ui(), container, selected));
+	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
+		menu::stack_push<menu_display_actual>(ui(), container, selected);
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
-void ui_menu_directory::populate()
+void menu_directory::populate()
 {
 	for (auto & elem : s_folders)
 		item_append(_(elem.name), nullptr, 0, (void *)(FPTR)elem.action);
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
@@ -109,7 +113,7 @@ void ui_menu_directory::populate()
 //  perform our special rendering
 //-------------------------------------------------
 
-void ui_menu_directory::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_directory::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
 
@@ -145,12 +149,12 @@ void ui_menu_directory::custom_render(void *selectedref, float top, float bottom
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_display_actual::ui_menu_display_actual(mame_ui_manager &mui, render_container *container, int ref)
-	: ui_menu(mui, container), m_ref(ref)
+menu_display_actual::menu_display_actual(mame_ui_manager &mui, render_container *container, int ref)
+	: menu(mui, container), m_ref(ref)
 {
 }
 
-ui_menu_display_actual::~ui_menu_display_actual()
+menu_display_actual::~menu_display_actual()
 {
 }
 
@@ -158,20 +162,20 @@ ui_menu_display_actual::~ui_menu_display_actual()
 //  handle
 //-------------------------------------------------
 
-void ui_menu_display_actual::handle()
+void menu_display_actual::handle()
 {
 	// process the menu
-	const ui_menu_event *m_event = process(0);
-	if (m_event != nullptr && m_event->itemref != nullptr && m_event->iptkey == IPT_UI_SELECT)
-		switch ((FPTR)m_event->itemref)
+	const event *menu_event = process(0);
+	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
+		switch ((FPTR)menu_event->itemref)
 		{
-			case REMOVE:
-				ui_menu::stack_push(global_alloc_clear<ui_menu_remove_folder>(ui(), container, m_ref));
-				break;
+		case REMOVE:
+			menu::stack_push<menu_remove_folder>(ui(), container, m_ref);
+			break;
 
-			case ADD_CHANGE:
-				ui_menu::stack_push(global_alloc_clear<ui_menu_add_change_folder>(ui(), container, m_ref));
-				break;
+		case ADD_CHANGE:
+			menu::stack_push<menu_add_change_folder>(ui(), container, m_ref);
+			break;
 		}
 }
 
@@ -179,7 +183,7 @@ void ui_menu_display_actual::handle()
 //  populate
 //-------------------------------------------------
 
-void ui_menu_display_actual::populate()
+void menu_display_actual::populate()
 {
 	m_tempbuf = string_format(_("Current %1$s Folders"), _(s_folders[m_ref].name));
 	if (ui().options().exists(s_folders[m_ref].option))
@@ -198,7 +202,7 @@ void ui_menu_display_actual::populate()
 	if (m_folders.size() > 1)
 		item_append(_("Remove Folder"), nullptr, 0, (void *)REMOVE);
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 	customtop = (m_folders.size() + 1) * ui().get_line_height() + 6.0f * UI_BOX_TB_BORDER;
 }
 
@@ -206,7 +210,7 @@ void ui_menu_display_actual::populate()
 //  perform our special rendering
 //-------------------------------------------------
 
-void ui_menu_display_actual::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_display_actual::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width, maxwidth = origx2 - origx1;
 	float lineh = ui().get_line_height();
@@ -272,7 +276,7 @@ MENU ADD FOLDER
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_add_change_folder::ui_menu_add_change_folder(mame_ui_manager &mui, render_container *container, int ref) : ui_menu(mui, container)
+menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_container *container, int ref) : menu(mui, container)
 {
 	m_ref = ref;
 	m_change = (s_folders[ref].action == CHANGE);
@@ -293,7 +297,7 @@ ui_menu_add_change_folder::ui_menu_add_change_folder(mame_ui_manager &mui, rende
 		m_folders.push_back(curpath);
 }
 
-ui_menu_add_change_folder::~ui_menu_add_change_folder()
+menu_add_change_folder::~menu_add_change_folder()
 {
 }
 
@@ -301,17 +305,17 @@ ui_menu_add_change_folder::~ui_menu_add_change_folder()
 //  handle
 //-------------------------------------------------
 
-void ui_menu_add_change_folder::handle()
+void menu_add_change_folder::handle()
 {
 	// process the menu
-	const ui_menu_event *m_event = process(0);
+	const event *menu_event = process(0);
 
-	if (m_event != nullptr && m_event->itemref != nullptr)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		if (m_event->iptkey == IPT_UI_SELECT)
+		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			int index = (FPTR)m_event->itemref - 1;
-			const ui_menu_item &pitem = item[index];
+			int index = (FPTR)menu_event->itemref - 1;
+			const menu_item &pitem = item[index];
 
 			// go up to the parent path
 			if (!strcmp(pitem.text, ".."))
@@ -336,31 +340,26 @@ void ui_menu_add_change_folder::handle()
 			}
 
 			// reset the char buffer also in this case
-			if (m_search[0] != 0)
-				m_search[0] = '\0';
-			reset(UI_MENU_RESET_SELECT_FIRST);
+			m_search[0] = '\0';
+			reset(reset_options::SELECT_FIRST);
 		}
-		else if (m_event->iptkey == IPT_SPECIAL)
+		else if (menu_event->iptkey == IPT_SPECIAL)
 		{
-			int buflen = strlen(m_search);
-			bool update_selected = FALSE;
+			auto const buflen = std::strlen(m_search);
+			bool update_selected = false;
 
-			// if it's a backspace and we can handle it, do so
-			if ((m_event->unichar == 8 || m_event->unichar == 0x7f) && buflen > 0)
+			if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
 			{
-				*(char *)utf8_previous_char(&m_search[buflen]) = 0;
-				update_selected = TRUE;
+				// if it's a backspace and we can handle it, do so
+				if (0 < buflen)
+				{
+					*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
+					update_selected = true;
+				}
 			}
-			// if it's any other key and we're not maxed out, update
-			else if (m_event->unichar >= ' ' && m_event->unichar < 0x7f)
+			else if (menu_event->unichar == 0x09)
 			{
-				buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, m_event->unichar);
-				m_search[buflen] = 0;
-				update_selected = TRUE;
-			}
-			// Tab key, save current path
-			else if (m_event->unichar == 0x09)
-			{
+				// Tab key, save current path
 				std::string error_string;
 				if (m_change)
 				{
@@ -393,8 +392,14 @@ void ui_menu_add_change_folder::handle()
 					}
 				}
 
-				ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
-				ui_menu::stack_pop(machine());
+				reset_parent(reset_options::SELECT_FIRST);
+				menu::stack_pop(machine());
+			}
+			else if (menu_event->is_char_printable())
+			{
+				// if it's any other key and we're not maxed out, update
+				if (menu_event->append_char(m_search, buflen))
+					update_selected = true;
 			}
 
 			// check for entries which matches our search buffer
@@ -443,7 +448,7 @@ void ui_menu_add_change_folder::handle()
 				top_line = selected - (visible_lines / 2);
 			}
 		}
-		else if (m_event->iptkey == IPT_UI_CANCEL)
+		else if (menu_event->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
 			if (m_search[0] != 0)
@@ -456,7 +461,7 @@ void ui_menu_add_change_folder::handle()
 //  populate
 //-------------------------------------------------
 
-void ui_menu_add_change_folder::populate()
+void menu_add_change_folder::populate()
 {
 	// open a path
 	const char *volume_name = nullptr;
@@ -475,7 +480,7 @@ void ui_menu_add_change_folder::populate()
 			item_append(dirent->name, "[DIR]", 0, (void *)(FPTR)++folders_count);
 	}
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 
 	// configure the custom rendering
 	customtop = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -486,7 +491,7 @@ void ui_menu_add_change_folder::populate()
 //  perform our special rendering
 //-------------------------------------------------
 
-void ui_menu_add_change_folder::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_add_change_folder::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width, maxwidth = origx2 - origx1;
 	std::string tempbuf[2];
@@ -564,7 +569,7 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_remove_folder::ui_menu_remove_folder(mame_ui_manager &mui, render_container *container, int ref) : ui_menu(mui, container)
+menu_remove_folder::menu_remove_folder(mame_ui_manager &mui, render_container *container, int ref) : menu(mui, container)
 {
 	m_ref = ref;
 	if (mui.options().exists(s_folders[m_ref].option))
@@ -578,7 +583,7 @@ ui_menu_remove_folder::ui_menu_remove_folder(mame_ui_manager &mui, render_contai
 		m_folders.push_back(curpath);
 }
 
-ui_menu_remove_folder::~ui_menu_remove_folder()
+menu_remove_folder::~menu_remove_folder()
 {
 }
 
@@ -586,11 +591,11 @@ ui_menu_remove_folder::~ui_menu_remove_folder()
 //  handle
 //-------------------------------------------------
 
-void ui_menu_remove_folder::handle()
+void menu_remove_folder::handle()
 {
 	// process the menu
-	const ui_menu_event *m_event = process(0);
-	if (m_event != nullptr && m_event->itemref != nullptr && m_event->iptkey == IPT_UI_SELECT)
+	const event *menu_event = process(0);
+	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
 	{
 		std::string tmppath, error_string;
 		m_folders.erase(m_folders.begin() + selected);
@@ -609,8 +614,8 @@ void ui_menu_remove_folder::handle()
 			machine().options().mark_changed(s_folders[m_ref].option);
 		}
 
-		ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
-		ui_menu::stack_pop(machine());
+		reset_parent(reset_options::REMEMBER_REF);
+		menu::stack_pop(machine());
 	}
 }
 
@@ -618,13 +623,13 @@ void ui_menu_remove_folder::handle()
 //  populate menu
 //-------------------------------------------------
 
-void ui_menu_remove_folder::populate()
+void menu_remove_folder::populate()
 {
 	int folders_count = 0;
 	for (auto & elem : m_folders)
 		item_append(elem.c_str(), nullptr, 0, (void *)(FPTR)++folders_count);
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
@@ -632,7 +637,7 @@ void ui_menu_remove_folder::populate()
 //  perform our special rendering
 //-------------------------------------------------
 
-void ui_menu_remove_folder::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_remove_folder::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
 	std::string tempbuf = string_format(_("Remove %1$s Folder"), _(s_folders[m_ref].name));
@@ -660,3 +665,5 @@ void ui_menu_remove_folder::custom_render(void *selectedref, float top, float bo
 	ui().draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL,
 		UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
+
+} // namespace ui

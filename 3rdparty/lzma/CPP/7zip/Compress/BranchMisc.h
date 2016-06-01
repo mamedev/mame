@@ -13,7 +13,10 @@ typedef SizeT (*Func_Bra)(Byte *data, SizeT size, UInt32 ip, int encoding);
 
 EXTERN_C_END
 
-class CBranchCoder:
+namespace NCompress {
+namespace NBranch {
+
+class CCoder:
   public ICompressFilter,
   public CMyUnknownImp
 {
@@ -21,10 +24,12 @@ class CBranchCoder:
   int _encode;
   Func_Bra BraFunc;
 public:
-  MY_UNKNOWN_IMP;
+  MY_UNKNOWN_IMP1(ICompressFilter);
   INTERFACE_ICompressFilter(;)
 
-  CBranchCoder(Func_Bra bra, int encode):  _bufferPos(0), _encode(encode), BraFunc(bra) {}
+  CCoder(Func_Bra bra, int encode):  _bufferPos(0), _encode(encode), BraFunc(bra) {}
 };
+
+}}
 
 #endif

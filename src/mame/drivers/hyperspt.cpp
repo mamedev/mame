@@ -4,7 +4,7 @@
 
 Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 
-- DIPs verified and defaults (when avaialble) are set from manuals
+- DIPs verified and defaults (when available) are set from manuals
 
 ***************************************************************************/
 
@@ -15,6 +15,7 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "sound/dac.h"
 #include "machine/konami1.h"
 #include "machine/nvram.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "includes/konamipt.h"
 #include "audio/trackfld.h"
@@ -40,7 +41,7 @@ static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x1481, 0x1481) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x1483, 0x1484) AM_WRITE(hyperspt_coin_counter_w)
 	AM_RANGE(0x1487, 0x1487) AM_WRITE(irq_mask_w)  /* Interrupt enable */
-	AM_RANGE(0x1500, 0x1500) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x1500, 0x1500) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
@@ -61,7 +62,7 @@ static ADDRESS_MAP_START( roadf_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x1481, 0x1481) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x1483, 0x1484) AM_WRITE(hyperspt_coin_counter_w)
 	AM_RANGE(0x1487, 0x1487) AM_WRITE(irq_mask_w)  /* Interrupt enable */
-	AM_RANGE(0x1500, 0x1500) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x1500, 0x1500) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1")
@@ -77,7 +78,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("vlm", vlm5030_device, data_w) /* speech data */
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, hyperspt_sound_w)      /* speech and output control */
@@ -89,7 +90,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( roadf_sound_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_NOP // No VLM
 	AM_RANGE(0xc000, 0xdfff) AM_NOP // No VLM
@@ -101,7 +102,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( soundb_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_NOP
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, write)   /* speech and output control */
@@ -320,6 +321,8 @@ static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 

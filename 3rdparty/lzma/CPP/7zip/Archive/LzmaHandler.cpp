@@ -110,7 +110,7 @@ HRESULT CDecoder::Create(bool filteredMode, ISequentialInStream *inStream)
     {
       _filterCoder = new CFilterCoder(false);
       CMyComPtr<ICompressCoder> coder = _filterCoder;
-      _filterCoder->Filter = new CBcjCoder(false);
+      _filterCoder->Filter = new NCompress::NBcj::CCoder(false);
       _bcjStream = _filterCoder;
     }
   }

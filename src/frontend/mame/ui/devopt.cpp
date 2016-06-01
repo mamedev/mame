@@ -10,22 +10,24 @@
 
 #include "emu.h"
 #include "ui/ui.h"
-#include "ui/menu.h"
 #include "ui/devopt.h"
 
+
+namespace ui {
+
 /*-------------------------------------------------
- ui_device_config - handle the game information
+ device_config - handle the game information
  menu
  -------------------------------------------------*/
 
-ui_menu_device_config::ui_menu_device_config(mame_ui_manager &mui, render_container *container, device_slot_interface *slot, device_slot_option *option) : ui_menu(mui, container)
+menu_device_config::menu_device_config(mame_ui_manager &mui, render_container *container, device_slot_interface *slot, device_slot_option *option) : menu(mui, container)
 {
 	m_option = option;
 	m_owner = slot;
 	m_mounted = slot->device().subdevice(option->name()) != nullptr;
 }
 
-void ui_menu_device_config::populate()
+void menu_device_config::populate()
 {
 	std::ostringstream str;
 	device_t *dev;
@@ -265,15 +267,17 @@ void ui_menu_device_config::populate()
 			str << "[None]\n";
 
 	const_cast<machine_config &>(machine().config()).device_remove(&machine().config().root_device(), m_option->name());
-	item_append(str.str().c_str(), nullptr, MENU_FLAG_MULTILINE, nullptr);
+	item_append(str.str().c_str(), nullptr, FLAG_MULTILINE, nullptr);
 }
 
-void ui_menu_device_config::handle()
+void menu_device_config::handle()
 {
 	/* process the menu */
 	process(0);
 }
 
-ui_menu_device_config::~ui_menu_device_config()
+menu_device_config::~menu_device_config()
 {
 }
+
+} // namespace ui

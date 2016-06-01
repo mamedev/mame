@@ -412,7 +412,7 @@ WRITE_LINE_MEMBER( snug_enhanced_video_device::video_interrupt_in )
 
 ROM_START( ti99_evpc )
 	ROM_REGION(0x10000, DSRROM, 0)
-	ROM_LOAD("evpcdsr.bin", 0, 0x10000, CRC(a062b75d) SHA1(6e8060f86e3bb9c36f244d88825e3fe237bfe9a9)) /* evpc DSR ROM */
+	ROM_LOAD("evpc_dsr.u21", 0, 0x10000, CRC(a062b75d) SHA1(6e8060f86e3bb9c36f244d88825e3fe237bfe9a9)) /* evpc DSR ROM */
 ROM_END
 
 MACHINE_CONFIG_FRAGMENT( ti99_evpc )

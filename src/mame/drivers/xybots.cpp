@@ -393,7 +393,7 @@ ROM_END
 DRIVER_INIT_MEMBER(xybots_state,xybots)
 {
 	m_h256 = 0x0400;
-	slapstic_configure(*m_maincpu, 0x008000, 0);
+	slapstic_configure(*m_maincpu, 0x008000, 0, memregion("maincpu")->base() + 0x8000);
 }
 
 

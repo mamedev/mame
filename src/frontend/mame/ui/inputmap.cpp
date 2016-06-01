@@ -16,6 +16,8 @@
 #include "ui/inputmap.h"
 
 
+namespace ui {
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -40,11 +42,11 @@
     input groups menu
 -------------------------------------------------*/
 
-ui_menu_input_groups::ui_menu_input_groups(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
+menu_input_groups::menu_input_groups(mame_ui_manager &mui, render_container *container) : menu(mui, container)
 {
 }
 
-void ui_menu_input_groups::populate()
+void menu_input_groups::populate()
 {
 	int player;
 
@@ -59,7 +61,7 @@ void ui_menu_input_groups::populate()
 	item_append(_("Other Controls"), nullptr, 0, (void *)(FPTR)(IPG_OTHER + 1));
 }
 
-ui_menu_input_groups::~ui_menu_input_groups()
+menu_input_groups::~menu_input_groups()
 {
 }
 
@@ -68,12 +70,12 @@ ui_menu_input_groups::~ui_menu_input_groups()
     menu
 -------------------------------------------------*/
 
-void ui_menu_input_groups::handle()
+void menu_input_groups::handle()
 {
 	/* process the menu */
-	const ui_menu_event *menu_event = process(0);
+	const event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		ui_menu::stack_push(global_alloc_clear<ui_menu_input_general>(ui(), container, int((long long)(menu_event->itemref)-1)));
+		menu::stack_push<menu_input_general>(ui(), container, int((long long)(menu_event->itemref)-1));
 }
 
 
@@ -83,12 +85,12 @@ void ui_menu_input_groups::handle()
     input menu
 -------------------------------------------------*/
 
-ui_menu_input_general::ui_menu_input_general(mame_ui_manager &mui, render_container *container, int _group) : ui_menu_input(mui, container)
+menu_input_general::menu_input_general(mame_ui_manager &mui, render_container *container, int _group) : menu_input(mui, container)
 {
 	group = _group;
 }
 
-void ui_menu_input_general::populate()
+void menu_input_general::populate()
 {
 	input_item_data *itemlist = nullptr;
 	int suborder[SEQ_TYPE_TOTAL];
@@ -137,7 +139,7 @@ void ui_menu_input_general::populate()
 	populate_and_sort(itemlist);
 }
 
-ui_menu_input_general::~ui_menu_input_general()
+menu_input_general::~menu_input_general()
 {
 }
 
@@ -146,11 +148,11 @@ ui_menu_input_general::~ui_menu_input_general()
     input menu
 -------------------------------------------------*/
 
-ui_menu_input_specific::ui_menu_input_specific(mame_ui_manager &mui, render_container *container) : ui_menu_input(mui, container)
+menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_container *container) : menu_input(mui, container)
 {
 }
 
-void ui_menu_input_specific::populate()
+void menu_input_specific::populate()
 {
 	input_item_data *itemlist = nullptr;
 	int suborder[SEQ_TYPE_TOTAL];
@@ -167,20 +169,19 @@ void ui_menu_input_specific::populate()
 		port_count++;
 		for (ioport_field &field : port.fields())
 		{
-			const char *name = field.name();
+			ioport_type_class type_class = field.type_class();
 
 			/* add if we match the group and we have a valid name */
-			if (name != nullptr && field.enabled() &&
-				((field.type() == IPT_OTHER && field.name() != nullptr) || machine().ioport().type_group(field.type(), field.player()) != IPG_INVALID))
+			if (field.enabled() && (type_class == INPUT_CLASS_CONTROLLER || type_class == INPUT_CLASS_MISC || type_class == INPUT_CLASS_KEYBOARD))
 			{
 				input_seq_type seqtype;
 				UINT32 sortorder;
 
 				/* determine the sorting order */
-				if (field.type() >= IPT_START1 && field.type() < IPT_ANALOG_LAST)
+				if (type_class == INPUT_CLASS_CONTROLLER)
 				{
 					sortorder = (field.type() << 2) | (field.player() << 12);
-					if (strcmp(field.device().tag(), ":"))
+					if (field.device().owner() != nullptr)
 						sortorder |= (port_count & 0xfff) * 0x10000;
 				}
 				else
@@ -200,7 +201,7 @@ void ui_menu_input_specific::populate()
 					item->defseq = &field.defseq(seqtype);
 					item->sortorder = sortorder + suborder[seqtype];
 					item->type = field.is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
-					item->name = name;
+					item->name = field.name();
 					item->owner_name = field.device().tag();
 					item->next = itemlist;
 					itemlist = item;
@@ -217,21 +218,21 @@ void ui_menu_input_specific::populate()
 	populate_and_sort(itemlist);
 }
 
-ui_menu_input_specific::~ui_menu_input_specific()
+menu_input_specific::~menu_input_specific()
 {
 }
 
 /*-------------------------------------------------
     menu_input - display a menu for inputs
 -------------------------------------------------*/
-ui_menu_input::ui_menu_input(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container), last_sortorder(0), record_next(false)
+menu_input::menu_input(mame_ui_manager &mui, render_container *container) : menu(mui, container), last_sortorder(0), record_next(false)
 {
 	pollingitem = nullptr;
 	pollingref = nullptr;
 	pollingseq = SEQ_TYPE_STANDARD;
 }
 
-ui_menu_input::~ui_menu_input()
+menu_input::~menu_input()
 {
 }
 
@@ -240,7 +241,7 @@ ui_menu_input::~ui_menu_input()
     and the default item
 -------------------------------------------------*/
 
-void ui_menu_input::toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq)
+void menu_input::toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq)
 {
 	/* if we used to be "none", toggle to the default value */
 	if (original_seq.length() == 0)
@@ -251,14 +252,14 @@ void ui_menu_input::toggle_none_default(input_seq &selected_seq, input_seq &orig
 		selected_seq.reset();
 }
 
-void ui_menu_input::handle()
+void menu_input::handle()
 {
 	input_item_data *seqchangeditem = nullptr;
-	const ui_menu_event *menu_event;
+	const event *menu_event;
 	int invalidate = false;
 
 	/* process the menu */
-	menu_event = process((pollingitem != nullptr) ? UI_MENU_PROCESS_NOKEYS : 0);
+	menu_event = process((pollingitem != nullptr) ? PROCESS_NOKEYS : 0);
 
 	/* if we are polling, handle as a special case */
 	if (pollingitem != nullptr)
@@ -331,17 +332,17 @@ void ui_menu_input::handle()
 			pollingref = pollingitem->ref;
 			pollingseq = pollingitem->seqtype;
 		}
-		reset(UI_MENU_RESET_REMEMBER_POSITION);
+		reset(reset_options::REMEMBER_POSITION);
 	}
 }
 
-void ui_menu_input_general::update_input(struct input_item_data *seqchangeditem)
+void menu_input_general::update_input(struct input_item_data *seqchangeditem)
 {
 	const input_type_entry *entry = (const input_type_entry *)seqchangeditem->ref;
 	machine().ioport().set_type_seq(entry->type(), entry->player(), seqchangeditem->seqtype, seqchangeditem->seq);
 }
 
-void ui_menu_input_specific::update_input(struct input_item_data *seqchangeditem)
+void menu_input_specific::update_input(struct input_item_data *seqchangeditem)
 {
 	ioport_field::user_settings settings;
 
@@ -356,7 +357,7 @@ void ui_menu_input_specific::update_input(struct input_item_data *seqchangeditem
     items for quicksort
 -------------------------------------------------*/
 
-int ui_menu_input::compare_items(const void *i1, const void *i2)
+int menu_input::compare_items(const void *i1, const void *i2)
 {
 	const input_item_data * const *data1 = (const input_item_data * const *)i1;
 	const input_item_data * const *data2 = (const input_item_data * const *)i2;
@@ -374,7 +375,7 @@ int ui_menu_input::compare_items(const void *i1, const void *i2)
     menu from them
 -------------------------------------------------*/
 
-void ui_menu_input::populate_and_sort(input_item_data *itemlist)
+void menu_input::populate_and_sort(input_item_data *itemlist)
 {
 	const char *nameformat[INPUT_TYPE_TOTAL] = { nullptr };
 	input_item_data **itemarray, *item;
@@ -415,7 +416,7 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 			if (first_entry)
 				first_entry = false;
 			else
-				item_append(ui_menu_item_type::SEPARATOR);
+				item_append(menu_item_type::SEPARATOR);
 			item_append(string_format("[root%s]", item->owner_name).c_str(), nullptr, 0, nullptr);
 			prev_owner.assign(item->owner_name);
 		}
@@ -426,14 +427,14 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 		if (pollingref == item->ref)
 		{
 			subtext.assign("   ");
-			flags |= MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
+			flags |= FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 		}
 
 		/* otherwise, generate the sequence name and invert it if different from the default */
 		else
 		{
 			subtext = machine().input().seq_name(item->seq);
-			flags |= (item->seq != *item->defseq) ? MENU_FLAG_INVERT : 0;
+			flags |= (item->seq != *item->defseq) ? FLAG_INVERT : 0;
 		}
 
 		/* add the item */
@@ -447,11 +448,11 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
     switches menu
 -------------------------------------------------*/
 
-ui_menu_settings_dip_switches::ui_menu_settings_dip_switches(mame_ui_manager &mui, render_container *container) : ui_menu_settings(mui, container, IPT_DIPSWITCH)
+menu_settings_dip_switches::menu_settings_dip_switches(mame_ui_manager &mui, render_container *container) : menu_settings(mui, container, IPT_DIPSWITCH)
 {
 }
 
-ui_menu_settings_dip_switches::~ui_menu_settings_dip_switches()
+menu_settings_dip_switches::~menu_settings_dip_switches()
 {
 }
 
@@ -460,11 +461,11 @@ ui_menu_settings_dip_switches::~ui_menu_settings_dip_switches()
     driver config menu
 -------------------------------------------------*/
 
-ui_menu_settings_driver_config::ui_menu_settings_driver_config(mame_ui_manager &mui, render_container *container) : ui_menu_settings(mui, container, IPT_CONFIG)
+menu_settings_driver_config::menu_settings_driver_config(mame_ui_manager &mui, render_container *container) : menu_settings(mui, container, IPT_CONFIG)
 {
 }
 
-ui_menu_settings_driver_config::~ui_menu_settings_driver_config()
+menu_settings_driver_config::~menu_settings_driver_config()
 {
 }
 
@@ -473,10 +474,10 @@ ui_menu_settings_driver_config::~ui_menu_settings_driver_config()
     switches menus
 -------------------------------------------------*/
 
-void ui_menu_settings::handle()
+void menu_settings::handle()
 {
 	// process the menu
-	const ui_menu_event *menu_event = process(0);
+	const event *menu_event = process(0);
 
 	// handle events
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
@@ -496,30 +497,30 @@ void ui_menu_settings::handle()
 
 			switch (menu_event->iptkey)
 			{
-				/* if selected, reset to default value */
-				case IPT_UI_SELECT:
-					field->get_user_settings(settings);
-					settings.value = field->defvalue();
-					field->set_user_settings(settings);
-					changed = true;
-					break;
+			/* if selected, reset to default value */
+			case IPT_UI_SELECT:
+				field->get_user_settings(settings);
+				settings.value = field->defvalue();
+				field->set_user_settings(settings);
+				changed = true;
+				break;
 
-				/* left goes to previous setting */
-				case IPT_UI_LEFT:
-					field->select_previous_setting();
-					changed = true;
-					break;
+			/* left goes to previous setting */
+			case IPT_UI_LEFT:
+				field->select_previous_setting();
+				changed = true;
+				break;
 
-				/* right goes to next setting */
-				case IPT_UI_RIGHT:
-					field->select_next_setting();
-					changed = true;
-					break;
+			/* right goes to next setting */
+			case IPT_UI_RIGHT:
+				field->select_next_setting();
+				changed = true;
+				break;
 			}
 
 			/* if anything changed, rebuild the menu, trying to stay on the same field */
 			if (changed)
-				reset(UI_MENU_RESET_REMEMBER_REF);
+				reset(reset_options::REMEMBER_REF);
 		}
 	}
 }
@@ -530,12 +531,12 @@ void ui_menu_settings::handle()
     switches menus
 -------------------------------------------------*/
 
-ui_menu_settings::ui_menu_settings(mame_ui_manager &mui, render_container *container, UINT32 _type) : ui_menu(mui, container), diplist(nullptr), dipcount(0)
+menu_settings::menu_settings(mame_ui_manager &mui, render_container *container, UINT32 _type) : menu(mui, container), diplist(nullptr), dipcount(0)
 {
 	type = _type;
 }
 
-void ui_menu_settings::populate()
+void menu_settings::populate()
 {
 	dip_descriptor **diplist_tailptr;
 	std::string prev_owner;
@@ -555,9 +556,9 @@ void ui_menu_settings::populate()
 
 				/* set the left/right flags appropriately */
 				if (field.has_previous_setting())
-					flags |= MENU_FLAG_LEFT_ARROW;
+					flags |= FLAG_LEFT_ARROW;
 				if (field.has_next_setting())
-					flags |= MENU_FLAG_RIGHT_ARROW;
+					flags |= FLAG_RIGHT_ARROW;
 
 				/* add the menu item */
 				if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
@@ -565,7 +566,7 @@ void ui_menu_settings::populate()
 					if (first_entry)
 						first_entry = false;
 					else
-						item_append(ui_menu_item_type::SEPARATOR);
+						item_append(menu_item_type::SEPARATOR);
 					string_format("[root%s]", field.device().tag());
 					item_append(string_format("[root%s]", field.device().tag()).c_str(), nullptr, 0, nullptr);
 					prev_owner.assign(field.device().tag());
@@ -618,11 +619,11 @@ void ui_menu_settings::populate()
 	if (type == IPT_DIPSWITCH)
 		custombottom = dipcount ? dipcount * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING : 0;
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Reset"),  nullptr, 0, (void *)1);
 }
 
-ui_menu_settings::~ui_menu_settings()
+menu_settings::~menu_settings()
 {
 }
 
@@ -631,7 +632,7 @@ ui_menu_settings::~ui_menu_settings()
     rendering
 -------------------------------------------------*/
 
-void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
+void menu_settings_dip_switches::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
 	// catch if no diploc has to be drawn
 	if (bottom == 0)
@@ -673,7 +674,7 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
     DIP switch
 -------------------------------------------------*/
 
-void ui_menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, UINT32 selectedmask)
+void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, UINT32 selectedmask)
 {
 	float switch_field_width = SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * container->manager().ui_aspect();
 	float switch_width = SINGLE_TOGGLE_SWITCH_WIDTH * container->manager().ui_aspect();
@@ -742,10 +743,10 @@ void ui_menu_settings_dip_switches::custom_render_one(float x1, float y1, float 
     menu_analog - handle the analog settings menu
 -------------------------------------------------*/
 
-void ui_menu_analog::handle()
+void menu_analog::handle()
 {
 	/* process the menu */
-	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
+	const event *menu_event = process(PROCESS_LR_REPEAT);
 
 	/* handle events */
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
@@ -794,7 +795,7 @@ void ui_menu_analog::handle()
 			data->field->set_user_settings(settings);
 
 			/* rebuild the menu */
-			reset(UI_MENU_RESET_REMEMBER_POSITION);
+			reset(reset_options::REMEMBER_POSITION);
 		}
 	}
 }
@@ -805,11 +806,11 @@ void ui_menu_analog::handle()
     settings menu
 -------------------------------------------------*/
 
-ui_menu_analog::ui_menu_analog(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
+menu_analog::menu_analog(mame_ui_manager &mui, render_container *container) : menu(mui, container)
 {
 }
 
-void ui_menu_analog::populate()
+void menu_analog::populate()
 {
 	std::string text;
 	std::string subtext;
@@ -862,7 +863,7 @@ void ui_menu_analog::populate()
 							if (first_entry)
 								first_entry = false;
 							else
-								item_append(ui_menu_item_type::SEPARATOR);
+								item_append(menu_item_type::SEPARATOR);
 							item_append(string_format("[root%s]", field.device().tag()).c_str(), nullptr, 0, nullptr);
 							prev_owner.assign(field.device().tag());
 						}
@@ -915,9 +916,9 @@ void ui_menu_analog::populate()
 
 						/* put on arrows */
 						if (data->cur > data->min)
-							flags |= MENU_FLAG_LEFT_ARROW;
+							flags |= FLAG_LEFT_ARROW;
 						if (data->cur < data->max)
-							flags |= MENU_FLAG_RIGHT_ARROW;
+							flags |= FLAG_RIGHT_ARROW;
 
 						/* append a menu item */
 						item_append(text.c_str(), subtext.c_str(), flags, data);
@@ -925,6 +926,8 @@ void ui_menu_analog::populate()
 			}
 }
 
-ui_menu_analog::~ui_menu_analog()
+menu_analog::~menu_analog()
 {
 }
+
+} // namespace ui

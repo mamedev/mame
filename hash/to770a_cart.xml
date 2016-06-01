@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- Thanks to DCMOTO (http://dcmoto.free.fr) for info!
+
+The Arabic BASIC 128 cartridge is useful only on an Arabic TO7/70!
+-->
+<softwarelist name="to770a_cart" description="Thomson TO7/70 Arabic cartridges">
+
+	<software name="basic128">
+		<description>BASIC 128 (Arab, v1.0)</description>
+		<year>1985</year>
+		<publisher>Thomson</publisher>
+
+		<part name="cart" interface="to_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="basic128.bin" size="65536" crc="ba082b73" sha1="bdcb3b2b0b4f0e56bda55dfeee220da9473143e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

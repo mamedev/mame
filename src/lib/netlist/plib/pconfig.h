@@ -8,6 +8,10 @@
 #ifndef PCONFIG_H_
 #define PCONFIG_H_
 
+#include <cstdint>
+#include <thread>
+#include <chrono>
+
 #ifndef PSTANDALONE
 	#define PSTANDALONE (0)
 #endif
@@ -19,14 +23,16 @@
 #endif
 
 #if (PHAS_INT128)
-typedef __uint128_t UINT128;
-typedef __int128_t INT128;
+typedef _uint128_t UINT128;
+typedef _int128_t INT128;
 #endif
 
+#define PLIB_NAMESPACE_START() namespace plib {
+#define PLIB_NAMESPACE_END() }
 
 #if !(PSTANDALONE)
-#include "osdcore.h"
-#include "eminline.h"
+#include "osdcomm.h"
+//#include "eminline.h"
 
 #ifndef assert
 #define assert(x) do {} while (0)
@@ -45,10 +51,10 @@ typedef __int128_t INT128;
 //============================================================
 
 // prevent implicit copying
-#define P_PREVENT_COPYING(_name)                \
-	private:                                    \
-		_name(const _name &);                   \
-		_name &operator=(const _name &);
+#define P_PREVENT_COPYING(name)               \
+	private:                                  \
+		name(const name &);                   \
+		name &operator=(const name &);
 
 //============================================================
 //  Compiling standalone
@@ -71,7 +77,7 @@ typedef __int128_t INT128;
 	/* does not work in versions over 4.7.x of 32bit MINGW  */
 	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
 		#define PHAS_PMF_INTERNAL 1
-		#define MEMBER_ABI __thiscall
+		#define MEMBER_ABI _thiscall
 	#elif defined(EMSCRIPTEN)
 		#define PHAS_PMF_INTERNAL 0
 	#elif defined(__arm__) || defined(__ARMEL__)
@@ -80,7 +86,7 @@ typedef __int128_t INT128;
 		#define PHAS_PMF_INTERNAL 1
 	#endif
 #else
-#define USE_DELEGATE_TYPE PHAS_PMF_INTERNAL 0
+#define PHAS_PMF_INTERNAL 0
 #endif
 
 #ifndef MEMBER_ABI
@@ -88,9 +94,6 @@ typedef __int128_t INT128;
 #endif
 
 /* not supported in GCC prior to 4.4.x */
-/* ATTR_HOT and ATTR_COLD cause performance degration in 5.1 */
-//#define ATTR_HOT
-//#define ATTR_COLD
 #define ATTR_HOT               __attribute__((hot))
 #define ATTR_COLD              __attribute__((cold))
 
@@ -109,16 +112,16 @@ typedef unsigned short                      UINT16;
 typedef signed short                        INT16;
 
 /* 32-bit values */
-#ifndef _WINDOWS_H
+#ifndef WINDOWS_H
 typedef unsigned int                        UINT32;
 typedef signed int                          INT32;
 #endif
 
 /* 64-bit values */
-#ifndef _WINDOWS_H
+#ifndef WINDOWS_H
 #ifdef _MSC_VER
-typedef signed __int64                      INT64;
-typedef unsigned __int64                    UINT64;
+typedef signed _int64                      INT64;
+typedef unsigned _int64                    UINT64;
 #else
 typedef uint64_t    UINT64;
 typedef int64_t      INT64;
@@ -136,42 +139,64 @@ typedef int64_t      INT64;
 
 #endif
 
+PLIB_NAMESPACE_START()
+
+using ticks_t = INT64;
+
+static inline ticks_t ticks()
+{
+	return std::chrono::high_resolution_clock::now().time_since_epoch().count();
+}
+static inline ticks_t ticks_per_second()
+{
+	return std::chrono::high_resolution_clock::period::den / std::chrono::high_resolution_clock::period::num;
+}
+
+#if defined(__x86_64__) &&  !defined(_clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
+
+static inline ticks_t profile_ticks()
+{
+    unsigned hi, lo;
+    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+    return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
+}
+
+#else
+static inline ticks_t profile_ticks() { return ticks(); }
+#endif
+
 /*
  * The following class was derived from the MAME delegate.h code.
  * It derives a pointer to a member function.
  */
 
 #if (PHAS_PMF_INTERNAL)
-class pmfp
+class mfp
 {
 public:
 	// construct from any member function pointer
 	class generic_class;
-	typedef void (*generic_function)();
+	using generic_function = void (*)();
 
-	#if (PSTANDALONE)
-	typedef std::size_t FPTR;
-	#endif
-
-	template<typename _MemberFunctionType>
-	pmfp(_MemberFunctionType mfp)
+	template<typename MemberFunctionType>
+	mfp(MemberFunctionType mftp)
 	: m_function(0), m_this_delta(0)
 	{
-		*reinterpret_cast<_MemberFunctionType *>(this) = mfp;
+		*reinterpret_cast<MemberFunctionType *>(this) = mftp;
 	}
 
 	// binding helper
-	template<typename _FunctionType, typename _ObjectType>
-	_FunctionType update_after_bind(_ObjectType *object)
+	template<typename FunctionType, typename ObjectType>
+	FunctionType update_after_bind(ObjectType *object)
 	{
-		return reinterpret_cast<_FunctionType>(
+		return reinterpret_cast<FunctionType>(
 				convert_to_generic(reinterpret_cast<generic_class *>(object)));
 	}
-	template<typename _FunctionType, typename _MemberFunctionType, typename _ObjectType>
-	static _FunctionType get_mfp(_MemberFunctionType mfp, _ObjectType *object)
+	template<typename FunctionType, typename MemberFunctionType, typename ObjectType>
+	static FunctionType get_mfp(MemberFunctionType mftp, ObjectType *object)
 	{
-		pmfp mfpo(mfp);
-		return mfpo.update_after_bind<_FunctionType>(object);
+		mfp mfpo(mftp);
+		return mfpo.update_after_bind<FunctionType>(object);
 	}
 
 private:
@@ -179,23 +204,26 @@ private:
 	generic_function convert_to_generic(generic_class * object) const
 	{
 		// apply the "this" delta to the object first
-		generic_class * o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<UINT8 *>(object) + m_this_delta);
+		generic_class * o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 
 		// if the low bit of the vtable index is clear, then it is just a raw function pointer
 		if (!(m_function & 1))
 			return reinterpret_cast<generic_function>(m_function);
 
 		// otherwise, it is the byte index into the vtable where the actual function lives
-		UINT8 *vtable_base = *reinterpret_cast<UINT8 **>(o_p_delta);
+		std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(o_p_delta);
 		return *reinterpret_cast<generic_function *>(vtable_base + m_function - 1);
 	}
 
 	// actual state
-	FPTR                    m_function;         // first item can be one of two things:
+	uintptr_t               m_function;         // first item can be one of two things:
 												//    if even, it's a pointer to the function
 												//    if odd, it's the byte offset into the vtable
 	int                     m_this_delta;       // delta to apply to the 'this' pointer
 };
+
 #endif
+
+PLIB_NAMESPACE_END()
 
 #endif /* PCONFIG_H_ */

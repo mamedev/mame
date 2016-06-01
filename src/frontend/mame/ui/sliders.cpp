@@ -11,17 +11,19 @@
 #include "emu.h"
 
 #include "osdepend.h"
+
 #include "ui/ui.h"
-#include "ui/menu.h"
 #include "ui/sliders.h"
+#include "ui/slider.h"
 
+namespace ui {
 
-ui_menu_sliders::ui_menu_sliders(mame_ui_manager &mui, render_container *container, bool menuless_mode) : ui_menu(mui, container)
+menu_sliders::menu_sliders(mame_ui_manager &mui, render_container *container, bool menuless_mode) : menu(mui, container)
 {
 	m_menuless_mode = m_hidden = menuless_mode;
 }
 
-ui_menu_sliders::~ui_menu_sliders()
+menu_sliders::~menu_sliders()
 {
 }
 
@@ -29,19 +31,19 @@ ui_menu_sliders::~ui_menu_sliders()
     menu_sliders - handle the sliders menu
 -------------------------------------------------*/
 
-void ui_menu_sliders::handle()
+void menu_sliders::handle()
 {
-	const ui_menu_event *menu_event;
+	const event *menu_event;
 
 	/* process the menu */
-	menu_event = process(UI_MENU_PROCESS_LR_REPEAT | (m_hidden ? UI_MENU_PROCESS_CUSTOM_ONLY : 0));
+	menu_event = process(PROCESS_LR_REPEAT | (m_hidden ? PROCESS_CUSTOM_ONLY : 0));
 	if (menu_event != nullptr)
 	{
 		/* handle keys if there is a valid item selected */
-		if (menu_event->itemref != nullptr && menu_event->type == ui_menu_item_type::SLIDER)
+		if (menu_event->itemref != nullptr && menu_event->type == menu_item_type::SLIDER)
 		{
 			const slider_state *slider = (const slider_state *)menu_event->itemref;
-			INT32 curvalue = (*slider->update)(machine(), slider->arg, slider->id, nullptr, SLIDER_NOCHANGE);
+			INT32 curvalue = slider->update(machine(), slider->arg, slider->id, nullptr, SLIDER_NOCHANGE);
 			INT32 increment = 0;
 			bool alt_pressed = machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(KEYCODE_RALT);
 			bool ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
@@ -52,7 +54,7 @@ void ui_menu_sliders::handle()
 				/* toggle visibility */
 				case IPT_UI_ON_SCREEN_DISPLAY:
 					if (m_menuless_mode)
-						ui_menu::stack_pop(machine());
+						menu::stack_pop(machine());
 					else
 						m_hidden = !m_hidden;
 					break;
@@ -103,8 +105,8 @@ void ui_menu_sliders::handle()
 					newvalue = slider->maxval;
 
 				/* update the slider and recompute the menu */
-				(*slider->update)(machine(), slider->arg, slider->id, nullptr, newvalue);
-				reset(UI_MENU_RESET_REMEMBER_REF);
+				slider->update(machine(), slider->arg, slider->id, nullptr, newvalue);
+				reset(reset_options::REMEMBER_REF);
 			}
 		}
 
@@ -134,24 +136,24 @@ void ui_menu_sliders::handle()
     menu
 -------------------------------------------------*/
 
-void ui_menu_sliders::populate()
+void menu_sliders::populate()
 {
 	std::string tempstring;
 
 	/* add UI sliders */
-	std::vector<ui_menu_item> ui_sliders = ui().get_slider_list();
-	for (ui_menu_item item : ui_sliders)
+	std::vector<menu_item> ui_sliders = ui().get_slider_list();
+	for (menu_item item : ui_sliders)
 	{
-		if (item.type == ui_menu_item_type::SLIDER)
+		if (item.type == menu_item_type::SLIDER)
 		{
 			slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
-			INT32 curval = (*slider->update)(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
+			INT32 curval = slider->update(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
 			UINT32 flags = 0;
 			if (curval > slider->minval)
-				flags |= MENU_FLAG_LEFT_ARROW;
+				flags |= FLAG_LEFT_ARROW;
 			if (curval < slider->maxval)
-				flags |= MENU_FLAG_RIGHT_ARROW;
-			item_append(slider->description, tempstring.c_str(), flags, (void *)slider, ui_menu_item_type::SLIDER);
+				flags |= FLAG_RIGHT_ARROW;
+			item_append(slider->description, tempstring.c_str(), flags, (void *)slider, menu_item_type::SLIDER);
 		}
 		else
 		{
@@ -159,22 +161,22 @@ void ui_menu_sliders::populate()
 		}
 	}
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 
 	/* add OSD options */
-	std::vector<ui_menu_item> osd_sliders = machine().osd().get_slider_list();
-	for (ui_menu_item item : osd_sliders)
+	std::vector<menu_item> osd_sliders = machine().osd().get_slider_list();
+	for (menu_item item : osd_sliders)
 	{
-		if (item.type == ui_menu_item_type::SLIDER)
+		if (item.type == menu_item_type::SLIDER)
 		{
 			slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
-			INT32 curval = (*slider->update)(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
+			INT32 curval = slider->update(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
 			UINT32 flags = 0;
 			if (curval > slider->minval)
-				flags |= MENU_FLAG_LEFT_ARROW;
+				flags |= FLAG_LEFT_ARROW;
 			if (curval < slider->maxval)
-				flags |= MENU_FLAG_RIGHT_ARROW;
-			item_append(slider->description, tempstring.c_str(), flags, (void *)slider, ui_menu_item_type::SLIDER);
+				flags |= FLAG_RIGHT_ARROW;
+			item_append(slider->description, tempstring.c_str(), flags, (void *)slider, menu_item_type::SLIDER);
 		}
 		else
 		{
@@ -190,7 +192,7 @@ void ui_menu_sliders::populate()
     rendering
 -------------------------------------------------*/
 
-void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
+void menu_sliders::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
 	const slider_state *curslider = (const slider_state *)selectedref;
 	if (curslider != nullptr)
@@ -203,7 +205,7 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 		INT32 curval;
 
 		/* determine the current value and text */
-		curval = (*curslider->update)(machine(), curslider->arg, curslider->id, &tempstring, SLIDER_NOCHANGE);
+		curval = curslider->update(machine(), curslider->arg, curslider->id, &tempstring, SLIDER_NOCHANGE);
 
 		/* compute the current and default percentages */
 		percentage = (float)(curval - curslider->minval) / (float)(curslider->maxval - curslider->minval);
@@ -257,26 +259,28 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 
 
 /*-------------------------------------------------
- ui_slider_ui_handler - pushes the slider
+ slider_ui_handler - pushes the slider
  menu on the stack and hands off to the
  standard menu handler
  -------------------------------------------------*/
 
-UINT32 ui_menu_sliders::ui_handler(mame_ui_manager &mui, render_container *container, UINT32 state)
+UINT32 menu_sliders::ui_handler(mame_ui_manager &mui, render_container *container, UINT32 state)
 {
 	UINT32 result;
 
 	/* if this is the first call, push the sliders menu */
 	if (state)
-		ui_menu::stack_push(global_alloc_clear<ui_menu_sliders>(mui, container, true));
+		menu::stack_push<menu_sliders>(mui, container, true);
 
 	/* handle standard menus */
-	result = ui_menu::ui_handler(mui, container, state);
+	result = menu::ui_handler(mui, container, state);
 
 	/* if we are cancelled, pop the sliders menu */
 	if (result == UI_HANDLER_CANCEL)
-		ui_menu::stack_pop(mui.machine());
+		menu::stack_pop(mui.machine());
 
-	ui_menu_sliders *uim = dynamic_cast<ui_menu_sliders *>(menu_stack);
+	menu_sliders *uim = topmost_menu<menu_sliders>();
 	return uim && uim->m_menuless_mode ? 0 : UI_HANDLER_CANCEL;
 }
+
+} // namespace ui

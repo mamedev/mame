@@ -13,28 +13,23 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-class nld_vdd_vss : public device_t
+NETLIB_OBJECT(vdd_vss)
 {
-	public:
-		nld_vdd_vss ()
-		: device_t()
-			{ }
+	NETLIB_CONSTRUCTOR(vdd_vss)
+	{
+		enregister("VDD", m_vdd);
+		enregister("VSS", m_vss);
+	}
 
-		analog_input_t m_vdd;
-		analog_input_t m_vss;
-
-	protected:
-		ATTR_HOT void update() override {};
-		ATTR_HOT void start() override
-		{
-			register_input("VDD", m_vdd);
-			register_input("VSS", m_vss);
-		};
-		ATTR_HOT void reset() override  {};
+	NETLIB_UPDATEI() {};
+	NETLIB_RESETI() {};
 
 public:
 	ATTR_HOT inline nl_double vdd() { return INPANALOG(m_vdd); }
 	ATTR_HOT inline nl_double vss() { return INPANALOG(m_vss); }
+
+	analog_input_t m_vdd;
+	analog_input_t m_vss;
 };
 
 NETLIB_NAMESPACE_DEVICES_END()

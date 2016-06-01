@@ -342,7 +342,7 @@ static ADDRESS_MAP_START( disco_audio_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(soundlatch_byte_r) AM_WRITENOP /* ack ? */
+	AM_RANGE(0x8000, 0x8fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP /* ack ? */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -367,14 +367,14 @@ INPUT_CHANGED_MEMBER(btime_state::coin_inserted_nmi_lo)
 
 WRITE8_MEMBER(btime_state::audio_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(btime_state::audio_command_r)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return soundlatch_byte_r(space, offset);
+	return m_soundlatch->read(space, offset);
 }
 
 READ8_MEMBER(btime_state::zoar_dsw1_read)
@@ -1314,6 +1314,8 @@ static MACHINE_CONFIG_START( btime, btime_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, HCLK2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)

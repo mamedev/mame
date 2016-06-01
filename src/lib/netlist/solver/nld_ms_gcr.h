@@ -14,24 +14,25 @@
 
 #include <algorithm>
 
+#include "plib/pdynlib.h"
 #include "solver/mat_cr.h"
 #include "solver/nld_ms_direct.h"
 #include "solver/nld_solver.h"
 #include "solver/vector_base.h"
-#include "plib/pdynlib.h"
 #include "plib/pstream.h"
 
 #define NL_USE_SSE 0
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-template <unsigned m_N, unsigned _storage_N>
+template <unsigned m_N, unsigned storage_N>
 class matrix_solver_GCR_t: public matrix_solver_t
 {
 public:
 
-	matrix_solver_GCR_t(const solver_parameters_t *params, int size)
-		: matrix_solver_t(matrix_solver_t::ASCENDING, params)
+	matrix_solver_GCR_t(netlist_t &anetlist, const pstring &name,
+			const solver_parameters_t *params, int size)
+		: matrix_solver_t(anetlist, name, matrix_solver_t::ASCENDING, params)
 		, m_dim(size)
 		, m_proc(nullptr)
 		{
@@ -46,29 +47,29 @@ public:
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 
-	virtual void create_solver_code(postream &strm) override;
+	virtual void create_solver_code(plib::postream &strm) override;
 
 private:
 
-	void csc_private(postream &strm);
+	void csc_private(plib::postream &strm);
 
-	typedef void extsolver(double * RESTRICT m_A, double * RESTRICT RHS);
+	using extsolver = void (*)(double * RESTRICT m_A, double * RESTRICT RHS);
 
 	pstring static_compile_name()
 	{
-		postringstream t;
+		plib::postringstream t;
 		csc_private(t);
-		phash_functor<pstring> h(t.str());
+		plib::hash_functor<pstring> h(t.str());
 
-		return pfmt("nl_gcr_{1:x}_{2}")(h())(mat.nz_num);
+		return plib::pfmt("nl_gcr_{1:x}_{2}")(h())(mat.nz_num);
 	}
 
 	unsigned m_dim;
-	pvector_t<int> m_term_cr[_storage_N];
-	mat_cr_t<_storage_N> mat;
-	nl_double m_A[_storage_N * _storage_N];
+	plib::pvector_t<int> m_term_cr[storage_N];
+	mat_cr_t<storage_N> mat;
+	nl_double m_A[storage_N * storage_N];
 
-	extsolver *m_proc;
+	extsolver m_proc;
 
 };
 
@@ -76,8 +77,8 @@ private:
 // matrix_solver - GMRES
 // ----------------------------------------------------------------------------------------
 
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_GCR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
+template <unsigned m_N, unsigned storage_N>
+void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	setup_base(nets);
 
@@ -86,7 +87,7 @@ void matrix_solver_GCR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 
 	/* build the final matrix */
 
-	bool touched[_storage_N][_storage_N] = { { false } };
+	bool touched[storage_N][storage_N] = { { false } };
 	for (unsigned k = 0; k < iN; k++)
 	{
 		for (auto & j : this->m_terms[k]->m_nz)
@@ -177,8 +178,8 @@ void matrix_solver_GCR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 
 }
 
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_GCR_t<m_N, _storage_N>::csc_private(postream &strm)
+template <unsigned m_N, unsigned storage_N>
+void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::postream &strm)
 {
 	const unsigned iN = N();
 	for (unsigned i = 0; i < iN - 1; i++)
@@ -190,7 +191,7 @@ void matrix_solver_GCR_t<m_N, _storage_N>::csc_private(postream &strm)
 			unsigned pi = mat.diag[i];
 
 			//const nl_double f = 1.0 / m_A[pi++];
-			strm.writeline(pfmt("const double f{1} = 1.0 / m_A[{2}];")(i)(pi));
+			strm.writeline(plib::pfmt("const double f{1} = 1.0 / m_A[{2}];")(i)(pi));
 			pi++;
 			const unsigned piie = mat.ia[i+1];
 
@@ -203,7 +204,7 @@ void matrix_solver_GCR_t<m_N, _storage_N>::csc_private(postream &strm)
 					pj++;
 
 				//const nl_double f1 = - m_A[pj++] * f;
-				strm.writeline(pfmt("\tconst double f{1}_{2} = -f{3} * m_A[{4}];")(i)(j)(i)(pj));
+				strm.writeline(plib::pfmt("\tconst double f{1}_{2} = -f{3} * m_A[{4}];")(i)(j)(i)(pj));
 				pj++;
 
 				// subtract row i from j */
@@ -212,35 +213,35 @@ void matrix_solver_GCR_t<m_N, _storage_N>::csc_private(postream &strm)
 					while (mat.ja[pj] < mat.ja[pii])
 						pj++;
 					//m_A[pj++] += m_A[pii++] * f1;
-					strm.writeline(pfmt("\tm_A[{1}] += m_A[{2}] * f{3}_{4};")(pj)(pii)(i)(j));
+					strm.writeline(plib::pfmt("\tm_A[{1}] += m_A[{2}] * f{3}_{4};")(pj)(pii)(i)(j));
 					pj++; pii++;
 				}
 				//RHS[j] += f1 * RHS[i];
-				strm.writeline(pfmt("\tRHS[{1}] += f{2}_{3} * RHS[{4}];")(j)(i)(j)(i));
+				strm.writeline(plib::pfmt("\tRHS[{1}] += f{2}_{3} * RHS[{4}];")(j)(i)(j)(i));
 			}
 		}
 	}
 }
 
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_GCR_t<m_N, _storage_N>::create_solver_code(postream &strm)
+template <unsigned m_N, unsigned storage_N>
+void matrix_solver_GCR_t<m_N, storage_N>::create_solver_code(plib::postream &strm)
 {
 	//const unsigned iN = N();
 
-	strm.writeline(pfmt("extern \"C\" void {1}(double * __restrict m_A, double * __restrict RHS)")(static_compile_name()));
+	strm.writeline(plib::pfmt("extern \"C\" void {1}(double * _restrict m_A, double * _restrict RHS)")(static_compile_name()));
 	strm.writeline("{");
 	csc_private(strm);
 	strm.writeline("}");
 }
 
 
-template <unsigned m_N, unsigned _storage_N>
-int matrix_solver_GCR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+template <unsigned m_N, unsigned storage_N>
+int matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	const unsigned iN = this->N();
 
-	ATTR_ALIGN nl_double RHS[_storage_N];
-	ATTR_ALIGN nl_double new_V[_storage_N];
+	ATTR_ALIGN nl_double RHS[storage_N];
+	ATTR_ALIGN nl_double new_V[storage_N];
 
 	for (unsigned i=0, e=mat.nz_num; i<e; i++)
 		m_A[i] = 0.0;
@@ -259,16 +260,16 @@ int matrix_solver_GCR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_r
 		const nl_double * const * RESTRICT other_cur_analog = t->other_curanalog();
 
 #if (0 ||NL_USE_SSE)
-		__m128d mg = _mm_set_pd(0.0, 0.0);
-		__m128d mr = _mm_set_pd(0.0, 0.0);
+		__m128d mg = mm_set_pd(0.0, 0.0);
+		__m128d mr = mm_set_pd(0.0, 0.0);
 		unsigned i = 0;
 		for (; i < term_count - 1; i+=2)
 		{
-			mg = _mm_add_pd(mg, _mm_loadu_pd(&gt[i]));
-			mr = _mm_add_pd(mr, _mm_loadu_pd(&Idr[i]));
+			mg = mm_add_pd(mg, mm_loadu_pd(&gt[i]));
+			mr = mm_add_pd(mr, mm_loadu_pd(&Idr[i]));
 		}
-		gtot_t = _mm_cvtsd_f64(mg) + _mm_cvtsd_f64(_mm_unpackhi_pd(mg,mg));
-		RHS_t = _mm_cvtsd_f64(mr) + _mm_cvtsd_f64(_mm_unpackhi_pd(mr,mr));
+		gtot_t = mm_cvtsd_f64(mg) + mm_cvtsd_f64(mm_unpackhi_pd(mg,mg));
+		RHS_t = mm_cvtsd_f64(mr) + mm_cvtsd_f64(mm_unpackhi_pd(mr,mr));
 		for (; i < term_count; i++)
 		{
 			gtot_t += gt[i];
@@ -352,16 +353,16 @@ int matrix_solver_GCR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_r
 		//__builtin_prefetch(&new_V[j-1], 1);
 		//if (j>0)__builtin_prefetch(&m_A[mat.diag[j-1]], 0);
 #if (NL_USE_SSE)
-		__m128d tmp = _mm_set_pd1(0.0);
+		__m128d tmp = mm_set_pd1(0.0);
 		const unsigned e = mat.ia[j+1];
 		unsigned pk = mat.diag[j] + 1;
 		for (; pk < e - 1; pk+=2)
 		{
 			//tmp += m_A[pk] * new_V[mat.ja[pk]];
-			tmp = _mm_add_pd(tmp, _mm_mul_pd(_mm_set_pd(m_A[pk], m_A[pk+1]),
+			tmp = mm_add_pd(tmp, mm_mul_pd(mm_set_pd(m_A[pk], m_A[pk+1]),
 					_mm_set_pd(new_V[mat.ja[pk]], new_V[mat.ja[pk+1]])));
 		}
-		double tmpx = _mm_cvtsd_f64(tmp) + _mm_cvtsd_f64(_mm_unpackhi_pd(tmp,tmp));
+		double tmpx = mm_cvtsd_f64(tmp) + mm_cvtsd_f64(mm_unpackhi_pd(tmp,tmp));
 		for (; pk < e; pk++)
 		{
 			tmpx += m_A[pk] * new_V[mat.ja[pk]];

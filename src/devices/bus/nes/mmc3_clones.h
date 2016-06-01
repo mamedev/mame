@@ -654,6 +654,27 @@ private:
 	UINT8 m_reg[4];
 };
 
+// ======================> nes_coolboy_device
+
+class nes_coolboy_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_coolboy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// device-level overrides
+//  virtual void device_start() override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void prg_cb(int start, int bank) override;
+	virtual void chr_cb(int start, int bank, int source) override;
+
+//  virtual void pcb_reset() override;
+
+private:
+//  inline void set_base_mask();
+	UINT8 m_reg[4];
+};
+
 
 
 
@@ -693,5 +714,6 @@ extern const device_type NES_BMC_GC6IN1;
 extern const device_type NES_BMC_411120C;
 extern const device_type NES_BMC_830118C;
 extern const device_type NES_PJOY84;
+extern const device_type NES_COOLBOY;
 
 #endif

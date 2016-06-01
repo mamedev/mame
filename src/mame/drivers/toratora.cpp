@@ -4,11 +4,31 @@
 
 Tora Tora (c) 1980 Game Plan
 
-driver by Nicola Salmoria
+driver by Nicola Salmoria, qwijibo
+
+deviations from schematics verified on set 2 pcb:
+
+  main pcb:
+	- U33.3 connected to /IRQ line via inverter U67.9,
+	  providing timer IRQ for input polling.
+
+	- U43 removed from timer circuit, U52.9 wired directly to
+	  U32.5, increasing timer frequency to 250 Hz.
+
+  audio pcb:
+	- U6.10 wired to U14.21, cut from R14/16
+	- R16 wired to R1 in series, R1 cut from GND
+	- R14 wired to GND instead of U6.10
+
+	- U5.10 wired to U15.21, cut from R13/15
+	- R15 wired to R2 in series, R2 cut from GND
+	- R13 wired to GND instead of U5.10
+
+	- EXT VCO DACs (U11, U12) and surrounding logic not placed
+	- Numerous changes to SN74677 timing component R & C values
 
 TODO:
-- The game doesn't seem to work right. It also reads some unmapped memory
-  addresses, are the two things related? Missing ROMs? There's an empty
+- The game reads some unmapped memory addresses, missing ROMs? There's an empty
   socket for U3 on the board, which should map at 5000-57ff, however the
   game reads mostly from 4800-4fff, which would be U6 according to the
   schematics.
@@ -16,6 +36,9 @@ TODO:
 - The manual mentions dip switch settings and the schematics show the switches,
   the game reads them but ignores them, forcing 1C/1C and 3 lives.
   Maybe the dump is from a proto?
+  Set 2 dump does read dip switches, so likely not a proto.
+
+- Bullet and explosion audio frequencies seem incorrect
 
 ***************************************************************************/
 
@@ -43,7 +66,6 @@ public:
 
 	/* video-related */
 	int        m_timer;
-	UINT8      m_last;
 	UINT8      m_clear_tv;
 
 	/* devices */
@@ -56,15 +78,15 @@ public:
 	DECLARE_WRITE8_MEMBER(clear_tv_w);
 	DECLARE_READ8_MEMBER(timer_r);
 	DECLARE_WRITE8_MEMBER(clear_timer_w);
-	DECLARE_WRITE_LINE_MEMBER(cb2_u3_w);
+	DECLARE_WRITE_LINE_MEMBER(cb2_u2_w);
 	DECLARE_WRITE8_MEMBER(port_b_u1_w);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
-	DECLARE_WRITE8_MEMBER(sn1_port_a_u2_u3_w);
-	DECLARE_WRITE8_MEMBER(sn1_port_b_u2_u3_w);
-	DECLARE_WRITE_LINE_MEMBER(sn1_ca2_u2_u3_w);
-	DECLARE_WRITE8_MEMBER(sn2_port_a_u2_u3_w);
-	DECLARE_WRITE8_MEMBER(sn2_port_b_u2_u3_w);
-	DECLARE_WRITE_LINE_MEMBER(sn2_ca2_u2_u3_w);
+	DECLARE_WRITE8_MEMBER(sn1_port_a_u3_w);
+	DECLARE_WRITE8_MEMBER(sn1_port_b_u3_w);
+	DECLARE_WRITE_LINE_MEMBER(sn1_ca2_u3_w);
+	DECLARE_WRITE8_MEMBER(sn2_port_a_u2_w);
+	DECLARE_WRITE8_MEMBER(sn2_port_b_u2_w);
+	DECLARE_WRITE_LINE_MEMBER(sn2_ca2_u2_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	UINT32 screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -79,7 +101,7 @@ public:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(toratora_state::cb2_u3_w)
+WRITE_LINE_MEMBER(toratora_state::cb2_u2_w)
 {
 	logerror("DIP tristate %sactive\n",(state & 1) ? "in" : "");
 }
@@ -161,17 +183,18 @@ WRITE_LINE_MEMBER(toratora_state::main_cpu_irq)
 
 INTERRUPT_GEN_MEMBER(toratora_state::toratora_timer)
 {
-	m_timer++;  /* timer counting at 16 Hz */
+	/* timer counting at 250 Hz. (500 Hz / 2 via U52.9).
+	 * U43 removed from circuit, U52.9 wired to U32.5) */
+	m_timer++;
+
+	/* U33 bit 0 routed to /IRQ line after inverting through U67.9 */
+	if(m_timer & 0x10)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	/* also, when the timer overflows (16 seconds) watchdog would kick in */
 	if (m_timer & 0x100)
 		popmessage("watchdog!");
 
-	if (m_last != (ioport("INPUT")->read() & 0x0f))
-	{
-		m_last = ioport("INPUT")->read() & 0x0f;
-		generic_pulse_irq_line(device.execute(), 0, 1);
-	}
 	m_pia_u1->porta_w(ioport("INPUT")->read() & 0x0f);
 	m_pia_u1->ca1_w(ioport("INPUT")->read() & 0x10);
 	m_pia_u1->ca2_w(ioport("INPUT")->read() & 0x20);
@@ -185,6 +208,7 @@ READ8_MEMBER(toratora_state::timer_r)
 WRITE8_MEMBER(toratora_state::clear_timer_w)
 {
 	m_timer = 0;
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -195,25 +219,25 @@ WRITE8_MEMBER(toratora_state::clear_timer_w)
  *************************************/
 
 
-WRITE8_MEMBER(toratora_state::sn1_port_a_u2_u3_w)
+WRITE8_MEMBER(toratora_state::sn1_port_a_u3_w)
 {
 	m_sn1->vco_voltage_w(2.35 * (data & 0x7f) / 128.0);
 	m_sn1->enable_w((data >> 7) & 0x01);
 }
 
 
-WRITE8_MEMBER(toratora_state::sn1_port_b_u2_u3_w)
+WRITE8_MEMBER(toratora_state::sn1_port_b_u3_w)
 {
 	static const double resistances[] =
 	{
-		0,  /* N/C */
-		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750) + RES_M(1.5),
-		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750),
-		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360),
-		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200),
-		RES_K(47) + RES_K(47) + RES_K(91),
-		RES_K(47) + RES_K(47) + RES_K(91),
-		RES_K(47)
+		RES_INF, /* N/C */
+		RES_INF, /* R39 not placed */
+		RES_K(10) + RES_K(10) + RES_K(24) + RES_K(51) + RES_K(100) + RES_K(240),
+		RES_K(10) + RES_K(10) + RES_K(24) + RES_K(51) + RES_K(100),
+		RES_K(10) + RES_K(10) + RES_K(24) + RES_K(51),
+		RES_K(10) + RES_K(10) + RES_K(24),
+		RES_K(10) + RES_K(10),
+		RES_INF
 	};
 
 	m_sn1->mixer_a_w      ((data >> 0) & 0x01);
@@ -221,34 +245,43 @@ WRITE8_MEMBER(toratora_state::sn1_port_b_u2_u3_w)
 	m_sn1->mixer_c_w      ((data >> 2) & 0x01);
 	m_sn1->envelope_1_w   ((data >> 3) & 0x01);
 	m_sn1->envelope_2_w   ((data >> 4) & 0x01);
-	m_sn1->amplitude_res_w(resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
+	m_sn1->slf_res_w(resistances[(data >> 5)]);
+
+	/*
+	 * TODO: Determine proper 7441 output voltage here.
+	 * Datasheet lists 2.5 V max under worst conditions,
+	 * probably much lower in reality?
+	 * However, shot audio is muted if V < 1.0, as mixer state
+	 * is set to SLF & VCO. Should SLF FF state be inverted?
+	 */
+	m_sn1->slf_cap_voltage_w((data >> 5) == 0x7 ? 2.5 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
 }
 
 
-WRITE_LINE_MEMBER(toratora_state::sn1_ca2_u2_u3_w)
+WRITE_LINE_MEMBER(toratora_state::sn1_ca2_u3_w)
 {
 	m_sn1->vco_w(state);
 }
 
-WRITE8_MEMBER(toratora_state::sn2_port_a_u2_u3_w)
+WRITE8_MEMBER(toratora_state::sn2_port_a_u2_w)
 {
 	m_sn2->vco_voltage_w(2.35 * (data & 0x7f) / 128.0);
 	m_sn2->enable_w((data >> 7) & 0x01);
 }
 
 
-WRITE8_MEMBER(toratora_state::sn2_port_b_u2_u3_w)
+WRITE8_MEMBER(toratora_state::sn2_port_b_u2_w)
 {
 	static const double resistances[] =
 	{
-		0,  /* N/C */
-		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750) + RES_M(1.5),
-		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750),
-		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360),
-		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200),
-		RES_K(47) + RES_K(47) + RES_K(91),
-		RES_K(47) + RES_K(47) + RES_K(91),
-		RES_K(47)
+		RES_INF, /* N/C */
+		RES_K(10) + RES_K(10) + RES_K(24) + RES_K(51) + RES_K(100) + RES_M(240) + RES_M(2),
+		RES_K(10) + RES_K(10) + RES_K(24) + RES_K(51) + RES_K(100) + RES_K(240),
+		RES_K(10) + RES_K(10) + RES_K(24) + RES_K(51) + RES_K(100),
+		RES_K(10) + RES_K(10) + RES_K(24) + RES_K(51),
+		RES_K(10) + RES_K(10) + RES_K(24),
+		RES_K(10) + RES_K(10),
+		RES_INF
 	};
 
 	m_sn2->mixer_a_w      ((data >> 0) & 0x01);
@@ -256,11 +289,15 @@ WRITE8_MEMBER(toratora_state::sn2_port_b_u2_u3_w)
 	m_sn2->mixer_c_w      ((data >> 2) & 0x01);
 	m_sn2->envelope_1_w   ((data >> 3) & 0x01);
 	m_sn2->envelope_2_w   ((data >> 4) & 0x01);
-	m_sn2->amplitude_res_w(resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
+	m_sn2->slf_res_w(resistances[(data >> 5)]);
+	m_sn2->slf_cap_voltage_w((data >> 5) == 0x7 ? 2.5 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+
+	/* Seems like the output should be muted in this case, but unsure of exact mechanism */
+	m_sn2->amplitude_res_w((data >> 5) == 0x0 ? RES_INF : RES_K(47));
 }
 
 
-WRITE_LINE_MEMBER(toratora_state::sn2_ca2_u2_u3_w)
+WRITE_LINE_MEMBER(toratora_state::sn2_ca2_u2_w)
 {
 	m_sn2->vco_w(state);
 }
@@ -285,8 +322,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, toratora_state )
 	AM_RANGE(0xf04b, 0xf04b) AM_READWRITE(timer_r, clear_timer_w)
 	AM_RANGE(0xa04c, 0xf09f) AM_NOP
 	AM_RANGE(0xf0a0, 0xf0a3) AM_DEVREADWRITE("pia_u1", pia6821_device, read, write)
-	AM_RANGE(0xf0a4, 0xf0a7) AM_DEVREADWRITE("pia_u3", pia6821_device, read, write)
-	AM_RANGE(0xf0a8, 0xf0ab) AM_DEVREADWRITE("pia_u2", pia6821_device, read, write)
+	AM_RANGE(0xf0a4, 0xf0a7) AM_DEVREADWRITE("pia_u2", pia6821_device, read, write)
+	AM_RANGE(0xf0a8, 0xf0ab) AM_DEVREADWRITE("pia_u3", pia6821_device, read, write)
 	AM_RANGE(0xf0ac, 0xf7ff) AM_NOP
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -342,40 +379,38 @@ INPUT_PORTS_END
 void toratora_state::machine_start()
 {
 	save_item(NAME(m_timer));
-	save_item(NAME(m_last));
 	save_item(NAME(m_clear_tv));
 }
 
 void toratora_state::machine_reset()
 {
 	m_timer = 0xff;
-	m_last = 0;
 	m_clear_tv = 0;
 }
 
 static MACHINE_CONFIG_START( toratora, toratora_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800,500000)   /* ?????? game speed is entirely controlled by this */
+	MCFG_CPU_ADD("maincpu", M6800, 5185000 / 8) /* 5.185 MHz XTAL divided by 8 (@ U94.12) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(toratora_state, toratora_timer, 16)    /* timer counting at 16 Hz */
+	MCFG_CPU_PERIODIC_INT_DRIVER(toratora_state, toratora_timer, 250) /* timer counting at 250 Hz */
 
 	MCFG_DEVICE_ADD("pia_u1", PIA6821, 0)
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state,port_b_u1_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(toratora_state,main_cpu_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(toratora_state,main_cpu_irq))
 
-	MCFG_DEVICE_ADD("pia_u2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(toratora_state, sn1_port_a_u2_u3_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state, sn1_port_b_u2_u3_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(toratora_state, sn1_ca2_u2_u3_w))
-
 	MCFG_DEVICE_ADD("pia_u3", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(toratora_state, sn1_port_a_u3_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state, sn1_port_b_u3_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(toratora_state, sn1_ca2_u3_w))
+
+	MCFG_DEVICE_ADD("pia_u2", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(toratora_state,sn2_port_a_u2_u3_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state,sn2_port_b_u2_u3_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(toratora_state,sn2_ca2_u2_u3_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(toratora_state,cb2_u3_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(toratora_state,sn2_port_a_u2_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state,sn2_port_b_u2_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(toratora_state,sn2_ca2_u2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(toratora_state,cb2_u2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -389,15 +424,15 @@ static MACHINE_CONFIG_START( toratora, toratora_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("sn1", SN76477, 0)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_M(1.2) /* RES_K(120) */, CAP_P(470)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(680))                   // decay_res
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(470), CAP_P(470)) // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_M(2))                     // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.2),  RES_K(3.3))  // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(0)                              // amplitude_res
+	MCFG_SN76477_AMP_RES(RES_K(47))                      // amplitude_res
 	MCFG_SN76477_FEEDBACK_RES(RES_K(50))                 // feedback_res
 	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(51))    // VCO volt + cap + res
 	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(0.1), RES_K(470))      // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_M(1))    // oneshot caps + res
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(10))       // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_K(100))  // oneshot caps + res
 	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
 	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
 	MCFG_SN76477_ENVELOPE_PARAMS(0, 0)                   // envelope 1, 2
@@ -405,15 +440,15 @@ static MACHINE_CONFIG_START( toratora, toratora_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("sn2", SN76477, 0)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_M(1.2) /* RES_K(120) */, CAP_P(470)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(680))                   // decay_res
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(470), CAP_P(470)) // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_M(2))                     // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.2),  RES_K(3.3))  // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(0)                              // amplitude_res
+	MCFG_SN76477_AMP_RES(RES_K(47))                      // amplitude_res
 	MCFG_SN76477_FEEDBACK_RES(RES_K(50))                 // feedback_res
 	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(51))    // VCO volt + cap + res
 	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(0.1), RES_K(470))      // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_M(1))    // oneshot caps + res
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(10))       // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_K(100))  // oneshot caps + res
 	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
 	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
 	MCFG_SN76477_ENVELOPE_PARAMS(0, 0)                   // envelope 1, 2
@@ -485,5 +520,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, toratora, 0,        toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, toratorab,toratora, toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (prototype?, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratora, 0,        toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratorab,toratora, toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

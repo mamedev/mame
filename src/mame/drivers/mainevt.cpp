@@ -26,6 +26,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "sound/2151intf.h"
 #include "includes/konamipt.h"
 #include "includes/mainevt.h"
@@ -152,7 +153,7 @@ WRITE8_MEMBER(mainevt_state::k052109_051960_w)
 
 static ADDRESS_MAP_START( mainevt_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(mainevt_bankswitch_w)
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_byte_w)                /* probably */
+	AM_RANGE(0x1f84, 0x1f84) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* probably */
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(mainevt_sh_irqtrigger_w)  /* probably */
 	AM_RANGE(0x1f8c, 0x1f8d) AM_WRITENOP    /* ??? */
 	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(mainevt_coin_w)   /* coin counters + lamps */
@@ -177,7 +178,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(mainevt_bankswitch_w)
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_byte_w)                /* probably */
+	AM_RANGE(0x1f84, 0x1f84) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* probably */
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(mainevt_sh_irqtrigger_w)  /* probably */
 	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(mainevt_coin_w)   /* coin counters + lamps */
 	AM_RANGE(0x1fb2, 0x1fb2) AM_WRITE(dv_nmienable_w)
@@ -203,7 +204,7 @@ static ADDRESS_MAP_START( mainevt_sound_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("upd", upd7759_device, port_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 	AM_RANGE(0xd000, 0xd000) AM_READ(mainevt_sh_busy_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(mainevt_sh_irqcontrol_w)
@@ -213,7 +214,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( devstors_sound_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(devstor_sh_irqcontrol_w)
@@ -438,6 +439,8 @@ static MACHINE_CONFIG_START( mainevt, mainevt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("k007232", K007232, 3579545)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(mainevt_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
@@ -485,6 +488,8 @@ static MACHINE_CONFIG_START( devstors, mainevt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)

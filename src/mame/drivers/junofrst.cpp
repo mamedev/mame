@@ -83,6 +83,7 @@ Blitter source graphics
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -304,7 +305,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_SHARE("scroll")  /* not used in Juno */
 	AM_RANGE(0x8034, 0x8035) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(sh_irqtrigger_w)
-	AM_RANGE(0x8050, 0x8050) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x8050, 0x8050) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(bankselect_w)
 	AM_RANGE(0x8070, 0x8073) AM_WRITE(blitter_w)
 	AM_RANGE(0x8100, 0x8fff) AM_RAM
@@ -316,11 +317,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(i8039_irq_w)
 ADDRESS_MAP_END
 
@@ -331,7 +332,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, junofrst_state )
-	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
@@ -439,6 +440,9 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 14318000/8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(junofrst_state, portA_r))

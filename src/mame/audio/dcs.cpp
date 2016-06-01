@@ -289,7 +289,7 @@ static ADDRESS_MAP_START( dcs_2k_uart_data_map, AS_DATA, 16, dcs_audio_device )
 	AM_RANGE(0x3400, 0x3402) AM_NOP                             /* UART (ignored) */
 	AM_RANGE(0x3403, 0x3403) AM_READWRITE(input_latch_r, output_latch_w)
 	AM_RANGE(0x3404, 0x3405) AM_NOP                             /* UART (ignored) */
-	AM_RANGE(0x3800, 0x39ff) AM_RAM
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("iram")
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( dcs_8k_data_map, AS_DATA, 16, dcs_audio_device )
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(dcs_data_bank_select_w)
 	AM_RANGE(0x3400, 0x3403) AM_READWRITE(input_latch_r, output_latch_w) // mk3 etc. need this
-	AM_RANGE(0x3800, 0x39ff) AM_RAM
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("iram")
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( dcs_wpc_data_map, AS_DATA, 16, dcs_audio_wpc_device )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(dcs_data_bank_select_w)
 	AM_RANGE(0x3100, 0x3100) AM_WRITE(dcs_data_bank_select2_w)
 	AM_RANGE(0x3300, 0x3303) AM_READWRITE(input_latch_r, output_latch_w)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("iram")
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( dcs2_2115_data_map, AS_DATA, 16, dcs_audio_device )
 	AM_RANGE(0x0403, 0x0403) AM_READ(latch_status_r)
 	AM_RANGE(0x0404, 0x0407) AM_READ(fifo_input_r)
 	AM_RANGE(0x0480, 0x0483) AM_READWRITE(sdrc_r, sdrc_w)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("iram")
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( dcs2_2104_data_map, AS_DATA, 16, dcs_audio_device )
 	AM_RANGE(0x0403, 0x0403) AM_READ(latch_status_r)
 	AM_RANGE(0x0404, 0x0407) AM_READ(fifo_input_r)
 	AM_RANGE(0x0480, 0x0483) AM_READWRITE(sdrc_r, sdrc_w)
-	AM_RANGE(0x3800, 0x38ff) AM_RAM
+	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_SHARE("iram")
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
@@ -562,6 +562,7 @@ MACHINE_CONFIG_FRAGMENT( dcs2_audio_denver )
 
 	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("dcs_sport_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // Atlantis driver waits for sport0 rx interrupts
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -836,7 +837,8 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_polling_base(nullptr),
 	m_internal_program_ram(nullptr),
 	m_external_program_ram(nullptr),
-	m_dram_in_mb(0)
+	m_dram_in_mb(0),
+	m_iram(*this, "iram")
 {
 	m_dmadac[0] = m_dmadac[1] = m_dmadac[2] = m_dmadac[3] = m_dmadac[4] = m_dmadac[5] = nullptr;
 	memset(m_control_regs, 0, sizeof(m_control_regs));
@@ -982,9 +984,10 @@ void dcs2_audio_device::device_start()
 	m_auto_ack = FALSE;
 
 	/* install the speedup handler */
-	if (m_polling_offset)
-		m_polling_base = m_cpu->space(AS_DATA).install_readwrite_handler(m_polling_offset, m_polling_offset, read16_delegate(FUNC(dcs_audio_device::dcs_polling_r),this), write16_delegate(FUNC(dcs_audio_device::dcs_polling_w),this));
-
+	if (m_polling_offset) {
+		m_cpu->space(AS_DATA).install_readwrite_handler(m_polling_offset, m_polling_offset, read16_delegate(FUNC(dcs_audio_device::dcs_polling_r),this), write16_delegate(FUNC(dcs_audio_device::dcs_polling_w),this));
+		m_polling_base = m_iram + (m_polling_offset - 0x3800);
+	}
 	/* allocate a watchdog timer for HLE transfers */
 	m_transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && m_dram_in_mb != 0);
 	if (m_transfer.hle_enabled)
@@ -1142,7 +1145,7 @@ void dcs_audio_device::sdrc_remap_memory()
 
 	/* reinstall the polling hotspot */
 	if (m_polling_offset)
-		m_polling_base = m_cpu->space(AS_DATA).install_readwrite_handler(m_polling_offset, m_polling_offset, read16_delegate(FUNC(dcs_audio_device::dcs_polling_r),this), write16_delegate(FUNC(dcs_audio_device::dcs_polling_w),this));
+		m_cpu->space(AS_DATA).install_readwrite_handler(m_polling_offset, m_polling_offset, read16_delegate(FUNC(dcs_audio_device::dcs_polling_r),this), write16_delegate(FUNC(dcs_audio_device::dcs_polling_w),this));
 }
 
 

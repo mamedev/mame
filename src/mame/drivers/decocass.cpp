@@ -746,6 +746,9 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("ay1", AY8910, HCLK2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 

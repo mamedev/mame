@@ -27,6 +27,7 @@ const device_type GBA_ROM_EEPROM = &device_creator<gba_rom_eeprom_device>;
 const device_type GBA_ROM_EEPROM64 = &device_creator<gba_rom_eeprom64_device>;
 const device_type GBA_ROM_FLASH = &device_creator<gba_rom_flash_device>;
 const device_type GBA_ROM_FLASH1M = &device_creator<gba_rom_flash1m_device>;
+const device_type GBA_ROM_3DMATRIX = &device_creator<gba_rom_3dmatrix_device>;
 
 
 gba_rom_device::gba_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -68,6 +69,11 @@ gba_rom_flash1m_device::gba_rom_flash1m_device(const machine_config &mconfig, co
 {
 }
 
+gba_rom_3dmatrix_device::gba_rom_3dmatrix_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: gba_rom_device(mconfig, GBA_ROM_3DMATRIX, "GBA Carts + 3D Matrix Memory Mapper", tag, owner, clock, "gba_3dmatrix", __FILE__)
+{
+}
+
 
 //-------------------------------------------------
 //  mapper specific start/reset
@@ -104,6 +110,20 @@ void gba_rom_eeprom64_device::device_start()
 	// for the moment we use a custom eeprom implementation, so we alloc/save it as nvram
 	nvram_alloc(0x2000);
 	m_eeprom = std::make_unique<gba_eeprom_device>(machine(), (UINT8*)get_nvram_base(), get_nvram_size(), 14);
+}
+
+void gba_rom_3dmatrix_device::device_start()
+{
+	save_item(NAME(m_src));
+	save_item(NAME(m_dst));
+	save_item(NAME(m_nblock));
+}
+
+void gba_rom_3dmatrix_device::device_reset()
+{
+	m_src = 0;
+	m_dst = 0;
+	m_nblock = 0;
 }
 
 
@@ -435,4 +455,59 @@ WRITE32_MEMBER(gba_rom_eeprom64_device::write_ram)
 		data >>= 16;
 
 	m_eeprom->write(data);
+}
+
+
+/*-------------------------------------------------
+ Carts with 3D Matrix Memory controller
+
+ Used by Video carts with 64MB ROM chips
+ Emulation based on the reverse engineering efforts
+ by endrift
+
+ The Memory controller basically behaves like a DMA
+ chip by writing first source and destination address,
+ then the number of 512K blocks to copy and finally
+ by issuing the transfer command.
+ Disney Collection 2 carts uses command 0x01 to start
+ the transfer, other carts might use 0x11 but currently
+ they die before getting to the mapper communication
+ (CPU emulation issue? cart mapping issue? still unknown)
+
+ To investigate:
+ - why the other carts fail
+ - which addresses might be used by the mapper
+   (Disney Collection 2 uses 0x08800180-0x0880018f
+   but it might well be possible to issue commands
+   in an extended range...)
+ - which bus addresses can be used by the mapper
+   (currently we restrict the mapping in the range
+   0x08000000-0x09ffffff but maybe also the rest of
+   the cart "range" is accessible...)
+ -------------------------------------------------*/
+
+WRITE32_MEMBER(gba_rom_3dmatrix_device::write_mapper)
+{
+	//printf("mapper write 0x%.8X - 0x%X\n", offset, data);
+	switch (offset & 3)
+	{
+		case 0:
+			if (data == 0x1)    // transfer data
+				memcpy((UINT8 *)m_romhlp + m_dst, (UINT8 *)m_rom + m_src, m_nblock * 0x200);
+			else
+				printf("Unknown mapper command 0x%X\n", data);
+			break;
+		case 1:
+			m_src = data;
+			break;
+		case 2:
+			if (data >= 0xa000000)
+				printf("Unknown transfer destination 0x%X\n", data);
+			m_dst = (data & 0x1ffffff);
+			break;
+		case 3:
+		default:
+			m_nblock = data;
+			break;
+	}
 }

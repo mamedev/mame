@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver
+
 /*************************************************************************
 
     Jack the Giant Killer
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 
 class jack_state : public driver_device
 {
@@ -19,6 +22,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
@@ -31,6 +35,7 @@ public:
 	required_shared_ptr<UINT8> m_colorram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	/* video-related */

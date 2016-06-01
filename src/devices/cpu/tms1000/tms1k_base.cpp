@@ -120,6 +120,7 @@ void tms1k_base_device::device_start()
 	m_cs = 0;
 	m_r = 0;
 	m_o = 0;
+	m_o_index = 0;
 	m_cki_bus = 0;
 	m_c4 = 0;
 	m_p = 0;
@@ -158,6 +159,7 @@ void tms1k_base_device::device_start()
 	save_item(NAME(m_cs));
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
+	save_item(NAME(m_o_index));
 	save_item(NAME(m_cki_bus));
 	save_item(NAME(m_c4));
 	save_item(NAME(m_p));
@@ -273,6 +275,7 @@ void tms1k_base_device::read_opcode()
 void tms1k_base_device::write_o_output(UINT8 index)
 {
 	// a hardcoded table is supported if the output pla is unknown
+	m_o_index = index;
 	m_o = (m_output_pla_table == nullptr) ? m_opla->read(index) : m_output_pla_table[index];
 	m_write_o(0, m_o & m_o_mask, 0xffff);
 }

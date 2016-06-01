@@ -1113,8 +1113,8 @@
 		</part>
 	</software>
 
-	<software name="oekakil">
-		<description>Ou-chan no Oekaki Logic</description>
+	<software name="ooekakil">
+		<description>O-chan no Oekaki Logic</description>
 		<year>2000</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SWJ-SUN004"/>

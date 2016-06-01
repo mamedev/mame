@@ -35,6 +35,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "sound/tms5220.h"
 #include "machine/ldvp931.h"
 #include "machine/6532riot.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "machine/x2212.h"
 
@@ -44,7 +45,7 @@ class firefox_state : public driver_device
 public:
 	firefox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc") ,
+		m_laserdisc(*this, "laserdisc") ,
 		m_tileram(*this, "tileram"),
 		m_spriteram(*this, "spriteram"),
 		m_sprite_palette(*this, "sprite_palette"),
@@ -53,7 +54,9 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2") { }
 
 	required_device<phillips_22vp931_device> m_laserdisc;
 	required_shared_ptr<unsigned char> m_tileram;
@@ -116,6 +119,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 };
 
 
@@ -323,13 +328,13 @@ CUSTOM_INPUT_MEMBER(firefox_state::soundflag_r)
 READ8_MEMBER(firefox_state::sound_to_main_r)
 {
 	m_sound_to_main_flag = 0;
-	return soundlatch2_byte_r(space, 0);
+	return m_soundlatch2->read(space, 0);
 }
 
 WRITE8_MEMBER(firefox_state::main_to_sound_w)
 {
 	m_main_to_sound_flag = 1;
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -343,13 +348,13 @@ WRITE8_MEMBER(firefox_state::sound_reset_w)
 READ8_MEMBER(firefox_state::main_to_sound_r)
 {
 	m_main_to_sound_flag = 0;
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 WRITE8_MEMBER(firefox_state::sound_to_main_w)
 {
 	m_sound_to_main_flag = 1;
-	soundlatch2_byte_w(space, 0, data);
+	m_soundlatch2->write(space, 0, data);
 }
 
 
@@ -743,6 +748,9 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)

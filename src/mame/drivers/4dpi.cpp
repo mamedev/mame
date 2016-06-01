@@ -51,7 +51,7 @@ public:
 };
 
 
-#define VERBOSE_LEVEL ( 0 )
+#define VERBOSE_LEVEL (0)
 
 #define ENABLE_VERBOSE_LOG (1)
 

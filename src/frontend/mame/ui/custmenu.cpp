@@ -10,11 +10,14 @@
 
 #include "emu.h"
 #include "ui/ui.h"
-#include "ui/menu.h"
 #include "ui/custmenu.h"
 #include "ui/selector.h"
 #include "ui/inifile.h"
+
 #include "rendfont.h"
+
+
+namespace ui {
 
 /**************************************************
     MENU CUSTOM FILTER
@@ -22,44 +25,44 @@
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
-ui_menu_custom_filter::ui_menu_custom_filter(mame_ui_manager &mui, render_container *container, bool _single_menu)
-	: ui_menu(mui, container)
+menu_custom_filter::menu_custom_filter(mame_ui_manager &mui, render_container *container, bool _single_menu)
+	: menu(mui, container)
 	, m_single_menu(_single_menu)
 	, m_added(false)
 {
 }
 
-ui_menu_custom_filter::~ui_menu_custom_filter()
+menu_custom_filter::~menu_custom_filter()
 {
 	if (m_single_menu)
-		ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
+		reset_topmost(reset_options::SELECT_FIRST);
 	save_custom_filters();
 }
 
 //-------------------------------------------------
 //  handle
 //-------------------------------------------------
-void ui_menu_custom_filter::handle()
+void menu_custom_filter::handle()
 {
 	bool changed = false;
 	m_added = false;
 
 	// process the menu
-	const ui_menu_event *m_event = process(UI_MENU_PROCESS_LR_REPEAT);
-	if (m_event != nullptr && m_event->itemref != nullptr)
+	const event *menu_event = process(PROCESS_LR_REPEAT);
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		switch ((FPTR)m_event->itemref)
+		switch ((FPTR)menu_event->itemref)
 		{
 			case MAIN_FILTER:
-				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
+				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					(m_event->iptkey == IPT_UI_RIGHT) ? custfltr::main++ : custfltr::main--;
+					(menu_event->iptkey == IPT_UI_RIGHT) ? custfltr::main++ : custfltr::main--;
 					changed = true;
 				}
 				break;
 
 			case ADD_FILTER:
-				if (m_event->iptkey == IPT_UI_SELECT)
+				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
 					custfltr::numother++;
 					custfltr::other[custfltr::numother] = FILTER_UNAVAILABLE + 1;
@@ -68,7 +71,7 @@ void ui_menu_custom_filter::handle()
 				break;
 
 			case REMOVE_FILTER:
-				if (m_event->iptkey == IPT_UI_SELECT)
+				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
 					custfltr::other[custfltr::numother] = FILTER_UNAVAILABLE + 1;
 					custfltr::numother--;
@@ -77,24 +80,24 @@ void ui_menu_custom_filter::handle()
 				break;
 		}
 
-		if ((FPTR)m_event->itemref >= OTHER_FILTER && (FPTR)m_event->itemref < OTHER_FILTER + MAX_CUST_FILTER)
+		if ((FPTR)menu_event->itemref >= OTHER_FILTER && (FPTR)menu_event->itemref < OTHER_FILTER + MAX_CUST_FILTER)
 		{
-			int pos = (int)((FPTR)m_event->itemref - OTHER_FILTER);
-			if (m_event->iptkey == IPT_UI_LEFT && custfltr::other[pos] > FILTER_UNAVAILABLE + 1)
+			int pos = (int)((FPTR)menu_event->itemref - OTHER_FILTER);
+			if (menu_event->iptkey == IPT_UI_LEFT && custfltr::other[pos] > FILTER_UNAVAILABLE + 1)
 			{
 				custfltr::other[pos]--;
 				for ( ; custfltr::other[pos] > FILTER_UNAVAILABLE && (custfltr::other[pos] == FILTER_CATEGORY
 						|| custfltr::other[pos] == FILTER_FAVORITE); custfltr::other[pos]--) { };
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_RIGHT && custfltr::other[pos] < FILTER_LAST - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && custfltr::other[pos] < FILTER_LAST - 1)
 			{
 				custfltr::other[pos]++;
 				for ( ; custfltr::other[pos] < FILTER_LAST && (custfltr::other[pos] == FILTER_CATEGORY
 						|| custfltr::other[pos] == FILTER_FAVORITE); custfltr::other[pos]++) { };
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_SELECT)
+			else if (menu_event->iptkey == IPT_UI_SELECT)
 			{
 				size_t total = main_filters::length;
 				std::vector<std::string> s_sel(total);
@@ -104,53 +107,53 @@ void ui_menu_custom_filter::handle()
 					else
 						s_sel[index] = main_filters::text[index];
 
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, s_sel, custfltr::other[pos]));
+				menu::stack_push<menu_selector>(ui(), container, s_sel, custfltr::other[pos]);
 			}
 		}
-		else if ((FPTR)m_event->itemref >= YEAR_FILTER && (FPTR)m_event->itemref < YEAR_FILTER + MAX_CUST_FILTER)
+		else if ((FPTR)menu_event->itemref >= YEAR_FILTER && (FPTR)menu_event->itemref < YEAR_FILTER + MAX_CUST_FILTER)
 		{
-			int pos = (int)((FPTR)m_event->itemref - YEAR_FILTER);
-			if (m_event->iptkey == IPT_UI_LEFT && custfltr::year[pos] > 0)
+			int pos = (int)((FPTR)menu_event->itemref - YEAR_FILTER);
+			if (menu_event->iptkey == IPT_UI_LEFT && custfltr::year[pos] > 0)
 			{
 				custfltr::year[pos]--;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_RIGHT && custfltr::year[pos] < c_year::ui.size() - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && custfltr::year[pos] < c_year::ui.size() - 1)
 			{
 				custfltr::year[pos]++;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, c_year::ui, custfltr::year[pos]));
+			else if (menu_event->iptkey == IPT_UI_SELECT)
+				menu::stack_push<menu_selector>(ui(), container, c_year::ui, custfltr::year[pos]);
 		}
-		else if ((FPTR)m_event->itemref >= MNFCT_FILTER && (FPTR)m_event->itemref < MNFCT_FILTER + MAX_CUST_FILTER)
+		else if ((FPTR)menu_event->itemref >= MNFCT_FILTER && (FPTR)menu_event->itemref < MNFCT_FILTER + MAX_CUST_FILTER)
 		{
-			int pos = (int)((FPTR)m_event->itemref - MNFCT_FILTER);
-			if (m_event->iptkey == IPT_UI_LEFT && custfltr::mnfct[pos] > 0)
+			int pos = (int)((FPTR)menu_event->itemref - MNFCT_FILTER);
+			if (menu_event->iptkey == IPT_UI_LEFT && custfltr::mnfct[pos] > 0)
 			{
 				custfltr::mnfct[pos]--;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_RIGHT && custfltr::mnfct[pos] < c_mnfct::ui.size() - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && custfltr::mnfct[pos] < c_mnfct::ui.size() - 1)
 			{
 				custfltr::mnfct[pos]++;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, c_mnfct::ui, custfltr::mnfct[pos]));
+			else if (menu_event->iptkey == IPT_UI_SELECT)
+				menu::stack_push<menu_selector>(ui(), container, c_mnfct::ui, custfltr::mnfct[pos]);
 		}
 	}
 
 	if (changed)
-		reset(UI_MENU_RESET_REMEMBER_REF);
+		reset(reset_options::REMEMBER_REF);
 	else if (m_added)
-		reset(UI_MENU_RESET_SELECT_FIRST);
+		reset(reset_options::SELECT_FIRST);
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
-void ui_menu_custom_filter::populate()
+void menu_custom_filter::populate()
 {
 	// add main filter
 	UINT32 arrow_flags = get_arrow_flags((int)FILTER_ALL, (int)FILTER_UNAVAILABLE, custfltr::main);
@@ -159,7 +162,7 @@ void ui_menu_custom_filter::populate()
 	// add other filters
 	for (int x = 1; x <= custfltr::numother; x++)
 	{
-		item_append(ui_menu_item_type::SEPARATOR);
+		item_append(menu_item_type::SEPARATOR);
 
 		// add filter items
 		arrow_flags = get_arrow_flags((int)FILTER_UNAVAILABLE + 1, (int)FILTER_LAST - 1, custfltr::other[x]);
@@ -187,7 +190,7 @@ void ui_menu_custom_filter::populate()
 		}
 	}
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 
 	if (custfltr::numother > 0)
 		item_append(_("Remove last filter"), nullptr, 0, (void *)(FPTR)REMOVE_FILTER);
@@ -195,14 +198,14 @@ void ui_menu_custom_filter::populate()
 	if (custfltr::numother < MAX_CUST_FILTER - 2)
 		item_append(_("Add filter"), nullptr, 0, (void *)(FPTR)ADD_FILTER);
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 //-------------------------------------------------
 //  perform our special rendering
 //-------------------------------------------------
-void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_custom_filter::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
 
@@ -235,7 +238,7 @@ void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bo
 //  save custom filters info to file
 //-------------------------------------------------
 
-void ui_menu_custom_filter::save_custom_filters()
+void menu_custom_filter::save_custom_filters()
 {
 	// attempt to open the output file
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -265,44 +268,44 @@ void ui_menu_custom_filter::save_custom_filters()
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
-ui_menu_swcustom_filter::ui_menu_swcustom_filter(mame_ui_manager &mui, render_container *container, const game_driver *_driver, s_filter &_filter) :
-	ui_menu(mui, container)
+menu_swcustom_filter::menu_swcustom_filter(mame_ui_manager &mui, render_container *container, const game_driver *_driver, s_filter &_filter)
+	: menu(mui, container)
 	, m_added(false)
 	, m_filter(_filter)
 	, m_driver(_driver)
 {
 }
 
-ui_menu_swcustom_filter::~ui_menu_swcustom_filter()
+menu_swcustom_filter::~menu_swcustom_filter()
 {
-	ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
+	reset_topmost(reset_options::SELECT_FIRST);
 	save_sw_custom_filters();
 }
 
 //-------------------------------------------------
 //  handle
 //-------------------------------------------------
-void ui_menu_swcustom_filter::handle()
+void menu_swcustom_filter::handle()
 {
 	bool changed = false;
 	m_added = false;
 
 	// process the menu
-	const ui_menu_event *m_event = process(UI_MENU_PROCESS_LR_REPEAT);
-	if (m_event != nullptr && m_event->itemref != nullptr)
+	const event *menu_event = process(PROCESS_LR_REPEAT);
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		switch ((FPTR)m_event->itemref)
+		switch ((FPTR)menu_event->itemref)
 		{
 			case MAIN_FILTER:
-				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
+				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					(m_event->iptkey == IPT_UI_RIGHT) ? sw_custfltr::main++ : sw_custfltr::main--;
+					(menu_event->iptkey == IPT_UI_RIGHT) ? sw_custfltr::main++ : sw_custfltr::main--;
 					changed = true;
 				}
 				break;
 
 			case ADD_FILTER:
-				if (m_event->iptkey == IPT_UI_SELECT)
+				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
 					sw_custfltr::numother++;
 					sw_custfltr::other[sw_custfltr::numother] = UI_SW_UNAVAILABLE + 1;
@@ -311,7 +314,7 @@ void ui_menu_swcustom_filter::handle()
 				break;
 
 			case REMOVE_FILTER:
-				if (m_event->iptkey == IPT_UI_SELECT)
+				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
 					sw_custfltr::other[sw_custfltr::numother] = UI_SW_UNAVAILABLE + 1;
 					sw_custfltr::numother--;
@@ -320,20 +323,20 @@ void ui_menu_swcustom_filter::handle()
 				break;
 		}
 
-		if ((FPTR)m_event->itemref >= OTHER_FILTER && (FPTR)m_event->itemref < OTHER_FILTER + MAX_CUST_FILTER)
+		if ((FPTR)menu_event->itemref >= OTHER_FILTER && (FPTR)menu_event->itemref < OTHER_FILTER + MAX_CUST_FILTER)
 		{
-			int pos = (int)((FPTR)m_event->itemref - OTHER_FILTER);
-			if (m_event->iptkey == IPT_UI_LEFT && sw_custfltr::other[pos] > UI_SW_UNAVAILABLE + 1)
+			int pos = (int)((FPTR)menu_event->itemref - OTHER_FILTER);
+			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::other[pos] > UI_SW_UNAVAILABLE + 1)
 			{
 				sw_custfltr::other[pos]--;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_RIGHT && sw_custfltr::other[pos] < UI_SW_LAST - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::other[pos] < UI_SW_LAST - 1)
 			{
 				sw_custfltr::other[pos]++;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_SELECT)
+			else if (menu_event->iptkey == IPT_UI_SELECT)
 			{
 				size_t total = sw_filters::length;
 				std::vector<std::string> s_sel(total);
@@ -343,101 +346,101 @@ void ui_menu_swcustom_filter::handle()
 					else
 						s_sel[index] = sw_filters::text[index];
 
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, s_sel, sw_custfltr::other[pos]));
+				menu::stack_push<menu_selector>(ui(), container, s_sel, sw_custfltr::other[pos]);
 			}
 		}
-		else if ((FPTR)m_event->itemref >= YEAR_FILTER && (FPTR)m_event->itemref < YEAR_FILTER + MAX_CUST_FILTER)
+		else if ((FPTR)menu_event->itemref >= YEAR_FILTER && (FPTR)menu_event->itemref < YEAR_FILTER + MAX_CUST_FILTER)
 		{
-			int pos = (int)((FPTR)m_event->itemref - YEAR_FILTER);
-			if (m_event->iptkey == IPT_UI_LEFT && sw_custfltr::year[pos] > 0)
+			int pos = (int)((FPTR)menu_event->itemref - YEAR_FILTER);
+			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::year[pos] > 0)
 			{
 				sw_custfltr::year[pos]--;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_RIGHT && sw_custfltr::year[pos] < m_filter.year.ui.size() - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::year[pos] < m_filter.year.ui.size() - 1)
 			{
 				sw_custfltr::year[pos]++;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, m_filter.year.ui, sw_custfltr::year[pos]));
+			else if (menu_event->iptkey == IPT_UI_SELECT)
+				menu::stack_push<menu_selector>(ui(), container, m_filter.year.ui, sw_custfltr::year[pos]);
 		}
-		else if ((FPTR)m_event->itemref >= TYPE_FILTER && (FPTR)m_event->itemref < TYPE_FILTER + MAX_CUST_FILTER)
+		else if ((FPTR)menu_event->itemref >= TYPE_FILTER && (FPTR)menu_event->itemref < TYPE_FILTER + MAX_CUST_FILTER)
 		{
-			int pos = (int)((FPTR)m_event->itemref - TYPE_FILTER);
-			if (m_event->iptkey == IPT_UI_LEFT && sw_custfltr::type[pos] > 0)
+			int pos = (int)((FPTR)menu_event->itemref - TYPE_FILTER);
+			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::type[pos] > 0)
 			{
 				sw_custfltr::type[pos]--;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_RIGHT && sw_custfltr::type[pos] < m_filter.type.ui.size() - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::type[pos] < m_filter.type.ui.size() - 1)
 			{
 				sw_custfltr::type[pos]++;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, m_filter.type.ui, sw_custfltr::type[pos]));
+			else if (menu_event->iptkey == IPT_UI_SELECT)
+				menu::stack_push<menu_selector>(ui(), container, m_filter.type.ui, sw_custfltr::type[pos]);
 		}
-		else if ((FPTR)m_event->itemref >= MNFCT_FILTER && (FPTR)m_event->itemref < MNFCT_FILTER + MAX_CUST_FILTER)
+		else if ((FPTR)menu_event->itemref >= MNFCT_FILTER && (FPTR)menu_event->itemref < MNFCT_FILTER + MAX_CUST_FILTER)
 		{
-			int pos = (int)((FPTR)m_event->itemref - MNFCT_FILTER);
-			if (m_event->iptkey == IPT_UI_LEFT && sw_custfltr::mnfct[pos] > 0)
+			int pos = (int)((FPTR)menu_event->itemref - MNFCT_FILTER);
+			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::mnfct[pos] > 0)
 			{
 				sw_custfltr::mnfct[pos]--;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_RIGHT && sw_custfltr::mnfct[pos] < m_filter.publisher.ui.size() - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::mnfct[pos] < m_filter.publisher.ui.size() - 1)
 			{
 				sw_custfltr::mnfct[pos]++;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, m_filter.publisher.ui, sw_custfltr::mnfct[pos]));
+			else if (menu_event->iptkey == IPT_UI_SELECT)
+				menu::stack_push<menu_selector>(ui(), container, m_filter.publisher.ui, sw_custfltr::mnfct[pos]);
 		}
-		else if ((FPTR)m_event->itemref >= REGION_FILTER && (FPTR)m_event->itemref < REGION_FILTER + MAX_CUST_FILTER)
+		else if ((FPTR)menu_event->itemref >= REGION_FILTER && (FPTR)menu_event->itemref < REGION_FILTER + MAX_CUST_FILTER)
 		{
-			int pos = (int)((FPTR)m_event->itemref - REGION_FILTER);
-			if (m_event->iptkey == IPT_UI_LEFT && sw_custfltr::region[pos] > 0)
+			int pos = (int)((FPTR)menu_event->itemref - REGION_FILTER);
+			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::region[pos] > 0)
 			{
 				sw_custfltr::region[pos]--;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_RIGHT && sw_custfltr::region[pos] < m_filter.region.ui.size() - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::region[pos] < m_filter.region.ui.size() - 1)
 			{
 				sw_custfltr::region[pos]++;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, m_filter.region.ui, sw_custfltr::region[pos]));
+			else if (menu_event->iptkey == IPT_UI_SELECT)
+				menu::stack_push<menu_selector>(ui(), container, m_filter.region.ui, sw_custfltr::region[pos]);
 		}
-		else if ((FPTR)m_event->itemref >= LIST_FILTER && (FPTR)m_event->itemref < LIST_FILTER + MAX_CUST_FILTER)
+		else if ((FPTR)menu_event->itemref >= LIST_FILTER && (FPTR)menu_event->itemref < LIST_FILTER + MAX_CUST_FILTER)
 		{
-			int pos = (int)((FPTR)m_event->itemref - LIST_FILTER);
-			if (m_event->iptkey == IPT_UI_LEFT && sw_custfltr::list[pos] > 0)
+			int pos = (int)((FPTR)menu_event->itemref - LIST_FILTER);
+			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::list[pos] > 0)
 			{
 				sw_custfltr::list[pos]--;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_RIGHT && sw_custfltr::list[pos] < m_filter.swlist.name.size() - 1)
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::list[pos] < m_filter.swlist.name.size() - 1)
 			{
 				sw_custfltr::list[pos]++;
 				changed = true;
 			}
-			else if (m_event->iptkey == IPT_UI_SELECT)
-				ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, m_filter.swlist.description, sw_custfltr::list[pos]));
+			else if (menu_event->iptkey == IPT_UI_SELECT)
+				menu::stack_push<menu_selector>(ui(), container, m_filter.swlist.description, sw_custfltr::list[pos]);
 		}
 	}
 
 	if (changed)
-		reset(UI_MENU_RESET_REMEMBER_REF);
+		reset(reset_options::REMEMBER_REF);
 	else if (m_added)
-		reset(UI_MENU_RESET_SELECT_FIRST);
+		reset(reset_options::SELECT_FIRST);
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
-void ui_menu_swcustom_filter::populate()
+void menu_swcustom_filter::populate()
 {
 	// add main filter
 	UINT32 arrow_flags = get_arrow_flags((int)UI_SW_ALL, (int)UI_SW_UNAVAILABLE, sw_custfltr::main);
@@ -446,7 +449,7 @@ void ui_menu_swcustom_filter::populate()
 	// add other filters
 	for (int x = 1; x <= sw_custfltr::numother; x++)
 	{
-		item_append(ui_menu_item_type::SEPARATOR);
+		item_append(menu_item_type::SEPARATOR);
 
 		// add filter items
 		arrow_flags = get_arrow_flags((int)UI_SW_UNAVAILABLE + 1, (int)UI_SW_LAST - 1, sw_custfltr::other[x]);
@@ -501,7 +504,7 @@ void ui_menu_swcustom_filter::populate()
 		}
 	}
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 
 	if (sw_custfltr::numother > 0)
 		item_append(_("Remove last filter"), nullptr, 0, (void *)(FPTR)REMOVE_FILTER);
@@ -509,7 +512,7 @@ void ui_menu_swcustom_filter::populate()
 	if (sw_custfltr::numother < MAX_CUST_FILTER - 2)
 		item_append(_("Add filter"), nullptr, 0, (void *)(FPTR)ADD_FILTER);
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -517,7 +520,7 @@ void ui_menu_swcustom_filter::populate()
 //-------------------------------------------------
 //  perform our special rendering
 //-------------------------------------------------
-void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_swcustom_filter::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
 
@@ -550,7 +553,7 @@ void ui_menu_swcustom_filter::custom_render(void *selectedref, float top, float 
 //  save custom filters info to file
 //-------------------------------------------------
 
-void ui_menu_swcustom_filter::save_sw_custom_filters()
+void menu_swcustom_filter::save_sw_custom_filters()
 {
 	// attempt to open the output file
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -579,3 +582,5 @@ void ui_menu_swcustom_filter::save_sw_custom_filters()
 		file.close();
 	}
 }
+
+} // namespace ui

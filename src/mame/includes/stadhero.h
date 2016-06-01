@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
+#include "machine/gen_latch.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
 
@@ -13,6 +15,7 @@ public:
 		m_tilegen1(*this, "tilegen1"),
 		m_spritegen(*this, "spritegen"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_pf1_data(*this, "pf1_data") { }
 
@@ -21,6 +24,7 @@ public:
 	required_device<deco_bac06_device> m_tilegen1;
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_pf1_data;

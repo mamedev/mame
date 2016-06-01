@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/konami1.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "audio/timeplt.h"
 #include "includes/konamipt.h"
@@ -66,7 +67,7 @@ static ADDRESS_MAP_START( rocnrope_map, AS_PROGRAM, 8, rocnrope_state )
 	AM_RANGE(0x8083, 0x8083) AM_WRITENOP    /* Coin counter 1 */
 	AM_RANGE(0x8084, 0x8084) AM_WRITENOP    /* Coin counter 2 */
 	AM_RANGE(0x8087, 0x8087) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x8100, 0x8100) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8182, 0x818d) AM_WRITE(rocnrope_interrupt_vector_w)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -221,6 +222,9 @@ static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
 	MCFG_PALETTE_INIT_OWNER(rocnrope_state, rocnrope)
 
 	/* sound hardware */
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_FRAGMENT_ADD(timeplt_sound)
 MACHINE_CONFIG_END
 

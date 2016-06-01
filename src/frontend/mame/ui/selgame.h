@@ -10,16 +10,19 @@
 
 #pragma once
 
-#ifndef __UI_MAIN_H__
-#define __UI_MAIN_H__
+#ifndef MAME_FRONTEND_UI_SELGAME_H
+#define MAME_FRONTEND_UI_SELGAME_H
 
 #include "ui/menu.h"
 
-class ui_menu_select_game : public ui_menu
+
+namespace ui {
+
+class menu_select_game : public menu
 {
 public:
-	ui_menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename);
-	virtual ~ui_menu_select_game();
+	menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename);
+	virtual ~menu_select_game();
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -74,12 +77,13 @@ private:
 	void infos_render(void *selectedref, float x1, float y1, float x2, float y2);
 
 	// handlers
-	void inkey_select(const ui_menu_event *menu_event);
-	void inkey_select_favorite(const ui_menu_event *menu_event);
-	void inkey_special(const ui_menu_event *menu_event);
+	void inkey_select(const event *menu_event);
+	void inkey_select_favorite(const event *menu_event);
+	void inkey_special(const event *menu_event);
 	void inkey_export();
-	void inkey_configure(const ui_menu_event *menu_event);
+	void inkey_configure(const event *menu_event);
 };
 
+} // namespace ui
 
-#endif  /* __UI_MAIN_H__ */
+#endif  // MAME_FRONTEND_UI_SELGAME_H

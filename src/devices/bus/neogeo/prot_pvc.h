@@ -20,7 +20,7 @@ public:
 
 	void pvc_write_unpack_color();
 	void pvc_write_pack_color();
-//	void pvc_write_bankswitch(address_space &space);
+//  void pvc_write_bankswitch(address_space &space);
 	UINT32 get_bank_base();
 	DECLARE_READ16_MEMBER(protection_r);
 	DECLARE_WRITE16_MEMBER(protection_w);

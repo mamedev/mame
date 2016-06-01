@@ -208,7 +208,6 @@ psoldier dip locations still need verification.
 #include "machine/irem_cpu.h"
 #include "sound/2151intf.h"
 #include "sound/iremga20.h"
-#include "sound/okim6295.h"
 
 
 // I haven't managed to find a way to keep nbbatman happy when using the proper upd71059c device
@@ -338,7 +337,7 @@ WRITE16_MEMBER(m92_state::m92_soundlatch_w)
 	if (m_soundcpu)
 		m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
 
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 }
 
 READ16_MEMBER(m92_state::m92_sound_status_r)
@@ -352,7 +351,7 @@ READ16_MEMBER(m92_state::m92_soundlatch_r)
 	if (m_soundcpu)
 		m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 
-	return soundlatch_byte_r(space, offset) | 0xff00;
+	return m_soundlatch->read(space, offset) | 0xff00;
 }
 
 WRITE16_MEMBER(m92_state::m92_sound_irq_ack_w)
@@ -1004,6 +1003,8 @@ static MACHINE_CONFIG_START( m92, m92_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
@@ -1056,6 +1057,7 @@ static MACHINE_CONFIG_DERIVED( ppan, m92 )
 	MCFG_CPU_IO_MAP(ppan_portmap)
 
 	MCFG_DEVICE_REMOVE("soundcpu")
+	MCFG_DEVICE_REMOVE("soundlatch")
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("irem")
 

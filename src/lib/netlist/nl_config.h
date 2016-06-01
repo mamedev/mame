@@ -14,6 +14,8 @@
 //  SETUP
 //============================================================
 
+#define NOEXCEPT noexcept
+
 /*
  * The following options determine how object::update is called.
  * NL_PMF_TYPE_VIRTUAL
@@ -46,8 +48,13 @@
  *  Disappointing is the GNUC_PMF performance.
  */
 
+
+/* FIXME: Currently, we are not registering subdevices and thus these will not
+ * be started and the internal method will not be initialized.
+ */
+
 // This will be autodetected
-// #define NL_PMF_TYPE 2
+//#define NL_PMF_TYPE 0
 
 #define NL_PMF_TYPE_VIRTUAL         0
 #define NL_PMF_TYPE_GNUC_PMF        1
@@ -111,8 +118,8 @@
 //  General Macros
 //============================================================
 
-#if defined(_OPENMP)
-#define HAS_OPENMP ( _OPENMP >= 200805 )
+#if defined(OPENMP)
+#define HAS_OPENMP ( OPENMP >= 200805 )
 #else
 #define HAS_OPENMP (0)
 #endif
@@ -122,11 +129,10 @@
 //============================================================
 
 #if NL_KEEP_STATISTICS
-#include "eminline.h"
 #define add_to_stat(v,x)        do { v += (x); } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)
-#define begin_timing(v)         do { v -= get_profile_ticks(); } while (0)
-#define end_timing(v)           do { v += get_profile_ticks(); } while (0)
+#define begin_timing(v)         do { v -= plib::profile_ticks(); } while (0)
+#define end_timing(v)           do { v += plib::profile_ticks(); } while (0)
 #else
 #define add_to_stat(v,x)        do { } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)

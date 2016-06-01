@@ -1928,14 +1928,14 @@ public:
 	DECLARE_READ32_MEMBER( banshee_io_r );
 	DECLARE_WRITE32_MEMBER( banshee_io_w );
 	DECLARE_READ32_MEMBER( banshee_rom_r );
+	DECLARE_READ8_MEMBER(banshee_vga_r);
+	DECLARE_WRITE8_MEMBER(banshee_vga_w);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	DECLARE_READ32_MEMBER( banshee_agp_r );
 	DECLARE_WRITE32_MEMBER( banshee_agp_w );
-	DECLARE_READ8_MEMBER( banshee_vga_r );
-	DECLARE_WRITE8_MEMBER( banshee_vga_w );
 };
 
 extern const device_type VOODOO_BANSHEE;

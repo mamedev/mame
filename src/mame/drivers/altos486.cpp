@@ -220,4 +220,3 @@ ROM_START( altos486 )
 ROM_END
 
 COMP( 1984, altos486, 0, 0, altos486, 0, driver_device, 0, "Altos Computer Systems", "Altos 486",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-

@@ -504,7 +504,8 @@ void midyunit_state::term2_init_common(write16_delegate hack_w)
 
 	/* HACK: this prevents the freeze on the movies */
 	/* until we figure what's causing it, this is better than nothing */
-	m_t2_hack_mem = m_maincpu->space(AS_PROGRAM).install_write_handler(0x010aa0e0, 0x010aa0ff, hack_w);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x010aa0e0, 0x010aa0ff, hack_w);
+	m_t2_hack_mem = m_mainram + (0xaa0e0>>4);
 }
 
 DRIVER_INIT_MEMBER(midyunit_state,term2)    { term2_init_common(write16_delegate(FUNC(midyunit_state::term2_hack_w),this)); }

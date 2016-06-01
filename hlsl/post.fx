@@ -194,7 +194,9 @@ float2 GetShadowCoord(float2 QuadCoord, float2 SourceCoord)
 		: shadowFrac.xy;
 
 	float2 shadowCoord = (shadowFrac * shadowUV);
-	shadowCoord += 0.5f / shadowDims; // fix half texel offset (DX9)
+	shadowCoord += ShadowTileMode == 0
+		? 0.5f / shadowDims // fix half texel offset (DX9)
+		: 0.0f;
 
 	return shadowCoord;
 }

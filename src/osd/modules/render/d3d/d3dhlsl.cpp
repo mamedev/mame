@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "drivenum.h"
 #include "render.h"
-#include "ui/uimain.h"
 #include "rendutil.h"
 #include "emuopts.h"
 #include "aviio.h"
@@ -32,6 +31,7 @@
 #include "d3dcomm.h"
 #include "strconv.h"
 #include "d3dhlsl.h"
+#include "../frontend/mame/ui/slider.h"
 
 
 //============================================================
@@ -389,7 +389,7 @@ void shaders::end_avi_recording()
 //  shaders::toggle
 //============================================================
 
-void shaders::toggle(std::vector<ui_menu_item>& sliders)
+void shaders::toggle(std::vector<ui::menu_item>& sliders)
 {
 	if (master_enable)
 	{
@@ -824,7 +824,7 @@ void shaders::init_fsfx_quad(void *vertbuf)
 //  shaders::create_resources
 //============================================================
 
-int shaders::create_resources(bool reset, std::vector<ui_menu_item>& sliders)
+int shaders::create_resources(bool reset, std::vector<ui::menu_item>& sliders)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
@@ -888,8 +888,8 @@ int shaders::create_resources(bool reset, std::vector<ui_menu_item>& sliders)
 		texture.palette = nullptr;
 		texture.seqid = 0;
 
-		// now create it (no prescale, but wrap)
-		shadow_texture = new texture_info(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32) | PRIMFLAG_TEXWRAP_MASK);
+		// now create it (no prescale, no wrap)
+		shadow_texture = new texture_info(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 	}
 
 	const char *fx_dir = downcast<windows_options &>(machine->options()).screen_post_fx_dir();
@@ -1000,7 +1000,7 @@ int shaders::create_resources(bool reset, std::vector<ui_menu_item>& sliders)
 
 	initialized = true;
 
-	std::vector<ui_menu_item> my_sliders = init_slider_list();
+	std::vector<ui::menu_item> my_sliders = init_slider_list();
 	sliders.insert(sliders.end(), my_sliders.begin(), my_sliders.end());
 
 	return 0;
@@ -1383,13 +1383,12 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	float yscale = 1.0f / screen_container.yscale();
 	float xoffset = -screen_container.xoffset();
 	float yoffset = -screen_container.yoffset();
-
 	float screen_scale[2] = { xscale, yscale };
 	float screen_offset[2] = { xoffset, yoffset };
 
-	rgb_t back_color_rgb = !machine->first_screen()->has_palette()
-		? rgb_t(0, 0, 0)
-		: machine->first_screen()->palette().palette()->entry_color(0);
+	rgb_t back_color_rgb = screen->has_palette()
+		? screen->palette().palette()->entry_color(0)
+		: rgb_t(0, 0, 0);
 	back_color_rgb = apply_color_convolution(back_color_rgb);
 	float back_color[3] = {
 		static_cast<float>(back_color_rgb.r()) / 255.0f,
@@ -1519,13 +1518,12 @@ int shaders::vector_pass(d3d_render_target *rt, int source_index, poly_info *pol
 {
 	int next_index = source_index;
 
-	float time_params[2] = { 0.0f, 0.0f };
-	float length_params[3] = { poly->get_line_length(), options->vector_length_scale, options->vector_length_ratio };
-
 	curr_effect = vector_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_vector("TimeParams", 2, time_params);
-	curr_effect->set_vector("LengthParams", 3, length_params);
+	// curr_effect->set_float("TimeRatio", options->vector_time_ratio);
+	// curr_effect->set_float("TimeScale", options->vector_time_scale);
+	curr_effect->set_float("LengthRatio", options->vector_length_ratio);
+	curr_effect->set_float("LengthScale", options->vector_length_scale);
 
 	blit(rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());
 
@@ -1665,10 +1663,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		lines_pending = true;
 
-		bool swap_xy = win->swap_xy();
-		int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
-		int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
-
+		int source_width = int(poly->get_prim_width() + 0.5f);
+		int source_height = int(poly->get_prim_height() + 0.5f);
+		if (win->swap_xy())
+		{
+			std::swap(source_width, source_height);
+		}
 		curr_render_target = find_render_target(source_width, source_height, 0, 0);
 
 		d3d_render_target *rt = curr_render_target;
@@ -1692,10 +1692,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_screen = curr_screen < num_screens ? curr_screen : 0;
 
-		bool swap_xy = win->swap_xy();
-		int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
-		int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
-
+		int source_width = int(poly->get_prim_width() + 0.5f);
+		int source_height = int(poly->get_prim_height() + 0.5f);
+		if (win->swap_xy())
+		{
+			std::swap(source_width, source_height);
+		}
 		curr_render_target = find_render_target(source_width, source_height, 0, 0);
 
 		d3d_render_target *rt = curr_render_target;
@@ -1783,10 +1785,9 @@ bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* texture, int so
 		return false;
 	}
 
+	target->screen_index = screen_index;
 	target->next = cachehead;
 	target->prev = nullptr;
-
-	target->screen_index = screen_index;
 
 	if (cachehead != nullptr)
 	{
@@ -1802,34 +1803,33 @@ bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* texture, int so
 //============================================================
 d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_info *texture)
 {
-	if (!vector_enable)
-	{
-		return nullptr;
-	}
-
 	auto win = d3d->assert_window();
 
-	bool swap_xy = win->swap_xy();
-	int target_width = swap_xy
-		? static_cast<int>(prim->get_quad_height() + 0.5f)
-		: static_cast<int>(prim->get_quad_width() + 0.5f);
-	int target_height = swap_xy
-		? static_cast<int>(prim->get_quad_width() + 0.5f)
-		: static_cast<int>(prim->get_quad_height() + 0.5f);
-
+	int target_width = int(prim->get_quad_width() + 0.5f);
+	int target_height = int(prim->get_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
+	if (win->swap_xy())
+	{
+		std::swap(target_width, target_height);
+	}
 
 	// find render target and check if the size of the target quad has changed
 	d3d_render_target *target = find_render_target(texture);
-	if (target != nullptr && target->target_width == target_width && target->target_height == target_height)
+	if (target != nullptr)
 	{
-		return target;
+		if (PRIMFLAG_GET_SCREENTEX(prim->flags))
+		{
+			// check if the size of the screen quad has changed
+			if (target->target_width != target_width || target->target_height != target_height)
+			{
+				osd_printf_verbose("get_texture_target() - invalid size\n");
+				return nullptr;
+			}
+		}
 	}
 
-	osd_printf_verbose("get_texture_target() - invalid size\n");
-
-	return nullptr;
+	return target;
 }
 
 d3d_render_target* shaders::get_vector_target(render_primitive *prim)
@@ -1841,50 +1841,56 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 
 	auto win = d3d->assert_window();
 
-	bool swap_xy = win->swap_xy();
-	int target_width = swap_xy
-		? static_cast<int>(prim->get_quad_height() + 0.5f)
-		: static_cast<int>(prim->get_quad_width() + 0.5f);
-	int target_height = swap_xy
-		? static_cast<int>(prim->get_quad_width() + 0.5f)
-		: static_cast<int>(prim->get_quad_height() + 0.5f);
-	int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
-	int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
-
+	// source and target size are the same for vector targets
+	int source_width = int(prim->get_quad_width() + 0.5f);
+	int source_height = int(prim->get_quad_height() + 0.5f);
+	int target_width = source_width;
+	int target_height = source_height;
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
-
-	// find render target and check of the size of the target quad has changed
-	d3d_render_target *target = find_render_target(source_width, source_height, 0, 0);
-	if (target != nullptr && target->target_width == target_width && target->target_height == target_height)
+	if (win->swap_xy())
 	{
-		return target;
+		std::swap(source_width, source_height);
+		std::swap(target_width, target_height);
 	}
 
-	osd_printf_verbose("get_vector_target() - invalid size\n");
+	// find render target
+	d3d_render_target *target = find_render_target(source_width, source_height, 0, 0);
+	if (target != nullptr)
+	{
+		if (PRIMFLAG_GET_VECTORBUF(prim->flags))
+		{
+			// check if the size of the screen quad has changed
+			if (target->target_width != target_width || target->target_height != target_height)
+			{
+				osd_printf_verbose("get_vector_target() - invalid size\n");
+				return nullptr;
+			}
+		}
+	}
 
-	return nullptr;
+	return target;
 }
 
 void shaders::create_vector_target(render_primitive *prim)
 {
 	auto win = d3d->assert_window();
 
-	bool swap_xy = win->swap_xy();
-	int target_width = swap_xy
-		? static_cast<int>(prim->get_quad_height() + 0.5f)
-		: static_cast<int>(prim->get_quad_width() + 0.5f);
-	int target_height = swap_xy
-		? static_cast<int>(prim->get_quad_width() + 0.5f)
-		: static_cast<int>(prim->get_quad_height() + 0.5f);
-	int source_width = swap_xy ? (float)d3d->get_height() : (float)d3d->get_width();
-	int source_height = swap_xy ? (float)d3d->get_width() : (float)d3d->get_height();
-
+	// source and target size are the same for vector targets
+	int source_width = int(prim->get_quad_width() + 0.5f);
+	int source_height = int(prim->get_quad_height() + 0.5f);
+	int target_width = source_width;
+	int target_height = source_height;
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
+	if (win->swap_xy())
+	{
+		std::swap(source_width, source_height);
+		std::swap(target_width, target_height);
+	}
 
 	osd_printf_verbose("create_vector_target() - %d, %d\n", target_width, target_height);
-	if (!add_render_target(d3d, nullptr, source_width, source_height, target_width, target_height))
+	if (!add_render_target(d3d, prim, nullptr, source_width, source_height, target_width, target_height))
 	{
 		vector_enable = false;
 	}
@@ -1895,7 +1901,7 @@ void shaders::create_vector_target(render_primitive *prim)
 //  shaders::add_render_target - register a render target
 //============================================================
 
-bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height)
+bool shaders::add_render_target(renderer_d3d9* d3d, render_primitive *prim, texture_info* texture, int source_width, int source_height, int target_width, int target_height)
 {
 	UINT32 screen_index = 0;
 	UINT32 page_index = 0;
@@ -1930,24 +1936,6 @@ bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* texture, int s
 
 	target->screen_index = screen_index;
 	target->page_index = page_index;
-
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, target->target_surface[0]);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-
-	cache_target* cache = find_cache_target(target->screen_index, source_width, source_height);
-	if (cache == nullptr)
-	{
-		if (!add_cache_target(d3d, texture, source_width, source_height, target_width, target_height, target->screen_index))
-		{
-			global_free(target);
-			return false;
-		}
-	}
-
 	target->next = targethead;
 	target->prev = nullptr;
 
@@ -1956,6 +1944,20 @@ bool shaders::add_render_target(renderer_d3d9* d3d, texture_info* texture, int s
 		targethead->prev = target;
 	}
 	targethead = target;
+
+	// cached target only for screen texture and vector buffer
+	if (PRIMFLAG_GET_SCREENTEX(prim->flags) || PRIMFLAG_GET_VECTORBUF(prim->flags))
+	{
+		cache_target* cache = find_cache_target(target->screen_index, source_width, source_height);
+		if (cache == nullptr)
+		{
+			if (!add_cache_target(d3d, texture, source_width, source_height, target_width, target_height, target->screen_index))
+			{
+				global_free(target);
+				return false;
+			}
+		}
+	}
 
 	return true;
 }
@@ -1984,19 +1986,20 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 
 	auto win = d3d->assert_window();
 
-	bool swap_xy = win->swap_xy();
-	int target_width = swap_xy
-		? static_cast<int>(prim->get_quad_height() + 0.5f)
-		: static_cast<int>(prim->get_quad_width() + 0.5f);
-	int target_height = swap_xy
-		? static_cast<int>(prim->get_quad_width() + 0.5f)
-		: static_cast<int>(prim->get_quad_height() + 0.5f);
-
+	int source_width = texture->get_width();
+	int source_height = texture->get_height();
+	int target_width = int(prim->get_quad_width() + 0.5f);
+	int target_height = int(prim->get_quad_height() + 0.5f);
 	target_width *= oversampling_enable ? 2 : 1;
 	target_height *= oversampling_enable ? 2 : 1;
+	if (win->swap_xy())
+	{
+		// source texture is already swapped
+		std::swap(target_width, target_height);
+	}
 
 	osd_printf_verbose("register_texture() - %d, %d\n", target_width, target_height);
-	if (!add_render_target(d3d, texture, texture->get_width(), texture->get_height(), target_width, target_height))
+	if (!add_render_target(d3d, prim, texture, source_width, source_height, target_width, target_height))
 	{
 		return false;
 	}
@@ -2181,7 +2184,7 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //  be done in a more ideal way.
 //============================================================
 
-static slider_state *slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
+slider_state* shaders::slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, void *arg)
 {
 	int size = sizeof(slider_state) + strlen(title);
 	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(machine, UINT8, size));
@@ -2190,7 +2193,10 @@ static slider_state *slider_alloc(running_machine &machine, int id, const char *
 	state->defval = defval;
 	state->maxval = maxval;
 	state->incval = incval;
-	state->update = update;
+
+	using namespace std::placeholders;
+	state->update = std::bind(&shaders::slider_changed, this, _1, _2, _3, _4, _5);
+
 	state->arg = arg;
 	state->id = id;
 	strcpy(state->description, title);
@@ -2264,7 +2270,7 @@ INT32 slider::update(std::string *str, INT32 newval)
 	return 0;
 }
 
-static INT32 slider_update_trampoline(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+INT32 shaders::slider_changed(running_machine& /*machine*/, void *arg, int /*id*/, std::string *str, INT32 newval)
 {
 	if (arg != nullptr)
 	{
@@ -2279,8 +2285,8 @@ hlsl_options shaders::last_options = { false };
 
 enum slider_option
 {
-	SLIDER_VECTOR_ATTENUATION = 0,
-	SLIDER_VECTOR_LENGTH_MAX,
+	SLIDER_VECTOR_ATT_MAX = 0,
+	SLIDER_VECTOR_ATT_LEN_MIN,
 	SLIDER_SHADOW_MASK_TILE_MODE,
 	SLIDER_SHADOW_MASK_ALPHA,
 	SLIDER_SHADOW_MASK_X_COUNT,
@@ -2356,45 +2362,45 @@ enum slider_screen_type
 
 slider_desc shaders::s_sliders[] =
 {
-	{ "Vector Length Attenuation",          0,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATTENUATION,      0.01f,    "%1.2f", {} },
-	{ "Vector Attenuation Length Limit",    1,   500,  1000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_LENGTH_MAX,       1.0f,     "%4f",   {} },
+	{ "Vector Attenuation Maximum",         0,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATT_MAX,          0.01f,    "%1.2f", {} },
+	{ "Vector Attenuation Length Minimum",  1,   500,  1000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATT_LEN_MIN,      0.001f,   "%1.3f", {} },
 	{ "Shadow Mask Tile Mode",              0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_TILE_MODE,   0,        "%s",    { "Screen", "Source" } },
-	{ "Shadow Mask Darkness",               0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_ALPHA,       0.01f,    "%1.2f", {} },
-	{ "Shadow Mask X Count",                1,     1,  1024, 1, SLIDER_INT,      SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_X_COUNT,     0,        "%d",    {} },
-	{ "Shadow Mask Y Count",                1,     1,  1024, 1, SLIDER_INT,      SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_Y_COUNT,     0,        "%d",    {} },
-	{ "Shadow Mask Pixel Count X",          1,     1,    64, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_U_SIZE,      0.03125f, "%2.5f", {} },
-	{ "Shadow Mask Pixel Count Y",          1,     1,    64, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_V_SIZE,      0.03125f, "%2.5f", {} },
-	{ "Shadow Mask Offset X",            -100,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_U_OFFSET,    0.01f,    "%1.2f", {} },
-	{ "Shadow Mask Offset Y",            -100,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_V_OFFSET,    0.01f,    "%1.2f", {} },
-	{ "Screen Distortion",               -100,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_DISTORTION,              0.01f,    "%2.2f", {} },
-	{ "Screen Distortion (Cubic)",       -100,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_CUBIC_DISTORTION,        0.01f,    "%2.2f", {} },
-	{ "Screen Distort Corner",              0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_DISTORT_CORNER,          0.01f,    "%1.2f", {} },
-	{ "Screen Round Corner",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_ROUND_CORNER,            0.01f,    "%1.2f", {} },
-	{ "Screen Smooth Border",               0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SMOOTH_BORDER,           0.01f,    "%1.2f", {} },
-	{ "Screen Reflection",                  0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_REFLECTION,              0.01f,    "%1.2f", {} },
-	{ "Image Vignetting",                   0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_VIGNETTING,              0.01f,    "%1.2f", {} },
-	{ "Scanline Darkness",                  0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_ALPHA,          0.01f,    "%1.2f", {} },
-	{ "Scanline Screen Scale",              0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_SCALE,          0.01f,    "%1.2f", {} },
-	{ "Scanline Height",                    0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_HEIGHT,         0.01f,    "%1.2f", {} },
-	{ "Scanline Height Variation",          0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_VARIATION,      0.01f,    "%1.2f", {} },
-	{ "Scanline Brightness",                0,   100,   200, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_BRIGHT_SCALE,   0.01f,    "%1.2f", {} },
-	{ "Scanline Brightness Overdrive",      0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_BRIGHT_OFFSET,  0.01f,    "%1.2f", {} },
-	{ "Scanline Jitter",                    0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_JITTER,         0.01f,    "%1.2f", {} },
-	{ "Hum Bar Darkness",                   0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_HUM_BAR_ALPHA,           0.01f,    "%2.2f", {} },
+	{ "Shadow Mask Amount",                 0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_ALPHA,       0.01f,    "%1.2f", {} },
+	{ "Shadow Mask Pixel X Count",          1,     1,  1024, 1, SLIDER_INT,      SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_X_COUNT,     0,        "%d",    {} },
+	{ "Shadow Mask Pixel Y Count",          1,     1,  1024, 1, SLIDER_INT,      SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_Y_COUNT,     0,        "%d",    {} },
+	{ "Shadow Mask U Size",                 1,     1,    32, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_U_SIZE,      0.03125f, "%2.5f", {} },
+	{ "Shadow Mask V Size",                 1,     1,    32, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_V_SIZE,      0.03125f, "%2.5f", {} },
+	{ "Shadow Mask U Offset",            -100,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_U_OFFSET,    0.01f,    "%1.2f", {} },
+	{ "Shadow Mask V Offset",            -100,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SHADOW_MASK_V_OFFSET,    0.01f,    "%1.2f", {} },
+	{ "Quadric Distortion Amount",       -200,     0,   200, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_DISTORTION,              0.01f,    "%2.2f", {} },
+	{ "Cubic Distortion Amount",         -200,     0,   200, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_CUBIC_DISTORTION,        0.01f,    "%2.2f", {} },
+	{ "Distorted Corner Amount",            0,     0,   200, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_DISTORT_CORNER,          0.01f,    "%1.2f", {} },
+	{ "Rounded Corner Amount",              0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_ROUND_CORNER,            0.01f,    "%1.2f", {} },
+	{ "Smooth Border Amount",               0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SMOOTH_BORDER,           0.01f,    "%1.2f", {} },
+	{ "Reflection Amount",                  0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_REFLECTION,              0.01f,    "%1.2f", {} },
+	{ "Vignetting Amount",                  0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_VIGNETTING,              0.01f,    "%1.2f", {} },
+	{ "Scanline Amount",                    0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_ALPHA,          0.01f,    "%1.2f", {} },
+	{ "Overall Scanline Scale",             0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_SCALE,          0.01f,    "%1.2f", {} },
+	{ "Individual Scanline Scale",          0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_HEIGHT,         0.01f,    "%1.2f", {} },
+	{ "Scanline Variation",                 0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_VARIATION,      0.01f,    "%1.2f", {} },
+	{ "Scanline Brightness Scale",          0,   100,   200, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_BRIGHT_SCALE,   0.01f,    "%1.2f", {} },
+	{ "Scanline Brightness Offset",         0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_BRIGHT_OFFSET,  0.01f,    "%1.2f", {} },
+	{ "Scanline Jitter Amount",             0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_SCANLINE_JITTER,         0.01f,    "%1.2f", {} },
+	{ "Hum Bar Amount",                     0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_HUM_BAR_ALPHA,           0.01f,    "%2.2f", {} },
 	{ "Defocus",                            0,     0,   100, 1, SLIDER_VEC2,     SLIDER_SCREEN_TYPE_ANY,           SLIDER_DEFOCUS,                 0.1f,     "%2.1f", {} },
-	{ "Position Offset X,",              -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_CONVERGE_X,              0.1f,     "%3.1f", {} },
-	{ "Position Offset Y,",              -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_CONVERGE_Y,              0.1f,     "%3.1f", {} },
-	{ "Convergence X,",                  -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_RADIAL_CONVERGE_X,       0.1f,     "%3.1f", {} },
-	{ "Convergence Y,",                  -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_RADIAL_CONVERGE_Y,       0.1f,     "%3.1f", {} },
-	{ "Red Input Percent in",            -400,     0,   400, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_RED_RATIO,               0.005f,   "%2.3f", {} },
-	{ "Green Input Percent in",          -400,     0,   400, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_GREEN_RATIO,             0.005f,   "%2.3f", {} },
-	{ "Blue Input Percent in",           -400,     0,   400, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLUE_RATIO,              0.005f,   "%2.3f", {} },
-	{ "Saturation",                         0,   100,   400, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SATURATION,              0.1f,     "%2.2f", {} },
-	{ "DC Offset,",                      -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_OFFSET,                  0.01f,    "%2.2f", {} },
-	{ "Scale,",                          -200,   100,   200, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SCALE,                   0.01f,    "%2.2f", {} },
-	{ "Gamma,",                           -80,     0,    80, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_POWER,                   0.1f,     "%2.2f", {} },
-	{ "Floor,",                             0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_FLOOR,                   0.01f,    "%2.2f", {} },
-	{ "Phosphor Life,",                     0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_PHOSPHOR,                0.01f,    "%2.2f", {} },
+	{ "Linear Convergence X,",           -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_CONVERGE_X,              0.1f,     "%3.1f",{} },
+	{ "Linear Convergence Y,",           -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_CONVERGE_Y,              0.1f,     "%3.1f", {} },
+	{ "Radial Convergence X,",           -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_RADIAL_CONVERGE_X,       0.1f,     "%3.1f", {} },
+	{ "Radial Convergence Y,",           -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_RADIAL_CONVERGE_Y,       0.1f,     "%3.1f", {} },
+	{ "Red Output from",                 -400,     0,   400, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_RED_RATIO,               0.005f,   "%2.3f", {} },
+	{ "Green Output from",               -400,     0,   400, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_GREEN_RATIO,             0.005f,   "%2.3f", {} },
+	{ "Blue Output from",                -400,     0,   400, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLUE_RATIO,              0.005f,   "%2.3f", {} },
+	{ "Color Saturation",                   0,  1000,  4000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SATURATION,              0.01f,    "%2.2f", {} },
+	{ "Signal Offset,",                  -100,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_OFFSET,                  0.01f,    "%2.2f", {} },
+	{ "Signal Scale,",                   -200,   100,   200, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SCALE,                   0.01f,    "%2.2f", {} },
+	{ "Signal Exponent,",                -800,     0,   800, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_POWER,                   0.01f,    "%2.2f", {} },
+	{ "Signal Floor,",                      0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_FLOOR,                   0.01f,    "%2.2f", {} },
+	{ "Phosphor Persistence,",              0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_PHOSPHOR,                0.01f,    "%2.2f", {} },
 	{ "Bloom Blend Mode",                   0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_BLEND_MODE,        0,        "%s",    { "Brighten", "Darken" } },
 	{ "Bloom Scale",                        0,     0,  2000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_SCALE,             0.001f,   "%1.3f", {} },
 	{ "Bloom Overdrive,",                   0,     0,  2000, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_OVERDRIVE,         0.001f,   "%1.3f", {} },
@@ -2407,18 +2413,18 @@ slider_desc shaders::s_sliders[] =
 	{ "Bloom Level 6 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL6_SCALE,        0.01f,    "%1.2f", {} },
 	{ "Bloom Level 7 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL7_SCALE,        0.01f,    "%1.2f", {} },
 	{ "Bloom Level 8 Scale",                0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_LVL8_SCALE,        0.01f,    "%1.2f", {} },
-	{ "NTSC processing",                    0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_ENABLE,             0,        "%s",    { "Off", "On" } },
-	{ "Signal Jitter",                      0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_JITTER,             0.01f,    "%1.2f", {} },
-	{ "A Value",                         -100,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_A_VALUE,            0.01f,    "%1.2f", {} },
-	{ "B Value",                         -100,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_B_VALUE,            0.01f,    "%1.2f", {} },
-	{ "Incoming Pixel Clock Scaling",    -300,   100,   300, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_P_VALUE,            0.01f,    "%1.2f", {} },
-	{ "Outgoing Color Carrier Phase",    -300,     0,   300, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_O_VALUE,            0.01f,    "%1.2f", {} },
-	{ "Color Carrier Frequency",            0, 35795, 60000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_CC_VALUE,           0.001f,   "%1.4f", {} },
-	{ "Y Notch",                            0,   100,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_N_VALUE,            0.01f,    "%1.4f", {} },
-	{ "Y Frequency",                        0,   600,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_Y_VALUE,            0.01f,    "%1.4f", {} },
-	{ "I Frequency",                        0,   120,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_I_VALUE,            0.01f,    "%1.4f", {} },
-	{ "Q Frequency",                        0,    60,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_Q_VALUE,            0.01f,    "%1.4f", {} },
-	{ "Scanline Duration",                  0,  5260, 10000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_SCAN_TIME,          0.01f,    "%1.2f", {} },
+	{ "NTSC Processing",                    0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_ENABLE,             0,        "%s",    { "Off", "On" } },
+	{ "NTSC Frame Jitter Offset",           0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_JITTER,             0.01f,    "%1.2f", {} },
+	{ "NTSC A Value",                    -100,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_A_VALUE,            0.01f,    "%1.2f", {} },
+	{ "NTSC B Value",                    -100,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_B_VALUE,            0.01f,    "%1.2f", {} },
+	{ "NTSC Incoming Phase Pixel Clock Scale",-300,   100,   300, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_P_VALUE,            0.01f,    "%1.2f", {} },
+	{ "NTSC Outgoing Phase Offset",      -300,     0,   300, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_O_VALUE,            0.01f,    "%1.2f", {} },
+	{ "NTSC Color Carrier (Hz)",            0, 35795, 60000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_CC_VALUE,           0.001f,   "%1.4f", {} },
+	{ "NTSC Color Notch Filter Width",      0,   100,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_N_VALUE,            0.01f,    "%1.4f", {} },
+	{ "NTSC Y Signal Bandwidth (Hz)",       0,   600,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_Y_VALUE,            0.01f,    "%1.4f", {} },
+	{ "NTSC I Signal Bandwidth (Hz)",       0,   120,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_I_VALUE,            0.01f,    "%1.4f", {} },
+	{ "NTSC Q Signal Bandwidth (Hz)",       0,    60,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_Q_VALUE,            0.01f,    "%1.4f", {} },
+	{ "NTSC Scanline Duration (uSec)",      0,  5260, 10000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_SCAN_TIME,          0.01f,    "%1.2f", {} },
 	{ nullptr, 0, 0, 0, 0, 0, 0, -1, 0, nullptr, {} }
 };
 
@@ -2427,8 +2433,8 @@ void *shaders::get_slider_option(int id, int index)
 {
 	switch (id)
 	{
-		case SLIDER_VECTOR_ATTENUATION: return &(options->vector_length_scale);
-		case SLIDER_VECTOR_LENGTH_MAX: return &(options->vector_length_ratio);
+		case SLIDER_VECTOR_ATT_MAX: return &(options->vector_length_scale);
+		case SLIDER_VECTOR_ATT_LEN_MIN: return &(options->vector_length_ratio);
 		case SLIDER_SHADOW_MASK_TILE_MODE: return &(options->shadow_mask_tile_mode);
 		case SLIDER_SHADOW_MASK_ALPHA: return &(options->shadow_mask_alpha);
 		case SLIDER_SHADOW_MASK_X_COUNT: return &(options->shadow_mask_count_x);
@@ -2494,9 +2500,9 @@ void *shaders::get_slider_option(int id, int index)
 	return nullptr;
 }
 
-std::vector<ui_menu_item> shaders::init_slider_list()
+std::vector<ui::menu_item> shaders::init_slider_list()
 {
-	std::vector<ui_menu_item> sliders;
+	std::vector<ui::menu_item> sliders;
 
 	for (slider* slider : internal_sliders)
 	{
@@ -2504,11 +2510,16 @@ std::vector<ui_menu_item> shaders::init_slider_list()
 	}
 	internal_sliders.clear();
 
+	auto first_screen = machine->first_screen();
+	if (first_screen == nullptr)
+	{
+		return sliders;
+	}
+	int screen_type = first_screen->screen_type();
+
 	for (int i = 0; s_sliders[i].name != nullptr; i++)
 	{
 		slider_desc *desc = &s_sliders[i];
-
-		int screen_type = machine->first_screen()->screen_type();
 		if ((screen_type == SCREEN_TYPE_VECTOR && (desc->screen_type & SLIDER_SCREEN_TYPE_VECTOR) == SLIDER_SCREEN_TYPE_VECTOR) ||
 			(screen_type == SCREEN_TYPE_RASTER && (desc->screen_type & SLIDER_SCREEN_TYPE_RASTER) == SLIDER_SCREEN_TYPE_RASTER) ||
 			(screen_type == SCREEN_TYPE_LCD    && (desc->screen_type & SLIDER_SCREEN_TYPE_LCD)    == SLIDER_SCREEN_TYPE_LCD))
@@ -2550,14 +2561,14 @@ std::vector<ui_menu_item> shaders::init_slider_list()
 						break;
 				}
 
-				slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_update_trampoline, slider_arg);
+				slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
 
-				ui_menu_item item;
+				ui::menu_item item;
 				item.text = core_slider->description;
 				item.subtext = "";
 				item.flags = 0;
 				item.ref = core_slider;
-				item.type = ui_menu_item_type::SLIDER;
+				item.type = ui::menu_item_type::SLIDER;
 				sliders.push_back(item);
 			}
 		}
@@ -2625,6 +2636,11 @@ void uniform::update()
 	renderer_d3d9 *d3d = shadersys->d3d;
 
 	auto win = d3d->assert_window();
+	auto first_screen = win->machine().first_screen();
+
+	bool vector_screen =
+		first_screen != nullptr &&
+		first_screen->screen_type() == SCREEN_TYPE_VECTOR;
 
 	switch (m_id)
 	{
@@ -2636,8 +2652,6 @@ void uniform::update()
 		}
 		case CU_SOURCE_DIMS:
 		{
-			bool vector_screen =
-				win->machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 			if (vector_screen)
 			{
 				if (shadersys->curr_render_target)
@@ -2690,8 +2704,6 @@ void uniform::update()
 		}
 		case CU_VECTOR_SCREEN:
 		{
-			bool vector_screen =
-				win->machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 			m_shader->set_bool("VectorScreen", vector_screen);
 			break;
 		}

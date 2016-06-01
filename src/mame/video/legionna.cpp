@@ -106,6 +106,12 @@ WRITE16_MEMBER(legionna_state::videowrite_cb_w)
 	}
 }
 
+WRITE16_MEMBER(legionna_state::grainbow_layer_config_w)
+{
+	// (0x8000|0x1ff), 0x200, 0x1ff, 0x200 written in sequence at startup
+	COMBINE_DATA(&m_layer_config[offset]);
+}
+
 WRITE16_MEMBER(legionna_state::legionna_background_w)
 {
 	COMBINE_DATA(&m_back_data[offset]);
@@ -291,6 +297,8 @@ VIDEO_START_MEMBER(legionna_state,grainbow)
 
 	m_has_extended_banking = 0;
 	m_has_extended_priority = 1;
+
+	m_layer_config = std::make_unique<UINT16[]>(0x8/2);
 }
 
 VIDEO_START_MEMBER(legionna_state,godzilla)
@@ -299,7 +307,6 @@ VIDEO_START_MEMBER(legionna_state,godzilla)
 
 	m_has_extended_banking = 1;
 	m_has_extended_priority = 0;
-
 }
 
 /*************************************************************************

@@ -52,6 +52,7 @@ public:
 			m_adpcm_sound(*this, "adpcm"),
 			m_generic_paletteram_16(*this, "paletteram"),
 			m_gfx_rom(*this, "gfx_rom", 16),
+			m_mainram(*this, "mainram"),
 			m_ports(*this, ports) { }
 
 	required_device<cpu_device> m_maincpu;
@@ -64,7 +65,7 @@ public:
 
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	optional_shared_ptr<UINT8> m_gfx_rom;
-
+	required_shared_ptr<UINT16> m_mainram;
 	optional_ioport_array<6> m_ports;
 
 	DECLARE_IOPORT_ARRAY(ports);

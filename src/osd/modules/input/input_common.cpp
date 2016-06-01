@@ -33,7 +33,7 @@
 #define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, ascii)     { ITEM_ID_##mame, KEY_ ## disc, virtual, ascii, "ITEM_ID_"#mame, (char*) #mame }
 #elif defined(OSD_SDL)
 // SDL include
-#include <sdlinc.h>
+#include <SDL2/SDL.h>
 #define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, ascii, UI) { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, SDLK_ ## sdlkey, ascii, "ITEM_ID_"#mame, (char *) UI }
 #define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, ascii)     { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, SDLK_ ## sdlkey, ascii, "ITEM_ID_"#mame, (char*) #mame }
 #else

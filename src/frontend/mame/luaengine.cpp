@@ -52,7 +52,6 @@ const char *const lua_engine::tname_ioport = "lua.ioport";
 lua_engine* lua_engine::luaThis = nullptr;
 
 extern "C" {
-	int luaopen_lsqlite3(lua_State *L);
 	int luaopen_zlib(lua_State *L);
 	int luaopen_lfs(lua_State *L);
 }
@@ -664,7 +663,8 @@ luabridge::LuaRef lua_engine::l_ioports_port_get_fields(const ioport_port *i)
 	luabridge::LuaRef f_table = luabridge::LuaRef::newTable(L);
 
 	for (ioport_field &field : p->fields()) {
-		f_table[field.name()] = &field;
+		if (field.type_class() != INPUT_CLASS_INTERNAL)
+			f_table[field.name()] = &field;
 	}
 
 	return f_table;
@@ -1710,9 +1710,6 @@ lua_engine::lua_engine()
 	lua_pushcfunction(m_lua_state, luaopen_zlib);
 	lua_setfield(m_lua_state, -2, "zlib");
 
-	lua_pushcfunction(m_lua_state, luaopen_lsqlite3);
-	lua_setfield(m_lua_state, -2, "lsqlite3");
-
 	lua_pushcfunction(m_lua_state, luaopen_lfs);
 	lua_setfield(m_lua_state, -2, "lfs");
 
@@ -1984,7 +1981,7 @@ void lua_engine::update_machine()
 		{
 			for (ioport_field &field : port.fields())
 			{
-				if (field.name())
+				if (field.type_class() != INPUT_CLASS_INTERNAL)
 				{
 					push(m_lua_state, &field, tname_ioport);
 					lua_setfield(m_lua_state, -2, field.name());
@@ -2213,9 +2210,9 @@ void lua_engine::initialize()
 				.addProperty ("sensitivity", &ioport_field::sensitivity)
 				.addProperty ("way", &ioport_field::way)
 				.addProperty ("is_analog", &ioport_field::is_analog)
-				.addProperty ("is_digitial_joystick", &ioport_field::is_digital_joystick)
+				.addProperty ("is_digital_joystick", &ioport_field::is_digital_joystick)
 				.addProperty ("enabled", &ioport_field::enabled)
-				.addProperty ("unused", &ioport_field::unused)
+				.addProperty ("optional", &ioport_field::optional)
 				.addProperty ("cocktail", &ioport_field::cocktail)
 				.addProperty ("toggle", &ioport_field::toggle)
 				.addProperty ("rotated", &ioport_field::rotated)
@@ -2224,6 +2221,7 @@ void lua_engine::initialize()
 				.addProperty ("analog_wraps", &ioport_field::analog_wraps)
 				.addProperty ("analog_invert", &ioport_field::analog_invert)
 				.addProperty ("impulse", &ioport_field::impulse)
+				.addProperty ("type", &ioport_field::type)
 				.addProperty <double, double> ("crosshair_scale", &ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale)
 				.addProperty <double, double> ("crosshair_offset", &ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset)
 			.endClass()

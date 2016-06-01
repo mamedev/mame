@@ -313,10 +313,10 @@ void emulator_info::display_ui_chooser(running_machine& machine)
 	// force the UI to show the game select screen
 	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 	render_container *container = &machine.render().ui_container();
-	if (strcmp(machine.options().ui(), "simple") == 0)
-		ui_simple_menu_select_game::force_game_select(mui, container);
+	if (machine.options().ui() == emu_options::UI_SIMPLE)
+		ui::simple_menu_select_game::force_game_select(mui, container);
 	else
-		ui_menu_select_game::force_game_select(mui, container);
+		ui::menu_select_game::force_game_select(mui, container);
 }
 
 int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[])
@@ -350,3 +350,5 @@ void emulator_info::layout_file_cb(xml_data_node &layout)
 			mame_machine_manager::instance()->lua()->call_plugin(script->value, "layout");
 	}
 }
+
+bool emulator_info::standalone() { return false; }

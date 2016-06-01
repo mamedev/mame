@@ -9,22 +9,24 @@
 *********************************************************************/
 
 #include "emu.h"
+
+#include "ui/videoopt.h"
+
 #include "rendutil.h"
 
-#include "ui/menu.h"
-#include "ui/videoopt.h"
+namespace ui {
 
 /*-------------------------------------------------
     menu_video_targets - handle the video targets
     menu
 -------------------------------------------------*/
 
-void ui_menu_video_targets::handle()
+void menu_video_targets::handle()
 {
 	/* process the menu */
-	const ui_menu_event *menu_event = process(0);
+	const event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		ui_menu::stack_push(global_alloc_clear<ui_menu_video_options>(ui(), container, static_cast<render_target *>(menu_event->itemref)));
+		menu::stack_push<menu_video_options>(ui(), container, static_cast<render_target *>(menu_event->itemref));
 }
 
 
@@ -33,11 +35,11 @@ void ui_menu_video_targets::handle()
     video targets menu
 -------------------------------------------------*/
 
-ui_menu_video_targets::ui_menu_video_targets(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
+menu_video_targets::menu_video_targets(mame_ui_manager &mui, render_container *container) : menu(mui, container)
 {
 }
 
-void ui_menu_video_targets::populate()
+void menu_video_targets::populate()
 {
 	int targetnum;
 
@@ -57,7 +59,7 @@ void ui_menu_video_targets::populate()
 	}
 }
 
-ui_menu_video_targets::~ui_menu_video_targets()
+menu_video_targets::~menu_video_targets()
 {
 }
 
@@ -66,12 +68,12 @@ ui_menu_video_targets::~ui_menu_video_targets()
     menu
 -------------------------------------------------*/
 
-void ui_menu_video_options::handle()
+void menu_video_options::handle()
 {
 	bool changed = false;
 
 	/* process the menu */
-	const ui_menu_event *menu_event = process(0);
+	const event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		switch ((FPTR)menu_event->itemref)
@@ -155,7 +157,7 @@ void ui_menu_video_options::handle()
 
 	/* if something changed, rebuild the menu */
 	if (changed)
-		reset(UI_MENU_RESET_REMEMBER_REF);
+		reset(reset_options::REMEMBER_REF);
 }
 
 
@@ -164,12 +166,12 @@ void ui_menu_video_options::handle()
     video options menu
 -------------------------------------------------*/
 
-ui_menu_video_options::ui_menu_video_options(mame_ui_manager &mui, render_container *container, render_target *_target) : ui_menu(mui, container)
+menu_video_options::menu_video_options(mame_ui_manager &mui, render_container *container, render_target *_target) : menu(mui, container)
 {
 	target = _target;
 }
 
-void ui_menu_video_options::populate()
+void menu_video_options::populate()
 {
 	const char *subtext = "";
 	std::string tempstring;
@@ -190,7 +192,7 @@ void ui_menu_video_options::populate()
 	}
 
 	/* add a separator */
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 
 	/* add a rotate item */
 	switch (target->orientation())
@@ -200,33 +202,35 @@ void ui_menu_video_options::populate()
 		case ROT180:    subtext = "180" UTF8_DEGREES;       break;
 		case ROT270:    subtext = "CCW 90" UTF8_DEGREES;    break;
 	}
-	item_append(_("Rotate"), subtext, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_ROTATE);
+	item_append(_("Rotate"), subtext, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_ROTATE);
 
 	/* backdrop item */
 	enabled = target->backdrops_enabled();
-	item_append(_("Backdrops"), enabled ? _("Enabled") : _("Disabled"), enabled ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_BACKDROPS);
+	item_append(_("Backdrops"), enabled ? _("Enabled") : _("Disabled"), enabled ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_BACKDROPS);
 
 	/* overlay item */
 	enabled = target->overlays_enabled();
-	item_append(_("Overlays"), enabled ? _("Enabled") : _("Disabled"), enabled ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_OVERLAYS);
+	item_append(_("Overlays"), enabled ? _("Enabled") : _("Disabled"), enabled ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_OVERLAYS);
 
 	/* bezel item */
 	enabled = target->bezels_enabled();
-	item_append(_("Bezels"), enabled ? _("Enabled") : _("Disabled"), enabled ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_BEZELS);
+	item_append(_("Bezels"), enabled ? _("Enabled") : _("Disabled"), enabled ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_BEZELS);
 
 	/* cpanel item */
 	enabled = target->cpanels_enabled();
-	item_append(_("CPanels"), enabled ? _("Enabled") : _("Disabled"), enabled ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_CPANELS);
+	item_append(_("CPanels"), enabled ? _("Enabled") : _("Disabled"), enabled ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_CPANELS);
 
 	/* marquee item */
 	enabled = target->marquees_enabled();
-	item_append(_("Marquees"), enabled ? _("Enabled") : _("Disabled"), enabled ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_MARQUEES);
+	item_append(_("Marquees"), enabled ? _("Enabled") : _("Disabled"), enabled ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_MARQUEES);
 
 	/* cropping */
 	enabled = target->zoom_to_screen();
-	item_append(_("View"), enabled ? _("Cropped") : _("Full"), enabled ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)VIDEO_ITEM_ZOOM);
+	item_append(_("View"), enabled ? _("Cropped") : _("Full"), enabled ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)VIDEO_ITEM_ZOOM);
 }
 
-ui_menu_video_options::~ui_menu_video_options()
+menu_video_options::~menu_video_options()
 {
 }
+
+} // namespace ui

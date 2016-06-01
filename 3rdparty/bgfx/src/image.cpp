@@ -1420,7 +1420,7 @@ namespace bgfx
 		UnpackFn unpack;
 	};
 
-	static PackUnpack s_packUnpack[] =
+	static const PackUnpack s_packUnpack[] =
 	{
 		{ NULL,           NULL             }, // BC1
 		{ NULL,           NULL             }, // BC2
@@ -2112,7 +2112,7 @@ namespace bgfx
 
 		{ 8, 0, 8, 0 },
 		{ 4, 4, 4, 4 },
-		{ 4, 4, 0, 0 },
+		{ 4, 4, 4, 4 },
 		{ 0, 8, 0, 8 },
 	};
 
@@ -2247,7 +2247,7 @@ namespace bgfx
 			*_r += bitRangeConvert( (_block >> 10) & 0x1f, 5, 8) * _factor;
 			*_g += bitRangeConvert( (_block >>  5) & 0x1f, 5, 8) * _factor;
 			*_b += bitRangeConvert( (_block >>  1) & 0x0f, 4, 8) * _factor;
-			*_a += 255;
+			*_a += 255 * _factor;
 		}
 		else
 		{
@@ -2265,7 +2265,7 @@ namespace bgfx
 			*_r += bitRangeConvert( (_block >> 26) & 0x1f, 5, 8) * _factor;
 			*_g += bitRangeConvert( (_block >> 21) & 0x1f, 5, 8) * _factor;
 			*_b += bitRangeConvert( (_block >> 16) & 0x1f, 5, 8) * _factor;
-			*_a += 255;
+			*_a += 255 * _factor;
 		}
 		else
 		{
@@ -2498,7 +2498,7 @@ namespace bgfx
 		bool m_srgb;
 	};
 
-	static TranslateDdsFormat s_translateDdsFourccFormat[] =
+	static const TranslateDdsFormat s_translateDdsFourccFormat[] =
 	{
 		{ DDS_DXT1,                  TextureFormat::BC1,     false },
 		{ DDS_DXT2,                  TextureFormat::BC2,     false },
@@ -2531,7 +2531,7 @@ namespace bgfx
 		{ DDS_A2B10G10R10,           TextureFormat::RGB10A2, false },
 	};
 
-	static TranslateDdsFormat s_translateDxgiFormat[] =
+	static const TranslateDdsFormat s_translateDxgiFormat[] =
 	{
 		{ DDS_FORMAT_BC1_UNORM,           TextureFormat::BC1,        false },
 		{ DDS_FORMAT_BC1_UNORM_SRGB,      TextureFormat::BC1,        true  },
@@ -2578,13 +2578,14 @@ namespace bgfx
 		TextureFormat::Enum m_textureFormat;
 	};
 
-	static TranslateDdsPixelFormat s_translateDdsPixelFormat[] =
+	static const TranslateDdsPixelFormat s_translateDdsPixelFormat[] =
 	{
 		{  8, { 0x000000ff, 0x00000000, 0x00000000, 0x00000000 }, TextureFormat::R8      },
 		{ 16, { 0x0000ffff, 0x00000000, 0x00000000, 0x00000000 }, TextureFormat::R16U    },
 		{ 16, { 0x00000f00, 0x000000f0, 0x0000000f, 0x0000f000 }, TextureFormat::RGBA4   },
 		{ 16, { 0x0000f800, 0x000007e0, 0x0000001f, 0x00000000 }, TextureFormat::R5G6B5  },
 		{ 16, { 0x00007c00, 0x000003e0, 0x0000001f, 0x00008000 }, TextureFormat::RGB5A1  },
+		{ 24, { 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000 }, TextureFormat::RGB8    },
 		{ 32, { 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000 }, TextureFormat::BGRA8   },
 		{ 32, { 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000 }, TextureFormat::BGRA8   },
 		{ 32, { 0x000003ff, 0x000ffc00, 0x3ff00000, 0xc0000000 }, TextureFormat::RGB10A2 },
@@ -2871,7 +2872,7 @@ namespace bgfx
 		uint32_t m_type;
 	};
 
-	static KtxFormatInfo s_translateKtxFormat[] =
+	static const KtxFormatInfo s_translateKtxFormat[] =
 	{
 		{ KTX_COMPRESSED_RGBA_S3TC_DXT1_EXT,            KTX_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT,        KTX_COMPRESSED_RGBA_S3TC_DXT1_EXT,            KTX_ZERO,                         }, // BC1
 		{ KTX_COMPRESSED_RGBA_S3TC_DXT3_EXT,            KTX_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT,        KTX_COMPRESSED_RGBA_S3TC_DXT3_EXT,            KTX_ZERO,                         }, // BC2
@@ -2943,6 +2944,18 @@ namespace bgfx
 	};
 	BX_STATIC_ASSERT(TextureFormat::UnknownDepth == BX_COUNTOF(s_translateKtxFormat) );
 
+	struct KtxFormatInfo2
+	{
+		uint32_t m_internalFmt;
+		TextureFormat::Enum m_format;
+	};
+
+	static const KtxFormatInfo2 s_translateKtxFormat2[] =
+	{
+		{ KTX_RED, TextureFormat::R8   },
+		{ KTX_RGB, TextureFormat::RGB8 },
+	};
+
 	bool imageParseKtx(ImageContainer& _imageContainer, bx::ReaderSeekerI* _reader)
 	{
 		uint8_t identifier[8];
@@ -3010,6 +3023,18 @@ namespace bgfx
 			}
 		}
 
+		if (TextureFormat::Unknown == format)
+		{
+			for (uint32_t ii = 0; ii < BX_COUNTOF(s_translateKtxFormat2); ++ii)
+			{
+				if (s_translateKtxFormat2[ii].m_internalFmt == glInternalFormat)
+				{
+					format = s_translateKtxFormat2[ii].m_format;
+					break;
+				}
+			}
+		}
+
 		_imageContainer.m_data     = NULL;
 		_imageContainer.m_size     = 0;
 		_imageContainer.m_offset   = (uint32_t)offset;
@@ -3017,7 +3042,7 @@ namespace bgfx
 		_imageContainer.m_height   = height;
 		_imageContainer.m_depth    = depth;
 		_imageContainer.m_format   = format;
-		_imageContainer.m_numMips  = uint8_t(numMips);
+		_imageContainer.m_numMips  = uint8_t(bx::uint32_max(numMips, 1) );
 		_imageContainer.m_hasAlpha = hasAlpha;
 		_imageContainer.m_cubeMap  = numFaces > 1;
 		_imageContainer.m_ktx      = true;
@@ -3064,13 +3089,14 @@ namespace bgfx
 #define PVR3_CHANNEL_TYPE_ANY   UINT32_MAX
 #define PVR3_CHANNEL_TYPE_FLOAT UINT32_C(12)
 
-	static struct TranslatePvr3Format
+	struct TranslatePvr3Format
 	{
 		uint64_t m_format;
 		uint32_t m_channelTypeMask;
 		TextureFormat::Enum m_textureFormat;
+	};
 
-	} s_translatePvr3Format[] =
+	static const TranslatePvr3Format s_translatePvr3Format[] =
 	{
 		{ PVR3_PVRTC1_2BPP_RGB,  PVR3_CHANNEL_TYPE_ANY,   TextureFormat::PTC12   },
 		{ PVR3_PVRTC1_2BPP_RGBA, PVR3_CHANNEL_TYPE_ANY,   TextureFormat::PTC12A  },
@@ -3165,7 +3191,7 @@ namespace bgfx
 		_imageContainer.m_height   = height;
 		_imageContainer.m_depth    = depth;
 		_imageContainer.m_format   = format;
-		_imageContainer.m_numMips  = uint8_t(numMips);
+		_imageContainer.m_numMips  = uint8_t(bx::uint32_max(numMips, 1) );
 		_imageContainer.m_hasAlpha = hasAlpha;
 		_imageContainer.m_cubeMap  = numFaces > 1;
 		_imageContainer.m_ktx      = false;
@@ -3222,6 +3248,7 @@ namespace bgfx
 			return true;
 		}
 
+		BX_TRACE("Unrecognized image format (magic: 0x%08x)!", magic);
 		return false;
 	}
 
@@ -3432,10 +3459,14 @@ namespace bgfx
 			break;
 
 		default:
-			if (!imageConvert(_dst, TextureFormat::BGRA8, _src, _format, _width, _height, _pitch) )
 			{
-				// Failed to convert, just make ugly red-yellow checkerboard texture.
-				imageCheckerboard(_width, _height, 16, UINT32_C(0xffff0000), UINT32_C(0xffffff00), _dst);
+				const uint32_t srcBpp   = s_imageBlockInfo[_format].bitsPerPixel;
+				const uint32_t srcPitch = _width * srcBpp / 8;
+				if (!imageConvert(_dst, TextureFormat::BGRA8, _src, _format, _width, _height, srcPitch) )
+				{
+					// Failed to convert, just make ugly red-yellow checkerboard texture.
+					imageCheckerboard(_width, _height, 16, UINT32_C(0xffff0000), UINT32_C(0xffffff00), _dst);
+				}
 			}
 			break;
 		}

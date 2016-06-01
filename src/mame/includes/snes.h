@@ -322,6 +322,7 @@ public:
 	UINT32                m_wram_address;
 	UINT16                m_htime;
 	UINT16                m_vtime;
+	bool                  m_is_pal;
 
 	/* non-SNES HW-specific flags / variables */
 	UINT8                 m_is_nss;

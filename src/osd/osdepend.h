@@ -16,7 +16,7 @@
 #include "emucore.h"
 #include "osdcore.h"
 #include "unicode.h"
-#include "ui/uimain.h"
+#include "../frontend/mame/ui/menuitem.h"
 
 #include <memory>
 #include <string>
@@ -79,7 +79,7 @@ public:
 
 	// video overridables
 	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) = 0;
-	virtual std::vector<ui_menu_item> get_slider_list() = 0;
+	virtual std::vector<ui::menu_item> get_slider_list() = 0;
 
 	// font interface
 	virtual osd_font::ptr font_alloc() = 0;

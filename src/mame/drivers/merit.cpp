@@ -724,6 +724,43 @@ static INPUT_PORTS_START( rivierab )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( iowapp )
+	PORT_INCLUDE( meritpoker )
+
+	PORT_MODIFY("IN0") /* Pins #65 through #58 of J3 in decending order */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+
+//  PORT_MODIFY("IN1") /* Pins #57 through #51 of J3 in decending order */
+//  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* If HIGH triggers a "TOKEN LOW" error - Hopper releated */
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "Auto Hold" )     PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Bonus Jackpot" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "Cards Dealt" )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x08, "Fast" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( dodge ) /* Same as "meritpoker" but not verified correct. Will correct / verify when these clones work */
 	PORT_INCLUDE( meritpoker )
 INPUT_PORTS_END
@@ -1587,6 +1624,19 @@ ROM_START( misdraw )
 	ROM_LOAD( "crt-209_2131-16", 0x0000, 0x0800, CRC(34729437) SHA1(f097a1a97d8078d7d6a6af85be416b1d1d09c7f2) ) /* 2816 EEPROM in Z80 epoxy CPU module */
 ROM_END
 
+ROM_START( iowapp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2131-21_u5-1.u5", 0x0000, 0x8000, CRC(29ce9656) SHA1(24054176f63957883ad9c022644de28684b95623) ) /* 2131-21 U5-1 981221 2131-21B - label shows copyright 1990 */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "iowa_u39.u39", 0x0000, 0x2000, CRC(8d003bbe) SHA1(06711632f4dea6b794b112525b0e26db698b334b) ) /* lables show copyright 1989 */
+	ROM_LOAD( "iowa_u38.u38", 0x2000, 0x2000, CRC(2f2152a8) SHA1(c0a6dd92ef5eb60363ac3855d62fcea07006368e) )
+	ROM_LOAD( "iowa_u37.u37", 0x4000, 0x2000, CRC(393c78fe) SHA1(d913d081a7205c19dff6a7c6d604716695de2e98) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "iowa_u40.u40", 0x0000, 0x2000, CRC(6d2a1ca8) SHA1(96ef3e0914c2b213ed9c9082fa3e27d75d52a8ec) )
+ROM_END
+
 ROM_START( dodgectya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2131-82_u5-0d.u5", 0x0000, 0x8000, CRC(ef71b268) SHA1(c85f2c8e7e9cd89b4720699814d8fcfbecf4dc1b) ) /* 2131-82 U5-0D 884111 2131 820*/
@@ -2296,6 +2346,7 @@ GAME( 1986, rivierab, riviera, dodge,    rivierab, driver_device,  0,   ROT0,  "
 
 GAME( 1986, bigappg,  0,       bigappg,  bigappg,  driver_device,  0,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1986, misdraw,  0,       misdraw,  bigappg,  driver_device,  0,   ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, iowapp,   0,       dodge,    iowapp,   driver_device,  0,   ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) /* Copyright year based on rom label */
 
 GAME( 1986, dodgectya,dodgecty,dodge,    dodge,    driver_device,  0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1986, dodgectyb,dodgecty,dodge,    dodge,    driver_device,  0,   ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

@@ -24,7 +24,7 @@ WRITE16_MEMBER(vaportra_state::vaportra_sound_w)
 {
 	/* Force synchronisation between CPUs with fake timer */
 	machine().scheduler().synchronize();
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
@@ -71,7 +71,7 @@ ADDRESS_MAP_END
 READ8_MEMBER(vaportra_state::vaportra_soundlatch_r)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return soundlatch_byte_r(space, offset);
+	return m_soundlatch->read(space, offset);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vaportra_state )
@@ -276,6 +276,8 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 /***********************************************************************************************************
- 
+
  Neo Geo cart emulation
  Super Bubble Pop cart type
- 
+
  Note: since protection here involves accesses to ROM, we include the scrambling in this
  file rather than in a separate prot_* source
- 
+
  ***********************************************************************************************************/
 
 
@@ -75,7 +75,7 @@ void neogeo_sbp_cart::patch(UINT8* cpurom, UINT32 cpurom_size)
 {
 	/* the game code clears the text overlay used ingame immediately after writing it.. why? protection? sloppy code that the hw ignores? imperfect emulation? */
 	UINT16* rom = (UINT16*)cpurom;
-	
+
 	rom[0x2a6f8/2] = 0x4e71;
 	rom[0x2a6fa/2] = 0x4e71;
 	rom[0x2a6fc/2] = 0x4e71;

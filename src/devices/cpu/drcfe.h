@@ -113,6 +113,7 @@ struct opcode_desc
 	UINT8           delayslots;             // number of delay slots (for branches)
 	UINT8           skipslots;              // number of skip slots (for branches)
 	UINT32          flags;                  // OPFLAG_* opcode flags
+	UINT32          userflags;              // core specific flags
 	UINT32          cycles;                 // number of cycles needed to execute
 
 	// register usage information
@@ -132,6 +133,9 @@ public:
 
 	// describe a block
 	const opcode_desc *describe_code(offs_t startpc);
+
+	// Set the allow branches in delay slot flag
+	void set_allow_branch_in_delay(bool flag) { m_allow_branch_in_delay = flag; }
 
 protected:
 	// required overrides
@@ -158,6 +162,8 @@ private:
 	simple_list<opcode_desc> m_desc_live_list;      // list of live descriptions
 	fixed_allocator<opcode_desc> m_desc_allocator;  // fixed allocator for descriptions
 	std::vector<opcode_desc *> m_desc_array;      // array of descriptions in PC order
+
+	bool m_allow_branch_in_delay;  // Allow branches in delay slots
 };
 
 

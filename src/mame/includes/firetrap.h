@@ -5,6 +5,8 @@
     Fire Trap
 
 ***************************************************************************/
+
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
 class firetrap_state : public driver_device
@@ -20,7 +22,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"){ }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bg1videoram;
@@ -53,6 +56,7 @@ public:
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(firetrap_nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(firetrap_bankselect_w);

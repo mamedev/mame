@@ -32,6 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcs51_tx_callback);
 	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);
 	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
+	HD44780_PIXEL_UPDATE(piggypas_pixel_update);
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_ticket;
@@ -123,7 +124,7 @@ void piggypas_state::machine_reset()
 	m_digit_idx = 0;
 }
 
-static HD44780_PIXEL_UPDATE(piggypas_pixel_update)
+HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
 {
 	if (pos < 8)
 		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
@@ -149,7 +150,7 @@ static MACHINE_CONFIG_START( piggypas, piggypas_state )
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(1, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(piggypas_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(piggypas_state, piggypas_pixel_update)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

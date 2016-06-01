@@ -4,7 +4,7 @@
 
 Egg Hunt
 
-hardware seems close to mitchell.c
+hardware seems close to mitchell.cpp
 --
 palette format is different
 has a sound cpu
@@ -29,7 +29,7 @@ the screen says VH-K October 1995, are VH-K another company involved?
 Egghunt by Invi Image
 
 PCB marked "Invi Image Co. 1995 IZ80B-1"
-The pcb has poor quality and resemble a bootleg.
+The pcb has poor quality and resembles a bootleg.
 
 2x Z80
 1x AD65 (oki 6295 probably)
@@ -45,6 +45,7 @@ I dumped it with this configuration. In case I'll redump it desoldering pin 16 f
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 
 class egghunt_state : public driver_device
@@ -57,7 +58,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
@@ -92,6 +94,7 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };
 
 
@@ -214,7 +217,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_vidram_bank_w)
 
 WRITE8_MEMBER(egghunt_state::egghunt_soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -251,7 +254,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe001, 0xe001) AM_READWRITE(egghunt_okibanking_r, egghunt_okibanking_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
@@ -440,6 +443,8 @@ static MACHINE_CONFIG_START( egghunt, egghunt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

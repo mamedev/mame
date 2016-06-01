@@ -43,6 +43,7 @@ STDMETHODIMP COpenCallbackImp::GetProperty(PROPID propID, PROPVARIANT *value)
     switch (propID)
     {
       case kpidName: prop = _subArchiveName; break;
+      // case kpidSize:  prop = _subArchiveSize; break; // we don't use it now
     }
   else
     switch (propID)

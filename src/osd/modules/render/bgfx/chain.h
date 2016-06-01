@@ -32,6 +32,7 @@ public:
 	~bgfx_chain();
 
 	void process(render_primitive* prim, int view, int screen, texture_manager& textures, osd_window &window, uint64_t blend = 0L);
+    void repopulate_targets();
 
 	// Getters
 	std::vector<bgfx_slider*>& sliders() { return m_sliders; }
@@ -48,7 +49,8 @@ private:
 	std::vector<bgfx_parameter*>        m_params;
 	std::vector<bgfx_chain_entry*>      m_entries;
 	std::vector<bgfx_target*>           m_target_list;
-	std::map<std::string, bgfx_slider*> m_slider_map;
+    std::vector<std::string>            m_target_names;
+    std::map<std::string, bgfx_target*> m_target_map;
 	int64_t                             m_current_time;
 	uint32_t                            m_screen_index;
 };

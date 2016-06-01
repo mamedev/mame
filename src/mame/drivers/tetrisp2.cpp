@@ -563,7 +563,7 @@ READ16_MEMBER(stepstag_state::unk_a42000_r)
 
 WRITE16_MEMBER(stepstag_state::stepstag_soundlatch_word_w)
 {
-	soundlatch_word_w(space, offset, data, mem_mask);
+	m_soundlatch->write(space, offset, data, mem_mask);
 
 	m_subcpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 
@@ -617,7 +617,7 @@ static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0xa44000, 0xa44001) AM_READNOP     // watchdog
 //  AM_RANGE(0xa48000, 0xa48001) AM_WRITENOP    // PC?
 //  AM_RANGE(0xa4c000, 0xa4c001) AM_WRITENOP    // PC?
-	AM_RANGE(0xa50000, 0xa50001) AM_READWRITE( soundlatch_word_r, stepstag_soundlatch_word_w )
+	AM_RANGE(0xa50000, 0xa50001) AM_DEVREAD("soundlatch", generic_latch_16_device, read) AM_WRITE(stepstag_soundlatch_word_w)
 	AM_RANGE(0xa60000, 0xa60003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff)             // Sound
 
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP                                                    // Coin Counter plus other things
@@ -673,7 +673,7 @@ static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0xa80000, 0xa80001) AM_WRITENOP // cleared after writing this sprite list
 //  AM_RANGE(0xac0000, 0xac0001) AM_WRITENOP // cleared at boot
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READWRITE( soundlatch_word_r, soundlatch_word_w )
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE("soundlatch", generic_latch_16_device, read, write)
 
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(unknown_read_0xc00000) AM_WRITENOP //??
 	AM_RANGE(0xd00000, 0xd00001) AM_READNOP // watchdog
@@ -1551,6 +1551,8 @@ static MACHINE_CONFIG_START( stepstag, stepstag_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

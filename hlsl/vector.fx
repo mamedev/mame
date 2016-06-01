@@ -38,9 +38,6 @@ struct PS_INPUT
 uniform float2 ScreenDims;
 uniform float2 QuadDims;
 
-uniform float2 TimeParams;
-uniform float3 LengthParams;
-
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
@@ -52,10 +49,9 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy *= 2.0f; // zoom
 
 	Output.TexCoord = Input.TexCoord;
+	Output.LineInfo = Input.LineInfo;
 
 	Output.Color = Input.Color;
-
-	Output.LineInfo = Input.LineInfo;
 
 	return Output;
 }
@@ -64,20 +60,22 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Vector Pixel Shader
 //-----------------------------------------------------------------------------
 
-// TimeParams.x: Frame time of the vector
-// TimeParams.y: How much frame time affects the vector's fade
-// LengthParams.y: How much length affects the vector's fade
-// LengthParams.z: Size at which fade is maximum
+uniform float TimeRatio; // Frame time of the vector (not set)
+uniform float TimeScale; // How much frame time affects the vector's fade (not set)
+uniform float LengthRatio; // Size at which fade is maximum
+uniform float LengthScale; // How much length affects the vector's fade
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float timeModulate = lerp(1.0f, TimeParams.x, TimeParams.y);
+	float lineLength = Input.LineInfo.x / max(QuadDims.x, QuadDims.y); // normalize
+	float lineLengthRatio = LengthRatio;
+	float lineLengthScale = LengthScale;
 
-	float lengthModulate = 1.0f - clamp(Input.LineInfo.x / LengthParams.z, 0.0f, 1.0f);
-	float minLength = 2.0f - clamp(Input.LineInfo.x - 1.0f, 0.0f, 2.0f);
-	lengthModulate = lerp(lengthModulate, 4.0f, minLength * 0.5f);
-	lengthModulate = lerp(1.0f, timeModulate * lengthModulate, LengthParams.y);
+	float timeModulate = lerp(1.0f, TimeRatio, TimeScale);
+	float lengthModulate = 1.0f - clamp(lineLength / lineLengthRatio, 0.0f, 1.0f);
+	float timeLengthModulate = lerp(1.0f, timeModulate * lengthModulate, LengthScale);
 
-	float4 outColor = float4(lengthModulate, lengthModulate, lengthModulate, 1.0f);
+	float4 outColor = float4(timeLengthModulate, timeLengthModulate, timeLengthModulate, 1.0f);
 	outColor *= Input.Color;
 
 	return outColor;

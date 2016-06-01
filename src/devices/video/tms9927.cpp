@@ -104,6 +104,7 @@ void tms9927_device::device_start()
 
 void tms9927_device::device_reset()
 {
+	m_start_datarow = 0;
 }
 
 //-------------------------------------------------
@@ -286,13 +287,14 @@ void tms9927_device::recompute_parameters(int postload)
 
 	/* determine the visible area, avoid division by 0 */
 	m_visible_hpix = CHARS_PER_DATA_ROW * m_hpixels_per_column;
-	m_visible_vpix = (LAST_DISP_DATA_ROW + 1) * SCANS_PER_DATA_ROW;
+	m_visible_vpix = DATA_ROWS_PER_FRAME * SCANS_PER_DATA_ROW;
 
+	m_start_datarow = (LAST_DISP_DATA_ROW + 1) % DATA_ROWS_PER_FRAME;
 	/* determine the horizontal/vertical offsets */
 	offset_hpix = HSYNC_DELAY * m_hpixels_per_column;
 	offset_vpix = VERTICAL_DATA_START;
 
-	osd_printf_debug("TMS9937: Total = %dx%d, Visible = %dx%d, Offset=%dx%d, Skew=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, offset_hpix, offset_vpix, SKEW_BITS);
+	osd_printf_debug("TMS9937: Total = %dx%d, Visible = %dx%d, Offset=%dx%d, Skew=%d, Upscroll=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, offset_hpix, offset_vpix, SKEW_BITS, m_start_datarow);
 
 	/* see if it all makes sense */
 	m_valid_config = TRUE;

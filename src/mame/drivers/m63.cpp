@@ -96,7 +96,7 @@ Notes:
   The NMI handler just handles the "Stop Mode" dip switch.
 
 TS 2008.06.14:
-- Addedd sound emulation - atomboy and fghtbskt req different interrupt (T1)
+- Added sound emulation - atomboy and fghtbskt req different interrupt (T1)
   timing than wilytowr, otherwise music/fx tempo is too fast.
   Music tempo and pitch verified on real pcb.
 - Extra space in atomboy 2764 eproms is filled with garbage z80 code
@@ -120,6 +120,7 @@ Dip locations verified for:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 
@@ -133,13 +134,14 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_soundcpu(*this, "soundcpu"),
-		m_samples(*this, "samples"),
 		m_maincpu(*this, "maincpu"),
 		m_ay1(*this, "ay1"),
 		m_ay2(*this, "ay2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundcpu(*this, "soundcpu"),
+		m_samples(*this, "samples"),
+		m_soundlatch(*this, "soundlatch")
 	{
 	}
 
@@ -165,9 +167,16 @@ public:
 	int      m_p2;
 	std::unique_ptr<INT16[]>    m_samplebuf;
 
-	/* sound devices */
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<ay8910_device> m_ay1;
+	optional_device<ay8910_device> m_ay2;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<samples_device> m_samples;
+	required_device<generic_latch_8_device> m_soundlatch;
+	
 	DECLARE_WRITE8_MEMBER(m63_videoram_w);
 	DECLARE_WRITE8_MEMBER(m63_colorram_w);
 	DECLARE_WRITE8_MEMBER(m63_videoram2_w);
@@ -197,11 +206,6 @@ public:
 	INTERRUPT_GEN_MEMBER(snd_irq);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
-	required_device<ay8910_device> m_ay1;
-	optional_device<ay8910_device> m_ay2;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 
@@ -440,7 +444,7 @@ READ8_MEMBER(m63_state::snddata_r)
 {
 	switch (m_p2 & 0xf0)
 	{
-		case 0x60:  return soundlatch_byte_r(space, 0); ;
+		case 0x60:  return m_soundlatch->read(space, 0); ;
 		case 0x70:  return memregion("user1")->base()[((m_p1 & 0x1f) << 8) | offset];
 	}
 	return 0xff;
@@ -471,7 +475,7 @@ static ADDRESS_MAP_START( m63_map, AS_PROGRAM, 8, m63_state )
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(m63_flipscreen_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(m63_palbank_w)
 	AM_RANGE(0xf006, 0xf007) AM_WRITE(coin_w)
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITENOP /* continues game when in stop mode (cleared by NMI handler) */
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf803, 0xf803) AM_WRITE(snd_irq_w)
@@ -494,7 +498,7 @@ static ADDRESS_MAP_START( fghtbskt_map, AS_PROGRAM, 8, m63_state )
 	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("DSW")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(snd_irq_w)
 	AM_RANGE(0xf001, 0xf001) AM_WRITENOP
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xf002, 0xf002) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP
 	AM_RANGE(0xf801, 0xf801) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xf802, 0xf802) AM_WRITE(fghtbskt_flipscreen_w)
@@ -779,6 +783,8 @@ static MACHINE_CONFIG_START( m63, m63_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono") /* ????? */
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -821,6 +827,8 @@ static MACHINE_CONFIG_START( fghtbskt, m63_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

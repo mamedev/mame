@@ -211,7 +211,7 @@ void n64_periphs::device_reset()
 	memset(pif_cmd, 0, sizeof(pif_cmd));
 	si_dram_addr = 0;
 	si_pif_addr = 0;
-	si_status = 0;
+	si_status_val = 0;
 	si_dma_dir = 0;
 	si_dma_timer->adjust(attotime::never);
 
@@ -2084,8 +2084,8 @@ void n64_periphs::si_dma_tick()
 {
 	si_dma_timer->adjust(attotime::never);
 	pif_dma(si_dma_dir);
-	si_status = 0;
-	si_status |= 0x1000;
+	si_status_val = 0;
+	si_status_val |= 0x1000;
 	signal_rcp_interrupt(SI_INTERRUPT);
 }
 
@@ -2139,7 +2139,7 @@ READ32_MEMBER( n64_periphs::si_reg_r )
 			//return si_dram_addr;
 
 		case 0x18/4:        // SI_STATUS_REG
-			ret = si_status;
+			ret = si_status_val;
 	}
 
 	return ret;
@@ -2155,23 +2155,23 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 
 		case 0x04/4:        // SI_PIF_ADDR_RD64B_REG
 			// PIF RAM -> RDRAM
-			if(si_status & 1)
+			if(si_status_val & 1)
 			{
-				si_status |= 8; //DMA Error, overlapping request
+				si_status_val |= 8; //DMA Error, overlapping request
 				return; // SI Busy, ignore request
 			}
 			si_pif_addr = data;
 			si_pif_addr_rd64b = data;
 			si_dma_dir = 0;
-			si_status |= 1;
+			si_status_val |= 1;
 			si_dma_timer->adjust(attotime::from_hz(50000));
 			break;
 
 		case 0x10/4:        // SI_PIF_ADDR_WR64B_REG
 			// RDRAM -> PIF RAM
-			if(si_status & 1)
+			if(si_status_val & 1)
 			{
-				si_status |= 8; //DMA Error, overlapping request
+				si_status_val |= 8; //DMA Error, overlapping request
 				return; // SI Busy, ignore request
 			}
 			si_pif_addr = data;
@@ -2181,7 +2181,7 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 			break;
 
 		case 0x18/4:        // SI_STATUS_REG
-			si_status = 0;
+			si_status_val = 0;
 			si_dma_timer->adjust(attotime::never);
 			clear_rcp_interrupt(SI_INTERRUPT);
 			break;
@@ -2493,63 +2493,63 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 			{
 				case 0x01: // Seek Read
 					dd_track_reg = dd_data_reg >> 16;
-					logerror("dd command: Seek Read %d\n", dd_track_reg);
+					//logerror("dd command: Seek Read %d\n", dd_track_reg);
 					dd_set_zone_and_track_offset();
 					dd_track_reg |= DD_TRACK_INDEX_LOCK;
 					dd_write = false;
 					break;
 				case 0x02: // Seek Write
 					dd_track_reg = dd_data_reg >> 16;
-					logerror("dd command: Seek Write %d\n", dd_track_reg);
+					//logerror("dd command: Seek Write %d\n", dd_track_reg);
 					dd_set_zone_and_track_offset();
 					dd_track_reg |= DD_TRACK_INDEX_LOCK;
 					dd_write = true;
 					break;
 				case 0x03: // Re-Zero / Recalibrate
-					logerror("dd command: Re-Zero\n");
+					//logerror("dd command: Re-Zero\n");
 					break;
 				case 0x04: // Engage Brake
-					logerror("dd command: Engage Brake\n");
+					//logerror("dd command: Engage Brake\n");
 					break;
 				case 0x05: // Start Motor
-					logerror("dd command: Start Motor\n");
+					//logerror("dd command: Start Motor\n");
 					break;
 				case 0x06: // Set Standby Time
-					logerror("dd command: Set Standby Time\n");
+					//logerror("dd command: Set Standby Time\n");
 					break;
 				case 0x07: // Set Sleep Time
-					logerror("dd command: Set Sleep Time\n");
+					//logerror("dd command: Set Sleep Time\n");
 					break;
 				case 0x08: // Clear Disk Change Flag
-					logerror("dd command: Clear Disk Change Flag\n");
+					//logerror("dd command: Clear Disk Change Flag\n");
 					break;
 				case 0x09: // Clear Reset Flag
-					logerror("dd command: Clear Reset Flag\n");
+					//logerror("dd command: Clear Reset Flag\n");
 					break;
 				case 0x0B: // Select Disk Type
-					logerror("dd command: Select Disk Type\n");
+					//logerror("dd command: Select Disk Type\n");
 					break;
 				case 0x0C: // ASIC Command Inquiry
-					logerror("dd command: ASIC Command Inquiry\n");
+					//logerror("dd command: ASIC Command Inquiry\n");
 					break;
 				case 0x0D: // Standby Mode (?)
-					logerror("dd command: Standby Mode(?)\n");
+					//logerror("dd command: Standby Mode(?)\n");
 					break;
 				case 0x0E: // (Track Seek) Index Lock Retry
-					logerror("dd command: Index Lock Retry\n");
+					//logerror("dd command: Index Lock Retry\n");
 					break;
 				case 0x0F: // Set RTC Year / Month
-					logerror("dd command: Set RTC Year / Month\n");
+					//logerror("dd command: Set RTC Year / Month\n");
 					break;
 				case 0x10: // Set RTC Day / Hour
-					logerror("dd command: Set RTC Day / Hour\n");
+					//logerror("dd command: Set RTC Day / Hour\n");
 					break;
 				case 0x11: // Set RTC Minute / Second
-					logerror("dd command: Set RTC Minute / Second\n");
+					//logerror("dd command: Set RTC Minute / Second\n");
 					break;
 				case 0x12: // Read RTC Month / Year
 				{
-					logerror("dd command: Read RTC Month / Year\n");
+					//logerror("dd command: Read RTC Month / Year\n");
 
 					system_time systime;
 					machine().base_datetime(systime);
@@ -2560,7 +2560,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 
 				case 0x13: // Read RTC Hour / Day
 				{
-					logerror("dd command: Read RTC Hour / Day\n");
+					//logerror("dd command: Read RTC Hour / Day\n");
 
 					system_time systime;
 					machine().base_datetime(systime);
@@ -2571,7 +2571,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 
 				case 0x14: // Read RTC Minute / Second
 				{
-					logerror("dd command: Read RTC Minute / Second\n");
+					//logerror("dd command: Read RTC Minute / Second\n");
 
 					system_time systime;
 					machine().base_datetime(systime);
@@ -2581,12 +2581,12 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 				}
 				case 0x15: // Set LED On/Off Time
 				{
-					logerror("dd command: Set LED On/Off Time\n");
+					//logerror("dd command: Set LED On/Off Time\n");
 					break;
 				}
 				case 0x1B: // Disk Inquiry
 				{
-					logerror("dd command: Disk Inquiry\n");
+					//logerror("dd command: Disk Inquiry\n");
 					dd_data_reg = 0x00000000;
 					break;
 				}
@@ -2597,7 +2597,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 			break;
 
 		case 0x10/4: // BM Status
-			logerror("dd BM Status write\n");
+			//logerror("dd BM Status write\n");
 			dd_start_sector = (data >> 16) & 0xFF;
 			if(dd_start_sector == 0x00)
 			{
@@ -2629,7 +2629,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 				dd_buf_status_reg = 0;
 				dd_current_reg = 0;
 				dd_start_block = 0;
-				logerror("dd: BM RESET\n");
+				//logerror("dd: BM RESET\n");
 			}
 			if(!(dd_status_reg & DD_ASIC_STATUS_BM_INT) && !(dd_status_reg & DD_ASIC_STATUS_MECHA_INT))
 			{
@@ -2643,7 +2643,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 				if(!dd_write && !(data & DD_BM_MODE))
 					popmessage("Attempt to read disk with BM Mode 0\n");
 				dd_buf_status_reg |= DD_BMST_RUNNING;
-				logerror("dd: Start BM\n");
+				//logerror("dd: Start BM\n");
 				dd_update_bm();
 			}
 

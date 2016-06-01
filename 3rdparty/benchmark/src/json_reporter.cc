@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <iostream>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "string_util.h"
@@ -120,7 +121,10 @@ void JSONReporter::Finalize() {
 }
 
 void JSONReporter::PrintRunData(Run const& run) {
-    double const multiplier = 1e9; // nano second multiplier
+    double multiplier;
+    const char* timeLabel;
+    std::tie(timeLabel, multiplier) = GetTimeUnitAndMultiplier(run.time_unit);
+
     double cpu_time = run.cpu_accumulated_time * multiplier;
     double real_time = run.real_accumulated_time * multiplier;
     if (run.iterations != 0) {
@@ -140,7 +144,10 @@ void JSONReporter::PrintRunData(Run const& run) {
         << FormatKV("real_time", RoundDouble(real_time))
         << ",\n";
     out << indent
-        << FormatKV("cpu_time", RoundDouble(cpu_time));
+        << FormatKV("cpu_time", RoundDouble(cpu_time))
+        << ",\n";
+    out << indent
+        << FormatKV("time_unit", timeLabel);
     if (run.bytes_per_second > 0.0) {
         out << ",\n" << indent
             << FormatKV("bytes_per_second", RoundDouble(run.bytes_per_second));

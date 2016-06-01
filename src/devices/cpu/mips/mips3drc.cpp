@@ -184,7 +184,9 @@ void mips3_device::clear_fastram(UINT32 select_start)
 		m_fastram[i].readonly = false;
 		m_fastram[i].base = nullptr;
 	}
-		m_fastram_select=select_start;
+	m_fastram_select=select_start;
+	// Set cache to dirty so that re-mapping occurs
+	m_cache_dirty = TRUE;
 }
 
 /*-------------------------------------------------

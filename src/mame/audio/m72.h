@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "machine/gen_latch.h"
 #include "sound/dac.h"
 
 class m72_audio_device : public device_t,
@@ -55,6 +56,7 @@ private:
 	UINT32 m_samples_size;
 	address_space *m_space;
 	dac_device *m_dac;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	TIMER_CALLBACK_MEMBER( setvector_callback );
 };

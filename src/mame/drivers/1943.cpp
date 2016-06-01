@@ -32,6 +32,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "includes/1943.h"
@@ -106,7 +107,7 @@ static ADDRESS_MAP_START( c1943_map, AS_PROGRAM, 8, _1943_state )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSWA")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSWB")
 	AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1943_c804_w) // ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xc807, 0xc807) AM_WRITE(c1943_protection_w)
@@ -127,7 +128,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _1943_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE("ym2", ym2203_device, write)
 ADDRESS_MAP_END
@@ -333,6 +334,8 @@ static MACHINE_CONFIG_START( 1943, _1943_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)

@@ -25,6 +25,8 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+class render_target;
+
 // forward of SDL_DisplayMode not possible (typedef struct) - define wrapper
 
 class SDL_DM_Wrapper;
@@ -89,7 +91,9 @@ private:
 
 	int                 m_extra_flags;
 
-	static OSDWORK_CALLBACK( complete_create_wt );
+	// returns 0 on success, else 1
+	int complete_create();
+	void complete_destroy();
 
 private:
 	int wnd_extra_width();
@@ -107,15 +111,6 @@ private:
 	// monitor info
 	osd_monitor_info *  m_monitor;
 	int                 m_fullscreen;
-
-	// static callbacks ...
-
-	static OSDWORK_CALLBACK( sdlwindow_resize_wt );
-	static OSDWORK_CALLBACK( draw_video_contents_wt );
-	static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt );
-	static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt );
-	static OSDWORK_CALLBACK( notify_changed_wt );
-	static OSDWORK_CALLBACK( update_cursor_state_wt );
 
 	void measure_fps(int update);
 

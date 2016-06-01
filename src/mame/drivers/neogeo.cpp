@@ -432,7 +432,7 @@
     backup ram to indiate that the protection check has failed.
 
 ****************************************************************************
- 
+
     Mahjong Panel notes (2009-03 FP):
     =================================
 
@@ -451,8 +451,8 @@
       doubt other BIOS were programmed to be compatible with mahjong panels
 
 ****************************************************************************
- 
-	AES driver (home version of MVS)
+
+    AES driver (home version of MVS)
     Current emulation status:
     - Cartridges run.
     - Riding Hero runs in slow-mo due to the unemulated comm link MCU in the cartridge.
@@ -892,13 +892,13 @@ WRITE8_MEMBER(neogeo_state::system_control_w)
 WRITE16_MEMBER(neogeo_state::write_banksel)
 {
 	UINT32 len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
-	
+
 	if ((len <= 0x100000) && (data & 0x07))
 		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", space.device().safe_pc(), data);
 	else
 	{
 		int bank = data & 0x07;
-		
+
 		if ((bank + 1) * 0x100000 >= len)
 		{
 			logerror("PC %06x: warning: bankswitch to empty bank %02x\n", space.device().safe_pc(), data);
@@ -986,7 +986,7 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_pvc)
 {
 	// write to cart ram
 	m_slots[m_curr_slot]->protection_w(space, offset, data, mem_mask);
-	
+
 	// actual bankswitch
 	if (offset >= 0xff8)
 	{
@@ -999,7 +999,7 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_kf2k3bl)
 {
 	// write to cart ram
 	m_slots[m_curr_slot]->protection_w(space, offset, data, mem_mask);
-	
+
 	// actual bankswitch
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2)
 	{
@@ -1011,7 +1011,7 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_kf2k3bl)
 WRITE16_MEMBER(neogeo_state::write_bankprot_ms5p)
 {
 	logerror("ms5plus bankswitch - offset: %06x PC %06x: set banking %04x\n", offset, space.device().safe_pc(), data);
-	
+
 	if ((offset == 0) && (data == 0xa0))
 	{
 		m_bank_base = 0xa0;
@@ -1027,7 +1027,7 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_ms5p)
 WRITE16_MEMBER(neogeo_state::write_bankprot_kof10th)
 {
 	m_slots[m_curr_slot]->protection_w(space, offset, data, mem_mask);
-	
+
 	if (offset == 0xffff0/2)
 	{
 		// Standard bankswitch
@@ -1054,7 +1054,7 @@ void neogeo_state::init_cpu()
 {
 	UINT8 *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->base() : (UINT8 *)m_slots[m_curr_slot]->get_rom_base();
 	UINT32 len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
-	
+
 	if (len > 0x100000)
 		m_bank_cartridge->set_base(ROM + 0x100000);
 	else
@@ -1066,18 +1066,18 @@ void neogeo_state::init_audio()
 	UINT8 *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->base() : m_slots[m_curr_slot]->get_audio_base();
 	UINT32 len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->bytes() : m_slots[m_curr_slot]->get_audio_size();
 	UINT32 address_mask;
-	
+
 	/* audio bios/cartridge selection */
 	m_bank_audio_main->configure_entry(0, (m_region_audiobios != nullptr) ? m_region_audiobios->base() : ROM); /* on hardware with no SM1 ROM, the cart ROM is always enabled */
 	m_bank_audio_main->configure_entry(1, ROM);
 	m_bank_audio_main->set_entry(1);
-	
+
 	/* audio banking */
 	m_bank_audio_cart[0] = membank("audio_f000");
 	m_bank_audio_cart[1] = membank("audio_e000");
 	m_bank_audio_cart[2] = membank("audio_c000");
 	m_bank_audio_cart[3] = membank("audio_8000");
-	
+
 	address_mask = (len - 0x10000 - 1) & 0x3ffff;
 	for (int region = 0; region < 4; region++)
 	{
@@ -1087,7 +1087,7 @@ void neogeo_state::init_audio()
 			m_bank_audio_cart[region]->configure_entry(bank, &ROM[bank_address]);
 		}
 	}
-	
+
 	// set initial audio banks - THIS IS A HACK
 	// Z80 banking is handled by the NEO-ZMC chip in the cartridge
 	// (in later cartridges, by multifunction banking/protection chips that implement the same bank scheme)
@@ -1105,12 +1105,12 @@ void neogeo_state::init_ym()
 {
 	UINT8 *ROM;
 	UINT32 len;
-	
+
 	// Resetting a sound device causes the core to update() it and generate samples if it's not up to date.
 	// Thus we preemptively reset it here while the old pointers are still valid so it's up to date and
 	// doesn't generate samples below when we reset it for the new pointers.
 	m_ym->reset();
-	
+
 	// all these region_free / region_alloc machinery is needed because current YM emulation does not allow
 	// to pass a ROM pointer different from a "ymsnd" / "ymsnd.deltat" region, and therefore we need to copy
 	// the ROM(s) from the cart to the corresponding region(s) with appropriate names...
@@ -1123,17 +1123,17 @@ void neogeo_state::init_ym()
 		machine().memory().region_alloc(":ymsnd", len, 1, ENDIANNESS_LITTLE);
 		memcpy(memregion(":ymsnd")->base(), ROM, len);
 	}
-	
+
 	if (memregion(":ymsnd.deltat"))
 		machine().memory().region_free(":ymsnd.deltat");
 	if (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_ymdelta_size())
 	{
 		ROM = m_slots[m_curr_slot]->get_ymdelta_base();
-		len	= m_slots[m_curr_slot]->get_ymdelta_size();
+		len = m_slots[m_curr_slot]->get_ymdelta_size();
 		machine().memory().region_alloc(":ymsnd.deltat", len, 1, ENDIANNESS_LITTLE);
 		memcpy(memregion(":ymsnd.deltat")->base(), ROM, len);
 	}
-	
+
 	m_ym->reset(); // reset it again to get the new pointers
 }
 
@@ -1164,10 +1164,10 @@ void neogeo_state::set_slot_idx(int slot)
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 		m_curr_slot = slot;
 		m_bank_base = 0;
-		
+
 		if (!m_slots[m_curr_slot]->user_loadable())
 			m_slots[m_curr_slot]->late_decrypt_all();
-		
+
 		// unmap any handler that previous carts could have installed
 		space.unmap_readwrite(0x000080, 0x0fffff);
 		space.unmap_readwrite(0x200000, 0x2fffff);
@@ -1175,24 +1175,24 @@ void neogeo_state::set_slot_idx(int slot)
 			space.install_rom(0x000080, 0x0fffff, 0, 0, (UINT16 *)m_region_maincpu->base() + 0x80/2);
 		else
 			space.install_rom(0x000080, 0x0fffff, 0, 0, (UINT16 *)m_slots[m_curr_slot]->get_rom_base() + 0x80/2);
-		
+
 
 		space.install_read_bank(0x200000, 0x2fffff, 0, 0, "cartridge");
 		space.install_write_handler(0x2ffff0, 0x2fffff, write16_delegate(FUNC(neogeo_state::write_banksel),this));
 		m_bank_cartridge = membank("cartridge");
-		
+
 		init_cpu();
-		
+
 		init_audio();
 		m_audiocpu->reset(); // svc have no sound if in higher slots without this?
-		
+
 		init_ym();
-		
+
 		init_sprites();
-		
+
 		if (!m_slots[m_curr_slot]->user_loadable())
 			m_slots[m_curr_slot]->set_cart_type(m_slots[m_curr_slot]->default_option());
-		
+
 		int type = m_slots[m_curr_slot]->get_type();
 		switch (type)
 		{
@@ -1306,16 +1306,16 @@ void neogeo_state::set_slot_idx(int slot)
 void neogeo_state::common_machine_start()
 {
 	m_use_cart_vectors = 0;
-	
+
 	create_interrupt_timers();
-	
+
 	/* irq levels for MVS / AES */
 	m_vblank_level = 1;
 	m_raster_level = 2;
-	
+
 	/* start with an IRQ3 - but NOT on a reset */
 	m_irq3_pending = 1;
-	
+
 	/* register state save */
 	save_item(NAME(m_display_position_interrupt_control));
 	save_item(NAME(m_display_counter));
@@ -1346,21 +1346,21 @@ void neogeo_state::machine_start()
 {
 	m_type = NEOGEO_MVS;
 	common_machine_start();
-	
+
 	// enable rtc and serial mode
 	m_upd4990a->cs_w(1);
 	m_upd4990a->oe_w(1);
 	m_upd4990a->c0_w(1);
 	m_upd4990a->c1_w(1);
 	m_upd4990a->c2_w(1);
-	
+
 	if (m_slot1) { m_slots[0] = m_slot1; } else { m_slots[0] = nullptr; }
 	if (m_slot2) { m_slots[1] = m_slot2; } else { m_slots[1] = nullptr; }
 	if (m_slot3) { m_slots[2] = m_slot3; } else { m_slots[2] = nullptr; }
 	if (m_slot4) { m_slots[3] = m_slot4; } else { m_slots[3] = nullptr; }
 	if (m_slot5) { m_slots[4] = m_slot5; } else { m_slots[4] = nullptr; }
 	if (m_slot6) { m_slots[5] = m_slot6; } else { m_slots[5] = nullptr; }
-	
+
 	m_sprgen->m_fixed_layer_bank_type = 0;
 	m_sprgen->set_screen(m_screen);
 
@@ -1372,7 +1372,7 @@ void neogeo_state::machine_start()
 void neogeo_state::neogeo_postload()
 {
 	m_bank_audio_main->set_entry(m_use_cart_audio);
-	
+
 	if (m_type == NEOGEO_MVS)
 		set_outputs();
 	if (m_type == NEOGEO_MVS || m_type == NEOGEO_AES)
@@ -1392,23 +1392,23 @@ void neogeo_state::machine_reset()
 {
 	offs_t offs;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	
+
 	// reset system control registers
 	for (offs = 0; offs < 8; offs++)
 		system_control_w(space, offs, 0);
-	
+
 	// disable audiocpu nmi
 	m_audio_cpu_nmi_enabled = false;
 	m_audio_cpu_nmi_pending = false;
 	audio_cpu_check_nmi();
-	
+
 	m_maincpu->reset();
-	
+
 	start_interrupt_timers();
-	
+
 	// trigger the IRQ3 that was set by MACHINE_START
 	update_interrupts();
-	
+
 	m_recurse = false;
 }
 
@@ -1700,23 +1700,23 @@ MACHINE_CONFIG_END
 
 // two cartslots (MV-2F)
 #define NEOGEO_CONFIG_TWO_CARTSLOTS    \
-	NEOGEO_CONFIG_CARTSLOT("cslot1")	\
+	NEOGEO_CONFIG_CARTSLOT("cslot1")    \
 	NEOGEO_CONFIG_CARTSLOT("cslot2")
 
 // four cartslots (MV-4F)
 #define NEOGEO_CONFIG_FOUR_CARTSLOTS    \
-	NEOGEO_CONFIG_CARTSLOT("cslot1")	\
-	NEOGEO_CONFIG_CARTSLOT("cslot2")	\
-	NEOGEO_CONFIG_CARTSLOT("cslot3")	\
+	NEOGEO_CONFIG_CARTSLOT("cslot1")    \
+	NEOGEO_CONFIG_CARTSLOT("cslot2")    \
+	NEOGEO_CONFIG_CARTSLOT("cslot3")    \
 	NEOGEO_CONFIG_CARTSLOT("cslot4")
 
 // six cartslots (MV-6F)
 #define NEOGEO_CONFIG_SIX_CARTSLOTS    \
-	NEOGEO_CONFIG_CARTSLOT("cslot1")	\
-	NEOGEO_CONFIG_CARTSLOT("cslot2")	\
-	NEOGEO_CONFIG_CARTSLOT("cslot3")	\
-	NEOGEO_CONFIG_CARTSLOT("cslot4")	\
-	NEOGEO_CONFIG_CARTSLOT("cslot5")	\
+	NEOGEO_CONFIG_CARTSLOT("cslot1")    \
+	NEOGEO_CONFIG_CARTSLOT("cslot2")    \
+	NEOGEO_CONFIG_CARTSLOT("cslot3")    \
+	NEOGEO_CONFIG_CARTSLOT("cslot4")    \
+	NEOGEO_CONFIG_CARTSLOT("cslot5")    \
 	NEOGEO_CONFIG_CARTSLOT("cslot6")
 
 
@@ -1746,14 +1746,14 @@ MACHINE_START_MEMBER(aes_state, aes)
 {
 	m_type = NEOGEO_AES;
 	common_machine_start();
-	
+
 	m_slots[0] = m_slot1;
 	m_slots[1] = nullptr;
 	m_slots[2] = nullptr;
 	m_slots[3] = nullptr;
 	m_slots[4] = nullptr;
 	m_slots[5] = nullptr;
-	
+
 	m_sprgen->m_fixed_layer_bank_type = 0;
 	m_sprgen->set_screen(m_screen);
 
@@ -1944,7 +1944,6 @@ MACHINE_CONFIG_END
 	ROM_LOAD( name,      0x00000, 0x80000, hash ) \
 	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
 
-#define NO_DELTAT_REGION
 
 
 #define NEO_SFIX_64K(name, hash) \
@@ -1987,8 +1986,6 @@ ROM_START( neogeo )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
 	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )
-
-	NO_DELTAT_REGION
 
 	ROM_REGION( 0x100000, "sprites", ROMREGION_ERASEFF )
 ROM_END
@@ -2039,4 +2036,3 @@ CONS( 1990, aes,    0,      0,     aes,      aes,           driver_device,  0,  
 
 // Include standalone drivers for the single games
 #include "neodriv.hxx"
-

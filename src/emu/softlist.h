@@ -29,6 +29,12 @@ enum softlist_type
 	SOFTWARE_LIST_COMPATIBLE_SYSTEM
 };
 
+enum software_compatibility
+{
+	SOFTWARE_IS_COMPATIBLE,
+	SOFTWARE_IS_INCOMPATIBLE,
+	SOFTWARE_NOT_COMPATIBLE
+};
 
 
 //**************************************************************************
@@ -115,9 +121,10 @@ public:
 	rom_entry *romdata(unsigned int index = 0) { return (index < m_romdata.size()) ? &m_romdata[index] : nullptr; }
 
 	// helpers
-	bool is_compatible(const software_list_device &swlist) const;
+	software_compatibility is_compatible(const software_list_device &swlist) const;
 	bool matches_interface(const char *interface) const;
 	const char *feature(const char *feature_name) const;
+	device_image_interface *find_mountable_image(const machine_config &mconfig) const;
 
 private:
 	// internal state

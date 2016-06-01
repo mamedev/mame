@@ -16,12 +16,13 @@
 
 #include <string>
 
-#include "ui/uimain.h"
+#include "../frontend/mame/ui/menuitem.h"
+#include "../frontend/mame/ui/sliderchangednotifier.h"
 
 class bgfx_effect;
 class chain_manager;
 
-class bgfx_input_pair
+class bgfx_input_pair : public slider_changed_notifier
 {
 public:
 	bgfx_input_pair(int index, std::string sampler, std::string texture, std::vector<std::string> available_textures, std::string selection, chain_manager& chains, uint32_t screen_index);
@@ -33,9 +34,10 @@ public:
 	chain_manager& chains() const { return m_chains; }
 	std::string sampler() const { return m_sampler; }
 	std::string texture() const { return m_texture; }
-	std::vector<ui_menu_item> get_slider_list();
+	std::vector<ui::menu_item> get_slider_list();
 
 private:
+	virtual INT32 slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, INT32 newval) override;
 	void create_selection_slider(uint32_t screen_index);
 	bool needs_sliders();
 
@@ -46,7 +48,7 @@ private:
 	std::string               m_selection;
 	chain_manager&            m_chains;
 	int32_t                   m_current_texture;
-	ui_menu_item              m_selection_slider;
+	ui::menu_item             m_selection_slider;
 };
 
 #endif // __DRAWBGFX_INPUT_PAIR__

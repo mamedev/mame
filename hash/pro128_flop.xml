@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- Thanks to DCMOTO (http://dcmoto.free.fr) for info! -->
+<!-- This list is exclusively for Italian MO5 and MO6 software -->
+<softwarelist name="pro128_flop" description="Olivetti Prodest PC 128 floppy disks">
+
+<!-- Compilations (Games) -->
+
+	<software name="microflp">
+		<description>MicroFloppy Compilation</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="microfloppy compilation (infogrames) (emile n'guyen) (1987) (pc128).fd" size="327680" crc="4fea64b4" sha1="a028e5b2d0ec34454a12d5dbd29160f496d73d8f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Games -->
+
+	<software name="sortelig">
+		<description>Sortileges</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="sortileges (infogrames) (william hennebois, alain vialon, laurent droulez) (1986) (pc128).fd" size="327680" crc="37df7268" sha1="d0384751ae3514cb1ad2849e8943f4c4a2100d03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

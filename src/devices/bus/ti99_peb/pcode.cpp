@@ -85,12 +85,9 @@
 #define PGROM5_TAG "grom5"
 #define PGROM6_TAG "grom6"
 #define PGROM7_TAG "grom7"
-
-#define GROMMASK 0x1ffd
-#define GROMREAD 0x1bfc
-#define GROMWRITE 0x1ffc
-
 #define ACTIVE_TAG "ACTIVE"
+
+#define CRU_BASE 0x1f00
 
 #define TRACE_ROM 0
 #define TRACE_GROM 0
@@ -114,10 +111,6 @@ ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const 
 
 SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 {
-	// Do not allow setaddress for the debugger. It will mess up the
-	// setaddress/memory access pairs when the CPU enters wait states.
-	if (space.debugger_access()) return;
-
 	m_address = offset;
 	m_inDsrArea = ((m_address & m_select_mask)==m_select_value);
 
@@ -144,8 +137,27 @@ SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 	}
 }
 
+void ti_pcode_card_device::debugger_read(address_space& space, UINT16 offset, UINT8& value)
+{
+	// The debuger does not call setaddress
+	if (m_active && ((offset & m_select_mask)==m_select_value))
+	{
+		bool isrom0 = ((offset & 0xf000)==0x4000);
+		bool isrom12 = ((offset & 0xf000)==0x5000);
+		if (isrom0) value = m_rom[m_address & 0x0fff];
+		else
+			if (isrom12) value = m_rom[(m_bank_select<<12) | (offset & 0x0fff)];
+	}
+}
+
 READ8Z_MEMBER( ti_pcode_card_device::readz )
 {
+	// Care for debugger
+	if (space.debugger_access())
+	{
+		debugger_read(space, offset, *value);
+	}
+
 	if (m_active && m_inDsrArea && m_selected)
 	{
 		if (m_isrom0)
@@ -184,6 +196,7 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
 */
 WRITE8_MEMBER( ti_pcode_card_device::write )
 {
+	if (space.debugger_access()) return;
 	if (m_active && m_isgrom && m_selected)
 	{
 		for (auto & elem : m_grom) elem->write(space, m_address, data);
@@ -234,7 +247,7 @@ READ8Z_MEMBER(ti_pcode_card_device::crureadz)
 */
 WRITE8_MEMBER(ti_pcode_card_device::cruwrite)
 {
-	if ((offset & 0xff00)==m_cru_base)
+	if ((offset & 0xff00)==CRU_BASE)
 	{
 		int addr = offset & 0x00ff;
 
@@ -251,7 +264,6 @@ WRITE8_MEMBER(ti_pcode_card_device::cruwrite)
 
 void ti_pcode_card_device::device_start()
 {
-	m_cru_base = 0x1f00;
 	m_grom[0] = downcast<tmc0430_device*>(subdevice(PGROM0_TAG));
 	m_grom[1] = downcast<tmc0430_device*>(subdevice(PGROM1_TAG));
 	m_grom[2] = downcast<tmc0430_device*>(subdevice(PGROM2_TAG));
@@ -319,10 +331,20 @@ INPUT_PORTS_END
 
 ROM_START( ti99_pcode )
 	ROM_REGION(0x10000, PCODE_GROM_TAG, 0)
-	ROM_LOAD("pcode_g0.bin", 0x0000, 0x10000, CRC(541b3860) SHA1(7be77c216737334ae997753a6a85136f117affb7)) /* TI P-Code card groms */
+	// The order of the GROMs with respect to the socket number is not guaranteed to be correct
+	// as all GROMs are connected in parallel and dumped in-system
+	ROM_LOAD("pcode_grom0.u11", 0x0000, 0x1800, CRC(505e5df0) SHA1(66911fba7599c64981180f8a673581f4b05941ff))
+	ROM_LOAD("pcode_grom1.u13", 0x2000, 0x1800, CRC(63b546d5) SHA1(3d830c8bdac102275ec0702eff1ebf4b67484f52))
+	ROM_LOAD("pcode_grom2.u14", 0x4000, 0x1800, CRC(28821e5c) SHA1(c147bd5d8d624caa690284bfc253c6699e3518d4))
+	ROM_LOAD("pcode_grom3.u16", 0x6000, 0x1800, CRC(1db4a4a5) SHA1(f7a0ba8050f00ccc1ee328c66df5cc4269748ced))
+	ROM_LOAD("pcode_grom4.u19", 0x8000, 0x1800, CRC(9618eb9b) SHA1(1f223f3febcb93e648cefe49c83bfeac802be9d6))
+	ROM_LOAD("pcode_grom5.u20", 0xa000, 0x1800, CRC(c47efe6d) SHA1(f5b56c7de1cb1e7345a0716d35f00a3a9722febe))
+	ROM_LOAD("pcode_grom6.u21", 0xc000, 0x1800, CRC(06a34c93) SHA1(56172c56afa3868f2098328f81881022230d949d))
+	ROM_LOAD("pcode_grom7.u22", 0xe000, 0x1800, CRC(a09ca8d9) SHA1(2ea33d875f9c8e7c00df023a0d8d4461d50f0a87))
+
 	ROM_REGION(0x3000, PCODE_ROM_TAG, 0)
-	ROM_LOAD("pcode_r0.bin", 0x0000, 0x1000, CRC(3881d5b0) SHA1(a60e0468bb15ff72f97cf6e80979ca8c11ed0426)) /* TI P-Code card rom4732 */
-	ROM_LOAD("pcode_r1.bin", 0x1000, 0x2000, CRC(46a06b8b) SHA1(24e2608179921aef312cdee6f455e3f46deb30d0)) /* TI P-Code card rom4764 */
+	ROM_LOAD("pcode_rom0.u1", 0x0000, 0x1000, CRC(3881d5b0) SHA1(a60e0468bb15ff72f97cf6e80979ca8c11ed0426)) /* TI P-Code card rom4732 */
+	ROM_LOAD("pcode_rom1.u18", 0x1000, 0x2000, CRC(46a06b8b) SHA1(24e2608179921aef312cdee6f455e3f46deb30d0)) /* TI P-Code card rom4764 */
 ROM_END
 
 machine_config_constructor ti_pcode_card_device::device_mconfig_additions() const

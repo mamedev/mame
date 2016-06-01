@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "includes/srumbler.h"
 
@@ -87,7 +88,7 @@ static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x400b, 0x400b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x400c, 0x400c) AM_READ_PORT("DSW2")
 	AM_RANGE(0x400a, 0x400d) AM_WRITE(scroll_w)
-	AM_RANGE(0x400e, 0x400e) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x400e, 0x400e) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x5000, 0x5fff) AM_ROMBANK("5000") AM_WRITE(foreground_w) AM_SHARE("foregroundram") /* Banked ROM */
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("6000") /* Banked ROM */
 	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP        /* Video RAM 2 ??? (not used) */
@@ -108,7 +109,7 @@ static ADDRESS_MAP_START( srumbler_sound_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym2", ym2203_device, write)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -270,6 +271,8 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)

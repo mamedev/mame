@@ -21,7 +21,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram")
+		m_generic_paletteram_32(*this, "paletteram"),
+		m_gfx2(*this,"gfx2")
 		{ }
 
 	optional_device<deco146_device> m_deco146;
@@ -77,6 +78,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	required_region_ptr<UINT8> m_gfx2;
 
 	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );

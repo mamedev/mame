@@ -8,12 +8,15 @@
 
 #include "../Common/RegisterCodec.h"
 
+namespace NCompress {
+namespace NByteSwap {
+
 class CByteSwap2:
   public ICompressFilter,
   public CMyUnknownImp
 {
 public:
-  MY_UNKNOWN_IMP
+  MY_UNKNOWN_IMP1(ICompressFilter);
   INTERFACE_ICompressFilter(;)
 };
 
@@ -22,7 +25,7 @@ class CByteSwap4:
   public CMyUnknownImp
 {
 public:
-  MY_UNKNOWN_IMP
+  MY_UNKNOWN_IMP1(ICompressFilter);
   INTERFACE_ICompressFilter(;)
 };
 
@@ -85,3 +88,5 @@ REGISTER_CODECS_VAR
 };
 
 REGISTER_CODECS(ByteSwap)
+
+}}

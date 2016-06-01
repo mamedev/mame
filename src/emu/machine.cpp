@@ -80,6 +80,7 @@
 #include "debug/debugvw.h"
 #include "image.h"
 #include "network.h"
+#include "ui/uimain.h"
 #include <time.h>
 
 #if defined(EMSCRIPTEN)
@@ -202,7 +203,7 @@ void running_machine::start()
 	// allocate a soft_reset timer
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
 
-	// intialize UI input
+	// initialize UI input
 	m_ui_input = make_unique_clear<ui_input_manager>(*this);
 
 	// init the osd layer

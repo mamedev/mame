@@ -24,7 +24,7 @@ const device_type GB_ROM_MBC3 = &device_creator<gb_rom_mbc3_device>;
 const device_type GB_ROM_MBC5 = &device_creator<gb_rom_mbc5_device>;
 const device_type GB_ROM_MBC6 = &device_creator<gb_rom_mbc6_device>;
 const device_type GB_ROM_MBC7 = &device_creator<gb_rom_mbc7_device>;
-const device_type GB_ROM_M161_M12 = &device_creator<gb_rom_m161_device>;
+const device_type GB_ROM_M161 = &device_creator<gb_rom_m161_device>;
 const device_type GB_ROM_MMM01 = &device_creator<gb_rom_mmm01_device>;
 const device_type GB_ROM_SACHEN1 = &device_creator<gb_rom_sachen_mmc1_device>;
 const device_type GB_ROM_SACHEN2 = &device_creator<gb_rom_sachen_mmc2_device>;
@@ -44,14 +44,14 @@ gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type 
 }
 
 gb_rom_mbc1_device::gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source), m_mode(0),
+					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source), m_mode(MODE_16M_64k),
 						m_mask(0x1f),
 						m_shift(0)
 {
 }
 
 gb_rom_mbc1_device::gb_rom_mbc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MBC1, "GB MBC1 Carts", tag, owner, clock, "gb_rom_mbc1", __FILE__), m_mode(0),
+					: gb_rom_mbc_device(mconfig, GB_ROM_MBC1, "GB MBC1 Carts", tag, owner, clock, "gb_rom_mbc1", __FILE__), m_mode(MODE_16M_64k),
 						m_mask(0x1f),
 						m_shift(0)
 {
@@ -88,12 +88,12 @@ gb_rom_mbc7_device::gb_rom_mbc7_device(const machine_config &mconfig, const char
 }
 
 gb_rom_m161_device::gb_rom_m161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_M161_M12, "GB M161-M12 Carts", tag, owner, clock, "gb_rom_m161m12", __FILE__), m_base_bank(0)
+					: gb_rom_mbc_device(mconfig, GB_ROM_M161, "GB M161 Carts", tag, owner, clock, "gb_rom_m161", __FILE__), m_base_bank(0), m_load_disable(0)
 				{
 }
 
 gb_rom_mmm01_device::gb_rom_mmm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MMM01, "GB MMM01 Carts", tag, owner, clock, "gb_rom_mmm01", __FILE__), m_bank_mask(0), m_bank(0), m_reg(0)
+					: gb_rom_mbc_device(mconfig, GB_ROM_MMM01, "GB MMM01 Carts", tag, owner, clock, "gb_rom_mmm01", __FILE__), m_romb(0), m_romb_nwe(0), m_ramb(0), m_ramb_nwe(0), m_mode(0), m_mode_nwe(0), m_map(0), m_mux(0)
 				{
 }
 
@@ -217,30 +217,38 @@ void gb_rom_m161_device::device_start()
 {
 	shared_start();
 	save_item(NAME(m_base_bank));
+	save_item(NAME(m_load_disable));
 }
 
 void gb_rom_m161_device::device_reset()
 {
 	shared_reset();
 	m_base_bank = 0;
+	m_load_disable = 0;
 }
 
 void gb_rom_mmm01_device::device_start()
 {
 	shared_start();
-	save_item(NAME(m_bank_mask));
-	save_item(NAME(m_bank));
-	save_item(NAME(m_reg));
+	save_item(NAME(m_romb));
+	save_item(NAME(m_romb_nwe));
+	save_item(NAME(m_ramb));
+	save_item(NAME(m_ramb_nwe));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_mode_nwe));
+	save_item(NAME(m_map));
+	save_item(NAME(m_mux));
 }
 
 void gb_rom_mmm01_device::device_reset()
 {
-	m_latch_bank = 0x200 - 2;
-	m_latch_bank2 = 0x200 - 1;
-	m_ram_bank = 0;
-	m_bank_mask = 0xff;
-	m_bank = 0;
-	m_reg = 0;
+	m_romb = 0x000;
+	m_romb_nwe = 0x00;
+	m_ramb = 0x00;
+	m_ramb_nwe = 0x00;
+	m_mode = 0x00;
+	m_map = 0x00;
+	m_mux = 0x00;
 }
 
 void gb_rom_sachen_mmc1_device::device_start()
@@ -424,7 +432,7 @@ WRITE8_MEMBER(gb_rom_mbc2_device::write_bank)
 READ8_MEMBER(gb_rom_mbc2_device::read_ram)
 {
 	if (!m_ram.empty() && m_ram_enable)
-		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x01ff)] | 0xF0;
+		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x01ff)] | 0xf0;
 	else
 		return 0xff;
 }
@@ -432,7 +440,7 @@ READ8_MEMBER(gb_rom_mbc2_device::read_ram)
 WRITE8_MEMBER(gb_rom_mbc2_device::write_ram)
 {
 	if (!m_ram.empty() && m_ram_enable)
-		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x01ff)] = data & 0x0F;
+		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x01ff)] = data & 0x0f;
 }
 
 
@@ -664,24 +672,26 @@ WRITE8_MEMBER(gb_rom_mbc7_device::write_ram)
 }
 
 
-// M161-M12
+// M161
 
 READ8_MEMBER(gb_rom_m161_device::read_rom)
 {
-	if (offset < 0x4000)
-		return m_rom[rom_bank_map[m_base_bank] * 0x4000 + offset];
-	else
-		return m_rom[rom_bank_map[m_base_bank] * 0x4000 + (offset & 0x3fff)];
+	return m_rom[rom_bank_map[m_base_bank] * 0x4000 + (offset & 0x7fff)];
 }
 
 WRITE8_MEMBER(gb_rom_m161_device::write_bank)
 {
-	switch (offset & 0xe000)
+	// the mapper (74HC161A) only has data lines D2..D0
+	data &= 0x07;
+	
+	// A15 is connected to #LOAD and overwritten by QD (m_load_disable)
+	switch (offset & 0x8000)
 	{
-		case 0x4000:    // Base Bank Register
-			m_base_bank = data << 1;
+		case 0x0000:    // Base Bank Register
+			if (!m_load_disable)
+				m_base_bank = data << 1;
+			m_load_disable = 0x01;
 			break;
-		case 0x2000:    // Tetris writes 1 here when selected...
 		default:
 			break;
 	}
@@ -689,55 +699,111 @@ WRITE8_MEMBER(gb_rom_m161_device::write_bank)
 
 
 // MMM01
-// This mmm01 implementation is mostly guess work, no clue how correct it all is
-/* TODO: This implementation is wrong. Tauwasser
- *
- * Register 0: Map Latch, AA Mask, RAM Enable
- * Register 1: EA1..EA0, RA18..RA14
- * Register 2: ??, AA18..AA15, AA14..AA13
- * Register 3: AA Multiplex, RA Mask, ???, MBC1 Mode
- *
- */
 
 READ8_MEMBER(gb_rom_mmm01_device::read_rom)
 {
-	if (offset < 0x4000)
-		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + offset];
-	else
-		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+
+	UINT16 romb = m_romb & ~m_romb_nwe;
+	UINT16 romb_base = m_romb & (0x1e0 | m_romb_nwe);
+	UINT8 ramb_masked = ((offset & 0x4000) | m_mode ? m_ramb : m_ramb & ~0x03);
+	
+	// zero-adjust RA18..RA14
+	romb = (romb ? romb : 0x01);
+	// if unmapped, force
+	romb = (m_map ? romb : 0x01);
+	
+	// RB 0 logic
+	if (!(offset & 0x4000))
+		romb = 0x00;
+	
+	// combine with base
+	romb |= romb_base;
+	
+	// multiplex with AA14..AA13
+	if (m_mux)
+		romb = (romb & ~0x60) | ((ramb_masked & 0x03) << 5);
+	
+	// if unmapped, force
+	if (!m_map)
+		romb |= 0x1fe;
+	
+	return m_rom[rom_bank_map[romb] * 0x4000 + (offset & 0x3fff)];
 }
 
 WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 {
-	if (offset < 0x2000)
+	// the mapper only has data lines D6..D0
+	data &= 0x7f;
+	
+	// the mapper only uses inputs A15..A13
+	switch (offset & 0xe000)
 	{
-		if (data & 0x40)
-		{
-			m_latch_bank = m_reg;
-			m_latch_bank2 = m_latch_bank + m_bank;
-		}
+		case 0x0000: // Map Latch, AA #WE, RAM Enable
+			if (!m_map) {
+				m_ramb_nwe = (data & (0x30)) >> 4;
+				m_map = (data & 0x40);
+			}
+			m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
+			break;
+		case 0x2000: // RA20..RA19 RA18..RA14
+			if (!m_map)
+				m_romb = (m_romb & ~0x60) | (data & 0x60);
+			
+			m_romb = (m_romb & (~0x1f | m_romb_nwe)) | (data & (0x1f & ~m_romb_nwe));
+			break;
+		case 0x4000: // Mode #WE, RA22..RA21, AA16..AA15, AA14..AA13
+			if (!m_map) {
+				m_mode_nwe = data & 0x40;
+				m_romb = (m_romb & ~0x180) | ((data & 0x30) << 3);
+				m_ramb = (m_ramb & ~0x0c) | (data & 0x0c);
+			}
+			
+			m_ramb = (m_ramb & (~0x03 | m_ramb_nwe)) | (data & (0x03 & ~m_ramb_nwe));
+			break;
+		case 0x6000: // Mux, RA18..RA15 #WE/Mask, ???, MBC1 Mode
+			if (!m_map) {
+				m_mux = data & 0x40;
+				// m_romb_nwe is aligned to RA14, hence >> 1 instead of >> 2
+				m_romb_nwe = (data & 0x3c) >> 1;
+			}
+			
+			if (!m_mode_nwe)
+				m_mode = data & 0x01;
+			break;
+		default:
+			break;
 	}
-	else if (offset < 0x4000)
+}
+
+READ8_MEMBER(gb_rom_mmm01_device::read_ram)
+{
+	UINT8 ramb_masked = ((offset & 0x4000) | m_mode ? m_ramb : m_ramb & ~0x03);
+	UINT8 ramb = ramb_masked;
+	
+	// multiplex with RA20..RA19
+	if (m_mux)
+		ramb = (ramb & ~0x03) | ((m_romb & 0x60) >> 5);
+	
+	if (!m_ram.empty() && m_ram_enable)
 	{
-		m_reg = data & ((m_rom_size / 0x4000) - 1);
-		m_bank = m_reg & m_bank_mask;
-		if (m_bank == 0)
-			m_bank = 1;
-		m_latch_bank2 = m_latch_bank + m_bank;
+		return m_ram[ram_bank_map[ramb] * 0x2000 + (offset & 0x1fff)];
 	}
-	else if (offset < 0x6000)
-		logerror("0x%04X: write 0x%02X to 0x%04X\n", space.device().safe_pc(), data, offset);
 	else
+		return 0xff;
+}
+
+WRITE8_MEMBER(gb_rom_mmm01_device::write_ram)
+{
+	UINT8 ramb_masked = ((offset & 0x4000) | m_mode ? m_ramb : m_ramb & ~0x03);
+	UINT8 ramb = ramb_masked;
+	
+	// multiplex with RA20..RA19
+	if (m_mux)
+		ramb = (ramb & ~0x03) | ((m_romb & 0x60) >> 5);
+	
+	if (!m_ram.empty() && m_ram_enable)
 	{
-		logerror("0x%04X: write 0x%02X to 0x%04X\n", space.device().safe_pc(), data, offset);
-		/* Not sure if this is correct, Taito Variety Pack sets these values */
-		/* Momotarou Collection 2 writes 01 and 21 here */
-		switch (data)
-		{
-			case 0x30:  m_bank_mask = 0x07;   break;
-			case 0x38:  m_bank_mask = 0x03;   break;
-			default:    m_bank_mask = 0xff; break;
-		}
+		m_ram[ram_bank_map[ramb] * 0x2000 + (offset & 0x1fff)] = data;
 	}
 }
 
@@ -759,8 +825,8 @@ READ8_MEMBER(gb_rom_sachen_mmc1_device::read_rom)
 		off_edit |= 0x80;
 
 	/* Header Un-Scramble */
-	if ((off_edit & 0xFF00) == 0x0100) {
-		off_edit &= 0xFFAC;
+	if ((off_edit & 0xff00) == 0x0100) {
+		off_edit &= 0xffac;
 		off_edit |= ((offset >> 6) & 0x01) << 0;
 		off_edit |= ((offset >> 4) & 0x01) << 1;
 		off_edit |= ((offset >> 1) & 0x01) << 4;
@@ -778,7 +844,7 @@ WRITE8_MEMBER(gb_rom_sachen_mmc1_device::write_bank)
 {
 	/* Only A15..A6, A4, A1..A0 are connected */
 	/* We only decode upper three bits */
-	switch ((offset & 0xFFD3) & 0xE000)
+	switch ((offset & 0xffd3) & 0xe000)
 	{
 		case 0x0000: /* Base ROM Bank Register */
 
@@ -838,8 +904,8 @@ READ8_MEMBER(gb_rom_sachen_mmc2_device::read_rom)
 		off_edit |= 0x80;
 
 	/* Header Un-Scramble */
-	if ((off_edit & 0xFF00) == 0x0100) {
-		off_edit &= 0xFFAC;
+	if ((off_edit & 0xff00) == 0x0100) {
+		off_edit &= 0xffac;
 		off_edit |= ((offset >> 6) & 0x01) << 0;
 		off_edit |= ((offset >> 4) & 0x01) << 1;
 		off_edit |= ((offset >> 1) & 0x01) << 4;
@@ -859,7 +925,7 @@ READ8_MEMBER(gb_rom_sachen_mmc2_device::read_ram)
 		m_unlock_cnt = 0x00;
 		m_mode = MODE_LOCKED_CGB;
 	}
-	return 0xFF;
+	return 0xff;
 
 }
 

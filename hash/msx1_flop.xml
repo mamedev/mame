@@ -881,7 +881,7 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="loderun">
+	<software name="ldrun">
 		<description>Lode Runner (Jpn)</description>
 		<year>1984</year>
 		<publisher>Sony</publisher>

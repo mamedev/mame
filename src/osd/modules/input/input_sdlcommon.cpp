@@ -14,7 +14,7 @@
 #if defined(OSD_SDL)
 
 // standard sdl header
-#include "sdlinc.h"
+#include <SDL2/SDL.h>
 #include <ctype.h>
 #include <stddef.h>
 #include <mutex>

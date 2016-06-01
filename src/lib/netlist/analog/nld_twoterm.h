@@ -39,36 +39,36 @@
 // Macros
 // -----------------------------------------------------------------------------
 
-#define RES(_name, _R)                                                         \
-		NET_REGISTER_DEV(RES, _name)                                           \
-		NETDEV_PARAMI(_name, R, _R)
+#define RES(name, p_R)                                                         \
+		NET_REGISTER_DEV(RES, name)                                           \
+		NETDEV_PARAMI(name, R, p_R)
 
-#define POT(_name, _R)                                                         \
-		NET_REGISTER_DEV(POT, _name)                                           \
-		NETDEV_PARAMI(_name, R, _R)
+#define POT(name, p_R)                                                         \
+		NET_REGISTER_DEV(POT, name)                                           \
+		NETDEV_PARAMI(name, R, p_R)
 
 /* Does not have pin 3 connected */
-#define POT2(_name, _R)                                                        \
-		NET_REGISTER_DEV(POT2, _name)                                          \
-		NETDEV_PARAMI(_name, R, _R)
+#define POT2(name, p_R)                                                        \
+		NET_REGISTER_DEV(POT2, name)                                          \
+		NETDEV_PARAMI(name, R, p_R)
 
 
-#define CAP(_name, _C)                                                         \
-		NET_REGISTER_DEV(CAP, _name)                                           \
-		NETDEV_PARAMI(_name, C, _C)
+#define CAP(name, p_C)                                                         \
+		NET_REGISTER_DEV(CAP, name)                                           \
+		NETDEV_PARAMI(name, C, p_C)
 
 /* Generic Diode */
-#define DIODE(_name,  _model)                                                  \
-		NET_REGISTER_DEV(DIODE, _name)                                         \
-		NETDEV_PARAMI(_name, MODEL, _model)
+#define DIODE(name,  model)                                                  \
+		NET_REGISTER_DEV(DIODE, name)                                         \
+		NETDEV_PARAMI(name, MODEL, model)
 
-#define VS(_name, _V)                                                          \
-		NET_REGISTER_DEV(VS, _name)                                            \
-		NETDEV_PARAMI(_name, V, _V)
+#define VS(name, pV)                                                          \
+		NET_REGISTER_DEV(VS, name)                                            \
+		NETDEV_PARAMI(name, V, pV)
 
-#define CS(_name, _I)                                                          \
-		NET_REGISTER_DEV(CS, _name)                                            \
-		NETDEV_PARAMI(_name, I, _I)
+#define CS(name, pI)                                                          \
+		NET_REGISTER_DEV(CS, name)                                            \
+		NETDEV_PARAMI(name, I, pI)
 
 // -----------------------------------------------------------------------------
 // Generic macros
@@ -100,19 +100,23 @@ NETLIB_NAMESPACE_DEVICES_START()
 // nld_twoterm
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(twoterm) : public device_t
+NETLIB_OBJECT(twoterm)
 {
 public:
-	ATTR_COLD NETLIB_NAME(twoterm)(const family_t afamily);
-	ATTR_COLD NETLIB_NAME(twoterm)();
+	NETLIB_CONSTRUCTOR(twoterm)
+	{
+		m_P.m_otherterm = &m_N;
+		m_N.m_otherterm = &m_P;
+	}
 
 	terminal_t m_P;
 	terminal_t m_N;
 
-	virtual NETLIB_UPDATE_TERMINALSI()
-	{
-	}
+	NETLIB_UPDATE_TERMINALSI() { }
+	NETLIB_RESETI() { }
+	NETLIB_UPDATEI();
 
+public:
 	ATTR_HOT /* inline */ void set(const nl_double G, const nl_double V, const nl_double I)
 	{
 		/*      GO, GT, I                */
@@ -132,11 +136,6 @@ public:
 		m_N.set(-a21, a22, -r2);
 	}
 
-protected:
-	virtual void start() override;
-	virtual void reset() override;
-	ATTR_HOT void update() override;
-
 private:
 };
 
@@ -144,67 +143,151 @@ private:
 // nld_R
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(R_base) : public NETLIB_NAME(twoterm)
+NETLIB_OBJECT_DERIVED(R_base, twoterm)
 {
-public:
-	ATTR_COLD NETLIB_NAME(R_base)() : NETLIB_NAME(twoterm)(RESISTOR) { }
+	NETLIB_CONSTRUCTOR_DERIVED(R_base, twoterm)
+	{
+		enregister("1", m_P);
+		enregister("2", m_N);
+	}
 
+public:
 	inline void set_R(const nl_double R)
 	{
 		set(NL_FCONST(1.0) / R, 0.0, 0.0);
 	}
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	ATTR_HOT void update() override;
+	NETLIB_RESETI()
+	{
+		NETLIB_NAME(twoterm)::reset();
+		set_R(1.0 / netlist().gmin());
+	}
+
+	NETLIB_UPDATEI()
+	{
+		NETLIB_NAME(twoterm)::update();
+	}
+
+
 };
 
-NETLIB_DEVICE_WITH_PARAMS_DERIVED(R, R_base,
+NETLIB_OBJECT_DERIVED(R, R_base)
+{
+	NETLIB_CONSTRUCTOR_DERIVED(R, R_base)
+	, m_R(*this, "R", 1.0 / netlist().gmin())
+	{
+	}
+
 	param_double_t m_R;
-);
+
+protected:
+
+	//NETLIB_RESETI() { }
+	//NETLIB_UPDATEI() { }
+	NETLIB_UPDATE_PARAMI()
+	{
+		update_dev();
+		if (m_R.Value() > 1e-9)
+			set_R(m_R.Value());
+		else
+			set_R(1e-9);
+	}
+
+};
 
 // -----------------------------------------------------------------------------
 // nld_POT
 // -----------------------------------------------------------------------------
 
-NETLIB_DEVICE_WITH_PARAMS(POT,
-	NETLIB_NAME(R_base) m_R1;
-	NETLIB_NAME(R_base) m_R2;
+NETLIB_OBJECT(POT)
+{
+	NETLIB_CONSTRUCTOR(POT)
+	, m_R1(*this, "R1")
+	, m_R2(*this, "R2")
+	, m_R(*this, "R", 1.0 / netlist().gmin())
+	, m_Dial(*this, "DIAL", 0.5)
+	, m_DialIsLog(*this, "DIALLOG", 0)
+	{
+		register_subalias("1", m_R1.m_P);
+		register_subalias("2", m_R1.m_N);
+		register_subalias("3", m_R2.m_N);
+
+		connect_late(m_R2.m_P, m_R1.m_N);
+
+	}
+
+	//NETLIB_UPDATEI();
+	//NETLIB_RESETI();
+	NETLIB_UPDATE_PARAMI();
+
+private:
+	NETLIB_SUB(R_base) m_R1;
+	NETLIB_SUB(R_base) m_R2;
 
 	param_double_t m_R;
 	param_double_t m_Dial;
 	param_logic_t m_DialIsLog;
-);
+};
 
-NETLIB_DEVICE_WITH_PARAMS(POT2,
-	NETLIB_NAME(R_base) m_R1;
+NETLIB_OBJECT(POT2)
+{
+	NETLIB_CONSTRUCTOR(POT2)
+	, m_R1(*this, "R1")
+	, m_R(*this, "R", 1.0 / netlist().gmin())
+	, m_Dial(*this, "DIAL", 0.5)
+	, m_DialIsLog(*this, "DIALLOG", 0)
+	, m_Reverse(*this, "REVERSE", 0)
+	{
+		register_subalias("1", m_R1.m_P);
+		register_subalias("2", m_R1.m_N);
+
+	}
+
+	//NETLIB_UPDATEI();
+	//NETLIB_RESETI();
+	NETLIB_UPDATE_PARAMI();
+
+private:
+	NETLIB_SUB(R_base) m_R1;
 
 	param_double_t m_R;
 	param_double_t m_Dial;
 	param_logic_t m_DialIsLog;
 	param_logic_t m_Reverse;
-);
+};
 
 
 // -----------------------------------------------------------------------------
 // nld_C
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(C) : public NETLIB_NAME(twoterm)
+NETLIB_OBJECT_DERIVED(C, twoterm)
 {
 public:
-	ATTR_COLD NETLIB_NAME(C)() : NETLIB_NAME(twoterm)(CAPACITOR), m_GParallel(0.0) { }
+	NETLIB_CONSTRUCTOR_DERIVED(C, twoterm)
+	, m_C(*this, "C", 1e-6)
+	, m_GParallel(0.0)
+	{
+		enregister("1", m_P);
+		enregister("2", m_N);
+	}
 
-	ATTR_HOT void step_time(const nl_double st) override;
+	NETLIB_TIMESTEP()
+	{
+		/* Gpar should support convergence */
+		const nl_double G = m_C.Value() / step +  m_GParallel;
+		const nl_double I = -G * deltaV();
+		set(G, 0.0, I);
+	}
+
 
 	param_double_t m_C;
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	virtual void update_param() override;
-	ATTR_HOT void update() override;
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
+	NETLIB_UPDATE_PARAMI();
 
 private:
 	nl_double m_GParallel;
@@ -288,22 +371,32 @@ private:
 // nld_D
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(D) : public NETLIB_NAME(twoterm)
+NETLIB_OBJECT_DERIVED(D, twoterm)
 {
 public:
-	ATTR_COLD NETLIB_NAME(D)() : NETLIB_NAME(twoterm)(DIODE) { }
+	NETLIB_CONSTRUCTOR_DERIVED(D, twoterm)
+	, m_model(*this, "MODEL", "")
+	{
+		enregister("A", m_P);
+		enregister("K", m_N);
+
+		m_D.save("m_D", *this);
+	}
+
+	NETLIB_DYNAMIC()
 
 	NETLIB_UPDATE_TERMINALSI();
 
 	param_model_t m_model;
 
 protected:
-	virtual void start() override;
-	virtual void update_param() override;
-	ATTR_HOT void update() override;
+	//NETLIB_RESETI();
+	NETLIB_UPDATEI();
+	NETLIB_UPDATE_PARAMI();
 
 	generic_diode m_D;
 };
+
 
 // -----------------------------------------------------------------------------
 // nld_VS - Voltage source
@@ -311,15 +404,21 @@ protected:
 // netlist voltage source must have inner resistance
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(VS) : public NETLIB_NAME(twoterm)
+NETLIB_OBJECT_DERIVED(VS, twoterm)
 {
 public:
-	ATTR_COLD NETLIB_NAME(VS)() : NETLIB_NAME(twoterm)(VS) { }
+	NETLIB_CONSTRUCTOR_DERIVED(VS, twoterm)
+	, m_R(*this, "R", 0.1)
+	, m_V(*this, "V", 0.0)
+	{
+
+		enregister("P", m_P);
+		enregister("N", m_N);
+	}
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	ATTR_HOT void update() override;
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
 
 	param_double_t m_R;
 	param_double_t m_V;
@@ -329,15 +428,19 @@ protected:
 // nld_CS - Current source
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(CS) : public NETLIB_NAME(twoterm)
+NETLIB_OBJECT_DERIVED(CS, twoterm)
 {
 public:
-	ATTR_COLD NETLIB_NAME(CS)() : NETLIB_NAME(twoterm)(CS) { }
+	NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
+	, m_I(*this, "I", 1.0)
+	{
+		enregister("P", m_P);
+		enregister("N", m_N);
+	}
 
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	ATTR_HOT void update() override;
 
 	param_double_t m_I;
 };

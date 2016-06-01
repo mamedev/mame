@@ -371,7 +371,10 @@ void snes_ppu_device::device_reset()
 	m_beam.latch_vert = 0;
 	m_beam.latch_horz = 0;
 	m_beam.current_vert = 0;
-	m_beam.last_visible_line = 225; /* TODO: PAL setting */
+
+	/* Set STAT78 to NTSC or PAL */
+	m_stat78 = (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds()) >= 59.0) ? SNES_NTSC : SNES_PAL;
+	m_beam.last_visible_line = m_stat78 & SNES_PAL ? 240 : 225;
 	m_mode = 0;
 	m_ppu1_version = 1;  // 5C77 chip version number, read by STAT77, only '1' is known
 	m_ppu2_version = 3;  // 5C78 chip version number, read by STAT78, only '2' & '3' encountered so far.
@@ -400,8 +403,6 @@ void snes_ppu_device::device_reset()
 
 	/* Init oam RAM */
 	memset((UINT8 *)m_oam_ram.get(), 0xff, SNES_OAM_SIZE);
-
-	m_stat78 = 0;
 
 	// other initializations to 0
 	memset(m_regs, 0, sizeof(m_regs));
@@ -2795,6 +2796,8 @@ void snes_ppu_device::write(address_space &space, UINT32 offset, UINT8 data)
 		case SETINI:    /* Screen mode/video select */
 			m_interlace = (data & 0x01) ? 2 : 1;
 			m_obj_interlace = (data & 0x02) ? 2 : 1;
+			// TODO: this should actually be always 240, then fill black remaining lines if bit is 0.
+			//m_beam.last_visible_line = (m_stat78 & SNES_PAL) ? 240 : (data & 0x04) ? 240 : 225;
 			m_beam.last_visible_line = (data & 0x04) ? 240 : 225;
 			m_pseudo_hires = BIT(data, 3);
 			m_mode7.extbg = BIT(data, 6);

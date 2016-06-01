@@ -10,8 +10,8 @@
 
 //#pragma once
 
-#ifndef __OSDMODULE_H__
-#define __OSDMODULE_H__
+#ifndef MAME_OSD_MODULES_OSDMODULE_H
+#define MAME_OSD_MODULES_OSDMODULE_H
 
 #include "osdcore.h"
 #include "osdepend.h"
@@ -51,11 +51,11 @@ private:
 typedef osd_module *(*module_type)();
 
 // this template function creates a stub which constructs a module
-template<class _ModuleClass>
+template<class ModuleClass>
 osd_module *module_creator()
 {
-	void *p = osd_malloc(sizeof(_ModuleClass));
-	return new(p) _ModuleClass;
+	void *p = osd_malloc(sizeof(ModuleClass));
+	return new(p) ModuleClass;
 }
 
 class osd_module_manager
@@ -93,17 +93,17 @@ private:
 	osd_module *m_selected[MAX_MODULES];
 };
 
-#define MODULE_DEFINITION(_id, _class) \
-	extern const module_type _id ;  \
-	const module_type _id = &module_creator< _class >;
+#define MODULE_DEFINITION(mod_id, mod_class) \
+	extern const module_type mod_id ;  \
+	const module_type mod_id = &module_creator< mod_class >;
 
 
-#define MODULE_NOT_SUPPORTED(_mod, _type, _name) \
-	class _mod : public osd_module { \
+#define MODULE_NOT_SUPPORTED(mod_class, mod_type, mod_name) \
+	class mod_class : public osd_module { \
 	public: \
-		_mod () : osd_module(_type, _name) { } \
+		mod_class () : osd_module(mod_type, mod_name) { } \
 		virtual int init(const osd_options &options) override { return -1; } \
 		virtual bool probe() override { return false; } \
 	};
 
-#endif  /* __OSDMODULE_H__ */
+#endif  /* MAME_OSD_MODULES_OSDMODULE_H */

@@ -979,7 +979,7 @@ private:
 	void load_layout_files(const internal_layout *layoutfile, bool singlefile);
 	bool load_layout_file(const char *dirname, const char *filename);
 	bool load_layout_file(const char *dirname, const internal_layout *layout_data);
-	void add_container_primitives(render_primitive_list &list, const object_transform &xform, render_container &container, int blendmode);
+	void add_container_primitives(render_primitive_list &list, const object_transform &root_xform, const object_transform &xform, render_container &container, int blendmode);
 	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
 	bool map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, ioport_port *&mapped_input_port, ioport_value &mapped_input_mask);
 

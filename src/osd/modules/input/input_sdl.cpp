@@ -17,7 +17,7 @@
 #if defined(SDLMAME_SDL2)
 
 // standard sdl header
-#include "sdlinc.h"
+#include <SDL2/SDL.h>
 #include <ctype.h>
 #include <stddef.h>
 #include <mutex>
@@ -156,11 +156,23 @@ public:
 			{
 				auto window = GET_FOCUS_WINDOW(&event.text);
 				//printf("Focus window is %p - wl %p\n", window, sdl_window_list);
-				unicode_char result;
 				if (window != nullptr)
 				{
-					osd_uchar_from_osdchar(&result, sdlevent.text.text, 1);
-					machine().ui_input().push_char_event(window->target(), result);
+					auto ptr = sdlevent.text.text;
+					auto len = std::strlen(sdlevent.text.text);
+					while (len)
+					{
+						unicode_char ch;
+						auto chlen = uchar_from_utf8(&ch, ptr, len);
+						if (0 > chlen)
+						{
+							ch = 0x0fffd;
+							chlen = 1;
+						}
+						ptr += chlen;
+						len -= chlen;
+						machine().ui_input().push_char_event(window->target(), ch);
+					}
 				}
 			}
 			break;

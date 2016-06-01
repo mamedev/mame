@@ -9,21 +9,24 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "mame.h"
+
 #include "ui/ui.h"
-#include "ui/menu.h"
-#include "rendfont.h"
 #include "ui/datfile.h"
 #include "ui/datmenu.h"
 #include "ui/utils.h"
+
+#include "mame.h"
+#include "rendfont.h"
 #include "softlist.h"
+
+namespace ui {
 
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_dats_view::ui_menu_dats_view(mame_ui_manager &mui, render_container *container, const game_driver *driver)
-	: ui_menu(mui, container)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container *container, const game_driver *driver)
+	: menu(mui, container)
 	, m_actual(0)
 	, m_driver((driver == nullptr) ? &mui.machine().system() : driver)
 	, m_issoft(false)
@@ -47,8 +50,8 @@ ui_menu_dats_view::ui_menu_dats_view(mame_ui_manager &mui, render_container *con
 //  ctor
 //-------------------------------------------------
 
-ui_menu_dats_view::ui_menu_dats_view(mame_ui_manager &mui, render_container *container, ui_software_info *swinfo, const game_driver *driver)
-	: ui_menu(mui, container)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container *container, ui_software_info *swinfo, const game_driver *driver)
+	: menu(mui, container)
 	, m_actual(0)
 	, m_driver((driver == nullptr) ? &mui.machine().system() : driver)
 	, m_swinfo(swinfo)
@@ -69,7 +72,7 @@ ui_menu_dats_view::ui_menu_dats_view(mame_ui_manager &mui, render_container *con
 //  dtor
 //-------------------------------------------------
 
-ui_menu_dats_view::~ui_menu_dats_view()
+menu_dats_view::~menu_dats_view()
 {
 }
 
@@ -77,21 +80,21 @@ ui_menu_dats_view::~ui_menu_dats_view()
 //  handle
 //-------------------------------------------------
 
-void ui_menu_dats_view::handle()
+void menu_dats_view::handle()
 {
-	const ui_menu_event *m_event = process(MENU_FLAG_UI_DATS);
-	if (m_event != nullptr)
+	const event *menu_event = process(FLAG_UI_DATS);
+	if (menu_event != nullptr)
 	{
-		if (m_event->iptkey == IPT_UI_LEFT && m_actual > 0)
+		if (menu_event->iptkey == IPT_UI_LEFT && m_actual > 0)
 		{
 			m_actual--;
-			reset(UI_MENU_RESET_SELECT_FIRST);
+			reset(reset_options::SELECT_FIRST);
 		}
 
-		if (m_event->iptkey == IPT_UI_RIGHT && m_actual < m_items_list.size() - 1)
+		if (menu_event->iptkey == IPT_UI_RIGHT && m_actual < m_items_list.size() - 1)
 		{
 			m_actual++;
-			reset(UI_MENU_RESET_SELECT_FIRST);
+			reset(reset_options::SELECT_FIRST);
 		}
 	}
 }
@@ -100,7 +103,7 @@ void ui_menu_dats_view::handle()
 //  populate
 //-------------------------------------------------
 
-void ui_menu_dats_view::populate()
+void menu_dats_view::populate()
 {
 	bool paused = machine().paused();
 	if (!paused)
@@ -108,7 +111,7 @@ void ui_menu_dats_view::populate()
 
 	(m_issoft == true) ? get_data_sw() : get_data();
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), nullptr);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, (FLAG_UI_DATS | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW), nullptr);
 	customtop = 2.0f * ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
 	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 
@@ -120,7 +123,7 @@ void ui_menu_dats_view::populate()
 //  perform our special rendering
 //-------------------------------------------------
 
-void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_dats_view::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float maxwidth = origx2 - origx1;
 	float width;
@@ -219,7 +222,7 @@ void ui_menu_dats_view::custom_render(void *selectedref, float top, float bottom
 //  load data from DATs
 //-------------------------------------------------
 
-void ui_menu_dats_view::get_data()
+void menu_dats_view::get_data()
 {
 	std::vector<int> xstart;
 	std::vector<int> xend;
@@ -248,11 +251,11 @@ void ui_menu_dats_view::get_data()
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		item_append(tempbuf.c_str(), nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_DISABLE), (void *)(FPTR)(x + 1));
+		item_append(tempbuf.c_str(), nullptr, (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
 	}
 }
 
-void ui_menu_dats_view::get_data_sw()
+void menu_dats_view::get_data_sw()
 {
 	std::vector<int> xstart;
 	std::vector<int> xend;
@@ -271,11 +274,11 @@ void ui_menu_dats_view::get_data_sw()
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		item_append(tempbuf.c_str(), nullptr, (MENU_FLAG_UI_DATS | MENU_FLAG_DISABLE), (void *)(FPTR)(x + 1));
+		item_append(tempbuf.c_str(), nullptr, (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
 	}
 }
 
-void ui_menu_dats_view::init_items()
+void menu_dats_view::init_items()
 {
 	datfile_manager &datfile = mame_machine_manager::instance()->datfile();
 	if (datfile.has_history(m_driver))
@@ -293,3 +296,5 @@ void ui_menu_dats_view::init_items()
 	if (datfile.has_command(m_driver))
 		m_items_list.emplace_back(_("Command"), UI_COMMAND_LOAD, "");
 }
+
+} // namespace ui

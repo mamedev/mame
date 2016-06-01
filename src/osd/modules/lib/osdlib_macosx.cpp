@@ -22,10 +22,6 @@
 #include "osdcore.h"
 #include "osdlib.h"
 
-// FIXME: We shouldn't use SDL functions in here
-
-#include "sdlinc.h"
-
 //============================================================
 //  osd_getenv
 //============================================================

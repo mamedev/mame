@@ -9,6 +9,7 @@
 #include "video/k053250.h"
 #include "sound/flt_vol.h"
 #include "sound/k054539.h"
+#include "machine/gen_latch.h"
 #include "machine/k053252.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053246_k053247_k055673.h"
@@ -37,7 +38,10 @@ public:
 		m_k053252(*this, "k053252"),
 		m_k054338(*this, "k054338"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch3(*this, "soundlatch3") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_workram;
@@ -73,6 +77,10 @@ public:
 	required_device<k054338_device> m_k054338;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<generic_latch_8_device> m_soundlatch3;
+
 	DECLARE_READ16_MEMBER(spriteram_mirror_r);
 	DECLARE_WRITE16_MEMBER(spriteram_mirror_w);
 	DECLARE_READ16_MEMBER(xexex_waitskip_r);

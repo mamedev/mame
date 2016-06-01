@@ -161,6 +161,26 @@ private:
 };
 
 
+// ======================> gba_rom_3dmatrix_device
+
+class gba_rom_3dmatrix_device : public gba_rom_device
+{
+public:
+	// construction/destruction
+	gba_rom_3dmatrix_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// reading and writing
+	virtual DECLARE_WRITE32_MEMBER(write_mapper) override;
+
+private:
+	UINT32 m_src, m_dst, m_nblock;
+};
+
+
 // device type definition
 extern const device_type GBA_ROM_STD;
 extern const device_type GBA_ROM_SRAM;
@@ -168,6 +188,7 @@ extern const device_type GBA_ROM_EEPROM;
 extern const device_type GBA_ROM_EEPROM64;
 extern const device_type GBA_ROM_FLASH;
 extern const device_type GBA_ROM_FLASH1M;
+extern const device_type GBA_ROM_3DMATRIX;
 
 
 

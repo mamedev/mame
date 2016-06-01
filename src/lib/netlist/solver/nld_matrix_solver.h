@@ -52,9 +52,9 @@ public:
 
 	unsigned m_railstart;
 
-	pvector_t<int> m_nz;   /* all non zero for multiplication */
-	pvector_t<int> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
-	pvector_t<int> m_nzbd; /* non zero below of the diagonal for elimination */
+	plib::pvector_t<unsigned> m_nz;   /* all non zero for multiplication */
+	plib::pvector_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
+	plib::pvector_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
 
 	/* state */
 	nl_double m_last_V;
@@ -62,20 +62,20 @@ public:
 	nl_double m_h_n_m_1;
 
 private:
-	pvector_t<int> m_net_other;
-	pvector_t<nl_double> m_go;
-	pvector_t<nl_double> m_gt;
-	pvector_t<nl_double> m_Idr;
-	pvector_t<nl_double *> m_other_curanalog;
-	pvector_t<terminal_t *> m_term;
+	plib::pvector_t<int> m_net_other;
+	plib::pvector_t<nl_double> m_go;
+	plib::pvector_t<nl_double> m_gt;
+	plib::pvector_t<nl_double> m_Idr;
+	plib::pvector_t<nl_double *> m_other_curanalog;
+	plib::pvector_t<terminal_t *> m_term;
 
 };
 
 class matrix_solver_t : public device_t
 {
 public:
-	typedef pvector_t<matrix_solver_t *> list_t;
-	typedef core_device_t::list_t dev_list_t;
+	using list_t = plib::pvector_t<matrix_solver_t *>;
+	using dev_list_t = core_device_t::list_t;
 
 	enum eSortType
 	{
@@ -84,38 +84,62 @@ public:
 		DESCENDING
 	};
 
-	matrix_solver_t(const eSortType sort, const solver_parameters_t *params);
+	matrix_solver_t(netlist_t &anetlist, const pstring &name,
+			const eSortType sort, const solver_parameters_t *params)
+	: device_t(anetlist, name),
+    m_stat_calculations(0),
+	m_stat_newton_raphson(0),
+	m_stat_vsolver_calls(0),
+	m_iterative_fail(0),
+	m_iterative_total(0),
+	m_params(*params),
+	m_cur_ts(0),
+	m_sort(sort)
+	{
+		enregister("Q_sync", m_Q_sync);
+		enregister("FB_sync", m_fb_sync);
+		connect_post_start(m_fb_sync, m_Q_sync);
+
+		save(NLNAME(m_last_step));
+		save(NLNAME(m_cur_ts));
+		save(NLNAME(m_stat_calculations));
+		save(NLNAME(m_stat_newton_raphson));
+		save(NLNAME(m_stat_vsolver_calls));
+		save(NLNAME(m_iterative_fail));
+		save(NLNAME(m_iterative_total));
+	}
+
 	virtual ~matrix_solver_t();
 
 	void setup(analog_net_t::list_t &nets) { vsetup(nets); }
 
-	netlist_time solve_base();
+	const netlist_time solve_base();
 
-	netlist_time solve();
+	const netlist_time solve();
 
-	inline bool is_dynamic() const { return m_dynamic_devices.size() > 0; }
-	inline bool is_timestep() const { return m_step_devices.size() > 0; }
+	inline bool has_dynamic_devices() const { return m_dynamic_devices.size() > 0; }
+	inline bool has_timestep_devices() const { return m_step_devices.size() > 0; }
 
 	void update_forced();
-	void update_after(const netlist_time after)
+	void update_after(const netlist_time &after)
 	{
 		m_Q_sync.net().reschedule_in_queue(after);
 	}
 
 	/* netdevice functions */
-	virtual void update() override;
-	virtual void start() override;
-	virtual void reset() override;
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
 
+public:
 	ATTR_COLD int get_net_idx(net_t *net);
 
-	plog_base<NL_DEBUG> &log() { return netlist().log(); }
+	plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
 
 	virtual void log_stats();
 
-	virtual void create_solver_code(postream &strm)
+	virtual void create_solver_code(plib::postream &strm)
 	{
-		strm.writeline(pfmt("/* {1} doesn't support static compile */"));
+		strm.writeline(plib::pfmt("/* {1} doesn't support static compile */"));
 	}
 
 protected:
@@ -139,11 +163,11 @@ protected:
 	template <typename T>
 	void build_LE_RHS();
 
-	pvector_t<terms_t *> m_terms;
-	pvector_t<analog_net_t *> m_nets;
-	pvector_t<analog_output_t *> m_inps;
+	plib::pvector_t<terms_t *> m_terms;
+	plib::pvector_t<analog_net_t *> m_nets;
+	plib::pvector_t<analog_output_t *> m_inps;
 
-	pvector_t<terms_t *> m_rails_temp;
+	plib::pvector_t<terms_t *> m_rails_temp;
 
 	int m_stat_calculations;
 	int m_stat_newton_raphson;

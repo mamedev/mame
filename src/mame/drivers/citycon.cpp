@@ -11,6 +11,7 @@ Dip locations added from dip listing at crazykong.com
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "includes/citycon.h"
@@ -35,8 +36,8 @@ static ADDRESS_MAP_START( citycon_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2800, 0x2fff) AM_NOP //0x2900-0x2fff cleared at post but unused
 	AM_RANGE(0x3000, 0x3000) AM_READ(citycon_in_r) AM_WRITE(citycon_background_w)   /* player 1 & 2 inputs multiplexed */
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x3007, 0x3007) AM_READ(citycon_irq_ack_r)
 	AM_RANGE(0x3800, 0x3cff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -210,12 +211,15 @@ static MACHINE_CONFIG_START( citycon, citycon_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, 1250000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(driver_device, soundlatch2_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch2", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)

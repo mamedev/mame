@@ -42,6 +42,7 @@ public:
 	virtual void machine_reset() override;
 
 	DECLARE_PALETTE_INIT(fb01);
+	HD44780_PIXEL_UPDATE(fb01_pixel_update);
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -150,7 +151,7 @@ void fb01_state::update_int()
 }
 
 
-static HD44780_PIXEL_UPDATE(fb01_pixel_update)
+HD44780_PIXEL_UPDATE(fb01_state::fb01_pixel_update)
 {
 	if ( pos < 8 && line < 2 )
 	{
@@ -189,7 +190,7 @@ static MACHINE_CONFIG_START( fb01, fb01_state )
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 8)   // 2x8 displayed as 1x16
-	MCFG_HD44780_PIXEL_UPDATE_CB(fb01_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(fb01_state,fb01_pixel_update)
 
 	MCFG_DEVICE_ADD("upd71051", I8251, XTAL_4MHz)
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(fb01_state, upd71051_rxrdy_w))

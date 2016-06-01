@@ -8,16 +8,22 @@
 
 ***************************************************************************/
 
-#ifndef __UI_SWLIST_H__
-#define __UI_SWLIST_H__
+#ifndef MAME_FRONTEND_UI_SWLIST_H
+#define MAME_FRONTEND_UI_SWLIST_H
 
-// ======================> ui_menu_software_parts
+#include "ui/menu.h"
 
-class ui_menu_software_parts : public ui_menu {
+
+namespace ui {
+
+// ======================> menu_software_parts
+
+class menu_software_parts : public menu
+{
 public:
 	enum { T_EMPTY, T_FMGR, T_SWLIST, T_ENTRY };
-	ui_menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, int *result);
-	virtual ~ui_menu_software_parts();
+	menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, int *result);
+	virtual ~menu_software_parts() override;
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -36,12 +42,13 @@ private:
 };
 
 
-// ======================> ui_menu_software_list
+// ======================> menu_software_list
 
-class ui_menu_software_list : public ui_menu {
+class menu_software_list : public menu
+{
 public:
-	ui_menu_software_list(mame_ui_manager &mui, render_container *container, software_list_device *swlist, const char *interface, std::string &result);
-	virtual ~ui_menu_software_list();
+	menu_software_list(mame_ui_manager &mui, render_container *container, software_list_device *swlist, const char *interface, std::string &result);
+	virtual ~menu_software_list() override;
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -67,12 +74,13 @@ private:
 };
 
 
-// ======================> ui_menu_software
+// ======================> menu_software
 
-class ui_menu_software : public ui_menu {
+class menu_software : public menu
+{
 public:
-	ui_menu_software(mame_ui_manager &mui, render_container *container, const char *interface, software_list_device **result);
-	virtual ~ui_menu_software();
+	menu_software(mame_ui_manager &mui, render_container *container, const char *interface, software_list_device **result);
+	virtual ~menu_software() override;
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -81,4 +89,6 @@ private:
 	software_list_device **         m_result;
 };
 
-#endif  /* __UI_SWLIST_H__ */
+} // namespace ui
+
+#endif  /* MAME_FRONTEND_UI_SWLIST_H */

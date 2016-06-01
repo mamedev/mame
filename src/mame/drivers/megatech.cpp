@@ -157,8 +157,8 @@ private:
 	void switch_cart(int gameno);
 
 	std::unique_ptr<UINT8[]> m_banked_ram;
-	UINT8* sms_mainram;
-	UINT8* sms_rom;
+	std::unique_ptr<UINT8[]> sms_mainram;
+	std::unique_ptr<UINT8[]> sms_rom;
 
 	required_device<sega315_5124_device> m_vdp1;
 	required_device<generic_slot_device> m_cart1;
@@ -344,18 +344,18 @@ WRITE8_MEMBER( mtech_state::mt_sms_standard_rom_bank_w )
 	{
 		case 0:
 			logerror("bank w %02x %02x\n", offset, data);
-			space.install_rom(0x0000, 0xbfff, sms_rom);
+			space.install_rom(0x0000, 0xbfff, sms_rom.get());
 			space.unmap_write(0x0000, 0xbfff);
 			//printf("bank ram??\n");
 			break;
 		case 1:
-			memcpy(sms_rom+0x0000, m_region_maincpu->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom.get()+0x0000, m_region_maincpu->base()+bank*0x4000, 0x4000);
 			break;
 		case 2:
-			memcpy(sms_rom+0x4000, m_region_maincpu->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom.get()+0x4000, m_region_maincpu->base()+bank*0x4000, 0x4000);
 			break;
 		case 3:
-			memcpy(sms_rom+0x8000, m_region_maincpu->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom.get()+0x8000, m_region_maincpu->base()+bank*0x4000, 0x4000);
 			break;
 
 	}
@@ -367,13 +367,15 @@ void mtech_state::set_genz80_as_sms()
 	address_space &io = m_z80snd->space(AS_IO);
 
 	// main ram area
-	sms_mainram = (UINT8 *)prg.install_ram(0xc000, 0xdfff, 0, 0x2000);
-	memset(sms_mainram,0x00,0x2000);
+	sms_mainram = std::make_unique<UINT8[]>(0x2000);
+	prg.install_ram(0xc000, 0xdfff, 0, 0x2000, sms_mainram.get());
+	memset(sms_mainram.get(), 0x00, 0x2000);
 
 	// fixed rom bank area
-	sms_rom = (UINT8 *)prg.install_rom(0x0000, 0xbfff, nullptr);
+	sms_rom = std::make_unique<UINT8[]>(0xc000);
+	prg.install_rom(0x0000, 0xbfff, sms_rom.get());
 
-	memcpy(sms_rom, m_region_maincpu->base(), 0xc000);
+	memcpy(sms_rom.get(), m_region_maincpu->base(), 0xc000);
 
 	prg.install_write_handler(0xfffc, 0xffff, write8_delegate(FUNC(mtech_state::mt_sms_standard_rom_bank_w),this));
 

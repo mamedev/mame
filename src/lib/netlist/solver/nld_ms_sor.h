@@ -19,13 +19,13 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-template <unsigned m_N, unsigned _storage_N>
-class matrix_solver_SOR_t: public matrix_solver_direct_t<m_N, _storage_N>
+template <unsigned m_N, unsigned storage_N>
+class matrix_solver_SOR_t: public matrix_solver_direct_t<m_N, storage_N>
 {
 public:
 
-	matrix_solver_SOR_t(const solver_parameters_t *params, int size)
-		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::ASCENDING, params, size)
+	matrix_solver_SOR_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, int size)
+		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
 		, m_lp_fact(0)
 		{
 		}
@@ -44,15 +44,15 @@ private:
 // ----------------------------------------------------------------------------------------
 
 
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_SOR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
+template <unsigned m_N, unsigned storage_N>
+void matrix_solver_SOR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
-	matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
+	matrix_solver_direct_t<m_N, storage_N>::vsetup(nets);
 	this->save(NLNAME(m_lp_fact));
 }
 
-template <unsigned m_N, unsigned _storage_N>
-int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+template <unsigned m_N, unsigned storage_N>
+int matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	const unsigned iN = this->N();
 	bool resched = false;
@@ -68,10 +68,10 @@ int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_r
 
 	const nl_double ws = this->m_params.m_sor;
 
-	ATTR_ALIGN nl_double w[_storage_N];
-	ATTR_ALIGN nl_double one_m_w[_storage_N];
-	ATTR_ALIGN nl_double RHS[_storage_N];
-	ATTR_ALIGN nl_double new_V[_storage_N];
+	ATTR_ALIGN nl_double w[storage_N];
+	ATTR_ALIGN nl_double one_m_w[storage_N];
+	ATTR_ALIGN nl_double RHS[storage_N];
+	ATTR_ALIGN nl_double new_V[storage_N];
 
 	for (unsigned k = 0; k < iN; k++)
 	{
@@ -163,7 +163,7 @@ int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_r
 	{
 		// Fallback to direct solver ...
 		this->m_iterative_fail++;
-		return matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
+		return matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(newton_raphson);
 	}
 
 	this->m_stat_calculations++;

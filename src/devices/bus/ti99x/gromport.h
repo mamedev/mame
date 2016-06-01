@@ -130,7 +130,7 @@ private:
 	int     m_slot;
 	int     get_index_from_tagname();
 
-	ti99_cartridge_pcb*                 m_pcb;          // inbound
+	std::unique_ptr<ti99_cartridge_pcb> m_pcb;          // inbound
 	ti99_cartridge_connector_device*    m_connector;    // outbound
 
 	// RPK which is associated to this cartridge
@@ -219,6 +219,7 @@ public:
 
 	void insert(int index, ti99_cartridge_device* cart) override;
 	void remove(int index) override;
+	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
 
 protected:
 	virtual void device_start() override;
@@ -345,10 +346,20 @@ public:
 
 /*********** Paged cartridge (like Extended Basic) ********************/
 
-class ti99_paged_cartridge : public ti99_cartridge_pcb
+class ti99_paged12k_cartridge : public ti99_cartridge_pcb
 {
 public:
-	~ti99_paged_cartridge() { };
+	~ti99_paged12k_cartridge() { };
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+};
+
+/*********** Paged cartridge (others) ********************/
+
+class ti99_paged16k_cartridge : public ti99_cartridge_pcb
+{
+public:
+	~ti99_paged16k_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 };

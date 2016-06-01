@@ -128,12 +128,12 @@ CIRCUIT_LAYOUT( breakout )
 	//----------------------------------------------------------------
 	// Clock circuit
 	//----------------------------------------------------------------
-#if 0  || (SLOW_BUT_ACCURATE)
+#if 0 || (SLOW_BUT_ACCURATE)
 	MAINCLOCK(Y1, 14318000.0)
 	CHIP("F1", 9316)
 	NET_C(Y1.Q, F1.2)
 
-	CONNECTION("F1", 14, d, 13)
+	CONNECTION("F1", 14, "H1", 13)
 	CONNECTION("F1", 13, "H1", 12)
 	CONNECTION("F1", 15, "E1", 5)
 	CONNECTION(P, "F1", 1)

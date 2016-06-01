@@ -10,6 +10,8 @@
 #include "../../Common/Defs.h"
 #include "../../Common/IntToString.h"
 
+#include "../../Windows/PropVariant.h"
+
 #include "../ICoder.h"
 
 #include "../Common/CWrappers.h"
@@ -21,7 +23,9 @@
 
 #include "IArchive.h"
 
+#ifndef EXTRACT_ONLY
 #include "Common/HandlerOut.h"
+#endif
 
 #include "XzHandler.h"
 
@@ -83,14 +87,19 @@ class CHandler:
   CMyComPtr<IInStream> _stream;
   CMyComPtr<ISequentialInStream> _seqStream;
 
-  UInt32 _filterId;
   AString _methodsString;
+
+  #ifndef EXTRACT_ONLY
+
+  UInt32 _filterId;
 
   void Init()
   {
     _filterId = 0;
     CMultiMethodProps::Init();
   }
+  
+  #endif
 
   HRESULT Open2(IInStream *inStream, /* UInt32 flags, */ IArchiveOpenCallback *callback);
 
@@ -126,8 +135,11 @@ public:
 
 CHandler::CHandler()
 {
+  #ifndef EXTRACT_ONLY
   Init();
+  #endif
 }
+
 
 static const Byte kProps[] =
 {

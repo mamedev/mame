@@ -3734,9 +3734,12 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 			return;
 		}
 
-		/* if this is a non-FIFO command, let it go to the FIFO, but stall until it completes */
-		if (!(access & REGISTER_FIFO))
-			stall = TRUE;
+		// if this is non-FIFO command, execute immediately
+		if (!(access & REGISTER_FIFO)) {
+			register_w(this, offset, data);
+			g_profiler.stop();
+			return;
+		}
 
 		/* track swap buffers */
 		if ((offset & 0xff) == swapbufferCMD)
@@ -4289,7 +4292,7 @@ READ8_MEMBER( voodoo_banshee_device::banshee_vga_r )
 			*/
 			result = 0x00;
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x300+offset);
+				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
 
 		/* Sequencer access */
@@ -4305,14 +4308,14 @@ READ8_MEMBER( voodoo_banshee_device::banshee_vga_r )
 			result = banshee.vga[0x3da & 0x1f];
 			banshee.attff = 0;
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x300+offset);
+				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
 
 		/* Miscellaneous output */
 		case 0x3cc:
 			result = banshee.vga[0x3c2 & 0x1f];
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x300+offset);
+				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
 
 		/* Graphics controller access */
@@ -4344,13 +4347,13 @@ READ8_MEMBER( voodoo_banshee_device::banshee_vga_r )
 			*/
 			result = 0x04;
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x300+offset);
+				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
 
 		default:
 			result = banshee.vga[offset];
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x300+offset);
+				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
 	}
 	return result;
@@ -4968,6 +4971,8 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 				banshee_vga_w(space, offset*4+2, data >> 16, mem_mask >> 16);
 			if (ACCESSING_BITS_24_31)
 				banshee_vga_w(space, offset*4+3, data >> 24, mem_mask >> 24);
+			if (LOG_REGISTERS)
+				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		default:

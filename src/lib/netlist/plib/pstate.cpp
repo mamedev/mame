@@ -7,13 +7,15 @@
 
 #include "pstate.h"
 
+PLIB_NAMESPACE_START()
+
 pstate_manager_t::pstate_manager_t()
 {
 }
 
 pstate_manager_t::~pstate_manager_t()
 {
-	m_save.clear_and_free();
+	m_save.clear();
 }
 
 
@@ -36,24 +38,20 @@ ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pst
 			"DT_FLOAT"
 	};
 
-	pstate_entry_t *p = palloc(pstate_entry_t(stname, dt, owner, size, count, ptr, is_ptr));
-	m_save.push_back(p);
+	auto p = pmake_unique<pstate_entry_t>(stname, dt, owner, size, count, ptr, is_ptr);
+	m_save.push_back(std::move(p));
 }
 
 ATTR_COLD void pstate_manager_t::remove_save_items(const void *owner)
 {
-	pstate_entry_t::list_t todelete;
-
-	for (std::size_t i=0; i < m_save.size(); i++)
+	unsigned i = 0;
+	while (i < m_save.size())
 	{
 		if (m_save[i]->m_owner == owner)
-			todelete.push_back(m_save[i]);
+			m_save.remove_at(i);
+		else
+			i++;
 	}
-	for (std::size_t i=0; i < todelete.size(); i++)
-	{
-		m_save.remove(todelete[i]);
-	}
-	todelete.clear_and_free();
 }
 
 ATTR_COLD void pstate_manager_t::pre_save()
@@ -74,7 +72,9 @@ template<> ATTR_COLD void pstate_manager_t::save_item(pstate_callback_t &state, 
 {
 	//save_state_ptr(stname, DT_CUSTOM, 0, 1, &state);
 	pstate_callback_t *state_p = &state;
-	pstate_entry_t *p = palloc(pstate_entry_t(stname, owner, state_p));
-	m_save.push_back(p);
+	auto p = pmake_unique<pstate_entry_t>(stname, owner, state_p);
+	m_save.push_back(std::move(p));
 	state.register_state(*this, stname);
 }
+
+PLIB_NAMESPACE_END()

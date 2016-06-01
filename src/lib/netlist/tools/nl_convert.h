@@ -10,6 +10,7 @@
 #ifndef NL_CONVERT_H_
 #define NL_CONVERT_H_
 
+#include <memory>
 #include "plib/pstring.h"
 #include "plib/plists.h"
 #include "plib/pparser.h"
@@ -25,12 +26,8 @@ public:
 	nl_convert_base_t() : out(m_buf) {};
 	virtual ~nl_convert_base_t()
 	{
-		for (std::size_t i = 0; i < m_nets.size(); i++)
-			pfree(m_nets.value_at(i));
 		m_nets.clear();
-		m_devs.clear_and_free();
-		for (std::size_t i = 0; i < m_pins.size(); i++)
-			pfree(m_pins.value_at(i));
+		m_devs.clear();
 		m_pins.clear();
 	}
 
@@ -57,7 +54,7 @@ protected:
 
 	double get_sp_val(const pstring &sin);
 
-	pstream_fmt_writer_t out;
+	plib::pstream_fmt_writer_t out;
 private:
 
 	struct net_t
@@ -67,14 +64,14 @@ private:
 		: m_name(aname), m_no_export(false) {}
 
 		const pstring &name() { return m_name;}
-		pstring_vector_t &terminals() { return m_terminals; }
+		plib::pstring_vector_t &terminals() { return m_terminals; }
 		void set_no_export() { m_no_export = true; }
 		bool is_no_export() { return m_no_export; }
 
 	private:
 		pstring m_name;
 		bool m_no_export;
-		pstring_vector_t m_terminals;
+		plib::pstring_vector_t m_terminals;
 	};
 
 	struct dev_t
@@ -129,14 +126,14 @@ private:
 
 private:
 
-	void add_device(dev_t *dev);
+	void add_device(std::shared_ptr<dev_t> dev);
 
-	postringstream m_buf;
+	plib::postringstream m_buf;
 
-	pvector_t<dev_t *> m_devs;
-	phashmap_t<pstring, net_t *> m_nets;
-	pvector_t<pstring> m_ext_alias;
-	phashmap_t<pstring, pin_alias_t *> m_pins;
+	plib::pvector_t<std::shared_ptr<dev_t>> m_devs;
+	plib::hashmap_t<pstring, std::shared_ptr<net_t> > m_nets;
+	plib::pvector_t<pstring> m_ext_alias;
+	plib::hashmap_t<pstring, std::shared_ptr<pin_alias_t>> m_pins;
 
 	static unit_t m_units[];
 
@@ -170,11 +167,11 @@ public:
 	{
 	}
 
-	class eagle_tokenizer : public ptokenizer
+	class eagle_tokenizer : public plib::ptokenizer
 	{
 	public:
-		eagle_tokenizer(nl_convert_eagle_t &convert, pistream &strm)
-		: ptokenizer(strm), m_convert(convert)
+		eagle_tokenizer(nl_convert_eagle_t &convert, plib::pistream &strm)
+		: plib::ptokenizer(strm), m_convert(convert)
 		{
 			set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
 			set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers

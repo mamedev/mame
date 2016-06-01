@@ -9,7 +9,10 @@
 
 #include "../ICoder.h"
 
-class CBcjCoder:
+namespace NCompress {
+namespace NBcj {
+
+class CCoder:
   public ICompressFilter,
   public CMyUnknownImp
 {
@@ -17,10 +20,12 @@ class CBcjCoder:
   UInt32 _prevMask;
   int _encode;
 public:
-  MY_UNKNOWN_IMP;
+  MY_UNKNOWN_IMP1(ICompressFilter);
   INTERFACE_ICompressFilter(;)
 
-  CBcjCoder(int encode): _bufferPos(0), _encode(encode) { x86_Convert_Init(_prevMask); }
+  CCoder(int encode): _bufferPos(0), _encode(encode) { x86_Convert_Init(_prevMask); }
 };
+
+}}
 
 #endif

@@ -172,7 +172,7 @@ WRITE16_MEMBER(ginganin_state::ginganin_vregs16_w)
 		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 		break;
 	case 7:
-		soundlatch_byte_w(space, 0, data);
+		m_soundlatch->write(space, 0, data);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		break;
 	default:

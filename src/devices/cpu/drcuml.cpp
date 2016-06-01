@@ -55,6 +55,14 @@ using namespace uml;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// determine the type of the native DRC, falling back to C
+#ifndef NATIVE_DRC
+typedef drcbe_c drcbe_native;
+#else
+typedef NATIVE_DRC drcbe_native;
+#endif
+
+
 // structure describing back-end validation test
 struct bevalidate_test
 {

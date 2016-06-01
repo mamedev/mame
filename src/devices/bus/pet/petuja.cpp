@@ -87,7 +87,7 @@ void pet_userport_joystick_adapter_device::device_start()
 
 void pet_userport_joystick_adapter_device::update_port1()
 {
-	printf( "update port1\n" );
+	//printf( "update port1\n" );
 	output_c(m_up1 && m_fire1);
 	output_d(m_down1 && m_fire1);
 }
@@ -99,7 +99,7 @@ void pet_userport_joystick_adapter_device::update_port1()
 
 void pet_userport_joystick_adapter_device::update_port2()
 {
-	printf( "update port2\n" );
+	//printf( "update port2\n" );
 	output_h(m_up2 && m_fire2);
 	output_j(m_down2 && m_fire2);
 }

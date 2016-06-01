@@ -16,6 +16,8 @@
 #include "pfmtlog.h"
 #include "palloc.h"
 
+PLIB_NAMESPACE_START()
+
 pfmt::pfmt(const pstring &fmt)
 : m_str(m_str_buf), m_allocated(0), m_arg(0)
 {
@@ -23,7 +25,7 @@ pfmt::pfmt(const pstring &fmt)
 	if (l>sizeof(m_str_buf))
 	{
 		m_allocated = 2 * l;
-		m_str = palloc_array(char, 2 * l);
+		m_str = palloc_array<char>(2 * l);
 	}
 	memcpy(m_str, fmt.cstr(), l);
 }
@@ -35,7 +37,7 @@ pfmt::pfmt(const char *fmt)
 	if (l>sizeof(m_str_buf))
 	{
 		m_allocated = 2 * l;
-		m_str = palloc_array(char, 2 * l);
+		m_str = palloc_array<char>(2 * l);
 	}
 	memcpy(m_str, fmt, l);
 }
@@ -148,7 +150,7 @@ void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  .
 				m_allocated = old_alloc;
 			while (new_size > m_allocated)
 				m_allocated *= 2;
-			char *np = palloc_array(char, m_allocated);
+			char *np = palloc_array<char>(m_allocated);
 			memcpy(np, m_str, old_alloc);
 			p = np + (p - m_str);
 			if (m_str != m_str_buf)
@@ -161,4 +163,7 @@ void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  .
 	}
 	va_end(ap);
 }
+
+PLIB_NAMESPACE_END()
+
 #endif

@@ -1,0 +1,515 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!--
+	Front panel of the Patinho Feio mini-computer
+	with clickable buttons, switches and lamps.
+
+	Written by Felipe Sanches.
+-->
+
+	<element name="bit_lamp" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.1" blue="0.1" />
+		</disk>
+		<disk state="0">
+			<color red="0.3" green="0.02" blue="0.02" />
+		</disk>
+	</element>
+
+	<element name="button" defstate="0">
+		<disk state="1">
+			<color red="0.10" green="0.70" blue="0.10" />
+		</disk>
+		<disk state="0">
+			<color red="0.05" green="0.2" blue="0.05" />
+		</disk>
+	</element>
+
+        <element name="rectangle">
+          <rect>
+            <color red="0.3" green="0.9" blue="0.6" />
+          </rect>
+        </element>
+
+        <element name="str_flags_t">
+                <text string="TRANSBORDO">
+                  <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_flags_v">
+                <text string="VAI - UM">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_ula">
+                <text string="UNIDADE ARITMETICA E LÓGICA" >
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_rc">
+                <text string="DADOS   DO   PAINEL">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_pc">
+                <text string="ENDEREÇO DE INSTRUÇÃO">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_mem_addr">
+                <text string="ENDEREÇO DA MEMÓRIA">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_acc">
+                <text string="ACUMULADOR">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_opcode">
+                <text string="CÓDIGO DE INSTRUÇÃO">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_mem_data">
+                <text string="DADOS DA MEMÓRIA">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_mem">
+                <text string="MEMÓRIA">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+
+        <element name="str_NORMAL">
+                <text string="NORMAL">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+
+        <element name="str_CICLOUNICO">
+                <text string="CICLO
+ÚNICO">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_INSTRUCAOUNICA">
+                <text string="INSTRUÇÃO
+ÚNICA">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_ENDERECAMENTO">
+                <text string="ENDEREÇAMENTO">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_ARMAZENAMENTO">
+                <text string="ARMAZENAMENTO">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_EXPOSICAO">
+                <text string="EXPOSIÇÃO">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+
+
+        <element name="str_ESPERA">
+                <text string="ESPERA">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_INTERRUPCAO">
+                <text string="INTERRUPÇÃO">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_PARTIDA">
+                <text string="PARTIDA">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+        <element name="str_PREPARACAO">
+                <text string="PREPARAÇÃO">
+                <color red="0" green="0" blue="0" /></text>
+        </element>
+
+<!-- define background -->
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="1000" bottom="1000" />
+		</screen>
+
+<!-- define lamps -->
+
+		<bezel element="rectangle">
+                        <bounds x="150" y="100" width="625" height="450" />
+		</bezel>
+
+		<bezel name="mem_data7" element="bit_lamp" inputtag="mem_data" inputmask="0x080">
+			<bounds x="190" y="440" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_data6" element="bit_lamp" inputtag="mem_data" inputmask="0x040">
+			<bounds x="215" y="440" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_data5" element="bit_lamp" inputtag="mem_data" inputmask="0x020">
+			<bounds x="240" y="440" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_data4" element="bit_lamp" inputtag="mem_data" inputmask="0x010">
+			<bounds x="265" y="440" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_data3" element="bit_lamp" inputtag="mem_data" inputmask="0x008">
+			<bounds x="290" y="440" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_data2" element="bit_lamp" inputtag="mem_data" inputmask="0x004">
+			<bounds x="315" y="440" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_data1" element="bit_lamp" inputtag="mem_data" inputmask="0x002">
+			<bounds x="340" y="440" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_data0" element="bit_lamp" inputtag="mem_data" inputmask="0x001">
+			<bounds x="365" y="440" width="20" height="20" />
+		</bezel>
+
+		<bezel element="str_mem_data">
+                        <bounds x="200" y="470" width="200" height="20" />
+		</bezel>
+
+		<bezel name="opcode7" element="bit_lamp" inputtag="opcode" inputmask="0x080">
+			<bounds x="190" y="340" width="20" height="20" />
+		</bezel>
+
+		<bezel name="opcode6" element="bit_lamp" inputtag="opcode" inputmask="0x040">
+			<bounds x="215" y="340" width="20" height="20" />
+		</bezel>
+
+		<bezel name="opcode5" element="bit_lamp" inputtag="opcode" inputmask="0x020">
+			<bounds x="240" y="340" width="20" height="20" />
+		</bezel>
+
+		<bezel name="opcode4" element="bit_lamp" inputtag="opcode" inputmask="0x010">
+			<bounds x="265" y="340" width="20" height="20" />
+		</bezel>
+
+		<bezel name="opcode3" element="bit_lamp" inputtag="opcode" inputmask="0x008">
+			<bounds x="290" y="340" width="20" height="20" />
+		</bezel>
+
+		<bezel name="opcode2" element="bit_lamp" inputtag="opcode" inputmask="0x004">
+			<bounds x="315" y="340" width="20" height="20" />
+		</bezel>
+
+		<bezel name="opcode1" element="bit_lamp" inputtag="opcode" inputmask="0x002">
+			<bounds x="340" y="340" width="20" height="20" />
+		</bezel>
+
+		<bezel name="opcode0" element="bit_lamp" inputtag="opcode" inputmask="0x001">
+			<bounds x="365" y="340" width="20" height="20" />
+		</bezel>
+
+		<bezel element="str_opcode">
+                        <bounds x="200" y="370" width="200" height="20" />
+		</bezel>
+
+		<bezel name="acc7" element="bit_lamp" inputtag="ACC" inputmask="0x080">
+			<bounds x="190" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="acc6" element="bit_lamp" inputtag="ACC" inputmask="0x040">
+			<bounds x="215" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="acc5" element="bit_lamp" inputtag="ACC" inputmask="0x020">
+			<bounds x="240" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="acc4" element="bit_lamp" inputtag="ACC" inputmask="0x010">
+			<bounds x="265" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="acc3" element="bit_lamp" inputtag="ACC" inputmask="0x008">
+			<bounds x="290" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="acc2" element="bit_lamp" inputtag="ACC" inputmask="0x004">
+			<bounds x="315" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="acc1" element="bit_lamp" inputtag="ACC" inputmask="0x002">
+			<bounds x="340" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="acc0" element="bit_lamp" inputtag="ACC" inputmask="0x001">
+			<bounds x="365" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel element="str_acc">
+                        <bounds x="200" y="270" width="200" height="20" />
+		</bezel>
+
+		<bezel name="rc11" element="bit_lamp" inputtag="RC" inputmask="0x800">
+			<bounds x="440" y="490" width="20" height="20" />
+		</bezel>
+
+		<bezel name="rc10" element="bit_lamp" inputtag="RC" inputmask="0x400">
+			<bounds x="465" y="490" width="20" height="20" />
+		</bezel>
+
+		<bezel name="rc9" element="bit_lamp" inputtag="RC" inputmask="0x200">
+			<bounds x="490" y="490" width="20" height="20" />
+		</bezel>
+
+		<bezel name="rc8" element="bit_lamp" inputtag="RC" inputmask="0x100">
+			<bounds x="515" y="490" width="20" height="20" />
+		</bezel>
+
+		<bezel name="rc7" element="bit_lamp" inputtag="RC" inputmask="0x080">
+			<bounds x="540" y="490" width="20" height="20" />
+		</bezel>
+
+		<bezel name="rc6" element="bit_lamp" inputtag="RC" inputmask="0x040">
+			<bounds x="565" y="490" width="20" height="20" />
+		</bezel>
+
+		<bezel name="rc5" element="bit_lamp" inputtag="RC" inputmask="0x020">
+			<bounds x="590" y="490" width="20" height="20" />
+		</bezel>
+
+		<bezel name="rc4" element="bit_lamp" inputtag="RC" inputmask="0x010">
+			<bounds x="615" y="490" width="20" height="20" />
+		</bezel>
+
+		<bezel name="rc3" element="bit_lamp" inputtag="RC" inputmask="0x008">
+			<bounds x="640" y="490" width="20" height="20" />
+		</bezel>
+
+		<bezel name="rc2" element="bit_lamp" inputtag="RC" inputmask="0x004">
+			<bounds x="665" y="490" width="20" height="20" />
+		</bezel>
+
+		<bezel name="rc1" element="bit_lamp" inputtag="RC" inputmask="0x002">
+			<bounds x="690" y="490" width="20" height="20" />
+		</bezel>
+
+		<bezel name="rc0" element="bit_lamp" inputtag="RC" inputmask="0x001">
+			<bounds x="715" y="490" width="20" height="20" />
+		</bezel>
+
+		<bezel element="str_rc">
+                        <bounds x="450" y="520" width="299" height="20" />
+		</bezel>
+
+		<bezel name="flags1" element="bit_lamp" inputtag="FLAGS" inputmask="0x002">
+			<bounds x="465" y="310" width="20" height="20" />
+		</bezel>
+
+		<bezel name="flags0" element="bit_lamp" inputtag="FLAGS" inputmask="0x001">
+			<bounds x="690" y="310" width="20" height="20" />
+		</bezel>
+
+		<bezel element="str_flags_t">
+                        <bounds x="400" y="350" width="199" height="20" />
+		</bezel>
+
+		<bezel element="str_flags_v">
+                        <bounds x="650" y="350" width="99" height="20" />
+		</bezel>
+
+		<bezel name="pc11" element="bit_lamp" inputtag="PC" inputmask="0x800">
+			<bounds x="440" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="pc10" element="bit_lamp" inputtag="PC" inputmask="0x400">
+			<bounds x="465" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="pc9" element="bit_lamp" inputtag="PC" inputmask="0x200">
+			<bounds x="490" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="pc8" element="bit_lamp" inputtag="PC" inputmask="0x100">
+			<bounds x="515" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="pc7" element="bit_lamp" inputtag="PC" inputmask="0x080">
+			<bounds x="540" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="pc6" element="bit_lamp" inputtag="PC" inputmask="0x040">
+			<bounds x="565" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="pc5" element="bit_lamp" inputtag="PC" inputmask="0x020">
+			<bounds x="590" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="pc4" element="bit_lamp" inputtag="PC" inputmask="0x010">
+			<bounds x="615" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="pc3" element="bit_lamp" inputtag="PC" inputmask="0x008">
+			<bounds x="640" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="pc2" element="bit_lamp" inputtag="PC" inputmask="0x004">
+			<bounds x="665" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="pc1" element="bit_lamp" inputtag="PC" inputmask="0x002">
+			<bounds x="690" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel name="pc0" element="bit_lamp" inputtag="PC" inputmask="0x001">
+			<bounds x="715" y="240" width="20" height="20" />
+		</bezel>
+
+		<bezel element="str_pc">
+                        <bounds x="450" y="270" width="299" height="20" />
+		</bezel>
+
+		<bezel name="mem_addr11" element="bit_lamp" inputtag="mem_addr" inputmask="0x800">
+			<bounds x="440" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_addr10" element="bit_lamp" inputtag="mem_addr" inputmask="0x400">
+			<bounds x="465" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_addr9" element="bit_lamp" inputtag="mem_addr" inputmask="0x200">
+			<bounds x="490" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_addr8" element="bit_lamp" inputtag="mem_addr" inputmask="0x100">
+			<bounds x="515" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_addr7" element="bit_lamp" inputtag="mem_addr" inputmask="0x080">
+			<bounds x="540" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_addr6" element="bit_lamp" inputtag="mem_addr" inputmask="0x040">
+			<bounds x="565" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_addr5" element="bit_lamp" inputtag="mem_addr" inputmask="0x020">
+			<bounds x="590" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_addr4" element="bit_lamp" inputtag="mem_addr" inputmask="0x010">
+			<bounds x="615" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_addr3" element="bit_lamp" inputtag="mem_addr" inputmask="0x008">
+			<bounds x="640" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_addr2" element="bit_lamp" inputtag="mem_addr" inputmask="0x004">
+			<bounds x="665" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_addr1" element="bit_lamp" inputtag="mem_addr" inputmask="0x002">
+			<bounds x="690" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel name="mem_addr0" element="bit_lamp" inputtag="mem_addr" inputmask="0x001">
+			<bounds x="715" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel element="str_mem_addr">
+                        <bounds x="450" y="170" width="299" height="20" />
+		</bezel>
+
+		<bezel name="NORMAL" element="button" inputtag="BUTTONS" inputmask="0x001">
+			<bounds x="40" y="640" width="40" height="40" />
+		</bezel>
+
+		<bezel element="str_NORMAL">
+                        <bounds x="12" y="610" width="150" height="20" />
+		</bezel>
+
+		<bezel name="CICLOUNICO" element="button" inputtag="BUTTONS" inputmask="0x002">
+			<bounds x="190" y="640" width="40" height="40" />
+		</bezel>
+
+		<bezel element="str_CICLOUNICO">
+                        <bounds x="162" y="610" width="150" height="20" />
+		</bezel>
+
+		<bezel name="INSTRUCAOUNICA" element="button" inputtag="BUTTONS" inputmask="0x004">
+			<bounds x="340" y="640" width="40" height="40" />
+		</bezel>
+
+		<bezel element="str_INSTRUCAOUNICA">
+                        <bounds x="312" y="610" width="150" height="20" />
+		</bezel>
+
+		<bezel name="ENDERECAMENTO" element="button" inputtag="BUTTONS" inputmask="0x008">
+			<bounds x="490" y="640" width="40" height="40" />
+		</bezel>
+
+		<bezel element="str_ENDERECAMENTO">
+                        <bounds x="462" y="610" width="150" height="20" />
+		</bezel>
+
+		<bezel name="ARMAZENAMENTO" element="button" inputtag="BUTTONS" inputmask="0x010">
+			<bounds x="640" y="640" width="40" height="40" />
+		</bezel>
+
+		<bezel element="str_ARMAZENAMENTO">
+                        <bounds x="612" y="610" width="150" height="20" />
+		</bezel>
+
+		<bezel name="EXPOSICAO" element="button" inputtag="BUTTONS" inputmask="0x020">
+			<bounds x="790" y="640" width="40" height="40" />
+		</bezel>
+
+		<bezel element="str_EXPOSICAO">
+                        <bounds x="762" y="610" width="150" height="20" />
+		</bezel>
+
+		<bezel name="ESPERA" element="button" inputtag="BUTTONS" inputmask="0x040">
+			<bounds x="340" y="740" width="40" height="40" />
+		</bezel>
+
+		<bezel element="str_ESPERA">
+                        <bounds x="308" y="710" width="166" height="20" />
+		</bezel>
+
+		<bezel name="INTERRUPCAO" element="button" inputtag="BUTTONS" inputmask="0x080">
+			<bounds x="506" y="740" width="40" height="40" />
+		</bezel>
+
+		<bezel element="str_INTERRUPCAO">
+                        <bounds x="474" y="710" width="166" height="20" />
+		</bezel>
+
+		<bezel name="PARTIDA" element="button" inputtag="BUTTONS" inputmask="0x100">
+			<bounds x="673" y="740" width="40" height="40" />
+		</bezel>
+
+		<bezel element="str_PARTIDA">
+                        <bounds x="641" y="710" width="166" height="20" />
+		</bezel>
+
+		<bezel name="PREPARACAO" element="button" inputtag="BUTTONS" inputmask="0x200">
+			<bounds x="840" y="740" width="40" height="40" />
+		</bezel>
+
+		<bezel element="str_PREPARACAO">
+                        <bounds x="808" y="710" width="166" height="20" />
+		</bezel>
+
+	</view>
+</mamelayout>

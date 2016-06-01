@@ -95,6 +95,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/tlcs90/tlcs90.h"
+#include "machine/gen_latch.h"
 #include "machine/msm6242.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -109,12 +110,15 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_videoram(*this, "videoram"),
 		m_audiocpu(*this, "audiocpu"),
-		m_rtc(*this, "rtc") { }
+		m_rtc(*this, "rtc"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<msm6242_device> m_rtc;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
 	UINT8 m_input_port_select;
 	UINT8 m_dsw_select;
 	UINT8 m_rombank;
@@ -808,7 +812,7 @@ READ8_MEMBER(royalmah_state::jansou_6405_r)
 
 WRITE8_MEMBER(royalmah_state::jansou_sound_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -837,7 +841,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jansou_sub_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r) AM_DEVWRITE("dac", dac_device, write_unsigned8 )
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("dac", dac_device, write_unsigned8 )
 ADDRESS_MAP_END
 
 
@@ -3352,6 +3356,8 @@ static MACHINE_CONFIG_DERIVED( jansou, royalmah )
 	MCFG_CPU_PROGRAM_MAP(jansou_sub_map)
 	MCFG_CPU_IO_MAP(jansou_sub_iomap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(royalmah_state, irq0_line_hold, 4000000/512)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

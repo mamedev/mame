@@ -13,6 +13,7 @@ To enter service mode, keep 1&2 pressed on reset
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -100,7 +101,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( megazone_sound_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(megazone_i8039_irq_w) /* START line. Interrupts 8039 */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch_byte_w)            /* CODE  line. Command Interrupts 8039 */
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)            /* CODE  line. Command Interrupts 8039 */
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")            /* IO Coin */
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("IN1")            /* P1 IO */
 	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN2")            /* P2 IO */
@@ -124,7 +125,7 @@ static ADDRESS_MAP_START( megazone_i8039_map, AS_PROGRAM, 8, megazone_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megazone_i8039_io_map, AS_IO, 8, megazone_state )
-	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
@@ -268,6 +269,8 @@ static MACHINE_CONFIG_START( megazone, megazone_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 14318000/8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(megazone_state, megazone_port_a_r))
@@ -507,12 +510,8 @@ ROM_START( megazonec )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(megazone_state,megazone)
-{
-}
-
-GAME( 1983, megazone, 0,         megazone, megazone, megazone_state, megazone, ROT90, "Konami", "Mega Zone (Konami set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonea, megazone, megazone, megazona, megazone_state, megazone, ROT90, "Konami", "Mega Zone (Konami set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazoneb, megazone, megazone, megazone, megazone_state, megazone, ROT90, "Konami (Kosuka license)", "Mega Zone (Kosuka set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonec, megazone, megazone, megazone, megazone_state, megazone, ROT90, "Konami (Kosuka license)", "Mega Zone (Kosuka set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonei, megazone, megazone, megazone, megazone_state, megazone, ROT90, "Konami (Interlogic license)", "Mega Zone (Interlogic)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazone, 0,         megazone, megazone, driver_device, 0, ROT90, "Konami", "Mega Zone (Konami set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonea, megazone, megazone, megazona, driver_device, 0, ROT90, "Konami", "Mega Zone (Konami set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazoneb, megazone, megazone, megazone, driver_device, 0, ROT90, "Konami (Kosuka license)", "Mega Zone (Kosuka set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonec, megazone, megazone, megazone, driver_device, 0, ROT90, "Konami (Kosuka license)", "Mega Zone (Kosuka set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonei, megazone, megazone, megazone, driver_device, 0, ROT90, "Konami (Interlogic license)", "Mega Zone (Interlogic)", MACHINE_SUPPORTS_SAVE )

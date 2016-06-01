@@ -8,11 +8,13 @@
 #define LOG_RTC             (0)
 #define LOG_RAM             (0)
 #define LOG_EEPROM          (0)
-#define LOG_IDE             (0)
-#define LOG_IDE_CTRL        (0)
-#define LOG_IDE_REG         (0)
+#define LOG_PERIPH          (0)
 
 const device_type ITEAGLE_FPGA = &device_creator<iteagle_fpga_device>;
+
+MACHINE_CONFIG_FRAGMENT(iteagle_fpga)
+	MCFG_NVRAM_ADD_0FILL("eagle2_rtc")
+MACHINE_CONFIG_END
 
 DEVICE_ADDRESS_MAP_START(fpga_map, 32, iteagle_fpga_device)
 	AM_RANGE(0x000, 0x01f) AM_READWRITE(fpga_r, fpga_w)
@@ -28,12 +30,20 @@ ADDRESS_MAP_END
 
 iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, ITEAGLE_FPGA, "ITEagle FPGA", tag, owner, clock, "iteagle_fpga", __FILE__),
-		device_nvram_interface(mconfig, *this), m_version(0), m_seq_init(0)
+		m_rtc(*this, "eagle2_rtc"), m_version(0), m_seq_init(0)
 {
+}
+
+machine_config_constructor iteagle_fpga_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(iteagle_fpga);
 }
 
 void iteagle_fpga_device::device_start()
 {
+	// RTC M48T02
+	m_rtc->set_base(m_rtc_regs, sizeof(m_rtc_regs));
+
 	pci_device::device_start();
 	status = 0x5555;
 	command = 0x5555;
@@ -382,35 +392,6 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 //*************************************
 //*  RTC M48T02
 //*************************************
-
-//-------------------------------------------------
-//  nvram_default - called to initialize NVRAM to
-//  its default state
-//-------------------------------------------------
-
-void iteagle_fpga_device::nvram_default()
-{
-	memset(m_rtc_regs, 0x0, sizeof(m_rtc_regs));
-}
-
-//-------------------------------------------------
-//  nvram_read - called to read NVRAM from the
-//  .nv file
-//-------------------------------------------------
-void iteagle_fpga_device::nvram_read(emu_file &file)
-{
-	file.read(m_rtc_regs, sizeof(m_rtc_regs));
-}
-
-//-------------------------------------------------
-//  nvram_write - called to write NVRAM to the
-//  .nv file
-//-------------------------------------------------
-void iteagle_fpga_device::nvram_write(emu_file &file)
-{
-	file.write(m_rtc_regs, sizeof(m_rtc_regs));
-}
-
 READ32_MEMBER( iteagle_fpga_device::rtc_r )
 {
 	UINT32 result = m_rtc_regs[offset];
@@ -485,33 +466,11 @@ WRITE32_MEMBER( iteagle_fpga_device::ram_w )
 const device_type ITEAGLE_EEPROM = &device_creator<iteagle_eeprom_device>;
 
 DEVICE_ADDRESS_MAP_START(eeprom_map, 32, iteagle_eeprom_device)
-	AM_RANGE(0x0000, 0x000F) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0x0000, 0x000F) AM_READWRITE(eeprom_r, eeprom_w)
 ADDRESS_MAP_END
 
-// When corrupt writes 0x3=2, 0x3e=2, 0xa=0, 0x30=0
-// 0x4 = HW Version - 6-8 is GREEN board PCB, 9 is RED board PCB
-// 0x5 = Serial Num + top byte of 0x4
-// 0x6 = OperID
-// 0xe = SW Version
-// 0xf = 0x01 for extra courses
-// 0x3e = 0x0002 for good nvram
-// 0x3f = checksum
-static const UINT16 iteagle_default_eeprom[0x40] =
-{
-	0xd000,0x0022,0x0000,0x0003,0x1209,0x1111,0x2222,0x1234,
-	0x0000,0x0000,0x0000,0x0000,0xcd00,0x0000,0x0000,0x0001,
-	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
-	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
-	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
-	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
-	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
-	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0002,0x0000
-};
-
-
-static MACHINE_CONFIG_FRAGMENT( iteagle_eeprom )
+MACHINE_CONFIG_FRAGMENT( iteagle_eeprom )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(iteagle_default_eeprom, 0x80)
 MACHINE_CONFIG_END
 
 machine_config_constructor iteagle_eeprom_device::device_mconfig_additions() const
@@ -521,12 +480,43 @@ machine_config_constructor iteagle_eeprom_device::device_mconfig_additions() con
 
 iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, ITEAGLE_EEPROM, "ITEagle EEPROM AT93C46", tag, owner, clock, "eeprom", __FILE__),
-		m_eeprom(*this, "eeprom"), m_sw_version(0)
+		m_eeprom(*this, "eeprom"), m_sw_version(0), m_hw_version(0)
 {
+	// When corrupt writes 0x3=2, 0x3e=2, 0xa=0, 0x30=0
+	// 0x4 = HW Version - 6-8 is GREEN board PCB, 9 is RED board PCB
+	// 0x5 = Serial Num + top byte of 0x4
+	// 0x6 = OperID
+	// 0xe = SW Version
+	// 0xf = 0x01 for extra courses
+	// 0x3e = 0x0002 for good nvram
+	// 0x3f = checksum
+	m_iteagle_default_eeprom =
+	{ {
+		0xd000,0x0022,0x0000,0x0003,0x1209,0x1111,0x2222,0x1234,
+		0x0000,0x0000,0x0000,0x0000,0xcd00,0x0000,0x0000,0x0001,
+		0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
+		0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
+		0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
+		0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
+		0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
+		0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0002,0x0000
+	} };
 }
 
 void iteagle_eeprom_device::device_start()
 {
+	// EEPROM: Set software version and calc crc
+	m_iteagle_default_eeprom[0xe] = m_sw_version;
+	m_iteagle_default_eeprom[0x4] = (m_iteagle_default_eeprom[0x4] & 0xff00) | m_hw_version;
+	UINT16 checkSum = 0;
+	for (int i=0; i<0x3f; i++) {
+		checkSum += m_iteagle_default_eeprom[i];
+	//logerror("eeprom init i: %x data: %04x\n", i, iteagle_default_eeprom[i]);
+	}
+	m_iteagle_default_eeprom[0x3f] = checkSum;
+
+	eeprom_base_device::static_set_default_data(m_eeprom, m_iteagle_default_eeprom.data(), 0x80);
+
 	pci_device::device_start();
 	skip_map_regs(1);
 	add_map(0x10, M_IO, FUNC(iteagle_eeprom_device::eeprom_map));
@@ -534,15 +524,6 @@ void iteagle_eeprom_device::device_start()
 
 void iteagle_eeprom_device::device_reset()
 {
-	// Set software version and calc crc
-	m_eeprom->write(0xe, m_sw_version);
-	m_eeprom->write(0x4, (m_eeprom->read(0x4)&0xff00) | m_hw_version);
-	UINT16 checkSum = 0;
-	for (int i=0; i<0x3f; i++) {
-		checkSum += m_eeprom->read(i);
-		//logerror("eeprom init i: %x data: %04x\n", i, m_eeprom->read(i));
-	}
-	m_eeprom->write(0x3f, checkSum);
 	pci_device::device_reset();
 }
 
@@ -603,98 +584,57 @@ WRITE32_MEMBER( iteagle_eeprom_device::eeprom_w )
 }
 
 //************************************
-// Attached IDE Controller
+// Attached Peripheral Controller
 //************************************
 
-const device_type ITEAGLE_IDE = &device_creator<iteagle_ide_device>;
+MACHINE_CONFIG_FRAGMENT(eagle1)
+	MCFG_NVRAM_ADD_0FILL("eagle1_rtc")
+MACHINE_CONFIG_END
 
-DEVICE_ADDRESS_MAP_START(ctrl_map, 32, iteagle_ide_device)
+machine_config_constructor iteagle_periph_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(eagle1);
+}
+
+const device_type ITEAGLE_PERIPH = &device_creator<iteagle_periph_device>;
+
+DEVICE_ADDRESS_MAP_START(ctrl_map, 32, iteagle_periph_device)
 	AM_RANGE(0x000, 0x0cf) AM_READWRITE(ctrl_r, ctrl_w)
 ADDRESS_MAP_END
 
-
-DEVICE_ADDRESS_MAP_START(ide_map, 32, iteagle_ide_device)
-	AM_RANGE(0x0, 0x7) AM_READWRITE(ide_r, ide_w)
-ADDRESS_MAP_END
-
-DEVICE_ADDRESS_MAP_START(ide_ctrl_map, 32, iteagle_ide_device)
-	AM_RANGE(0x0, 0x3) AM_READWRITE(ide_ctrl_r, ide_ctrl_w)
-ADDRESS_MAP_END
-
-DEVICE_ADDRESS_MAP_START(ide2_map, 32, iteagle_ide_device)
-	AM_RANGE(0x0, 0x7) AM_READWRITE(ide2_r, ide2_w)
-ADDRESS_MAP_END
-
-DEVICE_ADDRESS_MAP_START(ide2_ctrl_map, 32, iteagle_ide_device)
-	AM_RANGE(0x0, 0x3) AM_READWRITE(ide2_ctrl_r, ide2_ctrl_w)
-ADDRESS_MAP_END
-
-
-static MACHINE_CONFIG_FRAGMENT( iteagle_ide )
-	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(iteagle_ide_device, ide_interrupt))
-	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
-	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide2", ata_devices, nullptr, "cdrom", true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(iteagle_ide_device, ide2_interrupt))
-	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
-MACHINE_CONFIG_END
-
-machine_config_constructor iteagle_ide_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( iteagle_ide );
-}
-
-iteagle_ide_device::iteagle_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pci_device(mconfig, ITEAGLE_IDE, "ITEagle IDE Controller", tag, owner, clock, "ide", __FILE__),
-		m_ide(*this, "ide"),
-		m_ide2(*this, "ide2"),
-		m_irq_num(-1)
+iteagle_periph_device::iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: pci_device(mconfig, ITEAGLE_PERIPH, "ITEagle Peripheral Controller", tag, owner, clock, "periph", __FILE__),
+	m_rtc(*this, "eagle1_rtc")
 {
 }
 
-void iteagle_ide_device::set_irq_info(const char *tag, const int irq_num)
+void iteagle_periph_device::device_start()
 {
-	m_cpu_tag = tag;
-	m_irq_num = irq_num;
-}
-
-void iteagle_ide_device::device_start()
-{
-	m_cpu = machine().device<cpu_device>(m_cpu_tag);
-	m_irq_status = 0;
 	pci_device::device_start();
-	add_map(sizeof(m_ctrl_regs), M_IO, FUNC(iteagle_ide_device::ctrl_map));
+	pci_device::set_multifunction_device(true);
+	add_map(sizeof(m_ctrl_regs), M_IO, FUNC(iteagle_periph_device::ctrl_map));
 	// ctrl defaults to base address 0x00000000
 	bank_infos[0].adr = 0x000;
 
-	add_map(0x8, M_IO, FUNC(iteagle_ide_device::ide_map));
-	bank_infos[1].adr = 0x1f0;
-	add_map(0x4, M_IO, FUNC(iteagle_ide_device::ide_ctrl_map));
-	bank_infos[2].adr = 0x3f4;
-	add_map(0x8, M_IO, FUNC(iteagle_ide_device::ide2_map));
-	bank_infos[3].adr = 0x170;
-	add_map(0x4, M_IO, FUNC(iteagle_ide_device::ide2_ctrl_map));
-	bank_infos[4].adr = 0x374;
+	m_rtc_regs[0xa] = 0x20; // 32.768 MHz
+	m_rtc_regs[0xb] = 0x02; // 24-hour format
+	m_rtc->set_base(m_rtc_regs, sizeof(m_rtc_regs));
 }
 
-void iteagle_ide_device::device_reset()
+void iteagle_periph_device::device_reset()
 {
 	pci_device::device_reset();
 	memset(m_ctrl_regs, 0, sizeof(m_ctrl_regs));
 	m_ctrl_regs[0x10/4] =  0x00000000; // 0x6=No SIMM, 0x2, 0x1, 0x0 = SIMM .  Top 16 bits are compared to 0x3. Bit 0 might be lan chip present.
-	memset(m_rtc_regs, 0, sizeof(m_rtc_regs));
-	m_rtc_regs[0xa] = 0x20; // 32.768 MHz
-	m_rtc_regs[0xb] = 0x02; // 24-hour format
-	m_irq_status = 0;
 }
 
-READ32_MEMBER( iteagle_ide_device::ctrl_r )
+READ32_MEMBER( iteagle_periph_device::ctrl_r )
 {
 	system_time systime;
 	UINT32 result = m_ctrl_regs[offset];
 	switch (offset) {
 		case 0x0/4:
-			if (LOG_IDE_REG)
+			if (LOG_PERIPH)
 				logerror("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			osd_printf_debug("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
@@ -720,11 +660,11 @@ READ32_MEMBER( iteagle_ide_device::ctrl_r )
 				m_rtc_regs[0xd] = 0x80; // Reg D Valid time/ram Status
 				result = (result & 0xffff00ff) | (m_rtc_regs[m_ctrl_regs[0x70/4]&0xff]<<8);
 			}
-			if (LOG_IDE_REG)
+			if (LOG_PERIPH)
 				logerror("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		default:
-			if (LOG_IDE_REG)
+			if (LOG_PERIPH)
 				logerror("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			osd_printf_debug("%s:fpga ctrl_r from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
@@ -732,22 +672,16 @@ READ32_MEMBER( iteagle_ide_device::ctrl_r )
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_ide_device::ctrl_w )
+WRITE32_MEMBER( iteagle_periph_device::ctrl_w )
 {
 	COMBINE_DATA(&m_ctrl_regs[offset]);
 	switch (offset) {
 		case 0x20/4: // IDE LED
 			if (ACCESSING_BITS_16_23) {
 				// Sets register index
-				if (LOG_IDE_REG)
-					logerror("%s:fpga ctrl_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			} else if (ACCESSING_BITS_24_31) {
 				// Bit 25 is IDE LED
-				if (1 && LOG_IDE_REG)
-					logerror("%s:fpga ctrl_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			} else {
-				if (LOG_IDE_REG)
-					logerror("%s:fpga ctrl_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			}
 			break;
 		case 0x70/4:
@@ -755,112 +689,8 @@ WRITE32_MEMBER( iteagle_ide_device::ctrl_w )
 				m_rtc_regs[m_ctrl_regs[0x70/4]&0xff] = (data>>8)&0xff;
 			}
 		default:
-			if (LOG_IDE_REG)
-					logerror("%s:fpga ctrl_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 	}
-}
-
-READ32_MEMBER( iteagle_ide_device::ide_r )
-{
-	UINT32 result = m_ide->read_cs0(space, offset, mem_mask);
-	if (offset==0x4/4 && ACCESSING_BITS_24_31) {
-		if (m_irq_num!=-1 &&    m_irq_status==1) {
-			m_irq_status = 0;
-			m_cpu->set_input_line(m_irq_num, CLEAR_LINE);
-			if (LOG_IDE_CTRL)
-				logerror("%s:ide_r Clearing interrupt\n", machine().describe_context());
-		}
-	}
-	if (LOG_IDE && mem_mask!=0xffffffff)
-		logerror("%s:ide_r read from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
-	return result;
-}
-WRITE32_MEMBER( iteagle_ide_device::ide_w )
-{
-	m_ide->write_cs0(space, offset, data, mem_mask);
-	if (offset==0x4/4 && ACCESSING_BITS_24_31) {
-		if (m_irq_num!=-1 &&    m_irq_status==1) {
-			m_irq_status = 0;
-			m_cpu->set_input_line(m_irq_num, CLEAR_LINE);
-			if (LOG_IDE_CTRL)
-				logerror("%s:ide_w Clearing interrupt\n", machine().describe_context());
-		}
-	}
-	if (LOG_IDE)
-		logerror("%s:ide_w write to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
-}
-READ32_MEMBER( iteagle_ide_device::ide_ctrl_r )
-{
-	UINT32 result = m_ide->read_cs1(space, offset+1, mem_mask);
-	if (LOG_IDE_CTRL)
-		logerror("%s:ide_ctrl_r read from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
-	return result;
-}
-WRITE32_MEMBER( iteagle_ide_device::ide_ctrl_w )
-{
-	m_ide->write_cs1(space, offset+1, data, mem_mask);
-	if (LOG_IDE_CTRL)
-		logerror("%s:ide_ctrl_w write to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
-}
-WRITE_LINE_MEMBER(iteagle_ide_device::ide_interrupt)
-{
-	if (m_irq_num!=-1 && m_irq_status==0) {
-		m_irq_status = 1;
-		m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
-		if (LOG_IDE_CTRL)
-			logerror("%s:ide_interrupt Setting interrupt\n", machine().describe_context());
-	}
-}
-
-READ32_MEMBER( iteagle_ide_device::ide2_r )
-{
-	UINT32 result = m_ide2->read_cs0(space, offset, mem_mask);
-	if (offset==0x4/4 && ACCESSING_BITS_24_31) {
-		if (m_irq_num!=-1 &&    m_irq_status==1) {
-			m_irq_status = 0;
-			m_cpu->set_input_line(m_irq_num, CLEAR_LINE);
-			if (LOG_IDE_CTRL)
-				logerror("%s:ide2_r Clearing interrupt\n", machine().describe_context());
-		}
-	}
-	if (LOG_IDE)
-		logerror("%s:ide2_r read from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
-	return result;
-}
-WRITE32_MEMBER( iteagle_ide_device::ide2_w )
-{
-	m_ide2->write_cs0(space, offset, data, mem_mask);
-	if (offset==0x4/4 && ACCESSING_BITS_24_31) {
-		if (m_irq_num!=-1 &&    m_irq_status==1) {
-			m_irq_status = 0;
-			m_cpu->set_input_line(m_irq_num, CLEAR_LINE);
-			if (LOG_IDE_CTRL)
-				logerror("%s:ide2_w Clearing interrupt\n", machine().describe_context());
-		}
-	}
-	if (LOG_IDE)
-		logerror("%s:ide2_w write to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
-}
-READ32_MEMBER( iteagle_ide_device::ide2_ctrl_r )
-{
-	UINT32 result = m_ide2->read_cs1(space, offset+1, mem_mask);
-	if (LOG_IDE_CTRL)
-		logerror("%s:ide2_ctrl_r read from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
-	return result;
-}
-WRITE32_MEMBER( iteagle_ide_device::ide2_ctrl_w )
-{
-	m_ide2->write_cs1(space, offset+1, data, mem_mask);
-	if (LOG_IDE_CTRL)
-		logerror("%s:ide2_ctrl_w write to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
-}
-WRITE_LINE_MEMBER(iteagle_ide_device::ide2_interrupt)
-{
-	if (m_irq_num!=-1 && m_irq_status==0) {
-		m_irq_status = 1;
-		m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
-		if (LOG_IDE_CTRL)
-			logerror("%s:ide2_interrupt Setting interrupt\n", machine().describe_context());
-	}
+	if (LOG_PERIPH)
+		logerror("%s:fpga ctrl_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 }

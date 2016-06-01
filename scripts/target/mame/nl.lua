@@ -20,7 +20,7 @@ CPUS["Z80"] = true
 CPUS["M6800"] = true
 CPUS["M6803"] = true
 CPUS["M6809"] = true
---CPUS["MCS48"] = true
+CPUS["MCS48"] = true
 --CPUS["MCS51"] = true
 --CPUS["M6800"] = true
 --CPUS["M6809"] = true
@@ -57,6 +57,8 @@ VIDEOS["FIXFREQ"] = true
 --------------------------------------------------
 
 MACHINES["NETLIST"] = true
+MACHINES["Z80DMA"] = true
+MACHINES["GEN_LATCH"] = true
 --MACHINES["6821PIA"] = true
 --MACHINES["TTL74148"] = true
 --MACHINES["TTL74153"] = true
@@ -113,9 +115,15 @@ files{
 	MAME_DIR .. "src/mame/drivers/1942.cpp",
 	MAME_DIR .. "src/mame/includes/1942.h",
 	MAME_DIR .. "src/mame/video/1942.cpp",
+
 	MAME_DIR .. "src/mame/drivers/popeye.cpp",
 	MAME_DIR .. "src/mame/includes/popeye.h",
 	MAME_DIR .. "src/mame/video/popeye.cpp",
+
+  MAME_DIR .. "src/mame/drivers/mario.cpp",
+  MAME_DIR .. "src/mame/includes/mario.h",
+  MAME_DIR .. "src/mame/video/mario.cpp",
+  MAME_DIR .. "src/mame/audio/mario.cpp",
 	
 	MAME_DIR .. "src/mame/drivers/m62.cpp",
 	MAME_DIR .. "src/mame/includes/m62.h",

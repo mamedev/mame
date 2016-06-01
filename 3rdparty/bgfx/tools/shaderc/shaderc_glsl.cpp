@@ -10,7 +10,7 @@ namespace bgfx
 {
 	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _gles, const std::string& _code, bx::WriterI* _writer)
 	{
-		char ch = tolower(_cmdLine.findOption('\0', "type")[0]);
+		char ch = char(tolower(_cmdLine.findOption('\0', "type")[0]) );
 		const glslopt_shader_type type = ch == 'f'
 			? kGlslOptShaderFragment
 			: (ch == 'c' ? kGlslOptShaderCompute : kGlslOptShaderVertex);
@@ -152,7 +152,7 @@ namespace bgfx
 						char arraySize[32];
 						const char* end = bx::strnstr(array, "]", eol-array);
 						bx::strlcpy(arraySize, array+1, end-array);
-						num = atoi(arraySize);
+						num = uint8_t(atoi(arraySize) );
 					}
 					else
 					{
@@ -207,6 +207,13 @@ namespace bgfx
 		bx::write(_writer, optimizedShader, shaderSize);
 		uint8_t nul = 0;
 		bx::write(_writer, nul);
+
+		if (_cmdLine.hasArg('\0', "disasm") )
+		{
+			std::string disasmfp = _cmdLine.findOption('o');
+			disasmfp += ".disasm";
+			writeFile(disasmfp.c_str(), optimizedShader, shaderSize);
+		}
 
 		glslopt_cleanup(ctx);
 

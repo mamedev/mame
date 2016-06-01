@@ -292,7 +292,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="commconq">
+	<software name="cnc">
 		<description>Command &amp; Conquer (Euro)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -310,7 +310,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="commconqu" cloneof="commconq">
+	<software name="cncu" cloneof="cnc">
 		<description>Command &amp; Conquer (USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -3019,7 +3019,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="clayfg63">
-		<description>Clay Fighter 63 1/3 (Euro)</description>
+		<description>Clay Fighter 63⅓ (Euro)</description>
 		<year>1997</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="n64_cart">
@@ -3030,7 +3030,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="clayfg63ub" cloneof="clayfg63">
-		<description>Clay Fighter 63 1/3 (USA, Prototype)</description>
+		<description>Clay Fighter 63⅓ (USA, Prototype)</description>
 		<year>1997</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="n64_cart">
@@ -3041,7 +3041,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="clayfg63u" cloneof="clayfg63">
-		<description>Clay Fighter 63 1/3 (USA)</description>
+		<description>Clay Fighter 63⅓ (USA)</description>
 		<year>1997</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="n64_cart">
@@ -3051,7 +3051,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="commconqg" cloneof="commconq">
+	<software name="cncg" cloneof="cnc">
 		<description>Command &amp; Conquer (Ger)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -3654,6 +3654,17 @@ patched out (+ a fix for internal checksum)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="duck dodgers starring daffy duck (usa) (en,fr,es).bin" size="16777216" crc="b67bbc15" sha1="40ce11880a5e0603a42ae46b0518b95ae174556c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dukenk64p" cloneof="dukenk64">
+		<description>Duke Nukem 64 (Euro, Prototype)</description>
+		<year>1997</year>
+		<publisher>GT Interactive</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="duke nukem 64 (europe) (beta).bin" size="8388608" crc="1ff97bad" sha1="f4adffeb61eccf5715e3f61a9d24b87ce2ae08c9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4836,7 +4847,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="hotwheel">
+	<software name="hotwhltr">
 		<description>Hot Wheels - Turbo Racing (Euro)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
@@ -4847,7 +4858,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="hotwheelu" cloneof="hotwheel">
+	<software name="hotwhltru" cloneof="hotwhltr">
 		<description>Hot Wheels - Turbo Racing (USA)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
@@ -4966,7 +4977,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="ideyosuk">
+	<software name="ideyumjj">
 		<description>Ide Yousuke no Mahjong Juku (Jpn)</description>
 		<year>2000</year>
 		<publisher>Seta Corporation</publisher>
@@ -5268,7 +5279,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="jmcgrath">
+	<software name="jmg2k">
 		<description>Jeremy McGrath Supercross 2000 (Euro)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -5279,7 +5290,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="jmcgrathu" cloneof="jmcgrath">
+	<software name="jmg2ku" cloneof="jmg2k">
 		<description>Jeremy McGrath Supercross 2000 (USA)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -5800,7 +5811,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="kk2000">
+	<software name="koking2k">
 		<description>Knockout Kings 2000 (Euro)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
@@ -5811,7 +5822,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="kk2000u" cloneof="kk2000">
+	<software name="koking2ku" cloneof="koking2k">
 		<description>Knockout Kings 2000 (USA)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
@@ -5916,7 +5927,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="legoracr">
+	<software name="legorace">
 		<description>LEGO Racers (Euro)</description>
 		<year>1999</year>
 		<publisher>LEGO Media</publisher>
@@ -5927,7 +5938,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="legoracru" cloneof="legoracr">
+	<software name="legoraceu" cloneof="legorace">
 		<description>LEGO Racers (USA)</description>
 		<year>1999</year>
 		<publisher>LEGO Media</publisher>
@@ -6477,6 +6488,17 @@ patched out (+ a fix for internal checksum)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="mega man 64 (usa).bin" size="33554432" crc="b57dd0e4" sha1="c24b210f2fc297897940af1add23c1c19c191699" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megamanp" cloneof="megaman">
+		<description>Mega Man 64 (USA, Prototype)</description>
+		<year>2000</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="67108864">
+				<rom name="mega man 64 (proto).bin" size="67108864" crc="421d2a09" sha1="4f37f66ac3adf8257162d3420fd558504334be0f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7748,7 +7770,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="parlrpro">
+	<software name="parlpro">
 		<description>Parlor! Pro 64 - Pachinko Jikki Simulation Game (Jpn)</description>
 		<year>1999</year>
 		<publisher>Nihon Telenet</publisher>
@@ -9348,7 +9370,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="sparkchf">
+	<software name="luvshack">
 		<description>South Park - Chef's Luv Shack (Euro)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -9359,7 +9381,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="sparkchfu" cloneof="sparkchf">
+	<software name="luvshacku" cloneof="luvshack">
 		<description>South Park - Chef's Luv Shack (USA)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -10427,7 +10449,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="beastwarj" cloneof="beastwar">
+	<software name="bwmetal" cloneof="bwtmetal">
 		<description>Transformers - Beast Wars Metals 64 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Takara</publisher>
@@ -10441,7 +10463,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="beastwar">
+	<software name="bwtmetal">
 		<description>Transformers - Beast Wars Transmetals (USA)</description>
 		<year>2000</year>
 		<publisher>BAM! Entertainment</publisher>
@@ -11383,7 +11405,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="wormarmg">
+	<software name="wormsarm">
 		<description>Worms Armageddon (Euro)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
@@ -11394,7 +11416,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="wormarmgu" cloneof="wormarmg">
+	<software name="wormsarmu" cloneof="wormsarm">
 		<description>Worms Armageddon (USA)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>

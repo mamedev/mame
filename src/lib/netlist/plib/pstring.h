@@ -4,8 +4,8 @@
  * pstring.h
  */
 
-#ifndef _PSTRING_H_
-#define _PSTRING_H_
+#ifndef PSTRING_H_
+#define PSTRING_H_
 
 #include <cstdarg>
 #include <cstddef>
@@ -378,4 +378,4 @@ private:
 
 };
 
-#endif /* _PSTRING_H_ */
+#endif /* PSTRING_H_ */

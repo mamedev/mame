@@ -285,7 +285,6 @@ VIDEOS["DM9368"] = true
 VIDEOS["GF7600GS"] = true
 VIDEOS["EPIC12"] = true
 VIDEOS["FIXFREQ"] = true
-VIDEOS["H63484"] = true
 --VIDEOS["HD44102"] = true
 --VIDEOS["HD44352"] = true
 VIDEOS["HD44780"] = true
@@ -1350,7 +1349,6 @@ files {
 
 createMAMEProjects(_target, _subtarget, "cinemat")
 files {
-	MAME_DIR .. "src/mame/drivers/ataxx.cpp",
 	MAME_DIR .. "src/mame/drivers/cinemat.cpp",
 	MAME_DIR .. "src/mame/includes/cinemat.h",
 	MAME_DIR .. "src/mame/audio/cinemat.cpp",

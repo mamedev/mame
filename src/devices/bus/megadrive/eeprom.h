@@ -162,15 +162,15 @@ class md_eeprom_nbajam_device_alt : public md_std_eeprom_device
 public:
 	// construction/destruction
 	md_eeprom_nbajam_device_alt(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
-//	virtual machine_config_constructor device_mconfig_additions() const override;
+//  virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
 	virtual DECLARE_WRITE16_MEMBER(write) override;
-	
+
 	std::vector<UINT8> m_sram;
 
 	void eeprom_i2c_init();
@@ -180,15 +180,16 @@ public:
 
 private:
 	// EEPROM runtime vars
-	UINT8 m_eeprom_sda;		// current SDA
-	UINT8 m_eeprom_prev_sda;	// previous SDA
-	UINT8 m_eeprom_scl;		// current SCL
+	UINT8 m_eeprom_sda;     // current SDA
+	UINT8 m_eeprom_prev_sda;    // previous SDA
+	UINT8 m_eeprom_scl;     // current SCL
 	UINT8 m_eeprom_prev_scl;   // previous SCL
 	UINT8 m_eeprom_cnt;     // operation count in 0-9
 	UINT8 m_eeprom_readwrite;     // read/write bit
-	UINT16 m_eeprom_slave_mask;	// dev addr
+	UINT16 m_eeprom_slave_mask; // dev addr
 	UINT16 m_eeprom_word_address;  // memory addr
 	UINT16 m_eeprom_devsel;  // selected device
+	UINT16 m_eeprom_byte;  // byte to be written
 	int m_eeprom_cur_state;  // current state
 	// EEPROM physical characteristics (configured at init)
 	UINT16 m_eeprom_mask;       // size of the memory - 1

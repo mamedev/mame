@@ -69,15 +69,15 @@ class neogeo_svcsplus_cart : public neogeo_bootleg_cart
 {
 public:
 	neogeo_svcsplus_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	
+
 	virtual UINT32 get_bank_base(UINT16 sel) override { return m_pvc_prot->get_bank_base(); }
 	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_pvc_prot->protection_r(space, offset, mem_mask); }
 	virtual DECLARE_WRITE16_MEMBER(protection_w) override { m_pvc_prot->protection_w(space, offset, data, mem_mask); }
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
-	
+
 private:
 	required_device<pvc_prot_device> m_pvc_prot;
 };

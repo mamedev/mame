@@ -9,8 +9,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ui/menu.h"
+
 #include "ui/tapectrl.h"
+
+namespace ui {
 
 /***************************************************************************
     CONSTANTS
@@ -34,8 +36,8 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_tape_control::ui_menu_tape_control(mame_ui_manager &mui, render_container *container, cassette_image_device *device)
-	: ui_menu_device_control<cassette_image_device>(mui, container, device)
+menu_tape_control::menu_tape_control(mame_ui_manager &mui, render_container *container, cassette_image_device *device)
+	: menu_device_control<cassette_image_device>(mui, container, device)
 {
 }
 
@@ -44,7 +46,7 @@ ui_menu_tape_control::ui_menu_tape_control(mame_ui_manager &mui, render_containe
 //  dtor
 //-------------------------------------------------
 
-ui_menu_tape_control::~ui_menu_tape_control()
+menu_tape_control::~menu_tape_control()
 {
 }
 
@@ -53,7 +55,7 @@ ui_menu_tape_control::~ui_menu_tape_control()
 //  populate - populates the main tape control menu
 //-------------------------------------------------
 
-void ui_menu_tape_control::populate()
+void menu_tape_control::populate()
 {
 	if (current_device())
 	{
@@ -72,9 +74,9 @@ void ui_menu_tape_control::populate()
 			if (t1 > 0)
 			{
 				if (t0 > 0)
-					tapeflags |= MENU_FLAG_LEFT_ARROW;
+					tapeflags |= FLAG_LEFT_ARROW;
 				if (t0 < t1)
-					tapeflags |= MENU_FLAG_RIGHT_ARROW;
+					tapeflags |= FLAG_RIGHT_ARROW;
 			}
 
 			get_time_string(timepos, current_device(), nullptr, nullptr);
@@ -113,14 +115,14 @@ void ui_menu_tape_control::populate()
 //  handle - main tape control menu
 //-------------------------------------------------
 
-void ui_menu_tape_control::handle()
+void menu_tape_control::handle()
 {
 	// rebuild the menu (so to update the selected device, if the user has pressed L or R, and the tape counter)
-	reset(UI_MENU_RESET_REMEMBER_POSITION);
+	reset(reset_options::REMEMBER_POSITION);
 	populate();
 
 	// process the menu
-	const ui_menu_event *event = process(UI_MENU_PROCESS_LR_REPEAT);
+	const event *event = process(PROCESS_LR_REPEAT);
 	if (event != nullptr)
 	{
 		switch(event->iptkey)
@@ -163,7 +165,7 @@ void ui_menu_tape_control::handle()
 //  representation of the time
 //-------------------------------------------------
 
-void ui_menu_tape_control::get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos)
+void menu_tape_control::get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos)
 {
 	double t0, t1;
 
@@ -180,3 +182,5 @@ void ui_menu_tape_control::get_time_string(std::string &dest, cassette_image_dev
 	if (endpos != nullptr)
 		*endpos = t1;
 }
+
+} // namespace ui

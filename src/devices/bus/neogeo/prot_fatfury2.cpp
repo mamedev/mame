@@ -99,4 +99,3 @@ WRITE16_MEMBER( fatfury2_prot_device::protection_w )
 			break;
 	}
 }
-

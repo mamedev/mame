@@ -31,9 +31,13 @@ READ8_MEMBER( super80_state::pio_port_b_r )
 
 /**************************** CASSETTE ROUTINES *****************************************************************/
 
-void super80_state::super80_cassette_motor( UINT8 data )
+void super80_state::super80_cassette_motor( bool motor_state )
 {
-	if (data)
+	// relay sound
+	if (BIT(m_last_data, 1) != motor_state)
+		m_samples->start(0, motor_state ? 0 : 1);
+
+	if (motor_state)
 		m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 	else
 		m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
@@ -201,9 +205,19 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 
 /**************************** BASIC MACHINE CONSTRUCTION ***********************************************************/
 
-void super80_state::machine_reset()
+MACHINE_RESET_MEMBER( super80_state, super80 )
 {
 	m_portf0 = 0; // must be 0 like real machine, or banking breaks on 32-col systems
+	m_keylatch = 0xff;
+	m_key_pressed = 0;
+	m_palette_index = 0;
+	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(super80_state::super80_reset),this));
+	membank("boot")->set_entry(1);
+}
+
+MACHINE_RESET_MEMBER( super80_state, super80r )
+{
+	m_portf0 = 0x14;
 	m_keylatch = 0xff;
 	m_key_pressed = 0;
 	m_palette_index = 0;

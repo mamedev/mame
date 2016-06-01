@@ -57,7 +57,7 @@ VIDEO_START_MEMBER(exidy440_state,topsecex)
 {
 	VIDEO_START_CALL_MEMBER(exidy440);
 
-	*m_topsecex_yscroll = 0;
+	m_topsecex_yscroll = 0;
 }
 
 
@@ -442,7 +442,7 @@ UINT32 exidy440_state::screen_update_exidy440(screen_device &screen, bitmap_ind1
 UINT32 exidy440_state::screen_update_topsecex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* redraw the screen */
-	update_screen(screen, bitmap, cliprect, *m_topsecex_yscroll, FALSE);
+	update_screen(screen, bitmap, cliprect, m_topsecex_yscroll, FALSE);
 
 	return 0;
 }

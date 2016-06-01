@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 /***********************************************************************************************************
- 
+
  Neo Geo cart emulation
  Standard cart type, possibly with bankswitch in the area beyond 0x100000
  (We also include here V-Liner, which uses a standard cart + RAM + some custom input)
@@ -85,4 +85,3 @@ void neogeo_vliner_cart::device_reset()
 {
 	memset(m_cart_ram, 0, 0x2000);
 }
-

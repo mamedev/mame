@@ -23,7 +23,7 @@ public:
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	
+
 private:
 	required_device<cmc_prot_device> m_cmc_prot;
 	required_device<pcm2_prot_device> m_pcm2_prot;
@@ -45,7 +45,7 @@ public:
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	
+
 private:
 	required_device<cmc_prot_device> m_cmc_prot;
 	required_device<pcm2_prot_device> m_pcm2_prot;
@@ -66,7 +66,7 @@ public:
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	
+
 private:
 	required_device<cmc_prot_device> m_cmc_prot;
 	required_device<pcm2_prot_device> m_pcm2_prot;

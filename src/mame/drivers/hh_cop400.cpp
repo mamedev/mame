@@ -15,8 +15,10 @@
 #include "emu.h"
 #include "cpu/cop400/cop400.h"
 #include "sound/speaker.h"
+#include "sound/dac.h"
 
 // internal artwork
+#include "bship82.lh" // clickable
 #include "ctstein.lh" // clickable
 #include "einvaderc.lh" // test-layout(but still playable)
 #include "funjacks.lh"
@@ -53,7 +55,7 @@ public:
 	int m_sk;                           // MCU SK line state
 	UINT16 m_inp_mux;                   // multiplexed inputs mask
 
-	UINT8 read_inputs(int columns);
+	UINT16 read_inputs(int columns);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
@@ -92,7 +94,7 @@ void hh_cop400_state::machine_start()
 	m_d = 0;
 	m_so = 0;
 	m_sk = 0;
-	m_inp_mux = 0;
+	m_inp_mux = ~0;
 
 	// register for savestates
 	save_item(NAME(m_display_maxy));
@@ -224,14 +226,14 @@ void hh_cop400_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 set
 
 // generic input handlers
 
-UINT8 hh_cop400_state::read_inputs(int columns)
+UINT16 hh_cop400_state::read_inputs(int columns)
 {
 	// active low
-	UINT8 ret = 0xff;
+	UINT16 ret = 0xffff;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
+		if (~m_inp_mux >> i & 1)
 			ret &= m_inp_matrix[i]->read();
 
 	return ret;
@@ -274,7 +276,7 @@ public:
 WRITE8_MEMBER(ctstein_state::write_g)
 {
 	// G0-G2: input mux
-	m_inp_mux = ~data & 7;
+	m_inp_mux = data & 7;
 }
 
 WRITE8_MEMBER(ctstein_state::write_l)
@@ -322,7 +324,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ctstein, ctstein_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 860000) // approximation - RC osc. R=12K to +6V, C=100pf to GND
+	MCFG_CPU_ADD("maincpu", COP421, 860000) // approximation - RC osc. R=12K, C=100pf
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_G_CB(WRITE8(ctstein_state, write_g))
 	MCFG_COP400_WRITE_L_CB(WRITE8(ctstein_state, write_l))
@@ -380,7 +382,7 @@ WRITE8_MEMBER(h2hbaskb_state::write_d)
 WRITE8_MEMBER(h2hbaskb_state::write_g)
 {
 	// G: led select, input mux
-	m_inp_mux = ~data;
+	m_inp_mux = data;
 	m_g = data & 0xf;
 }
 
@@ -451,7 +453,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( h2hbaskb, h2hbaskb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 1600000) // approximation - RC osc. R=43K to +9V, C=101pf to GND
+	MCFG_CPU_ADD("maincpu", COP420, 1600000) // approximation - RC osc. R=43K, C=101pf
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(h2hbaskb_state, write_d))
 	MCFG_COP400_WRITE_G_CB(WRITE8(h2hbaskb_state, write_g))
@@ -566,7 +568,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( einvaderc, einvaderc_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP444, 1000000) // approximation - RC osc. R=47K to +9V, C=100pf to GND(-9V)
+	MCFG_CPU_ADD("maincpu", COP444, 1000000) // approximation - RC osc. R=47K, C=100pf
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
 	MCFG_COP400_WRITE_D_CB(WRITE8(einvaderc_state, write_d))
@@ -615,7 +617,8 @@ public:
 WRITE8_MEMBER(funjacks_state::write_d)
 {
 	// D: led grid + input mux
-	m_d = m_inp_mux = data ^ 0xf;
+	m_inp_mux = data;
+	m_d = data ^ 0xf;
 	display_matrix(2, 4, m_l, m_d);
 }
 
@@ -837,7 +840,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( plus1, plus1_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K to +5V, C=100pf to GND
+	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=100pf
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(plus1_state, write_d))
 	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
@@ -929,7 +932,7 @@ WRITE_LINE_MEMBER(lightfgt_state::write_sk)
 READ8_MEMBER(lightfgt_state::read_g)
 {
 	// G: multiplexed inputs
-	m_inp_mux = (m_so | m_d << 1) ^ 0x1f;
+	m_inp_mux = m_d << 1 | m_so;
 	return read_inputs(5);
 }
 
@@ -971,7 +974,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( lightfgt, lightfgt_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K to +6V, C=56pf to GND(-6V)
+	MCFG_CPU_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K, C=56pf
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_SO_CB(WRITELINE(lightfgt_state, write_so))
 	MCFG_COP400_WRITE_D_CB(WRITE8(lightfgt_state, write_d))
@@ -985,6 +988,154 @@ static MACHINE_CONFIG_START( lightfgt, lightfgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Milton Bradley Electronic Battleship (1982 version)
+  * COP420 MCU label COP420-JWE/N
+  
+  see hh_tms1k.cpp bship driver for more information
+
+***************************************************************************/
+
+class bship82_state : public hh_cop400_state
+{
+public:
+	bship82_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_cop400_state(mconfig, type, tag),
+		m_dac(*this, "dac")
+	{ }
+
+	required_device<dac_device> m_dac;
+
+	DECLARE_WRITE8_MEMBER(write_d);
+	DECLARE_WRITE8_MEMBER(write_g);
+	DECLARE_READ8_MEMBER(read_l);
+	DECLARE_READ8_MEMBER(read_in);
+	DECLARE_WRITE_LINE_MEMBER(write_so);
+};
+
+// handlers
+
+WRITE8_MEMBER(bship82_state::write_d)
+{
+	// D: input mux
+	m_inp_mux = data;
+}
+
+WRITE8_MEMBER(bship82_state::write_g)
+{
+	// G: 4-bit signed DAC
+	if (~data & 8) data ^= 7;
+	m_dac->write_signed8(data << 4);
+}
+
+READ8_MEMBER(bship82_state::read_l)
+{
+	// L: multiplexed inputs
+	return read_inputs(4) & 0xff;
+}
+
+READ8_MEMBER(bship82_state::read_in)
+{
+	// IN: multiplexed inputs
+	return read_inputs(4) >> 8 & 0xf;
+}
+
+WRITE_LINE_MEMBER(bship82_state::write_so)
+{
+	// SO: led
+	display_matrix(1, 1, state, 1);
+}
+
+
+// config
+
+static INPUT_PORTS_START( bship82 )
+	PORT_START("IN.0") // D0 ports L,IN
+	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("P1 Clear Last Entry") // CLE
+	PORT_BIT( 0x002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("P1 A")
+	PORT_BIT( 0x004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("P1 B")
+	PORT_BIT( 0x008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("P1 C")
+	PORT_BIT( 0x010, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("P1 D")
+	PORT_BIT( 0x020, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("P1 E")
+	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("P1 F")
+	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("P1 G")
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("P1 H")
+	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("P1 I")
+	PORT_BIT( 0x400, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P1 J")
+	PORT_BIT( 0x800, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.1") // D1 ports L,IN
+	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("P1 Clear Memory") // CM
+	PORT_BIT( 0x002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 1")
+	PORT_BIT( 0x004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("P1 2")
+	PORT_BIT( 0x008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("P1 3")
+	PORT_BIT( 0x010, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("P1 4")
+	PORT_BIT( 0x020, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("P1 5")
+	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("P1 6")
+	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("P1 7")
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("P1 8")
+	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("P1 9")
+	PORT_BIT( 0x400, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("P1 10")
+	PORT_BIT( 0x800, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("P1 Fire")
+
+	PORT_START("IN.2") // D2 ports L,IN
+	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 Clear Last Entry") // CLE
+	PORT_BIT( 0x002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 A")
+	PORT_BIT( 0x004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 B")
+	PORT_BIT( 0x008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 C")
+	PORT_BIT( 0x010, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 D")
+	PORT_BIT( 0x020, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 E")
+	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 F")
+	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 G")
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 H")
+	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 I")
+	PORT_BIT( 0x400, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 J")
+	PORT_BIT( 0x800, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.3") // D3 ports L,IN
+	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 Clear Memory") // CM
+	PORT_BIT( 0x002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 1")
+	PORT_BIT( 0x004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 2")
+	PORT_BIT( 0x008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 3")
+	PORT_BIT( 0x010, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 4")
+	PORT_BIT( 0x020, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 5")
+	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 6")
+	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 7")
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 8")
+	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 9")
+	PORT_BIT( 0x400, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 10")
+	PORT_BIT( 0x800, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("P2 Fire")
+
+	PORT_START("IN.4") // SI
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_TOGGLE PORT_CODE(KEYCODE_F1) PORT_NAME("Load/Go") // switch
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( bship82, bship82_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", COP420, 3000000) // approximation - RC osc. R=14K, C=100pf
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_COP400_WRITE_D_CB(WRITE8(bship82_state, write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8(bship82_state, write_g))
+	MCFG_COP400_READ_L_CB(READ8(bship82_state, read_l))
+	MCFG_COP400_READ_IN_CB(READ8(bship82_state, read_in))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(bship82_state, write_so))
+	MCFG_COP400_READ_SI_CB(IOPORT("IN.4"))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_bship82)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1040,6 +1191,12 @@ ROM_START( lightfgt )
 ROM_END
 
 
+ROM_START( bship82 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop420-jwe_n", 0x0000, 0x0400, CRC(5ea8111a) SHA1(34931463b806b48dce4f8ae2361512510bae0ebf) )
+ROM_END
+
+
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   driver_device, 0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -1051,5 +1208,9 @@ CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Ent
 CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  driver_device, 0, "Mattel", "Funtronics Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   driver_device, 0, "Mattel", "Funtronics Red Light Green Light", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1980, plus1,     0,        0, plus1,     plus1,     driver_device, 0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1980, plus1,     0,        0, plus1,     plus1,     driver_device, 0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
 CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  driver_device, 0, "Milton Bradley", "Lightfight", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, bship82,   bship,    0, bship82,   bship82,   driver_device, 0, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+
+// ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
+// with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

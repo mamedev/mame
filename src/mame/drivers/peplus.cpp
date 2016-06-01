@@ -11406,7 +11406,7 @@ ROM_START( pex2306p ) /* Superboard : Triple Double Bonus Poker (X002306P+XP0000
                                       5-K 2-4     with   with
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
 -----------------------------------------------------------------------------
- P908BM     1    1    2   4    7   9  50  80 160   400   400  50 400    800
+ P907BM     1    1    2   4    7   9  50  80 160   400   400  50 400    800
   % Range: 95.6-97.6%  Optimum: 99.6%  Hit Frequency: 43.3%
      Programs Available: X002306P
 */
@@ -11414,7 +11414,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
 	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /*  09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x002306p.u66",   0x00000, 0x10000, CRC(ef36ea67) SHA1(8914ad20526fd63e14d9fa1901e9c779a11eb29d) ) /* Triple Double Bonus Poker */
+	ROM_LOAD( "x002306p.u66",   0x00000, 0x10000, CRC(ef36ea67) SHA1(8914ad20526fd63e14d9fa1901e9c779a11eb29d) ) /* Triple Double Bonus Poker - 03/05/97   @ IGT  L97-0613 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2242.u77",  0x00000, 0x8000, CRC(963a7e7d) SHA1(ebb159f6c731a3f912382745ef9a9c6d4fa2fc99) ) /*  03/19/96   @ IGT  L96-0703 */
@@ -11441,7 +11441,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
 	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /*  09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x002307p.u66",   0x00000, 0x10000, CRC(c6d5db70) SHA1(017e1e382fb789e4cd8b410362ad5e82b61f61db) ) /* Triple Double Bonus Poker */
+	ROM_LOAD( "x002307p.u66",   0x00000, 0x10000, CRC(c6d5db70) SHA1(017e1e382fb789e4cd8b410362ad5e82b61f61db) ) /* Triple Double Bonus Poker - 03/05/97   @ IGT  L97-0614 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2242.u77",  0x00000, 0x8000, CRC(963a7e7d) SHA1(ebb159f6c731a3f912382745ef9a9c6d4fa2fc99) ) /*  03/19/96   @ IGT  L96-0703 */

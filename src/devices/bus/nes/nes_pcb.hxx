@@ -319,6 +319,15 @@ static const nes_pcb pcb_list[] =
 	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "dance2k",          UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
+	{ "bmc_f15",          UNSUPPORTED_BOARD },	// 150-in-1 Unchained Melody
+	{ "bmc_hp898f",       UNSUPPORTED_BOARD },	// Primasoft 9999999-in-1
+	{ "bmc_8in1",         UNSUPPORTED_BOARD },	// Super 8-in-1 (Incl. Rockin' Kats)
+	{ "unl_eh8813a",      UNSUPPORTED_BOARD },	// Dr. Mario II
+	{ "unl_158b",         UNSUPPORTED_BOARD },	// Blood of Jurassic
+	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },	// Dragon Fighter by Flying Star
+	{ "ks7016",           UNSUPPORTED_BOARD },	// Exciting Basketball FDS
+	{ "ks7037",           UNSUPPORTED_BOARD },	// Metroid FDS Chinese
+	{ "rt01",             UNSUPPORTED_BOARD },	// Russian Test Cart
 	{ "test",             TEST_BOARD },
 	{ "unknown",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
 };
@@ -550,10 +559,14 @@ void nes_cart_slot_device::call_load_pcb()
 
 	// SETUP step 4: logging what we have found
 	logerror("Loaded game from softlist:\n");
-	logerror("-- PCB: %s", get_feature("pcb"));
-	if (m_pcb_id == UNSUPPORTED_BOARD)
-		logerror(" (currently not supported by MESS)");
-	logerror("\n-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
+	if (get_feature("pcb"))
+	{
+		logerror("-- PCB: %s", get_feature("pcb"));
+		if (m_pcb_id == UNSUPPORTED_BOARD)
+			logerror(" (currently not supported by MESS)");
+		logerror("\n");
+	}
+	logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
 	logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
 	logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
 	logerror("-- PRG NVWRAM: %d\n", battery_size + mapper_sram_size);

@@ -158,7 +158,7 @@
 	</software>
 
 	<software name="samsprpg">
-		<description>Shinsetsu Samurai Spirits - Bushidohretsuden (Jpn)</description>
+		<description>Shinsetsu Samurai Spirits - Bushidou Retsuden (Jpn)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="真説サムライスピリッツ 武士道烈伝" />
@@ -426,7 +426,7 @@
 	</software>
 
 	<!-- Hangs during loading due to erasing vectors -->
-	<software name="ddragon" supported="no">
+	<software name="doubledr" supported="no">
 		<description>Double Dragon (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>

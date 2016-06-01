@@ -129,7 +129,7 @@ TGP_FUNCTION( model1_state::fsub )
 	float a = fifoin_pop_f();
 	float b = fifoin_pop_f();
 	float r = a-b;
-	m_dump = 1;
+	m_dump = true;
 	logerror("TGP fsub %f-%f=%f (%x)\n", a, b, r, m_pushpc);
 	fifoout_push_f(r);
 	next_fn();
@@ -296,7 +296,7 @@ TGP_FUNCTION( model1_state::normalize )
 TGP_FUNCTION( model1_state::acc_seti )
 {
 	INT32 a = fifoin_pop();
-	m_dump = 1;
+	m_dump = true;
 	logerror("TGP acc_seti %d (%x)\n", a, m_pushpc);
 	m_acc = a;
 	next_fn();
@@ -613,7 +613,7 @@ TGP_FUNCTION( model1_state::fsinm_m1 )
 {
 	INT16 a = fifoin_pop();
 	float b = fifoin_pop_f();
-	m_dump = 1;
+	m_dump = true;
 	logerror("TGP fsinm %d, %f (%x)\n", a, b, m_pushpc);
 	fifoout_push_f(b*tsin(a));
 	next_fn();
@@ -1961,7 +1961,7 @@ MACHINE_START_MEMBER(model1_state,model1)
 	save_item(NAME(m_list_length));
 }
 
-void model1_state::tgp_reset(int swa)
+void model1_state::tgp_reset(bool swa)
 {
 	m_ram_adr = 0;
 	memset(m_ram_data.get(), 0, 0x10000*4);
@@ -1978,7 +1978,7 @@ void model1_state::tgp_reset(int swa)
 	m_cmat[4] = 1.0;
 	m_cmat[8] = 1.0;
 
-	m_dump = 0;
+	m_dump = false;
 	m_swa = swa;
 	next_fn();
 }

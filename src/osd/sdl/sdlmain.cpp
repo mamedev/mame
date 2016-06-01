@@ -31,7 +31,7 @@
 #include <windows.h>
 #endif
 
-#include "sdlinc.h"
+#include <SDL2/SDL.h>
 
 // MAME headers
 #include "osdepend.h"
@@ -44,14 +44,6 @@
 #include "osdsdl.h"
 #include "modules/lib/osdlib.h"
 #include "modules/diagnostics/diagnostics_module.h"
-
-// we override SDL's normal startup on Win32
-// please see sdlprefix.h as well
-
-#if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#endif
 
 //============================================================
 //  OPTIONS

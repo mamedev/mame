@@ -189,7 +189,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 		case 4: /* 6502 sound cpu */
 			if (ACCESSING_BITS_0_7)
 			{
-				soundlatch_byte_w(space, 0, data & 0xff);
+				m_soundlatch->write(space, 0, data & 0xff);
 				m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
@@ -228,7 +228,7 @@ WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 		case 0xe: /* z80 sound cpu */
 			if (ACCESSING_BITS_0_7)
 			{
-				soundlatch_byte_w(space, 0, data & 0xff);
+				m_soundlatch->write(space, 0, data & 0xff);
 				m_audiocpu->set_input_line(0, HOLD_LINE);
 			}
 			break;
@@ -261,7 +261,7 @@ WRITE16_MEMBER(dec0_state::slyspy_control_w)
 		case 0:
 			if (ACCESSING_BITS_0_7)
 			{
-				soundlatch_byte_w(space, 0, data & 0xff);
+				m_soundlatch->write(space, 0, data & 0xff);
 				m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
@@ -275,7 +275,7 @@ WRITE16_MEMBER(dec0_state::midres_sound_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -500,7 +500,7 @@ static ADDRESS_MAP_START( dec0_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_device, write)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -512,7 +512,7 @@ static ADDRESS_MAP_START( slyspy_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READNOP /* Protection counter */
 	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x0f0000, 0x0f0001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
@@ -522,7 +522,7 @@ static ADDRESS_MAP_START( midres_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x108000, 0x108001) AM_DEVWRITE("ym2", ym3812_device, write)
 	AM_RANGE(0x118000, 0x118001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x138000, 0x138001) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x138000, 0x138001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
@@ -625,7 +625,7 @@ static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, dec0_automat_state )
 	AM_RANGE(0x0103, 0x0103) AM_WRITENOP
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("2203a", ym2203_device, write)
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("2203b", ym2203_device, write)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(automat_adpcm_w)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
@@ -1303,6 +1303,8 @@ static MACHINE_CONFIG_START( dec0_base, dec0_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	MCFG_DECO_MXC06_GFX_REGION(3)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dec0, dec0_base )
@@ -1425,6 +1427,8 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("2203a", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
@@ -1485,6 +1489,8 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("2203a", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)

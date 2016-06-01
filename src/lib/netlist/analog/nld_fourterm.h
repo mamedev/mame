@@ -16,17 +16,17 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define VCCS(_name)                                                            \
-		NET_REGISTER_DEV(VCCS, _name)
+#define VCCS(name)                                                            \
+		NET_REGISTER_DEV(VCCS, name)
 
-#define CCCS(_name)                                                            \
-		NET_REGISTER_DEV(CCCS, _name)
+#define CCCS(name)                                                            \
+		NET_REGISTER_DEV(CCCS, name)
 
-#define VCVS(_name)                                                            \
-		NET_REGISTER_DEV(VCVS, _name)
+#define VCVS(name)                                                            \
+		NET_REGISTER_DEV(VCVS, name)
 
-#define LVCCS(_name)                                                           \
-		NET_REGISTER_DEV(LVCCS, _name)
+#define LVCCS(name)                                                           \
+		NET_REGISTER_DEV(LVCCS, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -51,24 +51,47 @@ NETLIB_NAMESPACE_DEVICES_START()
  *
  */
 
-class NETLIB_NAME(VCCS) : public device_t
+NETLIB_OBJECT(VCCS)
 {
 public:
-	ATTR_COLD NETLIB_NAME(VCCS)()
-	: device_t(VCCS), m_gfac(1.0) {  }
-	ATTR_COLD NETLIB_NAME(VCCS)(const family_t afamily)
-	: device_t(afamily), m_gfac(1.0) {  }
+	NETLIB_CONSTRUCTOR(VCCS)
+	, m_G(*this, "G", 1.0)
+	, m_RI(*this, "RI", NL_FCONST(1.0) / netlist().gmin())
+	, m_gfac(1.0)
+	{
+
+		enregister("IP", m_IP);
+		enregister("IN", m_IN);
+		enregister("OP", m_OP);
+		enregister("ON", m_ON);
+
+		enregister("_OP1", m_OP1);
+		enregister("_ON1", m_ON1);
+
+		m_IP.m_otherterm = &m_IN; // <= this should be NULL and terminal be filtered out prior to solving...
+		m_IN.m_otherterm = &m_IP; // <= this should be NULL and terminal be filtered out prior to solving...
+
+		m_OP.m_otherterm = &m_IP;
+		m_OP1.m_otherterm = &m_IN;
+
+		m_ON.m_otherterm = &m_IP;
+		m_ON1.m_otherterm = &m_IN;
+
+		connect_late(m_OP, m_OP1);
+		connect_late(m_ON, m_ON1);
+		m_gfac = NL_FCONST(1.0);
+	}
 
 	param_double_t m_G;
 	param_double_t m_RI;
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	virtual void update_param() override;
-	ATTR_HOT virtual void update() override;
-
-	ATTR_COLD void start_internal(const nl_double def_RI);
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
+	NETLIB_UPDATE_PARAMI()
+	{
+		NETLIB_NAME(VCCS)::reset();
+	}
 
 	terminal_t m_OP;
 	terminal_t m_ON;
@@ -84,21 +107,23 @@ protected:
 
 /* Limited Current source*/
 
-class NETLIB_NAME(LVCCS) : public NETLIB_NAME(VCCS)
+NETLIB_OBJECT_DERIVED(LVCCS, VCCS)
 {
 public:
-	ATTR_COLD NETLIB_NAME(LVCCS)()
-	: NETLIB_NAME(VCCS)(LVCCS), m_vi(0.0) {  }
-	ATTR_COLD NETLIB_NAME(LVCCS)(const family_t afamily)
-	: NETLIB_NAME(VCCS)(afamily), m_vi(0.0) {  }
+	NETLIB_CONSTRUCTOR_DERIVED(LVCCS, VCCS)
+	, m_cur_limit(*this, "CURLIM", 1000.0)
+	, m_vi(0.0)
+	{
+	}
+
+	NETLIB_DYNAMIC()
 
 	param_double_t m_cur_limit; /* current limit */
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	virtual void update_param() override;
-	ATTR_HOT virtual void update() override;
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
+	NETLIB_UPDATE_PARAMI();
 	NETLIB_UPDATE_TERMINALSI();
 
 	nl_double m_vi;
@@ -127,17 +152,19 @@ protected:
  *
  */
 
-class NETLIB_NAME(CCCS) : public NETLIB_NAME(VCCS)
+NETLIB_OBJECT_DERIVED(CCCS, VCCS)
 {
 public:
-	ATTR_COLD NETLIB_NAME(CCCS)()
-	: NETLIB_NAME(VCCS)(CCCS), m_gfac(1.0) {  }
+	NETLIB_CONSTRUCTOR_DERIVED(CCCS, VCCS)
+	, m_gfac(1.0)
+	{
+		m_gfac = NL_FCONST(1.0) / m_RI.Value();
+	}
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	virtual void update_param() override;
-	ATTR_HOT void update() override;
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
+	NETLIB_UPDATE_PARAMI();
 
 	nl_double m_gfac;
 };
@@ -171,19 +198,29 @@ protected:
  */
 
 
-class NETLIB_NAME(VCVS) : public NETLIB_NAME(VCCS)
+NETLIB_OBJECT_DERIVED(VCVS, VCCS)
 {
 public:
-	ATTR_COLD NETLIB_NAME(VCVS)()
-	: NETLIB_NAME(VCCS)(VCVS) { }
+	NETLIB_CONSTRUCTOR_DERIVED(VCVS, VCCS)
+	, m_RO(*this, "RO",1.0)
+	{
+
+		enregister("_OP2", m_OP2);
+		enregister("_ON2", m_ON2);
+
+		m_OP2.m_otherterm = &m_ON2;
+		m_ON2.m_otherterm = &m_OP2;
+
+		connect_late(m_OP2, m_OP1);
+		connect_late(m_ON2, m_ON1);
+	}
 
 	param_double_t m_RO;
 
 protected:
-	virtual void start() override;
-	virtual void reset() override;
-	virtual void update_param() override;
-	//ATTR_HOT void update();
+	//NETLIB_UPDATEI();
+	NETLIB_RESETI();
+	//NETLIB_UPDATE_PARAMI();
 
 	terminal_t m_OP2;
 	terminal_t m_ON2;

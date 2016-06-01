@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 /***********************************************************************************************************
- 
+
  Neo Geo cart emulation
  The King of Fighters 10th Anniversary Bootleg cart type
 
@@ -103,9 +103,9 @@ WRITE16_MEMBER(neogeo_kof10th_cart::protection_w)
 	if (offset < 0x40000/2)
 	{
 		if (!m_cart_ram[0xffe])
-			COMBINE_DATA(&m_cart_ram2[(0x00000/2) + (offset & 0xffff)]);	// Write to RAM bank A
+			COMBINE_DATA(&m_cart_ram2[(0x00000/2) + (offset & 0xffff)]);    // Write to RAM bank A
 		else
-			m_fixed[offset] = BITSWAP8(data, 7,6,0,4,3,2,1,5);	// Write S data on-the-fly
+			m_fixed[offset] = BITSWAP8(data, 7,6,0,4,3,2,1,5);  // Write S data on-the-fly
 	}
 	else if (offset >= 0xfe000/2)
 	{

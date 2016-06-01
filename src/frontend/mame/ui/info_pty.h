@@ -10,15 +10,22 @@
 
 #pragma once
 
-#ifndef __UI_INFO_PTY_H__
-#define __UI_INFO_PTY_H__
+#ifndef MAME_FRONTEND_UI_INFO_PTY_H
+#define MAME_FRONTEND_UI_INFO_PTY_H
 
-class ui_menu_pty_info : public ui_menu {
+#include "ui/menu.h"
+
+namespace ui {
+
+class menu_pty_info : public menu
+{
 public:
-	ui_menu_pty_info(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_pty_info();
+	menu_pty_info(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_pty_info() override;
 	virtual void populate() override;
 	virtual void handle() override;
 };
 
-#endif // __UI_INFO_PTY_H__
+} // namespace ui
+
+#endif // MAME_FRONTEND_UI_INFO_PTY_H

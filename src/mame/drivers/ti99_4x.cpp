@@ -889,9 +889,9 @@ static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	// GROM devices
-	MCFG_GROM_ADD( GROM0_TAG, 0, region_grom, 0x0000, WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM1_TAG, 1, region_grom, 0x2000, WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM2_TAG, 2, region_grom, 0x4000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM0_TAG, 0, CONSOLEGROM, 0x0000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM1_TAG, 1, CONSOLEGROM, 0x2000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM2_TAG, 2, CONSOLEGROM, 0x4000, WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4_ADD( JOYPORT_TAG )
@@ -998,9 +998,9 @@ static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	// GROM devices
-	MCFG_GROM_ADD( GROM0_TAG, 0, region_grom, 0x0000, WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM1_TAG, 1, region_grom, 0x2000, WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM2_TAG, 2, region_grom, 0x4000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM0_TAG, 0, CONSOLEGROM, 0x0000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM1_TAG, 1, CONSOLEGROM, 0x2000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM2_TAG, 2, CONSOLEGROM, 0x4000, WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG )
@@ -1053,6 +1053,7 @@ MACHINE_CONFIG_END
 
 /*
     US version: 60 Hz, NTSC
+    There were no European versions.
 */
 static MACHINE_CONFIG_DERIVED( ti99_4qi_60hz, ti99_4qi )
 	MCFG_DEVICE_ADD( VDP_TAG, TMS9918A, XTAL_10_738635MHz / 2 )                  \
@@ -1060,18 +1061,6 @@ static MACHINE_CONFIG_DERIVED( ti99_4qi_60hz, ti99_4qi )
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
 	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )                             \
-	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
-MACHINE_CONFIG_END
-
-/*
-    European version: 50 Hz, PAL
-*/
-static MACHINE_CONFIG_DERIVED( ti99_4qi_50hz, ti99_4qi )
-	MCFG_DEVICE_ADD( VDP_TAG, TMS9929A, XTAL_10_738635MHz / 2 ) \
-	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))   \
-	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
-	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )                              \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
@@ -1155,9 +1144,9 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	// GROM devices
-	MCFG_GROM_ADD( GROM0_TAG, 0, region_grom, 0x0000, WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM1_TAG, 1, region_grom, 0x2000, WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( GROM2_TAG, 2, region_grom, 0x4000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM0_TAG, 0, CONSOLEGROM, 0x0000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM1_TAG, 1, CONSOLEGROM, 0x2000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( GROM2_TAG, 2, CONSOLEGROM, 0x4000, WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG )
@@ -1171,51 +1160,68 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 #define rom_ti99_4e rom_ti99_4
 #define rom_ti99_4ae rom_ti99_4a
-#define rom_ti99_4qe rom_ti99_4qi
 
 ROM_START(ti99_4)
 	// CPU memory space
+	// ROM files do not have a CRC16 at their end
 	ROM_REGION16_BE(0x2000, CONSOLEROM, 0)
-	ROM_LOAD16_BYTE("u610.bin", 0x0000, 0x1000, CRC(6fcf4b15) SHA1(d085213c64701d429ae535f9a4ac8a50427a8343)) /* CPU ROMs high */
-	ROM_LOAD16_BYTE("u611.bin", 0x0001, 0x1000, CRC(491c21d1) SHA1(7741ae9294c51a44a78033d1b77c01568a6bbfb9)) /* CPU ROMs low */
+	ROM_LOAD16_BYTE("994_rom_hb.u610", 0x0000, 0x1000, CRC(6fcf4b15) SHA1(d085213c64701d429ae535f9a4ac8a50427a8343)) /* CPU ROMs high */
+	ROM_LOAD16_BYTE("994_rom_lb.u611", 0x0001, 0x1000, CRC(491c21d1) SHA1(7741ae9294c51a44a78033d1b77c01568a6bbfb9)) /* CPU ROMs low */
 
 	// GROM memory space
-	ROM_REGION(0x10000, region_grom, 0)
-	ROM_LOAD("u500.bin", 0x0000, 0x1800, CRC(aa757e13) SHA1(4658d3d01c0131c283a30cebd12e76754d41a84a)) /* system GROM 0 */
-	ROM_LOAD("u501.bin", 0x2000, 0x1800, CRC(c863e460) SHA1(6d849a76011273a069a98ed0c3feaf13831c942f)) /* system GROM 1 */
-	ROM_LOAD("u502.bin", 0x4000, 0x1800, CRC(b0eda548) SHA1(725e3f26f8c819f356e4bb405b4102b5ae1e0e70)) /* system GROM 2 */
+	// GROM files do not have a CRC16 at their end
+	ROM_REGION(0x6000, CONSOLEGROM, 0)
+	ROM_LOAD("994_grom0.u500", 0x0000, 0x1800, CRC(aa757e13) SHA1(4658d3d01c0131c283a30cebd12e76754d41a84a)) /* system GROM 0 */
+	ROM_LOAD("994_grom1.u501", 0x2000, 0x1800, CRC(c863e460) SHA1(6d849a76011273a069a98ed0c3feaf13831c942f)) /* system GROM 1 */
+	ROM_LOAD("994_grom2.u502", 0x4000, 0x1800, CRC(b0eda548) SHA1(725e3f26f8c819f356e4bb405b4102b5ae1e0e70)) /* system GROM 2 */
 ROM_END
 
 ROM_START(ti99_4a)
 	// CPU memory space
+	// ROM files have valid CRC16 as last word
 	ROM_REGION16_BE(0x2000, CONSOLEROM, 0)
-	ROM_LOAD16_WORD("994arom.bin", 0x0000, 0x2000, CRC(db8f33e5) SHA1(6541705116598ab462ea9403c00656d6353ceb85)) /* system ROMs */
+	ROM_LOAD16_BYTE("994a_rom_hb.u610", 0x0000, 0x1000, CRC(ee859c5f) SHA1(a45245707c3dccea902b718554a882d214a82504)) /* CPU ROMs high */
+	ROM_LOAD16_BYTE("994a_rom_lb.u611", 0x0001, 0x1000, CRC(37859301) SHA1(f4e774fd5913b387a763f1b8de5524c54b255434)) /* CPU ROMs low */
 
 	// GROM memory space
-	ROM_REGION(0x10000, region_grom, 0)
-	ROM_LOAD("994agrom.bin", 0x0000, 0x6000, CRC(af5c2449) SHA1(0c5eaad0093ed89e9562a2c0ee6a370bdc9df439)) /* system GROMs */
+	// GROM files have valid CRC16 as last word
+	ROM_REGION(0x6000, CONSOLEGROM, 0)
+	ROM_LOAD("994a_grom0.u500", 0x0000, 0x1800, CRC(2445a5e8) SHA1(ea15d8b0ac52112dc0d5f4ab9a79ac8ca1cc1bbc)) /* system GROM 0 */
+	ROM_LOAD("994a_grom1.u501", 0x2000, 0x1800, CRC(b8f367ab) SHA1(3ecead4b83ec525084c70b6123d4053f8a80e1f7)) /* system GROM 1 */
+	ROM_LOAD("994a_grom2.u502", 0x4000, 0x1800, CRC(e0bb5341) SHA1(e255f0d65d69b927cecb8fcfac7a4c17d585ea96)) /* system GROM 2 */
 ROM_END
 
 ROM_START(ti99_4qi)
 	// CPU memory space
+	// ROM files are the same as for TI-99/4A, but located in sockets u3 and u5
 	ROM_REGION16_BE(0x2000, CONSOLEROM, 0)
-	ROM_LOAD16_WORD("994qirom.bin", 0x0000, 0x2000, CRC(db8f33e5) SHA1(6541705116598ab462ea9403c00656d6353ceb85)) /* system ROMs */
+	ROM_LOAD16_BYTE("994a_rom_hb.u610", 0x0000, 0x1000, CRC(ee859c5f) SHA1(a45245707c3dccea902b718554a882d214a82504)) /* CPU ROMs high */
+	ROM_LOAD16_BYTE("994a_rom_lb.u611", 0x0001, 0x1000, CRC(37859301) SHA1(f4e774fd5913b387a763f1b8de5524c54b255434)) /* CPU ROMs low */
 
 	// GROM memory space
-	ROM_REGION(0x10000, region_grom, 0)
-	ROM_LOAD("994qigr0.bin", 0x0000, 0x1800, CRC(8b07772d) SHA1(95dcf5b7350ade65297eadd2d680c27561cc975c)) /* system GROM 0 */
-	ROM_LOAD("994qigr1.bin", 0x2000, 0x1800, CRC(b8f367ab) SHA1(3ecead4b83ec525084c70b6123d4053f8a80e1f7)) /* system GROM 1 */
-	ROM_LOAD("994qigr2.bin", 0x4000, 0x1800, CRC(e0bb5341) SHA1(e255f0d65d69b927cecb8fcfac7a4c17d585ea96)) /* system GROM 2 */
+	// GROM files have valid CRC16 as last word
+	// GROM1 and GROM2 are the same as for TI-99/4A, located in u30 and u31
+	ROM_REGION(0x6000, CONSOLEGROM, 0)
+	ROM_LOAD("994qi_grom0.u29", 0x0000, 0x1800, CRC(8b07772d) SHA1(95dcf5b7350ade65297eadd2d680c27561cc975c)) /* system GROM 0 */
+	ROM_LOAD("994a_grom1.u501", 0x2000, 0x1800, CRC(b8f367ab) SHA1(3ecead4b83ec525084c70b6123d4053f8a80e1f7)) /* system GROM 1 */
+	ROM_LOAD("994a_grom2.u502", 0x4000, 0x1800, CRC(e0bb5341) SHA1(e255f0d65d69b927cecb8fcfac7a4c17d585ea96)) /* system GROM 2 */
 ROM_END
 
 ROM_START(ti99_4ev)
-	/*CPU memory space*/
+	// CPU memory space
+	// ROM files have valid CRC16 as last word
+	// ROM files are the same as for TI-99/4A
 	ROM_REGION16_BE(0x2000, CONSOLEROM, 0)
-	ROM_LOAD16_WORD("994arom.bin", 0x0000, 0x2000, CRC(db8f33e5) SHA1(6541705116598ab462ea9403c00656d6353ceb85)) /* system ROMs */
+	ROM_LOAD16_BYTE("994a_rom_hb.u610", 0x0000, 0x1000, CRC(ee859c5f) SHA1(a45245707c3dccea902b718554a882d214a82504)) /* CPU ROMs high */
+	ROM_LOAD16_BYTE("994a_rom_lb.u611", 0x0001, 0x1000, CRC(37859301) SHA1(f4e774fd5913b387a763f1b8de5524c54b255434)) /* CPU ROMs low */
 
-	/*GROM memory space*/
-	ROM_REGION(0x10000, region_grom, 0)
-	ROM_LOAD("994agr38.bin", 0x0000, 0x6000, CRC(bdd9f09b) SHA1(9b058a55d2528d2a6a69d7081aa296911ed7c0de)) /* system GROMs */
+	// GROM memory space
+	// GROM files have valid CRC16 as last word
+	// GROM1 has been patched to support the EVPC, but the CRC16 was not updated, being invalid now
+	ROM_REGION(0x6000, CONSOLEGROM, 0)
+	ROM_LOAD("994a_grom0.u500", 0x0000, 0x1800, CRC(2445a5e8) SHA1(ea15d8b0ac52112dc0d5f4ab9a79ac8ca1cc1bbc)) /* system GROM 0 */
+	ROM_LOAD("994ev_grom1.u501", 0x2000, 0x1800, CRC(6885326d) SHA1(1a98de5ee886dce705de5cce11034a7be31aceac)) /* system GROM 1 */
+	ROM_LOAD("994a_grom2.u502", 0x4000, 0x1800, CRC(e0bb5341) SHA1(e255f0d65d69b927cecb8fcfac7a4c17d585ea96)) /* system GROM 2 */
 ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT   MACHINE        INPUT    CLASS          INIT  COMPANY             FULLNAME                          FLAGS
@@ -1223,6 +1229,5 @@ COMP( 1979, ti99_4,   0,        0,     ti99_4_60hz,   ti99_4,  driver_device, 0,
 COMP( 1980, ti99_4e,  ti99_4,   0,     ti99_4_50hz,   ti99_4,  driver_device, 0,   "Texas Instruments", "TI-99/4 Home Computer (Europe)",   0)
 COMP( 1981, ti99_4a,  0,        0,     ti99_4a_60hz,  ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4A Home Computer (US)",      0)
 COMP( 1981, ti99_4ae, ti99_4a,  0,     ti99_4a_50hz,  ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4A Home Computer (Europe)",  0)
-COMP( 1983, ti99_4qe, ti99_4qi, 0,     ti99_4qi_50hz, ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4QI Home Computer (Europe)", 0)
-COMP( 1983, ti99_4qi, 0,        0,     ti99_4qi_60hz, ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4QI Home Computer (US)",     0)
+COMP( 1983, ti99_4qi, ti99_4a,  0,     ti99_4qi_60hz, ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4QI Home Computer (US)",     0)
 COMP( 1994, ti99_4ev, ti99_4a,  0,     ti99_4ev_60hz, ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4A Home Computer with EVPC", 0)

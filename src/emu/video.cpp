@@ -586,7 +586,7 @@ void video_manager::exit()
 	m_snap_bitmap.reset();
 
 	// print a final result if we have at least 2 seconds' worth of data
-	if (m_overall_emutime.seconds() >= 1)
+	if (!emulator_info::standalone() && m_overall_emutime.seconds() >= 1)
 	{
 		osd_ticks_t tps = osd_ticks_per_second();
 		double final_real_time = (double)m_overall_real_seconds + (double)m_overall_real_ticks / (double)tps;

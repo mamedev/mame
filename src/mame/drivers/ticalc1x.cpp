@@ -22,6 +22,7 @@
 
 // internal artwork
 #include "dataman.lh"
+#include "mathmarv.lh"
 #include "ti1250.lh"
 #include "ti1270.lh"
 #include "ti30.lh"
@@ -809,10 +810,10 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	virtual void prepare_display();
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_READ8_MEMBER(read_k);
 };
 
 // handlers
@@ -901,6 +902,76 @@ static MACHINE_CONFIG_START( dataman, dataman_state )
 	MCFG_DEFAULT_LAYOUT(layout_dataman)
 
 	/* no sound! */
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  TI Math Marvel
+  * TMS1980 MCU label TMC1986A-NL (die label 1980A 86A)
+  * 9-digit cyan VFD display(2 digits are custom), 1-bit sound
+
+  This is the same hardware as DataMan, with R8 connected to a piezo.
+
+***************************************************************************/
+
+class mathmarv_state : public dataman_state
+{
+public:
+	mathmarv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: dataman_state(mconfig, type, tag)
+	{ }
+
+	virtual DECLARE_WRITE16_MEMBER(write_r) override;
+};
+
+// handlers
+
+WRITE16_MEMBER(mathmarv_state::write_r)
+{
+	// R8: speaker out
+	m_speaker->level_w(data >> 8 & 1);
+
+	// rest is same as dataman
+	dataman_state::write_r(space, offset, data);
+}
+
+
+// config
+
+static INPUT_PORTS_START( mathmarv )
+	PORT_INCLUDE( dataman )
+
+	PORT_MODIFY("IN.4") // R4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Quest")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Checker")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Review")
+
+	PORT_MODIFY("IN.5") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_N) PORT_NAME("On/Numberific") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Zap")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Flash")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( mathmarv, mathmarv_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1980, 300000) // assume same as dataman
+	MCFG_TMS1XXX_READ_K_CB(READ8(dataman_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(dataman_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mathmarv_state, write_r))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_mathmarv)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -1306,6 +1377,19 @@ ROM_START( dataman )
 ROM_END
 
 
+ROM_START( mathmarv )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "tmc1986anl", 0x0000, 0x1000, CRC(79fda72d) SHA1(137852b29d9136459f78e29e7810195a956a5903) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 525, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1980_mathmarv_output.pla", 0, 525, CRC(5fc6f451) SHA1(11475c785c34eab5b13c5dc67f413c709cd4bd4d) )
+ROM_END
+
+
 ROM_START( ti30 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "tmc0981nl", 0x0000, 0x1000, CRC(41298a14) SHA1(06f654c70add4044a612d3a38b0c2831c188fd0c) )
@@ -1366,7 +1450,8 @@ COMP( 1976, lilprof,   0,        0, lilprof,   lilprof,   driver_device, 0, "Tex
 COMP( 1978, lilprof78, lilprof,  0, lilprof78, lilprof78, driver_device, 0, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 COMP( 1977, dataman,   0,        0, dataman,   dataman,   driver_device, 0, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, mathmarv,  0,        0, mathmarv,  mathmarv,  driver_device, 0, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1976, ti30,      0,        0, ti30,     ti30,       driver_device, 0, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, tibusan,   0,        0, ti30,     tibusan,    driver_device, 0, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, tiprog,    0,        0, ti30,     tiprog,     driver_device, 0, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti30,      0,        0, ti30,      ti30,      driver_device, 0, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, tibusan,   0,        0, ti30,      tibusan,   driver_device, 0, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, tiprog,    0,        0, ti30,      tiprog,    driver_device, 0, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

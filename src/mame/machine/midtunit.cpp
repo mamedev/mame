@@ -13,10 +13,6 @@
 #include "includes/midtunit.h"
 
 
-/* compile-time constants */
-#define ENABLE_ALL_JDREDD_LEVELS    0
-
-
 /* constant definitions */
 #define SOUND_ADPCM                 1
 #define SOUND_ADPCM_LARGE           2
@@ -351,21 +347,6 @@ READ16_MEMBER(midtunit_state::jdredd_prot_r)
 }
 
 
-#if ENABLE_ALL_JDREDD_LEVELS
-static UINT16 *jdredd_hack;
-READ16_MEMBER(midtunit_state::jdredd_hack_r)
-{
-	if (space.device().safe_pc() == 0xFFBA7EB0)
-	{
-		fprintf(stderr, "jdredd_hack_r\n");
-		return 0;
-	}
-
-	return jdredd_hack[offset];
-}
-#endif
-
-
 
 /*************************************
  *
@@ -466,11 +447,6 @@ DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
 	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_read_bank(0xfbcf, 0xfbf9, "bank7");
 	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_write_bank(0xfbcf, 0xfbf9, "bank9");
 	membank("adpcm:bank9")->set_base(auto_alloc_array(machine(), UINT8, 0x80));
-
-#if ENABLE_ALL_JDREDD_LEVELS
-	/* how about the final levels? */
-	jdredd_hack = m_maincpu->space(AS_PROGRAM).install_read_handler(0xFFBA7FF0, 0xFFBA7FFf, read16_delegate(FUNC(midtunit_state::jdredd_hack_r), this));
-#endif
 }
 
 

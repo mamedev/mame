@@ -5,7 +5,9 @@
     Crime Fighters
 
 *************************************************************************/
+
 #include "machine/bankdev.h"
+#include "machine/gen_latch.h"
 #include "sound/k007232.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
@@ -22,6 +24,7 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_rombank(*this, "rombank") { }
 
 	/* devices */
@@ -32,6 +35,7 @@ public:
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank m_rombank;
 
 	DECLARE_WRITE8_MEMBER(crimfght_coin_w);

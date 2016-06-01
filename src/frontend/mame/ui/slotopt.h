@@ -10,13 +10,19 @@
 
 #pragma once
 
-#ifndef __UI_SLOTOPT_H__
-#define __UI_SLOTOPT_H__
+#ifndef MAME_FRONTEND_UI_SLOTOPT_H
+#define MAME_FRONTEND_UI_SLOTOPT_H
 
-class ui_menu_slot_devices : public ui_menu {
+#include "ui/menu.h"
+
+
+namespace ui {
+
+class menu_slot_devices : public menu
+{
 public:
-	ui_menu_slot_devices(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_slot_devices();
+	menu_slot_devices(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_slot_devices() override;
 	virtual void populate() override;
 	virtual void handle() override;
 
@@ -30,4 +36,6 @@ private:
 	void set_slot_device(device_slot_interface &slot, const char *val);
 };
 
-#endif  /* __UI_SLOTOPT_H__ */
+} // namespace ui
+
+#endif  /* MAME_FRONTEND_UI_SLOTOPT_H */

@@ -42,7 +42,7 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 
     Each of the 256 (not all visible) lines of the screen
     can display any of the lines of gfx in ROM, which are
-    larger than the sceen and can therefore be scrolled
+    larger than the screen and can therefore be scrolled
 
                                     Cisco Heat              F1 GP Star
                 Line Width          1024                    1024
@@ -299,7 +299,7 @@ READ16_MEMBER(cischeat_state::bigrun_vregs_r)
 		case 0x0004/2 : return ioport("IN3")->read();   // Motor Limit Switches
 		case 0x0006/2 : return ioport("IN4")->read();   // DSW 1 & 2
 
-		case 0x0008/2 : return soundlatch2_word_r(space,0,0xffff);  // From sound cpu
+		case 0x0008/2 : return m_soundlatch2->read(space,0,0xffff);  // From sound cpu
 
 		case 0x0010/2 :
 			switch (m_ip_select & 0x3)
@@ -348,7 +348,7 @@ WRITE16_MEMBER(cischeat_state::bigrun_vregs_w)
 			break;
 
 		case 0x000a/2   :   // to sound cpu
-			soundlatch_word_w(space,0,new_data,0xffff);
+			m_soundlatch->write(space,0,new_data,0xffff);
 			break;
 
 		case 0x000c/2   :   break;  // ??
@@ -405,7 +405,7 @@ READ16_MEMBER(cischeat_state::cischeat_vregs_r)
 			}
 
 		case 0x2200/2 : return ioport("IN5")->read();   // DSW 3 (4 bits)
-		case 0x2300/2 : return soundlatch2_byte_r(space,0); // From sound cpu
+		case 0x2300/2 : return m_soundlatch2->read(space,0,0xffff); // From sound cpu
 
 		default:    SHOW_READ_ERROR("vreg %04X read!",offset*2);
 					return m_vregs[offset];
@@ -459,7 +459,7 @@ WRITE16_MEMBER(cischeat_state::cischeat_vregs_w)
 		case 0x2208/2   : break;    // watchdog reset
 
 		case 0x2300/2   :   /* Sound CPU: reads latch during int 4, and stores command */
-							soundlatch_word_w(space, 0, new_data, 0xffff);
+							m_soundlatch->write(space, 0, new_data, 0xffff);
 							m_soundcpu->set_input_line(4, HOLD_LINE);
 							break;
 
@@ -491,7 +491,7 @@ READ16_MEMBER(cischeat_state::f1gpstar_vregs_r)
 
 		case 0x0006/2 : return ioport("IN3")->read();   // ? Read at boot only
 
-		case 0x0008/2 : return soundlatch2_byte_r(space,0);     // From sound cpu
+		case 0x0008/2 : return m_soundlatch2->read(space,0,0xffff);     // From sound cpu
 
 		case 0x000c/2 : return ioport("IN4")->read();   // DSW 3
 
@@ -533,7 +533,7 @@ READ16_MEMBER(cischeat_state::wildplt_vregs_r)
 
 		case 0x0004/2 : return ioport("IN1")->read(); // Buttons
 
-		case 0x0008/2 : return soundlatch2_byte_r(space,0); // From sound cpu
+		case 0x0008/2 : return m_soundlatch2->read(space,0,0xffff); // From sound cpu
 
 		case 0x0010/2 : // X, Y
 			return ioport("IN2")->read() | (ioport("IN3")->read()<<8);
@@ -574,7 +574,7 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 		case 0x0014/2   :   break;
 
 		/* Usually written in sequence, but not always */
-		case 0x0008/2   :   soundlatch_word_w(space, 0, new_data, 0xffff);  break;
+		case 0x0008/2   :   m_soundlatch->write(space, 0, new_data, 0xffff);  break;
 		case 0x0018/2   :   m_soundcpu->set_input_line(4, HOLD_LINE);   break;
 
 		case 0x0010/2   :   break;

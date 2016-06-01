@@ -7,6 +7,7 @@
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
+#include "sound/samples.h"
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "video/mc6845.h"
@@ -31,6 +32,7 @@ public:
 		, m_pio(*this, "z80pio")
 		, m_cassette(*this, "cassette")
 		, m_wave(*this, WAVE_TAG)
+		, m_samples(*this, "samples")
 		, m_speaker(*this, "speaker")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
@@ -66,6 +68,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
 	DECLARE_DRIVER_INIT(super80);
+	DECLARE_MACHINE_RESET(super80);
+	DECLARE_MACHINE_RESET(super80r);
 	DECLARE_VIDEO_START(super80);
 	DECLARE_VIDEO_START(super80v);
 	DECLARE_PALETTE_INIT(super80m);
@@ -90,7 +94,6 @@ public:
 	UINT8 m_palette_index;
 	required_device<palette_device> m_palette;
 private:
-	virtual void machine_reset() override;
 	UINT8 m_keylatch;
 	UINT8 m_cass_data[4];
 	UINT8 m_int_sw;
@@ -103,11 +106,12 @@ private:
 	UINT8 m_mc6845_ind;
 	UINT8 *m_p_ram;
 	void mc6845_cursor_configure();
-	void super80_cassette_motor(UINT8 data);
+	void super80_cassette_motor(bool data);
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cassette;
 	required_device<wave_device> m_wave;
+	required_device<samples_device> m_samples;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;

@@ -17,8 +17,8 @@ class matrix_solver_direct2_t: public matrix_solver_direct_t<2,2>
 {
 public:
 
-	matrix_solver_direct2_t(const solver_parameters_t *params)
-		: matrix_solver_direct_t<2, 2>(params, 2)
+	matrix_solver_direct2_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params)
+		: matrix_solver_direct_t<2, 2>(anetlist, name, params, 2)
 		{}
 	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 
@@ -42,7 +42,7 @@ inline int matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED const bool ne
 	new_val[1] = (a * RHS(1) - c * RHS(0)) / (a * d - b * c);
 	new_val[0] = (RHS(0) - b * new_val[1]) / a;
 
-	if (is_dynamic())
+	if (has_dynamic_devices())
 	{
 		nl_double err = this->delta(new_val);
 		store(new_val);

@@ -25,7 +25,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
     Home Improvement 1-2-3                            ?                 ?             ?
     Katz Pippin Demo CD 2.0                           ?                 Kats-X01      ?
     Internet Kit Ver. 1.1                             Bandai            BDB-010       ?
-    Jungle Park                                       ?                 BDE-10013     ?
+    Jungle Park                                       Bandai            BDE-10013     ?
     LuLu                                              ?                 BDS-20039     ?
     Mac Fan Pippin - Pippin Title Demo                ?                 ?             ?
     Mission School R                                  ?                 BDS-20035     ?
@@ -59,6 +59,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10034" />
+		<info name="alt_title" value="@Card SDガンダム外伝" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="atcard" sha1="85510c817c27619464bbaba64a842459328e2e40"/>
@@ -105,8 +106,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="hanshind">
 		<description>1995.1.17 Hanshin Daishinsai (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Keikakudo</publisher>	<!-- 計画堂 -->
 		<info name="serial" value="BDS-20005" />
+		<info name="alt_title" value="1995.1.17 阪神大震災" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="hanshind" sha1="d83d9883ad6a64d30a92d966efe24db26a1d4cb6"/>
@@ -119,6 +121,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-70018" />
+		<info name="alt_title" value="アクションデザイナー　ウルトラマンティガ" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="actdesu" sha1="039f8e9a149686a9901ee36366896ee3ad762e30"/>
@@ -131,6 +134,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1996</year>
 		<publisher>ASG</publisher>
 		<info name="serial" value="BDS-20032" />
+		<info name="alt_title" value="AI将棋" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="aishogi" sha1="00c04dcfcfc8ec9bf4878f8c2a5f7b8fe4c9d4ab"/>
@@ -143,6 +147,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10019" />
+		<info name="alt_title" value="アニメデザイナー　ドラゴンボールZ" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="animedbz" sha1="cf680e743e4efde824b150d1564ac57bbfcffa98"/>
@@ -150,38 +155,41 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="anaiueon">
-		<description>Anpanman no AIUEO-N! (Jpn)</description>
+	<software name="anpanain">
+		<description>Anpanman no AIUEO~N! (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10015" />
+		<info name="alt_title" value="アンパンマンのあいうえお～ん！" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="anaiueon" sha1="208a6f3fc77fab7cd81733e3cf68c9847b6080e3"/>
+				<disk name="anpanain" sha1="208a6f3fc77fab7cd81733e3cf68c9847b6080e3"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="asobou1">
-		<description>Anpanman to asobou! 1 (Jpn)</description>
+	<software name="anpanas1">
+		<description>Anpanman to Asobou! 1 (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10009" />
+		<info name="alt_title" value="アンパンマンとあそぼう！1" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="asobou1" sha1="0ee04adbe9279fa1703f7e0d7f1e35635a118805"/>
+				<disk name="anpanas1" sha1="0ee04adbe9279fa1703f7e0d7f1e35635a118805"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="asobou2">
-		<description>Anpanman to asobou! 2 (Jpn)</description>
+	<software name="anpanas2">
+		<description>Anpanman to Asobou! 2 (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-70016" />
+		<info name="alt_title" value="アンパンマンとあそぼう！2" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="asobou2" sha1="e2a0694f0c46628fc17d95b487eaf2da7231fba0"/>
+				<disk name="anpanas2" sha1="e2a0694f0c46628fc17d95b487eaf2da7231fba0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -191,6 +199,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-005 (Disk 6 vol.1)" />
+		<info name="alt_title" value="アットマークタウン" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="atmtown" sha1="37e770e8824e5a990cb71143eb17cc55bbc97fb7"/>
@@ -203,6 +212,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-005 (Disk 6 vol.1.1)" />
+		<info name="alt_title" value="アットマークタウン" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="atmtowna" sha1="f9273af774fedf209e1eac0ceb6ec601fc1e3886"/>
@@ -215,6 +225,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-022" />
+		<info name="alt_title" value="アットマークタウン" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="atmtown2" sha1="7e0909d1be9d27684aa45241f9fc00b1a8c59101"/>
@@ -225,8 +236,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="chisatom">
 		<description>Chisato Moritaka CD-Rom Watarase Bashi (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Oracion</publisher>	<!-- オラシオン -->
 		<info name="serial" value="BDE-10007" />
+		<info name="alt_title" value="森高千里CD-ROM　渡良瀬橋" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="chisatom" sha1="0c1a34b194179a2c993ab211f4b3f420eebe5563"/>
@@ -237,8 +249,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="circus">
 		<description>Circus! (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Voyager</publisher>	<!-- ボイジャー -->
 		<info name="serial" value="BDS-20031" />
+		<info name="alt_title" value="サーカス！" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="circus" sha1="826b2ad9c271126e13e898dddf29d40d60ba1754"/>
@@ -261,8 +274,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="dazzloid">
 		<description>Dazzeloids (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Voyager</publisher>	<!-- ボイジャー -->
 		<info name="serial" value="BDS-20030" />
+		<info name="alt_title" value="ダズロイド" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="dazzloid" sha1="d5b68846455e3dbe33d33c932c4fe02778c16a12"/>
@@ -270,14 +284,14 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="egworldp">
+	<software name="egwordp">
 		<description>EGWord Pure (Jpn, Ver. 1.0)</description>
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="BDE-10021" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="egworldp" sha1="1db32f1fc16d3c639ddecd2e39a070b8e5783383"/>
+				<disk name="egwordp" sha1="1db32f1fc16d3c639ddecd2e39a070b8e5783383"/>
 			</diskarea>
 		</part>
 	</software>
@@ -306,14 +320,15 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="fortllia">
+	<software name="fortulia">
 		<description>Fortullia (Jpn)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10003" />
+		<info name="alt_title" value="フォルチュリア" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fortllia" sha1="d9ba61dc93d168da603ef66a581d2e8bad239c98"/>
+				<disk name="fortulia" sha1="d9ba61dc93d168da603ef66a581d2e8bad239c98"/>
 			</diskarea>
 		</part>
 	</software>
@@ -321,8 +336,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="ffaliens">
 		<description>Funky Funny Aliens (Jpn)</description>
 		<year>1996</year>
-		<publisher>Bandai</publisher>
+		<publisher>Amuse</publisher>	<!-- アミューズ -->
 		<info name="serial" value="BDS-20014" />
+		<info name="alt_title" value="ファンキー ファニー エイリアンズ" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ffaliens" sha1="a4f0cec5f084720f07684c3b326547d1a19cfe55"/>
@@ -333,7 +349,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="gadget">
 		<description>Gadget (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Synergy Ikunangaku</publisher>	<!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20033" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
@@ -342,14 +358,15 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="gakkono">
-		<description>Gakko no Kowai Uwasa: Hanako-san ga Kita!! (Jpn)</description>
+	<software name="gakkoku">
+		<description>Gakko no Kowai Uwasa - Hanako-san ga Kita!! (Jpn)</description>
 		<year>1996</year>
-		<publisher>Bandai</publisher>
+		<publisher>Amuse</publisher>	<!-- アミューズ -->
 		<info name="serial" value="BDS-20012" />
+		<info name="alt_title" value="学校のコワイうわさ　花子さんがきた!!" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gakkono" sha1="0acb92329d2e0a632d2e51d0a182e2d5efd14e35"/>
+				<disk name="gakkoku" sha1="0acb92329d2e0a632d2e51d0a182e2d5efd14e35"/>
 			</diskarea>
 		</part>
 	</software>
@@ -366,38 +383,41 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="gundamt">
-		<description>Gundam Tactics: Mobility Fleet0079 (Jpn)</description>
+	<software name="gundtact">
+		<description>Gundam Tactics - Mobility Fleet0079 (Jpn)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10008" />
+		<info name="alt_title" value="ガンダムタクティクス モビリティーフリート0079" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gundamt" sha1="11a2b1e31f373bd7c683fcb32bd46927c0ca4458"/>
+				<disk name="gundtact" sha1="11a2b1e31f373bd7c683fcb32bd46927c0ca4458"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="gundamta" cloneof="gundamt">
-		<description>Gundam Tactics: Mobility Fleet0079 (Jpn, Alt)</description>
+	<software name="gundtacta" cloneof="gundtact">
+		<description>Gundam Tactics - Mobility Fleet0079 (Jpn, Alt)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10008" />
+		<info name="alt_title" value="ガンダムタクティクス モビリティーフリート0079" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gundamta" sha1="6495e1f9bb17099b21c83dfd5d28b2d47a1de097"/>
+				<disk name="gundtacta" sha1="6495e1f9bb17099b21c83dfd5d28b2d47a1de097"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="gundamv">
+	<software name="gundamvm">
 		<description>Gundam Virtual Modeler Light (Jpn)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10029" />
+		<info name="alt_title" value="ガンダムバーチャルモデラーライト" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gundamv" sha1="98e03fa882108200fd211269288e682d2a8a6e0a"/>
+				<disk name="gundamvm" sha1="98e03fa882108200fd211269288e682d2a8a6e0a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -405,8 +425,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="kidsbox">
 		<description>Kids Box (Jpn)</description>
 		<year>1996</year>
-		<publisher>Bandai</publisher>
+		<publisher>Ask Kodansha</publisher>	<!-- アスク講談社 -->
 		<info name="serial" value="BDS-20003" />
+		<info name="alt_title" value="キッズ・ボックス" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="kidsbox" sha1="2b60fa2ac195c323f23f5f743a5eb911903d112d"/>
@@ -419,6 +440,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-70024" />
+		<info name="alt_title" value="はしってあそぼう！きかんしゃトーマス" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="thomas" sha1="6b99e021257a4a784d1238d3f6a0e5386b955157"/>
@@ -453,7 +475,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="lzone">
 		<description>L-Zone (Jpn)</description>
 		<year>1996</year>
-		<publisher>Bandai</publisher>
+		<publisher>Synergy Ikunangaku</publisher>	<!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20017" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
@@ -510,35 +532,38 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="msgundam">
-		<description>Mobile Suit Gundam: Zion Dukedom Military-File (Jpn)</description>
+	<software name="gundamzd">
+		<description>Mobile Suit Gundam - Zion Dukedom Military-File (Jpn)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10038" />
+		<info name="alt_title" value="機動戦士ガンダム　ジオン軍ミリタリーファイル" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="msgundam" sha1="c6705c416af0ac59a802a86e68fffaf973564435"/>
+				<disk name="gundamzd" sha1="c6705c416af0ac59a802a86e68fffaf973564435"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="msgunwb">
-		<description>Mobile Suit Gundam: White Base (Jpn)</description>
+	<software name="gundamwb">
+		<description>Mobile Suit Gundam - White Base (Jpn)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10031" />
+		<info name="alt_title" value="機動戦士ガンダム　第13独立部隊　ホワイトベース" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="msgunwb" sha1="0c4ea52dc8fbcbf523203eec0f6d14e525032baf"/>
+				<disk name="gundamwb" sha1="0c4ea52dc8fbcbf523203eec0f6d14e525032baf"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="music1">
-		<description>Music Island: Vol. 1 (Prokofiev Peter &amp; the Wolf) (Jpn)</description>
+		<description>Music Island Vol. 1 (Prokofiev Peter &amp; the Wolf) (Jpn)</description>
 		<year>1996</year>
-		<publisher>Oracion Inc.</publisher>
+		<publisher>Oracion</publisher>	<!-- オラシオン -->
 		<info name="serial" value="BDS-20007" />
+		<info name="alt_title" value="MUSIC ISLAND プロコフィエフ　ピーターと狼 PETER AND THE WOLF" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="music1" sha1="445690344db76dcd35365be47c6a61b10c23f0ca"/>
@@ -547,10 +572,11 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	</software>
 
 	<software name="music2">
-		<description>Music Island: Vol. 2 (Tchaikovsky The Nutcracker) (Jpn)</description>
+		<description>Music Island Vol. 2 (Tchaikovsky The Nutcracker) (Jpn)</description>
 		<year>1996</year>
-		<publisher>Oracion Inc.</publisher>
+		<publisher>Oracion</publisher>	<!-- オラシオン -->
 		<info name="serial" value="BDS-20027" />
+		<info name="alt_title" value="MUSIC ISLAND チャイコフスキー　くるみわり人形 The Nutcracker" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="music2" sha1="b6b55459da9c46ef4f43183772581e4c35cdd2a3"/>
@@ -559,10 +585,11 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	</software>
 
 	<software name="music3">
-		<description>Music Island: Vol. 3 (Vivaldi The Four Seasons) (Jpn)</description>
+		<description>Music Island Vol. 3 (Vivaldi The Four Seasons) (Jpn)</description>
 		<year>1996</year>
-		<publisher>Oracion Inc.</publisher>
+		<publisher>Oracion</publisher>	<!-- オラシオン -->
 		<info name="serial" value="BDS-20028" />
+		<info name="alt_title" value="MUSIC ISLAND ヴィヴァルディ　四季 The Four Seasons" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="music3" sha1="84993f48ad434ea941331fbbdaa30bf67169cc15"/>
@@ -571,10 +598,11 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	</software>
 
 	<software name="music4">
-		<description>Music Island: Vol. 4 (Saint-Saens Carnival of the Animals) (Jpn)</description>
+		<description>Music Island Vol. 4 (Saint-Saens Carnival of the Animals) (Jpn)</description>
 		<year>1996</year>
-		<publisher>Oracion Inc.</publisher>
+		<publisher>Oracion</publisher>	<!-- オラシオン -->
 		<info name="serial" value="BDS-20029" />
+		<info name="alt_title" value="MUSIC ISLAND サン=サーンス 動物の謝肉祭 Carnival of the Animals" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="music4" sha1="5902202f84c0632a912c95f758ad531ff2d9aa0f"/>
@@ -582,14 +610,15 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="nemurenu">
+	<software name="nemuyoru">
 		<description>Nemurenu Yoru no Chiisana Ohanashi (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Amuse</publisher>	<!-- アミューズ -->
 		<info name="serial" value="BDS-20015" />
+		<info name="alt_title" value="眠れぬ夜の小さなお話" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
-				<disk name="nemurenu" sha1="e27663ada1a6b982ac1283220cd6f8a8eaedf203"/>
+				<disk name="nemuyoru" sha1="e27663ada1a6b982ac1283220cd6f8a8eaedf203"/>
 			</diskarea>
 		</part>
 	</software>
@@ -743,6 +772,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-20008" />
+		<info name="alt_title" value="レーシング・デイズ フォー ピピン" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="racingd" sha1="06895708d6538f595a28db46e2ca36e559a6caa3"/>
@@ -750,11 +780,12 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="sdgumdam">
+	<software name="sdgundam">
 		<description>SD Gundam Wars (Jpn)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10017" />
+		<info name="alt_title" value="SD ガンダム ウォーズ" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sdgumdam" sha1="386027d308faef30da461486b138dd8dae616c94"/>
@@ -767,6 +798,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10010" />
+		<info name="alt_title" value="SDウルトラマンの挑戦！　迷路アイランド" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sdultram" sha1="11762569031abff107d947af89f56776037b2d9b"/>
@@ -777,8 +809,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="seesawc1">
 		<description>SeesawC 1 - My favorite things - Sukinamonodake Eitango 120 (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Aigaareba Daijoubu</publisher>	<!-- 愛があれば大丈夫 -->
 		<info name="serial" value="BDE-10006" />
+		<info name="alt_title" value="シーソーシー1" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="seesawc1" sha1="fa3e0fb2bd5a1c75f4c50d9e67c6cab5ad02b892"/>
@@ -789,8 +822,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="seesawc2">
 		<description>SeesawC 2 - My favorite places - Sukinatokorode Eitango 400 (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Aigaareba Daijoubu</publisher>	<!-- 愛があれば大丈夫 -->
 		<info name="serial" value="BDE-10023" />
+		<info name="alt_title" value="シーソーシー2" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="seesawc2" sha1="59189f06f8e82eab1f7c01705bb0c3c780483e00"/>
@@ -801,8 +835,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="shichiso">
 		<description>Shichisokusen (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Media Five</publisher>	<!-- メディアファイブ -->
 		<info name="serial" value="BDS-20019" />
+		<info name="alt_title" value="死地則戦 ビジネスエデュテイメントソフト" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="shichiso" sha1="0f9229cfc7db40339c949ff264be80f10cfe7545"/>
@@ -811,10 +846,11 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	</software>
 
 	<software name="shockwav">
-		<description>Shockwave: Invasion Earth 2019 (Jpn)</description>
+		<description>Shockwave - Invasion Earth 2019 (Jpn)</description>
 		<year>1996</year>
-		<publisher>Electronic Arts</publisher>
+		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="BDS-20024" />
+		<info name="alt_title" value="ショックウェーブ" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="shockwav" sha1="8aae6a286ac6a04632378f7bf8b912cf3597cd94"/>
@@ -848,9 +884,10 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 
 	<software name="tbreak">
 		<description>T-Break (Jpn)</description>
-		<year>19??</year>
-		<publisher>Infocity</publisher>
+		<year>1996</year>
+		<publisher>Infocity</publisher>	<!-- インフォシティ -->
 		<info name="serial" value="BDS-20026" />
+		<info name="alt_title" value="ティ・ブレイク" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tbreak" sha1="302c04fc7a0a660f3e8849a9f3ed190188f2b6de"/>
@@ -860,9 +897,11 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 
 	<software name="tamagotc">
 		<description>Tamagotchi CD-ROM (Jpn)</description>
-		<year>19??</year>
+		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10033" />
+		<info name="release" value="19970808?" />
+		<info name="alt_title" value="たまごっち CD-ROM" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tamagotc" sha1="3cc169f56144262b345a5fce3dfdded1f44bd5d7"/>
@@ -872,9 +911,10 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 
 	<software name="tropicis">
 		<description>Tropic Island (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Momoderazu Brand</publisher>	<!-- モモデラーズブランド -->
 		<info name="serial" value="BDS-20011" />
+		<info name="alt_title" value="トロピック　アイランド" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tropicis" sha1="9c929f38229a17d6bd65ed68d4d396dc06239d39"/>
@@ -887,6 +927,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10005" />
+		<info name="alt_title" value="チューニングルー" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tunglue" sha1="54585da0ce3774e621a50b47b2723ea529e889d5"/>
@@ -955,10 +996,11 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	</software>
 
 	<software name="ultraman">
-		<description>Ultraman: The Digital Board Game (Jpn)</description>
+		<description>Ultraman - The Digital Board Game (Jpn)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-70002" />
+		<info name="alt_title" value="ウルトラマン　デジタルボードゲーム" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultraman" sha1="a47f7953f2cbeb9e0106aebf67cda9f6e25b18dd"/>
@@ -967,10 +1009,11 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	</software>
 
 	<software name="ultramana" cloneof="ultraman">
-		<description>Ultraman: The Digital Board Game (Jpn, Alt)</description>
+		<description>Ultraman - The Digital Board Game (Jpn, Alt)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-70002" />
+		<info name="alt_title" value="ウルトラマン　デジタルボードゲーム" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultramana" sha1="4e0b449d2e534a3ea5f1f1a7b33be086a64ee1b7"/>
@@ -983,6 +1026,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-70020" />
+		<info name="alt_title" value="ウルトラマンクイズ王" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultramaq" sha1="d611d2faabdf654a84737b501dbbb95e4c8804a4"/>
@@ -993,8 +1037,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="victorp">
 		<description>Victorian Park (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10004-1,BDE-10004-2" />
+		<info name="alt_title" value="ビクトリアンパーク" />
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom">
@@ -1024,8 +1069,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="yellow1">
 		<description>Yellow Brick Road I (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Synergy Ikunangaku</publisher>	<!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20022" />
+		<info name="alt_title" value="イエロー・ブリック・ロード I" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="yellow1" sha1="ac9f59cca09608e034c695a560aa7948d8e649b5"/>
@@ -1034,10 +1080,11 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	</software>
 
 	<software name="yellow2">
-		<description>Yellow Brick Road II CD1 (Jpn)</description>
+		<description>Yellow Brick Road II - Glinda to Nishi no Majo (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Synergy Ikunangaku</publisher>	<!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20023" />
+		<info name="alt_title" value="イエロー・ブリック・ロード II　グリンダと西の魔女" />
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom">
@@ -1055,7 +1102,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="yellows">
 		<description>Yellows - Akira Gomi Photographs (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Digitalogue</publisher>	<!-- デジタローグ -->
 		<info name="serial" value="BDS-20001" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
@@ -1067,8 +1114,9 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="yellws2">
 		<description>Yellows 2.0 - Tokyo 1993 Akira Gomi Photographs (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Digitalogue</publisher>	<!-- デジタローグ -->
 		<info name="serial" value="BDS-20002" />
+		<info name="alt_title" value="イエローズ 2.0" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="yellws2" sha1="bdeacbbadfc8acba80e3778ed33a757416dd1767"/>
@@ -1077,10 +1125,11 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	</software>
 
 	<software name="yokumite">
-		<description>Yoku Mite Goran (Jpn)</description>
+		<description>Yoku Mite Goran! (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Voyager</publisher>	<!-- ボイジャー -->
 		<info name="serial" value="BDS-20018" />
+		<info name="alt_title" value="よく見てごらん！美術館へ行こう" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="yokumite" sha1="9edbbb48a197ddaf386db7cf5902adc766f65b27"/>
@@ -1089,10 +1138,11 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	</software>
 
 	<software name="zukkoke">
-		<description>Zukkoke Sanningumi: Drama Satsujin Jiken (Jpn)</description>
+		<description>Zukkoke Sanningumi - Drama Satsujin Jiken (Jpn)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10032" />
+		<info name="alt_title" value="ズッコケ三人組 ～ドラマ殺人事件～" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="zukkoke" sha1="2a541850909403f4ce30a798079e66b2a68364c0"/>

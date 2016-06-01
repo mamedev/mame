@@ -61,6 +61,7 @@ const device_type MD_ROM_TOPF = &device_creator<md_rom_topf_device>;
 const device_type MD_ROM_RADICA = &device_creator<md_rom_radica_device>;
 const device_type MD_ROM_BEGGARP = &device_creator<md_rom_beggarp_device>;
 const device_type MD_ROM_WUKONG = &device_creator<md_rom_wukong_device>;
+const device_type MD_ROM_STARODYS = &device_creator<md_rom_starodys_device>;
 
 
 md_std_rom_device::md_std_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -233,6 +234,11 @@ md_rom_beggarp_device::md_rom_beggarp_device(const machine_config &mconfig, cons
 md_rom_wukong_device::md_rom_wukong_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_WUKONG, "MD Legend of Wukong", tag, owner, clock, "md_rom_wukong", __FILE__), m_mode(0)
 				{
+}
+
+md_rom_starodys_device::md_rom_starodys_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: md_std_rom_device(mconfig, MD_ROM_STARODYS, "MD Star Odyssey", tag, owner, clock, "md_rom_starodys", __FILE__), m_mode(0), m_lock(0), m_ram_enable(0), m_base(0)
+{
 }
 
 //-------------------------------------------------
@@ -414,6 +420,22 @@ void md_rom_wukong_device::device_start()
 void md_rom_wukong_device::device_reset()
 {
 	m_mode = 0;
+}
+
+void md_rom_starodys_device::device_start()
+{
+	save_item(NAME(m_mode));
+	save_item(NAME(m_lock));
+	save_item(NAME(m_ram_enable));
+	save_item(NAME(m_base));
+}
+
+void md_rom_starodys_device::device_reset()
+{
+	m_mode = 0;
+	m_lock = 0;
+	m_ram_enable = 1;
+	m_base = 0;
 }
 
 /*-------------------------------------------------
@@ -1356,16 +1378,14 @@ WRITE16_MEMBER(md_rom_beggarp_device::write)
 		m_nvram[offset & 0x3fff] = data;
 }
 
+// this works the same as in standard SRAM carts
 WRITE16_MEMBER(md_rom_beggarp_device::write_a13)
 {
 	if (offset == 0xf0/2)
 	{
-		/* unsure if this is actually supposed to toggle or just switch on? yet to encounter game that uses this */
 		m_nvram_active = BIT(data, 0);
 		m_nvram_readonly = BIT(data, 1);
 
-		// since a lot of generic carts ends up here if loaded from fullpath
-		// we turn on nvram (with m_nvram_handlers_installed) only if they toggle it on by writing here!
 		if (m_nvram_active)
 			m_nvram_handlers_installed = 1;
 	}
@@ -1388,7 +1408,7 @@ READ16_MEMBER(md_rom_wukong_device::read)
 	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active)
 		return m_nvram[offset - m_nvram_start/2];
 
-	// here can access both last 128K of the ROM and the first 128K, depending of bit7 of m_mode
+	// here can access both last 128K of the ROM and the first 128K, depending of m_mode
 	if (offset >= 0x200000/2 && offset < 0x220000/2)
 		return !m_mode ? m_rom[offset] : m_rom[offset & 0xffff];
 	else if (offset < 0x400000/2)
@@ -1406,16 +1426,108 @@ WRITE16_MEMBER(md_rom_wukong_device::write)
 		m_nvram[offset - m_nvram_start/2] = data;
 }
 
+// this works the same as in standard SRAM carts
 WRITE16_MEMBER(md_rom_wukong_device::write_a13)
 {
 	if (offset == 0xf0/2)
 	{
-		/* unsure if this is actually supposed to toggle or just switch on? yet to encounter game that uses this */
 		m_nvram_active = BIT(data, 0);
 		m_nvram_readonly = BIT(data, 1);
 
-		// since a lot of generic carts ends up here if loaded from fullpath
-		// we turn on nvram (with m_nvram_handlers_installed) only if they toggle it on by writing here!
+		if (m_nvram_active)
+			m_nvram_handlers_installed = 1;
+	}
+}
+
+
+/*-------------------------------------------------
+ STAR ODYSSEY
+ This game uses a slightly more complex mapper:
+ not only RAM can be enabled / disabled, but also
+ ROM can be mapped in three different modes.
+ In what we call Mode0 the first 256K are mirrored
+ into area 0x000000-0x1fffff; in Mode1 cart gives
+ access to 5x256K banks into area 0x000000-0x13ffff
+ and open bus into 0x140000-0x1fffff; in Mode2 the
+ ROM is disabled and the whole 0x000000-0x1fffff
+ gives open bus
+-------------------------------------------------*/
+
+READ16_MEMBER(md_rom_starodys_device::read)
+{
+	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active && m_ram_enable)
+		return m_nvram[offset & 0x3fff];
+
+	if (offset < 0x200000/2)
+	{
+		if (m_mode == 0)
+			return m_rom[offset & 0x3ffff];
+		else if (m_mode == 1 && offset < 0x140000/2)
+			return m_rom[m_base * 0x40000/2 + offset];
+		else
+			return 0xffff;
+	}
+	else if (offset < 0x400000/2)
+		return m_rom[offset & 0xfffff];
+	else
+		return 0xffff;
+}
+
+WRITE16_MEMBER(md_rom_starodys_device::write)
+{
+	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active && !m_nvram_readonly && m_ram_enable)
+		m_nvram[offset & 0x3fff] = data;
+
+	if (offset < 0x10000/2)
+	{
+		UINT32 prot_offs = (offset * 2) & 0xf00;
+		if (!m_lock)
+		{
+			if (prot_offs == 0xd00)
+			{
+				//printf("RAM enable %s!\n", BIT(data, 7) ? "Yes" : "No");
+				m_ram_enable = BIT(data, 7);
+			}
+			if (prot_offs == 0xe00)
+			{
+				if (BIT(data, 5))
+					m_mode = 2;
+				else if (BIT(data, 6))
+					m_mode = 1;
+				else
+					m_mode = 0;
+				//printf("ROM mode %d!\n", m_mode);
+
+				if (!BIT(data, 7))
+				{
+					//printf("LOCK BANKSWITCH!\n");
+					m_lock = 1;
+				}
+			}
+			if (prot_offs == 0xf00)
+			{
+				m_base = ((data >> 4) & 7);
+				m_mode = 1;
+				//printf("ROM base %d!\n", m_base);
+			}
+		}
+	}
+
+}
+
+READ16_MEMBER(md_rom_starodys_device::read_a13)
+{
+	return m_base << 4;
+}
+
+// this works the same as in standard SRAM carts
+WRITE16_MEMBER(md_rom_starodys_device::write_a13)
+{
+	if (offset == 0xf0/2)
+	{
+		m_nvram_active = BIT(data, 0);
+		m_nvram_readonly = BIT(data, 1);
+
 		if (m_nvram_active)
 			m_nvram_handlers_installed = 1;
 	}

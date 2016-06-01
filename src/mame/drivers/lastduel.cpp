@@ -133,7 +133,7 @@ Notes:
 WRITE16_MEMBER(lastduel_state::lastduel_sound_w)
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 }
 
 /******************************************************************************/
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lastduel_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(lastduel_state::mg_bankswitch_w)
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( madgear_sound_map, AS_PROGRAM, 8, lastduel_state )
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0xf004, 0xf004) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xf006, 0xf006) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf006, 0xf006) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf00a, 0xf00a) AM_WRITE(mg_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -520,6 +520,8 @@ static MACHINE_CONFIG_START( lastduel, lastduel_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lastduel_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
@@ -562,6 +564,8 @@ static MACHINE_CONFIG_START( madgear, lastduel_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lastduel_state, irqhandler))

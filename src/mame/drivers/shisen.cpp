@@ -68,7 +68,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shisen_sound_io_map, AS_IO, 8, shisen_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, shisen_sample_addr_w)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
 	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
@@ -231,6 +231,8 @@ static MACHINE_CONFIG_START( shisen, shisen_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("m72", M72, 0)
 

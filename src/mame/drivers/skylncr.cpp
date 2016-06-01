@@ -112,6 +112,8 @@
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 
+#include <algorithm>
+
 
 class skylncr_state : public driver_device
 {
@@ -1930,7 +1932,7 @@ DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
   00 01 02 03 04 05 06 07
             \       /
              SWAPPED
-  
+
   00 01 02 03 04 05 06 07
       \     \ /     /
        \     X     /
@@ -1944,23 +1946,13 @@ DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
   00 04 02 06 01 05 03 07
 */
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 byte01, byte03, byte04, byte06;  // for a better visual understanding...
-	int x;
-
-	for (x= 0; x < 0x10000; x += 8)
+	UINT8 *const ROM = memregion("maincpu")->base();
+	for (unsigned x = 0; x < 0x10000; x += 8)
 	{
-		byte01 = ROM[x + 1];
-		byte03 = ROM[x + 3];
-		byte04 = ROM[x + 4];
-		byte06 = ROM[x + 6];
-
-        ROM[x + 1] = byte04;
-        ROM[x + 3] = byte06;
-        ROM[x + 4] = byte01;
-        ROM[x + 6] = byte03;
+		std::swap(ROM[x + 1], ROM[x + 4]);
+		std::swap(ROM[x + 3], ROM[x + 6]);
 	}
-	
+
 	m_generic_paletteram_8.allocate(0x100 * 3);
 	m_generic_paletteram2_8.allocate(0x100 * 3);
 }

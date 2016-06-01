@@ -12,9 +12,9 @@
 
 
 template<typename Class>
-static pvector_t<int> bubble(const pvector_t<Class *> &sl)
+static plib::pvector_t<int> bubble(const plib::pvector_t<Class> &sl)
 {
-	pvector_t<int> ret;
+	plib::pvector_t<int> ret;
 	for (unsigned i=0; i<sl.size(); i++)
 		ret.push_back(i);
 
@@ -38,7 +38,7 @@ static pvector_t<int> bubble(const pvector_t<Class *> &sl)
 void nl_convert_base_t::add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias)
 {
 	pstring pname = devname + "." + name;
-	m_pins.add(pname, palloc(pin_alias_t(pname, devname + "." + alias)));
+	m_pins.add(pname, plib::pmake_unique<pin_alias_t>(pname, devname + "." + alias));
 }
 
 void nl_convert_base_t::add_ext_alias(const pstring &alias)
@@ -46,7 +46,7 @@ void nl_convert_base_t::add_ext_alias(const pstring &alias)
 	m_ext_alias.push_back(alias);
 }
 
-void nl_convert_base_t::add_device(dev_t *dev)
+void nl_convert_base_t::add_device(std::shared_ptr<dev_t> dev)
 {
 	for (auto & d : m_devs)
 		if (d->name() == dev->name())
@@ -59,30 +59,31 @@ void nl_convert_base_t::add_device(dev_t *dev)
 
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname, const pstring &amodel)
 {
-	add_device(palloc(dev_t(atype, aname, amodel)));
+	add_device(std::make_shared<dev_t>(atype, aname, amodel));
 }
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname, double aval)
 {
-	add_device(palloc(dev_t(atype, aname, aval)));
+	add_device(std::make_shared<dev_t>(atype, aname, aval));
 }
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname)
 {
-	add_device(palloc(dev_t(atype, aname)));
+	add_device(std::make_shared<dev_t>(atype, aname));
 }
 
 void nl_convert_base_t::add_term(pstring netname, pstring termname)
 {
 	net_t * net = nullptr;
 	if (m_nets.contains(netname))
-		net = m_nets[netname];
+		net = m_nets[netname].get();
 	else
 	{
-		net = palloc(net_t(netname));
-		m_nets.add(netname, net);
+		auto nets = std::make_shared<net_t>(netname);
+		net = nets.get();
+		m_nets.add(netname, nets);
 	}
 
 	/* if there is a pin alias, translate ... */
-	pin_alias_t *alias = m_pins[termname];
+	pin_alias_t *alias = m_pins[termname].get();
 
 	if (alias != nullptr)
 		net->terminals().push_back(alias->alias());
@@ -94,14 +95,14 @@ void nl_convert_base_t::dump_nl()
 {
 	for (std::size_t i=0; i<m_ext_alias.size(); i++)
 	{
-		net_t *net = m_nets[m_ext_alias[i]];
+		net_t *net = m_nets[m_ext_alias[i]].get();
 		// use the first terminal ...
 		out("ALIAS({}, {})\n", m_ext_alias[i].cstr(), net->terminals()[0].cstr());
 		// if the aliased net only has this one terminal connected ==> don't dump
 		if (net->terminals().size() == 1)
 			net->set_no_export();
 	}
-	pvector_t<int> sorted = bubble(m_devs);
+	plib::pvector_t<int> sorted = bubble(m_devs);
 	for (std::size_t i=0; i<m_devs.size(); i++)
 	{
 		std::size_t j = sorted[i];
@@ -119,7 +120,7 @@ void nl_convert_base_t::dump_nl()
 	// print nets
 	for (std::size_t i=0; i<m_nets.size(); i++)
 	{
-		net_t * net = m_nets.value_at(i);
+		net_t * net = m_nets.value_at(i).get();
 		if (!net->is_no_export())
 		{
 			//printf("Net {}\n", net->name().cstr());
@@ -131,12 +132,8 @@ void nl_convert_base_t::dump_nl()
 			out(")\n");
 		}
 	}
-	m_devs.clear_and_free();
-	for (std::size_t i = 0; i < m_nets.size(); i++)
-		pfree(m_nets.value_at(i));
+	m_devs.clear();
 	m_nets.clear();
-	for (std::size_t i = 0; i < m_pins.size(); i++)
-		pfree(m_pins.value_at(i));
 	m_pins.clear();
 	m_ext_alias.clear();
 }
@@ -151,7 +148,7 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 				break;
 			i++;
 		}
-		return pfmt(m_units[i].m_func.cstr())(val / m_units[i].m_mult);
+		return plib::pfmt(m_units[i].m_func.cstr())(val / m_units[i].m_mult);
 	}
 }
 double nl_convert_base_t::get_sp_unit(const pstring &unit)
@@ -202,7 +199,7 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 
 void nl_convert_spice_t::convert(const pstring &contents)
 {
-	pstring_vector_t spnl(contents, "\n");
+	plib::pstring_vector_t spnl(contents, "\n");
 
 	// Add gnd net
 
@@ -234,7 +231,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 {
 	if (line != "")
 	{
-		pstring_vector_t tt(line, " ", true);
+		plib::pstring_vector_t tt(line, " ", true);
 		double val = 0.0;
 		switch (tt[0].code_at(0))
 		{
@@ -273,7 +270,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					model = tt[5];
 				else
 					model = tt[4];
-				pstring_vector_t m(model,"{");
+				plib::pstring_vector_t m(model,"{");
 				if (m.size() == 2)
 				{
 					if (m[1].len() != 4)
@@ -346,7 +343,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				add_device(tname, xname);
 				for (std::size_t i=1; i < tt.size() - 1; i++)
 				{
-					pstring term = pfmt("{1}.{2}")(xname)(i);
+					pstring term = plib::pfmt("{1}.{2}")(xname)(i);
 					add_term(tt[i], term);
 				}
 				break;
@@ -360,7 +357,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 //FIXME: should accept a stream as well
 void nl_convert_eagle_t::convert(const pstring &contents)
 {
-	pistringstream istrm(contents);
+	plib::pistringstream istrm(contents);
 	eagle_tokenizer tok(*this, istrm);
 
 	out("NETLIST_START(dummy)\n");

@@ -80,7 +80,7 @@
 			break; \
 		case 0x40: \
 			s2 = mem_readword( sm8500_b2w[r1 & 0x07] ); \
-			mem_writeword( sm8500_b2w[r1 & 0x07], s2 + 1 ); \
+			mem_writeword( sm8500_b2w[r1 & 0x07], s2 + 2 ); \
 			break; \
 		case 0x80: \
 			s2 = mem_readword( m_PC ); m_PC += 2; \
@@ -89,8 +89,8 @@
 			} \
 			break; \
 		case 0xC0: \
-			s2 = mem_readword( sm8500_b2w[ r1 & 0x07] ); \
-			mem_writeword( sm8500_b2w[r1 & 0x07], s2 - 1 ); \
+			s2 = mem_readword( sm8500_b2w[ r1 & 0x07])-2; \
+			mem_writeword( sm8500_b2w[r1 & 0x07], s2 ); \
 			break; \
 		} \
 		r2 = r1; \
@@ -945,6 +945,7 @@ case 0x31:  /* ADD r,@rr / ADD r,(rr)+ / ADD r,@ww / ADD r,ww(rr) / ADD r,-(rr) 
 case 0x32:  /* SUB r,@rr / SUB r,(rr)+ / SUB r,@ww / SUB r,ww(rr) / SUB r,-(rr) - 8,13,11,15,13 cycles - Flags affected: CZSV1H-- */
 	ARG_rmw;
 	OP_SUB8( mem_readbyte( r1 ), mem_readbyte( s2 ) );
+	mem_writebyte( r1, res & 0xFF );
 	switch( r2 & 0xC0 ) {
 	case 0x00:  mycycles += 8; break;
 	case 0x40:  mycycles += 13; break;
@@ -1146,17 +1147,19 @@ case 0x4B:  /* MOVW RRr,ww - 9 cycles - Flags affected: -------- */
 		mycycles += 9;
 	break;
 case 0x4C:  /* MULT Rrr,Rs - 24 cycles - Flags affected: -Z-0---- */
+	// operation is not known if r1 is odd, assuming same as even for now
 	ARG_RR;
-	res = mem_readword( r1 ) * mem_readbyte( r2 );
-	mem_writeword( r1, res & 0xFFFF );
+	res = mem_readbyte( r1 | 1 ) * mem_readbyte( r2 );
+	mem_writeword( r1 & 0xfe, res & 0xFFFF );
 	m_PS1 = m_PS1 & ~ ( FLAG_Z | FLAG_V );
 	m_PS1 |= ( ( res & 0xFFFF ) == 0x00 ? FLAG_Z : 0 );
 	mycycles += 24;
 	break;
 case 0x4D:  /* MULT RRr,i - 24 cycles - Flags affected: -Z-0---- */
+	// operation is not known if r1 is odd, assuming same as even for now
 	ARG_iR;
-	res = mem_readbyte( r1 + 1 ) * r2;
-	mem_writeword( r1, res & 0xFFFF );
+	res = mem_readbyte( r1 | 1 ) * r2;
+	mem_writeword( r1 & 0xfe, res & 0xFFFF );
 	m_PS1 = m_PS1 & ~ ( FLAG_Z | FLAG_V );
 	m_PS1 |= ( ( res & 0xFFFF ) == 0x00 ? FLAG_Z : 0 );
 	mycycles += 24;
@@ -1272,12 +1275,19 @@ case 0x59:  /* Invalid - 2? cycles - Flags affected: --------? */
 	mycycles += 2;
 	break;
 case 0x5A:  /* unk5A - 7,8,12,9,8 cycles */
-	logerror( "%04X: unk%02x\n", m_PC-1,op );
-/* NOTE: This unknown command is used in the calculator as a compare instruction
-       at 0x493A and 0x4941, we set the flags on the 3rd byte, although its real
-       function remains a mystery */
+/* NOTE: This unknown command is used in the game.com calculator, and in a number of carts.
+       It appears to compare the contents of the register number contained in the first
+       parameter, against a literal in the second parameter.
+        Example:
+        mov r02, 88
+        unk 5a 02 06   (compare contents of memory 88, to literal 06)
+       The calculator uses this instruction at 0x493A and 0x4941. Defender II (in Williams
+       Arcade Classics) uses it at 6DC9. */
 	ARG_iR;
-	OP_CMP8( 0, r1 );
+	s2 = mem_readbyte(r2);
+	logerror( "%04X: unk%02x (cmp r%02X->(%02X)->%02X to %02X)\n",
+		m_PC-3,op,r2,s2,mem_readbyte(s2),r1 );
+	OP_CMP8( mem_readbyte(s2), r1 );
 	mycycles += 7;
 	break;
 case 0x5B:  /* unk5B - 6,7,11,8,7 cycles */

@@ -10,102 +10,63 @@
 
 #pragma once
 
-#ifndef __UI_MENU_H__
-#define __UI_MENU_H__
+#ifndef MAME_FRONTEND_UI_MENU_H
+#define MAME_FRONTEND_UI_MENU_H
 
-#include "render.h"
-#include "language.h"
 #include "ui/ui.h"
+#include "ui/menuitem.h"
+
+#include "language.h"
+#include "render.h"
+
+#include <memory>
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-// flags for menu items
-#define MENU_FLAG_LEFT_ARROW        (1 << 0)
-#define MENU_FLAG_RIGHT_ARROW       (1 << 1)
-#define MENU_FLAG_INVERT            (1 << 2)
-#define MENU_FLAG_MULTILINE         (1 << 3)
-#define MENU_FLAG_REDTEXT           (1 << 4)
-#define MENU_FLAG_DISABLE           (1 << 5)
-#define MENU_FLAG_UI                (1 << 6)
-#define MENU_FLAG_UI_DATS           (1 << 7)
-#define MENU_FLAG_UI_SWLIST         (1 << 8)
-#define MENU_FLAG_UI_FAVORITE       (1 << 9)
-#define MENU_FLAG_UI_PALETTE        (1 << 10)
-#define MENU_FLAG_UI_HEADING        (1 << 11)
-
-// flags to pass to ui_menu_process
-#define UI_MENU_PROCESS_NOKEYS      1
-#define UI_MENU_PROCESS_LR_REPEAT   2
-#define UI_MENU_PROCESS_CUSTOM_ONLY 4
-#define UI_MENU_PROCESS_ONLYCHAR    8
-#define UI_MENU_PROCESS_NOINPUT     16
-#define UI_MENU_PROCESS_NOIMAGE     32
-
-// options for ui_menu_reset
-enum ui_menu_reset_options
-{
-	UI_MENU_RESET_SELECT_FIRST,
-	UI_MENU_RESET_REMEMBER_POSITION,
-	UI_MENU_RESET_REMEMBER_REF
-};
-
+namespace ui {
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-// menu-related events
-struct ui_menu_event
-{
-	void                *itemref;   // reference for the selected item
-	ui_menu_item_type   type;       // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
-	int                 iptkey;     // one of the IPT_* values from inptport.h
-	unicode_char        unichar;    // unicode character if iptkey == IPT_SPECIAL
-	render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
-};
-
-struct ui_menu_pool
-{
-	ui_menu_pool   *next;    // chain to next one
-	UINT8          *top;     // top of the pool
-	UINT8          *end;     // end of the pool
-};
-
-
-class ui_menu
+class menu
 {
 public:
-	ui_menu(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu();
+	// flags for menu items
+	enum
+	{
+		FLAG_LEFT_ARROW     = (1 << 0),
+		FLAG_RIGHT_ARROW    = (1 << 1),
+		FLAG_INVERT         = (1 << 2),
+		FLAG_MULTILINE      = (1 << 3),
+		FLAG_REDTEXT        = (1 << 4),
+		FLAG_DISABLE        = (1 << 5),
+		FLAG_UI             = (1 << 6),
+		FLAG_UI_DATS        = (1 << 7),
+		FLAG_UI_SWLIST      = (1 << 8),
+		FLAG_UI_FAVORITE    = (1 << 9),
+		FLAG_UI_PALETTE     = (1 << 10),
+		FLAG_UI_HEADING     = (1 << 11)
+	};
+
+	virtual ~menu();
 
 	mame_ui_manager &ui() const { return m_ui; }
 	running_machine &machine() const { return m_ui.machine(); }
 
-	render_container            *container;   // render_container we render to
-	ui_menu_event               menu_event;   // the UI menu_event that occurred
-	ui_menu                     *parent;      // pointer to parent menu
-	int                         resetpos;     // reset position
-	void                        *resetref;    // reset reference
-	int                         selected;     // which item is selected
-	int                         hover;        // which item is being hovered over
-	int                         visitems;     // number of visible items
-	float                       customtop;    // amount of extra height to add at the top
-	float                       custombottom; // amount of extra height to add at the bottom
-	ui_menu_pool                *pool;        // list of memory pools
-	std::vector<ui_menu_item>   item;         // array of items
-
-	// free all items in the menu, and all memory allocated from the memory pool
-	void reset(ui_menu_reset_options options);
+	render_container        *container;   // render_container we render to
+	int                     resetpos;     // reset position
+	void                    *resetref;    // reset reference
+	int                     selected;     // which item is selected
+	int                     hover;        // which item is being hovered over
+	int                     visitems;     // number of visible items
+	float                   customtop;    // amount of extra height to add at the top
+	float                   custombottom; // amount of extra height to add at the bottom
+	std::vector<menu_item>  item;         // array of items
 
 	// append a new item to the end of the menu
-	void item_append(const char *text, const char *subtext, UINT32 flags, void *ref, ui_menu_item_type type = ui_menu_item_type::UNKNOWN);
-	void item_append(ui_menu_item item);
-	void item_append(ui_menu_item_type type);
-
-	// process a menu, drawing it and returning any interesting events
-	const ui_menu_event *process(UINT32 flags, float x0 = 0.0f, float y0 = 0.0f);
+	void item_append(const char *text, const char *subtext, UINT32 flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
+	void item_append(menu_item item);
+	void item_append(menu_item_type type);
 
 	// configure the menu for custom rendering
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
@@ -124,7 +85,6 @@ public:
 
 	// request the specific handling of the game selection main menu
 	bool is_special_main_menu() const;
-	void set_special_main_menu(bool disable);
 
 	// Global initialization
 	static void init(running_machine &machine, ui_options &mopt);
@@ -134,7 +94,18 @@ public:
 	static void stack_reset(running_machine &machine);
 
 	// push a new menu onto the stack
-	static void stack_push(ui_menu *menu);
+	template <typename T, typename... Params>
+	static void stack_push(Params &&... args)
+	{
+		stack_push(std::unique_ptr<menu>(global_alloc_clear<T>(std::forward<Params>(args)...)));
+	}
+	template <typename T, typename... Params>
+	static void stack_push_special_main(Params &&... args)
+	{
+		std::unique_ptr<menu> ptr(global_alloc_clear<T>(std::forward<Params>(args)...));
+		ptr->set_special_main_menu(true);
+		stack_push(std::move(ptr));
+	}
 
 	// pop a menu from the stack
 	static void stack_pop(running_machine &machine);
@@ -153,7 +124,6 @@ public:
 
 	// Used by sliders
 	void validate_selection(int scandir);
-	static ui_menu *menu_stack;
 
 	void do_handle();
 
@@ -167,12 +137,8 @@ public:
 	virtual bool menu_has_search_active() { return false; }
 
 private:
-	static ui_menu *menu_free;
 	static std::unique_ptr<bitmap_rgb32> hilight_bitmap;
 	static render_texture *hilight_texture, *arrow_texture;
-
-	bool m_special_main_menu;
-	mame_ui_manager &m_ui;  // UI we are attached to
 
 	void draw(UINT32 flags, float x0 = 0.0f, float y0 = 0.0f);
 	void draw_text_box();
@@ -184,16 +150,6 @@ private:
 	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
 public:
-	// tab navigation
-	enum class focused_menu
-	{
-		main,
-		left,
-		righttop,
-		rightbottom
-	};
-
-	focused_menu m_focus;
 	void *m_prev_selected;
 
 	int  visible_items;
@@ -227,16 +183,93 @@ public:
 		if (max == 0)
 			return 0;
 		else
-			return ((actual <= min) ? MENU_FLAG_RIGHT_ARROW : (actual >= max ? MENU_FLAG_LEFT_ARROW : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW)));
+			return ((actual <= min) ? FLAG_RIGHT_ARROW : (actual >= max ? FLAG_LEFT_ARROW : (FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW)));
 	}
 
 protected:
+	// flags to pass to process
+	enum
+	{
+		PROCESS_NOKEYS      = 1,
+		PROCESS_LR_REPEAT   = 2,
+		PROCESS_CUSTOM_ONLY = 4,
+		PROCESS_ONLYCHAR    = 8,
+		PROCESS_NOINPUT     = 16,
+		PROCESS_NOIMAGE     = 32
+	};
+
+	// options for reset
+	enum class reset_options
+	{
+		SELECT_FIRST,
+		REMEMBER_POSITION,
+		REMEMBER_REF
+	};
+
+	// tab navigation
+	enum class focused_menu
+	{
+		main,
+		left,
+		righttop,
+		rightbottom
+	};
+
+	// menu-related events
+	struct event
+	{
+		void                *itemref;   // reference for the selected item
+		menu_item_type      type;       // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
+		int                 iptkey;     // one of the IPT_* values from inptport.h
+		unicode_char        unichar;    // unicode character if iptkey == IPT_SPECIAL
+		render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
+
+		bool is_char_printable() const
+		{
+			return
+				!(0x0001f >= unichar) &&                            // C0 control
+				!((0x0007f <= unichar) && (0x0009f >= unichar)) &&  // DEL and C1 control
+				!((0x0fdd0 <= unichar) && (0x0fddf >= unichar)) &&  // noncharacters
+				!(0x0fffe == (unichar & 0x0ffff)) &&                // byte-order detection noncharacter
+				!(0x0ffff == (unichar & 0x0ffff));                  // the other noncharacter
+		}
+
+		template <std::size_t N>
+		bool append_char(char (&buffer)[N], std::size_t offset) const
+		{
+			auto const chlen = utf8_from_uchar(&buffer[offset], N - offset - 1, unichar);
+			if (0 < chlen)
+			{
+				buffer[offset + chlen] = '\0';
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	};
+
 	int topline_datsview;      // right box top line
 	int top_line;              // main box top line
 	int l_sw_hover;
 	int l_hover;
 	int totallines;
 	int skip_main_items;
+
+	menu(mame_ui_manager &mui, render_container *container);
+
+	// free all items in the menu, and all memory allocated from the memory pool
+	void reset(reset_options options);
+	void reset_parent(reset_options options) { m_parent->reset(options); }
+	static void reset_topmost(reset_options options) { if (menu_stack) menu_stack->reset(options); }
+
+	// process a menu, drawing it and returning any interesting events
+	const event *process(UINT32 flags, float x0 = 0.0f, float y0 = 0.0f);
+	void process_parent() { m_parent->process(PROCESS_NOINPUT); }
+
+	bool is_focus(focused_menu focus) const { return m_focus == focus; }
+	void set_focus(focused_menu focus) { m_focus = focus; }
 
 	// draw right box
 	float draw_right_box_title(float x1, float y1, float x2, float y2);
@@ -252,6 +285,9 @@ protected:
 	// draw header and footer text
 	void extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, const char *header, const char *footer);
 
+	template <typename T>
+	static T *topmost_menu() { return dynamic_cast<T *>(menu_stack.get()); }
+
 	int visible_lines;        // main box visible lines
 	int right_visible_lines;  // right box lines
 
@@ -260,11 +296,16 @@ protected:
 
 	static std::unique_ptr<bitmap_rgb32> hilight_main_bitmap;
 	static render_texture *hilight_main_texture;
-private:
 
-	// mouse button held down
-	bool m_pressed = false;
-	osd_ticks_t m_repeat = 0;
+private:
+	struct pool
+	{
+		pool   *next;    // chain to next one
+		UINT8  *top;     // top of the pool
+		UINT8  *end;     // end of the pool
+	};
+
+
 	void reset_pressed() { m_pressed = false; m_repeat = 0; }
 	bool mouse_pressed() { return (osd_ticks() >= m_repeat); }
 	void set_pressed();
@@ -273,6 +314,12 @@ private:
 	static render_texture *bgrnd_texture, *star_texture;
 	static bitmap_argb32 *icons_bitmap[];
 	static render_texture *icons_texture[];
+
+	// request the specific handling of the game selection main menu
+	void set_special_main_menu(bool disable);
+
+	// push a new menu onto the stack
+	static void stack_push(std::unique_ptr<menu> &&menu);
 
 	// toolbar
 	static bitmap_argb32 *toolbar_bitmap[], *sw_toolbar_bitmap[];
@@ -297,6 +344,20 @@ private:
 
 	void draw_icon(int linenum, void *selectedref, float x1, float y1);
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction);
+
+	bool                    m_special_main_menu;
+	mame_ui_manager         &m_ui;     // UI we are attached to
+	std::unique_ptr<menu>   m_parent;  // pointer to parent menu
+	bool                    m_pressed; // mouse button held down
+	osd_ticks_t             m_repeat;
+	event                   m_event;   // the UI event that occurred
+	pool                    *m_pool;   // list of memory pools
+	focused_menu            m_focus;
+
+	static std::unique_ptr<menu> menu_stack;
+	static std::unique_ptr<menu> menu_free;
 };
 
-#endif  // __UI_MENU_H__
+} // namespace ui
+
+#endif  // MAME_FRONTEND_UI_MENU_H

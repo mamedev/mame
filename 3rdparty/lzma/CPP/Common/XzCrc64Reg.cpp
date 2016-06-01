@@ -19,7 +19,7 @@ class CXzCrc64Hasher:
 public:
   CXzCrc64Hasher(): _crc(CRC64_INIT_VAL) {}
 
-  MY_UNKNOWN_IMP
+  MY_UNKNOWN_IMP1(IHasher)
   INTERFACE_IHasher(;)
 };
 

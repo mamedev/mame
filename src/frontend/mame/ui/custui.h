@@ -10,18 +10,22 @@
 
 #pragma once
 
-#ifndef MAME_EMU_UI_UI_CUSTUI_H
-#define MAME_EMU_UI_UI_CUSTUI_H
+#ifndef MAME_FRONTEND_UI_CUSTUI_H
+#define MAME_FRONTEND_UI_CUSTUI_H
+
+#include "ui/menu.h"
+
+namespace ui {
 
 //-------------------------------------------------
 //  Custom UI menu
 //-------------------------------------------------
 
-class ui_menu_custom_ui : public ui_menu
+class menu_custom_ui : public menu
 {
 public:
-	ui_menu_custom_ui(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_custom_ui();
+	menu_custom_ui(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_custom_ui() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -43,11 +47,11 @@ private:
 //  Font UI menu
 //-------------------------------------------------
 
-class ui_menu_font_ui : public ui_menu
+class menu_font_ui : public menu
 {
 public:
-	ui_menu_font_ui(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_font_ui();
+	menu_font_ui(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_font_ui() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -78,11 +82,11 @@ private:
 //  Colors UI menu
 //-------------------------------------------------
 
-class ui_menu_colors_ui : public ui_menu
+class menu_colors_ui : public menu
 {
 public:
-	ui_menu_colors_ui(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_colors_ui();
+	menu_colors_ui(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_colors_ui() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -123,11 +127,11 @@ private:
 //  ARGB UI menu
 //-------------------------------------------------
 
-class ui_menu_rgb_ui : public ui_menu
+class menu_rgb_ui : public menu
 {
 public:
-	ui_menu_rgb_ui(mame_ui_manager &mui, render_container *container, rgb_t *_color, std::string _title);
-	virtual ~ui_menu_rgb_ui();
+	menu_rgb_ui(mame_ui_manager &mui, render_container *container, rgb_t *_color, std::string _title);
+	virtual ~menu_rgb_ui() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -148,18 +152,18 @@ private:
 		PALETTE_CHOOSE
 	};
 
-	void inkey_special(const ui_menu_event *menu_event);
+	void inkey_special(const event *menu_event);
 };
 
 //-------------------------------------------------
 //  Palette UI menu
 //-------------------------------------------------
 
-class ui_menu_palette_sel : public ui_menu
+class menu_palette_sel : public menu
 {
 public:
-	ui_menu_palette_sel(mame_ui_manager &mui, render_container *container, rgb_t &_color);
-	virtual ~ui_menu_palette_sel();
+	menu_palette_sel(mame_ui_manager &mui, render_container *container, rgb_t &_color);
+	virtual ~menu_palette_sel() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -175,4 +179,6 @@ private:
 	rgb_t &m_original;
 };
 
-#endif // MAME_EMU_UI_UI_CUSTUI_H
+} // namespace ui
+
+#endif // MAME_FRONTEND_UI_CUSTUI_H

@@ -18,9 +18,9 @@ public:
 	neogeo_kf2k3bl_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
-	
+
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	
+
 	virtual UINT32 get_bank_base(UINT16 sel) override { return m_kof2k3bl_prot->get_bank_base(); }
 	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_kof2k3bl_prot->protection_r(space, offset, mem_mask); }
 	virtual DECLARE_WRITE16_MEMBER(protection_w) override { m_kof2k3bl_prot->kof2003_w(space, offset, data, mem_mask); }
@@ -45,7 +45,7 @@ public:
 	neogeo_kf2k3pl_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
-	
+
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual UINT32 get_bank_base(UINT16 sel) override { return m_kof2k3bl_prot->get_bank_base(); }
@@ -71,9 +71,9 @@ public:
 	neogeo_kf2k3upl_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
-	
+
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	
+
 	virtual UINT32 get_bank_base(UINT16 sel) override { return m_kof2k3bl_prot->get_bank_base(); }
 	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_kof2k3bl_prot->protection_r(space, offset, mem_mask); }
 	virtual DECLARE_WRITE16_MEMBER(protection_w) override { m_kof2k3bl_prot->kof2003_w(space, offset, data, mem_mask); }

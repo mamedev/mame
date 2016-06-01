@@ -95,7 +95,7 @@ WRITE16_MEMBER(dbz_state::dbzcontrol_w)
 
 WRITE16_MEMBER(dbz_state::dbz_sound_command_w)
 {
-	soundlatch_byte_w(space, 0, data >> 8);
+	m_soundlatch->write(space, 0, data >> 8);
 }
 
 WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( dbz_sound_map, AS_PROGRAM, 8, dbz_state )
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xd000, 0xd002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe001) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbz_sound_io_map, AS_IO, 8, dbz_state )
@@ -369,6 +369,8 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

@@ -86,7 +86,8 @@ class CEncoder:
   public ICryptoResetInitVector
 {
 public:
-  MY_UNKNOWN_IMP3(
+  MY_UNKNOWN_IMP4(
+      ICompressFilter,
       ICryptoSetPassword,
       ICompressWriteCoderProperties,
       // ICryptoResetSalt,
@@ -104,7 +105,8 @@ class CDecoder:
   public ICompressSetDecoderProperties2
 {
 public:
-  MY_UNKNOWN_IMP2(
+  MY_UNKNOWN_IMP3(
+      ICompressFilter,
       ICryptoSetPassword,
       ICompressSetDecoderProperties2)
   STDMETHOD(SetDecoderProperties2)(const Byte *data, UInt32 size);

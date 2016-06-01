@@ -3,17 +3,6 @@
 # License: http://www.opensource.org/licenses/BSD-2-Clause
 #
 
-UNAME := $(shell uname)
-ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin))
-ifeq ($(UNAME),$(filter $(UNAME),Darwin))
-OS=darwin
-else
-OS=linux
-endif
-else
-OS=windows
-endif
-
 GENIE=../bx/tools/bin/$(OS)/genie
 
 all:
@@ -185,6 +174,7 @@ docs:
 clean:
 	@echo Cleaning...
 	-@rm -rf .build
+	@mkdir .build
 
 ###
 
@@ -213,13 +203,27 @@ BUILD_TOOLS_CONFIG=release32
 EXE=.exe
 endif
 
-.build/$(BUILD_OUTPUT_DIR)/bin/bin2cRelease$(EXE): .build/projects/$(BUILD_PROJECT_DIR)
-	$(SILENT) make -C .build/projects/$(BUILD_PROJECT_DIR) -f bin2c.make config=$(BUILD_TOOLS_CONFIG)
+.build/osx64_clang/bin/bin2cRelease: .build/projects/gmake-osx
+	$(SILENT) make -C .build/projects/gmake-osx bin2c config=$(BUILD_TOOLS_CONFIG)
 
-tools/bin/$(OS)/bin2c$(EXE): .build/$(BUILD_OUTPUT_DIR)/bin/bin2cRelease$(EXE)
+tools/bin/darwin/bin2c: .build/osx64_clang/bin/bin2cRelease
+	$(SILENT) cp $(<) $(@)
+
+.build/linux64_gcc/bin/bin2cRelease: .build/projects/gmake-linux
+	$(SILENT) make -C .build/projects/gmake-linux bin2c config=$(BUILD_TOOLS_CONFIG)
+
+tools/bin/linux/bin2c: .build/linux64_gcc/bin/bin2cRelease
+	$(SILENT) cp $(<) $(@)
+
+.build/win64_mingw-gcc/bin/bin2cRelease.exe: .build/projects/gmake-mingw-gcc
+	$(SILENT) make -C .build/projects/gmake-mingw-gcc bin2c config=$(BUILD_TOOLS_CONFIG)
+
+tools/bin/windows/bin2c.exe: .build/win64_mingw-gcc/bin/bin2cRelease
 	$(SILENT) cp $(<) $(@)
 
 tools: tools/bin/$(OS)/bin2c$(EXE)
+
+dist: tools/bin/darwin/bin2c tools/bin/linux/bin2c tools/bin/windows/bin2c.exe
 
 .build/$(BUILD_OUTPUT_DIR)/bin/bx.testRelease$(EXE): .build/projects/$(BUILD_PROJECT_DIR)
 	$(SILENT) make -C .build/projects/$(BUILD_PROJECT_DIR) bx.test config=$(BUILD_TOOLS_CONFIG)

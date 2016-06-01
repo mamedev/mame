@@ -14,9 +14,9 @@
 //  MACROS
 //============================================================
 
-#define NLTIME_FROM_NS(_t)  netlist_time::from_nsec(_t)
-#define NLTIME_FROM_US(_t)  netlist_time::from_usec(_t)
-#define NLTIME_FROM_MS(_t)  netlist_time::from_msec(_t)
+#define NLTIME_FROM_NS(t)  netlist_time::from_nsec(t)
+#define NLTIME_FROM_US(t)  netlist_time::from_usec(t)
+#define NLTIME_FROM_MS(t)  netlist_time::from_msec(t)
 #define NLTIME_IMMEDIATE    netlist_time::from_nsec(1)
 
 // ----------------------------------------------------------------------------------------
@@ -33,16 +33,19 @@ namespace netlist
 	public:
 
 #if (PHAS_INT128)
-		typedef UINT128 INTERNALTYPE;
+		using INTERNALTYPE = UINT128;
 		static const pstate_data_type_e STATETYPE = DT_INT128;
 #else
-		typedef UINT64 INTERNALTYPE;
-		static const pstate_data_type_e STATETYPE = DT_INT64;
+		using INTERNALTYPE = UINT64;
+		static const pstate_data_type_e STATETYPE = pstate_data_type_e::DT_INT64;
 #endif
 		static const INTERNALTYPE RESOLUTION = NETLIST_INTERNAL_RES;
 
 		ATTR_HOT netlist_time() : m_time(0) {}
-		ATTR_HOT netlist_time(const netlist_time &rhs) : m_time(rhs.m_time) {}
+		//ATTR_HOT netlist_time(const netlist_time &rhs) NOEXCEPT : m_time(rhs.m_time) {}
+		//ATTR_HOT netlist_time(netlist_time &&rhs) NOEXCEPT : m_time(rhs.m_time) {}
+		ATTR_HOT netlist_time(const netlist_time &rhs) NOEXCEPT = default;
+		ATTR_HOT netlist_time(netlist_time &&rhs) NOEXCEPT = default;
 
 		ATTR_HOT friend const netlist_time operator-(const netlist_time &left, const netlist_time &right);
 		ATTR_HOT friend const netlist_time operator+(const netlist_time &left, const netlist_time &right);
@@ -53,6 +56,7 @@ namespace netlist
 		ATTR_HOT friend bool operator>=(const netlist_time &left, const netlist_time &right);
 		ATTR_HOT friend bool operator<=(const netlist_time &left, const netlist_time &right);
 		ATTR_HOT friend bool operator!=(const netlist_time &left, const netlist_time &right);
+		ATTR_HOT friend bool operator==(const netlist_time &left, const netlist_time &right);
 
 		ATTR_HOT const netlist_time &operator=(const netlist_time &right) { m_time = right.m_time; return *this; }
 
@@ -126,12 +130,18 @@ namespace netlist
 		return (left.m_time != right.m_time);
 	}
 
+	ATTR_HOT inline bool operator==(const netlist_time &left, const netlist_time &right)
+	{
+		return (left.m_time == right.m_time);
+	}
+
 }
 
+PLIB_NAMESPACE_START()
 template<> ATTR_COLD inline void pstate_manager_t::save_item(netlist::netlist_time &nlt, const void *owner, const pstring &stname)
 {
 	save_state_ptr(stname, netlist::netlist_time::STATETYPE, owner, sizeof(netlist::netlist_time::INTERNALTYPE), 1, nlt.get_internaltype_ptr(), false);
 }
-
+PLIB_NAMESPACE_END()
 
 #endif /* NLTIME_H_ */

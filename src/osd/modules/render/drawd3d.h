@@ -75,8 +75,8 @@ public:
 
 	void                    draw_line(const render_primitive &prim);
 	void                    draw_quad(const render_primitive &prim);
-	void                    batch_vector(const render_primitive &prim, float line_time);
-	void                    batch_vectors();
+	void                    batch_vector(const render_primitive &prim);
+	void                    batch_vectors(int vector_count);
 
 	vertex *                mesh_alloc(int numverts);
 
@@ -117,7 +117,6 @@ public:
 
 	d3d_texture_manager *   get_texture_manager() const { return m_texture_manager; }
 	texture_info *          get_default_texture();
-	texture_info *          get_vector_texture();
 
 	shaders *               get_shaders() const { return m_shaders; }
 	hlsl_options *          get_shaders_options() const { return m_shaders_options; }
@@ -166,8 +165,6 @@ private:
 	hlsl_options *          m_shaders_options;          // HLSL options
 
 	d3d_texture_manager *  m_texture_manager;          // texture manager
-
-	int                     m_line_count;
 };
 
 #endif // OSD_WINDOWS

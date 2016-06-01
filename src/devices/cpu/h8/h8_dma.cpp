@@ -277,7 +277,7 @@ bool h8_dma_channel_device::start_test(int vector)
 		if(dte == 0)
 			return false;
 
-		throw emu_fatalerror("%s: DMA startup test in short address mode unimplemented.\n", tag());		
+		throw emu_fatalerror("%s: DMA startup test in short address mode unimplemented.\n", tag());
 	}
 }
 
@@ -297,7 +297,7 @@ void h8_dma_channel_device::start(int submodule)
 			cpu->set_current_dma(state + submodule);
 		}
 	} else {
-		throw emu_fatalerror("%s: DMA start in short address mode unimplemented.\n", tag());		
+		throw emu_fatalerror("%s: DMA start in short address mode unimplemented.\n", tag());
 	}
 }
 
@@ -315,6 +315,6 @@ void h8_dma_channel_device::count_done(int submodule)
 				throw emu_fatalerror("%s: DMA end-of-transfer interrupt in full address/normal mode unimplemented.\n", tag());
 		}
 	} else {
-		throw emu_fatalerror("%s: DMA count done in short address mode unimplemented.\n", tag());		
+		throw emu_fatalerror("%s: DMA count done in short address mode unimplemented.\n", tag());
 	}
 }

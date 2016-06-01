@@ -2313,7 +2313,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gauntleg, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CALSPEED)
@@ -2326,7 +2326,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gauntdl, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
@@ -2339,7 +2339,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( warfa, vegas250 )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
@@ -2352,7 +2352,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( tenthdeg, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
+//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb) -- Not in ram???
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
@@ -2570,7 +2570,18 @@ ROM_START( tenthdeg )
 ROM_END
 
 
-ROM_START( roadburn )
+ROM_START( roadburn ) /* version 1.04 - verified on hardware */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 2.6 4/22/1999 */
+	ROM_LOAD( "rbmain.bin", 0x000000, 0x80000, CRC(060e1aa8) SHA1(2a1027d209f87249fe143500e721dfde7fb5f3bc) )
+
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+
+	DISK_REGION( "ide:0:hdd:image" )    /* Guts 5/19/1999 Game 5/19/1999 */
+	DISK_IMAGE( "ROAD BURNERS V1.04", 0, SHA1(30567241c000ee572a9cfb1b080c02a51a2b12d2) )
+ROM_END
+
+ROM_START( roadburn1 ) /* version 1.0 - verified on hardware */
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 2.6 4/22/1999 */
 	ROM_LOAD( "rbmain.bin", 0x000000, 0x80000, CRC(060e1aa8) SHA1(2a1027d209f87249fe143500e721dfde7fb5f3bc) )
 
@@ -2799,7 +2810,8 @@ GAME( 1999, warfaa,   warfa,    warfa, warfa, vegas_state,    warfa,    ROT0, "A
 
 
 /* Durango + DSIO + Voodoo 2 */
-GAME( 1999, roadburn, 0,        roadburn, roadburn, vegas_state, roadburn, ROT0, "Atari Games",  "Road Burners", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, roadburn, 0,        roadburn, roadburn, vegas_state, roadburn, ROT0, "Atari Games",  "Road Burners (ver 1.04)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, roadburn1,roadburn, roadburn, roadburn, vegas_state, roadburn, ROT0, "Atari Games",  "Road Burners (ver 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /* Durango + DSIO? + Voodoo banshee */
 GAME( 1998, nbashowt, 0,        nbashowt, nbashowt, vegas_state, nbashowt, ROT0, "Midway Games", "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

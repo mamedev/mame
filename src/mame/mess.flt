@@ -19,6 +19,7 @@ advision.cpp
 aim65.cpp
 aim65_40.cpp
 alesis.cpp
+alesis_qs.cpp
 alphasma.cpp
 alphatro.cpp
 altair.cpp
@@ -242,6 +243,7 @@ hunter2.cpp
 hx20.cpp
 hyperscan.cpp
 i7000.cpp
+ibm3153.cpp
 ibm6580.cpp
 ibmpc.cpp
 ibmpcjr.cpp
@@ -370,7 +372,6 @@ nakajies.cpp
 nanos.cpp
 nascom1.cpp
 nc.cpp
-neogeo.cpp
 neogeocd.cpp
 nes.cpp
 newbrain.cpp
@@ -639,6 +640,7 @@ vixen.cpp
 vk100.cpp
 votrpss.cpp
 votrtnt.cpp
+vsmilepro.cpp
 vt100.cpp
 vt220.cpp
 vt240.cpp
@@ -692,5 +694,7 @@ zx.cpp
 +jaguarcd
 //konamim2.cpp
 +3do_m2
+//neogeo.cpp
++aes
 //vectrex.cpp
 -raaspec

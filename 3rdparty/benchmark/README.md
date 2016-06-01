@@ -1,5 +1,4 @@
-benchmark
-=========
+# benchmark
 [![Build Status](https://travis-ci.org/google/benchmark.svg?branch=master)](https://travis-ci.org/google/benchmark)
 [![Build status](https://ci.appveyor.com/api/projects/status/u0qsyp7t1tk7cpxs/branch/master?svg=true)](https://ci.appveyor.com/project/google/benchmark/branch/master)
 [![Coverage Status](https://coveralls.io/repos/google/benchmark/badge.svg)](https://coveralls.io/r/google/benchmark)
@@ -10,10 +9,9 @@ Discussion group: https://groups.google.com/d/forum/benchmark-discuss
 
 IRC channel: https://freenode.net #googlebenchmark
 
-Example usage
--------------
-Define a function that executes the code to be measured a
-specified number of times:
+## Example usage
+### Basic usage
+Define a function that executes the code to be measured.
 
 ```c++
 static void BM_StringCreation(benchmark::State& state) {
@@ -34,15 +32,16 @@ BENCHMARK(BM_StringCopy);
 BENCHMARK_MAIN();
 ```
 
-Sometimes a family of microbenchmarks can be implemented with
-just one routine that takes an extra argument to specify which
-one of the family of benchmarks to run.  For example, the following
-code defines a family of microbenchmarks for measuring the speed
-of `memcpy()` calls of different lengths:
+### Passing arguments
+Sometimes a family of benchmarks can be implemented with just one routine that
+takes an extra argument to specify which one of the family of benchmarks to
+run. For example, the following code defines a family of benchmarks for
+measuring the speed of `memcpy()` calls of different lengths:
 
 ```c++
 static void BM_memcpy(benchmark::State& state) {
-  char* src = new char[state.range_x()]; char* dst = new char[state.range_x()];
+  char* src = new char[state.range_x()];
+  char* dst = new char[state.range_x()];
   memset(src, 'x', state.range_x());
   while (state.KeepRunning())
     memcpy(dst, src, state.range_x());
@@ -54,18 +53,17 @@ static void BM_memcpy(benchmark::State& state) {
 BENCHMARK(BM_memcpy)->Arg(8)->Arg(64)->Arg(512)->Arg(1<<10)->Arg(8<<10);
 ```
 
-The preceding code is quite repetitive, and can be replaced with the
-following short-hand.  The following invocation will pick a few
-appropriate arguments in the specified range and will generate a
-microbenchmark for each such argument.
+The preceding code is quite repetitive, and can be replaced with the following
+short-hand. The following invocation will pick a few appropriate arguments in
+the specified range and will generate a benchmark for each such argument.
 
 ```c++
 BENCHMARK(BM_memcpy)->Range(8, 8<<10);
 ```
 
-You might have a microbenchmark that depends on two inputs.  For
-example, the following code defines a family of microbenchmarks for
-measuring the speed of set insertion.
+You might have a benchmark that depends on two inputs. For example, the
+following code defines a family of benchmarks for measuring the speed of set
+insertion.
 
 ```c++
 static void BM_SetInsert(benchmark::State& state) {
@@ -88,19 +86,18 @@ BENCHMARK(BM_SetInsert)
     ->ArgPair(8<<10, 512);
 ```
 
-The preceding code is quite repetitive, and can be replaced with
-the following short-hand.  The following macro will pick a few
-appropriate arguments in the product of the two specified ranges
-and will generate a microbenchmark for each such pair.
+The preceding code is quite repetitive, and can be replaced with the following
+short-hand. The following macro will pick a few appropriate arguments in the
+product of the two specified ranges and will generate a benchmark for each such
+pair.
 
 ```c++
 BENCHMARK(BM_SetInsert)->RangePair(1<<10, 8<<10, 1, 512);
 ```
 
-For more complex patterns of inputs, passing a custom function
-to Apply allows programmatic specification of an
-arbitrary set of arguments to run the microbenchmark on.
-The following example enumerates a dense range on one parameter,
+For more complex patterns of inputs, passing a custom function to `Apply` allows
+programmatic specification of an arbitrary set of arguments on which to run the
+benchmark. The following example enumerates a dense range on one parameter,
 and a sparse range on the second.
 
 ```c++
@@ -112,9 +109,10 @@ static void CustomArguments(benchmark::internal::Benchmark* b) {
 BENCHMARK(BM_SetInsert)->Apply(CustomArguments);
 ```
 
-Templated microbenchmarks work the same way:
-Produce then consume 'size' messages 'iters' times
-Measures throughput in the absence of multiprogramming.
+### Templated benchmarks
+Templated benchmarks work the same way: This example produces and consumes
+messages of size `sizeof(v)` `range_x` times. It also outputs throughput in the
+absence of multiprogramming.
 
 ```c++
 template <class Q> int BM_Sequential(benchmark::State& state) {
@@ -145,11 +143,12 @@ Three macros are provided for adding benchmark templates.
 #define BENCHMARK_TEMPLATE2(func, arg1, arg2)
 ```
 
+### Multithreaded benchmarks
 In a multithreaded test (benchmark invoked by multiple threads simultaneously),
 it is guaranteed that none of the threads will start until all have called
-KeepRunning, and all will have finished before KeepRunning returns false. As
-such, any global setup or teardown you want to do can be
-wrapped in a check against the thread index:
+`KeepRunning`, and all will have finished before KeepRunning returns false. As
+such, any global setup or teardown can be wrapped in a check against the thread
+index:
 
 ```c++
 static void BM_MultiThreaded(benchmark::State& state) {
@@ -176,6 +175,46 @@ BENCHMARK(BM_test)->Range(8, 8<<10)->UseRealTime();
 
 Without `UseRealTime`, CPU time is used by default.
 
+
+## Manual timing
+For benchmarking something for which neither CPU time nor real-time are
+correct or accurate enough, completely manual timing is supported using
+the `UseManualTime` function. 
+
+When `UseManualTime` is used, the benchmarked code must call
+`SetIterationTime` once per iteration of the `KeepRunning` loop to
+report the manually measured time.
+
+An example use case for this is benchmarking GPU execution (e.g. OpenCL
+or CUDA kernels, OpenGL or Vulkan or Direct3D draw calls), which cannot
+be accurately measured using CPU time or real-time. Instead, they can be
+measured accurately using a dedicated API, and these measurement results
+can be reported back with `SetIterationTime`.
+
+```c++
+static void BM_ManualTiming(benchmark::State& state) {
+  int microseconds = state.range_x();
+  std::chrono::duration<double, std::micro> sleep_duration {
+    static_cast<double>(microseconds)
+  };
+
+  while (state.KeepRunning()) {
+    auto start = std::chrono::high_resolution_clock::now();
+    // Simulate some useful workload with a sleep
+    std::this_thread::sleep_for(sleep_duration);
+    auto end   = std::chrono::high_resolution_clock::now();
+
+    auto elapsed_seconds =
+      std::chrono::duration_cast<std::chrono::duration<double>>(
+        end - start);
+
+    state.SetIterationTime(elapsed_seconds.count());
+  }
+}
+BENCHMARK(BM_ManualTiming)->Range(1, 1<<17)->UseManualTime();
+```
+
+### Preventing optimisation
 To prevent a value or expression from being optimized away by the compiler
 the `benchmark::DoNotOptimize(...)` function can be used.
 
@@ -190,8 +229,24 @@ static void BM_test(benchmark::State& state) {
 }
 ```
 
-Benchmark Fixtures
-------------------
+### Set time unit manually
+If a benchmark runs a few milliseconds it may be hard to visually compare the
+measured times, since the output data is given in nanoseconds per default. In
+order to manually set the time unit, you can specify it manually:
+
+```c++
+BENCHMARK(BM_test)->Unit(benchmark::kMillisecond);
+```
+
+## Controlling number of iterations
+In all cases, the number of iterations for which the benchmark is run is
+governed by the amount of time the benchmark takes. Concretely, the number of
+iterations is at least one, not more than 1e9, until CPU time is greater than
+the minimum time, or the wallclock time is 5x minimum time. The minimum time is
+set as a flag `--benchmark_min_time` or per benchmark by calling `MinTime` on
+the registered benchmark object.
+
+## Fixtures
 Fixture tests are created by
 first defining a type that derives from ::benchmark::Fixture and then
 creating/registering the tests using the following macros:
@@ -221,8 +276,7 @@ BENCHMARK_REGISTER_F(MyFixture, BarTest)->Threads(2);
 /* BarTest is now registered */
 ```
 
-Output Formats
---------------
+## Output Formats
 The library supports multiple output formats. Use the
 `--benchmark_format=<tabular|json>` flag to set the format type. `tabular` is
 the default format.
@@ -290,8 +344,7 @@ name,iterations,real_time,cpu_time,bytes_per_second,items_per_second,label
 "BM_SetInsert/1024/10",106365,17238.4,8421.53,4.74973e+06,1.18743e+06,
 ```
 
-Debug vs Release
-----------------
+## Debug vs Release
 By default, benchmark builds as a debug library. You will see a warning in the output when this is the case. To build it as a release library instead, use:
 
 ```
@@ -304,6 +357,5 @@ To enable link-time optimisation, use
 cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_LTO=true
 ```
 
-Linking against the library
----------------------------
+## Linking against the library
 When using gcc, it is necessary to link against pthread to avoid runtime exceptions. This is due to how gcc implements std::thread. See [issue #67](https://github.com/google/benchmark/issues/67) for more details.

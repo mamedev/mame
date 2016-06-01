@@ -22,7 +22,7 @@
 WRITE16_MEMBER(ultraman_state::sound_cmd_w)
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 }
 
 WRITE16_MEMBER(ultraman_state::sound_irq_trigger_w)
@@ -58,7 +58,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ultraman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) /* Sound latch read */
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 //  AM_RANGE(0xd000, 0xd000) AM_WRITENOP      /* ??? */
 	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("oki", okim6295_device, read, write)       /* M6295 */
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)   /* YM2151 */
@@ -223,6 +223,8 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 24000000/6)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

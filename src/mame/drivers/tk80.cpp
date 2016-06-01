@@ -48,6 +48,7 @@ ICS8080
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
 #include "tk80.lh"
@@ -276,13 +277,15 @@ static MACHINE_CONFIG_DERIVED( mikrolab, tk80 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(tk80_state, mikrolab_serial_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nd80z, tk80 )
-	MCFG_CPU_MODIFY("maincpu")
+static MACHINE_CONFIG_START( nd80z, tk80_state )
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_1MHz) // Sharp LH0080A, can't see writing on xtal
 	MCFG_CPU_PROGRAM_MAP(tk85_mem)
 	MCFG_CPU_IO_MAP(nd80z_io)
 
+	/* video hardware */
+	MCFG_DEFAULT_LAYOUT(layout_tk80)
+
 	/* Devices */
-	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(tk80_state, nd80z_key_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(tk80_state, serial_r))
@@ -330,7 +333,7 @@ ROM_END
 
 ROM_START( nd80z )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "nd80z.bin",  0x0000, 0x0800, CRC(fe829f1d) SHA1(6fff31884b8d984076d4450ca3a3e48efadeb648))
+	ROM_LOAD( "ndf.bin",  0x0000, 0x0800, CRC(fe829f1d) SHA1(6fff31884b8d984076d4450ca3a3e48efadeb648))
 ROM_END
 
 

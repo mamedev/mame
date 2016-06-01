@@ -56,10 +56,12 @@ Languages:
  * [C#/VB/F# language API bindings](https://github.com/MikePopoloski/SharpBgfx)
  * [D language API bindings](https://github.com/DerelictOrg/DerelictBgfx)
  * [Go language API bindings](https://github.com/james4k/go-bgfx)
- * [Java language API bindings](https://github.com/enleeten/twilight-bgfx)
  * [Haskell language API bindings](https://github.com/haskell-game/bgfx)
+ * [Java language API bindings](https://github.com/enleeten/twilight-bgfx)
+ * [Lua language API bindings](https://github.com/excessive/lua-bgfx)
  * [Python language API bindings](https://github.com/jnadro/pybgfx#pybgf)
  * [Rust language API bindings](https://github.com/rhoot/bgfx-rs)
+ * [Swift language API bindings](https://github.com/stuartcarnie/SwiftBGFX)
 
 [Building](https://bkaradzic.github.io/bgfx/build.html)
 ----------------------------------------------------
@@ -136,8 +138,12 @@ https://github.com/mamedev/mame MAME - Multiple Arcade Machine Emulator
 
 https://blackshift.itch.io/blackshift - Blackshift is a grid-based, space-themed
 action puzzle game which isn't afraid of complexity — think Chip's Challenge on
-crack.  
-![blackshift-screenshot](https://img.itch.io/aW1hZ2UvNTA3NDkvMjU2OTIzLmpwZw==/original/V%2BbpZD.jpg)
+crack. 
+https://www.youtube.com/watch?v=PUl8612Y-ds
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=PUl8612Y-ds
+" target="_blank"><img src="http://img.youtube.com/vi/PUl8612Y-ds/0.jpg" 
+alt="Blackshift Trailer, May 2016"
+width="640" height="480" border="0" /></a>
 
 https://eheitzresearch.wordpress.com/415-2/ - Real-Time Polygonal-Light Shading
 with Linearly Transformed Cosines, Eric Heitz, Jonathan Dupuy, Stephen Hill and

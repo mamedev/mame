@@ -131,7 +131,7 @@ WRITE8_MEMBER(lwings_state::avengers_protection_w)
 	else if (pc == 0x0445)
 	{
 		m_soundstate = 0x80;
-		soundlatch_byte_w(space, 0, data);
+		m_soundlatch->write(space, 0, data);
 	}
 }
 
@@ -322,7 +322,7 @@ static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf80a, 0xf80a) AM_READ_PORT("P2")
 	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf80a, 0xf80b) AM_WRITE(lwings_bg1_scrolly_w)
-	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf80d, 0xf80d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
@@ -346,19 +346,19 @@ static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1")
 	AM_RANGE(0xf80a, 0xf80a) AM_READ_PORT("P2")
 	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWA")
-	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB") AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xf80d, 0xf80d) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xf80d, 0xf80d) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lwings_sound_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("2203a", ym2203_device, write)
 	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE("2203b", ym2203_device, write)
 	AM_RANGE(0xe006, 0xe006) AM_READ(avengers_soundlatch2_r) //AT: (avengers061gre)
-	AM_RANGE(0xe006, 0xe006) AM_WRITEONLY AM_SHARE("soundlatch2")
+	AM_RANGE(0xe006, 0xe006) AM_WRITEONLY AM_SHARE("soundlatch_2")
 ADDRESS_MAP_END
 
 
@@ -379,7 +379,7 @@ static ADDRESS_MAP_START( fball_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf80a, 0xf80a) AM_READ_PORT("P2")
 	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf80a, 0xf80b) AM_WRITE(lwings_bg1_scrolly_w)
-	AM_RANGE(0xf80c, 0xf80c) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xf80c, 0xf80c) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf80d, 0xf80d) AM_READ_PORT("P3") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xf80e, 0xf80e) AM_READ_PORT("P4")
 
@@ -404,7 +404,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fball_sound_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 
 	AM_RANGE(0xA000, 0xA000) AM_WRITE(fball_oki_bank_w)
 
@@ -426,7 +426,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trojan_adpcm_io_map, AS_IO, 8, lwings_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
 ADDRESS_MAP_END
 
@@ -946,6 +946,8 @@ static MACHINE_CONFIG_START( lwings, lwings_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("2203a", YM2203, XTAL_12MHz/8)   /* verified on PCB */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
@@ -1000,6 +1002,8 @@ static MACHINE_CONFIG_START( fball, lwings_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, fball_oki_map)
@@ -1030,6 +1034,9 @@ static MACHINE_CONFIG_DERIVED( trojan, lwings )
 	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_trojan)
 
 	/* sound hardware */
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("5205", MSM5205, XTAL_384kHz)    /* verified on PCB */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* slave mode */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1720,7 +1727,7 @@ ROM_END
 DRIVER_INIT_MEMBER(lwings_state, avengersb)
 {
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8_delegate(FUNC(lwings_state::soundlatch_byte_w), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch));
 }
 
 

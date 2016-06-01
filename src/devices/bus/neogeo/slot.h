@@ -87,7 +87,7 @@ public:
 	// construction/destruction
 	device_neogeo_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_neogeo_cart_interface();
-	
+
 	// reading from ROM
 	virtual DECLARE_READ16_MEMBER(rom_r) { return 0xffff; }
 	virtual DECLARE_WRITE16_MEMBER(banksel_w) { };
@@ -102,7 +102,7 @@ public:
 
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) { };
 	virtual int get_fixed_bank_type(void) { return 0; }
-	
+
 	void rom_alloc(UINT32 size) { m_rom.resize(size/sizeof(UINT16)); }
 	UINT16* get_rom_base()  { return &m_rom[0]; }
 	UINT32 get_rom_size() { return m_rom.size() * sizeof(UINT16); }
@@ -114,19 +114,19 @@ public:
 	UINT32 get_fixed_size() { return m_fixed.size(); }
 	UINT8* get_region_fixed_base()  { if (m_region_fixed.found()) return m_region_fixed->base(); return nullptr; }
 	UINT32 get_region_fixed_size() { if (m_region_fixed.found()) return m_region_fixed->bytes(); return 0; }
-	
+
 	void audio_alloc(UINT32 size) { m_audio.resize(size); }
 	UINT8* get_audio_base() { return &m_audio[0]; }
 	UINT32 get_audio_size() { return m_audio.size(); }
 	UINT8* get_region_audio_base()  { if (m_region_audio.found()) return m_region_audio->base(); return nullptr; }
 	UINT32 get_region_audio_size() { if (m_region_audio.found()) return m_region_audio->bytes(); return 0; }
-	
+
 	void audiocrypt_alloc(UINT32 size) { m_audiocrypt.resize(size); }
 	UINT8* get_audiocrypt_base() { if (m_audiocrypt.size() == 0) return nullptr; else  return &m_audiocrypt[0]; }
 	UINT32 get_audiocrypt_size() { return m_audiocrypt.size(); }
 	UINT8* get_region_audiocrypt_base()  { if (m_region_audiocrypt.found()) return m_region_audiocrypt->base(); return nullptr; }
 	UINT32 get_region_audiocrypt_size() { if (m_region_audiocrypt.found()) return m_region_audiocrypt->bytes(); return 0; }
-	
+
 	// TODO: review sprite code later!!
 	void sprites_alloc(UINT32 size) { m_sprites.resize(size); }
 	UINT8* get_sprites_base() { return &m_sprites[0]; }
@@ -139,7 +139,7 @@ public:
 	UINT32 get_ym_size() { return m_ym.size(); }
 	UINT8* get_region_ym_base()  { if (m_region_ym.found()) return m_region_ym->base(); return nullptr; }
 	UINT32 get_region_ym_size() { if (m_region_ym.found()) return m_region_ym->bytes(); return 0; }
-	
+
 	void ymdelta_alloc(UINT32 size) { m_ymdelta.resize(size); }
 	UINT8* get_ymdelta_base() { return &m_ymdelta[0]; }
 	UINT32 get_ymdelta_size() { return m_ymdelta.size(); }
@@ -172,7 +172,7 @@ protected:
 	optional_memory_region  m_region_spr;
 	optional_memory_region  m_region_ym;
 	optional_memory_region  m_region_ymd;
-	
+
 	UINT32 get_region_mask(UINT8* rgn, UINT32 rgn_size);
 };
 
@@ -228,7 +228,7 @@ public:
 		}
 		return nullptr;
 	}
-	UINT32 get_rom_size()	{
+	UINT32 get_rom_size()   {
 		if (m_cart) {
 			if (!user_loadable()) return m_cart->get_region_rom_size(); else return m_cart->get_rom_size();
 		}
@@ -240,7 +240,7 @@ public:
 		}
 		return nullptr;
 	}
-	UINT32 get_fixed_size()	{
+	UINT32 get_fixed_size() {
 		if (m_cart) {
 			if (!user_loadable()) return m_cart->get_region_fixed_size(); else return m_cart->get_fixed_size();
 		}
@@ -252,7 +252,7 @@ public:
 		}
 		return nullptr;
 	}
-	UINT32 get_sprites_size()	{
+	UINT32 get_sprites_size()   {
 		if (m_cart) {
 			if (!user_loadable()) return m_cart->get_region_sprites_size(); else return m_cart->get_sprites_size();
 		}
@@ -264,7 +264,7 @@ public:
 		}
 		return nullptr;
 	}
-	UINT32 get_audio_size()	{
+	UINT32 get_audio_size() {
 		if (m_cart) {
 			if (!user_loadable()) return m_cart->get_region_audio_size(); else return m_cart->get_audio_size();
 		}
@@ -276,7 +276,7 @@ public:
 		}
 		return nullptr;
 	}
-	UINT32 get_audiocrypt_size()	{
+	UINT32 get_audiocrypt_size()    {
 		if (m_cart) {
 			if (!user_loadable()) return m_cart->get_region_audiocrypt_size(); else return m_cart->get_audiocrypt_size();
 		}
@@ -288,7 +288,7 @@ public:
 		}
 		return nullptr;
 	}
-	UINT32 get_ym_size()	{
+	UINT32 get_ym_size()    {
 		if (m_cart) {
 			if (!user_loadable()) return m_cart->get_region_ym_size(); else return m_cart->get_ym_size();
 		}
@@ -300,7 +300,7 @@ public:
 		}
 		return nullptr;
 	}
-	UINT32 get_ymdelta_size()	{
+	UINT32 get_ymdelta_size()   {
 		if (m_cart) {
 			if (!user_loadable()) return m_cart->get_region_ymdelta_size(); else return m_cart->get_ymdelta_size();
 		}
@@ -310,7 +310,7 @@ public:
 	UINT8* get_sprites_opt_base()  {
 		if (m_cart) return m_cart->get_sprites_opt_base(); else return nullptr;
 	}
-	UINT32 get_sprites_opt_size()	{
+	UINT32 get_sprites_opt_size()   {
 		if (m_cart) return m_cart->get_sprites_opt_size(); else return 0;
 	}
 

@@ -43659,7 +43659,7 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="ningyono">
+	<software name="ningynam">
 		<description>Ningyo no Namida</description>
 		<year>1985</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -55000,6 +55000,17 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
+	<software name="magicopy33a" cloneof="magicopy">
+		<description>Magic Copy II ver 3.3 (Alt)</description>
+		<year>1985</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="magic copy2 ver.3.3.d88" size="348848" crc="94034787" sha1="3f489a6d311ad1aab9fb9399136f2f0d1d6cff24" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magicopy34" cloneof="magicopy">
 		<description>Magic Copy II ver 3.4</description>
 		<year>1986</year>
@@ -55007,6 +55018,17 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 55536 -->
 				<rom name="magic copy v34.d88" size="348848" crc="08d61d54" sha1="5ec7f8430f0e9ecb56dcd7575bec7d1e802224af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicopy34a" cloneof="magicopy">
+		<description>Magic Copy II ver 3.4 (Alt)</description>
+		<year>1986</year>
+		<publisher>Westside Softhouse</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="magic copy2 ver.3.4.d88" size="348848" crc="a9ce6e76" sha1="72aa6ad87f3ff211208004ee602175a0bcc18fae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -55912,6 +55934,24 @@ ExtractDisk  [02]"DATA          " -> "musium 3_02.d88"
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="musium 3_02.d88" size="348848" crc="2e23681f" sha1="9fb8dd46f27309deb7dfa3f7f489dc8f59440694" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musium3a" cloneof="musium3">
+		<description>Musium 3 (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="musium3_01.d88" size="348848" crc="691cb9d6" sha1="de57c4cdddcd71042fa00c88f2e107fc6024b50e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="musium3_02.d88" size="348848" crc="cf4179af" sha1="79121bbec7e30408a9cb1f19f33ab260479d4636" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -57174,6 +57214,17 @@ ExtractDisk  [14]"EXPRESS 14      " -> "hot file_14.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 4092 -->
 				<rom name="hot file express no.16.d88" size="348848" crc="772cbd4f" sha1="b3c08020b64969f546f3dc0e3c94613950a634ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotfil34">
+		<description>Hot File Disk No.5</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hot file disk no.5.d88" size="348848" crc="22fd2899" sha1="d74676a8a213dad12943c450ac279a5a9e8f24db" offset="0" />
 			</dataarea>
 		</part>
 	</software>

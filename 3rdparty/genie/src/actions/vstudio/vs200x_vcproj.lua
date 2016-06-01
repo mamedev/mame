@@ -313,7 +313,13 @@
 			_p(4,'UsePrecompiledHeader="%s"', iif(cfg.flags.NoPCH, 0, 2))
 		end
 
-		_p(4,'WarningLevel="%s"', iif(cfg.flags.ExtraWarnings, 4, 3))
+		if cfg.flags.ExtraWarnings then
+			_p(4,'WarningLevel="%s"', 4)
+		elseif cfg.flags.MinimumWarnings then
+			_p(4,'WarningLevel="%s"', 1)
+		else
+			_p(4,'WarningLevel="%s"', 3)
+		end
 
 		if cfg.flags.FatalWarnings then
 			_p(4,'WarnAsError="%s"', bool(true))

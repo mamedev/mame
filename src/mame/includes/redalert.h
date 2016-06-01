@@ -9,6 +9,7 @@
 
 ****************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "sound/hc55516.h"
 
 class redalert_state : public driver_device
@@ -23,7 +24,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_cvsd(*this, "cvsd"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2") { }
 
 	UINT8 m_ay8910_latch_1;
 	UINT8 m_ay8910_latch_2;
@@ -37,6 +40,8 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<hc55516_device> m_cvsd;
 	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch2;
 
 	std::unique_ptr<UINT8[]> m_bitmap_colorram;
 	UINT8 m_control_xor;

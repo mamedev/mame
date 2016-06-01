@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __DRCBEX64_H__
-#define __DRCBEX64_H__
+#ifndef MAME_DEVICES_CPU_DRCBEX64_H
+#define MAME_DEVICES_CPU_DRCBEX64_H
 
 #include "drcuml.h"
 #include "drcbeut.h"
@@ -21,6 +21,7 @@
 #include "x86emit.h"
 
 
+namespace drc {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -179,6 +180,7 @@ private:
 	void op_or(x86code *&dst, const uml::instruction &inst);
 	void op_xor(x86code *&dst, const uml::instruction &inst);
 	void op_lzcnt(x86code *&dst, const uml::instruction &inst);
+	void op_tzcnt(x86code *&dst, const uml::instruction &inst);
 	void op_bswap(x86code *&dst, const uml::instruction &inst);
 	void op_shl(x86code *&dst, const uml::instruction &inst);
 	void op_shr(x86code *&dst, const uml::instruction &inst);
@@ -343,5 +345,9 @@ private:
 	static opcode_generate_func s_opcode_table[uml::OP_MAX];
 };
 
+} // namespace drc
 
-#endif /* __DRCBEC_H__ */
+using drc::drcbe_x64;
+
+
+#endif /* MAME_DEVICES_CPU_DRCBEX64_H */

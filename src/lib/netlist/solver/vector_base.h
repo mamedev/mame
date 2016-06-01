@@ -14,17 +14,17 @@
 #include "plib/pconfig.h"
 
 #if 0
-template <unsigned _storage_N>
+template <unsigned storage_N>
 struct pvector
 {
 	pvector(unsigned size)
 	: m_N(size) { }
 
 	unsigned size() {
-		if (_storage_N)
+		if (storage_N)
 	}
 
-	double m_V[_storage_N];
+	double m_V[storage_N];
 private:
 	unsigned m_N;
 };

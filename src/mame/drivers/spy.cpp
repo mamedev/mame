@@ -22,6 +22,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
 #include "includes/konamipt.h"
@@ -376,7 +377,7 @@ static ADDRESS_MAP_START( spy_map, AS_PROGRAM, 8, spy_state )
 	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x3f90, 0x3f90) AM_WRITE(spy_3f90_w)
 	AM_RANGE(0x3fa0, 0x3fa0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x3fb0, 0x3fb0) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x3fb0, 0x3fb0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x3fc0, 0x3fc0) AM_WRITE(spy_sh_irqtrigger_w)
 	AM_RANGE(0x3fd0, 0x3fd0) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3fd1, 0x3fd1) AM_READ_PORT("P1")
@@ -395,7 +396,7 @@ static ADDRESS_MAP_START( spy_sound_map, AS_PROGRAM, 8, spy_state )
 	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -524,6 +525,8 @@ static MACHINE_CONFIG_START( spy, spy_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))

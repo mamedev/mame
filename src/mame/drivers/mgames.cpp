@@ -2,8 +2,9 @@
 // copyright-holders:Angelo Salese, Roberto Fresca, David Haywood
 /*********************************************************************************
 
-  Merit Industries Match Games (1981)
-  -----------------------------------
+  Match Games.
+  CRT 100 + CRT 810 boards system.
+  Merit Industries, 1981.
 
   Driver by Angelo Salese, David Haywood & Roberto Fresca.
 
@@ -80,7 +81,7 @@
   ---------------
 
   1x OSC = 18.000 MHz.
-  1x CPU = Zilog Z80 (Z0840006PSC / 9512 / 2K).
+  1x CPU = Zilog Z80 (Z0840006PSC).
   4x 74LS253N (multiplexers).
   4x MM2114N-3 (4096-Bit Static RAM).
   2x SCM5101E (256x4 Static RAM).
@@ -88,7 +89,7 @@
   The PCB has a socket for two standard AA batteries
 
 
-  MAIN BOARD:
+  MAIN BOARD CRT 100:
   .------------------------. .-------------------. .---------------------------.
   |                        | ||||||||||||||||||||| |           .------------.  |
   |                        '-'        J2         '-'          -|4.7 Ohm 10% |- |
@@ -139,7 +140,6 @@
   |    '-----'  '-----'        '-----'                                 '-----' |
   '----------------------------------------------------------------------------'
 
-
   U13 = MLTI 0    U68 = CGM 0
   U14 = MLTI 1    U67 = CGM 1
   U15 = MLTI 2    U66 = CGM 2
@@ -151,48 +151,32 @@
   J1 = Jumpers bank? (see multiplexed port)
 
 
-  VIDEO I/O BOARD CRT810:
+  VIDEO I/O BOARD CRT 810:
                           .-------------------.
-                          |||||||||||||||||||||
-  .-----------------------'                   '----------------------.
+  .-----------------------|||||||||||||||||||||----------------------.
   |                                                                  |
   |                                                          LM380N  |
+  |                                       DISCRETE                   |
+  |                                       CIRCUITRY          MC1455P |
   |                                                                  |
-  |                                                          MC1455P |
   |                                                                  |
+  |                                                           ML7805 |
+  | SW 7407-N    SW 7407-N    SW 7407-N    SW 7407-N           +5V.  |
   |                                                                  |
-  | SW 7407-N    SW 7407-N    SW 7407-N    SW 7407-N                 |
-  | 21430 7301   21430 7301   21430 7301   21430 7301                |
+  | 74LS259N     74LS259N     74LS259N                        MC7812 |
+  |                                                            +12V. |
   |                                                                  |
-  | 74LS259N     74LS259N     74LS259N     74LS259N                  |
-  |                                                                  |
-  '----------------.                                .----------------'
-                   ||||||||||||||||||||||||||||||||||
+  '----------------||||||||||||||||||||||||||||||||||----------------'
                    '--------------------------------'
-                           To J4 on Main Board
+                          To J4 on Main Board
 
   LM380N = 2.5W Audio Power Amplifier.
   MC1455P = Direct Replacement for NE555 Timers.
 
-  (Audio seems to be discrete).
+  (Audio IS discrete).
 
   4x 7407N (Buffer Gates Non-Inverting).
   4x 74LS259N (8-Bit Addressable Latches).
-
-  4x 7301 (HDSP?)(RED Seven Segment Displays).
-
-  +---------+  Pin | Description
-  |    A    |  ----+------------
-  |   ---   |   01 | Anode (4).
-  | F|   |B |   02 | Cathode F.
-  |   -G-   |   03 | Cathode G.
-  | E|   |C |   04 | Cathode E.
-  |   ---   |   05 | Cathode D.
-  |    D .DP|   06 | Anode (4).
-  +---------+   07 | Cathode DP.
-                08 | Cathode C.
-                09 | Cathode B.
-                10 | Cathode A.
 
 
 **********************************************************************************
@@ -224,6 +208,7 @@
 
   - Color system (no bipolar PROMs in the system), needs a reference
 
+  - Discrete sound.
 
 **********************************************************************************/
 
@@ -231,7 +216,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-//#include "sound/dac.h"
 #include "machine/nvram.h"
 #include "mgames.lh"
 
@@ -278,13 +262,13 @@ UINT32 mgames_state::screen_update_mgames(screen_device &screen, bitmap_ind16 &b
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	count = 0;
-	for (y=0;y<32;y++)
+	for (y = 0; y < 32; y++)
 	{
-		for (x=0;x<32;x++)
+		for (x = 0; x < 32; x++)
 		{
 			UINT16 dat = m_video[count];
-			UINT16 col = m_video[count+0x400] & 0x7f;
-			gfx->opaque(bitmap,cliprect,dat,col,0,0,x*16,y*16);
+			UINT16 col = m_video[count + 0x400] & 0x7f;
+			gfx->opaque(bitmap, cliprect, dat, col, 0, 0, x * 16, y * 16);
 			count++;
 		}
 
@@ -301,7 +285,7 @@ PALETTE_INIT_MEMBER(mgames_state, mgames)
 		rgb_t color;
 
 		if (i & 0x01)
-			color = rgb_t(pal2bit((i & 0x6) >> 1),pal2bit((i & 0x18) >> 3),pal2bit((i & 0x60) >> 5));
+			color = rgb_t(pal2bit((i & 0x6) >> 1), pal2bit((i & 0x18) >> 3), pal2bit((i & 0x60) >> 5));
 		else
 			color = rgb_t::black;
 
@@ -532,10 +516,8 @@ WRITE8_MEMBER(mgames_state::outport7_w)
    05   | ---- | ---- | ---- | bit2
 
 
-WRITE8_MEMBER(mgames_state::sound_w)
-//{
-//  m_dac->write_unsigned8(data);
-//}
+  We're tracing the discrete circuitry...
+
 */
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mgames_state )
@@ -588,8 +570,8 @@ static INPUT_PORTS_START( mgames )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, "5 Coins/2 Credits" )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
-//  PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) ) --> damn check... you can't set 2 different bits pointing to the same coinage.
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) ) // Yes, again...
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_5C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
@@ -637,9 +619,9 @@ static const gfx_layout tiles16x16_layout =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16,10*16,11*16,12*16,13*16,14*16,15*16},
+		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16},
 	16*16
 };
 
@@ -652,7 +634,7 @@ static MACHINE_CONFIG_START( mgames, mgames_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mgames_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mgames_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -670,9 +652,8 @@ static MACHINE_CONFIG_START( mgames, mgames_state )
 	MCFG_PALETTE_INIT_OWNER(mgames_state, mgames)
 
 	/* sound hardware */
-//  MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_DAC_ADD("dac")
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+    //  to do...
+
 MACHINE_CONFIG_END
 
 
@@ -697,5 +678,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT   STATE          INIT   ROT    COMPANY  FULLNAME      FLAGS...                           LAYOUT  */
+/*     YEAR  NAME      PARENT  MACHINE   INPUT   STATE          INIT   ROT    COMPANY  FULLNAME      FLAGS...                                 LAYOUT  */
 GAMEL( 1981, mgames,   0,      mgames,   mgames, driver_device, 0,     ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, layout_mgames )

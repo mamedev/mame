@@ -130,9 +130,9 @@ void h8_timer8_channel_device::update_tcr()
 	}
 
 	if(V>=1) p += sprintf(p, ", irq=%c%c%c\n",
-					  tcr & TCR_CMIEB ? 'b' : '-',
-					  tcr & TCR_CMIEA ? 'a' : '-',
-					  tcr & TCR_OVIE  ? 'o' : '-');
+						tcr & TCR_CMIEB ? 'b' : '-',
+						tcr & TCR_CMIEA ? 'a' : '-',
+						tcr & TCR_OVIE  ? 'o' : '-');
 	logerror(buf);
 }
 

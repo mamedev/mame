@@ -76,7 +76,7 @@ void rtc_tcp_connection::user_on_tcp_connection_read()
 			// the latest parsed frame filled it, then empty the full buffer.
 			if ((m_frame_start + 2 + packet_len) == m_buffer_size)
 			{
-				osd_printf_error("no more space in the buffer, emptying the buffer data");
+				osd_printf_error("no more space in the buffer, emptying the buffer data\n");
 
 				m_frame_start = 0;
 				m_buffer_data_len = 0;
@@ -92,7 +92,7 @@ void rtc_tcp_connection::user_on_tcp_connection_read()
 			// parse again. Otherwise break here and wait for more data.
 			if (m_buffer_data_len > m_frame_start)
 			{
-				// osd_printf_error("there is more data after the parsed frame, continue parsing");
+				// osd_printf_error("there is more data after the parsed frame, continue parsing\n");
 
 				continue;
 			}
@@ -110,7 +110,7 @@ void rtc_tcp_connection::user_on_tcp_connection_read()
 				// the buffer, so move the frame to the position 0.
 				if (m_frame_start != 0)
 				{
-					// osd_printf_error("no more space in the buffer, moving parsed bytes to the beginning of the buffer and wait for more data");
+					// osd_printf_error("no more space in the buffer, moving parsed bytes to the beginning of the buffer and wait for more data\n");
 
 					std::memmove(m_buffer, m_buffer + m_frame_start, m_buffer_size - m_frame_start);
 					m_buffer_data_len = m_buffer_size - m_frame_start;
@@ -120,7 +120,7 @@ void rtc_tcp_connection::user_on_tcp_connection_read()
 				// The frame is too big, so close the connection.
 				else
 				{
-					osd_printf_error("no more space in the buffer for the unfinished frame being parsed, closing the connection");
+					osd_printf_error("no more space in the buffer for the unfinished frame being parsed, closing the connection\n");
 
 					// Close the socket.
 					close();
@@ -129,7 +129,7 @@ void rtc_tcp_connection::user_on_tcp_connection_read()
 			// The buffer is not full.
 			else
 			{
-				osd_printf_verbose("frame not finished yet, waiting for more data");
+				osd_printf_verbose("frame not finished yet, waiting for more data\n");
 			}
 
 			// Exit the parsing loop.

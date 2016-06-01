@@ -1,16 +1,20 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Thanks to DCMOTO (http://dcmoto.free.fr) for info!
+
+The BASIC 128 cartridge is useful only on a TO7/70!
+-->
 <softwarelist name="to770_cart" description="Thomson TO7/70 cartridges">
 
-
 	<software name="basic128">
-		<description>BASIC 128 v1.0</description>
-		<year>1985</year>
-		<publisher>Microsoft</publisher>
+		<description>BASIC 128 (v1.0)</description>
+		<year>1984</year>
+		<publisher>Thomson</publisher>
 
-		<part name="cart" interface="to770_cart">
+		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="basic 128 v1.0 (1985)(to tek)(fr)(en).m7" size="32768" crc="c9bc204f" sha1="e4c2a684e9186f49c8092d16f0f74764f51ad86c" offset="0x0000" />
+				<rom name="basic128.bin" size="32768" crc="c9bc204f" sha1="e4c2a684e9186f49c8092d16f0f74764f51ad86c" offset="0" />
 			</dataarea>
 		</part>
 	</software>

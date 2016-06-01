@@ -1185,34 +1185,12 @@ void atarigen_state::device_post_load()
 }
 
 
-DIRECT_UPDATE_MEMBER(atarigen_state::slapstic_setdirect)
-{
-	// if we jump to an address in the slapstic region, tweak the slapstic
-	// at that address and return ~0; this will cause us to be called on
-	// subsequent fetches as well
-	address &= ~m_slapstic_mirror;
-	if (address >= m_slapstic_base && address < m_slapstic_base + 0x8000)
-	{
-		offs_t pc = direct.space().device().safe_pcbase();
-		if (pc != m_slapstic_last_pc || address != m_slapstic_last_address)
-		{
-			m_slapstic_last_pc = pc;
-			m_slapstic_last_address = address;
-			slapstic_r(direct.space(), (address >> 1) & 0x3fff, 0xffff);
-		}
-		return ~0;
-	}
-	return address;
-}
-
-
-
 //-------------------------------------------------
 //  slapstic_configure: Installs memory handlers for the
 //  slapstic and sets the chip number.
 //-------------------------------------------------
 
-void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror)
+void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, UINT8 *mem)
 {
 	if (!m_slapstic_device.found())
 		fatalerror("Slapstic device is missing\n");
@@ -1223,8 +1201,8 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 
 	// install the memory handlers
 	address_space &program = device.space(AS_PROGRAM);
-	m_slapstic = program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
-	program.set_direct_update_handler(direct_update_delegate(FUNC(atarigen_state::slapstic_setdirect), this));
+	program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
+	m_slapstic = (UINT16 *)mem;
 
 	// allocate memory for a copy of bank 0
 	m_slapstic_bank0.resize(0x2000);

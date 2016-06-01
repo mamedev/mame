@@ -10,10 +10,8 @@ driver by Carlos A. Lozano Baides
 
 TODO:
 West Story:
-- sound (program rom is close to the original)
-- some bad sprites (2 bad sprite roms, should the actual decoded data match?, can they be reconstructed from the original?)
-- tilemap scroll
-- runs too fast? (vblank flag somewhere?)
+- sound (still has IRQ problems)
+- some bad sprites (2 bad sprite roms, should the actual decoded data match?)
 
 
 Blood Bros  (c) 1990 Nihon System [Seibu hardware]
@@ -24,6 +22,12 @@ The manual states:
  the screen
 
 This works for all sets and the bootleg.
+
+Fabtek licensed this game for the U.S. along with other games by Seibu and TAD.
+Though no Fabtek-licensed set has been dumped yet, and the program code does
+not appear to test a region byte, the TAD strings displayed on the title screen
+are both space-justified to the same length as the unused string "U.S. LICENSEE
+FABTEK, INC."
 
 Sky Smasher  (c) 1990 Nihon System [Seibu hardware]
 -----------
@@ -38,6 +42,12 @@ Game does not appear to have cocktail mode. The screen hardware
 is undoubtedly capable of flipscreen and layer priority flipping
 however.(which is why we have MACHINE_NO_COCKTAIL despite the games
 being upright)
+
+If the word at 0x488 in the maincpu ROM is set to any value other than 1, the
+attract mode will include the "Winners Don't Use Drugs" screen. The only other
+change this effects is reducing the first "NIHON SYSTEM INC." on the title
+screen to the initials NSI. The string "US LICENSEE FABTEC INC" appears twice
+in the program ROM, but no code that might display it is known to exist.
 
 Dumpers Notes
 =============
@@ -121,7 +131,6 @@ DIP locations verified for Blood Bros. & Sky Smasher via manual & DIP-SW setting
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "audio/seibu.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "includes/bloodbro.h"
@@ -161,22 +170,34 @@ static ADDRESS_MAP_START( skysmash_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
+WRITE8_MEMBER(bloodbro_state::weststry_soundlatch_w)
+{
+	m_seibu_sound->main_word_w(space, offset, data, mem_mask);
+
+	// Probably incorrect, but these interrupts must be triggered somehow
+	if (offset == 1)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	else
+		m_audiocpu->set_input_line(0, ASSERT_LINE);
+}
+
 static ADDRESS_MAP_START( weststry_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08afff) AM_RAM
-	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x08c400, 0x08cfff) AM_RAM
-	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x08d400, 0x08d7ff) AM_RAM
-	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0x08e000, 0x08ffff) AM_RAM
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM // old VRAM areas still used, but bootleg code copies them to higher addresses
 	AM_RANGE(0x0c1000, 0x0c1001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c1002, 0x0c1003) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c1004, 0x0c1005) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c1000, 0x0c17ff) AM_RAM
+	AM_RANGE(0x0c1000, 0x0c1003) AM_WRITE8(weststry_soundlatch_w, 0xff00)
+	AM_RANGE(0x0c1004, 0x0c100b) AM_WRITE(weststry_layer_scroll_w)
+	AM_RANGE(0x0e0002, 0x0e0003) AM_READNOP // remnant of old code
+	AM_RANGE(0x122800, 0x122bff) AM_RAM // cleared at startup
+	AM_RANGE(0x122c00, 0x122fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x123000, 0x1233ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0x123400, 0x1237ff) AM_RAM // cleared at startup
+	AM_RANGE(0x123800, 0x123fff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
+	AM_RANGE(0x124000, 0x124005) AM_RAM
+	AM_RANGE(0x124006, 0x1247fd) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x128000, 0x1287ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x120000, 0x128fff) AM_RAM
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -295,8 +316,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( weststry )
 	PORT_INCLUDE( bloodbro_base )
 
-	PORT_START("COIN")  /* referenced by seibu sound board */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
 INPUT_PORTS_END
 
 
@@ -451,6 +471,11 @@ WRITE16_MEMBER( bloodbro_state::layer_scroll_w )
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
+WRITE16_MEMBER( bloodbro_state::weststry_layer_scroll_w )
+{
+	COMBINE_DATA(&m_scrollram[offset]);
+}
+
 /* Machine Drivers */
 
 static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
@@ -495,8 +520,14 @@ static MACHINE_CONFIG_DERIVED( weststry, bloodbro )
 	MCFG_PALETTE_ENTRIES(1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
+	// Bootleg video hardware is non-Seibu 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_weststry)
+	MCFG_DEVICE_REMOVE("crtc")
+
+	// Bootleg sound hardware is close copy of Seibu, but uses different interrupts
+	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( skysmash, bloodbro )
@@ -591,13 +622,13 @@ ROM_END
 
 
 ROM_START( weststry )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code; based on bloodbrob */
 	ROM_LOAD16_BYTE( "ws13.bin",  0x00001, 0x20000, CRC(158e302a) SHA1(52cc1bf526424ff025a6b79f3fc7bba4b9bbfcbb) )
 	ROM_LOAD16_BYTE( "ws15.bin",  0x00000, 0x20000, CRC(672e9027) SHA1(71cb9fcef04edb972ba88de45d605dcff539ea2d) )
 	ROM_LOAD16_BYTE( "bb_04.bin", 0x40001, 0x20000, CRC(fd951c2c) SHA1(f4031bf303c67c82f2f78f7456f78382d8c1ac85) )
 	ROM_LOAD16_BYTE( "bb_03.bin", 0x40000, 0x20000, CRC(18d3c460) SHA1(93b86af1199f0fedeaf1fe64d27ffede4b819e42) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for sound cpu code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for sound cpu code; based on different revision of original Seibu code */
 	ROM_LOAD( "ws17.bin",    0x000000, 0x08000, CRC(e00a8f09) SHA1(e7247ce0ab99d0726f31dee5de5ba33f4ebd183e) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
@@ -663,10 +694,19 @@ ROM_START( skysmash )
 ROM_END
 
 
+DRIVER_INIT_MEMBER(bloodbro_state,weststry)
+{
+	// Patch out jp nz,$3000; no code known to exist at that address
+	memory_region *z80_rom = memregion("audiocpu");
+	z80_rom->u8(0x160e) = 0x00;
+	z80_rom->u8(0x1610) = 0x00;
+}
+
+
 /* Game Drivers */
 
 GAME( 1990, bloodbro, 0,        bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bloodbroa,bloodbro, bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bloodbrob,bloodbro, bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, weststry, bloodbro, weststry, weststry, driver_device, 0, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros.)", MACHINE_NO_COCKTAIL | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, weststry, bloodbro, weststry, weststry, bloodbro_state, weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros.)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, skysmash, 0,        skysmash, skysmash, driver_device, 0, ROT270, "Nihon System",    "Sky Smasher", MACHINE_SUPPORTS_SAVE )

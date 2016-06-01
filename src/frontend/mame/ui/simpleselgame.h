@@ -10,17 +10,19 @@
 
 #pragma once
 
-#ifndef __UI_SIMPLESELGAME_H__
-#define __UI_SIMPLESELGAME_H__
+#ifndef MAME_FRONTEND_UI_SIMPLESELGAME_H
+#define MAME_FRONTEND_UI_SIMPLESELGAME_H
 
 #include "menu.h"
 
 class driver_enumerator;
 
-class ui_simple_menu_select_game : public ui_menu {
+namespace ui {
+
+class simple_menu_select_game : public menu {
 public:
-	ui_simple_menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename);
-	virtual ~ui_simple_menu_select_game();
+	simple_menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename);
+	virtual ~simple_menu_select_game();
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -41,9 +43,11 @@ private:
 
 	// internal methods
 	void build_driver_list();
-	void inkey_select(const ui_menu_event *menu_event);
-	void inkey_cancel(const ui_menu_event *menu_event);
-	void inkey_special(const ui_menu_event *menu_event);
+	void inkey_select(const event *menu_event);
+	void inkey_cancel(const event *menu_event);
+	void inkey_special(const event *menu_event);
 };
 
-#endif  /* __UI_SELGAME_H__ */
+} // namespace ui
+
+#endif  /* MAME_FRONTEND_UI_SIMPLESELGAME_H */
