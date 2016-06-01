@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
+#include "machine/gen_latch.h"
 #include "sound/k054539.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k053251.h"
@@ -22,6 +24,8 @@ public:
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
 		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_z80bank(*this, "z80bank") { }
 
 	/* video-related */
@@ -49,6 +53,8 @@ public:
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
 	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
 	required_memory_bank m_z80bank;
 	DECLARE_WRITE16_MEMBER(eeprom_w);

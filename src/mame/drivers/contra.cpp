@@ -21,6 +21,7 @@ Dip locations and factory settings verified with manual
 #include "emu.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "sound/2151intf.h"
 #include "includes/konamipt.h"
 #include "includes/contra.h"
@@ -52,12 +53,6 @@ WRITE8_MEMBER(contra_state::contra_coin_counter_w)
 		machine().bookkeeping().coin_counter_w(1, (data & 0x02) >> 1);
 }
 
-WRITE8_MEMBER(contra_state::cpu_sound_command_w)
-{
-	soundlatch_byte_w(space, offset, data);
-}
-
-
 
 static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8, contra_state )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(contra_K007121_ctrl_0_w)
@@ -71,7 +66,7 @@ static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8, contra_state )
 
 	AM_RANGE(0x0018, 0x0018) AM_WRITE(contra_coin_counter_w)
 	AM_RANGE(0x001a, 0x001a) AM_WRITE(contra_sh_irqtrigger_w)
-	AM_RANGE(0x001c, 0x001c) AM_WRITE(cpu_sound_command_w)
+	AM_RANGE(0x001c, 0x001c) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x001e, 0x001e) AM_WRITENOP    /* ? */
 	AM_RANGE(0x0060, 0x0067) AM_WRITE(contra_K007121_ctrl_1_w)
 
@@ -97,7 +92,7 @@ static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8, contra_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, contra_state )
-	AM_RANGE(0x0000, 0x0000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x0000, 0x0000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x4000, 0x4000) AM_WRITENOP /* read triggers irq reset and latch read (in the hardware only). */
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
@@ -235,6 +230,8 @@ static MACHINE_CONFIG_START( contra, contra_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)

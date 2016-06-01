@@ -6,6 +6,7 @@
 
 *************************************************************************/
 #include "machine/bankdev.h"
+#include "machine/gen_latch.h"
 #include "sound/k007232.h"
 #include "video/k051960.h"
 #include "video/k051316.h"
@@ -26,6 +27,7 @@ public:
 		m_k051316_1(*this, "k051316_1"),
 		m_k051316_2(*this, "k051316_2"),
 		m_palette(*this, "palette"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_rombank(*this, "rombank") { }
 
 	/* misc */
@@ -45,6 +47,7 @@ public:
 	required_device<k051316_device> m_k051316_1;
 	required_device<k051316_device> m_k051316_2;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
 	/* memory pointers */
 	required_memory_bank m_rombank;

@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
+
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/k007232.h"
 #include "video/k052109.h"
@@ -21,7 +23,8 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
 		m_k051316(*this, "k051316"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* video-related */
 	UINT8      m_priority;
@@ -40,6 +43,8 @@ public:
 	required_device<k051960_device> m_k051960;
 	required_device<k051316_device> m_k051316;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 	DECLARE_READ8_MEMBER(ajax_ls138_f10_r);
 	DECLARE_WRITE8_MEMBER(ajax_ls138_f10_w);

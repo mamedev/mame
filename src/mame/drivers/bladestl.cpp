@@ -85,7 +85,7 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 
 WRITE8_MEMBER(bladestl_state::bladestl_sh_irqtrigger_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bladestl_state )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(bladestl_speech_ctrl_w)   /* UPD7759 */
 	AM_RANGE(0x4000, 0x4000) AM_READ(bladestl_speech_busy_r)    /* UPD7759 */
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP                                /* ??? */
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)                     /* soundlatch_byte_r */
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -341,6 +341,8 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 	/* the initialization order is important, the port callbacks being
 	   called at initialization time */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

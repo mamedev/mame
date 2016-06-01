@@ -55,6 +55,7 @@ This bug is due to 380_r02.6h, it differs from 380_q02.6h by 2 bytes, at
 #include "cpu/z80/z80.h"
 #include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/discrete.h"
@@ -146,7 +147,7 @@ static ADDRESS_MAP_START( circusc_map, AS_PROGRAM, 8, circusc_state )
 	AM_RANGE(0x0003, 0x0004) AM_MIRROR(0x03f8) AM_WRITE(circusc_coin_counter_w)     /* COIN1, COIN2 */
 	AM_RANGE(0x0005, 0x0005) AM_MIRROR(0x03f8) AM_WRITEONLY AM_SHARE("spritebank") /* OBJ CHENG */
 	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0x03ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* WDOG */
-	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x03ff) AM_WRITE(soundlatch_byte_w)              /* SOUND DATA */
+	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x03ff) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)              /* SOUND DATA */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_WRITE(circusc_sh_irqtrigger_w)    /* SOUND-ON causes interrupt on audio CPU */
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x03fc) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x03fc) AM_READ_PORT("P1")
@@ -167,7 +168,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, circusc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)       /* CS0 */
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)       /* CS0 */
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(circusc_sh_timer_r)  /* CS1 */
 	AM_RANGE(0xa000, 0xa07f) AM_MIRROR(0x1f80) AM_WRITE(circusc_sound_w)    /* CS2 - CS6 */
 ADDRESS_MAP_END
@@ -362,6 +363,8 @@ static MACHINE_CONFIG_START( circusc, circusc_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn1", SN76496, XTAL_14_31818MHz/8)
 	MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 0)

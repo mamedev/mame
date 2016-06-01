@@ -21,6 +21,7 @@
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
@@ -72,7 +73,7 @@ private:
 //**************************************************************************
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockhl_state )
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x1f84, 0x1f84) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x1f8c, 0x1f8c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW3")
@@ -95,7 +96,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, blockhl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xe00c, 0xe00d) AM_WRITENOP // leftover from missing 007232?
 ADDRESS_MAP_END
@@ -309,6 +310,8 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)

@@ -41,6 +41,7 @@ Stephh's notes (based on the games M6809 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "includes/konamipt.h"
@@ -103,7 +104,7 @@ static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x2100, 0x2100) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(mikie_palettebank_w)
 	AM_RANGE(0x2300, 0x2300) AM_WRITENOP    // ???
-	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x2401, 0x2401) AM_READ_PORT("P1")
 	AM_RANGE(0x2402, 0x2402) AM_READ_PORT("P2")
 	AM_RANGE(0x2403, 0x2403) AM_READ_PORT("DSW3")
@@ -123,7 +124,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP    // sound command latch
 	AM_RANGE(0x8001, 0x8001) AM_WRITENOP    // ???
 	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE("sn1", sn76489a_device, write) // trigger read of latch
-	AM_RANGE(0x8003, 0x8003) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8003, 0x8003) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE("sn2", sn76489a_device, write) // trigger read of latch
 	AM_RANGE(0x8005, 0x8005) AM_READ(mikie_sh_timer_r)
 	AM_RANGE(0x8079, 0x8079) AM_WRITENOP    // ???
@@ -277,6 +278,8 @@ static MACHINE_CONFIG_START( mikie, mikie_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn1", SN76489A, XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

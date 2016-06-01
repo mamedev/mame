@@ -75,6 +75,7 @@ Is there another alt program rom set labeled 9 & 10?
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
@@ -92,13 +93,17 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_pandora(*this, "pandora"),
-		m_view2_0(*this, "view2_0")
+		m_view2_0(*this, "view2_0"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<kaneko_pandora_device> m_pandora;
-	optional_device<kaneko_view2_tilemap_device> m_view2_0;
+	required_device<kaneko_view2_tilemap_device> m_view2_0;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
 	UINT8 m_sprite_irq;
 	UINT8 m_unknown_irq;
@@ -251,7 +256,7 @@ WRITE16_MEMBER(sandscrp_state::latchstatus_word_w)
 READ16_MEMBER(sandscrp_state::soundlatch_word_r)
 {
 	m_latch2_full = 0;
-	return soundlatch2_byte_r(space,0);
+	return m_soundlatch2->read(space,0);
 }
 
 WRITE16_MEMBER(sandscrp_state::soundlatch_word_w)
@@ -259,7 +264,7 @@ WRITE16_MEMBER(sandscrp_state::soundlatch_word_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_latch1_full = 1;
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		space.device().execute().spin_until_time(attotime::from_usec(100)); // Allow the other cpu to reply
 	}
@@ -306,13 +311,13 @@ READ8_MEMBER(sandscrp_state::latchstatus_r)
 READ8_MEMBER(sandscrp_state::soundlatch_r)
 {
 	m_latch1_full = 0;
-	return soundlatch_byte_r(space,0);
+	return m_soundlatch->read(space,0);
 }
 
 WRITE8_MEMBER(sandscrp_state::soundlatch_w)
 {
 	m_latch2_full = 1;
-	soundlatch2_byte_w(space,0,data);
+	m_soundlatch2->write(space,0,data);
 }
 
 static ADDRESS_MAP_START( sandscrp_soundmem, AS_PROGRAM, 8, sandscrp_state )
@@ -504,6 +509,9 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
