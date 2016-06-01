@@ -524,7 +524,7 @@ UINT32 sun2_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		scanline = &bitmap.pix32(y);
 		for (x = 0; x < 1152/8; x++)
 		{
-			pixels = m_vram[(y * (1152/8)) +  x ^ 1];
+			pixels = m_vram[(y * (1152/8)) +  (x ^ 1)];
 
 			*scanline++ = palette[(pixels>>7)&1];
 			*scanline++ = palette[(pixels>>6)&1];
