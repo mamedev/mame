@@ -499,10 +499,18 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
 
-	// if the view has changed its expression (disasm, memory), then update scroll bar
+	// if the view has changed its expression (disasm, memory), then update scroll bar and view cursor
 	if(exp_change)
-		ImGui::SetScrollY(view_ptr->view->visible_position().y * fsize.y);
-
+	{
+		if(view_ptr->view->cursor_supported())
+		{
+			view_ptr->view->set_cursor_visible(true);
+			view_ptr->view->set_cursor_position(debug_view_xy(0,view_ptr->view->visible_position().y));
+		}
+		if(view_ptr->type != DVT_MEMORY)  // no scroll bars in memory views
+			ImGui::SetScrollY(view_ptr->view->visible_position().y * fsize.y);
+	}
+	
 	// update view location, while the cursor is at 0,0.
 	view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
 	view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
@@ -512,7 +520,8 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 	drawlist = ImGui::GetWindowDrawList();
 
 	// temporarily set cursor to the last line, this will set the scroll bar range
-	ImGui::SetCursorPosY((totalsize.y) * fsize.y);
+	if(view_ptr->type != DVT_MEMORY)  // no scroll bars in memory views
+		ImGui::SetCursorPosY((totalsize.y) * fsize.y);
 
 	// set the visible area to be displayed
 	vsize.x = view_ptr->view_width / fsize.x;
@@ -520,10 +529,13 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 	view_ptr->view->set_visible_size(vsize);
 
 	// set the visible position
-	pos.x = 0;
-	pos.y = ImGui::GetScrollY() / fsize.y;
-	view_ptr->view->set_visible_position(pos);
-
+	if(view_ptr->type != DVT_MEMORY)  // since ImGui cannot handle huge memory views, we'll just let the view control the displayed area
+	{
+		pos.x = 0;
+		pos.y = ImGui::GetScrollY() / fsize.y;
+		view_ptr->view->set_visible_position(pos);
+	}
+	
 	viewdata = view_ptr->view->viewdata();
 
 	xy1.x = view_ptr->ofs_x;
