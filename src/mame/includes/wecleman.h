@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+
+#include "machine/gen_latch.h"
 #include "sound/k007232.h"
 #include "video/k051316.h"
 
@@ -15,6 +17,7 @@ public:
 		m_txtram(*this, "txtram"),
 		m_spriteram(*this, "spriteram"),
 		m_roadram(*this, "roadram"),
+		m_generic_paletteram_16(*this, "paletteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
@@ -27,7 +30,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_soundlatch(*this, "soundlatch") { }
 
 	optional_shared_ptr<UINT16> m_videostatus;
 	optional_shared_ptr<UINT16> m_protection_ram;
@@ -36,6 +39,7 @@ public:
 	optional_shared_ptr<UINT16> m_txtram;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_roadram;
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
 	int m_multiply_reg[2];
 	int m_spr_color_offs;
@@ -129,5 +133,5 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	required_device<generic_latch_8_device> m_soundlatch;
 };

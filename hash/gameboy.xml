@@ -356,7 +356,6 @@
 		<info name="alt_title" value="悪魔城ドラキュラ 漆黒たる前奏曲"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="akumajou dracula - shikkokutaru zensoukyoku (japan).bin" size="262144" crc="4825b25f" sha1="baaa12be322adc005e51b43c73a352420d7cd034" offset="0" />
 			</dataarea>
@@ -755,7 +754,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-ajaj-0.u1" size="524288" crc="c2eec22f" sha1="a34b7c4acc4454d96f93a7b04069adbcc3bc75a0" offset="0" />
 			</dataarea>
@@ -780,7 +778,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-aajj-0.u1" size="524288" crc="8d573f37" sha1="214d75221dbfb1a562740aa53e0239a73bee9a2d" offset="0" />
 			</dataarea>
@@ -830,7 +827,6 @@
 		<info name="alt_title" value="アナザ・バイブル"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="another bible (japan).bin" size="524288" crc="4a486435" sha1="6a5d0da889247169135665dc91f153305e1c71b6" offset="0" />
 			</dataarea>
@@ -1008,7 +1004,6 @@
 		<info name="alt_title" value="アレサIII"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="aretha iii (japan).bin" size="262144" crc="430d3d6b" sha1="f57ff26d31283c88cc4c414b18ef6f182d07da9d" offset="0" />
 			</dataarea>
@@ -1176,7 +1171,7 @@
 			<feature name="pcb" value="DMG-GDAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A [DMG MBC2A]" />
-			<feature name="u3" value="U3 26A [025 26A]" />
+			<feature name="u3" value="U3 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="65536">
@@ -1239,7 +1234,6 @@
 		<info name="alt_title" value="馬券王TV'94"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="bakenou tv '94 (japan).bin" size="131072" crc="d1c3f371" sha1="c567bdd1ca17750c853019f244e208fe812772fd" offset="0" />
 			</dataarea>
@@ -1263,7 +1257,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-vvj-0.u1" size="131072" crc="4e2fffe5" sha1="b1bf86f4ffb9af9c5f1c592f0cabedb95b405437" offset="0" />
 			</dataarea>
@@ -1282,7 +1275,6 @@
 		<info name="alt_title" value="爆釣 リトリーブマスター"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="bakuchou retrieve master (japan).bin" size="524288" crc="8a546dec" sha1="bfea17b22b3ac91366156d8db1a7dc619c7b5a28" offset="0" />
 			</dataarea>
@@ -1307,7 +1299,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-asyj-0.u1" size="524288" crc="ab3477c4" sha1="53808f56fa68ad8094d0e4ff62e06887b439be9a" offset="0" />
 			</dataarea>
@@ -1665,7 +1656,6 @@
 		<info name="alt_title" value="バトルドッジボール"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="battle dodge ball (japan).bin" size="131072" crc="a99242c0" sha1="ed63709af2dd22d2abaa7e99b9dd5373b6cc91c4" offset="0" />
 			</dataarea>
@@ -2261,7 +2251,6 @@
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-aywj-1.u1" size="524288" crc="da218e44" sha1="a1637d7ba09335631eac1291803ade05adcf5fc7" offset="0" />
 			</dataarea>
@@ -2281,7 +2270,6 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="bokujou monogatari gb (japan).bin" size="524288" crc="d3e2fd02" sha1="60ecafdb13213b3ac2daa3d71431ef8a89754edb" offset="0" />
 			</dataarea>
@@ -3650,7 +3638,6 @@
 		<info name="alt_title" value="超魔神英雄伝ワタル まぜっこモンスター"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="chou mashin eiyuuden wataru - mazekko monster (japan) (beta).bin" size="524288" crc="e6c3a473" sha1="ac2360d790c855fde91fca26ee88a4814a1f2e9f" offset="0" />
 			</dataarea>
@@ -3675,7 +3662,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-awaj-0.u1" size="524288" crc="b3e8028d" sha1="66e8df39ac137fe2b92581f2d88adfa0b0c3ac14" offset="0" />
 			</dataarea>
@@ -3694,7 +3680,6 @@
 		<info name="alt_title" value="超魔神英雄伝ワタル まぜっこモンスター2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="chou mashin eiyuuden wataru - mazekko monster 2 (japan).bin" size="524288" crc="e5520693" sha1="54d2672d9720fa4322a7a45244aa898d321c1dd1" offset="0" />
 			</dataarea>
@@ -4179,7 +4164,6 @@
 		<info name="alt_title" value="第2次スーパーロボット大戦G"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dai-2-ji super robot taisen g (japan).bin" size="524288" crc="df8b2b20" sha1="0baa751363c05f9830656f98e77902d543822656" offset="0" />
 			</dataarea>
@@ -4558,7 +4542,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-a2dj-0.u1" size="524288" crc="05a3ab7a" sha1="ac4b1fe0e917298d81725d7a9bdf46c285502ac7" offset="0" />
 			</dataarea>
@@ -4607,7 +4590,6 @@
 		<info name="alt_title" value="ドンキーコング"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="donkey kong (world) (rev a).bin" size="524288" crc="f777a5d8" sha1="397ad2ff25627b83e02c71b54c72bb4deb39e0c0" offset="0" />
 			</dataarea>
@@ -4626,7 +4608,6 @@
 		<info name="alt_title" value="ドンキーコング"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="donkey kong (world).bin" size="524288" crc="edab3378" sha1="6ed661bd1d6d8cdd48e1c10f8ca4e8dcba49128e" offset="0" />
 			</dataarea>
@@ -4648,10 +4629,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />
-			<feature name="u4" value="U4 26A [646 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-addj-0.u1" size="524288" crc="9aeca05c" sha1="18fd3fcf90e60122da92079669942b0363049d8f" offset="0" />
 			</dataarea>
@@ -4671,10 +4651,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="u3" value="U3 RAM" />
-			<feature name="u4" value="U4 26A [521 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-yte-0.u1" size="524288" crc="49dc0d37" sha1="4e6d8f085ca197479d59912c1d58e4f3b40c28ac" offset="0" />
 			</dataarea>
@@ -4694,10 +4673,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B1]" />
 			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />
-			<feature name="u4" value="U4 26A [627 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-adde-0.u1" size="524288" crc="2827e5d4" sha1="89cc4f01653a6105ee5c00e10fc65aa1437fd320" offset="0" />
 			</dataarea>
@@ -4714,7 +4692,6 @@
 		<info name="serial" value="DMG-AD3E-USA, DMG-AD3P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="donkey kong land iii (usa, europe) (rev a).bin" size="524288" crc="a19acdb6" sha1="a6ce883727212e1afb45b48431a46cfbc6f7f6ef" offset="0" />
 			</dataarea>
@@ -4734,10 +4711,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
 			<feature name="u3" value="U3 RAM [LH5164AN-10L]" /> <!-- Sharp RAM -->
-			<feature name="u4" value="U4 26A [6129A 7408]" />
+			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-ad3p-0.u1" size="524288" crc="b40c159c" sha1="a33f10194b5b228863c04abd0e65c7cc5d73fc3e" offset="0" />
 			</dataarea>
@@ -4753,7 +4729,6 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="donkeykongland.bin" size="524288" crc="872bbd5e" sha1="9d17bc07bd3c48f8bb8a3315faf817d055417f53" offset="0" />
 			</dataarea>
@@ -5217,7 +5192,6 @@
 		<info name="alt_title" value="ドラゴンボールZ 悟空激闘伝"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dragon ball z - gokuu gekitouden (japan).bin" size="524288" crc="ff3c027d" sha1="1f7a08d2e51e90d770d9dbf4092166b2bfa5697e" offset="0" />
 			</dataarea>
@@ -5503,7 +5477,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-dgj-0.u1" size="131072" crc="11be4b45" sha1="e354b0e78992f66bd598399998790231ff81b86f" offset="0" />
 			</dataarea>
@@ -5521,7 +5494,6 @@
 		<info name="alt_title" value="DX馬券王Z"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="dx bakenou z (japan) (rev a).bin" size="131072" crc="fadfd0f6" sha1="6e2b9b21ea7d8d482be1f17722a579f720f2029d" offset="0" />
 			</dataarea>
@@ -5539,7 +5511,6 @@
 		<info name="alt_title" value="DX馬券王Z"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="dx bakenou z (japan).bin" size="131072" crc="3ef2e823" sha1="346ed92c1f56221d1feda2a008ead2e3940bcbcb" offset="0" />
 			</dataarea>
@@ -5672,7 +5643,7 @@
 			<feature name="pcb" value="DMG-GDAN-10" />  <!-- EUR cart, also on DMG-GDAN-02 pcb -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A [DMG MBC2-A]" />
-			<feature name="u3" value="U3 26A [6129A 8R42]" />
+			<feature name="u3" value="U3 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="131072">
@@ -5824,7 +5795,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-fvj-0.u1" size="131072" crc="0325e729" sha1="d858fcdfce099435fa632859a9f8e8c82823bbcb" offset="0" />
 			</dataarea>
@@ -5878,7 +5848,6 @@
 		<info name="alt_title" value="ファミスタ3"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="famista 3 (japan).bin" size="262144" crc="bdc4ccc3" sha1="ac4b03e11e2ba135d0427c8b1da7de57c006b4a6" offset="0" />
 			</dataarea>
@@ -6088,7 +6057,6 @@
 		<info name="serial" value="DMG-S2-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="final fantasy legend ii (usa).bin" size="262144" crc="58314182" sha1="6ab6890e8f688bcd87e97886a1748a4d9d341909" offset="0" />
 			</dataarea>
@@ -6104,7 +6072,6 @@
 		<info name="serial" value="DMG-OS-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="final fantasy legend iii (usa).bin" size="262144" crc="3e454710" sha1="3864afa48a97db826ffda1d31a7ff9c6c315d5c9" offset="0" />
 			</dataarea>
@@ -6122,7 +6089,7 @@
 			<feature name="pcb" value="DMG-GDAN-03" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A [DMG MBC2A]" />
-			<feature name="u3" value="U3 26A [155 26A]" />
+			<feature name="u3" value="U3 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="131072">
@@ -6228,7 +6195,6 @@
 		<info name="alt_title" value="フリートコマンダーVS."/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="fleet commander vs. (japan).bin" size="262144" crc="71bf3256" sha1="b858d597e5eea575c5baa953785c96459d9be593" offset="0" />
 			</dataarea>
@@ -6486,7 +6452,6 @@
 		<info name="alt_title" value="不思議のダンジョン 風来のシレンGB 月影村の怪物"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="fushigi no dungeon - fuurai no shiren gb - tsukikage mura no kaibutsu (japan).bin" size="524288" crc="2962afb4" sha1="920ef94c05ac741047a266cb1668c881eab2937c" offset="0" />
 			</dataarea>
@@ -6519,7 +6484,6 @@
 		<info name="serial" value="DMG-AGAP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="game &amp; watch gallery (europe).bin" size="262144" crc="96ecc1e0" sha1="31186cff6bb548ecd0c91c07f16dc98de9c19ea2" offset="0" />
 			</dataarea>
@@ -6536,7 +6500,6 @@
 		<info name="serial" value="DMG-AGAE-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="game &amp; watch gallery (usa) (rev a).bin" size="262144" crc="9e6cdc96" sha1="4e4da0ed89c2baaed64600f7eaca90aeeadc084e" offset="0" />
 			</dataarea>
@@ -6553,7 +6516,6 @@
 		<info name="serial" value="DMG-AGAE-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="game &amp; watch gallery (usa).bin" size="262144" crc="99b2fe79" sha1="f8c5ad6d6bf1a5a90dffebada1dbd69a93720c83" offset="0" />
 			</dataarea>
@@ -6603,7 +6565,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-agaj-0.u1" size="262144" crc="a93e125b" sha1="9d9465486610ab470203236c614692bc7b86c328" offset="0" />
 			</dataarea>
@@ -6626,7 +6587,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-agau-0.u1" size="262144" crc="6b09508f" sha1="f002564f9cd9edb704b9c64f889aea3e7836a712" offset="0" />
 			</dataarea>
@@ -6651,7 +6611,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-agij-0.u1" size="524288" crc="9359a183" sha1="021c47f89fa975e4dc5cc32c61bf87b120a25c09" offset="0" />
 			</dataarea>
@@ -6670,7 +6629,6 @@
 		<info name="alt_title" value="ゲームボーイウォーズ"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="game boy wars (japan).bin" size="262144" crc="f5d364db" sha1="9f725d3cbbeb5e27b7ee36304f077f78d9ad074e" offset="0" />
 			</dataarea>
@@ -6689,7 +6647,6 @@
 		<info name="alt_title" value="ゲームボーイウォーズ ターボ"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="game boy wars turbo (japan).bin" size="524288" crc="94563424" sha1="27121450bee04790e7a0d8a08086ad42302f17e9" offset="0" />
 			</dataarea>
@@ -6704,7 +6661,6 @@
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="game boy wars turbo - famitsu version (japan).bin" size="262144" crc="86d04bfb" sha1="a0106f20aaf857a7ba033537821e31c6ec074dd6" offset="0" />
 			</dataarea>
@@ -6726,10 +6682,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
 			<feature name="u3" value="U3 RAM [LH5268ANF-10PLL]" />
-			<feature name="u4" value="U4 26A [6129A 7574]" />
+			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-ataj-0.u1" size="524288" crc="efc0f266" sha1="5aea023fd373643e55c7276b79a2d042302c3329" offset="0" />
 			</dataarea>
@@ -6778,7 +6733,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-at3j-0.u1" size="524288" crc="19889c43" sha1="ade11f43f6957c75cde8575e7cba11de9e53e0ea" offset="0" />
 			</dataarea>
@@ -6825,7 +6779,6 @@
 		<info name="alt_title" value="がんばれゴエモン 黒船党の謎"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="ganbare goemon - kurofunetou no nazo (japan).bin" size="262144" crc="910afe24" sha1="bd336346982e33270128b74a7b356e9e6824e4a6" offset="0" />
 			</dataarea>
@@ -6992,7 +6945,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-ipj-0.u1" size="131072" crc="a2e210e9" sha1="7636799f5a57d22cf579bb687be5bb9fedddd0ca" offset="0" />
 			</dataarea>
@@ -7066,7 +7018,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-apzj-0.u1" size="524288" crc="48c1ee22" sha1="22d6bf37eb3a29aeb1f9969ec51537eca8036a4c" offset="0" />
 			</dataarea>
@@ -7084,7 +7035,6 @@
 		<info name="alt_title" value="ジェムジェム"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="65536">
 				<rom name="gem gem (japan).bin" size="65536" crc="a64a8710" sha1="90a29d7a56f64b596cda1c64c8998b63d12c321e" offset="0" />
 			</dataarea>
@@ -7213,7 +7163,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="65536">
 				<rom name="dmg-gij-0.u1" size="65536" crc="150bc291" sha1="de6109b643a97e7a96e55a6becfd7e61dfdc915e" offset="0" />
 			</dataarea>
@@ -7282,7 +7231,6 @@
 		<info name="alt_title" value="ゴー!ゴー! ヒッチハイク"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="go! go! hitchhike (japan).bin" size="524288" crc="845735de" sha1="6a35bc2967f25fda0626b7a00a2cacfec9c53278" offset="0" />
 			</dataarea>
@@ -7370,7 +7318,6 @@
 		<info name="alt_title" value="ゴッドメディスン ファンタジー世界の誕生"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="god medicine - fantasy sekai no tanjou (japan).bin" size="262144" crc="a1b29ab8" sha1="b365cd58d133c2b441bbf53c2e5ff9486bbf0bde" offset="0" />
 			</dataarea>
@@ -7389,7 +7336,6 @@
 		<info name="alt_title" value="ゴッドメディスン 復刻版"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="god medicine - hukkoku ban (japan).bin" size="524288" crc="847e0772" sha1="61d3579293bf07166402d11d891e14bfd6fef6b4" offset="0" />
 			</dataarea>
@@ -7470,10 +7416,9 @@
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
 			<feature name="u3" value="U3 64K-SRAM [W2465S-70LL]" /> <!-- Winbond RAM -->
-			<feature name="u4" value="U4 MM1134A [126 134A]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-bj3j-0.u1" size="1048576" crc="26772e04" sha1="a6ab7420a2d69d62338bc03dc4e0e46b0dc8429b" offset="0" />
 			</dataarea>
@@ -7491,7 +7436,6 @@
 		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 国語 算数 理科 社会 常識の書 スペシャルエディション"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="goukaku boy series - shikakui atama o marukusuru - joushiki no sho (japan).bin" size="1048576" crc="5d43a385" sha1="d367f2dab5eacb10e785a13a2550ca7cc3e54177" offset="0" />
 			</dataarea>
@@ -7515,7 +7459,6 @@
 			<feature name="u4" value="U4 MM1134A [6735]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-bk4j-0.u1" size="1048576" crc="62b00f69" sha1="1d3e5ad888b8339e35c46455d84017d8a0d69c6d" offset="0" />
 			</dataarea>
@@ -7539,7 +7482,6 @@
 			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-bc4j-0.u1" size="1048576" crc="71acbb67" sha1="e2ac91493248869aba6b7d26a36e5ff6bd6d6f5a" offset="0" />
 			</dataarea>
@@ -7563,7 +7505,6 @@
 			<feature name="u4" value="U4 MM1134A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-bd4j-0.u1" size="1048576" crc="3c907f2c" sha1="fa7a40acd835676fbcae9507a8aaaf1191f9b1cd" offset="0" />
 			</dataarea>
@@ -8004,10 +7945,9 @@
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
 			<feature name="u3" value="U3 64K-SRAM [LH5164AN-10L]" />    <!-- Sharp RAM -->
-			<feature name="u4" value="U4 MM1134A [6735 0875]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-bz4j-0.u1" size="1048576" crc="479e2c18" sha1="630a331a3c89823647fbda13235b6299d91a1b25" offset="0" />
 			</dataarea>
@@ -8153,7 +8093,6 @@
 		<info name="serial" value="DMG-B6-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="great greed (usa).bin" size="262144" crc="c4cbf6b1" sha1="9d7de25431f3e31f244925e317e3d0933f5efa2e" offset="0" />
 			</dataarea>
@@ -8193,7 +8132,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-arvj-0.u1" size="524288" crc="e97f2e9a" sha1="d6fc45fd02e3d7c885c0e0244dc3c8073fb64ff4" offset="0" />
 			</dataarea>
@@ -8250,7 +8188,6 @@
 		<info name="serial" value="DMG-AYWE-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="harvest moon gb (usa).bin" size="524288" crc="1eae0e10" sha1="5b85d2accd3877e80d73a7ad19d9f55c288f43cc" offset="0" />
 			</dataarea>
@@ -8561,7 +8498,6 @@
 		<info name="alt_title" value="本将棋"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="65536">
 				<rom name="hon shougi (japan).bin" size="65536" crc="6c407eed" sha1="3f49109296b4dc0006b4e8e68133992f5ca2b843" offset="0" />
 			</dataarea>
@@ -8595,7 +8531,6 @@
 		<info name="alt_title" value="本命ボーイ"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="honmei boy (japan).bin" size="262144" crc="0d255d59" sha1="2d6c460123886502e1590268ec5d8422c5375f7b" offset="0" />
 			</dataarea>
@@ -8711,7 +8646,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-akbj-0.u1" size="524288" crc="4bedf22c" sha1="8487fcc3f9005f6c6819c3d5810f54e78b510d47" offset="0" />
 			</dataarea>
@@ -9066,7 +9000,6 @@
 			<feature name="u4" value="U4 26A [6129]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="65536">
 				<rom name="dmg-zrx-0.u1" size="65536" crc="bfd65534" sha1="434d2acb7c2c23ae58222254f2e2ca2f4ceddc61" offset="0" />
 			</dataarea>
@@ -9086,10 +9019,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B]" />
 			<feature name="u3" value="U3 RAM [LH5168NFA-10L]" />    <!-- Sharp RAM -->
-			<feature name="u4" value="U4 26A [195 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="65536">
 				<rom name="dmg-zre-0.u1" size="65536" crc="ca436939" sha1="9f65e16785e82fbddc27d811f051f60f4812fcb4" offset="0" />
 			</dataarea>
@@ -9120,7 +9052,6 @@
 		<info name="alt_title" value="頭文字D 外伝"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="initial d gaiden (japan).bin" size="262144" crc="6cc56612" sha1="1b3c4c1c4dfca46a009eb2e5cd45b343d7ee6681" offset="0" />
 			</dataarea>
@@ -9155,7 +9086,6 @@
 		<info name="alt_title" value="一発逆転! DX馬券王"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="65536">
 				<rom name="ippatsu gyakuten! dx bakenou (japan).bin" size="65536" crc="8f3e7f95" sha1="991efd117dcb30ddf111bb4f6e46bdda1c811417" offset="0" />
 			</dataarea>
@@ -9247,15 +9177,20 @@
 		<description>Itsudemo! Nyan to Wonderful (Jpn)</description>
 		<year>1998</year>
 		<publisher>Banpresto</publisher>
-		<info name="serial" value="DMG-ACAJ-JPN"/>
+		<info name="serial" value="DMG-ANWJ-JPN"/>
 		<info name="release" value="19980626"/>
 		<info name="alt_title" value="つでも!にゃんとワンダフル"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-KECN-SP" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC3 [MBC3]" />
+			<feature name="u3" value="U3 RAM [BR62658F-10SL]" />
+			<feature name="u4" value="U4 [6129A]" />
+			<feature name="battery" value="BATT CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
-				<rom name="itsudemo! nyan to wonderful (japan).bin" size="262144" crc="1c4d3665" sha1="a48d6b68d82b98e775c00366da544402d7c7ac0e" offset="0" />
+				<rom name="dmg-anwj-0.u1" size="262144" crc="1c4d3665" sha1="a48d6b68d82b98e775c00366da544402d7c7ac0e" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -9289,7 +9224,6 @@
 		<info name="alt_title" value="Jリーグファイティングサッカー ザ・キング・オブ・エースストライカー"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="j.league fighting soccer - the king of ace strikers (japan).bin" size="131072" crc="17608642" sha1="fbe94c42a9bd7d5ebddb28382caf03ab2f9902d6" offset="0" />
 			</dataarea>
@@ -9308,7 +9242,6 @@
 		<info name="alt_title" value="Jリーグライブ95"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="j.league live '95 (japan).bin" size="262144" crc="f0321342" sha1="3b4922f8034877d1a5aca380f846a7cb6841f6ee" offset="0" />
 			</dataarea>
@@ -9332,7 +9265,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-w7j-0.u1" size="131072" crc="adb46f9c" sha1="b8630f06e8b9682e667b7b1f2139162e2f022561" offset="0" />
 			</dataarea>
@@ -9396,10 +9328,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [MBC1-B]" />
 			<feature name="u3" value="U3 RAM [LH5164AN-10L]" />
-			<feature name="u4" value="U4 26A [840 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-aw7p-0.u1" size="524288" crc="ca3bc3ce" sha1="e03754173a5d62cb9da7d2306bc41b0e23e3d519" offset="0" />
 			</dataarea>
@@ -9809,7 +9740,6 @@
 		<info name="alt_title" value="ジャングルウォーズ"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="jungle wars (japan).bin" size="262144" crc="2ad46ac7" sha1="3835a7821c11197fca87564b8d51a82c81fa7286" offset="0" />
 			</dataarea>
@@ -9872,7 +9802,6 @@
 		<info name="alt_title" value="勝馬予想 競馬貴族"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="kachiuma yosou keiba kizoku (japan).bin" size="131072" crc="a57e1ac1" sha1="de965fae7d1e744302e6a12656ebb8867ba9cfff" offset="0" />
 			</dataarea>
@@ -9890,7 +9819,6 @@
 		<info name="alt_title" value="勝馬予想 競馬貴族EX'94"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="kachiuma yosou keiba kizoku ex '94 (japan).bin" size="131072" crc="d4319169" sha1="30aab6efed1cc00295d7a35ea8e9f3d809f96334" offset="0" />
 			</dataarea>
@@ -9908,7 +9836,6 @@
 		<info name="alt_title" value="勝馬予想 競馬貴族EX'95"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="kachiuma yosou keiba kizoku ex '95 (japan).bin" size="131072" crc="9c6a4918" sha1="a368d20e2edcb8bc2745ae2c875505f45e40f4fb" offset="0" />
 			</dataarea>
@@ -9927,7 +9854,6 @@
 		<info name="alt_title" value="カエルの為に鐘は鳴る"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="kaeru no tame ni kane wa naru (japan).bin" size="524288" crc="c18cd57a" sha1="ce1e4a788327f3099877c88cc848e48c1fd055ab" offset="0" />
 			</dataarea>
@@ -10014,7 +9940,6 @@
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-akmj-0.u1" size="524288" crc="82e03e10" sha1="9444196c413a13cf326c18c5aa457bcac92114a5" offset="0" />
 			</dataarea>
@@ -10064,7 +9989,6 @@
 		<info name="alt_title" value="化石創世リボーン"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="kaseki sousei reborn (japan).bin" size="524288" crc="42e8ba89" sha1="c61050451f8731e35b1b983c610041cb59509ed2" offset="0" />
 			</dataarea>
@@ -10082,7 +10006,6 @@
 		<info name="alt_title" value="カットビロード"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="kattobi road (japan).bin" size="131072" crc="efbc23fc" sha1="7ac064a877ecc8247dfb7213722dbd0f4be665f0" offset="0" />
 			</dataarea>
@@ -10107,7 +10030,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-a7kj-0.u1" size="524288" crc="147e82ae" sha1="5dc0c9b3fbaf75b44f368b8074c92a294e7382c4" offset="0" />
 			</dataarea>
@@ -10125,7 +10047,6 @@
 		<info name="alt_title" value="携帯競馬エイトスペシャル"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="keitai keiba eight special (japan).bin" size="131072" crc="326273b7" sha1="1bbc35ddf540f2ad9937f57184add528c2811a5d" offset="0" />
 			</dataarea>
@@ -10145,10 +10066,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [MBC1B1]" />
 			<feature name="u3" value="U3 RAM [BR6265BF-10SL]" />
-			<feature name="u4" value="U4 26A [6129A 7828]" />
+			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-akgp-0.u1" size="524288" crc="0a9859c1" sha1="7092afa1c1ea592bcd3afd185ae17a7b1cdf6800" offset="0" />
 			</dataarea>
@@ -10388,7 +10308,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-kjj-0.u1" size="131072" crc="f3ccadc3" sha1="0674abafb9de841d658d249d06a499c14484f72c" offset="0" />
 			</dataarea>
@@ -10445,7 +10364,6 @@
 		<info name="alt_title" value="カービィのブロックボール"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="kirby no block ball (japan).bin" size="524288" crc="df3bbcd7" sha1="3fecc964d2c13ad98abac1df49f05c488833ef5a" offset="0" />
 			</dataarea>
@@ -10464,7 +10382,6 @@
 		<info name="alt_title" value="カービィのきらきらきっず"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="kirby no kirakira kids (japan).bin" size="262144" crc="47f42f42" sha1="2c46c42be76eca134e188814345afa390e298811" offset="0" />
 			</dataarea>
@@ -10499,7 +10416,6 @@
 		<info name="serial" value="DMG-AKXE-USA, DMG-AKXP-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="kirby's block ball (usa, europe).bin" size="524288" crc="7ad90b4b" sha1="a790d96526972d7ceb026ca27ae41ff475ccb2c5" offset="0" />
 			</dataarea>
@@ -10538,7 +10454,6 @@
 			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-akbp-0.u1" size="524288" crc="8dc07c35" sha1="8a2898ffa17e25f43793f40c88421d840d372d3c" offset="0" />
 			</dataarea>
@@ -10578,10 +10493,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
 			<feature name="u3" value="U3 RAM [BR6265BF-10SL]" />
-			<feature name="u4" value="U4 26A [6129A 7832]" />
+			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-akcp-0.u1" size="262144" crc="91300898" sha1="3999993d31e457bb279efac3e4a65fe4967ba861" offset="0" />
 			</dataarea>
@@ -10857,7 +10771,6 @@
 		<info name="alt_title" value="昆虫博士"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="konchuu hakase (japan) (rev a).bin" size="524288" crc="05753790" sha1="3e8e47b36a2171ad93d0e21fe5c22feff17c6d88" offset="0" />
 			</dataarea>
@@ -10876,7 +10789,6 @@
 		<info name="alt_title" value="昆虫博士"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="konchuu hakase (japan).bin" size="524288" crc="f6b3e291" sha1="ac792793b43cc8fae098df23e6aeb845f98199cd" offset="0" />
 			</dataarea>
@@ -10909,7 +10821,6 @@
 		<info name="alt_title" value="高気圧ボーイ"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="koukiatsu boy (japan).bin" size="524288" crc="53ff8041" sha1="f7f5b71a8d3b393b0507eee75fbdaea7006f945f" offset="0" />
 			</dataarea>
@@ -10990,7 +10901,6 @@
 		<info name="alt_title" value="ダウンタウンスペシャル くにおくんの時代劇だよ全員集合!"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="kunio-kun no jidaigeki dayo zenin shuugou! (japan).bin" size="262144" crc="229e9113" sha1="97ff2392f126b195ac8a1700a9a91aa364549dfd" offset="0" />
 			</dataarea>
@@ -11139,7 +11049,6 @@
 		<info name="serial" value="DMG-AFHU-AUS"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="legend of the river king gb (australia).bin" size="524288" crc="51627213" sha1="87274e8c0d2daaac2e0dda94651c35d6a0617c0f" offset="0" />
 			</dataarea>
@@ -11156,7 +11065,6 @@
 		<info name="serial" value="DMG-AFHE-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="legend of the river king gb (usa).bin" size="524288" crc="a6e685dc" sha1="d2e8a9aceec8639b528f712532a38fe0c2b0edef" offset="0" />
 			</dataarea>
@@ -11172,7 +11080,6 @@
 		<info name="serial" value="DMG-ZL-USA-1, DMG-ZL-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="legend of zelda, the - link's awakening (usa, europe) (rev b).bin" size="524288" crc="34d08e7b" sha1="5ab63def958728933571c3b4f6af54db14f3f8b2" offset="0" />
 			</dataarea>
@@ -11188,7 +11095,6 @@
 		<info name="serial" value="DMG-ZL-(UKV/ESP-1)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="legend of zelda, the - link's awakening (usa, europe) (rev a).bin" size="524288" crc="7d1b6cd6" sha1="5259e68522225a7a830e29ea17dfddc33263ced5" offset="0" />
 			</dataarea>
@@ -11207,10 +11113,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1-B]" />
 			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />    <!-- Hyundai RAM -->
-			<feature name="u4" value="U4 26A [325 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-zle-0.u1" size="524288" crc="8cf27c90" sha1="602167f897b4f56fe8cee837933da3bed5882bbd" offset="0" />
 			</dataarea>
@@ -11232,7 +11137,6 @@
 			<feature name="u4" value="U4 26A [6129 3809]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-zcf-0.u1" size="524288" crc="4407c759" sha1="4bbd38a4548e0c7922d0a6719ac5d16791e9535b" offset="0" />
 			</dataarea>
@@ -11254,7 +11158,6 @@
 			<feature name="u4" value="U4 26A [6129 3809]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-zlf-0.u1" size="524288" crc="bf2ab18b" sha1="af93e1b3140f61fcd614f1ef9266d6892224767f" offset="0" />
 			</dataarea>
@@ -11273,10 +11176,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B]" />
 			<feature name="u3" value="U3 RAM [LH5168NFB-10TL]" />
-			<feature name="u4" value="U4 26A [365 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-zld-0.u1" size="524288" crc="760ab4e7" sha1="cc468442508a8ba6c4661238aa1925a3132f1630" offset="0" />
 			</dataarea>
@@ -11461,7 +11363,6 @@
 		<info name="alt_title" value="リトルマスター2 雷光の騎士"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="little master 2 - raikou no kishi (japan).bin" size="262144" crc="187de7f8" sha1="9cc2d0f5ec33ca5ebf382e68dd55503c75a889b5" offset="0" />
 			</dataarea>
@@ -11650,7 +11551,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-lua-0.u1" size="524288" crc="a3d5c8d7" sha1="2fef16fac95ec4ffd252e9974eccfce538e5f797" offset="0" />
 			</dataarea>
@@ -11759,7 +11659,6 @@
 		<info name="alt_title" value="マジックナイトレイアース"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="magic knight rayearth (japan).bin" size="262144" crc="94838a81" sha1="4f77031946e62772a241a9b5b046d7fcf6a28ea8" offset="0" />
 			</dataarea>
@@ -12029,7 +11928,6 @@
 		<info name="alt_title" value="マリオのピクロス"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="mario no picross (japan).bin" size="262144" crc="17533700" sha1="6b72cbff3e224299eff6f79e0110a477b8f840c2" offset="0" />
 			</dataarea>
@@ -12052,7 +11950,6 @@
 			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-apcp-0.u1" size="262144" crc="f2d652ad" sha1="9712f37171b8a0cdc99a60170ea7b2aed161195e" offset="0" />
 			</dataarea>
@@ -12115,7 +12012,6 @@
 		<info name="alt_title" value="マサカリ伝説−金太郎RPG編−"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="masakari densetsu - kintarou rpg hen (japan).bin" size="524288" crc="d8bab8e0" sha1="a9bcb90df5b19a372ceed81c614bb7eb295ec74c" offset="0" />
 			</dataarea>
@@ -12228,7 +12124,6 @@
 		<info name="alt_title" value="メダロット カブトバージョン"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="medarot - kabuto version (japan) (rev a).bin" size="524288" crc="12a3982d" sha1="1cbc7ab5941dc27bc50699a00ef2b1beb930449d" offset="0" />
 			</dataarea>
@@ -12247,7 +12142,6 @@
 		<info name="alt_title" value="メダロット カブトバージョン"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="medarot - kabuto version (japan).bin" size="524288" crc="1bab9900" sha1="ae26b9310ab41d94a73b807ef5f30e2d0e34d667" offset="0" />
 			</dataarea>
@@ -12266,7 +12160,6 @@
 		<info name="alt_title" value="メダロット クワガタバージョン"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="medarot - kuwagata version (japan) (rev a).bin" size="524288" crc="5e77e82e" sha1="2262f69a89abe0f66dc1554c1ee470fd536130a3" offset="0" />
 			</dataarea>
@@ -12285,7 +12178,6 @@
 		<info name="alt_title" value="メダロット クワガタバージョン"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="medarot - kuwagata version (japan).bin" size="524288" crc="bc0588c4" sha1="f657f822ed15e459c4abcd171c9620cddbdfd022" offset="0" />
 			</dataarea>
@@ -12304,7 +12196,6 @@
 		<info name="alt_title" value="メダロット パーツコレクション"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="medarot - parts collection (japan).bin" size="524288" crc="f4cab596" sha1="eec1245abb1d97cd2df976fdf179c924a4efa720" offset="0" />
 			</dataarea>
@@ -12323,7 +12214,6 @@
 		<info name="alt_title" value="メダロット パーツコレクション2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="medarot - parts collection 2 (japan).bin" size="524288" crc="89f94482" sha1="edd74afbfca5e3d3366fb231c4bedd80fcf8a81e" offset="0" />
 			</dataarea>
@@ -12518,7 +12408,6 @@
 		<info name="alt_title" value="女神転生外伝 ラストバイブル"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="megami tensei gaiden - last bible (japan).bin" size="262144" crc="fe9dd4c0" sha1="537b38234da5164335e98f6aee3b792048624626" offset="0" />
 			</dataarea>
@@ -12536,7 +12425,6 @@
 		<info name="alt_title" value="女神転生外伝 ラストバイブルII"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="megami tensei gaiden - last bible ii (japan).bin" size="262144" crc="f8e519d9" sha1="d7575f7f60c75dd71a7b5be071db57be13237d30" offset="0" />
 			</dataarea>
@@ -12616,7 +12504,6 @@
 		<info name="alt_title" value="メトロイド2 リターン・オブ・サムス"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="metroid ii - return of samus (world).bin" size="262144" crc="dee05370" sha1="74a2fad86b9a4c013149b1e214bc4600efb1066d" offset="0" />
 			</dataarea>
@@ -12944,7 +12831,6 @@
 		<info name="alt_title" value="ミニ4ボーイ"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="mini 4 boy (japan).bin" size="524288" crc="0618e4b0" sha1="cb6022ef5729cbf370ccdc9c1958d0b4bcbd5e90" offset="0" />
 			</dataarea>
@@ -12963,7 +12849,6 @@
 		<info name="alt_title" value="ミニ4ボーイII ファイナルエボリューション"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="mini 4 boy ii - final evolution (japan).bin" size="524288" crc="d6962241" sha1="eebcf67ab1455501f1b758ab71a8dc22808b34f1" offset="0" />
 			</dataarea>
@@ -12997,7 +12882,6 @@
 		<info name="alt_title" value="ミニ四駆GB レッツ&amp;ゴー"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="miniyonku gb let's &amp; go!! (japan).bin" size="524288" crc="fc0c180b" sha1="a51dc3ea1961297a3056e0326c8a153f496dae8a" offset="0" />
 			</dataarea>
@@ -13016,7 +12900,6 @@
 		<info name="alt_title" value="ミニ四駆GB Let's &amp; Go!! オールスターバトルMAX"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="miniyonku gb let's &amp; go!! - all-star battle max (japan).bin" size="1048576" crc="97ebd21d" sha1="ca662cb506b553f1730c29c088e597bace1e0052" offset="0" />
 			</dataarea>
@@ -13103,7 +12986,6 @@
 			<feature name="u4" value="U4 26A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-amoj-0.u1" size="524288" crc="82fca204" sha1="16b6355019e4e0eb8871d6cb16aabb971ab1b62a" offset="0" />
 			</dataarea>
@@ -13123,10 +13005,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" />
 			<feature name="u3" value="U3 RAM [XLJ6265BF-10SL]" />
-			<feature name="u4" value="U4 26A [651 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-amop-0.u1" size="524288" crc="2c36c74c" sha1="37085973519d61e17797693b23016493da56a462" offset="0" />
 			</dataarea>
@@ -13145,7 +13026,6 @@
 		<info name="alt_title" value="桃太郎コレクション"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1col" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="momotarou collection (japan).bin" size="1048576" crc="ad376905" sha1="cd7088d13f5b80f32c0fae95a57969f6f33a9a02" offset="0" />
 			</dataarea>
@@ -13167,10 +13047,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MMM01 [MMM01 644 113]" />
 			<feature name="u3" value="U3 RAM [XLJ6265BF-10SL]" />
-			<feature name="u4" value="U4 26A [642 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mmm01" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-am3j-0.u1" size="1048576" crc="562c8f7f" sha1="0d6bd573ae696b337d107eff2aee502bb240a40c" offset="0" />
 			</dataarea>
@@ -13237,7 +13116,6 @@
 		<info name="alt_title" value="桃太郎電鉄Jr. 全国ラーメンめぐりの巻"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="momotarou dentetsu jr. - zenkoku ramen meguri no maki (japan).bin" size="524288" crc="218265b3" sha1="30edf17fc9ddd9db7613c8f78b0ebc340cc89eb0" offset="0" />
 			</dataarea>
@@ -13351,7 +13229,6 @@
 		<info name="alt_title" value="モンスターメーカー2 ウルの秘剣"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="monster maker 2 - uru no hiken (japan).bin" size="262144" crc="66e708fc" sha1="ffac4e116cfe1c2d545c746640cc55e7df59101b" offset="0" />
 			</dataarea>
@@ -13383,7 +13260,6 @@
 		<info name="alt_title" value="もんすたあ★レース"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="monster race (japan).bin" size="524288" crc="c191bd66" sha1="bb305ec61ec272a7a2fada1c03ba6784c5168f86" offset="0" />
 			</dataarea>
@@ -13402,7 +13278,6 @@
 		<info name="alt_title" value="もんすたあ★レース おかわり"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="monster race okawari (japan).bin" size="524288" crc="bd3039e5" sha1="a566012977dbcede8066c06e445b6a346d158e53" offset="0" />
 			</dataarea>
@@ -14033,7 +13908,6 @@
 		<info name="alt_title" value="ゲームボーイ電子手帳 ナノノート"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="nanonote (japan).bin" size="131072" crc="3e30b63d" sha1="8d280e610a827e56864e6b99a637103a2d14f7bf" offset="0" />
 			</dataarea>
@@ -14716,7 +14590,6 @@
 		<info name="alt_title" value="Jリーグサポーターサッカー"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="nihon daihyou team france de ganbare! - j.league supporter soccer (japan).bin" size="524288" crc="91e6bf74" sha1="1f038df0b742a2d76d49eaefe7b753ed0dea3767" offset="0" />
 			</dataarea>
@@ -14735,7 +14608,6 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="nikkan berutomo club (japan).bin" size="524288" crc="ad3f851d" sha1="4403ddbc2faa6b540893814a7ecaafb218849ee9" offset="0" />
 			</dataarea>
@@ -14927,7 +14799,6 @@
 		<info name="alt_title" value="信長の野望 ゲームボーイ版"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="nobunaga no yabou - game boy ban (japan).bin" size="131072" crc="8803186a" sha1="b86474be139be4c7bd7aa8ad01c50d2c49f4b78b" offset="0" />
 			</dataarea>
@@ -14943,7 +14814,6 @@
 		<info name="serial" value="DMG-NY-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="nobunaga's ambition (usa).bin" size="131072" crc="5a843008" sha1="d4dd65535d2a15f177289b53a49f1bc9e9b739f3" offset="0" />
 			</dataarea>
@@ -15037,7 +14907,6 @@
 		<info name="alt_title" value="ONI II 隠忍伝説"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="oni ii - innin densetsu (japan).bin" size="262144" crc="2f895df5" sha1="7b40a873249f8306ff6c0277492ed28250d87fcc" offset="0" />
 			</dataarea>
@@ -15055,7 +14924,6 @@
 		<info name="alt_title" value="ONI III 黒の破壊神"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="oni iii - kuro no hakaishin (japan).bin" size="262144" crc="6cd62fdb" sha1="2813cf81a13d5a07a221320ba80da0d3e271d87c" offset="0" />
 			</dataarea>
@@ -15073,7 +14941,6 @@
 		<info name="alt_title" value="ONI IV 鬼神の血族"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="oni iv - kijin no ketsuzoku (japan).bin" size="262144" crc="beff4f57" sha1="5af71863e48afe1fb5f16aee6fbe7f4e97ef54ce" offset="0" />
 			</dataarea>
@@ -15092,7 +14959,6 @@
 		<info name="alt_title" value="ONI V 隠忍を継ぐ者"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="oni v - innin o tsugumono (japan).bin" size="262144" crc="af030940" sha1="197e2d2980053104ecf1c0edbff9f4d235518320" offset="0" />
 			</dataarea>
@@ -15527,7 +15393,6 @@
 		<info name="alt_title" value="Pachinko Data Card ちょ〜あたる君"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="pachinko data card - chou ataru-kun (japan).bin" size="1048576" crc="955b25ba" sha1="b8799e2a7d6df8a41f0e8f8857885f7ccc3397b8" offset="0" />
 			</dataarea>
@@ -15952,7 +15817,6 @@
 		<info name="alt_title" value="ペンタドラゴン"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="penta dragon (japan).bin" size="262144" crc="1e2efaee" sha1="fd75d43258e79f14d104fb4756e219141882c837" offset="0" />
 			</dataarea>
@@ -16033,7 +15897,6 @@
 		<info name="alt_title" value="ピクロス2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="picross 2 (japan).bin" size="524288" crc="f5aa5902" sha1="57788519111cbe9e20b43d1935e9f52ae165e858" offset="0" />
 			</dataarea>
@@ -16336,7 +16199,7 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 HuC1 [HuC-1]" />
 			<feature name="u3" value="U3 RAM [GM76C256CLLFW70]" />
-			<feature name="u4" value="U4 26A [6129A 7A52]" />
+			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_huc1" />
 			<dataarea name="rom" size="524288">
@@ -16413,7 +16276,6 @@
 		<info name="alt_title" value="ポケット漢字郎"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="pocket kanjirou (japan).bin" size="524288" crc="e18aedaf" sha1="ef150c97cb4e9a46f90d826b1aad208cbaa4410f" offset="0" />
 			</dataarea>
@@ -16453,10 +16315,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
 			<feature name="u3" value="U3 RAM [MS6264DLL-10FC]" />
-			<feature name="u4" value="U4 26A [6129A 7569]" />
+			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-aplj-0.u1" size="524288" crc="d570a9df" sha1="69f08aa97b5b72e99c826c810fdaebd766c2b416" offset="0" />
 			</dataarea>
@@ -16475,7 +16336,6 @@
 		<info name="alt_title" value="ポケットラブ2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="pocket love 2 (japan).bin" size="1048576" crc="9f8440b5" sha1="b35c25ae2a621748abb68a7c2fc7a3c7927467e8" offset="0" />
 			</dataarea>
@@ -16515,7 +16375,6 @@
 			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-apsj-3.u1" size="1048576" crc="e9e6483a" sha1="a40298a8123613ee60cd7aab204d788b8425976e" offset="0" />
 			</dataarea>
@@ -16540,7 +16399,6 @@
 			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-apsj-2.u1" size="1048576" crc="fd3da7ff" sha1="91864ecdf26d1c593bde4d9ed615520eb57d5e41" offset="0" />
 			</dataarea>
@@ -16565,7 +16423,6 @@
 			<feature name="u4" value="U4 [6129A]" />
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-apsj-1.u1" size="1048576" crc="a2545d33" sha1="28e4b8531ea4ea1de5a396fccb0cfba51b06b149" offset="0" />
 			</dataarea>
@@ -16590,7 +16447,6 @@
 			<feature name="u4" value="U4 [6129A]" />
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-apsj-0.u1" size="1048576" crc="4ec85504" sha1="1fb6c264e950d97ce3fd99b347e485b2150df4ff" offset="0" />
 			</dataarea>
@@ -16609,7 +16465,6 @@
 		<info name="alt_title" value="ポケットモンスター赤"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="pocket monsters aka (japan) (rev a).bin" size="524288" crc="b77be1e0" sha1="ef74c79cded14204ac79e77f4964d9cb25003120" offset="0" />
 			</dataarea>
@@ -16628,7 +16483,6 @@
 		<info name="alt_title" value="ポケットモンスター赤"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="pocket monsters aka (japan).bin" size="524288" crc="13652705" sha1="0623ad12f48c259447980d68bd85ddbf8204b2cd" offset="0" />
 			</dataarea>
@@ -16647,7 +16501,6 @@
 		<info name="alt_title" value="ポケットモンスター青"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="pocket monsters ao (japan).bin" size="524288" crc="e4468d14" sha1="0da501e3e5c51ab8fef55b092dcdd7e6b050e424" offset="0" />
 			</dataarea>
@@ -16669,10 +16522,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B [MBC1B1]" />
 			<feature name="u3" value="U3 RAM [LH52B256NZ-10PLL]" />
-			<feature name="u4" value="U4 26A [636 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-apbj-1.u1" size="524288" crc="37ae8dc4" sha1="4b97cd44aa3f0dd290bfe7b3ac17b7bd8270897b" offset="0" />
 			</dataarea>
@@ -16691,7 +16543,6 @@
 		<info name="alt_title" value="ポケットモンスター緑"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="pocket monsters midori (japan).bin" size="524288" crc="baeacd2b" sha1="82c0eef40a5e2423699d9fd8ba15dfaa8b51d196" offset="0" />
 			</dataarea>
@@ -16761,7 +16612,6 @@
 			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-apeu-0.u1" size="1048576" crc="d6da8a1a" sha1="d7037c83e1ae5b39bde3c30787637ba1d4c48ce2" offset="0" />
 			</dataarea>
@@ -16778,7 +16628,6 @@
 		<info name="serial" value="DMG-APEF-FRA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - version bleue (france).bin" size="1048576" crc="50e2fc1d" sha1="47faa910d0e073c600665bf9c83b6bd17babdf8a" offset="0" />
 			</dataarea>
@@ -16798,10 +16647,9 @@
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
 			<feature name="u3" value="U3 256K-SRAM [GM76C256CLLFW70]" />
-			<feature name="u4" value="U4 MM1134A [939 134A]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-aped-0.u1" size="1048576" crc="9c336307" sha1="20e72dc6f41493eee1fdd0cef54214e6c3389688" offset="0" />
 			</dataarea>
@@ -16821,10 +16669,9 @@
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
 			<feature name="u3" value="U3 256K-SRAM [LH52256CN-10LL]" />
-			<feature name="u4" value="U4 MM1134A [003 134A]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-apei-0.u1" size="1048576" crc="4d0984a9" sha1="f69ed1a1332f04c24c7db899a09019bb045fa8b3" offset="0" />
 			</dataarea>
@@ -16841,7 +16688,6 @@
 		<info name="serial" value="DMG-APES-ESP"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - edicion azul (spain).bin" size="1048576" crc="d95416f9" sha1="7715e7b133e8634df48918b9138374110212a108" offset="0" />
 			</dataarea>
@@ -16858,7 +16704,6 @@
 		<info name="serial" value="DMG-APAE-USA, DMG-APAU-(EUR/AUS)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - red version (usa, europe).bin" size="1048576" crc="9f7fdd53" sha1="ea9bcae617fdf159b045185467ae58b2e4a48b9a" offset="0" />
 			</dataarea>
@@ -16875,7 +16720,6 @@
 		<info name="serial" value="DMG-APAF-FRA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - version rouge (france).bin" size="1048576" crc="337fce11" sha1="47a7622fa30e6402a3891fe65b3a930bf9bd7aec" offset="0" />
 			</dataarea>
@@ -16892,7 +16736,6 @@
 		<info name="serial" value="DMG-APAD-NOE"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - rote edition (germany).bin" size="1048576" crc="89197825" sha1="87d523fe1a0c548db7c5477b451ddec1eb083c06" offset="0" />
 			</dataarea>
@@ -16912,10 +16755,9 @@
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
 			<feature name="u3" value="U3 256K-SRAM [GM76C256CLLFW70]" />
-			<feature name="u4" value="U4 MM1134A [021 134A]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-apai-0.u1" size="1048576" crc="2945aceb" sha1="65b97cf8f2f1cff711a6d08c6c894c8ce65ce522" offset="0" />
 			</dataarea>
@@ -16932,7 +16774,6 @@
 		<info name="serial" value="DMG-APAS-ESP"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - edicion roja (spain).bin" size="1048576" crc="d8507d8a" sha1="fc17c5b904d551b1b908054ccd1c493f755f832a" offset="0" />
 			</dataarea>
@@ -16952,10 +16793,9 @@
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
 			<feature name="u3" value="U3 256K-SRAM [GM76C256CLLFW70]" />
-			<feature name="u4" value="U4 MM1134A [033 134A]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-apsu-0.u1" size="1048576" crc="7d527d62" sha1="cc7d03262ebfaf2f06772c1a480c7d9d5f4a38e1" offset="0" />
 			</dataarea>
@@ -16975,12 +16815,11 @@
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
 			<feature name="u3" value="U3 256K-SRAM [LH52256CN-10LL]" /> <!-- Sharp RAM -->
-			<feature name="u4" value="U4 MM1134A [6735 0318]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - version jaune (france).bin" size="1048576" crc="d03426e9" sha1="0aceec0ef7aa2ca5aa831554598d91f61a925591" offset="0" />
+				<rom name="dmg-apsf-0.u1" size="1048576" crc="d03426e9" sha1="0aceec0ef7aa2ca5aa831554598d91f61a925591" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -17001,7 +16840,6 @@
 			<feature name="u4" value="U4 MM1134A" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-apsd-0.u1" size="1048576" crc="7a01e45a" sha1="42f3714eec6eca25200d42461ff08d57c98f6d1d" offset="0" />
 			</dataarea>
@@ -17021,10 +16859,9 @@
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
 			<feature name="u3" value="U3 256K-SRAM [GM76C256CLLFW70]" />
-			<feature name="u4" value="U4 MM1134A [019 134A]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-apsi-0.u1" size="1048576" crc="8b56fe33" sha1="05bb8e99f24d498613930949730afa8024e77d08" offset="0" />
 			</dataarea>
@@ -17041,7 +16878,6 @@
 		<info name="serial" value="DMG-APSS-ESP"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - edicion amarilla (spain).bin" size="1048576" crc="964b7a10" sha1="1dc242039218fba50928d1afb66b70565b6b9daf" offset="0" />
 			</dataarea>
@@ -17248,7 +17084,6 @@
 		<info name="alt_title" value="パワプロGB"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="power pro gb (japan) (rev a).bin" size="262144" crc="71bea855" sha1="ebca3bce624d19a0fa3a92d30a5c543c12541ea4" offset="0" />
 			</dataarea>
@@ -17267,7 +17102,6 @@
 		<info name="alt_title" value="パワプロGB"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="power pro gb (japan).bin" size="262144" crc="2e123f5b" sha1="135d04cbaab6afd03997bceb6b1a2a8aa1dbc7e8" offset="0" />
 			</dataarea>
@@ -17572,7 +17406,6 @@
 		<info name="alt_title" value="プリクラポケット 不完全女子高生マニュアル"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="purikura pocket - fukanzen joshikousei manual (japan).bin" size="524288" crc="acc589fc" sha1="2f2d519e0c9acad3cf96546aebb04b8ff309ab1f" offset="0" />
 			</dataarea>
@@ -17591,7 +17424,6 @@
 		<info name="alt_title" value="プリクラポケット2 彼氏改造大作戦"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="purikura pocket 2 - kareshi kaizou daisakusen (japan).bin" size="524288" crc="d145ea23" sha1="6b7ab5728973865f970cd676a4837e7f4c4128bb" offset="0" />
 			</dataarea>
@@ -17610,7 +17442,6 @@
 		<info name="alt_title" value="プリクラポケット3 タレントデビュー大作戦"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="purikura pocket 3 - talent debut daisakusen (japan).bin" size="1048576" crc="ceb62411" sha1="b8df59d63a2f836ef497f503b67a3401eae497a7" offset="0" />
 			</dataarea>
@@ -18240,7 +18071,6 @@
 		<info name="alt_title" value="連対王"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="65536">
 				<rom name="rentaiou (japan).bin" size="65536" crc="2350922b" sha1="5b2fa3da4dcd8afcd88c00134a2bbc8942135897" offset="0" />
 			</dataarea>
@@ -18785,7 +18615,6 @@
 		<info name="alt_title" value="サ・ガ2 秘宝伝説"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="sa-ga 2 - hihou densetsu (japan) (rev a).bin" size="262144" crc="f6cfcfb1" sha1="96ef7d31ad098a620ba7ac57afef416972707ea3" offset="0" />
 			</dataarea>
@@ -18803,7 +18632,6 @@
 		<info name="alt_title" value="サ・ガ2 秘宝伝説"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="sa-ga 2 - hihou densetsu (japan).bin" size="262144" crc="18055bb9" sha1="f1db92d8076237489aa1528141fe240843111a54" offset="0" />
 			</dataarea>
@@ -18821,7 +18649,6 @@
 		<info name="alt_title" value="サ・ガ3 時空の覇者"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="sa-ga 3 - jikuu no hasha (japan).bin" size="262144" crc="575d6d9d" sha1="c8dcbefc0352b0590fd85a683d983b5510a63519" offset="0" />
 			</dataarea>
@@ -18903,7 +18730,6 @@
 		<info name="alt_title" value="セームゲーム"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="same game (japan).bin" size="262144" crc="70393c0f" sha1="9dcb5a95e808423e6bd1149319ca8eda069363c8" offset="0" />
 			</dataarea>
@@ -18946,7 +18772,6 @@
 		<info name="alt_title" value="三國志 ゲームボーイ版"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="sangokushi - game boy ban (japan).bin" size="262144" crc="83706e92" sha1="e94128d58341caaee595ed75292908a9ac5a466d" offset="0" />
 			</dataarea>
@@ -19238,7 +19063,7 @@
 			<feature name="pcb" value="DMG-GDAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A [DMG MBC2A]" />
-			<feature name="u3" value="U3 26A [145 26A]" />
+			<feature name="u3" value="U3 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
@@ -19274,7 +19099,6 @@
 		<info name="alt_title" value="セレクション1&amp;2 選ばれし者&amp;暗黒の封印"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="selection i &amp; ii (japan).bin" size="524288" crc="a6027919" sha1="58c0c524b07018beb2d9178de53fe2f6cbb6670f" offset="0" />
 			</dataarea>
@@ -19292,7 +19116,6 @@
 		<info name="alt_title" value="セレクションII 暗黒の封印"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="selection ii - ankoku no fuuin (japan).bin" size="262144" crc="d09073f6" sha1="6e524d0894de0db1b3eb4ca0c1075f6ea1a2ffc1" offset="0" />
 			</dataarea>
@@ -19453,7 +19276,6 @@
 		<info name="alt_title" value="新 競馬貴族 ポケットジョッキー"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="shin keiba kizoku pocket jockey (japan).bin" size="524288" crc="490f8c46" sha1="8d65a4f9f7b903d145fa863d09c8894db4fd742a" offset="0" />
 			</dataarea>
@@ -20619,7 +20441,6 @@
 		<info name="alt_title" value="スタースイープ"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="star sweep (japan).bin" size="262144" crc="d6fd967c" sha1="caabaa2e9cbab27859db80ef6b0e90e7b94b3bd0" offset="0" />
 			</dataarea>
@@ -20946,7 +20767,7 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 HuC1 [HuC-1]" />
 			<feature name="u3" value="U3 RAM [LH52B256NB-10PLL]" />
-			<feature name="u4" value="U4 26A [720 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_huc1" />
 			<dataarea name="rom" size="524288">
@@ -21024,7 +20845,6 @@
 		<info name="alt_title" value="スーパーブラックバスポケット"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="super black bass pocket (japan).bin" size="1048576" crc="8a7c1678" sha1="1fb714757e9a0ad02c96feb57a0d04163e44dc74" offset="0" />
 			</dataarea>
@@ -21043,7 +20863,6 @@
 		<info name="alt_title" value="スーパーブラックバスポケット2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="super black bass pocket 2 (japan).bin" size="1048576" crc="68a553b6" sha1="86ec8d2e1a3151878b3d6a6c22d14a1ac7d26e39" offset="0" />
 			</dataarea>
@@ -21195,10 +21014,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
 			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />
-			<feature name="u4" value="U4 26A [6129A 7727]" />
+			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-ytj-0.u1" size="524288" crc="695f4600" sha1="fca5ebc5eebc20b0088423631719fb2dc862b276" offset="0" />
 			</dataarea>
@@ -21316,7 +21134,6 @@
 		<info name="serial" value="DMG-MQ-USA, DMG-MQ-(UKV/AUS/EUR)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="super mario land 2 - 6 golden coins (usa, europe) (rev b).bin" size="524288" crc="635a9112" sha1="d11d94fa3c36b9f72e925070b66bb4f16d31001e" offset="0" />
 			</dataarea>
@@ -21332,7 +21149,6 @@
 		<info name="serial" value="DMG-MQ-USA, DMG-MQ-ESP-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="super mario land 2 - 6 golden coins (usa, europe) (rev a).bin" size="524288" crc="e6f886e5" sha1="96e3a314561fb394cdf51101f9178a32713c2313" offset="0" />
 			</dataarea>
@@ -21348,7 +21164,6 @@
 		<info name="serial" value="DMG-MQ-USA, DMG-MQ-(NOE/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="super mario land 2 - 6 golden coins (usa, europe).bin" size="524288" crc="d5ec24e4" sha1="bba408539ecbf8d322324956d859bc86e2a9977b" offset="0" />
 			</dataarea>
@@ -21367,7 +21182,6 @@
 		<info name="alt_title" value="スーパーマリオランド2 6つの金貨"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="super mario land 2 - 6-tsu no kinka (japan) (rev b).bin" size="524288" crc="29e0911a" sha1="aaadb040ee6d85418e12f9993beb4f2cb8dc9953" offset="0" />
 			</dataarea>
@@ -21389,10 +21203,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B1]" />
 			<feature name="u3" value="U3 RAM [LH5168NFB-10TL]" />
-			<feature name="u4" value="U4 26A [2J5 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-l6j-1.u1" size="524288" crc="bf733e10" sha1="f536d4d76a22668b8672bb291e4c738abc55d759" offset="0" />
 			</dataarea>
@@ -21414,10 +21227,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B1]" />
 			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />
-			<feature name="u4" value="U4 26A [2J5 26A]" />
+			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-l6j-0.u1" size="524288" crc="a715daf5" sha1="dc410e83f06ebd63ae5bd97e1b9562f0c887be37" offset="0" />
 			</dataarea>
@@ -21458,7 +21270,6 @@
 		<info name="alt_title" value="スーパー桃太郎電鉄II"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="super momotarou dentetsu ii (japan).bin" size="262144" crc="e8b4891f" sha1="4974d8e868cc359dca73312749b71b0f163df92e" offset="0" />
 			</dataarea>
@@ -21719,7 +21530,6 @@
 		<info name="serial" value="DMG-SI-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="sword of hope ii, the (usa).bin" size="262144" crc="5b7ff38c" sha1="3ccb37fd8e6e39a9e8421ee6f1ae199b4586afc1" offset="0" />
 			</dataarea>
@@ -21942,7 +21752,6 @@
 			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-atap-0.u1" size="524288" crc="dbf1bd20" sha1="7368ec190bed39429812a26e18b2d3e153cf4e81" offset="0" />
 			</dataarea>
@@ -21959,7 +21768,6 @@
 		<info name="serial" value="DMG-ATAF-FRA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="tamagotchi (france).bin" size="524288" crc="084c2401" sha1="0f4e508f90e52a869efb245894a362e5f677c2ed" offset="0" />
 			</dataarea>
@@ -22478,7 +22286,6 @@
 		<info name="alt_title" value="テトリスプラス"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="tetris plus (japan).bin" size="262144" crc="2ec9120a" sha1="dbb20951409739f1e11ffbcd8b0af1e802bf693a" offset="0" />
 			</dataarea>
@@ -22498,10 +22305,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" />
 			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />    <!-- Sharp RAM -->
-			<feature name="u4" value="U4 26A [6129A 7862]" />
+			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-atrp-0.u1" size="262144" crc="dafc3bff" sha1="dfab75ab6bdc0765ba9a5d33a93ffdb114a49cbf" offset="0" />
 			</dataarea>
@@ -22678,7 +22484,6 @@
 		<info name="alt_title" value="トキオ戦鬼 英雄列伝"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="tokio senki - eiyuu retsuden (japan).bin" size="131072" crc="9db7dcc3" sha1="1aa4f93a4ad0e0a273a723c70e01494f04b1f214" offset="0" />
 			</dataarea>
@@ -22697,7 +22502,6 @@
 		<info name="alt_title" value="トコロ's まあじゃん ジュニア"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="tokoro's mahjong jr. (japan).bin" size="262144" crc="56afca4c" sha1="bc6ae2ade135ef59aa1a213df004252149937aa8" offset="0" />
 			</dataarea>
@@ -23239,7 +23043,6 @@
 		<info name="alt_title" value="釣り先生"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="tsuri sensei (japan).bin" size="524288" crc="dc324100" sha1="be079a98f072c4b694a10154c351379529897ff6" offset="0" />
 			</dataarea>
@@ -23568,7 +23371,6 @@
 		<info name="alt_title" value="海のぬし釣り2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="umi no nushi tsuri 2 (japan).bin" size="524288" crc="19ff5b3e" sha1="8e533bea9ce1ce1f5a984e7cc4414f02bc98f1c1" offset="0" />
 			</dataarea>
@@ -23724,7 +23526,6 @@
 			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-avsp-0.u1" size="524288" crc="c8be05d8" sha1="93cdf04a473dcfd7f8f4fb06cc0af857d16d00f2" offset="0" />
 			</dataarea>
@@ -23808,7 +23609,6 @@
 		<info name="alt_title" value="ビタミーナ王国物語"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="vitamina oukoku monogatari (japan).bin" size="262144" crc="89a7aeca" sha1="d4195257a2debe78aa4dd433a324aec335ad36d1" offset="0" />
 			</dataarea>
@@ -23879,7 +23679,6 @@
 			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-wja-0.u1" size="524288" crc="40be3889" sha1="ae65800302438e37a99e623a71d1c954d73c843e" offset="0" />
 			</dataarea>
@@ -23899,10 +23698,9 @@
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3 [MBC3]" />
 			<feature name="u3" value="U3 RAM [BR82256P-70LL]" />
-			<feature name="u4" value="U4 [6129A 8316]" />
+			<feature name="u4" value="U4 [6129A]" />
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-aw2p-0.u1" size="1048576" crc="9c54358d" sha1="c65820b2e52d00e6ce60e0a432fab002fec4386f" offset="0" />
 			</dataarea>
@@ -24123,7 +23921,6 @@
 		<info name="alt_title" value="ウィザードリィ・外伝I 女王の受難"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="wizardry gaiden 1 - joou no junan (japan).bin" size="262144" crc="4d640e73" sha1="e3d03144e4c15522a1469a87eb07130c1884e225" offset="0" />
 			</dataarea>
@@ -24141,7 +23938,6 @@
 		<info name="alt_title" value="ウィザードリィ・外伝II 古代皇帝の呪い"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="wizardry gaiden 2 - kodai koutei no noroi (japan).bin" size="262144" crc="f6826d12" sha1="8dc0ab82462d4ab287d8155e8eab7e796eb7c766" offset="0" />
 			</dataarea>
@@ -24165,7 +23961,6 @@
 			<feature name="u4" value="U4 26A [6129 3C86]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-w6j-0.u1" size="524288" crc="32c94538" sha1="e169014cf1f12b956f8dff040ddb063ea4f7cab9" offset="0" />
 			</dataarea>
@@ -24323,7 +24118,6 @@
 		<info name="serial" value="DMG-W9-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="world cup usa '94 (europe) (en,fr,de,es,it,nl,pt,sv).bin" size="262144" crc="60231f83" sha1="1bd9910825a1ba3a9a9ad9084c8be0af04f2545f" offset="0" />
 			</dataarea>
@@ -24342,7 +24136,6 @@
 		<info name="alt_title" value="ワールドカップUSA'94"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="world cup usa '94 (japan) (en,fr,de,es,it,nl,pt,sv).bin" size="262144" crc="9d27f9de" sha1="6f9fb96a4551b4c5b3c6d8928b9a561d1cc28acd" offset="0" />
 			</dataarea>
@@ -24390,7 +24183,6 @@
 		<info name="alt_title" value="ワールドサッカーGB"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="world soccer gb (japan).bin" size="524288" crc="57d21ef4" sha1="aca208dabd8d110cf0334103dcb8dd28b68e450d" offset="0" />
 			</dataarea>
@@ -24563,7 +24355,6 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="245760">
 				<rom name="x (usa) (proto).bin" size="245760" crc="cd555712" sha1="b1c5b60b82aaa0b824f7bf67fc8f111377ccfb6a" offset="0" />
 			</dataarea>
@@ -24794,7 +24585,6 @@
 		<info name="alt_title" value="遊戯王デュエルモンスターズ"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="yu-gi-oh! duel monsters (japan).bin" size="1048576" crc="8875ec54" sha1="07ae4a6437f00f6af462bf84fd0ac1cf345c8365" offset="0" />
 			</dataarea>
@@ -24891,7 +24681,6 @@
 		<info name="alt_title" value="ゼルダの伝説 夢をみる島"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="zelda no densetsu - yume o miru shima (japan) (rev a).bin" size="524288" crc="ea20b82a" sha1="80f5d111c7e2d79d39f6c25a37b54c3196d2bd12" offset="0" />
 			</dataarea>
@@ -24909,7 +24698,6 @@
 		<info name="alt_title" value="ゼルダの伝説 夢をみる島"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="zelda no densetsu - yume o miru shima (japan).bin" size="524288" crc="39a6684e" sha1="fa38601c371ca327166bf52be1094697d41a80f3" offset="0" />
 			</dataarea>
@@ -24969,7 +24757,6 @@
 		<info name="alt_title" value="ザードの伝説"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="zerd no densetsu (japan).bin" size="131072" crc="492edb36" sha1="8db8ad90505d9a2b4485e903b9f5d67bb9c0c149" offset="0" />
 			</dataarea>
@@ -24987,7 +24774,6 @@
 		<info name="alt_title" value="ザードの伝説II 偽神の領域"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="zerd no densetsu 2 - xerd!! gishin no ryouiki (japan).bin" size="524288" crc="a197bdb7" sha1="cfa91da4120c6e1ee0f1f121d944d44532506cfa" offset="0" />
 			</dataarea>
@@ -25261,7 +25047,6 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="524288">
 				<rom name="final fantasy 4 (unl).bin" size="524288" crc="a6b6e233" sha1="0968289212c4ed0a4fb77d1b31e8eaf8663e6ed7" offset="0" />
 			</dataarea>
@@ -25276,7 +25061,6 @@
 		<publisher>SKOB</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="meng huan zhi xing (unl).bin" size="262144" crc="76fd8bc5" sha1="40bf296ee9d89a8c4e7bd8ca9f19cd4e449dfd6c" offset="0" />
 			</dataarea>
@@ -25291,7 +25075,6 @@
 		<publisher>SKOB</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="262144">
 				<rom name="meng huan zhi xing (alt) (unl).bin" size="262144" crc="e498d751" sha1="726158dc176c82cf02b8838a672a5206b72ae9d8" offset="0" />
 			</dataarea>
@@ -25401,7 +25184,6 @@
 		<publisher>GOWIN</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="2097152">
 				<rom name="tiger a dragon (unl).bin" size="2097152" crc="933513a6" sha1="d327c880e7ffb9db0422e09310031e58a32b8433" offset="0" />
 			</dataarea>
@@ -25443,7 +25225,6 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
-			<!-- cartridge ram -->
 			<dataarea name="rom" size="131072">
 				<rom name="gameshark bios (usa).bin" size="131072" crc="d6909596" sha1="09a6dae5e5faae1c4b5cf20e1b913b1c5e72297e" offset="0" />
 			</dataarea>

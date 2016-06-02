@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
+
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
 class hyprolyb_adpcm_device : public device_t,
@@ -21,7 +23,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -30,6 +31,7 @@ protected:
 
 	private:
 	// internal state
+	required_device<generic_latch_8_device> m_soundlatch2;
 	msm5205_device *m_msm;
 	address_space *m_space;
 	UINT8    m_adpcm_ready; // only bootlegs

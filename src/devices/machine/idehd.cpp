@@ -170,6 +170,26 @@ void ata_mass_storage_device::ide_build_identify_device()
 	m_identify_buffer[176] = 0x00;                     /* 176-205: current media serial number */
 	m_identify_buffer[206] = 0x00;                     /* 206-254: reserved */
 	m_identify_buffer[255] = 0x00;                     /* 255: integrity word */
+
+	if (total_sectors >= 16514064)
+	{
+		/// CHS limit
+		m_identify_buffer[1] = 16383;           /*  1: logical cylinders */
+		m_identify_buffer[3] = 16;               /*  3: logical heads */
+		m_identify_buffer[6] = 63;             /*  6: logical sectors per logical track */
+		m_identify_buffer[54] = 16383;           /* 54: number of current logical cylinders */
+		m_identify_buffer[55] = 16;               /* 55: number of current logical heads */
+		m_identify_buffer[56] = 63;             /* 56: number of current logical sectors per track */
+		m_identify_buffer[57] = 16514064 & 0xffff;    /* 57-58: current capacity in sectors (ATA-1 through ATA-5; obsoleted in ATA-6) */
+		m_identify_buffer[58] = 16514064 >> 16;
+	}
+
+	if (total_sectors > 268435455)
+	{
+		/// LBA limit
+		m_identify_buffer[60] = 268435455 & 0xffff;    /* 60-61: total user addressable sectors for LBA mode (ATA-1 through ATA-7) */
+		m_identify_buffer[61] = 268435455 >> 16;
+	}
 }
 
 //-------------------------------------------------

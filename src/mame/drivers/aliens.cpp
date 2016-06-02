@@ -42,7 +42,7 @@ WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)
 
 WRITE8_MEMBER(aliens_state::aliens_sh_irqtrigger_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( aliens_sound_map, AS_PROGRAM, 8, aliens_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                     /* ROM g04_b03.bin */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                                     /* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)                         /* soundlatch_byte_r */
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 ADDRESS_MAP_END
 
@@ -232,6 +232,8 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* verified on pcb */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(aliens_state,aliens_snd_bankswitch_w))

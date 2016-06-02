@@ -1054,13 +1054,14 @@ OP_HANDLER( adda_im )
 /* $8c CMPX immediate -***- */
 OP_HANDLER( cmpx_im )
 {
-	UINT32 r,d;
-	PAIR b;
+	PAIR r,d,b;
 	IMMWORD(b);
-	d = X;
-	r = d - b.d;
+	d.d = X;
+	r.d = d.d - b.d;
 	CLR_NZV;
-	SET_NZ16(r); SET_V16(d,b.d,r);
+	SET_Z16(r.d);
+	SET_N8(r.b.h);
+	SET_V8(d.b.h, b.b.h, r.b.h);
 }
 
 /* $8c CPX immediate -**** (6803) */
@@ -1220,14 +1221,14 @@ OP_HANDLER( adda_di )
 /* $9c CMPX direct -***- */
 OP_HANDLER( cmpx_di )
 {
-	UINT32 r,d;
-	PAIR b;
+	PAIR r,d,b;
 	DIRWORD(b);
-	d = X;
-	r = d - b.d;
+	d.d = X;
+	r.d = d.d - b.d;
 	CLR_NZV;
-	SET_NZ16(r);
-	SET_V16(d,b.d,r);
+	SET_Z16(r.d);
+	SET_N8(r.b.h);
+	SET_V8(d.b.h, b.b.h, r.b.h);
 }
 
 /* $9c CPX direct -**** (6803) */
@@ -1394,14 +1395,14 @@ OP_HANDLER( adda_ix )
 /* $ac CMPX indexed -***- */
 OP_HANDLER( cmpx_ix )
 {
-	UINT32 r,d;
-	PAIR b;
+	PAIR r,d,b;
 	IDXWORD(b);
-	d = X;
-	r = d - b.d;
+	d.d = X;
+	r.d = d.d - b.d;
 	CLR_NZV;
-	SET_NZ16(r);
-	SET_V16(d,b.d,r);
+	SET_Z16(r.d);
+	SET_N8(r.b.h);
+	SET_V8(d.b.h, b.b.h, r.b.h);
 }
 
 /* $ac CPX indexed -**** (6803)*/
@@ -1570,14 +1571,14 @@ OP_HANDLER( adda_ex )
 /* $bc CMPX extended -***- */
 OP_HANDLER( cmpx_ex )
 {
-	UINT32 r,d;
-	PAIR b;
+	PAIR r,d,b;
 	EXTWORD(b);
-	d = X;
-	r = d - b.d;
+	d.d = X;
+	r.d = d.d - b.d;
 	CLR_NZV;
-	SET_NZ16(r);
-	SET_V16(d,b.d,r);
+	SET_Z16(r.d);
+	SET_N8(r.b.h);
+	SET_V8(d.b.h, b.b.h, r.b.h);
 }
 
 /* $bc CPX extended -**** (6803) */

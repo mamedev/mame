@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "audio/timeplt.h"
+#include "machine/gen_latch.h"
 
 
 #define MASTER_CLOCK         XTAL_14_31818MHz
@@ -188,7 +189,7 @@ MACHINE_CONFIG_FRAGMENT( timeplt_sound )
 	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
 
 	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("timeplt_audio", timeplt_audio_device, portB_r))
 	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.60)
 	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.60)

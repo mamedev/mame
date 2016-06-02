@@ -20,15 +20,11 @@ glm - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 googletest - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
-http-parser - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
-
 libflac - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
 libjpeg - [Custom BSD-like](https://github.com/numenta/nupic/blob/master/external/licenses/LICENSE.libjpeg-6b.txt)
 
 libuv - [Node License (BSD-like)](https://github.com/mamedev/mame/blob/master/3rdparty/libuv/LICENSE)
-
-lsqlite3 - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 lua - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
@@ -51,8 +47,6 @@ rapidjson - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clau
 sdl2 - [zlib license](http://opensource.org/licenses/Zlib)
 
 softfloat - [U.C. Berkeley open-source license](https://github.com/mamedev/mame/blob/master/3rdparty/softfloat/README.txt) MIT compatible
-
-sqlite3 - Public Domain
 
 winpcap - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 

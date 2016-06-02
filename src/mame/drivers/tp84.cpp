@@ -66,6 +66,7 @@ C004      76489 #4 trigger
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "sound/flt_rc.h"
@@ -133,7 +134,7 @@ static ADDRESS_MAP_START( tp84_cpu1_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x3004, 0x3004) AM_WRITEONLY AM_SHARE("flipscreen_x")
 	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_SHARE("flipscreen_y")
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(tp84_sh_irqtrigger_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITEONLY AM_SHARE("scroll_x")
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITEONLY AM_SHARE("scroll_y")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("bg_videoram")
@@ -159,7 +160,7 @@ static ADDRESS_MAP_START( tp84b_cpu1_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x1c04, 0x1c04) AM_WRITEONLY AM_SHARE("flipscreen_x")
 	AM_RANGE(0x1c05, 0x1c05) AM_WRITEONLY AM_SHARE("flipscreen_y")
 	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(tp84_sh_irqtrigger_w)
-	AM_RANGE(0x1e80, 0x1e80) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x1e80, 0x1e80) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1f00, 0x1f00) AM_WRITEONLY AM_SHARE("scroll_x")
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITEONLY AM_SHARE("scroll_y")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -186,7 +187,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8000) AM_READ(tp84_sh_timer_r)
 	AM_RANGE(0xa000, 0xa1ff) AM_WRITE(tp84_filter_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITENOP
@@ -318,6 +319,8 @@ static MACHINE_CONFIG_START( tp84, tp84_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("y2404_1", Y2404, XTAL_14_31818MHz/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.75)

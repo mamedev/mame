@@ -34,6 +34,7 @@ Notes:
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "machine/i8255.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "includes/scramble.h"
 
@@ -241,7 +242,7 @@ static ADDRESS_MAP_START( hotshock_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6006, 0x6006) AM_WRITE(galaxold_gfxbank_w)
 	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
 	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN3")
@@ -310,7 +311,7 @@ static ADDRESS_MAP_START( ad2083_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6805, 0x6805) AM_WRITE(galaxold_coin_counter_1_w)
 	AM_RANGE(0x6806, 0x6806) AM_WRITE(scrambold_background_red_w)
 	AM_RANGE(0x6807, 0x6807) AM_WRITE(scrambold_background_green_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(hotshock_sh_irqtrigger_w)
 	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
@@ -1399,7 +1400,7 @@ static MACHINE_CONFIG_START( scramble, scramble_state )
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
 
 	/* video hardware */
@@ -1420,11 +1421,13 @@ static MACHINE_CONFIG_START( scramble, scramble_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("8910.1", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 
 	MCFG_SOUND_ADD("8910.2", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
@@ -1437,7 +1440,7 @@ static MACHINE_CONFIG_DERIVED( mars, scramble )
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
 
@@ -1483,7 +1486,7 @@ static MACHINE_CONFIG_DERIVED( mrkougar, scramble )
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, mrkougar_sh_irqtrigger_w))
 
 	/* video hardware */
@@ -1501,7 +1504,7 @@ static MACHINE_CONFIG_DERIVED( mrkougb, scramble )
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, mrkougar_sh_irqtrigger_w))
 
 	/* video hardware */

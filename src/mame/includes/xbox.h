@@ -468,6 +468,10 @@ public:
 	DECLARE_WRITE32_MEMBER(geforce_w);
 	DECLARE_READ32_MEMBER(smbus_r);
 	DECLARE_WRITE32_MEMBER(smbus_w);
+	DECLARE_READ32_MEMBER(smbus2_r);
+	DECLARE_WRITE32_MEMBER(smbus2_w);
+	DECLARE_READ32_MEMBER(networkio_r);
+	DECLARE_WRITE32_MEMBER(networkio_w);
 	DECLARE_READ8_MEMBER(superio_read);
 	DECLARE_WRITE8_MEMBER(superio_write);
 	DECLARE_READ8_MEMBER(superiors232_read);
@@ -480,6 +484,10 @@ public:
 	DECLARE_WRITE32_MEMBER(dummy_w);
 	DECLARE_READ32_MEMBER(ohci_usb_r);
 	DECLARE_WRITE32_MEMBER(ohci_usb_w);
+	DECLARE_READ32_MEMBER(ohci_usb2_r);
+	DECLARE_WRITE32_MEMBER(ohci_usb2_w);
+	DECLARE_READ32_MEMBER(network_r);
+	DECLARE_WRITE32_MEMBER(network_w);
 
 	void smbus_register_device(int address, int(*handler)(xbox_base_state &chs, int command, int rw, int data));
 	int smbus_pic16lc(int command, int rw, int data);

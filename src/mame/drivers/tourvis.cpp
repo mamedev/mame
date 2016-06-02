@@ -63,7 +63,7 @@
     Mr. Heli (23)
     Ninja Ryukenden (10)
     Operation Wolf (26)
-  * Out Run
+    Out Run (38)
     Override (53)
     Pac-Land (16)
   * Paranoia (18)
@@ -90,7 +90,7 @@
     Skweek (89)
   * Soldier Blade
     Son Son II (80)
-    Special Criminal Investigation (?)
+    Special Criminal Investigation (58)
     Super Star Soldier (42)
     Super Volley ball (?)
     Tatsujin (31)

@@ -5,6 +5,8 @@
     Blades of Steel
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 #include "sound/flt_rc.h"
 #include "sound/upd7759.h"
 #include "video/k007342.h"
@@ -26,6 +28,7 @@ public:
 		m_filter2(*this, "filter2"),
 		m_filter3(*this, "filter3"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_soundlatch(*this, "soundlatch"),
 		m_trackball(*this, "TRACKBALL"),
 		m_rombank(*this, "rombank") { }
 
@@ -38,6 +41,7 @@ public:
 	required_device<filter_rc_device> m_filter2;
 	required_device<filter_rc_device> m_filter3;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport_array<4> m_trackball;
 
 	/* memory pointers */

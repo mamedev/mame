@@ -54,7 +54,6 @@ public:
 	DECLARE_WRITE8_MEMBER(contra_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(contra_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(contra_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(cpu_sound_command_w);
 	DECLARE_WRITE8_MEMBER(contra_fg_vram_w);
 	DECLARE_WRITE8_MEMBER(contra_fg_cram_w);
 	DECLARE_WRITE8_MEMBER(contra_bg_vram_w);

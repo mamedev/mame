@@ -184,7 +184,8 @@
 #endif
 
 #define BAUDGEN_CLOCK XTAL_19_6608MHz /* Raltron */
-#define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* Giving 4.9152MHz as documentation says */
+// TODO: figure out the correct divider circuit
+#define SCC_CLOCK (BAUDGEN_CLOCK / 5) /* Giving 9600 but not the 4.9152MHz the documentation says... */
 class hk68v10_state : public driver_device
 {
 public:

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/****************************************
+/*************************************************************************************************************************
 
     Metal Freezer (c) 1989 Seibu
 
@@ -9,13 +9,14 @@
     HW seems the natural evolution of Dark Mist type.
 
     TODO:
-    - Video registers needs better understanding.
+    - A few video register bits still needs sorting out (needs HW tests perhaps?)
     - Nuke legacy video code and re-do it by using tilemap system.
-    - sprites are ahead of 1/2 frames;
-    - Writes at 0xb800-0xbfff at attract mode gameplay demo transition?
-    - DIPs need work - Flip Screen does not function.  Still playable
+    - sprites are ahead of 1/2 frames, needs sprite DMA fixed;
+    - Writes at 0xb800-0xbfff or 0x8000-0x9fff during gameplays? (Check by allowing ROM write)
+    - Flip screen support;
+    - Why service mode returns all inputs as high? And why sound test doesn't seem to function at all, both BTANBs perhaps?
 
-****************************************/
+**************************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -55,6 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	UINT8 m_fg_tilebank;
+	bool m_rowscroll_enable;
 };
 
 
@@ -65,7 +67,7 @@ void metlfrzr_state::video_start()
 /*
  - video regs format:
     [0x06] ---- --x- used during title screen transition, unknown purpose
-    [0x06] ---- ---x
+    [0x06] ---- ---x X scrolling 8th bit
     [0x15] always 0?
     [0x16] always 0?
     [0x17] xxxx xxxx X scrolling base value
@@ -86,7 +88,7 @@ void metlfrzr_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 	{
 		int tile_base = count;
 		int y = (count % 32);
-		if(y > 7 || m_video_regs[0x06] & 3) // TODO: this condition breaks on level 5 halfway thru.
+		if(y > 7 || m_rowscroll_enable == false)
 		{
 			tile_base+= x_scroll_base;
 			x_scroll_shift = (x_scroll_value & 7);
@@ -112,7 +114,7 @@ void metlfrzr_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
     Sprite seems to traverse from top to bottom priority-wise, other than that format is almost 1:1 with darkmist.cpp.
  sprite format:
     [0] tttt tttt tile number
-    [1] x--- ---- if 1 sprite is disabled
+    [1] x--- ---- X 8th bit
     [1] -ttt ---- tile bank
     [1] ---- cccc palette number
     [2] yyyy yyyy Y offset
@@ -127,8 +129,6 @@ void metlfrzr_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 
 	for(count=0x200-4;count>-1;count-=4)
 	{
-		if(base_spriteram[count+1] & 0x80)
-			continue;
 
 		gfx_element *cur_gfx = base_spriteram[count+1] & 0x40 ? gfx_3 : gfx_2;
 		UINT8 tile_bank = (base_spriteram[count+1] & 0x30) >> 4;
@@ -136,7 +136,9 @@ void metlfrzr_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		UINT8 color = base_spriteram[count+1] & 0xf;
 		int y = base_spriteram[count+2];
 		int x = base_spriteram[count+3];
-
+		if(base_spriteram[count+1] & 0x80)
+			x-=256;
+		
 		cur_gfx->transpen(bitmap,cliprect,tile,color,0,0,x,y,0xf);
 	}
 }
@@ -144,7 +146,7 @@ void metlfrzr_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 UINT32 metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
-
+	
 	legacy_bg_draw(bitmap,cliprect);
 	legacy_obj_draw(bitmap,cliprect);
 	return 0;
@@ -156,13 +158,16 @@ WRITE8_MEMBER(metlfrzr_state::output_w)
 	// bit 6-5: coin lockouts
 	// bit 4: tilemap ROM banking
 	// bit 3-2: z80 ROM banking
-	// bit 1-0: unknown purpose, both 1s too generally
+	// bit 1: enabled during gameplay, rowscroll enable?
+	// bit 0: enabled , unknown purpose (lamp?)
+	// TODO: bits 1-0 might actually be sprite DMA enable mask/request
 	machine().bookkeeping().coin_lockout_w(1, BIT(data,6) );
 	machine().bookkeeping().coin_lockout_w(0, BIT(data,5) );
 	m_fg_tilebank = (data & 0x10) >> 4;
 	membank("bank1")->set_entry((data & 0xc) >> 2);
-
-//  popmessage("%02x",data & 3);
+	m_rowscroll_enable = bool(BIT(data,1));
+	
+//  popmessage("%02x %02x",m_fg_tilebank,data & 3);
 }
 
 static ADDRESS_MAP_START( metlfrzr_map, AS_PROGRAM, 8, metlfrzr_state )
@@ -242,55 +247,53 @@ static INPUT_PORTS_START( metlfrzr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:1") 
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
 	PORT_SERVICE_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_A ) )  PORT_DIPLOCATION("SW1:4,5,6") 
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:7,8") 
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "SYSB" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2") 
+	PORT_DIPSETTING(    0x02, "A" )
+	PORT_DIPSETTING(    0x03, "B" )
+	PORT_DIPSETTING(    0x01, "C" )
+	PORT_DIPSETTING(    0x00, "D" )
+	// service mode returns these values divided by 10 (so 02/05/10 effectively means 20k, 50k, 100k)
+	// TODO: check if it extends
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4") 
+	PORT_DIPSETTING(    0x08, "20k, 50k, 100k" )
+	PORT_DIPSETTING(    0x0c, "30k, 80k, 150k" )
+	PORT_DIPSETTING(    0x04, "50k, 100k, 200k" )
+	PORT_DIPSETTING(    0x00, "100k, 200k, 400k" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:5,6") 
+	PORT_DIPSETTING(    0x20, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	// disabling following enables intro / how to play screens
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Level_Select ) )  PORT_DIPLOCATION("SW2:7") 
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8") 
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -341,10 +344,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 {
 	int scanline = param;
 
-
 	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
 
+	// TODO: check this irq.
 	if(scanline == 0) // vblank-in irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
 }
@@ -454,4 +457,4 @@ DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 
 
 
-GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu", "Metal Freezer", MACHINE_NO_COCKTAIL )
+GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )

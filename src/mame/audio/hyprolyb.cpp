@@ -9,21 +9,13 @@ const device_type HYPROLYB_ADPCM = &device_creator<hyprolyb_adpcm_device>;
 hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HYPROLYB_ADPCM, "Hyper Olympics Audio", tag, owner, clock, "hyprolyb_adpcm", __FILE__),
 		device_sound_interface(mconfig, *this),
+		m_soundlatch2(*this, ":soundlatch2"),
 		m_adpcm_ready(0),
 		m_adpcm_busy(0),
 		m_vck_ready(0)
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void hyprolyb_adpcm_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -51,8 +43,7 @@ void hyprolyb_adpcm_device::device_reset()
 
 WRITE8_MEMBER( hyprolyb_adpcm_device::write )
 {
-	driver_device *drvstate = space.machine().driver_data<driver_device>();
-	drvstate->soundlatch2_byte_w(*m_space, offset, data);
+	m_soundlatch2->write(*m_space, offset, data);
 	m_adpcm_ready = 0x80;
 }
 
@@ -81,9 +72,8 @@ READ8_MEMBER( hyprolyb_adpcm_device::ready_r )
 
 READ8_MEMBER( hyprolyb_adpcm_device::data_r )
 {
-	driver_device *drvstate = space.machine().driver_data<driver_device>();
 	m_adpcm_ready = 0x00;
-	return drvstate->soundlatch2_byte_r(*m_space, offset);
+	return m_soundlatch2->read(*m_space, offset);
 }
 
 static ADDRESS_MAP_START( hyprolyb_adpcm_map, AS_PROGRAM, 8, driver_device )
@@ -116,6 +106,8 @@ void hyprolyb_adpcm_device::vck_callback( int st )
 MACHINE_CONFIG_FRAGMENT( hyprolyb_adpcm )
 	MCFG_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)    /* unknown clock */
 	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 

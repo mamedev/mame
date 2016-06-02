@@ -76,9 +76,9 @@ public:
 
 	// queries
 	const char *text();
-	bool has_itemlist() const { return (m_itemlist.count() != 0); }
-	bool is_minimum() const { return (m_value == ((m_itemlist.count() == 0) ? m_minval : m_itemlist.first()->value())); }
-	bool is_maximum() const { return (m_value == ((m_itemlist.count() == 0) ? m_maxval : m_itemlist.last()->value())); }
+	bool has_itemlist() const { return (m_itemlist.size() != 0); }
+	bool is_minimum() const { return (m_value == ((m_itemlist.size() == 0) ? m_minval : m_itemlist.front()->value())); }
+	bool is_maximum() const { return (m_value == ((m_itemlist.size() == 0) ? m_maxval : m_itemlist.back()->value())); }
 
 	// state setters
 	bool set_minimum_state();
@@ -92,23 +92,18 @@ private:
 	// a single item in a parameter item list
 	class item
 	{
-		friend class simple_list<item>;
-
 	public:
 		// construction/destruction
 		item(const char *text, UINT64 value, int valformat)
-			: m_next(nullptr),
-				m_text(text),
-				m_value(value, valformat) { }
+			: m_text(text),
+			  m_value(value, valformat) { }
 
 		// getters
-		item *next() const { return m_next; }
 		const number_and_format &value() const { return m_value; }
 		const char *text() const { return m_text.c_str(); }
 
 	private:
 		// internal state
-		item *              m_next;                         // next item in list
 		std::string         m_text;                         // name of the item
 		number_and_format   m_value;                        // value of the item
 	};
@@ -119,7 +114,7 @@ private:
 	number_and_format   m_stepval;                      // step value
 	UINT64              m_value;                        // live value of the parameter
 	std::string         m_curtext;                      // holding for a value string
-	simple_list<item>   m_itemlist;                     // list of items
+	std::vector<std::unique_ptr<item>>   m_itemlist;                     // list of items
 };
 
 
@@ -128,8 +123,6 @@ private:
 // a script entry, specifying which state to execute under
 class cheat_script
 {
-	friend class simple_list<cheat_script>;
-
 public:
 	// construction/destruction
 	cheat_script(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &scriptnode);
@@ -145,14 +138,9 @@ private:
 	// an entry within the script
 	class script_entry
 	{
-		friend class simple_list<script_entry>;
-
 	public:
 		// construction/destruction
 		script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &entrynode, bool isaction);
-
-		// getters
-		script_entry *next() const { return m_next; }
 
 		// actions
 		void execute(cheat_manager &manager, UINT64 &argindex);
@@ -162,14 +150,11 @@ private:
 		// an argument for output
 		class output_argument
 		{
-			friend class simple_list<output_argument>;
-
 		public:
 			// construction/destruction
 			output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &argnode);
 
 			// getters
-			output_argument *next() const { return m_next; }
 			int count() const { return m_count; }
 			int values(UINT64 &argindex, UINT64 *result);
 
@@ -178,7 +163,6 @@ private:
 
 		private:
 			// internal state
-			output_argument *   m_next;                         // link to next argument
 			parsed_expression   m_expression;                   // expression for argument
 			UINT64              m_count;                        // number of repetitions
 		};
@@ -187,11 +171,10 @@ private:
 		void validate_format(const char *filename, int line);
 
 		// internal state
-		script_entry *      m_next;                         // link to next entry
 		parsed_expression   m_condition;                    // condition under which this is executed
 		parsed_expression   m_expression;                   // expression to execute
 		std::string         m_format;                       // string format to print
-		simple_list<output_argument> m_arglist;             // list of arguments
+		std::vector<std::unique_ptr<output_argument>> m_arglist;             // list of arguments
 		INT8                m_line;                         // which line to print on
 		UINT8               m_justify;                      // justification when printing
 
@@ -200,7 +183,7 @@ private:
 	};
 
 	// internal state
-	simple_list<script_entry> m_entrylist;              // list of actions to perform
+	std::vector<std::unique_ptr<script_entry>> m_entrylist;              // list of actions to perform
 	script_state        m_state;                        // which state this script is for
 };
 
@@ -210,8 +193,6 @@ private:
 // a single cheat
 class cheat_entry
 {
-	friend class simple_list<cheat_entry>;
-
 public:
 	// construction/destruction
 	cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, xml_data_node &cheatnode);
@@ -219,7 +200,6 @@ public:
 
 	// getters
 	cheat_manager &manager() const { return m_manager; }
-	cheat_entry *next() const { return m_next; }
 	script_state state() const { return m_state; }
 	const char *description() const { return m_description.c_str(); }
 	const char *comment() const { return m_comment.c_str(); }
@@ -265,7 +245,6 @@ private:
 
 	// internal state
 	cheat_manager &     m_manager;                      // reference to our manager
-	cheat_entry *       m_next;                         // next cheat entry
 	std::string         m_description;                  // string description/menu title
 	std::string         m_comment;                      // comment data
 	std::unique_ptr<cheat_parameter> m_parameter;          // parameter
@@ -295,7 +274,7 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	bool enabled() const { return !m_disabled; }
-	const simple_list<cheat_entry> &entries() const { return m_cheatlist; }
+	const std::vector<std::unique_ptr<cheat_entry>> &entries() const { return m_cheatlist; }
 
 	// setters
 	void set_enable(bool enable = true);
@@ -320,7 +299,7 @@ private:
 
 	// internal state
 	running_machine &   m_machine;                          // reference to our machine
-	simple_list<cheat_entry> m_cheatlist;                   // cheat list
+	std::vector<std::unique_ptr<cheat_entry>> m_cheatlist;                   // cheat list
 	UINT64              m_framecount;                       // frame count
 	std::vector<std::string>  m_output;                     // array of output strings
 	std::vector<UINT8>        m_justify;                    // justification for each string

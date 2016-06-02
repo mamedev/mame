@@ -144,7 +144,10 @@ public:
 		// Create and initialize our helpers
 		status = init_helpers();
 		if (status != 0)
+		{
+			osd_printf_error("Hybrid joystick module helpers failed to initialize. Error 0x%X\n", static_cast<unsigned int>(status));
 			return status;
+		}
 
 		return 0;
 	}
@@ -240,7 +243,7 @@ private:
 			status = m_xinput_helper->initialize();
 			if (status != 0)
 			{
-				osd_printf_error("xinput_api_helper failed to initialize! Error: %u\n", static_cast<unsigned int>(status));
+				osd_printf_verbose("xinput_api_helper failed to initialize! Error: %u\n", static_cast<unsigned int>(status));
 				return -1;
 			}
 		}
@@ -251,7 +254,7 @@ private:
 			status = m_dinput_helper->initialize();
 			if (status != DI_OK)
 			{
-				osd_printf_error("dinput_api_helper failed to initialize! Error: %u\n", static_cast<unsigned int>(status));
+				osd_printf_verbose("dinput_api_helper failed to initialize! Error: %u\n", static_cast<unsigned int>(status));
 				return -1;
 			}
 		}

@@ -194,7 +194,7 @@ WRITE16_MEMBER(gijoe_state::sound_cmd_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		soundlatch_byte_w(space, 0, data);
+		m_soundlatch->write(space, 0, data);
 	}
 }
 
@@ -205,7 +205,7 @@ WRITE16_MEMBER(gijoe_state::sound_irq_w)
 
 READ16_MEMBER(gijoe_state::sound_status_r)
 {
-	return soundlatch2_byte_r(space, 0);
+	return m_soundlatch2->read(space, 0);
 }
 
 static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
@@ -242,8 +242,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gijoe_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_byte_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+	AM_RANGE(0xfc02, 0xfc02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -343,6 +343,9 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))

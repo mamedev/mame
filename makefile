@@ -58,7 +58,6 @@
 # USE_SYSTEM_LIB_JPEG = 1
 # USE_SYSTEM_LIB_FLAC = 1
 # USE_SYSTEM_LIB_LUA = 1
-# USE_SYSTEM_LIB_SQLITE3 = 1
 # USE_SYSTEM_LIB_PORTMIDI = 1
 # USE_SYSTEM_LIB_PORTAUDIO = 1
 # USE_SYSTEM_LIB_UV = 1
@@ -405,10 +404,6 @@ endif
 
 ifdef USE_SYSTEM_LIB_LUA
 PARAMS += --with-system-lua='$(USE_SYSTEM_LIB_LUA)'
-endif
-
-ifdef USE_SYSTEM_LIB_SQLITE3
-PARAMS += --with-system-sqlite3='$(USE_SYSTEM_LIB_SQLITE3)'
 endif
 
 ifdef USE_SYSTEM_LIB_PORTMIDI
@@ -849,6 +844,22 @@ MSBUILD_PARAMS += /p:Platform=x64
 else
 MSBUILD_PARAMS += /p:Platform=win32
 endif
+ifeq (posix,$(SHELLTYPE))
+MSBUILD_PARAMS := $(subst /,-,$(MSBUILD_PARAMS))
+endif
+endif
+ifdef FASTBUILD
+FASTBUILD_PARAMS := -j$(NUMBER_OF_PROCESSORS)
+ifeq ($(CONFIG),debug)
+FASTBUILD_TARGET := all-Debug
+else
+FASTBUILD_TARGET := all-Release
+endif
+ifeq ($(ARCHITECTURE),_x64)
+FASTBUILD_PARAMS += $(FASTBUILD_TARGET)-x64
+else
+FASTBUILD_PARAMS += $(FASTBUILD_TARGET)-x32
+endif
 endif
 else
 GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> /dev/null)
@@ -976,21 +987,21 @@ windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
 vs2013: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2013
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2013/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2013_intel
 vs2013_intel: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2013
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2013-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2013_xp
 vs2013_xp: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2013-xp vs2013
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2013-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2013-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 #-------------------------------------------------
@@ -1001,28 +1012,35 @@ endif
 vs2015: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2015
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2015_intel
 vs2015_intel: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2015
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2015_xp
 vs2015_xp: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2015-xp vs2015
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 .PHONY: vs2015_uwp
 vs2015_uwp: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=windows --NO_USE_MIDI=1 --USE_LIBUV=0 --NO_OPENGL=1 --USE_QTDEBUG=0 --MODERN_WIN_API=1 vs2015
 ifdef MSBUILD
-	$(SILENT) msbuild $(PROJECTDIR_WIN)/vs2015-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2015_fastbuild
+vs2015_fastbuild: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2015-fastbuild
+ifdef FASTBUILD
+	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2015-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
 endif
 
 #-------------------------------------------------

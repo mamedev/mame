@@ -134,13 +134,13 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 WRITE16_MEMBER(rungun_state::sound_cmd1_w)
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch_byte_w(space, 0, data >> 8);
+		m_soundlatch->write(space, 0, data >> 8);
 }
 
 WRITE16_MEMBER(rungun_state::sound_cmd2_w)
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch2_byte_w(space, 0, data >> 8);
+		m_soundlatch2->write(space, 0, data >> 8);
 }
 
 WRITE16_MEMBER(rungun_state::sound_irq_w)
@@ -269,8 +269,8 @@ static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8, rungun_state )
 	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_2", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_status_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0xf002, 0xf002) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xf003, 0xf003) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_ctrl_w)
 	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END
@@ -462,6 +462,9 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
 	MCFG_K054539_REGION_OVERRRIDE("shared")
