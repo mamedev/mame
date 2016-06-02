@@ -521,9 +521,9 @@ protected:
 	emu_timer *baudtimer;
 	UINT16 m_brg_counter;
 #else
-	UINT16 m_brg_rate;
+	unsigned int m_brg_rate;
 #endif
-	UINT16 m_brg_const;
+	unsigned int m_brg_const;
 
 	void update_serial();
 	void set_dtr(int state);
@@ -536,18 +536,18 @@ protected:
 	int get_tx_word_length();
 
 	// receiver state
-	UINT8 m_rx_data_fifo[8];    // receive data FIFO
-	UINT8 m_rx_error_fifo[8];   // receive error FIFO
-	UINT8 m_rx_error;       // current receive error
-	//int m_rx_fifo         // receive FIFO pointer
-		int m_rx_fifo_rp;   // receive FIFO read pointer
-	int m_rx_fifo_wp;   // receive FIFO write pointer
-	int m_rx_fifo_sz;   // receive FIFO size
+	UINT8 m_rx_data_fifo[8];	// receive data FIFO
+	UINT8 m_rx_error_fifo[8];	// receive error FIFO
+	UINT8 m_rx_error;		// current receive error
+	//int m_rx_fifo			// receive FIFO pointer
+	int m_rx_fifo_rp;		// receive FIFO read pointer
+	int m_rx_fifo_wp;		// receive FIFO write pointer
+	int m_rx_fifo_sz;		// receive FIFO size
 
-	int m_rx_clock;     // receive clock pulse count
-	int m_rx_first;     // first character received
-	int m_rx_break;     // receive break condition
-	UINT8 m_rx_rr0_latch;   // read register 0 latched
+	int m_rx_clock;	    	// receive clock pulse count
+	int m_rx_first;	    	// first character received
+	int m_rx_break;	    	// receive break condition
+	UINT8 m_rx_rr0_latch;	// read register 0 latched
 
 	int m_rxd;
 	int m_ri;       // ring indicator latch
