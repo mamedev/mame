@@ -605,8 +605,8 @@ luabridge::LuaRef lua_engine::l_cheat_get_entries(const cheat_manager *c)
 	luabridge::LuaRef entry_table = luabridge::LuaRef::newTable(L);
 
 	int cheatnum = 0;
-	for (cheat_entry &entry : cm->entries()) {
-		entry_table[cheatnum++] = &entry;
+	for (auto &entry : cm->entries()) {
+		entry_table[cheatnum++] = entry.get();
 	}
 
 	return entry_table;
