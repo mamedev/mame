@@ -146,15 +146,6 @@ class pvector_t : public std::vector<LC>
 public:
 	pvector_t() : std::vector<LC>() {}
 
-	void clear_and_free()
-	{
-		for (LC i : *this)
-		{
-			pfree(i);
-		}
-		this->clear();
-	}
-
 	bool contains(const LC &elem) const
 	{
 		return (std::find(this->begin(), this->end(), elem) != this->end());

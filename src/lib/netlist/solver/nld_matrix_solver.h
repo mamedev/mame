@@ -10,13 +10,32 @@
 
 #include <type_traits>
 
-#include "solver/nld_solver.h"
+//#include "solver/nld_solver.h"
+#include "nl_base.h"
 #include "plib/pstream.h"
 
 namespace netlist
 {
 	namespace devices
 	{
+
+	/* FIXME: these should become proper devices */
+
+	struct solver_parameters_t
+	{
+		int m_pivot;
+		nl_double m_accuracy;
+		nl_double m_lte;
+		nl_double m_min_timestep;
+		nl_double m_max_timestep;
+		nl_double m_sor;
+		bool m_dynamic;
+		int m_gs_loops;
+		int m_nr_loops;
+		netlist_time m_nt_sync_delay;
+		bool m_log_stats;
+	};
+
 
 class terms_t
 {
@@ -168,7 +187,7 @@ protected:
 
 	plib::pvector_t<terms_t *> m_terms;
 	plib::pvector_t<analog_net_t *> m_nets;
-	plib::pvector_t<analog_output_t *> m_inps;
+	std::vector<std::unique_ptr<analog_output_t>> m_inps;
 
 	plib::pvector_t<terms_t *> m_rails_temp;
 

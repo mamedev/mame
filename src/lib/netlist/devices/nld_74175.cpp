@@ -16,8 +16,8 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(74175_sub)
 		, m_CLK(*this, "CLK")
-		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4"})
-		, m_QQ(*this, {"Q1Q", "Q2Q", "Q3Q", "Q4Q"})
+		, m_Q(*this, {{"Q1", "Q2", "Q3", "Q4"}})
+		, m_QQ(*this, {{"Q1Q", "Q2Q", "Q3Q", "Q4Q"}})
 		, m_data(0)
 		{
 			save(NLNAME(m_clrq));
@@ -40,7 +40,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(74175)
 		, m_sub(*this, "sub")
-		, m_D(*this, {"D1", "D2", "D3", "D4"})
+		, m_D(*this, {{"D1", "D2", "D3", "D4"}})
 		, m_CLRQ(*this, "CLRQ")
 		{
 			register_subalias("CLK",   m_sub.m_CLK);

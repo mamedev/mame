@@ -48,7 +48,7 @@ namespace netlist
 		, m_LOADQ(*this, "LOADQ")
 		, m_CU(*this, "CU")
 		, m_CD(*this, "CD")
-		, m_Q(*this, {"QA", "QB", "QC", "QD"})
+		, m_Q(*this, {{"QA", "QB", "QC", "QD"}})
 		, m_BORROWQ(*this, "BORROWQ")
 		, m_CARRYQ(*this, "CARRYQ")
 		{

@@ -24,7 +24,7 @@ namespace netlist
 		, m_cnt(0)
 		, m_last_A(0)
 		, m_last_B(0)
-		, m_Q(*this, {"QA", "QB", "QC", "QD"})
+		, m_Q(*this, {{"QA", "QB", "QC", "QD"}})
 		{
 			save(NLNAME(m_cnt));
 			save(NLNAME(m_last_A));

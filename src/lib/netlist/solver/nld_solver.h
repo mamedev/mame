@@ -11,6 +11,7 @@
 #include "nl_setup.h"
 #include "nl_base.h"
 #include "plib/pstream.h"
+#include "solver/nld_matrix_solver.h"
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
@@ -33,23 +34,6 @@ namespace netlist
 	{
 
 class NETLIB_NAME(solver);
-
-/* FIXME: these should become proper devices */
-
-struct solver_parameters_t
-{
-	int m_pivot;
-	nl_double m_accuracy;
-	nl_double m_lte;
-	nl_double m_min_timestep;
-	nl_double m_max_timestep;
-	nl_double m_sor;
-	bool m_dynamic;
-	int m_gs_loops;
-	int m_nr_loops;
-	netlist_time m_nt_sync_delay;
-	bool m_log_stats;
-};
 
 
 class matrix_solver_t;
@@ -122,13 +106,13 @@ protected:
 
 	param_logic_t  m_log_stats;
 
-	plib::pvector_t<matrix_solver_t *> m_mat_solvers;
+	std::vector<std::unique_ptr<matrix_solver_t>> m_mat_solvers;
 private:
 
 	solver_parameters_t m_params;
 
 	template <int m_N, int storage_N>
-	matrix_solver_t *create_solver(int size, bool use_specific);
+	std::unique_ptr<matrix_solver_t> create_solver(int size, bool use_specific);
 };
 
 	} //namespace devices

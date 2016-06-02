@@ -11,6 +11,7 @@
 #include "net_lib.h"
 #include "nld_system.h"
 #include "nl_factory.h"
+#include "solver/nld_solver.h"
 
 NETLIST_START(diode_models)
 	NET_MODEL("D _(IS=1e-15 N=1)")

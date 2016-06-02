@@ -6,6 +6,7 @@
  */
 
 #include "solver/nld_matrix_solver.h"
+#include "solver/nld_solver.h"
 
 #include "plib/palloc.h"
 
