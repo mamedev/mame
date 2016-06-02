@@ -1657,6 +1657,7 @@ void z80scc_channel::do_sccreg_wr9(UINT8 data)
 		if (data & (WR9_BIT_MIE | WR9_BIT_IACK | WR9_BIT_SHSL | WR9_BIT_DLC | WR9_BIT_NV))
 			logerror(" SCC Interrupt system not yet implemented, please be patient.\n");
 		m_uart->device_reset();
+		break;
 	default:
 		logerror("Code is broken in WR9, please report!\n");
 	}
@@ -1676,7 +1677,7 @@ receive and transmit clocks, the type of signal on the /SYNC and /RTxC pins, and
 the /TRxC pin.*/
 void z80scc_channel::do_sccreg_wr11(UINT8 data)
 {
-	LOG(("\"%s\": %c : %s Clock Mode Control %02x - not implemented \n", m_owner->tag(), 'A' + m_index, FUNCNAME, data));
+	LOG(("\"%s\": %c : %s Clock Mode Control %02x\n", m_owner->tag(), 'A' + m_index, FUNCNAME, data));
 	m_wr11 = data;
 	/*Bit 7: This bit controls the type of input signal the SCC expects to see on the /RTxC pin. If this bit is set
 	  to 0, the SCC expects a TTL-compatible signal as an input to this pin. If this bit is set to 1, the SCC
@@ -1695,10 +1696,10 @@ void z80scc_channel::do_sccreg_wr11(UINT8 data)
 	LOG(("  Receive clock source is: "));
 	switch (data & WR11_RCVCLK_SRC_MASK)
 	{
-	case WR11_RCVCLK_SRC_RTXC: LOG(("RTxC\n")); break;
-	case WR11_RCVCLK_SRC_TRXC: LOG(("TRxC\n")); break;
+	case WR11_RCVCLK_SRC_RTXC: LOG(("RTxC - not implemented\n")); break;
+	case WR11_RCVCLK_SRC_TRXC: LOG(("TRxC - not implemented\n")); break;
 	case WR11_RCVCLK_SRC_BR:   LOG(("Baudrate Generator\n")); break;
-	case WR11_RCVCLK_SRC_DPLL: LOG(("DPLL\n")); break;
+	case WR11_RCVCLK_SRC_DPLL: LOG(("DPLL - not implemented\n")); break;
 	default: logerror("Wrong!\n");/* Will not happen unless someone messes with the mask */
 	}
 	/*Bits 4 and 3: Transmit Clock select bits 1 and 0.
@@ -1711,10 +1712,10 @@ void z80scc_channel::do_sccreg_wr11(UINT8 data)
 	LOG(("  Transmit clock source is: "));
 	switch (data & WR11_TRACLK_SRC_MASK)
 	{
-	case WR11_TRACLK_SRC_RTXC: LOG(("RTxC\n")); break;
-	case WR11_TRACLK_SRC_TRXC: LOG(("TRxC\n")); break;
+	case WR11_TRACLK_SRC_RTXC: LOG(("RTxC - not implemented\n")); break;
+	case WR11_TRACLK_SRC_TRXC: LOG(("TRxC - not implemented\n")); break;
 	case WR11_TRACLK_SRC_BR:   LOG(("Baudrate Generator\n")); break;
-	case WR11_TRACLK_SRC_DPLL: LOG(("DPLL\n")); break;
+	case WR11_TRACLK_SRC_DPLL: LOG(("DPLL - not implemented\n")); break;
 	default: logerror("Wrong!\n");/* Will not happen unless someone messes with the mask */
 	}
 	/* Bit 2: TRxC Pin I/O control bit
@@ -1734,10 +1735,10 @@ void z80scc_channel::do_sccreg_wr11(UINT8 data)
 	LOG(("  TRxC clock source is: "));
 	switch (data & WR11_TRXSRC_SRC_MASK)
 	{
-	case WR11_TRXSRC_SRC_XTAL: LOG(("the Oscillator\n")); break;
-	case WR11_TRXSRC_SRC_TRA:  LOG(("Transmit clock\n")); break;
+	case WR11_TRXSRC_SRC_XTAL: LOG(("the Oscillator - not implemented\n")); break;
+	case WR11_TRXSRC_SRC_TRA:  LOG(("Transmit clock - not_implemented\n")); break;
 	case WR11_TRXSRC_SRC_BR:   LOG(("Baudrate Generator\n")); break;
-	case WR11_TRXSRC_SRC_DPLL: LOG(("DPLL\n")); break;
+	case WR11_TRXSRC_SRC_DPLL: LOG(("DPLL - not implemented\n")); break;
 	default: logerror("Wrong!\n");/* Will not happen unless someone messes with the mask */
 	}
 }
@@ -1848,7 +1849,7 @@ void z80scc_channel::do_sccreg_wr14(UINT8 data)
 			m_rcv_mode = RCV_SEEKING;
 #endif
 #else
-			m_brg_rate = rate / 2 * get_clock_mode();
+			m_brg_rate = rate / (2 * get_clock_mode());
 			update_serial();
 #endif
 		}
@@ -2205,7 +2206,7 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 #endif
 			}
 
-		// set data carrier detect
+	// set data carrier detect
 		m_dcd = state;
 
 		if (!m_rx_rr0_latch)
