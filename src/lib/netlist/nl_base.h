@@ -1341,7 +1341,7 @@ protected:
 
 	ATTR_HOT inline void netlist_t::push_to_queue(net_t &out, const netlist_time &attime) NOEXCEPT
 	{
-		m_queue.push({ attime, &out });
+		m_queue.push(attime, &out);
 	}
 
 	ATTR_HOT inline void netlist_t::remove_from_queue(net_t &out)
@@ -1349,30 +1349,10 @@ protected:
 		m_queue.remove(&out);
 	}
 
-#if 1
 	ATTR_HOT inline void core_device_t::OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time &delay) NOEXCEPT
 	{
 		out.set_Q(val, delay);
 	}
-#else
-	ATTR_HOT inline void core_device_t::OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time &delay) NOEXCEPT
-	{
-		logic_net_t &net = out.m_my_net;
-		if (val !=  net.m_new_Q)
-		{
-			net.m_new_Q = val;
-			if (!net.is_queued() && (net.num_cons() > 0))
-			{
-				net.m_time = netlist().time() + delay;
-				net.m_in_queue = (net.m_active > 0);     /* queued ? */
-				if (net.m_in_queue)
-				{
-					netlist().push_to_queue(net, net.m_time);
-				}
-			}
-		}
-	}
-#endif
 
 
 }

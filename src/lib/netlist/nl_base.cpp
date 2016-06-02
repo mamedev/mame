@@ -19,7 +19,7 @@ namespace netlist
 {
 
 #if (NL_USE_MEMPOOL)
-static plib::pmempool p(65536, 16);
+static plib::mempool p(65536, 8);
 
 void * object_t::operator new (size_t size)
 {
@@ -146,7 +146,7 @@ void queue_t::on_post_load()
 		net_t *n = netlist().find_net(m_names[i].m_buf);
 		//log().debug("Got {1} ==> {2}\n", qtemp[i].m_name, n));
 		//log().debug("schedule time {1} ({2})\n", n->time().as_double(),  netlist_time::from_raw(m_times[i]).as_double()));
-		this->push({ netlist_time::from_raw(m_times[i]), n });
+		this->push(netlist_time::from_raw(m_times[i]), n);
 	}
 }
 

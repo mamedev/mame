@@ -46,13 +46,12 @@ namespace netlist
 		ATTR_HOT  std::size_t capacity() const { return m_list.size(); }
 		ATTR_HOT  bool empty() const { return (m_end == &m_list[1]); }
 
-		ATTR_HOT void push(const entry_t e) NOEXCEPT
+		ATTR_HOT void push(const Time t, Element o) NOEXCEPT
 		{
 	#if HAS_OPENMP && USE_OPENMP
 			/* Lock */
 			while (m_lock.exchange(1)) { }
 	#endif
-			const Time t = e.m_exec_time;
 			entry_t * i = m_end++;
 			for (; t > (i - 1)->m_exec_time; --i)
 			{
@@ -60,7 +59,7 @@ namespace netlist
 				//i--;
 				inc_stat(m_prof_sortmove);
 			}
-			*i = e;
+			*i = { t, o };
 			inc_stat(m_prof_call);
 	#if HAS_OPENMP && USE_OPENMP
 			m_lock = 0;
@@ -85,7 +84,7 @@ namespace netlist
 					while (i < m_end)
 					{
 						*i = *(i+1);
-						i++;
+						++i;
 					}
 	#if HAS_OPENMP && USE_OPENMP
 					m_lock = 0;
