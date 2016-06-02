@@ -20,7 +20,7 @@ CDEFS = -DPSTANDALONE=1 -DPTR64=1
 #-Werror
 #CFLAGS =  $(LTO) -g -O3 -std=c++98 -Doverride="" -march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra -Wno-long-long -Wno-unused-parameter -Wno-unused-result -Wno-variadic-macros -I..
 #LDFLAGS = $(LTO) -g -O3 -std=c++98 
-CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter 
+CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter
 LDFLAGS = $(LTO) -g -O3 -std=c++11 -lpthread -ldl
 
 CC = @g++-5

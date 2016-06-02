@@ -28,16 +28,8 @@ namespace netlist
 		P_PREVENT_COPYING(timed_queue)
 	public:
 
-		class entry_t
+		struct entry_t
 		{
-		public:
-			ATTR_HOT  entry_t()
-			:  m_exec_time(), m_object() {}
-			ATTR_HOT  entry_t(const Time &atime, const Element &elem) NOEXCEPT
-			: m_exec_time(atime), m_object(elem)  {}
-			ATTR_HOT  const Time &exec_time() const { return m_exec_time; }
-			ATTR_HOT  const Element &object() const { return m_object; }
-		private:
 			Time m_exec_time;
 			Element m_object;
 		};
@@ -52,8 +44,7 @@ namespace netlist
 		}
 
 		ATTR_HOT  std::size_t capacity() const { return m_list.size(); }
-		ATTR_HOT  bool is_empty() const { return (m_end == &m_list[1]); }
-		ATTR_HOT  bool is_not_empty() const { return (m_end > &m_list[1]); }
+		ATTR_HOT  bool empty() const { return (m_end == &m_list[1]); }
 
 		ATTR_HOT void push(const entry_t e) NOEXCEPT
 		{
@@ -61,9 +52,9 @@ namespace netlist
 			/* Lock */
 			while (m_lock.exchange(1)) { }
 	#endif
-			const Time t = e.exec_time();
+			const Time t = e.m_exec_time;
 			entry_t * i = m_end++;
-			for (; t > (i - 1)->exec_time(); --i)
+			for (; t > (i - 1)->m_exec_time; --i)
 			{
 				*(i) = *(i-1);
 				//i--;
@@ -77,15 +68,8 @@ namespace netlist
 			//nl_assert(m_end - m_list < Size);
 		}
 
-		ATTR_HOT  const entry_t & pop() NOEXCEPT
-		{
-			return *(--m_end);
-		}
-
-		ATTR_HOT  const entry_t & top() const NOEXCEPT
-		{
-			return *(m_end-1);
-		}
+		ATTR_HOT  const entry_t & pop() NOEXCEPT       { return *(--m_end); }
+		ATTR_HOT  const entry_t & top() const NOEXCEPT { return *(m_end-1); }
 
 		ATTR_HOT  void remove(const Element &elem) NOEXCEPT
 		{
@@ -95,7 +79,7 @@ namespace netlist
 	#endif
 			for (entry_t * i = m_end - 1; i > &m_list[0]; i--)
 			{
-				if (i->object() == elem)
+				if (i->m_object == elem)
 				{
 					m_end--;
 					while (i < m_end)
@@ -121,15 +105,15 @@ namespace netlist
 			 * the insert algo above will run into this element and doesn't
 			 * need a comparison with queue start.
 			 */
-			m_list[0] = entry_t(Time::from_raw(~0), Element(0));
+			m_list[0] = { Time::from_raw(~0), Element(0) };
 			m_end++;
 		}
 
 		// save state support & mame disasm
 
 		ATTR_COLD  const entry_t *listptr() const { return &m_list[1]; }
-		ATTR_HOT  int count() const { return m_end - &m_list[1]; }
-		ATTR_HOT  const entry_t & operator[](const int & index) const { return m_list[1+index]; }
+		ATTR_HOT  std::size_t size() const { return m_end - &m_list[1]; }
+		ATTR_HOT  const entry_t & operator[](const std::size_t index) const { return m_list[1+index]; }
 
 	#if (NL_KEEP_STATISTICS)
 		// profiling

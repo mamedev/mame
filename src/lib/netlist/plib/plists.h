@@ -14,6 +14,7 @@
 #include <stack>
 #include <vector>
 #include <type_traits>
+#include <cstring>
 
 #include "palloc.h"
 #include "pstring.h"

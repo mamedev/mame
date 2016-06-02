@@ -52,7 +52,7 @@ int mempool::new_block()
 void *mempool::alloc(size_t size)
 {
 	size_t rs = (size + sizeof(info) + m_min_align - 1) & ~(m_min_align - 1);
-	for (int bn=0; bn < m_blocks.size(); bn++)
+	for (size_t bn=0; bn < m_blocks.size(); bn++)
 	{
 		auto &b = m_blocks[bn];
 		if (b.m_free > rs)

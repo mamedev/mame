@@ -511,12 +511,12 @@ ATTR_COLD offs_t netlist_mame_cpu_device_t::disasm_disassemble(char *buffer, off
 	//char tmp[16];
 	unsigned startpc = pc;
 	int relpc = pc - m_genPC;
-	if (relpc >= 0 && relpc < netlist().queue().count())
+	if (relpc >= 0 && relpc < netlist().queue().size())
 	{
-		int dpc = netlist().queue().count() - relpc - 1;
+		int dpc = netlist().queue().size() - relpc - 1;
 		// FIXME: 50 below fixes crash in mame-debugger. It's based on try on error.
-		snprintf(buffer, 50, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].object()->name().cstr(),
-				netlist().queue()[dpc].exec_time().as_double());
+		snprintf(buffer, 50, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].m_object->name().cstr(),
+				netlist().queue()[dpc].m_exec_time.as_double());
 	}
 	else
 		sprintf(buffer, "%s", "");

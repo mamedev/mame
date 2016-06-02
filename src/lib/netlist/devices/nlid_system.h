@@ -131,13 +131,13 @@ namespace netlist
 				int pati[256];
 				m_size = pat.size();
 				int total = 0;
-				for (int i=0; i<m_size; i++)
+				for (unsigned i=0; i<m_size; i++)
 				{
 					pati[i] = pat[i].as_long();
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero;
-				for (int i=0; i<m_size - 1; i++)
+				for (unsigned i=0; i<m_size - 1; i++)
 				{
 					m_inc[i] = base * pati[i];
 					ttotal += m_inc[i];
@@ -158,8 +158,8 @@ namespace netlist
 
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
-		UINT32 m_cnt;
-		UINT32 m_size;
+		unsigned m_cnt;
+		unsigned m_size;
 		netlist_time m_inc[32];
 		netlist_time m_off;
 	};

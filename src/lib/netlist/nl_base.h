@@ -426,10 +426,10 @@ namespace netlist
 
 		ATTR_COLD void set_net(net_t *anet);
 		ATTR_COLD void clear_net();
+		ATTR_HOT  bool has_net() const { return (m_net != nullptr); }
+
 		ATTR_COLD bool is_logic() const;
 		ATTR_COLD bool is_analog() const;
-
-		ATTR_HOT  bool has_net() const { return (m_net != nullptr); }
 
 		ATTR_HOT  const net_t & net() const { return *m_net;}
 		ATTR_HOT  net_t & net() { return *m_net;}
@@ -552,8 +552,8 @@ namespace netlist
 		ATTR_COLD devices::nld_base_proxy *get_proxy() const  { return m_proxy; }
 		ATTR_COLD void set_proxy(devices::nld_base_proxy *proxy) { m_proxy = proxy; }
 
-		ATTR_HOT  logic_net_t & net() { return reinterpret_cast<logic_net_t &>(core_terminal_t::net()); }
-		ATTR_HOT  const logic_net_t &  net() const { return reinterpret_cast<const logic_net_t &>(core_terminal_t::net()); };
+		ATTR_HOT  logic_net_t & net();
+		ATTR_HOT  const logic_net_t &  net() const;
 
 	protected:
 
@@ -570,12 +570,12 @@ namespace netlist
 	public:
 		ATTR_COLD logic_input_t(core_device_t &dev, const pstring &aname);
 
-		ATTR_HOT const netlist_sig_t Q() const;
+		ATTR_HOT netlist_sig_t Q() const;
 
-		ATTR_HOT  void inactivate();
-		ATTR_HOT  void activate();
-		ATTR_HOT  void activate_hl();
-		ATTR_HOT  void activate_lh();
+		ATTR_HOT void inactivate();
+		ATTR_HOT void activate();
+		ATTR_HOT void activate_hl();
+		ATTR_HOT void activate_lh();
 
 	protected:
 		virtual void reset() override
@@ -650,8 +650,7 @@ namespace netlist
 
 		plib::pvector_t<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
-	protected:  //FIXME: needed by current solver code
-
+	protected:
 		netlist_sig_t m_new_Q;
 		netlist_sig_t m_cur_Q;
 
@@ -660,9 +659,8 @@ namespace netlist
 		UINT8        m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
 	private:
-
-		core_terminal_t * m_railterminal;
 		plib::linkedlist_t<core_terminal_t> m_list_active;
+		core_terminal_t * m_railterminal;
 
 	public:
 		// We have to have those on one object. Dividing those does lead
@@ -682,12 +680,12 @@ namespace netlist
 		ATTR_COLD logic_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t() { };
 
-		ATTR_HOT  const netlist_sig_t Q() const { return m_cur_Q; }
+		ATTR_HOT  netlist_sig_t Q() const { return m_cur_Q; }
 		ATTR_HOT  netlist_sig_t new_Q() const 	{ return m_new_Q; }
-		ATTR_HOT void toggle_new_Q() 			{ m_new_Q ^= 1; 	}
+		ATTR_HOT  void toggle_new_Q() 			{ m_new_Q ^= 1; 	}
 		ATTR_COLD void initial(const netlist_sig_t val) { m_cur_Q = m_new_Q = val; }
 
-		ATTR_HOT void set_Q(const netlist_sig_t newQ, const netlist_time &delay) NOEXCEPT
+		ATTR_HOT  void set_Q(const netlist_sig_t newQ, const netlist_time &delay) NOEXCEPT
 		{
 			if (newQ != m_new_Q)
 			{
@@ -898,7 +896,7 @@ namespace netlist
 
 		ATTR_HOT netlist_sig_t INPLOGIC_PASSIVE(logic_input_t &inp);
 
-		ATTR_HOT const netlist_sig_t INPLOGIC(const logic_input_t &inp) const
+		ATTR_HOT netlist_sig_t INPLOGIC(const logic_input_t &inp) const
 		{
 			nl_assert(inp.state() != logic_t::STATE_INP_PASSIVE);
 			return inp.Q();
@@ -1304,16 +1302,25 @@ protected:
 
 	ATTR_HOT inline const analog_net_t & analog_t::net() const
 	{
-		return reinterpret_cast<const analog_net_t &>(core_terminal_t::net());
+		return static_cast<const analog_net_t &>(core_terminal_t::net());
 	}
 
 	ATTR_HOT inline analog_net_t & analog_t::net()
 	{
-		return reinterpret_cast<analog_net_t &>(core_terminal_t::net());
+		return static_cast<analog_net_t &>(core_terminal_t::net());
 	}
 
+	ATTR_HOT inline logic_net_t & logic_t::net()
+	{
+		return *static_cast<logic_net_t *>(&core_terminal_t::net());
+	}
 
-	ATTR_HOT inline const netlist_sig_t logic_input_t::Q() const
+	ATTR_HOT inline const logic_net_t & logic_t::net() const
+	{
+		return static_cast<const logic_net_t &>(core_terminal_t::net());
+	}
+
+	ATTR_HOT inline netlist_sig_t logic_input_t::Q() const
 	{
 		return net().Q();
 	}
@@ -1334,7 +1341,7 @@ protected:
 
 	ATTR_HOT inline void netlist_t::push_to_queue(net_t &out, const netlist_time &attime) NOEXCEPT
 	{
-		m_queue.push(queue_t::entry_t(attime, &out));
+		m_queue.push({ attime, &out });
 	}
 
 	ATTR_HOT inline void netlist_t::remove_from_queue(net_t &out)

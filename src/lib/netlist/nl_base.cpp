@@ -123,12 +123,12 @@ void queue_t::register_state(plib::pstate_manager_t &manager, const pstring &mod
 void queue_t::on_pre_save()
 {
 	netlist().log().debug("on_pre_save\n");
-	m_qsize = this->count();
+	m_qsize = this->size();
 	netlist().log().debug("current time {1} qsize {2}\n", netlist().time().as_double(), m_qsize);
 	for (int i = 0; i < m_qsize; i++ )
 	{
-		m_times[i] =  this->listptr()[i].exec_time().as_raw();
-		pstring p = this->listptr()[i].object()->name();
+		m_times[i] =  this->listptr()[i].m_exec_time.as_raw();
+		pstring p = this->listptr()[i].m_object->name();
 		int n = p.len();
 		n = std::min(63, n);
 		std::strncpy(m_names[i].m_buf, p.cstr(), n);
@@ -146,7 +146,7 @@ void queue_t::on_post_load()
 		net_t *n = netlist().find_net(m_names[i].m_buf);
 		//log().debug("Got {1} ==> {2}\n", qtemp[i].m_name, n));
 		//log().debug("schedule time {1} ({2})\n", n->time().as_double(),  netlist_time::from_raw(m_times[i]).as_double()));
-		this->push(queue_t::entry_t(netlist_time::from_raw(m_times[i]), n));
+		this->push({ netlist_time::from_raw(m_times[i]), n });
 	}
 }
 
@@ -335,15 +335,15 @@ ATTR_HOT void netlist_t::process_queue(const netlist_time &delta)
 
 	if (m_mainclock == nullptr)
 	{
-		while ( (m_time < m_stop) && (m_queue.is_not_empty()))
+		while ( (m_time < m_stop) && (!m_queue.empty()))
 		{
 			const queue_t::entry_t &e = m_queue.pop();
-			m_time = e.exec_time();
-			e.object()->update_devs();
+			m_time = e.m_exec_time;
+			e.m_object->update_devs();
 
 			add_to_stat(m_perf_out_processed, 1);
 		}
-		if (m_queue.is_empty())
+		if (m_queue.empty())
 			m_time = m_stop;
 
 	} else {
@@ -353,9 +353,9 @@ ATTR_HOT void netlist_t::process_queue(const netlist_time &delta)
 
 		while (m_time < m_stop)
 		{
-			if (m_queue.is_not_empty())
+			if (!m_queue.empty())
 			{
-				while (m_queue.top().exec_time() > mc_time)
+				while (m_queue.top().m_exec_time > mc_time)
 				{
 					m_time = mc_time;
 					mc_time += inc;
@@ -365,8 +365,8 @@ ATTR_HOT void netlist_t::process_queue(const netlist_time &delta)
 				}
 
 				const queue_t::entry_t &e = m_queue.pop();
-				m_time = e.exec_time();
-				e.object()->update_devs();
+				m_time = e.m_exec_time;
+				e.m_object->update_devs();
 
 			} else {
 				m_time = mc_time;
@@ -634,7 +634,7 @@ ATTR_HOT void net_t::inc_active(core_terminal_t &term)
 
 ATTR_HOT void net_t::dec_active(core_terminal_t &term)
 {
-	m_active--;
+	--m_active;
 	nl_assert(m_active >= 0);
 	m_list_active.remove(term);
 	if (m_active == 0 && netlist().use_deactivate())
@@ -656,7 +656,7 @@ ATTR_COLD void net_t::rebuild_list()
 	m_active = cnt;
 }
 
-ATTR_HOT /* inline */ void net_t::update_devs()
+ATTR_HOT void net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
@@ -985,7 +985,7 @@ namespace netlist
 	// mainclock
 	// ----------------------------------------------------------------------------------------
 
-	ATTR_HOT /* inline */ void NETLIB_NAME(mainclock)::mc_update(logic_net_t &net)
+	ATTR_HOT void NETLIB_NAME(mainclock)::mc_update(logic_net_t &net)
 	{
 		net.toggle_new_Q();
 		net.update_devs();
