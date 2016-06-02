@@ -141,6 +141,15 @@ All three of the above are called "segment H".
 
 ******************************************************************************
 
+Reversi Sensory Challenger (RSC)
+The 1st version was out in 1980, a program revision was released in 1981.
+Another distinction is the board color: 1980 version is light brown, 1981 version is green.
+---------------------------------
+
+x
+
+******************************************************************************
+
 Sensory Chess Challenger "9" (SC9)
 2 versions were available, the newer version was 2MHz and included the Budapest program.
 ---------------------------------
@@ -296,12 +305,10 @@ class fidel6502_state : public fidelz80base_state
 public:
 	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fidelz80base_state(mconfig, type, tag),
-		m_6821pia(*this, "6821pia"),
 		m_cart(*this, "cartslot")
 	{ }
 
 	// devices/pointers
-	optional_device<pia6821_device> m_6821pia;
 	optional_device<generic_slot_device> m_cart;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
@@ -358,7 +365,7 @@ void fidel6502_state::csc_prepare_display()
 	// 7442 9: speaker out
 	m_speaker->level_w(m_inp_mux >> 9 & 1);
 
-	// 4 7seg leds + H
+	// 4 7seg leds + H (not used on RSC)
 	for (int i = 0; i < 4; i++)
 		m_display_state[i] = (m_inp_mux >> i & 1) ? m_7seg_data : 0;
 
@@ -640,6 +647,16 @@ READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
     Address Maps
 ******************************************************************************/
 
+// RSC
+
+static ADDRESS_MAP_START( rsc_map, AS_PROGRAM, 8, fidel6502_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x03ff) AM_RAM
+	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia", pia6821_device, read, write)
+	AM_RANGE(0xf000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
 // CSC
 
 static ADDRESS_MAP_START( csc_map, AS_PROGRAM, 8, fidel6502_state )
@@ -867,6 +884,31 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
+static MACHINE_CONFIG_START( rsc, fidel6502_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6502, 2000000) // approximation, source unknown
+	MCFG_CPU_PROGRAM_MAP(rsc_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, irq0_line_hold, 600) // 555 timer, guessed
+
+	MCFG_DEVICE_ADD("pia", PIA6821, 0) // MOS 6520
+	MCFG_PIA_READPA_HANDLER(READ8(fidel6502_state, csc_pia1_pa_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(fidel6502_state, csc_pia1_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(fidel6502_state, csc_pia1_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(fidel6502_state, csc_pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(fidel6502_state, csc_pia1_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_cb2_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_fidel_csc)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( csc, fidel6502_state )
 
 	/* basic machine hardware */
@@ -980,6 +1022,12 @@ MACHINE_CONFIG_END
     ROM Definitions
 ******************************************************************************/
 
+ROM_START( reversic )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-1000a01", 0xf000, 0x1000, CRC(ca7723a7) SHA1(bd92330f2d9494fa408f5a2ca300d7a755bdf489) )
+ROM_END
+
+
 ROM_START( csc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-64109.bin", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
@@ -1064,14 +1112,16 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1981, csc,     0,      0,      csc,     csc,     driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, cscsp,   csc,    0,      csc,     cscg,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, cscg,    csc,    0,      csc,     cscg,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, cscfr,   csc,    0,      csc,     cscg,    driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT              COMPANY, FULLNAME, FLAGS */
+CONS( 1981, reversic, 0,      0,      rsc, csc, driver_device, 0, "Fidelity Electronics", "Reversi Sensory Challenger (green version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1982, fscc9,   0,      0,      sc9,     sc12,    driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, fscc12,  0,      0,      sc12,    sc12,    driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, csc,      0,      0,      csc,      csc,      driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, cscsp,    csc,    0,      csc,      cscg,     driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, cscg,     csc,    0,      csc,      cscg,     driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, cscfr,    csc,    0,      csc,      cscg,     driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1987, fexcel,  0,      0,      fexcel,  fexcel,  driver_device, 0, "Fidelity Electronics", "Excellence (model 6080/6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, fexcelv, 0,      0,      fexcelv, fexcelv, driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc9,    0,      0,      sc9,      sc12,     driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, fscc12,   0,      0,      sc12,     sc12,     driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1987, fexcel,   0,      0,      fexcel,   fexcel,   driver_device, 0, "Fidelity Electronics", "Excellence (model 6080/6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexcelv,  0,      0,      fexcelv,  fexcelv,  driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

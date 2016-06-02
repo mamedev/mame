@@ -5758,7 +5758,7 @@ MACHINE_CONFIG_END
 
   U.S. Games Super Sports-4
   * TMS1100 MP1219 (no decap)
-  * 9-digit 7seg LEDs(not fully used), 47 more LEDs, 1-bit sound
+  * 4 7seg LEDs, 49 other LEDs, 1-bit sound
   
   This handheld includes 4 games: Basketball, Football, Soccer, Hockey.
   MAME external artwork is needed for the switchable overlays.
