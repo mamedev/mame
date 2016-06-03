@@ -3981,7 +3981,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="8388608">
-				<rom name="densha de go! 2 (japan).bin" size="8388608" crc="b72603fc" sha1="63bcca7177712a9bc6f032c83c2e129d9b9af0fa" offset="000000" />
+				<rom name="cgb-b82j-0 02.u1" size="4194304" crc="07f226df" sha1="6eff94940f67a4408e1a0d3c1cc544fddb20d9c0" offset="0x0000000" />
+				<rom name="cgb-b82j-0 12.u5" size="4194304" crc="b6caeb75" sha1="efb3a8229e7cd6a28fc9766a6de17e8b59483652" offset="0x400000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
