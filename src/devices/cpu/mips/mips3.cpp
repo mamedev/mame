@@ -386,9 +386,8 @@ void mips3_device::device_start()
 
 	/* initialize the front-end helper */
 	m_drcfe = std::make_unique<mips3_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
-	// Allow branches in delay slots (need to investigate which flavors require this)
-	if (m_flavor== MIPS3_TYPE_VR4300)
-		m_drcfe->set_allow_branch_in_delay(true);
+	// Allow branches in delay slots
+	m_drcfe->set_allow_branch_in_delay(true);
 
 	/* allocate memory for cache-local state and initialize it */
 	memcpy(m_fpmode, fpmode_source, sizeof(fpmode_source));
