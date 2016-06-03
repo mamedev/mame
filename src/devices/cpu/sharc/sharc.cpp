@@ -807,6 +807,8 @@ void adsp21062_device::device_reset()
 	m_core->lstkp = 0;
 	m_core->pcstkp = 0;
 	m_core->interrupt_active = 0;
+
+	m_drcfe->flush();
 }
 
 
