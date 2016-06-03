@@ -635,24 +635,28 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 			if (((data & 0x40) == 0) && (ports[offset] & 0x40))
 			{
 #ifndef KEYBOARD_WORKAROUND
-				if (ports[0] & 0x1) kbd_data = m_kbd0->read();
-				if (ports[0] & 0x2) kbd_data = m_kbd1->read();
-				if (ports[0] & 0x4) kbd_data = m_kbd2->read();
-				if (ports[0] & 0x8) kbd_data = m_kbd3->read();
-				if (ports[0] & 0x10) kbd_data = m_kbd4->read();
-				if (ports[0] & 0x20) kbd_data = m_kbd5->read();
-				if (ports[0] & 0x40) kbd_data = m_kbd6->read();
-				if (ports[0] & 0x80) kbd_data = m_kbd7->read();
-				if (ports[1] & 0x1) kbd_data = m_kbd8->read();
-				if (ports[1] & 0x2) kbd_data = m_kbd9->read();
-				if (ports[1] & 0x4) kbd_data = m_kbd10->read();
-				if (ports[1] & 0x8) kbd_data = m_kbd11->read();
-				if (ports[1] & 0x10) kbd_data = m_kbd12->read();
-				if (ports[1] & 0x20) kbd_data = m_kbd13->read();
-				if (ports[1] & 0x40) kbd_data = m_kbd14->read();
-				if (ports[1] & 0x80) kbd_data = m_kbd15->read();
-				if (ports[2] & 0x1) kbd_data = m_kbd16->read();
-				if (ports[2] & 0x2) kbd_data = m_kbd17->read();
+				UINT8 porta = ports[0] & ddrs[0];
+				UINT8 portb = ports[1] & ddrs[1];
+				UINT8 portc = ports[2] & ddrs[2];
+
+				if (porta & 0x1) kbd_data = m_kbd0->read();
+				if (porta & 0x2) kbd_data = m_kbd1->read();
+				if (porta & 0x4) kbd_data = m_kbd2->read();
+				if (porta & 0x8) kbd_data = m_kbd3->read();
+				if (porta & 0x10) kbd_data = m_kbd4->read();
+				if (porta & 0x20) kbd_data = m_kbd5->read();
+				if (porta & 0x40) kbd_data = m_kbd6->read();
+				if (porta & 0x80) kbd_data = m_kbd7->read();
+				if (portb & 0x1) kbd_data = m_kbd8->read();
+				if (portb & 0x2) kbd_data = m_kbd9->read();
+				if (portb & 0x4) kbd_data = m_kbd10->read();
+				if (portb & 0x8) kbd_data = m_kbd11->read();
+				if (portb & 0x10) kbd_data = m_kbd12->read();
+				if (portb & 0x20) kbd_data = m_kbd13->read();
+				if (portb & 0x40) kbd_data = m_kbd14->read();
+				if (portb & 0x80) kbd_data = m_kbd15->read();
+				if (portc & 0x1) kbd_data = m_kbd16->read();
+				if (portc & 0x2) kbd_data = m_kbd17->read();
 			}
 			// Check for LED update strobe
 			if (((data & 0x80) == 0) && (ports[offset] & 0x80))
