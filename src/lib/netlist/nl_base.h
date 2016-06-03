@@ -1053,8 +1053,8 @@ namespace netlist
 	private:
 		struct names_t { char m_buf[64]; };
 		int m_qsize;
-		plib::array_t<netlist_time::INTERNALTYPE> m_times;
-		plib::array_t<names_t> m_names;
+		std::vector<netlist_time::INTERNALTYPE> m_times;
+		std::vector<names_t> m_names;
 	};
 
 	// -----------------------------------------------------------------------------

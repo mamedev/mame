@@ -76,7 +76,7 @@ struct truthtable_desc_t
 
 private:
 	void help(unsigned cur, plib::pstring_vector_t list,
-			UINT64 state,UINT16 val, plib::array_t<UINT8> &timing_index);
+			UINT64 state,UINT16 val, std::vector<UINT8> &timing_index);
 	static unsigned count_bits(UINT32 v);
 	static UINT32 set_bits(UINT32 v, UINT32 b);
 	UINT32 get_ignored_simple(UINT32 i);

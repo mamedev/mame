@@ -126,7 +126,7 @@ namespace netlist
 		volatile std::atomic<int> m_lock;
 	#endif
 		entry_t * m_end;
-		plib::array_t<entry_t> m_list;
+		std::vector<entry_t> m_list;
 	};
 
 }

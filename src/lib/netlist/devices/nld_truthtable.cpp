@@ -67,7 +67,7 @@ UINT32 truthtable_desc_t::get_ignored_extended(UINT32 i)
 	 * may change the output
 	 */
 	UINT32 bits = (1<<count_bits(nign));
-	plib::array_t<int> t(bits);
+	std::vector<int> t(bits);
 
 	for (UINT32 j=1; j<bits; j++)
 	{
@@ -103,7 +103,7 @@ UINT32 truthtable_desc_t::get_ignored_extended(UINT32 i)
 // ----------------------------------------------------------------------------------------
 
 void truthtable_desc_t::help(unsigned cur, plib::pstring_vector_t list,
-		UINT64 state,UINT16 val, plib::array_t<UINT8> &timing_index)
+		UINT64 state,UINT16 val, std::vector<UINT8> &timing_index)
 {
 	pstring elem = list[cur].trim();
 	int start = 0;
@@ -178,7 +178,7 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, UINT32 d
 		nl_assert_always(times.size() == m_NO, "timing count not matching");
 
 		UINT16 val = 0;
-		plib::array_t<UINT8> tindex(m_NO);
+		std::vector<UINT8> tindex;
 
 		for (unsigned j=0; j<m_NO; j++)
 		{
@@ -192,7 +192,7 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, UINT32 d
 			while (m_timing_nt[k] != netlist_time::zero && m_timing_nt[k] != t)
 				k++;
 			m_timing_nt[k] = t;
-			tindex[j] = k;
+			tindex.push_back(k); //[j] = k;
 		}
 
 		help(0, inout, 0 , val, tindex);
@@ -204,10 +204,7 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, UINT32 d
 	}
 
 	// determine ignore
-	plib::array_t<UINT32> ign(m_size);
-
-	for (UINT32 j=0; j < m_size; j++)
-		ign[j] = ~0U;
+	std::vector<UINT32> ign(m_size, ~0U);
 
 	for (UINT32 i=0; i<m_size; i++)
 	{

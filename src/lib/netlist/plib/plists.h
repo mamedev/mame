@@ -15,77 +15,12 @@
 #include <vector>
 #include <type_traits>
 #include <cstring>
+#include <array>
 
 #include "palloc.h"
 #include "pstring.h"
 
 namespace plib {
-
-// ----------------------------------------------------------------------------------------
-// parray_t: dynamic array
-// ----------------------------------------------------------------------------------------
-
-template <class LC>
-class array_t
-{
-public:
-
-	ATTR_COLD array_t(std::size_t numElements)
-	: m_list(0), m_capacity(0)
-	{
-		set_capacity(numElements);
-	}
-
-	ATTR_COLD array_t(const array_t &rhs)
-	: m_list(0), m_capacity(0)
-	{
-		set_capacity(rhs.size());
-		for (std::size_t i=0; i<m_capacity; i++)
-			m_list[i] = rhs[i];
-	}
-
-	ATTR_COLD array_t &operator=(const array_t &rhs)
-	{
-		set_capacity(rhs.size());
-		for (std::size_t i=0; i<m_capacity; i++)
-			m_list[i] = rhs[i];
-		return *this;
-	}
-
-	~array_t()
-	{
-		if (m_list != nullptr)
-			pfree_array(m_list);
-		m_list = nullptr;
-	}
-
-	ATTR_HOT  LC& operator[](const std::size_t index) { return m_list[index]; }
-	ATTR_HOT  const LC& operator[](const std::size_t index) const { return m_list[index]; }
-
-	ATTR_HOT  std::size_t size() const { return m_capacity; }
-
-	void resize(const std::size_t new_size)
-	{
-		set_capacity(new_size);
-	}
-
-protected:
-	ATTR_COLD void set_capacity(const std::size_t new_capacity)
-	{
-		if (m_list != nullptr)
-			pfree_array(m_list);
-		if (new_capacity > 0)
-			m_list = palloc_array<LC>(new_capacity);
-		else
-			m_list = nullptr;
-		m_capacity = new_capacity;
-	}
-
-private:
-
-	LC * m_list;
-	int m_capacity;
-};
 
 /* ----------------------------------------------------------------------------------------
  * uninitialised_array_t:
@@ -637,7 +572,7 @@ private:
 
 	}
 	pvector_t<element_t> m_values;
-	array_t<int> m_hash;
+	std::vector<int> m_hash;
 };
 
 // ----------------------------------------------------------------------------------------
