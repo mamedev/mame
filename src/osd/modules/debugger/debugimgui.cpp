@@ -437,8 +437,14 @@ void debug_imgui::handle_console(running_machine* machine)
 {
 	if(view_main_console->exec_cmd && view_main_console->type == DVT_CONSOLE)
 	{
-		if(strlen(view_main_console->console_input) > 0)
-			debug_console_execute_command(*m_machine, view_main_console->console_input, 1);
+		// if console input is empty, then do a single step
+		if(strlen(view_main_console->console_input) == 0)
+		{
+			debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
+			view_main_console->exec_cmd = false;
+			return;
+		}
+		debug_console_execute_command(*m_machine, view_main_console->console_input, 1);
 		// check for commands that start execution (so that input fields can be disabled)
 		if(strcmp(view_main_console->console_input,"g") == 0)
 			m_running = true;
