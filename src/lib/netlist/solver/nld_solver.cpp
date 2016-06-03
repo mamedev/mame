@@ -59,7 +59,7 @@ namespace netlist
 	namespace devices
 	{
 
-ATTR_COLD void terms_t::add(terminal_t *term, int net_other, bool sorted)
+void terms_t::add(terminal_t *term, int net_other, bool sorted)
 {
 	if (sorted)
 		for (unsigned i=0; i < m_net_other.size(); i++)
@@ -83,7 +83,7 @@ ATTR_COLD void terms_t::add(terminal_t *term, int net_other, bool sorted)
 	m_other_curanalog.push_back(nullptr);
 }
 
-ATTR_COLD void terms_t::set_pointers()
+void terms_t::set_pointers()
 {
 	for (unsigned i = 0; i < count(); i++)
 	{
@@ -96,7 +96,7 @@ ATTR_COLD void terms_t::set_pointers()
 // matrix_solver
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD matrix_solver_t::~matrix_solver_t()
+matrix_solver_t::~matrix_solver_t()
 {
 	for (unsigned k = 0; k < m_terms.size(); k++)
 	{
@@ -105,7 +105,7 @@ ATTR_COLD matrix_solver_t::~matrix_solver_t()
 
 }
 
-ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
+void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 {
 	log().debug("New solver setup\n");
 
@@ -184,7 +184,7 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 	setup_matrix();
 }
 
-ATTR_COLD void matrix_solver_t::setup_matrix()
+void matrix_solver_t::setup_matrix()
 {
 	const unsigned iN = m_nets.size();
 
@@ -380,12 +380,12 @@ void matrix_solver_t::update_dynamic()
 		m_dynamic_devices[i]->update_terminals();
 }
 
-ATTR_COLD void matrix_solver_t::reset()
+void matrix_solver_t::reset()
 {
 	m_last_step = netlist_time::zero;
 }
 
-ATTR_COLD void matrix_solver_t::update() NOEXCEPT
+void matrix_solver_t::update() NOEXCEPT
 {
 	const netlist_time new_timestep = solve();
 
@@ -393,12 +393,12 @@ ATTR_COLD void matrix_solver_t::update() NOEXCEPT
 		m_Q_sync.net().reschedule_in_queue(new_timestep);
 }
 
-ATTR_COLD void matrix_solver_t::update_forced()
+void matrix_solver_t::update_forced()
 {
 	ATTR_UNUSED const netlist_time new_timestep = solve();
 
 	if (m_params.m_dynamic && has_timestep_devices())
-		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
+		m_Q_sync.net().reschedule_in_queue(netlist_time(m_params.m_min_timestep));
 }
 
 void matrix_solver_t::step(const netlist_time &delta)
@@ -460,7 +460,7 @@ const netlist_time matrix_solver_t::solve()
 	return next_time_step;
 }
 
-ATTR_COLD int matrix_solver_t::get_net_idx(net_t *net)
+int matrix_solver_t::get_net_idx(net_t *net)
 {
 	for (std::size_t k = 0; k < m_nets.size(); k++)
 		if (m_nets[k] == net)
@@ -468,7 +468,7 @@ ATTR_COLD int matrix_solver_t::get_net_idx(net_t *net)
 	return -1;
 }
 
-ATTR_COLD void matrix_solver_t::add_term(int k, terminal_t *term)
+void matrix_solver_t::add_term(int k, terminal_t *term)
 {
 	if (term->m_otherterm->net().isRailNet())
 	{
@@ -528,7 +528,7 @@ netlist_time matrix_solver_t::compute_next_timestep()
 	}
 	//if (new_solver_timestep > 10.0 * hn)
 	//    new_solver_timestep = 10.0 * hn;
-	return netlist_time::from_double(new_solver_timestep);
+	return netlist_time(new_solver_timestep);
 }
 
 
@@ -620,7 +620,7 @@ NETLIB_UPDATE(solver)
 	/* step circuit */
 	if (!m_Q_step.net().is_queued())
 	{
-		m_Q_step.net().push_to_queue(netlist_time::from_double(m_params.m_max_timestep));
+		m_Q_step.net().push_to_queue(netlist_time(m_params.m_max_timestep));
 	}
 }
 
@@ -687,7 +687,7 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(int size, co
 	}
 }
 
-ATTR_COLD void NETLIB_NAME(solver)::post_start()
+void NETLIB_NAME(solver)::post_start()
 {
 	plib::pvector_t<analog_net_t::list_t> groups;
 	const bool use_specific = true;
@@ -696,7 +696,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	m_params.m_accuracy = m_accuracy.Value();
 	m_params.m_gs_loops = m_gs_loops.Value();
 	m_params.m_nr_loops = m_nr_loops.Value();
-	m_params.m_nt_sync_delay = netlist_time::from_double(m_sync_delay.Value());
+	m_params.m_nt_sync_delay = netlist_time(m_sync_delay.Value());
 	m_params.m_lte = m_lte.Value();
 	m_params.m_sor = m_sor.Value();
 

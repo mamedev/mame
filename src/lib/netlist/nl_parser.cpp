@@ -15,7 +15,7 @@ namespace netlist
 // A netlist parser
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD void parser_t::verror(const pstring &msg, int line_num, const pstring &line)
+void parser_t::verror(const pstring &msg, int line_num, const pstring &line)
 {
 	m_setup.log().fatal("line {1}: error: {2}\n\t\t{3}\n", line_num,
 			msg, line);

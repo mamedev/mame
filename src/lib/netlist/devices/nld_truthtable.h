@@ -227,7 +227,7 @@ public:
 	}
 
 public:
-	ATTR_HOT void inc_active() override
+	void inc_active() override
 	{
 		nl_assert(netlist().use_deactivate());
 		if (has_state == 0)
@@ -237,7 +237,7 @@ public:
 			}
 	}
 
-	ATTR_HOT void dec_active() override
+	void dec_active() override
 	{
 		nl_assert(netlist().use_deactivate());
 		/* FIXME:

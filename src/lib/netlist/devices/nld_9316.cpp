@@ -33,7 +33,7 @@ namespace netlist
 		logic_input_t m_C;
 		logic_input_t m_D;
 
-		ATTR_HOT inline UINT8 read_ABCD() const
+		inline UINT8 read_ABCD() const
 		{
 			//return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
 			return (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
@@ -64,8 +64,8 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		ATTR_HOT inline void update_outputs_all(const UINT8 cnt, const netlist_time out_delay);
-		ATTR_HOT inline void update_outputs(const UINT8 cnt);
+		inline void update_outputs_all(const UINT8 cnt, const netlist_time out_delay);
+		inline void update_outputs(const UINT8 cnt);
 
 		logic_input_t m_CLK;
 

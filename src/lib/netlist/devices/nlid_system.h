@@ -76,7 +76,7 @@ namespace netlist
 		param_double_t m_freq;
 		netlist_time m_inc;
 
-		ATTR_HOT inline static void mc_update(logic_net_t &net);
+		inline static void mc_update(logic_net_t &net);
 	};
 
 	// -----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ namespace netlist
 			{
 				netlist_time base = netlist_time::from_hz(m_freq.Value()*2);
 				plib::pstring_vector_t pat(m_pattern.Value(),",");
-				m_off = netlist_time::from_double(m_offset.Value());
+				m_off = netlist_time(m_offset.Value());
 
 				int pati[256];
 				m_size = pat.size();
@@ -552,7 +552,7 @@ namespace netlist
 		P_PREVENT_COPYING(factory_lib_entry_t)
 	public:
 
-		ATTR_COLD factory_lib_entry_t(setup_t &setup, const pstring &name, const pstring &classname,
+		factory_lib_entry_t(setup_t &setup, const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		: base_factory_t(name, classname, def_param), m_setup(setup) {  }
 

@@ -91,12 +91,12 @@ public:
 		this->erase(std::remove(this->begin(), this->end(), elem), this->end());
 	}
 
-	ATTR_HOT void insert_at(const std::size_t index, const LC &elem)
+	void insert_at(const std::size_t index, const LC &elem)
 	{
 		this->insert(this->begin() + index, elem);
 	}
 
-	ATTR_HOT  void remove_at(const std::size_t pos)
+	 void remove_at(const std::size_t pos)
 	{
 		this->erase(this->begin() + pos);
 	}
@@ -144,7 +144,7 @@ public:
 
 	linkedlist_t() : m_head(nullptr) {}
 #if 0
-	ATTR_HOT  void insert(const LC &before, LC &elem)
+	 void insert(const LC &before, LC &elem)
 	{
 		if (m_head == &before)
 		{
@@ -168,13 +168,13 @@ public:
 		}
 	}
 #endif
-	ATTR_HOT  void insert(LC &elem)
+	 void insert(LC &elem)
 	{
 		elem.m_next = m_head;
 		m_head = &elem;
 	}
 
-	ATTR_HOT  void add(LC &elem)
+	 void add(LC &elem)
 	{
 		LC **p = &m_head;
 		while (*p != nullptr)
@@ -185,7 +185,7 @@ public:
 		elem.m_next = nullptr;
 	}
 
-	ATTR_HOT  void remove(const LC &elem)
+	 void remove(const LC &elem)
 	{
 		LC **p;
 		for (p = &m_head; *p != &elem; p = &((*p)->m_next))
@@ -195,9 +195,9 @@ public:
 		(*p) = elem.m_next;
 	}
 
-	ATTR_HOT  LC *first() const { return m_head; }
-	ATTR_HOT  void clear() { m_head = nullptr; }
-	ATTR_HOT  bool is_empty() const { return (m_head == nullptr); }
+	 LC *first() const { return m_head; }
+	 void clear() { m_head = nullptr; }
+	 bool is_empty() const { return (m_head == nullptr); }
 
 //private:
 	LC *m_head;
@@ -226,7 +226,7 @@ public:
 
 	linkedlist_t() : m_head(nullptr), m_tail(nullptr) {}
 
-	ATTR_HOT  void insert(LC &elem)
+	 void insert(LC &elem)
 	{
 		if (m_head != nullptr)
 			m_head->m_prev = &elem;
@@ -237,7 +237,7 @@ public:
 			m_tail = &elem;
 	}
 
-	ATTR_HOT  void add(LC &elem)
+	 void add(LC &elem)
 	{
 		if (m_tail != nullptr)
 			m_tail->m_next = &elem;
@@ -248,7 +248,7 @@ public:
 			m_head = &elem;
 	}
 
-	ATTR_HOT  void remove(const LC &elem)
+	 void remove(const LC &elem)
 	{
 		if (prev(elem) == nullptr)
 		{
@@ -270,13 +270,13 @@ public:
 	}
 
 
-	ATTR_HOT static  LC *next(const LC &elem) { return static_cast<LC *>(elem.m_next); }
-	ATTR_HOT static  LC *next(const LC *elem) { return static_cast<LC *>(elem->m_next); }
-	ATTR_HOT static  LC *prev(const LC &elem) { return static_cast<LC *>(elem.m_prev); }
-	ATTR_HOT static  LC *prev(const LC *elem) { return static_cast<LC *>(elem->m_prev); }
-	ATTR_HOT  LC *first() const { return m_head; }
-	ATTR_HOT  void clear() { m_head = m_tail = nullptr; }
-	ATTR_HOT  bool is_empty() const { return (m_head == nullptr); }
+	static  LC *next(const LC &elem) { return static_cast<LC *>(elem.m_next); }
+	static  LC *next(const LC *elem) { return static_cast<LC *>(elem->m_next); }
+	static  LC *prev(const LC &elem) { return static_cast<LC *>(elem.m_prev); }
+	static  LC *prev(const LC *elem) { return static_cast<LC *>(elem->m_prev); }
+	 LC *first() const { return m_head; }
+	 void clear() { m_head = m_tail = nullptr; }
+	 bool is_empty() const { return (m_head == nullptr); }
 
 private:
 	LC *m_head;

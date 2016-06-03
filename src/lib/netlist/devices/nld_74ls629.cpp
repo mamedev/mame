@@ -216,7 +216,7 @@ namespace netlist
 
 			// FIXME: we need a possibility to remove entries from queue ...
 			//        or an exact model ...
-			m_clock.m_inc = netlist_time::from_double(0.5 / (double) freq);
+			m_clock.m_inc = netlist_time(0.5 / (double) freq);
 			//m_clock.update();
 
 			//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));

@@ -76,7 +76,7 @@ setup_t::~setup_t()
 	pstring::resetmem();
 }
 
-ATTR_COLD pstring setup_t::build_fqn(const pstring &obj_name) const
+pstring setup_t::build_fqn(const pstring &obj_name) const
 {
 	if (m_namespace_stack.empty())
 		//return netlist().name() + "." + obj_name;

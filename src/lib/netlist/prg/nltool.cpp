@@ -161,7 +161,7 @@ struct input_t
 		int e = sscanf(line.cstr(), "%lf,%[^,],%lf", &t, buf, &m_value);
 		if ( e!= 3)
 			throw netlist::fatalerror_e(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
-		m_time = netlist::netlist_time::from_double(t);
+		m_time = netlist::netlist_time(t);
 		m_param = netlist->setup().find_param(buf, true);
 	}
 
@@ -235,14 +235,14 @@ static void run(tool_options_t &opts)
 	unsigned pos = 0;
 	netlist::netlist_time nlt = netlist::netlist_time::zero;
 
-	while (pos < inps->size() && (*inps)[pos].m_time < netlist::netlist_time::from_double(ttr))
+	while (pos < inps->size() && (*inps)[pos].m_time < netlist::netlist_time(ttr))
 	{
 		nt.process_queue((*inps)[pos].m_time - nlt);
 		(*inps)[pos].setparam();
 		nlt = (*inps)[pos].m_time;
 		pos++;
 	}
-	nt.process_queue(netlist::netlist_time::from_double(ttr) - nlt);
+	nt.process_queue(netlist::netlist_time(ttr) - nlt);
 	nt.stop();
 	pfree(inps);
 

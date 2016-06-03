@@ -206,7 +206,7 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
 }
 
 template <unsigned m_N, unsigned storage_N>
-ATTR_COLD void matrix_solver_direct_t<m_N, storage_N>::add_term(int k, terminal_t *term)
+void matrix_solver_direct_t<m_N, storage_N>::add_term(int k, terminal_t *term)
 {
 	if (term->m_otherterm->net().isRailNet())
 	{
@@ -230,7 +230,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, storage_N>::add_term(int k, terminal_
 
 
 template <unsigned m_N, unsigned storage_N>
-ATTR_COLD void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
+void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	if (m_dim < nets.size())
 		netlist().error("Dimension {1} less than {2}", m_dim,nets.size());

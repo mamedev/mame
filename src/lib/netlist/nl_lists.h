@@ -43,10 +43,10 @@ namespace netlist
 			clear();
 		}
 
-		ATTR_HOT  std::size_t capacity() const { return m_list.size(); }
-		ATTR_HOT  bool empty() const { return (m_end == &m_list[1]); }
+		 std::size_t capacity() const { return m_list.size(); }
+		 bool empty() const { return (m_end == &m_list[1]); }
 
-		ATTR_HOT void push(const Time t, Element o) NOEXCEPT
+		void push(const Time t, Element o) NOEXCEPT
 		{
 	#if HAS_OPENMP && USE_OPENMP
 			/* Lock */
@@ -67,10 +67,10 @@ namespace netlist
 			//nl_assert(m_end - m_list < Size);
 		}
 
-		ATTR_HOT  const entry_t & pop() NOEXCEPT       { return *(--m_end); }
-		ATTR_HOT  const entry_t & top() const NOEXCEPT { return *(m_end-1); }
+		 const entry_t & pop() NOEXCEPT       { return *(--m_end); }
+		 const entry_t & top() const NOEXCEPT { return *(m_end-1); }
 
-		ATTR_HOT  void remove(const Element &elem) NOEXCEPT
+		 void remove(const Element &elem) NOEXCEPT
 		{
 			/* Lock */
 	#if HAS_OPENMP && USE_OPENMP
@@ -97,7 +97,7 @@ namespace netlist
 	#endif
 		}
 
-		ATTR_COLD void clear()
+		void clear()
 		{
 			m_end = &m_list[0];
 			/* put an empty element with maximum time into the queue.
@@ -110,9 +110,9 @@ namespace netlist
 
 		// save state support & mame disasm
 
-		ATTR_COLD  const entry_t *listptr() const { return &m_list[1]; }
-		ATTR_HOT  std::size_t size() const { return m_end - &m_list[1]; }
-		ATTR_HOT  const entry_t & operator[](const std::size_t index) const { return m_list[1+index]; }
+		 const entry_t *listptr() const { return &m_list[1]; }
+		 std::size_t size() const { return m_end - &m_list[1]; }
+		 const entry_t & operator[](const std::size_t index) const { return m_list[1+index]; }
 
 	#if (NL_KEEP_STATISTICS)
 		// profiling

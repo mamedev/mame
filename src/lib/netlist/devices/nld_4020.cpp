@@ -36,7 +36,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		ATTR_HOT void update_outputs(const UINT16 cnt);
+		void update_outputs(const UINT16 cnt);
 
 		logic_input_t m_IP;
 		object_array_t<logic_output_t, 14> m_Q;

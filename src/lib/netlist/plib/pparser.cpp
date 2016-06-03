@@ -243,7 +243,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 
 }
 
-ATTR_COLD void ptokenizer::error(const pstring &errs)
+void ptokenizer::error(const pstring &errs)
 {
 	verror("Error: " + errs, currentline_no(), currentline_str());
 	//throw error;

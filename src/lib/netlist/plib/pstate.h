@@ -124,17 +124,17 @@ public:
 	pstate_manager_t();
 	~pstate_manager_t();
 
-	template<typename C> ATTR_COLD void save_item(const void *owner, C &state, const pstring &stname)
+	template<typename C> void save_item(const void *owner, C &state, const pstring &stname)
 	{
 		save_state_ptr( owner, stname, pstate_datatype<C>::type, sizeof(C), 1, &state, pstate_datatype<C>::is_ptr);
 	}
 
-	template<typename C, std::size_t N> ATTR_COLD void save_item(const void *owner, C (&state)[N], const pstring &stname)
+	template<typename C, std::size_t N> void save_item(const void *owner, C (&state)[N], const pstring &stname)
 	{
 		save_state_ptr(owner, stname, pstate_datatype<C>::type, sizeof(state[0]), N, &(state[0]), false);
 	}
 
-	template<typename C> ATTR_COLD void save_item(const void *owner, C *state, const pstring &stname, const int count)
+	template<typename C> void save_item(const void *owner, C *state, const pstring &stname, const int count)
 	{
 		save_state_ptr(owner, stname, pstate_datatype<C>::type, sizeof(C), count, state, false);
 	}
@@ -145,13 +145,13 @@ public:
 		save_state(v.data(), owner, stname, v.size());
 	}
 
-	ATTR_COLD void pre_save();
-	ATTR_COLD void post_load();
-	ATTR_COLD void remove_save_items(const void *owner);
+	void pre_save();
+	void post_load();
+	void remove_save_items(const void *owner);
 
 	const pstate_entry_t::list_t &save_list() const { return m_save; }
 
-	ATTR_COLD void save_state_ptr(const void *owner, const pstring &stname, const pstate_data_type_e, const int size, const int count, void *ptr, bool is_ptr);
+	void save_state_ptr(const void *owner, const pstring &stname, const pstate_data_type_e, const int size, const int count, void *ptr, bool is_ptr);
 
 protected:
 
@@ -159,7 +159,7 @@ private:
 	pstate_entry_t::list_t m_save;
 };
 
-template<> ATTR_COLD void pstate_manager_t::save_item(const void *owner, pstate_callback_t &state, const pstring &stname);
+template<> void pstate_manager_t::save_item(const void *owner, pstate_callback_t &state, const pstring &stname);
 
 template <typename T>
 class pstate_interface_t
@@ -173,13 +173,13 @@ public:
 		pstring module = static_cast<T*>(this)->name();
 		manager.save_item(this, state, module + "." + stname);
 	}
-	template<typename C, std::size_t N> ATTR_COLD void save(C (&state)[N], const pstring &stname)
+	template<typename C, std::size_t N> void save(C (&state)[N], const pstring &stname)
 	{
 		pstate_manager_t &manager = static_cast<T*>(this)->state_manager();
 		pstring module = static_cast<T*>(this)->name();
 		manager.save_state_ptr(this, module + "." + stname, pstate_datatype<C>::type, sizeof(state[0]), N, &(state[0]), false);
 	}
-	template<typename C> ATTR_COLD void save(C *state, const pstring &stname, const int count)
+	template<typename C> void save(C *state, const pstring &stname, const int count)
 	{
 		pstate_manager_t &manager = static_cast<T*>(this)->state_manager();
 		pstring module = static_cast<T*>(this)->name();

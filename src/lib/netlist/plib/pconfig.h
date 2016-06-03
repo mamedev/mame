@@ -91,8 +91,8 @@ typedef _int128_t INT128;
 #endif
 
 /* not supported in GCC prior to 4.4.x */
-#define ATTR_HOT               __attribute__((hot))
-#define ATTR_COLD              __attribute__((cold))
+#define               __attribute__((hot))
+#define              __attribute__((cold))
 
 #define RESTRICT                __restrict__
 #define EXPECTED(x)     (x)

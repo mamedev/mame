@@ -71,8 +71,8 @@ public:
 	static T log(const T &x) { return std::log(x); }
 
 	#if defined(MSC_VER) && MSC_VER < 1800
-	ATTR_HOT inline static double e_log1p(const double &x) { return nl_math::log(1.0 + x); }
-	ATTR_HOT inline static float e_log1p(const float &x) { return nl_math::log(1.0 + x); }
+	inline static double e_log1p(const double &x) { return nl_math::log(1.0 + x); }
+	inline static float e_log1p(const float &x) { return nl_math::log(1.0 + x); }
 #else
 	template <typename T>
 	static T e_log1p(const T &x) { return log1p(x); }
@@ -88,7 +88,7 @@ public:
 	// add c3 and it'll be better than 1%
 
 #if 0
-	ATTR_HOT inline static float exp(const float &x) { return std::exp(x); }
+	inline static float exp(const float &x) { return std::exp(x); }
 	inline static double fastexp_h(const double &x)
 	{
 		/* static */ const double ln2r = 1.442695040888963387;
@@ -109,7 +109,7 @@ public:
 			return pow(2.0, t)*e;
 	}
 
-	ATTR_HOT inline static double exp(const double &x)
+	inline static double exp(const double &x)
 	{
 		if (x<0)
 			return 1.0 / fastexp_h(-x);

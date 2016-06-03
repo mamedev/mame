@@ -121,19 +121,19 @@ NETLIB_OBJECT(twoterm)
 	NETLIB_UPDATEI();
 
 public:
-	ATTR_HOT /* inline */ void set(const nl_double G, const nl_double V, const nl_double I)
+	/* inline */ void set(const nl_double G, const nl_double V, const nl_double I)
 	{
 		/*      GO, GT, I                */
 		m_P.set( G,  G, (  V) * G - I);
 		m_N.set( G,  G, ( -V) * G + I);
 	}
 
-	ATTR_HOT /* inline */ nl_double deltaV() const
+	/* inline */ nl_double deltaV() const
 	{
 		return m_P.net().Q_Analog() - m_N.net().Q_Analog();
 	}
 
-	ATTR_HOT void set_mat(nl_double a11, nl_double a12, nl_double a21, nl_double a22, nl_double r1, nl_double r2)
+	void set_mat(nl_double a11, nl_double a12, nl_double a21, nl_double a22, nl_double r1, nl_double r2)
 	{
 		/*      GO, GT, I                */
 		m_P.set(-a12, a11, -r1);
@@ -311,9 +311,9 @@ private:
 class generic_diode
 {
 public:
-	ATTR_COLD generic_diode();
+	generic_diode();
 
-	ATTR_HOT inline void update_diode(const nl_double nVd)
+	inline void update_diode(const nl_double nVd)
 	{
 #if 1
 		if (nVd < NL_FCONST(-5.0) * m_Vt)
@@ -351,16 +351,16 @@ public:
 #endif
 	}
 
-	ATTR_COLD void set_param(const nl_double Is, const nl_double n, nl_double gmin);
+	void set_param(const nl_double Is, const nl_double n, nl_double gmin);
 
-	ATTR_HOT inline nl_double I() const { return m_Id; }
-	ATTR_HOT inline nl_double G() const { return m_G; }
-	ATTR_HOT inline nl_double Ieq() const { return (m_Id - m_Vd * m_G); }
-	ATTR_HOT inline nl_double Vd() const { return m_Vd; }
+	inline nl_double I() const { return m_Id; }
+	inline nl_double G() const { return m_G; }
+	inline nl_double Ieq() const { return (m_Id - m_Vd * m_G); }
+	inline nl_double Vd() const { return m_Vd; }
 
 	/* owning object must save those ... */
 
-	ATTR_COLD void save(pstring name, object_t &parent);
+	void save(pstring name, object_t &parent);
 
 private:
 	nl_double m_Vd;

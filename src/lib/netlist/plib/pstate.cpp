@@ -20,7 +20,7 @@ pstate_manager_t::~pstate_manager_t()
 
 
 
-ATTR_COLD void pstate_manager_t::save_state_ptr(const void *owner, const pstring &stname, const pstate_data_type_e dt, const int size, const int count, void *ptr, bool is_ptr)
+void pstate_manager_t::save_state_ptr(const void *owner, const pstring &stname, const pstate_data_type_e dt, const int size, const int count, void *ptr, bool is_ptr)
 {
 	pstring fullname = stname;
 	ATTR_UNUSED  pstring ts[] = {
@@ -42,7 +42,7 @@ ATTR_COLD void pstate_manager_t::save_state_ptr(const void *owner, const pstring
 	m_save.push_back(std::move(p));
 }
 
-ATTR_COLD void pstate_manager_t::remove_save_items(const void *owner)
+void pstate_manager_t::remove_save_items(const void *owner)
 {
 	unsigned i = 0;
 	while (i < m_save.size())
@@ -54,21 +54,21 @@ ATTR_COLD void pstate_manager_t::remove_save_items(const void *owner)
 	}
 }
 
-ATTR_COLD void pstate_manager_t::pre_save()
+void pstate_manager_t::pre_save()
 {
 	for (std::size_t i=0; i < m_save.size(); i++)
 		if (m_save[i]->m_dt == DT_CUSTOM)
 			m_save[i]->m_callback->on_pre_save();
 }
 
-ATTR_COLD void pstate_manager_t::post_load()
+void pstate_manager_t::post_load()
 {
 	for (std::size_t i=0; i < m_save.size(); i++)
 		if (m_save[i]->m_dt == DT_CUSTOM)
 			m_save[i]->m_callback->on_post_load();
 }
 
-template<> ATTR_COLD void pstate_manager_t::save_item(const void *owner, pstate_callback_t &state, const pstring &stname)
+template<> void pstate_manager_t::save_item(const void *owner, pstate_callback_t &state, const pstring &stname)
 {
 	//save_state_ptr(stname, DT_CUSTOM, 0, 1, &state);
 	pstate_callback_t *state_p = &state;

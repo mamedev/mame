@@ -42,14 +42,14 @@ class terms_t
 	P_PREVENT_COPYING(terms_t)
 
 public:
-	ATTR_COLD terms_t()
+	terms_t()
 	: m_railstart(0)
 	, m_last_V(0.0)
 	, m_DD_n_m_1(0.0)
 	, m_h_n_m_1(1e-6)
 	{}
 
-	ATTR_COLD void clear()
+	void clear()
 	{
 		m_term.clear();
 		m_net_other.clear();
@@ -59,7 +59,7 @@ public:
 		m_other_curanalog.clear();
 	}
 
-	ATTR_COLD void add(terminal_t *term, int net_other, bool sorted);
+	void add(terminal_t *term, int net_other, bool sorted);
 
 	inline unsigned count() { return m_term.size(); }
 
@@ -70,7 +70,7 @@ public:
 	inline nl_double *Idr() { return m_Idr.data(); }
 	inline nl_double **other_curanalog() { return m_other_curanalog.data(); }
 
-	ATTR_COLD void set_pointers();
+	void set_pointers();
 
 	unsigned m_railstart;
 
@@ -153,7 +153,7 @@ public:
 	NETLIB_RESETI();
 
 public:
-	ATTR_COLD int get_net_idx(net_t *net);
+	int get_net_idx(net_t *net);
 
 	plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
 
@@ -166,7 +166,7 @@ public:
 
 protected:
 
-	ATTR_COLD void setup_base(analog_net_t::list_t &nets);
+	void setup_base(analog_net_t::list_t &nets);
 	void update_dynamic();
 
 	virtual void vsetup(analog_net_t::list_t &nets) = 0;

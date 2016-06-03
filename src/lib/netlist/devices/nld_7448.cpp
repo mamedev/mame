@@ -45,7 +45,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		ATTR_HOT void update_outputs(UINT8 v);
+		void update_outputs(UINT8 v);
 		static const UINT8 tab7448[16][7];
 
 		logic_input_t m_A;

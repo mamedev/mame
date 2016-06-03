@@ -35,7 +35,7 @@ namespace netlist
 		NETLIB_RESETI();
 
 	protected:
-		ATTR_HOT void update_outputs();
+		void update_outputs();
 
 		logic_input_t m_A;
 		logic_input_t m_B;
