@@ -135,6 +135,23 @@
 		<text string="ST"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 
+	<element name="text_exp">
+		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<text string="EXPERT"><color red="0.17" green="0.15" blue="0.15" /></text>
+	</element>
+	<element name="text_mon">
+		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<text string="MONITOR"><color red="0.17" green="0.15" blue="0.15" /></text>
+	</element>
+	<element name="text_sa">
+		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<text string="Set-up &quot;A&quot;"><color red="0.17" green="0.15" blue="0.15" /></text>
+	</element>
+	<element name="text_sb">
+		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<text string="Set-up &quot;B&quot;"><color red="0.17" green="0.15" blue="0.15" /></text>
+	</element>
+
 <!-- build screen -->
 
 	<view name="Internal Layout">
@@ -245,6 +262,11 @@
 		<bezel element="disk_black"><bounds x="21.25" y="61.25" width="2.5" height="2.5" /></bezel>
 		<bezel element="disk_black"><bounds x="61.25" y="21.25" width="2.5" height="2.5" /></bezel>
 		<bezel element="disk_black"><bounds x="61.25" y="61.25" width="2.5" height="2.5" /></bezel>
+
+		<bezel element="text_sb"><bounds x="33.1" y="36.5" width="8.8" height="2" /></bezel>
+		<bezel element="text_sa"><bounds x="43.1" y="36.5" width="8.8" height="2" /></bezel>
+		<bezel element="text_mon"><bounds x="33.1" y="46.5" width="8.8" height="2" /></bezel>
+		<bezel element="text_exp"><bounds x="43.1" y="46.5" width="8.8" height="2" /></bezel>
 
 	<!-- board leds -->
 
