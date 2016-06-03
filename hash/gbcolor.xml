@@ -20,6 +20,35 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 -->
 
+
+<!--
+
+ Info on the PCB codes, based on Tauwasser's notes and research
+
+
+ DMG-*AA-NN
+
+ where
+ NN   = PCB revision
+ AA   = 2 number descriptor specifying MBC and ROM/RAM combination
+ *    = PCB code (A = production cart, Z = revision of some A PCB, B = test cart)
+
+ Number descriptors correspond to the following
+
+ Code     MBC                      ROM size    RAM size
+ 0        MBC5 (w/ or w/o rumble)  4/8M        2/4k EEPROM or 1M SRAM
+ 1        MBC5 (w/ rumble)         16/32/64M   64k
+ 2        G-MMC1 (+ 8M FLASH)      2/4/8M      256k
+ 3        MBC6 (+ 8M FLASH)        16/32/64M   256k
+ 4        MBC7                     4/8M        -?
+ 6        -                        2/4/8M      64k
+ 7        -                        16/32M      2/4k EEPROM
+
+ Descriptors 5, 8 and 9 have not been found yet
+
+-->
+
+
 <softwarelist name="gbcolor" description="Nintendo Game Boy Color cartridges">
 
 	<software name="007twine">
