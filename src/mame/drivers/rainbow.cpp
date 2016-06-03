@@ -903,7 +903,7 @@ void rainbow_state::machine_reset()
 	INT88 = false;
 
 	m_kbd_tx_ready = m_kbd_rx_ready = false;
-	m_kbd8251->write_cts(1);
+	m_kbd8251->write_cts(0);
 	m_KBD = 0;
 
 	m_irq_high = 0;

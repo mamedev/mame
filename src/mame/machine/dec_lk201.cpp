@@ -192,6 +192,7 @@ static ADDRESS_MAP_START( lk201_map, AS_PROGRAM, 8, lk201_device )
 	AM_RANGE(0x0004, 0x0006) AM_READWRITE(ddr_r, ddr_w)
 	AM_RANGE(0x000a, 0x000c) AM_READWRITE(spi_r, spi_w)
 	AM_RANGE(0x000d, 0x0011) AM_READWRITE(sci_r, sci_w)
+	AM_RANGE(0x0012, 0x001b) AM_READWRITE(timer_r, timer_w)
 	AM_RANGE(0x0050, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x1fff) AM_ROM AM_REGION(LK201_CPU_TAG, 0x100)
 ADDRESS_MAP_END
@@ -495,6 +496,7 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 
 void lk201_device::device_start()
 {
+	m_count = timer_alloc(1);
 	m_tx_handler.resolve_safe();
 }
 
@@ -507,6 +509,8 @@ void lk201_device::device_reset()
 {
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(4800);
+	m_count->adjust(attotime::from_hz(1200), 0, attotime::from_hz(1200));
+	memset(m_timer.regs, 0, sizeof(m_timer.regs));
 
 	sci_status = (SCSR_TC | SCSR_TDRE);
 
@@ -522,7 +526,14 @@ void lk201_device::device_reset()
 
 void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	device_serial_interface::device_timer(timer, id, param, ptr);
+	if(id == 1)
+	{
+		if(m_timer.tcr & 0x40)
+			m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
+		m_timer.tsr |= 0x40;
+	}
+	else
+		device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 void lk201_device::rcv_complete()
@@ -554,6 +565,22 @@ void lk201_device::update_interrupts()
 	{
 		m_maincpu->set_input_line(M68HC05EG_INT_CPI, 0);
 	}
+}
+
+READ8_MEMBER( lk201_device::timer_r )
+{
+	UINT8 ret = m_timer.regs[offset];
+	if(m_timer.tsr)
+	{
+		m_timer.tsr = 0;
+		m_maincpu->set_input_line(M68HC05EG_INT_TIMER, CLEAR_LINE);
+	}
+	return ret;
+}
+
+WRITE8_MEMBER( lk201_device::timer_w )
+{
+	m_timer.regs[offset] = data;
 }
 
 READ8_MEMBER( lk201_device::ddr_r )
