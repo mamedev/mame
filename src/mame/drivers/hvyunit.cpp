@@ -62,6 +62,7 @@ To Do:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "video/kan_pand.h"
 
@@ -85,6 +86,7 @@ public:
 		m_pandora(*this, "pandora"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram")
 		{ }
@@ -97,6 +99,7 @@ public:
 	required_device<kaneko_pandora_device> m_pandora;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* Video */
 	required_shared_ptr<UINT8> m_videoram;
@@ -269,7 +272,7 @@ READ8_MEMBER(hvyunit_state::mermaid_status_r)
 
 WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_sound_cpu2)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -463,7 +466,7 @@ static ADDRESS_MAP_START( sound_io, AS_IO, 8, hvyunit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -679,6 +682,8 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

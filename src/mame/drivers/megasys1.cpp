@@ -188,7 +188,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_iganinju_scanline)
 	int scanline = param;
 
 	// TODO: there's more than one hint that MCU controls IRQ signals via work RAM buffers.
-	//       This is a bare miminum guessing for this specific game, it definitely don't like neither lv 1 nor 2.
+	//       This is a bare minimum guessing for this specific game, it definitely don't like neither lv 1 nor 2.
 	//       Of course MCU is probably doing a lot more to mask and probably set a specific line too.
 	if(m_ram[0] == 0)
 		return;
@@ -197,14 +197,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_iganinju_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
+static ADDRESS_MAP_START( megasys1Z_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("P1")
 	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("P2")
 	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("DSW")
-	AM_RANGE(0x080008, 0x080009) AM_READ(soundlatch2_word_r)    /* from sound cpu */
 	AM_RANGE(0x084000, 0x0843ff) AM_RAM_WRITE(megasys1_vregs_A_w) AM_SHARE("vregs")
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x08e000, 0x08ffff) AM_RAM AM_SHARE("objectram")
@@ -214,6 +213,11 @@ static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(ms1_ram_w) AM_SHARE("ram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_IMPORT_FROM(megasys1Z_map)
+	AM_RANGE(0x080008, 0x080009) AM_DEVREAD("soundlatch2", generic_latch_16_device, read)    /* from sound cpu */
+ADDRESS_MAP_END
 
 /***************************************************************************
                             [ Main CPU - System B ]
@@ -448,8 +452,8 @@ READ8_MEMBER(megasys1_state::oki_status_2_r)
 
 static ADDRESS_MAP_START( megasys1A_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r)
-	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)   // to main cpu
+	AM_RANGE(0x040000, 0x040001) AM_DEVREAD("soundlatch", generic_latch_16_device, read)
+	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write)   // to main cpu
 	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ8(oki_status_1_r, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
@@ -466,8 +470,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megasys1B_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w) /* from/to main cpu */
-	AM_RANGE(0x060000, 0x060001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w) /* from/to main cpu */
+	AM_RANGE(0x040000, 0x040001) AM_DEVREAD("soundlatch", generic_latch_16_device, read) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write) /* from/to main cpu */
+	AM_RANGE(0x060000, 0x060001) AM_DEVREAD("soundlatch", generic_latch_16_device, read) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write) /* from/to main cpu */
 	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ8(oki_status_1_r, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
@@ -486,7 +490,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, megasys1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch_z", generic_latch_8_device, read)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
 
@@ -1526,6 +1530,9 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
+
 	MCFG_YM2151_ADD("ymsnd", SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(megasys1_state,sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -1686,16 +1693,11 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-WRITE_LINE_MEMBER(megasys1_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 static MACHINE_CONFIG_START( system_Z, megasys1_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
-	MCFG_CPU_PROGRAM_MAP(megasys1A_map)
+	MCFG_CPU_PROGRAM_MAP(megasys1Z_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
@@ -1720,8 +1722,10 @@ static MACHINE_CONFIG_START( system_Z, megasys1_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch_z")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(megasys1_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -4156,7 +4160,6 @@ READ16_MEMBER(megasys1_state::edfbl_input_r)
 DRIVER_INIT_MEMBER(megasys1_state,edfbl)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::edfbl_input_r),this));
-	//m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(*m_oki1, 0xe000e, 0xe000f, FUNC(soundlatch_byte_w));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,hayaosi1)

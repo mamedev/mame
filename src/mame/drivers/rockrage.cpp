@@ -78,7 +78,7 @@ WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
 
 WRITE8_MEMBER(rockrage_state::rockrage_sh_irqtrigger_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( rockrage_sound_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("vlm", vlm5030_device, data_w)              /* VLM5030 */
 	AM_RANGE(0x3000, 0x3000) AM_READ(rockrage_VLM5030_busy_r)           /* VLM5030 */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(rockrage_speech_w)                /* VLM5030 */
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)                             /* soundlatch_byte_r */
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)         /* YM 2151 */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM                                             /* RAM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM */
@@ -277,6 +277,8 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)

@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x1085, 0x1085) AM_MIRROR(0x0078) AM_WRITENOP                      /* CN3.2 */
 	AM_RANGE(0x1086, 0x1086) AM_MIRROR(0x0078) AM_WRITENOP                      /* CN3.4 */
 	AM_RANGE(0x1087, 0x1087) AM_MIRROR(0x0078) AM_WRITE(irq_mask_w)             /* INT */
-	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_WRITE(soundlatch_byte_w)          /* 32 */
+	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)  /* 32 */
 	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x007f) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_MIRROR(0x007c) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1281, 0x1281) AM_MIRROR(0x007c) AM_READ_PORT("IN0")
@@ -284,7 +284,7 @@ static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x1085, 0x1085) AM_MIRROR(0x0078) AM_WRITENOP                      /* CN3.2 */
 	AM_RANGE(0x1086, 0x1086) AM_MIRROR(0x0078) AM_WRITENOP                      /* CN3.4 */
 	AM_RANGE(0x1087, 0x1087) AM_MIRROR(0x0078) AM_WRITE(irq_mask_w)             /* INT */
-//  AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_WRITE(soundlatch_byte_w)           /* 32 */
+//  AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)     /* 32 */
 	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x007f) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_MIRROR(0x007c) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1281, 0x1281) AM_MIRROR(0x007c) AM_READ_PORT("IN0")
@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( reaktor_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x9081, 0x9081) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x9083, 0x9084) AM_WRITE(coin_w)
 	AM_RANGE(0x9087, 0x9087) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x9100, 0x9100) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x9100, 0x9100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("DSW2")
 	AM_RANGE(0x9280, 0x9280) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x9281, 0x9281) AM_READ_PORT("IN0")
@@ -344,7 +344,7 @@ static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x10b1, 0x10b1) AM_READNOP AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)
 	AM_RANGE(0x10b3, 0x10b4) AM_WRITE(coin_w) // actually not used
 	AM_RANGE(0x10b7, 0x10b7) AM_READNOP AM_WRITE(irq_mask_w)
-	AM_RANGE(0x1100, 0x1100) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x1100, 0x1100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1281, 0x1281) AM_READ_PORT("IN0")
@@ -371,7 +371,7 @@ static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x1081, 0x1081) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x1083, 0x1084) AM_WRITE(coin_w)
 	AM_RANGE(0x1087, 0x1087) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x1100, 0x1100) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x1100, 0x1100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1280, 0x1280) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1281, 0x1281) AM_READ_PORT("IN0")
@@ -402,7 +402,7 @@ READ8_MEMBER(trackfld_state::trackfld_SN76496_r)
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_DEVREAD("trackfld_audio", trackfld_audio_device, trackfld_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(konami_SN76496_latch_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(trackfld_SN76496_r) AM_WRITE(konami_SN76496_w)
@@ -416,7 +416,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyprolyb_sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_DEVREAD("trackfld_audio", trackfld_audio_device, trackfld_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(konami_SN76496_latch_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(trackfld_SN76496_r) AM_WRITE(konami_SN76496_w)
@@ -924,6 +924,8 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
 	MCFG_DAC_ADD("dac")
@@ -978,6 +980,8 @@ static MACHINE_CONFIG_START( yieartf, trackfld_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
@@ -1276,7 +1280,7 @@ ROM_START( hipoly )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "2.1a",        0x6000, 0x2000, CRC(82257fb7) SHA1(4a5038292e582d5c3b5f2d82b01c57ccb24f3095) )  // only one byte of difference with hyprolymba
 	ROM_LOAD( "2.2a",        0x8000, 0x2000, CRC(15b83099) SHA1(79827590d74f20c9a95723e06b05af2b15c34f5f) )  // ok
-	ROM_LOAD( "2.4a",        0xa000, 0x2000, CRC(93a32a97) SHA1(4fbb2fcdf9bc7a3d273dbc27b8157f163ff9bf11) )  // too different... maybe a bad dump?
+	ROM_LOAD( "2.4a",        0xa000, 0x2000, BAD_DUMP CRC(93a32a97) SHA1(4fbb2fcdf9bc7a3d273dbc27b8157f163ff9bf11) )  // too different... maybe a bad dump?
 	ROM_LOAD( "2.5a",        0xc000, 0x2000, CRC(d099b1e8) SHA1(0472991ad6caef41ec6b8ec8bf3d9d07584a57cc) )  // ok
 	ROM_LOAD( "2.7a",        0xe000, 0x2000, CRC(974ff815) SHA1(11512df2008a79ba44bbb84bd70885f187113211) )  // ok
 

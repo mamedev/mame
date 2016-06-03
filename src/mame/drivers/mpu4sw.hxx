@@ -64,8 +64,6 @@ DRIVER_INIT_MEMBER(mpu4_state,m4_showstring_big)
 	DRIVER_INIT_CALL(m4debug);
 }
 
-
-
 DRIVER_INIT_MEMBER(mpu4_state,m_grtecpss)
 {
 	DRIVER_INIT_CALL(m_grtecp);
@@ -89,7 +87,15 @@ DRIVER_INIT_MEMBER(mpu4_state,m_grtecpss)
 
 // "(C)1994  B.W.B."  and  "AC101.0"
 GAME_CUSTOM( 1994, m4andycp,           0,          "ac10.hex",         0x0000, 0x010000, CRC(0e250923) SHA1(9557315cca7a47c307e811d437ff424fe77a2843), "Bwb",      "Andy Capp (Bwb / Barcrest) (MPU4) (AC10)" )
-GAME_CUSTOM( 1994, m4andycp10c,        m4andycp,   "aci10___.1_1",     0x0000, 0x010000, CRC(afa29daa) SHA1(33d161977b1e3512b550980aed48954ba7f0c5a2), "Bwb",      "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C)" )
+
+ROM_START( m4andycp10c )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "aci10___.1_1",     0x0000, 0x010000, CRC(afa29daa) SHA1(33d161977b1e3512b550980aed48954ba7f0c5a2) )
+	M4ANDYCP_EXTRA_ROMS
+ROM_END
+
+GAME( 1994, m4andycp10c,  m4andycp,  mod4oki, mpu4, mpu4_state, m4_andycp10c , ROT0, "Bwb", "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C)",GAME_FLAGS )
+
 GAME_CUSTOM( 1994, m4andycp10d,        m4andycp,   "ac_10sd_.1_1",     0x0000, 0x010000, CRC(ec800208) SHA1(47734ae5a3184e4805a7620287fb5da7fe823929), "Bwb",      "Andy Capp (Bwb / Barcrest) (MPU4) (AC10D)" ) // datapak
 GAME_CUSTOM( 1994, m4andycp10k,        m4andycp,   "ac_10a__.1_1",     0x0000, 0x010000, CRC(c8a1150b) SHA1(99ba283aeacd1c415d261e10b5b7fd43d3c25af8), "Bwb",      "Andy Capp (Bwb / Barcrest) (MPU4) (AC10K)" )
 GAME_CUSTOM( 1994, m4andycp10yd,       m4andycp,   "ac_10sb_.1_1",     0x0000, 0x010000, CRC(f68f8f48) SHA1(a156d942e7ab7446290dcd8def6236e7436126b9), "Bwb",      "Andy Capp (Bwb / Barcrest) (MPU4) (AC10YD)" ) // datapak

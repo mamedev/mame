@@ -11,8 +11,8 @@ notes:
 the way the double screen works in xmen6p is not fully understood
 
 the board only has one of each gfx chip, the only additional chip not found
-on the 2/4p board is 053253.  This chip is also on Run n Gun which should
-likewise be a 2 screen game
+on the 2/4p board is 053253.  This chip is also on Run n Gun which is
+likewise a 2 screen game
 
 ***************************************************************************/
 #include "emu.h"
@@ -22,7 +22,6 @@ likewise be a 2 screen game
 #include "machine/watchdog.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
-#include "sound/k054539.h"
 #include "rendlay.h"
 #include "includes/xmen.h"
 #include "includes/konamipt.h"
@@ -58,7 +57,7 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 
 READ16_MEMBER(xmen_state::sound_status_r)
 {
-	return soundlatch2_byte_r(space, 0);
+	return m_soundlatch2->read(space, 0);
 }
 
 WRITE16_MEMBER(xmen_state::sound_cmd_w)
@@ -66,7 +65,7 @@ WRITE16_MEMBER(xmen_state::sound_cmd_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		soundlatch_byte_w(space, 0, data);
+		m_soundlatch->write(space, 0, data);
 	}
 }
 
@@ -117,8 +116,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xmen_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xe800, 0xe801) AM_MIRROR(0x0400) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_byte_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+	AM_RANGE(0xf002, 0xf002) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -353,6 +352,9 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
@@ -415,6 +417,9 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)

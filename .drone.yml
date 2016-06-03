@@ -26,10 +26,10 @@ notify:
       port: $$IRC_PORT
       password: $$IRC_PASS
       tls: true
-  when:
-    success: false
-    failure: true
-    change: true
+    when:
+      success: false
+      failure: true
+      change: true
 
 # Need to regen secrets file (.drone.sec) from within tea-ci.org to enable
 #notify:

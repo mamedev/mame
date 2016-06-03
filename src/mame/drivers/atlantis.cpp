@@ -60,6 +60,7 @@ public:
 	atlantis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_dcs(*this, "dcs"),
 		m_ioasic(*this, "ioasic"),
 		m_rtc(*this, "rtc")
@@ -69,11 +70,13 @@ public:
 	virtual void machine_reset() override;
 	UINT32 screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<mips3_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	//required_device<dcs2_audio_dsio_device> m_dcs;
 	required_device<dcs2_audio_denver_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
 	required_device<nvram_device> m_rtc;
-	std::vector<UINT8> m_rtc_data;
+	UINT8 m_rtc_data[0x800];
+
 	UINT32 m_last_offset;
 	READ8_MEMBER(cmos_r);
 	WRITE8_MEMBER(cmos_w);
@@ -87,20 +90,17 @@ public:
 
 	DECLARE_WRITE32_MEMBER(zeus_w);
 	DECLARE_READ32_MEMBER(zeus_r);
-	UINT32 m_zeus_data;
+	UINT32 m_zeus_data[0x80];
 
 	READ8_MEMBER (red_r);
 	WRITE8_MEMBER(red_w);
-	std::vector<UINT8> m_red_data;
+	UINT8 m_red_data[0x1000];
 	int m_red_count;
 
 	READ32_MEMBER (green_r);
 	WRITE32_MEMBER(green_w);
 	READ8_MEMBER (blue_r);
 	WRITE8_MEMBER(blue_w);
-
-	READ32_MEMBER(map2_r);
-	WRITE32_MEMBER(map2_w);
 
 	WRITE32_MEMBER(user_io_output);
 	READ32_MEMBER(user_io_input);
@@ -128,13 +128,16 @@ WRITE8_MEMBER(atlantis_state::red_w)
 
 	switch (offset) {
 	case 0:
-		// Data written is shifted by 1 bit each time.  Maybe a serial line output?
-		if (m_red_count == 0)
-			logerror("%06X: red_w start serial %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
-		m_red_count++;
-		if (m_red_count == 8)
-			m_red_count = 0;
-		break;
+		// User I/O 0 = Allow write to red[0]. Serial Write Enable?
+		if (m_user_io_state & 0x1) {
+			// Data written is shifted by 1 bit each time.  Maybe a serial line output?
+			if (m_red_count == 0)
+				logerror("%06X: red_w start serial %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
+			m_red_count++;
+			if (m_red_count == 8)
+				m_red_count = 0;
+			break;
+		}  // Fall through to default if not enabled
 	default:
 		logerror("%06X: red_w %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
 		break;
@@ -155,24 +158,6 @@ WRITE32_MEMBER(atlantis_state::green_w)
 {
 	logerror("%06X: green_w %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
 	m_last_offset = offset | 0x20000;
-}
-
-READ32_MEMBER(atlantis_state::map2_r)
-{
-	UINT32 data = 0;
-	switch (offset) {
-	case 0x104/4:
-		// CPU resets map2, writes 0xffffffff here, and then expects this read
-		data = 0x1fff03ff;
-		break;
-	}
-	logerror("%06X: map2_r %08x = %08x\n", machine().device("maincpu")->safe_pc(), offset*4, data);
-	return data;
-}
-
-WRITE32_MEMBER(atlantis_state::map2_w)
-{
-	logerror("%06X: map2_w %08x = %08x\n", machine().device("maincpu")->safe_pc(), offset*4, data);
 }
 
 READ8_MEMBER (atlantis_state::blue_r)
@@ -199,7 +184,7 @@ READ32_MEMBER(atlantis_state::user_io_input)
 	// Set user i/o (2) Power Detect?
 	m_user_io_state |= 1 << 2;
 
-	// User I/O 0 = Allow write to red[0]. Serial line?
+	// User I/O 0 = Allow write to red[0]. Serial Write Enable?
 	// Loop user_io(0) to user_io(1)
 	m_user_io_state = (m_user_io_state & ~(0x2)) | ((m_user_io_state & 1) << 1);
 	if (0)
@@ -216,15 +201,16 @@ READ32_MEMBER(atlantis_state::asic_reset_r)
 WRITE32_MEMBER(atlantis_state::asic_reset_w)
 {
 	// 0x1 IOASIC Reset
-	// 0x4 Map2 Reset?
+	// 0x4 Zeus2 Reset
 	// 0x10 IDE Reset
 	logerror("%s:asic_reset_w write to offset %04X = %08X & %08X\n", machine().describe_context(), offset, data, mem_mask);
-	//UINT32 oldData = m_asic_reset;
 	COMBINE_DATA(&m_asic_reset);
-	//if (!(m_asic_reset & 0x0002))
-	//if ((m_asic_reset & 0x0002))
-	if ((m_asic_reset & 0x0001)==0)
-			m_ioasic->ioasic_reset();
+	if ((m_asic_reset & 0x0001) == 0) {
+		m_ioasic->ioasic_reset();
+		m_dcs->reset_w(ASSERT_LINE);
+	} else {
+		m_dcs->reset_w(CLEAR_LINE);
+	}
 }
 
 
@@ -346,14 +332,31 @@ WRITE32_MEMBER(atlantis_state::status_leds_w)
 
 READ32_MEMBER(atlantis_state::zeus_r)
 {
-	logerror("%s:zeus_r read from offset %04X = %08X & %08X\n", machine().describe_context(), offset, m_zeus_data, mem_mask);
-	return m_zeus_data;
+	UINT32 result = m_zeus_data[offset];
+	switch (offset) {
+	case 0x1:
+		/* bit  $000C0070 are tested in a loop until 0 */
+		/* bits $00080000 is tested in a loop until 0 */
+		/* bit  $00000004 is tested for toggling; probably VBLANK */
+		// zeus is reset if 0x80 is read
+		result = 0x00;
+		if (m_screen->vblank())
+			result |= 0x00008;
+		break;
+	case 0x41:
+		// CPU resets map2, writes 0xffffffff here, and then expects this read
+		result &= 0x1fff03ff;
+		break;
+	}
+	logerror("%s:zeus_r read from offset %04X = %08X & %08X\n", machine().describe_context(), offset, result, mem_mask);
+	return result;
 }
 
 WRITE32_MEMBER(atlantis_state::zeus_w)
 {
-	COMBINE_DATA(&m_zeus_data);
+	COMBINE_DATA(&m_zeus_data[offset]);
 	logerror("%s:zeus_w write to offset %04X = %08X & %08X\n", machine().describe_context(), offset, data, mem_mask);
+	m_last_offset = offset | 0x30000;
 }
 
 
@@ -370,10 +373,8 @@ READ32_MEMBER(atlantis_state::cmos_protect_r)
 
 void atlantis_state::machine_start()
 {
-	m_rtc_data.resize(0x800);
-	m_rtc->set_base(m_rtc_data.data(), m_rtc_data.size());
+	m_rtc->set_base(m_rtc_data, sizeof(m_rtc_data));
 
-	m_red_data.resize(0x1000);
 	/* set the fastest DRC options */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 }
@@ -392,7 +393,7 @@ void atlantis_state::machine_reset()
 	m_dcs->reset_w(0);
 	m_user_io_state = 0;
 	m_cmos_write_enabled = FALSE;
-	m_zeus_data = 0;
+	memset(m_zeus_data, 0, sizeof(m_zeus_data));
 	m_red_count = 0;
 }
 
@@ -430,22 +431,22 @@ UINT32 atlantis_state::screen_update_mwskins(screen_device &screen, bitmap_ind16
  *************************************/
 
 static ADDRESS_MAP_START( map0, AS_PROGRAM, 32, atlantis_state )
-	//00b80000
-	//00980000
-	//00a00000
-	//00a80000
-	//00900000
 	// 00200004
 	// 00200008
 	AM_RANGE(0x000000, 0xfff) AM_READWRITE8(red_r, red_w, 0xff)
 	AM_RANGE(0x0001e000, 0x0001ffff) AM_READWRITE8(cmos_r, cmos_w, 0xff)
-	//AM_RANGE(0x00180010, 0x00180013) AM_READWRITE(asic_reset_r, asic_reset_w)
-	AM_RANGE(0x00400000, 0x0040002f) AM_READWRITE8(blue_r, blue_w, 0xff)
+	//AM_RANGE(0x00180000, 0x0018001f) // Bitlatches?
+	AM_RANGE(0x00400000, 0x004000bf) AM_READWRITE8(blue_r, blue_w, 0xff)
+	AM_RANGE(0x00880000, 0x00880003) AM_READWRITE(asic_reset_r, asic_reset_w)
+	//00900000
+	//AM_RANGE(0x00980000, 0x00980003) // irq clear ??
+	//00a00000
+	//AM_RANGE(0x00a80000, 0x00a80003) // irq enable ??
+	//AM_RANGE(0x00b80000, 0x00b80003) // irq cause ??
+	AM_RANGE(0x00c80000, 0x00c80003) AM_READWRITE(green_r, green_w) // irq status ??
 	AM_RANGE(0x00d80000, 0x00d80003) AM_READWRITE(status_leds_r, status_leds_w)
 	AM_RANGE(0x00e00000, 0x00e00003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
-	AM_RANGE(0x00c80000, 0x00c80003) AM_READWRITE(green_r, green_w)
-	//AM_RANGE(0x00e80000, 0x00e80003) AM_NOP // Watchdog?
-	AM_RANGE(0x00880000, 0x00880003) AM_READWRITE(asic_reset_r, asic_reset_w)
+	AM_RANGE(0x00e80000, 0x00e80003) AM_NOP // Watchdog?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( map1, AS_PROGRAM, 32, atlantis_state )
@@ -457,7 +458,7 @@ static ADDRESS_MAP_START( map1, AS_PROGRAM, 32, atlantis_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(map2, AS_PROGRAM, 32, atlantis_state)
-	AM_RANGE(0x00000000, 0x000001ff) AM_READWRITE(map2_r, map2_w)
+	AM_RANGE(0x00000000, 0x000001ff) AM_READWRITE(zeus_r, zeus_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( map3, AS_PROGRAM, 32, atlantis_state )

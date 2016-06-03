@@ -246,7 +246,7 @@ xx-xx-2003 Acho A. Tang
 TODO:
 - check dust color on title screen(I don't think it should be black)
 - check brake light(LED) support
-- check occational off-pitch music and samples(sound interrupt related?)
+- check occasional off-pitch music and samples(sound interrupt related?)
 
 * Sprite, road and sky drawings do not support 32-bit color depth.
   Certain sprites with incorrect z-value still pop in front of closer
@@ -594,11 +594,11 @@ WRITE16_MEMBER(wecleman_state::wecleman_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xFF);
+		m_soundlatch->write(space, 0, data & 0xFF);
 	}
 }
 
-/* Protection - an external multiplyer connected to the sound CPU */
+/* Protection - an external multiplier connected to the sound CPU */
 READ8_MEMBER(wecleman_state::multiply_r)
 {
 	return (m_multiply_reg[0] * m_multiply_reg[1]) & 0xFF;
@@ -643,7 +643,7 @@ static ADDRESS_MAP_START( wecleman_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)    // Protection
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // Protection
 	AM_RANGE(0x9006, 0x9006) AM_WRITENOP    // ?
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r) // From main CPU
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write) // K007232 (Reading offset 5/b triggers the sample)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(wecleman_K00723216_bank_w)    // Samples banking
@@ -659,7 +659,7 @@ WRITE16_MEMBER(wecleman_state::hotchase_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xFF);
+		m_soundlatch->write(space, 0, data & 0xFF);
 	}
 }
 
@@ -759,7 +759,7 @@ static ADDRESS_MAP_START( hotchase_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x3000, 0x300d) AM_READWRITE(hotchase_3_k007232_r, hotchase_3_k007232_w)
 	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w) // Sound volume, banking, etc.
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP   // 0 at start of IRQ service, 1 at end (irq mask?)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r) // From main CPU (Read on IRQ)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU (Read on IRQ)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(hotchase_sound_hs_w)    // ACK signal to main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1101,6 +1101,8 @@ static MACHINE_CONFIG_START( wecleman, wecleman_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.85)
 	MCFG_SOUND_ROUTE(1, "mono", 0.85)
@@ -1180,6 +1182,8 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere

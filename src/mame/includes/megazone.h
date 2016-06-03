@@ -55,7 +55,6 @@ public:
 	DECLARE_WRITE8_MEMBER(megazone_flipscreen_w);
 	DECLARE_READ8_MEMBER(megazone_port_a_r);
 	DECLARE_WRITE8_MEMBER(megazone_port_b_w);
-	DECLARE_DRIVER_INIT(megazone);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

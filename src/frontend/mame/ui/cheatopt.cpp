@@ -52,8 +52,8 @@ void menu_cheat::handle()
 		/* handle reset all + reset all cheats for reload all option */
 		if ((menu_event->itemref == ITEMREF_CHEATS_RESET_ALL || menu_event->itemref == ITEMREF_CHEATS_RELOAD_ALL) && menu_event->iptkey == IPT_UI_SELECT)
 		{
-			for (cheat_entry &curcheat : mame_machine_manager::instance()->cheat().entries())
-				if (curcheat.select_default_state())
+			for (auto &curcheat : mame_machine_manager::instance()->cheat().entries())
+				if (curcheat->select_default_state())
 					changed = true;
 		}
 
@@ -141,11 +141,11 @@ void menu_cheat::populate()
 
 	// add other cheats
 	if (!mame_machine_manager::instance()->cheat().entries().empty()) {
-		for (cheat_entry &curcheat : mame_machine_manager::instance()->cheat().entries())
+		for (auto &curcheat : mame_machine_manager::instance()->cheat().entries())
 		{
 			UINT32 flags;
-			curcheat.menu_text(text, subtext, flags);
-			item_append(text.c_str(), subtext.c_str(), flags, &curcheat);
+			curcheat->menu_text(text, subtext, flags);
+			item_append(text.c_str(), subtext.c_str(), flags, curcheat.get());
 		}
 
 		/* add a separator */

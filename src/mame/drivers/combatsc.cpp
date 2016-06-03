@@ -6,7 +6,7 @@
 
 TODO:
 - Ugly text flickering in various places, namely the text when you finish level 1.
-  This is due of completely busted sprite limit hook-up. (check konicdev.c and MT #00185)
+  This is due of completely busted sprite limit hook-up. (check k007121.cpp and MT #00185)
 - it seems that to get correct target colors in firing range III we have to
   use the WRONG lookup table (the one for tiles instead of the one for
   sprites).
@@ -112,7 +112,7 @@ SOUND CPU:
 9000        uPD7759
 b000        uPD7759
 c000        uPD7759
-d000        soundlatch_byte_r
+d000        soundlatch read
 e000-e001   YM2203
 
 
@@ -150,7 +150,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_vreg_w)
 
 WRITE8_MEMBER(combatsc_state::combatscb_sh_irqtrigger_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -363,7 +363,7 @@ static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(combatsc_coin_counter_w)  /* coin counters */
 	AM_RANGE(0x040c, 0x040c) AM_WRITE(combatsc_vreg_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(combatsc_bankselect_w)
-	AM_RANGE(0x0414, 0x0414) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x0414, 0x0414) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x0418, 0x0418) AM_WRITE(combatsc_sh_irqtrigger_w)
 	AM_RANGE(0x041c, 0x041c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* watchdog reset? */
 
@@ -393,7 +393,7 @@ static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0xb000, 0xb000) AM_READ(combatsc_busy_r)                   /* upd7759 busy? */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(combatsc_voice_reset_w)           /* upd7759 reset? */
 
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)                             /* soundlatch_byte_r? */
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) /* soundlatch read? */
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)   /* YM 2203 intercepted */
 ADDRESS_MAP_END
 
@@ -416,7 +416,7 @@ static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)   /* YM 2203 */
 	AM_RANGE(0x9008, 0x9009) AM_DEVREAD("ymsnd", ym2203_device, read)               /* ??? */
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(combatscb_dac_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)                     /* soundlatch_byte_r? */
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) /* soundlatch read? */
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bl_abank")
 ADDRESS_MAP_END
 
@@ -732,6 +732,8 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(combatsc_state, combatsc_portA_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
@@ -775,6 +777,8 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatscb)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)

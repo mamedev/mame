@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
+
 class ironhors_state : public driver_device
 {
 public:
@@ -15,6 +17,7 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_interrupt_enable(*this, "int_enable"),
 		m_scroll(*this, "scroll"),
 		m_colorram(*this, "colorram"),
@@ -27,6 +30,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_interrupt_enable;

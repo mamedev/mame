@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "video/kan_pand.h"
 
 #define PROT_OUTPUT_BUFFER_SIZE 8
@@ -23,7 +24,8 @@ public:
 		m_beast(*this, "beast"),
 		m_pandora(*this, "pandora"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 		{ }
 
 	/* memory pointers */
@@ -58,6 +60,7 @@ public:
 	required_device<kaneko_pandora_device> m_pandora;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(beast_data_w);
 	DECLARE_READ8_MEMBER(beast_data_r);

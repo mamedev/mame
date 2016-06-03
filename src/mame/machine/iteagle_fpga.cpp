@@ -42,8 +42,7 @@ machine_config_constructor iteagle_fpga_device::device_mconfig_additions() const
 void iteagle_fpga_device::device_start()
 {
 	// RTC M48T02
-	m_rtc_regs.resize(0x800 / 4);
-	m_rtc->set_base(m_rtc_regs.data(), m_rtc_regs.size() * sizeof(UINT32));
+	m_rtc->set_base(m_rtc_regs, sizeof(m_rtc_regs));
 
 	pci_device::device_start();
 	status = 0x5555;
@@ -53,7 +52,7 @@ void iteagle_fpga_device::device_start()
 	// fpga defaults to base address 0x00000300
 	bank_infos[0].adr = 0x00000300 & (~(bank_infos[0].size - 1));
 
-	add_map(m_rtc_regs.size() * sizeof(UINT32), M_MEM, FUNC(iteagle_fpga_device::rtc_map));
+	add_map(sizeof(m_rtc_regs), M_MEM, FUNC(iteagle_fpga_device::rtc_map));
 	// RTC defaults to base address 0x000c0000
 	bank_infos[1].adr = 0x000c0000 & (~(bank_infos[1].size - 1));
 
@@ -491,8 +490,8 @@ iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, cons
 	// 0xf = 0x01 for extra courses
 	// 0x3e = 0x0002 for good nvram
 	// 0x3f = checksum
-	iteagle_default_eeprom =
-	{
+	m_iteagle_default_eeprom =
+	{ {
 		0xd000,0x0022,0x0000,0x0003,0x1209,0x1111,0x2222,0x1234,
 		0x0000,0x0000,0x0000,0x0000,0xcd00,0x0000,0x0000,0x0001,
 		0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
@@ -501,22 +500,22 @@ iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, cons
 		0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
 		0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
 		0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0002,0x0000
-	};
+	} };
 }
 
 void iteagle_eeprom_device::device_start()
 {
 	// EEPROM: Set software version and calc crc
-	iteagle_default_eeprom[0xe] = m_sw_version;
-	iteagle_default_eeprom[0x4] = (iteagle_default_eeprom[0x4] & 0xff00) | m_hw_version;
+	m_iteagle_default_eeprom[0xe] = m_sw_version;
+	m_iteagle_default_eeprom[0x4] = (m_iteagle_default_eeprom[0x4] & 0xff00) | m_hw_version;
 	UINT16 checkSum = 0;
 	for (int i=0; i<0x3f; i++) {
-		checkSum += iteagle_default_eeprom[i];
+		checkSum += m_iteagle_default_eeprom[i];
 	//logerror("eeprom init i: %x data: %04x\n", i, iteagle_default_eeprom[i]);
 	}
-	iteagle_default_eeprom[0x3f] = checkSum;
+	m_iteagle_default_eeprom[0x3f] = checkSum;
 
-	eeprom_base_device::static_set_default_data(m_eeprom, iteagle_default_eeprom.data(), 0x80);
+	eeprom_base_device::static_set_default_data(m_eeprom, m_iteagle_default_eeprom.data(), 0x80);
 
 	pci_device::device_start();
 	skip_map_regs(1);
@@ -616,10 +615,10 @@ void iteagle_periph_device::device_start()
 	add_map(sizeof(m_ctrl_regs), M_IO, FUNC(iteagle_periph_device::ctrl_map));
 	// ctrl defaults to base address 0x00000000
 	bank_infos[0].adr = 0x000;
-	m_rtc_regs.resize(0x100);
+
 	m_rtc_regs[0xa] = 0x20; // 32.768 MHz
 	m_rtc_regs[0xb] = 0x02; // 24-hour format
-	m_rtc->set_base(m_rtc_regs.data(), m_rtc_regs.size());
+	m_rtc->set_base(m_rtc_regs, sizeof(m_rtc_regs));
 }
 
 void iteagle_periph_device::device_reset()

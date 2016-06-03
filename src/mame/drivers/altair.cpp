@@ -5,6 +5,8 @@
         MITS Altair 8800b Turnkey
 
         04/12/2009 Initial driver by Miodrag Milanovic
+        
+        Supposedly introduced October 1977.
 
         Commands:
         All commands must be in uppercase. Address and data is
@@ -15,6 +17,9 @@
         D - Memory Dump
         J - Jump to address
         M - Modify memory
+        
+        Reference:
+        http://www.computercloset.org/MITSAltair8800bt.htm
 
 ****************************************************************************/
 
@@ -129,4 +134,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1975, al8800bt,  0,       0,  altair,     altair, driver_device,   0,   "MITS",   "Altair 8800bt", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1977, al8800bt,  0,       0,  altair,     altair, driver_device,   0,   "MITS",   "Altair 8800bt", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

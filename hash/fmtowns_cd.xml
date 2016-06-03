@@ -2219,6 +2219,22 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="lodoss1">
+		<description>Record of Lodoss War: Haiiro no Majo</description>
+		<year>1994</year>
+		<publisher>Humming Bird Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="record of lodoss war - haiiro no majo (system disk).hdm" size="1261568" crc="4303f8cc" sha1="e5d6580d4b56d8b25a401f566dd07157866de128" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="record of lodoss war - haiiro no majo" sha1="7479e561eaf9a60468b924c3b822173710c37f47" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="loom">
 		<description>Loom</description>
 		<year>1991</year>
@@ -3205,6 +3221,57 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="rance3">
+		<description>Rance III: Leazas Kanraku</description>
+		<year>1992</year>
+		<publisher>Alice Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rance iii" sha1="abe5a360f7a7871406d6f80a1744915f875fcadb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rance4">
+		<description>Rance IV: Kyoudan no Isan</description>
+		<year>1994</year>
+		<publisher>Alice Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="rance iv (boot disk).hdm" size="1261568" crc="45c0e9e5" sha1="0c905ca63b159a886c429944d1c09b01feaf73d3" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rance iv" sha1="ca5c78eb1cddeac3eb6113b4d763791a03f361cc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rance41">
+		<description>Rance 4.1: Okusuri Koujou wo Sukue!</description>
+		<year>1995</year>
+		<publisher>Alice Soft</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rance 4.1" sha1="5eb36774483fe9c3e7ba5745aaa336540b07f402" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rance42">
+		<description>Rance 4.2: Angel-gumi</description>
+		<year>1995</year>
+		<publisher>Alice Soft</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rance 4.2" sha1="e61f331f1a8f026f1a88325a4497eeb4d4c06446" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ravnloft">
 		<description>Ravenloft</description>
 		<year>1995</year>
@@ -3227,6 +3294,294 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<!--
+	This image is missing the IPL data in sector 0. It's possible to run AUTOEXEC.BAT
+	manually from TownsOS, but it should be considered a bad dump.
+	-->
+	<software name="rbisland">
+		<description>Rainbow Islands Extra</description>
+		<year>1992</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rainbow islands extra" sha1="2c480a769d0f0340ab2c26988b5d37404606dc7e" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="regiopw2">
+		<description>Regional Power II</description>
+		<year>1992</year>
+		<publisher>Cosmos</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="regional power ii" sha1="18e1100519fbfdfec7a9abc495b1a3719a5529d0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Not sure how to romanize the subtitle for this (電脳少女). It should be "Dennou Shoujo" but
+	the title screen spells it as "Den-no Senshi" for whatever reason.
+	-->
+	<software name="rejectn">
+		<description>Rejection: Den-no Senshi</description>
+		<year>1992</year>
+		<publisher>Sur de Wave</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rejection - denno senshi" sha1="ed27051ac0deb746e97165008b9d19e4274af45e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="retzork">
+		<description>Return to Zork</description>
+		<year>1994</year>
+		<publisher>Data West</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="return to zork" sha1="ec6c343f5016d60df7650b636298945372471550" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ringout">
+		<description>Ring Out!!</description>
+		<year>1995</year>
+		<publisher>ZyX</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ring out!!" sha1="2b50d05b278824e36a1b2fdf500a5ec4c9daeb3b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rockrang">
+		<description>Rocket Ranger</description>
+		<year>1990</year>
+		<publisher>Pony Canyon</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rocket ranger" sha1="faee63cd159d68240360149887702560dedff780" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ryuutou">
+		<description>Ryuutouden</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ryuutouden" sha1="b3468afda6c697b270d49ccc89545dc57b0c6c80" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sayaka">
+		<description>Sayaka &amp; Miho</description>
+		<year>1994</year>
+		<publisher>Fairytale</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sayaka &amp; miho" sha1="c1a31725589c0256e6e93c71033db07772fa550c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="scav4dmo">
+		<description>Scavenger 4 Demo Disc</description>
+		<year>1993</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="scavenger 4 (demo disc)" sha1="d94ff9ddc64c3acc20814f8290e5c5a0e6fe2217" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="scav4">
+		<description>Scavenger 4</description>
+		<year>1993</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="scavenger 4" sha1="a78fff2a22e995afb7cbadcec026caf65ac3490e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="scholar">
+		<description>Scholar Movie Magazine</description>
+		<year>1994</year>
+		<publisher>King Records</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="scholar movie magazine (boot disk).hdm" size="1261568" crc="6351e1a6" sha1="57e30fa44927653d88d30da0df3236852c669394" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="scholar movie magazine" sha1="7f958862ef60d1f903914c43b2ce5cfc50062c4d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="schwarz">
+		<description>Schwarzschild</description>
+		<year>1991</year>
+		<publisher>Kogado</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="schwarzschild (game disk).hdm" size="1261568" crc="6a3658a7" sha1="e70e032a9ffe0f1454366a0d15fb2fb0ef224117" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="schwarzschild" sha1="97bd8659e635b7d1d1567206343c8f692b2a0955" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="schwarz4">
+		<description>Schwarzschild IV</description>
+		<year>1993</year>
+		<publisher>Kogado</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="schwarzschild iv" sha1="813091a4a7fe385da8014f6d3e22a06dc5ec275e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shangr2">
+		<description>Shangrlia 2</description>
+		<year>1993</year>
+		<publisher>Elf</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shangrlia 2" sha1="b774d673f3a49912e6ed857865b8a7a99b368b06" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sherlock">
+		<description>Sherlock Holmes: Consulting Detective</description>
+		<year>1991</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sherlock holmes no tantei kouza" sha1="df4dac06bc19ff169d9bdc958bfc25907aa7072e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shinc">
+		<description>Shinc</description>
+		<year>1993</year>
+		<publisher>Libido</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shinc" sha1="5cb5158e300c504e987d0ab9564ddffa902c28ed" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shounenm">
+		<description>Shounen Magazine History</description>
+		<year>1992</year>
+		<publisher>Datt Japan</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shounen magazine history" sha1="f453ee25f0f0da3ca23bbbd09632aa63f7a7d2fb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="simant">
+		<description>SimAnt</description>
+		<year>1993</year>
+		<publisher>Imagineer</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="simant" sha1="56d7d642dd93073a76f19db4dde3418eb0f5ab17" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="simcity">
+		<description>SimCity</description>
+		<year>1990</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="simcity" sha1="4f161a7cd9d5fb27f2ebd6d544310e2c42d26da6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="simc2000">
+		<description>SimCity 2000</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="simcity 2000" sha1="b0a731372cc12dbdb5dd7140daa75cb99952cc77" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="simearth">
+		<description>SimEarth</description>
+		<year>1991</year>
+		<publisher>Imagineer</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="simearth" sha1="e14823bae0e649313d2dec35d889e06d2a42986a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="simfarm">
+		<description>SimFarm</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="simfarm" sha1="4c87c0002006a539e04fd2bdb1b4a1c7435aa452" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="smobius">
+		<description>Silent Mobius</description>
+		<year>1991</year>
+		<publisher>Gainax</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="silent mobius" sha1="87a224ff3507b6ce8bc14a8f3a860ba07dcbabdf" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sotsu93">
+		<description>Sotsugyou '93: Graduation</description>
+		<year>1993</year>
+		<publisher>JHV</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="sotsugyou '93 - graduation (play disk).hdm" size="1261568" crc="fb4ac4d8" sha1="9ac7edfd20421df85d8fd469f45c3805a307023b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sotsugyou '93 - graduation" sha1="56c0e748abe85ca09a947821011bb304174119c0" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="splatter">
 		<description>Splatterhouse</description>
 		<year>1992</year>
@@ -3234,6 +3589,88 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="splatterhouse" sha1="ddd73172589f840d6feb5f55c17a011f2aa87c77" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sodyssey">
+		<description>Super Odyssey</description>
+		<year>1989</year>
+		<publisher>Wave Train</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super odyssey" sha1="c96c408d52c6d89374b7236de7af9751b0bcdefb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sotb">
+		<description>Shadow of the Beast: Mashou no Okite</description>
+		<year>1991</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shadow of the beast" sha1="0a87b1db41996c77b6552a598dc698f32c9a72df" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Original image from the redump.org database -->
+	<software name="sotb2">
+		<description>Shadow of the Beast II: Juushin no Jubaku</description>
+		<year>1993</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shadow of the beast ii - juushin no jubaku (japan)" sha1="39c34e8c2bc89404431c1be99144a3cd32998664" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="srmp23">
+		<description>Super Real Mahjong PII &amp; PIII</description>
+		<year>1992</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super real mahjong pii &amp; piii" sha1="8bdb2f443e29fe0b193d162be3a497987fa340ec" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="srmp4">
+		<description>Super Real Mahjong PIV</description>
+		<year>1994</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super real mahjong piv" sha1="f4bb6c4f57b02080fd734238ca7cf33e5d729eb3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="srogue">
+		<description>Space Rogue</description>
+		<year>1990</year>
+		<publisher>Wave Train</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="space rogue" sha1="f409d07391dfdff739241710df792ddd84531a85" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- 
+	This version seems to remove some kind of disc check (copy protection?).
+	Not sure when it was made or who made it.
+	-->
+	<software name="sroguend">
+		<description>Space Rogue (no disc check)</description>
+		<year>1990</year>
+		<publisher>Wave Train</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="space rogue (no disk check)" sha1="29b752371f08eb772eb91b4f8c268ea7efd8102f" />
 			</diskarea>
 		</part>
 	</software>
@@ -3260,36 +3697,104 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="simcity">
-		<description>SimCity</description>
-		<year>1990</year>
-		<publisher>Fujitsu</publisher>
-		<part name="cdrom" interface="fmt_cdrom">
-			<diskarea name="cdrom">
-				<disk name="simcity" sha1="4f161a7cd9d5fb27f2ebd6d544310e2c42d26da6" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="sotb">
-		<description>Shadow of the Beast: Mashou no Okite</description>
+	<software name="sshang">
+		<description>Super Shanghai: Dragon's Eye</description>
 		<year>1991</year>
-		<publisher>Victor</publisher>
+		<publisher>Hot-B</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shadow of the beast" sha1="0a87b1db41996c77b6552a598dc698f32c9a72df" />
+				<disk name="super shanghai - dragon's eye" sha1="3e8abecc76e6cb5f98c3d40398e71a0f3600e45a" />
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- Original image from the redump.org database -->
-	<software name="sotb2">
-		<description>Shadow of the Beast II: Juushin no Jubaku</description>
-		<year>1993</year>
-		<publisher>Victor</publisher>
+	<!--
+	Originally labeled as "mp3 source". It probably needs a redump.
+	Also, the floppy disk seems to be an overdump.
+	-->
+	<software name="sspirits">
+		<description>Samurai Spirits</description>
+		<year>1995</year>
+		<publisher>JHV</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1281280">
+				<rom name="samurai spirits (boot disk).bin" size="1281280" crc="2f1793ac" sha1="bd0f7f5f3fc4b0bd58d04812449cae853b58b5a8" offset="000000" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shadow of the beast ii - juushin no jubaku (japan)" sha1="39c34e8c2bc89404431c1be99144a3cd32998664" />
+				<disk name="samurai spirits" sha1="a84aa3a6017000284af369e5bccd3904e9aceaeb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sshootin">
+		<description>Super Shooting Towns</description>
+		<year>1991</year>
+		<publisher>Amorphous</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super shooting towns" sha1="64dd74baedfc4ef6c2bcdd96b8dd449c8beb36a2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="starcru2">
+		<description>Star Cruiser II: The Odysseus Project</description>
+		<year>1994</year>
+		<publisher>JHV</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="star cruiser 2 (user disk).hdm" size="1261568" crc="7d3863c4" sha1="2327aa7adb0209306dfd3c3945fcb115730175cd" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="star cruiser 2" sha1="7a2d5788f08400e37fafbb973c3bf1f9825ffe22" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="strike">
+		<description>Strike Commander</description>
+		<year>1994</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="strike commander" sha1="4ce5635dfe368cedfe0d61fb46a11d8f7fb2c083" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="strikpls">
+		<description>Strike Commander Plus</description>
+		<year>1995</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="strike commander plus" sha1="c926c123e3c0c8e439b16c27ecca3b420e1964bb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="strghold">
+		<description>Stronghold</description>
+		<year>1994</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="stronghold" sha1="dfebcbaaa112dfd262945e20bb881fc6f54e7f07" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="syndcate">
+		<description>Syndicate</description>
+		<year>1994</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="syndicate" sha1="d676fb5d4345ec464740c1b9c53327df0925a46a" />
 			</diskarea>
 		</part>
 	</software>
