@@ -592,9 +592,9 @@ WRITE8_MEMBER( lk201_device::ddr_w )
 {
 //  printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
 
-	send_port(space, offset, ports[offset] & data);
-
+	UINT8 olddata = ddrs[offset];
 	ddrs[offset] = data;
+	send_port(space, offset, ports[offset] & olddata);
 }
 
 READ8_MEMBER( lk201_device::ports_r )
@@ -613,14 +613,17 @@ READ8_MEMBER( lk201_device::ports_r )
 
 WRITE8_MEMBER( lk201_device::ports_w )
 {
-	send_port(space, offset, data);
-
+	UINT8 olddata = ports[offset];
 	ports[offset] = data;
+	send_port(space, offset, olddata & ddrs[offset]);
 }
 
-void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
+void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
 {
 //  printf("PORT %c write %02x (DDR = %02x) (PC=%x)\n", 'A' + offset, data, ddrs[offset], m_maincpu->pc());
+	UINT8 porta = ports[0] & ddrs[0];
+	UINT8 portb = ports[1] & ddrs[1];
+	UINT8 portc = ports[2] & ddrs[2];
 
 	switch (offset)
 	{
@@ -632,13 +635,9 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 
 		case 2: // port C
 			// Check for keyboard read strobe
-			if (((data & 0x40) == 0) && (ports[offset] & 0x40))
+			if (((portc & 0x40) == 0) && (olddata & 0x40))
 			{
 #ifndef KEYBOARD_WORKAROUND
-				UINT8 porta = ports[0] & ddrs[0];
-				UINT8 portb = ports[1] & ddrs[1];
-				UINT8 portc = ports[2] & ddrs[2];
-
 				if (porta & 0x1) kbd_data = m_kbd0->read();
 				if (porta & 0x2) kbd_data = m_kbd1->read();
 				if (porta & 0x4) kbd_data = m_kbd2->read();
@@ -659,7 +658,7 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 				if (portc & 0x2) kbd_data = m_kbd17->read();
 			}
 			// Check for LED update strobe
-			if (((data & 0x80) == 0) && (ports[offset] & 0x80))
+			if (((portc & 0x80) == 0) && (olddata & 0x40))
 			{
 				// Lower nibble contains the LED values (1 = on, 0 = off)
 				machine().output().set_value("led_wait"   , (led_data & 0x1) == 0);
