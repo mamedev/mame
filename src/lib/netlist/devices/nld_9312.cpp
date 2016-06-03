@@ -143,7 +143,7 @@ namespace netlist
 		const UINT8 G = INPLOGIC(m_G);
 		if (G)
 		{
-			/* static */ const netlist_time delay[2] = { NLTIME_FROM_NS(33), NLTIME_FROM_NS(19) };
+			const netlist_time delay[2] = { NLTIME_FROM_NS(33), NLTIME_FROM_NS(19) };
 			OUTLOGIC(m_Y, 0, delay[0]);
 			OUTLOGIC(m_YQ, 1, delay[1]);
 
@@ -161,7 +161,7 @@ namespace netlist
 				m_B.activate();
 				m_C.activate();
 			}
-			/* static */ const netlist_time delay[2] = { NLTIME_FROM_NS(33), NLTIME_FROM_NS(28) };
+			const netlist_time delay[2] = { NLTIME_FROM_NS(33), NLTIME_FROM_NS(28) };
 			const UINT8 chan = INPLOGIC(m_A) | (INPLOGIC(m_B)<<1) | (INPLOGIC(m_C)<<2);
 			if (m_last_chan != chan)
 			{

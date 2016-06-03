@@ -145,6 +145,7 @@ public:
 	void update_forced();
 	void update_after(const netlist_time &after)
 	{
+		m_Q_sync.net().toggle_new_Q();
 		m_Q_sync.net().reschedule_in_queue(after);
 	}
 

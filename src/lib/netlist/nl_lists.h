@@ -52,14 +52,14 @@ namespace netlist
 			/* Lock */
 			while (m_lock.exchange(1)) { }
 	#endif
-			entry_t * i = m_end++;
+			entry_t * i = m_end;
 			for (; t > (i - 1)->m_exec_time; --i)
 			{
 				*(i) = *(i-1);
-				//i--;
 				inc_stat(m_prof_sortmove);
 			}
 			*i = { t, o };
+			++m_end;
 			inc_stat(m_prof_call);
 	#if HAS_OPENMP && USE_OPENMP
 			m_lock = 0;
@@ -112,7 +112,7 @@ namespace netlist
 
 		 const entry_t *listptr() const { return &m_list[1]; }
 		 std::size_t size() const { return m_end - &m_list[1]; }
-		 const entry_t & operator[](const std::size_t index) const { return m_list[1+index]; }
+		 const entry_t & operator[](const std::size_t index) const { return m_list[ 1 + index]; }
 
 	#if (NL_KEEP_STATISTICS)
 		// profiling

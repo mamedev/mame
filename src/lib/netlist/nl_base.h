@@ -426,9 +426,9 @@ namespace netlist
 
 		void set_net(net_t *anet);
 		void clear_net();
-		 bool has_net() const { return (m_net != nullptr); }
-		 const net_t & net() const { return *m_net;}
-		 net_t & net() { return *m_net;}
+		bool has_net() const { return (m_net != nullptr); }
+		const net_t & net() const { return *m_net;}
+		net_t & net() { return *m_net;}
 
 		bool is_logic() const;
 		bool is_analog() const;
@@ -626,19 +626,21 @@ namespace netlist
 		bool is_logic() const;
 		bool is_analog() const;
 
-		 void push_to_queue(const netlist_time delay) NOEXCEPT;
-		 void reschedule_in_queue(const netlist_time delay) NOEXCEPT;
-		 bool is_queued() const { return m_in_queue == 1; }
+		void toggle_new_Q()				{ m_new_Q ^= 1;   }
+
+		void push_to_queue(const netlist_time delay) NOEXCEPT;
+		void reschedule_in_queue(const netlist_time delay) NOEXCEPT;
+		bool is_queued() const { return m_in_queue == 1; }
 
 		void update_devs();
 
-		 const netlist_time time() const { return m_time; }
-		 void set_time(const netlist_time ntime) { m_time = ntime; }
+		const netlist_time time() const { return m_time; }
+		void set_time(const netlist_time ntime) { m_time = ntime; }
 
-		 bool isRailNet() const { return !(m_railterminal == nullptr); }
-		 core_terminal_t & railterminal() const { return *m_railterminal; }
+		bool isRailNet() const { return !(m_railterminal == nullptr); }
+		core_terminal_t & railterminal() const { return *m_railterminal; }
 
-		 int num_cons() const { return m_core_terms.size(); }
+		int num_cons() const { return m_core_terms.size(); }
 
 		void inc_active(core_terminal_t &term);
 		void dec_active(core_terminal_t &term);
@@ -655,15 +657,13 @@ namespace netlist
 
 		netlist_time m_time;
 		INT32        m_active;
-		UINT8        m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
+		UINT8	     m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
 	private:
 		plib::linkedlist_t<core_terminal_t> m_list_active;
 		core_terminal_t * m_railterminal;
 
 	public:
-		// We have to have those on one object. Dividing those does lead
-		// to a significant performance hit
 		// FIXME: Have to fix the public at some time
 		nl_double m_cur_Analog;
 
@@ -679,9 +679,8 @@ namespace netlist
 		logic_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t() { };
 
-		 netlist_sig_t Q() const { return m_cur_Q; }
-		 netlist_sig_t new_Q() const 	{ return m_new_Q; }
-		 void toggle_new_Q() 			{ m_new_Q ^= 1; 	}
+		netlist_sig_t Q() const { return m_cur_Q; }
+		netlist_sig_t new_Q() const 	{ return m_new_Q; }
 		void initial(const netlist_sig_t val) { m_cur_Q = m_new_Q = val; }
 
 		 void set_Q(const netlist_sig_t newQ, const netlist_time &delay) NOEXCEPT
@@ -1334,6 +1333,7 @@ protected:
 		if (newQ != net().Q_Analog())
 		{
 			net().m_cur_Analog = newQ;
+			net().toggle_new_Q();
 			net().push_to_queue(NLTIME_FROM_NS(1));
 		}
 	}

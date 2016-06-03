@@ -662,30 +662,25 @@ void net_t::update_devs()
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
 
-	const int masks[4] = { 1, 5, 3, 1 };
-	const int mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
+	static const unsigned masks[4] =
+	{
+		0,
+		core_terminal_t::STATE_INP_LH | core_terminal_t::STATE_INP_ACTIVE,
+		core_terminal_t::STATE_INP_HL | core_terminal_t::STATE_INP_ACTIVE,
+		0
+	};
+
+	const unsigned mask = masks[ m_cur_Q  * 2 + m_new_Q ];
 
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
 
-#if 1
-	for (core_terminal_t *p = m_list_active.first(); p != nullptr; p = p->next())
+	for (auto p = m_list_active.first(); p != nullptr; p = p->next())
 	{
 		inc_stat(p->device().stat_call_count);
 		if ((p->state() & mask) != 0)
 			p->device().update_dev();
 	}
-#else
-	for (auto p = &m_list_active.m_head; *p != nullptr; )
-	{
-		auto pn = &((*p)->m_next);
-		inc_stat(p->device().stat_call_count);
-		if (((*p)->state() & mask) != 0)
-			(*p)->device().update_dev();
-		p = pn;
-	}
-
-#endif
 }
 
 void net_t::reset()

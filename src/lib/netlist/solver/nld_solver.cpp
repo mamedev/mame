@@ -390,7 +390,10 @@ void matrix_solver_t::update() NOEXCEPT
 	const netlist_time new_timestep = solve();
 
 	if (m_params.m_dynamic && has_timestep_devices() && new_timestep > netlist_time::zero)
+	{
+		m_Q_sync.net().toggle_new_Q();
 		m_Q_sync.net().reschedule_in_queue(new_timestep);
+	}
 }
 
 void matrix_solver_t::update_forced()
@@ -398,7 +401,10 @@ void matrix_solver_t::update_forced()
 	ATTR_UNUSED const netlist_time new_timestep = solve();
 
 	if (m_params.m_dynamic && has_timestep_devices())
+	{
+		m_Q_sync.net().toggle_new_Q();
 		m_Q_sync.net().reschedule_in_queue(netlist_time(m_params.m_min_timestep));
+	}
 }
 
 void matrix_solver_t::step(const netlist_time &delta)
@@ -428,6 +434,7 @@ const netlist_time matrix_solver_t::solve_base()
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
 			log().warning("NEWTON_LOOPS exceeded on net {1}... reschedule", this->name());
+			m_Q_sync.net().toggle_new_Q();
 			m_Q_sync.net().reschedule_in_queue(m_params.m_nt_sync_delay);
 		}
 	}
@@ -620,6 +627,7 @@ NETLIB_UPDATE(solver)
 	/* step circuit */
 	if (!m_Q_step.net().is_queued())
 	{
+		m_Q_step.net().toggle_new_Q();
 		m_Q_step.net().push_to_queue(netlist_time(m_params.m_max_timestep));
 	}
 }
