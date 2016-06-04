@@ -382,14 +382,14 @@ void matrix_solver_t::update_dynamic()
 
 void matrix_solver_t::reset()
 {
-	m_last_step = netlist_time::zero;
+	m_last_step = netlist_time::zero();
 }
 
 void matrix_solver_t::update() NOEXCEPT
 {
 	const netlist_time new_timestep = solve();
 
-	if (m_params.m_dynamic && has_timestep_devices() && new_timestep > netlist_time::zero)
+	if (m_params.m_dynamic && has_timestep_devices() && new_timestep > netlist_time::zero())
 	{
 		m_Q_sync.net().toggle_new_Q();
 		m_Q_sync.net().reschedule_in_queue(new_timestep);

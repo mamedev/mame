@@ -54,7 +54,7 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_Q.net().set_time(netlist_time::zero);
+			m_Q.net().set_time(netlist_time::zero());
 		}
 
 		NETLIB_UPDATE_PARAMI()
@@ -136,7 +136,7 @@ namespace netlist
 					pati[i] = pat[i].as_long();
 					total += pati[i];
 				}
-				netlist_time ttotal = netlist_time::zero;
+				netlist_time ttotal = netlist_time::zero();
 				for (unsigned i=0; i<m_size - 1; i++)
 				{
 					m_inc[i] = base * pati[i];

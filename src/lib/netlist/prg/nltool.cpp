@@ -233,7 +233,7 @@ static void run(tool_options_t &opts)
 	t = plib::ticks();
 
 	unsigned pos = 0;
-	netlist::netlist_time nlt = netlist::netlist_time::zero;
+	netlist::netlist_time nlt = netlist::netlist_time::zero();
 
 	while (pos < inps->size() && (*inps)[pos].m_time < netlist::netlist_time(ttr))
 	{

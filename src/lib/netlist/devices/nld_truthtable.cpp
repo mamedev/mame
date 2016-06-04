@@ -163,7 +163,7 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, UINT32 d
 		m_outs[j] = ~0L;
 
 	for (int j=0; j < 16; j++)
-		m_timing_nt[j] = netlist_time::zero;
+		m_timing_nt[j] = netlist_time::zero();
 
 	while (!ttline.equals(""))
 	{
@@ -189,7 +189,7 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, UINT32 d
 				nl_assert_always(outs.equals("0"), "Unknown value (not 0 or 1");
 			netlist_time t = netlist_time::from_nsec(times[j].trim().as_long());
 			int k=0;
-			while (m_timing_nt[k] != netlist_time::zero && m_timing_nt[k] != t)
+			while (m_timing_nt[k] != netlist_time::zero() && m_timing_nt[k] != t)
 				k++;
 			m_timing_nt[k] = t;
 			tindex.push_back(k); //[j] = k;

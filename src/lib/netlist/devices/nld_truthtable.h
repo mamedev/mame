@@ -201,7 +201,7 @@ public:
 		for (int j=0; j < m_size; j++)
 			printf("%05x %04x %04x %04x\n", j, m_ttp->m_outs[j] & ((1 << m_NO)-1),
 					m_ttp->m_outs[j] >> m_NO, m_ttp->m_timing[j * m_NO + 0]);
-		for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero; k++)
+		for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero(); k++)
 			printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
 #endif
 		save(NLNAME(m_last_state));
@@ -267,7 +267,7 @@ private:
 	template<bool doOUT>
 	inline void process()
 	{
-		netlist_time mt = netlist_time::zero;
+		netlist_time mt = netlist_time::zero();
 
 		UINT32 state = 0;
 		if (m_NI > 1 && !has_state)
@@ -294,11 +294,6 @@ private:
 		if (has_state)
 			m_last_state = (state << m_NO) | out;
 
-#if 0
-		for (int i = 0; i < m_NI; i++)
-			if (m_ign & (1 << i))
-				m_I[i].inactivate();
-#endif
 		const UINT32 timebase = nstate * m_NO;
 		if (doOUT)
 		{

@@ -67,8 +67,8 @@ namespace netlist
 			//nl_assert(m_end - m_list < Size);
 		}
 
-		 const entry_t & pop() NOEXCEPT       { return *(--m_end); }
-		 const entry_t & top() const NOEXCEPT { return *(m_end-1); }
+		 entry_t pop() NOEXCEPT       { return *(--m_end); }
+		 entry_t top() const NOEXCEPT { return *(m_end-1); }
 
 		 void remove(const Element &elem) NOEXCEPT
 		{
@@ -104,7 +104,7 @@ namespace netlist
 			 * the insert algo above will run into this element and doesn't
 			 * need a comparison with queue start.
 			 */
-			m_list[0] = { Time::from_raw(~0), Element(0) };
+			m_list[0] = { Time::never(), Element(0) };
 			m_end++;
 		}
 

@@ -14,8 +14,6 @@
 #include "devices/nlid_system.h"
 #include "nl_util.h"
 
-const netlist::netlist_time netlist::netlist_time::zero = netlist::netlist_time(0);
-
 namespace netlist
 {
 
@@ -188,8 +186,8 @@ device_object_t::device_object_t(core_device_t &dev, const pstring &aname, const
 
 netlist_t::netlist_t(const pstring &aname)
 	:   pstate_manager_t(),
-		m_stop(netlist_time::zero),
-		m_time(netlist_time::zero),
+		m_stop(netlist_time::zero()),
+		m_time(netlist_time::zero()),
 		m_use_deactivate(0),
 		m_queue(*this),
 		m_mainclock(nullptr),
@@ -294,10 +292,10 @@ void netlist_t::rebuild_lists()
 
 void netlist_t::reset()
 {
-	m_time = netlist_time::zero;
+	m_time = netlist_time::zero();
 	m_queue.clear();
 	if (m_mainclock != nullptr)
-		m_mainclock->m_Q.net().set_time(netlist_time::zero);
+		m_mainclock->m_Q.net().set_time(netlist_time::zero());
 	//if (m_solver != nullptr)
 	//	m_solver->do_reset();
 
@@ -336,9 +334,9 @@ void netlist_t::process_queue(const netlist_time &delta)
 
 	if (m_mainclock == nullptr)
 	{
-		while ( (m_time < m_stop) && (!m_queue.empty()))
+		while ( (m_time < m_stop) & (!m_queue.empty()))
 		{
-			const queue_t::entry_t &e = m_queue.pop();
+			const queue_t::entry_t e(m_queue.pop());
 			m_time = e.m_exec_time;
 			e.m_object->update_devs();
 
@@ -456,9 +454,6 @@ core_device_t::~core_device_t()
 
 void core_device_t::set_delegate_pointer()
 {
-#if (NL_KEEP_STATISTICS)
-	netlist().m_started_devices.push_back(this);
-#endif
 #if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
 	void (core_device_t::* pFunc)() = &core_device_t::update;
 	m_static_update = pFunc;
@@ -578,7 +573,7 @@ net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	: object_t(nl, aname, NET)
 	, m_new_Q(0)
 	, m_cur_Q (0)
-	, m_time(netlist_time::zero)
+	, m_time(netlist_time::zero())
 	, m_active(0)
 	, m_in_queue(2)
 	, m_railterminal(nullptr)
@@ -612,7 +607,7 @@ void net_t::inc_active(core_terminal_t &term)
 	{
 		if (netlist().use_deactivate())
 		{
-			railterminal().device().inc_active();
+			railterminal().device().do_inc_active();
 			//m_cur_Q = m_new_Q;
 		}
 		if (m_in_queue == 0)
@@ -639,7 +634,7 @@ void net_t::dec_active(core_terminal_t &term)
 	nl_assert(m_active >= 0);
 	m_list_active.remove(term);
 	if (m_active == 0 && netlist().use_deactivate())
-			railterminal().device().dec_active();
+		railterminal().device().do_dec_active();
 }
 
 void net_t::rebuild_list()
@@ -685,7 +680,7 @@ void net_t::update_devs()
 
 void net_t::reset()
 {
-	m_time = netlist_time::zero;
+	m_time = netlist_time::zero();
 	m_active = 0;
 	m_in_queue = 2;
 

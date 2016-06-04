@@ -168,13 +168,13 @@ public:
 		}
 	}
 #endif
-	 void insert(LC &elem)
+	void insert(LC &elem)
 	{
 		elem.m_next = m_head;
 		m_head = &elem;
 	}
 
-	 void add(LC &elem)
+	void add(LC &elem)
 	{
 		LC **p = &m_head;
 		while (*p != nullptr)
@@ -185,10 +185,10 @@ public:
 		elem.m_next = nullptr;
 	}
 
-	 void remove(const LC &elem)
+	void remove(const LC &elem)
 	{
-		LC **p;
-		for (p = &m_head; *p != &elem; p = &((*p)->m_next))
+		auto p = &m_head;
+		for ( ; *p != &elem; p = &((*p)->m_next))
 		{
 			//nl_assert(*p != nullptr);
 		}

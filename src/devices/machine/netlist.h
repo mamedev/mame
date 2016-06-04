@@ -569,7 +569,7 @@ public:
 	{
 		m_cur = 0.0;
 		m_last_pos = 0;
-		m_last_buffer = netlist::netlist_time::zero;
+		m_last_buffer = netlist::netlist_time::zero();
 	}
 
 	ATTR_HOT void sound_update(const netlist::netlist_time &upto)

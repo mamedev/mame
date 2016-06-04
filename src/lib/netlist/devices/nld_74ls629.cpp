@@ -54,7 +54,7 @@ namespace netlist
 		, m_Y(*this, "Y")
 		, m_enableq(1)
 		, m_out(0)
-		, m_inc(netlist_time::zero)
+		, m_inc(netlist_time::zero())
 		{
 			connect_late(m_FB, m_Y);
 
@@ -67,7 +67,7 @@ namespace netlist
 		{
 			m_enableq = 1;
 			m_out = 0;
-			m_inc = netlist_time::zero;
+			m_inc = netlist_time::zero();
 		}
 
 		NETLIB_UPDATEI();

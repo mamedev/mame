@@ -48,7 +48,7 @@ namespace netlist
 	{
 		OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
 		m_cnt = (m_cnt + 1) % m_size;
-		m_off = netlist_time::zero;
+		m_off = netlist_time::zero();
 	}
 
 	// ----------------------------------------------------------------------------------------

@@ -28,6 +28,7 @@ namespace netlist
 		/* clock */
 		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
+		, m_inc(0, 1)
 		, m_is_timestep(false)
 		{
 			m_inc = netlist_time::from_hz(56000);

@@ -264,7 +264,7 @@ ADDRESS_MAP_END
 netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NETLIST_CORE, "Netlist core device", tag, owner, clock, "netlist_core", __FILE__),
 		m_icount(0),
-		m_old(netlist::netlist_time::zero),
+		m_old(netlist::netlist_time::zero()),
 		m_netlist(nullptr),
 		m_setup(nullptr),
 		m_setup_func(nullptr)
@@ -274,7 +274,7 @@ netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, cons
 netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *file)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, file),
 		m_icount(0),
-		m_old(netlist::netlist_time::zero),
+		m_old(netlist::netlist_time::zero()),
 		m_netlist(nullptr),
 		m_setup(nullptr),
 		m_setup_func(nullptr)
@@ -328,8 +328,8 @@ void netlist_mame_device_t::device_start()
 
 	save_state();
 
-	m_old = netlist::netlist_time::zero;
-	m_rem = netlist::netlist_time::zero;
+	m_old = netlist::netlist_time::zero();
+	m_rem = netlist::netlist_time::zero();
 
 	LOG_DEV_CALLS(("device_start exit %s\n", tag()));
 }
@@ -344,8 +344,8 @@ void netlist_mame_device_t::device_clock_changed()
 void netlist_mame_device_t::device_reset()
 {
 	LOG_DEV_CALLS(("device_reset\n"));
-	m_old = netlist::netlist_time::zero;
-	m_rem = netlist::netlist_time::zero;
+	m_old = netlist::netlist_time::zero();
+	m_rem = netlist::netlist_time::zero();
 	netlist().reset();
 }
 

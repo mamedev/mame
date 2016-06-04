@@ -115,6 +115,7 @@ public:
 	m_iterative_fail(0),
 	m_iterative_total(0),
 	m_params(*params),
+	m_last_step(0, 1),
 	m_cur_ts(0),
 	m_fb_sync(*this, "FB_sync"),
 	m_Q_sync(*this, "Q_sync"),

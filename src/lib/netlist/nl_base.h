@@ -322,7 +322,7 @@ namespace netlist
 		logic_family_t() : m_logic_family(nullptr) {}
 		~logic_family_t() { }
 
-		 const logic_family_desc_t *logic_family() const { return m_logic_family; }
+		const logic_family_desc_t *logic_family() const { return m_logic_family; }
 		void set_logic_family(const logic_family_desc_t *fam) { m_logic_family = fam; }
 
 	protected:
@@ -366,11 +366,11 @@ namespace netlist
 
 		plib::pstate_manager_t &state_manager();
 
-		 type_t type() const { return m_objtype; }
-		 bool isType(const type_t atype) const { return (m_objtype == atype); }
+		type_t type() const { return m_objtype; }
+		bool isType(const type_t atype) const { return (m_objtype == atype); }
 
-		 netlist_t & netlist() { return m_netlist; }
-		 const netlist_t & netlist() const { return m_netlist; }
+		netlist_t & netlist() { return m_netlist; }
+		const netlist_t & netlist() const { return m_netlist; }
 
 	private:
 		netlist_t & m_netlist;
@@ -433,9 +433,9 @@ namespace netlist
 		bool is_logic() const;
 		bool is_analog() const;
 
-		 bool is_state(const state_e astate) const { return (m_state == astate); }
-		 state_e state() const { return m_state; }
-		 void set_state(const state_e astate)
+		bool is_state(const state_e astate) const { return (m_state == astate); }
+		state_e state() const { return m_state; }
+		void set_state(const state_e astate)
 		{
 			nl_assert(astate != STATE_NONEX);
 			m_state = astate;
@@ -485,21 +485,21 @@ namespace netlist
 
 		terminal_t *m_otherterm;
 
-		 void set(const nl_double G)
+		void set(const nl_double G)
 		{
 			set_ptr(m_Idr1, 0);
 			set_ptr(m_go1, G);
 			set_ptr(m_gt1, G);
 		}
 
-		 void set(const nl_double GO, const nl_double GT)
+		void set(const nl_double GO, const nl_double GT)
 		{
 			set_ptr(m_Idr1, 0);
 			set_ptr(m_go1, GO);
 			set_ptr(m_gt1, GT);
 		}
 
-		 void set(const nl_double GO, const nl_double GT, const nl_double I)
+		void set(const nl_double GO, const nl_double GT, const nl_double I)
 		{
 			set_ptr(m_Idr1, I);
 			set_ptr(m_go1, GO);
@@ -551,8 +551,8 @@ namespace netlist
 		devices::nld_base_proxy *get_proxy() const  { return m_proxy; }
 		void set_proxy(devices::nld_base_proxy *proxy) { m_proxy = proxy; }
 
-		 logic_net_t & net();
-		 const logic_net_t &  net() const;
+		logic_net_t & net();
+		const logic_net_t &  net() const;
 
 	protected:
 
@@ -592,7 +592,8 @@ namespace netlist
 	{
 	public:
 		analog_input_t(core_device_t &dev, const pstring &aname);
-		 nl_double Q_Analog() const;
+
+		nl_double Q_Analog() const;
 
 	protected:
 		virtual void reset() override
@@ -683,7 +684,7 @@ namespace netlist
 		netlist_sig_t new_Q() const 	{ return m_new_Q; }
 		void initial(const netlist_sig_t val) { m_cur_Q = m_new_Q = val; }
 
-		 void set_Q(const netlist_sig_t newQ, const netlist_time &delay) NOEXCEPT
+		void set_Q(const netlist_sig_t newQ, const netlist_time delay) NOEXCEPT
 		{
 			if (newQ != m_new_Q)
 			{
@@ -692,7 +693,7 @@ namespace netlist
 			}
 		}
 
-		void set_Q_time(const netlist_sig_t newQ, const netlist_time &at)
+		void set_Q_time(const netlist_sig_t newQ, const netlist_time at)
 		{
 			if (newQ != m_new_Q)
 			{
@@ -745,8 +746,6 @@ namespace netlist
 		P_PREVENT_COPYING(logic_output_t)
 	public:
 
-		friend class core_device_t; //FIXME
-
 		logic_output_t(core_device_t &dev, const pstring &aname);
 
 		virtual void reset() override
@@ -756,10 +755,10 @@ namespace netlist
 
 		void initial(const netlist_sig_t val);
 
-		void set_Q(const netlist_sig_t newQ, const netlist_time &delay) NOEXCEPT
+		void set_Q(const netlist_sig_t newQ, const netlist_time delay) NOEXCEPT
 		{
 			//net().set_Q(newQ, delay);
-			m_my_net.set_Q(newQ, delay);
+			m_my_net.set_Q(newQ, delay); // take the shortcut
 		}
 
 	private:
@@ -774,7 +773,7 @@ namespace netlist
 		analog_output_t(core_device_t &dev, const pstring &aname);
 
 		void initial(const nl_double val);
-		 void set_Q(const nl_double newQ);
+		void set_Q(const nl_double newQ);
 
 		analog_net_t *m_proxied_net; // only for proxy nets in analog input logic
 
@@ -819,9 +818,9 @@ namespace netlist
 
 		operator const C() const { return Value(); }
 
-		 void setTo(const C &param);
-		 void initial(const C &val) { m_param = val; }
-		 C Value() const { return m_param;   }
+		void setTo(const C &param);
+		void initial(const C &val) { m_param = val; }
+		C Value() const { return m_param;   }
 
 	protected:
 		virtual void changed() { }
@@ -870,7 +869,7 @@ namespace netlist
 
 		virtual ~core_device_t();
 
-		 void update_dev()
+		void update_dev()
 		{
 			begin_timing(stat_total_time);
 			inc_stat(stat_update_count);
@@ -892,26 +891,21 @@ namespace netlist
 		void set_delegate_pointer();
 		void stop_dev();
 
-		netlist_sig_t INPLOGIC_PASSIVE(logic_input_t &inp);
+		void do_inc_active() { inc_active();  }
+		void do_dec_active() { dec_active(); }
+		void do_reset() { reset(); }
 
+		netlist_sig_t INPLOGIC_PASSIVE(logic_input_t &inp);
 		netlist_sig_t INPLOGIC(const logic_input_t &inp) const
 		{
 			nl_assert(inp.state() != logic_t::STATE_INP_PASSIVE);
 			return inp.Q();
 		}
 
-		 void OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time &delay) NOEXCEPT;
-
-		 nl_double INPANALOG(const analog_input_t &inp) const { return inp.Q_Analog(); }
-
-		 nl_double TERMANALOG(const terminal_t &term) const { return term.net().Q_Analog(); }
-
-		 void OUTANALOG(analog_output_t &out, const nl_double val)
-		{
-			out.set_Q(val);
-		}
-
-		void  do_reset() { reset(); }
+		void OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time delay) NOEXCEPT;
+		nl_double INPANALOG(const analog_input_t &inp) const { return inp.Q_Analog(); }
+		nl_double TERMANALOG(const terminal_t &term) const { return term.net().Q_Analog(); }
+		void OUTANALOG(analog_output_t &out, const nl_double val) { out.set_Q(val); }
 
 	#if (NL_KEEP_STATISTICS)
 		/* stats */
@@ -923,12 +917,12 @@ namespace netlist
 	protected:
 
 		virtual void update() NOEXCEPT { }
+		virtual void inc_active() {  }
+		virtual void dec_active() {  }
 		virtual void stop() { }
 		virtual void reset() { }
 
 	public:
-		virtual void inc_active() {  }
-		virtual void dec_active() {  }
 		virtual void step_time(ATTR_UNUSED const nl_double st) { }
 		virtual void update_terminals() { }
 
@@ -1080,11 +1074,11 @@ namespace netlist
 		 devices::NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
 		nl_double gmin() const;
 
-		void push_to_queue(net_t &out, const netlist_time &attime) NOEXCEPT;
+		void push_to_queue(net_t &out, const netlist_time attime) NOEXCEPT;
 		void remove_from_queue(net_t &out);
 
 		void process_queue(const netlist_time &delta);
-		void abort_current_queue_slice() { m_stop = netlist_time::zero; }
+		void abort_current_queue_slice() { m_stop = netlist_time::zero(); }
 
 		bool use_deactivate() const { return m_use_deactivate; }
 
@@ -1125,10 +1119,6 @@ namespace netlist
 			}
 			return ret;
 		}
-
-	#if (NL_KEEP_STATISTICS)
-		pvector_t<core_device_t *> m_started_devices;
-	#endif
 
 		plib::plog_base<NL_DEBUG> &log() { return m_log; }
 		const plib::plog_base<NL_DEBUG> &log() const { return m_log; }
@@ -1238,7 +1228,7 @@ protected:
 
 	inline void logic_input_t::inactivate()
 	{
-		if (EXPECTED(!is_state(STATE_INP_PASSIVE)))
+		if (!is_state(STATE_INP_PASSIVE))
 		{
 			set_state(STATE_INP_PASSIVE);
 			net().dec_active(*this);
@@ -1292,7 +1282,7 @@ protected:
 
 		m_time = netlist().time() + delay;
 		m_in_queue = (m_active > 0);     /* queued ? */
-		if (EXPECTED(m_in_queue))
+		if (m_in_queue)
 		{
 			netlist().push_to_queue(*this, m_time);
 		}
@@ -1338,7 +1328,7 @@ protected:
 		}
 	}
 
-	inline void netlist_t::push_to_queue(net_t &out, const netlist_time &attime) NOEXCEPT
+	inline void netlist_t::push_to_queue(net_t &out, const netlist_time attime) NOEXCEPT
 	{
 		m_queue.push(attime, &out);
 	}
@@ -1348,7 +1338,7 @@ protected:
 		m_queue.remove(&out);
 	}
 
-	inline void core_device_t::OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time &delay) NOEXCEPT
+	inline void core_device_t::OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time delay) NOEXCEPT
 	{
 		out.set_Q(val, delay);
 	}
