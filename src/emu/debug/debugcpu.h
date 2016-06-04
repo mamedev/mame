@@ -250,7 +250,7 @@ public:
 	UINT32 comment_count() const { return m_comment_set.size(); }
 	UINT32 comment_change_count() const { return m_comment_change; }
 	bool comment_export(xml_data_node &node);
-	bool comment_import(xml_data_node &node);
+	bool comment_import(xml_data_node &node,bool is_inline);
 	UINT32 compute_opcode_crc32(offs_t pc) const;
 
 	// history
@@ -515,7 +515,7 @@ void debug_cpu_source_script(running_machine &machine, const char *file);
 bool debug_comment_save(running_machine &machine);
 
 // load all comments for a given machine
-bool debug_comment_load(running_machine &machine);
+bool debug_comment_load(running_machine &machine,bool is_inline);
 
 
 

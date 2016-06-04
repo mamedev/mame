@@ -1223,6 +1223,14 @@ static const help_item static_help_list[] =
 		"  Dumps memory to memdump.log.\n"
 	},
 	{
+		"comlist",
+		"\n"
+		"  comlist\n"
+		"\n"
+		"Prints the currently available comment file in human readable form in debugger output window."
+		"\n"
+	},
+	{
 		"comadd",
 		"\n"
 		"  comadd[//] <address>,<comment>\n"
