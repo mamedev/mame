@@ -14,6 +14,18 @@ Floppy disks are included for software that actually requires them to boot.
 User/save disks that can be created from the game itself are not included.
 -->
 
+	<software name="100isshu">
+		<description>Towns Hyakunin Isshu</description>
+		<year>1989</year>
+		<publisher>Fujitsu</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="towns hyakunin isshu" sha1="ef05fdcfbcdd8e4777638eaa3b8e7bf1d3e13ba8" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="3x3eyes">
 		<description>3x3 Eyes: Sanjiyan Henjou</description>
 		<year>1993</year>
@@ -55,6 +67,77 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="4d tennis" sha1="5ee1a3342469e87bc0f1d613982a92bc8ab5c5bb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="4thuni12">
+		<description>The 4th Unit 1-2 Towns: Linkage</description>
+		<year>1989</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the 4th unit 1-2 - linkage" sha1="66ad07db8959efe50d240471f1c24869dfae1e51" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="4thunit3">
+		<description>The 4th Unit 3: Dual Targets</description>
+		<year>1989</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the 4th unit 3 - dual targets" sha1="1cca0e9b4d6932e1412f50fd3caa96d32c397773" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="4thunit4">
+		<description>The 4th Unit 4: Zero</description>
+		<year>1989</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the 4th unit 4 - zero" sha1="7b41956851d62962e24329380441a0d7b5778983" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="4thunit5">
+		<description>The 4th Unit 5: D-Again</description>
+		<year>1990</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the 4th unit 5 - d-again" sha1="35ee819833c34bb963c4c167839be947f6433fb4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="4thunit6">
+		<description>The 4th Unit 6: Merry-Go-Round</description>
+		<year>1990</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the 4th unit 6 - merry-go-round" sha1="d254d7670bc2bdd396320aac687dba12906d49e2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="4thunit7">
+		<description>The 4th Unit 7: Wyatt</description>
+		<year>1992</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="the 4th unit 7 - wyatt (boot disk).hdm" size="1261568" crc="a516f2c4" sha1="f5ae3995c8a8358b88bb716bb9c88ee8d4083d1d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the 4th unit 7 - wyatt" sha1="e99d2537e5dc4fb2d890a16b67b115f19ff5391c" />
 			</diskarea>
 		</part>
 	</software>
@@ -357,6 +440,33 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="atlas">
+		<description>The Atlas</description>
+		<year>1991</year>
+		<publisher>Artdink</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the atlas" sha1="31378695a7eb7fe953e51463829468f214f2a2f4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="atlas2">
+		<description>The Atlas 2</description>
+		<year>1993</year>
+		<publisher>Artdink</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="the atlas 2 (system disk).hdm" size="1261568" crc="e28a55a2" sha1="7c0826908907f6e271048d479df37056c3b55a06" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the atlas 2" sha1="70f26116a3870c788fc77fafa45981f81b27ec9f" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="awesome">
 		<description>Awesome</description>
 		<year>1992</year>
@@ -504,6 +614,17 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="bpbase">
+		<description>The Best Play Baseball</description>
+		<year>1992</year>
+		<publisher>ASCII</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the best play baseball" sha1="11bdce513c48010b272988525ae458ec60c743f6" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="branmark">
 		<description>Branmarker</description>
 		<year>1991</year>
@@ -570,6 +691,17 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="caltiny">
+		<description>Cal Gaiden: Tiny Steps Behind the Cal</description>
+		<year>1993</year>
+		<publisher>Birdy Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tiny steps - cal gaiden" sha1="d4e6dfbb519a2890187b89a685fcc5abbd05e709" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="cancanb">
 		<description>Can Can Bunny Extra</description>
 		<year>1993</year>
@@ -603,6 +735,17 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="chasehq">
+		<description>Taito Chase H. Q.</description>
+		<year>1991</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="taito chase hq" sha1="688a4eb1780d0c4e246d4934784ada9cba3c9aea" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="classcrd">
 		<description>Classic Road</description>
 		<year>1994</year>
@@ -610,6 +753,17 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="classic road" sha1="a4debada6767e53ec0edb0ee9128f8fe96a99a6c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="condor">
+		<description>The Case of the Cautious Condor</description>
+		<year>1989</year>
+		<publisher>Toshiba EMI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the case of the cautious condor" sha1="b922563e2617dc46b3aac534c3ee81039a3953c7" />
 			</diskarea>
 		</part>
 	</software>
@@ -1775,6 +1929,17 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="incrmach">
+		<description>The Incredible Machine</description>
+		<year>1994</year>
+		<publisher>Cybelle</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the incredible machine" sha1="928b094e39e2fbbae68220c4bdfb51a38dbad317" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="indy3">
 		<description>Indiana Jones and the Last Crusade</description>
 		<year>1990</year>
@@ -2002,6 +2167,33 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="kyan kyan collection" sha1="14c8567dffc8e1e986d266be84c357ad22aa8132" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kyrand1">
+		<description>The Legend of Kyrandia</description>
+		<year>1993</year>
+		<publisher>Starcraft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="the legend of kyrandia (user disk).hdm" size="1261568" crc="da0241b6" sha1="12e125595d6a87496cf891bba1f67034d110b9e8" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the legend of kyrandia" sha1="0598efd2a0144568bce75c5a9462b6ae76c5c89b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kyrand2">
+		<description>Kyrandia II: The Hand of Fate</description>
+		<year>1995</year>
+		<publisher>Starcraft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the legend of kyrandia 2" sha1="245b1de4313891f5a6bd68104b03b24a3c7200e2" />
 			</diskarea>
 		</part>
 	</software>
@@ -2405,6 +2597,17 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="manhole">
+		<description>The Manhole</description>
+		<year>1990</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the manhole" sha1="b469808157cd2aeff35c8c538c0a56c9dd41d064" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="mbomber">
 		<description>Muscle Bomber: The Body Explosion</description>
 		<year>1993</year>
@@ -2557,6 +2760,17 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mode 7 demo" sha1="50d915eb7e5373e9095792af964a46a6a4f70a5e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="monkey">
+		<description>The Secret of Monkey Island</description>
+		<year>1992</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the secret of monkey island" sha1="06ed4efdb149fbee70474bc9a4fd0002b9a6a31e" />
 			</diskarea>
 		</part>
 	</software>
@@ -3795,6 +4009,297 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="syndicate" sha1="d676fb5d4345ec464740c1b9c53327df0925a46a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="taiken93">
+		<description>Towns Taikenban CD '93</description>
+		<year>1993</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="taikenban cd" sha1="4bfe5252ef91a95b06a2ece9b60f110cf913d980" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="taikou">
+		<description>Taikou Risshinden</description>
+		<year>1992</year>
+		<publisher>Koei</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="taikou risshinden" sha1="b66a2e514c893103f7fdc8b0c5850529d96f51ea" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="takamiza">
+		<description>Takamizawa Kyosuke: Nekketsu!! Kyouiku Kenshuu</description>
+		<year>1995</year>
+		<publisher>ZyX</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="takamizawa kyosuke - nekketsu!! kyouiku kenshuu" sha1="ce13831f3094f9ab53c392480ece497c9b3c7997" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tanjou">
+		<description>Tanjou: Debut</description>
+		<year>1994</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="tanjou - debut (key disk).hdm" size="1261568" crc="d731671d" sha1="7da7523a000aee0e4a3ee7cd73ee78109f54ea85" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tanjou - debut" sha1="cb4d6a5ee1ad68584088a7d38a9e0bcefdd47abf" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tatsuou">
+		<description>Tatsujin Ou</description>
+		<year>1993</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tatsujin oh" sha1="ee1b312958a139fc3a5329f4a9dae662286d3705" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tdf">
+		<description>TDF: Terrestrial Defense Force</description>
+		<year>1990</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tdf - terrestrial defense force" sha1="584ac4f25e5cc1f38857d26b5dc988219ae5646b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tenkagom">
+		<description>Tenka Gomen</description>
+		<year>1994</year>
+		<publisher>Artdink</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="tenka gomen (system disk).hdm" size="1261568" crc="ed6a772a" sha1="b67203849d45824fcb6afac6610621ca95b23966" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tenka gomen" sha1="6a25956177b71d6e77115e46b2dcc9533e63fa6a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="thedate">
+		<description>The Date</description>
+		<year>1990</year>
+		<publisher>JAMP</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the date" sha1="da0894abef4eb1a88c0aff9731f1121464014741" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="thehorde">
+		<description>The Horde</description>
+		<year>1995</year>
+		<publisher>Arrow Micro-Techs</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the horde" sha1="53b6f886fafc5e532583c7ccd85774d73608c4ca" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="titan">
+		<description>Titan</description>
+		<year>1989</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="titan" sha1="bb35134376680af0908f7a85501fbd9e50e81168" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tnzs">
+		<description>The NewZealand Story</description>
+		<year>1989</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the new zealand story" sha1="d523a6bc0fbee6aa874de47de192c639ae97a3cf" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tokio">
+		<description>Tokio</description>
+		<year>1992</year>
+		<publisher>Artdink</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="tokio (system disk).hdm" size="1261568" crc="664f6038" sha1="d2ceb4c0488cf252edf8eb912d707270c886747e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tokio" sha1="173fae976acb957fc5c52a0746025d5cc7f0cfb0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="toushin2">
+		<description>Toushin Toshi II: Soshite, Sorekara...</description>
+		<year>1995</year>
+		<publisher>Alice Soft</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="toushin toshi ii - soshite sorekara..." sha1="e3361f4395e93e9fe10edba31a77240e9f49b43d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tqod">
+		<description>The Queen of Duellist</description>
+		<year>1993</year>
+		<publisher>Agumix</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="the queen of duellist (user disk).hdm" size="1261568" crc="4be69833" sha1="b41753c9994b71a4c6634807fe437b465defde5a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the queen of duellist" sha1="311993a47783fdad8e1fdc4ed65d388dbf7f7d2d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="toutrun">
+		<description>Turbo Out Run</description>
+		<year>1989</year>
+		<publisher>CRI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="turbo outrun" sha1="35a8ec4cf334ee803abfdadd798e1fccee644776" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="townsmg1">
+		<description>Towns Magazine Vol. 1</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="towns magazine vol. 1" sha1="eab53db6a65d7d7030da1b9e7c5a93a19bd2f279" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="townsmg2">
+		<description>Towns Magazine Vol. 2</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom1" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="towns magazine vol. 2 (disc 1)" sha1="65d208a41d0089eb11f7607e0a78fba60fbdbaa4" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="towns magazine vol. 2 (disc 2)" sha1="241a9f4717ed95fa5c6689665c3330f796a28561" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="trigger">
+		<description>Trigger</description>
+		<year>1994</year>
+		<publisher>ZyX</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="trigger" sha1="4e6040576d084861e6fd478a8fbfb6b6723c7596" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tss1110">
+		<description>Towns System Software v1.1 L10</description>
+		<year>1989</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="[os] towns system software v1.1 l10" sha1="4cc560ebcf22337d4b6ae7143dafc2410c07907a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tss1120">
+		<description>Towns System Software v1.1 L20</description>
+		<year>1989</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="[os] towns system software v1.1 l20" sha1="d866918df900ff885e50da7ab96354cf4b9aae24" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tss1130">
+		<description>Towns System Software v1.1 L30</description>
+		<year>1990</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="[os] towns system software v1.1 l20" sha1="b67bc80774182e641f713920712410be4e715171" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tss2110a">
+		<description>Towns System Software v2.1 L10A</description>
+		<year>1991</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="[os] towns system software v2.1 l10a" sha1="17c7e8ab678ac7ff258242c1aad75673848e66d6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tss2151">
+		<description>Towns System Software v2.1 L51</description>
+		<year>1995</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="[os] towns system software v2.1 l51" sha1="58f008662746287e4ce4b2c02f77605fc1ebd440" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tuntroll">
+		<description>Tunnels and Trolls</description>
+		<year>1990</year>
+		<publisher>Starcraft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tunnels and trolls" sha1="098e7889db2229e69fe4ebbb9af0728154c94658" />
 			</diskarea>
 		</part>
 	</software>
