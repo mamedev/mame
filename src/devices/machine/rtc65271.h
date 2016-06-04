@@ -43,13 +43,9 @@ private:
 	void write(int xramsel, offs_t offset, UINT8 data);
 	void field_interrupts();
 
-	static TIMER_CALLBACK( rtc_SQW_callback );
-	static TIMER_CALLBACK( rtc_begin_update_callback );
-	static TIMER_CALLBACK( rtc_end_update_callback );
-
-	void rtc_SQW_cb();
-	void rtc_begin_update_cb();
-	void rtc_end_update_cb();
+	TIMER_CALLBACK_MEMBER(rtc_SQW_cb);
+	TIMER_CALLBACK_MEMBER(rtc_begin_update_cb);
+	TIMER_CALLBACK_MEMBER(rtc_end_update_cb);
 	/* 64 8-bit registers (10 clock registers, 4 control/status registers, and
 	50 bytes of user RAM) */
 	UINT8 m_regs[64];
@@ -66,7 +62,7 @@ private:
 	emu_timer *m_SQW_timer;
 	UINT8 m_SQW_internal_state;
 
-	/* callback called when interrupt pin state changes (may be NULL) */
+	/* callback called when interrupt pin state changes (may be nullptr) */
 	devcb_write_line    m_interrupt_cb;
 };
 

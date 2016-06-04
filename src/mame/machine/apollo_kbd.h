@@ -70,6 +70,8 @@ private:
 	TIMER_CALLBACK_MEMBER( kbd_scan_timer );
 
 	const char *cpu_context() ;
+	template <typename Format, typename... Params>
+	void logerror(Format &&fmt, Params &&... args) const;
 
 	void kgetchar(UINT8 data);
 
@@ -93,8 +95,7 @@ private:
 		void on();
 	private:
 		int keyboard_has_beeper();
-		void beeper_callback();
-		static TIMER_CALLBACK( static_beeper_callback );
+		TIMER_CALLBACK_MEMBER(beeper_callback);
 
 		apollo_kbd_device *m_device; // pointer back to our device
 		beep_device *m_beeper; // the keyboard beeper device

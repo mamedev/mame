@@ -18,21 +18,29 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_store(*this, "store"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{
+	}
 
-	required_device<ssem_device> m_maincpu;
-	required_shared_ptr<UINT8> m_store;
-	required_device<screen_device> m_screen;
-
-	UINT8 m_store_line;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	UINT32 screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(panel_check);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(ssem_store);
 	inline UINT32 reverse(UINT32 v);
-	void glyph_print(bitmap_rgb32 &bitmap, INT32 x, INT32 y, const char *msg, ...) ATTR_PRINTF(5,6);
 	void strlower(char *buf);
+
+private:
+	template <typename Format, typename... Params>
+	void glyph_print(bitmap_rgb32 &bitmap, INT32 x, INT32 y, Format &&fmt, Params &&...args);
+
+	required_device<ssem_device> m_maincpu;
+	required_shared_ptr<UINT8> m_store;
+	required_device<screen_device> m_screen;
+
+	UINT8 m_store_line;
+
+	util::ovectorstream m_glyph_print_buf;
 };
 
 
@@ -403,20 +411,19 @@ static const UINT8 char_glyphs[0x80][8] =
 	{ 0xff, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xff },
 };
 
-void ssem_state::glyph_print(bitmap_rgb32 &bitmap, INT32 x, INT32 y, const char *msg, ...)
+template <typename Format, typename... Params>
+void ssem_state::glyph_print(bitmap_rgb32 &bitmap, INT32 x, INT32 y, Format &&fmt, Params &&...args)
 {
-	va_list arg_list;
-	char buf[32768];
-	INT32 index = 0;
 	const rectangle &visarea = m_screen->visible_area();
 
-	va_start( arg_list, msg );
-	vsprintf( buf, msg, arg_list );
-	va_end( arg_list );
+	m_glyph_print_buf.clear();
+	m_glyph_print_buf.seekp(0, util::ovectorstream::beg);
+	util::stream_format(m_glyph_print_buf, std::forward<Format>(fmt), std::forward<Params>(args)...);
+	m_glyph_print_buf.put('\0');
 
-	for(index = 0; index < strlen(buf) && index < 32768; index++)
+	for(char const *buf = &m_glyph_print_buf.vec()[0]; *buf; buf++)
 	{
-		UINT8 cur = (UINT8)buf[index];
+		UINT8 cur = UINT8(*buf);
 		if(cur < 0x80)
 		{
 			INT32 line = 0;
@@ -493,7 +500,7 @@ UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitma
 					(m_store[(m_store_line << 2) | 1] << 16) |
 					(m_store[(m_store_line << 2) | 2] <<  8) |
 					(m_store[(m_store_line << 2) | 3] <<  0));
-	glyph_print(bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%" I64FMT "d", m_store_line, word, m_maincpu->state_int(SSEM_HALT));
+	glyph_print(bitmap, 0, 272, "LINE:%02u  VALUE:%08x  HALT:%d", m_store_line, word, m_maincpu->state_int(SSEM_HALT));
 	return 0;
 }
 
@@ -609,6 +616,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
 void ssem_state::machine_start()
 {
 	save_item(NAME(m_store_line));
+	m_glyph_print_buf.reserve(1024);
 }
 
 void ssem_state::machine_reset()
@@ -628,7 +636,7 @@ static MACHINE_CONFIG_START( ssem, ssem_state )
 	MCFG_SCREEN_SIZE(256, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 279)
 	MCFG_SCREEN_UPDATE_DRIVER(ssem_state, screen_update_ssem)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", ssem_state, ssem_store, "snp,asm", 1)

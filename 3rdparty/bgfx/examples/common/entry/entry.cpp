@@ -6,7 +6,7 @@
 #include <bx/bx.h>
 #include <bgfx/bgfx.h>
 #include <bx/string.h>
-#include <bx/readerwriter.h>
+#include <bx/crtimpl.h>
 
 #include <time.h>
 
@@ -188,7 +188,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		const bool isNumber = (Key::Key0 <= _key && _key <= Key::Key9);
 		if (isNumber)
 		{
-			return '0' + (_key - Key::Key0);
+			return '0' + char(_key - Key::Key0);
 		}
 
 		const bool isChar = (Key::KeyA <= _key && _key <= Key::KeyZ);
@@ -197,7 +197,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			enum { ShiftMask = Modifier::LeftShift|Modifier::RightShift };
 
 			const bool shift = !!(_modifiers&ShiftMask);
-			return (shift ? 'A' : 'a') + (_key - Key::KeyA);
+			return (shift ? 'A' : 'a') + char(_key - Key::KeyA);
 		}
 
 		switch (_key)
@@ -463,8 +463,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 				case Event::Gamepad:
 					{
-						const GamepadEvent* gev = static_cast<const GamepadEvent*>(ev);
-						DBG("gamepad %d, %d", gev->m_gamepad.idx, gev->m_connected);
+//						const GamepadEvent* gev = static_cast<const GamepadEvent*>(ev);
+//						DBG("gamepad %d, %d", gev->m_gamepad.idx, gev->m_connected);
 					}
 					break;
 
@@ -538,7 +538,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{
 			_reset = s_reset;
 			bgfx::reset(_width, _height, _reset);
-			inputSetMouseResolution(_width, _height);
+			inputSetMouseResolution(uint16_t(_width), uint16_t(_height) );
 		}
 
 		_debug = s_debug;
@@ -692,7 +692,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 			if (handle.idx == 0)
 			{
-				inputSetMouseResolution(win.m_width, win.m_height);
+				inputSetMouseResolution(uint16_t(win.m_width), uint16_t(win.m_height) );
 			}
 		}
 
@@ -700,7 +700,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{
 			_reset = s_reset;
 			bgfx::reset(s_window[0].m_width, s_window[0].m_height, _reset);
-			inputSetMouseResolution(s_window[0].m_width, s_window[0].m_height);
+			inputSetMouseResolution(uint16_t(s_window[0].m_width), uint16_t(s_window[0].m_height) );
 		}
 
 		_debug = s_debug;

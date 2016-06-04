@@ -66,6 +66,8 @@ protected:
 	static const UINT8 CS1 = 0x08;
 	static const UINT8 CS2 = 0x10;
 
+	optional_memory_region      m_region;
+
 	// configuration state
 	address_space_config        m_space_config;
 

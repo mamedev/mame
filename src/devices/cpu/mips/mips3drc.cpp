@@ -40,12 +40,15 @@ using namespace uml;
     MACROS
 ***************************************************************************/
 
+#define IS_FR0      ((m_core->mode & 1) == 0)
+#define IS_FR1      ((m_core->mode & 1) != 0)
+
 #define R32(reg)                m_regmaplo[reg]
 #define LO32                    R32(REG_LO)
 #define HI32                    R32(REG_HI)
 #define CPR032(reg)             mem(LOPTR(&m_core->cpr[0][reg]))
 #define CCR032(reg)             mem(LOPTR(&m_core->ccr[0][reg]))
-#define FPR32(reg)              mem(((m_core->mode & 1) == 0) ? &((float *)&m_core->cpr[1][0])[reg] : (float *)&m_core->cpr[1][reg])
+#define FPR32_FR0(reg)          mem(&((float *)&m_core->cpr[1][reg])[BYTE_XOR_LE(0)])
 #define CCR132(reg)             mem(LOPTR(&m_core->ccr[1][reg]))
 #define CPR232(reg)             mem(LOPTR(&m_core->cpr[2][reg]))
 #define CCR232(reg)             mem(LOPTR(&m_core->ccr[2][reg]))
@@ -55,10 +58,25 @@ using namespace uml;
 #define HI64                    R64(REG_HI)
 #define CPR064(reg)             mem(&m_core->cpr[0][reg])
 #define CCR064(reg)             mem(&m_core->ccr[0][reg])
-#define FPR64(reg)              mem(((m_core->mode & 1) == 0) ? (double *)&m_core->cpr[1][(reg)/2] : (double *)&m_core->cpr[1][reg])
+#define FPR64_FR1(reg)          mem((double *)&m_core->cpr[1][reg])
 #define CCR164(reg)             mem(&m_core->ccr[1][reg])
 #define CPR264(reg)             mem(&m_core->cpr[2][reg])
 #define CCR264(reg)             mem(&m_core->ccr[2][reg])
+
+#define FRVALS_FR0  mem(&((float *)&m_core->cpr[1][FRREG])[BYTE_XOR_LE(0)])
+#define FTVALS_FR0  mem(&((float *)&m_core->cpr[1][FTREG])[BYTE_XOR_LE(0)])
+#define FSVALS_FR0  mem(&((float *)&m_core->cpr[1][FSREG])[BYTE_XOR_LE(0)])
+#define FDVALS_FR0  mem(&((float *)&m_core->cpr[1][FDREG])[BYTE_XOR_LE(0)])
+
+#define FRVALS_FR1  mem(&((float *)&m_core->cpr[1][FRREG])[BYTE_XOR_LE(0)])
+#define FTVALS_FR1  mem(&((float *)&m_core->cpr[1][FTREG])[BYTE_XOR_LE(0)])
+#define FSVALS_FR1  mem(&((float *)&m_core->cpr[1][FSREG])[BYTE_XOR_LE(0)])
+#define FDVALS_FR1  mem(&((float *)&m_core->cpr[1][FDREG])[BYTE_XOR_LE(0)])
+
+#define FRVALD_FR1  mem((double *)&m_core->cpr[1][FRREG])
+#define FTVALD_FR1  mem((double *)&m_core->cpr[1][FTREG])
+#define FSVALD_FR1  mem((double *)&m_core->cpr[1][FSREG])
+#define FDVALD_FR1  mem((double *)&m_core->cpr[1][FDREG])
 
 #define FCCSHIFT(which)         fcc_shift[(m_flavor < MIPS3_TYPE_MIPS_IV) ? 0 : ((which) & 7)]
 #define FCCMASK(which)          ((UINT32)(1 << FCCSHIFT(which)))
@@ -150,7 +168,7 @@ inline void mips3_device::save_fast_iregs(drcuml_block *block)
 
 void mips3_device::mips3drc_set_options(UINT32 options)
 {
-	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
+	if (!allow_drc()) return;
 	m_drcoptions = options;
 }
 
@@ -196,7 +214,7 @@ void mips3_device::add_fastram(offs_t start, offs_t end, UINT8 readonly, void *b
 
 void mips3_device::mips3drc_add_hotspot(offs_t pc, UINT32 opcode, UINT32 cycles)
 {
-	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
+	if (!allow_drc()) return;
 	if (m_hotspot_select < ARRAY_LENGTH(m_hotspot))
 	{
 		m_hotspot[m_hotspot_select].pc = pc;
@@ -773,7 +791,7 @@ void mips3_device::static_generate_exception(UINT8 exception, int recover, const
 	if ((PRINTF_EXCEPTIONS && exception != EXCEPTION_INTERRUPT && exception != EXCEPTION_SYSCALL) ||
 		(PRINTF_MMU && (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)))
 	{
-		UML_CALLC(block, cfunc_printf_exception, this);                            // callc   cfunc_printf_exception,NULL
+		UML_CALLC(block, cfunc_printf_exception, this);                            // callc   cfunc_printf_exception,nullptr
 	}
 
 	/* choose our target PC */
@@ -1617,19 +1635,18 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			return TRUE;
 
 		case 0x1b:  /* LDR - MIPS III */
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_SHL(block, I1, I0, 3);                              // shl     i1,i0,3
-			UML_AND(block, I0, I0, ~7);                             // and     i0,i0,~7
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);            // add     i0,<rsreg>,SIMMVAL
+			UML_SHL(block, I1, I0, 3);                          // shl     i1,i0,3
+			UML_AND(block, I0, I0, ~7);                         // and     i0,i0,~7
 			if (m_bigendian)
-				UML_XOR(block, I1, I1, 0x38);                       // xor     i1,i1,0x38
-			UML_DSHL(block, I2, (UINT64)~0, I1);                        // dshl    i2,~0,i1
-			UML_CALLH(block, *m_read64mask[m_core->mode >> 1]);
-																					// callh   read64mask
+				UML_XOR(block, I1, I1, 0x38);                   // xor     i1,i1,0x38
+			UML_DSHL(block, I2, (UINT64)~0, I1);                // dshl    i2,~0,i1
+			UML_CALLH(block, *m_read64mask[m_core->mode >> 1]); // callh   read64mask
 			if (RTREG != 0)
 			{
-				UML_DSHR(block, I2, (UINT64)~0, I1);                    // dshr    i2,~0,i1
-				UML_SUB(block, I1, 64, I1);                         // sub     i1,64,i1
-				UML_DROLINS(block, R64(RTREG), I0, I1, I2);         // drolins <rtreg>,i0,i1,i2
+				UML_DSHR(block, I2, (UINT64)~0, I1);            // dshr    i2,~0,i1
+				UML_SUB(block, I1, 64, I1);                     // sub     i1,64,i1
+				UML_DROLINS(block, R64(RTREG), I0, I1, I2);     // drolins <rtreg>,i0,i1,i2
 			}
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
@@ -1637,18 +1654,18 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 
 		case 0x31:  /* LWC1 - MIPS I */
 			check_cop1_access(block);
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);        // add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, *m_read32[m_core->mode >> 1]); // callh   read32
-			UML_MOV(block, FPR32(RTREG), I0);                                   // mov     <cpr1_rt>,i0
+			UML_MOV(block, FPR32_FR0(RTREG), I0);           // mov     <cpr1_rt>,i0
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x35:  /* LDC1 - MIPS III */
 			check_cop1_access(block);
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);        // add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, *m_read64[m_core->mode >> 1]); // callh   read64
-			UML_DMOV(block, FPR64(RTREG), I0);                                  // dmov    <cpr1_rt>,i0
+			generate_set_cop1_reg64_i2d(block, compiler, desc, RTREG, I0);
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
@@ -1710,7 +1727,7 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 
 		case 0x3f:  /* SD - MIPS III */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_DMOV(block, I1, R64(RTREG));                                    // dmov    i1,<rtreg>
+			UML_DMOV(block, I1, R64(RTREG));                                // dmov    i1,<rtreg>
 			UML_CALLH(block, *m_write64[m_core->mode >> 1]);    // callh   write64
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
@@ -1759,39 +1776,39 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			return TRUE;
 
 		case 0x2c:  /* SDL - MIPS III */
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_SHL(block, I3, I0, 3);                              // shl     i3,i0,3
-			UML_AND(block, I0, I0, ~7);                             // and     i0,i0,~7
-			UML_DMOV(block, I1, R64(RTREG));                                    // dmov    i1,<rtreg>
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);            // add     i0,<rsreg>,SIMMVAL
+			UML_SHL(block, I3, I0, 3);                          // shl     i3,i0,3
+			UML_AND(block, I0, I0, ~7);                         // and     i0,i0,~7
+			UML_DMOV(block, I1, R64(RTREG));                    // dmov    i1,<rtreg>
 			if (!m_bigendian)
-				UML_XOR(block, I3, I3, 0x38);                       // xor     i3,i3,0x38
-			UML_DSHR(block, I2, (UINT64)~0, I3);                        // dshr    i2,~0,i3
-			UML_DSHR(block, I1, I1, I3);                                // dshr    i1,i1,i3
-			UML_CALLH(block, *m_write64mask[m_core->mode >> 1]);
-																					// callh   write64mask
+				UML_XOR(block, I3, I3, 0x38);                   // xor     i3,i3,0x38
+			UML_DSHR(block, I2, (UINT64)~0, I3);                // dshr    i2,~0,i3
+			UML_DSHR(block, I1, I1, I3);                        // dshr    i1,i1,i3
+			UML_CALLH(block, *m_write64mask[m_core->mode >> 1]);// callh   write64mask
+
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x2d:  /* SDR - MIPS III */
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_SHL(block, I3, I0, 3);                              // shl     i3,i0,3
-			UML_AND(block, I0, I0, ~7);                             // and     i0,i0,~7
-			UML_DMOV(block, I1, R64(RTREG));                                    // dmov    i1,<rtreg>
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);            // add     i0,<rsreg>,SIMMVAL
+			UML_SHL(block, I3, I0, 3);                          // shl     i3,i0,3
+			UML_AND(block, I0, I0, ~7);                         // and     i0,i0,~7
+			UML_DMOV(block, I1, R64(RTREG));                    // dmov    i1,<rtreg>
 			if (m_bigendian)
-				UML_XOR(block, I3, I3, 0x38);                       // xor     i3,i3,0x38
-			UML_DSHL(block, I2, (UINT64)~0, I3);                        // dshl    i2,~0,i3
-			UML_DSHL(block, I1, I1, I3);                                // dshl    i1,i1,i3
-			UML_CALLH(block, *m_write64mask[m_core->mode >> 1]);
-																					// callh   write64mask
+				UML_XOR(block, I3, I3, 0x38);                   // xor     i3,i3,0x38
+			UML_DSHL(block, I2, (UINT64)~0, I3);                // dshl    i2,~0,i3
+			UML_DSHL(block, I1, I1, I3);                        // dshl    i1,i1,i3
+			UML_CALLH(block, *m_write64mask[m_core->mode >> 1]);// callh   write64mask
+
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x39:  /* SWC1 - MIPS I */
 			check_cop1_access(block);
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_MOV(block, I1, FPR32(RTREG));                                   // mov     i1,<cpr1_rt>
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);            // add     i0,<rsreg>,SIMMVAL
+			UML_MOV(block, I1, FPR32_FR0(RTREG));               // mov     i1,<cpr1_rt>
 			UML_CALLH(block, *m_write32[m_core->mode >> 1]);    // callh   write32
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
@@ -1799,8 +1816,8 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 
 		case 0x3d:  /* SDC1 - MIPS III */
 			check_cop1_access(block);
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_DMOV(block, I1, FPR64(RTREG));                                  // dmov    i1,<cpr1_rt>
+			generate_get_cop1_reg64_d2i(block, compiler, desc, RTREG, I1);
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);            // add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, *m_write64[m_core->mode >> 1]);    // callh   write64
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
@@ -1836,10 +1853,18 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 			return generate_cop0(block, compiler, desc);
 
 		case 0x11:  /* COP1 - MIPS I */
-			return generate_cop1(block, compiler, desc);
+			if ((m_core->mode & 1) == 0)
+				return generate_cop1_fr0(block, compiler, desc);
+			else
+				return generate_cop1_fr1(block, compiler, desc);
+			return FALSE;
 
 		case 0x13:  /* COP1X - MIPS IV */
-			return generate_cop1x(block, compiler, desc);
+			if ((m_core->mode & 1) == 0)
+				return generate_cop1x_fr0(block, compiler, desc);
+			else
+				return generate_cop1x_fr1(block, compiler, desc);
+			return FALSE;
 
 		case 0x12:  /* COP2 - MIPS I */
 			UML_EXH(block, *m_exception[EXCEPTION_INVALIDOP], 0);// exh     invalidop,0
@@ -2062,11 +2087,11 @@ int mips3_device::generate_special(drcuml_block *block, compiler_state *compiler
 			return TRUE;
 
 		case 0x1c:  /* DMULT - MIPS III */
-			UML_DMULS(block, LO64, HI64, R64(RSREG), R64(RTREG));                   // dmuls   lo,hi,<rsreg>,<rtreg>
+			UML_DMULS(block, LO64, HI64, R64(RSREG), R64(RTREG));
 			return TRUE;
 
 		case 0x1d:  /* DMULTU - MIPS III */
-			UML_DMULU(block, LO64, HI64, R64(RSREG), R64(RTREG));                   // dmulu   lo,hi,<rsreg>,<rtreg>
+			UML_DMULU(block, LO64, HI64, R64(RSREG), R64(RTREG));
 			return TRUE;
 
 		case 0x1a:  /* DIV - MIPS I */
@@ -2265,11 +2290,15 @@ int mips3_device::generate_regimm(drcuml_block *block, compiler_state *compiler,
 		case 0x02:  /* BLTZL */
 		case 0x10:  /* BLTZAL */
 		case 0x12:  /* BLTZALL */
+			if (opswitch & 0x10)
+			{
+				UML_DMOV(block, R64(31), (INT32)(desc->pc + 8));
+			}
 			if (RSREG != 0)
 			{
 				UML_DCMP(block, R64(RSREG), 0);                             // dcmp    <rsreg>,0
 				UML_JMPc(block, COND_GE, skip = compiler->labelnum++);              // jmp     skip,GE
-				generate_delay_slot_and_branch(block, compiler, desc, (opswitch & 0x10) ? 31 : 0);
+				generate_delay_slot_and_branch(block, compiler, desc, 0);
 																					// <next instruction + hashjmp>
 				UML_LABEL(block, skip);                                         // skip:
 			}
@@ -2279,17 +2308,22 @@ int mips3_device::generate_regimm(drcuml_block *block, compiler_state *compiler,
 		case 0x03:  /* BGEZL */
 		case 0x11:  /* BGEZAL */
 		case 0x13:  /* BGEZALL */
+			if (opswitch & 0x10)
+			{
+				UML_DMOV(block, R64(31), (INT32)(desc->pc + 8));
+			}
+
 			if (RSREG != 0)
 			{
 				UML_DCMP(block, R64(RSREG), 0);                             // dcmp    <rsreg>,0
-				UML_JMPc(block, COND_L, skip = compiler->labelnum++);                   // jmp     skip,L
-				generate_delay_slot_and_branch(block, compiler, desc, (opswitch & 0x10) ? 31 : 0);
-																					// <next instruction + hashjmp>
-				UML_LABEL(block, skip);                                         // skip:
+				UML_JMPc(block, COND_L, skip = compiler->labelnum++);       // jmp     skip,L
+				generate_delay_slot_and_branch(block, compiler, desc, 0);   // <next instruction + hashjmp>
+				UML_LABEL(block, skip);                                     // skip:
 			}
 			else
-				generate_delay_slot_and_branch(block, compiler, desc, (opswitch & 0x10) ? 31 : 0);
-																					// <next instruction + hashjmp>
+			{
+				generate_delay_slot_and_branch(block, compiler, desc, 0);   // <next instruction + hashjmp>
+			}
 			return TRUE;
 
 		case 0x08:  /* TGEI */
@@ -2655,11 +2689,77 @@ void mips3_device::check_cop1_access(drcuml_block *block)
 	}
 }
 
-/*-------------------------------------------------
-    generate_cop1 - compile COP1 opcodes
--------------------------------------------------*/
+void mips3_device::generate_get_cop1_reg64_d2i(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const UINT32 reg, const uml::parameter& param)
+{
+	if ((m_core->mode & 1) == 0)
+	{
+		UML_ICOPYFS(block, I0, FPR32_FR0((reg & 0x1E) + 1));
+		UML_DSHL(block, I0, I0, 32);
+		UML_ICOPYFS(block, I1, FPR32_FR0(reg & 0x1E));
+		UML_DROLINS(block, I0, I1, 0, 0x00000000ffffffffL);
+		UML_DMOV(block, param, I0);
+	}
+	else
+	{
+		UML_DMOV(block, param, FPR64_FR1(reg));
+	}
+}
 
-int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void mips3_device::generate_get_cop1_reg64(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const UINT32 reg, const uml::parameter& param)
+{
+	if ((m_core->mode & 1) == 0)
+	{
+		UML_ICOPYFS(block, I0, FPR32_FR0((reg & 0x1E) + 1));
+		UML_DSHL(block, I0, I0, 32);
+		UML_ICOPYFS(block, I1, FPR32_FR0(reg & 0x1E));
+		UML_DROLINS(block, I0, I1, 0, 0x00000000ffffffffL);
+		UML_FDCOPYI(block, param, I0);
+	}
+	else
+	{
+		UML_FDMOV(block, param, FPR64_FR1(reg));
+	}
+}
+
+void mips3_device::generate_set_cop1_reg64(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const UINT32 reg, const uml::parameter& param)
+{
+	if ((m_core->mode & 1) == 0)
+	{
+		UML_ICOPYFD(block, I0, param);
+		UML_FSCOPYI(block, F1, I0);
+		UML_FSMOV(block, FPR32_FR0(reg & 0x1E), F1);
+		UML_DSHR(block, I0, I0, 32);
+		UML_FSCOPYI(block, F1, I0);
+		UML_FSMOV(block, FPR32_FR0((reg & 0x1E) + 1), F1);
+	}
+	else
+	{
+		UML_FDMOV(block, FPR64_FR1(reg), param);
+	}
+}
+
+void mips3_device::generate_set_cop1_reg64_i2d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const UINT32 reg, const uml::parameter& param)
+{
+	if ((m_core->mode & 1) == 0)
+	{
+		UML_DMOV(block, I1, param);
+		UML_FSCOPYI(block, F0, I1);
+		UML_FSMOV(block, FPR32_FR0(reg & 0x1E), F0);
+		UML_DSHR(block, I1, I1, 32);
+		UML_FSCOPYI(block, F0, I1);
+		UML_FSMOV(block, FPR32_FR0((reg & 0x1E) + 1), F0);
+	}
+	else
+	{
+		UML_DMOV(block, FPR64_FR1(reg), param);
+	}
+}
+
+/*-------------------------------------------------------
+    generate_cop1_fr0 - compile COP1 opcodes in FR0 mode
+---------------------------------------------------------*/
+
+int mips3_device::generate_cop1_fr0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	UINT32 op = desc->opptr.l[0];
 	code_label skip;
@@ -2671,39 +2771,47 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 	{
 		case 0x00:  /* MFC1 - MIPS I */
 			if (RTREG != 0)
-				UML_DSEXT(block, R64(RTREG), FPR32(RDREG), SIZE_DWORD);                 // dsext   <rtreg>,fpr[rdreg],dword
+			{
+				UML_DSEXT(block, R64(RTREG), FPR32_FR0(RDREG), SIZE_DWORD);     // dsext   <rtreg>,fpr[rdreg],dword
+			}
 			return TRUE;
 
 		case 0x01:  /* DMFC1 - MIPS III */
 			if (RTREG != 0)
-				UML_DMOV(block, R64(RTREG), FPR64(RDREG));                          // dmov    <rtreg>,fpr[rdreg]
+			{
+				generate_get_cop1_reg64_d2i(block, compiler, desc, RDREG, I0);
+				UML_DMOV(block, R64(RTREG), I0);
+			}
 			return TRUE;
 
 		case 0x02:  /* CFC1 - MIPS I */
 			if (RTREG != 0)
-				UML_DSEXT(block, R64(RTREG), CCR132(RDREG), SIZE_DWORD);                    // dsext   <rtreg>,ccr132[rdreg],dword
+				UML_DSEXT(block, R64(RTREG), CCR132(RDREG), SIZE_DWORD);        // dsext   <rtreg>,ccr132[rdreg],dword
 			return TRUE;
 
 		case 0x04:  /* MTC1 - MIPS I */
-			UML_MOV(block, FPR32(RDREG), R32(RTREG));                               // mov     fpr[rdreg],<rtreg>
+			UML_MOV(block, FPR32_FR0(RDREG), R32(RTREG));                       // mov     fpr[rdreg],<rtreg>
 			return TRUE;
 
 		case 0x05:  /* DMTC1 - MIPS III */
-			UML_DMOV(block, FPR64(RDREG), R64(RTREG));                              // dmov    fpr[rdreg],<rtreg>
+			UML_DMOV(block, I0, R64(RTREG));
+			generate_set_cop1_reg64_i2d(block, compiler, desc, RDREG, I0);
 			return TRUE;
 
 		case 0x06:  /* CTC1 - MIPS I */
 			if (RDREG != 31)
-				UML_DSEXT(block, CCR164(RDREG), R32(RTREG), SIZE_DWORD);                    // dsext   ccr1[rdreg],<rtreg>,dword
+			{
+				UML_DSEXT(block, CCR164(RDREG), R32(RTREG), SIZE_DWORD);        // dsext   ccr1[rdreg],<rtreg>,dword
+			}
 			else
 			{
-				UML_XOR(block, I0, CCR132(31), R32(RTREG));                 // xor     i0,ccr1[31],<rtreg>
-				UML_DSEXT(block, CCR164(31), R32(RTREG), SIZE_DWORD);                   // dsext   ccr1[31],<rtreg>,dword
-				UML_TEST(block, I0, 3);                                 // test    i0,3
-				UML_JMPc(block, COND_Z, skip = compiler->labelnum++);                   // jmp     skip,Z
-				UML_AND(block, I0, CCR132(31), 3);                      // and     i0,ccr1[31],3
-				UML_LOAD(block, I0, &m_fpmode[0], I0, SIZE_BYTE, SCALE_x1);// load   i0,fpmode,i0,byte
-				UML_SETFMOD(block, I0);                                     // setfmod i0
+				UML_XOR(block, I0, CCR132(31), R32(RTREG));                     // xor     i0,ccr1[31],<rtreg>
+				UML_DSEXT(block, CCR164(31), R32(RTREG), SIZE_DWORD);           // dsext   ccr1[31],<rtreg>,dword
+				UML_TEST(block, I0, 3);                                         // test    i0,3
+				UML_JMPc(block, COND_Z, skip = compiler->labelnum++);           // jmp     skip,Z
+				UML_AND(block, I0, CCR132(31), 3);                              // and     i0,ccr1[31],3
+				UML_LOAD(block, I0, &m_fpmode[0], I0, SIZE_BYTE, SCALE_x1);     // load   i0,fpmode,i0,byte
+				UML_SETFMOD(block, I0);                                         // setfmod i0
 				UML_LABEL(block, skip);                                         // skip:
 			}
 			return TRUE;
@@ -2713,17 +2821,17 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 			{
 				case 0x00:  /* BCzF - MIPS I */
 				case 0x02:  /* BCzFL - MIPS II */
-					UML_TEST(block, CCR132(31), FCCMASK(op >> 18));         // test    ccr1[31],fccmask[which]
-					UML_JMPc(block, COND_NZ, skip = compiler->labelnum++);          // jmp     skip,NZ
-					generate_delay_slot_and_branch(block, compiler, desc, 0);// <next instruction + hashjmp>
+					UML_TEST(block, CCR132(31), FCCMASK(op >> 18));             // test    ccr1[31],fccmask[which]
+					UML_JMPc(block, COND_NZ, skip = compiler->labelnum++);      // jmp     skip,NZ
+					generate_delay_slot_and_branch(block, compiler, desc, 0);   // <next instruction + hashjmp>
 					UML_LABEL(block, skip);                                     // skip:
 					return TRUE;
 
 				case 0x01:  /* BCzT - MIPS I */
 				case 0x03:  /* BCzTL - MIPS II */
-					UML_TEST(block, CCR132(31), FCCMASK(op >> 18));         // test    ccr1[31],fccmask[which]
-					UML_JMPc(block, COND_Z, skip = compiler->labelnum++);               // jmp     skip,Z
-					generate_delay_slot_and_branch(block, compiler, desc, 0);// <next instruction + hashjmp>
+					UML_TEST(block, CCR132(31), FCCMASK(op >> 18));             // test    ccr1[31],fccmask[which]
+					UML_JMPc(block, COND_Z, skip = compiler->labelnum++);       // jmp     skip,Z
+					generate_delay_slot_and_branch(block, compiler, desc, 0);   // <next instruction + hashjmp>
 					UML_LABEL(block, skip);                                     // skip:
 					return TRUE;
 			}
@@ -2734,203 +2842,362 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 			{
 				case 0x00:
 					if (IS_SINGLE(op))  /* ADD.S - MIPS I */
-						UML_FSADD(block, FPR32(FDREG), FPR32(FSREG), FPR32(FTREG)); // fsadd   <fdreg>,<fsreg>,<ftreg>
+					{
+						UML_FSADD(block, FDVALS_FR0, FSVALS_FR0, FTVALS_FR0);       // fsadd   <fdreg>,<fsreg>,<ftreg>
+					}
 					else                /* ADD.D - MIPS I */
-						UML_FDADD(block, FPR64(FDREG), FPR64(FSREG), FPR64(FTREG)); // fdadd   <fdreg>,<fsreg>,<ftreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    F0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);  // dmov    F1,<ftreg>
+						UML_FDADD(block, F2, F0, F1);                               // fdadd   F2,F0,F1
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F2);  // dmov    <fdreg>,F2
+					}
 					return TRUE;
 
 				case 0x01:
 					if (IS_SINGLE(op))  /* SUB.S - MIPS I */
-						UML_FSSUB(block, FPR32(FDREG), FPR32(FSREG), FPR32(FTREG)); // fssub   <fdreg>,<fsreg>,<ftreg>
+					{
+						UML_FSSUB(block, FDVALS_FR0, FSVALS_FR0, FTVALS_FR0);       // fssub   <fdreg>,<fsreg>,<ftreg>
+					}
 					else                /* SUB.D - MIPS I */
-						UML_FDSUB(block, FPR64(FDREG), FPR64(FSREG), FPR64(FTREG)); // fdsub   <fdreg>,<fsreg>,<ftreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    F0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);  // dmov    F1,<ftreg>
+						UML_FDSUB(block, F2, F0, F1);                               // fdsub   F2,F0,F1
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F2);  // dmov    <fdreg>,F2
+					}
 					return TRUE;
 
 				case 0x02:
 					if (IS_SINGLE(op))  /* MUL.S - MIPS I */
-						UML_FSMUL(block, FPR32(FDREG), FPR32(FSREG), FPR32(FTREG)); // fsmul   <fdreg>,<fsreg>,<ftreg>
+					{
+						UML_FSMUL(block, FDVALS_FR0, FSVALS_FR0, FTVALS_FR0);       // fsmul   <fdreg>,<fsreg>,<ftreg>
+					}
 					else                /* MUL.D - MIPS I */
-						UML_FDMUL(block, FPR64(FDREG), FPR64(FSREG), FPR64(FTREG)); // fdmul   <fdreg>,<fsreg>,<ftreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    F0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);  // dmov    F1,<ftreg>
+						UML_FDMUL(block, F2, F0, F1);                               // fdmul    F2,F0,F1
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F2);  // dmov    <fdreg>,F2
+					}
 					return TRUE;
 
 				case 0x03:
 					if (IS_SINGLE(op))  /* DIV.S - MIPS I */
-						UML_FSDIV(block, FPR32(FDREG), FPR32(FSREG), FPR32(FTREG)); // fsdiv   <fdreg>,<fsreg>,<ftreg>
+					{
+						UML_FSDIV(block, FDVALS_FR0, FSVALS_FR0, FTVALS_FR0);       // fsdiv   <fdreg>,<fsreg>,<ftreg>
+					}
 					else                /* DIV.D - MIPS I */
-						UML_FDDIV(block, FPR64(FDREG), FPR64(FSREG), FPR64(FTREG)); // fddiv   <fdreg>,<fsreg>,<ftreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    F0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);  // dmov    F1,<ftreg>
+						UML_FDDIV(block, F2, F0, F1);                               // fddiv   F2,F0,F1
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F2);  // dmov    <fdreg>,F2
+					}
 					return TRUE;
 
 				case 0x04:
 					if (IS_SINGLE(op))  /* SQRT.S - MIPS II */
-						UML_FSSQRT(block, FPR32(FDREG), FPR32(FSREG));              // fssqrt  <fdreg>,<fsreg>
+					{
+						UML_FSSQRT(block, FDVALS_FR0, FSVALS_FR0);                  // fssqrt  <fdreg>,<fsreg>
+					}
 					else                /* SQRT.D - MIPS II */
-						UML_FDSQRT(block, FPR64(FDREG), FPR64(FSREG));              // fdsqrt  <fdreg>,<fsreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    F0,<fsreg>
+						UML_FDSQRT(block, F0, F0);                                  // fdsqrt  F0,F0
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F0);  // dmov    <fdreg>,F0
+					}
 					return TRUE;
 
 				case 0x05:
 					if (IS_SINGLE(op))  /* ABS.S - MIPS I */
-						UML_FSABS(block, FPR32(FDREG), FPR32(FSREG));               // fsabs   <fdreg>,<fsreg>
+					{
+						UML_FSABS(block, FDVALS_FR0, FSVALS_FR0);                   // fsabs   <fdreg>,<fsreg>
+					}
 					else                /* ABS.D - MIPS I */
-						UML_FDABS(block, FPR64(FDREG), FPR64(FSREG));               // fdabs   <fdreg>,<fsreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    F0,<fsreg>
+						UML_FDABS(block, F0, F0);                                   // fdabs   F0,F0
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F0);  // dmov    <fdreg>,F0
+					}
 					return TRUE;
 
 				case 0x06:
 					if (IS_SINGLE(op))  /* MOV.S - MIPS I */
-						UML_FSMOV(block, FPR32(FDREG), FPR32(FSREG));               // fsmov   <fdreg>,<fsreg>
+					{
+						UML_FSMOV(block, FDVALS_FR0, FSVALS_FR0);                   // fsmov   <fdreg>,<fsreg>
+					}
 					else                /* MOV.D - MIPS I */
-						UML_FDMOV(block, FPR64(FDREG), FPR64(FSREG));               // fdmov   <fdreg>,<fsreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    F0,<fsreg>
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F0);  // dmov    <fdreg>,F0
+					}
 					return TRUE;
 
 				case 0x07:
 					if (IS_SINGLE(op))  /* NEG.S - MIPS I */
 					{
-						UML_FSNEG(block, FPR32(FDREG), FPR32(FSREG));               // fsneg   <fdreg>,<fsreg>
-						UML_CMP(block, FPR32(FSREG), 0);                            // cmp     <fsreg>,0.0
-						UML_MOVc(block, COND_E, FPR32(FDREG), 0x80000000);          // mov     <fdreg>,-0.0,e
+						UML_FSNEG(block, FDVALS_FR0, FSVALS_FR0);           // fsneg   <fdreg>,<fsreg>
+						UML_CMP(block, FSVALS_FR0, 0);                      // cmp     <fsreg>,0.0
+						UML_MOVc(block, COND_E, FDVALS_FR0, 0x80000000);    // mov     <fdreg>,-0.0,e
 					}
 					else                /* NEG.D - MIPS I */
 					{
-						UML_FDNEG(block, FPR64(FDREG), FPR64(FSREG));               // fdneg   <fdreg>,<fsreg>
-						UML_DCMP(block, FPR64(FSREG), 0);                            // cmp     <fsreg>,0.0
-						UML_DMOVc(block, COND_E, FPR64(FDREG), U64(0x8000000000000000));// dmov    <fdreg>,-0.0,e
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    F0,<fsreg>
+						UML_FDNEG(block, F1, F0);                                   // fdneg   F1,F0
+						UML_DCMP(block, F0, 0);                                     // cmp     F0,0.0
+						UML_DMOVc(block, COND_E, F1, U64(0x8000000000000000));      // dmov    F1,-0.0,e
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F1);  // dmov    <fdreg>,F1
 					}
 					return TRUE;
 
 				case 0x08:
 					if (IS_SINGLE(op))  /* ROUND.L.S - MIPS III */
-						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), SIZE_QWORD, ROUND_ROUND);// fstoint <fdreg>,<fsreg>,qword,round
+					{
+						UML_FSTOINT(block, F0, FSVALS_FR0, SIZE_QWORD, ROUND_ROUND);// fstoint  f0,<fsreg>,qword,round
+					}
 					else                /* ROUND.L.D - MIPS III */
-						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), SIZE_QWORD, ROUND_ROUND);// fdtoint <fdreg>,<fsreg>,qword,round
-					UML_DSEXT(block, FPR64(FDREG), FPR64(FDREG), SIZE_DWORD);
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov     f0,<fsreg>
+						UML_FDTOINT(block, F0, F0, SIZE_QWORD, ROUND_ROUND);        // fdtoint  f0,f0,qword,round
+					}
+					UML_ICOPYFD(block, I0, F0);                                     // icopyfd  i0,f0
+					generate_set_cop1_reg64_i2d(block, compiler, desc, FDREG, I0);  // dmov     <fdreg>,f0
 					return TRUE;
 
 				case 0x09:
 					if (IS_SINGLE(op))  /* TRUNC.L.S - MIPS III */
-						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), SIZE_QWORD, ROUND_TRUNC);// fstoint <fdreg>,<fsreg>,qword,trunc
+					{
+						UML_FSTOINT(block, F0, FSVALS_FR0, SIZE_QWORD, ROUND_TRUNC);// fstoint f0,<fsreg>,qword,trunc
+					}
 					else                /* TRUNC.L.D - MIPS III */
-						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), SIZE_QWORD, ROUND_TRUNC);// fdtoint <fdreg>,<fsreg>,qword,trunc
-					UML_DSEXT(block, FPR64(FDREG), FPR64(FDREG), SIZE_DWORD);
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov     f0,<fsreg>
+						UML_FDTOINT(block, F0, F0, SIZE_QWORD, ROUND_TRUNC);        // fdtoint  f0,f0,qword,trunc
+					}
+					UML_ICOPYFD(block, I0, F0);                                     // icopyfd  i0,f0
+					generate_set_cop1_reg64_i2d(block, compiler, desc, FDREG, I0);  // dmov     <fdreg>,i0
 					return TRUE;
 
 				case 0x0a:
 					if (IS_SINGLE(op))  /* CEIL.L.S - MIPS III */
-						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), SIZE_QWORD, ROUND_CEIL);// fstoint <fdreg>,<fsreg>,qword,ceil
+					{
+						UML_FSTOINT(block, F0, FSVALS_FR0, SIZE_QWORD, ROUND_CEIL);// fstoint f0,<fsreg>,qword,ceil
+					}
 					else                /* CEIL.L.D - MIPS III */
-						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), SIZE_QWORD, ROUND_CEIL);// fdtoint <fdreg>,<fsreg>,qword,ceil
-					UML_DSEXT(block, FPR64(FDREG), FPR64(FDREG), SIZE_DWORD);
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov     f0,<fsreg>
+						UML_FDTOINT(block, F0, F0, SIZE_QWORD, ROUND_CEIL);         // fdtoint  f0,<fsreg>,qword,ceil
+					}
+					UML_ICOPYFD(block, I0, F0);                                     // icopyfd  i0,f0
+					generate_set_cop1_reg64(block, compiler, desc, FDREG, I0);      // dmov     <fdreg>,f0
 					return TRUE;
 
 				case 0x0b:
 					if (IS_SINGLE(op))  /* FLOOR.L.S - MIPS III */
-						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), SIZE_QWORD, ROUND_FLOOR);// fstoint <fdreg>,<fsreg>,qword,floor
+					{
+						UML_FSTOINT(block, F0, FSVALS_FR0, SIZE_QWORD, ROUND_FLOOR);// fstoint f0,<fsreg>,qword,floor
+					}
 					else                /* FLOOR.L.D - MIPS III */
-						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), SIZE_QWORD, ROUND_FLOOR);// fdtoint <fdreg>,<fsreg>,qword,floor
-					UML_DSEXT(block, FPR64(FDREG), FPR64(FDREG), SIZE_DWORD);
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov     f0,<fsreg>
+						UML_FDTOINT(block, F0, F0, SIZE_QWORD, ROUND_FLOOR);        // fdtoint  f0,<fsreg>,qword,floor
+					}
+					UML_ICOPYFD(block, I0, F0);                                     // icopyfd  i0,f0
+					generate_set_cop1_reg64(block, compiler, desc, FDREG, I0);      // dmov     <fdreg>,f0
 					return TRUE;
 
 				case 0x0c:
 					if (IS_SINGLE(op))  /* ROUND.W.S - MIPS II */
-						UML_FSTOINT(block, FPR32(FDREG), FPR32(FSREG), SIZE_DWORD, ROUND_ROUND);// fstoint <fdreg>,<fsreg>,dword,round
+					{
+						UML_FSTOINT(block, FDVALS_FR0, FSVALS_FR0, SIZE_DWORD, ROUND_ROUND);// fstoint <fdreg>,<fsreg>,dword,round
+					}
 					else                /* ROUND.W.D - MIPS II */
-						UML_FDTOINT(block, FPR32(FDREG), FPR64(FSREG), SIZE_DWORD, ROUND_ROUND);// fdtoint <fdreg>,<fsreg>,dword,round
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);      // dmov    F0,<fsreg>
+						UML_FDTOINT(block, FDVALS_FR0, F0, SIZE_DWORD, ROUND_ROUND);    // fdtoint <fdreg>,F0,dword,round
+					}
 					return TRUE;
 
 				case 0x0d:
 					if (IS_SINGLE(op))  /* TRUNC.W.S - MIPS II */
-						UML_FSTOINT(block, FPR32(FDREG), FPR32(FSREG), SIZE_DWORD, ROUND_TRUNC);// fstoint <fdreg>,<fsreg>,dword,trunc
+					{
+						UML_FSTOINT(block, FDVALS_FR0, FSVALS_FR0, SIZE_DWORD, ROUND_TRUNC);// fstoint <fdreg>,<fsreg>,dword,trunc
+					}
 					else                /* TRUNC.W.D - MIPS II */
-						UML_FDTOINT(block, FPR32(FDREG), FPR64(FSREG), SIZE_DWORD, ROUND_TRUNC);// fdtoint <fdreg>,<fsreg>,dword,trunc
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);      // dmov    F0,<fsreg>
+						UML_FDTOINT(block, FDVALS_FR0, F0, SIZE_DWORD, ROUND_TRUNC);    // fdtoint <fdreg>,F0,dword,trunc
+					}
 					return TRUE;
 
 				case 0x0e:
 					if (IS_SINGLE(op))  /* CEIL.W.S - MIPS II */
-						UML_FSTOINT(block, FPR32(FDREG), FPR32(FSREG), SIZE_DWORD, ROUND_CEIL);// fstoint <fdreg>,<fsreg>,dword,ceil
+					{
+						UML_FSTOINT(block, FDVALS_FR0, FSVALS_FR0, SIZE_DWORD, ROUND_CEIL);// fstoint <fdreg>,<fsreg>,dword,ceil
+					}
 					else                /* CEIL.W.D - MIPS II */
-						UML_FDTOINT(block, FPR32(FDREG), FPR64(FSREG), SIZE_DWORD, ROUND_CEIL);// fdtoint <fdreg>,<fsreg>,dword,ceil
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);      // dmov    F0,<fsreg>
+						UML_FDTOINT(block, FDVALS_FR0, F0, SIZE_DWORD, ROUND_CEIL); // fdtoint <fdreg>,F0,dword,ceil
+					}
 					return TRUE;
 
 				case 0x0f:
 					if (IS_SINGLE(op))  /* FLOOR.W.S - MIPS II */
-						UML_FSTOINT(block, FPR32(FDREG), FPR32(FSREG), SIZE_DWORD, ROUND_FLOOR);// fstoint <fdreg>,<fsreg>,dword,floor
+					{
+						UML_FSTOINT(block, FDVALS_FR0, FSVALS_FR0, SIZE_DWORD, ROUND_FLOOR);// fstoint <fdreg>,<fsreg>,dword,floor
+					}
 					else                /* FLOOR.W.D - MIPS II */
-						UML_FDTOINT(block, FPR32(FDREG), FPR64(FSREG), SIZE_DWORD, ROUND_FLOOR);// fdtoint <fdreg>,<fsreg>,dword,floor
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);      // dmov    F0,<fsreg>
+						UML_FDTOINT(block, FDVALS_FR0, F0, SIZE_DWORD, ROUND_FLOOR);    // fdtoint <fdreg>,F0,dword,floor
+					}
 					return TRUE;
 
 				case 0x11:
-					condition = ((op >> 16) & 1) ? COND_NZ : COND_Z;
+
 					UML_TEST(block, CCR132(31), FCCMASK(op >> 18));         // test    ccr31,fccmask[op]
 					if (IS_SINGLE(op))  /* MOVT/F.S - MIPS IV */
-						UML_FSMOVc(block, condition, FPR32(FDREG), FPR32(FSREG));   // fsmov   <fdreg>,<fsreg>,condition
+					{
+						condition = ((op >> 16) & 1) ? COND_NZ : COND_Z;
+						UML_FSMOVc(block, condition, FDVALS_FR0, FSVALS_FR0);   // fsmov   <fdreg>,<fsreg>,condition
+					}
 					else                /* MOVT/F.D - MIPS IV */
-						UML_FDMOVc(block, condition, FPR64(FDREG), FPR64(FSREG));   // fdmov   <fdreg>,<fsreg>,condition
+					{
+						condition = ((op >> 16) & 1) ? COND_Z : COND_NZ;
+						generate_get_cop1_reg64(block, compiler, desc, FDREG, F0);  // dmov    F0,<fsreg>
+						UML_JMPc(block, condition, skip = compiler->labelnum++);
+
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    F0,<fsreg>
+
+						UML_LABEL(block, skip);
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F0);  // dmov    <fdreg>,F0
+					}
 					return TRUE;
 
 				case 0x12:
-					UML_DCMP(block, R64(RTREG), 0);                         // dcmp    <rtreg>,0
+					UML_DCMP(block, R64(RTREG), 0);                             // dcmp    <rtreg>,0
 					if (IS_SINGLE(op))  /* MOVZ.S - MIPS IV */
-						UML_FSMOVc(block, COND_Z, FPR32(FDREG), FPR32(FSREG));      // fsmov   <fdreg>,<fsreg>,Z
+					{
+						UML_FSMOVc(block, COND_Z, FDVALS_FR0, FSVALS_FR0);      // fsmov   <fdreg>,<fsreg>,Z
+					}
 					else                /* MOVZ.D - MIPS IV */
-						UML_FDMOVc(block, COND_Z, FPR64(FDREG), FPR64(FSREG));      // fdmov   <fdreg>,<fsreg>,Z
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FDREG, F1);  // dmov    f1,<fdreg>
+						UML_FDMOVc(block, COND_Z, F2, F0);                          // fdmov   f2,<fsreg>,Z
+						UML_FDMOVc(block, COND_NZ, F2, F1);                         // fdmov   f2,<fdreg>,NZ
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F2);  // dmov    <fdreg>,f0
+					}
 					return TRUE;
 
 				case 0x13:
-					UML_DCMP(block, R64(RTREG), 0);                         // dcmp    <rtreg>,0
+					UML_DCMP(block, R64(RTREG), 0);                                 // dcmp    <rtreg>,0
 					if (IS_SINGLE(op))  /* MOVN.S - MIPS IV */
-						UML_FSMOVc(block, COND_NZ, FPR32(FDREG), FPR32(FSREG));     // fsmov   <fdreg>,<fsreg>,NZ
+					{
+						UML_FSMOVc(block, COND_NZ, FDVALS_FR0, FSVALS_FR0);         // fsmov   <fdreg>,<fsreg>,NZ
+					}
 					else                /* MOVN.D - MIPS IV */
-						UML_FDMOVc(block, COND_NZ, FPR64(FDREG), FPR64(FSREG));     // fdmov   <fdreg>,<fsreg>,NZ
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FDREG, F1);  // dmov    f1,<fdreg>
+						UML_FDMOVc(block, COND_NZ, F2, F0);                         // fdmov   f2,<fsreg>,NZ
+						UML_FDMOVc(block, COND_Z, F2, F1);                          // fdmov   f2,<fdreg>,Z
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F2);  // dmov    <fdreg>,f2
+					}
 					return TRUE;
 
 				case 0x15:
 					if (IS_SINGLE(op))  /* RECIP.S - MIPS IV */
-						UML_FSRECIP(block, FPR32(FDREG), FPR32(FSREG));             // fsrecip <fdreg>,<fsreg>
+					{
+						UML_FSRECIP(block, FDVALS_FR0, FSVALS_FR0);                 // fsrecip <fdreg>,<fsreg>
+					}
 					else                /* RECIP.D - MIPS IV */
-						UML_FDRECIP(block, FPR64(FDREG), FPR64(FSREG));             // fdrecip <fdreg>,<fsreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						UML_FDRECIP(block, F0, F0);                                 // fdrecip f0,<fsreg>
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F0);  // dmov    <fdreg>,f0
+					}
 					return TRUE;
 
 				case 0x16:
 					if (IS_SINGLE(op))  /* RSQRT.S - MIPS IV */
-						UML_FSRSQRT(block, FPR32(FDREG), FPR32(FSREG));             // fsrsqrt <fdreg>,<fsreg>
+					{
+						UML_FSRSQRT(block, FDVALS_FR0, FSVALS_FR0);                 // fsrsqrt <fdreg>,<fsreg>
+					}
 					else                /* RSQRT.D - MIPS IV */
-						UML_FDRSQRT(block, FPR64(FDREG), FPR64(FSREG));             // fdrsqrt <fdreg>,<fsreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						UML_FDRSQRT(block, F0, F0);                                 // fdrsqrt f0,<fsreg>
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F0);  // dmov    <fdreg>,f0
+					}
 					return TRUE;
 
 				case 0x20:
 					if (IS_INTEGRAL(op))
 					{
 						if (IS_SINGLE(op))  /* CVT.S.W - MIPS I */
-							UML_FSFRINT(block, FPR32(FDREG), FPR32(FSREG), SIZE_DWORD); // fsfrint <fdreg>,<fsreg>,dword
+						{
+							UML_FSFRINT(block, FDVALS_FR0, FSVALS_FR0, SIZE_DWORD); // fsfrint <fdreg>,<fsreg>,dword
+						}
 						else                /* CVT.S.L - MIPS I */
-							UML_FSFRINT(block, FPR32(FDREG), FPR64(FSREG), SIZE_QWORD); // fsfrint <fdreg>,<fsreg>,qword
+						{
+							generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+							UML_FSFRINT(block, FDVALS_FR0, F0, SIZE_QWORD);             // fsfrint <fdreg>,f0,qword
+						}
 					}
 					else                    /* CVT.S.D - MIPS I */
-						UML_FSFRFLT(block, FPR32(FDREG), FPR64(FSREG), SIZE_QWORD);     // fsfrflt <fdreg>,<fsreg>,qword
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						UML_FSFRFLT(block, FDVALS_FR0, F0, SIZE_QWORD);             // fsfrflt <fdreg>,f0,qword
+					}
 					return TRUE;
 
 				case 0x21:
 					if (IS_INTEGRAL(op))
 					{
 						if (IS_SINGLE(op))  /* CVT.D.W - MIPS I */
-							UML_FDFRINT(block, FPR64(FDREG), FPR32(FSREG), SIZE_DWORD); // fdfrint <fdreg>,<fsreg>,dword
+						{
+							UML_FDFRINT(block, F0, FSVALS_FR0, SIZE_DWORD);             // fdfrint f0,<fsreg>,dword
+						}
 						else                /* CVT.D.L - MIPS I */
-							UML_FDFRINT(block, FPR64(FDREG), FPR64(FSREG), SIZE_QWORD); // fdfrint <fdreg>,<fsreg>,qword
+						{
+							generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+							UML_FDFRINT(block, F0, F0, SIZE_QWORD);                     // fdfrint f0,f0,qword
+						}
 					}
 					else                    /* CVT.D.S - MIPS I */
-						UML_FDFRFLT(block, FPR64(FDREG), FPR32(FSREG), SIZE_DWORD);     // fdfrflt <fdreg>,<fsreg>,dword
+					{
+						UML_FDFRFLT(block, F0, FSVALS_FR0, SIZE_DWORD);         // fdfrflt f0,<fsreg>,dword
+					}
+					generate_set_cop1_reg64(block, compiler, desc, FDREG, F0);  // dmov    <fdreg>,f0
 					return TRUE;
 
 				case 0x24:
 					if (IS_SINGLE(op))  /* CVT.W.S - MIPS I */
-						UML_FSTOINT(block, FPR32(FDREG), FPR32(FSREG), SIZE_DWORD, ROUND_DEFAULT);// fstoint <fdreg>,<fsreg>,dword,default
+					{
+						UML_FSTOINT(block, FDVALS_FR0, FSVALS_FR0, SIZE_DWORD, ROUND_DEFAULT);// fstoint <fdreg>,<fsreg>,dword,default
+					}
 					else                /* CVT.W.D - MIPS I */
-						UML_FDTOINT(block, FPR32(FDREG), FPR64(FSREG), SIZE_DWORD, ROUND_DEFAULT);// fdtoint <fdreg>,<fsreg>,dword,default
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						UML_FDTOINT(block, FDVALS_FR0, F0, SIZE_DWORD, ROUND_DEFAULT);// fdtoint <fdreg>,f0,dword,default
+					}
 					return TRUE;
 
 				case 0x25:
 					if (IS_SINGLE(op))  /* CVT.L.S - MIPS I */
-						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), SIZE_QWORD, ROUND_DEFAULT);// fstoint <fdreg>,<fsreg>,qword,default
+					{
+						UML_FSTOINT(block, F0, FSVALS_FR0, SIZE_QWORD, ROUND_DEFAULT);// fstoint f0,<fsreg>,qword,default
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F0);      // dmov    <fdreg>,f0
+					}
 					else                /* CVT.L.D - MIPS I */
-						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), SIZE_QWORD, ROUND_DEFAULT);// fdtoint <fdreg>,<fsreg>,qword,default
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						UML_FDTOINT(block, F0, F0, SIZE_QWORD, ROUND_DEFAULT);      // fdtoint <fdreg>,<fsreg>,qword,default
+						generate_set_cop1_reg64(block, compiler, desc, FDREG, F0);  // dmov    <fdreg>,f0
+					}
 					return TRUE;
 
 				case 0x30:
@@ -2941,9 +3208,15 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 				case 0x31:
 				case 0x39:
 					if (IS_SINGLE(op))  /* C.UN.S - MIPS I */
-						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));               // fscmp   <fsreg>,<ftreg>
+					{
+						UML_FSCMP(block, FSVALS_FR0, FTVALS_FR0);               // fscmp   <fsreg>,<ftreg>
+					}
 					else                /* C.UN.D - MIPS I */
-						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));               // fdcmp   <fsreg>,<ftreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);  // dmov    f1,<ftreg>
+						UML_FDCMP(block, F0, F1);                                   // fdcmp   f0,f1
+					}
 					UML_SETc(block, COND_U, I0);                                    // set     i0,u
 					UML_ROLINS(block, CCR132(31), I0, FCCSHIFT(op >> 8), FCCMASK(op >> 8));
 																					// rolins  ccr31,i0,fccshift,fcc
@@ -2952,9 +3225,15 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 				case 0x32:
 				case 0x3a:
 					if (IS_SINGLE(op))  /* C.EQ.S - MIPS I */
-						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));               // fscmp   <fsreg>,<ftreg>
+					{
+						UML_FSCMP(block, FSVALS_FR0, FTVALS_FR0);               // fscmp   <fsreg>,<ftreg>
+					}
 					else                /* C.EQ.D - MIPS I */
-						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));               // fdcmp   <fsreg>,<ftreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);  // dmov    f1,<ftreg>
+						UML_FDCMP(block, F0, F1);                                   // fdcmp   f0,f1
+					}
 					UML_SETc(block, COND_E, I0);                                    // set     i0,e
 					UML_SETc(block, COND_NU, I1);                               // set     i1,nu
 					UML_AND(block, I0, I0, I1);                     // and     i0,i0,i1
@@ -2965,9 +3244,15 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 				case 0x33:
 				case 0x3b:
 					if (IS_SINGLE(op))  /* C.UEQ.S - MIPS I */
-						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));               // fscmp   <fsreg>,<ftreg>
+					{
+						UML_FSCMP(block, FSVALS_FR0, FTVALS_FR0);               // fscmp   <fsreg>,<ftreg>
+					}
 					else                /* C.UEQ.D - MIPS I */
-						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));               // fdcmp   <fsreg>,<ftreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);  // dmov    f1,<ftreg>
+						UML_FDCMP(block, F0, F1);                                   // fdcmp   f0,f1
+					}
 					UML_SETc(block, COND_U, I0);                                    // set     i0,u
 					UML_SETc(block, COND_E, I1);                                    // set     i1,e
 					UML_OR(block, I0, I0, I1);                      // or      i0,i0,i1
@@ -2978,9 +3263,15 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 				case 0x34:
 				case 0x3c:
 					if (IS_SINGLE(op))  /* C.OLT.S - MIPS I */
-						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));               // fscmp   <fsreg>,<ftreg>
+					{
+						UML_FSCMP(block, FSVALS_FR0, FTVALS_FR0);               // fscmp   <fsreg>,<ftreg>
+					}
 					else                /* C.OLT.D - MIPS I */
-						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));               // fdcmp   <fsreg>,<ftreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);  // dmov    f1,<ftreg>
+						UML_FDCMP(block, F0, F1);                                   // fdcmp   f0,f1
+					}
 					UML_SETc(block, COND_B, I0);                                    // set     i0,b
 					UML_SETc(block, COND_NU, I1);                               // set     i1,nu
 					UML_AND(block, I0, I0, I1);                     // and     i0,i0,i1
@@ -2991,9 +3282,15 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 				case 0x35:
 				case 0x3d:
 					if (IS_SINGLE(op))  /* C.ULT.S - MIPS I */
-						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));               // fscmp   <fsreg>,<ftreg>
+					{
+						UML_FSCMP(block, FSVALS_FR0, FTVALS_FR0);               // fscmp   <fsreg>,<ftreg>
+					}
 					else                /* C.ULT.D - MIPS I */
-						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));               // fdcmp   <fsreg>,<ftreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);  // dmov    f1,<ftreg>
+						UML_FDCMP(block, F0, F1);                                   // fdcmp   f0,f1
+					}
 					UML_SETc(block, COND_U, I0);                                    // set     i0,u
 					UML_SETc(block, COND_B, I1);                                    // set     i1,b
 					UML_OR(block, I0, I0, I1);                      // or      i0,i0,i1
@@ -3004,9 +3301,15 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 				case 0x36:
 				case 0x3e:
 					if (IS_SINGLE(op))  /* C.OLE.S - MIPS I */
-						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));               // fscmp   <fsreg>,<ftreg>
+					{
+						UML_FSCMP(block, FSVALS_FR0, FTVALS_FR0);               // fscmp   <fsreg>,<ftreg>
+					}
 					else                /* C.OLE.D - MIPS I */
-						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));               // fdcmp   <fsreg>,<ftreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);  // dmov    f1,<ftreg>
+						UML_FDCMP(block, F0, F1);                                   // fdcmp   f0,f1
+					}
 					UML_SETc(block, COND_BE, I0);                               // set     i0,be
 					UML_SETc(block, COND_NU, I1);                               // set     i1,nu
 					UML_AND(block, I0, I0, I1);                     // and     i0,i0,i1
@@ -3017,9 +3320,15 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 				case 0x37:
 				case 0x3f:
 					if (IS_SINGLE(op))  /* C.ULE.S - MIPS I */
-						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));               // fscmp   <fsreg>,<ftreg>
+					{
+						UML_FSCMP(block, FSVALS_FR0, FTVALS_FR0);               // fscmp   <fsreg>,<ftreg>
+					}
 					else                /* C.ULE.D - MIPS I */
-						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));               // fdcmp   <fsreg>,<ftreg>
+					{
+						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    f0,<fsreg>
+						generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);  // dmov    f1,<ftreg>
+						UML_FDCMP(block, F0, F1);                                   // fdcmp   f0,f1
+					}
 					UML_SETc(block, COND_U, I0);                                    // set     i0,u
 					UML_SETc(block, COND_BE, I1);                               // set     i1,be
 					UML_OR(block, I0, I0, I1);                      // or      i0,i0,i1
@@ -3032,17 +3341,393 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 	return FALSE;
 }
 
+/*-------------------------------------------------------
+    generate_cop1_fr1 - compile COP1 opcodes in FR1 mode
+---------------------------------------------------------*/
 
+int mips3_device::generate_cop1_fr1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	UINT32 op = desc->opptr.l[0];
+	code_label skip;
+	condition_t condition;
+
+	check_cop1_access(block);
+
+	switch (RSREG)
+	{
+		case 0x00:  /* MFC1 - MIPS I */
+			if (RTREG != 0)
+			{
+				UML_DSEXT(block, R64(RTREG), FPR32_FR0(RDREG), SIZE_DWORD);     // dsext   <rtreg>,fpr[rdreg],dword
+			}
+			return TRUE;
+
+		case 0x01:  /* DMFC1 - MIPS III */
+			if (RTREG != 0)
+			{
+				generate_get_cop1_reg64_d2i(block, compiler, desc, RDREG, I0);
+				UML_DMOV(block, R64(RTREG), I0);
+			}
+			return TRUE;
+
+		case 0x02:  /* CFC1 - MIPS I */
+			if (RTREG != 0)
+				UML_DSEXT(block, R64(RTREG), CCR132(RDREG), SIZE_DWORD);        // dsext   <rtreg>,ccr132[rdreg],dword
+			return TRUE;
+
+		case 0x04:  /* MTC1 - MIPS I */
+			UML_MOV(block, FPR32_FR0(RDREG), R32(RTREG));                       // mov     fpr[rdreg],<rtreg>
+			return TRUE;
+
+		case 0x05:  /* DMTC1 - MIPS III */
+			UML_DMOV(block, I0, R64(RTREG));
+			generate_set_cop1_reg64_i2d(block, compiler, desc, RDREG, I0);
+			return TRUE;
+
+		case 0x06:  /* CTC1 - MIPS I */
+			if (RDREG != 31)
+			{
+				UML_DSEXT(block, CCR164(RDREG), R32(RTREG), SIZE_DWORD);        // dsext   ccr1[rdreg],<rtreg>,dword
+			}
+			else
+			{
+				UML_XOR(block, I0, CCR132(31), R32(RTREG));                     // xor     i0,ccr1[31],<rtreg>
+				UML_DSEXT(block, CCR164(31), R32(RTREG), SIZE_DWORD);           // dsext   ccr1[31],<rtreg>,dword
+				UML_TEST(block, I0, 3);                                         // test    i0,3
+				UML_JMPc(block, COND_Z, skip = compiler->labelnum++);           // jmp     skip,Z
+				UML_AND(block, I0, CCR132(31), 3);                              // and     i0,ccr1[31],3
+				UML_LOAD(block, I0, &m_fpmode[0], I0, SIZE_BYTE, SCALE_x1);     // load   i0,fpmode,i0,byte
+				UML_SETFMOD(block, I0);                                         // setfmod i0
+				UML_LABEL(block, skip);                                         // skip:
+			}
+			return TRUE;
+
+		case 0x08:  /* BC */
+			switch ((op >> 16) & 3)
+			{
+				case 0x00:  /* BCzF - MIPS I */
+				case 0x02:  /* BCzFL - MIPS II */
+					UML_TEST(block, CCR132(31), FCCMASK(op >> 18));             // test    ccr1[31],fccmask[which]
+					UML_JMPc(block, COND_NZ, skip = compiler->labelnum++);      // jmp     skip,NZ
+					generate_delay_slot_and_branch(block, compiler, desc, 0);   // <next instruction + hashjmp>
+					UML_LABEL(block, skip);                                     // skip:
+					return TRUE;
+
+				case 0x01:  /* BCzT - MIPS I */
+				case 0x03:  /* BCzTL - MIPS II */
+					UML_TEST(block, CCR132(31), FCCMASK(op >> 18));             // test    ccr1[31],fccmask[which]
+					UML_JMPc(block, COND_Z, skip = compiler->labelnum++);       // jmp     skip,Z
+					generate_delay_slot_and_branch(block, compiler, desc, 0);   // <next instruction + hashjmp>
+					UML_LABEL(block, skip);                                     // skip:
+					return TRUE;
+			}
+			break;
+
+		default:
+			switch (op & 0x3f)
+			{
+				case 0x00:
+					if (IS_SINGLE(op))  /* ADD.S - MIPS I */
+						UML_FSADD(block, FDVALS_FR1, FSVALS_FR1, FTVALS_FR1);       // fsadd   <fdreg>,<fsreg>,<ftreg>
+					else                /* ADD.D - MIPS I */
+						UML_FDADD(block, FDVALD_FR1, FSVALD_FR1, FTVALD_FR1);       // fdadd   <fdreg>,<fsreg>,<ftreg>
+					return TRUE;
+
+				case 0x01:
+					if (IS_SINGLE(op))  /* SUB.S - MIPS I */
+						UML_FSSUB(block, FDVALS_FR1, FSVALS_FR1, FTVALS_FR1);       // fssub   <fdreg>,<fsreg>,<ftreg>
+					else                /* SUB.D - MIPS I */
+						UML_FDSUB(block, FDVALD_FR1, FSVALD_FR1, FTVALD_FR1);       // fdsub   <fdreg>,<fsreg>,<ftreg>
+					return TRUE;
+
+				case 0x02:
+					if (IS_SINGLE(op))  /* MUL.S - MIPS I */
+						UML_FSMUL(block, FDVALS_FR1, FSVALS_FR1, FTVALS_FR1);       // fsmul   <fdreg>,<fsreg>,<ftreg>
+					else                /* MUL.D - MIPS I */
+						UML_FDMUL(block, FDVALD_FR1, FSVALD_FR1, FTVALD_FR1);       // fdmul   <fdreg>,<fsreg>,<ftreg>
+					return TRUE;
+
+				case 0x03:
+					if (IS_SINGLE(op))  /* DIV.S - MIPS I */
+						UML_FSDIV(block, FDVALS_FR1, FSVALS_FR1, FTVALS_FR1);       // fsdiv   <fdreg>,<fsreg>,<ftreg>
+					else                /* DIV.D - MIPS I */
+						UML_FDDIV(block, FDVALD_FR1, FSVALD_FR1, FTVALD_FR1);       // fddiv   <fdreg>,<fsreg>,<ftreg>
+					return TRUE;
+
+				case 0x04:
+					if (IS_SINGLE(op))  /* SQRT.S - MIPS II */
+						UML_FSSQRT(block, FDVALS_FR1, FSVALS_FR1);  // fssqrt  <fdreg>,<fsreg>
+					else                /* SQRT.D - MIPS II */
+						UML_FDSQRT(block, FDVALD_FR1, FSVALD_FR1);  // fdsqrt   <fdreg>,<fsreg>
+					return TRUE;
+
+				case 0x05:
+					if (IS_SINGLE(op))  /* ABS.S - MIPS I */
+						UML_FSABS(block, FDVALS_FR1, FSVALS_FR1);   // fsabs    <fdreg>,<fsreg>
+					else                /* ABS.D - MIPS I */
+						UML_FDABS(block, FDVALD_FR1, FSVALD_FR1);   // fdabs    <fdreg>,<fsreg>
+					return TRUE;
+
+				case 0x06:
+					if (IS_SINGLE(op))  /* MOV.S - MIPS I */
+						UML_FSMOV(block, FDVALS_FR1, FSVALS_FR1);   // fsmov    <fdreg>,<fsreg>
+					else                /* MOV.D - MIPS I */
+						UML_FDMOV(block, FDVALD_FR1, FSVALD_FR1);   // fdmov    <fdreg>,<fsreg>
+					return TRUE;
+
+				case 0x07:
+					if (IS_SINGLE(op))  /* NEG.S - MIPS I */
+					{
+						UML_FSNEG(block, FDVALS_FR1, FSVALS_FR1);           // fsneg   <fdreg>,<fsreg>
+						UML_CMP(block, FSVALS_FR1, 0);                      // cmp     <fsreg>,0.0
+						UML_MOVc(block, COND_E, FDVALS_FR1, 0x80000000);    // mov     <fdreg>,-0.0,e
+					}
+					else                /* NEG.D - MIPS I */
+					{
+						UML_FDNEG(block, FDVALD_FR1, FSVALD_FR1);           // fdneg    <fdreg>,<fsreg>
+						UML_DCMP(block, FSVALD_FR1, 0);                     // dcmp     <fsreg>,0.0
+						UML_DMOVc(block, COND_E, FDVALD_FR1, 0x8000000000000000L);// mov        <fdreg>,-0.0,e
+					}
+					return TRUE;
+
+				case 0x08:
+					if (IS_SINGLE(op))  /* ROUND.L.S - MIPS III */
+						UML_FSTOINT(block, FDVALD_FR1, FSVALS_FR1, SIZE_QWORD, ROUND_ROUND);    // fstoint f0,<fsreg>,qword,round
+					else                /* ROUND.L.D - MIPS III */
+						UML_FDTOINT(block, FDVALD_FR1, FSVALD_FR1, SIZE_QWORD, ROUND_ROUND);    // fdtoint f0,f0,qword,round
+					return TRUE;
+
+				case 0x09:
+					if (IS_SINGLE(op))  /* TRUNC.L.S - MIPS III */
+						UML_FSTOINT(block, FDVALD_FR1, FSVALS_FR1, SIZE_QWORD, ROUND_TRUNC);    // fstoint f0,<fsreg>,qword,trunc
+					else                /* TRUNC.L.D - MIPS III */
+						UML_FDTOINT(block, FDVALD_FR1, FSVALD_FR1, SIZE_QWORD, ROUND_TRUNC);    // fdtoint f0,f0,qword,trunc
+					return TRUE;
+
+				case 0x0a:
+					if (IS_SINGLE(op))  /* CEIL.L.S - MIPS III */
+						UML_FSTOINT(block, FDVALD_FR1, FSVALS_FR1, SIZE_QWORD, ROUND_CEIL);     // fstoint f0,<fsreg>,qword,ceil
+					else                /* CEIL.L.D - MIPS III */
+						UML_FDTOINT(block, FDVALD_FR1, FSVALD_FR1, SIZE_QWORD, ROUND_CEIL);     // fdtoint f0,<fsreg>,qword,ceil
+					return TRUE;
+
+				case 0x0b:
+					if (IS_SINGLE(op))  /* FLOOR.L.S - MIPS III */
+						UML_FSTOINT(block, FDVALD_FR1, FSVALS_FR1, SIZE_QWORD, ROUND_FLOOR);    // fstoint f0,<fsreg>,qword,floor
+					else                /* FLOOR.L.D - MIPS III */
+						UML_FDTOINT(block, FDVALD_FR1, FSVALD_FR1, SIZE_QWORD, ROUND_FLOOR);    // fdtoint f0,<fsreg>,qword,floor
+					return TRUE;
+
+				case 0x0c:
+					if (IS_SINGLE(op))  /* ROUND.W.S - MIPS II */
+						UML_FSTOINT(block, FDVALS_FR1, FSVALS_FR1, SIZE_DWORD, ROUND_ROUND);    // fstoint <fdreg>,<fsreg>,dword,round
+					else                /* ROUND.W.D - MIPS II */
+						UML_FDTOINT(block, FDVALS_FR1, FSVALD_FR1, SIZE_DWORD, ROUND_ROUND);    // fdtoint <fdreg>,F0,dword,round
+					return TRUE;
+
+				case 0x0d:
+					if (IS_SINGLE(op))  /* TRUNC.W.S - MIPS II */
+						UML_FSTOINT(block, FDVALS_FR1, FSVALS_FR1, SIZE_DWORD, ROUND_TRUNC);// fstoint <fdreg>,<fsreg>,dword,trunc
+					else                /* TRUNC.W.D - MIPS II */
+						UML_FDTOINT(block, FDVALS_FR1, FSVALD_FR1, SIZE_DWORD, ROUND_TRUNC);    // fdtoint <fdreg>,F0,dword,trunc
+					return TRUE;
+
+				case 0x0e:
+					if (IS_SINGLE(op))  /* CEIL.W.S - MIPS II */
+						UML_FSTOINT(block, FDVALS_FR1, FSVALS_FR1, SIZE_DWORD, ROUND_CEIL);// fstoint <fdreg>,<fsreg>,dword,ceil
+					else                /* CEIL.W.D - MIPS II */
+						UML_FDTOINT(block, FDVALS_FR1, FSVALD_FR1, SIZE_DWORD, ROUND_CEIL); // fdtoint <fdreg>,F0,dword,ceil
+					return TRUE;
+
+				case 0x0f:
+					if (IS_SINGLE(op))  /* FLOOR.W.S - MIPS II */
+						UML_FSTOINT(block, FDVALS_FR1, FSVALS_FR1, SIZE_DWORD, ROUND_FLOOR);// fstoint <fdreg>,<fsreg>,dword,floor
+					else                /* FLOOR.W.D - MIPS II */
+						UML_FDTOINT(block, FDVALS_FR1, FSVALD_FR1, SIZE_DWORD, ROUND_FLOOR);    // fdtoint <fdreg>,F0,dword,floor
+					return TRUE;
+
+				case 0x11:
+					UML_TEST(block, CCR132(31), FCCMASK(op >> 18));         // test    ccr31,fccmask[op]
+					condition = ((op >> 16) & 1) ? COND_NZ : COND_Z;
+					if (IS_SINGLE(op))  /* MOVT/F.S - MIPS IV */
+						UML_FSMOVc(block, condition, FDVALS_FR1, FSVALS_FR1);   // fsmov   <fdreg>,<fsreg>,condition
+					else                /* MOVT/F.D - MIPS IV */
+						UML_FDMOVc(block, condition, FDVALD_FR1, FSVALD_FR1);   // fdmov   <fdreg>,<fsreg>,condition
+					return TRUE;
+
+				case 0x12:
+					UML_DCMP(block, R64(RTREG), 0);                             // dcmp     <rtreg>,0
+					if (IS_SINGLE(op))  /* MOVZ.S - MIPS IV */
+						UML_FSMOVc(block, COND_Z, FDVALS_FR1, FSVALS_FR1);      // fsmov    <fdreg>,<fsreg>,Z
+					else                /* MOVZ.D - MIPS IV */
+						UML_FDMOVc(block, COND_Z, FDVALD_FR1, FSVALD_FR1);      // fdmov    <fdreg>,<fsreg>,Z
+					return TRUE;
+
+				case 0x13:
+					UML_DCMP(block, R64(RTREG), 0);                             // dcmp     <rtreg>,0
+					if (IS_SINGLE(op))  /* MOVN.S - MIPS IV */
+						UML_FSMOVc(block, COND_NZ, FDVALS_FR1, FSVALS_FR1);     // fsmov    <fdreg>,<fsreg>,NZ
+					else                /* MOVN.D - MIPS IV */
+						UML_FDMOVc(block, COND_NZ, FDVALD_FR1, FSVALD_FR1);     // fdmov    <fdreg>,<fsreg>,NZ
+					return TRUE;
+
+				case 0x15:
+					if (IS_SINGLE(op))  /* RECIP.S - MIPS IV */
+						UML_FSRECIP(block, FDVALS_FR1, FSVALS_FR1);             // fsrecip  <fdreg>,<fsreg>
+					else                /* RECIP.D - MIPS IV */
+						UML_FDRECIP(block, FDVALD_FR1, FSVALD_FR1);             // fdrecip  <fdreg>,<fsreg>
+					return TRUE;
+
+				case 0x16:
+					if (IS_SINGLE(op))  /* RSQRT.S - MIPS IV */
+						UML_FSRSQRT(block, FDVALS_FR1, FSVALS_FR1);             // fsrsqrt  <fdreg>,<fsreg>
+					else                /* RSQRT.D - MIPS IV */
+						UML_FDRSQRT(block, FDVALD_FR1, FSVALD_FR1);             // fdrsqrt  <fdreg>,<fsreg>
+					return TRUE;
+
+				case 0x20:
+					if (IS_INTEGRAL(op))
+					{
+						if (IS_SINGLE(op))  /* CVT.S.W - MIPS I */
+							UML_FSFRINT(block, FDVALS_FR1, FSVALS_FR1, SIZE_DWORD); // fsfrint  <fdreg>,<fsreg>,dword
+						else                /* CVT.S.L - MIPS I */
+							UML_FSFRINT(block, FDVALS_FR1, FSVALD_FR1, SIZE_QWORD); // fsfrint  <fdreg>,<fsreg>,qword
+					}
+					else                    /* CVT.S.D - MIPS I */
+					{
+						UML_FSFRFLT(block, FDVALS_FR1, FSVALD_FR1, SIZE_QWORD);     // fsfrflt  <fdreg>,f0,qword
+					}
+					return TRUE;
+
+				case 0x21:
+					if (IS_INTEGRAL(op))
+					{
+						if (IS_SINGLE(op))  /* CVT.D.W - MIPS I */
+							UML_FDFRINT(block, FDVALD_FR1, FSVALS_FR1, SIZE_DWORD); // fdfrint  <fdreg>,<fsreg>,dword
+						else                /* CVT.D.L - MIPS I */
+							UML_FDFRINT(block, FDVALD_FR1, FSVALD_FR1, SIZE_QWORD); // fdfrint  <fdreg>,<fsreg>,qword
+					}
+					else                    /* CVT.D.S - MIPS I */
+					{
+						UML_FDFRFLT(block, FDVALD_FR1, FSVALS_FR1, SIZE_DWORD);     // fdfrflt <fdreg>,<fsreg>,dword
+					}
+					return TRUE;
+
+				case 0x24:
+					if (IS_SINGLE(op))  /* CVT.W.S - MIPS I */
+						UML_FSTOINT(block, FDVALS_FR1, FSVALS_FR1, SIZE_DWORD, ROUND_DEFAULT);  // fstoint  <fdreg>,<fsreg>,dword,default
+					else                /* CVT.W.D - MIPS I */
+						UML_FDTOINT(block, FDVALS_FR1, FSVALD_FR1, SIZE_DWORD, ROUND_DEFAULT);  // fdtoint  <fdreg>,<fsreg>,dword,default
+					return TRUE;
+
+				case 0x25:
+					if (IS_SINGLE(op))  /* CVT.L.S - MIPS I */
+						UML_FSTOINT(block, FDVALD_FR1, FSVALS_FR1, SIZE_QWORD, ROUND_DEFAULT);  // fstoint  <fdreg>,<fsreg>,qword,default
+					else                /* CVT.L.D - MIPS I */
+						UML_FDTOINT(block, FDVALD_FR1, FSVALD_FR1, SIZE_QWORD, ROUND_DEFAULT);  // fdtoint  <fdreg>,<fsreg>,qword,default
+					return TRUE;
+
+				case 0x30:
+				case 0x38:              /* C.F.S/D - MIPS I */
+					UML_AND(block, CCR132(31), CCR132(31), ~FCCMASK(op >> 8));  // and     ccr31,ccr31,~fccmask[op]
+					return TRUE;
+
+				case 0x31:
+				case 0x39:
+					if (IS_SINGLE(op))  /* C.UN.S - MIPS I */
+						UML_FSCMP(block, FSVALS_FR1, FTVALS_FR1);   // fscmp   <fsreg>,<ftreg>
+					else                /* C.UN.D - MIPS I */
+						UML_FDCMP(block, FSVALD_FR1, FTVALD_FR1);   // fdcmp   <fsreg>,<ftreg>
+					UML_SETc(block, COND_U, I0);                    // set     i0,u
+					UML_ROLINS(block, CCR132(31), I0, FCCSHIFT(op >> 8), FCCMASK(op >> 8)); // rolins  ccr31,i0,fccshift,fcc
+					return TRUE;
+
+				case 0x32:
+				case 0x3a:
+					if (IS_SINGLE(op))  /* C.EQ.S - MIPS I */
+						UML_FSCMP(block, FSVALS_FR1, FTVALS_FR1);   // fscmp   <fsreg>,<ftreg>
+					else                /* C.EQ.D - MIPS I */
+						UML_FDCMP(block, FSVALD_FR1, FTVALD_FR1);   // fdcmp   <fsreg>,<ftreg>
+					UML_SETc(block, COND_E, I0);                    // set     i0,e
+					UML_SETc(block, COND_NU, I1);                   // set     i1,nu
+					UML_AND(block, I0, I0, I1);                     // and     i0,i0,i1
+					UML_ROLINS(block, CCR132(31), I0, FCCSHIFT(op >> 8), FCCMASK(op >> 8)); // rolins  ccr31,i0,fccshift,fcc
+					return TRUE;
+
+				case 0x33:
+				case 0x3b:
+					if (IS_SINGLE(op))  /* C.UEQ.S - MIPS I */
+						UML_FSCMP(block, FSVALS_FR1, FTVALS_FR1);   // fscmp   <fsreg>,<ftreg>
+					else                /* C.UEQ.D - MIPS I */
+						UML_FDCMP(block, FSVALD_FR1, FTVALD_FR1);   // fdcmp   f0,f1
+					UML_SETc(block, COND_U, I0);                    // set      i0,u
+					UML_SETc(block, COND_E, I1);                    // set      i1,e
+					UML_OR(block, I0, I0, I1);                      // or       i0,i0,i1
+					UML_ROLINS(block, CCR132(31), I0, FCCSHIFT(op >> 8), FCCMASK(op >> 8)); // rolins  ccr31,i0,fccshift,fcc
+					return TRUE;
+
+				case 0x34:
+				case 0x3c:
+					if (IS_SINGLE(op))  /* C.OLT.S - MIPS I */
+						UML_FSCMP(block, FSVALS_FR1, FTVALS_FR1);   // fscmp   <fsreg>,<ftreg>
+					else                /* C.OLT.D - MIPS I */
+						UML_FDCMP(block, FSVALD_FR1, FTVALD_FR1);   // fdcmp   f0,f1
+					UML_SETc(block, COND_B, I0);                    // set     i0,b
+					UML_SETc(block, COND_NU, I1);                   // set     i1,nu
+					UML_AND(block, I0, I0, I1);                     // and     i0,i0,i1
+					UML_ROLINS(block, CCR132(31), I0, FCCSHIFT(op >> 8), FCCMASK(op >> 8)); // rolins  ccr31,i0,fccshift,fcc
+					return TRUE;
+
+				case 0x35:
+				case 0x3d:
+					if (IS_SINGLE(op))  /* C.ULT.S - MIPS I */
+						UML_FSCMP(block, FSVALS_FR1, FTVALS_FR1);   // fscmp   <fsreg>,<ftreg>
+					else                /* C.ULT.D - MIPS I */
+						UML_FDCMP(block, FSVALD_FR1, FTVALD_FR1);   // fdcmp   f0,f1
+					UML_SETc(block, COND_U, I0);                    // set     i0,u
+					UML_SETc(block, COND_B, I1);                    // set     i1,b
+					UML_OR(block, I0, I0, I1);                      // or      i0,i0,i1
+					UML_ROLINS(block, CCR132(31), I0, FCCSHIFT(op >> 8), FCCMASK(op >> 8)); // rolins  ccr31,i0,fccshift,fcc
+					return TRUE;
+
+				case 0x36:
+				case 0x3e:
+					if (IS_SINGLE(op))  /* C.OLE.S - MIPS I */
+						UML_FSCMP(block, FSVALS_FR1, FTVALS_FR1);   // fscmp   <fsreg>,<ftreg>
+					else                /* C.OLE.D - MIPS I */
+						UML_FDCMP(block, FSVALD_FR1, FTVALD_FR1);   // fdcmp   f0,f1
+					UML_SETc(block, COND_BE, I0);                   // set     i0,be
+					UML_SETc(block, COND_NU, I1);                   // set     i1,nu
+					UML_AND(block, I0, I0, I1);                     // and     i0,i0,i1
+					UML_ROLINS(block, CCR132(31), I0, FCCSHIFT(op >> 8), FCCMASK(op >> 8)); // rolins  ccr31,i0,fccshift,fcc
+					return TRUE;
+
+				case 0x37:
+				case 0x3f:
+					if (IS_SINGLE(op))  /* C.ULE.S - MIPS I */
+						UML_FSCMP(block, FSVALS_FR1, FTVALS_FR1);   // fscmp   <fsreg>,<ftreg>
+					else                /* C.ULE.D - MIPS I */
+						UML_FDCMP(block, FSVALD_FR1, FTVALD_FR1);   // fdcmp   f0,f1
+					UML_SETc(block, COND_U, I0);                    // set     i0,u
+					UML_SETc(block, COND_BE, I1);                   // set     i1,be
+					UML_OR(block, I0, I0, I1);                      // or      i0,i0,i1
+					UML_ROLINS(block, CCR132(31), I0, FCCSHIFT(op >> 8), FCCMASK(op >> 8)); // rolins  ccr31,i0,fccshift,fcc
+					return TRUE;
+			}
+			break;
+	}
+	return FALSE;
+}
 
 /***************************************************************************
     COP1X RECOMPILATION
 ***************************************************************************/
 
-/*-------------------------------------------------
-    generate_cop1x - compile COP1X opcodes
--------------------------------------------------*/
+/*----------------------------------------------------------
+    generate_cop1x_fr0 - compile COP1X opcodes in FR0 mode
+----------------------------------------------------------*/
 
-int mips3_device::generate_cop1x(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+int mips3_device::generate_cop1x_fr0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
 	UINT32 op = desc->opptr.l[0];
@@ -3052,32 +3737,32 @@ int mips3_device::generate_cop1x(drcuml_block *block, compiler_state *compiler, 
 	switch (op & 0x3f)
 	{
 		case 0x00:      /* LWXC1 - MIPS IV */
-			UML_ADD(block, I0, R32(RSREG), R32(RTREG));                     // add     i0,<rsreg>,<rtreg>
-			UML_CALLH(block, *m_read32[m_core->mode >> 1]); // callh   read32
-			UML_MOV(block, FPR32(FDREG), I0);                                   // mov     <cpr1_fd>,i0
+			UML_ADD(block, I0, R32(RSREG), R32(RTREG));         // add     i0,<rsreg>,<rtreg>
+			UML_CALLH(block, *m_read32[m_core->mode >> 1]);     // callh   read32
+			UML_MOV(block, FDVALS_FR0, I0);                     // mov     <cpr1_fd>,i0
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x01:      /* LDXC1 - MIPS IV */
-			UML_ADD(block, I0, R32(RSREG), R32(RTREG));                     // add     i0,<rsreg>,<rtreg>
-			UML_CALLH(block, *m_read64[m_core->mode >> 1]); // callh   read64
-			UML_DMOV(block, FPR64(FDREG), I0);                                  // dmov    <cpr1_fd>,i0
+			UML_ADD(block, I0, R32(RSREG), R32(RTREG));         // add     i0,<rsreg>,<rtreg>
+			UML_CALLH(block, *m_read64[m_core->mode >> 1]);     // callh   read64
+			generate_set_cop1_reg64_i2d(block, compiler, desc, RTREG, I0);
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x08:      /* SWXC1 - MIPS IV */
-			UML_ADD(block, I0, R32(RSREG), R32(RTREG));                     // add     i0,<rsreg>,<rtreg>
-			UML_MOV(block, I1, FPR32(FSREG));                                   // mov     i1,<cpr1_fs>
+			UML_ADD(block, I0, R32(RSREG), R32(RTREG));         // add     i0,<rsreg>,<rtreg>
+			UML_MOV(block, I1, FSVALS_FR0);                     // mov     i1,<cpr1_fs>
 			UML_CALLH(block, *m_write32[m_core->mode >> 1]);    // callh   write32
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x09:      /* SDXC1 - MIPS IV */
-			UML_ADD(block, I0, R32(RSREG), R32(RTREG));                     // add     i0,<rsreg>,<rtreg>
-			UML_DMOV(block, I1, FPR64(FSREG));                                  // dmov    i1,<cpr1_fs>
+			generate_get_cop1_reg64_d2i(block, compiler, desc, FSREG, I1);
+			UML_ADD(block, I0, R32(RSREG), R32(RTREG));         // add     i0,<rsreg>,<rtreg>
 			UML_CALLH(block, *m_write64[m_core->mode >> 1]);    // callh   write64
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
@@ -3087,45 +3772,61 @@ int mips3_device::generate_cop1x(drcuml_block *block, compiler_state *compiler, 
 			return TRUE;
 
 		case 0x20:      /* MADD.S - MIPS IV */
-			UML_FSMUL(block, F0, FPR32(FSREG), FPR32(FTREG));                   // fsmul   f0,<fsreg>,<ftreg>
-			UML_FSADD(block, FPR32(FDREG), F0, FPR32(FRREG));                   // fsadd   <fdreg>,f0,<frreg>
+			UML_FSMUL(block, F0, FSVALS_FR0, FTVALS_FR0);               // fsmul   f0,<fsreg>,<ftreg>
+			UML_FSADD(block, FDVALS_FR0, F0, FRVALS_FR0);               // fsadd   <fdreg>,f0,<frreg>
 			return TRUE;
 
 		case 0x21:      /* MADD.D - MIPS IV */
-			UML_FDMUL(block, F0, FPR64(FSREG), FPR64(FTREG));                   // fdmul   f0,<fsreg>,<ftreg>
-			UML_FDADD(block, FPR64(FDREG), F0, FPR64(FRREG));                   // fdadd   <fdreg>,f0,<frreg>
+			generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);
+			generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);
+			generate_get_cop1_reg64(block, compiler, desc, FRREG, F2);
+			UML_FDMUL(block, F3, F0, F1);                               // fdmul   f3,f0,f1
+			UML_FDADD(block, F3, F3, F2);                               // fdadd   f3,f3,f2
+			generate_set_cop1_reg64(block, compiler, desc, FDREG, F3);  // dmov    <fdreg>,f3
 			return TRUE;
 
 		case 0x28:      /* MSUB.S - MIPS IV */
-			UML_FSMUL(block, F0, FPR32(FSREG), FPR32(FTREG));                   // fsmul   f0,<fsreg>,<ftreg>
-			UML_FSSUB(block, FPR32(FDREG), F0, FPR32(FRREG));                   // fssub   <fdreg>,f0,<frreg>
+			UML_FSMUL(block, F0, FSVALS_FR0, FTVALS_FR0);               // fsmul   f0,<fsreg>,<ftreg>
+			UML_FSSUB(block, FDVALS_FR0, F0, FRVALS_FR0);               // fssub   <fdreg>,f0,<frreg>
 			return TRUE;
 
 		case 0x29:      /* MSUB.D - MIPS IV */
-			UML_FDMUL(block, F0, FPR64(FSREG), FPR64(FTREG));                   // fdmul   f0,<fsreg>,<ftreg>
-			UML_FDSUB(block, FPR64(FDREG), F0, FPR64(FRREG));                   // fdsub   <fdreg>,f0,<frreg>
+			generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);
+			generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);
+			generate_get_cop1_reg64(block, compiler, desc, FRREG, F2);
+			UML_FDMUL(block, F3, F0, F1);                               // fdmul   f3,f0,f1
+			UML_FDSUB(block, F3, F3, F2);                               // fdadd   f3,f3,f2
+			generate_set_cop1_reg64(block, compiler, desc, FDREG, F3);  // dmov    <fdreg>,f3
 			return TRUE;
 
 		case 0x30:      /* NMADD.S - MIPS IV */
-			UML_FSMUL(block, F0, FPR32(FSREG), FPR32(FTREG));                   // fsmul   f0,<fsreg>,<ftreg>
-			UML_FSADD(block, F0, F0, FPR32(FRREG));                     // fsadd   f0,f0,<frreg>
-			UML_FSNEG(block, FPR32(FDREG), F0);                             // fsneg   <fdreg>,f0
+			UML_FSMUL(block, F0, FSVALS_FR0, FTVALS_FR0);               // fsmul   f0,<fsreg>,<ftreg>
+			UML_FSADD(block, F0, F0, FRVALS_FR0);                       // fsadd   f0,f0,<frreg>
+			UML_FSNEG(block, FDVALS_FR0, F0);                           // fsneg   <fdreg>,f0
 			return TRUE;
 
 		case 0x31:      /* NMADD.D - MIPS IV */
-			UML_FDMUL(block, F0, FPR64(FSREG), FPR64(FTREG));                   // fdmul   f0,<fsreg>,<ftreg>
-			UML_FDADD(block, F0, F0, FPR64(FRREG));                     // fdadd   f0,f0,<frreg>
-			UML_FDNEG(block, FPR64(FDREG), F0);                             // fdneg   <fdreg>,f0
+			generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);
+			generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);
+			generate_get_cop1_reg64(block, compiler, desc, FRREG, F2);
+			UML_FDMUL(block, F3, F0, F1);                               // fdmul   f3,f0,f1
+			UML_FDADD(block, F3, F3, F2);                               // fdadd   f3,f3,f2
+			UML_FDNEG(block, F3, F3);                                   // fdneg   f3,f3
+			generate_set_cop1_reg64(block, compiler, desc, FDREG, F3);  // dmov    <fdreg>,f3
 			return TRUE;
 
 		case 0x38:      /* NMSUB.S - MIPS IV */
-			UML_FSMUL(block, F0, FPR32(FSREG), FPR32(FTREG));                   // fsmul   f0,<fsreg>,<ftreg>
-			UML_FSSUB(block, FPR32(FDREG), FPR32(FRREG), F0);                   // fssub   <fdreg>,<frreg>,f0
+			UML_FSMUL(block, F0, FSVALS_FR0, FTVALS_FR0);               // fsmul   f0,<fsreg>,<ftreg>
+			UML_FSSUB(block, FDVALS_FR0, FRVALS_FR0, F0);               // fssub   <fdreg>,<frreg>,f0
 			return TRUE;
 
 		case 0x39:      /* NMSUB.D - MIPS IV */
-			UML_FDMUL(block, F0, FPR64(FSREG), FPR64(FTREG));                   // fdmul   f0,<fsreg>,<ftreg>
-			UML_FDSUB(block, FPR64(FDREG), FPR64(FRREG), F0);                   // fdsub   <fdreg>,<frreg>,f0
+			generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);
+			generate_get_cop1_reg64(block, compiler, desc, FTREG, F1);
+			generate_get_cop1_reg64(block, compiler, desc, FRREG, F2);
+			UML_FDMUL(block, F3, F0, F1);                               // fdmul   f4,f0,f1
+			UML_FDSUB(block, F3, F2, F0);                               // fdsub   f3,f2,f0
+			generate_set_cop1_reg64(block, compiler, desc, FDREG, F3);  // dmov    <fdreg>,f3
 			return TRUE;
 
 		default:
@@ -3135,6 +3836,102 @@ int mips3_device::generate_cop1x(drcuml_block *block, compiler_state *compiler, 
 	return FALSE;
 }
 
+/*----------------------------------------------------------
+    generate_cop1x_fr1 - compile COP1X opcodes in FR1 mode
+----------------------------------------------------------*/
+
+int mips3_device::generate_cop1x_fr1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
+	UINT32 op = desc->opptr.l[0];
+
+	check_cop1_access(block);
+
+	switch (op & 0x3f)
+	{
+		case 0x00:      /* LWXC1 - MIPS IV */
+			UML_ADD(block, I0, R32(RSREG), R32(RTREG));     // add     i0,<rsreg>,<rtreg>
+			UML_CALLH(block, *m_read32[m_core->mode >> 1]); // callh   read32
+			UML_MOV(block, FDVALS_FR1, I0);                 // mov     <cpr1_fd>,i0
+			if (!in_delay_slot)
+				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
+			return TRUE;
+
+		case 0x01:      /* LDXC1 - MIPS IV */
+			UML_ADD(block, I0, R32(RSREG), R32(RTREG));     // add     i0,<rsreg>,<rtreg>
+			UML_CALLH(block, *m_read64[m_core->mode >> 1]); // callh   read64
+			UML_DMOV(block, FDVALD_FR1, I0);                // dmov    <cpr1_fd>,i0
+			if (!in_delay_slot)
+				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
+			return TRUE;
+
+		case 0x08:      /* SWXC1 - MIPS IV */
+			UML_ADD(block, I0, R32(RSREG), R32(RTREG));     // add     i0,<rsreg>,<rtreg>
+			UML_MOV(block, I1, FSVALS_FR1);                 // mov     i1,<cpr1_fs>
+			UML_CALLH(block, *m_write32[m_core->mode >> 1]);// callh   write32
+			if (!in_delay_slot)
+				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
+			return TRUE;
+
+		case 0x09:      /* SDXC1 - MIPS IV */
+			generate_get_cop1_reg64_d2i(block, compiler, desc, FSREG, I1);
+			UML_ADD(block, I0, R32(RSREG), R32(RTREG));                     // add     i0,<rsreg>,<rtreg>
+			UML_CALLH(block, *m_write64[m_core->mode >> 1]);    // callh   write64
+			if (!in_delay_slot)
+				generate_update_cycles(block, compiler, desc->pc + 4, TRUE);
+			return TRUE;
+
+		case 0x0f:      /* PREFX */
+			return TRUE;
+
+		case 0x20:      /* MADD.S - MIPS IV */
+			UML_FSMUL(block, F0, FSVALS_FR1, FTVALS_FR1);   // fsmul   f0,<fsreg>,<ftreg>
+			UML_FSADD(block, FDVALS_FR1, F0, FRVALS_FR1);   // fsadd   <fdreg>,f0,<frreg>
+			return TRUE;
+
+		case 0x21:      /* MADD.D - MIPS IV */
+			UML_FDMUL(block, F0, FSVALD_FR1, FTVALD_FR1);   // fdmul   f0,<fsreg>,<ftreg>
+			UML_FDADD(block, FDVALD_FR1, F0, FRVALD_FR1);   // fdadd   <fdreg>,f0,<frreg>
+			return TRUE;
+
+		case 0x28:      /* MSUB.S - MIPS IV */
+			UML_FSMUL(block, F0, FSVALS_FR1, FTVALS_FR1);   // fsmul   f0,<fsreg>,<ftreg>
+			UML_FSSUB(block, FDVALS_FR1, F0, FRVALS_FR1);   // fssub   <fdreg>,f0,<frreg>
+			return TRUE;
+
+		case 0x29:      /* MSUB.D - MIPS IV */
+			UML_FDMUL(block, F0, FSVALD_FR1, FTVALD_FR1);   // fdmul   f0,<fsreg>,<ftreg>
+			UML_FDSUB(block, FDVALD_FR1, F0, FRVALD_FR1);   // fdsub   <fdreg>,f0,<frreg>
+			return TRUE;
+
+		case 0x30:      /* NMADD.S - MIPS IV */
+			UML_FSMUL(block, F0, FSVALS_FR1, FTVALS_FR1);   // fsmul   f0,<fsreg>,<ftreg>
+			UML_FSADD(block, F0, F0, FRVALS_FR1);           // fsadd   f0,f0,<frreg>
+			UML_FSNEG(block, FDVALS_FR1, F0);               // fsneg   <fdreg>,f0
+			return TRUE;
+
+		case 0x31:      /* NMADD.D - MIPS IV */
+			UML_FDMUL(block, F0, FSVALD_FR1, FTVALD_FR1);   // fdmul   f0,<fsreg>,<ftreg>
+			UML_FDADD(block, F0, F0, FRVALD_FR1);           // fdadd   f0,f0,<frreg>
+			UML_FDNEG(block, FDVALD_FR1, F0);               // fdneg   <fdreg>,f0
+			return TRUE;
+
+		case 0x38:      /* NMSUB.S - MIPS IV */
+			UML_FSMUL(block, F0, FSVALS_FR1, FTVALS_FR1);   // fsmul   f0,<fsreg>,<ftreg>
+			UML_FSSUB(block, FDVALS_FR1, FRVALS_FR1, F0);   // fssub   <fdreg>,<frreg>,f0
+			return TRUE;
+
+		case 0x39:      /* NMSUB.D - MIPS IV */
+			UML_FDMUL(block, F0, FSVALD_FR1, FTVALD_FR1);   // fdmul   f0,<fsreg>,<ftreg>
+			UML_FDSUB(block, FDVALD_FR1, FRVALD_FR1, F1);   // fdsub   <fdreg>,<frreg>,f0
+			return TRUE;
+
+		default:
+			fprintf(stderr, "cop1x %X\n", op);
+			break;
+	}
+	return FALSE;
+}
 
 
 /***************************************************************************

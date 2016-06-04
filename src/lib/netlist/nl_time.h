@@ -33,16 +33,19 @@ namespace netlist
 	public:
 
 #if (PHAS_INT128)
-		typedef UINT128 INTERNALTYPE;
+		using INTERNALTYPE = UINT128;
 		static const pstate_data_type_e STATETYPE = DT_INT128;
 #else
-		typedef UINT64 INTERNALTYPE;
+		using INTERNALTYPE = UINT64;
 		static const pstate_data_type_e STATETYPE = DT_INT64;
 #endif
 		static const INTERNALTYPE RESOLUTION = NETLIST_INTERNAL_RES;
 
 		ATTR_HOT netlist_time() : m_time(0) {}
-		ATTR_HOT netlist_time(const netlist_time &rhs) : m_time(rhs.m_time) {}
+		//ATTR_HOT netlist_time(const netlist_time &rhs) NOEXCEPT : m_time(rhs.m_time) {}
+		//ATTR_HOT netlist_time(netlist_time &&rhs) NOEXCEPT : m_time(rhs.m_time) {}
+		ATTR_HOT netlist_time(const netlist_time &rhs) NOEXCEPT = default;
+		ATTR_HOT netlist_time(netlist_time &&rhs) NOEXCEPT = default;
 
 		ATTR_HOT friend const netlist_time operator-(const netlist_time &left, const netlist_time &right);
 		ATTR_HOT friend const netlist_time operator+(const netlist_time &left, const netlist_time &right);
@@ -53,6 +56,7 @@ namespace netlist
 		ATTR_HOT friend bool operator>=(const netlist_time &left, const netlist_time &right);
 		ATTR_HOT friend bool operator<=(const netlist_time &left, const netlist_time &right);
 		ATTR_HOT friend bool operator!=(const netlist_time &left, const netlist_time &right);
+		ATTR_HOT friend bool operator==(const netlist_time &left, const netlist_time &right);
 
 		ATTR_HOT const netlist_time &operator=(const netlist_time &right) { m_time = right.m_time; return *this; }
 
@@ -124,6 +128,11 @@ namespace netlist
 	ATTR_HOT inline bool operator!=(const netlist_time &left, const netlist_time &right)
 	{
 		return (left.m_time != right.m_time);
+	}
+
+	ATTR_HOT inline bool operator==(const netlist_time &left, const netlist_time &right)
+	{
+		return (left.m_time == right.m_time);
 	}
 
 }

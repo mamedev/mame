@@ -252,7 +252,7 @@ void emu_timer::register_save()
 	// for device timers, it is an index based on the device and timer ID
 	else
 	{
-		strprintf(name,"%s/%d", m_device->tag(), m_id);
+		name = string_format("%s/%d", m_device->tag(), m_id);
 		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != nullptr; curtimer = curtimer->next())
 			if (!curtimer->m_temporary && curtimer->m_device != nullptr && curtimer->m_device == m_device && curtimer->m_id == m_id)
 				index++;
@@ -457,7 +457,7 @@ void device_scheduler::timeslice()
 				{
 					// compute how many cycles we want to execute
 					int ran = exec->m_cycles_running = divu_64x32((UINT64)delta >> exec->m_divshift, exec->m_divisor);
-					LOG(("  cpu '%s': %" I64FMT"d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running));
+					LOG(("  cpu '%s': %d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running));
 
 					// if we're not suspended, actually execute
 					if (exec->m_suspend == 0)
@@ -726,8 +726,8 @@ void device_scheduler::compute_perfect_interleave()
 		{
 			// adjust all the actuals; this doesn't affect the current
 			m_quantum_minimum = perfect;
-			for (quantum_slot *quant = m_quantum_list.first(); quant != nullptr; quant = quant->next())
-				quant->m_actual = MAX(quant->m_requested, m_quantum_minimum);
+			for (quantum_slot &quant : m_quantum_list)
+				quant.m_actual = MAX(quant.m_requested, m_quantum_minimum);
 		}
 	}
 }
@@ -742,7 +742,7 @@ void device_scheduler::compute_perfect_interleave()
 void device_scheduler::rebuild_execute_list()
 {
 	// if we haven't yet set a scheduling quantum, do it now
-	if (m_quantum_list.first() == nullptr)
+	if (m_quantum_list.empty())
 	{
 		// set the core scheduling quantum
 		attotime min_quantum = machine().config().m_minimum_quantum;
@@ -781,20 +781,19 @@ void device_scheduler::rebuild_execute_list()
 	device_execute_interface **suspend_tailptr = &suspend_list;
 
 	// iterate over all devices
-	execute_interface_iterator iter(machine().root_device());
-	for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
+	for (device_execute_interface &exec : execute_interface_iterator(machine().root_device()))
 	{
 		// append to the appropriate list
-		exec->m_nextexec = nullptr;
-		if (exec->m_suspend == 0)
+		exec.m_nextexec = nullptr;
+		if (exec.m_suspend == 0)
 		{
-			*active_tailptr = exec;
-			active_tailptr = &exec->m_nextexec;
+			*active_tailptr = &exec;
+			active_tailptr = &exec.m_nextexec;
 		}
 		else
 		{
-			*suspend_tailptr = exec;
-			suspend_tailptr = &exec->m_nextexec;
+			*suspend_tailptr = &exec;
+			suspend_tailptr = &exec.m_nextexec;
 		}
 	}
 

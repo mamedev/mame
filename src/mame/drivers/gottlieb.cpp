@@ -198,6 +198,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 
 #include "includes/gottlieb.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 
 #define LOG_AUDIO_DECODE    (0)
@@ -753,7 +754,7 @@ static ADDRESS_MAP_START( reactor_map, AS_PROGRAM, 8, gottlieb_state )
 	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_SHARE("charram")               /* BOJRSEL1 */
 /*  AM_RANGE(0x5000, 0x5fff) AM_WRITE() */                                                               /* BOJRSEL2 */
 	AM_RANGE(0x6000, 0x601f) AM_MIRROR(0x0fe0) AM_WRITE(gottlieb_paletteram_w) AM_SHARE("paletteram")       /* COLSEL */
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff8) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff8) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_analog_reset_w)                        /* A1J2 interface */
 	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_sh_w)                                  /* trackball H */
 	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff8) AM_WRITE(reactor_output_w)                               /* trackball V */
@@ -775,7 +776,7 @@ static ADDRESS_MAP_START( gottlieb_map, AS_PROGRAM, 8, gottlieb_state )
 	AM_RANGE(0x3800, 0x3bff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_SHARE("videoram")       /* BRSEL */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_SHARE("charram")               /* BOJRSEL1 */
 	AM_RANGE(0x5000, 0x501f) AM_MIRROR(0x07e0) AM_WRITE(gottlieb_paletteram_w) AM_SHARE("paletteram")       /* COLSEL */
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_analog_reset_w)                        /* A1J2 interface */
 	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_sh_w)                                  /* OP20-27 */
 	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_WRITE(general_output_w)                               /* OP30-37 */
@@ -1575,7 +1576,7 @@ static INPUT_PORTS_START( 3stooges )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN4")   /* joystick inputs */
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,stooges_joystick_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,stooges_joystick_r, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
@@ -1768,7 +1769,9 @@ static MACHINE_CONFIG_START( gottlieb_core, gottlieb_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gottlieb_state,  gottlieb_interrupt)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
-	MCFG_WATCHDOG_VBLANK_INIT(16)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2357,6 +2360,63 @@ ROM_START( mach3 )
 ROM_END
 
 
+ROM_START( mach3a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "m3rom4.bin",   0x6000, 0x2000, CRC(8bfd5a44) SHA1(61f5c6c39047c1d0296e2cacce2be9525cb47176) )
+	ROM_LOAD( "m3rom3.bin",   0x8000, 0x2000, CRC(b1b045af) SHA1(4e71ca4661bf5daaf9e2ffbb930ac3b13e2e57bd) )
+	ROM_LOAD( "m3rom2-1.bin",   0xa000, 0x2000, CRC(2b1689a7) SHA1(18714810de6501bc1656261aacf98be228af624e) )
+	ROM_LOAD( "m3rom1.bin",   0xc000, 0x2000, CRC(3b0ba80b) SHA1(bc7e961311b40f05f2998f10f0a68f2e515c8e66) )
+	ROM_LOAD( "m3rom0.bin",   0xe000, 0x2000, CRC(70c12bf4) SHA1(c26127b6e2a16791b3be8abac93be6af4f30fb3b) )
+
+	ROM_REGION( 0x10000, "r2sound:audiocpu", 0 )
+	ROM_LOAD( "m3drom1.bin",  0xd000, 0x1000, CRC(a6e29212) SHA1(a73aafc2efa99e9ae0aecbb6075a10f7178ac938) )
+
+	ROM_REGION( 0x10000, "r2sound:speechcpu", 0 )
+	ROM_LOAD( "m3yrom1.bin",  0xf000, 0x1000, CRC(eddf8872) SHA1(29ed0d1828639849bab826b3e2ab4eefac45fd85) )
+
+	ROM_REGION( 0x2000, "bgtiles", 0 )
+	ROM_LOAD( "mach3bg0.bin", 0x0000, 0x1000, CRC(ea2f5257) SHA1(664502dd2b7ee4ce96820da532615f3902b45557) )
+	ROM_LOAD( "mach3bg1.bin", 0x1000, 0x1000, CRC(f543e4ce) SHA1(2a1b7dbbcd9756f836ca2e42973043b98a303082) )
+
+	ROM_REGION( 0x8000, "sprites", 0 )
+	ROM_LOAD( "mach3fg3.bin", 0x0000, 0x2000, CRC(472128b4) SHA1(8c6f36cab5ec8abb6db2e6d52530560664b950fe) )
+	ROM_LOAD( "mach3fg2.bin", 0x2000, 0x2000, CRC(2a59e99e) SHA1(5c1faa244fc0f53cc2a52c8d4d40fb178706c2ed) )
+	ROM_LOAD( "mach3fg1.bin", 0x4000, 0x2000, CRC(9b88767b) SHA1(8071e11906b3f0026f9a210cc5a236d95ca1f659) )
+	ROM_LOAD( "mach3fg0.bin", 0x6000, 0x2000, CRC(0bae12a5) SHA1(7bc0b82ccab0e4498a7a2a9dc85f03125f25826e) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "mach3", 0, SHA1(d0f72bded7feff5c360f8749d6c27650a6964847) )
+ROM_END
+
+ROM_START( mach3b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rom4",   0x6000, 0x2000, CRC(bf460625) SHA1(899b691888505a7759c5ce6d4490519b72322d07) )
+	ROM_LOAD( "rom3",   0x8000, 0x2000, CRC(9daa023f) SHA1(80efeca6e7f9112a2335045c9890b1458ef38cce) )
+	ROM_LOAD( "rom2",   0xa000, 0x2000, CRC(5c1fd3ac) SHA1(8e3c14f7e6fe849ab6d9a1d99c03e2c275eca33a) )
+	ROM_LOAD( "rom1",   0xc000, 0x2000, CRC(1f755e11) SHA1(cead5f6be15d1ef21b3011a7ec345e35e942393b) )
+	ROM_LOAD( "rom0",   0xe000, 0x2000, CRC(4bfcd992) SHA1(7fe0977176ea1b5a54c3f77afb4e7bb46af8ec63) )
+
+	ROM_REGION( 0x10000, "r2sound:audiocpu", 0 )
+	ROM_LOAD( "m3drom1.bin",  0xd000, 0x1000, CRC(a6e29212) SHA1(a73aafc2efa99e9ae0aecbb6075a10f7178ac938) )
+
+	ROM_REGION( 0x10000, "r2sound:speechcpu", 0 )
+	ROM_LOAD( "m3yrom1.bin",  0xf000, 0x1000, CRC(eddf8872) SHA1(29ed0d1828639849bab826b3e2ab4eefac45fd85) )
+
+	ROM_REGION( 0x2000, "bgtiles", 0 )
+	ROM_LOAD( "mach3bg0.bin", 0x0000, 0x1000, CRC(ea2f5257) SHA1(664502dd2b7ee4ce96820da532615f3902b45557) )
+	ROM_LOAD( "mach3bg1.bin", 0x1000, 0x1000, CRC(f543e4ce) SHA1(2a1b7dbbcd9756f836ca2e42973043b98a303082) )
+
+	ROM_REGION( 0x8000, "sprites", 0 )
+	ROM_LOAD( "mach3fg3.bin", 0x0000, 0x2000, CRC(472128b4) SHA1(8c6f36cab5ec8abb6db2e6d52530560664b950fe) )
+	ROM_LOAD( "mach3fg2.bin", 0x2000, 0x2000, CRC(2a59e99e) SHA1(5c1faa244fc0f53cc2a52c8d4d40fb178706c2ed) )
+	ROM_LOAD( "mach3fg1.bin", 0x4000, 0x2000, CRC(9b88767b) SHA1(8071e11906b3f0026f9a210cc5a236d95ca1f659) )
+	ROM_LOAD( "mach3fg0.bin", 0x6000, 0x2000, CRC(0bae12a5) SHA1(7bc0b82ccab0e4498a7a2a9dc85f03125f25826e) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "mach3", 0, SHA1(d0f72bded7feff5c360f8749d6c27650a6964847) )
+ROM_END
+
+
 ROM_START( cobram3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bh03",   0x8000, 0x2000, CRC(755cbbf5) SHA1(e3ea146f8c344af1e9bf51548ae4902cb09e589a) )
@@ -2604,7 +2664,9 @@ GAME( 1984, curvebal,  0,        gottlieb1, curvebal, gottlieb_state, romtiles, 
 
 /* games using rev 2 sound board */
 GAME( 1983, screwloo,  0,        screwloo,  screwloo, gottlieb_state, screwloo, ROT0,   "Mylstar",                   "Screw Loose (prototype)", 0 )
-GAME( 1983, mach3,     0,        g2laser,   mach3,    gottlieb_state, romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3", 0 )
+GAME( 1983, mach3,     0,        g2laser,   mach3,    gottlieb_state, romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 1)", 0 )
+GAME( 1983, mach3a,    mach3,    g2laser,   mach3,    gottlieb_state, romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 2)", 0 )
+GAME( 1983, mach3b,    mach3,    g2laser,   mach3,    gottlieb_state, romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 3)", 0 )
 GAME( 1984, cobram3,   cobra,    cobram3,   cobram3,  gottlieb_state, romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware)", 0 )
 GAME( 1984, usvsthem,  0,        g2laser,   usvsthem, gottlieb_state, romtiles, ROT0,   "Mylstar",                   "Us vs. Them", 0 )
 GAME( 1984, 3stooges,  0,        gottlieb2, 3stooges, gottlieb_state, stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", 0 )

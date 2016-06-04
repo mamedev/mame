@@ -1,6 +1,7 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Hau
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 
 #include "video/poly.h"
 #include "video/tc0100scn.h"
@@ -54,6 +55,7 @@ public:
 		m_spriteram(*this,"spriteram") ,
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
+		m_watchdog(*this, "watchdog"),
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -65,6 +67,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<gfxdecode_device> m_gfxdecode;

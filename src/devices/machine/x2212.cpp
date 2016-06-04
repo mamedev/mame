@@ -46,11 +46,13 @@ x2212_device::x2212_device(const machine_config &mconfig, const char *tag, devic
 		m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_sram_map)),
 		m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_e2prom_map)),
 		m_store(false),
-		m_array_recall(false)
+		m_array_recall(false),
+		m_size_data(0x100),
+		m_default_data(*this, DEVICE_SELF, 0x100)
 {
 }
 
-x2212_device::x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+x2212_device::x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size_data)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -58,7 +60,9 @@ x2212_device::x2212_device(const machine_config &mconfig, device_type type, cons
 		m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_sram_map)),
 		m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_e2prom_map)),
 		m_store(false),
-		m_array_recall(false)
+		m_array_recall(false),
+		m_size_data(size_data),
+		m_default_data(*this, DEVICE_SELF, size_data)
 {
 }
 
@@ -81,22 +85,8 @@ void x2212_device::device_start()
 {
 	save_item(NAME(m_store));
 	save_item(NAME(m_array_recall));
-
-	m_sram = m_addrspace[0];
-	m_e2prom = m_addrspace[1];
-
-	SIZE_DATA = 0x100;
-}
-
-void x2210_device::device_start()
-{
-	save_item(NAME(m_store));
-	save_item(NAME(m_array_recall));
-
-	m_sram = m_addrspace[0];
-	m_e2prom = m_addrspace[1];
-
-	SIZE_DATA = 0x40;
+	m_sram = &space(AS_0);
+	m_e2prom = &space(AS_1);
 }
 
 
@@ -119,23 +109,17 @@ const address_space_config *x2212_device::memory_space_config(address_spacenum s
 void x2212_device::nvram_default()
 {
 	// default to all-0xff
-	for (int byte = 0; byte < SIZE_DATA; byte++)
+	for (int byte = 0; byte < m_size_data; byte++)
 	{
 		m_sram->write_byte(byte, 0xff);
 		m_e2prom->write_byte(byte, 0xff);
 	}
 
 	// populate from a memory region if present
-	if (m_region != nullptr)
+	if (m_default_data.found())
 	{
-		if (m_region->bytes() != SIZE_DATA)
-			fatalerror("x2212 region '%s' wrong size (expected size = 0x100)\n", tag());
-		if (m_region->bytewidth() != 1)
-			fatalerror("x2212 region '%s' needs to be an 8-bit region\n", tag());
-
-		UINT8 *default_data = m_region->base();
-		for (int byte = 0; byte < SIZE_DATA; byte++)
-			m_e2prom->write_byte(byte, default_data[byte]);
+		for (int byte = 0; byte < m_size_data; byte++)
+			m_e2prom->write_byte(byte, m_default_data[byte]);
 	}
 }
 
@@ -147,9 +131,9 @@ void x2212_device::nvram_default()
 
 void x2212_device::nvram_read(emu_file &file)
 {
-	UINT8 *buffer = (UINT8 *) alloca(SIZE_DATA);
-	file.read(buffer, SIZE_DATA);
-	for (int byte = 0; byte < SIZE_DATA; byte++)
+	UINT8 *buffer = (UINT8 *) alloca(m_size_data);
+	file.read(buffer, m_size_data);
+	for (int byte = 0; byte < m_size_data; byte++)
 	{
 		m_sram->write_byte(byte, 0xff);
 		m_e2prom->write_byte(byte, buffer[byte]);
@@ -168,10 +152,10 @@ void x2212_device::nvram_write(emu_file &file)
 	if (m_auto_save)
 		store();
 
-	UINT8 *buffer = (UINT8 *) alloca(SIZE_DATA);
-	for (int byte = 0; byte < SIZE_DATA; byte++)
+	UINT8 *buffer = (UINT8 *) alloca(m_size_data);
+	for (int byte = 0; byte < m_size_data; byte++)
 		buffer[byte] = m_e2prom->read_byte(byte);
-	file.write(buffer, SIZE_DATA);
+	file.write(buffer, m_size_data);
 }
 
 
@@ -187,7 +171,7 @@ void x2212_device::nvram_write(emu_file &file)
 
 void x2212_device::store()
 {
-	for (int byte = 0; byte < SIZE_DATA; byte++)
+	for (int byte = 0; byte < m_size_data; byte++)
 		m_e2prom->write_byte(byte, m_sram->read_byte(byte));
 }
 
@@ -199,7 +183,7 @@ void x2212_device::store()
 
 void x2212_device::recall()
 {
-	for (int byte = 0; byte < SIZE_DATA; byte++)
+	for (int byte = 0; byte < m_size_data; byte++)
 		m_sram->write_byte(byte, m_e2prom->read_byte(byte));
 }
 
@@ -256,6 +240,6 @@ WRITE_LINE_MEMBER( x2212_device::recall )
 
 
 x2210_device::x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: x2212_device(mconfig, X2210, "X2210", tag, owner, clock, "x2210", __FILE__)
+	: x2212_device(mconfig, X2210, "X2210", tag, owner, clock, "x2210", __FILE__, 0x40)
 {
 }

@@ -78,6 +78,7 @@ Versions known to exist but not dumped:
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "cpu/z80/z80.h"
 #include "includes/cave.h"
 #include "sound/2203intf.h"
@@ -567,7 +568,7 @@ static ADDRESS_MAP_START( gaia_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0xd00010, 0xd00011) AM_WRITE(gaia_coin_lsb_w)                                              // Coin counter only
 	AM_RANGE(0xd00012, 0xd00013) AM_READ_PORT("IN1")                                                    // Inputs
 	AM_RANGE(0xd00014, 0xd00015) AM_READ_PORT("DSW")                                                    // Dips
-	AM_RANGE(0xd00014, 0xd00015) AM_WRITE(watchdog_reset16_w)                                           // Watchdog?
+	AM_RANGE(0xd00014, 0xd00015) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)              // Watchdog?
 ADDRESS_MAP_END
 
 
@@ -735,7 +736,7 @@ static ADDRESS_MAP_START( mazinger_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
 /**/AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprites?
 	AM_RANGE(0x300000, 0x300007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
-	AM_RANGE(0x300068, 0x300069) AM_WRITE(watchdog_reset16_w)                                           // Watchdog
+	AM_RANGE(0x300068, 0x300069) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)              // Watchdog
 	AM_RANGE(0x30006e, 0x30006f) AM_READWRITE(soundlatch_ack_r, sound_cmd_w)                            // From Sound CPU
 	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE(cave_vram_1_8x8_w) AM_SHARE("vram.1")     // Layer 1
@@ -759,7 +760,7 @@ static ADDRESS_MAP_START( metmqstr_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x408000, 0x408fff) AM_RAM AM_SHARE("paletteram.0")  // Palette
-	AM_RANGE(0x600000, 0x600001) AM_READ(watchdog_reset16_r)                                            // Watchdog?
+	AM_RANGE(0x600000, 0x600001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)               // Watchdog?
 	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")         // Layer 2
 	AM_RANGE(0x888000, 0x88ffff) AM_RAM                                                                 //
 	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")         // Layer 1
@@ -767,7 +768,7 @@ static ADDRESS_MAP_START( metmqstr_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
 	AM_RANGE(0x988000, 0x98ffff) AM_RAM                                                                 //
 	AM_RANGE(0xa80000, 0xa80007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
-	AM_RANGE(0xa80068, 0xa80069) AM_WRITE(watchdog_reset16_w)                                           // Watchdog?
+	AM_RANGE(0xa80068, 0xa80069) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)              // Watchdog?
 	AM_RANGE(0xa8006c, 0xa8006d) AM_READ(soundflags_ack_r) AM_WRITENOP                                  // Communication
 	AM_RANGE(0xa8006e, 0xa8006f) AM_READWRITE(soundlatch_ack_r, sound_cmd_w)                            // From Sound CPU
 	AM_RANGE(0xa80000, 0xa8007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
@@ -880,7 +881,7 @@ static ADDRESS_MAP_START( ppsatan_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x200004, 0x200005) AM_READWRITE(ppsatan_touch1_r, ppsatan_io_mux_w)       // Touch Screen
 	AM_RANGE(0x200006, 0x200007) AM_WRITENOP                                            // Lev. 2 IRQ Ack?
 	AM_RANGE(0x2c0000, 0x2c0007) AM_READ(cave_irq_cause_r)                              // IRQ Cause
-	AM_RANGE(0x2c0068, 0x2c0069) AM_WRITE(watchdog_reset16_w)                           // Watchdog
+	AM_RANGE(0x2c0068, 0x2c0069) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // Watchdog
 	AM_RANGE(0x2c0000, 0x2c007f) AM_WRITEONLY AM_SHARE("videoregs.1")                   // Video Regs
 
 	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)   // M6295
@@ -1057,7 +1058,7 @@ static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("IN0")                                                    // Inputs + EEPROM + Hopper
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1")                                                    // Inputs
 	AM_RANGE(0x700000, 0x700007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
-	AM_RANGE(0x700068, 0x700069) AM_WRITE(watchdog_reset16_w)                                           // Watchdog
+	AM_RANGE(0x700068, 0x700069) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)              // Watchdog
 	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // M6295
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(tjumpman_leds_w)                                              // Leds + Hopper
@@ -1092,7 +1093,7 @@ static ADDRESS_MAP_START( pacslot_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprite bank 2
 	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
 	AM_RANGE(0x400000, 0x400007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
-	AM_RANGE(0x400068, 0x400069) AM_WRITE(watchdog_reset16_w)                                           // Watchdog
+	AM_RANGE(0x400068, 0x400069) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)              // Watchdog
 	AM_RANGE(0x400000, 0x40007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 	AM_RANGE(0x500000, 0x500005) AM_WRITEONLY AM_SHARE("vctrl.0")                       // Layer 0 Control
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("paletteram.0")  // Palette
@@ -1572,7 +1573,7 @@ static INPUT_PORTS_START( korokoro )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 ) // service medal out?
 	PORT_SERVICE( 0x2000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,korokoro_hopper_r, NULL) // motor / hopper status ???
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,korokoro_hopper_r, nullptr) // motor / hopper status ???
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1603,7 +1604,7 @@ static INPUT_PORTS_START( tjumpman )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)    // suru ("do")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "1 Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1628,7 +1629,7 @@ static INPUT_PORTS_START( pacslot )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2146,6 +2147,8 @@ static MACHINE_CONFIG_START( gaia, cave_state )
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
@@ -2321,6 +2324,7 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	MCFG_CPU_PROGRAM_MAP(mazinger_sound_map)
 	MCFG_CPU_IO_MAP(mazinger_sound_portmap)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
@@ -2374,6 +2378,7 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 	MCFG_CPU_PROGRAM_MAP(metmqstr_sound_map)
 	MCFG_CPU_IO_MAP(metmqstr_sound_portmap)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
@@ -2426,6 +2431,7 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 	MCFG_CPU_PROGRAM_MAP(pacslot_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
@@ -2480,6 +2486,7 @@ static MACHINE_CONFIG_START( ppsatan, cave_state )
 	MCFG_CPU_PROGRAM_MAP(ppsatan_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt_ppsatan)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1))  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
@@ -2654,6 +2661,7 @@ static MACHINE_CONFIG_START( tjumpman, cave_state )
 	MCFG_CPU_PROGRAM_MAP(tjumpman_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)

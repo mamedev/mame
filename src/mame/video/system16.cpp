@@ -34,14 +34,7 @@
 
 void segas1x_bootleg_state::setup_system16_bootleg_spritebanking(  )
 {
-	if (m_spritebank_type == 1)
-	{
-		static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-		int i;
-		for (i = 0; i < 16; i++)
-			m_sprites->set_bank(i, default_banklist[i]);
-	}
-	else
+	if (m_spritebank_type == 0)
 	{
 		static const UINT8 alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
 		int i;

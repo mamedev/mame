@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "machine/atarigen.h"
 #include "includes/xybots.h"
 
@@ -84,7 +85,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xybots_state )
 	AM_RANGE(0xffe200, 0xffe2ff) AM_MIRROR(0x7f8000) AM_READ(special_port1_r)
 	AM_RANGE(0xffe800, 0xffe8ff) AM_MIRROR(0x7f8000) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0xffe900, 0xffe9ff) AM_MIRROR(0x7f8000) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
-	AM_RANGE(0xffea00, 0xffeaff) AM_MIRROR(0x7f8000) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0xffea00, 0xffeaff) AM_MIRROR(0x7f8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xffeb00, 0xffebff) AM_MIRROR(0x7f8000) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xffee00, 0xffeeff) AM_MIRROR(0x7f8000) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
 ADDRESS_MAP_END
@@ -190,6 +191,8 @@ static MACHINE_CONFIG_START( xybots, xybots_state )
 
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xybots)
 
@@ -237,9 +240,8 @@ ROM_START( xybots )
 	ROM_LOAD16_BYTE( "136054-2114.17b",  0x020000, 0x008000, CRC(d31890cb) SHA1(b58722a4dcc79e97484c2f5e35b8dbf8c3520bd9) )
 	ROM_LOAD16_BYTE( "136054-2115.19b",  0x020001, 0x008000, CRC(750ab1b0) SHA1(0638de738bd804bde4b93cd23190ee0465887cf8) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "136054-1116.2k",  0x010000, 0x004000, CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
-	ROM_CONTINUE(                0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "136054-1116.2k",  0x00000, 0x10000, CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "136054-2102.12l", 0x000000, 0x008000, CRC(c1309674) SHA1(5a163c894142c8d662557c8322dc04fded637227) )
@@ -268,9 +270,8 @@ ROM_START( xybotsg )
 	ROM_LOAD16_BYTE( "136054-3214.17b",  0x020000, 0x008000, CRC(4ad35093) SHA1(6d2d82fb481c68819ec6c87d483eed17d4ae5d1a) )
 	ROM_LOAD16_BYTE( "136054-3215.19b",  0x020001, 0x008000, CRC(3a2afbaf) SHA1(61b88d15d95681eb24559d0696203cd4ee63d11f) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "136054-1116.2k",  0x010000, 0x004000, CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
-	ROM_CONTINUE(                0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "136054-1116.2k",  0x00000, 0x10000, CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "136054-2102.12l", 0x000000, 0x008000, CRC(c1309674) SHA1(5a163c894142c8d662557c8322dc04fded637227) )
@@ -299,9 +300,8 @@ ROM_START( xybotsf )
 	ROM_LOAD16_BYTE( "136054-3614.17b",  0x020000, 0x008000, CRC(7385e0b6) SHA1(98a69901069872b14413c1bfe48783fdb43c1c37) )
 	ROM_LOAD16_BYTE( "136054-3615.19b",  0x020001, 0x008000, CRC(8e37b812) SHA1(40f973a49c4b40f3a5d982d332995e792f718dcc) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "136054-1116.2k",  0x010000, 0x004000, CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
-	ROM_CONTINUE(                0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "136054-1116.2k",  0x00000, 0x10000, CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "136054-2102.12l", 0x000000, 0x008000, CRC(c1309674) SHA1(5a163c894142c8d662557c8322dc04fded637227) )
@@ -330,9 +330,8 @@ ROM_START( xybots1 )
 	ROM_LOAD16_BYTE( "136054-1114.17b",  0x020000, 0x008000, CRC(7444f88f) SHA1(e2a27754a57a809398ee639fe5d0920b564d4c0b) )
 	ROM_LOAD16_BYTE( "136054-1115.19b",  0x020001, 0x008000, CRC(848d072d) SHA1(c4d1181f0227200e60d99a99c1a83897275b055f) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "136054-1116.2k",  0x010000, 0x004000, CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
-	ROM_CONTINUE(                0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "136054-1116.2k",  0x00000, 0x10000, CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "136054-2102.12l", 0x000000, 0x008000, CRC(c1309674) SHA1(5a163c894142c8d662557c8322dc04fded637227) )
@@ -361,9 +360,8 @@ ROM_START( xybots0 )
 	ROM_LOAD16_BYTE( "136054-0114.17b",  0x020000, 0x008000, CRC(18b875f7) SHA1(aa78553bd3556d0b209513ba80b782cfb0e3bb8b) )
 	ROM_LOAD16_BYTE( "136054-0115.19b",  0x020001, 0x008000, CRC(7f116360) SHA1(d12c339ce973bd74be4a4ac9e9d293f6a6e358d6) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "136054-0116.2k",  0x010000, 0x004000, BAD_DUMP CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) ) // not dumped from this pcb, rom taken from another set instead
-	ROM_CONTINUE(                0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "136054-0116.2k",  0x00000, 0x10000, BAD_DUMP CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) ) // not dumped from this pcb, rom taken from another set instead
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "136054-1102.12l", 0x000000, 0x008000, CRC(0d304e5b) SHA1(203c86c865667b1538f61c0950682fb17ebd9abb) )
@@ -395,7 +393,7 @@ ROM_END
 DRIVER_INIT_MEMBER(xybots_state,xybots)
 {
 	m_h256 = 0x0400;
-	slapstic_configure(*m_maincpu, 0x008000, 0);
+	slapstic_configure(*m_maincpu, 0x008000, 0, memregion("maincpu")->base() + 0x8000);
 }
 
 

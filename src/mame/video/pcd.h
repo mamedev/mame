@@ -11,7 +11,7 @@
 #define MCFG_PCX_VIDEO_TXD_HANDLER(_devcb) \
 	devcb = &pcx_video_device::set_txd_handler(*device, DEVCB_##_devcb);
 
-class pcdx_video_device : public device_t
+class pcdx_video_device : public device_t, public device_gfx_interface
 {
 public:
 	pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
@@ -25,8 +25,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<scn2674_device> m_crtc;
-	required_device<palette_device> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<pic8259_device> m_pic2;
 };
 

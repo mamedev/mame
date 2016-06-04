@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/galaga.h"
+#include "includes/xevious.h"
 
 /***************************************************************************
 

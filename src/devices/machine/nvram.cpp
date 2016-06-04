@@ -25,6 +25,7 @@ const device_type NVRAM = &device_creator<nvram_device>;
 nvram_device::nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NVRAM, "NVRAM", tag, owner, clock, "nvram", __FILE__),
 		device_nvram_interface(mconfig, *this),
+		m_region(*this, DEVICE_SELF),
 		m_default_value(DEFAULT_ALL_1),
 		m_base(nullptr),
 		m_length(0)
@@ -79,7 +80,7 @@ void nvram_device::nvram_default()
 	determine_final_base();
 
 	// region always wins
-	if (m_region != nullptr)
+	if (m_region.found())
 	{
 		memcpy(m_base, m_region->base(), m_length);
 		return;
@@ -164,6 +165,6 @@ void nvram_device::determine_final_base()
 	}
 
 	// if we are region-backed for the default, find it now and make sure it's the right size
-	if (m_region != nullptr && m_region->bytes() != m_length)
-		throw emu_fatalerror("NVRAM device '%s' has a default region, but it should be 0x%" SIZETFMT "X bytes", tag(), m_length);
+	if (m_region.found() && m_region->bytes() != m_length)
+		throw emu_fatalerror("%s",string_format("NVRAM device '%s' has a default region, but it should be 0x%I64uX bytes", tag(), m_length).c_str());
 }

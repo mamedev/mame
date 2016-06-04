@@ -45,7 +45,7 @@ CPU_DISASSEMBLE(tms57002)
 		switch((opcode >> 11) & 0x7f) { // category 3
 
 #define DASM3
-#include "cpu/tms57002/tms57002.inc"
+#include "cpu/tms57002/tms57002.hxx"
 #undef  DASM3
 
 		default:
@@ -59,7 +59,7 @@ CPU_DISASSEMBLE(tms57002)
 			break;
 
 #define DASM1
-#include "cpu/tms57002/tms57002.inc"
+#include "cpu/tms57002/tms57002.hxx"
 #undef  DASM1
 
 		default:
@@ -82,7 +82,7 @@ CPU_DISASSEMBLE(tms57002)
 			break;
 
 #define DASM2
-#include "cpu/tms57002/tms57002.inc"
+#include "cpu/tms57002/tms57002.hxx"
 #undef  DASM2
 
 		default:

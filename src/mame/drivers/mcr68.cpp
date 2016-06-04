@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Bryan McPhail
 /***************************************************************************
 
     Midway MCR-68k system
@@ -58,7 +58,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
-#include "includes/mcr.h"
 #include "includes/mcr68.h"
 
 
@@ -310,7 +309,7 @@ static ADDRESS_MAP_START( mcr68_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x090000, 0x09007f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
-	AM_RANGE(0x0b0000, 0x0bffff) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x0b0000, 0x0bffff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x0d0000, 0x0dffff) AM_READ_PORT("IN0")
 	AM_RANGE(0x0e0000, 0x0effff) AM_READ_PORT("IN1")
 	AM_RANGE(0x0f0000, 0x0fffff) AM_READ_PORT("DSW")
@@ -353,7 +352,7 @@ static ADDRESS_MAP_START( pigskin_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x080000, 0x08ffff) AM_READ(pigskin_port_1_r)
 	AM_RANGE(0x0a0000, 0x0affff) AM_READ(pigskin_port_2_r)
 	AM_RANGE(0x0c0000, 0x0c007f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0e0000, 0x0effff) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x0e0000, 0x0effff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x120000, 0x120001) AM_READWRITE(pigskin_protection_r, pigskin_protection_w)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM
@@ -383,7 +382,7 @@ static ADDRESS_MAP_START( trisport_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
 	AM_RANGE(0x1a0000, 0x1affff) AM_WRITE(archrivl_control_w)
-	AM_RANGE(0x1c0000, 0x1cffff) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x1c0000, 0x1cffff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x1e0000, 0x1effff) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
@@ -551,7 +550,7 @@ static INPUT_PORTS_START( spyhunt2 )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0018, 0x0008, "Point Threshholds" ) PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPNAME( 0x0018, 0x0008, "Point Thresholds" ) PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Hard ) )
@@ -1023,7 +1022,8 @@ static MACHINE_CONFIG_START( zwackery, mcr68_state )
 	MCFG_CPU_PROGRAM_MAP(zwackery_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcr68_state,  mcr68_interrupt)
 
-//  MCFG_WATCHDOG_VBLANK_INIT(8)
+        MCFG_WATCHDOG_ADD("watchdog")
+//  MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,zwackery)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,zwackery)
 
@@ -1072,7 +1072,8 @@ static MACHINE_CONFIG_START( mcr68, mcr68_state )
 	MCFG_CPU_PROGRAM_MAP(mcr68_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcr68_state,  mcr68_interrupt)
 
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,mcr68)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,mcr68)
 
@@ -1109,7 +1110,8 @@ static MACHINE_CONFIG_DERIVED( intlaser, mcr68 )
 	MCFG_MIDWAY_SOUNDS_GOOD_ADD("sg")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_WATCHDOG_VBLANK_INIT(800)
+	MCFG_WATCHDOG_MODIFY("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 800)
 MACHINE_CONFIG_END
 
 

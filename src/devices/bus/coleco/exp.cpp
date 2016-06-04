@@ -38,7 +38,7 @@ void device_colecovision_cartridge_interface::rom_alloc(size_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc("coleco_cart:rom", size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(":coleco_cart:rom", size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -116,7 +116,7 @@ std::string colecovision_cartridge_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		UINT32 length = core_fsize(m_file);
+		UINT32 length = m_file->size();
 		if (length == 0x100000 || length == 0x200000)
 			return software_get_default_slot("xin1");
 	}

@@ -14,7 +14,7 @@ typedef device_delegate<void (int layer, int bank, int *code, int *color, int *f
 	k052109_device::set_ram(*device, _ram);
 
 #define MCFG_K052109_SCREEN_TAG(_tag) \
-		k052109_device::set_screen_tag(*device, owner, _tag);
+	k052109_device::set_screen_tag(*device, "^" _tag);
 
 #define MCFG_K052109_IRQ_HANDLER(_devcb) \
 	devcb = &k052109_device::set_irq_handler(*device, DEVCB_##_devcb);
@@ -36,7 +36,7 @@ public:
 
 	static void set_k052109_callback(device_t &device, k052109_cb_delegate callback) { downcast<k052109_device &>(device).m_k052109_cb = callback; }
 	static void set_ram(device_t &device, bool ram);
-	static void set_screen_tag(device_t &device, device_t *owner, const char *tag);
+	static void set_screen_tag(device_t &device, const char *tag);
 
 	/*
 	The callback is passed:
@@ -96,10 +96,9 @@ private:
 	UINT8    m_irq_enabled;
 	UINT8    m_romsubbank, m_scrollctrl;
 
-	UINT8 *m_char_rom;
-	UINT32 m_char_size;
+	optional_region_ptr<UINT8> m_char_rom;
 
-	const char *m_screen_tag;
+	optional_device<screen_device> m_screen;
 
 	k052109_cb_delegate m_k052109_cb;
 

@@ -1,0 +1,41 @@
+// license:GPL-2.0+
+// copyright-holders:Hyllian
+
+{
+	"name": "xBR-lv2 w/ Deposterize",
+	"author": "Hyllian",
+	"targets": [
+		{
+			"name": "deposterize",
+			"mode": "guest",
+			"bilinear": false,
+			"doublebuffer": true
+		}
+	],
+	"passes": [
+		{
+			"effect": "misc/deposterize-pass0",
+			"name": "Deposterize, Pass 0",
+			"input": [
+				{ "sampler": "decal", "texture": "screen" }
+			],
+			"output": "deposterize"
+		},
+		{
+			"effect": "misc/deposterize-pass1",
+			"name": "Deposterize, Pass 1",
+			"input": [
+				{ "sampler": "decal", "target": "deposterize" }
+			],
+			"output": "deposterize"
+		},
+		{
+			"effect": "xbr/xbr-lv2",
+			"name": "xBR LV2 pass",
+			"input": [
+				{ "sampler": "decal", "target": "deposterize" }
+			],
+			"output": "output"
+		}
+	]
+}

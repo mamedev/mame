@@ -84,7 +84,7 @@ int main( int argc, char *argv[] )
 	UINT32 format;
 	UINT32 cpu;
 
-	filename = NULL;
+	filename = nullptr;
 	begin = 0;
 	end = 0xffffffff;
 	format = FORMAT_BIN;
@@ -293,11 +293,11 @@ int main( int argc, char *argv[] )
 		switch( cpu )
 		{
 		case CPU_PSX:
-			i = DasmPSXCPU( NULL, buffer, pc + offset, filebuf + pc );
+			i = DasmPSXCPU( nullptr, buffer, pc + offset, filebuf + pc );
 			break;
 		case CPU_R3000:
 			{
-				legacy_cpu_device *device = NULL;
+				legacy_cpu_device *device = nullptr;
 				int options = 0;
 				UINT8 *opram = filebuf + pc;
 				UINT8 *oprom = opram;

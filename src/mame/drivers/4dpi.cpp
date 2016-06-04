@@ -51,7 +51,7 @@ public:
 };
 
 
-#define VERBOSE_LEVEL ( 0 )
+#define VERBOSE_LEVEL (0)
 
 #define ENABLE_VERBOSE_LOG (1)
 
@@ -229,7 +229,6 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_START( sgi_ip6, sgi_ip6_state )
 	MCFG_CPU_ADD( "maincpu", R3041, 20000000 ) // FIXME: Should be R2000
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_CONFIG( config )
 	MCFG_CPU_PROGRAM_MAP( sgi_ip6_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sgi_ip6_state,  sgi_ip6_vbl)
 

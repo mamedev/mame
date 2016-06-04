@@ -20,24 +20,24 @@
    to => PORT 0 @ KBD controller.
 
 ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
-..KBD17:|[R] |F19 |[R] |F20|PF4|N- | N,| Enter
+..KBD17:|[R] |F19 |[R] |F20|PF4|N- | N,| Enter (numpad)
 ........|    |    |    |   |   |   NOTE1)
 ........|    |G22 |    |G23|E23|D23|C23| A23
 --------|----|----|----|---|---|---|---|---
 ..KBD16:|F18 |PF3 |[R] |N9 |C:D|N6 |N3 |N.
 ........|G21 |E22 |    |D22|B17|C22|B22|A22
 --------|----|----|----|---|---|---|---|---
-..KBD15:|F17 |PF2 |[R] |N8 |N5 |C:R| N2|N0
-........|    |    |    |   |   |   |   |NOTE 2)
-........|G20 |E21 |    |D21|C21|B18|B21|
+..KBD15:|F17 |PF2 |[R] |N8 |N5 |C:R| N2|N0 (right)
+........|    |    |    |   |   |   |   |see NOTE 2)
+........|G20 |E21 |    |D21|C21|B18|B21|A21
 --------|----|----|----|---|---|---|---|---
-  KBD14:|PF1 |Next|Rem-|C:U|N7 |N4 |N1 |N0
-........|    |Scrn|move|...|   |   |   |
+  KBD14:|PF1 |Next|Rem-|C:U|N7 |N4 |N1 |N0 (left)
+........|    |Scrn|move|...|   |   |   |see NOTE 2)
 ........|E20 |D18 |E18 |C17|D20|C20|B20|A20
 --------|----|----|----|---|---|---|---|---
-..KBD13:|Ins.|--- |'Do'|Prev { |"  |[R]|[R]
-........|Here|-   |    Scrn| [ |'  |   |
-........|E17 |E11 |G16 |D17|D11|C11|   |
+..KBD13:|Ins.|'_' |'Do'|Prev { |"  |[R]|[R]
+........|Here|'-' |    |Scrn [ |'  |   |
+........|E17 |E11 |G16 |D17|D11|C11|B13|A17
 --------|----|----|----|---|---|---|---|---
 ..KBD12:|Find|+   |Help|Se-| } |Re-|C:L| |
 ........|    |=   |    |lect ] |turn...| \
@@ -93,9 +93,10 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
   [R] = Reserved
   NOTE 1) N0-N9, N-, N. and N, refer to numeric keypad
   NOTE 2) N0 can be divided into 2 keys.
-  Normally only the N0 keyswitch is implemented as a double-sized key.
+   Normally only the N0 keyswitch is implemented as a double-sized key.
+   A21 = N0 (right); A20 = N0 (left)
   NOTE 3) Return key occupies 2 positions that are
-  decoded as the Return (C13) key.
+   decoded as the Return (C13) key.  C13 = RETURN (bot.); D13 = RETURN (top)
 
   C:D - Cursor down (B17)
   C:U - Cursor up (C17)

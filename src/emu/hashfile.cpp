@@ -430,7 +430,7 @@ hash_file *hashfile_open(emu_options &options, const char *sysname, int is_prelo
 {
 	hash_file *hashfile = nullptr;
 	object_pool *pool = nullptr;
-	file_error filerr;
+	osd_file::error filerr;
 
 	/* create a pool for this hash file */
 	pool = pool_alloc_lib(error_proc);
@@ -450,7 +450,7 @@ hash_file *hashfile_open(emu_options &options, const char *sysname, int is_prelo
 	/* open a file */
 	hashfile->file = global_alloc(emu_file(options.hash_path(), OPEN_FLAG_READ));
 	filerr = hashfile->file->open(sysname, ".hsi");
-	if (filerr != FILERR_NONE)
+	if (filerr != osd_file::error::NONE)
 	{
 		global_free(hashfile->file);
 		hashfile->file = nullptr;
@@ -568,7 +568,7 @@ bool hashfile_extrainfo(device_image_interface &image, std::string &result)
 	/* now read the hash file */
 	image.crc();
 	extra_info = nullptr;
-	int drv = driver_list::find(*image.device().mconfig().options().system());
+	int drv = driver_list::find(image.device().mconfig().gamedrv());
 	int compat, open = drv;
 	bool hashfound;
 	do

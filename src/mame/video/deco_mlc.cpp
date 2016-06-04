@@ -140,8 +140,8 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 	UINT32 *index_ptr=nullptr;
 	int offs,fx=0,fy=0,x,y,color,colorOffset,sprite,indx,h,w,bx,by,fx1,fy1;
 	int xoffs,yoffs;
-	UINT8 *rom = memregion("gfx2")->base() + 0x20000, *index_ptr8;
-	UINT8 *rawrom = memregion("gfx2")->base();
+	UINT8 *rom = m_gfx2 + 0x20000, *index_ptr8;
+	UINT8 *rawrom = m_gfx2;
 	int blockIsTilemapIndex=0;
 	int sprite2=0,indx2=0,use8bppMode=0;
 	int yscale,xscale;

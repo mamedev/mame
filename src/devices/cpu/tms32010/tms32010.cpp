@@ -4,9 +4,6 @@
 	*                 Texas Instruments TMS32010 DSP Emulator                  *
 	*                                                                          *
 	*                  Copyright Tony La Porta                                 *
-	*      You are not allowed to distribute this software commercially.       *
-	*                      Written for the MAME project.                       *
-	*                                                                          *
 	*                                                                          *
 	*      Notes : The term 'DMA' within this document, is in reference        *
 	*                  to Direct Memory Addressing, and NOT the usual term     *
@@ -900,7 +897,7 @@ void tms32010_device::state_string_export(const device_state_entry &entry, std::
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				m_STR & 0x8000 ? 'O':'.',
 				m_STR & 0x4000 ? 'M':'.',
 				m_STR & 0x2000 ? 'I':'.',

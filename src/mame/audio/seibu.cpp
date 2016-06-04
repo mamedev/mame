@@ -78,6 +78,7 @@ const device_type SEIBU_SOUND = &device_creator<seibu_sound_device>;
 
 seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_SOUND, "Seibu Sound System", tag, owner, clock, "seibu_sound", __FILE__),
+		m_sound_rom(*this, ":audiocpu"),
 		m_main2sub_pending(0),
 		m_sub2main_pending(0),
 		m_rst10_irq(0xff),
@@ -98,16 +99,14 @@ void seibu_sound_device::set_encryption(int mode)
 
 void seibu_sound_device::device_start()
 {
-	int length = memregion(":audiocpu")->bytes();
-	UINT8 *rom = memregion(":audiocpu")->base();
-	if (length > 0x10000)
+	if (m_sound_rom.length() > 0x10000)
 	{
-		membank(":seibu_bank1")->configure_entries(0, (length - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
+		membank(":seibu_bank1")->configure_entries(0, (m_sound_rom.length() - 0x10000) / 0x8000, &m_sound_rom[0x10000], 0x8000);
 
 		/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
 		membank(":seibu_bank1")->set_entry(0);
 	} else
-		membank(":seibu_bank1")->set_base(rom + 0x8000);
+		membank(":seibu_bank1")->set_base(&m_sound_rom[0x8000]);
 
 	switch(m_encryption_mode) {
 	case 0: break;
@@ -115,13 +114,13 @@ void seibu_sound_device::device_start()
 
 	case 1:
 		get_custom_decrypt();
-		memcpy(m_decrypted_opcodes.get(), rom, length);
-		apply_decrypt(rom, m_decrypted_opcodes.get(), 0x2000);
+		memcpy(m_decrypted_opcodes.get(), &m_sound_rom[0], m_sound_rom.length());
+		apply_decrypt(&m_sound_rom[0], m_decrypted_opcodes.get(), 0x2000);
 		break;
 
 	case 2:
 		get_custom_decrypt();
-		apply_decrypt(rom, m_decrypted_opcodes.get(), length);
+		apply_decrypt(&m_sound_rom[0], m_decrypted_opcodes.get(), m_sound_rom.length());
 		break;
 	}
 
@@ -389,7 +388,7 @@ ADDRESS_MAP_START( seibu2_airraid_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
 	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
-	AM_RANGE(0x4007, 0x4007) AM_WRITENOP // bank, always 0
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
 	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
@@ -514,8 +513,7 @@ seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char
 		m_end(0),
 		m_nibble(0),
 		m_playing(0),
-		m_rom_tag(nullptr),
-		m_base(nullptr)
+		m_base(*this, DEVICE_SELF)
 {
 }
 
@@ -527,7 +525,6 @@ void seibu_adpcm_device::device_start()
 {
 	m_playing = 0;
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
-	m_base = machine().root_device().memregion(m_rom_tag)->base();
 	m_adpcm.reset();
 
 	save_item(NAME(m_current));
@@ -540,14 +537,11 @@ void seibu_adpcm_device::device_start()
 // simplify PCB layout/routing rather than intentional protection, but it
 // still fits, especially since the Z80s for all these games are truly encrypted.
 
-void seibu_adpcm_device::decrypt(const char *region)
+void seibu_adpcm_device::decrypt()
 {
-	UINT8 *ROM = machine().root_device().memregion(region)->base();
-	int len = machine().root_device().memregion(region)->bytes();
-
-	for (int i = 0; i < len; i++)
+	for (int i = 0; i < m_base.length(); i++)
 	{
-		ROM[i] = BITSWAP8(ROM[i], 7, 5, 3, 1, 6, 4, 2, 0);
+		m_base[i] = BITSWAP8(m_base[i], 7, 5, 3, 1, 6, 4, 2, 0);
 	}
 }
 

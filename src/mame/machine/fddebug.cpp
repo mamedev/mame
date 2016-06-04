@@ -442,7 +442,7 @@ static inline int pc_is_valid(address_space &space, UINT32 pc, UINT32 flags)
 		return 0;
 	if (pc & 0xff000000)
 		return 0;
-	if (space.direct().read_ptr(pc) == NULL)
+	if (space.direct().read_ptr(pc) == nullptr)
 		return 0;
 	return 1;
 }
@@ -591,8 +591,8 @@ static void load_overlay_file(running_machine &machine)
 
 	/* determine the filename and open the file */
 	emu_file file(OPEN_FLAG_READ);
-	file_error filerr = file.open(machine.system().name, ".kov");
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open(machine.system().name, ".kov");
+	if (filerr == osd_file::error::NONE)
 	{
 		file.read(keystatus, keystatus_words * 2);
 
@@ -617,8 +617,8 @@ static void save_overlay_file(running_machine &machine)
 
 	/* determin the filename and open the file */
 	emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	file_error filerr = file.open(machine.system().name, ".kov");
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open(machine.system().name, ".kov");
+	if (filerr == osd_file::error::NONE)
 	{
 		/* convert to big-endian */
 		for (pcaddr = 0; pcaddr < keystatus_words; pcaddr++)
@@ -670,7 +670,7 @@ void fd1094_regenerate_key(running_machine &machine)
 	}
 
 	/* update the key with the current fd1094 manager */
-	if (key_changed != NULL)
+	if (key_changed != nullptr)
 		(*key_changed)(machine);
 
 	/* force all memory and disassembly views to update */
@@ -760,8 +760,8 @@ static void execute_fdoutput(running_machine &machine, int ref, int params, cons
 
 	/* determin the filename and open the file */
 	emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	file_error filerr = file.open(param[0]);
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = file.open(param[0]);
+	if (filerr == osd_file::error::NONE)
 		file.write(keyregion, KEY_SIZE);
 
 	debug_console_printf(machine, "File '%s' saved\n", param[0]);
@@ -1183,8 +1183,8 @@ static void execute_fddasm(running_machine &machine, int ref, int params, const 
 
 	/* open the file */
 	emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	file_error filerr = file.open(filename);
-	if (filerr != FILERR_NONE)
+	osd_file::error filerr = file.open(filename);
+	if (filerr != osd_file::error::NONE)
 	{
 		debug_console_printf(machine, "Unable to create file '%s'\n", filename);
 		return;
@@ -2089,7 +2089,7 @@ static void build_optable(running_machine &machine)
 	for (opnum = 0; opnum < 65536; opnum++)
 	{
 		optable[opnum].flags = OF_INVALID;
-		optable[opnum].string = NULL;
+		optable[opnum].string = nullptr;
 	}
 
 	/* now iterate over entries in our intruction table */

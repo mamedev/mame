@@ -599,7 +599,7 @@ static MACHINE_CONFIG_START( coh110, namcos11_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 
-	MCFG_AT28C16_ADD( "at28c16", NULL )
+	MCFG_AT28C16_ADD( "at28c16", nullptr )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh100, coh110 )

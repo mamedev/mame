@@ -330,7 +330,7 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz/4) // U880D
 	MCFG_CPU_PROGRAM_MAP(amu880_mem)
 	MCFG_CPU_IO_MAP(amu880_io)
-	MCFG_CPU_CONFIG(amu880_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(amu880_daisy_chain)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", amu880_state, keyboard_tick, attotime::from_hz(1500))
 
@@ -340,7 +340,7 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_SCREEN_RAW_PARAMS(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amu880)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_10MHz/4)

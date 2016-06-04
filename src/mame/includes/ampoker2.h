@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+
+#include "machine/watchdog.h"
+
 class ampoker2_state : public driver_device
 {
 public:
@@ -7,6 +10,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
@@ -29,5 +33,6 @@ public:
 	DECLARE_VIDEO_START(sigma2k);
 	UINT32 screen_update_ampoker2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 };

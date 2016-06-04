@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-    uiinput.c
+    uiinput.cpp
 
     Internal MAME user interface input state.
 ***************************************************************************/
@@ -25,17 +25,18 @@ enum
 
 
 //**************************************************************************
-//  NETWORK MANAGER
+//  UI INPUT MANAGER
 //**************************************************************************
 
 //-------------------------------------------------
-//  network_manager - constructor
+//  ui_input_manager - constructor
 //-------------------------------------------------
 
 ui_input_manager::ui_input_manager(running_machine &machine)
 	: m_machine(machine),
 		m_current_mouse_target(nullptr),
 		m_current_mouse_down(false),
+		m_current_mouse_field(nullptr),
 		m_events_start(0),
 		m_events_end(0)
 {
@@ -67,6 +68,22 @@ void ui_input_manager::frame_update()
 		bool pressed = machine().ioport().type_pressed(code);
 		if (!pressed || m_seqpressed[code] != SEQ_PRESSED_RESET)
 			m_seqpressed[code] = pressed;
+	}
+
+	// perform mouse hit testing
+	ioport_field *mouse_field = m_current_mouse_down ? find_mouse_field() : nullptr;
+	if (m_current_mouse_field != mouse_field)
+	{
+		// clear the old field if there was one
+		if (m_current_mouse_field != nullptr)
+			m_current_mouse_field->set_value(0);
+
+		// set the new field if it exists and isn't already being pressed
+		if (mouse_field != nullptr && !mouse_field->digital_value())
+			mouse_field->set_value(1);
+
+		// update internal state
+		m_current_mouse_field = mouse_field;
 	}
 }
 
@@ -166,7 +183,7 @@ void ui_input_manager::reset()
     location of the mouse
 -------------------------------------------------*/
 
-render_target *ui_input_manager::find_mouse(INT32 *x, INT32 *y, bool *button)
+render_target *ui_input_manager::find_mouse(INT32 *x, INT32 *y, bool *button) const
 {
 	if (x != nullptr)
 		*x = m_current_mouse_x;
@@ -175,6 +192,29 @@ render_target *ui_input_manager::find_mouse(INT32 *x, INT32 *y, bool *button)
 	if (button != nullptr)
 		*button = m_current_mouse_down;
 	return m_current_mouse_target;
+}
+
+
+/*-------------------------------------------------
+    find_mouse_field - retrieves the input field
+    the mouse is currently pointing at
+-------------------------------------------------*/
+
+ioport_field *ui_input_manager::find_mouse_field() const
+{
+	// map the point and determine what was hit
+	if (m_current_mouse_target != nullptr)
+	{
+		ioport_port *port = nullptr;
+		ioport_value mask;
+		float x, y;
+		if (m_current_mouse_target->map_point_input(m_current_mouse_x, m_current_mouse_y, port, mask, x, y))
+		{
+			if (port != nullptr)
+				return port->field(mask);
+		}
+	}
+	return nullptr;
 }
 
 
@@ -298,6 +338,36 @@ void ui_input_manager::push_mouse_up_event(render_target* target, INT32 x, INT32
 }
 
 /*-------------------------------------------------
+push_mouse_down_event - pushes a mouse
+down event to the specified render_target
+-------------------------------------------------*/
+
+void ui_input_manager::push_mouse_rdown_event(render_target* target, INT32 x, INT32 y)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_MOUSE_RDOWN;
+	event.target = target;
+	event.mouse_x = x;
+	event.mouse_y = y;
+	push_event(event);
+}
+
+/*-------------------------------------------------
+push_mouse_down_event - pushes a mouse
+down event to the specified render_target
+-------------------------------------------------*/
+
+void ui_input_manager::push_mouse_rup_event(render_target* target, INT32 x, INT32 y)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_MOUSE_RUP;
+	event.target = target;
+	event.mouse_x = x;
+	event.mouse_y = y;
+	push_event(event);
+}
+
+/*-------------------------------------------------
     push_mouse_double_click_event - pushes
     a mouse double-click event to the specified
     render_target
@@ -326,8 +396,8 @@ void ui_input_manager::push_char_event(render_target* target, unicode_char ch)
 }
 
 /*-------------------------------------------------
-	push_mouse_wheel_event - pushes a mouse 
-	wheel event to the specified render_target
+    push_mouse_wheel_event - pushes a mouse
+    wheel event to the specified render_target
 -------------------------------------------------*/
 
 void ui_input_manager::push_mouse_wheel_event(render_target *target, INT32 x, INT32 y, short delta, int ucNumLines)

@@ -112,7 +112,7 @@ WRITE8_MEMBER(battlera_state::sound_w)
 {
 	if (offset == 0)
 	{
-		soundlatch_byte_w(space,0,data);
+		m_soundlatch->write(space, 0, data);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, battlera_state )
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0x1fe800, 0x1fe80f) AM_DEVWRITE("c6280", c6280_device, c6280_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank7") /* Main ram */
-	AM_RANGE(0x1ff000, 0x1ff001) AM_READ(soundlatch_byte_r) AM_WRITE(adpcm_reset_w)
+	AM_RANGE(0x1ff000, 0x1ff001) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_reset_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
@@ -295,6 +295,8 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)

@@ -11,6 +11,8 @@
 #include <cmath>
 #include <cstring>
 #include <cstdlib>
+#include <algorithm>
+#include <initializer_list>
 
 #include "plib/pstring.h"
 #include "plib/plists.h"
@@ -23,10 +25,26 @@ private:
 
 public:
 
+	static const pstring buildpath(std::initializer_list<pstring> list )
+	{
+		pstring ret = "";
+		for( auto elem : list )
+		{
+			if (ret == "")
+				ret = elem;
+			else
+#ifdef _WIN32
+				ret = ret + '\\' + elem;
+#else
+				ret = ret + '/' + elem;
+#endif
+		}
+		return ret;
+	}
 
 	static const pstring environment(const pstring &var, const pstring &default_val = "")
 	{
-		if (getenv(var.cstr()) == NULL)
+		if (getenv(var.cstr()) == nullptr)
 			return default_val;
 		else
 			return pstring(getenv(var.cstr()));
@@ -40,26 +58,38 @@ private:
 	nl_math() {};
 
 public:
-	ATTR_HOT inline static float exp(const float x) { return std::exp(x); }
-	ATTR_HOT inline static double abs(const double x) { return std::abs(x); }
-	ATTR_HOT inline static float abs(const float x) { return std::abs(x); }
-	ATTR_HOT inline static double log(const double x) { return std::log(x); }
-	ATTR_HOT inline static float log(const float x) { return std::log(x); }
-#if defined(_MSC_VER) && _MSC_VER < 1800
-	ATTR_HOT inline static double e_log1p(const double x) { return nl_math::log(1.0 + x); }
-	ATTR_HOT inline static float e_log1p(const float x) { return nl_math::log(1.0 + x); }
+	template <typename T>
+	static T abs(const T &x) { return std::abs(x); }
+
+	template <typename T>
+	static T max(const T &x, const T &y) { return std::max(x, y); }
+
+	template <typename T>
+	static T min(const T &x, const T &y) { return std::min(x, y); }
+
+	template <typename T>
+	static T log(const T &x) { return std::log(x); }
+
+	#if defined(_MSC_VER) && _MSC_VER < 1800
+	ATTR_HOT inline static double e_log1p(const double &x) { return nl_math::log(1.0 + x); }
+	ATTR_HOT inline static float e_log1p(const float &x) { return nl_math::log(1.0 + x); }
 #else
-	ATTR_HOT inline static double e_log1p(const double x) { return log1p(x); }
-	ATTR_HOT inline static float e_log1p(const float x) { return log1pf(x); }
+	template <typename T>
+	static T e_log1p(const T &x) { return log1p(x); }
 #endif
-	ATTR_HOT inline static double sqrt(const double x) { return std::sqrt(x); }
-	ATTR_HOT inline static float sqrt(const float x) { return std::sqrt(x); }
+
+	template <typename T>
+	static T sqrt(const T &x) { return std::sqrt(x); }
+
+	template <typename T>
+	static T hypot(const T &x, const T &y) { return std::hypot(x, y); }
 
 	// this one has an accuracy of better than 5%. That's enough for our purpose
 	// add c3 and it'll be better than 1%
 
 #if 0
-	inline static double fastexp_h(const double x)
+	ATTR_HOT inline static float exp(const float &x) { return std::exp(x); }
+	inline static double fastexp_h(const double &x)
 	{
 		/* static */ const double ln2r = 1.442695040888963387;
 		/* static */ const double ln2  = 0.693147180559945286;
@@ -79,7 +109,7 @@ public:
 			return pow(2.0, t)*e;
 	}
 
-	ATTR_HOT inline static double exp(const double x)
+	ATTR_HOT inline static double exp(const double &x)
 	{
 		if (x<0)
 			return 1.0 / fastexp_h(-x);
@@ -87,9 +117,95 @@ public:
 			return fastexp_h(x);
 	}
 #else
-	ATTR_HOT inline static double exp(const double x)  { return std::exp(x); }
+	template <typename T>
+	static double exp(const T &x)  { return std::exp(x); }
 #endif
 
 };
+
+template <typename _SC>
+class powned_ptr
+{
+private:
+	powned_ptr()
+	: m_ptr(nullptr), m_is_owned(true) { }
+public:
+	powned_ptr(_SC *p, bool owned)
+	: m_ptr(p), m_is_owned(owned)
+	{ }
+	powned_ptr(const powned_ptr &r) = delete;
+	powned_ptr & operator =(const powned_ptr &r) = delete;
+
+	powned_ptr(powned_ptr &&r)
+	{
+		m_is_owned = r.m_is_owned;
+		m_ptr = r.m_ptr;
+		r.m_is_owned = false;
+		r.m_ptr = nullptr;
+	}
+
+	template<typename _DC>
+	powned_ptr(powned_ptr<_DC> &&r)
+	{
+		_SC *dest_ptr = &dynamic_cast<_SC &>(*r.get());
+		bool o = r.is_owned();
+		r.release();
+		m_is_owned = o;
+		m_ptr = dest_ptr;
+	}
+
+	~powned_ptr()
+	{
+		if (m_is_owned)
+			delete m_ptr;
+	}
+	template<typename _DC, typename... _Args>
+	static powned_ptr Create(_Args&&... __args)
+	{
+		powned_ptr a;
+		_DC *x = new _DC(std::forward<_Args>(__args)...);
+		a.m_ptr = static_cast<_SC *>(x);
+		return a;
+	}
+
+	template<typename... _Args>
+	static powned_ptr Create(_Args&&... __args)
+	{
+		powned_ptr a;
+		a.m_ptr = new _SC(std::forward<_Args>(__args)...);
+		return a;
+	}
+	void release()
+	{
+		m_is_owned = false;
+		m_ptr = nullptr;
+	}
+
+	bool is_owned() const { return m_is_owned; }
+	
+	template<typename _DC>
+	powned_ptr<_DC> & operator =(powned_ptr<_DC> &r)
+	{
+		m_is_owned = r.m_is_owned;
+		m_ptr = r.m_ptr;
+		r.m_is_owned = false;
+		r.m_ptr = nullptr;
+		return *this;
+	}
+	_SC * operator ->() { return m_ptr; }
+	_SC & operator *() { return *m_ptr; }
+	_SC * get() const { return m_ptr; }
+private:
+	_SC *m_ptr;
+	bool m_is_owned;
+};
+
+template<typename _BC, typename _DC, typename... _Args>
+static std::unique_ptr<_BC> make_unique_base(_Args&&... __args)
+{
+	std::unique_ptr<_BC> ret(new _DC(std::forward<_Args>(__args)...));
+	return ret;
+}
+
 
 #endif /* NL_UTIL_H_ */

@@ -187,7 +187,6 @@ TODO!
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
-#include "video/hd63484.h"
 #include "includes/taito_b.h"
 
 WRITE8_MEMBER(taitob_state::bankswitch_w)
@@ -691,6 +690,10 @@ static ADDRESS_MAP_START( realpunc_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 //  AM_RANGE(0x320000, 0x320001) AM_NOP // ?
 	AM_RANGE(0x320002, 0x320003) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_comm_w, 0xff00)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( realpunc_hd63484_map, AS_0, 16, taitob_state )
+	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masterw_sound_map, AS_PROGRAM, 8, taitob_state )
@@ -2909,8 +2912,8 @@ static MACHINE_CONFIG_START( realpunc, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,realpunc)
 
-	// TODO: convert to use H63484 and hook it up properly
-	MCFG_DEVICE_ADD("hd63484", HD63484, 0)
+	MCFG_HD63484_ADD("hd63484", 0, realpunc_hd63484_map)
+	MCFG_HD63484_AUTO_CONFIGURE_SCREEN(false)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)

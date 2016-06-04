@@ -36,14 +36,14 @@ private:
 #endif
 
 template<typename T>
-inline void vec_set (const std::size_t n, const T &scalar, T * RESTRICT result)
+inline void vec_set (const std::size_t & n, const T &scalar, T * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] = scalar;
 }
 
 template<typename T>
-inline T vecmult (const std::size_t n, const T * RESTRICT a1, const T * RESTRICT a2 )
+inline T vecmult (const std::size_t & n, const T * RESTRICT a1, const T * RESTRICT a2 )
 {
 	T value = 0.0;
 	for ( std::size_t i = 0; i < n; i++ )
@@ -52,7 +52,7 @@ inline T vecmult (const std::size_t n, const T * RESTRICT a1, const T * RESTRICT
 }
 
 template<typename T>
-inline T vecmult2 (const std::size_t n, const T *a1)
+inline T vecmult2 (const std::size_t & n, const T *a1)
 {
 	T value = 0.0;
 	for ( std::size_t i = 0; i < n; i++ )
@@ -64,7 +64,7 @@ inline T vecmult2 (const std::size_t n, const T *a1)
 }
 
 template<typename T>
-inline void vec_mult_scalar (const std::size_t n, const T * RESTRICT v, const T scalar, T * RESTRICT result)
+inline void vec_mult_scalar (const std::size_t & n, const T * RESTRICT v, const T & scalar, T * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 	{
@@ -73,37 +73,37 @@ inline void vec_mult_scalar (const std::size_t n, const T * RESTRICT v, const T 
 }
 
 template<typename T>
-inline void vec_add_mult_scalar (const std::size_t n, const T * RESTRICT v, const T scalar, T * RESTRICT result)
+inline void vec_add_mult_scalar (const std::size_t & n, const T * RESTRICT v, const T scalar, T * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] += scalar * v[i];
 }
 
-inline void vec_add_ip(const std::size_t n, const double * RESTRICT v, double * RESTRICT result)
+inline void vec_add_ip(const std::size_t & n, const double * RESTRICT v, double * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] += v[i];
 }
 
 template<typename T>
-inline void vec_sub(const std::size_t n, const T * RESTRICT v1, const T * RESTRICT v2, T * RESTRICT result)
+inline void vec_sub(const std::size_t & n, const T * RESTRICT v1, const T * RESTRICT v2, T * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] = v1[i] - v2[i];
 }
 
 template<typename T>
-inline void vec_scale (const std::size_t n, T * RESTRICT v, const T scalar)
+inline void vec_scale (const std::size_t & n, T * RESTRICT v, const T scalar)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		v[i] = scalar * v[i];
 }
 
-inline double vec_maxabs(const std::size_t n, const double * RESTRICT v)
+inline double vec_maxabs(const std::size_t & n, const double * RESTRICT v)
 {
 	double ret = 0.0;
 	for ( std::size_t i = 0; i < n; i++ )
-		ret = std::max(ret, std::abs(v[i]));
+		ret = nl_math::max(ret, nl_math::abs(v[i]));
 
 	return ret;
 }

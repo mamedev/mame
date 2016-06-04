@@ -10,11 +10,7 @@
 
 #ifndef NO_USE_MIDI
 
-#ifndef USE_SYSTEM_PORTMIDI
-#include "portmidi/pm_common/portmidi.h"
-#else
 #include <portmidi.h>
-#endif
 #include "osdcore.h"
 #include "corealloc.h"
 #include "modules/osdmodule.h"

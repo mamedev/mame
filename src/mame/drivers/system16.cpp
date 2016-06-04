@@ -531,17 +531,7 @@ static ADDRESS_MAP_START( bayroute_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 ADDRESS_MAP_END
 #endif
 
-/***************************************************************************/
 
-/*
-    Flash Point (Datsu bootlegs = fpointbl, fpointbj)
-    Has sound latch at $E000 instead of I/O ports $C0-FF
-*/
-static ADDRESS_MAP_START( fpointbl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
 
 /***************************************************************************/
 
@@ -838,37 +828,6 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************/
-
-
-static ADDRESS_MAP_START( fpointbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
-
-	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_command_irq_w)
-	AM_RANGE(0x601000, 0x601001) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x601002, 0x601003) AM_READ_PORT("P1")
-	AM_RANGE(0x601004, 0x601005) AM_READ_PORT("P2")
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
-	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW1")
-
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x843000, 0x843001) AM_WRITENOP
-
-	AM_RANGE(0xC46000, 0xC46001) AM_WRITE(s16bl_fgscrolly_w)
-	AM_RANGE(0xC46008, 0xC46009) AM_WRITE(s16bl_fgscrollx_w)
-	AM_RANGE(0xC46010, 0xC46011) AM_WRITE(s16bl_bgscrolly_w)
-	AM_RANGE(0xC46018, 0xC46019) AM_WRITE(s16bl_bgscrollx_w)
-
-	AM_RANGE(0xC46020, 0xC46021) AM_WRITE(datsu_page0_w)
-	AM_RANGE(0xc46022, 0xc46023) AM_WRITE(datsu_page1_w)
-	AM_RANGE(0xC46024, 0xC46025) AM_WRITE(datsu_page2_w)
-	AM_RANGE(0xC46026, 0xC46027) AM_WRITE(datsu_page3_w)
-
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
-ADDRESS_MAP_END
 
 
 WRITE16_MEMBER(segas1x_bootleg_state::eswat_tilebank0_w)
@@ -1349,6 +1308,74 @@ static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
+READ16_MEMBER(segas1x_bootleg_state::ddcrew_c41006_r)
+{
+	return 0xffff;//rand();
+}
+
+WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
+{
+//  printf("banking write %08x: %04x (%04x %04x)\n", space.device().safe_pc(), offset*2, data&mem_mask, mem_mask);
+
+	data &= mem_mask;
+//  offset &= 0x7;
+	offset += 4;
+
+	int maxbanks = memregion("sprites")->bytes() / 0x40000;
+	if (data >= maxbanks)
+		data = 255;
+	m_sprites->set_bank((offset) * 2 + 0, data * 2 + 0);
+	m_sprites->set_bank((offset) * 2 + 1, data * 2 + 1);
+}
+
+
+// todo: this
+static ADDRESS_MAP_START(ddcrewbl_map, AS_PROGRAM, 16, segas1x_bootleg_state)
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM // ok
+	AM_RANGE(0x200000, 0x27ffff) AM_ROM // ok
+
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites") // ok
+
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram") // ok
+
+	AM_RANGE(0xC00000, 0xC00001) AM_WRITENOP // vdp leftovers maybe?
+	AM_RANGE(0xC00004, 0xC00005) AM_WRITENOP
+	AM_RANGE(0xC00006, 0xC00007) AM_WRITENOP
+
+
+	AM_RANGE(0xC40000, 0xC40001) AM_READ(ddcrew_c41006_r)
+	AM_RANGE(0xC40002, 0xC40003) AM_READ(ddcrew_c41006_r)
+	AM_RANGE(0xC41000, 0xC41001) AM_READ(ddcrew_c41006_r)
+	AM_RANGE(0xC41002, 0xC41003) AM_READ(ddcrew_c41006_r)
+	AM_RANGE(0xC41004, 0xC41005) AM_READ(ddcrew_c41006_r)
+	AM_RANGE(0xC41006, 0xC41007) AM_READ(ddcrew_c41006_r)
+
+
+
+	AM_RANGE(0xC44000, 0xC44001) AM_WRITENOP
+
+	AM_RANGE(0xc46600, 0xc46601) AM_WRITE(sys18_refreshenable_w)
+
+	AM_RANGE(0xC46038, 0xC4603f) AM_WRITE(ddcrewbl_spritebank_w) // ok
+
+	AM_RANGE(0xC46000, 0xC46001) AM_WRITENOP
+	AM_RANGE(0xC46010, 0xC46011) AM_WRITENOP
+	AM_RANGE(0xC46020, 0xC46021) AM_WRITENOP
+
+	AM_RANGE(0xC46040, 0xC46041) AM_WRITENOP
+	AM_RANGE(0xC46050, 0xC46051) AM_WRITENOP
+
+	AM_RANGE(0xC46060, 0xC46061) AM_WRITENOP
+	AM_RANGE(0xC46062, 0xC46063) AM_WRITENOP
+	AM_RANGE(0xC46064, 0xC46065) AM_WRITENOP
+
+	AM_RANGE(0xC46070, 0xC46071) AM_WRITENOP
+
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM // ok
+ADDRESS_MAP_END
+
 /*************************************
  *
  *  Input ports
@@ -1702,93 +1729,6 @@ static INPUT_PORTS_START( eswat )
 	PORT_DIPSETTING(    0x80, "4" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( fpointbl )
-	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-
-	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-
-	PORT_START("DSW2")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" ) /* Listed as "Unused" */
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" ) /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" ) /* Listed as "Unused" */
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x40, 0x40, "Clear Round Allowed" ) PORT_DIPLOCATION("SW2:7") /* Use button 3 */
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x40, "2" )
-	/* SW2:8 The mode in which a block falls at twice [ usual ] speed as this when playing 25 minutes or more on one coin. */
-	PORT_DIPNAME( 0x80, 0x80, "2 Cell Move" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x05, "2 Coins/1 Credit 5/3 6/4" )
-	PORT_DIPSETTING(    0x04, "2 Coins/1 Credit 4/3" )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(    0x02, "1 Coin/1 Credit 4/5" )
-	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit 5/6" )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too) or 1/1" )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
-	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x50, "2 Coins/1 Credit 5/3 6/4" )
-	PORT_DIPSETTING(    0x40, "2 Coins/1 Credit 4/3" )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x10, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(    0x20, "1 Coin/1 Credit 4/5" )
-	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit 5/6" )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( tetris )
 	PORT_INCLUDE( sys16_common )    /* unconfirmed coinage dip */
@@ -2298,18 +2238,7 @@ static MACHINE_CONFIG_DERIVED( eswatbl, system16_7759 )
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-124)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fpointbl, system16 )
 
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fpointbl_map)
-
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(fpointbl_sound_map)
-
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
-MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tetrisbl, system16 )
 
@@ -2433,6 +2362,48 @@ static MACHINE_CONFIG_DERIVED( shdancbla, system18 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
+
+
+MACHINE_RESET_MEMBER(segas1x_bootleg_state,ddcrewbl)
+{
+	// set up the initial banks for this game
+	// because it doesn't appear to actually program banks 0-3.
+	for (int i = 0; i < 4; i++)
+	{
+		m_sprites->set_bank((i)* 2 + 0, i * 2 + 0);
+		m_sprites->set_bank((i)* 2 + 1, i * 2 + 1);
+	}
+}
+
+
+static MACHINE_CONFIG_START( ddcrewbl, segas1x_bootleg_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
+	MCFG_CPU_PROGRAM_MAP(ddcrewbl_map)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(40*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sys16)
+	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER)
+
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
+
+	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-124)
+
+	MCFG_MACHINE_RESET_OVERRIDE(segas1x_bootleg_state,ddcrewbl)
+
+MACHINE_CONFIG_END
+
 
 /*************************************
  *
@@ -3037,51 +3008,6 @@ ROM_START( eswatbl )
 	ROM_LOAD( "ic6", 0x10000, 0x40000, CRC(254347c2) SHA1(bf2d83a69a5be375c7e42e9f7d6e65c1095a354c) )
 ROM_END
 
-ROM_START( fpointbl )
-	ROM_REGION( 0x0c0000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "flpoint.003", 0x000000, 0x10000, CRC(4d6df514) SHA1(168aa1629ab7152ba1984605155406b236954a2c) )
-	ROM_LOAD16_BYTE( "flpoint.002", 0x000001, 0x10000, CRC(4dff2ee8) SHA1(bd157d8c168d45e7490a05d5e1e901d9bdda9599) )
-
-	ROM_REGION( 0x30000, "gfx1", ROMREGION_INVERT ) /* tiles */
-	ROM_LOAD( "flpoint.006", 0x00000, 0x10000, CRC(c539727d) SHA1(56674effe1d273128dddd2ff9e02974ec10f3fff) )
-	ROM_LOAD( "flpoint.005", 0x10000, 0x10000, CRC(82c0b8b0) SHA1(e1e2e721cb8ad53df33065582dc90edeba9c3cab) )
-	ROM_LOAD( "flpoint.004", 0x20000, 0x10000, CRC(522426ae) SHA1(90fd0a19b30a8a61dc4cfa66a64115596333dcc6) )
-
-	ROM_REGION16_BE( 0x20000, "sprites", 0 ) /* sprites */
-	ROM_LOAD16_BYTE( "12596.bin", 0x00001, 0x010000, CRC(4a4041f3) SHA1(4c52b30223d8aa80ccdbb196098cb17e64ad6583) )
-	ROM_LOAD16_BYTE( "12597.bin", 0x00000, 0x010000, CRC(6961e676) SHA1(7639d2da086b57a9a8d6100fdacf40d97d7c4772) )
-
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "flpoint.001", 0x0000, 0x8000, CRC(c5b8e0fe) SHA1(6cf8c67151d8604326fc6dbf976c0635b452a844) ) // bootleg rom doesn't work, but should be correct!
-ROM_END
-
-ROM_START( fpointbj )
-	ROM_REGION( 0x0c0000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "boot2.003", 0x000000, 0x10000, CRC(6c00d1b0) SHA1(fd0c47b8ca010a64d3ef91980f93854ebc98fbda) )
-	ROM_LOAD16_BYTE( "boot2.002", 0x000001, 0x10000, CRC(c1fcd704) SHA1(697bef464e53fb9891ed15ee2d6210107b693b20) )
-
-	ROM_REGION( 0x30000, "gfx1", ROMREGION_INVERT ) /* tiles */
-	ROM_LOAD( "flpoint.006", 0x00000, 0x10000, CRC(c539727d) SHA1(56674effe1d273128dddd2ff9e02974ec10f3fff) )
-	ROM_LOAD( "flpoint.005", 0x10000, 0x10000, CRC(82c0b8b0) SHA1(e1e2e721cb8ad53df33065582dc90edeba9c3cab) )
-	ROM_LOAD( "flpoint.004", 0x20000, 0x10000, CRC(522426ae) SHA1(90fd0a19b30a8a61dc4cfa66a64115596333dcc6) )
-
-	ROM_REGION16_BE( 0x20000, "sprites", 0 ) /* sprites */
-	ROM_LOAD16_BYTE( "12596.bin", 0x00001, 0x010000, CRC(4a4041f3) SHA1(4c52b30223d8aa80ccdbb196098cb17e64ad6583) )
-	ROM_LOAD16_BYTE( "12597.bin", 0x00000, 0x010000, CRC(6961e676) SHA1(7639d2da086b57a9a8d6100fdacf40d97d7c4772) )
-
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "flpoint.001", 0x0000, 0x8000, CRC(c5b8e0fe) SHA1(6cf8c67151d8604326fc6dbf976c0635b452a844) ) // bootleg rom doesn't work, but should be correct!
-
-	/* stuff below isn't used but loaded because it was on the board .. */
-	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "82s129.1",  0x0000, 0x0100, CRC(a7c22d96) SHA1(160deae8053b09c09328325246598b3518c7e20b) )
-	ROM_LOAD( "82s123.2",  0x0100, 0x0020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) )
-
-	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "fpointbj_gal16v8_1.bin", 0x0000, 0x0117, CRC(ba7f292c) SHA1(c383700d05663c9c5f29d5d04d16b05cd6adceb8) )
-	ROM_LOAD( "fpointbj_gal16v8_3.bin", 0x0200, 0x0117, CRC(ce1ab1e1) SHA1(dcfc0015d8595ee6cb6bb02c95655161a7f3b017) )
-	ROM_LOAD( "fpointbj_gal20v8.bin", 0x0400, 0x019d, NO_DUMP ) /* Protected */
-ROM_END
 
 ROM_START( tetrisbl )
 	ROM_REGION( 0x040000, "maincpu", ROMREGION_ERASEFF ) /* 68000 code */
@@ -3108,7 +3034,7 @@ ROM_END
 ******************************/
 
 /*
-Program Roms contain
+The below-referenced Program Roms contain
 
 Designed and Programmed by A.M.T. Research & Development Department 03/30/1991.
 Copying or Revising for Commercial Use Is Not Permitted.
@@ -3477,6 +3403,48 @@ ROM_START( shdancbla )
 	ROM_LOAD( "10.bin", 0x10000, 0x10000, CRC(d47a1610) SHA1(96d22068321de3c285a41d28342ab97d1dfa09da) )
 	ROM_LOAD( "9.bin",  0x20000, 0x10000, CRC(430faf5e) SHA1(dfe34a757937d7a971911fcefd14dfd7f5942b02) )
 ROM_END
+
+// seems derived from the D. D. Crew (World, 4 Players) / FD1094 317-0187 version, old bootleg from the period the game was released
+ROM_START( ddcrewbl )
+	ROM_REGION( 0x400000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "11.bin", 0x000000, 0x20000, CRC(c670c8a6) SHA1(eeda32aa9f75b8917e39484f579441a6020c29f4) )
+	ROM_LOAD16_BYTE( "15.bin", 0x000001, 0x20000, CRC(7f3baab1) SHA1(390310765137cffc2a1119f1839195134439e929) )
+	ROM_LOAD16_BYTE( "12.bin", 0x040000, 0x20000, CRC(f8d3fedc) SHA1(3a3151c9a05db3f8c736f57d90f2dd3e5ea708dd) )
+	ROM_LOAD16_BYTE( "16.bin", 0x040001, 0x20000, CRC(9662afd7) SHA1(688a0b1b5a83b1cfb2ea2f08f4ca15d8a8be08d4) )
+	ROM_LOAD16_BYTE( "13.bin", 0x200000, 0x20000, CRC(0033fe50) SHA1(3f29db7ddcfb5b6d6dfdd500d6541ac6018974ca) )
+	ROM_LOAD16_BYTE( "17.bin", 0x200001, 0x20000, CRC(bbb43241) SHA1(7a2955c59c39e9e214f15a842d3bc94d7a1095f3) )
+	ROM_LOAD16_BYTE( "14.bin", 0x240000, 0x20000, CRC(8780712e) SHA1(05ab2f7b108e0ae139237665da14f33132fb555e) )
+	ROM_LOAD16_BYTE( "18.bin", 0x240001, 0x20000, CRC(94b69d68) SHA1(e49ac664f4a5576737db9b9a7eee34b8c5fcd333))
+
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles (same as original)
+	ROM_LOAD( "fac-03.bin", 0x00000, 0x40000, CRC(2228cd88) SHA1(5774bb6a401c3da05c5f3c9d3996b20bb3713cb2) )
+	ROM_LOAD( "fac-02.bin", 0x40000, 0x40000, CRC(edba8e10) SHA1(25a2833ead4ca363802ddc2eb97c40976502921a) )
+	ROM_LOAD( "fac-01.bin", 0x80000, 0x40000, CRC(e8ecc305) SHA1(a26d0c5c7826cd315f8b2c27e5a503a2a7b535c4) )
+
+	ROM_REGION16_BE( 0x800000, "sprites", 0 ) // sprites (same as original)
+	ROM_LOAD16_BYTE( "fac-10.bin", 0x000001, 0x80000, CRC(4fda6a4b) SHA1(a9e582e494ab967e8f3ccf4d5844bb8ef889928c) )
+	ROM_LOAD16_BYTE( "fac-11.bin", 0x000000, 0x80000, CRC(3cbf1f2a) SHA1(80b6b006936740087786acd538e28aca85fa6894) )
+	ROM_LOAD16_BYTE( "fac-08.bin", 0x200001, 0x80000, CRC(e9c74876) SHA1(aff9d071e77f01c6937188bf67be38fa898343e6) )
+	ROM_LOAD16_BYTE( "fac-09.bin", 0x200000, 0x80000, CRC(59022c31) SHA1(5e1409fe0f29284dc6a3ffacf69b761aae09f132) )
+	ROM_LOAD16_BYTE( "fac-06.bin", 0x400001, 0x80000, CRC(720d9858) SHA1(8ebcb8b3e9555ca48b28908d47dcbbd654398b6f) )
+	ROM_LOAD16_BYTE( "fac-07.bin", 0x400000, 0x80000, CRC(7775fdd4) SHA1(a03cac039b400b651a4bf2167a8f2338f488ce26) )
+	ROM_LOAD16_BYTE( "fac-04.bin", 0x600001, 0x80000, CRC(846c4265) SHA1(58d0c213d085fb4dee18b7aefb05087d9d522950) )
+	ROM_LOAD16_BYTE( "fac-05.bin", 0x600000, 0x80000, CRC(0e76c797) SHA1(9a44dc948e84e5acac36e80105c2349ee78e6cfa) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "fac-12.bin", 0x00000, 0x80000, CRC(2e7dade2) SHA1(4133138990ed10f56e299399f034f86ffd9cbd47) )
+
+	ROM_REGION( 0x100000, "proms", 0 )
+	ROM_LOAD( "82s123.bin", 0x000, 0x020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) )
+	ROM_LOAD( "82s129.bin", 0x000, 0x100, CRC(00b5c4c4) SHA1(acab51ad861b25edf310b9b903a7fc486daaee4b) )
+
+	ROM_REGION( 0x100000, "gals", 0 )
+	ROM_LOAD( "gal16v8-1.bin", 0x000, 0x117, CRC(64892ee8) SHA1(c7ea077aead5934d95d61f82bdf705dc0cb0e8e4) )
+	ROM_LOAD( "gal16v8-2.bin", 0x000, 0x117, CRC(22133a8f) SHA1(0b5bc074cfe88c0631df63e0c0a733c660d73af0) )
+ROM_END
+
+
+
 /*************************************
  *
  *  Driver initialization
@@ -3621,14 +3589,13 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,eswatbl)
 	m_spritebank_type = 1;
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,fpointbl)
+
+
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,ddcrewbl)
 {
 	DRIVER_INIT_CALL(common);
-	//sys16_video_config(fpoint_update_proc, -0xb8, NULL);
-
-	m_back_yscroll = 2;
-	m_fore_yscroll = 2;
 }
+
 
 WRITE16_MEMBER(segas1x_bootleg_state::altbeastbl_gfx_w)
 {
@@ -3787,8 +3754,6 @@ GAME( 1989, tturfbl,     tturf,     tturfbl,     tturf, segas1x_bootleg_state,  
 GAME( 1989, dduxbl,      ddux,      dduxbl,      ddux, segas1x_bootleg_state,      dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (Datsu bootleg)", MACHINE_NOT_WORKING )
 GAME( 1988, altbeastbl,  altbeast,  tetrisbl,    tetris, segas1x_bootleg_state,    altbeastbl, ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", MACHINE_NOT_WORKING )
 GAME( 1989, eswatbl,     eswat,     eswatbl,     eswat, segas1x_bootleg_state,     eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, fpointbl,    fpoint,    fpointbl,    fpointbl, segas1x_bootleg_state,  fpointbl,   ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", MACHINE_NOT_WORKING )
-GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl, segas1x_bootleg_state,  fpointbl,   ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg)", MACHINE_NOT_WORKING )
 GAME( 1988, tetrisbl,    tetris,    tetrisbl,    tetris, segas1x_bootleg_state,    dduxbl,     ROT0,   "bootleg", "Tetris (bootleg)", 0 )
 
 /* Tetris-based hardware */
@@ -3801,3 +3766,5 @@ GAME( 1990, astormb2,    astorm,    astormbl,    astormbl, segas1x_bootleg_state
 GAME( 1990, mwalkbl,     mwalk,     mwalkbl,     mwalkbl, segas1x_bootleg_state,   mwalkbl,    ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, shdancbl,    shdancer,  shdancbl,    shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, shdancbla,   shdancer,  shdancbla,   shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 1990, ddcrewbl,    ddcrew,    ddcrewbl,    astormbl, segas1x_bootleg_state,  ddcrewbl,   ROT0,   "bootleg", "D. D. Crew (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

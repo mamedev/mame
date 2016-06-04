@@ -191,6 +191,7 @@ MAIN BOARD:
 #include "includes/trackfld.h"
 #include "includes/konamipt.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 #define MASTER_CLOCK          XTAL_18_432MHz
 #define SOUND_CLOCK           XTAL_14_31818MHz
@@ -222,7 +223,7 @@ WRITE8_MEMBER(trackfld_state::irq_mask_w)
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trackfld_state )
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)       /* AFE */
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)       /* AFE */
 	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE(trackfld_flipscreen_w)  /* FLIP */
 	AM_RANGE(0x1081, 0x1081) AM_MIRROR(0x0078) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* 26 */ /* cause interrupt on audio CPU */
 	AM_RANGE(0x1082, 0x1082) AM_MIRROR(0x0078) AM_WRITENOP                      /* 25 */
@@ -275,7 +276,7 @@ static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(konami_SN76496_w)
 	AM_RANGE(0x0002, 0x0002) AM_WRITE(trackfld_VLM5030_control_w)
 	AM_RANGE(0x0003, 0x0003) AM_DEVWRITE("vlm", vlm5030_device, data_w)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)       /* AFE */
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)       /* AFE */
 	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE(trackfld_flipscreen_w)  /* FLIP */
 	AM_RANGE(0x1081, 0x1081) AM_MIRROR(0x0078) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* 26 */ /* cause interrupt on audio CPU */
 	AM_RANGE(0x1082, 0x1082) AM_MIRROR(0x0078) AM_WRITE(yieartf_nmi_mask_w)     /* 25 */
@@ -305,7 +306,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( reaktor_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	/* all usual addresses +0x8000 */
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x9080, 0x9080) AM_WRITE(trackfld_flipscreen_w)
 	AM_RANGE(0x9081, 0x9081) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x9083, 0x9084) AM_WRITE(coin_w)
@@ -338,7 +339,7 @@ static ADDRESS_MAP_START( reaktor_io_map, AS_IO, 8, trackfld_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8, trackfld_state )
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x10b0, 0x10b0) AM_WRITE(trackfld_flipscreen_w)
 	AM_RANGE(0x10b1, 0x10b1) AM_READNOP AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)
 	AM_RANGE(0x10b3, 0x10b4) AM_WRITE(coin_w) // actually not used
@@ -365,7 +366,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
+	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
 	AM_RANGE(0x1080, 0x1080) AM_WRITE(trackfld_flipscreen_w)
 	AM_RANGE(0x1081, 0x1081) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x1083, 0x1084) AM_WRITE(coin_w)
@@ -903,6 +904,8 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -955,6 +958,8 @@ static MACHINE_CONFIG_START( yieartf, trackfld_state )
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1266,6 +1271,52 @@ ROM_START( hyprolymba )
 	ROM_LOAD( "pal16l8.e6",  0x0200, 0x0104, CRC(122f23e6) SHA1(d178510843a46f043ecafaa44d95bb590ad67fb0) )
 ROM_END
 
+ROM_START( hipoly )
+	/* These ROM's are located on the CPU/Video Board */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
+	ROM_LOAD( "2.1a",        0x6000, 0x2000, CRC(82257fb7) SHA1(4a5038292e582d5c3b5f2d82b01c57ccb24f3095) )  // only one byte of difference with hyprolymba
+	ROM_LOAD( "2.2a",        0x8000, 0x2000, CRC(15b83099) SHA1(79827590d74f20c9a95723e06b05af2b15c34f5f) )  // ok
+	ROM_LOAD( "2.4a",        0xa000, 0x2000, CRC(93a32a97) SHA1(4fbb2fcdf9bc7a3d273dbc27b8157f163ff9bf11) )  // too different... maybe a bad dump?
+	ROM_LOAD( "2.5a",        0xc000, 0x2000, CRC(d099b1e8) SHA1(0472991ad6caef41ec6b8ec8bf3d9d07584a57cc) )  // ok
+	ROM_LOAD( "2.7a",        0xe000, 0x2000, CRC(974ff815) SHA1(11512df2008a79ba44bbb84bd70885f187113211) )  // ok
+
+	/* These ROM's are located on the Sound Board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "1.2c",        0x0000, 0x2000, CRC(95bf79b6) SHA1(ea9135acd7ad162c19c5cdde356e69792d61b675) )
+
+	/* These ROM's are located on the Sound Board */
+	ROM_REGION( 0x10000, "adpcm", 0 )   /*  64k for the 6802 which plays ADPCM samples */
+	ROM_LOAD( "1.11d",       0x8000, 0x2000, CRC(102d3a78) SHA1(0587e87c579f6d333fb1793d20eb7a3c769fbd11) )
+	ROM_LOAD( "1.10d",       0xa000, 0x2000, CRC(e9919365) SHA1(bd11d6e3ee2c6e698159c2768e315389d666107f) )
+	ROM_LOAD( "1.11c",       0xc000, 0x2000, CRC(c3ec42e1) SHA1(048a95726c4f031552e629c3788952c1bc5e7251) )
+	ROM_LOAD( "1.10c",       0xe000, 0x2000, CRC(76998389) SHA1(499189b0e20296af88712199b93b958655083608) )
+
+	/* These ROM's are located on the CPU/Video Board */
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "2.18a",       0x0000, 0x2000, CRC(8d28864f) SHA1(b6827592095543c92384a7e8b817a741d249cff8) )
+	ROM_LOAD( "2.19a",       0x2000, 0x2000, CRC(800ff1f1) SHA1(33d73b18903e3e6bfb30f1a06db4b8105d4040d8) )
+	ROM_LOAD( "2.21a",       0x4000, 0x2000, CRC(d9faf183) SHA1(4448b6242790783d37acf50704d597af5878c2ab) )
+	ROM_LOAD( "2.22a",       0x6000, 0x2000, CRC(5886c802) SHA1(884a12a8f63600da4f23b29be6dbaacef37add20) )
+
+	/* These ROM's are located on the CPU/Video Board */
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "2.22h",       0x0000, 0x2000, CRC(6c107a9c) SHA1(139e99b126aad16223573ef987adc94d96d17857) )
+	ROM_LOAD( "2.21h",       0x2000, 0x2000, CRC(21847e56) SHA1(dcc4f6e85e7125a6dfa2de9874f6adf8382e019c) )
+	ROM_LOAD( "2.19h",       0x4000, 0x2000, CRC(c2166a5c) SHA1(5ba25900e653ce4edcf35f1fbce758a327a715ce) )
+
+	/* These PROM's are located on the CPU/Video Board, borrowed from other sets */
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "361b16.e1",   0x0000, 0x0020, CRC(d55f30b5) SHA1(4d6a851f4886778307f75771645078b97ad55f5f) ) /* palette */
+	ROM_LOAD( "361b17.b15",  0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
+	ROM_LOAD( "361b18.f22",  0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
+
+	/* These PAL's are located on the CPU/Video Board */
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "pal16l8.e4",  0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8.e6",  0x0200, 0x0104, NO_DUMP )
+ROM_END
+
+
 ROM_START( atlantol )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "atl37", 0x00000, 0x10000, CRC(aca8da51) SHA1(50e96fd8496ed32e11eb43bcbfd468ce566caa47) )
@@ -1556,6 +1607,7 @@ GAME( 1983, trackfldc, trackfld, trackfld, trackfld, trackfld_state, trackfld, R
 GAME( 1983, hyprolym,  trackfld, trackfld, trackfld, trackfld_state, trackfld, ROT0,  "Konami",                               "Hyper Olympic", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hyprolymb, trackfld, hyprolyb, trackfld, trackfld_state, trackfld, ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hyprolymba,trackfld, hyprolyb, trackfld, trackfld_state, trackfld, ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hipoly,    trackfld, hyprolyb, trackfld, trackfld_state, trackfld, ROT0,  "bootleg",                              "Hipoly (bootleg of Hyper Olympic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, atlantol,  trackfld, atlantol, atlantol, trackfld_state, atlantol, ROT0,  "bootleg",                              "Atlant Olimpic", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, trackfldnz,trackfld, trackfld, trackfld, trackfld_state, trackfldnz,ROT0, "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)", MACHINE_SUPPORTS_SAVE) // bootleg of the Centuri version
 

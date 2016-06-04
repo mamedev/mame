@@ -15,6 +15,7 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "sound/dac.h"
 #include "machine/konami1.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "includes/konamipt.h"
 #include "audio/trackfld.h"
 #include "audio/hyprolyb.h"
@@ -34,7 +35,7 @@ WRITE8_MEMBER(hyperspt_state::irq_mask_w)
 static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_SHARE("scroll")  /* Scroll amount */
-	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x1483, 0x1484) AM_WRITE(hyperspt_coin_counter_w)
@@ -55,7 +56,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( roadf_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_SHARE("scroll")  /* Scroll amount */
-	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x1483, 0x1484) AM_WRITE(hyperspt_coin_counter_w)
@@ -300,6 +301,8 @@ static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

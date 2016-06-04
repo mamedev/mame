@@ -12,6 +12,7 @@
 #include "sound/msm5205.h"
 #include "sound/qsound.h"
 #include "sound/okim6295.h"
+#include "machine/gen_latch.h"
 #include "machine/timekpr.h"
 #include "cpu/m68000/m68000.h"
 
@@ -124,6 +125,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_region_stars(*this, "stars")
 	{ }
@@ -219,8 +222,8 @@ public:
 	int          m_sprite_base;
 	int          m_sprite_list_end_marker;
 	int          m_sprite_x_offset;
-	UINT16       *m_bootleg_sprite_ram;
-	UINT16       *m_bootleg_work_ram;
+	std::unique_ptr<UINT16[]> m_bootleg_sprite_ram;
+	std::unique_ptr<UINT16[]> m_bootleg_work_ram;
 
 	/* devices */
 	required_device<m68000_base_device> m_maincpu;
@@ -232,6 +235,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_shared_ptr<UINT16> m_decrypted_opcodes;
 	optional_memory_region m_region_stars;
 
@@ -294,7 +299,7 @@ public:
 	DECLARE_DRIVER_INIT(cps2_video);
 	DECLARE_DRIVER_INIT(cps2);
 	DECLARE_DRIVER_INIT(cps2nc);
-	DECLARE_DRIVER_INIT(cps2crpt);
+	DECLARE_DRIVER_INIT(cps2crypt);
 	DECLARE_DRIVER_INIT(ssf2tb);
 	DECLARE_DRIVER_INIT(pzloop2);
 	DECLARE_DRIVER_INIT(singbrd);

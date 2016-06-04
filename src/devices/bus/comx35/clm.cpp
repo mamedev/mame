@@ -135,7 +135,7 @@ GFXDECODE_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( comx_clm )
-	MCFG_SCREEN_ADD(MC6845_SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
@@ -143,7 +143,7 @@ static MACHINE_CONFIG_FRAGMENT( comx_clm )
 	MCFG_SCREEN_REFRESH_RATE(50)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", comx_clm)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, MC6845_SCREEN_TAG, XTAL_14_31818MHz/7)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
@@ -175,6 +175,7 @@ machine_config_constructor comx_clm_device::device_mconfig_additions() const
 comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_CLM, "COMX 80 Column Card", tag, owner, clock, "comx_clm", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
+	device_gfx_interface(mconfig, *this, nullptr, "palette"),
 	m_crtc(*this, MC6845_TAG),
 	m_palette(*this, "palette"),
 	m_rom(*this, "c000"),

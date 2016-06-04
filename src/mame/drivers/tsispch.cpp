@@ -132,23 +132,22 @@
 *****************************************************************************/
 WRITE_LINE_MEMBER(tsispch_state::i8251_rxrdy_int)
 {
-	machine().device<pic8259_device>("pic8259")->ir1_w(state);
+	m_pic->ir1_w(state);
 }
 
 WRITE_LINE_MEMBER(tsispch_state::i8251_txempty_int)
 {
-	machine().device<pic8259_device>("pic8259")->ir2_w(state);
+	m_pic->ir2_w(state);
 }
 
 WRITE_LINE_MEMBER(tsispch_state::i8251_txrdy_int)
 {
-	machine().device<pic8259_device>("pic8259")->ir3_w(state);
+	m_pic->ir3_w(state);
 }
 
 WRITE8_MEMBER( tsispch_state::i8251_rxd )
 {
-	i8251_device *uart = machine().device<i8251_device>("i8251a_u15");
-	uart->receive_character(data);
+	m_uart->receive_character(data);
 }
 
 /*****************************************************************************
@@ -393,7 +392,7 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 	MCFG_NECDSP_OUT_P1_CB(WRITELINE(tsispch_state, dsp_to_8086_p1_w))
 
 	/* PIC 8259 */
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NULL)
+	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
 
 	/* uarts */
 	MCFG_DEVICE_ADD("i8251a_u15", I8251, 0)

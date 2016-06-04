@@ -14,16 +14,6 @@
 //  Windows NT shipped with DirectX 3.0a
 //  Windows 95 shipped with DirectX 2
 
-// standard windows headers
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <tchar.h>
-#include <mmsystem.h>
-#include <d3d9.h>
-#include <d3dx9.h>
-#include <math.h>
-#undef interface
-
 // MAME headers
 #include "emu.h"
 #include "render.h"
@@ -33,25 +23,15 @@
 #include "aviio.h"
 
 // MAMEOS headers
-#include "modules/render/d3d/d3dintf.h"
 #include "winmain.h"
 #include "window.h"
-#include "modules/render/d3d/d3dcomm.h"
 #include "drawd3d.h"
-
-
-//============================================================
-//  DEBUGGING
-//============================================================
-
-extern void mtlog_add(const char *event);
+#include "modules/render/d3d/d3dhlsl.h"
 
 
 //============================================================
 //  CONSTANTS
 //============================================================
-
-#define ENABLE_BORDER_PIX   (1)
 
 enum
 {
@@ -109,7 +89,7 @@ static inline BOOL GetClientRectExceptMenu(HWND hWnd, PRECT pRect, BOOL fullscre
 		last_menu = menu;
 		last_rect = *pRect;
 
-		SetMenu(hWnd, NULL);
+		SetMenu(hWnd, nullptr);
 		result = GetClientRect(hWnd, &cached_rect);
 		SetMenu(hWnd, menu);
 	}
@@ -165,26 +145,21 @@ static inline UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
 //  drawd3d_init
 //============================================================
 
-static d3d::base *               d3dintf; // FIX ME
+static d3d_base *               d3dintf; // FIX ME
 
 
 //============================================================
 //  PROTOTYPES
 //============================================================
 
-// core functions
-static void drawd3d_exit(void);
-
-
 //============================================================
 //  drawd3d_window_init
 //============================================================
 
-int d3d::renderer::create()
+int renderer_d3d9::create()
 {
 	if (!initialize())
 	{
-		destroy();
 		osd_printf_error("Unable to initialize Direct3D.\n");
 		return 1;
 	}
@@ -192,42 +167,19 @@ int d3d::renderer::create()
 	return 0;
 }
 
-
-//============================================================
-//  drawd3d_exit
-//============================================================
-
-static void drawd3d_exit(void)
-{
-	if (d3dintf != NULL)
-		(*d3dintf->d3d.release)(d3dintf);
-}
-
-void d3d::renderer::toggle_fsfx()
+void renderer_d3d9::toggle_fsfx()
 {
 	set_restarting(true);
 }
 
-void d3d::renderer::record()
+void renderer_d3d9::record()
 {
 	get_shaders()->window_record();
 }
 
-void d3d::renderer::save()
+void renderer_d3d9::save()
 {
 	get_shaders()->window_save();
-}
-
-
-//============================================================
-//  drawd3d_window_destroy
-//============================================================
-
-void d3d::renderer::destroy()
-{
-	if (get_shaders() != NULL && get_shaders()->recording())
-		get_shaders()->window_record();
-
 }
 
 
@@ -235,21 +187,25 @@ void d3d::renderer::destroy()
 //  drawd3d_window_get_primitives
 //============================================================
 
-render_primitive_list *d3d::renderer::get_primitives()
+render_primitive_list *renderer_d3d9::get_primitives()
 {
 	RECT client;
+	auto win = try_getwindow();
+	if (win == nullptr)
+		return nullptr;
 
-	GetClientRectExceptMenu(window().m_hwnd, &client, window().fullscreen());
+	GetClientRectExceptMenu(win->platform_window<HWND>(), &client, win->fullscreen());
 	if (rect_width(&client) > 0 && rect_height(&client) > 0)
 	{
-		window().target()->set_bounds(rect_width(&client), rect_height(&client), window().aspect());
-		window().target()->set_max_update_rate((get_refresh() == 0) ? get_origmode().RefreshRate : get_refresh());
+		win->target()->set_bounds(rect_width(&client), rect_height(&client), win->pixel_aspect());
+		win->target()->set_max_update_rate((get_refresh() == 0) ? get_origmode().RefreshRate : get_refresh());
 	}
-	if (m_shaders != NULL)
+	if (m_shaders != nullptr)
 	{
-		window().target()->set_transform_primitives(!m_shaders->enabled());
+		// do not transform primitives (scale, offset) if shaders are enabled, the shaders will handle the transformation
+		win->target()->set_transform_container(!m_shaders->enabled());
 	}
-	return &window().target()->get_primitives();
+	return &win->target()->get_primitives();
 }
 
 
@@ -257,30 +213,19 @@ render_primitive_list *d3d::renderer::get_primitives()
 //  drawnone_create
 //============================================================
 
-static osd_renderer *drawd3d_create(osd_window *window)
+bool renderer_d3d9::init(running_machine &machine)
 {
-	return global_alloc(d3d::renderer(window));
-}
-
-int drawd3d_init(running_machine &machine, osd_draw_callbacks *callbacks)
-{
-	d3dintf = NULL;
-
 	// Use Direct3D9
-	d3dintf = d3d::drawd3d9_init();
+	d3dintf = drawd3d9_init();
 
 	// if we failed, note the error
-	if (d3dintf == NULL)
+	if (d3dintf == nullptr)
 	{
 		osd_printf_error("Unable to initialize Direct3D.\n");
-		return 1;
+		return true;
 	}
 
-	// fill in the callbacks
-	memset(callbacks, 0, sizeof(*callbacks));
-	callbacks->exit = drawd3d_exit;
-	callbacks->create = drawd3d_create;
-	return 0;
+	return false;
 }
 
 
@@ -288,7 +233,7 @@ int drawd3d_init(running_machine &machine, osd_draw_callbacks *callbacks)
 //  drawd3d_window_draw
 //============================================================
 
-int d3d::renderer::draw(const int update)
+int renderer_d3d9::draw(const int update)
 {
 	int check = pre_window_draw_check();
 	if (check >= 0)
@@ -301,21 +246,19 @@ int d3d::renderer::draw(const int update)
 	return 0;
 }
 
-namespace d3d
-{
-void renderer::set_texture(texture_info *texture)
+void renderer_d3d9::set_texture(texture_info *texture)
 {
 	if (texture != m_last_texture)
 	{
 		m_last_texture = texture;
-		m_last_texture_flags = (texture == NULL ? 0 : texture->get_flags());
-		HRESULT result = (*d3dintf->device.set_texture)(m_device, 0, (texture == NULL) ? get_default_texture()->get_finaltex() : texture->get_finaltex());
+		m_last_texture_flags = (texture == nullptr ? 0 : texture->get_flags());
+		HRESULT result = (*d3dintf->device.set_texture)(m_device, 0, (texture == nullptr) ? get_default_texture()->get_finaltex() : texture->get_finaltex());
 		m_shaders->set_texture(texture);
 		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_texture call\n", (int)result);
 	}
 }
 
-void renderer::set_filter(int filter)
+void renderer_d3d9::set_filter(int filter)
 {
 	if (filter != m_last_filter)
 	{
@@ -331,7 +274,7 @@ void renderer::set_filter(int filter)
 	}
 }
 
-void renderer::set_wrap(D3DTEXTUREADDRESS wrap)
+void renderer_d3d9::set_wrap(unsigned int wrap)
 {
 	if (wrap != m_last_wrap)
 	{
@@ -347,7 +290,7 @@ void renderer::set_wrap(D3DTEXTUREADDRESS wrap)
 	}
 }
 
-void renderer::set_modmode(DWORD modmode)
+void renderer_d3d9::set_modmode(int modmode)
 {
 	if (modmode != m_last_modmode)
 	{
@@ -359,7 +302,7 @@ void renderer::set_modmode(DWORD modmode)
 	}
 }
 
-void renderer::set_blendmode(int blendmode)
+void renderer_d3d9::set_blendmode(int blendmode)
 {
 	int blendenable;
 	int blendop;
@@ -406,7 +349,7 @@ void renderer::set_blendmode(int blendmode)
 	}
 }
 
-void renderer::reset_render_states()
+void renderer_d3d9::reset_render_states()
 {
 	// this ensures subsequent calls to the above setters will force-update the data
 	m_last_texture = (texture_info *)~0;
@@ -418,13 +361,13 @@ void renderer::reset_render_states()
 	m_last_wrap = (D3DTEXTUREADDRESS)-1;
 }
 
-texture_manager::texture_manager(renderer *d3d)
+d3d_texture_manager::d3d_texture_manager(renderer_d3d9 *d3d)
 {
 	m_renderer = d3d;
 
-	m_texlist = NULL;
-	m_vector_texture = NULL;
-	m_default_texture = NULL;
+	m_texlist = nullptr;
+	m_vector_texture = nullptr;
+	m_default_texture = nullptr;
 
 	// check for dynamic texture support
 	DWORD tempcaps;
@@ -461,25 +404,29 @@ texture_manager::texture_manager(renderer *d3d)
 	}
 	osd_printf_verbose("Direct3D: YUV format = %s\n", (m_yuv_format == D3DFMT_YUY2) ? "YUY2" : (m_yuv_format == D3DFMT_UYVY) ? "UYVY" : "RGB");
 
+	auto win = d3d->assert_window();
+
 	// set the max texture size
-	d3d->window().target()->set_max_texture_size(m_texture_max_width, m_texture_max_height);
+	win->target()->set_max_texture_size(m_texture_max_width, m_texture_max_height);
 	osd_printf_verbose("Direct3D: Max texture size = %dx%d\n", (int)m_texture_max_width, (int)m_texture_max_height);
 }
 
-texture_manager::~texture_manager()
+d3d_texture_manager::~d3d_texture_manager()
 {
 }
 
-void texture_manager::create_resources()
+void d3d_texture_manager::create_resources()
 {
+	auto win = m_renderer->assert_window();
+
 	// experimental: load a PNG to use for vector rendering; it is treated
 	// as a brightness map
-	emu_file file(m_renderer->window().machine().options().art_path(), OPEN_FLAG_READ);
-	render_load_png(m_vector_bitmap, file, NULL, "vector.png");
+	emu_file file(win->machine().options().art_path(), OPEN_FLAG_READ);
+	render_load_png(m_vector_bitmap, file, nullptr, "vector.png");
 	if (m_vector_bitmap.valid())
 	{
 		m_vector_bitmap.fill(rgb_t(0xff,0xff,0xff,0xff));
-		render_load_png(m_vector_bitmap, file, NULL, "vector.png", true);
+		render_load_png(m_vector_bitmap, file, nullptr, "vector.png", true);
 	}
 
 	m_default_bitmap.allocate(8, 8);
@@ -494,11 +441,11 @@ void texture_manager::create_resources()
 		texture.rowpixels = m_default_bitmap.rowpixels();
 		texture.width = m_default_bitmap.width();
 		texture.height = m_default_bitmap.height();
-		texture.palette = NULL;
+		texture.palette = nullptr;
 		texture.seqid = 0;
 
 		// now create it
-		m_default_texture = global_alloc(texture_info(this, &texture, m_renderer->window().prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
+		m_default_texture = global_alloc(texture_info(this, &texture, win->prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
 	}
 
 	// experimental: if we have a vector bitmap, create a texture for it
@@ -511,25 +458,25 @@ void texture_manager::create_resources()
 		texture.rowpixels = m_vector_bitmap.rowpixels();
 		texture.width = m_vector_bitmap.width();
 		texture.height = m_vector_bitmap.height();
-		texture.palette = NULL;
+		texture.palette = nullptr;
 		texture.seqid = 0;
 
 		// now create it
-		m_vector_texture = global_alloc(texture_info(this, &texture, m_renderer->window().prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
+		m_vector_texture = global_alloc(texture_info(this, &texture, win->prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
 	}
 }
 
-void texture_manager::delete_resources()
+void d3d_texture_manager::delete_resources()
 {
 	// is part of m_texlist and will be free'd there
 	//global_free(m_default_texture);
-	m_default_texture = NULL;
+	m_default_texture = nullptr;
 
 	//global_free(m_vector_texture);
-	m_vector_texture = NULL;
+	m_vector_texture = nullptr;
 
 	// free all textures
-	while (m_texlist != NULL)
+	while (m_texlist != nullptr)
 	{
 		texture_info *tex = m_texlist;
 		m_texlist = tex->get_next();
@@ -537,18 +484,18 @@ void texture_manager::delete_resources()
 	}
 }
 
-UINT32 texture_manager::texture_compute_hash(const render_texinfo *texture, UINT32 flags)
+UINT32 d3d_texture_manager::texture_compute_hash(const render_texinfo *texture, UINT32 flags)
 {
 	return (FPTR)texture->base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
 }
 
-texture_info *texture_manager::find_texinfo(const render_texinfo *texinfo, UINT32 flags)
+texture_info *d3d_texture_manager::find_texinfo(const render_texinfo *texinfo, UINT32 flags)
 {
 	UINT32 hash = texture_compute_hash(texinfo, flags);
 	texture_info *texture;
 
 	// find a match
-	for (texture = m_renderer->get_texture_manager()->get_texlist(); texture != NULL; texture = texture->get_next())
+	for (texture = m_renderer->get_texture_manager()->get_texlist(); texture != nullptr; texture = texture->get_next())
 	{
 		UINT32 test_screen = (UINT32)texture->get_texinfo().osddata >> 1;
 		UINT32 test_page = (UINT32)texture->get_texinfo().osddata & 1;
@@ -568,7 +515,7 @@ texture_info *texture_manager::find_texinfo(const render_texinfo *texinfo, UINT3
 			// Reject a texture if it belongs to an out-of-date render target, so as to cause the HLSL system to re-cache
 			if (m_renderer->get_shaders()->enabled() && texinfo->width != 0 && texinfo->height != 0 && (flags & PRIMFLAG_SCREENTEX_MASK) != 0)
 			{
-				if (m_renderer->get_shaders()->find_render_target(texture) != NULL)
+				if (m_renderer->get_shaders()->find_render_target(texture) != nullptr)
 				{
 					return texture;
 				}
@@ -585,13 +532,13 @@ texture_info *texture_manager::find_texinfo(const render_texinfo *texinfo, UINT3
 	{
 		if (texinfo->width == 0 || texinfo->height == 0)
 		{
-			return NULL;
+			return nullptr;
 		}
 
 		UINT32 prim_screen = texinfo->osddata >> 1;
 		UINT32 prim_page = texinfo->osddata & 1;
 
-		for (texture = m_renderer->get_texture_manager()->get_texlist(); texture != NULL; texture = texture->get_next())
+		for (texture = m_renderer->get_texture_manager()->get_texlist(); texture != nullptr; texture = texture->get_next())
 		{
 			UINT32 test_screen = texture->get_texinfo().osddata >> 1;
 			UINT32 test_page = texture->get_texinfo().osddata & 1;
@@ -612,46 +559,54 @@ texture_info *texture_manager::find_texinfo(const render_texinfo *texinfo, UINT3
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
-renderer::renderer(osd_window *window)
-	: osd_renderer(window, FLAG_NONE), m_adapter(0), m_width(0), m_height(0), m_refresh(0), m_create_error_count(0), m_device(NULL), m_gamma_supported(0), m_pixformat(),
-	m_vertexbuf(NULL), m_lockedbuf(NULL), m_numverts(0), m_vectorbatch(NULL), m_batchindex(0), m_numpolys(0), m_restarting(false), m_mod2x_supported(0), m_mod4x_supported(0),
-	m_screen_format(), m_last_texture(NULL), m_last_texture_flags(0), m_last_blendenable(0), m_last_blendop(0), m_last_blendsrc(0), m_last_blenddst(0), m_last_filter(0),
-	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(NULL), m_shaders(NULL), m_shaders_options(NULL), m_texture_manager(NULL), m_line_count(0)
+renderer_d3d9::renderer_d3d9(std::shared_ptr<osd_window> window)
+	: osd_renderer(window, FLAG_NONE), m_adapter(0), m_width(0), m_height(0), m_refresh(0), m_create_error_count(0), m_device(nullptr), m_gamma_supported(0), m_pixformat(),
+	m_vertexbuf(nullptr), m_lockedbuf(nullptr), m_numverts(0), m_vectorbatch(nullptr), m_batchindex(0), m_numpolys(0), m_restarting(false), m_mod2x_supported(0), m_mod4x_supported(0),
+	m_screen_format(), m_last_texture(nullptr), m_last_texture_flags(0), m_last_blendenable(0), m_last_blendop(0), m_last_blendsrc(0), m_last_blenddst(0), m_last_filter(0),
+	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(nullptr), m_shaders(nullptr), m_shaders_options(nullptr), m_texture_manager(nullptr), m_line_count(0)
 {
 }
 
-int renderer::initialize()
+int renderer_d3d9::initialize()
 {
 	// configure the adapter for the mode we want
 	if (config_adapter_mode())
+	{
 		return false;
+	}
 
-	// create the device immediately for the full screen case (defer for window mode)
-	if (window().fullscreen() && device_create(window().m_focus_hwnd))
+	// create the device immediately for the full screen case (defer for window mode in update_window_size())
+	auto win = assert_window();
+	if (win->fullscreen() && device_create(win->main_window()->platform_window<HWND>()))
+	{
 		return false;
+	}
 
 	return true;
 }
 
-int renderer::pre_window_draw_check()
+int renderer_d3d9::pre_window_draw_check()
 {
+	auto win = assert_window();
+
 	// if we're in the middle of resizing, leave things alone
-	if (window().m_resize_state == RESIZE_STATE_RESIZING)
+	if (win->m_resize_state == RESIZE_STATE_RESIZING)
 		return 0;
 
 	// if we're restarting the renderer, leave things alone
 	if (m_restarting)
 	{
-		m_shaders->toggle();
+		m_sliders.clear();
+		m_shaders->toggle(m_sliders);
 
 		m_restarting = false;
 	}
 
 	// if we have a device, check the cooperative level
-	if (m_device != NULL)
+	if (m_device != nullptr)
 	{
 		if (device_test_cooperative())
 		{
@@ -660,70 +615,95 @@ int renderer::pre_window_draw_check()
 	}
 
 	// in window mode, we need to track the window size
-	if (!window().fullscreen() || m_device == NULL)
+	if (!win->fullscreen() || m_device == nullptr)
 	{
 		// if the size changes, skip this update since the render target will be out of date
 		if (update_window_size())
 			return 0;
 
 		// if we have no device, after updating the size, return an error so GDI can try
-		if (m_device == NULL)
+		if (m_device == nullptr)
 			return 1;
 	}
 
 	return -1;
 }
 
-void texture_manager::update_textures()
+void d3d_texture_manager::update_textures()
 {
-	for (render_primitive *prim = m_renderer->window().m_primlist->first(); prim != NULL; prim = prim->next())
+	auto win = m_renderer->assert_window();
+
+	for (render_primitive &prim : *win->m_primlist)
 	{
-		if (prim->texture.base != NULL)
+		if (prim.texture.base != nullptr)
 		{
-			texture_info *texture = find_texinfo(&prim->texture, prim->flags);
-			if (texture == NULL)
+			texture_info *texture = find_texinfo(&prim.texture, prim.flags);
+			if (texture == nullptr)
 			{
-				// if there isn't one, create a new texture
-				global_alloc(texture_info(this, &prim->texture, m_renderer->window().prescale(), prim->flags));
+				if (m_renderer->get_shaders()->enabled())
+				{
+					// if there isn't one, create a new texture without prescale
+					texture = global_alloc(texture_info(this, &prim.texture, 1, prim.flags));
+				}
+				else
+				{
+					// if there isn't one, create a new texture
+					texture = global_alloc(texture_info(this, &prim.texture, win->prescale(), prim.flags));
+				}
 			}
 			else
 			{
 				// if there is one, but with a different seqid, copy the data
-				if (texture->get_texinfo().seqid != prim->texture.seqid)
+				if (texture->get_texinfo().seqid != prim.texture.seqid)
 				{
-					texture->set_data(&prim->texture, prim->flags);
-					texture->get_texinfo().seqid = prim->texture.seqid;
+					texture->set_data(&prim.texture, prim.flags);
+					texture->get_texinfo().seqid = prim.texture.seqid;
+				}
+			}
+
+			if (m_renderer->get_shaders()->enabled())
+			{
+				if (!m_renderer->get_shaders()->get_texture_target(&prim, texture))
+				{
+					if (!m_renderer->get_shaders()->register_texture(&prim, texture))
+					{
+						d3dintf->post_fx_available = false;
+					}
 				}
 			}
 		}
-		else if(m_renderer->get_shaders()->vector_enabled() && PRIMFLAG_GET_VECTORBUF(prim->flags))
+		else if(PRIMFLAG_GET_VECTORBUF(prim.flags))
 		{
-			if (!m_renderer->get_shaders()->get_vector_target())
+			if (m_renderer->get_shaders()->vector_enabled())
 			{
-				m_renderer->get_shaders()->create_vector_target(prim);
+				if (!m_renderer->get_shaders()->get_vector_target(&prim))
+				{
+					m_renderer->get_shaders()->create_vector_target(&prim);
+				}
 			}
 		}
 	}
 }
 
-void renderer::begin_frame()
+void renderer_d3d9::begin_frame()
 {
-	HRESULT result = (*d3dintf->device.clear)(m_device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+	auto win = assert_window();
+
+	HRESULT result = (*d3dintf->device.clear)(m_device, 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
 	m_shaders->begin_frame();
 
-	window().m_primlist->acquire_lock();
+	win->m_primlist->acquire_lock();
 
 	// first update any textures
 	m_texture_manager->update_textures();
 
 	// begin the scene
-	mtlog_add("drawd3d_window_draw: begin_scene");
 	result = (*d3dintf->device.begin_scene)(m_device);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device begin_scene call\n", (int)result);
 
-	m_lockedbuf = NULL;
+	m_lockedbuf = nullptr;
 
 	if(m_shaders->enabled())
 	{
@@ -731,23 +711,28 @@ void renderer::begin_frame()
 		m_shaders->init_fsfx_quad(m_hlsl_buf);
 	}
 
+	// loop over line primitives
 	m_line_count = 0;
-
-	// loop over primitives
-	for (render_primitive *prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
-		if (prim->type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim->flags))
+	for (render_primitive &prim : *win->m_primlist)
+	{
+		if (prim.type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim.flags))
+		{
 			m_line_count++;
+		}
+	}
 }
 
-void renderer::process_primitives()
+void renderer_d3d9::process_primitives()
 {
+	auto win = assert_window();
+
 	// Rotating index for vector time offsets
-	for (render_primitive *prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
+	for (render_primitive &prim : *win->m_primlist)
 	{
-		switch (prim->type)
+		switch (prim.type)
 		{
 			case render_primitive::LINE:
-				if (PRIMFLAG_GET_VECTOR(prim->flags))
+				if (PRIMFLAG_GET_VECTOR(prim.flags))
 				{
 					if (m_line_count > 0)
 						batch_vectors();
@@ -770,9 +755,11 @@ void renderer::process_primitives()
 	}
 }
 
-void renderer::end_frame()
+void renderer_d3d9::end_frame()
 {
-	window().m_primlist->release_lock();
+	auto win = assert_window();
+
+	win->m_primlist->release_lock();
 
 	// flush any pending polygons
 	primitive_flush_pending();
@@ -784,7 +771,7 @@ void renderer::end_frame()
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device end_scene call\n", (int)result);
 
 	// present the current buffers
-	result = (*d3dintf->device.present)(m_device, NULL, NULL, NULL, NULL, 0);
+	result = (*d3dintf->device.present)(m_device, nullptr, nullptr, nullptr, nullptr, 0);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device present call\n", (int)result);
 }
 
@@ -792,10 +779,10 @@ void renderer::end_frame()
 //  device_create
 //============================================================
 
-int renderer::device_create(HWND device_hwnd)
+int renderer_d3d9::device_create(HWND device_hwnd)
 {
 	// if a device exists, free it
-	if (m_device != NULL)
+	if (m_device != nullptr)
 	{
 		device_delete();
 	}
@@ -820,7 +807,7 @@ int renderer::device_create(HWND device_hwnd)
 		return 1;
 	}
 
-	m_texture_manager = global_alloc(texture_manager(this));
+	m_texture_manager = global_alloc(d3d_texture_manager(this));
 
 try_again:
 	// try for XRGB first
@@ -843,6 +830,8 @@ try_again:
 		}
 	}
 
+	auto win = assert_window();
+
 	// initialize the D3D presentation parameters
 	memset(&m_presentation, 0, sizeof(m_presentation));
 	m_presentation.BackBufferWidth               = m_width;
@@ -851,13 +840,13 @@ try_again:
 	m_presentation.BackBufferCount               = video_config.triplebuf ? 2 : 1;
 	m_presentation.MultiSampleType               = D3DMULTISAMPLE_NONE;
 	m_presentation.SwapEffect                    = D3DSWAPEFFECT_DISCARD;
-	m_presentation.hDeviceWindow                 = window().m_hwnd;
-	m_presentation.Windowed                      = !window().fullscreen() || window().win_has_menu();
+	m_presentation.hDeviceWindow                 = win->platform_window<HWND>();
+	m_presentation.Windowed                      = !win->fullscreen() || !video_config.switchres || win->win_has_menu();
 	m_presentation.EnableAutoDepthStencil        = FALSE;
 	m_presentation.AutoDepthStencilFormat        = D3DFMT_D16;
 	m_presentation.Flags                         = 0;
 	m_presentation.FullScreen_RefreshRateInHz    = m_refresh;
-	m_presentation.PresentationInterval          = ((video_config.triplebuf && window().fullscreen()) ||
+	m_presentation.PresentationInterval          = ((video_config.triplebuf && win->fullscreen()) ||
 													video_config.waitvsync || video_config.syncrefresh) ?
 													D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 
@@ -885,10 +874,10 @@ try_again:
 	osd_printf_verbose("Direct3D: Device created at %dx%d\n", m_width, m_height);
 
 	// set the gamma if we need to
-	if (window().fullscreen())
+	if (win->fullscreen())
 	{
 		// only set the gamma if it's not 1.0f
-		windows_options &options = downcast<windows_options &>(window().machine().options());
+		windows_options &options = downcast<windows_options &>(win->machine().options());
 		float brightness = options.full_screen_brightness();
 		float contrast = options.full_screen_contrast();
 		float gamma = options.full_screen_gamma();
@@ -913,20 +902,23 @@ try_again:
 	}
 
 	// create shader options only once
-	if (m_shaders_options == NULL)
+	if (m_shaders_options == nullptr)
 	{
 		m_shaders_options = (hlsl_options*)global_alloc_clear<hlsl_options>();
 		m_shaders_options->params_init = false;
 	}
 
 	m_shaders = (shaders*)global_alloc_clear<shaders>();
-	m_shaders->init(d3dintf, &window().machine(), this);
+	m_shaders->init(d3dintf, &win->machine(), this);
 
-	int failed = m_shaders->create_resources(false);
+	m_sliders.clear();
+	int failed = m_shaders->create_resources(false, m_sliders);
 	if (failed)
 	{
 		return failed;
 	}
+
+	m_sliders_dirty = true;
 
 	return device_create_resources();
 }
@@ -936,7 +928,7 @@ try_again:
 //  device_create_resources
 //============================================================
 
-int renderer::device_create_resources()
+int renderer_d3d9::device_create_resources()
 {
 	// allocate a vertex buffer to use
 	HRESULT result = (*d3dintf->device.create_vertex_buffer)(m_device,
@@ -988,8 +980,8 @@ int renderer::device_create_resources()
 	reset_render_states();
 
 	// clear the buffer
-	result = (*d3dintf->device.clear)(m_device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	result = (*d3dintf->device.present)(m_device, NULL, NULL, NULL, NULL, 0);
+	result = (*d3dintf->device.clear)(m_device, 0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+	result = (*d3dintf->device.present)(m_device, nullptr, nullptr, nullptr, nullptr, 0);
 
 	m_texture_manager->create_resources();
 
@@ -1001,22 +993,32 @@ int renderer::device_create_resources()
 //  device_delete
 //============================================================
 
-renderer::~renderer()
+renderer_d3d9::~renderer_d3d9()
 {
+	if (get_shaders() != nullptr && get_shaders()->recording())
+		get_shaders()->window_record();
+
 	device_delete();
 
-	if (m_shaders_options != NULL)
+	if (m_shaders_options != nullptr)
 	{
 		global_free(m_shaders_options);
-		m_shaders_options = NULL;
+		m_shaders_options = nullptr;
 	}
 }
 
-void renderer::device_delete()
+void renderer_d3d9::exit()
 {
-	if (m_shaders != NULL)
+	if (d3dintf != nullptr)
+		(*d3dintf->d3d.release)(d3dintf);
+}
+
+void renderer_d3d9::device_delete()
+{
+	if (m_shaders != nullptr)
 	{
 		// free our effects
+		m_sliders.clear();
 		m_shaders->delete_resources(false);
 
 		// delete the HLSL interface
@@ -1026,18 +1028,17 @@ void renderer::device_delete()
 	// free our base resources
 	device_delete_resources();
 
-	if (m_texture_manager != NULL)
+	if (m_texture_manager != nullptr)
 	{
 		global_free(m_texture_manager);
-		m_texture_manager = NULL;
+		m_texture_manager = nullptr;
 	}
 
 	// free the device itself
-	if (m_device != NULL)
+	if (m_device != nullptr)
 	{
-		(*d3dintf->device.reset)(m_device, &m_presentation);
 		(*d3dintf->device.release)(m_device);
-		m_device = NULL;
+		m_device = nullptr;
 	}
 }
 
@@ -1046,18 +1047,18 @@ void renderer::device_delete()
 //  device_delete_resources
 //============================================================
 
-void renderer::device_delete_resources()
+void renderer_d3d9::device_delete_resources()
 {
-	if (m_texture_manager != NULL)
+	if (m_texture_manager != nullptr)
 	{
 		m_texture_manager->delete_resources();
 	}
 
 	// free the vertex buffer
-	if (m_vertexbuf != NULL)
+	if (m_vertexbuf != nullptr)
 	{
 		(*d3dintf->vertexbuf.release)(m_vertexbuf);
-		m_vertexbuf = NULL;
+		m_vertexbuf = nullptr;
 	}
 }
 
@@ -1066,7 +1067,7 @@ void renderer::device_delete_resources()
 //  device_verify_caps
 //============================================================
 
-int renderer::device_verify_caps()
+int renderer_d3d9::device_verify_caps()
 {
 	int retval = 0;
 
@@ -1132,7 +1133,7 @@ int renderer::device_verify_caps()
 //  device_test_cooperative
 //============================================================
 
-int renderer::device_test_cooperative()
+int renderer_d3d9::device_test_cooperative()
 {
 	// check our current status; if we lost the device, punt to GDI
 	HRESULT result = (*d3dintf->device.test_cooperative_level)(m_device);
@@ -1145,6 +1146,7 @@ int renderer::device_test_cooperative()
 		osd_printf_verbose("Direct3D: resetting device\n");
 
 		// free all existing resources and call reset on the device
+		m_sliders.clear();
 		m_shaders->delete_resources(true);
 		device_delete_resources();
 		result = (*d3dintf->device.reset)(m_device, &m_presentation);
@@ -1164,7 +1166,8 @@ int renderer::device_test_cooperative()
 			return 1;
 		}
 
-		if (m_shaders->create_resources(true))
+		m_sliders.clear();
+		if (m_shaders->create_resources(true, m_sliders))
 		{
 			osd_printf_verbose("Direct3D: failed to recreate HLSL resources for device; failing permanently\n");
 			device_delete();
@@ -1179,7 +1182,7 @@ int renderer::device_test_cooperative()
 //  config_adapter_mode
 //============================================================
 
-int renderer::config_adapter_mode()
+int renderer_d3d9::config_adapter_mode()
 {
 	adapter_identifier identifier;
 
@@ -1203,13 +1206,15 @@ int renderer::config_adapter_mode()
 		return 1;
 	}
 
+	auto win = assert_window();
+
 	// choose a resolution: window mode case
-	if (!window().fullscreen() || !video_config.switchres || window().win_has_menu())
+	if (!win->fullscreen() || !video_config.switchres || win->win_has_menu())
 	{
 		RECT client;
 
 		// bounds are from the window client rect
-		GetClientRectExceptMenu(window().m_hwnd, &client, window().fullscreen());
+		GetClientRectExceptMenu(win->platform_window<HWND>(), &client, win->fullscreen());
 		m_width = client.right - client.left;
 		m_height = client.bottom - client.top;
 
@@ -1220,7 +1225,7 @@ int renderer::config_adapter_mode()
 		// make sure it's a pixel format we can get behind
 		if (m_pixformat != D3DFMT_X1R5G5B5 && m_pixformat != D3DFMT_R5G6B5 && m_pixformat != D3DFMT_X8R8G8B8)
 		{
-			osd_printf_error("Device %s currently in an unsupported mode\n", window().monitor()->devicename());
+			osd_printf_error("Device %s currently in an unsupported mode\n", win->monitor()->devicename());
 			return 1;
 		}
 	}
@@ -1240,10 +1245,10 @@ int renderer::config_adapter_mode()
 	}
 
 	// see if we can handle the device type
-	result = (*d3dintf->d3d.check_device_type)(d3dintf, m_adapter, D3DDEVTYPE_HAL, m_pixformat, m_pixformat, !window().fullscreen());
+	result = (*d3dintf->d3d.check_device_type)(d3dintf, m_adapter, D3DDEVTYPE_HAL, m_pixformat, m_pixformat, !win->fullscreen());
 	if (result != D3D_OK)
 	{
-		osd_printf_error("Proposed video mode not supported on device %s\n", window().monitor()->devicename());
+		osd_printf_error("Proposed video mode not supported on device %s\n", win->monitor()->devicename());
 		return 1;
 	}
 	return 0;
@@ -1254,9 +1259,11 @@ int renderer::config_adapter_mode()
 //  get_adapter_for_monitor
 //============================================================
 
-int renderer::get_adapter_for_monitor()
+int renderer_d3d9::get_adapter_for_monitor()
 {
 	int maxadapter = (*d3dintf->d3d.get_adapter_count)(d3dintf);
+
+	auto win = assert_window();
 
 	// iterate over adapters until we error or find a match
 	for (int adapternum = 0; adapternum < maxadapter; adapternum++)
@@ -1265,7 +1272,7 @@ int renderer::get_adapter_for_monitor()
 		HMONITOR curmonitor = (*d3dintf->d3d.get_adapter_monitor)(d3dintf, adapternum);
 
 		// if we match the proposed monitor, this is it
-		if (curmonitor == *((HMONITOR *)window().monitor()->oshandle()))
+		if (curmonitor == *((HMONITOR *)win->monitor()->oshandle()))
 		{
 			return adapternum;
 		}
@@ -1280,15 +1287,17 @@ int renderer::get_adapter_for_monitor()
 //  pick_best_mode
 //============================================================
 
-void renderer::pick_best_mode()
+void renderer_d3d9::pick_best_mode()
 {
 	double target_refresh = 60.0;
 	INT32 minwidth, minheight;
 	float best_score = 0.0f;
 
+	auto win = assert_window();
+
 	// determine the refresh rate of the primary screen
-	const screen_device *primary_screen = window().machine().config().first_screen();
-	if (primary_screen != NULL)
+	const screen_device *primary_screen = win->machine().config().first_screen();
+	if (primary_screen != nullptr)
 	{
 		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
 	}
@@ -1297,7 +1306,7 @@ void renderer::pick_best_mode()
 	// note: technically we should not be calling this from an alternate window
 	// thread; however, it is only done during init time, and the init code on
 	// the main thread is waiting for us to finish, so it is safe to do so here
-	window().target()->compute_minimum_size(minwidth, minheight);
+	win->target()->compute_minimum_size(minwidth, minheight);
 
 	// use those as the target for now
 	INT32 target_width = minwidth;
@@ -1332,7 +1341,7 @@ void renderer::pick_best_mode()
 			size_score *= 0.1f;
 
 		// if we're looking for a particular mode, that's a winner
-		if (mode.Width == window().m_win_config.width && mode.Height == window().m_win_config.height)
+		if (mode.Width == win->m_win_config.width && mode.Height == win->m_win_config.height)
 			size_score = 2.0f;
 
 		// compute refresh score
@@ -1343,7 +1352,7 @@ void renderer::pick_best_mode()
 			refresh_score *= 0.1f;
 
 		// if we're looking for a particular refresh, make sure it matches
-		if (mode.RefreshRate == window().m_win_config.refresh)
+		if (mode.RefreshRate == win->m_win_config.refresh)
 			refresh_score = 2.0f;
 
 		// weight size and refresh equally
@@ -1368,33 +1377,35 @@ void renderer::pick_best_mode()
 //  update_window_size
 //============================================================
 
-int renderer::update_window_size()
+int renderer_d3d9::update_window_size()
 {
+	auto win = assert_window();
+
 	// get the current window bounds
 	RECT client;
-	GetClientRectExceptMenu(window().m_hwnd, &client, window().fullscreen());
+	GetClientRectExceptMenu(win->platform_window<HWND>(), &client, win->fullscreen());
 
 	// if we have a device and matching width/height, nothing to do
-	if (m_device != NULL && rect_width(&client) == m_width && rect_height(&client) == m_height)
+	if (m_device != nullptr && rect_width(&client) == m_width && rect_height(&client) == m_height)
 	{
 		// clear out any pending resizing if the area didn't change
-		if (window().m_resize_state == RESIZE_STATE_PENDING)
-			window().m_resize_state = RESIZE_STATE_NORMAL;
+		if (win->m_resize_state == RESIZE_STATE_PENDING)
+			win->m_resize_state = RESIZE_STATE_NORMAL;
 		return FALSE;
 	}
 
 	// if we're in the middle of resizing, leave it alone as well
-	if (window().m_resize_state == RESIZE_STATE_RESIZING)
+	if (win->m_resize_state == RESIZE_STATE_RESIZING)
 		return FALSE;
 
 	// set the new bounds and create the device again
 	m_width = rect_width(&client);
 	m_height = rect_height(&client);
-	if (device_create(window().m_focus_hwnd))
+	if (device_create(win->main_window()->platform_window<HWND>()))
 		return FALSE;
 
 	// reset the resize state to normal, and indicate we made a change
-	window().m_resize_state = RESIZE_STATE_NORMAL;
+	win->m_resize_state = RESIZE_STATE_NORMAL;
 	return TRUE;
 }
 
@@ -1403,9 +1414,14 @@ int renderer::update_window_size()
 //  batch_vectors
 //============================================================
 
-void renderer::batch_vectors()
+void renderer_d3d9::batch_vectors()
 {
-	windows_options &options = downcast<windows_options &>(window().machine().options());
+	auto win = assert_window();
+
+	windows_options &options = downcast<windows_options &>(win->machine().options());
+
+	float quad_width = 0.0f;
+	float quad_height = 0.0f;
 
 	int vector_size = (options.antialias() ? 24 : 6);
 	m_vectorbatch = mesh_alloc(m_line_count * vector_size);
@@ -1415,12 +1431,12 @@ void renderer::batch_vectors()
 	int line_index = 0;
 	float period = options.screen_vector_time_period();
 	UINT32 cached_flags = 0;
-	for (render_primitive *prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
+	for (render_primitive &prim : *win->m_primlist)
 	{
-		switch (prim->type)
+		switch (prim.type)
 		{
 			case render_primitive::LINE:
-				if (PRIMFLAG_GET_VECTOR(prim->flags))
+				if (PRIMFLAG_GET_VECTOR(prim.flags))
 				{
 					if (period == 0.0f || m_line_count == 0)
 					{
@@ -1431,7 +1447,15 @@ void renderer::batch_vectors()
 						batch_vector(prim, (float)(start_index + line_index) / ((float)m_line_count * period));
 						line_index++;
 					}
-					cached_flags = prim->flags;
+					cached_flags = prim.flags;
+				}
+				break;
+
+			case render_primitive::QUAD:
+				if (PRIMFLAG_GET_VECTORBUF(prim.flags))
+				{
+					quad_width = prim.bounds.x1 - prim.bounds.x0;
+					quad_height = prim.bounds.y1 - prim.bounds.y0;
 				}
 				break;
 
@@ -1441,9 +1465,76 @@ void renderer::batch_vectors()
 		}
 	}
 
+	// handle orientation and rotation for vectors as they were a texture
+	if (m_shaders->enabled())
+	{
+		bool orientation_swap_xy =
+			(win->machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+		bool rotation_swap_xy =
+			(win->target()->orientation() & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+		bool swap_xy = orientation_swap_xy ^ rotation_swap_xy;
+
+		bool rotation_0 = win->target()->orientation() == ROT0;
+		bool rotation_90 = win->target()->orientation() == ROT90;
+		bool rotation_180 = win->target()->orientation() == ROT180;
+		bool rotation_270 = win->target()->orientation() == ROT270;
+		bool flip_x =
+			((rotation_0 || rotation_270) && orientation_swap_xy) ||
+			((rotation_180 || rotation_270) && !orientation_swap_xy);
+		bool flip_y =
+			((rotation_0 || rotation_90) && orientation_swap_xy) ||
+			((rotation_180 || rotation_90) && !orientation_swap_xy);
+
+		float screen_width = static_cast<float>(this->get_width());
+		float screen_height = static_cast<float>(this->get_height());
+		float half_screen_width = screen_width * 0.5f;
+		float half_screen_height = screen_height * 0.5f;
+		float screen_swap_x_factor = 1.0f / screen_width * screen_height;
+		float screen_swap_y_factor = 1.0f / screen_height * screen_width;
+		float screen_quad_ratio_x = screen_width / quad_width;
+		float screen_quad_ratio_y = screen_height / quad_height;
+
+		if (swap_xy)
+		{
+			std::swap(screen_quad_ratio_x, screen_quad_ratio_y);
+		}
+
+		for (int batchindex = 0; batchindex < m_batchindex; batchindex++)
+		{
+			if (swap_xy)
+			{
+				m_vectorbatch[batchindex].x *= screen_swap_x_factor;
+				m_vectorbatch[batchindex].y *= screen_swap_y_factor;
+				std::swap(m_vectorbatch[batchindex].x, m_vectorbatch[batchindex].y);
+			}
+
+			if (flip_x)
+			{
+				m_vectorbatch[batchindex].x = screen_width - m_vectorbatch[batchindex].x;
+			}
+
+			if (flip_y)
+			{
+				m_vectorbatch[batchindex].y = screen_height - m_vectorbatch[batchindex].y;
+			}
+
+			// center
+			m_vectorbatch[batchindex].x -= half_screen_width;
+			m_vectorbatch[batchindex].y -= half_screen_height;
+
+			// correct screen/quad ratio (vectors are created in screen coordinates and have to be adjusted for texture corrdinates of the quad)
+			m_vectorbatch[batchindex].x *= screen_quad_ratio_x;
+			m_vectorbatch[batchindex].y *= screen_quad_ratio_y;
+
+			// un-center
+			m_vectorbatch[batchindex].x += half_screen_width;
+			m_vectorbatch[batchindex].y += half_screen_height;
+		}
+	}
+
 	// now add a polygon entry
 	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, m_line_count * (options.antialias() ? 8 : 2), vector_size * m_line_count, cached_flags,
-		m_texture_manager->get_vector_texture(), D3DTOP_MODULATE, 0.0f, 1.0f, 0.0f, 0.0f);
+		m_texture_manager->get_vector_texture(), D3DTOP_MODULATE, 0.0f, 1.0f, quad_width, quad_height);
 	m_numpolys++;
 
 	start_index += (int)((float)line_index * period);
@@ -1455,10 +1546,10 @@ void renderer::batch_vectors()
 	m_line_count = 0;
 }
 
-void renderer::batch_vector(const render_primitive *prim, float line_time)
+void renderer_d3d9::batch_vector(const render_primitive &prim, float line_time)
 {
 	// compute the effective width based on the direction of the line
-	float effwidth = prim->width;
+	float effwidth = prim.width;
 	if (effwidth < 0.5f)
 	{
 		effwidth = 0.5f;
@@ -1466,15 +1557,24 @@ void renderer::batch_vector(const render_primitive *prim, float line_time)
 
 	// determine the bounds of a quad to draw this line
 	render_bounds b0, b1;
-	render_line_to_quad(&prim->bounds, effwidth, &b0, &b1);
+	render_line_to_quad(&prim.bounds, effwidth, effwidth, &b0, &b1);
+
+	float dx = b1.x1 - b0.x1;
+	float dy = b1.y1 - b0.y1;
+	float line_length = sqrtf(dx * dx + dy * dy);
+
+	vec2f& start = (get_vector_texture() ? get_vector_texture()->get_uvstart() : get_default_texture()->get_uvstart());
+	vec2f& stop = (get_vector_texture() ? get_vector_texture()->get_uvstop() : get_default_texture()->get_uvstop());
 
 	// iterate over AA steps
-	for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim->flags) ? line_aa_4step : line_aa_1step;
+	for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim.flags) ? line_aa_4step : line_aa_1step;
 		step->weight != 0; step++)
 	{
 		// get a pointer to the vertex buffer
-		if (m_vectorbatch == NULL)
+		if (m_vectorbatch == nullptr)
+		{
 			return;
+		}
 
 		m_vectorbatch[m_batchindex + 0].x = b0.x0 + step->xoffs;
 		m_vectorbatch[m_batchindex + 0].y = b0.y0 + step->yoffs;
@@ -1490,15 +1590,11 @@ void renderer::batch_vector(const render_primitive *prim, float line_time)
 		m_vectorbatch[m_batchindex + 5].x = b1.x1 + step->xoffs;
 		m_vectorbatch[m_batchindex + 5].y = b1.y1 + step->yoffs;
 
-		float dx = b1.x1 - b0.x1;
-		float dy = b1.y1 - b0.y1;
-		float line_length = sqrtf(dx * dx + dy * dy);
-
 		// determine the color of the line
-		INT32 r = (INT32)(prim->color.r * step->weight * 255.0f);
-		INT32 g = (INT32)(prim->color.g * step->weight * 255.0f);
-		INT32 b = (INT32)(prim->color.b * step->weight * 255.0f);
-		INT32 a = (INT32)(prim->color.a * 255.0f);
+		INT32 r = (INT32)(prim.color.r * step->weight * 255.0f);
+		INT32 g = (INT32)(prim.color.g * step->weight * 255.0f);
+		INT32 b = (INT32)(prim.color.b * step->weight * 255.0f);
+		INT32 a = (INT32)(prim.color.a * 255.0f);
 		if (r > 255 || g > 255 || b > 255)
 		{
 			if (r > 2*255 || g > 2*255 || b > 2*255)
@@ -1515,9 +1611,6 @@ void renderer::batch_vector(const render_primitive *prim, float line_time)
 		if (b > 255) b = 255;
 		if (a > 255) a = 255;
 		DWORD color = D3DCOLOR_ARGB(a, r, g, b);
-
-		vec2f& start = (get_vector_texture() ? get_vector_texture()->get_uvstart() : get_default_texture()->get_uvstart());
-		vec2f& stop = (get_vector_texture() ? get_vector_texture()->get_uvstop() : get_default_texture()->get_uvstop());
 
 		m_vectorbatch[m_batchindex + 0].u0 = start.c.x;
 		m_vectorbatch[m_batchindex + 0].v0 = start.c.y;
@@ -1543,6 +1636,8 @@ void renderer::batch_vector(const render_primitive *prim, float line_time)
 		// set the color, Z parameters to standard values
 		for (int i = 0; i < 6; i++)
 		{
+			m_vectorbatch[m_batchindex + i].x -= 0.5f;
+			m_vectorbatch[m_batchindex + i].y -= 0.5f;
 			m_vectorbatch[m_batchindex + i].z = 0.0f;
 			m_vectorbatch[m_batchindex + i].rhw = 1.0f;
 			m_vectorbatch[m_batchindex + i].color = color;
@@ -1557,10 +1652,10 @@ void renderer::batch_vector(const render_primitive *prim, float line_time)
 //  draw_line
 //============================================================
 
-void renderer::draw_line(const render_primitive *prim)
+void renderer_d3d9::draw_line(const render_primitive &prim)
 {
 	// compute the effective width based on the direction of the line
-	float effwidth = prim->width;
+	float effwidth = prim.width;
 	if (effwidth < 0.5f)
 	{
 		effwidth = 0.5f;
@@ -1568,15 +1663,15 @@ void renderer::draw_line(const render_primitive *prim)
 
 	// determine the bounds of a quad to draw this line
 	render_bounds b0, b1;
-	render_line_to_quad(&prim->bounds, effwidth, &b0, &b1);
+	render_line_to_quad(&prim.bounds, effwidth, 0.0f, &b0, &b1);
 
 	// iterate over AA steps
-	for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim->flags) ? line_aa_4step : line_aa_1step;
+	for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim.flags) ? line_aa_4step : line_aa_1step;
 		step->weight != 0; step++)
 	{
 		// get a pointer to the vertex buffer
 		vertex *vertex = mesh_alloc(4);
-		if (vertex == NULL)
+		if (vertex == nullptr)
 			return;
 
 		// rotate the unit vector by 135 degrees and add to point 0
@@ -1596,10 +1691,10 @@ void renderer::draw_line(const render_primitive *prim)
 		vertex[3].y = b1.y1 + step->yoffs;
 
 		// determine the color of the line
-		INT32 r = (INT32)(prim->color.r * step->weight * 255.0f);
-		INT32 g = (INT32)(prim->color.g * step->weight * 255.0f);
-		INT32 b = (INT32)(prim->color.b * step->weight * 255.0f);
-		INT32 a = (INT32)(prim->color.a * 255.0f);
+		INT32 r = (INT32)(prim.color.r * step->weight * 255.0f);
+		INT32 g = (INT32)(prim.color.g * step->weight * 255.0f);
+		INT32 b = (INT32)(prim.color.b * step->weight * 255.0f);
+		INT32 a = (INT32)(prim.color.a * 255.0f);
 		if (r > 255) r = 255;
 		if (g > 255) g = 255;
 		if (b > 255) b = 255;
@@ -1630,7 +1725,7 @@ void renderer::draw_line(const render_primitive *prim)
 		}
 
 		// now add a polygon entry
-		m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim->flags, get_vector_texture(),
+		m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, get_vector_texture(),
 								D3DTOP_MODULATE, 0.0f, 1.0f, 0.0f, 0.0f);
 		m_numpolys++;
 	}
@@ -1641,55 +1736,56 @@ void renderer::draw_line(const render_primitive *prim)
 //  draw_quad
 //============================================================
 
-void renderer::draw_quad(const render_primitive *prim)
+void renderer_d3d9::draw_quad(const render_primitive &prim)
 {
-	texture_info *texture = m_texture_manager->find_texinfo(&prim->texture, prim->flags);
+	texture_info *texture = m_texture_manager->find_texinfo(&prim.texture, prim.flags);
 
-	if (texture == NULL)
+	if (texture == nullptr)
 	{
 		texture = get_default_texture();
 	}
 
 	// get a pointer to the vertex buffer
 	vertex *vertex = mesh_alloc(4);
-	if (vertex == NULL)
+	if (vertex == nullptr)
 		return;
 
 	// fill in the vertexes clockwise
-	vertex[0].x = prim->bounds.x0;
-	vertex[0].y = prim->bounds.y0;
-	vertex[1].x = prim->bounds.x1;
-	vertex[1].y = prim->bounds.y0;
-	vertex[2].x = prim->bounds.x0;
-	vertex[2].y = prim->bounds.y1;
-	vertex[3].x = prim->bounds.x1;
-	vertex[3].y = prim->bounds.y1;
-	float width = prim->bounds.x1 - prim->bounds.x0;
-	float height = prim->bounds.y1 - prim->bounds.y0;
+	vertex[0].x = prim.bounds.x0;
+	vertex[0].y = prim.bounds.y0;
+	vertex[1].x = prim.bounds.x1;
+	vertex[1].y = prim.bounds.y0;
+	vertex[2].x = prim.bounds.x0;
+	vertex[2].y = prim.bounds.y1;
+	vertex[3].x = prim.bounds.x1;
+	vertex[3].y = prim.bounds.y1;
+	float width = prim.bounds.x1 - prim.bounds.x0;
+	float height = prim.bounds.y1 - prim.bounds.y0;
 
 	// set the texture coordinates
-	if(texture != NULL)
+	if (texture != nullptr)
 	{
 		vec2f& start = texture->get_uvstart();
 		vec2f& stop = texture->get_uvstop();
 		vec2f delta = stop - start;
-		vertex[0].u0 = start.c.x + delta.c.x * prim->texcoords.tl.u;
-		vertex[0].v0 = start.c.y + delta.c.y * prim->texcoords.tl.v;
-		vertex[1].u0 = start.c.x + delta.c.x * prim->texcoords.tr.u;
-		vertex[1].v0 = start.c.y + delta.c.y * prim->texcoords.tr.v;
-		vertex[2].u0 = start.c.x + delta.c.x * prim->texcoords.bl.u;
-		vertex[2].v0 = start.c.y + delta.c.y * prim->texcoords.bl.v;
-		vertex[3].u0 = start.c.x + delta.c.x * prim->texcoords.br.u;
-		vertex[3].v0 = start.c.y + delta.c.y * prim->texcoords.br.v;
+
+		vertex[0].u0 = start.c.x + delta.c.x * prim.texcoords.tl.u;
+		vertex[0].v0 = start.c.y + delta.c.y * prim.texcoords.tl.v;
+		vertex[1].u0 = start.c.x + delta.c.x * prim.texcoords.tr.u;
+		vertex[1].v0 = start.c.y + delta.c.y * prim.texcoords.tr.v;
+		vertex[2].u0 = start.c.x + delta.c.x * prim.texcoords.bl.u;
+		vertex[2].v0 = start.c.y + delta.c.y * prim.texcoords.bl.v;
+		vertex[3].u0 = start.c.x + delta.c.x * prim.texcoords.br.u;
+		vertex[3].v0 = start.c.y + delta.c.y * prim.texcoords.br.v;
 	}
 
 	// determine the color, allowing for over modulation
-	INT32 r = (INT32)(prim->color.r * 255.0f);
-	INT32 g = (INT32)(prim->color.g * 255.0f);
-	INT32 b = (INT32)(prim->color.b * 255.0f);
-	INT32 a = (INT32)(prim->color.a * 255.0f);
+	INT32 r = (INT32)(prim.color.r * 255.0f);
+	INT32 g = (INT32)(prim.color.g * 255.0f);
+	INT32 b = (INT32)(prim.color.b * 255.0f);
+	INT32 a = (INT32)(prim.color.a * 255.0f);
 	DWORD modmode = D3DTOP_MODULATE;
-	if (texture != NULL)
+	if (texture != nullptr)
 	{
 		if (m_mod2x_supported && (r > 255 || g > 255 || b > 255))
 		{
@@ -1722,7 +1818,7 @@ void renderer::draw_quad(const render_primitive *prim)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim->flags, texture, modmode, width, height);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, texture, modmode, width, height);
 	m_numpolys++;
 }
 
@@ -1755,12 +1851,12 @@ void poly_info::init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
 //  primitive_alloc
 //============================================================
 
-vertex *renderer::mesh_alloc(int numverts)
+vertex *renderer_d3d9::mesh_alloc(int numverts)
 {
 	HRESULT result;
 
 	// if we're going to overflow, flush
-	if (m_lockedbuf != NULL && m_numverts + numverts >= VERTEX_BUFFER_SIZE)
+	if (m_lockedbuf != nullptr && m_numverts + numverts >= VERTEX_BUFFER_SIZE)
 	{
 		primitive_flush_pending();
 
@@ -1772,21 +1868,21 @@ vertex *renderer::mesh_alloc(int numverts)
 	}
 
 	// if we don't have a lock, grab it now
-	if (m_lockedbuf == NULL)
+	if (m_lockedbuf == nullptr)
 	{
 		result = (*d3dintf->vertexbuf.lock)(m_vertexbuf, 0, 0, (VOID **)&m_lockedbuf, D3DLOCK_DISCARD);
 		if (result != D3D_OK)
-			return NULL;
+			return nullptr;
 	}
 
 	// if we already have the lock and enough room, just return a pointer
-	if (m_lockedbuf != NULL && m_numverts + numverts < VERTEX_BUFFER_SIZE)
+	if (m_lockedbuf != nullptr && m_numverts + numverts < VERTEX_BUFFER_SIZE)
 	{
 		int oldverts = m_numverts;
 		m_numverts += numverts;
 		return &m_lockedbuf[oldverts];
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1794,10 +1890,10 @@ vertex *renderer::mesh_alloc(int numverts)
 //  primitive_flush_pending
 //============================================================
 
-void renderer::primitive_flush_pending()
+void renderer_d3d9::primitive_flush_pending()
 {
 	// ignore if we're not locked
-	if (m_lockedbuf == NULL)
+	if (m_lockedbuf == nullptr)
 	{
 		return;
 	}
@@ -1805,7 +1901,7 @@ void renderer::primitive_flush_pending()
 	// unlock the buffer
 	HRESULT result = (*d3dintf->vertexbuf.unlock)(m_vertexbuf);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during vertex buffer unlock call\n", (int)result);
-	m_lockedbuf = NULL;
+	m_lockedbuf = nullptr;
 
 	// set the stream
 	result = (*d3dintf->device.set_stream_source)(m_device, 0, m_vertexbuf, sizeof(vertex));
@@ -1830,7 +1926,7 @@ void renderer::primitive_flush_pending()
 		set_texture(texture);
 
 		// set filtering if different
-		if (texture != NULL)
+		if (texture != nullptr)
 		{
 			newfilter = FALSE;
 			if (PRIMFLAG_GET_SCREENTEX(flags))
@@ -1882,24 +1978,24 @@ void renderer::primitive_flush_pending()
 
 texture_info::~texture_info()
 {
-	if (m_d3dfinaltex != NULL)
+	if (m_d3dfinaltex != nullptr)
 	{
 		if (m_d3dtex == m_d3dfinaltex)
 		{
-			m_d3dtex = NULL;
+			m_d3dtex = nullptr;
 		}
 		(*d3dintf->texture.release)(m_d3dfinaltex);
-		m_d3dfinaltex = NULL;
+		m_d3dfinaltex = nullptr;
 	}
-	if (m_d3dtex != NULL)
+	if (m_d3dtex != nullptr)
 	{
 		(*d3dintf->texture.release)(m_d3dtex);
-		m_d3dtex = NULL;
+		m_d3dtex = nullptr;
 	}
-	if (m_d3dsurface != NULL)
+	if (m_d3dsurface != nullptr)
 	{
 		(*d3dintf->surface.release)(m_d3dsurface);
-		m_d3dsurface = NULL;
+		m_d3dsurface = nullptr;
 	}
 }
 
@@ -1908,7 +2004,7 @@ texture_info::~texture_info()
 //  texture_info constructor
 //============================================================
 
-texture_info::texture_info(texture_manager *manager, const render_texinfo* texsource, int prescale, UINT32 flags)
+texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* texsource, int prescale, UINT32 flags)
 {
 	HRESULT result;
 
@@ -1921,9 +2017,33 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 	m_xprescale = prescale;
 	m_yprescale = prescale;
 
-	m_d3dtex = NULL;
-	m_d3dsurface = NULL;
-	m_d3dfinaltex = NULL;
+	m_d3dtex = nullptr;
+	m_d3dsurface = nullptr;
+	m_d3dfinaltex = nullptr;
+
+	// determine texture type, required to compute texture size
+	if (!PRIMFLAG_GET_SCREENTEX(flags))
+	{
+		m_type = TEXTURE_TYPE_PLAIN;
+	}
+	else
+	{
+		if ((m_xprescale == 1 && m_yprescale == 1) || m_renderer->get_shaders()->enabled())
+		{
+			m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
+		}
+		else
+		{
+			if (m_texture_manager->is_stretch_supported() && PRIMFLAG_GET_TEXFORMAT(flags) != TEXFORMAT_YUY16)
+			{
+				m_type = TEXTURE_TYPE_SURFACE;
+			}
+			else
+			{
+				m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
+			}
+		}
+	}
 
 	// compute the size
 	compute_size(texsource->width, texsource->height);
@@ -1936,7 +2056,6 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 		if (result != D3D_OK)
 			goto error;
 		m_d3dfinaltex = m_d3dtex;
-		m_type = TEXTURE_TYPE_PLAIN;
 	}
 
 	// screen textures are allocated differently
@@ -1979,7 +2098,9 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 			m_yprescale--;
 		}
 
-		int prescale = m_renderer->window().prescale();
+		auto win = m_renderer->assert_window();
+
+		int prescale = win->prescale();
 		if (m_xprescale != prescale || m_yprescale != prescale)
 		{
 			osd_printf_verbose("Direct3D: adjusting prescale from %dx%d to %dx%d\n", prescale, prescale, m_xprescale, m_yprescale);
@@ -2001,16 +2122,9 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 				if (result == D3D_OK)
 				{
 					m_d3dfinaltex = m_d3dtex;
-					m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
-					if (m_renderer->get_shaders()->enabled() && !m_renderer->get_shaders()->register_texture(this))
-					{
-						goto error;
-					}
-
 					break;
 				}
 			}
-
 			// screen textures with prescaling require two allocations
 			else
 			{
@@ -2023,9 +2137,7 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 					{
 						continue;
 					}
-					m_type = TEXTURE_TYPE_SURFACE;
 				}
-
 				// otherwise, we allocate a dynamic texture for the source
 				else
 				{
@@ -2034,7 +2146,6 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 					{
 						continue;
 					}
-					m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
 				}
 
 				// for the target surface, we allocate a render target texture
@@ -2043,17 +2154,15 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 
 				// target surfaces typically cannot be YCbCr, so we always pick RGB in that case
 				D3DFORMAT finalfmt = (format != m_texture_manager->get_yuv_format()) ? format : D3DFMT_A8R8G8B8;
+
 				result = (*d3dintf->device.create_texture)(m_renderer->get_device(), scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, finalfmt, D3DPOOL_DEFAULT, &m_d3dfinaltex);
 				if (result == D3D_OK)
 				{
-					if (m_renderer->get_shaders()->enabled() && !m_renderer->get_shaders()->register_prescaled_texture(this))
-					{
-						goto error;
-					}
 					break;
 				}
+
 				(*d3dintf->texture.release)(m_d3dtex);
-				m_d3dtex = NULL;
+				m_d3dtex = nullptr;
 			}
 		}
 	}
@@ -2061,11 +2170,10 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 	// copy the data to the texture
 	set_data(texsource, flags);
 
-	//texsource->osdhandle = (void*)this;
 	// add us to the texture list
-	if(m_texture_manager->get_texlist() != NULL)
+	if(m_texture_manager->get_texlist() != nullptr)
 		m_texture_manager->get_texlist()->m_prev = this;
-	m_prev = NULL;
+	m_prev = nullptr;
 	m_next = m_texture_manager->get_texlist();
 	m_texture_manager->set_texlist(this);
 	return;
@@ -2073,9 +2181,9 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 error:
 	d3dintf->post_fx_available = false;
 	osd_printf_error("Direct3D: Critical warning: A texture failed to allocate. Expect things to get bad quickly.\n");
-	if (m_d3dsurface != NULL)
+	if (m_d3dsurface != nullptr)
 		(*d3dintf->surface.release)(m_d3dsurface);
-	if (m_d3dtex != NULL)
+	if (m_d3dtex != nullptr)
 		(*d3dintf->texture.release)(m_d3dtex);
 }
 
@@ -2149,30 +2257,40 @@ void texture_info::compute_size(int texwidth, int texheight)
 	m_xborderpix = 0;
 	m_yborderpix = 0;
 
-	// if we're not wrapping, add a 1-2 pixel border on all sides
-	if (ENABLE_BORDER_PIX && !(m_flags & PRIMFLAG_TEXWRAP_MASK))
+	bool shaders_enabled = m_renderer->get_shaders()->enabled();
+	bool wrap_texture = (m_flags & PRIMFLAG_TEXWRAP_MASK) == PRIMFLAG_TEXWRAP_MASK;
+
+	// skip border when shaders are enabled
+	if (!shaders_enabled)
 	{
-		// note we need 2 pixels in X for YUY textures
-		m_xborderpix = (PRIMFLAG_GET_TEXFORMAT(m_flags) == TEXFORMAT_YUY16) ? 2 : 1;
-		m_yborderpix = 1;
+		// if we're not wrapping, add a 1-2 pixel border on all sides
+		if (!wrap_texture)
+		{
+			// note we need 2 pixels in X for YUY textures
+			m_xborderpix = (PRIMFLAG_GET_TEXFORMAT(m_flags) == TEXFORMAT_YUY16) ? 2 : 1;
+			m_yborderpix = 1;
+		}
 	}
 
-	// compute final texture size
 	finalwidth += 2 * m_xborderpix;
 	finalheight += 2 * m_yborderpix;
 
-	compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
-
-	// if we added pixels for the border, and that just barely pushed us over, take it back
-	if (finalwidth > m_texture_manager->get_max_texture_width() || finalheight > m_texture_manager->get_max_texture_height())
+	// take texture size as given when shaders are enabled
+	if (!shaders_enabled)
 	{
-		finalheight = texheight;
-		finalwidth = texwidth;
-
-		m_xborderpix = 0;
-		m_yborderpix = 0;
-
 		compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
+
+		// if we added pixels for the border, and that just barely pushed us over, take it back
+		if (finalwidth > m_texture_manager->get_max_texture_width() || finalheight > m_texture_manager->get_max_texture_height())
+		{
+			finalheight = texheight;
+			finalwidth = texwidth;
+
+			m_xborderpix = 0;
+			m_yborderpix = 0;
+
+			compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
+		}
 	}
 
 	// if we're above the max width/height, do what?
@@ -2242,7 +2360,7 @@ static inline void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, con
 	assert(xborderpix == 0 || xborderpix == 1);
 
 	// palette (really RGB map) case
-	if (palette != NULL)
+	if (palette != nullptr)
 	{
 		if (xborderpix)
 		{
@@ -2285,7 +2403,7 @@ static inline void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, co
 	assert(xborderpix == 0 || xborderpix == 1);
 
 	// palette (really RGB map) case
-	if (palette != NULL)
+	if (palette != nullptr)
 	{
 		if (xborderpix)
 		{
@@ -2329,7 +2447,7 @@ static inline void copyline_yuy16_to_yuy2(UINT16 *dst, const UINT16 *src, int wi
 	assert(width % 2 == 0);
 
 	// palette (really RGB map) case
-	if (palette != NULL)
+	if (palette != nullptr)
 	{
 		if (xborderpix)
 		{
@@ -2394,7 +2512,7 @@ static inline void copyline_yuy16_to_uyvy(UINT16 *dst, const UINT16 *src, int wi
 	assert(width % 2 == 0);
 
 	// palette (really RGB map) case
-	if (palette != NULL)
+	if (palette != nullptr)
 	{
 		if (xborderpix)
 		{
@@ -2457,7 +2575,7 @@ static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int wi
 	assert(width % 2 == 0);
 
 	// palette (really RGB map) case
-	if (palette != NULL)
+	if (palette != nullptr)
 	{
 		if (xborderpix)
 		{
@@ -2535,9 +2653,9 @@ void texture_info::set_data(const render_texinfo *texsource, UINT32 flags)
 	switch (m_type)
 	{
 		default:
-		case TEXTURE_TYPE_PLAIN:    result = (*d3dintf->texture.lock_rect)(m_d3dtex, 0, &rect, NULL, 0);                 break;
-		case TEXTURE_TYPE_DYNAMIC:  result = (*d3dintf->texture.lock_rect)(m_d3dtex, 0, &rect, NULL, D3DLOCK_DISCARD);   break;
-		case TEXTURE_TYPE_SURFACE:  result = (*d3dintf->surface.lock_rect)(m_d3dsurface, &rect, NULL, D3DLOCK_DISCARD);  break;
+		case TEXTURE_TYPE_PLAIN:    result = (*d3dintf->texture.lock_rect)(m_d3dtex, 0, &rect, nullptr, 0);                 break;
+		case TEXTURE_TYPE_DYNAMIC:  result = (*d3dintf->texture.lock_rect)(m_d3dtex, 0, &rect, nullptr, D3DLOCK_DISCARD);   break;
+		case TEXTURE_TYPE_SURFACE:  result = (*d3dintf->surface.lock_rect)(m_d3dsurface, &rect, nullptr, D3DLOCK_DISCARD);  break;
 	}
 	if (result != D3D_OK)
 	{
@@ -2625,7 +2743,7 @@ void texture_info::prescale()
 	// if we have an offscreen plain surface, we can just StretchRect to it
 	if (m_type == TEXTURE_TYPE_SURFACE)
 	{
-		assert(m_d3dsurface != NULL);
+		assert(m_d3dsurface != nullptr);
 
 		// set the source bounds
 		RECT source;
@@ -2649,7 +2767,7 @@ void texture_info::prescale()
 	{
 		surface *backbuffer;
 
-		assert(m_d3dtex != NULL);
+		assert(m_d3dtex != nullptr);
 
 		// first remember the original render target and set the new one
 		result = (*d3dintf->device.get_render_target)(m_renderer->get_device(), 0, &backbuffer);
@@ -2704,7 +2822,7 @@ void texture_info::prescale()
 		// unlock the vertex buffer
 		result = (*d3dintf->vertexbuf.unlock)(m_renderer->get_vertex_buffer());
 		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during vertex buffer unlock call\n", (int)result);
-		m_renderer->set_locked_buffer(NULL);
+		m_renderer->set_locked_buffer(nullptr);
 
 		// set the stream and draw the triangle strip
 		result = (*d3dintf->device.set_stream_source)(m_renderer->get_device(), 0, m_renderer->get_vertex_buffer(), sizeof(vertex));
@@ -2734,15 +2852,15 @@ void texture_info::prescale()
 
 cache_target::~cache_target()
 {
-	if (last_texture != NULL)
+	if (last_texture != nullptr)
 	{
 		(*d3dintf->texture.release)(last_texture);
-		last_texture = NULL;
+		last_texture = nullptr;
 	}
-	if (last_target != NULL)
+	if (last_target != nullptr)
 	{
 		(*d3dintf->surface.release)(last_target);
-		last_target = NULL;
+		last_target = nullptr;
 	}
 }
 
@@ -2751,119 +2869,143 @@ cache_target::~cache_target()
 //  cache_target::init - initializes a target cache
 //============================================================
 
-bool cache_target::init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y)
+bool cache_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height)
 {
-	HRESULT result = (*d3dintf->device.create_texture)(d3d->get_device(), width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &last_texture);
+	this->width = source_width;
+	this->height = source_height;
+	this->target_width = target_width;
+	this->target_height = target_height;
+
+	HRESULT result = (*d3dintf->device.create_texture)(d3d->get_device(), target_width, target_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &last_texture);
 	if (result != D3D_OK)
 	{
 		return false;
 	}
 	(*d3dintf->texture.get_surface_level)(last_texture, 0, &last_target);
 
-	target_width = width * prescale_x;
-	target_height = height * prescale_y;
-
 	return true;
 }
 
 
 //============================================================
-//  render_target::~render_target
+//  d3d_render_target::~d3d_render_target
 //============================================================
 
-render_target::~render_target()
+d3d_render_target::~d3d_render_target()
 {
-	for (int index = 0; index < 11; index++)
+	for (int index = 0; index < MAX_BLOOM_COUNT; index++)
 	{
-		if (bloom_texture[index] != NULL)
+		if (bloom_texture[index] != nullptr)
 		{
 			(*d3dintf->texture.release)(bloom_texture[index]);
-			bloom_texture[index] = NULL;
+			bloom_texture[index] = nullptr;
 		}
-		if (bloom_target[index] != NULL)
+		if (bloom_surface[index] != nullptr)
 		{
-			(*d3dintf->surface.release)(bloom_target[index]);
-			bloom_target[index] = NULL;
+			(*d3dintf->surface.release)(bloom_surface[index]);
+			bloom_surface[index] = nullptr;
 		}
 	}
 
 	for (int index = 0; index < 2; index++)
 	{
-		if (native_texture[index] != NULL)
+		if (source_texture[index] != nullptr)
 		{
-			(*d3dintf->texture.release)(native_texture[index]);
-			native_texture[index] = NULL;
+			(*d3dintf->texture.release)(source_texture[index]);
+			source_texture[index] = nullptr;
 		}
-		if (native_target[index] != NULL)
+		if (source_surface[index] != nullptr)
 		{
-			(*d3dintf->surface.release)(native_target[index]);
-			native_target[index] = NULL;
+			(*d3dintf->surface.release)(source_surface[index]);
+			source_surface[index] = nullptr;
 		}
-		if (prescale_texture[index] != NULL)
+		if (target_texture[index] != nullptr)
 		{
-			(*d3dintf->texture.release)(prescale_texture[index]);
-			prescale_texture[index] = NULL;
+			(*d3dintf->texture.release)(target_texture[index]);
+			target_texture[index] = nullptr;
 		}
-		if (prescale_target[index] != NULL)
+		if (target_surface[index] != nullptr)
 		{
-			(*d3dintf->surface.release)(prescale_target[index]);
-			prescale_target[index] = NULL;
+			(*d3dintf->surface.release)(target_surface[index]);
+			target_surface[index] = nullptr;
 		}
 	}
 }
 
 
 //============================================================
-//  render_target::init - initializes a render target
+//  d3d_render_target::init - initializes a render target
 //============================================================
 
-bool render_target::init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y)
+bool d3d_render_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height)
 {
 	HRESULT result;
 
+	this->width = source_width;
+	this->height = source_height;
+
+	this->target_width = target_width;
+	this->target_height = target_height;
+
 	for (int index = 0; index < 2; index++)
 	{
-		result = (*d3dintf->device.create_texture)(d3d->get_device(), width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &native_texture[index]);
+		result = (*d3dintf->device.create_texture)(d3d->get_device(), source_width, source_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &source_texture[index]);
 		if (result != D3D_OK)
 		{
 			return false;
 		}
-		(*d3dintf->texture.get_surface_level)(native_texture[index], 0, &native_target[index]);
+		(*d3dintf->texture.get_surface_level)(source_texture[index], 0, &source_surface[index]);
 
-		result = (*d3dintf->device.create_texture)(d3d->get_device(), width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &prescale_texture[index]);
+		result = (*d3dintf->device.create_texture)(d3d->get_device(), target_width, target_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &target_texture[index]);
 		if (result != D3D_OK)
 		{
 			return false;
 		}
-		(*d3dintf->texture.get_surface_level)(prescale_texture[index], 0, &prescale_target[index]);
+		(*d3dintf->texture.get_surface_level)(target_texture[index], 0, &target_surface[index]);
 	}
 
-	int bloom_index = 0;
-	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
-	float bloom_width = d3d->get_width();
-	float bloom_height = d3d->get_height();
-	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
+	auto win = d3d->assert_window();
+
+	auto first_screen = win->machine().first_screen();
+	bool vector_screen =
+		first_screen != nullptr &&
+		first_screen->screen_type() == SCREEN_TYPE_VECTOR;
+
+	float scale_factor = 0.75f;
+	int scale_count = vector_screen ? MAX_BLOOM_COUNT : HALF_BLOOM_COUNT;
+
+	float bloom_width = (float)source_width;
+	float bloom_height = (float)source_height;
+	float bloom_size = bloom_width < bloom_height ? bloom_width : bloom_height;
+	for (int bloom_index = 0; bloom_index < scale_count && bloom_size >= 2.0f; bloom_size *= scale_factor)
 	{
-		bloom_width *= 0.5f;
-		bloom_height *= 0.5f;
+		this->bloom_dims[bloom_index][0] = (int)bloom_width;
+		this->bloom_dims[bloom_index][1] = (int)bloom_height;
 
 		result = (*d3dintf->device.create_texture)(d3d->get_device(), (int)bloom_width, (int)bloom_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &bloom_texture[bloom_index]);
 		if (result != D3D_OK)
 		{
 			return false;
 		}
-		(*d3dintf->texture.get_surface_level)(bloom_texture[bloom_index], 0, &bloom_target[bloom_index]);
+		(*d3dintf->texture.get_surface_level)(bloom_texture[bloom_index], 0, &bloom_surface[bloom_index]);
+
+		bloom_width *= scale_factor;
+		bloom_height *= scale_factor;
 
 		bloom_index++;
+
+		this->bloom_count = bloom_index;
 	}
-
-	this->width = width;
-	this->height = height;
-
-	target_width = width * prescale_x;
-	target_height = height * prescale_y;
 
 	return true;
 }
 
+texture_info *renderer_d3d9::get_default_texture()
+{
+	return m_texture_manager->get_default_texture();
+}
+
+texture_info *renderer_d3d9::get_vector_texture()
+{
+	return m_texture_manager->get_vector_texture();
 }

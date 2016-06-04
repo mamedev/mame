@@ -12,7 +12,6 @@ the bottom screen.
 driver by Nicola Salmoria
 
 TODO:
-- finish spunchout protection, currently using a hacky workaround
 - add useless driver config to choose between pink and white color proms
 - video raw params - pixel clock is derived from 20.16mhz xtal
 - money bag placement might not be 100% correct in Arm Wrestling
@@ -148,10 +147,7 @@ WRITE8_MEMBER(punchout_state::punchout_speech_vcu_w)
 
 WRITE8_MEMBER(punchout_state::punchout_2a03_reset_w)
 {
-	if (data & 1)
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	else
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(punchout_state::nmi_mask_w)
@@ -192,20 +188,19 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x00, 0x01) AM_WRITENOP    /* the 2A03 #1 is not present */
+	AM_RANGE(0x00, 0x01) AM_WRITENOP // the 2A03 #1 is not present
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(soundlatch2_byte_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("vlm", vlm5030_device, data_w)  /* VLM5030 */
-//  AM_RANGE(0x05, 0x05) AM_WRITENOP  /* unused */
-//  AM_RANGE(0x06, 0x06) AM_WRITENOP
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("vlm", vlm5030_device, data_w)
+	AM_RANGE(0x05, 0x07) AM_WRITENOP // spunchout protection
 	AM_RANGE(0x08, 0x08) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x09, 0x09) AM_WRITENOP    /* watchdog reset, seldom used because 08 clears the watchdog as well */
-	AM_RANGE(0x0a, 0x0a) AM_WRITENOP    /* ?? */
+	AM_RANGE(0x09, 0x09) AM_WRITENOP // watchdog reset, seldom used because 08 clears the watchdog as well
+	AM_RANGE(0x0a, 0x0a) AM_WRITENOP // ?
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(punchout_2a03_reset_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(punchout_speech_reset_w)  /* VLM5030 */
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(punchout_speech_st_w) /* VLM5030 */
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(punchout_speech_vcu_w)    /* VLM5030 */
-	AM_RANGE(0x0f, 0x0f) AM_WRITENOP    /* enable NVRAM ? */
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(punchout_speech_reset_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(punchout_speech_st_w)
+	AM_RANGE(0x0e, 0x0e) AM_WRITE(punchout_speech_vcu_w)
+	AM_RANGE(0x0f, 0x0f) AM_WRITENOP // enable NVRAM?
 ADDRESS_MAP_END
 
 
@@ -229,15 +224,6 @@ READ8_MEMBER(punchout_state::spunchout_exp_r)
 	ret |= m_rp5h01->counter_r() ? 0x00 : 0x40;
 	ret |= m_rp5h01->data_r() ? 0x00 : 0x80;
 
-	// FIXME - hack d6/d7 state until we figure out why the game resets
-	/* PC = 0x0313 */
-	/* (ret or 0x10) -> (D7DF),(D7A0) - (D7DF),(D7A0) = 0d0h(ret nc) */
-	ret &= 0x3f;
-	if (space.device().safe_pcbase() == 0x0313)
-	{
-		ret |= 0xc0;
-	}
-
 	return ret;
 }
 
@@ -245,22 +231,30 @@ WRITE8_MEMBER(punchout_state::spunchout_exp_w)
 {
 	// d0-d3: D0-D3 to RP5C01
 	m_rtc->write(space, offset >> 4 & 0xf, data & 0xf);
+}
 
-	// d0: 74LS74 1D + 74LS74 2D
-	// 74LS74 1Q -> RP5H01 DATA CLOCK + TEST
+WRITE8_MEMBER(punchout_state::spunchout_rp5h01_reset_w)
+{
+	// d0: 74LS74 2D
 	// 74LS74 2Q -> RP5H01 RESET
 	// 74LS74 _2Q -> 74LS74 _1 RESET
+	m_rp5h01->reset_w(data & 1);
+	if (data & 1)
+		spunchout_rp5h01_clock_w(space, 0, 0);
+}
+
+WRITE8_MEMBER(punchout_state::spunchout_rp5h01_clock_w)
+{
+	// d0: 74LS74 1D
+	// 74LS74 1Q -> RP5H01 DATA CLOCK + TEST
 	m_rp5h01->clock_w(data & 1);
 	m_rp5h01->test_w(data & 1);
-	m_rp5h01->reset_w(data & 1);
-	m_rp5h01->clock_w(0);
-	m_rp5h01->test_w(0);
-
-	// d4-d7: unused?
 }
 
 static ADDRESS_MAP_START( spnchout_io_map, AS_IO, 8, punchout_state )
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf0) AM_MASK(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w) /* protection ports */
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0xf0) AM_WRITE(spunchout_rp5h01_reset_w)
+	AM_RANGE(0x06, 0x06) AM_MIRROR(0xf0) AM_WRITE(spunchout_rp5h01_clock_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf0) AM_MASK(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w) // protection ports
 	AM_IMPORT_FROM( punchout_io_map )
 ADDRESS_MAP_END
 

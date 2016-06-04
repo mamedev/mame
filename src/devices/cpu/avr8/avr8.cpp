@@ -638,8 +638,7 @@ avr8_device::avr8_device(const machine_config &mconfig, const char *name, const 
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 22),
 		m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 4),
-		m_eeprom_tag(nullptr),
-		m_eeprom(nullptr),
+		m_eeprom(*this),
 		m_cpu_type(cpu_type),
 		m_lfuses(0x62),
 		m_hfuses(0x99),
@@ -824,8 +823,6 @@ void avr8_device::device_start()
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
-
-	m_eeprom = machine().root_device().memregion(m_eeprom_tag)->base();
 }
 
 //-------------------------------------------------
@@ -878,7 +875,7 @@ void avr8_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -910,7 +907,7 @@ void avr8_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				(m_r[AVR8_REGIDX_SREG] & 0x80) ? 'I' : '-',
 				(m_r[AVR8_REGIDX_SREG] & 0x40) ? 'T' : '-',
 				(m_r[AVR8_REGIDX_SREG] & 0x20) ? 'H' : '-',

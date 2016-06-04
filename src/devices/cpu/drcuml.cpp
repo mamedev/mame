@@ -22,9 +22,6 @@
     * Support for FPU exceptions
 
     * New instructions?
-        - FCOPYI, ICOPYF
-            copy raw between float and integer registers
-
         - VALID opcode_desc,handle,param
             checksum/compare code referenced by opcode_desc; if not
             matching, generate exception with handle,param
@@ -35,6 +32,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "drcuml.h"
 #include "drcbec.h"
 #include "drcbex86.h"
@@ -232,7 +230,7 @@ void drcuml_state::symbol_add(void *base, UINT32 length, const char *name)
 
 //-------------------------------------------------
 //  symbol_find - look up a symbol from the
-//  internal symbol table or return NULL if not
+//  internal symbol table or return nullptr if not
 //  found
 //-------------------------------------------------
 
@@ -254,7 +252,7 @@ const char *drcuml_state::symbol_find(void *base, UINT32 *offset)
 			return cursym->m_name.c_str();
 		}
 
-	// not found; return NULL
+	// not found; return nullptr
 	return nullptr;
 }
 
@@ -373,31 +371,6 @@ uml::instruction &drcuml_block::append()
 		fatalerror("Overran maxinst in drcuml_block_append\n");
 
 	return curinst;
-}
-
-
-//-------------------------------------------------
-//  comment - attach a comment to the current
-//  output location in the specified block
-//-------------------------------------------------
-
-void drcuml_block::append_comment(const char *format, ...)
-{
-	// do the printf
-	std::string temp;
-	va_list va;
-	va_start(va, format);
-	strvprintf(temp,format, va);
-	va_end(va);
-
-	// allocate space in the cache to hold the comment
-	char *comment = (char *)m_drcuml.cache().alloc_temporary(temp.length() + 1);
-	if (comment == nullptr)
-		return;
-	strcpy(comment, temp.c_str());
-
-	// add an instruction with a pointer
-	append().comment(comment);
 }
 
 
@@ -525,11 +498,11 @@ const char *drcuml_block::get_comment_text(const instruction &inst, std::string 
 
 	// mapvars comment about their values
 	else if (inst.opcode() == OP_MAPVAR) {
-		strprintf(comment,"m%d = $%X", (int)inst.param(0).mapvar() - MAPVAR_M0, (UINT32)inst.param(1).immediate());
+		comment = string_format("m%d = $%X", (int)inst.param(0).mapvar() - MAPVAR_M0, (UINT32)inst.param(1).immediate());
 		return comment.c_str();
 	}
 
-	// everything else is NULL
+	// everything else is nullptr
 	return nullptr;
 }
 

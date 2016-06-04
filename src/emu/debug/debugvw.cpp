@@ -231,9 +231,9 @@ void debug_view::set_source(const debug_view_source &source)
 
 const debug_view_source *debug_view::source_for_device(device_t *device) const
 {
-	for (debug_view_source *source = m_source_list.first(); source != nullptr; source = source->next())
-		if (device == source->device())
-			return source;
+	for (debug_view_source &source : m_source_list)
+		if (device == source.device())
+			return &source;
 	return m_source_list.first();
 }
 

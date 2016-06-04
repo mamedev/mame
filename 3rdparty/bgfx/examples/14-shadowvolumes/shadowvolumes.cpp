@@ -21,11 +21,11 @@ using namespace std::tr1;
 
 #include <bgfx/bgfx.h>
 #include <bx/timer.h>
-#include <bx/readerwriter.h>
 #include <bx/allocator.h>
 #include <bx/hash.h>
 #include <bx/float4_t.h>
 #include <bx/fpumath.h>
+#include <bx/crtimpl.h>
 #include "entry/entry.h"
 #include "camera.h"
 #include "imgui/imgui.h"
@@ -989,7 +989,7 @@ typedef std::vector<Group> GroupArray;
 
 namespace bgfx
 {
-	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl);
+	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl, bx::Error* _err = NULL);
 }
 
 struct Mesh
@@ -1866,22 +1866,9 @@ int _main_(int _argc, char** _argv)
 	// Enable debug text.
 	bgfx::setDebug(debug);
 
-	// Setup root path for binary shaders. Shader binaries are different
-	// for each renderer.
-	switch (bgfx::getRendererType() )
-	{
-	case bgfx::RendererType::Direct3D9:
-		s_texelHalf = 0.5f;
-		break;
-
-	case bgfx::RendererType::OpenGL:
-	case bgfx::RendererType::OpenGLES:
-		s_oglNdc = true;
-		break;
-
-	default:
-		break;
-	}
+	const bgfx::Caps* caps = bgfx::getCaps();
+	s_oglNdc    = caps->homogeneousDepth;
+	s_texelHalf = bgfx::RendererType::Direct3D9 == caps->rendererType ? 0.5f : 0.0f;
 
 	// Imgui
 	imguiCreate();
@@ -1891,9 +1878,9 @@ int _main_(int _argc, char** _argv)
 	s_uniforms.init();
 	s_uniforms.submitConstUniforms();
 
-	bgfx::TextureHandle figureTex     = loadTexture("figure-rgba.dds");
-	bgfx::TextureHandle flareTex      = loadTexture("flare.dds");
-	bgfx::TextureHandle fieldstoneTex = loadTexture("fieldstone-rgba.dds");
+	bgfx::TextureHandle figureTex     = loadTexture("textures/figure-rgba.dds");
+	bgfx::TextureHandle flareTex      = loadTexture("textures/flare.dds");
+	bgfx::TextureHandle fieldstoneTex = loadTexture("textures/fieldstone-rgba.dds");
 
 	bgfx::TextureHandle fbtextures[] =
 	{

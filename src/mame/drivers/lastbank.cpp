@@ -483,7 +483,6 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
 	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
-	MCFG_TC0091LVC_PALETTE("palette")
 
 //  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 

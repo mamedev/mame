@@ -2050,12 +2050,12 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, std::st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c",
-							m_w & 0x10 ? 'I':'.',
-							m_w & 0x08 ? 'O':'.',
-							m_w & 0x04 ? 'Z':'.',
-							m_w & 0x02 ? 'C':'.',
-							m_w & 0x01 ? 'S':'.');
+			str = string_format("%c%c%c%c%c",
+					m_w & 0x10 ? 'I':'.',
+					m_w & 0x08 ? 'O':'.',
+					m_w & 0x04 ? 'Z':'.',
+					m_w & 0x02 ? 'C':'.',
+					m_w & 0x01 ? 'S':'.');
 			break;
 	}
 }

@@ -24,7 +24,6 @@
 
 debug_view_state_source::debug_view_state_source(const char *name, device_t &device)
 	: debug_view_source(name, &device),
-		m_device(device),
 		m_stateintf(dynamic_cast<device_state_interface *>(&device)),
 		m_execintf(dynamic_cast<device_execute_interface *>(&device))
 {
@@ -74,12 +73,11 @@ void debug_view_state::enumerate_sources()
 	m_source_list.reset();
 
 	// iterate over devices that have state interfaces
-	state_interface_iterator iter(machine().root_device());
 	std::string name;
-	for (device_state_interface *state = iter.first(); state != nullptr; state = iter.next())
+	for (device_state_interface &state : state_interface_iterator(machine().root_device()))
 	{
-		strprintf(name,"%s '%s'", state->device().name(), state->device().tag());
-		m_source_list.append(*global_alloc(debug_view_state_source(name.c_str(), state->device())));
+		name = string_format("%s '%s'", state.device().name(), state.device().tag());
+		m_source_list.append(*global_alloc(debug_view_state_source(name.c_str(), state.device())));
 	}
 
 	// reset the source to a known good entry
@@ -141,15 +139,15 @@ void debug_view_state::recompute()
 	tailptr = &(*tailptr)->m_next;
 
 	// add all registers into it
-	for (const device_state_entry *entry = source.m_stateintf->state_first(); entry != nullptr; entry = entry->next())
-		if (entry->divider())
+	for (const device_state_entry &entry : source.m_stateintf->state_entries())
+		if (entry.divider())
 		{
 			*tailptr = global_alloc(state_item(REG_DIVIDER, "", 0));
 			tailptr = &(*tailptr)->m_next;
 		}
-		else if (entry->visible())
+		else if (entry.visible())
 		{
-			*tailptr = global_alloc(state_item(entry->index(), entry->symbol(), source.m_stateintf->state_string_max_length(entry->index())));
+			*tailptr = global_alloc(state_item(entry.index(), entry.symbol(), source.m_stateintf->state_string_max_length(entry.index())));
 			tailptr = &(*tailptr)->m_next;
 		}
 
@@ -242,7 +240,7 @@ void debug_view_state::view_update()
 						if (source.m_execintf != nullptr)
 						{
 							curitem->m_currval = source.m_execintf->cycles_remaining();
-							strprintf(valstr, "%-8d", (UINT32)curitem->m_currval);
+							valstr = string_format("%-8d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -250,7 +248,7 @@ void debug_view_state::view_update()
 						if (screen != nullptr)
 						{
 							curitem->m_currval = screen->hpos();
-							strprintf(valstr, "%4d", (UINT32)curitem->m_currval);
+							valstr = string_format("%4d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -258,7 +256,7 @@ void debug_view_state::view_update()
 						if (screen != nullptr)
 						{
 							curitem->m_currval = screen->vpos();
-							strprintf(valstr, "%4d", (UINT32)curitem->m_currval);
+							valstr = string_format("%4d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -266,7 +264,7 @@ void debug_view_state::view_update()
 						if (screen != nullptr)
 						{
 							curitem->m_currval = screen->frame_number();
-							strprintf(valstr, "%6d", (UINT32)curitem->m_currval);
+							valstr = string_format("%6d", (UINT32)curitem->m_currval);
 						}
 						break;
 				}

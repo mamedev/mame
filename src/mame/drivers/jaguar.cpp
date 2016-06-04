@@ -339,10 +339,10 @@ Notes:
 #include "machine/vt83c461.h"
 #include "sound/dac.h"
 #include "includes/jaguar.h"
-#include "emuopts.h"
 #include "imagedev/snapquik.h"
 #include "sound/dac.h"
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "sound/cdda.h"
 #include "cdrom.h"
 #include "imagedev/chd_cd.h"
@@ -481,49 +481,49 @@ void jaguar_state::machine_reset()
 emu_file jaguar_state::*jaguar_nvram_fopen( UINT32 openflags)
 {
     device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));
-    file_error filerr;
+    osd_file::error filerr;
     emu_file *file;
     if (image->exists())
     {
         std::string fname(machine().system().name, PATH_SEPARATOR, image->basename_noext(), ".nv");
         filerr = mame_fopen( SEARCHPATH_NVRAM, fname, openflags, &file);
-        return (filerr == FILERR_NONE) ? file : NULL;
+        return (filerr == osd_file::error::NONE) ? file : nullptr;
     }
     else
-        return NULL;
+        return nullptr;
 }
 
 void jaguar_state::jaguar_nvram_load()
 {
-    emu_file *nvram_file = NULL;
+    emu_file *nvram_file = nullptr;
     device_t *device;
 
-    for (device = machine().m_devicelist.first(); device != NULL; device = device->next())
+    for (device = machine().m_devicelist.first(); device != nullptr; device = device->next())
     {
         device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
-        if (nvram != NULL)
+        if (nvram != nullptr)
         {
-            if (nvram_file == NULL)
+            if (nvram_file == nullptr)
                 nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_READ);
             (*nvram)(device, nvram_file, 0);
         }
     }
-    if (nvram_file != NULL)
+    if (nvram_file != nullptr)
         mame_fclose(nvram_file);
 }
 
 
 void jaguar_state::jaguar_nvram_save()
 {
-    emu_file *nvram_file = NULL;
+    emu_file *nvram_file = nullptr;
     device_t *device;
 
-    for (device = machine().m_devicelist.first(); device != NULL; device = device->next())
+    for (device = machine().m_devicelist.first(); device != nullptr; device = device->next())
     {
         device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
-        if (nvram != NULL)
+        if (nvram != nullptr)
         {
-            if (nvram_file == NULL)
+            if (nvram_file == nullptr)
                 nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
             // check nvram_file to avoid crash when no image is mounted or cannot be created
             if (nvram_file)
@@ -531,7 +531,7 @@ void jaguar_state::jaguar_nvram_save()
         }
     }
 
-    if (nvram_file != NULL)
+    if (nvram_file != nullptr)
         mame_fclose(nvram_file);
 }
 
@@ -618,7 +618,7 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 	}
 
 	/* adjust banking */
-	if (m_romboard_region != NULL)
+	if (m_romboard_region != nullptr)
 	{
 		membank("mainsndbank")->set_entry((data >> 1) & 7);
 		membank("dspsndbank")->set_entry((data >> 1) & 7);
@@ -777,7 +777,7 @@ WRITE32_MEMBER(jaguar_state::latch_w)
 	logerror("%08X:latch_w(%X)\n", space.device().safe_pcbase(), data);
 
 	/* adjust banking */
-	if (m_romboard_region != NULL)
+	if (m_romboard_region != nullptr)
 	{
 		if (m_is_r3000)
 		{
@@ -1342,9 +1342,9 @@ static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0x04f1b000, 0x04f1cfff) AM_RAM AM_SHARE("dspram")
 
 	AM_RANGE(0x06000000, 0x06000003) AM_READWRITE(misc_control_r, misc_control_w)
-	AM_RANGE(0x10000000, 0x1007ffff) AM_RAM
-	AM_RANGE(0x12000000, 0x120fffff) AM_RAM     // tested in self-test only?
-	AM_RANGE(0x14000004, 0x14000007) AM_WRITE(watchdog_reset32_w)
+	AM_RANGE(0x10000000, 0x1007ffff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x12000000, 0x120fffff) AM_RAM AM_SHARE("mainram2")    // tested in self-test only?
+	AM_RANGE(0x14000004, 0x14000007) AM_DEVWRITE("watchdog", watchdog_timer_device, reset32_w)
 	AM_RANGE(0x16000000, 0x16000003) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rom")
@@ -1354,9 +1354,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m68020_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rom")
-	AM_RANGE(0xa00000, 0xa1ffff) AM_RAM
+	AM_RANGE(0xa00000, 0xa1ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0xa20000, 0xa21fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
-	AM_RANGE(0xa30000, 0xa30003) AM_WRITE(watchdog_reset32_w)
+	AM_RANGE(0xa30000, 0xa30003) AM_DEVWRITE("watchdog", watchdog_timer_device, reset32_w)
 	AM_RANGE(0xa40000, 0xa40003) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xb70000, 0xb70003) AM_READWRITE(misc_control_r, misc_control_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("mainsndbank")
@@ -1817,6 +1817,8 @@ static MACHINE_CONFIG_START( cojagr3k, jaguar_state )
 	MCFG_CPU_PROGRAM_MAP(dsp_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_VT83C461_ADD("ide", cojag_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(jaguar_state, external_int))
@@ -2560,7 +2562,8 @@ DRIVER_INIT_MEMBER(jaguar_state,area51a)
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_write_handler(0xa02030, 0xa02033, write32_delegate(FUNC(jaguar_state::area51_main_speedup_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa02030, 0xa02033, write32_delegate(FUNC(jaguar_state::area51_main_speedup_w),this));
+	m_main_speedup = m_mainram + 0x2030/4;
 #endif
 }
 
@@ -2569,11 +2572,11 @@ DRIVER_INIT_MEMBER(jaguar_state,area51)
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x0c0, 0x09e);
-
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
-	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x100062e8, 0x100062eb, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100062e8, 0x100062eb, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_main_speedup = m_mainram + 0x62e8/4;
 #endif
 }
 
@@ -2588,7 +2591,8 @@ DRIVER_INIT_MEMBER(jaguar_state,maxforce)
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
-	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000865c, 0x1000865f, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000865c, 0x1000865f, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_main_speedup = m_mainram + 0x865c/4;
 #endif
 }
 
@@ -2603,7 +2607,8 @@ DRIVER_INIT_MEMBER(jaguar_state,area51mx)
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_write_handler(0xa19550, 0xa19557, write32_delegate(FUNC(jaguar_state::area51mx_main_speedup_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa19550, 0xa19557, write32_delegate(FUNC(jaguar_state::area51mx_main_speedup_w),this));
+	m_main_speedup = m_mainram + 0x19550/4;
 #endif
 }
 
@@ -2619,7 +2624,8 @@ DRIVER_INIT_MEMBER(jaguar_state,a51mxr3k)
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
-	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x10006f0c, 0x10006f0f, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10006f0c, 0x10006f0f, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_main_speedup = m_mainram + 0x6f0c/4;
 #endif
 }
 
@@ -2632,7 +2638,8 @@ DRIVER_INIT_MEMBER(jaguar_state,fishfren)
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 200;
-	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x10021b60, 0x10021b63, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10021b60, 0x10021b63, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_main_speedup = m_mainram + 0x21b60/4;
 #endif
 }
 
@@ -2644,9 +2651,12 @@ void jaguar_state::init_freeze_common(offs_t main_speedup_addr)
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 200;
-	if (main_speedup_addr != 0)
-		m_main_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(main_speedup_addr, main_speedup_addr + 3, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r), this));
-	m_main_gpu_wait = m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400d900, 0x0400d900 + 3, read32_delegate(FUNC(jaguar_state::main_gpu_wait_r), this));
+	if (main_speedup_addr != 0) {
+		m_maincpu->space(AS_PROGRAM).install_read_handler(main_speedup_addr, main_speedup_addr + 3, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r), this));
+		m_main_speedup = m_mainram + (main_speedup_addr - 0x10000000)/4;
+	}
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400d900, 0x0400d900 + 3, read32_delegate(FUNC(jaguar_state::main_gpu_wait_r), this));
+	m_main_gpu_wait = m_shared_ram + 0xd900/4;
 #endif
 }
 
@@ -2665,7 +2675,9 @@ DRIVER_INIT_MEMBER(jaguar_state,vcircle)
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 50;
-	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x12005b34, 0x12005b37, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x12005b34, 0x12005b37, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_main_speedup = m_mainram + 0x5b34/4;
+	m_main_speedup = m_mainram2 + 0x5b34/4;
 #endif
 }
 

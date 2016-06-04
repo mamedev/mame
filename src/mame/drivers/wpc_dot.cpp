@@ -3,7 +3,7 @@
 
 /* Williams WPC Dot Matrix */
 
-#include "includes/wpc_pin.h"
+#include "includes/wpc_dot.h"
 
 
 static ADDRESS_MAP_START( wpc_dot_map, AS_PROGRAM, 8, wpc_dot_state )

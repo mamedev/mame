@@ -214,7 +214,7 @@ INPUT_PORTS_END
 
 static SLOT_INTERFACE_START( osborne1_floppies )
 	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD) // Siemens FDD 100-5, custom Osborne electronics
-	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD) // MPI 52(?), custom Osborne electronics
+	SLOT_INTERFACE("525ssdd", FLOPPY_525_QD) // SSDD) // MPI 52(?), custom Osborne electronics
 SLOT_INTERFACE_END
 
 
@@ -244,12 +244,12 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_CPU_IO_MAP(osborne1_io)
 	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(osborne1_state, irqack_w))
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DRIVER(osborne1_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK, 1024, 0, 104*8, 260, 0, 24*10 )
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osborne1)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
+	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)

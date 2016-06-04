@@ -100,7 +100,7 @@ public:
 	UINT32 screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(cvsd_bit_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
-	
+
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 };
 
@@ -846,7 +846,7 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 	MCFG_CPU_IO_MAP(cpu1_io)
 
 	MCFG_JANGOU_BLITTER_ADD("blitter", MASTER_CLOCK/4)
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4,320,0,256,264,16,240) // assume same as nightgal.cpp

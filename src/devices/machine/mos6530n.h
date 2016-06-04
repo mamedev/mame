@@ -268,7 +268,7 @@ protected:
 	void timer_w(offs_t offset, UINT8 data, bool ie);
 	UINT8 timer_r(bool ie);
 
-	DECLARE_READ8_MEMBER( rom_r ) { return m_region->base()[offset]; }
+	DECLARE_READ8_MEMBER( rom_r ) { return m_rom[offset]; }
 	DECLARE_READ8_MEMBER( ram_r ) { return m_ram[offset]; }
 	DECLARE_WRITE8_MEMBER( ram_w ) { m_ram[offset] = data; }
 	DECLARE_READ8_MEMBER( pa_data_r );
@@ -287,6 +287,7 @@ protected:
 	DECLARE_WRITE8_MEMBER( edge_w );
 
 	optional_shared_ptr<UINT8> m_ram;
+	optional_region_ptr<UINT8> m_rom;
 
 	devcb_write_line m_irq_cb;
 	devcb_read8    m_in_pa_cb;

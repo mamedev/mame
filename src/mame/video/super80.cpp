@@ -16,7 +16,6 @@
 PALETTE_INIT_MEMBER( super80_state, super80m )
 {
 	// RGB
-	//palette_set_colors_rgb(super80_rgb_palette);
 	m_palette->set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   /*  0 Black     */
 	m_palette->set_pen_color(1, rgb_t(0x00, 0x00, 0x00));   /*  1 Black     */
 	m_palette->set_pen_color(2, rgb_t(0x00, 0x00, 0x7f));   /*  2 Blue      */
@@ -66,13 +65,21 @@ void super80_state::screen_eof_super80m(screen_device &screen, bool state)
 
 UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr=32,gfx,screen_on=0;
+	UINT8 y,ra,chr=32,gfx,screen_on=0,fg=0,options=m_io_config->read();
 	UINT16 sy=0,ma=m_vidpg,x;
 
 	output().set_value("cass_led",BIT(m_portf0, 5));
 
-	if ((BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((BIT(m_portf0, 2)) | (!BIT(options, 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
+
+	if (screen_on)
+	{
+		if BIT(options, 5)
+			fg = 15;    /* b&w */
+		else
+			fg = 5;     /* green */
+	}
 
 	for (y = 0; y < 16; y++)
 	{
@@ -83,20 +90,26 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 			for (x = 0; x < 32; x++)    // done this way to avoid x overflowing on page FF
 			{
 				if (screen_on)
-					chr = m_p_ram[ma | x] & 0x3f;
+				{
+					chr = m_p_ram[ma | x] & 0x7f;
+					if ((chr >= 0x61) && (chr <= 0x7a))
+						chr &= 0x1f;
+					else
+						chr &= 0x3f;
+				}
 
 				/* get pattern of pixels for that character scanline */
 				gfx = m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
+				*p++ = BIT(gfx, 7) ? fg : 0;
+				*p++ = BIT(gfx, 6) ? fg : 0;
+				*p++ = BIT(gfx, 5) ? fg : 0;
+				*p++ = BIT(gfx, 4) ? fg : 0;
+				*p++ = BIT(gfx, 3) ? fg : 0;
+				*p++ = BIT(gfx, 2) ? fg : 0;
+				*p++ = BIT(gfx, 1) ? fg : 0;
+				*p++ = BIT(gfx, 0) ? fg : 0;
 			}
 		}
 		ma+=32;
@@ -106,13 +119,21 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 
 UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr=32,gfx,screen_on=0;
+	UINT8 y,ra,chr=32,gfx,screen_on=0,fg=0,options=m_io_config->read();
 	UINT16 sy=0,ma=m_vidpg,x;
 
 	output().set_value("cass_led",BIT(m_portf0, 5));
 
-	if ((BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((BIT(m_portf0, 2)) | (!BIT(options, 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
+
+	if (screen_on)
+	{
+		if BIT(options, 5)
+			fg = 15;    /* b&w */
+		else
+			fg = 5;     /* green */
+	}
 
 	for (y = 0; y < 16; y++)
 	{
@@ -129,14 +150,14 @@ UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16
 				gfx = m_p_chargen[((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
+				*p++ = BIT(gfx, 7) ? fg : 0;
+				*p++ = BIT(gfx, 6) ? fg : 0;
+				*p++ = BIT(gfx, 5) ? fg : 0;
+				*p++ = BIT(gfx, 4) ? fg : 0;
+				*p++ = BIT(gfx, 3) ? fg : 0;
+				*p++ = BIT(gfx, 2) ? fg : 0;
+				*p++ = BIT(gfx, 1) ? fg : 0;
+				*p++ = BIT(gfx, 0) ? fg : 0;
 			}
 		}
 		ma+=32;
@@ -146,13 +167,21 @@ UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16
 
 UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr=32,gfx,screen_on=0;
+	UINT8 y,ra,chr=32,gfx,screen_on=0,fg=0,options=m_io_config->read();
 	UINT16 sy=0,ma=m_vidpg,x;
 
 	output().set_value("cass_led",BIT(m_portf0, 5));
 
-	if ((BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((BIT(m_portf0, 2)) | (!BIT(options, 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
+
+	if (screen_on)
+	{
+		if BIT(options, 5)
+			fg = 15;    /* b&w */
+		else
+			fg = 5;     /* green */
+	}
 
 	for (y = 0; y < 16; y++)
 	{
@@ -169,14 +198,14 @@ UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16
 				gfx = m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
+				*p++ = BIT(gfx, 7) ? fg : 0;
+				*p++ = BIT(gfx, 6) ? fg : 0;
+				*p++ = BIT(gfx, 5) ? fg : 0;
+				*p++ = BIT(gfx, 4) ? fg : 0;
+				*p++ = BIT(gfx, 3) ? fg : 0;
+				*p++ = BIT(gfx, 2) ? fg : 0;
+				*p++ = BIT(gfx, 1) ? fg : 0;
+				*p++ = BIT(gfx, 0) ? fg : 0;
 			}
 		}
 		ma+=32;
@@ -186,9 +215,8 @@ UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16
 
 UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr=32,gfx,screen_on=0;
+	UINT8 y,ra,chr=32,gfx,screen_on=0,col,bg=0,fg=0,options=m_io_config->read();
 	UINT16 sy=0,ma=m_vidpg,x;
-	UINT8 col, bg=0, fg=0, options=m_io_config->read();
 
 	/* get selected character generator */
 	UINT8 cgen = m_current_charset ^ ((options & 0x10)>>4); /* bit 0 of port F1 and cgen config switch */
@@ -200,7 +228,7 @@ UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16
 
 	if (screen_on)
 	{
-		if ((options & 0x60) == 0x60)
+		if BIT(options, 5)
 			fg = 15;    /* b&w */
 		else
 			fg = 5;     /* green */

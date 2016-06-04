@@ -3,8 +3,8 @@
 #ifndef __ZIP_REGISTRY_H
 #define __ZIP_REGISTRY_H
 
-#include "Common/MyString.h"
-#include "Common/Types.h"
+#include "../../../Common/MyTypes.h"
+#include "../../../Common/MyString.h"
 
 #include "ExtractMode.h"
 
@@ -14,12 +14,21 @@ namespace NExtract
   {
     NPathMode::EEnum PathMode;
     NOverwriteMode::EEnum OverwriteMode;
-    bool ShowPassword;
+    bool PathMode_Force;
+    bool OverwriteMode_Force;
+    
+    CBoolPair SplitDest;
+    CBoolPair ElimDup;
+    // CBoolPair AltStreams;
+    CBoolPair NtSecurity;
+    CBoolPair ShowPassword;
+
     UStringVector Paths;
 
     void Save() const;
     void Load();
   };
+  
   void Save_ShowPassword(bool showPassword);
   bool Read_ShowPassword();
 }
@@ -59,6 +68,11 @@ namespace NCompression
 
     CObjectVector<CFormatOptions> Formats;
 
+    CBoolPair NtSecurity;
+    CBoolPair AltStreams;
+    CBoolPair HardLinks;
+    CBoolPair SymLinks;
+
     void Save() const;
     void Load();
   };
@@ -97,7 +111,11 @@ namespace NWorkDir
 
 struct CContextMenuInfo
 {
-  bool Cascaded;
+  CBoolPair Cascaded;
+  CBoolPair MenuIcons;
+  CBoolPair ElimDup;
+
+  bool Flags_Def;
   UInt32 Flags;
 
   void Save() const;

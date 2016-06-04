@@ -33,8 +33,7 @@ const device_type SETA001_SPRITE = &device_creator<seta001_device>;
 
 seta001_device::seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SETA001_SPRITE, "Seta SETA001 Sprite", tag, owner, clock, "seta001", __FILE__),
-		m_gfxdecode(*this),
-		m_palette(*this)
+		m_gfxdecode(*this)
 {
 }
 
@@ -46,16 +45,6 @@ seta001_device::seta001_device(const machine_config &mconfig, const char *tag, d
 void seta001_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<seta001_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void seta001_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<seta001_device &>(device).m_palette.set_tag(tag);
 }
 
 void seta001_device::device_start()

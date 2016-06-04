@@ -20,10 +20,10 @@
 
 
 consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
-	disasmbasewin_info(debugger, true, "Debug", NULL),
-	m_devices_menu(NULL)
+	disasmbasewin_info(debugger, true, "Debug", nullptr),
+	m_devices_menu(nullptr)
 {
-	if ((window() == NULL) || (m_views[0] == NULL))
+	if ((window() == nullptr) || (m_views[0] == nullptr))
 		goto cleanup;
 
 	// create the views
@@ -37,16 +37,13 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	{
 		// Add image menu only if image devices exist
 		image_interface_iterator iter(machine().root_device());
-		device_image_interface *img = iter.first();
-		if (img != NULL)
+		if (iter.first() != nullptr)
 		{
 			m_devices_menu = CreatePopupMenu();
-			for ( ; img != NULL; img = iter.next())
+			for (device_image_interface &img : iter)
 			{
-				std::string temp;
-				strprintf(temp,"%s : %s", img->device().name(), img->exists() ? img->filename() : "[no image]");
-				TCHAR *tc_buf = tstring_from_utf8(temp.c_str());
-				if (tc_buf != NULL)
+				TCHAR *tc_buf = tstring_from_utf8(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]").c_str());
+				if (tc_buf != nullptr)
 				{
 					AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf);
 					osd_free(tc_buf);
@@ -106,9 +103,8 @@ void consolewin_info::set_cpu(device_t &device)
 
 	// then update the caption
 	char curtitle[256];
-	std::string title;
 
-	strprintf(title, "Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
+	std::string title = string_format("Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
 	win_get_window_text_utf8(window(), curtitle, ARRAY_LENGTH(curtitle));
 	if (title.compare(curtitle) != 0)
 		win_set_window_text_utf8(window(), title.c_str());
@@ -163,36 +159,34 @@ void consolewin_info::update_menu()
 {
 	disasmbasewin_info::update_menu();
 
-	if (m_devices_menu != NULL)
+	if (m_devices_menu != nullptr)
 	{
 		// create the image menu
-		image_interface_iterator iter(machine().root_device());
-		device_image_interface *img;
-		UINT32 cnt;
-		for (img = iter.first(), cnt = 0; img != NULL; img = iter.next(), cnt++)
+		UINT32 cnt = 0;
+		for (device_image_interface &img : image_interface_iterator(machine().root_device()))
 		{
 			HMENU const devicesubmenu = CreatePopupMenu();
 
 			UINT_PTR const new_item = ID_DEVICE_OPTIONS + (cnt * DEVOPTION_MAX);
 
 			UINT flags_for_exists = MF_ENABLED | MF_STRING;
-			if (!img->exists())
+			if (!img.exists())
 				flags_for_exists |= MF_GRAYED;
 
 			UINT flags_for_writing = flags_for_exists;
-			if (img->is_readonly())
+			if (img.is_readonly())
 				flags_for_writing |= MF_GRAYED;
 
 			AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_OPEN, TEXT("Mount..."));
 
-			//if (img->is_creatable())
+			//if (img.is_creatable())
 				//AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_CREATE, TEXT("Create..."));
 			AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CLOSE, TEXT("Unmount"));
 
-			if (img->device().type() == CASSETTE)
+			if (img.device().type() == CASSETTE)
 			{
-				cassette_state const state = (cassette_state)(img->exists() ? (downcast<cassette_image_device *>(&img->device())->get_state() & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
-				AppendMenu(devicesubmenu, MF_SEPARATOR, 0, NULL);
+				cassette_state const state = (cassette_state)(img.exists() ? (downcast<cassette_image_device *>(&img.device())->get_state() & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
+				AppendMenu(devicesubmenu, MF_SEPARATOR, 0, nullptr);
 				AppendMenu(devicesubmenu, flags_for_exists | ((state == CASSETTE_STOPPED) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_STOPPAUSE, TEXT("Pause/Stop"));
 				AppendMenu(devicesubmenu, flags_for_exists | ((state == CASSETTE_PLAY) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_PLAY, TEXT("Play"));
 				AppendMenu(devicesubmenu, flags_for_writing | ((state == CASSETTE_RECORD) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_RECORD, TEXT("Record"));
@@ -200,14 +194,14 @@ void consolewin_info::update_menu()
 				AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
 			}
 
-			std::string temp;
-			strprintf(temp,"%s :%s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
-			TCHAR *tc_buf = tstring_from_utf8(temp.c_str());
-			if (tc_buf != NULL)
+			TCHAR *tc_buf = tstring_from_utf8(string_format("%s :%s", img.device().name(), img.exists() ? img.filename() : "[empty slot]").c_str());
+			if (tc_buf != nullptr)
 			{
 				ModifyMenu(m_devices_menu, cnt, MF_BYPOSITION | MF_POPUP, (UINT_PTR)devicesubmenu, tc_buf);
 				osd_free(tc_buf);
 			}
+
+			cnt++;
 		}
 	}
 }
@@ -220,7 +214,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		UINT32 const devid = (LOWORD(wparam) - ID_DEVICE_OPTIONS) / DEVOPTION_MAX;
 		image_interface_iterator iter(machine().root_device());
 		device_image_interface *const img = iter.byindex(devid);
-		if (img != NULL)
+		if (img != nullptr)
 		{
 			switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
 			{
@@ -243,21 +237,21 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						OPENFILENAME ofn;
 						memset(&ofn, 0, sizeof(ofn));
 						ofn.lStructSize = sizeof(ofn);
-						ofn.hwndOwner = NULL;
+						ofn.hwndOwner = nullptr;
 						ofn.lpstrFile = selectedFilename;
 						ofn.lpstrFile[0] = '\0';
 						ofn.nMaxFile = MAX_PATH;
 						ofn.lpstrFilter = t_filter;
 						ofn.nFilterIndex = 1;
-						ofn.lpstrFileTitle = NULL;
+						ofn.lpstrFileTitle = nullptr;
 						ofn.nMaxFileTitle = 0;
-						ofn.lpstrInitialDir = NULL;
+						ofn.lpstrInitialDir = nullptr;
 						ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
 						if (GetOpenFileName(&ofn))
 						{
 							char *utf8_buf = utf8_from_tstring(selectedFilename);
-							if (utf8_buf != NULL)
+							if (utf8_buf != nullptr)
 							{
 								img->load(utf8_buf);
 								osd_free(utf8_buf);

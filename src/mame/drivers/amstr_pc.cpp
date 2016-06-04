@@ -31,7 +31,7 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "cpu/i86/i86.h"
 
 #include "machine/mc146818.h"
-#include "includes/genpc.h"
+#include "machine/genpc.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 
@@ -71,8 +71,6 @@ public:
 	DECLARE_READ8_MEMBER( pc1640_port4278_r );
 	DECLARE_READ8_MEMBER( pc1640_port278_r );
 
-	DECLARE_DRIVER_INIT(pc1640);
-
 	struct {
 		UINT8 x,y; //byte clipping needed
 	} m_mouse;
@@ -86,45 +84,30 @@ public:
 	int m_dipstate;
 };
 
-static ADDRESS_MAP_START( ppc512_map, AS_PROGRAM, 16, amstrad_pc_state )
-	AM_RANGE(0x00000, 0x7ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x80000, 0xbffff) AM_NOP
-	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
-	AM_RANGE(0xc8000, 0xcffff) AM_ROM
-	AM_RANGE(0xd0000, 0xeffff) AM_NOP
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( ppc640_map, AS_PROGRAM, 16, amstrad_pc_state )
-	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0xa0000, 0xbffff) AM_NOP
-	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
-	AM_RANGE(0xc8000, 0xcffff) AM_ROM
-	AM_RANGE(0xd0000, 0xeffff) AM_NOP
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ppc512_io, AS_IO, 16, amstrad_pc_state )
-	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(pc1640_port60_r, pc1640_port60_w, 0xffff)
-	AM_RANGE(0x0070, 0x0071) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffff)
-	AM_RANGE(0x0078, 0x0079) AM_READWRITE8(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
-	AM_RANGE(0x007a, 0x007b) AM_READWRITE8(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
-	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
-	AM_RANGE(0x0278, 0x027b) AM_READ8(pc200_port278_r, 0xffff) AM_DEVWRITE8("lpt_2", pc_lpt_device, write, 0x00ff)
-	AM_RANGE(0x0378, 0x037b) AM_READ8(pc200_port378_r, 0xffff) AM_DEVWRITE8("lpt_1", pc_lpt_device, write, 0x00ff)
-	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0x00ff)
+static ADDRESS_MAP_START( pc2086_map, AS_PROGRAM, 16, amstrad_pc_state )
+	AM_RANGE(0xc0000, 0xc9fff) AM_ROM AM_REGION("bios", 0)
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0x10000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc200_io, AS_IO, 16, amstrad_pc_state )
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(pc1640_port60_r, pc1640_port60_w, 0xffff)
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE8(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
 	AM_RANGE(0x007a, 0x007b) AM_READWRITE8(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", pc_noppi_mb_device, map, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x0278, 0x027b) AM_READ8(pc200_port278_r, 0xffff) AM_DEVWRITE8("lpt_2", pc_lpt_device, write, 0x00ff)
 	AM_RANGE(0x0378, 0x037b) AM_READ8(pc200_port378_r, 0xffff) AM_DEVWRITE8("lpt_1", pc_lpt_device, write, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(ppc512_io, AS_IO, 16, amstrad_pc_state )
+	AM_RANGE(0x0070, 0x0071) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffff)
+	AM_IMPORT_FROM(pc200_io)
+ADDRESS_MAP_END
 
 /* pc20 (v2)
    fc078
@@ -250,14 +233,6 @@ port 03de write/read
    7d 01 01 mouse button right
 */
 
-DRIVER_INIT_MEMBER(amstrad_pc_state,pc1640)
-{
-	address_space &io_space = m_maincpu->space( AS_IO );
-
-	io_space.install_read_handler(0x278, 0x27b, read8_delegate(FUNC(amstrad_pc_state::pc1640_port278_r),this), 0xffff);
-	io_space.install_read_handler(0x4278, 0x427b, read8_delegate(FUNC(amstrad_pc_state::pc1640_port4278_r),this), 0xffff);
-}
-
 WRITE8_MEMBER( amstrad_pc_state::pc1640_port60_w )
 {
 	switch (offset) {
@@ -306,7 +281,7 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
 
 	case 2:
 		data = m_port62;
-		if (m_mb->m_pit_out2)
+		if (m_mb->pit_out2())
 			data |= 0x20;
 		break;
 	}
@@ -525,14 +500,17 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+	MCFG_RAM_EXTRA_OPTIONS("512K")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pc2086, pc200 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pc2086_map)
+MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ppc512, pc200 )
-	MCFG_DEVICE_REMOVE("maincpu")
-
-	MCFG_CPU_ADD("maincpu", V30, 8000000)
-	MCFG_CPU_PROGRAM_MAP(ppc512_map)
+static MACHINE_CONFIG_DERIVED( ppc640, pc200 )
+	MCFG_CPU_REPLACE("maincpu", V30, 8000000)
+	MCFG_CPU_PROGRAM_MAP(ppc640_map)
 	MCFG_CPU_IO_MAP(ppc512_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
@@ -542,9 +520,10 @@ static MACHINE_CONFIG_DERIVED( ppc512, pc200 )
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ppc640, ppc512 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ppc640_map)
+static MACHINE_CONFIG_DERIVED( ppc512, ppc640 )
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_EXTRA_OPTIONS("640K")
 MACHINE_CONFIG_END
 
 /*
@@ -564,18 +543,18 @@ Sinclair PC200 ROMs (from a v1.2 PC200):
             V1.2:5EA8       V1.2:A058
 */
 ROM_START( pc200 )
-//  ROM_REGION(0x100000,"maincpu", 0)
-	ROM_REGION16_LE(0x100000,"maincpu", 0)
+//  ROM_REGION(0x100000,"bios", 0)
+	ROM_REGION16_LE(0x10000,"bios", 0)
 	// special bios at 0xe0000 !?
 	ROM_SYSTEM_BIOS(0, "v15", "v1.5")
-	ROMX_LOAD("40185-2.ic129", 0xfc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932), ROM_SKIP(1) | ROM_BIOS(1)) // v2
-	ROMX_LOAD("40184-2.ic132", 0xfc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24), ROM_SKIP(1) | ROM_BIOS(1)) // v2
+	ROMX_LOAD("40185-2.ic129", 0xc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932), ROM_SKIP(1) | ROM_BIOS(1)) // v2
+	ROMX_LOAD("40184-2.ic132", 0xc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24), ROM_SKIP(1) | ROM_BIOS(1)) // v2
 	ROM_SYSTEM_BIOS(1, "v13", "v1.3")
-	ROMX_LOAD("40185v13.ic129", 0xfc001, 0x2000, CRC(f082f08e) SHA1(b332db419033588a7380bfecdf46104974347341), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("40184v13.ic132", 0xfc000, 0x2000, CRC(5daf6068) SHA1(93a2ccfb0e29c8f2c98f06c64bb0ea0b3acafb13), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("40185v13.ic129", 0xc001, 0x2000, CRC(f082f08e) SHA1(b332db419033588a7380bfecdf46104974347341), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("40184v13.ic132", 0xc000, 0x2000, CRC(5daf6068) SHA1(93a2ccfb0e29c8f2c98f06c64bb0ea0b3acafb13), ROM_SKIP(1) | ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v12", "v1.2")
-	ROMX_LOAD("40185.ic129", 0xfc001, 0x2000, CRC(c2b4eeac) SHA1(f11015fadf0c16d86ce2c5047be3e6a4782044f7), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD("40184.ic132", 0xfc000, 0x2000, CRC(b22704a6) SHA1(dadd573db6cd34f339f2f0ae55b07537924c024a), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("40185.ic129", 0xc001, 0x2000, CRC(c2b4eeac) SHA1(f11015fadf0c16d86ce2c5047be3e6a4782044f7), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("40184.ic132", 0xc000, 0x2000, CRC(b22704a6) SHA1(dadd573db6cd34f339f2f0ae55b07537924c024a), ROM_SKIP(1) | ROM_BIOS(3))
 	// also mapped to f0000, f4000, f8000
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "40112.ic801", 0x000, 0x800, CRC(842a954c) SHA1(93ca6badf20e0215025fe109959eddead8c52f38) )
@@ -583,25 +562,25 @@ ROM_END
 
 
 ROM_START( pc20 )
-//  ROM_REGION(0x100000,"maincpu", 0)
-	ROM_REGION16_LE(0x100000,"maincpu", 0)
+//  ROM_REGION(0x100000,"bios", 0)
+	ROM_REGION16_LE(0x10000,"bios", 0)
 
 	// special bios at 0xe0000 !?
 	// This is probably referring to a check for the Amstrad RP5-2 diagnostic
 	// card, which can be plugged into an Amstrad XT for troubleshooting purposes.
 	// - John Elliott
-	ROM_LOAD16_BYTE("pc20v2.0", 0xfc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932)) // v2
-	ROM_LOAD16_BYTE("pc20v2.1", 0xfc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24)) // v2
+	ROM_LOAD16_BYTE("pc20v2.0", 0xc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932)) // v2
+	ROM_LOAD16_BYTE("pc20v2.1", 0xc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24)) // v2
 	// also mapped to f0000, f4000, f8000
 ROM_END
 
 
 ROM_START( ppc512 )
-//  ROM_REGION(0x100000,"maincpu", 0)
-	ROM_REGION16_LE(0x100000,"maincpu", 0)
+//  ROM_REGION(0x100000,"bios", 0)
+	ROM_REGION16_LE(0x10000,"bios", 0)
 	// special bios at 0xe0000 !?
-	ROM_LOAD16_BYTE("40107.v1", 0xfc000, 0x2000, CRC(4e37e769) SHA1(88be3d3375ec3b0a7041dbcea225b197e50d4bfe)) // v1.9
-	ROM_LOAD16_BYTE("40108.v1", 0xfc001, 0x2000, CRC(4f0302d9) SHA1(e4d69ca98c3b98f3705a2902b16746360043f039)) // v1.9
+	ROM_LOAD16_BYTE("40107.v1", 0xc000, 0x2000, CRC(4e37e769) SHA1(88be3d3375ec3b0a7041dbcea225b197e50d4bfe)) // v1.9
+	ROM_LOAD16_BYTE("40108.v1", 0xc001, 0x2000, CRC(4f0302d9) SHA1(e4d69ca98c3b98f3705a2902b16746360043f039)) // v1.9
 	// also mapped to f0000, f4000, f8000
 	ROM_REGION( 0x800, "keyboard", 0 ) // PPC512 / PPC640 / PC200 102-key keyboard
 	ROM_LOAD( "40112.ic801", 0x000, 0x800, CRC(842a954c) SHA1(93ca6badf20e0215025fe109959eddead8c52f38) )
@@ -609,11 +588,11 @@ ROM_END
 
 
 ROM_START( ppc640 )
-//  ROM_REGION(0x100000,"maincpu", 0)
-	ROM_REGION16_LE(0x100000,"maincpu", 0)
+//  ROM_REGION(0x100000,"bios", 0)
+	ROM_REGION16_LE(0x10000,"bios", 0)
 	// special bios at 0xe0000 !?
-	ROM_LOAD16_BYTE("40107.v2", 0xfc000, 0x2000, CRC(0785b63e) SHA1(4dbde6b9e9500298bb6241a8daefd85927f1ad28)) // v2.1
-	ROM_LOAD16_BYTE("40108.v2", 0xfc001, 0x2000, CRC(5351cf8c) SHA1(b4dbf11b39378ab4afd2107d3fe54a99fffdedeb)) // v2.1
+	ROM_LOAD16_BYTE("40107.v2", 0xc000, 0x2000, CRC(0785b63e) SHA1(4dbde6b9e9500298bb6241a8daefd85927f1ad28)) // v2.1
+	ROM_LOAD16_BYTE("40108.v2", 0xc001, 0x2000, CRC(5351cf8c) SHA1(b4dbf11b39378ab4afd2107d3fe54a99fffdedeb)) // v2.1
 	// also mapped to f0000, f4000, f8000
 	ROM_REGION(0x2000,"subcpu", 0)
 	ROM_LOAD("40135.ic192", 0x00000, 0x2000, CRC(75d99199) SHA1(a76d39fda3d5140e1fb9ce70fcddbdfb8f891dc6))
@@ -624,10 +603,10 @@ ROM_END
 
 
 ROM_START( pc2086 )
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )
-	ROM_LOAD(        "40186.ic171", 0xc0000, 0x8000, CRC(959f00ba) SHA1(5df1efe4203cd076292a7713bd7ebd1196dca577) )
-	ROM_LOAD16_BYTE( "40179.ic129", 0xfc000, 0x2000, CRC(003605e4) SHA1(b882e97ee81b9ba0e7d969c63da3f2052f23b4b9) )
-	ROM_LOAD16_BYTE( "40180.ic132", 0xfc001, 0x2000, CRC(28ee5e58) SHA1(93e045609466fcec74e2bb72578bb7405281cf7b) )
+	ROM_REGION16_LE( 0x20000, "bios", 0 )
+	ROM_LOAD(        "40186.ic171", 0x00000, 0x8000, CRC(959f00ba) SHA1(5df1efe4203cd076292a7713bd7ebd1196dca577) )
+	ROM_LOAD16_BYTE( "40179.ic129", 0x1c000, 0x2000, CRC(003605e4) SHA1(b882e97ee81b9ba0e7d969c63da3f2052f23b4b9) )
+	ROM_LOAD16_BYTE( "40180.ic132", 0x1c001, 0x2000, CRC(28ee5e58) SHA1(93e045609466fcec74e2bb72578bb7405281cf7b) )
 
 	ROM_REGION( 0x800, "keyboard", 0 ) // PC2086 / PC3086 102-key keyboard
 	ROM_LOAD( "40178.ic801", 0x000, 0x800, CRC(f72f1c2e) SHA1(34897e78b3d10f96b36d81778e97c4a9a1b8618b) )
@@ -635,10 +614,10 @@ ROM_END
 
 
 ROM_START( pc3086 )
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "c000.bin", 0xc0000, 0x8000, CRC(5a6c38e9) SHA1(382d2028e0dc5515a68843829563ce29018edb08) )
-	ROM_LOAD( "c800.bin", 0xc8000, 0x2000, CRC(3329c6d5) SHA1(982e852278185d69acde47a4f3942bc09ed76777) )
-	ROM_LOAD( "fc00.bin", 0xfc000, 0x4000, CRC(b5630753) SHA1(98c344831cc4dc59ebb39bbb1961964a8d39fe20) )
+	ROM_REGION16_LE( 0x20000, "bios", 0 )
+	ROM_LOAD( "c000.bin", 0x00000, 0x8000, CRC(5a6c38e9) SHA1(382d2028e0dc5515a68843829563ce29018edb08) )
+	ROM_LOAD( "c800.bin", 0x08000, 0x2000, CRC(3329c6d5) SHA1(982e852278185d69acde47a4f3942bc09ed76777) )
+	ROM_LOAD( "fc00.bin", 0x1c000, 0x4000, CRC(b5630753) SHA1(98c344831cc4dc59ebb39bbb1961964a8d39fe20) )
 
 	ROM_REGION( 0x800, "keyboard", 0 ) // PC2086 / PC3086 102-key keyboard
 	ROM_LOAD( "40178.ic801", 0x000, 0x800, CRC(f72f1c2e) SHA1(34897e78b3d10f96b36d81778e97c4a9a1b8618b) )
@@ -655,5 +634,5 @@ COMP(  1987,    ppc512,     ibm5150,    0,  ppc512,     pc200, driver_device,   
 COMP(  1987,    ppc640,     ibm5150,    0,  ppc640,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PPC640", MACHINE_NOT_WORKING)
 COMP(  1988,    pc20,       ibm5150,    0,  pc200,      pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC20" , MACHINE_NOT_WORKING)
 COMP(  1988,    pc200,      ibm5150,    0,  pc200,      pc200, driver_device,    0,  "Sinclair Research Ltd",  "PC200 Professional Series", MACHINE_NOT_WORKING)
-COMP(  1988,    pc2086,     ibm5150,    0,  pc200,      pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC2086", MACHINE_NOT_WORKING )
-COMP(  1990,    pc3086,     ibm5150,    0,  pc200,      pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC3086", MACHINE_NOT_WORKING )
+COMP(  1988,    pc2086,     ibm5150,    0,  pc2086,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC2086", MACHINE_NOT_WORKING )
+COMP(  1990,    pc3086,     ibm5150,    0,  pc2086,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC3086", MACHINE_NOT_WORKING )

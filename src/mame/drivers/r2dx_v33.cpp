@@ -17,7 +17,8 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
      - EEPROM contains high scores, but they don't get restored? (original bug?)
 
     New Zero Team
-     - 2 Player only? Service mode only shows 2 Players and I don't see a switch
+     - 2 Player only. Service mode only shows 2 Players, and the code confirms that the options
+       for three and four players have been removed from this version.
      - Stages 3 and 1 are swapped, this is correct.
 
     Raiden 2 New / Raiden DX
@@ -67,6 +68,7 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
+#include "machine/r2crypt.h"
 
 
 class r2dx_v33_state : public raiden2_state
@@ -634,6 +636,8 @@ static INPUT_PORTS_START( nzerotea )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	// The P3_P4 port is never read in this version
 
 	PORT_START("DSW") // taken from zeroteam, except last dip is service mode
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!1,!2,!3")

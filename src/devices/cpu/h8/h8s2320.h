@@ -27,12 +27,15 @@
 #define __H8S2320_H__
 
 #include "h8s2000.h"
-#include "h8_adc.h"
-#include "h8_port.h"
 #include "h8_intc.h"
-#include "h8_sci.h"
+#include "h8_adc.h"
+#include "h8_dma.h"
+#include "h8_dtc.h"
+#include "h8_port.h"
 #include "h8_timer8.h"
 #include "h8_timer16.h"
+#include "h8_sci.h"
+#include "h8_watchdog.h"
 
 class h8s2320_device : public h8s2000_device {
 public:
@@ -45,6 +48,10 @@ public:
 protected:
 	required_device<h8s_intc_device> intc;
 	required_device<h8_adc_device> adc;
+	optional_device<h8_dma_device> dma;
+	optional_device<h8_dma_channel_device> dma0;
+	optional_device<h8_dma_channel_device> dma1;
+	required_device<h8_dtc_device> dtc;
 	required_device<h8_port_device> port1;
 	required_device<h8_port_device> port2;
 	required_device<h8_port_device> port3;
@@ -70,6 +77,7 @@ protected:
 	required_device<h8_sci_device> sci0;
 	required_device<h8_sci_device> sci1;
 	required_device<h8_sci_device> sci2;
+	required_device<h8_watchdog_device> watchdog;
 
 	UINT32 ram_start;
 	UINT8 syscr;

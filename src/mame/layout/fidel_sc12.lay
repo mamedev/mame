@@ -208,29 +208,54 @@
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
 		<text string="CL"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
+	<element name="text_pb">
+		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
+		<text string="PB"><color red="0.17" green="0.15" blue="0.15" /></text>
+	</element>
+	<element name="text_pv">
+		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
+		<text string="PV"><color red="0.17" green="0.15" blue="0.15" /></text>
+	</element>
+	<element name="text_lv">
+		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
+		<text string="LV"><color red="0.17" green="0.15" blue="0.15" /></text>
+	</element>
+	<element name="text_tb">
+		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
+		<text string="TB"><color red="0.17" green="0.15" blue="0.15" /></text>
+	</element>
+	<element name="text_dm">
+		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
+		<text string="DM"><color red="0.17" green="0.15" blue="0.15" /></text>
+	</element>
+	<element name="text_rv">
+		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
+		<text string="RV"><color red="0.17" green="0.15" blue="0.15" /></text>
+	</element>
+
 	<element name="text_king">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="PB/K"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x2654;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_queen">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="PV/Q"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x2655;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_rook">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="LV/R"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x2656;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_bishop">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="TB/B"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x2657;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_knight">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="DM/N"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x2658;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_pion">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="RV/P"><color red="0.17" green="0.15" blue="0.15" /></text>
+		<text string="&#x2659;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 
 
@@ -459,42 +484,48 @@
 
 	<!-- right side -->
 
-		<bezel element="disk_black"><bounds x="87" y="3.1" width="7.4" height="7.4" /></bezel>
-		<bezel element="disk_black"><bounds x="87" y="12.4" width="7.4" height="7.4" /></bezel>
-		<bezel element="disk_black"><bounds x="87" y="24.3" width="7.4" height="7.4" /></bezel>
-		<bezel element="disk_black"><bounds x="87" y="33.6" width="7.4" height="7.4" /></bezel>
-		<bezel element="disk_black"><bounds x="87" y="42.9" width="7.4" height="7.4" /></bezel>
-		<bezel element="disk_black"><bounds x="87" y="52.2" width="7.4" height="7.4" /></bezel>
-		<bezel element="disk_black"><bounds x="87" y="61.5" width="7.4" height="7.4" /></bezel>
-		<bezel element="disk_black"><bounds x="87" y="70.8" width="7.4" height="7.4" /></bezel>
+		<bezel element="text_king"><bounds x="87.7" y="20.6" width="4.6" height="4" /></bezel>
+		<bezel element="text_queen"><bounds x="87.7" y="29.9" width="4.6" height="4" /></bezel>
+		<bezel element="text_rook"><bounds x="87.7" y="39.2" width="4.6" height="4" /></bezel>
+		<bezel element="text_bishop"><bounds x="87.7" y="48.5" width="4.6" height="4" /></bezel>
+		<bezel element="text_knight"><bounds x="87.7" y="57.8" width="4.6" height="4" /></bezel>
+		<bezel element="text_pion"><bounds x="87.7" y="67.1" width="4.6" height="4" /></bezel>
 
-		<bezel element="disk_white"><bounds x="87.8" y="3.9" width="5.8" height="5.8" /></bezel>
-		<bezel element="disk_white"><bounds x="87.8" y="13.2" width="5.8" height="5.8" /></bezel>
-		<bezel element="disk_white"><bounds x="87.8" y="25.1" width="5.8" height="5.8" /></bezel>
-		<bezel element="disk_white"><bounds x="87.8" y="34.4" width="5.8" height="5.8" /></bezel>
-		<bezel element="disk_white"><bounds x="87.8" y="43.7" width="5.8" height="5.8" /></bezel>
-		<bezel element="disk_white"><bounds x="87.8" y="53 " width="5.8" height="5.8" /></bezel>
-		<bezel element="disk_white"><bounds x="87.8" y="62.3" width="5.8" height="5.8" /></bezel>
-		<bezel element="disk_white"><bounds x="87.8" y="71.6" width="5.8" height="5.8" /></bezel>
+		<bezel element="disk_black"><bounds x="87" y="3.1" width="6" height="6" /></bezel>
+		<bezel element="disk_black"><bounds x="87" y="12.4" width="6" height="6" /></bezel>
+		<bezel element="disk_black"><bounds x="87" y="24.3" width="6" height="6" /></bezel>
+		<bezel element="disk_black"><bounds x="87" y="33.6" width="6" height="6" /></bezel>
+		<bezel element="disk_black"><bounds x="87" y="42.9" width="6" height="6" /></bezel>
+		<bezel element="disk_black"><bounds x="87" y="52.2" width="6" height="6" /></bezel>
+		<bezel element="disk_black"><bounds x="87" y="61.5" width="6" height="6" /></bezel>
+		<bezel element="disk_black"><bounds x="87" y="70.8" width="6" height="6" /></bezel>
 
-		<bezel element="text_re"><bounds x="87.8" y="5.6" width="5.8" height="2.4" /></bezel>
-		<bezel element="text_cl"><bounds x="87.8" y="14.9" width="5.8" height="2.4" /></bezel>
-		<bezel element="text_king"><bounds x="87.8" y="26.8" width="5.8" height="2.4" /></bezel>
-		<bezel element="text_queen"><bounds x="87.8" y="36.1" width="5.8" height="2.4" /></bezel>
-		<bezel element="text_rook"><bounds x="87.8" y="45.4" width="5.8" height="2.4" /></bezel>
-		<bezel element="text_bishop"><bounds x="87.8" y="54.7" width="5.8" height="2.4" /></bezel>
-		<bezel element="text_knight"><bounds x="87.8" y="64 " width="5.8" height="2.4" /></bezel>
-		<bezel element="text_pion"><bounds x="87.8" y="73.3" width="5.8" height="2.4" /></bezel>
+		<bezel element="disk_white"><bounds x="87.7" y="3.8" width="4.6" height="4.6" /></bezel>
+		<bezel element="disk_white"><bounds x="87.7" y="13.1" width="4.6" height="4.6" /></bezel>
+		<bezel element="disk_white"><bounds x="87.7" y="25.0" width="4.6" height="4.6" /></bezel>
+		<bezel element="disk_white"><bounds x="87.7" y="34.3" width="4.6" height="4.6" /></bezel>
+		<bezel element="disk_white"><bounds x="87.7" y="43.6" width="4.6" height="4.6" /></bezel>
+		<bezel element="disk_white"><bounds x="87.7" y="52.9" width="4.6" height="4.6" /></bezel>
+		<bezel element="disk_white"><bounds x="87.7" y="62.2" width="4.6" height="4.6" /></bezel>
+		<bezel element="disk_white"><bounds x="87.7" y="71.5" width="4.6" height="4.6" /></bezel>
 
-		<bezel element="hlb" inputtag="IN.8" inputmask="0x80"><bounds x="87" y="3.1" width="7.4" height="7.4" /><color alpha="0.3" /></bezel>
-		<bezel element="hlb" inputtag="IN.8" inputmask="0x40"><bounds x="87" y="12.4" width="7.4" height="7.4" /><color alpha="0.3" /></bezel>
-		<bezel element="hlb" inputtag="IN.8" inputmask="0x20"><bounds x="87" y="24.3" width="7.4" height="7.4" /><color alpha="0.3" /></bezel>
-		<bezel element="hlb" inputtag="IN.8" inputmask="0x10"><bounds x="87" y="33.6" width="7.4" height="7.4" /><color alpha="0.3" /></bezel>
-		<bezel element="hlb" inputtag="IN.8" inputmask="0x08"><bounds x="87" y="42.9" width="7.4" height="7.4" /><color alpha="0.3" /></bezel>
-		<bezel element="hlb" inputtag="IN.8" inputmask="0x04"><bounds x="87" y="52.2" width="7.4" height="7.4" /><color alpha="0.3" /></bezel>
-		<bezel element="hlb" inputtag="IN.8" inputmask="0x02"><bounds x="87" y="61.5" width="7.4" height="7.4" /><color alpha="0.3" /></bezel>
-		<bezel element="hlb" inputtag="IN.8" inputmask="0x01"><bounds x="87" y="70.8" width="7.4" height="7.4" /><color alpha="0.3" /></bezel>
+		<bezel element="text_re"><bounds x="87.7" y="4.9" width="4.6" height="2.4" /></bezel>
+		<bezel element="text_cl"><bounds x="87.7" y="14.2" width="4.6" height="2.4" /></bezel>
+		<bezel element="text_pb"><bounds x="87.7" y="26.1" width="4.6" height="2.4" /></bezel>
+		<bezel element="text_pv"><bounds x="87.7" y="35.4" width="4.6" height="2.4" /></bezel>
+		<bezel element="text_lv"><bounds x="87.7" y="44.7" width="4.6" height="2.4" /></bezel>
+		<bezel element="text_tb"><bounds x="87.7" y="54.0" width="4.6" height="2.4" /></bezel>
+		<bezel element="text_dm"><bounds x="87.7" y="63.3" width="4.6" height="2.4" /></bezel>
+		<bezel element="text_rv"><bounds x="87.7" y="72.6" width="4.6" height="2.4" /></bezel>
 
+		<bezel element="hlb" inputtag="IN.8" inputmask="0x80"><bounds x="87" y="3.1" width="6" height="6" /><color alpha="0.3" /></bezel>
+		<bezel element="hlb" inputtag="IN.8" inputmask="0x40"><bounds x="87" y="12.4" width="6" height="6" /><color alpha="0.3" /></bezel>
+		<bezel element="hlb" inputtag="IN.8" inputmask="0x20"><bounds x="87" y="24.3" width="6" height="6" /><color alpha="0.3" /></bezel>
+		<bezel element="hlb" inputtag="IN.8" inputmask="0x10"><bounds x="87" y="33.6" width="6" height="6" /><color alpha="0.3" /></bezel>
+		<bezel element="hlb" inputtag="IN.8" inputmask="0x08"><bounds x="87" y="42.9" width="6" height="6" /><color alpha="0.3" /></bezel>
+		<bezel element="hlb" inputtag="IN.8" inputmask="0x04"><bounds x="87" y="52.2" width="6" height="6" /><color alpha="0.3" /></bezel>
+		<bezel element="hlb" inputtag="IN.8" inputmask="0x02"><bounds x="87" y="61.5" width="6" height="6" /><color alpha="0.3" /></bezel>
+		<bezel element="hlb" inputtag="IN.8" inputmask="0x01"><bounds x="87" y="70.8" width="6" height="6" /><color alpha="0.3" /></bezel>
 
 	</view>
 </mamelayout>

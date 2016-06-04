@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Phil Stroffolino, Mirko Buffoni
 
-// later, this might be merged with segas1x_state in segas16.h
-
 #include "video/sega16sp.h"
 #include "machine/segaic16.h"
 #include "sound/msm5205.h"
@@ -131,7 +129,9 @@ public:
 	DECLARE_READ16_MEMBER(passht4b_io1_r);
 	DECLARE_READ16_MEMBER(passht4b_io2_r);
 	DECLARE_READ16_MEMBER(passht4b_io3_r);
+	DECLARE_READ16_MEMBER(ddcrew_c41006_r);
 	DECLARE_WRITE16_MEMBER(sys16_tilebank_w);
+	DECLARE_WRITE16_MEMBER(ddcrewbl_spritebank_w);
 	DECLARE_WRITE8_MEMBER(tturfbl_msm5205_data_w);
 	DECLARE_READ8_MEMBER(tturfbl_soundbank_r);
 	DECLARE_WRITE8_MEMBER(tturfbl_soundbank_w);
@@ -186,7 +186,9 @@ public:
 	DECLARE_DRIVER_INIT(shinobl);
 	DECLARE_DRIVER_INIT(tturfbl);
 	DECLARE_DRIVER_INIT(goldnaxeb1);
+	DECLARE_DRIVER_INIT(ddcrewbl);
 	DECLARE_DRIVER_INIT(common);
+	DECLARE_MACHINE_RESET(ddcrewbl);
 	TILEMAP_MAPPER_MEMBER(sys16_bg_map);
 	TILEMAP_MAPPER_MEMBER(sys16_text_map);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

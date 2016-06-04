@@ -1825,7 +1825,7 @@ void hyperstone_device::device_stop()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -1853,7 +1853,7 @@ void hyperstone_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c FTE:%X FRM:%X ILC:%d FL:%d FP:%d",
+			str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c FTE:%X FRM:%X ILC:%d FL:%d FP:%d",
 				GET_S ? 'S':'.',
 				GET_P ? 'P':'.',
 				GET_T ? 'T':'.',
@@ -4871,7 +4871,7 @@ void hyperstone_device::hyperstone_trap(struct hyperstone_device::regs_decode *d
 }
 
 
-#include "e132xsop.inc"
+#include "e132xsop.hxx"
 
 //**************************************************************************
 //  CORE EXECUTION LOOP

@@ -792,7 +792,7 @@ void atari_vad_device::eof_update(emu_timer &timer)
     update_pf_xscrolls();
 
     m_playfield_tilemap->set_scrolly(0, m_pf0_yscroll);
-    if (m_playfield2_tilemap != NULL)
+    if (m_playfield2_tilemap != nullptr)
         m_playfield2_tilemap->set_scrolly(0, m_pf1_yscroll);*/
 	timer.adjust(m_screen->time_until_pos(0));
 
@@ -970,17 +970,15 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 
 void atarigen_state::machine_start()
 {
-	screen_device *screen;
-	int i;
-
 	// allocate timers for all screens
-	screen_device_iterator iter(*this);
-	assert(iter.count() <= ARRAY_LENGTH(m_screen_timer));
-	for (i = 0, screen = iter.first(); screen != nullptr; i++, screen = iter.next())
+	int i = 0;
+	for (screen_device &screen : screen_device_iterator(*this))
 	{
-		m_screen_timer[i].screen = screen;
-		m_screen_timer[i].scanline_interrupt_timer = timer_alloc(TID_SCANLINE_INTERRUPT, (void *)screen);
-		m_screen_timer[i].scanline_timer = timer_alloc(TID_SCANLINE_TIMER, (void *)screen);
+		assert(i <= ARRAY_LENGTH(m_screen_timer));
+		m_screen_timer[i].screen = &screen;
+		m_screen_timer[i].scanline_interrupt_timer = timer_alloc(TID_SCANLINE_INTERRUPT, (void *)&screen);
+		m_screen_timer[i].scanline_timer = timer_alloc(TID_SCANLINE_TIMER, (void *)&screen);
+		i++;
 	}
 
 	save_item(NAME(m_scanline_int_state));
@@ -1214,7 +1212,7 @@ DIRECT_UPDATE_MEMBER(atarigen_state::slapstic_setdirect)
 //  slapstic and sets the chip number.
 //-------------------------------------------------
 
-void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror)
+void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, UINT8 *mem)
 {
 	if (!m_slapstic_device.found())
 		fatalerror("Slapstic device is missing\n");
@@ -1225,8 +1223,9 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 
 	// install the memory handlers
 	address_space &program = device.space(AS_PROGRAM);
-	m_slapstic = program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
+	program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
 	program.set_direct_update_handler(direct_update_delegate(FUNC(atarigen_state::slapstic_setdirect), this));
+	m_slapstic = (UINT16 *)mem;
 
 	// allocate memory for a copy of bank 0
 	m_slapstic_bank0.resize(0x2000);

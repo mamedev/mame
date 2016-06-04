@@ -3,11 +3,9 @@
 -- Functions to generate the different sections of an Xcode project.
 -- Copyright (c) 2009-2011 Jason Perkins and the Premake project
 --
-
+	premake.xcode.parameters = { }
 	local xcode = premake.xcode
 	local tree  = premake.tree
-
-
 --
 -- Return the Xcode build category for a given file, based on the file extension.
 --
@@ -681,7 +679,7 @@
 	end
 	
 	
-	function xcode.PBXSourcesBuildPhase(tr)
+	function xcode.PBXSourcesBuildPhase(tr,prj)
 		_p('/* Begin PBXSourcesBuildPhase section */')
 		for _, target in ipairs(tr.products.children) do
 			_p(2,'%s /* Sources */ = {', target.sourcesid)
@@ -691,7 +689,9 @@
 			tree.traverse(tr, {
 				onleaf = function(node)
 					if xcode.getbuildcategory(node) == "Sources" then
+        				if not table.icontains(prj.excludes, node.cfg.name) then -- if not excluded
 						_p(4,'%s /* %s in Sources */,', node.buildid, node.name)
+                        end
 					end
 				end
 			})
@@ -899,7 +899,13 @@
 				table.insert(flags, flag)
 			end
 		end
-		xcode.printlist(table.join(flags, cfg.buildoptions), 'OTHER_CFLAGS')
+
+		for _, val in ipairs(premake.xcode.parameters) do
+			_p(4, val ..';')
+		end
+
+		xcode.printlist(table.join(flags, cfg.buildoptions, cfg.buildoptions_c), 'OTHER_CFLAGS')
+		xcode.printlist(table.join(flags, cfg.buildoptions, cfg.buildoptions_cpp), 'OTHER_CPLUSPLUSFLAGS')
 
 		-- build list of "other" linked flags. All libraries that aren't frameworks
 		-- are listed here, so I don't have to try and figure out if they are ".a"

@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "includes/md_cons.h"
+#include "includes/megadriv.h"
 #include "sound/sn76496.h"
 
 #include "imagedev/chd_cd.h"
@@ -406,6 +406,9 @@ static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( genesis_tmss, ms_megadriv )
+	MCFG_SOFTWARE_LIST_FILTER("cart_list","TMSS")
+MACHINE_CONFIG_END
 
 
 
@@ -1058,7 +1061,7 @@ CONS( 1990, megadriv,   genesis,   0,      ms_megadpal,     md, md_cons_state,  
 CONS( 1988, megadrij,   genesis,   0,      ms_megadriv,     md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
 
 // 1990+ models had the TMSS security chip, leave this as a clone, it reduces compatibility and nothing more.
-CONS( 1990, genesis_tmss, genesis, 0,      ms_megadriv,     md, md_cons_state,     genesis,   "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1990, genesis_tmss, genesis, 0,      genesis_tmss,    md, md_cons_state,     genesis,   "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
 
 
 // the 32X plugged in the cart slot, games plugged into the 32x.  Maybe it should be handled as an expansion device?

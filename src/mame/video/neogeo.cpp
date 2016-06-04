@@ -13,9 +13,6 @@
 
 #define NUM_PENS    (0x1000)
 
-
-
-
 /*************************************
  *
  *  Palette handling
@@ -74,27 +71,27 @@ void neogeo_state::set_pens()
 }
 
 
-void neogeo_state::neogeo_set_screen_shadow( int data )
+void neogeo_state::set_screen_shadow(int data)
 {
 	m_screen_shadow = data;
 	set_pens();
 }
 
 
-void neogeo_state::neogeo_set_palette_bank( int data )
+void neogeo_state::set_palette_bank(int data)
 {
 	m_palette_bank = data ? 0x1000 : 0;
 	set_pens();
 }
 
 
-READ16_MEMBER(neogeo_state::neogeo_paletteram_r)
+READ16_MEMBER(neogeo_state::paletteram_r)
 {
 	return m_paletteram[m_palette_bank + offset];
 }
 
 
-WRITE16_MEMBER(neogeo_state::neogeo_paletteram_w)
+WRITE16_MEMBER(neogeo_state::paletteram_w)
 {
 	offset += m_palette_bank;
 	data = COMBINE_DATA(&m_paletteram[offset]);
@@ -181,7 +178,7 @@ UINT32 neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &b
  *
  *************************************/
 
-UINT16 neogeo_state::get_video_control(  )
+UINT16 neogeo_state::get_video_control()
 {
 	UINT16 ret;
 	UINT16 v_counter;
@@ -221,24 +218,24 @@ UINT16 neogeo_state::get_video_control(  )
 }
 
 
-void neogeo_state::set_video_control( UINT16 data )
+void neogeo_state::set_video_control(UINT16 data)
 {
 	if (VERBOSE) logerror("%s: video control write %04x\n", machine().describe_context(), data);
 
 	m_sprgen->set_auto_animation_speed(data >> 8);
 	m_sprgen->set_auto_animation_disabled(data & 0x0008);
 
-	neogeo_set_display_position_interrupt_control(data & 0x00f0);
+	set_display_position_interrupt_control(data & 0x00f0);
 }
 
 
-READ16_MEMBER(neogeo_state::neogeo_video_register_r)
+READ16_MEMBER(neogeo_state::video_register_r)
 {
 	UINT16 ret;
 
 	/* accessing the LSB only is not mapped */
 	if (mem_mask == 0x00ff)
-		ret = neogeo_unmapped_r(space, 0, 0xffff) & 0x00ff;
+		ret = unmapped_r(space, 0, 0xffff) & 0x00ff;
 	else
 	{
 		switch (offset)
@@ -255,7 +252,7 @@ READ16_MEMBER(neogeo_state::neogeo_video_register_r)
 }
 
 
-WRITE16_MEMBER(neogeo_state::neogeo_video_register_w)
+WRITE16_MEMBER(neogeo_state::video_register_w)
 {
 	/* accessing the LSB only is not mapped */
 	if (mem_mask != 0x00ff)
@@ -270,9 +267,9 @@ WRITE16_MEMBER(neogeo_state::neogeo_video_register_w)
 		case 0x01: m_sprgen->set_videoram_data(data); break;
 		case 0x02: m_sprgen->set_videoram_modulo(data); break;
 		case 0x03: set_video_control(data); break;
-		case 0x04: neogeo_set_display_counter_msb(data); break;
-		case 0x05: neogeo_set_display_counter_lsb(data); break;
-		case 0x06: neogeo_acknowledge_interrupt(data); break;
+		case 0x04: set_display_counter_msb(data); break;
+		case 0x05: set_display_counter_lsb(data); break;
+		case 0x06: acknowledge_interrupt(data); break;
 		case 0x07: break; // d0: pause timer for 32 lines when in PAL mode (LSPC2 only)
 		}
 	}

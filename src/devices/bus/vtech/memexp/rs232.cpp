@@ -2,7 +2,7 @@
 // copyright-holders:Dirk Best
 /***************************************************************************
 
-    Dick Smith VZ-200/300 RS-232 Cartridge
+    Dick Smith VZ-200/300 RS-232 Cartridge (K-6317)
 
 ***************************************************************************/
 
@@ -50,7 +50,7 @@ machine_config_constructor rs232_interface_device::device_mconfig_additions() co
 //**************************************************************************
 
 //-------------------------------------------------
-//  wordpro_device - constructor
+//  rs232_interface_device - constructor
 //-------------------------------------------------
 
 rs232_interface_device::rs232_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :

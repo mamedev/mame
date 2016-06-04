@@ -311,12 +311,12 @@ std::string ws_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 size = core_fsize(m_file);
+		UINT32 size = m_file->size();
 		dynamic_buffer rom(size);
 		int type;
 		UINT32 nvram;
 
-		core_fread(m_file, &rom[0], size);
+		m_file->read(&rom[0], size);
 
 		// nvram size is not really used here, but we set it up nevertheless
 		type = get_cart_type(&rom[0], size, nvram);

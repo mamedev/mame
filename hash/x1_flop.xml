@@ -5166,6 +5166,23 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 
+	<software name="dalk">
+		<description>The Cave of Dalk</description>
+		<year>1990?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Once booted in S-OS, type &quot;L DALK&quot; to load, and &quot;J 9600&quot; to run"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="the cave of dalk_x1.d88" size="348848" crc="2540f4f9" sha1="7cd598fe9ea3faebee64b899e73398e2ddb1da67" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="the cave of dalk_original.d88" size="348848" crc="7aa80627" sha1="a26362d0e80ab3f7c30c1d1dcf88ea78e1a6f211" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Utilities and Tech Demos -->
 
 	<software name="x1demo">

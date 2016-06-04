@@ -62,9 +62,11 @@
 	<view name="Player 2">
 		<screen index="0">
 			<bounds x="0" y="3" width="15" height="11.25" />
+			<orientation rotate="180" />
 		</screen>
 		<screen index="2">
-			<bounds x="0" y="0" width="15" height="3" />
+			<bounds x="0" y="14.25" width="15" height="3" />
+			<orientation rotate="180" />
 		</screen>
 	</view>
 </mamelayout>

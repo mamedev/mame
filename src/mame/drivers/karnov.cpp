@@ -361,7 +361,7 @@ WRITE16_MEMBER(karnov_state::karnov_control_w)
 			return;
 
 		case 2: /* SONREQ (Sound CPU byte) */
-			soundlatch_byte_w(space, 0, data & 0xff);
+			m_soundlatch->write(space, 0, data & 0xff);
 			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
@@ -439,7 +439,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( karnov_sound_map, AS_PROGRAM, 8, karnov_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3526_device, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -816,14 +816,15 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 	MCFG_PALETTE_INIT_OWNER(karnov_state, karnov)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 2);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -880,14 +881,15 @@ static MACHINE_CONFIG_START( wndrplnt, karnov_state )
 	MCFG_PALETTE_INIT_OWNER(karnov_state, karnov)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 2);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

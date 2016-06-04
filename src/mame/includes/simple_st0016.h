@@ -36,8 +36,3 @@ public:
 	optional_device<cpu_device> m_subcpu;
 	required_device<screen_device> m_screen;
 };
-
-
-/*----------- defined in video/st0016.c -----------*/
-
-extern UINT8 macs_cart_slot;

@@ -89,6 +89,7 @@ public:
 		{ }
 
 	virtual void machine_start() override;
+	HD44780_PIXEL_UPDATE(gl4000_pixel_update);
 };
 
 class pc1000_state : public pc2000_state
@@ -107,6 +108,7 @@ public:
 	DECLARE_WRITE8_MEMBER( lcdc_data_w );
 	DECLARE_READ8_MEMBER( lcdc_control_r );
 	DECLARE_WRITE8_MEMBER( lcdc_control_w );
+	HD44780_PIXEL_UPDATE(pc1000_pixel_update);
 };
 
 
@@ -331,7 +333,7 @@ WRITE8_MEMBER( pc1000_state::lcdc_control_w )
 	m_lcdc->control_write(space, 0, data<<4);
 }
 
-static HD44780_PIXEL_UPDATE(pc1000_pixel_update)
+HD44780_PIXEL_UPDATE(pc1000_state::pc1000_pixel_update)
 {
 	UINT8 layout[] = { 0x00, 0x4f, 0x4e, 0x4d, 0x4c, 0x4b, 0x4a, 0x49, 0x48, 0x47, 0x40, 0x3f, 0x3e, 0x3d, 0x3c, 0x3b, 0x3a, 0x39, 0x38, 0x37 };
 	//UINT8 layout[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49 };
@@ -748,7 +750,7 @@ void pc2000_state::machine_start()
 	std::string region_tag;
 	UINT8 *bios = memregion("bios")->base();
 	memory_region *cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	UINT8 *cart = (cart_region != NULL) ? cart_region->base() : memregion("bios")->base();
+	UINT8 *cart = (cart_region != nullptr) ? cart_region->base() : memregion("bios")->base();
 
 	m_bank0->configure_entries(0, 0x10, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x10, bios, 0x4000);
@@ -761,7 +763,7 @@ void gl4004_state::machine_start()
 	std::string region_tag;
 	UINT8 *bios = memregion("bios")->base();
 	memory_region *cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	UINT8 *cart = (cart_region != NULL) ? cart_region->base() : memregion("bios")->base();
+	UINT8 *cart = (cart_region != nullptr) ? cart_region->base() : memregion("bios")->base();
 
 	m_bank0->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x20, bios, 0x4000);
@@ -862,7 +864,7 @@ static MACHINE_CONFIG_DERIVED( gl2000, pc2000 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
-static HD44780_PIXEL_UPDATE(gl4000_pixel_update)
+HD44780_PIXEL_UPDATE(gl4004_state::gl4000_pixel_update)
 {
 	if (pos < 40)
 	{
@@ -907,7 +909,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( gl4000, pc2000, gl4004_state )
 
 	MCFG_DEVICE_MODIFY("hd44780")
 	MCFG_HD44780_LCD_SIZE(4, 20)
-	MCFG_HD44780_PIXEL_UPDATE_CB(gl4000_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(gl4004_state,gl4000_pixel_update)
 
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
@@ -927,7 +929,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( misterx, pc2000, pc1000_state )
 
 	MCFG_DEVICE_MODIFY("hd44780")
 	MCFG_HD44780_LCD_SIZE(1, 20)
-	MCFG_HD44780_PIXEL_UPDATE_CB(pc1000_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(pc1000_state,pc1000_pixel_update)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "misterx")

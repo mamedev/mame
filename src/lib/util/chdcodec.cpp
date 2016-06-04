@@ -632,7 +632,7 @@ chd_compressor_group::chd_compressor_group(chd_file &chd, UINT32 compressor_list
 				throw CHDERR_UNKNOWN_COMPRESSION;
 #if CHDCODEC_VERIFY_COMPRESSION
 			m_decompressor[codecnum] = chd_codec_list::new_decompressor(compressor_list[codecnum], chd);
-			if (m_decompressor[codecnum] == NULL)
+			if (m_decompressor[codecnum] == nullptr)
 				throw CHDERR_UNKNOWN_COMPRESSION;
 #endif
 		}
@@ -1128,20 +1128,35 @@ chd_lzma_decompressor::chd_lzma_decompressor(chd_file &chd, UINT32 hunkbytes, bo
 	// construct the decoder
 	LzmaDec_Construct(&m_decoder);
 
+	// FIXME: this code is written in a way that makes it impossible to safely upgrade the LZMA SDK
+	// This code assumes that the current version of the encoder imposes the same requirements on the
+	// decoder as the encoder used to produce the file.  This is not necessarily true.  The format
+	// needs to be changed so the encoder properties are written to the file.
+
 	// configure the properties like the compressor did
 	CLzmaEncProps encoder_props;
 	chd_lzma_compressor::configure_properties(encoder_props, hunkbytes);
 
 	// convert to decoder properties
-	CLzmaProps decoder_props;
-	decoder_props.lc = encoder_props.lc;
-	decoder_props.lp = encoder_props.lp;
-	decoder_props.pb = encoder_props.pb;
-	decoder_props.dicSize = encoder_props.dictSize;
+	CLzmaEncHandle enc = LzmaEnc_Create(&m_allocator);
+	if (!enc)
+		throw CHDERR_DECOMPRESSION_ERROR;
+	if (LzmaEnc_SetProps(enc, &encoder_props) != SZ_OK)
+	{
+		LzmaEnc_Destroy(enc, &m_allocator, &m_allocator);
+		throw CHDERR_DECOMPRESSION_ERROR;
+	}
+	Byte decoder_props[LZMA_PROPS_SIZE];
+	SizeT props_size = sizeof(decoder_props);
+	if (LzmaEnc_WriteProperties(enc, decoder_props, &props_size) != SZ_OK)
+	{
+		LzmaEnc_Destroy(enc, &m_allocator, &m_allocator);
+		throw CHDERR_DECOMPRESSION_ERROR;
+	}
+	LzmaEnc_Destroy(enc, &m_allocator, &m_allocator);
 
 	// do memory allocations
-	SRes res = LzmaDec_Allocate_MAME(&m_decoder, &decoder_props, &m_allocator);
-	if (res != SZ_OK)
+	if (LzmaDec_Allocate(&m_decoder, decoder_props, LZMA_PROPS_SIZE, &m_allocator) != SZ_OK)
 		throw CHDERR_DECOMPRESSION_ERROR;
 }
 

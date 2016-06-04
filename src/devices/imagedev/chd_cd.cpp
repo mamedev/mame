@@ -109,7 +109,7 @@ bool cdrom_image_device::call_load()
 	if (software_entry() == nullptr)
 	{
 		if (strstr(m_image_name.c_str(), ".chd") && is_loaded()) {
-			err = m_self_chd.open( *image_core_file() );    /* CDs are never writeable */
+			err = m_self_chd.open( image_core_file() );    /* CDs are never writeable */
 			if ( err )
 				goto error;
 			chd = &m_self_chd;

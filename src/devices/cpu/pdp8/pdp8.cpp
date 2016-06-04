@@ -116,7 +116,7 @@ void pdp8_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -126,7 +126,7 @@ const address_space_config *pdp8_device::memory_space_config(address_spacenum sp
 	{
 		return &m_program_config;
 	}
-	return NULL;
+	return nullptr;
 }
 
 

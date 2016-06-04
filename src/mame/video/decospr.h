@@ -18,7 +18,6 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_gfx_region(device_t &device, int gfxregion);
 	static void set_pri_callback(device_t &device, decospr_pri_cb_delegate callback) { downcast<decospr_device &>(device).m_pri_cb = callback; }
 	static void set_col_callback(device_t &device, decospr_col_cb_delegate callback) { downcast<decospr_device &>(device).m_col_cb = callback; }
@@ -60,14 +59,13 @@ protected:
 	bool m_is_bootleg; // used by various bootlegs (disables masking of sprite tile number when multi-sprite is used)
 	int m_bootleg_type; // for Puzzlove, has sprite bits moved around (probably to prevent board swaps)
 	int m_x_offset, m_y_offset; // used by various bootlegs
-	int m_flipallx; // used by esd16.c - hedpanio, multchmp , and nmg5.c
+	bool m_flipallx; // used by esd16.c - hedpanico, multchmp, and nmg5.c
 	int m_transpen; // used by fncywld (tumbleb.c)
 
 private:
 	template<class _BitmapClass>
 	void draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip);
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 extern const device_type DECO_SPRITE;
@@ -98,6 +96,3 @@ extern const device_type DECO_SPRITE;
 
 #define MCFG_DECO_SPRITE_GFXDECODE(_gfxtag) \
 	decospr_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-#define MCFG_DECO_SPRITE_PALETTE(_palette_tag) \
-	decospr_device::static_set_palette_tag(*device, "^" _palette_tag);

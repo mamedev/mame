@@ -206,7 +206,7 @@ On boot: 50 = 98, 51 = 06, 52 = 7f
 0061 - unknown
        0xFE written in irq 0xFB handler
 
-0070 - uknown 0x01 is written when going to terminal mode (enable rs232 receive?)
+0070 - unknown 0x01 is written when going to terminal mode (enable rs232 receive?)
 
 0090 - Interrupt source clear
        b7 - 1 = clear interrupt source for irq vector 0xf8
@@ -514,14 +514,14 @@ INPUT_CHANGED_MEMBER(nakajies_state::trigger_irq)
 
 static INPUT_PORTS_START( nakajies )
 	PORT_START( "debug" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F1 ) PORT_NAME( "irq 0xff" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, NULL )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F2 ) PORT_NAME( "irq 0xfe" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, NULL )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F3 ) PORT_NAME( "irq 0xfd" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, NULL )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F4 ) PORT_NAME( "irq 0xfc" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, NULL )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F5 ) PORT_NAME( "irq 0xfb" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, NULL )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F6 ) PORT_NAME( "irq 0xfa" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, NULL )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F7 ) PORT_NAME( "irq 0xf9" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, NULL )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F8 ) PORT_NAME( "irq 0xf8" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, NULL )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F1 ) PORT_NAME( "irq 0xff" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F2 ) PORT_NAME( "irq 0xfe" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F3 ) PORT_NAME( "irq 0xfd" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F4 ) PORT_NAME( "irq 0xfc" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F5 ) PORT_NAME( "irq 0xfb" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F6 ) PORT_NAME( "irq 0xfa" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F7 ) PORT_NAME( "irq 0xf9" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F8 ) PORT_NAME( "irq 0xf8" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
 
 	PORT_START( "ROW0" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Left Shift")  PORT_CODE( KEYCODE_LSHIFT )

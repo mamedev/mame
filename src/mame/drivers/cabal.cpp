@@ -503,11 +503,9 @@ static MACHINE_CONFIG_START( cabal_base, cabal_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
 	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
-	MCFG_SEIBU_ADPCM_ROMREGION("adpcm1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 
 	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
-	MCFG_SEIBU_ADPCM_ROMREGION("adpcm2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -647,6 +645,38 @@ ROM_START( cabala )
 	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "epr-a-1.1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
 ROM_END
+
+
+
+ROM_START( cabaluk )
+	ROM_REGION( 0x50000, "maincpu", 0 ) /* 64k for cpu code */
+	ROM_LOAD16_BYTE( "9-7H.BIN",    0x00000, 0x10000, CRC(f66378e5) SHA1(b3802f24863f857506ae1aeddc4e5c2908810695) )
+	ROM_LOAD16_BYTE( "7-6H.BIN",    0x00001, 0x10000, CRC(960991ac) SHA1(7e3ab0673585424206d791e8b0ed6af38e2ae8a9) )
+	ROM_LOAD16_BYTE( "8-7K.BIN",    0x20000, 0x10000, CRC(82160ab0) SHA1(a486f30ec3068025b690da4c1ae7295e79e7cd74) )
+	ROM_LOAD16_BYTE( "6-6K.BIN",    0x20001, 0x10000, CRC(7ef2ecc7) SHA1(43d621e2e7cfea8d906a968047817e23a3e4d047) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
+	ROM_LOAD( "4-3n",         0x0000, 0x2000, CRC(4038eff2) SHA1(0bcafc1b78c3bef9a0e9b822c482ea4a942fd180) )
+	ROM_LOAD( "3-3p",         0x8000, 0x8000, CRC(d9defcbf) SHA1(f26b10b1dbe5aa6446f70fd18e5f1379455578ec) )
+
+	ROM_REGION( 0x4000,  "gfx1", 0 )
+	ROM_LOAD( "5-6s",           0x00000, 0x04000, CRC(6a76955a) SHA1(733cb4b862b5dac97c2641b58f2362471e62fcf2) ) /* characters */
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "tad-2.7s",       0x00000, 0x80000, CRC(13ca7ae1) SHA1(b26bb4876a6518e3809e0fa4d442616508b3e7e8) ) /* tiles */
+
+	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_LOAD( "tad-1.5e",       0x00000, 0x80000, CRC(8324a7fe) SHA1(aed4470df35ec18e65e35bddc9c217a5019fdcbf) ) /* sprites */
+
+
+	ROM_REGION( 0x10000, "adpcm1", 0 )  /* Samples */
+	ROM_LOAD( "2-1s",           0x00000, 0x10000, CRC(850406b4) SHA1(23ac1650c6d6f35607a5264b3aa89868401a645a) )
+
+	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
+	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+ROM_END
+
+
 
 ROM_START( cabalus )
 	ROM_REGION( 0x50000, "maincpu", 0 ) /* 64k for cpu code */
@@ -841,8 +871,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cabal_state,cabal)
 {
-	m_adpcm1->decrypt("adpcm1");
-	m_adpcm2->decrypt("adpcm2");
+	m_adpcm1->decrypt();
+	m_adpcm2->decrypt();
 }
 
 DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
@@ -850,15 +880,16 @@ DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
 	UINT8 *decrypt = m_seibu_sound->get_custom_decrypt();
 	memcpy(decrypt,        memregion("audiocpu")->base()+0x2000, 0x2000);
 	memcpy(decrypt+0x8000, memregion("audiocpu")->base()+0x8000, 0x8000);
-	m_adpcm1->decrypt("adpcm1");
-	m_adpcm2->decrypt("adpcm2");
+	m_adpcm1->decrypt();
+	m_adpcm2->decrypt();
 }
 
 
-GAME( 1988, cabal,   0,     cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation", "Cabal (World, Joystick version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cabala,  cabal, cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Alpha Trading)", MACHINE_SUPPORTS_SAVE ) // korea?
-GAME( 1988, cabalbl, cabal, cabalbl, cabalbl, driver_device,  0,       ROT0, "bootleg (Red Corporation)", "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalbl2,cabal, cabalbl2,cabalj, cabal_state,   cabalbl2,ROT0, "bootleg", "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabal,   0,     cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation",                         "Cabal (World, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabala,  cabal, cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Korea?, Joystick)", MACHINE_SUPPORTS_SAVE ) // korea?
+GAME( 1988, cabalbl, cabal, cabalbl, cabalbl,driver_device, 0,       ROT0, "bootleg (Red Corporation)",               "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalbl2,cabal, cabalbl2,cabalj, cabal_state,   cabalbl2,ROT0, "bootleg",                                 "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, cabalus, cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 1, Trackball version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalus2,cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 2, Trackball version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus, cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)",         "Cabal (US set 1, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus2,cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)",         "Cabal (US set 2, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabaluk, cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Electrocoin license)",    "Cabal (UK, Trackball)", MACHINE_SUPPORTS_SAVE )

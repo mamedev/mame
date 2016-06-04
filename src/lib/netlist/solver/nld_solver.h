@@ -10,6 +10,7 @@
 
 #include "nl_setup.h"
 #include "nl_base.h"
+#include "plib/pstream.h"
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
@@ -48,154 +49,59 @@ struct solver_parameters_t
 };
 
 
-class terms_t
+class matrix_solver_t;
+
+NETLIB_OBJECT(solver)
 {
-	P_PREVENT_COPYING(terms_t)
-
-	public:
-	ATTR_COLD terms_t() : m_railstart(0)
-	{}
-
-	ATTR_COLD void clear()
+	NETLIB_CONSTRUCTOR(solver)
 	{
-		m_term.clear();
-		m_net_other.clear();
-		m_gt.clear();
-		m_go.clear();
-		m_Idr.clear();
-		m_other_curanalog.clear();
+		enregister("Q_step", m_Q_step);
+
+		register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(10).as_double());
+
+		register_param("FREQ", m_freq, 48000.0);
+
+
+		/* iteration parameters */
+		register_param("SOR_FACTOR", m_sor, 1.059);
+		register_param("ITERATIVE", m_iterative_solver, "SOR");
+		register_param("ACCURACY", m_accuracy, 1e-7);
+		register_param("GS_THRESHOLD", m_gs_threshold, 6);      // below this value, gaussian elimination is used
+		register_param("GS_LOOPS", m_gs_loops, 9);              // Gauss-Seidel loops
+
+		/* general parameters */
+		register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
+		register_param("PIVOT", m_pivot, 0);                    // use pivoting - on supported solvers
+		register_param("NR_LOOPS", m_nr_loops, 250);            // Newton-Raphson loops
+		register_param("PARALLEL", m_parallel, 0);
+
+		/* automatic time step */
+		register_param("DYNAMIC_TS", m_dynamic, 0);
+		register_param("DYNAMIC_LTE", m_lte, 5e-5);                     // diff/timestep
+		register_param("MIN_TIMESTEP", m_min_timestep, 1e-6);   // nl_double timestep resolution
+
+		register_param("LOG_STATS", m_log_stats, 1);   // nl_double timestep resolution
+
+		// internal staff
+
+		enregister("FB_step", m_fb_step);
+		connect_late(m_fb_step, m_Q_step);
 	}
-
-	ATTR_COLD void add(terminal_t *term, int net_other, bool sorted);
-
-	ATTR_HOT inline unsigned count() { return m_term.size(); }
-
-	ATTR_HOT inline terminal_t **terms() { return m_term.data(); }
-	ATTR_HOT inline int *net_other() { return m_net_other.data(); }
-	ATTR_HOT inline nl_double *gt() { return m_gt.data(); }
-	ATTR_HOT inline nl_double *go() { return m_go.data(); }
-	ATTR_HOT inline nl_double *Idr() { return m_Idr.data(); }
-	ATTR_HOT inline nl_double **other_curanalog() { return m_other_curanalog.data(); }
-
-	ATTR_COLD void set_pointers();
-
-	unsigned m_railstart;
-
-	plist_t<unsigned> m_nz;   /* all non zero for multiplication */
-	plist_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination */
-	plist_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
-private:
-	plist_t<terminal_t *> m_term;
-	plist_t<int> m_net_other;
-	plist_t<nl_double> m_go;
-	plist_t<nl_double> m_gt;
-	plist_t<nl_double> m_Idr;
-	plist_t<nl_double *> m_other_curanalog;
-};
-
-class matrix_solver_t : public device_t
-{
-public:
-	typedef plist_t<matrix_solver_t *> list_t;
-	typedef core_device_t::list_t dev_list_t;
-
-	enum eSolverType
-	{
-		GAUSSIAN_ELIMINATION,
-		GAUSS_SEIDEL
-	};
-
-	ATTR_COLD matrix_solver_t(const eSolverType type, const solver_parameters_t *params);
-	virtual ~matrix_solver_t();
-
-	virtual void vsetup(analog_net_t::list_t &nets) = 0;
-
-	template<class C>
-	void solve_base(C *p);
-
-	ATTR_HOT nl_double solve();
-
-	ATTR_HOT inline bool is_dynamic() { return m_dynamic_devices.size() > 0; }
-	ATTR_HOT inline bool is_timestep() { return m_step_devices.size() > 0; }
-
-	ATTR_HOT void update_forced();
-	ATTR_HOT inline void update_after(const netlist_time after)
-	{
-		m_Q_sync.net().reschedule_in_queue(after);
-	}
-
-	/* netdevice functions */
-	ATTR_HOT  virtual void update() override;
-	virtual void start() override;
-	virtual void reset() override;
-
-	ATTR_COLD int get_net_idx(net_t *net);
-
-	inline eSolverType type() const { return m_type; }
-	plog_base<NL_DEBUG> &log() { return netlist().log(); }
-
-	virtual void log_stats();
-
-protected:
-
-	ATTR_COLD void setup(analog_net_t::list_t &nets);
-	ATTR_HOT void update_dynamic();
-
-	// should return next time step
-	ATTR_HOT virtual nl_double vsolve() = 0;
-
-	virtual void  add_term(int net_idx, terminal_t *term) = 0;
-
-	plist_t<analog_net_t *> m_nets;
-	plist_t<analog_output_t *> m_inps;
-
-	int m_stat_calculations;
-	int m_stat_newton_raphson;
-	int m_stat_vsolver_calls;
-	int m_iterative_fail;
-	int m_iterative_total;
-
-	const solver_parameters_t &m_params;
-
-	ATTR_HOT inline nl_double current_timestep() { return m_cur_ts; }
-private:
-
-	netlist_time m_last_step;
-	nl_double m_cur_ts;
-	dev_list_t m_step_devices;
-	dev_list_t m_dynamic_devices;
-
-	logic_input_t m_fb_sync;
-	logic_output_t m_Q_sync;
-
-	ATTR_HOT void step(const netlist_time delta);
-
-	ATTR_HOT void update_inputs();
-
-	const eSolverType m_type;
-};
-
-
-
-class NETLIB_NAME(solver) : public device_t
-{
-public:
-	NETLIB_NAME(solver)()
-	: device_t()    { }
 
 	virtual ~NETLIB_NAME(solver)();
 
-	ATTR_COLD void post_start();
-	ATTR_COLD void stop() override;
+	void post_start();
+	void stop() override;
 
-	ATTR_HOT inline nl_double gmin() { return m_gmin.Value(); }
+	inline nl_double gmin() { return m_gmin.Value(); }
+
+	void create_solver_code(postream &strm);
+
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
+	NETLIB_UPDATE_PARAMI();
 
 protected:
-	ATTR_HOT void update() override;
-	ATTR_HOT void start() override;
-	ATTR_HOT void reset() override;
-	ATTR_HOT void update_param() override;
-
 	logic_input_t m_fb_step;
 	logic_output_t m_Q_step;
 
@@ -217,7 +123,7 @@ protected:
 
 	param_logic_t  m_log_stats;
 
-	matrix_solver_t::list_t m_mat_solvers;
+	pvector_t<matrix_solver_t *> m_mat_solvers;
 private:
 
 	solver_parameters_t m_params;

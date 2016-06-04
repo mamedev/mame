@@ -116,7 +116,7 @@ int ttl74123_device::timer_running()
 
 
 /*-------------------------------------------------
-    TIMER_CALLBACK( output_callback )
+    TIMER_CALLBACK_MEMBER( output_callback )
 -------------------------------------------------*/
 
 TIMER_CALLBACK_MEMBER( ttl74123_device::output_callback )
@@ -140,7 +140,7 @@ void ttl74123_device::set_output()
 
 
 /*-------------------------------------------------
-    TIMER_CALLBACK( clear_callback )
+    TIMER_CALLBACK_MEMBER( clear_callback )
 -------------------------------------------------*/
 
 TIMER_CALLBACK_MEMBER( ttl74123_device::clear_callback )

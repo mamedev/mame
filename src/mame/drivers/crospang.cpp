@@ -50,27 +50,36 @@ WRITE16_MEMBER(crospang_state::crospang_soundlatch_w)
 
 /* main cpu */
 
-static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16, crospang_state )
+static ADDRESS_MAP_START( crospang_base_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_WRITENOP // writes to rom quite often
+
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
+	AM_RANGE(0x270004, 0x270007) AM_WRITENOP // ??
+	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
+	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16, crospang_state )
+
+	AM_IMPORT_FROM(crospang_base_map)
+
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(crospang_fg_scrolly_w)
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(crospang_bg_scrollx_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(crospang_bg_scrolly_w)
 	AM_RANGE(0x100008, 0x100009) AM_WRITE(crospang_fg_scrollx_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITENOP
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
-	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
-	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
+
 	AM_RANGE(0x320000, 0x32ffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bestri_map, AS_PROGRAM, 16, crospang_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_WRITENOP // writes to rom quite often
+	AM_IMPORT_FROM(crospang_base_map)
 
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(bestri_fg_scrollx_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(bestri_fg_scrolly_w)
@@ -78,17 +87,20 @@ static ADDRESS_MAP_START( bestri_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(bestri_bg_scrollx_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(bestri_tilebank_w)
 
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
-	AM_RANGE(0x270004, 0x270005) AM_WRITENOP
-	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
-	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
-
 	AM_RANGE(0x3a0000, 0x3affff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bestria_map, AS_PROGRAM, 16, crospang_state )
+	AM_IMPORT_FROM(crospang_base_map)
+
+	AM_RANGE(0x100000, 0x100001) AM_WRITENOP // ??
+	AM_RANGE(0x100006, 0x100007) AM_WRITE(bestri_fg_scrollx_w)
+	AM_RANGE(0x100008, 0x100009) AM_WRITE(bestri_fg_scrolly_w)
+	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(bestri_bg_scrollx_w)
+	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(bestri_bg_scrolly_w)
+	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(bestri_tilebank_w)
+
+	AM_RANGE(0x340000, 0x34ffff) AM_RAM
 ADDRESS_MAP_END
 
 /* sound cpu */
@@ -360,7 +372,6 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_OFFSETS(5, 7)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 
 	/* sound hardware */
@@ -379,6 +390,14 @@ static MACHINE_CONFIG_DERIVED( bestri, crospang )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bestri_map)
+
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bestria, crospang )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bestria_map)
 
 MACHINE_CONFIG_END
 
@@ -543,6 +562,43 @@ ROM_START( bestri )
 	ROM_LOAD16_BYTE( "ud17.e12", 0x100001, 0x80000, CRC(3a3a3f1a) SHA1(48843140cd63c9387e09b84bd41b13dba35f48ad) )
 ROM_END
 
+ROM_START( bestria )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "O_UA02.I3", 0x00001, 0x80000, CRC(035c86f6) SHA1(d501553ed7fdb462c9c26fff6473cefe71424e26) )
+	ROM_LOAD16_BYTE( "E_UA03.I5", 0x00000, 0x80000, CRC(7c53d9f8) SHA1(92dc92471497292d3ba90f3f2fb35f7b4fba240c) )
+
+	ROM_REGION( 0x040000, "audiocpu", 0 ) /* Z80 */
+	ROM_LOAD( "US02.P3", 0x00000, 0x10000, CRC(c7cc05fa) SHA1(5fbf479be98f618c63e4c74a250d51279c2f5e3b)) // same as huek
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "US08.Q7", 0x00000, 0x40000, CRC(85d8f3de) SHA1(af55678bbe2c187cfee063c6f74cdd568307a7a2) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) // tiles
+
+	ROM_LOAD16_BYTE( "2_UC08.M12", 0x00001, 0x20000, CRC(23778472) SHA1(00f54aefe52f2f76ab2f2628bf2e860d468e4a02) )
+	ROM_CONTINUE ( 0x100001,0x20000)
+	ROM_CONTINUE ( 0x040001,0x20000)
+	ROM_CONTINUE ( 0x140001,0x20000)
+	ROM_LOAD16_BYTE( "0_UC07.P12", 0x00000, 0x20000, CRC(7aad194c) SHA1(5fc5882886576d939763200e705e1085be60671a) )
+	ROM_CONTINUE ( 0x100000,0x20000)
+	ROM_CONTINUE ( 0x040000,0x20000)
+	ROM_CONTINUE ( 0x140000,0x20000)
+	ROM_LOAD16_BYTE( "1_UC28.N12", 0x80001, 0x20000, CRC(4f737007) SHA1(37f379f3b491da35153ed3d14d8920f94b060643) )
+	ROM_CONTINUE ( 0x180001,0x20000)
+	ROM_CONTINUE ( 0x0c0001,0x20000)
+	ROM_CONTINUE ( 0x1c0001,0x20000)
+	ROM_LOAD16_BYTE( "3_UC29.K12", 0x80000, 0x20000, CRC(2f5b244f) SHA1(1d9bf3d1dd55a87d52d2d614f46177605e32c6bf) )
+	ROM_CONTINUE ( 0x180000,0x20000)
+	ROM_CONTINUE ( 0x0c0000,0x20000)
+	ROM_CONTINUE ( 0x1c0000,0x20000)
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) // sprites
+	ROM_LOAD16_BYTE( "A_UD14.J12", 0x000000, 0x80000, CRC(3502f71b) SHA1(ec012c414ace560ab67d60ce407bd67a4640c217) )
+	ROM_LOAD16_BYTE( "B_UD15.H12", 0x000001, 0x80000, CRC(2636b837) SHA1(692987bd8ace452ee40a253437f1e3672f737f98) )
+	ROM_LOAD16_BYTE( "C_UD16.G12", 0x100000, 0x80000, CRC(68b0ff81) SHA1(969579c2a29b577b9077e70a03c0ec92997ddcc0) )
+	ROM_LOAD16_BYTE( "D_UD17.E12", 0x100001, 0x80000, CRC(60082aed) SHA1(1431afe1a8200bd87520e90051db0ec43207b265) )
+ROM_END
+
 
 void crospang_state::tumblepb_gfx1_rearrange()
 {
@@ -570,6 +626,7 @@ DRIVER_INIT_MEMBER(crospang_state,crospang)
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1998, crospang, 0, crospang, crospang, crospang_state, crospang, ROT0, "F2 System", "Cross Pang", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, heuksun,  0, crospang, heuksun, crospang_state,  crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestri,   0, bestri,   bestri, crospang_state,   crospang, ROT0, "F2 System", "Bestri (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, crospang,        0, crospang, crospang, crospang_state, crospang, ROT0, "F2 System",         "Cross Pang", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, heuksun,         0, crospang,  heuksun, crospang_state, crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestri,          0,   bestri,   bestri, crospang_state, crospang, ROT0, "F2 System",         "Bestri (Korea, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestria,    bestri,  bestria,   bestri, crospang_state, crospang, ROT0, "F2 System",         "Bestri (Korea, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

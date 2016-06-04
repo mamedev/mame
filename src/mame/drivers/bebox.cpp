@@ -173,7 +173,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(bebox_state,bebox_pic8259_master_set_int_line), VCC, READ8(bebox_state,get_slave_ack) )
 
-	MCFG_PIC8259_ADD( "pic8259_2", WRITELINE(bebox_state,bebox_pic8259_slave_set_int_line), GND, NULL )
+	MCFG_PIC8259_ADD( "pic8259_2", WRITELINE(bebox_state,bebox_pic8259_slave_set_int_line), GND, NOOP)
 
 	MCFG_DEVICE_ADD( "ns16550_0", NS16550, 0 )   /* TODO: Verify model */
 	MCFG_DEVICE_ADD( "ns16550_1", NS16550, 0 )   /* TODO: Verify model */
@@ -210,7 +210,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "cirrus", true)
 
-	/*MCFG_PCI_BUS_DEVICE(12, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
+	/*MCFG_PCI_BUS_DEVICE(12, nullptr, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
 	MCFG_SMC37C78_ADD("smc37c78")
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(bebox_state, fdc_interrupt))

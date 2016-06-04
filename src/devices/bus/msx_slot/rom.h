@@ -7,7 +7,7 @@
 
 #define MCFG_MSX_SLOT_ROM_ADD(_tag, _startpage, _numpages, _region, _offset) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_ROM, _startpage, _numpages) \
-	msx_slot_rom_device::set_rom_start(*device, _region, _offset);
+	msx_slot_rom_device::set_rom_start(*device, "^" _region, _offset);
 
 class msx_slot_rom_device : public device_t,
 							public msx_internal_slot_interface
@@ -24,7 +24,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read) override;
 
 private:
-	const char *m_region;
+	required_memory_region m_rom_region;
 	UINT32 m_region_offset;
 	const UINT8 *m_rom;
 };

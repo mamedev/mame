@@ -337,7 +337,7 @@ static const gfx_layout char_layout =
 static GFXDECODE_START( dfruit )
 	GFXDECODE_ENTRY( "gfx1", 0, bg2_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, sp2_layout, 0, 16 )
-	//GFXDECODE_ENTRY( NULL,           0, char_layout,  0, 16 )  // Ram-based
+	//GFXDECODE_ENTRY( nullptr,           0, char_layout,  0, 16 )  // Ram-based
 GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
@@ -387,7 +387,6 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
 	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
-	MCFG_TC0091LVC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))

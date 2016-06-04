@@ -5,7 +5,6 @@
 
 #include "emu.h"
 #include "neogeo_spr.h"
-#include "bus/neogeo/neogeo_helper.h"
 
 // pure virtual functions
 //const device_type NEOGEO_SPRITE_BASE = &device_creator<neosprite_base_device>;
@@ -35,8 +34,6 @@ void neosprite_base_device::device_start()
 
 	create_sprite_line_timer();
 	create_auto_animation_timer();
-
-
 
 	/* initialize values that are not modified on a reset */
 	m_vram_offset = 0;
@@ -80,7 +77,7 @@ void neosprite_base_device::device_reset()
  *
  *************************************/
 
-void neosprite_base_device::set_videoram_offset( UINT16 data )
+void neosprite_base_device::set_videoram_offset(UINT16 data)
 {
 	m_vram_offset = (data & 0x8000 ? data & 0x87ff : data);
 
@@ -89,13 +86,13 @@ void neosprite_base_device::set_videoram_offset( UINT16 data )
 }
 
 
-UINT16 neosprite_base_device::get_videoram_data(  )
+UINT16 neosprite_base_device::get_videoram_data()
 {
 	return m_vram_read_buffer;
 }
 
 
-void neosprite_base_device::set_videoram_data( UINT16 data)
+void neosprite_base_device::set_videoram_data(UINT16 data)
 {
 	m_videoram[m_vram_offset] = data;
 
@@ -104,13 +101,13 @@ void neosprite_base_device::set_videoram_data( UINT16 data)
 }
 
 
-void neosprite_base_device::set_videoram_modulo( UINT16 data)
+void neosprite_base_device::set_videoram_modulo(UINT16 data)
 {
 	m_vram_modulo = data;
 }
 
 
-UINT16 neosprite_base_device::get_videoram_modulo(  )
+UINT16 neosprite_base_device::get_videoram_modulo()
 {
 	return m_vram_modulo;
 }
@@ -123,19 +120,19 @@ UINT16 neosprite_base_device::get_videoram_modulo(  )
  *
  *************************************/
 
-void neosprite_base_device::set_auto_animation_speed( UINT8 data)
+void neosprite_base_device::set_auto_animation_speed(UINT8 data)
 {
 	m_auto_animation_speed = data;
 }
 
 
-void neosprite_base_device::set_auto_animation_disabled( UINT8 data)
+void neosprite_base_device::set_auto_animation_disabled(UINT8 data)
 {
 	m_auto_animation_disabled = data;
 }
 
 
-UINT8 neosprite_base_device::neogeo_get_auto_animation_counter(  )
+UINT8 neosprite_base_device::neogeo_get_auto_animation_counter()
 {
 	return m_auto_animation_counter;
 }
@@ -155,13 +152,13 @@ TIMER_CALLBACK_MEMBER(neosprite_base_device::auto_animation_timer_callback)
 }
 
 
-void neosprite_base_device::create_auto_animation_timer(  )
+void neosprite_base_device::create_auto_animation_timer()
 {
 	m_auto_animation_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(neosprite_base_device::auto_animation_timer_callback),this));
 }
 
 
-void neosprite_base_device::start_auto_animation_timer(  )
+void neosprite_base_device::start_auto_animation_timer()
 {
 	m_auto_animation_timer->adjust(m_screen->time_until_pos(NEOGEO_VSSTART));
 }
@@ -174,13 +171,13 @@ void neosprite_base_device::start_auto_animation_timer(  )
  *
  *************************************/
 
-void neosprite_base_device::neogeo_set_fixed_layer_source( UINT8 data )
+void neosprite_base_device::neogeo_set_fixed_layer_source(UINT8 data)
 {
 	m_fixed_layer_source = data;
 }
 
 
-void neosprite_base_device::draw_fixed_layer( bitmap_rgb32 &bitmap, int scanline )
+void neosprite_base_device::draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline)
 {
 	int x;
 
@@ -308,7 +305,7 @@ inline bool neosprite_base_device::sprite_on_scanline(int scanline, int y, int r
 
 
 
-void neosprite_base_device::draw_sprites( bitmap_rgb32 &bitmap, int scanline )
+void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 {
 	int sprite_index;
 	int max_sprite_index;
@@ -498,7 +495,7 @@ void neosprite_base_device::draw_sprites( bitmap_rgb32 &bitmap, int scanline )
 }
 
 
-void neosprite_base_device::parse_sprites( int scanline )
+void neosprite_base_device::parse_sprites(int scanline)
 {
 	UINT16 sprite_number;
 	int y = 0;
@@ -567,13 +564,13 @@ TIMER_CALLBACK_MEMBER(neosprite_base_device::sprite_line_timer_callback)
 }
 
 
-void neosprite_base_device::create_sprite_line_timer(  )
+void neosprite_base_device::create_sprite_line_timer()
 {
 	m_sprite_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(neosprite_base_device::sprite_line_timer_callback),this));
 }
 
 
-void neosprite_base_device::start_sprite_line_timer(  )
+void neosprite_base_device::start_sprite_line_timer()
 {
 	m_sprite_line_timer->adjust(m_screen->time_until_pos(0));
 }
@@ -616,7 +613,6 @@ void neosprite_base_device::set_optimized_sprite_data(UINT8* sprdata, UINT32 mas
 	return;
 }
 
-
 // these are for passing in pointers from the main system
 void neosprite_base_device::set_sprite_region(UINT8* region_sprites, UINT32 region_sprites_size)
 {
@@ -658,8 +654,6 @@ neosprite_regular_device::neosprite_regular_device(const machine_config &mconfig
 	: neosprite_base_device(mconfig, tag, owner, clock, NEOGEO_SPRITE_REGULAR)
 {
 }
-
-
 
 void neosprite_regular_device::set_sprite_region(UINT8* region_sprites, UINT32 region_sprites_size)
 {
@@ -710,17 +704,56 @@ neosprite_optimized_device::neosprite_optimized_device(const machine_config &mco
 {
 }
 
+UINT32 neosprite_optimized_device::optimize_helper(std::vector<UINT8> &spritegfx, UINT8* region_sprites, UINT32 region_sprites_size)
+{
+	// convert the sprite graphics data into a format that allows faster blitting
+	UINT8 *src;
+	UINT8 *dest;
+	
+	UINT32 mask = get_region_mask(region_sprites, region_sprites_size);
+	
+	spritegfx.resize(mask + 1);
+	UINT32 spritegfx_address_mask = mask;
+	
+	src = region_sprites;
+	dest = &spritegfx[0];
+	
+	for (unsigned i = 0; i < region_sprites_size; i += 0x80, src += 0x80)
+	{
+		for (unsigned y = 0; y < 0x10; y++)
+		{
+			for (unsigned x = 0; x < 8; x++)
+			{
+				*(dest++) = (((src[0x43 | (y << 2)] >> x) & 0x01) << 3) |
+				(((src[0x41 | (y << 2)] >> x) & 0x01) << 2) |
+				(((src[0x42 | (y << 2)] >> x) & 0x01) << 1) |
+				(((src[0x40 | (y << 2)] >> x) & 0x01) << 0);
+			}
+			
+			for (unsigned x = 0; x < 8; x++)
+			{
+				*(dest++) = (((src[0x03 | (y << 2)] >> x) & 0x01) << 3) |
+				(((src[0x01 | (y << 2)] >> x) & 0x01) << 2) |
+				(((src[0x02 | (y << 2)] >> x) & 0x01) << 1) |
+				(((src[0x00 | (y << 2)] >> x) & 0x01) << 0);
+			}
+		}
+	}
+	
+	return spritegfx_address_mask;
+}
+
 
 void neosprite_optimized_device::optimize_sprite_data()
 {
-	m_sprite_gfx_address_mask = neogeohelper_optimize_sprite_data(m_sprite_gfx, m_region_sprites, m_region_sprites_size);
+	m_sprite_gfx_address_mask = optimize_helper(m_sprite_gfx, m_region_sprites, m_region_sprites_size);
 	m_spritegfx8 = &m_sprite_gfx[0];
 }
 
 void neosprite_optimized_device::set_optimized_sprite_data(UINT8* sprdata, UINT32 mask)
 {
-	m_spritegfx8 = sprdata;
 	m_sprite_gfx_address_mask = mask;
+	m_spritegfx8 = &sprdata[0];
 }
 
 inline void neosprite_optimized_device::draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens)

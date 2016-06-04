@@ -122,11 +122,11 @@ static const char * CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 //  cbm_crt_get_card - get slot interface card
 //-------------------------------------------------
 
-std::string cbm_crt_get_card(core_file *file)
+std::string cbm_crt_get_card(util::core_file &file)
 {
 	// read the header
 	cbm_crt_header header;
-	core_fread(file, &header, CRT_HEADER_LENGTH);
+	file.read(&header, CRT_HEADER_LENGTH);
 
 	if (memcmp(header.signature, CRT_SIGNATURE, 16) == 0)
 	{
@@ -143,11 +143,11 @@ std::string cbm_crt_get_card(core_file *file)
 //  cbm_crt_read_header - read cartridge header
 //-------------------------------------------------
 
-bool cbm_crt_read_header(core_file* file, size_t *roml_size, size_t *romh_size, int *exrom, int *game)
+bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_size, int *exrom, int *game)
 {
 	// read the header
 	cbm_crt_header header;
-	core_fread(file, &header, CRT_HEADER_LENGTH);
+	file.read(&header, CRT_HEADER_LENGTH);
 
 	if (memcmp(header.signature, CRT_SIGNATURE, 16) != 0)
 		return false;
@@ -166,10 +166,10 @@ bool cbm_crt_read_header(core_file* file, size_t *roml_size, size_t *romh_size, 
 	}
 
 	// determine ROM region lengths
-	while (!core_feof(file))
+	while (!file.eof())
 	{
 		cbm_crt_chip chip;
-		core_fread(file, &chip, CRT_CHIP_LENGTH);
+		file.read(&chip, CRT_CHIP_LENGTH);
 
 		UINT16 address = pick_integer_be(chip.start_address, 0, 2);
 		UINT16 size = pick_integer_be(chip.image_size, 0, 2);
@@ -190,7 +190,7 @@ bool cbm_crt_read_header(core_file* file, size_t *roml_size, size_t *romh_size, 
 		default: osd_printf_verbose("Invalid CHIP loading address!\n"); break;
 		}
 
-		core_fseek(file, size, SEEK_CUR);
+		file.seek(size, SEEK_CUR);
 	}
 
 	return true;
@@ -201,26 +201,26 @@ bool cbm_crt_read_header(core_file* file, size_t *roml_size, size_t *romh_size, 
 //  cbm_crt_read_data - read cartridge data
 //-------------------------------------------------
 
-bool cbm_crt_read_data(core_file* file, UINT8 *roml, UINT8 *romh)
+bool cbm_crt_read_data(util::core_file &file, UINT8 *roml, UINT8 *romh)
 {
 	UINT32 roml_offset = 0;
 	UINT32 romh_offset = 0;
 
-	core_fseek(file, CRT_HEADER_LENGTH, SEEK_SET);
+	file.seek(CRT_HEADER_LENGTH, SEEK_SET);
 
-	while (!core_feof(file))
+	while (!file.eof())
 	{
 		cbm_crt_chip chip;
-		core_fread(file, &chip, CRT_CHIP_LENGTH);
+		file.read(&chip, CRT_CHIP_LENGTH);
 
 		UINT16 address = pick_integer_be(chip.start_address, 0, 2);
 		UINT16 size = pick_integer_be(chip.image_size, 0, 2);
 
 		switch (address)
 		{
-		case 0x8000: core_fread(file, roml + roml_offset, size); roml_offset += size; break;
-		case 0xa000: core_fread(file, romh + romh_offset, size); romh_offset += size; break;
-		case 0xe000: core_fread(file, romh + romh_offset, size); romh_offset += size; break;
+		case 0x8000: file.read(roml + roml_offset, size); roml_offset += size; break;
+		case 0xa000: file.read(romh + romh_offset, size); romh_offset += size; break;
+		case 0xe000: file.read(romh + romh_offset, size); romh_offset += size; break;
 		}
 	}
 

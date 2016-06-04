@@ -83,6 +83,7 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/samples.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "includes/gridlee.h"
 
 
@@ -305,7 +306,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, gridlee_state )
 /*  { 0x9060, 0x9060, unknown - only written to at startup */
 	AM_RANGE(0x9070, 0x9070) AM_WRITE(gridlee_cocktail_flip_w)
 	AM_RANGE(0x9200, 0x9200) AM_WRITE(gridlee_palette_select_w)
-	AM_RANGE(0x9380, 0x9380) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x9380, 0x9380) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x9500, 0x9501) AM_READ(analog_port_r)
 	AM_RANGE(0x9502, 0x9502) AM_READ_PORT("IN0")
 	AM_RANGE(0x9503, 0x9503) AM_READ_PORT("IN1")
@@ -414,6 +415,8 @@ static MACHINE_CONFIG_START( gridlee, gridlee_state )
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

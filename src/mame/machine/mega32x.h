@@ -133,7 +133,7 @@ public:
 	int m_32x_240mode;
 	UINT16 m_32x_a1518a_reg;
 
-	void handle_pwm_callback();
+	TIMER_CALLBACK_MEMBER(handle_pwm_callback);
 	void calculate_pwm_timer();
 	UINT16 m_pwm_ctrl, m_pwm_cycle, m_pwm_tm_reg;
 	UINT16 m_cur_lch[0x10],m_cur_rch[0x10];

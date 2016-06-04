@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "video/tc0480scp.h"
 
 
@@ -26,6 +27,7 @@ public:
 		m_subcpu(*this, "sub"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_eeprom(*this, "eeprom"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -54,6 +56,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };

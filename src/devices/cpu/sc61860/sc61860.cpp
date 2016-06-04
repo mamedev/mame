@@ -89,8 +89,8 @@ TIMER_CALLBACK_MEMBER(sc61860_device::sc61860_2ms_tick)
 /***************************************************************
  * include the opcode macros, functions and tables
  ***************************************************************/
-#include "scops.inc"
-#include "sctable.inc"
+#include "scops.hxx"
+#include "sctable.hxx"
 
 void sc61860_device::device_reset()
 {
@@ -176,7 +176,7 @@ void sc61860_device::state_string_export(const device_state_entry &entry, std::s
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c", m_zero ? 'Z' : '.', m_carry ? 'C' : '.');
+			str = string_format("%c%c", m_zero ? 'Z' : '.', m_carry ? 'C' : '.');
 			break;
 	}
 }

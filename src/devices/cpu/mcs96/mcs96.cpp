@@ -133,7 +133,7 @@ void mcs96_device::state_string_export(const device_state_entry &entry, std::str
 	switch(entry.index()) {
 	case STATE_GENFLAGS:
 	case MCS96_PSW:
-		strprintf(str, "%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c",
+		str = string_format("%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c",
 						PSW & F_Z  ? 'Z' : '.',
 						PSW & F_N  ? 'N' : '.',
 						PSW & F_V  ? 'V' : '.',
@@ -749,4 +749,4 @@ void mcs96_device::set_nz16(UINT16 v)
 		PSW |= F_N;
 }
 
-#include "cpu/mcs96/mcs96.inc"
+#include "cpu/mcs96/mcs96.hxx"

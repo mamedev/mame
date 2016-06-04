@@ -737,8 +737,8 @@ JP4/5/6/7 - Jumpers to configure ROMs
 #include "machine/eepromser.h"
 #include "machine/53c810.h"
 #include "machine/nvram.h"
+#include "machine/m3comm.h"
 #include "includes/model3.h"
-
 
 void model3_state::update_irq_state()
 {
@@ -1619,7 +1619,7 @@ WRITE64_MEMBER(model3_state::model3_sys_w)
 			}
 			else
 			{
-				logerror("Unknown 0x18/8 write %" I64FMT "x mask %" I64FMT"x\n", data, mem_mask);
+				logerror("Unknown 0x18/8 write %x mask %x\n", data, mem_mask);
 			}
 			break;
 		case 0x08/8:
@@ -1735,20 +1735,6 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 
 
 
-READ64_MEMBER(model3_state::network_r)
-{
-	osd_printf_debug("network_r: %02X at %08X\n", offset, space.device().safe_pc());
-	return m_network_ram[offset];
-}
-
-WRITE64_MEMBER(model3_state::network_w)
-{
-	COMBINE_DATA(m_network_ram.get() + offset);
-	osd_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), space.device().safe_pc());
-}
-
-
-
 READ64_MEMBER(model3_state::model3_5881prot_r)
 {
 	UINT64 retvalue = U64(0xffffffffffffffff);
@@ -1823,7 +1809,7 @@ WRITE64_MEMBER(model3_state::daytona2_rombank_w)
 	}
 }
 
-static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64, model3_state )
+static ADDRESS_MAP_START( model3_10_mem, AS_PROGRAM, 64, model3_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("work_ram")    /* work RAM */
 
 	AM_RANGE(0x84000000, 0x8400003f) AM_READ(real3d_status_r )
@@ -1845,6 +1831,10 @@ static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64, model3_state )
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64, model3_state )
+	AM_IMPORT_FROM( model3_10_mem )
+	AM_RANGE(0xc0000000, 0xc003ffff) AM_DEVICE32("comm_board", m3comm_device, m3_map, U64(0xffffffffffffffff) )
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )
 	PORT_START("IN0")
@@ -5475,7 +5465,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model3_state::model3_interrupt)
 static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_CPU_ADD("maincpu", PPC603E, 66000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)   /* Multiplier 1, Bus = 66MHz, Core = 66MHz */
-	MCFG_CPU_PROGRAM_MAP(model3_mem)
+	MCFG_CPU_PROGRAM_MAP(model3_10_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
@@ -5562,6 +5552,8 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_LSI53C810_DMA_CB(model3_state, real3d_dma_callback)
 	MCFG_LSI53C810_FETCH_CB(model3_state, scsi_fetch)
 	MCFG_LEGACY_SCSI_PORT("scsi")
+
+	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(scud, model3_15)
@@ -5605,6 +5597,8 @@ static MACHINE_CONFIG_START(model3_20, model3_state)
 	MCFG_SOUND_ADD("scsp2", SCSP, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+
+	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(model3_20_5881, model3_20)
@@ -5647,6 +5641,8 @@ static MACHINE_CONFIG_START(model3_21, model3_state)
 	MCFG_SOUND_ADD("scsp2", SCSP, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+
+	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END
 
 
@@ -5751,7 +5747,6 @@ DRIVER_INIT_MEMBER(model3_state,lostwsga)
 	UINT32 *rom = (UINT32*)memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_15);
-	/* TODO: there's an M68K device at 0xC0000000 - FF, maybe lightgun controls ? */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
 	rom[0x7374f0/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
@@ -5770,14 +5765,12 @@ DRIVER_INIT_MEMBER(model3_state,scud)
 DRIVER_INIT_MEMBER(model3_state,scudplus)
 {
 	DRIVER_INIT_CALL(model3_15);
-	/* TODO: network device at 0xC0000000 - FF */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 }
 
 DRIVER_INIT_MEMBER(model3_state,scudplusa)
 {
 	DRIVER_INIT_CALL(model3_15);
-	/* TODO: network device at 0xC0000000 - FF */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 }
 
@@ -5892,17 +5885,11 @@ DRIVER_INIT_MEMBER(model3_state,vs299)
 DRIVER_INIT_MEMBER(model3_state,harley)
 {
 	DRIVER_INIT_CALL(model3_20);
-
-	m_network_ram = make_unique_clear<UINT64[]>(0x10000);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),this), write64_delegate(FUNC(model3_state::network_w),this));
 }
 
 DRIVER_INIT_MEMBER(model3_state,harleya)
 {
 	DRIVER_INIT_CALL(model3_20);
-
-	m_network_ram = make_unique_clear<UINT64[]>(0x10000);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),this), write64_delegate(FUNC(model3_state::network_w),this));
 }
 
 

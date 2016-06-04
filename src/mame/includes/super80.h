@@ -66,6 +66,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
 	DECLARE_DRIVER_INIT(super80);
+	DECLARE_MACHINE_RESET(super80);
+	DECLARE_MACHINE_RESET(super80r);
 	DECLARE_VIDEO_START(super80);
 	DECLARE_VIDEO_START(super80v);
 	DECLARE_PALETTE_INIT(super80m);
@@ -90,7 +92,6 @@ public:
 	UINT8 m_palette_index;
 	required_device<palette_device> m_palette;
 private:
-	virtual void machine_reset() override;
 	UINT8 m_keylatch;
 	UINT8 m_cass_data[4];
 	UINT8 m_int_sw;

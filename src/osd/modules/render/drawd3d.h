@@ -6,12 +6,15 @@
 //
 //============================================================
 
+#pragma once
+
 #ifndef __WIN_DRAWD3D__
 #define __WIN_DRAWD3D__
 
+#ifdef OSD_WINDOWS
 
-#include "modules/render/d3d/d3dhlsl.h"
-
+#include "d3d/d3dintf.h"
+#include "d3d/d3dcomm.h"
 
 //============================================================
 //  CONSTANTS
@@ -24,79 +27,24 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-namespace d3d
-{
-class cache_target;
-class render_target;
-class renderer;
-
-/* cache_target is a simple linked list containing only a rednerable target and texture, used for phosphor effects */
-class cache_target
-{
-public:
-	// construction/destruction
-	cache_target() { }
-	~cache_target();
-
-	bool init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y);
-
-	surface *last_target;
-	texture *last_texture;
-
-	int target_width;
-	int target_height;
-
-	int width;
-	int height;
-
-	int screen_index;
-
-	cache_target *next;
-	cache_target *prev;
-};
-
-/* render_target is the information about a Direct3D render target chain */
-class render_target
-{
-public:
-	// construction/destruction
-	render_target() { }
-	~render_target();
-
-	bool init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y);
-	int next_index(int index) { return ++index > 1 ? 0 : index; }
-
-	int target_width;
-	int target_height;
-
-	int prescale_x;
-	int prescale_y;
-
-	int width;
-	int height;
-
-	int screen_index;
-	int page_index;
-
-	surface *prescale_target[2];
-	texture *prescale_texture[2];
-	surface *native_target[2];
-	texture *native_texture[2];
-
-	render_target *next;
-	render_target *prev;
-
-	surface *bloom_target[11];
-	texture *bloom_texture[11];
-};
+struct vertex;
+class texture_info;
+class texture_manager;
+struct device;
+struct vertex_buffer;
+class shaders;
+struct hlsl_options;
+class poly_info;
 
 /* renderer is the information about Direct3D for the current screen */
-class renderer : public osd_renderer
+class renderer_d3d9 : public osd_renderer
 {
 public:
-	//renderer() { }
-	renderer(osd_window *window);
-	virtual ~renderer();
+	renderer_d3d9(std::shared_ptr<osd_window> window);
+	virtual ~renderer_d3d9();
+
+	static bool init(running_machine &machine);
+	static void exit();
 
 	virtual int create() override;
 	virtual render_primitive_list *get_primitives() override;
@@ -104,7 +52,6 @@ public:
 	virtual void save() override;
 	virtual void record() override;
 	virtual void toggle_fsfx() override;
-	virtual void destroy() override;
 
 	int                     initialize();
 
@@ -126,56 +73,54 @@ public:
 	void                    begin_frame();
 	void                    end_frame();
 
-	void                    draw_line(const render_primitive *prim);
-	void                    draw_quad(const render_primitive *prim);
-	void                    batch_vector(const render_primitive *prim, float line_time);
+	void                    draw_line(const render_primitive &prim);
+	void                    draw_quad(const render_primitive &prim);
+	void                    batch_vector(const render_primitive &prim, float line_time);
 	void                    batch_vectors();
 
 	vertex *                mesh_alloc(int numverts);
-
-	void                    update_textures();
 
 	void                    process_primitives();
 	void                    primitive_flush_pending();
 
 	void                    set_texture(texture_info *texture);
 	void                    set_filter(int filter);
-	void                    set_wrap(D3DTEXTUREADDRESS wrap);
-	void                    set_modmode(DWORD modmode);
+	void                    set_wrap(unsigned int wrap);
+	void                    set_modmode(int modmode);
 	void                    set_blendmode(int blendmode);
 	void                    reset_render_states();
 
 	// Setters / getters
-	int                     get_adapter() { return m_adapter; }
-	int                     get_width() { return m_width; }
-	vec2f                   get_dims() { return vec2f(m_width, m_height); }
-	int                     get_height() { return m_height; }
-	int                     get_refresh() { return m_refresh; }
+	int                     get_adapter() const { return m_adapter; }
+	int                     get_width() const { return m_width; }
+	vec2f                   get_dims() const { return vec2f(m_width, m_height); }
+	int                     get_height() const { return m_height; }
+	int                     get_refresh() const { return m_refresh; }
 
-	device *                get_device() { return m_device; }
+	device *                get_device() const { return m_device; }
 	present_parameters *    get_presentation() { return &m_presentation; }
 
-	vertex_buffer *         get_vertex_buffer() { return m_vertexbuf; }
-	vertex *                get_locked_buffer() { return m_lockedbuf; }
-	VOID **                 get_locked_buffer_ptr() { return (VOID **)&m_lockedbuf; }
+	vertex_buffer *         get_vertex_buffer() const { return m_vertexbuf; }
+	vertex *                get_locked_buffer() const { return m_lockedbuf; }
+	VOID **                 get_locked_buffer_ptr()const { return (VOID **)&m_lockedbuf; }
 	void                    set_locked_buffer(vertex *lockedbuf) { m_lockedbuf = lockedbuf; }
 
 	void                    set_restarting(bool restarting) { m_restarting = restarting; }
-	bool                    is_mod2x_supported() { return (bool)m_mod2x_supported; }
-	bool                    is_mod4x_supported() { return (bool)m_mod4x_supported; }
+	bool                    is_mod2x_supported() const { return (bool)m_mod2x_supported; }
+	bool                    is_mod4x_supported() const { return (bool)m_mod4x_supported; }
 
-	D3DFORMAT               get_screen_format() { return m_screen_format; }
-	D3DFORMAT               get_pixel_format() { return m_pixformat; }
-	D3DDISPLAYMODE          get_origmode() { return m_origmode; }
+	D3DFORMAT               get_screen_format() const { return m_screen_format; }
+	D3DFORMAT               get_pixel_format() const { return m_pixformat; }
+	D3DDISPLAYMODE          get_origmode() const { return m_origmode; }
 
-	UINT32                  get_last_texture_flags() { return m_last_texture_flags; }
+	UINT32                  get_last_texture_flags() const { return m_last_texture_flags; }
 
-	texture_manager *       get_texture_manager() { return m_texture_manager; }
-	texture_info *          get_default_texture() { return m_texture_manager->get_default_texture(); }
-	texture_info *          get_vector_texture() { return m_texture_manager->get_vector_texture(); }
+	d3d_texture_manager *   get_texture_manager() const { return m_texture_manager; }
+	texture_info *          get_default_texture();
+	texture_info *          get_vector_texture();
 
-	shaders *               get_shaders() { return m_shaders; }
-	hlsl_options *          get_shaders_options() { return m_shaders_options; }
+	shaders *               get_shaders() const { return m_shaders; }
+	hlsl_options *          get_shaders_options() const { return m_shaders_options; }
 
 private:
 	int                     m_adapter;                  // ordinal adapter number
@@ -213,18 +158,18 @@ private:
 	int                     m_last_blendsrc;            // previous blendmode
 	int                     m_last_blenddst;            // previous blendmode
 	int                     m_last_filter;              // previous texture filter
-	D3DTEXTUREADDRESS       m_last_wrap;                // previous wrap state
-	DWORD                   m_last_modmode;             // previous texture modulation
+	UINT32                  m_last_wrap;                // previous wrap state
+	int                     m_last_modmode;             // previous texture modulation
 
 	void *                  m_hlsl_buf;                 // HLSL vertex data
 	shaders *               m_shaders;                  // HLSL interface
 	hlsl_options *          m_shaders_options;          // HLSL options
 
-	texture_manager *       m_texture_manager;          // texture manager
+	d3d_texture_manager *  m_texture_manager;          // texture manager
 
 	int                     m_line_count;
 };
 
-}
+#endif // OSD_WINDOWS
 
-#endif
+#endif // __WIN_DRAWD3D__

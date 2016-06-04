@@ -67,7 +67,7 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	memset(&m_localtime, 0, sizeof(m_localtime));
 
 	// configure the fast accessor
-	device.m_execute = this;
+	device.interfaces().m_execute = this;
 }
 
 
@@ -272,7 +272,7 @@ void device_execute_interface::spin_until_time(const attotime &duration)
 	suspend_until_trigger(TRIGGER_SUSPENDTIME + timetrig, true);
 
 	// then set a timer for it
-	m_scheduler->timer_set(duration, FUNC(static_timed_trigger_callback), TRIGGER_SUSPENDTIME + timetrig, this);
+	m_scheduler->timer_set(duration, timer_expired_delegate(FUNC(device_execute_interface::timed_trigger_callback),this), TRIGGER_SUSPENDTIME + timetrig, this);
 	timetrig = (timetrig + 1) % 256;
 }
 
@@ -476,15 +476,14 @@ void device_execute_interface::interface_pre_start()
 	m_driver_irq.bind_relative_to(*device().owner());
 
 	// fill in the initial states
-	device_iterator iter(device().machine().root_device());
-	int index = iter.indexof(*this);
+	int index = device_iterator(device().machine().root_device()).indexof(*this);
 	m_suspend = SUSPEND_REASON_RESET;
 	m_profiler = profile_type(index + PROFILER_DEVICE_FIRST);
 	m_inttrigger = index + TRIGGER_INT;
 
 	// allocate timers if we need them
 	if (m_timed_interrupt_period != attotime::zero)
-		m_timedint_timer = m_scheduler->timer_alloc(FUNC(static_trigger_periodic_interrupt), (void *)this);
+		m_timedint_timer = m_scheduler->timer_alloc(timer_expired_delegate(FUNC(device_execute_interface::trigger_periodic_interrupt), this));
 }
 
 
@@ -653,10 +652,9 @@ attoseconds_t device_execute_interface::minimum_quantum() const
 //  trigger
 //-------------------------------------------------
 
-TIMER_CALLBACK( device_execute_interface::static_timed_trigger_callback )
+TIMER_CALLBACK_MEMBER( device_execute_interface::timed_trigger_callback )
 {
-	device_execute_interface *device = reinterpret_cast<device_execute_interface *>(ptr);
-	device->trigger(param);
+	trigger(param);
 }
 
 
@@ -681,16 +679,11 @@ void device_execute_interface::on_vblank(screen_device &screen, bool vblank_stat
 
 
 //-------------------------------------------------
-//  static_trigger_periodic_interrupt - timer
+//  trigger_periodic_interrupt - timer
 //  callback for timed interrupts
 //-------------------------------------------------
 
-TIMER_CALLBACK( device_execute_interface::static_trigger_periodic_interrupt )
-{
-	reinterpret_cast<device_execute_interface *>(ptr)->trigger_periodic_interrupt();
-}
-
-void device_execute_interface::trigger_periodic_interrupt()
+TIMER_CALLBACK_MEMBER(device_execute_interface::trigger_periodic_interrupt)
 {
 	// bail if there is no routine
 	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE | SUSPEND_REASON_CLOCK))
@@ -781,7 +774,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 	if (event_index >= ARRAY_LENGTH(m_queue))
 	{
 		m_qindex--;
-		empty_event_queue();
+		empty_event_queue(nullptr,0);
 		event_index = m_qindex++;
 		m_execute->device().logerror("Exceeded pending input line event queue on device '%s'!\n", m_execute->device().tag());
 	}
@@ -795,7 +788,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 
 		// if this is the first one, set the timer
 		if (event_index == 0)
-			m_execute->scheduler().synchronize(FUNC(static_empty_event_queue), 0, (void *)this);
+			m_execute->scheduler().synchronize(timer_expired_delegate(FUNC(device_execute_interface::device_input::empty_event_queue),this), 0, this);
 	}
 }
 
@@ -804,12 +797,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 //  empty_event_queue - empty our event queue
 //-------------------------------------------------
 
-TIMER_CALLBACK( device_execute_interface::device_input::static_empty_event_queue )
-{
-	reinterpret_cast<device_input *>(ptr)->empty_event_queue();
-}
-
-void device_execute_interface::device_input::empty_event_queue()
+TIMER_CALLBACK_MEMBER(device_execute_interface::device_input::empty_event_queue)
 {
 if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_execute->device().tag(), m_linenum, m_qindex);
 	// loop over all events

@@ -1343,7 +1343,7 @@ void mcs51_cpu_device::i8051_set_serial_rx_callback(read8_delegate rx_func)
 
 #define OPHANDLER( _name ) void mcs51_cpu_device::_name (UINT8 r)
 
-#include "mcs51ops.inc"
+#include "mcs51ops.hxx"
 
 
 void mcs51_cpu_device::execute_op(UINT8 op)
@@ -2218,7 +2218,7 @@ void mcs51_cpu_device::state_string_export(const device_state_entry &entry, std:
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str,"%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				PSW & 0x80 ? 'C':'.',
 				PSW & 0x40 ? 'A':'.',
 				PSW & 0x20 ? 'F':'.',

@@ -66,6 +66,8 @@ Sega System Multi32 Comm PCB 837-8792-91
         15033.17  OutRunners, Stadium Cross
 */
 
+#include "emu.h"
+#include "emuopts.h"
 #include "machine/s32comm.h"
 
 //#define __S32COMM_VERBOSE__

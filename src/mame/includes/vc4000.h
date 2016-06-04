@@ -11,7 +11,7 @@
 #define VC4000_H_
 
 #include "emu.h"
-#include "audio/vc4000snd.h"
+#include "audio/vc4000.h"
 #include "cpu/s2650/s2650.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"

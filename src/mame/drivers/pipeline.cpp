@@ -369,7 +369,7 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pipeline_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 7372800/2)
-	MCFG_CPU_CONFIG(daisy_chain_sound)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(cpu1_mem)
 	MCFG_CPU_IO_MAP(sound_port)
 

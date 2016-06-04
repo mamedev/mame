@@ -10,14 +10,6 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_START(nicRSFF)
-{
-	register_input("S", m_S);
-	register_input("R", m_R);
-	register_output("Q", m_Q);
-	register_output("QQ", m_QQ);
-}
-
 NETLIB_RESET(nicRSFF)
 {
 	m_Q.initial(0);
@@ -38,25 +30,9 @@ NETLIB_UPDATE(nicRSFF)
 	}
 }
 
-NETLIB_START(nicDelay)
-{
-	register_input("1", m_I);
-	register_output("2", m_Q);
-
-	register_param("L_TO_H", m_L_to_H, 10);
-	register_param("H_TO_L", m_H_to_L, 10);
-
-	save(NLNAME(m_last));
-
-}
-
 NETLIB_RESET(nicDelay)
 {
 	m_Q.initial(0);
-}
-
-NETLIB_UPDATE_PARAM(nicDelay)
-{
 }
 
 NETLIB_UPDATE(nicDelay)

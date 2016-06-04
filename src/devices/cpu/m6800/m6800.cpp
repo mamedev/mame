@@ -838,10 +838,10 @@ void m6800_cpu_device::write_port2()
 }
 
 /* include the opcode prototypes and function pointer tables */
-#include "6800tbl.inc"
+#include "6800tbl.hxx"
 
 /* include the opcode functions */
-#include "6800ops.inc"
+#include "6800ops.hxx"
 
 int m6800_cpu_device::m6800_rx()
 {
@@ -1145,7 +1145,7 @@ void m6800_cpu_device::state_string_export(const device_state_entry &entry, std:
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				m_cc & 0x80 ? '?':'.',
 				m_cc & 0x40 ? '?':'.',
 				m_cc & 0x20 ? 'H':'.',

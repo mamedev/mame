@@ -71,12 +71,13 @@ enum
 //  MACROS
 //**************************************************************************
 
+#define TIMER_CALLBACK(name)            void name(running_machine &machine, void *ptr, int param)
+#define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, INT32 param)
+
 // IRQ callback to be called by device implementations when an IRQ is actually taken
-#define IRQ_CALLBACK(func)              int func(device_t *device, int irqline)
 #define IRQ_CALLBACK_MEMBER(func)       int func(device_t &device, int irqline)
 
 // interrupt generator callback called as a VBLANK or periodic interrupt
-#define INTERRUPT_GEN(func)             void func(device_t *device)
 #define INTERRUPT_GEN_MEMBER(func)      void func(device_t &device)
 
 
@@ -88,21 +89,21 @@ enum
 #define MCFG_DEVICE_DISABLE() \
 	device_execute_interface::static_set_disable(*device);
 #define MCFG_DEVICE_VBLANK_INT_DRIVER(_tag, _class, _func) \
-	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0), _tag);
+	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr), _tag);
 #define MCFG_DEVICE_VBLANK_INT_DEVICE(_tag, _devtag, _class, _func) \
-	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)0), _tag);
+	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr), _tag);
 #define MCFG_DEVICE_VBLANK_INT_REMOVE()  \
-	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(), NULL);
+	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(), nullptr);
 #define MCFG_DEVICE_PERIODIC_INT_DRIVER(_class, _func, _rate) \
-	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0), attotime::from_hz(_rate));
+	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr), attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_DEVICE(_devtag, _class, _func, _rate) \
-	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)0), attotime::from_hz(_rate));
+	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr), attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_REMOVE()  \
 	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(), attotime());
 #define MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(_class, _func) \
-	device_execute_interface::static_set_irq_acknowledge_callback(*device, device_irq_acknowledge_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0));
+	device_execute_interface::static_set_irq_acknowledge_callback(*device, device_irq_acknowledge_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr));
 #define MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(_devtag, _class, _func) \
-	device_execute_interface::static_set_irq_acknowledge_callback(*device, device_irq_acknowledge_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)0));
+	device_execute_interface::static_set_irq_acknowledge_callback(*device, device_irq_acknowledge_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)nullptr));
 #define MCFG_DEVICE_IRQ_ACKNOWLEDGE_REMOVE()  \
 	device_execute_interface::static_set_irq_acknowledge_callback(*device, device_irq_acknowledge_delegate());
 
@@ -246,8 +247,7 @@ protected:
 		int             m_qindex;           // index within the queue
 
 	private:
-		static void static_empty_event_queue(running_machine &machine, void *ptr, int param);
-		void empty_event_queue();
+		TIMER_CALLBACK_MEMBER(empty_event_queue);
 	};
 
 	// scheduler
@@ -292,12 +292,11 @@ protected:
 
 private:
 	// callbacks
-	static void static_timed_trigger_callback(running_machine &machine, void *ptr, int param);
+	TIMER_CALLBACK_MEMBER(timed_trigger_callback);
 
 	void on_vblank(screen_device &screen, bool vblank_state);
 
-	static void static_trigger_periodic_interrupt(running_machine &machine, void *ptr, int param);
-	void trigger_periodic_interrupt();
+	TIMER_CALLBACK_MEMBER(trigger_periodic_interrupt);
 	void suspend_resume_changed();
 
 	attoseconds_t minimum_quantum() const;

@@ -317,6 +317,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
 #include "machine/v3021.h"
@@ -333,12 +334,14 @@ public:
 	fortecar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_vram(*this, "vram"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_shared_ptr<UINT8> m_vram;
 	DECLARE_WRITE8_MEMBER(ppi0_portc_w);
 	DECLARE_READ8_MEMBER(ppi0_portc_r);
@@ -508,7 +511,7 @@ Seems to work properly, but must be checked closely...
 */
 	if (((data >> 7) & 0x01) == 0)      /* check for bit7 */
 	{
-		machine().watchdog_reset();
+		m_watchdog->watchdog_reset();
 	}
 
 //  logerror("AY port B write %02x\n",data);
@@ -640,6 +643,8 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_CPU_PROGRAM_MAP(fortecar_map)
 	MCFG_CPU_IO_MAP(fortecar_ports)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fortecar_state,  nmi_line_pulse)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))   /* guess */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

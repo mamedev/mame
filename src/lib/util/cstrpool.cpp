@@ -32,7 +32,7 @@ const_string_pool::const_string_pool()
 
 const char *const_string_pool::add(const char *string)
 {
-	// if NULL or a small number (for some hash strings), just return as-is
+	// if nullptr or a small number (for some hash strings), just return as-is
 	if (FPTR(string) < 0x100)
 		return string;
 
@@ -58,7 +58,7 @@ const char *const_string_pool::add(const char *string)
 
 bool const_string_pool::contains(const char *string)
 {
-	// if NULL or a small number (for some hash strings), then yes, effectively
+	// if nullptr or a small number (for some hash strings), then yes, effectively
 	if (FPTR(string) < 0x100)
 		return true;
 
@@ -102,7 +102,7 @@ const char *const_string_pool::pool_chunk::add(const char *string)
 	int bytes = strlen(string) + 1;
 	assert(bytes < POOL_SIZE);
 
-	// if too big, return NULL
+	// if too big, return nullptr
 	if (m_used + bytes > POOL_SIZE)
 		return nullptr;
 

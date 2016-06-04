@@ -130,7 +130,7 @@ void ssem_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -154,7 +154,7 @@ void ssem_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c", m_halt ? 'H' : '.');
+			str = string_format("%c", m_halt ? 'H' : '.');
 			break;
 	}
 }

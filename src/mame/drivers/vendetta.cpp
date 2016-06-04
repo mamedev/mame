@@ -93,6 +93,7 @@
 
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
 #include "includes/konamipt.h"
@@ -230,7 +231,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x5fe4, 0x5fe4) AM_READWRITE(z80_irq_r, z80_irq_w)
 	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write)
 	AM_RANGE(0x5fe8, 0x5fe9) AM_DEVREAD("k053246", k053247_device, k053246_r)
-	AM_RANGE(0x5fea, 0x5fea) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x5fea, 0x5fea) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank3")
 	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK("bank2")
@@ -447,6 +448,8 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.17) /* measured on PCB */
@@ -460,16 +463,13 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k052109", K052109, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(vendetta_state, vendetta_tile_callback)
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(vendetta_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, 53, 6)
-	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, 6)
 	MCFG_K053246_PALETTE("palette")
 
 	MCFG_K053251_ADD("k053251")
@@ -507,7 +507,7 @@ static MACHINE_CONFIG_DERIVED( esckids, vendetta )
 	MCFG_K052109_CB(vendetta_state, esckids_tile_callback)
 
 	MCFG_DEVICE_MODIFY("k053246")
-	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, 101, 6)
+	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 101, 6)
 
 	MCFG_DEVICE_ADD("k053252", K053252, 6000000)
 	MCFG_K053252_OFFSETS(12*8, 1*8)

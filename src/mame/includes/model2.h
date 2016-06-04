@@ -293,56 +293,56 @@ public:
 	/* checker = 0, textured = 0, transparent = 0 */
 	#define MODEL2_FUNC 0
 	#define MODEL2_FUNC_NAME    model2_3d_render_0
-	#include "video/model2rd.inc"
+	#include "video/model2rd.hxx"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 0, textured = 0, translucent = 1 */
 	#define MODEL2_FUNC 1
 	#define MODEL2_FUNC_NAME    model2_3d_render_1
-	#include "video/model2rd.inc"
+	#include "video/model2rd.hxx"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 0, textured = 1, translucent = 0 */
 	#define MODEL2_FUNC 2
 	#define MODEL2_FUNC_NAME    model2_3d_render_2
-	#include "video/model2rd.inc"
+	#include "video/model2rd.hxx"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 0, textured = 1, translucent = 1 */
 	#define MODEL2_FUNC 3
 	#define MODEL2_FUNC_NAME    model2_3d_render_3
-	#include "video/model2rd.inc"
+	#include "video/model2rd.hxx"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 1, textured = 0, translucent = 0 */
 	#define MODEL2_FUNC 4
 	#define MODEL2_FUNC_NAME    model2_3d_render_4
-	#include "video/model2rd.inc"
+	#include "video/model2rd.hxx"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 1, textured = 0, translucent = 1 */
 	#define MODEL2_FUNC 5
 	#define MODEL2_FUNC_NAME    model2_3d_render_5
-	#include "video/model2rd.inc"
+	#include "video/model2rd.hxx"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 1, textured = 1, translucent = 0 */
 	#define MODEL2_FUNC 6
 	#define MODEL2_FUNC_NAME    model2_3d_render_6
-	#include "video/model2rd.inc"
+	#include "video/model2rd.hxx"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 1, textured = 1, translucent = 1 */
 	#define MODEL2_FUNC 7
 	#define MODEL2_FUNC_NAME    model2_3d_render_7
-	#include "video/model2rd.inc"
+	#include "video/model2rd.hxx"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 

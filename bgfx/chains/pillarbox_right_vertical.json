@@ -1,0 +1,103 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  pillarbox_right_vertical.json: Fills in the right
+//    portion of a pillarbox when displaying 4:3 content
+//    on a 16:9 screen.
+//
+//============================================================
+{
+	"name": "Vertical Pillarbox, Right",
+	"author": "Ryan Holtz",
+	
+	"sliders": [
+		{ "type": "float", "name": "saturation", "text": "Saturation", "default": 0.25, "max": 1.00, "min": 0.00, "step": 0.01, "format": "%1.2f", "screen": "raster" }
+	],
+	
+	"targets": [
+		{
+			"name": "guest",
+			"mode": "guest",
+			"bilinear": true,
+			"doublebuffer": true
+		},
+		{
+			"name": "internal",
+			"mode": "native",
+			"bilinear": true,
+			"doublebuffer": true
+		}
+	],
+	
+	"passes": [
+		{	"effect": "misc/blit",
+			"name": "Blit to scalable target",
+			"input": [
+				{ "sampler": "s_tex", "target": "screen" }
+			],
+			"output": "guest"
+		},
+		{	"effect": "pillarbox_right_vertical/gaussian",
+			"name": "Gaussian Blur 1, Horizontal",
+			"uniforms": [
+				{ "uniform": "u_dimension", "value": [ 1.0, 0.0 ] }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "guest" }
+			],
+			"output": "internal"
+		},
+		{	"effect": "pillarbox_right_vertical/gaussian",
+			"name": "Gaussian Blur 1, Vertical",
+			"uniforms": [
+				{ "uniform": "u_dimension", "value": [ 0.0, 1.0 ] }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "internal"
+		},
+		{	"effect": "pillarbox_right_vertical/gaussian",
+			"name": "Gaussian Blur 2, Horizontal",
+			"uniforms": [
+				{ "uniform": "u_dimension", "value": [ 1.0, 0.0 ] }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "internal"
+		},
+		{	"effect": "pillarbox_right_vertical/gaussian",
+			"name": "Gaussian Blur 2, Vertical",
+			"uniforms": [
+				{ "uniform": "u_dimension", "value": [ 0.0, 1.0 ] }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "internal"
+		},
+		{
+			"effect": "misc/saturation",
+			"name": "Saturation Pass",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "name": "saturation", "value": 100 }
+			],
+			"uniforms": [
+				{ "uniform": "u_saturation", "slider": "saturation" }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "internal"
+		},
+		{	"effect": "misc/blit",
+			"name": "Final Blit",
+			"input": [
+				{ "sampler": "s_tex", "target": "internal" }
+			],
+			"output": "output"
+		}
+	]
+}

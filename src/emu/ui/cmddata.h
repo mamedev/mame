@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dankan1890
+// copyright-holders:Maurizio Petrarota
 /*********************************************************************
 
     ui/cmddata.h
@@ -143,10 +143,8 @@ static rgb_t color_table[] =
 	BUTTON_COLOR_SILVER  // 8 Player Lever
 };
 
-// for color glyph
 #define COLOR_BUTTONS   ARRAY_LENGTH(color_table)
 
-// Follow Varialbe Defined Arraies for Game Command Tag
 struct fix_command_t
 {
 	unsigned char   glyph_char;
@@ -398,7 +396,7 @@ static fix_strings_t convert_text[] =
 	{ "charge",  131 }, // Charge
 	{ "tap",     132 }, // Serious Tap
 	{ "button",  133 }, // Any Button
-	{ 0, 0 }    // end of array
+	{ nullptr, 0 }    // end of array
 };
 
 #endif /* __UI_CMDDATA_H__ */

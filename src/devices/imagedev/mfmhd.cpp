@@ -531,11 +531,8 @@ void mfm_harddisk_device::call_unload()
 		{
 			logerror("%s: MFM HD sector arrangement and recording specs have changed; updating CHD metadata\n", tag());
 			chd_file* chdfile = get_chd_file();
-			std::string metadata;
 
-			strprintf(metadata, MFMHD_REC_METADATA_FORMAT, params->interleave, params->cylskew, params->headskew, params->write_precomp_cylinder, params->reduced_wcurr_cylinder);
-
-			chd_error err = chdfile->write_metadata(MFM_HARD_DISK_METADATA_TAG, 0, metadata, 0);
+			chd_error err = chdfile->write_metadata(MFM_HARD_DISK_METADATA_TAG, 0, string_format(MFMHD_REC_METADATA_FORMAT, params->interleave, params->cylskew, params->headskew, params->write_precomp_cylinder, params->reduced_wcurr_cylinder), 0);
 			if (err != CHDERR_NONE)
 			{
 				logerror("%s: Failed to save MFM HD sector arrangement/recording specs to CHD\n", tag());
@@ -546,11 +543,8 @@ void mfm_harddisk_device::call_unload()
 		{
 			logerror("%s: MFM HD track gap specs have changed; updating CHD metadata\n", tag());
 			chd_file* chdfile = get_chd_file();
-			std::string metadata;
 
-			strprintf(metadata, MFMHD_GAP_METADATA_FORMAT, params->gap1, params->gap2, params->gap3, params->sync, params->headerlen, params->ecctype);
-
-			chd_error err = chdfile->write_metadata(MFM_HARD_DISK_METADATA_TAG, 1, metadata, 0);
+			chd_error err = chdfile->write_metadata(MFM_HARD_DISK_METADATA_TAG, 1, string_format(MFMHD_GAP_METADATA_FORMAT, params->gap1, params->gap2, params->gap3, params->sync, params->headerlen, params->ecctype), 0);
 			if (err != CHDERR_NONE)
 			{
 				logerror("%s: Failed to save MFM HD track gap specs to CHD\n", tag());

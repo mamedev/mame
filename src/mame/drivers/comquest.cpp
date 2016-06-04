@@ -210,8 +210,6 @@ void comquest_state::machine_reset()
 //  membank(1)->set_base(mem+0x00000);
 }
 
-static const UINT32 amask= 0xffff;
-
 
 static MACHINE_CONFIG_START( comquest, comquest_state )
 	/* basic machine hardware */
@@ -244,7 +242,6 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
 */
 
 	MCFG_CPU_PROGRAM_MAP(comquest_mem)
-	MCFG_CPU_CONFIG( amask )
 
 
 	/* video hardware */
@@ -257,7 +254,7 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", comquest )
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	/* sound hardware */

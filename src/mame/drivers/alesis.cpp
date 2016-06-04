@@ -346,12 +346,10 @@ void alesis_state::machine_reset()
 }
 
 
-static HD44780_PIXEL_UPDATE(sr16_pixel_update)
+HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 {
-	alesis_state *driv_state = device.machine().driver_data<alesis_state>();
-
 	if (line == 1 && pos >= 6 && pos < 8)  // last 2 characters of the second line are used to control the LCD symbols
-		driv_state->update_lcd_symbols(bitmap, pos, y, x, state);
+		update_lcd_symbols(bitmap, pos, y, x, state);
 	else if (pos < 8)
 		bitmap.pix16(line*9 + y, pos*6 + x) = state;
 }
@@ -372,7 +370,7 @@ static MACHINE_CONFIG_START( hr16, alesis_state )
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_PALETTE_INIT_OWNER(alesis_state, alesis)
 
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -402,7 +400,7 @@ static MACHINE_CONFIG_DERIVED( sr16, hr16 )
 
 	MCFG_DEVICE_MODIFY("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 8)
-	MCFG_HD44780_PIXEL_UPDATE_CB(sr16_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(alesis_state, sr16_pixel_update)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mmt8, hr16 )

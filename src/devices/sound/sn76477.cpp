@@ -38,7 +38,7 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "sound/wavwrite.h"
+#include "wavwrite.h"
 #include "sn76477.h"
 
 

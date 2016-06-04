@@ -207,6 +207,8 @@ protected:
 	hle_transfer_state m_transfer;
 
 	int m_dram_in_mb;
+
+	optional_shared_ptr<UINT16> m_iram;
 };
 
 

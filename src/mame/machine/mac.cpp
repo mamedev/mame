@@ -118,9 +118,6 @@
 #define LOG_MEMORY      0
 #endif
 
-extern TIMER_CALLBACK(mac_adb_tick);    // macadb.c
-extern TIMER_CALLBACK(mac_pmu_tick);    // macadb.c
-
 static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 // returns non-zero if this Mac has ADB
@@ -537,7 +534,7 @@ READ32_MEMBER(mac_state::rom_switch_r)
 /*
     scan_keyboard()
 
-    scan the keyboard, and returns key transition code (or NULL ($7B) if none)
+    scan the keyboard, and returns key transition code (or nullptr ($7B) if none)
 */
 #ifndef MAC_USE_EMULATED_KBD
 int mac_state::scan_keyboard()
@@ -640,7 +637,7 @@ int mac_state::scan_keyboard()
 		}
 	}
 
-	return 0x7B;    /* return NULL */
+	return 0x7B;    /* return nullptr */
 }
 
 /*
@@ -746,7 +743,7 @@ TIMER_CALLBACK_MEMBER(mac_state::inquiry_timeout_func)
 {
 	if (LOG_KEYBOARD)
 		logerror("keyboard enquiry timeout\n");
-	kbd_shift_out(0x7B); /* always send NULL */
+	kbd_shift_out(0x7B); /* always send nullptr */
 }
 
 /*
@@ -757,7 +754,7 @@ void mac_state::keyboard_receive(int val)
 	switch (val)
 	{
 	case 0x10:
-		/* inquiry - returns key transition code, or NULL ($7B) if time out (1/4s) */
+		/* inquiry - returns key transition code, or nullptr ($7B) if time out (1/4s) */
 		if (LOG_KEYBOARD)
 			logerror("keyboard command : inquiry\n");
 
@@ -766,7 +763,7 @@ void mac_state::keyboard_receive(int val)
 		break;
 
 	case 0x14:
-		/* instant - returns key transition code, or NULL ($7B) */
+		/* instant - returns key transition code, or nullptr ($7B) */
 		if (LOG_KEYBOARD)
 			logerror("keyboard command : instant\n");
 
@@ -1837,13 +1834,13 @@ void mac_state::machine_start()
 {
 	if (has_adb())
 	{
-		this->m_adb_timer = machine().scheduler().timer_alloc(FUNC(mac_adb_tick));
+		this->m_adb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_adb_tick),this));
 		this->m_adb_timer->adjust(attotime::never);
 
 		// also allocate PMU timer
 		if (ADB_IS_PM_CLASS)
 		{
-			m_pmu_send_timer = machine().scheduler().timer_alloc(FUNC(mac_pmu_tick));
+			m_pmu_send_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_pmu_tick),this));
 			this->m_adb_timer->adjust(attotime::never);
 			m_pmu_int_status = 0;
 		}
@@ -3238,7 +3235,7 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 		"SCSIComplete", /* $04 */
 		"SCSIRead",     /* $05 */
 		"SCSIWrite",    /* $06 */
-		NULL,           /* $07 */
+		nullptr,           /* $07 */
 		"SCSIRBlind",   /* $08 */
 		"SCSIWBlind",   /* $09 */
 		"SCSIStat",     /* $0A */

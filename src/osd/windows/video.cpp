@@ -20,8 +20,9 @@
 #include "winmain.h"
 #include "video.h"
 #include "window.h"
-#include "input.h"
 #include "strconv.h"
+
+#include "modules/osdwindow.h"
 
 //============================================================
 //  CONSTANTS
@@ -35,7 +36,7 @@
 osd_video_config video_config;
 
 // monitor info
-osd_monitor_info *osd_monitor_info::list = NULL;
+osd_monitor_info *osd_monitor_info::list = nullptr;
 
 
 //============================================================
@@ -49,8 +50,6 @@ osd_monitor_info *osd_monitor_info::list = NULL;
 
 static void init_monitors(void);
 
-static void check_osd_inputs(running_machine &machine);
-
 static float get_aspect(const char *defdata, const char *data, int report_error);
 static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error);
 
@@ -60,12 +59,10 @@ static void get_resolution(const char *defdata, const char *data, osd_window_con
 //============================================================
 
 // FIXME: Temporary workaround
-static osd_window_config   windows[MAX_WINDOWS];        // configuration data per-window
+static osd_window_config   windows[MAX_VIDEO_WINDOWS];        // configuration data per-window
 
 bool windows_osd_interface::video_init()
 {
-	int index;
-
 	// extract data from the options
 	extract_video_config();
 
@@ -77,14 +74,16 @@ bool windows_osd_interface::video_init()
 
 	// create the windows
 	windows_options &options = downcast<windows_options &>(machine().options());
-	for (index = 0; index < video_config.numscreens; index++)
+	for (int index = 0; index < video_config.numscreens; index++)
+	{
 		win_window_info::create(machine(), index, osd_monitor_info::pick_monitor(options, index), &windows[index]);
+	}
+
 	if (video_config.mode != VIDEO_MODE_NONE)
-		SetForegroundWindow(win_window_list->m_hwnd);
+		SetForegroundWindow(win_window_list.front()->platform_window<HWND>());
 
 	return true;
 }
-
 
 //============================================================
 //  video_exit
@@ -95,7 +94,7 @@ void windows_osd_interface::video_exit()
 	window_exit();
 
 	// free all of our monitor information
-	while (osd_monitor_info::list != NULL)
+	while (osd_monitor_info::list != nullptr)
 	{
 		osd_monitor_info *temp = osd_monitor_info::list;
 		osd_monitor_info::list = temp->m_next;
@@ -142,20 +141,6 @@ void win_monitor_info::refresh()
 
 
 //============================================================
-//  sdlvideo_monitor_get_aspect
-//============================================================
-
-float osd_monitor_info::aspect()
-{
-	// FIXME: returning 0 looks odd, video_config is bad
-	if (video_config.keepaspect)
-	{
-		return m_aspect / ((float)m_pos_size.width() / (float)m_pos_size.height());
-	}
-	return 0.0f;
-}
-
-//============================================================
 //  winvideo_monitor_from_handle
 //============================================================
 
@@ -164,10 +149,10 @@ osd_monitor_info *win_monitor_info::monitor_from_handle(HMONITOR hmonitor)
 	osd_monitor_info *monitor;
 
 	// find the matching monitor
-	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->m_next)
+	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->m_next)
 		if (*((HMONITOR *)monitor->oshandle()) == hmonitor)
 			return monitor;
-	return NULL;
+	return nullptr;
 }
 
 
@@ -178,22 +163,21 @@ osd_monitor_info *win_monitor_info::monitor_from_handle(HMONITOR hmonitor)
 
 void windows_osd_interface::update(bool skip_redraw)
 {
-	// ping the watchdog on each update
-	winmain_watchdog_ping();
+	osd_common_t::update(skip_redraw);
 
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
-		for (win_window_info *window = win_window_list; window != NULL; window = window->m_next)
+		for (auto window : win_window_list)
 			window->update();
 //      profiler_mark(PROFILER_END);
 	}
 
 	// poll the joystick values here
 	winwindow_process_events(machine(), TRUE, FALSE);
-	wininput_poll(machine());
-	check_osd_inputs(machine());
+	poll_input(machine());
+	check_osd_inputs();
 	// if we're running, disable some parts of the debugger
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugger_update();
@@ -247,14 +231,14 @@ static void init_monitors(void)
 	osd_monitor_info **tailptr;
 
 	// make a list of monitors
-	osd_monitor_info::list = NULL;
+	osd_monitor_info::list = nullptr;
 	tailptr = &osd_monitor_info::list;
-	EnumDisplayMonitors(NULL, NULL, win_monitor_info::monitor_enum_callback, (LPARAM)&tailptr);
+	EnumDisplayMonitors(nullptr, nullptr, win_monitor_info::monitor_enum_callback, (LPARAM)&tailptr);
 
 	// if we're verbose, print the list of monitors
 	{
 		osd_monitor_info *monitor;
-		for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->m_next)
+		for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->m_next)
 		{
 			osd_printf_verbose("Video: Monitor %p = \"%s\" %s\n", monitor->oshandle(), monitor->devicename(), monitor->is_primary() ? "(primary)" : "");
 		}
@@ -266,8 +250,9 @@ static void init_monitors(void)
 //  pick_monitor
 //============================================================
 
-osd_monitor_info *osd_monitor_info::pick_monitor(windows_options &options, int index)
+osd_monitor_info *osd_monitor_info::pick_monitor(osd_options &osdopts, int index)
 {
+	windows_options &options = reinterpret_cast<windows_options &>(osdopts);
 	osd_monitor_info *monitor;
 	const char *scrname, *scrname2;
 	int moncount = 0;
@@ -285,9 +270,9 @@ osd_monitor_info *osd_monitor_info::pick_monitor(windows_options &options, int i
 	aspect = get_aspect(options.aspect(), options.aspect(index), TRUE);
 
 	// look for a match in the name first
-	if (scrname != NULL && (scrname[0] != 0))
+	if (scrname != nullptr && (scrname[0] != 0))
 	{
-		for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
+		for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
 		{
 			moncount++;
 			if (strcmp(scrname, monitor->devicename()) == 0)
@@ -297,12 +282,12 @@ osd_monitor_info *osd_monitor_info::pick_monitor(windows_options &options, int i
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
-	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
+	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
 		if (index-- == 0)
 			goto finishit;
 
 	// return the primary just in case all else fails
-	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
+	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
 		if (monitor->is_primary())
 			goto finishit;
 
@@ -320,22 +305,22 @@ finishit:
 //  check_osd_inputs
 //============================================================
 
-static void check_osd_inputs(running_machine &machine)
+void windows_osd_interface::check_osd_inputs()
 {
 	// check for toggling fullscreen mode
-	if (machine.ui_input().pressed(IPT_OSD_1))
+	if (machine().ui_input().pressed(IPT_OSD_1))
 		winwindow_toggle_full_screen();
 
 	// check for taking fullscreen snap
-	if (machine.ui_input().pressed(IPT_OSD_2))
+	if (machine().ui_input().pressed(IPT_OSD_2))
 		winwindow_take_snap();
 
 	// check for taking fullscreen video
-	if (machine.ui_input().pressed(IPT_OSD_3))
+	if (machine().ui_input().pressed(IPT_OSD_3))
 		winwindow_take_video();
 
 	// check for taking fullscreen video
-	if (machine.ui_input().pressed(IPT_OSD_4))
+	if (machine().ui_input().pressed(IPT_OSD_4))
 		winwindow_toggle_fsfx();
 }
 
@@ -373,18 +358,14 @@ void windows_osd_interface::extract_video_config()
 		video_config.mode = VIDEO_MODE_D3D;
 	else if (strcmp(stemp, "auto") == 0)
 		video_config.mode = VIDEO_MODE_D3D;
-	else if (strcmp(stemp, "ddraw") == 0)
-		video_config.mode = VIDEO_MODE_DDRAW;
 	else if (strcmp(stemp, "gdi") == 0)
 		video_config.mode = VIDEO_MODE_GDI;
-#if defined (USE_BGFX)
 	else if (strcmp(stemp, "bgfx") == 0)
 		video_config.mode = VIDEO_MODE_BGFX;
-#endif
 	else if (strcmp(stemp, "none") == 0)
 	{
 		video_config.mode = VIDEO_MODE_NONE;
-		if (options().seconds_to_run() == 0)
+		if (!emulator_info::standalone() && options().seconds_to_run() == 0)
 			osd_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
 #if (USE_OPENGL)
@@ -400,9 +381,6 @@ void windows_osd_interface::extract_video_config()
 	video_config.syncrefresh   = options().sync_refresh();
 	video_config.triplebuf     = options().triple_buffer();
 	video_config.switchres     = options().switch_res();
-
-	// ddraw options: extract the data
-	video_config.hwstretch     = options().hwstretch();
 
 	if (video_config.prescale < 1 || video_config.prescale > 3)
 	{
@@ -433,7 +411,7 @@ void windows_osd_interface::extract_video_config()
 					strcpy(video_config.glsl_shader_mamebm[i], stemp);
 					video_config.glsl_shader_mamebm_num++;
 				} else {
-					video_config.glsl_shader_mamebm[i] = NULL;
+					video_config.glsl_shader_mamebm[i] = nullptr;
 				}
 			}
 
@@ -448,7 +426,7 @@ void windows_osd_interface::extract_video_config()
 					strcpy(video_config.glsl_shader_scrn[i], stemp);
 					video_config.glsl_shader_scrn_num++;
 				} else {
-					video_config.glsl_shader_scrn[i] = NULL;
+					video_config.glsl_shader_scrn[i] = nullptr;
 				}
 			}
 		} else {
@@ -457,12 +435,12 @@ void windows_osd_interface::extract_video_config()
 			video_config.glsl_shader_mamebm_num=0;
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
-				video_config.glsl_shader_mamebm[i] = NULL;
+				video_config.glsl_shader_mamebm[i] = nullptr;
 			}
 			video_config.glsl_shader_scrn_num=0;
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
-				video_config.glsl_shader_scrn[i] = NULL;
+				video_config.glsl_shader_scrn[i] = nullptr;
 			}
 		}
 

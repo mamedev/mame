@@ -812,7 +812,6 @@ void unsp_device::execute_set_input(int irqline, int state)
 
 	if(!state)
 	{
-		logerror("clearing irq %d (%04x, %04x)\n", irqline, m_sirq, m_curirq);
 		return;
 	}
 
@@ -840,7 +839,6 @@ void unsp_device::execute_set_input(int irqline, int state)
 			}
 			m_irq |= 2;
 			m_curirq |= (1 << irqline);
-			logerror("taking irq %d (%04x, %04x)\n", irqline, m_sirq, m_curirq);
 			irq_vector = 0xfff8 + (irqline - UNSP_IRQ0_LINE);
 			break;
 		case UNSP_FIQ_LINE:
@@ -852,7 +850,6 @@ void unsp_device::execute_set_input(int irqline, int state)
 			}
 			m_fiq |= 2;
 			m_curirq |= (1 << irqline);
-			logerror("taking fiq %d (%04x, %04x)\n", irqline, m_sirq, m_curirq);
 			irq_vector = 0xfff6;
 			break;
 		case UNSP_BRK_LINE:

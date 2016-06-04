@@ -39,9 +39,11 @@ public:
 	// getters
 	int errors() const { return m_errors; }
 	int warnings() const { return m_warnings; }
+	int validate_all() const { return m_validate_all; }
 
 	// setter
 	void set_verbose(bool verbose) { m_print_verbose = verbose; }
+	void set_validate_all(bool all) { m_validate_all = all; }
 
 	// operations
 	void check_driver(const game_driver &driver);
@@ -110,7 +112,7 @@ private:
 	const char *            m_current_ioport;
 	int_map                 m_region_map;
 	std::unordered_set<std::string>   m_already_checked;
-
+	bool                    m_validate_all;
 };
 
 #endif

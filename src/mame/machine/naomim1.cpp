@@ -13,15 +13,16 @@ DEVICE_ADDRESS_MAP_START(submap, 16, naomi_m1_board)
 ADDRESS_MAP_END
 
 naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: naomi_board(mconfig, NAOMI_M1_BOARD, "Sega NAOMI M1 Board", tag, owner, clock, "naomi_m1_board", __FILE__)
+	: naomi_board(mconfig, NAOMI_M1_BOARD, "Sega NAOMI M1 Board", tag, owner, clock, "naomi_m1_board", __FILE__),
+		m_region(*this, DEVICE_SELF)
 {
 }
 
 READ16_MEMBER(naomi_m1_board::actel_id_r)
 {
-	if (rombdid_tag && memregion(rombdid_tag) != nullptr)
+	if (rombdid_tag && owner()->memregion(rombdid_tag) != nullptr)
 	{
-		const UINT8 *bdid = memregion(rombdid_tag)->base();
+		const UINT8 *bdid = owner()->memregion(rombdid_tag)->base();
 		return bdid[0] | (bdid[1] << 8);
 	}
 

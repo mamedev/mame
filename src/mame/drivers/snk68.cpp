@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 //  AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(pow_fg_videoram_r, pow_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram")   // 8-bit
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
+	AM_RANGE(0x200000, 0x207fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0f8000, 0x0f8001) AM_READ8(soundlatch2_byte_r, 0xff00)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
+	AM_RANGE(0x100000, 0x107fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram") /* Mirror is used by Ikari 3 */
 	AM_RANGE(0x300000, 0x33ffff) AM_ROM AM_REGION("user1", 0) /* Extra code bank */
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -561,6 +561,33 @@ GFXDECODE_END
 
 /******************************************************************************/
 
+// pow has 0x4000 tiles and independent x/y flipping
+// the other games have > 0x4000 tiles and flipping in only one direction
+// (globally selected)
+void snk68_state::tile_callback_pow(int &tile, int& fx, int& fy, int& region)
+{
+	fx = tile & 0x4000;
+	fy = tile & 0x8000;
+	tile &= 0x3fff;
+	region = 1;
+}
+
+void snk68_state::tile_callback_notpow(int &tile, int& fx, int& fy, int& region)
+{
+	if (m_sprite_flip_axis)
+	{
+		fx = 0;
+		fy = tile & 0x8000;
+	}
+	else
+	{
+		fx = tile & 0x8000;
+		fy = 0;
+	}
+	tile &= 0x7fff;
+	region = 1;
+}
+
 static MACHINE_CONFIG_START( pow, snk68_state )
 
 	/* basic machine hardware */
@@ -588,6 +615,10 @@ static MACHINE_CONFIG_START( pow, snk68_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_DEVICE_ADD("sprites", SNK68_SPR, 0)
+	MCFG_SNK68_SPR_GFXDECODE("gfxdecode")
+	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_pow )
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2) /* verified on pcb  */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -603,6 +634,9 @@ static MACHINE_CONFIG_DERIVED( searchar, pow )
 	MCFG_CPU_PROGRAM_MAP(searchar_map)
 
 	MCFG_VIDEO_START_OVERRIDE(snk68_state,searchar)
+
+	MCFG_DEVICE_MODIFY("sprites")
+	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_notpow )
 MACHINE_CONFIG_END
 
 

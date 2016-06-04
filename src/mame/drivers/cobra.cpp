@@ -156,7 +156,7 @@
         0x000ac:        Viewport center Y
 
         0x00114:        xxxxxxxx xxxxxxxx -------- --------             Framebuffer pixel read line count
-		                -------- -------- xxxxxxxx xxxxxxxx             Framebuffer pixel read pixel count
+                        -------- -------- xxxxxxxx xxxxxxxx             Framebuffer pixel read pixel count
 
         0x00118:        xxxxxxxx xxxxxxxx -------- --------             Framebuffer pixel read X pos
                         -------- -------- xxxxxxxx xxxxxxxx             Framebuffer pixel read Y pos
@@ -1968,7 +1968,7 @@ WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
 
 	/*
 	static FILE *out;
-	if (out == NULL)
+	if (out == nullptr)
 	    out = fopen("sound.bin", "wb");
 
 	fputc((data >> 24) & 0xff, out);
@@ -2668,7 +2668,7 @@ void cobra_renderer::gfx_fifo_exec()
 						case 0x0e0000:      buffer = &m_overlay->pix32(y+i); break;
 						case 0x000800:      buffer = &m_zbuffer->pix32(y+i); break;
 						case 0x000200:      buffer = &m_stencil->pix32(y+i); break;
-	
+
 						default:
 						{
 							fatalerror("gfxfifo_exec: fb read from buffer %08X!\n", m_gfx_gram[0x80100/4]);
@@ -3302,15 +3302,11 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_M48T58_ADD("m48t58")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_DEVICE_ADD("k001604", K001604, 0)     // on the LAN board in Racing Jam DX
-	MCFG_K001604_GFX_INDEX1(0)
-	MCFG_K001604_GFX_INDEX2(1)
 	MCFG_K001604_LAYER_SIZE(0)
 	MCFG_K001604_ROZ_SIZE(1)
 	MCFG_K001604_TXT_OFFSET(0)  // correct?
 	MCFG_K001604_ROZ_OFFSET(0)  // correct?
-	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("cobra_jvs_host", COBRA_JVS_HOST, 4000000)

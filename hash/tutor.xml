@@ -23,17 +23,17 @@ Japanese Releases - Pyuuta
 013E Mickey Athletic Land ~ ミッキー アスレチックランド [dumped]
 014E Pooyan ~ プーヤン [dumped]
 015E Jungler ~ ジャングラー [dumped]
-016E Guttang Gottong ~ ガッタンゴットン [dumped]]
+016E Guttang Gottong ~ ガッタンゴットン [dumped]
 017E Maze Patrol ~ メイズ パトロール    [dumped]
 018E Tron ~ トロン [dumped]
 019E Mr. Do! ~ Mr.DO!    [dumped]
 020E Bermuda Triangle ~ バミューダ・ トライアングル  [dumped]
 021E 4-nin Mahjan ~ 四人麻雀 [dumped]
 022E Triplecommand ~ トリプルコマンド   [dumped]
-023E SuperBike ~ スーパーバイク
+023E SuperBike ~ スーパーバイク [dumped]
 024E Rescue Copter [3D] ~ レスキュー コプター   [dumped]
 025E Baseball [3D] ~ ベースボール [dumped]
-026E Battlefighter [3D] ~ バトルファイター
+026E Battlefighter [3D] ~ バトルファイター [dumped]
 
 0XXE GajiGoji [Unreleased] ~ カジコジ
 0XXE Jack In The Box [Unreleased] ~ ジャック・イン・ ザ・ボックス
@@ -81,7 +81,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 <softwarelist name="tutor" description="Tomy Tutor &amp; Pyuuta cartridges">
 
 	<software name="4ninmj">
-		<description>4-nin Mahjan (Jpn)</description>
+		<description>4-nin Mahjan (Jpn, set 1)</description>
 		<year>1984</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="四人麻雀 "/>
@@ -93,8 +93,21 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
+	<software name="4ninmja" cloneof="4ninmj">
+		<description>4-nin Mahjan (Jpn, set 2)</description>
+		<year>1984</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="四人麻雀 "/>
+		<info name="serial" value="021E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="MahJongg(JP).BIN" size="0x4000" crc="127241ec" sha1="8b9ea7fc592e673e93cfae1bfc458bfab4a52600" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="baseball">
-		<description>Baseball (Jpn)</description>
+		<description>Baseball [3D] (Jpn)</description>
 		<year>1984</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ベースボール"/>
@@ -102,6 +115,19 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="baseball.bin" size="32768" crc="8f857d5f" sha1="2b612245777749e26d9c92ce7222d8db9582617f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlfght">
+		<description>Battle Fighter [3D] (Jpn)</description>
+		<year>1985</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="バトルファイター"/>
+		<info name="serial" value="026E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="Battlefighter(JP).BIN" size="0x8000" crc="e507480a" sha1="acb478e71f771854827217dd95472572759cb9d8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -382,6 +408,19 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="scramblej.bin" size="8192" crc="bd708ab4" sha1="9029d16c123e6d35a5f3ed4fbc9eefae8948215f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superbik">
+		<description>Super Bike (Jpn)</description>
+		<year>1984</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="スーパーバイク"/>
+		<info name="serial" value="023E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="SuperBike(JP).BIN" size="0x4000" crc="d66d2bc4" sha1="1941a4746b6ed0664dde0816966bc892d99691f6" offset="0" />
 			</dataarea>
 		</part>
 	</software>

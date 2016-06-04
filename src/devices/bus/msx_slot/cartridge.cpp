@@ -283,7 +283,7 @@ std::string msx_slot_cartridge_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "nomapper";
-		UINT32 length = core_fsize(m_file);
+		UINT32 length = m_file->size();
 		dynamic_buffer rom(length);
 		int type = NOMAPPER;
 
@@ -328,7 +328,7 @@ std::string msx_slot_cartridge_device::get_default_card_software()
 		if (type == NOMAPPER)
 		{
 			// Not identified through hashfile, try automatic detection
-			core_fread(m_file, &rom[0], length);
+			m_file->read(&rom[0], length);
 			type = get_cart_type(&rom[0], length);
 		}
 

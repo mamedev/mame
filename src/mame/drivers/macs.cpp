@@ -60,19 +60,24 @@ KISEKAE -- info
 #include "emu.h"
 #include "machine/st0016.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 class macs_state : public driver_device
 {
 public:
 	macs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_cart_bank(0),
 			m_ram2(*this, "ram2"),
-			m_maincpu(*this,"maincpu")
-
+			m_maincpu(*this,"maincpu"),
+			m_cart1(*this, "slot_a"),
+			m_cart2(*this, "slot_b")
 			{ }
 
 	UINT8 m_mux_data;
 	UINT8 m_rev;
+	UINT8 m_cart_bank;
 	std::unique_ptr<UINT8[]> m_ram1;
 	required_shared_ptr<UINT8> m_ram2;
 	DECLARE_WRITE8_MEMBER(rambank_w);
@@ -84,14 +89,16 @@ public:
 	DECLARE_DRIVER_INIT(kisekaem);
 	DECLARE_DRIVER_INIT(macs2);
 	DECLARE_MACHINE_RESET(macs);
-
+	DECLARE_MACHINE_START(macs);
+	ST0016_DMA_OFFS_CB(dma_offset);
+	
 	UINT32 screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	optional_device<st0016_cpu_device> m_maincpu;
+	optional_device<generic_slot_device> m_cart1;
+	optional_device<generic_slot_device> m_cart2;
 
 };
-
-
 
 
 
@@ -111,7 +118,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(macs_state::rambank_w)
 {
-	membank("bank3")->set_base(&m_ram1[0x10000+(data&1)*0x800] );
+	membank("bank3")->set_entry(2 + (data & 1));
 }
 
 READ8_MEMBER(macs_state::macs_input_r)
@@ -149,15 +156,11 @@ READ8_MEMBER(macs_state::macs_input_r)
 
 WRITE8_MEMBER(macs_state::macs_rom_bank_w)
 {
-	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000) + macs_cart_slot*0x400000 );
-
-//  m_st0016_rom_bank=data;
+	membank("bank1")->set_entry(m_cart_bank * 0x100 + data);
 }
 
 WRITE8_MEMBER(macs_state::macs_output_w)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-
 	switch(offset)
 	{
 		case 0:
@@ -169,16 +172,16 @@ WRITE8_MEMBER(macs_state::macs_output_w)
 
 		if(m_rev == 1)
 		{
-			/* FIXME: dunno if this RAM bank is right, DASM tracking made on the POST screens indicates that there's just one RAM bank,
-			          but then MACS2 games locks up. */
-			membank("bank3")->set_base(&m_ram1[((data&0x20)>>5)*0x1000+0x000] );
+			/* FIXME: dunno if this RAM bank is right, DASM tracking made on the POST
+			    screens indicates that there's just one RAM bank, but then MACS2 games
+			    locks up. */
+			membank("bank3")->set_entry(BIT(data, 5));
 
-			macs_cart_slot = (data & 0xc) >> 2;
-
-			membank("bank4")->set_base(&ROM[macs_cart_slot*0x400000] );
+			m_cart_bank = (data & 0xc) >> 2;
+			membank("bank4")->set_entry(m_cart_bank * 0x100);
 		}
 
-		membank("bank2")->set_base(&m_ram1[((data&0x20)>>5)*0x1000+0x800] );
+		membank("bank2")->set_entry(BIT(data, 5));
 		break;
 		case 2: m_mux_data = data; break;
 
@@ -200,11 +203,10 @@ static ADDRESS_MAP_START( macs_io, AS_IO, 8, macs_state )
 ADDRESS_MAP_END
 
 //static GFXDECODE_START( macs )
-//  GFXDECODE_ENTRY( NULL, 0, charlayout,      0, 16*4  )
+//  GFXDECODE_ENTRY( nullptr, 0, charlayout,      0, 16*4  )
 //GFXDECODE_END
 
 static INPUT_PORTS_START( macs_base )
-	/*0*/
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, "DSW0 - BIT 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -231,7 +233,6 @@ static INPUT_PORTS_START( macs_base )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/*1*/
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSW1 - BIT 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -258,7 +259,6 @@ static INPUT_PORTS_START( macs_base )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/*2*/
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "DSW2 - BIT 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -285,7 +285,6 @@ static INPUT_PORTS_START( macs_base )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/*3*/
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, "DSW3 - BIT 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -312,7 +311,7 @@ static INPUT_PORTS_START( macs_base )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/*4 - external (printer  in cultname)*/
+	// external (printer  in cultname)
 	PORT_START("DSW4")
 	PORT_DIPNAME( 0x01, 0x01, "DSW4 - BIT 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -339,9 +338,7 @@ static INPUT_PORTS_START( macs_base )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/*
-	Note: These could likely to be switches that are on the game board and not Dip Switches
-	*/
+	//Note: These could likely to be switches that are on the game board and not Dip Switches
 	PORT_START("SYS0")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Note In") PORT_CODE(KEYCODE_4_PAD)
@@ -357,7 +354,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( macs_m )
 	PORT_INCLUDE( macs_base )
 
-	/*MAHJONG PANEL*/
+	// MAHJONG PANEL
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
@@ -432,7 +429,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( macs_h )
 	PORT_INCLUDE( macs_base )
 
-	/*HANAFUDA PANEL*/
+	// HANAFUDA PANEL
 	// Also other inputs from the Mahjong panel are detected in Service Mode
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
@@ -484,15 +481,22 @@ UINT32 macs_state::screen_update_macs(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
+ST0016_DMA_OFFS_CB(macs_state::dma_offset)
+{
+	return m_cart_bank;
+}
+
 static MACHINE_CONFIG_START( macs, macs_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(macs_mem)
 	MCFG_CPU_IO_MAP(macs_io)
+	MCFG_ST0016_DMA_OFFS_CB(macs_state, dma_offset)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", macs_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", macs_state, irq0_line_hold)
 
-	MCFG_MACHINE_RESET_OVERRIDE(macs_state,macs)
+	MCFG_MACHINE_START_OVERRIDE(macs_state, macs)
+	MCFG_MACHINE_RESET_OVERRIDE(macs_state, macs)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -502,91 +506,94 @@ static MACHINE_CONFIG_START( macs, macs_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 128*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(macs_state, screen_update_macs)
 	MCFG_SCREEN_PALETTE("maincpu:palette")
+
+	MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT("slot_a", generic_plain_slot, "macs_cart", "rom")
+	MCFG_SET_IMAGE_LOADABLE(FALSE)
+	MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT("slot_b", generic_plain_slot, "macs_cart", "rom")
+	MCFG_SET_IMAGE_LOADABLE(FALSE)
+
 MACHINE_CONFIG_END
 
 
-
 #define MACS_BIOS \
-	ROM_REGION( 0x1000000, "user1", 0 ) \
+	ROM_REGION( 0x1000000, "bios", 0 ) \
 	ROM_LOAD16_BYTE( "macsos_l.u43", 0x00000, 0x80000, CRC(0b5aed5e) SHA1(042e705017ee34656e2c6af45825bb2dd3447747) ) \
 	ROM_LOAD16_BYTE( "macsos_h.u44", 0x00001, 0x80000, CRC(538b68e4) SHA1(a0534147791e94e726f49451d0e95671ae0a87d5) )
+
 #define MACS2_BIOS \
-	ROM_REGION( 0x1000000, "user1", 0 ) \
+	ROM_REGION( 0x1000000, "bios", 0 ) \
 	ROM_LOAD16_BYTE( "macs2os_l.bin", 0x00000, 0x80000, NO_DUMP ) \
 	ROM_LOAD16_BYTE( "macs2os_h.bin", 0x00001, 0x80000, NO_DUMP )
+
 ROM_START( macsbios )
 	MACS_BIOS
-	ROM_REGION( 0x400000, "user2", ROMREGION_ERASEFF ) // Slot A
-	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
+
+	ROM_REGION( 0x400000, "slot_a:rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( mac2bios )
 	MACS2_BIOS
-	ROM_REGION( 0x400000, "user2", ROMREGION_ERASEFF ) // Slot A
-	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
+
+	ROM_REGION( 0x400000, "slot_a:rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( kisekaem )
 	MACS_BIOS
 
-	ROM_REGION( 0x400000, "user2", 0 ) // Slot A
+	ROM_REGION( 0x400000, "slot_a:rom", 0 )
 	ROM_LOAD16_BYTE( "am-mj.u8", 0x000000, 0x100000, CRC(3cf85151) SHA1(e05400065c384730f04ef565db5ba27eb3973d15) )
 	ROM_LOAD16_BYTE( "am-mj.u7", 0x000001, 0x100000, CRC(4b645354) SHA1(1dbf9141c3724e5dff2cd8066117fb1b94671a80) )
 	ROM_LOAD16_BYTE( "am-mj.u6", 0x200000, 0x100000, CRC(23b3aa24) SHA1(bfabdb16f9b1b60230bb636a944ab46fdfda49d7) )
 	ROM_LOAD16_BYTE( "am-mj.u5", 0x200001, 0x100000, CRC(b4d53e29) SHA1(d7683fdd5531bf1aa0ef1e4e6f517b31e2d5829e) )
-
-
-	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
+	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
-	ROM_COPY( "user2",   0x000000, 0x400000, 0x400000 ) // Slot A
+	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "slot_a:rom", 0x000000, 0x400000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( kisekaeh )
 	MACS_BIOS
 
-	ROM_REGION( 0x400000, "user2", 0 ) // Slot A
+	ROM_REGION( 0x400000, "slot_a:rom", 0 )
 	ROM_LOAD16_BYTE( "kh-u8.bin", 0x000000, 0x100000, CRC(601b9e6a) SHA1(54508a6db3928f78897df64ce400791e4789d0f6) )
 	ROM_LOAD16_BYTE( "kh-u7.bin", 0x000001, 0x100000, CRC(8f6e4bb3) SHA1(361545189feeda0887f930727d25655309b84629) )
 	ROM_LOAD16_BYTE( "kh-u6.bin", 0x200000, 0x100000, CRC(8e700204) SHA1(876e5530d749828de077293cb109a71b67cef140) )
 	ROM_LOAD16_BYTE( "kh-u5.bin", 0x200001, 0x100000, CRC(709bf7c8) SHA1(0a93e0c4f9be22a3302a1c5d2a6ec4739b202ea8) )
-
-
-	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
+	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
-	ROM_COPY( "user2",   0x000000, 0x400000, 0x400000 ) // Slot A
+	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "slot_a:rom", 0x000000, 0x400000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( cultname ) // uses printer - two different games ? (slot a - checks for printer, slot b - not)
 	MACS_BIOS
 
-	ROM_REGION( 0x400000, "user2", 0 ) // Slot A
+	ROM_REGION( 0x400000, "slot_a:rom", 0 )
 	ROM_LOAD16_BYTE( "cult-d0.u8", 0x000000, 0x100000, CRC(394bc1a6) SHA1(98df5406862234815b46c7b0ac0b19e4b597d1b6) )
 	ROM_LOAD16_BYTE( "cult-d1.u7", 0x000001, 0x100000, CRC(f628133b) SHA1(f06e20212074e5d95cc7d419ac8ce98fb9be3b62) )
 	ROM_LOAD16_BYTE( "cult-d2.u6", 0x200000, 0x100000, CRC(c5521bc6) SHA1(7554b56b0201b7d81754defa2244fb7ff7452bf6) )
 	ROM_LOAD16_BYTE( "cult-d3.u5", 0x200001, 0x100000, CRC(4325b09b) SHA1(45699a0444a221f893724754c917d33041cabcb9) )
 
-
-	ROM_REGION( 0x400000, "user3", 0 ) // Slot B
+	ROM_REGION( 0x400000, "slot_b:rom", 0 )
 	ROM_LOAD16_BYTE( "cult-g0.u8", 0x000000, 0x100000, CRC(f5ab977b) SHA1(e7ee758cc2864500b339e236b944f98df9a1c10e) )
 	ROM_LOAD16_BYTE( "cult-g1.u7", 0x000001, 0x100000, CRC(32ae15a4) SHA1(061992efec1ed5527f200bf4c111344b156e759d) )
 	ROM_LOAD16_BYTE( "cult-g2.u6", 0x200000, 0x100000, CRC(30ed056d) SHA1(71735339bb501b94402ef403b5a2a60effa39c36) )
 	ROM_LOAD16_BYTE( "cult-g3.u5", 0x200001, 0x100000, CRC(fe58b418) SHA1(512f5c544cfafaa98bd2b3791ff1cf67adecec8d) )
 
-
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
-	ROM_COPY( "user2",   0x000000, 0x400000, 0x400000 ) // Slot A
-	ROM_COPY( "user3",   0x000000, 0x800000, 0x400000 ) // Slot B
+	ROM_COPY( "bios",   0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "slot_a:rom", 0x000000, 0x400000, 0x400000 ) // Slot A
+	ROM_COPY( "slot_b:rom", 0x000000, 0x800000, 0x400000 ) // Slot B
 ROM_END
 
 /* these are listed as MACS2 sub-boards, is it the same?  - it's not ;) */
@@ -594,31 +601,31 @@ ROM_END
 ROM_START( yuka )
 	MACS2_BIOS
 
-	ROM_REGION( 0x400000, "user2", 0 ) // Slot A
+	ROM_REGION( 0x400000, "slot_a:rom", 0 )
 	ROM_LOAD16_BYTE( "yu-ka_2.u6", 0x000001, 0x100000, CRC(c3c5728b) SHA1(e53cdcae556f34bab45d9342fd78ec29b6543c46) )
 	ROM_LOAD16_BYTE( "yu-ka_4.u5", 0x000000, 0x100000, CRC(7e391ee6) SHA1(3a0c122c9d0e2a91df6d8039fb958b6d00997747) )
 	ROM_LOAD16_BYTE( "yu-ka_1.u8", 0x200001, 0x100000, CRC(bccd1b15) SHA1(02511f3be60c53b5f5d90f12f0648f6e184ca667) )
 	ROM_LOAD16_BYTE( "yu-ka_3.u7", 0x200000, 0x100000, CRC(45b8263e) SHA1(59e1846c91dc39a086e8306260506673eb91de0b) )
 
-	ROM_REGION( 0x400000, "user3", ROMREGION_ERASE00 ) // Slot B
+	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user2",   0x000000, 0x000000, 0x400000 ) // Slot A
+	ROM_COPY( "slot_a:rom",   0x000000, 0x000000, 0x400000 )
 ROM_END
 
 ROM_START( yujan )
 	MACS2_BIOS
 
-	ROM_REGION( 0x400000, "user2", 0 ) // Slot A
+	ROM_REGION( 0x400000, "slot_a:rom", 0 )
 	ROM_LOAD16_BYTE( "yu-jan_2.u6", 0x000001, 0x100000, CRC(2f4a8d4b) SHA1(4b328a253b1980a76f46a9a98a7f486813894a33) )
 	ROM_LOAD16_BYTE( "yu-jan_4.u5", 0x000000, 0x100000, CRC(226df87b) SHA1(a887728f1ea2ef5f6b4dcd6b5b61586f5e8f267d) )
 	ROM_LOAD16_BYTE( "yu-jan_1.u8", 0x200001, 0x100000, CRC(feeeee6a) SHA1(e9613f50d6d2e62fac6b529f81486250cfe83819) )
 	ROM_LOAD16_BYTE( "yu-jan_3.u7", 0x200000, 0x100000, CRC(1c1d6997) SHA1(9b07ae6b9ef1c0b57fbaa5fd0bcf1d2d7f17351f) )
 
-	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
+	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user2",   0x000000, 0x000000, 0x400000 ) // Slot A
+	ROM_COPY( "slot_a:rom",   0x000000, 0x000000, 0x400000 )
 ROM_END
 
 #if 0
@@ -637,10 +644,29 @@ static const UINT8 ramdata[160]=
 };
 #endif
 
+MACHINE_START_MEMBER(macs_state,macs)
+{
+	membank("bank1")->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
+	membank("bank1")->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
+	membank("bank1")->configure_entries(512, 256, m_cart2->get_rom_base(), 0x4000);
+	membank("bank1")->set_entry(0);
+
+	membank("bank2")->configure_entries(0, 2, m_ram1.get() + 0x2000, 0x800);
+	membank("bank2")->set_entry(0);
+
+	membank("bank3")->configure_entries(0, 4, m_ram1.get(), 0x800);
+	membank("bank3")->set_entry(2);
+
+	membank("bank4")->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
+	membank("bank4")->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
+	membank("bank4")->configure_entries(512, 256, m_cart2->get_rom_base(), 0x4000);
+	membank("bank4")->set_entry(0);
+}
+
 MACHINE_RESET_MEMBER(macs_state,macs)
 {
-	UINT8 *macs_ram1 = m_ram1.get();
 	#if 0
+	UINT8 *macs_ram1 = m_ram1.get();
 	UINT8 *macs_ram2 = m_ram2;
 /*
         BIOS ram init:
@@ -670,11 +696,11 @@ MACHINE_RESET_MEMBER(macs_state,macs)
         730E: ED B0         ldir
         ...
 */
-		memcpy(macs_ram1 + 0x0e9f, memregion("user1")->base()+0x7327, 0xc7);
-		memcpy(macs_ram1 + 0x1e9f, memregion("user1")->base()+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x0e9f, memregion("bios")->base()+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x1e9f, memregion("bios")->base()+0x7327, 0xc7);
 
-		memcpy(macs_ram1 + 0x0800, memregion("user1")->base()+0x73fa, 0x507);
-		memcpy(macs_ram1 + 0x1800, memregion("user1")->base()+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x0800, memregion("bios")->base()+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x1800, memregion("bios")->base()+0x73fa, 0x507);
 
 #define MAKEJMP(n,m)    macs_ram2[(n) - 0xe800 + 0]=0xc3;\
 						macs_ram2[(n) - 0xe800 + 1]=(m)&0xff;\
@@ -709,38 +735,34 @@ MACHINE_RESET_MEMBER(macs_state,macs)
 		macs_ram1[0x0ff9]=0x07;
 		macs_ram1[0x1ff9]=0x07;
 		#endif
-
-		membank("bank1")->set_base(memregion("maincpu")->base() );
-		membank("bank2")->set_base(macs_ram1+0x800);
-		membank("bank3")->set_base(macs_ram1+0x10000);
-		membank("bank4")->set_base(memregion("maincpu")->base() );
 }
+
 
 DRIVER_INIT_MEMBER(macs_state,macs)
 {
 	m_ram1=std::make_unique<UINT8[]>(0x20000);
-	m_maincpu->st0016_game=10|0x80;
+	m_maincpu->set_st0016_game_flag((10 | 0x80));
 	m_rev = 1;
 }
 
 DRIVER_INIT_MEMBER(macs_state,macs2)
 {
 	m_ram1=std::make_unique<UINT8[]>(0x20000);
-	m_maincpu->st0016_game=10|0x80;
+	m_maincpu->set_st0016_game_flag((10 | 0x80));
 	m_rev = 2;
 }
 
 DRIVER_INIT_MEMBER(macs_state,kisekaeh)
 {
 	m_ram1=std::make_unique<UINT8[]>(0x20000);
-	m_maincpu->st0016_game=11|0x180;
+	m_maincpu->set_st0016_game_flag((11 | 0x180));
 	m_rev = 1;
 }
 
 DRIVER_INIT_MEMBER(macs_state,kisekaem)
 {
 	m_ram1=std::make_unique<UINT8[]>(0x20000);
-	m_maincpu->st0016_game=10|0x180;
+	m_maincpu->set_st0016_game_flag((10 | 0x180));
 	m_rev = 1;
 }
 

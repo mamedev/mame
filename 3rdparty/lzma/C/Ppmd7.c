@@ -1,6 +1,8 @@
 /* Ppmd7.c -- PPMdH codec
-2010-03-12 : Igor Pavlov : Public domain
+2015-09-28 : Igor Pavlov : Public domain
 This code is based on PPMd var.H (2001): Dmitry Shkarin : Public domain */
+
+#include "Precomp.h"
 
 #include <string.h>
 
@@ -64,7 +66,7 @@ void Ppmd7_Construct(CPpmd7 *p)
   for (i = 0, k = 0; i < PPMD_NUM_INDEXES; i++)
   {
     unsigned step = (i >= 12 ? 4 : (i >> 2) + 1);
-    do { p->Units2Indx[k++] = (Byte)i; } while(--step);
+    do { p->Units2Indx[k++] = (Byte)i; } while (--step);
     p->Indx2Units[i] = (Byte)k;
   }
 
@@ -255,7 +257,7 @@ static void *AllocUnits(CPpmd7 *p, unsigned indx)
 
 #define MyMem12Cpy(dest, src, num) \
   { UInt32 *d = (UInt32 *)dest; const UInt32 *s = (const UInt32 *)src; UInt32 n = num; \
-    do { d[0] = s[0]; d[1] = s[1]; d[2] = s[2]; s += 3; d += 3; } while(--n); }
+    do { d[0] = s[0]; d[1] = s[1]; d[2] = s[2]; s += 3; d += 3; } while (--n); }
 
 static void *ShrinkUnits(CPpmd7 *p, void *oldPtr, unsigned oldNU, unsigned newNU)
 {

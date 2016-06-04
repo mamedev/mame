@@ -8,11 +8,13 @@
 #ifndef PCONFIG_H_
 #define PCONFIG_H_
 
+#include <cstdint>
+
 #ifndef PSTANDALONE
 	#define PSTANDALONE (0)
 #endif
 
-//#define PHAS_INT128 (0)
+#define PHAS_INT128 (0)
 
 #ifndef PHAS_INT128
 #define PHAS_INT128 (0)
@@ -25,8 +27,8 @@ typedef __int128_t INT128;
 
 
 #if !(PSTANDALONE)
-#include "osdcore.h"
-#include "eminline.h"
+#include "osdcomm.h"
+//#include "eminline.h"
 
 #ifndef assert
 #define assert(x) do {} while (0)
@@ -80,7 +82,7 @@ typedef __int128_t INT128;
 		#define PHAS_PMF_INTERNAL 1
 	#endif
 #else
-#define USE_DELEGATE_TYPE PHAS_PMF_INTERNAL 0
+#define PHAS_PMF_INTERNAL 0
 #endif
 
 #ifndef MEMBER_ABI
@@ -88,9 +90,6 @@ typedef __int128_t INT128;
 #endif
 
 /* not supported in GCC prior to 4.4.x */
-/* ATTR_HOT and ATTR_COLD cause performance degration in 5.1 */
-//#define ATTR_HOT
-//#define ATTR_COLD
 #define ATTR_HOT               __attribute__((hot))
 #define ATTR_COLD              __attribute__((cold))
 
@@ -147,11 +146,7 @@ class pmfp
 public:
 	// construct from any member function pointer
 	class generic_class;
-	typedef void (*generic_function)();
-
-	#if (PSTANDALONE)
-	typedef std::size_t FPTR;
-	#endif
+	using generic_function = void (*)();
 
 	template<typename _MemberFunctionType>
 	pmfp(_MemberFunctionType mfp)
@@ -179,19 +174,19 @@ private:
 	generic_function convert_to_generic(generic_class * object) const
 	{
 		// apply the "this" delta to the object first
-		generic_class * o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<UINT8 *>(object) + m_this_delta);
+		generic_class * o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 
 		// if the low bit of the vtable index is clear, then it is just a raw function pointer
 		if (!(m_function & 1))
 			return reinterpret_cast<generic_function>(m_function);
 
 		// otherwise, it is the byte index into the vtable where the actual function lives
-		UINT8 *vtable_base = *reinterpret_cast<UINT8 **>(o_p_delta);
+		std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(o_p_delta);
 		return *reinterpret_cast<generic_function *>(vtable_base + m_function - 1);
 	}
 
 	// actual state
-	FPTR                    m_function;         // first item can be one of two things:
+	uintptr_t               m_function;         // first item can be one of two things:
 												//    if even, it's a pointer to the function
 												//    if odd, it's the byte offset into the vtable
 	int                     m_this_delta;       // delta to apply to the 'this' pointer

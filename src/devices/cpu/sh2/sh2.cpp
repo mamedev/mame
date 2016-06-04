@@ -193,7 +193,7 @@ sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t 
 	, m_out_of_cycles(nullptr)
 	, m_debugger_temp(0)
 {
-	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc) ? true : false;
+	m_isdrc = allow_drc();
 }
 
 
@@ -225,7 +225,7 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	, m_nocode(nullptr)
 	, m_out_of_cycles(nullptr)
 {
-	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc) ? true : false;
+	m_isdrc = allow_drc();
 }
 
 sh2a_device::sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -2588,7 +2588,7 @@ void sh2_device::state_string_export(const device_state_entry &entry, std::strin
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%d%c%c",
+			str = string_format("%c%c%d%c%c",
 					m_sh2_state->sr & M ? 'M':'.',
 					m_sh2_state->sr & Q ? 'Q':'.',
 					(m_sh2_state->sr & I) >> 4,

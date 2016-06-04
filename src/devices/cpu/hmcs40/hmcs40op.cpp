@@ -251,7 +251,7 @@ void hmcs40_cpu_device::op_lbi()
 void hmcs40_cpu_device::op_ai()
 {
 	// AI i: Add Immediate to A
-	m_a += (m_i);
+	m_a += m_i;
 	m_s = m_a >> 4 & 1;
 	m_a &= 0xf;
 }
@@ -364,7 +364,7 @@ void hmcs40_cpu_device::op_rotr()
 
 void hmcs40_cpu_device::op_or()
 {
-	// OR: OR A and B
+	// OR: OR A with B
 	m_a |= m_b;
 }
 
@@ -374,13 +374,13 @@ void hmcs40_cpu_device::op_or()
 void hmcs40_cpu_device::op_mnei()
 {
 	// MNEI i: Memory Not Equal to Immediate
-	m_s = (ram_r() != (m_i));
+	m_s = (ram_r() != m_i);
 }
 
 void hmcs40_cpu_device::op_ynei()
 {
 	// YNEI i: Y Not Equal to Immediate
-	m_s = (m_y != (m_i));
+	m_s = (m_y != m_i);
 }
 
 void hmcs40_cpu_device::op_anem()
@@ -398,7 +398,7 @@ void hmcs40_cpu_device::op_bnem()
 void hmcs40_cpu_device::op_alei()
 {
 	// ALEI i: A Less or Equal to Immediate
-	m_s = (m_a <= (m_i));
+	m_s = (m_a <= m_i);
 }
 
 void hmcs40_cpu_device::op_alem()
@@ -624,13 +624,13 @@ void hmcs40_cpu_device::op_td()
 void hmcs40_cpu_device::op_sedd()
 {
 	// SEDD n: Set Discrete I/O Latch Direct
-	write_d(m_op & 0xf, 1);
+	write_d(m_op & 3, 1);
 }
 
 void hmcs40_cpu_device::op_redd()
 {
 	// REDD n: Reset Discrete I/O Latch Direct
-	write_d(m_op & 0xf, 0);
+	write_d(m_op & 3, 0);
 }
 
 void hmcs40_cpu_device::op_lar()

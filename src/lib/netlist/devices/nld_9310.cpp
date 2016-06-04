@@ -11,45 +11,10 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_START(9310)
-{
-	register_sub("subABCD", subABCD);
-	sub.m_ABCD = &subABCD;
-	register_sub("sub", sub);
-
-	register_subalias("CLK", sub.m_CLK);
-
-	register_input("ENP", m_ENP);
-	register_input("ENT", m_ENT);
-	register_input("CLRQ", m_CLRQ);
-	register_input("LOADQ", m_LOADQ);
-
-	register_subalias("A", subABCD.m_A);
-	register_subalias("B", subABCD.m_B);
-	register_subalias("C", subABCD.m_C);
-	register_subalias("D", subABCD.m_D);
-
-	register_subalias("QA", sub.m_QA);
-	register_subalias("QB", sub.m_QB);
-	register_subalias("QC", sub.m_QC);
-	register_subalias("QD", sub.m_QD);
-	register_subalias("RC", sub.m_RC);
-
-}
-
 NETLIB_RESET(9310)
 {
 	sub.do_reset();
 	subABCD.do_reset();
-}
-
-NETLIB_START(9310_subABCD)
-{
-	register_input("A", m_A);
-	register_input("B", m_B);
-	register_input("C", m_C);
-	register_input("D", m_D);
-
 }
 
 NETLIB_RESET(9310_subABCD)
@@ -60,25 +25,6 @@ NETLIB_RESET(9310_subABCD)
 	m_C.inactivate();
 	m_D.inactivate();
 #endif
-}
-
-NETLIB_UPDATE(9310_subABCD)
-{
-}
-
-NETLIB_START(9310_sub)
-{
-	register_input("CLK", m_CLK);
-
-	register_output("QA", m_QA);
-	register_output("QB", m_QB);
-	register_output("QC", m_QC);
-	register_output("QD", m_QD);
-	register_output("RC", m_RC);
-
-	save(NLNAME(m_cnt));
-	save(NLNAME(m_loadq));
-	save(NLNAME(m_ent));
 }
 
 NETLIB_RESET(9310_sub)
@@ -199,39 +145,6 @@ inline NETLIB_FUNC_VOID(9310_sub, update_outputs, (const UINT8 cnt))
 
 	}
 #endif
-}
-
-NETLIB_START(9310_dip)
-{
-	NETLIB_NAME(9310)::start();
-
-	register_subalias("1", m_CLRQ);
-	register_subalias("2", sub.m_CLK);
-	register_subalias("3", subABCD.m_A);
-	register_subalias("4", subABCD.m_B);
-	register_subalias("5", subABCD.m_C);
-	register_subalias("6", subABCD.m_D);
-	register_subalias("7", m_ENP);
-	// register_subalias("8", ); --> GND
-
-	register_subalias("9", m_LOADQ);
-	register_subalias("10", m_ENT);
-	register_subalias("11", sub.m_QD);
-	register_subalias("12", sub.m_QC);
-	register_subalias("13", sub.m_QB);
-	register_subalias("14", sub.m_QA);
-	register_subalias("15", sub.m_RC);
-	// register_subalias("16", ); --> VCC
-}
-
-NETLIB_UPDATE(9310_dip)
-{
-	NETLIB_NAME(9310)::update();
-}
-
-NETLIB_RESET(9310_dip)
-{
-	NETLIB_NAME(9310)::reset();
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

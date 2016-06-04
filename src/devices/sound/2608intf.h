@@ -45,6 +45,7 @@ private:
 	emu_timer *     m_timer[2];
 	void *          m_chip;
 	devcb_write_line m_irq_handler;
+	required_memory_region m_region;
 };
 
 extern const device_type YM2608;

@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "includes/offtwall.h"
 
 
@@ -246,7 +247,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
 	AM_RANGE(0x260040, 0x260041) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
 	AM_RANGE(0x260050, 0x260051) AM_WRITE(io_latch_w)
 	AM_RANGE(0x260060, 0x260061) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
-	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
 	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_msb_w) AM_SHARE("vad:playfield")
@@ -255,7 +256,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
 	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
 	AM_RANGE(0x3f8000, 0x3fcfff) AM_RAM
 	AM_RANGE(0x3fd000, 0x3fd7ff) AM_RAM AM_SHARE("vad:mob")
-	AM_RANGE(0x3fd800, 0x3fffff) AM_RAM
+	AM_RANGE(0x3fd800, 0x3fffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
 
@@ -367,6 +368,8 @@ static MACHINE_CONFIG_START( offtwall, offtwall_state )
 
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", offtwall)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -408,9 +411,8 @@ ROM_START( offtwall )
 	ROM_LOAD16_BYTE( "136090-2012.17e", 0x00000, 0x20000, CRC(d08d81eb) SHA1(5a72aa2e4fc6455b94aa59a7719d0ddc8bcc80f2) )
 	ROM_LOAD16_BYTE( "136090-2013.17j", 0x00001, 0x20000, CRC(61c2553d) SHA1(343d39f9b75fd236e9769ec21ab65310f85e31ca) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "136090-1020.12c", 0x10000, 0x4000, CRC(488112a5) SHA1(55e84855daacfa303d1031de8c9adb992a846e21) )
-	ROM_CONTINUE(                0x04000, 0xc000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "136090-1020.12c", 0x00000, 0x10000, CRC(488112a5) SHA1(55e84855daacfa303d1031de8c9adb992a846e21) )
 
 	ROM_REGION( 0xc0000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "136090-1014.14s", 0x000000, 0x20000, CRC(4d64507e) SHA1(cb2ac41aecd2702cd57c746a6f5986cd753bc29e) )
@@ -442,9 +444,8 @@ ROM_START( offtwallc )
 	ROM_LOAD16_BYTE( "090-2612.rom", 0x00000, 0x20000, CRC(fc891a3f) SHA1(027815a20fbc6c0c9242768581b97362b39941c2) )
 	ROM_LOAD16_BYTE( "090-2613.rom", 0x00001, 0x20000, CRC(805d79d4) SHA1(943ec9f408ba875bdf1794ce7d24803043480401) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "136090-1020.12c", 0x10000, 0x4000, CRC(488112a5) SHA1(55e84855daacfa303d1031de8c9adb992a846e21) )
-	ROM_CONTINUE(                0x04000, 0xc000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "136090-1020.12c", 0x00000, 0x10000, CRC(488112a5) SHA1(55e84855daacfa303d1031de8c9adb992a846e21) )
 
 	ROM_REGION( 0xc0000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "090-1614.rom", 0x000000, 0x20000, CRC(307ed447) SHA1(acee15e58cd8def8e52a7586aa14240e1f8be319) )
@@ -469,18 +470,24 @@ ROM_END
 DRIVER_INIT_MEMBER(offtwall_state,offtwall)
 {
 	/* install son-of-slapstic workarounds */
-	m_spritecache_count = m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
-	m_bankswitch_base = m_maincpu->space(AS_PROGRAM).install_read_handler(0x037ec2, 0x037f39, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
-	m_unknown_verify_base = m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf1e, 0x3fdf1f, read16_delegate(FUNC(offtwall_state::unknown_verify_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037ec2, 0x037f39, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf1e, 0x3fdf1f, read16_delegate(FUNC(offtwall_state::unknown_verify_r),this));
+	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800)/2;
+	m_bankswitch_base = (UINT16 *)(memregion("maincpu")->base() + 0x37ec2);
+	m_unknown_verify_base = m_mainram + (0x3fdf1e - 0x3fd800)/2;
 }
 
 
 DRIVER_INIT_MEMBER(offtwall_state,offtwalc)
 {
 	/* install son-of-slapstic workarounds */
-	m_spritecache_count = m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
-	m_bankswitch_base = m_maincpu->space(AS_PROGRAM).install_read_handler(0x037eca, 0x037f43, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
-	m_unknown_verify_base = m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf24, 0x3fdf25, read16_delegate(FUNC(offtwall_state::unknown_verify_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037eca, 0x037f43, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf24, 0x3fdf25, read16_delegate(FUNC(offtwall_state::unknown_verify_r),this));
+	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800)/2;
+	m_bankswitch_base = (UINT16 *)(memregion("maincpu")->base() + 0x37eca);
+	m_unknown_verify_base = m_mainram + (0x3fdf24 - 0x3fd800)/2;
 }
 
 

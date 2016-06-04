@@ -197,7 +197,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( llc1, llc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
-	MCFG_CPU_CONFIG(llc1_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(llc1_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(llc1_mem)
 	MCFG_CPU_IO_MAP(llc1_io)
 
@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc1)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEFAULT_LAYOUT(layout_llc1)
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_3MHz)
@@ -241,7 +241,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( llc2, llc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
-	MCFG_CPU_CONFIG(llc2_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(llc2_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(llc2_mem)
 	MCFG_CPU_IO_MAP(llc2_io)
 
@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc2)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

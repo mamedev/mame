@@ -224,10 +224,10 @@ void kbdc8042_device::device_start()
 {
 	// resolve callbacks
 	m_system_reset_cb.resolve_safe();
-	m_gate_a20_cb.resolve();
-	m_input_buffer_full_cb.resolve();
+	m_gate_a20_cb.resolve_safe();
+	m_input_buffer_full_cb.resolve_safe();
 	m_output_buffer_empty_cb.resolve_safe();
-	m_speaker_cb.resolve();
+	m_speaker_cb.resolve_safe();
 	m_operation_write_state = 0; /* first write to 0x60 might occur before anything can set this */
 	memset(&m_keyboard, 0x00, sizeof(m_keyboard));
 	memset(&m_mouse, 0x00, sizeof(m_mouse));
@@ -287,7 +287,8 @@ void kbdc8042_device::at_8042_receive(UINT8 data)
 		m_input_buffer_full_cb(1);
 		/* Lets 8952's timers do their job before clear the interrupt line, */
 		/* else Keyboard interrupt never happens. */
-		machine().scheduler().timer_set(attotime::from_usec(2), timer_expired_delegate(FUNC(kbdc8042_device::kbdc8042_clr_int),this));
+		/* Why was this done?  It dies when an extended scan code is received */
+		//machine().scheduler().timer_set(attotime::from_usec(2), timer_expired_delegate(FUNC(kbdc8042_device::kbdc8042_clr_int),this));
 	}
 }
 
@@ -347,6 +348,7 @@ READ8_MEMBER(kbdc8042_device::data_r)
 	switch (offset) {
 	case 0:
 		data = m_data;
+		m_input_buffer_full_cb(0);
 		if ((m_status_read_mode != 3) || (data != 0xfa))
 		{
 			if (m_keybtype != KBDC8042_AT386 || (data != 0x55))

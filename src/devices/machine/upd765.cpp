@@ -1399,6 +1399,8 @@ void upd765_family_device::recalibrate_start(floppy_info &fi)
 	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
 	fi.dir = 1;
 	fi.counter = 77;
+	fi.ready = get_ready(command[1] & 3);
+	fi.st0 = (fi.ready ? 0 : ST0_NR);
 	seek_continue(fi);
 }
 
@@ -1408,6 +1410,8 @@ void upd765_family_device::seek_start(floppy_info &fi)
 	fi.main_state = SEEK;
 	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
 	fi.dir = fi.pcn > command[2] ? 1 : 0;
+	fi.ready = get_ready(command[1] & 3);
+	fi.st0 = (fi.ready ? 0 : ST0_NR);
 	seek_continue(fi);
 }
 
@@ -1458,7 +1462,7 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 				if(done)
 					fi.pcn = 0;
 				else if(!fi.counter) {
-					fi.st0 = ST0_FAIL|ST0_SE|ST0_EC | fi.id;
+					fi.st0 |= ST0_FAIL|ST0_SE|ST0_EC | fi.id;
 					command_end(fi, false);
 					return;
 				}
@@ -1468,7 +1472,7 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 				break;
 			}
 			if(done) {
-				fi.st0 = ST0_SE | fi.id;
+				fi.st0 |= ST0_SE | fi.id;
 				command_end(fi, false);
 				return;
 			}
@@ -1630,9 +1634,6 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 						st2 |= ST2_WC|ST2_BC;
 					else
 						st2 |= ST2_WC;
-					fi.st0 |= ST0_FAIL;
-					fi.sub_state = COMMAND_DONE;
-					break;
 				}
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 				return;

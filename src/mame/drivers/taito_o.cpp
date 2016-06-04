@@ -42,7 +42,7 @@ WRITE16_MEMBER(taitoo_state::io_w)
 {
 	switch(offset)
 	{
-		case 2: machine().watchdog_reset(); break;
+		case 2: m_watchdog->watchdog_reset(); break;
 
 		default: logerror("IO W %x %x %x\n", offset, data, mem_mask);
 	}
@@ -234,6 +234,7 @@ static MACHINE_CONFIG_START( parentj, taitoo_state )
 	MCFG_CPU_PROGRAM_MAP(parentj_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitoo_state, parentj_interrupt, "screen", 0, 1)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -253,7 +254,6 @@ static MACHINE_CONFIG_START( parentj, taitoo_state )
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
-	MCFG_TC0080VCO_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

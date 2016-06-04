@@ -1144,7 +1144,7 @@ void rainbow_state::hdc_reset()
 }
 
 // Return 'hard_disk_file' object for harddisk 1 (fixed).
-// < NULL if geometry is insane or other errors occured >
+// < nullptr if geometry is insane or other errors occured >
 hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 {
 	m_hdc_drive_ready = false;
@@ -1380,7 +1380,7 @@ int rainbow_state::do_write_sector()
 				logerror("...FAILURE **** \n");
 			}
 
-		} // IF 'info' not NULL
+		} // IF 'info' not nullptr
 	} // IF hard disk present
 
 	return feedback;

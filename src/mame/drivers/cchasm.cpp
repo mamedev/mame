@@ -22,6 +22,7 @@
 #include "sound/dac.h"
 #include "machine/6840ptm.h"
 #include "machine/z80ctc.h"
+#include "machine/watchdog.h"
 #include "includes/cchasm.h"
 
 #define CCHASM_68K_CLOCK (XTAL_8MHz)
@@ -37,7 +38,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 16, cchasm_state )
 	AM_RANGE(0x040000, 0x04000f) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0xff)
 	AM_RANGE(0x050000, 0x050001) AM_WRITE(refresh_control_w)
 	AM_RANGE(0x060000, 0x060001) AM_READ_PORT("DSW") AM_WRITE(led_w)
-	AM_RANGE(0x070000, 0x070001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x070000, 0x070001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xf80000, 0xf800ff) AM_READWRITE(io_r,io_w)
 	AM_RANGE(0xffb000, 0xffffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
@@ -57,7 +58,7 @@ static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 8, cchasm_state )
 	AM_RANGE(0x6001, 0x6001) AM_MIRROR(0xf9e) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x6020, 0x6021) AM_MIRROR(0xf9e) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x6021, 0x6021) AM_MIRROR(0xf9e) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0xf9e) AM_READWRITE(soundlatch_byte_r, soundlatch3_byte_w)
+	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0xf9e) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
 	AM_RANGE(0x6041, 0x6041) AM_MIRROR(0xf9e) AM_READWRITE(soundlatch2_r, soundlatch4_w)
 	AM_RANGE(0x6061, 0x6061) AM_MIRROR(0xf9e) AM_WRITE(reset_coin_flag_w)
 	AM_RANGE(0x7041, 0x7041) AM_NOP // TODO
@@ -148,7 +149,7 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 	MCFG_CPU_PROGRAM_MAP(memmap)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3584229)       /* 3.58  MHz (from schematics) */
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
@@ -156,6 +157,8 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(cchasm_state, ctc_timer_1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(cchasm_state, ctc_timer_2_w))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -167,6 +170,11 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1818182)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)

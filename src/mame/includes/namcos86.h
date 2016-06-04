@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#include "machine/watchdog.h"
 #include "sound/namco.h"
 
 class namcos86_state : public driver_device
@@ -9,6 +10,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cpu1(*this, "cpu1")
 		, m_cpu2(*this, "cpu2")
+		, m_watchdog(*this, "watchdog")
 		, m_cus30(*this, "namco")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
@@ -21,6 +23,7 @@ public:
 
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

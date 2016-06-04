@@ -237,7 +237,7 @@ static MACHINE_CONFIG_START( babbage, babbage_state )
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK) //2.5MHz
 	MCFG_CPU_PROGRAM_MAP(babbage_map)
 	MCFG_CPU_IO_MAP(babbage_io)
-	MCFG_CPU_CONFIG(babbage_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(babbage_daisy_chain)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_babbage)

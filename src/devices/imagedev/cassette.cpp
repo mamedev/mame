@@ -11,11 +11,7 @@
 #include "emu.h"
 #include "formats/imageutl.h"
 #include "cassette.h"
-#include "ui/ui.h"
-
-
-#define ANIMATION_FPS       1
-#define ANIMATION_FRAMES    4
+#include "ui/uimain.h"
 
 #define VERBOSE             0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
@@ -367,66 +363,18 @@ void cassette_image_device::call_unload()
 */
 void cassette_image_device::call_display()
 {
-	char buf[65];
-	float x, y;
-	int n;
-	double position, length;
-	cassette_state uistate;
-	cassette_image_device *dev;
-	static const UINT8 shapes[8] = { 0x2d, 0x5c, 0x7c, 0x2f, 0x2d, 0x20, 0x20, 0x20 };
-
 	/* abort if we should not be showing the image */
 	if (!exists())
 		return;
 	if (!is_motor_on())
 		return;
-
-	/* figure out where we are in the cassette */
-	position = get_position();
-	length = get_length();
-	uistate = (cassette_state)(get_state() & CASSETTE_MASK_UISTATE);
-
-	/* choose a location on the screen */
-	x = 0.2f;
-	y = 0.5f;
-
-	cassette_device_iterator iter(device().machine().root_device());
-	for (dev = iter.first(); dev != nullptr && strcmp( dev->tag(), device().tag() ); dev = iter.next())
-		y += 1;
-
-	y *= device().machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
-	/* choose which frame of the animation we are at */
-	n = ((int) position / ANIMATION_FPS) % ANIMATION_FRAMES;
-	/* Since you can have anything in a BDF file, we will use crude ascii characters instead */
-	snprintf(buf, ARRAY_LENGTH(buf), "%c%c %c %02d:%02d (%04d) [%02d:%02d (%04d)]",
-#if 0
-	/* THE ANIMATION HASN'T WORKED SINCE 0.114 - LEFT HERE FOR REFERENCE */
-	/* NEVER SEEN THE PLAY / RECORD ICONS */
-	/* character pairs 2-3, 4-5, 6-7, 8-9 form little tape cassette images */
-		n * 2 + 2,                              /* cassette icon left */
-		n * 2 + 3,                              /* cassette icon right */
-		(uistate == CASSETTE_PLAY) ? 16 : 14,   /* play or record icon */
-#else
-		shapes[n],                  /* cassette icon left */
-		shapes[n|4],                    /* cassette icon right */
-		(uistate == CASSETTE_PLAY) ? 0x50 : 0x52,   /* play (P) or record (R) */
-#endif
-		((int) position / 60),
-		((int) position % 60),
-		(int) position,
-		((int) length / 60),
-		((int) length % 60),
-		(int) length);
-
-	// draw the cassette
-	device().machine().ui().draw_text_box(&device().machine().render().ui_container(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
-
+	machine().ui().image_display(CASSETTE, this);
 	// make sure tape stops at end when playing
 	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
 	{
 		if ( m_cassette )
 		{
-			if (position > length)
+			if (get_position() > get_length())
 			{
 				m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
 			}

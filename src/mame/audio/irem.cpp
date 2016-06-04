@@ -10,7 +10,7 @@
 #include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
 #include "audio/irem.h"
-
+#include "netlist/devices/net_lib.h"
 
 const device_type IREM_M62_AUDIO = &device_creator<m62_audio_device>;
 const device_type IREM_M52_SOUNDC_AUDIO = &device_creator<m52_soundc_audio_device>;
@@ -171,12 +171,12 @@ WRITE8_MEMBER( irem_audio_device::ay8910_45M_portb_w )
 {
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
 	m_adpcm1->playmode_w((data >> 2) & 7);
-	if (m_adpcm2 != NULL)
+	if (m_adpcm2 != nullptr)
 		m_adpcm2->playmode_w(((data >> 2) & 4) | 3); /* always in slave mode */
 
 	/* bits 0 and 1 reset the two chips */
 	m_adpcm1->reset_w(data & 1);
-	if (m_adpcm2 != NULL)
+	if (m_adpcm2 != nullptr)
 		m_adpcm2->reset_w(data & 2);
 }
 
@@ -221,7 +221,7 @@ WRITE8_MEMBER( irem_audio_device::m52_adpcm_w )
 	}
 	if (offset & 2)
 	{
-		if (m_adpcm2 != NULL)
+		if (m_adpcm2 != nullptr)
 			m_adpcm2->data_w(data);
 	}
 }
@@ -230,7 +230,7 @@ WRITE8_MEMBER( irem_audio_device::m52_adpcm_w )
 WRITE8_MEMBER( irem_audio_device::m62_adpcm_w )
 {
 	msm5205_device *adpcm = (offset & 1) ? m_adpcm2 : m_adpcm1;
-	if (adpcm != NULL)
+	if (adpcm != nullptr)
 		adpcm->data_w(data);
 }
 
@@ -247,7 +247,7 @@ void irem_audio_device::adpcm_int(int st)
 	subdevice("iremsound")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
-	if (m_adpcm2 != NULL)
+	if (m_adpcm2 != nullptr)
 	{
 		m_adpcm2->vclk_w(1);
 		m_adpcm2->vclk_w(0);
@@ -406,97 +406,6 @@ ADDRESS_MAP_END
  *
  */
 
-#define USE_FRONTIERS 1
-#define USE_FIXED_STV 1
-
-#include "nl_kidniki.inc"
-
-NETLIST_START(kidniki_interface)
-
-#if (USE_FRONTIERS)
-	SOLVER(Solver, 18000)
-	PARAM(Solver.ACCURACY, 1e-8)
-	PARAM(Solver.NR_LOOPS, 300)
-	PARAM(Solver.GS_LOOPS, 1)
-	PARAM(Solver.GS_THRESHOLD, 6)
-	PARAM(Solver.ITERATIVE, "SOR")
-	PARAM(Solver.PARALLEL, 1)
-	PARAM(Solver.SOR_FACTOR, 1.00)
-#else
-	SOLVER(Solver, 12000)
-	PARAM(Solver.ACCURACY, 1e-8)
-	PARAM(Solver.NR_LOOPS, 300)
-	PARAM(Solver.GS_LOOPS, 20)
-	PARAM(Solver.ITERATIVE, "GMRES")
-	PARAM(Solver.PARALLEL, 0)
-#endif
-
-	LOCAL_SOURCE(kidniki_schematics)
-
-	ANALOG_INPUT(I_V5, 5)
-	//ANALOG_INPUT(I_V0, 0)
-	ALIAS(I_V0.Q, GND)
-
-	/* AY 8910 internal resistors */
-
-	RES(R_AY45L_A, 1000)
-	RES(R_AY45L_B, 1000)
-	RES(R_AY45L_C, 1000)
-
-	RES(R_AY45M_A, 1000)
-	RES(R_AY45M_B, 1000)
-	RES(R_AY45M_C, 1000)
-
-	NET_C(I_V5, R_AY45L_A.1, R_AY45L_B.1, R_AY45L_C.1, R_AY45M_A.1, R_AY45M_B.1, R_AY45M_C.1)
-	NET_C(R_AY45L_A.2, R_AY45L_B.2, R_AY45M_A.2, R_AY45M_B.2, R_AY45M_C.2)
-
-	ALIAS(I_SOUNDIC0, R_AY45L_C.2)
-	ALIAS(I_SOUND0, R_AY45L_A.2)
-
-	/* On M62 boards with pcb pictures available
-	 * D6 is missing, although the pcb print exists.
-	 * We are replacing this with a 10m Resistor.
-	 */
-	TTL_INPUT(SINH, 1)
-#if 0
-	DIODE(D6, "1N914")
-	NET_C(D6.K, SINH)
-	ALIAS(I_SINH0, D6.A)
-#else
-	RES(SINH_DUMMY, RES_M(10))
-	NET_C(SINH_DUMMY.1, SINH)
-	ALIAS(I_SINH0, SINH_DUMMY.2)
-#endif
-
-	NET_MODEL("AY8910PORT FAMILY(OVL=0.05 OVH=4.95 ORL=100.0 ORH=0.5k)")
-
-	LOGIC_INPUT(I_SD0, 1, "AY8910PORT")
-	//CLOCK(I_SD0, 5)
-	LOGIC_INPUT(I_BD0, 1, "AY8910PORT")
-	//CLOCK(I_BD0, 5)
-	LOGIC_INPUT(I_CH0, 1, "AY8910PORT")
-	//CLOCK(I_CH0, 2.2  )
-	LOGIC_INPUT(I_OH0, 1, "AY8910PORT")
-	//CLOCK(I_OH0, 1.0)
-	ANALOG_INPUT(I_MSM2K0, 0)
-	ANALOG_INPUT(I_MSM3K0, 0)
-
-	INCLUDE(kidniki_schematics)
-
-	#if (USE_FRONTIERS)
-	OPTIMIZE_FRONTIER(C63.2, RES_K(27), RES_K(1))
-	OPTIMIZE_FRONTIER(R31.2, RES_K(5.1), 50)
-	OPTIMIZE_FRONTIER(R29.2, RES_K(2.7), 50)
-	OPTIMIZE_FRONTIER(R87.2, RES_K(68), 50)
-
-	OPTIMIZE_FRONTIER(R50.1, RES_K(2.2), 50)
-	OPTIMIZE_FRONTIER(R55.1, RES_K(510), 50)
-	OPTIMIZE_FRONTIER(R84.2, RES_K(50), RES_K(5))
-
-	#endif
-
-NETLIST_END()
-
 /*************************************
  *
  *  Machine drivers
@@ -541,7 +450,7 @@ static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
 	/* NETLIST configuration using internal AY8910 resistor values */
 
 	MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, 48000)
-	MCFG_NETLIST_SETUP(kidniki_interface)
+	MCFG_NETLIST_SETUP(kidniki)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_NETLIST_LOGIC_INPUT("snd_nl", "ibd", "I_BD0.IN", 0, 1)

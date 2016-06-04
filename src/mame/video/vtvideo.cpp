@@ -78,7 +78,7 @@ vt100_video_device::vt100_video_device(const machine_config &mconfig, device_typ
 device_video_interface(mconfig, *this),
 m_read_ram(*this),
 m_write_clear_video_interrupt(*this),
-m_char_rom_tag(""),
+m_char_rom(*this),
 m_palette(*this, "palette")
 {
 }
@@ -89,7 +89,7 @@ vt100_video_device::vt100_video_device(const machine_config &mconfig, const char
 device_video_interface(mconfig, *this),
 m_read_ram(*this),
 m_write_clear_video_interrupt(*this),
-m_char_rom_tag(""),
+m_char_rom(*this),
 m_palette(*this, "palette")
 {
 }
@@ -110,9 +110,6 @@ void vt100_video_device::device_start()
 	/* resolve callbacks */
 	m_read_ram.resolve_safe(0);
 	m_write_clear_video_interrupt.resolve_safe();
-
-	m_gfx = machine().root_device().memregion(m_char_rom_tag)->base();
-	assert(m_gfx != nullptr);
 
 	// LBA7 is scan line frequency update
 	machine().scheduler().timer_pulse(attotime::from_nsec(31778), timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
@@ -425,7 +422,7 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, i
 		// modify line since that is how it is stored in rom
 		if (j == 0) j = 15; else j = j - 1;
 
-		line = m_gfx[(code & 0x7f) * 16 + j];
+		line = m_char_rom[(code & 0x7f) * 16 + j];
 
 		if (m_basic_attribute == 1)
 		{
@@ -659,7 +656,7 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 		// modify line since that is how it is stored in rom
 		if (j == 0) j = 15; else j = j - 1;
 
-		line = m_gfx[(code << 4) + j]; // code * 16
+		line = m_char_rom[(code << 4) + j]; // code * 16
 
 		// UNDERLINED CHARACTERS (CASE 5 - different in 1 line):
 		back_intensity = back_default_intensity; // 0, 1, 2
@@ -928,7 +925,7 @@ TIMER_CALLBACK_MEMBER(vt100_video_device::lba7_change)
 }
 
 static MACHINE_CONFIG_FRAGMENT(vt100_video)
-MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -942,7 +939,7 @@ machine_config_constructor vt100_video_device::device_mconfig_additions() const
 }
 
 static MACHINE_CONFIG_FRAGMENT(rainbow_video)
-MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_ADD("palette", 4)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

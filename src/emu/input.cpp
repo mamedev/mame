@@ -1184,7 +1184,7 @@ void input_manager::reset_polling()
 	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
 		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
 		{
-			// fetch the device; ignore if NULL
+			// fetch the device; ignore if nullptr
 			input_device *device = m_class[devclass]->device(devnum);
 			if (device == nullptr)
 				continue;
@@ -1211,7 +1211,7 @@ input_code input_manager::poll_switches()
 	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
 		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
 		{
-			// fetch the device; ignore if NULL
+			// fetch the device; ignore if nullptr
 			input_device *device = m_class[devclass]->device(devnum);
 			if (device == nullptr)
 				continue;
@@ -1291,7 +1291,7 @@ input_code input_manager::poll_keyboard_switches()
 	// iterate over devices within each class
 	for (int devnum = 0; devnum < m_keyboard_class.maxindex(); devnum++)
 	{
-		// fetch the device; ignore if NULL
+		// fetch the device; ignore if nullptr
 		input_device *device = m_keyboard_class.device(devnum);
 		if (device == nullptr)
 			continue;
@@ -1365,7 +1365,7 @@ input_code input_manager::poll_axes()
 	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
 		for (int devnum = 0; devnum <= m_class[devclass]->maxindex(); devnum++)
 		{
-			// fetch the device; ignore if NULL
+			// fetch the device; ignore if nullptr
 			input_device *device = m_class[devclass]->device(devnum);
 			if (device == nullptr)
 				continue;
@@ -1400,7 +1400,7 @@ input_device *input_manager::device_from_code(input_code code) const
 	if (devclass >= DEVICE_CLASS_FIRST_VALID && devclass <= DEVICE_CLASS_LAST_VALID)
 		return m_class[devclass]->device(code.device_index());
 
-	// otherwise, return NULL
+	// otherwise, return nullptr
 	return nullptr;
 }
 
@@ -1471,7 +1471,7 @@ std::string input_manager::code_name(input_code code) const
 	const char *devclass = (*devclass_string_table)[code.device_class()];
 
 	// determine the devindex part
-	std::string devindex = strformat("%d", code.device_index() + 1);
+	std::string devindex = string_format("%d", code.device_index() + 1);
 
 	// if we're unifying all devices, don't display a number
 	if (!m_class[code.device_class()]->multi())
@@ -1521,7 +1521,7 @@ std::string input_manager::code_to_token(input_code code) const
 	const char *devclass = (*devclass_token_table)[code.device_class()];
 
 	// determine the devindex part; keyboard 0 doesn't show an index
-	std::string devindex = strformat("%d", code.device_index() + 1);
+	std::string devindex = string_format("%d", code.device_index() + 1);
 	if (code.device_class() == DEVICE_CLASS_KEYBOARD && code.device_index() == 0)
 		devindex.clear();
 

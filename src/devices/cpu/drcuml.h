@@ -108,7 +108,7 @@ public:
 
 	// instruction appending
 	uml::instruction &append();
-	void append_comment(const char *format, ...) ATTR_PRINTF(2,3);
+	template <typename Format, typename... Params> void append_comment(Format &&fmt, Params &&... args);
 
 	// this class is thrown if abort() is called
 	class abort_compilation : public emu_exception
@@ -234,6 +234,33 @@ private:
 	simple_list<symbol>         m_symlist;          // list of symbols
 };
 
+
+
+//**************************************************************************
+//  MEMBER TEMPLATES
+//**************************************************************************
+
+//-------------------------------------------------
+//  comment - attach a comment to the current
+//  output location in the specified block
+//-------------------------------------------------
+
+template <typename Format, typename... Params>
+inline void drcuml_block::append_comment(Format &&fmt, Params &&... args)
+{
+	// do the printf
+	std::string temp(util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
+
+	// allocate space in the cache to hold the comment
+	char *comment = (char *)m_drcuml.cache().alloc_temporary(temp.length() + 1);
+	if (comment != nullptr)
+	{
+		strcpy(comment, temp.c_str());
+
+		// add an instruction with a pointer
+		append().comment(comment);
+	}
+}
 
 
 #endif /* __DRCUML_H__ */

@@ -38,7 +38,7 @@ void playch10_state::machine_reset()
 
 void playch10_state::machine_start()
 {
-	m_vrom = (m_vrom_region != NULL) ? m_vrom_region->base() : NULL;
+	m_vrom = (m_vrom_region != nullptr) ? m_vrom_region->base() : nullptr;
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */
@@ -58,7 +58,7 @@ void playch10_state::machine_start()
 
 MACHINE_START_MEMBER(playch10_state,playch10_hboard)
 {
-	m_vrom = (m_vrom_region != NULL) ? m_vrom_region->base() : NULL;
+	m_vrom = (m_vrom_region != nullptr) ? m_vrom_region->base() : nullptr;
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */

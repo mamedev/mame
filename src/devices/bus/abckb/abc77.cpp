@@ -136,6 +136,7 @@ static MACHINE_CONFIG_FRAGMENT( abc77 )
 	MCFG_CPU_IO_MAP(abc77_io)
 
 	// watchdog
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL_4_608MHz/3/5/4096))
 
 	// discrete sound
@@ -425,6 +426,7 @@ abc77_device::abc77_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock, "abc77", __FILE__),
 	abc_keyboard_interface(mconfig, *this),
 	m_maincpu(*this, I8035_TAG),
+	m_watchdog(*this, "watchdog"),
 	m_discrete(*this, DISCRETE_TAG),
 	m_x0(*this, "X0"),
 	m_x1(*this, "X1"),
@@ -450,6 +452,7 @@ abc77_device::abc77_device(const machine_config &mconfig, device_type type, cons
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	abc_keyboard_interface(mconfig, *this),
 	m_maincpu(*this, I8035_TAG),
+	m_watchdog(*this, "watchdog"),
 	m_discrete(*this, DISCRETE_TAG),
 	m_x0(*this, "X0"),
 	m_x1(*this, "X1"),
@@ -610,7 +613,7 @@ WRITE8_MEMBER( abc77_device::p2_w )
 
 		if (m_keylatch == 1)
 		{
-			machine().watchdog_reset();
+			m_watchdog->watchdog_reset();
 		}
 	}
 

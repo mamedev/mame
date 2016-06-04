@@ -43,7 +43,7 @@ public:
 private:
 	void make_mixer_table(int voices);
 
-	const unsigned char *m_sound_prom;
+	required_region_ptr<UINT8> m_sound_prom;
 	sound_stream *m_stream;
 	int m_rate;
 

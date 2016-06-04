@@ -270,7 +270,7 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(rt1715_mem)
 	MCFG_CPU_IO_MAP(rt1715_io)
-	MCFG_CPU_CONFIG(rt1715_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(rt1715_daisy_chain)
 
 
 	/* keyboard */

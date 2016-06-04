@@ -497,7 +497,7 @@ void tmmjprd_state::do_blit()
 				break;
 
 			default: /* unknown / illegal */
-				if(BLITLOG) osd_printf_debug("uknown blit command %02x\n",blt_commnd);
+				if(BLITLOG) osd_printf_debug("unknown blit command %02x\n",blt_commnd);
 				break;
 		}
 	}

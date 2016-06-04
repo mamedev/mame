@@ -71,7 +71,8 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 #define STEP1024(START,STEP)    STEP512(START,STEP),STEP512((START)+512*(STEP),STEP)
 #define STEP2048(START,STEP)    STEP1024(START,STEP),STEP1024((START)+1024*(STEP),STEP)
 
-
+#define STEP2_INV(START,STEP)	(START)+(STEP),(START)
+#define STEP4_INV(START,STEP)	 STEP2_INV(START+2*STEP,STEP),STEP2_INV(START,STEP)
 
 //**************************************************************************
 //  GRAPHICS INFO MACROS
@@ -178,7 +179,7 @@ struct gfx_decode_entry
 {
 	const char *    memory_region;      // memory region where the data resides
 	UINT32          start;              // offset of beginning of data to decode
-	const gfx_layout *gfxlayout;        // pointer to gfx_layout describing the layout; NULL marks the end of the array
+	const gfx_layout *gfxlayout;        // pointer to gfx_layout describing the layout; nullptr marks the end of the array
 	UINT16          color_codes_start;  // offset in the color lookup table where color codes start
 	UINT16          total_color_codes;  // total number of color codes
 	UINT32          flags;              // flags and optional scaling factors

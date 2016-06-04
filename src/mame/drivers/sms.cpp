@@ -60,7 +60,7 @@ General compatibility issues on real hardware (not emulation bugs):
   Paddle controller;
 - Few games of the ones with FM support need to detect the system region as
   Japanese to play FM sound;
-- The Light Phaser gun doesn't work with the Japanese SMS;
+- The Light Phaser gun doesn't work with the Japanese SMS and Sega Mark III;
 - There are reports about Light Phaser working on the second Korean SMS
   version, and a Korean advert shows support on the first version (Gam*Boy I,
   although based on Japanese SMS);
@@ -337,10 +337,10 @@ ADDRESS_MAP_END
 
 // The first Korean SMS version also seems to lack I/O port $3F. Games execute
 // a region detection procedure that, through that port, sets the mode used by
-// the TH bits of port $DD and tests their behavior. The region of the first SMS
+// the TH bits of port $DD and tests their behaviour. The region of the first SMS
 // version is detected as Japanese (opposite to the second version). However,
-// as it supports Light Phaser games, it doesn't have the same behavior of the
-// Japanese SMS. If it had the behavior of other SMS versions, the system
+// as it supports Light Phaser games, it doesn't have the same behaviour of the
+// Japanese SMS. If it had the behaviour of other SMS versions, the system
 // region would be detected as Export, so it probably lacks the port.
 static ADDRESS_MAP_START( sms1kr_io, AS_IO, 8, sms_state )
 	AM_IMPORT_FROM(sg1000m3_io)
@@ -760,9 +760,9 @@ static MACHINE_CONFIG_DERIVED( sg1000m3, smsj )
 
 	// Mark III does not have TH connected.
 	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NOOP)
 	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL2_TAG)
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NOOP)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms2_kr, sms2_ntsc )

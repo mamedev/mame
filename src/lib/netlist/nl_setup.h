@@ -8,7 +8,9 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
+#include <memory>
 #include "nl_base.h"
+#include "nl_factory.h"
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -28,9 +30,6 @@
 /* to be used to reference new library truthtable devices */
 #define NET_REGISTER_DEV(_type, _name)                                            \
 		setup.register_dev(# _type, # _name);
-
-#define NET_REGISTER_SIGNAL(_type, _name)                                           \
-		NET_REGISTER_DEV(_type ## _ ## sig, _name)
 
 #define NET_CONNECT(_name, _input, _output)                                         \
 		setup.register_link(# _name "." # _input, # _output);
@@ -55,7 +54,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup)                    \
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(_name)                                                    \
-		setup.register_source(palloc(netlist::source_proc_t(# _name, &NETLIST_NAME(_name))));
+		setup.register_source(std::make_shared<netlist::source_proc_t>(# _name, &NETLIST_NAME(_name)));
 
 #define LOCAL_LIB_ENTRY(_name)                                                 \
 		LOCAL_SOURCE(_name)                                                    \
@@ -91,7 +90,7 @@ namespace netlist
 		class source_t
 		{
 		public:
-			typedef plist_t<source_t *> list_t;
+			using list_t = pvector_t<std::shared_ptr<source_t>>;
 
 			source_t()
 			{}
@@ -102,44 +101,27 @@ namespace netlist
 		private:
 		};
 
-		struct link_t
-		{
-			link_t() { }
-			link_t(void *) { }
-			// Copy constructor
-			link_t(const link_t &from)
-			{
-				e1 = from.e1;
-				e2 = from.e2;
-			}
+		using link_t = std::pair<pstring, pstring>;
 
-			link_t(const pstring &ae1, const pstring &ae2)
-			{
-				e1 = ae1;
-				e2 = ae2;
-			}
-			pstring e1;
-			pstring e2;
-
-			bool operator==(const link_t &rhs) const { return (e1 == rhs.e1) && (e2 == rhs.e2); }
-			link_t &operator=(const link_t &rhs) { e1 = rhs.e1; e2 = rhs.e2; return *this; }
-
-			const pstring &name() const { return e1; }
-		};
-
-		setup_t(netlist_t *netlist);
+		setup_t(netlist_t &netlist);
 		~setup_t();
 
-		void init();
-
-		netlist_t &netlist() { return *m_netlist; }
-		const netlist_t &netlist() const { return *m_netlist; }
+		netlist_t &netlist() { return m_netlist; }
+		const netlist_t &netlist() const { return m_netlist; }
 
 		pstring build_fqn(const pstring &obj_name) const;
 
-		device_t *register_dev(device_t *dev, const pstring &name);
-		device_t *register_dev(const pstring &classname, const pstring &name);
-		void remove_dev(const pstring &name);
+		void register_object(device_t &dev, const pstring &name, object_t &obj);
+
+		template<class _X>
+		void register_dev_s(powned_ptr<_X> dev)
+		{
+			register_dev(std::move(dev));
+		}
+
+
+		void register_dev(powned_ptr<device_t> dev);
+		void register_dev(const pstring &classname, const pstring &name);
 
 		void register_lib_entry(const pstring &name);
 
@@ -157,13 +139,12 @@ namespace netlist
 		void register_param(const pstring &param, const double value);
 
 		void register_frontier(const pstring attach, const double r_IN, const double r_OUT);
+
 		void remove_connections(const pstring attach);
 
-		void register_object(device_t &dev, const pstring &name, object_t &obj);
 		bool connect(core_terminal_t &t1, core_terminal_t &t2);
 
-		core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
-		core_terminal_t *find_terminal(const pstring &outname_in, object_t::type_t atype, bool required = true);
+		bool device_exists(const pstring name) const;
 
 		param_t *find_param(const pstring &param_in, bool required = true);
 
@@ -181,18 +162,20 @@ namespace netlist
 
 		/* register a source */
 
-		void register_source(source_t *src) { m_sources.add(src); }
+		template <class C>
+		void register_source(std::shared_ptr<C> src)
+		{
+			m_sources.push_back(std::static_pointer_cast<source_t>(src));
+		}
 
-		factory_list_t &factory() { return *m_factory; }
-		const factory_list_t &factory() const { return *m_factory; }
+		factory_list_t &factory() { return m_factory; }
+		const factory_list_t &factory() const { return m_factory; }
 
 		bool is_library_item(const pstring &name) const { return m_lib.contains(name); }
 
-		void print_stats() const;
-
 		/* model / family related */
 
-		logic_family_desc_t *family_from_model(const pstring &model);
+		const logic_family_desc_t *family_from_model(const pstring &model);
 		const pstring model_value_str(model_map_t &map, const pstring &entity);
 		nl_double model_value(model_map_t &map, const pstring &entity);
 
@@ -201,9 +184,14 @@ namespace netlist
 		plog_base<NL_DEBUG> &log() { return netlist().log(); }
 		const plog_base<NL_DEBUG> &log() const { return netlist().log(); }
 
+		pvector_t<std::pair<pstring, base_factory_t *>> m_device_factory;
+
 	protected:
 
 	private:
+
+		core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
+		core_terminal_t *find_terminal(const pstring &outname_in, object_t::type_t atype, bool required = true);
 
 		void connect_terminals(core_terminal_t &in, core_terminal_t &out);
 		void connect_input_output(core_terminal_t &in, core_terminal_t &out);
@@ -217,24 +205,25 @@ namespace netlist
 		const pstring resolve_alias(const pstring &name) const;
 		devices::nld_base_proxy *get_d_a_proxy(core_terminal_t &out);
 
-		netlist_t *m_netlist;
+		netlist_t &m_netlist;
 
 		phashmap_t<pstring, pstring> m_alias;
 		phashmap_t<pstring, param_t *>  m_params;
-		phashmap_t<pstring, pstring> m_params_temp;
+		phashmap_t<pstring, pstring> m_param_values;
 		phashmap_t<pstring, core_terminal_t *> m_terminals;
 
-		plist_t<link_t> m_links;
+		pvector_t<link_t> m_links;
 
-		factory_list_t *m_factory;
+		factory_list_t m_factory;
 
 		phashmap_t<pstring, pstring> m_models;
 
 		int m_proxy_cnt;
+		int m_frontier_cnt;
 
-		pstack_t<pstring> m_stack;
+		std::stack<pstring> m_namespace_stack;
 		source_t::list_t m_sources;
-		plist_t<pstring> m_lib;
+		pvector_t<pstring> m_lib;
 
 	};
 

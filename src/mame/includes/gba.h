@@ -3,7 +3,7 @@
 #ifndef _GBA_H_
 #define _GBA_H_
 
-#include "audio/gb.h"
+#include "sound/gb.h"
 #include "machine/intelfsh.h"
 #include "bus/gba/gba_slot.h"
 #include "sound/dac.h"

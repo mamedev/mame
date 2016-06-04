@@ -99,7 +99,7 @@ public:
 };
 
 
-#define VERBOSE_LEVEL ( 3 )
+#define VERBOSE_LEVEL (0)
 
 static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char* s_fmt, ... )
 {
@@ -170,7 +170,7 @@ WRITE32_MEMBER(_39in1_state::pxa255_i2s_w)
 		{
 			sprintf(filename, "39in1_%04d.raw", count++);
 			audio_dump = fopen(filename, "rb");
-		}while(audio_dump != NULL);
+		}while(audio_dump != nullptr);
 		count--;
 		sprintf(filename, "39in1_%04d.raw", count);
 		audio_dump = fopen(filename, "wb");

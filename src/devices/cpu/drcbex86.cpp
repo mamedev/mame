@@ -85,6 +85,7 @@
 #include <stddef.h>
 #include "emu.h"
 #include "debugger.h"
+#include "emuopts.h"
 #include "drcuml.h"
 #include "drcbex86.h"
 
@@ -242,6 +243,7 @@ const drcbe_x86::opcode_table_entry drcbe_x86::s_opcode_table_source[] =
 	{ uml::OP_OR,      &drcbe_x86::op_or },         // OR      dst,src1,src2[,f]
 	{ uml::OP_XOR,     &drcbe_x86::op_xor },        // XOR     dst,src1,src2[,f]
 	{ uml::OP_LZCNT,   &drcbe_x86::op_lzcnt },      // LZCNT   dst,src[,f]
+	{ uml::OP_TZCNT,   &drcbe_x86::op_tzcnt },      // TZCNT   dst,src[,f]
 	{ uml::OP_BSWAP,   &drcbe_x86::op_bswap },      // BSWAP   dst,src
 	{ uml::OP_SHL,     &drcbe_x86::op_shl },        // SHL     dst,src,count[,f]
 	{ uml::OP_SHR,     &drcbe_x86::op_shr },        // SHR     dst,src,count[,f]
@@ -270,7 +272,9 @@ const drcbe_x86::opcode_table_entry drcbe_x86::s_opcode_table_source[] =
 	{ uml::OP_FABS,    &drcbe_x86::op_fabs },       // FABS    dst,src1
 	{ uml::OP_FSQRT,   &drcbe_x86::op_fsqrt },      // FSQRT   dst,src1
 	{ uml::OP_FRECIP,  &drcbe_x86::op_frecip },     // FRECIP  dst,src1
-	{ uml::OP_FRSQRT,  &drcbe_x86::op_frsqrt }      // FRSQRT  dst,src1
+	{ uml::OP_FRSQRT,  &drcbe_x86::op_frsqrt },     // FRSQRT  dst,src1
+	{ uml::OP_FCOPYI,  &drcbe_x86::op_fcopyi },     // FCOPYI  dst,src
+	{ uml::OP_ICOPYF,  &drcbe_x86::op_icopyf },     // ICOPYF  dst,src
 };
 
 
@@ -789,7 +793,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 			if (inst.opcode() == OP_HANDLE)
 				blockname = inst.param(0).handle().string();
 			else if (inst.opcode() == OP_HASH)
-				blockname = strformat("Code: mode=%d PC=%08X", (UINT32)inst.param(0).immediate(), (offs_t)inst.param(1).immediate()).c_str();
+				blockname = string_format("Code: mode=%d PC=%08X", (UINT32)inst.param(0).immediate(), (offs_t)inst.param(1).immediate()).c_str();
 		}
 
 		// generate code
@@ -5473,6 +5477,51 @@ void drcbe_x86::op_lzcnt(x86code *&dst, const instruction &inst)
 
 
 //-------------------------------------------------
+//  op_tzcnt - process a TZCNT opcode
+//-------------------------------------------------
+
+void drcbe_x86::op_tzcnt(x86code *&dst, const instruction &inst)
+{
+	// validate instruction
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_flags(inst, FLAG_Z | FLAG_S);
+
+	// normalize parameters
+	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
+
+	int dstreg = dstp.select_register(REG_EAX);
+	
+	// 32-bit form
+	if (inst.size() == 4)
+	{
+		emit_mov_r32_p32(dst, dstreg, srcp);											// mov   dstreg,src1p
+		emit_mov_r32_imm(dst, REG_ECX, 32);												// mov   ecx,32
+		emit_bsf_r32_r32(dst, dstreg, dstreg);											// bsf   dstreg,dstreg
+		emit_cmovcc_r32_r32(dst, x86emit::COND_Z, dstreg, REG_ECX);						// cmovz dstreg,ecx
+		emit_mov_p32_r32(dst, dstp, dstreg);											// mov   dstp,dstreg
+	}
+
+	// 64-bit form
+	else if (inst.size() == 8)
+	{
+		emit_link skip;
+		emit_mov_r64_p64(dst, REG_EDX, dstreg, srcp);									// mov   dstreg:edx,srcp
+		emit_bsf_r32_r32(dst, dstreg, dstreg);											// bsf   dstreg,dstreg		
+		emit_jcc_short_link(dst, x86emit::COND_NZ, skip);								// jnz   skip
+		emit_mov_r32_imm(dst, REG_ECX, 32);												// mov   ecx,32
+		emit_bsf_r32_r32(dst, dstreg, REG_EDX);											// bsf   dstreg,edx
+		emit_cmovcc_r32_r32(dst, x86emit::COND_Z, dstreg, REG_ECX);						// cmovz dstreg,ecx
+		emit_add_r32_imm(dst, dstreg, 32);												// add   dstreg,32
+		track_resolve_link(dst, skip);													// skip:
+		emit_xor_r32_r32(dst, REG_EDX, REG_EDX);										// xor   edx,edx
+		emit_mov_p64_r64(dst, dstp, dstreg, REG_EDX);									// mov   dstp,edx:dstreg
+	}
+}
+
+
+//-------------------------------------------------
 //  op_bswap - process a BSWAP opcode
 //-------------------------------------------------
 
@@ -6445,6 +6494,105 @@ void drcbe_x86::op_frsqrt(x86code *&dst, const instruction &inst)
 	emit_fsqrt(dst);                                                                    // fsqrt
 	emit_fdivp(dst);                                                                    // fdivp
 	emit_fstp_p(dst, inst.size(), dstp);                                                // fstp  dstp
+}
+
+
+//-------------------------------------------------
+//  op_fcopyi - process a FCOPYI opcode
+//-------------------------------------------------
+
+void drcbe_x86::op_fcopyi(x86code *&dst, const instruction &inst)
+{
+	// validate instruction
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_no_flags(inst);
+
+	// normalize parameters
+	be_parameter dstp(*this, inst.param(0), PTYPE_MF);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MR);
+
+	// 32-bit case
+	if (inst.size() == 4)
+	{
+		if (srcp.is_memory())
+		{
+			emit_mov_r32_m32(dst, REG_EAX, MABS(srcp.memory()));                            // mov eax,[srcp]
+			emit_mov_m32_r32(dst, MABS(dstp.memory()), REG_EAX);                            // mov [dstp],eax
+		}
+		else if (srcp.is_int_register())
+		{
+			emit_mov_m32_r32(dst, MABS(dstp.memory()), srcp.ireg());                        // mov [dstp],srcp
+		}
+	}
+
+	// 64-bit case
+	else if (inst.size() == 8)
+	{
+		if (srcp.is_memory())
+		{
+			emit_mov_r32_m32(dst, REG_EAX, MABS(srcp.memory()));                            // mov eax,[srcp]
+			emit_mov_r32_m32(dst, REG_EDX, MABS(srcp.memory(4)));                       // mov edx,[srcp+4]
+		}
+		else if (srcp.is_int_register())
+		{
+			emit_mov_r32_m32(dst, REG_EDX, MABS(m_reghi[srcp.ireg()]));                 // mov edx,[reghi[srcp]]
+			emit_mov_r32_r32(dst, REG_EAX, srcp.ireg());                                    // mov eax,srcp
+		}
+
+		emit_mov_m32_r32(dst, MABS(dstp.memory()), REG_EAX);                                // mov [dstp],eax
+		emit_mov_m32_r32(dst, MABS(dstp.memory(4)), REG_EDX);                           // mov [dstp+4],edx
+	}
+}
+
+
+//-------------------------------------------------
+//  op_icopyf - process a ICOPYF opcode
+//-------------------------------------------------
+
+void drcbe_x86::op_icopyf(x86code *&dst, const instruction &inst)
+{
+	// validate instruction
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_no_flags(inst);
+
+	// normalize parameters
+	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MF);
+
+	// 32-bit case
+	if (inst.size() == 4)
+	{
+		emit_mov_r32_m32(dst, REG_EAX, MABS(srcp.memory()));                                // mov eax,[srcp]
+
+		if (dstp.is_memory())
+		{
+			emit_mov_m32_r32(dst, MABS(dstp.memory()), REG_EAX);                            // mov [dstp],eax
+		}
+		else if (dstp.is_int_register())
+		{
+			emit_mov_r32_r32(dst, dstp.ireg(), REG_EAX);                                    // mov dstp,eax
+		}
+	}
+
+	// 64-bit case
+	else if (inst.size() == 8)
+	{
+		emit_mov_r32_m32(dst, REG_EAX, MABS(srcp.memory()));                                // mov eax,[srcp]
+		emit_mov_r32_m32(dst, REG_EDX, MABS(srcp.memory(4)));                           // mov edx,[srcp+4]
+
+		if (dstp.is_memory())
+		{
+			emit_mov_m32_r32(dst, MABS(dstp.memory()), REG_EAX);                            // mov [dstp],eax
+			emit_mov_m32_r32(dst, MABS(dstp.memory(4)), REG_EDX);                       // mov [dstp+4],edx
+		}
+		else
+		{
+			emit_mov_m32_r32(dst, MABS(m_reghi[dstp.ireg()]), REG_EDX);                 // mov [reghi[dstp]],edx
+			emit_mov_r32_r32(dst, dstp.ireg(), REG_EAX);                                    // mov dstp,eax
+		}
+	}
 }
 
 

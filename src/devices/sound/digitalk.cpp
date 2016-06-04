@@ -266,7 +266,7 @@ const device_type DIGITALKER = &device_creator<digitalker_device>;
 digitalker_device::digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DIGITALKER, "Digitalker", tag, owner, clock, "digitalker", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_rom(nullptr),
+		m_rom(*this, DEVICE_SELF),
 		m_stream(nullptr),
 		m_data(0),
 		m_cs(0),
@@ -655,7 +655,6 @@ void digitalker_device::digitalker_register_for_save()
 
 void digitalker_device::device_start()
 {
-	m_rom = m_region->base();
 	m_stream = stream_alloc(0, 1, clock()/4);
 	m_dac_index = 128;
 	m_data = 0xff;

@@ -1273,6 +1273,11 @@ inline void emit_op(x86code *&emitptr, UINT32 op, UINT8 opsize, UINT8 reg, UINT8
 	if (opsize == OP_16BIT)
 		emit_byte(emitptr, PREFIX_OPSIZE);
 
+	bool has_prefix = (op & 0xff0000) == 0x660000 || (op & 0xff0000) == 0xf20000 || (op & 0xff0000) == 0xf30000;
+
+	if (has_prefix)
+		emit_byte(emitptr, op >> 16);
+
 #if (X86EMIT_SIZE == 64)
 {
 	UINT8 rex;
@@ -1287,7 +1292,7 @@ inline void emit_op(x86code *&emitptr, UINT32 op, UINT8 opsize, UINT8 reg, UINT8
 	assert(opsize != OP_64BIT);
 #endif
 
-	if ((op & 0xff0000) != 0)
+	if ((op & 0xff0000) != 0 && !has_prefix)
 		emit_byte(emitptr, op >> 16);
 	if ((op & 0xff00) != 0)
 		emit_byte(emitptr, op >> 8);

@@ -23,96 +23,88 @@
     Michael Zapf
     February 2012: Rewritten as class
 
+    References
+    [1] Michael L. Bunyard: Hardware Manual for the Texas Instruments 99/4A Home Computer, chapter 8
+
 *****************************************************************************/
 
 #include "emu.h"
 #include "peribox.h"
 #include "ti_32kmem.h"
 
-#define RAMREGION "ram"
+#define RAMREGION "ram32k"
 
 ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI_32KMEM, "TI-99 32KiB memory expansion card", tag, owner, clock, "ti99_32k", __FILE__), m_ram_ptr(nullptr)
+: ti_expansion_card_device(mconfig, TI_32KMEM, "TI-99 32KiB memory expansion card", tag, owner, clock, "ti99_32k", __FILE__),
+	m_ram(*this, RAMREGION)
 {
 }
 
 READ8Z_MEMBER(ti_32k_expcard_device::readz)
 {
 	UINT8 val = 0;
-	bool access = true;
-	switch((offset & 0xe000)>>13)
-	{
-	case 1:
-		val = m_ram_ptr[offset & 0x1fff];
-		break;
-	case 5:
-		val = m_ram_ptr[(offset & 0x1fff) | 0x2000];
-		break;
-	case 6:
-		val = m_ram_ptr[(offset & 0x1fff) | 0x4000];
-		break;
-	case 7:
-		val = m_ram_ptr[(offset & 0x1fff) | 0x6000];
-		break;
-	default:
-		access = false;
-		break;
-	}
-	if (access)
-	{
-		// There is no evidence for an inverted write on the even addresses;
-		// we assume that the FF00 byte sequence in this memory is a power-on
-		// artifact.
+	/*
+	    The problem for mapping the memory into the address space is that
+	    we have a block at 2000-3FFF and another one at A000-FFFF. The trick
+	    is to calculate a bank number in a way to get subsequent address
+	    This is done in a PAL on the expansion board [1].
 
-		/* if ((offset&1)!=1) *value = ~val;
-		else */
+	                    S AB
+	    0000: 000x  ->  0 xx
+	    2000: 001x  ->  1 01
+	    4000: 010x  ->  0 xx
+	    6000: 011x  ->  0 xx
+	    8000: 100x  ->  0 xx
+	    A000: 101x  ->  1 00
+	    C000: 110x  ->  1 11
+	    E000: 111x  ->  1 10
+
+	    select = A0*A1 + /A1*A2   (A0 = MSB)
+	    A = A1
+	    B = A0 nand A2
+	*/
+
+	bool select = ((offset & 0xfc000)==0x7c000) | ((offset & 0xf6000)==0x72000); // PAL output pin 14 [1]
+
+	if (select)
+	{
+		// address = 0abx xxxx xxxx xxxx
+		int bank = (offset & 0x4000) | ((((offset & 0x8000)>>2) & (offset & 0x2000)) ^ 0x2000);
+		val = m_ram->pointer()[bank | (offset & 0x1fff)];
+
+		// On powerup we find a FF00FF00... pattern in RAM
+		if ((offset & 1)==0) val = ~val;
 		*value = val;
 	}
 }
 
 WRITE8_MEMBER(ti_32k_expcard_device::write)
 {
-	UINT8 data1 = data;
-	// if ((offset&1)!=1) data1 = ~data;
-	switch((offset & 0xe000)>>13)
+	bool select = ((offset & 0xfc000)==0x7c000) | ((offset & 0xf6000)==0x72000); // PAL output pin 14 [1]
+
+	if (select)
 	{
-	case 1:
-		m_ram_ptr[offset & 0x1fff] = data1;
-		break;
-	case 5:
-		m_ram_ptr[(offset & 0x1fff) | 0x2000] = data1;
-		break;
-	case 6:
-		m_ram_ptr[(offset & 0x1fff) | 0x4000] = data1;
-		break;
-	case 7:
-		m_ram_ptr[(offset & 0x1fff) | 0x6000] = data1;
-		break;
-	default:
-		break;
+		// address = 0abx xxxx xxxx xxxx
+		int bank = (offset & 0x4000) | ((((offset & 0x8000)>>2) & (offset & 0x2000)) ^ 0x2000);
+		if ((offset & 1)==0) data = ~data;
+		m_ram->pointer()[bank | (offset & 0x1fff)] = data;
 	}
 }
+
 
 void ti_32k_expcard_device::device_start(void)
 {
-	m_ram_ptr = memregion(RAMREGION)->base();
-	m_cru_base = 0;
-	// See above. Preset the memory with FF00
-	// ROM_FILL does not seem to allow filling with an alternating pattern
-	for (int i=0; i < 0x8000; i+=2)
-	{
-		m_ram_ptr[i] = (UINT8)0xff;
-	}
 }
 
-ROM_START( ti_exp_32k )
-	ROM_REGION(0x8000, RAMREGION, 0)
-	ROM_FILL(0x0000, 0x8000, 0x00)
-ROM_END
+MACHINE_CONFIG_FRAGMENT( mem32k )
+	MCFG_RAM_ADD(RAMREGION)
+	MCFG_RAM_DEFAULT_SIZE("32k")
+	MCFG_RAM_DEFAULT_VALUE(0)
+MACHINE_CONFIG_END
 
-const rom_entry *ti_32k_expcard_device::device_rom_region() const
+machine_config_constructor ti_32k_expcard_device::device_mconfig_additions() const
 {
-	return ROM_NAME( ti_exp_32k );
+	return MACHINE_CONFIG_NAME( mem32k );
 }
 
 const device_type TI_32KMEM = &device_creator<ti_32k_expcard_device>;

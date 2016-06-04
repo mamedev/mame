@@ -374,7 +374,7 @@ void lc8670_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%s%s%s%s",
+			str = string_format("%s%s%s%s",
 				GET_CY ? "CY" : "..",
 				GET_AC ? "AC" : "..",
 				GET_OV ? "OV" : "..",
@@ -387,7 +387,7 @@ void lc8670_cpu_device::state_string_export(const device_state_entry &entry, std
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 

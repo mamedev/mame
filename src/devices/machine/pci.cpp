@@ -59,7 +59,8 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, pci_bridge_device)
 ADDRESS_MAP_END
 
 pci_device::pci_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_region(*this, DEVICE_SELF)
 {
 	main_id = 0xffffffff;
 	revision = 0x00;
@@ -340,7 +341,7 @@ void pci_device::add_map(UINT64 size, int flags, address_map_delegate &map)
 		bank_reg_infos[breg].hi = 0;
 	}
 
-	logerror("Device %s (%s) has 0x%" I64FMT "x bytes of %s named %s\n", tag(), name(), size, flags & M_IO ? "io" : "memory", bank_infos[bid].map.name());
+	logerror("Device %s (%s) has 0x%x bytes of %s named %s\n", tag(), name(), size, flags & M_IO ? "io" : "memory", bank_infos[bid].map.name());
 }
 
 void pci_device::add_rom(const UINT8 *rom, UINT32 size)
@@ -434,14 +435,15 @@ void pci_bridge_device::device_start()
 	for(auto & elem : sub_devices)
 		elem = nullptr;
 
-	for(device_t *d = bus_root()->first_subdevice(); d != nullptr; d = d->next()) {
-		const char *t = d->tag();
+	for (device_t &d : bus_root()->subdevices())
+	{
+		const char *t = d.tag();
 		int l = strlen(t);
 		if(l <= 4 || t[l-5] != ':' || t[l-2] != '.')
 			continue;
 		int id = strtol(t+l-4, nullptr, 16);
 		int fct = t[l-1] - '0';
-		sub_devices[(id << 3) | fct] = downcast<pci_device *>(d);
+		sub_devices[(id << 3) | fct] = downcast<pci_device *>(&d);
 	}
 
 	mapper_cb cf_cb(FUNC(pci_bridge_device::regenerate_config_mapping), this);

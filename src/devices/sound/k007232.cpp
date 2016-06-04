@@ -162,7 +162,7 @@ k007232_device::k007232_device(const machine_config &mconfig, const char *tag, d
 void k007232_device::device_start()
 {
 	/* Set up the chips */
-	m_pcmlimit  = region()->bytes();
+	m_pcmlimit = m_rom.bytes();
 
 	m_port_write_handler.resolve();
 

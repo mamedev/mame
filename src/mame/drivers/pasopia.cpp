@@ -291,7 +291,7 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(pasopia_map)
 	MCFG_CPU_IO_MAP(pasopia_io)
-	MCFG_CPU_CONFIG(pasopia_daisy)
+	MCFG_Z80_DAISY_CHAIN(pasopia_daisy)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

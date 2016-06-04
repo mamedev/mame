@@ -48,6 +48,7 @@ eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_typ
 	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, file),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
+		m_region(*this, DEVICE_SELF),
 		m_cells(0),
 		m_address_bits(0),
 		m_data_bits(0),
@@ -146,7 +147,7 @@ void eeprom_base_device::static_set_timing(device_t &device, timing_type type, c
 UINT32 eeprom_base_device::read(offs_t address)
 {
 	if (!ready())
-		logerror("EEPROM: Read performed before previous operation completed!");
+		logerror("EEPROM: Read performed before previous operation completed!\n");
 	return internal_read(address);
 }
 
@@ -158,7 +159,7 @@ UINT32 eeprom_base_device::read(offs_t address)
 void eeprom_base_device::write(offs_t address, UINT32 data)
 {
 	if (!ready())
-		logerror("EEPROM: Write performed before previous operation completed!");
+		logerror("EEPROM: Write performed before previous operation completed!\n");
 	internal_write(address, data);
 	m_completion_time = machine().time() + m_operation_time[WRITE_TIME];
 }
@@ -173,7 +174,7 @@ void eeprom_base_device::write(offs_t address, UINT32 data)
 void eeprom_base_device::write_all(UINT32 data)
 {
 	if (!ready())
-		logerror("EEPROM: Write all performed before previous operation completed!");
+		logerror("EEPROM: Write all performed before previous operation completed!\n");
 	for (offs_t address = 0; address < (1 << m_address_bits); address++)
 		internal_write(address, internal_read(address) & data);
 	m_completion_time = machine().time() + m_operation_time[WRITE_ALL_TIME];
@@ -187,7 +188,7 @@ void eeprom_base_device::write_all(UINT32 data)
 void eeprom_base_device::erase(offs_t address)
 {
 	if (!ready())
-		logerror("EEPROM: Erase performed before previous operation completed!");
+		logerror("EEPROM: Erase performed before previous operation completed!\n");
 	internal_write(address, ~0);
 	m_completion_time = machine().time() + m_operation_time[ERASE_TIME];
 }
@@ -200,7 +201,7 @@ void eeprom_base_device::erase(offs_t address)
 void eeprom_base_device::erase_all()
 {
 	if (!ready())
-		logerror("EEPROM: Erase all performed before previous operation completed!");
+		logerror("EEPROM: Erase all performed before previous operation completed!\n");
 	for (offs_t address = 0; address < (1 << m_address_bits); address++)
 		internal_write(address, ~0);
 	m_completion_time = machine().time() + m_operation_time[ERASE_ALL_TIME];
@@ -271,9 +272,9 @@ void eeprom_base_device::nvram_default()
 	UINT32 default_value = m_default_value_set ? m_default_value : ~0;
 	for (offs_t offs = 0; offs < eeprom_length; offs++)
 		if (m_data_bits == 8)
-			m_addrspace[0]->write_byte(offs, default_value);
+			space(AS_PROGRAM).write_byte(offs, default_value);
 		else
-			m_addrspace[0]->write_word(offs * 2, default_value);
+			space(AS_PROGRAM).write_word(offs * 2, default_value);
 
 	// handle hard-coded data from the driver
 	if (m_default_data.u8 != nullptr)
@@ -282,14 +283,14 @@ void eeprom_base_device::nvram_default()
 		for (offs_t offs = 0; offs < m_default_data_size; offs++)
 		{
 			if (m_data_bits == 8)
-				m_addrspace[0]->write_byte(offs, m_default_data.u8[offs]);
+				space(AS_PROGRAM).write_byte(offs, m_default_data.u8[offs]);
 			else
-				m_addrspace[0]->write_word(offs * 2, m_default_data.u16[offs]);
+				space(AS_PROGRAM).write_word(offs * 2, m_default_data.u16[offs]);
 		}
 	}
 
 	// populate from a memory region if present
-	if (m_region != nullptr)
+	if (m_region.found())
 	{
 		if (m_region->bytes() != eeprom_bytes)
 			fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)\n", tag(), eeprom_bytes);
@@ -303,13 +304,13 @@ void eeprom_base_device::nvram_default()
 		{
 			UINT8 *default_data = m_region->base();
 			for (offs_t offs = 0; offs < eeprom_length; offs++)
-				m_addrspace[0]->write_byte(offs, default_data[offs]);
+				space(AS_PROGRAM).write_byte(offs, default_data[offs]);
 		}
 		else
 		{
 			UINT16 *default_data = (UINT16 *)(m_region->base());
 			for (offs_t offs = 0; offs < eeprom_length; offs++)
-				m_addrspace[0]->write_word(offs * 2, default_data[offs]);
+				space(AS_PROGRAM).write_word(offs * 2, default_data[offs]);
 		}
 	}
 }
@@ -328,7 +329,7 @@ void eeprom_base_device::nvram_read(emu_file &file)
 	dynamic_buffer buffer(eeprom_bytes);
 	file.read(&buffer[0], eeprom_bytes);
 	for (offs_t offs = 0; offs < eeprom_bytes; offs++)
-		m_addrspace[0]->write_byte(offs, buffer[offs]);
+		space(AS_PROGRAM).write_byte(offs, buffer[offs]);
 }
 
 
@@ -344,7 +345,7 @@ void eeprom_base_device::nvram_write(emu_file &file)
 
 	dynamic_buffer buffer(eeprom_bytes);
 	for (offs_t offs = 0; offs < eeprom_bytes; offs++)
-		buffer[offs] = m_addrspace[0]->read_byte(offs);
+		buffer[offs] = space(AS_PROGRAM).read_byte(offs);
 	file.write(&buffer[0], eeprom_bytes);
 }
 
@@ -356,9 +357,9 @@ void eeprom_base_device::nvram_write(emu_file &file)
 UINT32 eeprom_base_device::internal_read(offs_t address)
 {
 	if (m_data_bits == 16)
-		return m_addrspace[0]->read_word(address * 2);
+		return space(AS_PROGRAM).read_word(address * 2);
 	else
-		return m_addrspace[0]->read_byte(address);
+		return space(AS_PROGRAM).read_byte(address);
 }
 
 
@@ -370,7 +371,7 @@ UINT32 eeprom_base_device::internal_read(offs_t address)
 void eeprom_base_device::internal_write(offs_t address, UINT32 data)
 {
 	if (m_data_bits == 16)
-		m_addrspace[0]->write_word(address * 2, data);
+		space(AS_PROGRAM).write_word(address * 2, data);
 	else
-		m_addrspace[0]->write_byte(address, data);
+		space(AS_PROGRAM).write_byte(address, data);
 }

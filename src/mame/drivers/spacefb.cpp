@@ -10,12 +10,15 @@
     Schematics scanned and provided by James Twine
     Thanks to Gary Walton for lending me his REAL Space Firebird
 
+    There is an undumped bootleg of this named 'Fire Condor', see
+    http://solarfox.triluminary.net/arc_spacefirebird.php for info
+
     Known issues/to-do's:
         * Bullet colors are incorrect.  The schematics cannot be right, so
           I am using pure red for now
 
           "MAME has the bullets and missiles as red, the real pcb shows them as
-           yellow with red tinges, they are overal yellow/orange in appearance."
+           yellow with red tinges, they are overall yellow/orange in appearance."
            (Andrew Welburn 24/12/10)
 
         * Analog sounds
@@ -23,7 +26,7 @@
 
     0000-3FFF ROM       Code
     8000-83FF RAM       Sprite RAM
-    C000-C7FF RAM       Game ram
+    C000-C7FF RAM       Game RAM
 
     IO Ports
 
@@ -34,7 +37,7 @@
        bit 1 = Player 1 Left
        bit 2 = unused
        bit 3 = unused
-       bit 4 = Player 1 Escape
+       bit 4 = Player 1 Warp / Escape
        bit 5 = unused
        bit 6 = unused
        bit 7 = Player 1 Fire
@@ -45,7 +48,7 @@
        bit 1 = Player 2 Left
        bit 2 = unused
        bit 3 = unused
-       bit 4 = Player 2 Escape
+       bit 4 = Player 2 Warp / Escape
        bit 5 = unused
        bit 6 = unused
        bit 7 = Player 2 Fire
@@ -612,4 +615,4 @@ GAME( 1980, spacefbg, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nin
 GAME( 1980, spacebrd, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg (Karateco)", "Space Bird (bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacefbb, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg", "Space Firebird (bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacedem, spacefb, spacefb, spacedem, driver_device, 0, ROT270, "Nintendo (Fortrek license)", "Space Demon", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, starwarr, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg? (Potomac Mortgage)", "Star Warrior", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, starwarr, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg (Potomac Mortgage)", "Star Warrior", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

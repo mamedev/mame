@@ -44,31 +44,8 @@ Notes:
 2008-07
 Added Dip Locations based on Service Mode
 
-
-The video system is a little weird, and looks like it was overdesigned for
-what the hardware is capable of.
-
-The video RAM can be viewed as 8 'banks', the first bank is the sprite 'list'
-The other video banks contain 1x32 tile strips which are the sprites.
-
-For every tile strip the first bank contains an x/y position, entries
-which would coincide with strips in the first bank are left blank, presumably
-due to this bank being the actual list.
-
-This would suggest the hardware is capable of drawing 31x32 (992) sprites,
-each made of 1x32 tile strips, however the game only ever appears to use 3
-banks of tile strips (96 sprites)
-
-In practice it seems like the hardware can probably only draw these 3 banks
-as separate layers with seemingly hardcoded priority levels, despite the odd
-design.
-
-Furthermore there are two sets of graphics, background tiles and 'sprite'
-tiles which are of different bitdepths, but are addressed in the same way.
-
-Tilemap hookup is just to make viewing easier, it's not used for rendering
-
-There is also an additional 8x8 text layer..
+The hardware is cloned from 'snk68' with some extra capabilities
+the drivers can probably be merged.
 
 
 Bugs:
@@ -88,7 +65,7 @@ There are some unmapped writes past the end of text ram too
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-
+#include "video/snk68_spr.h"
 
 class blackt96_state : public driver_device
 {
@@ -96,27 +73,13 @@ public:
 	blackt96_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_tilemapram(*this, "tilemapram"),
-		m_spriteram0(*this, "spriteram0"),
-		m_spriteram1(*this, "spriteram1"),
-		m_spriteram2(*this, "spriteram2"),
-		m_spriteram3(*this, "spriteram3"),
-		m_spriteram4(*this, "spriteram4"),
-		m_spriteram5(*this, "spriteram5"),
-		m_spriteram6(*this, "spriteram6"),
-		m_spriteram7(*this, "spriteram7"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_sprites(*this, "sprites")
+		{ }
 
 	required_shared_ptr<UINT16> m_tilemapram;
-	required_shared_ptr<UINT16> m_spriteram0;
-	required_shared_ptr<UINT16> m_spriteram1;
-	required_shared_ptr<UINT16> m_spriteram2;
-	required_shared_ptr<UINT16> m_spriteram3;
-	required_shared_ptr<UINT16> m_spriteram4;
-	required_shared_ptr<UINT16> m_spriteram5;
-	required_shared_ptr<UINT16> m_spriteram6;
-	required_shared_ptr<UINT16> m_spriteram7;
 	DECLARE_WRITE16_MEMBER(blackt96_c0000_w);
 	DECLARE_WRITE16_MEMBER(blackt96_80000_w);
 	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
@@ -126,147 +89,34 @@ public:
 	DECLARE_READ8_MEMBER(blackt96_soundio_port02_r);
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port02_w);
 
+	void tile_callback(int &tile, int& fx, int& fy, int& region);
+
 	DECLARE_READ16_MEMBER( random_r )
 	{
 		return machine().rand();
 	}
 
-	DECLARE_WRITE16_MEMBER(bg_videoram0_w);
-	DECLARE_WRITE16_MEMBER(bg_videoram1_w);
-	DECLARE_WRITE16_MEMBER(bg_videoram2_w);
-	DECLARE_WRITE16_MEMBER(bg_videoram3_w);
-	DECLARE_WRITE16_MEMBER(bg_videoram4_w);
-	DECLARE_WRITE16_MEMBER(bg_videoram5_w);
-	DECLARE_WRITE16_MEMBER(bg_videoram6_w);
-	DECLARE_WRITE16_MEMBER(bg_videoram7_w);
-
-	UINT16*      m_spriteram[8];
-	tilemap_t    *m_bg_tilemap[8];
 	UINT8 m_txt_bank;
 
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg4_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg5_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg6_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg7_tile_info);
 	virtual void video_start() override;
 	UINT32 screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_strip(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int column);
-	void draw_page(bitmap_ind16 &bitmap, const rectangle &cliprect, int page);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<snk68_spr_device> m_sprites;
+
 };
-
-#define GET_INFO( ram ) \
-	int tileno = (ram[tile_index*2+1] & 0x1fff); \
-	int rgn = (ram[tile_index*2+1] & 0x2000) >> 13; \
-	int flipyx = (ram[tile_index*2+1] & 0xc000)>>14; \
-	int col = (ram[tile_index*2] & 0x00ff); \
-	if (rgn==1) col >>=4; \
-	SET_TILE_INFO_MEMBER(1-rgn, tileno, col, TILE_FLIPYX(flipyx));
-
-TILE_GET_INFO_MEMBER(blackt96_state::get_bg0_tile_info){ GET_INFO(m_spriteram0); }
-TILE_GET_INFO_MEMBER(blackt96_state::get_bg1_tile_info){ GET_INFO(m_spriteram1); }
-TILE_GET_INFO_MEMBER(blackt96_state::get_bg2_tile_info){ GET_INFO(m_spriteram2); }
-TILE_GET_INFO_MEMBER(blackt96_state::get_bg3_tile_info){ GET_INFO(m_spriteram3); }
-TILE_GET_INFO_MEMBER(blackt96_state::get_bg4_tile_info){ GET_INFO(m_spriteram4); }
-TILE_GET_INFO_MEMBER(blackt96_state::get_bg5_tile_info){ GET_INFO(m_spriteram5); }
-TILE_GET_INFO_MEMBER(blackt96_state::get_bg6_tile_info){ GET_INFO(m_spriteram6); }
-TILE_GET_INFO_MEMBER(blackt96_state::get_bg7_tile_info){ GET_INFO(m_spriteram7); }
-
-WRITE16_MEMBER(blackt96_state::bg_videoram0_w) { COMBINE_DATA(&m_spriteram0[offset]); m_bg_tilemap[0]->mark_tile_dirty(offset/2); }
-WRITE16_MEMBER(blackt96_state::bg_videoram1_w) { COMBINE_DATA(&m_spriteram1[offset]); m_bg_tilemap[1]->mark_tile_dirty(offset/2); }
-WRITE16_MEMBER(blackt96_state::bg_videoram2_w) { COMBINE_DATA(&m_spriteram2[offset]); m_bg_tilemap[2]->mark_tile_dirty(offset/2); }
-WRITE16_MEMBER(blackt96_state::bg_videoram3_w) { COMBINE_DATA(&m_spriteram3[offset]); m_bg_tilemap[3]->mark_tile_dirty(offset/2); }
-WRITE16_MEMBER(blackt96_state::bg_videoram4_w) { COMBINE_DATA(&m_spriteram4[offset]); m_bg_tilemap[4]->mark_tile_dirty(offset/2); }
-WRITE16_MEMBER(blackt96_state::bg_videoram5_w) { COMBINE_DATA(&m_spriteram5[offset]); m_bg_tilemap[5]->mark_tile_dirty(offset/2); }
-WRITE16_MEMBER(blackt96_state::bg_videoram6_w) { COMBINE_DATA(&m_spriteram6[offset]); m_bg_tilemap[6]->mark_tile_dirty(offset/2); }
-WRITE16_MEMBER(blackt96_state::bg_videoram7_w) { COMBINE_DATA(&m_spriteram7[offset]); m_bg_tilemap[7]->mark_tile_dirty(offset/2); }
 
 void blackt96_state::video_start()
 {
-	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blackt96_state::get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blackt96_state::get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_bg_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blackt96_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_bg_tilemap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blackt96_state::get_bg3_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_bg_tilemap[4] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blackt96_state::get_bg4_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_bg_tilemap[5] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blackt96_state::get_bg5_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_bg_tilemap[6] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blackt96_state::get_bg6_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_bg_tilemap[7] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blackt96_state::get_bg7_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-
-	m_spriteram[0] = m_spriteram0;
-	m_spriteram[1] = m_spriteram1;
-	m_spriteram[2] = m_spriteram2;
-	m_spriteram[3] = m_spriteram3;
-	m_spriteram[4] = m_spriteram4;
-	m_spriteram[5] = m_spriteram5;
-	m_spriteram[6] = m_spriteram6;
-	m_spriteram[7] = m_spriteram7;
 }
 
-void blackt96_state::draw_strip(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int column)
-{
-	/* the very first 'page' in the spriteram contains the x/y positions for each tile strip */
-	gfx_element *gfxbg = m_gfxdecode->gfx(0);
-	gfx_element *gfxspr = m_gfxdecode->gfx(1);
-
-	int base = column * (0x80/2);
-	base += page * 2;
-
-	/* ---- ---- ---x xxxx
-	   xxxx ---y yyyy yyyy */
-
-	int xx=  ((m_spriteram[0][base+0]&0x001f)<<4) | (m_spriteram[0][base+1]&0xf000)>>12;
-	int yy = ((m_spriteram[0][base+1]&0x1ff));
-
-	if (xx&0x100) xx-=0x200;
-	yy = 0x1ff-yy;
-	if (yy&0x100) yy-=0x200;
-
-	yy -= 15;
-
-	UINT16* base2 = m_spriteram[page]+column * (0x80/2);
-
-	for (int y=0;y<32;y++)
-	{
-		/* -Xtt tttt tttt tttt
-		   ---- ---- cccc cccc */
-
-		UINT16 tile = (base2[y*2+1]&0x3fff);
-		UINT16 flipx = (base2[y*2+1]&0x4000);
-		UINT16 colour = (base2[y*2]&0x00ff);
-
-		if (tile&0x2000)
-		{
-			gfxbg->transpen(bitmap,cliprect,tile&0x1fff,colour>>4,flipx,0,xx,yy+y*16,0);
-		}
-		else
-		{
-			gfxspr->transpen(bitmap,cliprect,tile&0x1fff,colour,flipx,0,xx,yy+y*16,0);
-		}
-	}
-}
-
-void blackt96_state::draw_page(bitmap_ind16 &bitmap, const rectangle &cliprect, int page)
-{
-	for (int strip=0;strip<32;strip++)
-	{
-		draw_strip(bitmap, cliprect, page, strip);
-	}
-}
 
 UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	draw_page(bitmap, cliprect, 2); // bg
-	draw_page(bitmap, cliprect, 3); // lower pri sprites
-	draw_page(bitmap, cliprect, 1); // higher pri sprites
-
+	m_sprites->draw_sprites_all(bitmap, cliprect);
 
 	/* Text Layer */
 	int count = 0;
@@ -279,7 +129,7 @@ UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind1
 		{
 			UINT16 tile = (m_tilemapram[count*2]&0xff);
 			tile += m_txt_bank * 0x100;
-			gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,-16+y*8,0);
+			gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
@@ -319,17 +169,7 @@ static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("tilemapram") // text tilemap
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(bg_videoram0_w) AM_SHARE("spriteram0") // this is the 'list'
-	AM_RANGE(0x201000, 0x201fff) AM_RAM_WRITE(bg_videoram1_w) AM_SHARE("spriteram1") // sprites layer 0
-	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(bg_videoram2_w) AM_SHARE("spriteram2") // bg layer?
-	AM_RANGE(0x203000, 0x203fff) AM_RAM_WRITE(bg_videoram3_w) AM_SHARE("spriteram3") // sprites layer 1
-	// the following potentially exist (the ram is cleared, there is room for entries in the 'spriteram0' region
-	// but they never get used..)
-	AM_RANGE(0x204000, 0x204fff) AM_RAM_WRITE(bg_videoram4_w) AM_SHARE("spriteram4")
-	AM_RANGE(0x205000, 0x205fff) AM_RAM_WRITE(bg_videoram5_w) AM_SHARE("spriteram5")
-	AM_RANGE(0x206000, 0x206fff) AM_RAM_WRITE(bg_videoram6_w) AM_SHARE("spriteram6")
-	AM_RANGE(0x207000, 0x207fff) AM_RAM_WRITE(bg_videoram7_w) AM_SHARE("spriteram7")
-
+	AM_RANGE(0x200000, 0x207fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
 
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
@@ -367,108 +207,6 @@ static INPUT_PORTS_START( blackt96 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-#if 0
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x0001, 0x0001, "2" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x0001, 0x0001, "3" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-#endif
 
 	/* Dipswitch Port A */
 	PORT_START("DSW1")
@@ -589,6 +327,21 @@ WRITE8_MEMBER(blackt96_state::blackt96_soundio_port02_w)
 {
 }
 
+void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
+{
+	fx = tile & 0x4000;
+	fy = tile & 0x8000;
+	tile &= 0x3fff;
+
+	if (tile & 0x2000)
+	{
+		region = 0;
+	}
+	else
+	{
+		region = 1;
+	}
+}
 
 
 static MACHINE_CONFIG_START( blackt96, blackt96_state )
@@ -611,13 +364,17 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 16*32-1, 0*8, 16*32-1)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 256-1, 0*8, 224-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 256-1, 2*8, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blackt96_state, screen_update_blackt96)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
+	MCFG_DEVICE_ADD("sprites", SNK68_SPR, 0)
+	MCFG_SNK68_SPR_GFXDECODE("gfxdecode")
+	MCFG_SNK68_SPR_SET_TILE_INDIRECT( blackt96_state, tile_callback )
+	MCFG_SNK68_SPR_NO_PARTIAL
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

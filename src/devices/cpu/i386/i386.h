@@ -333,6 +333,7 @@ struct I386_CALL_GATE
 	inline UINT32 DEC32(UINT32 dst);
 	inline void PUSH16(UINT16 value);
 	inline void PUSH32(UINT32 value);
+	inline void PUSH32SEG(UINT32 value);
 	inline void PUSH8(UINT8 value);
 	inline UINT8 POP8();
 	inline UINT16 POP16();

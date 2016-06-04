@@ -16,23 +16,24 @@
 // - LPU & PPU ROMs
 // - LPU & PPU RAMs
 // - Text mode screen
-// - Keyboard (most of keys)
+// - Graphic screen
+// - Keyboard
+// - T15 tape drive
+// - Software list to load optional ROMs
 // What's not yet in:
 // - Beeper
-// - Rest of keyboard
-// - Graphic screen
-// - Tape drive (this needs some heavy RE of the TACO chip)
+// - Better naming of tape drive image (it's now "magt", should be "t15")
 // - Better documentation of this file
-// - Software list to load optional ROMs
 // What's wrong:
 // - I'm using character generator from HP64K (another driver of mine): no known dump of the original one
 // - Speed, as usual
-// - There are a couple of undocumented opcodes that PPU executes at each keyboard interrupt: don't know if ignoring them is a Bad Thing (tm) or not
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "softlist.h"
 #include "cpu/hphybrid/hphybrid.h"
+#include "machine/hp_taco.h"
+#include "bus/hp_optroms/hp_optrom.h"
 
 #define BIT_MASK(n) (1U << (n))
 
@@ -43,13 +44,43 @@
 // Base address of video buffer
 #define VIDEO_BUFFER_BASE       0x17000
 
-#define MAX_WORD_PER_ROW        600
+// For test "B" of alpha video to succeed this must be < 234
+// Basically "B" test is designed to intentionally prevent line buffer to be filled so that display is blanked
+// from 2nd row on. This in turn prevents "BAD" text to be visible on screen.
+#define MAX_WORD_PER_ROW        220
 
+// Constants of alpha video
+#define VIDEO_PIXEL_CLOCK       20849400
 #define VIDEO_CHAR_WIDTH        9
 #define VIDEO_CHAR_HEIGHT       15
 #define VIDEO_CHAR_COLUMNS      80
+#define VIDEO_CHAR_TOTAL        99
 #define VIDEO_CHAR_ROWS         25
+#define VIDEO_ROWS_TOTAL        26
+#define VIDEO_HBSTART           (VIDEO_CHAR_WIDTH * VIDEO_CHAR_COLUMNS)
+#define VIDEO_HTOTAL            (VIDEO_CHAR_WIDTH * VIDEO_CHAR_TOTAL)
+#define VIDEO_VTOTAL            (VIDEO_CHAR_HEIGHT * VIDEO_ROWS_TOTAL)
 #define VIDEO_ACTIVE_SCANLINES  (VIDEO_CHAR_HEIGHT * VIDEO_CHAR_ROWS)
+
+// Constants of graphic video
+// Pixel clock is 20.8494 MHz (the same as alpha video)
+// Horizontal counter counts in [1..727] range
+// Vertical counter counts in [34..511] range
+#define GVIDEO_HTOTAL           727
+#define GVIDEO_HCNT_OFF         1       // Actual start value of h counter
+#define GVIDEO_HBEND            (69 - GVIDEO_HCNT_OFF)
+#define GVIDEO_HPIXELS          560
+#define GVIDEO_HBSTART          (GVIDEO_HBEND + GVIDEO_HPIXELS)
+#define GVIDEO_VTOTAL           478
+#define GVIDEO_VCNT_OFF         34      // Actual start value of v counter
+#define GVIDEO_VBEND            (50 - GVIDEO_VCNT_OFF)
+#define GVIDEO_VPIXELS          455
+#define GVIDEO_VBSTART          (GVIDEO_VBEND + GVIDEO_VPIXELS)
+#define GVIDEO_MEM_SIZE         16384
+#define GVIDEO_ADDR_MASK        (GVIDEO_MEM_SIZE - 1)
+#define GVIDEO_PA               13
+
+#define T15_PA                  15
 
 #define KEY_SCAN_OSCILLATOR     327680
 
@@ -73,11 +104,14 @@ public:
 		driver_device(mconfig, type, tag),
 				m_lpu(*this , "lpu"),
 				m_ppu(*this , "ppu"),
+                m_screen(*this , "screen"),
 				m_palette(*this , "palette"),
+                m_gv_timer(*this , "gv_timer"),
 		m_io_key0(*this , "KEY0"),
 		m_io_key1(*this , "KEY1"),
 		m_io_key2(*this , "KEY2"),
-		m_io_key3(*this , "KEY3")
+		m_io_key3(*this , "KEY3"),
+				m_t15(*this , "t15")
 	{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -86,11 +120,19 @@ public:
 		virtual void machine_reset() override;
 
 		TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
+        TIMER_DEVICE_CALLBACK_MEMBER(gv_timer);
 
 		void vblank_w(screen_device &screen, bool state);
 
+        void set_graphic_mode(bool graphic);
+	DECLARE_READ16_MEMBER(graphic_r);
+	DECLARE_WRITE16_MEMBER(graphic_w);
+        attotime time_to_gv_mem_availability(void) const;
+        void advance_gv_fsm(bool ds , bool trigger);
+        void update_graphic_bits(void);
+
 		IRQ_CALLBACK_MEMBER(irq_callback);
-	void update_irl(void);
+	void update_irq(void);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
 	DECLARE_READ16_MEMBER(kb_scancode_r);
@@ -99,18 +141,26 @@ public:
 
 		DECLARE_WRITE8_MEMBER(pa_w);
 
+		DECLARE_WRITE_LINE_MEMBER(t15_irq_w);
+		DECLARE_WRITE_LINE_MEMBER(t15_flg_w);
+		DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
+
 private:
 		required_device<hp_5061_3001_cpu_device> m_lpu;
 		required_device<hp_5061_3001_cpu_device> m_ppu;
+        required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+        required_device<timer_device> m_gv_timer;
 	required_ioport m_io_key0;
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
 	required_ioport m_io_key3;
+		required_device<hp_taco_device> m_t15;
 
 		void set_video_mar(UINT16 mar);
 		void video_fill_buff(bool buff_idx);
-		void video_render_buff(unsigned line_in_row, bool buff_idx);
+		void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
+        void graphic_video_render(unsigned video_scanline);
 
 	// Character generator
 	const UINT8 *m_chargen;
@@ -123,25 +173,53 @@ private:
 		} video_buffer_t;
 
 	bitmap_rgb32 m_bitmap;
-		unsigned m_video_scanline;
 		offs_t m_video_mar;
 		UINT16 m_video_word;
 		bool m_video_load_mar;
+        bool m_video_first_mar;
 		bool m_video_byte_idx;
 		UINT8 m_video_attr;
 		bool m_video_buff_idx;
 		bool m_video_blanked;
-		UINT8 m_video_frame;
 		video_buffer_t m_video_buff[ 2 ];
+
+        // Graphic video
+        typedef enum {
+                GV_STAT_RESET,
+                GV_STAT_WAIT_DS_0 = GV_STAT_RESET,
+                GV_STAT_WAIT_TRIG_0,
+                GV_STAT_WAIT_MEM_0,
+                GV_STAT_WAIT_DS_1,
+                GV_STAT_WAIT_DS_2,
+                GV_STAT_WAIT_TRIG_1,
+                GV_STAT_WAIT_MEM_1,
+                GV_STAT_WAIT_MEM_2
+        } gv_fsm_state_t;
+
+        bool m_graphic_sel;
+        gv_fsm_state_t m_gv_fsm_state;
+        bool m_gv_int_en;
+        bool m_gv_dma_en;
+        bool m_gv_ready;
+        UINT8 m_gv_cmd; // U65 (GC)
+        UINT16 m_gv_data_w;     // U29, U45, U28 & U44 (GC)
+        UINT16 m_gv_data_r;     // U59 & U60 (GC)
+        UINT16 m_gv_io_counter; // U1, U2, U14 & U15 (GC)
+        UINT16 m_gv_cursor_w;   // U38 & U39 (GS)
+        UINT16 m_gv_cursor_x;   // U31 & U23 (GS)
+        UINT16 m_gv_cursor_y;   // U15 & U8 (GS)
+        bool m_gv_cursor_gc;    // U8 (GS)
+        bool m_gv_cursor_fs;    // U8 (GS)
+        std::vector<UINT16> m_graphic_mem;
 
 		// Interrupt handling
 		UINT8 m_irl_pending;
+		UINT8 m_irh_pending;
 
 		// State of keyboard
 		ioport_value m_kb_state[ 4 ];
 		UINT8 m_kb_scancode;
 		UINT16 m_kb_status;
-
 };
 
 static INPUT_PORTS_START(hp9845b)
@@ -295,7 +373,11 @@ UINT32 hp9845_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 UINT32 hp9845b_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+        if (m_graphic_sel) {
+                copybitmap(bitmap, m_bitmap, 0, 0, GVIDEO_HBEND, GVIDEO_VBEND, cliprect);
+        } else {
+                copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+        }
 
 	return 0;
 }
@@ -305,6 +387,8 @@ void hp9845b_state::machine_start()
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 
 		m_chargen = memregion("chargen")->base();
+
+                m_graphic_mem.resize(GVIDEO_MEM_SIZE);
 }
 
 void hp9845b_state::machine_reset()
@@ -315,13 +399,19 @@ void hp9845b_state::machine_reset()
 		// Some sensible defaults
 		m_video_mar = VIDEO_BUFFER_BASE;
 		m_video_load_mar = false;
+                m_video_first_mar = false;
 		m_video_byte_idx = false;
 		m_video_attr = 0;
 		m_video_buff_idx = false;
 		m_video_blanked = false;
-		m_video_frame = 0;
+                m_graphic_sel = false;
+                m_gv_fsm_state = GV_STAT_RESET;
+                m_gv_int_en = false;
+                m_gv_dma_en = false;
+                m_gv_ready = true;
 
 		m_irl_pending = 0;
+				m_irh_pending = 0;
 
 		memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
 		m_kb_scancode = 0x7f;
@@ -351,7 +441,10 @@ void hp9845b_state::video_fill_buff(bool buff_idx)
 						m_video_word = prog_space.read_word(m_video_mar << 1);
 						if (m_video_load_mar) {
 								// Load new address into MAR after start of a new frame or NWA instruction
-								// TODO: decode graphic/alpha mode bit
+                                                        if (m_video_first_mar) {
+                                                                set_graphic_mode(!BIT(m_video_word , 15));
+                                                                m_video_first_mar = false;
+                                                        }
 								set_video_mar(~m_video_word);
 								m_video_load_mar = false;
 								continue;
@@ -393,20 +486,25 @@ void hp9845b_state::video_fill_buff(bool buff_idx)
 		}
 }
 
-void hp9845b_state::video_render_buff(unsigned line_in_row, bool buff_idx)
+void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx)
 {
 		if (!m_video_buff[ buff_idx ].full) {
 				m_video_blanked = true;
 		}
 
+                const pen_t *pen = m_palette->pens();
+
 		if (m_video_blanked) {
-				// TODO: blank scanline
+                        // Blank scanline
+                        for (unsigned i = 0; i < VIDEO_HBSTART; i++) {
+                                m_bitmap.pix32(video_scanline , i) = pen[ 0 ];
+                        }
 		} else {
-		const rgb_t *palette = m_palette->palette()->entry_list_raw();
 				bool cursor_line = line_in_row == 12;
 				bool ul_line = line_in_row == 14;
-				bool cursor_blink = BIT(m_video_frame , 3);
-				bool char_blink = BIT(m_video_frame , 4);
+                                unsigned video_frame = (unsigned)m_screen->frame_number();
+				bool cursor_blink = BIT(video_frame , 3);
+				bool char_blink = BIT(video_frame , 4);
 
 				for (unsigned i = 0; i < 80; i++) {
 						UINT8 charcode = m_video_buff[ buff_idx ].chars[ i ];
@@ -433,7 +531,7 @@ void hp9845b_state::video_render_buff(unsigned line_in_row, bool buff_idx)
 						for (unsigned j = 0; j < 9; j++) {
 								bool pixel = (pixels & (1U << (8 - j))) != 0;
 
-								m_bitmap.pix32(m_video_scanline , i * 9 + j) = palette[ pixel ? 1 : 0 ];
+								m_bitmap.pix32(video_scanline , i * 9 + j) = pen[ pixel ? 1 : 0 ];
 						}
 				}
 		}
@@ -441,51 +539,383 @@ void hp9845b_state::video_render_buff(unsigned line_in_row, bool buff_idx)
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::scanline_timer)
 {
-		m_video_scanline = param;
+        unsigned video_scanline = param;
 
-		if (m_video_scanline < VIDEO_ACTIVE_SCANLINES) {
-				unsigned row = m_video_scanline / 15;
-				unsigned line_in_row = m_video_scanline - row * 15;
+        if (m_graphic_sel) {
+                if (video_scanline >= GVIDEO_VBEND && video_scanline < GVIDEO_VBSTART) {
+                        graphic_video_render(video_scanline);
+                }
+        } else if (video_scanline < VIDEO_ACTIVE_SCANLINES) {
+                unsigned row = video_scanline / VIDEO_CHAR_HEIGHT;
+                unsigned line_in_row = video_scanline - row * VIDEO_CHAR_HEIGHT;
 
-				if (line_in_row == 0) {
-						// Start of new row, swap buffers
-						m_video_buff_idx = !m_video_buff_idx;
-						video_fill_buff(!m_video_buff_idx);
-				}
+                if (line_in_row == 0) {
+                        // Start of new row, swap buffers
+                        m_video_buff_idx = !m_video_buff_idx;
+                        video_fill_buff(!m_video_buff_idx);
+                }
 
-				video_render_buff(line_in_row , m_video_buff_idx);
-		}
+                video_render_buff(video_scanline , line_in_row , m_video_buff_idx);
+        }
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::gv_timer)
+{
+        advance_gv_fsm(false , false);
 }
 
 void hp9845b_state::vblank_w(screen_device &screen, bool state)
 {
-		// VBlank signal is fed into HALT flag of PPU
-		m_ppu->halt_w(state);
+                // VBlank signal is fed into HALT flag of PPU
+                m_ppu->halt_w(state);
 
-		if (state) {
-				// Start of V blank
-				set_video_mar(0);
-				m_video_load_mar = true;
-				m_video_byte_idx = false;
-				m_video_blanked = false;
-				m_video_frame++;
-				m_video_buff_idx = !m_video_buff_idx;
-				video_fill_buff(!m_video_buff_idx);
-		}
+                if (state) {
+                                // Start of V blank
+                                set_video_mar(0);
+                                m_video_load_mar = true;
+                                m_video_first_mar = true;
+                                m_video_byte_idx = false;
+                                m_video_blanked = false;
+                                m_video_buff_idx = !m_video_buff_idx;
+                                video_fill_buff(!m_video_buff_idx);
+                }
+}
+
+void hp9845b_state::set_graphic_mode(bool graphic)
+{
+        if (graphic != m_graphic_sel) {
+                m_graphic_sel = graphic;
+                logerror("GS=%d\n" , graphic);
+                if (m_graphic_sel) {
+                        m_screen->configure(GVIDEO_HTOTAL , GVIDEO_VTOTAL , rectangle(GVIDEO_HBEND , GVIDEO_HBSTART - 1 , GVIDEO_VBEND , GVIDEO_VBSTART - 1) , HZ_TO_ATTOSECONDS(VIDEO_PIXEL_CLOCK) * GVIDEO_HTOTAL * GVIDEO_VTOTAL);
+                } else {
+                        m_screen->configure(VIDEO_HTOTAL , VIDEO_VTOTAL , rectangle(0 , VIDEO_HBSTART - 1 , 0 , VIDEO_ACTIVE_SCANLINES - 1) , HZ_TO_ATTOSECONDS(VIDEO_PIXEL_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
+                }
+        }
+}
+
+READ16_MEMBER(hp9845b_state::graphic_r)
+{
+        UINT16 res = 0;
+
+        switch (offset) {
+        case 0:
+                // R4: data register
+                res = m_gv_data_r;
+                advance_gv_fsm(true , false);
+                break;
+
+        case 1:
+                // R5: status register
+                if (m_gv_int_en) {
+                        BIT_SET(res, 7);
+                }
+                if (m_gv_dma_en) {
+                        BIT_SET(res, 6);
+                }
+                BIT_SET(res, 5);
+                break;
+
+        case 2:
+                // R6: data register with DMA TC
+                m_gv_dma_en = false;
+                res = m_gv_data_r;
+                advance_gv_fsm(true , false);
+                break;
+
+        case 3:
+                // R7: not mapped
+                break;
+        }
+
+        //logerror("rd gv R%u = %04x\n", 4 + offset , res);
+
+        return res;
+}
+
+WRITE16_MEMBER(hp9845b_state::graphic_w)
+{
+        //logerror("wr gv R%u = %04x\n", 4 + offset , data);
+
+        switch (offset) {
+        case 0:
+                // R4: data register
+                m_gv_data_w = data;
+                m_gv_cursor_w = data;
+                advance_gv_fsm(true , false);
+                break;
+
+        case 1:
+                // R5: command register
+                m_gv_cmd = (UINT8)(data & 0xf);
+                if (BIT(data , 5)) {
+                        m_gv_fsm_state = GV_STAT_RESET;
+                }
+                m_gv_dma_en = BIT(data , 6) != 0;
+                m_gv_int_en = BIT(data , 7) != 0;
+                advance_gv_fsm(false , false);
+                break;
+
+        case 2:
+                // R6: data register with DMA TC
+                m_gv_dma_en = false;
+                m_gv_data_w = data;
+                m_gv_cursor_w = data;
+                advance_gv_fsm(true , false);
+                break;
+
+        case 3:
+                // R7: trigger
+                advance_gv_fsm(false , true);
+                break;
+        }
+}
+
+attotime hp9845b_state::time_to_gv_mem_availability(void) const
+{
+        if (m_graphic_sel) {
+                int hpos = m_screen->hpos();
+                if (hpos < (34 - GVIDEO_HCNT_OFF) || hpos >= (628 - GVIDEO_HCNT_OFF)) {
+                        // Access to graphic memory available now
+                        return attotime::zero;
+                } else {
+                        // Wait until start of hblank
+                        return m_screen->time_until_pos(m_screen->vpos() , 628);
+                }
+        } else {
+                // TODO:
+                return attotime::zero;
+        }
+}
+
+void hp9845b_state::advance_gv_fsm(bool ds , bool trigger)
+{
+        bool get_out = false;
+
+        attotime time_mem_av;
+
+        do {
+                bool act_trig = trigger || m_gv_dma_en || !BIT(m_gv_cmd , 2);
+
+                switch (m_gv_fsm_state) {
+                case GV_STAT_WAIT_DS_0:
+                        if ((m_gv_cmd & 0xc) == 0xc) {
+                                // Read command (11xx)
+                                m_gv_fsm_state = GV_STAT_WAIT_MEM_0;
+                        } else if (ds) {
+                                // Wait for data strobe (r/w on r4 or r6)
+                                m_gv_fsm_state = GV_STAT_WAIT_TRIG_0;
+                        } else {
+                                get_out = true;
+                        }
+                        break;
+
+                case GV_STAT_WAIT_TRIG_0:
+                        // Wait for trigger
+                        if (act_trig) {
+                                if (BIT(m_gv_cmd , 3)) {
+                                        // Not a cursor command
+                                        // Load memory address
+                                        m_gv_io_counter = ~m_gv_data_w & GVIDEO_ADDR_MASK;
+                                        // Write commands (10xx)
+                                        m_gv_fsm_state = GV_STAT_WAIT_DS_2;
+                                } else {
+                                        // Cursor command (0xxx)
+                                        if (BIT(m_gv_cmd , 2)) {
+                                                // Write X cursor position (01xx)
+                                                m_gv_cursor_x = (~m_gv_cursor_w >> 6) & 0x3ff;
+                                                //logerror("gv x curs pos = %u\n" , m_gv_cursor_x);
+                                        } else {
+                                                // Write Y cursor position and type (00xx)
+                                                m_gv_cursor_y = (~m_gv_cursor_w >> 6) & 0x1ff;
+                                                m_gv_cursor_gc = BIT(m_gv_cmd , 1) == 0;
+                                                m_gv_cursor_fs = BIT(m_gv_cmd , 0) != 0;
+                                                //logerror("gv y curs pos = %u gc = %d fs = %d\n" , m_gv_cursor_y , m_gv_cursor_gc , m_gv_cursor_fs);
+                                        }
+                                        m_gv_fsm_state = GV_STAT_WAIT_DS_0;
+                                }
+                        } else {
+                                get_out = true;
+                        }
+                        break;
+
+                case GV_STAT_WAIT_MEM_0:
+                        time_mem_av = time_to_gv_mem_availability();
+                        if (time_mem_av.is_zero()) {
+                                // Read a word from graphic memory
+                                m_gv_data_r = m_graphic_mem[ m_gv_io_counter ];
+                                //logerror("rd gv mem @%04x = %04x\n" , m_gv_io_counter , m_gv_data_r);
+                                m_gv_io_counter = (m_gv_io_counter + 1) & GVIDEO_ADDR_MASK;
+                                m_gv_fsm_state = GV_STAT_WAIT_DS_1;
+                        } else {
+                                m_gv_timer->adjust(time_mem_av);
+                                get_out = true;
+                        }
+                        break;
+
+                case GV_STAT_WAIT_DS_1:
+                        if (ds) {
+                                m_gv_fsm_state = GV_STAT_WAIT_MEM_0;
+                        } else {
+                                get_out = true;
+                        }
+                        break;
+
+                case GV_STAT_WAIT_DS_2:
+                        // Wait for data word to be written
+                        if (ds) {
+                                m_gv_fsm_state = GV_STAT_WAIT_TRIG_1;
+                        } else {
+                                get_out = true;
+                        }
+                        break;
+
+                case GV_STAT_WAIT_TRIG_1:
+                        // Wait for trigger
+                        if (act_trig) {
+                                if (BIT(m_gv_cmd , 1)) {
+                                        // Clear words (101x)
+                                        m_gv_data_w = 0;
+                                        m_gv_fsm_state = GV_STAT_WAIT_MEM_1;
+                                } else if (BIT(m_gv_cmd , 0)) {
+                                        // Write a single pixel (1001)
+                                        m_gv_fsm_state = GV_STAT_WAIT_MEM_2;
+                                } else {
+                                        // Write words (1000)
+                                        m_gv_fsm_state = GV_STAT_WAIT_MEM_1;
+                                }
+                        } else {
+                                get_out = true;
+                        }
+                        break;
+
+                case GV_STAT_WAIT_MEM_1:
+                        time_mem_av = time_to_gv_mem_availability();
+                        if (time_mem_av.is_zero()) {
+                                // Write a full word to graphic memory
+                                //logerror("wr gv mem @%04x = %04x\n" , m_gv_io_counter , m_gv_data_w);
+                                m_graphic_mem[ m_gv_io_counter ] = m_gv_data_w;
+                                m_gv_io_counter = (m_gv_io_counter + 1) & GVIDEO_ADDR_MASK;
+                                m_gv_fsm_state = GV_STAT_WAIT_DS_2;
+                        } else {
+                                m_gv_timer->adjust(time_mem_av);
+                                get_out = true;
+                        }
+                        break;
+
+                case GV_STAT_WAIT_MEM_2:
+                        time_mem_av = time_to_gv_mem_availability();
+                        if (time_mem_av.is_zero()) {
+                                // Write a single pixel to graphic memory
+                                //logerror("wr gv pixel @%04x:%x = %d\n" , m_gv_io_counter , m_gv_data_w & 0xf , BIT(m_gv_data_w , 15));
+                                UINT16 mask = 0x8000 >> (m_gv_data_w & 0xf);
+                                if (BIT(m_gv_data_w , 15)) {
+                                        // Set pixel
+                                        m_graphic_mem[ m_gv_io_counter ] |= mask;
+                                } else {
+                                        // Clear pixel
+                                        m_graphic_mem[ m_gv_io_counter ] &= ~mask;
+                                }
+                                // Not really needed
+                                m_gv_io_counter = (m_gv_io_counter + 1) & GVIDEO_ADDR_MASK;
+                                m_gv_fsm_state = GV_STAT_WAIT_DS_0;
+                        } else {
+                                m_gv_timer->adjust(time_mem_av);
+                                get_out = true;
+                        }
+                        break;
+
+                default:
+                        logerror("Invalid state reached %d\n" , m_gv_fsm_state);
+                        m_gv_fsm_state = GV_STAT_RESET;
+                }
+
+                ds = false;
+                trigger = false;
+        } while (!get_out);
+
+        update_graphic_bits();
+}
+
+void hp9845b_state::update_graphic_bits(void)
+{
+        m_gv_ready = m_gv_fsm_state == GV_STAT_WAIT_DS_0 ||
+            m_gv_fsm_state == GV_STAT_WAIT_DS_1 ||
+            m_gv_fsm_state == GV_STAT_WAIT_DS_2;
+
+        bool irq = m_gv_int_en && !m_gv_dma_en && m_gv_ready;
+
+        if (irq) {
+                BIT_SET(m_irh_pending, GVIDEO_PA - 8);
+        } else {
+                BIT_CLR(m_irh_pending, GVIDEO_PA - 8);
+        }
+
+        update_irq();
+
+        bool dmar = m_gv_ready && m_gv_dma_en;
+
+        m_ppu->dmar_w(dmar);
+
+        if (m_ppu->pa_r() == GVIDEO_PA) {
+                m_ppu->flag_w(m_gv_ready);
+        }
+}
+
+void hp9845b_state::graphic_video_render(unsigned video_scanline)
+{
+        const pen_t *pen = m_palette->pens();
+        bool yc = (video_scanline + GVIDEO_VCNT_OFF) == (m_gv_cursor_y + 6);
+        bool yw;
+        bool blink;
+
+        if (m_gv_cursor_fs) {
+                yw = true;
+                // Steady cursor
+                blink = true;
+        } else {
+                yw = (video_scanline + GVIDEO_VCNT_OFF) >= (m_gv_cursor_y + 2) &&
+                        (video_scanline + GVIDEO_VCNT_OFF) <= (m_gv_cursor_y + 10);
+                // Blinking cursor (frame freq. / 16)
+                blink = BIT(m_screen->frame_number() , 3) != 0;
+        }
+
+        unsigned mem_idx = 36 * (video_scanline - GVIDEO_VBEND);
+        for (unsigned i = 0; i < GVIDEO_HPIXELS; i += 16) {
+                UINT16 word = m_graphic_mem[ mem_idx++ ];
+                unsigned x = i;
+                for (UINT16 mask = 0x8000; mask != 0; mask >>= 1) {
+                        unsigned cnt_h = x + GVIDEO_HBEND + GVIDEO_HCNT_OFF;
+                        bool xc = cnt_h == (m_gv_cursor_x + 6);
+                        bool xw = m_gv_cursor_fs || (cnt_h >= (m_gv_cursor_x + 2) && cnt_h <= (m_gv_cursor_x + 10));
+                        unsigned pixel;
+                        if (blink && ((xw && yc) || (yw && xc && m_gv_cursor_gc))) {
+                                // Cursor
+                                pixel = 2;
+                        } else {
+                                // Normal pixel
+                                pixel = (word & mask) != 0;
+                        }
+                        m_bitmap.pix32(video_scanline - GVIDEO_VBEND , x++) = pen[ pixel ];
+                }
+        }
 }
 
 IRQ_CALLBACK_MEMBER(hp9845b_state::irq_callback)
 {
 		if (irqline == HPHYBRID_IRL) {
+                        logerror("irq ack L %02x\n" , m_irl_pending);
 				return m_irl_pending;
 		} else {
-				return 0;
+                        logerror("irq ack H %02x\n" , m_irh_pending);
+				return m_irh_pending;
 		}
 }
 
-void hp9845b_state::update_irl(void)
+void hp9845b_state::update_irq(void)
 {
 		m_ppu->set_input_line(HPHYBRID_IRL , m_irl_pending != 0);
+		m_ppu->set_input_line(HPHYBRID_IRH , m_irh_pending != 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::kb_scan)
@@ -546,7 +976,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::kb_scan)
 						m_kb_scancode = i;
 						BIT_SET(m_irl_pending , 0);
 						BIT_SET(m_kb_status, 0);
-						update_irl();
+						update_irq();
 
 						// Special case: pressing stop key sets LPU "status" flag
 						if (i == 0x47) {
@@ -572,21 +1002,48 @@ WRITE16_MEMBER(hp9845b_state::kb_irq_clear_w)
 {
 		BIT_CLR(m_irl_pending , 0);
 		BIT_CLR(m_kb_status, 0);
-		update_irl();
+		update_irq();
 		m_lpu->status_w(0);
 		// TODO: beeper start
 }
 
 WRITE8_MEMBER(hp9845b_state::pa_w)
 {
-		// TODO: handle sts & flg
-		if (data == 0xf) {
-				// RHS tape drive (T15)
-				m_ppu->status_w(1);
-				m_ppu->flag_w(1);
+		if (data == T15_PA) {
+						// RHS tape drive (T15)
+						m_ppu->status_w(m_t15->sts_r());
+						m_ppu->flag_w(m_t15->flg_r());
+                } else if (data == GVIDEO_PA) {
+                        // Graphic video
+                        m_ppu->status_w(1);
+                        m_ppu->flag_w(m_gv_ready);
 		} else {
 				m_ppu->status_w(0);
 				m_ppu->flag_w(0);
+		}
+}
+
+WRITE_LINE_MEMBER(hp9845b_state::t15_irq_w)
+{
+		if (state) {
+				BIT_SET(m_irh_pending , T15_PA - 8);
+		} else {
+				BIT_CLR(m_irh_pending , T15_PA - 8);
+		}
+		update_irq();
+}
+
+WRITE_LINE_MEMBER(hp9845b_state::t15_flg_w)
+{
+    if (m_ppu->pa_r() == T15_PA) {
+				m_ppu->flag_w(state);
+		}
+}
+
+WRITE_LINE_MEMBER(hp9845b_state::t15_sts_w)
+{
+    if (m_ppu->pa_r() == T15_PA) {
+				m_ppu->status_w(state);
 		}
 }
 
@@ -625,9 +1082,10 @@ static ADDRESS_MAP_START(global_mem_map , AS_PROGRAM , 16 , hp9845b_state)
 		ADDRESS_MAP_UNMAP_LOW
 		AM_RANGE(0x000000 , 0x007fff) AM_RAM AM_SHARE("lpu_ram")
 		AM_RANGE(0x014000 , 0x017fff) AM_RAM AM_SHARE("ppu_ram")
+                AM_RANGE(0x020000 , 0x027fff) AM_RAM AM_SHARE("lpu_02_ram")
 		AM_RANGE(0x030000 , 0x037fff) AM_ROM AM_REGION("lpu" , 0)
+                AM_RANGE(0x040000 , 0x047fff) AM_RAM AM_SHARE("lpu_04_ram")
 		AM_RANGE(0x050000 , 0x057fff) AM_ROM AM_REGION("ppu" , 0)
-//AM_RANGE(0x250000 , 0x251fff) AM_ROM AM_REGION("test_rom" , 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845b_state)
@@ -638,6 +1096,12 @@ static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845b_state)
 		// PA = 0, IC = 3
 		// Keyboard status input & keyboard interrupt clear
 		AM_RANGE(HP_MAKE_IOADDR(0 , 3) , HP_MAKE_IOADDR(0 , 3)) AM_READWRITE(kb_status_r , kb_irq_clear_w)
+        // PA = 13, IC = 0..3
+        // Graphic video
+        AM_RANGE(HP_MAKE_IOADDR(GVIDEO_PA , 0) , HP_MAKE_IOADDR(GVIDEO_PA , 3)) AM_READWRITE(graphic_r , graphic_w)
+		// PA = 15, IC = 0..3
+		// Right-hand side tape drive (T15)
+		AM_RANGE(HP_MAKE_IOADDR(T15_PA , 0) , HP_MAKE_IOADDR(T15_PA , 3))        AM_DEVREADWRITE("t15" , hp_taco_device , reg_r , reg_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
@@ -652,16 +1116,34 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 		MCFG_HPHYBRID_PA_CHANGED(WRITE8(hp9845b_state , pa_w))
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
-		MCFG_SCREEN_RAW_PARAMS(20849400 , 99 * 9 , 0 , 80 * 9 , 26 * 15 , 0 , 25 * 15)
+        // These parameters are for alpha video
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_HBSTART , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES)
 		MCFG_SCREEN_VBLANK_DRIVER(hp9845b_state, vblank_w)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp9845b_state, scanline_timer, "screen", 0, 1)
+        MCFG_TIMER_DRIVER_ADD("gv_timer", hp9845b_state, gv_timer)
 
 	// Actual keyboard refresh rate should be KEY_SCAN_OSCILLATOR / 128 (2560 Hz)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp9845b_state , kb_scan , attotime::from_hz(100))
+
+		// Tape controller
+		MCFG_DEVICE_ADD("t15" , HP_TACO , 4000000)
+		MCFG_TACO_IRQ_HANDLER(WRITELINE(hp9845b_state , t15_irq_w))
+		MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845b_state , t15_flg_w))
+		MCFG_TACO_STS_HANDLER(WRITELINE(hp9845b_state , t15_sts_w))
+
+		// In real machine there were 8 slots for LPU ROMs and 8 slots for PPU ROMs in
+		// right-hand side and left-hand side drawers, respectively.
+		// Here we do away with the distinction between LPU & PPU ROMs: in the end they
+		// are visible to both CPUs at the same addresses.
+		// For now we define just a couple of slots..
+		MCFG_DEVICE_ADD("drawer1", HP_OPTROM_SLOT, 0)
+		MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+		MCFG_DEVICE_ADD("drawer2", HP_OPTROM_SLOT, 0)
+		MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
 
 		MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
 MACHINE_CONFIG_END
@@ -699,10 +1181,6 @@ ROM_END
 #define rom_hp9835b rom_hp9835a
 
 ROM_START( hp9845b )
-		ROM_REGION(0x4000 , "test_rom" , ROMREGION_16BIT | ROMREGION_BE)
-		ROM_LOAD("09845-66520-45_00-Test_ROM.bin" , 0x0000 , 0x2000 , CRC(95a5b299))
-		ROM_LOAD("09845-66520-45_10-Test_ROM.bin" , 0x2000 , 0x2000 , CRC(257e4c66))
-
 	ROM_REGION(0x800 , "chargen" , 0)
 		// Don't have the real character generator from HP9845, use the one from HP64000 for now
 	ROM_LOAD("1818_2668.bin" , 0 , 0x800 , BAD_DUMP CRC(32a52664) SHA1(8b2a49a32510103ff424e8481d5ed9887f609f2f))

@@ -6,6 +6,7 @@
 #ifndef BX_READERWRITER_H_HEADER_GUARD
 #define BX_READERWRITER_H_HEADER_GUARD
 
+#include <alloca.h>
 #include <stdarg.h> // va_list
 #include <stdio.h>
 #include <string.h>
@@ -76,7 +77,7 @@ namespace bx
 		return _reader->read(_data, _size, _err);
 	}
 
-	/// Write value.
+	/// Read value.
 	template<typename Ty>
 	inline int32_t read(ReaderI* _reader, Ty& _value, Error* _err = NULL)
 	{
@@ -206,42 +207,82 @@ namespace bx
 	{
 	};
 
+	/// Peek data.
+	inline int32_t peek(ReaderSeekerI* _reader, void* _data, int32_t _size, Error* _err = NULL)
+	{
+		BX_ERROR_SCOPE(_err);
+		int64_t offset = bx::seek(_reader);
+		int32_t size = _reader->read(_data, _size, _err);
+		bx::seek(_reader, offset, bx::Whence::Begin);
+		return size;
+	}
+
+	/// Peek value.
+	template<typename Ty>
+	inline int32_t peek(ReaderSeekerI* _reader, Ty& _value, Error* _err = NULL)
+	{
+		BX_ERROR_SCOPE(_err);
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
+		return peek(_reader, &_value, sizeof(Ty), _err);
+	}
+
 	struct BX_NO_VTABLE WriterSeekerI : public WriterI, public SeekerI
 	{
 	};
 
-	struct BX_NO_VTABLE FileReaderI : public ReaderSeekerI
+	struct BX_NO_VTABLE ReaderOpenI
 	{
+		virtual ~ReaderOpenI() = 0;
 		virtual bool open(const char* _filePath, Error* _err) = 0;
-		virtual void close() = 0;
 	};
 
-	struct BX_NO_VTABLE FileWriterI : public WriterSeekerI
+	inline ReaderOpenI::~ReaderOpenI()
 	{
+	}
+
+	struct BX_NO_VTABLE WriterOpenI
+	{
+		virtual ~WriterOpenI() = 0;
 		virtual bool open(const char* _filePath, bool _append, Error* _err) = 0;
+	};
+
+	inline WriterOpenI::~WriterOpenI()
+	{
+	}
+
+	struct BX_NO_VTABLE CloserI
+	{
+		virtual ~CloserI() = 0;
 		virtual void close() = 0;
 	};
 
-	inline bool open(FileReaderI* _reader, const char* _filePath, Error* _err = NULL)
+	inline CloserI::~CloserI()
+	{
+	}
+
+	struct BX_NO_VTABLE FileReaderI : public ReaderOpenI, public CloserI, public ReaderSeekerI
+	{
+	};
+
+	struct BX_NO_VTABLE FileWriterI : public WriterOpenI, public CloserI, public WriterSeekerI
+	{
+	};
+
+	inline bool open(ReaderOpenI* _reader, const char* _filePath, Error* _err = NULL)
 	{
 		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
 		return _reader->open(_filePath, _err);
 	}
 
-	inline void close(FileReaderI* _reader)
-	{
-		_reader->close();
-	}
-
-	inline bool open(FileWriterI* _writer, const char* _filePath, bool _append = false, Error* _err = NULL)
+	inline bool open(WriterOpenI* _writer, const char* _filePath, bool _append = false, Error* _err = NULL)
 	{
 		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
 		return _writer->open(_filePath, _append, _err);
 	}
 
-	inline void close(FileWriterI* _writer)
+	inline void close(CloserI* _reader)
 	{
-		_writer->close();
+		_reader->close();
 	}
 
 	struct BX_NO_VTABLE MemoryBlockI
@@ -359,8 +400,8 @@ namespace bx
 				m_top += morecore;
 			}
 
-			int64_t reminder = m_top-m_pos;
-			int32_t size = uint32_min(_size, int32_t(reminder > INT32_MAX ? INT32_MAX : reminder) );
+			int64_t remainder = m_top-m_pos;
+			int32_t size = uint32_min(_size, int32_t(remainder > INT32_MAX ? INT32_MAX : remainder) );
 			m_pos += size;
 			if (size != _size)
 			{
@@ -412,8 +453,8 @@ namespace bx
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
-			int64_t reminder = m_top-m_pos;
-			int32_t size = uint32_min(_size, int32_t(reminder > INT32_MAX ? INT32_MAX : reminder) );
+			int64_t remainder = m_top-m_pos;
+			int32_t size = uint32_min(_size, int32_t(remainder > INT32_MAX ? INT32_MAX : remainder) );
 			memcpy(_data, &m_data[m_pos], size);
 			m_pos += size;
 			if (size != _size)
@@ -493,8 +534,8 @@ namespace bx
 				m_size = m_memBlock->getSize();
 			}
 
-			int64_t reminder = m_size-m_pos;
-			int32_t size = uint32_min(_size, int32_t(reminder > INT32_MAX ? INT32_MAX : reminder) );
+			int64_t remainder = m_size-m_pos;
+			int32_t size = uint32_min(_size, int32_t(remainder > INT32_MAX ? INT32_MAX : remainder) );
 			memcpy(&m_data[m_pos], _data, size);
 			m_pos += size;
 			m_top = int64_max(m_top, m_pos);
@@ -529,117 +570,6 @@ namespace bx
 	private:
 		StaticMemoryBlock m_smb;
 	};
-
-#if BX_CONFIG_CRT_FILE_READER_WRITER
-	class CrtFileReader : public FileReaderI
-	{
-	public:
-		CrtFileReader()
-			: m_file(NULL)
-		{
-		}
-
-		virtual ~CrtFileReader()
-		{
-		}
-
-		virtual bool open(const char* _filePath, Error* _err) BX_OVERRIDE
-		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-			m_file = fopen(_filePath, "rb");
-			if (NULL == m_file)
-			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "CrtFileReader: Failed to open file.");
-				return false;
-			}
-
-			return true;
-		}
-
-		virtual void close() BX_OVERRIDE
-		{
-			fclose(m_file);
-		}
-
-		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) BX_OVERRIDE
-		{
-			fseeko64(m_file, _offset, _whence);
-			return ftello64(m_file);
-		}
-
-		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE
-		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-			int32_t size = (int32_t)fread(_data, 1, _size, m_file);
-			if (size != _size)
-			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "CrtFileReader: read failed.");
-				return size >= 0 ? size : 0;
-			}
-
-			return size;
-		}
-
-	private:
-		FILE* m_file;
-	};
-
-	class CrtFileWriter : public FileWriterI
-	{
-	public:
-		CrtFileWriter()
-			: m_file(NULL)
-		{
-		}
-
-		virtual ~CrtFileWriter()
-		{
-		}
-
-		virtual bool open(const char* _filePath, bool _append, Error* _err) BX_OVERRIDE
-		{
-			m_file = fopen(_filePath, _append ? "ab" : "wb");
-
-			if (NULL == m_file)
-			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "CrtFileWriter: Failed to open file.");
-				return false;
-			}
-
-			return true;
-		}
-
-		virtual void close() BX_OVERRIDE
-		{
-			fclose(m_file);
-		}
-
-		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) BX_OVERRIDE
-		{
-			fseeko64(m_file, _offset, _whence);
-			return ftello64(m_file);
-		}
-
-		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE
-		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-			int32_t size = (int32_t)fwrite(_data, 1, _size, m_file);
-			if (size != _size)
-			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "CrtFileWriter: write failed.");
-				return size >= 0 ? size : 0;
-			}
-
-			return size;
-		}
-
-	private:
-		FILE* m_file;
-	};
-#endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
 } // namespace bx
 

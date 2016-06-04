@@ -34,13 +34,13 @@ PALETTE_INIT_MEMBER(jailbrek_state, jailbrek)
 	}
 }
 
-WRITE8_MEMBER(jailbrek_state::jailbrek_videoram_w)
+WRITE8_MEMBER(jailbrek_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jailbrek_state::jailbrek_colorram_w)
+WRITE8_MEMBER(jailbrek_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -58,7 +58,6 @@ TILE_GET_INFO_MEMBER(jailbrek_state::get_bg_tile_info)
 void jailbrek_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jailbrek_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_bg_tilemap->set_scrolldx(0, 396 - 256);
 }
 
 void jailbrek_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -90,7 +89,7 @@ void jailbrek_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 jailbrek_state::screen_update_jailbrek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 jailbrek_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

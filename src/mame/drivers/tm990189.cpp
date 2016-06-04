@@ -631,7 +631,7 @@ static const tms9901_interface usr9901reset_param =
     TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT3 | TMS9901_INT4 | TMS9901_INT5 | TMS9901_INT6,    // only input pins whose state is always known
 
     // Read handler. Covers all input lines (see tms9901.h)
-    DEVCB_NULL,
+    DEVCB_NOOP,
 
     // write handlers
     {
@@ -639,18 +639,18 @@ static const tms9901_interface usr9901reset_param =
         DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led1_w),
         DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led2_w),
         DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led3_w),
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL,
-        DEVCB_NULL
+        DEVCB_NOOP,
+        DEVCB_NOOP,
+        DEVCB_NOOP,
+        DEVCB_NOOP,
+        DEVCB_NOOP,
+        DEVCB_NOOP,
+        DEVCB_NOOP,
+        DEVCB_NOOP,
+        DEVCB_NOOP,
+        DEVCB_NOOP,
+        DEVCB_NOOP,
+        DEVCB_NOOP
     },
 
     // interrupt handler

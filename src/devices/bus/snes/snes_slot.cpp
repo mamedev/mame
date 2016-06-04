@@ -1007,11 +1007,11 @@ std::string base_sns_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		UINT32 offset;
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		dynamic_buffer rom(len);
 		int type = 0, addon = 0;
 
-		core_fread(m_file, &rom[0], len);
+		m_file->read(&rom[0], len);
 
 		offset = snes_skip_header(&rom[0], len);
 

@@ -95,7 +95,7 @@ private:
 	// internal state
 	static const device_timer_id BUSY_TIMER = 0;
 
-	memory_region *m_charset;
+	required_region_ptr<UINT8> m_charset;
 	address_space *m_videoram;
 
 	UINT8 m_irq_state;

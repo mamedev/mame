@@ -169,7 +169,7 @@ public:
 	symbol_table(void *globalref, symbol_table *parent = nullptr);
 
 	// getters
-	symbol_entry *first() const { return m_symlist.first(); }
+	const tagged_list<symbol_entry> &entries() const { return m_symlist; }
 	symbol_table *parent() const { return m_parent; }
 	void *globalref() const { return m_globalref; }
 
@@ -181,7 +181,7 @@ public:
 	void add(const char *name, UINT64 constvalue);
 	void add(const char *name, void *ref, getter_func getter, setter_func setter = nullptr);
 	void add(const char *name, void *ref, int minparams, int maxparams, execute_func execute);
-	symbol_entry *find(const char *name) { return m_symlist.find(name); }
+	symbol_entry *find(const char *name) const { return m_symlist.find(name); }
 	symbol_entry *find_deep(const char *name);
 
 	// value getter/setter

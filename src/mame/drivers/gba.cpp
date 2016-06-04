@@ -14,7 +14,7 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/dac.h"
-#include "audio/gb.h"
+#include "sound/gb.h"
 #include "includes/gba.h"
 #include "bus/gba/rom.h"
 #include "rendlay.h"
@@ -34,8 +34,6 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 		device.logerror( "%08x: %s", device.machine().driver_data<gba_state>()->m_maincpu->pc(), buf );
 	}
 }
-
-#define GBA_ATTOTIME_NORMALIZE(a)   a.normalize()
 
 static const UINT32 timer_clks[4] = { 16777216, 16777216/64, 16777216/256, 16777216/1024 };
 
@@ -343,7 +341,6 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 		final = clocksel / rate;
 		m_timer_hz[tmr] = final;
 		time = attotime::from_hz(final);
-		GBA_ATTOTIME_NORMALIZE(time);
 		m_tmr_timer[tmr]->adjust(time, tmr, time);
 	}
 
@@ -1639,7 +1636,6 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 					if( !(data & 0x40000) ) // if we're not in Count-Up mode
 					{
 						attotime time = attotime::from_hz(final);
-						GBA_ATTOTIME_NORMALIZE(time);
 						m_tmr_timer[offset]->adjust(time, offset, time);
 					}
 				}
@@ -1930,7 +1926,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gbadv )
 	PORT_START("INPUTS")
-	PORT_BIT( 0xfc00, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_UNUSED
+	PORT_BIT( 0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 L") PORT_PLAYER(1) // L
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 R") PORT_PLAYER(1) // R
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -2113,7 +2109,7 @@ void gba_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x08000000, 0x09ffffff, 0, 0, "rom1");
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0a000000, 0x0bffffff, 0, 0, "rom2");
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0c000000, 0x0cffffff, 0, 0, "rom3");
-
+		
 		std::string region_tag;
 		memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GBASLOT_ROM_REGION_TAG).c_str());
 
@@ -2122,6 +2118,7 @@ void gba_state::machine_start()
 		membank("rom2")->set_base(cart_rom->base());
 		membank("rom3")->set_base(cart_rom->base());
 
+		
 		// add nvram to save state
 		m_cart->save_nvram();
 
@@ -2148,6 +2145,13 @@ void gba_state::machine_start()
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe01ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe01ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
 		}
+		if (m_cart->get_type() == GBA_3DMATRIX)
+		{
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x08800000, 0x088001ff, write32_delegate(FUNC(gba_cart_slot_device::write_mapper),(gba_cart_slot_device*)m_cart));
+			memory_region *cart_romhlp = memregion(region_tag.assign(m_cart->tag()).append(GBAHELP_ROM_REGION_TAG).c_str());
+			membank("rom1")->set_base(cart_romhlp->base());
+		}
+		
 	}
 
 	save_item(NAME(m_DISPSTAT));
@@ -2249,6 +2253,7 @@ static SLOT_INTERFACE_START(gba_cart)
 	SLOT_INTERFACE_INTERNAL("gba_flash",       GBA_ROM_FLASH)   // Panasonic
 	SLOT_INTERFACE_INTERNAL("gba_flash_512",   GBA_ROM_FLASH)   // Panasonic
 	SLOT_INTERFACE_INTERNAL("gba_flash_1m",    GBA_ROM_FLASH1M) // Sanyo
+	SLOT_INTERFACE_INTERNAL("gba_3dmatrix",    GBA_ROM_3DMATRIX)
 SLOT_INTERFACE_END
 
 

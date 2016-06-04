@@ -14,7 +14,7 @@
 #if (defined(OSD_SDL) || defined(USE_SDL_SOUND))
 
 // standard sdl header
-#include "../../sdl/sdlinc.h"
+#include <SDL2/SDL.h>
 
 // MAME headers
 #include "emu.h"
@@ -51,8 +51,8 @@ public:
 	: osd_module(OSD_SOUND_PROVIDER, "sdl"), sound_module(),
 		stream_in_initialized(0),
 		stream_loop(0),
-		attenuation(0)
-	{
+		attenuation(0), buf_locked(0), stream_buffer(nullptr), stream_playpos(0), stream_buffer_size(0), stream_buffer_in(0), buffer_underflows(0), buffer_overflows(0)
+{
 		sdl_xfer_samples = SDL_XFER_SAMPLES;
 	}
 	virtual ~sound_sdl() { }
@@ -200,7 +200,7 @@ void sound_sdl::att_memcpy(void *dest, const INT16 *data, int bytes_to_copy)
 
 void sound_sdl::copy_sample_data(bool is_throttled, const INT16 *data, int bytes_to_copy)
 {
-	void *buffer1, *buffer2 = (void *)NULL;
+	void *buffer1, *buffer2 = (void *)nullptr;
 	long length1, length2;
 	int cur_bytes;
 
@@ -421,11 +421,7 @@ int sound_sdl::init(const osd_options &options)
 		}
 
 		osd_printf_verbose("Audio: Start initialization\n");
-	#if (SDLMAME_SDL2)
 		strncpy(audio_driver, SDL_GetCurrentAudioDriver(), sizeof(audio_driver));
-	#else
-		SDL_AudioDriverName(audio_driver, sizeof(audio_driver));
-	#endif
 		osd_printf_verbose("Audio: Driver is %s\n", audio_driver);
 
 		sdl_xfer_samples = SDL_XFER_SAMPLES;
@@ -533,7 +529,7 @@ void sound_sdl::sdl_destroy_buffers(void)
 	// release the buffer
 	if (stream_buffer)
 		global_free_array(stream_buffer);
-	stream_buffer = NULL;
+	stream_buffer = nullptr;
 }
 
 

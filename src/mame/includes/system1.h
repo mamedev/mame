@@ -2,6 +2,7 @@
 // copyright-holders:Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/segacrp2_device.h"
 
 class system1_state : public driver_device
 {
@@ -14,6 +15,7 @@ public:
 		m_nob_mcu_latch(*this, "nob_mcu_latch"),
 		m_nob_mcu_status(*this, "nob_mcu_status"),
 		m_paletteram(*this, "palette"),
+		m_videomode_custom(nullptr),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
@@ -25,7 +27,9 @@ public:
 		m_color_prom(*this, "palette"),
 		m_bank1(*this, "bank1"),
 		m_bank0d(*this, "bank0d"),
-		m_bank1d(*this, "bank1d") { }
+		m_bank1d(*this, "bank1d"),
+		m_banked_decrypted_opcodes(nullptr)
+		{ }
 
 	optional_device<i8255_device>  m_ppi8255;
 	required_shared_ptr<UINT8> m_ram;
@@ -82,48 +86,30 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_status_r);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 
+	DECLARE_DRIVER_INIT(bank00);
+	DECLARE_DRIVER_INIT(bank0c);
+	DECLARE_DRIVER_INIT(bank44);
+
 	DECLARE_DRIVER_INIT(nobb);
-	DECLARE_DRIVER_INIT(wboy2);
-	DECLARE_DRIVER_INIT(imsorry);
-	DECLARE_DRIVER_INIT(pitfall2);
 	DECLARE_DRIVER_INIT(dakkochn);
 	DECLARE_DRIVER_INIT(bootleg);
-	DECLARE_DRIVER_INIT(wboysys2);
 	DECLARE_DRIVER_INIT(shtngmst);
-	DECLARE_DRIVER_INIT(wboyo);
-	DECLARE_DRIVER_INIT(swat);
-	DECLARE_DRIVER_INIT(regulus);
-	DECLARE_DRIVER_INIT(bank0c);
 	DECLARE_DRIVER_INIT(blockgal);
 	DECLARE_DRIVER_INIT(nob);
-	DECLARE_DRIVER_INIT(mrviking);
-	DECLARE_DRIVER_INIT(teddybb);
-	DECLARE_DRIVER_INIT(flicky);
-	DECLARE_DRIVER_INIT(bank44);
 	DECLARE_DRIVER_INIT(myherok);
-	DECLARE_DRIVER_INIT(wmatch);
-	DECLARE_DRIVER_INIT(bank00);
-	DECLARE_DRIVER_INIT(myheroj);
 	DECLARE_DRIVER_INIT(ufosensi);
-	DECLARE_DRIVER_INIT(nprinces);
 	DECLARE_DRIVER_INIT(wbml);
 	DECLARE_DRIVER_INIT(bootsys2);
-	DECLARE_DRIVER_INIT(bullfgtj);
-	DECLARE_DRIVER_INIT(wboy);
-	DECLARE_DRIVER_INIT(hvymetal);
-	DECLARE_DRIVER_INIT(gardiab);
-	DECLARE_DRIVER_INIT(4dwarrio);
+	DECLARE_DRIVER_INIT(bootsys2d);
 	DECLARE_DRIVER_INIT(choplift);
-	DECLARE_DRIVER_INIT(seganinj);
-	DECLARE_DRIVER_INIT(gardia);
-	DECLARE_DRIVER_INIT(spatter);
-	DECLARE_DRIVER_INIT(spattera);
+
 	TILE_GET_INFO_MEMBER(tile_get_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(system2);
 	DECLARE_VIDEO_START(system2);
+	DECLARE_MACHINE_START(myherok);
 	UINT32 screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_system2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_system2_rowscroll(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

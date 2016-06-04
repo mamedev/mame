@@ -51,6 +51,7 @@
 #define TRACE_SMIOC 0
 #define TRACE_CPU_REG 0
 #define TRACE_LED 0
+#define TRACE_DMA 0
 
 class r9751_state : public driver_device
 {
@@ -86,6 +87,8 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<UINT32> m_main_ram;
 
+	m68000_base_device* ptr_m68000;
+
 	// Begin registers
 	UINT32 reg_ff050004;
 	UINT32 reg_fff80040;
@@ -101,6 +104,9 @@ private:
 
 	// functions
 	UINT32 swap_uint32( UINT32 val );
+	UINT32 debug_a6();
+	UINT32 debug_a5();
+	UINT32 debug_a5_20();
 
 	virtual void machine_reset() override;
 };
@@ -112,18 +118,35 @@ UINT32 r9751_state::swap_uint32( UINT32 val )
 	return (val << 16) | (val >> 16);
 }
 
+UINT32 r9751_state::debug_a6()
+{
+	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[14] + 4);
+}
+
+UINT32 r9751_state::debug_a5()
+{
+		return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13]);
+}
+
+UINT32 r9751_state::debug_a5_20()
+{
+		return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13] + 0x20);
+}
+
 READ8_MEMBER(r9751_state::pdc_dma_r)
 {
 	/* This callback function takes the value written to 0xFF01000C as the bank offset */
-	UINT32 address = (fdd_dma_bank & 0x7FFFF800) + (offset&0xFFFF);
+	UINT32 address = (fdd_dma_bank & 0x7FFFF800) + (offset&0x3FFFF);
+	if(TRACE_DMA) logerror("DMA READ: %08X DATA: %08X\n", address, m_maincpu->space(AS_PROGRAM).read_byte(address));
 	return m_maincpu->space(AS_PROGRAM).read_byte(address);
 }
 
 WRITE8_MEMBER(r9751_state::pdc_dma_w)
 {
 	/* This callback function takes the value written to 0xFF01000C as the bank offset */
-	UINT32 address = (fdd_dma_bank & 0x7FFFF800) + (data&0xFFFF);
-	m_maincpu->space(AS_PROGRAM).write_byte(m_pdc->fdd_68k_dma_address,address);
+	UINT32 address = (fdd_dma_bank & 0x7FFFF800) + (m_pdc->fdd_68k_dma_address&0x3FFFF);
+	m_maincpu->space(AS_PROGRAM).write_byte(address,data);
+	if(TRACE_DMA) logerror("DMA WRITE: %08X DATA: %08X\n", address,data);
 }
 
 DRIVER_INIT_MEMBER(r9751_state,r9751)
@@ -137,6 +160,7 @@ DRIVER_INIT_MEMBER(r9751_state,r9751)
 	smioc_dma_bank = 0;
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 
+	m_maincpu->interface<m68000_base_device>(ptr_m68000);
 }
 
 void r9751_state::machine_reset()
@@ -177,7 +201,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 			return 0;
 		case 0x30B0: /* FDD command completion status */
 			data = (m_pdc->reg_p5 << 8) + m_pdc->reg_p4;
-			if(TRACE_FDC) logerror("--- SCSI FDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
+			if(TRACE_FDC && data != 0) logerror("--- SCSI FDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			return data;
 		default:
 			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, 0, mem_mask);
@@ -213,7 +237,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 					m_terminal->write(space,0,m_mem->read_dword(smioc_out_addr));
 					break;
 				default:
-					if(TRACE_SMIOC) logerror("Uknown serial DMA command: %X\n", data);
+					if(TRACE_SMIOC) logerror("Unknown serial DMA command: %X\n", data);
 			}
 			break;
 		case 0xC098: /* Serial DMA output address */
@@ -229,7 +253,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			if(TRACE_FDC) logerror("--- FDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			break;
 		case 0x04B0: /* FDD RESET PDC */
-			if(TRACE_FDC) logerror("PDC RESET, PC: %08X\n", space.machine().firstcpu->pc());
+			if(TRACE_FDC) logerror("PDC RESET, PC: %08X DATA: %08X\n", space.machine().firstcpu->pc(),data);
 			m_pdc->reset();
 			break;
 		case 0x08B0: /* FDD SCSI read command */
@@ -249,16 +273,18 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			m_pdc->reg_p38 |= 0x2; /* Set bit 1 on port 38 register, PDC polls this port looking for a command */
 			if(TRACE_FDC) logerror("--- FDD Old Command: %02X and %02X\n", data_b0, data_b1);
 			break;
-		case 0x80B0: /* fdd_dest_address register */
+		case 0xC0B0:
+		case 0xC1B0: /* fdd_dest_address register */
 			fdd_dest_address = data << 1;
-			if(TRACE_FDC) logerror("--- FDD destination address: %08X\n", fdd_dest_address);
+			if(TRACE_FDC) logerror("--- FDD destination address: %08X PC: %08X Register: %08X (A6+4): %08X\n", (fdd_dma_bank & 0x7FFFF800) + (fdd_dest_address&0x3FFFF), space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, debug_a6());
 			data_b0 = data & 0xFF;
 			data_b1 = (data & 0xFF00) >> 8;
 			m_pdc->reg_p6 = data_b0;
 			m_pdc->reg_p7 = data_b1;
+			m_pdc->reg_p38 |= 0x2; // Set bit 1 on port 38 register, PDC polls this port looking for a command
+			if(TRACE_FDC)logerror("--- FDD SET PDC Port 38: %X\n",m_pdc->reg_p38);
 			break;
-		case 0xC0B0:
-		case 0xC1B0: /* FDD command address register */
+		case 0x80B0: /* FDD command address register */
 			UINT32 fdd_scsi_command;
 			UINT32 fdd_scsi_command2;
 			unsigned char c_fdd_scsi_command[8]; // Array for SCSI command
@@ -269,14 +295,14 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			m_pdc->reg_p5 = 0;
 
 			/* Send FDD SCSI command location address to PDC 0x2, 0x3 */
-			if(TRACE_FDC) logerror("--- FDD command address: %08X\n", data);
+			if(TRACE_FDC) logerror("--- FDD command address: %08X PC: %08X Register: %08X (A6+4): %08X A4: %08X (A5): %08X (A5+20): %08X\n", (fdd_dma_bank & 0x7FFFF800) + ((data << 1)&0x3FFFF), space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, debug_a6(), ptr_m68000->dar[12], debug_a5(), debug_a5_20());
 			data_b0 = data & 0xFF;
 			data_b1 = (data & 0xFF00) >> 8;
 			m_pdc->reg_p2 = data_b0;
 			m_pdc->reg_p3 = data_b1;
 
-			fdd_scsi_command = swap_uint32(m_mem->read_dword(data << 1));
-			fdd_scsi_command2 = swap_uint32(m_mem->read_dword((data << 1)+4));
+			fdd_scsi_command = swap_uint32(m_mem->read_dword((fdd_dma_bank & 0x7FFFF800) + ((data << 1)&0x3FFFF)));
+			fdd_scsi_command2 = swap_uint32(m_mem->read_dword(((fdd_dma_bank & 0x7FFFF800) + ((data << 1)&0x3FFFF))+4));
 
 			memcpy(c_fdd_scsi_command,&fdd_scsi_command,4);
 			memcpy(c_fdd_scsi_command+4,&fdd_scsi_command2,4);
@@ -292,12 +318,10 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			scsi_lba = c_fdd_scsi_command[3] | (c_fdd_scsi_command[2]<<8) | ((c_fdd_scsi_command[1]&0x1F)<<16);
 			if(TRACE_FDC) logerror("--- FDD SCSI LBA: %i\n", scsi_lba);
 
-			m_pdc->reg_p38 |= 0x2; // Set bit 1 on port 38 register, PDC polls this port looking for a command
-			if(TRACE_FDC)logerror("--- FDD SET PDC Port 38: %X\n",m_pdc->reg_p38);
 			break;
 
 		default:
-			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, data, mem_mask);
+			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x (A6+4): %08X\n", space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, data, mem_mask, debug_a6());
 	}
 }
 
@@ -326,11 +350,14 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff01_w )
 	{
 		case 0x000C: /* FDD DMA Offset */
 			fdd_dma_bank = data;
+			if(TRACE_DMA) logerror("Banking register(FDD): %08X PC: %08X Data: %08X\n", offset << 2 | 0xFF010000, space.machine().firstcpu->pc(), data);
 			return;
 		case 0x0010: /* SMIOC DMA Offset */
 			smioc_dma_bank = data;
+			if(TRACE_DMA) logerror("Banking register(SMIOC): %08X PC: %08X Data: %08X\n", offset << 2 | 0xFF010000, space.machine().firstcpu->pc(), data);
 			return;
 		default:
+			if(TRACE_DMA) logerror("Banking register(Unknown): %08X PC: %08X Data: %08X\n", offset << 2 | 0xFF010000, space.machine().firstcpu->pc(), data);
 			return;
 	}
 }
@@ -376,6 +403,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
 			return;
 		case 0x0320:
 			timer_32khz_last = machine().time();
+			return;
 		default:
 			if(TRACE_CPU_REG) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(),  offset << 2 | 0xFF050000, data, mem_mask);
 			return;

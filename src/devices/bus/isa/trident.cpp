@@ -12,16 +12,29 @@
 #include "trident.h"
 #include "debugger.h"
 
-const device_type TRIDENT_VGA = &device_creator<trident_vga_device>;
+const device_type TRIDENT_VGA = &device_creator<tgui9860_device>;
+const device_type TVGA9000_VGA = &device_creator<tvga9000_device>;
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
 #define LOG (1)
 #define LOG_ACCEL (1)
 
-trident_vga_device::trident_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: svga_device(mconfig, TRIDENT_VGA, "Trident TGUI9680", tag, owner, clock, "trident_vga", __FILE__)
+trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: svga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
+}
+
+tgui9860_device::tgui9860_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: trident_vga_device(mconfig, TRIDENT_VGA, "Trident TGUI9680", tag, owner, clock, "trident_vga", __FILE__)
+{
+	m_version = 0xd3;   // 0xd3 identifies at TGUI9660XGi (set to 0xe3 to identify at TGUI9440AGi)
+}
+
+tvga9000_device::tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: trident_vga_device(mconfig, TVGA9000_VGA, "Trident TVGA9000", tag, owner, clock, "tvga9000_vga", __FILE__)
+{
+	m_version = 0x43;
 }
 
 UINT8 trident_vga_device::READPIXEL8(INT16 x, INT16 y)
@@ -174,7 +187,7 @@ void trident_vga_device::device_start()
 void trident_vga_device::device_reset()
 {
 	svga_device::device_reset();
-	svga.id = 0xd3;  // 0xd3 identifies at TGUI9660XGi (set to 0xe3 to identify at TGUI9440AGi)
+	svga.id = m_version;
 	tri.revision = 0x01;  // revision identifies as TGUI9680
 	tri.new_mode = false;  // start up in old mode
 	tri.dac_active = false;
@@ -191,6 +204,7 @@ void trident_vga_device::device_reset()
 	// Windows 3.1 TGUI9440AGi drivers do not set the pointer colour registers?
 	tri.cursor_bg = 0x00000000;
 	tri.cursor_fg = 0xffffffff;
+	tri.pixel_depth = 0x10;  //disable 8bpp mode by default
 }
 
 UINT32 trident_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -376,10 +390,13 @@ void trident_vga_device::trident_define_video_mode()
 	switch((tri.pixel_depth & 0x0c) >> 2)
 	{
 	case 0:
-	default: if(!(tri.pixel_depth & 0x10)) svga.rgb8_en = 1; break;
+	default: if(!(tri.pixel_depth & 0x10) || (tri.cr1e & 0x80)) svga.rgb8_en = 1; break;
 	case 1:  if((tri.dac & 0xf0) == 0x30) svga.rgb16_en = 1; else svga.rgb15_en = 1; break;
 	case 2:  svga.rgb32_en = 1; break;
 	}
+
+	if((tri.cr1e & 0x80) && (svga.id == 0x43))
+		divisor = 2;
 
 	recompute_params_clock(divisor, xtal);
 }
@@ -443,7 +460,6 @@ void trident_vga_device::trident_seq_reg_write(UINT8 index, UINT8 data)
 	}
 	else
 	{
-		if(LOG) logerror("Trident SR%02X: %s mode write %02x\n",index,tri.new_mode ? "new" : "old",data);
 		switch(index)
 		{
 			case 0x0b:
@@ -490,6 +506,7 @@ void trident_vga_device::trident_seq_reg_write(UINT8 index, UINT8 data)
 				if(!LOG) logerror("Trident: Sequencer index %02x read\n",index);
 		}
 	}
+	if(LOG) logerror("Trident SR%02X: %s mode write %02x\n",index,tri.new_mode ? "new" : "old",data);
 }
 
 UINT8 trident_vga_device::trident_crtc_reg_read(UINT8 index)
@@ -605,7 +622,6 @@ void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
 	}
 	else
 	{
-		if(LOG) logerror("Trident CR%02X: write %02x\n",index,data);
 		switch(index)
 		{
 		case 0x1e:  // Module Testing Register
@@ -704,6 +720,7 @@ void trident_vga_device::trident_crtc_reg_write(UINT8 index, UINT8 data)
 			break;
 		}
 	}
+	if(LOG) logerror("Trident CR%02X: write %02x\n",index,data);
 }
 
 UINT8 trident_vga_device::trident_gc_reg_read(UINT8 index)
@@ -764,6 +781,7 @@ void trident_vga_device::trident_gc_reg_write(UINT8 index, UINT8 data)
 			break;
 		}
 	}
+	if(LOG) logerror("Trident GC%02X: write %02x\n",index,data);
 }
 
 READ8_MEMBER(trident_vga_device::port_03c0_r)

@@ -64,7 +64,7 @@
 //**************************************************************************
 
 #define MCFG_CPU_AVR8_EEPROM(_tag) \
-	avr8_device::set_eeprom_tag(*device, _tag);
+	avr8_device::set_eeprom_tag(*device, "^" _tag);
 
 
 //**************************************************************************
@@ -80,7 +80,7 @@ class avr8_device : public cpu_device
 {
 public:
 	// inline configuration helpers
-	static void set_eeprom_tag(device_t &device, const char *tag) { downcast<avr8_device &>(device).m_eeprom_tag = tag; }
+	static void set_eeprom_tag(device_t &device, const char *tag) { downcast<avr8_device &>(device).m_eeprom.set_tag(tag); }
 
 	// fuse configs
 	void set_low_fuses(UINT8 byte);
@@ -137,8 +137,7 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
 	const address_space_config m_io_config;
-	const char *m_eeprom_tag;
-	UINT8 *m_eeprom;
+	required_region_ptr<UINT8> m_eeprom;
 
 	// bootloader
 	UINT16 m_boot_size;

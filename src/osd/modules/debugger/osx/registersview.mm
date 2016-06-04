@@ -32,7 +32,7 @@
 	const debug_view_source	*source = view->source_for_device(curcpu);
 
 	max.x = max.y = 0;
-	for (const debug_view_source *source = view->source_list().first(); source != NULL; source = source->next())
+	for (const debug_view_source *source = view->source_list().first(); source != nullptr; source = source->next())
 	{
 		debug_view_xy   current;
 		view->set_source(*source);

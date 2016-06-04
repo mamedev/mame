@@ -13,25 +13,22 @@
 #define __TI99DEFS__
 
 // TI-99/4(A)
-#define region_grom     "cons_grom"
-#define region_grom_cart    "cart_grom"
-#define TMS9901_TAG     "tms9901"
-#define TIBOARD_TAG     "ti_board"
-#define DATAMUX_TAG     "datamux_16_8"
-#define VIDEO_SYSTEM_TAG "video"
-#define SCREEN_TAG      "screen"
 #define TISOUNDCHIP_TAG "soundchip"
-#define TISOUND_TAG     "tisound"
 #define GROMPORT_TAG    "gromport"
+#define PERIBOX_TAG     "peb"
+#define VDP_TAG         "vdp"
+#define TMS9901_TAG     "tms9901"
+#define SCREEN_TAG      "screen"
 #define GROM0_TAG       "console_grom_0"
 #define GROM1_TAG       "console_grom_1"
 #define GROM2_TAG       "console_grom_2"
-#define PERIBOX_TAG     "peb"
-#define MECMOUSE_TAG    "mecmouse"
-#define HANDSET_TAG     "handset"
 #define JOYPORT_TAG     "joyport"
-#define VDP_TAG         "vdp"
+#define EVPC_CONN_TAG   "evpc_conn"
+#define DATAMUX_TAG     "datamux_16_8"
+
 #define DSRROM          "dsrrom"
+#define CONSOLEROM      "console_rom"
+#define CONSOLEGROM     "cons_grom"
 
 #define VDPFREQ XTAL_10_738635MHz
 #define GROMFREQ VDPFREQ/24
@@ -41,10 +38,49 @@
 #define DRAM_TAG        "dram8"
 #define MAPPER_TAG      "mapper"
 #define MAINBOARD8_TAG  "mainboard8"
-#define SPEECH_TAG      "speech"
-#define ROM0_TAG        "rom0"
-#define ROM1_TAG        "rom1"
-#define PCODEROM_TAG    "pcode"
+#define SPEECHSYN_TAG     "speech"
+
+#define ROM0_REG        "rom0_region"
+#define ROM1_REG        "rom1_region"
+#define PASCAL_REG      "pascal_region"
+#define SYSGROM_REG     "sysgrom_region"
+#define GROMLIB1_REG    "gromlib1_region"
+#define GROMLIB2_REG    "gromlib2_region"
+#define GROMLIB3_REG    "gromlib3_region"
+#define SPEECHROM_REG       "speech_region"
+
+#define GROMLIB_TAG "gromlib"
+#define SYSGROM_TAG GROMLIB_TAG "0"
+#define SYSGROM0_TAG SYSGROM_TAG "_0"
+#define SYSGROM1_TAG SYSGROM_TAG "_1"
+#define SYSGROM2_TAG SYSGROM_TAG "_2"
+
+#define GLIB1_TAG GROMLIB_TAG "1"
+#define GLIB10_TAG GLIB1_TAG "_0"
+#define GLIB11_TAG GLIB1_TAG "_1"
+#define GLIB12_TAG GLIB1_TAG "_2"
+#define GLIB13_TAG GLIB1_TAG "_3"
+#define GLIB14_TAG GLIB1_TAG "_4"
+#define GLIB15_TAG GLIB1_TAG "_5"
+#define GLIB16_TAG GLIB1_TAG "_6"
+#define GLIB17_TAG GLIB1_TAG "_7"
+
+#define GLIB2_TAG GROMLIB_TAG "2"
+#define GLIB20_TAG GLIB2_TAG "_0"
+#define GLIB21_TAG GLIB2_TAG "_1"
+#define GLIB22_TAG GLIB2_TAG "_2"
+#define GLIB23_TAG GLIB2_TAG "_3"
+#define GLIB24_TAG GLIB2_TAG "_4"
+#define GLIB25_TAG GLIB2_TAG "_5"
+#define GLIB26_TAG GLIB2_TAG "_6"
+#define GLIB27_TAG GLIB2_TAG "_7"
+
+#define GLIB3_TAG GROMLIB_TAG "3"
+#define GLIB30_TAG GLIB3_TAG "_0"
+#define GLIB31_TAG GLIB3_TAG "_1"
+#define GLIB32_TAG GLIB3_TAG "_2"
+
+
 
 // Geneve
 #define GKEYBOARD_TAG   "gkeyboard"
@@ -96,6 +132,42 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write16) =0;
 	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { };
 };
+
+/****************************************************************************
+    Connector from EVPC
+    We need this for the TI-99/4A console as well as for the SGCPU, so we have
+    to use callbacks
+****************************************************************************/
+class ti99_4x_state;
+
+class evpc_clock_connector;
+
+const device_type EVPC_CONN = &device_creator<evpc_clock_connector>;
+
+class evpc_clock_connector : public device_t
+{
+public:
+	evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, EVPC_CONN, "EVPC clock connector", tag, owner, clock, "ti99_evpc_clock", __FILE__),
+		m_vdpint(*this) { };
+
+	template<class _Object> static devcb_base &static_set_vdpint_callback(device_t &device, _Object object)
+	{
+		return downcast<evpc_clock_connector &>(device).m_vdpint.set_callback(object);
+	}
+
+	WRITE_LINE_MEMBER( vclock_line ) { m_vdpint(state); }
+	void device_start() override { m_vdpint.resolve();  }
+
+private:
+	// VDPINT line to the CPU
+	devcb_write_line m_vdpint;
+};
+
+
+#define MCFG_ADD_EVPC_CONNECTOR( _tag, _vdpint ) \
+	MCFG_DEVICE_ADD(_tag, EVPC_CONN, 0) \
+	devcb = &evpc_clock_connector::static_set_vdpint_callback( *device, DEVCB_##_vdpint );
 
 /****************************************************************************
     Constants

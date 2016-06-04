@@ -8,7 +8,7 @@
 
 
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
-void skns_state::suprnova_draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
+void skns_state::draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
 {
 	//bitmap_ind16 *destbitmap = bitmap;
 	bitmap_ind16 &srcbitmap = tmap->pixmap();
@@ -89,7 +89,7 @@ void skns_state::suprnova_draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflag
 }
 
 
-WRITE32_MEMBER(skns_state::skns_pal_regs_w)
+WRITE32_MEMBER(skns_state::pal_regs_w)
 {
 	COMBINE_DATA(&m_pal_regs[offset]);
 	m_palette_updated =1;
@@ -176,7 +176,7 @@ WRITE32_MEMBER(skns_state::skns_pal_regs_w)
 }
 
 
-WRITE32_MEMBER(skns_state::skns_palette_ram_w)
+WRITE32_MEMBER(skns_state::palette_ram_w)
 {
 	int r,g,b;
 	int brightness_r, brightness_g, brightness_b/*, alpha*/;
@@ -291,7 +291,7 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_A_tile_info)
 	//if (pri) popmessage("pri A!! %02x\n", pri);
 }
 
-WRITE32_MEMBER(skns_state::skns_tilemapA_w)
+WRITE32_MEMBER(skns_state::tilemapA_w)
 {
 	COMBINE_DATA(&m_tilemapA_ram[offset]);
 	m_tilemap_A->mark_tile_dirty(offset);
@@ -317,13 +317,13 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_B_tile_info)
 	//if (pri) popmessage("pri B!! %02x\n", pri); // 02 on cyvern
 }
 
-WRITE32_MEMBER(skns_state::skns_tilemapB_w)
+WRITE32_MEMBER(skns_state::tilemapB_w)
 {
 	COMBINE_DATA(&m_tilemapB_ram[offset]);
 	m_tilemap_B->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(skns_state::skns_v3_regs_w)
+WRITE32_MEMBER(skns_state::v3_regs_w)
 {
 	COMBINE_DATA(&m_v3_regs[offset]);
 
@@ -361,6 +361,29 @@ void skns_state::video_start()
 
 	m_gfxdecode->gfx(2)->set_granularity(256);
 	m_gfxdecode->gfx(3)->set_granularity(256);
+
+
+	save_item(NAME(m_depthA));
+	save_item(NAME(m_depthB));
+	save_item(NAME(m_use_spc_bright));
+	save_item(NAME(m_use_v3_bright));
+	save_item(NAME(m_bright_spc_b));
+	save_item(NAME(m_bright_spc_g));
+	save_item(NAME(m_bright_spc_r));
+	save_item(NAME(m_bright_spc_b_trans));
+	save_item(NAME(m_bright_spc_g_trans));
+	save_item(NAME(m_bright_spc_r_trans));
+	save_item(NAME(m_bright_v3_b));
+	save_item(NAME(m_bright_v3_g));
+	save_item(NAME(m_bright_v3_r));
+	save_item(NAME(m_bright_v3_b_trans));
+	save_item(NAME(m_bright_v3_g_trans));
+	save_item(NAME(m_bright_v3_r_trans));
+	save_item(NAME(m_spc_changed));
+	save_item(NAME(m_v3_changed));
+	save_item(NAME(m_palette_updated));
+	save_item(NAME(m_alt_enable_background));
+	save_item(NAME(m_alt_enable_sprites));
 }
 
 void skns_state::video_reset()
@@ -376,7 +399,7 @@ void skns_state::video_reset()
 	m_alt_enable_background = m_alt_enable_sprites = 1;
 }
 
-void skns_state::supernova_draw_a( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const rectangle &cliprect, int tran )
+void skns_state::draw_a( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const rectangle &cliprect, int tran )
 {
 	int enable_a  = (m_v3_regs[0x10/4] >> 0) & 0x0001;
 	int nowrap_a = (m_v3_regs[0x10/4] >> 0) & 0x0004;
@@ -401,12 +424,12 @@ void skns_state::supernova_draw_a( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_fla
 
 		columnscroll = (m_v3_regs[0x0c/4] >> 1) & 0x0001;
 
-		suprnova_draw_roz(bitmap,bitmap_flags,cliprect, m_tilemap_A, startx << 8,starty << 8,    incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_a, columnscroll, &m_v3slc_ram[0]);
+		draw_roz(bitmap,bitmap_flags,cliprect, m_tilemap_A, startx << 8,starty << 8,    incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_a, columnscroll, &m_v3slc_ram[0]);
 		//tilemap_copy_bitmap(bitmap, m_tilemap_bitmap_lower, m_tilemap_bitmapflags_lower);
 	}
 }
 
-void skns_state::supernova_draw_b( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const rectangle &cliprect, int tran )
+void skns_state::draw_b( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const rectangle &cliprect, int tran )
 {
 	int enable_b  = (m_v3_regs[0x34/4] >> 0) & 0x0001;
 	int nowrap_b = (m_v3_regs[0x34/4] >> 0) & 0x0004;
@@ -429,14 +452,14 @@ void skns_state::supernova_draw_b( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_fla
 		incxx  = m_v3_regs[0x48/4]&0x7ffff;
 		if (incxx&0x40000) incxx = incxx-0x80000;
 		columnscroll = (m_v3_regs[0x0c/4] >> 9) & 0x0001; // selects column scroll or rowscroll
-		suprnova_draw_roz(bitmap,bitmap_flags, cliprect, m_tilemap_B, startx << 8,starty << 8,   incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_b, columnscroll, &m_v3slc_ram[0x1000/4]);
+		draw_roz(bitmap,bitmap_flags, cliprect, m_tilemap_B, startx << 8,starty << 8,   incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_b, columnscroll, &m_v3slc_ram[0x1000/4]);
 
 		//popmessage("%08x %08x %08x %08x %08x %08x", startx, starty, incxx, incyy, incxy, incyx);
 
 	}
 }
 
-UINT32 skns_state::screen_update_skns(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	palette_update();
 
@@ -457,8 +480,8 @@ UINT32 skns_state::screen_update_skns(screen_device &screen, bitmap_rgb32 &bitma
 		//popmessage("pri %d %d\n", supernova_pri_a, supernova_pri_b);
 
 		/*if (!supernova_pri_b) { */
-		supernova_draw_b(m_tilemap_bitmap_lower, m_tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
-		supernova_draw_a(m_tilemap_bitmap_higher,m_tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
+		draw_b(m_tilemap_bitmap_lower, m_tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
+		draw_a(m_tilemap_bitmap_higher,m_tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
 
 		{
 			int x,y;
@@ -614,8 +637,4 @@ UINT32 skns_state::screen_update_skns(screen_device &screen, bitmap_rgb32 &bitma
 
 
 	return 0;
-}
-
-void skns_state::screen_eof_skns(screen_device &screen, bool state)
-{
 }

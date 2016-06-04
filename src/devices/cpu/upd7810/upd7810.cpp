@@ -1701,7 +1701,7 @@ void upd7810_device::state_string_export(const device_state_entry &entry, std::s
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%s:%s:%s:%s:%s:%s",
+			str = string_format("%s:%s:%s:%s:%s:%s",
 				m_psw & 0x40 ? "ZF":"--",
 				m_psw & 0x20 ? "SK":"--",
 				m_psw & 0x10 ? "HC":"--",

@@ -33,6 +33,7 @@
 #include "video/seta001.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 class thedealr_state : public driver_device
 {
@@ -289,7 +290,7 @@ static ADDRESS_MAP_START( thedealr, AS_PROGRAM, 8, thedealr_state )
 	AM_RANGE(0x3c00, 0x3c00) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_w)
 	AM_RANGE(0x3c01, 0x3c01) AM_DEVWRITE    ("aysnd", ay8910_device, data_w)
 
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
@@ -532,9 +533,10 @@ static MACHINE_CONFIG_START( thedealr, thedealr_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 
 	MCFG_MACHINE_RESET_OVERRIDE(thedealr_state,thedealr)
 	MCFG_MACHINE_START_OVERRIDE(thedealr_state,thedealr)

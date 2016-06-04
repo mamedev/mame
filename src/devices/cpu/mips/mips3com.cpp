@@ -70,19 +70,17 @@ void mips3_device::execute_set_input(int inputnum, int state)
 void mips3_device::mips3com_update_cycle_counting()
 {
 	/* modify the timer to go off */
-	if (m_core->compare_armed && (m_core->cpr[0][COP0_Status] & SR_IMEX5))
+	if (m_core->compare_armed)
 	{
 		UINT32 count = (total_cycles() - m_core->count_zero_time) / 2;
 		UINT32 compare = m_core->cpr[0][COP0_Compare];
 		UINT32 delta = compare - count;
+		m_core->compare_armed = 0;
 		attotime newtime = cycles_to_attotime((UINT64)delta * 2);
 		m_compare_int_timer->adjust(newtime);
 		return;
 	}
-	m_compare_int_timer->adjust(attotime::never);
 }
-
-
 
 /***************************************************************************
     TLB HANDLING
@@ -199,6 +197,7 @@ void mips3_device::mips3com_tlbp()
 
 TIMER_CALLBACK_MEMBER( mips3_device::compare_int_callback )
 {
+	m_compare_int_timer->adjust(attotime::never);
 	set_input_line(MIPS3_IRQ5, ASSERT_LINE);
 }
 

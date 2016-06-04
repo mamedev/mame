@@ -2,7 +2,7 @@
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
-    TI-99 Myarc memory expansion
+    TI-99 Myarc memory expansion MEXP-1
 
     The card features 128 KiB of RAM, not buffered. In the TI-99/4A address
     space, RAM is located at 2000-3fff and a000-ffff (32 KiB). Using the CRU
@@ -29,10 +29,7 @@
 ****************************************************************************/
 #include "myarcmem.h"
 
-#define RAMREGION "ram"
-
-#define VERBOSE 0
-#define LOG logerror
+#define RAMREGION "ram512K"
 
 /* This card has two CRU bases where it answers. */
 #define MYARCMEM_CRU_BASE1 0x1000
@@ -46,7 +43,8 @@ enum
 
 myarc_memory_expansion_device::myarc_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI99_MYARCMEM, "Myarc Memory expansion card MEXP-1", tag, owner, clock, "ti99_myarcmem", __FILE__),
-m_ram(nullptr), m_dsrrom(nullptr), m_bank(0), m_size(0)
+	m_ram(*this, RAMREGION),
+	m_dsrrom(nullptr), m_bank(0), m_size(0)
 {
 }
 
@@ -77,19 +75,19 @@ READ8Z_MEMBER(myarc_memory_expansion_device::readz)
 	switch((offset & 0xe000)>>13)
 	{
 	case 1:
-		*value = m_ram[base];
+		*value = m_ram->pointer()[base];
 		break;
 	case 2:
 		if (m_selected) *value = m_dsrrom[offset & 0x1fff];
 		break;
 	case 5:
-		*value = m_ram[base | 0x2000];
+		*value = m_ram->pointer()[base | 0x2000];
 		break;
 	case 6:
-		*value = m_ram[base | 0x4000];
+		*value = m_ram->pointer()[base | 0x4000];
 		break;
 	case 7:
-		*value = m_ram[base | 0x6000];
+		*value = m_ram->pointer()[base | 0x6000];
 		break;
 	default:
 		break;
@@ -106,16 +104,16 @@ WRITE8_MEMBER(myarc_memory_expansion_device::write)
 	switch((offset & 0xe000)>>13)
 	{
 	case 1:
-		m_ram[base] = data;
+		m_ram->pointer()[base] = data;
 		break;
 	case 5:
-		m_ram[base | 0x2000] = data;
+		m_ram->pointer()[base | 0x2000] = data;
 		break;
 	case 6:
-		m_ram[base | 0x4000] = data;
+		m_ram->pointer()[base | 0x4000] = data;
 		break;
 	case 7:
-		m_ram[base | 0x6000] = data;
+		m_ram->pointer()[base | 0x6000] = data;
 		break;
 	default:
 		break;
@@ -165,6 +163,19 @@ WRITE8_MEMBER(myarc_memory_expansion_device::cruwrite)
 	}
 }
 
+void myarc_memory_expansion_device::device_start()
+{
+	m_dsrrom = memregion(DSRROM)->base();
+}
+
+void myarc_memory_expansion_device::device_reset()
+{
+	m_size = ioport("SIZE")->read();
+
+	// Resetting values
+	m_bank = 0;
+	m_selected = false;
+}
 
 INPUT_PORTS_START( myarc_exp )
 	PORT_START( "SIZE" )
@@ -175,26 +186,18 @@ INPUT_PORTS_END
 
 ROM_START( myarc_exp )
 	ROM_REGION(0x2000, DSRROM, 0)
-	ROM_LOAD("myarc512k_xb2.bin", 0x0000, 0x2000, CRC(41fbb96d) SHA1(4dc7fdfa46842957bcbb0cf2c37764e4bb6d877a)) /* DSR for Ramdisk etc. */
-	ROM_REGION(0x80000, RAMREGION, 0)
-	ROM_FILL(0x0000, 0x80000, 0x00)
+	ROM_LOAD("myarc512k_xb2_dsr.bin", 0x0000, 0x2000, CRC(41fbb96d) SHA1(4dc7fdfa46842957bcbb0cf2c37764e4bb6d877a)) /* DSR for Ramdisk etc. */
 ROM_END
 
-void myarc_memory_expansion_device::device_start()
-{
-	if (VERBOSE>5) LOG("myarc memexp: start\n");
-	m_dsrrom = memregion(DSRROM)->base();
-	m_ram = memregion(RAMREGION)->base();
-}
+MACHINE_CONFIG_FRAGMENT( myarc_exp )
+	MCFG_RAM_ADD(RAMREGION)
+	MCFG_RAM_DEFAULT_SIZE("512k")
+	MCFG_RAM_DEFAULT_VALUE(0)
+MACHINE_CONFIG_END
 
-void myarc_memory_expansion_device::device_reset()
+machine_config_constructor myarc_memory_expansion_device::device_mconfig_additions() const
 {
-	if (VERBOSE>5) LOG("myarc memexp: reset\n");
-	m_size = ioport("SIZE")->read();
-
-	// Resetting values
-	m_bank = 0;
-	m_selected = false;
+	return MACHINE_CONFIG_NAME( myarc_exp );
 }
 
 const rom_entry *myarc_memory_expansion_device::device_rom_region() const

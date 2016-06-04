@@ -8,25 +8,14 @@
 #ifndef PSTATE_H_
 #define PSTATE_H_
 
+#include <memory>
+
 #include "plists.h"
 #include "pstring.h"
 
 // ----------------------------------------------------------------------------------------
 // state saving ...
 // ----------------------------------------------------------------------------------------
-
-#define PSTATE_INTERFACE_DECL()               \
-	template<typename C> ATTR_COLD void save(C &state, const pstring &stname); \
-	template<typename C, std::size_t N> ATTR_COLD void save(C (&state)[N], const pstring &stname); \
-	template<typename C> ATTR_COLD void save(C *state, const pstring &stname, const int count);
-
-#define PSTATE_INTERFACE(obj, manager, module)               \
-	template<typename C> ATTR_COLD void obj::save(C &state, const pstring &stname) \
-	{ manager->save_item(state, this, module + "." + stname); } \
-	template<typename C, std::size_t N> ATTR_COLD void obj::save(C (&state)[N], const pstring &stname) \
-	{ manager->save_state_ptr(module + "." + stname, pstate_datatype<C>::type, this, sizeof(state[0]), N, &(state[0]), false); } \
-	template<typename C> ATTR_COLD void obj::save(C *state, const pstring &stname, const int count) \
-	{ manager->save_state_ptr(module + "." + stname, pstate_datatype<C>::type, this, sizeof(C), count, state, false);   }
 
 enum pstate_data_type_e {
 	NOT_SUPPORTED,
@@ -84,7 +73,7 @@ class pstate_manager_t;
 class pstate_callback_t
 {
 public:
-	typedef plist_t<pstate_callback_t *> list_t;
+	using list_t = pvector_t<pstate_callback_t *>;
 
 	virtual ~pstate_callback_t() { };
 
@@ -96,14 +85,14 @@ protected:
 
 struct pstate_entry_t
 {
-	typedef plist_t<pstate_entry_t *> list_t;
+	using list_t = pvector_t<std::unique_ptr<pstate_entry_t>>;
 
 	pstate_entry_t(const pstring &stname, const pstate_data_type_e dt, const void *owner,
 			const int size, const int count, void *ptr, bool is_ptr)
-	: m_name(stname), m_dt(dt), m_owner(owner), m_callback(NULL), m_size(size), m_count(count), m_ptr(ptr), m_is_ptr(is_ptr) { }
+	: m_name(stname), m_dt(dt), m_owner(owner), m_callback(nullptr), m_size(size), m_count(count), m_ptr(ptr), m_is_ptr(is_ptr) { }
 
 	pstate_entry_t(const pstring &stname, const void *owner, pstate_callback_t *callback)
-	: m_name(stname), m_dt(DT_CUSTOM), m_owner(owner), m_callback(callback), m_size(0), m_count(0), m_ptr(NULL), m_is_ptr(false) { }
+	: m_name(stname), m_dt(DT_CUSTOM), m_owner(owner), m_callback(callback), m_size(0), m_count(0), m_ptr(nullptr), m_is_ptr(false) { }
 
 	~pstate_entry_t() { }
 
@@ -148,6 +137,12 @@ public:
 		save_state_ptr(stname, pstate_datatype<C>::type, owner, sizeof(C), count, state, false);
 	}
 
+	template<typename C>
+	void save_item(std::vector<C> &v, const void *owner, const pstring &stname)
+	{
+		save_state(v.data(), owner, stname, v.size());
+	}
+
 	ATTR_COLD void pre_save();
 	ATTR_COLD void post_load();
 	ATTR_COLD void remove_save_items(const void *owner);
@@ -163,6 +158,32 @@ private:
 };
 
 template<> ATTR_COLD void pstate_manager_t::save_item(pstate_callback_t &state, const void *owner, const pstring &stname);
+
+template <typename T>
+class pstate_interface_t
+{
+public:
+	pstate_interface_t() { }
+
+	template<typename C> void save(C &state, const pstring &stname)
+	{
+		pstate_manager_t *manager = static_cast<T*>(this)->state_manager();
+		pstring module = static_cast<T*>(this)->name();
+		manager->save_item(state, this, module + "." + stname);
+	}
+	template<typename C, std::size_t N> ATTR_COLD void save(C (&state)[N], const pstring &stname)
+	{
+		pstate_manager_t *manager = static_cast<T*>(this)->state_manager();
+		pstring module = static_cast<T*>(this)->name();
+		manager->save_state_ptr(module + "." + stname, pstate_datatype<C>::type, this, sizeof(state[0]), N, &(state[0]), false);
+	}
+	template<typename C> ATTR_COLD void save(C *state, const pstring &stname, const int count)
+	{
+		pstate_manager_t *manager = static_cast<T*>(this)->state_manager();
+		pstring module = static_cast<T*>(this)->name();
+		manager->save_state_ptr(module + "." + stname, pstate_datatype<C>::type, this, sizeof(C), count, state, false);
+	}
+};
 
 
 #endif /* PSTATE_H_ */

@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "polylgcy.h"
-
+#include <atomic>
 
 /***************************************************************************
     DEBUGGING
@@ -88,7 +88,7 @@ struct poly_section
 struct work_unit_shared
 {
 	polygon_info *      polygon;                /* pointer to polygon */
-	volatile UINT32     count_next;             /* number of scanlines and index of next item to process */
+	std::atomic<UINT32> count_next;             /* number of scanlines and index of next item to process */
 	INT16               scanline;               /* starting scanline and count */
 	UINT16              previtem;               /* index of previous item in the same bucket */
 #ifndef PTR64
@@ -1305,7 +1305,7 @@ static void *poly_item_callback(void *param, int threadid)
 				{
 					orig_count_next = prevunit->shared.count_next;
 					new_count_next = orig_count_next | (unitnum << 16);
-				} while (compare_exchange32((volatile INT32 *)&prevunit->shared.count_next, orig_count_next, new_count_next) != orig_count_next);
+				} while (!prevunit->shared.count_next.compare_exchange_weak(orig_count_next, new_count_next, std::memory_order_release, std::memory_order_relaxed));
 
 #if KEEP_STATISTICS
 				/* track resolved conflicts */
@@ -1336,7 +1336,7 @@ static void *poly_item_callback(void *param, int threadid)
 		do
 		{
 			orig_count_next = unit->shared.count_next;
-		} while (compare_exchange32((volatile INT32 *)&unit->shared.count_next, orig_count_next, 0) != orig_count_next);
+		} while (!unit->shared.count_next.compare_exchange_weak(orig_count_next, 0, std::memory_order_release, std::memory_order_relaxed));
 
 		/* if we have no more work to do, do nothing */
 		orig_count_next >>= 16;

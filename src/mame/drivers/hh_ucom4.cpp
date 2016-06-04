@@ -4,6 +4,9 @@
 
   NEC uCOM4 MCU tabletops/handhelds or other simple devices,
   most of them (emulated ones) are VFD electronic games/toys.
+  List of child drivers:
+  - tb303: Roland TB-303
+  - tr606: Roland TR-606
 
   Commonly used VFD(vacuum fluorescent display) are by NEC or Futaba.
 
@@ -43,7 +46,9 @@
  @206     uPD553C  1982, Epoch Dracula
  @209     uPD553C  1982, Tomy Caveman (TN-12)
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
+ *296     uPD553C  1984, Epoch Computer Beam Gun Professional
 
+ *511     uPD557LC?1980, Gakken Game Robot 9/Mego Fabulous Fred
  @512     uPD557LC 1980, Castle Toy Tactix
 
  @060     uPD650C  1979, Mattel Computer Gin
@@ -69,7 +74,7 @@ TODO:
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
 
-#include "hh_ucom4_test.lh" // common test-layout - use external artwork
+#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 // machine start/reset
@@ -188,7 +193,7 @@ void hh_ucom4_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_ucom4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void hh_ucom4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
@@ -197,9 +202,12 @@ void hh_ucom4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
-	display_update();
+	if (update)
+		display_update();
 }
 
+
+// generic input handlers
 
 UINT8 hh_ucom4_state::read_inputs(int columns)
 {
@@ -225,7 +233,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 
   Bambino UFO Master-Blaster Station (manufactured in Japan)
   * PCB label Emix Corp. ET-02
-  * NEC uCOM-44 MCU, labeled EMIX D552C 017
+  * NEC uCOM-44 MCU, label EMIX D552C 017
   * cyan VFD display Emix-101, with blue color overlay
 
   This is Bambino's first game, it is not known if ET-01 exists. Emix Corp.
@@ -237,8 +245,6 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
   known releases:
   - Japan: "Missile Guerilla Warfare Maneuvers", published by Tomy
   - World: UFO Master-Blaster Station
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -304,8 +310,7 @@ static INPUT_PORTS_START( ufombs )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static const INT16 ufombs_speaker_levels[] = { 0, 32767, -32768, 0 };
+static const INT16 ufombs_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( ufombs, ufombs_state )
 
@@ -321,8 +326,13 @@ static MACHINE_CONFIG_START( ufombs, ufombs_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(ufombs_state, grid_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(ufombs_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(243, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 243-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -339,7 +349,7 @@ MACHINE_CONFIG_END
 
   Bambino Superstar Football (manufactured in Japan)
   * PCB label Emix Corp. ET-03
-  * NEC uCOM-43 MCU, labeled D553C 031
+  * NEC uCOM-43 MCU, label D553C 031
   * cyan VFD display Emix-102, with bezel
 
   The game was rereleased in 1982 as Classic Football, with an improved VFD.
@@ -347,8 +357,6 @@ MACHINE_CONFIG_END
   Press the Kick button to start the game, an automatic sequence follows.
   Then choose a formation(A,B,C) and either pass the ball, and/or start
   running. For more information, refer to the official manual.
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -438,14 +446,17 @@ static INPUT_PORTS_START( ssfball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // multiplexed, handled in input_b_r
 
 	PORT_START("IN.3") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("Ball-carrier Left/Right")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Ball-carrier Up")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("Ball-carrier Down")
+	PORT_BIT( 0x01, 0x01, IPT_SPECIAL ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pass")
+
+	PORT_START("FAKE") // fake port for left/right combination
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-
-static const INT16 ssfball_speaker_levels[] = { 0, 32767, -32768, 0 };
+static const INT16 ssfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( ssfball, ssfball_state )
 
@@ -461,8 +472,13 @@ static MACHINE_CONFIG_START( ssfball, ssfball_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(ssfball_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(ssfball_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920, 482)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 482-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -479,14 +495,12 @@ MACHINE_CONFIG_END
 
   Bambino Kick The Goal Soccer
   * PCB label Emix Corp. ET-10/08 (PCB is for 2 possible games)
-  * NEC uCOM-44 MCU, labeled D552C 043
+  * NEC uCOM-44 MCU, label D552C 043
   * cyan VFD display Emix-105, with bezel overlay
 
   Press the Display button twice to start the game. Action won't start until
   player 1 presses one of the directional keys. In 2-player mode, player 2
   controls the goalkeeper, defensive players are still controlled by the CPU.
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -586,8 +600,13 @@ static MACHINE_CONFIG_START( bmsoccer, bmsoccer_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(bmsoccer_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(bmsoccer_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(271, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 271-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -603,10 +622,8 @@ MACHINE_CONFIG_END
 
   Bambino Safari (manufactured in Japan)
   * PCB label Emix Corp. ET-11
-  * NEC uCOM-44 MCU, labeled EMIX D552C 049
+  * NEC uCOM-44 MCU, label EMIX D552C 049
   * cyan VFD display Emix-108
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -690,8 +707,13 @@ static MACHINE_CONFIG_START( bmsafari, bmsafari_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(bmsafari_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(bmsafari_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(248, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 248-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -707,13 +729,11 @@ MACHINE_CONFIG_END
 
   Bambino Space Laser Fight (manufactured in Japan)
   * PCB label Emix Corp. ET-12
-  * NEC uCOM-43 MCU, labeled D553C 055
+  * NEC uCOM-43 MCU, label D553C 055
   * cyan VFD display Emix-104, with blue or green color overlay
 
   This is basically a revamp of their earlier Boxing game (ET-06), case and
   buttons are exactly the same.
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -822,8 +842,7 @@ static INPUT_PORTS_START( splasfgt )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static const INT16 splasfgt_speaker_levels[] = { 0, 32767, -32768, 0 };
+static const INT16 splasfgt_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( splasfgt, splasfgt_state )
 
@@ -839,8 +858,13 @@ static MACHINE_CONFIG_START( splasfgt, splasfgt_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(splasfgt_state, grid_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(splasfgt_state, grid_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920, 476)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 476-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -857,14 +881,12 @@ MACHINE_CONFIG_END
 
   Bandai Crazy Climber (manufactured in Japan)
   * PCB labels SM-020/SM-021
-  * NEC uCOM-43 MCU, labeled D553C 170
+  * NEC uCOM-43 MCU, label D553C 170
   * cyan/red/green VFD display NEC FIP6AM2-T no. 1-8 2, with partial color overlay and bezel
 
   known releases:
   - Japan: FL Crazy Climbing
   - USA: Crazy Climber
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -940,8 +962,13 @@ static MACHINE_CONFIG_START( bcclimbr, bcclimbr_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(bcclimbr_state, grid_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(bcclimbr_state, grid_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(310, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 310-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -956,7 +983,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Castle Toy Tactix
-  * NEC uCOM-43 MCU, labeled D557LC 512
+  * NEC uCOM-43 MCU, label D557LC 512
   * 16 LEDs behind buttons
 
   Tactix is similar to Merlin, for 1 or 2 players. In 2-player mode, simply
@@ -965,8 +992,6 @@ MACHINE_CONFIG_END
   2: Jump-Off (peg solitaire)
   3: Triple Play (3 in a row)
   4: Concentration (memory)
-
-  note: MAME external artwork is not needed for this game
 
 ***************************************************************************/
 
@@ -1016,34 +1041,34 @@ READ8_MEMBER(tactix_state::input_r)
 
 static INPUT_PORTS_START( tactix )
 	PORT_START("IN.0") // C0 port A
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Button 1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Button 5")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Button 9")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Button 13")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Button 5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Button 9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Button 13")
 
 	PORT_START("IN.1") // C1 port A
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Button 2")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Button 6")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Button 10")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Button 14")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Button 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Button 6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Button 10")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Button 14")
 
 	PORT_START("IN.2") // C2 port A
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Button 3")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Button 7")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Button 11")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Button 15")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Button 3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Button 7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Button 11")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Button 15")
 
 	PORT_START("IN.3") // C3 port A
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Button 4")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Button 8")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Button 12")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Button 16")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("Button 4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Button 8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Button 12")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Button 16")
 
 	PORT_START("IN.4") // E0 port A
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_NAME("New Game")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Comp Turn")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("New Game")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Comp Turn")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( tactix, tactix_state )
@@ -1074,14 +1099,12 @@ MACHINE_CONFIG_END
 
   Epoch Invader From Space (manufactured in Japan)
   * PCB labels 36010(A/B)
-  * NEC uCOM-44 MCU, labeled D552C 054
+  * NEC uCOM-44 MCU, label D552C 054
   * cyan VFD display NEC FIP9AM18T tube no. 0D, with color overlay
 
   known releases:
   - USA: Invader From Space
   - UK: Invader From Space, published by Grandstand
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1156,8 +1179,13 @@ static MACHINE_CONFIG_START( invspace, invspace_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(invspace_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(invspace_state, grid_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(289, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 289-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1173,7 +1201,7 @@ MACHINE_CONFIG_END
 
   Epoch Electronic Football (manufactured in Japan)
   * PCB labels 36020(A/B/C)
-  * NEC uCOM-43 MCU, labeled D553C 080
+  * NEC uCOM-43 MCU, label D553C 080
   * cyan VFD display NEC FIP10AM15T tube no. 0F, with bezel overlay
 
   known releases:
@@ -1241,7 +1269,7 @@ static INPUT_PORTS_START( efball )
 	PORT_START("IN.1") // port B
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
+	PORT_BIT( 0x04, 0x04, IPT_SPECIAL ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Pass")
 
 	PORT_START("IN.2") // port C
@@ -1249,6 +1277,10 @@ static INPUT_PORTS_START( efball )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Kick Return")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Kick")
+
+	PORT_START("FAKE") // fake port for left/right combination
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( efball, efball_state )
@@ -1282,7 +1314,7 @@ MACHINE_CONFIG_END
 
   Epoch Galaxy II (manufactured in Japan)
   * PCB labels 19096/96062
-  * NEC uCOM-43 MCU, labeled D553C 153
+  * NEC uCOM-43 MCU, label D553C 153
   * cyan/red VFD display NEC FIP10xM20T, with color overlay. x = multiple VFD
     revisions exist, with different graphics: rev B no. 1-8, rev. D no. 2-21.
 
@@ -1290,8 +1322,6 @@ MACHINE_CONFIG_END
   - USA: Galaxy II
   - Japan: Astro Wars
   - UK: Astro Wars, published by Grandstand
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1366,13 +1396,26 @@ static MACHINE_CONFIG_START( galaxy2, galaxy2_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(galaxy2_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(galaxy2_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(304, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( galaxy2b, galaxy2 )
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(306, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 306-1, 0, 1080-1)
 MACHINE_CONFIG_END
 
 
@@ -1383,15 +1426,13 @@ MACHINE_CONFIG_END
 
   Epoch Astro Command (manufactured in Japan)
   * PCB labels 96111/96112
-  * NEC uCOM-43 MCU, labeled D553C 202
+  * NEC uCOM-43 MCU, label D553C 202
   * cyan/red VFD display NEC FIP9AM20T no. 42-42, with color overlay + bezel
 
   known releases:
   - Japan: Astro Command
   - USA: Astro Command, published by Tandy
   - UK: Scramble, published by Grandstand
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1473,8 +1514,13 @@ static MACHINE_CONFIG_START( astrocmd, astrocmd_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(astrocmd_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(astrocmd_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920, 525)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 525-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1490,15 +1536,13 @@ MACHINE_CONFIG_END
 
   Epoch Dracula (manufactured in Japan)
   * PCB label 96121
-  * NEC uCOM-43 MCU, labeled D553C 206
+  * NEC uCOM-43 MCU, label D553C 206
   * cyan/red/green VFD display NEC FIP8BM20T no. 2-42
 
   known releases:
   - Japan: Dracula House, yellow case
   - USA: Dracula, red case
   - Other: Dracula, yellow case, published by Hales
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1566,8 +1610,13 @@ static MACHINE_CONFIG_START( edracula, edracula_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(edracula_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(edracula_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920, 526)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 526-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1582,7 +1631,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Mattel Computer Gin
-  * NEC uCOM-43 MCU, labeled D650C 060
+  * NEC uCOM-43 MCU, label D650C 060
 
 ***************************************************************************/
 
@@ -1656,7 +1705,7 @@ MACHINE_CONFIG_END
 
   Mego Mini-Vid Break Free (manufactured in Japan)
   * PCB label Mego 79 rev F
-  * NEC uCOM-43 MCU, labeled D553C 049
+  * NEC uCOM-43 MCU, label D553C 049
   * cyan VFD display Futaba DM-4.5 91
 
   note: MAME external artwork is not needed for this game
@@ -1760,15 +1809,13 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Cosmic Combat (manufactured in Japan)
-  * PCBs are labeled 2E1019-E01
-  * NEC uCOM-44 MCU, labeled D552C 042
+  * PCB label 2E1019-E01
+  * NEC uCOM-44 MCU, label D552C 042
   * cyan VFD display NEC FIP32AM18Y tube no. 0E, with color overlay
 
   known releases:
   - USA: Cosmic Combat
   - Japan: Space Attack
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1839,8 +1886,13 @@ static MACHINE_CONFIG_START( tccombat, tccombat_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(tccombat_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(tccombat_state, grid_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(300, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 300-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1855,8 +1907,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Tennis (manufactured in Japan)
-  * PCB labeled TOMY TN-04 TENNIS
-  * NEC uCOM-44 MCU, labeled D552C 048
+  * PCB label TOMY TN-04 TENNIS
+  * NEC uCOM-44 MCU, label D552C 048
   * VFD display NEC FIP11AM15T tube no. 0F, with overlay
 
   The initial release of this game was in 1979, known as Pro-Tennis,
@@ -1864,8 +1916,6 @@ MACHINE_CONFIG_END
 
   Press the Serve button to start, then hit the ball by pressing one of the
   positional buttons when the ball flies over it.
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -1946,7 +1996,7 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P1 Button 6")
 
 	PORT_START("IN.1") // E1 port A/B
-	PORT_CONFNAME( 0x101, 0x100, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtennis_state, difficulty_switch, NULL)
+	PORT_CONFNAME( 0x101, 0x100, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtennis_state, difficulty_switch, nullptr)
 	PORT_CONFSETTING(     0x001, "Practice" )
 	PORT_CONFSETTING(     0x100, "Pro 1" ) // -> difficulty_switch
 	PORT_CONFSETTING(     0x000, "Pro 2" )
@@ -1995,8 +2045,13 @@ static MACHINE_CONFIG_START( tmtennis, tmtennis_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(tmtennis_state, grid_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(tmtennis_state, grid_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920, 417)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 417-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2011,8 +2066,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Pac-Man (manufactured in Japan)
-  * PCBs are labeled TN-08 2E108E01
-  * NEC uCOM-43 MCU, labeled D553C 160
+  * PCB label TN-08 2E108E01
+  * NEC uCOM-43 MCU, label D553C 160
   * cyan/red/green VFD display NEC FIP8AM18T no. 2-21
   * bright yellow round casing
 
@@ -2024,8 +2079,6 @@ MACHINE_CONFIG_END
 
   The game will start automatically after turning it on. This Pac Man refuses
   to eat dots with his butt, you can only eat them going right-to-left.
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2101,8 +2154,13 @@ static MACHINE_CONFIG_START( tmpacman, tmpacman_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(tmpacman_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(tmpacman_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920, 508)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 508-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2117,8 +2175,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Scramble (manufactured in Japan)
-  * PCBs are labeled TN-10 2E114E01
-  * NEC uCOM-43 MCU, labeled D553C 192
+  * PCB label TN-10 2E114E01
+  * NEC uCOM-43 MCU, label D553C 192
   * cyan/red/green VFD display NEC FIP10CM20T no. 2-41
 
   known releases:
@@ -2126,8 +2184,6 @@ MACHINE_CONFIG_END
   - USA: Scramble, published by Tandy
   - UK: Astro Blaster, published by Hales (Epoch Astro Command was named Scramble)
   - Germany: Rambler
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2201,8 +2257,13 @@ static MACHINE_CONFIG_START( tmscramb, tmscramb_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(tmscramb_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(tmscramb_state, grid_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920, 556)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 556-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2217,16 +2278,14 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Caveman (manufactured in Japan)
-  * PCBs are labeled TN-12 2E114E03
-  * NEC uCOM-43 MCU, labeled D553C 209
+  * PCB label TN-12 2E114E03
+  * NEC uCOM-43 MCU, label D553C 209
   * cyan/red/green VFD display NEC FIP8AM20T no. 2-42
 
   known releases:
   - World: Caveman
   - USA: Caveman, published by Tandy
   - UK: Cave Man - Jr. Caveman vs Dinosaur, published by Grandstand
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2297,8 +2356,13 @@ static MACHINE_CONFIG_START( tcaveman, tcaveman_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(tcaveman_state, plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(tcaveman_state, plate_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920, 559)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 559-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2313,8 +2377,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy Alien Chase (manufactured in Japan)
-  * PCBs are labeled TN-16 2E121B01
-  * NEC uCOM-43 MCU, labeled D553C 258
+  * PCB label TN-16 2E121B01
+  * NEC uCOM-43 MCU, label D553C 258
   * red/green VFD display NEC FIP9AM24T, with color overlay, 2-sided*
 
   *Player one views the VFD from the front (grid+filament side) while the
@@ -2322,8 +2386,6 @@ MACHINE_CONFIG_END
   basically a mirror-image.
 
   To start the game, simply press [UP]. Hold a joystick direction to move around.
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -2427,8 +2489,13 @@ static MACHINE_CONFIG_START( alnchase, alnchase_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(alnchase_state, output_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(alnchase_state, output_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(365, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 365-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2449,36 +2516,54 @@ MACHINE_CONFIG_END
 ROM_START( ufombs )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-017", 0x0000, 0x0400, CRC(0e208cb3) SHA1(57db6566916c94325e2b67ccb94b4ea3b233487d) )
+
+	ROM_REGION( 222395, "svg", 0)
+	ROM_LOAD( "ufombs.svg", 0, 222395, CRC(ae9fb93f) SHA1(165ea78eee93c503dbd277a56c41e3c63c534e38) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( ssfball )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
+
+	ROM_REGION( 330197, "svg", 0)
+	ROM_LOAD( "ssfball.svg", 0, 330197, CRC(cde0d483) SHA1(99d218aab4bb42e97194fdc38e9a0efbcde082de) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( bmsoccer )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-043", 0x0000, 0x0400, CRC(10c2a4ea) SHA1(6ebca7d406e22ff7a8cd529579b55a700da487b4) )
+
+	ROM_REGION( 273804, "svg", 0)
+	ROM_LOAD( "bmsoccer.svg", 0, 273804, CRC(29525b4a) SHA1(2f59d3ed59923a834b7ddcdfb9d61a9818196f2e) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( bmsafari )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-049", 0x0000, 0x0400, CRC(82fa3cbe) SHA1(019e7ec784e977eba09997fc46af253054fb222c) )
+
+	ROM_REGION( 273889, "svg", 0)
+	ROM_LOAD( "bmsafari.svg", 0, 273889, CRC(c61e26b3) SHA1(467db0396d350fddb46ecf2b1ad60501013c5dff) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( splasfgt )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-055", 0x0000, 0x0800, CRC(eb471fbd) SHA1(f06cfe567bf6f9ed4dcdc88acdcfad50cd370a02) )
+
+	ROM_REGION( 246609, "svg", 0)
+	ROM_LOAD( "splasfgt.svg", 0, 246609, CRC(365fae43) SHA1(344c120c2efa92ada9171047affac801a06cf303) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( bcclimbr )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-170", 0x0000, 0x0800, CRC(fc2eabdb) SHA1(0f5cc854be7fdf105d9bd2114659d40c65f9d782) )
+
+	ROM_REGION( 219971, "svg", 0)
+	ROM_LOAD( "bcclimbr.svg", 0, 219971, CRC(9c9102f4) SHA1(6a7e02fd1467a26c734b01724e23cef9e4917805) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
@@ -2491,6 +2576,9 @@ ROM_END
 ROM_START( invspace )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-054", 0x0000, 0x0400, CRC(913d9c13) SHA1(f20edb5458e54d2f6d4e45e5d59efd87e05a6f3f) )
+
+	ROM_REGION( 110899, "svg", 0)
+	ROM_LOAD( "invspace.svg", 0, 110899, CRC(ae794333) SHA1(3552215389f02e4ef1d608f7dfc84f0499a78ee2) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
@@ -2503,24 +2591,41 @@ ROM_END
 ROM_START( galaxy2 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
+
+	ROM_REGION( 325057, "svg", 0)
+	ROM_LOAD( "galaxy2d.svg", 0, 325057, CRC(b2d27a0e) SHA1(502ec22c324903ffe8ff235b9a3b8898dce17a64) ) // by kevtris, ver. 25 apr 2016
+ROM_END
+
+ROM_START( galaxy2b )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
+
+	ROM_REGION( 266377, "svg", 0)
+	ROM_LOAD( "galaxy2b.svg", 0, 266377, CRC(8633cebb) SHA1(6c41f5e918e1522eb55ef24270900a1b2477722b) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( astrocmd )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-202.s01", 0x0000, 0x0800, CRC(b4b34883) SHA1(6246d561c2df1f2124575d2ca671ef85b1819edd) )
+
+	ROM_REGION( 335362, "svg", 0)
+	ROM_LOAD( "astrocmd.svg", 0, 335362, CRC(fe2cd30f) SHA1(898a3d9afc5dca6c63ae28aed2c8530716ad1c45) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( edracula )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-206.s01", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
+
+	ROM_REGION( 794532, "svg", 0)
+	ROM_LOAD( "edracula.svg", 0, 794532, CRC(d20e018c) SHA1(7f70f1d373c034ec8c93e27b7e3371578ddaf61b) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( mcompgin )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d650c-060", 0x0000, 0x0800, BAD_DUMP CRC(92a4d8be) SHA1(d67f14a2eb53b79a7d9eb08103325299bc643781) )
+	ROM_LOAD( "d650c-060", 0x0000, 0x0800, BAD_DUMP CRC(92a4d8be) SHA1(d67f14a2eb53b79a7d9eb08103325299bc643781) ) // d5 stuck: xx1x xxxx
 ROM_END
 
 
@@ -2533,64 +2638,83 @@ ROM_END
 ROM_START( tccombat )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-042", 0x0000, 0x0400, CRC(d7b5cfeb) SHA1(a267be8e43b7740758eb0881b655b1cc8aec43da) )
+
+	ROM_REGION( 210960, "svg", 0)
+	ROM_LOAD( "tccombat.svg", 0, 210960, CRC(03e9eba6) SHA1(d558d3063da42dc7cc02b769bca06a3732418837) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( tmtennis )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-048", 0x0000, 0x0400, CRC(78702003) SHA1(4d427d4dbeed901770c682338867f58c7b54eee3) )
+
+	ROM_REGION( 203979, "svg", 0)
+	ROM_LOAD( "tmtennis.svg", 0, 203979, BAD_DUMP CRC(4679487c) SHA1(845e961e309fa9e52c4a856b3e7f5cecd1173a1b) ) // by kevtris, ver. 25 apr 2016 - BAD_DUMP: needs overlay
 ROM_END
 
 
 ROM_START( tmpacman )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-160", 0x0000, 0x0800, CRC(b21a8af7) SHA1(e3122be1873ce76a4067386bf250802776f0c2f9) )
+
+	ROM_REGION( 230216, "svg", 0)
+	ROM_LOAD( "tmpacman.svg", 0, 230216, CRC(2ab5c0f1) SHA1(b2b6482b03c28515dc76fd3d6034c8b7e6bf6efc) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( tmscramb )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-192", 0x0000, 0x0800, CRC(00fcc501) SHA1(a7771e934bf8268c83f38c7ec0acc668836e0939) )
+
+	ROM_REGION( 235601, "svg", 0)
+	ROM_LOAD( "tmscramb.svg", 0, 235601, CRC(9e76219a) SHA1(275273b98d378c9313dd73a3b86cc661a824b7af) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( tcaveman )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-209", 0x0000, 0x0800, CRC(d230d4b7) SHA1(2fb12b60410f5567c5e3afab7b8f5aa855d283be) )
+
+	ROM_REGION( 306952, "svg", 0)
+	ROM_LOAD( "tcaveman.svg", 0, 306952, CRC(a0588b14) SHA1(f67edf579963fc19bc7f9d268329cbc0230712d8) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 ROM_START( alnchase )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-258", 0x0000, 0x0800, CRC(c5284ff5) SHA1(6a20aaacc9748f0e0335958f3cea482e36153704) )
+
+	ROM_REGION( 576864, "svg", 0)
+	ROM_LOAD( "alnchase.svg", 0, 576864, CRC(fe7c7078) SHA1(0d201eeaeb291ded14c0759d1d3d5b2491cf0792) ) // by kevtris, ver. 25 apr 2016
 ROM_END
 
 
 
 /*    YEAR  NAME      PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   driver_device, 0, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, driver_device, 0, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, driver_device, 0, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   driver_device, 0, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, driver_device, 0, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, driver_device, 0, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, driver_device, 0, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, driver_device, 0, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, tactix,   0,        0, tactix,   tactix,   driver_device, 0, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tactix,   0,        0, tactix,   tactix,   driver_device, 0, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, invspace, 0,        0, invspace, invspace, driver_device, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, invspace, 0,        0, invspace, invspace, driver_device, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, efball,   0,        0, efball,   efball,   driver_device, 0, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  driver_device, 0, "Epoch", "Galaxy II", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  driver_device, 0, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  driver_device, 0, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, driver_device, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  driver_device, 0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, tccombat, 0,        0, tccombat, tccombat, driver_device, 0, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, driver_device, 0, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, driver_device, 0, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, driver_device, 0, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1984, alnchase, 0,        0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, tccombat, 0,        0, tccombat, tccombat, driver_device, 0, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, driver_device, 0, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, driver_device, 0, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, driver_device, 0, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, alnchase, 0,        0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )

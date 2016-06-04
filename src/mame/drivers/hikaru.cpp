@@ -385,8 +385,6 @@ Notes:
 #include "cpu/sh4/sh4.h"
 
 #define CPU_CLOCK (200000000)
-									/* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
-//static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
 class hikaru_state : public driver_device
 {
@@ -484,7 +482,16 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_START( hikaru, hikaru_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
-//  MCFG_CPU_CONFIG(sh4cpu_config)
+//  MCFG_SH4_MD0(1)
+//  MCFG_SH4_MD1(0)
+//  MCFG_SH4_MD2(1)
+//  MCFG_SH4_MD3(0)
+//  MCFG_SH4_MD4(0)
+//  MCFG_SH4_MD5(1)
+//  MCFG_SH4_MD6(0)
+//  MCFG_SH4_MD7(1)
+//  MCFG_SH4_MD8(0)
+//  MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(hikaru_map)
 //  MCFG_CPU_IO_MAP(hikaru_port)
 //  MCFG_CPU_VBLANK_INT("screen", hikaru,vblank)
@@ -509,7 +516,6 @@ static MACHINE_CONFIG_START( hikaru, hikaru_state )
 
 //  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 //  MCFG_SOUND_ADD("aica", AICA, 0)
-//  MCFG_SOUND_CONFIG(aica_config)
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 //  MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END

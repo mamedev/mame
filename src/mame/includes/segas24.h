@@ -20,6 +20,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_generic_paletteram_16(*this, "paletteram")
 		, m_romboard(*this, "romboard")
+		, m_gground_hack_timer(nullptr)
 	{
 	}
 
@@ -142,4 +143,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_clear_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_frc_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_vbl);
+
+	// game specific
+	TIMER_CALLBACK_MEMBER(gground_hack_timer_callback);
+	emu_timer *m_gground_hack_timer;
 };

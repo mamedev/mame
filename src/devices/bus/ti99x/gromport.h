@@ -1,11 +1,9 @@
 // license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /***************************************************************************
-    Gromport of the TI-99 consoles
+    Gromport (Cartridge port) of the TI-99 consoles
 
     For details see gromport.c
-
-    Michael Zapf, July 2012
 ***************************************************************************/
 
 #ifndef __GROMPORT__
@@ -13,7 +11,7 @@
 
 #include "emu.h"
 #include "ti99defs.h"
-#include "grom.h"
+#include "machine/tmc0430.h"
 
 extern const device_type GROMPORT;
 
@@ -29,13 +27,19 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite);
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 
+	DECLARE_WRITE_LINE_MEMBER(romgq_line);
+
+	// Combined GROM select lines
+	DECLARE_WRITE8_MEMBER(set_gromlines);
+
+	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+
+	static void set_mask(device_t &device, int mask) { downcast<gromport_device &>(device).m_mask = mask;   }
+
 	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object)  { return downcast<gromport_device &>(device).m_console_ready.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_reset_callback(device_t &device, _Object object) { return downcast<gromport_device &>(device).m_console_reset.set_callback(object); }
 
 	void    cartridge_inserted();
-	void    set_grom_base(UINT16 grombase, UINT16 grommask);
-	UINT16  get_grom_base() { return m_grombase; }
-	UINT16  get_grom_mask() { return m_grommask; }
 
 protected:
 	virtual void device_start() override;
@@ -48,15 +52,22 @@ private:
 	bool                m_reset_on_insert;
 	devcb_write_line   m_console_ready;
 	devcb_write_line   m_console_reset;
-	UINT16              m_grombase;
-	UINT16              m_grommask;
+	int             m_mask;
+	int m_romgq;
 };
 
-SLOT_INTERFACE_EXTERN(gromport);
+SLOT_INTERFACE_EXTERN(gromport4);
+SLOT_INTERFACE_EXTERN(gromport8);
 
-#define MCFG_TI99_GROMPORT_ADD( _tag )   \
+#define MCFG_GROMPORT4_ADD( _tag )   \
 	MCFG_DEVICE_ADD(_tag, GROMPORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(gromport, "single", false)
+	gromport_device::set_mask(*device, 0x1fff); \
+	MCFG_DEVICE_SLOT_INTERFACE(gromport4, "single", false)
+
+#define MCFG_GROMPORT8_ADD( _tag )   \
+	MCFG_DEVICE_ADD(_tag, GROMPORT, 0) \
+	gromport_device::set_mask(*device, 0x3fff); \
+	MCFG_DEVICE_SLOT_INTERFACE(gromport8, "single", false)
 
 #define MCFG_GROMPORT_READY_HANDLER( _ready ) \
 	devcb = &gromport_device::static_set_ready_callback( *device, DEVCB_##_ready );
@@ -80,11 +91,13 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite);
 
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
+	DECLARE_WRITE_LINE_MEMBER(romgq_line);
+	DECLARE_WRITE8_MEMBER(set_gromlines);
+
+	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+
 	bool    is_available() { return m_pcb != nullptr; }
-	bool    has_grom();
 	void    set_slot(int i);
-	UINT16  grom_base();
-	UINT16  grom_mask();
 
 protected:
 	virtual void device_start() override { };
@@ -111,6 +124,7 @@ protected:
 	const option_guide *create_option_guide() const override { return nullptr; }
 
 private:
+	bool    m_readrom;
 	bool    m_softlist;
 	int     m_pcbtype;
 	int     m_slot;
@@ -136,18 +150,24 @@ public:
 	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
 	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
 
+	virtual DECLARE_WRITE_LINE_MEMBER(romgq_line) =0;
+	virtual DECLARE_WRITE8_MEMBER(set_gromlines) =0;
+
+	virtual DECLARE_WRITE_LINE_MEMBER(gclock_in) =0;
+
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 
 	virtual void insert(int index, ti99_cartridge_device* cart) { m_gromport->cartridge_inserted(); };
 	virtual void remove(int index) { };
-	UINT16 grom_base();
-	UINT16 grom_mask();
+	// UINT16 grom_base();
+	// UINT16 grom_mask();
 
 protected:
 	ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual void device_config_complete() override;
 
 	gromport_device*    m_gromport;
+	bool     m_grom_selected;
 };
 
 /*
@@ -162,6 +182,9 @@ public:
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
+	DECLARE_WRITE8_MEMBER(set_gromlines) override;
+	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
 
 protected:
 	virtual void device_start() override;
@@ -190,9 +213,13 @@ public:
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
+	DECLARE_WRITE8_MEMBER(set_gromlines) override;
+	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
 
 	void insert(int index, ti99_cartridge_device* cart) override;
 	void remove(int index) override;
+	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
 
 protected:
 	virtual void device_start() override;
@@ -201,6 +228,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
+	bool m_readrom;
 	int     m_active_slot;
 	int     m_fixed_slot;
 	int     m_next_free_slot;
@@ -222,6 +250,9 @@ public:
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
+	DECLARE_WRITE8_MEMBER(set_gromlines) override;
+	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
 
 	void insert(int index, ti99_cartridge_device* cart) override;
 	void remove(int index) override;
@@ -243,6 +274,7 @@ protected:
 private:
 	int     m_gk_switch[6];         // Used to cache the switch settings.
 
+	bool    m_romspace_selected;
 	int     m_ram_page;
 	int     m_grom_address;
 	UINT8*  m_ram_ptr;
@@ -275,28 +307,33 @@ protected:
 	virtual DECLARE_READ8Z_MEMBER(crureadz);
 	virtual DECLARE_WRITE8_MEMBER(cruwrite);
 
+	DECLARE_WRITE_LINE_MEMBER(romgq_line);
+	virtual DECLARE_WRITE8_MEMBER(set_gromlines);
+	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+
 	DECLARE_READ8Z_MEMBER(gromreadz);
 	DECLARE_WRITE8_MEMBER(gromwrite);
 	inline void         set_grom_pointer(int number, device_t *dev);
 	void                set_cartridge(ti99_cartridge_device *cart);
-	UINT16              grom_base();
-	UINT16              grom_mask();
 	const char*         tag() { return m_tag; }
 	void                set_tag(const char* tag) { m_tag = tag; }
 
 	ti99_cartridge_device*  m_cart;
-	ti99_grom_device*   m_grom[5];
+	tmc0430_device*     m_grom[5];
 	int                 m_grom_size;
 	int                 m_rom_size;
 	int                 m_ram_size;
 
 	UINT8*              m_rom_ptr;
 	UINT8*              m_ram_ptr;
+	bool                m_romspace_selected;
 	int                 m_rom_page;     // for some cartridge types
 	UINT8*              m_grom_ptr;     // for gromemu
 	int                 m_grom_address; // for gromemu
 	int                 m_ram_page;     // for super
 	const char*         m_tag;
+	dynamic_buffer      m_nvram;    // for MiniMemory
+	dynamic_buffer      m_ram;  // for MBX
 };
 
 /******************** Standard cartridge ******************************/
@@ -309,10 +346,20 @@ public:
 
 /*********** Paged cartridge (like Extended Basic) ********************/
 
-class ti99_paged_cartridge : public ti99_cartridge_pcb
+class ti99_paged12k_cartridge : public ti99_cartridge_pcb
 {
 public:
-	~ti99_paged_cartridge() { };
+	~ti99_paged12k_cartridge() { };
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+};
+
+/*********** Paged cartridge (others) ********************/
+
+class ti99_paged16k_cartridge : public ti99_cartridge_pcb
+{
+public:
+	~ti99_paged16k_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 };
@@ -398,15 +445,20 @@ public:
 class ti99_gromemu_cartridge : public ti99_cartridge_pcb
 {
 public:
-	ti99_gromemu_cartridge(): m_waddr_LSB(false)
+	ti99_gromemu_cartridge(): m_waddr_LSB(false), m_grom_selected(false), m_grom_read_mode(false), m_grom_address_mode(false)
 	{  m_grom_address = 0; }
 	~ti99_gromemu_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(gromemureadz);
 	DECLARE_WRITE8_MEMBER(gromemuwrite);
+	DECLARE_WRITE8_MEMBER(set_gromlines) override;
+
 private:
 	bool    m_waddr_LSB;
+	bool    m_grom_selected;
+	bool    m_grom_read_mode;
+	bool    m_grom_address_mode;
 };
 
 
@@ -454,10 +506,10 @@ public:
 	rpk *open(emu_options &options, const char *filename, const char *system_name);
 
 private:
-	const zip_file_header*  find_file(zip_file *zip, const char *filename, UINT32 crc);
-	rpk_socket*             load_rom_resource(zip_file* zip, xml_data_node* rom_resource_node, const char* socketname);
-	rpk_socket*             load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name);
-	const pcb_type*         m_types;
+	int             find_file(util::archive_file &zip, const char *filename, UINT32 crc);
+	rpk_socket*     load_rom_resource(util::archive_file &zip, xml_data_node* rom_resource_node, const char* socketname);
+	rpk_socket*     load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name);
+	const pcb_type* m_types;
 };
 
 class rpk

@@ -129,8 +129,8 @@ const char *apollo_cpu_context(device_t *cpu) {
 	/* if we have an executing CPU, output data */
 	if (cpu != nullptr) {
 		osd_ticks_t t = osd_ticks();
-		int s = t / osd_ticks_per_second();
-		int ms = (t % osd_ticks_per_second()) / 1000;
+		int s = (t / osd_ticks_per_second()) % 3600;
+		int ms = (t / (osd_ticks_per_second() / 1000)) % 1000;
 
 		sprintf(statebuf, "%d.%03d %s pc=%08x", s, ms, cpu->tag(), cpu->safe_pcbase());
 	} else {

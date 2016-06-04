@@ -20,6 +20,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/watchdog.h"
 #include "video/atarirle.h"
 #include "includes/atarig42.h"
 
@@ -341,7 +342,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xe00050, 0xe00051) AM_WRITE(io_latch_w)
 	AM_RANGE(0xe00060, 0xe00061) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0xe03000, 0xe03001) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xe03800, 0xe03801) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0xe03800, 0xe03801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xe80000, 0xe80fff) AM_RAM
 	AM_RANGE(0xf40000, 0xf40001) AM_DEVREAD("asic65", asic65_device, io_r)
 	AM_RANGE(0xf60000, 0xf60001) AM_DEVREAD("asic65", asic65_device, read)
@@ -543,6 +544,8 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarig42)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -602,9 +605,8 @@ ROM_START( roadriot )
 	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, CRC(7c5498e7) SHA1(9d8b235baf7b75bef8ef9b168647c5b2b80b2cb3) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 6502 code */
-	ROM_LOAD( "136089-1047.12c", 0x10000, 0x4000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
-	ROM_CONTINUE(           0x04000, 0xc000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 6502 code */
+	ROM_LOAD( "136089-1047.12c", 0x00000, 0x10000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
 	ROM_LOAD( "136089-1041.22d",    0x000000, 0x20000, CRC(b7451f92) SHA1(9fd17913630e457e406e596f2d86afff98787750) ) /* playfield, planes 0-1 */
@@ -660,9 +662,8 @@ ROM_START( roadrioto )
 	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, CRC(7c5498e7) SHA1(9d8b235baf7b75bef8ef9b168647c5b2b80b2cb3) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 6502 code */
-	ROM_LOAD( "136089-1047.12c", 0x10000, 0x4000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
-	ROM_CONTINUE(           0x04000, 0xc000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 6502 code */
+	ROM_LOAD( "136089-1047.12c", 0x00000, 0x10000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
 	ROM_LOAD( "136089-1041.22d",    0x000000, 0x20000, CRC(b7451f92) SHA1(9fd17913630e457e406e596f2d86afff98787750) ) /* playfield, planes 0-1 */
@@ -719,9 +720,8 @@ ROM_START( guardian )
 	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, NO_DUMP )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 6502 code */
-	ROM_LOAD( "136092-0080-snd.12c", 0x10000, 0x4000, CRC(0388f805) SHA1(49c11313bc4192dbe294cf68b652cb19047889fd) )
-	ROM_CONTINUE(             0x04000, 0xc000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 6502 code */
+	ROM_LOAD( "136092-0080-snd.12c", 0x00000, 0x10000, CRC(0388f805) SHA1(49c11313bc4192dbe294cf68b652cb19047889fd) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "136092-0037a.23e",  0x000000, 0x80000, CRC(ca10b63e) SHA1(243a2a440e1bc9135d3dbe6553d39c54b9bdcd13) ) /* playfield, planes 0-1 */
@@ -781,8 +781,9 @@ DRIVER_INIT_MEMBER(atarig42_state,roadriot)
 	m_playfield_base = 0x400;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
-	m_sloop_base = main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::roadriot_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::roadriot_sloop_data_w),this));
+	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::roadriot_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::roadriot_sloop_data_w),this));
 	main.set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), this));
+	m_sloop_base = (UINT16 *)memregion("maincpu")->base();
 
 	/*
 	Road Riot color MUX
@@ -816,8 +817,9 @@ DRIVER_INIT_MEMBER(atarig42_state,guardian)
 	*(UINT16 *)&memregion("maincpu")->base()[0x80000] = 0x4E75;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
-	m_sloop_base = main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::guardians_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::guardians_sloop_data_w),this));
+	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::guardians_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::guardians_sloop_data_w),this));
 	main.set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), this));
+	m_sloop_base = (UINT16 *)memregion("maincpu")->base();
 
 	/*
 	Guardians color MUX

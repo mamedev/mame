@@ -78,6 +78,7 @@ i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, de
 	: device_t(mconfig, I2CMEM, "I2C Memory", tag, owner, clock, "i2cmem", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
+	m_region(*this, DEVICE_SELF),
 	m_slave_address( I2CMEM_SLAVE_ADDRESS ),
 	m_page_size( 0 ),
 	m_data_size( 0 ),
@@ -175,11 +176,11 @@ void i2cmem_device::nvram_default()
 	UINT16 default_value = 0xff;
 	for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
 	{
-		m_addrspace[ 0 ]->write_byte( offs, default_value );
+		space(AS_PROGRAM).write_byte( offs, default_value );
 	}
 
 	/* populate from a memory region if present */
-	if( m_region != nullptr )
+	if (m_region.found())
 	{
 		if( m_region->bytes() != i2cmem_bytes )
 		{
@@ -193,7 +194,7 @@ void i2cmem_device::nvram_default()
 
 		UINT8 *default_data = m_region->base();
 		for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
-			m_addrspace[ 0 ]->write_byte( offs, default_data[offs] );
+			space(AS_PROGRAM).write_byte( offs, default_data[offs] );
 	}
 }
 
@@ -212,7 +213,7 @@ void i2cmem_device::nvram_read( emu_file &file )
 
 	for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
 	{
-		m_addrspace[ 0 ]->write_byte( offs, buffer[ offs ] );
+		space(AS_PROGRAM).write_byte( offs, buffer[ offs ] );
 	}
 }
 
@@ -228,7 +229,7 @@ void i2cmem_device::nvram_write( emu_file &file )
 
 	for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
 	{
-		buffer[ offs ] = m_addrspace[ 0 ]->read_byte( offs );
+		buffer[ offs ] = space(AS_PROGRAM).read_byte( offs );
 	}
 
 	file.write( &buffer[0], i2cmem_bytes );
@@ -375,7 +376,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 
 								for( int i = 0; i < m_page_size; i++ )
 								{
-									m_addrspace[ 0 ]->write_byte( offset + i, m_page[ i ] );
+									space(AS_PROGRAM).write_byte( offset + i, m_page[ i ] );
 								}
 
 								m_page_offset = 0;
@@ -386,7 +387,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 							int offset = data_offset();
 
 							verboselog( this, 1, "data[ %04x ] <- %02x\n", offset, m_shift );
-							m_addrspace[ 0 ]->write_byte( offset, m_shift );
+							space(AS_PROGRAM).write_byte( offset, m_shift );
 
 							m_byteaddr++;
 						}
@@ -419,7 +420,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 					{
 						int offset = data_offset();
 
-						m_shift = m_addrspace[ 0 ]->read_byte( offset );
+						m_shift = space(AS_PROGRAM).read_byte( offset );
 						verboselog( this, 1, "data[ %04x ] -> %02x\n", offset, m_shift );
 						m_byteaddr++;
 					}

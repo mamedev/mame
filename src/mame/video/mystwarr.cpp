@@ -52,7 +52,7 @@ void mystwarr_state::decode_tiles()
 		d += 5;
 	}
 
-	m_gfxdecode->gfx(gfxnum)->set_source(m_decoded.get());
+	m_k056832->gfx(gfxnum)->set_source(m_decoded.get());
 }
 
 

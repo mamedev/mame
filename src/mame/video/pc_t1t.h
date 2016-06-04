@@ -4,6 +4,8 @@
 #define PC_T1T_H
 
 #include "video/mc6845.h"
+#include "machine/ram.h"
+#include "machine/bankdev.h"
 
 #define T1000_SCREEN_NAME   "screen"
 #define T1000_MC6845_NAME   "mc6845_t1000"
@@ -39,6 +41,7 @@ public:
 	DECLARE_PALETTE_INIT( pcjr );
 
 	DECLARE_WRITE_LINE_MEMBER( t1000_de_changed );
+	DECLARE_READ8_MEMBER( read );
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_UPDATE_ROW( t1000_text_inten_update_row );
@@ -48,13 +51,14 @@ public:
 	MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row );
 	MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row );
 
+protected:
 	required_device<mc6845_device> m_mc6845;
 	UINT8 m_mode_control, m_color_select;
 	UINT8 m_status;
 
 	struct reg m_reg;
 
-	UINT8 m_bank;
+	UINT16 m_bank;
 
 	int m_pc_framecnt;
 
@@ -80,8 +84,9 @@ public:
 	int vga_data_r(void);
 	int bank_r(void);
 
-	DECLARE_READ8_MEMBER( read );
 	required_device<palette_device> m_palette;
+	required_device<ram_device> m_ram;
+	required_device<address_map_bank_device> m_vram;
 };
 
 class pcvideo_t1000_device :  public pc_t1t_device
@@ -91,20 +96,19 @@ public:
 	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( videoram_r );
-	DECLARE_WRITE8_MEMBER( videoram_w );
 	DECLARE_WRITE_LINE_MEMBER( t1000_vsync_changed );
+	DECLARE_WRITE_LINE_MEMBER( disable_w );
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
 
 private:
-	UINT8 *m_t1_displayram;
 	void mode_switch( void );
 	void vga_data_w(int data);
 	void bank_w(int data);
 	void mode_control_w(int data);
+	bool m_disable;
 };
 
 extern const device_type PCVIDEO_T1000;

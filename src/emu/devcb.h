@@ -23,7 +23,6 @@
 //**************************************************************************
 
 // wrappers for ioports, constants, and loggers
-#define DEVCB_NULL devcb_base::null_desc()
 #define DEVCB_NOOP devcb_base::null_desc()
 #define DEVCB_IOPORT(_tag) devcb_base::ioport_desc(_tag)
 #define DEVCB_CONSTANT(_value) devcb_base::constant_desc(_value)
@@ -33,32 +32,32 @@
 #define DEVCB_GND DEVCB_CONSTANT(0)
 
 // wrappers for read callbacks into the owner device
-#define DEVCB_READLINE(_class, _func) read_line_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
-#define DEVCB_READ8(_class, _func) read8_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
-#define DEVCB_READ16(_class, _func) read16_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
-#define DEVCB_READ32(_class, _func) read32_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
-#define DEVCB_READ64(_class, _func) read64_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
+#define DEVCB_READLINE(_class, _func) read_line_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)
+#define DEVCB_READ8(_class, _func) read8_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)
+#define DEVCB_READ16(_class, _func) read16_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)
+#define DEVCB_READ32(_class, _func) read32_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)
+#define DEVCB_READ64(_class, _func) read64_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)
 
 // wrappers for read callbacks into any tagged device
-#define DEVCB_DEVREADLINE(tag, _class, _func) read_line_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
-#define DEVCB_DEVREAD8(tag, _class, _func) read8_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
-#define DEVCB_DEVREAD16(tag, _class, _func) read16_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
-#define DEVCB_DEVREAD32(tag, _class, _func) read32_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
-#define DEVCB_DEVREAD64(tag, _class, _func) read64_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
+#define DEVCB_DEVREADLINE(tag, _class, _func) read_line_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)nullptr)
+#define DEVCB_DEVREAD8(tag, _class, _func) read8_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)nullptr)
+#define DEVCB_DEVREAD16(tag, _class, _func) read16_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)nullptr)
+#define DEVCB_DEVREAD32(tag, _class, _func) read32_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)nullptr)
+#define DEVCB_DEVREAD64(tag, _class, _func) read64_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)nullptr)
 
 // wrappers for write callbacks into the owner device
-#define DEVCB_WRITELINE(_class, _func) write_line_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
-#define DEVCB_WRITE8(_class, _func) write8_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
-#define DEVCB_WRITE16(_class, _func) write16_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
-#define DEVCB_WRITE32(_class, _func) write32_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
-#define DEVCB_WRITE64(_class, _func) write64_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
+#define DEVCB_WRITELINE(_class, _func) write_line_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)
+#define DEVCB_WRITE8(_class, _func) write8_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)
+#define DEVCB_WRITE16(_class, _func) write16_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)
+#define DEVCB_WRITE32(_class, _func) write32_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)
+#define DEVCB_WRITE64(_class, _func) write64_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)
 
 // wrappers for write callbacks into any tagged device
-#define DEVCB_DEVWRITELINE(tag, _class, _func) write_line_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
-#define DEVCB_DEVWRITE8(tag, _class, _func) write8_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
-#define DEVCB_DEVWRITE16(tag, _class, _func) write16_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
-#define DEVCB_DEVWRITE32(tag, _class, _func) write32_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
-#define DEVCB_DEVWRITE64(tag, _class, _func) write64_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
+#define DEVCB_DEVWRITELINE(tag, _class, _func) write_line_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)nullptr)
+#define DEVCB_DEVWRITE8(tag, _class, _func) write8_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)nullptr)
+#define DEVCB_DEVWRITE16(tag, _class, _func) write16_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)nullptr)
+#define DEVCB_DEVWRITE32(tag, _class, _func) write32_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)nullptr)
+#define DEVCB_DEVWRITE64(tag, _class, _func) write64_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)nullptr)
 
 // machine config helpers to add shift, mask, or address space configuration
 #define MCFG_DEVCB_RSHIFT(_shift) devcb->set_rshift(_shift);

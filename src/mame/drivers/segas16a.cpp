@@ -148,7 +148,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 
 #include "emu.h"
 #include "includes/segas16a.h"
-#include "machine/segacrp2.h"
+#include "machine/segacrp2_device.h"
 #include "machine/fd1089.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
@@ -533,7 +533,7 @@ READ8_MEMBER( segas16a_state::mcu_io_r )
 		case 0:
 			// access watchdog? (unsure about this one)
 			if (                         offset < 0x3fff)
-				return watchdog_reset_r(space, 0);
+				return m_watchdog->reset_r(space, 0);
 
 			// access main work RAM
 			else if (offset >= 0x4000 && offset < 0x8000)
@@ -957,7 +957,7 @@ static ADDRESS_MAP_START( system16a_map, AS_PROGRAM, 16, segas16a_state )
 	AM_RANGE(0x440000, 0x4407ff) AM_MIRROR(0x3bf800) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc40000, 0xc43fff) AM_MIRROR(0x39c000) AM_READWRITE(misc_io_r, misc_io_w)
-	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(watchdog_reset16_r)
+	AM_RANGE(0xc60000, 0xc6ffff) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -1908,6 +1908,8 @@ static MACHINE_CONFIG_START( system16a, segas16a_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(segas16a_state, misc_control_w))
@@ -1982,8 +1984,11 @@ static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16a_no7751p, system16a_no7751 )
-	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_CPU_REPLACE("soundcpu", SEGA_315_5177, 4000000)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":sound_decrypted_opcodes")
 MACHINE_CONFIG_END
 
 /*
@@ -3674,63 +3679,6 @@ DRIVER_INIT_MEMBER(segas16a_state,quartet)
 	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16a_state::quartet_i8751_sim), this);
 }
 
-DRIVER_INIT_MEMBER(segas16a_state,fantzonep)
-{
-	DRIVER_INIT_CALL(generic);
-
-	// 315-5177
-	static const UINT8 xor_table[128] =
-	{
-		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
-		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
-		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
-		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
-		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
-		0x05,0x55,0x50,0x14,
-
-		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
-		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
-		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
-		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
-		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
-		0x05,0x55,0x50,0x14,
-	};
-
-	static const int swap_table[128] =
-	{
-		0,0,0,0,
-		1,1,1,1,1,
-		2,2,2,2,2,
-		3,3,3,3,
-		4,4,4,4,4,
-		5,5,5,5,5,
-		6,6,6,6,6,
-		7,7,7,7,7,
-		8,8,8,8,
-		9,9,9,9,9,
-		10,10,10,10,10,
-		11,11,11,11,11,
-		12,12,12,12,12,
-		13,13,
-
-		8,8,8,8,
-		9,9,9,9,9,
-		10,10,10,10,10,
-		11,11,11,11,
-		12,12,12,12,12,
-		13,13,13,13,13,
-		14,14,14,14,14,
-		15,15,15,15,15,
-		16,16,16,16,
-		17,17,17,17,17,
-		18,18,18,18,18,
-		19,19,19,19,19,
-		20,20,20,20,20,
-		21,21,
-	};
-
-	sega_decode_2(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, xor_table, swap_table);
-}
 
 DRIVER_INIT_MEMBER(segas16a_state,sdi)
 {
@@ -3778,7 +3726,7 @@ GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,   segas16a
 
 GAME( 1986, fantzone,   0,        system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzone1,  fantzone, system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, fantzonep,  fantzone, system16a_no7751p,        fantzone,   segas16a_state,fantzonep,   ROT0,   "Sega", "Fantasy Zone (317-5000)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, fantzonep,  fantzone, system16a_no7751p,        fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (317-5000)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzonepr, fantzone, system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bad / missing gfx roms
 
 GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a, segas16a_state,passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A) (FD1094 317-0071)", MACHINE_SUPPORTS_SAVE )

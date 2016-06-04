@@ -37,6 +37,7 @@ const device_type X76F041 = &device_creator<x76f041_device>;
 x76f041_device::x76f041_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t( mconfig, X76F041, "X76F041 Flash", tag, owner, clock, "x76f041", __FILE__ ),
 	device_nvram_interface(mconfig, *this),
+	m_region(*this, DEVICE_SELF),
 	m_cs( 0 ),
 	m_rst( 0 ),
 	m_scl( 0 ),
@@ -498,7 +499,7 @@ void x76f041_device::nvram_default()
 	int expected_bytes = sizeof( m_response_to_reset ) + sizeof( m_write_password ) + sizeof( m_read_password ) +
 		sizeof( m_configuration_password ) + sizeof( m_configuration_registers ) + sizeof( m_data );
 
-	if( !m_region )
+	if (!m_region.found())
 	{
 		logerror( "x76f041(%s) region not found\n", tag() );
 	}

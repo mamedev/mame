@@ -17,7 +17,7 @@
     1x MC1458P (u10)(sound)
     1x TDA2003 (u8)(sound)
     1x oscillator 10.000MHz (QZ1)
-    1x oscillator 16.000000 (QZ2) 
+    1x oscillator 16.000000 (QZ2)
   ROMs:
     1x AT27C020 (1)
     2x M27C4001 (2,3)
@@ -356,11 +356,11 @@ static INPUT_PORTS_START( galaxi )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, hopper_r, NULL)   // hopper sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, hopper_r, nullptr)   // hopper sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_COIN3 )   // pin 25LC
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, ticket_r, NULL)  // ticket sensor
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, ticket_r, nullptr)  // ticket sensor
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // hopper out (pin 14LS)
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // (pin 26LC)
@@ -376,11 +376,11 @@ static INPUT_PORTS_START( magjoker )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, hopper_r, NULL)   // hopper sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, hopper_r, nullptr)   // hopper sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Hopper Refill") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, ticket_r, NULL)  // ticket sensor
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, ticket_r, nullptr)  // ticket sensor
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // hopper out (pin 14LS)
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )   // (pin 26LC)
@@ -521,6 +521,40 @@ ROM_START( magjoker )
 	ROM_LOAD( "21.u38", 0x00000, 0x40000, CRC(199baf33) SHA1(006708d955481fe1ae44555d27896d18e1ff8440) )
 ROM_END
 
+/*
+  Last Four
+  2001, BRL.
+
+  CPUs:
+  1x MC68000P10 (u1) 16/32-bit Microprocessor (main).
+  1x AD-65      (u9) 4-Channel Mixing ADCPM Voice Synthesis LSI (sound).
+  1x MC1458     (u10) Dual Operational Amplifier (sound).
+  1x TDA2003    (u8) Audio Amplifier (sound).
+  1x 10.000000MHz. oscillator (QZ1).
+  1x 16.000MHz. oscillator (QZ2).
+
+  ROMs:
+  1x AF49F010 (14) dumped.
+  1x Am27C010 (15) dumped.
+  1x MC27C100 (21) dumped.
+  2x M27C4001 (12, 13) dumped.
+
+  RAMs:
+  2x KT76C28K-10 (u16, u17).
+  2x HT6264-70 (u26, u27).
+  2x DS1230Y-100 (u4, u5) not dumped.
+
+  PLDs:
+  1x A40MX04-PL84 (u29) read protected.
+
+  Others:
+  1x 28x2 JAMMA edge connector.
+  1x trimmer (volume).
+
+  Notes:
+  PCB is etched: GALAXI - 26 05 2000 BRL S.R.L. BOLOGNA.
+
+*/
 ROM_START( lastfour )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "15.u48", 0x00000, 0x20000, CRC(9168e19c) SHA1(4a2f0d100e457bd33691ba084a0f0549e8bf0790) )
@@ -533,6 +567,7 @@ ROM_START( lastfour )
 	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit ADPCM mono @ 6 kHz.*/
 	ROM_LOAD( "21.u38", 0x00000, 0x20000, CRC(e48523dd) SHA1(47bc2e5c2164b93d685fa134397845e0ed7aaa5f) )
 ROM_END
+
 
 /***************************************************************************
                                Game Drivers

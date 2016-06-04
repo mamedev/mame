@@ -57,6 +57,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 #include "cpu/tms9900/tms9980a.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
@@ -344,7 +345,7 @@ void looping_state::machine_start()
 void looping_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(ASSERT_LINE);
+	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
 }
 
 /*************************************
@@ -557,7 +558,7 @@ static ADDRESS_MAP_START( looping_io_map, AS_IO, 8, looping_state )
 	/* 404 = C0 */
 	/* 405 = C1 */
 	AM_RANGE(0x406, 0x406) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x407, 0x407) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x407, 0x407) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 
 	AM_RANGE(0x10000, 0x10000) AM_NOP       /* external IDLE signal -- we can ignore it */
 ADDRESS_MAP_END
@@ -626,12 +627,14 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_TMS99xx_ADD("audiocpu", TMS9980A,  SOUND_CLOCK/4, looping_sound_map, looping_sound_io_map)
 
 	MCFG_CPU_ADD("mcu", COP420, COP_CLOCK)
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED )
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
 	MCFG_COP400_WRITE_L_CB(WRITE8(looping_state, cop_l_w))
 	MCFG_COP400_READ_L_CB(READ8(looping_state, cop_unk_r))
 	MCFG_COP400_READ_G_CB(READ8(looping_state, cop_unk_r))
 	MCFG_COP400_READ_IN_CB(READ8(looping_state, cop_unk_r))
 	MCFG_COP400_READ_SI_CB(READLINE(looping_state, cop_serial_r))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

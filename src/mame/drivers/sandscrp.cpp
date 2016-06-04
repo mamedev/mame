@@ -75,6 +75,7 @@ Is there another alt program rom set labeled 9 & 10?
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
@@ -279,7 +280,7 @@ static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16, sandscrp_state )
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
-	AM_RANGE(0xec0000, 0xec0001) AM_READ(watchdog_reset16_r)    //
+	AM_RANGE(0xec0000, 0xec0001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0x800000, 0x800001) AM_READ(irq_cause_r)  // IRQ Cause
 	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(soundlatch_word_r, soundlatch_word_w)   // From/To Sound CPU
 	AM_RANGE(0xe40000, 0xe40001) AM_READWRITE(latchstatus_word_r, latchstatus_word_w) //
@@ -473,6 +474,7 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_CPU_PROGRAM_MAP(sandscrp_soundmem)
 	MCFG_CPU_IO_MAP(sandscrp_soundport)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
 	/* video hardware */
@@ -499,7 +501,6 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 
 	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
-	MCFG_KANEKO_PANDORA_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

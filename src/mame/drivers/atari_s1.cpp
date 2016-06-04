@@ -45,6 +45,7 @@ ToDo:
 
 #include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "atari_s1.lh"
 
@@ -110,7 +111,7 @@ static ADDRESS_MAP_START( atari_s1_map, AS_PROGRAM, 8, atari_s1_state )
 	AM_RANGE(0x108c, 0x108f) AM_READWRITE(m108c_r,m108c_w)
 	AM_RANGE(0x2000, 0x204f) AM_MIRROR(0x0F80) AM_READ(switch_r) AM_WRITENOP // aavenger ROL 200B causes a spurious write
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(audioen_w) // audio enable
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x5080, 0x508c) AM_MIRROR(3) AM_WRITE(meter_w) // time2000 only
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(audiores_w) // audio reset
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
@@ -125,7 +126,7 @@ static ADDRESS_MAP_START( atarians_map, AS_PROGRAM, 8, atari_s1_state ) // more 
 	AM_RANGE(0x108c, 0x108f) AM_READWRITE(m108c_r,m108c_w)
 	AM_RANGE(0x2000, 0x204f) AM_MIRROR(0x0F80) AM_READ(switch_r)
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(audioen_w) // audio enable
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(audiores_w) // audio reset
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -136,7 +137,7 @@ static ADDRESS_MAP_START( midearth_map, AS_PROGRAM, 8, atari_s1_state )
 	AM_RANGE(0x1000, 0x11ff) AM_WRITE(midearth_w)
 	AM_RANGE(0x2000, 0x204f) AM_MIRROR(0x0F80) AM_READ(switch_r)
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(audioen_w) // audio enable
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(audiores_w) // audio reset
 	AM_RANGE(0x7000, 0x7fff) AM_ROM AM_WRITENOP // writes to FFFF due to poor coding at 7FF5
 ADDRESS_MAP_END
@@ -432,6 +433,8 @@ static MACHINE_CONFIG_START( atari_s1, atari_s1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLK)
 	MCFG_CPU_PROGRAM_MAP(atari_s1_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )

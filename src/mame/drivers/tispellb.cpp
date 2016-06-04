@@ -13,8 +13,8 @@
   1st revision:
 
   Spelling B (US), 1978
-  - TMS0270 MCU TMC0272 (die labeled 0272A T0270B)
-  - TMS1980 MCU TMC1984 (die labeled 1980A 84A)
+  - TMS0270 MCU TMC0272 (die label 0272A T0270B)
+  - TMS1980 MCU TMC1984 (die label 1980A 84A)
   - 8-digit cyan VFD display (seen with and without apostrophe)
 
   Spelling ABC (UK), 1979: exact same hardware as US version
@@ -22,10 +22,11 @@
   2nd revision:
 
   Spelling B (US), 1979
-  - TMS0270 MCU TMC0274*
-  - TMC0355 4KB VSM ROM CD2602*
+  - TMS0270 MCU TMC0274
+  - TMC0355 4KB VSM ROM CD2602
   - 8-digit cyan VFD display
   - 1-bit sound (indicated by a music note symbol on the top-right of the casing)
+  - note: much rarer than the 1978 version, not much luck finding one on eBay
 
   Spelling ABC (UK), 1979: exact same hardware as US version
 
@@ -82,6 +83,7 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
 	void power_off();
 	void prepare_display();
+	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
 
 	DECLARE_READ8_MEMBER(main_read_k);
 	DECLARE_WRITE16_MEMBER(main_write_o);
@@ -104,7 +106,6 @@ protected:
 void tispellb_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
 
 	// zerofill
 	m_rev1_ctl = 0;
@@ -138,9 +139,10 @@ void tispellb_state::power_off()
 
 void tispellb_state::prepare_display()
 {
-	// same as snspell
-	UINT16 gridmask = (m_display_decay[15][16] != 0) ? 0xffff : 0x8000;
-	display_matrix_seg(16+1, 16, m_plate | 0x10000, m_grid & gridmask, 0x3fff);
+	// almost same as snspell
+	UINT16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
+	set_display_segmask(0xff, 0x3fff);
+	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
 }
 
 WRITE16_MEMBER(tispellb_state::main_write_o)
@@ -153,7 +155,7 @@ WRITE16_MEMBER(tispellb_state::main_write_o)
 WRITE16_MEMBER(tispellb_state::main_write_r)
 {
 	// R13: power-off request, on falling edge
-	if ((m_r >> 13 & 1) && !(data >> 13 & 1))
+	if (~data & m_r & 0x2000)
 		power_off();
 
 	// R0-R6: input mux
@@ -413,6 +415,21 @@ ROM_START( spellb )
 	ROM_LOAD( "tms1980_spellb_output.pla", 0, 525, CRC(1e26a719) SHA1(eb031aa216fe865bc9e40b070ca5de2b1509f13b) )
 ROM_END
 
+ROM_START( spellb79 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tmc0274n2l", 0x0000, 0x1000, CRC(98e3bd32) SHA1(e79b59ac29b0183bf1ee8d84b2944450c5e5d8fb) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_spellb79_output.pla", 0, 1246, CRC(b95e35e6) SHA1(430917486856c9e6c28af10ff3758242048096c4) )
+
+	ROM_REGION( 0x1000, "tms6100", 0 )
+	ROM_LOAD( "cd2602.vsm", 0x0000, 0x1000, CRC(dd1fff8c) SHA1(f1760b29aa50fc96a1538db814cc73289654ac25) )
+ROM_END
+
 
 ROM_START( mrchalgr )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -431,7 +448,8 @@ ROM_END
 
 
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1978, spellb,    0,        0,  rev1,   spellb,    driver_device, 0, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME      PARENT COMPAT MACHINE INPUT     INIT              COMPANY, FULLNAME, FLAGS */
+COMP( 1978, spellb,   0,        0,  rev1,   spellb,   driver_device, 0, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, spellb79, spellb,   0,  rev2,   spellb,   driver_device, 0, "Texas Instruments", "Spelling B (1979 version)", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1979, mrchalgr,  0,        0,  rev2,   mrchalgr,  driver_device, 0, "Texas Instruments", "Mr. Challenger", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, mrchalgr, 0,        0,  rev2,   mrchalgr, driver_device, 0, "Texas Instruments", "Mr. Challenger", MACHINE_SUPPORTS_SAVE )

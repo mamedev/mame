@@ -15,6 +15,13 @@
 
 
 //**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+GAME_EXTERN(___empty);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -84,9 +91,9 @@ public:
 	// current item
 	const game_driver &driver() const { return driver_list::driver(m_current); }
 	machine_config &config() const { return config(m_current, m_options); }
-	int clone() { return driver_list::clone(m_current); }
-	int non_bios_clone() { return driver_list::non_bios_clone(m_current); }
-	int compatible_with() { return driver_list::compatible_with(m_current); }
+	int clone() const { return driver_list::clone(m_current); }
+	int non_bios_clone() const { return driver_list::non_bios_clone(m_current); }
+	int compatible_with() const { return driver_list::compatible_with(m_current); }
 	void include() { include(m_current); }
 	void exclude() { exclude(m_current); }
 

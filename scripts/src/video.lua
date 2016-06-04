@@ -9,6 +9,14 @@
 --
 ---------------------------------------------------------------------------
 
+files {
+	MAME_DIR .. "src/devices/video/poly.h",
+	MAME_DIR .. "src/devices/video/sprite.cpp",
+	MAME_DIR .. "src/devices/video/sprite.h",
+	MAME_DIR .. "src/devices/video/vector.cpp",
+	MAME_DIR .. "src/devices/video/vector.h",
+}
+
 --------------------------------------------------
 --
 --@src/devices/video/315_5124.h,VIDEOS["SEGA315_5124"] = true
@@ -195,8 +203,8 @@ if (VIDEOS["EPIC12"]~=null) then
 		MAME_DIR .. "src/devices/video/epic12_blit6.cpp",
 		MAME_DIR .. "src/devices/video/epic12_blit7.cpp",
 		MAME_DIR .. "src/devices/video/epic12_blit8.cpp",
-		MAME_DIR .. "src/devices/video/epic12in.inc",
-		MAME_DIR .. "src/devices/video/epic12pixel.inc",
+		MAME_DIR .. "src/devices/video/epic12in.hxx",
+		MAME_DIR .. "src/devices/video/epic12pixel.hxx",
 	}
 end
 
@@ -233,18 +241,6 @@ if (VIDEOS["GF7600GS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/gf7600gs.cpp",
 		MAME_DIR .. "src/devices/video/gf7600gs.h",
-	}
-end
-
---------------------------------------------------
---
---@src/devices/video/h63484.h,VIDEOS["H63484"] = true
---------------------------------------------------
-
-if (VIDEOS["H63484"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/h63484.cpp",
-		MAME_DIR .. "src/devices/video/h63484.h",
 	}
 end
 
@@ -513,9 +509,9 @@ if (VIDEOS["MOS6566"]~=null) then
 end
 
 
-files {	
+files {
 	MAME_DIR .. "src/devices/video/cgapal.cpp",
-	MAME_DIR .. "src/devices/video/cgapal.h",	
+	MAME_DIR .. "src/devices/video/cgapal.h",
 }
 
 --------------------------------------------------
@@ -658,7 +654,9 @@ end
 if (VIDEOS["STVVDP"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/stvvdp1.cpp",
+		MAME_DIR .. "src/devices/video/stvvdp1.h",
 		MAME_DIR .. "src/devices/video/stvvdp2.cpp",
+		MAME_DIR .. "src/devices/video/stvvdp2.h",
 	}
 end
 
@@ -852,5 +850,17 @@ if (VIDEOS["JANGOU_BLITTER"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/jangou_blitter.cpp",
 		MAME_DIR .. "src/devices/video/jangou_blitter.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/gb_lcd.h,VIDEOS["GB_LCD"] = true
+--------------------------------------------------
+
+if (VIDEOS["GB_LCD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/gb_lcd.cpp",
+		MAME_DIR .. "src/devices/video/gb_lcd.h",
 	}
 end

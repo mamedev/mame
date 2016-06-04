@@ -806,7 +806,7 @@ void nes_cart_slot_device::pcb_reset()
  -------------------------------------------------*/
 
 /* Include emulation of NES PCBs for softlist */
-#include "nes_pcb.inc"
+#include "nes_pcb.hxx"
 
 
 /*-------------------------------------------------
@@ -816,7 +816,7 @@ void nes_cart_slot_device::pcb_reset()
  -------------------------------------------------*/
 
 /* Include emulation of UNIF Boards for .unf files */
-#include "nes_unif.inc"
+#include "nes_unif.hxx"
 
 
 /*-------------------------------------------------
@@ -826,7 +826,7 @@ void nes_cart_slot_device::pcb_reset()
  -------------------------------------------------*/
 
 /* Include emulation of iNES Mappers for .nes files */
-#include "nes_ines.inc"
+#include "nes_ines.hxx"
 
 
 bool nes_cart_slot_device::call_load()
@@ -917,10 +917,10 @@ std::string nes_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "nrom";
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		dynamic_buffer rom(len);
 
-		core_fread(m_file, &rom[0], len);
+		m_file->read(&rom[0], len);
 
 		if ((rom[0] == 'N') && (rom[1] == 'E') && (rom[2] == 'S'))
 			slot_string = get_default_card_ines(&rom[0], len);

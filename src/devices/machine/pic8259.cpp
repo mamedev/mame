@@ -133,7 +133,10 @@ UINT32 pic8259_device::acknowledge()
 			}
 		}
 	}
-	return 0;
+	logerror("Spurious IRQ\n");
+	if(m_is_x86)
+		return m_base + 7;
+	return 0xcd0000 + (m_vector_addr_high << 8) + m_vector_addr_low + (7 << (3-m_vector_size));
 }
 
 

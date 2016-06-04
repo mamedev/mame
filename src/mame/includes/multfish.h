@@ -7,6 +7,7 @@
 #include "sound/ay8910.h"
 #include "cpu/z80/z80.h"
 #include "machine/timekpr.h"
+#include "machine/watchdog.h"
 
 #define igrosoft_gamble_ROM_SIZE 0x80000
 #define igrosoft_gamble_VIDRAM_SIZE (0x2000*0x04)
@@ -93,24 +94,6 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-#define mfish_parent mfish_13
-#define czmon_parent czmon_13
-#define fcockt_parent fcockt_8
-#define lhaunt_parent lhaunt_6
-#define rollfr_parent rollfr_4
-#define garage_parent garage_5
-#define rclimb_parent rclimb_3
-#define sweetl_parent sweetl
-#define resdnt_parent resdnt_6
-#define island_parent island
-#define pirate_parent pirate_3
-#define island2_parent island2
-#define pirate2_parent pirate2
-#define keks_parent keks_2
-#define gnome_parent gnome_9
-#define sweetl2_parent sweetl2
-#define fcockt2_parent fcockt2
-#define crzmon2_parent crzmon2
 
 MACHINE_CONFIG_EXTERN( igrosoft_gamble );
 MACHINE_CONFIG_EXTERN( rollfr );

@@ -1,9 +1,30 @@
 // license:BSD-3-Clause
 // copyright-holders:F. Ulivi
 
+// I found 2 undocumented instructions in 5061-3001. First I noticed that PPU processor in
+// hp9845b emulator executed 2 unknown instructions at each keyboard interrupt whose opcodes
+// were 0x7026 & 0x7027.
+// I searched for a while for any kind of documentation about them but found nothing at all.
+// Some time later I found the mnemonics in the binary dump of assembly development option ROM:
+// CIM & SIM, respectively. From the mnemonic I deduced their function: Clear & Set Interrupt Mask.
+// I think they are basically used to temporarily disable/enable interrupt recognition inside
+// ISRs. This is consistent with their usage in PPU firmware and test ROM. The official EIR &
+// DIR instructions cannot be used while servicing an interrupt because they probably reset
+// the "in ISR" condition of the processor.
+// Using CIM&SIM only makes sense in low-level ISRs because high-level ones can't be interrupted
+// by anyone.
+// Now, I still have some doubts about the "polarity" of interrupt mask. Is interrupt
+// recognition disabled when the mask is cleared or is it the opposite?
+// I'm leaning towards the "no interrupts with mask cleared" interpretation, but I'm not 100%
+// convinced. CIM & SIM at the moment are implemented with this interpretation (see also
+// NO_ISR_WITH_IM_CLEARED macro below).
+
 #include "emu.h"
 #include "debugger.h"
 #include "hphybrid.h"
+
+// Define this to have "IM cleared" == "No interrupt recognition"
+#define NO_ISR_WITH_IM_CLEARED
 
 enum {
 				HPHYBRID_A,
@@ -58,6 +79,7 @@ enum {
 #define HPHYBRID_STS_BIT        13  // Status flag
 #define HPHYBRID_FLG_BIT        14  // "Flag" flag
 #define HPHYBRID_DC_BIT         15  // Decimal carry
+#define HPHYBRID_IM_BIT         16  // Interrupt mask
 
 #define HPHYBRID_IV_MASK        0xfff0  // IV mask
 
@@ -107,6 +129,11 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::flag_w)
 		} else {
 				BIT_CLR(m_flags , HPHYBRID_FLG_BIT);
 		}
+}
+
+UINT8 hp_hybrid_cpu_device::pa_r(void) const
+{
+        return CURRENT_PA;
 }
 
 hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname , UINT8 addrwidth)
@@ -512,6 +539,7 @@ UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
 																																memmove(&m_reg_PA[ 0 ] , &m_reg_PA[ 1 ] , HPHYBRID_INT_LVLS);
 																																																																m_pa_changed_func((UINT8)CURRENT_PA);
 																												}
+																																																								BIT_CLR(m_flags, HPHYBRID_IM_BIT);
 																								}
 																								tmp = RM(AEC_CASE_C , m_reg_R--) + (opcode & 0x1f);
 																								return BIT(opcode , 5) ? tmp - 0x20 : tmp;
@@ -619,7 +647,7 @@ UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
 void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	if (entry.index() == STATE_GENFLAGS) {
-		strprintf(str, "%s %s %c %c",
+		str = string_format("%s %s %c %c",
 					BIT(m_flags , HPHYBRID_DB_BIT) ? "Db":"..",
 					BIT(m_flags , HPHYBRID_CB_BIT) ? "Cb":"..",
 					BIT(m_flags , HPHYBRID_O_BIT) ? 'O':'.',
@@ -673,12 +701,7 @@ UINT16 hp_hybrid_cpu_device::RM(UINT32 addr)
 						return RIO(CURRENT_PA , addr_wo_bsc - HP_REG_R4_ADDR);
 
 				case HP_REG_IV_ADDR:
-						// Correct?
-						if (!BIT(m_flags , HPHYBRID_IRH_SVC_BIT) && !BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
-								return m_reg_IV;
-						} else {
-								return m_reg_IV | CURRENT_PA;
-						}
+										return m_reg_IV;
 
 				case HP_REG_PA_ADDR:
 						return CURRENT_PA;
@@ -883,6 +906,21 @@ UINT16 hp_hybrid_cpu_device::get_skip_addr_sc(UINT16 opcode , UINT16& v , unsign
 				return get_skip_addr(opcode , val);
 }
 
+UINT16 hp_hybrid_cpu_device::get_skip_addr_sc(UINT16 opcode , UINT32& v , unsigned n)
+{
+		bool val = BIT(v , n);
+
+		if (BIT(opcode , 7)) {
+				if (BIT(opcode , 6)) {
+						BIT_SET(v , n);
+				} else {
+						BIT_CLR(v , n);
+				}
+		}
+
+		return get_skip_addr(opcode , val);
+}
+
 void hp_hybrid_cpu_device::do_pw(UINT16 opcode)
 {
 				UINT16 tmp;
@@ -974,7 +1012,7 @@ void hp_hybrid_cpu_device::do_pw(UINT16 opcode)
 
 void hp_hybrid_cpu_device::check_for_interrupts(void)
 {
-				if (!BIT(m_flags , HPHYBRID_INTEN_BIT) || BIT(m_flags , HPHYBRID_IRH_SVC_BIT)) {
+		if (!BIT(m_flags , HPHYBRID_INTEN_BIT) || BIT(m_flags , HPHYBRID_IRH_SVC_BIT) || BIT(m_flags , HPHYBRID_IM_BIT)) {
 								return;
 				}
 
@@ -984,6 +1022,9 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 								// Service high-level interrupt
 								BIT_SET(m_flags , HPHYBRID_IRH_SVC_BIT);
 								irqline = HPHYBRID_IRH;
+																if (BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
+																		logerror("H pre-empted L @ %06x\n" , m_genpc);
+																}
 				} else if (BIT(m_flags , HPHYBRID_IRL_BIT) && !BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
 								// Service low-level interrupt
 								BIT_SET(m_flags , HPHYBRID_IRL_SVC_BIT);
@@ -1019,10 +1060,18 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 				// lasts for 32 cycles
 				m_icount -= 32;
 
+								// Allow special processing in 5061-3001
+								enter_isr();
+
 				// Do a double-indirect JSM IV,I instruction
 				WM(AEC_CASE_C , ++m_reg_R , m_reg_P);
-				m_reg_P = RM(AEC_CASE_I , RM(HP_REG_IV_ADDR));
+				m_reg_P = RM(AEC_CASE_I , m_reg_IV + CURRENT_PA);
 				m_reg_I = fetch();
+}
+
+void hp_hybrid_cpu_device::enter_isr(void)
+{
+		// Do nothing special
 }
 
 void hp_hybrid_cpu_device::handle_dma(void)
@@ -1043,12 +1092,7 @@ void hp_hybrid_cpu_device::handle_dma(void)
 								m_icount -= 9;
 				}
 
-				// This is the one of the biggest question marks: is the DMA automatically disabled on TC?
-				// Here we assume it is. After all it would make no difference because there is no way
-				// to read the DMA enable flag back, so each time the DMA is needed it has to be enabled again.
-				if (tc) {
-								BIT_CLR(m_flags , HPHYBRID_DMAEN_BIT);
-				}
+                                // Mystery solved: DMA is not automatically disabled at TC (test of 9845's graphic memory relies on this to work)
 }
 
 UINT16 hp_hybrid_cpu_device::RIO(UINT8 pa , UINT8 ic)
@@ -1433,6 +1477,34 @@ UINT16 hp_5061_3001_cpu_device::execute_no_bpc_ioc(UINT16 opcode)
 						do_mpy();
 						break;
 
+								case 0x7026:
+										// CIM
+										// Undocumented instruction, see beginning of this file
+										// Probably "Clear Interrupt Mask"
+										// No idea at all about exec. time: make it 9 cycles
+										m_icount -= 9;
+#ifndef NO_ISR_WITH_IM_CLEARED
+										BIT_CLR(m_flags, HPHYBRID_IM_BIT);
+#else
+										BIT_SET(m_flags, HPHYBRID_IM_BIT);
+#endif
+										logerror("hp-5061-3001: CIM, P = %06x flags = %05x\n" , m_genpc , m_flags);
+										break;
+
+								case 0x7027:
+										// SIM
+										// Undocumented instruction, see beginning of this file
+										// Probably "Set Interrupt Mask"
+										// No idea at all about exec. time: make it 9 cycles
+										m_icount -= 9;
+#ifndef NO_ISR_WITH_IM_CLEARED
+										BIT_SET(m_flags, HPHYBRID_IM_BIT);
+#else
+										BIT_CLR(m_flags, HPHYBRID_IM_BIT);
+#endif
+										logerror("hp-5061-3001: SIM, P = %06x flags = %05x\n" , m_genpc , m_flags);
+										break;
+
 				default:
 						if ((opcode & 0xfec0) == 0x74c0) {
 								// SDS
@@ -1464,7 +1536,7 @@ UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
 		bool top_half = BIT(addr , 15) != 0;
 
 		// Detect accesses to top half of base page
-		if (aec_case == AEC_CASE_C && (addr & 0xfe00) == 0xfe00) {
+		if ((aec_case == AEC_CASE_C || aec_case == AEC_CASE_I) && (addr & 0xfe00) == 0xfe00) {
 			aec_case = AEC_CASE_B;
 		}
 
@@ -1482,7 +1554,7 @@ UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
 				break;
 
 		case AEC_CASE_D:
-				bsc_reg = HP_REG_R37_ADDR;
+				bsc_reg = top_half ? HP_REG_R32_ADDR : HP_REG_R37_ADDR;
 				break;
 
 				case AEC_CASE_I:
@@ -1579,6 +1651,14 @@ void hp_5061_3001_cpu_device::write_non_common_reg(UINT16 addr , UINT16 v)
 		default:
 				break;
 		}
+}
+
+void hp_5061_3001_cpu_device::enter_isr(void)
+{
+		// Set interrupt mask when entering an ISR
+#ifndef NO_ISR_WITH_IM_CLEARED
+		BIT_SET(m_flags, HPHYBRID_IM_BIT);
+#endif
 }
 
 hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

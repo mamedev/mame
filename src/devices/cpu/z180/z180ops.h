@@ -233,7 +233,7 @@ UINT32 z180_device::ARG16()
 	POP(PC);                                                  \
 /* according to http://www.msxnet.org/tech/Z80/z80undoc.txt */  \
 /*  m_IFF1 = m_IFF2;  */                                            \
-	m_daisy.call_reti_device();                 \
+	daisy_call_reti_device();                 \
 }
 
 /***************************************************************

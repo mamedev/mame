@@ -256,7 +256,7 @@ WRITE8_MEMBER(namcos86_state::watchdog1_w)
 	if (m_wdog == 3)
 	{
 		m_wdog = 0;
-		watchdog_reset_w(space,0,0);
+		m_watchdog->reset_w(space,0,0);
 	}
 }
 
@@ -266,7 +266,7 @@ WRITE8_MEMBER(namcos86_state::watchdog2_w)
 	if (m_wdog == 3)
 	{
 		m_wdog = 0;
-		watchdog_reset_w(space,0,0);
+		m_watchdog->reset_w(space,0,0);
 	}
 }
 
@@ -1061,6 +1061,7 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(48000)) /* heavy interleaving needed to avoid hangs in rthunder */
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

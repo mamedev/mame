@@ -7,8 +7,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui/menu.h"
-#include "ui/filesel.h"
 #include "zippath.h"
 #include "floppy.h"
 #include "formats/imageutl.h"
@@ -295,9 +293,9 @@ void floppy_image_device::commit_image()
 	io.procs = &image_ioprocs;
 	io.filler = 0xff;
 
-	file_error err = core_truncate(image_core_file(), 0);
-	if (err != 0)
-		popmessage("Error, unable to truncate image: %d", err);
+	osd_file::error err = image_core_file().truncate(0);
+	if (err != osd_file::error::NONE)
+		popmessage("Error, unable to truncate image: %d", int(err));
 
 	output_format->save(&io, image);
 }
@@ -362,29 +360,30 @@ void floppy_image_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 floppy_image_format_t *floppy_image_device::identify(std::string filename)
 {
-	core_file *fd;
+	util::core_file::ptr fd;
 	std::string revised_path;
 
-	file_error err = zippath_fopen(filename.c_str(), OPEN_FLAG_READ, fd, revised_path);
-	if(err) {
+	osd_file::error err = util::zippath_fopen(filename.c_str(), OPEN_FLAG_READ, fd, revised_path);
+	if(err != osd_file::error::NONE) {
 		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to open the image file");
 		return nullptr;
 	}
 
 	io_generic io;
-	io.file = fd;
+	io.file = fd.get();
 	io.procs = &corefile_ioprocs_noclose;
 	io.filler = 0xff;
 	int best = 0;
 	floppy_image_format_t *best_format = nullptr;
-	for(floppy_image_format_t *format = fif_list; format; format = format->next) {
+	for (floppy_image_format_t *format = fif_list; format; format = format->next)
+	{
 		int score = format->identify(&io, form_factor);
 		if(score > best) {
 			best = score;
 			best_format = format;
 		}
 	}
-	core_fclose(fd);
+	fd.reset();
 	return best_format;
 }
 
@@ -413,7 +412,13 @@ bool floppy_image_device::call_load()
 	}
 
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
-	best_format->load(&io, form_factor, image);
+	if (!best_format->load(&io, form_factor, image))
+	{
+		seterror(IMAGE_ERROR_UNSUPPORTED, "Incompatible image format or corrupted data");
+		global_free(image);
+		image = nullptr;
+		return IMAGE_INIT_FAIL;
+	}
 	output_format = is_readonly() ? nullptr : best_format;
 
 	revolution_start_time = mon ? attotime::never : machine().time();
@@ -515,15 +520,15 @@ void floppy_image_device::mon_w(int state)
 	if (!mon && image)
 	{
 		revolution_start_time = machine().time();
-				if (motor_always_on) {
-					// Drives with motor that is always spinning are immediately ready when a disk is loaded
-					// because there is no spin-up time
-					ready = false;
-					if(!cur_ready_cb.isnull())
-						cur_ready_cb(this, ready);
-				} else {
-					ready_counter = 2;
-				}
+		if (motor_always_on) {
+			// Drives with motor that is always spinning are immediately ready when a disk is loaded
+			// because there is no spin-up time
+			ready = false;
+			if(!cur_ready_cb.isnull())
+				cur_ready_cb(this, ready);
+		} else {
+			ready_counter = 2;
+		}
 		index_resync();
 	}
 
@@ -929,163 +934,6 @@ UINT32 floppy_image_device::get_form_factor() const
 UINT32 floppy_image_device::get_variant() const
 {
 	return image ? image->get_variant() : 0;
-}
-
-ui_menu *floppy_image_device::get_selection_menu(running_machine &machine, render_container *container)
-{
-	return global_alloc_clear<ui_menu_control_floppy_image>(machine, container, this);
-}
-
-ui_menu_control_floppy_image::ui_menu_control_floppy_image(running_machine &machine, render_container *container, device_image_interface *_image) : ui_menu_control_device_image(machine, container, _image)
-{
-	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
-	const floppy_image_format_t *fif_list = fd->get_formats();
-	int fcnt = 0;
-	for(const floppy_image_format_t *i = fif_list; i; i = i->next)
-		fcnt++;
-
-	format_array = global_alloc_array(floppy_image_format_t *, fcnt);
-	input_format = output_format = nullptr;
-	input_filename = output_filename = "";
-}
-
-ui_menu_control_floppy_image::~ui_menu_control_floppy_image()
-{
-	global_free_array(format_array);
-}
-
-void ui_menu_control_floppy_image::do_load_create()
-{
-	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
-	if(input_filename.compare("")==0) {
-		int err = fd->create(output_filename.c_str(), nullptr, nullptr);
-		if (err != 0) {
-			machine().popmessage("Error: %s", fd->error());
-			return;
-		}
-		fd->setup_write(output_format);
-	} else {
-		int err = fd->load(input_filename.c_str());
-		if (!err && output_filename.compare("") != 0)
-			err = fd->reopen_for_write(output_filename.c_str());
-		if(err != 0) {
-			machine().popmessage("Error: %s", fd->error());
-			return;
-		}
-		if(output_format)
-			fd->setup_write(output_format);
-	}
-}
-
-void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist)
-{
-	if (softlist)
-	{
-		machine().popmessage("When loaded from software list, the disk is Read-only.\n");
-		image->load(filename.c_str());
-		ui_menu::stack_pop(machine());
-		return;
-	}
-
-	input_filename = filename;
-	input_format = static_cast<floppy_image_device *>(image)->identify(filename);
-
-	if (!input_format)
-	{
-		machine().popmessage("Error: %s\n", image->error());
-		ui_menu::stack_pop(machine());
-		return;
-	}
-
-	bool can_in_place = input_format->supports_save();
-	if(can_in_place) {
-		file_error filerr;
-		std::string tmp_path;
-		core_file *tmp_file;
-		/* attempt to open the file for writing but *without* create */
-		filerr = zippath_fopen(filename.c_str(), OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
-		if(!filerr)
-			core_fclose(tmp_file);
-		else
-			can_in_place = false;
-	}
-	submenu_result = -1;
-	ui_menu::stack_push(global_alloc_clear<ui_menu_select_rw>(machine(), container, can_in_place, &submenu_result));
-	state = SELECT_RW;
-}
-
-void ui_menu_control_floppy_image::handle()
-{
-	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
-	switch (state) {
-	case DO_CREATE: {
-		floppy_image_format_t *fif_list = fd->get_formats();
-			int ext_match;
-			int total_usable = 0;
-			for(floppy_image_format_t *i = fif_list; i; i = i->next) {
-			if(!i->supports_save())
-				continue;
-			if (i->extension_matches(current_file.c_str()))
-				format_array[total_usable++] = i;
-		}
-		ext_match = total_usable;
-		for(floppy_image_format_t *i = fif_list; i; i = i->next) {
-			if(!i->supports_save())
-				continue;
-			if (!i->extension_matches(current_file.c_str()))
-				format_array[total_usable++] = i;
-		}
-		submenu_result = -1;
-		ui_menu::stack_push(global_alloc_clear<ui_menu_select_format>(machine(), container, format_array, ext_match, total_usable, &submenu_result));
-
-		state = SELECT_FORMAT;
-		break;
-	}
-
-	case SELECT_FORMAT:
-		if(submenu_result == -1) {
-			state = START_FILE;
-			handle();
-		} else {
-			zippath_combine(output_filename, current_directory.c_str(), current_file.c_str());
-			output_format = format_array[submenu_result];
-			do_load_create();
-			ui_menu::stack_pop(machine());
-		}
-		break;
-
-	case SELECT_RW:
-		switch(submenu_result) {
-		case ui_menu_select_rw::READONLY:
-			do_load_create();
-			ui_menu::stack_pop(machine());
-			break;
-
-		case ui_menu_select_rw::READWRITE:
-			output_format = input_format;
-			do_load_create();
-			ui_menu::stack_pop(machine());
-			break;
-
-		case ui_menu_select_rw::WRITE_DIFF:
-			machine().popmessage("Sorry, diffs are not supported yet\n");
-			ui_menu::stack_pop(machine());
-			break;
-
-		case ui_menu_select_rw::WRITE_OTHER:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_file_create>(machine(), container, image, current_directory, current_file, &create_ok));
-			state = CHECK_CREATE;
-			break;
-
-		case -1:
-			state = START_FILE;
-			break;
-		}
-		break;
-
-	default:
-		ui_menu_control_device_image::handle();
-	}
 }
 
 //===================================================================

@@ -87,7 +87,7 @@ void device_md_cart_interface::rom_alloc(size_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = (UINT16 *)device().machine().memory().region_alloc(std::string(tag).append(MDSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_LITTLE)->base();
+		m_rom = (UINT16 *)device().machine().memory().region_alloc(std::string(tag).append(MDSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_BIG)->base();
 		m_rom_size = size;
 	}
 }
@@ -235,11 +235,13 @@ static const md_slot slot_list[] =
 	{ SEGA_FRAM, "rom_fram" },
 	{ HARDBALL95, "rom_hardbl95" },
 	{ XINQIG, "rom_xinqig"},
-	{ BEGGARP, "rom_beggarp"},
-	{ WUKONG, "rom_wukong"},
+	{ BEGGARP, "rom_sf001"},
+	{ WUKONG, "rom_sf002"},
+	{ STARODYS, "rom_sf004"},
 
 	{ SEGA_EEPROM, "rom_eeprom" },
 	{ NBA_JAM, "rom_nbajam" },
+	{ NBA_JAM_ALT, "rom_nbajam_alt" },
 	{ NBA_JAM_TE, "rom_nbajamte" },
 	{ NFL_QB_96, "rom_nflqb" },
 	{ C_SLAM, "rom_cslam" },
@@ -525,7 +527,7 @@ int base_md_cart_slot_device::load_nonlist()
 
 
 	// STEP 4: determine the cart type (to deal with sram/eeprom & pirate mappers)
-	m_type = get_cart_type(ROM, len);
+	m_type = get_cart_type(ROM, tmplen - offset);
 
 	// handle mirroring of ROM, unless it's SSF2 or Pier Solar
 	if (m_type != SSF2 && m_type != PSOLAR)
@@ -665,6 +667,15 @@ void base_md_cart_slot_device::setup_nvram()
 			m_cart->m_nvram_end = m_cart->m_nvram_start + 0x3fff;
 			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
 			m_cart->m_nvram_active = 1;
+			break;
+		case STARODYS:
+			m_cart->m_nvram_start = 0x200000;
+			m_cart->m_nvram_end = m_cart->m_nvram_start + 0xfffff;
+			m_cart->nvram_alloc(0x8000/2); // 32K mirrored
+			m_cart->m_nvram_active = 1;
+			break;
+		case NBA_JAM_ALT:
+			m_cart->nvram_alloc(0x100);
 			break;
 	}
 }
@@ -812,6 +823,9 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			if (!memcmp((char *)&ROM[0x0150], "Virtua Racing", 13))
 				type = SEGA_SVP;
 
+			if (!memcmp((char *)&ROM[0x0180], "SF-004", 6)) // Star Odyssey
+				type = STARODYS;
+
 			break;
 
 		case 0x200005:
@@ -819,6 +833,11 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 				type = REDCL_EN;
 			break;
 
+		case 0x220000:
+			if (!memcmp((char *)&ROM[0x0180], "SF-002", 6)) // Legend of Wukong
+				type = WUKONG;
+			break;
+			
 		case 0x300000:
 			if (!memcmp(&ROM[0x220], sdk_sig, sizeof(sdk_sig)))
 				type = LIONK3;
@@ -853,6 +872,9 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 			if (!memcmp((char *)&ROM[0x0180], "GM T-81476", 10)) // Big Hurt Baseball
 				type = C_SLAM;
+
+			if (!memcmp((char *)&ROM[0x0180], "SF-001", 6)) // Beggar Prince
+				type = BEGGARP;
 
 			break;
 
@@ -905,11 +927,11 @@ std::string base_md_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 len = core_fsize(m_file), offset = 0;
+		UINT32 len = m_file->size(), offset = 0;
 		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, &rom[0], len);
+		m_file->read(&rom[0], len);
 
 		if (genesis_is_SMD(&rom[0x200], len - 0x200))
 				offset = 0x200;

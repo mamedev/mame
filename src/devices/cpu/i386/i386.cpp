@@ -976,10 +976,10 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 					//logerror("IRQ (%08x): Interrupt during V8086 task\n",m_pc);
 					if(type & 0x08)
 					{
-						PUSH32(m_sreg[GS].selector & 0xffff);
-						PUSH32(m_sreg[FS].selector & 0xffff);
-						PUSH32(m_sreg[DS].selector & 0xffff);
-						PUSH32(m_sreg[ES].selector & 0xffff);
+						PUSH32SEG(m_sreg[GS].selector & 0xffff);
+						PUSH32SEG(m_sreg[FS].selector & 0xffff);
+						PUSH32SEG(m_sreg[DS].selector & 0xffff);
+						PUSH32SEG(m_sreg[ES].selector & 0xffff);
 					}
 					else
 					{
@@ -1001,7 +1001,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 				if(type & 0x08)
 				{
 					// 32-bit gate
-					PUSH32(oldSS);
+					PUSH32SEG(oldSS);
 					PUSH32(oldESP);
 				}
 				else
@@ -1063,7 +1063,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 			else
 			{
 				PUSH32(oldflags & 0x00ffffff );
-				PUSH32(m_sreg[CS].selector );
+				PUSH32SEG(m_sreg[CS].selector );
 				if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
 					PUSH32(m_eip );
 				else
@@ -1935,7 +1935,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 
 					if(operand32 != 0)
 					{
-						PUSH32(oldSS);
+						PUSH32SEG(oldSS);
 						PUSH32(oldESP);
 					}
 					else
@@ -2069,7 +2069,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 		else
 		{
 			/* 32-bit operand size */
-			PUSH32(m_sreg[CS].selector );
+			PUSH32SEG(m_sreg[CS].selector );
 			PUSH32(m_eip );
 			m_sreg[CS].selector = selector;
 			m_performed_intersegment_jump = 1;
@@ -2364,6 +2364,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	I386_SREG desc,stack;
 	UINT8 CPL, RPL, DPL;
 	UINT32 newflags;
+	UINT8 IOPL = m_IOP1 | (m_IOP2 << 1);
 
 	CPL = m_CPL;
 	UINT32 ea = i386_translate(SS, (STACK_32BIT)?REG32(ESP):REG16(SP), 0);
@@ -2383,7 +2384,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	if(V8086_MODE)
 	{
 		UINT32 oldflags = get_flags();
-		if(!m_IOP1 || !m_IOP2)
+		if(IOPL != 3)
 		{
 			logerror("IRET (%08x): Is in Virtual 8086 mode and IOPL != 3.\n",m_pc);
 			FAULT(FAULT_GP,0)
@@ -2455,6 +2456,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 			{
 				UINT32 oldflags = get_flags();
 				newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+				if(CPL > IOPL)
+					newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 			}
 			set_flags(newflags);
 			m_eip = POP32() & 0xffff;  // high 16 bits are ignored
@@ -2571,7 +2574,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				}
 				if((desc.flags & 0x0080) == 0)
 				{
-					logerror("IRET: Return CS segment is not present.\n");
+					logerror("IRET: (%08x) Return CS segment is not present.\n", m_pc);
 					FAULT(FAULT_NP,newCS & ~0x03)
 				}
 				if(newEIP > desc.limit)
@@ -2584,6 +2587,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				{
 					UINT32 oldflags = get_flags();
 					newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+					if(CPL > IOPL)
+						newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 				}
 
 				if(operand32 == 0)
@@ -2753,6 +2758,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				{
 					UINT32 oldflags = get_flags();
 					newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+					if(CPL > IOPL)
+						newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 				}
 
 				if(operand32 == 0)
@@ -2872,12 +2879,12 @@ void i386_device::report_invalid_modrm(const char* opcode, UINT8 modrm)
 }
 
 
-#include "i386ops.inc"
-#include "i386op16.inc"
-#include "i386op32.inc"
-#include "i486ops.inc"
-#include "pentops.inc"
-#include "x87ops.inc"
+#include "i386ops.hxx"
+#include "i386op16.hxx"
+#include "i386op32.hxx"
+#include "i486ops.hxx"
+#include "pentops.hxx"
+#include "x87ops.hxx"
 #include "i386ops.h"
 
 void i386_device::i386_decode_opcode()
@@ -3489,55 +3496,55 @@ void i386_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%08X", get_flags());
+			str = string_format("%08X", get_flags());
 			break;
 		case X87_ST0:
-			strprintf(str, "%f", fx80_to_double(ST(0)));
+			str = string_format("%f", fx80_to_double(ST(0)));
 			break;
 		case X87_ST1:
-			strprintf(str, "%f", fx80_to_double(ST(1)));
+			str = string_format("%f", fx80_to_double(ST(1)));
 			break;
 		case X87_ST2:
-			strprintf(str, "%f", fx80_to_double(ST(2)));
+			str = string_format("%f", fx80_to_double(ST(2)));
 			break;
 		case X87_ST3:
-			strprintf(str, "%f", fx80_to_double(ST(3)));
+			str = string_format("%f", fx80_to_double(ST(3)));
 			break;
 		case X87_ST4:
-			strprintf(str, "%f", fx80_to_double(ST(4)));
+			str = string_format("%f", fx80_to_double(ST(4)));
 			break;
 		case X87_ST5:
-			strprintf(str, "%f", fx80_to_double(ST(5)));
+			str = string_format("%f", fx80_to_double(ST(5)));
 			break;
 		case X87_ST6:
-			strprintf(str, "%f", fx80_to_double(ST(6)));
+			str = string_format("%f", fx80_to_double(ST(6)));
 			break;
 		case X87_ST7:
-			strprintf(str, "%f", fx80_to_double(ST(7)));
+			str = string_format("%f", fx80_to_double(ST(7)));
 			break;
 		case SSE_XMM0:
-			strprintf(str, "%08x%08x%08x%08x", XMM(0).d[3], XMM(0).d[2], XMM(0).d[1], XMM(0).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(0).d[3], XMM(0).d[2], XMM(0).d[1], XMM(0).d[0]);
 			break;
 		case SSE_XMM1:
-			strprintf(str, "%08x%08x%08x%08x", XMM(1).d[3], XMM(1).d[2], XMM(1).d[1], XMM(1).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(1).d[3], XMM(1).d[2], XMM(1).d[1], XMM(1).d[0]);
 			break;
 		case SSE_XMM2:
-			strprintf(str, "%08x%08x%08x%08x", XMM(2).d[3], XMM(2).d[2], XMM(2).d[1], XMM(2).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(2).d[3], XMM(2).d[2], XMM(2).d[1], XMM(2).d[0]);
 			break;
 		case SSE_XMM3:
-			strprintf(str, "%08x%08x%08x%08x", XMM(3).d[3], XMM(3).d[2], XMM(3).d[1], XMM(3).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(3).d[3], XMM(3).d[2], XMM(3).d[1], XMM(3).d[0]);
 			break;
 		case SSE_XMM4:
-			strprintf(str, "%08x%08x%08x%08x", XMM(4).d[3], XMM(4).d[2], XMM(4).d[1], XMM(4).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(4).d[3], XMM(4).d[2], XMM(4).d[1], XMM(4).d[0]);
 			break;
 		case SSE_XMM5:
-			strprintf(str, "%08x%08x%08x%08x", XMM(5).d[3], XMM(5).d[2], XMM(5).d[1], XMM(5).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(5).d[3], XMM(5).d[2], XMM(5).d[1], XMM(5).d[0]);
 			break;
 		case SSE_XMM6:
-			strprintf(str, "%08x%08x%08x%08x", XMM(6).d[3], XMM(6).d[2], XMM(6).d[1], XMM(6).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(6).d[3], XMM(6).d[2], XMM(6).d[1], XMM(6).d[0]);
 			break;
 		case SSE_XMM7:
-			strprintf(str, "%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
 			break;
 	}
 }
@@ -3749,6 +3756,7 @@ void i386_device::device_reset()
 	// Family 3 (386), Model 0 (DX), Stepping 8 (D1)
 	REG32(EAX) = 0;
 	REG32(EDX) = (3 << 8) | (0 << 4) | (8);
+	m_cpu_version = REG32(EDX);
 
 	m_CPL = 0;
 
@@ -3822,7 +3830,7 @@ void i386_device::pentium_smi()
 	WRITE32(REG32(ESI), smram_state+SMRAM_ESI);
 	WRITE32(REG32(EDI), smram_state+SMRAM_EDI);
 	WRITE32(m_eip, smram_state+SMRAM_EIP);
-	WRITE32(old_flags, smram_state+SMRAM_EAX);
+	WRITE32(old_flags, smram_state+SMRAM_EFLAGS);
 	WRITE32(m_cr[3], smram_state+SMRAM_CR3);
 	WRITE32(old_cr0, smram_state+SMRAM_CR0);
 
@@ -4039,6 +4047,7 @@ void i486_device::device_reset()
 	// Family 4 (486), Model 0/1 (DX), Stepping 3
 	REG32(EAX) = 0;
 	REG32(EDX) = (4 << 8) | (0 << 4) | (3);
+	m_cpu_version = REG32(EDX);
 
 	CHANGE_PC(m_eip);
 }

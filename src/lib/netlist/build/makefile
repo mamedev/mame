@@ -18,10 +18,10 @@ SRC = ..
 
 CDEFS = -DPSTANDALONE=1 -DPTR64=1
 #-Werror
-CFLAGS =  $(LTO) -g -O3 -std=c++98 -Doverride="" -march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra -Wno-long-long -Wno-unused-parameter -Wno-unused-result -Wno-variadic-macros -I..
-LDFLAGS = $(LTO) -g -O3 -std=c++98 
-#CFLAGS =  $(LTO) -g -O3 -std=c++11   -Wall -Wpedantic -Wsign-compare -Wextra -Isrc
-#LDFLAGS = $(LTO) -g -O3 -std=c++11 	
+#CFLAGS =  $(LTO) -g -O3 -std=c++98 -Doverride="" -march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra -Wno-long-long -Wno-unused-parameter -Wno-unused-result -Wno-variadic-macros -I..
+#LDFLAGS = $(LTO) -g -O3 -std=c++98 
+CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter 
+LDFLAGS = $(LTO) -g -O3 -std=c++11 -lpthread -ldl
 
 CC = @g++-5
 LD = @g++-5
@@ -53,6 +53,7 @@ POBJS := \
 	$(POBJ)/pstate.o \
 	$(POBJ)/pstream.o \
 	$(POBJ)/pfmtlog.o \
+	$(POBJ)/pdynlib.o \
 
 NLOBJS := \
 	$(NLOBJ)/nl_base.o \
@@ -66,23 +67,10 @@ NLOBJS := \
 	$(NLOBJ)/analog/nld_opamps.o \
 	$(NLOBJ)/devices/nld_4020.o \
 	$(NLOBJ)/devices/nld_4066.o \
-	$(NLOBJ)/devices/nld_7400.o \
-	$(NLOBJ)/devices/nld_7402.o \
-	$(NLOBJ)/devices/nld_7404.o \
-	$(NLOBJ)/devices/nld_7408.o \
-	$(NLOBJ)/devices/nld_7410.o \
-	$(NLOBJ)/devices/nld_7411.o \
-	$(NLOBJ)/devices/nld_7420.o \
-	$(NLOBJ)/devices/nld_7425.o \
-	$(NLOBJ)/devices/nld_7427.o \
-	$(NLOBJ)/devices/nld_7430.o \
-	$(NLOBJ)/devices/nld_7432.o \
-	$(NLOBJ)/devices/nld_7437.o \
 	$(NLOBJ)/devices/nld_7448.o \
 	$(NLOBJ)/devices/nld_7450.o \
 	$(NLOBJ)/devices/nld_7474.o \
 	$(NLOBJ)/devices/nld_7483.o \
-	$(NLOBJ)/devices/nld_7486.o \
 	$(NLOBJ)/devices/nld_7490.o \
 	$(NLOBJ)/devices/nld_7493.o \
 	$(NLOBJ)/devices/nld_74107.o \

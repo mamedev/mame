@@ -2,24 +2,35 @@
 // copyright-holders:hap
 /*
 
-  Sharp SM510 MCU family - known chips:
+  Known chips: (* means not emulated yet)
+
+  Sharp SM510 MCU family:
   - SM510: 2.7Kx8 ROM, 128x4 RAM(32x4 for LCD)
   - SM511: 4Kx8 ROM, 128x4 RAM(32x4 for LCD), melody controller
   - SM512: 4Kx8 ROM, 128x4 RAM(48x4 for LCD), melody controller
+  - *KB1013VK4-2: Soviet-era clone of SM510, minor differences
 
-  Other chips that may be in the same family, investigate more when one of
-  them needs to get emulated: SM500, SM530/31, SM4A, SM3903, ..
+  Sharp SM500 MCU family:
+  - *SM500: x
+  - *SM4A: x
+  - *SM530: x
+  - *SM531: x
+  - *KB1013VK1-2: Soviet-era clone of SM500, minor differences
 
   References:
   - 1990 Sharp Microcomputers Data Book
   - 1996 Sharp Microcomputer Databook
+  - KB1013VK1-2/KB1013VK4-2 manual
 
   TODO:
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
   - LB/SBM is correct?
-  - SM511 unknown opcodes
+  - SM511 undocumented/guessed opcodes:
+    * $01 is guessed as DIV to ACC transfer, unknown which bits
+    * $5d is certainly CEND
+    * $65 is certainly divider reset, but not sure if it behaves same as on SM510
 
 */
 
@@ -55,35 +66,6 @@ void sm510_base_device::device_start()
 	m_write_segb.resolve_safe();
 	m_write_segbs.resolve_safe();
 	m_write_segc.resolve_safe();
-
-	// zerofill
-	memset(m_stack, 0, sizeof(m_stack));
-	m_pc = 0;
-	m_prev_pc = 0;
-	m_op = 0;
-	m_prev_op = 0;
-	m_param = 0;
-	m_acc = 0;
-	m_bl = 0;
-	m_bm = 0;
-	m_c = 0;
-	m_skip = false;
-	m_w = 0;
-	m_r = 0;
-	m_div = 0;
-	m_1s = false;
-	m_k_active = false;
-	m_l = 0;
-	m_x = 0;
-	m_y = 0;
-	m_bp = false;
-	m_bc = false;
-	m_halt = false;
-	m_melody_rd = 0;
-	m_melody_step_count = 0;
-	m_melody_duty_count = 0;
-	m_melody_duty_index = 0;
-	m_melody_address = 0;
 
 	// register for savestates
 	save_item(NAME(m_stack));
@@ -141,8 +123,10 @@ void sm510_base_device::device_start()
 
 void sm510_base_device::device_reset()
 {
+	// ACL
 	m_skip = false;
 	m_halt = false;
+	m_sbm = false;
 	m_op = m_prev_op = 0;
 	do_branch(3, 7, 0);
 	m_prev_pc = m_pc;
@@ -314,7 +298,7 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
 {
 	m_div = (m_div + 1) & 0x7fff;
 
-	// 1S signal on overflow(falling edge of f1)
+	// 1S signal on overflow(falling edge of F1)
 	if (m_div == 0)
 		m_1s = true;
 

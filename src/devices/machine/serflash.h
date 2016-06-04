@@ -50,7 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER( flash_data_w );
 	DECLARE_WRITE8_MEMBER( flash_cmd_w );
 	DECLARE_WRITE8_MEMBER( flash_enab_w );
-	void flash_hard_reset(running_machine &machine);
+	void flash_hard_reset();
 
 	DECLARE_READ8_MEMBER(n3d_flash_r);
 	DECLARE_WRITE8_MEMBER(n3d_flash_cmd_w);
@@ -66,7 +66,7 @@ protected:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
-	void flash_change_state(running_machine &machine, flash_state_t state);
+	void flash_change_state(flash_state_t state);
 
 	// runtime state
 	size_t                      m_length;

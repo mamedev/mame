@@ -99,7 +99,7 @@ WRITE16_MEMBER(artmagic_state::control_w)
 	/* OKI banking here */
 	if (offset == 0)
 	{
-		m_oki->set_bank_base((((data >> 4) & 1) * 0x40000) % m_oki->region()->bytes());
+		m_oki->set_bank_base((((data >> 4) & 1) * 0x40000) % m_oki_region->bytes());
 	}
 
 	logerror("%06X:control_w(%d) = %04X\n", space.device().safe_pc(), offset, data);
@@ -596,7 +596,7 @@ static INPUT_PORTS_START( cheesech )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("30000a")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, NULL)    /* protection data */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, nullptr)    /* protection data */
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )     /* protection ready */
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -788,7 +788,7 @@ static INPUT_PORTS_START( shtstar )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("3c000a")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, NULL)    /* protection data */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, nullptr)    /* protection data */
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )     /* protection ready */
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )

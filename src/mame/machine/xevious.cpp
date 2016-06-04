@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "sound/samples.h"
 #include "includes/galaga.h"
+#include "includes/xevious.h"
 
 /***************************************************************************
 

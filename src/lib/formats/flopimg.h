@@ -50,7 +50,7 @@ enum floperr_t
 	FLOPPY_ERROR_INTERNAL,          /* fatal internal error */
 	FLOPPY_ERROR_UNSUPPORTED,       /* this operation is unsupported */
 	FLOPPY_ERROR_OUTOFMEMORY,       /* ran out of memory */
-	FLOPPY_ERROR_SEEKERROR,         /* attempted to seek to nonexistant location */
+	FLOPPY_ERROR_SEEKERROR,         /* attempted to seek to nonexistent location */
 	FLOPPY_ERROR_INVALIDIMAGE,      /* this image in invalid */
 	FLOPPY_ERROR_READONLY,          /* attempt to write to read-only image */
 	FLOPPY_ERROR_NOSPACE,
@@ -121,7 +121,7 @@ FLOPPY_CONSTRUCT(fdi_dsk_construct);
 	const struct FloppyFormat floppyoptions_##name[] =                              \
 	{
 #define LEGACY_FLOPPY_OPTIONS_END0 \
-		{ NULL }                            \
+		{ nullptr }                            \
 	};
 
 #define LEGACY_FLOPPY_OPTIONS_EXTERN(name)                                              \
@@ -129,12 +129,12 @@ FLOPPY_CONSTRUCT(fdi_dsk_construct);
 #define LEGACY_FLOPPY_OPTION(name, extensions_, description_, identify_, construct_, destruct_, ranges_)\
 	{ #name, extensions_, description_, identify_, construct_, destruct_, ranges_ },
 #define LEGACY_FLOPPY_OPTIONS_END                                                       \
-		LEGACY_FLOPPY_OPTION( fdi, "fdi", "Formatted Disk Image", fdi_dsk_identify, fdi_dsk_construct, NULL, NULL) \
-		LEGACY_FLOPPY_OPTION( td0, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, NULL) \
-		LEGACY_FLOPPY_OPTION( imd, "imd", "IMD floppy disk image",  imd_dsk_identify, imd_dsk_construct, NULL, NULL) \
-		LEGACY_FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",   cqm_dsk_identify, cqm_dsk_construct, NULL, NULL) \
-		LEGACY_FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",  dsk_dsk_identify, dsk_dsk_construct, NULL, NULL) \
-		LEGACY_FLOPPY_OPTION( d88, "d77,d88,1dd", "D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, NULL, NULL) \
+		LEGACY_FLOPPY_OPTION( fdi, "fdi", "Formatted Disk Image", fdi_dsk_identify, fdi_dsk_construct, nullptr, nullptr) \
+		LEGACY_FLOPPY_OPTION( td0, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, nullptr) \
+		LEGACY_FLOPPY_OPTION( imd, "imd", "IMD floppy disk image",  imd_dsk_identify, imd_dsk_construct, nullptr, nullptr) \
+		LEGACY_FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",   cqm_dsk_identify, cqm_dsk_construct, nullptr, nullptr) \
+		LEGACY_FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",  dsk_dsk_identify, dsk_dsk_construct, nullptr, nullptr) \
+		LEGACY_FLOPPY_OPTION( d88, "d77,d88,1dd", "D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, nullptr, nullptr) \
 	LEGACY_FLOPPY_OPTIONS_END0
 
 LEGACY_FLOPPY_OPTIONS_EXTERN(default);

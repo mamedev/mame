@@ -1,34 +1,35 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-/***************************************************************************
-
-    attotime.h
-
-    Support functions for working with attotime data.
-
-****************************************************************************
-
-    Attotime is an attosecond-accurate timing system implemented as
-    96-bit integers.
-
-        1 second      = 1e0 seconds
-        1 millisecond = 1e-3 seconds
-        1 microsecond = 1e-6 seconds
-        1 nanosecond  = 1e-9 seconds
-        1 picosecond  = 1e-12 seconds
-        1 femtosecond = 1e-15 seconds
-        1 attosecond  = 1e-18 seconds
-
-    This may seem insanely accurate, but it has its uses when multiple
-    clocks in the system are run by independent crystals. It is also
-    useful to compute the attotime for something small, say 1 clock tick,
-    and still have it be accurate and useful for scaling.
-
-    Attotime consists of a 32-bit seconds count and a 64-bit attoseconds
-    count. Because the lower bits are kept as attoseconds and not as a
-    full 64-bit value, there is headroom to make some operations simpler.
-
-***************************************************************************/
+/**************************************************************************/
+/**
+ * @file attotime.h
+ * Support functions for working with attotime data.
+ * @defgroup ATTOTIME
+ * @{
+ * Support functions for working with attotime data.
+ *
+ * @class attotime
+ *  Attotime is an attosecond-accurate timing system implemented as
+ *  96-bit integers.
+ *
+ *     1 second      = 1e0 seconds
+ *     1 millisecond = 1e-3 seconds
+ *     1 microsecond = 1e-6 seconds
+ *     1 nanosecond  = 1e-9 seconds
+ *     1 picosecond  = 1e-12 seconds
+ *     1 femtosecond = 1e-15 seconds
+ *     1 attosecond  = 1e-18 seconds
+ *
+ * This may seem insanely accurate, but it has its uses when multiple
+ * clocks in the system are run by independent crystals. It is also
+ * useful to compute the attotime for something small, say 1 clock tick,
+ * and still have it be accurate and useful for scaling.
+ *
+ * Attotime consists of a 32-bit seconds count and a 64-bit attoseconds
+ * count. Because the lower bits are kept as attoseconds and not as a
+ * full 64-bit value, there is headroom to make some operations simpler.
+ */
+/**************************************************************************/
 
 #pragma once
 
@@ -91,6 +92,7 @@ public:
 		: m_seconds(0),
 			m_attoseconds(0) { }
 
+	/** Constructs with @p secs seconds and @p attos attoseconds. */
 	attotime(seconds_t secs, attoseconds_t attos)
 		: m_seconds(secs),
 			m_attoseconds(attos) { }
@@ -109,35 +111,32 @@ public:
 
 	// queries
 	bool is_zero() const { return (m_seconds == 0 && m_attoseconds == 0); }
+	/** Test if value is above @ref ATTOTIME_MAX_SECONDS (considered an overflow) */
 	bool is_never() const { return (m_seconds >= ATTOTIME_MAX_SECONDS); }
 
 	// conversion to other forms
 	double as_double() const { return double(m_seconds) + ATTOSECONDS_TO_DOUBLE(m_attoseconds); }
 	attoseconds_t as_attoseconds() const;
 	UINT64 as_ticks(UINT32 frequency) const;
+	/** Convert to string using at @p precision */
 	const char *as_string(int precision = 9) const;
 
-	// Needed by gba.c FIXME: this shouldn't be necessary?
-
-	void normalize()
-	{
-			while (m_attoseconds >= ATTOSECONDS_PER_SECOND)
-			{
-				m_seconds++;
-				m_attoseconds -= ATTOSECONDS_PER_SECOND;
-			}
-	}
-
+	/** @return the attoseconds portion. */
 	attoseconds_t attoseconds() const { return m_attoseconds; }
+	/** @return the seconds portion. */
 	seconds_t seconds() const { return m_seconds; }
 
-	// conversion from other forms
 	static attotime from_double(double _time);
 	static attotime from_ticks(UINT64 ticks, UINT32 frequency);
+	/** Create an attotime from a integer count of seconds @seconds */
 	static attotime from_seconds(INT32 seconds) { return attotime(seconds, 0); }
+	/** Create an attotime from a integer count of milliseconds @msec */
 	static attotime from_msec(INT64 msec) { return attotime(msec / 1000, (msec % 1000) * (ATTOSECONDS_PER_SECOND / 1000)); }
+	/** Create an attotime from a integer count of microseconds @usec */
 	static attotime from_usec(INT64 usec) { return attotime(usec / 1000000, (usec % 1000000) * (ATTOSECONDS_PER_SECOND / 1000000)); }
+	/** Create an attotime from a integer count of nanoseconds @nsec */
 	static attotime from_nsec(INT64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (ATTOSECONDS_PER_SECOND / 1000000000)); }
+	/** Create an attotime from at the given frequency @frequency */
 	static attotime from_hz(double frequency) { assert(frequency > 0); double d = 1 / frequency; return attotime(floor(d), modf(d, &d) * ATTOSECONDS_PER_SECOND); }
 
 	// math
@@ -154,18 +153,14 @@ public:
 	static const attotime never;
 	static const attotime zero;
 };
-
+/** @} */
 
 
 //**************************************************************************
 //  INLINE FUNCTIONS
 //**************************************************************************
 
-//-------------------------------------------------
-//  operator+ - handle addition between two
-//  attotimes
-//-------------------------------------------------
-
+/** handle addition between two attotimes */
 inline attotime operator+(const attotime &left, const attotime &right)
 {
 	attotime result;
@@ -215,11 +210,7 @@ inline attotime &attotime::operator+=(const attotime &right)
 }
 
 
-//-------------------------------------------------
-//  operator- - handle subtraction between two
-//  attotimes
-//-------------------------------------------------
-
+/** handle subtraction between two attotimes */
 inline attotime operator-(const attotime &left, const attotime &right)
 {
 	attotime result;
@@ -261,12 +252,7 @@ inline attotime &attotime::operator-=(const attotime &right)
 }
 
 
-//-------------------------------------------------
-//  operator* - handle multiplication/division by
-//  an integral factor; defined in terms of the
-//  assignment operators
-//-------------------------------------------------
-
+/** handle multiplication by an integral factor; defined in terms of the assignment operators */
 inline attotime operator*(const attotime &left, UINT32 factor)
 {
 	attotime result = left;
@@ -281,6 +267,7 @@ inline attotime operator*(UINT32 factor, const attotime &right)
 	return result;
 }
 
+/** handle division by an integral factor; defined in terms of the assignment operators */
 inline attotime operator/(const attotime &left, UINT32 factor)
 {
 	attotime result = left;
@@ -289,11 +276,7 @@ inline attotime operator/(const attotime &left, UINT32 factor)
 }
 
 
-//-------------------------------------------------
-//  operator== - handle comparisons between
-//  attotimes
-//-------------------------------------------------
-
+/** handle comparisons between attotimes */
 inline bool operator==(const attotime &left, const attotime &right)
 {
 	return (left.m_seconds == right.m_seconds && left.m_attoseconds == right.m_attoseconds);
@@ -356,12 +339,7 @@ inline attotime max(const attotime &left, const attotime &right)
 	return right;
 }
 
-
-//-------------------------------------------------
-//  as_attoseconds - convert to an attoseconds
-//  value, clamping to +/- 1 second
-//-------------------------------------------------
-
+/** Convert to an attoseconds value, clamping to +/- 1 second */
 inline attoseconds_t attotime::as_attoseconds() const
 {
 	// positive values between 0 and 1 second
@@ -382,11 +360,7 @@ inline attoseconds_t attotime::as_attoseconds() const
 }
 
 
-//-------------------------------------------------
-//  as_ticks - convert to ticks at the given
-//  frequency
-//-------------------------------------------------
-
+/** as_ticks - convert to ticks at @p frequency */
 inline UINT64 attotime::as_ticks(UINT32 frequency) const
 {
 	UINT32 fracticks = (attotime(0, m_attoseconds) * frequency).m_seconds;
@@ -394,11 +368,7 @@ inline UINT64 attotime::as_ticks(UINT32 frequency) const
 }
 
 
-//-------------------------------------------------
-//  from_ticks - create an attotime from a tick
-//  count at the given frequency
-//-------------------------------------------------
-
+/** Create an attotime from a tick count @ticks at the given frequency @frequency  */
 inline attotime attotime::from_ticks(UINT64 ticks, UINT32 frequency)
 {
 	attoseconds_t attos_per_tick = HZ_TO_ATTOSECONDS(frequency);
@@ -411,12 +381,7 @@ inline attotime attotime::from_ticks(UINT64 ticks, UINT32 frequency)
 	return attotime(secs, (UINT64)remainder * attos_per_tick);
 }
 
-
-//-------------------------------------------------
-//  from_double - create an attotime from floating
-//  point count of seconds
-//-------------------------------------------------
-
+/** Create an attotime from floating point count of seconds @p _time */
 inline attotime attotime::from_double(double _time)
 {
 	seconds_t secs = floor(_time);

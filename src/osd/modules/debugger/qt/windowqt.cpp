@@ -15,7 +15,7 @@ bool WindowQt::s_hideAll = false;
 
 
 // Since all debug windows are intended to be top-level, this inherited
-// constructor is always called with a NULL parent.  The passed-in parent widget,
+// constructor is always called with a nullptr parent.  The passed-in parent widget,
 // however, is often used to place each child window & the code to do this can
 // be found in most of the inherited classes.
 

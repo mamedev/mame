@@ -14,11 +14,11 @@
 
 
 DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, NULL)
+	WindowQt(machine, nullptr)
 {
 	setWindowTitle("Debug: Disassembly View");
 
-	if (parent != NULL)
+	if (parent != nullptr)
 	{
 		QPoint parentPos = parent->pos();
 		setGeometry(parentPos.x()+100, parentPos.y()+100, 800, 400);
@@ -144,7 +144,7 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 		// Find an existing breakpoint at this address
 		INT32 bpindex = -1;
 		for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-				bp != NULL;
+				bp != nullptr;
 				bp = bp->next())
 		{
 			if (address == bp->address())
@@ -157,7 +157,7 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 		// If none exists, add a new one
 		if (bpindex == -1)
 		{
-			bpindex = cpuinfo->breakpoint_set(address, NULL, NULL);
+			bpindex = cpuinfo->breakpoint_set(address, nullptr, nullptr);
 			debug_console_printf(*m_machine, "Breakpoint %X set\n", bpindex);
 		}
 		else
@@ -183,10 +183,10 @@ void DasmWindow::enableBreakpointAtCursor(bool changedTo)
 
 		// Find an existing breakpoint at this address
 		device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-		while ((bp != NULL) && (bp->address() != address))
+		while ((bp != nullptr) && (bp->address() != address))
 			bp = bp->next();
 
-		if (bp != NULL)
+		if (bp != nullptr)
 		{
 			cpuinfo->breakpoint_enable(bp->index(), !bp->enabled());
 			debug_console_printf(*m_machine, "Breakpoint %X %s\n", (UINT32)bp->index(), bp->enabled() ? "enabled" : "disabled");
@@ -241,10 +241,10 @@ void DasmWindow::dasmViewUpdated()
 
 		// Find an existing breakpoint at this address
 		device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-		while ((bp != NULL) && (bp->address() != address))
+		while ((bp != nullptr) && (bp->address() != address))
 			bp = bp->next();
 
-		if (bp != NULL)
+		if (bp != nullptr)
 		{
 			haveBreakpoint = true;
 			breakpointEnabled = bp->enabled();
@@ -261,15 +261,13 @@ void DasmWindow::dasmViewUpdated()
 
 void DasmWindow::populateComboBox()
 {
-	if (m_dasmView == NULL)
+	if (m_dasmView == nullptr)
 		return;
 
 	m_cpuComboBox->clear();
-	for (const debug_view_source* source = m_dasmView->view()->first_source();
-			source != NULL;
-			source = source->next())
+	for (const debug_view_source &source : m_dasmView->view()->source_list())
 	{
-		m_cpuComboBox->addItem(source->name());
+		m_cpuComboBox->addItem(source.name());
 	}
 }
 

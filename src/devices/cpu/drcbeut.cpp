@@ -92,7 +92,7 @@ void drc_hash_table::block_begin(drcuml_block &block, const uml::instruction *in
 	{
 		const uml::instruction &inst = instlist[inum];
 
-		// if the opcode is a hash, verify that it makes sense and then set a NULL entry
+		// if the opcode is a hash, verify that it makes sense and then set a nullptr entry
 		if (inst.opcode() == OP_HASH)
 		{
 			assert(inst.numparams() == 2);
@@ -484,7 +484,7 @@ void drc_label_list::block_end(drcuml_block &block)
 
 //-------------------------------------------------
 //  get_codeptr - find or allocate a new label;
-//  returns NULL and requests an OOB callback if
+//  returns nullptr and requests an OOB callback if
 //  undefined
 //-------------------------------------------------
 

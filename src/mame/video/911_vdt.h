@@ -34,7 +34,7 @@ enum vdt911_model_t
 	vdt911_model_FrenchWP      // French word processing
 };
 
-class vdt911_device : public device_t
+class vdt911_device : public device_t, public device_gfx_interface
 {
 public:
 	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -58,7 +58,6 @@ public:
 
 protected:
 	// device-level overrides
-	void device_config_complete() override;
 	void device_start() override;
 	void device_reset() override;
 
@@ -103,8 +102,6 @@ private:
 	char m_foreign_mode;
 
 	required_device<beep_device>        m_beeper;
-	required_device<gfxdecode_device>   m_gfxdecode;
-	required_device<palette_device>     m_palette;
 	devcb_write_line                   m_keyint_line;
 	devcb_write_line                   m_lineint_line;
 };

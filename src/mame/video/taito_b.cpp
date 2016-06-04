@@ -427,19 +427,17 @@ UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 
 	/* Draw the 15bpp raw CRTC frame buffer directly to the output bitmap */
 	if (m_realpunc_video_ctrl & 0x0002)
 	{
-		int base = (m_hd63484->regs_r(space, 0xcc/2, 0xffff) << 16) + m_hd63484->regs_r(space, 0xce/2, 0xffff);
-		int stride = m_hd63484->regs_r(space, 0xca/2, 0xffff);
-
 //      scrollx = taitob_scroll[0];
 //      scrolly = taitob_scroll[1];
 
+		m_hd63484->update_screen(screen, *m_realpunc_bitmap, cliprect);
+
 		for (y = 0; y <= cliprect.max_y; y++)
 		{
-			int addr = base + (y*stride);
 			for (x = 0; x <= cliprect.max_x; x++)
 			{
 				int r, g, b;
-				UINT16 srcpix = m_hd63484->ram_r(space, addr++, 0xffff);
+				UINT16 srcpix = m_realpunc_bitmap->pix16(cliprect.min_y + y, cliprect.min_x + x);
 
 				r = (BIT(srcpix, 1)) | ((srcpix >> 11) & 0x1e);
 				g = (BIT(srcpix, 2)) | ((srcpix >> 7) & 0x1e);
@@ -448,8 +446,6 @@ UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 
 				if (srcpix)
 					bitmap.pix32(y, x) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
 			}
-
-			addr += stride;
 		}
 	}
 	/* Draw the 15bpp raw output of the camera ADCs (TODO) */

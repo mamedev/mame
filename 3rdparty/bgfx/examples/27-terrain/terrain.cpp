@@ -12,8 +12,6 @@
 #include <bx/debug.h>
 #include <bx/fpumath.h>
 
-static float s_texelHalf = 0.0f;
-static bool s_originBottomLeft = false;
 static uint32_t s_terrainSize = 256;
 
 struct PosTexCoord0Vertex
@@ -58,7 +56,7 @@ struct BrushData
 	float   m_power;
 };
 
-class Terrain : public entry::AppI
+class ExampleTerrain : public entry::AppI
 {
 	void init(int _argc, char** _argv) BX_OVERRIDE
 	{
@@ -94,9 +92,6 @@ class Terrain : public entry::AppI
 		imguiCreate();
 
 		m_timeOffset = bx::getHPCounter();
-		const bgfx::RendererType::Enum renderer = bgfx::getRendererType();
-		s_texelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
-		s_originBottomLeft = bgfx::RendererType::OpenGL == renderer || bgfx::RendererType::OpenGLES == renderer;
 
 		m_vbh.idx = bgfx::invalidHandle;
 		m_ibh.idx = bgfx::invalidHandle;
@@ -169,9 +164,14 @@ class Terrain : public entry::AppI
 		bgfx::destroyProgram(m_terrainProgram);
 		bgfx::destroyProgram(m_terrainHeightTextureProgram);
 
-		BX_FREE(entry::getAllocator(), m_terrain.m_vertices);
-		BX_FREE(entry::getAllocator(), m_terrain.m_indices);
-		BX_FREE(entry::getAllocator(), m_terrain.m_heightMap);
+		/// When data is passed to bgfx via makeRef we need to make
+		/// sure library is done with it before freeing memory blocks.
+		bgfx::frame();
+
+		bx::AllocatorI* allocator = entry::getAllocator();
+		BX_FREE(allocator, m_terrain.m_vertices);
+		BX_FREE(allocator, m_terrain.m_indices);
+		BX_FREE(allocator, m_terrain.m_heightMap);
 
 		// Shutdown bgfx.
 		bgfx::shutdown();
@@ -458,7 +458,7 @@ class Terrain : public entry::AppI
 			bgfx::setViewRect(0, 0, 0, m_width, m_height);
 
 			cameraGetViewMtx(m_viewMtx);
-			bx::mtxProj(m_projMtx, 60.0f, float(m_width) / float(m_height), 0.1f, 2000.0f, s_originBottomLeft);
+			bx::mtxProj(m_projMtx, 60.0f, float(m_width) / float(m_height), 0.1f, 2000.0f);
 
 			bgfx::setViewTransform(0, m_viewMtx, m_projMtx);
 			bgfx::setTransform(m_terrain.m_transform);
@@ -526,4 +526,4 @@ class Terrain : public entry::AppI
 	int64_t m_timeOffset;
 };
 
-ENTRY_IMPLEMENT_MAIN(Terrain);
+ENTRY_IMPLEMENT_MAIN(ExampleTerrain);

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    Driver for Midway MCR games
+    Midway MCR system
 
 **************************************************************************/
 
@@ -11,6 +11,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
+#include "machine/watchdog.h"
 #include "audio/midway.h"
 #include "sound/samples.h"
 
@@ -25,6 +26,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ipu(*this, "ipu"),
+		m_watchdog(*this, "watchdog"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_paletteram(*this, "paletteram"),
@@ -38,14 +40,12 @@ public:
 		m_dpoker_hopper_timer(*this, "dp_hopper"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_sio_txda(0),
-		m_sio_txdb(0) { }
+		m_palette(*this, "palette")
+	{ }
 
-	// these should be required but can't because mcr68 shares with us
-	// once the sound boards are properly device-ified, fix this
-	optional_device<z80_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	optional_device<cpu_device> m_ipu;
+	required_device<watchdog_timer_device> m_watchdog;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_paletteram;
@@ -61,6 +61,9 @@ public:
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	int m_sio_txda;
+	int m_sio_txdb;
 
 	DECLARE_WRITE8_MEMBER(mcr_control_port_w);
 	DECLARE_WRITE8_MEMBER(mcr_ipu_laserdisk_w);
@@ -129,9 +132,6 @@ public:
 	void render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask);
 	void mcr_init(int cpuboard, int vidboard, int ssioboard);
-
-	int m_sio_txda;
-	int m_sio_txdb;
 };
 
 /*----------- defined in machine/mcr.c -----------*/

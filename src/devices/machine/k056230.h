@@ -47,7 +47,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	static TIMER_CALLBACK( network_irq_clear_callback );
+	TIMER_CALLBACK_MEMBER(network_irq_clear);
 
 protected:
 	// device-level overrides
@@ -58,7 +58,6 @@ protected:
 
 private:
 
-	void network_irq_clear();
 	int m_is_thunderh;
 
 	required_device<cpu_device> m_cpu;

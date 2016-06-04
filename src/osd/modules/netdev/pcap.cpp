@@ -55,7 +55,7 @@ class pcap_module : public osd_module, public netdev_module
 public:
 
 	pcap_module()
-	: osd_module(OSD_NETDEV_PROVIDER, "pcap"), netdev_module(), handle(NULL)
+	: osd_module(OSD_NETDEV_PROVIDER, "pcap"), netdev_module(), handle(nullptr)
 	{
 	}
 	virtual ~pcap_module() { }
@@ -68,15 +68,15 @@ public:
 	HMODULE handle;
 };
 
-static int (*pcap_compile_dl)(pcap_t *, struct bpf_program *, char *, int, bpf_u_int32) = NULL;
-static int (*pcap_findalldevs_dl)(pcap_if_t **, char *) = NULL;
-static pcap_t *(*pcap_open_live_dl)(const char *name, int, int, int, char *) = NULL;
-static int (*pcap_next_ex_dl)(pcap_t *, struct pcap_pkthdr **, const u_char **) = NULL;
-static void (*pcap_close_dl)(pcap_t *) = NULL;
-static int (*pcap_setfilter_dl)(pcap_t *, struct bpf_program *) = NULL;
-static int (*pcap_sendpacket_dl)(pcap_t *, u_char *, int) = NULL;
-static int (*pcap_set_datalink_dl)(pcap_t *, int) = NULL;
-static int (*pcap_dispatch_dl)(pcap_t *, int, pcap_handler callback, u_char *) = NULL;
+static int (*pcap_compile_dl)(pcap_t *, struct bpf_program *, char *, int, bpf_u_int32) = nullptr;
+static int (*pcap_findalldevs_dl)(pcap_if_t **, char *) = nullptr;
+static pcap_t *(*pcap_open_live_dl)(const char *name, int, int, int, char *) = nullptr;
+static int (*pcap_next_ex_dl)(pcap_t *, struct pcap_pkthdr **, const u_char **) = nullptr;
+static void (*pcap_close_dl)(pcap_t *) = nullptr;
+static int (*pcap_setfilter_dl)(pcap_t *, struct bpf_program *) = nullptr;
+static int (*pcap_sendpacket_dl)(pcap_t *, u_char *, int) = nullptr;
+static int (*pcap_set_datalink_dl)(pcap_t *, int) = nullptr;
+static int (*pcap_dispatch_dl)(pcap_t *, int, pcap_handler callback, u_char *) = nullptr;
 
 
 #if 0
@@ -165,7 +165,7 @@ netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev
 	{
 		osd_printf_error("Unable to set %s to ethernet", name);
 		pcap_close_dl(m_p);
-		m_p = NULL;
+		m_p = nullptr;
 		return;
 	}
 	netdev_pcap::set_mac(get_mac());
@@ -174,7 +174,7 @@ netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev
 	m_ctx.head = 0;
 	m_ctx.tail = 0;
 	m_ctx.p = m_p;
-	pthread_create(&m_thread, NULL, netdev_pcap_blocker, &m_ctx);
+	pthread_create(&m_thread, nullptr, netdev_pcap_blocker, &m_ctx);
 #endif
 }
 
@@ -235,12 +235,12 @@ int netdev_pcap::recv_dev(UINT8 **buf)
 netdev_pcap::~netdev_pcap()
 {
 #ifdef SDLMAME_MACOSX
-	m_ctx.p = NULL;
+	m_ctx.p = nullptr;
 	pthread_cancel(m_thread);
-	pthread_join(m_thread, NULL);
+	pthread_join(m_thread, nullptr);
 #endif
 	if(m_p) pcap_close_dl(m_p);
-	m_p = NULL;
+	m_p = nullptr;
 }
 
 static CREATE_NETDEV(create_pcap)
@@ -251,10 +251,10 @@ static CREATE_NETDEV(create_pcap)
 
 bool pcap_module::probe()
 {
-	if (handle == NULL)
+	if (handle == nullptr)
 	{
 		handle = LoadDynamicLibrary(LIB_NAME);
-		return (handle != NULL);
+		return (handle != nullptr);
 	}
 	return true;
 }
@@ -314,8 +314,8 @@ int pcap_module::init(const osd_options &options)
 void pcap_module::exit()
 {
 	clear_netdev();
-	FreeLibrary(handle);
-	handle = NULL;
+	//FreeLibrary(handle);
+	//handle = nullptr;
 }
 #else
 	#include "modules/osdmodule.h"

@@ -991,7 +991,7 @@ static MACHINE_CONFIG_START( pockstat, pockstat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pockstat_state, screen_update_pockstat)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)

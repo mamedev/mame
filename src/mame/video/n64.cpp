@@ -63,7 +63,7 @@ bool n64_rdp::rdp_range_check(UINT32 addr)
 /*****************************************************************************/
 
 // The functions in this file should be moved into the parent Processor class.
-#include "rdpfiltr.inc"
+#include "rdpfiltr.hxx"
 
 INT32 n64_rdp::get_alpha_cvg(INT32 comb_alpha, rdp_span_aux* userdata, const rdp_poly_state &object)
 {
@@ -174,7 +174,7 @@ void n64_periphs::video_update(bitmap_rgb32 &bitmap)
 	}
 	else
 	{
-		field = 1;
+		field = 0;
 	}
 
 	switch(vi_control & 0x3)

@@ -40,7 +40,7 @@ s3520cf_device::s3520cf_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void s3520cf_device::timer_callback()
+TIMER_CALLBACK_MEMBER(s3520cf_device::timer_callback)
 {
 	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	int dpm_count;
@@ -71,10 +71,6 @@ void s3520cf_device::timer_callback()
 	if((m_rtc.year & 0xf0) >= 0xa0)             { m_rtc.year = 0; } //1901-2000 possible timeframe
 }
 
-TIMER_CALLBACK( s3520cf_device::rtc_inc_callback )
-{
-	reinterpret_cast<s3520cf_device *>(ptr)->timer_callback();
-}
 
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
@@ -93,7 +89,7 @@ void s3520cf_device::device_validity_check(validity_checker &valid) const
 void s3520cf_device::device_start()
 {
 	/* let's call the timer callback every second for now */
-	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), FUNC(rtc_inc_callback), 0, (void *)this);
+	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), timer_expired_delegate(FUNC(s3520cf_device::timer_callback), this));
 
 	system_time systime;
 	machine().base_datetime(systime);

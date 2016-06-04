@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( manohman, _manohman_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SAA1099_ADD("saa", MASTER_CLOCK /* guess */)
+	MCFG_SAA1099_ADD("saa", MASTER_CLOCK)  // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -235,5 +235,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT    ROT    COMPANY   FULLNAME        FLAGS... */
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT    ROT    COMPANY   FULLNAME        FLAGS... */
 GAME( 199?, manohman, 0,      manohman, manohman, driver_device, 0,      ROT0, "Merkur", "Mann, oh-Mann", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )

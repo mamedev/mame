@@ -25,7 +25,7 @@ class pstream
 	P_PREVENT_COPYING(pstream)
 public:
 
-	typedef long unsigned pos_type;
+	using pos_type = std::size_t;
 
 	static const pos_type SEEK_EOF = (pos_type) -1;
 

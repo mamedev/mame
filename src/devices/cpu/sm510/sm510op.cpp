@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 
-// SM510 opcode handlers
+// shared opcode handlers
 
 #include "sm510.h"
 
@@ -10,14 +10,14 @@
 
 inline UINT8 sm510_base_device::ram_r()
 {
-	int bmh = (m_prev_op == 0x02) ? (1 << (m_datawidth-1)) : 0; // from SBM
+	int bmh = (m_sbm) ? (1 << (m_datawidth-1)) : 0; // from SBM
 	UINT8 address = (bmh | m_bm << 4 | m_bl) & m_datamask;
 	return m_data->read_byte(address) & 0xf;
 }
 
 inline void sm510_base_device::ram_w(UINT8 data)
 {
-	int bmh = (m_prev_op == 0x02) ? (1 << (m_datawidth-1)) : 0; // from SBM
+	int bmh = (m_sbm) ? (1 << (m_datawidth-1)) : 0; // from SBM
 	UINT8 address = (bmh | m_bm << 4 | m_bl) & m_datamask;
 	m_data->write_byte(address, data & 0xf);
 }
@@ -67,9 +67,9 @@ void sm510_base_device::op_lb()
 	UINT8 hi = 0;
 	switch (m_bl)
 	{
-		case 0: hi = 3; break;
-		case 1: hi = 0; break;
-		case 2: hi = 0; break;
+		case 0: hi = 0; break;
+		case 1: hi = 3; break;
+		case 2: hi = 3; break;
 		case 3: hi = 3; break;
 	}
 	m_bl |= (hi << 2 & 0xc);
@@ -84,8 +84,7 @@ void sm510_base_device::op_lbl()
 
 void sm510_base_device::op_sbm()
 {
-	// SBM: set BM high bit for next opcode - handled in ram_r/w
-	assert(m_op == 0x02);
+	// SBM: set BM high bit for next opcode - handled in execute_one()
 }
 
 void sm510_base_device::op_exbla()
@@ -290,9 +289,9 @@ void sm510_base_device::op_add11()
 
 void sm510_base_device::op_adx()
 {
-	// ADX x: add immediate value to ACC, skip next on carry
+	// ADX x: add immediate value to ACC, skip next on carry except if x = 10
 	m_acc += (m_op & 0xf);
-	m_skip = ((m_acc & 0x10) != 0);
+	m_skip = ((m_op & 0xf) != 10 && (m_acc & 0x10) != 0);
 	m_acc &= 0xf;
 }
 
@@ -448,6 +447,18 @@ void sm510_base_device::op_idiv()
 {
 	// IDIV: reset divider
 	m_div = 0;
+}
+
+void sm510_base_device::op_dr()
+{
+	// DR: reset divider low 8 bits
+	m_div &= 0x7f;
+}
+
+void sm510_base_device::op_dta()
+{
+	// DTA: transfer divider low 4 bits to ACC
+	m_acc = m_div >> 11 & 0xf;
 }
 
 void sm510_base_device::op_illegal()

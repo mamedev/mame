@@ -22,7 +22,7 @@ static const UINT8 skew_bits_value[4] = { 0, 1, 2, 2 };
 #define CHARS_PER_DATA_ROW   (chars_per_row_value[(m_reg[2] >> 0) & 0x07])
 #define SKEW_BITS            (skew_bits_value[(m_reg[3] >> 6) & 0x03])
 #define DATA_ROWS_PER_FRAME  (((m_reg[3] >> 0) & 0x3f) + 1)
-#define SCAN_LINES_PER_FRAME ((m_reg[4] * 2) + 256)
+#define SCAN_LINES_PER_FRAME ((m_reg[4] * 2) + 256 + (((m_reg[1] >> 7) & 0x01) * 257))
 #define VERTICAL_DATA_START  (m_reg[5])
 #define LAST_DISP_DATA_ROW   (m_reg[6] & 0x3f)
 #define CURSOR_CHAR_ADDRESS  (m_reg[7])
@@ -39,7 +39,7 @@ tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, d
 					device_video_interface(mconfig, *this),
 					m_write_vsyn(*this),
 					m_hpixels_per_column(0),
-					m_selfload_region(nullptr),
+					m_selfload(*this),
 					m_reset(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
@@ -50,7 +50,7 @@ tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, 
 					device_video_interface(mconfig, *this),
 					m_write_vsyn(*this),
 					m_hpixels_per_column(0),
-					m_selfload_region(nullptr),
+					m_selfload(*this),
 					m_reset(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
@@ -79,17 +79,10 @@ crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, d
 void tms9927_device::device_start()
 {
 	assert(clock() > 0);
-	assert(m_hpixels_per_column > 0);
+	if (!(m_hpixels_per_column > 0)) fatalerror("TMS9927: number of pixels per column must be explicitly set using MCFG_TMS9927_CHAR_WIDTH()!\n");
 
 	/* copy the initial parameters */
 	m_clock = clock();
-
-	/* get the self-load PROM */
-	if (m_selfload_region != nullptr)
-	{
-		m_selfload = machine().root_device().memregion(m_selfload_region)->base();
-		assert(m_selfload != nullptr);
-	}
 
 	// resolve callbacks
 	m_write_vsyn.resolve_safe();
@@ -111,6 +104,7 @@ void tms9927_device::device_start()
 
 void tms9927_device::device_reset()
 {
+	m_start_datarow = 0;
 }
 
 //-------------------------------------------------
@@ -166,7 +160,7 @@ void tms9927_device::generic_access(address_space &space, offs_t offset)
 	{
 		case 0x07:  /* Processor Self Load */
 		case 0x0f:  /* Non-processor self-load */
-			if (m_selfload != nullptr)
+			if (m_selfload.found())
 			{
 				for (int cur = 0; cur < 7; cur++)
 					write(space, cur, m_selfload[cur]);
@@ -293,20 +287,28 @@ void tms9927_device::recompute_parameters(int postload)
 
 	/* determine the visible area, avoid division by 0 */
 	m_visible_hpix = CHARS_PER_DATA_ROW * m_hpixels_per_column;
-	m_visible_vpix = (LAST_DISP_DATA_ROW + 1) * SCANS_PER_DATA_ROW;
+	m_visible_vpix = DATA_ROWS_PER_FRAME * SCANS_PER_DATA_ROW;
 
+	m_start_datarow = (LAST_DISP_DATA_ROW + 1) % DATA_ROWS_PER_FRAME;
 	/* determine the horizontal/vertical offsets */
 	offset_hpix = HSYNC_DELAY * m_hpixels_per_column;
 	offset_vpix = VERTICAL_DATA_START;
 
-	osd_printf_debug("TMS9937: Total = %dx%d, Visible = %dx%d, Offset=%dx%d, Skew=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, offset_hpix, offset_vpix, SKEW_BITS);
+	osd_printf_debug("TMS9937: Total = %dx%d, Visible = %dx%d, Offset=%dx%d, Skew=%d, Upscroll=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, offset_hpix, offset_vpix, SKEW_BITS, m_start_datarow);
 
 	/* see if it all makes sense */
 	m_valid_config = TRUE;
-	if (m_visible_hpix > m_total_hpix || m_visible_vpix > m_total_vpix)
+	if ( (m_visible_hpix > m_total_hpix || m_visible_vpix > m_total_vpix) || (((m_visible_hpix-1)<=0) || ((m_visible_vpix-1)<=0)) || ((m_total_hpix * m_total_vpix) == 0) )
 	{
 		m_valid_config = FALSE;
 		logerror("tms9927: invalid visible size (%dx%d) versus total size (%dx%d)\n", m_visible_hpix, m_visible_vpix, m_total_hpix, m_total_vpix);
+	}
+
+	if (m_clock == 0)
+	{
+		m_valid_config = FALSE;
+		// TODO: make the screen refresh never, and disable the vblank and odd/even interrupts here!
+		logerror("tms9927: invalid clock rate of zero defined!\n");
 	}
 
 	/* update */

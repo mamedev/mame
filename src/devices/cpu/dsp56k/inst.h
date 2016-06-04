@@ -1568,7 +1568,7 @@ public:
 	size_t accumulatorBitsModified() const override { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
 
-//static Jmp_2* JMP2 = new Jmp_2(NULL, 0x0000, 0x0000);
+//static Jmp_2* JMP2 = new Jmp_2(nullptr, 0x0000, 0x0000);
 
 // JScc : 0000 0110 --01 cccc xxxx xxxx xxxx xxxx : A-112 //////////////////////
 class Jscc: public Instruction

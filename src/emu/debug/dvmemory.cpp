@@ -135,22 +135,21 @@ void debug_view_memory::enumerate_sources()
 	std::string name;
 
 	// first add all the devices' address spaces
-	memory_interface_iterator iter(machine().root_device());
-	for (device_memory_interface *memintf = iter.first(); memintf != nullptr; memintf = iter.next())
-		if (&memintf->device() != &machine().root_device())
+	for (device_memory_interface &memintf : memory_interface_iterator(machine().root_device()))
+		if (&memintf.device() != &machine().root_device())
 			for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
-				if (memintf->has_space(spacenum))
+				if (memintf.has_space(spacenum))
 				{
-					address_space &space = memintf->space(spacenum);
-					strprintf(name,"%s '%s' %s space memory", memintf->device().name(), memintf->device().tag(), space.name());
+					address_space &space = memintf.space(spacenum);
+					name = string_format("%s '%s' %s space memory", memintf.device().name(), memintf.device().tag(), space.name());
 					m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), space)));
 				}
 
 	// then add all the memory regions
-	for (memory_region *region = machine().memory().first_region(); region != nullptr; region = region->next())
+	for (memory_region &region : machine().memory().regions())
 	{
-		strprintf(name, "Region '%s'", region->name());
-		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), *region)));
+		name = string_format("Region '%s'", region.name());
+		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), region)));
 	}
 
 	// finally add all global array symbols
@@ -538,14 +537,14 @@ void debug_view_memory::recompute()
 	else
 	{
 		m_maxaddr = source.m_length - 1;
-		addrchars = strprintf(m_addrformat, "%X", m_maxaddr);
+		addrchars = string_format("%X", m_maxaddr).size();
 	}
 
 	// generate an 8-byte aligned format for the address
 	if (!m_reverse_view)
-		strprintf(m_addrformat, "%*s%%0%dX", 8 - addrchars, "", addrchars);
+		m_addrformat = string_format("%*s%%0%dX", 8 - addrchars, "", addrchars);
 	else
-		strprintf(m_addrformat, "%%0%dX%*s", addrchars, 8 - addrchars, "");
+		m_addrformat = string_format("%%0%dX%*s", addrchars, 8 - addrchars, "");
 
 	// if we are viewing a space with a minimum chunk size, clamp the bytes per chunk
 	if (source.m_space != nullptr && source.m_space->byte_to_address(1) > 1)

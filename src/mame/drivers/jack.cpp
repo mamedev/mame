@@ -102,7 +102,7 @@ READ8_MEMBER(jack_state::timer_r)
 
 WRITE8_MEMBER(jack_state::jack_sh_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -927,8 +927,10 @@ static MACHINE_CONFIG_START( jack, jack_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18MHz/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device,read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(jack_state, timer_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1428,6 +1430,25 @@ ROM_START( loverboy )
 	ROM_LOAD_NIB_HIGH( "color.n12", 0x000, 0x200, CRC(4b11ac21) SHA1(d9e7cecfb7237335288ab6f94bb35696d8291bdf) )
 ROM_END
 
+ROM_START( trikitri )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
+	ROM_LOAD( "1.bin", 0x0000, 0x2000, CRC(248f2f12) SHA1(a1796e3e56a2b499997b0459ab875e7e50b797a2) ) 
+	ROM_LOAD( "2.bin", 0x2000, 0x2000, CRC(04052262) SHA1(056a225c8625e53881753b0b0330f9b277d14a7d) ) 
+	ROM_LOAD( "3.bin", 0x4000, 0x2000, CRC(979c17c1) SHA1(518500d35241ceefa802edd6ffd948385faac9eb) ) 
+	ROM_LOAD( "4.bin", 0x6000, 0x1000, CRC(839d79b7) SHA1(ac1c0fbf23e7d1a53b47dae16170857c55e6ae48) ) 
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 cpu */
+	ROM_LOAD( "snd.bin", 0x0000, 0x1000, CRC(1589c4a9) SHA1(9422d55952b939c761fc47147f392ef0cc7d141b) ) 
+
+	ROM_REGION( 0x6000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
+	ROM_LOAD( "5.bin", 0x0000, 0x2000, CRC(8cb6ec1c) SHA1(89fb29b9c4931d1e32e705ee4c4e38af219100e4) ) 
+	ROM_LOAD( "6.bin", 0x2000, 0x2000, CRC(a7bed0c1) SHA1(67484858abf08b3ffc320777befbfb922d867af9) ) 
+	ROM_LOAD( "7.bin", 0x4000, 0x2000, CRC(b473ce14) SHA1(491539de23fc4b9d0705434bcfba26043414b3b4) ) 
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "prom2.bin", 0x000, 0x0100, CRC(ed5cec15) SHA1(22001ecce44d7fd886fc3aa8a184993b6e341c00) ) 
+	ROM_LOAD_NIB_HIGH( "prom1.bin", 0x000, 0x0100, CRC(79632c67) SHA1(21480e44ab4941a1e943c10ea6a58c6177f77933) ) 
+ROM_END
 
 
 /*************************************
@@ -1568,4 +1589,5 @@ GAME( 1984, sucasino,  0,        jack,     sucasino, jack_state, jack,     ROT90
 GAME( 1985, striv,     0,        striv,    striv,    jack_state, striv,    ROT270, "Nova du Canada", "Super Triv", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Hara Industries PCB
 GAME( 1983, joinem,    0,        joinem,   joinem,   jack_state, zzyzzyxx, ROT90,  "Global Corporation", "Joinem", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, unclepoo,  0,        unclepoo, unclepoo, jack_state, zzyzzyxx, ROT90,  "Diatec", "Uncle Poo", MACHINE_SUPPORTS_SAVE ) // based on Joinem?
-GAME( 1983, loverboy,  0,        joinem,   loverboy, jack_state, loverboy, ROT90,  "G.T Enterprise Inc.", "Lover Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, loverboy,  0,        joinem,   loverboy, jack_state, loverboy, ROT90,  "G.T Enterprise Inc", "Lover Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, trikitri,  loverboy, joinem,   loverboy, jack_state, loverboy, ROT90,  "DDT Enterprise Inc", "Triki Triki (Lover Boy bootleg)", MACHINE_SUPPORTS_SAVE )

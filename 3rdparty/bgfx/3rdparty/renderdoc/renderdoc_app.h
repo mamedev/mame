@@ -1,7 +1,7 @@
 /******************************************************************************
  * The MIT License (MIT)
  * 
- * Copyright (c) 2015 Baldur Karlsson
+ * Copyright (c) 2015-2016 Baldur Karlsson
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,21 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+// Constants not used directly in below API
+
+// This is a GUID/magic value used for when applications pass a path where shader debug
+// information can be found to match up with a stripped shader.
+// the define can be used like so: const GUID RENDERDOC_ShaderDebugMagicValue = RENDERDOC_ShaderDebugMagicValue_value
+#define RENDERDOC_ShaderDebugMagicValue_struct { 0xeab25520, 0x6670, 0x4865, 0x84, 0x29, 0x6c, 0x8, 0x51, 0x54, 0x00, 0xff }
+
+// as an alternative when you want a byte array (assuming x86 endianness):
+#define RENDERDOC_ShaderDebugMagicValue_bytearray { 0x20, 0x55, 0xb2, 0xea, 0x70, 0x66, 0x65, 0x48, 0x84, 0x29, 0x6c, 0x8, 0x51, 0x54, 0x00, 0xff }
 	
+// truncated version when only a uint64_t is available (e.g. Vulkan tags):
+#define RENDERDOC_ShaderDebugMagicValue_truncated 0x48656670eab25520ULL
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // RenderDoc capture options
 // 
@@ -445,10 +459,17 @@ typedef uint32_t (RENDERDOC_CC *pRENDERDOC_EndFrameCapture)(RENDERDOC_DevicePoin
 // instead of 1.0.0. You can check this with the GetAPIVersion entry point
 typedef enum
 {
-	eRENDERDOC_API_Version_1_0_0 = 10000, // RENDERDOC_API_1_0_0 = 1 000 000
+	eRENDERDOC_API_Version_1_0_0 = 10000, // RENDERDOC_API_1_0_0 = 1 00 00
+	eRENDERDOC_API_Version_1_0_1 = 10001, // RENDERDOC_API_1_0_1 = 1 00 01
 } RENDERDOC_Version;
 
-// eRENDERDOC_API_Version_1_0_0
+// API version changelog:
+//
+// 1.0.0 - initial release
+// 1.0.1 - Bugfix: IsFrameCapturing() was returning false for captures that were triggered
+//         by keypress or TriggerCapture, instead of Start/EndFrameCapture.
+
+// eRENDERDOC_API_Version_1_0_1
 typedef struct
 {
 	pRENDERDOC_GetAPIVersion              GetAPIVersion;
@@ -484,7 +505,9 @@ typedef struct
 	pRENDERDOC_StartFrameCapture          StartFrameCapture;
 	pRENDERDOC_IsFrameCapturing           IsFrameCapturing;
 	pRENDERDOC_EndFrameCapture            EndFrameCapture;
-} RENDERDOC_API_1_0_0;
+} RENDERDOC_API_1_0_1;
+
+typedef RENDERDOC_API_1_0_1 RENDERDOC_API_1_0_0;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // RenderDoc API entry point

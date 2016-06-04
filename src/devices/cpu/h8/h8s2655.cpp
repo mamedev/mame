@@ -34,9 +34,11 @@ h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, 
 	timer16_5(*this, "timer16:5"),
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
-	sci2(*this, "sci2"), syscr(0)
+	sci2(*this, "sci2"),
+	watchdog(*this, "watchdog")
 {
 	has_trace = true;
+	syscr = 0;
 }
 
 h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -67,10 +69,12 @@ h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, d
 	timer16_5(*this, "timer16:5"),
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
-	sci2(*this, "sci2")
+	sci2(*this, "sci2"),
+	watchdog(*this, "watchdog")
 
 {
 	has_trace = true;
+	syscr = 0;
 }
 
 h8s2653_device::h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -156,6 +160,7 @@ static MACHINE_CONFIG_FRAGMENT(h8s2655)
 	MCFG_H8_SCI_ADD("sci0", "intc", 80, 81, 82, 83)
 	MCFG_H8_SCI_ADD("sci1", "intc", 84, 85, 86, 87)
 	MCFG_H8_SCI_ADD("sci2", "intc", 88, 89, 90, 91)
+	MCFG_H8_WATCHDOG_ADD("watchdog", "intc", 25, h8_watchdog_device::S)
 MACHINE_CONFIG_END
 
 DEVICE_ADDRESS_MAP_START(map, 16, h8s2655_device)
@@ -266,6 +271,8 @@ DEVICE_ADDRESS_MAP_START(map, 16, h8s2655_device)
 	AM_RANGE(0xffffb4, 0xffffb7) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcor_r,  tcor_w,  0x00ff)
 	AM_RANGE(0xffffb8, 0xffffb9) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcnt_r,  tcnt_w,  0xff00)
 	AM_RANGE(0xffffb8, 0xffffb9) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcnt_r,  tcnt_w,  0x00ff)
+	AM_RANGE(0xffffbc, 0xffffbd) AM_DEVREADWRITE( "watchdog",  h8_watchdog_device,        wd_r,    wd_w           )
+	AM_RANGE(0xffffbe, 0xffffbf) AM_DEVREADWRITE( "watchdog",  h8_watchdog_device,        rst_r,   rst_w          )
 	AM_RANGE(0xffffc0, 0xffffc1) AM_DEVREADWRITE8("timer16",   h8_timer16_device,         tstr_r,  tstr_w,  0xff00)
 	AM_RANGE(0xffffc0, 0xffffc1) AM_DEVREADWRITE8("timer16",   h8_timer16_device,         tsyr_r,  tsyr_w,  0x00ff)
 	AM_RANGE(0xffffd0, 0xffffd1) AM_DEVREADWRITE8("timer16:0", h8_timer16_channel_device, tcr_r,   tcr_w,   0xff00)
@@ -406,6 +413,7 @@ void h8s2655_device::internal_update(UINT64 current_time)
 	add_event(event_time, timer16_3->internal_update(current_time));
 	add_event(event_time, timer16_4->internal_update(current_time));
 	add_event(event_time, timer16_5->internal_update(current_time));
+	add_event(event_time, watchdog->internal_update(current_time));
 
 	recompute_bcount(event_time);
 }
@@ -430,5 +438,5 @@ WRITE8_MEMBER(h8s2655_device::syscr_w)
 {
 	syscr = data;
 	update_irq_filter();
-	logerror("%s: syscr = %02x\n", tag(), data);
+	logerror("syscr = %02x\n", data);
 }

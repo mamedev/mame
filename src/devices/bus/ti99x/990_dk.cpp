@@ -178,7 +178,7 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
         return TRUE;
     }
 
-    if (m_drv[unit].img == NULL || !m_drv[unit].img->exists())
+    if (m_drv[unit].img == nullptr || !m_drv[unit].img->exists())
     {
         m_stat_reg |= status_drv_not_ready;
         return TRUE;
@@ -186,7 +186,7 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
 
     if (m_drv[unit].log_cylinder[head] == -1)
     {
-        if (!read_id(unit, head, &m_drv[unit].log_cylinder[head], NULL))
+        if (!read_id(unit, head, &m_drv[unit].log_cylinder[head], nullptr))
         {
             m_stat_reg |= status_ID_not_found;
             return TRUE;
@@ -205,7 +205,7 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
         if (m_drv[unit].phys_cylinder != -1)
             m_drv[unit].phys_cylinder += cylinder-m_drv[unit].log_cylinder[head];
 
-        if (!read_id(unit, head, &m_drv[unit].log_cylinder[head], NULL))
+        if (!read_id(unit, head, &m_drv[unit].log_cylinder[head], nullptr))
         {
             m_drv[unit].log_cylinder[head] = -1;
             m_stat_reg |= status_ID_not_found;
@@ -852,7 +852,7 @@ WRITE8_MEMBER( fd800_legacy_device::cru_w )
 #if 0
 LEGACY_FLOPPY_OPTIONS_START(fd800)
 	// SSSD 8"
-	LEGACY_FLOPPY_OPTION(fd800, "dsk", "TI990 8\" SSSD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+	LEGACY_FLOPPY_OPTION(fd800, "dsk", "TI990 8\" SSSD disk image", basicdsk_identify_default, basicdsk_construct_default, nullptr,
 		HEADS([1])
 		TRACKS([77])
 		SECTORS([26])
@@ -860,7 +860,7 @@ LEGACY_FLOPPY_OPTIONS_START(fd800)
 		FIRST_SECTOR_ID([1]))
 
 	// DSSD 8"
-	LEGACY_FLOPPY_OPTION(fd800, "dsk", "TI990 8\" DSSD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+	LEGACY_FLOPPY_OPTION(fd800, "dsk", "TI990 8\" DSSD disk image", basicdsk_identify_default, basicdsk_construct_default, nullptr,
 		HEADS([2])
 		TRACKS([77])
 		SECTORS([26])

@@ -41,12 +41,11 @@ Check game speed, it depends on a bit we toggle..
 
 /* The top 64k of samples are banked (16 banks total) */
 
-WRITE16_MEMBER(blmbycar_state::blmbycar_okibank_w)
+WRITE16_MEMBER(blmbycar_state::okibank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = memregion("oki")->base();
-		memcpy(&RAM[0x30000], &RAM[0x40000 + 0x10000 * (data & 0xf)], 0x10000);
+		membank("okibank")->set_entry(data & 0x0f);
 	}
 }
 
@@ -98,12 +97,12 @@ READ16_MEMBER(blmbycar_state::blmbycar_opt_wheel_r)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( blmbycar_map, AS_PROGRAM, 16, blmbycar_state )
+static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
 	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY                                               // ???
-	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_SHARE("vram_1") // Layer 1
-	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_SHARE("vram_0") // Layer 0
+	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1") // Layer 1
+	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") // Layer 0
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY                                               // ???
 	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_SHARE("scroll_1")              // Scroll 1
 	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_SHARE("scroll_0")              // Scroll 0
@@ -113,12 +112,17 @@ static ADDRESS_MAP_START( blmbycar_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_SHARE("spriteram")// Sprites (size?)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(okibank_w)                               // Sound
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( blmbycar_map, AS_PROGRAM, 16, blmbycar_state )
+	AM_IMPORT_FROM(common_map)
+
 	AM_RANGE(0x700004, 0x700005) AM_READ(blmbycar_opt_wheel_r)                              // Wheel (optical)
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("UNK")
 	AM_RANGE(0x700008, 0x700009) AM_READ(blmbycar_pot_wheel_r)                              // Wheel (potentiometer)
 	AM_RANGE(0x70000a, 0x70000b) AM_WRITENOP                                                // ? Wheel
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(blmbycar_okibank_w)                               // Sound
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0x70006a, 0x70006b) AM_WRITE(blmbycar_pot_wheel_reset_w)                       // Wheel (potentiometer)
 	AM_RANGE(0x70007a, 0x70007b) AM_WRITE(blmbycar_pot_wheel_shift_w)                       //
 ADDRESS_MAP_END
@@ -130,25 +134,16 @@ READ16_MEMBER(blmbycar_state::waterball_unk_r)
 }
 
 static ADDRESS_MAP_START( watrball_map, AS_PROGRAM, 16, blmbycar_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
-	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY                                               // ???
-	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_SHARE("vram_1") // Layer 1
-	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_SHARE("vram_0") // Layer 0
-	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY                                               // ???
-	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_SHARE("scroll_1")                  // Scroll 1
-	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_SHARE("scroll_0")                  // Scroll 0
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") AM_MIRROR(0x4000) // Palette
-	AM_RANGE(0x200600, 0x203fff) AM_RAM AM_MIRROR(0x4000)
-	AM_RANGE(0x440000, 0x441fff) AM_RAM
-	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_SHARE("spriteram")// Sprites (size?)
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
+	AM_IMPORT_FROM(common_map)
+
 	AM_RANGE(0x700006, 0x700007) AM_READNOP                                                 // read
 	AM_RANGE(0x700008, 0x700009) AM_READ(waterball_unk_r)                                   // 0x0008 must toggle
 	AM_RANGE(0x70000a, 0x70000b) AM_WRITEONLY                                               // ?? busy
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(blmbycar_okibank_w)                               // Sound
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  //
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( blmbycar_oki_map, AS_0, 8, blmbycar_state )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -334,6 +329,8 @@ MACHINE_START_MEMBER(blmbycar_state,blmbycar)
 {
 	save_item(NAME(m_pot_wheel));
 	save_item(NAME(m_old_val));
+
+	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
 MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
@@ -359,7 +356,7 @@ static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x180, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0x100-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update_blmbycar)
+	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blmbycar)
@@ -371,6 +368,7 @@ static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, blmbycar_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -379,6 +377,8 @@ MACHINE_CONFIG_END
 MACHINE_START_MEMBER(blmbycar_state,watrball)
 {
 	save_item(NAME(m_retvalue));
+
+	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
 MACHINE_RESET_MEMBER(blmbycar_state,watrball)
@@ -386,35 +386,19 @@ MACHINE_RESET_MEMBER(blmbycar_state,watrball)
 	m_retvalue = 0;
 }
 
-static MACHINE_CONFIG_START( watrball, blmbycar_state )
+static MACHINE_CONFIG_DERIVED( watrball, blmbycar )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12MHz */
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(watrball_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blmbycar_state,  irq1_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(blmbycar_state,watrball)
 	MCFG_MACHINE_RESET_OVERRIDE(blmbycar_state,watrball)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(0x180, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 16, 0x100-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update_blmbycar)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blmbycar)
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -450,10 +434,9 @@ ROM_START( blmbycar )
 	ROM_LOAD( "bc_rom9",   0x100000, 0x080000, CRC(0337ab3d) SHA1(18c72cd640c7b599390dffaeb670f5832202bf06) )
 	ROM_LOAD( "bc_rom10",  0x180000, 0x080000, CRC(5458917e) SHA1(c8dd5a391cc20a573e27a140b185893a8c04859e) )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* 8 bit adpcm (banked) */
-	ROM_LOAD( "bc_rom1",     0x040000, 0x080000, CRC(ac6f8ba1) SHA1(69d2d47cdd331bde5a8973d29659b3f8520452e7) )
-	ROM_LOAD( "bc_rom2",     0x0c0000, 0x080000, CRC(a4bc31bf) SHA1(f3d60141a91449a73f6cec9f4bc5d95ca7911e19) )
-	ROM_COPY( "oki", 0x040000, 0x000000,   0x040000 )
+	ROM_REGION( 0x100000, "oki", 0 )    /* 8 bit adpcm (banked) */
+	ROM_LOAD( "bc_rom1",     0x000000, 0x080000, CRC(ac6f8ba1) SHA1(69d2d47cdd331bde5a8973d29659b3f8520452e7) )
+	ROM_LOAD( "bc_rom2",     0x080000, 0x080000, CRC(a4bc31bf) SHA1(f3d60141a91449a73f6cec9f4bc5d95ca7911e19) )
 ROM_END
 
 ROM_START( blmbycaru )
@@ -467,10 +450,9 @@ ROM_START( blmbycaru )
 	ROM_LOAD( "bc_rom9",   0x100000, 0x080000, CRC(0337ab3d) SHA1(18c72cd640c7b599390dffaeb670f5832202bf06) )
 	ROM_LOAD( "bc_rom10",  0x180000, 0x080000, CRC(5458917e) SHA1(c8dd5a391cc20a573e27a140b185893a8c04859e) )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* 8 bit adpcm (banked) */
-	ROM_LOAD( "bc_rom1",     0x040000, 0x080000, CRC(ac6f8ba1) SHA1(69d2d47cdd331bde5a8973d29659b3f8520452e7) )
-	ROM_LOAD( "bc_rom2",     0x0c0000, 0x080000, CRC(a4bc31bf) SHA1(f3d60141a91449a73f6cec9f4bc5d95ca7911e19) )
-	ROM_COPY( "oki", 0x040000, 0x000000,   0x040000 )
+	ROM_REGION( 0x100000, "oki", 0 )    /* 8 bit adpcm (banked) */
+	ROM_LOAD( "bc_rom1",     0x000000, 0x080000, CRC(ac6f8ba1) SHA1(69d2d47cdd331bde5a8973d29659b3f8520452e7) )
+	ROM_LOAD( "bc_rom2",     0x080000, 0x080000, CRC(a4bc31bf) SHA1(f3d60141a91449a73f6cec9f4bc5d95ca7911e19) )
 ROM_END
 
 /*
@@ -478,7 +460,7 @@ ROM_END
 Waterball by ABM (sticker on the pcb 12-3-96)
 The pcb has some empty sockets, maybe it was used for other games since it has no markings.
 
-The game has fonts identical to World rally and obiviously Blomby car ;)
+The game has fonts identical to World Rally and obviously Blomby Car ;)
 
 1x 68k
 1x oki 6295
@@ -500,10 +482,9 @@ ROM_START( watrball )
 	ROM_LOAD( "rom9.bin",   0x100000, 0x080000, CRC(122cc0ad) SHA1(27cdb19fa082089e47c5cdb44742cfd93aa23a00) )
 	ROM_LOAD( "rom10.bin",  0x180000, 0x080000, CRC(22a2a706) SHA1(c7350a94a857e0007d7fc0076b44a3d62693cb6c) )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* 8 bit adpcm (banked) */
-	ROM_LOAD( "rom1.bin",     0x040000, 0x080000, CRC(7f88dee7) SHA1(d493b961fa4631185a33faee7f61786430707209))
-//  ROM_LOAD( "rom2.bin",     0x0c0000, 0x080000, /* not populated for this game */ )
-	ROM_COPY( "oki", 0x040000, 0x000000,   0x040000 )
+	ROM_REGION( 0x100000, "oki", 0 )    /* 8 bit adpcm (banked) */
+	ROM_LOAD( "rom1.bin",     0x000000, 0x080000, CRC(7f88dee7) SHA1(d493b961fa4631185a33faee7f61786430707209))
+//  ROM_LOAD( "rom2.bin",     0x080000, 0x080000, /* not populated for this game */ )
 ROM_END
 
 

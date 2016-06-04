@@ -148,12 +148,12 @@ void png_free(png_info *pnginfo)
     header at the current file location
 -------------------------------------------------*/
 
-static png_error verify_header(core_file *fp)
+static png_error verify_header(util::core_file &fp)
 {
 	UINT8 signature[8];
 
 	/* read 8 bytes */
-	if (core_fread(fp, signature, 8) != 8)
+	if (fp.read(signature, 8) != 8)
 		return PNGERR_FILE_TRUNCATED;
 
 	/* return an error if we don't match */
@@ -168,18 +168,18 @@ static png_error verify_header(core_file *fp)
     read_chunk - read the next PNG chunk
 -------------------------------------------------*/
 
-static png_error read_chunk(core_file *fp, UINT8 **data, UINT32 *type, UINT32 *length)
+static png_error read_chunk(util::core_file &fp, UINT8 **data, UINT32 *type, UINT32 *length)
 {
 	UINT32 crc, chunk_crc;
 	UINT8 tempbuff[4];
 
 	/* fetch the length of this chunk */
-	if (core_fread(fp, tempbuff, 4) != 4)
+	if (fp.read(tempbuff, 4) != 4)
 		return PNGERR_FILE_TRUNCATED;
 	*length = fetch_32bit(tempbuff);
 
 	/* fetch the type of this chunk */
-	if (core_fread(fp, tempbuff, 4) != 4)
+	if (fp.read(tempbuff, 4) != 4)
 		return PNGERR_FILE_TRUNCATED;
 	*type = fetch_32bit(tempbuff);
 
@@ -200,7 +200,7 @@ static png_error read_chunk(core_file *fp, UINT8 **data, UINT32 *type, UINT32 *l
 			return PNGERR_OUT_OF_MEMORY;
 
 		/* read the data from the file */
-		if (core_fread(fp, *data, *length) != *length)
+		if (fp.read(*data, *length) != *length)
 		{
 			free(*data);
 			*data = nullptr;
@@ -212,7 +212,7 @@ static png_error read_chunk(core_file *fp, UINT8 **data, UINT32 *type, UINT32 *l
 	}
 
 	/* read the CRC */
-	if (core_fread(fp, tempbuff, 4) != 4)
+	if (fp.read(tempbuff, 4) != 4)
 	{
 		free(*data);
 		*data = nullptr;
@@ -312,7 +312,7 @@ static png_error process_chunk(png_private *png, UINT8 *data, UINT32 type, UINT3
 			text->next = nullptr;
 
 			/* add to the end of the list */
-			for (pt = nullptr, ct = png->pnginfo->textlist; ct != nullptr; pt = ct, ct = ct->next) ;
+			for (pt = nullptr, ct = png->pnginfo->textlist; ct != nullptr; pt = ct, ct = ct->next) { }
 			if (pt == nullptr)
 				png->pnginfo->textlist = text;
 			else
@@ -502,7 +502,7 @@ handle_error:
     png_read_file - read a PNG from a core stream
 -------------------------------------------------*/
 
-png_error png_read_file(core_file *fp, png_info *pnginfo)
+png_error png_read_file(util::core_file &fp, png_info *pnginfo)
 {
 	UINT8 *chunk_data = nullptr;
 	png_private png;
@@ -579,7 +579,7 @@ handle_error:
     bitmap
 -------------------------------------------------*/
 
-png_error png_read_bitmap(core_file *fp, bitmap_argb32 &bitmap)
+png_error png_read_bitmap(util::core_file &fp, bitmap_argb32 &bitmap)
 {
 	png_error result;
 	png_info png;
@@ -726,13 +726,13 @@ png_error png_add_text(png_info *pnginfo, const char *keyword, const char *text)
 	strcpy(textdata, keyword);
 	strcpy(textdata + keylen + 1, text);
 
-	/* text follows a trailing NULL */
+	/* text follows a trailing nullptr */
 	newtext->keyword = textdata;
 	newtext->text = textdata + keylen + 1;
 	newtext->next = nullptr;
 
 	/* add us to the end of the linked list */
-	for (pt = nullptr, ct = pnginfo->textlist; ct != nullptr; pt = ct, ct = ct->next) ;
+	for (pt = nullptr, ct = pnginfo->textlist; ct != nullptr; pt = ct, ct = ct->next) { }
 	if (pt == nullptr)
 		pnginfo->textlist = newtext;
 	else
@@ -747,7 +747,7 @@ png_error png_add_text(png_info *pnginfo, const char *keyword, const char *text)
     the given file
 -------------------------------------------------*/
 
-static png_error write_chunk(core_file *fp, const UINT8 *data, UINT32 type, UINT32 length)
+static png_error write_chunk(util::core_file &fp, const UINT8 *data, UINT32 type, UINT32 length)
 {
 	UINT8 tempbuff[8];
 	UINT32 crc;
@@ -758,20 +758,20 @@ static png_error write_chunk(core_file *fp, const UINT8 *data, UINT32 type, UINT
 	crc = crc32(0, tempbuff + 4, 4);
 
 	/* write that data */
-	if (core_fwrite(fp, tempbuff, 8) != 8)
+	if (fp.write(tempbuff, 8) != 8)
 		return PNGERR_FILE_ERROR;
 
 	/* append the actual data */
 	if (length > 0)
 	{
-		if (core_fwrite(fp, data, length) != length)
+		if (fp.write(data, length) != length)
 			return PNGERR_FILE_ERROR;
 		crc = crc32(crc, data, length);
 	}
 
 	/* write the CRC */
 	put_32bit(tempbuff, crc);
-	if (core_fwrite(fp, tempbuff, 4) != 4)
+	if (fp.write(tempbuff, 4) != 4)
 		return PNGERR_FILE_ERROR;
 
 	return PNGERR_NONE;
@@ -783,9 +783,9 @@ static png_error write_chunk(core_file *fp, const UINT8 *data, UINT32 type, UINT
     chunk to the given file by deflating it
 -------------------------------------------------*/
 
-static png_error write_deflated_chunk(core_file *fp, UINT8 *data, UINT32 type, UINT32 length)
+static png_error write_deflated_chunk(util::core_file &fp, UINT8 *data, UINT32 type, UINT32 length)
 {
-	UINT64 lengthpos = core_ftell(fp);
+	UINT64 lengthpos = fp.tell();
 	UINT8 tempbuff[8192];
 	UINT32 zlength = 0;
 	z_stream stream;
@@ -798,7 +798,7 @@ static png_error write_deflated_chunk(core_file *fp, UINT8 *data, UINT32 type, U
 	crc = crc32(0, tempbuff + 4, 4);
 
 	/* write that data */
-	if (core_fwrite(fp, tempbuff, 8) != 8)
+	if (fp.write(tempbuff, 8) != 8)
 		return PNGERR_FILE_ERROR;
 
 	/* initialize the stream */
@@ -821,7 +821,7 @@ static png_error write_deflated_chunk(core_file *fp, UINT8 *data, UINT32 type, U
 		if (stream.avail_out < sizeof(tempbuff))
 		{
 			int bytes = sizeof(tempbuff) - stream.avail_out;
-			if (core_fwrite(fp, tempbuff, bytes) != bytes)
+			if (fp.write(tempbuff, bytes) != bytes)
 			{
 				deflateEnd(&stream);
 				return PNGERR_FILE_ERROR;
@@ -849,17 +849,17 @@ static png_error write_deflated_chunk(core_file *fp, UINT8 *data, UINT32 type, U
 
 	/* write the CRC */
 	put_32bit(tempbuff, crc);
-	if (core_fwrite(fp, tempbuff, 4) != 4)
+	if (fp.write(tempbuff, 4) != 4)
 		return PNGERR_FILE_ERROR;
 
 	/* seek back and update the length */
-	core_fseek(fp, lengthpos, SEEK_SET);
+	fp.seek(lengthpos, SEEK_SET);
 	put_32bit(tempbuff + 0, zlength);
-	if (core_fwrite(fp, tempbuff, 4) != 4)
+	if (fp.write(tempbuff, 4) != 4)
 		return PNGERR_FILE_ERROR;
 
 	/* return to the end */
-	core_fseek(fp, lengthpos + 8 + zlength + 4, SEEK_SET);
+	fp.seek(lengthpos + 8 + zlength + 4, SEEK_SET);
 	return PNGERR_NONE;
 }
 
@@ -905,7 +905,7 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 		return PNGERR_OUT_OF_MEMORY;
 	}
 
-	/* copy in the pixels, specifying a NULL filter */
+	/* copy in the pixels, specifying a nullptr filter */
 	for (y = 0; y < pnginfo->height; y++)
 	{
 		UINT16 *src = reinterpret_cast<UINT16 *>(bitmap.raw_pixptr(y));
@@ -944,7 +944,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
 	if (pnginfo->image == nullptr)
 		return PNGERR_OUT_OF_MEMORY;
 
-	/* copy in the pixels, specifying a NULL filter */
+	/* copy in the pixels, specifying a nullptr filter */
 	for (y = 0; y < pnginfo->height; y++)
 	{
 		UINT8 *dst = pnginfo->image + y * (rowbytes + 1);
@@ -1006,7 +1006,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
     chunks to the given file
 -------------------------------------------------*/
 
-static png_error write_png_stream(core_file *fp, png_info *pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+static png_error write_png_stream(util::core_file &fp, png_info *pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
 	UINT8 tempbuff[16];
 	png_text *text;
@@ -1061,7 +1061,7 @@ handle_error:
 }
 
 
-png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+png_error png_write_bitmap(util::core_file &fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
 	png_info pnginfo;
 	png_error error;
@@ -1074,7 +1074,7 @@ png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t &bitmap, int 
 	}
 
 	/* write the PNG signature */
-	if (core_fwrite(fp, PNG_Signature, 8) != 8)
+	if (fp.write(PNG_Signature, 8) != 8)
 	{
 		if (info == &pnginfo)
 			png_free(&pnginfo);
@@ -1097,7 +1097,7 @@ png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t &bitmap, int 
 ********************************************************************************/
 
 /**
- * @fn  png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate)
+ * @fn  png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, double rate)
  *
  * @brief   Mng capture start.
  *
@@ -1108,12 +1108,12 @@ png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t &bitmap, int 
  * @return  A png_error.
  */
 
-png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate)
+png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, double rate)
 {
 	UINT8 mhdr[28];
 	png_error error;
 
-	if (core_fwrite(fp, MNG_Signature, 8) != 8)
+	if (fp.write(MNG_Signature, 8) != 8)
 		return PNGERR_FILE_ERROR;
 
 	memset(mhdr, 0, 28);
@@ -1131,7 +1131,7 @@ png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate)
 }
 
 /**
- * @fn  png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+ * @fn  png_error mng_capture_frame(util::core_file &fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
  *
  * @brief   Mng capture frame.
  *
@@ -1144,13 +1144,13 @@ png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate)
  * @return  A png_error.
  */
 
-png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+png_error mng_capture_frame(util::core_file &fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
 	return write_png_stream(fp, info, bitmap, palette_length, palette);
 }
 
 /**
- * @fn  png_error mng_capture_stop(core_file *fp)
+ * @fn  png_error mng_capture_stop(util::core_file &fp)
  *
  * @brief   Mng capture stop.
  *
@@ -1159,7 +1159,7 @@ png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int
  * @return  A png_error.
  */
 
-png_error mng_capture_stop(core_file *fp)
+png_error mng_capture_stop(util::core_file &fp)
 {
 	return write_chunk(fp, nullptr, MNG_CN_MEND, 0);
 }

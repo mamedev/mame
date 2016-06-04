@@ -14,7 +14,7 @@ dofile("mess.lua")
 
 function createProjects_mame_mame(_target, _subtarget)
 	createProjects_mame_arcade(_target, _subtarget)
-	createProjects_mame_mess(_target, _subtarget)	
+	createProjects_mame_mess(_target, _subtarget)
 end
 
 function linkProjects_mame_mame(_target, _subtarget)

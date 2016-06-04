@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "emu.h"
+#include "machine/gen_latch.h"
 #include "cpu/z80/z80.h"
 
 class zerozone_state : public driver_device
@@ -16,6 +17,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
+			m_soundlatch(*this, "soundlatch"),
 			m_vram(*this, "videoram"),
 			m_gfxdecode(*this, "gfxdecode")
 	{ }
@@ -30,6 +32,7 @@ public:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<z80_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	// shared pointers
 	required_shared_ptr<UINT16> m_vram;

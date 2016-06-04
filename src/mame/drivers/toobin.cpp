@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "machine/atarigen.h"
 #include "includes/toobin.h"
 
@@ -86,7 +87,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
 	AM_RANGE(0xc09800, 0xc09fff) AM_MIRROR(0x046000) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0xc10000, 0xc107ff) AM_MIRROR(0x047800) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff6000, 0xff6001) AM_READNOP     /* who knows? read at controls time */
-	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x4500fe) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x4500fe) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xff8100, 0xff8101) AM_MIRROR(0x4500fe) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
 	AM_RANGE(0xff8300, 0xff8301) AM_MIRROR(0x45003e) AM_WRITE(intensity_w)
 	AM_RANGE(0xff8340, 0xff8341) AM_MIRROR(0x45003e) AM_WRITE(interrupt_scan_w) AM_SHARE("interrupt_scan")
@@ -203,7 +204,8 @@ static MACHINE_CONFIG_START( toobin, toobin_state )
 
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 4, toobin_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
@@ -250,9 +252,8 @@ ROM_START( toobin )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "1141-2k.061",  0x010000, 0x004000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "1101-1a.061",  0x000000, 0x010000, CRC(02696f15) SHA1(51856c331c45d287e574e2e4013b62a6472ad720) )
@@ -306,9 +307,8 @@ ROM_START( toobine )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "1141-2k.061",  0x010000, 0x004000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "1101-1a.061",  0x000000, 0x010000, CRC(02696f15) SHA1(51856c331c45d287e574e2e4013b62a6472ad720) )
@@ -362,9 +362,8 @@ ROM_START( toobing )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "1141-2k.061",  0x010000, 0x004000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "1101-1a.061",  0x000000, 0x010000, CRC(02696f15) SHA1(51856c331c45d287e574e2e4013b62a6472ad720) )
@@ -418,9 +417,8 @@ ROM_START( toobin2e )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "1141-2k.061",  0x010000, 0x004000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "1101-1a.061",  0x000000, 0x010000, CRC(02696f15) SHA1(51856c331c45d287e574e2e4013b62a6472ad720) )
@@ -474,9 +472,8 @@ ROM_START( toobin2 )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "1141-2k.061",  0x010000, 0x004000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "1101-1a.061",  0x000000, 0x010000, CRC(02696f15) SHA1(51856c331c45d287e574e2e4013b62a6472ad720) )
@@ -530,9 +527,8 @@ ROM_START( toobin1 )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
-	ROM_LOAD( "1141-2k.061",  0x010000, 0x004000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
-	ROM_CONTINUE(             0x004000, 0x00c000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "1101-1a.061",  0x000000, 0x010000, CRC(02696f15) SHA1(51856c331c45d287e574e2e4013b62a6472ad720) )

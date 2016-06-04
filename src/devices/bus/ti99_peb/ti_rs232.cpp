@@ -199,7 +199,7 @@ bool ti_rs232_attached_device::call_load()
 	}
 
 	// The following line may cause trouble in the init phase
-	// card->incoming_dtr(devnumber, (m_file!=NULL)? ASSERT_LINE : CLEAR_LINE);
+	// card->incoming_dtr(devnumber, (m_file!=nullptr)? ASSERT_LINE : CLEAR_LINE);
 
 	return false;  // OK
 }
@@ -1099,7 +1099,7 @@ MACHINE_CONFIG_END
 
 ROM_START( ti_rs232 )
 	ROM_REGION(0x1000, DSRROM, 0)
-	ROM_LOAD("rs232.bin", 0x0000, 0x1000, CRC(eab382fb) SHA1(ee609a18a21f1a3ddab334e8798d5f2a0fcefa91)) /* TI rs232 DSR ROM */
+	ROM_LOAD("rs232pio_dsr.u1", 0x0000, 0x1000, CRC(eab382fb) SHA1(ee609a18a21f1a3ddab334e8798d5f2a0fcefa91)) /* TI rs232 DSR ROM */
 ROM_END
 
 INPUT_PORTS_START( ti_rs232 )

@@ -16,6 +16,9 @@
 #include "bus/intv/ecs.h"
 //#include "bus/intv/keycomp.h"
 
+#include "bus/intv_ctrl/ctrl.h"
+#include "bus/intv_ctrl/handctrl.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -43,7 +46,6 @@ public:
 		m_iocart2(*this, "ioslot2"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_keyboard(*this, "keyboard"),
-		m_io_options(*this, "OPTIONS"),
 		m_io_test(*this, "TEST"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
@@ -118,19 +120,13 @@ protected:
 	optional_device<generic_slot_device> m_iocart2;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_keyboard;
-	required_ioport m_io_options;
 	optional_ioport m_io_test;
 
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	ioport_port *m_keypad[4];
-	ioport_port *m_disc[4];
-	ioport_port *m_discx[4];
-	ioport_port *m_discy[4];
 	ioport_port *m_intv_keyboard[10];
 
-	UINT8 intv_control_r(int hand);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

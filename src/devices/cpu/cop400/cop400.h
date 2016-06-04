@@ -111,12 +111,6 @@ enum cop400_cko_bond {
 	COP400_CKO_GENERAL_PURPOSE_INPUT
 };
 
-/* microbus bonding options */
-enum cop400_microbus {
-	COP400_MICROBUS_DISABLED = 0,
-	COP400_MICROBUS_ENABLED
-};
-
 
 #define MCFG_COP400_CONFIG(_cki, _cko, _microbus) \
 	cop400_cpu_device::set_cki(*device, _cki); \
@@ -146,7 +140,10 @@ public:
 
 	static void set_cki(device_t &device, cop400_cki_bond cki) { downcast<cop400_cpu_device &>(device).m_cki = cki; }
 	static void set_cko(device_t &device, cop400_cko_bond cko) { downcast<cop400_cpu_device &>(device).m_cko = cko; }
-	static void set_microbus(device_t &device, cop400_microbus microbus) { downcast<cop400_cpu_device &>(device).m_microbus = microbus; }
+	static void set_microbus(device_t &device, bool has_microbus) { downcast<cop400_cpu_device &>(device).m_has_microbus = has_microbus; }
+
+	DECLARE_READ8_MEMBER( microbus_rd );
+	DECLARE_WRITE8_MEMBER( microbus_wr );
 
 protected:
 	// device-level overrides
@@ -194,7 +191,7 @@ protected:
 
 	cop400_cki_bond m_cki;
 	cop400_cko_bond m_cko;
-	cop400_microbus m_microbus;
+	bool m_has_microbus;
 
 	bool m_has_counter;
 	bool m_has_inil;
@@ -241,9 +238,6 @@ protected:
 	int m_halt;               /* halt mode */
 	int m_idle;               /* idle mode */
 
-	/* microbus */
-	int m_microbus_int;       /* microbus interrupt */
-
 	/* execution logic */
 	int m_InstLen[256];       /* instruction length in bytes */
 	int m_icount;             /* instruction counter */
@@ -252,7 +246,6 @@ protected:
 	emu_timer *m_serial_timer;
 	emu_timer *m_counter_timer;
 	emu_timer *m_inil_timer;
-	emu_timer *m_microbus_timer;
 
 	typedef void ( cop400_cpu_device::*cop400_opcode_func ) (UINT8 opcode);
 
@@ -277,7 +270,6 @@ protected:
 	void serial_tick();
 	void counter_tick();
 	void inil_tick();
-	void microbus_tick();
 
 	void PUSH(UINT16 data);
 	void POP();

@@ -18,28 +18,28 @@
 #include "emu.h"
 #include "gl_shader_tool.h"
 
-PFNGLGETOBJECTPARAMETERIVARBPROC pfn_glGetObjectParameterivARB=NULL;
-PFNGLGETINFOLOGARBPROC pfn_glGetInfoLogARB=NULL;
-PFNGLDELETEOBJECTARBPROC pfn_glDeleteObjectARB=NULL;
-PFNGLCREATESHADEROBJECTARBPROC pfn_glCreateShaderObjectARB=NULL;
-PFNGLSHADERSOURCEARBPROC pfn_glShaderSourceARB=NULL;
-PFNGLCOMPILESHADERARBPROC pfn_glCompileShaderARB=NULL;
-PFNGLCREATEPROGRAMOBJECTARBPROC pfn_glCreateProgramObjectARB=NULL;
-PFNGLATTACHOBJECTARBPROC pfn_glAttachObjectARB=NULL;
-PFNGLLINKPROGRAMARBPROC pfn_glLinkProgramARB=NULL;
-PFNGLVALIDATEPROGRAMARBPROC pfn_glValidateProgramARB=NULL;
-PFNGLUSEPROGRAMOBJECTARBPROC pfn_glUseProgramObjectARB=NULL;
-PFNGLGETUNIFORMLOCATIONARBPROC pfn_glGetUniformLocationARB=NULL;
-PFNGLUNIFORM1FARBPROC pfn_glUniform1fARB=NULL;
-PFNGLUNIFORM1IARBPROC pfn_glUniform1iARB=NULL;
-PFNGLUNIFORM1FVARBPROC pfn_glUniform1fvARB=NULL;
-PFNGLUNIFORM2FVARBPROC pfn_glUniform2fvARB=NULL;
-PFNGLUNIFORM3FVARBPROC pfn_glUniform3fvARB=NULL;
-PFNGLUNIFORM4FVARBPROC pfn_glUniform4fvARB=NULL;
-PFNGLUNIFORM1IVARBPROC pfn_glUniform1ivARB=NULL;
-PFNGLUNIFORM2IVARBPROC pfn_glUniform2ivARB=NULL;
-PFNGLUNIFORM3IVARBPROC pfn_glUniform3ivARB=NULL;
-PFNGLUNIFORM4IVARBPROC pfn_glUniform4ivARB=NULL;
+PFNGLGETOBJECTPARAMETERIVARBPROC pfn_glGetObjectParameterivARB= nullptr;
+PFNGLGETINFOLOGARBPROC pfn_glGetInfoLogARB= nullptr;
+PFNGLDELETEOBJECTARBPROC pfn_glDeleteObjectARB= nullptr;
+PFNGLCREATESHADEROBJECTARBPROC pfn_glCreateShaderObjectARB= nullptr;
+PFNGLSHADERSOURCEARBPROC pfn_glShaderSourceARB= nullptr;
+PFNGLCOMPILESHADERARBPROC pfn_glCompileShaderARB= nullptr;
+PFNGLCREATEPROGRAMOBJECTARBPROC pfn_glCreateProgramObjectARB= nullptr;
+PFNGLATTACHOBJECTARBPROC pfn_glAttachObjectARB= nullptr;
+PFNGLLINKPROGRAMARBPROC pfn_glLinkProgramARB= nullptr;
+PFNGLVALIDATEPROGRAMARBPROC pfn_glValidateProgramARB= nullptr;
+PFNGLUSEPROGRAMOBJECTARBPROC pfn_glUseProgramObjectARB= nullptr;
+PFNGLGETUNIFORMLOCATIONARBPROC pfn_glGetUniformLocationARB= nullptr;
+PFNGLUNIFORM1FARBPROC pfn_glUniform1fARB= nullptr;
+PFNGLUNIFORM1IARBPROC pfn_glUniform1iARB= nullptr;
+PFNGLUNIFORM1FVARBPROC pfn_glUniform1fvARB= nullptr;
+PFNGLUNIFORM2FVARBPROC pfn_glUniform2fvARB= nullptr;
+PFNGLUNIFORM3FVARBPROC pfn_glUniform3fvARB= nullptr;
+PFNGLUNIFORM4FVARBPROC pfn_glUniform4fvARB= nullptr;
+PFNGLUNIFORM1IVARBPROC pfn_glUniform1ivARB= nullptr;
+PFNGLUNIFORM2IVARBPROC pfn_glUniform2ivARB= nullptr;
+PFNGLUNIFORM3IVARBPROC pfn_glUniform3ivARB= nullptr;
+PFNGLUNIFORM4IVARBPROC pfn_glUniform4ivARB= nullptr;
 
 
 int gl_shader_loadExtention(osd_gl_context *gl_ctx)
@@ -256,7 +256,7 @@ int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsi
 	glTexImage2D (texTargetProxy, level,
 			internalFormat,
 			width, height,
-			border, format, type, NULL);
+			border, format, type, nullptr);
 	if ( 0!=(err=GL_CHECK_ERROR_NORMAL() )) return err;
 
 	glGetTexLevelParameteriv( texTargetProxy, level, GL_TEXTURE_WIDTH,  avail_width);
@@ -305,7 +305,7 @@ static int delete_shader_tool( GLhandleARB *program, GLhandleARB *vertex_shader,
 	int res=0;
 
 	GL_CHECK_ERROR_QUIET();
-	if(program!=NULL && *program!=0)
+	if(program!= nullptr && *program!=0)
 	{
 		pfn_glDeleteObjectARB(*program);
 		if(externalcall)
@@ -314,7 +314,7 @@ static int delete_shader_tool( GLhandleARB *program, GLhandleARB *vertex_shader,
 		}
 		*program=0;
 	}
-	if(vertex_shader!=NULL && *vertex_shader!=0)
+	if(vertex_shader!= nullptr && *vertex_shader!=0)
 	{
 		pfn_glDeleteObjectARB(*vertex_shader);
 		if(externalcall)
@@ -323,7 +323,7 @@ static int delete_shader_tool( GLhandleARB *program, GLhandleARB *vertex_shader,
 		}
 		*vertex_shader=0;
 	}
-	if(fragment_shader!=NULL && *fragment_shader!=0)
+	if(fragment_shader!= nullptr && *fragment_shader!=0)
 	{
 		pfn_glDeleteObjectARB(*fragment_shader);
 		if(externalcall)
@@ -340,19 +340,19 @@ int gl_compile_shader_source( GLhandleARB *shader, GLenum type, const char * sha
 {
 		int err = 0;
 
-	if(shader==NULL || shader_source==NULL)
+	if(shader== nullptr || shader_source== nullptr)
 	{
-		if(shader==NULL)
-			osd_printf_warning("error: gl_compile_shader_source: NULL shader passed\n");
-		if(shader_source==NULL)
-			osd_printf_warning("error: gl_compile_shader_source: NULL shader source passed\n");
+		if(shader== nullptr)
+			osd_printf_warning("error: gl_compile_shader_source: nullptr shader passed\n");
+		if(shader_source== nullptr)
+			osd_printf_warning("error: gl_compile_shader_source: nullptr shader source passed\n");
 		return -1;
 	}
 		*shader = pfn_glCreateShaderObjectARB(type);
 	err=GL_SHADER_CHECK(*shader, GL_OBJECT_TYPE_ARB);
 		if(err) goto errout;
 
-		pfn_glShaderSourceARB(*shader, 1, (const GLcharARB **)&shader_source, NULL);
+		pfn_glShaderSourceARB(*shader, 1, (const GLcharARB **)&shader_source, nullptr);
 
 		pfn_glCompileShaderARB(*shader);
 		err=GL_SHADER_CHECK(*shader, GL_OBJECT_COMPILE_STATUS_ARB);
@@ -374,12 +374,12 @@ errout:
 
 int gl_compile_shader_file( GLhandleARB *shader, GLenum type, const char * shader_file, int verbose )
 {
-	if(shader==NULL || shader_file==NULL)
+	if(shader== nullptr || shader_file== nullptr)
 	{
-		if(shader==NULL)
-			osd_printf_warning("error: gl_compile_shader_source: NULL shader passed\n");
-		if(shader_file==NULL)
-			osd_printf_warning("error: gl_compile_shader_source: NULL shader file passed\n");
+		if(shader== nullptr)
+			osd_printf_warning("error: gl_compile_shader_source: nullptr shader passed\n");
+		if(shader_file== nullptr)
+			osd_printf_warning("error: gl_compile_shader_source: nullptr shader file passed\n");
 		return -1;
 	}
 

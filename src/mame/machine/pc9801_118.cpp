@@ -119,7 +119,7 @@ const rom_entry *pc9801_118_device::device_rom_region() const
 
 pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC9801_118, "pc9801_118", tag, owner, clock, "pc9801_118", __FILE__),
-//      m_maincpu(*owner, "maincpu"),
+//      m_maincpu(*this, "^maincpu"),
 		m_opn3(*this, "opn3")
 {
 }

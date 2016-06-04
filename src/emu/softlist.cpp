@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "softlist.h"
-#include "clifront.h"
 #include "validity.h"
 #include "expat.h"
 
@@ -31,7 +30,7 @@ class softlist_parser
 {
 public:
 	// construction (== execution)
-	softlist_parser(software_list_device &list, std::string &errors);
+	softlist_parser(software_list_device &list, std::ostringstream &errors);
 
 private:
 	enum parse_position
@@ -51,7 +50,7 @@ private:
 	const char *parser_error() const { return XML_ErrorString(XML_GetErrorCode(m_parser)); }
 
 	// internal error helpers
-	void ATTR_PRINTF(2,3) parse_error(const char *fmt, ...);
+	template <typename Format, typename... Params> void parse_error(Format &&fmt, Params &&... args);
 	void unknown_tag(const char *tagname) { parse_error("Unknown tag: %s", tagname); }
 	void unknown_attribute(const char *attrname) { parse_error("Unknown attribute: %s", attrname); }
 
@@ -77,7 +76,7 @@ private:
 
 	// internal parsing state
 	software_list_device &  m_list;
-	std::string &           m_errors;
+	std::ostringstream &    m_errors;
 	XML_Parser              m_parser;
 	bool                    m_done;
 	bool                    m_data_accum_expected;
@@ -128,9 +127,9 @@ const char *software_part::feature(const char *feature_name) const
 	assert(feature_name != nullptr);
 
 	// scan the feature list for an entry matching feature_name and return the value
-	for (const feature_list_item *feature = m_featurelist.first(); feature != nullptr; feature = feature->next())
-		if (strcmp(feature->name(), feature_name) == 0)
-			return feature->value();
+	for (const feature_list_item &feature : m_featurelist)
+		if (strcmp(feature.name(), feature_name) == 0)
+			return feature.value();
 	return nullptr;
 
 }
@@ -141,26 +140,48 @@ const char *software_part::feature(const char *feature_name) const
 //  with the given software_list_device
 //-------------------------------------------------
 
-bool software_part::is_compatible(const software_list_device &swlistdev) const
+software_compatibility software_part::is_compatible(const software_list_device &swlistdev) const
 {
-	// get the compatibility feature and the softlist filter; if either is NULL, assume compatible
-	const char *compatibility = feature("compatibility");
+	// get the softlist filter; if null, assume compatible
 	const char *filter = swlistdev.filter();
-	if (compatibility == nullptr || filter == nullptr)
-		return true;
+	if (filter == nullptr)
+		return SOFTWARE_IS_COMPATIBLE;
 
-	// copy the comma-delimited strings and ensure they end with a final comma
-	std::string comp = std::string(compatibility).append(",");
+	// copy the comma-delimited string and ensure it ends with a final comma
 	std::string filt = std::string(filter).append(",");
 
-	// iterate over filter items and see if they exist in the compatibility list; if so, return true
+	// get the incompatibility filter and test against it first if it exists
+	const char *incompatibility = feature("incompatibility");
+	if (incompatibility != nullptr)
+	{
+		// copy the comma-delimited string and ensure it ends with a final comma
+		std::string incomp = std::string(incompatibility).append(",");
+
+		// iterate over filter items and see if they exist in the list; if so, it's incompatible
+		for (int start = 0, end = filt.find_first_of(',',start); end != -1; start = end + 1, end = filt.find_first_of(',', start))
+		{
+			std::string token(filt, start, end - start + 1);
+			if (incomp.find(token) != -1)
+				return SOFTWARE_IS_INCOMPATIBLE;
+		}
+	}
+
+	// get the compatibility feature; if null, assume compatible
+	const char *compatibility = feature("compatibility");
+	if (compatibility == nullptr)
+		return SOFTWARE_IS_COMPATIBLE;
+
+	// copy the comma-delimited string and ensure it ends with a final comma
+	std::string comp = std::string(compatibility).append(",");
+
+	// iterate over filter items and see if they exist in the compatibility list; if so, it's compatible
 	for (int start = 0, end = filt.find_first_of(',',start); end != -1; start = end + 1, end = filt.find_first_of(',', start))
 	{
 		std::string token(filt, start, end - start + 1);
 		if (comp.find(token) != -1)
-			return true;
+			return SOFTWARE_IS_COMPATIBLE;
 	}
-	return false;
+	return SOFTWARE_NOT_COMPATIBLE;
 }
 
 
@@ -181,6 +202,34 @@ bool software_part::matches_interface(const char *interface_list) const
 	// then add a comma to the end of our interface and return true if we find it in the list string
 	std::string our_interface = std::string(m_interface).append(",");
 	return (interfaces.find(our_interface) != -1);
+}
+
+
+//-------------------------------------------------
+//  find_mountable_image - find an image interface
+//  that can automatically mount this software part
+//-------------------------------------------------
+
+device_image_interface *software_part::find_mountable_image(const machine_config &mconfig) const
+{
+	// if automount="no", don't bother
+	const char *mount = feature("automount");
+	if (mount != nullptr && strcmp(mount, "no") == 0)
+		return nullptr;
+
+	for (device_image_interface &image : image_interface_iterator(mconfig.root_device()))
+	{
+		const char *interface = image.image_interface();
+		if (interface != nullptr && matches_interface(interface))
+		{
+			// mount only if not already mounted
+			const char *option = mconfig.options().value(image.brief_instance_name());
+			if (*option == '\0' && !image.filename())
+
+				return &image;
+		}
+	}
+	return nullptr;
 }
 
 
@@ -232,14 +281,14 @@ software_part *software_info::find_part(const char *partname, const char *interf
 		return m_partdata.first();
 
 	// look for the part by name and match against the interface if provided
-	for (software_part *part = m_partdata.first(); part != nullptr; part = part->next())
-		if (partname != nullptr && strcmp(partname, part->name()) == 0)
+	for (software_part &part : m_partdata)
+		if (partname != nullptr && strcmp(partname, part.name()) == 0)
 		{
-			if (interface == nullptr || part->matches_interface(interface))
-				return part;
+			if (interface == nullptr || part.matches_interface(interface))
+				return &part;
 		}
-		else if (partname == nullptr && part->matches_interface(interface))
-				return part;
+		else if (partname == nullptr && part.matches_interface(interface))
+				return &part;
 	return nullptr;
 }
 
@@ -255,8 +304,8 @@ bool software_info::has_multiple_parts(const char *interface) const
 	int count = 0;
 
 	// increment the count for each match and stop if we hit more than 1
-	for (software_part *part = first_part(); part != nullptr; part = part->next())
-		if (part->matches_interface(interface))
+	for (software_part &part : m_partdata)
+		if (part.matches_interface(interface))
 			if (++count > 1)
 				return true;
 
@@ -338,14 +387,14 @@ void software_list_device::find_approx_matches(const char *name, int matches, so
 	}
 
 	// iterate over our info (will cause a parse if needed)
-	for (software_info *swinfo = first_software_info(); swinfo != nullptr; swinfo = swinfo->next())
+	for (software_info &swinfo : get_info())
 	{
-		software_part *part = swinfo->first_part();
-		if ((interface == nullptr || part->matches_interface(interface)) && part->is_compatible(*this))
+		software_part *part = swinfo.first_part();
+		if ((interface == nullptr || part->matches_interface(interface)) && part->is_compatible(*this) == SOFTWARE_IS_COMPATIBLE)
 		{
 			// pick the best match between driver name and description
-			int longpenalty = driver_list::penalty_compare(name, swinfo->longname());
-			int shortpenalty = driver_list::penalty_compare(name, swinfo->shortname());
+			int longpenalty = driver_list::penalty_compare(name, swinfo.longname());
+			int shortpenalty = driver_list::penalty_compare(name, swinfo.shortname());
 			int curpenalty = MIN(longpenalty, shortpenalty);
 
 			// insert into the sorted table of matches
@@ -361,7 +410,7 @@ void software_list_device::find_approx_matches(const char *name, int matches, so
 					penalty[matchnum + 1] = penalty[matchnum];
 					list[matchnum + 1] = list[matchnum];
 				}
-				list[matchnum] = swinfo;
+				list[matchnum] = &swinfo;
 				penalty[matchnum] = curpenalty;
 			}
 		}
@@ -392,10 +441,9 @@ void software_list_device::release()
 software_list_device *software_list_device::find_by_name(const machine_config &config, const char *name)
 {
 	// iterate over each device in the system and find a match
-	software_list_device_iterator deviter(config.root_device());
-	for (software_list_device *swlistdev = deviter.first(); swlistdev != nullptr; swlistdev = deviter.next())
-		if (strcmp(swlistdev->list_name(), name) == 0)
-			return swlistdev;
+	for (software_list_device &swlistdev : software_list_device_iterator(config.root_device()))
+		if (strcmp(swlistdev.list_name(), name) == 0)
+			return &swlistdev;
 	return nullptr;
 }
 
@@ -410,25 +458,25 @@ void software_list_device::display_matches(const machine_config &config, const c
 {
 	// check if there is at least one software list
 	software_list_device_iterator deviter(config.root_device());
-	if (deviter.first())
+	if (deviter.first() != nullptr)
 		osd_printf_error("\n\"%s\" approximately matches the following\n"
 							"supported software items (best match first):\n\n", name);
 
 	// iterate through lists
-	for (software_list_device *swlistdev = deviter.first(); swlistdev != nullptr; swlistdev = deviter.next())
+	for (software_list_device &swlistdev : deviter)
 	{
 		// get the top 16 approximate matches for the selected device interface (i.e. only carts for cartslot, etc.)
 		software_info *matches[16] = { nullptr };
-		swlistdev->find_approx_matches(name, ARRAY_LENGTH(matches), matches, interface);
+		swlistdev.find_approx_matches(name, ARRAY_LENGTH(matches), matches, interface);
 
 		// if we found some, print them
 		if (matches[0] != nullptr)
 		{
 			// different output depending on original system or compatible
-			if (swlistdev->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
-				osd_printf_error("* Software list \"%s\" (%s) matches: \n", swlistdev->list_name(), swlistdev->description());
+			if (swlistdev.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+				osd_printf_error("* Software list \"%s\" (%s) matches: \n", swlistdev.list_name(), swlistdev.description());
 			else
-				osd_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlistdev->list_name(), swlistdev->description());
+				osd_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlistdev.list_name(), swlistdev.description());
 
 			// print them out
 			for (auto & matche : matches)
@@ -449,14 +497,14 @@ void software_list_device::display_matches(const machine_config &config, const c
 
 software_info *software_list_device::find(const char *look_for, software_info *prev)
 {
-	// NULL search returns nothing
+	// nullptr search returns nothing
 	if (look_for == nullptr)
 		return nullptr;
 
 	bool iswild = strchr(look_for, '*') != nullptr || strchr(look_for, '?');
 
-	// find a match (will cause a parse if needed when calling first_software_info)
-	for (prev = (prev != nullptr) ? prev->next() : first_software_info(); prev != nullptr; prev = prev->next())
+	// find a match (will cause a parse if needed when calling get_info)
+	for (prev = (prev != nullptr) ? prev->next() : get_info().first(); prev != nullptr; prev = prev->next())
 		if ((iswild && core_strwildcmp(look_for, prev->shortname()) == 0) || core_stricmp(look_for, prev->shortname()) == 0)
 			break;
 
@@ -478,15 +526,17 @@ void software_list_device::parse()
 	m_errors.clear();
 
 	// attempt to open the file
-	file_error filerr = m_file.open(m_list_name.c_str(), ".xml");
-	if (filerr == FILERR_NONE)
+	osd_file::error filerr = m_file.open(m_list_name.c_str(), ".xml");
+	if (filerr == osd_file::error::NONE)
 	{
 		// parse if no error
-		softlist_parser parser(*this, m_errors);
+		std::ostringstream errs;
+		softlist_parser parser(*this, errs);
 		m_file.close();
+		m_errors = errs.str();
 	}
 	else
-		strprintf(m_errors, "Error opening file: %s\n", filename());
+		m_errors = string_format("Error opening file: %s\n", filename());
 
 	// indicate that we've been parsed
 	m_parsed = true;
@@ -506,7 +556,7 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 		return;
 
 	// do device validation only in case of validate command
-	if (strcmp(mconfig().options().command(), CLICOMMAND_VALIDATE) != 0)
+	if (!valid.validate_all())
 		return;
 
 	// actually do the validate
@@ -525,7 +575,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 
 	softlist_map names;
 	softlist_map descriptions;
-	for (software_info *swinfo = first_software_info(); swinfo != nullptr; swinfo = swinfo->next())
+	for (software_info &swinfo : get_info())
 	{
 		// first parse and output core errors if any
 		if (m_errors.length() > 0)
@@ -537,98 +587,98 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 		// Now check if the xml data is valid:
 
 		// Did we lost any description?
-		if (swinfo->longname() == nullptr)
+		if (swinfo.longname() == nullptr)
 		{
-			osd_printf_error("%s: %s has no description\n", filename(), swinfo->shortname());
+			osd_printf_error("%s: %s has no description\n", filename(), swinfo.shortname());
 			break;
 		}
 
 		// Did we lost any year?
-		if (swinfo->year() == nullptr)
+		if (swinfo.year() == nullptr)
 		{
-			osd_printf_error("%s: %s has no year\n", filename(), swinfo->shortname());
+			osd_printf_error("%s: %s has no year\n", filename(), swinfo.shortname());
 			break;
 		}
 
 		// Did we lost any publisher?
-		if (swinfo->publisher() == nullptr)
+		if (swinfo.publisher() == nullptr)
 		{
-			osd_printf_error("%s: %s has no publisher\n", filename(), swinfo->shortname());
+			osd_printf_error("%s: %s has no publisher\n", filename(), swinfo.shortname());
 			break;
 		}
 
 		// Did we lost the software parts?
-		if (swinfo->num_parts() == 0)
+		if (swinfo.parts().empty())
 		{
-			osd_printf_error("%s: %s has no part\n", filename(), swinfo->shortname());
+			osd_printf_error("%s: %s has no part\n", filename(), swinfo.shortname());
 			break;
 		}
 
 		// Second, since the xml is fine, run additional checks:
 
 		// check for duplicate names
-		if (!names.insert(std::make_pair(swinfo->shortname(), swinfo)).second)
+		if (!names.insert(std::make_pair(swinfo.shortname(), &swinfo)).second)
 		{
-			software_info *match = names.find(swinfo->shortname())->second;
-			osd_printf_error("%s: %s is a duplicate name (%s)\n", filename(), swinfo->shortname(), match->shortname());
+			software_info *match = names.find(swinfo.shortname())->second;
+			osd_printf_error("%s: %s is a duplicate name (%s)\n", filename(), swinfo.shortname(), match->shortname());
 		}
 
 		// check for duplicate descriptions
-		std::string longname = std::string(swinfo->longname());
-		if (!descriptions.insert(std::make_pair(strmakelower(longname), swinfo)).second)
-			osd_printf_error("%s: %s is a duplicate description (%s)\n", filename(), swinfo->longname(), swinfo->shortname());
+		std::string longname = std::string(swinfo.longname());
+		if (!descriptions.insert(std::make_pair(strmakelower(longname), &swinfo)).second)
+			osd_printf_error("%s: %s is a duplicate description (%s)\n", filename(), swinfo.longname(), swinfo.shortname());
 
 		bool is_clone = false;
-		if (swinfo->parentname() != nullptr)
+		if (swinfo.parentname() != nullptr)
 		{
 			is_clone = true;
-			if (strcmp(swinfo->parentname(), swinfo->shortname()) == 0)
+			if (strcmp(swinfo.parentname(), swinfo.shortname()) == 0)
 			{
-				osd_printf_error("%s: %s is set as a clone of itself\n", filename(), swinfo->shortname());
+				osd_printf_error("%s: %s is set as a clone of itself\n", filename(), swinfo.shortname());
 				break;
 			}
 
 			// make sure the parent exists
-			software_info *swinfo2 = find(swinfo->parentname());
+			software_info *swinfo2 = find(swinfo.parentname());
 
 			if (swinfo2 == nullptr)
-				osd_printf_error("%s: parent '%s' software for '%s' not found\n", filename(), swinfo->parentname(), swinfo->shortname());
+				osd_printf_error("%s: parent '%s' software for '%s' not found\n", filename(), swinfo.parentname(), swinfo.shortname());
 			else if (swinfo2->parentname() != nullptr)
-				osd_printf_error("%s: %s is a clone of a clone\n", filename(), swinfo->shortname());
+				osd_printf_error("%s: %s is a clone of a clone\n", filename(), swinfo.shortname());
 		}
 
 		// make sure the driver name is 8 chars or less
-		if ((is_clone && strlen(swinfo->shortname()) > NAME_LEN_CLONE) || (!is_clone && strlen(swinfo->shortname()) > NAME_LEN_PARENT))
-			osd_printf_error("%s: %s %s driver name must be %d characters or less\n", filename(), swinfo->shortname(),
+		if ((is_clone && strlen(swinfo.shortname()) > NAME_LEN_CLONE) || (!is_clone && strlen(swinfo.shortname()) > NAME_LEN_PARENT))
+			osd_printf_error("%s: %s %s driver name must be %d characters or less\n", filename(), swinfo.shortname(),
 								is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
 
 		// make sure the year is only digits, '?' or '+'
-		for (const char *s = swinfo->year(); *s != 0; s++)
+		for (const char *s = swinfo.year(); *s != 0; s++)
 			if (!isdigit((UINT8)*s) && *s != '?' && *s != '+')
 			{
-				osd_printf_error("%s: %s has an invalid year '%s'\n", filename(), swinfo->shortname(), swinfo->year());
+				osd_printf_error("%s: %s has an invalid year '%s'\n", filename(), swinfo.shortname(), swinfo.year());
 				break;
 			}
 
 		softlist_map part_names;
-		for (software_part *part = swinfo->first_part(); part != nullptr; part = part->next())
+		for (software_part &part : swinfo.parts())
 		{
-			if (part->interface() == nullptr)
-				osd_printf_error("%s: %s has a part (%s) without interface\n", filename(), swinfo->shortname(), part->name());
+			if (part.interface() == nullptr)
+				osd_printf_error("%s: %s has a part (%s) without interface\n", filename(), swinfo.shortname(), part.name());
 
-			if (part->romdata() == nullptr)
-				osd_printf_error("%s: %s has a part (%s) with no data\n", filename(), swinfo->shortname(), part->name());
+			if (part.romdata() == nullptr)
+				osd_printf_error("%s: %s has a part (%s) with no data\n", filename(), swinfo.shortname(), part.name());
 
-			if (!part_names.insert(std::make_pair(part->name(), swinfo)).second)
-				osd_printf_error("%s: %s has a part (%s) whose name is duplicate\n", filename(), swinfo->shortname(), part->name());
+			if (!part_names.insert(std::make_pair(part.name(), &swinfo)).second)
+				osd_printf_error("%s: %s has a part (%s) whose name is duplicate\n", filename(), swinfo.shortname(), part.name());
 
-			for (const rom_entry *data = part->romdata(); data->_name != nullptr; data++)
+			for (const rom_entry *data = part.romdata(); data->_name != nullptr; data++)
 				if (data->_hashdata != nullptr)
 				{
 					// make sure the hash is valid
 					hash_collection hashes;
 					if (!hashes.from_internal_string(data->_hashdata))
-						osd_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", filename(), swinfo->shortname(), data->_name, data->_hashdata);
+						osd_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", filename(), swinfo.shortname(), data->_name, data->_hashdata);
 				}
 		}
 	}
@@ -647,7 +697,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 //  softlist_parser - constructor
 //-------------------------------------------------
 
-softlist_parser::softlist_parser(software_list_device &list, std::string &errors)
+softlist_parser::softlist_parser(software_list_device &list, std::ostringstream &errors)
 	: m_list(list),
 		m_errors(errors),
 		m_done(false),
@@ -723,19 +773,17 @@ void softlist_parser::expat_free(void *ptr)
 //  filename, line and column information
 //-------------------------------------------------
 
-void ATTR_PRINTF(2,3) softlist_parser::parse_error(const char *fmt, ...)
+template <typename Format, typename... Params>
+inline void softlist_parser::parse_error(Format &&fmt, Params &&... args)
 {
 	// always start with filename(line.column):
-	strcatprintf(m_errors, "%s(%d.%d): ", filename(), line(), column());
+	util::stream_format(m_errors, "%s(%d.%d): ", filename(), line(), column());
 
 	// append the remainder of the string
-	va_list va;
-	va_start(va, fmt);
-	strcatvprintf(m_errors, fmt, va);
-	va_end(va);
+	util::stream_format(m_errors, std::forward<Format>(fmt), std::forward<Params>(args)...);
 
 	// append a newline at the end
-	m_errors.append("\n");
+	m_errors.put('\n');
 }
 
 
@@ -1151,14 +1199,14 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				std::string hashdata;
 				if (nodump)
 				{
-					strprintf(hashdata, "%s", NO_DUMP);
+					hashdata = string_format("%s", NO_DUMP);
 					if (crc != nullptr && sha1 != nullptr)
 						parse_error("No need for hash definition");
 				}
 				else
 				{
 					if (crc != nullptr && sha1 != nullptr)
-						strprintf(hashdata, "%c%s%c%s%s", hash_collection::HASH_CRC, crc, hash_collection::HASH_SHA1, sha1, (baddump ? BAD_DUMP : ""));
+						hashdata = string_format("%c%s%c%s%s", hash_collection::HASH_CRC, crc, hash_collection::HASH_SHA1, sha1, (baddump ? BAD_DUMP : ""));
 					else
 						parse_error("Incomplete rom hash definition");
 				}
@@ -1181,6 +1229,11 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			else
 				parse_error("Rom name missing");
 		}
+		else if (sizestr != nullptr && loadflag != nullptr && strcmp(loadflag, "ignore") == 0)
+		{
+			UINT32 length = strtol(sizestr, nullptr, 0);
+			add_rom_entry(nullptr, nullptr, 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
+		}
 		else
 			parse_error("Incomplete rom definition");
 	}
@@ -1201,8 +1254,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			bool baddump = (status != nullptr && strcmp(status, "baddump") == 0);
 			bool nodump = (status != nullptr && strcmp(status, "nodump" ) == 0);
 			bool writeable = (writeablestr != nullptr && strcmp(writeablestr, "yes") == 0);
-			std::string hashdata;
-			strprintf(hashdata, "%c%s%s", hash_collection::HASH_SHA1, sha1, (nodump ? NO_DUMP : (baddump ? BAD_DUMP : "")));
+			std::string hashdata = string_format("%c%s%s", hash_collection::HASH_SHA1, sha1, (nodump ? NO_DUMP : (baddump ? BAD_DUMP : "")));
 
 			add_rom_entry(name, hashdata.c_str(), 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY));
 		}
@@ -1254,7 +1306,7 @@ void softlist_parser::parse_soft_end(const char *tagname)
 		// get the info; if present, copy shared data (we assume name/value strings live
 		// in the string pool and don't need to be reallocated)
 		if (m_current_info != nullptr)
-			for (feature_list_item *item = m_current_info->shared_info(); item != nullptr; item = item->next())
-				m_current_part->m_featurelist.append(*global_alloc(feature_list_item(item->name(), item->value())));
+			for (feature_list_item &item : m_current_info->shared_info())
+				m_current_part->m_featurelist.append(*global_alloc(feature_list_item(item.name(), item.value())));
 	}
 }

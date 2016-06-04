@@ -10,7 +10,7 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "audio/warpwarp.h"
+#include "audio/geebee.h"
 
 
 const device_type GEEBEE = &device_creator<geebee_sound_device>;

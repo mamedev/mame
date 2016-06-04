@@ -23,7 +23,7 @@ wow_sh_ update- Null
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/astrocde.h"
-
+#include "audio/wow.h"
 
 /****************************************************************************
  * 64 Phonemes - currently 1 sample per phoneme, will be combined sometime!

@@ -29,7 +29,7 @@ static const char copyright_notice[] =
 #include "m68kcpu.h"
 #include "m68kops.h"
 
-#include "m68kfpu.inc"
+#include "m68kfpu.hxx"
 #include "m68kmmu.h"
 
 extern void m68040_fpu_op0(m68000_base_device *m68k);
@@ -598,18 +598,18 @@ const UINT8 m68ki_exception_cycle_table[7][256] =
 const UINT8 m68ki_ea_idx_cycle_table[64] =
 {
 		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		0, /* ..01.000 no memory indirect, base NULL             */
-		5, /* ..01..01 memory indirect,    base NULL, outer NULL */
-		7, /* ..01..10 memory indirect,    base NULL, outer 16   */
-		7, /* ..01..11 memory indirect,    base NULL, outer 32   */
+		0, /* ..01.000 no memory indirect, base nullptr             */
+		5, /* ..01..01 memory indirect,    base nullptr, outer nullptr */
+		7, /* ..01..10 memory indirect,    base nullptr, outer 16   */
+		7, /* ..01..11 memory indirect,    base nullptr, outer 32   */
 		0,  5,  7,  7,  0,  5,  7,  7,  0,  5,  7,  7,
 		2, /* ..10.000 no memory indirect, base 16               */
-		7, /* ..10..01 memory indirect,    base 16,   outer NULL */
+		7, /* ..10..01 memory indirect,    base 16,   outer nullptr */
 		9, /* ..10..10 memory indirect,    base 16,   outer 16   */
 		9, /* ..10..11 memory indirect,    base 16,   outer 32   */
 		0,  7,  9,  9,  0,  7,  9,  9,  0,  7,  9,  9,
 		6, /* ..11.000 no memory indirect, base 32               */
-	11, /* ..11..01 memory indirect,    base 32,   outer NULL */
+	11, /* ..11..01 memory indirect,    base 32,   outer nullptr */
 	13, /* ..11..10 memory indirect,    base 32,   outer 16   */
 	13, /* ..11..11 memory indirect,    base 32,   outer 32   */
 		0, 11, 13, 13,  0, 11, 13, 13,  0, 11, 13, 13
@@ -659,19 +659,19 @@ static void set_irq_line(m68000_base_device *m68k, int irqline, int state)
 		m68k->nmi_pending = TRUE;
 }
 
-static void m68k_presave(m68000_base_device *m68k)
+void m68000_base_device::presave()
 {
-	m68k->save_sr = m68ki_get_sr(m68k);
-	m68k->save_stopped = (m68k->stopped & STOP_LEVEL_STOP) != 0;
-	m68k->save_halted  = (m68k->stopped & STOP_LEVEL_HALT) != 0;
+	save_sr = m68ki_get_sr(this);
+	save_stopped = (stopped & STOP_LEVEL_STOP) != 0;
+	save_halted  = (stopped & STOP_LEVEL_HALT) != 0;
 }
 
-static void m68k_postload(m68000_base_device *m68k)
+void m68000_base_device::postload()
 {
-	m68ki_set_sr_noint_nosp(m68k, m68k->save_sr);
+	m68ki_set_sr_noint_nosp(this, save_sr);
 	//fprintf(stderr, "Reloaded, pc=%x\n", REG_PC(m68k));
-	m68k->stopped = (m68k->save_stopped ? STOP_LEVEL_STOP : 0) | (m68k->save_halted  ? STOP_LEVEL_HALT : 0);
-	m68ki_jump(m68k, REG_PC(m68k));
+	stopped = (save_stopped ? STOP_LEVEL_STOP : 0) | (save_halted  ? STOP_LEVEL_HALT : 0);
+	m68ki_jump(this, REG_PC(this));
 }
 
 static void m68k_cause_bus_error(m68000_base_device *m68k)
@@ -742,7 +742,6 @@ WRITE_LINE_MEMBER( m68000_base_device::write_irq7 )
 bool m68000_base_device::memory_translate(address_spacenum space, int intention, offs_t &address)
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */
-	if (this)
 	{
 		/* 68040 needs to call the MMU even when disabled so transparent translation works */
 		if ((space == AS_PROGRAM) && ((pmmu_enabled) || (CPU_TYPE_IS_040_PLUS(cpu_type))))
@@ -1025,8 +1024,8 @@ void m68000_base_device::init_cpu_common(void)
 		save_item(NAME(mmu_atc_data[i]), i);
 	}
 
-	machine().save().register_presave(save_prepost_delegate(FUNC(m68k_presave), this));
-	machine().save().register_postload(save_prepost_delegate(FUNC(m68k_postload), this));
+	machine().save().register_presave(save_prepost_delegate(FUNC(m68000_base_device::presave), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(m68000_base_device::postload), this));
 
 	m_icountptr = &remaining_cycles;
 	remaining_cycles = 0;
@@ -1173,40 +1172,40 @@ void m68000_base_device::state_string_export(const device_state_entry &entry, st
 	switch (entry.index())
 	{
 		case M68K_FP0:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[0]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[0]));
 			break;
 
 		case M68K_FP1:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[1]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[1]));
 			break;
 
 		case M68K_FP2:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[2]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[2]));
 			break;
 
 		case M68K_FP3:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[3]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[3]));
 			break;
 
 		case M68K_FP4:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[4]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[4]));
 			break;
 
 		case M68K_FP5:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[5]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[5]));
 			break;
 
 		case M68K_FP6:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[6]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[6]));
 			break;
 
 		case M68K_FP7:
-			strprintf(str,"%f", fx80_to_double(REG_FP(this)[7]));
+			str = string_format("%f", fx80_to_double(REG_FP(this)[7]));
 			break;
 
 		case STATE_GENFLAGS:
 			sr = m68ki_get_sr(this);
-			strprintf(str,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				sr & 0x8000 ? 'T':'.',
 				sr & 0x4000 ? 't':'.',
 				sr & 0x2000 ? 'S':'.',
@@ -1735,10 +1734,10 @@ void m68000_base_device::define_state(void)
 		state_add(M68K_MSP,    "MSP",       iotemp).callimport().callexport();
 
 	for (int regnum = 0; regnum < 8; regnum++) {
-		state_add(M68K_D0 + regnum, strformat("D%d", regnum).c_str(), dar[regnum]);
+		state_add(M68K_D0 + regnum, string_format("D%d", regnum).c_str(), dar[regnum]);
 	}
 	for (int regnum = 0; regnum < 8; regnum++) {
-		state_add(M68K_A0 + regnum, strformat("A%d", regnum).c_str(), dar[8 + regnum]);
+		state_add(M68K_A0 + regnum, string_format("A%d", regnum).c_str(), dar[8 + regnum]);
 	}
 
 	state_add(M68K_PREF_ADDR,  "PREF_ADDR", pref_addr).mask(addrmask);
@@ -1760,7 +1759,7 @@ void m68000_base_device::define_state(void)
 	if (cpu_type & MASK_030_OR_LATER)
 	{
 		for (int regnum = 0; regnum < 8; regnum++) {
-			state_add(M68K_FP0 + regnum, strformat("FP%d", regnum).c_str(), iotemp).callimport().callexport().formatstr("%10s");
+			state_add(M68K_FP0 + regnum, string_format("FP%d", regnum).c_str(), iotemp).callimport().callexport().formatstr("%10s");
 		}
 		state_add(M68K_FPSR, "FPSR", fpsr);
 		state_add(M68K_FPCR, "FPCR", fpcr);
@@ -2646,7 +2645,6 @@ void m68020pmmu_device::device_start()
 bool m68020hmmu_device::memory_translate(address_spacenum space, int intention, offs_t &address)
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */
-	if (this)
 	{
 		if ((space == AS_PROGRAM) && (hmmu_enabled))
 		{

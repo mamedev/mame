@@ -31,16 +31,47 @@ NETLIB_NAMESPACE_DEVICES_START()
 // Devices ...
 // ----------------------------------------------------------------------------------------
 
-NETLIB_DEVICE(nicRSFF,
+NETLIB_OBJECT(nicRSFF)
+{
+	NETLIB_CONSTRUCTOR(nicRSFF)
+	{
+		enregister("S", m_S);
+		enregister("R", m_R);
+		enregister("Q", m_Q);
+		enregister("QQ", m_QQ);
+	}
+
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
+
+protected:
 	logic_input_t m_S;
 	logic_input_t m_R;
 
 	logic_output_t m_Q;
 	logic_output_t m_QQ;
-);
+};
 
 
-NETLIB_DEVICE_WITH_PARAMS(nicDelay,
+NETLIB_OBJECT(nicDelay)
+{
+	NETLIB_CONSTRUCTOR(nicDelay)
+	, m_last(0)
+	{
+		enregister("1", m_I);
+		enregister("2", m_Q);
+
+		register_param("L_TO_H", m_L_to_H, 10);
+		register_param("H_TO_L", m_H_to_L, 10);
+
+		save(NLNAME(m_last));
+	}
+
+	//NETLIB_UPDATE_PARAMI();
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
+
+protected:
 	logic_input_t m_I;
 
 	logic_output_t m_Q;
@@ -49,7 +80,7 @@ NETLIB_DEVICE_WITH_PARAMS(nicDelay,
 	param_int_t m_H_to_L;
 
 	UINT8 m_last;
-);
+};
 
 NETLIB_NAMESPACE_DEVICES_END()
 

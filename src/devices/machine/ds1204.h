@@ -72,6 +72,8 @@ private:
 
 	static const int DQ_HIGH_IMPEDANCE = -1;
 
+	optional_memory_region m_region;
+
 	int m_rst;
 	int m_clk;
 	int m_dqw;

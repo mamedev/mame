@@ -441,6 +441,7 @@ or Fatal Fury for example).
 #include "cpu/mips/mips3.h"
 #include "machine/nvram.h"
 #include "includes/hng64.h"
+#include "machine/hng64_net.h"
 
 /* TODO: NOT measured! */
 #define PIXEL_CLOCK         ((HNG64_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
@@ -1129,10 +1130,10 @@ static INPUT_PORTS_START( roadedge )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Shift Up")
 	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Shift Down")
-	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, left_handle_r, NULL)
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, right_handle_r, NULL)
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, acc_down_r, NULL)
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, brake_down_r, NULL)
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, left_handle_r, nullptr)
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, right_handle_r, nullptr)
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, acc_down_r, nullptr)
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, brake_down_r, nullptr)
 
 	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
@@ -1527,7 +1528,6 @@ void hng64_state::machine_reset()
 }
 
 MACHINE_CONFIG_EXTERN(hng64_audio);
-MACHINE_CONFIG_EXTERN(hng64_network);
 
 static MACHINE_CONFIG_START(hng64, hng64_state)
 	/* basic machine hardware */

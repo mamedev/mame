@@ -102,8 +102,8 @@
     2800          |     D                     |  R   | Shield 1 Switch
     2800          |        D                  |  R   | Fire 2 Switch
     2800          |           D               |  R   | Shield 2 Switch
-    2800          |              D            |  R   | Not Used
-    2800          |                 D         |  R   | Speech Chip Ready
+    2800          |              D            |  R   | N/C (floating, probably reads as 1)
+    2800          |                 D         |  R   | /TIRDY (Speech Chip Ready)
     2800          |                    D      |  R   | Alpha Rcvd Flag
     2800          |                       D   |  R   | Alpha Xmtd Flag
                   |                           |      |
@@ -119,7 +119,7 @@
                   |                           |      |
     5800          |  D  D  D  D  D  D  D  D   |  W   | Speech Data Write / Write Strobe Clear
     5900          |                           |  W   | Speech Write Strobe Set
-                    |                           |      |
+                  |                           |      |
     6000-61FF     |  D  D  D  D  D  D  D  D   | R/W  | EEROM
     8000-BFFF     |  D  D  D  D  D  D  D  D   |  R   | Program ROM (16K)
     -----------------------------------------------------------------------------
@@ -193,15 +193,24 @@
 #include "sound/tms5220.h"
 #include "sound/pokey.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "includes/mhavoc.h"
 
-
+/* Quad pokey hookup (based on schematics):
+Address: 543210
+         |||||\- pokey A0
+         ||||\-- pokey A1
+         |||\--- pokey A2
+         ||\---- pokey chip number LSB
+         |\----- pokey chip number MSB
+         \------ pokey A3
+*/
 READ8_MEMBER(mhavoc_state::quad_pokeyn_r)
 {
 	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
-	int pokey_reg = (offset % 8) | control;
+	int pokey_reg = (offset & 0x7) | control;
 	pokey_device *pokey = machine().device<pokey_device>(devname[pokey_num]);
 
 	return pokey->read(pokey_reg);
@@ -212,7 +221,7 @@ WRITE8_MEMBER(mhavoc_state::quad_pokeyn_w)
 	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
-	int pokey_reg = (offset % 8) | control;
+	int pokey_reg = (offset & 0x7) | control;
 	pokey_device *pokey = machine().device<pokey_device>(devname[pokey_num]);
 
 	pokey->write(pokey_reg, data);
@@ -224,12 +233,19 @@ WRITE8_MEMBER(mhavoc_state::quad_pokeyn_w)
  *  Alpha One: dual POKEY?
  *
  *************************************/
-
+/* dual pokey hookup (presumably, based on the prototype code):
+Address: 43210
+         ||||\- pokey A0
+         |||\-- pokey A1
+         ||\--- pokey A2
+         |\---- pokey chip number
+         \----- pokey A3
+*/
 READ8_MEMBER(mhavoc_state::dual_pokey_r)
 {
 	int pokey_num = (offset >> 3) & 0x01;
 	int control = (offset & 0x10) >> 1;
-	int pokey_reg = (offset % 8) | control;
+	int pokey_reg = (offset & 0x7) | control;
 
 	if (pokey_num == 0)
 		return machine().device<pokey_device>("pokey1")->read(pokey_reg);
@@ -242,7 +258,7 @@ WRITE8_MEMBER(mhavoc_state::dual_pokey_w)
 {
 	int pokey_num = (offset >> 3) & 0x01;
 	int control = (offset & 0x10) >> 1;
-	int pokey_reg = (offset % 8) | control;
+	int pokey_reg = (offset & 0x7) | control;
 
 	if (pokey_num == 0)
 		machine().device<pokey_device>("pokey1")->write(pokey_reg, data);
@@ -267,7 +283,7 @@ static ADDRESS_MAP_START( alpha_map, AS_PROGRAM, 8, mhavoc_state )
 	AM_RANGE(0x1400, 0x141f) AM_RAM AM_SHARE("colorram")    /* ColorRAM */
 	AM_RANGE(0x1600, 0x1600) AM_WRITE(mhavoc_out_0_w)           /* Control Signals */
 	AM_RANGE(0x1640, 0x1640) AM_DEVWRITE("avg", avg_mhavoc_device, go_w)               /* Vector Generator GO */
-	AM_RANGE(0x1680, 0x1680) AM_WRITE(watchdog_reset_w)         /* Watchdog Clear */
+	AM_RANGE(0x1680, 0x1680) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)         /* Watchdog Clear */
 	AM_RANGE(0x16c0, 0x16c0) AM_DEVWRITE("avg", avg_mhavoc_device, reset_w)            /* Vector Generator Reset */
 	AM_RANGE(0x1700, 0x1700) AM_WRITE(mhavoc_alpha_irq_ack_w)   /* IRQ ack */
 	AM_RANGE(0x1740, 0x1740) AM_WRITE(mhavoc_rom_banksel_w)     /* Program ROM Page Select */
@@ -288,18 +304,40 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+/*
+a15 a14 a13 a12 a11 a10 a09 a08 a07 a06 a05 a04 a03 a02 a01 a00
+0   0   0   x   x   *   *   *   *   *   *   *   *   *   *   *      RW ZRAM (6116 SRAM@9PQ)
+0   0   1   0   0   x   x   x   x   x   *   *   *   *   *   *      RW INPUTS: QCI/O (Quad Pokey)
+0   0   1   0   1   x   x   x   x   x   x   x   x   x   x   x      R  INPUTS: SWITCHES
+0   0   1   1   0   x   x   x   x   x   x   x   x   x   x   x      R  INPUTS: PORTRD_gamma
+0   0   1   1   1   x   x   x   x   x   x   x   x   x   *   *      R  INPUTS: ROLLER (CCI(LETA?), with A2 grounded so only 4 ports are readable)
+0   1   0   x   x   x   x   x   x   x   x   x   x   x   x   x      R  OUTPUTS: read of dipswitches @8S encompasses the entire OUTPUTS area
+0   1   0   0   0   x   x   x   x   x   x   x   x   x   x   x       W OUTPUTS: IRQACK
+0   1   0   0   1   x   x   x   x   x   x   x   x   x   x   x       W OUTPUTS: STROBES
+0   1   0   1   0   x   x   x   x   x   x   x   x   x   x   x       W OUTPUTS: PORTWR_gamma
+0   1   0   1   1   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?       W OUTPUTS: TISND, unused tms5220 write
+ ( supposedly, but the /WS hookup is not traced on pcb yet:
+0   1   0   1   1   x?  x?  0   x?  x?  x?  x?  x?  x?  x?  x?      W? OUTPUTS: TISND: Gamma CPU write to octal latch??
+0   1   0   1   1   x?  x?  1   x?  x?  x?  x?  x?  x?  x?  x?      W? OUTPUTS: TISND: octal latch output enable to tms5220 and pulse /WS on 5220??
+ Is there a way to activate /RS on the TMS5220 to read the status register? is the TMS5220 /INT line connected to the 6502 somehow?
+ )
+0   1   1   x   x   x   x   *   *   *   *   *   *   *   *   *      RW EEROM: (2804 EEPROM@9QR, pins 22(A9) and 19(A10) are N/C inside the chip)
+1   x   *   *   *   *   *   *   *   *   *   *   *   *   *   *      R  ROM 27128 @9S
+*/
+
 static ADDRESS_MAP_START( gamma_map, AS_PROGRAM, 8, mhavoc_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM                             /* Program RAM (2K) */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_MIRROR (0x1800)
-	AM_RANGE(0x2000, 0x203f) AM_READWRITE(quad_pokeyn_r, quad_pokeyn_w) /* Quad Pokey read  */
-	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("IN1")                /* Gamma Input Port */
-	AM_RANGE(0x3000, 0x3000) AM_READ(mhavoc_alpha_r)            /* Alpha Comm. Read Port*/
-	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("DIAL")               /* Roller Controller Input*/
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW2") AM_WRITE(mhavoc_gamma_irq_ack_w)  /* DSW at 8S, IRQ Acknowledge*/
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(mhavoc_out_1_w)           /* Coin Counters    */
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(mhavoc_alpha_w)           /* Alpha Comm. Write Port */
-	AM_RANGE(0x6000, 0x61ff) AM_RAM AM_SHARE("nvram")   /* EEROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                 /* Program ROM (16K)    */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)                   /* Program RAM (2K) */
+	AM_RANGE(0x2000, 0x203f) AM_READWRITE(quad_pokeyn_r, quad_pokeyn_w) AM_MIRROR(0x07C0) /* Quad Pokey read/write  */
+	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("IN1") AM_MIRROR(0x07ff)      /* Gamma Input Port */
+	AM_RANGE(0x3000, 0x3000) AM_READ(mhavoc_alpha_r) AM_MIRROR(0x07ff)  /* Alpha Comm. Read Port */
+	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("DIAL") AM_MIRROR(0x07fc)     /* Roller Controller Input */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW2") AM_WRITE(mhavoc_gamma_irq_ack_w) AM_MIRROR(0x07ff) /* DSW at 8S, IRQ Acknowledge */
+	AM_RANGE(0x4800, 0x4800) AM_WRITE(mhavoc_out_1_w) AM_MIRROR(0x07ff) /* Coin Counters    */
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(mhavoc_alpha_w) AM_MIRROR(0x07ff) /* Alpha Comm. Write Port */
+	//AM_RANGE(0x5800, 0x5800) AM_WRITE(mhavocrv_speech_data_w) AM_MIRROR(0x06ff) /* TMS5220 data write */
+	//AM_RANGE(0x5900, 0x5900) AM_WRITE(mhavocrv_speech_strobe_w) AM_MIRROR(0x06ff) /* TMS5220 /WS strobe write */
+	AM_RANGE(0x6000, 0x61ff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x1e00) /* EEROM */
+	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_MIRROR(0x4000)                   /* Program ROM (16K) */
 ADDRESS_MAP_END
 
 
@@ -322,7 +360,7 @@ static ADDRESS_MAP_START( alphaone_map, AS_PROGRAM, 8, mhavoc_state )
 	AM_RANGE(0x1080, 0x1080) AM_READ_PORT("DIAL")               /* Roller Controller Input*/
 	AM_RANGE(0x10a0, 0x10a0) AM_WRITE(alphaone_out_0_w)         /* Control Signals */
 	AM_RANGE(0x10a4, 0x10a4) AM_DEVWRITE("avg", avg_mhavoc_device, go_w)               /* Vector Generator GO */
-	AM_RANGE(0x10a8, 0x10a8) AM_WRITE(watchdog_reset_w)         /* Watchdog Clear */
+	AM_RANGE(0x10a8, 0x10a8) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)         /* Watchdog Clear */
 	AM_RANGE(0x10ac, 0x10ac) AM_DEVWRITE("avg", avg_mhavoc_device, reset_w)            /* Vector Generator Reset */
 	AM_RANGE(0x10b0, 0x10b0) AM_WRITE(mhavoc_alpha_irq_ack_w)   /* IRQ ack */
 	AM_RANGE(0x10b4, 0x10b4) AM_WRITE(mhavoc_rom_banksel_w)
@@ -362,10 +400,10 @@ static INPUT_PORTS_START( mhavoc )
 	/* Bit 2 = Gamma xmtd flag */
 	/* Bit 1 = 2.4kHz (divide 2.5MHz by 1024) */
 	/* Bit 0 = Vector generator halt flag */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_mhavoc_device, done_r, NULL)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,clock_r, NULL)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,gamma_xmtd_r, NULL)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,gamma_rcvd_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_mhavoc_device, done_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,clock_r, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,gamma_xmtd_r, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,gamma_rcvd_r, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diag Step/Coin C") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,mhavoc_bit67_r, "COIN\0SERVICE")
@@ -374,8 +412,8 @@ static INPUT_PORTS_START( mhavoc )
 	/* Bits 7-2 = input switches */
 	/* Bit 1 = Alpha rcvd flag */
 	/* Bit 0 = Alpha xmtd flag */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,alpha_xmtd_r, NULL)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,alpha_rcvd_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,alpha_xmtd_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,alpha_rcvd_r, nullptr)
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -444,7 +482,7 @@ static INPUT_PORTS_START( mhavocrv )
 	PORT_INCLUDE( mhavoc )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,tms5220_r, NULL)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,tms5220_r, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -461,8 +499,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( alphaone )
 	PORT_START("IN0")   /* alpha (player_1 = 0) */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_mhavoc_device, done_r, NULL)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,clock_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_mhavoc_device, done_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,clock_r, nullptr)
 	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
@@ -496,6 +534,8 @@ static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("5k_timer", mhavoc_state, mhavoc_cpu_irq_clock, attotime::from_hz(MHAVOC_CLOCK_5K))
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -602,8 +642,7 @@ ROM_START( mhavoc )
 
 	/* Gamma Processor ROM */
 	ROM_REGION( 0x10000, "gamma", 0 )
-	ROM_LOAD( "136025.108",   0x08000, 0x4000, CRC(93faf210) SHA1(7744368a1d520f986d1c4246113a7e24fcdd6d04) )
-	ROM_RELOAD(               0x0c000, 0x4000 ) /* reset+interrupt vectors */
+	ROM_LOAD( "136025.108",   0x08000, 0x4000, CRC(93faf210) SHA1(7744368a1d520f986d1c4246113a7e24fcdd6d04) ) /* mirrored to c000-ffff for reset+interrupt vectors */
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
@@ -633,8 +672,7 @@ ROM_START( mhavoc2 )
 
 	/* Gamma Processor ROM */
 	ROM_REGION( 0x10000, "gamma", 0 )
-	ROM_LOAD( "136025.108",   0x08000, 0x4000, CRC(93faf210) SHA1(7744368a1d520f986d1c4246113a7e24fcdd6d04) )
-	ROM_RELOAD(               0x0c000, 0x4000 ) /* reset+interrupt vectors */
+	ROM_LOAD( "136025.108",   0x08000, 0x4000, CRC(93faf210) SHA1(7744368a1d520f986d1c4246113a7e24fcdd6d04) ) /* mirrored to c000-ffff for reset+interrupt vectors */
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
@@ -662,8 +700,7 @@ ROM_START( mhavocrv )
 
 	/* Gamma Processor ROM */
 	ROM_REGION( 0x10000, "gamma", 0 )
-	ROM_LOAD( "136025.908",   0x08000, 0x4000, CRC(c52ec664) SHA1(08120a385f71b17ec02a3c2ef856ff835a91773e) )
-	ROM_RELOAD(               0x0c000, 0x4000 ) /* reset+interrupt vectors */
+	ROM_LOAD( "136025.908",   0x08000, 0x4000, CRC(c52ec664) SHA1(08120a385f71b17ec02a3c2ef856ff835a91773e) ) /* mirrored to c000-ffff for reset+interrupt vectors */
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
@@ -693,8 +730,7 @@ ROM_START( mhavocp )
 
 	/* Gamma Processor ROM */
 	ROM_REGION( 0x10000, "gamma", 0 )
-	ROM_LOAD( "136025.008",   0x8000, 0x4000, CRC(22ea7399) SHA1(eeda8cc40089506063835a62c3273e7dd3918fd5) )
-	ROM_RELOAD(               0xc000, 0x4000 )/* reset+interrupt vectors */
+	ROM_LOAD( "136025.008",   0x8000, 0x4000, CRC(22ea7399) SHA1(eeda8cc40089506063835a62c3273e7dd3918fd5) ) /* mirrored to c000-ffff for reset+interrupt vectors */
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )

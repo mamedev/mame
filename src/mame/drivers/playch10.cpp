@@ -392,7 +392,7 @@ static INPUT_PORTS_START( playch10 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Channel Select") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Enter") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Reset") PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, playch10_state,pc10_int_detect_r, NULL)   // INT Detect
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, playch10_state,pc10_int_detect_r, nullptr)   // INT Detect
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -712,7 +712,9 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 1, "single", "Single Monitor Version" ) \
 	ROM_LOAD_BIOS( 1, "pck1-c.8t", 0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \
 	ROM_SYSTEM_BIOS( 2, "alt", "Alt Bios" ) /* this bios doens't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
-	ROM_LOAD_BIOS( 2, "pch1-c_8te.8t", 0x00000, 0x4000, CRC(123ffa37) SHA1(3bef754a5a85a8498bb6222ddf5cb9021f264db5) )
+	ROM_LOAD_BIOS( 2, "pch1-c_8te.8t", 0x00000, 0x4000, CRC(123ffa37) SHA1(3bef754a5a85a8498bb6222ddf5cb9021f264db5) ) \
+	ROM_SYSTEM_BIOS( 3, "singleb", "Single Monitor Version (Newer?)" ) /* Newer single screen? Four bytes different, reported bugfix in freeplay */ \
+	ROM_LOAD_BIOS( 3, "pck1-c_fix.8t", 0x00000, 0x4000, CRC(0be8ceb4) SHA1(45b127a537370226e6b30be2b5a92ad05673ca7f) )
 
 
 #define BIOS_GFX                                            \
@@ -728,6 +730,10 @@ MACHINE_CONFIG_END
 	ROM_LOAD_BIOS( 2, "pch1-c_8p-8p",    0x00000, 0x2000, CRC(90e1b80c) SHA1(c4f4b135b2a11743518aaa0554c365b4a8cf299a) )   \
 	ROM_LOAD_BIOS( 2, "pch1-c_8m.8m",    0x02000, 0x2000, CRC(83ebc7a3) SHA1(a7c607138f4f9b96ab5d3a82c47895f77672e296) )   \
 	ROM_LOAD_BIOS( 2, "pch1-c__8k.8k",    0x04000, 0x2000, CRC(9acffb30) SHA1(b814f10ef23f2ca445fabafcbf7f25e2d454ba8c) ) \
+	\
+	ROM_LOAD_BIOS( 3, "pch1-c__8p_e-1.8p",    0x00000, 0x2000, CRC(30c15e23) SHA1(69166afdb2fe827c7f1919cdf4197caccbd961fa) )   \
+	ROM_LOAD_BIOS( 3, "pch1-c__8m_e-1.8m",    0x02000, 0x2000, CRC(c1232eee) SHA1(beaf9fa2d091a3c7f70c51e966d885b1f9f0935f) )   \
+	ROM_LOAD_BIOS( 3, "pch1-c__8k.8k",    0x04000, 0x2000, CRC(9acffb30) SHA1(b814f10ef23f2ca445fabafcbf7f25e2d454ba8c) )   \
 	\
 	ROM_REGION( 0x0300, "proms", 0 )                        \
 	ROM_LOAD( "pch1-c-6f.82s129an.6f",    0x0000, 0x0100, CRC(e5414ca3) SHA1(d2878411cda84ffe0afb2e538a67457f51bebffb) )    \
@@ -1420,6 +1426,27 @@ ROM_START( pc_ngai3 )   /* Ninja Gaiden 3 */
 	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(13755943) SHA1(b7d809b0f60ef489777ccb35868f5c1e777356e0) )
 ROM_END
 
+// this is identcal to the USA NES release with the generic 'New Game 2' menu rom.
+// TT-CHR.U1           = nes-ni-0 chr          nes:ttoonadvu Tiny Toon Adventures (USA)
+// TT-GM2.U3           = u2                    pc_virus   Virus (Dr. Mario prototype, PlayChoice-10)
+// TT-PRG.U5           = nes-ni-0 prg          nes:ttoonadvu Tiny Toon Adventures (USA)
+ROM_START( pc_ttoon )   /* Tiny Toon Adventures */
+	BIOS_CPU
+	ROM_LOAD( "TT-GM2.U3",   0x0c000, 0x2000, CRC(d2764d91) SHA1(393b54148e9250f14d83318aed6686cc04b923e6) ) /* extra bios code for this game */
+	BIOS_GFX
+
+	ROM_REGION( 0x50000, "cart", 0 )
+	ROM_LOAD( "TT-PRG.U5",    0x10000, 0x20000, CRC(9cb55b96) SHA1(437c326a4575895b9d7e567cab4f70b2f44ed8dd) )   /* banked */
+	ROM_RELOAD(          0x30000, 0x20000 )
+
+	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
+	ROM_LOAD( "TT-CHR.U1",    0x00000, 0x20000, CRC(a024ae14) SHA1(2e797a173161a61c14ce299e3c5a31c6029f2b50) )
+
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.u6", 0x00, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )
+ROM_END
+
+
 ROM_START( pc_radr2 )   /* Rad Racer II */
 	BIOS_CPU
 	ROM_LOAD( "qr-u3",    0x0c000, 0x2000, CRC(0c8fea63) SHA1(7ac04b151df732bd16708655352b7f13926f004f) ) /* extra bios code for this game */
@@ -1649,6 +1676,20 @@ DRIVER_INIT_MEMBER(playch10_state,virus)
 	DRIVER_INIT_CALL(pcfboard);
 }
 
+DRIVER_INIT_MEMBER(playch10_state,ttoon)
+{
+	UINT8 *ROM = memregion("rp5h01")->base();
+	UINT32 len = memregion("rp5h01")->bytes();
+	for (int i = 0; i < len; i++)
+	{
+		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] ^= 0xff;
+	}
+
+	/* common init */
+	DRIVER_INIT_CALL(pcgboard);
+}
+
 /*     YEAR  NAME      PARENT    BIOS      MACHINE   INPUT     INIT      MONITOR  */
 
 /* Standard Games */
@@ -1717,6 +1758,8 @@ GAME( 1990, pc_ngai2, playch10, playch10, playch10, playch10_state, pcgboard, RO
 GAME( 1991, pc_ngai3, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode III: The Ancient Ship of Doom (PlayChoice-10)", 0 )
 GAME( 1991, pc_pwbld, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Taito (Nintendo of America license)",      "Power Blade (PlayChoice-10)", 0 )
 GAME( 1991, pc_rkats, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Atlus (Nintendo of America license)",      "Rockin' Kats (PlayChoice-10)", 0 )
+GAME( 1991, pc_ttoon, playch10, playch10, playch10, playch10_state, ttoon,    ROT0, "Konami (Nintendo of America license)",     "Tiny Toon Adventures (prototype) (PlayChoice-10)", 0 ) // Code is final USA NES version of the game, (which is MMC3C according to nes.xml, but this cart has MMC3B)
+
 /* variant with 4 screen mirror */
 GAME( 1990, pc_radr2, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", 0 )
 GAME( 1985, pc_gntlt, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )

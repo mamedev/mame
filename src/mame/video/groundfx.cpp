@@ -169,7 +169,7 @@ void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 		}
 	}
 
-	/* this happens only if primsks != NULL */
+	/* this happens only if primsks != nullptr */
 	while (sprite_ptr != m_spritelist.get())
 	{
 		const rectangle *clipper;

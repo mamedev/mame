@@ -272,9 +272,12 @@ MACHINE_START_MEMBER(astrafr_state,astra_common)
 	m_cpuregion_size = memregion( "maincpu" )->bytes()/4;
 	m_mainram = make_unique_clear<UINT32[]>(0x10000);
 
-	m_slavecpuregion = (UINT32*)memregion( "slavecpu" )->base();
-	m_slavecpuregion_size = memregion( "slavecpu" )->bytes()/4;
-	m_slaveram = make_unique_clear<UINT32[]>(0x10000);
+	if (memregion("slavecpu"))
+	{
+		m_slavecpuregion = (UINT32*)memregion( "slavecpu" )->base();
+		m_slavecpuregion_size = memregion( "slavecpu" )->bytes()/4;
+		m_slaveram = make_unique_clear<UINT32[]>(0x10000);
+	}
 
 
 }
@@ -2090,7 +2093,7 @@ ROM_END
 
 
 
-void astra_addresslines( UINT16* src, size_t srcsize, int small )
+static void astra_addresslines( UINT16* src, size_t srcsize, int small )
 {
 	std::vector<UINT16> dst(srcsize/2);
 

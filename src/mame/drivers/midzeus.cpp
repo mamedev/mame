@@ -31,6 +31,7 @@ The Grid         v1.2   10/18/2000
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "includes/midzeus.h"
+#include "includes/midzeus2.h"
 #include "machine/midwayic.h"
 #include "audio/dcs.h"
 #include "machine/nvram.h"

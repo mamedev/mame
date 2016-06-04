@@ -68,7 +68,8 @@ inline int atari_rle_objects_device::round_to_powerof2(int value)
 
 atari_rle_objects_device::atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATARI_RLE_OBJECTS, "Atari RLE Motion Objects", tag, owner, clock, "atari_rle", __FILE__),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_rombase(*this, DEVICE_SELF)
 {
 }
 
@@ -191,7 +192,7 @@ void atari_rle_objects_device::device_start()
 	// resolve our memory
 	memory_share *share = owner()->memshare(tag());
 	if (share == nullptr)
-		throw emu_fatalerror("Error: unable to find memory share '%s' needed for Atari RLE device", tag());
+		throw emu_fatalerror("Unable to find memory share '%s' needed for Atari RLE device", tag());
 	m_ram.set(*share, 2);
 
 	// register a VBLANK callback
@@ -218,8 +219,6 @@ void atari_rle_objects_device::device_start()
 	m_bitmapymask   = m_bitmapheight - 1;
 
 	// set up the graphics ROM
-	m_rombase       = reinterpret_cast<UINT16 *>(m_region->base());
-	m_romlength     = m_region->bytes();
 	m_objectcount   = count_objects();
 
 	// set up a cliprect
@@ -232,7 +231,7 @@ void atari_rle_objects_device::device_start()
 
 	// compute the checksums
 	memset(m_checksums, 0, sizeof(m_checksums));
-	for (int sumchunk = 0; sumchunk < m_romlength / 0x20000; sumchunk++)
+	for (int sumchunk = 0; sumchunk < m_rombase.bytes() / 0x20000; sumchunk++)
 	{
 		const UINT16 *csbase = &m_rombase[0x10000 * sumchunk];
 		int cursum = 0;
@@ -345,7 +344,7 @@ void atari_rle_objects_device::build_rle_tables()
 int atari_rle_objects_device::count_objects()
 {
 	// first determine the lowest address of all objects
-	int lowest_address = m_romlength;
+	int lowest_address = m_rombase.length();
 	for (int objoffset = 0; objoffset < lowest_address; objoffset += 4)
 	{
 		int offset = ((m_rombase[objoffset + 2] & 0xff) << 16) | m_rombase[objoffset + 3];
@@ -370,7 +369,7 @@ void atari_rle_objects_device::prescan_rle(int which)
 
 	// look up the offset
 	UINT16 *base = (UINT16 *)&m_rombase[which * 4];
-	const UINT16 *end = m_rombase + m_romlength / 2;
+	const UINT16 *end = &m_rombase[0] + m_rombase.length();
 	info.xoffs = (INT16)base[0];
 	info.yoffs = (INT16)base[1];
 
@@ -384,7 +383,7 @@ void atari_rle_objects_device::prescan_rle(int which)
 	info.data = base = (UINT16 *)&m_rombase[offset];
 
 	// make sure it's valid
-	if (offset < which * 4 || offset >= m_romlength)
+	if (offset < which * 4 || offset >= m_rombase.length())
 	{
 		info.data = nullptr;
 		return;
@@ -535,7 +534,7 @@ if (count++ == atarirle_hilite_index)
 
 void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &clip, int code, int color, int hflip, int vflip, int x, int y, int xscale, int yscale)
 {
-	// bail on a NULL object
+	// bail on a nullptr object
 	const object_info &info = m_info[code];
 	if (info.data == nullptr)
 		return;

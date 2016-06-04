@@ -474,7 +474,7 @@ void m6805_base_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -498,7 +498,7 @@ void m6805_base_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				(m_cc & 0x80) ? '?' : '.',
 				(m_cc & 0x40) ? '?' : '.',
 				(m_cc & 0x20) ? '?' : '.',
@@ -561,7 +561,7 @@ void m6805_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-#include "6805ops.inc"
+#include "6805ops.hxx"
 
 //-------------------------------------------------
 //  execute_clocks_to_cycles - convert the raw

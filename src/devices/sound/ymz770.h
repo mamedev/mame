@@ -86,8 +86,7 @@ protected:
 	UINT8 m_vlma;         // overall AAM volume
 	UINT8 m_bsl;          // boost level
 	UINT8 m_cpl;          // clip limiter
-	UINT8 *m_rom_base;
-	int m_rom_limit;
+	required_region_ptr<UINT8> m_rom;
 
 	ymz_channel m_channels[8];
 };

@@ -47,14 +47,14 @@ ROM_END
 
 hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, HD44780, "HD44780 A00", tag, owner, clock, "hd44780_a00", __FILE__),
-	m_pixel_update_func(nullptr)
+	m_cgrom(*this, DEVICE_SELF)
 {
 	set_charset_type(CHARSET_HD44780_A00);
 }
 
 hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_pixel_update_func(nullptr)
+	m_cgrom(*this, DEVICE_SELF)
 {
 }
 
@@ -86,11 +86,11 @@ const rom_entry *hd44780_device::device_rom_region() const
 
 void hd44780_device::device_start()
 {
-	if (region())
-		m_cgrom = region()->base();
-	else
-		m_cgrom = memregion("cgrom")->base();
+	if (!m_cgrom.found())
+		m_cgrom.set_target(memregion("cgrom")->base(), 0x1000);
 
+	m_pixel_update_cb.bind_relative_to(*owner());
+	
 	m_busy_timer = timer_alloc(TIMER_BUSY);
 	m_blink_timer = timer_alloc(TIMER_BLINKING);
 	m_blink_timer->adjust(attotime::from_msec(409), 0, attotime::from_msec(409));
@@ -235,9 +235,9 @@ void hd44780_device::update_nibble(int rs, int rw)
 
 inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8 pos, UINT8 y, UINT8 x, int state)
 {
-	if (m_pixel_update_func != nullptr)
+	if (!m_pixel_update_cb.isnull())
 	{
-		m_pixel_update_func(*this, bitmap, line, pos, y, x, state);
+		m_pixel_update_cb(bitmap, line, pos, y, x, state);
 	}
 	else
 	{

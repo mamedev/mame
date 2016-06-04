@@ -156,28 +156,20 @@ bgfx::ProgramHandle loadProgram(const char* _vsName, const char* _fsName)
 typedef unsigned char stbi_uc;
 extern "C" stbi_uc *stbi_load_from_memory(stbi_uc const *buffer, int len, int *x, int *y, int *comp, int req_comp);
 
-bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _name, uint32_t _flags, uint8_t _skip, bgfx::TextureInfo* _info)
+bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath, uint32_t _flags, uint8_t _skip, bgfx::TextureInfo* _info)
 {
-	char filePath[512] = { '\0' };
-	if (NULL == strchr(_name, '/') )
+	if (NULL != bx::stristr(_filePath, ".dds")
+	||  NULL != bx::stristr(_filePath, ".pvr")
+	||  NULL != bx::stristr(_filePath, ".ktx") )
 	{
-		strcpy(filePath, "textures/");
-	}
-
-	strcat(filePath, _name);
-
-	if (NULL != bx::stristr(_name, ".dds")
-	||  NULL != bx::stristr(_name, ".pvr")
-	||  NULL != bx::stristr(_name, ".ktx") )
-	{
-		const bgfx::Memory* mem = loadMem(_reader, filePath);
+		const bgfx::Memory* mem = loadMem(_reader, _filePath);
 		if (NULL != mem)
 		{
 			return bgfx::createTexture(mem, _flags, _skip, _info);
 		}
 
 		bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
-		DBG("Failed to load %s.", filePath);
+		DBG("Failed to load %s.", _filePath);
 		return handle;
 	}
 
@@ -185,7 +177,7 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _name, uin
 	bx::AllocatorI* allocator = entry::getAllocator();
 
 	uint32_t size = 0;
-	void* data = loadMem(_reader, allocator, filePath, &size);
+	void* data = loadMem(_reader, allocator, _filePath, &size);
 	if (NULL != data)
 	{
 		int width  = 0;
@@ -222,7 +214,7 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _name, uin
 	}
 	else
 	{
-		DBG("Failed to load %s.", filePath);
+		DBG("Failed to load %s.", _filePath);
 	}
 
 	return handle;
@@ -389,7 +381,7 @@ struct Group
 
 namespace bgfx
 {
-	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl);
+	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl, bx::Error* _err = NULL);
 }
 
 struct Mesh
@@ -540,17 +532,16 @@ struct Mesh
 				;
 		}
 
-		uint32_t cached = bgfx::setTransform(_mtx);
+		bgfx::setTransform(_mtx);
+		bgfx::setState(_state);
 
 		for (GroupArray::const_iterator it = m_groups.begin(), itEnd = m_groups.end(); it != itEnd; ++it)
 		{
 			const Group& group = *it;
 
-			bgfx::setTransform(cached);
 			bgfx::setIndexBuffer(group.m_ibh);
 			bgfx::setVertexBuffer(group.m_vbh);
-			bgfx::setState(_state);
-			bgfx::submit(_id, _program);
+			bgfx::submit(_id, _program, 0, it != itEnd-1);
 		}
 	}
 
@@ -560,26 +551,28 @@ struct Mesh
 
 		for (uint32_t pass = 0; pass < _numPasses; ++pass)
 		{
+			bgfx::setTransform(cached, _numMatrices);
+
 			const MeshState& state = *_state[pass];
+			bgfx::setState(state.m_state);
+
+			for (uint8_t tex = 0; tex < state.m_numTextures; ++tex)
+			{
+				const MeshState::Texture& texture = state.m_textures[tex];
+				bgfx::setTexture(texture.m_stage
+						, texture.m_sampler
+						, texture.m_texture
+						, texture.m_flags
+						);
+			}
 
 			for (GroupArray::const_iterator it = m_groups.begin(), itEnd = m_groups.end(); it != itEnd; ++it)
 			{
 				const Group& group = *it;
 
-				bgfx::setTransform(cached, _numMatrices);
-				for (uint8_t tex = 0; tex < state.m_numTextures; ++tex)
-				{
-					const MeshState::Texture& texture = state.m_textures[tex];
-					bgfx::setTexture(texture.m_stage
-							, texture.m_sampler
-							, texture.m_texture
-							, texture.m_flags
-							);
-				}
 				bgfx::setIndexBuffer(group.m_ibh);
 				bgfx::setVertexBuffer(group.m_vbh);
-				bgfx::setState(state.m_state);
-				bgfx::submit(state.m_viewId, state.m_program);
+				bgfx::submit(state.m_viewId, state.m_program, 0, it != itEnd-1);
 			}
 		}
 	}
@@ -646,10 +639,13 @@ Args::Args(int _argc, char** _argv)
 	{
 		m_type = bgfx::RendererType::OpenGL;
 	}
-	else if (cmdLine.hasArg("noop")
-		 ||  cmdLine.hasArg("vk") )
+	else if (cmdLine.hasArg("vk") )
 	{
-		m_type = bgfx::RendererType::OpenGL;
+		m_type = bgfx::RendererType::Vulkan;
+	}
+	else if (cmdLine.hasArg("noop") )
+	{
+		m_type = bgfx::RendererType::Null;
 	}
 	else if (BX_ENABLED(BX_PLATFORM_WINDOWS) )
 	{

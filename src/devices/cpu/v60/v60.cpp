@@ -85,6 +85,7 @@ v60_device::v60_device(const machine_config &mconfig, const char *tag, device_t 
 	: cpu_device(mconfig, V60, "V60", tag, owner, clock, "v60", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 24, 0)
+	, m_fetch_xor(BYTE_XOR_LE(0))
 	, m_start_pc(0xfffff0)
 {
 	// Set m_PIR (Processor ID) for NEC m_ LSB is reserved to NEC,
@@ -97,6 +98,7 @@ v60_device::v60_device(const machine_config &mconfig, device_type type, const ch
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 24, 0)
+	, m_fetch_xor(BYTE4_XOR_LE(0))
 	, m_start_pc(0xfffffff0)
 {
 	// Set m_PIR (Processor ID) for NEC v70. LSB is reserved to NEC,
@@ -358,16 +360,16 @@ UINT32 v60_device::v60_update_psw_for_exception(int is_interrupt, int target_lev
 
 
 // Addressing mode decoding functions
-#include "am.inc"
+#include "am.hxx"
 
 // Opcode functions
-#include "op12.inc"
-#include "op2.inc"
-#include "op3.inc"
-#include "op4.inc"
-#include "op5.inc"
-#include "op6.inc"
-#include "op7a.inc"
+#include "op12.hxx"
+#include "op2.hxx"
+#include "op3.hxx"
+#include "op4.hxx"
+#include "op5.hxx"
+#include "op6.hxx"
+#include "op7a.hxx"
 
 UINT32 v60_device::opUNHANDLED()
 {
@@ -376,7 +378,7 @@ UINT32 v60_device::opUNHANDLED()
 }
 
 // Opcode jump table
-#include "optable.inc"
+#include "optable.hxx"
 
 void v60_device::device_start()
 {
@@ -426,6 +428,7 @@ void v60_device::device_start()
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
 
+	save_item(NAME(m_fetch_xor));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_irq_line));
 	save_item(NAME(m_nmi_line));

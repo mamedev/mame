@@ -662,8 +662,13 @@ MACHINE_CONFIG_END
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1))
 
+// known undumped or private BIOS revisions:
+// "MPR-21068 SEGA JAPAN / 9850 D" from VA0 837-13392-02 (171-7782B) NTSC-J unit
+// KABUTO Ver.1.011 CRC 34DA5C88 from pre-release US unit (private)
+
+// MPR-21933-X2 confirmed match MPR-21931 (v1.01d)
+
 // actual mask rom labels can have -X1 or -X2 added, presumable depending on mobo revision and/or type of rom used (5v or 3.3v), contents is the same
-// known to exists undumped MPR-21086 (VA0 NTSC-J 3010) and MPR-21933 (VA0 US) boot roms
 
 #define DREAMCAST_COMMON_BIOS \
 	ROM_REGION(0x200000, "maincpu", 0) \

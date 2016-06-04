@@ -590,7 +590,7 @@ do {                                                                            
 		INT32 dy;                                                                       \
 																						\
 		assert(dest.valid());                                                           \
-		assert(gfx != NULL);                                                            \
+		assert(gfx != nullptr);                                                            \
 		assert(dest.cliprect().contains(cliprect));                                     \
 		assert(code < gfx->elements());                                             \
 																						\
@@ -3064,7 +3064,7 @@ ADDRESS_MAP_END
 
 
 static GFXDECODE_START( coolridr )
-//  GFXDECODE_ENTRY( NULL, 0, tiles16x16_layout, 0, 0x100 )
+//  GFXDECODE_ENTRY( nullptr, 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
 #define DUMMY_INPUT_PORT(_x_) \

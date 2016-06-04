@@ -21,8 +21,6 @@
 #include "video/mc6845.h"
 #include "video/saa5050.h"
 
-
-
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -329,24 +327,5 @@ public:
 	int m_vsync;                // vertical sync
 	int m_d_vsync;              // delayed vertical sync
 };
-
-
-
-//**************************************************************************
-//  MACHINE CONFIGURATION
-//**************************************************************************
-
-/*----------- defined in video/abc800.c -----------*/
-
-MACHINE_CONFIG_EXTERN(abc800m_video);
-MACHINE_CONFIG_EXTERN(abc800c_video);
-
-/*----------- defined in video/abc802.c -----------*/
-
-MACHINE_CONFIG_EXTERN(abc802_video);
-
-/*----------- defined in video/abc806.c -----------*/
-
-MACHINE_CONFIG_EXTERN(abc806_video);
 
 #endif

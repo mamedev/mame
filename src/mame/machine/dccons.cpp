@@ -136,7 +136,7 @@ READ32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_r )
 WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
 {
 	g1bus_regs[offset] = data; // 5f7400+reg*4=dat
-//  osd_printf_verbose("G1CTRL: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
+//  osd_printf_verbose("%s",string_format("G1CTRL: [%08x=%x] write %I64x to %x, mask %I64x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask).c_str());
 	switch (offset)
 	{
 	case SB_GDST:

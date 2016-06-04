@@ -819,7 +819,7 @@ bool pdp1_readtape_image_device::call_load()
 		/* restart reader IO when necessary */
 		/* note that this function may be called before pdp1_init_machine, therefore
 		before state->m_tape_reader.timer is allocated.  It does not matter, as the clutch is never
-		down at power-up, but we must not call timer_enable with a NULL parameter! */
+		down at power-up, but we must not call timer_enable with a nullptr parameter! */
 
 	if (state->m_tape_reader.timer)
 	{
@@ -1931,7 +1931,7 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */
 	MCFG_CPU_ADD("maincpu", PDP1, 1000000/*the CPU core uses microsecond counts*/)
-	MCFG_CPU_CONFIG(pdp1_reset_param)
+	MCFG_PDP1_RESET_PARAM(pdp1_reset_param)
 	MCFG_CPU_PROGRAM_MAP(pdp1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pdp1_state,  pdp1_interrupt)   /* dummy interrupt: handles input */
 

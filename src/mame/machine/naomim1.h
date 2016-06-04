@@ -35,6 +35,8 @@ private:
 	UINT32 rom_cur_address, buffer_actual_size, avail_bits;
 	bool encryption, stream_ended, has_history;
 
+	required_memory_region m_region;
+
 	void gb_reset();
 	UINT32 lookb(int bits);
 	void skipb(int bits);

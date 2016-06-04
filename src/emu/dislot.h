@@ -114,7 +114,7 @@ public:
 	static void static_set_option_clock(device_t &device, const char *option, UINT32 default_clock) { static_option(device, option)->m_clock = default_clock; }
 	bool fixed() const { return m_fixed; }
 	const char *default_option() const { return m_default_option; }
-	device_slot_option *first_option() const { return m_options.first(); }
+	const tagged_list<device_slot_option> &option_list() const { return m_options; }
 	device_slot_option *option(const char *name) const { if (name) return m_options.find(name); return nullptr; }
 	virtual std::string get_default_card_software() { return std::string(); }
 	device_t *get_card_device();

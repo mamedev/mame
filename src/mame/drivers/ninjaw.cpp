@@ -322,7 +322,7 @@ rumbling on a subwoofer in the cabinet.)
 #include "includes/taitoipt.h"
 #include "includes/ninjaw.h"
 
-extern const char layout_darius[];
+#include "ninjaw.lh"
 
 void ninjaw_state::parse_control(  )   /* assumes Z80 sandwiched between 68Ks */
 {
@@ -749,7 +749,7 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 	MCFG_PALETTE_ADD("palette2", 4096)
 	MCFG_PALETTE_ADD("palette3", 4096)
 
-	MCFG_DEFAULT_LAYOUT(layout_darius)
+	MCFG_DEFAULT_LAYOUT(layout_ninjaw)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -869,7 +869,7 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 	MCFG_PALETTE_ADD("palette2", 4096)
 	MCFG_PALETTE_ADD("palette3", 4096)
 
-	MCFG_DEFAULT_LAYOUT(layout_darius)
+	MCFG_DEFAULT_LAYOUT(layout_ninjaw)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1177,5 +1177,5 @@ ROM_END
 //    YEAR, NAME,    PARENT, MACHINE, INPUT,   INIT,MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1987, ninjaw,  0,      ninjaw,  ninjaw, driver_device,  0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ninjawj, ninjaw, ninjaw,  ninjawj, driver_device, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjawu, ninjaw, ninjaw,  ninjaw, driver_device,  0,   ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US)", MACHINE_SUPPORTS_SAVE ) /* Uses same coinage as World, see notes */
+GAME( 1987, ninjawu, ninjaw, ninjaw,  ninjawj, driver_device,  0,   ROT0,  "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US)", MACHINE_SUPPORTS_SAVE ) /* Uses same coinage as World, see notes */
 GAME( 1989, darius2, 0,      darius2, darius2, driver_device, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE )

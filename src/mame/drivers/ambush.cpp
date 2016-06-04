@@ -37,6 +37,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/ambush.h"
 
@@ -68,7 +69,7 @@ WRITE8_MEMBER(ambush_state::flip_screen_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ambush_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc080, 0xc09f) AM_SHARE("scrollram")
 	AM_RANGE(0xc100, 0xc1ff) AM_SHARE("colorram")
@@ -208,6 +209,8 @@ static MACHINE_CONFIG_START( ambush, ambush_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ambush_state,  irq0_line_hold)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

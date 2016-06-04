@@ -45,6 +45,7 @@ CPU/Video Board Parts:
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
 #include "machine/konami1.h"
+#include "machine/watchdog.h"
 #include "includes/konamipt.h"
 #include "audio/trackfld.h"
 #include "includes/sbasketb.h"
@@ -71,7 +72,7 @@ static ADDRESS_MAP_START( sbasketb_map, AS_PROGRAM, 8, sbasketb_state )
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3a00, 0x3bff) AM_RAM           /* Probably unused, but initialized */
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3c10, 0x3c10) AM_READNOP    /* ???? */
 	AM_RANGE(0x3c20, 0x3c20) AM_WRITEONLY AM_SHARE("palettebank")
 	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(sbasketb_flipscreen_w)
@@ -190,6 +191,8 @@ static MACHINE_CONFIG_START( sbasketb, sbasketb_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4) /* 3.5795 MHz */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_sound_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

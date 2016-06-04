@@ -19,6 +19,10 @@
 #include <tinyexr/tinyexr.h>
 #include <edtaa3/edtaa3func.h>
 
+extern "C" {
+#include <iqa.h>
+}
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.c>
 
@@ -27,8 +31,8 @@
 #endif // DEBUG
 
 #include <bx/bx.h>
-#include <bx/allocator.h>
 #include <bx/commandline.h>
+#include <bx/crtimpl.h>
 #include <bx/uint32_t.h>
 
 namespace bgfx
@@ -117,7 +121,7 @@ namespace bgfx
 		case TextureFormat::PTC14:
 			{
 				using namespace Javelin;
-				RgbBitmap bmp;
+				RgbaBitmap bmp;
 				bmp.width  = _width;
 				bmp.height = _height;
 				bmp.data   = (uint8_t*)const_cast<void*>(_src);
@@ -348,6 +352,7 @@ void help(const char* _error = NULL)
 		  "  -m, --mips               Generate mip-maps.\n"
 		  "  -n, --normalmap          Input texture is normal map.\n"
 		  "      --sdf <edge>         Compute SDF texture.\n"
+		  "      --iqa                Image Quality Assesment\n"
 
 		  "\n"
 		  "For additional information, see https://github.com/bkaradzic/bgfx\n"
@@ -409,8 +414,9 @@ int main(int _argc, const char* _argv[])
 		}
 	}
 
-	const bool mips      = cmdLine.hasArg('m', "mips");
-	const bool normalMap = cmdLine.hasArg('n', "normalmap");
+	const bool mips      = cmdLine.hasArg('m',  "mips");
+	const bool normalMap = cmdLine.hasArg('n',  "normalmap");
+	const bool iqa       = cmdLine.hasArg('\0', "iqa");
 
 	uint32_t size = (uint32_t)bx::getSize(&reader);
 	const bgfx::Memory* mem = bgfx::alloc(size);
@@ -472,7 +478,25 @@ int main(int _argc, const char* _argv[])
 
 				if (normalMap)
 				{
-					uint32_t size = imageGetSize(TextureFormat::RGBA32F, mip.m_width, mip.m_height);
+					output = imageAlloc(imageContainer, format, mip.m_width, mip.m_height, 0, false, mips);
+
+					ImageMip dstMip;
+					imageGetRawData(imageContainer, 0, 0, NULL, 0, dstMip);
+
+					if (mip.m_width  != dstMip.m_width
+					&&  mip.m_height != dstMip.m_height)
+					{
+						printf("Invalid input image size %dx%d, it must be at least %dx%d to be converted to %s format.\n"
+							, mip.m_width
+							, mip.m_height
+							, dstMip.m_width
+							, dstMip.m_height
+							, getName(format)
+							);
+						return EXIT_FAILURE;
+					}
+
+					uint32_t size = imageGetSize(TextureFormat::RGBA32F, dstMip.m_width, dstMip.m_height);
 					temp = BX_ALLOC(&allocator, size);
 					float* rgba = (float*)temp;
 					float* rgbaDst = (float*)BX_ALLOC(&allocator, size);
@@ -502,17 +526,13 @@ int main(int _argc, const char* _argv[])
 						}
 					}
 
-					output = imageAlloc(imageContainer, format, mip.m_width, mip.m_height, 0, false, mips);
-
-					imageRgba32f11to01(rgbaDst, mip.m_width, mip.m_height, mip.m_width*16, rgba);
-					imageEncodeFromRgba32f(&allocator, output->data, rgbaDst, mip.m_width, mip.m_height, format);
+					imageRgba32f11to01(rgbaDst, dstMip.m_width, dstMip.m_height, dstMip.m_width*16, rgba);
+					imageEncodeFromRgba32f(&allocator, output->data, rgbaDst, dstMip.m_width, dstMip.m_height, format);
 
 					for (uint8_t lod = 1; lod < numMips; ++lod)
 					{
-						imageRgba32fDownsample2x2NormalMap(mip.m_width, mip.m_height, mip.m_width*16, rgba, rgba);
-						imageRgba32f11to01(rgbaDst, mip.m_width, mip.m_height, mip.m_width*16, rgba);
-
-						ImageMip dstMip;
+						imageRgba32fDownsample2x2NormalMap(dstMip.m_width, dstMip.m_height, dstMip.m_width*16, rgba, rgba);
+						imageRgba32f11to01(rgbaDst, dstMip.m_width, dstMip.m_height, dstMip.m_width*16, rgba);
 						imageGetRawData(imageContainer, 0, lod, output->data, output->size, dstMip);
 						uint8_t* data = const_cast<uint8_t*>(dstMip.m_data);
 						imageEncodeFromRgba32f(&allocator, data, rgbaDst, dstMip.m_width, dstMip.m_height, format);
@@ -522,8 +542,27 @@ int main(int _argc, const char* _argv[])
 				}
 				else
 				{
-					uint32_t size = imageGetSize(TextureFormat::RGBA8, mip.m_width, mip.m_height);
+					output = imageAlloc(imageContainer, format, mip.m_width, mip.m_height, 0, false, mips);
+
+					ImageMip dstMip;
+					imageGetRawData(imageContainer, 0, 0, NULL, 0, dstMip);
+
+					if (mip.m_width  != dstMip.m_width
+					&&  mip.m_height != dstMip.m_height)
+					{
+						printf("Invalid input image size %dx%d, it must be at least %dx%d to be converted to %s format.\n"
+							, mip.m_width
+							, mip.m_height
+							, dstMip.m_width
+							, dstMip.m_height
+							, getName(format)
+							);
+						return EXIT_FAILURE;
+					}
+
+					uint32_t size = imageGetSize(TextureFormat::RGBA8, dstMip.m_width, dstMip.m_height);
 					temp = BX_ALLOC(&allocator, size);
+					memset(temp, 0, size);
 					uint8_t* rgba = (uint8_t*)temp;
 
 					imageDecodeToRgba8(rgba
@@ -534,18 +573,55 @@ int main(int _argc, const char* _argv[])
 						, mip.m_format
 						);
 
-					output = imageAlloc(imageContainer, format, mip.m_width, mip.m_height, 0, false, mips);
+					void* ref = NULL;
+					if (iqa)
+					{
+						ref = BX_ALLOC(&allocator, size);
+						memcpy(ref, rgba, size);
+					}
 
-					imageEncodeFromRgba8(output->data, rgba, mip.m_width, mip.m_height, format);
+					imageEncodeFromRgba8(output->data, rgba, dstMip.m_width, dstMip.m_height, format);
 
 					for (uint8_t lod = 1; lod < numMips; ++lod)
 					{
-						imageRgba8Downsample2x2(mip.m_width, mip.m_height, mip.m_width*4, rgba, rgba);
-
-						ImageMip dstMip;
+						imageRgba8Downsample2x2(dstMip.m_width, dstMip.m_height, dstMip.m_width*4, rgba, rgba);
 						imageGetRawData(imageContainer, 0, lod, output->data, output->size, dstMip);
 						uint8_t* data = const_cast<uint8_t*>(dstMip.m_data);
 						imageEncodeFromRgba8(data, rgba, dstMip.m_width, dstMip.m_height, format);
+					}
+
+					if (NULL != ref)
+					{
+						imageDecodeToRgba8(rgba
+							, output->data
+							, mip.m_width
+							, mip.m_height
+							, mip.m_width*mip.m_bpp/8
+							, format
+							);
+
+						static const iqa_ssim_args args =
+						{
+							0.39f,     // alpha
+							0.731f,    // beta
+							1.12f,     // gamma
+							187,       // L
+							0.025987f, // K1
+							0.0173f,   // K2
+							1          // factor
+						};
+
+						float result = iqa_ssim( (uint8_t*)ref
+								, rgba
+								, mip.m_width
+								, mip.m_height
+								, mip.m_width*mip.m_bpp/8
+								, 0
+								, &args
+								);
+						printf("%f\n", result);
+
+						BX_FREE(&allocator, ref);
 					}
 				}
 

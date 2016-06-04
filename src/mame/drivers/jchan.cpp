@@ -159,6 +159,7 @@ JC-301-00  W11 9510K7059    23C16000        U85
 #include "sound/ymz280b.h"
 #include "video/sknsspr.h"
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "video/kaneko_tmap.h"
 #include "machine/kaneko_toybox.h"
 
@@ -444,7 +445,7 @@ static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
 
 	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(ctrl_r, ctrl_w) AM_SHARE("ctrl")
 
-	AM_RANGE(0xf80000, 0xf80001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)   // watchdog
+	AM_RANGE(0xf80000, 0xf80001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
 ADDRESS_MAP_END
 
 
@@ -464,7 +465,7 @@ static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16, jchan_state )
 
 	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff) // sound
 
-	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)   // watchdog
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
 ADDRESS_MAP_END
 
 
@@ -581,6 +582,8 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 
 	MCFG_CPU_ADD("sub", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(jchan_sub)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jchan)
 

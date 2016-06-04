@@ -17,8 +17,10 @@
 --------------------------------------------------
 
 CPUS["Z80"] = true
---CPUS["M6502"] = true
---CPUS["MCS48"] = true
+CPUS["M6800"] = true
+CPUS["M6803"] = true
+CPUS["M6809"] = true
+CPUS["MCS48"] = true
 --CPUS["MCS51"] = true
 --CPUS["M6800"] = true
 --CPUS["M6809"] = true
@@ -33,9 +35,9 @@ CPUS["Z80"] = true
 
 --SOUNDS["SAMPLES"] = true
 SOUNDS["DAC"] = true
---SOUNDS["DISCRETE"] = true
+SOUNDS["DISCRETE"] = true
 SOUNDS["AY8910"] = true
---SOUNDS["YM2151"] = true
+SOUNDS["MSM5205"] = true
 --SOUNDS["ASTROCADE"] = true
 --SOUNDS["TMS5220"] = true
 --SOUNDS["OKIM6295"] = true
@@ -55,6 +57,8 @@ VIDEOS["FIXFREQ"] = true
 --------------------------------------------------
 
 MACHINES["NETLIST"] = true
+MACHINES["Z80DMA"] = true
+MACHINES["GEN_LATCH"] = true
 --MACHINES["6821PIA"] = true
 --MACHINES["TTL74148"] = true
 --MACHINES["TTL74153"] = true
@@ -84,7 +88,9 @@ function createProjects_mame_nl(_target, _subtarget)
 	targetsubdir(_target .."_" .. _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-mame-nl"))
-	
+	addprojectflags()
+	precompiledheaders()
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
@@ -99,17 +105,33 @@ function createProjects_mame_nl(_target, _subtarget)
 
 files{
 	MAME_DIR .. "src/mame/drivers/pong.cpp",
-	MAME_DIR .. "src/mame/drivers/nl_pong.cpp",
-	MAME_DIR .. "src/mame/drivers/nl_pongd.cpp",
-	MAME_DIR .. "src/mame/drivers/nl_breakout.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pong.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pong.h",
+	MAME_DIR .. "src/mame/machine/nl_pongd.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pongd.h",
+	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",
+	MAME_DIR .. "src/mame/machine/nl_breakout.h",
 
 	MAME_DIR .. "src/mame/drivers/1942.cpp",
 	MAME_DIR .. "src/mame/includes/1942.h",
 	MAME_DIR .. "src/mame/video/1942.cpp",
+
 	MAME_DIR .. "src/mame/drivers/popeye.cpp",
 	MAME_DIR .. "src/mame/includes/popeye.h",
 	MAME_DIR .. "src/mame/video/popeye.cpp",
 
+  MAME_DIR .. "src/mame/drivers/mario.cpp",
+  MAME_DIR .. "src/mame/includes/mario.h",
+  MAME_DIR .. "src/mame/video/mario.cpp",
+  MAME_DIR .. "src/mame/audio/mario.cpp",
+	
+	MAME_DIR .. "src/mame/drivers/m62.cpp",
+	MAME_DIR .. "src/mame/includes/m62.h",
+	MAME_DIR .. "src/mame/video/m62.cpp",
+	MAME_DIR .. "src/mame/audio/irem.cpp",
+	MAME_DIR .. "src/mame/audio/irem.h",
+	MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
+	MAME_DIR .. "src/mame/audio/nl_kidniki.h",
 }
 end
 

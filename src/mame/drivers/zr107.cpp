@@ -173,6 +173,7 @@ Check gticlub.c for details on the bottom board.
 #include "machine/adc083x.h"
 #include "machine/k056230.h"
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "sound/k056800.h"
 #include "sound/k054539.h"
 #include "video/k001604.h"
@@ -190,6 +191,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
+		m_watchdog(*this, "watchdog"),
 		m_k001604(*this, "k001604"),
 		m_k056800(*this, "k056800"),
 		m_k056832(*this, "k056832"),
@@ -215,6 +217,7 @@ public:
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_dsp;
+	required_device<watchdog_timer_device> m_watchdog;
 	optional_device<k001604_device> m_k001604;
 	required_device<k056800_device> m_k056800;
 	optional_device<k056832_device> m_k056832;
@@ -419,7 +422,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 			    0x01 = AFE
 			*/
 			if (data & 0x01)
-				machine().watchdog_reset();
+				m_watchdog->watchdog_reset();
 			break;
 
 	}
@@ -773,6 +776,8 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
 	MCFG_K056230_CPU("maincpu")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -784,12 +789,9 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	MCFG_VIDEO_START_OVERRIDE(zr107_state,zr107)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(zr107_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx2", 1, K056832_BPP_8, 1, 0, "none")
-	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_CONFIG("gfx2", K056832_BPP_8, 1, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k001005", K001005, 0)
@@ -845,6 +847,8 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
 	MCFG_K056230_CPU("maincpu")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -856,16 +860,11 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	MCFG_VIDEO_START_OVERRIDE(zr107_state,jetwave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k001604", K001604, 0)
-	MCFG_K001604_GFX_INDEX1(0)
-	MCFG_K001604_GFX_INDEX2(1)
 	MCFG_K001604_LAYER_SIZE(0)
 	MCFG_K001604_ROZ_SIZE(0)
 	MCFG_K001604_TXT_OFFSET(0)
 	MCFG_K001604_ROZ_OFFSET(16384)
-	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k001005", K001005, 0)

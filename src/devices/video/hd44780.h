@@ -21,15 +21,15 @@
 #define MCFG_HD44780_LCD_SIZE(_lines, _chars) \
 	hd44780_device::static_set_lcd_size(*device, _lines, _chars);
 
-#define MCFG_HD44780_PIXEL_UPDATE_CB(_cb) \
-	hd44780_device::static_set_pixel_update_cb(*device, _cb);
+#define MCFG_HD44780_PIXEL_UPDATE_CB(_class, _method) \
+	hd44780_device::static_set_pixel_update_cb(*device, hd44780_pixel_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef void (*hd44780_pixel_update_func)(device_t &device, bitmap_ind16 &bitmap, UINT8 line, UINT8 pos, UINT8 y, UINT8 x, int state);
-#define HD44780_PIXEL_UPDATE(name) void name(device_t &device, bitmap_ind16 &bitmap, UINT8 line, UINT8 pos, UINT8 y, UINT8 x, int state)
+typedef device_delegate<void (bitmap_ind16 &bitmap, UINT8 line, UINT8 pos, UINT8 y, UINT8 x, int state)> hd44780_pixel_update_delegate;
+#define HD44780_PIXEL_UPDATE(name) void name(bitmap_ind16 &bitmap, UINT8 line, UINT8 pos, UINT8 y, UINT8 x, int state)
 
 
 // ======================> hd44780_device
@@ -43,7 +43,7 @@ public:
 
 	// static configuration helpers
 	static void static_set_lcd_size(device_t &device, int _lines, int _chars) { hd44780_device &dev=downcast<hd44780_device &>(device); dev.m_lines = _lines; dev.m_chars = _chars; }
-	static void static_set_pixel_update_cb(device_t &device, hd44780_pixel_update_func _cb) { downcast<hd44780_device &>(device).m_pixel_update_func = _cb; }
+	static void static_set_pixel_update_cb(device_t &device, hd44780_pixel_update_delegate callback) { downcast<hd44780_device &>(device).m_pixel_update_cb = callback; }
 
 	// device interface
 	virtual DECLARE_WRITE8_MEMBER(write);
@@ -100,12 +100,12 @@ private:
 
 	UINT8       m_lines;          // number of lines
 	UINT8       m_chars;          // chars for line
-	hd44780_pixel_update_func m_pixel_update_func; // pixel update callback
+	hd44780_pixel_update_delegate m_pixel_update_cb; // pixel update callback
 
 	bool        m_busy_flag;      // busy flag
 	UINT8       m_ddram[0x80];    // internal display data RAM
 	UINT8       m_cgram[0x40];    // internal chargen RAM
-	UINT8 *     m_cgrom;          // internal chargen ROM
+	optional_region_ptr<UINT8> m_cgrom; // internal chargen ROM
 	int         m_ac;             // address counter
 	UINT8       m_dr;             // data register
 	UINT8       m_ir;             // instruction register

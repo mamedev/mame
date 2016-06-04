@@ -96,6 +96,7 @@ public:
 	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~legacy_floppy_image_device();
 
+	static void static_set_floppy_config(device_t &device, const floppy_interface *config) { downcast<legacy_floppy_image_device &>(device).m_config = config; }
 	template<class _Object> static devcb_base &set_out_idx_func(device_t &device, _Object object) { return downcast<legacy_floppy_image_device &>(device).m_out_idx_func.set_callback(object); }
 
 	virtual bool call_load() override;
@@ -242,24 +243,27 @@ int floppy_get_count(running_machine &machine);
 #define FLOPPY_3 "floppy3"
 
 
+#define MCFG_LEGACY_FLOPPY_CONFIG(_config) \
+	legacy_floppy_image_device::static_set_floppy_config(*device, &(_config));
+
 #define MCFG_LEGACY_FLOPPY_DRIVE_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, LEGACY_FLOPPY, 0)         \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_LEGACY_FLOPPY_CONFIG(_config)
 
 #define MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(_config)    \
 	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)     \
-	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
 	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)     \
-	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
 	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)     \
-	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
 	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)     \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_LEGACY_FLOPPY_CONFIG(_config)
 
 #define MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(_config)    \
 	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)     \
-	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
 	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)     \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_LEGACY_FLOPPY_CONFIG(_config)
 
 #endif /* __FLOPDRV_H__ */

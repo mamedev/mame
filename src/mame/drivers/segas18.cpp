@@ -45,7 +45,7 @@
 
 void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index)
 {
-	UINT32 romsize = m_maincpu->region()->bytes();
+	UINT32 romsize = m_maincpu_region->bytes();
 	switch (index)
 	{
 		case 7:

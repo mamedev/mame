@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 # 65ce02 opcodes, a lot only remove dummy read/write cycles, some are new, some use the B register
 
 adc_ce_aba

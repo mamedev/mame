@@ -187,7 +187,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxy)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	/* snapshot */
@@ -229,7 +229,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	/* snapshot */
@@ -255,7 +255,7 @@ MACHINE_CONFIG_END
 
 ROM_START (galaxy)
 	ROM_REGION (0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD ("galrom1.bin", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358))
+	ROM_LOAD ("galrom1.bin", 0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739))
 	ROM_LOAD_OPTIONAL ("galrom2.bin", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
@@ -263,7 +263,7 @@ ROM_END
 
 ROM_START (galaxyp)
 	ROM_REGION (0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD ("galrom1.bin", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358))
+	ROM_LOAD ("galrom1.bin", 0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739))
 	ROM_LOAD ("galrom2.bin", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1))
 	ROM_LOAD ("galplus.bin", 0xe000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee))
 	ROM_REGION(0x0800, "gfx1",0)
@@ -271,5 +271,5 @@ ROM_START (galaxyp)
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY FULLNAME */
-COMP(1983,  galaxy,     0,      0,  galaxy, galaxy, galaxy_state,   galaxy, "Elektronika inzenjering",          "Galaksija",      0)
-COMP(1985,  galaxyp,    galaxy, 0,  galaxyp,galaxyp, galaxy_state,galaxyp,"Elektronika inzenjering",            "Galaksija plus", 0)
+COMP(1983,  galaxy,     0,      0,  galaxy, galaxy, galaxy_state,   galaxy, "Voja Antonic / Elektronika inzenjering",          "Galaksija",      0)
+COMP(1985,  galaxyp,    galaxy, 0,  galaxyp,galaxyp, galaxy_state,galaxyp,"Nenad Dunjic",            "Galaksija plus", 0)

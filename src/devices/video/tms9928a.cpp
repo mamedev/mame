@@ -59,6 +59,7 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type typ
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_out_int_line_cb(*this),
+		m_out_gromclk_cb(*this),
 		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = is_50hz;
@@ -74,6 +75,7 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag
 		device_video_interface(mconfig, *this),
 		m_vram_size(0),
 		m_out_int_line_cb(*this),
+		m_out_gromclk_cb(*this),
 		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = false;
@@ -110,6 +112,25 @@ tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag,
 	: tms9928a_device( mconfig, TMS9929A, "TMS9929A", tag, owner, clock, true, true, true, "tms9929a", __FILE__)
 { }
 
+READ8_MEMBER( tms9928a_device::read )
+{
+	UINT8 value = 0;
+
+	if ((offset & 1) == 0)
+		value = vram_read(space, 0);
+	else
+		value = register_read(space, 0);
+
+	return value;
+}
+
+WRITE8_MEMBER( tms9928a_device::write )
+{
+	if ((offset & 1) == 0)
+		vram_write(space, 0, data);
+	else
+		register_write(space, 0, data);
+}
 
 READ8_MEMBER( tms9928a_device::vram_read )
 {
@@ -302,6 +323,15 @@ WRITE8_MEMBER( tms9928a_device::register_write )
 
 void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	// Handle GROM clock if present
+	if (id==GROMCLK)
+	{
+		// Pulse it
+		m_out_gromclk_cb(ASSERT_LINE);
+		m_out_gromclk_cb(CLEAR_LINE);
+		return;
+	}
+
 	int raw_vpos = m_screen->vpos();
 	int vpos = raw_vpos * m_vertical_size / m_screen->height();
 	UINT16 BackColour = m_Regs[7] & 15;
@@ -669,6 +699,7 @@ void tms9928a_device::device_start()
 	m_vertical_size = m_50hz ? TMS9928A_TOTAL_VERT_PAL : TMS9928A_TOTAL_VERT_NTSC;
 
 	m_out_int_line_cb.resolve();
+	m_out_gromclk_cb.resolve();
 
 	// Video RAM is allocated as an own address space
 	m_vram_space = &space(AS_DATA);
@@ -677,6 +708,7 @@ void tms9928a_device::device_start()
 	m_tmpbmp.allocate(TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_PAL);
 
 	m_line_timer = timer_alloc(TIMER_LINE);
+	m_gromclk_timer = timer_alloc(GROMCLK);
 
 	set_palette();
 
@@ -728,4 +760,7 @@ void tms9928a_device::device_reset()
 	m_mode = 0;
 
 	m_line_timer->adjust( m_screen->time_until_pos( 0, TMS9928A_HORZ_DISPLAY_START ) );
+
+	// TODO: Check clock freq settings in all drivers
+	if (!m_out_gromclk_cb.isnull() && m_99) m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()/12));
 }

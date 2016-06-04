@@ -34,7 +34,7 @@ struct mat_cr_t
 
 		while (k < oe)
 		{
-			double tmp = 0.0;
+			T tmp = 0.0;
 			const unsigned e = ia[i+1];
 			for (; k < e; k++)
 				tmp += A[k] * x[ja[k]];
@@ -42,7 +42,8 @@ struct mat_cr_t
 		}
 	}
 
-	void incomplete_LU_factorization(const nl_double * RESTRICT A, nl_double * RESTRICT LU)
+	template<typename T>
+	void incomplete_LU_factorization(const T * RESTRICT A, T * RESTRICT LU)
 	{
 		/*
 		 * incomplete LU Factorization according to http://de.wikipedia.org/wiki/ILU-Zerlegung
@@ -59,12 +60,13 @@ struct mat_cr_t
 		for (unsigned i = 1; ia[i] < lnz; i++) // row i
 		{
 			const unsigned iai1 = ia[i + 1];
-			for (unsigned pk = ia[i]; pk < diag[i]; pk++) // all columns left of diag in row i
+			const unsigned pke = diag[i];
+			for (unsigned pk = ia[i]; pk < pke; pk++) // all columns left of diag in row i
 			{
 				// pk == (i, k)
 				const unsigned k = ja[pk];
 				const unsigned iak1 = ia[k + 1];
-				const double LUpk = LU[pk] = LU[pk] / LU[diag[k]];
+				const T LUpk = LU[pk] = LU[pk] / LU[diag[k]];
 
 				unsigned pt = ia[k];
 
@@ -81,7 +83,8 @@ struct mat_cr_t
 		}
 	}
 
-	void solveLUx (const nl_double * RESTRICT LU, nl_double * RESTRICT r)
+	template<typename T>
+	void solveLUx (const T * RESTRICT LU, T * RESTRICT r)
 	{
 		/*
 		 * Solve a linear equation Ax = r
@@ -109,7 +112,7 @@ struct mat_cr_t
 
 		for (i = 1; ia[i] < nz_num; i++ )
 		{
-			double tmp = 0.0;
+			T tmp = 0.0;
 			const unsigned j1 = ia[i];
 			const unsigned j2 = diag[i];
 
@@ -122,7 +125,7 @@ struct mat_cr_t
 		for (; 0 < i; i-- )
 		{
 			const unsigned im1 = i - 1;
-			double tmp = 0.0;
+			T tmp = 0.0;
 			const unsigned j1 = diag[im1] + 1;
 			const unsigned j2 = ia[im1+1];
 			for (unsigned j = j1; j < j2; j++ )

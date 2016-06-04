@@ -6,67 +6,67 @@
 
     Next generation driver written in February 2016 by R. Belmont.
     Thanks to the original crew.
- 
+
     Apple I has:
-    	6502 @ 1.023 MHz (~0.960 MHz with RAM refresh)
-    	4 or 8 KB RAM on-board
-    	256 byte Monitor ROM
-		No IRQs, no sound, dumb terminal video 
-		6820 PIA for keyboard / terminal interface 
- 
-	------------------------------------------------------------------- 
- 
-	How to use cassettes:
-	The system has no error checking or checksums, and the cassette
-	has no header.
-	Therefore, you must know the details, and pass these to the
-	interface yourself.
- 
-	BASIC has no cassette handling. You must enter the monitor
-	with: CALL -151
-	then when finished, re-enter BASIC with: E2B3R
+        6502 @ 1.023 MHz (~0.960 MHz with RAM refresh)
+        4 or 8 KB RAM on-board
+        256 byte Monitor ROM
+        No IRQs, no sound, dumb terminal video
+        6820 PIA for keyboard / terminal interface
 
-	Examples:
+    -------------------------------------------------------------------
 
-	A machine-language program will typically be like this:
-	C100R    (enter the interface)
-	0300.0FFFR  (enter the load and end addresses, then load the tape)
-	You start the tape.
-	When the prompt returns you stop the tape.
-	0300R  (run your program)
+    How to use cassettes:
+    The system has no error checking or checksums, and the cassette
+    has no header.
+    Therefore, you must know the details, and pass these to the
+    interface yourself.
 
+    BASIC has no cassette handling. You must enter the monitor
+    with: CALL -151
+    then when finished, re-enter BASIC with: E2B3R
 
-	To Load Tape Basic:
-	C100R
-	E000.EFFFR
-	You start the tape.
-	When the prompt returns you stop the tape.
-	E000R  (It must say 4C - if not, your tape is no good).
-	The BASIC prompt will appear
-	>@
+    Examples:
+
+    A machine-language program will typically be like this:
+    C100R    (enter the interface)
+    0300.0FFFR  (enter the load and end addresses, then load the tape)
+    You start the tape.
+    When the prompt returns you stop the tape.
+    0300R  (run your program)
 
 
-	A BASIC program is split into two areas, one for the scratch pad,
-	and one for the program proper.
-	In BASIC you may have to adjust the allowed memory area, such as
-	LOMEM = 768
-	Then, go to the monitor: CALL -151
-	C100R    (enter the interface)
-	00A4.00FFR 0300.0FFFR   (load the 2 parts)
-	You start the tape.
-	When the prompt returns you stop the tape.
-	E2B3R    (back to BASIC)
-	You can LIST or RUN now.
+    To Load Tape Basic:
+    C100R
+    E000.EFFFR
+    You start the tape.
+    When the prompt returns you stop the tape.
+    E000R  (It must say 4C - if not, your tape is no good).
+    The BASIC prompt will appear
+    >@
 
 
-	Saving is almost the same, when you specify the address range, enter
-	W instead of R. The difficulty is finding out how long your program is.
+    A BASIC program is split into two areas, one for the scratch pad,
+    and one for the program proper.
+    In BASIC you may have to adjust the allowed memory area, such as
+    LOMEM = 768
+    Then, go to the monitor: CALL -151
+    C100R    (enter the interface)
+    00A4.00FFR 0300.0FFFR   (load the 2 parts)
+    You start the tape.
+    When the prompt returns you stop the tape.
+    E2B3R    (back to BASIC)
+    You can LIST or RUN now.
 
-	Insert a blank tape
-	C100R
-	0300.0FFFW
-	Quickly press Record.
-	When the prompt returns, press Stop.
+
+    Saving is almost the same, when you specify the address range, enter
+    W instead of R. The difficulty is finding out how long your program is.
+
+    Insert a blank tape
+    C100R
+    0300.0FFFW
+    Quickly press Record.
+    When the prompt returns, press Stop.
 
 **********************************************************************/
 
@@ -82,9 +82,9 @@
 
 #include "softlist.h"
 
-#define A1_CPU_TAG	"maincpu"
-#define A1_PIA_TAG	"pia6821"
-#define A1_BUS_TAG	"a1bus"
+#define A1_CPU_TAG  "maincpu"
+#define A1_PIA_TAG  "pia6821"
+#define A1_BUS_TAG  "a1bus"
 #define A1_BASICRAM_TAG "basicram"
 
 class apple1_state : public driver_device
@@ -146,20 +146,20 @@ private:
 
 static const UINT8 apple1_keymap[] =
 {
-	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '=', '[', ']', ';', '\'',	// KEY0
-	',', '.', '/', '\\', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',	// KEY1
-	'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '\r', '_',	// KEY2
-	' ', '\x1b', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,								// KEY3
+	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '=', '[', ']', ';', '\'',    // KEY0
+	',', '.', '/', '\\', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',    // KEY1
+	'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '\r', '_',    // KEY2
+	' ', '\x1b', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                              // KEY3
 
-	')', '!', '@', '#', '$', '%', '^', '&', '*', '(', '_', '+', '[', ']', ':', '"',		// KEY0 + shift
+	')', '!', '@', '#', '$', '%', '^', '&', '*', '(', '_', '+', '[', ']', ':', '"',     // KEY0 + shift
 	'<', '>', '?', '\\', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',    // KEY1 + shift
 	'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '\r', '_',    // KEY2 + shift
-	' ', '\x1b', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,								// KEY3 + shift
+	' ', '\x1b', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                              // KEY3 + shift
 
-	'0', '1', '\x00', '\x1b', '\x1c', '\x1d', '\x1e', '\x1f', '8', '9', '\x1f', '=', '\x1b', '\x1d', ';', '\'',	// KEY0 + CTRL
-	',', '.', '/', '\x1c', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x0a', '\x0b', '\x0c',	// KEY1 + CTRL
-	'\x0d', '\x0e', '\x0f', '\x10', '\x11', '\x12', '\x13', '\x14', '\x15', '\x16', '\x17', '\x18', '\x19', '\x1a', '\r', '_',	// KEY2 + CTRL
-	' ', '\x1b', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,								// KEY3 + CTRL
+	'0', '1', '\x00', '\x1b', '\x1c', '\x1d', '\x1e', '\x1f', '8', '9', '\x1f', '=', '\x1b', '\x1d', ';', '\'', // KEY0 + CTRL
+	',', '.', '/', '\x1c', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x0a', '\x0b', '\x0c',  // KEY1 + CTRL
+	'\x0d', '\x0e', '\x0f', '\x10', '\x11', '\x12', '\x13', '\x14', '\x15', '\x16', '\x17', '\x18', '\x19', '\x1a', '\r', '_',  // KEY2 + CTRL
+	' ', '\x1b', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                              // KEY3 + CTRL
 
 };
 
@@ -236,7 +236,7 @@ void apple1_state::poll_keyboard()
 	bool bKeypress = false;
 
 	// handle special keys first:
-	if (special & 0x10)	// RESET
+	if (special & 0x10) // RESET
 	{
 		m_reset_down = true;
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -248,7 +248,7 @@ void apple1_state::poll_keyboard()
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
-	if (special & 0x20)	// CLEAR SCREEN
+	if (special & 0x20) // CLEAR SCREEN
 	{
 		m_clear_down = true;
 		memset(m_vram, 0, sizeof(m_vram));
@@ -282,10 +282,10 @@ void apple1_state::poll_keyboard()
 				{
 					rawkey = (port * 16) + bit;
 					m_lastports[port] |= (1 << bit);
-					port = 4;	// force outer for loop to quit too
+					port = 4;   // force outer for loop to quit too
 					bKeypress = true;
 				}
-				else	// key up
+				else    // key up
 				{
 					m_lastports[port] &= ~(1 << bit);
 				}
@@ -387,6 +387,15 @@ void apple1_state::machine_start()
 	m_ready_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple1_state::ready_start_cb), this));
 	m_ready_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple1_state::ready_end_cb), this));
 	m_kbd_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple1_state::keyboard_strobe_cb), this));
+
+	// setup save states
+	save_item(NAME(m_vram));
+	save_item(NAME(m_cursx));
+	save_item(NAME(m_cursy));
+	save_item(NAME(m_reset_down));
+	save_item(NAME(m_clear_down));
+	save_item(NAME(m_transchar));
+	save_item(NAME(m_lastports));
 }
 
 void apple1_state::machine_reset()
@@ -424,12 +433,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(apple1_state::pia_keyboard_r)
 {
-	return m_transchar | 0x80;	// bit 7 is wired high, similar-ish to the Apple II
+	return m_transchar | 0x80;  // bit 7 is wired high, similar-ish to the Apple II
 }
 
 WRITE8_MEMBER(apple1_state::pia_display_w)
 {
-	data &= 0x7f;	// D7 is ignored by the video h/w
+	data &= 0x7f;   // D7 is ignored by the video h/w
 
 	// ignore characters if CLEAR is down
 	if (m_clear_down)
@@ -585,7 +594,7 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD( A1_PIA_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(apple1_state, pia_keyboard_r))
@@ -614,5 +623,4 @@ ROM_START(apple1)
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE         INIT     COMPANY            FULLNAME */
-COMP( 1976, apple1,  0,     0,      apple1,     apple1, driver_device,  0,        "Apple Computer",    "Apple I", MACHINE_NO_SOUND_HW )
-
+COMP( 1976, apple1,  0,     0,      apple1,     apple1, driver_device,  0,        "Apple Computer",    "Apple I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

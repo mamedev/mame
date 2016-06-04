@@ -2,11 +2,9 @@
 // copyright-holders:Wilbert Pol
 #include "emu.h"
 #include "coreutil.h"
-#include "includes/genpc.h"
+#include "machine/genpc.h"
 #include "machine/nvram.h"
 #include "machine/pckeybrd.h"
-#include "bus/isa/isa.h"
-#include "bus/isa/isa_cards.h"
 
 class europc_pc_state : public driver_device
 {
@@ -325,18 +323,18 @@ WRITE8_MEMBER( europc_pc_state::europc_rtc_w )
 
 DRIVER_INIT_MEMBER(europc_pc_state,europc)
 {
-	UINT8 *rom = &memregion("maincpu")->base()[0];
+	UINT8 *rom = &memregion("bios")->base()[0];
 
 	int i;
 	/*
 	  fix century rom bios bug !
 	  if year <79 month (and not CENTURY) is loaded with 0x20
 	*/
-	if (rom[0xff93e]==0xb6){ // mov dh,
+	if (rom[0xf93e]==0xb6){ // mov dh,
 		UINT8 a;
-		rom[0xff93e]=0xb5; // mov ch,
-		for (i=0xf8000, a=0; i<0xfffff; i++ ) a+=rom[i];
-		rom[0xfffff]=256-a;
+		rom[0xf93e]=0xb5; // mov ch,
+		for (i=0x8000, a=0; i<0xffff; i++ ) a+=rom[i];
+		rom[0xffff]=256-a;
 	}
 
 	memset(&m_rtc_data,0,sizeof(m_rtc_data));
@@ -383,7 +381,7 @@ READ8_MEMBER( europc_pc_state::europc_pio_r )
 		data = m_port61;
 		break;
 	case 2:
-		if (m_mb->m_pit_out2)
+		if (m_mb->pit_out2())
 			data |= 0x20;
 		break;
 	}
@@ -462,17 +460,13 @@ INPUT_PORTS_END
 
 static ADDRESS_MAP_START( europc_map, AS_PROGRAM, 8, europc_pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0xa0000, 0xaffff) AM_NOP
-	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
-	AM_RANGE(0xc8000, 0xcffff) AM_ROM
-	AM_RANGE(0xd0000, 0xeffff) AM_NOP
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r, europc_pio_w)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 	AM_RANGE(0x0250, 0x025f) AM_READWRITE(europc_jim_r, europc_jim_w)
 	AM_RANGE(0x02e0, 0x02e0) AM_READ(europc_jim2_r)
 ADDRESS_MAP_END
@@ -497,12 +491,13 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
 MACHINE_CONFIG_END
 
 ROM_START( europc )
-	ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION(0x10000,"bios", 0)
 	// hdd bios integrated!
-	ROM_LOAD("50145", 0xf8000, 0x8000, CRC(1775a11d) SHA1(54430d4d0462860860397487c9c109e6f70db8e3)) // V2.07
+	ROM_LOAD("50145", 0x8000, 0x8000, CRC(1775a11d) SHA1(54430d4d0462860860397487c9c109e6f70db8e3)) // V2.07
 ROM_END
 
 COMP( 1988, europc,     ibm5150,    0,          europc,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", MACHINE_NOT_WORKING)

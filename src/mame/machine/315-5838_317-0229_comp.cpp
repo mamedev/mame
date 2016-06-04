@@ -4,31 +4,32 @@
 
     315-5838 - Decathlete (ST-V)
     317-0229 - Dead or Alive (Model 2A)
-	317-0229 - Name Club / Name Club Ver 2 (ST-V) (tested as RCDD2 in the service menu!)
-	317-0231 - Print Club Love Love / Print Club Love Love Ver 2 (ST-V)
+    317-0229 - Name Club / Name Club Ver 2 (ST-V) (tested as RCDD2 in the service menu!)
+    317-0230 - Winnie The Pooh Vol 2 / 3
+    317-0231 - Print Club Love Love / Print Club Love Love Ver 2 (ST-V)
 
-	Several Print Club (ST-V) carts have
-	an unpopulated space marked '317-0229' on the PCB
+    Several Print Club (ST-V) carts have
+    an unpopulated space marked '317-0229' on the PCB
 
     Package Type: TQFP100
 
     Decathlete accesses the chip at 2 different addresses, however, I don't think there
-	are 2 channels / sets of registers, instead the 2nd set of addresses are just a
-	mirror that allows access to a different set of source roms; the tables etc. are
-	re-uploaded before every transfer.
+    are 2 channels / sets of registers, instead the 2nd set of addresses are just a
+    mirror that allows access to a different set of source roms; the tables etc. are
+    re-uploaded before every transfer.
 
     Dead of Alive has the source data in RAM, not ROM.
     This is similar to how some 5881 games were set up, with the ST-V versions decrypting
     data directly from ROM and the Model 2 ones using a RAM source buffer.
 
-	Decathlete decompresses all graphic data with the chip.
+    Decathlete decompresses all graphic data with the chip.
 
-	The Name Club games use the chip for decompressing data for the printer (full size
-	versions of the graphics?)
+    The Name Club games use the chip for decompressing data for the printer (full size
+    versions of the graphics?)
 
-	Print Club Love Love decrypts some start up code/data required for booting.
+    Print Club Love Love decrypts some start up code/data required for booting.
 
-	Dead or Alive decrypts a string that is checked on startup, nothing else.
+    Dead or Alive decrypts a string that is checked on startup, nothing else.
 
     Looking at the values read I don't think there is any address based encryption, for
     example many blocks where you'd expect a zero fill start with repeating patterns

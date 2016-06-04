@@ -736,7 +736,7 @@ void g65816_device::g65816_set_sp(unsigned val)
 /* Get a register */
 unsigned g65816_device::g65816_get_reg(int regnum)
 {
-	/* Set the function tables to emulation mode if the FTABLE is NULL */
+	/* Set the function tables to emulation mode if the FTABLE is nullptr */
 	if( FTABLE_GET_REG == nullptr )
 		g65816i_set_execution_mode(EXECUTION_MODE_E);
 
@@ -957,7 +957,7 @@ void g65816_device::state_string_export(const device_state_entry &entry, std::st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				m_flag_n & NFLAG_SET ? 'N':'.',
 				m_flag_v & VFLAG_SET ? 'V':'.',
 				m_flag_m & MFLAG_SET ? 'M':'.',

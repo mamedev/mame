@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/watchdog.h"
 #include "sound/flt_vol.h"
 
 /* Calculated from CRT controller writes */
@@ -33,6 +34,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_ground(*this, "ground"),
 		m_object(*this, "object"),
+		m_watchdog(*this, "watchdog"),
 		m_f2203_1l(*this, "f2203.1l"),
 		m_f2203_2l(*this, "f2203.2l"),
 		m_f2203_3l(*this, "f2203.3l"),
@@ -85,6 +87,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_ground;
 	required_device<cpu_device> m_object;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<filter_volume_device> m_f2203_1l;
 	required_device<filter_volume_device> m_f2203_2l;
 	required_device<filter_volume_device> m_f2203_3l;

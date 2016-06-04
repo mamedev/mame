@@ -16,6 +16,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
+#include "machine/watchdog.h"
 #include "sound/2151intf.h"
 #include "includes/konamipt.h"
 #include "includes/crimfght.h"
@@ -89,7 +90,7 @@ static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x3f85, 0x3f85) AM_READ_PORT("P3")
 	AM_RANGE(0x3f86, 0x3f86) AM_READ_PORT("P4")
 	AM_RANGE(0x3f87, 0x3f87) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3f88, 0x3f88) AM_MIRROR(0x03) AM_READ(watchdog_reset_r) AM_WRITE(crimfght_coin_w) // 051550
+	AM_RANGE(0x3f88, 0x3f88) AM_MIRROR(0x03) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(crimfght_coin_w) // 051550
 	AM_RANGE(0x3f8c, 0x3f8c) AM_MIRROR(0x03) AM_WRITE(sound_w)
 	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)   /* video RAM + sprite RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")                        /* banked ROM */
@@ -134,8 +135,8 @@ static INPUT_PORTS_START( crimfght )
 	PORT_DIPSETTING(   0x0b, DEF_STR( 1C_5C ))
 	PORT_DIPSETTING(   0x0a, DEF_STR( 1C_6C ))
 	PORT_DIPSETTING(   0x09, DEF_STR( 1C_7C ))
-	PORT_DIPSETTING(   0x00, "Void")
-	PORT_DIPNAME(0xf0, 0x00, "Coin B (unused)") PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(   0x00, DEF_STR( Free_Play ))
+	PORT_DIPNAME(0xf0, 0xf0, "Coin B") PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(   0x20, DEF_STR( 4C_1C ))
 	PORT_DIPSETTING(   0x50, DEF_STR( 3C_1C ))
 	PORT_DIPSETTING(   0x80, DEF_STR( 2C_1C ))
@@ -151,11 +152,14 @@ static INPUT_PORTS_START( crimfght )
 	PORT_DIPSETTING(   0xb0, DEF_STR( 1C_5C ))
 	PORT_DIPSETTING(   0xa0, DEF_STR( 1C_6C ))
 	PORT_DIPSETTING(   0x90, DEF_STR( 1C_7C ))
-	PORT_DIPSETTING(   0x00, "Void")
+	PORT_DIPSETTING(   0x00, DEF_STR( Unused ))
 
 	PORT_START("DSW2")
-	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW2:1")
-	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW2:2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+		PORT_DIPSETTING(    0x03, "1" )
+		PORT_DIPSETTING(    0x02, "2" )
+		PORT_DIPSETTING(    0x01, "3" )
+		PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "SW2:3")
 	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "SW2:4")
 	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW2:5")
@@ -175,64 +179,75 @@ static INPUT_PORTS_START( crimfght )
 	PORT_DIPUNUSED_DIPLOC(0x02, IP_ACTIVE_LOW, "SW3:2")
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW3:3")
 	PORT_DIPUNUSED_DIPLOC(0x08, IP_ACTIVE_LOW, "SW3:4")
-	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, crimfght_state, system_r, NULL)
+	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, crimfght_state, system_r, nullptr)
 
 	PORT_START("P1")
-	KONAMI8_B12_UNK(1)
+	KONAMI8_B123_START(1)
 
 	PORT_START("P2")
-	KONAMI8_B12_UNK(2)
+	KONAMI8_B123_START(2)
 
 	PORT_START("P3")
-	KONAMI8_B12_UNK(3)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P4")
-	KONAMI8_B12_UNK(4)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN3)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN4)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE2)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE3)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE4)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( crimfghtj )
+static INPUT_PORTS_START( crimfghtu )
 	PORT_INCLUDE( crimfght )
 
 	PORT_MODIFY("DSW1")
-	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "No Coin B", SW1)
-	/* "No Coin B" = coins produce sound, but no effect on coin counter */
+	PORT_DIPNAME(0xf0, 0x00, "Coin B (Unused)") PORT_DIPLOCATION("SW1:5,6,7,8")
+		PORT_DIPSETTING(   0x20, DEF_STR( 4C_1C ))
+		PORT_DIPSETTING(   0x50, DEF_STR( 3C_1C ))
+		PORT_DIPSETTING(   0x80, DEF_STR( 2C_1C ))
+		PORT_DIPSETTING(   0x40, DEF_STR( 3C_2C ))
+		PORT_DIPSETTING(   0x10, DEF_STR( 4C_3C ))
+		PORT_DIPSETTING(   0xf0, DEF_STR( 1C_1C ))
+		PORT_DIPSETTING(   0x30, DEF_STR( 3C_4C ))
+		PORT_DIPSETTING(   0x70, DEF_STR( 2C_3C ))
+		PORT_DIPSETTING(   0xe0, DEF_STR( 1C_2C ))
+		PORT_DIPSETTING(   0x60, DEF_STR( 2C_5C ))
+		PORT_DIPSETTING(   0xd0, DEF_STR( 1C_3C ))
+		PORT_DIPSETTING(   0xc0, DEF_STR( 1C_4C ))
+		PORT_DIPSETTING(   0xb0, DEF_STR( 1C_5C ))
+		PORT_DIPSETTING(   0xa0, DEF_STR( 1C_6C ))
+		PORT_DIPSETTING(   0x90, DEF_STR( 1C_7C ))
+		PORT_DIPSETTING(   0x00, DEF_STR( Unused ))
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(    0x03, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
+		PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW2:1")
+		PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW2:2")
 
-	PORT_MODIFY("P1")
-	KONAMI8_B123_START(1)
+		PORT_MODIFY("P1")
+		KONAMI8_B12_UNK(1)
 
-	PORT_MODIFY("P2")
-	KONAMI8_B123_START(2)
+		PORT_MODIFY("P2")
+		KONAMI8_B12_UNK(2)
 
-	PORT_MODIFY("P3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+		PORT_MODIFY("P3")
+		KONAMI8_B12_UNK(3)
 
-	PORT_MODIFY("P4")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+		PORT_MODIFY("P4")
+		KONAMI8_B12_UNK(4)
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 INPUT_PORTS_END
-
 
 
 /***************************************************************************
@@ -298,6 +313,8 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(11)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 96, 416, 256, 16, 240) // measured 59.17
@@ -344,7 +361,7 @@ MACHINE_CONFIG_END
 
 ROM_START( crimfght )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
-	ROM_LOAD( "821l02.f24", 0x00000, 0x20000, CRC(588e7da6) SHA1(285febb3bcca31f82b34af3695a59eafae01cd30) )
+	ROM_LOAD( "821r02.f24", 0x00000, 0x20000, CRC(4ecdd923) SHA1(78e5260c4bb9b18d7818fb6300d7e1d3a577fb63) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
@@ -386,9 +403,9 @@ ROM_START( crimfghtj )
 	ROM_LOAD( "821k03.e5",  0x00000, 0x40000, CRC(fef8505a) SHA1(5c5121609f69001838963e961cb227d6b64e4f5f) )
 ROM_END
 
-ROM_START( crimfght2 )
+ROM_START( crimfghtu )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
-	ROM_LOAD( "821r02.f24", 0x00000, 0x20000, CRC(4ecdd923) SHA1(78e5260c4bb9b18d7818fb6300d7e1d3a577fb63) )
+		ROM_LOAD( "821l02.f24", 0x00000, 0x20000, CRC(588e7da6) SHA1(285febb3bcca31f82b34af3695a59eafae01cd30) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
@@ -414,6 +431,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1989, crimfght,  0,        crimfght, crimfght, driver_device, 0, ROT0, "Konami", "Crime Fighters (US 4 players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, crimfght2, crimfght, crimfght, crimfghtj, driver_device,0, ROT0, "Konami", "Crime Fighters (World 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, crimfghtj, crimfght, crimfght, crimfghtj, driver_device,0, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimfght,  0,        crimfght, crimfght, driver_device, 0, ROT0, "Konami", "Crime Fighters (World 2 players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimfghtu, crimfght, crimfght, crimfghtu, driver_device,0, ROT0, "Konami", "Crime Fighters (US 4 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimfghtj, crimfght, crimfght, crimfght, driver_device,0, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )

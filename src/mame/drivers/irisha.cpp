@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", irisha)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -425,7 +425,7 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(irisha_state, irisha_8255_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(irisha_state, irisha_8255_portc_w))
 
-	MCFG_PIC8259_ADD( "pic8259", WRITELINE(irisha_state,irisha_pic_set_int_line), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic8259", WRITELINE(irisha_state,irisha_pic_set_int_line), VCC, NOOP)
 MACHINE_CONFIG_END
 
 /* ROM definition */

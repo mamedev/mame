@@ -15,6 +15,8 @@
 #include "machine/rtc9701.h"
 
 
+ALLOW_SAVE_TYPE(rtc9701_state_t);
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -41,7 +43,7 @@ rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void rtc9701_device::timer_callback()
+TIMER_CALLBACK_MEMBER(rtc9701_device::timer_callback)
 {
 	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	int dpm_count;
@@ -72,11 +74,6 @@ void rtc9701_device::timer_callback()
 	if((m_rtc.year & 0xf0) >= 0xa0)             { m_rtc.year = 0; } //2000-2099 possible timeframe
 }
 
-TIMER_CALLBACK( rtc9701_device::rtc_inc_callback )
-{
-	reinterpret_cast<rtc9701_device *>(ptr)->timer_callback();
-}
-
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
 //  on this device
@@ -93,7 +90,7 @@ void rtc9701_device::device_validity_check(validity_checker &valid) const
 void rtc9701_device::device_start()
 {
 	/* let's call the timer callback every second */
-	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), FUNC(rtc_inc_callback), 0, (void *)this);
+	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), timer_expired_delegate(FUNC(rtc9701_device::timer_callback), this));
 
 	system_time systime;
 	machine().base_datetime(systime);
@@ -109,6 +106,25 @@ void rtc9701_device::device_start()
 	rtc_state = RTC9701_CMD_WAIT;
 	cmd_stream_pos = 0;
 	current_cmd = 0;
+
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reset_line));
+	save_item(NAME(m_clock_line));
+	save_item(NAME(rtc_state));
+	save_item(NAME(cmd_stream_pos));
+	save_item(NAME(current_cmd));
+	save_item(NAME(rtc9701_address_pos));
+	save_item(NAME(rtc9701_current_address));
+	save_item(NAME(rtc9701_current_data));
+	save_item(NAME(rtc9701_data_pos));
+	save_item(NAME(rtc9701_data));
+	save_item(NAME(m_rtc.sec));
+	save_item(NAME(m_rtc.min));
+	save_item(NAME(m_rtc.hour));
+	save_item(NAME(m_rtc.day));
+	save_item(NAME(m_rtc.wday));
+	save_item(NAME(m_rtc.month));
+	save_item(NAME(m_rtc.year));
 }
 
 

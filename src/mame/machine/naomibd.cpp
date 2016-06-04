@@ -3,7 +3,6 @@
 
 #include "emu.h"
 #include "naomibd.h"
-#include "machine/x76f100.h"
 
 /*
     Naomi ROM board info from ElSemi:
@@ -91,8 +90,8 @@ void naomi_board::device_start()
 	save_item(NAME(pio_ready));
 	save_item(NAME(dma_ready));
 
-	if(eeprom_tag)
-		eeprom = machine().device<x76f100_device>(eeprom_tag);
+	if (eeprom_tag != nullptr)
+		eeprom = owner()->subdevice<x76f100_device>(eeprom_tag);
 	else
 		eeprom = nullptr;
 }

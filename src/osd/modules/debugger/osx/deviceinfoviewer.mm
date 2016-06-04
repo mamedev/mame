@@ -165,11 +165,11 @@
 			toView:contentView];
 
 	// add interfaces if present
-	device_interface *interface = device->first_interface();
-	if (interface != NULL)
+	device_interface *interface = device->interfaces().first();
+	if (interface != nullptr)
 	{
 		NSBox *const interfacesBox = [self makeBox:@"Interfaces" toFit:contentView];
-		while (interface != NULL)
+		while (interface != nullptr)
 		{
 			[self addField:[NSString stringWithUTF8String:interface->interface_type()]
 					 toBox:interfacesBox];

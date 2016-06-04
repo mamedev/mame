@@ -26,6 +26,10 @@
 #define _XOPEN_SOURCE 500
 #endif
 
+#include <cctype>
+#include <cstdlib>
+#include <utility>
+
 //#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -38,7 +42,7 @@
 #include "osdcore.h"
 #include "modules/lib/osdlib.h"
 
-#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
+#if defined(SDLMAME_WIN32)
 #define PATHSEPCH '\\'
 #define INVPATHSEPCH '/'
 #else
@@ -46,7 +50,7 @@
 #define INVPATHSEPCH '\\'
 #endif
 
-#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU) || defined(SDLMAME_EMSCRIPTEN)
+#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_HAIKU) || defined(SDLMAME_EMSCRIPTEN) || defined(SDLMAME_ANDROID)
 typedef struct dirent sdl_dirent;
 typedef struct stat sdl_stat;
 #define sdl_readdir readdir
@@ -135,7 +139,7 @@ static UINT64 osd_get_file_size(const char *file)
 
 osd_directory *osd_opendir(const char *dirname)
 {
-	osd_directory *dir = NULL;
+	osd_directory *dir = nullptr;
 	char *tmpstr, *envstr;
 	int i, j;
 
@@ -143,7 +147,7 @@ osd_directory *osd_opendir(const char *dirname)
 	if (dir)
 	{
 		memset(dir, 0, sizeof(osd_directory));
-		dir->fd = NULL;
+		dir->fd = nullptr;
 	}
 
 	tmpstr = (char *) osd_malloc_array(strlen(dirname)+1);
@@ -164,7 +168,7 @@ osd_directory *osd_opendir(const char *dirname)
 		envstr[i] = '\0';
 
 		const char *envval = osd_getenv(&envstr[1]);
-		if (envval != NULL)
+		if (envval != nullptr)
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;
 			osd_free(tmpstr);
@@ -185,11 +189,11 @@ osd_directory *osd_opendir(const char *dirname)
 	dir->fd = opendir(tmpstr);
 	dir->path = tmpstr;
 
-	if (dir && (dir->fd == NULL))
+	if (dir && (dir->fd == nullptr))
 	{
 		osd_free(dir->path);
 		osd_free(dir);
-		dir = NULL;
+		dir = nullptr;
 	}
 
 	return dir;
@@ -205,8 +209,8 @@ const osd_directory_entry *osd_readdir(osd_directory *dir)
 	char *temp;
 	dir->data = sdl_readdir(dir->fd);
 
-	if (dir->data == NULL)
-		return NULL;
+	if (dir->data == nullptr)
+		return nullptr;
 
 	dir->ent.name = dir->data->d_name;
 	temp = build_full_path(dir->path, dir->data->d_name);
@@ -227,11 +231,86 @@ const osd_directory_entry *osd_readdir(osd_directory *dir)
 
 void osd_closedir(osd_directory *dir)
 {
-	if (dir->fd != NULL)
+	if (dir->fd != nullptr)
 		closedir(dir->fd);
 	osd_free(dir->path);
 	osd_free(dir);
 }
 
+
+//============================================================
+//  osd_subst_env
+//============================================================
+
+void osd_subst_env(std::string &dst, std::string const &src)
+{
+	std::string result, var;
+	auto start = src.begin();
+
+	// a leading tilde expands as $HOME
+	if ((src.end() != start) && ('~' == *start))
+	{
+		char const *const home = std::getenv("HOME");
+		if (home)
+		{
+			++start;
+			if ((src.end() == start) || (PATHSEPCH == *start))
+				result.append(home);
+			else
+				result.push_back('~');
+		}
+	}
+
+	while (src.end() != start)
+	{
+		// find $ marking start of environment variable or end of string
+		auto it = start;
+		while ((src.end() != it) && ('$' != *it)) ++it;
+		if (start != it) result.append(start, it);
+		start = it;
+
+		if (src.end() != start)
+		{
+			start = ++it;
+			if ((src.end() != start) && ('{' == *start))
+			{
+				start = ++it;
+				for (++it; (src.end() != it) && ('}' != *it); ++it) { }
+				if (src.end() == it)
+				{
+					result.append("${").append(start, it);
+					start = it;
+				}
+				else
+				{
+					var.assign(start, it);
+					start = ++it;
+					const char *const exp = std::getenv(var.c_str());
+					if (exp)
+						result.append(exp);
+					else
+						fprintf(stderr, "Warning: osd_subst_env variable %s not found.\n", var.c_str());
+				}
+			}
+			else if ((src.end() != start) && (('_' == *start) || std::isalnum(*start)))
+			{
+				for (++it; (src.end() != it) && (('_' == *it) || std::isalnum(*it)); ++it) { }
+				var.assign(start, it);
+				start = it;
+				const char *const exp = std::getenv(var.c_str());
+				if (exp)
+					result.append(exp);
+				else
+					fprintf(stderr, "Warning: osd_subst_env variable %s not found.\n", var.c_str());
+			}
+			else
+			{
+				result.push_back('$');
+			}
+		}
+	}
+
+	dst = std::move(result);
+}
 
 #endif

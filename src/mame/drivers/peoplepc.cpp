@@ -248,16 +248,16 @@ static MACHINE_CONFIG_START( olypeopl, peoplepc_state)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic8259_0", pic8259_device, ir0_w))
 
 	MCFG_PIC8259_ADD("pic8259_0", INPUTLINE("maincpu", 0), VCC, READ8(peoplepc_state, get_slave_ack))
-	MCFG_PIC8259_ADD("pic8259_1", DEVWRITELINE("pic8259_0", pic8259_device, ir7_w), GND, NULL)
+	MCFG_PIC8259_ADD("pic8259_1", DEVWRITELINE("pic8259_0", pic8259_device, ir7_w), GND, NOOP)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_22MHz,640,0,640,475,0,475)
 	MCFG_SCREEN_UPDATE_DEVICE( "h46505", mc6845_device, screen_update )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("h46505", H46505, "screen", XTAL_22MHz/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

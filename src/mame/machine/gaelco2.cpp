@@ -287,19 +287,75 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_data_w)
 
 ***************************************************************************/
 
+static UINT32 rol(UINT32 x, unsigned int c)
+{
+	return (x << c) | (x >> (32 - c));
+}
+
+static UINT16 get_lo(UINT32 x)
+{
+	return ((x & 0x00000010) <<  1) |
+			((x & 0x00000800) <<  3) |
+			((x & 0x40000000) >> 27) |
+			((x & 0x00000005) <<  6) |
+			((x & 0x00000008) <<  8) |
+			rol(x & 0x00800040, 9)   |
+			((x & 0x04000000) >> 16) |
+			((x & 0x00008000) >> 14) |
+			((x & 0x00002000) >> 11) |
+			((x & 0x00020000) >> 10) |
+			((x & 0x00100000) >>  8) |
+			((x & 0x00044000) >>  5) |
+			((x & 0x00000020) >>  1);
+}
+
+static UINT16 get_hi(UINT32 x)
+{
+	return ((x & 0x00001400) >>  0) |
+			((x & 0x10000000) >> 26) |
+			((x & 0x02000000) >> 24) |
+			((x & 0x08000000) >> 21) |
+			((x & 0x00000002) << 12) |
+			((x & 0x01000000) >> 19) |
+			((x & 0x20000000) >> 18) |
+			((x & 0x80000000) >> 16) |
+			((x & 0x00200000) >> 13) |
+			((x & 0x00010000) >> 12) |
+			((x & 0x00080000) >> 10) |
+			((x & 0x00000200) >>  9) |
+			((x & 0x00400000) >>  8) |
+			((x & 0x00000080) >>  4) |
+			((x & 0x00000100) >>  1);
+}
+
+static UINT16 get_out(UINT16 x)
+{
+	return ((x & 0xc840) <<  0) |
+			((x & 0x0080) <<  2) |
+			((x & 0x0004) <<  3) |
+			((x & 0x0008) <<  5) |
+			((x & 0x0010) <<  8) |
+			((x & 0x0002) <<  9) |
+			((x & 0x0001) << 13) |
+			((x & 0x0200) >>  9) |
+			((x & 0x1400) >>  8) |
+			((x & 0x0100) >>  7) |
+			((x & 0x2000) >>  6) |
+			((x & 0x0020) >>  2);
+}
+
+UINT16 mangle(UINT32 x)
+{
+	UINT16 a = get_lo(x);
+	UINT16 b = get_hi(x);
+	return get_out(((a ^ 0x0010) - (b ^ 0x0024)) ^ 0x5496);
+}
+
 READ16_MEMBER(gaelco2_state::snowboar_protection_r)
 {
-	chd_file * table = machine().rom_load().get_disk_handle(":decrypt");
-	UINT8 temp[1024];
-	table->read_hunk(snowboard_latch>>9, &temp[0]);
-	UINT16 data = (temp[(snowboard_latch & 0x1ff)*2]<<8) | temp[((snowboard_latch & 0x1ff)*2)+1];
-
-	// TODO: replace above lookup (8GB table) with emulation of device
-
-	logerror("%06x: protection read (input %08x output %04x)\n", space.device().safe_pc(), snowboard_latch, data);
-
-
-	return data;
+	UINT16 ret  = mangle(snowboard_latch);
+	ret = ((ret & 0xff00) >> 8) | ((ret & 0x00ff) << 8);
+	return ret;
 
 }
 

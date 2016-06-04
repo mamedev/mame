@@ -353,7 +353,7 @@ void mc68hc11_cpu_device::WRITE16(UINT32 address, UINT16 value)
 /*****************************************************************************/
 
 
-#include "hc11ops.inc"
+#include "hc11ops.hxx"
 #include "hc11ops.h"
 
 void mc68hc11_cpu_device::device_start()
@@ -453,7 +453,7 @@ void mc68hc11_cpu_device::state_string_export(const device_state_entry &entry, s
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				(m_ccr & CC_S) ? 'S' : '.',
 				(m_ccr & CC_X) ? 'X' : '.',
 				(m_ccr & CC_H) ? 'H' : '.',

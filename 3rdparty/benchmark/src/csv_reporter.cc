@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <iostream>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "string_util.h"
@@ -34,7 +35,7 @@ bool CSVReporter::ReportContext(const Context& context) {
 
   if (context.cpu_scaling_enabled) {
     std::cerr << "***WARNING*** CPU scaling is enabled, the benchmark "
-                 "real time measurements may be noisy and will incure extra "
+                 "real time measurements may be noisy and will incur extra "
                  "overhead.\n";
   }
 
@@ -42,7 +43,7 @@ bool CSVReporter::ReportContext(const Context& context) {
   std::cerr << "***WARNING*** Library was built as DEBUG. Timings may be "
                "affected.\n";
 #endif
-  std::cout << "name,iterations,real_time,cpu_time,bytes_per_second,"
+  std::cout << "name,iterations,real_time,cpu_time,time_unit,bytes_per_second,"
                "items_per_second,label\n";
   return true;
 }
@@ -66,7 +67,10 @@ void CSVReporter::ReportRuns(std::vector<Run> const& reports) {
 }
 
 void CSVReporter::PrintRunData(Run const& run) {
-  double const multiplier = 1e9;  // nano second multiplier
+  double multiplier;
+  const char* timeLabel;
+  std::tie(timeLabel, multiplier) = GetTimeUnitAndMultiplier(run.time_unit);
+
   double cpu_time = run.cpu_accumulated_time * multiplier;
   double real_time = run.real_accumulated_time * multiplier;
   if (run.iterations != 0) {
@@ -83,6 +87,7 @@ void CSVReporter::PrintRunData(Run const& run) {
   std::cout << run.iterations << ",";
   std::cout << real_time << ",";
   std::cout << cpu_time << ",";
+  std::cout << timeLabel << ",";
 
   if (run.bytes_per_second > 0.0) {
     std::cout << run.bytes_per_second;

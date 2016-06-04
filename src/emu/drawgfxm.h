@@ -59,7 +59,7 @@ extern bitmap_ind8 drawgfx_dummy_priority_bitmap;
 
 /* macros for using the optional priority */
 #define PRIORITY_VALID(x)       (sizeof(x) != sizeof(NO_PRIORITY))
-#define PRIORITY_ADDR(p,t,y,x)  (PRIORITY_VALID(t) ? (&(p).pixt<t>(y, x)) : NULL)
+#define PRIORITY_ADDR(p,t,y,x)  (PRIORITY_VALID(t) ? (&(p).pixt<t>(y, x)) : nullptr)
 #define PRIORITY_ADVANCE(t,p,i) do { if (PRIORITY_VALID(t)) (p) += (i); } while (0)
 
 
@@ -1173,7 +1173,7 @@ do {                                                                            
 	assert(destx + length <= bitmap.width());                                       \
 	assert(desty >= 0);                                                             \
 	assert(desty < bitmap.height());                                                    \
-	assert(srcptr != NULL);                                                         \
+	assert(srcptr != nullptr);                                                         \
 	assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());                     \
 																					\
 	{                                                                               \
@@ -1228,7 +1228,7 @@ do {                                                                            
 	assert(srcx + length <= bitmap.width());                                        \
 	assert(srcy >= 0);                                                              \
 	assert(srcy < bitmap.height());                                             \
-	assert(destptr != NULL);                                                        \
+	assert(destptr != nullptr);                                                        \
 																					\
 	{                                                                               \
 		const PIXEL_TYPE *srcptr = &bitmap.pixt<PIXEL_TYPE>(srcy, srcx);            \

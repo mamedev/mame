@@ -11,7 +11,7 @@
 #include "bus/gameboy/rom.h"
 #include "bus/gameboy/mbc.h"
 #include "video/gb_lcd.h"
-#include "audio/gb.h"
+#include "sound/gb.h"
 
 
 // ======================> sns_rom_sgb_device

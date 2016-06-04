@@ -19,10 +19,19 @@ const device_type K054539 = &device_creator<k054539_device>;
 
 k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K054539, "K054539 ADPCM", tag, owner, clock, "k054539", __FILE__),
-		device_sound_interface(mconfig, *this), flags(0), ram(nullptr), reverb_pos(0), cur_ptr(0), cur_limit(0),
-	cur_zone(nullptr), rom(nullptr), rom_size(0), rom_mask(0), stream(nullptr), m_timer(nullptr), m_timer_state(0),
-		m_timer_handler(*this),
-		m_rgnoverride(nullptr)
+		device_sound_interface(mconfig, *this),
+		flags(0),
+		ram(nullptr),
+		reverb_pos(0),
+		cur_ptr(0),
+		cur_limit(0),
+		cur_zone(nullptr),
+		m_rom(*this, DEVICE_SELF),
+		rom_mask(0),
+		stream(nullptr),
+		m_timer(nullptr),
+		m_timer_state(0),
+		m_timer_handler(*this)
 {
 }
 
@@ -190,10 +199,10 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 						cur_pos += pdelta;
 
 						cur_pval = cur_val;
-						cur_val = (INT16)(rom[cur_pos] << 8);
+						cur_val = (INT16)(m_rom[cur_pos] << 8);
 						if(cur_val == (INT16)0x8000 && (base2[1] & 1)) {
 							cur_pos = (base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16)) & rom_mask;
-							cur_val = (INT16)(rom[cur_pos] << 8);
+							cur_val = (INT16)(m_rom[cur_pos] << 8);
 						}
 						if(cur_val == (INT16)0x8000) {
 							keyoff(ch);
@@ -213,10 +222,10 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 						cur_pos += pdelta;
 
 						cur_pval = cur_val;
-						cur_val = (INT16)(rom[cur_pos] | rom[cur_pos+1]<<8);
+						cur_val = (INT16)(m_rom[cur_pos] | m_rom[cur_pos+1]<<8);
 						if(cur_val == (INT16)0x8000 && (base2[1] & 1)) {
 							cur_pos = (base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16)) & rom_mask;
-							cur_val = (INT16)(rom[cur_pos] | rom[cur_pos+1]<<8);
+							cur_val = (INT16)(m_rom[cur_pos] | m_rom[cur_pos+1]<<8);
 						}
 						if(cur_val == (INT16)0x8000) {
 							keyoff(ch);
@@ -241,10 +250,10 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 						cur_pos += pdelta;
 
 						cur_pval = cur_val;
-						cur_val = rom[cur_pos>>1];
+						cur_val = m_rom[cur_pos>>1];
 						if(cur_val == 0x88 && (base2[1] & 1)) {
 							cur_pos = ((base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16)) & rom_mask) << 1;
-							cur_val = rom[cur_pos>>1];
+							cur_val = m_rom[cur_pos>>1];
 						}
 						if(cur_val == 0x88) {
 							keyoff(ch);
@@ -311,12 +320,9 @@ void k054539_device::init_chip()
 	cur_ptr = 0;
 	memset(ram.get(), 0, 0x4000);
 
-	memory_region *reg = (m_rgnoverride != nullptr) ? owner()->memregion(m_rgnoverride) : region();
-	rom = reg->base();
-	rom_size = reg->bytes();
 	rom_mask = 0xffffffffU;
 	for(int i=0; i<32; i++)
-		if((1U<<i) >= rom_size) {
+		if((1U<<i) >= m_rom.bytes()) {
 			rom_mask = (1U<<i) - 1;
 			break;
 		}
@@ -429,7 +435,7 @@ WRITE8_MEMBER(k054539_device::write)
 		case 0x22e:
 			cur_zone =
 				data == 0x80 ? ram.get() :
-				rom + 0x20000*data;
+				&m_rom[0x20000*data];
 			cur_limit = data == 0x80 ? 0x4000 : 0x20000;
 			cur_ptr = 0;
 		break;
@@ -466,7 +472,7 @@ WRITE8_MEMBER(k054539_device::write)
 void k054539_device::device_post_load()
 {
 	int data = regs[0x22e];
-	cur_zone = data == 0x80 ? ram.get() : rom + 0x20000*data;
+	cur_zone = data == 0x80 ? ram.get() : &m_rom[0x20000*data];
 	cur_limit = data == 0x80 ? 0x4000 : 0x20000;
 }
 

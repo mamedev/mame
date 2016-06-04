@@ -183,7 +183,7 @@ static void cfunc_write32(void *param)
 
 void rsp_device::rspdrc_set_options(UINT32 options)
 {
-	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
+	if (!allow_drc()) return;
 	m_drcoptions = options;
 }
 
@@ -307,7 +307,7 @@ void rsp_device::execute_run_drc()
 
 void rsp_device::rspdrc_flush_drc_cache()
 {
-	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
+	if (!allow_drc()) return;
 	m_cache_dirty = TRUE;
 }
 

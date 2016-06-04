@@ -16,6 +16,7 @@
 #include "imagedev/cassette.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "machine/spec_snqk.h"
 
 /* Spectrum crystals */
 
@@ -44,23 +45,6 @@
 #define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizonal retrace */
 #define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
 
-/* 128K machines take an extra 4 cycles per scan line - add this to retrace */
-#define SPEC128_UNSEEN_LINES    15
-#define SPEC128_RETRACE_CYCLES  52
-#define SPEC128_CYCLES_PER_LINE 228
-
-/* Border sizes for TS2068. These are guesses based on the number of cycles
-   available per frame. */
-#define TS2068_TOP_BORDER    32
-#define TS2068_BOTTOM_BORDER 32
-#define TS2068_SCREEN_HEIGHT (TS2068_TOP_BORDER + SPEC_DISPLAY_YSIZE + TS2068_BOTTOM_BORDER)
-
-/* Double the border sizes to maintain ratio of screen to border */
-#define TS2068_LEFT_BORDER   96   /* Number of left hand border pixels */
-#define TS2068_DISPLAY_XSIZE 512  /* Horizontal screen resolution */
-#define TS2068_RIGHT_BORDER  96   /* Number of right hand border pixels */
-#define TS2068_SCREEN_WIDTH (TS2068_LEFT_BORDER + TS2068_DISPLAY_XSIZE + TS2068_RIGHT_BORDER)
-
 struct EVENT_LIST_ITEM
 {
 	/* driver defined ID for this write */
@@ -69,15 +53,6 @@ struct EVENT_LIST_ITEM
 	int Event_Data;
 	/* time at which this write occurred */
 	int Event_Time;
-};
-
-
-enum
-{
-	TIMEX_CART_NONE,
-	TIMEX_CART_DOCK,
-	TIMEX_CART_EXROM,
-	TIMEX_CART_HOME
 };
 
 
@@ -254,9 +229,5 @@ INPUT_PORTS_EXTERN( spectrum );
 INPUT_PORTS_EXTERN( spec_plus );
 
 MACHINE_CONFIG_EXTERN( spectrum );
-
-/*----------- defined in drivers/spec128.c -----------*/
-
-MACHINE_CONFIG_EXTERN( spectrum_128 );
 
 #endif /* __SPECTRUM_H__ */

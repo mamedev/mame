@@ -34,7 +34,8 @@ void advision_state::machine_start()
 
 	/* configure EA banking */
 	m_bank1->configure_entry(0, memregion(I8048_TAG)->base());
-	m_bank1->configure_entry(1, m_cart_rom->base());
+	if (m_cart_rom != nullptr)
+		m_bank1->configure_entry(1, m_cart_rom->base());
 	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");
 	m_bank1->set_entry(0);
 
@@ -78,7 +79,7 @@ WRITE8_MEMBER( advision_state::bankswitch_w )
 	m_rambank = (data & 0x03) << 8;
 
 	m_maincpu->set_input_line(MCS48_INPUT_EA, m_ea_bank ? ASSERT_LINE : CLEAR_LINE);
-	if (m_cart_rom)
+	if (m_cart_rom != nullptr)
 		m_bank1->set_entry(m_ea_bank);
 }
 

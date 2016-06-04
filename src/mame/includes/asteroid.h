@@ -64,6 +64,3 @@ public:
 DISCRETE_SOUND_EXTERN( asteroid );
 DISCRETE_SOUND_EXTERN( astdelux );
 
-/*----------- defined in audio/llander.c -----------*/
-
-DISCRETE_SOUND_EXTERN( llander );

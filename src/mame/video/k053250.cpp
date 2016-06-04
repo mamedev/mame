@@ -7,7 +7,8 @@ const device_type K053250 = &device_creator<k053250_device>;
 k053250_device::k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053250, "K053250 LVC", tag, owner, clock, "k053250", __FILE__),
 		device_gfx_interface(mconfig, *this),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_rom(*this, DEVICE_SELF)
 {
 }
 
@@ -20,18 +21,12 @@ void k053250_device::static_set_offsets(device_t &device, int offx, int offy)
 
 void k053250_device::unpack_nibbles()
 {
-	if(!m_region)
-		throw emu_fatalerror("k053250 %s: no associated region found\n", tag());
+	m_unpacked_rom.resize(m_rom.length()*2);
 
-	const UINT8 *base = m_region->base();
-	int size = m_region->bytes();
-
-	m_unpacked_rom.resize(size*2);
-
-	for(int i=0; i<size; i++)
+	for (int i = 0; i < m_rom.length(); i++)
 	{
-		m_unpacked_rom[2*i] = base[i] >> 4;
-		m_unpacked_rom[2*i+1] = base[i] & 0xf;
+		m_unpacked_rom[2*i] = m_rom[i] >> 4;
+		m_unpacked_rom[2*i+1] = m_rom[i] & 0xf;
 	}
 }
 
@@ -461,5 +456,5 @@ WRITE16_MEMBER(k053250_device::ram_w)
 
 READ16_MEMBER(k053250_device::rom_r)
 {
-	return m_region->base()[0x80000 * m_regs[6] + 0x800 * m_regs[7] + offset/2];
+	return m_rom[0x80000 * m_regs[6] + 0x800 * m_regs[7] + offset/2];
 }

@@ -9,9 +9,14 @@
 #ifndef _HH_TMS1K_H_
 #define _HH_TMS1K_H_
 
-
 #include "emu.h"
-#include "cpu/tms0980/tms0980.h"
+#include "cpu/tms1000/tms1000.h"
+#include "cpu/tms1000/tms1100.h"
+#include "cpu/tms1000/tms1400.h"
+#include "cpu/tms1000/tms0970.h"
+#include "cpu/tms1000/tms0980.h"
+#include "cpu/tms1000/tms0270.h"
+#include "cpu/tms1000/tp0320.h"
 #include "sound/speaker.h"
 
 
@@ -29,7 +34,7 @@ public:
 	{ }
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<tms1k_base_device> m_maincpu;
 	optional_ioport_array<18> m_inp_matrix; // max 18
 	optional_device<speaker_sound_device> m_speaker;
 
@@ -41,6 +46,7 @@ public:
 	bool m_power_led;
 
 	UINT8 read_inputs(int columns);
+	UINT8 read_rotated_inputs(int columns, UINT8 rowmask = 0xf);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 
@@ -49,8 +55,8 @@ public:
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
 
-	UINT32 m_grid;                      // VFD current row data
-	UINT32 m_plate;                     // VFD current column data
+	UINT32 m_grid;                      // VFD/LED current row data
+	UINT32 m_plate;                     // VFD/LED current column data
 
 	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
@@ -61,8 +67,7 @@ public:
 	void display_update();
 	void set_display_size(int maxx, int maxy);
 	void set_display_segmask(UINT32 digits, UINT32 mask);
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
-	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
+	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;

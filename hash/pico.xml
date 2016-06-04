@@ -621,8 +621,8 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
-	<software name="csshanze">
-		<description>Choukou Senshi Shanzerion (Jpn)</description>
+	<software name="changern">
+		<description>Choukou Senshi Changerion (Jpn)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="HPC-6038"/>
@@ -999,17 +999,17 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 	</software>
 
 	<software name="doraeiu10th" cloneof="doraeiu">
-		<description>Doraemon Ensoku-Imohori-Undoukai ~10th Anniversary Edition~ (Jpn)</description>
+		<description>Doraemon Ensoku-Imohori-Undoukai (Jpn, 10th Anniversary Edition Reprint)</description>
 		<year>2003</year>
 		<publisher>Shogakukan</publisher>
 		<info name="serial" value="T-226090"/>
-		<!-- * ドラえもん えんそく･いもほり･うんどうかい <10th Anniversary> - Doraemon Ensoku-Imohori-Undoukai ~10th Anniversary Edition~ (Shogakukan - 200309xx - T-226090) -->
-		<info name="alt_title" value="ドラえもん えんそく･いもほり･うんどうかい"/>
+		<info name="release" value="200309xx"/>
+		<info name="alt_title" value="ドラえもん えんそく･いもほり･うんどうかい &lt;10th&gt;"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7090A" />
-			<feature name="ic1" value="unknown" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="Doraemon Ensoku-Imohori-Undoukai (10th Anniversary) (Japan).ic1" size="2097152" crc="5adcb456" sha1="9609c98dd34e6d5e5d0389d019c3017b9f244aff" offset="000000" loadflag="load16_word_swap" />
+				<rom name="epoxy block u1.ic1" size="2097152" crc="5adcb456" sha1="9609c98dd34e6d5e5d0389d019c3017b9f244aff" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1813,12 +1813,16 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
-	<software name="heiseiky">
+	<software name="heiseijr">
 		<description>Heisei Kyouiku Iinkai Jr. Mezase Yuutousei (Jpn)</description>
 		<year>1995</year>
 		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150270"/>
+		<info name="release" value="19951201"/>
+		<info name="alt_title" value="平成教育委員会Jr. めざせ優等生"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18565-T" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18565-t.ic1" size="524288" crc="8ba23bbe" sha1="85e6ed98f5e7bfa04c1b099bba79ddd34ccdd40e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -3218,8 +3222,9 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="alt_title" value="おジャ魔女どれみ ドッカ～ン!"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="ojamajo doremi dokka~n! (japan).bin" size="2097152" crc="9c31107f" sha1="f96f74adbff56dfd1685fd769828dcc56429404e" offset="000000" loadflag="load16_word_swap" />
+				<rom name="epoxy block u1.ic1" size="2097152" crc="9c31107f" sha1="f96f74adbff56dfd1685fd769828dcc56429404e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3438,19 +3443,17 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	</software>
 
 	<software name="peterpan10th" cloneof="peterpan">
-		<description>Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Jpn)</description>
-		<year>2002</year>
+		<description>Peter Pan - Neverland e Ikou! (Jpn, 10th Anniversary Edition Reprint)</description>
+		<year>2003</year>
 		<publisher>Sega Toys</publisher>
-		<info name="serial" value="HPC-6214"/>
+		<info name="serial" value="HPC-6124"/>
 		<info name="release" value="200306xx"/>
-		<!-- * ピーターパン ネバーランドへ いこう!<10th> - Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6124) [reprint HPC-6047]
-		   malformed token?  Used normal Peter Pan alt_title for now -->
-		<info name="alt_title" value="ピーターパン ネバーランドへ いこう!"/>
+		<info name="alt_title" value="ピーターパン ネバーランドへ いこう! &lt;10th&gt;"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7090A" />
-			<feature name="ic1" value="unknown" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="Peter Pan - Neverland e Ikou! (10th Anniversary) (Japan).bin.ic1" size="2097152" crc="e0ea39c0" sha1="ae35761b41632dfbe4f1a6f3065a5db2514d5558" offset="000000" loadflag="load16_word_swap" />
+				<rom name="epoxy block u1.ic1" size="2097152" crc="e0ea39c0" sha1="ae35761b41632dfbe4f1a6f3065a5db2514d5558" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3472,14 +3475,19 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 
 	<software name="plarail">
 		<description>Plarail Pico - Plarail de Asobou! (Jpn)</description>
-		<year>199?</year>
+		<year>2001</year>
 		<publisher>Sega Toys</publisher>
 		<info name="serial" value="HPC-6099"/>
 		<info name="release" value="20010921"/>
 		<info name="alt_title" value="プラレール・ピコ プラレールであそぼう!"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7967" />
+			<feature name="ic1" value="9K0-0046" />
+			<feature name="ic2" value="HC32" />
+			<feature name="ic3" value="HC74" />
+			<feature name="ic4" value="HC125" />
 			<dataarea name="rom" size="2097152">
-				<rom name="plarail pico - plarail de asobou! (j).bin" size="2097152" crc="442298ee" sha1="e40812561106e177b7874e6f7827aaad26b1740d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="9k0-0046.ic1" size="2097152" crc="442298ee" sha1="e40812561106e177b7874e6f7827aaad26b1740d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3622,7 +3630,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="pcb" value="171-6882A" />
 			<feature name="ic1" value="MPR-17935-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="professor pico and the paintbox puzzle (Europe).bin" size="524288" crc="2e81a633" sha1="a32376e294d0b7f0cc2043965891784bbe614e09" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17935-t.ic1" size="524288" crc="2e81a633" sha1="a32376e294d0b7f0cc2043965891784bbe614e09" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3820,23 +3828,27 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	</software>
 
 	<software name="sanouk5">
-		<description>Sanou Kaihatsu Series 5 Meiro - Kioku (CD Tsuki) (Jpn)</description>
+		<description>Sanou Kaihatsu Series 5 Meiro - Kioku (Jpn, CD Tsuki)</description>
 		<year>1995</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-150240"/>
-		<!-- * 左脳開発シリーズ5 迷路・記憶 (CD付き) (malformed token? - using sanouk4 above to fill field for now) -->
 		<info name="release" value="19951208"/>
-		<info name="alt_title" value="左脳開発シリーズ4 推理・構成"/>
+		<info name="alt_title" value="左脳開発シリーズ5 迷路・記憶 (CD付き)"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6882A" />
 			<feature name="ic1" value="MPR-18458-T" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18458-t.ic1" size="524288" crc="6340c18a" sha1="101d5652ffd704788f1f44b671be843e3430e58a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
-		<!-- this is a 22 track companion audio CD (to be played on standalone CD player while operating the game?) -->
-		<!-- dumping software / drive: BurnAtOnce 0.99.5 / TS-L633R -->
+			<!-- this is a 22 track companion audio CD (to be played on standalone CD player while operating the game?) -->
+			<!-- dumping software / drive: BurnAtOnce 0.99.5 / TS-L633R -->
+			<!-- Original images
+			 <rom name="image.dat" size="497176560" crc="d7ffc4a0"/>
+			 <rom name="image.toc" size="3208"      crc="465f07ea"/>
+			 Notice that the .toc file has to be modified before conversion (Remove absolute path "C:/CD/New folder (2)/" in favor of local path)
+			 -->
 			<diskarea name="cdrom">
-				<disk name="sanouk5cd" sha1="c9330bbf118405c02347bd83a1cc24ab2bb4310d"/>
+				<disk name="imgpico-001" sha1="c9330bbf118405c02347bd83a1cc24ab2bb4310d" />
 			</diskarea>
 		</part>
 	</software>
@@ -4629,12 +4641,20 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	</software>
 
 	<software name="tomicarp">
-		<description>Tomica Pico Rescue Parking ~Shokai-Tomica Fuzoku~ (Jpn)</description>
+		<description>Tomica Pico Rescue Parking - Shokai-Tomica Fuzoku (Jpn)</description>
 		<year>2002</year>
 		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6114"/>
+		<info name="release" value="200207xx"/>
+		<info name="alt_title" value="トミカ・ピコ レスキューパーキング きんきゅうしゅつどう! はたらくのりもの &lt;初回･トミカ付属&gt; - Tomica Pico Rescue Parking Kinkyuushutsudou! Hataraku Norimono ~Shokai-Tomica Fuzoku~"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7438B" />
+			<feature name="u1" value="9B1-0014AR2" />
+			<feature name="u2" value="HC32" />
+			<feature name="u3" value="HC74" />
+			<feature name="u4" value="HC245" />
 			<dataarea name="rom" size="2097152">
-				<rom name="9v1-0014ar2" size="2097152" crc="3e53c515" sha1="fff0d70882c10adab3065bebe4ce07aee690f674" offset="000000" loadflag="load16_word_swap" />
+				<rom name="9b1-0014ar2.u1" size="2097152" crc="3e53c515" sha1="fff0d70882c10adab3065bebe4ce07aee690f674" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4662,8 +4682,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="T-226080"/>
 		<info name="alt_title" value="とっとこハム太郎 おえかきいっぱい! ハムちゃんず!"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="tottoko hamtarou - oekaki ippai! ham-chans! (j).bin" size="2097152" crc="c71101d8" sha1="6e7c1ceeedf9c8ed641a7332fb1fe1a06d48fc17" offset="000000" loadflag="load16_word_swap" />
+				<rom name="epoxy block u1.ic1" size="2097152" crc="c71101d8" sha1="6e7c1ceeedf9c8ed641a7332fb1fe1a06d48fc17" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -5930,7 +5952,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="zaiweini" supported="no">
+	<software name="poohcorntw" cloneof="poohcorn" supported="no">
 		<description>Zai Weini Tiandilide Yinian (Tw)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -5939,13 +5961,13 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="pcb" value="171-6882A" />
 			<feature name="ic1" value="MPR-20692-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="zai weini tiandilide yinian (taiwan).bin" size="524288" crc="072a429a" sha1="fadfb37537389fa636ba1c1da0d5cdceaaf35f06" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-20692-t.ic1" size="524288" crc="072a429a" sha1="fadfb37537389fa636ba1c1da0d5cdceaaf35f06" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="anpanetk">
-		<description>Anpanman Eigo - Tanosii Kanibaru (Tw)</description>
+	<software name="anpanmentw" cloneof="anpanmen">
+		<description>Soreike! Anpanman - Eigo Tanosii Kanibaru (Tw)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-49800-16" />
@@ -5953,12 +5975,12 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="pcb" value="171-6883A" />
 			<feature name="ic1" value="MPR-20357 J51" />
 			<dataarea name="rom" size="1048576">
-				<rom name="anpanman eigo - tanosii kanibaru (taiwan).bin" size="1048576" crc="d2f15d6f" sha1="a2014920d3c255130738f687c49c2ade3cd37331" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-20357 j51.ic1" size="1048576" crc="d2f15d6f" sha1="a2014920d3c255130738f687c49c2ade3cd37331" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="doramach">
+	<software name="doratimmtw" cloneof="doratimm">
 		<description>Doraemon Machinaka (Tw)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -5967,13 +5989,13 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="pcb" value="171-6882A" />
 			<feature name="ic1" value="MPR-20358-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="doraemon machinaka (taiwan).bin" size="524288" crc="cdc2855a" sha1="c9f8da3b87491543f9b9784136dbd433b2970978" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-20358-t.ic1" size="524288" crc="cdc2855a" sha1="c9f8da3b87491543f9b9784136dbd433b2970978" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="micktoof">
-		<description>Mickey To Ookina Furudokei (Tw))</description>
+	<software name="mickbmttw" cloneof="mickbmt">
+		<description>Mickey to Ookina Furudokei (Tw)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-49807-16" />
@@ -5981,7 +6003,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="pcb" value="171-6883A" />
 			<feature name="ic1" value="MPR-20642 J54" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mickey to ookina furudokei (taiwan).bin" size="1048576" crc="27b74c2d" sha1="459b9c49124894e0a3e5124d13ce34ff109ff076" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-20642 j54.ic1" size="1048576" crc="27b74c2d" sha1="459b9c49124894e0a3e5124d13ce34ff109ff076" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

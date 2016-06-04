@@ -14,7 +14,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "includes/atari.h"
+#include "includes/atari400.h"
 #include "atarifdc.h"
 #include "sound/pokey.h"
 #include "machine/6821pia.h"
@@ -146,7 +146,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image)
 
 	ext = image.filetype();
 
-	// hack alert, this means we can only load ATR via the softlist at the moment, image.filetype reutrns NULL :/
+	// hack alert, this means we can only load ATR via the softlist at the moment, image.filetype reutrns nullptr :/
 	if (image.software_entry() != nullptr) ext="ATR";
 
 	/* no extension: assume XFD format (no header) */

@@ -16,11 +16,7 @@
 #include "osdcore.h"
 #include "corefile.h"
 
-#ifdef FLAC__NO_DLL
-#include "libflac/include/FLAC/all.h"
-#else
 #include <FLAC/all.h>
-#endif
 
 
 //**************************************************************************
@@ -35,7 +31,7 @@ public:
 	// construction/destruction
 	flac_encoder();
 	flac_encoder(void *buffer, UINT32 buflength);
-	flac_encoder(core_file &file);
+	flac_encoder(util::core_file &file);
 	~flac_encoder();
 
 	// configuration
@@ -51,7 +47,7 @@ public:
 	// reset
 	bool reset();
 	bool reset(void *buffer, UINT32 buflength);
-	bool reset(core_file &file);
+	bool reset(util::core_file &file);
 
 	// encode a buffer
 	bool encode_interleaved(const INT16 *samples, UINT32 samples_per_channel, bool swap_endian = false);
@@ -68,7 +64,7 @@ private:
 
 	// internal state
 	FLAC__StreamEncoder *   m_encoder;              // actual encoder
-	core_file *             m_file;                 // output file
+	util::core_file *       m_file;                 // output file
 	UINT32                  m_compressed_offset;    // current offset with the compressed stream
 	FLAC__byte *            m_compressed_start;     // start of compressed data
 	UINT32                  m_compressed_length;    // length of the compressed stream
@@ -93,7 +89,7 @@ public:
 	// construction/destruction
 	flac_decoder();
 	flac_decoder(const void *buffer, UINT32 length, const void *buffer2 = nullptr, UINT32 length2 = 0);
-	flac_decoder(core_file &file);
+	flac_decoder(util::core_file &file);
 	~flac_decoder();
 
 	// getters (valid after reset)
@@ -108,7 +104,7 @@ public:
 	bool reset();
 	bool reset(const void *buffer, UINT32 length, const void *buffer2 = nullptr, UINT32 length2 = 0);
 	bool reset(UINT32 sample_rate, UINT8 num_channels, UINT32 block_size, const void *buffer, UINT32 length);
-	bool reset(core_file &file);
+	bool reset(util::core_file &file);
 
 	// decode to a buffer; num_samples must be a multiple of the block size
 	bool decode_interleaved(INT16 *samples, UINT32 num_samples, bool swap_endian = false);
@@ -129,7 +125,7 @@ private:
 
 	// output state
 	FLAC__StreamDecoder *   m_decoder;              // actual encoder
-	core_file *             m_file;                 // output file
+	util::core_file *       m_file;                 // output file
 	UINT32                  m_sample_rate;          // decoded sample rate
 	UINT8                   m_channels;             // decoded number of channels
 	UINT8                   m_bits_per_sample;      // decoded bits per sample

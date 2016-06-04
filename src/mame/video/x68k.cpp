@@ -89,7 +89,7 @@ bitmap_rgb32* ::x68k_get_gfx_page(int pri,int type)
     if(type == GFX65536)
         return x68k_gfx_0_bitmap_65536;
 
-    return NULL;  // should never reach here either.
+    return nullptr;  // should never reach here either.
 }
 */
 void x68k_state::x68k_crtc_text_copy(int src, int dest, UINT8 planes)
@@ -867,7 +867,7 @@ bool x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 									else
 										bitmap.pix16(scanline, pixel) = (pal[colour] & 0xfffe) + blend;
 								}
-								if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
+								else if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
 									m_special.pix16(scanline, pixel) = colour;
 								else
 									bitmap.pix16(scanline, pixel) = colour;

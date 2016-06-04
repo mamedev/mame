@@ -44,14 +44,14 @@ struct osd_directory
 
 osd_directory *osd_opendir(const char *dirname)
 {
-	osd_directory *dir = NULL;
-	TCHAR *t_dirname = NULL;
-	TCHAR *dirfilter = NULL;
+	osd_directory *dir = nullptr;
+	TCHAR *t_dirname = nullptr;
+	TCHAR *dirfilter = nullptr;
 	size_t dirfilter_size;
 
 	// allocate memory to hold the osd_tool_directory structure
 	dir = (osd_directory *)malloc(sizeof(*dir));
-	if (dir == NULL)
+	if (dir == nullptr)
 		goto error;
 	memset(dir, 0, sizeof(*dir));
 
@@ -61,29 +61,29 @@ osd_directory *osd_opendir(const char *dirname)
 
 	// convert the path to TCHARs
 	t_dirname = tstring_from_utf8(dirname);
-	if (t_dirname == NULL)
+	if (t_dirname == nullptr)
 		goto error;
 
 	// append \*.* to the directory name
 	dirfilter_size = _tcslen(t_dirname) + 5;
 	dirfilter = (TCHAR *)malloc(dirfilter_size * sizeof(*dirfilter));
-	if (dirfilter == NULL)
+	if (dirfilter == nullptr)
 		goto error;
 	_sntprintf(dirfilter, dirfilter_size, TEXT("%s\\*.*"), t_dirname);
 
 	// attempt to find the first file
-	dir->find = FindFirstFile(dirfilter, &dir->data);
+	dir->find = FindFirstFileEx(dirfilter, FindExInfoStandard, &dir->data, FindExSearchNameMatch, nullptr, 0);
 
 error:
 	// cleanup
-	if (t_dirname != NULL)
+	if (t_dirname != nullptr)
 		osd_free(t_dirname);
-	if (dirfilter != NULL)
+	if (dirfilter != nullptr)
 		free(dirfilter);
-	if (dir != NULL && dir->find == INVALID_HANDLE_VALUE)
+	if (dir != nullptr && dir->find == INVALID_HANDLE_VALUE)
 	{
 		free(dir);
-		dir = NULL;
+		dir = nullptr;
 	}
 	return dir;
 }
@@ -96,17 +96,17 @@ error:
 const osd_directory_entry *osd_readdir(osd_directory *dir)
 {
 	// if we've previously allocated a name, free it now
-	if (dir->entry.name != NULL)
+	if (dir->entry.name != nullptr)
 	{
 		osd_free((void *)dir->entry.name);
-		dir->entry.name = NULL;
+		dir->entry.name = nullptr;
 	}
 
 	// if this isn't the first file, do a find next
 	if (!dir->is_first)
 	{
 		if (!FindNextFile(dir->find, &dir->data))
-			return NULL;
+			return nullptr;
 	}
 
 	// otherwise, just use the data we already had
@@ -117,7 +117,7 @@ const osd_directory_entry *osd_readdir(osd_directory *dir)
 	dir->entry.name = utf8_from_tstring(dir->data.cFileName);
 	dir->entry.type = win_attributes_to_entry_type(dir->data.dwFileAttributes);
 	dir->entry.size = dir->data.nFileSizeLow | ((UINT64) dir->data.nFileSizeHigh << 32);
-	return (dir->entry.name != NULL) ? &dir->entry : NULL;
+	return (dir->entry.name != nullptr) ? &dir->entry : nullptr;
 }
 
 
@@ -128,26 +128,9 @@ const osd_directory_entry *osd_readdir(osd_directory *dir)
 void osd_closedir(osd_directory *dir)
 {
 	// free any data associated
-	if (dir->entry.name != NULL)
+	if (dir->entry.name != nullptr)
 		osd_free((void *)dir->entry.name);
 	if (dir->find != INVALID_HANDLE_VALUE)
 		FindClose(dir->find);
 	free(dir);
-}
-
-
-//============================================================
-//  osd_is_absolute_path
-//============================================================
-
-int osd_is_absolute_path(const char *path)
-{
-	int result = FALSE;
-	TCHAR *t_path = tstring_from_utf8(path);
-	if (t_path != NULL)
-	{
-		result = !PathIsRelative(t_path);
-		osd_free(t_path);
-	}
-	return result;
 }

@@ -145,21 +145,10 @@ const device_type VDT911 = &device_creator<vdt911_device>;
 
 vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VDT911, "911 VDT", tag, owner, clock, "vdt911", __FILE__),
+		device_gfx_interface(mconfig, *this, GFXDECODE_NAME(vdt911), "palette"),
 		m_beeper(*this, "beeper"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
 		m_keyint_line(*this),
 		m_lineint_line(*this)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vdt911_device::device_config_complete()
 {
 }
 
@@ -467,7 +456,7 @@ WRITE8_MEMBER( vdt911_device::cru_w )
 */
 void vdt911_device::refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y)
 {
-	gfx_element *gfx = m_gfxdecode->gfx(m_model);
+	gfx_element *gfx = this->gfx(m_model);
 	int height = (m_screen_size == char_960) ? 12 : /*25*/24;
 
 	int use_8bit_charcodes = USES_8BIT_CHARCODES();
@@ -822,8 +811,6 @@ static MACHINE_CONFIG_FRAGMENT( vdt911 )
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(3)
 	MCFG_PALETTE_INIT_OWNER(vdt911_device, vdt911)
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vdt911)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

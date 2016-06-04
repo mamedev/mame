@@ -42,6 +42,7 @@ Dip locations and factory settings verified with US manual
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "includes/deadang.h"
@@ -83,7 +84,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x03800, 0x03fff) AM_RAM_WRITE(foreground_w) AM_SHARE("video_data")
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x08000, 0x08001) AM_WRITE(bank_w)
-	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x0c000, 0x0c001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -249,6 +250,8 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 	SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60)) // the game stops working with higher interleave rates..
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -463,14 +466,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(deadang_state,deadang)
 {
-	m_adpcm1->decrypt("adpcm1");
-	m_adpcm2->decrypt("adpcm2");
+	m_adpcm1->decrypt();
+	m_adpcm2->decrypt();
 }
 
 DRIVER_INIT_MEMBER(deadang_state,ghunter)
 {
-	m_adpcm1->decrypt("adpcm1");
-	m_adpcm2->decrypt("adpcm2");
+	m_adpcm1->decrypt();
+	m_adpcm2->decrypt();
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x80001, read16_delegate(FUNC(deadang_state::ghunter_trackball_low_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0000, 0xb0001, read16_delegate(FUNC(deadang_state::ghunter_trackball_high_r),this));

@@ -141,6 +141,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_irq6 );
 	DECLARE_WRITE_LINE_MEMBER( write_irq7 );
 
+	void presave();
+	void postload();
+
 	void clear_all(void);
 
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };

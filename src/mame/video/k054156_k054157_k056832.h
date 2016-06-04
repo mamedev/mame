@@ -16,8 +16,8 @@ typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k05
 #define MCFG_K056832_CB(_class, _method) \
 	k056832_device::set_k056832_callback(*device, k056832_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
-#define MCFG_K056832_CONFIG(_gfx_reg, _gfx_num, _bpp, _big, _djmain_hack, _k055555) \
-	k056832_device::set_config(*device, _gfx_reg, _gfx_num, _bpp, _big, _djmain_hack, _k055555);
+#define MCFG_K056832_CONFIG(_gfx_reg, _bpp, _big, _djmain_hack, _k055555) \
+	k056832_device::set_config(*device, "^" _gfx_reg, _bpp, _big, _djmain_hack, _k055555);
 
 
 #define K056832_PAGE_COUNT 16
@@ -35,7 +35,7 @@ typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k05
 #define K056382_DRAW_FLAG_FORCE_XYSCROLL        0x00800000
 
 
-class k056832_device : public device_t
+class k056832_device : public device_t, public device_gfx_interface
 {
 public:
 	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -45,20 +45,15 @@ public:
 	}
 
 	static void set_k056832_callback(device_t &device, k056832_cb_delegate callback) { downcast<k056832_device &>(device).m_k056832_cb = callback; }
-	static void set_config(device_t &device, const char *gfx_reg, int gfx_num, int bpp, int big, int djmain_hack, const char *k055555)
+	static void set_config(device_t &device, const char *gfx_reg, int bpp, int big, int djmain_hack, const char *k055555)
 	{
 		k056832_device &dev = downcast<k056832_device &>(device);
-		dev.m_gfx_memory_region = gfx_reg;
-		dev.m_gfx_num = gfx_num;
+		dev.m_rombase.set_tag(gfx_reg);
 		dev.m_bpp = bpp;
 		dev.m_big = big;
 		dev.m_djmain_hack = djmain_hack;
 		dev.m_k055555_tag = k055555;
 	}
-
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	void SetExtLinescroll();    /* Lethal Enforcers */
 
@@ -132,15 +127,13 @@ private:
 	UINT16    m_regs[0x20];   // 157/832 regs group 1
 	UINT16    m_regsb[4]; // 157/832 regs group 2, board dependent
 
-	UINT8 *   m_rombase;  // pointer to tile gfx data
+	required_region_ptr<UINT8> m_rombase;   // pointer to tile gfx data
 
 	int       m_num_gfx_banks;    // depends on size of graphics ROMs
 	int       m_cur_gfx_banks;        // cached info for K056832_regs[0x1a]
 
 	k056832_cb_delegate   m_k056832_cb;
 
-	//FIXME: device should be updated to use device_gfx_interface to get rid of most of these!
-	const char         *m_gfx_memory_region;
 	int                m_gfx_num;
 	int                m_bpp;
 	int                m_big;
@@ -215,12 +208,9 @@ private:
 	template<class _BitmapClass>
 	void tilemap_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
 
-	void create_gfx(const char *gfx_memory_region, int bpp, int big);
+	void create_gfx();
 	void create_tilemaps();
 	void finalize_init();
-
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 public:
 	void m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
@@ -234,11 +224,8 @@ extern const device_type K056832;
 
 
 
-#define MCFG_K056832_GFXDECODE(_gfxtag) \
-	k056832_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
 #define MCFG_K056832_PALETTE(_palette_tag) \
-	k056832_device::static_set_palette_tag(*device, "^" _palette_tag);
+	MCFG_GFX_PALETTE(_palette_tag)
 
 
 #endif

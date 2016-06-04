@@ -61,11 +61,11 @@ extern const struct io_procs corefile_ioprocs_noclose;
 
 
 
-void io_generic_close(struct io_generic *generic);
-void io_generic_read(struct io_generic *generic, void *buffer, UINT64 offset, size_t length);
-void io_generic_write(struct io_generic *generic, const void *buffer, UINT64 offset, size_t length);
-void io_generic_write_filler(struct io_generic *generic, UINT8 filler, UINT64 offset, size_t length);
-UINT64 io_generic_size(struct io_generic *generic);
+void io_generic_close(struct io_generic *genio);
+void io_generic_read(struct io_generic *genio, void *buffer, UINT64 offset, size_t length);
+void io_generic_write(struct io_generic *genio, const void *buffer, UINT64 offset, size_t length);
+void io_generic_write_filler(struct io_generic *genio, UINT8 filler, UINT64 offset, size_t length);
+UINT64 io_generic_size(struct io_generic *genio);
 
 
 

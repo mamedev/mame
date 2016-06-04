@@ -12,7 +12,7 @@
 #include "emuopts.h"
 #include "osdepend.h"
 #include "config.h"
-#include "sound/wavwrite.h"
+#include "wavwrite.h"
 
 
 
@@ -75,8 +75,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 		m_callback = stream_update_delegate(FUNC(device_sound_interface::sound_stream_update),(device_sound_interface *)sound);
 
 	// create a unique tag for saving
-	std::string state_tag;
-	strprintf(state_tag, "%d", m_device.machine().sound().m_stream_list.count());
+	std::string state_tag = string_format("%d", m_device.machine().sound().m_stream_list.count());
 	m_device.machine().save().save_item(&m_device, "stream", state_tag.c_str(), 0, NAME(m_sample_rate));
 	m_device.machine().save().register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
 
@@ -165,17 +164,17 @@ float sound_stream::output_gain(int outputnum) const
 
 std::string sound_stream::input_name(int inputnum) const
 {
-	std::string str;
+	std::ostringstream str;
 
 	// start with our device name and tag
 	assert(inputnum >= 0 && inputnum < m_input.size());
-	strprintf(str, "%s '%s': ", m_device.name(), m_device.tag());
+	util::stream_format(str, "%s '%s': ", m_device.name(), m_device.tag());
 
 	// if we have a source, indicate where the sound comes from by device name and tag
 	if (m_input[inputnum].m_source != nullptr && m_input[inputnum].m_source->m_stream != nullptr)
 	{
 		device_t &source = m_input[inputnum].m_source->m_stream->device();
-		strcatprintf(str, "%s '%s'", source.name(), source.tag());
+		util::stream_format(str, "%s '%s'", source.name(), source.tag());
 
 		// get the sound interface; if there is more than 1 output we need to figure out which one
 		device_sound_interface *sound;
@@ -188,12 +187,12 @@ std::string sound_stream::input_name(int inputnum) const
 			for (int outputnum = 0; (outstream = sound->output_to_stream_output(outputnum, streamoutputnum)) != nullptr; outputnum++)
 				if (outstream == m_input[inputnum].m_source->m_stream && m_input[inputnum].m_source == &outstream->m_output[streamoutputnum])
 				{
-					strcatprintf(str, " Ch.%d", outputnum);
+					util::stream_format(str, " Ch.%d", outputnum);
 					break;
 				}
 		}
 	}
-	return str;
+	return str.str();
 }
 
 
@@ -232,11 +231,11 @@ void sound_stream::set_input(int index, sound_stream *input_stream, int output_i
 
 	// make sure it's a valid input
 	if (index >= m_input.size())
-		fatalerror("Fatal error: stream_set_input attempted to configure non-existant input %d (%d max)\n", index, int(m_input.size()));
+		fatalerror("stream_set_input attempted to configure non-existant input %d (%d max)\n", index, int(m_input.size()));
 
 	// make sure it's a valid output
 	if (input_stream != nullptr && output_index >= input_stream->m_output.size())
-		fatalerror("Fatal error: stream_set_input attempted to use a non-existant output %d (%d max)\n", output_index, int(m_output.size()));
+		fatalerror("stream_set_input attempted to use a non-existant output %d (%d max)\n", output_index, int(m_output.size()));
 
 	// if this input is already wired, update the dependent info
 	stream_input &input = m_input[index];
@@ -835,15 +834,12 @@ sound_manager::sound_manager(running_machine &machine)
 	VPRINTF(("total mixers = %d\n", iter.count()));
 #endif
 
-	// open the output WAV file if specified
-	if (wavfile[0] != 0 && &machine.system() != &GAME_NAME(___empty))
-		m_wavfile = wav_open(wavfile, machine.sample_rate(), 2);
-
 	// register callbacks
 	machine.configuration().config_register("mixer", config_saveload_delegate(FUNC(sound_manager::config_load), this), config_saveload_delegate(FUNC(sound_manager::config_save), this));
 	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(sound_manager::pause), this));
 	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(sound_manager::resume), this));
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(sound_manager::reset), this));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sound_manager::stop_recording), this));
 
 	// register global states
 	machine.save().save_item(NAME(m_last_update));
@@ -862,6 +858,28 @@ sound_manager::sound_manager(running_machine &machine)
 //-------------------------------------------------
 
 sound_manager::~sound_manager()
+{
+}
+
+
+//-------------------------------------------------
+//  start_recording - begin audio recording
+//-------------------------------------------------
+
+void sound_manager::start_recording()
+{
+	// open the output WAV file if specified
+	const char *wavfile = machine().options().wav_write();
+	if (wavfile[0] != 0 && m_wavfile == nullptr)
+		m_wavfile = wav_open(wavfile, machine().sample_rate(), 2);
+}
+
+
+//-------------------------------------------------
+//  stop_recording - end audio recording
+//-------------------------------------------------
+
+void sound_manager::stop_recording()
 {
 	// close any open WAV file
 	if (m_wavfile != nullptr)
@@ -900,19 +918,20 @@ void sound_manager::set_attenuation(int attenuation)
 bool sound_manager::indexed_mixer_input(int index, mixer_input &info) const
 {
 	// scan through the mixers until we find the indexed input
-	mixer_interface_iterator iter(machine().root_device());
-	for (info.mixer = iter.first(); info.mixer != nullptr; info.mixer = iter.next())
+	for (device_mixer_interface &mixer : mixer_interface_iterator(machine().root_device()))
 	{
-		if (index < info.mixer->inputs())
+		if (index < mixer.inputs())
 		{
-			info.stream = info.mixer->input_to_stream_input(index, info.inputnum);
+			info.mixer = &mixer;
+			info.stream = mixer.input_to_stream_input(index, info.inputnum);
 			assert(info.stream != nullptr);
 			return true;
 		}
-		index -= info.mixer->inputs();
+		index -= mixer.inputs();
 	}
 
 	// didn't locate
+	info.mixer = nullptr;
 	return false;
 }
 
@@ -938,9 +957,8 @@ void sound_manager::mute(bool mute, UINT8 reason)
 void sound_manager::reset()
 {
 	// reset all the sound chips
-	sound_interface_iterator iter(machine().root_device());
-	for (device_sound_interface *sound = iter.first(); sound != nullptr; sound = iter.next())
-		sound->device().reset();
+	for (device_sound_interface &sound : sound_interface_iterator(machine().root_device()))
+		sound.device().reset();
 }
 
 
@@ -1040,9 +1058,8 @@ void sound_manager::update(void *ptr, int param)
 
 	// force all the speaker streams to generate the proper number of samples
 	int samples_this_update = 0;
-	speaker_device_iterator iter(machine().root_device());
-	for (speaker_device *speaker = iter.first(); speaker != nullptr; speaker = iter.next())
-		speaker->mix(&m_leftmix[0], &m_rightmix[0], samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
+	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+		speaker.mix(&m_leftmix[0], &m_rightmix[0], samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// now downmix the final result
 	UINT32 finalmix_step = machine().video().speed_factor();
@@ -1076,6 +1093,7 @@ void sound_manager::update(void *ptr, int param)
 	{
 		if (!m_nosound_mode)
 			machine().osd().update_audio_stream(finalmix, finalmix_offset / 2);
+		machine().osd().add_audio_to_recording(finalmix, finalmix_offset / 2);
 		machine().video().add_sound_to_recording(finalmix, finalmix_offset / 2);
 		if (m_wavfile != nullptr)
 			wav_add_data_16(m_wavfile, finalmix, finalmix_offset);
@@ -1091,15 +1109,15 @@ void sound_manager::update(void *ptr, int param)
 	}
 
 	// iterate over all the streams and update them
-	for (sound_stream *stream = m_stream_list.first(); stream != nullptr; stream = stream->next())
-		stream->update_with_accounting(second_tick);
+	for (sound_stream &stream : m_stream_list)
+		stream.update_with_accounting(second_tick);
 
 	// remember the update time
 	m_last_update = curtime;
 
 	// update sample rates if they have changed
-	for (sound_stream *stream = m_stream_list.first(); stream != nullptr; stream = stream->next())
-		stream->apply_sample_rate_changes();
+	for (sound_stream &stream : m_stream_list)
+		stream.apply_sample_rate_changes();
 
 	g_profiler.stop();
 }

@@ -52,6 +52,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
+#include "machine/watchdog.h"
 #include "sound/2151intf.h"
 #include "includes/rockrage.h"
 #include "includes/konamipt.h"
@@ -105,7 +106,7 @@ static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(rockrage_sh_irqtrigger_w)                 /* cause interrupt on audio CPU */
-	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)                         /* watchdog reset */
+	AM_RANGE(0x2ec0, 0x2ec0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2f00, 0x2f00) AM_WRITE(rockrage_vreg_w)                          /* ??? */
 	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(rockrage_bankswitch_w)                    /* bankswitch control */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                                             /* RAM */
@@ -246,6 +247,7 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_CPU_ADD("audiocpu", M6809, 1500000)        /* 24MHz/16 */
 	MCFG_CPU_PROGRAM_MAP(rockrage_sound_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -147,11 +147,11 @@ std::string nes_aladdin_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "algn";
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		dynamic_buffer rom(len);
 		UINT8 mapper;
 
-		core_fread(m_file, &rom[0], len);
+		m_file->read(&rom[0], len);
 
 		mapper = (rom[6] & 0xf0) >> 4;
 		mapper |= rom[7] & 0xf0;

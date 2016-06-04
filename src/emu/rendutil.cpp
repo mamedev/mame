@@ -12,7 +12,7 @@
 #include "rendutil.h"
 #include "png.h"
 
-
+#include "libjpeg/jpeglib.h"
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -429,10 +429,9 @@ int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_qu
     width to four points
 -------------------------------------------------*/
 
-void render_line_to_quad(const render_bounds *bounds, float width, render_bounds *bounds0, render_bounds *bounds1)
+void render_line_to_quad(const render_bounds *bounds, float width, float length_extension, render_bounds *bounds0, render_bounds *bounds1)
 {
 	render_bounds modbounds = *bounds;
-	float unitx, unity;
 
 	/*
 	    High-level logic -- due to math optimizations, this info is lost below.
@@ -480,27 +479,46 @@ void render_line_to_quad(const render_bounds *bounds, float width, render_bounds
 	*/
 
 	/* we only care about the half-width */
-	width *= 0.5f;
+	float half_width = width * 0.5f;
 
 	/* compute a vector from point 0 to point 1 */
-	unitx = modbounds.x1 - modbounds.x0;
-	unity = modbounds.y1 - modbounds.y0;
+	float unitx = modbounds.x1 - modbounds.x0;
+	float unity = modbounds.y1 - modbounds.y0;
 
 	/* points just use a +1/+1 unit vector; this gives a nice diamond pattern */
 	if (unitx == 0 && unity == 0)
 	{
-		unitx = unity = 0.70710678f * width;
-		modbounds.x0 -= 0.5f * unitx;
-		modbounds.y0 -= 0.5f * unity;
-		modbounds.x1 += 0.5f * unitx;
-		modbounds.y1 += 0.5f * unity;
+		/* length of a unit vector (1,1) */
+		float unit_length = 0.70710678f;
+
+		unitx = unity = unit_length * half_width;
+		modbounds.x0 -= unitx;
+		modbounds.y0 -= unity;
+		modbounds.x1 += unitx;
+		modbounds.y1 += unity;
 	}
 
 	/* lines need to be divided by their length */
 	else
 	{
+		float length = sqrtf(unitx * unitx + unity * unity);
+
+		/* extend line length */
+		if (length_extension > 0.0f)
+		{
+			float half_length_extension = length_extension *0.5f;
+
+			float directionx = unitx / length;
+			float directiony = unity / length;
+
+			modbounds.x0 -= directionx * half_length_extension;
+			modbounds.y0 -= directiony * half_length_extension;
+			modbounds.x1 += directionx * half_length_extension;
+			modbounds.y1 += directiony * half_length_extension;
+		}
+
 		/* prescale unitx and unity by the half-width */
-		float invlength = width / sqrtf(unitx * unitx + unity * unity);
+		float invlength = half_width / length;
 		unitx *= invlength;
 		unity *= invlength;
 	}
@@ -524,6 +542,86 @@ void render_line_to_quad(const render_bounds *bounds, float width, render_bounds
 
 
 /*-------------------------------------------------
+    render_load_jpeg - load a JPG file into a
+    bitmap
+-------------------------------------------------*/
+
+void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename)
+{
+	// deallocate previous bitmap
+	bitmap.reset();
+
+	// define file's full name
+	std::string fname;
+
+	if (dirname == nullptr)
+		fname = filename;
+	else
+		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
+
+	if (file.open(fname.c_str()) != osd_file::error::NONE)
+		return;
+
+	// define standard JPEG structures
+	jpeg_decompress_struct cinfo;
+	jpeg_error_mgr jerr;
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_decompress(&cinfo);
+
+	// allocates a buffer for the image
+	UINT32 jpg_size = file.size();
+	unsigned char *jpg_buffer = global_alloc_array(unsigned char, jpg_size);
+
+	// read data from the file and set them in the buffer
+	file.read(jpg_buffer, jpg_size);
+	jpeg_mem_src(&cinfo, jpg_buffer, jpg_size);
+
+	// read JPEG header and start decompression
+	jpeg_read_header(&cinfo, TRUE);
+	jpeg_start_decompress(&cinfo);
+
+	// allocates the destination bitmap
+	int w = cinfo.output_width;
+	int h = cinfo.output_height;
+	int s = cinfo.output_components;
+	bitmap.allocate(w, h);
+
+	// allocates a buffer to receive the information and copy them into the bitmap
+	int row_stride = cinfo.output_width * cinfo.output_components;
+	JSAMPARRAY buffer = (JSAMPARRAY)malloc(sizeof(JSAMPROW));
+	buffer[0] = (JSAMPROW)malloc(sizeof(JSAMPLE) * row_stride);
+
+	while ( cinfo.output_scanline < cinfo.output_height )
+	{
+		int j = cinfo.output_scanline;
+		jpeg_read_scanlines(&cinfo, buffer, 1);
+
+		if (s == 1)
+			for (int i = 0; i < w; ++i)
+				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i], buffer[0][i], buffer[0][i]);
+
+		else if (s == 3)
+			for (int i = 0; i < w; ++i)
+				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
+		else
+		{
+			osd_printf_error("Cannot read JPEG data from %s file.\n", fname.c_str());
+			bitmap.reset();
+			break;
+		}
+	}
+
+	// finish decompression and frees the memory
+	jpeg_finish_decompress(&cinfo);
+	jpeg_destroy_decompress(&cinfo);
+	file.close();
+	free(buffer[0]);
+	free(buffer);
+	global_free_array(jpg_buffer);
+}
+
+
+/*-------------------------------------------------
     render_load_png - load a PNG file into a
     bitmap
 -------------------------------------------------*/
@@ -540,8 +638,8 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 		fname.assign(filename);
 	else
 		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
-	file_error filerr = file.open(fname.c_str());
-	if (filerr != FILERR_NONE)
+	osd_file::error filerr = file.open(fname.c_str());
+	if (filerr != osd_file::error::NONE)
 		return false;
 
 	// read the PNG data

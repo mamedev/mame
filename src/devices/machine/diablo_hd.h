@@ -76,7 +76,7 @@ protected:
 private:
 #if DIABLO_DEBUG
 	int m_log_level;
-	void logprintf(int level, const char* format, ...);
+	template <typename Format, typename... Params> void logprintf(int level, Format &&fmt, Params &&... args);
 #   define  LOG_DRIVE(x) logprintf x
 
 #else

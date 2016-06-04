@@ -10,13 +10,10 @@
 
   Games running on this hardware:
 
-  * Joker's Wild (B52 system, set 1),        199?, Sigma.
-  * Joker's Wild (B52 system, set 2),        199?, Sigma.
-  * Joker's Wild (B52 system, Harrah's GFX), 199?, Sigma.
-
-
-  The HD63484 ACRTC support is a bit hacky and incomplete,
-  due to its preliminary emulation state.
+  * Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV),               199?, Sigma.
+  * Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV, Harrah's GFX), 199?, Sigma.
+  * Joker's Wild (B52 system, WP02001-054, Ver.031WM),                  199?, Sigma.
+  * Super 8 Ways FC (DB98103-011, Fruit combination),                   1989, Sigma.
 
 
 *******************************************************************************
@@ -132,7 +129,7 @@
 #include "machine/6850acia.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
-#include "video/h63484.h"
+#include "video/hd63484.h"
 
 #include "sigmab52.lh"
 
@@ -319,8 +316,8 @@ static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 
 	AM_RANGE(0xf720, 0xf727) AM_DEVREADWRITE("6840ptm_1", ptm6840_device, read, write)
 
-	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", h63484_device, status_r, address_w)
-	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", h63484_device, data_r, data_w)
+	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
+	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 
 	AM_RANGE(0xf740, 0xf740) AM_READ(in0_r)
 	AM_RANGE(0xf741, 0xf741) AM_READ_PORT("IN1")
@@ -450,7 +447,7 @@ static INPUT_PORTS_START( jwildb52 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("V Door")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, sigmab52_state, coin_drop_start, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, sigmab52_state, coin_drop_start, nullptr)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSW1-1" )        PORT_DIPLOCATION("SW1:1")
@@ -599,10 +596,10 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 544-1, 0, 436-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", h63484_device, update_screen)
+	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_H63484_ADD("hd63484", SEC_CLOCK, jwildb52_hd63484_map)
+	MCFG_HD63484_ADD("hd63484", SEC_CLOCK, jwildb52_hd63484_map)
 
 	MCFG_PALETTE_ADD("palette", 16)
 
@@ -618,8 +615,12 @@ MACHINE_CONFIG_END
 *        Rom Load        *
 *************************/
 
+/* Joker's Wild
+   BP55114-V1104, Ver.054NMV
+   Modern cards set. Normal cardsback.
+*/
 ROM_START( jwildb52 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // BP55114-V1104, Ver.054NMV
 	ROM_LOAD( "poker.ic95", 0x00000, 0x10000, CRC(07eb9007) SHA1(ee814c40c6d8c9ea9e5246cae0cfa2c30f2976ed) )
 
 	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
@@ -636,6 +637,32 @@ ROM_START( jwildb52 )
 ROM_END
 
 
+/* Joker's Wild
+   BP55114-V1104, Ver.054NMV
+   Modern cards set. Harrah's cardsback.
+*/
+ROM_START( jwildb52h )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jokers_wild_ver_xxx.ic95", 0x00000, 0x10000, CRC(07eb9007) SHA1(ee814c40c6d8c9ea9e5246cae0cfa2c30f2976ed) )
+
+	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "2006-1_harrahs.ic45", 0x00003, 0x10000, CRC(6e6871dc) SHA1(5dfc99c808c06ec34838324181988d4550c1ed1a) )
+	ROM_LOAD32_BYTE( "2006-2_harrahs.ic46", 0x00001, 0x10000, CRC(1039c62d) SHA1(11f0dbcbbff5f6e9028a0305f7e16a0654be40d4) )
+	ROM_LOAD32_BYTE( "2006-3_harrahs.ic47", 0x00000, 0x10000, CRC(d66af95a) SHA1(70bba1aeea9221541b82642045ce8ecf26e1d08c) )
+	ROM_LOAD32_BYTE( "2006-4_harrahs.ic48", 0x00002, 0x10000, CRC(2bf196cb) SHA1(686ca0dd84c48f51efee5349ea3db65531dd4a52) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "poker-01-00.43", 0x0000, 0x8000, CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "mb7118.41", 0x0000, 0x0100, CRC(b362f9e2) SHA1(3963b40389ed6584e4cd96ab48849552857d99af) )
+ROM_END
+
+
+/* Joker's Wild
+   WP02001-054, Ver.031WM
+   Classic cards set.  Normal cardsback.
+*/
 ROM_START( jwildb52a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sigm_wrk.bin", 0x00000, 0x10000, CRC(15c83c6c) SHA1(7a05bd94ea8b1ad051fbe6580a6550d4bb47dd15) )
@@ -656,24 +683,10 @@ ROM_START( jwildb52a )
 ROM_END
 
 
-ROM_START( jwildb52h )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jokers_wild_ver_xxx.ic95", 0x00000, 0x10000, CRC(07eb9007) SHA1(ee814c40c6d8c9ea9e5246cae0cfa2c30f2976ed) )
-
-	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "2006-1_harrahs.ic45", 0x00003, 0x10000, CRC(6e6871dc) SHA1(5dfc99c808c06ec34838324181988d4550c1ed1a) )
-	ROM_LOAD32_BYTE( "2006-2_harrahs.ic46", 0x00001, 0x10000, CRC(1039c62d) SHA1(11f0dbcbbff5f6e9028a0305f7e16a0654be40d4) )
-	ROM_LOAD32_BYTE( "2006-3_harrahs.ic47", 0x00000, 0x10000, CRC(d66af95a) SHA1(70bba1aeea9221541b82642045ce8ecf26e1d08c) )
-	ROM_LOAD32_BYTE( "2006-4_harrahs.ic48", 0x00002, 0x10000, CRC(2bf196cb) SHA1(686ca0dd84c48f51efee5349ea3db65531dd4a52) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "poker-01-00.43", 0x0000, 0x8000, CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "mb7118.41", 0x0000, 0x0100, CRC(b362f9e2) SHA1(3963b40389ed6584e4cd96ab48849552857d99af) )
-ROM_END
-
-
+/* Super 8 Ways FC
+   Fruit combination.
+   DB98103-011.
+*/
 ROM_START( s8waysfc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dv98103.011", 0x00000, 0x10000, CRC(416190a1) SHA1(e2738644efc6c2adcea2470b482f3f818ed9af8d) )
@@ -698,7 +711,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(sigmab52_state,jwildb52)
+DRIVER_INIT_MEMBER(sigmab52_state, jwildb52)
 {
 }
 
@@ -707,8 +720,8 @@ DRIVER_INIT_MEMBER(sigmab52_state,jwildb52)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT    COMPANY  FULLNAME                                  FLAGS */
-GAMEL( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 1)",        MACHINE_NOT_WORKING, layout_sigmab52 )
-GAMEL( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 2)",        MACHINE_NOT_WORKING, layout_sigmab52 )
-GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, Harrah's GFX)", MACHINE_NOT_WORKING, layout_sigmab52 )
-GAME ( 199?, s8waysfc,  0,        jwildb52, s8waysfc, sigmab52_state, jwildb52, ROT0, "Sigma", "Super 8 Ways FC (Fruit combination)",     MACHINE_NOT_WORKING )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY  FULLNAME                                                             FLAGS */
+GAMEL( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV)",               MACHINE_NOT_WORKING, layout_sigmab52 )
+GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV, Harrah's GFX)", MACHINE_NOT_WORKING, layout_sigmab52 )
+GAMEL( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, WP02001-054, Ver.031WM)",                  MACHINE_NOT_WORKING, layout_sigmab52 )
+GAME ( 1989, s8waysfc,  0,        jwildb52, s8waysfc, sigmab52_state, jwildb52, ROT0, "Sigma", "Super 8 Ways FC (DB98103-011, Fruit combination)",                   MACHINE_NOT_WORKING )

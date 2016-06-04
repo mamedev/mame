@@ -208,7 +208,6 @@ void barcode_reader_device::decode(int len)
 			sum += (i & 1) ? (m_byte_data[i] * 1) : (m_byte_data[i] * 3);
 	}
 
-	if (m_pixel_data)
 	{
 		sum = (10 - (sum % 10)) % 10;
 		if (sum != m_byte_data[len - 1])

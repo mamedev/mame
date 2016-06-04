@@ -127,7 +127,7 @@ WRITE32_MEMBER(superchs_state::superchs_input_w)
 		{
 			if (ACCESSING_BITS_24_31)   /* $300000 is watchdog */
 			{
-				machine().watchdog_reset();
+				m_watchdog->watchdog_reset();
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -317,6 +317,8 @@ static MACHINE_CONFIG_START( superchs, superchs_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -336,10 +338,9 @@ static MACHINE_CONFIG_START( superchs, superchs_state )
 	MCFG_TC0480SCP_OFFSETS(0x20, 0x08)
 	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(taito_en_sound)
+	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chase3, superchs )
@@ -358,7 +359,7 @@ ROM_START( superchs )
 	ROM_LOAD32_BYTE( "d46-33+.ic23", 0x00002, 0x40000, CRC(3094bcd0) SHA1(b6779b81a3ebec440a9359868dc43fc3a631ee11) ) /* Actually labeled D46 33* */
 	ROM_LOAD32_BYTE( "d46-32+.ic21", 0x00003, 0x40000, CRC(4fbeb335) SHA1(430cb753f3a12ab0412e82aef99e6e93b83050d6) ) /* Actually labeled D46 32* */
 
-	ROM_REGION( 0x140000, "audiocpu", 0 )   /* Sound cpu */
+	ROM_REGION( 0x140000, "taito_en:audiocpu", 0 )   /* Sound cpu */
 	ROM_LOAD16_BYTE( "d46-37.ic8", 0x100000, 0x20000, CRC(60b51b91) SHA1(0d0b017808e0a3bdabe8ef5a726bbe16428db06b) )
 	ROM_LOAD16_BYTE( "d46-36.ic7", 0x100001, 0x20000, CRC(8f7aa276) SHA1(b3e330e33099d3cbf4cdc43063119b041e9eea3a) )
 
@@ -408,7 +409,7 @@ ROM_START( superchsu )
 	ROM_LOAD32_BYTE( "d46-33+.ic23", 0x00002, 0x40000, CRC(3094bcd0) SHA1(b6779b81a3ebec440a9359868dc43fc3a631ee11) ) /* Actually labeled D46 33* */
 	ROM_LOAD32_BYTE( "d46-31+.ic21", 0x00003, 0x40000, CRC(38b983a3) SHA1(c4859cecc2f3506b7090c462cecd3e4eaabe85aa) ) /* Actually labeled D46 31* */
 
-	ROM_REGION( 0x140000, "audiocpu", 0 )   /* Sound cpu */
+	ROM_REGION( 0x140000, "taito_en:audiocpu", 0 )   /* Sound cpu */
 	ROM_LOAD16_BYTE( "d46-37.ic8", 0x100000, 0x20000, CRC(60b51b91) SHA1(0d0b017808e0a3bdabe8ef5a726bbe16428db06b) )
 	ROM_LOAD16_BYTE( "d46-36.ic7", 0x100001, 0x20000, CRC(8f7aa276) SHA1(b3e330e33099d3cbf4cdc43063119b041e9eea3a) )
 
@@ -458,7 +459,7 @@ ROM_START( superchsj )
 	ROM_LOAD32_BYTE( "d46-26+.ic23", 0x00002, 0x40000, CRC(2aaba1b0) SHA1(13ceaa678bd671c5c88cac35e8a021a180728a69) ) /* Actually labeled D46 26* */
 	ROM_LOAD32_BYTE( "d46-25+.ic21", 0x00003, 0x40000, CRC(4241e97a) SHA1(e3e361080e3ebc098805310d41b3afe7f14ff8b4) ) /* Actually labeled D46 25* */
 
-	ROM_REGION( 0x140000, "audiocpu", 0 )   /* Sound cpu */
+	ROM_REGION( 0x140000, "taito_en:audiocpu", 0 )   /* Sound cpu */
 	ROM_LOAD16_BYTE( "d46-30.ic8", 0x100000, 0x20000, CRC(88f8a421) SHA1(4fd0885d398b1b0e127d7462926d1630a635e305) )
 	ROM_LOAD16_BYTE( "d46-29.ic7", 0x100001, 0x20000, CRC(04501fa5) SHA1(dfbafc34df8ab0fcaefb5ca4c3143977020b7e58) )
 
@@ -508,7 +509,7 @@ ROM_START( superchsp )
 	ROM_LOAD32_BYTE( "ic25 a56c.bin", 0x00001, 0x40000, CRC(553ebaa9) SHA1(cfa544cb147218c3b3d9be313d83350bed34b348) )
 	ROM_LOAD32_BYTE( "ic27 1a46.bin", 0x00000, 0x40000, CRC(544e34c0) SHA1(57039063fa547e650fc66baf132988fb23ba0565) )
 
-	ROM_REGION( 0x140000, "audiocpu", 0 )   /* Sound cpu */
+	ROM_REGION( 0x140000, "taito_en:audiocpu", 0 )   /* Sound cpu */
 	ROM_LOAD16_BYTE( "sound ic7 lower.bin", 0x100001, 0x20000, CRC(e70902cc) SHA1(ee3d31c4e2c92c4a338d08d379cb80f42f8fa9cf) )
 	ROM_LOAD16_BYTE( "sound ic8 upper.bin", 0x100000, 0x20000, CRC(86eea635) SHA1(49615a152c215e1f940ab16be3b0f1120822969c) )
 

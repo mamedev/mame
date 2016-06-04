@@ -874,7 +874,7 @@ UINT8 corvus_hdc_t::corvus_read_firmware_block(UINT8 head, UINT8 sector) {
 //      Status of command
 //
 UINT8 corvus_hdc_t::corvus_write_firmware_block(UINT8 head, UINT8 sector, UINT8 *buffer) {
-	UINT16  relative_sector;    // Relative sector on drive for Physical Read
+	UINT16  relative_sector;    // Relative sector on drive for Physical Write
 	UINT8   status;
 
 	relative_sector = head * m_sectors_per_track + sector;
@@ -1222,7 +1222,7 @@ void corvus_hdc_t::device_timer(emu_timer &timer, device_timer_id id, int param,
 //      Nothing
 //
 // Returns:
-//      NULL if there's no file to attach to
+//      nullptr if there's no file to attach to
 //
 void corvus_hdc_t::device_start() {
 	m_status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY); // Host-to-controller mode, Idle (awaiting command from Host mode)

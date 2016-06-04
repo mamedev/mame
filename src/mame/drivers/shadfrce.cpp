@@ -142,6 +142,7 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "sound/2151intf.h"
 #include "includes/shadfrce.h"
 
@@ -378,7 +379,7 @@ static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x1d0010, 0x1d0011) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0012, 0x1d0013) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0014, 0x1d0015) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1d0016, 0x1d0017) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x1d0016, 0x1d0017) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x1d0020, 0x1d0027) AM_READ(input_ports_r)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
@@ -545,6 +546,8 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)         /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shadfrce_sound_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */

@@ -14,7 +14,7 @@
 
 /* Only problems ... */
 #if defined(_WIN32)
-#define SDLMAME_WIN32
+#define SDLMAME_WIN32 1
 #define _SDL_main_h
 #endif
 
@@ -59,10 +59,6 @@
 #define SDLMAME_BSD 1
 #endif
 
-#if defined(__OS2__)
-#define SDLMAME_OS2 1
-#endif
-
 #if defined(__HAIKU__)
 #define SDLMAME_HAIKU 1
 #define SDLMAME_NO64BITIO 1
@@ -72,6 +68,10 @@
 #define SDLMAME_EMSCRIPTEN 1
 #define SDLMAME_NO64BITIO 1
 struct _IO_FILE {};  //_IO_FILE is an opaque type in the emscripten libc which makes clang cranky
+#endif
+
+#if defined(__ANDROID__)
+#define SDLMAME_ANDROID 1
 #endif
 
 // fix for Ubuntu 8.10

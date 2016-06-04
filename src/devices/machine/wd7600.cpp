@@ -51,7 +51,7 @@ static MACHINE_CONFIG_FRAGMENT( wd7600 )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(wd7600_device, dma2_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(wd7600_device, dma2_dack3_w))
 	MCFG_PIC8259_ADD("intc1", WRITELINE(wd7600_device, pic1_int_w), VCC, READ8(wd7600_device, pic1_slave_ack_r))
-	MCFG_PIC8259_ADD("intc2", DEVWRITELINE("intc1", pic8259_device, ir2_w), GND, NULL)
+	MCFG_PIC8259_ADD("intc2", DEVWRITELINE("intc1", pic8259_device, ir2_w), GND, NOOP)
 
 	MCFG_DEVICE_ADD("ctc", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL_14_31818MHz / 12)
@@ -165,12 +165,12 @@ void wd7600_device::device_start()
 
 	// install video BIOS (we should use the VGA BIOS at the beginning of the system BIOS ROM, but that gives a
 	// blank display (but still runs))
-	//m_space->install_rom(0x000c0000, 0x000cffff, m_bios + 0xe0000);
+	//m_space->install_rom(0x000c0000, 0x000cffff, m_bios);
 	m_space->install_rom(0x000c0000, 0x000cffff, m_isa);
 
 	// install BIOS ROM at cpu inital pc
-	m_space->install_rom(0x000f0000, 0x000fffff, m_bios + 0xf0000);
-	m_space->install_rom(0xffff0000, 0xffffffff, m_bios + 0xf0000);
+	m_space->install_rom(0x000f0000, 0x000fffff, m_bios + 0x10000);
+	m_space->install_rom(0xffff0000, 0xffffffff, m_bios + 0x10000);
 
 	// install i/o accesses
 	m_space_io->install_readwrite_handler(0x0000, 0x000f, read8_delegate(FUNC(am9517a_device::read), &(*m_dma1)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma1)), 0xffffffff);

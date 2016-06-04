@@ -28,11 +28,12 @@
 #define BX_PLATFORM_XBOX360    0
 #define BX_PLATFORM_XBOXONE    0
 
-#define BX_CPU_ARM  0
-#define BX_CPU_JIT  0
-#define BX_CPU_MIPS 0
-#define BX_CPU_PPC  0
-#define BX_CPU_X86  0
+#define BX_CPU_ARM   0
+#define BX_CPU_JIT   0
+#define BX_CPU_MIPS  0
+#define BX_CPU_PPC   0
+#define BX_CPU_RISCV 0
+#define BX_CPU_X86   0
 
 #define BX_ARCH_32BIT 0
 #define BX_ARCH_64BIT 0
@@ -84,6 +85,12 @@
 #	undef  BX_CPU_PPC
 #	define BX_CPU_PPC 1
 #	define BX_CACHE_LINE_SIZE 128
+#elif defined(__riscv)   || \
+	  defined(__riscv__) || \
+	  defined(RISCVEL)
+#	undef  BX_CPU_RISCV
+#	define BX_CPU_RISCV 1
+#	define BX_CACHE_LINE_SIZE 64
 #elif defined(_M_IX86)    || \
 	  defined(_M_X64)     || \
 	  defined(__i386__)   || \
@@ -103,7 +110,8 @@
 	defined(__64BIT__)     || \
 	defined(__mips64)      || \
 	defined(__powerpc64__) || \
-	defined(__ppc64__)
+	defined(__ppc64__)     || \
+	defined(__LP64__)
 #	undef  BX_ARCH_64BIT
 #	define BX_ARCH_64BIT 64
 #else
@@ -123,7 +131,7 @@
 #if defined(_XBOX_VER)
 #	undef  BX_PLATFORM_XBOX360
 #	define BX_PLATFORM_XBOX360 1
-#elif defined (_DURANGO)
+#elif defined(_DURANGO) || defined(_XBOX_ONE)
 #	undef  BX_PLATFORM_XBOXONE
 #	define BX_PLATFORM_XBOXONE 1
 #elif defined(_WIN32) || defined(_WIN64)
@@ -171,10 +179,12 @@
 // RaspberryPi compiler defines __linux__
 #	undef  BX_PLATFORM_RPI
 #	define BX_PLATFORM_RPI 1
-#elif defined(__linux__)
+#elif  defined(__linux__) \
+	|| defined(__riscv__)
 #	undef  BX_PLATFORM_LINUX
 #	define BX_PLATFORM_LINUX 1
-#elif defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
+#elif  defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) \
+	|| defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
 #	undef  BX_PLATFORM_IOS
 #	define BX_PLATFORM_IOS 1
 #elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
@@ -183,7 +193,7 @@
 #		define BX_PLATFORM_OSX __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
 #	else
 #		define BX_PLATFORM_OSX 1
-#	endif // defined(MAC_OS_X_VERSION_MAX_ALLOWED)
+#	endif // defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
 #elif defined(__EMSCRIPTEN__)
 #	undef  BX_PLATFORM_EMSCRIPTEN
 #	define BX_PLATFORM_EMSCRIPTEN 1
@@ -283,12 +293,14 @@
 
 #if BX_CPU_ARM
 #	define BX_CPU_NAME "ARM"
+#elif BX_CPU_JIT
+#	define BX_CPU_NAME "JIT-VM"
 #elif BX_CPU_MIPS
 #	define BX_CPU_NAME "MIPS"
 #elif BX_CPU_PPC
 #	define BX_CPU_NAME "PowerPC"
-#elif BX_CPU_JIT
-#	define BX_CPU_NAME "JIT-VM"
+#elif BX_CPU_RISCV
+#	define BX_CPU_NAME "RISC-V"
 #elif BX_CPU_X86
 #	define BX_CPU_NAME "x86"
 #endif // BX_CPU_

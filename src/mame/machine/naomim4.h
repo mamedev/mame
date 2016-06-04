@@ -7,14 +7,14 @@
 
 #define MCFG_NAOMI_M4_BOARD_ADD(_tag, _key_tag, _eeprom_tag, _actel_tag, _irq_cb) \
 	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M4_BOARD, _eeprom_tag, _actel_tag, _irq_cb) \
-	naomi_m4_board::static_set_tags(*device, _key_tag);
+	naomi_m4_board::static_set_tags(*device, "^" _key_tag);
 
 class naomi_m4_board : public naomi_board
 {
 public:
 	naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_tags(device_t &device, const char *_key_tag);
+	static void static_set_tags(device_t &device, const char *key_tag);
 
 	virtual DECLARE_ADDRESS_MAP(submap, 16) override;
 
@@ -33,7 +33,8 @@ private:
 
 	static const UINT8 k_sboxes[4][16];
 
-	const char *key_tag;
+	required_memory_region m_region;
+	required_region_ptr<UINT8> m_key_data;
 	UINT16 subkey1, subkey2;
 	std::unique_ptr<UINT16[]> one_round;
 

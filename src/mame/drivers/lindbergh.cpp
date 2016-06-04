@@ -113,7 +113,8 @@ SEGA Network Taisen Mahjong MJ4 (rev G)       ?                 ?               
 SEGA-Race TV (EXPORT)                         253-5508-0504    ^317-0504-COM   ^DVP-0044
 StarHorse 2: Fifth Expansion (rev D)          ?                 ?               DVP-0082D
 StarHorse 2: Fifth Expansion (rev E)          ?                 ?               DVP-0082E
-The House Of The Dead 4 (EXPORT)              253-5508-0427    ^317-0427-COM   ^DVP-0003A
+The House Of The Dead 4 (EXPORT) (rev A)      253-5508-0427    ^317-0427-COM   ^DVP-0003A
+The House Of The Dead 4 (EXPORT) (rev B)      ?                 ?               DVP-0003B
 The House Of The Dead EX (JAPAN)              253-5508-0550    ^317-0550-JPN    ?
 The House Of the Dead 4 Special               ?                 ?               ?
 VBIOS Update                                  ?                 ?              ^DVP-0021B
@@ -413,6 +414,16 @@ ROM_END
 ROM_START(hotd4)
 	LINDBERGH_BIOS
 
+	ROM_REGION(0x2000, ":pic", 0)
+	ROM_LOAD("317-0427-com.bin", 0, 0x2000, CRC(ef4a120c) SHA1(fcc0386fa708af9e010e40e1d259a6bd95e8b9e2))  // PIC was added from Rev A
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY("dvp-0003b", 0, SHA1(67f2565338f1e8df4c6cfc83447f490f75541b16))
+ROM_END
+
+ROM_START(hotd4a)
+	LINDBERGH_BIOS
+
 	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0427 / 317-0427-COM
 	ROM_LOAD("317-0427-com.bin", 0, 0x2000, CRC(ef4a120c) SHA1(fcc0386fa708af9e010e40e1d259a6bd95e8b9e2))
 
@@ -572,7 +583,8 @@ ROM_START(lbvbiosu)
 ROM_END
 
 GAME(1999, lindbios,         0, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Sega Lindbergh Bios",                      MACHINE_IS_BIOS_ROOT)
-GAME(2005, hotd4,     lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "House of the Dead 4 (Export)",             MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2005, hotd4,     lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "House of the Dead 4 (Export) (Rev B)",     MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2005, hotd4a,    hotd4,    lindbergh, 0, driver_device, 0, ROT0, "Sega", "House of the Dead 4 (Export) (Rev A)",     MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2005, vf5,       lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Virtua Fighter 5 (Export)",                MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2006, abclimax,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "After Burner Climax (Export)",             MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2006, letsgoju,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Let's Go Jungle (Export)",                 MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)

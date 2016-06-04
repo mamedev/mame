@@ -361,7 +361,7 @@ void rsp_device::resolve_cb()
 
 void rsp_device::device_start()
 {
-	m_isdrc = (mconfig().options().drc() && !mconfig().m_force_no_drc) ? true : false;
+	m_isdrc = allow_drc();
 	m_rsp_state = (internal_rsp_state *)m_cache.alloc_near(sizeof(internal_rsp_state));
 
 	if (LOG_INSTRUCTION_EXECUTION)
@@ -548,7 +548,7 @@ void rsp_device::state_string_export(const device_state_entry &entry, std::strin
 	}
 	else if (index == STATE_GENFLAGS)
 	{
-		strprintf(str, "%s", "");
+		str = "";
 	}
 }
 

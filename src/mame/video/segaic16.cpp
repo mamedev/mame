@@ -384,7 +384,15 @@ segaic16_video_device::segaic16_video_device(const machine_config &mconfig, cons
 {
 	memset(m_rotate, 0, sizeof(m_rotate));
 	memset(m_bg_tilemap, 0, sizeof(m_bg_tilemap));
+	m_pagelatch_cb =  segaic16_video_pagelatch_delegate(FUNC(segaic16_video_device::tilemap_16b_fill_latch), this);
 }
+
+void segaic16_video_device::set_pagelatch_cb(device_t &device,segaic16_video_pagelatch_delegate newtilecb)
+{
+	segaic16_video_device &dev = downcast<segaic16_video_device &>(device);
+	dev.m_pagelatch_cb = newtilecb;
+}
+
 
 //-------------------------------------------------
 //  static_set_gfxdecode_tag: Set the tag of the
@@ -403,6 +411,8 @@ void segaic16_video_device::device_start()
 		throw device_missing_dependencies();
 
 	save_item(NAME(m_display_enable));
+
+	m_pagelatch_cb.bind_relative_to(*owner());
 }
 
 void segaic16_video_device::device_reset()
@@ -1012,6 +1022,16 @@ void tilemap_16b_draw_layer(screen_device &screen, struct tilemap_info *info, bi
 }
 
 
+
+
+void segaic16_video_device::tilemap_16b_fill_latch(int i, UINT16* latched_pageselect, UINT16* latched_yscroll, UINT16* latched_xscroll, UINT16* textram)
+{
+	latched_pageselect[i] = textram[0xe80 / 2 + i];
+	latched_yscroll[i] = textram[0xe90/2 + i];
+	latched_xscroll[i] = textram[0xe98/2 + i];
+//  printf("%02x returning latched page select %04x scrollx %04x scrolly %04x\n", i, latched_pageselect[i], latched_xscroll[i], latched_yscroll[i]);
+}
+
 TIMER_CALLBACK_MEMBER( segaic16_video_device::tilemap_16b_latch_values )
 {
 	struct tilemap_info *info = &m_bg_tilemap[param];
@@ -1021,9 +1041,7 @@ TIMER_CALLBACK_MEMBER( segaic16_video_device::tilemap_16b_latch_values )
 	/* latch the scroll and page select values */
 	for (i = 0; i < 4; i++)
 	{
-		info->latched_pageselect[i] = textram[0xe80/2 + i];
-		info->latched_yscroll[i] = textram[0xe90/2 + i];
-		info->latched_xscroll[i] = textram[0xe98/2 + i];
+		m_pagelatch_cb(i, info->latched_pageselect, info->latched_yscroll, info->latched_xscroll, textram);
 	}
 
 	/* set a timer to do this again next frame */

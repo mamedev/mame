@@ -81,6 +81,8 @@ public:
 	// construction/destruction
 	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	static void static_set_reset_param(device_t &device, const pdp1_reset_param_t *param) { downcast<pdp1_device &>(device).m_reset_param = param; }
+
 	void pulse_start_clear();
 	void io_complete() { m_ios = 1; }
 	void pdp1_null_iot(int op2, int nac, int mb, int *io, int ac);
@@ -190,10 +192,15 @@ private:
 	void field_interrupt();
 	void execute_instruction();
 
+	const pdp1_reset_param_t *m_reset_param;
 };
 
 
 extern const device_type PDP1;
+
+
+#define MCFG_PDP1_RESET_PARAM(_param) \
+	pdp1_device::static_set_reset_param(*device, &(_param));
 
 
 #endif /* __PDP1_H__ */

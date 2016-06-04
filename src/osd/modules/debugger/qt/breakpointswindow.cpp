@@ -15,11 +15,11 @@
 
 
 BreakpointsWindow::BreakpointsWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, NULL)
+	WindowQt(machine, nullptr)
 {
 	setWindowTitle("Debug: All Breakpoints");
 
-	if (parent != NULL)
+	if (parent != nullptr)
 	{
 		QPoint parentPos = parent->pos();
 		setGeometry(parentPos.x()+100, parentPos.y()+100, 800, 400);
@@ -75,7 +75,7 @@ void BreakpointsWindow::typeChanged(QAction* changedTo)
 {
 	// Clean
 	delete m_breakpointsView;
-	m_breakpointsView = NULL;
+	m_breakpointsView = nullptr;
 
 	// Create
 	if (changedTo->text() == "Breakpoints")

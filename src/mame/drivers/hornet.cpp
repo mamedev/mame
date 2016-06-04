@@ -319,6 +319,7 @@
 #include "machine/konppc.h"
 #include "machine/timekpr.h"
 #include "machine/ds2401.h"
+#include "machine/watchdog.h"
 #include "sound/rf5c400.h"
 #include "sound/k056800.h"
 #include "video/voodoo.h"
@@ -353,7 +354,9 @@ public:
 		m_analog1(*this, "ANALOG1"),
 		m_analog2(*this, "ANALOG2"),
 		m_user3_ptr(*this, "user3"),
-		m_user5_ptr(*this, "user5")
+		m_user5_ptr(*this, "user5"),
+		m_lan_ds2401(*this, "lan_serial_id"),
+		m_watchdog(*this, "watchdog")
 	{ }
 
 	// TODO: Needs verification on real hardware
@@ -377,6 +380,8 @@ public:
 	optional_ioport m_eepromout, m_analog1, m_analog2;
 	optional_region_ptr<UINT8> m_user3_ptr;
 	optional_region_ptr<UINT8> m_user5_ptr;
+	optional_device<ds2401_device> m_lan_ds2401;
+	required_device<watchdog_timer_device> m_watchdog;
 
 	emu_timer *m_sound_irq_timer;
 	UINT8 m_led_reg0;
@@ -413,6 +418,8 @@ public:
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
 	DECLARE_WRITE8_MEMBER(jamma_jvs_w);
+	DECLARE_READ8_MEMBER(comm_eeprom_r);
+	DECLARE_WRITE8_MEMBER(comm_eeprom_w);
 
 	DECLARE_DRIVER_INIT(hornet);
 	DECLARE_DRIVER_INIT(hornet_2board);
@@ -542,8 +549,6 @@ READ8_MEMBER(hornet_state::sysreg_r)
 			    0x01 = ADDO (ADC DO)
 			*/
 			r = 0xf0;
-			if (m_lan_eeprom)
-				r |= m_lan_eeprom->do_read() << 3;
 			r |= m_adc12138->do_r(space, 0) | (m_adc12138->eoc_r(space, 0) << 2);
 			break;
 
@@ -581,8 +586,6 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			    0x02 = LAMP1
 			    0x01 = LAMP0
 			*/
-			if (m_eepromout)
-				m_eepromout->write(data, 0xff);
 			osd_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -625,7 +628,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			    0x80 = WDTCLK
 			*/
 			if (data & 0x80)
-				machine().watchdog_reset();
+				m_watchdog->watchdog_reset();
 			break;
 
 		case 7: /* CG Control Register */
@@ -646,6 +649,20 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 }
 
 /*****************************************************************************/
+
+READ8_MEMBER(hornet_state::comm_eeprom_r)
+{
+	UINT8 r = 0;
+	r |= (m_lan_eeprom->do_read() & 1) << 1;
+	r |= m_lan_ds2401->read() & 1;
+	return r;
+}
+
+WRITE8_MEMBER(hornet_state::comm_eeprom_w)
+{
+	m_eepromout->write(data, 0xff);
+	m_lan_ds2401->write((data >> 4) & 1);
+}
 
 WRITE32_MEMBER(hornet_state::comm1_w)
 {
@@ -725,6 +742,7 @@ static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32, hornet_state )
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE8(sysreg_w, 0xffffffff)
 	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0xffffffff)  /* M48T58Y RTC/NVRAM */
 	AM_RANGE(0x7d030000, 0x7d03000f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
+	AM_RANGE(0x7d040004, 0x7d040007) AM_READWRITE8(comm_eeprom_r, comm_eeprom_w, 0xffffffff)
 	AM_RANGE(0x7d042000, 0x7d043fff) AM_RAM             /* COMM BOARD 0 */
 	AM_RANGE(0x7d044000, 0x7d044007) AM_READ(comm0_unk_r)
 	AM_RANGE(0x7d048000, 0x7d048003) AM_WRITE(comm1_w)
@@ -912,9 +930,9 @@ static INPUT_PORTS_START( sscope2 )
 
 	// LAN board EEPROM
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, di_write)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
 
@@ -950,17 +968,22 @@ void hornet_state::machine_start()
 
 void hornet_state::machine_reset()
 {
-	if (m_user3_ptr)
+	memory_region* comm_region = memregion("user3");
+	if (comm_region != nullptr)
 	{
-		membank("bank1")->configure_entries(0, m_user3_ptr.bytes() / 0x10000, m_user3_ptr, 0x10000);
+		UINT8* comm_rom = comm_region->base();
+		membank("bank1")->configure_entries(0, comm_region->bytes() / 0x10000, comm_rom, 0x10000);
 		membank("bank1")->set_entry(0);
 	}
 
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	if (m_dsp2 != nullptr)
+		m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (m_user5_ptr)
 	{
 		membank("bank5")->set_base(m_user5_ptr);
+		membank("bank6")->set_base(m_user5_ptr);
 	}
 }
 
@@ -992,6 +1015,8 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 //  PCB description at top doesn't mention any EEPROM on the base board...
 //  MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -1014,10 +1039,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
-	MCFG_K037122_ADD("k037122_1", "screen", 0)
-	MCFG_K037122_GFXDECODE("gfxdecode")
+	MCFG_K037122_ADD("k037122_1", "screen")
 	MCFG_K037122_PALETTE("palette")
 
 	MCFG_K056800_ADD("k056800", XTAL_16_9344MHz)
@@ -1039,40 +1061,18 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_HORNET)
 MACHINE_CONFIG_END
 
-
-MACHINE_RESET_MEMBER(hornet_state,hornet_2board)
-{
-	if (m_user3_ptr)
-	{
-		membank("bank1")->configure_entries(0, m_user3_ptr.bytes() / 0x10000, m_user3_ptr, 0x10000);
-		membank("bank1")->set_entry(0);
-	}
-	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
-	if (m_user5_ptr)
-	{
-		membank("bank5")->set_base(m_user5_ptr);
-		membank("bank6")->set_base(m_user5_ptr);
-	}
-}
-
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 
 	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL_36MHz)
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc1_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(hornet_state,hornet_2board)
-
 
 	MCFG_DEVICE_REMOVE("k037122_1")
-	MCFG_K037122_ADD("k037122_1", "lscreen", 0)
-	MCFG_K037122_GFXDECODE("gfxdecode")
+	MCFG_K037122_ADD("k037122_1", "lscreen")
 	MCFG_K037122_PALETTE("palette")
 
-	MCFG_K037122_ADD("k037122_2", "rscreen", 1)
-	MCFG_K037122_GFXDECODE("gfxdecode")
+	MCFG_K037122_ADD("k037122_2", "rscreen")
 	MCFG_K037122_PALETTE("palette")
 
 	MCFG_DEVICE_REMOVE("voodoo0")
@@ -1407,8 +1407,8 @@ ROM_START(sscope2)
 	ROM_LOAD32_WORD_SWAP("931a04.bin", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
 
 	ROM_REGION32_BE(0x800000, "user3", 0)   /* Comm board roms */
-	ROM_LOAD("931a19.bin", 0x000000, 0x400000, CRC(8b25a6f1) SHA1(41f9c2046a6aae1e9f5f3ffa3e0ffb15eba46211) )
-	ROM_LOAD("931a20.bin", 0x400000, 0x400000, CRC(ecf665f6) SHA1(5a73e87435560a7bb2d0f9be7fba12254b18708d) )
+	ROM_LOAD("931a19.bin", 0x000000, 0x400000, BAD_DUMP CRC(8b25a6f1) SHA1(41f9c2046a6aae1e9f5f3ffa3e0ffb15eba46211) )
+	ROM_LOAD("931a20.bin", 0x400000, 0x400000, BAD_DUMP CRC(ecf665f6) SHA1(5a73e87435560a7bb2d0f9be7fba12254b18708d) )
 
 	ROM_REGION(0x800000, "user5", ROMREGION_ERASE00)    /* CG Board texture roms */
 
@@ -1424,10 +1424,10 @@ ROM_START(sscope2)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(d4e69d7a) SHA1(1e29eecf4886e5e098a388dedd5f3901c2bb65e5) )
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     /* LAN Board DS2401 */
-	ROM_LOAD( "ds2401.8b", 0x000000, 0x000008, NO_DUMP )
+	ROM_LOAD( "ds2401.8b", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a) ) // hand built
 
 	ROM_REGION(0x80, "lan_eeprom", 0)       /* LAN Board AT93C46 */
-	ROM_LOAD( "at93c46.16g", 0x000000, 0x000080, NO_DUMP )
+	ROM_LOAD( "at93c46.16g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
 ROM_END
 
 ROM_START(gradius4)

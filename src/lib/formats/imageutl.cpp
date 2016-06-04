@@ -167,7 +167,7 @@ void image_specify_extension(char *buffer, size_t buffer_len, const char *extens
 	/* determine the length of the buffer */
 	len = strlen(buffer);
 
-	/* be aware that extension can be NULL */
+	/* be aware that extension can be nullptr */
 	if (extension != nullptr)
 	{
 		while(extension[extension_pos] != '\0')

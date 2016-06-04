@@ -192,7 +192,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 
 	/* bit 3 is the watchdog */
 	if ((olddata ^ m_control_data) & 0x0008)
-		watchdog_reset_w(space, 0, 0);
+		m_watchdog->reset_w(space, 0, 0);
 
 	/* bit 1 is the DCS sound reset */
 	m_dcs->reset_w((~m_control_data >> 1) & 1);
@@ -213,7 +213,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 
 	/* bit 9 is the watchdog */
 	if ((olddata ^ m_control_data) & 0x0200)
-		watchdog_reset_w(space, 0, 0);
+		m_watchdog->reset_w(space, 0, 0);
 
 	/* bit 8 is the LED */
 
@@ -417,7 +417,7 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 			/* bit 0x10 resets watchdog */
 			if ((olddata ^ m_midvplus_misc[offset]) & 0x0010)
 			{
-				watchdog_reset_w(space, 0, 0);
+				m_watchdog->reset_w(space, 0, 0);
 				logit = 0;
 			}
 			break;
@@ -1010,6 +1010,8 @@ static MACHINE_CONFIG_START( midvcommon, midvunit_state )
 
 	MCFG_TIMER_ADD_NONE("timer0")
 	MCFG_TIMER_ADD_NONE("timer1")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)
@@ -1728,7 +1730,8 @@ void midvunit_state::init_crusnusa_common(offs_t speedup)
 	m_adc_shift = 24;
 
 	/* speedups */
-	m_generic_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+	m_generic_speedup = m_ram_base + speedup;
 }
 DRIVER_INIT_MEMBER(midvunit_state,crusnusa)  { init_crusnusa_common(0xc93e); }
 DRIVER_INIT_MEMBER(midvunit_state,crusnu40)  { init_crusnusa_common(0xc957); }
@@ -1751,8 +1754,10 @@ void midvunit_state::init_crusnwld_common(offs_t speedup)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9d0000, 0x9d0000, write32_delegate(FUNC(midvunit_state::bit_reset_w),this));
 
 	/* speedups */
-	if (speedup)
-		m_generic_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+	if (speedup) {
+		m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+		m_generic_speedup = m_ram_base + speedup;
+	}
 }
 DRIVER_INIT_MEMBER(midvunit_state,crusnwld)  { init_crusnwld_common(0xd4c0); }
 #if 0
@@ -1771,7 +1776,8 @@ DRIVER_INIT_MEMBER(midvunit_state,offroadc)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x996000, 0x996000, read32_delegate(FUNC(midvunit_state::offroadc_serial_data_r),this), write32_delegate(FUNC(midvunit_state::offroadc_serial_data_w),this));
 
 	/* speedups */
-	m_generic_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x195aa, 0x195aa, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x195aa, 0x195aa, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+	m_generic_speedup = m_ram_base + 0x195aa;
 }
 
 
@@ -1794,7 +1800,8 @@ DRIVER_INIT_MEMBER(midvunit_state,wargods)
 	machine().device<midway_ioasic_device>("ioasic")->set_default_nvram(default_nvram);
 
 	/* speedups */
-	m_generic_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f4c, 0x2f4c, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f4c, 0x2f4c, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+	m_generic_speedup = m_ram_base + 0x2f4c;
 }
 
 

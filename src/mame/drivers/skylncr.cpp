@@ -25,11 +25,6 @@
 
   - Press key 0 to navigate between statistics pages. Press START to exit the mode.
 
-
-  TODO:
-
-  - Proper M5M82C255 device emulation.
-
 ****************************************************************************************************
 
   Settings:
@@ -84,6 +79,28 @@
 
   Press START (key 1) to exit the mode.
 
+****************************************************************************************************
+
+  Game specific notes...
+
+  * Sonik Fighter
+
+  The game is encrypted, and runs with an obfuscated daughterboard in place of the CPU.
+  Even when I have the attract working, accepting coins, getting sounds and accurate inputs,
+  the game is still not working. Once coined, there's no way to start a game.
+
+  The PPI0 port B, D5 input line behaves like a reset, when the Attract/Girls DSW is set OFF.
+  Need more investigation about...
+
+  Colors are wrong due to can't find a way to set the palette.
+
+****************************************************************************************************
+
+  TODO:
+
+  - Proper M5M82C255 device emulation.
+  - Colors: Find the palette in Sonik Fighter.
+
 ***************************************************************************************************/
 
 
@@ -94,6 +111,8 @@
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+
+#include <algorithm>
 
 
 class skylncr_state : public driver_device
@@ -163,6 +182,7 @@ public:
 	DECLARE_READ8_MEMBER(ret_ff);
 	DECLARE_WRITE8_MEMBER(skylncr_nmi_enable_w);
 	DECLARE_DRIVER_INIT(skylncr);
+	DECLARE_DRIVER_INIT(sonikfig);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
@@ -543,6 +563,22 @@ static const gfx_layout layout8x8x8_alt =   /* for sstar97 */
 	8*8*4
 };
 
+static const gfx_layout layout8x8x8_bdream97 =   /* for bdream97 */
+{
+	8,8,
+	RGN_FRAC(1,2),
+	8,
+	{ STEP8(0,1) },
+	{
+		8*0,RGN_FRAC(1,2)+8*0,
+		RGN_FRAC(1,2)+8*1,8*1,
+		8*2,RGN_FRAC(1,2)+8*2,
+		RGN_FRAC(1,2)+8*3,8*3
+	},
+	{ STEP8(0,8*4) },
+	8*8*4
+};
+
 static const gfx_layout layout8x32x8 =
 {
 	8,32,
@@ -621,6 +657,25 @@ static const gfx_layout layout8x32x8_alt2 =  /* for neraidov */
 	8*32*8/2
 };
 
+static const gfx_layout layout8x32x8_bdream97 =  /* for bdream97 */
+{
+	8,32,
+	RGN_FRAC(1,2),
+	8,
+	{ STEP8(0,1) },
+	{
+		8*1, RGN_FRAC(1,2)+8*1,
+		8*0, RGN_FRAC(1,2)+8*0,
+		8*3, RGN_FRAC(1,2)+8*3,
+		8*2, RGN_FRAC(1,2)+8*2
+	},
+	{
+		STEP16(0,8*4),
+		STEP16(16*8*4,8*4)
+	},
+	8*32*8/2
+};
+
 
 /**************************************
 *           Graphics Decode           *
@@ -642,6 +697,12 @@ static GFXDECODE_START( sstar97 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( bdream97 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_bdream97,    0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_bdream97,   0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_bdream97,   0x100, 1 )
 GFXDECODE_END
 
 
@@ -1362,6 +1423,148 @@ static INPUT_PORTS_START( sstar97 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( sonikfig )
+	PORT_START("IN1")   /* $00 (PPI0 port A) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_D) PORT_NAME("IN1-02")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_F) PORT_NAME("IN1-08")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_G) PORT_NAME("IN1-20")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_H) PORT_NAME("IN1-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_J) PORT_NAME("IN1-80")
+
+	PORT_START("IN2")   /* $01 (PPI0 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_K) PORT_NAME("IN2-02")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_L) PORT_NAME("IN2-08")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")  // OK
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_T) PORT_NAME("Reset #2") // Behaves like a reset, only when attract DSW is off...
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_Y) PORT_NAME("IN2-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_U) PORT_NAME("IN2-80")
+
+	PORT_START("IN3")   /* $11 (PPI1 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)     // OK
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)     // OK
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)     // OK
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )              // OK
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_I) PORT_NAME("IN3-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score")
+
+	PORT_START("IN4")   /* $12 (PPI1 port C) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-01")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset #1")  // OK
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   // Settings OK
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-10")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-20")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START("DSW1")  /* $02 (PPI0 port C) */
+	PORT_DIPNAME( 0x11, 0x00, "D-UP Percentage" )  // OK
+	PORT_DIPSETTING(    0x11, "40%" )  // OK
+	PORT_DIPSETTING(    0x01, "50%" )  // OK
+	PORT_DIPSETTING(    0x10, "60%" )  // OK
+	PORT_DIPSETTING(    0x00, "70%" )  // OK
+	PORT_DIPNAME( 0x0e, 0x00, "Main Game Percentage" )  // OK
+	PORT_DIPSETTING(    0x0e, "55%" )  // OK
+	PORT_DIPSETTING(    0x0c, "60%" )  // OK
+	PORT_DIPSETTING(    0x0a, "65%" )  // OK
+	PORT_DIPSETTING(    0x08, "70%" )  // OK
+	PORT_DIPSETTING(    0x06, "75%" )  // OK
+	PORT_DIPSETTING(    0x04, "80%" )  // OK
+	PORT_DIPSETTING(    0x02, "85%" )  // OK
+	PORT_DIPSETTING(    0x00, "90%" )  // OK
+	PORT_DIPNAME( 0x20, 0x00, "Reels Speed" )  // OK
+	PORT_DIPSETTING(    0x20, "Low" )  // OK
+	PORT_DIPSETTING(    0x00, "Hi" )  // OK
+	PORT_DIPNAME( 0x40, 0x00, "Bonus Score" )  // OK
+	PORT_DIPSETTING(    0x40, "32" )  // OK
+	PORT_DIPSETTING(    0x00, "24" )  // OK
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )  // OK
+	PORT_DIPSETTING(    0x00, "x1" )  // OK
+	PORT_DIPSETTING(    0x80, "x100" )  // OK
+
+	PORT_START("DSW2")  /* $10 (PPI1 port A) */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )  // OK
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )  // OK
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )  // OK
+	PORT_DIPNAME( 0x18, 0x18, "Payout Limit" )  // OK
+	PORT_DIPSETTING(    0x00, "0" )  // OK
+	PORT_DIPSETTING(    0x18, "1000" )  // OK
+	PORT_DIPSETTING(    0x10, "2000" )  // OK
+	PORT_DIPSETTING(    0x08, "5000" )  // OK
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")  /* AY8910 port A */
+	PORT_DIPNAME( 0x07, 0x07, "Coinage A, B & C" )  // OK on test
+	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x01, "1 Coin / 5 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x02, "1 Coin / 10 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x04, "1 Coin / 30 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x05, "1 Coin / 40 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )  // OK on test, always 1c-1c in game...
+	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credit" )  // OK on test, always 1c-1c in game...
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )  // This input should be turned ON, otherwise you can't enter the setup (F2)
+	PORT_DIPNAME( 0x10, 0x00, "Attract / Girls" )  // OK... Could be either or both. Need the game working to check it.
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Max Bonus" )  // OK
+	PORT_DIPSETTING(    0x20, "10000" )  // OK
+	PORT_DIPSETTING(    0x00, "20000" )  // OK
+	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Bet" )  // OK
+	PORT_DIPSETTING(    0xc0, "0" )  // OK
+	PORT_DIPSETTING(    0x80, "8" )  // OK
+	PORT_DIPSETTING(    0x40, "16" )  // OK
+	PORT_DIPSETTING(    0x00, "32" )  // OK
+
+	PORT_START("DSW4")  /* AY8910 port B */
+	PORT_DIPNAME( 0x07, 0x00, "Key In" )  // OK on test
+	PORT_DIPSETTING(    0x00, "1 Pulse / 100 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x01, "1 Pulse / 110 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x02, "1 Pulse / 120 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x03, "1 Pulse / 130 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x04, "1 Pulse / 200 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x05, "1 Pulse / 400 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x06, "1 Pulse / 500 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPSETTING(    0x07, "1 Pulse / 1000 Credits" )  // OK on test, always 1 credit in game...
+	PORT_DIPNAME( 0x18, 0x00, "Max Bet" )  // OK
+	PORT_DIPSETTING(    0x18, "64" )  // OK
+	PORT_DIPSETTING(    0x10, "72" )  // OK
+	PORT_DIPSETTING(    0x08, "80" )  // OK
+	PORT_DIPSETTING(    0x00, "96" )  // OK
+	PORT_DIPNAME( 0x20, 0x00, "Lit" )  // OK
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )  // OK
+	PORT_DIPSETTING(    0x00, "Yes (50.000)" )  // OK, 50.000
+	PORT_DIPNAME( 0x40, 0x00, "Control" )  // OK
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )  // OK
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )  // OK
+	PORT_DIPNAME( 0x80, 0x00, "Reel Cover" )  // OK
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )  // OK
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )  // OK
+INPUT_PORTS_END
+
+
+
 // It runs in IM 0, thus needs an opcode on the data bus
 INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 {
@@ -1428,6 +1631,14 @@ static MACHINE_CONFIG_DERIVED( sstar97, skylncr )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_GFXDECODE_MODIFY("gfxdecode", sstar97)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( bdream97, skylncr )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_GFXDECODE_MODIFY("gfxdecode", bdream97)
 MACHINE_CONFIG_END
 
 
@@ -1650,13 +1861,98 @@ ROM_START( sstar97 )
 	ROM_LOAD16_BYTE( "bor_dun_5.u22", 0x40001, 0x20000, CRC(ca17a632) SHA1(d491310ccdbe9b59a1e607f9254646f20700d79d) )
 ROM_END
 
+/*
+  Butterfly Dream 97 / Hudie Meng 97
+  Game is encrypted and needs better decoded graphics.
+*/
+ROM_START( bdream97 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "27c512_subboard.bin",    0x0000, 0x10000, CRC(b0056324) SHA1(8299198d5e7ed50967f380ba0fddff5a39eee857) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )    // All ROMs are 27010.
+	ROM_LOAD16_BYTE( "27c010.u20", 0x00000, 0x20000, CRC(df1fd438) SHA1(8da4d116e768a3c269a2031db6bf38a5b7707029) )
+	ROM_LOAD16_BYTE( "27c010.u22", 0x00001, 0x20000, CRC(e66910eb) SHA1(454dc47caf4ae9408c3d0b759f4a32d346f86ffe) )
+	ROM_LOAD16_BYTE( "27c010.u21", 0x40000, 0x20000, CRC(b984f5bd) SHA1(9a21b46d6d497271cd589e01af3f3143946980b1) )
+	ROM_LOAD16_BYTE( "27c010.u23", 0x40001, 0x20000, CRC(2b6e6fd7) SHA1(cf0c66c90c6ab3ebc69ebe1e4f29b69b72edfdc2) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    // All ROMs are 27010.
+	ROM_LOAD16_BYTE( "27c010.u24", 0x00000, 0x20000, CRC(b77f3fc5) SHA1(63f7b46ed19f256a6d84624e191dc1719a57cbed) )
+	ROM_LOAD16_BYTE( "27c010.u26", 0x00001, 0x20000, CRC(27cd64ef) SHA1(6b39b2919aca967f72fa16cd61b1641d0fb98d88) )
+	ROM_LOAD16_BYTE( "27c010.u25", 0x40000, 0x20000, CRC(bdebdf35) SHA1(245247b23ddeded32519608f4696205bb5541ccc) )
+	ROM_LOAD16_BYTE( "27c010.u27", 0x40001, 0x20000, CRC(0a266de4) SHA1(0ff9ad793e77d5419bd446cb73d4968e42305353) )
+ROM_END
+
+/*
+  Sonik Fighter.
+  Greek Version By ZBOUNOS (Z GAMES).
+  Year 2000.
+
+  Multiple Butterfly type with naked girls.
+  + new features and hold a pair.
+  + jackpot.
+  + tetris game?.
+
+  Program ROM is encrypted.
+*/
+ROM_START( sonikfig )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "subboard_27c512.bin",  0x00000, 0x10000, CRC(f9b5b03e) SHA1(3832a7d70b41052f9dca46faa6f311ccc5a817b7) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "1__am27c100.u29", 0x00000, 0x20000, CRC(69824294) SHA1(a221ab3e5d50435c10e3cd4601cfda1c87038a74) )
+	ROM_LOAD16_BYTE( "2__am27c100.u31", 0x00001, 0x20000, CRC(5224ed08) SHA1(3ba9af7557f13bf31c529bff7b2b8cfd6e71552c) )
+	ROM_LOAD16_BYTE( "3__am27c100.u33", 0x40000, 0x20000, CRC(38fef15c) SHA1(00f7578bac395421fa3289748f85cf3b9d80e04b) )
+	ROM_LOAD16_BYTE( "4__am27c100.u35", 0x40001, 0x20000, CRC(6193d30d) SHA1(390b3f451224eb4236c6c921d34b25b702d366e0) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "5__am27c100.u52", 0x00000, 0x20000, CRC(56921033) SHA1(25086b0f5978df04b28b60a30e271f4364112c96) )
+	ROM_LOAD16_BYTE( "6__am27c100.u54", 0x00001, 0x20000, CRC(72802c6c) SHA1(c552d438399fb8c983e995d5e78e591982ef96e5) )
+	ROM_LOAD16_BYTE( "7__am27c100.u56", 0x40000, 0x20000, CRC(90a09327) SHA1(3bb1150ec397627cc04b46d2bf07538c55e7f116) )
+	ROM_LOAD16_BYTE( "8__am27c100.u58", 0x40001, 0x20000, CRC(b02ed0ce) SHA1(ec8ab64210a1b10cdba5ee179e46fc8d6a1a67b6) )
+ROM_END
+
 
 /**********************************
 *           Driver Init           *
 **********************************/
 
-DRIVER_INIT_MEMBER(skylncr_state,skylncr)
+DRIVER_INIT_MEMBER(skylncr_state, skylncr)
 {
+	m_generic_paletteram_8.allocate(0x100 * 3);
+	m_generic_paletteram2_8.allocate(0x100 * 3);
+}
+
+DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
+/*
+  Encryption: For each 8 bytes group,
+  swap byte #1 with #4 and #3 with #6.
+
+       SWAPPED
+      /       \
+  00 01 02 03 04 05 06 07
+            \       /
+             SWAPPED
+  
+  00 01 02 03 04 05 06 07
+      \     \ /     /
+       \     X     /
+        \   / \   /
+         \ /   \ /
+          X     X
+         / \   / \
+        /   \ /   \
+       /     X     \
+      /     / \     \
+  00 04 02 06 01 05 03 07
+*/
+{
+	UINT8 *const ROM = memregion("maincpu")->base();
+	for (unsigned x = 0; x < 0x10000; x += 8)
+	{
+		std::swap(ROM[x + 1], ROM[x + 4]);
+		std::swap(ROM[x + 3], ROM[x + 6]);
+	}
+
 	m_generic_paletteram_8.allocate(0x100 * 3);
 	m_generic_paletteram2_8.allocate(0x100 * 3);
 }
@@ -1666,12 +1962,14 @@ DRIVER_INIT_MEMBER(skylncr_state,skylncr)
 *                  Game Drivers                     *
 ****************************************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT     ROT    COMPANY                 FULLNAME                                         FLAGS  */
-GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
-GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
-GAME( 1999, mbutrfly, 0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Magical Butterfly (version U350C, encrypted)",   MACHINE_NOT_WORKING )
-GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr, ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
-GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr, ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
-GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr, ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
-GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr, ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
-GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
+/*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT    COMPANY                 FULLNAME                                         FLAGS  */
+GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
+GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
+GAME( 1999, mbutrfly, 0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Magical Butterfly (version U350C, encrypted)",   MACHINE_NOT_WORKING )
+GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
+GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr,  ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
+GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr,  ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
+GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr,  ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
+GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
+GAME( 199?, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr,  ROT0, "bootleg",              "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_NOT_WORKING )
+GAME( 2000, sonikfig, 0,       skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )

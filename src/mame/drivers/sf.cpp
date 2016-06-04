@@ -7,11 +7,7 @@
     driver by Olivier Galibert
 
     TODO:
-    - is there a third coin input?
-
-    - Is sfj confirmed to have a 68705?, sfua has an i8751 and the actual
-      gamecode is closer to sfua than the other sets.  The protection
-      appears to be the same on both.
+    - acquire i8751 protection mcu internal rom dump and emulate it
 
 ***************************************************************************/
 
@@ -19,12 +15,11 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
-#include "sound/msm5205.h"
 #include "includes/sf.h"
 
 
 /* The protection of the Japanese (and alt US) version */
-/* I'd love to see someone dump the 68705 / i8751 roms */
+/* I'd love to see someone dump the i8751 rom */
 
 void sf_state::write_dword( address_space &space, offs_t offset, UINT32 data )
 {
@@ -136,7 +131,7 @@ WRITE8_MEMBER(sf_state::coin_w)
 
 WRITE8_MEMBER(sf_state::soundcmd_w)
 {
-	soundlatch_byte_w(space, offset, data & 0xff);
+	m_soundlatch->write(space, offset, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -235,8 +230,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, sf_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
+	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 ADDRESS_MAP_END
 
 /* Yes, _no_ ram */
@@ -250,7 +245,7 @@ static ADDRESS_MAP_START( sound2_io_map, AS_IO, 8, sf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(msm1_5205_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm2_5205_w)
-	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound2_bank_w)
 ADDRESS_MAP_END
 
@@ -568,6 +563,8 @@ static MACHINE_CONFIG_START( sfan, sf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
@@ -700,7 +697,7 @@ ROM_START( sfua )
 	ROM_LOAD( "sf-01.bin", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
 
 	ROM_REGION( 0x0800, "mcu", 0 ) /* i8751 MCU */
-	ROM_LOAD( "i8751.bin",   0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "sf_s.id8751h-8.14f",   0x0000, 0x0800, NO_DUMP ) // is this mcu label right for the US set?
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "sf-39.bin", 0x000000, 0x020000, CRC(cee3d292) SHA1(a8c22f1dc81976e8dd5d6c70361c61fa3f9f89d6) ) /* Background b planes 0-1*/
@@ -769,8 +766,8 @@ ROM_START( sfj )
 	ROM_LOAD( "sf-00.bin", 0x00000, 0x20000, CRC(4b733845) SHA1(f7ff46e02f8ce6682d6e573588271bae2edfa90f) )
 	ROM_LOAD( "sf-01.bin", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
 
-	ROM_REGION( 0x0800, "mcu", 0 ) /* 68705 MCU */ // or should it be an i8751 like the above set? the protection is the same!
-	ROM_LOAD( "68705.bin",   0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 ) /* i8751 MCU */
+	ROM_LOAD( "sf_s.id8751h-8.14f",   0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "sf-39.bin", 0x000000, 0x020000, CRC(cee3d292) SHA1(a8c22f1dc81976e8dd5d6c70361c61fa3f9f89d6) ) /* Background b planes 0-1*/

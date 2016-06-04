@@ -19,7 +19,7 @@ if the LOAD key is accidentally pressed quickly while using the system, which wo
 erase everything in memory and all data up to that point and re-load the software from
 scratch. When loading is activated application software is read from floppies.
 
-The softwares are not point and click auto-generation type conversational CAD/CAM
+The software are not point and click auto-generation type conversational CAD/CAM
 applications. The earlier 'non-Symbolic' software requires knowledge of programming in APT
 and other languages of the era. The 'Symbolic' software has menus and asks questions and
 the blanks must be filled in correctly. The graphics are mostly made of lines but are
@@ -982,7 +982,7 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_I8257_OUT_IOW_0_CB(WRITE8(fanucspmg_state, fdcdma_w))
 
 	MCFG_PIC8259_ADD(PIC0_TAG, INPUTLINE("maincpu", 0), VCC, READ8(fanucspmg_state, get_slave_ack))
-	MCFG_PIC8259_ADD(PIC1_TAG, DEVWRITELINE(PIC0_TAG, pic8259_device, ir7_w), GND, NULL)
+	MCFG_PIC8259_ADD(PIC1_TAG, DEVWRITELINE(PIC0_TAG, pic8259_device, ir7_w), GND, NOOP)
 
 	MCFG_UPD765A_ADD(FDC_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(PIC0_TAG, pic8259_device, ir3_w))

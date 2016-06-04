@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Hau
 #include "emu.h"
 #include "includes/galastrm.h"

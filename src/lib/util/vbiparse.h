@@ -13,6 +13,7 @@
 #ifndef __VBIPARSE_H__
 #define __VBIPARSE_H__
 
+#include "osdcomm.h"
 
 /***************************************************************************
     CONSTANTS

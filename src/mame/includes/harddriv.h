@@ -165,8 +165,6 @@ public:
 
 	TIMER_CALLBACK_MEMBER( xsdp_sport1_irq_off_callback );
 
-	WRITE16_MEMBER( watchdog_reset16_w );
-
 	DECLARE_READ16_MEMBER( hdgsp_control_lo_r );
 	DECLARE_WRITE16_MEMBER( hdgsp_control_lo_w );
 	DECLARE_READ16_MEMBER( hdgsp_control_hi_r );
@@ -257,6 +255,8 @@ protected:
 	optional_device<dsp32c_device> m_dsp32;
 	optional_device<adsp2105_device> m_ds3sdsp;
 	optional_device<adsp2105_device> m_ds3xdsp;
+	optional_memory_region m_ds3sdsp_region;
+	optional_memory_region m_ds3xdsp_region;
 	optional_device<dac_device> m_ds3dac1;
 	optional_device<dac_device> m_ds3dac2;
 	optional_device<harddriv_sound_board_device> m_harddriv_sound;
@@ -287,6 +287,8 @@ protected:
 	optional_shared_ptr<UINT32> m_ds3sdsp_pgm_memory;
 	optional_shared_ptr<UINT32> m_ds3xdsp_pgm_memory;
 
+	optional_shared_ptr<UINT32> m_dsp32_ram;
+
 	UINT16 *                m_gsp_protection;
 
 	UINT16 *                m_gsp_speedup_addr[2];
@@ -306,7 +308,7 @@ protected:
 	UINT32                  m_adsp_speedup_count[4];
 
 	UINT8                   m_gsp_multisync;
-	optional_shared_ptr<UINT8> m_gsp_vram;
+	optional_shared_ptr<UINT8>  m_gsp_vram;
 	optional_shared_ptr<UINT16> m_gsp_control_lo;
 	optional_shared_ptr<UINT16> m_gsp_control_hi;
 	optional_shared_ptr<UINT16> m_gsp_paletteram_lo;
@@ -339,8 +341,7 @@ protected:
 	UINT16                  m_adsp_som_address;
 	UINT32                  m_adsp_eprom_base;
 
-	UINT16 *                m_sim_memory;
-	UINT32                  m_sim_memory_size;
+	required_region_ptr<UINT16> m_sim_memory;
 	UINT16                  m_som_memory[0x8000/2];
 	UINT16 *                m_adsp_pgm_memory_word;
 

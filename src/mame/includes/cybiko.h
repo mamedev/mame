@@ -19,7 +19,6 @@
 
 /* Core includes */
 #include "emu.h"
-#include "emuopts.h"
 #include "sound/speaker.h"
 
 /* Components */
@@ -32,19 +31,6 @@
 #include "machine/ram.h"
 #include "imagedev/snapquik.h"
 #include "machine/nvram.h"
-
-struct CYBIKO_RS232_PINS
-{
-	int sck; // serial clock
-	int txd; // transmit data
-	int rxd; // receive data
-};
-
-struct CYBIKO_RS232
-{
-	CYBIKO_RS232_PINS pin;
-	UINT8 rx_bits, rx_byte, tx_byte, tx_bits;
-};
 
 class cybiko_state : public driver_device
 {
@@ -67,8 +53,10 @@ public:
 	DECLARE_READ16_MEMBER(xtclock_r);
 	DECLARE_WRITE16_MEMBER(xtclock_w);
 	DECLARE_READ16_MEMBER(xtpower_r);
+	DECLARE_READ16_MEMBER(adc1_r);
+	DECLARE_READ16_MEMBER(adc2_r);
+	DECLARE_READ16_MEMBER(port0_r);
 
-	CYBIKO_RS232 m_rs232;
 	DECLARE_READ16_MEMBER(cybiko_lcd_r);
 	DECLARE_WRITE16_MEMBER(cybiko_lcd_w);
 	DECLARE_READ16_MEMBER(cybikov1_key_r);
@@ -76,14 +64,6 @@ public:
 	DECLARE_READ16_MEMBER(cybikoxt_key_r);
 	DECLARE_WRITE16_MEMBER(cybiko_usb_w);
 	int cybiko_key_r( offs_t offset, int mem_mask);
-	void cybiko_rs232_write_byte(int data);
-	void cybiko_rs232_pin_sck(int data);
-	void cybiko_rs232_pin_txd(int data);
-	int cybiko_rs232_pin_rxd();
-	int cybiko_rs232_rx_queue();
-	void cybiko_rs232_init();
-	void cybiko_rs232_exit();
-	void cybiko_rs232_reset();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd66421_device> m_crtc;
@@ -97,7 +77,6 @@ public:
 	DECLARE_DRIVER_INIT(cybiko);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void machine_stop_cybiko();
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybiko );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybikoxt );
 };

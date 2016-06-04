@@ -82,7 +82,7 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 	memset(DSP->EFREG,0,2*16);
 #if 0
 	int dump=0;
-	FILE *f=NULL;
+	FILE *f=nullptr;
 	if(dump)
 		f=fopen("dsp.txt","wt");
 #endif

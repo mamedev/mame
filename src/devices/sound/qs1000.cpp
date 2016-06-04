@@ -581,7 +581,7 @@ void qs1000_device::start_voice(int ch)
 	if (LOGGING_ENABLED)
 		printf("[%.6x] Freq:%.4x  ????:%.4x  Addr:%.4x\n", table_addr, freq, word1, base);
 
-	// See Raccoon World and Wyvern Wings NULL sound
+	// See Raccoon World and Wyvern Wings nullptr sound
 	if (freq == 0)
 		return;
 

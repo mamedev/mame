@@ -68,14 +68,13 @@ beckerport_device::beckerport_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, COCO_DWSOCK, "Virtual Becker Port", tag, owner, clock, "coco_dwsock", __FILE__), m_hostname(nullptr),
 	m_dwconfigport(*this, DRIVEWIRE_PORT_TAG), m_dwtcpport(0)
 {
-	m_pSocket = nullptr;
 	m_head = 0;
 	m_rx_pending = 0;
 }
 
 beckerport_device::~beckerport_device()
 {
-	if (m_pSocket != nullptr)
+	if (m_pSocket)
 		beckerport_device::device_stop();
 }
 
@@ -93,8 +92,8 @@ void beckerport_device::device_start(void)
 	osd_printf_verbose("Connecting to Drivewire server on %s:%d... ", m_hostname, m_dwtcpport);
 
 	UINT64 filesize; // unused
-	file_error filerr = osd_open(chAddress, 0, &m_pSocket, &filesize);
-	if (filerr != FILERR_NONE)
+	osd_file::error filerr = osd_file::open(chAddress, 0, m_pSocket, filesize);
+	if (filerr != osd_file::error::NONE)
 	{
 		osd_printf_verbose("Error: osd_open returned error %i!\n", (int) filerr);
 		return;
@@ -109,11 +108,10 @@ void beckerport_device::device_start(void)
 
 void beckerport_device::device_stop(void)
 {
-	if (m_pSocket != nullptr)
+	if (m_pSocket)
 	{
 		printf("Closing connection to Drivewire server\n");
-		osd_close(m_pSocket);
-		m_pSocket = nullptr;
+		m_pSocket.reset();
 	}
 }
 
@@ -135,7 +133,7 @@ READ8_MEMBER(beckerport_device::read)
 {
 	unsigned char data = 0x5a;
 
-	if (m_pSocket == nullptr)
+	if (!m_pSocket)
 		return data;
 
 	switch (offset)
@@ -144,9 +142,9 @@ READ8_MEMBER(beckerport_device::read)
 			if (!m_rx_pending)
 			{
 				/* Try to read from dws */
-				file_error filerr = osd_read(m_pSocket, m_buf, 0, sizeof(m_buf), &m_rx_pending);
-				if (filerr != FILERR_NONE && filerr != FILERR_FAILURE)  // FILERR_FAILURE means no data available, so don't throw error message
-					fprintf(stderr, "coco_dwsock.c: beckerport_device::read() socket read operation failed with file_error %i\n", filerr);
+				osd_file::error filerr = m_pSocket->read(m_buf, 0, sizeof(m_buf), m_rx_pending);
+				if (filerr != osd_file::error::NONE && filerr != osd_file::error::FAILURE)  // osd_file::error::FAILURE means no data available, so don't throw error message
+					fprintf(stderr, "coco_dwsock.c: beckerport_device::read() socket read operation failed with osd_file::error %i\n", int(filerr));
 				else
 					m_head = 0;
 			}
@@ -175,10 +173,11 @@ READ8_MEMBER(beckerport_device::read)
 
 WRITE8_MEMBER(beckerport_device::write)
 {
-	char d = (char)data;
-	file_error filerr;
+	char d = char(data);
+	osd_file::error filerr;
+	std::uint32_t written;
 
-	if (m_pSocket == nullptr)
+	if (!m_pSocket)
 		return;
 
 	switch (offset)
@@ -187,9 +186,9 @@ WRITE8_MEMBER(beckerport_device::write)
 			//printf("beckerport_write: error: write (0x%02x) to status register\n", d);
 			break;
 		case DWS_DATA:
-			filerr = osd_write(m_pSocket, &d, 0, 1, nullptr);
-			if (filerr != FILERR_NONE)
-				fprintf(stderr, "coco_dwsock.c: beckerport_device::write() socket write operation failed with file_error %i\n", filerr);
+			filerr = m_pSocket->write(&d, 0, 1, written);
+			if (filerr != osd_file::error::NONE)
+				fprintf(stderr, "coco_dwsock.c: beckerport_device::write() socket write operation failed with osd_file::error %i\n", int(filerr));
 			//printf("beckerport_write: data write one byte (0x%02x)\n", d & 0xff);
 			break;
 		default:

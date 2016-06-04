@@ -1,0 +1,10 @@
+{
+  "plugin": {
+    "name": "layout",
+	"description": "Layout helper plugin",
+    "version": "0.0.1",
+    "author": "Carl",
+	"type": "plugin",
+	"start": "false"
+  }
+}

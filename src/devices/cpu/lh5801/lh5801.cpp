@@ -77,7 +77,7 @@ lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, const char *
 /***************************************************************
  * include the opcode macros, functions and tables
  ***************************************************************/
-#include "5801tbl.inc"
+#include "5801tbl.hxx"
 
 void lh5801_cpu_device::device_start()
 {
@@ -147,7 +147,7 @@ void lh5801_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				m_t&0x80?'1':'0',
 				m_t&0x40?'1':'0',
 				m_t&0x20?'1':'0',

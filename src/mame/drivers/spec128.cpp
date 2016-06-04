@@ -153,6 +153,7 @@ resulting mess can be seen in the F4 viewer display.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
+#include "includes/spec128.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "sound/ay8910.h"

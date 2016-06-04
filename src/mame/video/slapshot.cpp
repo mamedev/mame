@@ -354,7 +354,7 @@ void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 
 
-	/* this happens only if primsks != NULL */
+	/* this happens only if primsks != nullptr */
 	while (sprite_ptr != m_spritelist)
 	{
 		sprite_ptr--;

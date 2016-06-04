@@ -332,7 +332,7 @@ void tx0_state::machine_reset()
 void tx0_state::tx0_machine_stop()
 {
 	/* the core will take care of freeing the timers, BUT we must set the variables
-	to NULL if we don't want to risk confusing the tape image init function */
+	to nullptr if we don't want to risk confusing the tape image init function */
 	m_tape_reader.timer = m_tape_puncher.timer = m_typewriter.prt_timer = m_dis_timer = nullptr;
 }
 
@@ -511,7 +511,7 @@ bool tx0_readtape_image_device::call_load()
 		/* restart reader IO when necessary */
 		/* note that this function may be called before tx0_init_machine, therefore
 		before tape_reader.timer is allocated.  It does not matter, as the clutch is never
-		down at power-up, but we must not call timer_enable with a NULL parameter! */
+		down at power-up, but we must not call timer_enable with a nullptr parameter! */
 
 	if (state->m_tape_reader.timer)
 	{
@@ -864,7 +864,7 @@ bool tx0_magtape_image_device::call_load()
 	/* restart IO when necessary */
 	/* note that this function may be called before tx0_init_machine, therefore
 	before magtape.timer is allocated.  We must not call timer_enable with a
-	NULL parameter! */
+	nullptr parameter! */
 	if (state->m_magtape.timer)
 	{
 		if (state->m_magtape.state == MTS_SELECTING)
@@ -1550,7 +1550,7 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 		WRITELINE( tx0_state, tx0_io_dis ),
 		WRITELINE( tx0_state, tx0_io_r3l ),
 		WRITELINE( tx0_state, tx0_io_prt ),
-		NULL,
+		NOOP,
 		WRITELINE( tx0_state, tx0_io_p6h ),
 		WRITELINE( tx0_state, tx0_io_p7h ),
 		WRITELINE( tx0_state, tx0_sel ),

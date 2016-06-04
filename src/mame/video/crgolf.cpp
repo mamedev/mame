@@ -14,42 +14,16 @@
 #define VIDEORAM_SIZE   (0x2000 * 3)
 
 
-/*************************************
- *
- *  Video RAM access
- *
- *************************************/
-
-WRITE8_MEMBER(crgolf_state::crgolf_videoram_w)
-{
-	if (*m_screen_select & 1)
-		m_videoram_b[offset] = data;
-	else
-		m_videoram_a[offset] = data;
-}
-
-
-READ8_MEMBER(crgolf_state::crgolf_videoram_r)
-{
-	UINT8 ret;
-
-	if (*m_screen_select & 1)
-		ret = m_videoram_b[offset];
-	else
-		ret = m_videoram_a[offset];
-
-	return ret;
-}
 
 
 
 /*************************************
  *
- *  Palette handling
+ *  Video startup
  *
  *************************************/
 
-void crgolf_state::get_pens( pen_t *pens )
+PALETTE_INIT_MEMBER(crgolf_state, crgolf)
 {
 	offs_t offs;
 	const UINT8 *prom = memregion("proms")->base();
@@ -77,30 +51,14 @@ void crgolf_state::get_pens( pen_t *pens )
 		bit1 = (data >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		pens[offs] = rgb_t(r, g, b);
+		m_palette->set_pen_color(offs, r, g, b);
 	}
 }
 
-
-
-/*************************************
- *
- *  Video startup
- *
- *************************************/
-
-VIDEO_START_MEMBER(crgolf_state,crgolf)
+PALETTE_INIT_MEMBER(crgolf_state, mastrglf)
 {
-	/* allocate memory for the two bitmaps */
-	m_videoram_a = std::make_unique<UINT8[]>(VIDEORAM_SIZE);
-	m_videoram_b = std::make_unique<UINT8[]>(VIDEORAM_SIZE);
 
-	/* register for save states */
-	save_pointer(NAME(m_videoram_a.get()), VIDEORAM_SIZE);
-	save_pointer(NAME(m_videoram_b.get()), VIDEORAM_SIZE);
 }
-
-
 
 /*************************************
  *
@@ -108,14 +66,11 @@ VIDEO_START_MEMBER(crgolf_state,crgolf)
  *
  *************************************/
 
-UINT32 crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flip = *m_screen_flip & 1;
 
 	offs_t offs;
-	pen_t pens[NUM_PENS];
-
-	get_pens(pens);
 
 	/* for each byte in the video RAM */
 	for (offs = 0; offs < VIDEORAM_SIZE / 3; offs++)
@@ -161,7 +116,7 @@ UINT32 crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_rgb32 &b
 			if (*m_color_select)
 				color = color | 0x10;
 
-			bitmap.pix32(y, x) = pens[color];
+			bitmap.pix16(y, x) = color;
 
 			/* next pixel */
 			data_a0 = data_a0 << 1;
@@ -181,20 +136,3 @@ UINT32 crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
-
-MACHINE_CONFIG_FRAGMENT( crgolf_video )
-
-	MCFG_VIDEO_START_OVERRIDE(crgolf_state,crgolf)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 247)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_DRIVER(crgolf_state, screen_update_crgolf)
-MACHINE_CONFIG_END

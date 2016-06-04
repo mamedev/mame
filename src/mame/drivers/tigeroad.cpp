@@ -53,7 +53,7 @@ single plane board.
 WRITE16_MEMBER(tigeroad_state::tigeroad_soundcmd_w)
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch_byte_w(space,offset,data >> 8);
+		m_soundlatch->write(space,offset,data >> 8);
 }
 
 
@@ -106,12 +106,12 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tigeroad_state )
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, tigeroad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 /* toramich ONLY */
@@ -121,7 +121,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sample_port_map, AS_IO, 8, tigeroad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
 ADDRESS_MAP_END
 
@@ -136,7 +136,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( comad_sound_map, AS_PROGRAM, 8, tigeroad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( comad_sound_io_map, AS_IO, 8, tigeroad_state )
@@ -630,6 +630,9 @@ static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(tigeroad_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -691,6 +694,8 @@ static MACHINE_CONFIG_START( f1dream_comad, tigeroad_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 2000000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(tigeroad_state, irqhandler))

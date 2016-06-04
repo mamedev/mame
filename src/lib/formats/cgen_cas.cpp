@@ -7,6 +7,16 @@ Support for EACA Colour Genie .cas cassette images
 Current state: Not working. Only the sync signal and 0x66 byte get
                recognized.
 
+NOTE: There exist multiples type of .cas files for Colour Genie
+ - the original one from Jurgen's emu, which starts with TAPE_HEADER
+   below, followed by the sync signal, without the 255 leading 0xaa
+   bytes (which are added at loading time)
+ - a newer type from Genieous emu, which does not start with TAPE_HEADER
+   but contains the 255 leading 0xaa bytes (which are now skipped below)
+ - an alternative type (from Genieous as well?) without TAPE_HEADER
+   and without the 255 leading 0xaa bytes
+We now support these three types below...
+
 ********************************************************************/
 
 #include <assert.h>
@@ -25,22 +35,21 @@ static int level;
 
 static int cgenie_output_byte(INT16 *buffer, int sample_count, UINT8 data)
 {
-	int i;
 	int samples = 0;
 
-	for ( i = 0; i < 8; i++ )
+	for (int i = 0; i < 8; i++)
 	{
-		/* Output bit boundary */
+		// Output bit boundary
 		level ^= 1;
-		if ( buffer )
-			buffer[ sample_count + samples ] = level ? SMPHI : SMPLO;
+		if (buffer)
+			buffer[sample_count + samples] = level ? SMPHI : SMPLO;
 		samples++;
 
-		/* Output bit */
-		if ( data & 0x80 )
+		// Output bit
+		if (data & 0x80)
 			level ^= 1;
-		if ( buffer )
-			buffer[ sample_count + samples ] = level ? SMPHI : SMPLO;
+		if (buffer)
+			buffer[sample_count + samples] = level ? SMPHI : SMPLO;
 		samples++;
 
 		data <<= 1;
@@ -51,46 +60,47 @@ static int cgenie_output_byte(INT16 *buffer, int sample_count, UINT8 data)
 
 static int cgenie_handle_cas(INT16 *buffer, const UINT8 *casdata)
 {
-	int i, data_pos, sample_count;
+	int data_pos, sample_count;
 
 	data_pos = 0;
 	sample_count = 0;
 	level = 0;
 
-	/* Check for presence of optional header */
-	if ( ! memcmp( casdata, TAPE_HEADER, sizeof(TAPE_HEADER) - 1 ) )
+	// Check for presence of optional header
+	if (!memcmp(casdata, TAPE_HEADER, sizeof(TAPE_HEADER) - 1))
 	{
-		/* Search for 0x00 or end of file */
-		while ( data_pos < cas_size && casdata[data_pos] )
+		// Search for 0x00 or end of file
+		while (data_pos < cas_size && casdata[data_pos])
 			data_pos++;
 
-		/* If we're at the end of the file it's not a valid .cas file */
-		if ( data_pos == cas_size )
+		// If we're at the end of the file it's not a valid .cas file
+		if (data_pos == cas_size)
 			return -1;
 
-		/* Skip the 0x00 byte */
+		// Skip the 0x00 byte
 		data_pos++;
 	}
 
-	/* If we're at the end of the file it's not a valid .cas file */
-	if ( data_pos == cas_size )
+	// If we're at the end of the file it's not a valid .cas file
+	if (data_pos == cas_size)
 		return -1;
 
-	/* Check for beginning of tape file marker */
-	if ( casdata[data_pos] != 0x66 )
+	// Check for beginning of tape file marker (possibly skipping the 0xaa header)
+	if (casdata[data_pos] != 0x66 && casdata[data_pos + 0xff] != 0x66)
 		return -1;
 
-	/* Create header */
-	for ( i = 0; i < 256; i++ )
-		sample_count += cgenie_output_byte( buffer, sample_count, 0xaa );
+	// Create header, if not present in the file
+	if (casdata[data_pos] == 0x66)
+		for (int i = 0; i < 256; i++)
+			sample_count += cgenie_output_byte(buffer, sample_count, 0xaa);
 
-	/* Start outputting data */
-	while( data_pos < cas_size )
+	// Start outputting data
+	while (data_pos < cas_size)
 	{
-		sample_count += cgenie_output_byte( buffer, sample_count, casdata[data_pos] );
+		sample_count += cgenie_output_byte(buffer, sample_count, casdata[data_pos]);
 		data_pos++;
 	}
-	sample_count += cgenie_output_byte( buffer, sample_count, 0x00 );
+	sample_count += cgenie_output_byte(buffer, sample_count, 0x00);
 
 	return sample_count;
 }
@@ -100,7 +110,7 @@ static int cgenie_handle_cas(INT16 *buffer, const UINT8 *casdata)
 ********************************************************************/
 static int cgenie_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 {
-	return cgenie_handle_cas( buffer, bytes );
+	return cgenie_handle_cas(buffer, bytes);
 }
 
 
@@ -111,7 +121,7 @@ static int cgenie_cas_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	cas_size = caslen;
 
-	return cgenie_handle_cas( nullptr, casdata );
+	return cgenie_handle_cas(nullptr, casdata);
 }
 
 static const struct CassetteLegacyWaveFiller cgenie_cas_legacy_fill_wave =

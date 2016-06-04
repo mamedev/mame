@@ -29,7 +29,7 @@
 #include "sound/2151intf.h"
 #include "sound/dac.h"
 #include "audio/s11c_bg.h"
-#include "includes/s11.h"
+#include "includes/s11b.h"
 #include "s11b.lh"
 
 static ADDRESS_MAP_START( s11b_main_map, AS_PROGRAM, 8, s11b_state )

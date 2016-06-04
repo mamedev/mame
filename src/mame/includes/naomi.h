@@ -25,6 +25,7 @@ naomi.h -> NAOMI includes
 #include "machine/aicartc.h"
 #include "machine/jvsdev.h"
 #include "machine/jvs13551.h"
+#include "machine/m3comm.h"
 #include "dc.h"
 
 enum {

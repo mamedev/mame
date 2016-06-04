@@ -62,11 +62,9 @@ WRITE16_MEMBER(gaelco_state::bigkarnk_coin_w)
 
 WRITE16_MEMBER(gaelco_state::OKIM6295_bankswitch_w)
 {
-	UINT8 *RAM = memregion("oki")->base();
-
 	if (ACCESSING_BITS_0_7)
 	{
-		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f) * 0x10000], 0x10000);
+		membank("okibank")->set_entry(data & 0x0f);
 	}
 }
 
@@ -118,7 +116,7 @@ static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_SHARE("videoram")               /* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM                                                         /* Screen RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                         /* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
+//  AM_RANGE(0x10800c, 0x10800d) AM_DEVWRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                               /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")
@@ -189,6 +187,12 @@ static ADDRESS_MAP_START( thoop_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                                        /* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                      /* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                         /* Work RAM */
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( oki_map, AS_0, 8, gaelco_state )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
 
@@ -494,6 +498,8 @@ GFXDECODEINFO(0x100000,64)
 
 void gaelco_state::machine_start()
 {
+	if (memregion("oki")->bytes() > 0x040000) //bigkarnk oki isn't banked
+		membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
 static MACHINE_CONFIG_START( bigkarnk, gaelco_state )
@@ -561,6 +567,7 @@ static MACHINE_CONFIG_START( maniacsq, gaelco_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -593,6 +600,7 @@ static MACHINE_CONFIG_START( squash, gaelco_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -625,6 +633,7 @@ static MACHINE_CONFIG_START( thoop, gaelco_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -676,11 +685,9 @@ ROM_START( maniacsp ) /* PCB - REF 922804/2 */
 	ROM_RELOAD(     0x380000, 0x040000 )
 	/* 0x340000-0x37ffff and 0x3c0000-0x3fffff empty */
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x080000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(2557f2d6) SHA1(3a99388f2d845281f73a427d6dc797dce87b2f82) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(     0x040000, 0x080000 )
-	ROM_RELOAD(     0x0c0000, 0x080000 )
 ROM_END
 
 
@@ -708,11 +715,10 @@ ROM_START( biomtoy ) /* PCB - REF 922804/2 */
 	ROM_LOAD( "j10",    0x300000, 0x040000, CRC(8e3e96cc) SHA1(761009f3f32b18139e98f20a22c433b6a49d9168) )
 	ROM_CONTINUE(       0x380000, 0x040000 )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(0f02de7e) SHA1(a8779370cc36290616794ff11eb3eebfdea5b1a9) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(     0x040000, 0x080000 )
-	ROM_LOAD( "c3", 0x0c0000, 0x080000, CRC(914e4bbc) SHA1(ca82b7481621a119f05992ed093b963da70d748a) )
+	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(914e4bbc) SHA1(ca82b7481621a119f05992ed093b963da70d748a) )
 ROM_END
 
 
@@ -741,11 +747,10 @@ ROM_START( biomtoya ) /* PCB - REF 922804/2 */
 	ROM_CONTINUE(       0x380000, 0x040000 )
 
 	// using the same samples as the parent set causes bad sounds for most of the game
-	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "c1", 0x000000, 0x080000, BAD_DUMP CRC(0f02de7e) SHA1(a8779370cc36290616794ff11eb3eebfdea5b1a9) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(     0x040000, 0x080000 )
-	ROM_LOAD( "c3", 0x0c0000, 0x080000, BAD_DUMP CRC(914e4bbc) SHA1(ca82b7481621a119f05992ed093b963da70d748a) )
+	ROM_LOAD( "c3", 0x080000, 0x080000, BAD_DUMP CRC(914e4bbc) SHA1(ca82b7481621a119f05992ed093b963da70d748a) )
 ROM_END
 
 
@@ -812,11 +817,9 @@ ROM_START( squash )
 	ROM_LOAD( "squash.c12", 0x000000, 0x80000, CRC(5c440645) SHA1(4f2fc1647ffc549fa079f2dc0aaaceb447afdf44) ) /* encrypted video ram */
 	ROM_RELOAD(               0x080000, 0x80000 )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x80000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "squash.d01",   0x000000, 0x80000, CRC(a1b9651b) SHA1(a396ba94889f70ea06d6330e3606b0f2497ff6ce) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(     0x040000, 0x080000 )
-	ROM_RELOAD(     0x0c0000, 0x080000 )
 ROM_END
 
 
@@ -843,10 +846,9 @@ ROM_START( thoop )
 	ROM_CONTINUE(    0x040000, 0x040000 )
 	ROM_CONTINUE(    0x0c0000, 0x040000 )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "sound", 0x000000, 0x100000, CRC(99f80961) SHA1(de3a514a8f46dffd5f762e52aac1f4c3b08e2e18) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(        0x040000, 0x100000 )
 ROM_END
 
 

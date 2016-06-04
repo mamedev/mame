@@ -261,7 +261,7 @@ void tutor_state::machine_reset()
 	m_centronics_busy = 0;
 
 	// Enable auto wait states by lowering READY during reset
-	m_maincpu->set_ready(CLEAR_LINE);
+	m_maincpu->ready_line(CLEAR_LINE);
 }
 
 /*

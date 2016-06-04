@@ -361,7 +361,7 @@ inline void konami_cpu_device::execute_one()
 {
 	switch(pop_state())
 	{
-#include "cpu/m6809/konami.inc"
+#include "cpu/m6809/konami.hxx"
 	}
 }
 

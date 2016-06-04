@@ -103,6 +103,7 @@ protected:
 
 	// configuration state
 	const address_space_config  m_space_config;
+	optional_memory_region  m_region;
 
 	// internal state
 	static const int OKIM6295_VOICES = 4;

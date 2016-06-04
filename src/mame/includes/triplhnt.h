@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
 
@@ -34,6 +35,7 @@ public:
 		m_orga_ram(*this, "orga_ram"),
 		m_code_ram(*this, "code_ram"),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_discrete(*this, "discrete"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -68,6 +70,7 @@ public:
 	void triplhnt_set_collision(int code);
 	void triplhnt_update_misc(address_space &space, int offset);
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_device> m_discrete;
 	required_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;

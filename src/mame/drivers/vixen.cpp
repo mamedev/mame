@@ -740,13 +740,13 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vixen_state,vixen_int_ack)
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber)
 	MCFG_SCREEN_UPDATE_DRIVER(vixen_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_23_9616MHz/2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vsync", vixen_state, vsync_tick, SCREEN_TAG, 26*10, 27*10)
 
-	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

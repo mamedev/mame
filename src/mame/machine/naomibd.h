@@ -4,6 +4,7 @@
 #define _NAOMIBD_H_
 
 #include "machine/naomig1.h"
+#include "machine/x76f100.h"
 
 #define MCFG_NAOMI_BOARD_ADD(_tag, type, _eeprom_tag, _actel_tag, _irq_cb)    \
 	MCFG_NAOMI_G1_ADD(_tag, type, _irq_cb)                        \
@@ -55,7 +56,7 @@ private:
 	bool pio_ready, dma_ready;
 
 	const char *eeprom_tag;
-	class x76f100_device *eeprom;
+	x76f100_device *eeprom;
 };
 
 #endif

@@ -1,4 +1,4 @@
-// license:BSD-3
+// license:BSD-3-Clause
 // copyright-holders:Andreas Naive
 /****************************************************************************
 Namco System 10 decryption emulation

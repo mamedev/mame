@@ -3,6 +3,7 @@
 /* TODO: some variables are per-game specifics */
 #include "sound/okim6295.h"
 #include "machine/ticket.h"
+#include "machine/watchdog.h"
 
 class cischeat_state : public driver_device
 {
@@ -20,6 +21,7 @@ public:
 		m_cpu3(*this, "cpu3"),
 		m_cpu5(*this, "cpu5"),
 		m_soundcpu(*this, "soundcpu"),
+		m_watchdog(*this, "watchdog"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -121,6 +123,7 @@ public:
 	optional_device<cpu_device> m_cpu3;
 	optional_device<cpu_device> m_cpu5;
 	optional_device<cpu_device> m_soundcpu;
+	optional_device<watchdog_timer_device> m_watchdog;
 	required_device<okim6295_device> m_oki1;
 	required_device<okim6295_device> m_oki2;
 	required_device<gfxdecode_device> m_gfxdecode;

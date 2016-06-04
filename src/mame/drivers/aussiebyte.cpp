@@ -447,7 +447,7 @@ static MACHINE_CONFIG_START( aussiebyte, aussiebyte_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(aussiebyte_map)
 	MCFG_CPU_IO_MAP(aussiebyte_io)
-	MCFG_CPU_CONFIG(daisy_chain_intf)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	MCFG_MACHINE_RESET_OVERRIDE(aussiebyte_state, aussiebyte )
 
@@ -458,7 +458,7 @@ static MACHINE_CONFIG_START( aussiebyte, aussiebyte_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crt8002)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

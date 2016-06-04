@@ -13,7 +13,7 @@
 #include "sound/2151intf.h"
 #include "sound/dac.h"
 #include "audio/s11c_bg.h"
-#include "includes/s11.h"
+#include "includes/s11c.h"
 #include "s11c.lh"
 
 

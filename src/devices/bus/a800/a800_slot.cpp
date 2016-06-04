@@ -277,6 +277,10 @@ bool a800_cart_slot_device::call_load()
 					m_type = A800_8K;
 				if (len == 0x1000)
 					m_type = A5200_4K;
+				// also make a try with .hsi file (for .a52 files)
+				std::string info;
+				if (hashfile_extrainfo(*this, info) && info.compare("A13MIRRORING")==0)
+					m_type = A5200_16K_2CHIPS;
 			}
 
 			m_cart->rom_alloc(len, tag());
@@ -285,7 +289,7 @@ bool a800_cart_slot_device::call_load()
 		if (m_type == A800_TELELINK2)
 			m_cart->nvram_alloc(0x100);
 
-		printf("%s loaded cartridge '%s' size %dK\n", machine().system().name, filename(), len/1024);
+		logerror("%s loaded cartridge '%s' size %dK\n", machine().system().name, filename(), len/1024);
 	}
 	return IMAGE_INIT_PASS;
 }
@@ -412,13 +416,13 @@ std::string a800_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		dynamic_buffer head(0x10);
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		int type = A800_8K;
 
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, &head[0], 0x10);
+			m_file->read(&head[0], 0x10);
 			type = identify_cart_type(&head[0]);
 		}
 		else    // otherwise try to guess based on size
@@ -449,15 +453,17 @@ std::string a5200_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		dynamic_buffer head(0x10);
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		int type = A5200_8K;
 
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, &head[0], 0x10);
+			m_file->read(&head[0], 0x10);
 			type = identify_cart_type(&head[0]);
-
+		}
+		else
+		{
 			std::string info;
 			if (hashfile_extrainfo(*this, info) && info.compare("A13MIRRORING")==0)
 				type = A5200_16K_2CHIPS;
@@ -482,13 +488,13 @@ std::string xegs_cart_slot_device::get_default_card_software()
 	{
 		const char *slot_string;
 		dynamic_buffer head(0x10);
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = m_file->size();
 		int type = A800_8K;
 
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, &head[0], 0x10);
+			m_file->read(&head[0], 0x10);
 			type = identify_cart_type(&head[0]);
 		}
 		if (type != A800_XEGS)

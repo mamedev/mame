@@ -46,7 +46,6 @@
 #include "machine/sgi.h"
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
-#include "includes/at.h"
 #include "machine/8042kbdc.h"
 #include "machine/pit8253.h"
 #include "video/newport.h"
@@ -1573,14 +1572,6 @@ INTERRUPT_GEN_MEMBER(ip22_state::ip22_vbl)
 	}
 }
 
-#if 0
-static const mips3_config config =
-{
-	32768,  /* code cache size */
-	32768   /* data cache size */
-};
-#endif
-
 static MACHINE_CONFIG_FRAGMENT( cdrom_config )
 	MCFG_DEVICE_MODIFY( "cdda" )
 	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 1.0 )
@@ -1589,7 +1580,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_CPU_ADD( "maincpu", R5000BE, 50000000*3 )
-	MCFG_CPU_CONFIG( config )
+	//MCFG_MIPS3_ICACHE_SIZE(32768)
+	//MCFG_MIPS3_DCACHE_SIZE(32768)
 	MCFG_CPU_PROGRAM_MAP( ip225015_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ip22_state,  ip22_vbl)
 
@@ -1640,14 +1632,16 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ip224613, ip225015 )
 	MCFG_CPU_REPLACE( "maincpu", R4600BE, 133333333 )
-	MCFG_CPU_CONFIG( config )
+	//MCFG_MIPS3_ICACHE_SIZE(32768)
+	//MCFG_MIPS3_DCACHE_SIZE(32768)
 	MCFG_CPU_PROGRAM_MAP( ip225015_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ip22_state,  ip22_vbl)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ip244415, ip225015 )
 	MCFG_CPU_REPLACE( "maincpu", R4600BE, 150000000 )
-	MCFG_CPU_CONFIG( config )
+	//MCFG_MIPS3_ICACHE_SIZE(32768)
+	//MCFG_MIPS3_DCACHE_SIZE(32768)
 	MCFG_CPU_PROGRAM_MAP( ip225015_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ip22_state,  ip22_vbl)
 MACHINE_CONFIG_END

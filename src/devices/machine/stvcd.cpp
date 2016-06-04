@@ -25,7 +25,7 @@
 
 #include "emu.h"
 #include "imagedev/chd_cd.h"
-#include "includes/stv.h"
+#include "includes/saturn.h"
 #include "cdrom.h"
 #include "sound/cdda.h"
 #include "debugger.h"
@@ -258,7 +258,7 @@ void saturn_state::cd_exec_command( void )
 				#endif
 
 				/* reset CD device connection */
-				//cddevice = (filterT *)NULL;
+				//cddevice = (filterT *)nullptr;
 			}
 
 			hirqreg |= (CMOK|ESEL);
@@ -1179,7 +1179,7 @@ void saturn_state::cd_exec_command( void )
 					//deallocate the src blocks
 					//partitions[src_filter].size -= partitions[src_filter].blocks[i]->size;
 					//cd_free_block(partitions[src_filter].blocks[i]);
-					//partitions[src_filter].blocks[i] = (blockT *)NULL;
+					//partitions[src_filter].blocks[i] = (blockT *)nullptr;
 					//partitions[src_filter].bnum[i] = 0xff;
 				}
 

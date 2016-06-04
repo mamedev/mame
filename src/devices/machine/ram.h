@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license:BSD-3-Clause
+// copyright-holders: Dirk Best
 /*************************************************************************
 
     RAM device
@@ -31,7 +31,7 @@
 
 #define MCFG_RAM_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)    \
-	ram_device::static_set_extra_options(*device, NULL);
+	ram_device::static_set_extra_options(*device, nullptr);
 
 #define MCFG_RAM_DEFAULT_SIZE(_default_size) \
 	ram_device::static_set_default_size(*device, _default_size);

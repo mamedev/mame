@@ -39,6 +39,9 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
  * a temporary support and not be used in commits.
  */
 
+#define NETLIB_NAME_STR_S(_s) # _s
+#define NETLIB_NAME_STR(_chip) NETLIB_NAME_STR_S(nld_ ## _chip)
+
 #ifndef NL_CONVERT_CPP
 #ifndef NETLIST_DEVELOPMENT
 #define NETLIST_DEVELOPMENT 0

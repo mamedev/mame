@@ -13,6 +13,7 @@ Tomasz Slanina
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/changela.h"
 
@@ -236,7 +237,7 @@ static ADDRESS_MAP_START( changela_map, AS_PROGRAM, 8, changela_state )
 	AM_RANGE(0xd030, 0xd030) AM_READWRITE(changela_30_r, mcu_w)
 	AM_RANGE(0xd031, 0xd031) AM_READ(changela_31_r)
 
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(watchdog_reset_w) /* Watchdog */
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* Watchdog */
 
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM /* RAM2 (Processor RAM) */
 ADDRESS_MAP_END
@@ -483,6 +484,7 @@ static MACHINE_CONFIG_START( changela, changela_state )
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", changela_state, chl_mcu_irq)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

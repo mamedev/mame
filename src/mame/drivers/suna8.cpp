@@ -37,6 +37,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
@@ -624,7 +625,7 @@ WRITE8_MEMBER(suna8_state::sranger_prot_w)
 static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                             // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(watchdog_reset_r, soundlatch_byte_w)  // To Sound CPU
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(soundlatch_byte_w)  // To Sound CPU
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(rranger_bankswitch_w  )   // ROM Banking
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P1")                 // P1 (Inputs)
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")                 // P2
@@ -1694,8 +1695,8 @@ static INPUT_PORTS_START( starfigh )
 	PORT_DIPSETTING(    0x38, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Very_Easy) )
 	PORT_DIPSETTING(    0x28, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x20, "Moderate" )
-	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x18, "Moderate" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Harder ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Very_Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
@@ -1714,7 +1715,7 @@ static INPUT_PORTS_START( starfigh )
 	PORT_DIPNAME( 0x04, 0x04, "Play Together" )     PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x38, 0x30, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPNAME( 0x38, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5,6")
 	PORT_DIPSETTING(    0x30, "10K" )
 	PORT_DIPSETTING(    0x28, "30K" )
 	PORT_DIPSETTING(    0x18, "50K, Every 50K" )
@@ -1934,6 +1935,8 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rranger_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* NMI = retn */
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -56,7 +56,7 @@ const device_type K005289 = &device_creator<k005289_device>;
 k005289_device::k005289_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K005289, "K005289 SCC", tag, owner, clock, "k005289", __FILE__),
 		device_sound_interface(mconfig, *this),
-	m_sound_prom(nullptr),
+	m_sound_prom(*this, DEVICE_SELF),
 	m_stream(nullptr),
 	m_rate(0),
 	m_mixer_table(nullptr),
@@ -81,8 +81,6 @@ void k005289_device::device_start()
 
 	/* build the mixer table */
 	make_mixer_table(2);
-
-	m_sound_prom = m_region->base();
 
 	/* reset all the voices */
 	for (int i = 0; i < 2; i++)
@@ -119,7 +117,7 @@ void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	f=m_frequency[0];
 	if (v && f)
 	{
-		const unsigned char *w = m_sound_prom + m_waveform[0];
+		const unsigned char *w = &m_sound_prom[m_waveform[0]];
 		int c = m_counter[0];
 
 		mix = m_mixer_buffer.get();
@@ -142,7 +140,7 @@ void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	f=m_frequency[1];
 	if (v && f)
 	{
-		const unsigned char *w = m_sound_prom + m_waveform[1];
+		const unsigned char *w = &m_sound_prom[m_waveform[1]];
 		int c = m_counter[1];
 
 		mix = m_mixer_buffer.get();

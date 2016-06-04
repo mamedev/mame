@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "isa.h"
 
 
@@ -54,7 +53,7 @@ void isa8_slot_device::device_start()
 	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
 	const device_isa16_card_interface *intf;
 	if (get_card_device()->interface(intf))
-		fatalerror("Error ISA16 device in ISA8 slot\n");
+		fatalerror("ISA16 device in ISA8 slot\n");
 
 	if (dev) device_isa8_card_interface::static_set_isabus(*dev,m_owner->subdevice(m_isa_tag));
 }
@@ -323,7 +322,7 @@ void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t m
 void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
 	m_prgspace->install_readwrite_bank(start, end, mask, mirror, tag );
-	machine().root_device().membank(tag)->set_base(data);
+	machine().root_device().membank(m_prgspace->device().siblingtag(tag).c_str())->set_base(data);
 }
 
 void isa8_device::unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror)
@@ -340,7 +339,7 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 	} else {
 		m_prgspace->install_read_bank(start, end, mask, mirror, tag);
 		m_prgspace->unmap_write(start, end, mask, mirror);
-		machine().root_device().membank(tag)->set_base(machine().root_device().memregion(dev->subtag(region).c_str())->base());
+		machine().root_device().membank(m_prgspace->device().siblingtag(tag).c_str())->set_base(machine().root_device().memregion(dev->subtag(region).c_str())->base());
 	}
 }
 

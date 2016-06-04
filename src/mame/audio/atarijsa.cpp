@@ -291,6 +291,7 @@ atari_jsa_base_device::atari_jsa_base_device(const machine_config &mconfig, devi
 		m_soundcomm(*this, "soundcomm"),
 		m_jsacpu(*this, "cpu"),
 		m_ym2151(*this, "ym2151"),
+		m_cpu_region(*this, "cpu"),
 		m_cpu_bank(*this, "cpubank"),
 		m_test_read_cb(*this),
 		m_main_int_cb(*this),
@@ -308,7 +309,7 @@ atari_jsa_base_device::atari_jsa_base_device(const machine_config &mconfig, devi
 void atari_jsa_base_device::device_start()
 {
 	// configure CPU bank
-	m_cpu_bank->configure_entries(0, 4, m_jsacpu->region()->base() + 0x10000, 0x1000);
+	m_cpu_bank->configure_entries(0, 4, m_cpu_region->base(), 0x1000);
 
 	// resolve devices
 	m_test_read_cb.resolve_safe(0);
@@ -415,6 +416,8 @@ atari_jsa_oki_base_device::atari_jsa_oki_base_device(const machine_config &mconf
 	: atari_jsa_base_device(mconfig, devtype, name, tag, owner, clock, shortname, channels),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
+		m_oki1_region(*this, "oki1"),
+		m_oki2_region(*this, "oki2"),
 		m_oki1_banklo(*this, "oki1lo"),
 		m_oki1_bankhi(*this, "oki1hi"),
 		m_oki2_banklo(*this, "oki2lo"),
@@ -568,19 +571,19 @@ void atari_jsa_oki_base_device::device_start()
 	save_item(NAME(m_overall_volume));
 
 	// configure JSA III ADPCM banking
-	if (m_oki1_banklo != nullptr && m_oki1_bankhi != nullptr && m_oki1->region()->bytes() >= 0x80000)
+	if (m_oki1_banklo.found() && m_oki1_bankhi.found() && m_oki1_region->bytes() >= 0x80000)
 	{
-		m_oki1_banklo->configure_entries(0, 2, m_oki1->region()->base() + 0x00000, 0x00000);
-		m_oki1_banklo->configure_entries(2, 2, m_oki1->region()->base() + 0x20000, 0x20000);
-		m_oki1_bankhi->set_base(m_oki1->region()->base() + 0x60000);
+		m_oki1_banklo->configure_entries(0, 2, m_oki1_region->base() + 0x00000, 0x00000);
+		m_oki1_banklo->configure_entries(2, 2, m_oki1_region->base() + 0x20000, 0x20000);
+		m_oki1_bankhi->set_base(m_oki1_region->base() + 0x60000);
 	}
 
 	// configure JSA IIIs ADPCM banking
-	if (m_oki2_banklo != nullptr && m_oki2_bankhi != nullptr && m_oki2->region()->bytes() >= 0x80000)
+	if (m_oki2_banklo.found() && m_oki2_bankhi.found() && m_oki2_region->bytes() >= 0x80000)
 	{
-		m_oki2_banklo->configure_entries(0, 2, m_oki2->region()->base() + 0x00000, 0x00000);
-		m_oki2_banklo->configure_entries(2, 2, m_oki2->region()->base() + 0x20000, 0x20000);
-		m_oki2_bankhi->set_base(m_oki1->region()->base() + 0x60000);
+		m_oki2_banklo->configure_entries(0, 2, m_oki2_region->base() + 0x00000, 0x00000);
+		m_oki2_banklo->configure_entries(2, 2, m_oki2_region->base() + 0x20000, 0x20000);
+		m_oki2_bankhi->set_base(m_oki2_region->base() + 0x60000);
 	}
 }
 
@@ -608,9 +611,9 @@ void atari_jsa_oki_base_device::device_reset()
 
 void atari_jsa_oki_base_device::update_all_volumes()
 {
-	if (m_oki1 != nullptr)
+	if (m_oki1.found())
 		m_oki1->set_output_gain(ALL_OUTPUTS, m_overall_volume * m_oki6295_volume * m_ym2151_ct1);
-	if (m_oki2 != nullptr)
+	if (m_oki2.found())
 		m_oki2->set_output_gain(ALL_OUTPUTS, m_overall_volume * m_oki6295_volume * m_ym2151_ct1);
 	m_ym2151->set_output_gain(ALL_OUTPUTS, m_overall_volume * m_ym2151_volume);
 }

@@ -1,6 +1,8 @@
 /* Bra.c -- Converters for RISC code
 2010-04-16 : Igor Pavlov : Public domain */
 
+#include "Precomp.h"
+
 #include "Bra.h"
 
 SizeT ARM_Convert(Byte *data, SizeT size, UInt32 ip, int encoding)

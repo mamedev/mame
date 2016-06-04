@@ -71,7 +71,8 @@ enum
 	COMMAND_LPRD,
 	COMMAND_DMAR,
 	COMMAND_DMAW,
-	COMMAND_5A
+	COMMAND_5A,
+	COMMAND_05
 };
 
 enum
@@ -93,6 +94,7 @@ enum
 #define UPD7220_COMMAND_CCHAR           0x4b
 #define UPD7220_COMMAND_START           0x6b
 #define UPD7220_COMMAND_BCTRL           0x0c // & 0xfe
+#define UPD7220_COMMAND_05              0x05
 #define UPD7220_COMMAND_ZOOM            0x46
 #define UPD7220_COMMAND_CURS            0x49
 #define UPD7220_COMMAND_PRAM            0x70 // & 0xf0
@@ -1049,6 +1051,7 @@ int upd7220_device::translate_command(UINT8 data)
 	case UPD7220_COMMAND_CURD:  command = COMMAND_CURD;  break;
 	case UPD7220_COMMAND_LPRD:  command = COMMAND_LPRD;  break;
 	case UPD7220_COMMAND_5A:    command = COMMAND_5A;    break;
+	case UPD7220_COMMAND_05:    command = COMMAND_05;    break;
 	default:
 		switch (data & 0xfe)
 		{
@@ -1224,6 +1227,10 @@ void upd7220_device::process_fifo()
 		m_de = 1;
 
 		//LOG(("uPD7220 '%s' DE: 1\n", tag()));
+		break;
+
+	case COMMAND_05:
+		m_de = 0;
 		break;
 
 	case COMMAND_BCTRL: /* display blanking control */

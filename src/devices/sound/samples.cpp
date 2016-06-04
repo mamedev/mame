@@ -571,7 +571,7 @@ bool samples_device::read_flac_sample(emu_file &file, sample_t &sample)
 	file.seek(0, SEEK_SET);
 
 	// create the FLAC decoder and fill in the sample data
-	flac_decoder decoder((core_file&) file);
+	flac_decoder decoder((util::core_file &)file);
 	sample.frequency = decoder.sample_rate();
 
 	// error if more than 1 channel or not 16bpp
@@ -618,20 +618,20 @@ bool samples_device::load_samples()
 	{
 		// attempt to open as FLAC first
 		emu_file file(machine().options().sample_path(), OPEN_FLAG_READ);
-		file_error filerr = file.open(basename, PATH_SEPARATOR, samplename, ".flac");
-		if (filerr != FILERR_NONE && altbasename != nullptr)
+		osd_file::error filerr = file.open(basename, PATH_SEPARATOR, samplename, ".flac");
+		if (filerr != osd_file::error::NONE && altbasename != nullptr)
 			filerr = file.open(altbasename, PATH_SEPARATOR, samplename, ".flac");
 
 		// if not, try as WAV
-		if (filerr != FILERR_NONE)
+		if (filerr != osd_file::error::NONE)
 			filerr = file.open(basename, PATH_SEPARATOR, samplename, ".wav");
-		if (filerr != FILERR_NONE && altbasename != nullptr)
+		if (filerr != osd_file::error::NONE && altbasename != nullptr)
 			filerr = file.open(altbasename, PATH_SEPARATOR, samplename, ".wav");
 
 		// if opened, read it
-		if (filerr == FILERR_NONE)
+		if (filerr == osd_file::error::NONE)
 			read_sample(file, m_sample[index]);
-		else if (filerr == FILERR_NOT_FOUND)
+		else if (filerr == osd_file::error::NOT_FOUND)
 		{
 			logerror("%s: Sample '%s' NOT FOUND\n", tag(), samplename);
 			ok = false;

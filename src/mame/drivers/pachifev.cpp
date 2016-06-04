@@ -278,19 +278,13 @@ WRITE_LINE_MEMBER(pachifev_state::pf_adpcm_int)
 	}
 }
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pachifev_state,pf_adpcm_int),    /* interrupt function */
-	MSM5205_S48_4B    /* 8kHz */
-};
-
 #endif
 
 void pachifev_state::machine_reset()
 {
 	// Pulling down the line on RESET configures the CPU to insert one wait
 	// state on external memory accesses
-	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(CLEAR_LINE);
+	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(CLEAR_LINE);
 
 	m_power=0;
 	m_max_power=0;
@@ -360,7 +354,8 @@ static MACHINE_CONFIG_START( pachifev, pachifev_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 #if USE_MSM
 	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)  /* guess */
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(pachifev_state,pf_adpcm_int))    /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)    /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 	MCFG_SOUND_ADD("y2404_1", Y2404, XTAL_10_738635MHz/3) /* guess */

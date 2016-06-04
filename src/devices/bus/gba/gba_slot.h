@@ -18,7 +18,8 @@ enum
 	GBA_EEPROM64,
 	GBA_FLASH,
 	GBA_FLASH512,
-	GBA_FLASH1M
+	GBA_FLASH1M,
+	GBA_3DMATRIX
 };
 
 
@@ -35,12 +36,15 @@ public:
 	virtual DECLARE_READ32_MEMBER(read_rom) { return 0xffffffff; }
 	virtual DECLARE_READ32_MEMBER(read_ram) { return 0xffffffff; }
 	virtual DECLARE_WRITE32_MEMBER(write_ram) {};
+	virtual DECLARE_WRITE32_MEMBER(write_mapper) {};
 
 	void rom_alloc(UINT32 size, const char *tag);
 	void nvram_alloc(UINT32 size);
 	UINT32* get_rom_base() { return m_rom; }
+	UINT32* get_romhlp_base() { return m_romhlp; }
 	UINT32* get_nvram_base() { return &m_nvram[0]; }
 	UINT32 get_rom_size() { return m_rom_size; }
+	UINT32 get_romhlp_size() { return m_romhlp_size; }
 	UINT32 get_nvram_size() { return m_nvram.size()*sizeof(UINT32); }
 	void set_rom_size(UINT32 val) { m_rom_size = val; }
 
@@ -49,6 +53,8 @@ public:
 	// internal state
 	UINT32 *m_rom;  // this points to the cart rom region
 	UINT32 m_rom_size;  // this is the actual game size, not the rom region size!
+	UINT32 *m_romhlp;
+	UINT32 m_romhlp_size;
 	std::vector<UINT32> m_nvram;
 };
 
@@ -79,6 +85,7 @@ public:
 	void internal_header_logging(UINT8 *ROM, UINT32 len);
 
 	void save_nvram()   { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
+	UINT32 get_rom_size()   { if (m_cart) return m_cart->get_rom_size(); return 0; }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 	virtual bool is_readable()  const override { return 1; }
@@ -97,6 +104,7 @@ public:
 	virtual DECLARE_READ32_MEMBER(read_rom);
 	virtual DECLARE_READ32_MEMBER(read_ram);
 	virtual DECLARE_WRITE32_MEMBER(write_ram);
+	virtual DECLARE_WRITE32_MEMBER(write_mapper) { if (m_cart) return m_cart->write_mapper(space, offset, data, mem_mask); };
 
 
 protected:
@@ -116,6 +124,7 @@ extern const device_type GBA_CART_SLOT;
  ***************************************************************************/
 
 #define GBASLOT_ROM_REGION_TAG ":cart:rom"
+#define GBAHELP_ROM_REGION_TAG ":cart:romhlp"
 
 #define MCFG_GBA_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, GBA_CART_SLOT, 0) \

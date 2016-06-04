@@ -26,6 +26,7 @@
 		"base/api.lua",
 		"base/cmdline.lua",
 		"base/inspect.lua",
+		"base/profiler.lua",
 		"tools/dotnet.lua",
 		"tools/gcc.lua",
 		"tools/ghs.lua",
@@ -69,6 +70,7 @@
 		"actions/vstudio/vs2012.lua",
 		"actions/vstudio/vs2013.lua",
 		"actions/vstudio/vs2015.lua",
+		"actions/vstudio/vs15.lua",
 
 		-- Xcode action
 		"actions/xcode/_xcode.lua",
@@ -80,4 +82,9 @@
 
 		-- Clean action
 		"actions/clean/_clean.lua",
+
+		--FASTBuild action
+		"actions/fastbuild/_fastbuild.lua",
+		"actions/fastbuild/fastbuild_project.lua",
+		"actions/fastbuild/fastbuild_solution.lua",
 	}

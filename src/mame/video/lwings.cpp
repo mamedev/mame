@@ -204,7 +204,7 @@ void lwings_state::lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 			}
 
 			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-					code,color,
+					code+(m_sprbank*0x400),color,
 					flipx,flipy,
 					sx,sy,15);
 		}

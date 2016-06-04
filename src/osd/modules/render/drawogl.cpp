@@ -24,15 +24,11 @@
 #ifndef OSD_WINDOWS
 // standard SDL headers
 #define TOBEMIGRATED 1
-#include "sdlinc.h"
+#include <SDL2/SDL.h>
 #endif
 
 #include "modules/lib/osdlib.h"
 #include "modules/lib/osdobj_common.h"
-
-#if defined(OSD_WINDOWS) && !defined(SDLMAME_SDL2)
-#define SDLMAME_SDL2 0
-#endif
 
 // OpenGL headers
 #include "modules/opengl/osd_opengl.h"
@@ -123,17 +119,7 @@ typedef void (APIENTRYP PFNGLDELETERENDERBUFFERSEXTPROC) (GLsizei n, const GLuin
 #define GL_DEPTH_COMPONENT32                0x81A7
 #endif
 
-#define HASH_SIZE       ((1<<10)+1)
-#define OVERFLOW_SIZE   (1<<10)
-
-// OSD headers
-#ifndef OSD_WINDOWS
-#include "osdsdl.h"
-#include "window.h"
-#else
-#include "../windows/window.h"
-typedef UINT64 HashT;
-#endif
+#include "drawogl.h"
 
 //============================================================
 //  DEBUGGING
@@ -183,450 +169,6 @@ enum
 #define FSWAP(var1, var2) do { float temp = var1; var1 = var2; var2 = temp; } while (0)
 #define GL_NO_PRIMITIVE -1
 
-//============================================================
-//  TYPES
-//============================================================
-
-#if defined(OSD_WINDOWS)
-
-class win_gl_context : public osd_gl_context
-{
-public:
-	win_gl_context(HWND window) : osd_gl_context(), m_context(0), m_window(NULL), m_hdc(0)
-	{
-		m_error[0] = 0;
-
-		this->pfn_wglGetProcAddress = (PROC (WINAPI *)(LPCSTR lpszProc)) GetProcAddress(m_module, "wglGetProcAddress");
-		this->pfn_wglCreateContext = (HGLRC (WINAPI *)(HDC hdc)) GetProcAddress(m_module, "wglCreateContext");
-		this->pfn_wglDeleteContext = (BOOL (WINAPI *)(HGLRC hglrc)) GetProcAddress(m_module, "wglDeleteContext");
-		this->pfn_wglMakeCurrent = (BOOL (WINAPI *)(HDC hdc, HGLRC hglrc)) GetProcAddress(m_module, "wglMakeCurrent");
-
-		this->pfn_wglGetExtensionsStringEXT = (const char *(WINAPI *) (void)) pfn_wglGetProcAddress("wglGetExtensionsStringEXT");
-
-		if (WGLExtensionSupported("WGL_EXT_swap_control"))
-		{
-			this->pfn_wglSwapIntervalEXT = (BOOL (WINAPI *) (int)) getProcAddress("wglSwapIntervalEXT");
-			this->pfn_wglGetSwapIntervalEXT = (int (WINAPI *) (void)) getProcAddress("wglGetSwapIntervalEXT");
-		}
-		else
-		{
-			pfn_wglSwapIntervalEXT = NULL;
-			pfn_wglGetSwapIntervalEXT = NULL;
-		}
-
-		m_hdc = GetDC(window);
-		if (!setupPixelFormat(m_hdc))
-		{
-			m_context = this->pfn_wglCreateContext(m_hdc);
-			if  (!m_context)
-			{
-				FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), 0, m_error, 255, NULL);
-				return;
-			}
-			this->pfn_wglMakeCurrent(m_hdc, m_context);
-		}
-	}
-
-	virtual ~win_gl_context()
-	{
-		this->pfn_wglDeleteContext(m_context);
-		ReleaseDC(m_window, m_hdc);
-	}
-
-	virtual void MakeCurrent() override
-	{
-		this->pfn_wglMakeCurrent(m_hdc, m_context);
-	}
-
-	virtual const char *LastErrorMsg() override
-	{
-		if (m_error[0] == 0)
-			return NULL;
-		else
-			return m_error;
-	}
-
-	virtual void *getProcAddress(const char *proc) override
-	{
-		void *ret = (void *) GetProcAddress(m_module, proc);
-		if (ret == NULL)
-			ret = (void *) this->pfn_wglGetProcAddress(proc);
-		return ret;
-	}
-
-	virtual int SetSwapInterval(const int swap) override
-	{
-		if (this->pfn_wglSwapIntervalEXT != NULL)
-		{
-			this->pfn_wglSwapIntervalEXT(swap ? 1 : 0);
-		}
-		return 0;
-	}
-
-	virtual void SwapBuffer() override
-	{
-		SwapBuffers(m_hdc);
-		//wglSwapLayerBuffers(GetDC(window().m_hwnd), WGL_SWAP_MAIN_PLANE);
-	}
-
-	static void load_library()
-	{
-		m_module = LoadLibraryA("opengl32.dll");
-	}
-
-private:
-
-	int setupPixelFormat(HDC hDC)
-	{
-		PIXELFORMATDESCRIPTOR pfd = {
-			sizeof(PIXELFORMATDESCRIPTOR),  /* size */
-			1,                              /* version */
-			PFD_SUPPORT_OPENGL |
-			PFD_DRAW_TO_WINDOW |
-			PFD_DOUBLEBUFFER,               /* support double-buffering */
-			PFD_TYPE_RGBA,                  /* color type */
-			32,                             /* prefered color depth */
-			0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
-			0,                              /* no alpha buffer */
-			0,                              /* alpha bits (ignored) */
-			0,                              /* no accumulation buffer */
-			0, 0, 0, 0,                     /* accum bits (ignored) */
-			16,                             /* depth buffer */
-			0,                              /* no stencil buffer */
-			0,                              /* no auxiliary buffers */
-			PFD_MAIN_PLANE,                 /* main layer */
-			0,                              /* reserved */
-			0, 0, 0,                        /* no layer, visible, damage masks */
-		};
-		int pixelFormat;
-
-		pixelFormat = ChoosePixelFormat(hDC, &pfd);
-		if (pixelFormat == 0) {
-			strcpy(m_error, "ChoosePixelFormat failed");
-			return 1;
-		}
-
-		if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE) {
-			strcpy(m_error, "SetPixelFormat failed.");
-			return 1;
-		}
-		return 0;
-	}
-
-	bool WGLExtensionSupported(const char *extension_name)
-	{
-		//if (pfn_wglGetExtensionsStringEXT != NULL)
-		//  printf("%s\n", this->pfn_wglGetExtensionsStringEXT());
-
-		if (pfn_wglGetExtensionsStringEXT != NULL && strstr(pfn_wglGetExtensionsStringEXT(), extension_name) != NULL)
-			return true;
-		else
-			return false;
-	}
-
-	HGLRC m_context;
-	HWND m_window;
-	HDC m_hdc;
-	char m_error[256];
-
-	PROC (WINAPI *pfn_wglGetProcAddress)(LPCSTR lpszProc);
-	HGLRC (WINAPI *pfn_wglCreateContext)(HDC hdc);
-	BOOL (WINAPI *pfn_wglDeleteContext)(HGLRC hglrc);
-	BOOL (WINAPI *pfn_wglMakeCurrent)(HDC hdc, HGLRC hglrc);
-
-	const char *(WINAPI *pfn_wglGetExtensionsStringEXT) (void);
-	BOOL (WINAPI *pfn_wglSwapIntervalEXT) (int interval);
-	int (WINAPI * pfn_wglGetSwapIntervalEXT) (void);
-
-	static HMODULE m_module;
-};
-
-HMODULE win_gl_context::m_module;
-
-
-#elif SDLMAME_SDL2
-
-class sdl_gl_context : public osd_gl_context
-{
-public:
-	sdl_gl_context(SDL_Window *window) : osd_gl_context(), m_context(0), m_window(window)
-	{
-		m_error[0] = 0;
-		m_context = SDL_GL_CreateContext(window);
-		if  (!m_context)
-		{
-			snprintf(m_error,255, "OpenGL not supported on this driver: %s", SDL_GetError());
-		}
-	}
-	virtual ~sdl_gl_context()
-	{
-		SDL_GL_DeleteContext(m_context);
-	}
-	virtual void MakeCurrent() override
-	{
-		SDL_GL_MakeCurrent(m_window, m_context);
-	}
-
-	virtual int SetSwapInterval(const int swap) override
-	{
-		return SDL_GL_SetSwapInterval(swap);
-	}
-
-	virtual const char *LastErrorMsg() override
-	{
-		if (m_error[0] == 0)
-			return NULL;
-		else
-			return m_error;
-	}
-	virtual void *getProcAddress(const char *proc) override
-	{
-		return SDL_GL_GetProcAddress(proc);
-	}
-
-	virtual void SwapBuffer() override
-	{
-		SDL_GL_SwapWindow(m_window);
-	}
-
-private:
-	SDL_GLContext m_context;
-	SDL_Window *m_window;
-	char m_error[256];
-};
-
-#else
-// SDL 1.2
-class sdl12_gl_context : public osd_gl_context
-{
-public:
-	sdl12_gl_context(SDL_Surface *window) : osd_gl_context(), m_window(window)
-	{
-		m_error[0] = 0;
-	}
-	virtual ~sdl12_gl_context()
-	{
-	}
-	virtual void MakeCurrent()
-	{
-	}
-
-	virtual int SetSwapInterval(const int swap)
-	{
-		// Not supported on 1.2
-		return 0;
-	}
-
-	virtual const char *LastErrorMsg()
-	{
-		if (m_error[0] == 0)
-			return NULL;
-		else
-			return m_error;
-	}
-
-	virtual void *getProcAddress(const char *proc)
-	{
-		return SDL_GL_GetProcAddress(proc);
-	}
-
-	virtual void SwapBuffer()
-	{
-		SDL_GL_SwapBuffers();
-	}
-
-private:
-	SDL_Surface *m_window;
-	char m_error[256];
-};
-
-#endif
-
-//============================================================
-//  Textures
-//============================================================
-
-/* ogl_texture_info holds information about a texture */
-class ogl_texture_info
-{
-public:
-	ogl_texture_info()
-	:   hash(0), flags(0), rawwidth(0), rawheight(0),
-		rawwidth_create(0), rawheight_create(0),
-		type(0), format(0), borderpix(0), xprescale(0), yprescale(0), nocopy(0),
-		texture(0), texTarget(0), texpow2(0), mpass_dest_idx(0), pbo(0), data(NULL),
-		data_own(0), texCoordBufferName(0)
-	{
-		for (int i=0; i<2; i++)
-		{
-			mpass_textureunit[i] = 0;
-			mpass_texture_mamebm[i] = 0;
-			mpass_fbo_mamebm[i] = 0;
-			mpass_texture_scrn[i] = 0;
-			mpass_fbo_scrn[i] = 0;
-		}
-		for (int i=0; i<8; i++)
-			texCoord[i] = 0.0f;
-	}
-
-	HashT               hash;               // hash value for the texture (must be >= pointer size)
-	UINT32              flags;              // rendering flags
-	render_texinfo      texinfo;            // copy of the texture info
-	int                 rawwidth, rawheight;    // raw width/height of the texture
-	int                 rawwidth_create;    // raw width/height, pow2 compatible, if needed
-	int                 rawheight_create;   // (create and initial set the texture, not for copy!)
-	int                 type;               // what type of texture are we?
-	int                 format;             // texture format
-	int                 borderpix;          // do we have a 1 pixel border?
-	int                 xprescale;          // what is our X prescale factor?
-	int                 yprescale;          // what is our Y prescale factor?
-	int                 nocopy;             // must the texture date be copied?
-
-	UINT32              texture;            // OpenGL texture "name"/ID
-
-	GLenum              texTarget;          // OpenGL texture target
-	int                 texpow2;            // Is this texture pow2
-
-	UINT32              mpass_dest_idx;         // Multipass dest idx [0..1]
-	UINT32              mpass_textureunit[2];   // texture unit names for GLSL
-
-	UINT32              mpass_texture_mamebm[2];// Multipass OpenGL texture "name"/ID for the shader
-	UINT32              mpass_fbo_mamebm[2];    // framebuffer object for this texture, multipass
-	UINT32              mpass_texture_scrn[2];  // Multipass OpenGL texture "name"/ID for the shader
-	UINT32              mpass_fbo_scrn[2];      // framebuffer object for this texture, multipass
-
-	UINT32              pbo;                    // pixel buffer object for this texture (DYNAMIC only!)
-	UINT32              *data;                  // pixels for the texture
-	int                 data_own;               // do we own / allocated it ?
-	GLfloat             texCoord[8];
-	GLuint              texCoordBufferName;
-
-};
-
-/* sdl_info is the information about SDL for the current screen */
-class sdl_info_ogl : public osd_renderer
-{
-public:
-	sdl_info_ogl(osd_window *window)
-	: osd_renderer(window, FLAG_NEEDS_OPENGL), m_blittimer(0),
-		m_width(0), m_height(0),
-		m_blit_dim(0, 0),
-		m_gl_context(NULL),
-		m_initialized(0),
-		m_last_blendmode(0),
-		m_texture_max_width(0),
-		m_texture_max_height(0),
-		m_texpoweroftwo(0),
-		m_usevbo(0), m_usepbo(0), m_usefbo(0), m_useglsl(0), m_glsl(NULL),
-		m_glsl_program_num(0),
-		m_glsl_program_mb2sc(0),
-		m_usetexturerect(0),
-		m_init_context(0),
-		m_last_hofs(0.0f),
-		m_last_vofs(0.0f),
-		m_surf_w(0),
-		m_surf_h(0)
-	{
-		for (int i=0; i < HASH_SIZE + OVERFLOW_SIZE; i++)
-			m_texhash[i] = NULL;
-		for (int i=0; i < 2*GLSL_SHADER_MAX; i++)
-			m_glsl_program[i] = 0;
-		for (int i=0; i < 8; i++)
-			m_texVerticex[i] = 0.0f;
-	}
-
-	virtual int create() override;
-	virtual int draw(const int update) override;
-
-#ifndef OSD_WINDOWS
-	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
-#endif
-	virtual void destroy() override;
-	virtual render_primitive_list *get_primitives() override
-	{
-#ifdef OSD_WINDOWS
-		osd_dim nd = window().get_size();
-#else
-		osd_dim nd = window().blit_surface_size();
-#endif
-		if (nd != m_blit_dim)
-		{
-			m_blit_dim = nd;
-			notify_changed();
-		}
-		window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().aspect());
-		return &window().target()->get_primitives();
-	}
-
-#ifdef OSD_WINDOWS
-	virtual void save() override { }
-	virtual void record() override { }
-	virtual void toggle_fsfx() override { }
-#endif
-
-private:
-	void destroy_all_textures();
-
-	void loadGLExtensions();
-	void initialize_gl();
-	void set_blendmode(int blendmode);
-	void texture_compute_type_subroutine(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags);
-	void texture_compute_size_subroutine(ogl_texture_info *texture, UINT32 flags,
-				UINT32 width, UINT32 height,
-				int* p_width, int* p_height, int* p_width_create, int* p_height_create);
-	void texture_compute_size_type(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags);
-	ogl_texture_info *texture_create(const render_texinfo *texsource, UINT32 flags);
-	int texture_shader_create(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags);
-	ogl_texture_info *texture_find(const render_primitive *prim);
-	void texture_coord_update(ogl_texture_info *texture, const render_primitive *prim, int shaderIdx);
-	void texture_mpass_flip(ogl_texture_info *texture, int shaderIdx);
-	void texture_shader_update(ogl_texture_info *texture, render_container *container,  int shaderIdx);
-	ogl_texture_info * texture_update(const render_primitive *prim, int shaderIdx);
-	void texture_disable(ogl_texture_info * texture);
-	void texture_all_disable();
-
-	INT32           m_blittimer;
-	int             m_width;
-	int             m_height;
-	osd_dim         m_blit_dim;
-
-	osd_gl_context  *m_gl_context;
-
-	int             m_initialized;        // is everything well initialized, i.e. all GL stuff etc.
-	// 3D info (GL mode only)
-	ogl_texture_info *  m_texhash[HASH_SIZE + OVERFLOW_SIZE];
-	int             m_last_blendmode;     // previous blendmode
-	INT32           m_texture_max_width;      // texture maximum width
-	INT32           m_texture_max_height;     // texture maximum height
-	int             m_texpoweroftwo;          // must textures be power-of-2 sized?
-	int             m_usevbo;         // runtime check if VBO is available
-	int             m_usepbo;         // runtime check if PBO is available
-	int             m_usefbo;         // runtime check if FBO is available
-	int             m_useglsl;        // runtime check if GLSL is available
-
-	glsl_shader_info *m_glsl;             // glsl_shader_info
-
-	GLhandleARB     m_glsl_program[2*GLSL_SHADER_MAX];  // GLSL programs, or 0
-	int             m_glsl_program_num;   // number of GLSL programs
-	int             m_glsl_program_mb2sc; // GLSL program idx, which transforms
-										// the mame-bitmap. screen-bitmap (size/rotation/..)
-										// All progs <= glsl_program_mb2sc using the mame bitmap
-										// as input, otherwise the screen bitmap.
-										// All progs >= glsl_program_mb2sc using the screen bitmap
-										// as output, otherwise the mame bitmap.
-	int             m_usetexturerect;     // use ARB_texture_rectangle for non-power-of-2, general use
-
-	int             m_init_context;       // initialize context before next draw
-
-	float           m_last_hofs;
-	float           m_last_vofs;
-
-	// Static vars from draogl_window_dra
-	INT32           m_surf_w;
-	INT32           m_surf_h;
-	GLfloat         m_texVerticex[8];
-};
-
 /* line_aa_step is used for drawing antialiased lines */
 struct line_aa_step
 {
@@ -655,14 +197,14 @@ static const line_aa_step line_aa_4step[] =
 //  INLINES
 //============================================================
 
-static inline HashT texture_compute_hash(const render_texinfo *texture, UINT32 flags)
+HashT renderer_ogl::texture_compute_hash(const render_texinfo *texture, UINT32 flags)
 {
 	HashT h = (HashT)texture->base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
 	//printf("hash %d\n", (int) h % HASH_SIZE);
 	return (h >> 8) % HASH_SIZE;
 }
 
-void sdl_info_ogl::set_blendmode(int blendmode)
+void renderer_ogl::set_blendmode(int blendmode)
 {
 	// try to minimize texture state changes
 	if (blendmode != m_last_blendmode)
@@ -691,45 +233,34 @@ void sdl_info_ogl::set_blendmode(int blendmode)
 }
 
 //============================================================
-//  PROTOTYPES
-//============================================================
-
-// core functions
-
-//============================================================
 //  STATIC VARIABLES
 //============================================================
 
-static void drawogl_exit(void);
-static void load_gl_lib(running_machine &machine);
-
-
-
 // OGL 1.3
 #ifdef GL_ARB_multitexture
-static PFNGLACTIVETEXTUREARBPROC pfn_glActiveTexture    = NULL;
+static PFNGLACTIVETEXTUREARBPROC pfn_glActiveTexture    = nullptr;
 #else
-static PFNGLACTIVETEXTUREPROC pfn_glActiveTexture   = NULL;
+static PFNGLACTIVETEXTUREPROC pfn_glActiveTexture   = nullptr;
 #endif
 
 // VBO
-static PFNGLGENBUFFERSPROC pfn_glGenBuffers     = NULL;
-static PFNGLDELETEBUFFERSPROC pfn_glDeleteBuffers   = NULL;
-static PFNGLBINDBUFFERPROC pfn_glBindBuffer     = NULL;
-static PFNGLBUFFERDATAPROC pfn_glBufferData     = NULL;
-static PFNGLBUFFERSUBDATAPROC pfn_glBufferSubData   = NULL;
+static PFNGLGENBUFFERSPROC pfn_glGenBuffers     = nullptr;
+static PFNGLDELETEBUFFERSPROC pfn_glDeleteBuffers   = nullptr;
+static PFNGLBINDBUFFERPROC pfn_glBindBuffer     = nullptr;
+static PFNGLBUFFERDATAPROC pfn_glBufferData     = nullptr;
+static PFNGLBUFFERSUBDATAPROC pfn_glBufferSubData   = nullptr;
 
 // PBO
-static PFNGLMAPBUFFERPROC     pfn_glMapBuffer       = NULL;
-static PFNGLUNMAPBUFFERPROC   pfn_glUnmapBuffer     = NULL;
+static PFNGLMAPBUFFERPROC     pfn_glMapBuffer       = nullptr;
+static PFNGLUNMAPBUFFERPROC   pfn_glUnmapBuffer     = nullptr;
 
 // FBO
-static PFNGLISFRAMEBUFFEREXTPROC   pfn_glIsFramebuffer          = NULL;
-static PFNGLBINDFRAMEBUFFEREXTPROC pfn_glBindFramebuffer        = NULL;
-static PFNGLDELETEFRAMEBUFFERSEXTPROC pfn_glDeleteFramebuffers      = NULL;
-static PFNGLGENFRAMEBUFFERSEXTPROC pfn_glGenFramebuffers        = NULL;
-static PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC pfn_glCheckFramebufferStatus  = NULL;
-static PFNGLFRAMEBUFFERTEXTURE2DEXTPROC pfn_glFramebufferTexture2D  = NULL;
+static PFNGLISFRAMEBUFFEREXTPROC   pfn_glIsFramebuffer          = nullptr;
+static PFNGLBINDFRAMEBUFFEREXTPROC pfn_glBindFramebuffer        = nullptr;
+static PFNGLDELETEFRAMEBUFFERSEXTPROC pfn_glDeleteFramebuffers      = nullptr;
+static PFNGLGENFRAMEBUFFERSEXTPROC pfn_glGenFramebuffers        = nullptr;
+static PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC pfn_glCheckFramebufferStatus  = nullptr;
+static PFNGLFRAMEBUFFERTEXTURE2DEXTPROC pfn_glFramebufferTexture2D  = nullptr;
 
 static int glsl_shader_feature = GLSL_SHADER_FEAT_PLAIN;
 
@@ -743,36 +274,52 @@ static void texture_set_data(ogl_texture_info *texture, const render_texinfo *te
 //  Static Variables
 //============================================================
 
-static int shown_video_info = 0;
-static int dll_loaded = 0;
+bool renderer_ogl::s_shown_video_info = false;
+bool renderer_ogl::s_dll_loaded = false;
 
-//============================================================
-//  drawsdl_init
-//============================================================
-
-static osd_renderer *drawogl_create(osd_window *window)
+void renderer_ogl::init(running_machine &machine)
 {
-	return global_alloc(sdl_info_ogl(window));
-}
-
-int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks)
-{
-	// fill in the callbacks
-	callbacks->exit = drawogl_exit;
-	callbacks->create = drawogl_create;
-
-	dll_loaded = 0;
+	s_dll_loaded = false;
 
 	load_gl_lib(machine);
 #if defined(OSD_WINDOWS)
 	osd_printf_verbose("Using Windows OpenGL driver\n");
-#elif SDLMAME_SDL2
-	osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
 #else
-	osd_printf_verbose("Using SDL single-window OpenGL driver (SDL 1.2)\n");
+	osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
 #endif
+}
 
-	return 0;
+//============================================================
+// CONSTRUCTOR & DESTRUCTOR
+//============================================================
+
+renderer_ogl::~renderer_ogl()
+{
+	// free the memory in the window
+	destroy_all_textures();
+
+	global_free(m_gl_context);
+	m_gl_context = nullptr;
+}
+
+void renderer_ogl::exit()
+{
+	for (int i = 0; i < video_config.glsl_shader_mamebm_num; i++)
+	{
+		if (nullptr != video_config.glsl_shader_mamebm[i])
+		{
+			free(video_config.glsl_shader_mamebm[i]);
+			video_config.glsl_shader_mamebm[i] = nullptr;
+		}
+	}
+	for (int i =0; i < video_config.glsl_shader_scrn_num; i++)
+	{
+		if (nullptr != video_config.glsl_shader_scrn[i])
+		{
+			free(video_config.glsl_shader_scrn[i]);
+			video_config.glsl_shader_scrn[i] = nullptr;
+		}
+	}
 }
 
 //============================================================
@@ -813,9 +360,13 @@ static void loadgl_functions(osd_gl_context *context)
 osd_gl_dispatch *gl_dispatch;
 #endif
 
-static void load_gl_lib(running_machine &machine)
+#ifdef OSD_WINDOWS
+HMODULE win_gl_context::m_module;
+#endif
+
+void renderer_ogl::load_gl_lib(running_machine &machine)
 {
-	if (!dll_loaded)
+	if (!s_dll_loaded)
 	{
 #ifdef OSD_WINDOWS
 		win_gl_context::load_library();
@@ -828,10 +379,10 @@ static void load_gl_lib(running_machine &machine)
 		const char *stemp;
 
 		stemp = downcast<sdl_options &>(machine.options()).gl_lib();
-		if (stemp != NULL && strcmp(stemp, OSDOPTVAL_AUTO) == 0)
-			stemp = NULL;
+		if (stemp != nullptr && strcmp(stemp, OSDOPTVAL_AUTO) == 0)
+			stemp = nullptrnullptr;
 
-		if (SDL_GL_LoadLibrary(stemp) != 0) // Load library (default for e==NULL
+		if (SDL_GL_LoadLibrary(stemp) != 0) // Load library (default for e==nullptr
 		{
 			fatalerror("Unable to load opengl library: %s\n", stemp ? stemp : "<default>");
 		}
@@ -842,11 +393,11 @@ static void load_gl_lib(running_machine &machine)
 #ifdef USE_DISPATCH_GL
 		gl_dispatch = (osd_gl_dispatch *) osd_malloc(sizeof(osd_gl_dispatch));
 #endif
-		dll_loaded=1;
+		s_dll_loaded = true;
 	}
 }
 
-void sdl_info_ogl::initialize_gl()
+void renderer_ogl::initialize_gl()
 {
 	int has_and_allow_texturerect = 0;
 
@@ -859,7 +410,7 @@ void sdl_info_ogl::initialize_gl()
 		extstr = (char *)"";
 #endif
 	// print out the driver info for debugging
-	if (!shown_video_info)
+	if (!s_shown_video_info)
 	{
 		osd_printf_verbose("OpenGL: %s\nOpenGL: %s\nOpenGL: %s\n", vendor, (char *)glGetString(GL_RENDERER), (char *)glGetString(GL_VERSION));
 	}
@@ -871,21 +422,19 @@ void sdl_info_ogl::initialize_gl()
 	m_usefbo = 0;
 	m_useglsl = 0;
 
-	if ( video_config.allowtexturerect &&
-			( strstr(extstr, "GL_ARB_texture_rectangle") ||  strstr(extstr, "GL_EXT_texture_rectangle") )
-		)
+	if (video_config.allowtexturerect && (strstr(extstr, "GL_ARB_texture_rectangle") ||  strstr(extstr, "GL_EXT_texture_rectangle")))
 	{
 		has_and_allow_texturerect = 1;
-					if (!shown_video_info)
-					{
-							osd_printf_verbose("OpenGL: texture rectangle supported\n");
-					}
+		if (!s_shown_video_info)
+		{
+			osd_printf_verbose("OpenGL: texture rectangle supported\n");
+		}
 	}
 
 	// does this card support non-power-of-two sized textures?  (they're faster, so use them if possible)
 	if ( !video_config.forcepow2texture && strstr(extstr, "GL_ARB_texture_non_power_of_two"))
 	{
-		if (!shown_video_info)
+		if (!s_shown_video_info)
 		{
 			osd_printf_verbose("OpenGL: non-power-of-2 textures supported (new method)\n");
 		}
@@ -896,7 +445,7 @@ void sdl_info_ogl::initialize_gl()
 		// second chance: GL_ARB_texture_rectangle or GL_EXT_texture_rectangle (old version)
 		if (has_and_allow_texturerect)
 		{
-			if (!shown_video_info)
+			if (!s_shown_video_info)
 			{
 				osd_printf_verbose("OpenGL: non-power-of-2 textures supported (old method)\n");
 			}
@@ -904,7 +453,7 @@ void sdl_info_ogl::initialize_gl()
 		}
 		else
 		{
-			if (!shown_video_info)
+			if (!s_shown_video_info)
 			{
 				osd_printf_verbose("OpenGL: forcing power-of-2 textures (creation, not copy)\n");
 			}
@@ -913,8 +462,8 @@ void sdl_info_ogl::initialize_gl()
 
 	if (strstr(extstr, "GL_ARB_vertex_buffer_object"))
 	{
-					m_usevbo = video_config.vbo;
-		if (!shown_video_info)
+		m_usevbo = video_config.vbo;
+		if (!s_shown_video_info)
 		{
 			if(m_usevbo)
 				osd_printf_verbose("OpenGL: vertex buffer supported\n");
@@ -928,15 +477,17 @@ void sdl_info_ogl::initialize_gl()
 		if( m_usevbo )
 		{
 			m_usepbo = video_config.pbo;
-			if (!shown_video_info)
+			if (!s_shown_video_info)
 			{
 				if(m_usepbo)
 					osd_printf_verbose("OpenGL: pixel buffers supported\n");
 				else
 					osd_printf_verbose("OpenGL: pixel buffers supported, but disabled\n");
 			}
-		} else {
-			if (!shown_video_info)
+		}
+		else
+		{
+			if (!s_shown_video_info)
 			{
 				osd_printf_verbose("OpenGL: pixel buffers supported, but disabled due to disabled vbo\n");
 			}
@@ -944,7 +495,7 @@ void sdl_info_ogl::initialize_gl()
 	}
 	else
 	{
-		if (!shown_video_info)
+		if (!s_shown_video_info)
 		{
 			osd_printf_verbose("OpenGL: pixel buffers not supported\n");
 		}
@@ -953,7 +504,7 @@ void sdl_info_ogl::initialize_gl()
 	if (strstr(extstr, "GL_EXT_framebuffer_object"))
 	{
 		m_usefbo = 1;
-		if (!shown_video_info)
+		if (!s_shown_video_info)
 		{
 			if(m_usefbo)
 				osd_printf_verbose("OpenGL: framebuffer object supported\n");
@@ -969,22 +520,24 @@ void sdl_info_ogl::initialize_gl()
 		)
 	{
 		m_useglsl = video_config.glsl;
-		if (!shown_video_info)
+		if (!s_shown_video_info)
 		{
 			if(m_useglsl)
 				osd_printf_verbose("OpenGL: GLSL supported\n");
 			else
 				osd_printf_verbose("OpenGL: GLSL supported, but disabled\n");
 		}
-	} else {
-		if (!shown_video_info)
+	}
+	else
+	{
+		if (!s_shown_video_info)
 		{
 			osd_printf_verbose("OpenGL: GLSL not supported\n");
 		}
 	}
 
 #ifdef TOBEMIGRATED
-	if (osd_getenv(SDLENV_VMWARE) != NULL)
+	if (osd_getenv(SDLENV_VMWARE) != nullptr)
 	{
 		m_usetexturerect = 1;
 		m_texpoweroftwo = 1;
@@ -992,55 +545,29 @@ void sdl_info_ogl::initialize_gl()
 #endif
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint *)&m_texture_max_width);
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint *)&m_texture_max_height);
-	if (!shown_video_info)
+	if (!s_shown_video_info)
 	{
 		osd_printf_verbose("OpenGL: max texture size %d x %d\n", m_texture_max_width, m_texture_max_height);
 	}
 
-	shown_video_info = 1;
+	s_shown_video_info = true;
 
 }
 //============================================================
 //  sdl_info::create
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
-// a
 //============================================================
 
-int sdl_info_ogl::create()
+int renderer_ogl::create()
 {
+	auto win = assert_window();
+
 	// create renderer
 #if defined(OSD_WINDOWS)
-	m_gl_context = global_alloc(win_gl_context(window().m_hwnd));
-#elif SDLMAME_SDL2
-	m_gl_context = global_alloc(sdl_gl_context(window().sdl_window()));
+	m_gl_context = global_alloc(win_gl_context(win->platform_window<HWND>()));
 #else
-	m_gl_context = global_alloc(sdl12_gl_context(window().sdl_surface()));
+	m_gl_context = global_alloc(sdl_gl_context(win->platform_window<SDL_Window*>()));
 #endif
-	if  (m_gl_context->LastErrorMsg() != NULL)
+	if  (m_gl_context->LastErrorMsg() != nullptr)
 	{
 		osd_printf_error("%s\n", m_gl_context->LastErrorMsg());
 		return 1;
@@ -1068,23 +595,8 @@ int sdl_info_ogl::create()
 
 	m_init_context = 0;
 
-	osd_printf_verbose("Leave sdl_info_ogl::create\n");
+	osd_printf_verbose("Leave renderer_ogl::create\n");
 	return 0;
-}
-
-
-//============================================================
-//  sdl_info::destroy
-//============================================================
-
-void sdl_info_ogl::destroy()
-{
-	// free the memory in the window
-
-	destroy_all_textures();
-
-	global_free(m_gl_context);
-	m_gl_context = NULL;
 }
 
 
@@ -1092,7 +604,7 @@ void sdl_info_ogl::destroy()
 //  drawsdl_xy_to_render_target
 //============================================================
 #ifndef OSD_WINDOWS
-int sdl_info_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
+int renderer_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
@@ -1103,25 +615,33 @@ int sdl_info_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 	return 1;
 }
 #endif
+
 //============================================================
-//  drawsdl_destroy_all_textures
+//  renderer_ogl::destroy_all_textures
 //============================================================
 
-void sdl_info_ogl::destroy_all_textures()
+void renderer_ogl::destroy_all_textures()
 {
-	ogl_texture_info *texture = NULL;
+	ogl_texture_info *texture = nullptr;
 	int lock=FALSE;
 	int i;
 
 	if ( !m_initialized )
 		return;
 
+	auto win = try_getwindow();
+
+	// During destroy this can get called
+	// and the window is no longer available
+	if (win == nullptr)
+		return;
+
 	m_gl_context->MakeCurrent();
 
-	if(window().m_primlist)
+	if(win->m_primlist)
 	{
 		lock=TRUE;
-		window().m_primlist->acquire_lock();
+		win->m_primlist->acquire_lock();
 	}
 
 	glFinish();
@@ -1134,8 +654,8 @@ void sdl_info_ogl::destroy_all_textures()
 	while (i<HASH_SIZE+OVERFLOW_SIZE)
 	{
 		texture = m_texhash[i];
-		m_texhash[i] = NULL;
-		if (texture != NULL)
+		m_texhash[i] = nullptr;
+		if (texture != nullptr)
 		{
 			if(m_usevbo)
 			{
@@ -1167,7 +687,7 @@ void sdl_info_ogl::destroy_all_textures()
 			if ( texture->data_own )
 			{
 				free(texture->data);
-				texture->data=NULL;
+				texture->data=nullptr;
 				texture->data_own=FALSE;
 			}
 			global_free(texture);
@@ -1177,19 +697,19 @@ void sdl_info_ogl::destroy_all_textures()
 	if ( m_useglsl )
 	{
 		glsl_shader_free(m_glsl);
-		m_glsl = NULL;
+		m_glsl = nullptr;
 	}
 
 	m_initialized = 0;
 
 	if (lock)
-		window().m_primlist->release_lock();
+		win->m_primlist->release_lock();
 }
 //============================================================
 //  loadGLExtensions
 //============================================================
 
-void sdl_info_ogl::loadGLExtensions()
+void renderer_ogl::loadGLExtensions()
 {
 	static int _once = 1;
 
@@ -1390,7 +910,7 @@ void sdl_info_ogl::loadGLExtensions()
 	if ( m_useglsl )
 	{
 		m_glsl = glsl_shader_init(m_gl_context);
-		m_useglsl = (m_glsl != NULL ? 1 : 0);
+		m_useglsl = (m_glsl != nullptr ? 1 : 0);
 
 		if ( ! m_useglsl )
 		{
@@ -1403,7 +923,7 @@ void sdl_info_ogl::loadGLExtensions()
 
 	if ( m_useglsl )
 	{
-		if ( window().prescale() != 1 )
+		if (assert_window()->prescale() != 1 )
 		{
 			m_useglsl = 0;
 			if (_once)
@@ -1499,10 +1019,9 @@ void sdl_info_ogl::loadGLExtensions()
 //  sdl_info::draw
 //============================================================
 
-int sdl_info_ogl::draw(const int update)
+int renderer_ogl::draw(const int update)
 {
-	render_primitive *prim;
-	ogl_texture_info *texture=NULL;
+	ogl_texture_info *texture=nullptr;
 	float vofs, hofs;
 	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
 
@@ -1513,7 +1032,9 @@ int sdl_info_ogl::draw(const int update)
 	}
 #endif
 
-	osd_dim wdim = window().get_size();
+	auto win = assert_window();
+
+	osd_dim wdim = win->get_size();
 
 	if (has_flags(FI_CHANGED) || (wdim.width() != m_width) || (wdim.height() != m_height))
 	{
@@ -1530,11 +1051,9 @@ int sdl_info_ogl::draw(const int update)
 	if (m_init_context)
 	{
 		// do some one-time OpenGL setup
-#if SDLMAME_SDL2
 		// FIXME: SRGB conversion is working on SDL2, may be of use
 		// when we eventually target gamma and monitor profiles.
 		//glEnable(GL_FRAMEBUFFER_SRGB);
-#endif
 		glShadeModel(GL_SMOOTH);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClearDepth(1.0f);
@@ -1560,18 +1079,13 @@ int sdl_info_ogl::draw(const int update)
 			loadGLExtensions();
 		}
 
-#if !defined(OSD_WINDOWS) && !SDLMAME_SDL2
-		// force all textures to be regenerated
-		destroy_all_textures();
-#endif
-
 		m_surf_w = m_width;
 		m_surf_h = m_height;
 
 		// we're doing nothing 3d, so the Z-buffer is currently not interesting
 		glDisable(GL_DEPTH_TEST);
 
-		if (window().machine().options().antialias())
+		if (win->machine().options().antialias())
 		{
 			// enable antialiasing for lines
 			glEnable(GL_LINE_SMOOTH);
@@ -1651,14 +1165,14 @@ int sdl_info_ogl::draw(const int update)
 	m_last_hofs = hofs;
 	m_last_vofs = vofs;
 
-	window().m_primlist->acquire_lock();
+	win->m_primlist->acquire_lock();
 
 	// now draw
-	for (prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
+	for (render_primitive &prim : *win->m_primlist)
 	{
 		int i;
 
-		switch (prim->type)
+		switch (prim.type)
 		{
 			/**
 			 * Try to stay in one Begin/End block as long as possible,
@@ -1667,7 +1181,7 @@ int sdl_info_ogl::draw(const int update)
 			case render_primitive::LINE:
 				#if !USE_WIN32_STYLE_LINES
 				// check if it's really a point
-				if (((prim->bounds.x1 - prim->bounds.x0) == 0) && ((prim->bounds.y1 - prim->bounds.y0) == 0))
+				if (((prim.bounds.x1 - prim.bounds.x0) == 0) && ((prim.bounds.y1 - prim.bounds.y0) == 0))
 				{
 					curPrimitive=GL_POINTS;
 				} else {
@@ -1682,10 +1196,10 @@ int sdl_info_ogl::draw(const int update)
 
 						if ( pendingPrimitive==GL_NO_PRIMITIVE )
 				{
-							set_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags));
+							set_blendmode(PRIMFLAG_GET_BLENDMODE(prim.flags));
 				}
 
-				glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+				glColor4f(prim.color.r, prim.color.g, prim.color.b, prim.color.a);
 
 				if(pendingPrimitive!=curPrimitive)
 				{
@@ -1696,12 +1210,12 @@ int sdl_info_ogl::draw(const int update)
 				// check if it's really a point
 				if (curPrimitive==GL_POINTS)
 				{
-					glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
+					glVertex2f(prim.bounds.x0+hofs, prim.bounds.y0+vofs);
 				}
 				else
 				{
-					glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
-					glVertex2f(prim->bounds.x1+hofs, prim->bounds.y1+vofs);
+					glVertex2f(prim.bounds.x0+hofs, prim.bounds.y0+vofs);
+					glVertex2f(prim.bounds.x1+hofs, prim.bounds.y1+vofs);
 				}
 				#else
 				{
@@ -1717,15 +1231,15 @@ int sdl_info_ogl::draw(const int update)
 						pendingPrimitive=GL_NO_PRIMITIVE;
 					}
 
-					set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags));
+					set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim.flags));
 
 					// compute the effective width based on the direction of the line
-					effwidth = prim->width();
+					effwidth = prim.width();
 					if (effwidth < 0.5f)
 						effwidth = 0.5f;
 
 					// determine the bounds of a quad to draw this line
-					render_line_to_quad(&prim->bounds, effwidth, &b0, &b1);
+					render_line_to_quad(&prim.bounds, effwidth, 0.0f, &b0, &b1);
 
 					// fix window position
 					b0.x0 += hofs;
@@ -1738,7 +1252,7 @@ int sdl_info_ogl::draw(const int update)
 					b1.y1 += vofs;
 
 					// iterate over AA steps
-					for (step = PRIMFLAG_GET_ANTIALIAS(prim->flags) ? line_aa_4step : line_aa_1step; step->weight != 0; step++)
+					for (step = PRIMFLAG_GET_ANTIALIAS(prim.flags) ? line_aa_4step : line_aa_1step; step->weight != 0; step++)
 					{
 						glBegin(GL_TRIANGLE_STRIP);
 
@@ -1755,22 +1269,22 @@ int sdl_info_ogl::draw(const int update)
 						glVertex2f(b1.x1 + step->xoffs, b1.y1 + step->yoffs);
 
 						// determine the color of the line
-						r = (prim->color.r * step->weight);
-						g = (prim->color.g * step->weight);
-						b = (prim->color.b * step->weight);
-						a = (prim->color.a * 255.0f);
+						r = (prim.color.r * step->weight);
+						g = (prim.color.g * step->weight);
+						b = (prim.color.b * step->weight);
+						a = (prim.color.a * 255.0f);
 						if (r > 1.0) r = 1.0;
 						if (g > 1.0) g = 1.0;
 						if (b > 1.0) b = 1.0;
 						if (a > 1.0) a = 1.0;
 						glColor4f(r, g, b, a);
 
-//                      texture = texture_update(window, prim, 0);
+//                      texture = texture_update(window, &prim, 0);
 //                      if (texture) printf("line has texture!\n");
 
 						// if we have a texture to use for the vectors, use it here
 						#if 0
-						if (d3d->vector_texture != NULL)
+						if (d3d->vector_texture != nullptr)
 						{
 							printf("SDL: textured lines unsupported\n");
 							vertex[0].u0 = d3d->vector_texture->ustart;
@@ -1800,11 +1314,11 @@ int sdl_info_ogl::draw(const int update)
 					pendingPrimitive=GL_NO_PRIMITIVE;
 				}
 
-				glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+				glColor4f(prim.color.r, prim.color.g, prim.color.b, prim.color.a);
 
-				set_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags));
+				set_blendmode(PRIMFLAG_GET_BLENDMODE(prim.flags));
 
-				texture = texture_update(prim, 0);
+				texture = texture_update(&prim, 0);
 
 				if ( texture && texture->type==TEXTURE_TYPE_SHADER )
 				{
@@ -1813,14 +1327,14 @@ int sdl_info_ogl::draw(const int update)
 						if ( i==m_glsl_program_mb2sc )
 						{
 							// i==glsl_program_mb2sc -> transformation mamebm->scrn
-							m_texVerticex[0]=prim->bounds.x0 + hofs;
-							m_texVerticex[1]=prim->bounds.y0 + vofs;
-							m_texVerticex[2]=prim->bounds.x1 + hofs;
-							m_texVerticex[3]=prim->bounds.y0 + vofs;
-							m_texVerticex[4]=prim->bounds.x1 + hofs;
-							m_texVerticex[5]=prim->bounds.y1 + vofs;
-							m_texVerticex[6]=prim->bounds.x0 + hofs;
-							m_texVerticex[7]=prim->bounds.y1 + vofs;
+							m_texVerticex[0]=prim.bounds.x0 + hofs;
+							m_texVerticex[1]=prim.bounds.y0 + vofs;
+							m_texVerticex[2]=prim.bounds.x1 + hofs;
+							m_texVerticex[3]=prim.bounds.y0 + vofs;
+							m_texVerticex[4]=prim.bounds.x1 + hofs;
+							m_texVerticex[5]=prim.bounds.y1 + vofs;
+							m_texVerticex[6]=prim.bounds.x0 + hofs;
+							m_texVerticex[7]=prim.bounds.y1 + vofs;
 						} else {
 							// 1:1 tex coord CCW (0/0) (1/0) (1/1) (0/1) on texture dimensions
 							m_texVerticex[0]=(GLfloat)0.0;
@@ -1835,19 +1349,19 @@ int sdl_info_ogl::draw(const int update)
 
 						if(i>0) // first fetch already done
 						{
-							texture = texture_update(prim, i);
+							texture = texture_update(&prim, i);
 						}
 						glDrawArrays(GL_QUADS, 0, 4);
 					}
 				} else {
-					m_texVerticex[0]=prim->bounds.x0 + hofs;
-					m_texVerticex[1]=prim->bounds.y0 + vofs;
-					m_texVerticex[2]=prim->bounds.x1 + hofs;
-					m_texVerticex[3]=prim->bounds.y0 + vofs;
-					m_texVerticex[4]=prim->bounds.x1 + hofs;
-					m_texVerticex[5]=prim->bounds.y1 + vofs;
-					m_texVerticex[6]=prim->bounds.x0 + hofs;
-					m_texVerticex[7]=prim->bounds.y1 + vofs;
+					m_texVerticex[0]=prim.bounds.x0 + hofs;
+					m_texVerticex[1]=prim.bounds.y0 + vofs;
+					m_texVerticex[2]=prim.bounds.x1 + hofs;
+					m_texVerticex[3]=prim.bounds.y0 + vofs;
+					m_texVerticex[4]=prim.bounds.x1 + hofs;
+					m_texVerticex[5]=prim.bounds.y1 + vofs;
+					m_texVerticex[6]=prim.bounds.x0 + hofs;
+					m_texVerticex[7]=prim.bounds.y1 + vofs;
 
 					glDrawArrays(GL_QUADS, 0, 4);
 				}
@@ -1855,7 +1369,7 @@ int sdl_info_ogl::draw(const int update)
 				if ( texture )
 				{
 					texture_disable(texture);
-					texture=NULL;
+					texture=nullptr;
 				}
 				break;
 
@@ -1870,7 +1384,7 @@ int sdl_info_ogl::draw(const int update)
 		pendingPrimitive=GL_NO_PRIMITIVE;
 	}
 
-	window().m_primlist->release_lock();
+	win->m_primlist->release_lock();
 	m_init_context = 0;
 
 	m_gl_context->SwapBuffer();
@@ -1913,32 +1427,6 @@ static const GLint texture_copy_properties[9][2] = {
 };
 
 //============================================================
-//  drawogl_exit
-//============================================================
-
-static void drawogl_exit(void)
-{
-	int i;
-
-	for(i=0; i<video_config.glsl_shader_mamebm_num; i++)
-	{
-		if ( NULL!=video_config.glsl_shader_mamebm[i])
-		{
-			free(video_config.glsl_shader_mamebm[i]);
-			video_config.glsl_shader_mamebm[i] = NULL;
-		}
-	}
-	for(i=0; i<video_config.glsl_shader_scrn_num; i++)
-	{
-		if ( NULL!=video_config.glsl_shader_scrn[i])
-		{
-			free(video_config.glsl_shader_scrn[i]);
-			video_config.glsl_shader_scrn[i] = NULL;
-		}
-	}
-}
-
-//============================================================
 //  texture_compute_size and type
 //============================================================
 
@@ -1949,7 +1437,7 @@ static void drawogl_exit(void)
 // we also don't want to use PBO's in the case of nocopy==TRUE,
 // since we now might have GLSL shaders - this decision simplifies out life ;-)
 //
-void sdl_info_ogl::texture_compute_type_subroutine(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags)
+void renderer_ogl::texture_compute_type_subroutine(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags)
 {
 	texture->type = TEXTURE_TYPE_NONE;
 	texture->nocopy = FALSE;
@@ -2003,7 +1491,7 @@ static inline int get_valid_pow2_value(int v, int needPow2)
 	return (needPow2)?gl_round_to_pow2(v):v;
 }
 
-void sdl_info_ogl::texture_compute_size_subroutine(ogl_texture_info *texture, UINT32 flags,
+void renderer_ogl::texture_compute_size_subroutine(ogl_texture_info *texture, UINT32 flags,
 											UINT32 width, UINT32 height,
 											int* p_width, int* p_height, int* p_width_create, int* p_height_create)
 {
@@ -2031,8 +1519,10 @@ void sdl_info_ogl::texture_compute_size_subroutine(ogl_texture_info *texture, UI
 		texture->xprescale--;
 	while (texture->yprescale > 1 && height_create * texture->yprescale > m_texture_max_height)
 		texture->yprescale--;
-	if (PRIMFLAG_GET_SCREENTEX(flags) && (texture->xprescale != window().prescale() || texture->yprescale != window().prescale()))
-		osd_printf_warning("SDL: adjusting prescale from %dx%d to %dx%d\n", window().prescale(), window().prescale(), texture->xprescale, texture->yprescale);
+
+	auto win = assert_window();
+	if (PRIMFLAG_GET_SCREENTEX(flags) && (texture->xprescale != win->prescale() || texture->yprescale != win->prescale()))
+		osd_printf_warning("SDL: adjusting prescale from %dx%d to %dx%d\n", win->prescale(), win->prescale(), texture->xprescale, texture->yprescale);
 
 	width  *= texture->xprescale;
 	height *= texture->yprescale;
@@ -2054,7 +1544,7 @@ void sdl_info_ogl::texture_compute_size_subroutine(ogl_texture_info *texture, UI
 		*p_height_create=height_create;
 }
 
-void sdl_info_ogl::texture_compute_size_type(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags)
+void renderer_ogl::texture_compute_size_type(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags)
 {
 	int finalheight, finalwidth;
 	int finalheight_create, finalwidth_create;
@@ -2186,7 +1676,7 @@ static int texture_fbo_create(UINT32 text_unit, UINT32 text_name, UINT32 fbo_nam
 		}
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height,
-				0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, NULL );
+				0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, nullptr );
 	}
 	// non-screen textures will never be filtered
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -2207,7 +1697,7 @@ static int texture_fbo_create(UINT32 text_unit, UINT32 text_name, UINT32 fbo_nam
 	return 0;
 }
 
-int sdl_info_ogl::texture_shader_create(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags)
+int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags)
 {
 	int uniform_location;
 	int i;
@@ -2326,7 +1816,7 @@ int sdl_info_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->rawwidth_create);
 
-	UINT32 * dummy = NULL;
+	UINT32 * dummy = nullptr;
 	GLint _width, _height;
 	if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8,
 					texture->rawwidth_create, texture->rawheight_create,
@@ -2380,7 +1870,7 @@ int sdl_info_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 	return 0;
 }
 
-ogl_texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, UINT32 flags)
+ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, UINT32 flags)
 {
 	ogl_texture_info *texture;
 
@@ -2394,8 +1884,9 @@ ogl_texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, 
 	texture->texinfo.seqid = -1; // force set data
 	if (PRIMFLAG_GET_SCREENTEX(flags))
 	{
-		texture->xprescale = window().prescale();
-		texture->yprescale = window().prescale();
+		auto win = assert_window();
+		texture->xprescale = win->prescale();
+		texture->yprescale = win->prescale();
 	}
 	else
 	{
@@ -2423,7 +1914,7 @@ ogl_texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, 
 			texture->format = SDL_TEXFORMAT_ARGB32;
 			break;
 		case TEXFORMAT_RGB32:
-			if (texsource->palette != NULL)
+			if (texsource->palette != nullptr)
 				texture->format = SDL_TEXFORMAT_RGB32_PALETTED;
 			else
 				texture->format = SDL_TEXFORMAT_RGB32;
@@ -2435,7 +1926,7 @@ ogl_texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, 
 			texture->format = SDL_TEXFORMAT_PALETTE16A;
 			break;
 		case TEXFORMAT_YUY16:
-			if (texsource->palette != NULL)
+			if (texsource->palette != nullptr)
 				texture->format = SDL_TEXFORMAT_YUY16_PALETTED;
 			else
 				texture->format = SDL_TEXFORMAT_YUY16;
@@ -2460,7 +1951,7 @@ ogl_texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, 
 		if ( texture_shader_create(texsource, texture, flags) )
 		{
 			global_free(texture);
-			return NULL;
+			return nullptr;
 		}
 	}
 	else
@@ -2477,7 +1968,7 @@ ogl_texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, 
 		glTexImage2D(texture->texTarget, 0, GL_RGBA8,
 				texture->rawwidth_create, texture->rawheight_create,
 				texture->borderpix ? 1 : 0,
-				GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, NULL);
+				GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, nullptr);
 
 		if ((PRIMFLAG_GET_SCREENTEX(flags)) && video_config.filter)
 		{
@@ -2524,7 +2015,7 @@ ogl_texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, 
 		// set up the PBO dimension, ..
 		pfn_glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB,
 							texture->rawwidth * texture->rawheight * sizeof(UINT32),
-					NULL, GL_STREAM_DRAW);
+					nullptr, GL_STREAM_DRAW);
 	}
 
 	if ( !texture->nocopy && texture->type!=TEXTURE_TYPE_DYNAMIC )
@@ -2534,13 +2025,13 @@ ogl_texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, 
 	}
 
 	// add us to the texture list
-	if (m_texhash[texture->hash] == NULL)
+	if (m_texhash[texture->hash] == nullptr)
 		m_texhash[texture->hash] = texture;
 	else
 	{
 		int i;
 		for (i = HASH_SIZE; i < HASH_SIZE + OVERFLOW_SIZE; i++)
-			if (m_texhash[i] == NULL)
+			if (m_texhash[i] == nullptr)
 			{
 				m_texhash[i] = texture;
 				break;
@@ -2555,7 +2046,7 @@ ogl_texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, 
 		pfn_glBindBuffer( GL_ARRAY_BUFFER_ARB, texture->texCoordBufferName );
 		// Load The Data
 		pfn_glBufferData( GL_ARRAY_BUFFER_ARB, 4*2*sizeof(GLfloat), texture->texCoord, GL_STREAM_DRAW );
-		glTexCoordPointer( 2, GL_FLOAT, 0, (char *) NULL ); // we are using ARB VBO buffers
+		glTexCoordPointer( 2, GL_FLOAT, 0, (char *) nullptr ); // we are using ARB VBO buffers
 	}
 	else
 	{
@@ -2622,7 +2113,7 @@ static inline void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, con
 	assert(xborderpix == 0 || xborderpix == 1);
 
 	// palette (really RGB map) case
-	if (palette != NULL)
+	if (palette != nullptr)
 	{
 		if (xborderpix)
 		{
@@ -2674,7 +2165,7 @@ static inline void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, co
 	assert(xborderpix == 0 || xborderpix == 1);
 
 	// palette (really RGB map) case
-	if (palette != NULL)
+	if (palette != nullptr)
 	{
 		if (xborderpix)
 		{
@@ -2763,7 +2254,7 @@ static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int wi
 	assert(width % 2 == 0);
 
 	// palette (really RGB map) case
-	if (palette != NULL)
+	if (palette != nullptr)
 	{
 		if (xborderpix)
 		{
@@ -2936,7 +2427,7 @@ static void texture_set_data(ogl_texture_info *texture, const render_texinfo *te
 
 		// kick off the DMA
 		glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight,
-					GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, NULL);
+					GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, nullptr);
 	}
 	else
 	{
@@ -2971,13 +2462,13 @@ static int compare_texture_primitive(const ogl_texture_info *texture, const rend
 		return 0;
 }
 
-ogl_texture_info *sdl_info_ogl::texture_find(const render_primitive *prim)
+ogl_texture_info *renderer_ogl::texture_find(const render_primitive *prim)
 {
 	HashT texhash = texture_compute_hash(&prim->texture, prim->flags);
 	ogl_texture_info *texture;
 
 	texture = m_texhash[texhash];
-	if (texture != NULL)
+	if (texture != nullptr)
 	{
 		int i;
 		if (compare_texture_primitive(texture, prim))
@@ -2985,18 +2476,18 @@ ogl_texture_info *sdl_info_ogl::texture_find(const render_primitive *prim)
 		for (i=HASH_SIZE; i<HASH_SIZE + OVERFLOW_SIZE; i++)
 		{
 			texture = m_texhash[i];
-			if (texture != NULL && compare_texture_primitive(texture, prim))
+			if (texture != nullptr && compare_texture_primitive(texture, prim))
 				return texture;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 //============================================================
 //  texture_update
 //============================================================
 
-void sdl_info_ogl::texture_coord_update(ogl_texture_info *texture, const render_primitive *prim, int shaderIdx)
+void renderer_ogl::texture_coord_update(ogl_texture_info *texture, const render_primitive *prim, int shaderIdx)
 {
 	float ustart = 0.0f, ustop = 0.0f;            // beginning/ending U coordinates
 	float vstart = 0.0f, vstop = 0.0f;            // beginning/ending V coordinates
@@ -3073,7 +2564,7 @@ void sdl_info_ogl::texture_coord_update(ogl_texture_info *texture, const render_
 	}
 }
 
-void sdl_info_ogl::texture_mpass_flip(ogl_texture_info *texture, int shaderIdx)
+void renderer_ogl::texture_mpass_flip(ogl_texture_info *texture, int shaderIdx)
 {
 	UINT32 mpass_src_idx = texture->mpass_dest_idx;
 
@@ -3145,12 +2636,12 @@ void sdl_info_ogl::texture_mpass_flip(ogl_texture_info *texture, int shaderIdx)
 	}
 }
 
-void sdl_info_ogl::texture_shader_update(ogl_texture_info *texture, render_container *container, int shaderIdx)
+void renderer_ogl::texture_shader_update(ogl_texture_info *texture, render_container *container, int shaderIdx)
 {
 	int uniform_location;
 	GLfloat vid_attributes[4];
 
-	if (container!=NULL)
+	if (container!=nullptr)
 	{
 		render_container::user_settings settings;
 		container->get_user_settings(settings);
@@ -3170,17 +2661,17 @@ void sdl_info_ogl::texture_shader_update(ogl_texture_info *texture, render_conta
 	}
 }
 
-ogl_texture_info * sdl_info_ogl::texture_update(const render_primitive *prim, int shaderIdx)
+ogl_texture_info * renderer_ogl::texture_update(const render_primitive *prim, int shaderIdx)
 {
 	ogl_texture_info *texture = texture_find(prim);
 	int texBound = 0;
 
 	// if we didn't find one, create a new texture
-	if (texture == NULL && prim->texture.base != NULL)
+	if (texture == nullptr && prim->texture.base != nullptr)
 	{
 		texture = texture_create(&prim->texture, prim->flags);
 	}
-	else if (texture != NULL)
+	else if (texture != nullptr)
 	{
 		if ( texture->type == TEXTURE_TYPE_SHADER )
 		{
@@ -3198,7 +2689,7 @@ ogl_texture_info * sdl_info_ogl::texture_update(const render_primitive *prim, in
 		}
 	}
 
-	if (texture != NULL)
+	if (texture != nullptr)
 	{
 		if ( texture->type == TEXTURE_TYPE_SHADER )
 		{
@@ -3211,7 +2702,7 @@ ogl_texture_info * sdl_info_ogl::texture_update(const render_primitive *prim, in
 
 		if ( shaderIdx==0 ) // redundant for subsequent multipass shader
 		{
-			if (prim->texture.base != NULL && texture->texinfo.seqid != prim->texture.seqid)
+			if (prim->texture.base != nullptr && texture->texinfo.seqid != prim->texture.seqid)
 			{
 				texture->texinfo.seqid = prim->texture.seqid;
 
@@ -3232,7 +2723,7 @@ ogl_texture_info * sdl_info_ogl::texture_update(const render_primitive *prim, in
 			pfn_glBindBuffer( GL_ARRAY_BUFFER_ARB, texture->texCoordBufferName );
 			// Load The Data
 			pfn_glBufferSubData( GL_ARRAY_BUFFER_ARB, 0, 4*2*sizeof(GLfloat), texture->texCoord );
-			glTexCoordPointer( 2, GL_FLOAT, 0, (char *) NULL ); // we are using ARB VBO buffers
+			glTexCoordPointer( 2, GL_FLOAT, 0, (char *) nullptr ); // we are using ARB VBO buffers
 		}
 		else
 		{
@@ -3243,7 +2734,7 @@ ogl_texture_info * sdl_info_ogl::texture_update(const render_primitive *prim, in
 		return texture;
 }
 
-void sdl_info_ogl::texture_disable(ogl_texture_info * texture)
+void renderer_ogl::texture_disable(ogl_texture_info * texture)
 {
 	if ( texture->type == TEXTURE_TYPE_SHADER )
 	{
@@ -3258,7 +2749,7 @@ void sdl_info_ogl::texture_disable(ogl_texture_info * texture)
 	}
 }
 
-void sdl_info_ogl::texture_all_disable()
+void renderer_ogl::texture_all_disable()
 {
 	if ( m_useglsl )
 	{

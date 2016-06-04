@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( skydiver_map, AS_PROGRAM, 8, skydiver_state )
 	AM_RANGE(0x180b, 0x180b) AM_MIRROR(0x47e4) AM_READ_PORT("IN11")
 	AM_RANGE(0x1810, 0x1810) AM_MIRROR(0x47e4) AM_READ_PORT("IN12")
 	AM_RANGE(0x1811, 0x1811) AM_MIRROR(0x47e4) AM_READ_PORT("IN13")
-	AM_RANGE(0x2000, 0x201f) AM_MIRROR(0x47e0) AM_READ(watchdog_reset_r) AM_WRITE(_2000_201F_w)
+	AM_RANGE(0x2000, 0x201f) AM_MIRROR(0x47e0) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(_2000_201F_w)
 	AM_RANGE(0x2800, 0x2fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x3800, 0x3fff) AM_ROM
@@ -378,7 +378,9 @@ static MACHINE_CONFIG_START( skydiver, skydiver_state )
 	MCFG_CPU_ADD("maincpu", M6800,MASTER_CLOCK/16)     /* ???? */
 	MCFG_CPU_PROGRAM_MAP(skydiver_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(skydiver_state, interrupt,  5*60)
-	MCFG_WATCHDOG_VBLANK_INIT(8)    // 128V clocks the same as VBLANK
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)    // 128V clocks the same as VBLANK
 
 
 	/* video hardware */

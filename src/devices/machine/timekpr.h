@@ -55,7 +55,7 @@ class timekeeper_device :   public device_t,
 {
 protected:
 	// construction/destruction
-	timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size);
 
 public:
 	DECLARE_WRITE8_MEMBER( write );

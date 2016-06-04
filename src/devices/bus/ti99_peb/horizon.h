@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "peribox.h"
+#include "machine/ram.h"
 
 extern const device_type TI99_HORIZON;
 
@@ -29,13 +30,13 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
-	DECLARE_INPUT_CHANGED_MEMBER( ks_changed );
+	DECLARE_INPUT_CHANGED_MEMBER( hs_changed );
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	void device_start() override;
+	void device_reset() override;
 
-	virtual const rom_entry *device_rom_region() const override;
+	machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	void nvram_default() override;
@@ -44,10 +45,10 @@ protected:
 
 private:
 	void    setbit(int& page, int pattern, bool set);
-	int     get_size();
-	UINT8*  m_ram;
-	UINT8*  m_nvram;
-	UINT8*  m_ros;
+
+	required_device<ram_device> m_ram;
+	required_device<ram_device> m_nvram;
+	required_device<ram_device> m_ros;
 
 	int     m_select6_value;
 	int     m_select_all;
@@ -60,7 +61,7 @@ private:
 	bool    m_32k_installed;
 	bool    m_split_mode;
 	bool    m_rambo_mode;
-	bool    m_killswitch;
+	bool    m_hideswitch;
 	bool    m_use_rambo;
 };
 

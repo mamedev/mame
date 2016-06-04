@@ -608,7 +608,7 @@ static MACHINE_CONFIG_DERIVED( psion_4lines, psion_2lines )
 
 	MCFG_DEVICE_MODIFY("hd44780")
 	MCFG_HD44780_LCD_SIZE(4, 20)
-	MCFG_HD44780_PIXEL_UPDATE_CB(psion_state::lz_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(psion_state,lz_pixel_update)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( psion1, psion_2lines, psion1_state )
@@ -624,7 +624,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( psion1, psion_2lines, psion1_state )
 
 	MCFG_DEVICE_MODIFY("hd44780")
 	MCFG_HD44780_LCD_SIZE(1, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(psion1_state::psion1_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(psion1_state,psion1_pixel_update)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_REMOVE("pack_list")

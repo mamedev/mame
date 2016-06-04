@@ -205,7 +205,7 @@ UINT32 voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
 	RASTERIZER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, (((tex0) == 0xffffffff) ? 0 : ((tex1) == 0xffffffff) ? 1 : 2), fbzcp, fbz, alpha, fog, tex0, tex1)
 
-#include "voodoo_rast.inc"
+#include "voodoo_rast.hxx"
 
 #undef RASTERIZER_ENTRY
 
@@ -218,11 +218,11 @@ UINT32 voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
  *************************************/
 
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
-	{ NULL, voodoo_device::raster_##fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, FALSE, 0, 0, 0, fbzcp, alpha, fog, fbz, tex0, tex1 },
+	{ nullptr, voodoo_device::raster_##fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, FALSE, 0, 0, 0, fbzcp, alpha, fog, fbz, tex0, tex1 },
 
 static const raster_info predef_raster_table[] =
 {
-#include "voodoo_rast.inc"
+#include "voodoo_rast.hxx"
 	{ nullptr }
 };
 
@@ -960,7 +960,7 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
 	/* set a timer for the next off state */
 	machine().scheduler().timer_set(screen->time_until_pos(0), timer_expired_delegate(FUNC(voodoo_device::vblank_off_callback),this), 0, this);
 
-	
+
 
 	/* set internal state and call the client */
 	fbi.vblank = TRUE;
@@ -1353,6 +1353,15 @@ static void recompute_texture_params(tmu_state *t)
 	t->detailbias = (INT8)(TEXDETAIL_DETAIL_BIAS(t->reg[tDetail].u) << 2) << 6;
 	t->detailscale = TEXDETAIL_DETAIL_SCALE(t->reg[tDetail].u);
 
+	/* ensure that the NCC tables are up to date */
+	if ((TEXMODE_FORMAT(t->reg[textureMode].u) & 7) == 1)
+	{
+		ncc_table *n = &t->ncc[TEXMODE_NCC_TABLE_SELECT(t->reg[textureMode].u)];
+		t->texel[1] = t->texel[9] = n->texel;
+		if (n->dirty)
+			ncc_table_update(n);
+	}
+
 	/* no longer dirty */
 	t->regdirty = FALSE;
 
@@ -1371,15 +1380,6 @@ static inline INT32 prepare_tmu(tmu_state *t)
 	if (t->regdirty)
 	{
 		recompute_texture_params(t);
-
-		/* ensure that the NCC tables are up to date */
-		if ((TEXMODE_FORMAT(t->reg[textureMode].u) & 7) == 1)
-		{
-			ncc_table *n = &t->ncc[TEXMODE_NCC_TABLE_SELECT(t->reg[textureMode].u)];
-			t->texel[1] = t->texel[9] = n->texel;
-			if (n->dirty)
-				ncc_table_update(n);
-		}
 	}
 
 	/* compute (ds^2 + dt^2) in both X and Y as 28.36 numbers */
@@ -1748,15 +1748,15 @@ UINT32 voodoo_device::cmdfifo_execute(voodoo_device *vd, cmdfifo_info *f)
 				if (command & (1 << 12))
 					svert.z = *(float *)src++;
 				if (command & (1 << 13))
-					svert.wb = *(float *)src++;
+					svert.wb = svert.w0 = svert.w1 = *(float *)src++;
 
 				/* load W0, S0, T0 values */
 				if (command & (1 << 14))
-					svert.w0 = *(float *)src++;
+					svert.w0 = svert.w1 = *(float *)src++;
 				if (command & (1 << 15))
 				{
-					svert.s0 = *(float *)src++;
-					svert.t0 = *(float *)src++;
+					svert.s0 = svert.s1 = *(float *)src++;
+					svert.t0 = svert.t1 = *(float *)src++;
 				}
 
 				/* load W1, S1, T1 values */
@@ -2877,7 +2877,7 @@ default_case:
  *
  *************************************/
 INT32 voodoo_device::lfb_direct_w(voodoo_device *vd, offs_t offset, UINT32 data, UINT32 mem_mask)
-{	
+{
 	UINT16 *dest;
 	UINT32 destmax;
 	int x, y;
@@ -2923,10 +2923,9 @@ INT32 voodoo_device::lfb_direct_w(voodoo_device *vd, offs_t offset, UINT32 data,
 
 INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
-
 	UINT16 *dest, *depth;
 	UINT32 destmax, depthmax;
-	int sr[2], sg[2], sb[2], sa[2], sw[2];
+	int sr[2], sg[2], sb[2], sa[2], sz[2];
 	int x, y, scry, mask;
 	int pix, destbuf;
 
@@ -2948,7 +2947,7 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 	}
 
 	/* extract default depth and alpha values */
-	sw[0] = sw[1] = vd->reg[zaColor].u & 0xffff;
+	sz[0] = sz[1] = vd->reg[zaColor].u & 0xffff;
 	sa[0] = sa[1] = vd->reg[zaColor].u >> 24;
 
 	/* first extract A,R,G,B from the data */
@@ -3055,55 +3054,55 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 
 		case 16*0 + 12:     /* ARGB, 32-bit depth+RGB 5-6-5 */
 		case 16*2 + 12:     /* RGBA, 32-bit depth+RGB 5-6-5 */
-			sw[0] = data >> 16;
+			sz[0] = data >> 16;
 			EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 		case 16*1 + 12:     /* ABGR, 32-bit depth+RGB 5-6-5 */
 		case 16*3 + 12:     /* BGRA, 32-bit depth+RGB 5-6-5 */
-			sw[0] = data >> 16;
+			sz[0] = data >> 16;
 			EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 
 		case 16*0 + 13:     /* ARGB, 32-bit depth+RGB x-5-5-5 */
-			sw[0] = data >> 16;
+			sz[0] = data >> 16;
 			EXTRACT_x555_TO_888(data, sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 		case 16*1 + 13:     /* ABGR, 32-bit depth+RGB x-5-5-5 */
-			sw[0] = data >> 16;
+			sz[0] = data >> 16;
 			EXTRACT_x555_TO_888(data, sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 		case 16*2 + 13:     /* RGBA, 32-bit depth+RGB x-5-5-5 */
-			sw[0] = data >> 16;
+			sz[0] = data >> 16;
 			EXTRACT_555x_TO_888(data, sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 		case 16*3 + 13:     /* BGRA, 32-bit depth+RGB x-5-5-5 */
-			sw[0] = data >> 16;
+			sz[0] = data >> 16;
 			EXTRACT_555x_TO_888(data, sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 
 		case 16*0 + 14:     /* ARGB, 32-bit depth+ARGB 1-5-5-5 */
-			sw[0] = data >> 16;
+			sz[0] = data >> 16;
 			EXTRACT_1555_TO_8888(data, sa[0], sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 		case 16*1 + 14:     /* ABGR, 32-bit depth+ARGB 1-5-5-5 */
-			sw[0] = data >> 16;
+			sz[0] = data >> 16;
 			EXTRACT_1555_TO_8888(data, sa[0], sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 		case 16*2 + 14:     /* RGBA, 32-bit depth+ARGB 1-5-5-5 */
-			sw[0] = data >> 16;
+			sz[0] = data >> 16;
 			EXTRACT_5551_TO_8888(data, sr[0], sg[0], sb[0], sa[0]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 		case 16*3 + 14:     /* BGRA, 32-bit depth+ARGB 1-5-5-5 */
-			sw[0] = data >> 16;
+			sz[0] = data >> 16;
 			EXTRACT_5551_TO_8888(data, sb[0], sg[0], sr[0], sa[0]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
@@ -3112,8 +3111,8 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 		case 16*1 + 15:     /* ARGB, 16-bit depth */
 		case 16*2 + 15:     /* ARGB, 16-bit depth */
 		case 16*3 + 15:     /* ARGB, 16-bit depth */
-			sw[0] = data & 0xffff;
-			sw[1] = data >> 16;
+			sz[0] = data & 0xffff;
+			sz[1] = data >> 16;
 			mask = LFB_DEPTH_PRESENT | (LFB_DEPTH_PRESENT << 4);
 			offset <<= 1;
 			break;
@@ -3199,7 +3198,7 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 
 					/* write to the depth buffer */
 					if ((mask & (LFB_DEPTH_PRESENT | LFB_DEPTH_PRESENT_MSW)) && !FBZMODE_ENABLE_ALPHA_PLANES(vd->reg[fbzMode].u))
-						depth[bufoffs] = sw[pix];
+						depth[bufoffs] = sz[pix];
 				}
 
 				/* track pixel writes to the frame buffer regardless of mask */
@@ -3245,9 +3244,9 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 					iterw = (UINT32) vd->reg[zaColor].u << 16;
 				} else {
 					// The most significant fractional bits of 16.32 W are set to z
-					iterw = (UINT32) sw[pix] << 16;
+					iterw = (UINT32) sz[pix] << 16;
 				}
-				INT32 iterz = sw[pix] << 12;
+				INT32 iterz = sz[pix] << 12;
 
 				/* apply clipping */
 				if (FBZMODE_ENABLE_CLIPPING(vd->reg[fbzMode].u))
@@ -3307,7 +3306,7 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 // End PIXEL_PIPELINE_BEGIN COPY
 
 				// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
-				fogdepth = biasdepth = (UINT32) sw[pix];
+				fogdepth = biasdepth = (UINT32) sz[pix];
 
 
 				/* Perform depth testing */
@@ -3331,10 +3330,10 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 				/* wait for any outstanding work to finish */
 				poly_wait(vd->poly, "LFB Write");
 
-				/* pixel pipeline part 2 handles color combine, fog, alpha, and final output */
+				/* pixel pipeline part 2 handles color blending, fog, alpha, and final output */
 				PIXEL_PIPELINE_END(vd, stats, dither, dither4, dither_lookup, x, dest, depth,
 					vd->reg[fbzMode].u, vd->reg[fbzColorPath].u, vd->reg[alphaMode].u, vd->reg[fogMode].u,
-					iterz, iterw, iterargb) {};
+					iterz, iterw, iterargb);
 nextpixel:
 			/* advance our pointers */
 			x++;
@@ -3672,9 +3671,12 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 			return;
 		}
 
-		/* if this is a non-FIFO command, let it go to the FIFO, but stall until it completes */
-		if (!(access & REGISTER_FIFO))
-			stall = TRUE;
+		// if this is non-FIFO command, execute immediately
+		if (!(access & REGISTER_FIFO)) {
+			register_w(this, offset, data);
+			g_profiler.stop();
+			return;
+		}
 
 		/* track swap buffers */
 		if ((offset & 0xff) == swapbufferCMD)
@@ -3783,7 +3785,6 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 
 static UINT32 register_r(voodoo_device *vd, offs_t offset)
 {
-
 	int regnum = offset & 0xff;
 	UINT32 result;
 
@@ -4053,7 +4054,6 @@ static UINT32 lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
 
 READ32_MEMBER( voodoo_device::voodoo_r )
 {
-
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (pci.op_pending)
 		flush_fifos(this, machine().time());
@@ -4224,7 +4224,7 @@ READ8_MEMBER( voodoo_banshee_device::banshee_vga_r )
 			*/
 			result = 0x00;
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x300+offset);
+				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
 
 		/* Sequencer access */
@@ -4240,14 +4240,14 @@ READ8_MEMBER( voodoo_banshee_device::banshee_vga_r )
 			result = banshee.vga[0x3da & 0x1f];
 			banshee.attff = 0;
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x300+offset);
+				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
 
 		/* Miscellaneous output */
 		case 0x3cc:
 			result = banshee.vga[0x3c2 & 0x1f];
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x300+offset);
+				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
 
 		/* Graphics controller access */
@@ -4279,13 +4279,13 @@ READ8_MEMBER( voodoo_banshee_device::banshee_vga_r )
 			*/
 			result = 0x04;
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x300+offset);
+				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
 
 		default:
 			result = banshee.vga[offset];
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x300+offset);
+				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
 	}
 	return result;
@@ -4699,7 +4699,6 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_agp_w )
 
 WRITE32_MEMBER( voodoo_banshee_device::banshee_w )
 {
-
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (pci.op_pending)
 		flush_fifos(this, machine().time());
@@ -4901,6 +4900,8 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 				banshee_vga_w(space, offset*4+2, data >> 16, mem_mask >> 16);
 			if (ACCESSING_BITS_24_31)
 				banshee_vga_w(space, offset*4+3, data >> 24, mem_mask >> 24);
+			if (LOG_REGISTERS)
+				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		default:
@@ -5014,12 +5015,11 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 	}
 
 	/* set the type, and initialize the chip mask */
-	device_iterator iter(machine().root_device());
 	index = 0;
-	for (device_t *scan = iter.first(); scan != nullptr; scan = iter.next())
-		if (scan->type() == this->type())
+	for (device_t &scan : device_iterator(machine().root_device()))
+		if (scan.type() == this->type())
 		{
-			if (scan == this)
+			if (&scan == this)
 				break;
 			index++;
 		}
@@ -5045,7 +5045,7 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 	pci.fifo.in = pci.fifo.out = 0;
 	pci.stall_state = NOT_STALLED;
 	pci.continue_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::stall_cpu_callback),this), nullptr);
-	
+
 	/* allocate memory */
 	tmumem0 = m_tmumem0;
 	tmumem1 = m_tmumem1;
@@ -5396,16 +5396,9 @@ INT32 voodoo_device::setup_and_draw_triangle(voodoo_device *vd)
 	float dx1, dy1, dx2, dy2;
 	float divisor, tdiv;
 
-	/* grab the X/Ys at least */
-	vd->fbi.ax = (INT16)(vd->fbi.svert[0].x * 16.0f);
-	vd->fbi.ay = (INT16)(vd->fbi.svert[0].y * 16.0f);
-	vd->fbi.bx = (INT16)(vd->fbi.svert[1].x * 16.0f);
-	vd->fbi.by = (INT16)(vd->fbi.svert[1].y * 16.0f);
-	vd->fbi.cx = (INT16)(vd->fbi.svert[2].x * 16.0f);
-	vd->fbi.cy = (INT16)(vd->fbi.svert[2].y * 16.0f);
-
 	/* compute the divisor */
-	divisor = 1.0f / ((vd->fbi.svert[0].x - vd->fbi.svert[1].x) * (vd->fbi.svert[0].y - vd->fbi.svert[2].y) -
+	// Just need sign for now
+	divisor = ((vd->fbi.svert[0].x - vd->fbi.svert[1].x) * (vd->fbi.svert[0].y - vd->fbi.svert[2].y) -
 						(vd->fbi.svert[0].x - vd->fbi.svert[2].x) * (vd->fbi.svert[0].y - vd->fbi.svert[1].y));
 
 	/* backface culling */
@@ -5422,6 +5415,17 @@ INT32 voodoo_device::setup_and_draw_triangle(voodoo_device *vd)
 		if (divisor_sign == culling_sign)
 			return TRIANGLE_SETUP_CLOCKS;
 	}
+
+	// Finish the divisor
+	divisor = 1.0f / divisor;
+
+	/* grab the X/Ys at least */
+	vd->fbi.ax = (INT16)(vd->fbi.svert[0].x * 16.0f);
+	vd->fbi.ay = (INT16)(vd->fbi.svert[0].y * 16.0f);
+	vd->fbi.bx = (INT16)(vd->fbi.svert[1].x * 16.0f);
+	vd->fbi.by = (INT16)(vd->fbi.svert[1].y * 16.0f);
+	vd->fbi.cx = (INT16)(vd->fbi.svert[2].x * 16.0f);
+	vd->fbi.cy = (INT16)(vd->fbi.svert[2].y * 16.0f);
 
 	/* compute the dx/dy values */
 	dx1 = vd->fbi.svert[0].y - vd->fbi.svert[2].y;
@@ -5903,16 +5907,16 @@ void voodoo_device::raster_fastfill(void *destbase, INT32 y, const poly_extent *
 	/* fill this dest buffer row */
 	if (FBZMODE_AUX_BUFFER_MASK(vd->reg[fbzMode].u) && vd->fbi.auxoffs != ~0)
 	{
-		UINT16 color = vd->reg[zaColor].u;
-		UINT64 expanded = ((UINT64)color << 48) | ((UINT64)color << 32) | (color << 16) | color;
+		UINT16 depth = vd->reg[zaColor].u;
+		UINT64 expanded = ((UINT64)depth << 48) | ((UINT64)depth << 32) | (depth << 16) | depth;
 		UINT16 *dest = (UINT16 *)(vd->fbi.ram + vd->fbi.auxoffs) + scry * vd->fbi.rowpixels;
 
 		for (x = startx; x < stopx && (x & 3) != 0; x++)
-			dest[x] = color;
+			dest[x] = depth;
 		for ( ; x < (stopx & ~3); x += 4)
 			*(UINT64 *)&dest[x] = expanded;
 		for ( ; x < stopx; x++)
-			dest[x] = color;
+			dest[x] = depth;
 	}
 }
 

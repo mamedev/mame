@@ -205,7 +205,7 @@ public:
 	virtual DECLARE_READ16_MEMBER(adc7_r) override;
 };
 
-#include "../drivers/ymmu100.inc"
+#include "../drivers/ymmu100.hxx"
 
 void mu100_state::machine_start()
 {

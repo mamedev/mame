@@ -65,7 +65,7 @@ const device_type C64_PS64 = &device_creator<c64_ps64_cartridge_device>;
 /*
 static struct votrax_sc02_interface votrax_intf =
 {
-    DEVCB_NULL
+    DEVCB_NOOP
 };
 */
 

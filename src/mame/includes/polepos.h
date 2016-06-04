@@ -6,10 +6,31 @@
 
 *************************************************************************/
 
-#include "sound/filter.h"
 #include "sound/namco.h"
 #include "sound/tms5220.h"
 #include "sound/discrete.h"
+
+struct filter2_context
+{
+	filter2_context() :
+		x0(0.0),
+		x1(0.0),
+		x2(0.0),
+		y0(0.0),
+		y1(0.0),
+		y2(0.0),
+		a1(0.0),
+		a2(0.0),
+		b0(0.0),
+		b1(0.0),
+		b2(0.0)
+	{}
+
+	double x0, x1, x2;  /* x[k], x[k-1], x[k-2], current and previous 2 input values */
+	double y0, y1, y2;  /* y[k], y[k-1], y[k-2], current and previous 2 output values */
+	double a1, a2;      /* digital filter coefficients, denominator */
+	double b0, b1, b2;  /* digital filter coefficients, numerator */
+};
 
 
 class polepos_state : public driver_device

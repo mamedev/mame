@@ -48,6 +48,7 @@
 #include "rendlay.h"
 #include "includes/tx1.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 #include "tx1.lh"
 #include "buggyboy.lh"
@@ -485,7 +486,7 @@ static ADDRESS_MAP_START( tx1_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(tx1_scolst_w)
 	AM_RANGE(0x0d000, 0x0d003) AM_WRITE(tx1_slincs_w)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(tx1_slock_w)
-	AM_RANGE(0x0f000, 0x0f001) AM_READ(watchdog_reset16_r) AM_WRITE(resume_math_w)
+	AM_RANGE(0x0f000, 0x0f001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r) AM_WRITE(resume_math_w)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(z80_shared_r, z80_shared_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_MIRROR(0xd0000) AM_ROM
 ADDRESS_MAP_END
@@ -534,7 +535,7 @@ static ADDRESS_MAP_START( buggyboy_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(buggyboy_scolst_w)
 	AM_RANGE(0x0d000, 0x0d003) AM_WRITE(tx1_slincs_w)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(buggyboy_sky_w)
-	AM_RANGE(0x0f000, 0x0f003) AM_READ(watchdog_reset16_r) AM_WRITE(resume_math_w)
+	AM_RANGE(0x0f000, 0x0f003) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r) AM_WRITE(resume_math_w)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(z80_shared_r, z80_shared_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_ROM
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
@@ -549,7 +550,7 @@ static ADDRESS_MAP_START( buggybjr_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(buggyboy_scolst_w)
 	AM_RANGE(0x0d000, 0x0d003) AM_WRITE(tx1_slincs_w)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(buggyboy_sky_w)
-	AM_RANGE(0x0f000, 0x0f003) AM_READ(watchdog_reset16_r) AM_WRITE(resume_math_w)
+	AM_RANGE(0x0f000, 0x0f003) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r) AM_WRITE(resume_math_w)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(z80_shared_r, z80_shared_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_ROM
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
@@ -605,6 +606,8 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_START( tx1, tx1_state )
 	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_CPU_PROGRAM_MAP(tx1_main)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 //  MCFG_WATCHDOG_TIME_INIT(5)
 
 	MCFG_CPU_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
@@ -666,6 +669,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( buggyboy, tx1_state )
 	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_CPU_PROGRAM_MAP(buggyboy_main)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 //  MCFG_WATCHDOG_TIME_INIT(5)
 
 	MCFG_CPU_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
@@ -728,6 +733,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( buggybjr, tx1_state )
 	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_CPU_PROGRAM_MAP(buggybjr_main)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 //  MCFG_WATCHDOG_TIME_INIT(5)
 
 	MCFG_CPU_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)

@@ -4,8 +4,6 @@
 	*               Texas Instruments TMS32010 DSP Disassembler                *
 	*                                                                          *
 	*                 Copyright Tony La Porta                                  *
-	*      You are not allowed to distribute this software commercially.       *
-	*                      Written for the MAME project.                       *
 	*                                                                          *
 	*      Notes : Data is expected to be read from source file as MSB first.  *
 	*              This is a word based microcontroller, with addressing       *
@@ -51,12 +49,12 @@ int main(int argc,char *argv[])
 	argv++; argc--;
 	if (argv[1])
 	{
-		offset = strtol(argv[1],NULL,0);
+		offset = strtol(argv[1],nullptr,0);
 		argv++; argc--;
 	}
 	if (argv[1])
 	{
-		length = strtol(argv[1],NULL,0);
+		length = strtol(argv[1],nullptr,0);
 		argv++; argc--;
 	}
 
@@ -70,14 +68,14 @@ int main(int argc,char *argv[])
 	length_to_dump = length;
 	printf("Starting from %d, dumping %d opcodes (word size)\n",offset,length/2);
 	Buffer = calloc((filelength+1),sizeof(char));
-	if (Buffer==NULL)
+	if (Buffer==nullptr)
 	{
 		printf("Out of Memory !!!");
 		fclose(F);
 		exit(3);
 	}
 	String_Output = calloc(80,sizeof(char));
-	if (String_Output==NULL)
+	if (String_Output==nullptr)
 	{
 		printf("Out of Memory !!!");
 		free(Buffer);

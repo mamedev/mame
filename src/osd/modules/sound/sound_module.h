@@ -27,7 +27,7 @@ public:
 	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame) = 0;
 	virtual void set_mastervolume(int attenuation) = 0;
 
-	int sample_rate() { return m_sample_rate; }
+	int sample_rate() const { return m_sample_rate; }
 
 	int m_sample_rate;
 	int m_audio_latency;

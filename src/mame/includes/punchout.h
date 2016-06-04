@@ -60,6 +60,8 @@ public:
 	DECLARE_WRITE8_MEMBER(punchout_2a03_reset_w);
 	DECLARE_READ8_MEMBER(spunchout_exp_r);
 	DECLARE_WRITE8_MEMBER(spunchout_exp_w);
+	DECLARE_WRITE8_MEMBER(spunchout_rp5h01_reset_w);
+	DECLARE_WRITE8_MEMBER(spunchout_rp5h01_clock_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(punchout_bg_top_videoram_w);
 	DECLARE_WRITE8_MEMBER(punchout_bg_bot_videoram_w);

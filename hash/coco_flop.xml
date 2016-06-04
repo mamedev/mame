@@ -3,7 +3,7 @@
 
 <softwarelist name="coco_flop" description="Tandy Radio Shack Color Computer disk images">
 
-	<!-- coco3 only requires 512Kb, audio is a farty, run best with a 6309? - coco3h driver) -->
+	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
 	<!-- RUN"DONKEY" -->
 	<software name="dkong" supported ="partial">
 		<description>Donkey Kong (Sock Master's Donkey Kong Emulator for CoCo 3) (512Kb)</description>
@@ -14,6 +14,22 @@
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">
 				<rom name="dk.dsk" size="161280" crc="87a22c49" sha1="e9c1ac85150ed14ac81c854df13f6c09fa5b4748" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
+	<!-- LOADM"DKREMIX" -->
+	<!-- EXEC -->
+	<software name="dkremix" supported ="partial">
+		<description>Donkey Kong Remix (Sock Master's Donkey Kong Remix Emulator for CoCo 3) (512Kb)</description>
+		<year>2015</year>
+		<publisher>Sock Master</publisher>
+		<info name="author" value="Sock Master" />
+		<info name="usage" value="CoCo 3 Only" />
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="161280">
+				<rom name="dkremix.dsk" size="161280" crc="639d71af" sha1="ee1584807eb8f28744e1f1c5fc1031abd80a0548" offset="0" />
 			</dataarea>
 		</part>
 	</software>

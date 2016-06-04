@@ -110,6 +110,10 @@ public:
 	ATTR_COLD P &          e(const double x, const char *f = "") { format_element(f, "", "e", x); return static_cast<P &>(*this);  }
 	ATTR_COLD P &          g(const double x, const char *f = "") { format_element(f, "", "g", x); return static_cast<P &>(*this);  }
 
+	ATTR_COLD P &operator ()(const float x, const char *f = "") { format_element(f, "", "f", x); return static_cast<P &>(*this); }
+	ATTR_COLD P &          e(const float x, const char *f = "") { format_element(f, "", "e", x); return static_cast<P &>(*this);  }
+	ATTR_COLD P &          g(const float x, const char *f = "") { format_element(f, "", "g", x); return static_cast<P &>(*this);  }
+
 	ATTR_COLD P &operator ()(const char *x, const char *f = "") { format_element(f, "", "s", x); return static_cast<P &>(*this);  }
 	ATTR_COLD P &operator ()(char *x, const char *f = "") { format_element(f, "", "s", x); return static_cast<P &>(*this);  }
 	ATTR_COLD P &operator ()(const void *x, const char *f = "") { format_element(f, "", "p", x); return static_cast<P &>(*this);  }

@@ -29,10 +29,10 @@ Sound: AY8930 (or compatible)
   OSC: 21.47727MHz
 Other: Z80APIO x 2  (I/O and interrupt controllers)
        P8255A (I/O)
-       8-switch DSW (socketted)
+       8-switch DSW (socketed)
        Volume pot
 
-Memory: Fujitsu MB81464-12 (or compatible) all socketted. The 3rd row of memory
+Memory: Fujitsu MB81464-12 (or compatible) all socketed. The 3rd row of memory
         may or may not be populated.
 
 JP6 - 3 pin jumper: ROM size (1-2 = 27256, 2-3 = 27512)
@@ -182,6 +182,7 @@ Not all regional versions are available for each Megatouch series
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 
 class meritm_state : public driver_device
@@ -205,9 +206,22 @@ public:
 			m_region_extra(*this, "extra")
 	{ }
 
-	std::unique_ptr<UINT8[]> m_ram;
 	required_device<z80pio_device> m_z80pio_0;
 	required_device<z80pio_device> m_z80pio_1;
+	required_device<ds1204_device> m_ds1204;
+	required_device<v9938_device> m_v9938_0;
+	required_device<v9938_device> m_v9938_1;
+	optional_device<microtouch_device> m_microtouch;
+	optional_device<ns16550_device> m_uart;
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	required_memory_bank m_bank1;
+	optional_memory_bank m_bank2;
+	optional_memory_bank m_bank3;
+	required_memory_region m_region_maincpu;
+	optional_memory_region m_region_extra;
+	std::unique_ptr<UINT8[]> m_ram;
+
 	int m_vint;
 	int m_interrupt_vdp0_state;
 	int m_interrupt_vdp1_state;
@@ -216,11 +230,7 @@ public:
 	int m_bank;
 	int m_psd_a15;
 	UINT16 m_questions_loword_address;
-	required_device<ds1204_device> m_ds1204;
-	required_device<v9938_device> m_v9938_0;
-	required_device<v9938_device> m_v9938_1;
-	optional_device<microtouch_device> m_microtouch;
-	optional_device<ns16550_device> m_uart;
+
 	DECLARE_WRITE8_MEMBER(meritm_crt250_bank_w);
 	DECLARE_WRITE8_MEMBER(meritm_psd_a15_w);
 	DECLARE_WRITE8_MEMBER(meritm_bank_w);
@@ -254,13 +264,6 @@ public:
 	UINT8 binary_to_BCD(UINT8 data);
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp0_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp1_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
-	required_memory_bank m_bank1;
-	optional_memory_bank m_bank2;
-	optional_memory_bank m_bank3;
-	required_memory_region m_region_maincpu;
-	optional_memory_region m_region_extra;
 };
 
 
@@ -541,8 +544,8 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8930_device, data_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8930_device, address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
@@ -554,8 +557,8 @@ static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
 	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8930_device, data_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8930_device, address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
@@ -568,15 +571,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( meritm_io_map, AS_IO, 8, meritm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(meritm_psd_a15_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
 	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8930_device, data_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8930_device, address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_bank_w)
 ADDRESS_MAP_END
 
@@ -1085,7 +1088,7 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_CPU_ADD("maincpu", Z80, SYSTEM_CLK/6)
 	MCFG_CPU_PROGRAM_MAP(meritm_crt250_map)
 	MCFG_CPU_IO_MAP(meritm_crt250_io_map)
-	MCFG_CPU_CONFIG(meritm_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(meritm_daisy_chain)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(meritm_state, meritm_crt250_port_b_w))   // used LMP x DRIVE
@@ -1123,7 +1126,7 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, SYSTEM_CLK/12)
+	MCFG_SOUND_ADD("aysnd", AY8930, SYSTEM_CLK/12)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW")) /* Port A read */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(meritm_state, meritm_ay8930_port_b_w))  /* Port B write */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1155,6 +1158,7 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTC_CB(READ8(meritm_state, meritm_8255_port_c_r))
 
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt260)
 

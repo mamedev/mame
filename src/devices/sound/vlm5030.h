@@ -47,6 +47,7 @@ private:
 
 	/* need to save state */
 
+	required_memory_region m_region;
 	UINT8 *m_rom;
 	int m_address_mask;
 	UINT16 m_address;

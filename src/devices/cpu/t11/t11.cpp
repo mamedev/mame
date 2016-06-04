@@ -234,10 +234,10 @@ void t11_device::t11_check_irqs()
  *************************************/
 
 /* includes the static function prototypes and the master opcode table */
-#include "t11table.inc"
+#include "t11table.hxx"
 
 /* includes the actual opcode implementations */
-#include "t11ops.inc"
+#include "t11ops.hxx"
 
 
 
@@ -296,7 +296,7 @@ void t11_device::state_string_export(const device_state_entry &entry, std::strin
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				m_psw.b.l & 0x80 ? '?':'.',
 				m_psw.b.l & 0x40 ? 'I':'.',
 				m_psw.b.l & 0x20 ? 'I':'.',
@@ -315,7 +315,7 @@ void k1801vm2_device::state_string_export(const device_state_entry &entry, std::
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c",
 				m_psw.b.l & 0x100 ? 'H':'.',
 				m_psw.b.l & 0x80 ? 'P':'.',
 				m_psw.b.l & 0x40 ? '?':'.',

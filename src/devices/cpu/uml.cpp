@@ -22,9 +22,6 @@
     * Support for FPU exceptions
 
     * New instructions?
-        - FCOPYI, ICOPYF
-            copy raw between float and integer registers
-
         - VALID opcode_desc,handle,param
             checksum/compare code referenced by opcode_desc; if not
             matching, generate exception with handle,param
@@ -58,6 +55,7 @@ using namespace uml;
 // opcode validation condition/flag valid bitmasks
 #define OPFLAGS_NONE    0x00
 #define OPFLAGS_C       FLAG_C
+#define OPFLAGS_Z       FLAG_Z
 #define OPFLAGS_SZ      (FLAG_S | FLAG_Z)
 #define OPFLAGS_SZC     (FLAG_S | FLAG_Z | FLAG_C)
 #define OPFLAGS_SZV     (FLAG_S | FLAG_Z | FLAG_V)
@@ -185,6 +183,7 @@ const opcode_info instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO3(OR,      "!or",      4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO3(XOR,     "!xor",     4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO2(LZCNT,   "!lzcnt",   4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
+	OPINFO2(TZCNT,   "!tzcnt",   4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
 	OPINFO2(BSWAP,   "!bswap",   4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
 	OPINFO3(SHL,     "!shl",     4|8, false, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO3(SHR,     "!shr",     4|8, false, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
@@ -214,6 +213,8 @@ const opcode_info instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO2(FSQRT,   "f#sqrt",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
 	OPINFO2(FRECIP,  "f#recip",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
 	OPINFO2(FRSQRT,  "f#rsqrt",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO2(FCOPYI,  "f#copyi",  4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, FRM), PINFO(IN, OP, IRM))
+	OPINFO2(ICOPYF,  "icopyf#",  4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, FRM))
 };
 
 
@@ -867,19 +868,22 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 	assert(m_opcode != OP_INVALID && m_opcode < OP_MAX);
 
 	// start with the raw mnemonic and substitute sizes
-	std::string buffer;
+	std::ostringstream buffer;
 	for (const char *opsrc = opinfo.mnemonic; *opsrc != 0; opsrc++)
 		if (*opsrc == '!')
-			strcatprintf(buffer, "%s", bang_size[m_size]);
+			util::stream_format(buffer, "%s", bang_size[m_size]);
 		else if (*opsrc == '#')
-			strcatprintf(buffer, "%s", pound_size[m_size]);
+			util::stream_format(buffer, "%s", pound_size[m_size]);
 		else
-			buffer.push_back(*opsrc);
+			util::stream_format(buffer, "%c", *opsrc);
 
 	// pad to 8 spaces
-	int pad = 8 - buffer.length();
-	for (int ch = 0; ch < pad; ch++)
-		buffer.push_back(' ');
+	int pad = 8 - buffer.tellp();
+	while (pad > 0)
+	{
+		buffer.put(' ');
+		pad--;
+	}
 
 	// iterate through parameters
 	for (int pnum = 0; pnum < m_numparams; pnum++)
@@ -888,7 +892,7 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 
 		// start with a comma for all except the first parameter
 		if (pnum != 0)
-			buffer.push_back(',');
+			buffer.put(',');
 
 		// ouput based on type
 		switch (param.type())
@@ -916,20 +920,20 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 					if (size == 2) value = (UINT16)value;
 					if (size == 4) value = (UINT32)value;
 					if ((UINT32)value == value)
-						strcatprintf(buffer, "$%X", (UINT32)value);
+						util::stream_format(buffer, "$%X", (UINT32)value);
 					else
-						strcatprintf(buffer, "$%X%08X", (UINT32)(value >> 32), (UINT32)value);
+						util::stream_format(buffer, "$%X%08X", (UINT32)(value >> 32), (UINT32)value);
 				}
 				break;
 
 			// immediates have several special cases
 			case parameter::PTYPE_SIZE:
-				strcatprintf(buffer, "%s", sizes[param.size()]);
+				util::stream_format(buffer, "%s", sizes[param.size()]);
 				break;
 
 			// size + address space immediate
 			case parameter::PTYPE_SIZE_SPACE:
-				strcatprintf(buffer, "%s_%s", spaces[param.space()], sizes[param.size()]);
+				util::stream_format(buffer, "%s_%s", spaces[param.space()], sizes[param.size()]);
 				break;
 
 			// size + scale immediate
@@ -938,30 +942,30 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 					int scale = param.scale();
 					int size  = param.size();
 					if (scale == size)
-						strcatprintf(buffer, "%s", sizes[size]);
+						util::stream_format(buffer, "%s", sizes[size]);
 					else
-						strcatprintf(buffer, "%s_x%d", sizes[size], 1 << scale);
+						util::stream_format(buffer, "%s_x%d", sizes[size], 1 << scale);
 				}
 				break;
 
 			// fmod immediate
 			case parameter::PTYPE_ROUNDING:
-				strcatprintf(buffer, "%s", fmods[param.rounding()]);
+				util::stream_format(buffer, "%s", fmods[param.rounding()]);
 				break;
 
 			// integer registers
 			case parameter::PTYPE_INT_REGISTER:
-				strcatprintf(buffer, "i%d", param.ireg() - REG_I0);
+				util::stream_format(buffer, "i%d", param.ireg() - REG_I0);
 				break;
 
 			// floating point registers
 			case parameter::PTYPE_FLOAT_REGISTER:
-				strcatprintf(buffer, "f%d", param.freg() - REG_F0);
+				util::stream_format(buffer, "f%d", param.freg() - REG_F0);
 				break;
 
 			// map variables
 			case parameter::PTYPE_MAPVAR:
-				strcatprintf(buffer, "m%d", param.mapvar() - MAPVAR_M0);
+				util::stream_format(buffer, "m%d", param.mapvar() - MAPVAR_M0);
 				break;
 
 			// memory
@@ -974,55 +978,55 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 				if (drcuml != nullptr && (symbol = drcuml->symbol_find(param.memory(), &symoffset)) != nullptr)
 				{
 					if (symoffset == 0)
-						strcatprintf(buffer, "[%s]", symbol);
+						util::stream_format(buffer, "[%s]", symbol);
 					else
-						strcatprintf(buffer, "[%s+$%X]", symbol, symoffset);
+						util::stream_format(buffer, "[%s+$%X]", symbol, symoffset);
 				}
 
 				// cache memory
 				else if (drcuml != nullptr && drcuml->cache().contains_pointer(param.memory()))
-					strcatprintf(buffer, "[+$%X]", (UINT32)(FPTR)((drccodeptr)param.memory() - drcuml->cache().near()));
+					util::stream_format(buffer, "[+$%X]", (UINT32)(FPTR)((drccodeptr)param.memory() - drcuml->cache().near()));
 
 				// general memory
 				else
-					strcatprintf(buffer, "[[$%p]]", param.memory());
+					util::stream_format(buffer, "[[$%p]]", param.memory());
 				break;
 			}
 
 			// string pointer
 			case parameter::PTYPE_STRING:
-				strcatprintf(buffer, "%s", (const char *)(FPTR)param.string());
+				util::stream_format(buffer, "%s", (const char *)(FPTR)param.string());
 				break;
 
 			// handle pointer
 			case parameter::PTYPE_CODE_HANDLE:
-				strcatprintf(buffer, "%s", param.handle().string());
+				util::stream_format(buffer, "%s", param.handle().string());
 				break;
 
 			default:
-				strcatprintf(buffer, "???");
+				util::stream_format(buffer, "???");
 				break;
 		}
 	}
 
 	// if there's a condition, append it
 	if (m_condition != COND_ALWAYS)
-		strcatprintf(buffer, ",%s", conditions[m_condition & 0x0f]);
+		util::stream_format(buffer, ",%s", conditions[m_condition & 0x0f]);
 
 	// if there are flags, append them
 	if (m_flags != 0)
 	{
-		buffer.push_back(',');
+		buffer.put(',');
 		if (m_flags & FLAG_U)
-			buffer.push_back('U');
+			buffer.put('U');
 		if (m_flags & FLAG_S)
-			buffer.push_back('S');
+			buffer.put('S');
 		if (m_flags & FLAG_Z)
-			buffer.push_back('Z');
+			buffer.put('Z');
 		if (m_flags & FLAG_V)
-			buffer.push_back('V');
+			buffer.put('V');
 		if (m_flags & FLAG_C)
-			buffer.push_back('C');
+			buffer.put('C');
 	}
-	return buffer;
+	return buffer.str();
 }

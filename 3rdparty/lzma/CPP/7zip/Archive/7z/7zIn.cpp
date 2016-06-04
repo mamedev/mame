@@ -2,6 +2,12 @@
 
 #include "StdAfx.h"
 
+#ifdef _WIN32
+#include <wchar.h>
+#else
+#include <ctype.h>
+#endif
+
 #include "../../../../C/7zCrc.h"
 #include "../../../../C/CpuArch.h"
 
@@ -20,127 +26,38 @@
 #define FORMAT_7Z_RECOVERY
 #endif
 
+using namespace NWindows;
+using namespace NCOM;
+
 namespace NArchive {
 namespace N7z {
 
-static void BoolVector_Fill_False(CBoolVector &v, int size)
+static void BoolVector_Fill_False(CBoolVector &v, unsigned size)
 {
-  v.Clear();
-  v.Reserve(size);
-  for (int i = 0; i < size; i++)
-    v.Add(false);
-}
-
-static bool BoolVector_GetAndSet(CBoolVector &v, UInt32 index)
-{
-  if (index >= (UInt32)v.Size())
-    return true;
-  bool res = v[index];
-  v[index] = true;
-  return res;
-}
-
-bool CFolder::CheckStructure() const
-{
-  const int kNumCodersMax = sizeof(UInt32) * 8; // don't change it
-  const int kMaskSize = sizeof(UInt32) * 8; // it must be >= kNumCodersMax
-  const int kNumBindsMax = 32;
-
-  if (Coders.Size() > kNumCodersMax || BindPairs.Size() > kNumBindsMax)
-    return false;
-
-  {
-    CBoolVector v;
-    BoolVector_Fill_False(v, BindPairs.Size() + PackStreams.Size());
-    
-    int i;
-    for (i = 0; i < BindPairs.Size(); i++)
-      if (BoolVector_GetAndSet(v, BindPairs[i].InIndex))
-        return false;
-    for (i = 0; i < PackStreams.Size(); i++)
-      if (BoolVector_GetAndSet(v, PackStreams[i]))
-        return false;
-    
-    BoolVector_Fill_False(v, UnpackSizes.Size());
-    for (i = 0; i < BindPairs.Size(); i++)
-      if (BoolVector_GetAndSet(v, BindPairs[i].OutIndex))
-        return false;
-  }
-  
-  UInt32 mask[kMaskSize];
-  int i;
-  for (i = 0; i < kMaskSize; i++)
-    mask[i] = 0;
-
-  {
-    CIntVector inStreamToCoder, outStreamToCoder;
-    for (i = 0; i < Coders.Size(); i++)
-    {
-      CNum j;
-      const CCoderInfo &coder = Coders[i];
-      for (j = 0; j < coder.NumInStreams; j++)
-        inStreamToCoder.Add(i);
-      for (j = 0; j < coder.NumOutStreams; j++)
-        outStreamToCoder.Add(i);
-    }
-    
-    for (i = 0; i < BindPairs.Size(); i++)
-    {
-      const CBindPair &bp = BindPairs[i];
-      mask[inStreamToCoder[bp.InIndex]] |= (1 << outStreamToCoder[bp.OutIndex]);
-    }
-  }
-  
-  for (i = 0; i < kMaskSize; i++)
-    for (int j = 0; j < kMaskSize; j++)
-      if (((1 << j) & mask[i]) != 0)
-        mask[i] |= mask[j];
-
-  for (i = 0; i < kMaskSize; i++)
-    if (((1 << i) & mask[i]) != 0)
-      return false;
-
-  return true;
+  v.ClearAndSetSize(size);
+  bool *p = &v[0];
+  for (unsigned i = 0; i < size; i++)
+    p[i] = false;
 }
 
 class CInArchiveException {};
+class CUnsupportedFeatureException: public CInArchiveException {};
 
 static void ThrowException() { throw CInArchiveException(); }
 static inline void ThrowEndOfData()   { ThrowException(); }
-static inline void ThrowUnsupported() { ThrowException(); }
+static inline void ThrowUnsupported() { throw CUnsupportedFeatureException(); }
 static inline void ThrowIncorrect()   { ThrowException(); }
-static inline void ThrowUnsupportedVersion() { ThrowException(); }
-
-/*
-class CInArchiveException
-{
-public:
-  enum CCauseType
-  {
-    kUnsupportedVersion = 0,
-    kUnsupported,
-    kIncorrect,
-    kEndOfData
-  } Cause;
-  CInArchiveException(CCauseType cause): Cause(cause) {};
-};
-
-static void ThrowException(CInArchiveException::CCauseType c) { throw CInArchiveException(c); }
-static void ThrowEndOfData()   { ThrowException(CInArchiveException::kEndOfData); }
-static void ThrowUnsupported() { ThrowException(CInArchiveException::kUnsupported); }
-static void ThrowIncorrect()   { ThrowException(CInArchiveException::kIncorrect); }
-static void ThrowUnsupportedVersion() { ThrowException(CInArchiveException::kUnsupportedVersion); }
-*/
 
 class CStreamSwitch
 {
   CInArchive *_archive;
   bool _needRemove;
+  bool _needUpdatePos;
 public:
-  CStreamSwitch(): _needRemove(false) {}
+  CStreamSwitch(): _needRemove(false), _needUpdatePos(false) {}
   ~CStreamSwitch() { Remove(); }
   void Remove();
-  void Set(CInArchive *archive, const Byte *data, size_t size);
+  void Set(CInArchive *archive, const Byte *data, size_t size, bool needUpdatePos);
   void Set(CInArchive *archive, const CByteBuffer &byteBuffer);
   void Set(CInArchive *archive, const CObjectVector<CByteBuffer> *dataVector);
 };
@@ -149,22 +66,25 @@ void CStreamSwitch::Remove()
 {
   if (_needRemove)
   {
-    _archive->DeleteByteStream();
+    if (_archive->_inByteBack->GetRem() != 0)
+      _archive->ThereIsHeaderError = true;
+    _archive->DeleteByteStream(_needUpdatePos);
     _needRemove = false;
   }
 }
 
-void CStreamSwitch::Set(CInArchive *archive, const Byte *data, size_t size)
+void CStreamSwitch::Set(CInArchive *archive, const Byte *data, size_t size, bool needUpdatePos)
 {
   Remove();
   _archive = archive;
   _archive->AddByteStream(data, size);
   _needRemove = true;
+  _needUpdatePos = needUpdatePos;
 }
 
 void CStreamSwitch::Set(CInArchive *archive, const CByteBuffer &byteBuffer)
 {
-  Set(archive, byteBuffer, byteBuffer.GetCapacity());
+  Set(archive, byteBuffer, byteBuffer.Size(), false);
 }
 
 void CStreamSwitch::Set(CInArchive *archive, const CObjectVector<CByteBuffer> *dataVector)
@@ -173,12 +93,23 @@ void CStreamSwitch::Set(CInArchive *archive, const CObjectVector<CByteBuffer> *d
   Byte external = archive->ReadByte();
   if (external != 0)
   {
-    int dataIndex = (int)archive->ReadNum();
-    if (dataIndex < 0 || dataIndex >= dataVector->Size())
+    if (!dataVector)
+      ThrowIncorrect();
+    CNum dataIndex = archive->ReadNum();
+    if (dataIndex >= dataVector->Size())
       ThrowIncorrect();
     Set(archive, (*dataVector)[dataIndex]);
   }
 }
+
+void CInArchive::AddByteStream(const Byte *buf, size_t size)
+{
+  if (_numInByteBufs == kNumBufLevelsMax)
+    ThrowIncorrect();
+  _inByteBack = &_inByteVector[_numInByteBufs++];
+  _inByteBack->Init(buf, size);
+}
+  
 
 Byte CInByte2::ReadByte()
 {
@@ -189,10 +120,12 @@ Byte CInByte2::ReadByte()
 
 void CInByte2::ReadBytes(Byte *data, size_t size)
 {
+  if (size == 0)
+    return;
   if (size > _size - _pos)
     ThrowEndOfData();
-  for (size_t i = 0; i < size; i++)
-    data[i] = _buffer[_pos++];
+  memcpy(data, _buffer + _pos, size);
+  _pos += size;
 }
 
 void CInByte2::SkipData(UInt64 size)
@@ -207,31 +140,82 @@ void CInByte2::SkipData()
   SkipData(ReadNumber());
 }
 
-UInt64 CInByte2::ReadNumber()
+static UInt64 ReadNumberSpec(const Byte *p, size_t size, size_t &processed)
 {
-  if (_pos >= _size)
-    ThrowEndOfData();
-  Byte firstByte = _buffer[_pos++];
-  Byte mask = 0x80;
-  UInt64 value = 0;
-  for (int i = 0; i < 8; i++)
+  if (size == 0)
   {
-    if ((firstByte & mask) == 0)
+    processed = 0;
+    return 0;
+  }
+  
+  unsigned b = *p++;
+  size--;
+  
+  if ((b & 0x80) == 0)
+  {
+    processed = 1;
+    return b;
+  }
+  
+  if (size == 0)
+  {
+    processed = 0;
+    return 0;
+  }
+  
+  UInt64 value = (UInt64)*p;
+  p++;
+  size--;
+  
+  for (unsigned i = 1; i < 8; i++)
+  {
+    unsigned mask = (unsigned)0x80 >> i;
+    if ((b & mask) == 0)
     {
-      UInt64 highPart = firstByte & (mask - 1);
-      value += (highPart << (i * 8));
+      UInt64 high = b & (mask - 1);
+      value |= (high << (i * 8));
+      processed = i + 1;
       return value;
     }
-    if (_pos >= _size)
-      ThrowEndOfData();
-    value |= ((UInt64)_buffer[_pos++] << (8 * i));
-    mask >>= 1;
+    
+    if (size == 0)
+    {
+      processed = 0;
+      return 0;
+    }
+    
+    value |= ((UInt64)*p << (i * 8));
+    p++;
+    size--;
   }
+  
+  processed = 9;
   return value;
+}
+
+UInt64 CInByte2::ReadNumber()
+{
+  size_t processed;
+  UInt64 res = ReadNumberSpec(_buffer + _pos, _size - _pos, processed);
+  if (processed == 0)
+    ThrowEndOfData();
+  _pos += processed;
+  return res;
 }
 
 CNum CInByte2::ReadNum()
 {
+  /*
+  if (_pos < _size)
+  {
+    Byte val = _buffer[_pos];
+    if ((unsigned)val < 0x80)
+    {
+      _pos++;
+      return (unsigned)val;
+    }
+  }
+  */
   UInt64 value = ReadNumber();
   if (value > kNumMax)
     ThrowUnsupported();
@@ -256,48 +240,21 @@ UInt64 CInByte2::ReadUInt64()
   return res;
 }
 
-void CInByte2::ReadString(UString &s)
-{
-  const Byte *buf = _buffer + _pos;
-  size_t rem = (_size - _pos) / 2 * 2;
-  {
-    size_t i;
-    for (i = 0; i < rem; i += 2)
-      if (buf[i] == 0 && buf[i + 1] == 0)
-        break;
-    if (i == rem)
-      ThrowEndOfData();
-    rem = i;
-  }
-  int len = (int)(rem / 2);
-  if (len < 0 || (size_t)len * 2 != rem)
-    ThrowUnsupported();
-  wchar_t *p = s.GetBuffer(len);
-  int i;
-  for (i = 0; i < len; i++, buf += 2)
-    p[i] = (wchar_t)Get16(buf);
-  s.ReleaseBuffer(len);
-  _pos += rem + 2;
-}
+#define CHECK_SIGNATURE if (p[0] != '7' || p[1] != 'z' || p[2] != 0xBC || p[3] != 0xAF || p[4] != 0x27 || p[5] != 0x1C) return false;
 
 static inline bool TestSignature(const Byte *p)
 {
-  for (int i = 0; i < kSignatureSize; i++)
-    if (p[i] != kSignature[i])
-      return false;
-  return CrcCalc(p + 12, 20) == GetUi32(p + 8);
+  CHECK_SIGNATURE
+  return CrcCalc(p + 12, 20) == Get32(p + 8);
 }
 
 #ifdef FORMAT_7Z_RECOVERY
 static inline bool TestSignature2(const Byte *p)
 {
-  int i;
-  for (i = 0; i < kSignatureSize; i++)
-    if (p[i] != kSignature[i])
-      return false;
-  if (CrcCalc(p + 12, 20) == GetUi32(p + 8))
+  CHECK_SIGNATURE;
+  if (CrcCalc(p + 12, 20) == Get32(p + 8))
     return true;
-  for (i = 8; i < kHeaderSize; i++)
+  for (unsigned i = 8; i < kHeaderSize; i++)
     if (p[i] != 0)
       return false;
   return (p[6] != 0 || p[7] != 0);
@@ -312,39 +269,56 @@ HRESULT CInArchive::FindAndReadSignature(IInStream *stream, const UInt64 *search
 
   if (TestSignature2(_header))
     return S_OK;
+  if (searchHeaderSizeLimit && *searchHeaderSizeLimit == 0)
+    return S_FALSE;
 
-  CByteBuffer byteBuffer;
-  const UInt32 kBufferSize = (1 << 16);
-  byteBuffer.SetCapacity(kBufferSize);
-  Byte *buffer = byteBuffer;
-  memcpy(buffer, _header, kHeaderSize);
-  UInt64 curTestPos = _arhiveBeginStreamPosition;
+  const UInt32 kBufSize = 1 << 15;
+  CByteArr buf(kBufSize);
+  memcpy(buf, _header, kHeaderSize);
+  UInt64 offset = 0;
+  
   for (;;)
   {
-    if (searchHeaderSizeLimit != NULL)
-      if (curTestPos - _arhiveBeginStreamPosition > *searchHeaderSizeLimit)
-        break;
-    UInt32 processedSize;
-    RINOK(stream->Read(buffer + kHeaderSize, kBufferSize - kHeaderSize, &processedSize));
-    if (processedSize == 0)
-      return S_FALSE;
-    for (UInt32 pos = 1; pos <= processedSize; pos++)
+    UInt32 readSize = kBufSize - kHeaderSize;
+    if (searchHeaderSizeLimit)
     {
-      for (; buffer[pos] != '7' && pos <= processedSize; pos++);
-      if (pos > processedSize)
-        break;
-      if (TestSignature(buffer + pos))
+      UInt64 rem = *searchHeaderSizeLimit - offset;
+      if (readSize > rem)
+        readSize = (UInt32)rem;
+      if (readSize == 0)
+        return S_FALSE;
+    }
+    
+    UInt32 processed = 0;
+    RINOK(stream->Read(buf + kHeaderSize, readSize, &processed));
+    if (processed == 0)
+      return S_FALSE;
+    
+    for (UInt32 pos = 0;;)
+    {
+      const Byte *p = buf + pos + 1;
+      const Byte *lim = buf + processed;
+      for (; p <= lim; p += 4)
       {
-        memcpy(_header, buffer + pos, kHeaderSize);
-        curTestPos += pos;
-        _arhiveBeginStreamPosition = curTestPos;
-        return stream->Seek(curTestPos + kHeaderSize, STREAM_SEEK_SET, NULL);
+        if (p[0] == '7') break;
+        if (p[1] == '7') { p += 1; break; }
+        if (p[2] == '7') { p += 2; break; }
+        if (p[3] == '7') { p += 3; break; }
+      };
+      if (p > lim)
+        break;
+      pos = (UInt32)(p - buf);
+      if (TestSignature(p))
+      {
+        memcpy(_header, p, kHeaderSize);
+        _arhiveBeginStreamPosition += offset + pos;
+        return stream->Seek(_arhiveBeginStreamPosition + kHeaderSize, STREAM_SEEK_SET, NULL);
       }
     }
-    curTestPos += processedSize;
-    memmove(buffer, buffer + processedSize, kHeaderSize);
+    
+    offset += processed;
+    memmove(buf, buf + processed, kHeaderSize);
   }
-  return S_FALSE;
 }
 
 // S_FALSE means that file is not archive
@@ -362,7 +336,9 @@ HRESULT CInArchive::Open(IInStream *stream, const UInt64 *searchHeaderSizeLimit)
   
 void CInArchive::Close()
 {
+  _numInByteBufs = 0;
   _stream.Release();
+  ThereIsHeaderError = false;
 }
 
 void CInArchive::ReadArchiveProperties(CInArchiveInfo & /* archiveInfo */)
@@ -375,92 +351,214 @@ void CInArchive::ReadArchiveProperties(CInArchiveInfo & /* archiveInfo */)
   }
 }
 
-void CInArchive::GetNextFolderItem(CFolder &folder)
-{
-  CNum numCoders = ReadNum();
+// CFolder &folder can be non empty. So we must set all fields
 
-  folder.Coders.Clear();
-  folder.Coders.Reserve((int)numCoders);
-  CNum numInStreams = 0;
-  CNum numOutStreams = 0;
-  CNum i;
+void CInByte2::ParseFolder(CFolder &folder)
+{
+  UInt32 numCoders = ReadNum();
+
+  if (numCoders == 0)
+    ThrowUnsupported();
+
+  folder.Coders.SetSize(numCoders);
+
+  UInt32 numInStreams = 0;
+  UInt32 i;
   for (i = 0; i < numCoders; i++)
   {
-    folder.Coders.Add(CCoderInfo());
-    CCoderInfo &coder = folder.Coders.Back();
-
+    CCoderInfo &coder = folder.Coders[i];
     {
       Byte mainByte = ReadByte();
-      int idSize = (mainByte & 0xF);
-      Byte longID[15];
-      ReadBytes(longID, idSize);
-      if (idSize > 8)
+      if ((mainByte & 0xC0) != 0)
         ThrowUnsupported();
+      unsigned idSize = (mainByte & 0xF);
+      if (idSize > 8 || idSize > GetRem())
+        ThrowUnsupported();
+      const Byte *longID = GetPtr();
       UInt64 id = 0;
-      for (int j = 0; j < idSize; j++)
-        id |= (UInt64)longID[idSize - 1 - j] << (8 * j);
+      for (unsigned j = 0; j < idSize; j++)
+        id = ((id << 8) | longID[j]);
+      SkipDataNoCheck(idSize);
       coder.MethodID = id;
 
       if ((mainByte & 0x10) != 0)
       {
-        coder.NumInStreams = ReadNum();
-        coder.NumOutStreams = ReadNum();
+        coder.NumStreams = ReadNum();
+        /* numOutStreams = */ ReadNum();
       }
       else
       {
-        coder.NumInStreams = 1;
-        coder.NumOutStreams = 1;
+        coder.NumStreams = 1;
       }
+      
       if ((mainByte & 0x20) != 0)
       {
         CNum propsSize = ReadNum();
-        coder.Props.SetCapacity((size_t)propsSize);
+        coder.Props.Alloc((size_t)propsSize);
         ReadBytes((Byte *)coder.Props, (size_t)propsSize);
       }
-      if ((mainByte & 0x80) != 0)
-        ThrowUnsupported();
+      else
+        coder.Props.Free();
     }
-    numInStreams += coder.NumInStreams;
-    numOutStreams += coder.NumOutStreams;
+    numInStreams += coder.NumStreams;
   }
 
-  CNum numBindPairs = numOutStreams - 1;
-  folder.BindPairs.Clear();
-  folder.BindPairs.Reserve(numBindPairs);
-  for (i = 0; i < numBindPairs; i++)
+  UInt32 numBonds = numCoders - 1;
+  folder.Bonds.SetSize(numBonds);
+  for (i = 0; i < numBonds; i++)
   {
-    CBindPair bp;
-    bp.InIndex = ReadNum();
-    bp.OutIndex = ReadNum();
-    folder.BindPairs.Add(bp);
+    CBond &bp = folder.Bonds[i];
+    bp.PackIndex = ReadNum();
+    bp.UnpackIndex = ReadNum();
   }
 
-  if (numInStreams < numBindPairs)
+  if (numInStreams < numBonds)
     ThrowUnsupported();
-  CNum numPackStreams = numInStreams - numBindPairs;
-  folder.PackStreams.Reserve(numPackStreams);
+  UInt32 numPackStreams = numInStreams - numBonds;
+  folder.PackStreams.SetSize(numPackStreams);
+  
   if (numPackStreams == 1)
   {
     for (i = 0; i < numInStreams; i++)
-      if (folder.FindBindPairForInStream(i) < 0)
+      if (folder.FindBond_for_PackStream(i) < 0)
       {
-        folder.PackStreams.Add(i);
+        folder.PackStreams[0] = i;
         break;
       }
-    if (folder.PackStreams.Size() != 1)
+    if (i == numInStreams)
       ThrowUnsupported();
   }
   else
     for (i = 0; i < numPackStreams; i++)
-      folder.PackStreams.Add(ReadNum());
+      folder.PackStreams[i] = ReadNum();
 }
 
-void CInArchive::WaitAttribute(UInt64 attribute)
+void CFolders::ParseFolderInfo(unsigned folderIndex, CFolder &folder) const
+{
+  size_t startPos = FoCodersDataOffset[folderIndex];
+  CInByte2 inByte;
+  inByte.Init(CodersData + startPos, FoCodersDataOffset[folderIndex + 1] - startPos);
+  inByte.ParseFolder(folder);
+  if (inByte.GetRem() != 0)
+    throw 20120424;
+}
+
+
+void CDatabase::GetPath(unsigned index, UString &path) const
+{
+  path.Empty();
+  if (!NameOffsets || !NamesBuf)
+    return;
+
+  size_t offset = NameOffsets[index];
+  size_t size = NameOffsets[index + 1] - offset;
+
+  if (size >= (1 << 28))
+    return;
+
+  wchar_t *s = path.GetBuf((unsigned)size - 1);
+
+  const Byte *p = ((const Byte *)NamesBuf + offset * 2);
+
+  #if defined(_WIN32) && defined(MY_CPU_LE)
+  
+  wmemcpy(s, (const wchar_t *)p, size);
+  
+  #else
+
+  for (size_t i = 0; i < size; i++)
+  {
+    *s = Get16(p);
+    p += 2;
+    s++;
+  }
+
+  #endif
+
+  path.ReleaseBuf_SetLen((unsigned)size - 1);
+}
+
+HRESULT CDatabase::GetPath_Prop(unsigned index, PROPVARIANT *path) const throw()
+{
+  PropVariant_Clear(path);
+  if (!NameOffsets || !NamesBuf)
+    return S_OK;
+
+  size_t offset = NameOffsets[index];
+  size_t size = NameOffsets[index + 1] - offset;
+
+  if (size >= (1 << 14))
+    return S_OK;
+
+  RINOK(PropVarEm_Alloc_Bstr(path, (unsigned)size - 1));
+  wchar_t *s = path->bstrVal;
+
+  const Byte *p = ((const Byte *)NamesBuf + offset * 2);
+
+  for (size_t i = 0; i < size; i++)
+  {
+    wchar_t c = Get16(p);
+    p += 2;
+    #if WCHAR_PATH_SEPARATOR != L'/'
+    if (c == L'/')
+      c = WCHAR_PATH_SEPARATOR;
+    #endif
+    *s++ = c;
+  }
+
+  return S_OK;
+
+  /*
+  unsigned cur = index;
+  unsigned size = 0;
+  
+  for (int i = 0;; i++)
+  {
+    size_t len = NameOffsets[cur + 1] - NameOffsets[cur];
+    size += (unsigned)len;
+    if (i > 256 || len > (1 << 14) || size > (1 << 14))
+      return PropVarEm_Set_Str(path, "[TOO-LONG]");
+    cur = Files[cur].Parent;
+    if (cur < 0)
+      break;
+  }
+  size--;
+
+  RINOK(PropVarEm_Alloc_Bstr(path, size));
+  wchar_t *s = path->bstrVal;
+  s += size;
+  *s = 0;
+  cur = index;
+  
+  for (;;)
+  {
+    unsigned len = (unsigned)(NameOffsets[cur + 1] - NameOffsets[cur] - 1);
+    const Byte *p = (const Byte *)NamesBuf + (NameOffsets[cur + 1] * 2) - 2;
+    for (; len != 0; len--)
+    {
+      p -= 2;
+      --s;
+      wchar_t c = Get16(p);
+      if (c == '/')
+        c = WCHAR_PATH_SEPARATOR;
+      *s = c;
+    }
+
+    const CFileItem &file = Files[cur];
+    cur = file.Parent;
+    if (cur < 0)
+      return S_OK;
+    *(--s) = (file.IsAltStream ? ':' : WCHAR_PATH_SEPARATOR);
+  }
+  */
+}
+
+void CInArchive::WaitId(UInt64 id)
 {
   for (;;)
   {
     UInt64 type = ReadID();
-    if (type == attribute)
+    if (type == id)
       return;
     if (type == NID::kEnd)
       ThrowIncorrect();
@@ -468,90 +566,222 @@ void CInArchive::WaitAttribute(UInt64 attribute)
   }
 }
 
-void CInArchive::ReadHashDigests(int numItems,
-    CBoolVector &digestsDefined,
-    CRecordVector<UInt32> &digests)
+void CInArchive::ReadHashDigests(unsigned numItems, CUInt32DefVector &crcs)
 {
-  ReadBoolVector2(numItems, digestsDefined);
-  digests.Clear();
-  digests.Reserve(numItems);
-  for (int i = 0; i < numItems; i++)
+  ReadBoolVector2(numItems, crcs.Defs);
+  crcs.Vals.ClearAndSetSize(numItems);
+  UInt32 *p = &crcs.Vals[0];
+  const bool *defs = &crcs.Defs[0];
+  for (unsigned i = 0; i < numItems; i++)
   {
     UInt32 crc = 0;
-    if (digestsDefined[i])
+    if (defs[i])
       crc = ReadUInt32();
-    digests.Add(crc);
+    p[i] = crc;
   }
 }
 
-void CInArchive::ReadPackInfo(
-    UInt64 &dataOffset,
-    CRecordVector<UInt64> &packSizes,
-    CBoolVector &packCRCsDefined,
-    CRecordVector<UInt32> &packCRCs)
-{
-  dataOffset = ReadNumber();
-  CNum numPackStreams = ReadNum();
+#define k_Scan_NumCoders_MAX 64
+#define k_Scan_NumCodersStreams_in_Folder_MAX 64
 
-  WaitAttribute(NID::kSize);
-  packSizes.Clear();
-  packSizes.Reserve(numPackStreams);
+void CInArchive::ReadPackInfo(CFolders &f)
+{
+  CNum numPackStreams = ReadNum();
+  
+  WaitId(NID::kSize);
+  f.PackPositions.Alloc(numPackStreams + 1);
+  f.NumPackStreams = numPackStreams;
+  UInt64 sum = 0;
   for (CNum i = 0; i < numPackStreams; i++)
-    packSizes.Add(ReadNumber());
+  {
+    f.PackPositions[i] = sum;
+    UInt64 packSize = ReadNumber();
+    sum += packSize;
+    if (sum < packSize)
+      ThrowIncorrect();
+  }
+  f.PackPositions[numPackStreams] = sum;
 
   UInt64 type;
   for (;;)
   {
     type = ReadID();
     if (type == NID::kEnd)
-      break;
+      return;
     if (type == NID::kCRC)
     {
-      ReadHashDigests(numPackStreams, packCRCsDefined, packCRCs);
+      CUInt32DefVector PackCRCs;
+      ReadHashDigests(numPackStreams, PackCRCs);
       continue;
     }
     SkipData();
-  }
-  if (packCRCsDefined.IsEmpty())
-  {
-    BoolVector_Fill_False(packCRCsDefined, numPackStreams);
-    packCRCs.Reserve(numPackStreams);
-    packCRCs.Clear();
-    for (CNum i = 0; i < numPackStreams; i++)
-      packCRCs.Add(0);
   }
 }
 
 void CInArchive::ReadUnpackInfo(
     const CObjectVector<CByteBuffer> *dataVector,
-    CObjectVector<CFolder> &folders)
+    CFolders &folders)
 {
-  WaitAttribute(NID::kFolder);
+  WaitId(NID::kFolder);
   CNum numFolders = ReadNum();
 
+  CNum numCodersOutStreams = 0;
   {
     CStreamSwitch streamSwitch;
     streamSwitch.Set(this, dataVector);
-    folders.Clear();
-    folders.Reserve(numFolders);
-    for (CNum i = 0; i < numFolders; i++)
+    const Byte *startBufPtr = _inByteBack->GetPtr();
+    folders.NumFolders = numFolders;
+
+    folders.FoStartPackStreamIndex.Alloc(numFolders + 1);
+    folders.FoToMainUnpackSizeIndex.Alloc(numFolders);
+    folders.FoCodersDataOffset.Alloc(numFolders + 1);
+    folders.FoToCoderUnpackSizes.Alloc(numFolders + 1);
+
+    CBoolVector StreamUsed;
+    CBoolVector CoderUsed;
+
+    CNum packStreamIndex = 0;
+    CNum fo;
+    CInByte2 *inByte = _inByteBack;
+    
+    for (fo = 0; fo < numFolders; fo++)
     {
-      folders.Add(CFolder());
-      GetNextFolderItem(folders.Back());
+      UInt32 indexOfMainStream = 0;
+      UInt32 numPackStreams = 0;
+      folders.FoCodersDataOffset[fo] = _inByteBack->GetPtr() - startBufPtr;
+
+      CNum numInStreams = 0;
+      CNum numCoders = inByte->ReadNum();
+    
+      if (numCoders == 0 || numCoders > k_Scan_NumCoders_MAX)
+        ThrowUnsupported();
+
+      for (CNum ci = 0; ci < numCoders; ci++)
+      {
+        Byte mainByte = inByte->ReadByte();
+        if ((mainByte & 0xC0) != 0)
+          ThrowUnsupported();
+        
+        unsigned idSize = (mainByte & 0xF);
+        if (idSize > 8)
+          ThrowUnsupported();
+        if (idSize > inByte->GetRem())
+          ThrowEndOfData();
+        const Byte *longID = inByte->GetPtr();
+        UInt64 id = 0;
+        for (unsigned j = 0; j < idSize; j++)
+          id = ((id << 8) | longID[j]);
+        inByte->SkipDataNoCheck(idSize);
+        if (folders.ParsedMethods.IDs.Size() < 128)
+          folders.ParsedMethods.IDs.AddToUniqueSorted(id);
+        
+        CNum coderInStreams = 1;
+        if ((mainByte & 0x10) != 0)
+        {
+          coderInStreams = inByte->ReadNum();
+          if (coderInStreams > k_Scan_NumCodersStreams_in_Folder_MAX)
+            ThrowUnsupported();
+          if (inByte->ReadNum() != 1)
+            ThrowUnsupported();
+        }
+
+        numInStreams += coderInStreams;
+        if (numInStreams > k_Scan_NumCodersStreams_in_Folder_MAX)
+          ThrowUnsupported();
+        
+        if ((mainByte & 0x20) != 0)
+        {
+          CNum propsSize = inByte->ReadNum();
+          if (propsSize > inByte->GetRem())
+            ThrowEndOfData();
+          if (id == k_LZMA2 && propsSize == 1)
+          {
+            Byte v = *_inByteBack->GetPtr();
+            if (folders.ParsedMethods.Lzma2Prop < v)
+              folders.ParsedMethods.Lzma2Prop = v;
+          }
+          else if (id == k_LZMA && propsSize == 5)
+          {
+            UInt32 dicSize = GetUi32(_inByteBack->GetPtr() + 1);
+            if (folders.ParsedMethods.LzmaDic < dicSize)
+              folders.ParsedMethods.LzmaDic = dicSize;
+          }
+          inByte->SkipDataNoCheck((size_t)propsSize);
+        }
+      }
+      
+      if (numCoders == 1 && numInStreams == 1)
+      {
+        indexOfMainStream = 0;
+        numPackStreams = 1;
+      }
+      else
+      {
+        UInt32 i;
+        CNum numBonds = numCoders - 1;
+        if (numInStreams < numBonds)
+          ThrowUnsupported();
+        
+        BoolVector_Fill_False(StreamUsed, numInStreams);
+        BoolVector_Fill_False(CoderUsed, numCoders);
+        
+        for (i = 0; i < numBonds; i++)
+        {
+          CNum index = ReadNum();
+          if (index >= numInStreams || StreamUsed[index])
+            ThrowUnsupported();
+          StreamUsed[index] = true;
+          
+          index = ReadNum();
+          if (index >= numCoders || CoderUsed[index])
+            ThrowUnsupported();
+          CoderUsed[index] = true;
+        }
+        
+        numPackStreams = numInStreams - numBonds;
+        
+        if (numPackStreams != 1)
+          for (i = 0; i < numPackStreams; i++)
+          {
+            CNum index = inByte->ReadNum(); // PackStreams
+            if (index >= numInStreams || StreamUsed[index])
+              ThrowUnsupported();
+            StreamUsed[index] = true;
+          }
+          
+        for (i = 0; i < numCoders; i++)
+          if (!CoderUsed[i])
+          {
+            indexOfMainStream = i;
+            break;
+          }
+          
+        if (i == numCoders)
+          ThrowUnsupported();
+      }
+      
+      folders.FoToCoderUnpackSizes[fo] = numCodersOutStreams;
+      numCodersOutStreams += numCoders;
+      folders.FoStartPackStreamIndex[fo] = packStreamIndex;
+      if (numPackStreams > folders.NumPackStreams - packStreamIndex)
+        ThrowIncorrect();
+      packStreamIndex += numPackStreams;
+      folders.FoToMainUnpackSizeIndex[fo] = (Byte)indexOfMainStream;
     }
+    
+    size_t dataSize = _inByteBack->GetPtr() - startBufPtr;
+    folders.FoToCoderUnpackSizes[fo] = numCodersOutStreams;
+    folders.FoStartPackStreamIndex[fo] = packStreamIndex;
+    folders.FoCodersDataOffset[fo] = _inByteBack->GetPtr() - startBufPtr;
+    folders.CodersData.CopyFrom(startBufPtr, dataSize);
+
+    // if (folders.NumPackStreams != packStreamIndex) ThrowUnsupported();
   }
 
-  WaitAttribute(NID::kCodersUnpackSize);
-
-  CNum i;
-  for (i = 0; i < numFolders; i++)
-  {
-    CFolder &folder = folders[i];
-    CNum numOutStreams = folder.GetNumOutStreams();
-    folder.UnpackSizes.Reserve(numOutStreams);
-    for (CNum j = 0; j < numOutStreams; j++)
-      folder.UnpackSizes.Add(ReadNumber());
-  }
+  WaitId(NID::kCodersUnpackSize);
+  folders.CoderUnpackSizes.Alloc(numCodersOutStreams);
+  for (CNum i = 0; i < numCodersOutStreams; i++)
+    folders.CoderUnpackSizes[i] = ReadNumber();
 
   for (;;)
   {
@@ -560,15 +790,7 @@ void CInArchive::ReadUnpackInfo(
       return;
     if (type == NID::kCRC)
     {
-      CBoolVector crcsDefined;
-      CRecordVector<UInt32> crcs;
-      ReadHashDigests(numFolders, crcsDefined, crcs);
-      for (i = 0; i < numFolders; i++)
-      {
-        CFolder &folder = folders[i];
-        folder.UnpackCRCDefined = crcsDefined[i];
-        folder.UnpackCRC = crcs[i];
-      }
+      ReadHashDigests(numFolders, folders.FolderCRCs);
       continue;
     }
     SkipData();
@@ -576,170 +798,217 @@ void CInArchive::ReadUnpackInfo(
 }
 
 void CInArchive::ReadSubStreamsInfo(
-    const CObjectVector<CFolder> &folders,
-    CRecordVector<CNum> &numUnpackStreamsInFolders,
+    CFolders &folders,
     CRecordVector<UInt64> &unpackSizes,
-    CBoolVector &digestsDefined,
-    CRecordVector<UInt32> &digests)
+    CUInt32DefVector &digests)
 {
-  numUnpackStreamsInFolders.Clear();
-  numUnpackStreamsInFolders.Reserve(folders.Size());
+  folders.NumUnpackStreamsVector.Alloc(folders.NumFolders);
+  CNum i;
+  for (i = 0; i < folders.NumFolders; i++)
+    folders.NumUnpackStreamsVector[i] = 1;
+  
   UInt64 type;
+  
   for (;;)
   {
     type = ReadID();
     if (type == NID::kNumUnpackStream)
     {
-      for (int i = 0; i < folders.Size(); i++)
-        numUnpackStreamsInFolders.Add(ReadNum());
+      for (i = 0; i < folders.NumFolders; i++)
+        folders.NumUnpackStreamsVector[i] = ReadNum();
       continue;
     }
-    if (type == NID::kCRC || type == NID::kSize)
-      break;
-    if (type == NID::kEnd)
+    if (type == NID::kCRC || type == NID::kSize || type == NID::kEnd)
       break;
     SkipData();
   }
 
-  if (numUnpackStreamsInFolders.IsEmpty())
-    for (int i = 0; i < folders.Size(); i++)
-      numUnpackStreamsInFolders.Add(1);
-
-  int i;
-  for (i = 0; i < numUnpackStreamsInFolders.Size(); i++)
+  if (type == NID::kSize)
   {
-    // v3.13 incorrectly worked with empty folders
-    // v4.07: we check that folder is empty
-    CNum numSubstreams = numUnpackStreamsInFolders[i];
-    if (numSubstreams == 0)
-      continue;
-    UInt64 sum = 0;
-    for (CNum j = 1; j < numSubstreams; j++)
-      if (type == NID::kSize)
+    for (i = 0; i < folders.NumFolders; i++)
+    {
+      // v3.13 incorrectly worked with empty folders
+      // v4.07: we check that folder is empty
+      CNum numSubstreams = folders.NumUnpackStreamsVector[i];
+      if (numSubstreams == 0)
+        continue;
+      UInt64 sum = 0;
+      for (CNum j = 1; j < numSubstreams; j++)
       {
         UInt64 size = ReadNumber();
         unpackSizes.Add(size);
         sum += size;
+        if (sum < size)
+          ThrowIncorrect();
       }
-    unpackSizes.Add(folders[i].GetUnpackSize() - sum);
-  }
-  if (type == NID::kSize)
+      UInt64 folderUnpackSize = folders.GetFolderUnpackSize(i);
+      if (folderUnpackSize < sum)
+        ThrowIncorrect();
+      unpackSizes.Add(folderUnpackSize - sum);
+    }
     type = ReadID();
-
-  int numDigests = 0;
-  int numDigestsTotal = 0;
-  for (i = 0; i < folders.Size(); i++)
+  }
+  else
   {
-    CNum numSubstreams = numUnpackStreamsInFolders[i];
-    if (numSubstreams != 1 || !folders[i].UnpackCRCDefined)
+    for (i = 0; i < folders.NumFolders; i++)
+    {
+      /* v9.26 - v9.29 incorrectly worked:
+         if (folders.NumUnpackStreamsVector[i] == 0), it threw error */
+      CNum val = folders.NumUnpackStreamsVector[i];
+      if (val > 1)
+        ThrowIncorrect();
+      if (val == 1)
+        unpackSizes.Add(folders.GetFolderUnpackSize(i));
+    }
+  }
+
+  unsigned numDigests = 0;
+  for (i = 0; i < folders.NumFolders; i++)
+  {
+    CNum numSubstreams = folders.NumUnpackStreamsVector[i];
+    if (numSubstreams != 1 || !folders.FolderCRCs.ValidAndDefined(i))
       numDigests += numSubstreams;
-    numDigestsTotal += numSubstreams;
   }
 
   for (;;)
   {
+    if (type == NID::kEnd)
+      break;
     if (type == NID::kCRC)
     {
-      CBoolVector digestsDefined2;
-      CRecordVector<UInt32> digests2;
-      ReadHashDigests(numDigests, digestsDefined2, digests2);
-      int digestIndex = 0;
-      for (i = 0; i < folders.Size(); i++)
+      // CUInt32DefVector digests2;
+      // ReadHashDigests(numDigests, digests2);
+      CBoolVector digests2;
+      ReadBoolVector2(numDigests, digests2);
+
+      digests.ClearAndSetSize(unpackSizes.Size());
+      
+      unsigned k = 0;
+      unsigned k2 = 0;
+      
+      for (i = 0; i < folders.NumFolders; i++)
       {
-        CNum numSubstreams = numUnpackStreamsInFolders[i];
-        const CFolder &folder = folders[i];
-        if (numSubstreams == 1 && folder.UnpackCRCDefined)
+        CNum numSubstreams = folders.NumUnpackStreamsVector[i];
+        if (numSubstreams == 1 && folders.FolderCRCs.ValidAndDefined(i))
         {
-          digestsDefined.Add(true);
-          digests.Add(folder.UnpackCRC);
+          digests.Defs[k] = true;
+          digests.Vals[k] = folders.FolderCRCs.Vals[i];
+          k++;
         }
-        else
-          for (CNum j = 0; j < numSubstreams; j++, digestIndex++)
-          {
-            digestsDefined.Add(digestsDefined2[digestIndex]);
-            digests.Add(digests2[digestIndex]);
-          }
+        else for (CNum j = 0; j < numSubstreams; j++)
+        {
+          bool defined = digests2[k2++];
+          digests.Defs[k] = defined;
+          UInt32 crc = 0;
+          if (defined)
+            crc = ReadUInt32();
+          digests.Vals[k] = crc;
+          k++;
+        }
       }
-    }
-    else if (type == NID::kEnd)
-    {
-      if (digestsDefined.IsEmpty())
-      {
-        BoolVector_Fill_False(digestsDefined, numDigestsTotal);
-        digests.Clear();
-        for (int i = 0; i < numDigestsTotal; i++)
-          digests.Add(0);
-      }
-      return;
+      // if (k != unpackSizes.Size()) throw 1234567;
     }
     else
       SkipData();
+    
     type = ReadID();
+  }
+
+  if (digests.Defs.Size() != unpackSizes.Size())
+  {
+    digests.ClearAndSetSize(unpackSizes.Size());
+    unsigned k = 0;
+    for (i = 0; i < folders.NumFolders; i++)
+    {
+      CNum numSubstreams = folders.NumUnpackStreamsVector[i];
+      if (numSubstreams == 1 && folders.FolderCRCs.ValidAndDefined(i))
+      {
+        digests.Defs[k] = true;
+        digests.Vals[k] = folders.FolderCRCs.Vals[i];
+        k++;
+      }
+      else for (CNum j = 0; j < numSubstreams; j++)
+      {
+        digests.Defs[k] = false;
+        digests.Vals[k] = 0;
+        k++;
+      }
+    }
   }
 }
 
 void CInArchive::ReadStreamsInfo(
     const CObjectVector<CByteBuffer> *dataVector,
     UInt64 &dataOffset,
-    CRecordVector<UInt64> &packSizes,
-    CBoolVector &packCRCsDefined,
-    CRecordVector<UInt32> &packCRCs,
-    CObjectVector<CFolder> &folders,
-    CRecordVector<CNum> &numUnpackStreamsInFolders,
+    CFolders &folders,
     CRecordVector<UInt64> &unpackSizes,
-    CBoolVector &digestsDefined,
-    CRecordVector<UInt32> &digests)
+    CUInt32DefVector &digests)
 {
-  for (;;)
+  UInt64 type = ReadID();
+  
+  if (type == NID::kPackInfo)
   {
-    UInt64 type = ReadID();
-    if (type > ((UInt32)1 << 30))
-      ThrowIncorrect();
-    switch((UInt32)type)
+    dataOffset = ReadNumber();
+    ReadPackInfo(folders);
+    type = ReadID();
+  }
+
+  if (type == NID::kUnpackInfo)
+  {
+    ReadUnpackInfo(dataVector, folders);
+    type = ReadID();
+  }
+
+  if (folders.NumFolders != 0 && !folders.PackPositions)
+  {
+    // if there are folders, we need PackPositions also
+    folders.PackPositions.Alloc(1);
+    folders.PackPositions[0] = 0;
+  }
+  
+  if (type == NID::kSubStreamsInfo)
+  {
+    ReadSubStreamsInfo(folders, unpackSizes, digests);
+    type = ReadID();
+  }
+  else
+  {
+    folders.NumUnpackStreamsVector.Alloc(folders.NumFolders);
+    /* If digests.Defs.Size() == 0, it means that there are no crcs.
+       So we don't need to fill digests with values. */
+    // digests.Vals.ClearAndSetSize(folders.NumFolders);
+    // BoolVector_Fill_False(digests.Defs, folders.NumFolders);
+    for (CNum i = 0; i < folders.NumFolders; i++)
     {
-      case NID::kEnd:
-        return;
-      case NID::kPackInfo:
-      {
-        ReadPackInfo(dataOffset, packSizes, packCRCsDefined, packCRCs);
-        break;
-      }
-      case NID::kUnpackInfo:
-      {
-        ReadUnpackInfo(dataVector, folders);
-        break;
-      }
-      case NID::kSubStreamsInfo:
-      {
-        ReadSubStreamsInfo(folders, numUnpackStreamsInFolders,
-            unpackSizes, digestsDefined, digests);
-        break;
-      }
-      default:
-        ThrowIncorrect();
+      folders.NumUnpackStreamsVector[i] = 1;
+      unpackSizes.Add(folders.GetFolderUnpackSize(i));
+      // digests.Vals[i] = 0;
     }
   }
+  
+  if (type != NID::kEnd)
+    ThrowIncorrect();
 }
 
-void CInArchive::ReadBoolVector(int numItems, CBoolVector &v)
+void CInArchive::ReadBoolVector(unsigned numItems, CBoolVector &v)
 {
-  v.Clear();
-  v.Reserve(numItems);
+  v.ClearAndSetSize(numItems);
   Byte b = 0;
   Byte mask = 0;
-  for (int i = 0; i < numItems; i++)
+  bool *p = &v[0];
+  for (unsigned i = 0; i < numItems; i++)
   {
     if (mask == 0)
     {
       b = ReadByte();
       mask = 0x80;
     }
-    v.Add((b & mask) != 0);
+    p[i] = ((b & mask) != 0);
     mask >>= 1;
   }
 }
 
-void CInArchive::ReadBoolVector2(int numItems, CBoolVector &v)
+void CInArchive::ReadBoolVector2(unsigned numItems, CBoolVector &v)
 {
   Byte allAreDefined = ReadByte();
   if (allAreDefined == 0)
@@ -747,27 +1016,30 @@ void CInArchive::ReadBoolVector2(int numItems, CBoolVector &v)
     ReadBoolVector(numItems, v);
     return;
   }
-  v.Clear();
-  v.Reserve(numItems);
-  for (int i = 0; i < numItems; i++)
-    v.Add(true);
+  v.ClearAndSetSize(numItems);
+  bool *p = &v[0];
+  for (unsigned i = 0; i < numItems; i++)
+    p[i] = true;
 }
 
 void CInArchive::ReadUInt64DefVector(const CObjectVector<CByteBuffer> &dataVector,
-    CUInt64DefVector &v, int numFiles)
+    CUInt64DefVector &v, unsigned numItems)
 {
-  ReadBoolVector2(numFiles, v.Defined);
+  ReadBoolVector2(numItems, v.Defs);
 
   CStreamSwitch streamSwitch;
   streamSwitch.Set(this, &dataVector);
-  v.Values.Reserve(numFiles);
+  
+  v.Vals.ClearAndSetSize(numItems);
+  UInt64 *p = &v.Vals[0];
+  const bool *defs = &v.Defs[0];
 
-  for (int i = 0; i < numFiles; i++)
+  for (unsigned i = 0; i < numItems; i++)
   {
     UInt64 t = 0;
-    if (v.Defined[i])
+    if (defs[i])
       t = ReadUInt64();
-    v.Values.Add(t);
+    p[i] = t;
   }
 }
 
@@ -775,97 +1047,71 @@ HRESULT CInArchive::ReadAndDecodePackedStreams(
     DECL_EXTERNAL_CODECS_LOC_VARS
     UInt64 baseOffset,
     UInt64 &dataOffset, CObjectVector<CByteBuffer> &dataVector
-    #ifndef _NO_CRYPTO
-    , ICryptoGetTextPassword *getTextPassword, bool &passwordIsDefined
-    #endif
+    _7Z_DECODER_CRYPRO_VARS_DECL
     )
 {
-  CRecordVector<UInt64> packSizes;
-  CBoolVector packCRCsDefined;
-  CRecordVector<UInt32> packCRCs;
-  CObjectVector<CFolder> folders;
-  
-  CRecordVector<CNum> numUnpackStreamsInFolders;
+  CFolders folders;
   CRecordVector<UInt64> unpackSizes;
-  CBoolVector digestsDefined;
-  CRecordVector<UInt32> digests;
+  CUInt32DefVector  digests;
   
   ReadStreamsInfo(NULL,
     dataOffset,
-    packSizes,
-    packCRCsDefined,
-    packCRCs,
     folders,
-    numUnpackStreamsInFolders,
     unpackSizes,
-    digestsDefined,
     digests);
   
-  // db.ArchiveInfo.DataStartPosition2 += db.ArchiveInfo.StartPositionAfterHeader;
-  
-  CNum packIndex = 0;
-  CDecoder decoder(
-    #ifdef _ST_MODE
-    false
-    #else
-    true
-    #endif
-    );
-  UInt64 dataStartPos = baseOffset + dataOffset;
-  for (int i = 0; i < folders.Size(); i++)
+  CDecoder decoder(_useMixerMT);
+
+  for (CNum i = 0; i < folders.NumFolders; i++)
   {
-    const CFolder &folder = folders[i];
-    dataVector.Add(CByteBuffer());
-    CByteBuffer &data = dataVector.Back();
-    UInt64 unpackSize64 = folder.GetUnpackSize();
+    CByteBuffer &data = dataVector.AddNew();
+    UInt64 unpackSize64 = folders.GetFolderUnpackSize(i);
     size_t unpackSize = (size_t)unpackSize64;
     if (unpackSize != unpackSize64)
       ThrowUnsupported();
-    data.SetCapacity(unpackSize);
+    data.Alloc(unpackSize);
     
     CBufPtrSeqOutStream *outStreamSpec = new CBufPtrSeqOutStream;
     CMyComPtr<ISequentialOutStream> outStream = outStreamSpec;
     outStreamSpec->Init(data, unpackSize);
     
     HRESULT result = decoder.Decode(
-      EXTERNAL_CODECS_LOC_VARS
-      _stream, dataStartPos,
-      &packSizes[packIndex], folder, outStream, NULL
-      #ifndef _NO_CRYPTO
-      , getTextPassword, passwordIsDefined
-      #endif
-      #if !defined(_7ZIP_ST) && !defined(_SFX)
-      , false, 1
-      #endif
+        EXTERNAL_CODECS_LOC_VARS
+        _stream, baseOffset + dataOffset,
+        folders, i,
+        NULL, // *unpackSize
+        
+        outStream,
+        NULL, // *compressProgress
+        NULL  // **inStreamMainRes
+        
+        _7Z_DECODER_CRYPRO_VARS
+        #if !defined(_7ZIP_ST) && !defined(_SFX)
+          , false // mtMode
+          , 1     // numThreads
+        #endif
       );
     RINOK(result);
     
-    if (folder.UnpackCRCDefined)
-      if (CrcCalc(data, unpackSize) != folder.UnpackCRC)
+    if (folders.FolderCRCs.ValidAndDefined(i))
+      if (CrcCalc(data, unpackSize) != folders.FolderCRCs.Vals[i])
         ThrowIncorrect();
-    for (int j = 0; j < folder.PackStreams.Size(); j++)
-    {
-      UInt64 packSize = packSizes[packIndex++];
-      dataStartPos += packSize;
-      HeadersSize += packSize;
-    }
   }
+  HeadersSize += folders.PackPositions[folders.NumPackStreams];
   return S_OK;
 }
 
 HRESULT CInArchive::ReadHeader(
     DECL_EXTERNAL_CODECS_LOC_VARS
-    CArchiveDatabaseEx &db
-    #ifndef _NO_CRYPTO
-    , ICryptoGetTextPassword *getTextPassword, bool &passwordIsDefined
-    #endif
+    CDbEx &db
+    _7Z_DECODER_CRYPRO_VARS_DECL
     )
 {
   UInt64 type = ReadID();
 
   if (type == NID::kArchiveProperties)
   {
-    ReadArchiveProperties(db.ArchiveInfo);
+    ReadArchiveProperties(db.ArcInfo);
     type = ReadID();
   }
  
@@ -875,70 +1121,53 @@ HRESULT CInArchive::ReadHeader(
   {
     HRESULT result = ReadAndDecodePackedStreams(
         EXTERNAL_CODECS_LOC_VARS
-        db.ArchiveInfo.StartPositionAfterHeader,
-        db.ArchiveInfo.DataStartPosition2,
+        db.ArcInfo.StartPositionAfterHeader,
+        db.ArcInfo.DataStartPosition2,
         dataVector
-        #ifndef _NO_CRYPTO
-        , getTextPassword, passwordIsDefined
-        #endif
+        _7Z_DECODER_CRYPRO_VARS
         );
     RINOK(result);
-    db.ArchiveInfo.DataStartPosition2 += db.ArchiveInfo.StartPositionAfterHeader;
+    db.ArcInfo.DataStartPosition2 += db.ArcInfo.StartPositionAfterHeader;
     type = ReadID();
   }
 
   CRecordVector<UInt64> unpackSizes;
-  CBoolVector digestsDefined;
-  CRecordVector<UInt32> digests;
+  CUInt32DefVector digests;
   
   if (type == NID::kMainStreamsInfo)
   {
     ReadStreamsInfo(&dataVector,
-        db.ArchiveInfo.DataStartPosition,
-        db.PackSizes,
-        db.PackCRCsDefined,
-        db.PackCRCs,
-        db.Folders,
-        db.NumUnpackStreamsVector,
+        db.ArcInfo.DataStartPosition,
+        (CFolders &)db,
         unpackSizes,
-        digestsDefined,
         digests);
-    db.ArchiveInfo.DataStartPosition += db.ArchiveInfo.StartPositionAfterHeader;
+    db.ArcInfo.DataStartPosition += db.ArcInfo.StartPositionAfterHeader;
     type = ReadID();
-  }
-  else
-  {
-    for (int i = 0; i < db.Folders.Size(); i++)
-    {
-      db.NumUnpackStreamsVector.Add(1);
-      CFolder &folder = db.Folders[i];
-      unpackSizes.Add(folder.GetUnpackSize());
-      digestsDefined.Add(folder.UnpackCRCDefined);
-      digests.Add(folder.UnpackCRC);
-    }
   }
 
   db.Files.Clear();
 
-  if (type == NID::kEnd)
-    return S_OK;
-  if (type != NID::kFilesInfo)
-    ThrowIncorrect();
+  if (type == NID::kFilesInfo)
+  {
   
   CNum numFiles = ReadNum();
+  db.Files.ClearAndSetSize(numFiles);
+  CNum i;
+  /*
   db.Files.Reserve(numFiles);
   CNum i;
   for (i = 0; i < numFiles; i++)
     db.Files.Add(CFileItem());
+  */
 
-  db.ArchiveInfo.FileInfoPopIDs.Add(NID::kSize);
-  if (!db.PackSizes.IsEmpty())
-    db.ArchiveInfo.FileInfoPopIDs.Add(NID::kPackInfo);
-  if (numFiles > 0  && !digests.IsEmpty())
-    db.ArchiveInfo.FileInfoPopIDs.Add(NID::kCRC);
+  db.ArcInfo.FileInfoPopIDs.Add(NID::kSize);
+  // if (!db.PackSizes.IsEmpty())
+    db.ArcInfo.FileInfoPopIDs.Add(NID::kPackInfo);
+  if (numFiles > 0 && !digests.Defs.IsEmpty())
+    db.ArcInfo.FileInfoPopIDs.Add(NID::kCRC);
 
   CBoolVector emptyStreamVector;
-  BoolVector_Fill_False(emptyStreamVector, (int)numFiles);
+  BoolVector_Fill_False(emptyStreamVector, (unsigned)numFiles);
   CBoolVector emptyFileVector;
   CBoolVector antiFileVector;
   CNum numEmptyStreams = 0;
@@ -949,22 +1178,43 @@ HRESULT CInArchive::ReadHeader(
     if (type == NID::kEnd)
       break;
     UInt64 size = ReadNumber();
-    size_t ppp = _inByteBack->_pos;
+    if (size > _inByteBack->GetRem())
+      ThrowIncorrect();
+    CStreamSwitch switchProp;
+    switchProp.Set(this, _inByteBack->GetPtr(), (size_t)size, true);
     bool addPropIdToList = true;
     bool isKnownType = true;
     if (type > ((UInt32)1 << 30))
       isKnownType = false;
-    else switch((UInt32)type)
+    else switch ((UInt32)type)
     {
       case NID::kName:
       {
         CStreamSwitch streamSwitch;
         streamSwitch.Set(this, &dataVector);
-        for (int i = 0; i < db.Files.Size(); i++)
-          _inByteBack->ReadString(db.Files[i].Name);
+        size_t rem = _inByteBack->GetRem();
+        db.NamesBuf.Alloc(rem);
+        ReadBytes(db.NamesBuf, rem);
+        db.NameOffsets.Alloc(db.Files.Size() + 1);
+        size_t pos = 0;
+        unsigned i;
+        for (i = 0; i < db.Files.Size(); i++)
+        {
+          size_t curRem = (rem - pos) / 2;
+          const UInt16 *buf = (const UInt16 *)(db.NamesBuf + pos);
+          size_t j;
+          for (j = 0; j < curRem && buf[j] != 0; j++);
+          if (j == curRem)
+            ThrowEndOfData();
+          db.NameOffsets[i] = pos / 2;
+          pos += j * 2 + 2;
+        }
+        db.NameOffsets[i] = pos / 2;
+        if (pos != rem)
+          ThereIsHeaderError = true;
         break;
       }
-      case NID::kWinAttributes:
+      case NID::kWinAttrib:
       {
         CBoolVector boolVector;
         ReadBoolVector2(db.Files.Size(), boolVector);
@@ -979,9 +1229,40 @@ HRESULT CInArchive::ReadHeader(
         }
         break;
       }
+      /*
+      case NID::kIsAux:
+      {
+        ReadBoolVector(db.Files.Size(), db.IsAux);
+        break;
+      }
+      case NID::kParent:
+      {
+        db.IsTree = true;
+        // CBoolVector boolVector;
+        // ReadBoolVector2(db.Files.Size(), boolVector);
+        // CStreamSwitch streamSwitch;
+        // streamSwitch.Set(this, &dataVector);
+        CBoolVector boolVector;
+        ReadBoolVector2(db.Files.Size(), boolVector);
+
+        db.ThereAreAltStreams = false;
+        for (i = 0; i < numFiles; i++)
+        {
+          CFileItem &file = db.Files[i];
+          // file.Parent = -1;
+          // if (boolVector[i])
+          file.Parent = (int)ReadUInt32();
+          file.IsAltStream = !boolVector[i];
+          if (file.IsAltStream)
+            db.ThereAreAltStreams = true;
+        }
+        break;
+      }
+      */
       case NID::kEmptyStream:
       {
         ReadBoolVector(numFiles, emptyStreamVector);
+        numEmptyStreams = 0;
         for (i = 0; i < (CNum)emptyStreamVector.Size(); i++)
           if (emptyStreamVector[i])
             numEmptyStreams++;
@@ -993,33 +1274,85 @@ HRESULT CInArchive::ReadHeader(
       }
       case NID::kEmptyFile:  ReadBoolVector(numEmptyStreams, emptyFileVector); break;
       case NID::kAnti:  ReadBoolVector(numEmptyStreams, antiFileVector); break;
-      case NID::kStartPos:  ReadUInt64DefVector(dataVector, db.StartPos, (int)numFiles); break;
-      case NID::kCTime:  ReadUInt64DefVector(dataVector, db.CTime, (int)numFiles); break;
-      case NID::kATime:  ReadUInt64DefVector(dataVector, db.ATime, (int)numFiles); break;
-      case NID::kMTime:  ReadUInt64DefVector(dataVector, db.MTime, (int)numFiles); break;
+      case NID::kStartPos:  ReadUInt64DefVector(dataVector, db.StartPos, (unsigned)numFiles); break;
+      case NID::kCTime:  ReadUInt64DefVector(dataVector, db.CTime, (unsigned)numFiles); break;
+      case NID::kATime:  ReadUInt64DefVector(dataVector, db.ATime, (unsigned)numFiles); break;
+      case NID::kMTime:  ReadUInt64DefVector(dataVector, db.MTime, (unsigned)numFiles); break;
       case NID::kDummy:
       {
         for (UInt64 j = 0; j < size; j++)
           if (ReadByte() != 0)
-            ThrowIncorrect();
+            ThereIsHeaderError = true;
         addPropIdToList = false;
         break;
       }
+      /*
+      case NID::kNtSecure:
+      {
+        try
+        {
+          {
+            CStreamSwitch streamSwitch;
+            streamSwitch.Set(this, &dataVector);
+            UInt32 numDescriptors = ReadUInt32();
+            size_t offset = 0;
+            db.SecureOffsets.Clear();
+            for (i = 0; i < numDescriptors; i++)
+            {
+              UInt32 size = ReadUInt32();
+              db.SecureOffsets.Add(offset);
+              offset += size;
+            }
+            // ThrowIncorrect();;
+            db.SecureOffsets.Add(offset);
+            db.SecureBuf.SetCapacity(offset);
+            for (i = 0; i < numDescriptors; i++)
+            {
+              offset = db.SecureOffsets[i];
+              ReadBytes(db.SecureBuf + offset, db.SecureOffsets[i + 1] - offset);
+            }
+            db.SecureIDs.Clear();
+            for (unsigned i = 0; i < db.Files.Size(); i++)
+            {
+              db.SecureIDs.Add(ReadNum());
+              // db.SecureIDs.Add(ReadUInt32());
+            }
+            // ReadUInt32();
+            if (_inByteBack->GetRem() != 0)
+              ThrowIncorrect();;
+          }
+        }
+        catch(CInArchiveException &)
+        {
+          ThereIsHeaderError = true;
+          addPropIdToList = isKnownType = false;
+          db.ClearSecure();
+        }
+        break;
+      }
+      */
       default:
         addPropIdToList = isKnownType = false;
     }
     if (isKnownType)
     {
-      if(addPropIdToList)
-        db.ArchiveInfo.FileInfoPopIDs.Add(type);
+      if (addPropIdToList)
+        db.ArcInfo.FileInfoPopIDs.Add(type);
     }
     else
-      SkipData(size);
-    bool checkRecordsSize = (db.ArchiveInfo.Version.Major > 0 ||
-        db.ArchiveInfo.Version.Minor > 2);
-    if (checkRecordsSize && _inByteBack->_pos - ppp != size)
+    {
+      db.UnsupportedFeatureWarning = true;
+      _inByteBack->SkipRem();
+    }
+    // SkipData worked incorrectly in some versions before v4.59 (7zVer <= 0.02)
+    if (_inByteBack->GetRem() != 0)
       ThrowIncorrect();
   }
+
+  type = ReadID(); // Read (NID::kEnd) end of headers
+
+  if (numFiles - numEmptyStreams != unpackSizes.Size())
+    ThrowUnsupported();
 
   CNum emptyFileIndex = 0;
   CNum sizeIndex = 0;
@@ -1028,19 +1361,21 @@ HRESULT CInArchive::ReadHeader(
   for (i = 0; i < numEmptyStreams; i++)
     if (antiFileVector[i])
       numAntiItems++;
-    
+
   for (i = 0; i < numFiles; i++)
   {
     CFileItem &file = db.Files[i];
     bool isAnti;
     file.HasStream = !emptyStreamVector[i];
+    file.Crc = 0;
     if (file.HasStream)
     {
       file.IsDir = false;
       isAnti = false;
       file.Size = unpackSizes[sizeIndex];
-      file.Crc = digests[sizeIndex];
-      file.CrcDefined = digestsDefined[sizeIndex];
+      file.CrcDefined = digests.ValidAndDefined(sizeIndex);
+      if (file.CrcDefined)
+        file.Crc = digests.Vals[sizeIndex];
       sizeIndex++;
     }
     else
@@ -1054,158 +1389,182 @@ HRESULT CInArchive::ReadHeader(
     if (numAntiItems != 0)
       db.IsAnti.Add(isAnti);
   }
+  }
+  db.FillLinks();
+  /*
+  if (type != NID::kEnd)
+    ThrowIncorrect();
+  if (_inByteBack->GetRem() != 0)
+    ThrowIncorrect();
+  */
   return S_OK;
 }
 
-
-void CArchiveDatabaseEx::FillFolderStartPackStream()
+void CDbEx::FillLinks()
 {
-  FolderStartPackStreamIndex.Clear();
-  FolderStartPackStreamIndex.Reserve(Folders.Size());
-  CNum startPos = 0;
-  for (int i = 0; i < Folders.Size(); i++)
-  {
-    FolderStartPackStreamIndex.Add(startPos);
-    startPos += (CNum)Folders[i].PackStreams.Size();
-  }
-}
-
-void CArchiveDatabaseEx::FillStartPos()
-{
-  PackStreamStartPositions.Clear();
-  PackStreamStartPositions.Reserve(PackSizes.Size());
-  UInt64 startPos = 0;
-  for (int i = 0; i < PackSizes.Size(); i++)
-  {
-    PackStreamStartPositions.Add(startPos);
-    startPos += PackSizes[i];
-  }
-}
-
-void CArchiveDatabaseEx::FillFolderStartFileIndex()
-{
-  FolderStartFileIndex.Clear();
-  FolderStartFileIndex.Reserve(Folders.Size());
-  FileIndexToFolderIndexMap.Clear();
-  FileIndexToFolderIndexMap.Reserve(Files.Size());
+  FolderStartFileIndex.Alloc(NumFolders);
+  FileIndexToFolderIndexMap.Alloc(Files.Size());
   
-  int folderIndex = 0;
+  CNum folderIndex = 0;
   CNum indexInFolder = 0;
-  for (int i = 0; i < Files.Size(); i++)
+  unsigned i;
+
+  for (i = 0; i < Files.Size(); i++)
   {
-    const CFileItem &file = Files[i];
-    bool emptyStream = !file.HasStream;
-    if (emptyStream && indexInFolder == 0)
-    {
-      FileIndexToFolderIndexMap.Add(kNumNoIndex);
-      continue;
-    }
+    bool emptyStream = !Files[i].HasStream;
     if (indexInFolder == 0)
     {
+      if (emptyStream)
+      {
+        FileIndexToFolderIndexMap[i] = kNumNoIndex;
+        continue;
+      }
       // v3.13 incorrectly worked with empty folders
-      // v4.07: Loop for skipping empty folders
+      // v4.07: we skip empty folders
       for (;;)
       {
-        if (folderIndex >= Folders.Size())
+        if (folderIndex >= NumFolders)
           ThrowIncorrect();
-        FolderStartFileIndex.Add(i); // check it
+        FolderStartFileIndex[folderIndex] = i;
         if (NumUnpackStreamsVector[folderIndex] != 0)
           break;
         folderIndex++;
       }
     }
-    FileIndexToFolderIndexMap.Add(folderIndex);
+    FileIndexToFolderIndexMap[i] = folderIndex;
     if (emptyStream)
       continue;
-    indexInFolder++;
-    if (indexInFolder >= NumUnpackStreamsVector[folderIndex])
+    if (++indexInFolder >= NumUnpackStreamsVector[folderIndex])
     {
       folderIndex++;
       indexInFolder = 0;
     }
   }
+
+  if (indexInFolder != 0)
+    folderIndex++;
+  /*
+  if (indexInFolder != 0)
+    ThrowIncorrect();
+  */
+  
+  for (;;)
+  {
+    if (folderIndex >= NumFolders)
+      return;
+    FolderStartFileIndex[folderIndex] = i;
+    /*
+    if (NumUnpackStreamsVector[folderIndex] != 0)
+      ThrowIncorrect();;
+    */
+    folderIndex++;
+  }
 }
 
 HRESULT CInArchive::ReadDatabase2(
     DECL_EXTERNAL_CODECS_LOC_VARS
-    CArchiveDatabaseEx &db
-    #ifndef _NO_CRYPTO
-    , ICryptoGetTextPassword *getTextPassword, bool &passwordIsDefined
-    #endif
+    CDbEx &db
+    _7Z_DECODER_CRYPRO_VARS_DECL
     )
 {
   db.Clear();
-  db.ArchiveInfo.StartPosition = _arhiveBeginStreamPosition;
+  db.ArcInfo.StartPosition = _arhiveBeginStreamPosition;
 
-  db.ArchiveInfo.Version.Major = _header[6];
-  db.ArchiveInfo.Version.Minor = _header[7];
+  db.ArcInfo.Version.Major = _header[6];
+  db.ArcInfo.Version.Minor = _header[7];
 
-  if (db.ArchiveInfo.Version.Major != kMajorVersion)
-    ThrowUnsupportedVersion();
+  if (db.ArcInfo.Version.Major != kMajorVersion)
+  {
+    // db.UnsupportedVersion = true;
+    return S_FALSE;
+  }
 
-  UInt32 crcFromArchive = Get32(_header + 8);
-  UInt64 nextHeaderOffset = Get64(_header + 0xC);
-  UInt64 nextHeaderSize = Get64(_header + 0x14);
-  UInt32 nextHeaderCRC = Get32(_header + 0x1C);
-  UInt32 crc = CrcCalc(_header + 0xC, 20);
+  UInt64 nextHeaderOffset = Get64(_header + 12);
+  UInt64 nextHeaderSize = Get64(_header + 20);
+  UInt32 nextHeaderCRC = Get32(_header + 28);
 
   #ifdef FORMAT_7Z_RECOVERY
-  if (crcFromArchive == 0 && nextHeaderOffset == 0 && nextHeaderSize == 0 && nextHeaderCRC == 0)
+  UInt32 crcFromArc = Get32(_header + 8);
+  if (crcFromArc == 0 && nextHeaderOffset == 0 && nextHeaderSize == 0 && nextHeaderCRC == 0)
   {
-    UInt64 cur, cur2;
+    UInt64 cur, fileSize;
     RINOK(_stream->Seek(0, STREAM_SEEK_CUR, &cur));
-    const int kCheckSize = 500;
+    const unsigned kCheckSize = 512;
     Byte buf[kCheckSize];
-    RINOK(_stream->Seek(0, STREAM_SEEK_END, &cur2));
-    int checkSize = kCheckSize;
-    if (cur2 - cur < kCheckSize)
-      checkSize = (int)(cur2 - cur);
-    RINOK(_stream->Seek(-checkSize, STREAM_SEEK_END, &cur2));
-    
+    RINOK(_stream->Seek(0, STREAM_SEEK_END, &fileSize));
+    UInt64 rem = fileSize - cur;
+    unsigned checkSize = kCheckSize;
+    if (rem < kCheckSize)
+      checkSize = (unsigned)(rem);
+    if (checkSize < 3)
+      return S_FALSE;
+    RINOK(_stream->Seek(fileSize - checkSize, STREAM_SEEK_SET, NULL));
     RINOK(ReadStream_FALSE(_stream, buf, (size_t)checkSize));
 
-    int i;
-    for (i = (int)checkSize - 2; i >= 0; i--)
-      if (buf[i] == 0x17 && buf[i + 1] == 0x6 || buf[i] == 0x01 && buf[i + 1] == 0x04)
-        break;
-    if (i < 0)
+    if (buf[checkSize - 1] != 0)
       return S_FALSE;
+
+    unsigned i;
+    for (i = checkSize - 2;; i--)
+    {
+      if (buf[i] == NID::kEncodedHeader && buf[i + 1] == NID::kPackInfo ||
+          buf[i] == NID::kHeader && buf[i + 1] == NID::kMainStreamsInfo)
+        break;
+      if (i == 0)
+        return S_FALSE;
+    }
     nextHeaderSize = checkSize - i;
-    nextHeaderOffset = cur2 - cur + i;
+    nextHeaderOffset = rem - nextHeaderSize;
     nextHeaderCRC = CrcCalc(buf + i, (size_t)nextHeaderSize);
     RINOK(_stream->Seek(cur, STREAM_SEEK_SET, NULL));
+    db.StartHeaderWasRecovered = true;
   }
   else
   #endif
   {
-    if (crc != crcFromArchive)
-      ThrowIncorrect();
+    // Crc was tested already at signature check
+    // if (CrcCalc(_header + 12, 20) != crcFromArchive) ThrowIncorrect();
   }
 
-  db.ArchiveInfo.StartPositionAfterHeader = _arhiveBeginStreamPosition + kHeaderSize;
+  db.ArcInfo.StartPositionAfterHeader = _arhiveBeginStreamPosition + kHeaderSize;
+  db.PhySize = kHeaderSize;
 
+  db.IsArc = false;
+  if ((Int64)nextHeaderOffset < 0 ||
+      nextHeaderSize > ((UInt64)1 << 62))
+    return S_FALSE;
   if (nextHeaderSize == 0)
+  {
+    if (nextHeaderOffset != 0)
+      return S_FALSE;
+    db.IsArc = true;
     return S_OK;
-
-  if (nextHeaderSize > (UInt64)(UInt32)0xFFFFFFFF)
-    return S_FALSE;
-
-  if ((Int64)nextHeaderOffset < 0)
-    return S_FALSE;
-
-  if (db.ArchiveInfo.StartPositionAfterHeader + nextHeaderOffset > _fileEndPosition)
-    return S_FALSE;
-  RINOK(_stream->Seek(nextHeaderOffset, STREAM_SEEK_CUR, NULL));
-
-  CByteBuffer buffer2;
-  buffer2.SetCapacity((size_t)nextHeaderSize);
-
-  RINOK(ReadStream_FALSE(_stream, buffer2, (size_t)nextHeaderSize));
+  }
+  
+  if (!db.StartHeaderWasRecovered)
+    db.IsArc = true;
+  
   HeadersSize += kHeaderSize + nextHeaderSize;
   db.PhySize = kHeaderSize + nextHeaderOffset + nextHeaderSize;
+  if (_fileEndPosition - db.ArcInfo.StartPositionAfterHeader < nextHeaderOffset + nextHeaderSize)
+  {
+    db.UnexpectedEnd = true;
+    return S_FALSE;
+  }
+  RINOK(_stream->Seek(nextHeaderOffset, STREAM_SEEK_CUR, NULL));
 
-  if (CrcCalc(buffer2, (UInt32)nextHeaderSize) != nextHeaderCRC)
+  size_t nextHeaderSize_t = (size_t)nextHeaderSize;
+  if (nextHeaderSize_t != nextHeaderSize)
+    return E_OUTOFMEMORY;
+  CByteBuffer buffer2(nextHeaderSize_t);
+
+  RINOK(ReadStream_FALSE(_stream, buffer2, nextHeaderSize_t));
+
+  if (CrcCalc(buffer2, nextHeaderSize_t) != nextHeaderCRC)
     ThrowIncorrect();
+
+  if (!db.StartHeaderWasRecovered)
+    db.PhySizeWasConfirmed = true;
   
   CStreamSwitch streamSwitch;
   streamSwitch.Set(this, buffer2);
@@ -1219,12 +1578,10 @@ HRESULT CInArchive::ReadDatabase2(
       ThrowIncorrect();
     HRESULT result = ReadAndDecodePackedStreams(
         EXTERNAL_CODECS_LOC_VARS
-        db.ArchiveInfo.StartPositionAfterHeader,
-        db.ArchiveInfo.DataStartPosition2,
+        db.ArcInfo.StartPositionAfterHeader,
+        db.ArcInfo.DataStartPosition2,
         dataVector
-        #ifndef _NO_CRYPTO
-        , getTextPassword, passwordIsDefined
-        #endif
+        _7Z_DECODER_CRYPRO_VARS
         );
     RINOK(result);
     if (dataVector.Size() == 0)
@@ -1237,35 +1594,45 @@ HRESULT CInArchive::ReadDatabase2(
       ThrowIncorrect();
   }
 
+  db.IsArc = true;
+
   db.HeadersSize = HeadersSize;
 
   return ReadHeader(
     EXTERNAL_CODECS_LOC_VARS
     db
-    #ifndef _NO_CRYPTO
-    , getTextPassword, passwordIsDefined
-    #endif
+    _7Z_DECODER_CRYPRO_VARS
     );
 }
 
 HRESULT CInArchive::ReadDatabase(
     DECL_EXTERNAL_CODECS_LOC_VARS
-    CArchiveDatabaseEx &db
-    #ifndef _NO_CRYPTO
-    , ICryptoGetTextPassword *getTextPassword, bool &passwordIsDefined
-    #endif
+    CDbEx &db
+    _7Z_DECODER_CRYPRO_VARS_DECL
     )
 {
   try
   {
-    return ReadDatabase2(
+    HRESULT res = ReadDatabase2(
       EXTERNAL_CODECS_LOC_VARS db
-      #ifndef _NO_CRYPTO
-      , getTextPassword, passwordIsDefined
-      #endif
+      _7Z_DECODER_CRYPRO_VARS
       );
+    if (ThereIsHeaderError)
+      db.ThereIsHeaderError = true;
+    if (res == E_NOTIMPL)
+      ThrowUnsupported();
+    return res;
   }
-  catch(CInArchiveException &) { return S_FALSE; }
+  catch(CUnsupportedFeatureException &)
+  {
+    db.UnsupportedFeatureError = true;
+    return S_FALSE;
+  }
+  catch(CInArchiveException &)
+  {
+    db.ThereIsHeaderError = true;
+    return S_FALSE;
+  }
 }
 
 }}

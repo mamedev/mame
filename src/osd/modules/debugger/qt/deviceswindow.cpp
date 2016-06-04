@@ -46,7 +46,7 @@ QModelIndex DevicesWindowModel::index(int row, int column, const QModelIndex &pa
 	if(!hasIndex(row, column, parent))
 		return QModelIndex();
 
-	device_t *target = NULL;
+	device_t *target = nullptr;
 
 	if(!parent.isValid()) {
 		if(row == 0)
@@ -55,7 +55,7 @@ QModelIndex DevicesWindowModel::index(int row, int column, const QModelIndex &pa
 	} else {
 		device_t *dparent = static_cast<device_t *>(parent.internalPointer());
 		int count = row;
-		for(target = dparent->first_subdevice(); count && target; target = target->next())
+		for(target = dparent->subdevices().first(); count && target; target = target->next())
 			count--;
 	}
 
@@ -79,7 +79,7 @@ QModelIndex DevicesWindowModel::parent(const QModelIndex &index) const
 	device_t *dpp = dparent->owner();
 	int row = 0;
 	if(dpp) {
-		for(device_t *child = dpp->first_subdevice(); child && child != dparent; child = child->next())
+		for(device_t *child = dpp->subdevices().first(); child && child != dparent; child = child->next())
 			row++;
 	}
 	return createIndex(row, 0, dparent);
@@ -91,11 +91,7 @@ int DevicesWindowModel::rowCount(const QModelIndex &parent) const
 		return 1;
 
 	device_t *dparent = static_cast<device_t *>(parent.internalPointer());
-	int count = 0;
-	for(device_t *child = dparent->first_subdevice(); child; child = child->next())
-		count++;
-
-	return count;
+	return dparent->subdevices().count();
 }
 
 int DevicesWindowModel::columnCount(const QModelIndex &parent) const
@@ -106,14 +102,14 @@ int DevicesWindowModel::columnCount(const QModelIndex &parent) const
 
 
 DevicesWindow::DevicesWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, NULL),
+	WindowQt(machine, nullptr),
 	m_devices_model(machine)
 {
-	m_selected_device = NULL;
+	m_selected_device = nullptr;
 
 	setWindowTitle("Debug: All Devices");
 
-	if (parent != NULL)
+	if (parent != nullptr)
 	{
 		QPoint parentPos = parent->pos();
 		setGeometry(parentPos.x()+100, parentPos.y()+100, 600, 400);

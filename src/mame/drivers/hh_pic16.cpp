@@ -66,7 +66,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
+	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;
@@ -186,7 +186,7 @@ void hh_pic16_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
@@ -195,7 +195,8 @@ void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
-	display_update();
+	if (update)
+		display_update();
 }
 
 
@@ -257,8 +258,7 @@ static INPUT_PORTS_START( maniac )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // upper-left
 INPUT_PORTS_END
 
-
-static const INT16 maniac_speaker_levels[] = { 0, 32767, -32768, 0 };
+static const INT16 maniac_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( maniac, maniac_state )
 

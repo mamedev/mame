@@ -370,15 +370,15 @@ enum tilemap_standard_mapper
 #define MCFG_TILEMAP_BYTES_PER_ENTRY(_bpe) \
 	tilemap_device::static_set_bytes_per_entry(*device, _bpe);
 #define MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
-	tilemap_device::static_set_info_callback(*device, tilemap_get_info_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	tilemap_device::static_set_info_callback(*device, tilemap_get_info_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 #define MCFG_TILEMAP_INFO_CB_DEVICE(_device, _class, _method) \
-	tilemap_device::static_set_info_callback(*device, tilemap_get_info_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)0));
+	tilemap_device::static_set_info_callback(*device, tilemap_get_info_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)nullptr));
 #define MCFG_TILEMAP_LAYOUT_STANDARD(_standard, _columns, _rows) \
 	tilemap_device::static_set_layout(*device, TILEMAP_##_standard, _columns, _rows);
 #define MCFG_TILEMAP_LAYOUT_CB_DRIVER(_class, _method, _columns, _rows) \
-	tilemap_device::static_set_layout(*device, tilemap_mapper_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0), _columns, _rows);
+	tilemap_device::static_set_layout(*device, tilemap_mapper_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr), _columns, _rows);
 #define MCFG_TILEMAP_LAYOUT_CB_DEVICE(_device, _class, _method, _columns, _rows) \
-	tilemap_device::static_set_layout(*device, tilemap_mapper_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)0), _columns, _rows);
+	tilemap_device::static_set_layout(*device, tilemap_mapper_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)nullptr), _columns, _rows);
 #define MCFG_TILEMAP_TILE_SIZE(_width, _height) \
 	tilemap_device::static_set_tile_size(*device, _width, _height);
 #define MCFG_TILEMAP_TRANSPARENT_PEN(_pen) \
@@ -550,16 +550,16 @@ public:
 
 	// mappers
 	// scan in row-major order with optional flipping
-	static tilemap_memory_index scan_rows(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_rows_flip_x(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_rows_flip_y(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_rows_flip_xy(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_rows(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_rows_flip_x(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_rows_flip_y(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_rows_flip_xy(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
 
 	// scan in column-major order with optional flipping
-	static tilemap_memory_index scan_cols(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_cols_flip_x(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_cols_flip_y(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
-	static tilemap_memory_index scan_cols_flip_xy(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_cols(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_cols_flip_x(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_cols_flip_y(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	tilemap_memory_index scan_cols_flip_xy(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
 
 	// optional memory accessors
 	UINT32 basemem_read(int index) { return m_basemem.read(index); }

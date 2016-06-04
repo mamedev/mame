@@ -9,7 +9,7 @@
 
     See cat.c for the machine which the swyft later became.
 
-    This driver is dedicated in memory of Jef Raskin and Dave Boulton
+    This driver is dedicated in memory of Jef Raskin, Dave Boulton, and John "Sandy" Bumgarner (1941-2016)
 
 IAI detailed credits:
 Scott Kim - responsible for fonts on swyft and cat
@@ -783,7 +783,7 @@ static MACHINE_CONFIG_START( swyft, swyft_state )
 	MCFG_SCREEN_UPDATE_DRIVER(swyft_state, screen_update_swyft)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(swyft_state,swyft)
 

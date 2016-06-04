@@ -128,7 +128,7 @@ private:
 		ISTR_FE_FLG = 0x001     // fifo-empty flag
 	};
 
-	static const int ISTR_INT_MASK = 0x1fc;
+	static const int ISTR_INT_MASK = 0x1ec;
 
 	// callbacks
 	devcb_write_line m_cfgout_handler;

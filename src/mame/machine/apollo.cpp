@@ -974,7 +974,7 @@ bool apollo_ni::call_load()
 	UINT64 size = length();
 		if (size != 32)
 	{
-		CLOG(("apollo_ni::call_load: %s has unexpected file size %" I64FMT "d", filename(), size));
+		CLOG(("apollo_ni::call_load: %s has unexpected file size %d", filename(), size));
 	}
 	else
 	{
@@ -1117,7 +1117,7 @@ MACHINE_CONFIG_FRAGMENT( common )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(apollo_state, pc_dack6_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(apollo_state, pc_dack7_w))
 	MCFG_PIC8259_ADD( APOLLO_PIC1_TAG, WRITELINE(apollo_state,apollo_pic8259_master_set_int_line), VCC, READ8(apollo_state, apollo_pic8259_get_slave_ack))
-	MCFG_PIC8259_ADD( APOLLO_PIC2_TAG, WRITELINE(apollo_state,apollo_pic8259_slave_set_int_line), GND, NULL)
+	MCFG_PIC8259_ADD( APOLLO_PIC2_TAG, WRITELINE(apollo_state,apollo_pic8259_slave_set_int_line), GND, NOOP)
 
 	MCFG_DEVICE_ADD(APOLLO_PTM_TAG, PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(0)

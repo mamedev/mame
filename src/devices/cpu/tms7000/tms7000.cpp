@@ -49,18 +49,6 @@ const device_type TMS70C46 = &device_creator<tms70c46_device>;
 // in peripheral file I/O, it is not backward compatible to TMS70x2.
 
 
-// flag helpers
-#define SR_C        0x80 /* Carry */
-#define SR_N        0x40 /* Negative */
-#define SR_Z        0x20 /* Zero */
-#define SR_I        0x10 /* Interrupt */
-
-#define GET_C()     (m_sr >> 7 & 1)
-#define SET_C(x)    m_sr = (m_sr & 0x7f) | ((x) >> 1 & 0x80)
-#define SET_NZ(x)   m_sr = (m_sr & 0x9f) | ((x) >> 1 & 0x40) | (((x) & 0xff) ? 0 : 0x20)
-#define SET_CNZ(x)  m_sr = (m_sr & 0x1f) | ((x) >> 1 & 0xc0) | (((x) & 0xff) ? 0 : 0x20)
-
-
 // internal memory maps
 static ADDRESS_MAP_START(tms7000_io, AS_IO, 8, tms7000_device)
 	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_READNOP
@@ -262,7 +250,7 @@ void tms7000_device::state_string_export(const device_state_entry &entry, std::s
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				m_sr & 0x80 ? 'C':'c',
 				m_sr & 0x40 ? 'N':'n',
 				m_sr & 0x20 ? 'Z':'z',
@@ -620,8 +608,6 @@ WRITE8_MEMBER(tms7000_device::tms7000_pf_w)
 //-------------------------------------------------
 //  execute
 //-------------------------------------------------
-
-#include "tms70op.inc"
 
 void tms7000_device::execute_run()
 {

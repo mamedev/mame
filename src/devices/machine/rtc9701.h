@@ -59,7 +59,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( read_bit );
 	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
 	DECLARE_WRITE_LINE_MEMBER( set_clock_line );
-	void timer_callback();
+	TIMER_CALLBACK_MEMBER(timer_callback);
 
 protected:
 	// device-level overrides
@@ -73,8 +73,6 @@ protected:
 	virtual void nvram_write(emu_file &file) override;
 	inline UINT8 rtc_read(UINT8 offset);
 	inline void rtc_write(UINT8 offset,UINT8 data);
-
-	static TIMER_CALLBACK( rtc_inc_callback );
 
 	int                     m_latch;
 	int                     m_reset_line;

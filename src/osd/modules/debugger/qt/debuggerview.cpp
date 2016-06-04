@@ -15,7 +15,7 @@ DebuggerView::DebuggerView(const debug_view_type& type,
 							QWidget* parent) :
 	QAbstractScrollArea(parent),
 	m_preferBottom(false),
-	m_view(NULL),
+	m_view(nullptr),
 	m_machine(machine)
 {
 	// I like setting the font per-view since it doesn't override the menuing fonts.
@@ -163,7 +163,7 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 
 void DebuggerView::keyPressEvent(QKeyEvent* event)
 {
-	if (m_view == NULL)
+	if (m_view == nullptr)
 		return QWidget::keyPressEvent(event);
 
 	Qt::KeyboardModifiers keyMods = QApplication::keyboardModifiers();
@@ -233,7 +233,7 @@ void DebuggerView::keyPressEvent(QKeyEvent* event)
 
 void DebuggerView::mousePressEvent(QMouseEvent* event)
 {
-	if (m_view == NULL)
+	if (m_view == nullptr)
 		return;
 
 	if (event->button() == Qt::LeftButton)

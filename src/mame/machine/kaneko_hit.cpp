@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, David Haywood
+// copyright-holders:Luca Elia, David Haywood,Stephane Humbert
 /* Kaneko 'Calc' hitbox collision / protection
 
    It is thought that this is done by the 'CALC1' 'TOYBOX' and 'CALC3' protection chips found on the various boards
@@ -31,7 +31,8 @@
 const device_type KANEKO_HIT = &device_creator<kaneko_hit_device>;
 
 kaneko_hit_device::kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_HIT, "Kaneko CALC Hitbox", tag, owner, clock, "kaneko_hit", __FILE__)
+	: device_t(mconfig, KANEKO_HIT, "Kaneko CALC Hitbox", tag, owner, clock, "kaneko_hit", __FILE__),
+		m_watchdog(*this, "^watchdog")
 {
 	m_hittype = -1;
 	memset(&m_hit, 0, sizeof m_hit);
@@ -153,7 +154,7 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type0_r)
 	switch (offset)
 	{
 		case 0x00/2: // watchdog
-			machine().watchdog_reset();
+			m_watchdog->watchdog_reset();
 			return 0;
 
 		case 0x02/2: // unknown (yet!), used by *MANY* games !!!

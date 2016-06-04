@@ -724,9 +724,26 @@
 		end
 
 		-- build configuration objects for all files
+		-- TODO: can I build this as a tree instead, and avoid the extra
+		-- step of building it later?
 		cfg.__fileconfigs = { }
 		for _, fname in ipairs(cfg.files) do
-			local fcfg = { }
+			local fcfg = {}
+
+			-- Only do this if the script has called enablefilelevelconfig()
+			if premake._filelevelconfig then
+				cfg.terms.required = fname:lower()
+				for _, blk in ipairs(cfg.project.blocks) do
+					-- BK - `iskeywordsmatch` call is super slow for large projects...
+					if (premake.iskeywordsmatch(blk.keywords, cfg.terms)) then
+						mergeobject(fcfg, blk)
+					end
+				end
+			end
+
+			-- add indexed by name and integer
+			-- TODO: when everything is converted to trees I won't need
+			-- to index by name any longer
 			fcfg.name = fname
 			cfg.__fileconfigs[fname] = fcfg
 			table.insert(cfg.__fileconfigs, fcfg)

@@ -2,69 +2,69 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-	machine.c
+    machine.c
 
-	Controls execution of the core MAME system.
+    Controls execution of the core MAME system.
 
 ****************************************************************************
 
-	Since there has been confusion in the past over the order of
-	initialization and other such things, here it is, all spelled out
-	as of January, 2008:
+    Since there has been confusion in the past over the order of
+    initialization and other such things, here it is, all spelled out
+    as of January, 2008:
 
-	main()
-		- does platform-specific init
-		- calls mame_execute() [mame.c]
+    main()
+        - does platform-specific init
+        - calls mame_execute() [mame.c]
 
-		mame_execute() [mame.c]
-			- calls mame_validitychecks() [validity.c] to perform validity checks on all compiled drivers
-			- begins resource tracking (level 1)
-			- calls create_machine [mame.c] to initialize the running_machine structure
-			- calls init_machine() [mame.c]
+        mame_execute() [mame.c]
+            - calls mame_validitychecks() [validity.c] to perform validity checks on all compiled drivers
+            - begins resource tracking (level 1)
+            - calls create_machine [mame.c] to initialize the running_machine structure
+            - calls init_machine() [mame.c]
 
-			init_machine() [mame.c]
-				- calls fileio_init() [fileio.c] to initialize file I/O info
-				- calls config_init() [config.c] to initialize configuration system
-				- calls input_init() [input.c] to initialize the input system
-				- calls output_init() [output.c] to initialize the output system
-				- calls state_init() [state.c] to initialize save state system
-				- calls state_save_allow_registration() [state.c] to allow registrations
-				- calls palette_init() [palette.c] to initialize palette system
-				- calls render_init() [render.c] to initialize the rendering system
-				- calls ui_init() [ui.c] to initialize the user interface
-				- calls generic_machine_init() [machine/generic.c] to initialize generic machine structures
-				- calls timer_init() [timer.c] to reset the timer system
-				- calls osd_init() [osdepend.h] to do platform-specific initialization
-				- calls input_port_init() [inptport.c] to set up the input ports
-				- calls rom_init() [romload.c] to load the game's ROMs
-				- calls memory_init() [memory.c] to process the game's memory maps
-				- calls the driver's DRIVER_INIT callback
-				- calls device_list_start() [devintrf.c] to start any devices
-				- calls video_init() [video.c] to start the video system
-				- calls tilemap_init() [tilemap.c] to start the tilemap system
-				- calls crosshair_init() [crsshair.c] to configure the crosshairs
-				- calls sound_init() [sound.c] to start the audio system
-				- calls debugger_init() [debugger.c] to set up the debugger
-				- calls the driver's MACHINE_START, SOUND_START, and VIDEO_START callbacks
-				- calls cheat_init() [cheat.c] to initialize the cheat system
-				- calls image_init() [image.c] to initialize the image system
+            init_machine() [mame.c]
+                - calls fileio_init() [fileio.c] to initialize file I/O info
+                - calls config_init() [config.c] to initialize configuration system
+                - calls input_init() [input.c] to initialize the input system
+                - calls output_init() [output.c] to initialize the output system
+                - calls state_init() [state.c] to initialize save state system
+                - calls state_save_allow_registration() [state.c] to allow registrations
+                - calls palette_init() [palette.c] to initialize palette system
+                - calls render_init() [render.c] to initialize the rendering system
+                - calls ui_init() [ui.c] to initialize the user interface
+                - calls generic_machine_init() [machine/generic.c] to initialize generic machine structures
+                - calls timer_init() [timer.c] to reset the timer system
+                - calls osd_init() [osdepend.h] to do platform-specific initialization
+                - calls input_port_init() [inptport.c] to set up the input ports
+                - calls rom_init() [romload.c] to load the game's ROMs
+                - calls memory_init() [memory.c] to process the game's memory maps
+                - calls the driver's DRIVER_INIT callback
+                - calls device_list_start() [devintrf.c] to start any devices
+                - calls video_init() [video.c] to start the video system
+                - calls tilemap_init() [tilemap.c] to start the tilemap system
+                - calls crosshair_init() [crsshair.c] to configure the crosshairs
+                - calls sound_init() [sound.c] to start the audio system
+                - calls debugger_init() [debugger.c] to set up the debugger
+                - calls the driver's MACHINE_START, SOUND_START, and VIDEO_START callbacks
+                - calls cheat_init() [cheat.c] to initialize the cheat system
+                - calls image_init() [image.c] to initialize the image system
 
-			- calls config_load_settings() [config.c] to load the configuration file
-			- calls nvram_load [machine/generic.c] to load NVRAM
-			- calls ui_display_startup_screens() [ui.c] to display the startup screens
-			- begins resource tracking (level 2)
-			- calls soft_reset() [mame.c] to reset all systems
+            - calls config_load_settings() [config.c] to load the configuration file
+            - calls nvram_load [machine/generic.c] to load NVRAM
+            - calls ui_display_startup_screens() [ui.c] to display the startup screens
+            - begins resource tracking (level 2)
+            - calls soft_reset() [mame.c] to reset all systems
 
-				-------------------( at this point, we're up and running )----------------------
+                -------------------( at this point, we're up and running )----------------------
 
-			- calls scheduler->timeslice() [schedule.c] over and over until we exit
-			- ends resource tracking (level 2), freeing all auto_mallocs and timers
-			- calls the nvram_save() [machine/generic.c] to save NVRAM
-			- calls config_save_settings() [config.c] to save the game's configuration
-			- calls all registered exit routines [mame.c]
-			- ends resource tracking (level 1), freeing all auto_mallocs and timers
+            - calls scheduler->timeslice() [schedule.c] over and over until we exit
+            - ends resource tracking (level 2), freeing all auto_mallocs and timers
+            - calls the nvram_save() [machine/generic.c] to save NVRAM
+            - calls config_save_settings() [config.c] to save the game's configuration
+            - calls all registered exit routines [mame.c]
+            - ends resource tracking (level 1), freeing all auto_mallocs and timers
 
-		- exits the program
+        - exits the program
 
 ***************************************************************************/
 
@@ -74,16 +74,13 @@
 #include "config.h"
 #include "debugger.h"
 #include "render.h"
-#include "cheat.h"
 #include "uiinput.h"
 #include "crsshair.h"
 #include "unzip.h"
-#include "ui/datfile.h"
-#include "ui/inifile.h"
 #include "debug/debugvw.h"
 #include "image.h"
-#include "luaengine.h"
 #include "network.h"
+#include "ui/uimain.h"
 #include <time.h>
 
 #if defined(EMSCRIPTEN)
@@ -91,15 +88,6 @@
 
 void js_set_main_loop(running_machine * machine);
 #endif
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// a giant string buffer for temporary strings
-static char giant_string_buffer[65536] = { 0 };
 
 
 
@@ -147,18 +135,17 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 
 	// set the machine on all devices
 	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-		device->set_machine(*this);
+	for (device_t &device : iter)
+		device.set_machine(*this);
 
 	// find devices
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-		if (dynamic_cast<cpu_device *>(device) != nullptr)
+	for (device_t &device : iter)
+		if (dynamic_cast<cpu_device *>(&device) != nullptr)
 		{
-			firstcpu = downcast<cpu_device *>(device);
+			firstcpu = downcast<cpu_device *>(&device);
 			break;
 		}
-	screen_device_iterator screeniter(root_device());
-	primary_screen = screeniter.first();
+	primary_screen = screen_device_iterator(root_device()).first();
 
 	// fetch core options
 	if (options().debug())
@@ -190,7 +177,7 @@ const char *running_machine::describe_context()
 		if (cpu != nullptr)
 		{
 			address_space &prg = cpu->space(AS_PROGRAM);
-			strprintf(m_context, "'%s' (%s)", cpu->tag(), core_i64_format(cpu->pc(), prg.logaddrchars(), prg.is_octal()));
+			m_context = string_format(prg.is_octal() ? "'%s' (%0*o)" :  "'%s' (%0*X)", cpu->tag(), prg.logaddrchars(), cpu->pc());
 		}
 	}
 	else
@@ -199,18 +186,6 @@ const char *running_machine::describe_context()
 	return m_context.c_str();
 }
 
-TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
-{
-	if (strlen(options().autoboot_script())!=0) {
-		manager().lua()->load_script(options().autoboot_script());
-	}
-	else if (strlen(options().autoboot_command())!=0) {
-		std::string cmd = std::string(options().autoboot_command());
-		strreplace(cmd, "'", "\\'");
-		std::string val = std::string("emu.keypost('").append(cmd).append("')");
-		manager().lua()->load_string(val.c_str());
-	}
-}
 
 //-------------------------------------------------
 //  start - initialize the emulated machine
@@ -228,7 +203,7 @@ void running_machine::start()
 	// allocate a soft_reset timer
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
 
-	// intialize UI input
+	// initialize UI input
 	m_ui_input = make_unique_clear<ui_input_manager>(*this);
 
 	// init the osd layer
@@ -236,11 +211,7 @@ void running_machine::start()
 
 	// create the video manager
 	m_video = std::make_unique<video_manager>(*this);
-	m_ui = std::make_unique<ui_manager>(*this);
-	m_ui->init();
-
-	// start the inifile manager
-	m_inifile = std::make_unique<inifile_manager>(*this);
+	m_ui = manager().create_ui(*this);
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
@@ -259,14 +230,6 @@ void running_machine::start()
 	// these operations must proceed in this order
 	m_rom_load = make_unique_clear<rom_load_manager>(*this);
 	m_memory.initialize();
-
-	// initialize the watchdog
-	m_watchdog_counter = 0;
-	m_watchdog_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::watchdog_fired), this));
-	if (config().m_watchdog_vblank_count != 0 && primary_screen != nullptr)
-		primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(running_machine::watchdog_vblank), this));
-	save().save_item(NAME(m_watchdog_enabled));
-	save().save_item(NAME(m_watchdog_counter));
 
 	// save the random seed or save states might be broken in drivers that use the rand() method
 	save().save_item(NAME(m_rand_seed));
@@ -287,10 +250,7 @@ void running_machine::start()
 
 	m_render->resolve_tags();
 
-	// call the game driver's init function
-	// this is where decryption is done and memory maps are altered
-	// so this location in the init order is important
-	ui().set_startup_text("Initializing...", true);
+	manager().create_custom(*this);
 
 	// register callbacks for the devices, then start them
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(running_machine::reset_all_devices), this));
@@ -308,17 +268,6 @@ void running_machine::start()
 	else if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) != 0)
 		schedule_load("auto");
 
-	// set up the cheat engine
-	m_cheat = std::make_unique<cheat_manager>(*this);
-
-	// allocate autoboot timer
-	m_autoboot_timer = scheduler().timer_alloc(timer_expired_delegate(FUNC(running_machine::autoboot_callback), this));
-
-	// start datfile manager
-	m_datfile = std::make_unique<datfile_manager>(*this);
-
-	// start favorite manager
-	m_favorite = std::make_unique<favorite_manager>(*this);
 
 	manager().update_machine();
 }
@@ -328,9 +277,9 @@ void running_machine::start()
 //  run - execute the machine
 //-------------------------------------------------
 
-int running_machine::run(bool firstrun)
+int running_machine::run(bool quiet)
 {
-	int error = MAMERR_NONE;
+	int error = EMU_ERR_NONE;
 
 	// use try/catch for deep error recovery
 	try
@@ -339,11 +288,11 @@ int running_machine::run(bool firstrun)
 		m_current_phase = MACHINE_PHASE_INIT;
 
 		// if we have a logfile, set up the callback
-		if (options().log() && &system() != &GAME_NAME(___empty))
+		if (options().log() && !quiet)
 		{
 			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			file_error filerr = m_logfile->open("error.log");
-			assert_always(filerr == FILERR_NONE, "unable to open log file");
+			osd_file::error filerr = m_logfile->open("error.log");
+			assert_always(filerr == osd_file::error::NONE, "unable to open log file");
 			add_logerror_callback(logfile_callback);
 		}
 
@@ -360,12 +309,12 @@ int running_machine::run(bool firstrun)
 
 		nvram_load();
 		sound().ui_mute(false);
+		if (!quiet)
+			sound().start_recording();
 
 		// initialize ui lists
-		ui().initialize(*this);
-
 		// display the startup screens
-		ui().display_startup_screens(firstrun, false);
+		manager().ui_initialize(*this);
 
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();
@@ -381,14 +330,16 @@ int running_machine::run(bool firstrun)
 			g_profiler.start(PROFILER_EXTRA);
 
 #if defined(EMSCRIPTEN)
-			//break out to our async javascript loop and halt
+			// break out to our async javascript loop and halt
 			js_set_main_loop(this);
 #endif
 
 			// execute CPUs if not paused
 			if (!m_paused)
+			{
 				m_scheduler.timeslice();
-
+				emulator_info::periodic_check();
+			}
 			// otherwise, just pump video updates through
 			else
 				m_video->frame_update();
@@ -410,35 +361,35 @@ int running_machine::run(bool firstrun)
 	}
 	catch (emu_fatalerror &fatal)
 	{
-		osd_printf_error("FATALERROR: %s\n", fatal.string());
-		error = MAMERR_FATALERROR;
+		osd_printf_error("Fatal error: %s\n", fatal.string());
+		error = EMU_ERR_FATALERROR;
 		if (fatal.exitcode() != 0)
 			error = fatal.exitcode();
 	}
 	catch (emu_exception &)
 	{
 		osd_printf_error("Caught unhandled emulator exception\n");
-		error = MAMERR_FATALERROR;
+		error = EMU_ERR_FATALERROR;
 	}
 	catch (binding_type_exception &btex)
 	{
 		osd_printf_error("Error performing a late bind of type %s to %s\n", btex.m_actual_type.name(), btex.m_target_type.name());
-		error = MAMERR_FATALERROR;
+		error = EMU_ERR_FATALERROR;
 	}
 	catch (add_exception &aex)
 	{
 		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag());
-		error = MAMERR_FATALERROR;
+		error = EMU_ERR_FATALERROR;
 	}
 	catch (std::exception &ex)
 	{
 		osd_printf_error("Caught unhandled %s exception: %s\n", typeid(ex).name(), ex.what());
-		error = MAMERR_FATALERROR;
+		error = EMU_ERR_FATALERROR;
 	}
 	catch (...)
 	{
 		osd_printf_error("Caught unhandled exception\n");
-		error = MAMERR_FATALERROR;
+		error = EMU_ERR_FATALERROR;
 	}
 
 	// make sure our phase is set properly before cleaning up,
@@ -447,7 +398,7 @@ int running_machine::run(bool firstrun)
 
 	// call all exit callbacks registered
 	call_notifiers(MACHINE_NOTIFY_EXIT);
-	zip_file_cache_clear();
+	util::archive_file::cache_clear();
 
 	// close the logfile
 	m_logfile.reset();
@@ -561,19 +512,18 @@ std::string running_machine::get_statename(const char *option) const
 			//printf("check template: %s\n", devname_str.c_str());
 
 			// verify that there is such a device for this system
-			image_interface_iterator iter(root_device());
-			for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
+			for (device_image_interface &image : image_interface_iterator(root_device()))
 			{
 				// get the device name
-				std::string tempdevname(image->brief_instance_name());
+				std::string tempdevname(image.brief_instance_name());
 				//printf("check device: %s\n", tempdevname.c_str());
 
 				if (devname_str.compare(tempdevname) == 0)
 				{
 					// verify that such a device has an image mounted
-					if (image->basename_noext() != nullptr)
+					if (image.basename_noext() != nullptr)
 					{
-						std::string filename(image->basename_noext());
+						std::string filename(image.basename_noext());
 
 						// setup snapname and remove the %d_
 						strreplace(statename_str, devname_str.c_str(), filename.c_str());
@@ -746,12 +696,15 @@ void running_machine::toggle_pause()
 //  given type
 //-------------------------------------------------
 
-void running_machine::add_notifier(machine_notification event, machine_notify_delegate callback)
+void running_machine::add_notifier(machine_notification event, machine_notify_delegate callback, bool first)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_notifier at init time!");
 
+	if(first)
+		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
+
 	// exit notifiers are added to the head, and executed in reverse order
-	if (event == MACHINE_NOTIFY_EXIT)
+	else if (event == MACHINE_NOTIFY_EXIT)
 		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
 
 	// all other notifiers are added to the tail, and executed in the order registered
@@ -768,70 +721,8 @@ void running_machine::add_notifier(machine_notification event, machine_notify_de
 void running_machine::add_logerror_callback(logerror_callback callback)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_logerror_callback at init time!");
+		m_string_buffer.reserve(1024);
 	m_logerror_list.push_back(std::make_unique<logerror_callback_item>(callback));
-}
-
-/*-------------------------------------------------
-    popmessage - pop up a user-visible message
--------------------------------------------------*/
-
-void running_machine::popmessage(const char *format, ...) const
-{
-	// if the format is NULL, it is a signal to clear the popmessage
-	if (format == nullptr)
-		ui().popup_time(0, " ");
-
-	// otherwise, generate the buffer and call the UI to display the message
-	else
-	{
-		std::string temp;
-		va_list arg;
-
-		// dump to the buffer
-		va_start(arg, format);
-		strvprintf(temp,format, arg);
-		va_end(arg);
-
-		// pop it in the UI
-		ui().popup_time(temp.length() / 40 + 2, "%s", temp.c_str());
-	}
-}
-
-
-/*-------------------------------------------------
-    logerror - log to the debugger and any other
-    OSD-defined output streams
--------------------------------------------------*/
-
-void running_machine::logerror(const char *format, ...) const
-{
-	va_list arg;
-	va_start(arg, format);
-	vlogerror(format, arg);
-	va_end(arg);
-}
-
-
-//-------------------------------------------------
-//  vlogerror - vprintf-style error logging
-//-------------------------------------------------
-
-void running_machine::vlogerror(const char *format, va_list args) const
-{
-	// process only if there is a target
-	if (!m_logerror_list.empty())
-	{
-		g_profiler.start(PROFILER_LOGERROR);
-
-		// dump to the buffer
-		vsnprintf(giant_string_buffer, ARRAY_LENGTH(giant_string_buffer), format, args);
-
-		// log to all callbacks
-		for (auto& cb : m_logerror_list)
-			(cb->m_func)(*this, giant_string_buffer);
-
-		g_profiler.stop();
-	}
 }
 
 
@@ -891,76 +782,76 @@ void running_machine::call_notifiers(machine_notification which)
 
 void running_machine::handle_saveload()
 {
-	UINT32 openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	const char *opnamed = (m_saveload_schedule == SLS_LOAD) ? "loaded" : "saved";
-	const char *opname = (m_saveload_schedule == SLS_LOAD) ? "load" : "save";
-	file_error filerr = FILERR_NONE;
-
 	// if no name, bail
-	emu_file file(m_saveload_searchpath, openflags);
-	if (m_saveload_pending_file.empty())
-		goto cancel;
-
-	// if there are anonymous timers, we can't save just yet, and we can't load yet either
-	// because the timers might overwrite data we have loaded
-	if (!m_scheduler.can_save())
+	if (!m_saveload_pending_file.empty())
 	{
-		// if more than a second has passed, we're probably screwed
-		if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
+		const char *const opname = (m_saveload_schedule == SLS_LOAD) ? "load" : "save";
+
+		// if there are anonymous timers, we can't save just yet, and we can't load yet either
+		// because the timers might overwrite data we have loaded
+		if (!m_scheduler.can_save())
 		{
-			popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
-			goto cancel;
+			// if more than a second has passed, we're probably screwed
+			if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
+				popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
+			else
+				return; // return without cancelling the operation
 		}
-		return;
-	}
-
-	// open the file
-	filerr = file.open(m_saveload_pending_file.c_str());
-	if (filerr == FILERR_NONE)
-	{
-		// read/write the save state
-		save_error saverr = (m_saveload_schedule == SLS_LOAD) ? m_save.read_file(file) : m_save.write_file(file);
-
-		// handle the result
-		switch (saverr)
+		else
 		{
-			case STATERR_ILLEGAL_REGISTRATIONS:
-				popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
-				break;
+			UINT32 const openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
-			case STATERR_INVALID_HEADER:
-				popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this game.", opname);
-				break;
+			// open the file
+			emu_file file(m_saveload_searchpath, openflags);
+			auto const filerr = file.open(m_saveload_pending_file.c_str());
+			if (filerr == osd_file::error::NONE)
+			{
+				const char *const opnamed = (m_saveload_schedule == SLS_LOAD) ? "loaded" : "saved";
 
-			case STATERR_READ_ERROR:
-				popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
-				break;
+				// read/write the save state
+				save_error saverr = (m_saveload_schedule == SLS_LOAD) ? m_save.read_file(file) : m_save.write_file(file);
 
-			case STATERR_WRITE_ERROR:
-				popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
-				break;
+				// handle the result
+				switch (saverr)
+				{
+				case STATERR_ILLEGAL_REGISTRATIONS:
+					popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
+					break;
 
-			case STATERR_NONE:
-				if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
-					popmessage("State successfully %s.\nWarning: Save states are not officially supported for this game.", opnamed);
-				else
-					popmessage("State successfully %s.", opnamed);
-				break;
+				case STATERR_INVALID_HEADER:
+					popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this game.", opname);
+					break;
 
-			default:
-				popmessage("Error: Unknown error during state %s.", opnamed);
-				break;
+				case STATERR_READ_ERROR:
+					popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
+					break;
+
+				case STATERR_WRITE_ERROR:
+					popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
+					break;
+
+				case STATERR_NONE:
+					if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
+						popmessage("State successfully %s.\nWarning: Save states are not officially supported for this game.", opnamed);
+					else
+						popmessage("State successfully %s.", opnamed);
+					break;
+
+				default:
+					popmessage("Error: Unknown error during state %s.", opnamed);
+					break;
+				}
+
+				// close and perhaps delete the file
+				if (saverr != STATERR_NONE && m_saveload_schedule == SLS_SAVE)
+					file.remove_on_close();
+			}
+			else
+				popmessage("Error: Failed to open file for %s operation.", opname);
 		}
-
-		// close and perhaps delete the file
-		if (saverr != STATERR_NONE && m_saveload_schedule == SLS_SAVE)
-			file.remove_on_close();
 	}
-	else
-		popmessage("Error: Failed to open file for %s operation.", opname);
 
 	// unschedule the operation
-cancel:
 	m_saveload_pending_file.clear();
 	m_saveload_searchpath = nullptr;
 	m_saveload_schedule = SLS_NONE;
@@ -979,95 +870,11 @@ void running_machine::soft_reset(void *ptr, INT32 param)
 	// temporarily in the reset phase
 	m_current_phase = MACHINE_PHASE_RESET;
 
-	// set up the watchdog timer; only start off enabled if explicitly configured
-	m_watchdog_enabled = (config().m_watchdog_vblank_count != 0 || config().m_watchdog_time != attotime::zero);
-	watchdog_reset();
-	m_watchdog_enabled = true;
-
 	// call all registered reset callbacks
 	call_notifiers(MACHINE_NOTIFY_RESET);
 
-	// setup autoboot if needed
-	m_autoboot_timer->adjust(attotime(options().autoboot_delay(),0),0);
-
 	// now we're running
 	m_current_phase = MACHINE_PHASE_RUNNING;
-}
-
-
-//-------------------------------------------------
-//  watchdog_reset - reset the watchdog timer
-//-------------------------------------------------
-
-void running_machine::watchdog_reset()
-{
-	// if we're not enabled, skip it
-	if (!m_watchdog_enabled)
-		m_watchdog_timer->adjust(attotime::never);
-
-	// VBLANK-based watchdog?
-	else if (config().m_watchdog_vblank_count != 0)
-		m_watchdog_counter = config().m_watchdog_vblank_count;
-
-	// timer-based watchdog?
-	else if (config().m_watchdog_time != attotime::zero)
-		m_watchdog_timer->adjust(config().m_watchdog_time);
-
-	// default to an obscene amount of time (3 seconds)
-	else
-		m_watchdog_timer->adjust(attotime::from_seconds(3));
-}
-
-
-//-------------------------------------------------
-//  watchdog_enable - reset the watchdog timer
-//-------------------------------------------------
-
-void running_machine::watchdog_enable(bool enable)
-{
-	// when re-enabled, we reset our state
-	if (m_watchdog_enabled != enable)
-	{
-		m_watchdog_enabled = enable;
-		watchdog_reset();
-	}
-}
-
-
-//-------------------------------------------------
-//  watchdog_fired - watchdog timer callback
-//-------------------------------------------------
-
-void running_machine::watchdog_fired(void *ptr, INT32 param)
-{
-	logerror("Reset caused by the watchdog!!!\n");
-
-	bool verbose = options().verbose();
-#ifdef MAME_DEBUG
-	verbose = true;
-#endif
-	if (verbose)
-		popmessage("Reset caused by the watchdog!!!\n");
-
-	schedule_soft_reset();
-}
-
-
-//-------------------------------------------------
-//  watchdog_vblank - VBLANK state callback for
-//  watchdog timers
-//-------------------------------------------------
-
-void running_machine::watchdog_vblank(screen_device &screen, bool vblank_state)
-{
-	// VBLANK starting
-	if (vblank_state && m_watchdog_enabled)
-	{
-		// check the watchdog
-		if (config().m_watchdog_vblank_count != 0)
-			if (--m_watchdog_counter == 0)
-				watchdog_fired();
-	}
 }
 
 
@@ -1079,7 +886,10 @@ void running_machine::watchdog_vblank(screen_device &screen, bool vblank_state)
 void running_machine::logfile_callback(const running_machine &machine, const char *buffer)
 {
 	if (machine.m_logfile != nullptr)
+	{
 		machine.m_logfile->puts(buffer);
+		machine.m_logfile->flush();
+	}
 }
 
 
@@ -1095,20 +905,19 @@ void running_machine::start_all_devices()
 	{
 		// iterate over all devices
 		int failed_starts = 0;
-		device_iterator iter(root_device());
-		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-			if (!device->started())
+		for (device_t &device : device_iterator(root_device()))
+			if (!device.started())
 			{
 				// attempt to start the device, catching any expected exceptions
 				try
 				{
 					// if the device doesn't have a machine yet, set it first
-					if (device->m_machine == nullptr)
-						device->set_machine(*this);
+					if (device.m_machine == nullptr)
+						device.set_machine(*this);
 
 					// now start the device
-					osd_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
-					device->start();
+					osd_printf_verbose("Starting %s '%s'\n", device.name(), device.tag());
+					device.start();
 				}
 
 				// handle missing dependencies by moving the device to the end
@@ -1153,9 +962,8 @@ void running_machine::stop_all_devices()
 		debug_comment_save(*this);
 
 	// iterate over devices and stop them
-	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-		device->stop();
+	for (device_t &device : device_iterator(root_device()))
+		device.stop();
 }
 
 
@@ -1166,9 +974,8 @@ void running_machine::stop_all_devices()
 
 void running_machine::presave_all_devices()
 {
-	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-		device->pre_save();
+	for (device_t &device : device_iterator(root_device()))
+		device.pre_save();
 }
 
 
@@ -1179,9 +986,8 @@ void running_machine::presave_all_devices()
 
 void running_machine::postload_all_devices()
 {
-	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
-		device->post_load();
+	for (device_t &device : device_iterator(root_device()))
+		device.post_load();
 }
 
 
@@ -1197,9 +1003,10 @@ void running_machine::postload_all_devices()
 std::string running_machine::nvram_filename(device_t &device) const
 {
 	// start with either basename or basename_biosnum
-	std::string result(basename());
+	std::ostringstream result;
+	result << basename();
 	if (root_device().system_bios() != 0 && root_device().default_bios() != root_device().system_bios())
-		strcatprintf(result, "_%d", root_device().system_bios() - 1);
+		util::stream_format(result, "_%d", root_device().system_bios() - 1);
 
 	// device-based NVRAM gets its own name in a subdirectory
 	if (device.owner() != nullptr)
@@ -1216,14 +1023,14 @@ std::string running_machine::nvram_filename(device_t &device) const
 			}
 		}
 		if (software != nullptr && *software != '\0')
-			result.append(PATH_SEPARATOR).append(software);
+			result << PATH_SEPARATOR << software;
 
 		std::string tag(device.tag());
 		tag.erase(0, 1);
 		strreplacechr(tag,':', '_');
-		result.append(PATH_SEPARATOR).append(tag);
+		result << PATH_SEPARATOR << tag;
 	}
-	return result;
+	return result.str();
 }
 
 /*-------------------------------------------------
@@ -1232,17 +1039,16 @@ std::string running_machine::nvram_filename(device_t &device) const
 
 void running_machine::nvram_load()
 {
-	nvram_interface_iterator iter(root_device());
-	for (device_nvram_interface *nvram = iter.first(); nvram != nullptr; nvram = iter.next())
+	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(nvram->device()).c_str()) == FILERR_NONE)
+		if (file.open(nvram_filename(nvram.device()).c_str()) == osd_file::error::NONE)
 		{
-			nvram->nvram_load(file);
+			nvram.nvram_load(file);
 			file.close();
 		}
 		else
-			nvram->nvram_reset();
+			nvram.nvram_reset();
 	}
 }
 
@@ -1253,17 +1059,34 @@ void running_machine::nvram_load()
 
 void running_machine::nvram_save()
 {
-	nvram_interface_iterator iter(root_device());
-	for (device_nvram_interface *nvram = iter.first(); nvram != nullptr; nvram = iter.next())
+	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(nvram->device()).c_str()) == FILERR_NONE)
+		if (file.open(nvram_filename(nvram.device()).c_str()) == osd_file::error::NONE)
 		{
-			nvram->nvram_save(file);
+			nvram.nvram_save(file);
 			file.close();
 		}
 	}
 }
+
+
+//**************************************************************************
+//  OUTPUT
+//**************************************************************************
+
+void running_machine::popup_clear() const
+{
+	ui().popup_time(0, " ");
+}
+
+void running_machine::popup_message(util::format_argument_pack<std::ostream> const &args) const
+{
+	std::string const temp(string_format(args));
+	ui().popup_time(temp.length() / 40 + 2, "%s", temp);
+}
+
+
 //**************************************************************************
 //  CALLBACK ITEMS
 //**************************************************************************
@@ -1324,12 +1147,12 @@ void system_time::full_time::set(struct tm &t)
 {
 	second  = t.tm_sec;
 	minute  = t.tm_min;
-	hour	= t.tm_hour;
-	mday	= t.tm_mday;
+	hour    = t.tm_hour;
+	mday    = t.tm_mday;
 	month   = t.tm_mon;
-	year	= t.tm_year + 1900;
+	year    = t.tm_year + 1900;
 	weekday = t.tm_wday;
-	day	 = t.tm_yday;
+	day  = t.tm_yday;
 	is_dst  = t.tm_isdst;
 }
 
