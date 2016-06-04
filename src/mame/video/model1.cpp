@@ -1198,13 +1198,11 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		for(;;) {
 			int type = (list[1]<<16)|list[0];
 			m_glist=list;
-			switch(type) {
-			case 0x0:
-				LOG_TGP(("VIDEO:   unknown type %x\n", type));
+			switch(type & 15) {
+			case 0:
 				list += 2;
 				break;
-			case 0x1:
-			case 0x41:
+			case 1:
 				// 1 = plane 1
 				// 2 = ??  draw object (413d3, 17c4c, e)
 				// 3 = plane 2
@@ -1216,10 +1214,10 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					push_object(readi(list+2), readi(list+4), readi(list+6));
 				list += 8;
 				break;
-			case 0x2:
+			case 2:
 				list = draw_direct(bitmap, cliprect, list+2);
 				break;
-			case 0x3:
+			case 3:
 				LOG_TGP(("VIDEO:   viewport (%d, %d, %d, %d, %d, %d, %d)\n",
 							readi(list+2),
 							readi16(list+4), readi16(list+6), readi16(list+8),
@@ -1238,7 +1236,7 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 				list += 16;
 				break;
-			case 0x4: {
+			case 4: {
 				int adr = readi(list+2);
 				int len = readi(list+4)+1;
 				int i;
@@ -1248,12 +1246,11 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				list += 6+len*2;
 				break;
 			}
-			case 0x5:
+			case 5:
 				{
 					int adr = readi(list+2);
 					int len = readi(list+4);
 					int i;
-					LOG_TGP(("VIDEO:   write poly ram, adr=%x, len=%x\n", adr, len));
 					for(i=0;i<len;++i)
 					{
 						m_poly_ram[adr-0x800000+i]=readi(list+2*i+6);
@@ -1261,7 +1258,7 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					list+=6+len*2;
 				}
 				break;
-			case 0x6: {
+			case 6: {
 				int adr = readi(list+2);
 				int len = readi(list+4);
 				int i;
@@ -1277,16 +1274,16 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				list += 6+len*2;
 				break;
 			}
-			case 0x7:
+			case 7:
 				LOG_TGP(("VIDEO:   code 7 (%d)\n", readi(list+2)));
 				zz++;
 				list += 4;
 				break;
-			case 0x8:
+			case 8:
 				LOG_TGP(("VIDEO:   select mode %08x\n", readi(list+2)));
 				list += 4;
 				break;
-			case 0x9:
+			case 9:
 				LOG_TGP(("VIDEO:   zoom (%f, %f)\n", readf(list+2), readf(list+4)));
 				view->zoomx = readf(list+2)*4;
 				view->zoomy = readf(list+4)*4;
@@ -1325,12 +1322,10 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				list += 6;
 				break;
 			case 0xf:
-				// end of list
-				LOG_TGP(("VIDEO: end of list\n"));
 			//case -1:
 				goto end;
 			default:
-				LOG_TGP(("VIDEO:   unknown type %x\n", type));
+				LOG_TGP(("VIDEO:   unknown type %d\n", type));
 				goto end;
 			}
 		}
@@ -1366,7 +1361,6 @@ void model1_state::tgp_scan()
 				list += 2;
 				break;
 			case 1:
-			case 41:
 				list += 8;
 				break;
 			case 2:
@@ -1436,7 +1430,7 @@ void model1_state::tgp_scan()
 			case -1:
 				goto end;
 			default:
-				LOG_TGP(("VIDEO:   unknown type %x\n", type));
+				LOG_TGP(("VIDEO:   unknown type %d\n", type));
 				goto end;
 			}
 		}
