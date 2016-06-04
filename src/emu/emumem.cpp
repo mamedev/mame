@@ -2385,7 +2385,7 @@ void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_
 //  RAM region into the given address space
 //-------------------------------------------------
 
-void *address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
+void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
 {
 	VPRINTF(("address_space::install_ram_generic(%s-%s mask=%s mirror=%s, %s, %p)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2450,8 +2450,6 @@ void *address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_
 			bank.set_base(block.data());
 		}
 	}
-
-	return (void *)find_backing_memory(addrstart, addrend);
 }
 
 
