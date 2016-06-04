@@ -2,17 +2,6 @@
 // copyright-holders:Luca Elia, Olivier Galibert
 /***************************************************************************
 
-TODO:
-- Find out how layers are enabled\disabled
-- dangar input ports - parent set requires F2 be held for Service Mode
-- wrong title screen in ninjemak
-- bit 3 of ninjemak_gfxbank_w, there currently is a kludge to clear text RAM
-  but it should really copy stuff from the extra ROM.
-- Likely missing MCU emulation/simulation for displaying text layer for Ninja Emaki.
-  There is no text displayed when you enter Service Mode when there should be.
-  Examine $3000+ in file loaded for "gfx5".
-
-
 Galivan
 (C) 1985 Nihon Bussan
 driver by
@@ -26,6 +15,14 @@ Youma Ninpou Chou (Japan)
 (c)1986 NihonBussan Co.,Ltd.
 Driver by
 Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
+
+TODO
+- Find out how layers are enabled\disabled
+- dangar input ports - parent set requires F2 be held for Service Mode
+- wrong title screen in ninjemak
+- bit 3 of ninjemak_gfxbank_w, there currently is a kludge to clear text RAM
+  but it should really copy stuff from the extra ROM.
+- Ninja Emaki has minor protection issues, see NB1414M4 simulation for more info.
 
 ***************************************************************************/
 
