@@ -276,7 +276,7 @@ void turbo_state::turbo_prepare_sprites(UINT8 y, sprite_info *info)
 	/* compute the sprite information, which was done on the previous scanline during HBLANK */
 	for (sprnum = 0; sprnum < 16; sprnum++)
 	{
-		UINT8 *rambase = &m_spriteram[sprnum * 0x10];
+		UINT8 *rambase = &m_alt_spriteram[sprnum * 8];
 		int level = sprnum & 7;
 		UINT8 clo, chi;
 		UINT32 sum;
