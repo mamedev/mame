@@ -302,10 +302,30 @@ void mame_ui_manager::initialize(running_machine &machine)
 //  pair for the current UI handler
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::set_handler(ui_callback callback, UINT32 param)
+void mame_ui_manager::set_handler(ui_callback_type callback_type, const std::function<UINT32 (render_container *)> callback)
 {
 	m_handler_callback = callback;
-	m_handler_param = param;
+	m_handler_callback_type = callback_type;
+}
+
+
+//-------------------------------------------------
+//  set_handler - set a callback/parameter
+//  pair for the current UI handler
+//-------------------------------------------------
+
+UINT32 mame_ui_manager::set_handler(ui_callback callback, UINT32 param)
+{
+	ui_callback_type callback_type;
+	if (callback == ui::menu::ui_handler)
+		callback_type = UI_CALLBACK_TYPE_MENU;
+	else if (callback == handler_messagebox_anykey)
+		callback_type = UI_CALLBACK_TYPE_MODAL;
+	else
+		callback_type = UI_CALLBACK_TYPE_GENERAL;
+
+	auto callback_func = [=](render_container *container) { return callback(*this, container, param); };
+	set_handler(callback_type, callback_func);
 	return param;
 }
 
@@ -374,7 +394,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		while (machine().input().poll_switches() != INPUT_CODE_INVALID) { }
 
 		// loop while we have a handler
-		while (m_handler_callback != handler_ingame && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu())
+		while (m_handler_callback_type == UI_CALLBACK_TYPE_MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu())
 		{
 			machine().video().frame_update();
 		}
@@ -443,8 +463,7 @@ void mame_ui_manager::update_and_render(render_container *container)
 	}
 
 	// call the current UI handler
-	assert(m_handler_callback != nullptr);
-	m_handler_param = (*m_handler_callback)(*this, container, m_handler_param);
+	m_handler_param = m_handler_callback(container);
 
 	// display any popup messages
 	if (osd_ticks() < m_popup_text_end)
@@ -967,7 +986,7 @@ void mame_ui_manager::show_mouse(bool status)
 
 bool mame_ui_manager::is_menu_active(void)
 {
-	return (m_handler_callback == ui::menu::ui_handler);
+	return m_handler_callback_type == UI_CALLBACK_TYPE_MENU;
 }
 
 

@@ -154,6 +154,13 @@ enum
 class mame_ui_manager;
 typedef UINT32 (*ui_callback)(mame_ui_manager &, render_container *, UINT32);
 
+enum ui_callback_type
+{
+	UI_CALLBACK_TYPE_GENERAL,
+	UI_CALLBACK_TYPE_MODAL,
+	UI_CALLBACK_TYPE_MENU
+};
+
 // ======================> mame_ui_manager
 
 class mame_ui_manager : public ui_manager, public slider_changed_notifier
@@ -175,6 +182,8 @@ public:
 	// methods
 	void initialize(running_machine &machine);
 	std::vector<ui::menu_item> slider_init(running_machine &machine);
+
+	void set_handler(ui_callback_type callback_type, const std::function<UINT32 (render_container *)> callback);
 	UINT32 set_handler(ui_callback callback, UINT32 param);
 	void display_startup_screens(bool first_time);
 	virtual void set_startup_text(const char *text, bool force) override;
@@ -236,7 +245,8 @@ public:
 private:
 	// instance variables
 	render_font *           m_font;
-	ui_callback             m_handler_callback;
+	std::function<UINT32 (render_container *)> m_handler_callback;
+	ui_callback_type		m_handler_callback_type;
 	UINT32                  m_handler_param;
 	bool                    m_single_step;
 	bool                    m_showfps;
