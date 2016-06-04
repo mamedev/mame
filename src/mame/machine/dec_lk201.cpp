@@ -660,11 +660,11 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
 			// Check for LED update strobe
 			if (((portc & 0x80) == 0) && (olddata & 0x40))
 			{
-				// Lower nibble contains the LED values (1 = on, 0 = off)
-				machine().output().set_value("led_wait"   , (led_data & 0x1) == 0);
-				machine().output().set_value("led_compose", (led_data & 0x2) == 0);
-				machine().output().set_value("led_hold"   , (led_data & 0x4) == 0);
-				machine().output().set_value("led_lock"   , (led_data & 0x8) == 0);
+^				// Lower nibble contains the LED values (1 = on, 0 = off)
+				machine().output().set_value("led_wait"   , (led_data & 0x1) == 1);
+				machine().output().set_value("led_compose", (led_data & 0x2) == 2);
+				machine().output().set_value("led_lock"   , (led_data & 0x4) == 4);
+				machine().output().set_value("led_hold"   , (led_data & 0x8) == 8);
 			}
 #endif
 
