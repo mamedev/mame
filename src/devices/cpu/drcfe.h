@@ -140,7 +140,7 @@ protected:
 
 private:
 	// internal helpers
-	opcode_desc *describe_one(offs_t curpc, const opcode_desc *prevdesc);
+	opcode_desc *describe_one(offs_t curpc, const opcode_desc *prevdesc, bool in_delay_slot = false);
 	void build_sequence(int start, int end, UINT32 endflag);
 	void accumulate_required_backwards(opcode_desc &desc, UINT32 *reqmask);
 	void release_descriptions();
