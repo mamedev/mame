@@ -2988,7 +2988,10 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 	ratio = (m_total_in == 0) ? 1.0 : double(m_total_out) / double(m_total_in);
 
 	// if we're waiting for work, wait
-	while (m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_status != WS_COMPLETE && m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_osd != nullptr)
+	// sometimes code can get here with .m_status == WS_READY and .m_osd != nullptr, TODO find out why this happens
+	while (m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_status != WS_READY &&
+		m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_status != WS_COMPLETE &&
+		m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_osd != nullptr)
 		osd_work_item_wait(m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_osd, osd_ticks_per_second());
 
 	return m_walking_parent ? CHDERR_WALKING_PARENT : CHDERR_COMPRESSING;
