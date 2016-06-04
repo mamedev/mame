@@ -301,35 +301,6 @@ void debug_imgui::handle_keys()
 		m_hide = true;
 	}
 
-/*  if(m_machine->input().code_pressed_once(KEYCODE_UP))
-        io.KeysDown[ImGuiKey_UpArrow] = true;
-    if(m_machine->input().code_pressed_once(KEYCODE_DOWN))
-        io.KeysDown[ImGuiKey_DownArrow] = true;
-    if(m_machine->input().code_pressed_once(KEYCODE_LEFT))
-        io.KeysDown[ImGuiKey_LeftArrow] = true;
-    if(m_machine->input().code_pressed_once(KEYCODE_RIGHT))
-        io.KeysDown[ImGuiKey_RightArrow] = true;
-
-    if(m_machine->input().code_pressed(KEYCODE_TAB))
-        io.KeysDown[ImGuiKey_Tab] = true;
-
-    if(m_machine->input().code_pressed_once(KEYCODE_PGUP))
-    {
-        io.KeysDown[ImGuiKey_PageUp] = true;
-    }
-    if(m_machine->input().code_pressed_once(KEYCODE_PGDN))
-    {
-        io.KeysDown[ImGuiKey_PageDown] = true;
-    }
-
-    if(m_machine->input().code_pressed_once(KEYCODE_HOME))
-    {
-        io.KeysDown[ImGuiKey_Home] = true;
-    }
-    if(m_machine->input().code_pressed_once(KEYCODE_END))
-    {
-        io.KeysDown[ImGuiKey_End] = true;
-    }*/
 	if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
 		io.KeyCtrl = true;
 	else
@@ -1049,6 +1020,10 @@ void debug_imgui::init_debugger(running_machine &machine)
 	io.KeyMap[ImGuiKey_End] = ITEM_ID_END;
 	io.KeyMap[ImGuiKey_Escape] = ITEM_ID_ESC;
 	io.KeyMap[ImGuiKey_Enter] = ITEM_ID_ENTER;
+	io.KeyMap[ImGuiKey_LeftArrow] = ITEM_ID_LEFT;
+	io.KeyMap[ImGuiKey_RightArrow] = ITEM_ID_RIGHT;
+	io.KeyMap[ImGuiKey_UpArrow] = ITEM_ID_UP;
+	io.KeyMap[ImGuiKey_DownArrow] = ITEM_ID_DOWN;
 
 	font_name = (downcast<osd_options &>(m_machine->options()).debugger_font());
 	font_size = (downcast<osd_options &>(m_machine->options()).debugger_font_size());
