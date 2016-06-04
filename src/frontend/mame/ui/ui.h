@@ -184,7 +184,33 @@ public:
 	std::vector<ui::menu_item> slider_init(running_machine &machine);
 
 	void set_handler(ui_callback_type callback_type, const std::function<UINT32 (render_container *)> callback);
-	UINT32 set_handler(ui_callback callback, UINT32 param);
+
+	template<typename T, typename... Params>
+	void set_handler(ui_callback_type callback_type, T &obj, UINT32(T::*callback)(render_container *, Params...), Params ...args)
+	{
+		auto lambda = [=, &obj](render_container *container)
+		{
+			return ((obj).*(callback))(container, args...);
+		};
+		set_handler(callback_type, lambda);
+	}
+
+	template<typename... Params>
+	void set_handler(ui_callback_type callback_type, UINT32(mame_ui_manager::*callback)(render_container *, Params...), Params ...args)
+	{
+		set_handler(callback_type, *this, callback, args...);
+	}
+
+	template<typename... Params>
+	void set_handler(ui_callback_type callback_type, UINT32(*callback)(render_container *, Params...), Params ...args)
+	{
+		auto lambda = [&, callback](render_container *container)
+		{
+			return callback(container, args...);
+		};
+		set_handler(callback_type, lambda);
+	}
+
 	void display_startup_screens(bool first_time);
 	virtual void set_startup_text(const char *text, bool force) override;
 	void update_and_render(render_container *container);
@@ -271,11 +297,11 @@ private:
 	std::string &warnings_string(std::string &buffer);
 
 	// UI handlers
-	static UINT32 handler_messagebox(mame_ui_manager &mui, render_container *container, UINT32 state);
-	static UINT32 handler_messagebox_anykey(mame_ui_manager &mui, render_container *container, UINT32 state);
-	static UINT32 handler_ingame(mame_ui_manager &mui, render_container *container, UINT32 state);
-	static UINT32 handler_load_save(mame_ui_manager &mui, render_container *container, UINT32 state);
-	static UINT32 handler_confirm_quit(mame_ui_manager &mui, render_container *container, UINT32 state);
+	UINT32 handler_messagebox(render_container *container);
+	UINT32 handler_messagebox_anykey(render_container *container);
+	UINT32 handler_ingame(render_container *container);
+	UINT32 handler_load_save(render_container *container, UINT32 state);
+	UINT32 handler_confirm_quit(render_container *container);
 
 	// private methods
 	void exit();

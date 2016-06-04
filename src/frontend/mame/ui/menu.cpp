@@ -1270,7 +1270,7 @@ void menu::do_handle()
 //  and calls the menu handler
 //-------------------------------------------------
 
-UINT32 menu::ui_handler(mame_ui_manager &mui, render_container *container, UINT32 state)
+UINT32 menu::ui_handler(render_container *container, mame_ui_manager &mui)
 {
 	// if we have no menus stacked up, start with the main menu
 	if (!menu_stack)
