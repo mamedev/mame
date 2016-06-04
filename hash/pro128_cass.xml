@@ -154,7 +154,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="produkitc" cloneof="produkit">
 		<description>Productivity Kit - Introduzione al software integrato (Alt 3)</description>
 		<year>1987</year>

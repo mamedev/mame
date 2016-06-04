@@ -1158,7 +1158,7 @@
 		</part>
 	</software>
 
-	<software name="akagawa">
+	<software name="ajyureir">
 		<description>Akagawa Jirou no Yuurei Ressha (Jpn)</description>
 		<year>1991</year>
 		<publisher>King Records</publisher>
@@ -15635,7 +15635,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="snowwhit">
 		<description>Happily Ever After Starring Snow White (USA, Prototype)</description>
 		<year>1991</year>
@@ -29733,7 +29733,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="racermt2b" cloneof="racermt2" supported="no">
 		<description>RacerMate Challenge 2 (USA, v5.01.033)</description>
 		<year>1996</year>
@@ -34387,7 +34387,7 @@
 		</part>
 	</software>
 
-	<software name="anpaman">
+	<software name="anpanman">
 		<description>Soreike! Anpanman - Minna de Hiking Game! (Jpn)</description>
 		<year>1992</year>
 		<publisher>Bandai</publisher>
@@ -37444,7 +37444,7 @@
 		</part>
 	</software>
 
-	<software name="tantjsts">
+	<software name="tjstnsmn">
 		<description>Tantei Jinguuji Saburou - Toki no Sugiyuku Mama ni (Jpn)</description>
 		<year>1990</year>
 		<publisher>Data East</publisher>
@@ -44047,7 +44047,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="brdtalejs" cloneof="brdtale">
 		<description>The Bard's Tale - Tales of the Unknown (Jpn, Sample)</description>
 		<year>1990</year>
@@ -44868,7 +44868,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="columbuss" cloneof="columbus">
 		<description>Columbus - Ougon no Yoake (Jpn, Sample)</description>
 		<year>1992</year>
@@ -49701,7 +49701,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tantjsyr">
+	<software name="tjsyrsj">
 		<description>Tantei Jinguuji Saburou - Yokohamakou Renzoku Satsujin Jiken (Jpn)</description>
 		<year>1988</year>
 		<publisher>Data East</publisher>
@@ -49721,7 +49721,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tashimp">
-		<description>Tashiro Masashi no Princess Ga Ippai (Jpn)</description>
+		<description>Tashiro Masashi no Princess ga Ippai (Jpn)</description>
 		<year>1989</year>
 		<publisher>Epic / Sony Records</publisher>
 		<info name="serial" value="ESF-P0/55・6R-4"/>
@@ -50737,6 +50737,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="32768">
 				<rom name="othello (australia) (unl).prg" size="16384" crc="257736c8" sha1="ff341d3b1e87a8685c05594365858ab747795f0d" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipe5">
+		<description>Pipe 5 (Aus)</description>
+		<year>19??</year>
+		<publisher>HES</publisher>
+		<info name="alt_title" value="PipeMania (Box)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nina006" />
+			<feature name="pcb" value="AVE-NINA-06" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="16384">
+				<rom name="pipemania (hes).chr" size="16384" crc="eac077bd" sha1="31c9163aeff2f301fedb31537d239e6a7d6852c7" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="pipemania (hes).prg" size="32768" crc="713d51cc" sha1="7f46340433dc63ec40c11f8ea3560c2917d6ca83" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -52259,7 +52277,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="pipe5">
+	<software name="pipe5t" cloneof="pipe5">
 		<description>Pipe 5 (Tw)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -52802,7 +52820,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 		</part>
 	</software>
- 
+
 	<software name="cosmocops" cloneof="cosmocop">
 		<description>Cosmos Cop (Spa)</description>
 		<year>1991</year>
@@ -53289,9 +53307,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="policemn">
-		<description>Policeman (Tw)</description>
+		<description>Policeman (Spa, Tw)</description>
 		<year>19??</year>
-		<publisher>TXC Corp</publisher>
+		<publisher>Gluk Video / TXC Corp</publisher>
 		<info name="serial" value="MGC-015"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_strikew" />
@@ -53303,24 +53321,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="policeman (mgc-015).prg" size="65536" crc="65fe1590" sha1="be06c1c9c76bf270e83e98f6c5a79ff4d5589c59" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="policemns" cloneof="policemn">
-		<description>Policeman (Spa)</description>
-		<year>19??</year>
-		<publisher>Gluk Video</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_strikew" />
-			<feature name="pcb" value="TXC-STRIKEWOLF" />
-			<feature name="mirroring" value="vertical" />
-			<feature name="bus_conflict" value="no" />
-			<dataarea name="chr" size="65536">
-				<rom name="policeman (spain) (gluk video) (unl).chr" size="65536" crc="f73ee39e" sha1="0142d357b7a8e38c720bef9a13250da76dbc0738" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="65536">
-				<rom name="policeman (spain) (gluk video) (unl).prg" size="65536" crc="65fe1590" sha1="be06c1c9c76bf270e83e98f6c5a79ff4d5589c59" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -55024,7 +55024,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="rongyu" cloneof="akagawa">
+	<software name="rongyu" cloneof="ajyureir">
 		<description>Rong Yu Xun Zhang (Chi)</description>
 		<year>2005?</year>
 		<publisher>Waixing</publisher>
@@ -55046,7 +55046,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="youlinlc" cloneof="akagawa">
+	<software name="youlinlc" cloneof="ajyureir">
 		<description>You Ling Lie Che (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -55068,7 +55068,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="liecheqa" cloneof="akagawa">
+	<software name="liecheqa" cloneof="ajyureir">
 		<description>Lie Che Qi An (Chi)</description>
 		<year>19??</year>
 		<publisher>CoolBoy</publisher>
@@ -59497,7 +59497,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="shconan" cloneof="akagawa">
+	<software name="shconan" cloneof="ajyureir">
 		<description>Shentan Conan (Chi)</description>
 		<year>19??</year>
 		<publisher>XingXing</publisher>
@@ -61814,7 +61814,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_sgzlz" />		<!-- Mapper 178 in header, is it really? -->
+			<feature name="slot" value="waixing_sgzlz" />       <!-- Mapper 178 in header, is it really? -->
 			<feature name="pcb" value="WAIXING-SGZLZ" />
 			<dataarea name="prg" size="524288">
 				<rom name="gameinis pingpong (unl)[!].prg" size="524288" crc="d065b311" sha1="a74cddff12eb57735c770542b87af38171d54e8a" offset="00000" status="baddump" />
@@ -64659,7 +64659,7 @@ All musics were removed in this game.
 			</dataarea>
 		</part>
 	</software>
- 
+
 	<software name="magicarps" cloneof="magicarp">
 		<description>Magic Carpet 1001 (Spa, Rev. 1)</description>
 		<year>19??</year>
@@ -69195,7 +69195,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="edu2k" />	<!-- Marked as mapper 178 in header -->
+			<feature name="slot" value="edu2k" />   <!-- Marked as mapper 178 in header -->
 			<feature name="pcb" value="UNL-EDU2000" />
 			<dataarea name="prg" size="524288">
 				<rom name="bravesoft windows 2000 (r)[!].prg" size="524288" crc="305d75b1" sha1="b6ccfab2c38786e09da662b3488dab2431894dd2" offset="00000" status="baddump" />
@@ -74321,7 +74321,7 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="rom city rampage.prg" size="524288" crc="0dc29799" sha1="83cf38b049ea72a108462b2b51afd9c34892a49b" offset="00000" status="baddump" />
-			</dataarea>		
+			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="32768">
 				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
@@ -76426,7 +76426,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="xiaozy" />	<!-- header give 176, but is it correct? -->
+			<feature name="slot" value="xiaozy" />  <!-- header give 176, but is it correct? -->
 			<feature name="pcb" value="UNL-XZY" />
 			<dataarea name="chr" size="1048576">
 				<rom name="125-in-1 [p1][!].chr" size="1048576" crc="56520c13" sha1="9490fdcc34bbf5905098835d748c56ec89d3d5ba" offset="00000" status="baddump" />
@@ -76918,7 +76918,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik300" />	<!-- header gives 212, but is it correct? -->
+			<feature name="slot" value="bmc_hik300" />  <!-- header gives 212, but is it correct? -->
 			<feature name="pcb" value="BMC-SUPERHIK-300IN1" />
 			<dataarea name="chr" size="65536">
 				<rom name="200-in-1 (unchained melody)[p1][!].chr" size="65536" crc="aa97eff7" sha1="68ffcb379e3c3ad44b0b5ea4df47118c811d9d0d" offset="00000" status="baddump" />
@@ -76934,7 +76934,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_gc6in1" />	<!-- header gives 217, but is it correct? -->
+			<feature name="slot" value="bmc_gc6in1" />  <!-- header gives 217, but is it correct? -->
 			<feature name="pcb" value="BMC-GOLDENCARD-6IN1" />
 			<dataarea name="chr" size="65536">
 				<rom name="2000-in-1 (no splash, no rev, alt mapper)[p1][!].chr" size="65536" crc="4a0611c1" sha1="8a1869ce3aff1c34a743c9cc3f22f01df5be2c77" offset="00000" status="baddump" />
@@ -79024,7 +79024,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik300" />	<!-- header gives 212, but is it correct? -->
+			<feature name="slot" value="bmc_hik300" />  <!-- header gives 212, but is it correct? -->
 			<feature name="pcb" value="BMC-SUPERHIK-300IN1" />
 			<dataarea name="chr" size="65536">
 				<rom name="9999-in-1 (anim splash, rev 13)[p1][!].chr" size="65536" crc="9b6e8be7" sha1="4c53a3d5e510c4355041b9ad88f1e633ce85f916" offset="00000" status="baddump" />
@@ -81055,7 +81055,7 @@ that the real dumps might surface -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 
 <!-- TO SORT AND RENAME PROPERLY!!! -->
 

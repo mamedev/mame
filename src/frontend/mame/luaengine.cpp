@@ -52,7 +52,6 @@ const char *const lua_engine::tname_ioport = "lua.ioport";
 lua_engine* lua_engine::luaThis = nullptr;
 
 extern "C" {
-	int luaopen_lsqlite3(lua_State *L);
 	int luaopen_zlib(lua_State *L);
 	int luaopen_lfs(lua_State *L);
 }
@@ -606,8 +605,8 @@ luabridge::LuaRef lua_engine::l_cheat_get_entries(const cheat_manager *c)
 	luabridge::LuaRef entry_table = luabridge::LuaRef::newTable(L);
 
 	int cheatnum = 0;
-	for (cheat_entry &entry : cm->entries()) {
-		entry_table[cheatnum++] = &entry;
+	for (auto &entry : cm->entries()) {
+		entry_table[cheatnum++] = entry.get();
 	}
 
 	return entry_table;
@@ -1711,9 +1710,6 @@ lua_engine::lua_engine()
 	lua_pushcfunction(m_lua_state, luaopen_zlib);
 	lua_setfield(m_lua_state, -2, "zlib");
 
-	lua_pushcfunction(m_lua_state, luaopen_lsqlite3);
-	lua_setfield(m_lua_state, -2, "lsqlite3");
-
 	lua_pushcfunction(m_lua_state, luaopen_lfs);
 	lua_setfield(m_lua_state, -2, "lfs");
 
@@ -2216,7 +2212,7 @@ void lua_engine::initialize()
 				.addProperty ("is_analog", &ioport_field::is_analog)
 				.addProperty ("is_digital_joystick", &ioport_field::is_digital_joystick)
 				.addProperty ("enabled", &ioport_field::enabled)
-				.addProperty ("unused", &ioport_field::unused)
+				.addProperty ("optional", &ioport_field::optional)
 				.addProperty ("cocktail", &ioport_field::cocktail)
 				.addProperty ("toggle", &ioport_field::toggle)
 				.addProperty ("rotated", &ioport_field::rotated)

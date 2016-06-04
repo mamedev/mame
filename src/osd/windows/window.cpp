@@ -74,7 +74,6 @@ using namespace Windows::UI::Core;
 #define MIN_WINDOW_DIM                  200
 
 // custom window messages
-#define WM_USER_SELF_TERMINATE          (WM_USER + 1)
 #define WM_USER_REDRAW                  (WM_USER + 2)
 #define WM_USER_SET_FULLSCREEN          (WM_USER + 3)
 #define WM_USER_SET_MAXSIZE             (WM_USER + 4)
@@ -114,7 +113,6 @@ static DWORD window_threadid;
 static DWORD last_update_time;
 
 static HANDLE ui_pause_event;
-static HANDLE window_thread_ready_event;
 
 
 
@@ -234,7 +232,7 @@ void windows_osd_interface::build_slider_list()
 	for (auto window : win_window_list)
 	{
 		// take the sliders of the first window
-		std::vector<ui_menu_item> window_sliders = window->m_renderer->get_slider_list();
+		std::vector<ui::menu_item> window_sliders = window->m_renderer->get_slider_list();
 		m_sliders.insert(m_sliders.end(), window_sliders.begin(), window_sliders.end());
 	}
 }
@@ -296,17 +294,13 @@ void windows_osd_interface::window_exit()
 	// kill the UI pause event
 	if (ui_pause_event)
 		CloseHandle(ui_pause_event);
-
-	// kill the window thread ready event
-	if (window_thread_ready_event)
-		CloseHandle(window_thread_ready_event);
 }
 
 win_window_info::win_window_info(
 	running_machine &machine,
 	int index,
 	osd_monitor_info *monitor,
-	const osd_window_config *config) : osd_window(),
+	const osd_window_config *config) : osd_window(*config),
 		m_next(nullptr),
 		m_init_state(0),
 		m_startmaximized(0),
@@ -331,8 +325,6 @@ win_window_info::win_window_info(
 	m_non_fullscreen_bounds.right  = 0;
 	m_non_fullscreen_bounds.bottom = 0;
 	m_prescale = video_config.prescale;
-
-
 }
 
 win_window_info::~win_window_info()
@@ -812,7 +804,7 @@ void win_window_info::destroy()
 
 	// destroy the window
 	if (platform_window<HWND>() != nullptr)
-		SendMessage(platform_window<HWND>(), WM_USER_SELF_TERMINATE, 0, 0);
+		DestroyWindow(platform_window<HWND>());
 
 	// free the render target
 	machine().render().target_free(m_target);
@@ -977,11 +969,11 @@ void win_window_info::set_starting_view(int index, const char *defview, const ch
 
 
 //============================================================
-//  winwindow_ui_pause_from_main_thread
+//  winwindow_ui_pause
 //  (main thread)
 //============================================================
 
-void winwindow_ui_pause_from_main_thread(running_machine &machine, int pause)
+void winwindow_ui_pause(running_machine &machine, int pause)
 {
 	int old_temp_pause = ui_temp_pause;
 
@@ -1017,34 +1009,7 @@ void winwindow_ui_pause_from_main_thread(running_machine &machine, int pause)
 	}
 
 	if (LOG_TEMP_PAUSE)
-		osd_printf_verbose("winwindow_ui_pause_from_main_thread(): %d --> %d\n", old_temp_pause, ui_temp_pause);
-}
-
-
-
-//============================================================
-//  winwindow_ui_pause_from_window_thread
-//  (window thread)
-//============================================================
-
-void winwindow_ui_pause_from_window_thread(running_machine &machine, int pause)
-{
-	assert(GetCurrentThreadId() == window_threadid);
-	winwindow_ui_pause_from_main_thread(machine, pause);
-}
-
-
-
-//============================================================
-//  winwindow_ui_exec_on_main_thread
-//  (window thread)
-//============================================================
-
-void winwindow_ui_exec_on_main_thread(void (*func)(void *), void *param)
-{
-	assert(GetCurrentThreadId() == window_threadid);
-
-	(*func)(param);
+		osd_printf_verbose("winwindow_ui_pause(): %d --> %d\n", old_temp_pause, ui_temp_pause);
 }
 
 
@@ -1089,93 +1054,6 @@ int win_window_info::wnd_extra_height()
 	AdjustWindowRectEx(&temprect, WINDOW_STYLE, win_has_menu(), WINDOW_STYLE_EX);
 	return rect_height(&temprect) - 100;
 }
-
-//============================================================
-//  thread_entry
-//  (window thread)
-//============================================================
-
-unsigned __stdcall win_window_info::thread_entry(void *param)
-{
-	MSG message;
-	windows_osd_interface *osd = static_cast<windows_osd_interface*>(param);
-
-	// make a bogus user call to make us a message thread
-	PeekMessage(&message, nullptr, 0, 0, PM_NOREMOVE);
-
-	// attach our input to the main thread
-	AttachThreadInput(main_threadid, window_threadid, TRUE);
-
-	// signal to the main thread that we are ready to receive events
-	SetEvent(window_thread_ready_event);
-
-	// run the message pump
-	while (GetMessage(&message, nullptr, 0, 0))
-	{
-		int dispatch = TRUE;
-
-		if ((message.hwnd == nullptr) || is_mame_window(message.hwnd))
-		{
-			switch (message.message)
-			{
-				// ignore input messages here
-				case WM_SYSKEYUP:
-				case WM_SYSKEYDOWN:
-					dispatch = FALSE;
-					break;
-
-				// forward mouse button downs to the input system
-				case WM_LBUTTONDOWN:
-					dispatch = !handle_mouse_button(osd, 0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					break;
-
-				case WM_RBUTTONDOWN:
-					dispatch = !handle_mouse_button(osd, 1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					break;
-
-				case WM_MBUTTONDOWN:
-					dispatch = !handle_mouse_button(osd, 2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					break;
-
-				case WM_XBUTTONDOWN:
-					dispatch = !handle_mouse_button(osd, 3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					break;
-
-				// forward mouse button ups to the input system
-				case WM_LBUTTONUP:
-					dispatch = !handle_mouse_button(osd, 0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					break;
-
-				case WM_RBUTTONUP:
-					dispatch = !handle_mouse_button(osd, 1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					break;
-
-				case WM_MBUTTONUP:
-					dispatch = !handle_mouse_button(osd, 2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					break;
-
-				case WM_XBUTTONUP:
-					dispatch = !handle_mouse_button(osd, 3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					break;
-
-				// a terminate message to the thread posts a quit
-				case WM_USER_SELF_TERMINATE:
-					PostQuitMessage(0);
-					dispatch = FALSE;
-					break;
-			}
-		}
-
-		// dispatch if necessary
-		if (dispatch)
-		{
-			TranslateMessage(&message);
-			DispatchMessage(&message);
-		}
-	}
-	return 0;
-}
-
 
 
 //============================================================
@@ -1369,14 +1247,14 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		case WM_ENTERSIZEMOVE:
 			window->m_resize_state = RESIZE_STATE_RESIZING;
 		case WM_ENTERMENULOOP:
-			winwindow_ui_pause_from_window_thread(window->machine(), TRUE);
+			winwindow_ui_pause(window->machine(), TRUE);
 			break;
 
 		// unpause the system when we stop a menu or resize and force a redraw
 		case WM_EXITSIZEMOVE:
 			window->m_resize_state = RESIZE_STATE_PENDING;
 		case WM_EXITMENULOOP:
-			winwindow_ui_pause_from_window_thread(window->machine(), FALSE);
+			winwindow_ui_pause(window->machine(), FALSE);
 			InvalidateRect(wnd, nullptr, FALSE);
 			break;
 
@@ -1457,11 +1335,6 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			ReleaseDC(wnd, hdc);
 			break;
 		}
-
-		// self destruct
-		case WM_USER_SELF_TERMINATE:
-			DestroyWindow(window->platform_window<HWND>());
-			break;
 
 		// fullscreen set
 		case WM_USER_SET_FULLSCREEN:

@@ -3,14 +3,14 @@
 #define SIGN_EXTEND6(x)     (((x) & 0x20) ? (0xffffffc0 | (x)) : (x))
 #define SIGN_EXTEND24(x)    (((x) & 0x800000) ? (0xff000000 | (x)) : (x))
 
-#define PM_REG_I(x)         (m_dag2.i[x])
-#define PM_REG_M(x)         (m_dag2.m[x])
-#define PM_REG_B(x)         (m_dag2.b[x])
-#define PM_REG_L(x)         (m_dag2.l[x])
-#define DM_REG_I(x)         (m_dag1.i[x])
-#define DM_REG_M(x)         (m_dag1.m[x])
-#define DM_REG_B(x)         (m_dag1.b[x])
-#define DM_REG_L(x)         (m_dag1.l[x])
+#define PM_REG_I(x)         (m_core->dag2.i[x])
+#define PM_REG_M(x)         (m_core->dag2.m[x])
+#define PM_REG_B(x)         (m_core->dag2.b[x])
+#define PM_REG_L(x)         (m_core->dag2.l[x])
+#define DM_REG_I(x)         (m_core->dag1.i[x])
+#define DM_REG_M(x)         (m_core->dag1.m[x])
+#define DM_REG_B(x)         (m_core->dag1.b[x])
+#define DM_REG_L(x)         (m_core->dag1.l[x])
 
 // ASTAT flags
 #define AZ      0x1         /* ALU result zero */
@@ -33,44 +33,6 @@
 #define FLG2    0x200000    /* FLAG2 */
 #define FLG3    0x400000    /* FLAG3 */
 
-// STKY flags
-#define AUS     0x1         /* ALU floating-point underflow */
-#define AVS     0x2         /* ALU floating-point overflow */
-#define AOS     0x4         /* ALU fixed-point overflow */
-#define AIS     0x20        /* ALU floating-point invalid operation */
-
-// MODE1 flags
-#define MODE1_BR8           0x1         /* Bit-reverse for I8 */
-#define MODE1_BR0           0x2         /* Bit-reverse for I0 */
-#define MODE1_SRCU          0x4         /* Alternate register select for computational units */
-#define MODE1_SRD1H         0x8         /* DAG alternate register select (7-4) */
-#define MODE1_SRD1L         0x10        /* DAG alternate register select (3-0) */
-#define MODE1_SRD2H         0x20        /* DAG alternate register select (15-12) */
-#define MODE1_SRD2L         0x40        /* DAG alternate register select (11-8) */
-#define MODE1_SRRFH         0x80        /* Register file alternate select for R(15-8) */
-#define MODE1_SRRFL         0x400       /* Register file alternate select for R(7-0) */
-#define MODE1_NESTM         0x800       /* Interrupt nesting enable */
-#define MODE1_IRPTEN        0x1000      /* Global interrupt enable */
-#define MODE1_ALUSAT        0x2000      /* Enable ALU fixed-point saturation */
-#define MODE1_SSE           0x4000      /* Enable short word sign extension */
-#define MODE1_TRUNCATE      0x8000      /* (1) Floating-point truncation / (0) round to nearest */
-#define MODE1_RND32         0x10000     /* (1) 32-bit floating-point rounding / (0) 40-bit rounding */
-#define MODE1_CSEL          0x60000     /* CSelect */
-
-// MODE2 flags
-#define MODE2_IRQ0E         0x1         /* IRQ0 (1) Edge sens. / (0) Level sens. */
-#define MODE2_IRQ1E         0x2         /* IRQ1 (1) Edge sens. / (0) Level sens. */
-#define MODE2_IRQ2E         0x4         /* IRQ2 (1) Edge sens. / (0) Level sens. */
-#define MODE2_CADIS         0x10        /* Cache disable */
-#define MODE2_TIMEN         0x20        /* Timer enable */
-#define MODE2_BUSLK         0x40        /* External bus lock */
-#define MODE2_FLG0O         0x8000      /* FLAG0 (1) Output / (0) Input */
-#define MODE2_FLG1O         0x10000     /* FLAG1 (1) Output / (0) Input */
-#define MODE2_FLG2O         0x20000     /* FLAG2 (1) Output / (0) Input */
-#define MODE2_FLG3O         0x40000     /* FLAG3 (1) Output / (0) Input */
-#define MODE2_CAFRZ         0x80000     /* Cache freeze */
-
-
 #define REG_PC              0x63
 #define REG_PCSTK           0x64
 #define REG_PCSTKP          0x65
@@ -89,8 +51,8 @@
 
 
 
-#define REG(x)      (m_r[x].r)
-#define FREG(x)     (m_r[x].f)
+#define REG(x)      (m_core->r[x].r)
+#define FREG(x)     (m_core->r[x].f)
 
 #define UPDATE_CIRCULAR_BUFFER_PM(x)                        \
 	{                                                       \
@@ -127,16 +89,16 @@
 
 void adsp21062_device::add_systemreg_write_latency_effect(int sysreg, UINT32 data, UINT32 prev_data)
 {
-	if (m_systemreg_latency_cycles > 0)
+	if (m_core->systemreg_latency_cycles > 0)
 	{
-		//fatalerror("SHARC: add_systemreg_write_latency_effect: already scheduled! (reg: %02X, data: %08X, PC: %08X)\n", systemreg_latency_reg, systemreg_latency_data, m_pc);
+		//fatalerror("SHARC: add_systemreg_write_latency_effect: already scheduled! (reg: %02X, data: %08X, PC: %08X)\n", systemreg_latency_reg, systemreg_latency_data, m_core->pc);
 		systemreg_write_latency_effect();
 	}
 
-	m_systemreg_latency_cycles = 2;
-	m_systemreg_latency_reg = sysreg;
-	m_systemreg_latency_data = data;
-	m_systemreg_previous_data = prev_data;
+	m_core->systemreg_latency_cycles = 2;
+	m_core->systemreg_latency_reg = sysreg;
+	m_core->systemreg_latency_data = data;
+	m_core->systemreg_previous_data = prev_data;
 }
 
 void adsp21062_device::swap_register(UINT32 *a, UINT32 *b)
@@ -149,15 +111,15 @@ void adsp21062_device::swap_register(UINT32 *a, UINT32 *b)
 void adsp21062_device::systemreg_write_latency_effect()
 {
 	int i;
-	UINT32 data = m_systemreg_latency_data;
-	UINT32 old_data = m_systemreg_previous_data;
+	UINT32 data = m_core->systemreg_latency_data;
+	UINT32 old_data = m_core->systemreg_previous_data;
 
-	switch(m_systemreg_latency_reg)
+	switch(m_core->systemreg_latency_reg)
 	{
 		case 0xb:   /* MODE1 */
 		{
 			UINT32 oldreg = old_data;
-			m_mode1 = data;
+			m_core->mode1 = data;
 
 			if ((data & 0x1) != (oldreg & 0x1))
 			{
@@ -174,96 +136,96 @@ void adsp21062_device::systemreg_write_latency_effect()
 
 			if ((data & 0x8) != (oldreg & 0x8))         /* Switch DAG1 7-4 */
 			{
-				swap_register(&m_dag1.i[4], &m_dag1_alt.i[4]);
-				swap_register(&m_dag1.i[5], &m_dag1_alt.i[5]);
-				swap_register(&m_dag1.i[6], &m_dag1_alt.i[6]);
-				swap_register(&m_dag1.i[7], &m_dag1_alt.i[7]);
-				swap_register(&m_dag1.m[4], &m_dag1_alt.m[4]);
-				swap_register(&m_dag1.m[5], &m_dag1_alt.m[5]);
-				swap_register(&m_dag1.m[6], &m_dag1_alt.m[6]);
-				swap_register(&m_dag1.m[7], &m_dag1_alt.m[7]);
-				swap_register(&m_dag1.l[4], &m_dag1_alt.l[4]);
-				swap_register(&m_dag1.l[5], &m_dag1_alt.l[5]);
-				swap_register(&m_dag1.l[6], &m_dag1_alt.l[6]);
-				swap_register(&m_dag1.l[7], &m_dag1_alt.l[7]);
-				swap_register(&m_dag1.b[4], &m_dag1_alt.b[4]);
-				swap_register(&m_dag1.b[5], &m_dag1_alt.b[5]);
-				swap_register(&m_dag1.b[6], &m_dag1_alt.b[6]);
-				swap_register(&m_dag1.b[7], &m_dag1_alt.b[7]);
+				swap_register(&m_core->dag1.i[4], &m_core->dag1_alt.i[4]);
+				swap_register(&m_core->dag1.i[5], &m_core->dag1_alt.i[5]);
+				swap_register(&m_core->dag1.i[6], &m_core->dag1_alt.i[6]);
+				swap_register(&m_core->dag1.i[7], &m_core->dag1_alt.i[7]);
+				swap_register(&m_core->dag1.m[4], &m_core->dag1_alt.m[4]);
+				swap_register(&m_core->dag1.m[5], &m_core->dag1_alt.m[5]);
+				swap_register(&m_core->dag1.m[6], &m_core->dag1_alt.m[6]);
+				swap_register(&m_core->dag1.m[7], &m_core->dag1_alt.m[7]);
+				swap_register(&m_core->dag1.l[4], &m_core->dag1_alt.l[4]);
+				swap_register(&m_core->dag1.l[5], &m_core->dag1_alt.l[5]);
+				swap_register(&m_core->dag1.l[6], &m_core->dag1_alt.l[6]);
+				swap_register(&m_core->dag1.l[7], &m_core->dag1_alt.l[7]);
+				swap_register(&m_core->dag1.b[4], &m_core->dag1_alt.b[4]);
+				swap_register(&m_core->dag1.b[5], &m_core->dag1_alt.b[5]);
+				swap_register(&m_core->dag1.b[6], &m_core->dag1_alt.b[6]);
+				swap_register(&m_core->dag1.b[7], &m_core->dag1_alt.b[7]);
 			}
 			if ((data & 0x10) != (oldreg & 0x10))       /* Switch DAG1 3-0 */
 			{
-				swap_register(&m_dag1.i[0], &m_dag1_alt.i[0]);
-				swap_register(&m_dag1.i[1], &m_dag1_alt.i[1]);
-				swap_register(&m_dag1.i[2], &m_dag1_alt.i[2]);
-				swap_register(&m_dag1.i[3], &m_dag1_alt.i[3]);
-				swap_register(&m_dag1.m[0], &m_dag1_alt.m[0]);
-				swap_register(&m_dag1.m[1], &m_dag1_alt.m[1]);
-				swap_register(&m_dag1.m[2], &m_dag1_alt.m[2]);
-				swap_register(&m_dag1.m[3], &m_dag1_alt.m[3]);
-				swap_register(&m_dag1.l[0], &m_dag1_alt.l[0]);
-				swap_register(&m_dag1.l[1], &m_dag1_alt.l[1]);
-				swap_register(&m_dag1.l[2], &m_dag1_alt.l[2]);
-				swap_register(&m_dag1.l[3], &m_dag1_alt.l[3]);
-				swap_register(&m_dag1.b[0], &m_dag1_alt.b[0]);
-				swap_register(&m_dag1.b[1], &m_dag1_alt.b[1]);
-				swap_register(&m_dag1.b[2], &m_dag1_alt.b[2]);
-				swap_register(&m_dag1.b[3], &m_dag1_alt.b[3]);
+				swap_register(&m_core->dag1.i[0], &m_core->dag1_alt.i[0]);
+				swap_register(&m_core->dag1.i[1], &m_core->dag1_alt.i[1]);
+				swap_register(&m_core->dag1.i[2], &m_core->dag1_alt.i[2]);
+				swap_register(&m_core->dag1.i[3], &m_core->dag1_alt.i[3]);
+				swap_register(&m_core->dag1.m[0], &m_core->dag1_alt.m[0]);
+				swap_register(&m_core->dag1.m[1], &m_core->dag1_alt.m[1]);
+				swap_register(&m_core->dag1.m[2], &m_core->dag1_alt.m[2]);
+				swap_register(&m_core->dag1.m[3], &m_core->dag1_alt.m[3]);
+				swap_register(&m_core->dag1.l[0], &m_core->dag1_alt.l[0]);
+				swap_register(&m_core->dag1.l[1], &m_core->dag1_alt.l[1]);
+				swap_register(&m_core->dag1.l[2], &m_core->dag1_alt.l[2]);
+				swap_register(&m_core->dag1.l[3], &m_core->dag1_alt.l[3]);
+				swap_register(&m_core->dag1.b[0], &m_core->dag1_alt.b[0]);
+				swap_register(&m_core->dag1.b[1], &m_core->dag1_alt.b[1]);
+				swap_register(&m_core->dag1.b[2], &m_core->dag1_alt.b[2]);
+				swap_register(&m_core->dag1.b[3], &m_core->dag1_alt.b[3]);
 			}
 			if ((data & 0x20) != (oldreg & 0x20))       /* Switch DAG2 15-12 */
 			{
-				swap_register(&m_dag2.i[4], &m_dag2_alt.i[4]);
-				swap_register(&m_dag2.i[5], &m_dag2_alt.i[5]);
-				swap_register(&m_dag2.i[6], &m_dag2_alt.i[6]);
-				swap_register(&m_dag2.i[7], &m_dag2_alt.i[7]);
-				swap_register(&m_dag2.m[4], &m_dag2_alt.m[4]);
-				swap_register(&m_dag2.m[5], &m_dag2_alt.m[5]);
-				swap_register(&m_dag2.m[6], &m_dag2_alt.m[6]);
-				swap_register(&m_dag2.m[7], &m_dag2_alt.m[7]);
-				swap_register(&m_dag2.l[4], &m_dag2_alt.l[4]);
-				swap_register(&m_dag2.l[5], &m_dag2_alt.l[5]);
-				swap_register(&m_dag2.l[6], &m_dag2_alt.l[6]);
-				swap_register(&m_dag2.l[7], &m_dag2_alt.l[7]);
-				swap_register(&m_dag2.b[4], &m_dag2_alt.b[4]);
-				swap_register(&m_dag2.b[5], &m_dag2_alt.b[5]);
-				swap_register(&m_dag2.b[6], &m_dag2_alt.b[6]);
-				swap_register(&m_dag2.b[7], &m_dag2_alt.b[7]);
+				swap_register(&m_core->dag2.i[4], &m_core->dag2_alt.i[4]);
+				swap_register(&m_core->dag2.i[5], &m_core->dag2_alt.i[5]);
+				swap_register(&m_core->dag2.i[6], &m_core->dag2_alt.i[6]);
+				swap_register(&m_core->dag2.i[7], &m_core->dag2_alt.i[7]);
+				swap_register(&m_core->dag2.m[4], &m_core->dag2_alt.m[4]);
+				swap_register(&m_core->dag2.m[5], &m_core->dag2_alt.m[5]);
+				swap_register(&m_core->dag2.m[6], &m_core->dag2_alt.m[6]);
+				swap_register(&m_core->dag2.m[7], &m_core->dag2_alt.m[7]);
+				swap_register(&m_core->dag2.l[4], &m_core->dag2_alt.l[4]);
+				swap_register(&m_core->dag2.l[5], &m_core->dag2_alt.l[5]);
+				swap_register(&m_core->dag2.l[6], &m_core->dag2_alt.l[6]);
+				swap_register(&m_core->dag2.l[7], &m_core->dag2_alt.l[7]);
+				swap_register(&m_core->dag2.b[4], &m_core->dag2_alt.b[4]);
+				swap_register(&m_core->dag2.b[5], &m_core->dag2_alt.b[5]);
+				swap_register(&m_core->dag2.b[6], &m_core->dag2_alt.b[6]);
+				swap_register(&m_core->dag2.b[7], &m_core->dag2_alt.b[7]);
 			}
 			if ((data & 0x40) != (oldreg & 0x40))       /* Switch DAG2 11-8 */
 			{
-				swap_register(&m_dag2.i[0], &m_dag2_alt.i[0]);
-				swap_register(&m_dag2.i[1], &m_dag2_alt.i[1]);
-				swap_register(&m_dag2.i[2], &m_dag2_alt.i[2]);
-				swap_register(&m_dag2.i[3], &m_dag2_alt.i[3]);
-				swap_register(&m_dag2.m[0], &m_dag2_alt.m[0]);
-				swap_register(&m_dag2.m[1], &m_dag2_alt.m[1]);
-				swap_register(&m_dag2.m[2], &m_dag2_alt.m[2]);
-				swap_register(&m_dag2.m[3], &m_dag2_alt.m[3]);
-				swap_register(&m_dag2.l[0], &m_dag2_alt.l[0]);
-				swap_register(&m_dag2.l[1], &m_dag2_alt.l[1]);
-				swap_register(&m_dag2.l[2], &m_dag2_alt.l[2]);
-				swap_register(&m_dag2.l[3], &m_dag2_alt.l[3]);
-				swap_register(&m_dag2.b[0], &m_dag2_alt.b[0]);
-				swap_register(&m_dag2.b[1], &m_dag2_alt.b[1]);
-				swap_register(&m_dag2.b[2], &m_dag2_alt.b[2]);
-				swap_register(&m_dag2.b[3], &m_dag2_alt.b[3]);
+				swap_register(&m_core->dag2.i[0], &m_core->dag2_alt.i[0]);
+				swap_register(&m_core->dag2.i[1], &m_core->dag2_alt.i[1]);
+				swap_register(&m_core->dag2.i[2], &m_core->dag2_alt.i[2]);
+				swap_register(&m_core->dag2.i[3], &m_core->dag2_alt.i[3]);
+				swap_register(&m_core->dag2.m[0], &m_core->dag2_alt.m[0]);
+				swap_register(&m_core->dag2.m[1], &m_core->dag2_alt.m[1]);
+				swap_register(&m_core->dag2.m[2], &m_core->dag2_alt.m[2]);
+				swap_register(&m_core->dag2.m[3], &m_core->dag2_alt.m[3]);
+				swap_register(&m_core->dag2.l[0], &m_core->dag2_alt.l[0]);
+				swap_register(&m_core->dag2.l[1], &m_core->dag2_alt.l[1]);
+				swap_register(&m_core->dag2.l[2], &m_core->dag2_alt.l[2]);
+				swap_register(&m_core->dag2.l[3], &m_core->dag2_alt.l[3]);
+				swap_register(&m_core->dag2.b[0], &m_core->dag2_alt.b[0]);
+				swap_register(&m_core->dag2.b[1], &m_core->dag2_alt.b[1]);
+				swap_register(&m_core->dag2.b[2], &m_core->dag2_alt.b[2]);
+				swap_register(&m_core->dag2.b[3], &m_core->dag2_alt.b[3]);
 			}
 			if ((data & 0x80) != (oldreg & 0x80))
 			{
 				for (i=8; i<16; i++)
-					swap_register((UINT32*)&m_r[i].r, (UINT32*)&m_reg_alt[i].r);
+					swap_register((UINT32*)&m_core->r[i].r, (UINT32*)&m_core->reg_alt[i].r);
 			}
 			if ((data & 0x400) != (oldreg & 0x400))
 			{
 				for (i=0; i<8; i++)
-					swap_register((UINT32*)&m_r[i].r, (UINT32*)&m_reg_alt[i].r);
+					swap_register((UINT32*)&m_core->r[i].r, (UINT32*)&m_core->reg_alt[i].r);
 			}
 			break;
 		}
-		default:    fatalerror("SHARC: systemreg_latency_op: unknown register %02X at %08X\n", m_systemreg_latency_reg, m_pc);
+		default:    fatalerror("SHARC: systemreg_latency_op: unknown register %02X at %08X\n", m_core->systemreg_latency_reg, m_core->pc);
 	}
 
-	m_systemreg_latency_reg = -1;
+	m_core->systemreg_latency_reg = -1;
 }
 
 UINT32 adsp21062_device::GET_UREG(int ureg)
@@ -273,18 +235,18 @@ UINT32 adsp21062_device::GET_UREG(int ureg)
 	{
 		case 0x0:       /* R0 - R15 */
 		{
-			return m_r[reg].r;
+			return m_core->r[reg].r;
 		}
 
 		case 0x1:
 		{
 			if (reg & 0x8)      /* I8 - I15 */
 			{
-				return m_dag2.i[reg & 0x7];
+				return m_core->dag2.i[reg & 0x7];
 			}
 			else                /* I0 - I7 */
 			{
-				return m_dag1.i[reg & 0x7];
+				return m_core->dag1.i[reg & 0x7];
 			}
 		}
 
@@ -292,14 +254,14 @@ UINT32 adsp21062_device::GET_UREG(int ureg)
 		{
 			if (reg & 0x8)      /* M8 - M15 */
 			{
-				INT32 r = m_dag2.m[reg & 0x7];
+				INT32 r = m_core->dag2.m[reg & 0x7];
 				if (r & 0x800000)   r |= 0xff000000;
 
 				return r;
 			}
 			else                /* M0 - M7 */
 			{
-				return m_dag1.m[reg & 0x7];
+				return m_core->dag1.m[reg & 0x7];
 			}
 		}
 
@@ -307,11 +269,11 @@ UINT32 adsp21062_device::GET_UREG(int ureg)
 		{
 			if (reg & 0x8)      /* L8 - L15 */
 			{
-				return m_dag2.l[reg & 0x7];
+				return m_core->dag2.l[reg & 0x7];
 			}
 			else                /* L0 - L7 */
 			{
-				return m_dag1.l[reg & 0x7];
+				return m_core->dag1.l[reg & 0x7];
 			}
 		}
 
@@ -319,11 +281,11 @@ UINT32 adsp21062_device::GET_UREG(int ureg)
 		{
 			if (reg & 0x8)      /* B8 - B15 */
 			{
-				return m_dag2.b[reg & 0x7];
+				return m_core->dag2.b[reg & 0x7];
 			}
 			else                /* B0 - B7 */
 			{
-				return m_dag1.b[reg & 0x7];
+				return m_core->dag1.b[reg & 0x7];
 			}
 		}
 
@@ -331,8 +293,8 @@ UINT32 adsp21062_device::GET_UREG(int ureg)
 		{
 			switch(reg)
 			{
-				case 0x4:   return m_pcstack[m_pcstkp];     /* PCSTK */
-				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_pc);
+				case 0x4:   return m_core->pcstack[m_core->pcstkp];     /* PCSTK */
+				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
 		}
@@ -341,24 +303,24 @@ UINT32 adsp21062_device::GET_UREG(int ureg)
 		{
 			switch(reg)
 			{
-				case 0x0:   return m_ustat1;        /* USTAT1 */
-				case 0x1:   return m_ustat2;        /* USTAT2 */
-				case 0x9:   return m_irptl;         /* IRPTL */
-				case 0xa:   return m_mode2;         /* MODE2 */
-				case 0xb:   return m_mode1;         /* MODE1 */
+				case 0x0:   return m_core->ustat1;        /* USTAT1 */
+				case 0x1:   return m_core->ustat2;        /* USTAT2 */
+				case 0x9:   return m_core->irptl;         /* IRPTL */
+				case 0xa:   return m_core->mode2;         /* MODE2 */
+				case 0xb:   return m_core->mode1;         /* MODE1 */
 				case 0xc:                               /* ASTAT */
 				{
-					UINT32 r = m_astat;
+					UINT32 r = m_core->astat;
 					r &= ~0x00780000;
-					r |= (m_flag[0] << 19);
-					r |= (m_flag[1] << 20);
-					r |= (m_flag[2] << 21);
-					r |= (m_flag[3] << 22);
+					r |= (m_core->flag[0] << 19);
+					r |= (m_core->flag[1] << 20);
+					r |= (m_core->flag[2] << 21);
+					r |= (m_core->flag[3] << 22);
 					return r;
 				}
-				case 0xd:   return m_imask;         /* IMASK */
-				case 0xe:   return m_stky;          /* STKY */
-				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_pc);
+				case 0xd:   return m_core->imask;         /* IMASK */
+				case 0xe:   return m_core->stky;          /* STKY */
+				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
 		}
@@ -368,15 +330,15 @@ UINT32 adsp21062_device::GET_UREG(int ureg)
 			switch(reg)
 			{
 				/* PX needs to be handled separately if the whole 48 bits are needed */
-				case 0xb:   return (UINT32)(m_px);          /* PX */
-				case 0xc:   return (UINT16)(m_px);          /* PX1 */
-				case 0xd:   return (UINT32)(m_px >> 16);    /* PX2 */
-				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_pc);
+				case 0xb:   return (UINT32)(m_core->px);          /* PX */
+				case 0xc:   return (UINT16)(m_core->px);          /* PX1 */
+				case 0xd:   return (UINT32)(m_core->px >> 16);    /* PX2 */
+				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
 		}
 
-		default:            fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_pc);
+		default:            fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 	}
 }
 
@@ -386,39 +348,39 @@ void adsp21062_device::SET_UREG(int ureg, UINT32 data)
 	switch((ureg >> 4) & 0xf)
 	{
 		case 0x0:       /* R0 - R15 */
-			m_r[reg].r = data;
+			m_core->r[reg].r = data;
 			break;
 
 		case 0x1:
 			if (reg & 0x8)      /* I8 - I15 */
 			{
-				m_dag2.i[reg & 0x7] = data;
+				m_core->dag2.i[reg & 0x7] = data;
 			}
 			else                /* I0 - I7 */
 			{
-				m_dag1.i[reg & 0x7] = data;
+				m_core->dag1.i[reg & 0x7] = data;
 			}
 			break;
 
 		case 0x2:
 			if (reg & 0x8)      /* M8 - M15 */
 			{
-				m_dag2.m[reg & 0x7] = data;
+				m_core->dag2.m[reg & 0x7] = data;
 			}
 			else                /* M0 - M7 */
 			{
-				m_dag1.m[reg & 0x7] = data;
+				m_core->dag1.m[reg & 0x7] = data;
 			}
 			break;
 
 		case 0x3:
 			if (reg & 0x8)      /* L8 - L15 */
 			{
-				m_dag2.l[reg & 0x7] = data;
+				m_core->dag2.l[reg & 0x7] = data;
 			}
 			else                /* L0 - L7 */
 			{
-				m_dag1.l[reg & 0x7] = data;
+				m_core->dag1.l[reg & 0x7] = data;
 			}
 			break;
 
@@ -426,73 +388,73 @@ void adsp21062_device::SET_UREG(int ureg, UINT32 data)
 			// Note: loading B also loads the same value in I
 			if (reg & 0x8)      /* B8 - B15 */
 			{
-				m_dag2.b[reg & 0x7] = data;
-				m_dag2.i[reg & 0x7] = data;
+				m_core->dag2.b[reg & 0x7] = data;
+				m_core->dag2.i[reg & 0x7] = data;
 			}
 			else                /* B0 - B7 */
 			{
-				m_dag1.b[reg & 0x7] = data;
-				m_dag1.i[reg & 0x7] = data;
+				m_core->dag1.b[reg & 0x7] = data;
+				m_core->dag1.i[reg & 0x7] = data;
 			}
 			break;
 
 		case 0x6:
 			switch (reg)
 			{
-				case 0x5:   m_pcstkp = data; break;     /* PCSTKP */
-				case 0x8:   m_lcntr = data; break;      /* LCNTR */
-				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_pc);
+				case 0x5:   m_core->pcstkp = data; break;     /* PCSTKP */
+				case 0x8:   m_core->lcntr = data; break;      /* LCNTR */
+				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
 
 		case 0x7:       /* system regs */
 			switch(reg)
 			{
-				case 0x0:   m_ustat1 = data; break;     /* USTAT1 */
-				case 0x1:   m_ustat2 = data; break;     /* USTAT2 */
+				case 0x0:   m_core->ustat1 = data; break;     /* USTAT1 */
+				case 0x1:   m_core->ustat2 = data; break;     /* USTAT2 */
 
-				case 0x9:   m_irptl = data; break;      /* IRPTL */
-				case 0xa:   m_mode2 = data; break;      /* MODE2 */
+				case 0x9:   m_core->irptl = data; break;      /* IRPTL */
+				case 0xa:   m_core->mode2 = data; break;      /* MODE2 */
 
 				case 0xb:                                   /* MODE1 */
 				{
-					add_systemreg_write_latency_effect(reg, data, m_mode1);
-					m_mode1 = data;
+					add_systemreg_write_latency_effect(reg, data, m_core->mode1);
+					m_core->mode1 = data;
 					break;
 				}
 
-				case 0xc:   m_astat = data; break;      /* ASTAT */
+				case 0xc:   m_core->astat = data; break;      /* ASTAT */
 
 				case 0xd:                                   /* IMASK */
 				{
 					check_interrupts();
-					m_imask = data;
+					m_core->imask = data;
 					break;
 				}
 
-				case 0xe:   m_stky = data; break;       /* STKY */
-				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_pc);
+				case 0xe:   m_core->stky = data; break;       /* STKY */
+				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
 
 		case 0xd:
 			switch(reg)
 			{
-				case 0xc:   m_px &= U64(0xffffffffffff0000); m_px |= (data & 0xffff); break;        /* PX1 */
-				case 0xd:   m_px &= U64(0x000000000000ffff); m_px |= (UINT64)data << 16; break;     /* PX2 */
-				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_pc);
+				case 0xc:   m_core->px &= U64(0xffffffffffff0000); m_core->px |= (data & 0xffff); break;        /* PX1 */
+				case 0xd:   m_core->px &= U64(0x000000000000ffff); m_core->px |= (UINT64)data << 16; break;     /* PX2 */
+				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
 
-		default:            fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_pc);
+		default:            fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 	}
 }
 
 /*****************************************************************************/
-#define SET_FLAG_SV_LSHIFT(x, shift)    if((x) & ((UINT32)0xffffffff << shift)) m_astat |= SV
-#define SET_FLAG_SV_RSHIFT(x, shift)    if((x) & ((UINT32)0xffffffff >> shift)) m_astat |= SV
+#define SET_FLAG_SV_LSHIFT(x, shift)    if((x) & ((UINT32)0xffffffff << shift)) m_core->astat |= SV
+#define SET_FLAG_SV_RSHIFT(x, shift)    if((x) & ((UINT32)0xffffffff >> shift)) m_core->astat |= SV
 
-#define SET_FLAG_SZ(x)                  if((x) == 0) m_astat |= SZ
+#define SET_FLAG_SZ(x)                  if((x) == 0) m_core->astat |= SZ
 
 #define MAKE_EXTRACT_MASK(start_bit, length)    ((0xffffffff << start_bit) & (((UINT32)0xffffffff) >> (32 - (start_bit + length))))
 
@@ -502,7 +464,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 	int bit = data & 0x3f;
 	int len = (data >> 6) & 0x3f;
 
-	m_astat &= ~(SZ|SV|SS);
+	m_core->astat &= ~(SZ|SV|SS);
 
 	switch(shiftop)
 	{
@@ -514,7 +476,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 				REG(rn) = (shift < 32) ? (REG(rx) << shift) : 0;
 				if (shift > 0)
 				{
-					m_astat |= SV;
+					m_core->astat |= SV;
 				}
 			}
 			SET_FLAG_SZ(REG(rn));
@@ -532,7 +494,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 				REG(rn) = (shift < 32) ? ((INT32)REG(rx) << shift) : 0;
 				if (shift > 0)
 				{
-					m_astat |= SV;
+					m_core->astat |= SV;
 				}
 			}
 			SET_FLAG_SZ(REG(rn));
@@ -566,7 +528,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 				r = (shift < 32) ? (REG(rx) << shift) : 0;
 				if (shift > 0)
 				{
-					m_astat |= SV;
+					m_core->astat |= SV;
 				}
 			}
 			SET_FLAG_SZ(r);
@@ -583,7 +545,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			SET_FLAG_SZ(REG(rn));
 			if (bit+len > 32)
 			{
-				m_astat |= SV;
+				m_core->astat |= SV;
 			}
 			break;
 		}
@@ -602,7 +564,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			SET_FLAG_SZ(REG(rn));
 			if (bit+len > 32)
 			{
-				m_astat |= SV;
+				m_core->astat |= SV;
 			}
 			break;
 		}
@@ -618,7 +580,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			SET_FLAG_SZ(REG(rn));
 			if (bit+len > 32)
 			{
-				m_astat |= SV;
+				m_core->astat |= SV;
 			}
 			break;
 		}
@@ -632,7 +594,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			SET_FLAG_SZ(REG(rn));
 			if (bit+len > 32)
 			{
-				m_astat |= SV;
+				m_core->astat |= SV;
 			}
 			break;
 		}
@@ -646,7 +608,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			}
 			else
 			{
-				m_astat |= SV;
+				m_core->astat |= SV;
 			}
 			SET_FLAG_SZ(REG(rn));
 			break;
@@ -661,7 +623,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			}
 			else
 			{
-				m_astat |= SV;
+				m_core->astat |= SV;
 			}
 			SET_FLAG_SZ(REG(rn));
 			break;
@@ -676,7 +638,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			}
 			else
 			{
-				m_astat |= SV;
+				m_core->astat |= SV;
 			}
 			SET_FLAG_SZ(REG(rn));
 			break;
@@ -692,12 +654,12 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			}
 			else
 			{
-				m_astat |= SZ | SV;
+				m_core->astat |= SZ | SV;
 			}
 			break;
 		}
 
-		default:    fatalerror("SHARC: unimplemented shift operation %02X at %08X\n", shiftop, m_pc);
+		default:    fatalerror("SHARC: unimplemented shift operation %02X at %08X\n", shiftop, m_core->pc);
 	}
 }
 
@@ -795,7 +757,7 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 			}
 
 			default:
-				fatalerror("SHARC: compute: multi-function opcode %02X not implemented ! (%08X, %08X)\n", multiop, m_pc, opcode);
+				fatalerror("SHARC: compute: multi-function opcode %02X not implemented ! (%08X, %08X)\n", multiop, m_core->pc, opcode);
 				break;
 		}
 	}
@@ -863,7 +825,7 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 						break;
 					}
 
-					default:        fatalerror("SHARC: compute: unimplemented ALU operation %02X (%08X, %08X)\n", op, m_pc, opcode);
+					default:        fatalerror("SHARC: compute: unimplemented ALU operation %02X (%08X, %08X)\n", op, m_core->pc, opcode);
 				}
 				break;
 			}
@@ -874,8 +836,8 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 			{
 				switch(op)
 				{
-					case 0x14:      m_mrf = 0; break;
-					case 0x16:      m_mrb = 0; break;
+					case 0x14:      m_core->mrf = 0; break;
+					case 0x16:      m_core->mrb = 0; break;
 
 					case 0x30:      compute_fmul(rn, rx, ry); break;
 					case 0x40:      compute_mul_uuin(rn, rx, ry); break;
@@ -885,7 +847,7 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 					case 0xb2:      REG(rn) = compute_mrb_plus_mul_ssin(rx, ry); break;
 
 					default:
-						fatalerror("SHARC: compute: multiplier operation %02X not implemented ! (%08X, %08X)\n", op, m_pc, opcode);
+						fatalerror("SHARC: compute: multiplier operation %02X not implemented ! (%08X, %08X)\n", op, m_core->pc, opcode);
 						break;
 				}
 				break;
@@ -895,7 +857,7 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 			/* Shifter operations */
 			case 2:
 			{
-				m_astat &= ~(SZ|SV|SS);
+				m_core->astat &= ~(SZ|SV|SS);
 
 				op >>= 2;
 				switch(op)
@@ -912,7 +874,7 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 							REG(rn) = (shift < 32) ? (REG(rx) << shift) : 0;
 							if (shift > 0)
 							{
-								m_astat |= SV;
+								m_core->astat |= SV;
 							}
 						}
 						SET_FLAG_SZ(REG(rn));
@@ -935,7 +897,7 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 										(((UINT32)REG(rx) >> (32-s)) & ((UINT32)(0xffffffff) >> (32-s)));
 							if (shift > 0)
 							{
-								m_astat |= SV;
+								m_core->astat |= SV;
 							}
 						}
 						SET_FLAG_SZ(REG(rn));
@@ -951,7 +913,7 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 							REG(rn) = REG(rn) | ((shift < 32) ? (REG(rx) << shift) : 0);
 							if (shift > 0)
 							{
-								m_astat |= SV;
+								m_core->astat |= SV;
 							}
 						}
 						SET_FLAG_SZ(REG(rn));
@@ -968,7 +930,7 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 						SET_FLAG_SZ(REG(rn));
 						if (bit+len > 32)
 						{
-							m_astat |= SV;
+							m_core->astat |= SV;
 						}
 						break;
 					}
@@ -986,7 +948,7 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 						SET_FLAG_SZ(REG(rn));
 						if (bit+len > 32)
 						{
-							m_astat |= SV;
+							m_core->astat |= SV;
 						}
 						break;
 					}
@@ -1002,7 +964,7 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 						SET_FLAG_SZ(REG(rn));
 						if (bit+len > 32)
 						{
-							m_astat |= SV;
+							m_core->astat |= SV;
 						}
 						break;
 					}
@@ -1017,7 +979,7 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 						}
 						else
 						{
-							m_astat |= SV;
+							m_core->astat |= SV;
 						}
 						SET_FLAG_SZ(REG(rn));
 						break;
@@ -1033,7 +995,7 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 						}
 						else
 						{
-							m_astat |= SV;
+							m_core->astat |= SV;
 						}
 						SET_FLAG_SZ(REG(rn));
 						break;
@@ -1050,13 +1012,13 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 						}
 						else
 						{
-							m_astat |= SZ | SV;
+							m_core->astat |= SZ | SV;
 						}
 						break;
 					}
 
 					default:
-						fatalerror("SHARC: compute: shift operation %02X not implemented ! (%08X, %08X)\n", op, m_pc, opcode);
+						fatalerror("SHARC: compute: shift operation %02X not implemented ! (%08X, %08X)\n", op, m_core->pc, opcode);
 				}
 				break;
 			}
@@ -1069,143 +1031,143 @@ void adsp21062_device::COMPUTE(UINT32 opcode)
 
 void adsp21062_device::PUSH_PC(UINT32 pc)
 {
-	m_pcstkp++;
-	if(m_pcstkp >= 32)
+	m_core->pcstkp++;
+	if(m_core->pcstkp >= 32)
 	{
 		fatalerror("SHARC: PC Stack overflow!\n");
 	}
 
-	if (m_pcstkp == 0)
+	if (m_core->pcstkp == 0)
 	{
-		m_stky |= 0x400000;
+		m_core->stky |= 0x400000;
 	}
 	else
 	{
-		m_stky &= ~0x400000;
+		m_core->stky &= ~0x400000;
 	}
 
-	m_pcstk = pc;
-	m_pcstack[m_pcstkp] = pc;
+	m_core->pcstk = pc;
+	m_core->pcstack[m_core->pcstkp] = pc;
 }
 
 UINT32 adsp21062_device::POP_PC()
 {
-	m_pcstk = m_pcstack[m_pcstkp];
+	m_core->pcstk = m_core->pcstack[m_core->pcstkp];
 
-	if(m_pcstkp == 0)
+	if(m_core->pcstkp == 0)
 	{
 		fatalerror("SHARC: PC Stack underflow!\n");
 	}
 
-	m_pcstkp--;
+	m_core->pcstkp--;
 
-	if (m_pcstkp == 0)
+	if (m_core->pcstkp == 0)
 	{
-		m_stky |= 0x400000;
+		m_core->stky |= 0x400000;
 	}
 	else
 	{
-		m_stky &= ~0x400000;
+		m_core->stky &= ~0x400000;
 	}
 
-	return m_pcstk;
+	return m_core->pcstk;
 }
 
 UINT32 adsp21062_device::TOP_PC()
 {
-	return m_pcstack[m_pcstkp];
+	return m_core->pcstack[m_core->pcstkp];
 }
 
 void adsp21062_device::PUSH_LOOP(UINT32 addr, UINT32 code, UINT32 type, UINT32 count)
 {
-	m_lstkp++;
-	if(m_lstkp >= 6)
+	m_core->lstkp++;
+	if(m_core->lstkp >= 6)
 	{
 		fatalerror("SHARC: Loop Stack overflow!\n");
 	}
 
-	if (m_lstkp == 0)
+	if (m_core->lstkp == 0)
 	{
-		m_stky |= 0x4000000;
+		m_core->stky |= 0x4000000;
 	}
 	else
 	{
-		m_stky &= ~0x4000000;
+		m_core->stky &= ~0x4000000;
 	}
 
-	m_lcstack[m_lstkp] = count;
-	m_lastack[m_lstkp] = (type << 30) | (code << 24) | addr;
-	m_curlcntr = count;
+	m_core->lcstack[m_core->lstkp] = count;
+	m_core->lastack[m_core->lstkp] = (type << 30) | (code << 24) | addr;
+	m_core->curlcntr = count;
 
-	m_laddr.addr = addr;
-	m_laddr.code = code;
-	m_laddr.loop_type = type;
+	m_core->laddr.addr = addr;
+	m_core->laddr.code = code;
+	m_core->laddr.loop_type = type;
 }
 
 void adsp21062_device::POP_LOOP()
 {
-	if(m_lstkp == 0)
+	if(m_core->lstkp == 0)
 	{
 		fatalerror("SHARC: Loop Stack underflow!\n");
 	}
 
-	m_lstkp--;
+	m_core->lstkp--;
 
-	if (m_lstkp == 0)
+	if (m_core->lstkp == 0)
 	{
-		m_stky |= 0x4000000;
+		m_core->stky |= 0x4000000;
 	}
 	else
 	{
-		m_stky &= ~0x4000000;
+		m_core->stky &= ~0x4000000;
 	}
 
-	m_curlcntr = m_lcstack[m_lstkp];
+	m_core->curlcntr = m_core->lcstack[m_core->lstkp];
 
-	m_laddr.addr = m_lastack[m_lstkp] & 0xffffff;
-	m_laddr.code = (m_lastack[m_lstkp] >> 24) & 0x1f;
-	m_laddr.loop_type = (m_lastack[m_lstkp] >> 30) & 0x3;
+	m_core->laddr.addr = m_core->lastack[m_core->lstkp] & 0xffffff;
+	m_core->laddr.code = (m_core->lastack[m_core->lstkp] >> 24) & 0x1f;
+	m_core->laddr.loop_type = (m_core->lastack[m_core->lstkp] >> 30) & 0x3;
 }
 
 void adsp21062_device::PUSH_STATUS_STACK()
 {
-	m_status_stkp++;
-	if (m_status_stkp >= 5)
+	m_core->status_stkp++;
+	if (m_core->status_stkp >= 5)
 	{
 		fatalerror("SHARC: Status stack overflow!\n");
 	}
 
-	if (m_status_stkp == 0)
+	if (m_core->status_stkp == 0)
 	{
-		m_stky |= 0x1000000;
+		m_core->stky |= 0x1000000;
 	}
 	else
 	{
-		m_stky &= ~0x1000000;
+		m_core->stky &= ~0x1000000;
 	}
 
-	m_status_stack[m_status_stkp].mode1 = GET_UREG(REG_MODE1);
-	m_status_stack[m_status_stkp].astat = GET_UREG(REG_ASTAT);
+	m_core->status_stack[m_core->status_stkp].mode1 = GET_UREG(REG_MODE1);
+	m_core->status_stack[m_core->status_stkp].astat = GET_UREG(REG_ASTAT);
 }
 
 void adsp21062_device::POP_STATUS_STACK()
 {
-	SET_UREG(REG_MODE1, m_status_stack[m_status_stkp].mode1);
-	SET_UREG(REG_ASTAT, m_status_stack[m_status_stkp].astat);
+	SET_UREG(REG_MODE1, m_core->status_stack[m_core->status_stkp].mode1);
+	SET_UREG(REG_ASTAT, m_core->status_stack[m_core->status_stkp].astat);
 
-	m_status_stkp--;
-	if (m_status_stkp < 0)
+	m_core->status_stkp--;
+	if (m_core->status_stkp < 0)
 	{
 		fatalerror("SHARC: Status stack underflow!\n");
 	}
 
-	if (m_status_stkp == 0)
+	if (m_core->status_stkp == 0)
 	{
-		m_stky |= 0x1000000;
+		m_core->stky |= 0x1000000;
 	}
 	else
 	{
-		m_stky &= ~0x1000000;
+		m_core->stky &= ~0x1000000;
 	}
 }
 
@@ -1213,36 +1175,36 @@ int adsp21062_device::IF_CONDITION_CODE(int cond)
 {
 	switch(cond)
 	{
-		case 0x00:  return m_astat & AZ;        /* EQ */
-		case 0x01:  return !(m_astat & AZ) && (m_astat & AN);   /* LT */
-		case 0x02:  return (m_astat & AZ) || (m_astat & AN);    /* LE */
-		case 0x03:  return (m_astat & AC);      /* AC */
-		case 0x04:  return (m_astat & AV);      /* AV */
-		case 0x05:  return (m_astat & MV);      /* MV */
-		case 0x06:  return (m_astat & MN);      /* MS */
-		case 0x07:  return (m_astat & SV);      /* SV */
-		case 0x08:  return (m_astat & SZ);      /* SZ */
-		case 0x09:  return (m_flag[0] != 0);    /* FLAG0 */
-		case 0x0a:  return (m_flag[1] != 0);    /* FLAG1 */
-		case 0x0b:  return (m_flag[2] != 0);    /* FLAG2 */
-		case 0x0c:  return (m_flag[3] != 0);    /* FLAG3 */
-		case 0x0d:  return (m_astat & BTF);     /* TF */
+		case 0x00:  return m_core->astat & AZ;        /* EQ */
+		case 0x01:  return !(m_core->astat & AZ) && (m_core->astat & AN);   /* LT */
+		case 0x02:  return (m_core->astat & AZ) || (m_core->astat & AN);    /* LE */
+		case 0x03:  return (m_core->astat & AC);      /* AC */
+		case 0x04:  return (m_core->astat & AV);      /* AV */
+		case 0x05:  return (m_core->astat & MV);      /* MV */
+		case 0x06:  return (m_core->astat & MN);      /* MS */
+		case 0x07:  return (m_core->astat & SV);      /* SV */
+		case 0x08:  return (m_core->astat & SZ);      /* SZ */
+		case 0x09:  return (m_core->flag[0] != 0);    /* FLAG0 */
+		case 0x0a:  return (m_core->flag[1] != 0);    /* FLAG1 */
+		case 0x0b:  return (m_core->flag[2] != 0);    /* FLAG2 */
+		case 0x0c:  return (m_core->flag[3] != 0);    /* FLAG3 */
+		case 0x0d:  return (m_core->astat & BTF);     /* TF */
 		case 0x0e:  return 0;                       /* BM */
-		case 0x0f:  return (m_curlcntr!=1);     /* NOT LCE */
-		case 0x10:  return !(m_astat & AZ);     /* NOT EQUAL */
-		case 0x11:  return (m_astat & AZ) || !(m_astat & AN);   /* GE */
-		case 0x12:  return !(m_astat & AZ) && !(m_astat & AN);  /* GT */
-		case 0x13:  return !(m_astat & AC);     /* NOT AC */
-		case 0x14:  return !(m_astat & AV);     /* NOT AV */
-		case 0x15:  return !(m_astat & MV);     /* NOT MV */
-		case 0x16:  return !(m_astat & MN);     /* NOT MS */
-		case 0x17:  return !(m_astat & SV);     /* NOT SV */
-		case 0x18:  return !(m_astat & SZ);     /* NOT SZ */
-		case 0x19:  return (m_flag[0] == 0);    /* NOT FLAG0 */
-		case 0x1a:  return (m_flag[1] == 0);    /* NOT FLAG1 */
-		case 0x1b:  return (m_flag[2] == 0);    /* NOT FLAG2 */
-		case 0x1c:  return (m_flag[3] == 0);    /* NOT FLAG3 */
-		case 0x1d:  return !(m_astat & BTF);    /* NOT TF */
+		case 0x0f:  return (m_core->curlcntr!=1);     /* NOT LCE */
+		case 0x10:  return !(m_core->astat & AZ);     /* NOT EQUAL */
+		case 0x11:  return (m_core->astat & AZ) || !(m_core->astat & AN);   /* GE */
+		case 0x12:  return !(m_core->astat & AZ) && !(m_core->astat & AN);  /* GT */
+		case 0x13:  return !(m_core->astat & AC);     /* NOT AC */
+		case 0x14:  return !(m_core->astat & AV);     /* NOT AV */
+		case 0x15:  return !(m_core->astat & MV);     /* NOT MV */
+		case 0x16:  return !(m_core->astat & MN);     /* NOT MS */
+		case 0x17:  return !(m_core->astat & SV);     /* NOT SV */
+		case 0x18:  return !(m_core->astat & SZ);     /* NOT SZ */
+		case 0x19:  return (m_core->flag[0] == 0);    /* NOT FLAG0 */
+		case 0x1a:  return (m_core->flag[1] == 0);    /* NOT FLAG1 */
+		case 0x1b:  return (m_core->flag[2] == 0);    /* NOT FLAG2 */
+		case 0x1c:  return (m_core->flag[3] == 0);    /* NOT FLAG3 */
+		case 0x1d:  return !(m_core->astat & BTF);    /* NOT TF */
 		case 0x1e:  return 1;                       /* NOT BM */
 		case 0x1f:  return 1;                       /* TRUE */
 	}
@@ -1253,36 +1215,36 @@ int adsp21062_device::DO_CONDITION_CODE(int cond)
 {
 	switch(cond)
 	{
-		case 0x00:  return m_astat & AZ;        /* EQ */
-		case 0x01:  return !(m_astat & AZ) && (m_astat & AN);   /* LT */
-		case 0x02:  return (m_astat & AZ) || (m_astat & AN);    /* LE */
-		case 0x03:  return (m_astat & AC);      /* AC */
-		case 0x04:  return (m_astat & AV);      /* AV */
-		case 0x05:  return (m_astat & MV);      /* MV */
-		case 0x06:  return (m_astat & MN);      /* MS */
-		case 0x07:  return (m_astat & SV);      /* SV */
-		case 0x08:  return (m_astat & SZ);      /* SZ */
-		case 0x09:  return (m_flag[0] != 0);    /* FLAG0 */
-		case 0x0a:  return (m_flag[1] != 0);    /* FLAG1 */
-		case 0x0b:  return (m_flag[2] != 0);    /* FLAG2 */
-		case 0x0c:  return (m_flag[3] != 0);    /* FLAG3 */
-		case 0x0d:  return (m_astat & BTF);     /* TF */
+		case 0x00:  return m_core->astat & AZ;        /* EQ */
+		case 0x01:  return !(m_core->astat & AZ) && (m_core->astat & AN);   /* LT */
+		case 0x02:  return (m_core->astat & AZ) || (m_core->astat & AN);    /* LE */
+		case 0x03:  return (m_core->astat & AC);      /* AC */
+		case 0x04:  return (m_core->astat & AV);      /* AV */
+		case 0x05:  return (m_core->astat & MV);      /* MV */
+		case 0x06:  return (m_core->astat & MN);      /* MS */
+		case 0x07:  return (m_core->astat & SV);      /* SV */
+		case 0x08:  return (m_core->astat & SZ);      /* SZ */
+		case 0x09:  return (m_core->flag[0] != 0);    /* FLAG0 */
+		case 0x0a:  return (m_core->flag[1] != 0);    /* FLAG1 */
+		case 0x0b:  return (m_core->flag[2] != 0);    /* FLAG2 */
+		case 0x0c:  return (m_core->flag[3] != 0);    /* FLAG3 */
+		case 0x0d:  return (m_core->astat & BTF);     /* TF */
 		case 0x0e:  return 0;                       /* BM */
-		case 0x0f:  return (m_curlcntr==1);     /* LCE */
-		case 0x10:  return !(m_astat & AZ);     /* NOT EQUAL */
-		case 0x11:  return (m_astat & AZ) || !(m_astat & AN);   /* GE */
-		case 0x12:  return !(m_astat & AZ) && !(m_astat & AN);  /* GT */
-		case 0x13:  return !(m_astat & AC);     /* NOT AC */
-		case 0x14:  return !(m_astat & AV);     /* NOT AV */
-		case 0x15:  return !(m_astat & MV);     /* NOT MV */
-		case 0x16:  return !(m_astat & MN);     /* NOT MS */
-		case 0x17:  return !(m_astat & SV);     /* NOT SV */
-		case 0x18:  return !(m_astat & SZ);     /* NOT SZ */
-		case 0x19:  return (m_flag[0] == 0);    /* NOT FLAG0 */
-		case 0x1a:  return (m_flag[1] == 0);    /* NOT FLAG1 */
-		case 0x1b:  return (m_flag[2] == 0);    /* NOT FLAG2 */
-		case 0x1c:  return (m_flag[3] == 0);    /* NOT FLAG3 */
-		case 0x1d:  return !(m_astat & BTF);    /* NOT TF */
+		case 0x0f:  return (m_core->curlcntr==1);     /* LCE */
+		case 0x10:  return !(m_core->astat & AZ);     /* NOT EQUAL */
+		case 0x11:  return (m_core->astat & AZ) || !(m_core->astat & AN);   /* GE */
+		case 0x12:  return !(m_core->astat & AZ) && !(m_core->astat & AN);  /* GT */
+		case 0x13:  return !(m_core->astat & AC);     /* NOT AC */
+		case 0x14:  return !(m_core->astat & AV);     /* NOT AV */
+		case 0x15:  return !(m_core->astat & MV);     /* NOT MV */
+		case 0x16:  return !(m_core->astat & MN);     /* NOT MS */
+		case 0x17:  return !(m_core->astat & SV);     /* NOT SV */
+		case 0x18:  return !(m_core->astat & SZ);     /* NOT SZ */
+		case 0x19:  return (m_core->flag[0] == 0);    /* NOT FLAG0 */
+		case 0x1a:  return (m_core->flag[1] == 0);    /* NOT FLAG1 */
+		case 0x1b:  return (m_core->flag[2] == 0);    /* NOT FLAG2 */
+		case 0x1c:  return (m_core->flag[3] == 0);    /* NOT FLAG3 */
+		case 0x1d:  return !(m_core->astat & BTF);    /* NOT TF */
 		case 0x1e:  return 1;                       /* NOT BM */
 		case 0x1f:  return 0;                       /* FALSE (FOREVER) */
 	}
@@ -1295,15 +1257,15 @@ int adsp21062_device::DO_CONDITION_CODE(int cond)
 /* compute / dreg <-> DM / dreg <-> PM */
 void adsp21062_device::sharcop_compute_dreg_dm_dreg_pm()
 {
-	int pm_dreg = (m_opcode >> 23) & 0xf;
-	int pmm = (m_opcode >> 27) & 0x7;
-	int pmi = (m_opcode >> 30) & 0x7;
-	int dm_dreg = (m_opcode >> 33) & 0xf;
-	int dmm = (m_opcode >> 38) & 0x7;
-	int dmi = (m_opcode >> 41) & 0x7;
-	int pmd = (m_opcode >> 37) & 0x1;
-	int dmd = (m_opcode >> 44) & 0x1;
-	int compute = m_opcode & 0x7fffff;
+	int pm_dreg = (m_core->opcode >> 23) & 0xf;
+	int pmm = (m_core->opcode >> 27) & 0x7;
+	int pmi = (m_core->opcode >> 30) & 0x7;
+	int dm_dreg = (m_core->opcode >> 33) & 0xf;
+	int dmm = (m_core->opcode >> 38) & 0x7;
+	int dmi = (m_core->opcode >> 41) & 0x7;
+	int pmd = (m_core->opcode >> 37) & 0x1;
+	int dmd = (m_core->opcode >> 44) & 0x1;
+	int compute = m_core->opcode & 0x7fffff;
 
 	/* due to parallelity issues, source DREGs must be saved */
 	/* because the compute operation may change them */
@@ -1348,8 +1310,8 @@ void adsp21062_device::sharcop_compute_dreg_dm_dreg_pm()
 /* compute */
 void adsp21062_device::sharcop_compute()
 {
-	int cond = (m_opcode >> 33) & 0x1f;
-	int compute = m_opcode & 0x7fffff;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int compute = m_core->opcode & 0x7fffff;
 
 	if (IF_CONDITION_CODE(cond) && compute != 0)
 	{
@@ -1363,13 +1325,13 @@ void adsp21062_device::sharcop_compute()
 /* compute / ureg <-> DM|PM, pre-modify */
 void adsp21062_device::sharcop_compute_ureg_dmpm_premod()
 {
-	int i = (m_opcode >> 41) & 0x7;
-	int m = (m_opcode >> 38) & 0x7;
-	int cond = (m_opcode >> 33) & 0x1f;
-	int g = (m_opcode >> 32) & 0x1;
-	int d = (m_opcode >> 31) & 0x1;
-	int ureg = (m_opcode >> 23) & 0xff;
-	int compute = m_opcode & 0x7fffff;
+	int i = (m_core->opcode >> 41) & 0x7;
+	int m = (m_core->opcode >> 38) & 0x7;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int g = (m_core->opcode >> 32) & 0x1;
+	int d = (m_core->opcode >> 31) & 0x1;
+	int ureg = (m_core->opcode >> 23) & 0xff;
+	int compute = m_core->opcode & 0x7fffff;
 
 	if (IF_CONDITION_CODE(cond))
 	{
@@ -1388,7 +1350,7 @@ void adsp21062_device::sharcop_compute_ureg_dmpm_premod()
 			{
 				if (ureg == 0xdb)       /* PX register access is always 48-bit */
 				{
-					pm_write48(PM_REG_I(i)+PM_REG_M(m), m_px);
+					pm_write48(PM_REG_I(i)+PM_REG_M(m), m_core->px);
 				}
 				else
 				{
@@ -1399,7 +1361,7 @@ void adsp21062_device::sharcop_compute_ureg_dmpm_premod()
 			{
 				if (ureg == 0xdb)       /* PX register access is always 48-bit */
 				{
-					m_px = pm_read48(PM_REG_I(i)+PM_REG_M(m));
+					m_core->px = pm_read48(PM_REG_I(i)+PM_REG_M(m));
 				}
 				else
 				{
@@ -1424,13 +1386,13 @@ void adsp21062_device::sharcop_compute_ureg_dmpm_premod()
 /* compute / ureg <-> DM|PM, post-modify */
 void adsp21062_device::sharcop_compute_ureg_dmpm_postmod()
 {
-	int i = (m_opcode >> 41) & 0x7;
-	int m = (m_opcode >> 38) & 0x7;
-	int cond = (m_opcode >> 33) & 0x1f;
-	int g = (m_opcode >> 32) & 0x1;
-	int d = (m_opcode >> 31) & 0x1;
-	int ureg = (m_opcode >> 23) & 0xff;
-	int compute = m_opcode & 0x7fffff;
+	int i = (m_core->opcode >> 41) & 0x7;
+	int m = (m_core->opcode >> 38) & 0x7;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int g = (m_core->opcode >> 32) & 0x1;
+	int d = (m_core->opcode >> 31) & 0x1;
+	int ureg = (m_core->opcode >> 23) & 0xff;
+	int compute = m_core->opcode & 0x7fffff;
 
 	if(IF_CONDITION_CODE(cond))
 	{
@@ -1449,7 +1411,7 @@ void adsp21062_device::sharcop_compute_ureg_dmpm_postmod()
 			{
 				if (ureg == 0xdb)       /* PX register access is always 48-bit */
 				{
-					pm_write48(PM_REG_I(i), m_px);
+					pm_write48(PM_REG_I(i), m_core->px);
 				}
 				else
 				{
@@ -1462,7 +1424,7 @@ void adsp21062_device::sharcop_compute_ureg_dmpm_postmod()
 			{
 				if (ureg == 0xdb)       /* PX register access is always 48-bit */
 				{
-					m_px = pm_read48(PM_REG_I(i));
+					m_core->px = pm_read48(PM_REG_I(i));
 				}
 				else
 				{
@@ -1496,12 +1458,12 @@ void adsp21062_device::sharcop_compute_ureg_dmpm_postmod()
 /* compute / dreg <- DM, immediate modify */
 void adsp21062_device::sharcop_compute_dm_to_dreg_immmod()
 {
-	int cond = (m_opcode >> 33) & 0x1f;
-	int u = (m_opcode >> 38) & 0x1;
-	int dreg = (m_opcode >> 23) & 0xf;
-	int i = (m_opcode >> 41) & 0x7;
-	int mod = SIGN_EXTEND6((m_opcode >> 27) & 0x3f);
-	int compute = m_opcode & 0x7fffff;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int u = (m_core->opcode >> 38) & 0x1;
+	int dreg = (m_core->opcode >> 23) & 0xf;
+	int i = (m_core->opcode >> 41) & 0x7;
+	int mod = SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f);
+	int compute = m_core->opcode & 0x7fffff;
 
 	if (IF_CONDITION_CODE(cond))
 	{
@@ -1526,12 +1488,12 @@ void adsp21062_device::sharcop_compute_dm_to_dreg_immmod()
 /* compute / dreg -> DM, immediate modify */
 void adsp21062_device::sharcop_compute_dreg_to_dm_immmod()
 {
-	int cond = (m_opcode >> 33) & 0x1f;
-	int u = (m_opcode >> 38) & 0x1;
-	int dreg = (m_opcode >> 23) & 0xf;
-	int i = (m_opcode >> 41) & 0x7;
-	int mod = SIGN_EXTEND6((m_opcode >> 27) & 0x3f);
-	int compute = m_opcode & 0x7fffff;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int u = (m_core->opcode >> 38) & 0x1;
+	int dreg = (m_core->opcode >> 23) & 0xf;
+	int i = (m_core->opcode >> 41) & 0x7;
+	int mod = SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f);
+	int compute = m_core->opcode & 0x7fffff;
 
 	/* due to parallelity issues, source REG must be saved */
 	/* because the shift operation may change it */
@@ -1560,12 +1522,12 @@ void adsp21062_device::sharcop_compute_dreg_to_dm_immmod()
 /* compute / dreg <- PM, immediate modify */
 void adsp21062_device::sharcop_compute_pm_to_dreg_immmod()
 {
-	int cond = (m_opcode >> 33) & 0x1f;
-	int u = (m_opcode >> 38) & 0x1;
-	int dreg = (m_opcode >> 23) & 0xf;
-	int i = (m_opcode >> 41) & 0x7;
-	int mod = SIGN_EXTEND6((m_opcode >> 27) & 0x3f);
-	int compute = m_opcode & 0x7fffff;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int u = (m_core->opcode >> 38) & 0x1;
+	int dreg = (m_core->opcode >> 23) & 0xf;
+	int i = (m_core->opcode >> 41) & 0x7;
+	int mod = SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f);
+	int compute = m_core->opcode & 0x7fffff;
 
 	if (IF_CONDITION_CODE(cond))
 	{
@@ -1590,12 +1552,12 @@ void adsp21062_device::sharcop_compute_pm_to_dreg_immmod()
 /* compute / dreg -> PM, immediate modify */
 void adsp21062_device::sharcop_compute_dreg_to_pm_immmod()
 {
-	int cond = (m_opcode >> 33) & 0x1f;
-	int u = (m_opcode >> 38) & 0x1;
-	int dreg = (m_opcode >> 23) & 0xf;
-	int i = (m_opcode >> 41) & 0x7;
-	int mod = SIGN_EXTEND6((m_opcode >> 27) & 0x3f);
-	int compute = m_opcode & 0x7fffff;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int u = (m_core->opcode >> 38) & 0x1;
+	int dreg = (m_core->opcode >> 23) & 0xf;
+	int i = (m_core->opcode >> 41) & 0x7;
+	int mod = SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f);
+	int compute = m_core->opcode & 0x7fffff;
 
 	/* due to parallelity issues, source REG must be saved */
 	/* because the compute operation may change it */
@@ -1627,10 +1589,10 @@ void adsp21062_device::sharcop_compute_dreg_to_pm_immmod()
 /* compute / ureg <-> ureg */
 void adsp21062_device::sharcop_compute_ureg_to_ureg()
 {
-	int src_ureg = (m_opcode >> 36) & 0xff;
-	int dst_ureg = (m_opcode >> 23) & 0xff;
-	int cond = (m_opcode >> 31) & 0x1f;
-	int compute = m_opcode & 0x7fffff;
+	int src_ureg = (m_core->opcode >> 36) & 0xff;
+	int dst_ureg = (m_core->opcode >> 23) & 0xff;
+	int cond = (m_core->opcode >> 31) & 0x1f;
+	int compute = m_core->opcode & 0x7fffff;
 
 	if (IF_CONDITION_CODE(cond))
 	{
@@ -1653,16 +1615,16 @@ void adsp21062_device::sharcop_compute_ureg_to_ureg()
 /* immediate shift / dreg <-> DM|PM */
 void adsp21062_device::sharcop_imm_shift_dreg_dmpm()
 {
-	int i = (m_opcode >> 41) & 0x7;
-	int m = (m_opcode >> 38) & 0x7;
-	int g = (m_opcode >> 32) & 0x1;
-	int d = (m_opcode >> 31) & 0x1;
-	int dreg = (m_opcode >> 23) & 0xf;
-	int cond = (m_opcode >> 33) & 0x1f;
-	int data = ((m_opcode >> 8) & 0xff) | ((m_opcode >> 19) & 0xf00);
-	int shiftop = (m_opcode >> 16) & 0x3f;
-	int rn = (m_opcode >> 4) & 0xf;
-	int rx = (m_opcode & 0xf);
+	int i = (m_core->opcode >> 41) & 0x7;
+	int m = (m_core->opcode >> 38) & 0x7;
+	int g = (m_core->opcode >> 32) & 0x1;
+	int d = (m_core->opcode >> 31) & 0x1;
+	int dreg = (m_core->opcode >> 23) & 0xf;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int data = ((m_core->opcode >> 8) & 0xff) | ((m_core->opcode >> 19) & 0xf00);
+	int shiftop = (m_core->opcode >> 16) & 0x3f;
+	int rn = (m_core->opcode >> 4) & 0xf;
+	int rx = (m_core->opcode & 0xf);
 
 	if (IF_CONDITION_CODE(cond))
 	{
@@ -1711,11 +1673,11 @@ void adsp21062_device::sharcop_imm_shift_dreg_dmpm()
 /* immediate shift */
 void adsp21062_device::sharcop_imm_shift()
 {
-	int cond = (m_opcode >> 33) & 0x1f;
-	int data = ((m_opcode >> 8) & 0xff) | ((m_opcode >> 19) & 0xf00);
-	int shiftop = (m_opcode >> 16) & 0x3f;
-	int rn = (m_opcode >> 4) & 0xf;
-	int rx = (m_opcode & 0xf);
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int data = ((m_core->opcode >> 8) & 0xff) | ((m_core->opcode >> 19) & 0xf00);
+	int shiftop = (m_core->opcode >> 16) & 0x3f;
+	int rn = (m_core->opcode >> 4) & 0xf;
+	int rx = (m_core->opcode & 0xf);
 
 	if (IF_CONDITION_CODE(cond))
 	{
@@ -1729,11 +1691,11 @@ void adsp21062_device::sharcop_imm_shift()
 /* compute / modify */
 void adsp21062_device::sharcop_compute_modify()
 {
-	int cond = (m_opcode >> 33) & 0x1f;
-	int compute = m_opcode & 0x7fffff;
-	int g = (m_opcode >> 38) & 0x1;
-	int m = (m_opcode >> 27) & 0x7;
-	int i = (m_opcode >> 30) & 0x7;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int compute = m_core->opcode & 0x7fffff;
+	int g = (m_core->opcode >> 38) & 0x1;
+	int m = (m_core->opcode >> 27) & 0x7;
+	int i = (m_core->opcode >> 30) & 0x7;
 
 	if (IF_CONDITION_CODE(cond))
 	{
@@ -1761,22 +1723,22 @@ void adsp21062_device::sharcop_compute_modify()
 /* direct call to absolute address */
 void adsp21062_device::sharcop_direct_call()
 {
-	int j = (m_opcode >> 26) & 0x1;
-	int cond = (m_opcode >> 33) & 0x1f;
-	UINT32 address = m_opcode & 0xffffff;
+	int j = (m_core->opcode >> 26) & 0x1;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	UINT32 address = m_core->opcode & 0xffffff;
 
 	if (IF_CONDITION_CODE(cond))
 	{
 		if (j)
 		{
-			//PUSH_PC(m_pc+3);  /* 1 instruction + 2 delayed instructions */
-			PUSH_PC(m_nfaddr);    /* 1 instruction + 2 delayed instructions */
+			//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+			PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
 			CHANGE_PC_DELAYED(address);
 		}
 		else
 		{
-			//PUSH_PC(m_pc+1);
-			PUSH_PC(m_daddr);
+			//PUSH_PC(m_core->pc+1);
+			PUSH_PC(m_core->daddr);
 			CHANGE_PC(address);
 		}
 	}
@@ -1785,11 +1747,11 @@ void adsp21062_device::sharcop_direct_call()
 /* direct jump to absolute address */
 void adsp21062_device::sharcop_direct_jump()
 {
-	int la = (m_opcode >> 38) & 0x1;
-	int ci = (m_opcode >> 24) & 0x1;
-	int j = (m_opcode >> 26) & 0x1;
-	int cond = (m_opcode >> 33) & 0x1f;
-	UINT32 address = m_opcode & 0xffffff;
+	int la = (m_core->opcode >> 38) & 0x1;
+	int ci = (m_core->opcode >> 24) & 0x1;
+	int j = (m_core->opcode >> 26) & 0x1;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	UINT32 address = m_core->opcode & 0xffffff;
 
 	if(IF_CONDITION_CODE(cond))
 	{
@@ -1797,13 +1759,13 @@ void adsp21062_device::sharcop_direct_jump()
 		if (ci)
 		{
 			// TODO: anything else?
-			if (m_status_stkp > 0)
+			if (m_core->status_stkp > 0)
 			{
 				POP_STATUS_STACK();
 			}
 
-			m_interrupt_active = 0;
-			m_irptl &= ~(1 << m_active_irq_num);
+			m_core->interrupt_active = 0;
+			m_core->irptl &= ~(1 << m_core->active_irq_num);
 		}
 
 		if (la)
@@ -1829,21 +1791,21 @@ void adsp21062_device::sharcop_direct_jump()
 /* direct call to relative address */
 void adsp21062_device::sharcop_relative_call()
 {
-	int j = (m_opcode >> 26) & 0x1;
-	int cond = (m_opcode >> 33) & 0x1f;
-	UINT32 address = m_opcode & 0xffffff;
+	int j = (m_core->opcode >> 26) & 0x1;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	UINT32 address = m_core->opcode & 0xffffff;
 
 	if (IF_CONDITION_CODE(cond))
 	{
 		if (j)
 		{
-			PUSH_PC(m_pc+3);  /* 1 instruction + 2 delayed instructions */
-			CHANGE_PC_DELAYED(m_pc + SIGN_EXTEND24(address));
+			PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+			CHANGE_PC_DELAYED(m_core->pc + SIGN_EXTEND24(address));
 		}
 		else
 		{
-			PUSH_PC(m_pc+1);
-			CHANGE_PC(m_pc + SIGN_EXTEND24(address));
+			PUSH_PC(m_core->pc+1);
+			CHANGE_PC(m_core->pc + SIGN_EXTEND24(address));
 		}
 	}
 }
@@ -1851,11 +1813,11 @@ void adsp21062_device::sharcop_relative_call()
 /* direct jump to relative address */
 void adsp21062_device::sharcop_relative_jump()
 {
-	int la = (m_opcode >> 38) & 0x1;
-	int ci = (m_opcode >> 24) & 0x1;
-	int j = (m_opcode >> 26) & 0x1;
-	int cond = (m_opcode >> 33) & 0x1f;
-	UINT32 address = m_opcode & 0xffffff;
+	int la = (m_core->opcode >> 38) & 0x1;
+	int ci = (m_core->opcode >> 24) & 0x1;
+	int j = (m_core->opcode >> 26) & 0x1;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	UINT32 address = m_core->opcode & 0xffffff;
 
 	if (IF_CONDITION_CODE(cond))
 	{
@@ -1863,13 +1825,13 @@ void adsp21062_device::sharcop_relative_jump()
 		if (ci)
 		{
 			// TODO: anything else?
-			if (m_status_stkp > 0)
+			if (m_core->status_stkp > 0)
 			{
 				POP_STATUS_STACK();
 			}
 
-			m_interrupt_active = 0;
-			m_irptl &= ~(1 << m_active_irq_num);
+			m_core->interrupt_active = 0;
+			m_core->irptl &= ~(1 << m_core->active_irq_num);
 		}
 
 		if (la)
@@ -1880,11 +1842,11 @@ void adsp21062_device::sharcop_relative_jump()
 
 		if (j)
 		{
-			CHANGE_PC_DELAYED(m_pc + SIGN_EXTEND24(address));
+			CHANGE_PC_DELAYED(m_core->pc + SIGN_EXTEND24(address));
 		}
 		else
 		{
-			CHANGE_PC(m_pc + SIGN_EXTEND24(address));
+			CHANGE_PC(m_core->pc + SIGN_EXTEND24(address));
 		}
 	}
 }
@@ -1895,26 +1857,26 @@ void adsp21062_device::sharcop_relative_jump()
 /* indirect jump */
 void adsp21062_device::sharcop_indirect_jump()
 {
-	int la = (m_opcode >> 38) & 0x1;
-	int ci = (m_opcode >> 24) & 0x1;
-	int j = (m_opcode >> 26) & 0x1;
-	int e = (m_opcode >> 25) & 0x1;
-	int pmi = (m_opcode >> 30) & 0x7;
-	int pmm = (m_opcode >> 27) & 0x7;
-	int cond = (m_opcode >> 33) & 0x1f;
-	int compute = m_opcode & 0x7fffff;
+	int la = (m_core->opcode >> 38) & 0x1;
+	int ci = (m_core->opcode >> 24) & 0x1;
+	int j = (m_core->opcode >> 26) & 0x1;
+	int e = (m_core->opcode >> 25) & 0x1;
+	int pmi = (m_core->opcode >> 30) & 0x7;
+	int pmm = (m_core->opcode >> 27) & 0x7;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int compute = m_core->opcode & 0x7fffff;
 
 	// Clear Interrupt
 	if (ci)
 	{
 		// TODO: anything else?
-		if (m_status_stkp > 0)
+		if (m_core->status_stkp > 0)
 		{
 			POP_STATUS_STACK();
 		}
 
-		m_interrupt_active = 0;
-		m_irptl &= ~(1 << m_active_irq_num);
+		m_core->interrupt_active = 0;
+		m_core->irptl &= ~(1 << m_core->active_irq_num);
 	}
 
 	if (e)      /* IF...ELSE */
@@ -1974,12 +1936,12 @@ void adsp21062_device::sharcop_indirect_jump()
 /* indirect call */
 void adsp21062_device::sharcop_indirect_call()
 {
-	int j = (m_opcode >> 26) & 0x1;
-	int e = (m_opcode >> 25) & 0x1;
-	int pmi = (m_opcode >> 30) & 0x7;
-	int pmm = (m_opcode >> 27) & 0x7;
-	int cond = (m_opcode >> 33) & 0x1f;
-	int compute = m_opcode & 0x7fffff;
+	int j = (m_core->opcode >> 26) & 0x1;
+	int e = (m_core->opcode >> 25) & 0x1;
+	int pmi = (m_core->opcode >> 30) & 0x7;
+	int pmm = (m_core->opcode >> 27) & 0x7;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int compute = m_core->opcode & 0x7fffff;
 
 	if (e)      /* IF...ELSE */
 	{
@@ -1987,14 +1949,14 @@ void adsp21062_device::sharcop_indirect_call()
 		{
 			if (j)
 			{
-				//PUSH_PC(m_pc+3);  /* 1 instruction + 2 delayed instructions */
-				PUSH_PC(m_nfaddr);    /* 1 instruction + 2 delayed instructions */
+				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
 				CHANGE_PC_DELAYED(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 			else
 			{
-				//PUSH_PC(m_pc+1);
-				PUSH_PC(m_daddr);
+				//PUSH_PC(m_core->pc+1);
+				PUSH_PC(m_core->daddr);
 				CHANGE_PC(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 		}
@@ -2017,14 +1979,14 @@ void adsp21062_device::sharcop_indirect_call()
 
 			if (j)
 			{
-				//PUSH_PC(m_pc+3);  /* 1 instruction + 2 delayed instructions */
-				PUSH_PC(m_nfaddr);    /* 1 instruction + 2 delayed instructions */
+				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
 				CHANGE_PC_DELAYED(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 			else
 			{
-				//PUSH_PC(m_pc+1);
-				PUSH_PC(m_daddr);
+				//PUSH_PC(m_core->pc+1);
+				PUSH_PC(m_core->daddr);
 				CHANGE_PC(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 		}
@@ -2037,24 +1999,24 @@ void adsp21062_device::sharcop_indirect_call()
 /* indirect jump to relative address */
 void adsp21062_device::sharcop_relative_jump_compute()
 {
-	int la = (m_opcode >> 38) & 0x1;
-	int ci = (m_opcode >> 24) & 0x1;
-	int j = (m_opcode >> 26) & 0x1;
-	int e = (m_opcode >> 25) & 0x1;
-	int cond = (m_opcode >> 33) & 0x1f;
-	int compute = m_opcode & 0x7fffff;
+	int la = (m_core->opcode >> 38) & 0x1;
+	int ci = (m_core->opcode >> 24) & 0x1;
+	int j = (m_core->opcode >> 26) & 0x1;
+	int e = (m_core->opcode >> 25) & 0x1;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int compute = m_core->opcode & 0x7fffff;
 
 	// Clear Interrupt
 	if (ci)
 	{
 		// TODO: anything else?
-		if (m_status_stkp > 0)
+		if (m_core->status_stkp > 0)
 		{
 			POP_STATUS_STACK();
 		}
 
-		m_interrupt_active = 0;
-		m_irptl &= ~(1 << m_active_irq_num);
+		m_core->interrupt_active = 0;
+		m_core->irptl &= ~(1 << m_core->active_irq_num);
 	}
 
 	if (e)      /* IF...ELSE */
@@ -2069,11 +2031,11 @@ void adsp21062_device::sharcop_relative_jump_compute()
 
 			if (j)
 			{
-				CHANGE_PC_DELAYED(m_pc + SIGN_EXTEND6((m_opcode >> 27) & 0x3f));
+				CHANGE_PC_DELAYED(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
 			}
 			else
 			{
-				CHANGE_PC(m_pc + SIGN_EXTEND6((m_opcode >> 27) & 0x3f));
+				CHANGE_PC(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
 			}
 		}
 		else
@@ -2101,11 +2063,11 @@ void adsp21062_device::sharcop_relative_jump_compute()
 
 			if (j)
 			{
-				CHANGE_PC_DELAYED(m_pc + SIGN_EXTEND6((m_opcode >> 27) & 0x3f));
+				CHANGE_PC_DELAYED(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
 			}
 			else
 			{
-				CHANGE_PC(m_pc + SIGN_EXTEND6((m_opcode >> 27) & 0x3f));
+				CHANGE_PC(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
 			}
 		}
 	}
@@ -2114,10 +2076,10 @@ void adsp21062_device::sharcop_relative_jump_compute()
 /* indirect call to relative address */
 void adsp21062_device::sharcop_relative_call_compute()
 {
-	int j = (m_opcode >> 26) & 0x1;
-	int e = (m_opcode >> 25) & 0x1;
-	int cond = (m_opcode >> 33) & 0x1f;
-	int compute = m_opcode & 0x7fffff;
+	int j = (m_core->opcode >> 26) & 0x1;
+	int e = (m_core->opcode >> 25) & 0x1;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int compute = m_core->opcode & 0x7fffff;
 
 	if (e)      /* IF...ELSE */
 	{
@@ -2125,15 +2087,15 @@ void adsp21062_device::sharcop_relative_call_compute()
 		{
 			if (j)
 			{
-				//PUSH_PC(m_pc+3);  /* 1 instruction + 2 delayed instructions */
-				PUSH_PC(m_nfaddr);    /* 1 instruction + 2 delayed instructions */
-				CHANGE_PC_DELAYED(m_pc + SIGN_EXTEND6((m_opcode >> 27) & 0x3f));
+				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
+				CHANGE_PC_DELAYED(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
 			}
 			else
 			{
-				//PUSH_PC(m_pc+1);
-				PUSH_PC(m_daddr);
-				CHANGE_PC(m_pc + SIGN_EXTEND6((m_opcode >> 27) & 0x3f));
+				//PUSH_PC(m_core->pc+1);
+				PUSH_PC(m_core->daddr);
+				CHANGE_PC(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
 			}
 		}
 		else
@@ -2155,15 +2117,15 @@ void adsp21062_device::sharcop_relative_call_compute()
 
 			if (j)
 			{
-				//PUSH_PC(m_pc+3);  /* 1 instruction + 2 delayed instructions */
-				PUSH_PC(m_nfaddr);    /* 1 instruction + 2 delayed instructions */
-				CHANGE_PC_DELAYED(m_pc + SIGN_EXTEND6((m_opcode >> 27) & 0x3f));
+				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
+				CHANGE_PC_DELAYED(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
 			}
 			else
 			{
-				//PUSH_PC(m_pc+1);
-				PUSH_PC(m_daddr);
-				CHANGE_PC(m_pc + SIGN_EXTEND6((m_opcode >> 27) & 0x3f));
+				//PUSH_PC(m_core->pc+1);
+				PUSH_PC(m_core->daddr);
+				CHANGE_PC(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
 			}
 		}
 	}
@@ -2175,13 +2137,13 @@ void adsp21062_device::sharcop_relative_call_compute()
 /* indirect jump / compute / dreg <-> DM */
 void adsp21062_device::sharcop_indirect_jump_compute_dreg_dm()
 {
-	int d = (m_opcode >> 44) & 0x1;
-	int dmi = (m_opcode >> 41) & 0x7;
-	int dmm = (m_opcode >> 38) & 0x7;
-	int pmi = (m_opcode >> 30) & 0x7;
-	int pmm = (m_opcode >> 27) & 0x7;
-	int cond = (m_opcode >> 33) & 0x1f;
-	int dreg = (m_opcode >> 23) & 0xf;
+	int d = (m_core->opcode >> 44) & 0x1;
+	int dmi = (m_core->opcode >> 41) & 0x7;
+	int dmm = (m_core->opcode >> 38) & 0x7;
+	int pmi = (m_core->opcode >> 30) & 0x7;
+	int pmm = (m_core->opcode >> 27) & 0x7;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int dreg = (m_core->opcode >> 23) & 0xf;
 
 	if (IF_CONDITION_CODE(cond))
 	{
@@ -2189,7 +2151,7 @@ void adsp21062_device::sharcop_indirect_jump_compute_dreg_dm()
 	}
 	else
 	{
-		UINT32 compute = m_opcode & 0x7fffff;
+		UINT32 compute = m_core->opcode & 0x7fffff;
 		/* due to parallelity issues, source REG must be saved */
 		/* because the compute operation may change it */
 		UINT32 parallel_dreg = REG(dreg);
@@ -2220,19 +2182,19 @@ void adsp21062_device::sharcop_indirect_jump_compute_dreg_dm()
 /* relative jump / compute / dreg <-> DM */
 void adsp21062_device::sharcop_relative_jump_compute_dreg_dm()
 {
-	int d = (m_opcode >> 44) & 0x1;
-	int dmi = (m_opcode >> 41) & 0x7;
-	int dmm = (m_opcode >> 38) & 0x7;
-	int cond = (m_opcode >> 33) & 0x1f;
-	int dreg = (m_opcode >> 23) & 0xf;
+	int d = (m_core->opcode >> 44) & 0x1;
+	int dmi = (m_core->opcode >> 41) & 0x7;
+	int dmm = (m_core->opcode >> 38) & 0x7;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int dreg = (m_core->opcode >> 23) & 0xf;
 
 	if (IF_CONDITION_CODE(cond))
 	{
-		CHANGE_PC(m_pc + SIGN_EXTEND6((m_opcode >> 27) & 0x3f));
+		CHANGE_PC(m_core->pc + SIGN_EXTEND6((m_core->opcode >> 27) & 0x3f));
 	}
 	else
 	{
-		UINT32 compute = m_opcode & 0x7fffff;
+		UINT32 compute = m_core->opcode & 0x7fffff;
 		/* due to parallelity issues, source REG must be saved */
 		/* because the compute operation may change it */
 		UINT32 parallel_dreg = REG(dreg);
@@ -2263,11 +2225,11 @@ void adsp21062_device::sharcop_relative_jump_compute_dreg_dm()
 /* return from subroutine / compute */
 void adsp21062_device::sharcop_rts()
 {
-	int cond = (m_opcode >> 33) & 0x1f;
-	int j = (m_opcode >> 26) & 0x1;
-	int e = (m_opcode >> 25) & 0x1;
-	//int lr = (m_opcode >> 24) & 0x1;
-	int compute = m_opcode & 0x7fffff;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int j = (m_core->opcode >> 26) & 0x1;
+	int e = (m_core->opcode >> 25) & 0x1;
+	//int lr = (m_core->opcode >> 24) & 0x1;
+	int compute = m_core->opcode & 0x7fffff;
 
 	//if(lr)
 	//  fatalerror("SHARC: rts: loop reentry not implemented!\n");
@@ -2320,12 +2282,12 @@ void adsp21062_device::sharcop_rts()
 /* return from interrupt / compute */
 void adsp21062_device::sharcop_rti()
 {
-	int cond = (m_opcode >> 33) & 0x1f;
-	int j = (m_opcode >> 26) & 0x1;
-	int e = (m_opcode >> 25) & 0x1;
-	int compute = m_opcode & 0x7fffff;
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int j = (m_core->opcode >> 26) & 0x1;
+	int e = (m_core->opcode >> 25) & 0x1;
+	int compute = m_core->opcode & 0x7fffff;
 
-	m_irptl &= ~(1 << m_active_irq_num);
+	m_core->irptl &= ~(1 << m_core->active_irq_num);
 
 	if(e)       /* IF...ELSE */
 	{
@@ -2368,12 +2330,12 @@ void adsp21062_device::sharcop_rti()
 		}
 	}
 
-	if (m_status_stkp > 0)
+	if (m_core->status_stkp > 0)
 	{
 		POP_STATUS_STACK();
 	}
 
-	m_interrupt_active = 0;
+	m_core->interrupt_active = 0;
 	check_interrupts();
 }
 
@@ -2383,9 +2345,9 @@ void adsp21062_device::sharcop_rti()
 /* do until counter expired, LCNTR immediate */
 void adsp21062_device::sharcop_do_until_counter_imm()
 {
-	UINT16 data = (UINT16)(m_opcode >> 24);
-	int offset = SIGN_EXTEND24(m_opcode & 0xffffff);
-	UINT32 address = m_pc + offset;
+	UINT16 data = (UINT16)(m_core->opcode >> 24);
+	int offset = SIGN_EXTEND24(m_core->opcode & 0xffffff);
+	UINT32 address = m_core->pc + offset;
 	int type;
 	int cond = 0xf;     /* until LCE (loop counter expired */
 	int distance = abs(offset);
@@ -2403,11 +2365,11 @@ void adsp21062_device::sharcop_do_until_counter_imm()
 		type = 3;
 	}
 
-	m_lcntr = data;
-	if (m_lcntr > 0)
+	m_core->lcntr = data;
+	if (m_core->lcntr > 0)
 	{
-		PUSH_PC(m_pc+1);
-		PUSH_LOOP(address, cond, type, m_lcntr);
+		PUSH_PC(m_core->pc+1);
+		PUSH_LOOP(address, cond, type, m_core->lcntr);
 	}
 }
 
@@ -2417,9 +2379,9 @@ void adsp21062_device::sharcop_do_until_counter_imm()
 /* do until counter expired, LCNTR from UREG */
 void adsp21062_device::sharcop_do_until_counter_ureg()
 {
-	int ureg = (m_opcode >> 32) & 0xff;
-	int offset = SIGN_EXTEND24(m_opcode & 0xffffff);
-	UINT32 address = m_pc + offset;
+	int ureg = (m_core->opcode >> 32) & 0xff;
+	int offset = SIGN_EXTEND24(m_core->opcode & 0xffffff);
+	UINT32 address = m_core->pc + offset;
 	int type;
 	int cond = 0xf;     /* until LCE (loop counter expired */
 	int distance = abs(offset);
@@ -2437,11 +2399,11 @@ void adsp21062_device::sharcop_do_until_counter_ureg()
 		type = 3;
 	}
 
-	m_lcntr = GET_UREG(ureg);
-	if (m_lcntr > 0)
+	m_core->lcntr = GET_UREG(ureg);
+	if (m_core->lcntr > 0)
 	{
-		PUSH_PC(m_pc+1);
-		PUSH_LOOP(address, cond, type, m_lcntr);
+		PUSH_PC(m_core->pc+1);
+		PUSH_LOOP(address, cond, type, m_core->lcntr);
 	}
 }
 
@@ -2451,11 +2413,11 @@ void adsp21062_device::sharcop_do_until_counter_ureg()
 /* do until */
 void adsp21062_device::sharcop_do_until()
 {
-	int cond = (m_opcode >> 33) & 0x1f;
-	int offset = SIGN_EXTEND24(m_opcode & 0xffffff);
-	UINT32 address = (m_pc + offset);
+	int cond = (m_core->opcode >> 33) & 0x1f;
+	int offset = SIGN_EXTEND24(m_core->opcode & 0xffffff);
+	UINT32 address = (m_core->pc + offset);
 
-	PUSH_PC(m_pc+1);
+	PUSH_PC(m_core->pc+1);
 	PUSH_LOOP(address, cond, 0, 0);
 }
 
@@ -2465,8 +2427,8 @@ void adsp21062_device::sharcop_do_until()
 /* ureg <- DM (direct addressing) */
 void adsp21062_device::sharcop_dm_to_ureg_direct()
 {
-	int ureg = (m_opcode >> 32) & 0xff;
-	UINT32 address = (UINT32)(m_opcode);
+	int ureg = (m_core->opcode >> 32) & 0xff;
+	UINT32 address = (UINT32)(m_core->opcode);
 
 	SET_UREG(ureg, dm_read32(address));
 }
@@ -2474,8 +2436,8 @@ void adsp21062_device::sharcop_dm_to_ureg_direct()
 /* ureg -> DM (direct addressing) */
 void adsp21062_device::sharcop_ureg_to_dm_direct()
 {
-	int ureg = (m_opcode >> 32) & 0xff;
-	UINT32 address = (UINT32)(m_opcode);
+	int ureg = (m_core->opcode >> 32) & 0xff;
+	UINT32 address = (UINT32)(m_core->opcode);
 
 	dm_write32(address, GET_UREG(ureg));
 }
@@ -2483,12 +2445,12 @@ void adsp21062_device::sharcop_ureg_to_dm_direct()
 /* ureg <- PM (direct addressing) */
 void adsp21062_device::sharcop_pm_to_ureg_direct()
 {
-	int ureg = (m_opcode >> 32) & 0xff;
-	UINT32 address = (UINT32)(m_opcode);
+	int ureg = (m_core->opcode >> 32) & 0xff;
+	UINT32 address = (UINT32)(m_core->opcode);
 
 	if (ureg == 0xdb)       // PX is 48-bit
 	{
-		m_px = pm_read48(address);
+		m_core->px = pm_read48(address);
 	}
 	else
 	{
@@ -2499,12 +2461,12 @@ void adsp21062_device::sharcop_pm_to_ureg_direct()
 /* ureg -> PM (direct addressing) */
 void adsp21062_device::sharcop_ureg_to_pm_direct()
 {
-	int ureg = (m_opcode >> 32) & 0xff;
-	UINT32 address = (UINT32)(m_opcode);
+	int ureg = (m_core->opcode >> 32) & 0xff;
+	UINT32 address = (UINT32)(m_core->opcode);
 
 	if (ureg == 0xdb)       // PX is 48-bit
 	{
-		pm_write48(address, m_px);
+		pm_write48(address, m_core->px);
 	}
 	else
 	{
@@ -2518,9 +2480,9 @@ void adsp21062_device::sharcop_ureg_to_pm_direct()
 /* ureg <- DM (indirect addressing) */
 void adsp21062_device::sharcop_dm_to_ureg_indirect()
 {
-	int ureg = (m_opcode >> 32) & 0xff;
-	UINT32 offset = (UINT32)m_opcode;
-	int i = (m_opcode >> 41) & 0x7;
+	int ureg = (m_core->opcode >> 32) & 0xff;
+	UINT32 offset = (UINT32)m_core->opcode;
+	int i = (m_core->opcode >> 41) & 0x7;
 
 	SET_UREG(ureg, dm_read32(DM_REG_I(i) + offset));
 }
@@ -2528,9 +2490,9 @@ void adsp21062_device::sharcop_dm_to_ureg_indirect()
 /* ureg -> DM (indirect addressing) */
 void adsp21062_device::sharcop_ureg_to_dm_indirect()
 {
-	int ureg = (m_opcode >> 32) & 0xff;
-	UINT32 offset = (UINT32)m_opcode;
-	int i = (m_opcode >> 41) & 0x7;
+	int ureg = (m_core->opcode >> 32) & 0xff;
+	UINT32 offset = (UINT32)m_core->opcode;
+	int i = (m_core->opcode >> 41) & 0x7;
 
 	dm_write32(DM_REG_I(i) + offset, GET_UREG(ureg));
 }
@@ -2538,13 +2500,13 @@ void adsp21062_device::sharcop_ureg_to_dm_indirect()
 /* ureg <- PM (indirect addressing) */
 void adsp21062_device::sharcop_pm_to_ureg_indirect()
 {
-	int ureg = (m_opcode >> 32) & 0xff;
-	UINT32 offset = m_opcode & 0xffffff;
-	int i = (m_opcode >> 41) & 0x7;
+	int ureg = (m_core->opcode >> 32) & 0xff;
+	UINT32 offset = m_core->opcode & 0xffffff;
+	int i = (m_core->opcode >> 41) & 0x7;
 
 	if (ureg == 0xdb)       /* PX is 48-bit */
 	{
-		m_px = pm_read48(PM_REG_I(i) + offset);
+		m_core->px = pm_read48(PM_REG_I(i) + offset);
 	}
 	else
 	{
@@ -2555,13 +2517,13 @@ void adsp21062_device::sharcop_pm_to_ureg_indirect()
 /* ureg -> PM (indirect addressing) */
 void adsp21062_device::sharcop_ureg_to_pm_indirect()
 {
-	int ureg = (m_opcode >> 32) & 0xff;
-	UINT32 offset = (UINT32)m_opcode;
-	int i = (m_opcode >> 41) & 0x7;
+	int ureg = (m_core->opcode >> 32) & 0xff;
+	UINT32 offset = (UINT32)m_core->opcode;
+	int i = (m_core->opcode >> 41) & 0x7;
 
 	if (ureg == 0xdb)       /* PX is 48-bit */
 	{
-		pm_write48(PM_REG_I(i) + offset, m_px);
+		pm_write48(PM_REG_I(i) + offset, m_core->px);
 	}
 	else
 	{
@@ -2575,10 +2537,10 @@ void adsp21062_device::sharcop_ureg_to_pm_indirect()
 /* immediate data -> DM|PM */
 void adsp21062_device::sharcop_imm_to_dmpm()
 {
-	int i = (m_opcode >> 41) & 0x7;
-	int m = (m_opcode >> 38) & 0x7;
-	int g = (m_opcode >> 37) & 0x1;
-	UINT32 data = (UINT32)m_opcode;
+	int i = (m_core->opcode >> 41) & 0x7;
+	int m = (m_core->opcode >> 38) & 0x7;
+	int g = (m_core->opcode >> 37) & 0x1;
+	UINT32 data = (UINT32)m_core->opcode;
 
 	if (g)
 	{
@@ -2602,8 +2564,8 @@ void adsp21062_device::sharcop_imm_to_dmpm()
 /* immediate data -> ureg */
 void adsp21062_device::sharcop_imm_to_ureg()
 {
-	int ureg = (m_opcode >> 32) & 0xff;
-	UINT32 data = (UINT32)m_opcode;
+	int ureg = (m_core->opcode >> 32) & 0xff;
+	UINT32 data = (UINT32)m_core->opcode;
 
 	SET_UREG(ureg, data);
 }
@@ -2614,9 +2576,9 @@ void adsp21062_device::sharcop_imm_to_ureg()
 /* system register bit manipulation */
 void adsp21062_device::sharcop_sysreg_bitop()
 {
-	int bop = (m_opcode >> 37) & 0x7;
-	int sreg = (m_opcode >> 32) & 0xf;
-	UINT32 data = (UINT32)m_opcode;
+	int bop = (m_core->opcode >> 37) & 0x7;
+	int sreg = (m_core->opcode >> 32) & 0xf;
+	UINT32 data = (UINT32)m_core->opcode;
 
 	UINT32 src = GET_UREG(0x70 | sreg);
 
@@ -2641,11 +2603,11 @@ void adsp21062_device::sharcop_sysreg_bitop()
 		{
 			if ((src & data) == data)
 			{
-				m_astat |= BTF;
+				m_core->astat |= BTF;
 			}
 			else
 			{
-				m_astat &= ~BTF;
+				m_core->astat &= ~BTF;
 			}
 			break;
 		}
@@ -2653,11 +2615,11 @@ void adsp21062_device::sharcop_sysreg_bitop()
 		{
 			if (src == data)
 			{
-				m_astat |= BTF;
+				m_core->astat |= BTF;
 			}
 			else
 			{
-				m_astat &= ~BTF;
+				m_core->astat &= ~BTF;
 			}
 			break;
 		}
@@ -2675,9 +2637,9 @@ void adsp21062_device::sharcop_sysreg_bitop()
 /* I register modify */
 void adsp21062_device::sharcop_modify()
 {
-	int g = (m_opcode >> 38) & 0x1;
-	int i = (m_opcode >> 32) & 0x7;
-	INT32 data = (m_opcode);
+	int g = (m_core->opcode >> 38) & 0x1;
+	int i = (m_core->opcode >> 32) & 0x7;
+	INT32 data = (m_core->opcode);
 
 	if (g)      // PM
 	{
@@ -2706,29 +2668,29 @@ void adsp21062_device::sharcop_bit_reverse()
 /* push/pop stacks / flush cache */
 void adsp21062_device::sharcop_push_pop_stacks()
 {
-	if (m_opcode & U64(0x008000000000))
+	if (m_core->opcode & U64(0x008000000000))
 	{
 		fatalerror("sharcop_push_pop_stacks: push loop not implemented\n");
 	}
-	if (m_opcode & U64(0x004000000000))
+	if (m_core->opcode & U64(0x004000000000))
 	{
 		fatalerror("sharcop_push_pop_stacks: pop loop not implemented\n");
 	}
-	if (m_opcode & U64(0x002000000000))
+	if (m_core->opcode & U64(0x002000000000))
 	{
 		//fatalerror("sharcop_push_pop_stacks: push sts not implemented\n");
 		PUSH_STATUS_STACK();
 	}
-	if (m_opcode & U64(0x001000000000))
+	if (m_core->opcode & U64(0x001000000000))
 	{
 		//fatalerror("sharcop_push_pop_stacks: pop sts not implemented\n");
 		POP_STATUS_STACK();
 	}
-	if (m_opcode & U64(0x000800000000))
+	if (m_core->opcode & U64(0x000800000000))
 	{
-		PUSH_PC(m_pcstk);
+		PUSH_PC(m_core->pcstk);
 	}
-	if (m_opcode & U64(0x000400000000))
+	if (m_core->opcode & U64(0x000400000000))
 	{
 		POP_PC();
 	}
@@ -2746,13 +2708,13 @@ void adsp21062_device::sharcop_nop()
 
 void adsp21062_device::sharcop_idle()
 {
-	//CHANGE_PC(m_pc);
+	//CHANGE_PC(m_core->pc);
 
-	m_daddr = m_pc;
-	m_faddr = m_pc+1;
-	m_nfaddr = m_pc+2;
+	m_core->daddr = m_core->pc;
+	m_core->faddr = m_core->pc+1;
+	m_core->nfaddr = m_core->pc+2;
 
-	m_idle = 1;
+	m_core->idle = 1;
 }
 
 /*****************************************************************************/
@@ -2761,7 +2723,7 @@ void adsp21062_device::sharcop_unimplemented()
 {
 	extern CPU_DISASSEMBLE(sharc);
 	char dasm[1000];
-	CPU_DISASSEMBLE_NAME(sharc)(nullptr, dasm, m_pc, nullptr, nullptr, 0);
-	osd_printf_debug("SHARC: %08X: %s\n", m_pc, dasm);
-	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X\n", (UINT16)(m_opcode >> 32), (UINT32)(m_opcode), m_pc);
+	CPU_DISASSEMBLE_NAME(sharc)(nullptr, dasm, m_core->pc, nullptr, nullptr, 0);
+	osd_printf_debug("SHARC: %08X: %s\n", m_core->pc, dasm);
+	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X\n", (UINT16)(m_core->opcode >> 32), (UINT32)(m_core->opcode), m_core->pc);
 }

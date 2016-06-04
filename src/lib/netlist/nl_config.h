@@ -118,8 +118,8 @@
 //  General Macros
 //============================================================
 
-#if defined(_OPENMP)
-#define HAS_OPENMP ( _OPENMP >= 200805 )
+#if defined(OPENMP)
+#define HAS_OPENMP ( OPENMP >= 200805 )
 #else
 #define HAS_OPENMP (0)
 #endif
@@ -129,11 +129,10 @@
 //============================================================
 
 #if NL_KEEP_STATISTICS
-#include "eminline.h"
 #define add_to_stat(v,x)        do { v += (x); } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)
-#define begin_timing(v)         do { v -= get_profile_ticks(); } while (0)
-#define end_timing(v)           do { v += get_profile_ticks(); } while (0)
+#define begin_timing(v)         do { v -= plib::profile_ticks(); } while (0)
+#define end_timing(v)           do { v += plib::profile_ticks(); } while (0)
 #else
 #define add_to_stat(v,x)        do { } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)

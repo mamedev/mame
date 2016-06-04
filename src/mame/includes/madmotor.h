@@ -38,7 +38,7 @@ public:
 	required_device<deco_bac06_device> m_tilegen3;
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
-	
+
 	DECLARE_WRITE16_MEMBER(madmotor_sound_w);
 	DECLARE_DRIVER_INIT(madmotor);
 	virtual void machine_start() override;

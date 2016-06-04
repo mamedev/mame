@@ -13,13 +13,13 @@
 #include <algorithm>
 #include "plib/pconfig.h"
 
-template<int _storage_N>
+template<int storage_N>
 struct mat_cr_t
 {
 	unsigned nz_num;
-	unsigned ia[_storage_N + 1];
-	unsigned ja[_storage_N * _storage_N];
-	unsigned diag[_storage_N];       /* n */
+	unsigned ia[storage_N + 1];
+	unsigned ja[storage_N * storage_N];
+	unsigned diag[storage_N];       /* n */
 
 	template<typename T>
 	void mult_vec(const T * RESTRICT A, const T * RESTRICT x, T * RESTRICT res)

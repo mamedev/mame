@@ -6,6 +6,9 @@
      Release dates are between 1981 and 1987, but precise dates are unknown.
      Although each software is intended for certain computer variations, they may work on others.
      Meaning of codes: L1 = super80; L2 = super80d; L3 = V3.7 system; L4 = 8Rx system; J = arrow keys can be used; R1,2 = revision numbers
+     Meaning of numbers: 1-99 = for BASIC (32 columns); 100-119 = for BASIC (80 columns); 400-499 = Machine Language;
+                         150-299 = ported from Microbee; 300-329 = BASIC, ported from Exidy Sorcerer;
+                         500-529 = Machine Language, ported from Exidy Sorcerer. All porting done by Robbbert.
  -->
 <softwarelist name="super80_cass" description="Super-80 cassettes">
 <!--
@@ -1744,6 +1747,18 @@
 			</dataarea>
 		</part>
 	</software>
+	<software name="xkadath">
+		<description>Kadath</description>
+		<year>1986</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="313L3R4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="66466996">
+				<rom name="xkadath.wav" size="66466996" crc="2f7adf13" sha1="8dc2feac174e05b37c7b719a9610198e40b47736" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 	<software name="xbeez80">
 		<description>BEE-Z80</description>
 		<year>1983</year>
@@ -1955,6 +1970,330 @@
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="3557048">
 				<rom name="xmart1j.wav" size="3557048" crc="d846b785" sha1="d90e305bfc964736294f000dc6d19893d0d4ff43" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xcstrek">
+		<description>Star Trek (CPM)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="451" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="47189666">
+				<rom name="xcstrek.wav" size="47189666" crc="44a90d61" sha1="e90c097d04ce2eb4b3e4234e2f8ffdede41ae60e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xcaliens">
+		<description>Aliens (CPM)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="452" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="24948102">
+				<rom name="xcaliens.wav" size="24948102" crc="fb8b53cf" sha1="82922d7e0480d88071faca44ecd7eff9c9f1ca93" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xpenetr">
+		<description>Penetrator</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="453" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="27614180">
+				<rom name="xpenetr.wav" size="27614180" crc="d4ebb257" sha1="af59bbb076a222883a1c5ad432fc140f19c5d1fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xpenetrj" cloneof="xpenetr">
+		<description>Penetrator (with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="453J" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="27614116">
+				<rom name="xpenetrj.wav" size="27614116" crc="c9e4ed98" sha1="b022367d7ca83eaa11566a69ebc1c34fd98e7cd4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xdemon">
+		<description>Demon Monitor</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="454" />
+		<info name="usage" value="L to load, G0 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="2244932">
+				<rom name="xdemon.wav" size="2244932" crc="f2dcd645" sha1="ff5ea3808dec8a7bd8184ea5b554c4d7bdc42cca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xexmon">
+		<description>Exmon (L2)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="455L2" />
+		<info name="usage" value="L to load, GAA00 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="1806646">
+				<rom name="xexmon.wav" size="1806646" crc="c86835f1" sha1="190ac8f0c8cf6030d8bb83a00c38a7ff99f5b8ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xexmon3" cloneof="xexmon">
+		<description>Exmon (L3)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="455L3" />
+		<info name="usage" value="L to load, GAA00 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="2679896">
+				<rom name="xexmon3.wav" size="2679896" crc="855bbb92" sha1="32c714930f96726bf2f4c4d7ef62a662073dda9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xatc">
+		<description>Air Traffic Control</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="500R2" />
+		<info name="usage" value="L to load, G0 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="4864606">
+				<rom name="xatc.wav" size="4864606" crc="b764a7d0" sha1="2f0cf54db32a6cb818ebfc816143060696b305a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xschess1">
+		<description>Sargon Chess</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="501V1" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="11416236">
+				<rom name="xschess1.wav" size="11416236" crc="f50fdd58" sha1="ce839005880190cec51d08f4fed0a078b1f82c8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xschess2" cloneof="xschess1">
+		<description>Sargon Chess (newer)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="501R2" />
+		<info name="usage" value="L to load, G4040 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="11850730">
+				<rom name="xschess2.wav" size="11850730" crc="7b06313a" sha1="009a05bb204daad1354d11ea0402396d196fc720" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xfgam">
+		<description>Fastgammon</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="502R2" />
+		<info name="usage" value="L to load, G1F0 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="12285212">
+				<rom name="xfgam.wav" size="12285212" crc="d58e0884" sha1="5f08b44f2ab0fa27ba836e4f4cd25240a9f69e5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xcdes">
+		<description>Character Designer</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="503" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="5739800">
+				<rom name="xcdes.wav" size="5739800" crc="488d370b" sha1="fc95dabd38785ea466673237e2d938cc90d5d0d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xadvland">
+		<description>Adventureland</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="504R2" />
+		<info name="usage" value="L to load, G3DE0 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="26712336">
+				<rom name="xadvland.wav" size="26712336" crc="74161419" sha1="7b98a925c39b0c819337b143eabccb3e65c67fa3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xmission">
+		<description>Mission Impossible</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="505R2" />
+		<info name="usage" value="L to load, G3C80 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="26272928">
+				<rom name="xmission.wav" size="26272928" crc="a5c191cf" sha1="7373048b7c651d4263f9006ae49dced120196270" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xaa">
+		<description>Arrows and Alleys</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="506R4" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="10977770">
+				<rom name="xaa.wav" size="10977770" crc="08d28ee0" sha1="e4e89839178fa64ae368354d28f772e7fc2b005e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xaaj" cloneof="xaa">
+		<description>Arrows and Alleys (with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="506R4J" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="10977352">
+				<rom name="xaaj.wav" size="10977352" crc="8c4cef44" sha1="ff4ad5141880452101077eee62c91c5fd804a594" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xdefend">
+		<description>Defender</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="507R2" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="26702016">
+				<rom name="xdefend.wav" size="26702016" crc="54b8a293" sha1="a33934df3781d43feb81a8103c25ec73804174b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xchomp">
+		<description>Chomp</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="508R3" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="21047050">
+				<rom name="xchomp.wav" size="21047050" crc="b2181471" sha1="6b98fd97ce2a6e79b068cc04f07605e6fe8b12db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xchompj" cloneof="xchomp">
+		<description>Chomp (with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="508R3J" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="21046992">
+				<rom name="xchompj.wav" size="21046992" crc="82a1a3d7" sha1="37ff28bf7957589b845f7952986dbd10858e8db9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xaster">
+		<description>Super Asteroids</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="509R4" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="15356462">
+				<rom name="xaster.wav" size="15356462" crc="f5362c01" sha1="f934a565fe4946949e875605d21689a28f18b12f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xasterj" cloneof="xaster">
+		<description>Super Asteroids (with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="509R4J" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="15356424">
+				<rom name="xasterj.wav" size="15356424" crc="dd332d82" sha1="b748e71c6a72913cd9c0ed788027a982d7054499" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xgalaxj">
+		<description>Galaxians (V1) (with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="510V1J" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="13170644">
+				<rom name="xgalaxj.wav" size="13170644" crc="dcc2b9c5" sha1="4dd5e53ec6f546f176fd5f0b5026640dae94e4f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xgalax2j" cloneof="xgalaxj">
+		<description>Galaxians (V2) (with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="510V2J" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="13602976">
+				<rom name="xgalax2j.wav" size="13602976" crc="e6ed8c32" sha1="31db9f28763bb33317c6d941340456256000565d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xastro">
+		<description>Astro Attacker</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="511R1" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="25383594">
+				<rom name="xastro.wav" size="25383594" crc="4118f2df" sha1="12c6407a4689c79b720723da406802c16e7ffb00" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xastroj" cloneof="xastro">
+		<description>Astro Attacker (with arrows)</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="511R1J" />
+		<info name="usage" value="L to load, G100 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="25383492">
+				<rom name="xastroj.wav" size="25383492" crc="cf36a43e" sha1="ea86ce791194343a229761f9f15c62fca693a1f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xmidas">
+		<description>Midas Word Processor</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="514" />
+		<info name="usage" value="L to load, G200 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="9231372">
+				<rom name="xmidas.wav" size="9231372" crc="f64148f7" sha1="dc5b9cbc7381412a37499774447876450ac6e077" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xexsbas">
+		<description>Exidy Standard Basic</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="523" />
+		<info name="usage" value="L to load, GA000 to run" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="12274854">
+				<rom name="xexsbas.wav" size="12274854" crc="605da53c" sha1="bd77732f6d0e3d9bd603cc1e2922fc5d7fa553fc" offset="0" />
 			</dataarea>
 		</part>
 	</software>

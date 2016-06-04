@@ -5010,7 +5010,7 @@ void harddriv_state::init_racedrivc_panorama_side()
 //  m_gsp->space(AS_PROGRAM).install_write_handler(0xfff76f60, 0xfff76f6f, write16_delegate(FUNC(harddriv_state::rdgsp_speedup1_w), this));
 //  m_gsp->space(AS_PROGRAM).install_read_handler(0xfff76f60, 0xfff76f6f, read16_delegate(FUNC(harddriv_state::rdgsp_speedup1_r), this));
 //  m_gsp_speedup_pc = 0xfff43a00;
-//	m_gsp_speedup_addr[0] = (UINT16 *)(m_gsp_vram + ((0xfff76f60 - 0xffc00000) >> 3));
+//  m_gsp_speedup_addr[0] = (UINT16 *)(m_gsp_vram + ((0xfff76f60 - 0xffc00000) >> 3));
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16_delegate(FUNC(harddriv_state::hdadsp_speedup_r), this));

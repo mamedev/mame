@@ -2379,10 +2379,10 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *desti
 					v[i] += matrix.projection[i][j] * t[j];
 			};
 			/*for (int i = 0; i < 3; i++) {
-				v[i] *= matrix.scale[i];
+			    v[i] *= matrix.scale[i];
 			}
 			for (int i = 0; i < 3; i++) {
-				v[i] += matrix.translate[i];
+			    v[i] += matrix.translate[i];
 			}*/
 			destination[m].w = v[3];
 			destination[m].x = (v[0] / v[3])*supersample_factor_x; // source[m].attribute[0].fv[0];
@@ -2629,13 +2629,11 @@ void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
 		}
 }
 
-UINT32 nv2a_renderer::render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, const nv2avertex_t &_v1, const nv2avertex_t &_v2, const nv2avertex_t &_v3)
+UINT32 nv2a_renderer::render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
 {
 	float areax2;
 	NV2A_GL_CULL_FACE face = NV2A_GL_CULL_FACE::FRONT;
 
-	if ((_v1.w <= 0) || (_v2.w <= 0) || (_v3.w <= 0)) // remove, for now
-		return 0;
 	if (backface_culling_enabled == false)
 		return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
 	if (backface_culling_culled == NV2A_GL_CULL_FACE::FRONT_AND_BACK)
@@ -2663,6 +2661,74 @@ UINT32 nv2a_renderer::render_triangle_culling(const rectangle &cliprect, render_
 	return 0;
 }
 
+UINT32 nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
+{
+#if 0
+	nv2avertex_t *vi[3];
+	nv2avertex_t vo[16];
+	int idx_prev, idx_curr;
+	int neg_prev, neg_curr;
+	float tfactor;
+	int idx;
+#endif
+
+	if ((_v1.w > 0) && (_v2.w > 0) && (_v3.w > 0))
+		return render_triangle_culling(cliprect, callback, paramcount, _v1, _v2, _v3);
+#if 0
+	vi[0] = &_v1;
+	vi[1] = &_v2;
+	vi[2] = &_v3;
+	for (int n=0;n < 3;n++)
+	{
+		vi[n]->x = vi[n]->x * vi[n]->w;
+		vi[n]->y = vi[n]->y * vi[n]->w;
+		vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
+	}
+	idx_prev = 2;
+	idx_curr = 0;
+	idx = 0;
+	neg_prev = vi[idx_prev]->w < 0.00000001 ? 1 : 0;
+	while (idx_curr < 3)
+	{
+		neg_curr = vi[idx_curr]->w < 0.00000001 ? 1 : 0;
+		if (neg_curr ^ neg_prev)
+		{
+			float p = (float)0.00000001;
+
+			tfactor = (p - vi[idx_prev]->w) / (vi[idx_curr]->w - vi[idx_prev]->w);
+
+			vo[idx].x = ((vi[idx_curr]->x - vi[idx_prev]->x) * tfactor) + vi[idx_prev]->x;
+			vo[idx].y = ((vi[idx_curr]->y - vi[idx_prev]->y) * tfactor) + vi[idx_prev]->y;
+			vo[idx].w = ((vi[idx_curr]->w - vi[idx_prev]->w) * tfactor) + vi[idx_prev]->w;
+			for (int n=0;n < 13;n++)
+				vo[idx].p[n] = ((vi[idx_curr]->p[n] - vi[idx_prev]->p[n]) * tfactor) + vi[idx_prev]->p[n];
+			idx++;
+		}
+		if (neg_curr == 0)
+		{
+			memcpy(&vo[idx], vi[idx_curr],sizeof(nv2avertex_t));
+			idx++;
+		}
+		neg_prev = neg_curr;
+		idx_prev = idx_curr;
+		idx_curr++;
+	}
+	for (int n = 0; n < idx; n++)
+	{
+		vo[n].x = vo[n].x / vo[n].w;
+		vo[n].y = vo[n].y / vo[n].w;
+		vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] / vo[n].w;
+	}
+	if (idx > 2)
+		render_triangle_culling(cliprect, callback, paramcount, vo[0], vo[1], vo[2]);
+	if (idx > 3)
+		render_triangle_culling(cliprect, callback, paramcount, vo[0], vo[2], vo[3]);
+	if (idx > 4)
+		exit(0);
+#endif
+	return 0;
+}
+
 void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_delegate &renderspans)
 {
 	for (; count > 0; count--) {
@@ -2672,8 +2738,8 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 			if (vertex_accumulated == 4) {
 				primitives_count++;
 				vertex_accumulated = 0;
-				render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[vertex_count + 1], vertex_xy[vertex_count + 2]);
-				render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[vertex_count + 2], vertex_xy[vertex_count + 3]);
+				render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[vertex_count + 1], vertex_xy[vertex_count + 2]);
+				render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[vertex_count + 2], vertex_xy[vertex_count + 3]);
 				vertex_count = (vertex_count + 4) & 1023;
 				wait();
 			}
@@ -2684,7 +2750,7 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 			if (vertex_accumulated == 3) {
 				primitives_count++;
 				vertex_accumulated = 0;
-				render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[(vertex_count + 1) & 1023], vertex_xy[(vertex_count + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
+				render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[(vertex_count + 1) & 1023], vertex_xy[(vertex_count + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
 				vertex_count = (vertex_count + 3) & 1023;
 				wait();
 			}
@@ -2707,7 +2773,7 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 				// if software sends the vertices 0 1 2 3 4 5 6
 				// hardware will draw triangles made by (0,1,2) (0,2,3) (0,3,4) (0,4,5) (0,5,6)
 				convert_vertices_poly(source, vertex_xy + vertex_count, 1);
-				render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_count - 1) & 1023], vertex_xy[vertex_count]);
+				render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_count - 1) & 1023], vertex_xy[vertex_count]);
 				vertex_count = (vertex_count + 1) & 1023;
 				wait();
 			}
@@ -2731,9 +2797,9 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 				// hardware will draw triangles made by (0,1,2) (1,3,2) (2,3,4) (3,5,4) (4,5,6)
 				convert_vertices_poly(source, vertex_xy + vertex_count, 1);
 				if ((vertex_count & 1) == 0)
-					render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[(vertex_count - 2) & 1023], vertex_xy[(vertex_count - 1) & 1023], vertex_xy[vertex_count]);
+					render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[(vertex_count - 2) & 1023], vertex_xy[(vertex_count - 1) & 1023], vertex_xy[vertex_count]);
 				else
-					render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[(vertex_count - 2) & 1023], vertex_xy[vertex_count], vertex_xy[(vertex_count - 1) & 1023]);
+					render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[(vertex_count - 2) & 1023], vertex_xy[vertex_count], vertex_xy[(vertex_count - 1) & 1023]);
 				vertex_count = (vertex_count + 1) & 1023;
 				wait();
 			}
@@ -2758,8 +2824,8 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 				{
 					primitives_count++;
 					// quad is made of vertices vertex count +0 +1 +3 +2
-					render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count + 0], vertex_xy[vertex_count + 1], vertex_xy[(vertex_count + 3) & 1023]);
-					render_triangle_culling(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[(vertex_count + 3) & 1023], vertex_xy[(vertex_count + 2) & 1023], vertex_xy[vertex_count + 0]);
+					render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count + 0], vertex_xy[vertex_count + 1], vertex_xy[(vertex_count + 3) & 1023]);
+					render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[(vertex_count + 3) & 1023], vertex_xy[(vertex_count + 2) & 1023], vertex_xy[vertex_count + 0]);
 					vertex_accumulated = 2;
 					vertex_count = (vertex_count + 2) & 1023;
 					wait();
@@ -2864,7 +2930,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		// each dword after 1808 contains a 32 bit index value to select the vartices
 		while (1) {
 			int c;
-			
+
 			if ((countlen * mult + indexesleft_count) < 4)
 				break;
 			if (mult == 1)
@@ -3373,13 +3439,13 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			}
 		}
 		/*if (maddress == 0x1b08) {
-			(data >> 0) & 15;
-			(data >> 4) & 15;
-			(data >> 8) & 15;
-			(data >> 12) & 15;
-			(data >> 16) & 15;
-			(data >> 20) & 15;
-			(data >> 24) & 255;
+		    (data >> 0) & 15;
+		    (data >> 4) & 15;
+		    (data >> 8) & 15;
+		    (data >> 12) & 15;
+		    (data >> 16) & 15;
+		    (data >> 20) & 15;
+		    (data >> 24) & 255;
 		}*/
 		if (maddress == 0x1b0c) {
 			texture[unit].colorkey = (data >> 0) & 3;
@@ -4549,7 +4615,9 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 			dmaput = &channel[chanel][0].regs[0x40 / 4];
 			dmaget = &channel[chanel][0].regs[0x44 / 4];
 			//printf("dmaget %08X dmaput %08X\n\r",*dmaget,*dmaput);
-			if ((*dmaput == 0x048cf000) && (*dmaget == 0x07f4d000)) { // only for outr2
+			if (((*dmaput == 0x048cf000) && (*dmaget == 0x07f4d000)) || // only for outr2
+				((*dmaput == 0x07dca000) && (*dmaget == 0x07f4d000))) // only for crtaxihr
+			{ 
 				*dmaget = *dmaput;
 				puller_waiting = 0;
 				puller_timer->enable(false);

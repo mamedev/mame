@@ -13,24 +13,25 @@
 
 namespace netlist
 {
+
 // ----------------------------------------------------------------------------------------
 // net_device_t_base_factory
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD const pstring_vector_t base_factory_t::term_param_list()
+ATTR_COLD const plib::pstring_vector_t base_factory_t::term_param_list()
 {
 	if (m_def_param.startsWith("+"))
-		return pstring_vector_t(m_def_param.substr(1), ",");
+		return plib::pstring_vector_t(m_def_param.substr(1), ",");
 	else
-		return pstring_vector_t();
+		return plib::pstring_vector_t();
 }
 
-ATTR_COLD const pstring_vector_t base_factory_t::def_params()
+ATTR_COLD const plib::pstring_vector_t base_factory_t::def_params()
 {
 	if (m_def_param.startsWith("+") || m_def_param.equals("-"))
-		return pstring_vector_t();
+		return plib::pstring_vector_t();
 	else
-		return pstring_vector_t(m_def_param, ",");
+		return plib::pstring_vector_t(m_def_param, ",");
 }
 
 
@@ -66,7 +67,7 @@ void factory_list_t::error(const pstring &s)
 	m_setup.log().fatal("{1}", s);
 }
 
-powned_ptr<device_t> factory_list_t::new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name)
+plib::powned_ptr<device_t> factory_list_t::new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name)
 {
 	base_factory_t *f = factory_by_name(devname);
 	return f->Create(anetlist, name);

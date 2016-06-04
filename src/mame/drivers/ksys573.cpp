@@ -4456,6 +4456,30 @@ ROM_START( hyperbbca )
 	ROM_LOAD( "876aa.22h",    0x000000, 0x002000, CRC(3c17f026) SHA1(8ed33aca99f5d09d5792e136e700e3ac628018e8) )
 ROM_END
 
+ROM_START( hyperbbck )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
+	ROM_LOAD( "876ka.31m",    0x000000, 0x200000, CRC(b2f5ea67) SHA1(205416c2954cfc303f164bb74f66356c393db294) )
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
+	ROM_LOAD( "876ka.27m",    0x000000, 0x200000, CRC(d5f32438) SHA1(3bc8598af2e8817bbcb381f90a9b12d5736abed7) )
+	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
+	ROM_LOAD( "876ka.31l",    0x000000, 0x200000, CRC(628cd211) SHA1(5c2d5f95bf3e7995ad32dc432c81e69e42ba9b88) )
+	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
+	ROM_LOAD( "876ka.27l",    0x000000, 0x200000, CRC(4a860adf) SHA1(02aea8c205ea5b094d1a52dadc751c11d6b8aab7) )
+	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
+	ROM_LOAD( "876ka.31j",    0x000000, 0x200000, CRC(4d572e90) SHA1(ac06a4f4efcee2729b131da8634eced85338196a) )
+	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
+	ROM_LOAD( "876ka.27j",    0x000000, 0x200000, CRC(f80953f7) SHA1(c82bea38a8dc19ed99e5fd5c97cbffd7669581a7) )
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
+	ROM_LOAD( "876ka.31h",    0x000000, 0x200000, CRC(4f99ef5b) SHA1(df02cdc61455a470cadada16c43e7f153d9d48c7) )
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
+	ROM_LOAD( "876ka.27h",    0x000000, 0x200000, CRC(21586113) SHA1(a563e383961b8e2421869070fe384ed910ed2fe4) )
+
+	ROM_REGION( 0x002000, "m48t58", 0 )
+	ROM_LOAD( "876ka.22h",    0x000000, 0x002000, CRC(b4705bde) SHA1(3005982b3c237181c6a03b42bf37ffe79f68dc79) )
+ROM_END
+
 ROM_START( hypbbc2p )
 	SYS573_BIOS_A
 
@@ -4711,6 +4735,7 @@ GAME( 1998, fbait2bc,  sys573,   fbaitbc,    fbaitbc,   driver_device, 0,       
 GAME( 1998, bassang2,  fbait2bc, fbaitbc,    fbaitbc,   driver_device, 0,        ROT0, "Konami", "Bass Angler 2 (GE865 VER. JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, hyperbbc,  sys573,   hyperbbc,   hyperbbc,  ksys573_state, hyperbbc, ROT0, "Konami", "Hyper Bishi Bashi Champ (GQ876 VER. EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, hyperbbca, hyperbbc, hyperbbc,   hyperbbc,  ksys573_state, hyperbbc, ROT0, "Konami", "Hyper Bishi Bashi Champ (GQ876 VER. AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, hyperbbck, hyperbbc, hyperbbc,   hyperbbc,  ksys573_state, hyperbbc, ROT0, "Konami", "Hyper Bishi Bashi Champ (GE876 VER. KAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, gchgchmp,  sys573,   gchgchmp,   gchgchmp,  driver_device, 0,        ROT0, "Konami", "Gachaga Champ (GE877 VER. JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, drmn,      sys573,   drmn,       drmn,      ksys573_state, drmn,     ROT0, "Konami", "DrumMania (GQ881 VER. JAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, gtrfrks,   sys573,   gtrfrks,    gtrfrks,   driver_device, 0,        ROT0, "Konami", "Guitar Freaks (GQ886 VER. EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

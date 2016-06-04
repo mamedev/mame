@@ -554,7 +554,7 @@ void osd_common_t::customize_input_type_list(simple_list<input_type_entry> &type
 //  list of OS-dependent slider values.
 //-------------------------------------------------
 
-std::vector<ui_menu_item> osd_common_t::get_slider_list()
+std::vector<ui::menu_item> osd_common_t::get_slider_list()
 {
 	return m_sliders;
 }

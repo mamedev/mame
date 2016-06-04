@@ -837,7 +837,7 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			if (!memcmp((char *)&ROM[0x0180], "SF-002", 6)) // Legend of Wukong
 				type = WUKONG;
 			break;
-			
+
 		case 0x300000:
 			if (!memcmp(&ROM[0x220], sdk_sig, sizeof(sdk_sig)))
 				type = LIONK3;

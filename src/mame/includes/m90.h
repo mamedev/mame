@@ -13,7 +13,8 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_audio(*this, "m72"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	required_shared_ptr<UINT16> m_video_data;
 	optional_shared_ptr<UINT16> m_spriteram;
@@ -23,6 +24,7 @@ public:
 	optional_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	UINT16 m_video_control_data[8];
 	tilemap_t *m_pf1_layer;

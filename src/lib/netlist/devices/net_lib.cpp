@@ -58,8 +58,8 @@ NETLIST_END()
 
 
 #define xstr(s) # s
-#define ENTRY1(_nic, _name, _defparam) factory.register_device<_nic>( # _name, xstr(_nic), _defparam );
-#define ENTRY(_nic, _name, _defparam) ENTRY1(NETLIB_NAME(_nic), _name, _defparam)
+#define ENTRY1(nic, name, defparam) factory.register_device<nic>( # name, xstr(nic), defparam );
+#define ENTRY(nic, name, defparam) ENTRY1(NETLIB_NAME(nic), name, defparam)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -119,7 +119,7 @@ void initialize_factory(factory_list_t &factory)
 	ENTRY(9316,                 TTL_9316,               "+CLK,ENP,ENT,CLRQ,LOADQ,A,B,C,D")
 	ENTRY(CD4020,               CD4020,                 "")
 	ENTRY(CD4066_GATE,          CD4066_GATE,            "")
-	/* entries with suffix _WI are legacy only */
+	/* entries with suffix WI are legacy only */
 	ENTRY(CD4020,               CD4020_WI,              "+IP,RESET,VDD,VSS")
 	//ENTRY(4066,                 CD_4066,              "+A,B")
 	ENTRY(NE555,                NE555,                  "-")

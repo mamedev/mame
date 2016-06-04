@@ -22,8 +22,8 @@
 #include "nl_base.h"
 #include "analog/nld_twoterm.h"
 
-#define NE555(_name)                                                        \
-		NET_REGISTER_DEV(NE555, _name)
+#define NE555(name)                                                        \
+		NET_REGISTER_DEV(NE555, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -77,8 +77,8 @@ private:
 
 };
 
-#define NE555_DIP(_name)                                                         \
-		NET_REGISTER_DEV(NE555_DIP, _name)
+#define NE555_DIP(name)                                                         \
+		NET_REGISTER_DEV(NE555_DIP, name)
 
 NETLIB_OBJECT_DERIVED(NE555_dip, NE555)
 {

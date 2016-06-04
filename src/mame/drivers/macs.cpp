@@ -91,7 +91,7 @@ public:
 	DECLARE_MACHINE_RESET(macs);
 	DECLARE_MACHINE_START(macs);
 	ST0016_DMA_OFFS_CB(dma_offset);
-	
+
 	UINT32 screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	optional_device<st0016_cpu_device> m_maincpu;

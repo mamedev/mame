@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Phil Stroffolino, Acho A. Tang, Nicola Salmoria
+
+#include "machine/gen_latch.h"
 #include "sound/k054539.h"
 #include "machine/k053252.h"
 #include "video/k055555.h"
@@ -15,6 +17,9 @@ public:
 		m_k053252(*this, "k053252"),
 		m_k056832(*this, "k056832"),
 		m_k055673(*this, "k055673"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch3(*this, "soundlatch3"),
 		m_gx_workram(*this,"gx_workram"),
 		m_spriteram(*this,"spriteram")
 		{ }
@@ -23,6 +28,9 @@ public:
 	required_device<k053252_device> m_k053252;
 	required_device<k056832_device> m_k056832;
 	required_device<k055673_device> m_k055673;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<generic_latch_8_device> m_soundlatch3;
 	required_shared_ptr<UINT16> m_gx_workram;
 	optional_shared_ptr<UINT16> m_spriteram;
 	std::unique_ptr<UINT8[]> m_decoded;

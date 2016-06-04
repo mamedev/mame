@@ -114,80 +114,71 @@ function toolchain(_buildDir, _subDir)
 			os.exit(1)
 		end
 
-		if "android-arm" == _OPTIONS["gcc"] then
-
-			if not os.getenv("ANDROID_NDK_ARM") or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_ARM and ANDROID_NDK_ROOT envrionment variables.")
+		if string.find(_OPTIONS["gcc"], "android") then
+			if not  os.getenv("ANDROID_NDK_LLVM") then
+				print("Set ANDROID_NDK_LLVM envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"
-			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
-			premake.gcc.ar  = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
+			premake.gcc.cc  = "$(ANDROID_NDK_LLVM)/bin/clang"
+			premake.gcc.cxx = "$(ANDROID_NDK_LLVM)/bin/clang++"
 			premake.gcc.llvm = true
+		end
+
+		if "android-arm" == _OPTIONS["gcc"] then
+			if not os.getenv("ANDROID_NDK_ARM") then
+				print("Set ANDROID_NDK_ARM envrionment variables.")
+			end
+
+			premake.gcc.ar  = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-arm")
 		end
 
 		if "android-arm64" == _OPTIONS["gcc"] then
-
-			if not os.getenv("ANDROID_NDK_ARM64") or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_ARM64 and ANDROID_NDK_ROOT envrionment variables.")
+			if not os.getenv("ANDROID_NDK_ARM64") then
+				print("Set ANDROID_NDK_ARM64 envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"
-			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
-			premake.gcc.ar  = "$(ANDROID_NDK_ARM64)/bin/aarch64-linux-android-ar.exe"
+			premake.gcc.ar  = "$(ANDROID_NDK_ARM64)/bin/aarch64-linux-android-ar"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-arm64")
 		end
 
 		if "android-mips" == _OPTIONS["gcc"] then
-
-			if not os.getenv("ANDROID_NDK_MIPS") or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_MIPS and ANDROID_NDK_ROOT envrionment variables.")
+			if not os.getenv("ANDROID_NDK_MIPS") then
+				print("Set ANDROID_NDK_MIPS envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"
-			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-ar"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-mips")
 		end
 
 		if "android-mips64" == _OPTIONS["gcc"] then
-
-			if not os.getenv("ANDROID_NDK_MIPS64") or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_MIPS64 and ANDROID_NDK_ROOT envrionment variables.")
+			if not os.getenv("ANDROID_NDK_MIPS64") then
+				print("Set ANDROID_NDK_MIPS64 envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"
-			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
-			premake.gcc.ar  = "$(ANDROID_NDK_MIPS64)/bin/mips64el-linux-android-ar.exe"
+			premake.gcc.ar  = "$(ANDROID_NDK_MIPS64)/bin/mips64el-linux-android-ar"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-mips64")
 		end
 
 		if "android-x86" == _OPTIONS["gcc"] then
-
-			if not os.getenv("ANDROID_NDK_X86") or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_X86 and ANDROID_NDK_ROOT envrionment variables.")
+			if not os.getenv("ANDROID_NDK_X86") then
+				print("Set ANDROID_NDK_X86 envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"
-			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 			premake.gcc.ar  = "$(ANDROID_NDK_X86)/bin/i686-linux-android-ar"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-x86")
 		end
 
 		if "android-x64" == _OPTIONS["gcc"] then
-
-			if not os.getenv("ANDROID_NDK_X64") or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_X64 and ANDROID_NDK_ROOT envrionment variables.")
+			if not os.getenv("ANDROID_NDK_X64") then
+				print("Set ANDROID_NDK_X64 envrionment variables.")
 			end
 
-			premake.gcc.cc  = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"
-			premake.gcc.cxx = "$(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
-			premake.gcc.ar  = "$(ANDROID_NDK_X64)/bin/x86_64-linux-android-ar.exe"
+			premake.gcc.ar  = "$(ANDROID_NDK_X64)/bin/x86_64-linux-android-ar"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-x64")
 		end
@@ -373,7 +364,7 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ci20")
 		end
 
-	elseif _ACTION == "vs2013" or _ACTION == "vs2015" then
+	elseif _ACTION == "vs2013" or _ACTION == "vs2015" or _ACTION == "vs2015-fastbuild" then
 
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("LLVM-" .. _ACTION)

@@ -95,7 +95,6 @@ public:
 	// static callbacks
 
 	static LRESULT CALLBACK video_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
-	static unsigned __stdcall thread_entry(void *param);
 
 	// member variables
 
@@ -186,11 +185,9 @@ void winwindow_toggle_fsfx(void);
 void winwindow_process_events_periodic(running_machine &machine);
 void winwindow_process_events(running_machine &machine, int ingame, bool nodispatch);
 
-void winwindow_ui_pause_from_window_thread(running_machine &machine, int pause);
-void winwindow_ui_pause_from_main_thread(running_machine &machine, int pause);
+void winwindow_ui_pause(running_machine &machine, int pause);
 int winwindow_ui_is_paused(running_machine &machine);
 
-void winwindow_ui_exec_on_main_thread(void (*func)(void *), void *param);
 void winwindow_dispatch_message(running_machine &machine, MSG *message);
 
 extern int win_create_menu(running_machine &machine, HMENU *menus);

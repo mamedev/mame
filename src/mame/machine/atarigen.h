@@ -357,7 +357,6 @@ public:
 	// slapstic helpers
 	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, UINT8 *mem);
 	void slapstic_update_bank(int bank);
-	DECLARE_DIRECT_UPDATE_MEMBER(slapstic_setdirect);
 	DECLARE_WRITE16_MEMBER(slapstic_w);
 	DECLARE_READ16_MEMBER(slapstic_r);
 

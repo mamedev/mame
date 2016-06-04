@@ -471,7 +471,7 @@ public:
 
 				// loop over channels and read the samples
 				int channels = MIN(m_info.channels, ARRAY_LENGTH(m_audio));
-				INT16 *samplesptr[ARRAY_LENGTH(m_audio)];
+				EQUIVALENT_ARRAY(m_audio, INT16 *) samplesptr;
 				for (int chnum = 0; chnum < channels; chnum++)
 				{
 					// read the sound samples
@@ -1790,6 +1790,10 @@ static void do_create_hd(parameters_t &params)
 		cylinders = (identdata[3] << 8) | identdata[2];
 		heads = (identdata[7] << 8) | identdata[6];
 		sectors = (identdata[13] << 8) | identdata[12];
+
+		// ignore CHS for > 8GB drives
+		if (cylinders * heads * sectors >= 16514064)
+			cylinders = 0;
 	}
 
 	// extract geometry from the parent if we have one

@@ -25,16 +25,16 @@
 	end
 
 	function layout.reset()
-		board = 
+		board =
 			{{ 3, 5, 4, 2, 1, 4, 5, 3},
-	 		 { 6, 6, 6, 6, 6, 6, 6, 6},
-			 { 0, 0, 0, 0, 0, 0, 0, 0},
-			 { 0, 0, 0, 0, 0, 0, 0, 0},
-			 { 0, 0, 0, 0, 0, 0, 0, 0},
-			 { 0, 0, 0, 0, 0, 0, 0, 0},
-			 {12,12,12,12,12,12,12,12},
-			 { 9,11,10, 8, 7,10,11, 9}}
-		
+				{ 6, 6, 6, 6, 6, 6, 6, 6},
+				{ 0, 0, 0, 0, 0, 0, 0, 0},
+				{ 0, 0, 0, 0, 0, 0, 0, 0},
+				{ 0, 0, 0, 0, 0, 0, 0, 0},
+				{ 0, 0, 0, 0, 0, 0, 0, 0},
+				{12,12,12,12,12,12,12,12},
+				{ 9,11,10, 8, 7,10,11, 9}}
+
 		for y, row in ipairs(board) do
 			for x, cell in ipairs(row) do
 				machine:outputs():set_indexed_value("pos", (y * 10) + x, board[y][x])
@@ -49,7 +49,7 @@
 			layout.reset()
 			return
 		end
-		
+
 		for x, tag in ipairs(port_tags) do
 			local port = ports[tag]
 			if port then
@@ -260,7 +260,7 @@
 		<text string="&#x265d;" state="4"><color red="0.27" green="0.25" blue="0.25" /></text>
 		<text string="&#x265e;" state="5"><color red="0.27" green="0.25" blue="0.25" /></text>
 		<text string="&#x265f;" state="6"><color red="0.27" green="0.25" blue="0.25" /></text>
-		
+
 		<text string="&#x265a;" state="7"><color red="0.71" green="0.7" blue="0.69" /></text>
 		<text string="&#x265b;" state="8"><color red="0.71" green="0.7" blue="0.69" /></text>
 		<text string="&#x265c;" state="9"><color red="0.71" green="0.7" blue="0.69" /></text>

@@ -5,6 +5,8 @@
     Combat School
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 #include "sound/upd7759.h"
 #include "sound/msm5205.h"
 #include "video/k007121.h"
@@ -14,14 +16,15 @@ class combatsc_state : public driver_device
 public:
 	combatsc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121_1(*this, "k007121_1"),
 		m_k007121_2(*this, "k007121_2"),
-		m_maincpu(*this, "maincpu"),
 		m_upd7759(*this, "upd"),
 		m_msm5205(*this, "msm5205"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	UINT8 *    m_videoram;
@@ -50,14 +53,15 @@ public:
 
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<k007121_device> m_k007121_1;
 	optional_device<k007121_device> m_k007121_2;
-	required_device<cpu_device> m_maincpu;
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<msm5205_device> m_msm5205;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(combatsc_vreg_w);
 	DECLARE_WRITE8_MEMBER(combatscb_sh_irqtrigger_w);

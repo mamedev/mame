@@ -53,8 +53,8 @@
 #include "nld_system.h"
 #include "analog/nld_twoterm.h"
 
-#define TTL_74123(_name)                                                        \
-		NET_REGISTER_DEV(TTL_74123, _name)
+#define TTL_74123(name)                                                        \
+		NET_REGISTER_DEV(TTL_74123, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -64,6 +64,8 @@ NETLIB_OBJECT(74123)
 	, m_dev_type(dev_type)
 	, m_RP(*this, "RP")
 	, m_RN(*this, "RN")
+	, m_K(*this, "K", (m_dev_type == 4538) ? 0.4 : 0.4)
+	, m_RI(*this, "RI", 400.0) // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
 	{
 		if ((m_dev_type != 9602) && (m_dev_type != 4538) )
 			m_dev_type = 74123;
@@ -84,12 +86,6 @@ NETLIB_OBJECT(74123)
 		register_subalias("C",   m_RN.m_R.m_N);
 		register_subalias("RC",  m_RN.m_R.m_P);
 
-		if (m_dev_type == 4538)
-			register_param("K", m_K, 0.4);
-		else
-			register_param("K", m_K, 0.4);
-
-		register_param("RI", m_RI, 400.0); // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
 
 		connect_late(m_RP_Q, m_RP.m_I);
 		connect_late(m_RN_Q, m_RN.m_I);
@@ -130,8 +126,8 @@ public:
 	param_double_t m_RI;
 };
 
-#define TTL_74123_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_74123_DIP, _name)
+#define TTL_74123_DIP(name)                                                         \
+		NET_REGISTER_DEV(TTL_74123_DIP, name)
 
 NETLIB_OBJECT(74123_dip)
 {
@@ -170,8 +166,8 @@ private:
  * THe 9602 uses an OR gate instead of an AND gate.
  */
 
-#define TTL_9602_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_9602_DIP, _name)
+#define TTL_9602_DIP(name)                                                         \
+		NET_REGISTER_DEV(TTL_9602_DIP, name)
 
 NETLIB_OBJECT(9602_dip)
 {
@@ -210,8 +206,8 @@ private:
  * The CD4538 is pretty similar to the 9602
  */
 
-#define CD4538_DIP(_name)                                                         \
-		NET_REGISTER_DEV(CD4538_DIP, _name)
+#define CD4538_DIP(name)                                                         \
+		NET_REGISTER_DEV(CD4538_DIP, name)
 
 NETLIB_OBJECT(4538_dip)
 {

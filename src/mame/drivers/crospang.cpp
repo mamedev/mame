@@ -44,7 +44,7 @@ WRITE16_MEMBER(crospang_state::crospang_soundlatch_w)
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 	}
 }
 
@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( crospang_sound_io_map, AS_IO, 8, crospang_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -376,6 +376,8 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

@@ -1542,10 +1542,6 @@ const input_seq &ioport_field::seq(input_seq_type seqtype) const
 	if (m_live == nullptr)
 		return defseq(seqtype);
 
-	// if the field is disabled, return no key
-	if (unused())
-		return input_seq::empty_seq;
-
 	// if the sequence is the special default code, return the expanded default value
 	if (m_live->seq[seqtype].is_default())
 		return manager().type_seq(m_type, m_player, seqtype);
@@ -1562,10 +1558,6 @@ const input_seq &ioport_field::seq(input_seq_type seqtype) const
 
 const input_seq &ioport_field::defseq(input_seq_type seqtype) const
 {
-	// if the field is disabled, return no key
-	if (unused())
-		return input_seq::empty_seq;
-
 	// if the sequence is the special default code, return the expanded default value
 	if (m_seq[seqtype].is_default())
 		return manager().type_seq(m_type, m_player, seqtype);

@@ -3,6 +3,14 @@
 
 [![Join the chat at https://gitter.im/mamedev/mame](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mamedev/mame?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+Build status for tiny build only, containing just core parts of project
+
+| OS/Compiler        | Status           | 
+| ------------- |:-------------:| 
+|Linux GCC / OSX Clang| [![Build Status](https://travis-ci.org/mamedev/mame.svg?branch=master)](https://travis-ci.org/mamedev/mame) |
+|Windows MinGW | [![Build Status](https://tea-ci.org/api/badges/mamedev/mame/status.svg)](https://tea-ci.org/mamedev/mame) |
+
+
 What is MAME?
 =============
 

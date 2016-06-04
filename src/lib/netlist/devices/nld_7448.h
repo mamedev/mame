@@ -27,18 +27,18 @@
 #include "nl_base.h"
 #include "nld_truthtable.h"
 
-#define TTL_7448(_name, _A0, _A1, _A2, _A3, _LTQ, _BIQ, _RBIQ)                      \
-		NET_REGISTER_DEV(TTL_7448, _name)                                               \
-		NET_CONNECT(_name, A, _A0)                                                  \
-		NET_CONNECT(_name, B, _A1)                                                  \
-		NET_CONNECT(_name, C, _A2)                                                  \
-		NET_CONNECT(_name, D, _A3)                                                  \
-		NET_CONNECT(_name, LTQ, _LTQ)                                               \
-		NET_CONNECT(_name, BIQ, _BIQ)                                               \
-		NET_CONNECT(_name, RBIQ, _RBIQ)
+#define TTL_7448(name, cA0, cA1, cA2, cA3, cLTQ, cBIQ, cRBIQ)                      \
+		NET_REGISTER_DEV(TTL_7448, name)                                               \
+		NET_CONNECT(name, A, cA0)                                                  \
+		NET_CONNECT(name, B, cA1)                                                  \
+		NET_CONNECT(name, C, cA2)                                                  \
+		NET_CONNECT(name, D, cA3)                                                  \
+		NET_CONNECT(name, LTQ, cLTQ)                                               \
+		NET_CONNECT(name, BIQ, cBIQ)                                               \
+		NET_CONNECT(name, RBIQ, cRBIQ)
 
-#define TTL_7448_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_7448_DIP, _name)
+#define TTL_7448_DIP(name)                                                         \
+		NET_REGISTER_DEV(TTL_7448_DIP, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

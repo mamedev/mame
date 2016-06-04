@@ -54,7 +54,7 @@ protected:
 
 	double get_sp_val(const pstring &sin);
 
-	pstream_fmt_writer_t out;
+	plib::pstream_fmt_writer_t out;
 private:
 
 	struct net_t
@@ -64,14 +64,14 @@ private:
 		: m_name(aname), m_no_export(false) {}
 
 		const pstring &name() { return m_name;}
-		pstring_vector_t &terminals() { return m_terminals; }
+		plib::pstring_vector_t &terminals() { return m_terminals; }
 		void set_no_export() { m_no_export = true; }
 		bool is_no_export() { return m_no_export; }
 
 	private:
 		pstring m_name;
 		bool m_no_export;
-		pstring_vector_t m_terminals;
+		plib::pstring_vector_t m_terminals;
 	};
 
 	struct dev_t
@@ -128,12 +128,12 @@ private:
 
 	void add_device(std::shared_ptr<dev_t> dev);
 
-	postringstream m_buf;
+	plib::postringstream m_buf;
 
-	pvector_t<std::shared_ptr<dev_t>> m_devs;
-	phashmap_t<pstring, std::shared_ptr<net_t> > m_nets;
-	pvector_t<pstring> m_ext_alias;
-	phashmap_t<pstring, std::shared_ptr<pin_alias_t>> m_pins;
+	plib::pvector_t<std::shared_ptr<dev_t>> m_devs;
+	plib::hashmap_t<pstring, std::shared_ptr<net_t> > m_nets;
+	plib::pvector_t<pstring> m_ext_alias;
+	plib::hashmap_t<pstring, std::shared_ptr<pin_alias_t>> m_pins;
 
 	static unit_t m_units[];
 
@@ -167,11 +167,11 @@ public:
 	{
 	}
 
-	class eagle_tokenizer : public ptokenizer
+	class eagle_tokenizer : public plib::ptokenizer
 	{
 	public:
-		eagle_tokenizer(nl_convert_eagle_t &convert, pistream &strm)
-		: ptokenizer(strm), m_convert(convert)
+		eagle_tokenizer(nl_convert_eagle_t &convert, plib::pistream &strm)
+		: plib::ptokenizer(strm), m_convert(convert)
 		{
 			set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
 			set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers

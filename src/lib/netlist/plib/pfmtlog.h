@@ -4,8 +4,8 @@
  * pfmtlog.h
  */
 
-#ifndef _PFMT_H_
-#define _PFMT_H_
+#ifndef PFMT_H_
+#define PFMT_H_
 
 //#include <cstdarg>
 //#include <cstddef>
@@ -13,6 +13,8 @@
 #include "pconfig.h"
 #include "pstring.h"
 #include "ptypes.h"
+
+PLIB_NAMESPACE_START()
 
 template <typename T>
 struct ptype_treats
@@ -293,4 +295,7 @@ void plog_channel<L, build_enabled>::vdowrite(const pstring &ls) const
 	m_base->vlog(L, ls);
 }
 
-#endif /* _PSTRING_H_ */
+PLIB_NAMESPACE_END()
+
+
+#endif /* PSTRING_H_ */

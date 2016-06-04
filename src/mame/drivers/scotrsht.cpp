@@ -56,7 +56,7 @@ INTERRUPT_GEN_MEMBER(scotrsht_state::interrupt)
 
 WRITE8_MEMBER(scotrsht_state::soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( scotrsht_sound_map, AS_PROGRAM, 8, scotrsht_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scotrsht_sound_port, AS_IO, 8, scotrsht_state )
@@ -209,6 +209,8 @@ static MACHINE_CONFIG_START( scotrsht, scotrsht_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

@@ -11,10 +11,13 @@
 
 #pragma once
 
-#ifndef __UI_CUSTMENU_H__
-#define __UI_CUSTMENU_H__
+#ifndef MAME_FRONTEND_UI_CUSTMENU_H
+#define MAME_FRONTEND_UI_CUSTMENU_H
 
+#include "ui/menu.h"
 #include "ui/utils.h"
+
+namespace ui {
 
 // Software region
 struct c_sw_region
@@ -70,11 +73,11 @@ struct s_filter
 //-------------------------------------------------
 //  custom software filter menu class
 //-------------------------------------------------
-class ui_menu_swcustom_filter : public ui_menu
+class menu_swcustom_filter : public menu
 {
 public:
-	ui_menu_swcustom_filter(mame_ui_manager &mui, render_container *container, const game_driver *_driver, s_filter &_filter);
-	virtual ~ui_menu_swcustom_filter();
+	menu_swcustom_filter(mame_ui_manager &mui, render_container *container, const game_driver *_driver, s_filter &_filter);
+	virtual ~menu_swcustom_filter() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -103,11 +106,11 @@ private:
 //-------------------------------------------------
 //  custom filter menu class
 //-------------------------------------------------
-class ui_menu_custom_filter : public ui_menu
+class menu_custom_filter : public menu
 {
 public:
-	ui_menu_custom_filter(mame_ui_manager &mui, render_container *container, bool _single_menu = false);
-	virtual ~ui_menu_custom_filter();
+	menu_custom_filter(mame_ui_manager &mui, render_container *container, bool _single_menu = false);
+	virtual ~menu_custom_filter() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -128,4 +131,6 @@ private:
 	void save_custom_filters();
 };
 
-#endif  /* __UI_CUSTMENU_H__ */
+} // namespace ui
+
+#endif  /* MAME_FRONTEND_UI_CUSTMENU_H */

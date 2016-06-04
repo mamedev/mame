@@ -47,7 +47,7 @@
 #define TIMER_PERIOD            attotime::from_hz(m_clock)
 #define PCI_BUS_CLOCK        33000000
 // Number of dma words to transfer at a time, real hardware configurable between 8-32
-#define DMA_BURST_SIZE		 32
+#define DMA_BURST_SIZE       32
 #define DMA_TIMER_PERIOD     attotime::from_hz(PCI_BUS_CLOCK / 48)
 
 /* Galileo registers - 0x000-0x3ff */
@@ -290,7 +290,7 @@ private:
 	std::vector<UINT32> m_ram[4];
 
 	// Chip Select
-	std::vector<galileo_device_map> m_cs_map;
+	galileo_device_map m_cs_map[4];
 
 	template<int id> void map_trampoline(::address_map &map, device_t &device) {
 		m_cs_map[id].map(map, *m_cs_map[id].device);
@@ -305,7 +305,7 @@ private:
 
 	int m_last_dma;
 	emu_timer* m_dma_timer;
-	std::vector<galileo_addr_map> dma_addr_map;
+	galileo_addr_map dma_addr_map[proc_addr_bank::ADDR_NUM];
 	int dma_fetch_next(address_space &space, int which);
 	TIMER_CALLBACK_MEMBER(perform_dma);
 	address_space* dma_decode_address(UINT32 &addr);

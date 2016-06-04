@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( 1943, _1943_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/16) /* verified on pcb */

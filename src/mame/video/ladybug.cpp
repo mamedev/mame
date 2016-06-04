@@ -218,4 +218,3 @@ UINT32 ladybug_state::screen_update_ladybug(screen_device &screen, bitmap_ind16 
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
-

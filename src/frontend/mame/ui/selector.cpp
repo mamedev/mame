@@ -9,18 +9,21 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "mame.h"
-#include "ui/ui.h"
-#include "ui/menu.h"
+
 #include "ui/selector.h"
+#include "ui/ui.h"
 #include "ui/inifile.h"
+
+#include "mame.h"
+
+namespace ui {
 
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_selector::ui_menu_selector(mame_ui_manager &mui, render_container *container, std::vector<std::string> const &s_sel, UINT16 &s_actual, int category, int _hover)
-	: ui_menu(mui, container)
+menu_selector::menu_selector(mame_ui_manager &mui, render_container *container, std::vector<std::string> const &s_sel, UINT16 &s_actual, int category, int _hover)
+	: menu(mui, container)
 	, m_selector(s_actual)
 	, m_category(category)
 	, m_hover(_hover)
@@ -31,8 +34,8 @@ ui_menu_selector::ui_menu_selector(mame_ui_manager &mui, render_container *conta
 	m_searchlist[0] = nullptr;
 }
 
-ui_menu_selector::ui_menu_selector(mame_ui_manager &mui, render_container *container, std::vector<std::string> &&s_sel, UINT16 &s_actual, int category, int _hover)
-	: ui_menu(mui, container)
+menu_selector::menu_selector(mame_ui_manager &mui, render_container *container, std::vector<std::string> &&s_sel, UINT16 &s_actual, int category, int _hover)
+	: menu(mui, container)
 	, m_selector(s_actual)
 	, m_category(category)
 	, m_hover(_hover)
@@ -43,7 +46,7 @@ ui_menu_selector::ui_menu_selector(mame_ui_manager &mui, render_container *conta
 	m_searchlist[0] = nullptr;
 }
 
-ui_menu_selector::~ui_menu_selector()
+menu_selector::~menu_selector()
 {
 }
 
@@ -51,75 +54,75 @@ ui_menu_selector::~ui_menu_selector()
 //  handle
 //-------------------------------------------------
 
-void ui_menu_selector::handle()
+void menu_selector::handle()
 {
 	// process the menu
-	const ui_menu_event *m_event = process(0);
+	const event *menu_event = process(0);
 
-	if (m_event != nullptr && m_event->itemref != nullptr)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		if (m_event->iptkey == IPT_UI_SELECT)
+		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			for (size_t idx = 0; idx < m_str_items.size(); ++idx)
-				if ((void*)&m_str_items[idx] == m_event->itemref)
+				if ((void*)&m_str_items[idx] == menu_event->itemref)
 					m_selector = idx;
 
 			switch (m_category)
 			{
-				case SELECTOR_INIFILE:
-					mame_machine_manager::instance()->inifile().set_file(m_selector);
-					mame_machine_manager::instance()->inifile().set_cat(0);
-					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
-					break;
+			case INIFILE:
+				mame_machine_manager::instance()->inifile().set_file(m_selector);
+				mame_machine_manager::instance()->inifile().set_cat(0);
+				reset_parent(reset_options::REMEMBER_REF);
+				break;
 
-				case SELECTOR_CATEGORY:
-					mame_machine_manager::instance()->inifile().set_cat(m_selector);
-					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
-					break;
+			case CATEGORY:
+				mame_machine_manager::instance()->inifile().set_cat(m_selector);
+				reset_parent(reset_options::REMEMBER_REF);
+				break;
 
-				case SELECTOR_GAME:
-					main_filters::actual = m_hover;
-					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
-					break;
+			case GAME:
+				main_filters::actual = m_hover;
+				reset_parent(reset_options::SELECT_FIRST);
+				break;
 
-				case SELECTOR_SOFTWARE:
-					sw_filters::actual = m_hover;
-					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
-					break;
+			case SOFTWARE:
+				sw_filters::actual = m_hover;
+				reset_parent(reset_options::SELECT_FIRST);
+				break;
 
-				default:
-					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
-					break;
+			default:
+				reset_parent(reset_options::REMEMBER_REF);
+				break;
 			}
 
 			ui_globals::switch_image = true;
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 		}
-		else if (m_event->iptkey == IPT_SPECIAL)
+		else if (menu_event->iptkey == IPT_SPECIAL)
 		{
-			int buflen = strlen(m_search);
-
-			// if it's a backspace and we can handle it, do so
-			if ((m_event->unichar == 8 || m_event->unichar == 0x7f) && buflen > 0)
+			auto const buflen = strlen(m_search);
+			if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
 			{
-				*(char *)utf8_previous_char(&m_search[buflen]) = 0;
-				reset(UI_MENU_RESET_SELECT_FIRST);
+				// if it's a backspace and we can handle it, do so
+				if (0 < buflen)
+				{
+					*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
+					reset(reset_options::SELECT_FIRST);
+				}
 			}
-
-			// if it's any other key and we're not maxed out, update
-			else if (m_event->unichar >= ' ' && m_event->unichar < 0x7f)
+			else if (menu_event->is_char_printable())
 			{
-				buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, m_event->unichar);
-				m_search[buflen] = 0;
-				reset(UI_MENU_RESET_SELECT_FIRST);
+				// if it's any other key and we're not maxed out, update
+				if (menu_event->append_char(m_search, buflen))
+					reset(reset_options::SELECT_FIRST);
 			}
 		}
 
 		// escape pressed with non-empty text clears the text
-		else if (m_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
+		else if (menu_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
 		{
 			m_search[0] = '\0';
-			reset(UI_MENU_RESET_SELECT_FIRST);
+			reset(reset_options::SELECT_FIRST);
 		}
 	}
 }
@@ -128,7 +131,7 @@ void ui_menu_selector::handle()
 //  populate
 //-------------------------------------------------
 
-void ui_menu_selector::populate()
+void menu_selector::populate()
 {
 	if (m_search[0] != 0)
 	{
@@ -150,7 +153,7 @@ void ui_menu_selector::populate()
 			}
 	}
 
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR);
 	customtop = custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	m_first_pass = false;
 }
@@ -159,7 +162,7 @@ void ui_menu_selector::populate()
 //  perform our special rendering
 //-------------------------------------------------
 
-void ui_menu_selector::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_selector::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
 	std::string tempbuf = std::string(_("Selection List - Search: ")).append(m_search).append("_");
@@ -221,7 +224,7 @@ void ui_menu_selector::custom_render(void *selectedref, float top, float bottom,
 //  find approximate matches
 //-------------------------------------------------
 
-void ui_menu_selector::find_matches(const char *str)
+void menu_selector::find_matches(const char *str)
 {
 	// allocate memory to track the penalty value
 	std::vector<int> penalty(VISIBLE_GAMES_IN_SEARCH, 9999);
@@ -255,3 +258,5 @@ void ui_menu_selector::find_matches(const char *str)
 	}
 	(index < VISIBLE_GAMES_IN_SEARCH) ? m_searchlist[index] = nullptr : m_searchlist[VISIBLE_GAMES_IN_SEARCH] = nullptr;
 }
+
+} // namespace ui

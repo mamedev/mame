@@ -10,29 +10,40 @@
 
 #pragma once
 
-#ifndef __UI_PLUGINOPT_H__
-#define __UI_PLUGINOPT_H__
+#ifndef MAME_FRONTEND_UI_PLUGINOPT_H
+#define MAME_FRONTEND_UI_PLUGINOPT_H
 
 #include "ui/ui.h"
 #include "ui/menu.h"
 
-class ui_menu_plugin : public ui_menu {
+#include <string>
+#include <vector>
+
+
+namespace ui {
+
+class menu_plugin : public menu
+{
 public:
-	ui_menu_plugin(mame_ui_manager &mui, render_container *container);
-	virtual ~ui_menu_plugin();
+	menu_plugin(mame_ui_manager &mui, render_container *container);
+	virtual ~menu_plugin();
 	virtual void populate() override;
 	virtual void handle() override;
 private:
 	std::vector<std::string> &m_plugins;
 };
 
-class ui_menu_plugin_opt : public ui_menu {
+class menu_plugin_opt : public menu
+{
 public:
-	ui_menu_plugin_opt(mame_ui_manager &mui, render_container *container, char *menu);
-	virtual ~ui_menu_plugin_opt();
+	menu_plugin_opt(mame_ui_manager &mui, render_container *container, char *menu);
+	virtual ~menu_plugin_opt();
 	virtual void populate() override;
 	virtual void handle() override;
 private:
 	std::string m_menu;
 };
-#endif  /* __UI_PLUGINOPT_H__ */
+
+} // namespace ui
+
+#endif  /* MAME_FRONTEND_UI_PLUGINOPT_H */

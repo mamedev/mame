@@ -19,6 +19,7 @@ advision.cpp
 aim65.cpp
 aim65_40.cpp
 alesis.cpp
+alesis_qs.cpp
 alphasma.cpp
 alphatro.cpp
 altair.cpp
@@ -639,6 +640,7 @@ vixen.cpp
 vk100.cpp
 votrpss.cpp
 votrtnt.cpp
+vsmilepro.cpp
 vt100.cpp
 vt220.cpp
 vt240.cpp

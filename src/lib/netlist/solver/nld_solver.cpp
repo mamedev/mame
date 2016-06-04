@@ -99,7 +99,7 @@ ATTR_COLD matrix_solver_t::~matrix_solver_t()
 	m_inps.clear_and_free();
 	for (unsigned k = 0; k < m_terms.size(); k++)
 	{
-		pfree(m_terms[k]);
+		plib::pfree(m_terms[k]);
 	}
 
 }
@@ -114,8 +114,8 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 	for (auto & net : nets)
 	{
 		m_nets.push_back(net);
-		m_terms.push_back(palloc(terms_t));
-		m_rails_temp.push_back(palloc(terms_t));
+		m_terms.push_back(plib::palloc<terms_t>());
+		m_rails_temp.push_back(plib::palloc<terms_t>());
 	}
 
 	for (std::size_t k = 0; k < nets.size(); k++)
@@ -157,9 +157,9 @@ ATTR_COLD void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 						if (net_proxy_output == nullptr)
 						{
 							//net_proxy_output = palloc(analog_output_t(*this,
-							//      this->name() + "." + pfmt("m{1}")(m_inps.size())));
+							//      this->name() + "." + plib::pfmt("m{1}")(m_inps.size())));
 
-							net_proxy_output = palloc(analog_output_t(*this, this->name() + "." + pfmt("m{1}")(m_inps.size())));
+							net_proxy_output = plib::palloc<analog_output_t>(*this, this->name() + "." + plib::pfmt("m{1}")(m_inps.size()));
 							m_inps.push_back(net_proxy_output);
 							net_proxy_output->m_proxied_net = &p->net().as_analog();
 						}
@@ -196,7 +196,7 @@ ATTR_COLD void matrix_solver_t::setup_matrix()
 	}
 
 	for (unsigned k = 0; k < iN; k++)
-		pfree(m_rails_temp[k]); // no longer needed
+		plib::pfree(m_rails_temp[k]); // no longer needed
 
 	m_rails_temp.clear();
 
@@ -259,7 +259,7 @@ ATTR_COLD void matrix_solver_t::setup_matrix()
 		t->m_nz.push_back(k);     // add diagonal
 
 		/* and sort */
-		psort_list(t->m_nz);
+		plib::sort_list(t->m_nz);
 	}
 
 	/* create a list of non zero elements right of the diagonal
@@ -292,7 +292,7 @@ ATTR_COLD void matrix_solver_t::setup_matrix()
 				t->m_nzrd.push_back(other[i]);
 
 		/* and sort */
-		psort_list(t->m_nzrd);
+		plib::sort_list(t->m_nzrd);
 	}
 
 	/* create a list of non zero elements below diagonal k
@@ -336,9 +336,9 @@ ATTR_COLD void matrix_solver_t::setup_matrix()
 	if (0)
 		for (unsigned k = 0; k < iN; k++)
 		{
-			pstring line = pfmt("{1}")(k, "3");
+			pstring line = plib::pfmt("{1}")(k, "3");
 			for (unsigned j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				line += pfmt(" {1}")(m_terms[k]->m_nzrd[j], "3");
+				line += plib::pfmt(" {1}")(m_terms[k]->m_nzrd[j], "3");
 			log().verbose("{1}", line);
 		}
 
@@ -347,7 +347,7 @@ ATTR_COLD void matrix_solver_t::setup_matrix()
 	 */
 	for (unsigned k = 0; k < iN; k++)
 	{
-		pstring num = pfmt("{1}")(k);
+		pstring num = plib::pfmt("{1}")(k);
 
 		save(m_terms[k]->m_last_V, "lastV." + num);
 		save(m_terms[k]->m_DD_n_m_1, "m_DD_n_m_1." + num);
@@ -567,12 +567,6 @@ NETLIB_RESET(solver)
 		m_mat_solvers[i]->do_reset();
 }
 
-
-NETLIB_UPDATE_PARAM(solver)
-{
-	//m_inc = time::from_hz(m_freq.Value());
-}
-
 NETLIB_STOP(solver)
 {
 	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)
@@ -628,54 +622,54 @@ NETLIB_UPDATE(solver)
 	}
 }
 
-template <int m_N, int _storage_N>
+template <int m_N, int storage_N>
 matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_specific)
 {
-	pstring solvername = pfmt("Solver_{1}")(m_mat_solvers.size());
+	pstring solvername = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 	if (use_specific && m_N == 1)
-		return palloc(matrix_solver_direct1_t(netlist(), solvername, &m_params));
+		return plib::palloc<matrix_solver_direct1_t>(netlist(), solvername, &m_params);
 	else if (use_specific && m_N == 2)
-		return palloc(matrix_solver_direct2_t(netlist(), solvername, &m_params));
+		return plib::palloc<matrix_solver_direct2_t>(netlist(), solvername, &m_params);
 	else
 	{
 		if (size >= m_gs_threshold)
 		{
 			if (pstring("SOR_MAT").equals(m_iterative_solver))
 			{
-				typedef matrix_solver_SOR_mat_t<m_N,_storage_N> solver_sor_mat;
-				return palloc(solver_sor_mat(netlist(), solvername, &m_params, size));
+				typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
+				return plib::palloc<solver_sor_mat>(netlist(), solvername, &m_params, size);
 			}
 			else if (pstring("MAT_CR").equals(m_iterative_solver))
 			{
-				typedef matrix_solver_GCR_t<m_N,_storage_N> solver_mat;
-				return palloc(solver_mat(netlist(), solvername, &m_params, size));
+				typedef matrix_solver_GCR_t<m_N,storage_N> solver_mat;
+				return plib::palloc<solver_mat>(netlist(), solvername, &m_params, size);
 			}
 			else if (pstring("MAT").equals(m_iterative_solver))
 			{
-				typedef matrix_solver_direct_t<m_N,_storage_N> solver_mat;
-				return palloc(solver_mat(netlist(), solvername, &m_params, size));
+				typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
+				return plib::palloc<solver_mat>(netlist(), solvername, &m_params, size);
 			}
 			else if (pstring("SM").equals(m_iterative_solver))
 			{
 				/* Sherman-Morrison Formula */
-				typedef matrix_solver_sm_t<m_N,_storage_N> solver_mat;
-				return palloc(solver_mat(netlist(), solvername, &m_params, size));
+				typedef matrix_solver_sm_t<m_N,storage_N> solver_mat;
+				return plib::palloc<solver_mat>(netlist(), solvername, &m_params, size);
 			}
 			else if (pstring("W").equals(m_iterative_solver))
 			{
 				/* Woodbury Formula */
-				typedef matrix_solver_w_t<m_N,_storage_N> solver_mat;
-				return palloc(solver_mat(netlist(), solvername, &m_params, size));
+				typedef matrix_solver_w_t<m_N,storage_N> solver_mat;
+				return plib::palloc<solver_mat>(netlist(), solvername, &m_params, size);
 			}
 			else if (pstring("SOR").equals(m_iterative_solver))
 			{
-				typedef matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
-				return palloc(solver_GS(netlist(), solvername, &m_params, size));
+				typedef matrix_solver_SOR_t<m_N,storage_N> solver_GS;
+				return plib::palloc<solver_GS>(netlist(), solvername, &m_params, size);
 			}
 			else if (pstring("GMRES").equals(m_iterative_solver))
 			{
-				typedef matrix_solver_GMRES_t<m_N,_storage_N> solver_GMRES;
-				return palloc(solver_GMRES(netlist(), solvername, &m_params, size));
+				typedef matrix_solver_GMRES_t<m_N,storage_N> solver_GMRES;
+				return plib::palloc<solver_GMRES>(netlist(), solvername, &m_params, size);
 			}
 			else
 			{
@@ -685,15 +679,15 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 		}
 		else
 		{
-			typedef matrix_solver_direct_t<m_N,_storage_N> solver_D;
-			return palloc(solver_D(netlist(), solvername, &m_params, size));
+			typedef matrix_solver_direct_t<m_N,storage_N> solver_D;
+			return plib::palloc<solver_D>(netlist(), solvername, &m_params, size);
 		}
 	}
 }
 
 ATTR_COLD void NETLIB_NAME(solver)::post_start()
 {
-	pvector_t<analog_net_t::list_t> groups;
+	plib::pvector_t<analog_net_t::list_t> groups;
 	const bool use_specific = true;
 
 	m_params.m_pivot = m_pivot.Value();
@@ -846,7 +840,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	}
 }
 
-void NETLIB_NAME(solver)::create_solver_code(postream &strm)
+void NETLIB_NAME(solver)::create_solver_code(plib::postream &strm)
 {
 	for (auto & s : m_mat_solvers)
 		s->create_solver_code(strm);

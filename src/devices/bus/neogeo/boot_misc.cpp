@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 /***********************************************************************************************************
- 
+
  Neo Geo cart emulation
  Misc. bootleg cart types (possibly to be split further at a later stage)
 
@@ -286,4 +286,3 @@ void neogeo_kog_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_prot->sx_decrypt(fix_region, fix_region_size, 1);
 	m_prot->cx_decrypt(spr_region, spr_region_size);
 }
-

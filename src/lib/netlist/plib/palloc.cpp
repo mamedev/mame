@@ -9,6 +9,9 @@
 
 #include "pconfig.h"
 #include "palloc.h"
+
+PLIB_NAMESPACE_START()
+
 //============================================================
 //  Exceptions
 //============================================================
@@ -18,42 +21,6 @@ pexception::pexception(const pstring &text)
 	m_text = text;
 	fprintf(stderr, "%s\n", m_text.cstr());
 }
-
-#if (PSTANDALONE)
-#include <stdlib.h>
-#include <xmmintrin.h>
-
-class pmemory_pool
-{
-public:
-	pmemory_pool() {}
-};
-
-static pmemory_pool sppool;
-
-pmemory_pool *ppool = &sppool;
-
-void* operator new(std::size_t size, pmemory_pool *pool) throw (std::bad_alloc)
-{
-	return palloc_raw(size);;
-}
-
-void operator delete(void *ptr, pmemory_pool *pool)
-{
-	if (ptr != nullptr)
-		pfree_raw(ptr);
-}
-
-void *palloc_raw(const size_t size)
-{
-	return _mm_malloc(size, 64);
-}
-
-void pfree_raw(void *p)
-{
-	_mm_free(p);
-}
-#endif
 
 pmempool::pmempool(int min_alloc, int min_align)
 : m_min_alloc(min_alloc), m_min_align(min_align)
@@ -127,3 +94,5 @@ void pmempool::free(void *ptr)
 	}
 	b->m_num_alloc--;
 }
+
+PLIB_NAMESPACE_END()

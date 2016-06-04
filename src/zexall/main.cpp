@@ -48,7 +48,7 @@ public:
 
 	~zexall_machine_manager() { delete m_manager;  m_manager = nullptr; }
 
-	int execute() 
+	int execute()
 	{
 		auto system = &GAME_NAME(zexall);
 		machine_config config(*system, m_options);

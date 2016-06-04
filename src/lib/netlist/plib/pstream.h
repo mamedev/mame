@@ -4,8 +4,8 @@
  * pstream.h
  */
 
-#ifndef _PSTREAM_H_
-#define _PSTREAM_H_
+#ifndef PSTREAM_H_
+#define PSTREAM_H_
 
 #include <cstdarg>
 #include <cstddef>
@@ -15,6 +15,8 @@
 #include "pstring.h"
 #include "palloc.h"
 #include "pfmtlog.h"
+
+PLIB_NAMESPACE_START()
 
 // -----------------------------------------------------------------------------
 // pstream: things common to all streams
@@ -357,7 +359,7 @@ private:
 // pstream_fmt_writer_t: writer on top of ostream
 // -----------------------------------------------------------------------------
 
-class pstream_fmt_writer_t : public pfmt_writer_t<>
+class pstream_fmt_writer_t : public plib::pfmt_writer_t<>
 {
 	P_PREVENT_COPYING(pstream_fmt_writer_t)
 public:
@@ -375,4 +377,6 @@ private:
 	postream &m_strm;
 };
 
-#endif /* _PSTREAM_H_ */
+PLIB_NAMESPACE_END()
+
+#endif /* PSTREAM_H_ */

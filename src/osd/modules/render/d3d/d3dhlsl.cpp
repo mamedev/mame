@@ -389,7 +389,7 @@ void shaders::end_avi_recording()
 //  shaders::toggle
 //============================================================
 
-void shaders::toggle(std::vector<ui_menu_item>& sliders)
+void shaders::toggle(std::vector<ui::menu_item>& sliders)
 {
 	if (master_enable)
 	{
@@ -824,7 +824,7 @@ void shaders::init_fsfx_quad(void *vertbuf)
 //  shaders::create_resources
 //============================================================
 
-int shaders::create_resources(bool reset, std::vector<ui_menu_item>& sliders)
+int shaders::create_resources(bool reset, std::vector<ui::menu_item>& sliders)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 	{
@@ -1000,7 +1000,7 @@ int shaders::create_resources(bool reset, std::vector<ui_menu_item>& sliders)
 
 	initialized = true;
 
-	std::vector<ui_menu_item> my_sliders = init_slider_list();
+	std::vector<ui::menu_item> my_sliders = init_slider_list();
 	sliders.insert(sliders.end(), my_sliders.begin(), my_sliders.end());
 
 	return 0;
@@ -2184,7 +2184,7 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //  be done in a more ideal way.
 //============================================================
 
-static slider_state *slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
+slider_state* shaders::slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, void *arg)
 {
 	int size = sizeof(slider_state) + strlen(title);
 	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(machine, UINT8, size));
@@ -2193,7 +2193,10 @@ static slider_state *slider_alloc(running_machine &machine, int id, const char *
 	state->defval = defval;
 	state->maxval = maxval;
 	state->incval = incval;
-	state->update = update;
+
+	using namespace std::placeholders;
+	state->update = std::bind(&shaders::slider_changed, this, _1, _2, _3, _4, _5);
+
 	state->arg = arg;
 	state->id = id;
 	strcpy(state->description, title);
@@ -2267,7 +2270,7 @@ INT32 slider::update(std::string *str, INT32 newval)
 	return 0;
 }
 
-static INT32 slider_update_trampoline(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+INT32 shaders::slider_changed(running_machine& /*machine*/, void *arg, int /*id*/, std::string *str, INT32 newval)
 {
 	if (arg != nullptr)
 	{
@@ -2497,9 +2500,9 @@ void *shaders::get_slider_option(int id, int index)
 	return nullptr;
 }
 
-std::vector<ui_menu_item> shaders::init_slider_list()
+std::vector<ui::menu_item> shaders::init_slider_list()
 {
-	std::vector<ui_menu_item> sliders;
+	std::vector<ui::menu_item> sliders;
 
 	for (slider* slider : internal_sliders)
 	{
@@ -2558,14 +2561,14 @@ std::vector<ui_menu_item> shaders::init_slider_list()
 						break;
 				}
 
-				slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_update_trampoline, slider_arg);
+				slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
 
-				ui_menu_item item;
+				ui::menu_item item;
 				item.text = core_slider->description;
 				item.subtext = "";
 				item.flags = 0;
 				item.ref = core_slider;
-				item.type = ui_menu_item_type::SLIDER;
+				item.type = ui::menu_item_type::SLIDER;
 				sliders.push_back(item);
 			}
 		}

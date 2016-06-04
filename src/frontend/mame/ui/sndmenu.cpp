@@ -10,18 +10,19 @@
 
 #include "emu.h"
 #include "ui/ui.h"
-#include "ui/menu.h"
 #include "ui/sndmenu.h"
 #include "ui/selector.h"
 #include "../osd/modules/lib/osdobj_common.h" // TODO: remove
 
-const int ui_menu_sound_options::m_sound_rate[] = { 11025, 22050, 44100, 48000 };
+namespace ui {
+
+const int menu_sound_options::m_sound_rate[] = { 11025, 22050, 44100, 48000 };
 
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
-ui_menu_sound_options::ui_menu_sound_options(mame_ui_manager &mui, render_container *container) : ui_menu(mui, container)
+menu_sound_options::menu_sound_options(mame_ui_manager &mui, render_container *container) : menu(mui, container)
 {
 	osd_options &options = downcast<osd_options &>(mui.machine().options());
 
@@ -43,7 +44,7 @@ ui_menu_sound_options::ui_menu_sound_options(mame_ui_manager &mui, render_contai
 //  dtor
 //-------------------------------------------------
 
-ui_menu_sound_options::~ui_menu_sound_options()
+menu_sound_options::~menu_sound_options()
 {
 	std::string error_string;
 	emu_options &moptions = machine().options();
@@ -69,54 +70,54 @@ ui_menu_sound_options::~ui_menu_sound_options()
 //  handle
 //-------------------------------------------------
 
-void ui_menu_sound_options::handle()
+void menu_sound_options::handle()
 {
 	bool changed = false;
 
 	// process the menu
-	const ui_menu_event *m_event = process(0);
+	const event *menu_event = process(0);
 
-	if (m_event != nullptr && m_event->itemref != nullptr)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		switch ((FPTR)m_event->itemref)
+		switch ((FPTR)menu_event->itemref)
 		{
-			case ENABLE_SOUND:
-				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT || m_event->iptkey == IPT_UI_SELECT)
-				{
-					m_sound = !m_sound;
-					changed = true;
-				}
-				break;
+		case ENABLE_SOUND:
+			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
+			{
+				m_sound = !m_sound;
+				changed = true;
+			}
+			break;
 
-			case SAMPLE_RATE:
-				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT)
-				{
-					(m_event->iptkey == IPT_UI_LEFT) ? m_cur_rates-- : m_cur_rates++;
-					changed = true;
-				}
-				else if (m_event->iptkey == IPT_UI_SELECT)
-				{
-					int total = ARRAY_LENGTH(m_sound_rate);
-					std::vector<std::string> s_sel(total);
-					for (int index = 0; index < total; index++)
-						s_sel[index] = std::to_string(m_sound_rate[index]);
+		case SAMPLE_RATE:
+			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+			{
+				(menu_event->iptkey == IPT_UI_LEFT) ? m_cur_rates-- : m_cur_rates++;
+				changed = true;
+			}
+			else if (menu_event->iptkey == IPT_UI_SELECT)
+			{
+				int total = ARRAY_LENGTH(m_sound_rate);
+				std::vector<std::string> s_sel(total);
+				for (int index = 0; index < total; index++)
+					s_sel[index] = std::to_string(m_sound_rate[index]);
 
-					ui_menu::stack_push(global_alloc_clear<ui_menu_selector>(ui(), container, s_sel, m_cur_rates));
-				}
-				break;
+				menu::stack_push<menu_selector>(ui(), container, s_sel, m_cur_rates);
+			}
+			break;
 
-			case ENABLE_SAMPLES:
-				if (m_event->iptkey == IPT_UI_LEFT || m_event->iptkey == IPT_UI_RIGHT || m_event->iptkey == IPT_UI_SELECT)
-				{
-					m_samples = !m_samples;
-					changed = true;
-				}
-				break;
+		case ENABLE_SAMPLES:
+			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
+			{
+				m_samples = !m_samples;
+				changed = true;
+			}
+			break;
 		}
 	}
 
 	if (changed)
-		reset(UI_MENU_RESET_REMEMBER_REF);
+		reset(reset_options::REMEMBER_REF);
 
 }
 
@@ -124,16 +125,16 @@ void ui_menu_sound_options::handle()
 //  populate
 //-------------------------------------------------
 
-void ui_menu_sound_options::populate()
+void menu_sound_options::populate()
 {
 	UINT32 arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(m_sound_rate) - 1, m_cur_rates);
 	m_sample_rate = m_sound_rate[m_cur_rates];
 
 	// add options items
-	item_append(_("Sound"), m_sound ? _("On") : _("Off"), m_sound ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SOUND);
+	item_append(_("Sound"), m_sound ? _("On") : _("Off"), m_sound ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SOUND);
 	item_append(_("Sample Rate"), string_format("%d", m_sample_rate).c_str(), arrow_flags, (void *)(FPTR)SAMPLE_RATE);
-	item_append(_("Use External Samples"), m_samples ? _("On") : _("Off"), m_samples ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SAMPLES);
-	item_append(ui_menu_item_type::SEPARATOR);
+	item_append(_("Use External Samples"), m_samples ? _("On") : _("Off"), m_samples ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SAMPLES);
+	item_append(menu_item_type::SEPARATOR);
 
 	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
 }
@@ -142,7 +143,7 @@ void ui_menu_sound_options::populate()
 //  perform our special rendering
 //-------------------------------------------------
 
-void ui_menu_sound_options::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_sound_options::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
 	ui().draw_text_full(container, _("Sound Options"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
@@ -168,3 +169,5 @@ void ui_menu_sound_options::custom_render(void *selectedref, float top, float bo
 	ui().draw_text_full(container, _("Sound Options"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
+
+} // namespace ui

@@ -581,7 +581,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	</software>
 
 <!-- According to http://mercenaryforce.web.fc2.com/x68k/x68000/00013.html there should be a 3rd disk -->
-	<software name="aressha2">
+	<software name="aressh2">
 		<description>A Ressha de Ikou II X68000</description>
 		<year>1988</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -631,7 +631,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="aressha3">
+	<software name="aressh3">
 		<description>A Ressha de Ikou III</description>
 		<year>1991</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
@@ -651,7 +651,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="aressha3mc" cloneof="aressha3">
+	<software name="aressh3mc" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Map Construction</description>
 		<year>1991</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
@@ -671,7 +671,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="aressha3mc1" cloneof="aressha3">
+	<software name="aressh3mc1" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Map Construction (Alt?)</description>
 		<year>1991</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
@@ -682,7 +682,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="aressha3log" cloneof="aressha3">
+	<software name="aressh3log" cloneof="aressh3">
 		<description>A Ressha de Ikou III - LOGiN Map</description>
 		<year>1991</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -693,7 +693,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="aressha3oms" cloneof="aressha3">
+	<software name="aressh3oms" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Original Meitetsu Sharyou Disk</description>
 		<year>1991</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -7650,7 +7650,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="kouryuuk">
+	<software name="koryuki">
 		<description>Kouryuuki</description>
 		<year>1993</year>
 		<publisher>光栄 (Koei)</publisher>

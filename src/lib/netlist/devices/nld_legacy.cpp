@@ -32,7 +32,7 @@ NETLIB_UPDATE(nicRSFF)
 
 NETLIB_RESET(nicDelay)
 {
-	m_Q.initial(0);
+	//m_Q.initial(0);
 }
 
 NETLIB_UPDATE(nicDelay)

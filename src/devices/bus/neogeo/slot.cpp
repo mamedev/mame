@@ -3,7 +3,7 @@
 /***********************************************************************************************************
 
  SNK Neo Geo cartslot emulation
- 
+
  ***********************************************************************************************************/
 
 #include "slot.h"
@@ -44,15 +44,15 @@ UINT32 device_neogeo_cart_interface::get_region_mask(UINT8* rgn, UINT32 rgn_size
 	// get mask based on the length rounded up to the nearest power of 2
 	UINT32 mask = 0xffffffff;
 	UINT32 len = rgn_size;
-	
+
 	for (UINT32 bit = 0x80000000; bit != 0; bit >>= 1)
 	{
 		if ((len * 2 - 1) & bit)
 			break;
-		
+
 		mask >>= 1;
 	}
-	
+
 	return mask;
 }
 
@@ -64,7 +64,7 @@ void device_neogeo_cart_interface::optimize_sprites(UINT8* region_sprites, UINT3
 
 	m_sprites_opt.resize(spritegfx_address_mask + 1);
 	UINT8 *dest = &m_sprites_opt[0];
-	
+
 	for (unsigned i = 0; i < region_sprites_size; i += 0x80, src += 0x80)
 	{
 		for (unsigned y = 0; y < 0x10; y++)
@@ -76,7 +76,7 @@ void device_neogeo_cart_interface::optimize_sprites(UINT8* region_sprites, UINT3
 				(((src[0x42 | (y << 2)] >> x) & 0x01) << 1) |
 				(((src[0x40 | (y << 2)] >> x) & 0x01) << 0);
 			}
-			
+
 			for (unsigned x = 0; x < 8; x++)
 			{
 				*(dest++) = (((src[0x03 | (y << 2)] >> x) & 0x01) << 3) |
@@ -219,7 +219,7 @@ static int neogeo_get_pcb_id(const char *slot)
 		if (!core_stricmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
-	
+
 	return 0;
 }
 

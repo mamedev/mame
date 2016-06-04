@@ -59,10 +59,10 @@ void pvc_prot_device::pvc_write_pack_color()
 
 /*void pvc_prot_device::pvc_write_bankswitch()
 {
-	UINT32 bankaddress = ((m_cart_ram[0xff8] >> 8)|(m_cart_ram[0xff9] << 8));
-	m_cart_ram[0xff8] = (m_cart_ram[0xff8] & 0xfe00) | 0x00a0;
-	m_cart_ram[0xff9] &= 0x7fff;
-	m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress + 0x100000);
+    UINT32 bankaddress = ((m_cart_ram[0xff8] >> 8)|(m_cart_ram[0xff9] << 8));
+    m_cart_ram[0xff8] = (m_cart_ram[0xff8] & 0xfe00) | 0x00a0;
+    m_cart_ram[0xff9] &= 0x7fff;
+    m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress + 0x100000);
 }
  */
 
@@ -87,8 +87,8 @@ WRITE16_MEMBER( pvc_prot_device::protection_w )
 	else if (offset >= 0xff4 && offset <= 0xff5)
 		pvc_write_pack_color();
 	// FIXME: temporarily moved to the driver, through get_bank_base() above
-//	else if(offset >= 0xff8)
-//		pvc_write_bankswitch(space);
+//  else if(offset >= 0xff8)
+//      pvc_write_bankswitch(space);
 }
 
 
@@ -289,4 +289,3 @@ void pvc_prot_device::kof2003h_decrypt_68k(UINT8* rom, UINT32 size)
 	memcpy(&rom[0x100000], &buf[0x800000], 0x100000);
 	memcpy(&rom[0x200000], &buf[0x100000], 0x700000);
 }
-

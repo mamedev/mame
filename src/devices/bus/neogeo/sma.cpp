@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 /***********************************************************************************************************
- 
+
  Neo Geo cart emulation
  SMA encrypted cart type (+ CMC42 or CMC50)
 
@@ -149,4 +149,3 @@ void neogeo_sma_kof2000_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2000_GFX_KEY);
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 }
-

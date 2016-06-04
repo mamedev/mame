@@ -55,6 +55,7 @@ $7004 writes, related to $7000 reads
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 
 class olibochu_state : public driver_device
@@ -68,13 +69,20 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_spriteram2;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -93,9 +101,6 @@ public:
 	UINT32 screen_update_olibochu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(olibochu_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 
@@ -255,7 +260,7 @@ WRITE8_MEMBER(olibochu_state::sound_command_w)
 	for (c = 15; c >= 0; c--)
 		if (m_cmd & (1 << c)) break;
 
-	if (c >= 0) soundlatch_byte_w(space, 0, 15 - c);
+	if (c >= 0) m_soundlatch->write(space, 0, 15 - c);
 }
 
 
@@ -281,7 +286,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( olibochu_sound_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
-	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_byte_r) /* likely ay8910 input port, not direct */
+	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) /* likely ay8910 input port, not direct */
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x7004, 0x7004) AM_WRITENOP //sound filter?
 	AM_RANGE(0x7006, 0x7006) AM_WRITENOP //irq ack?
@@ -478,6 +483,8 @@ static MACHINE_CONFIG_START( olibochu, olibochu_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

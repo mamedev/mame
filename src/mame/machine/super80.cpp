@@ -31,9 +31,13 @@ READ8_MEMBER( super80_state::pio_port_b_r )
 
 /**************************** CASSETTE ROUTINES *****************************************************************/
 
-void super80_state::super80_cassette_motor( UINT8 data )
+void super80_state::super80_cassette_motor( bool motor_state )
 {
-	if (data)
+	// relay sound
+	if (BIT(m_last_data, 1) != motor_state)
+		m_samples->start(0, motor_state ? 0 : 1);
+
+	if (motor_state)
 		m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 	else
 		m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);

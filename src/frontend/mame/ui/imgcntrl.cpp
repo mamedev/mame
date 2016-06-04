@@ -9,17 +9,21 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "ui/ui.h"
-#include "ui/menu.h"
+
 #include "ui/imgcntrl.h"
+
+#include "ui/ui.h"
 #include "ui/filesel.h"
 #include "ui/swlist.h"
-#include "zippath.h"
-#include "drivenum.h"
-#include "audit.h"
-#include "softlist.h"
 
+#include "audit.h"
+#include "drivenum.h"
+#include "emuopts.h"
+#include "softlist.h"
+#include "zippath.h"
+
+
+namespace ui {
 
 /***************************************************************************
     IMPLEMENTATION
@@ -29,8 +33,8 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_control_device_image::ui_menu_control_device_image(mame_ui_manager &mui, render_container *container, device_image_interface *_image)
-	: ui_menu(mui, container),
+menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, render_container *container, device_image_interface *_image)
+	: menu(mui, container),
 		submenu_result(0),
 		create_ok(false),
 		create_confirmed(false)
@@ -72,7 +76,7 @@ ui_menu_control_device_image::ui_menu_control_device_image(mame_ui_manager &mui,
 //  dtor
 //-------------------------------------------------
 
-ui_menu_control_device_image::~ui_menu_control_device_image()
+menu_control_device_image::~menu_control_device_image()
 {
 }
 
@@ -81,7 +85,7 @@ ui_menu_control_device_image::~ui_menu_control_device_image()
 //  test_create - creates a new disk image
 //-------------------------------------------------
 
-void ui_menu_control_device_image::test_create(bool &can_create, bool &need_confirm)
+void menu_control_device_image::test_create(bool &can_create, bool &need_confirm)
 {
 	std::string path;
 	osd_directory_entry *entry;
@@ -130,7 +134,7 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 //  load_software_part
 //-------------------------------------------------
 
-void ui_menu_control_device_image::load_software_part()
+void menu_control_device_image::load_software_part()
 {
 	std::string temp_name = std::string(sld->list_name()).append(":").append(swi->shortname()).append(":").append(swp->name());
 
@@ -153,11 +157,11 @@ void ui_menu_control_device_image::load_software_part()
 //  hook_load
 //-------------------------------------------------
 
-void ui_menu_control_device_image::hook_load(std::string name, bool softlist)
+void menu_control_device_image::hook_load(std::string name, bool softlist)
 {
 	if (image->is_reset_on_load()) image->set_init_phase();
 	image->load(name.c_str());
-	ui_menu::stack_pop(machine());
+	menu::stack_pop(machine());
 }
 
 
@@ -165,7 +169,7 @@ void ui_menu_control_device_image::hook_load(std::string name, bool softlist)
 //  populate
 //-------------------------------------------------
 
-void ui_menu_control_device_image::populate()
+void menu_control_device_image::populate()
 {
 }
 
@@ -174,7 +178,7 @@ void ui_menu_control_device_image::populate()
 //  handle
 //-------------------------------------------------
 
-void ui_menu_control_device_image::handle()
+void menu_control_device_image::handle()
 {
 	switch(state) {
 	case START_FILE: {
@@ -187,31 +191,31 @@ void ui_menu_control_device_image::handle()
 				util::zippath_closedir(directory);
 		}
 		submenu_result = -1;
-		ui_menu::stack_push(global_alloc_clear<ui_menu_file_selector>(ui(), container, image, current_directory, current_file, true, image->image_interface()!=nullptr, can_create, &submenu_result));
+		menu::stack_push<menu_file_selector>(ui(), container, image, current_directory, current_file, true, image->image_interface()!=nullptr, can_create, &submenu_result);
 		state = SELECT_FILE;
 		break;
 	}
 
 	case START_SOFTLIST:
 		sld = nullptr;
-		ui_menu::stack_push(global_alloc_clear<ui_menu_software>(ui(), container, image->image_interface(), &sld));
+		menu::stack_push<menu_software>(ui(), container, image->image_interface(), &sld);
 		state = SELECT_SOFTLIST;
 		break;
 
 	case START_OTHER_PART: {
 		submenu_result = -1;
-		ui_menu::stack_push(global_alloc_clear<ui_menu_software_parts>(ui(), container, swi, swp->interface(), &swp, true, &submenu_result));
+		menu::stack_push<menu_software_parts>(ui(), container, swi, swp->interface(), &swp, true, &submenu_result);
 		state = SELECT_OTHER_PART;
 		break;
 	}
 
 	case SELECT_SOFTLIST:
 		if(!sld) {
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 			break;
 		}
 		software_info_name = "";
-		ui_menu::stack_push(global_alloc_clear<ui_menu_software_list>(ui(), container, sld, image->image_interface(), software_info_name));
+		menu::stack_push<menu_software_list>(ui(), container, sld, image->image_interface(), software_info_name);
 		state = SELECT_PARTLIST;
 		break;
 
@@ -223,7 +227,7 @@ void ui_menu_control_device_image::handle()
 		{
 			submenu_result = -1;
 			swp = nullptr;
-			ui_menu::stack_push(global_alloc_clear<ui_menu_software_parts>(ui(), container, swi, image->image_interface(), &swp, false, &submenu_result));
+			menu::stack_push<menu_software_parts>(ui(), container, swi, image->image_interface(), &swp, false, &submenu_result);
 			state = SELECT_ONE_PART;
 		}
 		else
@@ -235,7 +239,7 @@ void ui_menu_control_device_image::handle()
 
 	case SELECT_ONE_PART:
 		switch(submenu_result) {
-		case ui_menu_software_parts::T_ENTRY: {
+		case menu_software_parts::T_ENTRY: {
 			load_software_part();
 			break;
 		}
@@ -249,27 +253,27 @@ void ui_menu_control_device_image::handle()
 
 	case SELECT_OTHER_PART:
 		switch(submenu_result) {
-		case ui_menu_software_parts::T_ENTRY:
+		case menu_software_parts::T_ENTRY:
 			load_software_part();
 			break;
 
-		case ui_menu_software_parts::T_FMGR:
+		case menu_software_parts::T_FMGR:
 			state = START_FILE;
 			handle();
 			break;
 
-		case ui_menu_software_parts::T_EMPTY:
+		case menu_software_parts::T_EMPTY:
 			image->unload();
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 			break;
 
-		case ui_menu_software_parts::T_SWLIST:
+		case menu_software_parts::T_SWLIST:
 			state = START_SOFTLIST;
 			handle();
 			break;
 
 		case -1: // return to system
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 			break;
 
 		}
@@ -277,27 +281,27 @@ void ui_menu_control_device_image::handle()
 
 	case SELECT_FILE:
 		switch(submenu_result) {
-		case ui_menu_file_selector::R_EMPTY:
+		case menu_file_selector::R_EMPTY:
 			image->unload();
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 			break;
 
-		case ui_menu_file_selector::R_FILE:
+		case menu_file_selector::R_FILE:
 			hook_load(current_file, false);
 			break;
 
-		case ui_menu_file_selector::R_CREATE:
-			ui_menu::stack_push(global_alloc_clear<ui_menu_file_create>(ui(), container, image, current_directory, current_file, &create_ok));
+		case menu_file_selector::R_CREATE:
+			menu::stack_push<menu_file_create>(ui(), container, image, current_directory, current_file, &create_ok);
 			state = CHECK_CREATE;
 			break;
 
-		case ui_menu_file_selector::R_SOFTLIST:
+		case menu_file_selector::R_SOFTLIST:
 			state = START_SOFTLIST;
 			handle();
 			break;
 
 		case -1: // return to system
-			ui_menu::stack_pop(machine());
+			menu::stack_pop(machine());
 			break;
 		}
 		break;
@@ -307,7 +311,7 @@ void ui_menu_control_device_image::handle()
 		test_create(can_create, need_confirm);
 		if(can_create) {
 			if(need_confirm) {
-				ui_menu::stack_push(global_alloc_clear<ui_menu_confirm_save_as>(ui(), container, &create_confirmed));
+				menu::stack_push<menu_confirm_save_as>(ui(), container, &create_confirmed);
 				state = CREATE_CONFIRM;
 			} else {
 				state = DO_CREATE;
@@ -336,8 +340,10 @@ void ui_menu_control_device_image::handle()
 		int err = image->create(path.c_str(), nullptr, nullptr);
 		if (err != 0)
 			machine().popmessage("Error: %s", image->error());
-		ui_menu::stack_pop(machine());
+		menu::stack_pop(machine());
 		break;
 	}
 	}
 }
+
+} // namespace ui

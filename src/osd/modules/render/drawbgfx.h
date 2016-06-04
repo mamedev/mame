@@ -43,7 +43,7 @@ public:
 	virtual int draw(const int update) override;
 
 	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
-	virtual std::vector<ui_menu_item> get_slider_list() override;
+	virtual std::vector<ui::menu_item> get_slider_list() override;
 	virtual void set_sliders_dirty() override;
 
 #ifdef OSD_SDL
@@ -105,6 +105,7 @@ private:
 	void render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
 
 	void put_packed_quad(render_primitive *prim, UINT32 hash, ScreenVertex* vertex);
+	void put_packed_line(render_primitive *prim, ScreenVertex* vertex);
 	void put_polygon(const float* coords, UINT32 num_coords, float r, UINT32 rgba, ScreenVertex* vertex);
 	void put_line(float x0, float y0, float x1, float y1, float r, UINT32 rgba, ScreenVertex* vertex, float fth = 1.0f);
 

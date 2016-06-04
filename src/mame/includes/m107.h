@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "machine/pic8259.h"
 
 struct pf_layer_info
@@ -24,9 +25,10 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_upd71059c(*this, "upd71059c")
+		, m_soundlatch(*this, "soundlatch")
 		, m_spriteram(*this, "spriteram")
 		, m_vram_data(*this, "vram_data")
-		, m_upd71059c(*this, "upd71059c")
 		, m_user1_ptr(*this, "user1")
 	{
 	}
@@ -36,10 +38,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<pic8259_device> m_upd71059c;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_vram_data;
-	required_device<pic8259_device> m_upd71059c;
 	optional_region_ptr<UINT8> m_user1_ptr;
 
 	// driver init

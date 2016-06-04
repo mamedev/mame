@@ -446,8 +446,16 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_A_w)
 							}
 							break;
 
-		case 0x308/2   :    soundlatch_word_w(space,0,new_data,0xffff);
-							m_audiocpu->set_input_line(4, HOLD_LINE);
+		case 0x308/2   :    if (!m_hardware_type_z)
+							{	
+								m_soundlatch->write(space,0,new_data,0xffff);
+								m_audiocpu->set_input_line(4, HOLD_LINE);
+							}
+							else
+							{
+								m_soundlatch_z->write(space,0,new_data&0xff);
+								m_audiocpu->set_input_line(5, HOLD_LINE);
+							}
 							break;
 
 		default      :  SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
@@ -490,7 +498,7 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_monkelf_w)
 							}
 							break;
 
-		case 0x308/2   :    soundlatch_word_w(space,0,new_data,0xffff);
+		case 0x308/2   :    m_soundlatch->write(space,0,new_data,0xffff);
 							m_audiocpu->set_input_line(4, HOLD_LINE);
 							break;
 
@@ -505,7 +513,7 @@ READ16_MEMBER(megasys1_state::megasys1_vregs_C_r)
 {
 	switch (offset)
 	{
-		case 0x8000/2:  return soundlatch2_word_r(space,0,0xffff);
+		case 0x8000/2:  return m_soundlatch2->read(space,0,0xffff);
 		default:        return m_vregs[offset];
 	}
 }
@@ -540,7 +548,7 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_C_w)
 							break;
 
 		case 0x8000/2   :   /* Cybattler reads sound latch on irq 2 */
-							soundlatch_word_w(space, 0, new_data, 0xffff);
+							m_soundlatch->write(space, 0, new_data, 0xffff);
 							m_audiocpu->set_input_line(2, HOLD_LINE);
 							break;
 

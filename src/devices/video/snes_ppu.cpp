@@ -371,7 +371,7 @@ void snes_ppu_device::device_reset()
 	m_beam.latch_vert = 0;
 	m_beam.latch_horz = 0;
 	m_beam.current_vert = 0;
-	
+
 	/* Set STAT78 to NTSC or PAL */
 	m_stat78 = (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds()) >= 59.0) ? SNES_NTSC : SNES_PAL;
 	m_beam.last_visible_line = m_stat78 & SNES_PAL ? 240 : 225;

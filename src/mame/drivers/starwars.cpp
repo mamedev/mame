@@ -125,38 +125,6 @@ WRITE8_MEMBER(starwars_state::esb_slapstic_w)
 }
 
 
-
-/*************************************
- *
- *  ESB Opcode base handler
- *
- *************************************/
-
-DIRECT_UPDATE_MEMBER(starwars_state::esb_setdirect)
-{
-	/* if we are in the slapstic region, process it */
-	if ((address & 0xe000) == 0x8000)
-	{
-		offs_t pc = direct.space().device().safe_pc();
-
-		/* filter out duplicates; we get these because the handler gets called for
-		   multiple reasons:
-		    1. Because we have read/write handlers backing the current address
-		    2. Because the CPU core executed a jump to a new address
-		*/
-		if (pc != m_slapstic_last_pc || address != m_slapstic_last_address)
-		{
-			m_slapstic_last_pc = pc;
-			m_slapstic_last_address = address;
-			esb_slapstic_tweak(direct.space(), address & 0x1fff);
-		}
-		return ~0;
-	}
-	return address;
-}
-
-
-
 /*************************************
  *
  *  Main CPU memory handlers
@@ -568,10 +536,6 @@ DRIVER_INIT_MEMBER(starwars_state,esb)
 	m_slapstic_source = &rom[0x14000];
 	m_slapstic_base = &rom[0x08000];
 
-	/* install an opcode base handler */
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.set_direct_update_handler(direct_update_delegate(FUNC(starwars_state::esb_setdirect), this));
-
 	/* install read/write handlers for it */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0x9fff, read8_delegate(FUNC(starwars_state::esb_slapstic_r),this), write8_delegate(FUNC(starwars_state::esb_slapstic_w),this));
 
@@ -590,8 +554,6 @@ DRIVER_INIT_MEMBER(starwars_state,esb)
 
 	/* additional globals for state saving */
 	save_item(NAME(m_slapstic_current_bank));
-	save_item(NAME(m_slapstic_last_pc));
-	save_item(NAME(m_slapstic_last_address));
 }
 
 

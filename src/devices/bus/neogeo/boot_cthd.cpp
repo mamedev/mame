@@ -133,4 +133,3 @@ machine_config_constructor neogeo_matrimbl_cart::device_mconfig_additions() cons
 {
 	return MACHINE_CONFIG_NAME( matrimbl_cart );
 }
-

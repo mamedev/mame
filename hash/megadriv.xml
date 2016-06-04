@@ -2197,6 +2197,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Only Euro is confirmed -->
+<!-- A Prototype build 19920428 got released (CRC = 3155e45c) which is the same as this with final 16bytes (padding) missing -->
 	<software name="ddwares">
 		<description>Dungeons &amp; Dragons - Warriors of the Eternal Sun (Euro, USA)</description>
 		<year>1992</year>
@@ -9793,7 +9794,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="aresshmd">
+	<software name="aressha">
 		<description>A Ressha de Ikou MD - Take the "A" Train (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -9908,6 +9909,20 @@ but dumps still have to be confirmed.
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mpr-13842a.bin" size="1048576" crc="e0d5e18a" sha1="842430c0465d810576e75851023929fec873580d" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advdaisnp" cloneof="advdaisn">
+		<description>Advanced Daisenryaku - Deutsch Dengeki Sakusen (Jpn, Prototype 19910307)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="advanced daisenryaku - deutsch dengeki sakusen (mar 7, 1991 prototype).bin" size="1048576" crc="6ce17e36" sha1="423fdfb037c4a3e6cb97e49bc1cce6f08bd77475" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -10506,7 +10521,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="arielp" cloneof="ariel">
 		<description>Disney's Ariel the Little Mermaid (USA, Prototype 19921010)</description>
 		<year>1992</year>
@@ -11048,7 +11063,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="barneyp" cloneof="barney">
 		<description>Barney's Hide &amp; Seek Game (USA, Prototype 19930918)</description>
 		<year>1993</year>
@@ -11227,7 +11242,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beastwp" cloneof="beastw">
 		<description>Beast Wrestler (USA, Prototype 19910913)</description>
 		<year>1991</year>
@@ -12051,7 +12066,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="budokanup" cloneof="budokan">
 		<description>Budokan - The Martial Spirit (USA, Prototype 19900925)</description>
 		<year>1990</year>
@@ -12206,7 +12221,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="chakanp" cloneof="chakan">
 		<description>Chakan - The Forever Man (Prototype 19921006)</description>
 		<year>1992</year>
@@ -13525,7 +13540,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="twinhawkp" cloneof="twinhawk">
 		<description>Daisenpuu (Jpn, Prototype 19900406)</description>
 		<year>1990</year>
@@ -13572,6 +13587,17 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="darwin 4081 (jpn, kor).bin" size="524288" crc="7a33b0cb" sha1="e9decc48451aba62d949a7710e466e1d041a2210" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darwinp" cloneof="darwin">
+		<description>Darwin 4081 (Jpn, Prototype 19900221)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="darwin 4081 (feb 21, 1990 prototype).bin" size="524288" crc="db68d1ac" sha1="a4e5d757fb734ab3b8ece62340d7687d92efa0e4" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -13633,7 +13659,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="drscjp" cloneof="drsc">
 		<description>David Robinson's Supreme Court (Jpn, Prototype 19920415)</description>
 		<year>1992</year>
@@ -13757,6 +13783,17 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="death duel (usa).bin" size="1048576" crc="a9804dcc" sha1="21390cc3036047f3de4a58c5f41f588079b0e56f" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="deathdlp" cloneof="deathdl">
+		<description>Death Duel (USA, Prototype 19920506)</description>
+		<year>1992</year>
+		<publisher>Razorsoft</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="death duel (may 6, 1992 prototype).bin" size="1048576" crc="2f979365" sha1="21f8ec496fca1fb09d0671a301e80e86c32b74dd" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14109,6 +14146,17 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="ddragon2p" cloneof="ddragon2">
+		<description>Double Dragon II - The Revenge (Jpn, Prototype 19911018)</description>
+		<year>1991</year>
+		<publisher>Palsoft</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="double dragon ii - the revenge (oct 18, 1991 prototype).bin" size="524288" crc="e11f8543" sha1="2e9c5ef4db0c0c233eaf38f9b9e77bce49a5544d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ddragon5">
 		<description>Double Dragon V - The Shadow Falls (USA)</description>
 		<year>1994</year>
@@ -14342,6 +14390,17 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="mpr-13438.bin" size="524288" crc="39d01c8c" sha1="1bd77ad31665f7bdda85d9dfb9f08c0338ec4da9" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dyndukep" cloneof="dynduke">
+		<description>Dynamite Duke (Prototype 19900621)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="dynamite duke (jun 21, 1990 prototype).bin" size="524288" crc="7d2cd95c" sha1="712ef5cfd9dadb78f2c16c40dcb4d15848f3f6a6" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14699,7 +14758,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="steelempp" cloneof="empsteel">
 		<description>Steel Empire (USA, Prototype 19920313)</description>
 		<year>1992</year>
@@ -14963,6 +15022,17 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="euroclubp" cloneof="euroclub">
+		<description>European Club Soccer (Euro, Prototype 19911025)</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="european club soccer (oct 25, 1991 prototype).bin" size="524288" crc="4e63f90a" sha1="a61607762a691b9bf29eb43e24d2aa7cad92c521" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jlcs" cloneof="euroclub">
 		<description>J. League Champion Soccer (Jpn)</description>
 		<year>1993</year>
@@ -14990,7 +15060,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="exilep" cloneof="exile">
 		<description>Exile (USA, Prototype 19911213)</description>
 		<year>1991</year>
@@ -15123,7 +15193,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="f22p2" cloneof="f22">
 		<description>F-22 Interceptor (Prototype 19910917)</description>
 		<year>1991</year>
@@ -15568,6 +15638,17 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="mpr-13301.bin" size="524288" crc="77bbd841" sha1="b0d2552c5aae75dbe2d63600c0dbd64868c2f2c5" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="samesamep" cloneof="fireshrk">
+		<description>Same! Same! Same! (Jpn, Prototype 19900730)</description>
+		<year>1990</year>
+		<publisher>Toaplan</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="same! same! same! (jul 30, 1990 prototype).bin" size="524288" crc="6fd46dc2" sha1="798646ff94c867077ebd7188a3c87dbad1a23844" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16276,6 +16357,17 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="growlp" cloneof="growl">
+		<description>Growl (USA, Prototype 19910826)</description>
+		<year>1991</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="growl (aug 26, 1991 prototype).bin" size="524288" crc="aa973de7" sha1="554885a8ec5fcd238cd6fce667f2c082ab138786" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="runark" cloneof="growl">
 		<description>Runark (Jpn, Kor)</description>
 		<year>1991</year>
@@ -16480,6 +16572,18 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="home alone 2 - lost in new york (usa).bin" size="524288" crc="cbf87c14" sha1="24232a572b7eabc3e0ed5f483042a7085bd77c48" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+	
+<!-- This is the same as the final, but without the padding up to 512Kb and with different checksum in the internal header -->
+	<software name="homea2p" cloneof="homea2">
+		<description>Home Alone 2 - Lost in New York (USA, Prototype 19930929)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="home alone 2 - lost in new york (sep 29, 1993 build).bin" size="522726" crc="c2f37ae2" sha1="6a9f892b2425f4dd53bac7d43a05e2d91ebdf396" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16900,7 +17004,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="finalbu" cloneof="jbdougko">
 		<description>Final Blow (USA, James 'Buster' Douglas Knockout Boxing Prototype 19900116)</description>
 		<year>1990</year>
@@ -17120,7 +17224,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="maddenp" cloneof="madden">
 		<description>John Madden Football (Prototype, 19901107)</description>
 		<year>1990</year>
@@ -17243,7 +17347,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jparkp" cloneof="jpark">
 		<description>Jurassic Park (Euro, Prototype 19930614)</description>
 		<year>1993</year>
@@ -17265,7 +17369,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jparkup2" cloneof="jpark">
 		<description>Jurassic Park (USA, Prototype 19930526)</description>
 		<year>1993</year>
@@ -17669,7 +17773,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="landstlkup2" cloneof="landstlk">
 		<description>Landstalker - The Treasures of King Nole (USA, Prototype 19930713)</description>
 		<year>1993</year>
@@ -18442,7 +18546,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mastmonsjp" cloneof="mastmons">
 		<description>Master of Monsters (Jpn, Prototype 19910426)</description>
 		<year>1991</year>
@@ -19387,7 +19491,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mystdefp" cloneof="mystdef">
 		<description>Mystic Defender (Prototype, 19890914)</description>
 		<year>1989</year>
@@ -20037,7 +20141,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="ncaabask">
+	<software name="ncaafin4">
 		<description>NCAA Final Four Basketball (USA)</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
@@ -20424,7 +20528,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="nfl94jp" cloneof="nfl94">
 		<description>NFL Football '94 Starring Joe Montana (Jpn, Prototype 19931104)</description>
 		<year>1994</year>
@@ -20776,6 +20880,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="slot" value="rom_eeprom"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="ninja burai densetsu (jpn).bin" size="1048576" crc="a8d828a0" sha1="9cc3419ca7ecaf0d106aa896ffc0266c7145fff7" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjabp" cloneof="ninjab">
+		<description>Ninja Burai Densetsu (Jpn, Prototype 19910528)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_eeprom"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="ninja burai densetsu (may 28, 1991 prototype).bin" size="1048576" crc="49089471" sha1="5c7bf27ec6cc81b9a9888025fbfa6dcb57d3eae5" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21316,6 +21432,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="paperboyp" cloneof="paperboy">
+		<description>Paperboy (USA, Prototype 19911028)</description>
+		<year>1992</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="paperboy (oct 28, 1991 prototype).bin" size="524288" crc="9856d9ea" sha1="2e239046e07f511540db351659a6f9408754be28" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="paperboyj" cloneof="paperboy">
 		<description>Paperboy (Jpn)</description>
@@ -21358,7 +21485,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pebblep" cloneof="pebble">
 		<description>Pebble Beach Golf Links (Prototype, 19940214)</description>
 		<year>1993</year>
@@ -21821,7 +21948,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="psolar">
 		<description>Pier Solar and the Great Architects (World, Rev. C)</description>
 		<year>2010</year>
@@ -21833,7 +21960,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="psolara" cloneof="psolar">
 		<description>Pier Solar and the Great Architects (World, Rev. B)</description>
 		<year>2010</year>
@@ -21845,7 +21972,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="psolarb" cloneof="psolar">
 		<description>Pier Solar and the Great Architects (World, Rev. A)</description>
 		<year>2010</year>
@@ -21857,7 +21984,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="psolarp" cloneof="psolar">
 		<description>Pier Solar and the Great Architects (World, Prototype)</description>
 		<year>2010</year>
@@ -22486,6 +22613,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="rbibb3p" cloneof="rbibb3">
+		<description>R.B.I. Baseball 3 (USA, Prototype 19910718)</description>
+		<year>1991</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="r.b.i. baseball 3 (jul 18, 1991 prototype).bin" size="524288" crc="d0430946" sha1="e6d142f6d483f423c2d2271f3895ebf50063a6d5" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rbibb4">
 		<description>R.B.I. Baseball 4 (USA)</description>
 		<year>1992</year>
@@ -22689,6 +22827,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="rastan saga ii (jpn).bin" size="524288" crc="ebacfb5a" sha1="e7bd8367ae962af48a2e937bf6ced253f428b03d" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- This is the same as the final, but without the padding up to 1Mb and with no checksum in the internal header -->
+	<software name="renstimp" cloneof="renstim">
+		<description>Stimpy's Invention Starring Starring Ren Hoëk &amp; Stimpy (Euro, Prototype 19931209)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="alt_title" value="The Ren &amp; Stimpy Show Presents Stimpy's Invention (Box)"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="ren &amp; stimpy - stimpy's invention (dec 9, 1993 build).bin" size="1045114" crc="1b475ed3" sha1="d39b2e07933060439030e9fddfaa5cd1b0e986c1" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23063,6 +23214,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="ic1" value="335032-1050"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="335032-1050.ic1" size="524288" crc="ec6cd5f0" sha1="927cdb93e688152f2ff9a89a1b22cd6517ada652" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="roadblstp" cloneof="roadblst">
+		<description>RoadBlasters (USA, Prototype 19910627)</description>
+		<year>1992</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="roadblasters (jun 27, 1991 prototype).bin" size="524288" crc="e4ef86b9" sha1="b53c65a7c11bda45b001b6c3c3e636d92f166404" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24134,7 +24296,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="slaughtrp" cloneof="slaughtr">
 		<description>Slaughter Sport (USA, Prototype 19910927)</description>
 		<year>1991</year>
@@ -24231,7 +24393,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="soldeacep" cloneof="soldeace">
 		<description>Sol-Deace (USA, Prototype 19920203)</description>
 		<year>1992</year>
@@ -24905,7 +25067,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sorcerkjp" cloneof="sorcerk">
 		<description>Sorcer Kingdom (Jpn, 19911108)</description>
 		<year>1992</year>
@@ -25022,6 +25184,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="speedball 2 - brutal deluxe (usa).bin" size="524288" crc="9fc340a7" sha1="4598f1714fd05e74ab758c09263f7948c8ca1883" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="speedbl2up" cloneof="speedbl2">
+		<description>Speedball 2 - Brutal Deluxe (USA, Prototype 19910607)</description>
+		<year>1991</year>
+		<publisher>Arena</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="speedball 2 - brutal deluxe (jun 7, 1991 prototype).bin" size="524288" crc="13c803b7" sha1="eac8744a01f946af11a36673c63a4b1df2d0742d" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25179,6 +25352,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="patrileyp" cloneof="srealbas">
+		<description>Pat Riley Basketball (USA, Prototype 19900614)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="pat riley basketball (jun 14, 1990 prototype).bin" size="524288" crc="00f4c7cc" sha1="b939dd0e18800f93f8674114c6838e364d74021a" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starctrl">
 		<description>Star Control (USA)</description>
 		<year>1991</year>
@@ -25206,7 +25390,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="starodys">
 		<description>Star Odyssey (USA)</description>
 		<year>2011</year>
@@ -25220,7 +25404,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="starodysp" cloneof="starodys">
 		<description>Star Odyssey (USA, Prototype 19920116)</description>
 		<year>1990</year>
@@ -25405,7 +25589,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="Stargate.98DC.bin" size="2097152" crc="51946ea9" sha1="92bee364d23fc28d9f976037d3420767c4f97d68" offset="0x000000"/>
+				<rom name="stargate.98dc.bin" size="2097152" crc="51946ea9" sha1="92bee364d23fc28d9f976037d3420767c4f97d68" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25663,7 +25847,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ssmartp" cloneof="ssmart">
 		<description>Street Smart (Prototype, 19900629)</description>
 		<year>1991</year>
@@ -26083,6 +26267,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- This is the same as the final build, except for the internal header... -->
+	<software name="shangonp" cloneof="shangon">
+		<description>Super Hang-On (Prototype 19890818)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="super hang-on (aug 18, 1989 build).bin" size="524288" crc="b6eae5c4" sha1="9ec0f37f4bf15797466377bd073cfe50c3afcda3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shimpact">
 		<description>Super High Impact (USA)</description>
 		<year>1992</year>
@@ -26143,6 +26339,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="mpr-12706.bin" size="524288" crc="4fb50304" sha1="dde1b2465f54f4f6f485c1ba063ff47c5d1baf27" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="lasordap" cloneof="suprleag">
+		<description>Tommy Lasorda Baseball (USA, Prototype 19890430)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="tommy lasorda baseball (apr 30, 1989 prototype).bin" size="524288" crc="aa3965db" sha1="057004754c9bfd8bbbc107a69681ae0977b664de" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26547,7 +26754,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="trgearthp" cloneof="trgearth">
 		<description>Target Earth (USA, Prototype 19900216)</description>
 		<year>1990</year>
@@ -26623,13 +26830,24 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="tecnocopp" cloneof="tecnocop">
+	<software name="tecnocopp1" cloneof="tecnocop">
 		<description>Technocop (USA, Prototype)</description>
 		<year>1990</year>
 		<publisher>Razorsoft</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="technocop (prototype).bin" size="524288" crc="059ac8fb" sha1="cb69d62fbaaa60cf9ff18db7b63e3f436e55967d" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tecnocopp2" cloneof="tecnocop">
+		<description>Technocop (USA, Prototype 19900912)</description>
+		<year>1990</year>
+		<publisher>Razorsoft</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="technocop (sep 12, 1990 prototype).bin" size="524288" crc="f06ed8ca" sha1="acb094ea683779c8e94b8ea58a5c86d8303e0590" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26943,6 +27161,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="termintrp" cloneof="termintr">
+		<description>The Terminator (Prototype, 19920414)</description>
+		<year>1991</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="the terminator (apr 15, 1992 prototype).bin" size="1048576" crc="7350a152" sha1="c57fc68252709ce63a59aac9031f58e4cfb31329" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="td2">
 		<description>Test Drive II - The Duel (Euro, USA)</description>
 		<year>1992</year>
@@ -27020,7 +27249,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tf3p" cloneof="tf3">
 		<description>Thunder Force III (Prototype 19900801)</description>
 		<year>1990</year>
@@ -27272,6 +27501,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- This is the same as the final, but with "Sega_Channel" XORed at the end. -->
+	<software name="toejam2p2" cloneof="toejam2">
+		<description>Toe Jam &amp; Earl in Panic on Funkotron (Prototype 19930911)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="toejam &amp; earl in panic on funkotron (sep 11, 1993 build).bin" size="2097152" crc="d9dfbb5c" sha1="9959ab08c2f74cbd9009bf784fc0205ce1f7bce1" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="toki">
 		<description>Toki - Going Ape Spit ~ JuJu Densetsu (World, Rev. A)</description>
@@ -27411,7 +27652,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Disney Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="ExecuteDemo1.9F79.bin" size="4194304" crc="9321bec1" sha1="7932c7de237ca333750b98ff3d2832c5f65be851" offset="0x000000"/>
+				<rom name="executedemo1.9f79.bin" size="4194304" crc="9321bec1" sha1="7932c7de237ca333750b98ff3d2832c5f65be851" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27446,6 +27687,20 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="traysia (usa).bin" size="1048576" crc="96184f4f" sha1="ff0efe6da308919f843a7593e8af7fae82160b0b" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="traysiap" cloneof="traysia">
+		<description>Traysia (USA, Prototype 19920122)</description>
+		<year>1992</year>
+		<publisher>Renovation</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="traysia (jan 22, 1992 prototype).bin" size="1048576" crc="daa83cb5" sha1="284c7a67843be8b56bba8d9050a6cbaeae3c896b" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -27594,6 +27849,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="toutrunp" cloneof="toutrun">
+		<description>Turbo Out Run (Prototype, 19911209)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="turbo outrun (dec 9, 1991 prototype).bin" size="524288" crc="2a7f2b36" sha1="9695c91c42f635e6b3a046ca813d3cbe6d180a83" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="turrican">
 		<description>Turrican (Euro, USA)</description>
 		<year>1991</year>
@@ -27634,6 +27900,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="twinkle tale (jpn).bin" size="1048576" crc="d757f924" sha1="5377e96b4cb14038675c41d165f1d92ae067cd9b" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twocrudep" cloneof="twocrude">
+		<description>Two Crude Dudes (Prototype, 19911124)</description>
+		<year>1992</year>
+		<publisher>Data East</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="two crude dudes (nov 24, 1991 prototype).bin" size="1048576" crc="4ba361a7" sha1="5a386d3f2dd851339f40f2eec339bb5a09f6c3a5" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27844,7 +28121,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="valisp" cloneof="valis">
 		<description>Valis (USA, Prototype 19911025)</description>
 		<year>1991</year>
@@ -27891,7 +28168,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="vaportrp" cloneof="vaportr">
 		<description>Vapor Trail (USA, Prototype 19910526)</description>
 		<year>1991</year>
@@ -28356,6 +28633,20 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="warsongp" cloneof="warsong">
+		<description>Warsong (USA, Prototype 19911001)</description>
+		<year>1991</year>
+		<publisher>Treco</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="warsong (oct 1, 1991 prototype).bin" size="524288" crc="522642c6" sha1="375140685b7622a07005f575cb7128cbea75a1f6" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="waterwld">
 		<description>WaterWorld (Euro, Prototype)</description>
 		<year>1995?</year>
@@ -28440,6 +28731,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="whip rush (usa).bin" size="524288" crc="7eb6b86b" sha1="f05560b088565c1c32c0039dc7bf58caa5310680" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whiprushp" cloneof="whiprush">
+		<description>Whip Rush (USA, Prototype 19900129)</description>
+		<year>1990</year>
+		<publisher>Renovation</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="whip rush (jan 29, 1990 prototype).bin" size="524288" crc="ff39fc9f" sha1="05ad0305c0a0b92b3ea2b3419feb995b45518175" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28574,6 +28876,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="slot" value="rom_eeprom"/>
 			<dataarea name="rom" width="16" endianness="big" size="655360">
 				<rom name="wonder boy v - monster world iii (jpn, kor).bin" size="655360" crc="45a50f96" sha1="1582f159e1969ff0541319a9bd7e6f7a53505d01" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wboy5p" cloneof="wboymw">
+		<description>Wonder Boy V - Monster World III (Jpn, Prototype 19910725)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_eeprom"/>
+			<dataarea name="rom" width="16" endianness="big" size="655360">
+				<rom name="wonder boy v - monster world iii (jul 25, 1991 prototype).bin" size="786432" crc="334035f8" sha1="1677039ede9a4cf51ac182cfe27d797c864290c8" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -30081,7 +30395,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ys3p" cloneof="ys3">
 		<description>Ys III (USA, Prototype 19910828)</description>
 		<year>1991</year>
@@ -30362,7 +30676,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="segachnj" supported="no">
 		<description>Sega Channel (Jpn, v2.11)</description>
 		<year>199?</year>
@@ -30373,7 +30687,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="segachnjo" cloneof="segachnj" supported="no">
 		<description>Sega Channel (Jpn, v2.11 older)</description>
 		<year>199?</year>
@@ -31262,7 +31576,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="commconq">
+	<software name="cnc">
 		<description>Command &amp; Conquer (Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>

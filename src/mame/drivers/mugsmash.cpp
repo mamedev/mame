@@ -56,7 +56,7 @@ WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 	switch (offset)
 	{
 	case 1:
-		soundlatch_byte_w(space, 1, data & 0xff);
+		m_soundlatch->write(space, 1, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( mugsmash_sound_map, AS_PROGRAM, 8, mugsmash_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -418,6 +418,8 @@ static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

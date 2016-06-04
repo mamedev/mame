@@ -33,7 +33,7 @@ public:
 			if (ret == "")
 				ret = elem;
 			else
-#ifdef _WIN32
+#ifdef WIN32
 				ret = ret + '\\' + elem;
 #else
 				ret = ret + '/' + elem;
@@ -70,7 +70,7 @@ public:
 	template <typename T>
 	static T log(const T &x) { return std::log(x); }
 
-	#if defined(_MSC_VER) && _MSC_VER < 1800
+	#if defined(MSC_VER) && MSC_VER < 1800
 	ATTR_HOT inline static double e_log1p(const double &x) { return nl_math::log(1.0 + x); }
 	ATTR_HOT inline static float e_log1p(const float &x) { return nl_math::log(1.0 + x); }
 #else
@@ -123,89 +123,6 @@ public:
 
 };
 
-template <typename _SC>
-class powned_ptr
-{
-private:
-	powned_ptr()
-	: m_ptr(nullptr), m_is_owned(true) { }
-public:
-	powned_ptr(_SC *p, bool owned)
-	: m_ptr(p), m_is_owned(owned)
-	{ }
-	powned_ptr(const powned_ptr &r) = delete;
-	powned_ptr & operator =(const powned_ptr &r) = delete;
-
-	powned_ptr(powned_ptr &&r)
-	{
-		m_is_owned = r.m_is_owned;
-		m_ptr = r.m_ptr;
-		r.m_is_owned = false;
-		r.m_ptr = nullptr;
-	}
-
-	template<typename _DC>
-	powned_ptr(powned_ptr<_DC> &&r)
-	{
-		_SC *dest_ptr = &dynamic_cast<_SC &>(*r.get());
-		bool o = r.is_owned();
-		r.release();
-		m_is_owned = o;
-		m_ptr = dest_ptr;
-	}
-
-	~powned_ptr()
-	{
-		if (m_is_owned)
-			delete m_ptr;
-	}
-	template<typename _DC, typename... _Args>
-	static powned_ptr Create(_Args&&... __args)
-	{
-		powned_ptr a;
-		_DC *x = new _DC(std::forward<_Args>(__args)...);
-		a.m_ptr = static_cast<_SC *>(x);
-		return a;
-	}
-
-	template<typename... _Args>
-	static powned_ptr Create(_Args&&... __args)
-	{
-		powned_ptr a;
-		a.m_ptr = new _SC(std::forward<_Args>(__args)...);
-		return a;
-	}
-	void release()
-	{
-		m_is_owned = false;
-		m_ptr = nullptr;
-	}
-
-	bool is_owned() const { return m_is_owned; }
-	
-	template<typename _DC>
-	powned_ptr<_DC> & operator =(powned_ptr<_DC> &r)
-	{
-		m_is_owned = r.m_is_owned;
-		m_ptr = r.m_ptr;
-		r.m_is_owned = false;
-		r.m_ptr = nullptr;
-		return *this;
-	}
-	_SC * operator ->() { return m_ptr; }
-	_SC & operator *() { return *m_ptr; }
-	_SC * get() const { return m_ptr; }
-private:
-	_SC *m_ptr;
-	bool m_is_owned;
-};
-
-template<typename _BC, typename _DC, typename... _Args>
-static std::unique_ptr<_BC> make_unique_base(_Args&&... __args)
-{
-	std::unique_ptr<_BC> ret(new _DC(std::forward<_Args>(__args)...));
-	return ret;
-}
 
 
 #endif /* NL_UTIL_H_ */

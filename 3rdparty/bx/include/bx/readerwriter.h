@@ -374,7 +374,7 @@ namespace bx
 			switch (_whence)
 			{
 			case Whence::Begin:
-				m_pos = _offset;
+				m_pos = int64_clamp(_offset, 0, m_top);
 				break;
 
 			case Whence::Current:
@@ -434,7 +434,7 @@ namespace bx
 			switch (_whence)
 			{
 				case Whence::Begin:
-					m_pos = _offset;
+					m_pos = int64_clamp(_offset, 0, m_top);
 					break;
 
 				case Whence::Current:
@@ -506,7 +506,7 @@ namespace bx
 			switch (_whence)
 			{
 				case Whence::Begin:
-					m_pos = _offset;
+					m_pos = int64_clamp(_offset, 0, m_top);
 					break;
 
 				case Whence::Current:

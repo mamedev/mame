@@ -32,19 +32,19 @@ enum pstate_data_type_e {
 	DT_FLOAT
 };
 
-template<typename _ItemType> struct pstate_datatype
+template<typename ItemType> struct pstate_datatype
 {
 	static const pstate_data_type_e type = pstate_data_type_e(NOT_SUPPORTED);
 	static const bool is_ptr = false;
 };
 
-template<typename _ItemType> struct pstate_datatype<_ItemType *>
+template<typename ItemType> struct pstate_datatype<ItemType *>
 {
 	static const pstate_data_type_e type = pstate_data_type_e(NOT_SUPPORTED);
 	static const bool is_ptr = true;
 };
 
-//template<typename _ItemType> struct type_checker<_ItemType*> { static const bool is_atom = false; static const bool is_pointer = true; };
+//template<typename ItemType> struct type_checker<ItemType*> { static const bool is_atom = false; static const bool is_pointer = true; };
 
 #define NETLIST_SAVE_TYPE(TYPE, TYPEDESC) \
 		template<> struct pstate_datatype<TYPE>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = false;}; \
@@ -67,6 +67,8 @@ NETLIST_SAVE_TYPE(INT32, DT_INT);
 NETLIST_SAVE_TYPE(UINT16, DT_INT16);
 NETLIST_SAVE_TYPE(INT16, DT_INT16);
 //NETLIST_SAVE_TYPE(std::size_t, DT_INT64);
+
+PLIB_NAMESPACE_START()
 
 class pstate_manager_t;
 
@@ -185,5 +187,6 @@ public:
 	}
 };
 
+PLIB_NAMESPACE_END()
 
 #endif /* PSTATE_H_ */

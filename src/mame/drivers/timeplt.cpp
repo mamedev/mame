@@ -49,6 +49,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "includes/konamipt.h"
 #include "audio/timeplt.h"
@@ -131,7 +132,7 @@ static ADDRESS_MAP_START( common_main_map, AS_PROGRAM, 8, timeplt_state )
 	AM_RANGE(0xa800, 0xafff) AM_RAM
 	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_READ(scanline_r) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_READ(scanline_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_READ_PORT("DSW1") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0c9f) AM_READ_PORT("IN0")
 	AM_RANGE(0xc302, 0xc302) AM_MIRROR(0x0cf1) AM_WRITE(flipscreen_w)
@@ -445,6 +446,9 @@ static MACHINE_CONFIG_START( timeplt, timeplt_state )
 	MCFG_PALETTE_INIT_OWNER(timeplt_state, timeplt)
 
 	/* sound hardware */
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_FRAGMENT_ADD(timeplt_sound)
 MACHINE_CONFIG_END
 

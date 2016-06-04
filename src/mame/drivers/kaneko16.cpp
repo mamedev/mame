@@ -102,7 +102,6 @@ Non-Bugs (happen on real PCB)
 #include "includes/kaneko16.h"
 #include "machine/watchdog.h"
 #include "sound/2151intf.h"
-#include "sound/okim6295.h"
 #include "machine/kaneko_hit.h"
 
 
@@ -162,7 +161,7 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_byte_w(space, 0, (data & 0xff00) >> 8 );
+		m_soundlatch->write(space, 0, (data & 0xff00) >> 8 );
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -769,7 +768,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blazeon_soundport, AS_IO, 8, kaneko16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -788,7 +787,7 @@ static ADDRESS_MAP_START( wingforc_soundport, AS_IO, 8, kaneko16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) // 02 written at boot
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x0a, 0x0a) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(wingforc_oki_bank_w)
 ADDRESS_MAP_END
@@ -2036,6 +2035,8 @@ static MACHINE_CONFIG_START( blazeon, kaneko16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -2087,6 +2088,8 @@ static MACHINE_CONFIG_START( wingforc, kaneko16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
@@ -3929,6 +3932,38 @@ ROM_START( shogwarr )
 	ROM_LOAD( "fb-003.u44",   0x100000, 0x100000, CRC(0aea4ac5) SHA1(8f3b30e505b0ba51c140a0a2c071680d4fa05db9) )
 ROM_END
 
+
+ROM_START( shogwarrk )
+	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
+	ROM_LOAD16_BYTE( "fb-030a.U61", 0x000000, 0x020000, CRC(32ce7909) SHA1(02d87342706ac9547eb611bd542f8498ba41e34a) )
+	ROM_LOAD16_BYTE( "fb-031a.U62", 0x000001, 0x020000, CRC(bbffe957) SHA1(d916fde185985f6de216b8fb68a851fc75e3d04b) )
+
+	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
+	ROM_LOAD( "fb-040a.U33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
+
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASEFF )  /* Sprites */
+	ROM_LOAD( "fb-020a.u1", 0x000000, 0x100000, CRC(87e55c6d) SHA1(87886c045d7c30b8dee3c8fb0bf8f2cdbc5fd7fb) )
+	ROM_LOAD( "fb020b.u2",  0x100000, 0x100000, CRC(276b9d7b) SHA1(7a154f65b4737f2b6ac8effa3352711079f571dc) )
+	ROM_LOAD( "fb021a.u3",  0x200000, 0x100000, CRC(7da15d37) SHA1(345cf2242e8210a697294a45197f2b3b974de885) )
+	ROM_LOAD( "fb021b.u4",  0x300000, 0x100000, CRC(6a512d7b) SHA1(7fc3002d23262a9a590a283ea9e111e38d889ef2) )
+	ROM_LOAD( "fb-22a.u5",  0x400000, 0x100000, CRC(9039e5d3) SHA1(222452cd7947f7c99c68e495835cca62e0449b5c) )
+	ROM_LOAD( "fb-22b.u6",  0x500000, 0x100000, CRC(96ac9e54) SHA1(2b066375963dc57fe2ce89d65f6c0a9d183a838d) )
+	ROM_LOAD( "fb023.u7",   0x600000, 0x100000, CRC(132794bd) SHA1(bcc73c3183c59a4b66f79d04774773b8a9239501) )
+	ROM_LOAD( "fb-024.U8",  0x700000, 0x080000, CRC(4bf3282d) SHA1(6058e46f20fe4faf32cddb6f2bb0fbf70f256a54) )  // extra censored gfx
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* Tiles (scrambled) */
+	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )  // 42 pin mask rom
+	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )  // 40 pin mask rom (verified correct)
+
+	ROM_REGION( 0x100000, "oki1", 0 )
+	ROM_LOAD( "fb-000.U43",  0x000000, 0x080000, CRC(f524aaa1) SHA1(006a886f9df2e57c51b61c6cea70a6574fc20304) )
+	ROM_LOAD( "fb-003.U101",  0x080000, 0x080000, CRC(969f1465) SHA1(4f56d1ad341b08f4db41b7ab2498740612ff7c3d) )
+
+	ROM_REGION( 0x200000, "oki2", 0 )
+	ROM_LOAD( "fb-002.u45",   0x000000, 0x100000, CRC(010acc17) SHA1(2dc0897c7778eacf6bce12ff0adbadb307ea6c17) )
+	ROM_LOAD( "fb-003.u44",   0x100000, 0x100000, CRC(0aea4ac5) SHA1(8f3b30e505b0ba51c140a0a2c071680d4fa05db9) )
+ROM_END
+
 /***************************************************************************
 
                                 Shogun Warriors
@@ -4434,6 +4469,9 @@ GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtm
 GAME( 1992, brapboys, 0,        brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, brapboysj,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, brapboysu,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)", MACHINE_SUPPORTS_SAVE )
+// these 3 are all the same code revision (differ by region byte + extra gfx roms/sample roms)
 GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, shogwarrk,shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (Korea?)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // censored Japanese flags etc.
 GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Fujiyama Buster (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+// different revision
+GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

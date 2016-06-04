@@ -32,13 +32,13 @@ namespace netlist
 
 		virtual ~base_factory_t() {}
 
-		virtual powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) = 0;
+		virtual plib::powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) = 0;
 
 		const pstring &name() const { return m_name; }
 		const pstring &classname() const { return m_classname; }
 		const pstring &param_desc() const { return m_def_param; }
-		const pstring_vector_t term_param_list();
-		const pstring_vector_t def_params();
+		const plib::pstring_vector_t term_param_list();
+		const plib::pstring_vector_t def_params();
 
 	protected:
 		pstring m_name;                             /* device name */
@@ -46,7 +46,7 @@ namespace netlist
 		pstring m_def_param;                        /* default parameter */
 	};
 
-	template <class _device_class>
+	template <class device_class>
 	class factory_t : public base_factory_t
 	{
 		P_PREVENT_COPYING(factory_t)
@@ -55,27 +55,27 @@ namespace netlist
 				const pstring &def_param)
 		: base_factory_t(name, classname, def_param) { }
 
-		powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
+		plib::powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 		{
-			return powned_ptr<device_t>::Create<_device_class>(anetlist, name);
+			return plib::powned_ptr<device_t>::Create<device_class>(anetlist, name);
 		}
 
 	};
 
-	class factory_list_t : public pvector_t<powned_ptr<base_factory_t>>
+	class factory_list_t : public plib::pvector_t<plib::powned_ptr<base_factory_t>>
 	{
 	public:
 		factory_list_t(setup_t &m_setup);
 		~factory_list_t();
 
-		template<class _device_class>
+		template<class device_class>
 		void register_device(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		{
-			register_device(powned_ptr<base_factory_t>::Create<factory_t<_device_class>>(name, classname, def_param));
+			register_device(plib::powned_ptr<base_factory_t>::Create<factory_t<device_class>>(name, classname, def_param));
 		}
 
-		void register_device(powned_ptr<base_factory_t> factory)
+		void register_device(plib::powned_ptr<base_factory_t> factory)
 		{
 			for (auto & e : *this)
 				if (e->name() == factory->name())
@@ -85,13 +85,13 @@ namespace netlist
 
 		//ATTR_COLD device_t *new_device_by_classname(const pstring &classname) const;
 		// FIXME: legacy, should use factory_by_name
-		powned_ptr<device_t> new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name);
+		plib::powned_ptr<device_t> new_device_by_name(const pstring &devname, netlist_t &anetlist, const pstring &name);
 		base_factory_t * factory_by_name(const pstring &devname);
 
-		template <class _class>
+		template <class C>
 		bool is_class(base_factory_t *f)
 		{
-			return dynamic_cast<factory_t<_class> *>(f) != nullptr;
+			return dynamic_cast<factory_t<C> *>(f) != nullptr;
 		}
 
 	private:

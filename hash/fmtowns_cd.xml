@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="fmtowns_cd" description="FM Towns CD-ROMs">
-<!-- 
+<!--
 Preliminary list for FM Towns CDs.
 
-Most images come from the Neo Kobe Collection, dated 2016-02-25. 
+Most images come from the Neo Kobe Collection, dated 2016-02-25.
 
 Software with a CUE file was converted directly with CHDMAN. The rest were
 converted to CUE+BIN with IsoBuster+EAC (preserving the pregaps if present)
@@ -24,7 +24,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="4dboxing">
 		<description>4D Boxing</description>
 		<year>1992</year>
@@ -35,7 +35,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Converted from MDS/MDF -->
 	<software name="4ddriv">
 		<description>4D Driving</description>
@@ -47,7 +47,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="4dtennis">
 		<description>4D Tennis</description>
 		<year>1993</year>
@@ -58,7 +58,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="38mank">
 		<description>38-man Kilo no Kokuu</description>
 		<year>1989</year>
@@ -74,7 +74,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="atrain3">
 		<description>A Ressha de Ikou III</description>
 		<year>1991</year>
@@ -85,7 +85,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="atrain4">
 		<description>A Ressha de Ikou IV</description>
 		<year>1992</year>
@@ -101,7 +101,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="abel">
 		<description>Abel: Shin Mokushiroku Taisen</description>
 		<year>1995</year>
@@ -123,7 +123,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aeternam">
 		<description>Aeternam</description>
 		<year>1992</year>
@@ -134,7 +134,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aburner">
 		<description>After Burner</description>
 		<year>1989</year>
@@ -145,7 +145,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aburner3">
 		<description>After Burner III</description>
 		<year>1992</year>
@@ -156,7 +156,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aircmb2s">
 		<description>Air Combat II Special</description>
 		<year>1993</year>
@@ -167,7 +167,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Seems to be missing a floppy disk -->
 	<software name="airwar">
 		<description>Air Warrior</description>
@@ -179,7 +179,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="alice1">
 		<description>Alice no Yakata CD</description>
 		<year>1992</year>
@@ -190,7 +190,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="alice2">
 		<description>Alice no Yakata II</description>
 		<year>1992</year>
@@ -201,7 +201,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- probably a bad dump -->
 	<software name="alice3">
 		<description>Alice no Yakata III</description>
@@ -213,7 +213,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aitd">
 		<description>Alone in the Dark</description>
 		<year>1993</year>
@@ -224,7 +224,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aitd2">
 		<description>Alone in the Dark 2</description>
 		<year>1994</year>
@@ -236,7 +236,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="alshark">
 		<description>Alshark</description>
 		<year>1993</year>
@@ -247,7 +247,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="amarant3">
 		<description>Amaranth III</description>
 		<year>1994</year>
@@ -258,7 +258,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ambival">
 		<description>Ambivalenz</description>
 		<year>1994</year>
@@ -274,7 +274,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aouq">
 		<description>America Oudan Ultra Quiz</description>
 		<year>1994</year>
@@ -285,7 +285,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="angel">
 		<description>Angel</description>
 		<year>1993</year>
@@ -296,7 +296,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="anghalo">
 		<description>Angel Halo</description>
 		<year>1996</year>
@@ -307,7 +307,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aokiooka">
 		<description>Aoki Ookami to Shiroki Mejika: Genchou Hishi</description>
 		<year>1993</year>
@@ -318,7 +318,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="arabesq">
 		<description>Arabesque</description>
 		<year>1994</year>
@@ -329,7 +329,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aska">
 		<description>Aska Towns</description>
 		<year>1989</year>
@@ -340,7 +340,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="asukabfe">
 		<description>Asuka 120% Burning Fest. Excellent</description>
 		<year>1994</year>
@@ -356,7 +356,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="awesome">
 		<description>Awesome</description>
 		<year>1992</year>
@@ -378,7 +378,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ayumi">
 		<description>Ayumi-chan Monogatari</description>
 		<year>1993</year>
@@ -394,7 +394,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ayumijb">
 		<description>Ayumi-chan Monogatari Jissha-ban</description>
 		<year>1995</year>
@@ -405,7 +405,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="azure">
 		<description>Azure</description>
 		<year>1993</year>
@@ -416,7 +416,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="bacta12v">
 		<description>Bacta 1 &amp; 2 + Voice</description>
 		<year>1996</year>
@@ -427,7 +427,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="bfmaria">
 		<description>Ballade for Maria / Maria ni Sasageru Ballade</description>
 		<year>1995</year>
@@ -443,7 +443,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="beast3">
 		<description>Beast 3</description>
 		<year>1994</year>
@@ -454,7 +454,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="biblemas">
 		<description>Bible Master</description>
 		<year>1993</year>
@@ -481,7 +481,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="blue">
 		<description>Blue: Will to Power</description>
 		<year>1992</year>
@@ -492,7 +492,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="panicbom">
 		<description>Bomberman: Panic Bomber</description>
 		<year>1995</year>
@@ -503,7 +503,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="branmark">
 		<description>Branmarker</description>
 		<year>1991</year>
@@ -514,7 +514,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="branmar2">
 		<description>Branmarker 2</description>
 		<year>1995</year>
@@ -525,7 +525,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="bublbobl">
 		<description>Bubble Bobble</description>
 		<year>1990</year>
@@ -536,7 +536,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="buraij">
 		<description>Burai Joukan</description>
 		<year>1990</year>
@@ -547,7 +547,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="buraik">
 		<description>Burai Kanketsu-hen</description>
 		<year>1991</year>
@@ -558,7 +558,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="cal">
 		<description>Cal Towns</description>
 		<year>1992</year>
@@ -569,7 +569,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="cancanb">
 		<description>Can Can Bunny Extra</description>
 		<year>1993</year>
@@ -580,7 +580,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="castles">
 		<description>Castles</description>
 		<year>1992</year>
@@ -591,7 +591,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="centurio">
 		<description>Centurion</description>
 		<year>1993</year>
@@ -602,7 +602,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="classcrd">
 		<description>Classic Road</description>
 		<year>1994</year>
@@ -613,7 +613,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="crystrnl">
 		<description>Crystal Rinal</description>
 		<year>1994</year>
@@ -624,7 +624,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="cm2itsuk">
 		<description>Custom Mate 2 &amp; Itsuka dokoka de</description>
 		<year>1995</year>
@@ -640,7 +640,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="cybercty">
 		<description>Cybercity</description>
 		<year>1989</year>
@@ -656,7 +656,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-		
+
 	<software name="cyberia">
 		<description>Cyberia</description>
 		<year>1995</year>
@@ -668,7 +668,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dokanshu">
 		<description>D.O. Kanshuu Premium Box: Touch My Heart</description>
 		<year>1995</year>
@@ -679,7 +679,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dpszenbu">
 		<description>D.P.S. Zenbu</description>
 		<year>1995</year>
@@ -690,7 +690,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="daikouk">
 		<description>Daikoukai Jidai</description>
 		<year>1990</year>
@@ -706,7 +706,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="daikouk2">
 		<description>Daikoukai Jidai II</description>
 		<year>1993</year>
@@ -722,7 +722,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="daisenr3">
 		<description>Daisenryaku III '90</description>
 		<year>1990</year>
@@ -738,14 +738,14 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
-	<!-- 
+
+	<!--
 	The collection includes two Dalk images, one marked as "Trurip" and one marked as
-	"freeware".	Analysis of the tracks shows that the data track is exactly the same, and
+	"freeware". Analysis of the tracks shows that the data track is exactly the same, and
 	audio tracks are the same but shifted forwards by 5980 bytes in the "freeware"
 	image. This difference is probably due to the read offset of the drive used
-	to dump the disk. 
-	
+	to dump the disk.
+
 	The only difference is in the last track. The image marked as freeware had its
 	data shifted beyond the boundaries of the disc, so it's missing some bytes at the
 	end. Trurip images are always offset-corrected, so we can assume that one is the
@@ -766,7 +766,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dangel">
 		<description>Dangel</description>
 		<year>1996</year>
@@ -777,7 +777,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="defana">
 		<description>De.FaNa</description>
 		<year>1995</year>
@@ -788,7 +788,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="deadforc">
 		<description>Dead Force</description>
 		<year>1995</year>
@@ -799,7 +799,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dotb">
 		<description>Dead of the Brain</description>
 		<year>1993</year>
@@ -810,7 +810,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="deathbrd">
 		<description>Death Brade</description>
 		<year>1992</year>
@@ -821,7 +821,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="deep">
 		<description>Deep</description>
 		<year>1995</year>
@@ -837,7 +837,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="deja2">
 		<description>De-Ja II</description>
 		<year>1992</year>
@@ -848,7 +848,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dengekin">
 		<description>Dengeki Nurse</description>
 		<year>1992</year>
@@ -859,7 +859,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="derbysta">
 		<description>Derby Stallion</description>
 		<year>1993</year>
@@ -870,7 +870,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="desire">
 		<description>Desire: Haitoku no Rasen</description>
 		<year>1994</year>
@@ -881,7 +881,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="diegekir">
 		<description>Die Gekirin</description>
 		<year>1995</year>
@@ -892,7 +892,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="digipin1">
 		<description>Digital Pinup Girls Vol. 1</description>
 		<year>1993</year>
@@ -903,7 +903,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dokidok1">
 		<description>Doki Doki Disk CD-ban Dai-1-kan: Club D.O. Jimukyoku</description>
 		<year>1994</year>
@@ -914,7 +914,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dorbestj">
 		<description>DOR Best Selection Joukan</description>
 		<year>1993</year>
@@ -930,7 +930,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dorse93">
 		<description>DOR Special Edition '93</description>
 		<year>1993</year>
@@ -941,7 +941,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dorsesak">
 		<description>DOR Special Edition Sakigake</description>
 		<year>1993</year>
@@ -952,7 +952,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="doukyuu">
 		<description>Doukyuusei</description>
 		<year>1992</year>
@@ -963,7 +963,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="doukyuu2">
 		<description>Doukyuusei 2</description>
 		<year>1995</year>
@@ -974,7 +974,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dhalf">
 		<description>Dragon Half</description>
 		<year>1994</year>
@@ -996,7 +996,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dknight4">
 		<description>Dragon Knight 4</description>
 		<year>1994</year>
@@ -1007,7 +1007,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dragflam">
 		<description>Dragons of Flame</description>
 		<year>1992</year>
@@ -1018,7 +1018,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="drakkhen">
 		<description>Drakkhen</description>
 		<year>1990</year>
@@ -1029,7 +1029,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dmaster">
 		<description>Dungeon Master</description>
 		<year>1989</year>
@@ -1040,7 +1040,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dmaster2">
 		<description>Dungeon Master II: Skullkeep</description>
 		<year>1994</year>
@@ -1051,7 +1051,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="eimmy">
 		<description>Eimmy to Yobanaide</description>
 		<year>1995</year>
@@ -1062,7 +1062,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="elfish">
 		<description>Elfish</description>
 		<year>1994</year>
@@ -1074,7 +1074,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="elfishlt">
 		<description>Elfish Lite</description>
 		<year>1993</year>
@@ -1085,7 +1085,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="elmknght">
 		<description>Elm Knight</description>
 		<year>1992</year>
@@ -1096,7 +1096,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="emdragon">
 		<description>Emerald Dragon</description>
 		<year>1992</year>
@@ -1112,7 +1112,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="etsuraku">
 		<description>Etsuraku no Gakuen</description>
 		<year>1994</year>
@@ -1123,7 +1123,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="evolutn">
 		<description>Evolution</description>
 		<year>1989</year>
@@ -1134,7 +1134,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="excel10">
 		<description>Excellent 10</description>
 		<year>1990</year>
@@ -1145,7 +1145,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="excitcd">
 		<description>Exciting CD</description>
 		<year>1994</year>
@@ -1161,7 +1161,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="excd94s">
 		<description>Exciting CD '94 Summer</description>
 		<year>1994</year>
@@ -1177,7 +1177,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="eyeotb2">
 		<description>Eye of the Beholder II: The Legend of Darkmoon</description>
 		<year>1993</year>
@@ -1188,7 +1188,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fbas1120">
 		<description>F-BASIC386 v1.1 L20</description>
 		<year>1989</year>
@@ -1199,7 +1199,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fbas2110">
 		<description>F-BASIC386 v2.1 L10</description>
 		<year>1992</year>
@@ -1210,7 +1210,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="f29retal">
 		<description>F29 Retaliator</description>
 		<year>1993</year>
@@ -1221,7 +1221,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fblow">
 		<description>Final Blow</description>
 		<year>1990</year>
@@ -1232,7 +1232,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="flashbck">
 		<description>Flashback</description>
 		<year>1994</year>
@@ -1243,7 +1243,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Seems to be a coverdisc for Oh!FM magazine, would be nice to have more info -->
 	<software name="fmthcdd1">
 		<description>FM Towns Hyper CD Demo Futoppara No. 1</description>
@@ -1255,7 +1255,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fmtstdem">
 		<description>FM Towns Super Technology Demo 1993</description>
 		<year>1993</year>
@@ -1266,7 +1266,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-		
+
 	<software name="fractal">
 		<description>Fractal Engine Demo</description>
 		<year>1991</year>
@@ -1277,7 +1277,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="freewill">
 		<description>Free Will: Knight of Argent</description>
 		<year>1992</year>
@@ -1288,7 +1288,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="frogfstd">
 		<description>Frog Feast Demo</description>
 		<year>2005</year>
@@ -1299,7 +1299,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc4">
 		<description>Free Software Collection 4</description>
 		<year>1991</year>
@@ -1315,7 +1315,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc5">
 		<description>Free Software Collection 5</description>
 		<year>1992</year>
@@ -1326,7 +1326,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc6">
 		<description>Free Software Collection 6</description>
 		<year>1993</year>
@@ -1337,7 +1337,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc7">
 		<description>Free Software Collection 7</description>
 		<year>1993</year>
@@ -1348,7 +1348,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc8">
 		<description>Free Software Collection 8</description>
 		<year>1994</year>
@@ -1359,7 +1359,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc9">
 		<description>Free Software Collection 9</description>
 		<year>1994</year>
@@ -1370,7 +1370,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc10">
 		<description>Free Software Collection 10</description>
 		<year>1995</year>
@@ -1381,7 +1381,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fsc11">
 		<description>Free Software Collection 11</description>
 		<year>1995</year>
@@ -1392,7 +1392,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fshark">
 		<description>Hishouzame / Flying Shark</description>
 		<year>1993</year>
@@ -1403,7 +1403,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fwc1">
 		<description>Freeware Collection 1</description>
 		<year>1989</year>
@@ -1414,7 +1414,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fwc2">
 		<description>Freeware Collection 2</description>
 		<year>1990</year>
@@ -1425,7 +1425,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fwc3">
 		<description>Freeware Collection 3</description>
 		<year>1991</year>
@@ -1436,7 +1436,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gakuking">
 		<description>Gakuen King: Hidehiko Gakkou wo Tsukuru</description>
 		<year>1996</year>
@@ -1448,7 +1448,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="galaxyf2">
 		<description>Galaxy Force II</description>
 		<year>1991</year>
@@ -1459,7 +1459,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gametec1">
 		<description>Game Technopolis Super Collection 1</description>
 		<year>1992</year>
@@ -1470,7 +1470,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gametec2">
 		<description>Game Technopolis Super Collection 2</description>
 		<year>1993</year>
@@ -1481,7 +1481,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gekirin">
 		<description>Gekirin: Ushinawareshi Houken</description>
 		<year>1994</year>
@@ -1492,7 +1492,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gendaiex">
 		<description>Gendai Daisenryaku EX Special</description>
 		<year>1994</year>
@@ -1503,7 +1503,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="genocsq">
 		<description>Genocide Square</description>
 		<year>1993</year>
@@ -1514,7 +1514,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gigamort">
 		<description>Giga Mortion</description>
 		<year>1995</year>
@@ -1525,7 +1525,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gnutowns">
 		<description>GNU for Towns Release 2</description>
 		<year>1991</year>
@@ -1536,7 +1536,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="goh2">
 		<description>Goh II Towns Special</description>
 		<year>1993</year>
@@ -1552,7 +1552,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gunblaze">
 		<description>Gunblaze</description>
 		<year>1994</year>
@@ -1563,7 +1563,29 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="gundamhc">
+		<description>Mobile Suit Gundam: Hyper Classic Operation</description>
+		<year>1992</year>
+		<publisher>Family Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mobile suit gundam hyper classic operation" sha1="6c4a876c7973e4652d06c8ad1a9b3b3769e3f90e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gundamhd">
+		<description>Mobile Suit Gundam: Hyper Desert Operation</description>
+		<year>1992</year>
+		<publisher>Family Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mobile suit gundam hyper desert operation" sha1="05410dc1fe303c5613650f2a697d76ad769644ea" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="gunship">
 		<description>Gunship: The Helicopter Simulation</description>
 		<year>1990</year>
@@ -1574,7 +1596,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hanakiok">
 		<description>Hana no Kioku</description>
 		<year>1995</year>
@@ -1585,7 +1607,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hanapon">
 		<description>Hanafuda de Pon!</description>
 		<year>1996</year>
@@ -1601,7 +1623,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="heartron">
 		<description>Heart de Ron!!</description>
 		<year>1995</year>
@@ -1612,7 +1634,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="highccom">
 		<description>High C Compiler Multimedia Development Kit v1.7 L13</description>
 		<year>1995</year>
@@ -1623,7 +1645,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="highlt20">
 		<description>Highlight CD 20</description>
 		<year>1993</year>
@@ -1639,7 +1661,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hoshis1">
 		<description>Hoshi no Suna Monogatari</description>
 		<year>1992</year>
@@ -1650,7 +1672,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hoshis2">
 		<description>Hoshi no Suna Monogatari 2</description>
 		<year>1992</year>
@@ -1661,7 +1683,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hoshis3">
 		<description>Hoshi no Suna Monogatari 3</description>
 		<year>1995</year>
@@ -1672,7 +1694,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hypraddr">
 		<description>Hyper Address</description>
 		<year>1990</year>
@@ -1688,7 +1710,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hyprocea">
 		<description>Hyper Ocean</description>
 		<year>1993</year>
@@ -1699,7 +1721,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="idolproj">
 		<description>Idol Project</description>
 		<year>1995</year>
@@ -1715,7 +1737,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="igo2">
 		<description>Igo II</description>
 		<year>1989</year>
@@ -1726,8 +1748,8 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-		
-	<!-- 
+
+	<!--
 	This is named "Go Dojo Yaburi" in the Neo Kobe Collection. That name actually
 	corresponds to a different Go game, also published by Fujitsu.
 	-->
@@ -1741,7 +1763,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="imgfight">
 		<description>Image Fight</description>
 		<year>1990</year>
@@ -1752,7 +1774,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="indy3">
 		<description>Indiana Jones and the Last Crusade</description>
 		<year>1990</year>
@@ -1763,7 +1785,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="indy4">
 		<description>Indiana Jones and the Fate of Atlantis</description>
 		<year>1993</year>
@@ -1774,7 +1796,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="infest">
 		<description>Infestation: Chinmoku no Wakusei</description>
 		<year>1992</year>
@@ -1785,7 +1807,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="injuugak">
 		<description>Injuu Gakuen: La Blue Girl</description>
 		<year>1994</year>
@@ -1796,7 +1818,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ishidou">
 		<description>Ishidou</description>
 		<year>1990</year>
@@ -1807,7 +1829,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="janjaka">
 		<description>Jan Jaka Jan</description>
 		<year>1992</year>
@@ -1818,7 +1840,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="jango4">
 		<description>Jango 4</description>
 		<year>1994</year>
@@ -1829,7 +1851,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="jankirou">
 		<description>Jankirou</description>
 		<year>1994</year>
@@ -1840,7 +1862,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="jealousy">
 		<description>Jealousy</description>
 		<year>1995</year>
@@ -1851,7 +1873,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="joshikou">
 		<description>Joshikousei Shoujo Hatsunetsu</description>
 		<year>1993</year>
@@ -1862,7 +1884,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="joshua">
 		<description>Joshua</description>
 		<year>1992</year>
@@ -1873,7 +1895,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kidpix">
 		<description>Kid Pix</description>
 		<year>1992</year>
@@ -1884,7 +1906,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kigen">
 		<description>Kigen: Kagayaki no Hasha</description>
 		<year>1992</year>
@@ -1895,7 +1917,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kindan">
 		<description>Kindan no Ketsuzoku</description>
 		<year>1993</year>
@@ -1906,7 +1928,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kbounty">
 		<description>King's Bounty</description>
 		<year>1994</year>
@@ -1917,7 +1939,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kquest5">
 		<description>King's Quest V: Absence Makes the Heart Go Yonder</description>
 		<year>1991</year>
@@ -1928,7 +1950,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kiwame">
 		<description>Kiwame</description>
 		<year>1992</year>
@@ -1939,7 +1961,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kiwame2">
 		<description>Kiwame II</description>
 		<year>1994</year>
@@ -1950,7 +1972,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kokoraku">
 		<description>Koko wa Rakuensou</description>
 		<year>1996</year>
@@ -1961,7 +1983,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kokorak2">
 		<description>Koko wa Rakuensou 2</description>
 		<year>1996</year>
@@ -1972,7 +1994,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kyankyan">
 		<description>Kyan Kyan Collection</description>
 		<year>1989</year>
@@ -1983,7 +2005,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Originally labeled as "mp3 source". It probably needs a redump. -->
 	<software name="ktiger">
 		<description>Kyuukyoku Tiger</description>
@@ -1995,7 +2017,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="landlore">
 		<description>Lands of Lore: The Throne of Chaos</description>
 		<year>1993</year>
@@ -2006,8 +2028,8 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
-	<software name="lastarmag">
+
+	<software name="lastarmg">
 		<description>Last Armageddon CD Special</description>
 		<year>1989</year>
 		<publisher>Brain Grey</publisher>
@@ -2027,7 +2049,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lastsurv">
 		<description>Last Survivor</description>
 		<year>1990</year>
@@ -2038,7 +2060,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ldawn2">
 		<description>Lunatic Dawn II</description>
 		<year>1994</year>
@@ -2054,7 +2076,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lemmings">
 		<description>Lemmings</description>
 		<year>1992</year>
@@ -2065,8 +2087,8 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
-	<!-- 
+
+	<!--
 	Is the English version official? The intro is still in Japanese, and there's
 	very little information available about this release.
 	-->
@@ -2080,7 +2102,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lemmin2j">
 		<description>Lemmings 2: The Tribes (Japanese)</description>
 		<year>1994</year>
@@ -2091,7 +2113,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lesserm">
 		<description>Lesser Mern</description>
 		<year>1992</year>
@@ -2102,7 +2124,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- The floppy image seems to have 19712 extra bytes filled with 0xE5 - bad dump? -->
 	<software name="lettuce">
 		<description>Lettuce Cooking</description>
@@ -2119,7 +2141,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="libido7">
 		<description>Libido7</description>
 		<year>1994</year>
@@ -2130,7 +2152,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lifedth">
 		<description>Life &amp; Death</description>
 		<year>1992</year>
@@ -2141,7 +2163,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lifedth2">
 		<description>Life &amp; Death II: The Brain</description>
 		<year>1992</year>
@@ -2152,7 +2174,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="links386">
 		<description>Golf Links 386 Pro</description>
 		<year>1995</year>
@@ -2164,7 +2186,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="linuxje3">
 		<description>Linux + JE3</description>
 		<year>1994</year>
@@ -2175,7 +2197,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="linuxje4">
 		<description>Linux + JE4 1995/12</description>
 		<year>1995</year>
@@ -2197,6 +2219,22 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="lodoss1">
+		<description>Record of Lodoss War: Haiiro no Majo</description>
+		<year>1994</year>
+		<publisher>Humming Bird Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="record of lodoss war - haiiro no majo (system disk).hdm" size="1261568" crc="4303f8cc" sha1="e5d6580d4b56d8b25a401f566dd07157866de128" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="record of lodoss war - haiiro no majo" sha1="7479e561eaf9a60468b924c3b822173710c37f47" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="loom">
 		<description>Loom</description>
 		<year>1991</year>
@@ -2212,7 +2250,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lrabble">
 		<description>Libble Rabble</description>
 		<year>1994</year>
@@ -2223,7 +2261,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lupin3">
 		<description>Lupin Sansei: Hong Kong no Mashu: Fukushuu wa Meikyuu no Hate ni</description>
 		<year>1990</year>
@@ -2234,7 +2272,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lvalour">
 		<description>Legends of Valour</description>
 		<year>1994</year>
@@ -2245,7 +2283,106 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="madpara">
+		<description>Mad Paradox</description>
+		<year>1994</year>
+		<publisher>Queen Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mad paradox" sha1="da8146ef3fcffb9e8679b3f64bb80efc48785e80" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="madparae">
+		<description>Mad Paradox (unofficial English translation by Demoniac)</description>
+		<year>1994</year>
+		<publisher>Queen Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mad paradox (en)" sha1="a8da9f8d22bf5101776731bfb1cf7754691eaa26" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="madstalk">
+		<description>Mad Stalker</description>
+		<year>1994</year>
+		<publisher>Family Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mad stalker" sha1="1d2865889b1e124ec073106312cd58c8136fd08f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="madogakr">
+		<description>Madou Gakuin R</description>
+		<year>1994</year>
+		<publisher>Foresight</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="madou gakuin r" sha1="743d1ed325898829e92e229d7c5c3474c9ea2760" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mahdepon">
+		<description>Mahjong de Pon!</description>
+		<year>1994</year>
+		<publisher>Active</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mahjong de pon!" sha1="58c4ae95a830294baa1a448c328d53c1d0a6002b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mahhoute">
+		<description>Mahjong Houteiraoyui</description>
+		<year>1995</year>
+		<publisher>Queen Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mahjong houteiraoyui" sha1="a89200b37fee06bfa727a85433705b2a2ad95e6d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mahoudai">
+		<description>Mahou Daisakusen</description>
+		<year>1995</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mahou daisakusen" sha1="534e04e71d29907098b0c0151b69de70ba37570e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mandarak">
+		<description>Mandarake Ichizoku</description>
+		<year>1995</year>
+		<publisher>Foresight</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mandarake ichizoku" sha1="5a991b6ca46127232a270e6f422c9a17f7ede537" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="manycol">
+		<description>Many Colors</description>
+		<year>1993</year>
+		<publisher>Amorphous</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="many colors" sha1="392e9a0faebb7ec2bc56fc0cfdc6ca800f610dd0" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="marble">
 		<description>Marble Madness</description>
 		<year>1991</year>
@@ -2256,18 +2393,18 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
-	<software name="mode7dmo">
-		<description>Mode 7 Demo</description>
-		<year>2008</year>
-		<publisher>Rastersoft</publisher>
+
+	<software name="marineph">
+		<description>Marine Philt</description>
+		<year>1993</year>
+		<publisher>Fairytale</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mode 7 demo" sha1="50d915eb7e5373e9095792af964a46a6a4f70a5e" />
+				<disk name="marine philt" sha1="09b14f591f1c78ab0b125c1cad9b041670931695" />
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mbomber">
 		<description>Muscle Bomber: The Body Explosion</description>
 		<year>1993</year>
@@ -2278,7 +2415,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mcosm">
 		<description>Microcosm</description>
 		<year>1993</year>
@@ -2289,7 +2426,64 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="menzober">
+		<description>Menzoberranzan</description>
+		<year>1995</year>
+		<publisher>KSS</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="menzoberranzan" sha1="ff975cf59dc3c8c884a588245311a3319fb7506e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="metaleye">
+		<description>Metal Eye</description>
+		<year>1993</year>
+		<publisher>Elf</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="metal eye" sha1="01c44ebc9e9ec32a37f9153b890adb22801928d3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="metaley2">
+		<description>Metal Eye 2</description>
+		<year>1994</year>
+		<publisher>Elf</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="metal eye 2" sha1="a657dea0277866d0dee8af92f987985464e5f83d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mflcan2">
+		<description>My Fair Lady CAN II: Elementary</description>
+		<year>1990</year>
+		<publisher>CRI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="my fair lady can ii - elementary" sha1="49e0d2a348b405d01b9790267f70a108b69cac8b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mhouyou">
+		<description>Mugen Houyou</description>
+		<year>1995</year>
+		<publisher>Alice Soft</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mugen houyou" sha1="19d89c9f5c41fc1c77bc3a27220aeb9da39f484a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="mirage">
 		<description>Mirage</description>
 		<year>1992</year>
@@ -2300,7 +2494,29 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="mirrors">
+		<description>Mirrors</description>
+		<year>1992</year>
+		<publisher>Apros</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mirrors" sha1="cecb05ffd74a82b4f7664fae139172f8493a32af" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="misty">
+		<description>Misty</description>
+		<year>1989</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="misty" sha1="77b69d046829ec088621bbd47d2fbaacaa5e21a6" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="mmagic4">
 		<description>Might and Magic: Clouds of Xeen</description>
 		<year>1993</year>
@@ -2311,7 +2527,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="mmagic5">
 		<description>Might and Magic: Darkside of Xeen</description>
 		<year>1994</year>
@@ -2322,7 +2538,135 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="mmorph">
+		<description>Megamorph</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="megamorph" sha1="59e30f6ce0c8cb62b22afe383ffcf7450910a612" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mode7dmo">
+		<description>Mode 7 Demo</description>
+		<year>2008</year>
+		<publisher>Rastersoft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mode 7 demo" sha1="50d915eb7e5373e9095792af964a46a6a4f70a5e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="monkey2">
+		<description>Monkey Island 2: LeChuck's Revenge</description>
+		<year>1994</year>
+		<publisher>Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="monkey island 2 - lechuck's revenge" sha1="4e3575059ee57961ad2a96c9cf4e7cbedbd3d2a5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="moonchan">
+		<description>Moonlight-chan Rinshan</description>
+		<year>1993</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="moonlight chan rin shan" sha1="55e927efd17e1b7dd5f08745a68219da488d6c82" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="moritas2">
+		<description>Morita Shougi II</description>
+		<year>1989</year>
+		<publisher>Enix</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="morita shogi 2" sha1="a5cdde15bd0eabac6c5bfd195a651b18f9b4d869" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="msdet1">
+		<description>Ms. Detective File #1: Iwami Ginzan Satsujin Jiken</description>
+		<year>1992</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom1" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ms. detective file #1 (disc 1)" sha1="314bf8187639251ce93e7a8c83a805732079fe79" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ms. detective file #1 (disc 2)" sha1="2d45728ab1f6204c308ab7dee657cbaaef137229" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Missing a floppy disk that seems to be necessary to boot the game -->
+	<software name="msdet2">
+		<description>Ms. Detective File #2: Sugata-naki Irainin</description>
+		<year>1993</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ms. detective file #2" sha1="42a02837b31ce0cbec20053d5b178f26d2c46ee1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mspectre">
+		<description>Megaspectre</description>
+		<year>1993</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="megaspectre" sha1="05e155efae133d07ed615a01a4dcb402522a0a88" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mujintou">
+		<description>Mujintou Monogatari</description>
+		<year>1995</year>
+		<publisher>KSS</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mujintou monogatari" sha1="7cfe7c2b9d4bef30c1db4dbeae0a99799a90dea0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- For some reason, this game requires swapping the mouse/controller ports -->
+	<software name="mclubdx">
+		<description>Murder Club DX</description>
+		<year>1992</year>
+		<publisher>Riverhill Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="murder club dx" sha1="eddbdc4e5f8b5d2ffa35aab5f6c136129ce29653" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mumgoose">
+		<description>Mixed-Up Mother Goose</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line Japan</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mixed-up mother goose" sha1="99d38872f432ff082707b1405b8cfc63ddeb1feb" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="mustowns">
 		<description>Musium Towns</description>
 		<year>1993</year>
@@ -2333,7 +2677,18 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="myeyes">
+		<description>My Eyes!</description>
+		<year>1992</year>
+		<publisher>Birdy Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="my eyes!" sha1="a1093fcd4bbddcd90b3faa0617d5a895c214e3c4" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="nadia">
 		<description>Fushigi no Umi no Nadia</description>
 		<year>1993</year>
@@ -2354,7 +2709,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="necronom">
 		<description>Necronomicon</description>
 		<year>1994</year>
@@ -2362,6 +2717,111 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="necronomicon" sha1="82672ceafa32c0e9975aeda8f3f578c1c204ff52" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nihonrki">
+		<description>Nihon no Rekishi: Kizoku-hen</description>
+		<year>1990</year>
+		<publisher>CRI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nihon no rekishi - kizoku-hen" sha1="1bf433fc57cba5d452088b69c3b63d1be8ff9e1c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nihonrko">
+		<description>Nihon no Rekishi: Kodai-hen</description>
+		<year>1990</year>
+		<publisher>CRI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nihon no rekishi - kodai-hen" sha1="994b5f62b4c1ff2cd439948f12c52fa6d63cb8dc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nihonya">
+		<description>Nihon no Yachou</description>
+		<year>1990</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nihon no yachou" sha1="561a61de28e33c514f7e661632cdb58c5dc2eddf" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ningyou">
+		<description>Ningyou Tsukai</description>
+		<year>1993</year>
+		<publisher>Forest</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ningyou tsukai" sha1="d2e93204d3cc2557f26ee72c07d0ab1109bf5846" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nobunagh">
+		<description>Nobunaga no Yabou: Haouden</description>
+		<year>1993</year>
+		<publisher>Koei</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="nobunaga no yabou - haou-den.hdm" size="1261568" crc="d426a880" sha1="4194c61909c37fdf83daae77dcd84ad996237b0c" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nobunaga no yabou - haou-den" sha1="0e2f9b942ba4f72961fc7dd5c3c9678eaa24b12d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Originally labeled as "mp3 source". It probably needs a redump. -->
+	<software name="nobunagt">
+		<description>Nobunaga no Yabou: Tenshouki</description>
+		<year>1995</year>
+		<publisher>Koei</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nobunaga no yabou - tenshouki" sha1="fe1ca3991c5a1399cd720ae177644ca314b5d004" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nova">
+		<description>Nova</description>
+		<year>1993</year>
+		<publisher>Cat's Pro</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nova" sha1="1e9dad67f2b4c242f655976e05abafc97c804bd6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="oasyswin">
+		<description>OASYS/Win v2.0</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="oasys-win" sha1="6db75f509d91ffe754f5188cd7a03f646631a6ba" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="okitgear">
+		<description>Okiraku TownsGEAR</description>
+		<year>1994</year>
+		<publisher>Softbank</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="okiraku towns gear" sha1="a614a4471c91a19fe33bf903a5f699907bad813e" />
 			</diskarea>
 		</part>
 	</software>
@@ -2376,7 +2836,29 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="oshacook">
+		<description>Oshare Cooking</description>
+		<year>1989</year>
+		<publisher>Misawa Home</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="oshare cooking" sha1="d6175d9a81760fbd9e497e6a396dbaf2aad6d57c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ourashin">
+		<description>Ougon no Rashinban</description>
+		<year>1990</year>
+		<publisher>Riverhill Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ougon no rashimban" sha1="192ab79d6cd44db18a8410d35891fe4bc1f74528" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="panzrdiv">
 		<description>Panzer Division / Kikou Shidan</description>
 		<year>1990</year>
@@ -2387,7 +2869,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="pegasus">
 		<description>Pegasus</description>
 		<year>1995</year>
@@ -2398,7 +2880,40 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="planedge">
+		<description>Planet's Edge</description>
+		<year>1993</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="planet's edge" sha1="41c000e9a1f73d76437ab56bee363d481f56b58f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pmaker2">
+		<description>Princess Maker 2</description>
+		<year>1994</year>
+		<publisher>Gainax</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="princess maker 2" sha1="a0ed8d1a394ccfc109c3afdc6fdc6fd6a095643d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ponkan">
+		<description>Ponkan</description>
+		<year>1994</year>
+		<publisher>Ponytail Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ponkan" sha1="2e02fbd3cafbfc385d21c97c8b91d771fdd22cc2" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="populous">
 		<description>Populous &amp; The Promised Lands</description>
 		<year>1990</year>
@@ -2409,7 +2924,46 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- 
+	It should be possible to recreate the user disk by running the ユーザーディスク作成 program
+	on the CD, but it doesn't seem to work. Not sure if it's an emulation issue or
+	something else.
 	
+	The system disk is needed only for installing the game into a hard disk.
+	-->		
+	<software name="powrdoll">
+		<description>Power Dolls</description>
+		<year>1994</year>
+		<publisher>Kogado</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="power dolls (user disk).hdm" size="1261568" crc="7b90b036" sha1="8cc2d7cdf2ffde4133cddd039f6620ba17b1e553" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="power dolls (system disk).hdm" size="1261568" crc="5f6c44c7" sha1="721dd113dc6bedfb2d212e3a4de15260c41805f7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="power dolls" sha1="22c895ef1b29fe4f01b1956d323657fe67a9c832" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="powrdol2">
+		<description>Power Dolls 2</description>
+		<year>1995</year>
+		<publisher>Kogado</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="power dolls 2" sha1="248ec3f239e8d069490867d437ac0465dbf878b4" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="powermon">
 		<description>Powermonger</description>
 		<year>1992</year>
@@ -2430,7 +2984,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="prinpers">
 		<description>Prince of Persia</description>
 		<year>1992</year>
@@ -2441,7 +2995,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="prinper2">
 		<description>Prince of Persia 2: The Shadow and the Flame</description>
 		<year>1994</year>
@@ -2449,6 +3003,141 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="prince of persia 2" sha1="7e46f99eb028afc8f955e5d4d7d3e38b6fefbc73" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="prostudg">
+		<description>Pro Student G</description>
+		<year>1993</year>
+		<publisher>Alice Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="pro student g (boot disk).hdm" size="1261568" crc="a068feeb" sha1="fa5e5b185cc452e9fa252eac61eb6f8a133cc080" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pro student g" sha1="a7675c732045804fbaf292a191eb1967f98894a4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="provvdnz">
+		<description>Provvidenza: Legenda la Spada di Alfa</description>
+		<year>1991</year>
+		<publisher>Sofcom</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="provvidenza" sha1="a104b48ade5fbe34b324f0c7f3a3fa0de7b482fc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydet1">
+		<description>Psychic Detective Series Vol. 1: Invitation</description>
+		<year>1989</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 1 - invitation" sha1="4d53507fe063ae02cb1db77a0bf591dd62d5a014" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydet2">
+		<description>Psychic Detective Series Vol. 2: Memories</description>
+		<year>1989</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 2 - memories" sha1="dc3d92414e77cf0220e10f46a92e2c24d07daa82" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydet3">
+		<description>Psychic Detective Series Vol. 3: Aya</description>
+		<year>1990</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 3 - aya" sha1="2ee820e859d4a6120ed6940a318d45c1101b4140" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydet4">
+		<description>Psychic Detective Series Vol. 4: Orgel</description>
+		<year>1991</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic detective series vol. 4 - orgel.hdm" size="1261568" crc="81a557bf" sha1="e32d7a6b60a2265a7035a05f8272ac7938cf82bf" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 4 - orgel" sha1="f1bef6f55415b869685c157acae67f8afb9dfdd3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydet5">
+		<description>Psychic Detective Series Vol. 5: Nightmare</description>
+		<year>1991</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic detective series vol. 5 - nightmare (system disk).hdm" size="1261568" crc="10de4174" sha1="9222ef4d56b96879dc26bcd99d4b61777556aeee" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 5 - nightmare" sha1="ec31d635bb4cbdb7f8b4b4dfc48d690a61ab602e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydetf1">
+		<description>Psychic Detective Series Final: Solitude Joukan</description>
+		<year>1992</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic detective series final - solitude joukan.hdm" size="1261568" crc="9dd1bf09" sha1="36f9557b45a606f54cebb180f88e37207a854e37" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series final - solitude joukan" sha1="66736198f2507efba5967f7af0b7f98255a38cca" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psydetf2">
+		<description>Psychic Detective Series Final: Solitude Gekan</description>
+		<year>1993</year>
+		<publisher>Data West</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="psychic detective series final - solitude gekan.hdm" size="1261568" crc="1e6f92b3" sha1="a0c3e96599e546c0c212091f52d42adbb2dbbb5b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series final - solitude gekan" sha1="7268bbc2f30212f658a52442db1cdd860c47bba6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pulirula">
+		<description>Pu-Li-Ru-La</description>
+		<year>1994</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pu-li-ru-la" sha1="eb21c2d89c6a01570af580985b1b3771d0f151d0" />
 			</diskarea>
 		</part>
 	</software>
@@ -2463,7 +3152,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="puzznic">
 		<description>Puzznic</description>
 		<year>1990</year>
@@ -2474,7 +3163,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="racrally">
 		<description>RAC Rally</description>
 		<year>1995</year>
@@ -2485,7 +3174,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- works well on fmtmarty, keyboard seems to interfere with movements on fmtowns -->
 	<software name="raiden">
 		<description>Raiden Densetsu / Raiden Trad</description>
@@ -2497,7 +3186,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="raidy">
 		<description>Ikazuchi no Senshi Raidy</description>
 		<year>1994</year>
@@ -2508,7 +3197,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="raidy2">
 		<description>Ikazuchi no Senshi Raidy 2</description>
 		<year>1996</year>
@@ -2519,7 +3208,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Missing a floppy disk -->
 	<software name="railtyc">
 		<description>Railroad Tycoon</description>
@@ -2531,7 +3220,58 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="rance3">
+		<description>Rance III: Leazas Kanraku</description>
+		<year>1992</year>
+		<publisher>Alice Soft</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rance iii" sha1="abe5a360f7a7871406d6f80a1744915f875fcadb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rance4">
+		<description>Rance IV: Kyoudan no Isan</description>
+		<year>1994</year>
+		<publisher>Alice Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="rance iv (boot disk).hdm" size="1261568" crc="45c0e9e5" sha1="0c905ca63b159a886c429944d1c09b01feaf73d3" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rance iv" sha1="ca5c78eb1cddeac3eb6113b4d763791a03f361cc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rance41">
+		<description>Rance 4.1: Okusuri Koujou wo Sukue!</description>
+		<year>1995</year>
+		<publisher>Alice Soft</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rance 4.1" sha1="5eb36774483fe9c3e7ba5745aaa336540b07f402" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rance42">
+		<description>Rance 4.2: Angel-gumi</description>
+		<year>1995</year>
+		<publisher>Alice Soft</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rance 4.2" sha1="e61f331f1a8f026f1a88325a4497eeb4d4c06446" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ravnloft">
 		<description>Ravenloft</description>
 		<year>1995</year>
@@ -2542,7 +3282,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="rayxanbr">
 		<description>Rayxanber</description>
 		<year>1990</year>
@@ -2553,40 +3293,224 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
-	<software name="splatter">
-		<description>Splatterhouse</description>
+
+	<!--
+	This image is missing the IPL data in sector 0. It's possible to run AUTOEXEC.BAT
+	manually from TownsOS, but it should be considered a bad dump.
+	-->
+	<software name="rbisland">
+		<description>Rainbow Islands Extra</description>
 		<year>1992</year>
 		<publisher>Ving</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="splatterhouse" sha1="ddd73172589f840d6feb5f55c17a011f2aa87c77" />
+				<disk name="rainbow islands extra" sha1="2c480a769d0f0340ab2c26988b5d37404606dc7e" />
 			</diskarea>
 		</part>
 	</software>
 	
-	<software name="ssf2">
-		<description>Super Street Fighter II: The New Challengers</description>
-		<year>1994</year>
-		<publisher>Capcom</publisher>
+	<software name="regiopw2">
+		<description>Regional Power II</description>
+		<year>1992</year>
+		<publisher>Cosmos</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="super street fighter ii" sha1="97ddbbc746d7b7f6fb72e57a6b443efab384b30c" />
+				<disk name="regional power ii" sha1="18e1100519fbfdfec7a9abc495b1a3719a5529d0" />
 			</diskarea>
 		</part>
 	</software>
-	
-	<software name="ssf2samp">
-		<description>Super Street Fighter II: The New Challengers (Sample Disc)</description>
-		<year>1994</year>
-		<publisher>Capcom</publisher>
+
+	<!--
+	Not sure how to romanize the subtitle for this (電脳少女). It should be "Dennou Shoujo" but
+	the title screen spells it as "Den-no Senshi" for whatever reason.
+	-->
+	<software name="rejectn">
+		<description>Rejection: Den-no Senshi</description>
+		<year>1992</year>
+		<publisher>Sur de Wave</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="super street fighter ii (sample disc)" sha1="6eae776377e80ae43950f47c4f930df36b63c6d6" />
+				<disk name="rejection - denno senshi" sha1="ed27051ac0deb746e97165008b9d19e4274af45e" />
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="retzork">
+		<description>Return to Zork</description>
+		<year>1994</year>
+		<publisher>Data West</publisher>
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="return to zork" sha1="ec6c343f5016d60df7650b636298945372471550" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ringout">
+		<description>Ring Out!!</description>
+		<year>1995</year>
+		<publisher>ZyX</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ring out!!" sha1="2b50d05b278824e36a1b2fdf500a5ec4c9daeb3b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rockrang">
+		<description>Rocket Ranger</description>
+		<year>1990</year>
+		<publisher>Pony Canyon</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rocket ranger" sha1="faee63cd159d68240360149887702560dedff780" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ryuutou">
+		<description>Ryuutouden</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ryuutouden" sha1="b3468afda6c697b270d49ccc89545dc57b0c6c80" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sayaka">
+		<description>Sayaka &amp; Miho</description>
+		<year>1994</year>
+		<publisher>Fairytale</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sayaka &amp; miho" sha1="c1a31725589c0256e6e93c71033db07772fa550c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="scav4dmo">
+		<description>Scavenger 4 Demo Disc</description>
+		<year>1993</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="scavenger 4 (demo disc)" sha1="d94ff9ddc64c3acc20814f8290e5c5a0e6fe2217" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="scav4">
+		<description>Scavenger 4</description>
+		<year>1993</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="scavenger 4" sha1="a78fff2a22e995afb7cbadcec026caf65ac3490e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="scholar">
+		<description>Scholar Movie Magazine</description>
+		<year>1994</year>
+		<publisher>King Records</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="scholar movie magazine (boot disk).hdm" size="1261568" crc="6351e1a6" sha1="57e30fa44927653d88d30da0df3236852c669394" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="scholar movie magazine" sha1="7f958862ef60d1f903914c43b2ce5cfc50062c4d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="schwarz">
+		<description>Schwarzschild</description>
+		<year>1991</year>
+		<publisher>Kogado</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="schwarzschild (game disk).hdm" size="1261568" crc="6a3658a7" sha1="e70e032a9ffe0f1454366a0d15fb2fb0ef224117" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="schwarzschild" sha1="97bd8659e635b7d1d1567206343c8f692b2a0955" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="schwarz4">
+		<description>Schwarzschild IV</description>
+		<year>1993</year>
+		<publisher>Kogado</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="schwarzschild iv" sha1="813091a4a7fe385da8014f6d3e22a06dc5ec275e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shangr2">
+		<description>Shangrlia 2</description>
+		<year>1993</year>
+		<publisher>Elf</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shangrlia 2" sha1="b774d673f3a49912e6ed857865b8a7a99b368b06" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sherlock">
+		<description>Sherlock Holmes: Consulting Detective</description>
+		<year>1991</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sherlock holmes no tantei kouza" sha1="df4dac06bc19ff169d9bdc958bfc25907aa7072e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shinc">
+		<description>Shinc</description>
+		<year>1993</year>
+		<publisher>Libido</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shinc" sha1="5cb5158e300c504e987d0ab9564ddffa902c28ed" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shounenm">
+		<description>Shounen Magazine History</description>
+		<year>1992</year>
+		<publisher>Datt Japan</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shounen magazine history" sha1="f453ee25f0f0da3ca23bbbd09632aa63f7a7d2fb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="simant">
+		<description>SimAnt</description>
+		<year>1993</year>
+		<publisher>Imagineer</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="simant" sha1="56d7d642dd93073a76f19db4dde3418eb0f5ab17" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="simcity">
 		<description>SimCity</description>
 		<year>1990</year>
@@ -2597,7 +3521,89 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="simc2000">
+		<description>SimCity 2000</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="simcity 2000" sha1="b0a731372cc12dbdb5dd7140daa75cb99952cc77" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="simearth">
+		<description>SimEarth</description>
+		<year>1991</year>
+		<publisher>Imagineer</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="simearth" sha1="e14823bae0e649313d2dec35d889e06d2a42986a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="simfarm">
+		<description>SimFarm</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="simfarm" sha1="4c87c0002006a539e04fd2bdb1b4a1c7435aa452" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="smobius">
+		<description>Silent Mobius</description>
+		<year>1991</year>
+		<publisher>Gainax</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="silent mobius" sha1="87a224ff3507b6ce8bc14a8f3a860ba07dcbabdf" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sotsu93">
+		<description>Sotsugyou '93: Graduation</description>
+		<year>1993</year>
+		<publisher>JHV</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="sotsugyou '93 - graduation (play disk).hdm" size="1261568" crc="fb4ac4d8" sha1="9ac7edfd20421df85d8fd469f45c3805a307023b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sotsugyou '93 - graduation" sha1="56c0e748abe85ca09a947821011bb304174119c0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="splatter">
+		<description>Splatterhouse</description>
+		<year>1992</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="splatterhouse" sha1="ddd73172589f840d6feb5f55c17a011f2aa87c77" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sodyssey">
+		<description>Super Odyssey</description>
+		<year>1989</year>
+		<publisher>Wave Train</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super odyssey" sha1="c96c408d52c6d89374b7236de7af9751b0bcdefb" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sotb">
 		<description>Shadow of the Beast: Mashou no Okite</description>
 		<year>1991</year>
@@ -2608,7 +3614,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Original image from the redump.org database -->
 	<software name="sotb2">
 		<description>Shadow of the Beast II: Juushin no Jubaku</description>
@@ -2620,7 +3626,179 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="srmp23">
+		<description>Super Real Mahjong PII &amp; PIII</description>
+		<year>1992</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super real mahjong pii &amp; piii" sha1="8bdb2f443e29fe0b193d162be3a497987fa340ec" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="srmp4">
+		<description>Super Real Mahjong PIV</description>
+		<year>1994</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super real mahjong piv" sha1="f4bb6c4f57b02080fd734238ca7cf33e5d729eb3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="srogue">
+		<description>Space Rogue</description>
+		<year>1990</year>
+		<publisher>Wave Train</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="space rogue" sha1="f409d07391dfdff739241710df792ddd84531a85" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- 
+	This version seems to remove some kind of disc check (copy protection?).
+	Not sure when it was made or who made it.
+	-->
+	<software name="sroguend">
+		<description>Space Rogue (no disc check)</description>
+		<year>1990</year>
+		<publisher>Wave Train</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="space rogue (no disk check)" sha1="29b752371f08eb772eb91b4f8c268ea7efd8102f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ssf2">
+		<description>Super Street Fighter II: The New Challengers</description>
+		<year>1994</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super street fighter ii" sha1="97ddbbc746d7b7f6fb72e57a6b443efab384b30c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ssf2samp">
+		<description>Super Street Fighter II: The New Challengers (Sample Disc)</description>
+		<year>1994</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super street fighter ii (sample disc)" sha1="6eae776377e80ae43950f47c4f930df36b63c6d6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sshang">
+		<description>Super Shanghai: Dragon's Eye</description>
+		<year>1991</year>
+		<publisher>Hot-B</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super shanghai - dragon's eye" sha1="3e8abecc76e6cb5f98c3d40398e71a0f3600e45a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Originally labeled as "mp3 source". It probably needs a redump.
+	Also, the floppy disk seems to be an overdump.
+	-->
+	<software name="sspirits">
+		<description>Samurai Spirits</description>
+		<year>1995</year>
+		<publisher>JHV</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1281280">
+				<rom name="samurai spirits (boot disk).bin" size="1281280" crc="2f1793ac" sha1="bd0f7f5f3fc4b0bd58d04812449cae853b58b5a8" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="samurai spirits" sha1="a84aa3a6017000284af369e5bccd3904e9aceaeb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sshootin">
+		<description>Super Shooting Towns</description>
+		<year>1991</year>
+		<publisher>Amorphous</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super shooting towns" sha1="64dd74baedfc4ef6c2bcdd96b8dd449c8beb36a2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="starcru2">
+		<description>Star Cruiser II: The Odysseus Project</description>
+		<year>1994</year>
+		<publisher>JHV</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="star cruiser 2 (user disk).hdm" size="1261568" crc="7d3863c4" sha1="2327aa7adb0209306dfd3c3945fcb115730175cd" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="star cruiser 2" sha1="7a2d5788f08400e37fafbb973c3bf1f9825ffe22" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="strike">
+		<description>Strike Commander</description>
+		<year>1994</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="strike commander" sha1="4ce5635dfe368cedfe0d61fb46a11d8f7fb2c083" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="strikpls">
+		<description>Strike Commander Plus</description>
+		<year>1995</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="strike commander plus" sha1="c926c123e3c0c8e439b16c27ecca3b420e1964bb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="strghold">
+		<description>Stronghold</description>
+		<year>1994</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="stronghold" sha1="dfebcbaaa112dfd262945e20bb881fc6f54e7f07" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="syndcate">
+		<description>Syndicate</description>
+		<year>1994</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="syndicate" sha1="d676fb5d4345ec464740c1b9c53327df0925a46a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ultima4">
 		<description>Ultima IV: Quest of the Avatar</description>
 		<year>1992</year>
@@ -2631,7 +3809,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="volfied">
 		<description>Volfied</description>
 		<year>1991</year>
@@ -2642,7 +3820,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Missing a floppy disk -->
 	<software name="win31">
 		<description>Windows 3.1 L11</description>
@@ -2654,7 +3832,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="win95">
 		<description>Windows 95</description>
 		<year>1996</year>
@@ -2665,7 +3843,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-		
+
 	<software name="wingcmar">
 		<description>Wing Commander Armada</description>
 		<year>1995</year>
@@ -2676,7 +3854,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wingcmdr">
 		<description>Wing Commander</description>
 		<year>1992</year>
@@ -2687,7 +3865,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wingcmsm">
 		<description>Wing Commander: Secret Missions</description>
 		<year>1994</year>
@@ -2698,7 +3876,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wingcm2s">
 		<description>Wing Commander II and Special Operations</description>
 		<year>1995</year>
@@ -2709,7 +3887,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wiz5">
 		<description>Wizardry V: Heart of the Maelstrom</description>
 		<year>1990</year>
@@ -2725,7 +3903,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wiz6">
 		<description>Wizardry VI: Bane of the Cosmic Forge</description>
 		<year>1991</year>
@@ -2741,7 +3919,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wiz7">
 		<description>Wizardry VII: Crusaders of the Dark Savant</description>
 		<year>1994</year>
@@ -2752,7 +3930,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="wwcarmen">
 		<description>Where in the World is Carmen Sandiego?</description>
 		<year>1993</year>
@@ -2763,7 +3941,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="xak2">
 		<description>Xak II: Rising of the Redmoon</description>
 		<year>1991</year>
@@ -2774,7 +3952,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="xak3">
 		<description>Xak III: The Eternal Recurrence</description>
 		<year>1993</year>
@@ -2785,7 +3963,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="xenon">
 		<description>Xenon</description>
 		<year>1995</year>
@@ -2796,7 +3974,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="zak">
 		<description>Zak McKracken and The Alien Mindbenders</description>
 		<year>1990</year>
@@ -2807,7 +3985,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="zenith">
 		<description>Zenith</description>
 		<year>1995</year>
@@ -2818,7 +3996,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="zokudm">
 		<description>Zoku Dungeon Master: Chaos no Gyakushuu</description>
 		<year>1990</year>

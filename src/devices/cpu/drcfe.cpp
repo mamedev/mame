@@ -171,6 +171,7 @@ opcode_desc *drc_frontend::describe_one(offs_t curpc, const opcode_desc *prevdes
 	desc->delayslots = 0;
 	desc->skipslots = 0;
 	desc->flags = 0;
+	desc->userflags = 0;
 	desc->cycles = 0;
 	memset(desc->regin, 0x00, sizeof(desc->regin));
 	memset(desc->regout, 0x00, sizeof(desc->regout));

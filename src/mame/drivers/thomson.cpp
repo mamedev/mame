@@ -742,7 +742,7 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("40K")
 	MCFG_RAM_EXTRA_OPTIONS("24K,48K")
-	
+
 /* software lists */
 	MCFG_SOFTWARE_LIST_ADD("to7_cart_list","to7_cart")
 	MCFG_SOFTWARE_LIST_ADD("to7_cass_list","to7_cass")
@@ -2235,7 +2235,7 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
-	
+
 	MCFG_DEVICE_REMOVE("to7_cart_list")
 	MCFG_DEVICE_REMOVE("to7_cass_list")
 	MCFG_DEVICE_REMOVE("to_flop_list")
@@ -2505,7 +2505,7 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
-	
+
 	MCFG_DEVICE_REMOVE("to7_cart_list")
 	MCFG_DEVICE_REMOVE("to7_cass_list")
 	MCFG_DEVICE_REMOVE("to_flop_list")

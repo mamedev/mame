@@ -1,0 +1,34 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//============================================================
+//
+//  offset_sat.json: Applies saturation to an image.
+//  
+//  Additionally, takes only a portion of the image, as
+//  this instance is intended for the right-hand pillarbox
+//  when displaying 4:3 content on a 16:9 screen.
+//
+//============================================================
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "srcalpha",
+    	"dstColor": "1-srcalpha",
+    	"srcAlpha": "srcalpha",
+    	"dstAlpha": "1-srcalpha"
+    },
+    "depth": {
+    	"function": "always"
+    },
+    "cull": { "mode": "none" },
+    "write": {
+    	"rgb": true,
+    	"alpha": true
+    },
+    "vertex": "chains/pillarbox_right_horizontal/vs_offset_sat",
+    "fragment": "chains/pillarbox_right_horizontal/fs_offset_sat",
+    "uniforms": [
+    	{ "name": "s_tex",        "type": "int",  "values": [ 1.0 ] },
+    	{ "name": "u_saturation", "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] }
+    ]
+}

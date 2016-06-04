@@ -16,8 +16,8 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_RESET(MM5837_dip)
 {
-	m_V0.initial(0.0);
-	m_RV.do_reset();
+	//m_V0.initial(0.0);
+	//m_RV.do_reset();
 	m_RV.set(NL_FCONST(1.0) / R_LOW, 0.0, 0.0);
 
 	m_shift = 0x1ffff;

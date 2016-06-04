@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia,Paul Priest
+
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/fuukifg.h"
 
@@ -22,6 +24,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_fuukivid(*this, "fuukivid"),
+		m_soundlatch(*this, "soundlatch"),
 		m_vram(*this, "vram"),
 		m_vregs(*this, "vregs"),
 		m_unknown(*this, "unknown"),
@@ -36,6 +39,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<fuukivid_device> m_fuukivid;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
 	required_shared_ptr_array<UINT16,4> m_vram;

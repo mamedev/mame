@@ -24,12 +24,6 @@ Notes:
   uses a different mode, because the Sega Mark III lacks the TH line, so
   there is a different Sports Pad model released in Japan (see sportsjp.c).
 
-  The Japanese SMS has the TH line connected, but doesn't report TH input
-  on port 0xDD. However, a magazine raffled the US Sports Pad along with a
-  Great Ice Hockey cartridge, in Japanese format, to owners of that console.
-  So, Great Ice Hockey seems to just need TH pin as output to work, while
-  other games designed for the US Sports Pad don't work on the Japanese SMS.
-
   It was discovered that games designed for the Paddle Controller, released
   in Japan, switch to a mode incompatible with the original Paddle when
   detect the system region as Export. Similar to how the US model of the
@@ -53,7 +47,7 @@ Notes:
 const device_type SMS_SPORTS_PAD = &device_creator<sms_sports_pad_device>;
 
 // time interval not verified
-#define SPORTS_PAD_INTERVAL attotime::from_hz(XTAL_53_693175MHz/15/512)
+#define SPORTS_PAD_INTERVAL attotime::from_hz(XTAL_10_738635MHz/3/512)
 
 
 void sms_sports_pad_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

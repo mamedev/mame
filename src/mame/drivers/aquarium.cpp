@@ -37,7 +37,6 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
-#include "sound/okim6295.h"
 #include "includes/aquarium.h"
 
 
@@ -60,7 +59,7 @@ WRITE16_MEMBER(aquarium_state::aquarium_sound_w)
 {
 //  popmessage("sound write %04x",data);
 
-	soundlatch_byte_w(space, 1, data & 0xff);
+	m_soundlatch->write(space, 1, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
@@ -137,7 +136,7 @@ static ADDRESS_MAP_START( snd_portmap, AS_IO, 8, aquarium_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(aquarium_oki_r, aquarium_oki_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x06, 0x06) AM_WRITE(aquarium_snd_ack_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(aquarium_z80_bank_w)
 ADDRESS_MAP_END
@@ -333,6 +332,8 @@ static MACHINE_CONFIG_START( aquarium, aquarium_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4) // clock not verified on pcb
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

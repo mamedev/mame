@@ -52,7 +52,6 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 #include "sound/2151intf.h"
 #include "sound/3526intf.h"
 #include "sound/dac.h"
-#include "sound/msm5205.h"
 #include "includes/fantland.h"
 
 /***************************************************************************
@@ -77,7 +76,7 @@ WRITE16_MEMBER(fantland_state::fantland_nmi_enable_16_w)
 
 WRITE8_MEMBER(fantland_state::fantland_soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -294,13 +293,13 @@ static ADDRESS_MAP_START( fantland_sound_map, AS_PROGRAM, 8, fantland_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantland_sound_iomap, AS_IO, 8, fantland_state )
-	AM_RANGE( 0x0080, 0x0080 ) AM_READ(soundlatch_byte_r )
+	AM_RANGE( 0x0080, 0x0080 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE( 0x0180, 0x0180 ) AM_DEVWRITE("dac", dac_device, write_unsigned8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galaxygn_sound_iomap, AS_IO, 8, fantland_state )
-	AM_RANGE( 0x0080, 0x0080 ) AM_READ(soundlatch_byte_r )
+	AM_RANGE( 0x0080, 0x0080 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 ADDRESS_MAP_END
 
@@ -399,7 +398,7 @@ WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_3) { borntofi_adpcm_int(m_m
 
 static ADDRESS_MAP_START( borntofi_sound_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE( 0x00000, 0x003ff ) AM_RAM
-	AM_RANGE( 0x04000, 0x04000 ) AM_READ(soundlatch_byte_r)
+	AM_RANGE( 0x04000, 0x04000 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE( 0x04000, 0x0401f ) AM_WRITE(borntofi_msm5205_w)
 	AM_RANGE( 0x08000, 0x0ffff ) AM_ROM
 	AM_RANGE( 0xf8000, 0xfffff ) AM_ROM
@@ -418,7 +417,7 @@ static ADDRESS_MAP_START( wheelrun_sound_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // on a car crash / hit
 	AM_RANGE(0xc000, 0xc000) AM_WRITENOP    // ""
 
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r )    // during NMI
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)    // during NMI
 ADDRESS_MAP_END
 
 
@@ -870,6 +869,8 @@ static MACHINE_CONFIG_START( fantland, fantland_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", 3000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
@@ -914,6 +915,8 @@ static MACHINE_CONFIG_START( galaxygn, fantland_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 3000000)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(fantland_state, galaxygn_sound_irq))
@@ -993,6 +996,8 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	// OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_0))   /* IRQ handler */
@@ -1045,6 +1050,8 @@ static MACHINE_CONFIG_START( wheelrun, fantland_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_14MHz/4)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))

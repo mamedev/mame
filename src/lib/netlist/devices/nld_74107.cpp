@@ -12,8 +12,8 @@ NETLIB_NAMESPACE_DEVICES_START()
 NETLIB_RESET(74107Asub)
 {
 	m_clk.set_state(logic_t::STATE_INP_HL);
-	m_Q.initial(0);
-	m_QQ.initial(1);
+	//m_Q.initial(0);
+	//m_QQ.initial(1);
 
 	m_Q1 = 0;
 	m_Q2 = 0;

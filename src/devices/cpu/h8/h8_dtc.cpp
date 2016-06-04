@@ -131,7 +131,7 @@ void h8_dtc_device::vector_done(int vector)
 
 	UINT32 mode = sra & 0x0c000000;
 	if(V>=1) logerror("regs at %08x sra=%08x dar=%08x cr=%08x %s mode\n", state->base, sra, dar, cr,
-					  mode == 0x00000000 || mode == 0x0c000000 ? "normal" : mode == 0x04000000 ? "repeat" : "block");
+						mode == 0x00000000 || mode == 0x0c000000 ? "normal" : mode == 0x04000000 ? "repeat" : "block");
 	state->incs = sra & 0x80000000 ?
 		sra & 0x40000000 ? sra & 0x01000000 ? -2 : -1 :
 		sra & 0x01000000 ? 2 : 1 :
@@ -140,7 +140,7 @@ void h8_dtc_device::vector_done(int vector)
 		sra & 0x10000000 ? sra & 0x01000000 ? -2 : -1 :
 		sra & 0x01000000 ? 2 : 1 :
 		0;
-		
+
 	switch(mode) {
 	case 0x00000000: case 0x0c0000000:
 		state->count = 1;
@@ -215,7 +215,7 @@ bool h8_dtc_device::trigger_dtc(int vector)
 {
 	int slot = vector_to_enable[vector];
 	if(slot == -1)
-	   return false;
+		return false;
 	if(dtcer[slot >> 3] & (0x01 << (7-(slot & 7)))) {
 		edge(vector);
 		return true;
@@ -266,4 +266,3 @@ void h8_dtc_device::count_done(int id)
 		cpu->request_state(h8_device::STATE_DTC_WRITEBACK);
 	waiting_writeback.push_back(id);
 }
-

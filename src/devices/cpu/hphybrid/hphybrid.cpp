@@ -133,7 +133,7 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::flag_w)
 
 UINT8 hp_hybrid_cpu_device::pa_r(void) const
 {
-        return CURRENT_PA;
+		return CURRENT_PA;
 }
 
 hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname , UINT8 addrwidth)
@@ -1092,7 +1092,7 @@ void hp_hybrid_cpu_device::handle_dma(void)
 								m_icount -= 9;
 				}
 
-                                // Mystery solved: DMA is not automatically disabled at TC (test of 9845's graphic memory relies on this to work)
+								// Mystery solved: DMA is not automatically disabled at TC (test of 9845's graphic memory relies on this to work)
 }
 
 UINT16 hp_hybrid_cpu_device::RIO(UINT8 pa , UINT8 ic)

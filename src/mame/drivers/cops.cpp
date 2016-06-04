@@ -7,7 +7,7 @@
     Preliminary driver by Mariusz Wojcieszek, James Wallace
 
     Cops uses a Sony CD-ROM in addition to the regular setup, purely to play
-    Bad Boys by Inner Circle, so there is muscial accompaniment to areas
+    Bad Boys by Inner Circle, so there is musical accompaniment to areas
     where the laserdisc audio is muted.
 
     NOTES: To boot up Revelations, turn the refill key (R) and press button A.
@@ -872,7 +872,7 @@ static MACHINE_CONFIG_START( cops, cops_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-		/* TODO: Verify clock */
+	/* TODO: Verify clock */
 	MCFG_SOUND_ADD("snsnd", SN76489, MAIN_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

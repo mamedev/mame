@@ -86,9 +86,9 @@ bgfx_target* target_manager::target(uint32_t screen, std::string name)
 	return target;
 }
 
-void target_manager::update_target_sizes(uint32_t screen, uint16_t width, uint16_t height, uint32_t style)
+bool target_manager::update_target_sizes(uint32_t screen, uint16_t width, uint16_t height, uint32_t style)
 {
-	if (style == TARGET_STYLE_CUSTOM) return;
+	if (style == TARGET_STYLE_CUSTOM) return false;
 
 	std::vector<osd_dim>& sizes = style == TARGET_STYLE_GUEST ? m_guest_dims : m_native_dims;
 
@@ -102,7 +102,10 @@ void target_manager::update_target_sizes(uint32_t screen, uint16_t width, uint16
 	{
 		sizes[screen] = osd_dim(width, height);
 		rebuild_targets(screen, style);
+        return true;
 	}
+
+    return false;
 }
 
 void target_manager::rebuild_targets(uint32_t screen, uint32_t style)

@@ -25,12 +25,12 @@ in secondary boot loader with a RESTORE (seek track 0) when track 2 sector 1 sho
 Writing files to floppy is next to impossible on both CPM 1.x and DOS 3 (these two OS boot
 with keyboard workarounds enabled). File deletion works, so few bytes pass.
 
-(3) heavy system interaction stalls the driver. Start one of the torture tests on the diag.disk
-and see what happens (system interaction, Z80, about any test except the video / CRT tests).
-
+(3) heavy system interaction stalls the driver. Start the RX50 diag.disk and
+ see what happens (key 3 for individual tests, then select system interaction).
+    
 (4) arbitration chip (E11; in 100-A schematics or E13 in -B) should be dumped.
-It is a 6308 OTP ROM (2048 bit, 256 x 8) used as a lookup table (LUT) with the address pins (A)
-used as inputs and the data pins (D) as output.
+ It is a 6308 OTP ROM (2048 bit, 256 x 8) used as a lookup table (LUT) with the address pins (A)
+ used as inputs and the data pins (D) as output.
 
 Plays a role in DMA access to lower memory (limited to 64 K; Extended communication option only).
 Arbiter is also involved in refresh and shared memory contention (affects Z80/8088 CPU cycles).
@@ -387,10 +387,10 @@ private:
 		IRQ_8088_MAILBOX = 0, // 27/A7  9C/29C  - [built-in] Interrupt from Z80A
 		IRQ_8088_KBD,         // 26/A6  98/298  - [built-in] KEYBOARD Interrupt - 8251A
 		IRQ_BDL_INTR_L,       // 25/A5  94/294  - [ext. BUNDLE OPTION] Hard disk or Extended communication IRQ (no DMA)
-		// IRQ_COMM_PTR_INTR_L,  // 24/A4  90/290  - [built-in 7201] Communication/Printer interrupt
-		// IRQ_DMAC_INTR_L,      // 23/A3  8C/28C  - [ext. COMM.BOARD only] - external DMA Controller (8237) interrupt
-		// IRQ_GRF_INTR_L,       // 22/A2  88/288  - [ext. COLOR GRAPHICS]
-		// IRQ_BDL_INTR_1L,      // 21/A1  84/284  - [ext. COMM.BOARD only]
+		IRQ_COMM_PTR_INTR_L,  // 24/A4  90/290  - [built-in 7201] Communication/Printer interrupt
+		IRQ_DMAC_INTR_L,      // 23/A3  8C/28C  - [ext. COMM.BOARD only] - external DMA Controller (8237) interrupt
+		IRQ_GRF_INTR_L,       // 22/A2  88/288  - [ext. COLOR GRAPHICS]
+		IRQ_BDL_INTR_1L,      // 21/A1  84/284  - [ext. COMM.BOARD only]
 		IRQ_8088_VBL,         // 20/A0  80/280  - [built-in DC012] - VERT INTR L (= schematics)
 		IRQ_8088_NMI          // 02/02  08/08   - [external MEMORY EXTENSION] - PARITY ERROR L
 	};  // HIGHEST PRIORITY
@@ -492,7 +492,6 @@ FLOPPY_IMD_FORMAT,
 FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-// initially only : SLOT_INTERFACE("525qd", FLOPPY_525_SSQD)
 static SLOT_INTERFACE_START(rainbow_floppies)
 SLOT_INTERFACE("525qd0", FLOPPY_525_SSQD)
 SLOT_INTERFACE("525qd1", FLOPPY_525_SSQD)
@@ -904,7 +903,7 @@ void rainbow_state::machine_reset()
 	INT88 = false;
 
 	m_kbd_tx_ready = m_kbd_rx_ready = false;
-	m_kbd8251->write_cts(1);
+	m_kbd8251->write_cts(0);
 	m_KBD = 0;
 
 	m_irq_high = 0;
@@ -953,7 +952,7 @@ UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 
 // Interrupt handling and arbitration.  See 3.1.3.8 OF PC-100 spec.
 void rainbow_state::update_8088_irqs()
 {
-	static const int vectors[] = { 0x27, 0x26, 0x25, 0x20 };
+	static const int vectors[] = { 0x27, 0x26, 0x25, 0x24, 0x23, 0x22, 0x21, 0x20, 0x02 };
 
 	if (m_irq_mask != 0)
 	{
@@ -961,7 +960,10 @@ void rainbow_state::update_8088_irqs()
 		{
 			if (m_irq_mask & (1 << i))
 			{
-				m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, vectors[i] | m_irq_high);
+				if (vectors[i] == 0x02) // NMI
+					m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, 0x02);
+				else
+					m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, vectors[i] | m_irq_high);
 				break;
 			}
 		}
@@ -1986,7 +1988,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		}
 		else
 		{
-			m_floppy->ss_w((data & 20) ? 1 : 0); // RX50 board in Rainbow has 'side select'
+			m_floppy->ss_w((data & 0x20) ? 1 : 0); // RX50 board in Rainbow has 'side select'
 			m_floppy->set_rpm(300.);
 		}
 	}

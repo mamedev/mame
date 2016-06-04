@@ -2502,13 +2502,13 @@ WRITE8_MEMBER(nes_pjoy84_device::write_m)
 }
 
 /*-------------------------------------------------
- 
+
  COOLBOY
- 
+
  Games: several multigame carts
- 
+
  In MESS: Not Supported.
- 
+
  -------------------------------------------------*/
 
 void nes_coolboy_device::prg_cb(int start, int bank)
@@ -2526,7 +2526,7 @@ void nes_coolboy_device::chr_cb(int start, int bank, int source)
 WRITE8_MEMBER(nes_coolboy_device::write_m)
 {
 	LOG_MMC(("coolboy write_m, offset: %04x, data: %02x\n", offset, data));
-	
+
 	m_reg[offset & 0x03] = data;
 	//set_base_mask();
 	set_chr(m_chr_source, m_chr_base, m_chr_mask);

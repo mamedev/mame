@@ -192,6 +192,7 @@ static ADDRESS_MAP_START( lk201_map, AS_PROGRAM, 8, lk201_device )
 	AM_RANGE(0x0004, 0x0006) AM_READWRITE(ddr_r, ddr_w)
 	AM_RANGE(0x000a, 0x000c) AM_READWRITE(spi_r, spi_w)
 	AM_RANGE(0x000d, 0x0011) AM_READWRITE(sci_r, sci_w)
+	AM_RANGE(0x0012, 0x001b) AM_READWRITE(timer_r, timer_w)
 	AM_RANGE(0x0050, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x1fff) AM_ROM AM_REGION(LK201_CPU_TAG, 0x100)
 ADDRESS_MAP_END
@@ -495,6 +496,7 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 
 void lk201_device::device_start()
 {
+	m_count = timer_alloc(1);
 	m_tx_handler.resolve_safe();
 }
 
@@ -507,6 +509,8 @@ void lk201_device::device_reset()
 {
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(4800);
+	m_count->adjust(attotime::from_hz(1200), 0, attotime::from_hz(1200));
+	memset(m_timer.regs, 0, sizeof(m_timer.regs));
 
 	sci_status = (SCSR_TC | SCSR_TDRE);
 
@@ -522,7 +526,14 @@ void lk201_device::device_reset()
 
 void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	device_serial_interface::device_timer(timer, id, param, ptr);
+	if(id == 1)
+	{
+		if(m_timer.tcr & 0x40)
+			m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
+		m_timer.tsr |= 0x40;
+	}
+	else
+		device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 void lk201_device::rcv_complete()
@@ -556,6 +567,22 @@ void lk201_device::update_interrupts()
 	}
 }
 
+READ8_MEMBER( lk201_device::timer_r )
+{
+	UINT8 ret = m_timer.regs[offset];
+	if(m_timer.tsr)
+	{
+		m_timer.tsr = 0;
+		m_maincpu->set_input_line(M68HC05EG_INT_TIMER, CLEAR_LINE);
+	}
+	return ret;
+}
+
+WRITE8_MEMBER( lk201_device::timer_w )
+{
+	m_timer.regs[offset] = data;
+}
+
 READ8_MEMBER( lk201_device::ddr_r )
 {
 	return ddrs[offset];
@@ -565,9 +592,9 @@ WRITE8_MEMBER( lk201_device::ddr_w )
 {
 //  printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
 
-	send_port(space, offset, ports[offset] & data);
-
+	UINT8 olddata = ddrs[offset];
 	ddrs[offset] = data;
+	send_port(space, offset, ports[offset] & olddata);
 }
 
 READ8_MEMBER( lk201_device::ports_r )
@@ -586,14 +613,17 @@ READ8_MEMBER( lk201_device::ports_r )
 
 WRITE8_MEMBER( lk201_device::ports_w )
 {
-	send_port(space, offset, data);
-
+	UINT8 olddata = ports[offset];
 	ports[offset] = data;
+	send_port(space, offset, olddata & ddrs[offset]);
 }
 
-void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
+void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
 {
 //  printf("PORT %c write %02x (DDR = %02x) (PC=%x)\n", 'A' + offset, data, ddrs[offset], m_maincpu->pc());
+	UINT8 porta = ports[0] & ddrs[0];
+	UINT8 portb = ports[1] & ddrs[1];
+	UINT8 portc = ports[2] & ddrs[2];
 
 	switch (offset)
 	{
@@ -605,30 +635,30 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 
 		case 2: // port C
 			// Check for keyboard read strobe
-			if (((data & 0x40) == 0) && (ports[offset] & 0x40))
+			if (((portc & 0x40) == 0) && (olddata & 0x40))
 			{
 #ifndef KEYBOARD_WORKAROUND
-				if (ports[0] & 0x1) kbd_data = m_kbd0->read();
-				if (ports[0] & 0x2) kbd_data = m_kbd1->read();
-				if (ports[0] & 0x4) kbd_data = m_kbd2->read();
-				if (ports[0] & 0x8) kbd_data = m_kbd3->read();
-				if (ports[0] & 0x10) kbd_data = m_kbd4->read();
-				if (ports[0] & 0x20) kbd_data = m_kbd5->read();
-				if (ports[0] & 0x40) kbd_data = m_kbd6->read();
-				if (ports[0] & 0x80) kbd_data = m_kbd7->read();
-				if (ports[1] & 0x1) kbd_data = m_kbd8->read();
-				if (ports[1] & 0x2) kbd_data = m_kbd9->read();
-				if (ports[1] & 0x4) kbd_data = m_kbd10->read();
-				if (ports[1] & 0x8) kbd_data = m_kbd11->read();
-				if (ports[1] & 0x10) kbd_data = m_kbd12->read();
-				if (ports[1] & 0x20) kbd_data = m_kbd13->read();
-				if (ports[1] & 0x40) kbd_data = m_kbd14->read();
-				if (ports[1] & 0x80) kbd_data = m_kbd15->read();
-				if (ports[2] & 0x1) kbd_data = m_kbd16->read();
-				if (ports[2] & 0x2) kbd_data = m_kbd17->read();
+				if (porta & 0x1) kbd_data = m_kbd0->read();
+				if (porta & 0x2) kbd_data = m_kbd1->read();
+				if (porta & 0x4) kbd_data = m_kbd2->read();
+				if (porta & 0x8) kbd_data = m_kbd3->read();
+				if (porta & 0x10) kbd_data = m_kbd4->read();
+				if (porta & 0x20) kbd_data = m_kbd5->read();
+				if (porta & 0x40) kbd_data = m_kbd6->read();
+				if (porta & 0x80) kbd_data = m_kbd7->read();
+				if (portb & 0x1) kbd_data = m_kbd8->read();
+				if (portb & 0x2) kbd_data = m_kbd9->read();
+				if (portb & 0x4) kbd_data = m_kbd10->read();
+				if (portb & 0x8) kbd_data = m_kbd11->read();
+				if (portb & 0x10) kbd_data = m_kbd12->read();
+				if (portb & 0x20) kbd_data = m_kbd13->read();
+				if (portb & 0x40) kbd_data = m_kbd14->read();
+				if (portb & 0x80) kbd_data = m_kbd15->read();
+				if (portc & 0x1) kbd_data = m_kbd16->read();
+				if (portc & 0x2) kbd_data = m_kbd17->read();
 			}
 			// Check for LED update strobe
-			if (((data & 0x80) == 0) && (ports[offset] & 0x80))
+			if (((portc & 0x80) == 0) && (olddata & 0x40))
 			{
 				// Lower nibble contains the LED values (1 = on, 0 = off)
 				machine().output().set_value("led_wait"   , (led_data & 0x1) == 0);

@@ -38,10 +38,10 @@
 
 #include "nl_base.h"
 
-#define TTL_74175(_name)                                     \
-		NET_REGISTER_DEV(TTL_74175, _name)
-#define TTL_74175_DIP(_name)                                 \
-		NET_REGISTER_DEV(TTL_74175_DIP, _name)
+#define TTL_74175(name)                                     \
+		NET_REGISTER_DEV(TTL_74175, name)
+#define TTL_74175_DIP(name)                                 \
+		NET_REGISTER_DEV(TTL_74175_DIP, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

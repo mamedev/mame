@@ -31,10 +31,10 @@ public:
 	zexall_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_main_ram(*this, "main_ram"), 
-		m_out_data(0), 
-		m_out_req(0), 
-		m_out_req_last(0), 
+		m_main_ram(*this, "main_ram"),
+		m_out_data(0),
+		m_out_req(0),
+		m_out_req_last(0),
 		m_out_ack(0)
 	{
 	}
@@ -68,7 +68,7 @@ DRIVER_INIT_MEMBER(zexall_state,zexall)
 void zexall_state::machine_reset()
 {
 	// rom is self-modifying, so need to refresh it on each run
-	// fill main ram with zexall code 
+	// fill main ram with zexall code
 	memcpy(m_main_ram, zexall_program, 0x228a);
 }
 

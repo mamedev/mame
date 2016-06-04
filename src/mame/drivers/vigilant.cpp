@@ -117,7 +117,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, vigilant_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x81) AM_READ(soundlatch_byte_r) AM_DEVWRITE("m72", m72_audio_device, vigilant_sample_addr_w)   /* STL / STH */
+	AM_RANGE(0x80, 0x81) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("m72", m72_audio_device, vigilant_sample_addr_w)   /* STL / STH */
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)            /* COUNT UP */
 	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w) /* IRQ clear */
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r) /* S ROM C */
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( buccanrs_sound_io_map, AS_IO, 8, vigilant_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)             /* SDRE */
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)             /* SDRE */
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, vigilant_sample_addr_w)  /* STL / STH */
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)                /* COUNT UP */
 	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)     /* IRQ clear */
@@ -496,6 +496,8 @@ static MACHINE_CONFIG_START( vigilant, vigilant_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("m72", M72, 0)
 
 	MCFG_YM2151_ADD("ymsnd", 3579645)
@@ -536,6 +538,8 @@ static MACHINE_CONFIG_START( buccanrs, vigilant_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("m72", M72, 0)
 
@@ -593,6 +597,8 @@ static MACHINE_CONFIG_START( kikcubic, vigilant_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("m72", M72, 0)
 

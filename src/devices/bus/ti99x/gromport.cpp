@@ -1337,47 +1337,47 @@ bool ti99_cartridge_device::call_load()
 	{
 	case PCB_STANDARD:
 		if (TRACE_CONFIG) logerror("Standard PCB\n");
-		m_pcb = new ti99_standard_cartridge();
+		m_pcb = std::make_unique<ti99_standard_cartridge>();
 		break;
 	case PCB_PAGED12K:
 		if (TRACE_CONFIG) logerror("Paged PCB 12K\n");
-		m_pcb = new ti99_paged12k_cartridge();
+		m_pcb = std::make_unique<ti99_paged12k_cartridge>();
 		break;
 	case PCB_PAGED16K:
 		if (TRACE_CONFIG) logerror("Paged PCB 16K\n");
-		m_pcb = new ti99_paged16k_cartridge();
+		m_pcb = std::make_unique<ti99_paged16k_cartridge>();
 		break;
 	case PCB_MINIMEM:
 		if (TRACE_CONFIG) logerror("Minimem PCB\n");
-		m_pcb = new ti99_minimem_cartridge();
+		m_pcb = std::make_unique<ti99_minimem_cartridge>();
 		break;
 	case PCB_SUPER:
 		if (TRACE_CONFIG) logerror("Superspace PCB\n");
-		m_pcb = new ti99_super_cartridge();
+		m_pcb = std::make_unique<ti99_super_cartridge>();
 		break;
 	case PCB_MBX:
 		if (TRACE_CONFIG) logerror("MBX PCB\n");
-		m_pcb = new ti99_mbx_cartridge();
+		m_pcb = std::make_unique<ti99_mbx_cartridge>();
 		break;
 	case PCB_PAGED379I:
 		if (TRACE_CONFIG) logerror("Paged379i PCB\n");
-		m_pcb = new ti99_paged379i_cartridge();
+		m_pcb = std::make_unique<ti99_paged379i_cartridge>();
 		break;
 	case PCB_PAGED378:
 		if (TRACE_CONFIG) logerror("Paged378 PCB\n");
-		m_pcb = new ti99_paged378_cartridge();
+		m_pcb = std::make_unique<ti99_paged378_cartridge>();
 		break;
 	case PCB_PAGED377:
 		if (TRACE_CONFIG) logerror("Paged377 PCB\n");
-		m_pcb = new ti99_paged377_cartridge();
+		m_pcb = std::make_unique<ti99_paged377_cartridge>();
 		break;
 	case PCB_PAGEDCRU:
 		if (TRACE_CONFIG) logerror("PagedCRU PCB\n");
-		m_pcb = new ti99_pagedcru_cartridge();
+		m_pcb = std::make_unique<ti99_pagedcru_cartridge>();
 		break;
 	case PCB_GROMEMU:
 		if (TRACE_CONFIG) logerror("Grom Emulation PCB\n");
-		m_pcb = new ti99_gromemu_cartridge();
+		m_pcb = std::make_unique<ti99_gromemu_cartridge>();
 		break;
 	}
 
@@ -1408,7 +1408,6 @@ void ti99_cartridge_device::call_unload()
 		}
 	}
 
-	delete m_pcb;
 	m_pcb = nullptr;
 	m_connector->remove(m_slot);
 }

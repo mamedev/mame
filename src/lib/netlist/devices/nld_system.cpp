@@ -38,7 +38,7 @@ NETLIB_RESET(extclock)
 {
 	m_cnt = 0;
 	m_off = netlist_time::from_double(m_offset.Value());
-	m_Q.initial(0);
+	//m_Q.initial(0);
 }
 
 NETLIB_UPDATE(extclock)
@@ -66,6 +66,12 @@ NETLIB_UPDATE(extclock)
 // logic_input
 // ----------------------------------------------------------------------------------------
 
+NETLIB_RESET(logic_input)
+{
+	//FIXME: causes issues in breakout (lots of pings after first player 1 start)
+	//m_Q.initial(m_IN.Value() & 1);
+}
+
 NETLIB_UPDATE(logic_input)
 {
 	OUTLOGIC(m_Q, m_IN.Value() & 1, netlist_time::from_nsec(1));
@@ -73,12 +79,16 @@ NETLIB_UPDATE(logic_input)
 
 NETLIB_UPDATE_PARAM(logic_input)
 {
-	update();
 }
 
 // ----------------------------------------------------------------------------------------
 // analog_input
 // ----------------------------------------------------------------------------------------
+
+NETLIB_RESET(analog_input)
+{
+//	m_Q.initial(m_IN.Value() * 0.999);
+}
 
 NETLIB_UPDATE(analog_input)
 {
@@ -87,7 +97,6 @@ NETLIB_UPDATE(analog_input)
 
 NETLIB_UPDATE_PARAM(analog_input)
 {
-	update();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -96,7 +105,7 @@ NETLIB_UPDATE_PARAM(analog_input)
 
 void nld_d_to_a_proxy::reset()
 {
-	m_Q.initial(0.0);
+	//m_Q.initial(0.0);
 	m_last_state = -1;
 	m_RV.do_reset();
 	m_is_timestep = m_RV.m_P.net().solver()->has_timestep_devices();
@@ -152,18 +161,13 @@ NETLIB_UPDATE(res_sw)
 	}
 }
 
-NETLIB_UPDATE_PARAM(res_sw)
-{
-	// nothing, not intended to be called
-}
-
 /* -----------------------------------------------------------------------------
  * nld_function
  * ----------------------------------------------------------------------------- */
 
 NETLIB_RESET(function)
 {
-	m_Q.initial(0.0);
+	//m_Q.initial(0.0);
 }
 
 NETLIB_UPDATE(function)

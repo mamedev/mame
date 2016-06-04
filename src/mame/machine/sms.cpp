@@ -78,8 +78,6 @@ WRITE_LINE_MEMBER(sms_state::gg_ext_th_input)
 
 void sms_state::sms_get_inputs()
 {
-	bool port_dd_has_th_input = true;
-
 	UINT8 data1 = 0xff;
 	UINT8 data2 = 0xff;
 
@@ -92,11 +90,6 @@ void sms_state::sms_get_inputs()
 
 	if (m_is_gamegear)
 	{
-		// Assume the Japanese Game Gear behaves as the
-		// Japanese Master System, regarding TH input.
-		if (m_is_gg_region_japan)
-			port_dd_has_th_input = false;
-
 		// For Game Gear, this function is used only if SMS mode is
 		// enabled, else only register $dc receives input data, through
 		// direct read of the m_port_gg_dc I/O port.
@@ -108,11 +101,6 @@ void sms_state::sms_get_inputs()
 	}
 	else
 	{
-		// Sega Mark III does not have TH lines connected.
-		// The Japanese Master System does not set port $dd with TH input.
-		if (m_is_mark_iii || m_is_smsj)
-			port_dd_has_th_input = false;
-
 		data1 = m_port_ctrl1->port_r();
 		m_port_dc_reg &= ~0x0f | data1; // Up, Down, Left, Right
 		m_port_dc_reg &= ~0x10 | (data1 >> 1); // TL (Button 1)
@@ -126,7 +114,7 @@ void sms_state::sms_get_inputs()
 	m_port_dd_reg &= ~0x04 | (data2 >> 3); // TL (Button 1)
 	m_port_dd_reg &= ~0x08 | (data2 >> 4); // TR (Button 2)
 
-	if (port_dd_has_th_input)
+	if (!m_is_mark_iii)
 	{
 		m_port_dd_reg &= ~0x40 | data1; // TH ctrl1
 		m_port_dd_reg &= ~0x80 | (data2 << 1); // TH ctrl2
@@ -328,20 +316,6 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 		m_port_dd_reg &= ~0x08 | ((m_io_ctrl_reg & 0x40) >> 3);
 	}
 
-	if (m_is_smsj || (m_is_gamegear && m_is_gg_region_japan))
-	{
-		// For Japanese Master System, set upper 4 bits with TH/TR
-		// direction bits of IO control register, according to Enri's
-		// docs ( http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm ).
-		// This makes the console incapable of using the Light Phaser.
-		// Assume the same for a Japanese Game Gear.
-		m_port_dd_reg &= ~0x10 | ((m_io_ctrl_reg & 0x01) << 4);
-		m_port_dd_reg &= ~0x20 | ((m_io_ctrl_reg & 0x04) << 3);
-		m_port_dd_reg &= ~0x40 | ((m_io_ctrl_reg & 0x02) << 5);
-		m_port_dd_reg &= ~0x80 | ((m_io_ctrl_reg & 0x08) << 4);
-		return m_port_dd_reg;
-	}
-
 	// Reset Button
 	if ( m_port_reset )
 	{
@@ -351,8 +325,15 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	// Check if TH of controller port 1 is set to output (0)
 	if (!(m_io_ctrl_reg & 0x02))
 	{
-		// Read TH state set through IO control port
-		m_port_dd_reg &= ~0x40 | ((m_io_ctrl_reg & 0x20) << 1);
+		if (m_is_smsj || (m_is_gamegear && m_is_gg_region_japan))
+		{
+			m_port_dd_reg &= ~0x40;
+		}
+		else
+		{
+			// Read TH state set through IO control port
+			m_port_dd_reg &= ~0x40 | ((m_io_ctrl_reg & 0x20) << 1);
+		}
 	}
 	else  // TH set to input (1)
 	{
@@ -366,8 +347,15 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	// Check if TH of controller port 2 is set to output (0)
 	if (!(m_io_ctrl_reg & 0x08))
 	{
-		// Read TH state set through IO control port
-		m_port_dd_reg &= ~0x80 | (m_io_ctrl_reg & 0x80);
+		if (m_is_smsj || (m_is_gamegear && m_is_gg_region_japan))
+		{
+			m_port_dd_reg &= ~0x80;
+		}
+		else
+		{
+			// Read TH state set through IO control port
+			m_port_dd_reg &= ~0x80 | (m_io_ctrl_reg & 0x80);
+		}
 	}
 	else  // TH set to input (1)
 	{
@@ -397,9 +385,30 @@ WRITE8_MEMBER(sms_state::sms_audio_control_w)
 READ8_MEMBER(sms_state::sms_audio_control_r)
 {
 	if (m_has_fm)
-		// The register reference on SMSPower states that just the
-		// first bit written is returned on reads (even for smsj?).
-		return m_audio_control & 0x01;
+	{
+		if (m_is_smsj)
+		{
+			/* Charles MacDonald discovered an internal 12-bit counter that is
+			   incremented on each pulse of the C-Sync line that connects the VDP
+			   with the 315-5297. Only 3 bits of the counter are returned when
+			   read this port:
+
+			   D7 : Counter bit 11
+			   D6 : Counter bit 7
+			   D5 : Counter bit 3
+			   D4 : Always zero
+			   D3 : Always zero
+			   D2 : Always zero
+			   D1 : Mute control bit 1
+			   D0 : Mute control bit 0
+
+			   For the moment, only the mute bits are handled by this code.
+			*/
+			return m_audio_control & 0x03;
+		}
+		else
+			return m_audio_control & 0x01;
+	}
 	else
 		return sms_input_port_dc_r(space, offset);
 }
@@ -407,26 +416,34 @@ READ8_MEMBER(sms_state::sms_audio_control_r)
 
 WRITE8_MEMBER(sms_state::sms_ym2413_register_port_w)
 {
-	if (m_has_fm && (m_audio_control & 0x01))
-		m_ym->write(space, 0, data & 0x3f);
+	if (m_has_fm)
+	{
+		if (m_audio_control == 0x01 || m_audio_control == 0x03)
+			m_ym->write(space, 0, data & 0x3f);
+	}
 }
 
 
 WRITE8_MEMBER(sms_state::sms_ym2413_data_port_w)
 {
-	if (m_has_fm && (m_audio_control & 0x01))
+	if (m_has_fm)
 	{
-		//logerror("data_port_w %x %x\n", offset, data);
-		m_ym->write(space, 1, data);
+		if (m_audio_control == 0x01 || m_audio_control == 0x03)
+		{
+			//logerror("data_port_w %x %x\n", offset, data);
+			m_ym->write(space, 1, data);
+		}
 	}
 }
 
 
 WRITE8_MEMBER(sms_state::sms_psg_w)
 {
-	// On Japanese SMS, if FM is enabled, PSG must be explicitly enabled too.
-	if (m_is_smsj && (m_audio_control & 0x01) && !(m_audio_control & 0x02))
-		return;
+	if (m_is_smsj)
+	{
+		if (m_audio_control != 0x00 && m_audio_control != 0x03)
+			return;
+	}
 
 	m_psg_sms->write(space, offset, data, mem_mask);
 }
@@ -453,7 +470,13 @@ READ8_MEMBER(sms_state::gg_input_port_00_r)
 		return 0xff;
 	else
 	{
+		// bit 6 is NJAP (0=domestic/1=overseas); bit 7 is STT (START button)
 		UINT8 data = (m_is_gg_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80);
+
+		// According to GG official docs, bits 0-4 are meaningless and bit 5
+		// is NNTS (0=NTSC, 1=PAL). All games run in NTSC and no original GG
+		// allows the user to change that mode, but there are NTSC and PAL
+		// versions of the TV Tuner.
 
 		//logerror("port $00 read, val: %02x, pc: %04x\n", data, activecpu_get_pc());
 		return data;
@@ -1102,14 +1125,6 @@ DRIVER_INIT_MEMBER(sms_state,sms1)
 DRIVER_INIT_MEMBER(sms_state,smsj)
 {
 	m_is_smsj = 1;
-	m_has_bios_2000 = 1;
-	m_has_fm = 1;
-	m_has_jpn_sms_cart_slot = 1;
-}
-
-
-DRIVER_INIT_MEMBER(sms_state,sms1krfm)
-{
 	m_has_bios_2000 = 1;
 	m_has_fm = 1;
 	m_has_jpn_sms_cart_slot = 1;

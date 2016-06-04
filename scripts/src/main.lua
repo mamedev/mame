@@ -115,7 +115,7 @@ end
 		targetextension ".bc"
 		if os.getenv("EMSCRIPTEN") then
 			local emccopts = ""
-				.. " -O3"
+				.. " -O" .. _OPTIONS["OPTIMIZE"]
 				.. " -s USE_SDL=2"
 				.. " -s USE_SDL_TTF=2"
 				.. " --memory-init-file 0"
@@ -132,7 +132,9 @@ end
 				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png"
 
 			if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
-				emccopts = emccopts .. " -g" .. _OPTIONS["SYMLEVEL"]
+				emccopts = emccopts
+					.. " -g" .. _OPTIONS["SYMLEVEL"]
+					.. " -s DEMANGLE_SUPPORT=1"
 			end
 
 			if _OPTIONS["ARCHOPTS"] then
@@ -229,13 +231,11 @@ end
 	if _OPTIONS["USE_LIBUV"]=="1" then
 		links {
 			ext_lib("uv"),
-			"http-parser",
 		}
 	end
 	links {
 		ext_lib("zlib"),
 		ext_lib("flac"),
-		ext_lib("sqlite3"),
 	}
 
 	if _OPTIONS["NO_USE_MIDI"]~="1" then

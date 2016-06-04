@@ -99,12 +99,12 @@ public:
 	DECLARE_WRITE16_MEMBER(write_bankprot_kf2k3bl);
 	DECLARE_WRITE16_MEMBER(write_bankprot_kof10th);
 	DECLARE_READ16_MEMBER(read_lorom_kof10th);
-	
+
 	DECLARE_DRIVER_INIT(neogeo);
 
 protected:
 	void common_machine_start();
-	
+
 	void set_outputs();
 
 	// device overrides
@@ -121,7 +121,7 @@ protected:
 	optional_device<ym2610_device> m_ym;
 	required_device<neosprite_optimized_device> m_sprgen;
 	optional_shared_ptr<UINT16> m_save_ram;
-	
+
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<ng_memcard_device> m_memcard;
@@ -169,14 +169,14 @@ protected:
 	void init_sprites();
 	// temporary helper to restore memory banking while bankswitch is handled in the driver...
 	UINT32 m_bank_base;
-	
+
 	optional_device<neogeo_cart_slot_device> m_slot1;
 	optional_device<neogeo_cart_slot_device> m_slot2;
 	optional_device<neogeo_cart_slot_device> m_slot3;
 	optional_device<neogeo_cart_slot_device> m_slot4;
 	optional_device<neogeo_cart_slot_device> m_slot5;
 	optional_device<neogeo_cart_slot_device> m_slot6;
-	
+
 	int m_curr_slot;
 	neogeo_cart_slot_device* m_slots[6];
 
@@ -185,28 +185,28 @@ private:
 	void create_interrupt_timers();
 	void start_interrupt_timers();
 	void acknowledge_interrupt(UINT16 data);
-	
+
 	void adjust_display_position_interrupt_timer();
 	void set_display_position_interrupt_control(UINT16 data);
 	void set_display_counter_msb(UINT16 data);
 	void set_display_counter_lsb(UINT16 data);
 	void set_video_control(UINT16 data);
-	
+
 	void create_rgb_lookups();
 	void set_pens();
 	void set_screen_shadow(int data);
 	void set_palette_bank(int data);
-	
+
 	void audio_cpu_check_nmi();
 	void set_save_ram_unlock(UINT8 data);
 	void set_output_latch(UINT8 data);
 	void set_output_data(UINT8 data);
-	
+
 	// internal state
 	bool       m_recurse;
 	bool       m_audio_cpu_nmi_enabled;
 	bool       m_audio_cpu_nmi_pending;
-	
+
 	// MVS-specific state
 	UINT8      m_save_ram_unlocked;
 	UINT8      m_output_data;
@@ -214,7 +214,7 @@ private:
 	UINT8      m_el_value;
 	UINT8      m_led1_value;
 	UINT8      m_led2_value;
-	
+
 	emu_timer  *m_display_position_interrupt_timer;
 	emu_timer  *m_display_position_vblank_timer;
 	emu_timer  *m_vblank_interrupt_timer;
@@ -223,9 +223,9 @@ private:
 	UINT8      m_display_position_interrupt_pending;
 	UINT8      m_irq3_pending;
 	UINT8      m_display_position_interrupt_control;
-	
+
 	UINT16 get_video_control();
-	
+
 	// color/palette related
 	std::vector<UINT16> m_paletteram;
 	UINT8        m_palette_lookup[32][4];
@@ -241,11 +241,11 @@ class aes_state : public neogeo_state
 			: neogeo_state(mconfig, type, tag)
 			, m_io_in2(*this, "IN2")
 	{}
-	
+
 	DECLARE_READ16_MEMBER(aes_in2_r);
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 	DECLARE_MACHINE_START(aes);
-	
+
 protected:
 	required_ioport m_io_in2;
 };
@@ -264,7 +264,7 @@ class neopcb_state : public neogeo_state
 		, m_pcm2_prot(*this, "pcm2")
 		, m_pvc_prot(*this, "pvc")
 	{}
-	
+
 	// device overrides
 	virtual void machine_start() override;
 
@@ -286,7 +286,7 @@ class neopcb_state : public neogeo_state
 	void kf2k3pcb_gfx_decrypt();
 	void kf2k3pcb_decrypt_s1data();
 	void kf2k3pcb_sp1_decrypt();
-	
+
 	required_device<cmc_prot_device> m_cmc_prot;
 	required_device<pcm2_prot_device> m_pcm2_prot;
 	required_device<pvc_prot_device> m_pvc_prot;
@@ -299,4 +299,3 @@ MACHINE_CONFIG_EXTERN( neogeo_base );
 MACHINE_CONFIG_EXTERN( neogeo_arcade );
 INPUT_PORTS_EXTERN(neogeo);
 INPUT_PORTS_EXTERN(aes);
-

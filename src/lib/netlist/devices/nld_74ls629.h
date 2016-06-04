@@ -31,14 +31,14 @@
 #include "nl_base.h"
 #include "analog/nld_twoterm.h"
 
-#define SN74LS629(_name, _cap)                                                      \
-		NET_REGISTER_DEV(SN74LS629, _name)                                          \
-		NETDEV_PARAMI(_name, CAP, _cap)
+#define SN74LS629(name, p_cap)                                                      \
+		NET_REGISTER_DEV(SN74LS629, name)                                          \
+		NETDEV_PARAMI(name, CAP, p_cap)
 
-#define SN74LS629_DIP(_name, _cap1, _cap2)                                        \
-		NET_REGISTER_DEV(SN74LS629_DIP, _name)                                    \
-		NETDEV_PARAMI(_name, 1.CAP, _cap1)                                        \
-		NETDEV_PARAMI(_name, 2.CAP, _cap2)
+#define SN74LS629_DIP(name, p_cap1, p_cap2)                                        \
+		NET_REGISTER_DEV(SN74LS629_DIP, name)                                    \
+		NETDEV_PARAMI(name, 1.CAP, p_cap1)                                        \
+		NETDEV_PARAMI(name, 2.CAP, p_cap2)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -83,6 +83,7 @@ NETLIB_OBJECT(SN74LS629)
 	, m_clock(*this, "OSC")
 	, m_R_FC(*this, "R_FC")
 	, m_R_RNG(*this, "R_RNG")
+	, m_CAP(*this, "CAP", 1e-6)
 	{
 		enregister("ENQ", m_ENQ);
 		enregister("RNG",    m_RNG);
@@ -94,7 +95,6 @@ NETLIB_OBJECT(SN74LS629)
 		connect_late(m_R_FC.m_N, m_R_RNG.m_N);
 
 		register_subalias("Y", m_clock.m_Y);
-		register_param("CAP", m_CAP, 1e-6);
 	}
 
 	NETLIB_RESETI()

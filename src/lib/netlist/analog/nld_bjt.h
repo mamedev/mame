@@ -15,13 +15,13 @@
 // Macros
 // -----------------------------------------------------------------------------
 
-#define QBJT_SW(_name, _model)                                                 \
-		NET_REGISTER_DEV(QBJT_SW, _name)                                       \
-		NETDEV_PARAMI(_name,  MODEL,   _model)
+#define QBJT_SW(name, model)                                                 \
+		NET_REGISTER_DEV(QBJT_SW, name)                                       \
+		NETDEV_PARAMI(name,  MODEL, model)
 
-#define QBJT_EB(_name, _model)                                                 \
-		NET_REGISTER_DEV(QBJT_EB, _name)                                       \
-		NETDEV_PARAMI(_name,  MODEL,   _model)
+#define QBJT_EB(name, model)                                                 \
+		NET_REGISTER_DEV(QBJT_EB, name)                                       \
+		NETDEV_PARAMI(name,  MODEL, model)
 
 
 NETLIB_NAMESPACE_DEVICES_START()
@@ -41,9 +41,9 @@ public:
 	};
 
 	NETLIB_CONSTRUCTOR(Q)
+	, m_model(*this, "MODEL", "")
 	, m_qtype(BJT_NPN)
 	{
-		register_param("MODEL", m_model, "");
 	}
 
 	NETLIB_DYNAMIC()
@@ -152,11 +152,11 @@ NETLIB_OBJECT_DERIVED(QBJT_EB, QBJT)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(QBJT_EB, QBJT)
-	  ,	m_D_CB(owner, "m_D_CB")
-	  ,	m_D_EB(owner, "m_D_EB")
-	  ,	m_D_EC(owner, "m_D_EC")
-	  ,	m_alpha_f(0)
-	  ,	m_alpha_r(0)
+		,   m_D_CB(owner, "m_D_CB")
+		,   m_D_EB(owner, "m_D_EB")
+		,   m_D_EC(owner, "m_D_EC")
+		,   m_alpha_f(0)
+		,   m_alpha_r(0)
 	{
 		enregister("E", m_D_EB.m_P);   // Cathode
 		enregister("B", m_D_EB.m_N);   // Anode

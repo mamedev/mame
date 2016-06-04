@@ -9,6 +9,7 @@
 #ifndef __KANEKO16_H__
 #define __KANEKO16_H__
 
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "video/kan_pand.h"
 #include "video/kaneko_tmap.h"
@@ -38,6 +39,7 @@ public:
 		m_pandora(*this, "pandora"),
 		m_palette(*this, "palette"),
 		m_eeprom(*this, "eeprom"),
+		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_mainram(*this, "mainram")
 		{ }
@@ -55,6 +57,7 @@ public:
 	optional_device<kaneko_pandora_device> m_pandora;
 	required_device<palette_device> m_palette;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_mainram;

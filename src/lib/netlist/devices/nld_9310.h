@@ -47,20 +47,20 @@
 
 #include "nl_base.h"
 
-#define TTL_9310(_name, _CLK, _ENP, _ENT, _CLRQ, _LOADQ, _A, _B, _C, _D)            \
-		NET_REGISTER_DEV(TTL_9310, _name)                                               \
-		NET_CONNECT(_name, CLK, _CLK)                                               \
-		NET_CONNECT(_name, ENP,  _ENP)                                              \
-		NET_CONNECT(_name, ENT,  _ENT)                                              \
-		NET_CONNECT(_name, CLRQ, _CLRQ)                                             \
-		NET_CONNECT(_name, LOADQ,_LOADQ)                                            \
-		NET_CONNECT(_name, A,    _A)                                                \
-		NET_CONNECT(_name, B,    _B)                                                \
-		NET_CONNECT(_name, C,    _C)                                                \
-		NET_CONNECT(_name, D,    _D)
+#define TTL_9310(name, cCLK, cENP, cENT, cCLRQ, cLOADQ, cA, cB, cC, cD)            \
+		NET_REGISTER_DEV(TTL_9310, name)                                               \
+		NET_CONNECT(name, CLK, cCLK)                                               \
+		NET_CONNECT(name, ENP,  cENP)                                              \
+		NET_CONNECT(name, ENT,  cENT)                                              \
+		NET_CONNECT(name, CLRQ, cCLRQ)                                             \
+		NET_CONNECT(name, LOADQ,_LOADQ)                                            \
+		NET_CONNECT(name, A,    cA)                                                \
+		NET_CONNECT(name, B,    cB)                                                \
+		NET_CONNECT(name, C,    cC)                                                \
+		NET_CONNECT(name, D,    cD)
 
-#define TTL_9310_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_9310_DIP, _name)
+#define TTL_9310_DIP(name)                                                         \
+		NET_REGISTER_DEV(TTL_9310_DIP, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

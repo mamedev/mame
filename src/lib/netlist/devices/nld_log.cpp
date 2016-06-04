@@ -15,7 +15,7 @@ NETLIB_NAMESPACE_DEVICES_START()
 NETLIB_UPDATE(log)
 {
 	/* use pstring::sprintf, it is a LOT faster */
-	m_strm->writeline(pfmt("{1} {2}").e(netlist().time().as_double(),".9").e((nl_double) INPANALOG(m_I)));
+	m_strm->writeline(plib::pfmt("{1} {2}").e(netlist().time().as_double(),".9").e((nl_double) INPANALOG(m_I)));
 }
 
 NETLIB_NAME(log)::~NETLIB_NAME(log)()
@@ -25,7 +25,7 @@ NETLIB_NAME(log)::~NETLIB_NAME(log)()
 
 NETLIB_UPDATE(logD)
 {
-	m_strm->writeline(pfmt("{1} {2}").e(netlist().time().as_double(),".9").e((nl_double) (INPANALOG(m_I) - INPANALOG(m_I2))));
+	m_strm->writeline(plib::pfmt("{1} {2}").e(netlist().time().as_double(),".9").e((nl_double) (INPANALOG(m_I) - INPANALOG(m_I2))));
 }
 
 // FIXME: Implement wav later, this must be clock triggered device where the input to be written

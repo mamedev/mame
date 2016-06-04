@@ -28,11 +28,11 @@
 
 #include "nl_base.h"
 
-#define TTL_74193(_name)                                              \
-		NET_REGISTER_DEV(TTL_74193, _name)
+#define TTL_74193(name)                                              \
+		NET_REGISTER_DEV(TTL_74193, name)
 
-#define TTL_74193_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_74193_DIP, _name)
+#define TTL_74193_DIP(name)                                                         \
+		NET_REGISTER_DEV(TTL_74193_DIP, name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

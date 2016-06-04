@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood,Paul Priest
+
+#include "machine/gen_latch.h"
+
 class ms32_state : public driver_device
 {
 public:
@@ -22,7 +25,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	optional_shared_ptr<UINT32> m_mainram;
 	optional_shared_ptr<UINT32> m_roz_ctrl;
@@ -116,4 +120,5 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch; //not for bnstars.cpp
 };

@@ -603,7 +603,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
 			if ( m_p_ram[SM8521_TM0D] >= m_timer[0].check_value )
 			{
 				m_p_ram[SM8521_TM0D] = 0;
-//				m_maincpu->set_input_line(sm8500_cpu_device::TIM0_INT, ASSERT_LINE ); // this causes crazy flickering
+//              m_maincpu->set_input_line(sm8500_cpu_device::TIM0_INT, ASSERT_LINE ); // this causes crazy flickering
 			}
 		}
 	}

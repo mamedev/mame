@@ -2109,7 +2109,7 @@ void gba_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x08000000, 0x09ffffff, 0, 0, "rom1");
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0a000000, 0x0bffffff, 0, 0, "rom2");
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0c000000, 0x0cffffff, 0, 0, "rom3");
-		
+
 		std::string region_tag;
 		memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GBASLOT_ROM_REGION_TAG).c_str());
 
@@ -2118,7 +2118,7 @@ void gba_state::machine_start()
 		membank("rom2")->set_base(cart_rom->base());
 		membank("rom3")->set_base(cart_rom->base());
 
-		
+
 		// add nvram to save state
 		m_cart->save_nvram();
 
@@ -2151,7 +2151,7 @@ void gba_state::machine_start()
 			memory_region *cart_romhlp = memregion(region_tag.assign(m_cart->tag()).append(GBAHELP_ROM_REGION_TAG).c_str());
 			membank("rom1")->set_base(cart_romhlp->base());
 		}
-		
+
 	}
 
 	save_item(NAME(m_DISPSTAT));

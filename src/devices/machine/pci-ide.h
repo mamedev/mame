@@ -8,7 +8,7 @@ Generic PCI IDE controller implementation.
 Based on datasheet for National Semiconductor PC87415
 
 TODO:
-	Add pci configuration write to PIF byte
+    Add pci configuration write to PIF byte
 ***************************************************************************/
 
 #ifndef PCI_IDE_H

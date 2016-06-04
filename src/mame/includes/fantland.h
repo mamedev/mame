@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
 class fantland_state : public driver_device
@@ -7,17 +9,18 @@ class fantland_state : public driver_device
 public:
 	fantland_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_msm1(*this, "msm1"),
 		m_msm2(*this, "msm2"),
 		m_msm3(*this, "msm3"),
 		m_msm4(*this, "msm4"),
 		m_spriteram(*this, "spriteram", 0),
-		m_spriteram2(*this, "spriteram2", 0),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")  { }
+		m_spriteram2(*this, "spriteram2", 0)  { }
 
 	/* memory pointers */
 //  UINT8 *    m_spriteram;   // currently directly used in a 16bit map...
@@ -34,10 +37,17 @@ public:
 	int        m_adpcm_nibble[4];
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device<msm5205_device> m_msm1;
 	optional_device<msm5205_device> m_msm2;
 	optional_device<msm5205_device> m_msm3;
 	optional_device<msm5205_device> m_msm4;
+
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_spriteram2;
 	DECLARE_WRITE_LINE_MEMBER(galaxygn_sound_irq);
@@ -68,9 +78,4 @@ public:
 	void borntofi_adpcm_start( msm5205_device *device, int voice );
 	void borntofi_adpcm_stop( msm5205_device *device, int voice );
 	void borntofi_adpcm_int( msm5205_device *device, int voice );
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 };

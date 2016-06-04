@@ -1070,7 +1070,7 @@ int drcbe_c::execute(code_handle &entry)
 				PARAM0 = temp32;
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_TZCNT, 4, 0):		// TZCNT   dst,src
+			case MAKE_OPCODE_SHORT(OP_TZCNT, 4, 0):     // TZCNT   dst,src
 				PARAM0 = tzcount32(PARAM1);
 				break;
 
@@ -1689,7 +1689,7 @@ int drcbe_c::execute(code_handle &entry)
 				DPARAM0 = temp64;
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_TZCNT, 8, 0):		// DTZCNT  dst,src
+			case MAKE_OPCODE_SHORT(OP_TZCNT, 8, 0):     // DTZCNT  dst,src
 				DPARAM0 = tzcount64(DPARAM1);
 				break;
 

@@ -161,9 +161,9 @@
 #include "nl_lists.h"
 #include "nl_time.h"
 #include "nl_util.h"
+#include "plib/pdynlib.h"
 #include "plib/pstate.h"
 #include "plib/pfmtlog.h"
-#include "plib/pdynlib.h"
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
@@ -183,58 +183,61 @@ using netlist_sig_t = std::uint32_t;
 #define NETLIB_NAMESPACE_DEVICES_START()    namespace netlist { namespace devices {
 #define NETLIB_NAMESPACE_DEVICES_END()  }}
 
-#define NETLIB_NAME(_chip) nld_ ## _chip
+#define NETLIB_NAME(chip) nld_ ## chip
 
-#define NETLIB_OBJECT_DERIVED(_name, _pclass)                                   \
-class NETLIB_NAME(_name) : public NETLIB_NAME(_pclass)
+#define NETLIB_OBJECT_DERIVED(name, pclass)                                   \
+class NETLIB_NAME(name) : public NETLIB_NAME(pclass)
 
-#define NETLIB_OBJECT(_name)                                                    \
-class NETLIB_NAME(_name) : public device_t
+#define NETLIB_OBJECT(name)                                                    \
+class NETLIB_NAME(name) : public device_t
 
-#define NETLIB_CONSTRUCTOR_DERIVED(_name, _pclass)                              \
+#define NETLIB_CONSTRUCTOR_DERIVED(cname, pclass)                              \
 	private: family_setter_t m_famsetter;                                       \
-	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name) \
-	: NETLIB_NAME(_pclass)(owner, name)
+	public: template <class CLASS> ATTR_COLD NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
+	: NETLIB_NAME(pclass)(owner, name)
 
-#define NETLIB_CONSTRUCTOR(_name)                                               \
+#define NETLIB_CONSTRUCTOR(cname)                                               \
 	private: family_setter_t m_famsetter;                                       \
-	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name) \
+	public: template <class CLASS> ATTR_COLD NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
 		: device_t(owner, name)
 
-#define NETLIB_DESTRUCTOR(_name) public: ATTR_HOT virtual ~NETLIB_NAME(_name)()
+#define NETLIB_DESTRUCTOR(name) public: ATTR_HOT virtual ~NETLIB_NAME(name)()
 
-#define NETLIB_CONSTRUCTOR_EX(_name, ...)                                  \
+#define NETLIB_CONSTRUCTOR_EX(cname, ...)                                       \
 	private: family_setter_t m_famsetter;                                       \
-	public: template <class _CLASS> ATTR_COLD NETLIB_NAME(_name)(_CLASS &owner, const pstring name, __VA_ARGS__) \
+	public: template <class CLASS> ATTR_COLD NETLIB_NAME(cname)(CLASS &owner, const pstring name, __VA_ARGS__) \
 		: device_t(owner, name)
 
 #define NETLIB_DYNAMIC() 														\
 	public: ATTR_HOT virtual bool is_dynamic1() const override { return true; }
 
 #define NETLIB_TIMESTEP() 														\
-	public: ATTR_HOT virtual bool is_timestep() const override { return true; }         \
+	public: ATTR_HOT virtual bool is_timestep() const override { return true; } \
 	public: ATTR_HOT virtual void step_time(const nl_double step) override
 
-#define NETLIB_FAMILY(_family) , m_famsetter(*this, _family)
+#define NETLIB_UPDATE_AFTER_PARAM_CHANGE() 						     			\
+	public: ATTR_HOT virtual bool needs_update_after_param_change() const override { return true; }
+
+#define NETLIB_FAMILY(family) , m_famsetter(*this, family)
 
 #define NETLIB_UPDATE_TERMINALSI() public: ATTR_HOT virtual void update_terminals() override
 #define NETLIB_UPDATEI() protected: ATTR_HOT virtual void update() NOEXCEPT override
 #define NETLIB_UPDATE_PARAMI() public: ATTR_HOT virtual void update_param() override
 #define NETLIB_RESETI() protected: ATTR_HOT virtual void reset() override
 
-#define NETLIB_SUB(_chip) nld_ ## _chip
-#define NETLIB_SUBXX(_chip) std::unique_ptr< nld_ ## _chip >
+#define NETLIB_SUB(chip) nld_ ## chip
+#define NETLIB_SUBXX(chip) std::unique_ptr< nld_ ## chip >
 
-#define NETLIB_UPDATE(_chip) ATTR_HOT void NETLIB_NAME(_chip) :: update(void) NOEXCEPT
+#define NETLIB_UPDATE(chip) ATTR_HOT void NETLIB_NAME(chip) :: update(void) NOEXCEPT
 
-#define NETLIB_RESET(_chip) ATTR_COLD void NETLIB_NAME(_chip) :: reset(void)
+#define NETLIB_RESET(chip) ATTR_COLD void NETLIB_NAME(chip) :: reset(void)
 
-#define NETLIB_STOP(_chip) ATTR_COLD void NETLIB_NAME(_chip) :: stop(void)
+#define NETLIB_STOP(chip) ATTR_COLD void NETLIB_NAME(chip) :: stop(void)
 
-#define NETLIB_UPDATE_PARAM(_chip) ATTR_HOT void NETLIB_NAME(_chip) :: update_param(void)
-#define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT void NETLIB_NAME(_chip) :: _name _params
+#define NETLIB_UPDATE_PARAM(chip) ATTR_HOT void NETLIB_NAME(chip) :: update_param(void)
+#define NETLIB_FUNC_VOID(chip, name, params) ATTR_HOT void NETLIB_NAME(chip) :: name params
 
-#define NETLIB_UPDATE_TERMINALS(_chip) ATTR_HOT void NETLIB_NAME(_chip) :: update_terminals(void)
+#define NETLIB_UPDATE_TERMINALS(chip) ATTR_HOT void NETLIB_NAME(chip) :: update_terminals(void)
 
 
 //============================================================
@@ -247,11 +250,11 @@ class NETLIB_NAME(_name) : public device_t
 //============================================================
 
 #if defined(MAME_DEBUG)
-#define nl_assert(x)               do { if (1) if (!(x)) throw fatalerror_e(pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
+#define nl_assert(x)               do { if (1) if (!(x)) throw fatalerror_e(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
 #else
-#define nl_assert(x)               do { if (0) if (!(x)) throw fatalerror_e(pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
+#define nl_assert(x)               do { if (0) if (!(x)) throw fatalerror_e(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
 #endif
-#define nl_assert_always(x, msg)    do { if (!(x)) throw fatalerror_e(pfmt("Fatal error: {1}\nCaused by assert: {2}:{3}: {4}")(msg)(__FILE__)(__LINE__)(#x)); } while (0)
+#define nl_assert_always(x, msg)    do { if (!(x)) throw fatalerror_e(plib::pfmt("Fatal error: {1}\nCaused by assert: {2}:{3}: {4}")(msg)(__FILE__)(__LINE__)(#x)); } while (0)
 
 
 // -----------------------------------------------------------------------------
@@ -279,10 +282,10 @@ namespace netlist
 	//  Exceptions
 	//============================================================
 
-	class fatalerror_e : public pexception
+	class fatalerror_e : public plib::pexception
 	{
 	public:
-		fatalerror_e(const pstring &text) : pexception(text) { }
+		fatalerror_e(const pstring &text) : plib::pexception(text) { }
 		virtual ~fatalerror_e() throw() {}
 	};
 
@@ -299,7 +302,7 @@ namespace netlist
 	// model_map_t
 	// -----------------------------------------------------------------------------
 
-	using model_map_t = phashmap_t<pstring, pstring>;
+	using model_map_t = plib::hashmap_t<pstring, pstring>;
 
 	// -----------------------------------------------------------------------------
 	// logic_family_t
@@ -310,7 +313,7 @@ namespace netlist
 	public:
 		logic_family_desc_t() {}
 		virtual ~logic_family_desc_t() {}
-		virtual powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
+		virtual plib::powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
 
 		nl_double m_low_thresh_V;
@@ -351,7 +354,7 @@ namespace netlist
 	// object_t
 	// -----------------------------------------------------------------------------
 
-	class object_t : public pstate_interface_t<object_t>
+	class object_t : public plib::pstate_interface_t<object_t>
 	{
 		P_PREVENT_COPYING(object_t)
 	public:
@@ -376,7 +379,7 @@ namespace netlist
 
 		ATTR_COLD const pstring &name() const;
 
-		ATTR_COLD inline pstate_manager_t *state_manager();
+		ATTR_COLD inline plib::pstate_manager_t *state_manager();
 
 		ATTR_HOT  type_t type() const { return m_objtype; }
 
@@ -430,12 +433,12 @@ namespace netlist
 	// core_terminal_t
 	// -----------------------------------------------------------------------------
 
-	class core_terminal_t : public device_object_t, public plinkedlist_element_t<core_terminal_t>
+	class core_terminal_t : public device_object_t, public plib::plinkedlist_element_t<core_terminal_t>
 	{
 		P_PREVENT_COPYING(core_terminal_t)
 	public:
 
-		using list_t = pvector_t<core_terminal_t *>;
+		using list_t = plib::pvector_t<core_terminal_t *>;
 
 		/* needed here ... */
 
@@ -516,7 +519,7 @@ namespace netlist
 		P_PREVENT_COPYING(terminal_t)
 	public:
 
-		using list_t = pvector_t<terminal_t *>;
+		using list_t = plib::pvector_t<terminal_t *>;
 
 		ATTR_COLD terminal_t();
 
@@ -665,7 +668,7 @@ namespace netlist
 	public:
 
 		using ptr_t = net_t *;
-		using list_t = pvector_t<std::shared_ptr<net_t>>;
+		using list_t = plib::pvector_t<std::shared_ptr<net_t>>;
 
 		ATTR_COLD net_t();
 		virtual ~net_t();
@@ -705,7 +708,7 @@ namespace netlist
 
 		ATTR_COLD void move_connections(net_t *new_net);
 
-		pvector_t<core_terminal_t *> m_core_terms; // save post-start m_list ...
+		plib::pvector_t<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
 		ATTR_HOT  void set_Q_time(const netlist_sig_t &newQ, const netlist_time &at)
 		{
@@ -728,7 +731,7 @@ namespace netlist
 	private:
 
 		core_terminal_t * m_railterminal;
-		plinkedlist_t<core_terminal_t> m_list_active;
+		plib::linkedlist_t<core_terminal_t> m_list_active;
 
 		netlist_time m_time;
 		INT32        m_active;
@@ -747,7 +750,7 @@ namespace netlist
 		P_PREVENT_COPYING(logic_net_t)
 	public:
 
-		using list_t = pvector_t<logic_net_t *>;
+		using list_t = plib::pvector_t<logic_net_t *>;
 
 		ATTR_COLD logic_net_t();
 		virtual ~logic_net_t() { };
@@ -807,7 +810,7 @@ namespace netlist
 		P_PREVENT_COPYING(analog_net_t)
 	public:
 
-		using list_t =  pvector_t<analog_net_t *>;
+		using list_t =  plib::pvector_t<analog_net_t *>;
 
 		ATTR_COLD analog_net_t();
 		ATTR_COLD analog_net_t(netlist_t &nl, const pstring &aname);
@@ -826,8 +829,8 @@ namespace netlist
 
 		ATTR_HOT devices::matrix_solver_t *solver() { return m_solver; }
 
-		ATTR_COLD bool already_processed(pvector_t<list_t> &groups);
-		ATTR_COLD void process_net(pvector_t<list_t> &groups);
+		ATTR_COLD bool already_processed(plib::pvector_t<list_t> &groups);
+		ATTR_COLD void process_net(plib::pvector_t<list_t> &groups);
 
 	protected:
 
@@ -896,8 +899,10 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
-	// net_param_t
+	// param_t
 	// -----------------------------------------------------------------------------
+
+	class device_t;
 
 	class param_t : public device_object_t
 	{
@@ -912,7 +917,7 @@ namespace netlist
 			LOGIC
 		};
 
-		ATTR_COLD param_t(const param_type_t atype);
+		ATTR_COLD param_t(const param_type_t atype, device_t &device, const pstring &name);
 
 		ATTR_HOT  param_type_t param_type() const { return m_param_type; }
 
@@ -924,16 +929,12 @@ namespace netlist
 		const param_type_t m_param_type;
 	};
 
-	template <class C, param_t::param_type_t T>
+	template <typename C, param_t::param_type_t T>
 	class param_template_t : public param_t
 	{
 		P_PREVENT_COPYING(param_template_t)
 	public:
-		ATTR_COLD param_template_t()
-		: param_t(T)
-		, m_param(C(0))
-		{
-		}
+		param_template_t(device_t &device, const pstring name, const C val);
 
 		operator const C() const { return Value(); }
 
@@ -942,14 +943,6 @@ namespace netlist
 		ATTR_HOT  C Value() const { return m_param;   }
 
 	protected:
-		virtual void save_register() override
-		{
-			/* pstrings not yet supported, these need special logic */
-			if (T != param_t::STRING && T != param_t::MODEL)
-				save(NLNAME(m_param));
-			param_t::save_register();
-		}
-
 		virtual void changed() { }
 		C m_param;
 	private:
@@ -959,18 +952,13 @@ namespace netlist
 	using param_int_t = param_template_t<int, param_t::INTEGER>;
 	using param_str_t = param_template_t<pstring, param_t::STRING>;
 
-	class param_logic_t : public param_int_t
-	{
-		P_PREVENT_COPYING(param_logic_t)
-	public:
-		ATTR_COLD param_logic_t() : param_int_t() { };
-	};
+	using param_logic_t = param_template_t<int, param_t::INTEGER>;
 
-	class param_model_t : public param_template_t<pstring, param_t::MODEL>
+	class param_model_t : public param_str_t
 	{
-		P_PREVENT_COPYING(param_model_t)
 	public:
-		ATTR_COLD param_model_t() : param_template_t<pstring, param_t::MODEL>() { }
+		ATTR_COLD param_model_t(device_t &device, const pstring name, const pstring val)
+		: param_str_t(device, name, val) { }
 
 		/* these should be cached! */
 		ATTR_COLD nl_double model_value(const pstring &entity);
@@ -994,14 +982,12 @@ namespace netlist
 		P_PREVENT_COPYING(core_device_t)
 	public:
 
-		using list_t = pvector_t<core_device_t *>;
+		using list_t = plib::pvector_t<core_device_t *>;
 
 		ATTR_COLD core_device_t(netlist_t &owner, const pstring &name);
 		ATTR_COLD core_device_t(core_device_t &owner, const pstring &name);
 
 		virtual ~core_device_t();
-
-		ATTR_HOT virtual void update_param() {}
 
 		ATTR_HOT  void update_dev()
 		{
@@ -1053,21 +1039,24 @@ namespace netlist
 
 	#if (NL_KEEP_STATISTICS)
 		/* stats */
-		osd_ticks_t stat_total_time;
+		plib::ticks_t stat_total_time;
 		INT32 stat_update_count;
 		INT32 stat_call_count;
 	#endif
 
 	protected:
 
-		/*ATTR_HOT*/ virtual void update() NOEXCEPT { }
+		ATTR_HOT virtual void update() NOEXCEPT { }
 		ATTR_HOT virtual void stop() { }
 
 	public:
 		ATTR_HOT virtual void step_time(ATTR_UNUSED const nl_double st) { }
 		ATTR_HOT virtual void update_terminals() { }
+
+		ATTR_HOT virtual void update_param() {}
 		ATTR_HOT virtual bool is_dynamic1() const { return false; }
 		ATTR_HOT virtual bool is_timestep() const { return false; }
+		ATTR_HOT virtual bool needs_update_after_param_change() const { return false; }
 
 	private:
 
@@ -1080,6 +1069,22 @@ namespace netlist
 	#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
 		net_update_delegate m_static_update;
 	#endif
+	};
+
+	// -----------------------------------------------------------------------------
+	// param_ref_t
+	// -----------------------------------------------------------------------------
+
+	struct param_ref_t
+	{
+		param_ref_t(const pstring name, core_device_t &device, param_t &param)
+		: m_name(name)
+		, m_device(device)
+		, m_param(param)
+		{ }
+		pstring m_name;
+		core_device_t &m_device;
+		param_t &m_param;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1119,7 +1124,7 @@ namespace netlist
 		ATTR_COLD void connect_late(core_terminal_t &t1, core_terminal_t &t2);
 		ATTR_COLD void connect_post_start(core_terminal_t &t1, core_terminal_t &t2);
 
-		pvector_t<pstring> m_terminals;
+		plib::pvector_t<pstring> m_terminals;
 
 	protected:
 
@@ -1161,7 +1166,7 @@ namespace netlist
 
 	class queue_t : public timed_queue<net_t *, netlist_time>,
 							public object_t,
-							public pstate_callback_t
+							public plib::pstate_callback_t
 	{
 	public:
 		queue_t(netlist_t &nl);
@@ -1170,15 +1175,15 @@ namespace netlist
 
 		void reset() override {}
 
-		void register_state(pstate_manager_t &manager, const pstring &module) override;
+		void register_state(plib::pstate_manager_t &manager, const pstring &module) override;
 		void on_pre_save() override;
 		void on_post_load() override;
 
 	private:
 		struct names_t { char m_buf[64]; };
 		int m_qsize;
-		parray_t<netlist_time::INTERNALTYPE> m_times;
-		parray_t<names_t> m_names;
+		plib::array_t<netlist_time::INTERNALTYPE> m_times;
+		plib::array_t<names_t> m_names;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1186,7 +1191,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 
-	class netlist_t : public pstate_manager_t, public plog_dispatch_intf //, public device_owner_t
+	class netlist_t : public plib::pstate_manager_t, public plib::plog_dispatch_intf //, public device_owner_t
 	{
 		P_PREVENT_COPYING(netlist_t)
 	public:
@@ -1221,26 +1226,26 @@ namespace netlist
 
 		ATTR_COLD net_t *find_net(const pstring &name);
 
-		template<class _device_class>
-		ATTR_COLD pvector_t<_device_class *> get_device_list()
+		template<class device_class>
+		ATTR_COLD plib::pvector_t<device_class *> get_device_list()
 		{
-			pvector_t<_device_class *> tmp;
+			plib::pvector_t<device_class *> tmp;
 			for (auto &d : m_devices)
 			{
-				_device_class *dev = dynamic_cast<_device_class *>(d.get());
+				device_class *dev = dynamic_cast<device_class *>(d.get());
 				if (dev != nullptr)
 					tmp.push_back(dev);
 			}
 			return tmp;
 		}
 
-		template<class _device_class>
-		ATTR_COLD _device_class *get_single_device(const char *classname)
+		template<class device_class>
+		ATTR_COLD device_class *get_single_device(const char *classname)
 		{
-			_device_class *ret = nullptr;
+			device_class *ret = nullptr;
 			for (auto &d : m_devices)
 			{
-				_device_class *dev = dynamic_cast<_device_class *>(d.get());
+				device_class *dev = dynamic_cast<device_class *>(d.get());
 				if (dev != nullptr)
 				{
 					if (ret != nullptr)
@@ -1256,16 +1261,16 @@ namespace netlist
 		pvector_t<core_device_t *> m_started_devices;
 	#endif
 
-		ATTR_COLD plog_base<NL_DEBUG> &log() { return m_log; }
-		ATTR_COLD const plog_base<NL_DEBUG> &log() const { return m_log; }
+		ATTR_COLD plib::plog_base<NL_DEBUG> &log() { return m_log; }
+		ATTR_COLD const plib::plog_base<NL_DEBUG> &log() const { return m_log; }
 
 		virtual void reset();
 
-		ATTR_COLD pdynlib &lib() { return *m_lib; }
+		ATTR_COLD plib::dynlib &lib() { return *m_lib; }
 
 		void print_stats() const;
 
-		pvector_t<powned_ptr<core_device_t>> m_devices;
+		plib::pvector_t<plib::powned_ptr<core_device_t>> m_devices;
 
 		/* sole use is to manage lifetime of net objects */
 		net_t::list_t m_nets;
@@ -1297,15 +1302,15 @@ protected:
 
 		pstring m_name;
 		setup_t *m_setup;
-		plog_base<NL_DEBUG> m_log;
-		pdynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
+		plib::plog_base<NL_DEBUG> m_log;
+		plib::dynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
 	};
 
 	// -----------------------------------------------------------------------------
 	// inline implementations
 	// -----------------------------------------------------------------------------
 
-	ATTR_COLD inline pstate_manager_t *object_t::state_manager()
+	ATTR_COLD inline plib::pstate_manager_t *object_t::state_manager()
 	{
 		return m_netlist;
 	}
@@ -1318,6 +1323,8 @@ protected:
 			m_param = param;
 			changed();
 			device().update_param();
+			if (device().needs_update_after_param_change())
+				device().update_dev();
 		}
 	}
 
@@ -1471,7 +1478,7 @@ protected:
 
 }
 
-NETLIST_SAVE_TYPE(netlist::core_terminal_t::state_e, DT_INT);
+NETLIST_SAVE_TYPE(netlist::core_terminal_t::state_e, pstate_data_type_e::DT_INT);
 
 
 #endif /* NLBASE_H_ */

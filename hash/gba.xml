@@ -921,7 +921,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="metrdfsnp2" cloneof="metrdfsn">
 		<description>Metroid Fusion (Euro, Prototype 20020911)</description>
 		<year>2002</year>
@@ -934,7 +934,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="metrdfsnp1" cloneof="metrdfsn">
 		<description>Metroid Fusion (Euro, Prototype 20020916)</description>
 		<year>2002</year>
@@ -2204,7 +2204,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="metroid0up" cloneof="metroid0">
 		<description>Metroid - Zero Mission (USA, Prototype)</description>
 		<year>2004</year>
@@ -7082,7 +7082,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="boktai">
 		<description>Boktai - The Sun Is in Your Hand (Euro)</description>
 		<year>2004</year>
@@ -7096,14 +7096,14 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u4" value="U4 74LV4040" /><!-- 37C7E1K -->
 			<feature name="u5" value="U5 TLV272" />
 			<feature name="bt1" value="CR1616" />
-			
+
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="boktai - the sun is in your hand (europe) (en,fr,de,es,it).bin" size="16777216" crc="9686c36b" sha1="64f7bf0f0560f6e94da33b549d3206678b29f557" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="boktaiud" cloneof="boktai">
 		<description>Boktai - The Sun Is in Your Hand (USA, Demo)</description>
 		<year>2003</year>
@@ -8993,7 +8993,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="n_cvania">
 		<description>NES Classics - Castlevania (Euro)</description>
 		<year>2004</year>
@@ -11598,7 +11598,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dobchobi">
 		<description>Doubutsu-jima no Chobigurumi (Jpn, Rev. 1)</description>
 		<year>2003</year>
@@ -13031,7 +13031,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="extskateu" cloneof="extskate">
 		<description>Disney's Extreme Skate Adventure (USA, Rev. 1)</description>
 		<year>2003</year>
@@ -14559,7 +14559,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="firembssjp" cloneof="firembss">
 		<description>Fire Emblem - Seima no Kouseki (Jpn, Prototype)</description>
 		<year>2004</year>
@@ -15502,7 +15502,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="v_dccol2">
 		<description>Game Boy Advance Video - Disney Channel Collection - Volume 2 (USA)</description>
 		<year>2004?</year>
@@ -15650,7 +15650,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="v_sharkta" cloneof="v_sharkt" supported="no">
 		<description>Game Boy Advance Video - Shark Tale (USA, Rev. 5)</description>
 		<year>2004?</year>
@@ -18111,7 +18111,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="hunterxh">
+	<software name="hxhmintd">
 		<description>Hunter X Hunter - Minna Tomodachi Daisakusen!! (Jpn)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
@@ -20972,7 +20972,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="legorcr2p" cloneof="legorcr2">
+	<software name="legorac2p" cloneof="legorac2">
 		<description>LEGO Racers 2 (Euro, Prototype)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts</publisher>
@@ -20984,7 +20984,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="legorcr2">
+	<software name="legorac2">
 		<description>LEGO Racers 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts</publisher>
@@ -20997,7 +20997,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="legorcr2u" cloneof="legorcr2">
+	<software name="legorac2u" cloneof="legorac2">
 		<description>LEGO Racers 2 (USA)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts</publisher>
@@ -22608,7 +22608,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="marivsdkud" cloneof="marivsdk">
 		<description>Mario vs. Donkey Kong (USA, Kiosk, v16)</description>
 		<year>2004</year>
@@ -23740,7 +23740,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="metroid0p" cloneof="metroid0">
 		<description>Metroid - Zero Mission (Euro, Prototype)</description>
 		<year>2004</year>
@@ -24427,7 +24427,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="monstfrm" cloneof="mnstrnch">
+	<software name="mfarm" cloneof="mrancher">
 		<description>Monster Farm Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>Tecmo</publisher>
@@ -24442,7 +24442,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="monstfr2" cloneof="mnstrnc2">
+	<software name="mfarm2" cloneof="mranchr2">
 		<description>Monster Farm Advance 2 (Jpn)</description>
 		<year>2002</year>
 		<publisher>Tecmo</publisher>
@@ -24622,7 +24622,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="mnstrnch">
+	<software name="mrancher">
 		<description>Monster Rancher Advance (USA)</description>
 		<year>2001</year>
 		<publisher>Tecmo</publisher>
@@ -24635,7 +24635,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="mnstrnc2">
+	<software name="mranchr2">
 		<description>Monster Rancher Advance 2 (USA)</description>
 		<year>2002</year>
 		<publisher>Tecmo</publisher>
@@ -25352,7 +25352,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="nakayouc">
 		<description>Nakayoshi Youchien - Sukoyaka Enji Ikusei Game (Jpn, Rev. 1)</description>
 		<year>2002</year>
@@ -25486,7 +25486,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="narutoks">
 		<description>Naruto - Konoha Senki (Jpn, Rev. 1)</description>
 		<year>2003</year>
@@ -26770,7 +26770,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="petpanrn">
 		<description>Disney's Peter Pan - Return to Neverland (Euro, Rev. 1)</description>
 		<year>2002</year>
@@ -26992,7 +26992,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="piacarro">
+	<software name="picarro3">
 		<description>Pia Carrot e Youkoso!! 3.3 (Jpn)</description>
 		<year>2004</year>
 		<publisher>NEC Interchannel</publisher>
@@ -28248,7 +28248,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="powrpkp4">
 		<description>Power Pro Kun Pocket 4 (Jpn, Rev. 1)</description>
 		<year>2002</year>
@@ -29265,7 +29265,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="r2rumble">
+	<software name="r2rumbl2">
 		<description>Ready 2 Rumble Boxing - Round 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Midway</publisher>
@@ -29277,7 +29277,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="r2rumbleu" cloneof="r2rumble">
+	<software name="r2rumbl2u" cloneof="r2rumbl2">
 		<description>Ready 2 Rumble Boxing - Round 2 (USA)</description>
 		<year>2001</year>
 		<publisher>Midway</publisher>
@@ -31907,7 +31907,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="stomv4tra" cloneof="stomv4tr">
 		<description>Simple 2960 Tomodachi Series Vol. 4 - The Trump - Minna de Asoberu 12 Shurui no Trump Game (Jpn)</description>
 		<year>2003</year>
@@ -35062,7 +35062,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
-	<software name="tantjssk">
+	<software name="tjsskns">
 		<description>Tantei Jinguuji Saburou - Shiroi Kage no Shoujo (Jpn)</description>
 		<year>2005</year>
 		<publisher>Marvelous Interactive</publisher>
@@ -39345,7 +39345,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="yoshia" cloneof="yoshi">
 		<description>Yoshi Demo (Alt?)</description>
 		<year>2001?</year>

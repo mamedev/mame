@@ -1022,7 +1022,7 @@ static MACHINE_CONFIG_START( zwackery, mcr68_state )
 	MCFG_CPU_PROGRAM_MAP(zwackery_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcr68_state,  mcr68_interrupt)
 
-        MCFG_WATCHDOG_ADD("watchdog")
+		MCFG_WATCHDOG_ADD("watchdog")
 //  MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,zwackery)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,zwackery)

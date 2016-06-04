@@ -26,6 +26,7 @@ Revisions:
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "includes/aeroboto.h"
 
@@ -81,8 +82,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aeroboto_state )
 	AM_RANGE(0x2900, 0x2fff) AM_WRITENOP                    // cleared along with sprite RAM
 	AM_RANGE(0x2973, 0x2973) AM_READ(aeroboto_2973_r)           // protection read
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(aeroboto_in0_r, aeroboto_3000_w)
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0x3003, 0x3003) AM_WRITEONLY AM_SHARE("vscroll")
 	AM_RANGE(0x3004, 0x3004) AM_READ(aeroboto_201_r) AM_WRITEONLY AM_SHARE("starx")
 	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_SHARE("stary") // usable but probably wrong
@@ -259,9 +260,12 @@ static MACHINE_CONFIG_START( formatz, aeroboto_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_10MHz/8) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(driver_device, soundlatch2_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch2", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_10MHz/16) /* verified on pcb */
@@ -330,5 +334,5 @@ ROM_END
 
 
 
-GAME( 1984, formatz,  0,       formatz, formatz, driver_device, 0, ROT0, "Jaleco", "Formation Z", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, aeroboto, formatz, formatz, formatz, driver_device, 0, ROT0, "Jaleco (Williams license)", "Aeroboto", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, formatz,  0,       formatz, formatz, driver_device, 0, ROT0, "Jaleco", "Formation Z", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, aeroboto, formatz, formatz, formatz, driver_device, 0, ROT0, "Jaleco (Williams license)", "Aeroboto", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

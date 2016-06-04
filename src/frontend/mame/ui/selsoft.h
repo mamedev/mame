@@ -9,20 +9,22 @@
 ***************************************************************************/
 #pragma once
 
-#ifndef __UI_SELSOFT_H__
-#define __UI_SELSOFT_H__
+#ifndef MAME_FRONTEND_UI_SELSOFT_H
+#define MAME_FRONTEND_UI_SELSOFT_H
 
 #include "ui/custmenu.h"
+
+namespace ui {
 
 using s_bios = std::vector<std::pair<std::string, int>>;
 using s_parts = std::unordered_map<std::string, std::string>;
 
 // Menu Class
-class ui_menu_select_software : public ui_menu
+class menu_select_software : public menu
 {
 public:
-	ui_menu_select_software(mame_ui_manager &mui, render_container *container, const game_driver *driver);
-	virtual ~ui_menu_select_software();
+	menu_select_software(mame_ui_manager &mui, render_container *container, const game_driver *driver);
+	virtual ~menu_select_software() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -57,16 +59,16 @@ private:
 	void infos_render(void *selectedref, float x1, float y1, float x2, float y2);
 
 	// handlers
-	void inkey_select(const ui_menu_event *menu_event);
-	void inkey_special(const ui_menu_event *menu_event);
-	void inkey_configure(const ui_menu_event *menu_event);
+	void inkey_select(const event *menu_event);
+	void inkey_special(const event *menu_event);
+	void inkey_configure(const event *menu_event);
 };
 
-class ui_software_parts : public ui_menu
+class software_parts : public menu
 {
 public:
-	ui_software_parts(mame_ui_manager &mui, render_container *container, s_parts parts, ui_software_info *ui_info);
-	virtual ~ui_software_parts();
+	software_parts(mame_ui_manager &mui, render_container *container, s_parts parts, ui_software_info *ui_info);
+	virtual ~software_parts() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -76,11 +78,11 @@ private:
 	s_parts m_parts;
 };
 
-class ui_bios_selection : public ui_menu
+class bios_selection : public menu
 {
 public:
-	ui_bios_selection(mame_ui_manager &mui, render_container *container, s_bios biosname, void *driver, bool software, bool inlist);
-	virtual ~ui_bios_selection();
+	bios_selection(mame_ui_manager &mui, render_container *container, s_bios biosname, void *driver, bool software, bool inlist);
+	virtual ~bios_selection() override;
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -106,5 +108,6 @@ private:
 // Getter
 bool has_multiple_bios(const game_driver *driver, s_bios &biosname);
 
+} // namespace ui
 
-#endif /* __UI_SELSOFT_H__ */
+#endif /* MAME_FRONTEND_UI_SELSOFT_H */

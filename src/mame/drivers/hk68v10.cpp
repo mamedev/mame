@@ -184,7 +184,8 @@
 #endif
 
 #define BAUDGEN_CLOCK XTAL_19_6608MHz /* Raltron */
-#define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* Giving 4.9152MHz as documentation says */
+// TODO: figure out the correct divider circuit
+#define SCC_CLOCK (BAUDGEN_CLOCK / 5) /* Giving 9600 but not the 4.9152MHz the documentation says... */
 class hk68v10_state : public driver_device
 {
 public:
@@ -366,13 +367,13 @@ ROM_LOAD16_BYTE ("hk68kv10U12.bin", 0xFC0000, 0x2000, CRC (f2d688e9) SHA1 (e6869
  * Setup sequence channel B
  *  00
  *  04 4C - x16 clock, 2 stop bits, no parity
- *  05 EA - 
+ *  05 EA -
  *  03 E1 - 8 bit, receiver enable, auto enable on
  *  09 00 - no reset
- *  01 00 
+ *  01 00
  *  0B 56
- *  0C 0B - low baudrate divider 
- *  0D 00 - hi baudrate divider 
+ *  0C 0B - low baudrate divider
+ *  0D 00 - hi baudrate divider
  *  0E 03 - Baud Rate Generator enabled, PCLK is source
  */
 ROM_END

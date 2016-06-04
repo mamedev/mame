@@ -17,6 +17,8 @@
 
 extern const char UI_VERSION_TAG[];
 
+namespace ui {
+
 //-------------------------------------------------
 //  sort
 //-------------------------------------------------
@@ -84,8 +86,8 @@ bool sorted_game_list(const game_driver *x, const game_driver *y)
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_audit::ui_menu_audit(mame_ui_manager &mui, render_container *container, vptr_game &availablesorted, vptr_game &unavailablesorted,  int _audit_mode)
-	: ui_menu(mui, container)
+menu_audit::menu_audit(mame_ui_manager &mui, render_container *container, vptr_game &availablesorted, vptr_game &unavailablesorted,  int _audit_mode)
+	: menu(mui, container)
 	, m_availablesorted(availablesorted)
 	, m_unavailablesorted(unavailablesorted)
 	, m_audit_mode(_audit_mode)
@@ -98,7 +100,7 @@ ui_menu_audit::ui_menu_audit(mame_ui_manager &mui, render_container *container, 
 	}
 }
 
-ui_menu_audit::~ui_menu_audit()
+menu_audit::~menu_audit()
 {
 }
 
@@ -106,9 +108,9 @@ ui_menu_audit::~ui_menu_audit()
 //  handle
 //-------------------------------------------------
 
-void ui_menu_audit::handle()
+void menu_audit::handle()
 {
-	process(UI_MENU_PROCESS_CUSTOM_ONLY);
+	process(PROCESS_CUSTOM_ONLY);
 
 	if (m_first)
 	{
@@ -157,15 +159,15 @@ void ui_menu_audit::handle()
 	std::stable_sort(m_availablesorted.begin(), m_availablesorted.end(), sorted_game_list);
 	std::stable_sort(m_unavailablesorted.begin(), m_unavailablesorted.end(), sorted_game_list);
 	save_available_machines();
-	ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
-	ui_menu::stack_pop(machine());
+	reset_parent(reset_options::SELECT_FIRST);
+	menu::stack_pop(machine());
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
-void ui_menu_audit::populate()
+void menu_audit::populate()
 {
 	item_append("Dummy", nullptr, 0, (void *)(FPTR)1);
 }
@@ -174,7 +176,7 @@ void ui_menu_audit::populate()
 //  save drivers infos to file
 //-------------------------------------------------
 
-void ui_menu_audit::save_available_machines()
+void menu_audit::save_available_machines()
 {
 	// attempt to open the output file
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -203,3 +205,5 @@ void ui_menu_audit::save_available_machines()
 		file.close();
 	}
 }
+
+} // namespace ui

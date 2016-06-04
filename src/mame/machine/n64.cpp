@@ -211,7 +211,7 @@ void n64_periphs::device_reset()
 	memset(pif_cmd, 0, sizeof(pif_cmd));
 	si_dram_addr = 0;
 	si_pif_addr = 0;
-	si_status = 0;
+	si_status_val = 0;
 	si_dma_dir = 0;
 	si_dma_timer->adjust(attotime::never);
 
@@ -2084,8 +2084,8 @@ void n64_periphs::si_dma_tick()
 {
 	si_dma_timer->adjust(attotime::never);
 	pif_dma(si_dma_dir);
-	si_status = 0;
-	si_status |= 0x1000;
+	si_status_val = 0;
+	si_status_val |= 0x1000;
 	signal_rcp_interrupt(SI_INTERRUPT);
 }
 
@@ -2139,7 +2139,7 @@ READ32_MEMBER( n64_periphs::si_reg_r )
 			//return si_dram_addr;
 
 		case 0x18/4:        // SI_STATUS_REG
-			ret = si_status;
+			ret = si_status_val;
 	}
 
 	return ret;
@@ -2155,23 +2155,23 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 
 		case 0x04/4:        // SI_PIF_ADDR_RD64B_REG
 			// PIF RAM -> RDRAM
-			if(si_status & 1)
+			if(si_status_val & 1)
 			{
-				si_status |= 8; //DMA Error, overlapping request
+				si_status_val |= 8; //DMA Error, overlapping request
 				return; // SI Busy, ignore request
 			}
 			si_pif_addr = data;
 			si_pif_addr_rd64b = data;
 			si_dma_dir = 0;
-			si_status |= 1;
+			si_status_val |= 1;
 			si_dma_timer->adjust(attotime::from_hz(50000));
 			break;
 
 		case 0x10/4:        // SI_PIF_ADDR_WR64B_REG
 			// RDRAM -> PIF RAM
-			if(si_status & 1)
+			if(si_status_val & 1)
 			{
-				si_status |= 8; //DMA Error, overlapping request
+				si_status_val |= 8; //DMA Error, overlapping request
 				return; // SI Busy, ignore request
 			}
 			si_pif_addr = data;
@@ -2181,7 +2181,7 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 			break;
 
 		case 0x18/4:        // SI_STATUS_REG
-			si_status = 0;
+			si_status_val = 0;
 			si_dma_timer->adjust(attotime::never);
 			clear_rcp_interrupt(SI_INTERRUPT);
 			break;

@@ -5,6 +5,8 @@
     GI Joe
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 #include "sound/k054539.h"
 #include "video/k053251.h"
 #include "video/k054156_k054157_k056832.h"
@@ -24,7 +26,9 @@ public:
 		m_k056832(*this, "k056832"),
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -50,6 +54,9 @@ public:
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+
 	DECLARE_READ16_MEMBER(control2_r);
 	DECLARE_WRITE16_MEMBER(control2_w);
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);

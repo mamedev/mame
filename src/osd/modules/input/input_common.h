@@ -11,9 +11,14 @@
 #ifndef INPUT_COMMON_H_
 #define INPUT_COMMON_H_
 
-#include <memory>
+#include "input_module.h"
+
 #include <chrono>
+#include <memory>
+#include <mutex>
 #include <queue>
+#include <string>
+
 
 //============================================================
 //  PARAMETERS
@@ -618,4 +623,4 @@ inline static INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawma
 	}
 }
 
-#endif
+#endif // INPUT_COMMON_H_

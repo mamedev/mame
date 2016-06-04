@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Andrew Gardner
+
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "video/k053936.h"
 #include "cpu/dsp56k/dsp56k.h"
 
@@ -21,26 +23,32 @@ public:
 		m_dsp(*this, "dsp"),
 		m_eeprom(*this, "eeprom"),
 		m_k053936(*this, "k053936"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch3(*this, "soundlatch3"),
 		m_shared_ram(*this, "shared_ram"),
 		m_dsp56k_p_mirror(*this, "dsp56k_p_mirror"),
-		m_dsp56k_p_8000(*this, "dsp56k_p_8000"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		m_dsp56k_p_8000(*this, "dsp56k_p_8000")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dsp56k_device> m_dsp;
 	required_device<eeprom_serial_er5911_device> m_eeprom;
 	required_device<k053936_device> m_k053936;
-
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<generic_latch_8_device> m_soundlatch3;
+	
 	/* 68k-side shared ram */
 	required_shared_ptr<UINT32> m_shared_ram;
 
 	required_shared_ptr<UINT16> m_dsp56k_p_mirror;
 	required_shared_ptr<UINT16> m_dsp56k_p_8000;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	ioport_port *m_inputs[4];
 	UINT8 m_sys0;

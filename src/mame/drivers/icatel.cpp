@@ -55,8 +55,8 @@ public:
 
 	DECLARE_DRIVER_INIT(icatel);
 	DECLARE_PALETTE_INIT(icatel);
-	
-	HD44780_PIXEL_UPDATE(icatel_pixel_update);	
+
+	HD44780_PIXEL_UPDATE(icatel_pixel_update);
 
 private:
 	virtual void machine_start() override;

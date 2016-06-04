@@ -178,7 +178,7 @@ offset in ramht+4 contains in the lower 16 bits the offset in RAMIN divided by 1
 objects have methods used to do drawing
 most methods set parameters, others actually draw
 */
-class nv2a_renderer : public poly_manager<float, nvidia_object_data, 13, 8192>
+class nv2a_renderer : public poly_manager<double, nvidia_object_data, 13, 8192>
 {
 public:
 	enum class VERTEX_PARAMETER {
@@ -212,7 +212,7 @@ public:
 	enum class NV2A_VERTEX_ATTR {
 		POS = 0, // position
 		WEIGHT = 1, // blend weigth
-		NORMAL = 2, 
+		NORMAL = 2,
 		COLOR0 = 3, // diffuse
 		COLOR1 = 4, // specular
 		FOG = 5,
@@ -361,7 +361,7 @@ public:
 		float w;
 	};
 
-	nv2a_renderer(running_machine &machine) : poly_manager<float, nvidia_object_data, 13, 8192>(machine)
+	nv2a_renderer(running_machine &machine) : poly_manager<double, nvidia_object_data, 13, 8192>(machine)
 	{
 		memset(channel, 0, sizeof(channel));
 		memset(pfifo, 0, sizeof(pfifo));
@@ -490,7 +490,8 @@ public:
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, UINT32 address, int limit);
 	void convert_vertices_poly(vertex_nv *source, nv2avertex_t *destination, int count);
 	void assemble_primitive(vertex_nv *source, int count, render_delegate &renderspans);
-	UINT32 render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, const nv2avertex_t &_v1, const nv2avertex_t &_v2, const nv2avertex_t &_v3);
+	UINT32 render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
+	UINT32 render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
 	void clear_render_target(int what, UINT32 value);
 	void clear_depth_buffer(int what, UINT32 value);
 	inline UINT8 *direct_access_ptr(offs_t address);

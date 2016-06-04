@@ -84,4 +84,3 @@ private:
 	void log_waveram(UINT32 length_and_base);
 	void update_gun_irq();
 };
-

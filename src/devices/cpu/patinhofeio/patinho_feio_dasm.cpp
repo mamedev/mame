@@ -1,14 +1,13 @@
 // license:GPL-2.0+
 // copyright-holders:Felipe Sanches
 #include "emu.h"
-#include "cpu/patinhofeio/patinho_feio.h"
+#include "cpu/patinhofeio/patinhofeio_cpu.h"
 
 CPU_DISASSEMBLE( patinho_feio )
 {
 	int addr, value, n, f;
 
-	switch (oprom[0] & 0xF0)
-	{
+	switch (oprom[0] & 0xF0) {
 		case 0x00:
 			//PLA = "Pula": Unconditionally JUMP to effective address
 			addr = (oprom[0] & 0x0F) << 8 | oprom[1];
@@ -124,8 +123,7 @@ CPU_DISASSEMBLE( patinho_feio )
 			return 2;
 	}
 
-	switch (oprom[0])
-	{
+	switch (oprom[0]) {
 		case 0x80: sprintf (buffer, "LIMPO");       return 1;
 		case 0x81: sprintf (buffer, "UM");          return 1;
 		case 0x82: sprintf (buffer, "CMP1");        return 1;

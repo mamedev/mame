@@ -172,6 +172,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram) override { }
 
 	UINT8 m_base_bank;
+	UINT8 m_load_disable;
 };
 
 // ======================> gb_rom_mmm01_device
@@ -188,7 +189,17 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom) override;
 	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	UINT8 m_bank_mask, m_bank, m_reg;
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	
+	UINT16 m_romb;
+	UINT8  m_romb_nwe;
+	UINT8  m_ramb;
+	UINT8  m_ramb_nwe;
+	UINT8  m_mode;
+	UINT8  m_mode_nwe;
+	UINT8  m_map;
+	UINT8  m_mux;
 };
 
 // ======================> gb_rom_sachen_mmc1_device
@@ -378,7 +389,7 @@ extern const device_type GB_ROM_MBC4;
 extern const device_type GB_ROM_MBC5;
 extern const device_type GB_ROM_MBC6;
 extern const device_type GB_ROM_MBC7;
-extern const device_type GB_ROM_M161_M12;
+extern const device_type GB_ROM_M161;
 extern const device_type GB_ROM_MMM01;
 extern const device_type GB_ROM_SACHEN1;
 extern const device_type GB_ROM_SACHEN2;

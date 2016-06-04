@@ -84,4 +84,3 @@ READ16_MEMBER( mslugx_prot_device::protection_r )
 
 	return res;
 }
-
