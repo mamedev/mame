@@ -227,6 +227,7 @@ static const help_item static_help_list[] =
 		"  comdelete <address> -- removes a comment from the given address\n"
 		"  comsave -- save the current comments to a file\n"
 		"  comlist -- print currently avaliable comments from file\n"
+		"  commit[/*] <address>,<comment> -- gives a bulk comadd then comsave command\n"
 		"\n"
 	},
 	{
@@ -1249,6 +1250,23 @@ static const help_item static_help_list[] =
 		"  Adds the comment 'hello world.' to the code at address 0x0\n"
 		"\n"
 		"// 10, undocumented opcode!\n"
+		"  Adds the comment 'undocumented opcode!' to the code at address 0x10\n"
+		"\n"
+	},
+	{
+		"commit",
+		"\n"
+		"  commit[/*] <address>,<comment>\n"
+		"\n"
+		"Adds a string <comment> to the disassembled code at <address> then saves to file. Basically same as comadd + comsave via a single line.\n" 
+		"The shortcut for this command is simply '/*'\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"commit 0, hello world.\n"
+		"  Adds the comment 'hello world.' to the code at address 0x0\n"
+		"\n"
+		"/* 10, undocumented opcode!\n"
 		"  Adds the comment 'undocumented opcode!' to the code at address 0x10\n"
 		"\n"
 	},

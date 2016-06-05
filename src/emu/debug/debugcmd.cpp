@@ -112,10 +112,11 @@ static void execute_focus(running_machine &machine, int ref, int params, const c
 static void execute_ignore(running_machine &machine, int ref, int params, const char **param);
 static void execute_observe(running_machine &machine, int ref, int params, const char **param);
 static void execute_next(running_machine &machine, int ref, int params, const char **param);
-static void execute_comment(running_machine &machine, int ref, int params, const char **param);
+static void execute_comment_add(running_machine &machine, int ref, int params, const char **param);
 static void execute_comment_del(running_machine &machine, int ref, int params, const char **param);
 static void execute_comment_save(running_machine &machine, int ref, int params, const char **param);
 static void execute_comment_list(running_machine &machine, int ref, int params, const char **param);
+static void execute_comment_commit(running_machine &machine, int ref, int params, const char **param);
 static void execute_bpset(running_machine &machine, int ref, int params, const char **param);
 static void execute_bpclear(running_machine &machine, int ref, int params, const char **param);
 static void execute_bpdisenable(running_machine &machine, int ref, int params, const char **param);
@@ -296,12 +297,14 @@ void debug_command_init(running_machine &machine)
 	debug_console_register_command(machine, "ignore",    CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, execute_ignore);
 	debug_console_register_command(machine, "observe",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, execute_observe);
 
-	debug_console_register_command(machine, "comadd",    CMDFLAG_NONE, 0, 1, 2, execute_comment);
-	debug_console_register_command(machine, "//",        CMDFLAG_NONE, 0, 1, 2, execute_comment);
+	debug_console_register_command(machine, "comadd",    CMDFLAG_NONE, 0, 1, 2, execute_comment_add);
+	debug_console_register_command(machine, "//",        CMDFLAG_NONE, 0, 1, 2, execute_comment_add);
 	debug_console_register_command(machine, "comdelete", CMDFLAG_NONE, 0, 1, 1, execute_comment_del);
 	debug_console_register_command(machine, "comsave",   CMDFLAG_NONE, 0, 0, 0, execute_comment_save);
 	debug_console_register_command(machine, "comlist",   CMDFLAG_NONE, 0, 0, 0, execute_comment_list);
-
+	debug_console_register_command(machine, "commit",    CMDFLAG_NONE, 0, 1, 2, execute_comment_commit);
+	debug_console_register_command(machine, "/*",        CMDFLAG_NONE, 0, 1, 2, execute_comment_commit);
+	
 	debug_console_register_command(machine, "bpset",     CMDFLAG_NONE, 0, 1, 3, execute_bpset);
 	debug_console_register_command(machine, "bp",        CMDFLAG_NONE, 0, 1, 3, execute_bpset);
 	debug_console_register_command(machine, "bpclear",   CMDFLAG_NONE, 0, 0, 1, execute_bpclear);
@@ -1130,7 +1133,7 @@ static void execute_observe(running_machine &machine, int ref, int params, const
     execute_comment - add a comment to a line
 -------------------------------------------------*/
 
-static void execute_comment(running_machine &machine, int ref, int params, const char *param[])
+static void execute_comment_add(running_machine &machine, int ref, int params, const char *param[])
 {
 	device_t *cpu;
 	UINT64 address;
@@ -1192,18 +1195,28 @@ static void execute_comment_list(running_machine &machine, int ref, int params, 
 		debug_console_printf(machine, "Error while parsing XML file\n");
 }
 
+/**
+ * @fn void execute_comment_commit(running_machine &machine, int ref, int params, const char *param[])
+ * @brief Add and Save current list of comments in debugger
+ *
+ */
 
+static void execute_comment_commit(running_machine &machine, int ref, int params, const char *param[])
+{
+	execute_comment_add(machine,ref,params,param);
+	execute_comment_save(machine,ref,params,param);
+}
+ 
 /*-------------------------------------------------
     execute_comment - add a comment to a line
 -------------------------------------------------*/
 
-// TODO: needs an autosave option in debugger for this, or a direct comment add and save.
 static void execute_comment_save(running_machine &machine, int ref, int params, const char *param[])
 {
 	if (debug_comment_save(machine))
-		debug_console_printf(machine, "Comments successfully saved\n");
+		debug_console_printf(machine, "Comment successfully saved\n");
 	else
-		debug_console_printf(machine, "Comments not saved\n");
+		debug_console_printf(machine, "Comment not saved\n");
 }
 
 
