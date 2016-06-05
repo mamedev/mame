@@ -114,8 +114,8 @@ void h8_device::device_start()
 	inst_substate = 0;
 	count_before_instruction_step = 0;
 	requested_state = -1;
-	dma_device = NULL;
-	dtc_device = NULL;
+	dma_device = nullptr;
+	dtc_device = nullptr;
 }
 
 void h8_device::device_reset()
@@ -130,8 +130,8 @@ void h8_device::device_reset()
 	irq_nmi = false;
 	taken_irq_vector = 0;
 	taken_irq_level = -1;
-	current_dma = NULL;
-	current_dtc = NULL;
+	current_dma = nullptr;
+	current_dtc = nullptr;
 }
 
 bool h8_device::trigger_dma(int vector)

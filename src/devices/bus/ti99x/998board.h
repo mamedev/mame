@@ -63,6 +63,8 @@ public:
 		m_counter(0),
 		m_addressed(true),
 		m_ready(true)   { };
+
+	virtual ~waitstate_generator() { }
 	void select_in(bool addressed);
 	virtual void ready_in(line_state ready) =0;
 	virtual void clock_in(line_state clkout) =0;
