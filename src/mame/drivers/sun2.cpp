@@ -122,6 +122,11 @@ How the architecture works:
 #include "machine/bankdev.h"
 #include "bus/rs232/rs232.h"
 
+#define SCC1_TAG        "scc1"
+#define SCC2_TAG        "scc2"
+#define RS232A_TAG      "rs232a"
+#define RS232B_TAG      "rs232b"
+
 // page table entry constants
 #define PM_VALID	(0x80000000)	// page is valid
 #define PM_PROTMASK (0x7e000000)	// protection mask
@@ -260,10 +265,12 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 
 	//	printf("sun2: Context = %d, pmeg = %d, offset >> 14 = %x, entry = %d, page = %d\n", context, pmeg, offset >> 14, entry, (offset >> 10) & 0xf);
 
-	m_pagemap[entry] |= PM_ACCESSED;
 	if (m_pagemap[entry] & PM_VALID)
 	{
-		UINT32 tmp = (m_pagemap[entry] & 0xfffff) << 10;
+		m_pagemap[entry] |= PM_ACCESSED;
+		
+		// Sun2 implementations only use 12 bits from the page entry
+		UINT32 tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
 		
 	//	if (!space.debugger_access())
@@ -404,12 +411,14 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 	UINT8 pmeg = m_segmap[context][offset >> 14];
 	UINT32 entry = (pmeg << 4) + ((offset >> 10) & 0xf);
 	
-	m_pagemap[entry] |= PM_ACCESSED;
 	if (m_pagemap[entry] & PM_VALID)
 	{
-		UINT32 tmp = (m_pagemap[entry] & 0xfffff) << 10;
-		tmp |= (offset & 0x3ff);
+		m_pagemap[entry] |= (PM_ACCESSED | PM_MODIFIED);
 		
+		// only 12 of the 20 bits in the page table entry are used on either Sun2 implementation
+		UINT32 tmp = (m_pagemap[entry] & 0xfff) << 10;
+		tmp |= (offset & 0x3ff);
+
 		//if (!space.debugger_access()) printf("sun2: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, m_pagemap[entry], offset<<1);
 
 		switch ((m_pagemap[entry] >> 22) & 7)
@@ -419,17 +428,17 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 				return;
 				
 			case 1: // type 1
-				//printf("write device space @ %x\n", tmp<<1);
+				//printf("write device space @ %x\n", tmp<<1);				
 				m_type1space->write16(space, tmp, data, mem_mask);
 				return;
 				
 			case 2:	// type 2
 				m_type2space->write16(space, tmp, data, mem_mask);
-				break;
+				return;
 				
 			case 3:	// type 3
 				m_type3space->write16(space, tmp, data, mem_mask);
-				break;
+				return;
 		}
 	}
 	else
@@ -469,8 +478,14 @@ static ADDRESS_MAP_START(vmetype1space_map, AS_PROGRAM, 16, sun2_state)
 	AM_RANGE(0x7f0000, 0x7f07ff) AM_ROM AM_REGION("bootprom", 0)	// uses MMU loophole to read 32k from a 2k window
 	// 7f0800-7f0fff: Ethernet interface
 	// 7f1000-7f17ff: AM9518 encryption processor
-	// 7f1800-7f1fff: Keyboard/mouse SCC8530
-	// 7f2000-7f27ff: RS232 ports SCC8530
+	//AM_RANGE(0x7f1800, 0x7f1801) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, cb_r, cb_w, 0xff00)
+	//AM_RANGE(0x7f1802, 0x7f1803) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, db_r, db_w, 0xff00)
+	//AM_RANGE(0x7f1804, 0x7f1805) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ca_r, ca_w, 0xff00)
+	//AM_RANGE(0x7f1806, 0x7f1807) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, da_r, da_w, 0xff00)
+	AM_RANGE(0x7f2000, 0x7f2001) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, cb_r, cb_w, 0xff00)
+	AM_RANGE(0x7f2002, 0x7f2003) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, db_r, db_w, 0xff00)
+	AM_RANGE(0x7f2004, 0x7f2005) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ca_r, ca_w, 0xff00)
+	AM_RANGE(0x7f2006, 0x7f2007) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, da_r, da_w, 0xff00)
 	// 7f2800-7f2fff: AM9513 timer
 ADDRESS_MAP_END
 
@@ -487,16 +502,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mbustype0space_map, AS_PROGRAM, 16, sun2_state)
 	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(ram_r, ram_w)
 	// 7f80000-7f807ff: Keyboard/mouse SCC8530
-	AM_RANGE(0x7f00000, 0x7f1ffff) AM_RAM AM_SHARE("bw2_vram")
-	AM_RANGE(0x7f81800, 0x7f81801) AM_READWRITE( video_ctrl_r, video_ctrl_w )
+	//AM_RANGE(0x7f8000, 0x7f8007) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00)
+	AM_RANGE(0x700000, 0x71ffff) AM_RAM AM_SHARE("bw2_vram")
+	AM_RANGE(0x781800, 0x781801) AM_READWRITE( video_ctrl_r, video_ctrl_w )
 ADDRESS_MAP_END
 
 // type 1 device space
 static ADDRESS_MAP_START(mbustype1space_map, AS_PROGRAM, 16, sun2_state)
 	AM_RANGE(0x000000, 0x0007ff) AM_ROM AM_REGION("bootprom", 0)	// uses MMU loophole to read 32k from a 2k window
 	// 001000-0017ff: AM9518 encryption processor
-	// 001800-001fff: Keyboard/mouse parallel port
-	// 002000-0027ff: RS232 ports SCC8530
+	// 001800-001fff: Parallel port
+	AM_RANGE(0x002000, 0x0027ff) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00)
 	// 002800-002fff: AM9513 timer
 	// 003800-003fff: MM58167 RTC
 ADDRESS_MAP_END
@@ -524,7 +540,7 @@ UINT32 sun2_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		scanline = &bitmap.pix32(y);
 		for (x = 0; x < 1152/8; x++)
 		{
-			pixels = m_vram[(y * (1152/8)) +  (x ^ 1)];
+			pixels = m_vram[(y * (1152/8)) + (BYTE_XOR_BE(x))];
 
 			*scanline++ = palette[(pixels>>7)&1];
 			*scanline++ = palette[(pixels>>6)&1];
@@ -608,6 +624,21 @@ static MACHINE_CONFIG_START( sun2vme, sun2_state )
 	MCFG_SCREEN_SIZE(1152,900)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
+	
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sun2mbus, sun2_state )
@@ -653,6 +684,21 @@ static MACHINE_CONFIG_START( sun2mbus, sun2_state )
 	MCFG_SCREEN_SIZE(1152,900)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
+	
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
