@@ -1009,6 +1009,7 @@ void debug_imgui::init_debugger(running_machine &machine)
 	if(strcmp(downcast<osd_options &>(m_machine->options()).video(),"bgfx") != 0)
 		fatalerror("Error: ImGui debugger requires the BGFX renderer.\n");
 
+	// map keys to ImGui inputs
 	io.KeyMap[ImGuiKey_A] = ITEM_ID_A;
 	io.KeyMap[ImGuiKey_C] = ITEM_ID_C;
 	io.KeyMap[ImGuiKey_V] = ITEM_ID_V;
@@ -1029,6 +1030,10 @@ void debug_imgui::init_debugger(running_machine &machine)
 	io.KeyMap[ImGuiKey_RightArrow] = ITEM_ID_RIGHT;
 	io.KeyMap[ImGuiKey_UpArrow] = ITEM_ID_UP;
 	io.KeyMap[ImGuiKey_DownArrow] = ITEM_ID_DOWN;
+
+	// set key delay and repeat rates
+	io.KeyRepeatDelay = 0.400f;
+	io.KeyRepeatRate = 0.050f;
 
 	font_name = (downcast<osd_options &>(m_machine->options()).debugger_font());
 	font_size = (downcast<osd_options &>(m_machine->options()).debugger_font_size());
