@@ -6,6 +6,7 @@
  */
 
 #include "nld_74279.h"
+#include "nld_truthtable.h"
 
 namespace netlist
 {
@@ -53,8 +54,8 @@ namespace netlist
 			NETLIB_SUB(74279A) m_4;
 		};
 
-		nld_74279A::truthtable_t nld_74279A::m_ttbl;
-		nld_74279B::truthtable_t nld_74279B::m_ttbl;
+		nld_74279A::truthtable_t nld_74279A::m_ttbl(3,1,0);
+		nld_74279B::truthtable_t nld_74279B::m_ttbl(4,1,0);
 
 		const char *nld_74279A::m_desc[] = {
 				"S,R,_Q|Q",

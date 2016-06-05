@@ -107,7 +107,7 @@ namespace netlist
 	};
 
 	#if (1 && USE_TRUTHTABLE)
-	nld_9312::truthtable_t nld_9312::m_ttbl;
+	nld_9312::truthtable_t nld_9312::m_ttbl(12,2,0);
 
 	/* FIXME: Data changes are propagating faster than changing selects A,B,C
 	 *        Please refer to data sheet.

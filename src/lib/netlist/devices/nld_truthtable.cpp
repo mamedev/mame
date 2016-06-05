@@ -13,6 +13,25 @@ namespace netlist
 	namespace devices
 	{
 
+	template<unsigned m_NI, unsigned m_NO, int has_state>
+	class netlist_factory_truthtable_t : public netlist_base_factory_truthtable_t
+	{
+		P_PREVENT_COPYING(netlist_factory_truthtable_t)
+	public:
+		netlist_factory_truthtable_t(const pstring &name, const pstring &classname,
+				const pstring &def_param)
+		: netlist_base_factory_truthtable_t(name, classname, def_param)
+		, m_ttbl(m_NI, m_NO, has_state){ }
+
+		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
+		{
+			typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
+			return plib::owned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, &m_ttbl, m_desc);
+		}
+	private:
+		typename nld_truthtable_t<m_NI, m_NO, has_state>::truthtable_t m_ttbl;
+	};
+
 unsigned truthtable_desc_t::count_bits(UINT32 v)
 {
 	unsigned ret = 0;

@@ -888,6 +888,7 @@ namespace netlist
 		INT32 stat_call_count;
 	#endif
 
+		bool m_is_truthtable;
 	protected:
 
 		virtual void update() NOEXCEPT { }

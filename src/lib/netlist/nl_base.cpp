@@ -12,6 +12,7 @@
 
 #include "nl_base.h"
 #include "devices/nlid_system.h"
+#include "devices/nld_truthtable.h"
 #include "nl_util.h"
 
 namespace netlist
@@ -430,6 +431,7 @@ core_device_t::core_device_t(netlist_t &owner, const pstring &name)
 	, stat_call_count(0)
 #endif
 {
+	m_is_truthtable = false;
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
 }
@@ -443,6 +445,7 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	, stat_call_count(0)
 #endif
 {
+	m_is_truthtable = false;
 	set_logic_family(owner.logic_family());
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
@@ -675,7 +678,15 @@ void net_t::update_devs()
 	{
 		inc_stat(p.device().stat_call_count);
 		if ((p.state() & mask) != 0)
-			p.device().update_dev();
+		{
+			//if (0 && p.device().m_is_truthtable)
+			{
+				/* inlining doesn't help, this kills performance */
+				//reinterpret_cast<devices::nld_xtruthtable_t &>(p.device()).update();
+			}
+			//else
+				p.device().update_dev();
+		}
 	}
 }
 
