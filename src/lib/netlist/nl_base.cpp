@@ -904,7 +904,6 @@ analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname)
 
 analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
 	: analog_t(dev, aname, OUTPUT)
-	, m_proxied_net(nullptr)
 	, m_my_net(dev.netlist(), name() + ".net", this)
 {
 	this->set_net(&m_my_net);

@@ -751,8 +751,6 @@ namespace netlist
 		void initial(const nl_double val);
 		void set_Q(const nl_double newQ);
 
-		analog_net_t *m_proxied_net; // only for proxy nets in analog input logic
-
 	private:
 		analog_net_t m_my_net;
 	};

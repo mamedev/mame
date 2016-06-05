@@ -147,7 +147,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					break;
 				case terminal_t::INPUT:
 					{
-						analog_output_t *net_proxy_output = nullptr;
+						proxied_analog_output_t *net_proxy_output = nullptr;
 						for (auto & input : m_inps)
 							if (input->m_proxied_net == &p->net())
 							{
@@ -160,7 +160,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 							//net_proxy_output = palloc(analog_output_t(*this,
 							//      this->name() + "." + plib::pfmt("m{1}")(m_inps.size())));
 
-							auto net_proxy_output_u = plib::make_unique<analog_output_t>(*this, this->name() + "." + plib::pfmt("m{1}")(m_inps.size()));
+							auto net_proxy_output_u = plib::make_unique<proxied_analog_output_t>(*this, this->name() + "." + plib::pfmt("m{1}")(m_inps.size()));
 							net_proxy_output = net_proxy_output_u.get();
 							m_inps.push_back(std::move(net_proxy_output_u));
 							nl_assert(p->net().is_analog());

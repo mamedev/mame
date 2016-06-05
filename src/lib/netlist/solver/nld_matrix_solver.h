@@ -93,6 +93,19 @@ private:
 
 };
 
+class proxied_analog_output_t : public analog_output_t
+{
+public:
+
+	proxied_analog_output_t(core_device_t &dev, const pstring &aname)
+	: analog_output_t(dev, aname)
+	, m_proxied_net(nullptr)
+	{ }
+
+	analog_net_t *m_proxied_net; // only for proxy nets in analog input logic
+};
+
+
 class matrix_solver_t : public device_t
 {
 public:
@@ -189,7 +202,7 @@ protected:
 
 	plib::pvector_t<terms_t *> m_terms;
 	plib::pvector_t<analog_net_t *> m_nets;
-	std::vector<std::unique_ptr<analog_output_t>> m_inps;
+	std::vector<std::unique_ptr<proxied_analog_output_t>> m_inps;
 
 	plib::pvector_t<terms_t *> m_rails_temp;
 
