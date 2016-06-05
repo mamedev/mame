@@ -36,6 +36,10 @@ namespace netlist
 
 		timed_queue(unsigned list_size)
 		: m_list(list_size)
+#if (NL_KEEP_STATISTICS)
+		, m_prof_sortmove(0)
+		, m_prof_call(0)
+#endif
 		{
 	#if HAS_OPENMP && USE_OPENMP
 			m_lock = 0;
@@ -114,12 +118,6 @@ namespace netlist
 		 std::size_t size() const { return m_end - &m_list[1]; }
 		 const entry_t & operator[](const std::size_t index) const { return m_list[ 1 + index]; }
 
-	#if (NL_KEEP_STATISTICS)
-		// profiling
-		INT32   m_prof_sortmove;
-		INT32   m_prof_call;
-	#endif
-
 	private:
 
 	#if HAS_OPENMP && USE_OPENMP
@@ -127,7 +125,15 @@ namespace netlist
 	#endif
 		entry_t * m_end;
 		std::vector<entry_t> m_list;
-	};
+
+	public:
+	#if (NL_KEEP_STATISTICS)
+		// profiling
+		INT32   m_prof_sortmove;
+		INT32   m_prof_call;
+	#endif
+
+};
 
 }
 
