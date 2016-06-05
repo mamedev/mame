@@ -1303,12 +1303,13 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		for (;;) {
 			int type = (list[1] << 16) | list[0];
 			m_glist = list;
-			switch (type & 15)
+			switch (type)
 			{
 				case 0:
 					list += 2;
 					break;
 				case 1:
+				case 0x41:
 					// 1 = plane 1
 					// 2 = ??  draw object (413d3, 17c4c, e)
 					// 3 = plane 2
@@ -1463,6 +1464,7 @@ void model1_state::tgp_scan()
 					list += 2;
 					break;
 				case 1:
+				case 0x41:
 					list += 8;
 					break;
 				case 2:
