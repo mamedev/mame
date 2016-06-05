@@ -31,6 +31,7 @@ public:
 			type(0),
 			ofs_x(0),
 			ofs_y(0),
+			is_collapsed(false),
 			exec_cmd(false)
 		{
 		this->view = machine.debug_view().alloc_view(type, nullptr, this);
@@ -72,6 +73,7 @@ public:
 	float               view_width;
 	float               view_height;
 	bool                has_focus;
+	bool                is_collapsed;
 	bool                exec_cmd;  // console only
 	int                 src_sel;
 	char                console_input[512];
@@ -365,38 +367,38 @@ void debug_imgui::handle_keys_views()
 		return;
 
 	// pass keypresses to debug view with focus
-	if(m_machine->input().code_pressed_once(KEYCODE_UP))
+	if(ImGui::IsKeyPressed(ITEM_ID_UP))
 		focus_view->view->process_char(DCH_UP);
-	if(m_machine->input().code_pressed_once(KEYCODE_DOWN))
+	if(ImGui::IsKeyPressed(ITEM_ID_DOWN))
 		focus_view->view->process_char(DCH_DOWN);
-	if(m_machine->input().code_pressed_once(KEYCODE_LEFT))
+	if(ImGui::IsKeyPressed(ITEM_ID_LEFT))
 	{
-		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+		if(ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 			focus_view->view->process_char(DCH_CTRLLEFT);
 		else
 			focus_view->view->process_char(DCH_LEFT);
 	}
-	if(m_machine->input().code_pressed_once(KEYCODE_RIGHT))
+	if(ImGui::IsKeyPressed(ITEM_ID_RIGHT))
 	{
-		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+		if(ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 			focus_view->view->process_char(DCH_CTRLRIGHT);
 		else
 			focus_view->view->process_char(DCH_RIGHT);
 	}
-	if(m_machine->input().code_pressed_once(KEYCODE_PGUP))
+	if(ImGui::IsKeyPressed(ITEM_ID_PGUP))
 		focus_view->view->process_char(DCH_PUP);
-	if(m_machine->input().code_pressed_once(KEYCODE_PGDN))
+	if(ImGui::IsKeyPressed(ITEM_ID_PGDN))
 		focus_view->view->process_char(DCH_PDOWN);
-	if(m_machine->input().code_pressed_once(KEYCODE_HOME))
+	if(ImGui::IsKeyPressed(ITEM_ID_HOME))
 	{
-		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+		if(ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 			focus_view->view->process_char(DCH_CTRLHOME);
 		else
 			focus_view->view->process_char(DCH_HOME);
 	}
-	if(m_machine->input().code_pressed_once(KEYCODE_END))
+	if(ImGui::IsKeyPressed(ITEM_ID_END))
 	{
-		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+		if(ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 			focus_view->view->process_char(DCH_CTRLEND);
 		else
 			focus_view->view->process_char(DCH_END);
@@ -554,12 +556,15 @@ void debug_imgui::draw_bpoints(debug_area* view_ptr, bool* opened)
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened))
 	{
+		view_ptr->is_collapsed = false;
 		ImGui::BeginChild("##break_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		draw_view(view_ptr,false);
 		ImGui::EndChild();
 
 		ImGui::End();
 	}
+	else
+		view_ptr->is_collapsed = true;
 }
 
 void debug_imgui::add_bpoints(int id)
@@ -597,12 +602,15 @@ void debug_imgui::draw_log(debug_area* view_ptr, bool* opened)
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened))
 	{
+		view_ptr->is_collapsed = false;
 		ImGui::BeginChild("##log_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		draw_view(view_ptr,false);
 		ImGui::EndChild();
 
 		ImGui::End();
 	}
+	else
+		view_ptr->is_collapsed = true;
 }
 
 void debug_imgui::add_log(int id)
@@ -631,6 +639,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		bool done = false;
 		bool exp_change = false;
 
+		view_ptr->is_collapsed = false;
 		if(ImGui::BeginMenuBar())
 		{
 			if(ImGui::BeginMenu("Options"))
@@ -685,6 +694,8 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 
 		ImGui::End();
 	}
+	else
+		view_ptr->is_collapsed = true;
 }
 
 void debug_imgui::add_disasm(int id)
@@ -715,6 +726,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		bool done = false;
 		bool exp_change = false;
 
+		view_ptr->is_collapsed = false;
 		if(ImGui::BeginMenuBar())
 		{
 			if(ImGui::BeginMenu("Options"))
@@ -793,6 +805,8 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 
 		ImGui::End();
 	}
+	else
+		view_ptr->is_collapsed = true;			
 }
 
 void debug_imgui::add_memory(int id)
@@ -879,20 +893,11 @@ void debug_imgui::draw_console()
 				}
 				ImGui::Separator();
 				// list all extra windows, so we can un-collapse the windows if necessary
-				//debug_area* view_ptr;
 				for(std::vector<debug_area*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
 				{
-					bool collapsed;
-					if(ImGui::Begin((*view_ptr)->title.c_str()))
-					{
-						collapsed = false;
-						ImGui::End();
-					}
-					else
-					{
+					bool collapsed = false;
+					if((*view_ptr)->is_collapsed)
 						collapsed = true;
-						ImGui::End();
-					}
 					if(ImGui::MenuItem((*view_ptr)->title.c_str(), nullptr,!collapsed))
 						ImGui::SetWindowCollapsed((*view_ptr)->title.c_str(),false);
 				}
@@ -1004,6 +1009,7 @@ void debug_imgui::init_debugger(running_machine &machine)
 	if(strcmp(downcast<osd_options &>(m_machine->options()).video(),"bgfx") != 0)
 		fatalerror("Error: ImGui debugger requires the BGFX renderer.\n");
 
+	// map keys to ImGui inputs
 	io.KeyMap[ImGuiKey_A] = ITEM_ID_A;
 	io.KeyMap[ImGuiKey_C] = ITEM_ID_C;
 	io.KeyMap[ImGuiKey_V] = ITEM_ID_V;
@@ -1024,6 +1030,10 @@ void debug_imgui::init_debugger(running_machine &machine)
 	io.KeyMap[ImGuiKey_RightArrow] = ITEM_ID_RIGHT;
 	io.KeyMap[ImGuiKey_UpArrow] = ITEM_ID_UP;
 	io.KeyMap[ImGuiKey_DownArrow] = ITEM_ID_DOWN;
+
+	// set key delay and repeat rates
+	io.KeyRepeatDelay = 0.400f;
+	io.KeyRepeatRate = 0.050f;
 
 	font_name = (downcast<osd_options &>(m_machine->options()).debugger_font());
 	font_size = (downcast<osd_options &>(m_machine->options()).debugger_font_size());

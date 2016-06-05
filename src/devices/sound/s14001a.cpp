@@ -569,7 +569,7 @@ void s14001a_device::ClearStatistics()
 	m_uNControlWords = 0;
 }
 
-void s14001a_device::GetStatistics(UINT32 &uNPitchPeriods, UINT32 &uNVoiced, UINT32 uNControlWords)
+void s14001a_device::GetStatistics(UINT32 &uNPitchPeriods, UINT32 &uNVoiced, UINT32 &uNControlWords)
 {
 	uNPitchPeriods = m_uNPitchPeriods;
 	uNVoiced = m_uNVoiced;

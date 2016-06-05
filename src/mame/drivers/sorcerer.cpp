@@ -399,7 +399,7 @@ static const floppy_interface sorcerer_floppy_interface =
 
 static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12638000/6)
+	MCFG_CPU_ADD("maincpu", Z80, ES_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sorcerer_mem)
 	MCFG_CPU_IO_MAP(sorcerer_io)
 
@@ -423,8 +423,8 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass2 speaker
 
 	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
-	MCFG_AY31015_TX_CLOCK(4800.0)
-	MCFG_AY31015_RX_CLOCK(4800.0)
+	MCFG_AY31015_TX_CLOCK(ES_UART_CLOCK)
+	MCFG_AY31015_RX_CLOCK(ES_UART_CLOCK)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "covox")

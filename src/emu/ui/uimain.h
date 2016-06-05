@@ -29,6 +29,7 @@ public:
 
 	virtual void set_startup_text(const char *text, bool force) { }
 
+	// is a menuing system active?  we want to disable certain keyboard/mouse inputs under such context
 	virtual bool is_menu_active() { return false; }
 
 	bool use_natural_keyboard() const { return m_use_natural_keyboard; }

@@ -2713,23 +2713,23 @@ void alto2_cpu_device::hard_reset()
 		if (0 == (m_reset_mode & (1 << task)))
 			m_task_mpc[task] |= ALTO2_UCODE_RAM_BASE;
 
-		set_bs(task, bs_read_r,         &alto2_cpu_device::bs_early_read_r, 0);
+		set_bs(task, bs_read_r,         &alto2_cpu_device::bs_early_read_r, nullptr);
 		set_bs(task, bs_load_r,         &alto2_cpu_device::bs_early_load_r, &alto2_cpu_device::bs_late_load_r);
-		set_bs(task, bs_no_source,      0, 0);
+		set_bs(task, bs_no_source,      nullptr, nullptr);
 		set_bs(task, bs_task_3,         &alto2_cpu_device::fn_bs_bad_0, &alto2_cpu_device::fn_bs_bad_1);    // task specific
 		set_bs(task, bs_task_4,         &alto2_cpu_device::fn_bs_bad_0, &alto2_cpu_device::fn_bs_bad_1);    // task specific
-		set_bs(task, bs_read_md,        &alto2_cpu_device::bs_early_read_md, 0);
-		set_bs(task, bs_mouse,          &alto2_cpu_device::bs_early_mouse, 0);
-		set_bs(task, bs_disp,           &alto2_cpu_device::bs_early_disp, 0);
+		set_bs(task, bs_read_md,        &alto2_cpu_device::bs_early_read_md, nullptr);
+		set_bs(task, bs_mouse,          &alto2_cpu_device::bs_early_mouse, nullptr);
+		set_bs(task, bs_disp,           &alto2_cpu_device::bs_early_disp, nullptr);
 
-		set_f1(task, f1_nop,            0, 0);
-		set_f1(task, f1_load_mar,       0, &alto2_cpu_device::f1_late_load_mar);
-		set_f1(task, f1_task,           &alto2_cpu_device::f1_early_task, 0);
+		set_f1(task, f1_nop,            nullptr, nullptr);
+		set_f1(task, f1_load_mar,       nullptr, &alto2_cpu_device::f1_late_load_mar);
+		set_f1(task, f1_task,           &alto2_cpu_device::f1_early_task, nullptr);
 		set_f1(task, f1_block,          &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // not all tasks have the f1_block
-		set_f1(task, f1_l_lsh_1,        0, &alto2_cpu_device::f1_late_l_lsh_1);
-		set_f1(task, f1_l_rsh_1,        0, &alto2_cpu_device::f1_late_l_rsh_1);
-		set_f1(task, f1_l_lcy_8,        0, &alto2_cpu_device::f1_late_l_lcy_8);
-		set_f1(task, f1_const,          0, 0);
+		set_f1(task, f1_l_lsh_1,        nullptr, &alto2_cpu_device::f1_late_l_lsh_1);
+		set_f1(task, f1_l_rsh_1,        nullptr, &alto2_cpu_device::f1_late_l_rsh_1);
+		set_f1(task, f1_l_lcy_8,        nullptr, &alto2_cpu_device::f1_late_l_lcy_8);
+		set_f1(task, f1_const,          nullptr, nullptr);
 		set_f1(task, f1_task_10,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
 		set_f1(task, f1_task_11,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
 		set_f1(task, f1_task_12,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
@@ -2739,14 +2739,14 @@ void alto2_cpu_device::hard_reset()
 		set_f1(task, f1_task_16,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
 		set_f1(task, f1_task_17,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
 
-		set_f2(task, f2_nop,            0, 0);
-		set_f2(task, f2_bus_eq_zero,    0, &alto2_cpu_device::f2_late_bus_eq_zero);
-		set_f2(task, f2_shifter_lt_zero,0, &alto2_cpu_device::f2_late_shifter_lt_zero);
-		set_f2(task, f2_shifter_eq_zero,0, &alto2_cpu_device::f2_late_shifter_eq_zero);
-		set_f2(task, f2_bus,            0, &alto2_cpu_device::f2_late_bus);
-		set_f2(task, f2_alucy,          0, &alto2_cpu_device::f2_late_alucy);
-		set_f2(task, f2_load_md,        0, &alto2_cpu_device::f2_late_load_md);
-		set_f2(task, f2_const,          0, 0);
+		set_f2(task, f2_nop,            nullptr, nullptr);
+		set_f2(task, f2_bus_eq_zero,    nullptr, &alto2_cpu_device::f2_late_bus_eq_zero);
+		set_f2(task, f2_shifter_lt_zero,nullptr, &alto2_cpu_device::f2_late_shifter_lt_zero);
+		set_f2(task, f2_shifter_eq_zero,nullptr, &alto2_cpu_device::f2_late_shifter_eq_zero);
+		set_f2(task, f2_bus,            nullptr, &alto2_cpu_device::f2_late_bus);
+		set_f2(task, f2_alucy,          nullptr, &alto2_cpu_device::f2_late_alucy);
+		set_f2(task, f2_load_md,        nullptr, &alto2_cpu_device::f2_late_load_md);
+		set_f2(task, f2_const,          nullptr, nullptr);
 		set_f2(task, f2_task_10,        &alto2_cpu_device::fn_f2_bad_0, &alto2_cpu_device::fn_f2_bad_1);    // f2_task_10 to f2_task_17 are task specific
 		set_f2(task, f2_task_11,        &alto2_cpu_device::fn_f2_bad_0, &alto2_cpu_device::fn_f2_bad_1);    // f2_task_10 to f2_task_17 are task specific
 		set_f2(task, f2_task_12,        &alto2_cpu_device::fn_f2_bad_0, &alto2_cpu_device::fn_f2_bad_1);    // f2_task_10 to f2_task_17 are task specific

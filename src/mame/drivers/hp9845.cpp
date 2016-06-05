@@ -20,8 +20,8 @@
 // - Keyboard
 // - T15 tape drive
 // - Software list to load optional ROMs
-// What's not yet in:
 // - Beeper
+// What's not yet in:
 // - Better naming of tape drive image (it's now "magt", should be "t15")
 // - Better documentation of this file
 // What's wrong:
@@ -34,6 +34,7 @@
 #include "cpu/hphybrid/hphybrid.h"
 #include "machine/hp_taco.h"
 #include "bus/hp_optroms/hp_optrom.h"
+#include "sound/beep.h"
 
 #define BIT_MASK(n) (1U << (n))
 
@@ -111,7 +112,9 @@ public:
 		m_io_key1(*this , "KEY1"),
 		m_io_key2(*this , "KEY2"),
 		m_io_key3(*this , "KEY3"),
-				m_t15(*this , "t15")
+		m_t15(*this , "t15"),
+		m_beeper(*this , "beeper"),
+		m_beep_timer(*this , "beep_timer")
 	{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -138,6 +141,7 @@ public:
 	DECLARE_READ16_MEMBER(kb_scancode_r);
 	DECLARE_READ16_MEMBER(kb_status_r);
 	DECLARE_WRITE16_MEMBER(kb_irq_clear_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off);
 
 		DECLARE_WRITE8_MEMBER(pa_w);
 
@@ -156,6 +160,8 @@ private:
 	required_ioport m_io_key2;
 	required_ioport m_io_key3;
 		required_device<hp_taco_device> m_t15;
+	required_device<beep_device> m_beeper;
+	required_device<timer_device> m_beep_timer;
 
 		void set_video_mar(UINT16 mar);
 		void video_fill_buff(bool buff_idx);
@@ -416,6 +422,8 @@ void hp9845b_state::machine_reset()
 		memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
 		m_kb_scancode = 0x7f;
 		m_kb_status = 0;
+
+		m_beeper->set_state(0);
 }
 
 void hp9845b_state::set_video_mar(UINT16 mar)
@@ -512,7 +520,6 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 						UINT8 chargen_byte = m_chargen[ line_in_row  | ((unsigned)charcode << 4) ];
 						UINT16 pixels;
 
-						// TODO: Handle selection of 2nd chargen
 						// TODO: Check if order of bits in "pixels" is ok
 
 						if ((ul_line && BIT(attrs , 3)) ||
@@ -520,8 +527,11 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 								pixels = ~0;
 						} else if (char_blink && BIT(attrs , 2)) {
 								pixels = 0;
+						} else if (BIT(attrs , 4)) {
+								// Optional character generator ROM not installed, it reads as 1 everywhere
+								pixels = 0x7f << 1;
 						} else {
-								pixels = (UINT16)(chargen_byte & 0x7f) << 2;
+								pixels = (UINT16)(chargen_byte & 0x7f) << 1;
 						}
 
 						if (BIT(attrs , 1)) {
@@ -1004,7 +1014,17 @@ WRITE16_MEMBER(hp9845b_state::kb_irq_clear_w)
 		BIT_CLR(m_kb_status, 0);
 		update_irq();
 		m_lpu->status_w(0);
-		// TODO: beeper start
+
+		if (BIT(data , 15)) {
+			// Start beeper
+			m_beep_timer->adjust(attotime::from_ticks(64, KEY_SCAN_OSCILLATOR / 512));
+			m_beeper->set_state(1);
+		}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::beeper_off)
+{
+	m_beeper->set_state(0);
 }
 
 WRITE8_MEMBER(hp9845b_state::pa_w)
@@ -1129,21 +1149,39 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 	// Actual keyboard refresh rate should be KEY_SCAN_OSCILLATOR / 128 (2560 Hz)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp9845b_state , kb_scan , attotime::from_hz(100))
 
+	// Beeper
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper" , BEEP , KEY_SCAN_OSCILLATOR / 512)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
+
+	MCFG_TIMER_DRIVER_ADD("beep_timer" , hp9845b_state , beeper_off);
+
 		// Tape controller
 		MCFG_DEVICE_ADD("t15" , HP_TACO , 4000000)
 		MCFG_TACO_IRQ_HANDLER(WRITELINE(hp9845b_state , t15_irq_w))
 		MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845b_state , t15_flg_w))
 		MCFG_TACO_STS_HANDLER(WRITELINE(hp9845b_state , t15_sts_w))
 
-		// In real machine there were 8 slots for LPU ROMs and 8 slots for PPU ROMs in
-		// right-hand side and left-hand side drawers, respectively.
-		// Here we do away with the distinction between LPU & PPU ROMs: in the end they
-		// are visible to both CPUs at the same addresses.
-		// For now we define just a couple of slots..
-		MCFG_DEVICE_ADD("drawer1", HP_OPTROM_SLOT, 0)
-		MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
-		MCFG_DEVICE_ADD("drawer2", HP_OPTROM_SLOT, 0)
-		MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	// In real machine there were 8 slots for LPU ROMs and 8 slots for PPU ROMs in
+	// right-hand side and left-hand side drawers, respectively.
+	// Here we do away with the distinction between LPU & PPU ROMs: in the end they
+	// are visible to both CPUs at the same addresses.
+	MCFG_DEVICE_ADD("drawer1", HP_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer2", HP_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer3", HP_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer4", HP_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer5", HP_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer6", HP_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer7", HP_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_ADD("drawer8", HP_OPTROM_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
 
 		MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
 MACHINE_CONFIG_END
@@ -1253,6 +1291,6 @@ COMP( 1978, hp9845a,   0,       0,      hp9845a,       hp9845, driver_device, 0,
 COMP( 1978, hp9845s,   hp9845a, 0,      hp9845a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845S",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1979, hp9835a,   0,       0,      hp9835a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9835A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1979, hp9835b,   hp9835a, 0,      hp9835a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9835B",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1980, hp9845b,   0,       0,      hp9845b,       hp9845b,driver_device, 0,      "Hewlett-Packard",  "9845B",  MACHINE_NO_SOUND )
+COMP( 1980, hp9845b,   0,       0,      hp9845b,       hp9845b,driver_device, 0,      "Hewlett-Packard",  "9845B",  0 )
 COMP( 1980, hp9845t,   hp9845b, 0,      hp9845b,       hp9845b,driver_device, 0,      "Hewlett-Packard",  "9845T",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1981, hp9845c,   hp9845b, 0,      hp9845b,       hp9845b,driver_device, 0,      "Hewlett-Packard",  "9845C",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

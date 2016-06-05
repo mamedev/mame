@@ -56,7 +56,7 @@ private:
 	void CalculateIncrement(bool bVoicedP2, UINT8 uPPQtrP2, bool bPPQStartP2, UINT8 uDeltaP2, UINT8 uDeltaOldP2, UINT8 &uDeltaOldP1, UINT8 &uIncrementP2, bool &bAddP2);
 	UINT8 CalculateOutput(bool bVoicedP2, bool bXSilenceP2, UINT8 uPPQtrP2, bool bPPQStartP2, UINT8 uLOutputP2, UINT8 uIncrementP2, bool bAddP2);
 	void ClearStatistics();
-	void GetStatistics(UINT32 &uNPitchPeriods, UINT32 &uNVoiced, UINT32 uNControlWords);
+	void GetStatistics(UINT32 &uNPitchPeriods, UINT32 &uNVoiced, UINT32 &uNControlWords);
 	void SetPrintLevel(UINT32 uPrintLevel) { m_uPrintLevel = uPrintLevel; }
 
 	// internal state

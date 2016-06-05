@@ -69,7 +69,6 @@ protected:
 	// inline helper
 
 private:
-	void screen_scanning( int force_clear );
 	void set_video_mode(void);
 	void draw_border(UINT16 line);
 

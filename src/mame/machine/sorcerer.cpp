@@ -202,14 +202,14 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 			(BIT(data,5)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 		if (data & 0x30)
-			m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(19200));
+			m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(ES_UART_CLOCK*4));
 		else
 			m_cassette_timer->adjust(attotime::zero);
 	}
 #if SORCERER_USING_RS232
 	else
 	{
-		m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(19200));
+		m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(ES_UART_CLOCK*4));
 		m_cassette_timer->adjust(attotime::zero);
 	}
 #endif
@@ -217,8 +217,8 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 	// bit 6 baud rate */
 	if (BIT(changed_bits, 6))
 	{
-		m_uart->set_receiver_clock(BIT(data, 6) ? 19200.0 : 4800.0);
-		m_uart->set_transmitter_clock(BIT(data, 6) ? 19200.0 : 4800.0);
+		m_uart->set_receiver_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
+		m_uart->set_transmitter_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
 	}
 }
 
@@ -455,7 +455,7 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 		    C858 = an autorun basic program will have this exec address on the tape
 		    C3DD = part of basic that displays READY and lets user enter input */
 
-		if ((start_address == 0x1d5) || (execute_address == 0xc858))
+		if (((start_address == 0x1d5) || (execute_address == 0xc858)) && (space.read_byte(0xdffa) == 0xc3))
 		{
 			UINT8 i;
 			static const UINT8 data[]={

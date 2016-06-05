@@ -21,7 +21,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pet_userport_joystick_adapter_device
+// ======================> pet_userport_joystick_and_sound_device
 
 class pet_userport_joystick_and_sound_device : public device_t,
 	public device_pet_user_port_interface

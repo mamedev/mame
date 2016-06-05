@@ -31,7 +31,6 @@ public:
 	UINT32 garouh_bank_base(UINT16 sel);
 	UINT32 mslug3_bank_base(UINT16 sel);
 	UINT32 kof2000_bank_base(UINT16 sel);
-	void sma_install_random_read_handler(cpu_device* maincpu, int addr1, int addr2 );
 	void kof99_decrypt_68k(UINT8* base);
 	void garou_decrypt_68k(UINT8* base);
 	void garouh_decrypt_68k(UINT8* base);
