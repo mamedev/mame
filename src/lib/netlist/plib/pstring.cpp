@@ -147,7 +147,7 @@ const pstring_t<F> pstring_t<F>::ucase() const
 {
 	pstring_t ret = *this;
 	ret.pcopy(cstr(), blen());
-	for (unsigned i=0; i<ret.len(); i++)
+	for (std::size_t  i=0; i<ret.len(); i++)
 		ret.m_ptr->str()[i] = toupper((unsigned) ret.m_ptr->str()[i]);
 	return ret;
 }
@@ -158,11 +158,11 @@ int pstring_t<F>::find_first_not_of(const pstring_t &no) const
 	char *t = m_ptr->str();
 	unsigned nolen = no.len();
 	unsigned tlen = len();
-	for (unsigned i=0; i < tlen; i++)
+	for (std::size_t  i=0; i < tlen; i++)
 	{
 		char *n = no.m_ptr->str();
 		bool f = true;
-		for (unsigned j=0; j < nolen; j++)
+		for (std::size_t  j=0; j < nolen; j++)
 		{
 			if (F::code(t) == F::code(n))
 				f = false;
@@ -182,11 +182,11 @@ int pstring_t<F>::find_last_not_of(const pstring_t &no) const
 	unsigned nolen = no.len();
 	unsigned tlen = len();
 	int last_found = -1;
-	for (unsigned i=0; i < tlen; i++)
+	for (std::size_t  i=0; i < tlen; i++)
 	{
 		char *n = no.m_ptr->str();
 		bool f = true;
-		for (unsigned j=0; j < nolen; j++)
+		for (std::size_t  j=0; j < nolen; j++)
 		{
 			if (F::code(t) == F::code(n))
 				f = false;
@@ -392,7 +392,7 @@ void pstring_t<F>::resetmem()
 {
 	if (stk != nullptr)
 	{
-		for (unsigned i=0; i<=16; i++)
+		for (std::size_t  i=0; i<=16; i++)
 		{
 			for (; stk[i].size() > 0; )
 			{
@@ -448,7 +448,7 @@ int pstring_t<F>::find(const pstring_t &search, unsigned start) const
 	const char *s = search.cstr();
 	const unsigned startt = std::min(start, tlen);
 	const char *t = cstr();
-	for (unsigned i=0; i<startt; i++)
+	for (std::size_t  i=0; i<startt; i++)
 		t += F::codelen(t);
 	for (int i=0; i <= (int) tlen - (int) startt - (int) slen; i++)
 	{
@@ -477,7 +477,7 @@ int pstring_t<F>::find(const mem_t *search, unsigned start) const
 	const char *s = search;
 	const unsigned startt = std::min(start, tlen);
 	const char *t = cstr();
-	for (unsigned i=0; i<startt; i++)
+	for (std::size_t  i=0; i<startt; i++)
 		t += F::codelen(t);
 	for (int i=0; i <= (int) tlen - (int) startt - (int) slen; i++)
 	{

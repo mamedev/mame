@@ -163,13 +163,13 @@ public:
 		plib::pstring_vector_t out(io[1], ",");
 		nl_assert_always(out.size() == m_NO, "output count wrong");
 
-		for (unsigned i=0; i < m_NI; i++)
+		for (std::size_t i=0; i < m_NI; i++)
 		{
 			//new (&m_I[i]) logic_input_t();
 			inout[i] = inout[i].trim();
 			m_I.emplace(i, *this, inout[i]);
 		}
-		for (unsigned i=0; i < m_NO; i++)
+		for (std::size_t i=0; i < m_NO; i++)
 		{
 			//new (&m_Q[i]) logic_output_t();
 			out[i] = out[i].trim();
@@ -179,7 +179,7 @@ public:
 		// Connect output "Q" to input "_Q" if this exists
 		// This enables timed state without having explicit state ....
 		UINT32 disabled_ignore = 0;
-		for (unsigned i=0; i < m_NO; i++)
+		for (std::size_t i=0; i < m_NO; i++)
 		{
 			pstring tmp = "_" + out[i];
 			const int idx = inout.indexof(tmp);
@@ -213,9 +213,9 @@ public:
 	{
 		m_active = 0;
 		m_ign = 0;
-		for (unsigned i = 0; i < m_NI; i++)
+		for (std::size_t i = 0; i < m_NI; i++)
 			m_I[i].activate();
-		for (unsigned i=0; i<m_NO;i++)
+		for (std::size_t i=0; i<m_NO;i++)
 			if (this->m_Q[i].net().num_cons()>0)
 				m_active++;
 		m_last_state = 0;
@@ -249,7 +249,7 @@ public:
 		if (m_NI > 1 && has_state == 0)
 			if (--m_active == 0)
 			{
-				for (unsigned i = 0; i< m_NI; i++)
+				for (std::size_t i = 0; i< m_NI; i++)
 					m_I[i].inactivate();
 				m_ign = (1<<m_NI)-1;
 			}
@@ -271,20 +271,20 @@ private:
 
 		UINT32 state = 0;
 		if (m_NI > 1 && !has_state)
-			for (unsigned i = 0; i < m_NI; i++)
+			for (std::size_t i = 0; i < m_NI; i++)
 			{
 				if (!doOUT || (m_ign & (1<<i)))
 					m_I[i].activate();
 			}
 
 		if (!doOUT)
-			for (unsigned i = 0; i < m_NI; i++)
+			for (std::size_t i = 0; i < m_NI; i++)
 			{
 				state |= (INPLOGIC(m_I[i]) << i);
 				mt = std::max(this->m_I[i].net().time(), mt);
 			}
 		else
-			for (unsigned i = 0; i < m_NI; i++)
+			for (std::size_t i = 0; i < m_NI; i++)
 				state |= (INPLOGIC(m_I[i]) << i);
 
 		const UINT32 nstate = state | (has_state ? (m_last_state << m_NI) : 0);
@@ -297,16 +297,16 @@ private:
 		const UINT32 timebase = nstate * m_NO;
 		if (doOUT)
 		{
-			for (unsigned i = 0; i < m_NO; i++)
+			for (std::size_t i = 0; i < m_NO; i++)
 				OUTLOGIC(m_Q[i], (out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
 		}
 		else
-			for (unsigned i = 0; i < m_NO; i++)
+			for (std::size_t i = 0; i < m_NO; i++)
 				m_Q[i].net().set_Q_time((out >> i) & 1, mt + m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
 
 		if (m_NI > 1 && !has_state)
 		{
-			for (unsigned i = 0; i < m_NI; i++)
+			for (std::size_t i = 0; i < m_NI; i++)
 				if (m_ign & (1 << i))
 					m_I[i].inactivate();
 		}

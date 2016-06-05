@@ -112,11 +112,11 @@ public:
 	{
 		log().debug("Creating dynamic logs ...\n");
 		plib::pstring_vector_t ll(m_opts ? m_opts->opt_logs() : "" , ":");
-		for (unsigned i=0; i < ll.size(); i++)
+		for (auto & log : ll)
 		{
-			pstring name = "log_" + ll[i];
+			pstring name = "log_" + log;
 			/*netlist_device_t *nc = */ m_setup->register_dev("LOG", name);
-			m_setup->register_link(name + ".I", ll[i]);
+			m_setup->register_link(name + ".I", log);
 		}
 	}
 
@@ -284,18 +284,16 @@ static void listdevices()
 	nt.setup().start_devices();
 	nt.setup().resolve_inputs();
 
-	for (unsigned i=0; i < list.size(); i++)
+	for (auto & f : list)
 	{
-		auto &f = list[i];
 		pstring out = plib::pfmt("{1} {2}(<id>")(f->classname(),"-20")(f->name());
 		pstring terms("");
 
-		auto d = f->Create(nt.setup().netlist(), plib::pfmt("dummy{1}")(i));
+		auto d = f->Create(nt.setup().netlist(), "dummy");
 
 		// get the list of terminals ...
-		for (unsigned j=0; j < d->m_terminals.size(); j++)
+		for (auto & inp :  d->m_terminals)
 		{
-			pstring inp = d->m_terminals[j];
 			if (inp.startsWith(d->name() + "."))
 				inp = inp.substr(d->name().len() + 1);
 			terms += "," + inp;

@@ -461,7 +461,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 
 		/* connect all existing terminals to new net */
 
-		for (core_terminal_t *p : out.net().m_core_terms)
+		for (auto & p : out.net().m_core_terms)
 		{
 			p->clear_net(); // de-link from all nets ...
 			if (!connect(new_proxy->proxy_term(), *p))
@@ -615,7 +615,7 @@ bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 			ret = connect(t2, t1.net().railterminal());
 		if (!ret)
 		{
-			for (core_terminal_t *t : t1.net().m_core_terms)
+			for (auto & t : t1.net().m_core_terms)
 			{
 				if (t->is_type(core_terminal_t::TERMINAL))
 					ret = connect(t2, *t);
@@ -630,7 +630,7 @@ bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 			ret = connect(t1, t2.net().railterminal());
 		if (!ret)
 		{
-			for (core_terminal_t *t : t2.net().m_core_terms)
+			for (auto & t : t2.net().m_core_terms)
 			{
 				if (t->is_type(core_terminal_t::TERMINAL))
 					ret = connect(t1, *t);
@@ -723,8 +723,8 @@ void setup_t::resolve_inputs()
 	}
 	if (tries == 0)
 	{
-		for (std::size_t i = 0; i < m_links.size(); i++ )
-			log().warning("Error connecting {1} to {2}\n", m_links[i].first, m_links[i].second);
+		for (auto & link : m_links)
+			log().warning("Error connecting {1} to {2}\n", link.first, link.second);
 
 		log().fatal("Error connecting -- bailing out\n");
 	}
@@ -767,16 +767,12 @@ void setup_t::resolve_inputs()
 
 
 	log().verbose("looking for two terms connected to rail nets ...\n");
-	for (std::size_t i=0; i < netlist().m_devices.size(); i++)
+	for (auto & t : netlist().get_device_list<devices::NETLIB_NAME(twoterm)>())
 	{
-		devices::NETLIB_NAME(twoterm) *t = dynamic_cast<devices::NETLIB_NAME(twoterm) *>(netlist().m_devices[i].get());
-		if (t != nullptr)
-		{
-			has_twoterms = true;
-			if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
-				log().warning("Found device {1} connected only to railterminals {2}/{3}\n",
-					t->name(), t->m_N.net().name(), t->m_P.net().name());
-		}
+		has_twoterms = true;
+		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
+			log().warning("Found device {1} connected only to railterminals {2}/{3}\n",
+				t->name(), t->m_N.net().name(), t->m_P.net().name());
 	}
 
 	log().verbose("initialize solver ...\n");

@@ -103,7 +103,7 @@ public:
 
 	int indexof(const LC &elem) const
 	{
-		for (unsigned i = 0; i < this->size(); i++)
+		for (std::size_t i = 0; i < this->size(); i++)
 		{
 			if (this->at(i) == elem)
 				return i;

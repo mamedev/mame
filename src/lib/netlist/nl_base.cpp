@@ -299,8 +299,8 @@ void netlist_t::reset()
 	//	m_solver->do_reset();
 
 	// Reset all nets once !
-	for (std::size_t i = 0; i < m_nets.size(); i++)
-		m_nets[i]->reset();
+	for (auto & n : m_nets)
+		n->reset();
 
 	// Reset all devices once !
 	for (auto & dev : m_devices)
@@ -384,9 +384,8 @@ void netlist_t::print_stats() const
 {
 #if (NL_KEEP_STATISTICS)
 	{
-		for (std::size_t i = 0; i < m_devices.size(); i++)
+		for (auto & entry : m_devices)
 		{
-			core_device_t *entry = m_devices[i].get();
 			printf("Device %20s : %12d %12d %15ld\n", entry->name().cstr(), entry->stat_call_count, entry->stat_update_count, (long int) entry->stat_total_time / (entry->stat_update_count + 1));
 		}
 		printf("Queue Pushes %15d\n", queue().m_prof_call);
@@ -642,7 +641,7 @@ void net_t::rebuild_list()
 
 	unsigned cnt = 0;
 	m_list_active.clear();
-	for (core_terminal_t *term : m_core_terms)
+	for (auto & term : m_core_terms)
 		if (term->state() != logic_t::STATE_INP_PASSIVE)
 		{
 			m_list_active.add(*term);

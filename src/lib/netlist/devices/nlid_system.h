@@ -311,7 +311,7 @@ namespace netlist
 		, m_Q(*this, "Q")
 		{
 
-			for (int i=0; i < m_N; i++)
+			for (std::size_t i=0; i < m_N; i++)
 				m_I.emplace(i, *this, plib::pfmt("A{1}")(i));
 
 			plib::pstring_vector_t cmds(m_func.Value(), " ");

@@ -56,16 +56,16 @@ void pstate_manager_t::remove_save_items(const void *owner)
 
 void pstate_manager_t::pre_save()
 {
-	for (std::size_t i=0; i < m_save.size(); i++)
-		if (m_save[i]->m_dt == DT_CUSTOM)
-			m_save[i]->m_callback->on_pre_save();
+	for (auto & s : m_save)
+		if (s->m_dt == DT_CUSTOM)
+			s->m_callback->on_pre_save();
 }
 
 void pstate_manager_t::post_load()
 {
-	for (std::size_t i=0; i < m_save.size(); i++)
-		if (m_save[i]->m_dt == DT_CUSTOM)
-			m_save[i]->m_callback->on_post_load();
+	for (auto & s : m_save)
+		if (s->m_dt == DT_CUSTOM)
+			s->m_callback->on_post_load();
 }
 
 template<> void pstate_manager_t::save_item(const void *owner, pstate_callback_t &state, const pstring &stname)
