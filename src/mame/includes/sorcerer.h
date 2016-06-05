@@ -27,6 +27,9 @@
 
 #define SORCERER_USING_RS232 0
 
+#define ES_CPU_CLOCK (12638000 / 6)
+#define ES_UART_CLOCK (ES_CPU_CLOCK / 440)
+
 struct cass_data_t {
 	struct {
 		int length;     /* time cassette level is at input.level */
