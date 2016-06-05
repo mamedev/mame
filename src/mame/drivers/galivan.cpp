@@ -24,9 +24,13 @@ TODO
   but it should really copy stuff from the extra ROM.
 - Ninja Emaki has minor protection issues, see NB1414M4 simulation for more info.
 - dangarj has unemulated protection at I/Os 0x80-1 for missing sprites. 
-  It then checks the checksum result with 0x27, jumps to unmapped ROM area 
-  during gameplay if it's manually hampered hmm ...
-
+  [0x80] W is data
+  [0x81] W --11 xxxx address
+  [0x80] R result
+  The protection is used for a code snippet at 0xf9c0, that of course is the
+  sprite handling. The code snippet is sum8 with 0x27 at 0x9d74 so no, the 
+  later dangar US version snippet doesn't work ...
+  
 ***************************************************************************/
 
 #include "emu.h"
