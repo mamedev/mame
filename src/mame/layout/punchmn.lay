@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+	<element name="yellow_lamp">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="red_lamp">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	
+	<view name="PunchMania cabinet layout">
+		<bounds x="0" y="0" width="740" height="530" />
+		<screen index="0">
+			<bounds x="50" y="0" width="640" height="480" />
+		</screen>
+		
+		<!-- left pad lamps -->	
+		<bezel name="left_top_lamp" element="red_lamp">
+			<bounds x="10" y="200" width="25" height="25" />
+		</bezel>
+		
+		<bezel name="left_middle_lamp" element="red_lamp">
+			<bounds x="10" y="300" width="25" height="25" />
+		</bezel>
+		
+		<bezel name="left_bottom_lamp" element="red_lamp">
+			<bounds x="10" y="400" width="25" height="25" />
+		</bezel>
+		
+		<!-- right pad lamps -->	
+		<bezel name="right_top_lamp" element="red_lamp">
+			<bounds x="700" y="200" width="25" height="25" />
+		</bezel>
+		
+		<bezel name="right_middle_lamp" element="red_lamp">
+			<bounds x="700" y="300" width="25" height="25" />
+		</bezel>
+		
+		<bezel name="right_bottom_lamp" element="red_lamp">
+			<bounds x="700" y="400" width="25" height="25" />
+		</bezel>
+		
+		<!-- control panel lamps -->
+		<bezel name="select_left_right" element="yellow_lamp">
+			<bounds x="285" y="500" width="50" height="25" />
+		</bezel>
+
+		<bezel name="start_lamp" element="red_lamp">
+			<bounds x="345" y="500" width="50" height="25" />
+		</bezel>
+		
+		<bezel name="select_left_right" element="yellow_lamp">
+			<bounds x="405" y="500" width="50" height="25" />
+		</bezel>
+
+	</view>
+</mamelayout>

@@ -364,6 +364,8 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "video/psx.h"
 #include "cdrom.h"
 
+#include "punchmn.lh"
+
 #define VERBOSE_LEVEL ( 0 )
 
 #define ATAPI_CYCLES_PER_SECTOR ( 5000 )  // plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
@@ -1726,44 +1728,44 @@ static MACHINE_CONFIG_FRAGMENT( punchmania_cassette_install )
 MACHINE_CONFIG_END
 
 
-int pad_light[ 6 ];
+//int pad_light[ 6 ];
 
 WRITE8_MEMBER( ksys573_state::punchmania_output_callback )
 {
 	double *pad_position = m_pad_position;
-	char pad[ 7 ];
+	//char pad[ 7 ];
 
 	switch( offset )
 	{
 	case 8:
-		output().set_value( "select left right", !data );
+		output().set_value( "select_left_right", data == 0 );
 		break;
 	case 9:
-		pad_light[ 2 ] = !data;
-		output().set_value( "left bottom lamp", !data );
+		//pad_light[ 2 ] = !data;
+		output().set_value( "left_bottom_lamp", data == 0 );
 		break;
 	case 10:
-		pad_light[ 1 ] = !data;
-		output().set_value( "left middle lamp", !data );
+		//pad_light[ 1 ] = !data;
+		output().set_value( "left_middle_lamp", data == 0 );
 		break;
 	case 11:
-		output().set_value( "start lamp", !data );
+		output().set_value( "start_lamp", data == 0 );
 		break;
 	case 12:
-		pad_light[ 0 ] = !data;
-		output().set_value( "left top lamp", !data );
+		//pad_light[ 0 ] = !data;
+		output().set_value( "left_top_lamp", data == 0 );
 		break;
 	case 13:
-		pad_light[ 4 ] = !data;
-		output().set_value( "right middle lamp", !data );
+		//pad_light[ 4 ] = !data;
+		output().set_value( "right_middle_lamp", data == 0 );
 		break;
 	case 14:
-		pad_light[ 3 ] = !data;
-		output().set_value( "right top lamp", !data );
+		//pad_light[ 3 ] = !data;
+		output().set_value( "right_top_lamp", data == 0 );
 		break;
 	case 15:
-		pad_light[ 5 ] = !data;
-		output().set_value( "right bottom lamp", !data );
+		//pad_light[ 5 ] = !data;
+		output().set_value( "right_bottom_lamp", data == 0 );
 		break;
 	case 16:
 		if( data )
@@ -1838,6 +1840,7 @@ WRITE8_MEMBER( ksys573_state::punchmania_output_callback )
 		}
 		break;
 	}
+	#if 0
 	sprintf( pad, "%d%d%d%d%d%d",
 		( int )pad_position[ 0 ], ( int )pad_position[ 1 ], ( int )pad_position[ 2 ],
 		( int )pad_position[ 3 ], ( int )pad_position[ 4 ], ( int )pad_position[ 5 ] );
@@ -1850,6 +1853,7 @@ WRITE8_MEMBER( ksys573_state::punchmania_output_callback )
 	if( pad_light[ 5 ] ) pad[ 5 ] = '*';
 
 	popmessage( "%s", pad );
+	#endif
 }
 
 DRIVER_INIT_MEMBER( ksys573_state,pnchmn )
@@ -4773,12 +4777,12 @@ GAME( 1999, stepchmp,  sys573,   salarymc,   hyperbbc,  ksys573_state, salarymc,
 GAME( 2000, dncfrks,   sys573,   dmx,        dmx,       driver_device, 0,        ROT0, "Konami", "Dance Freaks (G*874 VER. KAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dmx,       dncfrks,  dmx,        dmx,       driver_device, 0,        ROT0, "Konami", "Dance Maniax (G*874 VER. JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, gunmania,  sys573,   gunmania,   gunmania,  driver_device, 0,        ROT0, "Konami", "GunMania (GL906 VER. JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, fghtmn,    sys573,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
-GAME( 2000, fghtmna,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
-GAME( 2000, pnchmn,    fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Punch Mania: Hokuto No Ken (GQ918 VER. JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
-GAME( 2000, pnchmna,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Punch Mania: Hokuto No Ken (GQ918 VER. JAB ALT CD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
-GAME( 2000, fghtmnk,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. KAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
-GAME( 2000, fghtmnu,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
+GAMEL( 2000, fghtmn,    sys573,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
+GAMEL( 2000, fghtmna,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
+GAMEL( 2000, pnchmn,    fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Punch Mania: Hokuto No Ken (GQ918 VER. JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
+GAMEL( 2000, pnchmna,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Punch Mania: Hokuto No Ken (GQ918 VER. JAB ALT CD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
+GAMEL( 2000, fghtmnk,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. KAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
+GAMEL( 2000, fghtmnu,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
 GAME( 2000, dsem,      sys573,   dsem,       ddr,       driver_device, 0,        ROT0, "Konami", "Dancing Stage Euro Mix (G*936 VER. EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.7 */
 GAME( 2000, gtrfrk3m,  sys573,   gtrfrk3m,   gtrfrks,   driver_device, 0,        ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3ma,  gtrfrk3m, gtrfrk3m,   gtrfrks,   driver_device, 0,        ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.4 */
