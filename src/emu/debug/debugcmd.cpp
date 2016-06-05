@@ -1219,6 +1219,19 @@ static void execute_comment_save(running_machine &machine, int ref, int params, 
 		debug_console_printf(machine, "Comment not saved\n");
 }
 
+// TODO: add color hex editing capabilities for comments, see below for more info
+/**
+ * @fn void execute_comment_color(running_machine &machine, int ref, int params, const char *param[])
+ * @brief Modifies comment given at address $xx with given color
+ * Useful for marking comment with a different color scheme (for example by marking start and end of a given function visually).
+ * @param[in] "address,color" First is the comment address in the current context, color can be hexadecimal or shorthanded to common 1bpp RGB names.
+ *
+ * @todo check if the comment exists in the first place, bail out with error if not.
+ * @todo add shorthand for color modify and save
+ *
+ */
+ 
+
 
 /*-------------------------------------------------
     execute_bpset - execute the breakpoint set
