@@ -76,7 +76,7 @@ void a1bus_cffa_device::device_start()
 	m_rom = device().machine().root_device().memregion(this->subtag(CFFA_ROM_REGION).c_str())->base();
 
 	install_device(0xafe0, 0xafff, read8_delegate(FUNC(a1bus_cffa_device::cffa_r), this), write8_delegate(FUNC(a1bus_cffa_device::cffa_w), this));
-	install_bank(0x9000, 0xafdf, 0, 0, (char *)"bank_cffa1", m_rom);
+	install_bank(0x9000, 0xafdf, (char *)"bank_cffa1", m_rom);
 
 	save_item(NAME(m_lastdata));
 	save_item(NAME(m_writeprotect));

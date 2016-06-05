@@ -120,12 +120,12 @@ void macpds_device::install_device(offs_t start, offs_t end, read16_delegate rha
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
 }
 
-void macpds_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
+void macpds_device::install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data)
 {
-//  printf("install_bank: %s @ %x->%x mask %x mirror %x\n", tag, start, end, mask, mirror);
+//  printf("install_bank: %s @ %x->%x\n", tag, start, end);
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_bank(start, end, mask, mirror, tag );
+	space.install_readwrite_bank(start, end, 0, tag );
 	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
 }
 
@@ -176,7 +176,7 @@ void device_macpds_card_interface::set_macpds_device()
 	m_macpds->add_macpds_card(this);
 }
 
-void device_macpds_card_interface::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
+void device_macpds_card_interface::install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data)
 {
 	char bank[256];
 
@@ -185,7 +185,7 @@ void device_macpds_card_interface::install_bank(offs_t start, offs_t end, offs_t
 	strcat(bank, "_");
 	strcat(bank, m_macpds_slottag);
 
-	m_macpds->install_bank(start, end, mask, mirror, bank, data);
+	m_macpds->install_bank(start, end, bank, data);
 }
 
 void device_macpds_card_interface::install_rom(device_t *dev, const char *romregion, UINT32 addr)
@@ -195,5 +195,5 @@ void device_macpds_card_interface::install_rom(device_t *dev, const char *romreg
 	char bankname[128];
 	sprintf(bankname, "rom_%x", addr);
 
-	m_macpds->install_bank(addr, addr+romlen-1, 0, 0, bankname, rom);
+	m_macpds->install_bank(addr, addr+romlen-1, bankname, rom);
 }

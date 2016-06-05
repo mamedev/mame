@@ -773,7 +773,7 @@ static ADDRESS_MAP_START( attache_io , AS_IO, 8, attache_state)
 	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("ctc",z80ctc_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("pio",z80pio_device,read_alt,write_alt) AM_MIRROR(0xff00)
 	AM_RANGE(0xfc, 0xfd) AM_DEVICE("fdc",upd765a_device,map) AM_MIRROR(0xff00)
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE(display_data_r, display_data_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE(display_data_r, display_data_w) AM_SELECT(0xff00)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(memmap_r, memmap_w) AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 

@@ -505,7 +505,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( einstein2_io, AS_IO, 8, einstein_state )
 	AM_IMPORT_FROM(einstein_io)
-	AM_RANGE(0x40, 0x47) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(einstein_80col_ram_r, einstein_80col_ram_w)
+	AM_RANGE(0x40, 0x47) AM_SELECT(0xff00) AM_READWRITE(einstein_80col_ram_r, einstein_80col_ram_w)
 	AM_RANGE(0x48, 0x48) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x49, 0x49) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x4c, 0x4c) AM_MIRROR(0xff00) AM_READ(einstein_80col_state_r)

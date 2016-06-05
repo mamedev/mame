@@ -44,7 +44,7 @@ WRITE8_MEMBER(isa8_pds_device::ppi_w)
 void isa8_pds_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0300, 0x0307, 0, 0, read8_delegate(FUNC(isa8_pds_device::ppi_r),this), write8_delegate(FUNC(isa8_pds_device::ppi_w),this) );
+	m_isa->install_device(0x0300, 0x0307, read8_delegate(FUNC(isa8_pds_device::ppi_r),this), write8_delegate(FUNC(isa8_pds_device::ppi_w),this) );
 }
 
 void isa8_pds_device::device_reset()

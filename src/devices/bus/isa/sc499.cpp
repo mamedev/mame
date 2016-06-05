@@ -394,7 +394,7 @@ void sc499_device::device_reset()
 		m_irq = m_irqdrq->read() & 7;
 		m_drq = m_irqdrq->read()>>4;
 
-		m_isa->install_device(base, base+7, 0, 0, read8_delegate(FUNC(sc499_device::read), this), write8_delegate(FUNC(sc499_device::write), this));
+		m_isa->install_device(base, base+7, read8_delegate(FUNC(sc499_device::read), this), write8_delegate(FUNC(sc499_device::write), this));
 		m_isa->set_dma_channel(m_drq, this, true);
 
 		m_installed = true;

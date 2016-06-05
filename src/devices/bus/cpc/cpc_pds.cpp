@@ -52,7 +52,7 @@ void cpc_pds_device::device_start()
 	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfbec,0xfbef,0,0,read8_delegate(FUNC(cpc_pds_device::pio_r),this),write8_delegate(FUNC(cpc_pds_device::pio_w),this));
+	space.install_readwrite_handler(0xfbec,0xfbef,read8_delegate(FUNC(cpc_pds_device::pio_r),this),write8_delegate(FUNC(cpc_pds_device::pio_w),this));
 }
 
 //-------------------------------------------------

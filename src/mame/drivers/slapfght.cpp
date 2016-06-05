@@ -463,7 +463,7 @@ static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x0010) AM_MASK(0x0010) AM_WRITE(sound_nmi_enable_w)
+	AM_RANGE(0xa0e0, 0xa0e0) AM_SELECT(0x0010) AM_WRITE(sound_nmi_enable_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerh_sound_map, AS_PROGRAM, 8, slapfght_state )
@@ -474,7 +474,7 @@ static ADDRESS_MAP_START( tigerh_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x0010) AM_MASK(0x0010) AM_WRITE(sound_nmi_enable_w)
+	AM_RANGE(0xa0e0, 0xa0e0) AM_SELECT(0x0010) AM_WRITE(sound_nmi_enable_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xffff) AM_RAM
 ADDRESS_MAP_END

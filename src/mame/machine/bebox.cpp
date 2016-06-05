@@ -786,8 +786,8 @@ DRIVER_INIT_MEMBER(bebox_state,bebox)
 	membank("bank2")->set_base(memregion("user2")->base());
 
 	/* install MESS managed RAM */
-	space_0.install_readwrite_bank(0, m_ram->size() - 1, 0, 0x02000000, "bank3");
-	space_1.install_readwrite_bank(0, m_ram->size() - 1, 0, 0x02000000, "bank3");
+	space_0.install_readwrite_bank(0, m_ram->size() - 1, 0x02000000, "bank3");
+	space_1.install_readwrite_bank(0, m_ram->size() - 1, 0x02000000, "bank3");
 	membank("bank3")->set_base(m_ram->pointer());
 
 	/* The following is a verrrry ugly hack put in to support NetBSD for

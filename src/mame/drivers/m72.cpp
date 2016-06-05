@@ -480,8 +480,8 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 	io.install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::main_mcu_sound_w),this));
 
 	/* sound cpu */
-	sndio.install_write_handler(0x82, 0x82, 0xff, 0, write8_delegate(FUNC(dac_device::write_unsigned8),(dac_device*)m_dac));
-	sndio.install_read_handler (0x84, 0x84, 0xff, 0, read8_delegate(FUNC(m72_state::snd_cpu_sample_r),this));
+	sndio.install_write_handler(0x82, 0x82, write8_delegate(FUNC(dac_device::write_unsigned8),(dac_device*)m_dac));
+	sndio.install_read_handler (0x84, 0x84, read8_delegate(FUNC(m72_state::snd_cpu_sample_r),this));
 
 	/* lohtb2 */
 #if 0

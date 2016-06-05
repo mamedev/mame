@@ -148,19 +148,19 @@ void pc9801_86_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc9801_86_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
+void pc9801_86_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
 	int buswidth = machine().firstcpu->space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0);
+			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, rhandler, whandler, 0);
 			break;
 		case 16:
-			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffff);
+			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
 			break;
 		case 32:
-			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffffffff);
+			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
 			break;
 		default:
 			fatalerror("PC-9801-86: Bus width %d not supported\n", buswidth);
@@ -181,9 +181,9 @@ void pc9801_86_device::device_start()
 void pc9801_86_device::device_reset()
 {
 	UINT16 port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
-	install_device(port_base + 0x0088, port_base + 0x008f, 0, 0, read8_delegate(FUNC(pc9801_86_device::opn_r), this), write8_delegate(FUNC(pc9801_86_device::opn_w), this) );
-	install_device(0xa460, 0xa463, 0, 0, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
-	install_device(0xa464, 0xa46f, 0, 0, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
+	install_device(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_86_device::opn_r), this), write8_delegate(FUNC(pc9801_86_device::opn_w), this) );
+	install_device(0xa460, 0xa463, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
+	install_device(0xa464, 0xa46f, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
 	m_mask = 0;
 	m_head = m_tail = m_count = 0;
 	m_fmirq = m_pcmirq = false;

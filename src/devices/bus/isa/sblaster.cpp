@@ -1264,23 +1264,23 @@ isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, 
 
 void sb8_device::device_start()
 {
-	m_isa->install_device(0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
-	m_isa->install_device(0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb_device::dsp_reset_r), this), write8_delegate(FUNC(sb_device::dsp_reset_w), this));
-	m_isa->install_device(0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb_device::dsp_data_r), this), write8_delegate(FUNC(sb_device::dsp_data_w), this) );
-	m_isa->install_device(0x022c, 0x022d, 0, 0, read8_delegate(FUNC(sb_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_cmd_w), this) );
-	m_isa->install_device(0x022e, 0x022f, 0, 0, read8_delegate(FUNC(sb_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_rbuf_status_w), this) );
+	m_isa->install_device(0x0200, 0x0207, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
+	m_isa->install_device(0x0226, 0x0227, read8_delegate(FUNC(sb_device::dsp_reset_r), this), write8_delegate(FUNC(sb_device::dsp_reset_w), this));
+	m_isa->install_device(0x022a, 0x022b, read8_delegate(FUNC(sb_device::dsp_data_r), this), write8_delegate(FUNC(sb_device::dsp_data_w), this) );
+	m_isa->install_device(0x022c, 0x022d, read8_delegate(FUNC(sb_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_cmd_w), this) );
+	m_isa->install_device(0x022e, 0x022f, read8_delegate(FUNC(sb_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_rbuf_status_w), this) );
 	if(m_dsp.version >= 0x0301)
 	{
 		ymf262_device *ymf262 = subdevice<ymf262_device>("ymf262");
 
-		m_isa->install_device(0x0388, 0x038b, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-		m_isa->install_device(0x0220, 0x0223, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-		m_isa->install_device(0x0228, 0x0229, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+		m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+		m_isa->install_device(0x0220, 0x0223, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+		m_isa->install_device(0x0228, 0x0229, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
 	}
 	else
 	{
-		m_isa->install_device(0x0388, 0x0389, 0, 0, read8_delegate( FUNC(sb8_device::ym3812_16_r), this ), write8_delegate( FUNC(sb8_device::ym3812_16_w), this ) );
-		m_isa->install_device(0x0228, 0x0229, 0, 0, read8_delegate( FUNC(sb8_device::ym3812_16_r), this ), write8_delegate( FUNC(sb8_device::ym3812_16_w), this ) );
+		m_isa->install_device(0x0388, 0x0389, read8_delegate( FUNC(sb8_device::ym3812_16_r), this ), write8_delegate( FUNC(sb8_device::ym3812_16_w), this ) );
+		m_isa->install_device(0x0228, 0x0229, read8_delegate( FUNC(sb8_device::ym3812_16_r), this ), write8_delegate( FUNC(sb8_device::ym3812_16_w), this ) );
 	}
 
 	m_timer = timer_alloc(0, nullptr);
@@ -1305,8 +1305,8 @@ void isa8_sblaster1_0_device::device_start()
 {
 	set_isa_device();
 	// 1.0 always has the SAA1099s for CMS back-compatibility
-	m_isa->install_device(0x0220, 0x0221, 0, 0, read8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_1_16_w), this ) );
-	m_isa->install_device(0x0222, 0x0223, 0, 0, read8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_2_16_w), this ) );
+	m_isa->install_device(0x0220, 0x0221, read8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_1_16_w), this ) );
+	m_isa->install_device(0x0222, 0x0223, read8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_2_16_w), this ) );
 	m_isa->set_dma_channel(1, this, FALSE);
 	m_dsp.version = 0x0105;
 	sb8_device::device_start();
@@ -1325,16 +1325,16 @@ void sb16_device::device_start()
 {
 	ymf262_device *ymf262 = subdevice<ymf262_device>("ymf262");
 
-	m_isa->install_device(0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
-	m_isa->install_device(0x0224, 0x0225, 0, 0, read8_delegate(FUNC(sb16_device::mixer_r), this), write8_delegate(FUNC(sb16_device::mixer_w), this));
-	m_isa->install_device(0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb_device::dsp_reset_r), this), write8_delegate(FUNC(sb_device::dsp_reset_w), this));
-	m_isa->install_device(0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb_device::dsp_data_r), this), write8_delegate(FUNC(sb_device::dsp_data_w), this) );
-	m_isa->install_device(0x022c, 0x022d, 0, 0, read8_delegate(FUNC(sb_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_cmd_w), this) );
-	m_isa->install_device(0x022e, 0x022f, 0, 0, read8_delegate(FUNC(sb_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_rbuf_status_w), this) );
-	m_isa->install_device(0x0330, 0x0331, 0, 0, read8_delegate(FUNC(sb16_device::mpu401_r), this), write8_delegate(FUNC(sb16_device::mpu401_w), this));
-	m_isa->install_device(0x0388, 0x038b, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-	m_isa->install_device(0x0220, 0x0223, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-	m_isa->install_device(0x0228, 0x0229, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0200, 0x0207, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
+	m_isa->install_device(0x0224, 0x0225, read8_delegate(FUNC(sb16_device::mixer_r), this), write8_delegate(FUNC(sb16_device::mixer_w), this));
+	m_isa->install_device(0x0226, 0x0227, read8_delegate(FUNC(sb_device::dsp_reset_r), this), write8_delegate(FUNC(sb_device::dsp_reset_w), this));
+	m_isa->install_device(0x022a, 0x022b, read8_delegate(FUNC(sb_device::dsp_data_r), this), write8_delegate(FUNC(sb_device::dsp_data_w), this) );
+	m_isa->install_device(0x022c, 0x022d, read8_delegate(FUNC(sb_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_cmd_w), this) );
+	m_isa->install_device(0x022e, 0x022f, read8_delegate(FUNC(sb_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_rbuf_status_w), this) );
+	m_isa->install_device(0x0330, 0x0331, read8_delegate(FUNC(sb16_device::mpu401_r), this), write8_delegate(FUNC(sb16_device::mpu401_w), this));
+	m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0220, 0x0223, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0228, 0x0229, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
 
 	m_timer = timer_alloc(0, nullptr);
 

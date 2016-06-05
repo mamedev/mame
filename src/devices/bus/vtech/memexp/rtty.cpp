@@ -59,7 +59,7 @@ void rtty_interface_device::device_start()
 void rtty_interface_device::device_reset()
 {
 	// program
-	m_slot->m_program->install_rom(0x4000, 0x4fff, 0, 0x1000, memregion("software")->base());
+	m_slot->m_program->install_rom(0x4000, 0x4fff, 0x1000, memregion("software")->base());
 
 	// data
 	m_slot->m_program->install_read_handler(0x5000, 0x57ff, read8_delegate(FUNC(rtty_interface_device::receive_data_r), this));

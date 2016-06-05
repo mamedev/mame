@@ -206,8 +206,8 @@ wdxt_gen_device::wdxt_gen_device(const machine_config &mconfig, const char *tag,
 void wdxt_gen_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
-	m_isa->install_device(0x0320, 0x0323, 0, 0, READ8_DEVICE_DELEGATE(m_host, wd11c00_17_device, io_r), WRITE8_DEVICE_DELEGATE(m_host, wd11c00_17_device, io_w));
+	m_isa->install_rom(this, 0xc8000, 0xc9fff, "hdc", "hdc");
+	m_isa->install_device(0x0320, 0x0323, READ8_DEVICE_DELEGATE(m_host, wd11c00_17_device, io_r), WRITE8_DEVICE_DELEGATE(m_host, wd11c00_17_device, io_w));
 	m_isa->set_dma_channel(3, this, FALSE);
 }
 

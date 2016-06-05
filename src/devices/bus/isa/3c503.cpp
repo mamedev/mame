@@ -35,8 +35,8 @@ void el2_3c503_device::device_start() {
 	memset(m_rom, 0, 8*1024); // empty
 	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install_device(0x0300, 0x030f, 0, 0, read8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_w), this));
-	m_isa->install_device(0x0700, 0x070f, 0, 0, read8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_w), this));
+	m_isa->install_device(0x0300, 0x030f, read8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_w), this));
+	m_isa->install_device(0x0700, 0x070f, read8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_w), this));
 
 	// TODO: This is wrong, fix if anything actually uses it
 	//  DMA can change in runtime
@@ -57,8 +57,8 @@ void el2_3c503_device::device_reset() {
 	m_regs.pcfr = 0x20; // address 0xcc000
 	m_regs.ctrl = 0x0a;
 	m_irq_state = CLEAR_LINE;
-	m_isa->unmap_bank(SADDR, SADDR + 0x1fff, 0, 0);
-	m_isa->install_bank(SADDR, SADDR + 0x1fff, 0, 0, "3c503 rom", m_rom);
+	m_isa->unmap_bank(SADDR, SADDR + 0x1fff);
+	m_isa->install_bank(SADDR, SADDR + 0x1fff, "3c503 rom", m_rom);
 }
 
 void el2_3c503_device::set_irq(int state) {
@@ -193,16 +193,16 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_hiport_w) {
 		return;
 	case 5:
 		if((m_regs.gacfr & 0xf) != (data & 0xf)) {
-			m_isa->unmap_bank(SADDR, SADDR + 0x1fff, 0, 0);
+			m_isa->unmap_bank(SADDR, SADDR + 0x1fff);
 			switch(data & 0xf) {
 			case 0:
-				m_isa->install_bank(SADDR, SADDR + 0x1fff, 0, 0, "3c503 rom", m_rom);
+				m_isa->install_bank(SADDR, SADDR + 0x1fff, "3c503 rom", m_rom);
 				break;
 			case 9:
-				m_isa->install_bank(SADDR, SADDR + 0x1fff, 0, 0, "3c503 ram", m_board_ram);
+				m_isa->install_bank(SADDR, SADDR + 0x1fff, "3c503 ram", m_board_ram);
 				break;
 			default:
-				m_isa->install_bank(SADDR, SADDR + 0x1fff, 0, 0, "3c503 no map", m_rom);
+				m_isa->install_bank(SADDR, SADDR + 0x1fff, "3c503 no map", m_rom);
 				break;
 			}
 		}

@@ -29,7 +29,7 @@ void super6_state::bankswitch()
 	UINT8 *ram = m_ram->pointer();
 
 	// power on jump
-	if (!BIT(m_bank0, 6)) { program.install_rom(0x0000, 0x07ff, 0, 0xf800, m_rom); return; }
+	if (!BIT(m_bank0, 6)) { program.install_rom(0x0000, 0x07ff, 0xf800, m_rom); return; }
 
 	// first 64KB of memory
 	program.install_ram(0x0000, 0xffff, ram);
@@ -82,7 +82,7 @@ void super6_state::bankswitch()
 	if (BIT(m_bank0, 3)) program.install_ram(0xc000, 0xffff, ram + 0xc000);
 
 	// PROM enabled
-	if (!BIT(m_bank0, 5)) program.install_rom(0xf000, 0xf7ff, 0, 0x800, m_rom);
+	if (!BIT(m_bank0, 5)) program.install_rom(0xf000, 0xf7ff, 0x800, m_rom);
 }
 
 

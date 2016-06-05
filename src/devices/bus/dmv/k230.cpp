@@ -165,7 +165,7 @@ void dmv_k230_device::device_start()
 void dmv_k234_device::device_start()
 {
 	dmv_k230_device::device_start();
-	m_io->install_readwrite_handler(0xd8, 0xdf, 0, 0, read8_delegate(FUNC(dmv_k234_device::snr_r), this), write8_delegate(FUNC(dmv_k234_device::snr_w), this), 0);
+	m_io->install_readwrite_handler(0xd8, 0xdf, read8_delegate(FUNC(dmv_k234_device::snr_r), this), write8_delegate(FUNC(dmv_k234_device::snr_w), this), 0);
 }
 
 //-------------------------------------------------

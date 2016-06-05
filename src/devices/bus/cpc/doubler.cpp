@@ -53,7 +53,7 @@ void cpc_doubler_device::device_start()
 	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	space.install_read_handler(0xf0e0,0xf0e0,0,0,read8_delegate(FUNC(cpc_doubler_device::ext_tape_r),this));
+	space.install_read_handler(0xf0e0,0xf0e0,read8_delegate(FUNC(cpc_doubler_device::ext_tape_r),this));
 }
 
 //-------------------------------------------------

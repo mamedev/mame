@@ -330,7 +330,7 @@ void abc806_state::bankswitch()
 
 					program.install_read_bank(0x7000, 0x77ff, bank_name);
 					program.unmap_write(0x7000, 0x77ff);
-					program.install_readwrite_handler(0x7800, 0x7fff, 0, 0, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
+					program.install_readwrite_handler(0x7800, 0x7fff, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
 					membank(bank_name)->set_entry(0);
 					break;
 
@@ -365,7 +365,7 @@ void abc806_state::bankswitch()
 			if (start_addr == 0x7000)
 			{
 				program.install_readwrite_bank(0x7000, 0x77ff, bank_name);
-				program.install_readwrite_handler(0x7800, 0x7fff, 0, 0, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
+				program.install_readwrite_handler(0x7800, 0x7fff, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
 			}
 			else
 			{
@@ -562,10 +562,10 @@ static ADDRESS_MAP_START( abc806_io, AS_IO, 8, abc806_state )
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff18) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_t, rst_r) AM_WRITE(hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff00) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
-	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(mai_r, mao_w)
+	AM_RANGE(0x34, 0x34) AM_SELECT(0xff00) AM_READWRITE(mai_r, mao_w)
 	AM_RANGE(0x35, 0x35) AM_MIRROR(0xff00) AM_READWRITE(ami_r, amo_w)
 	AM_RANGE(0x36, 0x36) AM_MIRROR(0xff00) AM_READWRITE(sti_r, sto_w)
-	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(cli_r, sso_w)
+	AM_RANGE(0x37, 0x37) AM_SELECT(0xff00) AM_READWRITE(cli_r, sso_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff00) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff00) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio2_device, ba_cd_r, ba_cd_w)
