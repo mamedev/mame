@@ -450,6 +450,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe3 );
 	DECLARE_WRITE_LINE_MEMBER( ata_interrupt );
 	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
+	TIMER_DEVICE_CALLBACK_MEMBER( punchmania_motor_timer_callback );
 	DECLARE_WRITE8_MEMBER( ddr_output_callback );
 	DECLARE_WRITE8_MEMBER( ddrsolo_output_callback );
 	DECLARE_WRITE8_MEMBER( drmn_output_callback );
@@ -462,6 +463,8 @@ public:
 	void cdrom_dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size );
 	void sys573_vblank( screen_device &screen, bool vblank_state );
 	double m_pad_position[ 6 ];
+	bool m_pad_motor_up[ 6 ];
+	bool m_pad_motor_down[ 6 ];
 	required_ioport m_analog0;
 	required_ioport m_analog1;
 	required_ioport m_analog2;
@@ -1684,35 +1687,69 @@ WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b5 )
 
 
 /* punch mania */
+#define PAD_MAX_VALUE 255.0f
+#define PAD_MIN_VALUE 0.0f
+
+TIMER_DEVICE_CALLBACK_MEMBER(ksys573_state::punchmania_motor_timer_callback)
+{
+	// SW compares against a fixed timer for detecting if movement is from player punch or just motor.
+	const double pad_step = 3.0f;
+#if 0
+	if(machine().input().code_pressed(KEYCODE_Z))
+		pad_step+=0.1f;
+	if(machine().input().code_pressed(KEYCODE_X))
+		pad_step-=0.1f;
+#endif	
+	double *pad_position = m_pad_position;
+	bool *pad_motor_up = m_pad_motor_up;
+	bool *pad_motor_down = m_pad_motor_down;
+	
+	popmessage("%d %d %f %f",m_pad_motor_up[0],m_pad_motor_down[0],pad_position[0],pad_step);
+	
+	for(int i=0; i < 6; i++)
+	{
+		if(pad_motor_up[i] == true)
+		{
+			pad_position[i] -= pad_step;
+			
+			if(pad_position[i] < PAD_MIN_VALUE)
+				pad_position[i]  = PAD_MIN_VALUE;
+		}
+
+		if(pad_motor_down[i] == true)
+		{
+			pad_position[i] += pad_step;
+			
+			if(pad_position[i] > PAD_MAX_VALUE)
+				pad_position[i] = PAD_MAX_VALUE;
+		}
+	}
+}
 
 
 ADC083X_INPUT_CB(konami573_cassette_xi_device::punchmania_inputs_callback)
 {
 	ksys573_state *state = machine().driver_data<ksys573_state>();
 	double *pad_position = state->m_pad_position;
+	//bool *pad_motor_up = state->m_pad_motor_up;
+	//bool *pad_motor_down = state->m_pad_motor_down;
 	int pads = state->m_pads->read();
 	for( int i = 0; i < 6; i++ )
-	{
+	{	
 		if( ( pads & ( 1 << i ) ) != 0 )
 		{
-			pad_position[ i ] = 5;
+			pad_position[ i ] = PAD_MAX_VALUE;
 		}
 	}
 
+	if(input <= ADC083X_CH5)
+	{
+		UINT8 res = (UINT8)((pad_position[input] / PAD_MAX_VALUE) * (5.0f));
+		return res;
+	}
+	
 	switch( input )
 	{
-	case ADC083X_CH0:
-		return pad_position[ 0 ]; /* Left Top */
-	case ADC083X_CH1:
-		return pad_position[ 1 ]; /* Left Middle */
-	case ADC083X_CH2:
-		return pad_position[ 2 ]; /* Left Bottom */
-	case ADC083X_CH3:
-		return pad_position[ 3 ]; /* Right Top */
-	case ADC083X_CH4:
-		return pad_position[ 4 ]; /* Right Middle */
-	case ADC083X_CH5:
-		return pad_position[ 5 ]; /* Right Bottom */
 	case ADC083X_COM:
 		return 0;
 	case ADC083X_VREF:
@@ -1732,9 +1769,6 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER( ksys573_state::punchmania_output_callback )
 {
-	double *pad_position = m_pad_position;
-	//char pad[ 7 ];
-
 	switch( offset )
 	{
 	case 8:
@@ -1768,79 +1802,46 @@ WRITE8_MEMBER( ksys573_state::punchmania_output_callback )
 		output().set_value( "right_bottom_lamp", data == 0 );
 		break;
 	case 16:
-		if( data )
-		{
-			pad_position[ 0 ] = 0; // left top motor +
-		}
+		m_pad_motor_up[0] = data != 0;  // left top motor +
 		break;
 	case 17:
-		if( data )
-		{
-			pad_position[ 1 ] = 0; // left middle motor +
-		}
+		m_pad_motor_up[1] = data != 0;  // left middle motor +
 		break;
 	case 18:
-		if( data )
-		{
-			pad_position[ 1 ] = 5; // left middle motor -
-		}
+		m_pad_motor_down[1] = data != 0; // left middle motor -
 		break;
 	case 19:
-		if( data )
-		{
-			pad_position[ 0 ] = 5; // left top motor -
-		}
+		m_pad_motor_down[0] = data != 0; // left top motor -
 		break;
 	case 20:
-		if( data )
-		{
-			pad_position[ 2 ] = 0; // left bottom motor +
-		}
+		m_pad_motor_up[2] = data != 0; // left bottom motor +
 		break;
 	case 21:
-		if( data )
-		{
-			pad_position[ 3 ] = 5; // right top motor -
-		}
+		m_pad_motor_down[3] = data != 0; // right top motor -
 		break;
 	case 22:
-		if( data )
-		{
-			pad_position[ 3 ] = 0; // right top motor +
-		}
+		m_pad_motor_up[3] = data != 0; // right top motor +
 		break;
 	case 23:
-		if( data )
-		{
-			pad_position[ 2 ] = 5; // left bottom motor -
-		}
+		m_pad_motor_down[2] = data != 0; // left bottom motor -
 		break;
 	case 26:
-		if( data )
-		{
-			pad_position[ 5 ] = 0; // right bottom motor +
-		}
+		m_pad_motor_up[5] = data != 0; // right bottom motor +
 		break;
 	case 27:
-		if( data )
-		{
-			pad_position[ 4 ] = 0; // right middle motor +
-		}
+		m_pad_motor_up[4] = data != 0; // right middle motor +
 		break;
 	case 30:
-		if( data )
-		{
-			pad_position[ 4 ] = 5; // right middle motor -
-		}
+		m_pad_motor_down[4] = data != 0; // right middle motor -
 		break;
 	case 31:
-		if( data )
-		{
-			pad_position[ 5 ] = 5; // right bottom motor -
-		}
+		m_pad_motor_down[5] = data != 0; // right bottom motor -
 		break;
 	}
 	#if 0
+	double *pad_position = m_pad_position;
+	char pad[ 7 ];
+	
 	sprintf( pad, "%d%d%d%d%d%d",
 		( int )pad_position[ 0 ], ( int )pad_position[ 1 ], ( int )pad_position[ 2 ],
 		( int )pad_position[ 3 ], ( int )pad_position[ 4 ], ( int )pad_position[ 5 ] );
@@ -1851,7 +1852,7 @@ WRITE8_MEMBER( ksys573_state::punchmania_output_callback )
 	if( pad_light[ 3 ] ) pad[ 3 ] = '*';
 	if( pad_light[ 4 ] ) pad[ 4 ] = '*';
 	if( pad_light[ 5 ] ) pad[ 5 ] = '*';
-
+	
 	popmessage( "%s", pad );
 	#endif
 }
@@ -2367,6 +2368,8 @@ static MACHINE_CONFIG_DERIVED( pnchmn, konami573 )
 	MCFG_FRAGMENT_ADD( cassxi )
 	MCFG_FRAGMENT_ADD( pccard1_32mb )
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor_sim_timer", ksys573_state, punchmania_motor_timer_callback, attotime::from_hz(60))
+	
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", punchmania_cassette_install )
 MACHINE_CONFIG_END
