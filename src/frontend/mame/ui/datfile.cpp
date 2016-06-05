@@ -518,7 +518,7 @@ int datfile_manager::index_datafile(dataindex &index, int &swcount)
 					}
 					else
 					{
-						name = s_list;
+						name = s_list.substr(curpoint);
 						curpoint = ends;
 					}
 
