@@ -365,38 +365,38 @@ void debug_imgui::handle_keys_views()
 		return;
 
 	// pass keypresses to debug view with focus
-	if(m_machine->input().code_pressed_once(KEYCODE_UP))
+	if(ImGui::IsKeyPressed(ITEM_ID_UP))
 		focus_view->view->process_char(DCH_UP);
-	if(m_machine->input().code_pressed_once(KEYCODE_DOWN))
+	if(ImGui::IsKeyPressed(ITEM_ID_DOWN))
 		focus_view->view->process_char(DCH_DOWN);
-	if(m_machine->input().code_pressed_once(KEYCODE_LEFT))
+	if(ImGui::IsKeyPressed(ITEM_ID_LEFT))
 	{
-		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+		if(ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 			focus_view->view->process_char(DCH_CTRLLEFT);
 		else
 			focus_view->view->process_char(DCH_LEFT);
 	}
-	if(m_machine->input().code_pressed_once(KEYCODE_RIGHT))
+	if(ImGui::IsKeyPressed(ITEM_ID_RIGHT))
 	{
-		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+		if(ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 			focus_view->view->process_char(DCH_CTRLRIGHT);
 		else
 			focus_view->view->process_char(DCH_RIGHT);
 	}
-	if(m_machine->input().code_pressed_once(KEYCODE_PGUP))
+	if(ImGui::IsKeyPressed(ITEM_ID_PGUP))
 		focus_view->view->process_char(DCH_PUP);
-	if(m_machine->input().code_pressed_once(KEYCODE_PGDN))
+	if(ImGui::IsKeyPressed(ITEM_ID_PGDN))
 		focus_view->view->process_char(DCH_PDOWN);
-	if(m_machine->input().code_pressed_once(KEYCODE_HOME))
+	if(ImGui::IsKeyPressed(ITEM_ID_HOME))
 	{
-		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+		if(ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 			focus_view->view->process_char(DCH_CTRLHOME);
 		else
 			focus_view->view->process_char(DCH_HOME);
 	}
-	if(m_machine->input().code_pressed_once(KEYCODE_END))
+	if(ImGui::IsKeyPressed(ITEM_ID_END))
 	{
-		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+		if(ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 			focus_view->view->process_char(DCH_CTRLEND);
 		else
 			focus_view->view->process_char(DCH_END);
