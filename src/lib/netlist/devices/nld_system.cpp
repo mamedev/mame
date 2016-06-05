@@ -57,8 +57,7 @@ namespace netlist
 
 	NETLIB_RESET(logic_input)
 	{
-		//FIXME: causes issues in breakout (lots of pings after first player 1 start)
-		//m_Q.initial(m_IN.Value() & 1);
+		m_Q.initial(0);
 	}
 
 	NETLIB_UPDATE(logic_input)
@@ -76,7 +75,7 @@ namespace netlist
 
 	NETLIB_RESET(analog_input)
 	{
-	//	m_Q.initial(m_IN.Value() * 0.999);
+		m_Q.initial(0.0);
 	}
 
 	NETLIB_UPDATE(analog_input)

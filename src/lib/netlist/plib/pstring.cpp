@@ -131,8 +131,6 @@ const pstring_t<F> pstring_t<F>::substr(int start, int count) const
 		ret.pcopy(p, 0);
 	else
 	{
-		//FIXME: Trait to tell which one
-		//ret.pcopy(cstr() + start, count);
 		// find start
 		for (int i=0; i<start; i++)
 			p += F::codelen(p);

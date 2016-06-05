@@ -246,10 +246,10 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 
 void setup_t::register_term(core_terminal_t &term)
 {
-	if (term.isType(terminal_t::OUTPUT))
+	if (term.is_type(terminal_t::OUTPUT))
 	{
 	}
-	else if (term.isType(terminal_t::INPUT))
+	else if (term.is_type(terminal_t::INPUT))
 	{
 		static_cast<device_t &>(term.device()).m_terminals.push_back(term.name());
 	}
@@ -338,7 +338,6 @@ void setup_t::register_frontier(const pstring attach, const double r_IN, const d
 
 void setup_t::register_param(const pstring &param, const double value)
 {
-	// FIXME: there should be a better way
 	register_param(param, plib::pfmt("{1}").e(value,".9"));
 }
 
@@ -618,7 +617,7 @@ bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 		{
 			for (core_terminal_t *t : t1.net().m_core_terms)
 			{
-				if (t->isType(core_terminal_t::TERMINAL))
+				if (t->is_type(core_terminal_t::TERMINAL))
 					ret = connect(t2, *t);
 				if (ret)
 					break;
@@ -633,7 +632,7 @@ bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 		{
 			for (core_terminal_t *t : t2.net().m_core_terms)
 			{
-				if (t->isType(core_terminal_t::TERMINAL))
+				if (t->is_type(core_terminal_t::TERMINAL))
 					ret = connect(t1, *t);
 				if (ret)
 					break;
@@ -652,39 +651,39 @@ bool setup_t::connect(core_terminal_t &t1_in, core_terminal_t &t2_in)
 	core_terminal_t &t2 = resolve_proxy(t2_in);
 	bool ret = true;
 
-	if (t1.isType(core_terminal_t::OUTPUT) && t2.isType(core_terminal_t::INPUT))
+	if (t1.is_type(core_terminal_t::OUTPUT) && t2.is_type(core_terminal_t::INPUT))
 	{
 		if (t2.has_net() && t2.net().isRailNet())
 			log().fatal("Input {1} already connected\n", t2.name());
 		connect_input_output(t2, t1);
 	}
-	else if (t1.isType(core_terminal_t::INPUT) && t2.isType(core_terminal_t::OUTPUT))
+	else if (t1.is_type(core_terminal_t::INPUT) && t2.is_type(core_terminal_t::OUTPUT))
 	{
 		if (t1.has_net()  && t1.net().isRailNet())
 			log().fatal("Input {1} already connected\n", t1.name());
 		connect_input_output(t1, t2);
 	}
-	else if (t1.isType(core_terminal_t::OUTPUT) && t2.isType(core_terminal_t::TERMINAL))
+	else if (t1.is_type(core_terminal_t::OUTPUT) && t2.is_type(core_terminal_t::TERMINAL))
 	{
 		connect_terminal_output(dynamic_cast<terminal_t &>(t2), t1);
 	}
-	else if (t1.isType(core_terminal_t::TERMINAL) && t2.isType(core_terminal_t::OUTPUT))
+	else if (t1.is_type(core_terminal_t::TERMINAL) && t2.is_type(core_terminal_t::OUTPUT))
 	{
 		connect_terminal_output(dynamic_cast<terminal_t &>(t1), t2);
 	}
-	else if (t1.isType(core_terminal_t::INPUT) && t2.isType(core_terminal_t::TERMINAL))
+	else if (t1.is_type(core_terminal_t::INPUT) && t2.is_type(core_terminal_t::TERMINAL))
 	{
 		connect_terminal_input(dynamic_cast<terminal_t &>(t2), t1);
 	}
-	else if (t1.isType(core_terminal_t::TERMINAL) && t2.isType(core_terminal_t::INPUT))
+	else if (t1.is_type(core_terminal_t::TERMINAL) && t2.is_type(core_terminal_t::INPUT))
 	{
 		connect_terminal_input(dynamic_cast<terminal_t &>(t1), t2);
 	}
-	else if (t1.isType(core_terminal_t::TERMINAL) && t2.isType(core_terminal_t::TERMINAL))
+	else if (t1.is_type(core_terminal_t::TERMINAL) && t2.is_type(core_terminal_t::TERMINAL))
 	{
 		connect_terminals(dynamic_cast<terminal_t &>(t1), dynamic_cast<terminal_t &>(t2));
 	}
-	else if (t1.isType(core_terminal_t::INPUT) && t2.isType(core_terminal_t::INPUT))
+	else if (t1.is_type(core_terminal_t::INPUT) && t2.is_type(core_terminal_t::INPUT))
 	{
 		ret = connect_input_input(t1, t2);
 	}
@@ -768,7 +767,6 @@ void setup_t::resolve_inputs()
 
 
 	log().verbose("looking for two terms connected to rail nets ...\n");
-	// FIXME: doesn't find internal devices. This needs to be more clever
 	for (std::size_t i=0; i < netlist().m_devices.size(); i++)
 	{
 		devices::NETLIB_NAME(twoterm) *t = dynamic_cast<devices::NETLIB_NAME(twoterm) *>(netlist().m_devices[i].get());

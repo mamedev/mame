@@ -206,7 +206,7 @@ class NETLIB_NAME(name) : public device_t
 		: device_t(owner, name)
 
 #define NETLIB_DYNAMIC() 														\
-	public: virtual bool is_dynamic1() const override { return true; }
+	public: virtual bool is_dynamic() const override { return true; }
 
 #define NETLIB_TIMESTEP() 														\
 	public: virtual bool is_timestep() const override { return true; } \
@@ -367,7 +367,7 @@ namespace netlist
 		plib::pstate_manager_t &state_manager();
 
 		type_t type() const { return m_objtype; }
-		bool isType(const type_t atype) const { return (m_objtype == atype); }
+		bool is_type(const type_t atype) const { return (m_objtype == atype); }
 
 		netlist_t & netlist() { return m_netlist; }
 		const netlist_t & netlist() const { return m_netlist; }
@@ -427,6 +427,7 @@ namespace netlist
 		void set_net(net_t *anet);
 		void clear_net();
 		bool has_net() const { return (m_net != nullptr); }
+
 		const net_t & net() const { return *m_net;}
 		net_t & net() { return *m_net;}
 
@@ -441,8 +442,7 @@ namespace netlist
 			m_state = astate;
 		}
 
-		// FIXME: need to get rid at some point
-		virtual void reset() { }
+		void reset();
 
 	private:
 		net_t * m_net;
@@ -464,10 +464,6 @@ namespace netlist
 
 		const analog_net_t & net() const;
 		analog_net_t & net();
-
-	protected:
-
-	private:
 	};
 
 	// -----------------------------------------------------------------------------
@@ -516,8 +512,6 @@ namespace netlist
 			m_Idr1 = Idr;
 		}
 
-	protected:
-		void reset() override;
 	private:
 		void set_ptr(nl_double *ptr, const nl_double val)
 		{
@@ -531,7 +525,7 @@ namespace netlist
 		nl_double *m_go1;  // conductance for Voltage from other term
 		nl_double *m_gt1;  // conductance for total conductance
 
-};
+	};
 
 
 	// -----------------------------------------------------------------------------
@@ -576,12 +570,6 @@ namespace netlist
 		void activate_hl();
 		void activate_lh();
 
-	protected:
-		virtual void reset() override
-		{
-			set_state(STATE_INP_ACTIVE);
-		}
-
 	};
 
 	// -----------------------------------------------------------------------------
@@ -595,11 +583,6 @@ namespace netlist
 
 		nl_double Q_Analog() const;
 
-	protected:
-		virtual void reset() override
-		{
-			set_state(STATE_INP_ACTIVE);
-		}
 	};
 
 	// -----------------------------------------------------------------------------
@@ -610,8 +593,6 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(net_t)
 	public:
-
-		friend class core_device_t; // FIXME
 
 		using ptr_t = net_t *;
 		using list_t = plib::pvector_t<std::shared_ptr<net_t>>;
@@ -726,6 +707,7 @@ namespace netlist
 
 		nl_double Q_Analog() const { return m_cur_Analog; }
 		nl_double &Q_Analog_state_ptr() { return m_cur_Analog; }
+
 		//FIXME: needed by current solver code
 		devices::matrix_solver_t *solver() { return m_solver; }
 		void set_solver(devices::matrix_solver_t *solver) { m_solver = solver; }
@@ -748,16 +730,10 @@ namespace netlist
 
 		logic_output_t(core_device_t &dev, const pstring &aname);
 
-		virtual void reset() override
-		{
-			set_state(STATE_OUT);
-		}
-
 		void initial(const netlist_sig_t val);
 
 		void set_Q(const netlist_sig_t newQ, const netlist_time delay) NOEXCEPT
 		{
-			//net().set_Q(newQ, delay);
 			m_my_net.set_Q(newQ, delay); // take the shortcut
 		}
 
@@ -927,7 +903,7 @@ namespace netlist
 		virtual void update_terminals() { }
 
 		virtual void update_param() {}
-		virtual bool is_dynamic1() const { return false; }
+		virtual bool is_dynamic() const { return false; }
 		virtual bool is_timestep() const { return false; }
 		virtual bool needs_update_after_param_change() const { return false; }
 

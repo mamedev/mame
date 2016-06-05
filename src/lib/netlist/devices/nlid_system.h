@@ -540,7 +540,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	private:
-		analog_output_t m_GNDHack;  // FIXME: LOng term, we need to connect proxy gnd to device gnd
+		analog_output_t m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
 		NETLIB_SUB(twoterm) m_RV;
 		int m_last_state;
 		bool m_is_timestep;

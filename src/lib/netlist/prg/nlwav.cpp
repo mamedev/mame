@@ -50,7 +50,7 @@ public:
 	void write_sample(int sample)
 	{
 		m_data.len += m_fmt.block_align;
-		short ps = sample; /* 16 bit sample, FIXME: powerpc? */
+		short ps = sample; /* 16 bit sample, FIXME: Endianess? */
 		m_f.write(&ps, sizeof(ps));
 	}
 

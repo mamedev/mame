@@ -136,7 +136,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					if (p->device().is_timestep())
 						if (!m_step_devices.contains(&p->device()))
 							m_step_devices.push_back(&p->device());
-					if (p->device().is_dynamic1())
+					if (p->device().is_dynamic())
 						if (!m_dynamic_devices.contains(&p->device()))
 							m_dynamic_devices.push_back(&p->device());
 					{

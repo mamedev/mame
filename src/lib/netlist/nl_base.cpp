@@ -66,7 +66,6 @@ public:
 	}
 };
 
-//FIXME: set to proper values
 class logic_family_cd4xxx_t : public logic_family_desc_t
 {
 public:
@@ -507,7 +506,7 @@ void device_t::register_subalias(const pstring &name, core_terminal_t &term)
 	// everything already fully qualified
 	setup().register_alias_nofqn(alias, term.name());
 
-	if (term.isType(terminal_t::INPUT) || term.isType(terminal_t::TERMINAL))
+	if (term.is_type(terminal_t::INPUT) || term.is_type(terminal_t::TERMINAL))
 		m_terminals.push_back(alias);
 }
 
@@ -787,7 +786,7 @@ void analog_net_t::process_net(plib::pvector_t<list_t> &groups)
 	groups.back().push_back(this);
 	for (core_terminal_t *p : m_core_terms)
 	{
-		if (p->isType(terminal_t::TERMINAL))
+		if (p->is_type(terminal_t::TERMINAL))
 		{
 			terminal_t *pt = static_cast<terminal_t *>(p);
 			analog_net_t *other_net = &pt->m_otherterm->net();
@@ -809,6 +808,14 @@ core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname, const
 , m_state(STATE_NONEX)
 {
 	save(NLNAME(m_state));
+}
+
+void core_terminal_t::reset()
+{
+	if (is_type(OUTPUT))
+		set_state(STATE_OUT);
+	else
+		set_state(STATE_INP_ACTIVE);
 }
 
 void core_terminal_t::set_net(net_t::ptr_t anet)
@@ -854,15 +861,6 @@ void terminal_t::schedule_after(const netlist_time &after)
 		net().solver()->update_after(after);
 }
 
-void terminal_t::reset()
-{
-	set_state(STATE_INP_ACTIVE);
-	set_ptr(m_Idr1, 0.0);
-	set_ptr(m_go1, netlist().gmin());
-	set_ptr(m_gt1, netlist().gmin());
-}
-
-
 // ----------------------------------------------------------------------------------------
 // net_input_t
 // ----------------------------------------------------------------------------------------
@@ -906,7 +904,8 @@ analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname)
 // ----------------------------------------------------------------------------------------
 
 analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
-	: analog_t(dev, aname, OUTPUT), m_proxied_net(nullptr)
+	: analog_t(dev, aname, OUTPUT)
+	, m_proxied_net(nullptr)
 	, m_my_net(dev.netlist(), name() + ".net", this)
 {
 	this->set_net(&m_my_net);
