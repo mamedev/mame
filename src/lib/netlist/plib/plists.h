@@ -11,11 +11,10 @@
 #define PLISTS_H_
 
 #include <algorithm>
-#include <stack>
 #include <vector>
 #include <type_traits>
-#include <cstring>
-#include <array>
+//#include <cstring>
+//#include <array>
 
 #include "palloc.h"
 #include "pstring.h"
@@ -119,170 +118,77 @@ public:
 // ----------------------------------------------------------------------------------------
 
 template <class LC>
-class linkedlist_t;
-
-#if 1
-
-template <class LC>
-struct plinkedlist_element_t
-{
-public:
-
-	friend class linkedlist_t<LC>;
-
-	plinkedlist_element_t() : m_next(nullptr) {}
-
-	LC *next() const { return m_next; }
-//private:
-	LC * m_next;
-};
-
-template <class LC>
 class linkedlist_t
 {
 public:
 
+	struct element_t
+	{
+	public:
+
+		friend class linkedlist_t<LC>;
+
+		element_t() : m_next(nullptr) {}
+
+		LC *next() const { return m_next; }
+	private:
+		LC * m_next;
+	};
+
+	struct iter_t final : public std::iterator<std::forward_iterator_tag, LC>
+	{
+		LC* p;
+	public:
+		constexpr iter_t(LC* x) noexcept : p(x) {}
+		iter_t(const iter_t &rhs) noexcept = default;
+		iter_t(iter_t &&rhs) noexcept = default;
+		iter_t& operator++() noexcept {p = p->next();return *this;}
+		iter_t operator++(int) noexcept {iter_t tmp(*this); operator++(); return tmp;}
+		bool operator==(const iter_t& rhs) noexcept {return p==rhs.p;}
+		bool operator!=(const iter_t& rhs) noexcept {return p!=rhs.p;}
+		LC& operator*() noexcept {return *p;}
+		LC* operator->() noexcept {return p;}
+	};
+
 	linkedlist_t() : m_head(nullptr) {}
-#if 0
-	 void insert(const LC &before, LC &elem)
+
+	iter_t begin() const { return iter_t(m_head); }
+	constexpr iter_t end() const { return iter_t(nullptr); }
+
+	void push_front(LC *elem)
 	{
-		if (m_head == &before)
-		{
-			elem.m_next = m_head;
-			m_head = &elem;
-		}
-		else
-		{
-			LC *p = m_head;
-			while (p != nullptr)
-			{
-				if (p->m_next == &before)
-				{
-					elem->m_next = &before;
-					p->m_next = &elem;
-					return;
-				}
-				p = p->m_next;
-			}
-			//throw pexception("element not found");
-		}
-	}
-#endif
-	void insert(LC &elem)
-	{
-		elem.m_next = m_head;
-		m_head = &elem;
+		elem->m_next = m_head;
+		m_head = elem;
 	}
 
-	void add(LC &elem)
+	void push_back(LC *elem)
 	{
 		LC **p = &m_head;
 		while (*p != nullptr)
 		{
 			p = &((*p)->m_next);
 		}
-		*p = &elem;
-		elem.m_next = nullptr;
+		*p = elem;
+		elem->m_next = nullptr;
 	}
 
-	void remove(const LC &elem)
+	void remove(const LC *elem)
 	{
 		auto p = &m_head;
-		for ( ; *p != &elem; p = &((*p)->m_next))
+		for ( ; *p != elem; p = &((*p)->m_next))
 		{
 			//nl_assert(*p != nullptr);
 		}
-		(*p) = elem.m_next;
+		(*p) = elem->m_next;
 	}
 
-	 LC *first() const { return m_head; }
-	 void clear() { m_head = nullptr; }
-	 bool is_empty() const { return (m_head == nullptr); }
+	LC *front() const { return m_head; }
+	void clear() { m_head = nullptr; }
+	bool empty() const { return (m_head == nullptr); }
 
 //private:
 	LC *m_head;
 };
-#else
-
-template <class LC>
-struct plinkedlist_element_t
-{
-public:
-
-	friend class linkedlist_t<LC>;
-
-	plinkedlist_element_t() : m_next(nullptr), m_prev(nullptr) {}
-
-	LC *next() const { return m_next; }
-private:
-	LC * m_next;
-	LC * m_prev;
-};
-
-template <class LC>
-class linkedlist_t
-{
-public:
-
-	linkedlist_t() : m_head(nullptr), m_tail(nullptr) {}
-
-	 void insert(LC &elem)
-	{
-		if (m_head != nullptr)
-			m_head->m_prev = &elem;
-		elem.m_next = m_head;
-		elem.m_prev = nullptr;
-		m_head = &elem;
-		if (m_tail == nullptr)
-			m_tail = &elem;
-	}
-
-	 void add(LC &elem)
-	{
-		if (m_tail != nullptr)
-			m_tail->m_next = &elem;
-		elem.m_prev = m_tail;
-		m_tail = &elem;
-		elem.m_next = nullptr;
-		if (m_head == nullptr)
-			m_head = &elem;
-	}
-
-	 void remove(const LC &elem)
-	{
-		if (prev(elem) == nullptr)
-		{
-			m_head = next(elem);
-			if (m_tail == &elem)
-				m_tail = nullptr;
-		}
-		else
-			prev(elem)->m_next = next(elem);
-
-		if (next(elem) == nullptr)
-		{
-			m_tail = prev(elem);
-			if (m_head == &elem)
-				m_head = nullptr;
-		}
-		else
-			next(elem)->m_prev = prev(elem);
-	}
-
-
-	static  LC *next(const LC &elem) { return static_cast<LC *>(elem.m_next); }
-	static  LC *next(const LC *elem) { return static_cast<LC *>(elem->m_next); }
-	static  LC *prev(const LC &elem) { return static_cast<LC *>(elem.m_prev); }
-	static  LC *prev(const LC *elem) { return static_cast<LC *>(elem->m_prev); }
-	 LC *first() const { return m_head; }
-	 void clear() { m_head = m_tail = nullptr; }
-	 bool is_empty() const { return (m_head == nullptr); }
-
-private:
-	LC *m_head;
-	LC *m_tail;
-};
-#endif
 
 // ----------------------------------------------------------------------------------------
 // string list

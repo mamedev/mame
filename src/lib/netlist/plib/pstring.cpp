@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <algorithm>
+#include <stack>
 
 #include "pstring.h"
 #include "palloc.h"

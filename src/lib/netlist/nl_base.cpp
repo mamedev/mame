@@ -602,7 +602,7 @@ net_t::~net_t()
 void net_t::inc_active(core_terminal_t &term)
 {
 	m_active++;
-	m_list_active.insert(term);
+	m_list_active.push_front(&term);
 	nl_assert(m_active <= num_cons());
 	if (m_active == 1)
 	{
@@ -633,7 +633,7 @@ void net_t::dec_active(core_terminal_t &term)
 {
 	--m_active;
 	nl_assert(m_active >= 0);
-	m_list_active.remove(term);
+	m_list_active.remove(&term);
 	if (m_active == 0 && netlist().use_deactivate())
 		railterminal().device().do_dec_active();
 }
@@ -647,7 +647,7 @@ void net_t::rebuild_list()
 	for (auto & term : m_core_terms)
 		if (term->state() != logic_t::STATE_INP_PASSIVE)
 		{
-			m_list_active.add(*term);
+			m_list_active.push_back(term);
 			cnt++;
 		}
 	m_active = cnt;
@@ -671,11 +671,11 @@ void net_t::update_devs()
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
 
-	for (auto p = m_list_active.first(); p != nullptr; p = p->next())
+	for (auto & p : m_list_active)
 	{
-		inc_stat(p->device().stat_call_count);
-		if ((p->state() & mask) != 0)
-			p->device().update_dev();
+		inc_stat(p.device().stat_call_count);
+		if ((p.state() & mask) != 0)
+			p.device().update_dev();
 	}
 }
 
@@ -693,7 +693,7 @@ void net_t::reset()
 
 	m_list_active.clear();
 	for (core_terminal_t *ct : m_core_terms)
-		m_list_active.add(*ct);
+		m_list_active.push_back(ct);
 
 	for (core_terminal_t *ct : m_core_terms)
 		ct->reset();
@@ -805,7 +805,7 @@ void analog_net_t::process_net(plib::pvector_t<list_t> &groups)
 
 core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname, const type_t atype)
 : device_object_t(dev, dev.name() + "." + aname, atype)
-, plinkedlist_element_t()
+, plib::linkedlist_t<core_terminal_t>::element_t()
 , m_net(nullptr)
 , m_state(STATE_NONEX)
 {

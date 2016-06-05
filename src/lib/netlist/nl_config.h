@@ -93,7 +93,7 @@
 //============================================================
 
 #define NL_DEBUG                    (false)
-#define NL_KEEP_STATISTICS          (1)
+#define NL_KEEP_STATISTICS          (0)
 
 //============================================================
 //  General Macros

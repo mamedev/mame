@@ -403,7 +403,7 @@ namespace netlist
 	// core_terminal_t
 	// -----------------------------------------------------------------------------
 
-	class core_terminal_t : public device_object_t, public plib::plinkedlist_element_t<core_terminal_t>
+	class core_terminal_t : public device_object_t, public plib::linkedlist_t<core_terminal_t>::element_t
 	{
 		P_PREVENT_COPYING(core_terminal_t)
 	public:

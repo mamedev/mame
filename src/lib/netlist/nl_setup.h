@@ -9,6 +9,7 @@
 #define NLSETUP_H_
 
 #include <memory>
+#include <stack>
 #include "nl_base.h"
 #include "nl_factory.h"
 
