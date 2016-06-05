@@ -23,7 +23,7 @@ Connections
     E ----- |   2 | joy 1 down
             | 7   |
     D ----- |   3 | joy 1 left
-            | 8   |
+    A ----- | 8   | ground
     C ----- |   4 | joy 1 right
             | 9   |
             |   5 |
@@ -35,13 +35,14 @@ Connections
     K ----- |   2 | joy 2 down
             | 7   |
     J ----- |   3 | joy 2 left
-            | 8   |
+    N ----- | 8   | ground
     H ----- |   4 | joy 2 right
             | 9   |
             |   5 |
              \____|
 
-    M -----  audio amplifier
+    M ----- / audio
+    N ----- \ amplifier
 
 */
 
@@ -139,7 +140,6 @@ void pet_userport_joystick_and_sound_device::device_start()
 
 void pet_userport_joystick_and_sound_device::update_port1()
 {
-//	printf( "update port1\n" );
 	output_f(m_up1 && m_fire1);
 	output_e(m_down1 && m_fire1);
 }
@@ -151,7 +151,6 @@ void pet_userport_joystick_and_sound_device::update_port1()
 
 void pet_userport_joystick_and_sound_device::update_port2()
 {
-//	printf( "update port2\n" );
 	output_l(m_up2 && m_fire2);
 	output_k(m_down2 && m_fire2);
 }
