@@ -1044,26 +1044,30 @@ ifdef FASTBUILD
 endif
 
 #-------------------------------------------------
+# android-ndk
+#-------------------------------------------------
+
+.PHONY: android-ndk
+android-ndk:
+ifndef ANDROID_NDK_LLVM
+	$(error ANDROID_NDK_LLVM is not set)
+endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
+endif
+
+#-------------------------------------------------
 # android-arm
 #-------------------------------------------------
 
-$(PROJECTDIR_SDL)/gmake-android-arm/Makefile: makefile $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/gmake-android-arm/Makefile: makefile android-ndk $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_ARM
 	$(error ANDROID_NDK_ARM is not set)
-endif
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=arm --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 gmake
 
 .PHONY: android-arm
 android-arm: generate $(PROJECTDIR_SDL)/gmake-android-arm/Makefile
-ifndef ANDROID_NDK_ARM
-	$(error ANDROID_NDK_ARM is not set)
-endif
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
-endif	
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-arm config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-arm config=$(CONFIG)
 
@@ -1071,23 +1075,14 @@ endif
 # android-arm64
 #-------------------------------------------------
 
-$(PROJECTDIR_SDL)/gmake-android-arm64/Makefile: makefile $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/gmake-android-arm64/Makefile: makefile android-ndk $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_ARM64
 	$(error ANDROID_NDK_ARM64 is not set)
-endif
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=arm64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 gmake
 
 .PHONY: android-arm64
 android-arm64: generate $(PROJECTDIR_SDL)/gmake-android-arm64/Makefile
-ifndef ANDROID_NDK_ARM64
-	$(error ANDROID_NDK_ARM64 is not set)
-endif
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
-endif	
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-arm64 config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-arm64 config=$(CONFIG)
 
@@ -1095,23 +1090,14 @@ endif
 # android-mips
 #-------------------------------------------------
 
-$(PROJECTDIR_SDL)/gmake-android-mips/Makefile: makefile $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/gmake-android-mips/Makefile: makefile android-ndk $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_MIPS
 	$(error ANDROID_NDK_MIPS is not set)
-endif
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=mips --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 gmake
 
 .PHONY: android-mips
 android-mips: generate $(PROJECTDIR_SDL)/gmake-android-mips/Makefile
-ifndef ANDROID_NDK_MIPS
-	$(error ANDROID_NDK_MIPS is not set)
-endif
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
-endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-mips config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-mips config=$(CONFIG)
 
@@ -1119,23 +1105,14 @@ endif
 # android-mips64
 #-------------------------------------------------
 
-$(PROJECTDIR_SDL)/gmake-android-mips64/Makefile: makefile $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/gmake-android-mips64/Makefile: makefile android-ndk $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_MIPS64
 	$(error ANDROID_NDK_MIPS64 is not set)
-endif
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips64 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=mips64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 gmake
 
 .PHONY: android-mips64
 android-mips64: generate $(PROJECTDIR_SDL)/gmake-android-mips64/Makefile
-ifndef ANDROID_NDK_MIPS64
-	$(error ANDROID_NDK_MIPS64 is not set)
-endif
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
-endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-mips64 config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-mips64 config=$(CONFIG)
 
@@ -1143,23 +1120,14 @@ endif
 # android-x86
 #-------------------------------------------------
 
-$(PROJECTDIR_SDL)/gmake-android-x86/Makefile: makefile $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/gmake-android-x86/Makefile: makefile android-ndk $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_X86
 	$(error ANDROID_NDK_X86 is not set)
-endif
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=x86 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 gmake
 
 .PHONY: android-x86
 android-x86: generate $(PROJECTDIR_SDL)/gmake-android-x86/Makefile
-ifndef ANDROID_NDK_X86
-	$(error ANDROID_NDK_X86 is not set)
-endif
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
-endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-x86 config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-x86 config=$(CONFIG)
 
@@ -1167,23 +1135,14 @@ endif
 # android-x64
 #-------------------------------------------------
 
-$(PROJECTDIR_SDL)/gmake-android-x64/Makefile: makefile $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/gmake-android-x64/Makefile: makefile android-ndk $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_X64
 	$(error ANDROID_NDK_X64 is not set)
-endif
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=x64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 gmake
 
 .PHONY: android-x64
 android-x64: generate $(PROJECTDIR_SDL)/gmake-android-x64/Makefile
-ifndef ANDROID_NDK_X64
-	$(error ANDROID_NDK_X64 is not set)
-endif
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
-endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-x64 config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/gmake-android-x64 config=$(CONFIG)
 
