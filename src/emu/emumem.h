@@ -452,7 +452,7 @@ private:
 	void populate_map_entry(const address_map_entry &entry, read_or_write readorwrite);
 	void populate_map_entry_setoffset(const address_map_entry &entry);
 	void unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, bool quiet);
-	void *install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, void *baseptr);
+	void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, void *baseptr);
 	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag);
 	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank);
 	void adjust_addresses(offs_t &start, offs_t &end, offs_t &mask, offs_t &mirror);

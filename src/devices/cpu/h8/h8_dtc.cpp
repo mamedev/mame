@@ -77,10 +77,10 @@ WRITE8_MEMBER(h8_dtc_device::dtvecr_w)
 
 void h8_dtc_device::edge(int vector)
 {
-	for(std::list<int>::const_iterator i = waiting_vector.begin(); i != waiting_vector.end(); i++)
+	for(std::list<int>::const_iterator i = waiting_vector.begin(); i != waiting_vector.end(); ++i)
 		if(*i == vector)
 			return;
-	for(std::list<int>::const_iterator i = waiting_writeback.begin(); i != waiting_writeback.end(); i++)
+	for(std::list<int>::const_iterator i = waiting_writeback.begin(); i != waiting_writeback.end(); ++i)
 		if(*i == vector)
 			return;
 	if(waiting_vector.empty() && waiting_writeback.empty())
@@ -120,7 +120,7 @@ void h8_dtc_device::queue(int vector)
 void h8_dtc_device::vector_done(int vector)
 {
 	std::list<int>::iterator wi;
-	for(wi = waiting_vector.begin(); wi != waiting_vector.end() && *wi != vector && *wi != vector + DTC_CHAINED; wi++);
+	for(wi = waiting_vector.begin(); wi != waiting_vector.end() && *wi != vector && *wi != vector + DTC_CHAINED; ++wi) {};
 	assert(wi != waiting_vector.end());
 	waiting_vector.erase(wi);
 
@@ -167,7 +167,7 @@ void h8_dtc_device::vector_done(int vector)
 void h8_dtc_device::writeback_done(int vector)
 {
 	std::list<int>::iterator wi;
-	for(wi = waiting_writeback.begin(); wi != waiting_writeback.end() && *wi != vector; wi++);
+	for(wi = waiting_writeback.begin(); wi != waiting_writeback.end() && *wi != vector; ++wi) {};
 	assert(wi != waiting_writeback.end());
 	waiting_writeback.erase(wi);
 

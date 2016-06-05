@@ -239,7 +239,7 @@ elseif _OPTIONS["targetos"]=="macosx" then
 	SDL_NETWORK         = "pcap"
 end
 
-if _OPTIONS["with-bundled-sdl2"]~=nil or _OPTIONS["targetos"]=="android" then
+if _OPTIONS["with-bundled-sdl2"]~=nil then
 	includedirs {
 		GEN_DIR .. "includes",
 	}
@@ -295,10 +295,12 @@ if BASE_TARGETOS=="unix" then
 				"/usr/openwin/lib",
 			}
 		end
-		if _OPTIONS["with-bundled-sdl2"]~=nil and _OPTIONS["targetos"]~="android" then
-			links {
-				"SDL2",
-			}
+		if _OPTIONS["with-bundled-sdl2"]~=nil then
+			if _OPTIONS["targetos"]~="android" then
+				links {
+					"SDL2",
+				}
+			end
 		else
 			local str = backtick(sdlconfigcmd() .. " --libs")
 			addlibfromstring(str)

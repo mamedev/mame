@@ -348,13 +348,12 @@ bool debug_comment_save(running_machine &machine)
 	return comments_saved;
 }
 
-
 //-------------------------------------------------
 //  debug_comment_load - load all comments for
 //  the given machine
 //-------------------------------------------------
 
-bool debug_comment_load(running_machine &machine)
+bool debug_comment_load(running_machine &machine,bool is_inline)
 {
 	// open the file
 	emu_file file(machine.options().comment_directory(), OPEN_FLAG_READ);
@@ -391,10 +390,16 @@ bool debug_comment_load(running_machine &machine)
 		// iterate over devices
 		for (xml_data_node *cpunode = xml_get_sibling(systemnode->child, "cpu"); cpunode; cpunode = xml_get_sibling(cpunode->next, "cpu"))
 		{
-			device_t *device = machine.device(xml_get_attribute_string(cpunode, "tag", ""));
+			const char *cputag_name = xml_get_attribute_string(cpunode, "tag", "");
+			device_t *device = machine.device(cputag_name);
 			if (device != nullptr)
-				if (!device->debug()->comment_import(*cpunode))
+			{
+				if(is_inline == false)
+					debug_console_printf(machine,"@%s\n",cputag_name);
+				
+				if (!device->debug()->comment_import(*cpunode,is_inline))
 					throw emu_exception();
+			}
 		}
 	}
 	catch (emu_exception &)
@@ -1904,7 +1909,7 @@ void device_debug::instruction_hook(offs_t curpc)
 		// load comments if we haven't yet
 		if (!global->comments_loaded)
 		{
-			debug_comment_load(m_device.machine());
+			debug_comment_load(m_device.machine(),true);
 			global->comments_loaded = true;
 		}
 
@@ -2692,8 +2697,8 @@ bool device_debug::comment_export(xml_data_node &curnode)
 //  given XML data node
 //-------------------------------------------------
 
-bool device_debug::comment_import(xml_data_node &cpunode)
-{
+bool device_debug::comment_import(xml_data_node &cpunode,bool is_inline)
+{	
 	// iterate through nodes
 	for (xml_data_node *datanode = xml_get_sibling(cpunode.child, "comment"); datanode; datanode = xml_get_sibling(datanode->next, "comment"))
 	{
@@ -2705,7 +2710,10 @@ bool device_debug::comment_import(xml_data_node &cpunode)
 		sscanf(xml_get_attribute_string(datanode, "crc", nullptr), "%08X", &crc);
 
 		// add the new comment
-		m_comment_set.insert(dasm_comment(address, crc, datanode->value, color));
+		if(is_inline == true)
+			m_comment_set.insert(dasm_comment(address, crc, datanode->value, color));
+		else
+			debug_console_printf(m_device.machine()," %08X - %s\n",address,datanode->value);
 	}
 	return true;
 }

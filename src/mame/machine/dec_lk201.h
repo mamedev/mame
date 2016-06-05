@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER( sci_w );
 	DECLARE_READ8_MEMBER( spi_r );
 	DECLARE_WRITE8_MEMBER( spi_w );
+	DECLARE_READ8_MEMBER( timer_r );
+	DECLARE_WRITE8_MEMBER( timer_w );
 
 	template<class _Object> static devcb_base &set_tx_handler(device_t &device, _Object wr) { return downcast<lk201_device &>(device).m_tx_handler.set_callback(wr); }
 
@@ -75,6 +77,24 @@ private:
 	UINT8 ports[3];
 	UINT8 led_data;
 	UINT8 kbd_data;
+
+	union {
+		struct {
+			UINT8 tcr;
+			UINT8 tsr;
+			UINT8 icrh;
+			UINT8 icrl;
+			UINT8 ocrh;
+			UINT8 ocrl;
+			UINT8 crh;
+			UINT8 crl;
+			UINT8 acrh;
+			UINT8 acrl;
+		};
+		UINT8 regs[10];
+	} m_timer;
+
+	emu_timer *m_count;
 
 	UINT8 sci_ctl2;
 	UINT8 sci_status;

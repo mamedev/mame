@@ -55,8 +55,7 @@ drc_frontend::drc_frontend(device_t &cpu, UINT32 window_start, UINT32 window_end
 		m_cpudevice(downcast<cpu_device &>(cpu)),
 		m_program(m_cpudevice.space(AS_PROGRAM)),
 		m_pageshift(m_cpudevice.space_config(AS_PROGRAM)->m_page_shift),
-		m_desc_array(window_end + window_start + 2, nullptr),
-		m_allow_branch_in_delay(false)
+		m_desc_array(window_end + window_start + 2, nullptr)
 {
 }
 
@@ -157,7 +156,7 @@ const opcode_desc *drc_frontend::describe_code(offs_t startpc)
 //  slots of branches as well
 //-------------------------------------------------
 
-opcode_desc *drc_frontend::describe_one(offs_t curpc, const opcode_desc *prevdesc)
+opcode_desc *drc_frontend::describe_one(offs_t curpc, const opcode_desc *prevdesc, bool in_delay_slot)
 {
 	// initialize the description
 	opcode_desc *desc = m_desc_allocator.alloc();
@@ -171,7 +170,8 @@ opcode_desc *drc_frontend::describe_one(offs_t curpc, const opcode_desc *prevdes
 	desc->length = 0;
 	desc->delayslots = 0;
 	desc->skipslots = 0;
-	desc->flags = 0;
+	// set the delay slot flag
+	desc->flags = in_delay_slot ? OPFLAG_IN_DELAY_SLOT : 0;
 	desc->userflags = 0;
 	desc->cycles = 0;
 	memset(desc->regin, 0x00, sizeof(desc->regin));
@@ -197,26 +197,26 @@ opcode_desc *drc_frontend::describe_one(offs_t curpc, const opcode_desc *prevdes
 	{
 		// iterate over slots and describe them
 		offs_t delaypc = curpc + desc->length;
-
-		// If previous instruction is a branch use the target pc. Currently MIP3s only.
-		if (m_allow_branch_in_delay && prevdesc && (prevdesc->flags & OPFLAG_IS_BRANCH) && prevdesc->targetpc != BRANCH_TARGET_DYNAMIC) {
-			// We got here because the previous instruction is a branch and this instruction is a branch.
-			// So the PC of the delay slot for the this branch will be the target address of the previous branch.
-			delaypc = prevdesc->targetpc;
-			//printf("drc_frontend::describe_one: branch in delay slot. curpc=0x%08X, delaypc=0x%08X\n", curpc, delaypc);
+		// If this is a delay slot it is the true branch fork and the pc should be the previous branch target
+		if (desc->flags & OPFLAG_IN_DELAY_SLOT) {
+			if (prevdesc->targetpc != BRANCH_TARGET_DYNAMIC) {
+				delaypc = prevdesc->targetpc;
+				//printf("drc_frontend::describe_one Branch in delay slot. curpc=%08X delaypc=%08X\n", curpc, delaypc);
+			} else {
+				//printf("drc_frontend::describe_one Warning! Branch in delay slot of dynamic target. curpc=%08X\n", curpc);
+			}
 		}
 		opcode_desc *prev = desc;
 		for (UINT8 slotnum = 0; slotnum < desc->delayslots; slotnum++)
 		{
 			// recursively describe the next instruction
-			opcode_desc *delaydesc = describe_one(delaypc, prev);
+			opcode_desc *delaydesc = describe_one(delaypc, prev, true);
 			if (delaydesc == nullptr)
 				break;
 			desc->delay.append(*delaydesc);
 			prev = desc;
 
-			// set the delay slot flag and a pointer back to the original branch
-			delaydesc->flags |= OPFLAG_IN_DELAY_SLOT;
+			// set a pointer back to the original branch
 			delaydesc->branch = desc;
 
 			// stop if we hit a page fault

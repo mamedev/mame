@@ -3333,7 +3333,7 @@ INT32 voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, UINT32 data, UINT32
 				/* pixel pipeline part 2 handles color blending, fog, alpha, and final output */
 				PIXEL_PIPELINE_END(vd, stats, dither, dither4, dither_lookup, x, dest, depth,
 					vd->reg[fbzMode].u, vd->reg[fbzColorPath].u, vd->reg[alphaMode].u, vd->reg[fogMode].u,
-					iterz, iterw, iterargb);
+					iterz, iterw, iterargb) { };
 nextpixel:
 			/* advance our pointers */
 			x++;

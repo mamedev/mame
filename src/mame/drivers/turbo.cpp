@@ -191,6 +191,7 @@
 MACHINE_RESET_MEMBER(turbo_state,buckrog)
 {
 	m_buckrog_command = 0x00;
+	memset(m_alt_spriteram, 0x00, sizeof(m_alt_spriteram));
 }
 
 
@@ -477,6 +478,17 @@ WRITE8_MEMBER(turbo_state::buckrog_i8255_0_w)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(turbo_state::delayed_i8255_w),this), ((offset & 3) << 8) | (data & 0xff));
 }
 
+READ8_MEMBER(turbo_state::spriteram_r)
+{
+	offset = (offset & 0x07) | ((offset & 0xf0) >> 1);
+	return m_alt_spriteram[offset];
+}
+
+WRITE8_MEMBER(turbo_state::spriteram_w)
+{
+	offset = (offset & 0x07) | ((offset & 0xf0) >> 1);
+	m_alt_spriteram[offset] = data;
+}
 
 
 /*************************************
@@ -487,7 +499,7 @@ WRITE8_MEMBER(turbo_state::buckrog_i8255_0_w)
 
 static ADDRESS_MAP_START( turbo_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x0700) AM_MASK(0x0f7) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x0700) AM_READWRITE(spriteram_r, spriteram_w)
 	AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_WRITE(turbo_coin_and_lamp_w)
 	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("spritepos")
 	AM_RANGE(0xb800, 0xbfff) AM_WRITE(turbo_analog_reset_w)
@@ -1758,7 +1770,13 @@ void turbo_state::turbo_rom_decode()
 
 DRIVER_INIT_MEMBER(turbo_state,turbo_enc)
 {
+	save_item(NAME(m_alt_spriteram));
 	turbo_rom_decode();
+}
+
+DRIVER_INIT_MEMBER(turbo_state,turbo_noenc)
+{
+	save_item(NAME(m_alt_spriteram));
 }
 
 
@@ -1770,12 +1788,12 @@ DRIVER_INIT_MEMBER(turbo_state,turbo_enc)
  *
  *************************************/
 
-GAMEL( 1981, turbo,    0,       turbo,     turbo,    driver_device, 0,           ROT270, "Sega", "Turbo (program 1513-1515)", MACHINE_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turbo,    0,       turbo,     turbo,    turbo_state,   turbo_noenc, ROT270, "Sega", "Turbo (program 1513-1515)", MACHINE_IMPERFECT_SOUND , layout_turbo )
 GAMEL( 1981, turboa,   turbo,   turbo,     turbo,    turbo_state,   turbo_enc,   ROT270, "Sega", "Turbo (encrypted, program 1262-1264)", MACHINE_IMPERFECT_SOUND , layout_turbo )
 GAMEL( 1981, turbob,   turbo,   turbo,     turbo,    turbo_state,   turbo_enc,   ROT270, "Sega", "Turbo (encrypted, program 1363-1365 rev B)", MACHINE_IMPERFECT_SOUND , layout_turbo )
 GAMEL( 1981, turboc,   turbo,   turbo,     turbo,    turbo_state,   turbo_enc,   ROT270, "Sega", "Turbo (encrypted, program 1363-1365 rev A)", MACHINE_IMPERFECT_SOUND , layout_turbo )
 GAMEL( 1981, turbod,   turbo,   turbo,     turbo,    turbo_state,   turbo_enc,   ROT270, "Sega", "Turbo (encrypted, program 1363-1365)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // but still reports 1262-1264 in the test mode?
-GAMEL( 1981, turbobl,  turbo,   turbo,     turbo,    driver_device, 0,           ROT270, "bootleg", "Indianapolis (bootleg of Turbo)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // decrypted bootleg of a 1262-1264 set
+GAMEL( 1981, turbobl,  turbo,   turbo,     turbo,    turbo_state,   turbo_noenc, ROT270, "bootleg", "Indianapolis (bootleg of Turbo)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // decrypted bootleg of a 1262-1264 set
 
 GAMEL( 1982, subroc3d, 0,       subroc3d,  subroc3d, driver_device, 0,           ORIENTATION_FLIP_X, "Sega", "Subroc-3D", MACHINE_IMPERFECT_SOUND , layout_subroc3d )
 
