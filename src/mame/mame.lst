@@ -1467,7 +1467,8 @@ alchemy
 atkgld
 amzqueen
 amztempl
-antcleo                         // (c) 2004
+antcleo
+antcleom                        // (c) 2004
 apocof
 arabnga6
 arabnga6u
@@ -1497,6 +1498,7 @@ canaryrc
 cmtonig
 cinhell
 csd
+csdsp
 csdm                         // (c) 2003
 csdce
 csret
@@ -1558,7 +1560,7 @@ indremce
 indremll
 indrem2c
 indremmm                        // (c) 2003
-indremcm
+indgldcm
 indprncs
 jailbrk
 jefffox
@@ -1566,6 +1568,7 @@ jewelcm
 kingnep
 kingnile
 kingnilea
+kingpeng
 koalama6
 kohinoor
 lgfish
@@ -1609,6 +1612,7 @@ pcfavor
 pcbydem
 pcmostw
 pcgold
+pcplat
 pwsuper
 pompeia6
 pompeia6u
@@ -1617,6 +1621,7 @@ prophecy
 qnile
 qnilese
 qnilejc
+qnilejcsp
 qsheeba
 raprichs
 redbara6
@@ -1625,6 +1630,7 @@ ruprup
 rubymag
 rumbreel
 scatmag2
+scatmag2sa
 sealdeal
 shorthng
 shamnmg
@@ -1677,6 +1683,7 @@ wldpanth
 wldstall
 wtepee
 wwaratah
+wwaratahsp
 wways
 wwaysm                        // (c) 2003
 wzwaysll
@@ -12739,8 +12746,10 @@ galgame                         // (c) 1971 Computer Recreations, Inc
 
 @source:galivan.cpp
 dangar                          // (c) 1986
-dangar2                         // (c) 1986
-dangarb                         // bootleg
+dangara                         // (c) 1986
+dangarb                         // (c) 1986
+dangarj                         // (c) 1986
+dangarbt                        // bootleg
 galivan                         // (c) 1985
 galivan2                        // (c) 1985
 galivan3                        // (c) 1985
@@ -14666,6 +14675,7 @@ wfortunea                       // (c) 1989 GameTek
 
 @source:itgambl2.cpp
 cmagica                         // (c) 200? unknown
+mcard_h8                        // (c) 200? unknown
 elvis                           // (c) 200? unknown
 europass                        // (c) 200? unknown
 laser2k1                        // (c) 2001 unknown
@@ -16641,6 +16651,7 @@ hypbbc2p                        // 1999 - Hyper Bishi Bashi Champ - 2 Player (GX
 hypbbc2pk                       // 1999 - Hyper Bishi Bashi Champ - 2 Player (GX908 1999/08/24 VER. KAA)
 hyperbbc                        // 1998 - Hyper Bishi Bashi (GQ876 VER. EAA)
 hyperbbca                       // 1998 - Hyper Bishi Bashi (GQ876 VER. AAA)
+hyperbbck                       // 1998 - Hyper Bishi Bashi (GE876 VER. KAA)
 konam80a                        // 1998 - Konami 80's AC Special (GC826 VER. AAA)
 konam80j                        // 1998 - Konami 80's Gallery (GC826 VER. JAA)
 konam80k                        // 1998 - Konami 80's AC Special (GC826 VER. KAA)
@@ -35305,6 +35316,7 @@ outzonea                        // TP-O18 (c) 1990 Toaplan
 outzoneb                        // TP-O18 (c) 1990 Toaplan
 outzonec                        // TP-O18 (c) 1990 Toaplan
 outzoneh                        // TP-O18 (c) 1990 Toaplan
+outzonecv                       // TP-O18 (c) 1990 Toaplan (TP-015 conversion)
 rallybik                        // B45 / TP-O12 (c) 1988 Taito
 samesame                        // TP-O17 (c) 1989 Toaplan
 samesame2                       // TP-O17 (c) 1989 Toaplan

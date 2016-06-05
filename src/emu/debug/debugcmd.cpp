@@ -115,6 +115,7 @@ static void execute_next(running_machine &machine, int ref, int params, const ch
 static void execute_comment(running_machine &machine, int ref, int params, const char **param);
 static void execute_comment_del(running_machine &machine, int ref, int params, const char **param);
 static void execute_comment_save(running_machine &machine, int ref, int params, const char **param);
+static void execute_comment_list(running_machine &machine, int ref, int params, const char **param);
 static void execute_bpset(running_machine &machine, int ref, int params, const char **param);
 static void execute_bpclear(running_machine &machine, int ref, int params, const char **param);
 static void execute_bpdisenable(running_machine &machine, int ref, int params, const char **param);
@@ -299,6 +300,7 @@ void debug_command_init(running_machine &machine)
 	debug_console_register_command(machine, "//",        CMDFLAG_NONE, 0, 1, 2, execute_comment);
 	debug_console_register_command(machine, "comdelete", CMDFLAG_NONE, 0, 1, 1, execute_comment_del);
 	debug_console_register_command(machine, "comsave",   CMDFLAG_NONE, 0, 0, 0, execute_comment_save);
+	debug_console_register_command(machine, "comlist",   CMDFLAG_NONE, 0, 0, 0, execute_comment_list);
 
 	debug_console_register_command(machine, "bpset",     CMDFLAG_NONE, 0, 1, 3, execute_bpset);
 	debug_console_register_command(machine, "bp",        CMDFLAG_NONE, 0, 1, 3, execute_bpset);
@@ -1177,11 +1179,25 @@ static void execute_comment_del(running_machine &machine, int ref, int params, c
 	cpu->machine().debug_view().update_all(DVT_DISASSEMBLY);
 }
 
+/**
+ * @fn void execute_comment_list(running_machine &machine, int ref, int params, const char *param[])
+ * @brief Print current list of comments in debugger
+ * 
+ *  
+ */
+
+static void execute_comment_list(running_machine &machine, int ref, int params, const char *param[])
+{
+	if (debug_comment_load(machine,false) == false)
+		debug_console_printf(machine, "Error while parsing XML file\n");
+}
+
 
 /*-------------------------------------------------
     execute_comment - add a comment to a line
 -------------------------------------------------*/
 
+// TODO: needs an autosave option in debugger for this, or a direct comment add and save.
 static void execute_comment_save(running_machine &machine, int ref, int params, const char *param[])
 {
 	if (debug_comment_save(machine))

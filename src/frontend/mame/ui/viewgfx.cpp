@@ -240,7 +240,7 @@ bool ui_gfx_is_relevant(running_machine &machine)
 //  ui_gfx_ui_handler - primary UI handler
 //-------------------------------------------------
 
-UINT32 ui_gfx_ui_handler(mame_ui_manager &mui, render_container *container, UINT32 uistate)
+UINT32 ui_gfx_ui_handler(render_container *container, mame_ui_manager &mui, bool uistate)
 {
 	ui_gfx_state &state = ui_gfx;
 

@@ -790,6 +790,29 @@ static ADDRESS_MAP_START( outzone_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0x340006, 0x340007) AM_WRITE(toaplan1_fcu_flipscreen_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( outzonecv_main_map, AS_PROGRAM, 16, toaplan1_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+//	AM_RANGE(0x040000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x087fff) AM_RAM
+	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(toaplan1_tile_offsets_w)
+	AM_RANGE(0x0c0006, 0x0c0007) AM_WRITE(toaplan1_fcu_flipscreen_w)
+	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("VBLANK")
+//  AM_RANGE(0x400000, 0x400001) AM_WRITE(?? video frame related ??)
+	AM_RANGE(0x400002, 0x400003) AM_WRITE(toaplan1_intenable_w)
+	AM_RANGE(0x400008, 0x40000f) AM_WRITE(toaplan1_bcu_control_w)
+	AM_RANGE(0x404000, 0x4047ff) AM_RAM_WRITE(toaplan1_bgpalette_w) AM_SHARE("bgpalette")
+	AM_RANGE(0x406000, 0x4067ff) AM_RAM_WRITE(toaplan1_fgpalette_w) AM_SHARE("fgpalette")
+	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(toaplan1_shared_r, toaplan1_shared_w)
+	AM_RANGE(0x480000, 0x480001) AM_WRITE(toaplan1_bcu_flipscreen_w)
+	AM_RANGE(0x480002, 0x480003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
+	AM_RANGE(0x480004, 0x480007) AM_READWRITE(toaplan1_tileram16_r, toaplan1_tileram16_w)
+	AM_RANGE(0x480010, 0x48001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
+	AM_RANGE(0x4c0000, 0x4c0001) AM_READ(toaplan1_frame_done_r)
+	AM_RANGE(0x4c0002, 0x4c0003) AM_READWRITE(toaplan1_spriteram_offs_r, toaplan1_spriteram_offs_w)
+	AM_RANGE(0x4c0004, 0x4c0005) AM_READWRITE(toaplan1_spriteram16_r, toaplan1_spriteram16_w)
+	AM_RANGE(0x4c0006, 0x4c0007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( vimana_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080003) AM_WRITE(toaplan1_tile_offsets_w)
@@ -2058,6 +2081,44 @@ static MACHINE_CONFIG_START( outzone, toaplan1_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_START( outzonecv, toaplan1_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP(outzonecv_main_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
+
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_CPU_IO_MAP(zerowing_sound_io_map)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16)
+	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
+	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_state, screen_eof_toaplan1)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
+	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_START( vimana, toaplan1_state )
 
 	/* basic machine hardware */
@@ -2808,6 +2869,29 @@ ROM_START( outzonec )                   /* From board serial number 2122 */
 	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
+ROM_START( outzonecv ) /* This is a factory conversion of a Zero Wing (TP-015 hardware) PCB */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
+	ROM_LOAD16_BYTE( "tp_018_07+.bin",  0x000000, 0x20000, CRC(8768d843) SHA1(17421d390e490191aa419bc541d78456a1675bc4) ) /* The actual label has a black dot instead of the "+" */
+	ROM_LOAD16_BYTE( "tp_018_08+.bin",  0x000001, 0x20000, CRC(af238f71) SHA1(2643f8d9e78ddd04ceb40d8f8c6412129c678baf) ) /* The actual label has a black dot instead of the "+" */
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
+	ROM_LOAD( "tp_018_09+.bin",  0x0000, 0x8000, CRC(b7201606) SHA1(d413074b59f25eb2136c1bc98189550410658493) ) /* The actual label has a black dot instead of the "+" */
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_WORD( "rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) ) /* Located on a SUB 015 daughter card */
+	ROM_LOAD16_WORD( "rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) ) /* Located on a SUB 015 daughter card */
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
+	ROM_LOAD16_BYTE( "rom1.bin",  0x00001, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
+	ROM_LOAD16_BYTE( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
+	ROM_LOAD16_BYTE( "rom4.bin",  0x40001, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
+
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
+ROM_END
+
 ROM_START( vimana )         /* From board serial number 1547.04 (July '94) */
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "tp019-7a.bin",  0x000000, 0x20000, CRC(5a4bf73e) SHA1(9a43d822bc24b59278f294d0b3275595de997d16) )
@@ -2924,6 +3008,7 @@ GAME( 1990, outzoneh,   outzone,  outzone,  outzone,   toaplan1_state, toaplan1,
 GAME( 1990, outzonea,   outzone,  outzone,  outzonea,  toaplan1_state, toaplan1, ROT270, "Toaplan", "Out Zone (old set)", 0 )
 GAME( 1990, outzoneb,   outzone,  outzone,  outzonea,  toaplan1_state, toaplan1, ROT270, "Toaplan", "Out Zone (older set)", 0 )
 GAME( 1990, outzonec,   outzone,  outzone,  outzonec,  toaplan1_state, toaplan1, ROT270, "Toaplan", "Out Zone (oldest set)", MACHINE_IMPERFECT_SOUND ) // prototype?
+GAME( 1990, outzonecv,  outzone,  outzonecv,outzone,   toaplan1_state, toaplan1, ROT270, "Toaplan", "Out Zone (Zero Wing TP-015 PCB conversion)", 0 )
 GAME( 1991, vimana,     0,        vimana,   vimana,    toaplan1_state, vimana,   ROT270, "Toaplan", "Vimana (World, set 1)", MACHINE_NO_SOUND )
 GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   toaplan1_state, vimana,   ROT270, "Toaplan", "Vimana (World, set 2)", MACHINE_NO_SOUND )
 GAME( 1991, vimanaj,    vimana,   vimana,   vimanaj,   toaplan1_state, vimana,   ROT270, "Toaplan", "Vimana (Japan)", MACHINE_NO_SOUND )

@@ -120,7 +120,7 @@ public:
 	static void draw_arrow(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, UINT32 orientation);
 
 	// master handler
-	static UINT32 ui_handler(mame_ui_manager &mui, render_container *container, UINT32 state);
+	static UINT32 ui_handler(render_container *container, mame_ui_manager &mui);
 
 	// Used by sliders
 	void validate_selection(int scandir);

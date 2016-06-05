@@ -554,6 +554,40 @@ ROM_START( cmagica )
 	ROM_LOAD( "sound.bin", 0x00000, 0x20000, CRC(9dab99a6) SHA1(ce34056dd964be32359acd2e53a6101cb4d9ddff) )
 ROM_END
 
+/*
+  Magic Card (H8 hardware)
+
+  English version of Carta Magica. Same title picture.
+  However, all the service/bookkeeping modes are in Italian.
+
+  This set have 4 different graphics:
+
+  1) Normal Cards.
+  2) Naked Girls.
+  3) Chips.
+  4) Numbers.
+
+  Hardware is similar to Carta Magica, but with different connectors:
+
+  1x 28x2 edge connector (not JAMMA).
+  1x RS232 connector.
+  1x 10 legs male connector.
+  1x 4 legs male connector.
+*/
+
+ROM_START( mcard_h8 )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "cmcard_h8_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "m_card_ep_1.bin", 0x000000, 0x80000, CRC(f887f740) SHA1(d9a59ed753f3f61705658af1cac673c523ad2237) )
+	ROM_LOAD( "m_card_ep_2.bin", 0x080000, 0x80000, CRC(e5fa014c) SHA1(96fcdf6a15617dbf928f465e21df3638cbae26aa) )
+	ROM_LOAD( "m_card_ep_3.bin", 0x100000, 0x80000, CRC(cd6f22cf) SHA1(0b8f5d9ce4f9bb5b776beec38087494d1e4bae7e) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "m_card_msg_0.bin", 0x00000, 0x20000, CRC(9dab99a6) SHA1(ce34056dd964be32359acd2e53a6101cb4d9ddff) )
+ROM_END
+
 
 /*
   Millennium Sun.
@@ -1018,22 +1052,23 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT ROT    COMPANY      FULLNAME                                FLAGS  */
-GAME( 1999, ntcash,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "NtCash",                                MACHINE_IS_SKELETON )
-GAME( 1999, wizard,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "A.A.",      "Wizard (Ver 1.0)",                      MACHINE_IS_SKELETON )
-GAME( 200?, trstar2k, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "A.M.",      "Triple Star 2000",                      MACHINE_IS_SKELETON )
-GAME( 2001, laser2k1, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Laser 2001 (Ver 1.2)",                  MACHINE_IS_SKELETON )
-GAME( 2001, mdrink,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Magic Drink (Ver 1.2)",                 MACHINE_IS_SKELETON )
-GAME( 2001, te0144,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Puzzle Bobble (Italian Gambling Game)", MACHINE_IS_SKELETON )
-GAME( 200?, cmagica,  0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Carta Magica (Ver 1.8)",                MACHINE_IS_SKELETON )
-GAME( 200?, millsun,  0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Millennium Sun",                        MACHINE_IS_SKELETON )
-GAME( 200?, sspac2k1, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Super Space 2001",                      MACHINE_IS_SKELETON )
-GAME( 200?, elvis,    0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Elvis?",                                MACHINE_IS_SKELETON )
-GAME( 200?, sstar,    0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Super Star",                            MACHINE_IS_SKELETON )
-GAME( 2001, pirati,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "Cin",       "Pirati",                                MACHINE_IS_SKELETON )
-GAME( 200?, mnumitg,  0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Magic Number (Italian Gambling Game, Ver 1.5)", MACHINE_IS_SKELETON )
-GAME( 200?, mclass,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Magic Class (Ver 2.2)",                 MACHINE_IS_SKELETON )
-GAME( 200?, europass, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Euro Pass (Ver 1.1)",                   MACHINE_IS_SKELETON )
-GAME( 200?, thedrink, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "The Drink",                             MACHINE_IS_SKELETON )
-GAME( 200?, unkh8gam, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "unknown H8 Italian Gambling game",      MACHINE_IS_SKELETON )
-GAME( 200?, eurodsr,  0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Euro Double Star Record (ver.1.2)",     MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT ROT    COMPANY      FULLNAME                                FLAGS  */
+GAME( 1999, ntcash,   0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "NtCash",                                MACHINE_IS_SKELETON )
+GAME( 1999, wizard,   0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "A.A.",      "Wizard (Ver 1.0)",                      MACHINE_IS_SKELETON )
+GAME( 200?, trstar2k, 0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "A.M.",      "Triple Star 2000",                      MACHINE_IS_SKELETON )
+GAME( 2001, laser2k1, 0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Laser 2001 (Ver 1.2)",                  MACHINE_IS_SKELETON )
+GAME( 2001, mdrink,   0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Magic Drink (Ver 1.2)",                 MACHINE_IS_SKELETON )
+GAME( 2001, te0144,   0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Puzzle Bobble (Italian Gambling Game)", MACHINE_IS_SKELETON )
+GAME( 200?, cmagica,  0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Carta Magica (Ver 1.8)",                MACHINE_IS_SKELETON )
+GAME( 200?, mcard_h8, cmagica,  itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Magic Card (H8, English)",              MACHINE_IS_SKELETON )
+GAME( 200?, millsun,  0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Millennium Sun",                        MACHINE_IS_SKELETON )
+GAME( 200?, sspac2k1, 0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Super Space 2001",                      MACHINE_IS_SKELETON )
+GAME( 200?, elvis,    0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Elvis?",                                MACHINE_IS_SKELETON )
+GAME( 200?, sstar,    0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Super Star",                            MACHINE_IS_SKELETON )
+GAME( 2001, pirati,   0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "Cin",       "Pirati",                                MACHINE_IS_SKELETON )
+GAME( 200?, mnumitg,  0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Magic Number (Italian Gambling Game, Ver 1.5)", MACHINE_IS_SKELETON )
+GAME( 200?, mclass,   0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Magic Class (Ver 2.2)",                 MACHINE_IS_SKELETON )
+GAME( 200?, europass, 0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Euro Pass (Ver 1.1)",                   MACHINE_IS_SKELETON )
+GAME( 200?, thedrink, 0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "The Drink",                             MACHINE_IS_SKELETON )
+GAME( 200?, unkh8gam, 0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "unknown H8 Italian Gambling game",      MACHINE_IS_SKELETON )
+GAME( 200?, eurodsr,  0,        itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Euro Double Star Record (ver.1.2)",     MACHINE_IS_SKELETON )

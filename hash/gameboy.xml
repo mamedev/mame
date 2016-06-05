@@ -12,6 +12,45 @@
 
 -->
 
+
+<!--
+
+ Info on the PCB codes, based on Tauwasser's notes and research
+
+
+ DMG-****-NN
+
+ where
+     NN   = PCB revision
+     **** = 3 or 4 letter descriptor (+ possibly an optional letter code in parenthesis)
+
+ Letters have the following meaning
+
+ Code     MBC / Battery                   ROM size   RAM size
+ -        -                               -          -             QFP
+ A        none                            256kbit    none          -
+ B        MBC1A/MBC1B/MBC1B1              512kbit    -?            -
+ C        -                               1Mbit      64kbit        COB
+ D        MBC1A/MBC1B/MBC1B1 + CR1616     2Mbit      256kbit       -
+ E        -                               4Mbit      512kbit       -
+ F        -                               8Mbit      -             -
+ G        MBC2A + CR1616                  16Mbit     -             -
+ H        -                               32Mbit     -             -
+ K        MBC3/MBC3A/MBC3B w/X + CR2025   -          -             -
+ L        MBC3/MBC3A/MBC3B w/oX + CR2025  -          -             -
+ M        MBC30 w/ X + CR2025             -          -             -
+ N        -                               -          -             SOP
+ P        MMM01                           -          -             -
+ S        MMM01 + CR1616                  -          -             -
+ T        HuC1/HuC1A + CR1616             -          -             TSOP I
+ U        HuC3A + CR2025                  -          -             TSOP II
+
+
+ So that, for instance, DMG-BEAN-02 stands for a PCB with MBC1A/MBC1B/MBC1B1 and no battery,
+ up to 256kbit ROM, no SRAM and roms in SOP
+
+-->
+
 <softwarelist name="gameboy" description="Nintendo Game Boy cartridges">
 
 	<software name="tamafrnd">
@@ -24896,7 +24935,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- 4in1_003 missing -->
 
 	<software name="4in1_004">

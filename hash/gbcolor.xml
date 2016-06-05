@@ -20,6 +20,35 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 -->
 
+
+<!--
+
+ Info on the PCB codes, based on Tauwasser's notes and research
+
+
+ DMG-*AA-NN
+
+ where
+ NN   = PCB revision
+ AA   = 2 number descriptor specifying MBC and ROM/RAM combination
+ *    = PCB code (A = production cart, Z = revision of some A PCB, B = test cart)
+
+ Number descriptors correspond to the following
+
+ Code     MBC                      ROM size    RAM size
+ 0        MBC5 (w/ or w/o rumble)  4/8M        2/4k EEPROM or 1M SRAM
+ 1        MBC5 (w/ rumble)         16/32/64M   64k
+ 2        G-MMC1 (+ 8M FLASH)      2/4/8M      256k
+ 3        MBC6 (+ 8M FLASH)        16/32/64M   256k
+ 4        MBC7                     4/8M        -?
+ 6        -                        2/4/8M      64k
+ 7        -                        16/32M      2/4k EEPROM
+
+ Descriptors 5, 8 and 9 have not been found yet
+
+-->
+
+
 <softwarelist name="gbcolor" description="Nintendo Game Boy Color cartridges">
 
 	<software name="007twine">
@@ -3981,7 +4010,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="8388608">
-				<rom name="densha de go! 2 (japan).bin" size="8388608" crc="b72603fc" sha1="63bcca7177712a9bc6f032c83c2e129d9b9af0fa" offset="000000" />
+				<rom name="cgb-b82j-0 02.u1" size="4194304" crc="07f226df" sha1="6eff94940f67a4408e1a0d3c1cc544fddb20d9c0" offset="0x0000000" />
+				<rom name="cgb-b82j-0 12.u5" size="4194304" crc="b6caeb75" sha1="efb3a8229e7cd6a28fc9766a6de17e8b59483652" offset="0x400000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>

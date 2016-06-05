@@ -27,7 +27,7 @@ public:
 
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
-	static UINT32 ui_handler(mame_ui_manager &mui, render_container *container, UINT32 state);
+	static UINT32 ui_handler(render_container *container, mame_ui_manager &mui, bool state);
 
 private:
 	enum {
