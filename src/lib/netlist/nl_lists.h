@@ -129,8 +129,8 @@ namespace netlist
 	public:
 	#if (NL_KEEP_STATISTICS)
 		// profiling
-		INT32   m_prof_sortmove;
-		INT32   m_prof_call;
+		std::size_t   m_prof_sortmove;
+		std::size_t   m_prof_call;
 	#endif
 
 };

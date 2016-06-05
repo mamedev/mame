@@ -386,10 +386,13 @@ void netlist_t::print_stats() const
 	{
 		for (auto & entry : m_devices)
 		{
-			printf("Device %20s : %12d %12d %15ld\n", entry->name().cstr(), entry->stat_call_count, entry->stat_update_count, (long int) entry->stat_total_time / (entry->stat_update_count + 1));
+			log().verbose("Device {1:20} : {2:12} {3:12} {4:15}", entry->name(),
+					entry->stat_call_count, entry->stat_update_count,
+					(long int) entry->stat_total_time / (entry->stat_update_count + 1));
 		}
-		printf("Queue Pushes %15d\n", queue().m_prof_call);
-		printf("Queue Moves  %15d\n", queue().m_prof_sortmove);
+
+		log().verbose("Queue Pushes {1:15}", queue().m_prof_call);
+		log().verbose("Queue Moves  {1:15}", queue().m_prof_sortmove);
 	}
 #endif
 }
