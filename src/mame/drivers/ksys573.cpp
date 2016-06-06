@@ -1693,7 +1693,8 @@ WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b5 )
 TIMER_DEVICE_CALLBACK_MEMBER(ksys573_state::punchmania_motor_timer_callback)
 {
 	// SW compares against a fixed timer for detecting if movement is from player punch or just motor.
-	const double pad_step = 3.0f;
+	// TODO: needs power being measured from actual cabinet! (I also assume it can't be linear too)
+	const double pad_step = 3.35f;
 #if 0
 	if(machine().input().code_pressed(KEYCODE_Z))
 		pad_step+=0.1f;
@@ -1708,7 +1709,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksys573_state::punchmania_motor_timer_callback)
 	
 	for(int i=0; i < 6; i++)
 	{
-		std::string pad_name ("pad%c",i + 0x30);
+		std::string pad_name ("pad");
+		pad_name += (i + 0x30);
 		
 		if(pad_motor_up[i] == true)
 		{
@@ -1722,6 +1724,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksys573_state::punchmania_motor_timer_callback)
 		{
 			pad_position[i] += pad_step;
 			
+			// TODO: move back and forth by adding rebounding force on pad press
 			if(pad_position[i] > PAD_MAX_VALUE)
 				pad_position[i] = PAD_MAX_VALUE;
 		}
@@ -1739,6 +1742,7 @@ ADC083X_INPUT_CB(konami573_cassette_xi_device::punchmania_inputs_callback)
 	//bool *pad_motor_up = state->m_pad_motor_up;
 	//bool *pad_motor_down = state->m_pad_motor_down;
 	int pads = state->m_pads->read();
+	// TODO: actual power force, change to analog and INPUT_CHANGED_MEMBER?
 	for( int i = 0; i < 6; i++ )
 	{	
 		if( ( pads & ( 1 << i ) ) != 0 )
