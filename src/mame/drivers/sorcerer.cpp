@@ -115,8 +115,7 @@ It was often hooked to a printer, a joystick, a music card, or a speaker.
 We emulate the printer and the speaker.
 
 Another 25-pin port provided two-way serial communications. Only two speeds are
-available - 300 baud and 1200 baud. There is no handshaking. This protocol is
-currently not emulated.
+available - 300 baud and 1200 baud. There is no handshaking.
 
 Other pins on this connector provided for two cassette players. The connections
 for cassette unit 1 are duplicated on a set of phono plugs.
@@ -154,6 +153,11 @@ NOTES (2011-08-08)
                          after the computer has booted. It is not particularly
                          stable, so be prepared to cold boot whenever something
                          goes wrong.
+
+NOTES (2016-06-06)
+1. SORCERER_USING_RS232 removed, since the core now supports RS-232 as a device.
+                         Not actually tested due to the bios bugs making it
+                         pretty much impossible to use.
 
 ********************************************************************************/
 
@@ -396,6 +400,14 @@ static const floppy_interface sorcerer_floppy_interface =
 	"floppy_8"
 };
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
+DEVICE_INPUT_DEFAULTS_END
 
 static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	/* basic machine hardware */
@@ -425,6 +437,8 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(ES_UART_CLOCK)
 	MCFG_AY31015_RX_CLOCK(ES_UART_CLOCK)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "covox")

@@ -9,24 +9,22 @@
 #include "includes/sorcerer.h"
 #include "machine/z80bin.h"
 
-#if SORCERER_USING_RS232
-
-/* The serial code (which was never connected to the outside) is disabled for now. */
 
 /* timer for sorcerer serial chip transmit and receive */
 
 TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_serial_tc)
 {
 	/* if rs232 is enabled, uart is connected to clock defined by bit6 of port fe.
-	Transmit and receive clocks are connected to the same clock */
+	Transmit and receive clocks are connected to the same clock. */
 
 	/* if rs232 is disabled, receive clock is linked to cassette hardware */
-	if (m_fe & 0x80)
+	if BIT(m_fe, 7)
 	{
 		/* connect to rs232 */
+		m_rs232->write_txd(m_uart->get_output_pin(AY31015_SO));
+		m_uart->set_input_pin(AY31015_SI, m_rs232->rxd_r());
 	}
 }
-#endif
 
 
 void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -34,9 +32,7 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_SERIAL:
-#if SORCERER_USING_RS232
 		sorcerer_serial_tc(ptr, param);
-#endif
 		break;
 	case TIMER_CASSETTE:
 		sorcerer_cassette_tc(ptr, param);
@@ -181,9 +177,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 
 	if (!BIT(data, 7)) // cassette operations
 	{
-#if SORCERER_USING_RS232
 		m_serial_timer->adjust(attotime::zero);
-#endif
 
 		bool sound = BIT(m_iop_config->read(), 3);
 
@@ -206,13 +200,11 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 		else
 			m_cassette_timer->adjust(attotime::zero);
 	}
-#if SORCERER_USING_RS232
 	else
 	{
 		m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(ES_UART_CLOCK*4));
 		m_cassette_timer->adjust(attotime::zero);
 	}
-#endif
 
 	// bit 6 baud rate */
 	if (BIT(changed_bits, 6))
@@ -349,9 +341,7 @@ SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
 void sorcerer_state::machine_start()
 {
 	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
-#if SORCERER_USING_RS232
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
-#endif
 
 	UINT16 endmem = 0xbfff;
 
@@ -379,9 +369,7 @@ void sorcerer_state::machine_start()
 MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 {
 	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
-#if SORCERER_USING_RS232
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
-#endif
 
 	UINT16 endmem = 0xbbff;
 
