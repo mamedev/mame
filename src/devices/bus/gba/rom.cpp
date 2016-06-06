@@ -863,7 +863,7 @@ void gba_s3511_device::write(UINT16 data, int gpio_dirs)
 	{
 //		if (m_phase == 3)
 //			printf("RTC command OK\n");
-		if (!(m_last_val & 1) & (data & 1))
+		if (!(m_last_val & 1) && (data & 1))
 		{
 			// bit transfer
 			m_last_val = data & 0xff;
