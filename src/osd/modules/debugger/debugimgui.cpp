@@ -261,6 +261,16 @@ void debug_imgui::handle_keys()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	ui_event event;
+	debug_area* focus_view = nullptr;
+
+	// find view that has focus (should only be one at a time)
+	for(std::vector<debug_area*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
+		if((*view_ptr)->has_focus)
+			focus_view = *view_ptr;
+
+	// check views in main views also (only the disassembler view accepts inputs)
+	if(view_main_disasm->has_focus)
+		focus_view = view_main_disasm;
 
 	if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
 		io.KeyCtrl = true;
@@ -290,6 +300,8 @@ void debug_imgui::handle_keys()
 		{
 		case UI_EVENT_CHAR:
 			m_key_char = event.ch;
+			if(focus_view != nullptr)
+				focus_view->view->process_char(m_key_char);
 			return;
 		default:
 			break;
