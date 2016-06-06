@@ -6,6 +6,10 @@
 //
 //============================================================
 
+#include "output_module.h"
+#include "modules/osdmodule.h"
+#include "modules/lib/osdobj_common.h"
+
 #if defined(OSD_WINDOWS)
 
 // standard windows headers
@@ -330,7 +334,7 @@ void output_win32::notify(const char *outname, INT32 value)
 
 
 #else
-MODULE_NOT_SUPPORTED(output_win32, OSD_OUTPUT_PROVIDER, "windows")
+	MODULE_NOT_SUPPORTED(output_win32, OSD_OUTPUT_PROVIDER, "windows")
 #endif
 
 MODULE_DEFINITION(OUTPUT_WIN32, output_win32)
