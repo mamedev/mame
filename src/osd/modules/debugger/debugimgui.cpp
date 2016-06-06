@@ -262,47 +262,6 @@ void debug_imgui::handle_keys()
 	ImGuiIO& io = ImGui::GetIO();
 	ui_event event;
 
-	// global keys
-	if(m_machine->input().code_pressed_once(KEYCODE_F3))
-	{
-		if(m_machine->input().code_pressed(KEYCODE_LSHIFT))
-			m_machine->schedule_hard_reset();
-		else
-		{
-			m_machine->schedule_soft_reset();
-			debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-		}
-	}
-
-	if(m_machine->input().code_pressed_once(KEYCODE_F5))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-		m_running = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_F6))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_next_device();
-		m_running = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_F7))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_interrupt();
-		m_running = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_F8))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_vblank();
-	if(m_machine->input().code_pressed_once(KEYCODE_F9))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_out();
-	if(m_machine->input().code_pressed_once(KEYCODE_F10))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_over();
-	if(m_machine->input().code_pressed_once(KEYCODE_F11))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
-	if(m_machine->input().code_pressed_once(KEYCODE_F12))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-		m_hide = true;
-	}
-
 	if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
 		io.KeyCtrl = true;
 	else
@@ -335,6 +294,47 @@ void debug_imgui::handle_keys()
 		default:
 			break;
 		}
+	}
+
+	// global keys
+	if(ImGui::IsKeyPressed(ITEM_ID_F3,false))
+	{
+		if(ImGui::IsKeyDown(ITEM_ID_LSHIFT))
+			m_machine->schedule_hard_reset();
+		else
+		{
+			m_machine->schedule_soft_reset();
+			debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+		}
+	}
+
+	if(ImGui::IsKeyPressed(ITEM_ID_F5,false))
+	{
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+		m_running = true;
+	}
+	if(ImGui::IsKeyPressed(ITEM_ID_F6,false))
+	{
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_next_device();
+		m_running = true;
+	}
+	if(ImGui::IsKeyPressed(ITEM_ID_F7,false))
+	{
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_interrupt();
+		m_running = true;
+	}
+	if(ImGui::IsKeyPressed(ITEM_ID_F8,false))
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_vblank();
+	if(ImGui::IsKeyPressed(ITEM_ID_F9,false))
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_out();
+	if(ImGui::IsKeyPressed(ITEM_ID_F10,false))
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_over();
+	if(ImGui::IsKeyPressed(ITEM_ID_F11,false))
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
+	if(ImGui::IsKeyPressed(ITEM_ID_F12,false))
+	{
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+		m_hide = true;
 	}
 
 	if(ImGui::IsKeyPressed(ITEM_ID_D) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
