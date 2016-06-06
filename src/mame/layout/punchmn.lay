@@ -2,23 +2,40 @@
 <mamelayout version="2">
 
 	<element name="yellow_lamp">
-		<rect state="1">
+		<!-- TODO: Unicode, rly??? -->
+		<text state="1" string="&#x25bc;">
+			<color red="1.0" green="0.3" blue="0.3" />
+		</text>
+		<text state="0" string="&#x25bc;">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</text>
+<!--	<rect state="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</rect>
 		<rect state="0">
 			<color red="0.3" green="0.3" blue="0.0" />
-		</rect>
+		</rect>-->
 	</element>
 
 	<element name="red_lamp">
-		<rect state="1">
+		<rect state="1" >
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
-		<rect state="0">
+		<rect state="0" >
 			<color red="0.3" green="0.0" blue="0.0" />
 		</rect>
 	</element>
 	
+	<element name="circle_lamp">
+		<disk state="1">
+			<color red="1.0" green="0.3" blue="0.3" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</disk>
+	</element>
+	
+	<!-- fake, to be converted ... -->
 	<element name="pad_position" defstate="0">
 		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<simplecounter maxstate="255" digits="2" align="1">
@@ -84,15 +101,17 @@
 		
 		<!-- control panel lamps -->
 		<bezel name="select_left_right" element="yellow_lamp">
-			<bounds x="285" y="500" width="50" height="25" />
+			<orientation rotate="90" />
+			<bounds x="285" y="500" width="25" height="25" />
 		</bezel>
 
-		<bezel name="start_lamp" element="red_lamp">
-			<bounds x="345" y="500" width="50" height="25" />
+		<bezel name="start_lamp" element="circle_lamp">
+			<bounds x="345" y="495" width="25" height="25" />
 		</bezel>
 		
 		<bezel name="select_left_right" element="yellow_lamp">
-			<bounds x="405" y="500" width="50" height="25" />
+			<orientation rotate="90" flipx="yes" />
+			<bounds x="405" y="500" width="25" height="25" />
 		</bezel>
 
 	</view>
