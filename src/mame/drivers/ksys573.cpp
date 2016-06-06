@@ -1704,10 +1704,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksys573_state::punchmania_motor_timer_callback)
 	bool *pad_motor_up = m_pad_motor_up;
 	bool *pad_motor_down = m_pad_motor_down;
 	
-	popmessage("%d %d %f %f",m_pad_motor_up[0],m_pad_motor_down[0],pad_position[0],pad_step);
+	//popmessage("%d %d %f %f",m_pad_motor_up[0],m_pad_motor_down[0],pad_position[0],pad_step);
 	
 	for(int i=0; i < 6; i++)
 	{
+		std::string pad_name ("pad%c",i + 0x30);
+		
 		if(pad_motor_up[i] == true)
 		{
 			pad_position[i] -= pad_step;
@@ -1723,7 +1725,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksys573_state::punchmania_motor_timer_callback)
 			if(pad_position[i] > PAD_MAX_VALUE)
 				pad_position[i] = PAD_MAX_VALUE;
 		}
+
+		output().set_value(pad_name.c_str(), pad_position[i]);
 	}
+
 }
 
 

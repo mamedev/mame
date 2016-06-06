@@ -19,6 +19,13 @@
 		</rect>
 	</element>
 	
+	<element name="pad_position" defstate="0">
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
+		<simplecounter maxstate="255" digits="2" align="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</simplecounter>
+	</element>
+	
 	<view name="PunchMania cabinet layout">
 		<bounds x="0" y="0" width="740" height="530" />
 		<screen index="0">
@@ -29,13 +36,25 @@
 		<bezel name="left_top_lamp" element="red_lamp">
 			<bounds x="10" y="200" width="25" height="25" />
 		</bezel>
-		
+
 		<bezel name="left_middle_lamp" element="red_lamp">
 			<bounds x="10" y="300" width="25" height="25" />
 		</bezel>
 		
 		<bezel name="left_bottom_lamp" element="red_lamp">
 			<bounds x="10" y="400" width="25" height="25" />
+		</bezel>
+				
+		<bezel name="pad0" element="pad_position">
+			<bounds x="10" y="225" width="30" height="25" />
+		</bezel>
+		
+		<bezel name="pad1" element="pad_position">
+			<bounds x="10" y="325" width="30" height="25" />
+		</bezel>
+		
+		<bezel name="pad2" element="pad_position">
+			<bounds x="10" y="425" width="30" height="25" />
 		</bezel>
 		
 		<!-- right pad lamps -->	
@@ -49,6 +68,18 @@
 		
 		<bezel name="right_bottom_lamp" element="red_lamp">
 			<bounds x="700" y="400" width="25" height="25" />
+		</bezel>
+		
+		<bezel name="pad3" element="pad_position">
+			<bounds x="700" y="225" width="30" height="25" />
+		</bezel>
+		
+		<bezel name="pad4" element="pad_position">
+			<bounds x="700" y="325" width="30" height="25" />
+		</bezel>
+		
+		<bezel name="pad5" element="pad_position">
+			<bounds x="700" y="425" width="30" height="25" />
 		</bezel>
 		
 		<!-- control panel lamps -->
