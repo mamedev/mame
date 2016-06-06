@@ -93,7 +93,11 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 	virtual DECLARE_READ8_MEMBER(read_ram) override;
 	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
-	UINT8 m_rtc_map[5];
+
+private:
+	void update_rtc();
+	UINT8 m_rtc_regs[5];
+	int m_rtc_ready;
 };
 
 // ======================> gb_rom_mbc5_device

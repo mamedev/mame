@@ -5,7 +5,7 @@
  Game Boy carts with MBC (Memory Bank Controller)
 
 
- TODO: add proper RTC and Rumble support
+ TODO: RTC runs too fast while in-game, in MBC-3 games... find the problem!
 
  ***********************************************************************************************************/
 
@@ -179,13 +179,15 @@ void gb_rom_mbc_device::shared_reset()
 void gb_rom_mbc3_device::device_start()
 {
 	shared_start();
-	save_item(NAME(m_rtc_map));
+	save_item(NAME(m_rtc_regs));
+	save_item(NAME(m_rtc_ready));
 }
 
 void gb_rom_mbc3_device::device_reset()
 {
 	shared_reset();
-	memset(m_rtc_map, 0, sizeof(m_rtc_map));
+	memset(m_rtc_regs, 0, sizeof(m_rtc_regs));
+	m_rtc_ready = 0;
 }
 
 void gb_rom_mbc6_device::device_start()
@@ -446,6 +448,18 @@ WRITE8_MEMBER(gb_rom_mbc2_device::write_ram)
 
 // MBC3
 
+void gb_rom_mbc3_device::update_rtc()
+{
+	system_time curtime;
+	machine().current_datetime(curtime);
+	
+	m_rtc_regs[0] = curtime.local_time.second;
+	m_rtc_regs[1] = curtime.local_time.minute;
+	m_rtc_regs[2] = curtime.local_time.hour;
+	m_rtc_regs[3] = curtime.local_time.day & 0xff;
+	m_rtc_regs[4] = (m_rtc_regs[4] & 0xf0) | (curtime.local_time.day >> 8);
+}
+
 READ8_MEMBER(gb_rom_mbc3_device::read_rom)
 {
 	if (offset < 0x4000)
@@ -472,16 +486,14 @@ WRITE8_MEMBER(gb_rom_mbc3_device::write_bank)
 	{
 		m_ram_bank = data;
 	}
-	else
+	else if (has_timer)
 	{
-		if (has_timer)
+		if (m_rtc_ready == 1 && data == 0)
+			m_rtc_ready = 0;
+		if (m_rtc_ready == 0 && data == 1)
 		{
-			/* FIXME: RTC Latch goes here */
-			m_rtc_map[0] = 50;    /* Seconds */
-			m_rtc_map[1] = 40;    /* Minutes */
-			m_rtc_map[2] = 15;    /* Hours */
-			m_rtc_map[3] = 25;    /* Day counter lowest 8 bits */
-			m_rtc_map[4] = 0x01;  /* Day counter upper bit, timer off, no day overflow occurred (bit7) */
+			m_rtc_ready = 1;
+			update_rtc();
 		}
 	}
 }
@@ -489,14 +501,16 @@ WRITE8_MEMBER(gb_rom_mbc3_device::write_bank)
 READ8_MEMBER(gb_rom_mbc3_device::read_ram)
 {
 	if (m_ram_bank < 4 && m_ram_enable)
-	{   // RAM
+	{
+		// RAM
 		if (!m_ram.empty())
 			return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
 	}
 	if (m_ram_bank >= 0x8 && m_ram_bank <= 0xc)
-	{   // RAM
+	{
+		// RTC registers
 		if (has_timer)
-			return m_rtc_map[m_ram_bank - 8];
+			return m_rtc_regs[m_ram_bank - 8];
 	}
 	return 0xff;
 }
@@ -504,16 +518,16 @@ READ8_MEMBER(gb_rom_mbc3_device::read_ram)
 WRITE8_MEMBER(gb_rom_mbc3_device::write_ram)
 {
 	if (m_ram_bank < 4 && m_ram_enable)
-	{   // RAM
+	{
+		// RAM
 		if (!m_ram.empty())
 			m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 	}
-	if (m_ram_bank >= 0x8 && m_ram_bank <= 0xc)
-	{   // RAM
+	if (m_ram_bank >= 0x8 && m_ram_bank <= 0xc && m_ram_enable)
+	{
+		// RTC registers are writeable too
 		if (has_timer)
-		{
-		// what to do here?
-		}
+			m_rtc_regs[m_ram_bank - 8] = data;
 	}
 }
 
@@ -547,7 +561,10 @@ WRITE8_MEMBER(gb_rom_mbc5_device::write_bank)
 	{
 		data &= 0x0f;
 		if (has_rumble)
+		{
+			machine().output().set_value("Rumble", BIT(data, 3));
 			data &= 0x7;
+		}
 		m_ram_bank = data;
 	}
 }
@@ -1071,8 +1088,6 @@ WRITE8_MEMBER(gb_rom_sintax_device::write_bank)
 	else if (offset < 0x5000)
 	{
 		data &= 0x0f;
-		if (has_rumble)
-			data &= 0x7;
 		m_ram_bank = data;
 	}
 	else if (offset < 0x6000)
@@ -1167,8 +1182,6 @@ WRITE8_MEMBER(gb_rom_digimon_device::write_bank)
 	{
 //      printf("written $05-$06 %X at %X\n", data, offset);
 		data &= 0x0f;
-		if (has_rumble)
-			data &= 0x7;
 		m_ram_bank = data;
 	}
 //  else

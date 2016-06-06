@@ -86,7 +86,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="10pinbu" cloneof="10pinb">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>10-Pin Bowling (USA)</description>
 		<year>1999</year>
 		<publisher>Majesco</publisher>
@@ -177,7 +177,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="3dupinb">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>3-D Ultra Pinball - Thrillride (USA)</description>
 		<year>2000</year>
 		<publisher>Sierra</publisher>
@@ -3051,7 +3051,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="cheechai">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Chee-Chai Alien (Jpn)</description>
 		<year>2001</year>
 		<publisher>Creatures</publisher>
@@ -6698,7 +6698,6 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="getchuu">
-		<!-- Notes: Rumble support -->
 		<description>Get Chuu Club - Minna no Konchuu Daizukan (Jpn)</description>
 		<year>1999</year>
 		<publisher>Jaleco</publisher>
@@ -8057,7 +8056,6 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="holein1">
-		<!-- Notes: Rumble support -->
 		<description>Hole In One Golf (USA)</description>
 		<year>1999</year>
 		<publisher>Natsume</publisher>
@@ -9197,7 +9195,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="kawanus4" cloneof="rivking2">
-		<!-- Notes: SGB enhanced, Rumble support -->
+		<!-- Notes: SGB enhanced -->
 		<description>Kawa no Nushi Tsuri 4 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Victor Interactive Software</publisher>
@@ -10446,7 +10444,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="mermaid2u" cloneof="mermaid2">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Disney's The Little Mermaid II - Pinball Frenzy (USA)</description>
 		<year>2000</year>
 		<publisher>Disney Interactive</publisher>
@@ -12538,7 +12536,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="missileu" cloneof="missile">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Missile Command (USA)</description>
 		<year>1999</year>
 		<publisher>Hasbro Interactive</publisher>
@@ -13556,7 +13554,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="nascchal">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>NASCAR Challenge (USA)</description>
 		<year>1999</year>
 		<publisher>Hasbro Interactive</publisher>
@@ -14086,7 +14084,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="nushiadv">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Nushi Tsuri Adventure - Kite no Bouken (Jpn)</description>
 		<year>2000</year>
 		<publisher>Victor Interactive Software</publisher>
@@ -14477,7 +14475,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="pdark">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Perfect Dark (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -15502,7 +15500,6 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="pokepinb">
-		<!-- Notes: Rumble support -->
 		<description>Pokémon Pinball (Euro)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -15526,7 +15523,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="pokepinbj" cloneof="pokepinb">
-		<!-- Notes: SGB enhanced, Rumble support -->
+		<!-- Notes: SGB enhanced -->
 		<description>Pokémon Pinball (Jpn)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -15545,7 +15542,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="pokepinbu" cloneof="pokepinb">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Pokémon Pinball (Aus, USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -15645,7 +15642,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="polarsno" cloneof="snowcros">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Polaris SnoCross (USA)</description>
 		<year>2000</year>
 		<publisher>Vatical Entertainment</publisher>
@@ -17088,7 +17085,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="r2rumbleu" cloneof="r2rumble">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Ready 2 Rumble Boxing (USA)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
@@ -19194,7 +19191,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="swracer">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Star Wars Episode I - Racer (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -19304,7 +19301,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="sblkbass">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Super Black Bass - Real Fight (Jpn)</description>
 		<year>1999</year>
 		<publisher>Starfish</publisher>
@@ -19545,7 +19542,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="srfish">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Super Real Fishing (Jpn)</description>
 		<year>1999</year>
 		<publisher>Bottom Up</publisher>
@@ -20151,7 +20148,6 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="tdoffr3" cloneof="4x4world">
-		<!-- Notes: Rumble support -->
 		<description>Test Drive Off-Road 3 (USA)</description>
 		<year>1999</year>
 		<publisher>Infogrames</publisher>
@@ -20684,7 +20680,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="tonkaracua" cloneof="tonkarac">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Tonka Raceway (USA, Rumble Version)</description>
 		<year>1999</year>
 		<publisher>Hasbro Interactive</publisher>
@@ -20828,7 +20824,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="topgearj" cloneof="tgrally">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Top Gear Pocket (Jpn)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
@@ -20845,7 +20841,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="topgear" cloneof="tgrally">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Top Gear Pocket (USA)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
@@ -20860,7 +20856,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="topgear2j" cloneof="tgrally2">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Top Gear Pocket 2 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
@@ -20895,7 +20891,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="tgrally">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Top Gear Rally (Euro)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
@@ -21645,7 +21641,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="vigilnt8">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Vigilante 8 (USA)</description>
 		<year>1999</year>
 		<publisher>Vatical Entertainment</publisher>
@@ -22909,7 +22905,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="zebco">
-		<!-- Notes: GBC only, Rumble support -->
+		<!-- Notes: GBC only -->
 		<description>Zebco Fishing! (USA)</description>
 		<year>1999</year>
 		<publisher>Vatical Entertainment</publisher>
