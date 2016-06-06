@@ -1085,22 +1085,14 @@ int renderer_ogl::draw(const int update)
 		// we're doing nothing 3d, so the Z-buffer is currently not interesting
 		glDisable(GL_DEPTH_TEST);
 
-		if (win->machine().options().antialias())
-		{
-			// enable antialiasing for lines
-			glEnable(GL_LINE_SMOOTH);
-			// enable antialiasing for points
-			glEnable(GL_POINT_SMOOTH);
+		// enable antialiasing for lines
+		glEnable(GL_LINE_SMOOTH);
+		// enable antialiasing for points
+		glEnable(GL_POINT_SMOOTH);
 
-			// prefer quality to speed
-			glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-			glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-		}
-		else
-		{
-			glDisable(GL_LINE_SMOOTH);
-			glDisable(GL_POINT_SMOOTH);
-		}
+		// prefer quality to speed
+		glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
 		// enable blending
 		glEnable(GL_BLEND);

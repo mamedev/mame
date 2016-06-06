@@ -261,47 +261,16 @@ void debug_imgui::handle_keys()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	ui_event event;
+	debug_area* focus_view = nullptr;
 
-	// global keys
-	if(m_machine->input().code_pressed_once(KEYCODE_F3))
-	{
-		if(m_machine->input().code_pressed(KEYCODE_LSHIFT))
-			m_machine->schedule_hard_reset();
-		else
-		{
-			m_machine->schedule_soft_reset();
-			debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-		}
-	}
+	// find view that has focus (should only be one at a time)
+	for(std::vector<debug_area*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
+		if((*view_ptr)->has_focus)
+			focus_view = *view_ptr;
 
-	if(m_machine->input().code_pressed_once(KEYCODE_F5))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-		m_running = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_F6))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_next_device();
-		m_running = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_F7))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_interrupt();
-		m_running = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_F8))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_vblank();
-	if(m_machine->input().code_pressed_once(KEYCODE_F9))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_out();
-	if(m_machine->input().code_pressed_once(KEYCODE_F10))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_over();
-	if(m_machine->input().code_pressed_once(KEYCODE_F11))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
-	if(m_machine->input().code_pressed_once(KEYCODE_F12))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-		m_hide = true;
-	}
+	// check views in main views also (only the disassembler view accepts inputs)
+	if(view_main_disasm->has_focus)
+		focus_view = view_main_disasm;
 
 	if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
 		io.KeyCtrl = true;
@@ -331,21 +300,64 @@ void debug_imgui::handle_keys()
 		{
 		case UI_EVENT_CHAR:
 			m_key_char = event.ch;
+			if(focus_view != nullptr)
+				focus_view->view->process_char(m_key_char);
 			return;
 		default:
 			break;
 		}
 	}
 
-	if(ImGui::IsKeyPressed(ITEM_ID_D) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	// global keys
+	if(ImGui::IsKeyPressed(ITEM_ID_F3,false))
+	{
+		if(ImGui::IsKeyDown(ITEM_ID_LSHIFT))
+			m_machine->schedule_hard_reset();
+		else
+		{
+			m_machine->schedule_soft_reset();
+			debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+		}
+	}
+
+	if(ImGui::IsKeyPressed(ITEM_ID_F5,false))
+	{
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+		m_running = true;
+	}
+	if(ImGui::IsKeyPressed(ITEM_ID_F6,false))
+	{
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_next_device();
+		m_running = true;
+	}
+	if(ImGui::IsKeyPressed(ITEM_ID_F7,false))
+	{
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_interrupt();
+		m_running = true;
+	}
+	if(ImGui::IsKeyPressed(ITEM_ID_F8,false))
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_vblank();
+	if(ImGui::IsKeyPressed(ITEM_ID_F9,false))
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_out();
+	if(ImGui::IsKeyPressed(ITEM_ID_F10,false))
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_over();
+	if(ImGui::IsKeyPressed(ITEM_ID_F11,false))
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
+	if(ImGui::IsKeyPressed(ITEM_ID_F12,false))
+	{
+		debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+		m_hide = true;
+	}
+
+	if(ImGui::IsKeyPressed(ITEM_ID_D,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_disasm(++m_win_count);
-	if(ImGui::IsKeyPressed(ITEM_ID_M) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	if(ImGui::IsKeyPressed(ITEM_ID_M,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_memory(++m_win_count);
-	if(ImGui::IsKeyPressed(ITEM_ID_B) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	if(ImGui::IsKeyPressed(ITEM_ID_B,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_bpoints(++m_win_count);
-	if(ImGui::IsKeyPressed(ITEM_ID_W) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	if(ImGui::IsKeyPressed(ITEM_ID_W,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_wpoints(++m_win_count);
-	if(ImGui::IsKeyPressed(ITEM_ID_L) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	if(ImGui::IsKeyPressed(ITEM_ID_L,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_log(++m_win_count);
 
 }

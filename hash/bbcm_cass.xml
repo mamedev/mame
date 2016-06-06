@@ -50,7 +50,7 @@
 	</software>
 
 	<software name="strykrun">
-		<description>Strykers Run</description>
+		<description>Stryker's Run</description>
 		<year>1986</year>
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">

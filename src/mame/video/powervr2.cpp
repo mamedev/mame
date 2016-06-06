@@ -1024,7 +1024,7 @@ WRITE32_MEMBER( powervr2_device::startrender_w )
 			}
 //          printf("ISP START %d %d\n",sanitycount,m_screen->vpos());
 			/* Fire ISP irq after a set amount of time TODO: timing of this */
-			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(sanitycount*25));
+			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(sanitycount*25 + 500000));	// hacky end of render delay for Capcom games, otherwise they works at ~1/10 speed
 			break;
 		}
 	}

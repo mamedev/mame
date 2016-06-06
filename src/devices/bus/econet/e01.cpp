@@ -53,7 +53,7 @@
 
 #include "e01.h"
 #include "bus/scsi/scsihd.h"
-
+#include "softlist.h"
 
 
 //**************************************************************************
@@ -166,6 +166,10 @@ WRITE_LINE_MEMBER( e01_device::clk_en_w )
 	m_clk_en = state;
 }
 
+FLOPPY_FORMATS_MEMBER( floppy_formats_afs )
+	FLOPPY_AFS_FORMAT
+FLOPPY_FORMATS_END0
+
 static SLOT_INTERFACE_START( e01_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD ) // NEC FD1036 A
 SLOT_INTERFACE_END
@@ -253,8 +257,9 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 	MCFG_WD2793_ADD(WD2793_TAG, XTAL_8MHz/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(e01_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(e01_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", e01_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", e01_floppies, "35dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", e01_floppies, "35dd", floppy_formats_afs)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", e01_floppies, "35dd", floppy_formats_afs)
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_e01", "e01_flop")
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))

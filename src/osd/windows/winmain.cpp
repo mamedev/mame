@@ -217,6 +217,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_YIQ_PHASE_COUNT";yiqp",                         "2",                 OPTION_INTEGER,    "Phase Count value for NTSC signal processing" },
 	/* Vector simulation below this line */
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "VECTOR POST-PROCESSING OPTIONS" },
+	{ WINOPTION_VECTOR_BEAM_SMOOTH";vecsmooth",                 "0.0",               OPTION_FLOAT,      "The vector beam smoothness" },
 	{ WINOPTION_VECTOR_LENGTH_SCALE";vecscale",                 "0.5",               OPTION_FLOAT,      "The maximum vector attenuation" },
 	{ WINOPTION_VECTOR_LENGTH_RATIO";vecratio",                 "0.5",               OPTION_FLOAT,      "The minimum vector length (vector length to screen size ratio) that is affected by the attenuation" },
 	/* Bloom below this line */

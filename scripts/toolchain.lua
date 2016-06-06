@@ -95,6 +95,8 @@ function toolchain(_buildDir, _subDir)
 	local androidPlatform = "android-14"
 	if _OPTIONS["with-android"] then
 		androidPlatform = "android-" .. _OPTIONS["with-android"]
+	elseif _OPTIONS["PLATFORM"]:find("64", -2) then
+		androidPlatform = "android-21"
 	end
 
 	local iosPlatform = ""
@@ -115,73 +117,40 @@ function toolchain(_buildDir, _subDir)
 		end
 
 		if string.find(_OPTIONS["gcc"], "android") then
-			if not  os.getenv("ANDROID_NDK_LLVM") then
-				print("Set ANDROID_NDK_LLVM envrionment variables.")
+			-- 64-bit android platform requires >= 21
+			if _OPTIONS["PLATFORM"]:find("64", -2) and tonumber(androidPlatform:sub(9)) < 21 then
+				error("64-bit android requires platform 21 or higher")
 			end
+			if not os.getenv("ANDROID_NDK_ROOT") then
+				print("Set ANDROID_NDK_ROOT environment variable.")
+			end
+			if not os.getenv("ANDROID_NDK_LLVM") then
+				print("Set ANDROID_NDK_LLVM envrionment variable.")
+			end
+			platform_ndk_env = "ANDROID_NDK_" .. _OPTIONS["PLATFORM"]:upper()
+			if not os.getenv(platform_ndk_env) then
+				print("Set " .. platform_ndk_env .. " environment variable.")
+			end
+
+			local platformToolchainMap = {
+				['arm']    = "arm-linux-androideabi",
+				['arm64']  = "aarch64-linux-android",
+				['mips64'] = "mips64el-linux-android",
+				['mips']   = "mipsel-linux-android",
+				['x86']    = "i686-linux-android",
+				['x64']    = "x86_64-linux-android",
+			}
+
+			toolchainPrefix = os.getenv(platform_ndk_env) .. "/bin/" .. platformToolchainMap[_OPTIONS["PLATFORM"]] .. "-"
 
 			premake.gcc.cc  = "$(ANDROID_NDK_LLVM)/bin/clang"
 			premake.gcc.cxx = "$(ANDROID_NDK_LLVM)/bin/clang++"
+			premake.gcc.ar  = toolchainPrefix .. "ar"
 			premake.gcc.llvm = true
+
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-" .. _OPTIONS["PLATFORM"])
 		end
 
-		if "android-arm" == _OPTIONS["gcc"] then
-			if not os.getenv("ANDROID_NDK_ARM") then
-				print("Set ANDROID_NDK_ARM envrionment variables.")
-			end
-
-			premake.gcc.ar  = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-arm")
-		end
-
-		if "android-arm64" == _OPTIONS["gcc"] then
-			if not os.getenv("ANDROID_NDK_ARM64") then
-				print("Set ANDROID_NDK_ARM64 envrionment variables.")
-			end
-
-			premake.gcc.ar  = "$(ANDROID_NDK_ARM64)/bin/aarch64-linux-android-ar"
-			premake.gcc.llvm = true
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-arm64")
-		end
-
-		if "android-mips" == _OPTIONS["gcc"] then
-			if not os.getenv("ANDROID_NDK_MIPS") then
-				print("Set ANDROID_NDK_MIPS envrionment variables.")
-			end
-
-			premake.gcc.ar  = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-ar"
-			premake.gcc.llvm = true
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-mips")
-		end
-
-		if "android-mips64" == _OPTIONS["gcc"] then
-			if not os.getenv("ANDROID_NDK_MIPS64") then
-				print("Set ANDROID_NDK_MIPS64 envrionment variables.")
-			end
-
-			premake.gcc.ar  = "$(ANDROID_NDK_MIPS64)/bin/mips64el-linux-android-ar"
-			premake.gcc.llvm = true
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-mips64")
-		end
-
-		if "android-x86" == _OPTIONS["gcc"] then
-			if not os.getenv("ANDROID_NDK_X86") then
-				print("Set ANDROID_NDK_X86 envrionment variables.")
-			end
-
-			premake.gcc.ar  = "$(ANDROID_NDK_X86)/bin/i686-linux-android-ar"
-			premake.gcc.llvm = true
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-x86")
-		end
-
-		if "android-x64" == _OPTIONS["gcc"] then
-			if not os.getenv("ANDROID_NDK_X64") then
-				print("Set ANDROID_NDK_X64 envrionment variables.")
-			end
-
-			premake.gcc.ar  = "$(ANDROID_NDK_X64)/bin/x86_64-linux-android-ar"
-			premake.gcc.llvm = true
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-x64")
-		end
 		if "asmjs" == _OPTIONS["gcc"] then
 
 			if not os.getenv("EMSCRIPTEN") then
@@ -804,6 +773,8 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "openbsd" .. "/bin/x64/Debug")
 
 	configuration { "android-*" }
+		targetdir (_buildDir .. "android-" .. _OPTIONS["PLATFORM"] .. "/bin")
+		objdir (_buildDir .. "android-" .. _OPTIONS["PLATFORM"] .. "/obj")
 		includedirs {
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
@@ -848,8 +819,6 @@ function toolchain(_buildDir, _subDir)
 
 
 	configuration { "android-arm" }
-		targetdir (_buildDir .. "android-arm" .. "/bin")
-		objdir (_buildDir .. "android-arm" .. "/obj")
 			libdirs {
 				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib",
@@ -876,9 +845,6 @@ function toolchain(_buildDir, _subDir)
 			}
 
 	configuration { "android-arm64" }
-		androidPlatform = "android-21" -- supported from API 21
-		targetdir (_buildDir .. "android-arm64" .. "/bin")
-		objdir (_buildDir .. "android-arm64" .. "/obj")
 			libdirs {
 				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/arm64-v8a",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib64",
@@ -899,8 +865,6 @@ function toolchain(_buildDir, _subDir)
 			}
 
 	configuration { "android-mips" }
-		targetdir (_buildDir .. "android-mips" .. "/bin")
-		objdir (_buildDir .. "android-mips" .. "/obj")
 		libdirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/mips",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/",
@@ -921,9 +885,6 @@ function toolchain(_buildDir, _subDir)
 		}
 
 	configuration { "android-mips64" }
-		androidPlatform = "android-21" -- supported from API 21
-		targetdir (_buildDir .. "android-mips64" .. "/bin")
-		objdir (_buildDir .. "android-mips64" .. "/obj")
 		libdirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/mips64",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/lib64/",
@@ -944,8 +905,6 @@ function toolchain(_buildDir, _subDir)
 		}
 
 	configuration { "android-x86" }
-		targetdir (_buildDir .. "android-x86" .. "/bin")
-		objdir (_buildDir .. "android-x86" .. "/obj")
 		libdirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib",
@@ -968,9 +927,6 @@ function toolchain(_buildDir, _subDir)
 		}
 
 	configuration { "android-x64" }
-		androidPlatform = "android-21" -- supported from API 21
-		targetdir (_buildDir .. "android-x64" .. "/bin")
-		objdir (_buildDir .. "android-x64" .. "/obj")
 		libdirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86_64",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64",
@@ -1092,22 +1048,10 @@ function strip()
 			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] and toolchainPrefix) .. "strip \"$(TARGET)\"",
 		}
 
-	configuration { "android-arm", "Release" }
+	configuration { "android-*", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) $(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-strip -s \"$(TARGET)\""
-		}
-
-	configuration { "android-mips", "Release" }
-		postbuildcommands {
-			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) $(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-strip -s \"$(TARGET)\""
-		}
-
-	configuration { "android-x86", "Release" }
-		postbuildcommands {
-			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) $(ANDROID_NDK_X86)/bin/i686-linux-android-strip -s \"$(TARGET)\""
+			"$(SILENT) " .. toolchainPrefix .. "strip -s \"$(TARGET)\""
 		}
 
 	configuration { "linux-* or rpi", "Release" }
