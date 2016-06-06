@@ -42,33 +42,6 @@ enum
 
 
 //============================================================
-//  MACROS
-//============================================================
-
-#define FSWAP(var1, var2) do { float temp = var1; var1 = var2; var2 = temp; } while (0)
-
-
-//============================================================
-//  GLOBALS
-//============================================================
-
-static const line_aa_step line_aa_1step[] =
-{
-	{  0.00f,  0.00f,  1.00f  },
-	{ 0 }
-};
-
-static const line_aa_step line_aa_4step[] =
-{
-	{ -0.25f,  0.00f,  0.25f  },
-	{  0.25f,  0.00f,  0.25f  },
-	{  0.00f, -0.25f,  0.25f  },
-	{  0.00f,  0.25f,  0.25f  },
-	{ 0 }
-};
-
-
-//============================================================
 //  INLINES
 //============================================================
 
@@ -1388,13 +1361,11 @@ void renderer_d3d9::batch_vectors(int vector_count)
 {
 	auto win = assert_window();
 
-	windows_options &options = downcast<windows_options &>(win->machine().options());
-
 	float quad_width = 0.0f;
 	float quad_height = 0.0f;
 
-	int vertex_count = vector_count * (options.antialias() ? 24 : 6);
-	int triangle_count = vector_count * (options.antialias() ? 8 : 2);
+	int vertex_count = vector_count * 6;
+	int triangle_count = vector_count * 2;
 	m_vectorbatch = mesh_alloc(vertex_count);
 	m_batchindex = 0;
 
@@ -1499,71 +1470,103 @@ void renderer_d3d9::batch_vectors(int vector_count)
 
 void renderer_d3d9::batch_vector(const render_primitive &prim)
 {
+	// get a pointer to the vertex buffer
+	if (m_vectorbatch == nullptr)
+	{
+		return;
+	}
+
 	// compute the effective width based on the direction of the line
 	float effwidth = prim.width;
-	if (effwidth < 0.5f)
+	if (effwidth < 2.0f)
 	{
-		effwidth = 0.5f;
+		effwidth = 2.0f;
 	}
 
 	// determine the bounds of a quad to draw this line
 	render_bounds b0, b1;
 	render_line_to_quad(&prim.bounds, effwidth, effwidth, &b0, &b1);
 
-	float dx = b1.x1 - b0.x1;
-	float dy = b1.y1 - b0.y1;
-	float line_length = sqrtf(dx * dx + dy * dy);
+	float lx = b1.x1 - b0.x1;
+	float ly = b1.y1 - b0.y1;
+	float wx = b1.x1 - b1.x0;
+	float wy = b1.y1 - b1.y0;
+	float line_length = sqrtf(lx * lx + ly * ly);
+	float line_width = sqrtf(wx * wx + wy * wy);
 
-	// iterate over AA steps
-	for (const line_aa_step *step = PRIMFLAG_GET_ANTIALIAS(prim.flags) ? line_aa_4step : line_aa_1step;
-		step->weight != 0; step++)
+	m_vectorbatch[m_batchindex + 0].x = b0.x0;
+	m_vectorbatch[m_batchindex + 0].y = b0.y0;
+	m_vectorbatch[m_batchindex + 1].x = b0.x1;
+	m_vectorbatch[m_batchindex + 1].y = b0.y1;
+	m_vectorbatch[m_batchindex + 2].x = b1.x0;
+	m_vectorbatch[m_batchindex + 2].y = b1.y0;
+
+	m_vectorbatch[m_batchindex + 3].x = b0.x1;
+	m_vectorbatch[m_batchindex + 3].y = b0.y1;
+	m_vectorbatch[m_batchindex + 4].x = b1.x0;
+	m_vectorbatch[m_batchindex + 4].y = b1.y0;
+	m_vectorbatch[m_batchindex + 5].x = b1.x1;
+	m_vectorbatch[m_batchindex + 5].y = b1.y1;
+
+	if (m_shaders->enabled())
 	{
-		// get a pointer to the vertex buffer
-		if (m_vectorbatch == nullptr)
-		{
-			return;
-		}
+		// procedural generated texture
+		m_vectorbatch[m_batchindex + 0].u0 = 0.0f;
+		m_vectorbatch[m_batchindex + 0].v0 = 0.0f;
+		m_vectorbatch[m_batchindex + 1].u0 = 0.0f;
+		m_vectorbatch[m_batchindex + 1].v0 = 1.0f;
+		m_vectorbatch[m_batchindex + 2].u0 = 1.0f;
+		m_vectorbatch[m_batchindex + 2].v0 = 0.0f;
 
-		m_vectorbatch[m_batchindex + 0].x = b0.x0 + step->xoffs;
-		m_vectorbatch[m_batchindex + 0].y = b0.y0 + step->yoffs;
-		m_vectorbatch[m_batchindex + 1].x = b0.x1 + step->xoffs;
-		m_vectorbatch[m_batchindex + 1].y = b0.y1 + step->yoffs;
-		m_vectorbatch[m_batchindex + 2].x = b1.x0 + step->xoffs;
-		m_vectorbatch[m_batchindex + 2].y = b1.y0 + step->yoffs;
-
-		m_vectorbatch[m_batchindex + 3].x = b0.x1 + step->xoffs;
-		m_vectorbatch[m_batchindex + 3].y = b0.y1 + step->yoffs;
-		m_vectorbatch[m_batchindex + 4].x = b1.x0 + step->xoffs;
-		m_vectorbatch[m_batchindex + 4].y = b1.y0 + step->yoffs;
-		m_vectorbatch[m_batchindex + 5].x = b1.x1 + step->xoffs;
-		m_vectorbatch[m_batchindex + 5].y = b1.y1 + step->yoffs;
-
-		// determine the color of the line
-		INT32 r = (INT32)(prim.color.r * step->weight * 255.0f);
-		INT32 g = (INT32)(prim.color.g * step->weight * 255.0f);
-		INT32 b = (INT32)(prim.color.b * step->weight * 255.0f);
-		INT32 a = (INT32)(prim.color.a * 255.0f);
-		DWORD color = D3DCOLOR_ARGB(a, r, g, b);
-
-		// set the color, Z parameters to standard values
-		for (int i = 0; i < 6; i++)
-		{
-			m_vectorbatch[m_batchindex + i].x -= 0.5f;
-			m_vectorbatch[m_batchindex + i].y -= 0.5f;
-			m_vectorbatch[m_batchindex + i].z = 0.0f;
-			m_vectorbatch[m_batchindex + i].rhw = 1.0f;
-			m_vectorbatch[m_batchindex + i].color = color;
-
-			// no texture mapping
-			m_vectorbatch[m_batchindex + i].u0 = 0.0f;
-			m_vectorbatch[m_batchindex + i].v0 = 0.0f;
-
-			// line length
-			m_vectorbatch[m_batchindex + i].u1 = line_length;
-		}
-
-		m_batchindex += 6;
+		m_vectorbatch[m_batchindex + 3].u0 = 0.0f;
+		m_vectorbatch[m_batchindex + 3].v0 = 1.0f;
+		m_vectorbatch[m_batchindex + 4].u0 = 1.0f;
+		m_vectorbatch[m_batchindex + 4].v0 = 0.0f;
+		m_vectorbatch[m_batchindex + 5].u0 = 1.0f;
+		m_vectorbatch[m_batchindex + 5].v0 = 1.0f;
 	}
+	else
+	{
+		vec2f& start = get_default_texture()->get_uvstart();
+		vec2f& stop = get_default_texture()->get_uvstop();
+
+		m_vectorbatch[m_batchindex + 0].u0 = start.c.x;
+		m_vectorbatch[m_batchindex + 0].v0 = start.c.y;
+		m_vectorbatch[m_batchindex + 1].u0 = start.c.x;
+		m_vectorbatch[m_batchindex + 1].v0 = stop.c.y;
+		m_vectorbatch[m_batchindex + 2].u0 = stop.c.x;
+		m_vectorbatch[m_batchindex + 2].v0 = start.c.y;
+
+		m_vectorbatch[m_batchindex + 3].u0 = start.c.x;
+		m_vectorbatch[m_batchindex + 3].v0 = stop.c.y;
+		m_vectorbatch[m_batchindex + 4].u0 = stop.c.x;
+		m_vectorbatch[m_batchindex + 4].v0 = start.c.y;
+		m_vectorbatch[m_batchindex + 5].u0 = stop.c.x;
+		m_vectorbatch[m_batchindex + 5].v0 = stop.c.y;
+	}
+
+	// determine the color of the line
+	INT32 r = (INT32)(prim.color.r * 255.0f);
+	INT32 g = (INT32)(prim.color.g * 255.0f);
+	INT32 b = (INT32)(prim.color.b * 255.0f);
+	INT32 a = (INT32)(prim.color.a * 255.0f);
+	DWORD color = D3DCOLOR_ARGB(a, r, g, b);
+
+	// set the color, Z parameters to standard values
+	for (int i = 0; i < 6; i++)
+	{
+		m_vectorbatch[m_batchindex + i].x -= 0.5f;
+		m_vectorbatch[m_batchindex + i].y -= 0.5f;
+		m_vectorbatch[m_batchindex + i].z = 0.0f;
+		m_vectorbatch[m_batchindex + i].rhw = 1.0f;
+		m_vectorbatch[m_batchindex + i].color = color;
+
+		// vector length/width
+		m_vectorbatch[m_batchindex + i].u1 = line_length;
+		m_vectorbatch[m_batchindex + i].v1 = line_width;
+	}
+
+	m_batchindex += 6;
 }
 
 
@@ -1573,37 +1576,44 @@ void renderer_d3d9::batch_vector(const render_primitive &prim)
 
 void renderer_d3d9::draw_line(const render_primitive &prim)
 {
+	// get a pointer to the vertex buffer
+	vertex *vertex = mesh_alloc(4);
+	if (vertex == nullptr)
+	{
+		return;
+	}
+
 	// compute the effective width based on the direction of the line
 	float effwidth = prim.width;
-	if (effwidth < 0.5f)
+	if (effwidth < 1.0f)
 	{
-		effwidth = 0.5f;
+		effwidth = 1.0f;
 	}
 
 	// determine the bounds of a quad to draw this line
 	render_bounds b0, b1;
 	render_line_to_quad(&prim.bounds, effwidth, 0.0f, &b0, &b1);
 
-	// get a pointer to the vertex buffer
-	vertex *vertex = mesh_alloc(4);
-	if (vertex == nullptr)
-		return;
-
-	// rotate the unit vector by 135 degrees and add to point 0
 	vertex[0].x = b0.x0;
 	vertex[0].y = b0.y0;
-
-	// rotate the unit vector by -135 degrees and add to point 0
 	vertex[1].x = b0.x1;
 	vertex[1].y = b0.y1;
-
-	// rotate the unit vector by 45 degrees and add to point 1
 	vertex[2].x = b1.x0;
 	vertex[2].y = b1.y0;
-
-	// rotate the unit vector by -45 degrees and add to point 1
 	vertex[3].x = b1.x1;
 	vertex[3].y = b1.y1;
+
+	vec2f& start = get_default_texture()->get_uvstart();
+	vec2f& stop = get_default_texture()->get_uvstop();
+
+	vertex[0].u0 = start.c.x;
+	vertex[0].v0 = start.c.y;
+	vertex[2].u0 = stop.c.x;
+	vertex[2].v0 = start.c.y;
+	vertex[1].u0 = start.c.x;
+	vertex[1].v0 = stop.c.y;
+	vertex[3].u0 = stop.c.x;
+	vertex[3].v0 = stop.c.y;
 
 	// determine the color of the line
 	INT32 r = (INT32)(prim.color.r * 255.0f);
@@ -1618,10 +1628,6 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 		vertex[i].z = 0.0f;
 		vertex[i].rhw = 1.0f;
 		vertex[i].color = color;
-
-		// no texture mapping
-		vertex[i].u0 = 0.0f;
-		vertex[i].v0 = 0.0f;
 	}
 
 	// now add a polygon entry

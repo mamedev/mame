@@ -170,22 +170,18 @@ float GetSpotAddend(float2 coord, float amount)
 	return saturate(SigmoidSpot);
 }
 
-float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
+float GetRoundCornerFactor(float2 coord, float2 bounds, float radiusAmount, float smoothAmount)
 {
 	// reduce smooth amount down to radius amount
 	smoothAmount = min(smoothAmount, radiusAmount);
 
-	float2 quadDims = QuadDims;
-	quadDims = SwapXY
-		? quadDims.yx
-		: quadDims.xy;
-
-	float range = min(quadDims.x, quadDims.y) * 0.5;
-	float radius = range * max(radiusAmount, 0.0025f);
-	float smooth = 1.0 / (range * max(smoothAmount, 0.0025f));
+	float range = min(bounds.x, bounds.y);
+	float amountMinimum = range > 0.0f ? 1.0f / range : 0.0f;
+	float radius = range * max(radiusAmount, amountMinimum);
+	float smooth = 1.0f / (range * max(smoothAmount, amountMinimum * 3.0f));
 
 	// compute box
-	float box = roundBox(quadDims * (coord * 2.0f), quadDims, radius);
+	float box = roundBox(bounds * (coord * 2.0f), bounds, radius);
 
 	// apply smooth
 	box *= smooth;
@@ -279,8 +275,11 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	// Round Corners Simulation
 	float2 RoundCornerCoord = CornerCoordCentered;
+	float2 RoundCornerBounds = SwapXY
+		? QuadDims.yx
+		: QuadDims.xy;
 
-	float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, RoundCornerAmount, SmoothBorderAmount);
+	float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, RoundCornerBounds, RoundCornerAmount * 0.5f, SmoothBorderAmount * 0.5f);
 	BaseColor.rgb *= roundCornerFactor;
 
 	return BaseColor;

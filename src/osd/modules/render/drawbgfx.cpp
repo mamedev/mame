@@ -624,6 +624,13 @@ void renderer_bgfx::put_line(float x0, float y0, float x1, float y1, float r, UI
 		dy *= d;
 	}
 
+	// create diamond shape for points
+	else
+	{
+		// set distance to unit vector length (1,1)
+		dx = dy = 0.70710678f;
+	}
+
 	float nx = dy;
 	float ny = -dx;
 	float verts[4 * 3];

@@ -223,6 +223,9 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "electron_cart")
 	MCFG_GENERIC_LOAD(electron_state, electron_cart)
 
+	/* expansion ports */
+	MCFG_ELECTRON_EXPANSION_SLOT_ADD("exp", electron_expansion_devices, nullptr)
+
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list","electron_cass")
 	MCFG_SOFTWARE_LIST_ADD("cart_list","electron_cart")

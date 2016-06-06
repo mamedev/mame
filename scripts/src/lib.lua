@@ -145,6 +145,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/adam_cas.h",
 		MAME_DIR .. "src/lib/formats/adam_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/adam_dsk.h",
+		MAME_DIR .. "src/lib/formats/afs_dsk.cpp",
+		MAME_DIR .. "src/lib/formats/afs_dsk.h",
 		MAME_DIR .. "src/lib/formats/ami_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/ami_dsk.h",
 		MAME_DIR .. "src/lib/formats/ap2_dsk.cpp",

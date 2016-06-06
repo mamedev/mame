@@ -96,6 +96,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/output/none.cpp",
 		MAME_DIR .. "src/osd/modules/output/console.cpp",
 		MAME_DIR .. "src/osd/modules/output/network.cpp",
+		MAME_DIR .. "src/osd/modules/output/win32_output.cpp",
+		MAME_DIR .. "src/osd/modules/output/win32_output.h",
 		MAME_DIR .. "src/osd/modules/ipc/tcp_connection.cpp",
 		MAME_DIR .. "src/osd/modules/ipc/tcp_connection.h",
 		MAME_DIR .. "src/osd/modules/ipc/tcp_server.cpp",

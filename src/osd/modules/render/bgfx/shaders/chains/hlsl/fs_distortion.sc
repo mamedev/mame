@@ -97,19 +97,18 @@ float GetSpotAddend(vec2 coord, float amount)
 	return saturate(SigmoidSpot);
 }
 
-float GetRoundCornerFactor(vec2 coord, float radiusAmount, float smoothAmount)
+float GetRoundCornerFactor(vec2 coord, vec2 bounds, float radiusAmount, float smoothAmount)
 {
 	// reduce smooth amount down to radius amount
 	smoothAmount = min(smoothAmount, radiusAmount);
 
-	vec2 quadDims = (u_swap_xy.x > 0.0) ? u_quad_dims.yx : u_quad_dims.xy;
-
-	float range = min(quadDims.x, quadDims.y) * 0.5;
-	float radius = range * max(radiusAmount, 0.0025);
-	float smooth_val = 1.0 / (range * max(smoothAmount, 0.0025));
+	float range = min(bounds.x, bounds.y);
+	float amountMinimum = range > 0.0f ? 1.0f / range : 0.0f;
+	float radius = range * max(radiusAmount, amountMinimum);
+	float smooth_val = 1.0f / (range * max(smoothAmount, amountMinimum * 3.0f));
 
 	// compute box
-	float box = roundBox(quadDims * (coord * 2.0f), quadDims, radius);
+	float box = roundBox(bounds * (coord * 2.0f), bounds, radius);
 
 	// apply smooth
 	box *= smooth_val;
@@ -206,8 +205,11 @@ void main()
 
 		// Round Corners Simulation
 		vec2 RoundCornerCoord = CornerCoordCentered;
+		vec2 RoundCornerBounds = (u_swap_xy.x > 0.0)
+			? u_quad_dims.yx
+			: u_quad_dims.xy;
 
-		float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, u_round_corner.x, u_smooth_border.x);
+		float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, RoundCornerBounds, u_round_corner.x * 0.5f, u_smooth_border.x * 0.5f);
 		BaseColor.rgb *= roundCornerFactor;
 
 		gl_FragColor = BaseColor;

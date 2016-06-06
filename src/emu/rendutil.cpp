@@ -535,7 +535,7 @@ void render_line_to_quad(const render_bounds *bounds, float width, float length_
 	bounds1->x0 = modbounds.x1 - unity;
 	bounds1->y0 = modbounds.y1 + unitx;
 
-	/* rotate the unit vector by -09 degrees and add to point 1 */
+	/* rotate the unit vector by -90 degrees and add to point 1 */
 	bounds1->x1 = modbounds.x1 + unity;
 	bounds1->y1 = modbounds.y1 - unitx;
 }

@@ -21,6 +21,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+class output_module;
 typedef void (*output_notifier_func)(const char *outname, INT32 value, void *param);
 
 // ======================> output_manager
@@ -72,7 +73,7 @@ public:
 	void set_notifier(const char *outname, output_notifier_func callback, void *param);
 
 	// set a notifier on a particular output, or globally if nullptr
-	void notify_all(output_notifier_func callback, void *param);
+	void notify_all(output_module *module);
 
 	// map a name to a unique ID
 	UINT32 name_to_id(const char *outname);
