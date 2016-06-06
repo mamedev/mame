@@ -33972,11 +33972,13 @@ sun2_50                         //
 sun3_110                        //
 sun3_150                        //
 sun3_260                        //
-sun3_460                        //
 sun3_50                         //
 sun3_60                         //
-sun3_80                         //
 sun3_e                          //
+
+@source:sun3x.cpp
+sun3_80                         //
+sun3_460                        //
 
 @source:sun4.cpp
 sun_s10                         //
