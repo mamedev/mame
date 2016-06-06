@@ -2329,8 +2329,8 @@ atmtb2                          //
 
 @source:atom.cpp
 atom                            // 1979 Acorn Atom
-atombb                          // 1979 Acorn Atom
-atomeb                          // 1979 Acorn Atom
+atombb                          // 1982 Acorn Atom with BBC Basic
+atomeb                          // 1979 Acorn Atom with Eprom Box
 
 @source:atpci.cpp
 at586                           // 19?? AT 586
@@ -14542,6 +14542,14 @@ isbc286                         //
 isbc2861                        //
 isbc86                          //
 rpc86                           //
+
+@source:isbc8010.cpp
+isbc8010                        //
+isbc8010a                       //
+isbc8010b                       //
+
+@source:isbc8030.cpp
+isbc8030                        //
 
 @source:iskr103x.cpp
 iskr1030m                       //
