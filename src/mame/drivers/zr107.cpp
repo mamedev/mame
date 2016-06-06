@@ -216,7 +216,7 @@ public:
 
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_dsp;
+	required_device<adsp21062_device> m_dsp;
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_device<k001604_device> m_k001604;
 	required_device<k056800_device> m_k056800;
@@ -911,6 +911,8 @@ DRIVER_INIT_MEMBER(zr107_state,common)
 	m_sharc_dataram = std::make_unique<UINT32[]>(0x100000/4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
 	m_ccu_vcth = m_ccu_vctl = 0;
+
+	m_dsp->enable_recompiler();
 }
 
 DRIVER_INIT_MEMBER(zr107_state,zr107)

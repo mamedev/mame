@@ -168,6 +168,8 @@ public:
 	void sharc_cfunc_unimplemented_shiftimm();
 	void sharc_cfunc_write_snoop();
 
+	void enable_recompiler();
+
 	enum ASTAT_FLAGS
 	{
 		// ASTAT flags
@@ -451,6 +453,8 @@ private:
 	opcode_func m_sharc_op[512];
 
 	UINT16 m_internal_ram[2 * 0x10000]; // 2x 128KB
+
+	bool m_enable_drc;
 
 	inline void CHANGE_PC(UINT32 newpc);
 	inline void CHANGE_PC_DELAYED(UINT32 newpc);
