@@ -106,8 +106,8 @@ namespace netlist
 		NETLIB_SUB(9312) m_sub;
 	};
 
-	#if (1 && USE_TRUTHTABLE)
-	nld_9312::truthtable_t nld_9312::m_ttbl(12,2,0);
+	#if (USE_TRUTHTABLE)
+	nld_9312::truthtable_t nld_9312::m_ttbl;
 
 	/* FIXME: Data changes are propagating faster than changing selects A,B,C
 	 *        Please refer to data sheet.

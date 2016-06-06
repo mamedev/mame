@@ -52,656 +52,372 @@ namespace netlist
 	namespace devices
 	{
 
-	class dyn_bitset
+	template<unsigned bits>
+	struct need_bytes_for_bits
 	{
-		dyn_bitset(const std::size_t size)
-		: m_size(size)
-		, m_data_size((m_data_bits - 1 + size) / m_data_bits)
+	    enum { value =
+	        bits <= 8       ?  1 :
+	        bits <= 16      ?  2 :
+	        bits <= 32      ?  4 :
+	                           8
+	    };
+	};
+
+	template<unsigned bits> struct uint_for_size;
+	template<> struct uint_for_size<1> { typedef uint8_t type; };
+	template<> struct uint_for_size<2> { typedef uint16_t type; };
+	template<> struct uint_for_size<4> { typedef uint32_t type; };
+	template<> struct uint_for_size<8> { typedef uint64_t type; };
+
+	struct packed_int
+	{
+		template<typename C>
+		packed_int(C *data)
+		: m_data(data)
+		, m_size(sizeof(C))
+		{}
+
+		void set(const size_t pos, const uint64_t val)
 		{
-			m_d = new data_type[m_data_size];
-			for (std::size_t i=0; i<m_data_size; i++)
-				m_d[i] = 0;
+			switch (m_size)
+			{
+				case 1: ((uint8_t *) m_data)[pos] = val; break;
+				case 2: ((uint16_t *) m_data)[pos] = val; break;
+				case 4: ((uint32_t *) m_data)[pos] = val; break;
+				case 8: ((uint64_t *) m_data)[pos] = val; break;
+				default: { }
+			}
 		}
 
-		~dyn_bitset()
+		UINT64 operator[] (size_t pos) const
 		{
-			delete [] m_d;
+			switch (m_size)
+			{
+				case 1: return ((uint8_t *) m_data)[pos]; break;
+				case 2: return ((uint16_t *) m_data)[pos]; break;
+				case 4: return ((uint32_t *) m_data)[pos]; break;
+				case 8: return ((uint64_t *) m_data)[pos]; break;
+				default:
+					return 0; //should never happen
+			}
 		}
 
-		void set()
+		uint64_t adjust(uint64_t val) const
 		{
-			for (std::size_t i=0; i<m_data_size; i++)
-				m_d[i] = ~0;
+			switch (m_size)
+			{
+				case 1: return ((uint8_t) val); break;
+				case 2: return ((uint16_t) val); break;
+				case 4: return ((uint32_t) val); break;
+				case 8: return ((uint64_t) val); break;
+				default:
+					return 0; //should never happen
+			}
+		}
+	private:
+		void *m_data;
+		size_t m_size;
+	};
+
+	struct truthtable_desc_t
+	{
+		truthtable_desc_t(int NO, int NI, int has_state, bool *initialized,
+				packed_int outs, UINT8 *timing, netlist_time *timing_nt)
+		: m_NO(NO), m_NI(NI), /*m_has_state(has_state),*/ m_initialized(initialized),
+			m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
+			m_num_bits(m_NI + has_state * (m_NI + m_NO)),
+			m_size(1 << (m_num_bits))
+		{
 		}
 
-		void set(std::size_t pos)
-		{
-			const std::size_t bytepos = (pos >> m_data_shift);
-			const std::size_t bitpos =  (pos & m_data_mask);
-			m_d[bytepos] |= (1 << bitpos);
-		}
-
-		void reset()
-		{
-			for (std::size_t i=0; i<m_data_size; i++)
-				m_d[i] = 0;
-		}
-
-		void reset(std::size_t pos)
-		{
-			const std::size_t bytepos = (pos >> m_data_shift);
-			const std::size_t bitpos =  (pos & m_data_mask);
-			m_d[bytepos] &= ~(1 << bitpos);
-		}
-
-		bool operator[] (size_t pos) const
-		{
-			const std::size_t bytepos = (pos >> m_data_shift);
-			const std::size_t bitpos =  (pos & m_data_mask);
-			return (m_d[bytepos] >> bitpos) & 1;
-		}
+		void setup(const plib::pstring_vector_t &desc, UINT32 disabled_ignore);
 
 	private:
-		typedef std::uint64_t data_type;
-		static constexpr std::size_t m_data_bits = sizeof(data_type) * 8;
-		static constexpr std::size_t m_data_shift = 6;
-		static constexpr std::size_t m_data_mask = (1<< m_data_shift) - 1;
-		std::size_t m_size;
-		std::size_t m_data_size;
-		data_type *m_d;
+		void help(unsigned cur, plib::pstring_vector_t list,
+				uint64_t state, uint64_t val, std::vector<uint8_t> &timing_index);
+		static unsigned count_bits(uint64_t v);
+		static uint64_t set_bits(uint64_t v, uint64_t b);
+		uint64_t get_ignored_simple(uint64_t i);
+		uint64_t get_ignored_extended(uint64_t i);
+
+		unsigned m_NO;
+		unsigned m_NI;
+		bool *m_initialized;
+		packed_int m_outs;
+		uint8_t  *m_timing;
+		netlist_time *m_timing_nt;
+
+		/* additional values */
+
+		const std::size_t m_num_bits;
+		const std::size_t m_size;
+
 	};
 
-
-#if 0
-static inline UINT32 remove_first_bit(UINT32 v)
-{
-	for (int i=0; i<32; i++)
-		if (v & (1<<i))
-			return v & ~(1<<i);
-	return v;
-}
-#endif
-
-struct truthtable_desc_t
-{
-	truthtable_desc_t(int NO, int NI, int has_state, bool *initialized,
-			UINT16 *outs, UINT8 *timing, netlist_time *timing_nt)
-	: m_NO(NO), m_NI(NI), /*m_has_state(has_state),*/ m_initialized(initialized),
-		m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
-		m_num_bits(m_NI + has_state * (m_NI + m_NO)),
-		m_size(1 << (m_num_bits))
+	template<unsigned m_NI, unsigned m_NO, int m_has_state>
+	NETLIB_OBJECT(truthtable_t)
 	{
-	}
+	private:
+		family_setter_t m_fam;
+	public:
 
-	void setup(const plib::pstring_vector_t &desc, UINT32 disabled_ignore);
+		static const int m_num_bits = m_NI + m_has_state * (m_NI + m_NO);
+		static const int m_size = (1 << (m_num_bits));
 
-private:
-	void help(unsigned cur, plib::pstring_vector_t list,
-			UINT64 state,UINT16 val, std::vector<UINT8> &timing_index);
-	static unsigned count_bits(UINT32 v);
-	static UINT32 set_bits(UINT32 v, UINT32 b);
-	UINT32 get_ignored_simple(UINT32 i);
-	UINT32 get_ignored_extended(UINT32 i);
-
-	unsigned m_NO;
-	unsigned m_NI;
-	//int m_has_state;
-	bool *m_initialized;
-	UINT16 *m_outs;
-	UINT8  *m_timing;
-	netlist_time *m_timing_nt;
-
-	/* additional values */
-
-	const UINT32 m_num_bits;
-	const UINT32 m_size;
-
-};
-
-#if 1
-template<unsigned m_NI, unsigned m_NO, int m_has_state>
-NETLIB_OBJECT(truthtable_t)
-{
-private:
-	family_setter_t m_fam;
-public:
-
-	static const int m_num_bits = m_NI + m_has_state * (m_NI + m_NO);
-	static const int m_size = (1 << (m_num_bits));
-
-	struct truthtable_t
-	{
-		truthtable_t(size_t NI, size_t NO, bool has_state)
-		: m_initialized(false)
-		, m_desc(NO, NI, has_state, &m_initialized, m_outs, m_timing, m_timing_nt) {}
-		bool m_initialized;
-		UINT16 m_outs[m_size];
-		//UINT32 m_outs[m_size];
-		UINT8  m_timing[m_size * m_NO];
-		netlist_time m_timing_nt[16];
-		truthtable_desc_t m_desc;
-	};
-
-	template <class C>
-	nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
-			truthtable_t *ttbl, const char *desc[])
-	: device_t(owner, name)
-	, m_fam(*this, fam)
-	, m_last_state(0)
-	, m_ign(0)
-	, m_active(1)
-	, m_ttp(ttbl)
-	{
-		while (*desc != nullptr && **desc != 0 )
-			{
-				m_desc.push_back(*desc);
-				desc++;
-			}
-		startxx();
-	}
-
-	template <class C>
-	nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
-			truthtable_t *ttbl, const plib::pstring_vector_t &desc)
-	: device_t(owner, name)
-	, m_fam(*this, fam)
-	, m_last_state(0)
-	, m_ign(0)
-	, m_active(1)
-	, m_ttp(ttbl)
-	{
-		m_desc = desc;
-		startxx();
-	}
-
-	void startxx()
-	{
-		pstring header = m_desc[0];
-
-		plib::pstring_vector_t io(header,"|");
-		// checks
-		nl_assert_always(io.size() == 2, "too many '|'");
-		plib::pstring_vector_t inout(io[0], ",");
-		nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
-		plib::pstring_vector_t out(io[1], ",");
-		nl_assert_always(out.size() == m_NO, "output count wrong");
-
-		for (std::size_t i=0; i < m_NI; i++)
+		struct truthtable_t
 		{
-			//new (&m_I[i]) logic_input_t();
-			inout[i] = inout[i].trim();
-			m_I.emplace(i, *this, inout[i]);
-		}
-		for (std::size_t i=0; i < m_NO; i++)
+			truthtable_t()
+			: m_initialized(false)
+			{}
+			bool m_initialized;
+			typename uint_for_size<need_bytes_for_bits<m_NO + m_NI>::value>::type m_outs[m_size];
+			UINT8  m_timing[m_size * m_NO];
+			netlist_time m_timing_nt[16];
+		};
+
+		template <class C>
+		nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
+				truthtable_t *ttp, const char *desc[])
+		: device_t(owner, name)
+		, m_fam(*this, fam)
+		, m_last_state(0)
+		, m_ign(0)
+		, m_active(1)
+		, m_ttp(ttp)
 		{
-			//new (&m_Q[i]) logic_output_t();
-			out[i] = out[i].trim();
-			m_Q.emplace(i, *this, out[i]);
-			//enregister(out[i], m_Q[i]);
-		}
-		// Connect output "Q" to input "_Q" if this exists
-		// This enables timed state without having explicit state ....
-		UINT32 disabled_ignore = 0;
-		for (std::size_t i=0; i < m_NO; i++)
-		{
-			pstring tmp = "_" + out[i];
-			const int idx = inout.indexof(tmp);
-			if (idx>=0)
-			{
-				connect_late(m_Q[i], m_I[idx]);
-				// disable ignore for this inputs altogether.
-				// FIXME: This shouldn't be necessary
-				disabled_ignore |= (1<<idx);
-			}
+			while (*desc != nullptr && **desc != 0 )
+				{
+					m_desc.push_back(*desc);
+					desc++;
+				}
+			startxx();
 		}
 
-		m_ign = 0;
-
-		m_ttp->m_desc.setup(m_desc, disabled_ignore * 0);
-
-#if 0
-		printf("%s\n", name().cstr());
-		for (int j=0; j < m_size; j++)
-			printf("%05x %04x %04x %04x\n", j, m_ttp->m_outs[j] & ((1 << m_NO)-1),
-					m_ttp->m_outs[j] >> m_NO, m_ttp->m_timing[j * m_NO + 0]);
-		for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero(); k++)
-			printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
-#endif
-		save(NLNAME(m_last_state));
-		save(NLNAME(m_ign));
-		save(NLNAME(m_active));
-	}
-
-	NETLIB_RESETI()
-	{
-		m_active = 0;
-		m_ign = 0;
-		for (std::size_t i = 0; i < m_NI; i++)
-			m_I[i].activate();
-		for (std::size_t i=0; i<m_NO;i++)
-			if (this->m_Q[i].net().num_cons()>0)
-				m_active++;
-		m_last_state = 0;
-	}
-
-	NETLIB_UPDATEI()
-	{
-		process<true>();
-	}
-
-public:
-	void inc_active() override
-	{
-		nl_assert(netlist().use_deactivate());
-		if (m_has_state == 0)
-			if (++m_active == 1)
-			{
-				process<false>();
-			}
-	}
-
-	void dec_active() override
-	{
-		nl_assert(netlist().use_deactivate());
-		/* FIXME:
-		 * Based on current measurements there is no point to disable
-		 * 1 input devices. This should actually be a parameter so that we
-		 * can decide for each individual gate whether it is benefitial to
-		 * ignore deactivation.
-		 */
-		if (m_NI > 1 && m_has_state == 0)
-			if (--m_active == 0)
-			{
-				for (std::size_t i = 0; i< m_NI; i++)
-					m_I[i].inactivate();
-				m_ign = (1<<m_NI)-1;
-			}
-	}
-
-	//logic_input_t m_I[m_NI];
-	//logic_output_t m_Q[m_NO];
-	plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
-	plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;
-
-protected:
-
-private:
-
-	template<bool doOUT>
-	inline void process()
-	{
-		netlist_time mt = netlist_time::zero();
-
-		UINT32 state = 0;
-		if (m_NI > 1 && !m_has_state)
+		template <class C>
+		nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
+				truthtable_t *ttp, const plib::pstring_vector_t &desc)
+		: device_t(owner, name)
+		, m_fam(*this, fam)
+		, m_last_state(0)
+		, m_ign(0)
+		, m_active(1)
+		, m_ttp(ttp)
 		{
+			m_desc = desc;
+			startxx();
+		}
 
-			if (!doOUT)
+		void startxx()
+		{
+			pstring header = m_desc[0];
+
+			plib::pstring_vector_t io(header,"|");
+			// checks
+			nl_assert_always(io.size() == 2, "too many '|'");
+			plib::pstring_vector_t inout(io[0], ",");
+			nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
+			plib::pstring_vector_t out(io[1], ",");
+			nl_assert_always(out.size() == m_NO, "output count wrong");
+
+			for (std::size_t i=0; i < m_NI; i++)
 			{
-				for (std::size_t i = 0; i < m_NI; i++)
-					m_I[i].activate();
+				inout[i] = inout[i].trim();
+				m_I.emplace(i, *this, inout[i]);
+			}
+			for (std::size_t i=0; i < m_NO; i++)
+			{
+				out[i] = out[i].trim();
+				m_Q.emplace(i, *this, out[i]);
+			}
+			// Connect output "Q" to input "_Q" if this exists
+			// This enables timed state without having explicit state ....
+			UINT32 disabled_ignore = 0;
+			for (std::size_t i=0; i < m_NO; i++)
+			{
+				pstring tmp = "_" + out[i];
+				const int idx = inout.indexof(tmp);
+				if (idx>=0)
+				{
+					connect_late(m_Q[i], m_I[idx]);
+					// disable ignore for this inputs altogether.
+					// FIXME: This shouldn't be necessary
+					disabled_ignore |= (1<<idx);
+				}
+			}
+
+			m_ign = 0;
+
+			truthtable_desc_t desc(m_NO, m_NI, m_has_state,
+					&m_ttp->m_initialized, packed_int(m_ttp->m_outs), m_ttp->m_timing, m_ttp->m_timing_nt);
+
+			desc.setup(m_desc, disabled_ignore * 0);
+
+	#if 0
+			printf("%s\n", name().cstr());
+			for (int j=0; j < m_size; j++)
+				printf("%05x %04x %04x %04x\n", j, m_ttp.m_outs[j] & ((1 << m_NO)-1),
+						m_ttp.m_outs[j] >> m_NO, m_ttp.m_timing[j * m_NO + 0]);
+			for (int k=0; m_ttp.m_timing_nt[k] != netlist_time::zero(); k++)
+				printf("%d %f\n", k, m_ttp.m_timing_nt[k].as_double() * 1000000.0);
+	#endif
+			save(NLNAME(m_last_state));
+			save(NLNAME(m_ign));
+			save(NLNAME(m_active));
+		}
+
+		NETLIB_RESETI()
+		{
+			m_active = 0;
+			m_ign = 0;
+			for (std::size_t i = 0; i < m_NI; i++)
+				m_I[i].activate();
+			for (std::size_t i=0; i<m_NO;i++)
+				if (this->m_Q[i].net().num_cons()>0)
+					m_active++;
+			m_last_state = 0;
+		}
+
+		NETLIB_UPDATEI()
+		{
+			process<true>();
+		}
+
+	public:
+		void inc_active() override
+		{
+			nl_assert(netlist().use_deactivate());
+			if (m_NI > 1 && m_has_state == 0)
+				if (++m_active == 1)
+				{
+					process<false>();
+				}
+		}
+
+		void dec_active() override
+		{
+			nl_assert(netlist().use_deactivate());
+			/* FIXME:
+			 * Based on current measurements there is no point to disable
+			 * 1 input devices. This should actually be a parameter so that we
+			 * can decide for each individual gate whether it is benefitial to
+			 * ignore deactivation.
+			 */
+			if (m_NI > 1 && m_has_state == 0)
+				if (--m_active == 0)
+				{
+					for (std::size_t i = 0; i< m_NI; i++)
+						m_I[i].inactivate();
+					m_ign = (1<<m_NI)-1;
+				}
+		}
+
+		//logic_input_t m_I[m_NI];
+		//logic_output_t m_Q[m_NO];
+		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
+		plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;
+
+	protected:
+
+	private:
+
+		template<bool doOUT>
+		inline void process()
+		{
+			netlist_time mt = netlist_time::zero();
+
+			uint64_t state = 0;
+			if (m_NI > 1 && !m_has_state)
+			{
+				auto ign = m_ign;
+				if (!doOUT)
+					for (std::size_t i = 0; i < m_NI; i++)
+					{
+						m_I[i].activate();
+						state |= (INPLOGIC(m_I[i]) << i);
+						mt = std::max(this->m_I[i].net().time(), mt);
+					}
+				else
+					for (std::size_t i = 0; i < m_NI; ign >>= 1, i++)
+					{
+						if ((ign & 1))
+							m_I[i].activate();
+						state |= (INPLOGIC(m_I[i]) << i);
+					}
 			}
 			else
 			{
-				auto ign(m_ign);
-				for (std::size_t i = 0; ign != 0; ign >>= 1, i++)
-					if ((ign & 1))
-						m_I[i].activate();
+				if (!doOUT)
+					for (std::size_t i = 0; i < m_NI; i++)
+					{
+						state |= (INPLOGIC(m_I[i]) << i);
+						mt = std::max(this->m_I[i].net().time(), mt);
+					}
+				else
+					for (std::size_t i = 0; i < m_NI; i++)
+						state |= (INPLOGIC(m_I[i]) << i);
 			}
-		}
+			auto nstate = state;
 
-		if (!doOUT)
-			for (std::size_t i = 0; i < m_NI; i++)
+			if (m_has_state)
+				nstate |= (m_last_state << m_NI);
+
+			const auto outstate = m_ttp->m_outs[nstate];
+			const auto out = outstate & ((1 << m_NO) - 1);
+
+			m_ign = outstate >> m_NO;
+
+			const auto timebase = nstate * m_NO;
+
+			if (doOUT)
 			{
-				state |= (INPLOGIC(m_I[i]) << i);
-				mt = std::max(this->m_I[i].net().time(), mt);
-			}
-		else
-			for (std::size_t i = 0; i < m_NI; i++)
-				state |= (INPLOGIC(m_I[i]) << i);
-
-		UINT32 nstate = state;
-
-		if (m_has_state)
-			nstate |= (m_last_state << m_NI);
-
-		const UINT32 outstate = m_ttp->m_outs[nstate];
-		const UINT32 out = outstate & ((1 << m_NO) - 1);
-
-		m_ign = outstate >> m_NO;
-
-		const UINT32 timebase = nstate * m_NO;
-
-		if (doOUT)
-		{
-			for (std::size_t i = 0; i < m_NO; i++)
-				OUTLOGIC(m_Q[i], (out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
-		}
-		else
-			for (std::size_t i = 0; i < m_NO; i++)
-				m_Q[i].net().set_Q_time((out >> i) & 1, mt + m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
-
-		if (m_has_state)
-			m_last_state = (state << m_NO) | out;
-
-		if (m_NI > 1 && !m_has_state)
-		{
-			auto ign(m_ign);
-			for (std::size_t i = 0; ign != 0; ign >>= 1, i++)
-				if (ign & 1)
-					m_I[i].inactivate();
-		}
-	}
-
-	UINT32 m_last_state;
-	UINT32 m_ign;
-	INT32 m_active;
-
-	truthtable_t *m_ttp;
-	plib::pstring_vector_t m_desc;
-};
-
-#else
-NETLIB_OBJECT(xtruthtable_t)
-{
-private:
-	family_setter_t m_fam;
-public:
-
-	struct truthtable_t
-	{
-		truthtable_t(size_t NI, size_t NO, bool has_state)
-		: m_initialized(false)
-		, m_num_bits(NI + has_state * (NI + NO))
-		, m_size(1 << (m_num_bits))
-		{
-			m_timing = new UINT8[m_size * NO];
-			m_outs = new UINT16[m_size];
-			m_desc = new truthtable_desc_t(NO, NI, has_state, &m_initialized, m_outs, m_timing, m_timing_nt);
-		}
-		bool m_initialized;
-		UINT16 *m_outs;
-		//UINT32 m_outs[m_size];
-		UINT8  *m_timing;
-		netlist_time m_timing_nt[16];
-		truthtable_desc_t *m_desc;
-		int m_num_bits;
-		int m_size;
-	};
-
-	template <class C>
-	nld_xtruthtable_t(size_t NI, size_t NO, bool has_state, C &owner, const pstring &name, const logic_family_desc_t *fam,
-			truthtable_t *ttbl, const char *desc[])
-	: device_t(owner, name)
-	, m_fam(*this, fam)
-	, m_last_state(0)
-	, m_ign(0)
-	, m_active(1)
-	, m_ttp(ttbl)
-	, m_NI(NI)
-	, m_NO(NO)
-	, m_has_state(has_state)
-	{
-		m_is_truthtable = true;
-		while (*desc != nullptr && **desc != 0 )
-			{
-				m_desc.push_back(*desc);
-				desc++;
-			}
-		startxx();
-	}
-
-	template <class C>
-	nld_xtruthtable_t(size_t NI, size_t NO, bool has_state, C &owner, const pstring &name, const logic_family_desc_t *fam,
-			truthtable_t *ttbl, const plib::pstring_vector_t &desc)
-	: device_t(owner, name)
-	, m_fam(*this, fam)
-	, m_last_state(0)
-	, m_ign(0)
-	, m_active(1)
-	, m_ttp(ttbl)
-	, m_NI(NI)
-	, m_NO(NO)
-	, m_has_state(has_state)
-	{
-		m_is_truthtable = true;
-		m_desc = desc;
-		startxx();
-	}
-
-	void startxx()
-	{
-		pstring header = m_desc[0];
-
-		plib::pstring_vector_t io(header,"|");
-		// checks
-		nl_assert_always(io.size() == 2, "too many '|'");
-		plib::pstring_vector_t inout(io[0], ",");
-		nl_assert_always(inout.size() == m_ttp->m_num_bits, "bitcount wrong");
-		plib::pstring_vector_t out(io[1], ",");
-		nl_assert_always(out.size() == m_NO, "output count wrong");
-
-		for (std::size_t i=0; i < m_NI; i++)
-		{
-			//new (&m_I[i]) logic_input_t();
-			inout[i] = inout[i].trim();
-			m_I.emplace(i, *this, inout[i]);
-		}
-		for (std::size_t i=0; i < m_NO; i++)
-		{
-			//new (&m_Q[i]) logic_output_t();
-			out[i] = out[i].trim();
-			m_Q.emplace(i, *this, out[i]);
-			//enregister(out[i], m_Q[i]);
-		}
-		// Connect output "Q" to input "_Q" if this exists
-		// This enables timed state without having explicit state ....
-		UINT32 disabled_ignore = 0;
-		for (std::size_t i=0; i < m_NO; i++)
-		{
-			pstring tmp = "_" + out[i];
-			const int idx = inout.indexof(tmp);
-			if (idx>=0)
-			{
-				connect_late(m_Q[i], m_I[idx]);
-				// disable ignore for this inputs altogether.
-				// FIXME: This shouldn't be necessary
-				disabled_ignore |= (1<<idx);
-			}
-		}
-
-		m_ign = 0;
-
-		m_ttp->m_desc->setup(m_desc, disabled_ignore * 0);
-
-#if 0
-		printf("%s\n", name().cstr());
-		for (int j=0; j < m_size; j++)
-			printf("%05x %04x %04x %04x\n", j, m_ttp->m_outs[j] & ((1 << m_NO)-1),
-					m_ttp->m_outs[j] >> m_NO, m_ttp->m_timing[j * m_NO + 0]);
-		for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero(); k++)
-			printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
-#endif
-		save(NLNAME(m_last_state));
-		save(NLNAME(m_ign));
-		save(NLNAME(m_active));
-	}
-
-	NETLIB_RESETI()
-	{
-		m_active = 0;
-		m_ign = 0;
-		for (std::size_t i = 0; i < m_NI; i++)
-			m_I[i].activate();
-		for (std::size_t i=0; i<m_NO;i++)
-			if (this->m_Q[i].net().num_cons()>0)
-				m_active++;
-		m_last_state = 0;
-	}
-
-public:
-	void update() noexcept override final
-	{
-		process<true>();
-	}
-
-public:
-	void inc_active() override
-	{
-		nl_assert(netlist().use_deactivate());
-		if (m_has_state == 0)
-			if (++m_active == 1)
-			{
-				process<false>();
-			}
-	}
-
-	void dec_active() override
-	{
-		nl_assert(netlist().use_deactivate());
-		/* FIXME:
-		 * Based on current measurements there is no point to disable
-		 * 1 input devices. This should actually be a parameter so that we
-		 * can decide for each individual gate whether it is benefitial to
-		 * ignore deactivation.
-		 */
-		if (m_NI > 1 && m_has_state == 0)
-			if (--m_active == 0)
-			{
-				for (std::size_t i = 0; i< m_NI; i++)
-					m_I[i].inactivate();
-				m_ign = (1<<m_NI)-1;
-			}
-	}
-
-	//logic_input_t m_I[m_NI];
-	//logic_output_t m_Q[m_NO];
-	plib::uninitialised_array_t<logic_input_t, 16> m_I;
-	plib::uninitialised_array_t<logic_output_t, 8> m_Q;
-
-protected:
-
-private:
-
-	template<bool doOUT>
-	inline void process()
-	{
-		netlist_time mt = netlist_time::zero();
-
-		UINT32 state = 0;
-		if (m_NI > 1 && !m_has_state)
-		{
-
-			if (!doOUT)
-			{
-				for (std::size_t i = 0; i < m_NI; i++)
-					m_I[i].activate();
+				for (std::size_t i = 0; i < m_NO; i++)
+					OUTLOGIC(m_Q[i], (out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
 			}
 			else
+				for (std::size_t i = 0; i < m_NO; i++)
+					m_Q[i].net().set_Q_time((out >> i) & 1, mt + m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
+
+			if (m_has_state)
+				m_last_state = (state << m_NO) | out;
+
+			if (m_NI > 1 && !m_has_state)
 			{
 				auto ign(m_ign);
 				for (std::size_t i = 0; ign != 0; ign >>= 1, i++)
-					if ((ign & 1))
-						m_I[i].activate();
+					if (ign & 1)
+						m_I[i].inactivate();
 			}
 		}
 
-		if (!doOUT)
-			for (std::size_t i = 0; i < m_NI; i++)
-			{
-				state |= (INPLOGIC(m_I[i]) << i);
-				mt = std::max(this->m_I[i].net().time(), mt);
-			}
-		else
-			for (std::size_t i = 0; i < m_NI; i++)
-				state |= (INPLOGIC(m_I[i]) << i);
+		UINT32 m_last_state;
+		UINT32 m_ign;
+		INT32 m_active;
 
-		UINT32 nstate = state;
+		truthtable_t *m_ttp;
+		plib::pstring_vector_t m_desc;
+	};
 
-		if (m_has_state)
-			nstate |= (m_last_state << m_NI);
+	class netlist_base_factory_truthtable_t : public base_factory_t
+	{
+		P_PREVENT_COPYING(netlist_base_factory_truthtable_t)
+	public:
+		netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
+				const pstring &def_param)
+		: base_factory_t(name, classname, def_param), m_family(family_TTL())
+		{}
 
-		const UINT32 outstate = m_ttp->m_outs[nstate];
-		const UINT32 out = outstate & ((1 << m_NO) - 1);
-
-		m_ign = outstate >> m_NO;
-
-		const UINT32 timebase = nstate * m_NO;
-
-		if (doOUT)
+		virtual ~netlist_base_factory_truthtable_t()
 		{
-			for (std::size_t i = 0; i < m_NO; i++)
-				OUTLOGIC(m_Q[i], (out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
 		}
-		else
-			for (std::size_t i = 0; i < m_NO; i++)
-				m_Q[i].net().set_Q_time((out >> i) & 1, mt + m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
 
-		if (m_has_state)
-			m_last_state = (state << m_NO) | out;
+		plib::pstring_vector_t m_desc;
+		const logic_family_desc_t *m_family;
+	};
 
-		if (m_NI > 1 && !m_has_state)
-		{
-			auto ign(m_ign);
-			for (std::size_t i = 0; ign != 0; ign >>= 1, i++)
-				if (ign & 1)
-					m_I[i].inactivate();
-		}
-	}
-
-	UINT32 m_last_state;
-	UINT32 m_ign;
-	INT32 m_active;
-
-	truthtable_t *m_ttp;
-	size_t m_NI;
-	size_t m_NO;
-	bool   m_has_state;
-	plib::pstring_vector_t m_desc;
-};
-
-template<unsigned NI, unsigned NO, int has_state>
-NETLIB_OBJECT_DERIVED(truthtable_t, xtruthtable_t)
-{
-public:
-	template <class C>
-	nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
-			truthtable_t *ttbl, const char *desc[])
-	: nld_xtruthtable_t(NI, NO, has_state, owner, name, fam, ttbl, desc)
-	{
-	}
-
-	template <class C>
-	nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
-			truthtable_t *ttbl, const plib::pstring_vector_t &desc)
-	: nld_xtruthtable_t(NI, NO, has_state, owner, name, fam, ttbl, desc)
-	{
-	}
-
-};
-
-#endif
-class netlist_base_factory_truthtable_t : public base_factory_t
-{
-	P_PREVENT_COPYING(netlist_base_factory_truthtable_t)
-public:
-	netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
-			const pstring &def_param)
-	: base_factory_t(name, classname, def_param), m_family(family_TTL())
-	{}
-
-	virtual ~netlist_base_factory_truthtable_t()
-	{
-	}
-
-	plib::pstring_vector_t m_desc;
-	const logic_family_desc_t *m_family;
-};
-
-plib::owned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
-		const unsigned has_state,
-		const pstring &name, const pstring &classname,
-		const pstring &def_param);
+	plib::owned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
+			const unsigned has_state,
+			const pstring &name, const pstring &classname,
+			const pstring &def_param);
 
 	} //namespace devices
 } // namespace netlist
