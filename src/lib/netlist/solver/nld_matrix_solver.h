@@ -246,7 +246,7 @@ T matrix_solver_t::delta(const T * RESTRICT V)
 	const unsigned iN = this->m_terms.size();
 	T cerr = 0;
 	for (unsigned i = 0; i < iN; i++)
-		cerr = nl_math::max(cerr, nl_math::abs(V[i] - (T) this->m_nets[i]->m_cur_Analog));
+		cerr = std::max(cerr, std::abs(V[i] - (T) this->m_nets[i]->m_cur_Analog));
 	return cerr;
 }
 

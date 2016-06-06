@@ -66,7 +66,7 @@ int matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 	 *
 	 * and estimate using
 	 *
-	 * omega = 2.0 / (1.0 + nl_math::sqrt(1-rho))
+	 * omega = 2.0 / (1.0 + std::sqrt(1-rho))
 	 */
 
 	const nl_double ws = this->m_params.m_sor;
@@ -104,7 +104,7 @@ int matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 		if (USE_GABS)
 		{
 			for (unsigned i = 0; i < term_count; i++)
-				gabs_t = gabs_t + nl_math::abs(go[i]);
+				gabs_t = gabs_t + std::abs(go[i]);
 
 			gabs_t *= NL_FCONST(0.5); // derived by try and error
 			if (gabs_t <= gtot_t)
@@ -149,7 +149,7 @@ int matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 
 			const nl_double new_val = new_V[k] * one_m_w[k] + (Idrive + RHS[k]) * w[k];
 
-			err = nl_math::max(nl_math::abs(new_val - new_V[k]), err);
+			err = std::max(std::abs(new_val - new_V[k]), err);
 			new_V[k] = new_val;
 		}
 

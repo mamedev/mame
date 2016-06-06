@@ -9,6 +9,7 @@
 ****************************************************************************/
 
 #include <cstdio>
+#include <cstdlib>
 
 #ifdef PSTANDALONE
 #if (PSTANDALONE)
@@ -16,7 +17,7 @@
 #endif
 #endif
 
-#include <plib/poptions.h>
+#include "plib/poptions.h"
 #include "plib/pstring.h"
 #include "plib/plists.h"
 #include "plib/ptypes.h"

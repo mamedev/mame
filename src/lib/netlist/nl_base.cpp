@@ -8,11 +8,11 @@
 #include "solver/nld_matrix_solver.h"
 #include "solver/nld_solver.h"
 
+#include "plib/putil.h"
 #include "plib/palloc.h"
 
 #include "nl_base.h"
 #include "devices/nlid_system.h"
-#include "nl_util.h"
 
 namespace netlist
 {
@@ -221,7 +221,7 @@ void netlist_t::start()
 {
 	/* load the library ... */
 
-	pstring libpath = nl_util::environment("NL_BOOSTLIB", nl_util::buildpath({".", "nlboost.so"}));
+	pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
 
 	m_lib = plib::palloc<plib::dynlib>(libpath);
 

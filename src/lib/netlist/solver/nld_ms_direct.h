@@ -310,7 +310,7 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 				{
 					x_i[p] = i;
 					x_start[p] = chunks * p;
-					x_stop[p] = nl_math::min(chunks*(p+1), eb);
+					x_stop[p] = std::min(chunks*(p+1), eb);
 					if (p<num_thr && x_start[p] < x_stop[p]) thr_process(p, this, nullptr);
 				}
 				if (x_start[num_thr] < x_stop[num_thr])

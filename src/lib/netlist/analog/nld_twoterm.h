@@ -326,7 +326,7 @@ public:
 		{
 			m_Vd = nVd;
 			//m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
-			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
+			const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
 			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 		}
@@ -334,18 +334,18 @@ public:
 		{
 #if 1
 			const nl_double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(0.5) - NL_FCONST(1.0));
-			m_Vd = m_Vd + nl_math::e_log1p(a) * m_Vt;
+			m_Vd = m_Vd + std::log1p(a) * m_Vt;
 #else
 			m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
 #endif
-			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
+			const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
 			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 
 			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 		}
 #else
 		m_Vd = m_Vd + 20.0 * m_Vt * std::tanh((nVd - m_Vd) / 20.0 / m_Vt);
-		const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
+		const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
 		m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 		m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 #endif

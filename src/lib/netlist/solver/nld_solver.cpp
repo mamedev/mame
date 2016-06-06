@@ -37,6 +37,7 @@
 #include "omp.h"
 #endif
 
+#include "plib/putil.h"
 #include "nld_solver.h"
 #include "nld_matrix_solver.h"
 
@@ -520,8 +521,8 @@ netlist_time matrix_solver_t::compute_next_timestep()
 
 			t->m_h_n_m_1 = hn;
 			t->m_DD_n_m_1 = DD_n;
-			if (nl_math::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
-				new_net_timestep = nl_math::sqrt(m_params.m_lte / nl_math::abs(NL_FCONST(0.5)*DD2));
+			if (std::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
+				new_net_timestep = std::sqrt(m_params.m_lte / std::abs(NL_FCONST(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 
@@ -722,7 +723,7 @@ void NETLIB_NAME(solver)::post_start()
 	}
 
 	// Override log statistics
-	pstring p = nl_util::environment("NL_STATS");
+	pstring p = plib::util::environment("NL_STATS");
 	if (p != "")
 		m_params.m_log_stats = (bool) p.as_long();
 	else

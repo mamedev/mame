@@ -10,10 +10,10 @@
 #include "solver/nld_solver.h"
 
 #include "plib/palloc.h"
+#include "plib/putil.h"
 #include "nl_base.h"
 #include "nl_setup.h"
 #include "nl_parser.h"
-#include "nl_util.h"
 #include "nl_factory.h"
 #include "devices/net_lib.h"
 #include "devices/nlid_system.h"
@@ -795,7 +795,7 @@ void setup_t::resolve_inputs()
 
 void setup_t::start_devices()
 {
-	pstring env = nl_util::environment("NL_LOGS");
+	pstring env = plib::util::environment("NL_LOGS");
 
 	if (env != "")
 	{

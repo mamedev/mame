@@ -29,14 +29,14 @@ generic_diode::generic_diode()
 
 void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double gmin)
 {
-	static const double csqrt2 = nl_math::sqrt(2.0);
+	static const double csqrt2 = std::sqrt(2.0);
 	m_Is = Is;
 	m_n = n;
 	m_gmin = gmin;
 
 	m_Vt = 0.0258 * m_n;
 
-	m_Vcrit = m_Vt * nl_math::log(m_Vt / m_Is / csqrt2);
+	m_Vcrit = m_Vt * std::log(m_Vt / m_Is / csqrt2);
 	m_VtInv = 1.0 / m_Vt;
 }
 
@@ -69,7 +69,7 @@ NETLIB_UPDATE_PARAM(POT)
 {
 	nl_double v = m_Dial.Value();
 	if (m_DialIsLog.Value())
-		v = (nl_math::exp(v) - 1.0) / (nl_math::exp(1.0) - 1.0);
+		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
 	m_R1.update_dev();
 	m_R2.update_dev();
@@ -88,7 +88,7 @@ NETLIB_UPDATE_PARAM(POT2)
 	nl_double v = m_Dial.Value();
 
 	if (m_DialIsLog.Value())
-		v = (nl_math::exp(v) - 1.0) / (nl_math::exp(1.0) - 1.0);
+		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 	if (m_Reverse.Value())
 		v = 1.0 - v;
 

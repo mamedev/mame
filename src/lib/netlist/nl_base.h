@@ -160,7 +160,6 @@
 
 #include "nl_lists.h"
 #include "nl_time.h"
-#include "nl_util.h"
 #include "plib/pdynlib.h"
 #include "plib/pstate.h"
 #include "plib/pfmtlog.h"

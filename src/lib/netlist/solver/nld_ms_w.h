@@ -360,8 +360,8 @@ int matrix_solver_w_t<m_N, storage_N>::solve_non_dynamic(ATTR_UNUSED const bool 
 			{
 				tmp += A(i,j) * new_V[j];
 			}
-			if (nl_math::abs(tmp-RHS(i)) > 1e-6)
-				printf("%s failed on row %d: %f RHS: %f\n", this->name().cstr(), i, nl_math::abs(tmp-RHS(i)), RHS(i));
+			if (std::abs(tmp-RHS(i)) > 1e-6)
+				printf("%s failed on row %d: %f RHS: %f\n", this->name().cstr(), i, std::abs(tmp-RHS(i)), RHS(i));
 		}
 	if (newton_raphson)
 	{

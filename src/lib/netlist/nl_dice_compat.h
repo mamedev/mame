@@ -200,7 +200,7 @@ inline int CAPACITOR_tc_hl(const double c, const double r)
 	 * Vt = (VH-VL)*exp(-t/RC)
 	 * ln(Vt/(VH-VL))*RC = -t
 	 */
-	static const double TIME_CONSTANT = -nl_math::log(2.0 / (3.7-0.3));
+	static const double TIME_CONSTANT = -std::log(2.0 / (3.7-0.3));
 	int ret = (int) (TIME_CONSTANT * (130.0 + r) * c * 1e9);
 	return ret;
 }
@@ -211,7 +211,7 @@ inline int CAPACITOR_tc_lh(const double c, const double r)
 	 * Vt = (VH-VL)*(1-exp(-t/RC))
 	 * -t=ln(1-Vt/(VH-VL))*RC
 	 */
-	static const double TIME_CONSTANT = -nl_math::log(1.0 - 0.8 / (3.7-0.3));
+	static const double TIME_CONSTANT = -std::log(1.0 - 0.8 / (3.7-0.3));
 	int ret = (int) (TIME_CONSTANT * (1.0 + r) * c * 1e9);
 	return ret;
 }
