@@ -3221,7 +3221,7 @@
 			<feature name="u4" value="U4 74LV4040 [37C7E1K]" />
 			<feature name="u5" value="U5 TLV272" />
 			<feature name="bt1" value="CR1616" />
-			<feature name="slot" value="gba_eeprom_64k" />
+			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-u3ip-0.u1" size="16777216" crc="9686c36b" sha1="64f7bf0f0560f6e94da33b549d3206678b29f557" offset="000000" />
 			</dataarea>
@@ -3233,7 +3233,7 @@
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_eeprom_64k" />
+			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
 				<rom name="bokura no taiyou - taiyou action rpg - kabunushi go-yuutai ban (japan) (demo).bin" size="16777216" crc="cf692572" sha1="f91126cd3a1bf7bf5f770d3a70229171d0d5a6ee" offset="000000" />
 			</dataarea>
@@ -3246,7 +3246,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-U3IE-USA"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_eeprom_64k" />
+			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
 				<rom name="boktai - the sun is in your hand (usa).bin" size="16777216" crc="e715ac45" sha1="7164326283df46a3941ec7b6ceca889cbc40e660" offset="000000" />
 			</dataarea>
@@ -3259,7 +3259,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-U32P"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_eeprom_64k" />
+			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
 				<rom name="boktai 2 - solar boy django (europe) (en,fr,de,es,it).bin" size="16777216" crc="748189b5" sha1="eeacdf5a9d3d2173a4a96689b72dc6b7ad92153c" offset="000000" />
 			</dataarea>
@@ -3272,7 +3272,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-U32E-USA"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_eeprom_64k" />
+			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
 				<rom name="boktai 2 - solar boy django (usa).bin" size="16777216" crc="e1ffb2d1" sha1="cd10d8ed82f4daf4072774f70d015e39a5d32d0b" offset="000000" />
 			</dataarea>
@@ -3339,7 +3339,7 @@
 			<feature name="u4" value="U4 74LV4040 [34FV1KK]" />
 			<feature name="u5" value="U5 TLV272" />
 			<feature name="bt1" value="CR1616" />
-			<feature name="slot" value="gba_eeprom_64k" />
+			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-u3ij-0.u1" size="16777216" crc="a09c0807" sha1="c51ad84e9403db94cd18a14ac72f8367b52a0d7f" offset="000000" />
 			</dataarea>
@@ -8504,7 +8504,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-V49E-USA"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_sram" />
+			<feature name="slot" value="gba_drilldoz" />
 			<dataarea name="rom" size="8388608">
 				<rom name="drill dozer (usa).bin" size="8388608" crc="e60ec183" sha1="c1058cc2482b91204100cc8515da99aeb06773f5" offset="000000" />
 			</dataarea>
@@ -17557,7 +17557,7 @@
 		<info name="release" value="20020308"/>
 		<info name="alt_title" value="コロコロパズル ハッピィパネッチュ!"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_eeprom_4k" />
+			<feature name="slot" value="gba_yoshiug" />
 			<dataarea name="rom" size="4194304">
 				<rom name="koro koro puzzle - happy panechu! (japan).bin" size="4194304" crc="0bfe46e9" sha1="40cb751d119a49be0cd44cf0491c93ebc8795ef0" offset="000000" />
 			</dataarea>
@@ -20131,7 +20131,7 @@
 		<info name="release" value="20041014"/>
 		<info name="alt_title" value="まわるメイドインワリオ"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_sram" />
+			<feature name="slot" value="gba_wariotws" />
 			<dataarea name="rom" size="16777216">
 				<rom name="mawaru - made in wario (japan).bin" size="16777216" crc="e69964f1" sha1="a389fa50e2e842b264b980cbe30e980c69d93a5b" offset="000000" />
 			</dataarea>
@@ -25144,7 +25144,7 @@
 		<info name="release" value="20040916"/>
 		<info name="alt_title" value="ポケットモンスター エメラルド"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pocket monsters - emerald (japan).bin" size="16777216" crc="4881f3f8" sha1="d7cf8f156ba9c455d164e1ea780a6bf1945465c2" offset="000000" />
 			</dataarea>
@@ -25222,7 +25222,7 @@
 		<info name="release" value="20021121"/>
 		<info name="alt_title" value="ポケットモンスター ルビー"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="8388608">
 				<rom name="pocket monsters - ruby (japan).bin" size="8388608" crc="cee9471a" sha1="5c5e546720300b99ae45d2aa35c646c8b8ff5c56" offset="000000" />
 			</dataarea>
@@ -25242,7 +25242,7 @@
 			<feature name="u2" value="U2 1M/512K FLASH [LE26FV10N1TS]" />
 			<feature name="u3" value="U3 RTC [S3516]" />
 			<feature name="bt1" value="CR1616" />
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-axpj-0.u1" size="8388608" crc="fd1eeb78" sha1="3233342c2f3087e6ffe6c1791cd5867db07df842" offset="000000" />
 			</dataarea>
@@ -25319,7 +25319,7 @@
 			<feature name="u2" value="U2 1M/512K FLASH [MX29L010TC-15A1]" />
 			<feature name="u3" value="U3 RTC [S3511]" />
 			<feature name="bt1" value="CR1616" />
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bpep-0.u1" size="16777216" crc="1f1c08fb" sha1="f3ae088181bf583e55daf962a92bb46f4f1d07b7" offset="000000" />
 			</dataarea>
@@ -25331,7 +25331,7 @@
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - smaragd-edition (germany).bin" size="16777216" crc="34c9df89" sha1="61c2eb2b380b1a75f0c94b767a2d4c26cd7ce4e3" offset="000000" />
 			</dataarea>
@@ -25343,7 +25343,7 @@
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - version emeraude (france).bin" size="16777216" crc="a3fdccb1" sha1="ca666651374d89ca439007bed54d839eb7bd14d0" offset="000000" />
 			</dataarea>
@@ -25355,7 +25355,7 @@
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - versione smeraldo (italy).bin" size="16777216" crc="a0aec80a" sha1="1692db322400c3141c5de2db38469913ceb1f4d4" offset="000000" />
 			</dataarea>
@@ -25373,7 +25373,7 @@
 			<feature name="u2" value="U2 1M/512K FLASH [MX29L010TC-15A1]" />
 			<feature name="u3" value="U3 RTC [S3511]" />
 			<feature name="bt1" value="CR1616" />
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bpes-0.u1" size="16777216" crc="8c4d3108" sha1="fe1558a3dcb0360ab558969e09b690888b846dd9" offset="000000" />
 			</dataarea>
@@ -25546,7 +25546,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-AXVE-USA, AGB-AXVP"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - ruby version (usa, europe) (rev 2).bin" size="16777216" crc="aeac73e6" sha1="5b64eacf892920518db4ec664e62a086dd5f5bc8" offset="000000" />
 			</dataarea>
@@ -25564,7 +25564,7 @@
 			<feature name="u2" value="U2 1M/512K FLASH [LE26FV10N1TS-10]" />
 			<feature name="u3" value="U3 RTC [S3511]" />
 			<feature name="bt1" value="CR1616" />
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-axvp-1.u1" size="16777216" crc="61641576" sha1="610b96a9c9a7d03d2bafb655e7560ccff1a6d894" offset="000000" />
 			</dataarea>
@@ -25577,7 +25577,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-AXVE-USA"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - ruby version (usa).bin" size="16777216" crc="f0815ee7" sha1="f28b6ffc97847e94a6c21a63cacf633ee5c8df1e" offset="000000" />
 			</dataarea>
@@ -25589,7 +25589,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - rubin-edition (germany) (rev 1).bin" size="16777216" crc="cae89464" sha1="424740be1fc67a5ddb954794443646e6aeee2c1b" offset="000000" />
 			</dataarea>
@@ -25601,7 +25601,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - rubin-edition (germany).bin" size="16777216" crc="15e1e280" sha1="1c2a53332382e14dab8815e3a6dd81ad89534050" offset="000000" />
 			</dataarea>
@@ -25613,7 +25613,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon_ruby_german_final_d.bin" size="16777216" crc="40686c47" sha1="ca5e3d415c4b47353a73a616878ba833f3648b7a" offset="000000" />
 			</dataarea>
@@ -25625,7 +25625,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - edicion rubi (spain) (rev 1).bin" size="16777216" crc="b980fff5" sha1="9ac73481d7f5d150a018309bba91d185ce99fb7c" offset="000000" />
 			</dataarea>
@@ -25643,7 +25643,7 @@
 			<feature name="u2" value="U2 1M/512K FLASH [MX29L010TC-15A1]" />
 			<feature name="u3" value="U3 RTC [S3511]" />
 			<feature name="bt1" value="CR1616" />
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-axvs-0.u1" size="16777216" crc="eb0729cf" sha1="1f49f7289253dcbfecbc4c5ba3e67aa0652ec83c" offset="000000" />
 			</dataarea>
@@ -25655,7 +25655,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - version rubis (france) (rev 1).bin" size="16777216" crc="9f981f72" sha1="ba888dfba231a231cbd60fe228e894b54fb1ed79" offset="000000" />
 			</dataarea>
@@ -25667,7 +25667,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - version rubis (france).bin" size="16777216" crc="690fd310" sha1="a6ee94202bec0641c55d242757e84dc89336d4cb" offset="000000" />
 			</dataarea>
@@ -25679,7 +25679,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - versione rubino (italy) (rev 1).bin" size="16777216" crc="9305e793" sha1="015a5d380afe316a2a6fcc561798ebff9dfb3009" offset="000000" />
 			</dataarea>
@@ -25691,7 +25691,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - versione rubino (italy).bin" size="16777216" crc="c18231a9" sha1="2b3134224392f58da00f802faa1bf4b5cf6270be" offset="000000" />
 			</dataarea>
@@ -25704,7 +25704,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-AXPE-USA, AGB-AXPP"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - sapphire version (usa, europe) (rev 2).bin" size="16777216" crc="9cc4410e" sha1="89b45fb172e6b55d51fc0e61989775187f6fe63c" offset="000000" />
 			</dataarea>
@@ -25722,7 +25722,7 @@
 			<feature name="u2" value="U2 1M/512K FLASH [MX29L010TC-15A1]" />
 			<feature name="u3" value="U3 RTC [S3511]" />
 			<feature name="bt1" value="CR1616" />
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-axpp-1.u1" size="16777216" crc="bafedae5" sha1="4722efb8cd45772ca32555b98fd3b9719f8e60a9" offset="000000" />
 			</dataarea>
@@ -25735,7 +25735,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-AXPE-USA"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - sapphire version (usa).bin" size="16777216" crc="554dedc4" sha1="3ccbbd45f8553c36463f13b938e833f652b793e4" offset="000000" />
 			</dataarea>
@@ -25747,7 +25747,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - saphir-edition (germany) (rev 1).bin" size="16777216" crc="b0c40c7c" sha1="7e6e034f9cdca6d2c4a270fdb50a94def5883d17" offset="000000" />
 			</dataarea>
@@ -25759,7 +25759,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - saphir-edition (germany).bin" size="16777216" crc="6fcd7a98" sha1="5a087835009d552d4c5c1f96be3be3206e378153" offset="000000" />
 			</dataarea>
@@ -25771,7 +25771,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - edicion zafiro (spain) (rev 1).bin" size="16777216" crc="f2c88931" sha1="0fe9ad1e602e2fafa090aee25e43d6980625173c" offset="000000" />
 			</dataarea>
@@ -25783,7 +25783,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - edicion zafiro (spain).bin" size="16777216" crc="a04f5f0b" sha1="3a6489189e581c4b29914071b79207883b8c16d8" offset="000000" />
 			</dataarea>
@@ -25795,7 +25795,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - version saphir (france) (rev 1).bin" size="16777216" crc="2ae49146" sha1="860e93f5ea44f4278132f6c1ee5650d07b852fd8" offset="000000" />
 			</dataarea>
@@ -25807,7 +25807,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - version saphir (france).bin" size="16777216" crc="3581a05f" sha1="c269b5692b2d0e5800ba1ddf117fda95ac648634" offset="000000" />
 			</dataarea>
@@ -25819,7 +25819,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - versione zaffiro (italy) (rev 1).bin" size="16777216" crc="5efe4493" sha1="73edf67b9b82ff12795622dca412733755d2c0fe" offset="000000" />
 			</dataarea>
@@ -25831,7 +25831,7 @@
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - versione zaffiro (italy).bin" size="16777216" crc="0c7992a9" sha1="f729dd571fb2c09e72c5c1d68fe0a21e72713d34" offset="000000" />
 			</dataarea>
@@ -27789,7 +27789,7 @@
 		<info name="release" value="20040806"/>
 		<info name="alt_title" value="ロックマン エグゼ4.5 リアルオペレーション"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash" />
+			<feature name="slot" value="gba_flash_rtc" />
 			<dataarea name="rom" size="8388608">
 				<rom name="rockman exe 4.5 - real operation (japan).bin" size="8388608" crc="a646601b" sha1="f89ef4ca8ec1823eb75fa184f2d0f9e66cc78a59" offset="000000" />
 			</dataarea>
@@ -28594,7 +28594,7 @@
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K FRAM [MB85R256S]" />
 			<feature name="u3" value="U3 [empty]" />
-			<feature name="slot" value="gba_sram" />
+			<feature name="slot" value="gba_drilldoz" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-v49j-0.u1" size="8388608" crc="b17532ee" sha1="84afa7108e4d604e7b1a6d105df5760869a247fa" offset="000000" />
 			</dataarea>
@@ -28824,7 +28824,7 @@
 		</part>
 	</software>
 
-	<software name="sennenkz" supported="no">
+	<software name="sennenkz">
 		<description>Sennen Kazoku (Jpn)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
@@ -28837,7 +28837,7 @@
 			<feature name="u2" value="U2 1M/512K FLASH [MX29L010TC-15A1]" />
 			<feature name="u3" value="U3 RTC [S3511]" />
 			<feature name="bt1" value="CR1616" />
-			<feature name="slot" value="gba_flash_1m" />
+			<feature name="slot" value="gba_flash_1m_rtc" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bkaj-0.u1" size="16777216" crc="a2f6976c" sha1="4dcd7cee46d3a5e848a22eb371bebbbc2fb8d488" offset="000000" />
 			</dataarea>
@@ -29181,7 +29181,7 @@
 		</part>
 	</software>
 
-	<software name="sboktai" supported="partial">
+	<software name="sboktai">
 		<description>Shin Bokura no Taiyou - Gyakushuu no Sabata (Jpn)</description>
 		<year>2005</year>
 		<publisher>Konami</publisher>
@@ -29189,7 +29189,7 @@
 		<info name="release" value="20050728"/>
 		<info name="alt_title" value="新ボクらの太陽 逆襲のサバタ"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_eeprom_64k" />
+			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
 				<rom name="shin bokura no taiyou - gyakushuu no sabata (japan).bin" size="16777216" crc="af453162" sha1="2651c5e6875ac60abff734510d152166d211c87c" offset="000000" />
 			</dataarea>
@@ -36155,7 +36155,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 			<feature name="u3" value="U3 [X01A]" />
 			<feature name="u4" value="U4 [empty]" />
 			<feature name="p1" value="P1 [AGB-MOG-01]" />
-			<feature name="slot" value="gba_sram" />
+			<feature name="slot" value="gba_wariotws" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-rzwe-0.u1" size="16777216" crc="cb4e844b" sha1="f0102d0d6f7596fe853d5d0a94682718278e083a" offset="000000" />
 			</dataarea>
@@ -37054,20 +37054,20 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
-	<software name="yoshitt" cloneof="yoshiug" supported="partial">
+	<software name="yoshitt" cloneof="yoshiug">
 		<description>Yoshi - Topsy-Turvy (USA)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-KYGE-USA"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_eeprom_4k" />
+			<feature name="slot" value="gba_yoshiug" />
 			<dataarea name="rom" size="8388608">
 				<rom name="yoshi - topsy-turvy (usa).bin" size="8388608" crc="e64c265c" sha1="947498cb1db918d305500257e8223deeaddf561d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="yoshiban" cloneof="yoshiug" supported="partial">
+	<software name="yoshiban" cloneof="yoshiug">
 		<description>Yoshi no Banyuuinryoku (Jpn)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
@@ -37075,14 +37075,14 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<info name="release" value="20041209"/>
 		<info name="alt_title" value="ヨッシーの万有引力"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_eeprom_4k" />
+			<feature name="slot" value="gba_yoshiug" />
 			<dataarea name="rom" size="8388608">
 				<rom name="yoshi no banyuuinryoku (japan).bin" size="8388608" crc="31594b7a" sha1="a3f2035ca2bdc2bc59e9e46efbb6187705ebe3d1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="yoshiug" supported="partial">
+	<software name="yoshiug">
 		<description>Yoshi's Universal Gravitation (Euro)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
@@ -37094,7 +37094,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 			<feature name="u3" value="U3 4K/64K EEPROM [9853]" />
 			<feature name="u4" value="U4 ADXL202JE [202JE]" />
 			<feature name="u5" value="U5 ADXL202JQC [empty]" />
-			<feature name="slot" value="gba_eeprom_4k" />
+			<feature name="slot" value="gba_yoshiug" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-kygp-0.u2" size="8388608" crc="05f4d0aa" sha1="045be1369964f141009f3701839ec0a8dccb25c1" offset="000000" />
 			</dataarea>
@@ -37972,7 +37972,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<info name="release" value="20040722"/>
 		<info name="alt_title" value="続ボクらの太陽 太陽少年ジャンゴ"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_eeprom_64k" />
+			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
 				<rom name="zoku bokura no taiyou - taiyou shounen django (japan) (rev 1).bin" size="16777216" crc="71e2cd01" sha1="1a81843c3070decea4cbca20c4563541400b2437" offset="000000" />
 			</dataarea>
@@ -37986,7 +37986,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<info name="serial" value="AGB-U32J-JPN (RK363-J1)"/>
 		<info name="release" value="20040722"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_eeprom_64k" />
+			<feature name="slot" value="gba_boktai" />
 			<dataarea name="rom" size="16777216">
 				<rom name="zoku bokura no taiyou - taiyou shounen django (japan).bin" size="16777216" crc="2804e589" sha1="54a4dcdeca2ee9a22559eb104b88586386639097" offset="000000" />
 			</dataarea>

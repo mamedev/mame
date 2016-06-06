@@ -2118,29 +2118,40 @@ void gba_state::machine_start()
 		membank("rom2")->set_base(cart_rom->base());
 		membank("rom3")->set_base(cart_rom->base());
 
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000c4, 0x80000cb, read32_delegate(FUNC(gba_cart_slot_device::read_gpio),(gba_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x80000c4, 0x80000cb, write32_delegate(FUNC(gba_cart_slot_device::write_gpio),(gba_cart_slot_device*)m_cart));
 
 		// add nvram to save state
 		m_cart->save_nvram();
 
 		// install the cart NVRAM handlers if necessary
-		if (m_cart->get_type() == GBA_SRAM)
+		if (m_cart->get_type() == GBA_SRAM || m_cart->get_type() == GBA_DRILLDOZ || m_cart->get_type() == GBA_WARIOTWS)
 		{
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
 		}
-		if (m_cart->get_type() == GBA_EEPROM || m_cart->get_type() == GBA_EEPROM4 || m_cart->get_type() == GBA_EEPROM64)
+		if (m_cart->get_type() == GBA_EEPROM || m_cart->get_type() == GBA_EEPROM4 || m_cart->get_type() == GBA_EEPROM64 || m_cart->get_type() == GBA_BOKTAI)
 		{
 			// for games larger than 16MB the actual range is smaller but read_ram/write_ram handles that!
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000000, 0xdffffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000000, 0xdffffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
 		}
+		if (m_cart->get_type() == GBA_YOSHIUG)
+		{
+			// EEPROM
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000000, 0xdffffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000000, 0xdffffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
+			// Tilt Sensor
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe008000, 0xe0085ff, read32_delegate(FUNC(gba_cart_slot_device::read_tilt),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe008000, 0xe0085ff, write32_delegate(FUNC(gba_cart_slot_device::write_tilt),(gba_cart_slot_device*)m_cart));
+		}
 		// merge the two flash and mask accesses in read_ram?!?
-		if (m_cart->get_type() == GBA_FLASH || m_cart->get_type() == GBA_FLASH512)
+		if (m_cart->get_type() == GBA_FLASH || m_cart->get_type() == GBA_FLASH512 || m_cart->get_type() == GBA_FLASH_RTC)
 		{
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
 		}
-		if (m_cart->get_type() == GBA_FLASH1M)
+		if (m_cart->get_type() == GBA_FLASH1M || m_cart->get_type() == GBA_FLASH1M_RTC)
 		{
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe01ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe01ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
@@ -2245,15 +2256,21 @@ void gba_state::machine_start()
 
 
 static SLOT_INTERFACE_START(gba_cart)
-	SLOT_INTERFACE_INTERNAL("gba_rom",         GBA_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("gba_sram",        GBA_ROM_SRAM)
-	SLOT_INTERFACE_INTERNAL("gba_eeprom",      GBA_ROM_EEPROM)
-	SLOT_INTERFACE_INTERNAL("gba_eeprom_4k",   GBA_ROM_EEPROM)
-	SLOT_INTERFACE_INTERNAL("gba_eeprom_64k",  GBA_ROM_EEPROM64)
-	SLOT_INTERFACE_INTERNAL("gba_flash",       GBA_ROM_FLASH)   // Panasonic
-	SLOT_INTERFACE_INTERNAL("gba_flash_512",   GBA_ROM_FLASH)   // Panasonic
-	SLOT_INTERFACE_INTERNAL("gba_flash_1m",    GBA_ROM_FLASH1M) // Sanyo
-	SLOT_INTERFACE_INTERNAL("gba_3dmatrix",    GBA_ROM_3DMATRIX)
+	SLOT_INTERFACE_INTERNAL("gba_rom",          GBA_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("gba_sram",         GBA_ROM_SRAM)
+	SLOT_INTERFACE_INTERNAL("gba_drilldoz",     GBA_ROM_DRILLDOZ)	// Rumble output unemulated
+	SLOT_INTERFACE_INTERNAL("gba_wariotws",     GBA_ROM_WARIOTWS)	// Rumble output unemulated
+	SLOT_INTERFACE_INTERNAL("gba_eeprom",       GBA_ROM_EEPROM)
+	SLOT_INTERFACE_INTERNAL("gba_eeprom_4k",    GBA_ROM_EEPROM)
+	SLOT_INTERFACE_INTERNAL("gba_yoshiug",      GBA_ROM_YOSHIUG)
+	SLOT_INTERFACE_INTERNAL("gba_eeprom_64k",   GBA_ROM_EEPROM64)
+	SLOT_INTERFACE_INTERNAL("gba_boktai",       GBA_ROM_BOKTAI)
+	SLOT_INTERFACE_INTERNAL("gba_flash",        GBA_ROM_FLASH)   // Panasonic
+	SLOT_INTERFACE_INTERNAL("gba_flash_rtc",    GBA_ROM_FLASH_RTC)   // Panasonic
+	SLOT_INTERFACE_INTERNAL("gba_flash_512",    GBA_ROM_FLASH)   // Panasonic
+	SLOT_INTERFACE_INTERNAL("gba_flash_1m",     GBA_ROM_FLASH1M) // Sanyo
+	SLOT_INTERFACE_INTERNAL("gba_flash_1m_rtc", GBA_ROM_FLASH1M_RTC) // Sanyo
+	SLOT_INTERFACE_INTERNAL("gba_3dmatrix",     GBA_ROM_3DMATRIX)
 SLOT_INTERFACE_END
 
 
