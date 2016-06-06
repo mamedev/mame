@@ -28582,7 +28582,7 @@
 		</part>
 	</software>
 
-	<software name="screwbrk" cloneof="drilldoz" supported="partial">
+	<software name="screwbrk" cloneof="drilldoz">
 		<description>Screw Breaker - Goushin DoriRureRo (Jpn)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
