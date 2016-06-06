@@ -411,7 +411,7 @@ Power Stone                                     841-0001C    21597    8 (64Mb)  
 Power Stone 2                                   841-0008C    23127    9 (64Mb)   present     315-6213  317-5054-COM   joystick + 3 buttons
 Puyo Puyo Da!                                   841-0006C    22206   20 (64Mb)   ?           315-6213  317-5052-COM
 Ring Out 4x4                                    840-0004C    21779   10 (64Mb)   present     315-6213  317-0250-COM   requires 2 JVS boards
-Samba de Amigo (Rev B)                          840-0020C    22966B  16 (64Mb)   present     315-6213  317-0270-COM   will boot but requires special controller to play it
+Samba de Amigo (Rev B) (Rev A)                  840-0020C    22966B  16 (64Mb)   present     315-6213  317-0270-COM   will boot but requires special controller to play it
 Sega Marine Fishing                             840-0027C    22221   10 (64Mb)   ?           315-6213  not present    ROM 3&4 not present. Requires 837-13844 JVS IO with all DIPSW Off and fishing controller
 Sega Strike Fighter (Rev A, set 1)              840-0035C    23323A  20 (64Mb)   present     315-6213  317-0281-COM   have "Rev. A" label on case
 Sega Strike Fighter (Rev A, set 2)              840-0035C    23786A  20 (64Mb)   present     315-6213  317-0281-COM   have "Rev. A" label on PCB
@@ -5295,7 +5295,7 @@ ROM_START( samba )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x8800000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD("epr-22966b.ic22",0x0000000, 0x0400000, CRC(893116b8) SHA1(35cb4f40690ff21af5ab7cc5adbc53228d6fb0b3) )
+	ROM_LOAD("epr-22966b.ic22",0x0000000, 0x0400000, CRC(893116b8) SHA1(35cb4f40690ff21af5ab7cc5adbc53228d6fb0b3) )	// was also found in cartridge with Rev.A case label
 	ROM_LOAD("mpr-22950.ic1",  0x0800000, 0x0800000, CRC(16dee15c) SHA1(b46849e492756ff406bf8956303472255fcf55a5) )
 	ROM_LOAD("mpr-22951.ic2",  0x1000000, 0x0800000, CRC(f509496f) SHA1(41281576f7d58c8ede9c0a89bfd46a98d5b97033) )
 	ROM_LOAD("mpr-22952.ic3",  0x1800000, 0x0800000, CRC(fb9b3ef0) SHA1(e9d44b673c273e97445a12186496a0594e291542) )
