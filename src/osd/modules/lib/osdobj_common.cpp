@@ -322,9 +322,6 @@ void osd_common_t::register_options()
 
 	// Register video options and update options
 	video_options_add("none", nullptr);
-#if USE_OPENGL
-	video_options_add("opengl", nullptr);
-#endif
 	video_register();
 	update_option(OSDOPTION_VIDEO, m_video_names);
 }
