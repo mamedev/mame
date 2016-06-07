@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
 // thanks-to:Richard Bush
+
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "machine/nmk004.h"
+#include "machine/gen_latch.h"
 
 class nmk16_state : public driver_device
 {
@@ -14,6 +16,10 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_nmk004(*this, "nmk004"),
+		m_soundlatch(*this, "soundlatch"),
 		m_nmk_bgvideoram0(*this, "nmk_bgvideoram0"),
 		m_nmk_txvideoram(*this, "nmk_txvideoram"),
 		m_mainram(*this, "mainram"),
@@ -26,9 +32,6 @@ public:
 		m_nmk_bgvideoram3(*this, "nmk_bgvideoram3"),
 		m_afega_scroll_0(*this, "afega_scroll_0"),
 		m_afega_scroll_1(*this, "afega_scroll_1"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_nmk004(*this, "nmk004"),
 		m_sprdma_base(0x8000)
 	{}
 
@@ -36,6 +39,11 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	optional_device<nmk004_device> m_nmk004;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
 	required_shared_ptr<UINT16> m_nmk_bgvideoram0;
 	optional_shared_ptr<UINT16> m_nmk_txvideoram;
 	required_shared_ptr<UINT16> m_mainram;
@@ -48,9 +56,8 @@ public:
 	optional_shared_ptr<UINT16> m_nmk_bgvideoram3;
 	optional_shared_ptr<UINT16> m_afega_scroll_0;
 	optional_shared_ptr<UINT16> m_afega_scroll_1;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	optional_device<nmk004_device> m_nmk004;
+	
+
 	int m_sprdma_base;
 	int mask[4*2];
 	int m_simple_scroll;

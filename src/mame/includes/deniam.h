@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
 /*************************************************************************
 
     Deniam games
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 
 class deniam_state : public driver_device
@@ -20,7 +23,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
@@ -76,4 +80,5 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 };

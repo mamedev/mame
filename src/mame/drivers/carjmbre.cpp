@@ -40,6 +40,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
 
@@ -241,7 +242,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, carjmbre_state )
 	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_SHARE("spriteram") // 5101*2
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN1")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN2")
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -254,7 +255,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, carjmbre_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x22, 0x22) AM_WRITENOP // bdir/bc2/bc1 1/0/1 inactive write
 	AM_RANGE(0x24, 0x24) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -368,8 +369,12 @@ static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

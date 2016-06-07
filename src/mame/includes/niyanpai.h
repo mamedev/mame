@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+
 #include "sound/dac.h"
+#include "machine/gen_latch.h"
 #include "machine/tmp68301.h"
+
 #define VRAM_MAX    3
 
 class niyanpai_state : public driver_device
@@ -19,7 +22,8 @@ public:
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
@@ -27,6 +31,7 @@ public:
 	required_device<dac_device> m_dac2;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	// common
 	int m_scrollx[VRAM_MAX];

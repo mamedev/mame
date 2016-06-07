@@ -154,6 +154,7 @@ Player 2 and Player 1 share the same controls !
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/thepit.h"
@@ -211,7 +212,7 @@ static ADDRESS_MAP_START( thepit_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0xb004, 0xb005) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( desertdan_main_map, AS_PROGRAM, 8, thepit_state )
@@ -231,7 +232,7 @@ static ADDRESS_MAP_START( desertdan_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0xb004, 0xb005) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( intrepid_main_map, AS_PROGRAM, 8, thepit_state )
@@ -253,7 +254,7 @@ static ADDRESS_MAP_START( intrepid_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0xb005, 0xb005) AM_WRITE(intrepid_graphics_bank_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -265,7 +266,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, thepit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_byte_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x8d, 0x8d) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
@@ -732,8 +733,10 @@ static MACHINE_CONFIG_START( thepit, thepit_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, PIXEL_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, PIXEL_CLOCK/4)

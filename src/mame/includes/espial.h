@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver
+
 /***************************************************************************
 
- Espial hardware games (drivers: espial.c)
+ Espial hardware games (drivers: espial.cpp)
 
 ***************************************************************************/
+
+#include "machine/gen_latch.h"
 
 class espial_state : public driver_device
 {
@@ -21,7 +24,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_attributeram;
@@ -45,6 +49,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(espial_master_interrupt_mask_w);
 	DECLARE_WRITE8_MEMBER(espial_master_soundlatch_w);

@@ -53,7 +53,7 @@ WRITE8_MEMBER(niyanpai_state::soundbank_w)
 
 WRITE8_MEMBER(niyanpai_state::soundlatch_clear_w)
 {
-	if (!(data & 0x01)) soundlatch_clear_byte_w(space, 0, 0);
+	if (!(data & 0x01)) m_soundlatch->clear_w(space, 0, 0);
 }
 
 
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
 
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE8(soundlatch_byte_w, 0xff00)
+	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITENOP            // unknown
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE8(soundlatch_byte_w, 0xff00)
+	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w) // inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf000, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE8(soundlatch_byte_w, 0xff00)
+	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w) // inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
@@ -258,7 +258,7 @@ static ADDRESS_MAP_START( zokumahj_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE8(soundlatch_byte_w, 0xff00)
+	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w) // inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
@@ -743,7 +743,7 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(niyanpai_sound_map)
 	MCFG_CPU_IO_MAP(niyanpai_sound_io_map)
-	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(niyanpai_state, soundlatch_byte_r))
+	MCFG_TMPZ84C011_PORTD_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(niyanpai_state, soundbank_w))
 	MCFG_TMPZ84C011_PORTB_WRITE_CB(DEVWRITE8("dac1", dac_device, write_unsigned8))
 	MCFG_TMPZ84C011_PORTC_WRITE_CB(DEVWRITE8("dac2", dac_device, write_unsigned8))
@@ -765,6 +765,8 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

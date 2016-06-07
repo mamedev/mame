@@ -30,7 +30,7 @@
     filtered output, while a "FIRE" line triggers a fixed short duration
     pulse (controlled by another 555 timer) of modulated noise.
 
-    See video/galaxian.c for a description of the video section.
+    See video/galaxian.cpp for a description of the video section.
 
 ****************************************************************************
 
@@ -657,10 +657,8 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/i8255.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
-#include "sound/dac.h"
 #include "sound/discrete.h"
 #include "audio/cclimber.h"
 #include "audio/galaxian.h"
@@ -949,7 +947,7 @@ WRITE8_MEMBER(galaxian_state::explorer_sound_control_w)
 READ8_MEMBER(galaxian_state::explorer_sound_latch_r)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return soundlatch_byte_r(m_audiocpu->space(AS_PROGRAM), 0);
+	return m_soundlatch->read(m_audiocpu->space(AS_PROGRAM), 0);
 }
 
 
@@ -1343,7 +1341,7 @@ WRITE8_MEMBER(galaxian_state::kingball_sound1_w)
 WRITE8_MEMBER(galaxian_state::kingball_sound2_w)
 {
 	m_kingball_sound = (m_kingball_sound & ~0x02) | (data << 1);
-	soundlatch_byte_w(space, 0, m_kingball_sound | 0xf0);
+	m_soundlatch->write(space, 0, m_kingball_sound | 0xf0);
 }
 
 
@@ -1419,7 +1417,7 @@ READ8_MEMBER(galaxian_state::jumpbug_protection_r)
 
 WRITE8_MEMBER(galaxian_state::checkman_sound_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -1718,7 +1716,7 @@ static ADDRESS_MAP_START( explorer_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x6807, 0x6807) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w) /* watchdog works for writes as well? (or is it just disabled?) */
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0");
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ffc) AM_READ_PORT("IN1");
 	AM_RANGE(0x8002, 0x8002) AM_MIRROR(0x0ffc) AM_READ_PORT("IN2");
 	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x0ffc) AM_READ_PORT("IN3");
@@ -2084,7 +2082,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( checkman_sound_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE("8910.0", ay8910_device, address_data_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("8910.0", ay8910_device, data_r)
 ADDRESS_MAP_END
@@ -2126,7 +2124,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kingball_sound_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ(soundlatch_byte_r) AM_WRITE(kingball_dac_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(kingball_dac_w)
 ADDRESS_MAP_END
 
 
@@ -5527,7 +5525,7 @@ static MACHINE_CONFIG_DERIVED( konami_base, galaxian_base )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, konami_portc_0_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(galaxian_state, konami_sound_control_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, konami_portc_1_w))
@@ -5541,11 +5539,13 @@ static MACHINE_CONFIG_FRAGMENT( konami_sound_1x_ay8910 )
 	MCFG_CPU_PROGRAM_MAP(frogger_sound_map)
 	MCFG_CPU_IO_MAP(frogger_sound_portmap)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(galaxian_state, frogger_sound_timer_r))
 	MCFG_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
@@ -5564,11 +5564,13 @@ static MACHINE_CONFIG_FRAGMENT( konami_sound_2x_ay8910 )
 	MCFG_CPU_PROGRAM_MAP(konami_sound_map)
 	MCFG_CPU_IO_MAP(konami_sound_portmap)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(galaxian_state, konami_sound_timer_r))
 	MCFG_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
@@ -5732,6 +5734,8 @@ static MACHINE_CONFIG_DERIVED( checkman, mooncrst )
 	MCFG_CPU_IO_MAP(checkman_sound_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxian_state,  irq0_line_hold)   /* NMIs are triggered by the main CPU */
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, 1789750)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -5750,9 +5754,11 @@ static MACHINE_CONFIG_DERIVED( checkmaj, galaxian_base )
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq0", galaxian_state, checkmaj_irq0_gen, "screen", 0, 8)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, 1620000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2)
 MACHINE_CONFIG_END
 
@@ -5776,6 +5782,8 @@ static MACHINE_CONFIG_DERIVED( kingball, mooncrst )
 	MCFG_CPU_ADD("audiocpu", Z80,5000000/2)
 	MCFG_CPU_PROGRAM_MAP(kingball_sound_map)
 	MCFG_CPU_IO_MAP(kingball_sound_portmap)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
 	MCFG_DAC_ADD("dac")
@@ -5845,7 +5853,7 @@ static MACHINE_CONFIG_DERIVED( theend, galaxian_base )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, theend_coin_counter_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(galaxian_state, konami_sound_control_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, konami_portc_1_w))
@@ -5866,7 +5874,7 @@ static MACHINE_CONFIG_DERIVED( scramble, galaxian_base )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, konami_portc_0_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(galaxian_state, konami_sound_control_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(galaxian_state, scramble_protection_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, scramble_protection_w))
@@ -5883,6 +5891,8 @@ static MACHINE_CONFIG_DERIVED( explorer, galaxian_base )
 	MCFG_CPU_ADD("audiocpu", Z80,KONAMI_SOUND_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(konami_sound_map)
 	MCFG_CPU_IO_MAP(konami_sound_portmap)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
@@ -5922,7 +5932,7 @@ static MACHINE_CONFIG_DERIVED( scorpion, theend )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, konami_portc_0_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(galaxian_state, konami_sound_control_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(galaxian_state, scorpion_protection_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, scorpion_protection_w))
@@ -5959,17 +5969,19 @@ static MACHINE_CONFIG_DERIVED( sfx, galaxian_base )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, konami_portc_0_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(galaxian_state, konami_sound_control_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, konami_portc_1_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(driver_device, soundlatch2_byte_r))
+	MCFG_I8255_IN_PORTA_CB(DEVREAD8("soundlatch2", generic_latch_8_device, read))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	/* port on 2nd 8910 is used for communication */
 	MCFG_SOUND_MODIFY("8910.1")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(driver_device, soundlatch2_byte_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("soundlatch2", generic_latch_8_device, write))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(galaxian_state, sfx_sample_control_w))
 
 	/* DAC for the sample player */
@@ -6119,7 +6131,7 @@ static MACHINE_CONFIG_DERIVED( moonwar, scobra )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, moonwar_port_select_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(galaxian_state, konami_sound_control_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, konami_portc_1_w))
@@ -7076,7 +7088,7 @@ DRIVER_INIT_MEMBER(galaxian_state,froggermc)
 	/* video extensions */
 	common_init(nullptr, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
 
-	space.install_write_handler(0xa800, 0xa800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::soundlatch_byte_w),this));
+	space.install_write_handler(0xa800, 0xa800, 0, 0x7ff, write8_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch));
 	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::froggermc_sound_control_w),this));
 
 	/* actually needs 2k of RAM */

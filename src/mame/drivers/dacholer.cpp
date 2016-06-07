@@ -34,6 +34,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/dac.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
@@ -46,24 +47,26 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_audiocpu(*this,"audiocpu"),
-		m_bgvideoram(*this, "bgvideoram"),
-		m_fgvideoram(*this, "fgvideoram"),
-		m_spriteram(*this, "spriteram"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_spriteram(*this, "spriteram") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bgvideoram;
 	required_shared_ptr<UINT8> m_fgvideoram;
 	required_shared_ptr<UINT8> m_spriteram;
-
-	optional_device<msm5205_device> m_msm;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -217,7 +220,7 @@ WRITE8_MEMBER(dacholer_state::coins_w)
 
 WRITE8_MEMBER(dacholer_state::snd_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -298,7 +301,7 @@ WRITE8_MEMBER(dacholer_state::music_irq_w)
 
 static ADDRESS_MAP_START( snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_byte_r, soundlatch_clear_byte_w )
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(music_irq_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(snd_irq_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(snd_ack_w)
@@ -310,7 +313,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itaten_snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_byte_r, soundlatch_clear_byte_w )
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
 	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
@@ -674,6 +677,8 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_19_968MHz/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

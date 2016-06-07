@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carlos A. Lozano
+
+#include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 
 class terracre_state : public driver_device
@@ -11,6 +13,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
+		m_soundlatch(*this, "soundlatch"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram") { }
 
@@ -18,6 +21,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_bg_videoram;
 	required_shared_ptr<UINT16> m_fg_videoram;

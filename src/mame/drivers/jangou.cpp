@@ -28,6 +28,7 @@ $c088-$c095 player tiles
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
 #include "sound/msm5205.h"
@@ -48,7 +49,8 @@ public:
 		m_msm(*this, "msm"),
 		m_cvsd(*this, "cvsd"),
 		m_palette(*this, "palette"),
-		m_blitter(*this, "blitter") { }
+		m_blitter(*this, "blitter"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* sound-related */
 	// Jangou CVSD Sound
@@ -72,6 +74,7 @@ public:
 	optional_device<hc55516_device> m_cvsd;
 	required_device<palette_device> m_palette;
 	required_device<jangou_blitter_device> m_blitter;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	/* video-related */
 	DECLARE_WRITE8_MEMBER(mux_w);
@@ -233,14 +236,14 @@ READ8_MEMBER(jangou_state::input_system_r)
 
 WRITE8_MEMBER(jangou_state::sound_latch_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_cpu_1->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(jangou_state::sound_latch_r)
 {
 	m_cpu_1->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 /* Jangou HC-55516 CVSD */
@@ -859,6 +862,8 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 16)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(jangou_state, input_mux_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(jangou_state, input_system_r))
@@ -909,6 +914,7 @@ static MACHINE_CONFIG_DERIVED( cntrygrl, jangou )
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("cvsd")
+	MCFG_DEVICE_REMOVE("soundlatch")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( roylcrdn, jangou )
@@ -928,6 +934,7 @@ static MACHINE_CONFIG_DERIVED( roylcrdn, jangou )
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("cvsd")
+	MCFG_DEVICE_REMOVE("soundlatch")
 MACHINE_CONFIG_END
 
 
