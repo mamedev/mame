@@ -32,7 +32,7 @@ header and leader bytes.
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
 
-#define SORCERER_WAV_FREQUENCY   4800
+#define SORCERER_WAV_FREQUENCY   4788
 
 // image size
 static int sorcerer_image_size;

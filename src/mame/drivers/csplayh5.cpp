@@ -30,6 +30,7 @@
 #include "cpu/z80/tmpz84c011.h"
 #include "sound/dac.h"
 #include "sound/3812intf.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "cpu/h8/h83002.h"
 
@@ -44,6 +45,7 @@ public:
 		m_v9958(*this, "v9958"),
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
+		m_soundlatch(*this, "soundlatch"),
 		m_key(*this, "KEY"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_audiocpu(*this, "audiocpu"),
@@ -55,6 +57,7 @@ public:
 	required_device<v9958_device> m_v9958;
 	required_device<dac_device> m_dac1;
 	required_device<dac_device> m_dac2;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport_array<5> m_key;
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_audiocpu;
@@ -123,7 +126,7 @@ WRITE16_MEMBER(csplayh5_state::csplayh5_mux_w)
 
 WRITE16_MEMBER(csplayh5_state::csplayh5_sound_w)
 {
-	soundlatch_byte_w(space, 0, ((data >> 8) & 0xff));
+	m_soundlatch->write(space, 0, ((data >> 8) & 0xff));
 }
 
 
@@ -186,12 +189,12 @@ void csplayh5_state::soundbank_w(int data)
 
 READ8_MEMBER(csplayh5_state::csplayh5_sound_r)
 {
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 WRITE8_MEMBER(csplayh5_state::csplayh5_soundclr_w)
 {
-	soundlatch_clear_byte_w(space, 0, 0);
+	m_soundlatch->clear_w(space, 0, 0);
 }
 
 
@@ -485,6 +488,8 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)

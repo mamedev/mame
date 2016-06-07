@@ -1632,6 +1632,7 @@ MACHINE_CONFIG_END
 
   Mattel Computer Gin
   * NEC uCOM-43 MCU, label D650C 060
+  * Hughes HLCD0569 LCD driver
 
 ***************************************************************************/
 

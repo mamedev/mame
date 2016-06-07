@@ -134,12 +134,18 @@ static const gba_slot slot_list[] =
 {
 	{ GBA_STD, "gba_rom" },
 	{ GBA_SRAM, "gba_sram" },
+	{ GBA_DRILLDOZ, "gba_drilldoz" },
+	{ GBA_WARIOTWS, "gba_wariotws" },
 	{ GBA_EEPROM, "gba_eeprom" },
 	{ GBA_EEPROM4, "gba_eeprom_4k" },
+	{ GBA_YOSHIUG, "gba_yoshiug" },
 	{ GBA_EEPROM64, "gba_eeprom_64k" },
+	{ GBA_BOKTAI, "gba_boktai" },
 	{ GBA_FLASH, "gba_flash" },
+	{ GBA_FLASH_RTC, "gba_flash_rtc" },
 	{ GBA_FLASH512, "gba_flash_512" },
 	{ GBA_FLASH1M, "gba_flash_1m" },
+	{ GBA_FLASH1M_RTC, "gba_flash_1m_rtc" },
 	{ GBA_3DMATRIX, "gba_3dmatrix" },
 };
 
@@ -204,7 +210,7 @@ bool gba_cart_slot_device::call_load()
 			osd_printf_info("GBA: Detected (XML) %s\n", pcb_name ? pcb_name : "NONE");
 		}
 
-		if (m_type == GBA_SRAM)
+		if (m_type == GBA_SRAM || m_type == GBA_DRILLDOZ || m_type == GBA_WARIOTWS)
 			m_cart->nvram_alloc(0x10000);
 
 		// mirror the ROM
@@ -300,6 +306,8 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 {
 	UINT32 chip = 0;
 	int type = GBA_STD;
+	bool has_rtc = false;
+	bool has_rumble = false;
 
 	// first detect nvram type based on strings inside the file
 	for (int i = 0; i < len; i++)
@@ -359,10 +367,20 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 		for (auto & elem : gba_chip_fix_eeprom_list)
 		{
-			const gba_chip_fix_eeprom_item *item = &elem;
+			const gba_chip_fix_item *item = &elem;
 			if (!strcmp(game_code, item->game_code))
 			{
 				chip = (chip & ~GBA_CHIP_EEPROM) | GBA_CHIP_EEPROM_64K;
+				break;
+			}
+		}
+
+		for (auto & elem : gba_chip_fix_rumble_list)
+		{
+			const gba_chip_fix_item *item = &elem;
+			if (!strcmp(game_code, item->game_code))
+			{
+				has_rumble = true;
 				break;
 			}
 		}
@@ -370,8 +388,9 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 	if (chip & GBA_CHIP_RTC)
 	{
-		osd_printf_info("game has RTC - not emulated at the moment\n");
+		//osd_printf_info("game has RTC - not emulated at the moment\n");
 		chip &= ~GBA_CHIP_RTC;
+		has_rtc = true;
 	}
 
 	osd_printf_info("GBA: Emulate %s\n", gba_chip_string(chip).c_str());
@@ -383,21 +402,29 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			break;
 		case GBA_CHIP_EEPROM:
 			type = GBA_EEPROM;
+			if (has_rumble)
+				type = GBA_YOSHIUG;
 			break;
 		case GBA_CHIP_EEPROM_4K:
 			type = GBA_EEPROM4;
 			break;
 		case GBA_CHIP_EEPROM_64K:
 			type = GBA_EEPROM64;
+			if (has_rtc)
+				type = GBA_BOKTAI;
 			break;
 		case GBA_CHIP_FLASH:
 			type = GBA_FLASH;
+			if (has_rtc)
+				type = GBA_FLASH_RTC;
 			break;
 		case GBA_CHIP_FLASH_512:
 			type = GBA_FLASH512;
 			break;
 		case GBA_CHIP_FLASH_1M:
 			type = GBA_FLASH1M;
+			if (has_rtc)
+				type = GBA_FLASH1M_RTC;
 			break;
 		default:
 			break;
@@ -455,6 +482,14 @@ READ32_MEMBER(gba_cart_slot_device::read_ram)
 		return 0xffffffff;
 }
 
+READ32_MEMBER(gba_cart_slot_device::read_gpio)
+{
+	if (m_cart)
+		return m_cart->read_gpio(space, offset, mem_mask);
+	else
+		return 0xffffffff;
+}
+
 
 /*-------------------------------------------------
  write
@@ -464,6 +499,12 @@ WRITE32_MEMBER(gba_cart_slot_device::write_ram)
 {
 	if (m_cart)
 		m_cart->write_ram(space, offset, data, mem_mask);
+}
+
+WRITE32_MEMBER(gba_cart_slot_device::write_gpio)
+{
+	if (m_cart)
+		m_cart->write_gpio(space, offset, data, mem_mask);
 }
 
 

@@ -22,6 +22,7 @@
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "formats/afs_dsk.h"
 
 class e01_device : public device_t,
 	public device_econet_interface
@@ -36,6 +37,8 @@ public:
 		TYPE_E01 = 0,
 		TYPE_E01S
 	};
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats_afs);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

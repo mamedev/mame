@@ -38,8 +38,6 @@ public:
 	virtual UINT8 pet_bd_r(address_space &space, offs_t offset, UINT8 data, int &sel) override;
 	virtual void pet_bd_w(address_space &space, offs_t offset, UINT8 data, int &sel) override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;

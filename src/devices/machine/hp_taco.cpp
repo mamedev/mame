@@ -803,10 +803,10 @@ hp_taco_device::tape_pos_t hp_taco_device::word_end_pos(const tape_track_t::iter
 void hp_taco_device::adjust_it(tape_track_t& track , tape_track_t::iterator& it , tape_pos_t pos)
 {
 		if (it != track.begin()) {
-				it--;
-				if (word_end_pos(it) <= pos) {
-						it++;
-				}
+			--it;
+			if (word_end_pos(it) <= pos) {
+				++it;
+			}
 		}
 }
 
@@ -873,11 +873,11 @@ bool hp_taco_device::next_data(tape_track_t::iterator& it , tape_pos_t pos , boo
 		} else {
 				// Never more than 2 iterations
 				do {
-						if (it == track.begin()) {
-								it = track.end();
-								return false;
-						}
-						it--;
+					if (it == track.begin()) {
+						it = track.end();
+						return false;
+					}
+					--it;
 				} while (!inclusive && word_end_pos(it) > pos);
 				return true;
 		}
@@ -887,23 +887,23 @@ hp_taco_device::adv_res_t hp_taco_device::adv_it(tape_track_t::iterator& it)
 {
 		tape_track_t& track = current_track();
 		if (m_tape_fwd) {
-				tape_pos_t prev_pos = word_end_pos(it);
-				it++;
+			tape_pos_t prev_pos = word_end_pos(it);
+			++it;
 				if (it == track.end()) {
-						return ADV_NO_MORE_DATA;
+					return ADV_NO_MORE_DATA;
 				} else {
-						adv_res_t res = prev_pos == it->first ? ADV_CONT_DATA : ADV_DISCONT_DATA;
-						return res;
+					adv_res_t res = prev_pos == it->first ? ADV_CONT_DATA : ADV_DISCONT_DATA;
+					return res;
 				}
 		} else {
-				if (it == track.begin()) {
-						it = track.end();
-						return ADV_NO_MORE_DATA;
-				} else {
-						tape_pos_t prev_pos = it->first;
-						it--;
-						return prev_pos == word_end_pos(it) ? ADV_CONT_DATA : ADV_DISCONT_DATA;
-				}
+			if (it == track.begin()) {
+				it = track.end();
+				return ADV_NO_MORE_DATA;
+			} else {
+				tape_pos_t prev_pos = it->first;
+				--it;
+				return prev_pos == word_end_pos(it) ? ADV_CONT_DATA : ADV_DISCONT_DATA;
+			}
 		}
 }
 
@@ -1025,51 +1025,51 @@ void hp_taco_device::clear_tape(void)
 
 void hp_taco_device::dump_sequence(tape_track_t::const_iterator it_start , unsigned n_words)
 {
-		if (n_words) {
-				UINT32 tmp32;
-				UINT16 tmp16;
+	if (n_words) {
+		UINT32 tmp32;
+		UINT16 tmp16;
 
-				tmp32 = n_words;
-				fwrite(&tmp32 , sizeof(tmp32));
-				tmp32 = it_start->first;
-				fwrite(&tmp32 , sizeof(tmp32));
+		tmp32 = n_words;
+		fwrite(&tmp32 , sizeof(tmp32));
+		tmp32 = it_start->first;
+		fwrite(&tmp32 , sizeof(tmp32));
 
-				for (unsigned i = 0; i < n_words; i++) {
-						tmp16 = it_start->second;
-						fwrite(&tmp16 , sizeof(tmp16));
-						it_start++;
-				}
+		for (unsigned i = 0; i < n_words; i++) {
+			tmp16 = it_start->second;
+			fwrite(&tmp16 , sizeof(tmp16));
+			++it_start;
 		}
+	}
 }
 
 void hp_taco_device::save_tape(void)
 {
-		UINT32 tmp32;
+	UINT32 tmp32;
 
-		fseek(0, SEEK_SET);
+	fseek(0, SEEK_SET);
 
-		tmp32 = FILE_MAGIC;
-		fwrite(&tmp32 , sizeof(tmp32));
+	tmp32 = FILE_MAGIC;
+	fwrite(&tmp32 , sizeof(tmp32));
 
-		for (unsigned track_n = 0; track_n < 2; track_n++) {
-				const tape_track_t& track = m_tracks[ track_n ];
-				tape_pos_t next_pos = (tape_pos_t)-1;
-				unsigned n_words = 0;
-				tape_track_t::const_iterator it_start;
-				for (tape_track_t::const_iterator it = track.cbegin(); it != track.cend(); it++) {
-						if (it->first != next_pos) {
-								dump_sequence(it_start , n_words);
-								it_start = it;
-								n_words = 0;
-						}
-						next_pos = it->first + word_length(it->second);
-						n_words++;
+	for (unsigned track_n = 0; track_n < 2; track_n++) {
+		const tape_track_t& track = m_tracks[ track_n ];
+		tape_pos_t next_pos = (tape_pos_t)-1;
+		unsigned n_words = 0;
+		tape_track_t::const_iterator it_start;
+		for (tape_track_t::const_iterator it = track.cbegin(); it != track.cend(); ++it) {
+				if (it->first != next_pos) {
+						dump_sequence(it_start , n_words);
+						it_start = it;
+						n_words = 0;
 				}
-				dump_sequence(it_start , n_words);
-				// End of track
-				tmp32 = (UINT32)-1;
-				fwrite(&tmp32 , sizeof(tmp32));
+				next_pos = it->first + word_length(it->second);
+				n_words++;
 		}
+		dump_sequence(it_start , n_words);
+		// End of track
+		tmp32 = (UINT32)-1;
+		fwrite(&tmp32 , sizeof(tmp32));
+	}
 }
 
 bool hp_taco_device::load_track(tape_track_t& track)

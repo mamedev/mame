@@ -4,31 +4,38 @@
 DEC Rainbow 100
 
 Driver-in-progress by R. Belmont and Miodrag Milanovic.
-Portions (2013 - 2015) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk).
+Keyboard fix by Cracyc (June 2016)
+Portions (2013 - 2016) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk).
 
-STATE AS OF APRIL 2015
+To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side effect of ERROR 13).
+Only single sided disk images with 80 tracks, 10 sectors appear to work (IMG or *.TD0 / TeleDisk).
+If problems arise, delete the NVRAM file in folder Rainbow.
+You may also want to reassign SETUP (away from F3, where it sits on a LK201).
+
+STATE AS OF JUNE 2016
 ----------------------
 Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
 While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
-RBCONVERT.ZIP has details on how model 'A' differs from version B.
+RBCONVERT.ZIP documents how model 'A' differs from version B.
 
-Issues with this driver:
+BUGS / ISSUES
 
-(1) Keyboard emulation incomplete (fatal; inhibits the system from booting with ERROR 50).
+(1) LOOPBACK circuit not emulated, NMI from RAM card also unemulated (ERROR 27).
+The former is used in startup tests, the latter seems less relevant (must use menu self test "S").
 
-Serial ports do not work, so serial communication failure (ERROR 60) and ERROR 40 (serial
-printer interface) result. Unfortunately the BIOS tests all three serial interfaces in line.
+(2) serial ports do not work, so serial communication failure (ERROR 60) and ERROR 40 (serial
+printer interface) result. 
 
-(2) while DOS 3 and UCSD systems (fort_sys, pas_sys) + diag disks boot, CPM 2.x and DOS 2.x die
+(3) while DOS 3 and UCSD systems (fort_sys, pas_sys) + diag disks boot, CPM 2.x and DOS 2.x die
 in secondary boot loader with a RESTORE (seek track 0) when track 2 sector 1 should be loaded.
 
 Writing files to floppy is next to impossible on both CPM 1.x and DOS 3 (these two OS boot
-with keyboard workarounds enabled). File deletion works, so few bytes pass.
+with new workaround enabled). File deletion works, so few bytes pass.
 
-(3) heavy system interaction stalls the driver. Start the RX50 diag.disk and
- see what happens (key 3 for individual tests, then select system interaction).
-    
-(4) arbitration chip (E11; in 100-A schematics or E13 in -B) should be dumped.
+(4) system interaction tests HALT Z80 CPU at location $0211 (forever). Boot the RX50 diag.disk
+to see what happens (key 3 for individual tests, then select system interaction).
+
+(5) arbitration chip (E11; in 100-A schematics or E13 in -B) should be dumped.
  It is a 6308 OTP ROM (2048 bit, 256 x 8) used as a lookup table (LUT) with the address pins (A)
  used as inputs and the data pins (D) as output.
 
@@ -207,14 +214,9 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 // ---------------------------------------------------------------------------
 // WORKAROUNDS:
-// (1) FORCE LOGO: - not valid for 100-A ROM -
-//#define FORCE_RAINBOW_B_LOGO
-
-// (2) KEYBOARD_WORKAROUND : also requires FORCE...LOGO (and preliminary headers)
-//#define KEYBOARD_WORKAROUND
-//#define KBD_DELAY 8    // (debounce delay)
+// - tested only in conjunction with 100-B ROM -
+//#define WORKAROUND_RAINBOW_B
 // ---------------------------------------------------------------------------
-
 
 // Define standard and maximum RAM sizes (A, then B model):
 //#define BOARD_RAM 0x0ffff  // 64 K base RAM  (100-A)
@@ -260,11 +262,6 @@ class rainbow_state : public driver_device
 public:
 	rainbow_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-
-#ifdef KEYBOARD_WORKAROUND
-#include "./m_kbd1.c"
-#endif
-
 
 		m_inp1(*this, "W13"),
 		m_inp2(*this, "W14"),
@@ -365,10 +362,6 @@ public:
 
 	DECLARE_READ8_MEMBER(rtc_w);
 
-
-#ifdef KEYBOARD_WORKAROUND
-#include "./port9x_Ax.c"
-#endif
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
@@ -394,11 +387,6 @@ private:
 		IRQ_8088_VBL,         // 20/A0  80/280  - [built-in DC012] - VERT INTR L (= schematics)
 		IRQ_8088_NMI          // 02/02  08/08   - [external MEMORY EXTENSION] - PARITY ERROR L
 	};  // HIGHEST PRIORITY
-
-
-#ifdef KEYBOARD_WORKAROUND
-#include "./m_kbd2.c"
-#endif
 
 	required_ioport m_inp1;
 	required_ioport m_inp2;
@@ -516,40 +504,13 @@ void rainbow_state::machine_start()
 	save_item(NAME(m_irq_high));
 	save_item(NAME(m_irq_mask));
 
-#ifdef FORCE_RAINBOW_B_LOGO
+#ifdef WORKAROUND_RAINBOW_B
 	UINT8 *rom = memregion("maincpu")->base();
-
-	rom[0xf4000 + 0x364a] = 2 + 8;  // 2 :set ; 4 : reset, 8 : set for 0xf4363 ( 0363 WAIT_FOR_BIT3__loc_35E )
-
-	rom[0xf4000 + 0x0363] = 0x90;
-	rom[0xf4000 + 0x0364] = 0x90;
-
-	// If bit 2 = 1 (Efff9), then a keyboard powerup is necessary (=> will lock up in current state)
-	rom[0xf4000 + 0x3638] = 0x80;  // OR instead of TEST
-	rom[0xf4000 + 0x3639] = 0x0f;  // OR instead of TEST
-	rom[0xf4000 + 0x363a] = 0x08;  // 04 => 08
-
-	rom[0xf4000 + 0x363b] = 0xeb;  // COND => JMPS
-
-	if (rom[0xf4174] == 0x75)
+	if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B (5.01)    0x35 would test for V5.05
 	{
-		rom[0xf4174] = 0xeb; // jmps  RAINBOW100_LOGO__loc_33D
-		rom[0xf4175] = 0x08;
+		rom[0xf4000 + 0x0303] = 0x00; // disable CRC check
+		rom[0xf4000 + 0x135e] = 0x00; // FLOPPY / RX-50 WORKAROUND: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), do not block floppy access.
 	}
-
-	if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B
-		rom[0xf4384] = 0xeb; // JMPS  =>  BOOT80
-
-	if (rom[0xf4000 + 0x3ffc] == 0x35) // v5.05
-		rom[0xf437b] = 0xeb;
-
-	//TEST-DEBUG: always reset NVM to defaults (!)
-	//rom[0x3d6c] = 0x90;
-	//rom[0x3d6d] = 0x90;
-#endif
-
-#ifdef KEYBOARD_WORKAROUND
-#include "./rainbow_keyboard0.c"
 #endif
 }
 
@@ -681,12 +642,6 @@ AM_RANGE(0x69, 0x69) AM_READ(hd_status_69_r)
 // ===========================================================
 // 0x10c
 AM_RANGE(0x10c, 0x10c) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w)
-
-
-#ifdef KEYBOARD_WORKAROUND
-#include "./am_range_9x_Ax.c"
-#endif
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(rainbowz80_mem, AS_PROGRAM, 8, rainbow_state)
@@ -716,9 +671,6 @@ ADDRESS_MAP_END
 /* DIP switches */
 static INPUT_PORTS_START(rainbow100b_in)
 
-#ifdef KEYBOARD_WORKAROUND
-#include "./rainbow_ipt.c"
-#endif
 PORT_START("MONITOR TYPE")
 PORT_DIPNAME(0x03, 0x03, "MONOCHROME MONITOR")
 PORT_DIPSETTING(0x01, "WHITE")
@@ -926,10 +878,6 @@ void rainbow_state::machine_reset()
 	m_irq_mask = 0;
 }
 
-#ifdef KEYBOARD_WORKAROUND
-#include "./rainbow_keyboard2.c"
-#endif
-
 UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
@@ -956,7 +904,7 @@ void rainbow_state::update_8088_irqs()
 
 	if (m_irq_mask != 0)
 	{
-		for (int i = 0; i < IRQ_8088_NMI; i++)
+		for (int i = IRQ_8088_NMI; i >= 0; i--)
 		{
 			if (m_irq_mask & (1 << i))
 			{
@@ -1664,21 +1612,6 @@ WRITE_LINE_MEMBER(rainbow_state::bundle_irq)
 
 READ8_MEMBER(rainbow_state::system_parameter_r)
 {
-#ifdef FORCE_RAINBOW_B_LOGO
-
-	// WORKAROUND: Initialize NVRAM + VOLATILE RAM with DEFAULTS + correct RAM SIZE !
-	int test = (m_inp8->read() >> 16) - 2; // 0 = 128 K (!)
-	if (test >= 0)
-	{
-		m_p_vol_ram[0xdb] = test;
-		m_p_nvram[0xdb] = test;
-	}
-
-	// NVRAM @ 0x89 : AUTO RPT(0 = OFF 1 = ON)
-	m_p_nvram[0x89] = 0;  //  AUTO REPEAT ON (1 would be DETRIMENTAL TO "SET-UP" (80/132 + 50/60 Hz) with KEYBOARD_WORKAROUND (!)
-#endif
-
-
 	/*  Info about option boards is in bits 0 - 3:
 	SYSTEM PARAMETER INFORMATION: see AA-P308A-TV page 92 section 14.0
 	Bundle card (1) | Floppy (2) | Graphics (4) | Memory option (8)
@@ -2179,16 +2112,10 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 // KEYBOARD
 void rainbow_state::update_kbd_irq()
 {
-#ifndef KEYBOARD_WORKAROUND
 	if ((m_kbd_rx_ready) || (m_kbd_tx_ready))
-	{
 		raise_8088_irq(IRQ_8088_KBD);
-	}
 	else
-	{
 		lower_8088_irq(IRQ_8088_KBD);
-	}
-#endif
 }
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_tx)

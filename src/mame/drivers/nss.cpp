@@ -516,6 +516,7 @@ READ8_MEMBER(nss_state::port_00_r)
 	UINT8 res;
 
 	res = (m_joy_flag) << 7;
+	// TODO: reads from SNES screen output, correct?
 	res|= (m_screen->vblank() & 1) << 6;
 	res|= (BIT(ioport("SERIAL1_DATA1")->read(), 15) << 5);
 	res|= (BIT(ioport("SERIAL1_DATA1")->read(),  7) << 4);
@@ -852,8 +853,8 @@ static MACHINE_CONFIG_START( nss, nss_state )
 	MCFG_SCREEN_ADD("osd", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(24*12+22, 12*18+22)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*12-1, 0*8, 12*18-1)
+	MCFG_SCREEN_SIZE(288+22, 216+22)
+	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 216-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nss_state,screen_update)
 MACHINE_CONFIG_END
 

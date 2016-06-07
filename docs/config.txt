@@ -876,17 +876,20 @@ Core screen options
 Core vector options
 -------------------
 
--[no]antialias / -[no]aa
+-beam_width_min <value>
+-beam_width_max <value>
 
-	Enables antialiased line rendering for vector games. The default is ON
-	(-antialias).
-
--beam <width>
-
-	Sets the width of the vectors. This is a scaling factor against the
-	standard vector width. A value of 1.0 will keep the default vector
-	line width. Smaller values will reduce the width, and larger values
+	Sets the minimum and maximum width of the vectors. This is a scaling factor
+	against the standard vector width, which is interpolated between minimum and
+	maximum according to the beam's intensity. A value of 1.0 will keep the default
+	vector line width. Smaller values will reduce the width, and larger values
 	will increase the width. The default is 1.0.
+
+-beam_intensity_weight <value>
+
+	Applies an exponential weight to the minimum and maximum beam width. For positive
+	values the interpolated scaling factor will affect lines with higher intensity
+	more than lines with lower intensity. The default is 0.0.
 
 -flicker <value>
 

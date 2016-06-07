@@ -148,7 +148,13 @@ void main()
 
 			float ColorBrightness = 0.299 * BaseColor.r + 0.587 * BaseColor.g + 0.114 * BaseColor.b;
 
-			float ScanCoord = BaseCoord.y * u_source_dims.y * u_scanline_scale.x * 3.1415927; // PI
+			float ScanCoord = BaseCoord.y;
+			ScanCoord += u_quad_dims.y <= u_source_dims.y * 2.0f
+				? 0.5f / u_quad_dims.y // uncenter scanlines if the quad is less than twice the size of the source
+				: 0.0f;
+
+			ScanCoord *= u_source_dims.y * u_scanline_scale.x * 3.1415927; // PI
+
 			float ScanCoordJitter = u_scanline_jitter.x * u_jitter_amount.x * 1.618034; // PHI
 			float ScanSine = sin(ScanCoord + ScanCoordJitter);
 			float ScanlineWide = u_scanline_height.x + u_scanline_variation.x * max(1.0, u_scanline_height.x) * (1.0 - ColorBrightness);

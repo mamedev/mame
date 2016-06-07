@@ -265,6 +265,8 @@ iq151.cpp
 iris3130.cpp
 irisha.cpp
 isbc.cpp
+isbc8010.cpp
+isbc8030.cpp
 iskr103x.cpp
 itt3030.cpp
 jade.cpp
@@ -545,6 +547,7 @@ studio2.cpp
 sun1.cpp
 sun2.cpp
 sun3.cpp
+sun3x.cpp
 sun4.cpp
 super6.cpp
 super80.cpp

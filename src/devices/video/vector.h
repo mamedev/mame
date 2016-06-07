@@ -53,18 +53,6 @@ public:
 
 	void add_point(int x, int y, rgb_t color, int intensity);
 
-	void set_flicker(float newval);
-	float get_flicker();
-
-	void set_beam_width_min(float newval);
-	float get_beam_width_min();
-
-	void set_beam_width_max(float newval);
-	float get_beam_width_max();
-
-	void set_beam_intensity_weight(float newval);
-	float get_beam_intensity_weight();
-
 	// device-level overrides
 	virtual void device_start() override;
 

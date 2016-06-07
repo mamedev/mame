@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+
 #include "includes/nb1413m3.h"
 
 class nbmj8891_state : public driver_device

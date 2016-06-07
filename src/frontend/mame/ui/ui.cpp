@@ -1572,7 +1572,7 @@ UINT32 mame_ui_manager::handler_ingame(render_container *container)
 	// if the on-screen display isn't up and the user has toggled it, turn it on
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0 && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
 	{
-		set_handler<mame_ui_manager&, bool>(UI_CALLBACK_TYPE_GENERAL, ui::menu_sliders::ui_handler, *this, true);
+		set_handler<mame_ui_manager&>(UI_CALLBACK_TYPE_MENU, ui::menu_sliders::ui_handler, *this);
 		return 1;
 	}
 
@@ -2015,8 +2015,8 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		{
 			// add vector control
 			sliders.push_back(slider_alloc(machine, SLIDER_ID_FLICKER + slider_index, _("Vector Flicker"), 0, 0, 1000, 10, nullptr));
-			sliders.push_back(slider_alloc(machine, SLIDER_ID_BEAM_WIDTH_MIN + slider_index, _("Beam Width Minimum"), 1, 100, 1000, 1, nullptr));
-			sliders.push_back(slider_alloc(machine, SLIDER_ID_BEAM_WIDTH_MAX + slider_index, _("Beam Width Maximum"), 1, 100, 1000, 1, nullptr));
+			sliders.push_back(slider_alloc(machine, SLIDER_ID_BEAM_WIDTH_MIN + slider_index, _("Beam Width Minimum"), 100, 100, 1000, 1, nullptr));
+			sliders.push_back(slider_alloc(machine, SLIDER_ID_BEAM_WIDTH_MAX + slider_index, _("Beam Width Maximum"), 100, 100, 1000, 1, nullptr));
 			sliders.push_back(slider_alloc(machine, SLIDER_ID_BEAM_INTENSITY + slider_index, _("Beam Intensity Weight"), -1000, 0, 1000, 10, nullptr));
 			slider_index++;
 			break;

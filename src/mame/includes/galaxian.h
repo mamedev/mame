@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -50,11 +51,12 @@ public:
 			m_ppi8255_0(*this, "ppi8255_0"),
 			m_ppi8255_1(*this, "ppi8255_1"),
 			m_ppi8255_2(*this, "ppi8255_2"),
-			m_spriteram(*this, "spriteram"),
-			m_videoram(*this, "videoram"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
+			m_soundlatch(*this, "soundlatch"),
+			m_spriteram(*this, "spriteram"),
+			m_videoram(*this, "videoram"),
 			m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -66,14 +68,16 @@ public:
 	optional_device<ay8910_device> m_ay8910_2;
 	optional_device<ay8910_device> m_ay8910_cclimber;
 	optional_device<digitalker_device> m_digitalker;
-	optional_device<i8255_device>  m_ppi8255_0;
-	optional_device<i8255_device>  m_ppi8255_1;
-	optional_device<i8255_device>  m_ppi8255_2;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
+	optional_device<i8255_device> m_ppi8255_0;
+	optional_device<i8255_device> m_ppi8255_1;
+	optional_device<i8255_device> m_ppi8255_2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	int m_bullets_base;
@@ -239,7 +243,6 @@ public:
 	DECLARE_DRIVER_INIT(thepitm);
 	DECLARE_DRIVER_INIT(theend);
 	DECLARE_DRIVER_INIT(scramble);
-	DECLARE_DRIVER_INIT(explorer);
 	DECLARE_DRIVER_INIT(sfx);
 	DECLARE_DRIVER_INIT(atlantis);
 	DECLARE_DRIVER_INIT(scobra);

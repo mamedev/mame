@@ -245,6 +245,7 @@ struct hlsl_options
 	int                     yiq_phase_count;
 
 	// Vectors
+	float                   vector_beam_smooth;
 	float                   vector_length_scale;
 	float                   vector_length_ratio;
 

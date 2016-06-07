@@ -24,9 +24,13 @@ TODO
   but it should really copy stuff from the extra ROM.
 - Ninja Emaki has minor protection issues, see NB1414M4 simulation for more info.
 - dangarj has unemulated protection at I/Os 0x80-1 for missing sprites. 
-  It then checks the checksum result with 0x27, jumps to unmapped ROM area 
-  during gameplay if it's manually hampered hmm ...
-
+  [0x80] W is data
+  [0x81] W --11 xxxx address
+  [0x80] R result
+  The protection is used for a code snippet at 0xf9c0, that of course is the
+  sprite handling. The code snippet is sum8 with 0x27 at 0x9d74 so no, the 
+  later dangar US version snippet doesn't work ...
+  
 ***************************************************************************/
 
 #include "emu.h"
@@ -38,12 +42,12 @@ TODO
 
 WRITE8_MEMBER(galivan_state::galivan_sound_command_w)
 {
-	soundlatch_byte_w(space,0,((data & 0x7f) << 1) | 1);
+	m_soundlatch->write(space,0,((data & 0x7f) << 1) | 1);
 }
 
 READ8_MEMBER(galivan_state::soundlatch_clear_r)
 {
-	soundlatch_clear_byte_w(space, 0, 0);
+	m_soundlatch->clear_w(space, 0, 0);
 	return 0;
 }
 
@@ -118,7 +122,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, galivan_state )
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -448,6 +452,8 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -497,6 +503,9 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

@@ -1449,7 +1449,7 @@ end
 
 --------------------------------------------------
 -- PATINHO FEIO - Escola Politecnica - USP (Brazil)
---@src/devices/cpu/patinhofeio/patinho_feio.h,CPUS["PATINHOFEIO"] = true
+--@src/devices/cpu/patinhofeio/patinhofeio_cpu.h,CPUS["PATINHOFEIO"] = true
 --------------------------------------------------
 
 if (CPUS["PATINHOFEIO"]~=null) then

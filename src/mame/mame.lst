@@ -2017,6 +2017,7 @@ abattle                         // Sidam
 abattle2                        // Sidam
 acombat                         // bootleg
 acombat3                        // bootleg
+acombat4                        // bootleg
 acombato                        // bootleg
 afire                           // Rene Pierre
 astrof                          // (c) [1980?]
@@ -2328,8 +2329,8 @@ atmtb2                          //
 
 @source:atom.cpp
 atom                            // 1979 Acorn Atom
-atombb                          // 1979 Acorn Atom
-atomeb                          // 1979 Acorn Atom
+atombb                          // 1982 Acorn Atom with BBC Basic
+atomeb                          // 1979 Acorn Atom with Eprom Box
 
 @source:atpci.cpp
 at586                           // 19?? AT 586
@@ -14541,6 +14542,14 @@ isbc286                         //
 isbc2861                        //
 isbc86                          //
 rpc86                           //
+
+@source:isbc8010.cpp
+isbc8010                        //
+isbc8010a                       //
+isbc8010b                       //
+
+@source:isbc8030.cpp
+isbc8030                        //
 
 @source:iskr103x.cpp
 iskr1030m                       //
@@ -28125,8 +28134,11 @@ vtenis2c                        // 2001.10 Virtua Tennis 2 / Power Smash 2 (Rev 
 vtennis                         // 1999.12 Virtua Tennis / Power Smash (cartridge)
 vtennis2                        // 2001.08.27 Virtua Tennis 2 / Power Smash 2 (GD-ROM)
 vtennisg                        // 1999.?? Virtua Tennis / Power Smash (GD-ROM)
+wccf116                         // 2003.?? World Club Champion Football Serie A 2001-2002 Ver. 2
+wccf1dup                        // 2002.?? World Club Champion Football Serie A 2001-2002 DIMM FIRM Ver.3.03
 wccf212e                        // 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.12
 wccf234j                        // 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.34
+wccf2chk                        // 2004.?? World Club Champion Football Serie A 2002-2003 Drive Checker
 wccf310j                        // 2005.06 World Club Champion Football European Clubs 2004-2005
 wccf322e                        // 2005.11 World Club Champion Football European Clubs 2004-2005 Ver.3.22
 wccf331e                        // 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.1
@@ -33969,11 +33981,13 @@ sun2_50                         //
 sun3_110                        //
 sun3_150                        //
 sun3_260                        //
-sun3_460                        //
 sun3_50                         //
 sun3_60                         //
-sun3_80                         //
 sun3_e                          //
+
+@source:sun3x.cpp
+sun3_80                         //
+sun3_460                        //
 
 @source:sun4.cpp
 sun_s10                         //

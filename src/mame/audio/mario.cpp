@@ -24,17 +24,17 @@
 #define ACTIVELOW_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | ((D ^ 1) << A))
 #define ACTIVEHIGH_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | (D << A))
 
-#define I8035_T_R(M,N) ((soundlatch2_byte_r(M,0) >> (N)) & 1)
-#define I8035_T_W_AH(M,N,D) do { m_portT = ACTIVEHIGH_PORT_BIT(m_portT,N,D); soundlatch2_byte_w(M, 0, m_portT); } while (0)
+#define I8035_T_R(M,N) ((m_soundlatch2->read(M,0) >> (N)) & 1)
+#define I8035_T_W_AH(M,N,D) do { m_portT = ACTIVEHIGH_PORT_BIT(m_portT,N,D); m_soundlatch2->write(M, 0, m_portT); } while (0)
 
-#define I8035_P1_R(M) (soundlatch3_byte_r(M,0))
-#define I8035_P2_R(M) (soundlatch4_byte_r(M,0))
-#define I8035_P1_W(M,D) soundlatch3_byte_w(M,0,D)
+#define I8035_P1_R(M) (m_soundlatch3->read(M,0))
+#define I8035_P2_R(M) (m_soundlatch4->read(M,0))
+#define I8035_P1_W(M,D) m_soundlatch3->write(M,0,D)
 
 #if (USE_8039)
-#define I8035_P2_W(M,D) do { soundlatch4_byte_w(M,0,D); } while (0)
+#define I8035_P2_W(M,D) do { m_soundlatch4->write(M,0,D); } while (0)
 #else
-#define I8035_P2_W(M,D) do { set_ea(M, ((D) & 0x20) ? 0 : 1);  soundlatch4_byte_w(M,0,D); } while (0)
+#define I8035_P2_W(M,D) do { set_ea(M, ((D) & 0x20) ? 0 : 1);  m_soundlatch4->write(M,0,D); } while (0)
 #endif
 
 #define I8035_P1_W_AH(M,B,D) I8035_P1_W(M,ACTIVEHIGH_PORT_BIT(I8035_P1_R(M),B,(D)))
@@ -691,12 +691,12 @@ void mario_state::sound_reset()
 #endif
 
 	/* FIXME: convert to latch8 */
-	soundlatch_clear_byte_w(space, 0, 0);
-	soundlatch2_clear_byte_w(space, 0, 0);
-	soundlatch3_clear_byte_w(space, 0, 0);
-	soundlatch4_clear_byte_w(space, 0, 0);
-	I8035_P1_W(space, 0x00); /* Input port */
-	I8035_P2_W(space, 0xff); /* Port is in high impedance state after reset */
+	m_soundlatch->clear_w(space, 0, 0);
+	if (m_soundlatch2) m_soundlatch2->clear_w(space, 0, 0);
+	if (m_soundlatch3) m_soundlatch3->clear_w(space, 0, 0);
+	if (m_soundlatch4) m_soundlatch4->clear_w(space, 0, 0);
+	if (m_soundlatch3) I8035_P1_W(space, 0x00); /* Input port */
+	if (m_soundlatch4) I8035_P2_W(space, 0xff); /* Port is in high impedance state after reset */
 
 	m_last = 0;
 }
@@ -734,7 +734,7 @@ READ8_MEMBER(mario_state::mario_sh_tune_r)
 	UINT8 p2 = I8035_P2_R(space);
 
 	if ((p2 >> 7) & 1)
-		return soundlatch_byte_r(space, offset);
+		return m_soundlatch->read(space, offset);
 	else
 		return (SND[(0x1000 + (p2 & 0x0f) * 256 + offset) & mask]);
 }
@@ -777,7 +777,7 @@ WRITE8_MEMBER(mario_state::masao_sh_irqtrigger_w)
 
 WRITE8_MEMBER(mario_state::mario_sh_tuneselect_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 }
 
 /* Sound 0 and 1 are pulsed !*/
@@ -883,6 +883,11 @@ MACHINE_CONFIG_FRAGMENT( mario_audio )
 	MCFG_CPU_IO_MAP(mario_sound_io_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 
 #if OLD_SOUND
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
@@ -910,8 +915,10 @@ MACHINE_CONFIG_FRAGMENT( masao_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, 14318000/6)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END
