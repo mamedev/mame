@@ -129,6 +129,7 @@ struct SHARC_DMA_OP
 #define OP_USERFLAG_ASTAT_DELAY_COPY_SZ		0x00080000
 #define OP_USERFLAG_ASTAT_DELAY_COPY_BTF	0x00100000
 #define OP_USERFLAG_ASTAT_DELAY_COPY		0x001ff000
+#define OP_USERFLAG_CALL					0x10000000
 
 
 #define MCFG_SHARC_BOOT_MODE(boot_mode) \
@@ -403,7 +404,9 @@ private:
 		ASTAT_DRC astat_drc_copy;
 		ASTAT_DRC astat_delay_copy;
 		UINT32 dreg_temp;
+		UINT32 dreg_temp2;
 		UINT32 jmpdest;
+		UINT32 temp_return;
 
 		float fp0;
 		float fp1;
@@ -630,6 +633,7 @@ private:
 	void generate_shift_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int data, int shiftop, int rn, int rx);
 	void generate_call(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, bool delayslot);
 	void generate_jump(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, bool delayslot, bool loopabort, bool clearint);
+	void generate_loop_jump(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_write_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 data);
 	void generate_set_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 data);
 	void generate_clear_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 data);

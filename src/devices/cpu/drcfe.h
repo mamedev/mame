@@ -114,6 +114,7 @@ struct opcode_desc
 	UINT8           skipslots;              // number of skip slots (for branches)
 	UINT32          flags;                  // OPFLAG_* opcode flags
 	UINT32          userflags;              // core specific flags
+	UINT32          userdata0;              // core specific data
 	UINT32          cycles;                 // number of cycles needed to execute
 
 	// register usage information
