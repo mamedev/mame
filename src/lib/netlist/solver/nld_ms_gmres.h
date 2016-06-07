@@ -19,7 +19,10 @@
 #include "solver/nld_solver.h"
 #include "solver/vector_base.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 template <unsigned m_N, unsigned storage_N>
 class matrix_solver_GMRES_t: public matrix_solver_direct_t<m_N, storage_N>
@@ -118,7 +121,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_
 	 *
 	 * and estimate using
 	 *
-	 * omega = 2.0 / (1.0 + nl_math::sqrt(1-rho))
+	 * omega = 2.0 / (1.0 + std::sqrt(1-rho))
 	 */
 
 	//nz_num = 0;
@@ -169,7 +172,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_
 	int mr = iN;
 	if (iN > 3 )
 		mr = (int) sqrt(iN) * 2;
-	int iter = nl_math::max(1, this->m_params.m_gs_loops);
+	int iter = std::max(1, this->m_params.m_gs_loops);
 	int gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy);
 	int failed = mr * iter;
 
@@ -259,12 +262,12 @@ int matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double * RESTRICT
 		mat.mult_vec(m_A, t, Ax);
 		mat.solveLUx(m_LU, Ax);
 
-		const nl_double rho_to_accuracy = nl_math::sqrt(vecmult2(n, Ax)) / accuracy;
+		const nl_double rho_to_accuracy = std::sqrt(vecmult2(n, Ax)) / accuracy;
 
 		rho_delta = accuracy * rho_to_accuracy;
 	}
 	else
-		rho_delta = accuracy * nl_math::sqrt((double) n) * m_accuracy_mult;
+		rho_delta = accuracy * std::sqrt((double) n) * m_accuracy_mult;
 
 	for (unsigned itr = 0; itr < restart_max; itr++)
 	{
@@ -284,7 +287,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double * RESTRICT
 			mat.solveLUx(m_LU, residual);
 		}
 
-		rho = nl_math::sqrt(vecmult2(n, residual));
+		rho = std::sqrt(vecmult2(n, residual));
 
 		vec_mult_scalar(n, residual, NL_FCONST(1.0) / rho, m_v[0]);
 
@@ -308,7 +311,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double * RESTRICT
 				m_ht[j][k] = vecmult(n, m_v[k1], m_v[j]);
 				vec_add_mult_scalar(n, m_v[j], -m_ht[j][k], m_v[k1]);
 			}
-			m_ht[k1][k] = nl_math::sqrt(vecmult2(n, m_v[k1]));
+			m_ht[k1][k] = std::sqrt(vecmult2(n, m_v[k1]));
 
 			if (m_ht[k1][k] != 0.0)
 				vec_scale(n, m_v[k1], NL_FCONST(1.0) / m_ht[k1][k]);
@@ -316,7 +319,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double * RESTRICT
 			for (unsigned j = 0; j < k; j++)
 				givens_mult(m_c[j], m_s[j], m_ht[j][k], m_ht[j+1][k]);
 
-			mu = nl_math::hypot(m_ht[k][k], m_ht[k1][k]);
+			mu = std::hypot(m_ht[k][k], m_ht[k1][k]);
 
 			m_c[k] = m_ht[k][k] / mu;
 			m_s[k] = -m_ht[k1][k] / mu;
@@ -325,7 +328,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double * RESTRICT
 
 			givens_mult(m_c[k], m_s[k], m_g[k], m_g[k1]);
 
-			rho = nl_math::abs(m_g[k1]);
+			rho = std::abs(m_g[k1]);
 
 			itr_used = itr_used + 1;
 
@@ -381,6 +384,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double * RESTRICT
 
 
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_MS_GMRES_H_ */

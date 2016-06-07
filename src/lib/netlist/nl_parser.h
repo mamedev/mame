@@ -9,7 +9,6 @@
 #define NL_PARSER_H_
 
 #include "nl_setup.h"
-#include "nl_util.h"
 #include "plib/pparser.h"
 
 namespace netlist

@@ -94,7 +94,10 @@
 // Implementation
 // -----------------------------------------------------------------------------
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 // -----------------------------------------------------------------------------
 // nld_twoterm
@@ -102,8 +105,9 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_OBJECT(twoterm)
 {
-public:
-	NETLIB_CONSTRUCTOR(twoterm)
+	NETLIB_CONSTRUCTOR_EX(twoterm, bool terminals_owned = false)
+	, m_P(bselect(terminals_owned, owner, *this), (terminals_owned ? name + "." : "") + "1")
+	, m_N(bselect(terminals_owned, owner, *this), (terminals_owned ? name + "." : "") + "2")
 	{
 		m_P.m_otherterm = &m_N;
 		m_N.m_otherterm = &m_P;
@@ -112,24 +116,24 @@ public:
 	terminal_t m_P;
 	terminal_t m_N;
 
-	NETLIB_UPDATE_TERMINALSI() { }
-	NETLIB_RESETI() { }
+	//NETLIB_UPDATE_TERMINALSI() { }
+	//NETLIB_RESETI() { }
 	NETLIB_UPDATEI();
 
 public:
-	ATTR_HOT /* inline */ void set(const nl_double G, const nl_double V, const nl_double I)
+	/* inline */ void set(const nl_double G, const nl_double V, const nl_double I)
 	{
 		/*      GO, GT, I                */
 		m_P.set( G,  G, (  V) * G - I);
 		m_N.set( G,  G, ( -V) * G + I);
 	}
 
-	ATTR_HOT /* inline */ nl_double deltaV() const
+	/* inline */ nl_double deltaV() const
 	{
-		return m_P.net().as_analog().Q_Analog() - m_N.net().as_analog().Q_Analog();
+		return m_P.net().Q_Analog() - m_N.net().Q_Analog();
 	}
 
-	ATTR_HOT void set_mat(nl_double a11, nl_double a12, nl_double a21, nl_double a22, nl_double r1, nl_double r2)
+	void set_mat(nl_double a11, nl_double a12, nl_double a21, nl_double a22, nl_double r1, nl_double r2)
 	{
 		/*      GO, GT, I                */
 		m_P.set(-a12, a11, -r1);
@@ -137,7 +141,14 @@ public:
 	}
 
 private:
+	template <class C>
+	static core_device_t &bselect(bool b, C &d1, core_device_t &d2)
+	{
+		core_device_t *h = dynamic_cast<core_device_t *>(&d1);
+		return b ? *h : d2;
+	}
 };
+
 
 // -----------------------------------------------------------------------------
 // nld_R
@@ -147,8 +158,6 @@ NETLIB_OBJECT_DERIVED(R_base, twoterm)
 {
 	NETLIB_CONSTRUCTOR_DERIVED(R_base, twoterm)
 	{
-		enregister("1", m_P);
-		enregister("2", m_N);
 	}
 
 public:
@@ -269,8 +278,8 @@ public:
 	, m_C(*this, "C", 1e-6)
 	, m_GParallel(0.0)
 	{
-		enregister("1", m_P);
-		enregister("2", m_N);
+		//register_term("1", m_P);
+		//register_term("2", m_N);
 	}
 
 	NETLIB_TIMESTEP()
@@ -302,9 +311,9 @@ private:
 class generic_diode
 {
 public:
-	ATTR_COLD generic_diode();
+	generic_diode();
 
-	ATTR_HOT inline void update_diode(const nl_double nVd)
+	inline void update_diode(const nl_double nVd)
 	{
 #if 1
 		if (nVd < NL_FCONST(-5.0) * m_Vt)
@@ -317,7 +326,7 @@ public:
 		{
 			m_Vd = nVd;
 			//m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
-			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
+			const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
 			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 		}
@@ -325,33 +334,33 @@ public:
 		{
 #if 1
 			const nl_double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(0.5) - NL_FCONST(1.0));
-			m_Vd = m_Vd + nl_math::e_log1p(a) * m_Vt;
+			m_Vd = m_Vd + std::log1p(a) * m_Vt;
 #else
 			m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
 #endif
-			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
+			const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
 			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 
 			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 		}
 #else
 		m_Vd = m_Vd + 20.0 * m_Vt * std::tanh((nVd - m_Vd) / 20.0 / m_Vt);
-		const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
+		const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
 		m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 		m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 #endif
 	}
 
-	ATTR_COLD void set_param(const nl_double Is, const nl_double n, nl_double gmin);
+	void set_param(const nl_double Is, const nl_double n, nl_double gmin);
 
-	ATTR_HOT inline nl_double I() const { return m_Id; }
-	ATTR_HOT inline nl_double G() const { return m_G; }
-	ATTR_HOT inline nl_double Ieq() const { return (m_Id - m_Vd * m_G); }
-	ATTR_HOT inline nl_double Vd() const { return m_Vd; }
+	inline nl_double I() const { return m_Id; }
+	inline nl_double G() const { return m_G; }
+	inline nl_double Ieq() const { return (m_Id - m_Vd * m_G); }
+	inline nl_double Vd() const { return m_Vd; }
 
 	/* owning object must save those ... */
 
-	ATTR_COLD void save(pstring name, object_t &parent);
+	void save(pstring name, object_t &parent);
 
 private:
 	nl_double m_Vd;
@@ -377,8 +386,8 @@ public:
 	NETLIB_CONSTRUCTOR_DERIVED(D, twoterm)
 	, m_model(*this, "MODEL", "")
 	{
-		enregister("A", m_P);
-		enregister("K", m_N);
+		register_subalias("A", m_P);
+		register_subalias("K", m_N);
 
 		m_D.save("m_D", *this);
 	}
@@ -412,8 +421,8 @@ public:
 	, m_V(*this, "V", 0.0)
 	{
 
-		enregister("P", m_P);
-		enregister("N", m_N);
+		register_subalias("P", m_P);
+		register_subalias("N", m_N);
 	}
 
 protected:
@@ -434,8 +443,8 @@ public:
 	NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
 	, m_I(*this, "I", 1.0)
 	{
-		enregister("P", m_P);
-		enregister("N", m_N);
+		register_subalias("P", m_P);
+		register_subalias("N", m_N);
 	}
 
 	NETLIB_UPDATEI();
@@ -446,6 +455,7 @@ protected:
 };
 
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_TWOTERM_H_ */

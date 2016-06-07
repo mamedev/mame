@@ -16,7 +16,7 @@
 #include "pfmtlog.h"
 #include "palloc.h"
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 pfmt::pfmt(const pstring &fmt)
 : m_str(m_str_buf), m_allocated(0), m_arg(0)
@@ -48,30 +48,6 @@ pfmt::~pfmt()
 		pfree_array(m_str);
 }
 
-#if 0
-void pformat::format_element(const char *f, const char *l, const char *fmt_spec,  ...)
-{
-	va_list ap;
-	va_start(ap, fmt_spec);
-	char fmt[30] = "%";
-	char search[10] = "";
-	char buf[1024];
-	strcat(fmt, f);
-	strcat(fmt, l);
-	strcat(fmt, fmt_spec);
-	int nl = vsprintf(buf, fmt, ap);
-	m_arg++;
-	int sl = sprintf(search, "%%%d", m_arg);
-	char *p = strstr(m_str, search);
-	if (p != nullptr)
-	{
-		// Make room
-		memmove(p+nl, p+sl, strlen(p) + 1 - sl);
-		memcpy(p, buf, nl);
-	}
-	va_end(ap);
-}
-#else
 void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  ...)
 {
 	va_list ap;
@@ -164,6 +140,5 @@ void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  .
 	va_end(ap);
 }
 
-PLIB_NAMESPACE_END()
+}
 
-#endif

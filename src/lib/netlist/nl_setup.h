@@ -9,6 +9,7 @@
 #define NLSETUP_H_
 
 #include <memory>
+#include <stack>
 #include "nl_base.h"
 #include "nl_factory.h"
 
@@ -46,10 +47,10 @@
 #define NETLIST_NAME(name) netlist ## _ ## name
 
 #define NETLIST_EXTERNAL(name)                                                \
-		ATTR_COLD void NETLIST_NAME(name)(netlist::setup_t &setup);
+		void NETLIST_NAME(name)(netlist::setup_t &setup);
 
 #define NETLIST_START(name)                                                   \
-ATTR_COLD void NETLIST_NAME(name)(netlist::setup_t &setup)                    \
+void NETLIST_NAME(name)(netlist::setup_t &setup)                    \
 {
 #define NETLIST_END()  }
 
@@ -113,16 +114,9 @@ namespace netlist
 
 		void register_and_set_param(pstring name, param_t &param);
 
-		void register_object(device_t &dev, const pstring &name, object_t &obj);
+		void register_term(core_terminal_t &obj);
 
-		template<class NETLIST_X>
-		void register_dev_s(plib::powned_ptr<NETLIST_X> dev)
-		{
-			register_dev(std::move(dev));
-		}
-
-
-		void register_dev(plib::powned_ptr<device_t> dev);
+		void register_dev(plib::owned_ptr<device_t> dev);
 		void register_dev(const pstring &classname, const pstring &name);
 
 		void register_lib_entry(const pstring &name);
@@ -202,7 +196,7 @@ namespace netlist
 		bool connect_input_input(core_terminal_t &t1, core_terminal_t &t2);
 
 		// helpers
-		pstring objtype_as_astr(object_t &in) const;
+		pstring objtype_as_str(object_t &in) const;
 
 		const pstring resolve_alias(const pstring &name) const;
 		devices::nld_base_proxy *get_d_a_proxy(core_terminal_t &out);

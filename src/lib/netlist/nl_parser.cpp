@@ -15,7 +15,7 @@ namespace netlist
 // A netlist parser
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD void parser_t::verror(const pstring &msg, int line_num, const pstring &line)
+void parser_t::verror(const pstring &msg, int line_num, const pstring &line)
 {
 	m_setup.log().fatal("line {1}: error: {2}\n\t\t{3}\n", line_num,
 			msg, line);
@@ -158,7 +158,7 @@ void parser_t::net_truthtable_start()
 	pstring def_param = get_string();
 	require_token(m_tok_param_right);
 
-	plib::powned_ptr<netlist::devices::netlist_base_factory_truthtable_t> ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
+	plib::owned_ptr<netlist::devices::netlist_base_factory_truthtable_t> ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
 			name, name, "+" + def_param);
 
 	while (true)

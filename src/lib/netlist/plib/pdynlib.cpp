@@ -12,7 +12,7 @@
 #include <dlfcn.h>
 #endif
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 dynlib::dynlib(const pstring libname)
 : m_isLoaded(false), m_lib(nullptr)
@@ -96,4 +96,4 @@ void *dynlib::getsym_p(const pstring name)
 #endif
 }
 
-PLIB_NAMESPACE_END()
+}
