@@ -157,6 +157,7 @@
 
 #include <vector>
 #include <memory>
+#include <cmath>
 
 #include "nl_lists.h"
 #include "nl_time.h"
