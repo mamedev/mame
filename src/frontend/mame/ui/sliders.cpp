@@ -264,18 +264,18 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
  standard menu handler
  -------------------------------------------------*/
 
-UINT32 menu_sliders::ui_handler(render_container *container, mame_ui_manager &mui, bool state)
+UINT32 menu_sliders::ui_handler(render_container *container, mame_ui_manager &mui)
 {
 	UINT32 result;
 
-	/* if this is the first call, push the sliders menu */
-	if (state)
+	// if this is the first call, push the sliders menu
+	if (topmost_menu<menu_sliders>() == nullptr)
 		menu::stack_push<menu_sliders>(mui, container, true);
 
-	/* handle standard menus */
+	// handle standard menus
 	result = menu::ui_handler(container, mui);
 
-	/* if we are cancelled, pop the sliders menu */
+	// if we are cancelled, pop the sliders menu
 	if (result == UI_HANDLER_CANCEL)
 		menu::stack_pop(mui.machine());
 

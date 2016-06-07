@@ -1572,7 +1572,7 @@ UINT32 mame_ui_manager::handler_ingame(render_container *container)
 	// if the on-screen display isn't up and the user has toggled it, turn it on
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0 && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
 	{
-		set_handler<mame_ui_manager&, bool>(UI_CALLBACK_TYPE_GENERAL, ui::menu_sliders::ui_handler, *this, true);
+		set_handler<mame_ui_manager&>(UI_CALLBACK_TYPE_MENU, ui::menu_sliders::ui_handler, *this);
 		return 1;
 	}
 
