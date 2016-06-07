@@ -14,7 +14,7 @@ SRC = ..
 
 #-fuse-ld=gold -Wpedantic -march=native -march=native
 
-# LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
+LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
 CDEFS = -DPSTANDALONE=1 -DPTR64=1
 #-Werror
@@ -49,11 +49,12 @@ OBJS = $(POBJS) $(NLOBJS)
 POBJS := \
 	$(POBJ)/pstring.o \
 	$(POBJ)/palloc.o \
+	$(POBJ)/pdynlib.o \
+	$(POBJ)/pfmtlog.o \
 	$(POBJ)/pparser.o \
 	$(POBJ)/pstate.o \
 	$(POBJ)/pstream.o \
-	$(POBJ)/pfmtlog.o \
-	$(POBJ)/pdynlib.o \
+	$(POBJ)/putil.o \
 
 NLOBJS := \
 	$(NLOBJ)/nl_base.o \

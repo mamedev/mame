@@ -14,6 +14,7 @@
 
 #include "pstring.h"
 #include "plists.h"
+#include "putil.h"
 
 namespace plib {
 
@@ -82,7 +83,7 @@ public:
 	pstring operator ()() { return m_val; }
 private:
 	pstring m_val;
-	pstring_vector_t m_limit;
+	plib::pstring_vector_t m_limit;
 };
 
 class option_bool : public option

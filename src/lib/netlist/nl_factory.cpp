@@ -10,6 +10,7 @@
 
 #include "nl_factory.h"
 #include "nl_setup.h"
+#include "plib/putil.h"
 
 namespace netlist
 {
