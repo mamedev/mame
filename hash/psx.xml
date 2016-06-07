@@ -2,10 +2,11 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="psx" description="Sony Playstation CD-ROMs">
 
-<!-- redump.org US PS1 discs (1717 of 1719), based on 'Sony - PlayStation (20160515 00-54-32).dat'
+<!-- redump.org US PS1 discs (1716 of 1719), based on 'Sony - PlayStation (20160515 00-54-32).dat'
 
 These CHDs have been converted from redump.org disc images. The following redump.org NTSC-U images are currently missing from this software list:
 
+    Street Fighter Collection (USA) (Disc 1) (v1.0) [we miss the redump of Track 72, with CRC e0b15ee3]
     Street Fighter Collection (USA) (Disc 1) (v1.1)
     Street Fighter Collection (USA) (Disc 2) (v1.1)
 
@@ -5975,7 +5976,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cyberspeed (usa) (v1.1)"  sha1="98e32f8bf655654d67aa870008bbe875efa282c0"/>
+				<disk name="cyberspeed (usa) (v1.1)" sha1="98e32f8bf655654d67aa870008bbe875efa282c0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22702,12 +22703,12 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street fighter collection (usa) (disc 1)"  sha1="36122123032445b2d4f2add70af071fa335fa5c8"/>
+				<disk name="street fighter collection (usa) (disc 1)" sha1="36122123032445b2d4f2add70af071fa335fa5c8" status="baddump" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street fighter collection (usa) (disc 2)"  sha1="273e82b4b9615803ba62babc5825639f1614bea6"/>
+				<disk name="street fighter collection (usa) (disc 2)" sha1="273e82b4b9615803ba62babc5825639f1614bea6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30272,7 +30273,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wwf in your house (usa) (v1.0)"  sha1="cd75aec002461c7eacb7558c4f24d6dccf29bc33"/>
+				<disk name="wwf in your house (usa) (v1.0)" sha1="cd75aec002461c7eacb7558c4f24d6dccf29bc33"/>
 			</diskarea>
 		</part>
 	</software>
@@ -31007,15 +31008,14 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<!-- Original images (Redump)
 		<rom name="gameshark lite (usa) (unl).cue" size="92" crc="b33850fb" sha1="96934592f595e3692cd3c37a8223ee2fac3104c8" />
 		<rom name="gameshark lite (usa) (unl).bin" size="194331648" crc="07f69b1a" sha1="80b4b311cc81c9b320f7c6a245cb59571e7985d0" />
-		    </dataarea>
 		-->
-		<description>GameShark Lite (USA) (</description>
+		<description>GameShark Lite (USA)</description>
 		<year>2000</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gameshark lite (usa) (unl)"  sha1="d9ee86ebc314e98ce4fc66efbd8805f13628cd5f"/>
+				<disk name="gameshark lite (usa) (unl)" sha1="d9ee86ebc314e98ce4fc66efbd8805f13628cd5f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56281,7 +56281,7 @@ A few comments on these:
 		<publisher>Accolade</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="starcon"  sha1="cae7074b0498bc489d668a30a7bc94b541d10036" />
+				<disk name="starcon" sha1="cae7074b0498bc489d668a30a7bc94b541d10036" />
 			</diskarea>
 		</part>
 	</software>
@@ -56296,7 +56296,7 @@ A few comments on these:
 		<publisher>Virgin Interactive</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="thrill kill"  sha1="09721bf343ee69f13b7ed86cc92beb0be94db04a" />
+				<disk name="thrill kill" sha1="09721bf343ee69f13b7ed86cc92beb0be94db04a" />
 			</diskarea>
 		</part>
 	</software>
@@ -56313,7 +56313,7 @@ A few comments on these:
 		<publisher>Virgin Interactive</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="thrill_kill_slus12345_frederico_psx_ud"  sha1="5ee0e947808176e37a946c69ee6234927a0b96cc" />
+				<disk name="thrill_kill_slus12345_frederico_psx_ud" sha1="5ee0e947808176e37a946c69ee6234927a0b96cc" />
 			</diskarea>
 		</part>
 	</software>
