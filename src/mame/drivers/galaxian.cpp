@@ -1701,6 +1701,29 @@ static ADDRESS_MAP_START( theend_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(theend_ppi8255_r, theend_ppi8255_w)
 ADDRESS_MAP_END
 
+/* map not derived from schematics. Used by explorer and takeoff */
+static ADDRESS_MAP_START( explorer_map, AS_PROGRAM, 8, galaxian_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x6800, 0x6800) AM_WRITENOP // ????
+	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
+	AM_RANGE(0x6803, 0x6803) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_enable_w)
+	AM_RANGE(0x6804, 0x6804) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
+	AM_RANGE(0x6805, 0x6805) AM_MIRROR(0x07f8) //POUT2
+	AM_RANGE(0x6806, 0x6806) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
+	AM_RANGE(0x6807, 0x6807) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w) /* watchdog works for writes as well? (or is it just disabled?) */
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0");
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ffc) AM_READ_PORT("IN1");
+	AM_RANGE(0x8002, 0x8002) AM_MIRROR(0x0ffc) AM_READ_PORT("IN2");
+	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x0ffc) AM_READ_PORT("IN3");
+	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0fff) AM_WRITE(explorer_sound_control_w);
+ADDRESS_MAP_END
 
 /* map derived from schematics */
 static ADDRESS_MAP_START( scobra_map, AS_PROGRAM, 8, galaxian_state )
@@ -2077,6 +2100,21 @@ static ADDRESS_MAP_START( checkmaj_sound_map, AS_PROGRAM, 8, galaxian_state )
 ADDRESS_MAP_END
 
 
+/* Take Off with 1x AY-8912*/
+
+static ADDRESS_MAP_START( takeoff_sound_map, AS_PROGRAM, 8, galaxian_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x6c00) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( takeoff_sound_portmap, AS_IO, 8, galaxian_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x20, 0x20) AM_READ(konami_sound_timer_r)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("8912", ay8912_device, address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("8912", ay8912_device, data_r, data_w)
+ADDRESS_MAP_END
+	
 /* King and Balloon with DAC */
 static ADDRESS_MAP_START( kingball_sound_map, AS_PROGRAM, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -5839,7 +5877,7 @@ static MACHINE_CONFIG_DERIVED( explorer, galaxian_base )
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(theend_map)
+	MCFG_CPU_PROGRAM_MAP(explorer_map)
 
 	/* 2nd CPU to drive sound */
 	MCFG_CPU_ADD("audiocpu", Z80,KONAMI_SOUND_CLOCK/8)
@@ -5856,6 +5894,21 @@ static MACHINE_CONFIG_DERIVED( explorer, galaxian_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( takeoff, explorer ) // takeoff shares the same main map as explorer, but uses only an AY8912 for sound.
+	
+	/* 2nd CPU to drive sound */
+	MCFG_SOUND_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(takeoff_sound_map)
+	MCFG_CPU_IO_MAP(takeoff_sound_portmap)
+
+	/* sound hardware */
+	MCFG_DEVICE_REMOVE("8910.0")
+	MCFG_DEVICE_REMOVE("8910.1")
+
+	MCFG_SOUND_ADD("8912", AY8912, KONAMI_SOUND_CLOCK/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(galaxian_state, explorer_sound_latch_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( scorpion, theend )
 
@@ -6919,28 +6972,6 @@ DRIVER_INIT_MEMBER(galaxian_state,scramble)
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
-}
-
-
-DRIVER_INIT_MEMBER(galaxian_state,explorer)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* video extensions */
-	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
-
-	/* watchdog works for writes as well? (or is it just disabled?) */
-	watchdog_timer_device *wdog = subdevice<watchdog_timer_device>("watchdog");
-	space.install_write_handler(0x7000, 0x7000, 0, 0x7ff, write8_delegate(FUNC(watchdog_timer_device::reset_w), wdog));
-
-	/* I/O appears to be direct, not via PPIs */
-	space.unmap_readwrite(0x8000, 0xffff);
-	space.install_read_port(0x8000, 0x8000, 0, 0xffc, "IN0");
-	space.install_read_port(0x8001, 0x8001, 0, 0xffc, "IN1");
-	space.install_read_port(0x8002, 0x8002, 0, 0xffc, "IN2");
-	space.install_read_port(0x8003, 0x8003, 0, 0xffc, "IN3");
-	space.install_write_handler(0x8000, 0x8000, 0, 0xfff, write8_delegate(FUNC(galaxian_state::soundlatch_byte_w),this));
-	space.install_write_handler(0x9000, 0x9000, 0, 0xfff, write8_delegate(FUNC(galaxian_state::explorer_sound_control_w),this));
 }
 
 
@@ -11583,13 +11614,13 @@ GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, scram
 /* The End/Scramble based hardware */
 GAME( 1980, theend,      0,        theend,     theend,     galaxian_state, theend,     ROT90,  "Konami", "The End", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, theends,     theend,   theend,     theend,     galaxian_state, theend,     ROT90,  "Konami (Stern Electronics license)", "The End (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, takeoff,     theend,   explorer,   explorer,   galaxian_state, explorer,   ROT90,  "bootleg (Sidam)", "Take Off (bootleg of The End)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, takeoff,     theend,   takeoff,    explorer,   galaxian_state, scramble,   ROT90,  "bootleg (Sidam)", "Take Off (bootleg of The End)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, scramble,    0,        scramble,   scramble,   galaxian_state, scramble,   ROT90,  "Konami", "Scramble", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambles,   scramble, scramble,   scramble,   galaxian_state, scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambles2,  scramble, scramble,   scramble,   galaxian_state, scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, strfbomb,    scramble, scramble,   strfbomb,   galaxian_state, scramble,   ROT90,  "bootleg (Omni)",                     "Strafe Bomb (bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, explorer,    scramble, explorer,   explorer,   galaxian_state, explorer,   ROT90,  "bootleg (Sidam)",                    "Explorer (bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, explorer,    scramble, explorer,   explorer,   galaxian_state, scramble,   ROT90,  "bootleg (Sidam)",                    "Explorer (bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scramblebf,  scramble, scramble,   scramble,   galaxian_state, scramble,   ROT90,  "bootleg (Karateko)",                 "Scramble (Karateko, French bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambp,     scramble, scramble,   scramble,   galaxian_state, scramble,   ROT90,  "bootleg (Billport S.A.)",            "Impacto (Billport S.A., Spanish bootleg of Scramble)", MACHINE_SUPPORTS_SAVE ) // similar to the Karateko set above
 GAME( 1981, scramce,     scramble, scramble,   scramble,   galaxian_state, scramble,   ROT90,  "bootleg (Centromatic S.A.)",         "Scramble (Centromatic S.A., Spanish bootleg)", MACHINE_SUPPORTS_SAVE ) // similar to above
