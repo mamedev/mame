@@ -180,9 +180,6 @@ using netlist_sig_t = std::uint32_t;
  //  MACROS / New Syntax
  //============================================================
 
-#define NETLIB_NAMESPACE_DEVICES_START()    namespace netlist { namespace devices {
-#define NETLIB_NAMESPACE_DEVICES_END()  }}
-
 #define NETLIB_NAME(chip) nld_ ## chip
 
 #define NETLIB_OBJECT_DERIVED(name, pclass)                                   \
@@ -238,12 +235,6 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_FUNC_VOID(chip, name, params) ATTR_HOT void NETLIB_NAME(chip) :: name params
 
 #define NETLIB_UPDATE_TERMINALS(chip) ATTR_HOT void NETLIB_NAME(chip) :: update_terminals(void)
-
-
-//============================================================
-//  MACROS / netlist devices
-//============================================================
-
 
 //============================================================
 //  Asserts
@@ -313,7 +304,7 @@ namespace netlist
 	public:
 		logic_family_desc_t() {}
 		virtual ~logic_family_desc_t() {}
-		virtual plib::powned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
+		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
 
 		nl_double m_low_thresh_V;
@@ -404,11 +395,11 @@ namespace netlist
 		const type_t m_objtype;
 		netlist_t * m_netlist;
 
-#if 1
 	public:
+	    void * operator new (size_t size, void *ptr) { return ptr; }
+	    void operator delete (void *ptr, void *) {  }
 	    void * operator new (size_t size);
 	    void operator delete (void * mem);
-#endif
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1015,6 +1006,8 @@ namespace netlist
 
 		ATTR_HOT  netlist_sig_t INPLOGIC(const logic_input_t &inp) const
 		{
+			//if (inp.state() == logic_t::STATE_INP_PASSIVE)
+			//	printf("argh input %s\n", inp.name().cstr());
 			nl_assert(inp.state() != logic_t::STATE_INP_PASSIVE);
 			return inp.Q();
 		}
@@ -1270,7 +1263,7 @@ namespace netlist
 
 		void print_stats() const;
 
-		plib::pvector_t<plib::powned_ptr<core_device_t>> m_devices;
+		plib::pvector_t<plib::owned_ptr<core_device_t>> m_devices;
 
 		/* sole use is to manage lifetime of net objects */
 		net_t::list_t m_nets;
@@ -1305,6 +1298,7 @@ protected:
 		plib::plog_base<NL_DEBUG> m_log;
 		plib::dynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
 	};
+
 
 	// -----------------------------------------------------------------------------
 	// inline implementations

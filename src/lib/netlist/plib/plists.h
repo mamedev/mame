@@ -10,16 +10,14 @@
 #ifndef PLISTS_H_
 #define PLISTS_H_
 
-#include <cstring>
 #include <algorithm>
-#include <cmath>
 #include <stack>
 #include <vector>
 
 #include "palloc.h"
 #include "pstring.h"
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 // ----------------------------------------------------------------------------------------
 // parray_t: dynamic array
@@ -85,6 +83,52 @@ private:
 
 	LC * m_list;
 	int m_capacity;
+};
+
+/* ----------------------------------------------------------------------------------------
+ * uninitialised_array_t:
+ * 		fixed size array allowing to override constructor and initialize
+ * 		members by placement new.
+ *
+ * 		Use with care. This template is provided to improve locality of storage
+ * 		in high frequency applications. It should not be used for anything else.
+ * ---------------------------------------------------------------------------------------- */
+
+template <class C, std::size_t N>
+class uninitialised_array_t
+{
+public:
+	uninitialised_array_t()
+	{
+	}
+
+	~uninitialised_array_t()
+	{
+		for (std::size_t i=0; i<N; i++)
+		{
+			C &r = (*this)[i];
+			r.~C();
+		}
+	}
+
+	size_t size() { return N; }
+
+	C& operator[](const std::size_t &index)
+	{
+		return *reinterpret_cast<C *>(reinterpret_cast<char *>(m_buf) + index * sizeof(C));
+	}
+
+	const C& operator[](const std::size_t &index) const
+	{
+		return *reinterpret_cast<C *>(reinterpret_cast<char *>(m_buf) + index * sizeof(C));
+	}
+
+protected:
+
+private:
+
+	/* ensure proper alignment */
+	UINT64 m_buf[(N * sizeof(C) + sizeof(UINT64) - 1) / sizeof(UINT64)];
 };
 
 // ----------------------------------------------------------------------------------------
@@ -617,6 +661,6 @@ static inline void sort_list(T &sl)
 	}
 }
 
-PLIB_NAMESPACE_END()
+}
 
 #endif /* PLISTS_H_ */

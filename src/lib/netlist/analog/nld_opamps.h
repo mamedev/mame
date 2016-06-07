@@ -32,7 +32,10 @@
 
 NETLIST_EXTERNAL(opamp_lm3900)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(OPAMP)
 {
@@ -121,6 +124,7 @@ private:
 	unsigned m_type;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_OPAMPS_H_ */

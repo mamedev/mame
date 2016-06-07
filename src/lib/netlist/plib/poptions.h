@@ -15,7 +15,7 @@
 #include "pstring.h"
 #include "plists.h"
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 /***************************************************************************
     Options
@@ -235,6 +235,6 @@ option::option(pstring ashort, pstring along, pstring help, bool has_argument, o
 		parent->register_option(this);
 }
 
-PLIB_NAMESPACE_END()
+}
 
 #endif /* POPTIONS_H_ */

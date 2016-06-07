@@ -10,8 +10,11 @@
 #ifndef NLD_TRUTHTABLE_H_
 #define NLD_TRUTHTABLE_H_
 
+#include <new>
+
 #include "nl_base.h"
 #include "nl_factory.h"
+#include "plib/plists.h"
 
 #define NETLIB_TRUTHTABLE(cname, nIN, nOUT, state)                               \
 	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT, state>         \
@@ -43,7 +46,10 @@
 	setup.factory().register_device(std::move(ttd)); \
 	}
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 #if 0
 static inline UINT32 remove_first_bit(UINT32 v)
@@ -159,11 +165,13 @@ public:
 
 		for (unsigned i=0; i < m_NI; i++)
 		{
+			new (&m_I[i]) logic_input_t();
 			inout[i] = inout[i].trim();
 			enregister(inout[i], m_I[i]);
 		}
 		for (unsigned i=0; i < m_NO; i++)
 		{
+			new (&m_Q[i]) logic_output_t();
 			out[i] = out[i].trim();
 			enregister(out[i], m_Q[i]);
 		}
@@ -246,8 +254,10 @@ public:
 			}
 	}
 
-	logic_input_t m_I[m_NI];
-	logic_output_t m_Q[m_NO];
+	//logic_input_t m_I[m_NI];
+	//logic_output_t m_Q[m_NO];
+	plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
+	plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;
 
 protected:
 
@@ -341,21 +351,22 @@ public:
 			const pstring &def_param)
 	: netlist_base_factory_truthtable_t(name, classname, def_param) { }
 
-	plib::powned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
+	plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 	{
 		typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
-		return plib::powned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, &m_ttbl, m_desc);
+		return plib::owned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, &m_ttbl, m_desc);
 	}
 private:
 	typename nld_truthtable_t<m_NI, m_NO, has_state>::truthtable_t m_ttbl;
 };
 
-plib::powned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
+plib::owned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
 		const unsigned has_state,
 		const pstring &name, const pstring &classname,
 		const pstring &def_param);
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 
 

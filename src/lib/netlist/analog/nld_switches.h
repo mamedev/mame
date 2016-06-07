@@ -27,7 +27,10 @@
 // Devices ...
 // ----------------------------------------------------------------------------------------
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(switch1)
 {
@@ -71,6 +74,7 @@ NETLIB_OBJECT(switch2)
 	param_int_t m_POS;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_SWITCHES_H_ */

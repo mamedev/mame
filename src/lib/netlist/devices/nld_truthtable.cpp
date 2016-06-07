@@ -8,7 +8,10 @@
 #include "nld_truthtable.h"
 #include "plib/plists.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 unsigned truthtable_desc_t::count_bits(UINT32 v)
 {
@@ -243,13 +246,13 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, UINT32 d
 
 #define ENTRYX(n, m, h)    case (n * 1000 + m * 10 + h): \
 	{ using xtype = netlist_factory_truthtable_t<n, m, h>; \
-		return plib::powned_ptr<netlist_base_factory_truthtable_t>::Create<xtype>(name,classname,def_param); } break
+		return plib::owned_ptr<netlist_base_factory_truthtable_t>::Create<xtype>(name,classname,def_param); } break
 
 #define ENTRYY(n, m)   ENTRYX(n, m, 0); ENTRYX(n, m, 1)
 
 #define ENTRY(n) ENTRYY(n, 1); ENTRYY(n, 2); ENTRYY(n, 3); ENTRYY(n, 4); ENTRYY(n, 5); ENTRYY(n, 6)
 
-plib::powned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
+plib::owned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
 		const unsigned has_state,
 		const pstring &name, const pstring &classname,
 		const pstring &def_param)
@@ -273,4 +276,5 @@ plib::powned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const u
 	//return nullptr;
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

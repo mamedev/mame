@@ -9,7 +9,10 @@
 #include "analog/nld_bjt.h"
 #include "nl_setup.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 class diode
 {
@@ -187,4 +190,5 @@ NETLIB_UPDATE_PARAM(QBJT_EB)
 	m_gD_BC.set_param(IS / m_alpha_r, NR, netlist().gmin());
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

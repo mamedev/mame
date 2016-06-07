@@ -17,7 +17,10 @@
 #include "solver/nld_ms_direct.h"
 #include "solver/nld_solver.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 template <unsigned m_N, unsigned storage_N>
 class matrix_solver_SOR_t: public matrix_solver_direct_t<m_N, storage_N>
@@ -182,6 +185,7 @@ int matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 	return resched_cnt;
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_MS_SOR_H_ */

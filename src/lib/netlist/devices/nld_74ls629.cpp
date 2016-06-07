@@ -40,84 +40,205 @@
 
 
 #include "nld_74ls629.h"
-#include "nl_setup.h"
+#include "analog/nld_twoterm.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
-
-NETLIB_UPDATE(SN74LS629clk)
+namespace netlist
 {
-	if (!m_enableq)
+	namespace devices
 	{
-		m_out = m_out ^ 1;
-		OUTLOGIC(m_Y, m_out, m_inc);
-	}
-	else
+
+	NETLIB_OBJECT(SN74LS629clk)
 	{
-		OUTLOGIC(m_Y, 1, m_inc);
-	}
-}
+		NETLIB_CONSTRUCTOR(SN74LS629clk)
+		, m_enableq(1)
+		, m_out(0)
+		, m_inc(netlist_time::zero)
+		{
+			enregister("FB",    m_FB);
+			enregister("Y",    m_Y);
 
-NETLIB_UPDATE(SN74LS629)
-{
+			connect_late(m_FB, m_Y);
+
+			save(NLNAME(m_enableq));
+			save(NLNAME(m_inc));
+			save(NLNAME(m_out));
+		}
+
+		NETLIB_RESETI()
+		{
+			m_enableq = 1;
+			m_out = 0;
+			m_inc = netlist_time::zero;
+		}
+
+		NETLIB_UPDATEI();
+
+	public:
+		logic_input_t m_FB;
+		logic_output_t m_Y;
+
+		netlist_sig_t m_enableq;
+		netlist_sig_t m_out;
+		netlist_time m_inc;
+	};
+
+	NETLIB_OBJECT(SN74LS629)
 	{
-		// recompute
-		nl_double  freq;
-		nl_double  v_freq_2, v_freq_3, v_freq_4;
-		nl_double  v_freq = INPANALOG(m_FC);
-		nl_double  v_rng = INPANALOG(m_RNG);
+		NETLIB_CONSTRUCTOR(SN74LS629)
+		, m_clock(*this, "OSC")
+		, m_R_FC(*this, "R_FC")
+		, m_R_RNG(*this, "R_RNG")
+		, m_CAP(*this, "CAP", 1e-6)
+		{
+			enregister("ENQ", m_ENQ);
+			enregister("RNG",    m_RNG);
+			enregister("FC",     m_FC);
+			register_subalias("GND",    m_R_FC.m_N);
 
-		/* coefficients */
-		const nl_double k1 = 1.9904769024796283E+03;
-		const nl_double k2 = 1.2070059213983407E+03;
-		const nl_double k3 = 1.3266985579561108E+03;
-		const nl_double k4 = -1.5500979825922698E+02;
-		const nl_double k5 = 2.8184536266938172E+00;
-		const nl_double k6 = -2.3503421582744556E+02;
-		const nl_double k7 = -3.3836786704527788E+02;
-		const nl_double k8 = -1.3569136703258670E+02;
-		const nl_double k9 = 2.9914575453819188E+00;
-		const nl_double k10 = 1.6855569086173170E+00;
+			connect_late(m_FC, m_R_FC.m_P);
+			connect_late(m_RNG, m_R_RNG.m_P);
+			connect_late(m_R_FC.m_N, m_R_RNG.m_N);
 
-		/* scale due to input resistance */
+			register_subalias("Y", m_clock.m_Y);
+		}
 
-		/* Polyfunctional3D_model created by zunzun.com using sum of squared absolute error */
+		NETLIB_RESETI()
+		{
+			m_R_FC.set_R(90000.0);
+			m_R_RNG.set_R(90000.0);
+			m_clock.do_reset();
+		}
+		NETLIB_UPDATEI();
 
-		v_freq_2 = v_freq * v_freq;
-		v_freq_3 = v_freq_2 * v_freq;
-		v_freq_4 = v_freq_3 * v_freq;
-		freq = k1;
-		freq += k2 * v_freq;
-		freq += k3 * v_freq_2;
-		freq += k4 * v_freq_3;
-		freq += k5 * v_freq_4;
-		freq += k6 * v_rng;
-		freq += k7 * v_rng * v_freq;
-		freq += k8 * v_rng * v_freq_2;
-		freq += k9 * v_rng * v_freq_3;
-		freq += k10 * v_rng * v_freq_4;
+		NETLIB_UPDATE_PARAMI() { update_dev(); }
 
-		freq *= NL_FCONST(0.1e-6) / m_CAP;
+	public:
+		NETLIB_SUB(SN74LS629clk) m_clock;
+		NETLIB_SUB(R_base) m_R_FC;
+		NETLIB_SUB(R_base) m_R_RNG;
 
-		// FIXME: we need a possibility to remove entries from queue ...
-		//        or an exact model ...
-		m_clock.m_inc = netlist_time::from_double(0.5 / (double) freq);
-		//m_clock.update();
+		logic_input_t m_ENQ;
+		analog_input_t m_RNG;
+		analog_input_t m_FC;
 
-		//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));
-	}
+		param_double_t m_CAP;
+	};
 
-	if (!m_clock.m_enableq && INPLOGIC(m_ENQ))
+	NETLIB_OBJECT(SN74LS629_dip)
 	{
-		m_clock.m_enableq = 1;
-		m_clock.m_out = m_clock.m_out ^ 1;
-		OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
-	}
-	else if (m_clock.m_enableq && !INPLOGIC(m_ENQ))
-	{
-		m_clock.m_enableq = 0;
-		m_clock.m_out = m_clock.m_out ^ 1;
-		OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
-	}
-}
+		NETLIB_CONSTRUCTOR(SN74LS629_dip)
+		, m_1(*this, "1")
+		, m_2(*this, "2")
+		{
+			register_subalias("1",  m_2.m_FC);
+			register_subalias("2",  m_1.m_FC);
+			register_subalias("3",  m_1.m_RNG);
 
-NETLIB_NAMESPACE_DEVICES_END()
+			register_subalias("6",  m_1.m_ENQ);
+			register_subalias("7",  m_1.m_clock.m_Y);
+
+			register_subalias("8",  m_1.m_R_FC.m_N);
+			register_subalias("9",  m_1.m_R_FC.m_N);
+			connect_late(m_1.m_R_FC.m_N, m_2.m_R_FC.m_N);
+
+			register_subalias("10",  m_2.m_clock.m_Y);
+
+			register_subalias("11",  m_2.m_ENQ);
+			register_subalias("14",  m_2.m_RNG);
+		}
+
+		NETLIB_UPDATEI() { }
+
+		NETLIB_RESETI()
+		{
+			m_1.do_reset();
+			m_2.do_reset();
+		}
+
+	private:
+		NETLIB_SUB(SN74LS629) m_1;
+		NETLIB_SUB(SN74LS629) m_2;
+	};
+
+
+	NETLIB_UPDATE(SN74LS629clk)
+	{
+		if (!m_enableq)
+		{
+			m_out = m_out ^ 1;
+			OUTLOGIC(m_Y, m_out, m_inc);
+		}
+		else
+		{
+			OUTLOGIC(m_Y, 1, m_inc);
+		}
+	}
+
+	NETLIB_UPDATE(SN74LS629)
+	{
+		{
+			// recompute
+			nl_double  freq;
+			nl_double  v_freq_2, v_freq_3, v_freq_4;
+			nl_double  v_freq = INPANALOG(m_FC);
+			nl_double  v_rng = INPANALOG(m_RNG);
+
+			/* coefficients */
+			const nl_double k1 = 1.9904769024796283E+03;
+			const nl_double k2 = 1.2070059213983407E+03;
+			const nl_double k3 = 1.3266985579561108E+03;
+			const nl_double k4 = -1.5500979825922698E+02;
+			const nl_double k5 = 2.8184536266938172E+00;
+			const nl_double k6 = -2.3503421582744556E+02;
+			const nl_double k7 = -3.3836786704527788E+02;
+			const nl_double k8 = -1.3569136703258670E+02;
+			const nl_double k9 = 2.9914575453819188E+00;
+			const nl_double k10 = 1.6855569086173170E+00;
+
+			/* scale due to input resistance */
+
+			/* Polyfunctional3D_model created by zunzun.com using sum of squared absolute error */
+
+			v_freq_2 = v_freq * v_freq;
+			v_freq_3 = v_freq_2 * v_freq;
+			v_freq_4 = v_freq_3 * v_freq;
+			freq = k1;
+			freq += k2 * v_freq;
+			freq += k3 * v_freq_2;
+			freq += k4 * v_freq_3;
+			freq += k5 * v_freq_4;
+			freq += k6 * v_rng;
+			freq += k7 * v_rng * v_freq;
+			freq += k8 * v_rng * v_freq_2;
+			freq += k9 * v_rng * v_freq_3;
+			freq += k10 * v_rng * v_freq_4;
+
+			freq *= NL_FCONST(0.1e-6) / m_CAP;
+
+			// FIXME: we need a possibility to remove entries from queue ...
+			//        or an exact model ...
+			m_clock.m_inc = netlist_time::from_double(0.5 / (double) freq);
+			//m_clock.update();
+
+			//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));
+		}
+
+		if (!m_clock.m_enableq && INPLOGIC(m_ENQ))
+		{
+			m_clock.m_enableq = 1;
+			m_clock.m_out = m_clock.m_out ^ 1;
+			OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
+		}
+		else if (m_clock.m_enableq && !INPLOGIC(m_ENQ))
+		{
+			m_clock.m_enableq = 0;
+			m_clock.m_out = m_clock.m_out ^ 1;
+			OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
+		}
+	}
+
+	NETLIB_DEVICE_IMPL(SN74LS629)
+	NETLIB_DEVICE_IMPL(SN74LS629_dip)
+
+	} //namespace devices
+} // namespace netlist

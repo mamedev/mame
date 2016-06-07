@@ -7,40 +7,97 @@
 
 #include "nld_7450.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
-
-NETLIB_UPDATE(7450)
+namespace netlist
 {
-	m_A.activate();
-	m_B.activate();
-	m_C.activate();
-	m_D.activate();
-	UINT8 t1 = INPLOGIC(m_A) & INPLOGIC(m_B);
-	UINT8 t2 = INPLOGIC(m_C) & INPLOGIC(m_D);
-
-	const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
-
-	UINT8 res = 0;
-	if (t1 ^ 1)
+	namespace devices
 	{
-		if (t2 ^ 1)
+
+	NETLIB_OBJECT(7450)
+	{
+		NETLIB_CONSTRUCTOR(7450)
 		{
-			res = 1;
+			enregister("A", m_A);
+			enregister("B", m_B);
+			enregister("C", m_C);
+			enregister("D", m_D);
+			enregister("Q", m_Q);
 		}
-		else
+		//NETLIB_RESETI();
+		NETLIB_UPDATEI();
+
+	public:
+		logic_input_t m_A;
+		logic_input_t m_B;
+		logic_input_t m_C;
+		logic_input_t m_D;
+		logic_output_t m_Q;
+	};
+
+	NETLIB_OBJECT(7450_dip)
+	{
+		NETLIB_CONSTRUCTOR(7450_dip)
+		, m_1(*this, "1")
+		, m_2(*this, "2")
 		{
-			m_A.inactivate();
-			m_B.inactivate();
+
+			register_subalias("1", m_1.m_A);
+			register_subalias("2", m_2.m_A);
+			register_subalias("3", m_2.m_B);
+			register_subalias("4", m_2.m_C);
+			register_subalias("5", m_2.m_D);
+			register_subalias("6", m_2.m_Q);
+			//register_subalias("7",);  GND
+
+			register_subalias("8", m_1.m_Q);
+			register_subalias("9", m_1.m_C);
+			register_subalias("10", m_1.m_D);
+			//register_subalias("11", m_1.m_X1);
+			//register_subalias("12", m_1.m_X1Q);
+			register_subalias("13", m_1.m_B);
+			//register_subalias("14",);  VCC
 		}
-	} else {
-		if (t2 ^ 1)
+		//NETLIB_RESETI();
+		//NETLIB_UPDATEI();
+
+		NETLIB_SUB(7450) m_1;
+		NETLIB_SUB(7450) m_2;
+	};
+
+	NETLIB_UPDATE(7450)
+	{
+		m_A.activate();
+		m_B.activate();
+		m_C.activate();
+		m_D.activate();
+		UINT8 t1 = INPLOGIC(m_A) & INPLOGIC(m_B);
+		UINT8 t2 = INPLOGIC(m_C) & INPLOGIC(m_D);
+
+		const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
+
+		UINT8 res = 0;
+		if (t1 ^ 1)
 		{
-			m_C.inactivate();
-			m_D.inactivate();
+			if (t2 ^ 1)
+			{
+				res = 1;
+			}
+			else
+			{
+				m_A.inactivate();
+				m_B.inactivate();
+			}
+		} else {
+			if (t2 ^ 1)
+			{
+				m_C.inactivate();
+				m_D.inactivate();
+			}
 		}
+		OUTLOGIC(m_Q, res, times[1 - res]);// ? 22000 : 15000);
 	}
-	OUTLOGIC(m_Q, res, times[1 - res]);// ? 22000 : 15000);
-}
 
+	NETLIB_DEVICE_IMPL(7450)
+	NETLIB_DEVICE_IMPL(7450_dip)
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

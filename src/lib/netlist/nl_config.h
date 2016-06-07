@@ -14,8 +14,6 @@
 //  SETUP
 //============================================================
 
-#define NOEXCEPT noexcept
-
 /*
  * The following options determine how object::update is called.
  * NL_PMF_TYPE_VIRTUAL
@@ -48,11 +46,6 @@
  *  Disappointing is the GNUC_PMF performance.
  */
 
-
-/* FIXME: Currently, we are not registering subdevices and thus these will not
- * be started and the internal method will not be initialized.
- */
-
 // This will be autodetected
 //#define NL_PMF_TYPE 0
 
@@ -73,38 +66,26 @@
 #pragma GCC diagnostic ignored "-Wpmf-conversions"
 #endif
 
-#define USE_TRUTHTABLE          (1)
 
-// The following adds about 10% performance ...
 
-#if !defined(USE_OPENMP)
-#define USE_OPENMP              (0)
-#endif // !defined(USE_OPENMP)
+//============================================================
+//  GENERAL
+//============================================================
 
-// Use nano-second resolution - Sufficient for now
-#define NETLIST_INTERNAL_RES        (U64(1000000000))
-//#define NETLIST_INTERNAL_RES      (U64(1000000000000))
-
-#define NETLIST_CLOCK               (NETLIST_INTERNAL_RES)
-
-#define NETLIST_GMIN_DEFAULT    (1e-9)
-
-//#define nl_double float
-//#define NL_FCONST(x) (x ## f)
-
-#define nl_double double
-#define NL_FCONST(x) x
-
+#define NL_USE_MEMPOOL				(0)
+#define USE_TRUTHTABLE          	(1)
 
 //============================================================
 //  Solver defines
 //============================================================
 
-#define USE_MATRIX_GS (0)
-#define USE_GABS (1)
+#define USE_MATRIX_GS 				(0)
+#define USE_GABS 					(1)
 // savings are eaten up by effort
 // FIXME: Convert into solver parameter
-#define USE_LINEAR_PREDICTION (0)
+#define USE_LINEAR_PREDICTION 		(0)
+#define NETLIST_GMIN_DEFAULT     (1e-9)
+
 
 
 //============================================================
@@ -140,8 +121,33 @@
 #define end_timing(v)           do { } while (0)
 #endif
 
+//============================================================
+//  General
+//============================================================
+
 // this macro passes an item followed by a string version of itself as two consecutive parameters
 #define NLNAME(x) x, #x
+
+#define NOEXCEPT noexcept
+
+// The following adds about 10% performance ...
+
+#if !defined(USE_OPENMP)
+#define USE_OPENMP              (0)
+#endif // !defined(USE_OPENMP)
+
+// Use nano-second resolution - Sufficient for now
+#define NETLIST_INTERNAL_RES        (U64(1000000000))
+//#define NETLIST_INTERNAL_RES      (U64(1000000000000))
+
+#define NETLIST_CLOCK               (NETLIST_INTERNAL_RES)
+
+//#define nl_double float
+//#define NL_FCONST(x) (x ## f)
+
+#define nl_double double
+#define NL_FCONST(x) x
+
 
 //============================================================
 //  WARNINGS

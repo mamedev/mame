@@ -94,7 +94,10 @@
 // Implementation
 // -----------------------------------------------------------------------------
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 // -----------------------------------------------------------------------------
 // nld_twoterm
@@ -446,6 +449,7 @@ protected:
 };
 
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_TWOTERM_H_ */

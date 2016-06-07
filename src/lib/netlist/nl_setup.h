@@ -116,13 +116,13 @@ namespace netlist
 		void register_object(device_t &dev, const pstring &name, object_t &obj);
 
 		template<class NETLIST_X>
-		void register_dev_s(plib::powned_ptr<NETLIST_X> dev)
+		void register_dev_s(plib::owned_ptr<NETLIST_X> dev)
 		{
 			register_dev(std::move(dev));
 		}
 
 
-		void register_dev(plib::powned_ptr<device_t> dev);
+		void register_dev(plib::owned_ptr<device_t> dev);
 		void register_dev(const pstring &classname, const pstring &name);
 
 		void register_lib_entry(const pstring &name);
