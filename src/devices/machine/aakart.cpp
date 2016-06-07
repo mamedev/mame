@@ -165,7 +165,7 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
 READ8_MEMBER( aakart_device::read )
 {
 	m_out_tx_cb(CLEAR_LINE);
-	//debugger_break(machine());
+	//machine().debugger().debug_break();
 	return m_rx;
 }
 

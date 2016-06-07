@@ -6,6 +6,9 @@
 //
 //============================================================
 
+// only for oslog callback
+#include <functional>
+
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -418,7 +421,7 @@ windows_options::windows_options()
 //  output_oslog
 //============================================================
 
-static void output_oslog(const running_machine &machine, const char *buffer)
+void windows_osd_interface::output_oslog(const char *buffer)
 {
 	if (IsDebuggerPresent())
 		win_output_debug_string_utf8(buffer);
@@ -523,7 +526,10 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// hook up the debugger log
 	if (options.oslog())
-		machine.add_logerror_callback(output_oslog);
+	{
+		using namespace std::placeholders;
+		machine.add_logerror_callback(std::bind(&windows_osd_interface::output_oslog, this, _1));
+	}
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// crank up the multimedia timer resolution to its max

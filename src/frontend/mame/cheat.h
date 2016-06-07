@@ -14,6 +14,7 @@
 #define __CHEAT_H__
 
 #include "debug/express.h"
+#include "debug/debugcpu.h"
 
 
 //**************************************************************************
@@ -48,8 +49,10 @@ class number_and_format
 public:
 	// construction/destruction
 	number_and_format(UINT64 value = 0, int format = 0)
-		: m_value(value),
-			m_format(format) { }
+		: m_value(value)
+		, m_format(format)
+	{
+	}
 
 	// pass-through to look like a regular number
 	operator UINT64 &() { return m_value; }
@@ -307,6 +310,7 @@ private:
 	INT8                m_lastline;                         // last line used for output
 	bool                m_disabled;                         // true if the cheat engine is disabled
 	symbol_table        m_symtable;                         // global symbol table
+	std::unique_ptr<debugger_cpu> m_cpu;					// debugger interface for cpus/memory
 
 	// constants
 	static constexpr int CHEAT_VERSION = 1;

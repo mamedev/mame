@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
+
+#include <functional>
+
 #include "emu.h"
 #include "machine/fddebug.h"
 
@@ -422,11 +425,9 @@ static inline void set_constraint(fd1094_constraint *constraint, UINT32 pc, UINT
 
 static inline void print_possibilities(running_machine &machine)
 {
-	int i;
-
-	debug_console_printf(machine, "Possibilities @ %06X:\n", posslist[0].basepc);
-	for (i = 0; i < posscount; i++)
-		debug_console_printf(machine, " %c%2x: %s\n", posslist[i].iffy ? ' ' : '*', i, posslist[i].dasm);
+	machine.debugger().console().printf("Possibilities @ %06X:\n", posslist[0].basepc);
+	for (int i = 0; i < posscount; i++)
+		machine.debugger().console().printf(" %c%2x: %s\n", posslist[i].iffy ? ' ' : '*', i, posslist[i].dasm);
 }
 
 
@@ -522,23 +523,24 @@ void fd1094_init_debugging(running_machine &machine, const char *cpureg, const c
 	load_overlay_file(machine);
 
 	/* add some commands */
-	debug_console_register_command(machine, "fdsave", CMDFLAG_NONE, 0, 0, 0, execute_fdsave);
-	debug_console_register_command(machine, "fdoutput", CMDFLAG_NONE, 0, 1, 1, execute_fdoutput);
-	debug_console_register_command(machine, "fdseed", CMDFLAG_NONE, 0, 2, 2, execute_fdseed);
-	debug_console_register_command(machine, "fdguess", CMDFLAG_NONE, STATUS_GUESS, 1, 1, execute_fdlockguess);
-	debug_console_register_command(machine, "fdlock", CMDFLAG_NONE, STATUS_LOCKED, 1, 1, execute_fdlockguess);
-	debug_console_register_command(machine, "fdeliminate", CMDFLAG_NONE, 0, 1, 10, execute_fdeliminate);
-	debug_console_register_command(machine, "fdunlock", CMDFLAG_NONE, 0, 1, 1, execute_fdunlock);
-	debug_console_register_command(machine, "fdignore", CMDFLAG_NONE, 0, 0, 1, execute_fdignore);
-	debug_console_register_command(machine, "fdundo", CMDFLAG_NONE, 0, 0, 0, execute_fdundo);
-	debug_console_register_command(machine, "fdstatus", CMDFLAG_NONE, 0, 0, 0, execute_fdstatus);
-	debug_console_register_command(machine, "fdstate", CMDFLAG_NONE, 0, 0, 1, execute_fdstate);
-	debug_console_register_command(machine, "fdpc", CMDFLAG_NONE, 0, 0, 1, execute_fdpc);
-	debug_console_register_command(machine, "fdsearch", CMDFLAG_NONE, 0, 0, 0, execute_fdsearch);
-	debug_console_register_command(machine, "fddasm", CMDFLAG_NONE, 0, 1, 1, execute_fddasm);
-	debug_console_register_command(machine, "fdcset", CMDFLAG_NONE, 0, 2, 4, execute_fdcset);
-	debug_console_register_command(machine, "fdclist", CMDFLAG_NONE, 0, 0, 0, execute_fdclist);
-	debug_console_register_command(machine, "fdcsearch", CMDFLAG_NONE, 0, 0, 0, execute_fdcsearch);
+	using namespace std::placeholder;
+	machine.debugger().console().register_command("fdsave", CMDFLAG_NONE, 0, 0, 0, std::bind(&execute_fdsave, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdoutput", CMDFLAG_NONE, 0, 1, 1, std::bind(&execute_fdoutput, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdseed", CMDFLAG_NONE, 0, 2, 2, std::bind(&execute_fdseed, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdguess", CMDFLAG_NONE, STATUS_GUESS, 1, 1, std::bind(&execute_fdlockguess, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdlock", CMDFLAG_NONE, STATUS_LOCKED, 1, 1, std::bind(&execute_fdlockguess, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdeliminate", CMDFLAG_NONE, 0, 1, 10, std::bind(&execute_fdeliminate, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdunlock", CMDFLAG_NONE, 0, 1, 1, std::bind(&execute_fdunlock, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdignore", CMDFLAG_NONE, 0, 0, 1, std::bind(&execute_fdignore, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdundo", CMDFLAG_NONE, 0, 0, 0, std::bind(&execute_fdundo, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdstatus", CMDFLAG_NONE, 0, 0, 0, std::bind(&execute_fdstatus, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdstate", CMDFLAG_NONE, 0, 0, 1, std::bind(&execute_fdstate, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdpc", CMDFLAG_NONE, 0, 0, 1, std::bind(&execute_fdpc, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdsearch", CMDFLAG_NONE, 0, 0, 0, std::bind(&execute_fdsearch, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fddasm", CMDFLAG_NONE, 0, 1, 1, std::bind(&execute_fddasm, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdcset", CMDFLAG_NONE, 0, 2, 4, std::bind(&execute_fdcset, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdclist", CMDFLAG_NONE, 0, 0, 0, std::bind(&execute_fdclist, std::ref(machine), _1, _2, _3));
+	machine.debugger().console().register_command("fdcsearch", CMDFLAG_NONE, 0, 0, 0, std::bind(&execute_fdcsearch, std::ref(machine), _1, _2, _3));
 
 	/* set up the instruction hook */
 	machine.device("maincpu")->debug()->set_instruction_hook(instruction_hook);
@@ -743,7 +745,7 @@ static int instruction_hook(device_t &device, offs_t curpc)
 static void execute_fdsave(running_machine &machine, int ref, int params, const char **param)
 {
 	save_overlay_file(machine);
-	debug_console_printf(machine, "File saved\n");
+	machine.debugger().console().printf("File saved\n");
 }
 
 
@@ -764,7 +766,7 @@ static void execute_fdoutput(running_machine &machine, int ref, int params, cons
 	if (filerr == osd_file::error::NONE)
 		file.write(keyregion, KEY_SIZE);
 
-	debug_console_printf(machine, "File '%s' saved\n", param[0]);
+	machine.debugger().console().printf("File '%s' saved\n", param[0]);
 }
 
 
@@ -777,9 +779,9 @@ static void execute_fdseed(running_machine &machine, int ref, int params, const 
 	UINT64 num1, num2;
 
 	/* extract the parameters */
-	if (!debug_command_parameter_number(machine, param[0], &num1))
+	if (!machine.debugger().commands().validate_number_parameter(param[0], &num1))
 		return;
-	if (!debug_command_parameter_number(machine, param[1], &num2))
+	if (!machine.debugger().commands().validate_number_parameter(param[1], &num2))
 		return;
 
 	/* set the global and seed, and then regenerate the key */
@@ -804,13 +806,13 @@ static void execute_fdlockguess(running_machine &machine, int ref, int params, c
 	UINT64 num1;
 
 	/* extract the parameter */
-	if (!debug_command_parameter_number(machine, param[0], &num1))
+	if (!machine.debugger().commands().validate_number_parameter(param[0], &num1))
 		return;
 
 	/* make sure it is within range of our recent possibilities */
 	if (num1 >= posscount)
 	{
-		debug_console_printf(machine, "Possibility of out range (%x max)\n", posscount);
+		machine.debugger().console().printf("Possibility of out range (%x max)\n", posscount);
 		return;
 	}
 
@@ -839,13 +841,13 @@ static void execute_fdeliminate(running_machine &machine, int ref, int params, c
 		UINT64 num1;
 
 		/* extract the parameters */
-		if (!debug_command_parameter_number(machine, param[pnum], &num1))
+		if (!machine.debugger().commands().validate_number_parameter(param[pnum], &num1))
 			return;
 
 		/* make sure it is within range of our recent possibilities */
 		if (num1 >= posscount)
 		{
-			debug_console_printf(machine, "Possibility %x of out range (%x max)\n", (int)num1, posscount);
+			machine.debugger().console().printf("Possibility %x of out range (%x max)\n", (int)num1, posscount);
 			return;
 		}
 
@@ -881,21 +883,20 @@ static void execute_fdeliminate(running_machine &machine, int ref, int params, c
 
 static void execute_fdunlock(running_machine &machine, int ref, int params, const char **param)
 {
-	device_t *cpu = debug_cpu_get_visible_cpu(machine);
-	int reps = keystatus_words / KEY_SIZE;
-	int keyaddr, repnum;
-	UINT64 offset;
+	device_t *cpu = machine.debugger().cpu().get_visible_cpu();
 
 	/* support 0 or 1 parameters */
-	if (params != 1 || !debug_command_parameter_number(machine, param[0], &offset))
+	UINT64 offset;
+	if (params != 1 || !machine.debugger().commands().validate_number_parameter(param[0], &offset))
 		offset = cpu->safe_pc();
-	keyaddr = addr_to_keyaddr(offset / 2);
+	int keyaddr = addr_to_keyaddr(offset / 2);
 
 	/* toggle the ignore PC status */
-	debug_console_printf(machine, "Unlocking PC %06X\n", (int)offset);
+	machine.debugger().console().printf("Unlocking PC %06X\n", (int)offset);
 
 	/* iterate over all reps and unlock them */
-	for (repnum = 0; repnum < reps; repnum++)
+	const int reps = keystatus_words / KEY_SIZE;
+	for (int repnum = 0; repnum < reps; repnum++)
 	{
 		UINT16 *dest = &keystatus[repnum * KEY_SIZE + keyaddr];
 		if ((*dest & STATUS_MASK) == STATUS_LOCKED)
@@ -919,30 +920,31 @@ static void execute_fdunlock(running_machine &machine, int ref, int params, cons
 
 static void execute_fdignore(running_machine &machine, int ref, int params, const char **param)
 {
-	device_t *cpu = debug_cpu_get_visible_cpu(machine);
-	UINT64 offset;
+	device_t *cpu = machine.debugger().cpu().get_visible_cpu();
 
 	/* support 0 or 1 parameters */
 	if (params == 1 && strcmp(param[0], "all") == 0)
 	{
 		ignore_all = TRUE;
-		debug_console_printf(machine, "Ignoring all unknown opcodes\n");
+		machine.debugger().console().printf("Ignoring all unknown opcodes\n");
 		return;
 	}
-	if (params != 1 || !debug_command_parameter_number(machine, param[0], &offset))
+
+	UINT64 offset;
+	if (params != 1 || !machine.debugger().commands().validate_number_parameter(param[0], &offset))
 		offset = cpu->safe_pc();
 	offset /= 2;
 
 	/* toggle the ignore PC status */
 	ignorepc[offset] = !ignorepc[offset];
 	if (ignorepc[offset])
-		debug_console_printf(machine, "Ignoring address %06X\n", (int)offset * 2);
+		machine.debugger().console().printf("Ignoring address %06X\n", (int)offset * 2);
 	else
-		debug_console_printf(machine, "No longer ignoring address %06X\n", (int)offset * 2);
+		machine.debugger().console().printf("No longer ignoring address %06X\n", (int)offset * 2);
 
 	/* if no parameter given, implicitly run as well */
 	if (params == 0)
-		debug_cpu_get_visible_cpu(machine)->debug()->go();
+		machine.debugger().cpu().get_visible_cpu()->debug()->go();
 }
 
 
@@ -956,7 +958,7 @@ static void execute_fdundo(running_machine &machine, int ref, int params, const 
 	/* copy the undobuffer back and regenerate the key */
 	memcpy(keystatus, undobuff, keystatus_words * 2);
 	fd1094_regenerate_key(machine);
-	debug_console_printf(machine, "Undid last change\n");
+	machine.debugger().console().printf("Undid last change\n");
 }
 
 
@@ -986,9 +988,9 @@ static void execute_fdstatus(running_machine &machine, int ref, int params, cons
 		else
 			nomatter++;
 	}
-	debug_console_printf(machine, "%4d/%4d keys locked (%d%%)\n", locked, KEY_SIZE, locked * 100 / KEY_SIZE);
-	debug_console_printf(machine, "%4d/%4d keys guessed (%d%%)\n", guesses, KEY_SIZE, guesses * 100 / KEY_SIZE);
-	debug_console_printf(machine, "%4d/%4d keys don't matter (%d%%)\n", nomatter, KEY_SIZE, nomatter * 100 / KEY_SIZE);
+	machine.debugger().console().printf("%4d/%4d keys locked (%d%%)\n", locked, KEY_SIZE, locked * 100 / KEY_SIZE);
+	machine.debugger().console().printf("%4d/%4d keys guessed (%d%%)\n", guesses, KEY_SIZE, guesses * 100 / KEY_SIZE);
+	machine.debugger().console().printf("%4d/%4d keys don't matter (%d%%)\n", nomatter, KEY_SIZE, nomatter * 100 / KEY_SIZE);
 }
 
 
@@ -1004,7 +1006,7 @@ static void execute_fdstate(running_machine &machine, int ref, int params, const
 	/* set the new state if we got a parameter */
 	if (params > 0)
 	{
-		if (!debug_command_parameter_number(machine, param[0], &newstate))
+		if (!machine.debugger().commands().validate_number_parameter(param[0], &newstate))
 			return;
 		fd1094_set_state(keyregion, newstate);
 		fd1094_regenerate_key(machine);
@@ -1013,7 +1015,7 @@ static void execute_fdstate(running_machine &machine, int ref, int params, const
 	}
 
 	/* 0 parameters displays the current state */
-	debug_console_printf(machine, "FD1094 state = %X\n", fd1094_set_state(keyregion, -1));
+	machine.debugger().console().printf("FD1094 state = %X\n", fd1094_set_state(keyregion, -1));
 }
 
 
@@ -1024,11 +1026,11 @@ static void execute_fdstate(running_machine &machine, int ref, int params, const
 
 static void execute_fdpc(running_machine &machine, int ref, int params, const char **param)
 {
-	device_t *cpu = debug_cpu_get_visible_cpu(machine);
-	UINT64 newpc;
+	device_t *cpu = machine.debugger().cpu().get_visible_cpu();
 
 	/* support 0 or 1 parameters */
-	if (!debug_command_parameter_number(machine, param[0], &newpc))
+	UINT64 newpc = 0;
+	if (!machine.debugger().commands().validate_number_parameter(param[0], &newpc))
 		newpc = cpu->safe_pc();
 
 	/* set the new PC */
@@ -1046,7 +1048,7 @@ static void execute_fdpc(running_machine &machine, int ref, int params, const ch
 
 static void execute_fdsearch(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space = debug_cpu_get_visible_cpu(machine)->memory().space(AS_PROGRAM);
+	address_space &space = machine->debugger().cpu().get_visible_cpu()->memory().space(AS_PROGRAM);
 	int pc = space.device().safe_pc();
 	int length, first = TRUE;
 	UINT8 instrdata[2];
@@ -1056,14 +1058,14 @@ static void execute_fdsearch(running_machine &machine, int ref, int params, cons
 	if (searchsp == 0 || searchstack[searchsp-1] != pc)
 	{
 		int pcaddr;
-		debug_console_printf(machine, "Starting new search at PC=%06X\n", pc);
+		machine.debugger().console().printf("Starting new search at PC=%06X\n", pc);
 		searchsp = 0;
 		for (pcaddr = 0; pcaddr < coderegion_words; pcaddr++)
 			keystatus[pcaddr] &= ~SEARCH_MASK;
 	}
 	else
 	{
-		debug_console_printf(machine, "Resuming search at PC=%06X\n", pc);
+		machine.debugger().console().printf("Resuming search at PC=%06X\n", pc);
 		searchsp--;
 	}
 
@@ -1080,7 +1082,7 @@ static void execute_fdsearch(running_machine &machine, int ref, int params, cons
 				pc = searchstack[--searchsp];
 			if ((keystatus[pc/2] & SEARCH_MASK) != 0)
 			{
-				debug_console_printf(machine, "Search stack exhausted\n");
+				machine.debugger().console().printf("Search stack exhausted\n");
 				break;
 			}
 
@@ -1103,7 +1105,7 @@ static void execute_fdsearch(running_machine &machine, int ref, int params, cons
 			length = -length;
 		if (length == 0)
 		{
-			debug_console_printf(machine, "Invalid opcode; unable to advance\n");
+			machine.debugger().console().printf("Invalid opcode; unable to advance\n");
 			break;
 		}
 
@@ -1172,7 +1174,7 @@ static void execute_fdsearch(running_machine &machine, int ref, int params, cons
 
 static void execute_fddasm(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space = debug_cpu_get_visible_cpu(machine)->memory().space(AS_PROGRAM);
+	address_space &space = machine->debugger().cpu().get_visible_cpu()->memory().space(AS_PROGRAM);
 	int origstate = fd1094_set_state(keyregion, -1);
 	const char *filename;
 	int skipped = FALSE;
@@ -1186,7 +1188,7 @@ static void execute_fddasm(running_machine &machine, int ref, int params, const 
 	osd_file::error filerr = file.open(filename);
 	if (filerr != osd_file::error::NONE)
 	{
-		debug_console_printf(machine, "Unable to create file '%s'\n", filename);
+		machine.debugger().console().printf("Unable to create file '%s'\n", filename);
 		return;
 	}
 
@@ -1292,24 +1294,24 @@ static void execute_fdcset(running_machine &machine, int ref, int params, const 
 	int cnum;
 
 	/* extract the parameters */
-	if (!debug_command_parameter_number(machine, param[0], &pc))
+	if (!machine.debugger().commands().validate_number_parameter(param[0], &pc))
 		return;
-	if (!debug_command_parameter_number(machine, param[1], &value))
+	if (!machine.debugger().commands().validate_number_parameter(param[1], &value))
 		return;
-	if (params >= 3 && !debug_command_parameter_number(machine, param[2], &mask))
+	if (params >= 3 && !machine.debugger().commands().validate_number_parameter(param[2], &mask))
 		return;
 	if (params >= 4)
 	{
 		if (strcmp(param[3], "irq") == 0)
 			state = FD1094_STATE_IRQ;
-		else if (!debug_command_parameter_number(machine, param[3], &state))
+		else if (!machine.debugger().commands().validate_number_parameter(param[3], &state))
 			return;
 	}
 
 	/* validate parameters */
 	if ((pc & 1) != 0 || pc > 0xffffff)
 	{
-		debug_console_printf(machine, "Invalid PC specified (%08X)\n", (UINT32)pc);
+		machine.debugger().console().printf("Invalid PC specified (%08X)\n", (UINT32)pc);
 		return;
 	}
 
@@ -1334,7 +1336,7 @@ static void execute_fdcset(running_machine &machine, int ref, int params, const 
 	set_constraint(&constraints[cnum], pc, state, value, mask);
 
 	/* explain what we did */
-	debug_console_printf(machine, "Set new constraint at PC=%06X, state=%03X: decrypted & %04X == %04X\n",
+	machine.debugger().console().printf("Set new constraint at PC=%06X, state=%03X: decrypted & %04X == %04X\n",
 			(int)pc, (int)state, (int)mask, (int)value);
 }
 
@@ -1352,7 +1354,7 @@ static void execute_fdclist(running_machine &machine, int ref, int params, const
 	for (cnum = 0; cnum < constcount; cnum++)
 	{
 		fd1094_constraint *constraint = &constraints[cnum];
-		debug_console_printf(machine, "  PC=%06X, state=%03X: decrypted & %04X == %04X\n",
+		machine.debugger().console().printf("  PC=%06X, state=%03X: decrypted & %04X == %04X\n",
 				constraint->pc, constraint->state, constraint->mask, constraint->value);
 	}
 }
@@ -1365,7 +1367,7 @@ static void execute_fdclist(running_machine &machine, int ref, int params, const
 
 static void execute_fdcsearch(running_machine &machine, int ref, int params, const char **param)
 {
-//  debug_console_printf(machine, "Searching for possible global keys....\n");
+//  machine.debugger().console().printf("Searching for possible global keys....\n");
 	perform_constrained_search(machine);
 }
 
@@ -1565,7 +1567,7 @@ static void tag_possibility(running_machine &machine, fd1094_possibility *possda
 			nomatter++;
 	}
 
-	debug_console_printf(machine, "PC=%06X: locked %d, guessed %d, nochange %d\n", possdata->basepc, locked, guessed, nomatter);
+	machine.debugger().console().printf("PC=%06X: locked %d, guessed %d, nochange %d\n", possdata->basepc, locked, guessed, nomatter);
 }
 
 
@@ -1598,7 +1600,7 @@ static void perform_constrained_search(running_machine &machine)
 		global = find_global_key_matches(global + 1, output);
 		if (global == 0)
 			break;
-//      debug_console_printf(machine, "Checking global key %08X (PC=%06X)....\n", global, (output[2] << 16) | output[3]);
+//      machine.debugger().console().printf("Checking global key %08X (PC=%06X)....\n", global, (output[2] << 16) | output[3]);
 
 		/* use the IRQ handler to find more possibilities */
 		numseeds = find_constraint_sequence(global, FALSE);
@@ -1606,7 +1608,7 @@ static void perform_constrained_search(running_machine &machine)
 		{
 			int i;
 			for (i = 0; i < numseeds; i++)
-				debug_console_printf(machine, "  Possible: global=%08X seed=%06X pc=%04X\n", global, possible_seed[i], output[3]);
+				machine.debugger().console().printf("  Possible: global=%08X seed=%06X pc=%04X\n", global, possible_seed[i], output[3]);
 		}
 	}
 }
@@ -1779,7 +1781,7 @@ static int find_constraint_sequence(UINT32 global, int quick)
 			{
 				UINT32 seedlow;
 
-//              debug_console_printf(machine, "Global %08X ... Looking for keys that generate a keyvalue of %02X at %04X\n",
+//              machine.debugger().console().printf("Global %08X ... Looking for keys that generate a keyvalue of %02X at %04X\n",
 //                      global, keyvalue, keyaddr);
 
 				/* iterate over seed possibilities */

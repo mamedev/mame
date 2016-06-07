@@ -99,7 +99,7 @@ void tms340x0_device::unimpl(UINT16 op)
 	if (m_pc == 0 || s_opcode_table[m_direct->read_word(TOBYTE(m_pc)) >> 4] == &tms34010_device::unimpl)
 	{
 		set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		debugger_break(machine());
+		machine().debugger().debug_break();
 	}
 }
 

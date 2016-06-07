@@ -274,7 +274,7 @@ bool integer_symbol_entry::is_lval() const
 
 UINT64 integer_symbol_entry::value() const
 {
-	return (*m_getter)(m_table, m_ref);
+	return m_getter(m_table, m_ref);
 }
 
 
@@ -285,7 +285,7 @@ UINT64 integer_symbol_entry::value() const
 void integer_symbol_entry::set_value(UINT64 newvalue)
 {
 	if (m_setter != nullptr)
-		(*m_setter)(m_table, m_ref, newvalue);
+		m_setter(m_table, m_ref, newvalue);
 	else
 		throw emu_fatalerror("Symbol '%s' is read-only", m_name.c_str());
 }
@@ -371,7 +371,7 @@ UINT64 function_symbol_entry::execute(int numparams, const UINT64 *paramlist)
 		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name.c_str(), m_minparams);
 	if (numparams > m_maxparams)
 		throw emu_fatalerror("Function '%s' accepts no more than %d parameters", m_name.c_str(), m_maxparams);
-	return (*m_execute)(m_table, m_ref, numparams, paramlist);
+	return m_execute(m_table, m_ref, numparams, paramlist);
 }
 
 
@@ -504,7 +504,7 @@ expression_error::error_code symbol_table::memory_valid(const char *name, expres
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
 		if (symtable->m_memory_valid != nullptr)
 		{
-			expression_error::error_code err = (*symtable->m_memory_valid)(symtable->m_memory_param, name, space);
+			expression_error::error_code err = symtable->m_memory_valid(symtable->m_memory_param, name, space);
 			if (err != expression_error::NO_SUCH_MEMORY_SPACE)
 				return err;
 		}
@@ -522,9 +522,9 @@ UINT64 symbol_table::memory_value(const char *name, expression_space space, UINT
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
 		if (symtable->m_memory_valid != nullptr)
 		{
-			expression_error::error_code err = (*symtable->m_memory_valid)(symtable->m_memory_param, name, space);
+			expression_error::error_code err = symtable->m_memory_valid(symtable->m_memory_param, name, space);
 			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_read != nullptr)
-				return (*symtable->m_memory_read)(symtable->m_memory_param, name, space, offset, size);
+				return symtable->m_memory_read(symtable->m_memory_param, name, space, offset, size);
 			return 0;
 		}
 	return 0;
@@ -541,9 +541,9 @@ void symbol_table::set_memory_value(const char *name, expression_space space, UI
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
 		if (symtable->m_memory_valid != nullptr)
 		{
-			expression_error::error_code err = (*symtable->m_memory_valid)(symtable->m_memory_param, name, space);
+			expression_error::error_code err = symtable->m_memory_valid(symtable->m_memory_param, name, space);
 			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_write != nullptr)
-				(*symtable->m_memory_write)(symtable->m_memory_param, name, space, offset, size, value);
+				symtable->m_memory_write(symtable->m_memory_param, name, space, offset, size, value);
 			return;
 		}
 }

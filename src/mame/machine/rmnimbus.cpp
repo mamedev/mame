@@ -59,8 +59,11 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 
 */
 
+#include <functional>
+
 #include "debugger.h"
 #include "debug/debugcon.h"
+#include "debug/debugcpu.h"
 #include "imagedev/flopdrv.h"
 #include "includes/rmnimbus.h"
 
@@ -172,8 +175,6 @@ struct t_nimbus_brush
 };
 
 
-static void nimbus_debug(running_machine &machine, int ref, int params, const char *param[]);
-
 static int instruction_hook(device_t &device, offs_t curpc);
 static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag);
 static void decode_dos21(device_t *device,offs_t pc);
@@ -229,7 +230,8 @@ void rmnimbus_state::machine_start()
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command(machine(), "nimbus_debug", CMDFLAG_NONE, 0, 0, 1, nimbus_debug);
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("nimbus_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::debug_command, this, _1, _2, _3));
 
 		/* set up the instruction hook */
 		m_maincpu->debug()->set_instruction_hook(instruction_hook);
@@ -239,18 +241,18 @@ void rmnimbus_state::machine_start()
 	m_fdc->dden_w(0);
 }
 
-static void nimbus_debug(running_machine &machine, int ref, int params, const char *param[])
+void rmnimbus_state::debug_command(int ref, int params, const char *param[])
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	if(params>0)
+	if (params > 0)
 	{
 		int temp;
-		sscanf(param[0],"%d",&temp); state->m_debug_machine = temp;
+		sscanf(param[0],"%d",&temp);
+		m_debug_machine = temp;
 	}
 	else
 	{
-		debug_console_printf(machine,"Error usage : nimbus_debug <debuglevel>\n");
-		debug_console_printf(machine,"Current debuglevel=%02X\n",state->m_debug_machine);
+		machine().debugger().console().printf("Error usage : nimbus_debug <debuglevel>\n");
+		machine().debugger().console().printf("Current debuglevel=%02X\n", m_debug_machine);
 	}
 }
 

@@ -22,6 +22,7 @@
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debug/debugcpu.h"
+#include "debugger.h"
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
 

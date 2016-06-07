@@ -253,7 +253,7 @@ void video_manager::frame_update(bool debug)
 	{
 		// reset partial updates if we're paused or if the debugger is active
 		screen_device *screen = machine().first_screen();
-		if (screen != nullptr && (machine().paused() || debug || debugger_within_instruction_hook(machine())))
+		if (screen != nullptr && (machine().paused() || debug || machine().debugger().within_instruction_hook()))
 			screen->reset_partial_updates();
 	}
 }

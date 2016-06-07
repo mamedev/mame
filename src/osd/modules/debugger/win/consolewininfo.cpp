@@ -11,6 +11,7 @@
 #include "debugviewinfo.h"
 #include "uimetrics.h"
 
+#include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "imagedev/cassette.h"
@@ -77,7 +78,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	}
 
 	// recompute the children
-	set_cpu(*debug_cpu_get_visible_cpu(machine()));
+	set_cpu(*machine().debugger().cpu().get_visible_cpu());
 
 	// mark the edit box as the default focus and set it
 	editwin_info::set_default_focus();
@@ -298,9 +299,9 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 void consolewin_info::process_string(char const *string)
 {
 	if (string[0] == 0) // an empty string is a single step
-		debug_cpu_get_visible_cpu(machine())->debug()->single_step();
+		machine().debugger().cpu().get_visible_cpu()->debug()->single_step();
 	else                // otherwise, just process the command
-		debug_console_execute_command(machine(), string, 1);
+		machine().debugger().console().execute_command(string, true);
 
 	// clear the edit text box
 	set_editwnd_text("");

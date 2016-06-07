@@ -12,6 +12,7 @@
 #include "debugvw.h"
 #include "dvmemory.h"
 #include "debugcpu.h"
+#include "debugger.h"
 #include <ctype.h>
 
 
@@ -747,10 +748,10 @@ bool debug_view_memory::read(UINT8 size, offs_t offs, UINT64 &data)
 		{
 			switch (size)
 			{
-				case 1: data = debug_read_byte(*source.m_space, offs, !m_no_translation); break;
-				case 2: data = debug_read_word(*source.m_space, offs, !m_no_translation); break;
-				case 4: data = debug_read_dword(*source.m_space, offs, !m_no_translation); break;
-				case 8: data = debug_read_qword(*source.m_space, offs, !m_no_translation); break;
+				case 1: data = machine().debugger().cpu().read_byte(*source.m_space, offs, !m_no_translation); break;
+				case 2: data = machine().debugger().cpu().read_word(*source.m_space, offs, !m_no_translation); break;
+				case 4: data = machine().debugger().cpu().read_dword(*source.m_space, offs, !m_no_translation); break;
+				case 8: data = machine().debugger().cpu().read_qword(*source.m_space, offs, !m_no_translation); break;
 			}
 		}
 		return ismapped;
@@ -819,10 +820,10 @@ void debug_view_memory::write(UINT8 size, offs_t offs, UINT64 data)
 	{
 		switch (size)
 		{
-			case 1: debug_write_byte(*source.m_space, offs, data, !m_no_translation); break;
-			case 2: debug_write_word(*source.m_space, offs, data, !m_no_translation); break;
-			case 4: debug_write_dword(*source.m_space, offs, data, !m_no_translation); break;
-			case 8: debug_write_qword(*source.m_space, offs, data, !m_no_translation); break;
+			case 1: machine().debugger().cpu().write_byte(*source.m_space, offs, data, !m_no_translation); break;
+			case 2: machine().debugger().cpu().write_word(*source.m_space, offs, data, !m_no_translation); break;
+			case 4: machine().debugger().cpu().write_dword(*source.m_space, offs, data, !m_no_translation); break;
+			case 8: machine().debugger().cpu().write_qword(*source.m_space, offs, data, !m_no_translation); break;
 		}
 		return;
 	}

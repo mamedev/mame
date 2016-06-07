@@ -295,7 +295,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 READ16_MEMBER(l7a1045_sound_device::sound_data_r)
 {
 	//printf("%04x (%04x %04x)\n",offset,m_audioregister,m_audiochannel);
-	//debugger_break(machine());
+	//machine().debugger().debug_break();
 	l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
 	switch(m_audioregister)

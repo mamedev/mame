@@ -9,7 +9,10 @@
     2011-01-29.
 *****************************************************************************/
 
+#include <functional>
+
 #include "includes/mbc55x.h"
+#include "debug/debugcpu.h"
 
 
 /*-------------------------------------------------------------------------*/
@@ -30,7 +33,6 @@
 
 static void decode_dos21(device_t *device,offs_t pc);
 //static void mbc55x_recalculate_ints(running_machine &machine);
-static void mbc55x_debug(running_machine &machine, int ref, int params, const char *param[]);
 static int instruction_hook(device_t &device, offs_t curpc);
 //static void fdc_reset(running_machine &machine);
 //static void set_disk_int(running_machine &machine, int state);
@@ -334,7 +336,8 @@ void mbc55x_state::machine_start()
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command(machine(), "mbc55x_debug", CMDFLAG_NONE, 0, 0, 1, mbc55x_debug);
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("mbc55x_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&mbc55x_state::debug_command, this, _1, _2, _3));
 
 		/* set up the instruction hook */
 		m_maincpu->debug()->set_instruction_hook(instruction_hook);
@@ -347,18 +350,18 @@ void mbc55x_state::machine_start()
 }
 
 
-static void mbc55x_debug(running_machine &machine, int ref, int params, const char *param[])
+void mbc55x_state::debug_command(int ref, int params, const char *param[])
 {
-	mbc55x_state *state = machine.driver_data<mbc55x_state>();
-	if(params>0)
+	if (params > 0)
 	{
 		int temp;
-		sscanf(param[0],"%d",&temp); state->m_debug_machine = temp;
+		sscanf(param[0], "%d", &temp);
+		m_debug_machine = temp;
 	}
 	else
 	{
-		debug_console_printf(machine,"Error usage : mbc55x_debug <debuglevel>\n");
-		debug_console_printf(machine,"Current debuglevel=%02X\n",state->m_debug_machine);
+		machine().debugger().console().printf("Error usage : mbc55x_debug <debuglevel>\n");
+		machine().debugger().console().printf("Current debuglevel=%02X\n", m_debug_machine);
 	}
 }
 
@@ -410,5 +413,7 @@ static void decode_dos21(device_t *device,offs_t pc)
 	device->logerror("=======================================================================\n");
 
 	if((ax & 0xff00)==0x0900)
-		debugger_break(device->machine());
+	{
+		device->machine().debugger().debug_break();
+	}
 }

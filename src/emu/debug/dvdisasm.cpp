@@ -12,7 +12,7 @@
 #include "debugvw.h"
 #include "dvdisasm.h"
 #include "debugcpu.h"
-
+#include "debugger.h"
 
 
 //**************************************************************************
@@ -254,8 +254,8 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 		while (curpcbyte < fillpcbyte)
 		{
 			fillpcbyte--;
-			opbuf[1000 + fillpcbyte - targetpcbyte] = debug_read_opcode(source.m_decrypted_space, fillpcbyte, 1);
-			argbuf[1000 + fillpcbyte - targetpcbyte] = debug_read_opcode(source.m_space, fillpcbyte, 1);
+			opbuf[1000 + fillpcbyte - targetpcbyte] = machine().debugger().cpu().read_opcode(source.m_decrypted_space, fillpcbyte, 1);
+			argbuf[1000 + fillpcbyte - targetpcbyte] = machine().debugger().cpu().read_opcode(source.m_space, fillpcbyte, 1);
 		}
 
 		// loop until we get past the target instruction
@@ -269,7 +269,7 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 
 			// get the disassembly, but only if mapped
 			instlen = 1;
-			if (debug_cpu_translate(source.m_space, TRANSLATE_FETCH, &physpcbyte))
+			if (machine().debugger().cpu().translate(source.m_space, TRANSLATE_FETCH, &physpcbyte))
 			{
 				char dasmbuffer[100];
 				instlen = source.device()->debug()->disassemble(dasmbuffer, scanpc, &opbuf[1000 + scanpcbyte - targetpcbyte], &argbuf[1000 + scanpcbyte - targetpcbyte]) & DASMFLAG_LENGTHMASK;
@@ -315,12 +315,12 @@ void debug_view_disasm::generate_bytes(offs_t pcbyte, int numbytes, int minbytes
 	// output the first value
 	int offset = 0;
 	if (maxchars >= char_num * minbytes)
-		offset += util::stream_format(m_dasm, source.m_space.is_octal() ? "%0*o" : "%0*X", minbytes * char_num, debug_read_opcode(source.m_decrypted_space, pcbyte, minbytes));
+		offset += util::stream_format(m_dasm, source.m_space.is_octal() ? "%0*o" : "%0*X", minbytes * char_num, machine().debugger().cpu().read_opcode(source.m_decrypted_space, pcbyte, minbytes));
 
 	// output subsequent values
 	int byte;
 	for (byte = minbytes; byte < numbytes && offset + 1 + char_num * minbytes < maxchars; byte += minbytes)
-		offset += util::stream_format(m_dasm, source.m_space.is_octal() ? " %0*o" : " %0*X", minbytes * char_num, debug_read_opcode(encrypted ? source.m_space : source.m_decrypted_space, pcbyte + byte, minbytes));
+		offset += util::stream_format(m_dasm, source.m_space.is_octal() ? " %0*o" : " %0*X", minbytes * char_num, machine().debugger().cpu().read_opcode(encrypted ? source.m_space : source.m_decrypted_space, pcbyte + byte, minbytes));
 
 	// if we ran out of room, indicate more
 	if ((byte < numbytes) && (byte != minbytes) && (maxchars > 3))
@@ -395,15 +395,15 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 		char buffer[100];
 		int numbytes = 0;
 		offs_t physpcbyte = pcbyte;
-		if (debug_cpu_translate(source.m_space, TRANSLATE_FETCH_DEBUG, &physpcbyte))
+		if (machine().debugger().cpu().translate(source.m_space, TRANSLATE_FETCH_DEBUG, &physpcbyte))
 		{
 			UINT8 opbuf[64], argbuf[64];
 
 			// fetch the bytes up to the maximum
 			for (numbytes = 0; numbytes < maxbytes; numbytes++)
 			{
-				opbuf[numbytes] = debug_read_opcode(source.m_decrypted_space, pcbyte + numbytes, 1);
-				argbuf[numbytes] = debug_read_opcode(source.m_space, pcbyte + numbytes, 1);
+				opbuf[numbytes] = machine().debugger().cpu().read_opcode(source.m_decrypted_space, pcbyte + numbytes, 1);
+				argbuf[numbytes] = machine().debugger().cpu().read_opcode(source.m_space, pcbyte + numbytes, 1);
 			}
 
 			// disassemble the result

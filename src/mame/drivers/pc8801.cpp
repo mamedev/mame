@@ -2341,7 +2341,7 @@ IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
 	}
 
 	printf("IRQ triggered but no vector on the bus! %02x %02x %02x %02x\n",m_i8214_irq_level,m_sound_irq_latch,m_vrtc_irq_latch,m_timer_irq_latch);
-	debugger_break(machine());
+	machine().debugger().debug_break();
 
 	return 4*2; //TODO: mustn't happen
 }

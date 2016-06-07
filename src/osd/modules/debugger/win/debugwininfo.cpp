@@ -10,6 +10,7 @@
 
 #include "debugviewinfo.h"
 
+#include "debugger.h"
 #include "debug/debugcpu.h"
 #include "window.h"
 #include "winutf8.h"
@@ -296,31 +297,31 @@ bool debugwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		case ID_RUN_AND_HIDE:
 			debugger().hide_all();
 		case ID_RUN:
-			debug_cpu_get_visible_cpu(machine())->debug()->go();
+			machine().debugger().cpu().get_visible_cpu()->debug()->go();
 			return true;
 
 		case ID_NEXT_CPU:
-			debug_cpu_get_visible_cpu(machine())->debug()->go_next_device();
+			machine().debugger().cpu().get_visible_cpu()->debug()->go_next_device();
 			return true;
 
 		case ID_RUN_VBLANK:
-			debug_cpu_get_visible_cpu(machine())->debug()->go_vblank();
+			machine().debugger().cpu().get_visible_cpu()->debug()->go_vblank();
 			return true;
 
 		case ID_RUN_IRQ:
-			debug_cpu_get_visible_cpu(machine())->debug()->go_interrupt();
+			machine().debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
 			return true;
 
 		case ID_STEP:
-			debug_cpu_get_visible_cpu(machine())->debug()->single_step();
+			machine().debugger().cpu().get_visible_cpu()->debug()->single_step();
 			return true;
 
 		case ID_STEP_OVER:
-			debug_cpu_get_visible_cpu(machine())->debug()->single_step_over();
+			machine().debugger().cpu().get_visible_cpu()->debug()->single_step_over();
 			return true;
 
 		case ID_STEP_OUT:
-			debug_cpu_get_visible_cpu(machine())->debug()->single_step_out();
+			machine().debugger().cpu().get_visible_cpu()->debug()->single_step_out();
 			return true;
 
 		case ID_HARD_RESET:
@@ -329,7 +330,7 @@ bool debugwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 		case ID_SOFT_RESET:
 			machine().schedule_soft_reset();
-			debug_cpu_get_visible_cpu(machine())->debug()->go();
+			machine().debugger().cpu().get_visible_cpu()->debug()->go();
 			return true;
 
 		case ID_EXIT:
@@ -488,7 +489,7 @@ LRESULT debugwin_info::window_proc(UINT message, WPARAM wparam, LPARAM lparam)
 		if (m_is_main_console)
 		{
 			debugger().hide_all();
-			debug_cpu_get_visible_cpu(machine())->debug()->go();
+			machine().debugger().cpu().get_visible_cpu()->debug()->go();
 		}
 		else
 		{

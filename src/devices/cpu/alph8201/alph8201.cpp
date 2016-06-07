@@ -274,7 +274,7 @@ void alpha8201_cpu_device::M_UNDEFINED()
 	osd_printf_debug("alpha8201:  PC = %03x,  Unimplemented opcode = %02x\n", m_pc.w.l-1, M_RDMEM(m_pc.w.l-1));
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
-	debugger_break(machine());
+	machine().debugger().debug_break();
 #endif
 }
 
@@ -287,7 +287,7 @@ void alpha8201_cpu_device::M_UNDEFINED2()
 	osd_printf_debug("alpha8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", m_pc.w.l-2, op,imm);
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
-	debugger_break(machine());
+	machine().debugger().debug_break();
 #endif
 }
 

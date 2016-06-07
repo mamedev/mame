@@ -297,7 +297,7 @@ WRITE32_MEMBER( psxcpu_device::biu_w )
 
 void psxcpu_device::stop()
 {
-	debugger_break( machine() );
+	machine().debugger().debug_break();
 	debugger_instruction_hook( this,  m_pc );
 }
 

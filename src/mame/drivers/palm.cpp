@@ -17,6 +17,7 @@
 #include "machine/ram.h"
 #include "sound/dac.h"
 #include "debugger.h"
+#include "debug/debugcpu.h"
 #include "rendlay.h"
 
 #define MC68328_TAG "dragonball"

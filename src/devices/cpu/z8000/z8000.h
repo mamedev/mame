@@ -665,6 +665,9 @@ protected:
 	virtual UINT32 F_SEG_Z8001() override;
 	virtual UINT32 PSA_ADDR() override;
 	virtual UINT32 read_irq_vector() override;
+
+private:
+	void z8k_disass_mode(int ref, int params, const char *param[]);
 };
 
 

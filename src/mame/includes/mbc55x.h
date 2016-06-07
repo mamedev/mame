@@ -174,6 +174,10 @@ public:
 	void keyboard_reset();
 	void scan_keyboard();
 	void set_ram_size();
+
+private:
+	void debug_command(int ref, int params, const char *param[]);
+	void video_debug(int ref, int params, const char *param[]);
 };
 
 /*----------- defined in drivers/mbc55x.c -----------*/
