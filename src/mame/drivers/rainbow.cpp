@@ -65,7 +65,7 @@ Graphics output is independent from monochrome output.
 Two ports, a high-speed RS-422 half-duplex interface (port A) + lower-speed RS-423 full/half-duplex interface
 with modem control (port B). A 5 Mhz. 8237 DMA controller transfers data into and out of shared memory (not: optional RAM).
 
-Uses SHRAM, SHMA, BDL SH WR L, NONSHARED CYCLE. Implementation requires DMA and arbitration logic (dump of E11/E13 ?).
+Uses SHRAM, SHMA, BDL SH WR L, NONSHARED CYCLE. Implementation requires DMA and arbitration logic (using dump of E11/E13?).
 Can't be added if RD51 hard disk controller present (J4 + J5). For programming info see NEWCOM1.DOC (-> RBETECDOC.ZIP).
 
 
@@ -2330,6 +2330,10 @@ ROM_LOAD("23-092e4-00.bin", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91
 
 ROM_REGION(0x1000, "chargen", 0) // [E98] 2732 (4 K) EPROM
 ROM_LOAD("23-020e3-00.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
+
+// Z80 ARBITRATION PROM
+ROM_REGION(0x100, "prom", 0)
+ROM_LOAD("23-090b1.mmi6308-ij.e11", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E11, same prom is @E13 on 100-B
 ROM_END
 
 //----------------------------------------------------------------------------------------
@@ -2360,6 +2364,10 @@ ROM_RELOAD(0xfc000, 0x4000)
 // CHARACTER GENERATOR (E3-03)
 ROM_REGION(0x1000, "chargen", 0)
 ROM_LOAD("23-037e3.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
+
+// Z80 ARBITRATION PROM
+ROM_REGION(0x100, "prom", 0)
+ROM_LOAD("23-090b1.mmi6308-ij.e13", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E13, same prom is @E11 on 100-A
 ROM_END
 
 //----------------------------------------------------------------------------------------
