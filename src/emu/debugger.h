@@ -12,8 +12,6 @@
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
 
-#include "emu.h"
-
 class debugger_commands;
 class debugger_cpu;
 class debugger_console;
