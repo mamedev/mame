@@ -938,9 +938,9 @@ WRITE8_MEMBER(wingco_state::magodds_outb860_w)
 //  popmessage("magodds_outb860_w %02x\n", data);
 }
 
-WRITE8_MEMBER(wingco_state::fl7w4_outb802_w)
+WRITE8_MEMBER(wingco_state::fl7w4_outc802_w)
 {
-	m_fl7w4_id->write((data & 0x40) ? 1 : 0);
+	m_fl7w4_id->write((data >> 6) & 0x01);
 }
 
 static ADDRESS_MAP_START( magodds_map, AS_PROGRAM, 8, wingco_state )
@@ -8193,7 +8193,7 @@ static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
 //  MCFG_CPU_IO_MAP(flaming7_readport)
 
 	MCFG_DEVICE_MODIFY("ppi8255_0")
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, fl7w4_outb802_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
 
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
@@ -14163,7 +14163,7 @@ ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights. Serial 7D063
 	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 
 	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
-	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, BAD_DUMP CRC(747b40b1) SHA1(3336d8de5333057beb5f55873b9410cc7bf73fbb) ) // Hand built... Last byte is CRC-8. Need to be checked.
+	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, CRC(b7078792) SHA1(f9eba1587b65ed9bc07ea6c4b2d393fb43f60659) ) // Hand built to match our ROM set
 
 ROM_END
 
@@ -14912,7 +14912,7 @@ GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,driver_device,  0,        
 
 
 // --- Flaming 7's hardware (W-4 derivative) ---
-GAME(  199?, fl7_3121,  0,        flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Red, White & Blue 7's + Hollywood Nights)",     MACHINE_NOT_WORKING )
+GAME(  199?, fl7_3121,  0,        flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Red, White & Blue 7's + Hollywood Nights)",     0 )
 
 
 // --- Wing W-8 hardware ---

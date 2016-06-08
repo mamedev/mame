@@ -162,7 +162,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(magodds_outb850_w);
 	DECLARE_WRITE8_MEMBER(magodds_outb860_w);
-	DECLARE_WRITE8_MEMBER(fl7w4_outb802_w);
+	DECLARE_WRITE8_MEMBER(fl7w4_outc802_w);
 	DECLARE_WRITE8_MEMBER(system_outputa_w);
 	DECLARE_WRITE8_MEMBER(system_outputb_w);
 	DECLARE_WRITE8_MEMBER(system_outputc_w);
