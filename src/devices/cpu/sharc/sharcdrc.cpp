@@ -2193,6 +2193,12 @@ void adsp21062_device::generate_write_ureg(drcuml_block *block, compiler_state *
 		case 0x65:		// PCSTKP
 			UML_MOV(block, PCSTKP, imm ? data : I0);
 			break;
+		case 0x67:		// CURLCNTR
+			UML_MOV(block, CURLCNTR, imm ? data : I0);
+			break;
+		case 0x68:		// LCNTR
+			UML_MOV(block, LCNTR, imm ? data : I0);
+			break;
 		case 0x70:		// USTAT1
 			UML_MOV(block, mem(&m_core->ustat1), imm ? data : I0);
 			break;
