@@ -1184,7 +1184,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 		case NREG_T2CTRL+1:     /* general purpose timer control (control bits) */
 		case NREG_T3CTRL+1:     /* watchdog timer control (control bits) */
 			which = (offset - NREG_T0CTRL) / 4;
-			if (1 || LOG_NILE) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", safe_pc(), which, offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", safe_pc(), which, offset*4, data, mem_mask);
 			logit = 0;
 
 			/* timer just enabled? */
