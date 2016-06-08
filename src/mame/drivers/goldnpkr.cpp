@@ -4898,10 +4898,83 @@ ROM_END
 
   Golden Poker derivative, with blue killer circuitry.
   Suitable for "Good Luck" and "Buena Suerte" games.
+  Addressing, ROM banks, and edge connector close to Magic Fly.
   
+  Discrete sound need to be traced...
+
   30x2-pins Edge connector.
 
-  Addressing, ROM banks, and edge connector close to Magic Fly.
+  *********** Edge connector (WIP) ************
+
+     Solder side  |Conn|  Components side
+  ----------------+----+---------------------
+                  |    |
+            +5V.  | 01 |  +5V.
+  (GND) Speaker-  | 02 |  Speaker- (GND)
+                  | 03 |  Speaker+
+                  | 04 |  
+                  |    |
+            Sync  | 05 |  Red
+           Green  | 06 |  Blue
+                  |    |
+           (out)  | 07 |  (out)
+           (out)  | 08 |  (out)
+           (out)  | 09 |  12VAC. *IN* (0)
+                  |    |
+         (input)  | 10 |  (input)
+         (input)  | 11 |  (input)
+         (input)  | 12 |  (input)
+         (input)  | 13 |  (input)
+         (input)  | 14 |  (input)
+         (input)  | 15 |  (input)
+         (input)  | 16 |  (input)
+         (input)  | 17 |  (input)
+         (input)  | 18 |  (input)
+         (input)  | 19 |  (input)
+                  |    |
+    Common C (3)  | 20 |  Common A (1)
+    Common D (4)  | 21 |  Common B (2)
+                  |    |
+                  | 22 |  n/c (5)
+                  | 23 |  
+                  | 24 |  
+                  |    |
+             GND  | 25 |  GND
+         +12VAC.  | 26 |  +12VAC.
+         +12VAC.  | 27 |  +12VAC.
+         +10VAC.  | 28 |  +10VAC.
+         +10VAC.  | 29 |  +10VAC.
+             GND  | 30 |  GND
+                  |    |
+
+  (0) 12V. AV *IN*: for lamps, audio, and mech counters.
+
+  (1) = 
+  (2) = 
+  (3) = 
+  (4) = 
+
+  Note: Each Common GND (A-B-C-D) are for their respective
+  Multiplexed groups of inputs, since there are 4 groups
+  with 5 valid inputs each one.
+
+  (5) = Not connected, but there is a wire patch from here to
+        the internal Power Supply diode, to enter 12Vcc. from
+        a external power supply instead of the normal 12VAC.
+        expected for the hardware.
+
+
+  ** 10-pin connector **
+
+  Only the last 4 have a male connector. The rest are just marked on the PCB.
+ 
+  0000000000
+  ++++
+  ||||    
+  |||'-- Out Mech Counter.
+  ||'--- Out Mech Counter.
+  |'---- n/c (is routed to a place where another transistor could be mounted).
+  '----- 12V.
 
 */
 ROM_START( bsuerten )
