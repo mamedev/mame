@@ -29,6 +29,8 @@
 #include <bgfx/bgfx.h>
 #include <ocornut-imgui/imgui.h>
 #include <ocornut-imgui/imgui_wm.h>
+#include <iconfontheaders/icons_kenney.h>
+#include <iconfontheaders/icons_font_awesome.h>
 
 #define IMGUI_MBUT_LEFT   0x01
 #define IMGUI_MBUT_RIGHT  0x02
@@ -131,13 +133,13 @@ inline uint32_t imguiRGBA(uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a = 255)
 
 BGFX_HANDLE(ImguiFontHandle);
 
-ImguiFontHandle imguiCreateFont(const void* _data, float _fontSize=15.0f);
+ImguiFontHandle imguiCreateFont(const void* _data, float _fontSize = 18.0f);
 void imguiSetFont(ImguiFontHandle _handle);
 ImguiFontHandle imguiGetCurrentFont();
 
 namespace bx { struct AllocatorI; }
 
-ImguiFontHandle imguiCreate(const void* _data = NULL, uint32_t _size = 0, float _fontSize = 15.0f, bx::AllocatorI* _allocator = NULL);
+ImguiFontHandle imguiCreate(const void* _data = NULL, uint32_t _size = 0, float _fontSize = 18.0f, bx::AllocatorI* _allocator = NULL);
 void imguiDestroy();
 
 void imguiBeginFrame(int32_t _mx, int32_t _my, uint8_t _button, int32_t _scroll, uint16_t _width, uint16_t _height, char _inputChar = 0, uint8_t _view = 255);

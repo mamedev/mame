@@ -1,4 +1,4 @@
-// dear imgui, v1.49 WIP
+// dear imgui, v1.50 WIP
 // (demo code)
 
 // Don't remove this file from your project! It is useful reference code that you can execute.
@@ -11,7 +11,7 @@
 
 #include "imgui.h"
 #include <ctype.h>          // toupper, isprint
-#include <math.h>           // sqrtf, fabsf, fmodf, powf, cosf, sinf, floorf, ceilf
+#include <math.h>           // sqrtf, powf, cosf, sinf, floorf, ceilf
 #include <stdio.h>          // vsnprintf, sscanf, printf
 #include <stdlib.h>         // NULL, malloc, free, qsort, atoi
 #if defined(_MSC_VER) && _MSC_VER <= 1500 // MSVC 2008 or earlier
@@ -251,34 +251,53 @@ void ImGui::ShowTestWindow(bool* p_open)
                 ImGui::TreePop();
             }
 
-            if (ImGui::TreeNode("With selectable nodes"))
+            if (ImGui::TreeNode("Advanced, with Selectable nodes"))
             {
-                ShowHelpMarker("Click to select, CTRL+Click to toggle, click on arrows to open");
-                static int selection_mask = 0x02;   // Dumb representation of what may be user-side selection state. You may carry selection state inside or outside your objects in whatever format you see fit.
-                int node_clicked = -1;
+                ShowHelpMarker("This is a more standard looking tree with selectable nodes.\nClick to select, CTRL+Click to toggle, click on arrows or double-click to open.");
+                static bool align_label_with_current_x_position = false;
+                ImGui::Checkbox("Align label with current X position)", &align_label_with_current_x_position);
+                ImGui::Text("Hello!");
+                if (align_label_with_current_x_position)
+                    ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
+
+                static int selection_mask = (1 << 2); // Dumb representation of what may be user-side selection state. You may carry selection state inside or outside your objects in whatever format you see fit.
+                int node_clicked = -1;                // Temporary storage of what node we have clicked to process selection at the end of the loop. May be a pointer to your own node type, etc.
+                ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, ImGui::GetFontSize()*3); // Increase spacing to differentiate leaves from expanded contents.
                 for (int i = 0; i < 6; i++)
                 {
-                    ImGuiTreeNodeFlags node_flags = ((selection_mask & (1 << i)) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-                    if (i >= 3)
-                        node_flags |= ImGuiTreeNodeFlags_AlwaysOpen;
-                    bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, "Selectable %s %d", (i >= 3) ? "Leaf" : "Node", i);
-                    if (ImGui::IsItemClicked()) 
-                        node_clicked = i;
-                    if (node_open)
+                    // Disable the default open on single-click behavior and pass in Selected flag according to our selection state.
+                    ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ((selection_mask & (1 << i)) ? ImGuiTreeNodeFlags_Selected : 0);
+                    if (i < 3)
                     {
-                        ImGui::Text("Selectable Blah blah");
-                        ImGui::Text("Blah blah");
-                        ImGui::TreePop();
+                        // Node
+                        bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, "Selectable Node %d", i);
+                        if (ImGui::IsItemClicked()) 
+                            node_clicked = i;
+                        if (node_open)
+                        {
+                            ImGui::Text("Blah blah\nBlah Blah");
+                            ImGui::TreePop();
+                        }
+                    }
+                    else
+                    {
+                        // Leaf: The only reason we have a TreeNode at all is to allow selection of the leaf. Otherwise we can use BulletText() or TreeAdvanceToLabelPos()+Text().
+                        ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen, "Selectable Leaf %d", i);
+                        if (ImGui::IsItemClicked()) 
+                            node_clicked = i;
                     }
                 }
                 if (node_clicked != -1)
                 {
                     // Update selection state. Process outside of tree loop to avoid visual inconsistencies during the clicking-frame.
                     if (ImGui::GetIO().KeyCtrl)
-                        selection_mask ^= (1 << node_clicked);  // CTRL+click to toggle
-                    else
-                        selection_mask = (1 << node_clicked);   // Click to single-select
+                        selection_mask ^= (1 << node_clicked);          // CTRL+click to toggle
+                    else //if (!(selection_mask & (1 << node_clicked))) // Depending on selection behavior you want, this commented bit preserve selection when clicking on item that is part of the selection
+                        selection_mask = (1 << node_clicked);           // Click to single-select
                 }
+                ImGui::PopStyleVar();
+                if (align_label_with_current_x_position)
+                    ImGui::Indent(ImGui::GetTreeNodeToLabelSpacing());
                 ImGui::TreePop();
             }
             ImGui::TreePop();
@@ -421,6 +440,19 @@ void ImGui::ShowTestWindow(bool* p_open)
                 ImGui::Selectable("main.c", &selected[0]);    ImGui::SameLine(300); ImGui::Text(" 2,345 bytes");
                 ImGui::Selectable("Hello.cpp", &selected[1]); ImGui::SameLine(300); ImGui::Text("12,345 bytes");
                 ImGui::Selectable("Hello.h", &selected[2]);   ImGui::SameLine(300); ImGui::Text(" 2,345 bytes");
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNode("In columns"))
+            {
+                ImGui::Columns(3, NULL, false);
+                static bool selected[16] = { 0 };
+                for (int i = 0; i < 16; i++)
+                {
+                    char label[32]; sprintf(label, "Item %d", i);
+                    if (ImGui::Selectable(label, &selected[i])) {}
+                    ImGui::NextColumn();
+                }
+                ImGui::Columns(1);
                 ImGui::TreePop();
             }
             if (ImGui::TreeNode("Grid"))
@@ -1293,7 +1325,22 @@ void ImGui::ShowTestWindow(bool* p_open)
         // Basic columns
         if (ImGui::TreeNode("Basic"))
         {
-            ImGui::Columns(4, "mycolumns");
+            ImGui::Text("Without border:");
+            ImGui::Columns(3, "mycolumns3", false);  // 3-ways, no border
+            ImGui::Separator();
+            for (int n = 0; n < 14; n++)
+            {
+                char label[32];
+                sprintf(label, "Item %d", n);
+                if (ImGui::Selectable(label)) {}
+                //if (ImGui::Button(label, ImVec2(-1,0))) {}
+                ImGui::NextColumn();
+            }
+            ImGui::Columns(1);
+            ImGui::Separator();
+
+            ImGui::Text("With border:");
+            ImGui::Columns(4, "mycolumns"); // 4-ways, with border
             ImGui::Separator();
             ImGui::Text("ID"); ImGui::NextColumn();
             ImGui::Text("Name"); ImGui::NextColumn();
@@ -1807,12 +1854,12 @@ static void ShowExampleAppConstrainedResize(bool* p_open)
     };
 
     static int type = 0;
-    if (type == 0) ImGui::SetNextWindowSizeConstraint(ImVec2(-1, 0),    ImVec2(-1, FLT_MAX));      // Vertical only
-    if (type == 1) ImGui::SetNextWindowSizeConstraint(ImVec2(0, -1),    ImVec2(FLT_MAX, -1));      // Horizontal only
-    if (type == 2) ImGui::SetNextWindowSizeConstraint(ImVec2(100, 100), ImVec2(FLT_MAX, FLT_MAX)); // Width > 100, Height > 100
-    if (type == 3) ImGui::SetNextWindowSizeConstraint(ImVec2(300, 0),   ImVec2(400, FLT_MAX));     // Width 300-400
-    if (type == 4) ImGui::SetNextWindowSizeConstraint(ImVec2(0, 0),     ImVec2(FLT_MAX, FLT_MAX), CustomConstraints::Square);          // Always Square
-    if (type == 5) ImGui::SetNextWindowSizeConstraint(ImVec2(0, 0),     ImVec2(FLT_MAX, FLT_MAX), CustomConstraints::Step, (void*)100);// Fixed Step
+    if (type == 0) ImGui::SetNextWindowSizeConstraints(ImVec2(-1, 0),    ImVec2(-1, FLT_MAX));      // Vertical only
+    if (type == 1) ImGui::SetNextWindowSizeConstraints(ImVec2(0, -1),    ImVec2(FLT_MAX, -1));      // Horizontal only
+    if (type == 2) ImGui::SetNextWindowSizeConstraints(ImVec2(100, 100), ImVec2(FLT_MAX, FLT_MAX)); // Width > 100, Height > 100
+    if (type == 3) ImGui::SetNextWindowSizeConstraints(ImVec2(300, 0),   ImVec2(400, FLT_MAX));     // Width 300-400
+    if (type == 4) ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0),     ImVec2(FLT_MAX, FLT_MAX), CustomConstraints::Square);          // Always Square
+    if (type == 5) ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0),     ImVec2(FLT_MAX, FLT_MAX), CustomConstraints::Step, (void*)100);// Fixed Step
 
     if (ImGui::Begin("Example: Constrained Resize", p_open))
     {
