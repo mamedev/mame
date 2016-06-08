@@ -81,7 +81,7 @@ public:
 	osd_file::error open_next(emu_file &file, const char *extension);
 
 	// render a frame
-	void frame_update(bool debug = false);
+	void frame_update(bool from_debugger = false);
 
 	// current speed helpers
 	std::string speed_text();

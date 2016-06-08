@@ -203,7 +203,7 @@ void video_manager::set_frameskip(int frameskip)
 //  operations
 //-------------------------------------------------
 
-void video_manager::frame_update(bool debug)
+void video_manager::frame_update(bool from_debugger)
 {
 	// only render sound and video if we're in the running phase
 	int phase = machine().phase();
@@ -226,34 +226,36 @@ void video_manager::frame_update(bool debug)
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();
-	if (!debug && !skipped_it && effective_throttle())
+	if (!from_debugger && !skipped_it && effective_throttle())
 		update_throttle(current_time);
 
 	// ask the OSD to update
 	g_profiler.start(PROFILER_BLIT);
-	machine().osd().update(!debug && skipped_it);
+	machine().osd().update(!from_debugger && skipped_it);
 	g_profiler.stop();
 
 	emulator_info::periodic_check();
 
 	// perform tasks for this frame
-	if (!debug)
+	if (!from_debugger)
 		machine().call_notifiers(MACHINE_NOTIFY_FRAME);
 
 	// update frameskipping
-	if (!debug)
+	if (!from_debugger)
 		update_frameskip();
 
 	// update speed computations
-	if (!debug && !skipped_it)
+	if (!from_debugger && !skipped_it)
 		recompute_speed(current_time);
 
 	// call the end-of-frame callback
 	if (phase == MACHINE_PHASE_RUNNING)
 	{
 		// reset partial updates if we're paused or if the debugger is active
-		screen_device *screen = machine().first_screen();
-		if (screen != nullptr && (machine().paused() || debug || machine().debugger().within_instruction_hook()))
+		screen_device *const screen = machine().first_screen();
+		bool const debugger_enabled = machine().debug_flags & DEBUG_FLAG_ENABLED;
+		bool const within_instruction_hook = debugger_enabled && machine().debugger().within_instruction_hook();
+		if (screen && (machine().paused() || from_debugger || within_instruction_hook))
 			screen->reset_partial_updates();
 	}
 }
