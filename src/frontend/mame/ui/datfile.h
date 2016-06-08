@@ -71,7 +71,7 @@ private:
 	void init_messinfo();
 	void init_command();
 	void init_sysinfo();
-	void init_storyinfo();
+	void init_story();
 	void init_gameinit();
 
 	// file open/close/seek

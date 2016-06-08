@@ -108,7 +108,7 @@ menu_confirm_save_as::~menu_confirm_save_as()
 void menu_confirm_save_as::populate()
 {
 	item_append(_("File Already Exists - Override?"), nullptr, FLAG_DISABLE, nullptr);
-	item_append(MENU_SEPARATOR_ITEM, nullptr, FLAG_DISABLE, nullptr);
+	item_append(menu_item_type::SEPARATOR);
 	item_append(_("No"), nullptr, 0, ITEMREF_NO);
 	item_append(_("Yes"), nullptr, 0, ITEMREF_YES);
 }

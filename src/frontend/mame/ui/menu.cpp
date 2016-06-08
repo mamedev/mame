@@ -37,12 +37,7 @@ namespace ui {
 #define UI_MENU_POOL_SIZE  65536
 #define MAX_ICONS_RENDER   40
 
-struct arts_info
-{
-	const char *title, *path;
-};
-
-static const arts_info arts_info[] =
+static std::vector<std::pair<const char *, const char *>> arts_info =
 {
 	{ __("Snapshots"), OPTION_SNAPSHOT_DIRECTORY },
 	{ __("Cabinets"), OPTION_CABINETS_PATH },
@@ -61,7 +56,6 @@ static const arts_info arts_info[] =
 	{ __("Select"), OPTION_SELECT_PATH },
 	{ __("Marquees"), OPTION_MARQUEES_PATH },
 	{ __("Covers"), OPTION_COVER_PATH },
-	{ nullptr }
 };
 
 static const char *hover_msg[] = {
@@ -90,10 +84,10 @@ std::unique_ptr<bitmap_argb32> menu::snapx_bitmap;
 std::unique_ptr<bitmap_argb32> menu::no_avail_bitmap;
 std::unique_ptr<bitmap_argb32> menu::star_bitmap;
 std::unique_ptr<bitmap_argb32> menu::bgrnd_bitmap;
-bitmap_argb32 *menu::icons_bitmap[MAX_ICONS_RENDER];
+std::vector<std::unique_ptr<bitmap_argb32>> menu::icons_bitmap;
 std::unique_ptr<bitmap_rgb32> menu::hilight_main_bitmap;
-bitmap_argb32 *menu::toolbar_bitmap[UI_TOOLBAR_BUTTONS];
-bitmap_argb32 *menu::sw_toolbar_bitmap[UI_TOOLBAR_BUTTONS];
+std::vector<std::shared_ptr<bitmap_argb32>> menu::toolbar_bitmap;
+std::vector<std::shared_ptr<bitmap_argb32>> menu::sw_toolbar_bitmap;
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -106,7 +100,7 @@ bitmap_argb32 *menu::sw_toolbar_bitmap[UI_TOOLBAR_BUTTONS];
 
 inline bool is_selectable(menu_item const &item)
 {
-	return ((item.flags & (menu::FLAG_MULTILINE | menu::FLAG_DISABLE)) == 0 && strcmp(item.text, MENU_SEPARATOR_ITEM) != 0);
+	return ((item.flags & (menu::FLAG_MULTILINE | menu::FLAG_DISABLE)) == 0 && item.type != menu_item_type::SEPARATOR);
 }
 
 
@@ -322,7 +316,7 @@ void menu::item_append(menu_item item)
 void menu::item_append(menu_item_type type)
 {
 	if (type == menu_item_type::SEPARATOR)
-		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr, menu_item_type::SEPARATOR);
 }
 
 //-------------------------------------------------
@@ -725,7 +719,7 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 			}
 
 			// if we're just a divider, draw a line
-			else if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
+			else if (pitem.type == menu_item_type::SEPARATOR)
 				container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// if we don't have a subitem, just draw the string centered
@@ -1409,7 +1403,7 @@ void menu::init_ui(running_machine &machine, ui_options &mopt)
 	// allocate icons
 	for (int i = 0; i < MAX_ICONS_RENDER; i++)
 	{
-		icons_bitmap[i] = auto_alloc(machine, bitmap_argb32);
+		icons_bitmap.emplace_back(std::make_unique<bitmap_argb32>());
 		icons_texture[i] = mrender.texture_alloc();
 	}
 
@@ -1436,28 +1430,28 @@ void menu::init_ui(running_machine &machine, ui_options &mopt)
 	// create a texture for toolbar
 	for (int x = 0; x < UI_TOOLBAR_BUTTONS; ++x)
 	{
-		toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32(32, 32));
-		sw_toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32(32, 32));
+		toolbar_bitmap.emplace_back(std::make_shared<bitmap_argb32>(32, 32));
+		sw_toolbar_bitmap.emplace_back(std::make_shared<bitmap_argb32>(32, 32));
 		toolbar_texture[x] = mrender.texture_alloc();
 		sw_toolbar_texture[x] = mrender.texture_alloc();
-		UINT32 *texture_dst = &toolbar_bitmap[x]->pix32(0);
+		UINT32 *texture_dst = &toolbar_bitmap.back()->pix32(0);
 		memcpy(texture_dst, toolbar_bitmap_bmp[x], 32 * 32 * sizeof(UINT32));
-		if (toolbar_bitmap[x]->valid())
-			toolbar_texture[x]->set_bitmap(*toolbar_bitmap[x], toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
+		if (toolbar_bitmap.back()->valid())
+			toolbar_texture[x]->set_bitmap(*toolbar_bitmap.back(), toolbar_bitmap.back()->cliprect(), TEXFORMAT_ARGB32);
 		else
-			toolbar_bitmap[x]->reset();
+			toolbar_bitmap.back()->reset();
 
 		if (x == 0 || x == 2)
 		{
 			texture_dst = &sw_toolbar_bitmap[x]->pix32(0);
 			memcpy(texture_dst, toolbar_bitmap_bmp[x], 32 * 32 * sizeof(UINT32));
-			if (sw_toolbar_bitmap[x]->valid())
-				sw_toolbar_texture[x]->set_bitmap(*sw_toolbar_bitmap[x], sw_toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
+			if (sw_toolbar_bitmap.back()->valid())
+				sw_toolbar_texture[x]->set_bitmap(*sw_toolbar_bitmap.back(), sw_toolbar_bitmap.back()->cliprect(), TEXFORMAT_ARGB32);
 			else
-				sw_toolbar_bitmap[x]->reset();
+				sw_toolbar_bitmap.back()->reset();
 		}
 		else
-			sw_toolbar_bitmap[x]->reset();
+			sw_toolbar_bitmap.back()->reset();
 
 	}
 }
@@ -1610,9 +1604,10 @@ void menu::draw_select_game(UINT32 flags)
 				hover = HOVER_ARROW_DOWN;
 		}
 		// if we're just a divider, draw a line
-		else if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
+		else if (pitem.type == menu_item_type::SEPARATOR)
 			container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height,
 				UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
 		// draw the item centered
 		else if (pitem.subtext == nullptr)
 		{
@@ -1686,7 +1681,7 @@ void menu::draw_select_game(UINT32 flags)
 			highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
 		}
 
-		if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
+		if (pitem.type == menu_item_type::SEPARATOR)
 			container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
 				UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		else
@@ -1731,21 +1726,21 @@ void menu::draw_select_game(UINT32 flags)
 void menu::get_title_search(std::string &snaptext, std::string &searchstr)
 {
 	// get arts title text
-	snaptext.assign(_(arts_info[ui_globals::curimage_view].title));
+	snaptext.assign(_(arts_info[ui_globals::curimage_view].first));
 
 	// get search path
 	std::string addpath;
 	if (ui_globals::curimage_view == SNAPSHOT_VIEW)
 	{
 		emu_options moptions;
-		searchstr = machine().options().value(arts_info[ui_globals::curimage_view].path);
-		addpath = moptions.value(arts_info[ui_globals::curimage_view].path);
+		searchstr = machine().options().value(arts_info[ui_globals::curimage_view].second);
+		addpath = moptions.value(arts_info[ui_globals::curimage_view].second);
 	}
 	else
 	{
 		ui_options moptions;
-		searchstr = ui().options().value(arts_info[ui_globals::curimage_view].path);
-		addpath = moptions.value(arts_info[ui_globals::curimage_view].path);
+		searchstr = ui().options().value(arts_info[ui_globals::curimage_view].second);
+		addpath = moptions.value(arts_info[ui_globals::curimage_view].second);
 	}
 
 	std::string tmp(searchstr);
@@ -2266,7 +2261,7 @@ std::string menu::arts_render_common(float origx1, float origy1, float origx2, f
 	// apply title to right panel
 	for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
 	{
-		ui().draw_text_full(container, _(arts_info[x].title), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
+		ui().draw_text_full(container, _(arts_info[x].first), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
 			WRAP_TRUNCATE, DRAW_NONE, rgb_t::white, rgb_t::black, &txt_lenght, nullptr);
 		txt_lenght += 0.01f;
 		title_size = MAX(txt_lenght, title_size);
@@ -2320,16 +2315,11 @@ void menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software)
 	y2 -= UI_BOX_TB_BORDER;
 
 	render_texture **t_texture = (software) ? sw_toolbar_texture : toolbar_texture;
-	bitmap_argb32 **t_bitmap = (software) ? sw_toolbar_bitmap : toolbar_bitmap;
+	auto t_bitmap = (software) ? sw_toolbar_bitmap : toolbar_bitmap;
 
 	int m_valid = 0;
-	for (int x = 0; x < UI_TOOLBAR_BUTTONS; ++x)
-	{
-		if (t_bitmap[x]->valid())
-		{
-			m_valid++;
-		}
-	}
+	for (auto & e : t_bitmap)
+		if (e->valid()) m_valid++;
 
 	float space_x = (y2 - y1) * container->manager().ui_aspect();
 	float total = (m_valid * space_x) + ((m_valid - 1) * 0.001f);
@@ -2337,7 +2327,6 @@ void menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software)
 	x2 = x1 + space_x;
 
 	for (int z = 0; z < UI_TOOLBAR_BUTTONS; ++z)
-	{
 		if (t_bitmap[z]->valid())
 		{
 			rgb_t color(0xEFEFEFEF);
@@ -2353,7 +2342,6 @@ void menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software)
 			x1 += space_x + ((z < UI_TOOLBAR_BUTTONS - 1) ? 0.001f : 0.0f);
 			x2 = x1 + space_x;
 		}
-	}
 }
 
 
@@ -2390,11 +2378,11 @@ void menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float ori
 		int panel_height_pixel = panel_height * screen_height;
 
 		// Calculate resize ratios for resizing
-		float ratioW = (float)panel_width_pixel / tmp_bitmap->width();
-		float ratioH = (float)panel_height_pixel / tmp_bitmap->height();
-		float ratioI = (float)tmp_bitmap->height() / tmp_bitmap->width();
-		int dest_xPixel = tmp_bitmap->width();
-		int dest_yPixel = tmp_bitmap->height();
+		auto ratioW = (float)panel_width_pixel / tmp_bitmap->width();
+		auto ratioH = (float)panel_height_pixel / tmp_bitmap->height();
+		auto ratioI = (float)tmp_bitmap->height() / tmp_bitmap->width();
+		auto dest_xPixel = tmp_bitmap->width();
+		auto dest_yPixel = tmp_bitmap->height();
 
 		// force 4:3 ratio min
 		if (ui().options().forced_4x3_snapshot() && ratioI < 0.75f && ui_globals::curimage_view == SNAPSHOT_VIEW)
@@ -2451,9 +2439,9 @@ void menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float ori
 
 void menu::draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title_size)
 {
-	float line_height = ui().get_line_height();
-	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
-	float gutter_width = lr_arrow_width * 1.3f;
+	auto line_height = ui().get_line_height();
+	auto lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
+	auto gutter_width = lr_arrow_width * 1.3f;
 
 	// set left-right arrows dimension
 	float ar_x0 = 0.5f * (origx2 + origx1) + 0.5f * title_size + gutter_width - lr_arrow_width;
@@ -2504,9 +2492,9 @@ void menu::draw_common_arrow(float origx1, float origy1, float origx2, float ori
 void menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 {
 	static const game_driver *olddriver[MAX_ICONS_RENDER] = { nullptr };
-	float x1 = x0 + ui().get_line_height() * container->manager().ui_aspect(container);
-	float y1 = y0 + ui().get_line_height();
-	const game_driver *driver = (const game_driver *)selectedref;
+	auto x1 = x0 + ui().get_line_height() * container->manager().ui_aspect(container);
+	auto y1 = y0 + ui().get_line_height();
+	auto driver = (const game_driver *)selectedref;
 
 	if (olddriver[linenum] != driver || ui_globals::redraw_icon)
 	{
@@ -2516,7 +2504,7 @@ void menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 		bool cloneof = strcmp(driver->parent, "0");
 		if (cloneof)
 		{
-			int cx = driver_list::find(driver->parent);
+			auto cx = driver_list::find(driver->parent);
 			if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 				cloneof = false;
 		}
@@ -2545,8 +2533,8 @@ void menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 		{
 			float panel_width = x1 - x0;
 			float panel_height = y1 - y0;
-			int screen_width = machine().render().ui_target().width();
-			int screen_height = machine().render().ui_target().height();
+			auto screen_width = machine().render().ui_target().width();
+			auto screen_height = machine().render().ui_target().height();
 
 			if (machine().render().ui_target().orientation() & ORIENTATION_SWAP_XY)
 				std::swap(screen_height, screen_width);
@@ -2555,10 +2543,10 @@ void menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 			int panel_height_pixel = panel_height * screen_height;
 
 			// Calculate resize ratios for resizing
-			float ratioW = (float)panel_width_pixel / tmp->width();
-			float ratioH = (float)panel_height_pixel / tmp->height();
-			int dest_xPixel = tmp->width();
-			int dest_yPixel = tmp->height();
+			auto ratioW = (float)panel_width_pixel / tmp->width();
+			auto ratioH = (float)panel_height_pixel / tmp->height();
+			auto dest_xPixel = tmp->width();
+			auto dest_yPixel = tmp->height();
 
 			if (ratioW < 1 || ratioH < 1)
 			{
@@ -2629,24 +2617,22 @@ void menu::info_arrow(int ub, float origx1, float origx2, float oy1, float line_
 
 void menu::draw_palette_menu()
 {
-	float line_height = ui().get_line_height();
-	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
-	float ud_arrow_width = line_height * machine().render().ui_aspect();
-	float gutter_width = lr_arrow_width * 1.3f;
+	auto line_height = ui().get_line_height();
+	auto lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
+	auto ud_arrow_width = line_height * machine().render().ui_aspect();
+	auto gutter_width = lr_arrow_width * 1.3f;
 	int itemnum, linenum;
 
 	if (ui().options().use_background_image() && &machine().system() == &GAME_NAME(___empty) && bgrnd_bitmap->valid())
 		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t::white, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	// compute the width and height of the full menu
-	float visible_width = 0;
-	float visible_main_menu_height = 0;
-	for (itemnum = 0; itemnum < item.size(); itemnum++)
+	auto visible_width = 0.0f;
+	auto visible_main_menu_height = 0.0f;
+	for (auto & pitem : item)
 	{
-		const menu_item &pitem = item[itemnum];
-
 		// compute width of left hand side
-		float total_width = gutter_width + ui().get_string_width(pitem.text) + gutter_width;
+		auto total_width = gutter_width + ui().get_string_width(pitem.text) + gutter_width;
 
 		// add in width of right hand side
 		if (pitem.subtext)
@@ -2661,7 +2647,7 @@ void menu::draw_palette_menu()
 	}
 
 	// account for extra space at the top and bottom
-	float visible_extra_menu_height = customtop + custombottom;
+	auto visible_extra_menu_height = customtop + custombottom;
 
 	// add a little bit of slop for rounding
 	visible_width += 0.01f;
@@ -2778,13 +2764,13 @@ void menu::draw_palette_menu()
 		}
 
 		// if we're just a divider, draw a line
-		else if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
+		else if (pitem.type == menu_item_type::SEPARATOR)
 			container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// if we don't have a subitem, just draw the string centered
 		else if (pitem.subtext == nullptr)
 			ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-			JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 		// otherwise, draw the item on the left and the subitem text on the right
 		else
@@ -2817,9 +2803,9 @@ void menu::draw_palette_menu()
 
 void menu::draw_dats_menu()
 {
-	float line_height = ui().get_line_height();
-	float ud_arrow_width = line_height * machine().render().ui_aspect();
-	float gutter_width = 0.52f * line_height * machine().render().ui_aspect();
+	auto line_height = ui().get_line_height();
+	auto ud_arrow_width = line_height * machine().render().ui_aspect();
+	auto gutter_width = 0.52f * line_height * machine().render().ui_aspect();
 	mouse_x = -1, mouse_y = -1;
 	float visible_width = 1.0f - 2.0f * UI_BOX_LR_BORDER;
 	float visible_left = (1.0f - visible_width) * 0.5f;
@@ -2938,7 +2924,7 @@ void menu::draw_dats_menu()
 		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && is_selectable(pitem))
 			hover = count;
 
-		if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
+		if (pitem.type == menu_item_type::SEPARATOR)
 			container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
 				UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		else
@@ -2973,7 +2959,7 @@ void menu::extra_text_draw_box(float origx1, float origx2, float origy, float ys
 {
 	float text_width, text_height;
 	float width, maxwidth;
-	float x1, y1, x2, y2, temp;
+	float x1, y1, x2, y2;
 
 	// get the size of the text
 	ui().draw_text_full(container,text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD,
@@ -2988,11 +2974,7 @@ void menu::extra_text_draw_box(float origx1, float origx2, float origy, float ys
 	y2 = origy + (UI_BOX_TB_BORDER * direction);
 
 	if (y1 > y2)
-	{
-		temp = y1;
-		y1 = y2;
-		y2 = temp;
-	}
+		std::swap(y1, y2);
 
 	// draw a box
 	ui().draw_outlined_box(container,x1, y1, x2, y2, UI_BACKGROUND_COLOR);
@@ -3003,7 +2985,7 @@ void menu::extra_text_draw_box(float origx1, float origx2, float origy, float ys
 
 	// draw the text within it
 	ui().draw_text_full(container,text, x1, y1, text_width, JUSTIFY_LEFT, WRAP_WORD,
-						DRAW_NORMAL, rgb_t::white, rgb_t::black, nullptr, nullptr);
+		DRAW_NORMAL, rgb_t::white, rgb_t::black, nullptr, nullptr);
 }
 
 
@@ -3012,9 +2994,7 @@ void menu::extra_text_draw_box(float origx1, float origx2, float origy, float ys
 //  and footer text
 //-------------------------------------------------
 
-void menu::extra_text_render(float top, float bottom,
-	float origx1, float origy1, float origx2, float origy2,
-	const char *header, const char *footer)
+void menu::extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, const char *header, const char *footer)
 {
 	header = ((header != nullptr) && (header[0] != '\0')) ? header : nullptr;
 	footer = ((footer != nullptr) && (footer[0] != '\0')) ? footer : nullptr;

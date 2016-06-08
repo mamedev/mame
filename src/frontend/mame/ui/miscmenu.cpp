@@ -450,12 +450,7 @@ void menu_crosshair::populate()
 				int length = strlen(dir->name);
 
 				/* look for files ending in .png with a name not larger then 9 chars*/
-				if ((length > 4) && (length <= CROSSHAIR_PIC_NAME_LENGTH + 4) &&
-					dir->name[length - 4] == '.' &&
-					tolower((UINT8)dir->name[length - 3]) == 'p' &&
-					tolower((UINT8)dir->name[length - 2]) == 'n' &&
-					tolower((UINT8)dir->name[length - 1]) == 'g')
-
+				if ((length > 4) && (length <= CROSSHAIR_PIC_NAME_LENGTH + 4) && core_filename_ends_with(dir->name, ".png"))
 				{
 					/* remove .png from length */
 					length -= 4;

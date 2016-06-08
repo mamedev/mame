@@ -590,7 +590,7 @@ void menu_select_game::populate()
 		}
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, FLAG_UI, nullptr);
+	item_append(menu_item_type::SEPARATOR);
 
 	// add special items
 	if (menu::stack_has_special_main_menu())

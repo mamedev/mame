@@ -242,15 +242,10 @@ struct sw_custfltr
 };
 
 // GLOBAL FUNCTIONS
-
-// advanced search function
 int fuzzy_substring(std::string needle, std::string haystack);
-
-// trim carriage return
 char* chartrimcarriage(char str[]);
-
 const char* strensure(const char* s);
-
 int getprecisionchr(const char* s);
+std::vector<std::string> tokenize(const std::string &text, char sep);
 
 #endif /* __UI_UTILS_H__ */

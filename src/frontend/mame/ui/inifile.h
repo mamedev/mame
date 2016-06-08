@@ -55,7 +55,7 @@ private:
 	std::vector<std::pair<std::string, categoryindex>> ini_index;
 
 	// init category index
-	void init_category(std::string &filename);
+	void init_category(std::string filename);
 
 	// init file index
 	void directory_scan();
