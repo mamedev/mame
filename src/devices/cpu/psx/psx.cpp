@@ -13,7 +13,7 @@
  *   CXD8606BQ
  *   CXD8606CQ
  *
- * The PlayStation CPU is based on the LSI LR33300.
+ * The PlayStation CPU is based on the LSI CoreWare CW33300 library, this was available packaged as an LSI LR33300.
  *
  * Differences from the LR33300:
  *
@@ -24,6 +24,8 @@
  *
  *  If COP0 is disabled in user mode you get a coprocessor unusable exception, while
  *  the LR33300 is documented to generate a reserved instruction exception.
+ *
+ * MDEC is based on the LSI Jpeg CoreWare library (CW702?).
  *
  * Known limitations of the emulation:
  *
