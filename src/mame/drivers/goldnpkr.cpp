@@ -4902,7 +4902,8 @@ ROM_END
   
   Discrete sound need to be traced...
 
-  30x2-pins Edge connector.
+  30x2-pins Edge connector + 10-pin connector.
+
 
   *********** Edge connector (WIP) ************
 
