@@ -2,13 +2,9 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="psx" description="Sony Playstation CD-ROMs">
 
-<!-- redump.org US PS1 discs (1716 of 1719), based on 'Sony - PlayStation (20160515 00-54-32).dat'
+<!-- redump.org US PS1 discs (1719 of 1719), based on 'Sony - PlayStation (20160515 00-54-32).dat'
 
-These CHDs have been converted from redump.org disc images. The following redump.org NTSC-U images are currently missing from this software list:
-
-    Street Fighter Collection (USA) (Disc 1) (v1.0) [we miss the redump of Track 72, with CRC e0b15ee3]
-    Street Fighter Collection (USA) (Disc 1) (v1.1)
-    Street Fighter Collection (USA) (Disc 2) (v1.1)
+These CHDs have been converted from redump.org disc images. 
 
     (Madden NFL 96 (USA) (Beta))*
     (Twisted Metal 2 (USA) (Beta))*
@@ -17949,7 +17945,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<rom name="NHL Face Off '97 (USA).cue" size="88" crc="2f1615a1" sha1="7cd6addcd8157bc743426df063da2ad847b09679"/>
 		<rom name="NHL Face Off '97 (USA).bin" size="373250640" crc="76b98f42" sha1="9a0148f37e5dd6489205f75cbad9c30add98ff27"/>
 		-->
-		<description>NHL Face Off '97</description>
+		<description>NHL Face Off '97 (USA)</description>
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94550"/>
@@ -22618,79 +22614,176 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 
 	<software name="sfcoll">
 		<!-- Original images (Redump)
-		<rom name="street fighter collection (usa) (disc 1).cue" size="9707" crc="15bd13a9" sha1="cbd8190a9b9d0755d8a1abdd79a60078d51c3ec9" />
-		<rom name="street fighter collection (usa) (disc 1) (track 01).bin" size="54705168" crc="b366deb0" sha1="da079bc675c21502e43ef5599df5a7984b499f47" />
-		<rom name="street fighter collection (usa) (disc 1) (track 02).bin" size="13411104" crc="286e2469" sha1="d9b22da5e87dce6424fa1755bc2e716d918dbacc" />
-		<rom name="street fighter collection (usa) (disc 1) (track 03).bin" size="18999456" crc="f55b5bb4" sha1="2b63c56f1c26cf8c2a3c4fcd1c3d5a36e10e7390" />
-		<rom name="street fighter collection (usa) (disc 1) (track 04).bin" size="22842624" crc="df0d9c18" sha1="8ab7ee8f119634e074777b7f305f4917791f2830" />
-		<rom name="street fighter collection (usa) (disc 1) (track 05).bin" size="20191920" crc="adeb6f07" sha1="7aced627c64d8feced824a59bfa835bc34dbeba0" />
-		<rom name="street fighter collection (usa) (disc 1) (track 06).bin" size="21283248" crc="e4160536" sha1="4f9ae78781ae0dd008bd4760f1522426e33bc0a3" />
-		<rom name="street fighter collection (usa) (disc 1) (track 07).bin" size="20384784" crc="7d9d2178" sha1="ca0f2e87dd4c31b0b40d4669712857ab6e42947b" />
-		<rom name="street fighter collection (usa) (disc 1) (track 08).bin" size="13084176" crc="b783360c" sha1="7b19e6a8bccf9e64ea2e06a7a3a69ebc3791c2a8" />
-		<rom name="street fighter collection (usa) (disc 1) (track 09).bin" size="20241312" crc="a6a59798" sha1="faac5b0f0b67712f9c64919f7c6aadba2733ddcc" />
-		<rom name="street fighter collection (usa) (disc 1) (track 10).bin" size="20222496" crc="aef7e62a" sha1="211fb82ad2eaa93e56ce4b01e68899da3f436e12" />
-		<rom name="street fighter collection (usa) (disc 1) (track 11).bin" size="20812848" crc="46d5a57f" sha1="f10e8c405668af9456eae237ef24d6cc98b967ae" />
-		<rom name="street fighter collection (usa) (disc 1) (track 12).bin" size="15612576" crc="d053b686" sha1="99feacbc78ba8d244d0aa9e8e578c4649bdb2ecb" />
-		<rom name="street fighter collection (usa) (disc 1) (track 13).bin" size="24185616" crc="57b4445a" sha1="fa6eaf58b4df2ecd21bb11b6bdc75a417672074e" />
-		<rom name="street fighter collection (usa) (disc 1) (track 14).bin" size="14601216" crc="86c45372" sha1="35dcb73b5c25bc0c5108fcd340247a998b6d29d5" />
-		<rom name="street fighter collection (usa) (disc 1) (track 15).bin" size="20779920" crc="324330f1" sha1="146c3e73569c9ea6ebd75e63438786b67857c931" />
-		<rom name="street fighter collection (usa) (disc 1) (track 16).bin" size="14794080" crc="cdb744fc" sha1="a1df1ca0dfa55d347a32a04ae3ce992e6122783b" />
-		<rom name="street fighter collection (usa) (disc 1) (track 17).bin" size="15617280" crc="88273989" sha1="60683104c951fdec1e3c59e1cec82da1625dbc67" />
-		<rom name="street fighter collection (usa) (disc 1) (track 18).bin" size="14116704" crc="bbaeb962" sha1="6e8c103a1d8e724b2f453f73f0fb39ef0adb350c" />
-		<rom name="street fighter collection (usa) (disc 1) (track 19).bin" size="5618928" crc="e29aad19" sha1="40dca8d5cf7ca7eee1638d6cb3224d698eacceea" />
-		<rom name="street fighter collection (usa) (disc 1) (track 20).bin" size="5625984" crc="b6c26358" sha1="8d57bb594d9ddbfc82183d962196c48f062f373c" />
-		<rom name="street fighter collection (usa) (disc 1) (track 21).bin" size="5647152" crc="fdd6218a" sha1="3f262c1ecb19182c4b00869fa92be4670e3eb81f" />
-		<rom name="street fighter collection (usa) (disc 1) (track 22).bin" size="5647152" crc="297c1e79" sha1="66b4a431bb00f0334b34051d615bbb2e54947d4c" />
-		<rom name="street fighter collection (usa) (disc 1) (track 23).bin" size="5647152" crc="089f3516" sha1="8e93f429f4570063e6c83f49b4adadeca5e148fe" />
-		<rom name="street fighter collection (usa) (disc 1) (track 24).bin" size="5644800" crc="1675a709" sha1="07925332b4d6c6c10dcd281a688a637df1fc02db" />
-		<rom name="street fighter collection (usa) (disc 1) (track 25).bin" size="5647152" crc="18c47c1c" sha1="f275c63277ba07f06b0e0b0a6fceb8ddcfcfa674" />
-		<rom name="street fighter collection (usa) (disc 1) (track 26).bin" size="5647152" crc="5798f15d" sha1="53728bd64af7db595e20f3aa8f164672761f9593" />
-		<rom name="street fighter collection (usa) (disc 1) (track 27).bin" size="5644800" crc="2d9bfad9" sha1="01907be1ae7ec68be604a4ae711bc936f04b5c45" />
-		<rom name="street fighter collection (usa) (disc 1) (track 28).bin" size="5647152" crc="b565a7eb" sha1="8e0c12d9eeb41c985cfcb7a51a23f166a121c079" />
-		<rom name="street fighter collection (usa) (disc 1) (track 29).bin" size="5647152" crc="e0165238" sha1="97c238b894a9500381cbdbd1a77a3d7f6b2e5d43" />
-		<rom name="street fighter collection (usa) (disc 1) (track 30).bin" size="5647152" crc="43f3d3d0" sha1="de1245bcfec8e0bedf057271dca11c3bd7bb96e9" />
-		<rom name="street fighter collection (usa) (disc 1) (track 31).bin" size="5647152" crc="7b7c8ffb" sha1="c1b4690981e3e6dfcb4ee8fc4f9b2206c3de4681" />
-		<rom name="street fighter collection (usa) (disc 1) (track 32).bin" size="5647152" crc="6b129a34" sha1="1e72cc91338ad0aebc73d741a859c4e1763b4c02" />
-		<rom name="street fighter collection (usa) (disc 1) (track 33).bin" size="5647152" crc="3d2518ba" sha1="8eb9f2b43c1f16741aa552d335bbbe07ebfd20e7" />
-		<rom name="street fighter collection (usa) (disc 1) (track 34).bin" size="5647152" crc="782f73bf" sha1="4c3cf975ad7fa20ef0061d2a25539f9911a670cd" />
-		<rom name="street fighter collection (usa) (disc 1) (track 35).bin" size="5647152" crc="a5507367" sha1="d57b36e79264a8051b9f5da97de10ecd0d5bc73a" />
-		<rom name="street fighter collection (usa) (disc 1) (track 36).bin" size="1415904" crc="7c3d8845" sha1="57cdd1b6cd1ccf9cadbdbd198c6a21be2b3b8738" />
-		<rom name="street fighter collection (usa) (disc 1) (track 37).bin" size="1270080" crc="6a44f6dd" sha1="acfab5d61cca881f2837ca46a7b7e75f15f4fc52" />
-		<rom name="street fighter collection (usa) (disc 1) (track 38).bin" size="11738832" crc="e102da73" sha1="dd60f01402da47bd65351c12ecd0da46a9e2c492" />
-		<rom name="street fighter collection (usa) (disc 1) (track 39).bin" size="6364512" crc="c6b16ca3" sha1="9470e8029c244ed30234e20e3bcab11478c73ffe" />
-		<rom name="street fighter collection (usa) (disc 1) (track 40).bin" size="6296304" crc="0bed55e0" sha1="6a8939f9062c72ea2f59060ea7ec5c420f1afcab" />
-		<rom name="street fighter collection (usa) (disc 1) (track 41).bin" size="1411200" crc="a7fc7dec" sha1="67d4f43b9d6fe2a696194f2a156da8bafceb23b4" />
-		<rom name="street fighter collection (usa) (disc 1) (track 42).bin" size="5917632" crc="ac64fdec" sha1="f2a02535c08138c07e195d66cb2d67304e7abfb2" />
-		<rom name="street fighter collection (usa) (disc 1) (track 43).bin" size="4487616" crc="649b83d0" sha1="9fcc817179b7bfe50f5f1cd58834a1b57583a954" />
-		<rom name="street fighter collection (usa) (disc 1) (track 44).bin" size="5630688" crc="c885c313" sha1="b6dfd352f42066bacd922bb121ebdc8574f7bddc" />
-		<rom name="street fighter collection (usa) (disc 1) (track 45).bin" size="1194816" crc="2f3e3e65" sha1="d4311c6fba50ee1e295706a49a63212cfe705ed8" />
-		<rom name="street fighter collection (usa) (disc 1) (track 46).bin" size="4760448" crc="11d25bc0" sha1="eef2f926942d093587cc89c5e87af25502592d3c" />
-		<rom name="street fighter collection (usa) (disc 1) (track 47).bin" size="2998800" crc="ee6d6af8" sha1="96a78701191ec68aa9f5ddde22facfce1f376ee4" />
-		<rom name="street fighter collection (usa) (disc 1) (track 48).bin" size="10233552" crc="ae680269" sha1="c8f059fa77da1ee71cee4f343202d6a156893cc2" />
-		<rom name="street fighter collection (usa) (disc 1) (track 49).bin" size="8290800" crc="1bf614d3" sha1="5d5c11d30cbbe9f6fd608baeec026485c429e162" />
-		<rom name="street fighter collection (usa) (disc 1) (track 50).bin" size="4765152" crc="7e6a4ffd" sha1="5bd2a63c4a5b82ef1b84532aaabde496a421be4c" />
-		<rom name="street fighter collection (usa) (disc 1) (track 51).bin" size="6703200" crc="6e631c68" sha1="8c5de24f241359c2ba81e36b64f480a077d441b0" />
-		<rom name="street fighter collection (usa) (disc 1) (track 52).bin" size="6705552" crc="5db7abb7" sha1="8729950598d265fffe59a98744c4114311826b53" />
-		<rom name="street fighter collection (usa) (disc 1) (track 53).bin" size="8293152" crc="cd6e7648" sha1="9b3f87716f053021be7f5a52321fb4456962478d" />
-		<rom name="street fighter collection (usa) (disc 1) (track 54).bin" size="7411152" crc="68356031" sha1="6ed8c5c923aff6c40ef7bda5c9e89475b48b5901" />
-		<rom name="street fighter collection (usa) (disc 1) (track 55).bin" size="12173952" crc="792d80d8" sha1="0a9fb5db8a63f980d21c3f6e230c4b18bed884e9" />
-		<rom name="street fighter collection (usa) (disc 1) (track 56).bin" size="18096288" crc="65196dc2" sha1="b5faffaef0ab253a01edad11016179606dc74590" />
-		<rom name="street fighter collection (usa) (disc 1) (track 57).bin" size="6343344" crc="871ec341" sha1="7334aa0967ecf93936b4aaaee17a6b7a1a3ffaa7" />
-		<rom name="street fighter collection (usa) (disc 1) (track 58).bin" size="8041488" crc="1b26484c" sha1="a50e09b722871925e718caf483c12db0989bc697" />
-		<rom name="street fighter collection (usa) (disc 1) (track 59).bin" size="7989744" crc="dbd3fe6f" sha1="f353b725b215ec94402741ee80cfec528c1879dc" />
-		<rom name="street fighter collection (usa) (disc 1) (track 60).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
-		<rom name="street fighter collection (usa) (disc 1) (track 61).bin" size="9732576" crc="b3db1344" sha1="28c1cc22b11e20544b083d29d6b711ebae5e5878" />
-		<rom name="street fighter collection (usa) (disc 1) (track 62).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
-		<rom name="street fighter collection (usa) (disc 1) (track 63).bin" size="9191616" crc="381da497" sha1="6faee1e8df560a41ee281d69132c98a646a55408" />
-		<rom name="street fighter collection (usa) (disc 1) (track 64).bin" size="2450784" crc="2617087b" sha1="f5be17ca0ea1032da0451d2fe83b221cc86f3095" />
-		<rom name="street fighter collection (usa) (disc 1) (track 65).bin" size="10449936" crc="ee5cb1b8" sha1="65026b656b70d2a7098f4f32e8a19891a7c89d99" />
-		<rom name="street fighter collection (usa) (disc 1) (track 66).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
-		<rom name="street fighter collection (usa) (disc 1) (track 67).bin" size="12352704" crc="0e2adadf" sha1="519d9b11b6ee9a5180a417c6934c97eb416dfa43" />
-		<rom name="street fighter collection (usa) (disc 1) (track 68).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
-		<rom name="street fighter collection (usa) (disc 1) (track 69).bin" size="10120656" crc="5a34ece1" sha1="9fc04864669fe030f3326bdf43490822b7eee7e6" />
-		<rom name="street fighter collection (usa) (disc 1) (track 70).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
-		<rom name="street fighter collection (usa) (disc 1) (track 71).bin" size="9760800" crc="1b579db0" sha1="5b61d772a22d032e4abc385008e748c8e9939889" />
-		<rom name="street fighter collection (usa) (disc 1) (track 72).bin" size="43424976" crc="adaed2d3" sha1="ab4d1ecbc3cccc9a180566858f4f492a8360de5e" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1).cue" size="10206" crc="693e8d67" sha1="6fc5cda5bef5282c8e608f219dedc221fb99f0de" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 01).bin" size="54702816" crc="f1a74a1f" sha1="81ab560545f82c631dbd633a914b8cfa736913e6" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 02).bin" size="13411104" crc="286e2469" sha1="d9b22da5e87dce6424fa1755bc2e716d918dbacc" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 03).bin" size="18999456" crc="f55b5bb4" sha1="2b63c56f1c26cf8c2a3c4fcd1c3d5a36e10e7390" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 04).bin" size="22842624" crc="df0d9c18" sha1="8ab7ee8f119634e074777b7f305f4917791f2830" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 05).bin" size="20191920" crc="adeb6f07" sha1="7aced627c64d8feced824a59bfa835bc34dbeba0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 06).bin" size="21283248" crc="e4160536" sha1="4f9ae78781ae0dd008bd4760f1522426e33bc0a3" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 07).bin" size="20384784" crc="7d9d2178" sha1="ca0f2e87dd4c31b0b40d4669712857ab6e42947b" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 08).bin" size="13084176" crc="b783360c" sha1="7b19e6a8bccf9e64ea2e06a7a3a69ebc3791c2a8" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 09).bin" size="20241312" crc="a6a59798" sha1="faac5b0f0b67712f9c64919f7c6aadba2733ddcc" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 10).bin" size="20222496" crc="aef7e62a" sha1="211fb82ad2eaa93e56ce4b01e68899da3f436e12" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 11).bin" size="20812848" crc="46d5a57f" sha1="f10e8c405668af9456eae237ef24d6cc98b967ae" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 12).bin" size="15612576" crc="d053b686" sha1="99feacbc78ba8d244d0aa9e8e578c4649bdb2ecb" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 13).bin" size="24185616" crc="57b4445a" sha1="fa6eaf58b4df2ecd21bb11b6bdc75a417672074e" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 14).bin" size="14601216" crc="86c45372" sha1="35dcb73b5c25bc0c5108fcd340247a998b6d29d5" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 15).bin" size="20779920" crc="324330f1" sha1="146c3e73569c9ea6ebd75e63438786b67857c931" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 16).bin" size="14794080" crc="cdb744fc" sha1="a1df1ca0dfa55d347a32a04ae3ce992e6122783b" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 17).bin" size="15617280" crc="88273989" sha1="60683104c951fdec1e3c59e1cec82da1625dbc67" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 18).bin" size="14116704" crc="bbaeb962" sha1="6e8c103a1d8e724b2f453f73f0fb39ef0adb350c" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 19).bin" size="5618928" crc="e29aad19" sha1="40dca8d5cf7ca7eee1638d6cb3224d698eacceea" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 20).bin" size="5625984" crc="b6c26358" sha1="8d57bb594d9ddbfc82183d962196c48f062f373c" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 21).bin" size="5647152" crc="fdd6218a" sha1="3f262c1ecb19182c4b00869fa92be4670e3eb81f" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 22).bin" size="5647152" crc="297c1e79" sha1="66b4a431bb00f0334b34051d615bbb2e54947d4c" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 23).bin" size="5647152" crc="089f3516" sha1="8e93f429f4570063e6c83f49b4adadeca5e148fe" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 24).bin" size="5644800" crc="1675a709" sha1="07925332b4d6c6c10dcd281a688a637df1fc02db" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 25).bin" size="5647152" crc="18c47c1c" sha1="f275c63277ba07f06b0e0b0a6fceb8ddcfcfa674" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 26).bin" size="5647152" crc="5798f15d" sha1="53728bd64af7db595e20f3aa8f164672761f9593" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 27).bin" size="5644800" crc="2d9bfad9" sha1="01907be1ae7ec68be604a4ae711bc936f04b5c45" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 28).bin" size="5647152" crc="b565a7eb" sha1="8e0c12d9eeb41c985cfcb7a51a23f166a121c079" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 29).bin" size="5647152" crc="e0165238" sha1="97c238b894a9500381cbdbd1a77a3d7f6b2e5d43" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 30).bin" size="5647152" crc="43f3d3d0" sha1="de1245bcfec8e0bedf057271dca11c3bd7bb96e9" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 31).bin" size="5647152" crc="7b7c8ffb" sha1="c1b4690981e3e6dfcb4ee8fc4f9b2206c3de4681" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 32).bin" size="5647152" crc="6b129a34" sha1="1e72cc91338ad0aebc73d741a859c4e1763b4c02" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 33).bin" size="5647152" crc="3d2518ba" sha1="8eb9f2b43c1f16741aa552d335bbbe07ebfd20e7" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 34).bin" size="5647152" crc="782f73bf" sha1="4c3cf975ad7fa20ef0061d2a25539f9911a670cd" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 35).bin" size="5647152" crc="a5507367" sha1="d57b36e79264a8051b9f5da97de10ecd0d5bc73a" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 36).bin" size="1415904" crc="7c3d8845" sha1="57cdd1b6cd1ccf9cadbdbd198c6a21be2b3b8738" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 37).bin" size="1270080" crc="6a44f6dd" sha1="acfab5d61cca881f2837ca46a7b7e75f15f4fc52" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 38).bin" size="11738832" crc="e102da73" sha1="dd60f01402da47bd65351c12ecd0da46a9e2c492" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 39).bin" size="6364512" crc="c6b16ca3" sha1="9470e8029c244ed30234e20e3bcab11478c73ffe" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 40).bin" size="6296304" crc="0bed55e0" sha1="6a8939f9062c72ea2f59060ea7ec5c420f1afcab" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 41).bin" size="1411200" crc="a7fc7dec" sha1="67d4f43b9d6fe2a696194f2a156da8bafceb23b4" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 42).bin" size="5917632" crc="ac64fdec" sha1="f2a02535c08138c07e195d66cb2d67304e7abfb2" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 43).bin" size="4487616" crc="649b83d0" sha1="9fcc817179b7bfe50f5f1cd58834a1b57583a954" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 44).bin" size="5630688" crc="c885c313" sha1="b6dfd352f42066bacd922bb121ebdc8574f7bddc" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 45).bin" size="1194816" crc="2f3e3e65" sha1="d4311c6fba50ee1e295706a49a63212cfe705ed8" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 46).bin" size="4760448" crc="11d25bc0" sha1="eef2f926942d093587cc89c5e87af25502592d3c" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 47).bin" size="2998800" crc="ee6d6af8" sha1="96a78701191ec68aa9f5ddde22facfce1f376ee4" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 48).bin" size="10233552" crc="ae680269" sha1="c8f059fa77da1ee71cee4f343202d6a156893cc2" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 49).bin" size="8290800" crc="1bf614d3" sha1="5d5c11d30cbbe9f6fd608baeec026485c429e162" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 50).bin" size="4765152" crc="7e6a4ffd" sha1="5bd2a63c4a5b82ef1b84532aaabde496a421be4c" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 51).bin" size="6703200" crc="6e631c68" sha1="8c5de24f241359c2ba81e36b64f480a077d441b0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 52).bin" size="6705552" crc="5db7abb7" sha1="8729950598d265fffe59a98744c4114311826b53" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 53).bin" size="8293152" crc="cd6e7648" sha1="9b3f87716f053021be7f5a52321fb4456962478d" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 54).bin" size="7411152" crc="68356031" sha1="6ed8c5c923aff6c40ef7bda5c9e89475b48b5901" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 55).bin" size="12173952" crc="792d80d8" sha1="0a9fb5db8a63f980d21c3f6e230c4b18bed884e9" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 56).bin" size="18096288" crc="65196dc2" sha1="b5faffaef0ab253a01edad11016179606dc74590" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 57).bin" size="6343344" crc="871ec341" sha1="7334aa0967ecf93936b4aaaee17a6b7a1a3ffaa7" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 58).bin" size="8041488" crc="1b26484c" sha1="a50e09b722871925e718caf483c12db0989bc697" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 59).bin" size="7989744" crc="dbd3fe6f" sha1="f353b725b215ec94402741ee80cfec528c1879dc" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 60).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 61).bin" size="9732576" crc="b3db1344" sha1="28c1cc22b11e20544b083d29d6b711ebae5e5878" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 62).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 63).bin" size="9191616" crc="381da497" sha1="6faee1e8df560a41ee281d69132c98a646a55408" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 64).bin" size="2450784" crc="2617087b" sha1="f5be17ca0ea1032da0451d2fe83b221cc86f3095" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 65).bin" size="10449936" crc="ee5cb1b8" sha1="65026b656b70d2a7098f4f32e8a19891a7c89d99" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 66).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 67).bin" size="12352704" crc="0e2adadf" sha1="519d9b11b6ee9a5180a417c6934c97eb416dfa43" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 68).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 69).bin" size="10120656" crc="5a34ece1" sha1="9fc04864669fe030f3326bdf43490822b7eee7e6" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 70).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 71).bin" size="9760800" crc="1b579db0" sha1="5b61d772a22d032e4abc385008e748c8e9939889" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.1) (track 72).bin" size="37396800" crc="7976083e" sha1="d9f92af296360772e62caa4cb276de3fa74f5538" />
+
+		<rom name="street fighter collection (usa) (disc 2) (v1.1).cue" size="269" crc="2cd5ad12" sha1="88bfed66411c080174af64d3702410a7e3c66690" />
+		<rom name="street fighter collection (usa) (disc 2) (v1.1) (track 1).bin" size="590227344" crc="29696e36" sha1="e65d05cbb2b65e67383ba4797f06a6fd32f7ff1f" />
+		<rom name="street fighter collection (usa) (disc 2) (v1.1) (track 2).bin" size="43248576" crc="f7f4ec2d" sha1="5504d0e184167d9b13be64b079005c6eb7b3b5bd" />
+		-->
+		<description>Street Fighter Collection (USA, v1.1)</description>
+		<year>1997</year>
+		<publisher>Capcom Entertainment</publisher>
+		<info name="serial" value="SLUS-00423, SLUS-00584"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom1" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="street fighter collection (usa) (disc 1) (v1.1)"  sha1="9eaab12a032b7e9d6a05f342752f1de8fe4d27b3"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="street fighter collection (usa) (disc 2) (v1.1)"  sha1="b42293238b6b2dd5ebc9dc990bdc08ab6e6ec8c4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sfcolla" cloneof="sfcoll">	 <!-- Tracks 01 & 72 differ from v1.1! -->
+		<!-- Original images (Redump)
+		<rom name="street fighter collection (usa) (disc 1) (v1.0).cue" size="10211" crc="2be12124" sha1="6b70efeade397d03ffe0482da1a109385887832f" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 01).bin" size="54705168" crc="b366deb0" sha1="da079bc675c21502e43ef5599df5a7984b499f47" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 02).bin" size="13411104" crc="286e2469" sha1="d9b22da5e87dce6424fa1755bc2e716d918dbacc" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 03).bin" size="18999456" crc="f55b5bb4" sha1="2b63c56f1c26cf8c2a3c4fcd1c3d5a36e10e7390" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 04).bin" size="22842624" crc="df0d9c18" sha1="8ab7ee8f119634e074777b7f305f4917791f2830" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 05).bin" size="20191920" crc="adeb6f07" sha1="7aced627c64d8feced824a59bfa835bc34dbeba0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 06).bin" size="21283248" crc="e4160536" sha1="4f9ae78781ae0dd008bd4760f1522426e33bc0a3" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 07).bin" size="20384784" crc="7d9d2178" sha1="ca0f2e87dd4c31b0b40d4669712857ab6e42947b" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 08).bin" size="13084176" crc="b783360c" sha1="7b19e6a8bccf9e64ea2e06a7a3a69ebc3791c2a8" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 09).bin" size="20241312" crc="a6a59798" sha1="faac5b0f0b67712f9c64919f7c6aadba2733ddcc" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 10).bin" size="20222496" crc="aef7e62a" sha1="211fb82ad2eaa93e56ce4b01e68899da3f436e12" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 11).bin" size="20812848" crc="46d5a57f" sha1="f10e8c405668af9456eae237ef24d6cc98b967ae" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 12).bin" size="15612576" crc="d053b686" sha1="99feacbc78ba8d244d0aa9e8e578c4649bdb2ecb" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 13).bin" size="24185616" crc="57b4445a" sha1="fa6eaf58b4df2ecd21bb11b6bdc75a417672074e" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 14).bin" size="14601216" crc="86c45372" sha1="35dcb73b5c25bc0c5108fcd340247a998b6d29d5" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 15).bin" size="20779920" crc="324330f1" sha1="146c3e73569c9ea6ebd75e63438786b67857c931" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 16).bin" size="14794080" crc="cdb744fc" sha1="a1df1ca0dfa55d347a32a04ae3ce992e6122783b" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 17).bin" size="15617280" crc="88273989" sha1="60683104c951fdec1e3c59e1cec82da1625dbc67" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 18).bin" size="14116704" crc="bbaeb962" sha1="6e8c103a1d8e724b2f453f73f0fb39ef0adb350c" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 19).bin" size="5618928" crc="e29aad19" sha1="40dca8d5cf7ca7eee1638d6cb3224d698eacceea" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 20).bin" size="5625984" crc="b6c26358" sha1="8d57bb594d9ddbfc82183d962196c48f062f373c" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 21).bin" size="5647152" crc="fdd6218a" sha1="3f262c1ecb19182c4b00869fa92be4670e3eb81f" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 22).bin" size="5647152" crc="297c1e79" sha1="66b4a431bb00f0334b34051d615bbb2e54947d4c" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 23).bin" size="5647152" crc="089f3516" sha1="8e93f429f4570063e6c83f49b4adadeca5e148fe" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 24).bin" size="5644800" crc="1675a709" sha1="07925332b4d6c6c10dcd281a688a637df1fc02db" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 25).bin" size="5647152" crc="18c47c1c" sha1="f275c63277ba07f06b0e0b0a6fceb8ddcfcfa674" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 26).bin" size="5647152" crc="5798f15d" sha1="53728bd64af7db595e20f3aa8f164672761f9593" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 27).bin" size="5644800" crc="2d9bfad9" sha1="01907be1ae7ec68be604a4ae711bc936f04b5c45" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 28).bin" size="5647152" crc="b565a7eb" sha1="8e0c12d9eeb41c985cfcb7a51a23f166a121c079" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 29).bin" size="5647152" crc="e0165238" sha1="97c238b894a9500381cbdbd1a77a3d7f6b2e5d43" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 30).bin" size="5647152" crc="43f3d3d0" sha1="de1245bcfec8e0bedf057271dca11c3bd7bb96e9" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 31).bin" size="5647152" crc="7b7c8ffb" sha1="c1b4690981e3e6dfcb4ee8fc4f9b2206c3de4681" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 32).bin" size="5647152" crc="6b129a34" sha1="1e72cc91338ad0aebc73d741a859c4e1763b4c02" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 33).bin" size="5647152" crc="3d2518ba" sha1="8eb9f2b43c1f16741aa552d335bbbe07ebfd20e7" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 34).bin" size="5647152" crc="782f73bf" sha1="4c3cf975ad7fa20ef0061d2a25539f9911a670cd" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 35).bin" size="5647152" crc="a5507367" sha1="d57b36e79264a8051b9f5da97de10ecd0d5bc73a" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 36).bin" size="1415904" crc="7c3d8845" sha1="57cdd1b6cd1ccf9cadbdbd198c6a21be2b3b8738" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 37).bin" size="1270080" crc="6a44f6dd" sha1="acfab5d61cca881f2837ca46a7b7e75f15f4fc52" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 38).bin" size="11738832" crc="e102da73" sha1="dd60f01402da47bd65351c12ecd0da46a9e2c492" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 39).bin" size="6364512" crc="c6b16ca3" sha1="9470e8029c244ed30234e20e3bcab11478c73ffe" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 40).bin" size="6296304" crc="0bed55e0" sha1="6a8939f9062c72ea2f59060ea7ec5c420f1afcab" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 41).bin" size="1411200" crc="a7fc7dec" sha1="67d4f43b9d6fe2a696194f2a156da8bafceb23b4" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 42).bin" size="5917632" crc="ac64fdec" sha1="f2a02535c08138c07e195d66cb2d67304e7abfb2" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 43).bin" size="4487616" crc="649b83d0" sha1="9fcc817179b7bfe50f5f1cd58834a1b57583a954" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 44).bin" size="5630688" crc="c885c313" sha1="b6dfd352f42066bacd922bb121ebdc8574f7bddc" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 45).bin" size="1194816" crc="2f3e3e65" sha1="d4311c6fba50ee1e295706a49a63212cfe705ed8" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 46).bin" size="4760448" crc="11d25bc0" sha1="eef2f926942d093587cc89c5e87af25502592d3c" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 47).bin" size="2998800" crc="ee6d6af8" sha1="96a78701191ec68aa9f5ddde22facfce1f376ee4" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 48).bin" size="10233552" crc="ae680269" sha1="c8f059fa77da1ee71cee4f343202d6a156893cc2" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 49).bin" size="8290800" crc="1bf614d3" sha1="5d5c11d30cbbe9f6fd608baeec026485c429e162" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 50).bin" size="4765152" crc="7e6a4ffd" sha1="5bd2a63c4a5b82ef1b84532aaabde496a421be4c" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 51).bin" size="6703200" crc="6e631c68" sha1="8c5de24f241359c2ba81e36b64f480a077d441b0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 52).bin" size="6705552" crc="5db7abb7" sha1="8729950598d265fffe59a98744c4114311826b53" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 53).bin" size="8293152" crc="cd6e7648" sha1="9b3f87716f053021be7f5a52321fb4456962478d" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 54).bin" size="7411152" crc="68356031" sha1="6ed8c5c923aff6c40ef7bda5c9e89475b48b5901" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 55).bin" size="12173952" crc="792d80d8" sha1="0a9fb5db8a63f980d21c3f6e230c4b18bed884e9" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 56).bin" size="18096288" crc="65196dc2" sha1="b5faffaef0ab253a01edad11016179606dc74590" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 57).bin" size="6343344" crc="871ec341" sha1="7334aa0967ecf93936b4aaaee17a6b7a1a3ffaa7" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 58).bin" size="8041488" crc="1b26484c" sha1="a50e09b722871925e718caf483c12db0989bc697" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 59).bin" size="7989744" crc="dbd3fe6f" sha1="f353b725b215ec94402741ee80cfec528c1879dc" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 60).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 61).bin" size="9732576" crc="b3db1344" sha1="28c1cc22b11e20544b083d29d6b711ebae5e5878" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 62).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 63).bin" size="9191616" crc="381da497" sha1="6faee1e8df560a41ee281d69132c98a646a55408" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 64).bin" size="2450784" crc="2617087b" sha1="f5be17ca0ea1032da0451d2fe83b221cc86f3095" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 65).bin" size="10449936" crc="ee5cb1b8" sha1="65026b656b70d2a7098f4f32e8a19891a7c89d99" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 66).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 67).bin" size="12352704" crc="0e2adadf" sha1="519d9b11b6ee9a5180a417c6934c97eb416dfa43" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 68).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 69).bin" size="10120656" crc="5a34ece1" sha1="9fc04864669fe030f3326bdf43490822b7eee7e6" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 70).bin" size="4548768" crc="0d4b679e" sha1="2251135edd2ca9cfc6c4fc114022a7f8dd79ecc0" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 71).bin" size="9760800" crc="1b579db0" sha1="5b61d772a22d032e4abc385008e748c8e9939889" />
+		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 72).bin" size="43424976" crc="e0b15ee3" sha1="1041e1c05a06caf34722d90e7c2f0798e858590f" />
 
 		<rom name="street fighter collection (usa) (disc 2).cue" size="250" crc="29ab2e2f" sha1="ad72cb6d2dff74c5afd4c1480131fe60d56aea74" />
 		<rom name="street fighter collection (usa) (disc 2) (track 1).bin" size="590580144" crc="c7b3039c" sha1="e844ff5b660879c6235ab75762401b703e4cc01f" />
@@ -22703,12 +22796,12 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street fighter collection (usa) (disc 1)" sha1="36122123032445b2d4f2add70af071fa335fa5c8" status="baddump" />
+				<disk name="street fighter collection (usa) (disc 1) (v1.0)"  sha1="52532f13a35f9077b7e02d53f3feeb843727bd1e"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="street fighter collection (usa) (disc 2)" sha1="273e82b4b9615803ba62babc5825639f1614bea6"/>
+				<disk name="street fighter collection (usa) (disc 2) (v1.0)" sha1="273e82b4b9615803ba62babc5825639f1614bea6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -31061,7 +31154,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<rom name="16 Tales 2 (USA).cue" size="82" crc="359166ed" sha1="b699b8ff729299c4e631aae6d57c959e0a586b52"/>
 		<rom name="16 Tales 2 (USA).bin" size="620871552" crc="ccc970d0" sha1="527b150dd9b526d5ddd83c15fb804b59cf076b4a"/>
 		-->
-		<description>16 Tales 2</description>
+		<description>16 Tales 2 (USA)</description>
 		<year>1996</year>
 		<publisher>The Lightspan Partnership</publisher>
 		<info name="serial" value="LSP-990122, LSP-99012201"/>
@@ -39537,7 +39630,7 @@ TODO: Check if these match the corresponding redump dumps.
 		<description>Dance Dance Revolution - Best Hits (Jpn)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="SLPM-86693 (VX224-J1)    " />
+		<info name="serial" value="SLPM-86693 (VX224-J1)" />
 		<info name="release" value="20001221" />
 		<info name="alt_title" value="ダンスダンスレボリューション ベストヒッツ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -56371,7 +56464,7 @@ A few comments on these:
 		-->
 		<description>Torc - Legend of the Ogre Crown (Prototype)</description>
 		<year>19??</year>
-		<publisher>Head Games</publisher>   <!-- Head Games were actually the developer, but I was unable to dig any info about actual publishing deals -->
+		<publisher>Head Games</publisher>	<!-- Head Games were actually the developer, but I was unable to dig any info about actual publishing deals -->
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="torc - legend of the ogre crown (prototype)" sha1="0c27726e8957a2054c9c4fe38b8859ef4c4929c9" />
