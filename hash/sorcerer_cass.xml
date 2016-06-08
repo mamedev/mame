@@ -120,6 +120,18 @@
 			</dataarea>
 		</part>
 	</software>
+	<software name="salvo">
+		<description>Salvo</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="J.T.Staley"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="12412710">
+				<rom name="salvo.wav" size="12412710" crc="7cca90bb" sha1="6b8ebf52955ee1dd49615966d7c8e12ab51aee8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 <!--
      The original tapes have died long ago, so these were loaded from the
