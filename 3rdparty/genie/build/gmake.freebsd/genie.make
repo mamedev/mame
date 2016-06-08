@@ -42,9 +42,9 @@ endif
 
 ifeq ($(config),release)
   OBJDIR         = obj/Release
-  TARGETDIR      = ../../bin/windows
-  override TARGET         = $(TARGETDIR)/genie.exe
-  DEFINES       += -DNDEBUG -DLUA_COMPAT_MODULE
+  TARGETDIR      = ../../bin/bsd
+  override TARGET         = $(TARGETDIR)/genie
+  DEFINES       += -DNDEBUG -DLUA_COMPAT_MODULE -DLUA_USE_POSIX -DLUA_USE_DLOPEN
   INCLUDES      += -I../../src/host/lua-5.3.0/src
   INCLUDES      +=
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP -MP $(DEFINES) $(INCLUDES)
@@ -52,9 +52,9 @@ ifeq ($(config),release)
   ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os
   ALL_OBJCFLAGS += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS   += $(LDFLAGS) -L. -s
+  ALL_LDFLAGS   += $(LDFLAGS) -L. -s -rdynamic
   LDDEPS        +=
-  LIBS          += $(LDDEPS) -lole32
+  LIBS          += $(LDDEPS) -lm
   EXTERNAL_LIBS +=
   LINKCMD        = $(CC) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
   OBJECTS := \
@@ -121,9 +121,9 @@ endif
 
 ifeq ($(config),debug)
   OBJDIR         = obj/Debug
-  TARGETDIR      = ../../bin/windows
-  override TARGET         = $(TARGETDIR)/genie.exe
-  DEFINES       += -D_DEBUG -DLUA_COMPAT_MODULE
+  TARGETDIR      = ../../bin/bsd
+  override TARGET         = $(TARGETDIR)/genie
+  DEFINES       += -D_DEBUG -DLUA_COMPAT_MODULE -DLUA_USE_POSIX -DLUA_USE_DLOPEN
   INCLUDES      += -I../../src/host/lua-5.3.0/src
   INCLUDES      +=
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP -MP $(DEFINES) $(INCLUDES)
@@ -131,9 +131,9 @@ ifeq ($(config),debug)
   ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g
   ALL_OBJCFLAGS += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS   += $(LDFLAGS) -L.
+  ALL_LDFLAGS   += $(LDFLAGS) -L. -rdynamic
   LDDEPS        +=
-  LIBS          += $(LDDEPS) -lole32
+  LIBS          += $(LDDEPS) -lm
   EXTERNAL_LIBS +=
   LINKCMD        = $(CC) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
   OBJECTS := \

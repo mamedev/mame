@@ -220,6 +220,30 @@
 		end
 		return result
 	end
+	
+
+--
+-- Returns true if the filename has a particular extension.
+--
+-- @param fname
+--    The file name to test.
+-- @param extensions
+--    The extension(s) to test. Maybe be a string or table.
+--
+
+	function path.hasextension(fname, extensions)
+		local fext = path.getextension(fname):lower()
+		if type(extensions) == "table" then
+			for _, extension in pairs(extensions) do
+				if fext == extension then
+					return true
+				end
+			end
+			return false
+		else
+			return (fext == extensions)
+		end
+	end
 
 --
 -- Returns true if the filename represents a C/C++ source code file. This check
@@ -228,44 +252,40 @@
 --
 
 	function path.iscfile(fname)
-		local extensions = { ".c", ".s", ".m" }
-		local ext = path.getextension(fname):lower()
-		return table.contains(extensions, ext)
+		return path.hasextension(fname, { ".c", ".s", ".m" })
+	end
+	
+	function path.iscppfile(fname)
+		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c", ".s", ".m", ".mm" })
 	end
 
 	function path.iscxfile(fname)
-		local extensions = { ".cx" }
-		local ext = path.getextension(fname):lower()
-		return table.contains(extensions, ext)
+		return path.hasextension(fname, ".cx")
 	end
 
 	function path.isobjcfile(fname)
-		local extensions = { ".m", ".mm" }
-		local ext = path.getextension(fname):lower()
-		return table.contains(extensions, ext)
+		return path.hasextension(fname, { ".m", ".mm" })
 	end
 
 	function path.iscppheader(fname)
-		local extensions = { ".h", ".hh", ".hpp", ".hxx" }
-		local ext = path.getextension(fname):lower()
-		return table.contains(extensions, ext)
+		return path.hasextension(fname, { ".h", ".hh", ".hpp", ".hxx" })
 	end
 
 	function path.isappxmanifest(fname)
-		local extensions = { ".appxmanifest" }
-		local ext = path.getextension(fname):lower()
-		return table.contains(extensions, ext)
+		return path.hasextension(fname, ".appxmanifest")
 	end
 
 	function path.isSourceFile(fname)
-		local extensions = { ".cc", ".cpp", ".cxx", ".c", ".s", ".m", ".mm" }
-		local ext = path.getextension(fname):lower()
-		return table.contains(extensions, ext)
+		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c", ".s", ".m", ".mm", ".vala" })
 	end
 
 	function path.isSourceFileVS(fname)
 		return path.isSourceFile(fname)
 			or path.iscxfile(fname)
+	end
+
+	function path.isasmfile(fname)
+		return path.hasextension(fname, ".asm")
 	end
 
 --
@@ -274,9 +294,7 @@
 --
 
 	function path.isresourcefile(fname)
-		local extensions = { ".rc" }
-		local ext = path.getextension(fname):lower()
-		return table.contains(extensions, ext)
+		return path.hasextension(fname, ".rc")
 	end
 
 
@@ -397,4 +415,35 @@
 		until not changed
 
 		return p
+	end
+
+--
+-- Takes a path which is relative to one location and makes it relative
+-- to another location instead.
+--
+
+	function path.rebase(p, oldbase, newbase)
+		p = path.getabsolute(path.join(oldbase, p))
+		p = path.getrelative(newbase, p)
+		return p
+	end
+
+
+
+--
+-- Replace the file extension.
+--
+
+	function path.replaceextension(p, newext)
+		local ext = path.getextension(p)
+
+		if not ext then
+			return p
+		end
+
+		if #newext > 0 and not newext:findlast(".", true) then
+			newext = "."..newext
+		end
+
+		return p:match("^(.*)"..ext.."$")..newext
 	end

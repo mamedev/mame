@@ -241,8 +241,11 @@
 			_p(4,'OmitFramePointers="%s"', bool(true))
 		end
 
-		if #cfg.includedirs > 0 then
-			_p(4,'AdditionalIncludeDirectories="%s"', premake.esc(path.translate(table.concat(cfg.includedirs, ";"), '\\')))
+
+		local includedirs = table.join(cfg.userincludedirs, cfg.includedirs)
+
+		if #includedirs > 0 then
+			_p(4,'AdditionalIncludeDirectories="%s"', premake.esc(path.translate(table.concat(includedirs, ";"), '\\')))
 		end
 
 		if #cfg.defines > 0 then
@@ -448,8 +451,10 @@
 
 		_p(4,'AdditionalOptions="%s"', premake.esc(table.concat(buildoptions, " ")))
 
-		if #cfg.includedirs > 0 then
-			_p(4,'AdditionalIncludeDirectories="%s"', premake.esc(path.translate(table.concat(cfg.includedirs, ";"), '\\')))
+		local includedirs = table.join(cfg.userincludedirs, cfg.includedirs)
+
+		if #includedirs > 0 then
+			_p(4,'AdditionalIncludeDirectories="%s"', premake.esc(path.translate(table.concat(includedirs, ";"), '\\')))
 		end
 
 		if #cfg.defines > 0 then
@@ -524,9 +529,10 @@
 			_p(4,'PreprocessorDefinitions="%s"', table.concat(premake.esc(table.join(cfg.defines, cfg.resdefines)), ";"))
 		end
 
-		if #cfg.includedirs > 0 or #cfg.resincludedirs > 0 then
-			local dirs = table.join(cfg.includedirs, cfg.resincludedirs)
-			_p(4,'AdditionalIncludeDirectories="%s"', premake.esc(path.translate(table.concat(dirs, ";"), '\\')))
+		local includedirs = table.join(cfg.userincludedir, cfg.includedirs, cfg.resincludedirs)
+
+		if #includedirs > 0 then
+			_p(4,'AdditionalIncludeDirectories="%s"', premake.esc(path.translate(table.concat(includedirs, ";"), '\\')))
 		end
 
 		_p(3,'/>')

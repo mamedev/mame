@@ -58,6 +58,15 @@
 			end
 		})
 		
+		-- fix .xcassets files, they should be treated as a file, not a folder
+		tree.traverse(tr, {
+			onbranch = function(node)
+				if path.getextension(node.name) == ".xcassets" then
+					node.children = {}
+				end
+			end
+		})
+				
 		-- the special folder "Frameworks" lists all linked frameworks
 		tr.frameworks = tree.new("Frameworks")
 		for cfg in premake.eachconfig(prj) do
@@ -118,6 +127,9 @@
 				if string.endswith(node.name, "Info.plist") then
 					tr.infoplist = node
 				end						
+				if string.endswith(node.name, ".entitlements") then
+					tr.entitlements = node
+				end
 			end
 		}, true)
 

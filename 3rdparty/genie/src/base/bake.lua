@@ -703,7 +703,7 @@
 
 		-- remove excluded files from the file list
 		local removefiles = cfg.removefiles
-		if _ACTION == 'gmake' then
+		if _ACTION == 'gmake' or _ACTION == 'ninja' then
 			removefiles = table.join(removefiles, cfg.excludes)
 		end
 		local files = {}

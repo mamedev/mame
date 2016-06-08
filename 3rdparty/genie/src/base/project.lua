@@ -574,8 +574,10 @@
 				return premake[action.valid_tools.cc[1]]
 			end
 			return premake.gcc
-		else
+		elseif premake.isdotnetproject(cfg) then
 			return premake.dotnet
+		else
+			return premake.valac
 		end
 	end
 
@@ -705,4 +707,12 @@
 
 	function premake.isdotnetproject(prj)
 		return (prj.language == "C#")
+	end
+
+--
+-- Returns true if the project uses the Vala language.
+--
+
+	function premake.isvalaproject(prj)
+		return (prj.language == "Vala")
 	end

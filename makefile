@@ -162,19 +162,19 @@ GENIEOS := solaris
 endif
 ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
 OS := freebsd
-GENIEOS := bsd
+GENIEOS := freebsd
 endif
 ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
 OS := freebsd
-GENIEOS := bsd
+GENIEOS := freebsd
 endif
 ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
 OS := netbsd
-GENIEOS := bsd
+GENIEOS := freebsd
 endif
 ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
 OS := openbsd
-GENIEOS := bsd
+GENIEOS := freebsd
 endif
 ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
 OS := macosx

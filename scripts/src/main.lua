@@ -369,7 +369,7 @@ end
 	configuration { }
 
 	if _OPTIONS["DEBUG_DIR"]~=nil then
-		debugabsolutedir(_OPTIONS["DEBUG_DIR"])
+		debugdir(_OPTIONS["DEBUG_DIR"])
 	else
 		debugdir (MAME_DIR)
 	end

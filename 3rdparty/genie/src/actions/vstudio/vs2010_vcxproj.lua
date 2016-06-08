@@ -117,6 +117,10 @@
 			_p(2,'<UseOfAtl>%s</UseOfAtl>', iif(cfg.flags.StaticATL, "Static", "Dynamic"))
 		end
 
+		if cfg.flags.Unicode then
+			_p(2,'<CharacterSet>Unicode</CharacterSet>')
+		end
+
 		if cfg.flags.Managed then
 			_p(2,'<CLRSupport>true</CLRSupport>')
 		end
@@ -218,9 +222,11 @@
 	end
 
 	local function include_dirs(indent,cfg)
-		if #cfg.includedirs > 0 then
+		local includedirs = table.join(cfg.userincludedirs, cfg.includedirs)
+
+		if #includedirs> 0 then
 			_p(indent,'<AdditionalIncludeDirectories>%s;%%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>'
-					,premake.esc(path.translate(table.concat(cfg.includedirs, ";"), '\\')))
+					,premake.esc(path.translate(table.concat(includedirs, ";"), '\\')))
 		end
 	end
 
@@ -410,6 +416,10 @@
 			_p(3,'<OmitFramePointers>true</OmitFramePointers>')
 		end
 
+		if cfg.flags.UseFullPaths then
+			_p(3, '<UseFullPaths>true</UseFullPaths>')
+		end
+
 		compile_language(cfg)
 
 		forcedinclude_files(3,cfg);
@@ -462,8 +472,6 @@
 		end
 	end
 
-
-
 	local function import_lib(cfg)
 		--Prevent the generation of an import library for a Windows DLL.
 		if cfg.kind == "SharedLib" then
@@ -472,6 +480,53 @@
 		end
 	end
 
+	local function hasmasmfiles(prj)
+		local files = vc2010.getfilegroup(prj, "MASM")
+		return #files > 0
+	end
+
+	local function vs10_masm(prj, cfg)
+		if hasmasmfiles(prj) then
+			_p(2, '<MASM>')
+
+			local includedirs = table.join(cfg.userincludedirs, cfg.includedirs)
+
+			if #includedirs > 0 then
+				_p(3, '<IncludePaths>%s;%%(IncludePaths)</IncludePaths>'
+					, premake.esc(path.translate(table.concat(includedirs, ";"), '\\'))
+					)
+			end
+
+			-- table.join is used to create a copy rather than a reference
+			local defines = table.join(cfg.defines)
+
+			-- pre-defined preprocessor defines:
+			-- _DEBUG:  For debug configurations
+			-- _WIN32:  For 32-bit platforms
+			-- _WIN64:  For 64-bit platforms
+			-- _EXPORT: `EXPORT` for shared libraries, empty for other project kinds
+			table.insertflat(defines, iif(premake.config.isdebugbuild(cfg), "_DEBUG", {}))
+			table.insert(defines, iif(cfg.platform == "x64", "_WIN64", "_WIN32"))
+			table.insert(defines, iif(prj.kind == "SharedLib", "_EXPORT=EXPORT", "_EXPORT="))
+
+			_p(3, '<PreprocessorDefinitions>%s;%%(PreprocessorDefinitions)</PreprocessorDefinitions>'
+				, premake.esc(table.concat(defines, ";"))
+				)
+
+			if cfg.flags.FatalWarnings then
+				_p(3,'<TreatWarningsAsErrors>true</TreatWarningsAsErrors>')
+			end
+
+			-- MASM only has 3 warning levels where 3 is default, so we can ignore `ExtraWarnings`
+			if cfg.flags.MinimumWarnings then
+				_p(3,'<WarningLevel>0</WarningLevel>')
+			else
+				_p(3,'<WarningLevel>3</WarningLevel>')
+			end
+
+			_p(2, '</MASM>')
+		end
+	end
 
 --
 -- Generate the <Link> element and its children.
@@ -488,7 +543,7 @@
 		end
 
 		if cfg.kind ~= 'StaticLib' then
-			vc2010.additionalDependencies(cfg)
+			vc2010.additionalDependencies(3,cfg)
 			_p(3,'<OutputFile>$(OutDir)%s</OutputFile>', cfg.buildtarget.name)
 
 			if #cfg.libdirs > 0 then
@@ -530,10 +585,10 @@
 -- by an <ItemGroup/ProjectReference>).
 --
 
-	function vc2010.additionalDependencies(cfg)
+	function vc2010.additionalDependencies(tab,cfg)
 		local links = premake.getlinks(cfg, "system", "fullpath")
 		if #links > 0 then
-			_p(3,'<AdditionalDependencies>%s;%s</AdditionalDependencies>'
+			_p(tab,'<AdditionalDependencies>%s;%s</AdditionalDependencies>'
 				, table.concat(links, ";")
 				, iif(cfg.platform == "Durango"
 					, '$(XboxExtensionsDependencies)'
@@ -554,6 +609,7 @@
 				item_def_lib(cfg)
 				vc2010.link(cfg)
 				event_hooks(cfg)
+				vs10_masm(prj, cfg)
 			_p(1,'</ItemDefinitionGroup>')
 		end
 	end
@@ -561,7 +617,7 @@
 
 --
 -- Retrieve a list of files for a particular build group, one of
--- "ClInclude", "ClCompile", "ResourceCompile", and "None".
+-- "ClInclude", "ClCompile", "ResourceCompile", "MASM", and "None".
 --
 
 	function vc2010.getfilegroup(prj, group)
@@ -570,6 +626,7 @@
 			sortedfiles = {
 				ClCompile = {},
 				ClInclude = {},
+				MASM = {},
 				None = {},
 				ResourceCompile = {},
 				AppxManifest = {},
@@ -590,6 +647,8 @@
 				elseif path.isappxmanifest(file.name) then
 					foundAppxManifest = true
 					table.insert(sortedfiles.AppxManifest, file)
+				elseif path.isasmfile(file.name) then
+					table.insert(sortedfiles.MASM, file)
 				elseif file.flags and table.icontains(file.flags, "DeploymentContent") then
 					table.insert(sortedfiles.DeploymentContent, file)
 				else
@@ -802,6 +861,31 @@
 		end
 	end
 
+	function vc2010.masmfiles(prj)
+		local configs = prj.solution.vstudio_configs
+		local files = vc2010.getfilegroup(prj, "MASM")
+		if #files > 0 then
+			_p(1, '<ItemGroup>')
+			for _, file in ipairs(files) do
+				local translatedpath = path.translate(file.name, "\\")
+				_p(2, '<MASM Include="%s">', translatedpath)
+
+				local excluded = table.icontains(prj.excludes, file.name)
+				for _, vsconfig in ipairs(configs) do
+					local cfg = premake.getconfig(prj, vsconfig.src_buildcfg, vsconfig.src_platform)
+					if excluded or table.icontains(cfg.excludes, file.name) then
+						_p(3, '<ExcludedFromBuild ' .. if_config_and_platform() .. '>true</ExcludedFromBuild>'
+							, premake.esc(vsconfig.name)
+							)
+					end
+				end
+
+				_p(2, '</MASM>')
+			end
+			_p(1, '</ItemGroup>')
+		end
+	end
+
 
 --
 -- Output the VC2010 project file header
@@ -825,6 +909,8 @@
 --
 
 	function premake.vs2010_vcxproj(prj)
+		local usemasm = hasmasmfiles(prj)
+
 		io.indent = "  "
 		vc2010.header("Build")
 
@@ -840,10 +926,11 @@
 
 			_p(1,'<Import Project="$(VCTargetsPath)\\Microsoft.Cpp.props" />')
 
-			--check what this section is doing
 			_p(1,'<ImportGroup Label="ExtensionSettings">')
+			if usemasm then
+				_p(2, '<Import Project="$(VCTargetsPath)\\BuildCustomizations\\masm.props" />')
+			end
 			_p(1,'</ImportGroup>')
-
 
 			import_props(prj)
 
@@ -856,9 +943,13 @@
 
 			vc2010.files(prj)
 			vc2010.projectReferences(prj)
+			vc2010.masmfiles(prj)
 
 			_p(1,'<Import Project="$(VCTargetsPath)\\Microsoft.Cpp.targets" />')
 			_p(1,'<ImportGroup Label="ExtensionTargets">')
+			if usemasm then
+				_p(2, '<Import Project="$(VCTargetsPath)\\BuildCustomizations\\masm.targets" />')
+			end
 			_p(1,'</ImportGroup>')
 
 		_p('</Project>')
@@ -894,10 +985,6 @@
 	function vc2010.debugdir(cfg)
 		if cfg.debugdir and not vstudio.iswinrt() then
 			_p('    <LocalDebuggerWorkingDirectory>%s</LocalDebuggerWorkingDirectory>', path.translate(cfg.debugdir, '\\'))
-			_p('    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>')
-		end
-		if cfg.debugabsolutedir and not vstudio.iswinrt() then
-			_p('    <LocalDebuggerWorkingDirectory>%s</LocalDebuggerWorkingDirectory>', path.translate(cfg.debugabsolutedir, '\\'))
 			_p('    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>')
 		end
 		if cfg.debugargs then
