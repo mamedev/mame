@@ -698,7 +698,7 @@ msgstr "Configurazione Macchina"
 
 #: src/emu/ui/mainmenu.cpp:69
 msgid "Bookkeeping Info"
-msgstr "Info Crediti e Tempi d'Utilizzo"
+msgstr "Info Crediti e Tempi di Utilizzo"
 
 #: src/emu/ui/mainmenu.cpp:72
 msgid "Machine Information"
@@ -861,12 +861,12 @@ msgstr ""
 
 #: src/emu/ui/miscmenu.cpp:258
 msgid "Coin %1$c: NA%3$s\n"
-msgstr ""
+msgstr "Monete %1$c: NA%3$s\n"
 
 #: src/emu/ui/miscmenu.cpp:258
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
-msgstr ""
+msgstr "Monete %1$c: %2$d%3$s\n"
 
 #: src/emu/ui/miscmenu.cpp:261
 msgid " (locked)"
@@ -1123,7 +1123,7 @@ msgstr "Sistema: %1$-.100s"
 #: src/emu/ui/selgame.cpp:900 src/emu/ui/selsoft.cpp:804
 #, c-format
 msgid "Software is clone of: %1$-.100s"
-msgstr "Il software è clone di: %1$-.100s"
+msgstr "Il software è Clone di: %1$-.100s"
 
 #: src/emu/ui/selgame.cpp:902 src/emu/ui/selsoft.cpp:806
 msgid "Software is parent"
@@ -1316,12 +1316,12 @@ msgstr ""
 #: src/emu/ui/selsoft.cpp:683
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s ( %3$d / %4$d pacchetti software )"
 
 #: src/emu/ui/selsoft.cpp:684
 #, c-format
 msgid "Driver: \"%1$s\" software list "
-msgstr ""
+msgstr "Driver: \"%1$s\" lista software "
 
 #: src/emu/ui/selsoft.cpp:687
 #, c-format
@@ -1487,7 +1487,7 @@ msgstr "Registra"
 
 #: src/emu/ui/tapectrl.cpp:103
 msgid "Rewind"
-msgstr ""
+msgstr "Riavvolgi"
 
 #: src/emu/ui/tapectrl.cpp:106
 msgid "Fast Forward"
@@ -1607,7 +1607,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Ci sono cloni funzionanti di questa macchina: "
+"Ci sono Cloni funzionanti di questa macchina: "
 
 #: src/emu/ui/ui.cpp:1167
 msgid ""
