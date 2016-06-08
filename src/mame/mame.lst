@@ -12113,6 +12113,10 @@ fexcelv                         //
 fscc9                           //
 fscc12                          //
 reversic                        //
+super9cc                        // SU9: Super 9 Sensory Chess Challenger (English)
+super9ccfr                      // * French
+super9ccg                       // * German
+super9ccsp                      // * Spanish
 
 @source:fidel68k.cpp
 feagv10                         //
