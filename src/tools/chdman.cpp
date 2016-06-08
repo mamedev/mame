@@ -962,9 +962,6 @@ static void guess_chs(std::string *filename, UINT64 filesize, int sectorsize, UI
 						return;
 					}
 			}
-
-	// ack, it didn't work!
-	report_error(1, "Can't guess CHS values because no logical combination works!");
 }
 
 
