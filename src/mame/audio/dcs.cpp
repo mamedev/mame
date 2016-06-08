@@ -534,6 +534,7 @@ MACHINE_CONFIG_FRAGMENT( dcs2_audio_dsio )
 
 	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("dcs_sport_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // roadburn needs this to pass harware test
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

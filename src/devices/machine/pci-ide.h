@@ -20,8 +20,12 @@ TODO:
 #define MCFG_IDE_PCI_ADD(_tag, _main_id, _revision, _subdevice_id) \
 	MCFG_PCI_DEVICE_ADD(_tag, IDE_PCI, _main_id, _revision, 0x01018a, _subdevice_id)
 
+// Setting this to a value other than -1 will cause the ide_pci_device to assert/clear the cpu interrupt directly.
 #define MCFG_IDE_PCI_IRQ_ADD(_cpu_tag, _irq_num) \
 	downcast<ide_pci_device *>(device)->set_irq_info(_cpu_tag, _irq_num);
+
+#define MCFG_IDE_PCI_IRQ_HANDLER(_devcb) \
+	devcb = &ide_pci_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 class ide_pci_device : public pci_device {
 public:
@@ -35,6 +39,7 @@ public:
 	DECLARE_READ32_MEMBER(ide2_read_cs1);
 	DECLARE_WRITE32_MEMBER(ide2_write_cs1);
 	void set_irq_info(const char *tag, const int irq_num);
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ide_pci_device &>(device).m_irq_handler.set_callback(object); }
 
 protected:
 	virtual void device_start() override;
@@ -47,6 +52,7 @@ private:
 	const char *m_cpu_tag;
 	cpu_device *m_cpu;
 	int m_irq_num;
+	devcb_write_line m_irq_handler;
 
 	UINT32 m_config_data[0x10];
 	DECLARE_ADDRESS_MAP(chan1_data_command_map, 32);
