@@ -215,7 +215,9 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 // ---------------------------------------------------------------------------
 // WORKAROUNDS:
 // - tested only in conjunction with 100-B ROM -
-//#define WORKAROUND_RAINBOW_B
+// Part of the self test feeds an mfm bitstream directly into the data separator
+// this isn't currently possible to emulate and may never be so enable this rom patch by default
+#define WORKAROUND_RAINBOW_B
 // ---------------------------------------------------------------------------
 
 // Define standard and maximum RAM sizes (A, then B model):
