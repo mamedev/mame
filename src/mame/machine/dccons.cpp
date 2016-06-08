@@ -119,16 +119,16 @@ READ32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_r )
 	{
 		case SB_GDSTARD:
 			printf("G1CTRL: GDSTARD %08x\n", atapi_xferbase); // Hello Kitty reads here
-			machine().debugger().debug_break();
+			machine().debug_break();
 			return atapi_xferbase;
 		case SB_GDST:
 			break;
 		case SB_GDLEND:
-			//machine().debugger().debug_break();
+			//machine().debug_break();
 			return atapi_xferlen; // TODO: check me
 		default:
 			printf("G1CTRL:  Unmapped read %08x\n", 0x5f7400+offset*4);
-			machine().debugger().debug_break();
+			machine().debug_break();
 			break;
 	}
 	return g1bus_regs[offset];

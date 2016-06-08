@@ -167,7 +167,7 @@ inline UINT32 atvtrack_state::decode64_32(offs_t offset64, UINT64 data, UINT64 m
 		return (UINT32)(data >> 32);
 	}
 	logerror("Wrong word size in external access\n");
-	//machine().debugger().debug_break();
+	//machine().debug_break();
 	return 0;
 }
 

@@ -750,7 +750,7 @@ void segas24_state::reset_reset()
 			m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 			//osd_printf_debug("enable 2nd cpu!\n");
-			//machine().debugger().debug_break();
+			//machine().debug_break();
 			if (m_gground_hack_timer)
 			{
 				m_subcpu->set_clock_scale(0.7f); // reduce clock speed temporarily so a check passes, see notes above

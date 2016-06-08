@@ -93,8 +93,7 @@ void debugger_interrupt_hook(device_t *device, int irqline)
 
 void debugger_manager::debug_break()
 {
-	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		m_cpu->get_visible_cpu()->debug()->halt_on_next_instruction("Internal breakpoint\n");
+	m_cpu->get_visible_cpu()->debug()->halt_on_next_instruction("Internal breakpoint\n");
 }
 
 

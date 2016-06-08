@@ -212,6 +212,7 @@ public:
 	void call_notifiers(machine_notification which);
 	void add_logerror_callback(logerror_callback callback);
 	void set_ui_active(bool active) { m_ui_active = active; }
+	void debug_break();
 
 	// TODO: Do saves and loads still require scheduling?
 	void immediate_save(const char *filename);

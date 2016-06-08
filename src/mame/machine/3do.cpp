@@ -1004,7 +1004,7 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 	case 0x17fc/4:
 		/* TODO: DSPP enabled just before enabling DSPP irq! */
 		if(data & 1)
-			machine().debugger().debug_break();
+			machine().debug_break();
 
 		//printf("%08x\n",data);
 		break;

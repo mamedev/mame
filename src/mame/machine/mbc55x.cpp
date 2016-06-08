@@ -414,6 +414,6 @@ static void decode_dos21(device_t *device,offs_t pc)
 
 	if((ax & 0xff00)==0x0900)
 	{
-		device->machine().debugger().debug_break();
+		device->machine().debug_break();
 	}
 }

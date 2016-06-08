@@ -377,7 +377,7 @@ WRITE8_MEMBER(midway_serial_pic2_device::write)
 					memcpy(m_buffer, m_data, 16);
 					m_total = 16;
 					m_index = 0;
-					machine().debugger().debug_break();
+					machine().debug_break();
 				}
 				break;
 

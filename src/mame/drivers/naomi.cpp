@@ -1817,7 +1817,7 @@ inline int naomi_state::decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
 		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
-		//machine().debugger().debug_break();
+		//machine().debug_break();
 	}
 
 	if (mem_mask == U64(0xffffffff00000000))

@@ -706,7 +706,7 @@ void avr8_device::set_lock_bits(const UINT8 byte)
 
 void avr8_device::unimplemented_opcode(UINT32 op)
 {
-//  machine().debugger().debug_break();
+//  machine().debug_break();
 	fatalerror("AVR8: unknown opcode (%08x) at %08x\n", op, m_shifted_pc);
 }
 
@@ -2915,7 +2915,7 @@ READ8_MEMBER( avr8_device::regs_r )
 
 		default:
 			printf("[%08X] AVR8: Unknown Register Read: 0x%03X\n", m_shifted_pc, offset);
-//      	machine().debugger().debug_break();
+//      	machine().debug_break();
 			return 0;
 	}
 }

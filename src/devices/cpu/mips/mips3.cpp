@@ -224,7 +224,7 @@ void mips3_device::generate_exception(int exception, int backup)
     if (exception != 0)
     {
         fprintf(stderr, "Exception: PC=%08X, PPC=%08X\n", m_core->pc, m_ppc);
-        machine().debugger().debug_break();
+        machine().debug_break();
     }
 */
 

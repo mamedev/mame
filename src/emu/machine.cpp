@@ -728,6 +728,17 @@ void running_machine::add_logerror_callback(logerror_callback callback)
 
 
 //-------------------------------------------------
+//  debug_break - breaks into the debugger, if
+//  enabled
+//-------------------------------------------------
+
+void running_machine::debug_break()
+{
+	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debugger().debug_break();
+}
+
+//-------------------------------------------------
 //  base_datetime - retrieve the time of the host
 //  system; useful for RTC implementations
 //-------------------------------------------------

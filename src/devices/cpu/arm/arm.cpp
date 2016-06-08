@@ -1390,7 +1390,7 @@ void arm_cpu_device::HandleCoProVL86C020( UINT32 insn )
 			0x00<<0 <- Revision number, 0
 			*/
 			SetRegister(rn, 0x41560300);
-			//machine().debugger().debug_break();
+			//machine().debug_break();
 		}
 		else
 			SetRegister(rn, m_coproRegister[crn]);
@@ -1407,7 +1407,7 @@ void arm_cpu_device::HandleCoProVL86C020( UINT32 insn )
 	else
 	{
 		printf("%08x:  Unimplemented VL86C020 copro instruction %08x %d %d\n", R15 & 0x3ffffff, insn,rn,crn);
-		machine().debugger().debug_break();
+		machine().debug_break();
 	}
 }
 

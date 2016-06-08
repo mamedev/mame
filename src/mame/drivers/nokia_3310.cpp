@@ -553,7 +553,7 @@ WRITE8_MEMBER(noki3310_state::mad2_io_w)
 	{
 		case 0x02:
 			//printf("DSP %s\n", data & 1 ? "RUN" : "HOLD");
-			//if (data & 0x01)  machine().debugger().debug_break();
+			//if (data & 0x01)  machine().debug_break();
 			break;
 		case 0x08:
 			ack_fiq(data);

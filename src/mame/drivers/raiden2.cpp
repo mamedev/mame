@@ -856,7 +856,7 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 		dst1 += 8;
 	}
 	//printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,dst1,dst2);
-	//machine().debugger().debug_break();
+	//machine().debug_break();
 }
 
 READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)
