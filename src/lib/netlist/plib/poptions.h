@@ -224,7 +224,7 @@ private:
 		return nullptr;
 	}
 
-	pvector_t<option *> m_opts;
+	std::vector<option *> m_opts;
 	pstring m_app;
 };
 

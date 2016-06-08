@@ -408,7 +408,7 @@ namespace netlist
 		P_PREVENT_COPYING(core_terminal_t)
 	public:
 
-		using list_t = plib::pvector_t<core_terminal_t *>;
+		using list_t = std::vector<core_terminal_t *>;
 
 		/* needed here ... */
 

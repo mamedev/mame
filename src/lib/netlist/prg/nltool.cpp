@@ -191,9 +191,9 @@ struct input_t
 
 };
 
-plib::pvector_t<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
+std::vector<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
 {
-	plib::pvector_t<input_t> *ret = plib::palloc<plib::pvector_t<input_t>>();
+	std::vector<input_t> *ret = plib::palloc<std::vector<input_t>>();
 	if (fname != "")
 	{
 		plib::pifilestream f(fname);
@@ -225,7 +225,7 @@ static void run(tool_options_t &opts)
 
 	nt.read_netlist(opts.opt_file(), opts.opt_name());
 
-	plib::pvector_t<input_t> *inps = read_input(&nt, opts.opt_inp());
+	std::vector<input_t> *inps = read_input(&nt, opts.opt_inp());
 
 	double ttr = opts.opt_ttr();
 
@@ -245,7 +245,7 @@ static void run(tool_options_t &opts)
 	}
 	nt.process_queue(netlist::netlist_time(ttr) - nlt);
 	nt.stop();
-	pfree(inps);
+	plib::pfree(inps);
 
 	double emutime = (double) (plib::ticks() - t) / (double) plib::ticks_per_second();
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n", ttr, emutime, ttr/emutime*100.0);

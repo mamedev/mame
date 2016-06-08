@@ -110,7 +110,7 @@ void setup_t::register_dev(plib::owned_ptr<device_t> dev)
 
 void setup_t::register_lib_entry(const pstring &name)
 {
-	if (m_lib.contains(name))
+	if (plib::container::contains(m_lib, name))
 		log().warning("Lib entry collection already contains {1}. IGNORED", name);
 	else
 		m_lib.push_back(name);
@@ -118,7 +118,7 @@ void setup_t::register_lib_entry(const pstring &name)
 
 void setup_t::register_dev(const pstring &classname, const pstring &name)
 {
-	if (m_lib.contains(classname))
+	if (plib::container::contains(m_lib, classname))
 	{
 		namespace_push(name);
 		include(classname);
@@ -291,15 +291,16 @@ void setup_t::remove_connections(const pstring pin)
 	pstring pinfn = build_fqn(pin);
 	bool found = false;
 
-	for (int i = m_links.size() - 1; i >= 0; i--)
+	for (auto link = m_links.begin(); link != m_links.end(); )
 	{
-		auto &link = m_links[i];
-		if ((link.first == pinfn) || (link.second == pinfn))
+		if ((link->first == pinfn) || (link->second == pinfn))
 		{
-			log().verbose("removing connection: {1} <==> {2}\n", link.first, link.second);
-			m_links.remove_at(i);
+			log().verbose("removing connection: {1} <==> {2}\n", link->first, link->second);
+			link = m_links.erase(link);
 			found = true;
 		}
+		else
+			link++;
 	}
 	if (!found)
 		log().fatal("remove_connections: found no occurrence of {1}\n", pin);
@@ -706,16 +707,16 @@ void setup_t::resolve_inputs()
 	int tries = 100;
 	while (m_links.size() > 0 && tries >  0) // FIXME: convert into constant
 	{
-		unsigned li = 0;
-		while (li < m_links.size())
+		auto li = m_links.begin();
+		while (li != m_links.end())
 		{
-			const pstring t1s = m_links[li].first;
-			const pstring t2s = m_links[li].second;
+			const pstring t1s = li->first;
+			const pstring t2s = li->second;
 			core_terminal_t *t1 = find_terminal(t1s);
 			core_terminal_t *t2 = find_terminal(t2s);
 
 			if (connect(*t1, *t2))
-				m_links.remove_at(li);
+				li = m_links.erase(li);
 			else
 				li++;
 		}

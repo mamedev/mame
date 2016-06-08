@@ -91,7 +91,7 @@ namespace netlist
 		class source_t
 		{
 		public:
-			using list_t = plib::pvector_t<std::shared_ptr<source_t>>;
+			using list_t = std::vector<std::shared_ptr<source_t>>;
 
 			source_t()
 			{}
@@ -167,7 +167,7 @@ namespace netlist
 		factory_list_t &factory() { return m_factory; }
 		const factory_list_t &factory() const { return m_factory; }
 
-		bool is_library_item(const pstring &name) const { return m_lib.contains(name); }
+		bool is_library_item(const pstring &name) const { return plib::container::contains(m_lib, name); }
 
 		/* model / family related */
 
@@ -180,7 +180,7 @@ namespace netlist
 		plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
 		const plib::plog_base<NL_DEBUG> &log() const { return netlist().log(); }
 
-		plib::pvector_t<std::pair<pstring, base_factory_t *>> m_device_factory;
+		std::vector<std::pair<pstring, base_factory_t *>> m_device_factory;
 
 	protected:
 
@@ -208,7 +208,7 @@ namespace netlist
 		plib::hashmap_t<pstring, pstring> m_param_values;
 		plib::hashmap_t<pstring, core_terminal_t *> m_terminals;
 
-		plib::pvector_t<link_t> m_links;
+		std::vector<link_t> m_links;
 
 		factory_list_t m_factory;
 
@@ -219,7 +219,7 @@ namespace netlist
 
 		std::stack<pstring> m_namespace_stack;
 		source_t::list_t m_sources;
-		plib::pvector_t<pstring> m_lib;
+		std::vector<pstring> m_lib;
 
 	};
 

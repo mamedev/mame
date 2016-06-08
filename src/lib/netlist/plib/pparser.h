@@ -139,7 +139,7 @@ private:
 	pstring m_identifier_chars;
 	pstring m_number_chars;
 	pstring m_number_chars_start;
-	pvector_t<pstring> m_tokens;
+	std::vector<pstring> m_tokens;
 	pstring m_whitespace;
 	pstring::code_t  m_string;
 

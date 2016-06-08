@@ -44,11 +44,10 @@ void pstate_manager_t::save_state_ptr(const void *owner, const pstring &stname, 
 
 void pstate_manager_t::remove_save_items(const void *owner)
 {
-	unsigned i = 0;
-	while (i < m_save.size())
+	for (auto i = m_save.begin(); i != m_save.end(); )
 	{
-		if (m_save[i]->m_owner == owner)
-			m_save.remove_at(i);
+		if (i->get()->m_owner == owner)
+			i = m_save.erase(i);
 		else
 			i++;
 	}

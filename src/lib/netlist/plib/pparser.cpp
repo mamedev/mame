@@ -197,7 +197,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			c = getc();
 		}
 		ungetc();
-		token_id_t id = token_id_t(m_tokens.indexof(tokstr));
+		token_id_t id(plib::container::indexof(m_tokens, tokstr));
 		if (id.id() >= 0)
 			return token_t(id, tokstr);
 		else
@@ -225,14 +225,14 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			/* expensive, check for single char tokens */
 			if (tokstr.len() == 1)
 			{
-				token_id_t id = token_id_t(m_tokens.indexof(tokstr));
+				token_id_t id(plib::container::indexof(m_tokens, tokstr));
 				if (id.id() >= 0)
 					return token_t(id, tokstr);
 			}
 			c = getc();
 		}
 		ungetc();
-		token_id_t id = token_id_t(m_tokens.indexof(tokstr));
+		token_id_t id(plib::container::indexof(m_tokens, tokstr));
 		if (id.id() >= 0)
 			return token_t(id, tokstr);
 		else

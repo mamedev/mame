@@ -377,7 +377,7 @@ namespace netlist
 		analog_output_t m_Q;
 		plib::uninitialised_array_t<analog_input_t, 10> m_I;
 
-		plib::pvector_t<rpn_inst> m_precompiled;
+		std::vector<rpn_inst> m_precompiled;
 	};
 
 	// -----------------------------------------------------------------------------

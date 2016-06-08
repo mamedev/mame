@@ -19,6 +19,25 @@ namespace plib
 	{
 		const pstring buildpath(std::initializer_list<pstring> list );
 		const pstring environment(const pstring &var, const pstring &default_val = "");
+
+	}
+	namespace container
+	{
+		template <class C>
+		const bool contains(C &con, const typename C::value_type &elem)
+		{
+			return std::find(con.begin(), con.end(), elem) != con.end();
+		}
+
+		template <class C>
+		int indexof(C &con, const typename C::value_type &elem)
+		{
+			auto it = std::find(con.begin(), con.end(), elem);
+			if (it != con.end())
+				return it - con.begin();
+			return -1;
+		}
+
 	}
 
 	// ----------------------------------------------------------------------------------------
