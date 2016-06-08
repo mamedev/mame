@@ -120,6 +120,18 @@
 			</dataarea>
 		</part>
 	</software>
+	<software name="milen">
+		<description>Military Encounter</description>
+		<year>1981</year>
+		<publisher>Global Software Network</publisher>
+		<info name="developer" value="David Ittner"/>
+		<info name="usage" value="In Basic, BYE then LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="12103836">
+				<rom name="salvo.wav" size="12103836" crc="07925abd" sha1="cde6fa8c9da41eee8db6c7c936f9bb61c5591ae6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 	<software name="salvo">
 		<description>Salvo</description>
 		<year>1979</year>
@@ -656,7 +668,7 @@
 		<year>198?</year>
 		<publisher>unknown</publisher>
 		<info name="serial" value="520ES" />
-		<info name="usage" value="Boot to Basic, BYE, LOG" />
+		<info name="usage" value="In Basic, BYE then LOG" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="2199566">
 				<rom name="spx48.wav" size="2199566" crc="c4bbb8af" sha1="3b290e41f76535a1c7e73de6b2790e87706368e7" offset="0" />
