@@ -1195,7 +1195,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 				//	logerror("Unexpected value: timer %d is prescaled\n", which);
 				if (m_nile_regs[offset] & 2) {
 					UINT32 scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
-					scale *= m_nile_regs[NREG_T0CTRL + which * 4];
+					scale *= m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
 					logerror("Timer scale: timer %d is scaled by %08X\n", which, m_nile_regs[NREG_T0CTRL + which * 4]);
 				}
 				if (scale != 0)
@@ -1211,7 +1211,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 				UINT32 scale = 1;
 				if (m_nile_regs[offset] & 2) {
 					UINT32 scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
-					scale = m_nile_regs[NREG_T0CTRL + which * 4];
+					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
 					logerror("Timer scale: timer %d is scaled by %08X\n", which, scale);
 				}
 				m_nile_regs[offset + 1] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK / scale;
@@ -1234,7 +1234,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 				UINT32 scale = 1;
 				if (m_nile_regs[offset - 1] & 2) {
 					UINT32 scaleSrc = (m_nile_regs[offset - 1] >> 2) & 0x3;
-					scale = m_nile_regs[NREG_T0CTRL + which * 4];
+					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
 					logerror("Timer scale: timer %d is scaled by %08X\n", which, scale);
 				}
 				m_timer[which]->adjust(TIMER_PERIOD * m_nile_regs[offset] * scale, which);
