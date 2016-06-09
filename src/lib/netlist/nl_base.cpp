@@ -336,17 +336,18 @@ void netlist_t::process_queue(const netlist_time &delta)
 
 	if (m_mainclock == nullptr)
 	{
-		while (1)
+		queue_t::entry_t e(m_queue.pop());
+		m_time = e.m_exec_time;
+		while (e.m_object != nullptr)
 		{
-			const queue_t::entry_t e(m_queue.pop());
-			m_time = e.m_exec_time;
-			if (e.m_object == nullptr)
-				break;
 			e.m_object->update_devs();
 			add_to_stat(m_perf_out_processed, 1);
+			e = m_queue.pop();
+			m_time = e.m_exec_time;
 		}
-
-	} else {
+	}
+	else
+	{
 		logic_net_t &mc_net = m_mainclock->m_Q.net();
 		const netlist_time inc = m_mainclock->m_inc;
 		netlist_time mc_time(mc_net.time());
