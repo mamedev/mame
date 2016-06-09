@@ -1401,59 +1401,20 @@ void mame_ui_manager::paste()
 void mame_ui_manager::image_handler_ingame()
 {
 	// run display routine for devices
-	if (machine().phase() == MACHINE_PHASE_RUNNING)
-		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
-			image.call_display();
-}
+    if (machine().phase() == MACHINE_PHASE_RUNNING)
+		for (device_image_interface &image : image_interface_iterator(machine().root_device())) {
+			std::string str;
+			int idx = image.call_display(str);
+			if (idx >= 0) {
+				float x, y;
+				/* choose a location on the screen */
+				x = 0.2f;
+				y = 0.5f + idx;
+				y *= get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 
-
-#define ANIMATION_FPS       1
-#define ANIMATION_FRAMES    4
-
-void mame_ui_manager::image_display(const device_type &type, device_image_interface *image)
-{
-	if (type == CASSETTE)
-	{
-		cassette_image_device *cass = dynamic_cast<cassette_image_device *>(image);
-		if (cass != nullptr)
-		{
-			char buf[65];
-			float x, y;
-			int n;
-			double position, length;
-			cassette_state uistate;
-			static const UINT8 shapes[8] = { 0x2d, 0x5c, 0x7c, 0x2f, 0x2d, 0x20, 0x20, 0x20 };
-
-			/* figure out where we are in the cassette */
-			position = cass->get_position();
-			length = cass->get_length();
-			uistate = (cassette_state)(cass->get_state() & CASSETTE_MASK_UISTATE);
-
-			/* choose a location on the screen */
-			x = 0.2f;
-			y = 0.5f;
-
-			y += cassette_device_iterator(machine().root_device()).indexof(*cass);
-
-			y *= get_line_height() + 2.0f * UI_BOX_TB_BORDER;
-			/* choose which frame of the animation we are at */
-			n = ((int)position / ANIMATION_FPS) % ANIMATION_FRAMES;
-			/* Since you can have anything in a BDF file, we will use crude ascii characters instead */
-			snprintf(buf, ARRAY_LENGTH(buf), "%c%c %c %02d:%02d (%04d) [%02d:%02d (%04d)]",
-				shapes[n],                  /* cassette icon left */
-				shapes[n | 4],                    /* cassette icon right */
-				(uistate == CASSETTE_PLAY) ? 0x50 : 0x52,   /* play (P) or record (R) */
-				((int)position / 60),
-				((int)position % 60),
-				(int)position,
-				((int)length / 60),
-				((int)length % 60),
-				(int)length);
-
-			// draw the cassette
-			draw_text_box(&machine().render().ui_container(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
+				draw_text_box(&machine().render().ui_container(), str.c_str(), JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
+			}
 		}
-	}
 }
 
 //-------------------------------------------------
