@@ -906,6 +906,9 @@ NEW_GIT_VERSION := $(shell git describe --dirty)
 else
 NEW_GIT_VERSION := unknown
 endif
+ifeq ($(NEW_GIT_VERSION),)
+NEW_GIT_VERSION := unknown
+endif
 
 GENIE := 3rdparty/genie/bin/$(GENIEOS)/genie$(EXE)
 

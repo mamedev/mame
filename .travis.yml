@@ -23,8 +23,8 @@ env:
 script:
   - if [ $TRAVIS_OS_NAME == 'linux' ]; then
     if [ $CC == 'clang' ]; then
-    make -j2 OVERRIDE_CXX="clang++-3.6" OVERRIDE_CC="clang-3.6" && ./$MAME -validate;
-    else make -j4 OPTIMIZE=0 OVERRIDE_CC="gcc-5" OVERRIDE_CXX="g++-5" && ./$MAME -validate;
+    make -j2 IGNORE_GIT=1 OVERRIDE_CXX="clang++-3.6" OVERRIDE_CC="clang-3.6" && ./$MAME -validate;
+    else make -j4 IGNORE_GIT=1 OPTIMIZE=0 OVERRIDE_CC="gcc-5" OVERRIDE_CXX="g++-5" && ./$MAME -validate;
     fi
     elif [ $TRAVIS_OS_NAME == 'osx' ]; then
     unset LDOPTS && make -j2 OPTIMIZE=0 USE_LIBSDL=1 && ./$MAME -validate;
@@ -43,4 +43,4 @@ branches:
     - master
 notifications:
   email: false
-  
+
