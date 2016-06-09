@@ -206,7 +206,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	{
 		terms_t * t = m_terms[k];
 
-		if (!t->m_nzrd.contains(N()))
+		if (!plib::container::contains(t->m_nzrd, N()))
 			t->m_nzrd.push_back(N());
 	}
 

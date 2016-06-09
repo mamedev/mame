@@ -12,9 +12,9 @@
 
 
 template<typename Class>
-static plib::pvector_t<int> bubble(const plib::pvector_t<Class> &sl)
+static std::vector<int> bubble(const std::vector<Class> &sl)
 {
-	plib::pvector_t<int> ret;
+	std::vector<int> ret;
 	for (unsigned i=0; i<sl.size(); i++)
 		ret.push_back(i);
 
@@ -102,7 +102,7 @@ void nl_convert_base_t::dump_nl()
 		if (net->terminals().size() == 1)
 			net->set_no_export();
 	}
-	plib::pvector_t<int> sorted = bubble(m_devs);
+	std::vector<int> sorted = bubble(m_devs);
 	for (std::size_t i=0; i<m_devs.size(); i++)
 	{
 		std::size_t j = sorted[i];

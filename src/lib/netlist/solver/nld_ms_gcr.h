@@ -68,7 +68,7 @@ private:
 	}
 
 	unsigned m_dim;
-	plib::pvector_t<int> m_term_cr[storage_N];
+	std::vector<int> m_term_cr[storage_N];
 	mat_cr_t<storage_N> mat;
 	nl_double m_A[storage_N * storage_N];
 

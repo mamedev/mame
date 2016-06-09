@@ -38,16 +38,22 @@ namespace plib
 			return -1;
 		}
 
+		template <class C>
+		void insert_at(C &con, const std::size_t index, const typename C::value_type &elem)
+		{
+			con.insert(con.begin() + index, elem);
+		}
+
 	}
 
 	// ----------------------------------------------------------------------------------------
 	// string list
 	// ----------------------------------------------------------------------------------------
 
-	class pstring_vector_t : public pvector_t<pstring>
+	class pstring_vector_t : public std::vector<pstring>
 	{
 	public:
-		pstring_vector_t() : pvector_t<pstring>() { }
+		pstring_vector_t() : std::vector<pstring>() { }
 		pstring_vector_t(const pstring &str, const pstring &onstr, bool ignore_empty = false);
 		pstring_vector_t(const pstring &str, const pstring_vector_t &onstrl);
 	};

@@ -761,19 +761,19 @@ analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname, core_terminal_t 
 {
 }
 
-bool analog_net_t::already_processed(plib::pvector_t<list_t> &groups)
+bool analog_net_t::already_processed(std::vector<list_t> &groups)
 {
 	if (isRailNet())
 		return true;
 	for (auto & grp : groups)
 	{
-		if (grp.contains(this))
+		if (plib::container::contains(grp, this))
 			return true;
 	}
 	return false;
 }
 
-void analog_net_t::process_net(plib::pvector_t<list_t> &groups)
+void analog_net_t::process_net(std::vector<list_t> &groups)
 {
 	if (num_cons() == 0)
 		return;
@@ -813,7 +813,7 @@ void core_terminal_t::reset()
 		set_state(STATE_INP_ACTIVE);
 }
 
-void core_terminal_t::set_net(net_t::ptr_t anet)
+void core_terminal_t::set_net(net_t *anet)
 {
 	m_net = anet;
 }

@@ -589,7 +589,7 @@ void setup_t::connect_terminals(core_terminal_t &t1, core_terminal_t &t2)
 	{
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
-		analog_net_t::ptr_t anet = plib::palloc<analog_net_t>(netlist(),"net." + t1.name());
+		auto anet = plib::palloc<analog_net_t>(netlist(),"net." + t1.name());
 		t1.set_net(anet);
 		anet->register_con(t2);
 		anet->register_con(t1);
@@ -734,20 +734,15 @@ void setup_t::resolve_inputs()
 
 	// delete empty nets ... and save m_list ...
 
-	net_t::list_t todelete;
-
-	for (auto & net : netlist().m_nets)
+	for (auto net = netlist().m_nets.begin(); net != netlist().m_nets.end();)
 	{
-		if (net->num_cons() == 0)
-			todelete.push_back(net);
+		if (net->get()->num_cons() == 0)
+		{
+			log().verbose("Deleting net {1} ...", net->get()->name());
+			net = netlist().m_nets.erase(net);
+		}
 		else
-			net->rebuild_list();
-	}
-
-	for (auto & net : todelete)
-	{
-		log().verbose("Deleting net {1} ...", net->name());
-		netlist().m_nets.remove(net);
+			++net;
 	}
 
 	pstring errstr("");

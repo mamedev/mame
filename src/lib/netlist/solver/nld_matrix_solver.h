@@ -74,9 +74,9 @@ public:
 
 	unsigned m_railstart;
 
-	plib::pvector_t<unsigned> m_nz;   /* all non zero for multiplication */
-	plib::pvector_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
-	plib::pvector_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
+	std::vector<unsigned> m_nz;   /* all non zero for multiplication */
+	std::vector<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
+	std::vector<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
 
 	/* state */
 	nl_double m_last_V;
@@ -84,12 +84,12 @@ public:
 	nl_double m_h_n_m_1;
 
 private:
-	plib::pvector_t<int> m_net_other;
-	plib::pvector_t<nl_double> m_go;
-	plib::pvector_t<nl_double> m_gt;
-	plib::pvector_t<nl_double> m_Idr;
-	plib::pvector_t<nl_double *> m_other_curanalog;
-	plib::pvector_t<terminal_t *> m_term;
+	std::vector<int> m_net_other;
+	std::vector<nl_double> m_go;
+	std::vector<nl_double> m_gt;
+	std::vector<nl_double> m_Idr;
+	std::vector<nl_double *> m_other_curanalog;
+	std::vector<terminal_t *> m_term;
 
 };
 
@@ -109,8 +109,7 @@ public:
 class matrix_solver_t : public device_t
 {
 public:
-	using list_t = plib::pvector_t<matrix_solver_t *>;
-	using dev_list_t = core_device_t::list_t;
+	using list_t = std::vector<matrix_solver_t *>;
 
 	enum eSortType
 	{
@@ -200,11 +199,11 @@ protected:
 	template <typename T>
 	void build_LE_RHS();
 
-	plib::pvector_t<terms_t *> m_terms;
-	plib::pvector_t<analog_net_t *> m_nets;
+	std::vector<terms_t *> m_terms;
+	std::vector<analog_net_t *> m_nets;
 	std::vector<std::unique_ptr<proxied_analog_output_t>> m_inps;
 
-	plib::pvector_t<terms_t *> m_rails_temp;
+	std::vector<terms_t *> m_rails_temp;
 
 	int m_stat_calculations;
 	int m_stat_newton_raphson;
@@ -219,8 +218,8 @@ private:
 
 	netlist_time m_last_step;
 	nl_double m_cur_ts;
-	dev_list_t m_step_devices;
-	dev_list_t m_dynamic_devices;
+	std::vector<core_device_t *> m_step_devices;
+	std::vector<core_device_t *> m_dynamic_devices;
 
 	logic_input_t m_fb_sync;
 	logic_output_t m_Q_sync;

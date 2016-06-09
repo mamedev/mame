@@ -235,7 +235,7 @@ namespace netlist
 			for (std::size_t i=0; i < m_NO; i++)
 			{
 				pstring tmp = "_" + out[i];
-				const int idx = inout.indexof(tmp);
+				const int idx = plib::container::indexof(inout, tmp);
 				if (idx>=0)
 				{
 					connect_late(m_Q[i], m_I[idx]);

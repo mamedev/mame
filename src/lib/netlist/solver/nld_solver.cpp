@@ -67,12 +67,12 @@ void terms_t::add(terminal_t *term, int net_other, bool sorted)
 		{
 			if (m_net_other[i] > net_other)
 			{
-				m_term.insert_at(i, term);
-				m_net_other.insert_at(i, net_other);
-				m_gt.insert_at(i, 0.0);
-				m_go.insert_at(i, 0.0);
-				m_Idr.insert_at(i, 0.0);
-				m_other_curanalog.insert_at(i, nullptr);
+				plib::container::insert_at(m_term, i, term);
+				plib::container::insert_at(m_net_other, i, net_other);
+				plib::container::insert_at(m_gt, i, 0.0);
+				plib::container::insert_at(m_go, i, 0.0);
+				plib::container::insert_at(m_Idr, i, 0.0);
+				plib::container::insert_at(m_other_curanalog, i, nullptr);
 				return;
 			}
 		}
@@ -135,10 +135,10 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 			{
 				case terminal_t::TERMINAL:
 					if (p->device().is_timestep())
-						if (!m_step_devices.contains(&p->device()))
+						if (!plib::container::contains(m_step_devices, &p->device()))
 							m_step_devices.push_back(&p->device());
 					if (p->device().is_dynamic())
-						if (!m_dynamic_devices.contains(&p->device()))
+						if (!plib::container::contains(m_dynamic_devices, &p->device()))
 							m_dynamic_devices.push_back(&p->device());
 					{
 						terminal_t *pterm = dynamic_cast<terminal_t *>(p);
@@ -257,7 +257,7 @@ void matrix_solver_t::setup_matrix()
 		t->m_nz.clear();
 
 		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!t->m_nz.contains(other[i]))
+			if (!plib::container::contains(t->m_nz, other[i]))
 				t->m_nz.push_back(other[i]);
 
 		t->m_nz.push_back(k);     // add diagonal
@@ -281,18 +281,17 @@ void matrix_solver_t::setup_matrix()
 		else
 		{
 			t->m_nzrd = m_terms[k-1]->m_nzrd;
-			unsigned j=0;
-			while(j < t->m_nzrd.size())
+			for (auto j = t->m_nzrd.begin(); j != t->m_nzrd.end(); )
 			{
-				if (t->m_nzrd[j] < k + 1)
-					t->m_nzrd.remove_at(j);
+				if (*j < k + 1)
+					j = t->m_nzrd.erase(j);
 				else
-					j++;
+					++j;
 			}
 		}
 
 		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
+			if (!plib::container::contains(t->m_nzrd, other[i]) && other[i] >= (int) (k + 1))
 				t->m_nzrd.push_back(other[i]);
 
 		/* and sort */
@@ -324,7 +323,7 @@ void matrix_solver_t::setup_matrix()
 			if (touched[row][k])
 			{
 				ops++;
-				if (!m_terms[k]->m_nzbd.contains(row))
+				if (!plib::container::contains(m_terms[k]->m_nzbd, row))
 					m_terms[k]->m_nzbd.push_back(row);
 				for (unsigned col = k + 1; col < iN; col++)
 					if (touched[k][col])
@@ -698,7 +697,7 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(int size, co
 
 void NETLIB_NAME(solver)::post_start()
 {
-	plib::pvector_t<analog_net_t::list_t> groups;
+	std::vector<analog_net_t::list_t> groups;
 	const bool use_specific = true;
 
 	m_params.m_pivot = m_pivot.Value();

@@ -475,8 +475,6 @@ namespace netlist
 		P_PREVENT_COPYING(terminal_t)
 	public:
 
-		using list_t = plib::pvector_t<terminal_t *>;
-
 		terminal_t(core_device_t &dev, const pstring &aname);
 
 		terminal_t *m_otherterm;
@@ -594,9 +592,6 @@ namespace netlist
 		P_PREVENT_COPYING(net_t)
 	public:
 
-		using ptr_t = net_t *;
-		using list_t = plib::pvector_t<std::shared_ptr<net_t>>;
-
 		net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~net_t();
 
@@ -631,7 +626,7 @@ namespace netlist
 
 		void move_connections(net_t *new_net);
 
-		plib::pvector_t<core_terminal_t *> m_core_terms; // save post-start m_list ...
+		std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
 	protected:
 		netlist_sig_t m_new_Q;
@@ -655,8 +650,6 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(logic_net_t)
 	public:
-
-		using list_t = plib::pvector_t<logic_net_t *>;
 
 		logic_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t() { };
@@ -699,7 +692,7 @@ namespace netlist
 		P_PREVENT_COPYING(analog_net_t)
 	public:
 
-		using list_t =  plib::pvector_t<analog_net_t *>;
+		using list_t =  std::vector<analog_net_t *>;
 
 		analog_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 
@@ -712,8 +705,8 @@ namespace netlist
 		devices::matrix_solver_t *solver() { return m_solver; }
 		void set_solver(devices::matrix_solver_t *solver) { m_solver = solver; }
 
-		bool already_processed(plib::pvector_t<list_t> &groups);
-		void process_net(plib::pvector_t<list_t> &groups);
+		bool already_processed(std::vector<list_t> &groups);
+		void process_net(std::vector<list_t> &groups);
 
 	private:
 		devices::matrix_solver_t *m_solver;
@@ -835,9 +828,6 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(core_device_t)
 	public:
-
-		using list_t = plib::pvector_t<core_device_t *>;
-
 		core_device_t(netlist_t &owner, const pstring &name);
 		core_device_t(core_device_t &owner, const pstring &name);
 
@@ -966,7 +956,7 @@ namespace netlist
 		void connect_late(core_terminal_t &t1, core_terminal_t &t2);
 		void connect_post_start(core_terminal_t &t1, core_terminal_t &t2);
 
-		plib::pvector_t<pstring> m_terminals;
+		std::vector<pstring> m_terminals;
 
 	protected:
 
@@ -1064,9 +1054,9 @@ namespace netlist
 		net_t *find_net(const pstring &name);
 
 		template<class device_class>
-		plib::pvector_t<device_class *> get_device_list()
+		std::vector<device_class *> get_device_list()
 		{
-			plib::pvector_t<device_class *> tmp;
+			std::vector<device_class *> tmp;
 			for (auto &d : m_devices)
 			{
 				device_class *dev = dynamic_cast<device_class *>(d.get());
@@ -1103,10 +1093,10 @@ namespace netlist
 
 		void print_stats() const;
 
-		plib::pvector_t<plib::owned_ptr<core_device_t>> m_devices;
+		std::vector<plib::owned_ptr<core_device_t>> m_devices;
 
 		/* sole use is to manage lifetime of net objects */
-		net_t::list_t m_nets;
+		std::vector<std::shared_ptr<net_t>> m_nets;
 
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;

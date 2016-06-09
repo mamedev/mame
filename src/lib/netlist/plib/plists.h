@@ -70,48 +70,6 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
-// plist_t: a simple list
-// ----------------------------------------------------------------------------------------
-
-template <typename LC>
-class pvector_t : public std::vector<LC>
-{
-public:
-	pvector_t() : std::vector<LC>() {}
-
-	bool contains(const LC &elem) const
-	{
-		return (std::find(this->begin(), this->end(), elem) != this->end());
-	}
-
-	void remove(const LC &elem)
-	{
-		this->erase(std::remove(this->begin(), this->end(), elem), this->end());
-	}
-
-	void insert_at(const std::size_t index, const LC &elem)
-	{
-		this->insert(this->begin() + index, elem);
-	}
-
-	 void remove_at(const std::size_t pos)
-	{
-		this->erase(this->begin() + pos);
-	}
-
-	int indexof(const LC &elem) const
-	{
-		for (std::size_t i = 0; i < this->size(); i++)
-		{
-			if (this->at(i) == elem)
-				return i;
-		}
-		return -1;
-	}
-
-};
-
-// ----------------------------------------------------------------------------------------
 // plinkedlist_t: a simple linked list
 //                the list allows insertions / deletions if used properly
 // ----------------------------------------------------------------------------------------
@@ -407,7 +365,7 @@ private:
 		}
 
 	}
-	pvector_t<element_t> m_values;
+	std::vector<element_t> m_values;
 	std::vector<int> m_hash;
 };
 

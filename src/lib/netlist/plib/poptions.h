@@ -71,7 +71,7 @@ public:
 
 	virtual int parse(pstring argument) override
 	{
-		if (m_limit.contains(argument))
+		if (plib::container::contains(m_limit, argument))
 		{
 			m_val = argument;
 			return 0;
