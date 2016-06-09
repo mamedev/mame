@@ -1052,7 +1052,7 @@ namespace netlist
 		void remove_from_queue(net_t &out);
 
 		void process_queue(const netlist_time &delta);
-		void abort_current_queue_slice() { m_stop = netlist_time::zero(); }
+		void abort_current_queue_slice() { m_queue.retime(m_time, nullptr); }
 
 		bool use_deactivate() const { return m_use_deactivate; }
 
@@ -1121,8 +1121,6 @@ protected:
 	#endif
 
 	private:
-		netlist_time                m_stop;     // target time for current queue processing
-
 		netlist_time                m_time;
 		bool                        m_use_deactivate;
 		queue_t                     m_queue;

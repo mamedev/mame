@@ -187,7 +187,6 @@ device_object_t::device_object_t(core_device_t &dev, const pstring &aname, const
 
 netlist_t::netlist_t(const pstring &aname)
 	:   pstate_manager_t(),
-		m_stop(netlist_time::zero()),
 		m_time(netlist_time::zero()),
 		m_use_deactivate(0),
 		m_queue(*this),
@@ -331,51 +330,42 @@ void netlist_t::reset()
 
 void netlist_t::process_queue(const netlist_time &delta)
 {
-	m_stop = m_time + delta;
+	netlist_time stop(m_time + delta);
+
+	m_queue.push(stop, nullptr);
 
 	if (m_mainclock == nullptr)
 	{
-		while ( (m_time < m_stop) & (!m_queue.empty()))
+		while (1)
 		{
 			const queue_t::entry_t e(m_queue.pop());
 			m_time = e.m_exec_time;
+			if (e.m_object == nullptr)
+				break;
 			e.m_object->update_devs();
-
 			add_to_stat(m_perf_out_processed, 1);
 		}
-		if (m_queue.empty())
-			m_time = m_stop;
 
 	} else {
 		logic_net_t &mc_net = m_mainclock->m_Q.net();
 		const netlist_time inc = m_mainclock->m_inc;
 		netlist_time mc_time(mc_net.time());
 
-		while (m_time < m_stop)
+		while (1)
 		{
-			if (!m_queue.empty())
+			while (m_queue.top().m_exec_time > mc_time)
 			{
-				while (m_queue.top().m_exec_time > mc_time)
-				{
-					m_time = mc_time;
-					mc_time += inc;
-					mc_net.toggle_new_Q();
-					mc_net.update_devs();
-					//devices::NETLIB_NAME(mainclock)::mc_update(mc_net);
-				}
-
-				const queue_t::entry_t &e = m_queue.pop();
-				m_time = e.m_exec_time;
-				e.m_object->update_devs();
-
-			} else {
 				m_time = mc_time;
 				mc_time += inc;
 				mc_net.toggle_new_Q();
 				mc_net.update_devs();
-				//devices::NETLIB_NAME(mainclock)::mc_update(mc_net);
 			}
 
+			const queue_t::entry_t e(m_queue.pop());
+			m_time = e.m_exec_time;
+			if (e.m_object == nullptr)
+				break;
+			e.m_object->update_devs();
 			add_to_stat(m_perf_out_processed, 1);
 		}
 		mc_net.set_time(mc_time);
