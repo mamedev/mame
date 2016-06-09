@@ -11,26 +11,6 @@
 #include "nl_convert.h"
 
 
-template<typename Class>
-static std::vector<int> bubble(const std::vector<Class> &sl)
-{
-	std::vector<int> ret;
-	for (unsigned i=0; i<sl.size(); i++)
-		ret.push_back(i);
-
-	for(unsigned i=0; i < sl.size(); i++)
-	{
-		for(unsigned j=i+1; j < sl.size(); j++)
-		{
-			if(sl[ret[i]]->name() > sl[ret[j]]->name())
-			{
-				std::swap(ret[i], ret[j]);
-			}
-		}
-	}
-	return ret;
-}
-
 /*-------------------------------------------------
     convert - convert a spice netlist
 -------------------------------------------------*/
@@ -102,7 +82,12 @@ void nl_convert_base_t::dump_nl()
 		if (net->terminals().size() == 1)
 			net->set_no_export();
 	}
-	std::vector<int> sorted = bubble(m_devs);
+
+	std::vector<int> sorted;
+	for (unsigned i=0; i < m_devs.size(); i++)
+		sorted.push_back(i);
+	std::sort(sorted.begin(), sorted.end(), plib::indexed_compare<std::vector<std::shared_ptr<dev_t>>>(m_devs));
+
 	for (std::size_t i=0; i<m_devs.size(); i++)
 	{
 		std::size_t j = sorted[i];

@@ -263,7 +263,7 @@ void matrix_solver_t::setup_matrix()
 		t->m_nz.push_back(k);     // add diagonal
 
 		/* and sort */
-		plib::sort_list(t->m_nz);
+		std::sort(t->m_nz.begin(), t->m_nz.end());
 	}
 
 	/* create a list of non zero elements right of the diagonal
@@ -295,7 +295,7 @@ void matrix_solver_t::setup_matrix()
 				t->m_nzrd.push_back(other[i]);
 
 		/* and sort */
-		plib::sort_list(t->m_nzrd);
+		std::sort(t->m_nzrd.begin(), t->m_nzrd.end());
 	}
 
 	/* create a list of non zero elements below diagonal k

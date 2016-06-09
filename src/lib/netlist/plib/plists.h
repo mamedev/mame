@@ -143,7 +143,7 @@ public:
 	void clear() { m_head = nullptr; }
 	bool empty() const { return (m_head == nullptr); }
 
-//private:
+private:
 	LC *m_head;
 };
 
@@ -368,23 +368,6 @@ private:
 	std::vector<element_t> m_values;
 	std::vector<int> m_hash;
 };
-
-// ----------------------------------------------------------------------------------------
-// sort a list ... slow, I am lazy
-// elements must support ">" operator.
-// ----------------------------------------------------------------------------------------
-
-template<typename T>
-static inline void sort_list(T &sl)
-{
-	for(unsigned i = 0; i < sl.size(); i++)
-	{
-		for(unsigned j = i + 1; j < sl.size(); j++)
-			if(sl[i] > sl[j])
-				std::swap(sl[i], sl[j]);
-
-	}
-}
 
 }
 

@@ -19,8 +19,8 @@ namespace plib
 	{
 		const pstring buildpath(std::initializer_list<pstring> list );
 		const pstring environment(const pstring &var, const pstring &default_val = "");
-
 	}
+
 	namespace container
 	{
 		template <class C>
@@ -45,6 +45,16 @@ namespace plib
 		}
 
 	}
+
+	template <class C>
+	struct indexed_compare
+	{
+	    indexed_compare(const C& target): m_target(target) {}
+
+	    bool operator()(int a, int b) const { return m_target[a] < m_target[b]; }
+
+	    const C& m_target;
+	};
 
 	// ----------------------------------------------------------------------------------------
 	// string list
