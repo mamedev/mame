@@ -350,15 +350,6 @@ newoption {
 }
 
 newoption {
-	trigger = "IGNORE_GIT",
-	description = "Ignore usage of git command in build process",
-	allowed = {
-		{ "0",  "Do not ignore"   },
-		{ "1",  "Ingore"  },
-	},
-}
-
-newoption {
 	trigger = "SOURCES",
 	description = "List of sources to compile.",
 }

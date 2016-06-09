@@ -15,6 +15,7 @@
 # REGENIE = 1
 # VERBOSE = 1
 # NOWERROR = 1
+# IGNORE_GIT = 1
 
 # TARGET = mame
 # SUBTARGET = tiny
@@ -893,25 +894,18 @@ $(error Python is not available in path)
 endif
 
 ifneq ($(GIT_AVAILABLE),git)
-PARAMS += --IGNORE_GIT='1'
+	IGNORE_GIT := 1
 endif
 ifeq ($(wildcard .git/*),)
-PARAMS += --IGNORE_GIT='1'
+	IGNORE_GIT := 1
 endif
 
-ifeq ($(GIT_AVAILABLE),git)
-NEW_GIT_VERSION := $(shell git describe)
-ifeq (posix,$(SHELLTYPE))
-OLD_GIT_VERSION := $(shell cat .mame_version 2> /dev/null)
+OLD_GIT_VERSION := $(file <$(GENDIR)/git_desc)
+ifneq ($(IGNORE_GIT),1)
+NEW_GIT_VERSION := $(shell git describe --dirty)
 else
-OLD_GIT_VERSION := $(shell cat .mame_version 2> NUL)
+NEW_GIT_VERSION := unknown
 endif
-ifneq ($(NEW_GIT_VERSION),$(OLD_GIT_VERSION))
-$(shell git describe > .mame_version)
-$(shell touch $(SRC)/version.cpp)
-endif
-endif
-
 
 GENIE := 3rdparty/genie/bin/$(GENIEOS)/genie$(EXE)
 
@@ -1463,6 +1457,7 @@ genie: $(GENIE)
 generate: \
 		genie \
 		$(GEN_FOLDERS) \
+		$(GENDIR)/version.cpp \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
 		$(GENDIR)/mame/drivers/ymmu100.hxx \
@@ -1472,6 +1467,32 @@ generate: \
 $(GENDIR)/includes/SDL2:
 	-$(call MKDIR,$@)
 	-$(call COPY,3rdparty/SDL2/include/,$(GENDIR)/includes/SDL2)
+
+ifneq ($(NEW_GIT_VERSION),$(OLD_GIT_VERSION))
+stale:
+
+.PHONY: stale
+
+$(GENDIR)/git_desc: stale | $(GEN_FOLDERS)
+	@echo $(NEW_GIT_VERSION) > $@
+endif
+
+ifeq (posix,$(SHELLTYPE))
+$(GENDIR)/version.cpp: $(GENDIR)/git_desc | $(GEN_FOLDERS)
+	@echo '#define BARE_BUILD_VERSION "0.174"' > $@
+	@echo 'extern const char bare_build_version[];' >> $@
+	@echo 'extern const char build_version[];' >> $@
+	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
+	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
+else
+$(GENDIR)/version.cpp: $(GENDIR)/git_desc
+	@echo \#define BARE_BUILD_VERSION "0.174" > $@
+	@echo extern const char bare_build_version[]; >> $@
+	@echo extern const char build_version[]; >> $@
+	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
+	@echo const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))"; >> $@
+endif
+
 
 $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/complay.py | $(GEN_FOLDERS)
 	@echo Compressing $<...
