@@ -88,7 +88,7 @@ project "zlib"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
-		configuration { "gmake" }
+		configuration { "gmake or ninja" }
 		if (version >= 30700) then
 			buildoptions {
 				"-Wno-shift-negative-value",
@@ -113,7 +113,7 @@ end
 			"verbose=-1",
 		}
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-strict-prototypes",
 		}
@@ -299,7 +299,7 @@ end
 			"HAVE_CONFIG_H=1",
 		}
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-unused-function",
 			"-O0",
@@ -352,7 +352,7 @@ project "7z"
 	uuid "ad573d62-e76a-4b11-ae34-5110a6789a42"
 	kind "StaticLib"
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-undef",
       "-Wno-strict-prototypes",
@@ -446,7 +446,7 @@ project "lua"
 	--  "ForceCPP",
 	--}
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-bad-function-cast"
 		}
@@ -717,7 +717,7 @@ end
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions {
 			"-Wno-uninitialized",
 			"-Wno-unused-function",
@@ -845,7 +845,7 @@ end
 --			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 --		}
 --
---	configuration { "gmake" }
+--	configuration { "gmake or ninja" }
 --		buildoptions_c {
 --			"-Wno-strict-prototypes",
 --			"-Wno-bad-function-cast",
@@ -982,7 +982,7 @@ project "uv"
 		MAME_DIR .. "3rdparty/libuv/src/win",
 	}
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-strict-prototypes",
 			"-Wno-bad-function-cast",
