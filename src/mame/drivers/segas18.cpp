@@ -30,7 +30,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/segaic16.h"
 #include "machine/nvram.h"
 #include "includes/segas18.h"
 #include "sound/2612intf.h"
@@ -129,7 +128,7 @@ UINT8 segas18_state::mapper_sound_r()
 
 void segas18_state::mapper_sound_w(UINT8 data)
 {
-	soundlatch_write(data & 0xff);
+	m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, data & 0xff);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -551,7 +550,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas18_state )
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_device, read, write)
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym2", ym3438_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE(soundbank_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_READ(soundlatch_byte_r) AM_WRITE(mcu_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(mcu_data_w)
 ADDRESS_MAP_END
 
 
@@ -1250,6 +1249,8 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

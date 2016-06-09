@@ -17,7 +17,6 @@
 
 #include "emu.h"
 #include "includes/segahang.h"
-#include "machine/segaic16.h"
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"
 #include "sound/2203intf.h"
@@ -306,7 +305,7 @@ READ8_MEMBER( segahang_state::sound_data_r )
 {
 	// assert ACK
 	m_i8255_1->pc6_w(CLEAR_LINE);
-	return soundlatch_read();
+	return m_soundlatch->read(space, 0);
 }
 
 
@@ -775,7 +774,7 @@ static MACHINE_CONFIG_START( shared_base, segahang_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(segahang_state, video_lamps_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(segahang_state, tilemap_sound_w))
 
@@ -795,6 +794,8 @@ static MACHINE_CONFIG_START( shared_base, segahang_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segahang_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
 

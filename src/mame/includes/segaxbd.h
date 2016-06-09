@@ -9,6 +9,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
@@ -106,6 +107,7 @@ protected:
 	required_device<sega_xboard_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<UINT16> m_subram0;
 
 	// configuration
@@ -136,21 +138,6 @@ protected:
 	UINT8       m_palette_hilight[32];      // RGB translations for hilighted pixels
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-
-	UINT16                  m_latched_value[4];
-	UINT8                   m_latch_read[4];
-
-	UINT32 soundlatch_read(UINT8 index = 0) { m_latch_read[index] = 1; return m_latched_value[index]; };
-	void soundlatch_write(UINT8 index, UINT32 data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(segaxbd_state::soundlatch_sync_callback), this), index | (data << 8)); };
-	void soundlatch_write(UINT32 data) { soundlatch_write(0, data); }
-
-	void soundlatch_sync_callback(void *ptr, INT32 param)
-	{
-		UINT16 value = param >> 8;
-		int which = param & 0xff;
-		m_latched_value[which] = value;
-		m_latch_read[which] = 0;
-	};
 
 protected:
 	virtual void device_start() override;

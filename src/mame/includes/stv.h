@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 
 #include "includes/saturn.h"
+#include "machine/gen_latch.h"
 
 class stv_state : public saturn_state
 {
@@ -11,7 +12,8 @@ public:
 		m_adsp(*this, "adsp"),
 		m_adsp_pram(*this, "adsp_pram"),
 		m_cryptdevice(*this, "315_5881"),
-		m_5838crypt(*this, "315_5838")
+		m_5838crypt(*this, "315_5838"),
+		m_soundlatch(*this, "soundlatch")
 	{
 	}
 
@@ -122,6 +124,7 @@ public:
 
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_5838crypt;
+	optional_device<generic_latch_16_device> m_soundlatch; // batmanfr
 	UINT16 crypt_read_callback(UINT32 addr);
 	UINT16 crypt_read_callback_ch1(UINT32 addr);
 	UINT16 crypt_read_callback_ch2(UINT32 addr);

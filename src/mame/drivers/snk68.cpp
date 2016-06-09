@@ -97,7 +97,7 @@ WRITE16_MEMBER(snk68_state::sound_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_byte_w(space, 0, data >> 8);
+		m_soundlatch->write(space, 0, data >> 8);
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
 //  AM_RANGE(0x0f0000, 0x0f0001) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0f8000, 0x0f8001) AM_READ8(soundlatch2_byte_r, 0xff00)
+	AM_RANGE(0x0f8000, 0x0f8001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0xff00)
 	AM_RANGE(0x100000, 0x107fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram") /* Mirror is used by Ikari 3 */
 	AM_RANGE(0x300000, 0x33ffff) AM_ROM AM_REGION("user1", 0) /* Extra code bank */
@@ -148,7 +148,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, snk68_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(snk68_state::D7759_write_port_0_w)
@@ -612,12 +612,15 @@ static MACHINE_CONFIG_START( pow, snk68_state )
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
 	MCFG_DEVICE_ADD("sprites", SNK68_SPR, 0)
 	MCFG_SNK68_SPR_GFXDECODE("gfxdecode")
 	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_pow )
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2) /* verified on pcb  */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
