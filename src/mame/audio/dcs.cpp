@@ -1949,6 +1949,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 	/* copy the current data into the buffer */
 	{
 		int count = m_size / (2*(m_incs ? m_incs : 1));
+		// sf2049se was having overflow issues with fixed size of 0x400 buffer (m_size==0xb40, count=0x5a0).
+		//INT16 buffer[0x400];
 		std::unique_ptr<INT16[]> buffer;
 		buffer = std::make_unique<INT16[]>(count);
 		int i;
