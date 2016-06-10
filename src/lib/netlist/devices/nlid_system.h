@@ -158,10 +158,10 @@ namespace netlist
 
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
-		unsigned m_cnt;
-		unsigned m_size;
 		netlist_time m_inc[32];
+		unsigned m_cnt;
 		netlist_time m_off;
+		unsigned m_size;
 	};
 
 	// -----------------------------------------------------------------------------

@@ -158,6 +158,7 @@
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <cstdint>
 
 #include "nl_lists.h"
 #include "nl_time.h"
@@ -169,11 +170,6 @@
 // Type definitions
 // ----------------------------------------------------------------------------------------
 
-/*
- *  unsigned int would be a 20% speed increase over UINT8 for pong.
- *  For breakout it causes a slight decrease.
- *
- */
 using netlist_sig_t = std::uint32_t;
 
  //============================================================
@@ -617,7 +613,7 @@ namespace netlist
 		bool isRailNet() const { return !(m_railterminal == nullptr); }
 		core_terminal_t & railterminal() const { return *m_railterminal; }
 
-		int num_cons() const { return m_core_terms.size(); }
+		std::size_t num_cons() const { return m_core_terms.size(); }
 
 		void inc_active(core_terminal_t &term);
 		void dec_active(core_terminal_t &term);
@@ -632,9 +628,9 @@ namespace netlist
 		netlist_sig_t m_new_Q;
 		netlist_sig_t m_cur_Q;
 
-		netlist_time m_time;
-		INT32        m_active;
-		UINT8	     m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
+		netlist_time  m_time;
+		INT32         m_active;
+		UINT8    	  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
 	private:
 		plib::linkedlist_t<core_terminal_t> m_list_active;
@@ -1111,14 +1107,15 @@ protected:
 	#endif
 
 	private:
+		/* mostly rw */
 		netlist_time                m_time;
-		bool                        m_use_deactivate;
 		queue_t                     m_queue;
+		/* mostly rw */
+		bool                        m_use_deactivate;
 
 		devices::NETLIB_NAME(mainclock) *    m_mainclock;
 		devices::NETLIB_NAME(solver) *       m_solver;
 		devices::NETLIB_NAME(gnd) *          m_gnd;
-
 		devices::NETLIB_NAME(netlistparams) *m_params;
 
 		pstring m_name;
@@ -1226,7 +1223,7 @@ protected:
 
 	inline void net_t::push_to_queue(const netlist_time delay) NOEXCEPT
 	{
-		if (!is_queued() && (num_cons() > 0))
+		if (!is_queued() && (num_cons() != 0))
 		{
 			m_time = netlist().time() + delay;
 			m_in_queue = (m_active > 0);     /* queued ? */

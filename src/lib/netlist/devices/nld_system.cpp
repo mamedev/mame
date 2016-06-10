@@ -30,7 +30,7 @@ namespace netlist
 
 	NETLIB_UPDATE(clock)
 	{
-		OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
+		OUTLOGIC(m_Q, !INPLOGIC(m_feedback), m_inc  );
 	}
 
 	// ----------------------------------------------------------------------------------------

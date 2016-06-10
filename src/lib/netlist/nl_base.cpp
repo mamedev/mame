@@ -188,8 +188,8 @@ device_object_t::device_object_t(core_device_t &dev, const pstring &aname, const
 netlist_t::netlist_t(const pstring &aname)
 	:   pstate_manager_t(),
 		m_time(netlist_time::zero()),
-		m_use_deactivate(0),
 		m_queue(*this),
+		m_use_deactivate(0),
 		m_mainclock(nullptr),
 		m_solver(nullptr),
 		m_gnd(nullptr),
