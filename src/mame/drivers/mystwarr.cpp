@@ -95,25 +95,40 @@ Notes:
 
 Notes on metamrpha.  Research done by Vas Crabb
 The one rom that is different than the parent set has 2 bytes which have switched values (0 to 1 and 1 to 0).
+This appears to be a deliberate change in the main CPU progam function that begins at 03A86E, affecting a
+fragment towards the end of the function where it sets the return value:
 
-03A90E: B247                       cmp.w   D7, D1
-03A910: 6604                       bne     $3a916
-03A912: 08C0 0001                  bset    #$1, D0
-03A916: 3E3C 6B6E                  move.w  #$6b6e, D7
-03A91A: 0647 7F92                  addi.w  #$7f92, D7
-03A91E: B447                       cmp.w   D7, D2
-03A920: 6604                       bne     $3a926
-03A922: 08C0 0000                  bset    #$0, D0
+03A8FC  moveq   #$0, D0
+03A8FE  move.w  ($0,A5), D1
+03A902  move.w  ($2,A5), D2
+03A906  move.w  #$b61d, D7
+03A90A  addi.w  #$3f1b, D7
+03A90E  cmp.w   D7, D1
+03A910  bne     $3a916
+03A912  bset    #$1, D0
+03A916  move.w  #$6b6e, D7
+03A91A  addi.w  #$7f92, D7
+03A91E  cmp.w   D7, D2
+03A920  bne     $3a926
+03A922  bset    #$0, D0
 
-In this snippet of code where the change is, from the original metamrph set
-D0 is the integer return value of the function in C ABI, so it's
-if (blah) result |= 2; ... if (blah) result |= 1; ...
+The bset #$1,D0 and bset #$0,D0 instructions are reversed.  This code looks like poorly optimised compiled
+C code.  Remember D0 is the integer return value register in M68k C ABI and int is a 16-bit integer.
+The code as above amounts to:
 
-In the new dump, the "bset #$1, D0" and "bset #$0, D0" are reversed.
-if (blah) result |= 1; ... if (blah) result |= 2; ...
+unsigned result = 0;
+if (a == (46621U + 16155U)) result |= 2;
+if (b == (27502U + 32658U)) result |= 1;
+
+In the alternate set this is changed to:
+
+unsigned result = 0;
+if (a == (46621U + 16155U)) result |= 1;
+if (b == (27502U + 32658U)) result |= 2;
 
 So I would bet one is a bug fix to the other because someone forgot what each bit in the return value meant.
-There's no way a bad dump could be that precise.
+There's no way a bad dump could be that precise and logical.  However without further investigation/tracing
+we have no way of knowing which is the later/corrected version.
 
 **************************************************************************/
 
