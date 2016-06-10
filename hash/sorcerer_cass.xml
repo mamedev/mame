@@ -757,7 +757,7 @@
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="13658750">
-				<rom name="amaze.wav" size="13658750" crc="fac6fb02" sha1="de3437f174e88b6a84b652bc15aa2cae298c6f80" offset="0" />
+				<rom name="adv8.wav" size="13658750" crc="fac6fb02" sha1="de3437f174e88b6a84b652bc15aa2cae298c6f80" offset="0" />
 			</dataarea>
 		</part>
 	</software>
