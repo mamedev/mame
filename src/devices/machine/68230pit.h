@@ -43,14 +43,35 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_PIT68230_PA_OUTPUT_CALLBACK(_write) \
-		devcb = &pit68230_device::set_pa_wr_callback (*device, DEVCB_ ## _write);
+#define MCFG_PIT68230_PA_INPUT_CB(_devcb) \
+		devcb = &pit68230_device::set_pa_in_callback (*device, DEVCB_##_devcb);
 
-#define MCFG_PIT68230_PB_OUTPUT_CALLBACK(_write) \
-		devcb = &pit68230_device::set_pb_wr_callback (*device, DEVCB_ ## _write);
+#define MCFG_PIT68230_PA_OUTPUT_CB(_devcb) \
+		devcb = &pit68230_device::set_pa_out_callback (*device, DEVCB_##_devcb);
 
-#define MCFG_PIT68230_H2_CALLBACK(_write) \
-		devcb = &pit68230_device::set_h2_wr_callback (*device, DEVCB_ ## _write);
+#define MCFG_PIT68230_PB_INPUT_CB(_devcb) \
+		devcb = &pit68230_device::set_pb_in_callback (*device, DEVCB_##_devcb);
+
+#define MCFG_PIT68230_PB_OUTPUT_CB(_devcb) \
+		devcb = &pit68230_device::set_pb_out_callback (*device, DEVCB_##_devcb);
+
+#define MCFG_PIT68230_PC_INPUT_CB(_devcb) \
+		devcb = &pit68230_device::set_pc_in_callback (*device, DEVCB_##_devcb);
+
+#define MCFG_PIT68230_PC_OUTPUT_CB(_devcb) \
+		devcb = &pit68230_device::set_pc_out_callback (*device, DEVCB_##_devcb);
+
+#define MCFG_PIT68230_H1_CB(_devcb) \
+		devcb = &pit68230_device::set_h1_out_callback (*device, DEVCB_##_devcb);
+
+#define MCFG_PIT68230_H2_CB(_devcb) \
+		devcb = &pit68230_device::set_h2_out_callback (*device, DEVCB_##_devcb);
+
+#define MCFG_PIT68230_H3_CB(_devcb) \
+		devcb = &pit68230_device::set_h3_out_callback (*device, DEVCB_##_devcb);
+
+#define MCFG_PIT68230_H4_CB(_devcb) \
+		devcb = &pit68230_device::set_h4_out_callback (*device, DEVCB_##_devcb);
 
 /*-----------------------------------------------------------------------
  * Registers                RS1-RS5   R/W Description
@@ -84,46 +105,100 @@
 //**************************************************************************
 class pit68230_device :  public device_t, public device_execute_interface
 {
-public:
-// construction/destruction
-pit68230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-template<class _Object> static devcb_base &set_pa_wr_callback (device_t &device, _Object object)
-{
-		return downcast<pit68230_device &>(device).m_write_pa.set_callback (object);
-}
-template<class _Object> static devcb_base &set_h2_wr_callback (device_t &device, _Object object)
-{
-		return downcast<pit68230_device &>(device).m_write_h2.set_callback (object);
-}
+ public:
+	// construction/destruction
+	pit68230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	template<class _Object> static devcb_base &set_pa_in_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pa_in_cb.set_callback (object); }
+	template<class _Object> static devcb_base &set_pa_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pa_out_cb.set_callback (object); }
+	template<class _Object> static devcb_base &set_pb_in_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pb_in_cb.set_callback (object); }
+	template<class _Object> static devcb_base &set_pb_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pb_out_cb.set_callback (object); }
+	template<class _Object> static devcb_base &set_pc_in_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pc_in_cb.set_callback (object); }
+	template<class _Object> static devcb_base &set_pc_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pc_out_cb.set_callback (object); }
+	template<class _Object> static devcb_base &set_h1_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h1_out_cb.set_callback (object); }
+	template<class _Object> static devcb_base &set_h2_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h2_out_cb.set_callback (object); }
+	template<class _Object> static devcb_base &set_h3_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h3_out_cb.set_callback (object); }
+	template<class _Object> static devcb_base &set_h4_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h4_out_cb.set_callback (object); }
 
-DECLARE_WRITE8_MEMBER (write);
-DECLARE_READ8_MEMBER (read);
+	DECLARE_WRITE8_MEMBER (write);
+	DECLARE_READ8_MEMBER (read);
 
-void h1_set (UINT8 state);
-void portb_setbit (UINT8 bit, UINT8 state);
+	void h1_set (UINT8 state);
+	void portb_setbit (UINT8 bit, UINT8 state);
+
+	void wr_pitreg_pgcr(UINT8 data);
+	void wr_pitreg_psrr(UINT8 data);
+	void wr_pitreg_paddr(UINT8 data);
+	void wr_pitreg_pbddr(UINT8 data);
+	void wr_pitreg_pcddr(UINT8 data);
+	void wr_pitreg_pacr(UINT8 data);
+	void wr_pitreg_pbcr(UINT8 data);
+	void wr_pitreg_padr(UINT8 data);
+	void wr_pitreg_paar(UINT8 data);
+	void wr_pitreg_pbar(UINT8 data);
+	void wr_pitreg_psr(UINT8 data);
+	void wr_pitreg_tcr(UINT8 data);
+	void wr_pitreg_cprh(UINT8 data);
+	void wr_pitreg_cprm(UINT8 data);
+	void wr_pitreg_cprl(UINT8 data);
+
+	UINT8 rr_pitreg_pgcr();
+	UINT8 rr_pitreg_psrr();
+	UINT8 rr_pitreg_paddr();
+	UINT8 rr_pitreg_pbddr();
+	UINT8 rr_pitreg_pcddr();
+	UINT8 rr_pitreg_pacr();
+	UINT8 rr_pitreg_pbcr();
+	UINT8 rr_pitreg_padr();
+	UINT8 rr_pitreg_pbdr();
+	UINT8 rr_pitreg_paar();
+	UINT8 rr_pitreg_pbar();
+	UINT8 rr_pitreg_psr();
+	UINT8 rr_pitreg_cntrh();
+	UINT8 rr_pitreg_cntrm();
+	UINT8 rr_pitreg_cntrl();
 
 protected:
-// device-level overrides
-virtual void device_start () override;
-virtual void device_reset () override;
-virtual void device_timer (emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-virtual void execute_run () override;
-int m_icount;
-devcb_write8 m_write_pa;
-devcb_write_line m_write_h2;
 
-// peripheral ports
-UINT8 m_pgcr;           // Port General Control register
-UINT8 m_psrr;           // Port Service Request register
-UINT8 m_paddr;          // Port A Data Direction register
-UINT8 m_pbddr;          // Port B Data Direction register
-UINT8 m_pcddr;          // Port C Data Direction register
-UINT8 m_pacr;           // Port A Control register
-UINT8 m_pbcr;           // Port B Control register
-UINT8 m_padr;           // Port A Data register
-UINT8 m_pbdr;           // Port B Data register
-UINT8 m_psr;            // Port Status Register
+	enum {
+		REG_TCR_ENABLE =	0x01
+	};
+
+	// device-level overrides
+	virtual void device_start () override;
+	virtual void device_reset () override;
+	virtual void device_timer (emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void execute_run () override;
+	int m_icount;
+
+	devcb_write8		m_pa_out_cb;
+	devcb_read8			m_pa_in_cb;
+	devcb_write8		m_pb_out_cb;
+	devcb_read8			m_pb_in_cb;
+	devcb_write8		m_pc_out_cb;
+	devcb_read8			m_pc_in_cb;
+	devcb_write_line	m_h1_out_cb;
+	devcb_write_line	m_h2_out_cb;
+	devcb_write_line	m_h3_out_cb;
+	devcb_write_line	m_h4_out_cb;
+
+	// peripheral ports
+	UINT8 m_pgcr;           // Port General Control register
+	UINT8 m_psrr;           // Port Service Request register
+	UINT8 m_paddr;          // Port A Data Direction register
+	UINT8 m_pbddr;          // Port B Data Direction register
+	UINT8 m_pcddr;          // Port C Data Direction register
+	UINT8 m_pacr;           // Port A Control register
+	UINT8 m_pbcr;           // Port B Control register
+	UINT8 m_padr;           // Port A Data register
+	UINT8 m_pbdr;           // Port B Data register
+	UINT8 m_psr;            // Port Status Register
+	UINT8 m_tcr;		// Timer Control Register
+	int m_cpr;			// Counter Preload Registers (3 x 8 = 24 bits) 
+	//	UINT8 m_cprh;	// Counter Preload Register High
+	//	UINT8 m_cprm;	// Counter Preload Register Mid
+	//	UINT8 m_cprl;	// Counter Preload Register Low
+	int   m_cntr;		// - The 24 bit Counter 
 };
 
 // device type definition
