@@ -5,7 +5,7 @@
 --
 
 	premake._filelevelconfig = false
-
+	premake.check_regenerate = true
 --
 -- Open a file for output, and call a function to actually do the writing.
 -- Used by the actions to generate solution and project files.
@@ -23,38 +23,51 @@
 	function premake.generate(obj, filename, callback)
 		filename = premake.project.getfilename(obj, filename)
 
-		io.capture()
-		callback(obj)
-		local new = io.endcapture()
+		if (premake.check_regenerate) then
+			io.capture()
+			callback(obj)
+			local new = io.endcapture()
 
-		local delta = false
+			local delta = false
 
-		local f, err = io.open(filename, "rb")
-		if (not f) then
-			if string.find(err, "No such file or directory") then
-				delta = true
+			local f, err = io.open(filename, "rb")
+			if (not f) then
+				if string.find(err, "No such file or directory") then
+					delta = true
+				else
+					error(err, 0)
+				end
 			else
-				error(err, 0)
+				local existing = f:read("*all")
+				if existing ~= new then
+					delta = true
+				end
+				f:close()
+			end
+
+			if delta then
+				printf("Generating %s...", filename)
+				local f, err = io.open(filename, "wb")
+				if (not f) then
+					error(err, 0)
+				end
+
+				f:write(new)
+				f:close()
+			else
+				printf("Skipping %s as its contents would not change.", filename)
 			end
 		else
-			local existing = f:read("*all")
-			if existing ~= new then
-				delta = true
-			end
-			f:close()
-		end
-
-		if delta then
 			printf("Generating %s...", filename)
+			
 			local f, err = io.open(filename, "wb")
 			if (not f) then
 				error(err, 0)
 			end
 
-			f:write(new)
+			io.output(f)
+			callback(obj)
 			f:close()
-		else
-			printf("Skipping %s as its contents would not change.", filename)
 		end
 	end
 
