@@ -2868,6 +2868,7 @@ if (MACHINES["APPLE_FDC"]~=null) then
 		MAME_DIR .. "src/devices/machine/applefdc.h",
 	}
 end
+
 ---------------------------------------------------
 --
 --@src/devices/machine/sonydriv.h,MACHINES["SONY_DRIVE"] = true
@@ -2876,5 +2877,16 @@ if (MACHINES["SONY_DRIVE"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/sonydriv.cpp",
 		MAME_DIR .. "src/devices/machine/sonydriv.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/scnxx562.h,MACHINES["SCNXX562"] = true
+---------------------------------------------------
+if (MACHINES["SCNXX562"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/scnxx562.cpp",
+		MAME_DIR .. "src/devices/machine/scnxx562.h",
 	}
 end
