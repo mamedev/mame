@@ -402,50 +402,43 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 	for (auto const & s : netlist().save_list())
 	{
 		netlist().log().debug("saving state for {1}\n", s->m_name.cstr());
-		switch (s->m_dt)
+		if (s->m_dt.is_float)
 		{
-			case pstate_data_type_e::DT_DOUBLE:
-				{
-					double *td = s->resolved<double>();
-					if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
-				}
-				break;
-			case pstate_data_type_e::DT_FLOAT:
-				{
-					float *td = s->resolved<float>();
-					if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
-				}
-				break;
-#if (PHAS_INT128)
-			case pstate_data_type_e::DT_INT128:
-				// FIXME: we are cheating here
-				save_pointer((char *) s->m_ptr, s->m_name.cstr(), s->m_count * sizeof(INT128));
-				break;
-#endif
-			case pstate_data_type_e::DT_INT64:
-				save_pointer((INT64 *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_INT16:
-				save_pointer((INT16 *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_INT8:
-				save_pointer((INT8 *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_INT:
-				save_pointer((int *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_BOOLEAN:
-				save_pointer((bool *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_CUSTOM:
-				break;
-			case pstate_data_type_e::NOT_SUPPORTED:
-			default:
-				netlist().log().fatal("found unsupported save element %s\n", s->m_name);
-				break;
+			if (s->m_dt.size == sizeof(double))
+			{
+				double *td = s->resolved<double>();
+				if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
+			}
+			else if (s->m_dt.size == sizeof(float))
+			{
+				float *td = s->resolved<float>();
+				if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
+			}
+			else
+				netlist().log().fatal("Unknown floating type for {1}\n", s->m_name.cstr());
 		}
+		else if (s->m_dt.is_integral)
+		{
+			if (s->m_dt.size == sizeof(long long int))
+				save_pointer((long long int *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(long int))
+				save_pointer((long int *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(int))
+				save_pointer((int *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(short))
+				save_pointer((short *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(char))
+				save_pointer((char *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else
+				netlist().log().fatal("Unknown integral type for {1}\n", s->m_name.cstr());
+		}
+		else if (s->m_dt.is_custom)
+		{
+			/* do nothing */
+		}
+		else
+			netlist().log().fatal("found unsupported save element %s\n", s->m_name);
 	}
-
 }
 
 // ----------------------------------------------------------------------------------------

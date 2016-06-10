@@ -31,10 +31,8 @@ namespace netlist
 
 #if (PHAS_INT128)
 		using INTERNALTYPE = UINT128;
-		static const pstate_data_type_e STATETYPE = DT_INT128;
 #else
 		using INTERNALTYPE = UINT64;
-		static constexpr pstate_data_type_e STATETYPE = pstate_data_type_e::DT_INT64;
 #endif
 		static constexpr INTERNALTYPE RESOLUTION = NETLIST_INTERNAL_RES;
 
@@ -125,14 +123,12 @@ namespace netlist
 		INTERNALTYPE m_time;
 	};
 
-
-
 }
 
 namespace plib {
 template<> inline void pstate_manager_t::save_item(const void *owner, netlist::netlist_time &nlt, const pstring &stname)
 {
-	save_state_ptr(owner, stname, netlist::netlist_time::STATETYPE, sizeof(netlist::netlist_time::INTERNALTYPE), 1, nlt.get_internaltype_ptr(), false);
+	save_state_ptr(owner, stname, datatype_t(sizeof(netlist::netlist_time::INTERNALTYPE), false, true, false), 1, nlt.get_internaltype_ptr());
 }
 }
 

@@ -105,7 +105,7 @@ const logic_family_desc_t *family_CD4XXX()
 queue_t::queue_t(netlist_t &nl)
 	: timed_queue<net_t *, netlist_time>(512)
 	, object_t(nl, "QUEUE", QUEUE)
-	, plib::pstate_callback_t()
+	, plib::pstate_manager_t::callback_t()
 	, m_qsize(0)
 	, m_times(512)
 	, m_names(512)
@@ -199,7 +199,7 @@ netlist_t::netlist_t(const pstring &aname)
 		m_log(this),
 		m_lib(nullptr)
 {
-	save_item(this, static_cast<plib::pstate_callback_t &>(m_queue), "m_queue");
+	save_item(this, static_cast<plib::pstate_manager_t::callback_t &>(m_queue), "m_queue");
 	save_item(this, m_time, "m_time");
 }
 

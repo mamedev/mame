@@ -991,7 +991,7 @@ namespace netlist
 
 	class queue_t : public timed_queue<net_t *, netlist_time>,
 							public object_t,
-							public plib::pstate_callback_t
+							public plib::pstate_manager_t::callback_t
 	{
 	public:
 		queue_t(netlist_t &nl);
@@ -1304,8 +1304,6 @@ protected:
 
 
 }
-
-NETLIST_SAVE_TYPE(netlist::core_terminal_t::state_e, pstate_data_type_e::DT_INT);
 
 
 #endif /* NLBASE_H_ */
