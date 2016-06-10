@@ -1553,6 +1553,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2mdtb",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2b",        CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"varth",       CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
+	{"varthb",      CPS_B_04,     mapper_VA63B, 0, 0, 0, 0x0F },
 	{"varthr1",     CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
 	{"varthu",      CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthj",      CPS_B_21_BT5, mapper_VA22B },   /* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
@@ -1947,12 +1948,26 @@ void cps_state::cps1_get_video_base()
 	}
 
 	/* Some of the sf2 hacks use only sprite port 0x9100 and the scroll layers are offset */
-	if (m_game_config->bootleg_kludge == 1)
+	if (m_game_config->bootleg_kludge == 0x01)
 	{
 		m_cps_a_regs[CPS1_OBJ_BASE] = 0x9100;
 		scroll1xoff = -0x0c;
 		scroll2xoff = -0x0e;
 		scroll3xoff = -0x10;
+	}
+	else
+	if (m_game_config->bootleg_kludge == 0x0E)
+	{
+		scroll1xoff = 0xffba;
+		scroll2xoff = 0xffc0;
+		scroll3xoff = 0xffba;
+	}
+	else
+	if (m_game_config->bootleg_kludge == 0x0F)
+	{
+		scroll1xoff = 0xffc0;
+		scroll2xoff = 0xffc0;
+		scroll3xoff = 0xffc0;
 	}
 	else
 	if (m_game_config->bootleg_kludge == 2)

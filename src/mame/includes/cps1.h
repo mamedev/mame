@@ -370,6 +370,7 @@ public:
 	DECLARE_WRITE8_MEMBER(knightsb_snd_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_msm5205_0_data_w);
 	DECLARE_WRITE8_MEMBER(fcrash_msm5205_1_data_w);
+	DECLARE_WRITE16_MEMBER(varthb_layer_w);
 	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fcrash_update_transmasks();
 	void fcrash_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -425,6 +426,7 @@ INPUT_PORTS_EXTERN( knights );
 INPUT_PORTS_EXTERN( punisher );
 INPUT_PORTS_EXTERN( sf2 );
 INPUT_PORTS_EXTERN( slammast );
+INPUT_PORTS_EXTERN( varth );
 
 
 #endif
