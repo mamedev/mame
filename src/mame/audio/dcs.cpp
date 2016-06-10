@@ -1949,7 +1949,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 	/* copy the current data into the buffer */
 	{
 		int count = m_size / (2*(m_incs ? m_incs : 1));
-		INT16 buffer[0x400];
+		std::unique_ptr<INT16[]> buffer;
+		buffer = std::make_unique<INT16[]>(count);
 		int i;
 
 		for (i = 0; i < count; i++)
@@ -1959,7 +1960,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 		}
 
 		if (m_channels)
-			dmadac_transfer(&m_dmadac[0], m_channels, 1, m_channels, count / m_channels, buffer);
+			dmadac_transfer(&m_dmadac[0], m_channels, 1, m_channels, count / m_channels, buffer.get());
 	}
 
 	/* check for wrapping */
