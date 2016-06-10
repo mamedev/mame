@@ -235,7 +235,6 @@ void menu_selector::find_matches(const char *str)
 		if (m_str_items[index] == "_skip_")
 			continue;
 
-		// pick the best match between driver name and description
 		int curpenalty = fuzzy_substring(str, m_str_items[index]);
 
 		// insert into the sorted table of matches

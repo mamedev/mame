@@ -185,6 +185,7 @@ struct c_mnfct
 	static void set(const char *str);
 	static std::string getname(const char *str);
 	static std::vector<std::string> ui;
+	static std::unordered_map<std::string, int> uimap;
 	static UINT16 actual;
 };
 

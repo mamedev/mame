@@ -209,8 +209,7 @@ void datfile_manager::load_data_info(const game_driver *drv, std::string &buffer
 {
 	dataindex index_idx;
 	drvindex driver_idx;
-	std::string tag;
-	std::string filename;
+	std::string tag, filename;
 
 	switch (type)
 	{
@@ -269,7 +268,7 @@ void datfile_manager::load_data_info(const game_driver *drv, std::string &buffer
 //-------------------------------------------------
 void datfile_manager::load_data_text(const game_driver *drv, std::string &buffer, dataindex &idx, std::string &tag)
 {
-	dataindex::iterator itemsiter = idx.find(drv);
+	auto itemsiter = idx.find(drv);
 	if (itemsiter == idx.end())
 	{
 		auto cloneof = driver_list::non_bios_clone(*drv);
@@ -312,7 +311,7 @@ void datfile_manager::load_data_text(const game_driver *drv, std::string &buffer
 void datfile_manager::load_driver_text(const game_driver *drv, std::string &buffer, drvindex &idx, std::string &tag)
 {
 	std::string s(core_filename_extract_base(drv->source_file));
-	drvindex::const_iterator index = idx.find(s);
+	auto index = idx.find(s);
 
 	// if driver not found, return
 	if (index == idx.end())
@@ -346,7 +345,6 @@ void datfile_manager::load_driver_text(const game_driver *drv, std::string &buff
 //-------------------------------------------------
 int datfile_manager::index_mame_mess_info(dataindex &index, drvindex &index_drv, int &drvcount)
 {
-	std::string name;
 	size_t foundtag;
 	auto t_mame = TAG_MAMEINFO_R.size();
 	auto t_mess = TAG_MESSINFO_R.size();
@@ -354,7 +352,7 @@ int datfile_manager::index_mame_mess_info(dataindex &index, drvindex &index_drv,
 	auto t_info = TAG_INFO.size();
 
 	char rbuf[64 * 1024];
-	std::string readbuf, xid;
+	std::string readbuf, xid, name;
 	while (fgets(rbuf, 64 * 1024, fp) != nullptr)
 	{
 		readbuf = chartrimcarriage(rbuf);
@@ -424,7 +422,9 @@ int datfile_manager::index_datafile(dataindex &index, int &swcount)
 			m_sysinfo_rev = readbuf.substr(t_sysinfo + 1, found - t_sysinfo);
 		}
 		else if (m_story_rev.empty() && readbuf.compare(0, t_story, TAG_STORY_R) == 0)
+		{
 			m_story_rev = readbuf.substr(t_story + 1);
+		}
 		else if (readbuf.compare(0, t_info, TAG_INFO) == 0)
 		{
 			// search for game info
@@ -558,6 +558,7 @@ void datfile_manager::command_sub_menu(const game_driver *drv, std::vector<std::
 	{
 		m_menuidx.clear();
 		index_menuidx(drv, m_cmdidx, m_menuidx);
+		menuitems.reserve(m_menuidx.size());
 		for (auto & elem : m_menuidx)
 			menuitems.push_back(elem.first);
 		parseclose();

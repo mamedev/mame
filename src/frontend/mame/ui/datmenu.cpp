@@ -171,7 +171,6 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
-	x2 -= UI_BOX_LR_BORDER;
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
@@ -224,22 +223,20 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 
 void menu_dats_view::get_data()
 {
-	std::vector<int> xstart;
-	std::vector<int> xend;
+	std::vector<int> xstart, xend;
 	std::string buffer;
-	std::vector<std::string> m_item;
 	if (m_items_list[m_actual].option == UI_COMMAND_LOAD)
 	{
+		std::vector<std::string> m_item;
 		mame_machine_manager::instance()->datfile().command_sub_menu(m_driver, m_item);
 		if (!m_item.empty())
 		{
-			for (size_t x = 0; x < m_item.size(); ++x)
+			for (auto & e : m_item)
 			{
 				std::string t_buffer;
-				buffer.append(m_item[x]).append("\n");
-				mame_machine_manager::instance()->datfile().load_command_info(t_buffer, m_item[x]);
-				if (!t_buffer.empty())
-					buffer.append(t_buffer).append("\n");
+				buffer.append(e).append("\n");
+				mame_machine_manager::instance()->datfile().load_command_info(t_buffer, e);
+				if (!t_buffer.empty()) buffer.append(t_buffer).append("\n");
 			}
 			convert_command_glyph(buffer);
 		}
@@ -247,7 +244,7 @@ void menu_dats_view::get_data()
 	else
 		mame_machine_manager::instance()->datfile().load_data_info(m_driver, buffer, m_items_list[m_actual].option);
 
-	int lines = ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	auto lines = ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
@@ -270,7 +267,7 @@ void menu_dats_view::get_data_sw()
 			mame_machine_manager::instance()->datfile().load_software_info(m_swinfo->listname, buffer, m_swinfo->shortname, m_swinfo->parentname);
 	}
 
-	int lines = ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	auto lines = ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));

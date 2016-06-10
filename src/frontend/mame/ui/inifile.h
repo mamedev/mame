@@ -29,10 +29,12 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	std::string get_file(int file = -1) { return ((file == -1) ? ini_index[c_file].first : ini_index[file].first); }
-	std::string get_category(int cat = -1) { return ((cat == -1) ? ini_index[c_file].second[c_cat].first : ini_index[c_file].second[cat].first); }
+	std::string get_file() { return ini_index[c_file].first; }
+	std::string get_file(int file) { return ini_index[file].first; }
+	std::string get_category(int cat) { return ini_index[c_file].second[cat].first; }
+	std::string get_category() { return ini_index[c_file].second[c_cat].first; }
 	size_t total() { return ini_index.size(); }
-	size_t cat_total(int cat = -1) { return ((cat == -1) ? ini_index[c_file].second.size() : ini_index[cat].second.size()); }
+	size_t cat_total() { return ini_index[c_file].second.size(); }
 	UINT16 &cur_file() { return c_file; }
 	UINT16 &cur_cat() { return c_cat; }
 
@@ -42,8 +44,8 @@ public:
 	// setters
 	void move_file(int d) { c_file += d; c_cat = 0; }
 	void move_cat(int d) { c_cat += d; }
-	void set_cat(int i = -1) { (i == -1) ? c_cat = 0 : c_cat = i; }
-	void set_file(int i = -1) { (i == -1) ? c_file = 0 : c_file = i; }
+	void set_cat(int i) { c_cat = i; }
+	void set_file(int i) { c_file = i; }
 
 private:
 
