@@ -181,6 +181,7 @@ fanucs15.cpp
 fanucspmg.cpp
 fb01.cpp
 fc100.cpp
+fccpu30.cpp
 fidel6502.cpp
 fidel68k.cpp
 fidelz80.cpp
