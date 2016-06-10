@@ -144,7 +144,7 @@ public:
 		case SDL_KEYDOWN:
 			keyboard.state[OSD_SDL_INDEX_KEYSYM(&sdlevent.key.keysym)] = 0x80;
 			if (sdlevent.key.keysym.sym < 0x20)
-				machine().ui_input().push_char_event(sdl_window_list.front()->target(), sdlevent.key.keysym.sym);
+				machine().ui_input().push_char_event(window_list.front()->target(), sdlevent.key.keysym.sym);
 			break;
 
 		case SDL_KEYUP:
@@ -155,7 +155,7 @@ public:
 			if (*sdlevent.text.text)
 			{
 				auto window = GET_FOCUS_WINDOW(&event.text);
-				//printf("Focus window is %p - wl %p\n", window, sdl_window_list);
+				//printf("Focus window is %p - wl %p\n", window, window_list);
 				if (window != nullptr)
 				{
 					auto ptr = sdlevent.text.text;

@@ -71,11 +71,11 @@ public:
 			char buffer[1024];
 
 			// if we are in fullscreen mode, go to windowed mode
-			if ((video_config.windowed == 0) && !win_window_list.empty())
+			if ((video_config.windowed == 0) && !window_list.empty())
 				winwindow_toggle_full_screen();
 
 			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
-			win_message_box_utf8(!win_window_list.empty() ? win_window_list.front()->platform_window<HWND>() : nullptr, buffer, emulator_info::get_appname(), MB_OK);
+			win_message_box_utf8(!window_list.empty() ? window_list.front()->platform_window<HWND>() : nullptr, buffer, emulator_info::get_appname(), MB_OK);
 		}
 		else
 			chain_output(channel, msg, args);
@@ -519,9 +519,9 @@ void windows_osd_interface::init(running_machine &machine)
 	osd_common_t::init_subsystems();
 
 	// notify listeners of screen configuration
-	for (auto info : win_window_list)
+	for (auto info : window_list)
 	{
-		machine.output().set_value(string_format("Orientation(%s)", info->m_monitor->devicename()).c_str(), info->m_targetorient);
+		machine.output().set_value(string_format("Orientation(%s)", info->monitor()->devicename()).c_str(), std::static_pointer_cast<win_window_info>(info)->m_targetorient);
 	}
 
 	// hook up the debugger log

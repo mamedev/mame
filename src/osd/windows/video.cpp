@@ -80,7 +80,7 @@ bool windows_osd_interface::video_init()
 	}
 
 	if (video_config.mode != VIDEO_MODE_NONE)
-		SetForegroundWindow(win_window_list.front()->platform_window<HWND>());
+		SetForegroundWindow(window_list.front()->platform_window<HWND>());
 
 	return true;
 }
@@ -169,7 +169,7 @@ void windows_osd_interface::update(bool skip_redraw)
 	if (!skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
-		for (auto window : win_window_list)
+		for (auto window : window_list)
 			window->update();
 //      profiler_mark(PROFILER_END);
 	}

@@ -52,7 +52,7 @@ public:
 	virtual bool should_hide_mouse()
 	{
 		if (winwindow_has_focus()  // has focus
-			&& (!video_config.windowed || !win_window_list.front()->win_has_menu()) // not windowed or doesn't have a menu
+			&& (!video_config.windowed || !window_list.front()->win_has_menu()) // not windowed or doesn't have a menu
 			&& (input_enabled() && !input_paused()) // input enabled and not paused
 			&& (mouse_enabled() || lightgun_enabled())) // either mouse or lightgun enabled in the core
 		{

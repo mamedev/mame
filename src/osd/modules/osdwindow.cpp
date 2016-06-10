@@ -21,9 +21,11 @@
 #include "render/drawsdl.h"
 #endif
 
-osd_window::~osd_window()
-{
-}
+//============================================================
+//  GLOBAL VARIABLES
+//============================================================
+
+std::list<std::shared_ptr<osd_window>> window_list;
 
 std::unique_ptr<osd_renderer> osd_renderer::make_for_type(int mode, std::shared_ptr<osd_window> window, int extra_flags)
 {

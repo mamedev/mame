@@ -574,7 +574,7 @@ public:
 		dinput_joystick_device *devinfo;
 		int result = 0;
 
-		if (!win_window_list.empty() && win_window_list.front()->win_has_menu())
+		if (!window_list.empty() && window_list.front()->win_has_menu())
 			cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
 
 		// allocate and link in a new device

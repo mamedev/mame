@@ -125,8 +125,6 @@ public:
 		m_main(nullptr)
 		{}
 
-	virtual ~osd_window();
-
 	virtual render_target *target() = 0;
 	virtual int fullscreen() const = 0;
 	virtual running_machine &machine() const = 0;
@@ -174,6 +172,9 @@ public:
 
 	virtual void show_pointer() = 0;
 	virtual void hide_pointer() = 0;
+
+	virtual void update() = 0;
+	virtual void destroy() = 0;
 
 	void renderer_reset() { m_renderer.reset(); }
 #ifndef OSD_SDL
@@ -339,5 +340,7 @@ struct osd_video_config
 //============================================================
 
 extern osd_video_config video_config;
+
+extern std::list<std::shared_ptr<osd_window>> window_list;
 
 #endif /* __OSDWINDOW__ */
