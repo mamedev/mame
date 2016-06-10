@@ -2034,6 +2034,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/scnxx562.h,MACHINES["DUSCC"] = true
+---------------------------------------------------
+
+if (MACHINES["DUSCC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/scnxx562.cpp",
+		MAME_DIR .. "src/devices/machine/scnxx562.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/serflash.h,MACHINES["SERFLASH"] = true
 ---------------------------------------------------
 
