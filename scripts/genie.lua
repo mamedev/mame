@@ -9,8 +9,6 @@ newoption {
 
 premake.check_paths = true
 premake.make.override = { "TARGET" }
-premake.ignore_makefile_changes = true
-premake.check_regenerate = false
 
 premake.xcode.parameters = { 'CLANG_CXX_LANGUAGE_STANDARD = "c++14"', 'CLANG_CXX_LIBRARY = "libc++"' }
 
