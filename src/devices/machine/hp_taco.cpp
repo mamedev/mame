@@ -1686,42 +1686,38 @@ void hp_taco_device::call_unload()
 		set_tape_present(false);
 }
 
-void hp_taco_device::call_display()
+int hp_taco_device::call_display(std::string& s)
 {
-/*
-        // Mostly lifted from cassette_image_device::call_display ;)
+	// Mostly lifted from cassette_image_device::call_display ;)
 
-        // Do not show anything if image not loaded or tape not moving
-        if (!exists() || m_start_time.is_never()) {
-                return;
-        }
+	// Do not show anything if image not loaded or tape not moving
+	if (!exists() || m_start_time.is_never()) {
+		return -1;
+	}
 
-        char buffer[ 64 ];
+	char buffer[ 64 ];
 
-        char track = BIT(m_status_reg , STATUS_TRACKB_BIT) ? 'B' : 'A';
-        char r_w = m_tape_wr ? 'W' : 'R';
-        char m1;
-        char m2;
+	char track = BIT(m_status_reg , STATUS_TRACKB_BIT) ? 'B' : 'A';
+	char r_w = m_tape_wr ? 'W' : 'R';
+	char m1;
+	char m2;
 
-        if (m_tape_fwd) {
-                m1 = '>';
-                m2 = m_tape_fast ? '>' : ' ';
-        } else {
-                m1 = '<';
-                m2 = m_tape_fast ? '<' : ' ';
-        }
+	if (m_tape_fwd) {
+		m1 = '>';
+		m2 = m_tape_fast ? '>' : ' ';
+	} else {
+		m1 = '<';
+		m2 = m_tape_fast ? '<' : ' ';
+	}
 
-        int pos_in = current_tape_pos() / ONE_INCH_POS;
+	int pos_in = current_tape_pos() / ONE_INCH_POS;
 
-        snprintf(buffer , sizeof(buffer) , "%c %c %c%c [%04d/1824]" , track , r_w , m1 , m2 , pos_in);
+	snprintf(buffer , sizeof(buffer) , "%c %c %c%c [%04d/1824]" , track , r_w , m1 , m2 , pos_in);
 
-    float x, y;
-    x = 0.2f;
-    y = 0.5f;
-    y *= device().machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+	s = buffer;
 
-    device().machine().ui().draw_text_box(&device().machine().render().ui_container(), buffer, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
-    */
+	// Not correct when there are 2 or more instances of TACO
+	return 0;
 }
 
 const char *hp_taco_device::file_extensions() const

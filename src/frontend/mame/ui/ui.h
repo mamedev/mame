@@ -264,8 +264,6 @@ public:
 	void draw_textured_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, UINT32 flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	virtual void popup_time_string(int seconds, std::string message) override;
 
-	virtual void image_display(const device_type &type, device_image_interface *image) override;
-
 	virtual void menu_reset() override;
 
 private:
