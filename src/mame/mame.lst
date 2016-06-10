@@ -12096,6 +12096,7 @@ sf2mdta                         // bootleg
 sf2mdtb                         // bootleg
 sgyxz                           // bootleg (All-In Electronics)
 slampic                         // bootleg
+varthb                          // bootleg
 
 @source:feversoc.cpp
 feversoc                        // (c) 2004
