@@ -4402,6 +4402,116 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="vaindrm">
+		<description>Vain Dream</description>
+		<year>1993</year>
+		<publisher>Glodia</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="vain dream (system disk).hdm" size="1261568" crc="193225c1" sha1="2d3ee819482517b3b9d5d5c6e3877f2def4fbc20" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="vain dream" sha1="947209a09f094536f30bb804bbcf34896f23dfef" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="vaindrm2">
+		<description>Vain Dream II</description>
+		<year>1993</year>
+		<publisher>Glodia</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="vain dream ii (system disk).hdm" size="1261568" crc="a95283e8" sha1="a61fd855e256c7216a8d8d5b7f72dcaed319e727" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="vain dream ii" sha1="9e913130175e0c73ea346a90ed46fe5709aee67b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="vastness">
+		<description>Vastness: Kuukyo no Ikenie-tachi</description>
+		<year>1993</year>
+		<publisher>CD Bros.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="vastness" sha1="12d1fbe66e92cd580616814077eebb402d4e0332" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="veildark">
+		<description>Veil of Darkness</description>
+		<year>1994</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="veil of darkness" sha1="bf61510fbd3893f086297ad0c3e27655a08bde1c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Originally labeled as "mp3 source". It probably needs a redump. -->
+	<software name="viewpoin">
+		<description>Viewpoint</description>
+		<year>1993</year>
+		<publisher>Ving</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="viewpoint" sha1="f5d017b08a34eaadfab6e4f4c272d574a09d1718" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="viperv6">
+		<description>Viper V6 Turbo RS</description>
+		<year>1995</year>
+		<publisher>Sogna</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="viper v6 turbo rs" sha1="3ba0afc8b3cfbdae0e37c0e049d8ed6d9dd4e4ff" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="viperv10">
+		<description>Viper V10 Turbo RS</description>
+		<year>1995</year>
+		<publisher>Sogna</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="viper v10 turbo rs" sha1="0afcc96abbe300b9b0499948fede525dcf084ba0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	There are two other images of the save disk:
+	Virtuacall (Disk A) [Alt 1].hdm / c36be7e424fecd61c83c50258e8a8b4b02ad551f
+	Virtuacall (Disk A) [Alt 2].hdm / 5f452d3b6582942cbbb37f97631ddf63a88e580c
+	but this one seems to be cleaner (no modified/deleted files).
+	-->
+	<software name="vircall">
+		<description>Virtuacall</description>
+		<year>1995</year>
+		<publisher>Fairytale</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="virtuacall (disk a).hdm" size="1261568" crc="ebdfc4b9" sha1="b4240a3b28093c832a38be17cf72495f4f094f88" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="virtuacall" sha1="5db49ac6cf4d8ed15e5f2e42ebd3b431f3b885c5" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="volfied">
 		<description>Volfied</description>
 		<year>1991</year>
@@ -4409,6 +4519,17 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="volfied" sha1="353db36abf89433dfc2f63659f471fd9edfbaf8d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wakoku">
+		<description>Wakoku Seiha Den</description>
+		<year>1994</year>
+		<publisher>Mic</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wakoku seiha den" sha1="c678cf3231d465243e898f81259032635bc7aaf5" />
 			</diskarea>
 		</part>
 	</software>
@@ -4522,6 +4643,43 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 	</software>
+	
+	<!--
+	There's another image of the save disk (Wrestle Angels 3 (Save disk) [Alt 1].hdm,
+	SHA1 dcfb0b2da665aa4bd1630003c6a1b719c11b6dce), but this one seems to be cleaner
+	(no modified/deleted files).
+	-->
+	<software name="wresang3">
+		<description>Wrestle Angels 3</description>
+		<year>1994</year>
+		<publisher>Great</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="wrestle angels 3 (save disk).hdm" size="1261568" crc="c29e2e9c" sha1="1f4d99366200b8938cc3a1868bc2540a20720740" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wrestle angels 3" sha1="2d5cde32541789c456d6e0ebb7a4ef7c91886f6d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wresangs">
+		<description>Wrestle Angels Special</description>
+		<year>1994</year>
+		<publisher>Great</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="wrestle angels special (user disk).hdm" size="1261568" crc="7df5c0a6" sha1="09c2ecaba12aabc2b2cf8f4527f491ccd257faac" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wrestle angels special" sha1="8411c536a37c0a59f42831c906c5d39c19b86df4" />
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="wwcarmen">
 		<description>Where in the World is Carmen Sandiego?</description>
@@ -4530,6 +4688,17 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="where in the world is carmen sandiego" sha1="cc3fe8d265784809b893a8e8375153060b162a1d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wworth">
+		<description>Words Worth</description>
+		<year>1993</year>
+		<publisher>Elf</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="words worth" sha1="63c9e54e3cc6db4e716377ac15a08c5941327fef" />
 			</diskarea>
 		</part>
 	</software>
@@ -4567,6 +4736,60 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="yamikets">
+		<description>Yami no Ketsuzoku Special</description>
+		<year>1991</year>
+		<publisher>System Sacom</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="yami no ketsuzoku special (user disk).hdm" size="1261568" crc="62e6f35a" sha1="ee1e86547bac53e5e9dc7a010bc60f3b511965b6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="yami no ketsuzoku special" sha1="17fb4fcf02935c509a87f6d8c5b7809b633f64a8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="yojuusen">
+		<description>Yojuu Senki: A.D. 2048</description>
+		<year>1993</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="youjuu senki - a.d. 2048" sha1="724d7aaaae57be82231eacfca5fe0501a9683277" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="yumimimx">
+		<description>Yumimi Mix</description>
+		<year>1993</year>
+		<publisher>CRI</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="yumimi mix" sha1="3b3f323e8c70ced7fe47850b1910c318a9a23f10" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="yuuwaku">
+		<description>Yuuwaku</description>
+		<year>1995</year>
+		<publisher>T2</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="yuuwaku (user disk).hdm" size="1261568" crc="985a282d" sha1="fbdbf25410b554156becc935fbf34ea103870c42" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="yuuwaku" sha1="5448539447e40144bb0b24d5e9298449ecd1c7b1" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="zak">
 		<description>Zak McKracken and The Alien Mindbenders</description>
 		<year>1990</year>
@@ -4574,6 +4797,33 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="zak mckracken" sha1="0a06dcd3aaebcd79ec3c03dd0b179b9047e2bccd" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="zan2">
+		<description>Zan II: Towns Special</description>
+		<year>1992</year>
+		<publisher>Wolfteam</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="zan 2 towns special (user disk).hdm" size="1261568" crc="863e02e3" sha1="28622691fd1a431055f4c586cfe585e0920a6153" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zan 2 towns special" sha1="e1a85e9691abb531bdef1cdf9373630ffa2338d7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="zatsuon">
+		<description>Zatsuon Ryouiki</description>
+		<year>1995</year>
+		<publisher>D.O.</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zatsuon ryouiki" sha1="f61c4277ef4a2ec49f127d6b798e30d9b7b0b3af" />
 			</diskarea>
 		</part>
 	</software>
