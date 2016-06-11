@@ -37,10 +37,9 @@ namespace netlist
 		, m_LTQ(*this, "LTQ")
 		, m_BIQ(*this, "BIQ")
 		, m_RBIQ(*this, "RBIQ")
-		, m_state(0)
+		, m_state(*this, "m_state", 0)
 		, m_Q(*this, {{"a", "b", "c", "d", "e", "f", "g"}})
 		{
-			save(NLNAME(m_state));
 		}
 
 		NETLIB_RESETI();
@@ -58,7 +57,7 @@ namespace netlist
 		logic_input_t m_BIQ;
 		logic_input_t m_RBIQ;
 
-		UINT8 m_state;
+		state_var<unsigned> m_state;
 
 		object_array_t<logic_output_t, 7> m_Q;  /* a .. g */
 

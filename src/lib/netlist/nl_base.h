@@ -1128,24 +1128,44 @@ protected:
 	struct state_var
 	{
 	public:
-		state_var(device_t &d, const pstring name, T value)
+		state_var(device_t &dev, const pstring name, const T &value)
 		: m_value(value)
 		{
-			d.save(m_value, name);
+			dev.save(m_value, name);
 		}
 
 		state_var(const state_var &rhs) NOEXCEPT = default;
 		state_var(state_var &&rhs) NOEXCEPT = default;
 		state_var &operator=(const state_var rhs) { m_value = rhs.m_value; return *this; }
 		state_var &operator=(const T rhs) { m_value = rhs; return *this; }
-
-
-		operator T &() { return m_value; }
-		operator const T &() const { return m_value; }
+		operator T & () { return m_value; }
+		T & operator()() { return m_value; }
+		operator const T & () const { return m_value; }
+		const T & operator()() const { return m_value; }
 	private:
 		T m_value;
 	};
 
+	template <typename T, std::size_t N>
+	struct state_var<T[N]>
+	{
+	public:
+		state_var(device_t &d, const pstring name, const T & value)
+		{
+			d.save(m_value, name);
+			for (int i=0; i<N; i++)
+				m_value[i] = value;
+		}
+
+		state_var(const state_var &rhs) NOEXCEPT = default;
+		state_var(state_var &&rhs) NOEXCEPT = default;
+		state_var &operator=(const state_var rhs) { m_value = rhs.m_value; return *this; }
+		state_var &operator=(const T rhs) { m_value = rhs; return *this; }
+		T & operator[](const std::size_t i) { return m_value[i]; }
+		const T & operator[](const std::size_t i) const { return m_value[i]; }
+	private:
+		T m_value[N];
+	};
 
 
 	// -----------------------------------------------------------------------------

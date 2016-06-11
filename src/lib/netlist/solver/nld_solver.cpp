@@ -551,11 +551,11 @@ void matrix_solver_t::log_stats()
 		log().verbose("       has {1} elements", this->has_timestep_devices() ? "timestep" : "no timestep");
 		log().verbose("       {1:6.3} average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
 		log().verbose("       {1:10} invocations ({2:6} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
-				this->m_stat_calculations,
-				this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
-				this->m_iterative_fail,
-				100.0 * (double) this->m_iterative_fail / (double) this->m_stat_calculations,
-				(double) this->m_iterative_total / (double) this->m_stat_calculations);
+				this->m_stat_calculations(),
+				this->m_stat_calculations() * 10 / (int) (this->netlist().time().as_double() * 10.0),
+				this->m_iterative_fail(),
+				100.0 * (double) this->m_iterative_fail() / (double) this->m_stat_calculations(),
+				(double) this->m_iterative_total() / (double) this->m_stat_calculations());
 	}
 }
 

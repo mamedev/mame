@@ -18,14 +18,10 @@ namespace netlist
 		, m_clk(*this, "CLK")
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
-		, m_Q1(0)
-		, m_Q2(0)
-		, m_F(0)
-
+		, m_Q1(*this, "m_Q1", 0)
+		, m_Q2(*this, "m_Q2", 0)
+		, m_F(*this, "m_F", 0)
 		{
-			save(NLNAME(m_Q1));
-			save(NLNAME(m_Q2));
-			save(NLNAME(m_F));
 		}
 
 		NETLIB_RESETI();
@@ -37,9 +33,9 @@ namespace netlist
 		logic_output_t m_Q;
 		logic_output_t m_QQ;
 
-		netlist_sig_t m_Q1;
-		netlist_sig_t m_Q2;
-		netlist_sig_t m_F;
+		state_var<netlist_sig_t> m_Q1;
+		state_var<netlist_sig_t> m_Q2;
+		state_var<netlist_sig_t> m_F;
 
 		void newstate(const netlist_sig_t state);
 

@@ -137,15 +137,10 @@ void matrix_solver_w_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 	matrix_solver_t::setup_base(nets);
 
-
-	save(NLNAME(m_last_RHS));
+	save(m_last_RHS, "m_last_RHS");
 
 	for (unsigned k = 0; k < N(); k++)
-	{
-		pstring num = plib::pfmt("{1}")(k);
-
-		save(RHS(k), "RHS." + num);
-	}
+		save(RHS(k), plib::pfmt("RHS.{1}")(k));
 }
 
 

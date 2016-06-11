@@ -25,17 +25,13 @@ namespace netlist
 		, m_LOADQ(*this, "LOADQ")
 		, m_CU(*this, "CU")
 		, m_CD(*this, "CD")
-		, m_cnt(0)
-		, m_last_CU(0)
-		, m_last_CD(0)
+		, m_cnt(*this, "m_cnt", 0)
+		, m_last_CU(*this, "m_last_CU", 0)
+		, m_last_CD(*this, "m_last_CD", 0)
 		, m_Q(*this, {{"QA", "QB", "QC", "QD"}})
 		, m_BORROWQ(*this, "BORROWQ")
 		, m_CARRYQ(*this, "CARRYQ")
 		{
-
-			save(NLNAME(m_cnt));
-			save(NLNAME(m_last_CU));
-			save(NLNAME(m_last_CD));
 		}
 
 		NETLIB_RESETI();
@@ -51,9 +47,9 @@ namespace netlist
 		logic_input_t m_CU;
 		logic_input_t m_CD;
 
-		INT8 m_cnt;
-		UINT8 m_last_CU;
-		UINT8 m_last_CD;
+		state_var<int> m_cnt;
+		state_var<unsigned> m_last_CU;
+		state_var<unsigned> m_last_CD;
 
 		object_array_t<logic_output_t, 4> m_Q;
 		logic_output_t m_BORROWQ;

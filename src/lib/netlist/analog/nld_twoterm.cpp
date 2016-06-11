@@ -19,12 +19,18 @@ namespace netlist
 // generic_diode
 // ----------------------------------------------------------------------------------------
 
-generic_diode::generic_diode()
+generic_diode::generic_diode(device_t &dev, pstring name)
+	: m_Vd(dev, name + ".m_Vd", 0.7)
+	, m_Id(dev, name + ".m_Id", 0.0)
+	, m_G(dev,  name + ".m_G", 1e-15)
+	, m_Vt(0.0)
+	, m_Is(0.0)
+	, m_n(0.0)
+	, m_gmin(1e-15)
+	, m_VtInv(0.0)
+	, m_Vcrit(0.0)
 {
-	m_Vd = 0.7;
 	set_param(1e-15, 1, 1e-15);
-	m_G = m_gmin;
-	m_Id = 0.0;
 }
 
 void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double gmin)
@@ -38,13 +44,6 @@ void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double g
 
 	m_Vcrit = m_Vt * std::log(m_Vt / m_Is / csqrt2);
 	m_VtInv = 1.0 / m_Vt;
-}
-
-void generic_diode::save(pstring name, object_t &parent)
-{
-	parent.save(m_Vd, name + ".m_Vd");
-	parent.save(m_Id, name + ".m_Id");
-	parent.save(m_G, name + ".m_G");
 }
 
 // ----------------------------------------------------------------------------------------

@@ -29,7 +29,7 @@ public:
 
 	matrix_solver_SOR_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, int size)
 		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
-		, m_lp_fact(0)
+		, m_lp_fact(*this, "m_lp_fact", 0)
 		{
 		}
 
@@ -39,7 +39,7 @@ public:
 	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 
 private:
-	nl_double m_lp_fact;
+	state_var<nl_double> m_lp_fact;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -51,7 +51,6 @@ template <unsigned m_N, unsigned storage_N>
 void matrix_solver_SOR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_direct_t<m_N, storage_N>::vsetup(nets);
-	this->save(NLNAME(m_lp_fact));
 }
 
 template <unsigned m_N, unsigned storage_N>

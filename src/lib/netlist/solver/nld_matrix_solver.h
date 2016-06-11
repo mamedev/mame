@@ -120,28 +120,20 @@ public:
 
 	matrix_solver_t(netlist_t &anetlist, const pstring &name,
 			const eSortType sort, const solver_parameters_t *params)
-	: device_t(anetlist, name),
-    m_stat_calculations(0),
-	m_stat_newton_raphson(0),
-	m_stat_vsolver_calls(0),
-	m_iterative_fail(0),
-	m_iterative_total(0),
-	m_params(*params),
-	m_last_step(0, 1),
-	m_cur_ts(0),
-	m_fb_sync(*this, "FB_sync"),
-	m_Q_sync(*this, "Q_sync"),
-	m_sort(sort)
+	: device_t(anetlist, name)
+	, m_params(*params)
+	, m_stat_calculations(*this, "m_stat_calculations", 0)
+	, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
+	, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
+	, m_iterative_fail(*this, "m_iterative_fail", 0)
+	, m_iterative_total(*this, "m_iterative_total", 0)
+	, m_last_step(*this, "m_last_step", netlist_time::quantum())
+	, m_cur_ts(*this, "m_cur_ts", 0)
+	, m_fb_sync(*this, "FB_sync")
+	, m_Q_sync(*this, "Q_sync")
+	, m_sort(sort)
 	{
 		connect_post_start(m_fb_sync, m_Q_sync);
-
-		save(NLNAME(m_last_step));
-		save(NLNAME(m_cur_ts));
-		save(NLNAME(m_stat_calculations));
-		save(NLNAME(m_stat_newton_raphson));
-		save(NLNAME(m_stat_vsolver_calls));
-		save(NLNAME(m_iterative_fail));
-		save(NLNAME(m_iterative_total));
 	}
 
 	virtual ~matrix_solver_t();
@@ -205,19 +197,19 @@ protected:
 
 	std::vector<terms_t *> m_rails_temp;
 
-	int m_stat_calculations;
-	int m_stat_newton_raphson;
-	int m_stat_vsolver_calls;
-	int m_iterative_fail;
-	int m_iterative_total;
-
 	const solver_parameters_t &m_params;
+
+	state_var<int> m_stat_calculations;
+	state_var<int> m_stat_newton_raphson;
+	state_var<int> m_stat_vsolver_calls;
+	state_var<int> m_iterative_fail;
+	state_var<int> m_iterative_total;
 
 	inline nl_double current_timestep() { return m_cur_ts; }
 private:
 
-	netlist_time m_last_step;
-	nl_double m_cur_ts;
+	state_var<netlist_time> m_last_step;
+	state_var<nl_double> m_cur_ts;
 	std::vector<core_device_t *> m_step_devices;
 	std::vector<core_device_t *> m_dynamic_devices;
 
