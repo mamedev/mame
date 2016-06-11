@@ -45,7 +45,6 @@ namespace netlist
 		constexpr explicit netlist_time(const INTERNALTYPE nom, const INTERNALTYPE den)
 		: m_time(nom * (RESOLUTION / den)) { }
 
-
 		netlist_time &operator=(const netlist_time rhs) { m_time = rhs.m_time; return *this; }
 
 		netlist_time &operator+=(const netlist_time &rhs) { m_time += rhs.m_time; return *this; }

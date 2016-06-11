@@ -1124,6 +1124,30 @@ protected:
 		plib::dynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
 	};
 
+	template <typename T>
+	struct state_var
+	{
+	public:
+		state_var(device_t &d, const pstring name, T value)
+		: m_value(value)
+		{
+			d.save(m_value, name);
+		}
+
+		state_var(const state_var &rhs) NOEXCEPT = default;
+		state_var(state_var &&rhs) NOEXCEPT = default;
+		state_var &operator=(const state_var rhs) { m_value = rhs.m_value; return *this; }
+		state_var &operator=(const T rhs) { m_value = rhs; return *this; }
+
+
+		operator T &() { return m_value; }
+		operator const T &() const { return m_value; }
+	private:
+		T m_value;
+	};
+
+
+
 	// -----------------------------------------------------------------------------
 	// Support classes for devices
 	// -----------------------------------------------------------------------------

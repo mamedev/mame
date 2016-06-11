@@ -30,7 +30,7 @@ public:
 		: size(bsize), is_ptr(bptr), is_integral(bintegral), is_float(bfloat), is_custom(false)
 		{}
 		datatype_t(bool bcustom)
-		: size(0), is_ptr(false), is_integral(false), is_float(false), is_custom(true)
+		: size(0), is_ptr(false), is_integral(false), is_float(false), is_custom(bcustom)
 		{}
 
 		const std::size_t size;
@@ -42,12 +42,19 @@ public:
 
 	template<typename T> struct datatype_f
 	{
-		static inline const datatype_t f() { return datatype_t(false, sizeof(T), std::is_integral<T>::value, std::is_floating_point<T>::value); }
+		static inline const datatype_t f()
+		{
+			return datatype_t(sizeof(T), false, std::is_integral<T>::value || std::is_enum<T>::value,
+					std::is_floating_point<T>::value); }
 	};
 
 	template<typename T> struct datatype_f<T *>
 	{
-		static inline const datatype_t f() { return datatype_t(true, sizeof(T), std::is_integral<T>::value, std::is_floating_point<T>::value); }
+		static inline const datatype_t f()
+		{
+			return datatype_t(sizeof(T), true, std::is_integral<T>::value || std::is_enum<T>::value,
+					std::is_floating_point<T>::value);
+		}
 	};
 
 	class callback_t

@@ -50,13 +50,10 @@ namespace netlist
 		, m_QC(*this, "QC")
 		, m_QD(*this, "QD")
 		, m_RC(*this, "RC")
-		, m_cnt(0)
-		, m_loadq(0)
-		, m_ent(0)
+		, m_cnt(*this, "m_cnt", 0)
+		, m_loadq(*this, "m_loadq", 0)
+		, m_ent(*this, "m_ent", 0)
 		{
-			save(NLNAME(m_cnt));
-			save(NLNAME(m_loadq));
-			save(NLNAME(m_ent));
 		}
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
@@ -73,9 +70,9 @@ namespace netlist
 		logic_output_t m_QC;
 		logic_output_t m_QD;
 		logic_output_t m_RC;
-		UINT8 m_cnt;
-		netlist_sig_t m_loadq;
-		netlist_sig_t m_ent;
+		state_var<UINT8> m_cnt;
+		state_var<netlist_sig_t> m_loadq;
+		state_var<netlist_sig_t> m_ent;
 	};
 
 	NETLIB_OBJECT(9310)

@@ -419,25 +419,23 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 		}
 		else if (s->m_dt.is_integral)
 		{
-			if (s->m_dt.size == sizeof(long long int))
-				save_pointer((long long int *) s->m_ptr, s->m_name.cstr(), s->m_count);
-			else if (s->m_dt.size == sizeof(long int))
-				save_pointer((long int *) s->m_ptr, s->m_name.cstr(), s->m_count);
-			else if (s->m_dt.size == sizeof(int))
-				save_pointer((int *) s->m_ptr, s->m_name.cstr(), s->m_count);
-			else if (s->m_dt.size == sizeof(short))
-				save_pointer((short *) s->m_ptr, s->m_name.cstr(), s->m_count);
-			else if (s->m_dt.size == sizeof(char))
-				save_pointer((char *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			if (s->m_dt.size == sizeof(INT64))
+				save_pointer((INT64 *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(INT32))
+				save_pointer((INT32 *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(INT16))
+				save_pointer((INT16 *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(INT8))
+				save_pointer((INT8 *) s->m_ptr, s->m_name.cstr(), s->m_count);
 			else
-				netlist().log().fatal("Unknown integral type for {1}\n", s->m_name.cstr());
+				netlist().log().fatal("Unknown integral type size {1} for {2}\n", s->m_dt.size, s->m_name.cstr());
 		}
 		else if (s->m_dt.is_custom)
 		{
 			/* do nothing */
 		}
 		else
-			netlist().log().fatal("found unsupported save element %s\n", s->m_name);
+			netlist().log().fatal("found unsupported save element {1}\n", s->m_name);
 	}
 }
 

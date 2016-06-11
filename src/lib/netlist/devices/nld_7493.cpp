@@ -19,10 +19,9 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(7493ff)
 		, m_I(*this, "CLK")
 		, m_Q(*this, "Q")
+		, m_reset(*this, "m_reset", 0)
+		, m_state(*this, "m_state", 0)
 		{
-
-			save(NLNAME(m_reset));
-			save(NLNAME(m_state));
 		}
 
 		NETLIB_RESETI();
@@ -32,8 +31,8 @@ namespace netlist
 		logic_input_t m_I;
 		logic_output_t m_Q;
 
-		UINT8 m_reset;
-		UINT8 m_state;
+		state_var<UINT8> m_reset;
+		state_var<UINT8> m_state;
 	};
 
 	NETLIB_OBJECT(7493)

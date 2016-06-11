@@ -180,9 +180,9 @@ namespace netlist
 				truthtable_t *ttp, const char *desc[])
 		: device_t(owner, name)
 		, m_fam(*this, fam)
-		, m_last_state(0)
-		, m_ign(0)
-		, m_active(1)
+		, m_last_state(*this, "m_last_state", 0)
+		, m_ign(*this, "m_ign", 0)
+		, m_active(*this, "m_active", 1)
 		, m_ttp(ttp)
 		{
 			while (*desc != nullptr && **desc != 0 )
@@ -198,9 +198,9 @@ namespace netlist
 				truthtable_t *ttp, const plib::pstring_vector_t &desc)
 		: device_t(owner, name)
 		, m_fam(*this, fam)
-		, m_last_state(0)
-		, m_ign(0)
-		, m_active(1)
+		, m_last_state(*this, "m_last_state", 0)
+		, m_ign(*this, "m_ign", 0)
+		, m_active(*this, "m_active", 1)
 		, m_ttp(ttp)
 		{
 			m_desc = desc;
@@ -260,9 +260,6 @@ namespace netlist
 			for (int k=0; m_ttp.m_timing_nt[k] != netlist_time::zero(); k++)
 				printf("%d %f\n", k, m_ttp.m_timing_nt[k].as_double() * 1000000.0);
 	#endif
-			save(NLNAME(m_last_state));
-			save(NLNAME(m_ign));
-			save(NLNAME(m_active));
 		}
 
 		NETLIB_RESETI()
@@ -389,9 +386,9 @@ namespace netlist
 			}
 		}
 
-		UINT32 m_last_state;
-		UINT32 m_ign;
-		INT32 m_active;
+		state_var<UINT32> m_last_state;
+		state_var<UINT32> m_ign;
+		state_var<INT32> m_active;
 
 		truthtable_t *m_ttp;
 		plib::pstring_vector_t m_desc;
