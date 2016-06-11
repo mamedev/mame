@@ -1065,6 +1065,84 @@ ROM_START( majorpkr )
 ROM_END
 
 
+ROM_START( majorpkra )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512__a.rom6", 0x00000, 0x10000, CRC(0213a933) SHA1(0c3238f037bcbe096c85b5c57ac735d707361f87) )
+
+	ROM_REGION( 0x100000, "bg_gfx", 0 )
+	ROM_LOAD( "27c040.rom1", 0x00000, 0x80000, CRC(67299eff) SHA1(34d3d8baf08dea495b699dd63272b445e2acb42d) )
+	ROM_LOAD( "27c040.rom2", 0x80000, 0x80000, CRC(2d68b177) SHA1(01c934e0383991f2208b915cc5015463a8b6a8fd) )
+
+	ROM_REGION( 0x40000, "fg_gfx", 0 )
+	ROM_LOAD( "27c1001.rom3", 0x00000, 0x20000, CRC(54452bb8) SHA1(9d13c17b85dd0185ba64fc6f90425e0c75363960) )
+	ROM_LOAD( "27c1001.rom4", 0x20000, 0x20000, CRC(2e1e0972) SHA1(729dba2ef6ae8a7299c7ceb38835bebb0c42d28e) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "27c2001.rom5", 0x00000, 0x40000, CRC(4843858e) SHA1(27629829cf7753d7801a6eb42bb77ca2a467bebd) )
+ROM_END
+
+ROM_START( majorpkrb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512__b.rom6", 0x00000, 0x10000, CRC(3ab1e2c2) SHA1(11339fe32bb372f01b0983d2d571440530353b2a) )
+
+	ROM_REGION( 0x100000, "bg_gfx", 0 )
+	ROM_LOAD( "27c040.rom1", 0x00000, 0x80000, CRC(67299eff) SHA1(34d3d8baf08dea495b699dd63272b445e2acb42d) )
+	ROM_LOAD( "27c040.rom2", 0x80000, 0x80000, CRC(2d68b177) SHA1(01c934e0383991f2208b915cc5015463a8b6a8fd) )
+
+	ROM_REGION( 0x40000, "fg_gfx", 0 )
+	ROM_LOAD( "27c1001.rom3", 0x00000, 0x20000, CRC(54452bb8) SHA1(9d13c17b85dd0185ba64fc6f90425e0c75363960) )
+	ROM_LOAD( "27c1001.rom4", 0x20000, 0x20000, CRC(2e1e0972) SHA1(729dba2ef6ae8a7299c7ceb38835bebb0c42d28e) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "27c2001.rom5", 0x00000, 0x40000, CRC(4843858e) SHA1(27629829cf7753d7801a6eb42bb77ca2a467bebd) )
+ROM_END
+
+/*
+  Only one byte of difference against set B.
+  10 <--> 08
+
+*/
+ROM_START( majorpkrc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512__c.rom6", 0x00000, 0x10000, CRC(7379026b) SHA1(49e4f935ba3d27c70df351e3e61fb94e00f1536e) )
+
+	ROM_REGION( 0x100000, "bg_gfx", 0 )
+	ROM_LOAD( "27c040.rom1", 0x00000, 0x80000, CRC(67299eff) SHA1(34d3d8baf08dea495b699dd63272b445e2acb42d) )
+	ROM_LOAD( "27c040.rom2", 0x80000, 0x80000, CRC(2d68b177) SHA1(01c934e0383991f2208b915cc5015463a8b6a8fd) )
+
+	ROM_REGION( 0x40000, "fg_gfx", 0 )
+	ROM_LOAD( "27c1001.rom3", 0x00000, 0x20000, CRC(54452bb8) SHA1(9d13c17b85dd0185ba64fc6f90425e0c75363960) )
+	ROM_LOAD( "27c1001.rom4", 0x20000, 0x20000, CRC(2e1e0972) SHA1(729dba2ef6ae8a7299c7ceb38835bebb0c42d28e) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "27c2001.rom5", 0x00000, 0x40000, CRC(4843858e) SHA1(27629829cf7753d7801a6eb42bb77ca2a467bebd) )
+ROM_END
+
+/*
+  Lucky Poker.
+  (also written in the black logic box of PCB)
+
+  Seems to be a title hack of Major Joker.
+
+*/
+ROM_START( luckypkr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512__luckypkr.rom6", 0x00000, 0x10000, CRC(e5e6d79d) SHA1(2c4b54d8cc9083cfa1508a73269baff923504778) )
+
+	ROM_REGION( 0x100000, "bg_gfx", 0 )
+	ROM_LOAD( "27c040.rom1", 0x00000, 0x80000, CRC(67299eff) SHA1(34d3d8baf08dea495b699dd63272b445e2acb42d) )
+	ROM_LOAD( "27c040.rom2", 0x80000, 0x80000, CRC(2d68b177) SHA1(01c934e0383991f2208b915cc5015463a8b6a8fd) )
+
+	ROM_REGION( 0x40000, "fg_gfx", 0 )
+	ROM_LOAD( "27c1001.rom3", 0x00000, 0x20000, CRC(54452bb8) SHA1(9d13c17b85dd0185ba64fc6f90425e0c75363960) )
+	ROM_LOAD( "27c1001.rom4", 0x20000, 0x20000, CRC(2e1e0972) SHA1(729dba2ef6ae8a7299c7ceb38835bebb0c42d28e) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "27c2001.rom5", 0x00000, 0x40000, CRC(4843858e) SHA1(27629829cf7753d7801a6eb42bb77ca2a467bebd) )
+ROM_END
+
+
+
 /*************************
 *      Driver Init       *
 *************************/
@@ -1080,5 +1158,9 @@ DRIVER_INIT_MEMBER(majorpkr_state, majorpkr)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY       FULLNAME             FLAGS  LAYOUT */
-GAMEL( 1994, majorpkr,  0,        majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System", "Major Poker (v2.0)", 0,     layout_majorpkr )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY       FULLNAME                                         FLAGS  LAYOUT */
+GAMEL( 1994, majorpkr,  0,        majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System", "Major Poker (set 1, v2.0)",                      0,     layout_majorpkr )
+GAMEL( 1994, majorpkra, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System", "Major Poker (set 2, Micro Manufacturing intro)", 0,     layout_majorpkr )
+GAMEL( 1994, majorpkrb, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System", "Major Poker (set 3, Micro Manufacturing intro)", 0,     layout_majorpkr )
+GAMEL( 1994, majorpkrc, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System", "Major Poker (set 4, Micro Manufacturing intro)", 0,     layout_majorpkr )
+GAMEL( 1994, luckypkr,  majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "<bootleg>",  "Lucky Poker (bootleg/hack of Major Poker)",      0,     layout_majorpkr )
