@@ -1053,7 +1053,7 @@ ROM_START( majorpkr )
 
 	ROM_REGION( 0x2000, "plds2", 0 )  // from PCB
 	ROM_LOAD( "g1_gal16v8d.bin",  0x0000, 0x0117, CRC(5ec2527a) SHA1(af9832a75efc25578ca79a08fae4bb169d4eb5ec) )
-	ROM_LOAD( "g2_gal16v8d.bin",  0x0200, 0x0117, NO_DUMP )  // to crack...
+	ROM_LOAD( "g2_gal16v8d.bin",  0x0200, 0x0117, CRC(f6a04079) SHA1(fd9e7fac2867de9746138e5aa22fdac10c370d65) )  // protected, but cracked...
 	ROM_LOAD( "g3_gal16v8d.bin",  0x0400, 0x0117, CRC(8b36df82) SHA1(b629557a8ebc88edd9e13372906f393f9fbc0669) )
 	ROM_LOAD( "g4_gal16v8d.bin",  0x0600, 0x0117, CRC(8b36df82) SHA1(b629557a8ebc88edd9e13372906f393f9fbc0669) )
 	ROM_LOAD( "g5_gal16v8d.bin",  0x0800, 0x0117, CRC(8b36df82) SHA1(b629557a8ebc88edd9e13372906f393f9fbc0669) )
