@@ -18,7 +18,10 @@
 #include "solver/nld_matrix_solver.h"
 #include "solver/nld_solver.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 template <unsigned m_N, unsigned storage_N>
 class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<m_N, storage_N>
@@ -105,7 +108,7 @@ nl_double matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve()
 
 		// FIXME: used to be 1e90, but this would not be compatible with float
 		if (sqo > NL_FCONST(1e-20))
-			m_lp_fact = nl_math::min(nl_math::sqrt(sq/sqo), (nl_double) 2.0);
+			m_lp_fact = std::min(std::sqrt(sq/sqo), (nl_double) 2.0);
 		else
 			m_lp_fact = NL_FCONST(0.0);
 	}
@@ -146,16 +149,16 @@ int matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newto
 		for (int k = 0; k < iN; k++)
 		{
 	#if 0
-			nl_double akk = nl_math::abs(this->m_A[k][k]);
+			nl_double akk = std::abs(this->m_A[k][k]);
 			if ( akk > lambdaN)
 				lambdaN = akk;
 			if (akk < lambda1)
 				lambda1 = akk;
 	#else
-			nl_double akk = nl_math::abs(this->m_A[k][k]);
+			nl_double akk = std::abs(this->m_A[k][k]);
 			nl_double s = 0.0;
 			for (int i=0; i<iN; i++)
-				s = s + nl_math::abs(this->m_A[k][i]);
+				s = s + std::abs(this->m_A[k][i]);
 			akk = s / akk - 1.0;
 			if ( akk > lambdaN)
 				lambdaN = akk;
@@ -189,7 +192,7 @@ int matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newto
 				Idrive = Idrive + this->A(k,p[i]) * new_v[p[i]];
 
 			const nl_double delta = m_omega * (this->RHS(k) - Idrive) / this->A(k,k);
-			cerr = nl_math::max(cerr, nl_math::abs(delta));
+			cerr = std::max(cerr, std::abs(delta));
 			new_v[k] += delta;
 		}
 
@@ -217,6 +220,7 @@ int matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newto
 
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_MS_GAUSS_SEIDEL_H_ */

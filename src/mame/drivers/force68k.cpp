@@ -470,8 +470,8 @@ MCFG_DEVICE_ADD ("rtc", MM58167, XTAL_32_768kHz)
 
 /* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
 MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_16MHz / 2)
-MCFG_PIT68230_PA_OUTPUT_CALLBACK (DEVWRITE8 ("cent_data_out", output_latch_device, write))
-MCFG_PIT68230_H2_CALLBACK (DEVWRITELINE ("centronics", centronics_device, write_strobe))
+MCFG_PIT68230_PA_OUTPUT_CB (DEVWRITE8 ("cent_data_out", output_latch_device, write))
+MCFG_PIT68230_H2_CB (DEVWRITELINE ("centronics", centronics_device, write_strobe))
 
 // centronics
 MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")

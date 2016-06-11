@@ -62,7 +62,7 @@
 //
 // NOTE:
 // Firmware running on PIO is NOT original because a dump is not available at the moment.
-// Emulator runs a version of PIO firmware that was specifically developped by me to implement
+// Emulator runs a version of PIO firmware that was specifically developed by me to implement
 // line printer output.
 //
 // TODO:
@@ -881,7 +881,18 @@ MACHINE_CONFIG_END
 ROM_START(imds2)
 		// ROM definition of IPC cpu (8085A)
 		ROM_REGION(0x1000 , "ipcrom" , 0)
-		ROM_LOAD("ipc_a82.bin" , 0x0000 , 0x1000 , CRC(0889394f) SHA1(b7525baf1884a7d67402dea4b5566016a9861ef2))
+		ROM_DEFAULT_BIOS("mon13")
+		// 1x2732 Copyright 1979
+		ROM_SYSTEM_BIOS(0, "mon13", "Series II Monitor v1.3")
+		ROMX_LOAD("ipc13_a82.bin" , 0x0000 , 0x1000 , CRC(0889394f) SHA1(b7525baf1884a7d67402dea4b5566016a9861ef2), ROM_BIOS(1))
+		// 2x2716 Copyright 1978
+		ROM_SYSTEM_BIOS(1, "mon12", "Series II Monitor v1.2")
+		ROMX_LOAD("ipc12_a57.bin" , 0x0000 , 0x0800 , CRC(6496efaf) SHA1(1a9c0f1b19c1807803db3f1543f51349d7fd693a), ROM_BIOS(2))
+		ROMX_LOAD("ipc12_a48.bin" , 0x0800 , 0x0800 , CRC(258dc9a6) SHA1(3fde993aee06d9af5093d7a2d9a8cbd71fed0951), ROM_BIOS(2))
+		// 2x2716 Copyright 1977
+		ROM_SYSTEM_BIOS(2, "mon11", "Series II Monitor v1.1")
+		ROMX_LOAD("ipc11_a57.bin" , 0x0000 , 0x0800 , CRC(ffb7c036) SHA1(6f60cdfe20621c4b633c972adcb644a1c02eaa39), ROM_BIOS(3))
+		ROMX_LOAD("ipc11_a48.bin" , 0x0800 , 0x0800 , CRC(3696ff28) SHA1(38b435e10a81629430275aec051fb0a55ec1f6fd), ROM_BIOS(3))
 
 		// ROM definition of IOC cpu (8080A)
 		ROM_REGION(0x2000 , "ioccpu" , 0)
@@ -891,7 +902,7 @@ ROM_START(imds2)
 		ROM_LOAD("ioc_a53.bin" , 0x1800 , 0x0800 , CRC(c8df4bb9) SHA1(2dfb921e94ae7033a7182457b2f00657674d1b77))
 
 		// ROM definition of PIO controller (8041A)
-		// For the time being a specially developped PIO firmware is used until a dump of the original PIO is
+		// For the time being a specially developed PIO firmware is used until a dump of the original PIO is
 		// available.
 		ROM_REGION(0x400 , "iocpio" , 0)
 		ROM_LOAD("pio_a72.bin" , 0 , 0x400 , BAD_DUMP CRC(8c8e740b))

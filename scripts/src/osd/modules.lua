@@ -96,6 +96,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/output/none.cpp",
 		MAME_DIR .. "src/osd/modules/output/console.cpp",
 		MAME_DIR .. "src/osd/modules/output/network.cpp",
+		MAME_DIR .. "src/osd/modules/output/win32_output.cpp",
+		MAME_DIR .. "src/osd/modules/output/win32_output.h",
 		MAME_DIR .. "src/osd/modules/ipc/tcp_connection.cpp",
 		MAME_DIR .. "src/osd/modules/ipc/tcp_connection.h",
 		MAME_DIR .. "src/osd/modules/ipc/tcp_server.cpp",
@@ -242,7 +244,7 @@ function qtdebuggerbuild()
 	}
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
-		configuration { "gmake" }
+		configuration { "gmake or ninja" }
 		if (version >= 30600) then
 			buildoptions {
 				"-Wno-inconsistent-missing-override",

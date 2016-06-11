@@ -13,15 +13,6 @@ class nlwav_options_t : public plib::options
 public:
 	nlwav_options_t() :
 		plib::options(),
-#if 0
-		opt_ttr ("t", "time_to_run", 1.0,     "time to run the emulation (seconds)", this),
-		opt_name("n", "name",        "",      "netlist in file to run; default is first one", this),
-		opt_logs("l", "logs",        "",      "colon separated list of terminals to log", this),
-		opt_file("f", "file",        "-",     "file to process (default is stdin)", this),
-		opt_type("y", "type",        "spice", "spice:eagle", "type of file to be converted: spice,eagle", this),
-		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices", this),
-		opt_inp( "i", "input",       "",      "input file to process (default is none)", this),
-#endif
 		opt_inp( "i", "input",       "",      "input file", this),
 		opt_out( "o", "output",      "",      "output file", this),
 		opt_amp( "a", "amp",    10000.0,      "amplification after mean correction", this),
@@ -29,14 +20,6 @@ public:
 		opt_quiet("q", "quiet",               "be quiet - no warnings", this),
 		opt_help("h", "help",                 "display help", this)
 	{}
-#if 0
-	option_double opt_ttr;
-	option_str    opt_name;
-	option_str    opt_logs;
-	option_str    opt_file;
-	poption_str_limit opt_type;
-	option_str    opt_cmd;
-#endif
 	plib::option_str    opt_inp;
 	plib::option_str    opt_out;
 	plib::option_double opt_amp;
@@ -67,7 +50,7 @@ public:
 	void write_sample(int sample)
 	{
 		m_data.len += m_fmt.block_align;
-		short ps = sample; /* 16 bit sample, FIXME: powerpc? */
+		short ps = sample; /* 16 bit sample, FIXME: Endianess? */
 		m_f.write(&ps, sizeof(ps));
 	}
 

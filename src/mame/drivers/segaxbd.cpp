@@ -261,10 +261,7 @@ ROMs:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/segaxbd.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/segaic16.h"
 #include "machine/nvram.h"
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
@@ -284,6 +281,7 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, dev
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
 			m_segaic16road(*this, "segaic16road"),
+			m_soundlatch(*this, "soundlatch"),
 			m_subram0(*this, "subram0"),
 			m_road_priority(1),
 			m_scanline_timer(nullptr),
@@ -300,8 +298,6 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, dev
 	memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
 	memset(m_iochip_regs, 0, sizeof(m_iochip_regs));
 	palette_init();
-	memset(m_latched_value, 0, sizeof(m_latched_value));
-	memset(m_latch_read, 0, sizeof(m_latch_read));
 }
 
 
@@ -773,7 +769,7 @@ WRITE16_MEMBER( segaxbd_state::smgp_excs_w )
 READ8_MEMBER( segaxbd_state::sound_data_r )
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_read();
+	return m_soundlatch->read(space, 0);
 }
 
 
@@ -791,7 +787,7 @@ void segaxbd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	switch (id)
 	{
 		case TID_SOUND_WRITE:
-			soundlatch_write(param);
+			m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, param);
 			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 			// if an extra sound board is attached, do an nmi there as well
@@ -1857,6 +1853,8 @@ static MACHINE_CONFIG_FRAGMENT( xboard )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

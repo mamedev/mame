@@ -21,6 +21,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "includes/goindol.h"
 
@@ -81,7 +82,7 @@ static ADDRESS_MAP_START( goindol_map, AS_PROGRAM, 8, goindol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_WRITE(soundlatch_byte_w) // watchdog?
+	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // watchdog?
 	AM_RANGE(0xc810, 0xc810) AM_WRITE(goindol_bankswitch_w)
 	AM_RANGE(0xc820, 0xc820) AM_READ_PORT("DIAL")
 	AM_RANGE(0xc820, 0xd820) AM_WRITEONLY AM_SHARE("fg_scrolly")
@@ -107,7 +108,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, goindol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -255,6 +256,8 @@ static MACHINE_CONFIG_START( goindol, goindol_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8)   /* Confirmed pitch from recording */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

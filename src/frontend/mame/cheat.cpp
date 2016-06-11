@@ -1078,10 +1078,10 @@ cheat_manager::cheat_manager(running_machine &machine)
 	// we rely on the debugger expression callbacks; if the debugger isn't
 	// enabled, we must jumpstart them manually
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0)
-		debug_cpu_init(machine);
+		m_cpu = std::make_unique<debugger_cpu>(machine);
 
 	// configure for memory access (shared with debugger)
-	debug_cpu_configure_memory(machine, m_symtable);
+	m_cpu->configure_memory(m_symtable);
 
 	// load the cheats
 	reload();

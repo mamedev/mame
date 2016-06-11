@@ -24,6 +24,7 @@
 			[".cxx"] = "Sources",
 			[".dylib"] = "Frameworks",
 			[".framework"] = "Frameworks",
+			[".tbd"] = "Frameworks",
 			[".m"] = "Sources",
 			[".mm"] = "Sources",
 			[".strings"] = "Resources",
@@ -32,6 +33,8 @@
 			[".icns"] = "Resources",
 			[".bmp"] = "Resources",
 			[".wav"] = "Resources",
+			[".xcassets"]  = "Resources",
+			[".xcdatamodeld"] = "Sources",
 		}
 		return categories[path.getextension(node.name)]
 	end
@@ -72,7 +75,9 @@
 			[".cpp"]       = "sourcecode.cpp.cpp",
 			[".css"]       = "text.css",
 			[".cxx"]       = "sourcecode.cpp.cpp",
+			[".entitlements"] = "text.xml",
 			[".framework"] = "wrapper.framework",
+			[".tbd"]       = "sourcecode.text-based-dylib-definition",
 			[".gif"]       = "image.gif",
 			[".h"]         = "sourcecode.c.h",
 			[".html"]      = "text.html",
@@ -87,6 +92,8 @@
 			[".icns"]      = "image.icns",
 			[".bmp"]       = "image.bmp",
 			[".wav"]       = "audio.wav",
+			[".xcassets"]  = "folder.assetcatalog",
+			[".xcdatamodeld"] = "wrapper.xcdatamodeld",
 		}
 		return types[path.getextension(node.path)] or "text"
 	end
@@ -107,7 +114,9 @@
 			[".cpp"]       = "sourcecode.cpp.cpp",
 			[".css"]       = "text.css",
 			[".cxx"]       = "sourcecode.cpp.cpp",
+			[".entitlements"] = "text.xml",
 			[".framework"] = "wrapper.framework",
+			[".tbd"]       = "wrapper.framework",
 			[".gif"]       = "image.gif",
 			[".h"]         = "sourcecode.cpp.h",
 			[".html"]      = "text.html",
@@ -122,6 +131,8 @@
 			[".icns"]      = "image.icns",
 			[".bmp"]       = "image.bmp",
 			[".wav"]       = "audio.wav",
+			[".xcassets"]  = "folder.assetcatalog",
+			[".xcdatamodeld"] = "wrapper.xcdatamodeld",
 		}
 		return types[path.getextension(node.path)] or "text"
 	end
@@ -192,7 +203,7 @@
 --
 
 	function xcode.isframework(fname)
-		return (path.getextension(fname) == ".framework")
+		return (path.getextension(fname) == ".framework" or path.getextension(fname) == ".tbd")
 	end
 
 
@@ -363,6 +374,8 @@
 								error('relative paths are not currently supported for frameworks')
 							end
 							pth = nodePath
+						elseif path.getextension(nodePath)=='.tbd' then
+							pth = "/usr/lib/" .. nodePath
 						else
 							pth = "/System/Library/Frameworks/" .. nodePath
 						end
@@ -641,7 +654,9 @@
 				if #cfgcmds > #prjcmds then
 					table.insert(commands, 'if [ "${CONFIGURATION}" = "' .. xcode.getconfigname(cfg) .. '" ]; then')
 					for i = #prjcmds + 1, #cfgcmds do
-						table.insert(commands, cfgcmds[i])
+						local cmd = cfgcmds[i]
+						cmd = cmd:gsub('\\','\\\\')
+						table.insert(commands, cmd)
 					end
 					table.insert(commands, 'fi')
 				end
@@ -826,6 +841,10 @@
 
 		_p(4,'SDKROOT = "%s";', xcode.toolset)
 		
+		if tr.entitlements then
+			_p(4,'CODE_SIGN_ENTITLEMENTS = "%s";', tr.entitlements.cfg.name)
+		end
+
 		local targetdir = path.getdirectory(cfg.buildtarget.bundlepath)
 		if targetdir ~= "." then
 			_p(4,'CONFIGURATION_BUILD_DIR = "$(SYMROOT)";');
@@ -880,6 +899,7 @@
 		_p(4,'GCC_WARN_UNUSED_VARIABLE = YES;')
 
 		xcode.printlist(cfg.includedirs, 'HEADER_SEARCH_PATHS')
+		xcode.printlist(cfg.userincludedirs, 'USER_HEADER_SEARCH_PATHS')
 		xcode.printlist(cfg.libdirs, 'LIBRARY_SEARCH_PATHS')
 		
 		_p(4,'OBJROOT = "%s";', cfg.objectsdir)

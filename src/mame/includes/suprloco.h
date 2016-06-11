@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+
+#include "machine/gen_latch.h"
+
 class suprloco_state : public driver_device
 {
 public:
@@ -8,6 +11,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_scrollram(*this, "scrollram"),
@@ -16,6 +20,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;

@@ -4,7 +4,6 @@
 -- Copyright (c) 2002-2011 Jason Perkins and the Premake project
 --
 
-
 	_WORKING_DIR        = os.getcwd()
 
 
@@ -152,11 +151,19 @@
 		ok, err = premake.checkprojects()
 		if (not ok) then error("Error: " .. err, 0) end
 
+		premake.stats = { }
+
+		premake.stats.num_generated = 0
+		premake.stats.num_skipped   = 0
+
 		-- Hand over control to the action
 		printf("Running action '%s'...", action.trigger)
 		premake.action.call(action.trigger)
 
-		print("Done.")
+		printf("Done. Generated %d/%d projects."
+			, premake.stats.num_generated
+			, premake.stats.num_generated+premake.stats.num_skipped
+			)
 		return 0
 
 	end

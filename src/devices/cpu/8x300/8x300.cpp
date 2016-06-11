@@ -9,8 +9,8 @@
  *  Written by Barry Rodewald
  */
 
-#include "debugger.h"
 #include "8x300.h"
+#include "debugger.h"
 
 #define FETCHOP(a)         (m_direct->read_word(a))
 #define CYCLES(x)          do { m_icount -= (x); } while (0)

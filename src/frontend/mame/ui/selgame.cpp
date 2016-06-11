@@ -236,6 +236,11 @@ void menu_select_game::handle()
 			// handle IPT_CUSTOM (mouse right click)
 			if (!isfavorite())
 				menu::stack_push<menu_machine_configure>(ui(), container, (const game_driver *)m_prev_selected, menu_event->mouse.x0, menu_event->mouse.y0);
+			else
+			{
+				ui_software_info *sw = (ui_software_info *)m_prev_selected;
+				menu::stack_push<menu_machine_configure>(ui(), container, (const game_driver *)sw->driver, menu_event->mouse.x0, menu_event->mouse.y0);
+			}
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT)
 		{
@@ -590,7 +595,7 @@ void menu_select_game::populate()
 		}
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, FLAG_UI, nullptr);
+	item_append(menu_item_type::SEPARATOR);
 
 	// add special items
 	if (menu::stack_has_special_main_menu())
@@ -664,11 +669,11 @@ void menu_select_game::build_available_list()
 	// now check and include NONE_NEEDED
 	for (int x = 0; x < m_total; ++x)
 	{
-		const game_driver *driver = &driver_list::driver(x);
+		auto driver = &driver_list::driver(x);
 		if (!m_included[x] && driver != &GAME_NAME(___empty))
 		{
 			const rom_entry *rom = driver->rom;
-			bool noroms = true;
+			auto noroms = true;
 
 			// check NO-DUMP
 			for (; !ROMENTRY_ISEND(rom) && noroms == true; ++rom)
@@ -685,8 +690,8 @@ void menu_select_game::build_available_list()
 				int cx = driver_list::clone(*driver);
 				if (cx != -1 && m_included[cx])
 				{
-					const game_driver *drv = &driver_list::driver(cx);
-					const rom_entry *parentrom = drv->rom;
+					auto drv = &driver_list::driver(cx);
+					auto parentrom = drv->rom;
 					if ((rom = driver->rom) == parentrom)
 						noroms = true;
 
@@ -703,7 +708,7 @@ void menu_select_game::build_available_list()
 									continue;
 
 								UINT64 lenght = ROM_GETLENGTH(rom);
-								bool found = false;
+								auto found = false;
 								for (parentrom = drv->rom; !ROMENTRY_ISEND(parentrom) && found == false; ++parentrom)
 								{
 									if (ROMENTRY_ISFILE(parentrom) && ROM_GETLENGTH(parentrom) == lenght)
@@ -1028,8 +1033,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 	{
 		if (m_prev_selected != nullptr)
 			menu::stack_push<menu_machine_configure>(ui(), container, (const game_driver *)m_prev_selected);
-		else
-			return;
+		return;
 	}
 
 	// special case for configure plugins
@@ -1093,18 +1097,16 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 	// special case for configure options
 	if ((FPTR)ui_swinfo == CONF_OPTS)
 		menu::stack_push<menu_game_options>(ui(), container);
-	/* special case for configure machine TODO
+	// special case for configure machine
 	else if ((FPTR)ui_swinfo == CONF_MACHINE)
 	{
 	    if (m_prev_selected != nullptr)
 	    {
 	        ui_software_info *swinfo = (ui_software_info *)m_prev_selected;
-	        if (swinfo->startempty == 1)
-	            menu::stack_push(ui(), container, swinfo->driver);
+			menu::stack_push<menu_machine_configure>(ui(), container, (const game_driver *)swinfo->driver);
 	    }
-	    else
-	        return;
-	} */
+		return;
+	}
 	// special case for configure plugins
 	else if ((FPTR)ui_swinfo == CONF_PLUGINS)
 	{
@@ -1676,6 +1678,9 @@ void menu_select_game::init_sorted_list()
 		c_mnfct::set(driver->manufacturer);
 		c_year::set(driver->year);
 	}
+
+	for (auto & e : c_mnfct::uimap)
+		c_mnfct::ui.emplace_back(e.first);
 
 	// sort manufacturers - years and driver
 	std::stable_sort(c_mnfct::ui.begin(), c_mnfct::ui.end());

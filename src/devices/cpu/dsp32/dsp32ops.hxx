@@ -358,7 +358,7 @@ inline void dsp32c_device::dau_set_val_flags(int aidx, double res)
 	else if (absres > 3.40282e38)
 	{
 		m_VUflags = VFLAGBIT;
-//      debugger_break(Machine);
+//      machine().debug_break();
 //      fprintf(stderr, "Result = %g\n", absres);
 		res = (res < 0) ? -3.40282e38 : 3.40282e38;
 	}
@@ -403,7 +403,7 @@ inline UINT32 dsp32c_device::double_to_dsp(double val)
 		return 0x00000000;
 	else if (exponent > 255)
 	{
-//      debugger_break(Machine);
+//      machine().debug_break();
 //      fprintf(stderr, "Exponent = %d\n", exponent);
 		return ((INT32)id.i[BYTE_XOR_BE(0)] >= 0) ? 0x7fffffff : 0x800000ff;
 	}

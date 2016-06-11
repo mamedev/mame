@@ -211,7 +211,7 @@ void ata_hle_device::process_command()
 		m_status |= IDE_STATUS_ERR;
 		m_error = IDE_ERROR_ABRT;
 		set_irq(ASSERT_LINE);
-		//debugger_break(device->machine());
+		//machine().debug_break();
 		break;
 	}
 }

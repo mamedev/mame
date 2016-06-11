@@ -312,7 +312,7 @@ private:
 
 	static std::unique_ptr<bitmap_argb32> no_avail_bitmap, bgrnd_bitmap, star_bitmap;
 	static render_texture *bgrnd_texture, *star_texture;
-	static bitmap_argb32 *icons_bitmap[];
+	static std::vector<std::unique_ptr<bitmap_argb32>> icons_bitmap;
 	static render_texture *icons_texture[];
 
 	// request the specific handling of the game selection main menu
@@ -322,7 +322,7 @@ private:
 	static void stack_push(std::unique_ptr<menu> &&menu);
 
 	// toolbar
-	static bitmap_argb32 *toolbar_bitmap[], *sw_toolbar_bitmap[];
+	static std::vector<std::shared_ptr<bitmap_argb32>> toolbar_bitmap, sw_toolbar_bitmap;
 	static render_texture *toolbar_texture[], *sw_toolbar_texture[];
 
 	// draw game list

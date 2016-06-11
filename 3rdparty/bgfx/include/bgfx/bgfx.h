@@ -938,13 +938,15 @@ namespace bgfx
 	/// just swaps internal buffers, kicks render thread, and returns. In
 	/// singlethreaded renderer this call does frame rendering.
 	///
+	/// @param[in] _capture Capture frame with graphics debugger.
+	///
 	/// @returns Current frame number. This might be used in conjunction with
 	///   double/multi buffering data outside the library and passing it to
 	///   library via `bgfx::makeRef` calls.
 	///
 	/// @attention C99 equivalent is `bgfx_frame`.
 	///
-	uint32_t frame();
+	uint32_t frame(bool _capture = false);
 
 	/// Returns current renderer backend API type.
 	///
@@ -1671,11 +1673,13 @@ namespace bgfx
 	/// @param[in] _handle Texture handle.
 	/// @param[in] _data Destination buffer.
 	///
+	/// @returns Frame number when the result will be available. See: `bgfx::frame`.
+	///
 	/// @attention Texture must be created with `BGFX_TEXTURE_READ_BACK` flag.
 	/// @attention Availability depends on: `BGFX_CAPS_TEXTURE_READ_BACK`.
 	/// @attention C99 equivalent is `bgfx_read_texture`.
 	///
-	void readTexture(TextureHandle _handle, void* _data);
+	uint32_t readTexture(TextureHandle _handle, void* _data);
 
 	/// Read back texture content.
 	///
@@ -1683,11 +1687,13 @@ namespace bgfx
 	/// @param[in] _attachment Frame buffer attachment index.
 	/// @param[in] _data Destination buffer.
 	///
+	/// @returns Frame number when the result will be available. See: `bgfx::frame`.
+	///
 	/// @attention Texture must be created with `BGFX_TEXTURE_READ_BACK` flag.
 	/// @attention Availability depends on: `BGFX_CAPS_TEXTURE_READ_BACK`.
 	/// @attention C99 equivalent is `bgfx_read_frame_buffer`.
 	///
-	void readTexture(FrameBufferHandle _handle, uint8_t _attachment, void* _data);
+	uint32_t readTexture(FrameBufferHandle _handle, uint8_t _attachment, void* _data);
 
 	/// Destroy texture.
 	///
@@ -1708,6 +1714,8 @@ namespace bgfx
 	///     mode.
 	///   - `BGFX_TEXTURE_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
 	///     sampling.
+	///
+	/// @returns Handle to frame buffer object.
 	///
 	/// @attention C99 equivalent is `bgfx_create_frame_buffer`.
 	///
@@ -1731,6 +1739,8 @@ namespace bgfx
 	///   - `BGFX_TEXTURE_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic
 	///     sampling.
 	///
+	/// @returns Handle to frame buffer object.
+	///
 	/// @attention C99 equivalent is `bgfx_create_frame_buffer_scaled`.
 	///
 	FrameBufferHandle createFrameBuffer(
@@ -1746,6 +1756,8 @@ namespace bgfx
 	/// @param[in] _destroyTextures If true, textures will be destroyed when
 	///   frame buffer is destroyed.
 	///
+	/// @returns Handle to frame buffer object.
+	///
 	/// @attention C99 equivalent is `bgfx_create_frame_buffer_from_handles`.
 	///
 	FrameBufferHandle createFrameBuffer(
@@ -1760,6 +1772,8 @@ namespace bgfx
 	/// @param[in] _attachment Attachment texture info. See: `Attachment`.
 	/// @param[in] _destroyTextures If true, textures will be destroyed when
 	///   frame buffer is destroyed.
+	///
+	/// @returns Handle to frame buffer object.
 	///
 	/// @attention C99 equivalent is `bgfx_create_frame_buffer_from_handles`.
 	///

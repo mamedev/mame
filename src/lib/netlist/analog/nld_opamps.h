@@ -32,24 +32,25 @@
 
 NETLIST_EXTERNAL(opamp_lm3900)
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 NETLIB_OBJECT(OPAMP)
 {
 	NETLIB_CONSTRUCTOR(OPAMP)
 	, m_RP(*this, "RP1")
 	, m_G1(*this, "G1")
+	, m_VCC(*this, "VCC")
+	, m_GND(*this, "GND")
 	, m_model(*this, "MODEL", "")
+	, m_VH(*this, "VH")
+	, m_VL(*this, "VL")
+	, m_VREF(*this, "VREF")
 	{
 
 		m_type = m_model.model_value("TYPE");
-
-		enregister("VCC", m_VCC);
-		enregister("GND", m_GND);
-
-		enregister("VL", m_VL);
-		enregister("VH", m_VH);
-		enregister("VREF", m_VREF);
 
 		if (m_type == 1)
 		{
@@ -121,6 +122,7 @@ private:
 	unsigned m_type;
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_OPAMPS_H_ */

@@ -13,6 +13,8 @@
 #ifndef __EXPRESS_H__
 #define __EXPRESS_H__
 
+#include <functional>
+
 #include "emu.h"
 
 
@@ -148,16 +150,16 @@ class symbol_table
 {
 public:
 	// callback functions for getting/setting a symbol value
-	typedef UINT64 (*getter_func)(symbol_table &table, void *symref);
-	typedef void (*setter_func)(symbol_table &table, void *symref, UINT64 value);
+	typedef std::function<UINT64(symbol_table &table, void *symref)> getter_func;
+	typedef std::function<void(symbol_table &table, void *symref, UINT64 value)> setter_func;
 
 	// callback functions for function execution
-	typedef UINT64 (*execute_func)(symbol_table &table, void *symref, int numparams, const UINT64 *paramlist);
+	typedef std::function<UINT64(symbol_table &table, void *symref, int numparams, const UINT64 *paramlist)> execute_func;
 
 	// callback functions for memory reads/writes
-	typedef expression_error::error_code (*valid_func)(void *cbparam, const char *name, expression_space space);
-	typedef UINT64 (*read_func)(void *cbparam, const char *name, expression_space space, UINT32 offset, int size);
-	typedef void (*write_func)(void *cbparam, const char *name, expression_space space, UINT32 offset, int size, UINT64 value);
+	typedef std::function<expression_error::error_code(void *cbparam, const char *name, expression_space space)> valid_func;
+	typedef std::function<UINT64(void *cbparam, const char *name, expression_space space, UINT32 offset, int size)> read_func;
+	typedef std::function<void(void *cbparam, const char *name, expression_space space, UINT32 offset, int size, UINT64 value)> write_func;
 
 	enum read_write
 	{

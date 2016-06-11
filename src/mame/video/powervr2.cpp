@@ -1024,7 +1024,7 @@ WRITE32_MEMBER( powervr2_device::startrender_w )
 			}
 //          printf("ISP START %d %d\n",sanitycount,m_screen->vpos());
 			/* Fire ISP irq after a set amount of time TODO: timing of this */
-			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(sanitycount*25));
+			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(sanitycount*25 + 500000));	// hacky end of render delay for Capcom games, otherwise they works at ~1/10 speed
 			break;
 		}
 	}
@@ -1502,13 +1502,13 @@ WRITE32_MEMBER( powervr2_device::ta_yuv_tex_ctrl_w )
 /* TODO */
 READ32_MEMBER( powervr2_device::ta_yuv_tex_cnt_r )
 {
-	debugger_break(machine());
+	machine().debug_break();
 	return ta_yuv_tex_cnt;
 }
 
 WRITE32_MEMBER( powervr2_device::ta_yuv_tex_cnt_w )
 {
-	debugger_break(machine());
+	machine().debug_break();
 	COMBINE_DATA(&ta_yuv_tex_cnt);
 }
 

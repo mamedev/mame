@@ -493,7 +493,7 @@ void menu_select_software::populate()
 						(void *)m_searchlist[curitem]);
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, flags_ui, nullptr);
+	item_append(menu_item_type::SEPARATOR);
 
 	// configure the custom rendering
 	customtop = 4.0f * ui().get_line_height() + 5.0f * UI_BOX_TB_BORDER;

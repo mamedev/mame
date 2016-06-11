@@ -261,47 +261,16 @@ void debug_imgui::handle_keys()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	ui_event event;
+	debug_area* focus_view = nullptr;
 
-	// global keys
-	if(m_machine->input().code_pressed_once(KEYCODE_F3))
-	{
-		if(m_machine->input().code_pressed(KEYCODE_LSHIFT))
-			m_machine->schedule_hard_reset();
-		else
-		{
-			m_machine->schedule_soft_reset();
-			debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-		}
-	}
+	// find view that has focus (should only be one at a time)
+	for(std::vector<debug_area*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
+		if((*view_ptr)->has_focus)
+			focus_view = *view_ptr;
 
-	if(m_machine->input().code_pressed_once(KEYCODE_F5))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-		m_running = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_F6))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_next_device();
-		m_running = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_F7))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_interrupt();
-		m_running = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_F8))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_vblank();
-	if(m_machine->input().code_pressed_once(KEYCODE_F9))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_out();
-	if(m_machine->input().code_pressed_once(KEYCODE_F10))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_over();
-	if(m_machine->input().code_pressed_once(KEYCODE_F11))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
-	if(m_machine->input().code_pressed_once(KEYCODE_F12))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-		m_hide = true;
-	}
+	// check views in main views also (only the disassembler view accepts inputs)
+	if(view_main_disasm->has_focus)
+		focus_view = view_main_disasm;
 
 	if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
 		io.KeyCtrl = true;
@@ -331,21 +300,64 @@ void debug_imgui::handle_keys()
 		{
 		case UI_EVENT_CHAR:
 			m_key_char = event.ch;
+			if(focus_view != nullptr)
+				focus_view->view->process_char(m_key_char);
 			return;
 		default:
 			break;
 		}
 	}
 
-	if(ImGui::IsKeyPressed(ITEM_ID_D) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	// global keys
+	if(ImGui::IsKeyPressed(ITEM_ID_F3,false))
+	{
+		if(ImGui::IsKeyDown(ITEM_ID_LSHIFT))
+			m_machine->schedule_hard_reset();
+		else
+		{
+			m_machine->schedule_soft_reset();
+			m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+		}
+	}
+
+	if(ImGui::IsKeyPressed(ITEM_ID_F5,false))
+	{
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+		m_running = true;
+	}
+	if(ImGui::IsKeyPressed(ITEM_ID_F6,false))
+	{
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->go_next_device();
+		m_running = true;
+	}
+	if(ImGui::IsKeyPressed(ITEM_ID_F7,false))
+	{
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
+		m_running = true;
+	}
+	if(ImGui::IsKeyPressed(ITEM_ID_F8,false))
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->go_vblank();
+	if(ImGui::IsKeyPressed(ITEM_ID_F9,false))
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_out();
+	if(ImGui::IsKeyPressed(ITEM_ID_F10,false))
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_over();
+	if(ImGui::IsKeyPressed(ITEM_ID_F11,false))
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+	if(ImGui::IsKeyPressed(ITEM_ID_F12,false))
+	{
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+		m_hide = true;
+	}
+
+	if(ImGui::IsKeyPressed(ITEM_ID_D,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_disasm(++m_win_count);
-	if(ImGui::IsKeyPressed(ITEM_ID_M) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	if(ImGui::IsKeyPressed(ITEM_ID_M,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_memory(++m_win_count);
-	if(ImGui::IsKeyPressed(ITEM_ID_B) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	if(ImGui::IsKeyPressed(ITEM_ID_B,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_bpoints(++m_win_count);
-	if(ImGui::IsKeyPressed(ITEM_ID_W) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	if(ImGui::IsKeyPressed(ITEM_ID_W,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_wpoints(++m_win_count);
-	if(ImGui::IsKeyPressed(ITEM_ID_L) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	if(ImGui::IsKeyPressed(ITEM_ID_L,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_log(++m_win_count);
 
 }
@@ -413,11 +425,11 @@ void debug_imgui::handle_console(running_machine* machine)
 		// if console input is empty, then do a single step
 		if(strlen(view_main_console->console_input) == 0)
 		{
-			debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
+			m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
 			view_main_console->exec_cmd = false;
 			return;
 		}
-		debug_console_execute_command(*m_machine, view_main_console->console_input, 1);
+		m_machine->debugger().console().execute_command(view_main_console->console_input, true);
 		// check for commands that start execution (so that input fields can be disabled)
 		if(strcmp(view_main_console->console_input,"g") == 0)
 			m_running = true;
@@ -489,7 +501,7 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 		if(view_ptr->type != DVT_MEMORY)  // no scroll bars in memory views
 			ImGui::SetScrollY(view_ptr->view->visible_position().y * fsize.y);
 	}
-	
+
 	// update view location, while the cursor is at 0,0.
 	view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
 	view_ptr->ofs_y = ImGui::GetCursorScreenPos().y;
@@ -514,7 +526,7 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 		pos.y = ImGui::GetScrollY() / fsize.y;
 		view_ptr->view->set_visible_position(pos);
 	}
-	
+
 	viewdata = view_ptr->view->viewdata();
 
 	xy1.x = view_ptr->ofs_x;
@@ -854,33 +866,33 @@ void debug_imgui::draw_console()
 				ImGui::Separator();
 				if(ImGui::MenuItem("Run", "F5"))
 				{
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
 					m_running = true;
 				}
 				if(ImGui::MenuItem("Go to next CPU", "F6"))
 				{
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->go_next_device();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->go_next_device();
 					m_running = true;
 				}
 				if(ImGui::MenuItem("Run until next interrupt", "F7"))
 				{
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->go_interrupt();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
 					m_running = true;
 				}
 				if(ImGui::MenuItem("Run until VBLANK", "F8"))
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->go_vblank();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->go_vblank();
 				if(ImGui::MenuItem("Run and hide debugger", "F12"))
 				{
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
 					m_hide = true;
 				}
 				ImGui::Separator();
 				if(ImGui::MenuItem("Single step", "F11"))
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
 				if(ImGui::MenuItem("Step over", "F10"))
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_over();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_over();
 				if(ImGui::MenuItem("Step out", "F9"))
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_out();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_out();
 
 				ImGui::EndMenu();
 			}
@@ -1096,7 +1108,7 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 
 void debug_imgui::debugger_update()
 {
-	if ((m_machine != nullptr) && (!debug_cpu_is_stopped(*m_machine)) && (m_machine->phase() == MACHINE_PHASE_RUNNING) && !m_hide)
+	if ((m_machine != nullptr) && (!m_machine->debugger().cpu().is_stopped()) && (m_machine->phase() == MACHINE_PHASE_RUNNING) && !m_hide)
 	{
 		UINT32 width = m_machine->render().ui_target().width();
 		UINT32 height = m_machine->render().ui_target().height();

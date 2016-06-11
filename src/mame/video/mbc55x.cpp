@@ -68,6 +68,8 @@ give the leftmost column of the rectangle, the next four give the next column, a
 
 *************************************************************************************************************/
 
+#include <functional>
+
 #include "includes/mbc55x.h"
 
 #define DEBUG_LINES     1
@@ -75,18 +77,18 @@ give the leftmost column of the rectangle, the next four give the next column, a
 
 #define DEBUG_SET(flags)    ((m_debug_video & (flags))==(flags))
 
-static void video_debug(running_machine &machine, int ref, int params, const char *param[])
+void mbc55x_state::video_debug(int ref, int params, const char *param[])
 {
-	mbc55x_state *mstate = machine.driver_data<mbc55x_state>();
-	if(params>0)
+	if (params > 0)
 	{
 		int temp;
-		sscanf(param[0],"%d",&temp); mstate->m_debug_video = temp;;
+		sscanf(param[0],"%d",&temp);
+		m_debug_video = temp;
 	}
 	else
 	{
-		debug_console_printf(machine,"Error usage : mbc55x_vid_debug <debuglevel>\n");
-		debug_console_printf(machine,"Current debuglevel=%02X\n",mstate->m_debug_video);
+		machine().debugger().console().printf("Error usage : mbc55x_vid_debug <debuglevel>\n");
+		machine().debugger().console().printf("Current debuglevel=%02X\n", m_debug_video);
 	}
 }
 
@@ -168,7 +170,8 @@ void mbc55x_state::video_start()
 
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command(machine(), "mbc55x_vid_debug", CMDFLAG_NONE, 0, 0, 1, video_debug);
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("mbc55x_vid_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&mbc55x_state::video_debug, this, _1, _2, _3));
 	}
 }
 

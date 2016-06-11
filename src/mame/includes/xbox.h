@@ -562,6 +562,22 @@ public:
 	int debug_irq_number;
 	required_device<cpu_device> m_maincpu;
 	ohci_usb_controller *ohci_usb;
+
+private:
+	void dump_string_command(int ref, int params, const char **param);
+	void dump_process_command(int ref, int params, const char **param);
+	void dump_list_command(int ref, int params, const char **param);
+	void dump_dpc_command(int ref, int params, const char **param);
+	void dump_timer_command(int ref, int params, const char **param);
+	void curthread_command(int ref, int params, const char **param);
+	void generate_irq_command(int ref, int params, const char **param);
+	void nv2a_combiners_command(int ref, int params, const char **param);
+	void waitvblank_command(int ref, int params, const char **param);
+	void grab_texture_command(int ref, int params, const char **param);
+	void grab_vprog_command(int ref, int params, const char **param);
+	void vprogdis_command(int ref, int params, const char **param);
+	void help_command(int ref, int params, const char **param);
+	void xbox_debug_commands(int ref, int params, const char **param);
 };
 
 ADDRESS_MAP_EXTERN(xbox_base_map, 32);

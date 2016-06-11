@@ -11,9 +11,10 @@
 #include "pconfig.h"
 #include "pstring.h"
 #include "plists.h"
+#include "putil.h"
 #include "pstream.h"
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 class ptokenizer
 {
@@ -176,7 +177,7 @@ protected:
 
 	postream &process_i(pistream &istrm, postream &ostrm);
 
-	double expr(const pstring_vector_t &sexpr, std::size_t &start, int prio);
+	double expr(const plib::pstring_vector_t &sexpr, std::size_t &start, int prio);
 
 	define_t *get_define(const pstring &name);
 
@@ -189,7 +190,7 @@ private:
 	pstring process_line(const pstring &line);
 
 	hashmap_t<pstring, define_t> m_defines;
-	pstring_vector_t m_expr_sep;
+	plib::pstring_vector_t m_expr_sep;
 
 	//pstringbuffer m_ret;
 	UINT32 m_ifflag; // 31 if levels
@@ -197,6 +198,6 @@ private:
 	int m_lineno;
 };
 
-PLIB_NAMESPACE_END()
+}
 
 #endif /* PPARSER_H_ */

@@ -291,7 +291,7 @@ void MemoryWindow::populateComboBox()
 
 void MemoryWindow::setToCurrentCpu()
 {
-	device_t* curCpu = debug_cpu_get_visible_cpu(*m_machine);
+	device_t* curCpu = m_machine->debugger().cpu().get_visible_cpu();
 	const debug_view_source *source = m_memTable->view()->source_for_device(curCpu);
 	const int listIndex = m_memTable->view()->source_list().indexof(*source);
 	m_memoryComboBox->setCurrentIndex(listIndex);
@@ -346,7 +346,7 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 			const debug_view_memory_source* source = downcast<const debug_view_memory_source*>(memView->source());
 			address_space* addressSpace = source->space();
 			const int nativeDataWidth = addressSpace->data_width() / 8;
-			const UINT64 memValue = debug_read_memory(*addressSpace,
+			const UINT64 memValue = source->device()->machine().debugger().cpu().read_memory(*addressSpace,
 														addressSpace->address_to_byte(address),
 														nativeDataWidth,
 														true);

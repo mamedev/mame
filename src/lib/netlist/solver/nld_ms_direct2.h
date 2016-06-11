@@ -11,7 +11,10 @@
 #include "solver/nld_ms_direct.h"
 #include "solver/nld_solver.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 class matrix_solver_direct2_t: public matrix_solver_direct_t<2,2>
 {
@@ -55,6 +58,7 @@ inline int matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED const bool ne
 	return 1;
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_MS_DIRECT2_H_ */

@@ -1,11 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi,Tim Lindquist,Carlos A. Lozano,Bryan McPhail,Jarek Parchanski,Nicola Salmoria,Tomasz Slanina,Phil Stroffolino,Acho A. Tang,Victor Trucco
 // thanks-to:Marco Cassili
+
 /*************************************************************************
 
     various SNK triple Z80 games
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 
 class snk_state : public driver_device
 {
@@ -18,6 +21,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
@@ -29,6 +33,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_fg_videoram;

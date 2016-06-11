@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria, Phil Stroffolino, Mirko Buffoni
 
 #include "video/sega16sp.h"
+#include "machine/gen_latch.h"
 #include "machine/segaic16.h"
 #include "sound/msm5205.h"
 #include "sound/upd7759.h"
@@ -23,6 +24,7 @@ public:
 		m_msm(*this, "5205"),
 		m_upd7759(*this, "7759"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_soundlatch(*this, "soundlatch"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_shared_ptr<UINT16> m_textram;
@@ -120,6 +122,7 @@ public:
 	optional_device<msm5205_device> m_msm;
 	optional_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<UINT16> m_decrypted_opcodes;
 
 	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);

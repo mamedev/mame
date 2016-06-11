@@ -48,45 +48,6 @@ static const char *const ints[4] = {
 int z8k_segm;                               /* Current disassembler mode: 0 - non-segmented, 1 - segmented */
 int z8k_segm_mode = Z8K_SEGM_MODE_AUTO;     /* User disassembler mode setting: segmented, non-segmented, auto */
 
-void z8k_disass_mode(running_machine &machine, int ref, int params, const char *param[])
-{
-	size_t len;
-	if (params == 1)
-	{
-		len = strlen(param[0]);
-		if (!core_strnicmp(param[0], "segmented", len) || !core_stricmp(param[0], "z8001")) {
-			z8k_segm = true;
-			z8k_segm_mode = Z8K_SEGM_MODE_SEG;
-			debug_console_printf(machine, "Disassembler mode set to Z8001/segmented\n");
-		}
-		else if (!core_strnicmp(param[0], "non-segmented", len) || !core_stricmp(param[0], "z8002")) {
-			z8k_segm = false;
-			z8k_segm_mode = Z8K_SEGM_MODE_NONSEG;
-			debug_console_printf(machine, "Disassembler mode set to Z8002/non-segmented\n");
-		}
-		else if (!core_strnicmp(param[0], "automatic", len)) {
-			z8k_segm_mode = Z8K_SEGM_MODE_AUTO;
-			debug_console_printf(machine, "Disassembler mode set to automatic\n");
-		}
-		else
-			goto usage;
-	}
-	else if (params > 1) {
-	usage:
-		debug_console_printf(machine, "Usage: z8k_disass_mode <mode>\n");
-		debug_console_printf(machine, "       set disassembler mode\n");
-		debug_console_printf(machine, "       mode: \"segmented\" or \"z8001\"     - Z8001 mode\n");
-		debug_console_printf(machine, "             \"non-segmented\" or \"z8002\" - Z8002 mode\n");
-		debug_console_printf(machine, "             \"automatic\"                  - automatic mode\n");
-	}
-	else {
-		debug_console_printf(machine, "Current disassembler mode: ");
-		if (z8k_segm_mode == Z8K_SEGM_MODE_AUTO)
-			debug_console_printf(machine, "automatic, currently ");
-		debug_console_printf(machine, "%s\n", z8k_segm ? "Z8001/segmented" : "Z8002/non-segmented");
-	}
-}
-
 CPU_DISASSEMBLE( z8000 )
 {
 	int new_pc = pc, i, j, tmp;

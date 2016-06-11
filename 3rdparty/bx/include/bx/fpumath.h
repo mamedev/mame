@@ -341,6 +341,30 @@ namespace bx
 		_result[2] = 1.0f / _a[2];
 	}
 
+	inline void vec3TangentFrame(const float* _n, float* _t, float* _b)
+	{
+		const float nx = _n[0];
+		const float ny = _n[1];
+		const float nz = _n[2];
+
+		if (bx::fabsolute(nx) > bx::fabsolute(nz) )
+		{
+			float invLen = 1.0f / bx::fsqrt(nx*nx + nz*nz);
+			_t[0] = -nz * invLen;
+			_t[1] =  0.0f;
+			_t[2] =  nx * invLen;
+		}
+		else
+		{
+			float invLen = 1.0f / bx::fsqrt(ny*ny + nz*nz);
+			_t[0] =  0.0f;
+			_t[1] =  nz * invLen;
+			_t[2] = -ny * invLen;
+		}
+
+		bx::vec3Cross(_b, _n, _t);
+	}
+
 	inline void quatIdentity(float* _result)
 	{
 		_result[0] = 0.0f;

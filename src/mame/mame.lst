@@ -185,6 +185,7 @@ searthina                       // bootleg
 sflush                          // (c)1979 Taito
 shuttlei                        // (c) 1979 Omori (Arcade Tv Game List - P.79, Left, 6 from bottom)
 sicv                            // (c) 1979 Taito
+sicv1                           // (c) 1979 Taito
 sinvemag                        // Zenitone-Microsec Ltd.
 sinvzen                         // Zenitone-Microsec Ltd
 sisv                            // (c) 1978 Taito
@@ -2017,6 +2018,7 @@ abattle                         // Sidam
 abattle2                        // Sidam
 acombat                         // bootleg
 acombat3                        // bootleg
+acombat4                        // bootleg
 acombato                        // bootleg
 afire                           // Rene Pierre
 astrof                          // (c) [1980?]
@@ -2328,8 +2330,8 @@ atmtb2                          //
 
 @source:atom.cpp
 atom                            // 1979 Acorn Atom
-atombb                          // 1979 Acorn Atom
-atomeb                          // 1979 Acorn Atom
+atombb                          // 1982 Acorn Atom with BBC Basic
+atomeb                          // 1979 Acorn Atom with Eprom Box
 
 @source:atpci.cpp
 at586                           // 19?? AT 586
@@ -12067,6 +12069,9 @@ fb01                            // 1986 FB-01
 @source:fc100.cpp
 fc100                           //
 
+@source:fccpu30.cpp
+fccpu30                         //
+
 @source:fcscsi.cpp
 fcscsi1                         //
 
@@ -12094,6 +12099,7 @@ sf2mdta                         // bootleg
 sf2mdtb                         // bootleg
 sgyxz                           // bootleg (All-In Electronics)
 slampic                         // bootleg
+varthb                          // bootleg
 
 @source:feversoc.cpp
 feversoc                        // (c) 2004
@@ -12112,6 +12118,10 @@ fexcelv                         //
 fscc9                           //
 fscc12                          //
 reversic                        //
+super9cc                        // SU9: Super 9 Sensory Chess Challenger (English)
+super9ccfr                      // * French
+super9ccg                       // * German
+super9ccsp                      // * Spanish
 
 @source:fidel68k.cpp
 feagv10                         //
@@ -12653,6 +12663,7 @@ scrambp                         // bootleg (Billport S.A.)
 scramce                         // bootleg (Centromatic S.A.)
 scrampt                         // bootleg (Petaco S.A.)
 scramrf                         // bootleg (Recreativos Franco)
+scrammr                         // bootleg (Model Racing)
 sfx                             // (c) 1983 Nichibutsu
 skelagon                        // (c) 1983 Nichibutsu USA
 skybase                         // (c) 1982 Omori Electric Co., Ltd.
@@ -14541,6 +14552,14 @@ isbc286                         //
 isbc2861                        //
 isbc86                          //
 rpc86                           //
+
+@source:isbc8010.cpp
+isbc8010                        //
+isbc8010a                       //
+isbc8010b                       //
+
+@source:isbc8030.cpp
+isbc8030                        //
 
 @source:iskr103x.cpp
 iskr1030m                       //
@@ -27407,6 +27426,7 @@ gaiapols                        // GX123 (c) 1993 (Europe)
 gaiapolsj                       // GX123 (c) 1993 (Japan)
 gaiapolsu                       // GX123 (c) 1993 (US)
 metamrph                        // GX224 (c) 1993 (Europe)
+metamrpha                       // GX224 (c) 1993 (Europe) - Alternate
 metamrphj                       // GX224 (c) 1993 (Japan)
 metamrphu                       // GX224 (c) 1993 (US)
 mmaulers                        // GX170 (c) 1993 (Europe)
@@ -28125,8 +28145,11 @@ vtenis2c                        // 2001.10 Virtua Tennis 2 / Power Smash 2 (Rev 
 vtennis                         // 1999.12 Virtua Tennis / Power Smash (cartridge)
 vtennis2                        // 2001.08.27 Virtua Tennis 2 / Power Smash 2 (GD-ROM)
 vtennisg                        // 1999.?? Virtua Tennis / Power Smash (GD-ROM)
+wccf116                         // 2003.?? World Club Champion Football Serie A 2001-2002 Ver. 2
+wccf1dup                        // 2002.?? World Club Champion Football Serie A 2001-2002 DIMM FIRM Ver.3.03
 wccf212e                        // 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.12
 wccf234j                        // 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.34
+wccf2chk                        // 2004.?? World Club Champion Football Serie A 2002-2003 Drive Checker
 wccf310j                        // 2005.06 World Club Champion Football European Clubs 2004-2005
 wccf322e                        // 2005.11 World Club Champion Football European Clubs 2004-2005 Ver.3.22
 wccf331e                        // 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.1
@@ -33969,11 +33992,13 @@ sun2_50                         //
 sun3_110                        //
 sun3_150                        //
 sun3_260                        //
-sun3_460                        //
 sun3_50                         //
 sun3_60                         //
-sun3_80                         //
 sun3_e                          //
+
+@source:sun3x.cpp
+sun3_80                         //
+sun3_460                        //
 
 @source:sun4.cpp
 sun_s10                         //

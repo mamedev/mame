@@ -259,3 +259,35 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/file/winsocket.cpp",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_win32.cpp",
 	}
+	
+
+
+--------------------------------------------------
+-- ledutil
+--------------------------------------------------
+
+if _OPTIONS["with-tools"] then
+	project("ledutil")
+		uuid ("061293ca-7290-44ac-b2b5-5913ae8dc9c0")
+		kind "ConsoleApp"
+
+		flags {
+			"Symbols", -- always include minimum symbols for executables
+		}
+
+		if _OPTIONS["SEPARATE_BIN"]~="1" then
+			targetdir(MAME_DIR)
+		end
+
+		links {
+			"ocore_" .. _OPTIONS["osd"],
+		}
+
+		includedirs {
+			MAME_DIR .. "src/osd",
+		}
+
+		files {
+			MAME_DIR .. "src/osd/windows/ledutil.cpp",
+		}
+end

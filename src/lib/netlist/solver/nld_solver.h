@@ -11,6 +11,7 @@
 #include "nl_setup.h"
 #include "nl_base.h"
 #include "plib/pstream.h"
+#include "solver/nld_matrix_solver.h"
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
@@ -27,26 +28,12 @@
 // solver
 // ----------------------------------------------------------------------------------------
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 class NETLIB_NAME(solver);
-
-/* FIXME: these should become proper devices */
-
-struct solver_parameters_t
-{
-	int m_pivot;
-	nl_double m_accuracy;
-	nl_double m_lte;
-	nl_double m_min_timestep;
-	nl_double m_max_timestep;
-	nl_double m_sor;
-	bool m_dynamic;
-	int m_gs_loops;
-	int m_nr_loops;
-	netlist_time m_nt_sync_delay;
-	bool m_log_stats;
-};
 
 
 class matrix_solver_t;
@@ -54,6 +41,8 @@ class matrix_solver_t;
 NETLIB_OBJECT(solver)
 {
 	NETLIB_CONSTRUCTOR(solver)
+	, m_fb_step(*this, "FB_step")
+	, m_Q_step(*this, "Q_step")
 	, m_sync_delay(*this, "SYNC_DELAY", NLTIME_FROM_NS(10).as_double())
 	, m_freq(*this, "FREQ", 48000.0)
 
@@ -77,11 +66,8 @@ NETLIB_OBJECT(solver)
 
 	, m_log_stats(*this, "LOG_STATS", 1)   // nl_double timestep resolution
 	{
-		enregister("Q_step", m_Q_step);
-
 		// internal staff
 
-		enregister("FB_step", m_fb_step);
 		connect_late(m_fb_step, m_Q_step);
 	}
 
@@ -120,15 +106,16 @@ protected:
 
 	param_logic_t  m_log_stats;
 
-	plib::pvector_t<matrix_solver_t *> m_mat_solvers;
+	std::vector<std::unique_ptr<matrix_solver_t>> m_mat_solvers;
 private:
 
 	solver_parameters_t m_params;
 
 	template <int m_N, int storage_N>
-	matrix_solver_t *create_solver(int size, bool use_specific);
+	std::unique_ptr<matrix_solver_t> create_solver(int size, bool use_specific);
 };
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_SOLVER_H_ */

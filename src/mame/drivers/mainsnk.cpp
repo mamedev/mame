@@ -74,7 +74,7 @@ Canvas Croquis, SNK 1984
 Note:
 
 The bproms(MB7054) was read as 74s572.
-I have not tested this PCB yet so i have no idea if it's workin.
+I have not tested this PCB yet so I have no idea if it's working.
 All Bproms and P1-P8 is on top pcb, P9-P14 on bottom board, see pictures.
 
 Documentation:
@@ -123,7 +123,7 @@ void mainsnk_state::machine_start()
 WRITE8_MEMBER(mainsnk_state::sound_command_w)
 {
 	m_sound_cpu_busy = 1;
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -159,7 +159,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, mainsnk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xc000) AM_READ(sound_ack_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITENOP    // ? always FFFF, snkwave leftover?
@@ -411,6 +411,8 @@ static MACHINE_CONFIG_START( mainsnk, mainsnk_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)

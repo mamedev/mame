@@ -1241,13 +1241,13 @@ WRITE16_MEMBER(tx1_state::buggyboy_math_w)
 		else
 		{
 			osd_printf_debug("BB_DSEL was not 3 for P->S load!\n");
-			debugger_break(machine());
+			machine().debug_break();
 		}
 	}
 	else
 	{
 		osd_printf_debug("Buggy Boy unknown math state!\n");
-		debugger_break(machine());
+		machine().debug_break();
 	}
 
 	if (offset & BB_INSLD)

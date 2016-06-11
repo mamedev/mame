@@ -16,7 +16,7 @@ project "gtest"
 	uuid "fa306a8d-fb10-4d4a-9d2e-fdb9076407b4"
 	kind "StaticLib"
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions {
 			"-Wno-undef",
 			"-Wno-unused-variable",
@@ -52,7 +52,7 @@ project("mametests")
 		targetdir(MAME_DIR)
 	end
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions {
 			"-Wno-undef",
 		}

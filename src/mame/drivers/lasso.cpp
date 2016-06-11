@@ -48,7 +48,7 @@ INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
 /* Write to the sound latch and generate an IRQ on the sound CPU */
 WRITE8_MEMBER(lasso_state::sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( lasso_audio_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_SHARE("chip_data")
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
-	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xb005, 0xb005) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x7000)
 ADDRESS_MAP_END
 
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( chameleo_audio_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_SHARE("chip_data")
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
-	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xb005, 0xb005) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x7000)
 ADDRESS_MAP_END
 
@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( wwjgtin_audio_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb003, 0xb003) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
-	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xb005, 0xb005) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( pinbo_audio_io_map, AS_IO, 8, lasso_state )
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x08, 0x08) AM_READ(soundlatch_byte_r) AM_WRITENOP /* ??? */
+	AM_RANGE(0x08, 0x08) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP /* ??? */
 	AM_RANGE(0x14, 0x14) AM_WRITENOP    /* ??? */
 ADDRESS_MAP_END
 
@@ -502,6 +502,8 @@ static MACHINE_CONFIG_START( base, lasso_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn76489.1", SN76489, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

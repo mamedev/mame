@@ -77,7 +77,7 @@
 
 ****************************************************************************
 
-    See also sega.c for the Sega G-80 Vector games.
+    See also segag80v.cpp for the Sega G-80 Vector games.
 
     Many thanks go to Dave Fish for the fine detective work he did into the
     G-80 security chips (315-0064, 315-0070, 315-0076, 315-0082) which provided
@@ -283,7 +283,7 @@ WRITE8_MEMBER(segag80r_state::coin_count_w)
 
 WRITE8_MEMBER(segag80r_state::sindbadm_soundport_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
@@ -371,7 +371,7 @@ static ADDRESS_MAP_START( sindbadm_sound_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_WRITE(sindbadm_sn1_SN76496_w)
 	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_WRITE(sindbadm_sn2_SN76496_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -932,6 +932,8 @@ static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 	MCFG_CPU_ADD("audiocpu", Z80, SINDBADM_SOUND_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(sindbadm_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(segag80r_state, irq0_line_hold, 4*60)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/4)

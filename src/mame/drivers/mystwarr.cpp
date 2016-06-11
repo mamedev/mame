@@ -92,6 +92,44 @@ Notes:
       HSync - 15.2042kHz
       VSync - 59.1879Hz
 
+
+Notes on metamrpha.  Research done by Vas Crabb
+The one rom that is different than the parent set has 2 bytes which have switched values (0 to 1 and 1 to 0).
+This appears to be a deliberate change in the main CPU progam function that begins at 03A86E, affecting a
+fragment towards the end of the function where it sets the return value:
+
+03A8FC  moveq   #$0, D0
+03A8FE  move.w  ($0,A5), D1
+03A902  move.w  ($2,A5), D2
+03A906  move.w  #$b61d, D7
+03A90A  addi.w  #$3f1b, D7
+03A90E  cmp.w   D7, D1
+03A910  bne     $3a916
+03A912  bset    #$1, D0
+03A916  move.w  #$6b6e, D7
+03A91A  addi.w  #$7f92, D7
+03A91E  cmp.w   D7, D2
+03A920  bne     $3a926
+03A922  bset    #$0, D0
+
+The bset #$1,D0 and bset #$0,D0 instructions are reversed.  This code looks like poorly optimised compiled
+C code.  Remember D0 is the integer return value register in M68k C ABI and int is a 16-bit integer.
+The code as above amounts to:
+
+unsigned result = 0;
+if (a == (46621U + 16155U)) result |= 2;
+if (b == (27502U + 32658U)) result |= 1;
+
+In the alternate set this is changed to:
+
+unsigned result = 0;
+if (a == (46621U + 16155U)) result |= 1;
+if (b == (27502U + 32658U)) result |= 2;
+
+So I would bet one is a bug fix to the other because someone forgot what each bit in the return value meant.
+There's no way a bad dump could be that precise and logical.  However without further investigation/tracing
+we have no way of knowing which is the later/corrected version.
+
 **************************************************************************/
 
 #include "emu.h"
@@ -1646,6 +1684,43 @@ ROM_START( metamrph )
 	ROM_LOAD( "metamrph.nv", 0x0000, 0x080, CRC(2c51229a) SHA1(7f056792cc44ec3d4aacc33c825ab796a913488e) )
 ROM_END
 
+ROM_START( metamrpha ) /* alternate set - possibly a bugfix version. Only 2 adjusted bytes causing a swap in commands */
+	/* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "3.15h",        0x000001, 0x40000, CRC(8b9f1ba3) SHA1(cccbaf117800a030c8218a91740dc98182a27901) )
+	ROM_LOAD16_BYTE( "224eaa02.15f", 0x000000, 0x40000, CRC(e314330a) SHA1(728a18d604eca58409551e52b7dc18e2d807700a) )
+	ROM_LOAD16_BYTE( "224a03",       0x100001, 0x80000, CRC(a5bedb01) SHA1(5e7a0b93af654ba6a87be8d449c7080a0f0e2a43) )
+	ROM_LOAD16_BYTE( "224a04",       0x100000, 0x80000, CRC(ada53ba4) SHA1(f77bf854dff1f8f718579fe6d3730066708396e2) )
+
+	/* sound program */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
+
+	/* tiles */
+	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOADTILE_WORD( "224a09", 0x000000, 1*1024*1024, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
+	ROM_LOADTILE_WORD( "224a08", 0x000002, 1*1024*1024, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
+
+	/* sprites */
+	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD64_WORD( "224a10", 0x000000, 2*1024*1024, CRC(161287f0) SHA1(a13b197a98fa1cebb11fb87b54e277c72852c4ee) )
+	ROM_LOAD64_WORD( "224a11", 0x000002, 2*1024*1024, CRC(df5960e1) SHA1(ee7794dd119f5f2c52e7ba589d78067a89ff3cab) )
+	ROM_LOAD64_WORD( "224a12", 0x000004, 2*1024*1024, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
+	ROM_LOAD64_WORD( "224a13", 0x000006, 2*1024*1024, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
+
+	/* K053250 linescroll/zoom thingy */
+	ROM_REGION( 0x40000, "k053250_1", 0 )
+	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0 )
+	ROM_LOAD( "224a06", 0x000000, 2*1024*1024, CRC(972f6abe) SHA1(30907495fc49fe3424c092b074c1dc137aa14306) )
+	ROM_LOAD( "224a07", 0x200000, 1*1024*1024, CRC(61b2f97a) SHA1(34bf835d6361c7809d40fa20fd238c9e2a84b101) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "metamrph.nv", 0x0000, 0x080, CRC(2c51229a) SHA1(7f056792cc44ec3d4aacc33c825ab796a913488e) )
+ROM_END
+
 ROM_START( metamrphu )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -2196,6 +2271,7 @@ GAME( 1993, viostorma,  viostorm, viostorm, viostorm, driver_device, 0, ROT0,  "
 GAME( 1993, viostormab, viostorm, viostorm, viostorm, driver_device, 0, ROT0,  "Konami", "Violent Storm (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1993, metamrph,   0,        metamrph, metamrph, driver_device, 0, ROT0,  "Konami", "Metamorphic Force (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrpha,  metamrph, metamrph, metamrph, driver_device, 0, ROT0,  "Konami", "Metamorphic Force (ver EAA - alternate)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, metamrphu,  metamrph, metamrph, metamrph, driver_device, 0, ROT0,  "Konami", "Metamorphic Force (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, metamrphj,  metamrph, metamrph, metamrph, driver_device, 0, ROT0,  "Konami", "Metamorphic Force (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 

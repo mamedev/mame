@@ -41,7 +41,7 @@ Notes:
 
 WRITE8_MEMBER(nbmj8991_state::soundbank_w)
 {
-	if (!(data & 0x80)) soundlatch_clear_byte_w(space, 0, 0);
+	if (!(data & 0x80)) m_soundlatch->clear_w(space, 0, 0);
 	membank("bank1")->set_entry(data & 0x03);
 }
 
@@ -188,7 +188,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pstadium_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_WRITE(blitter_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x90, 0x90) AM_DEVREAD("nb1413m3", nb1413m3_device, inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport1_r, inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_DEVREAD("nb1413m3", nb1413m3_device, inputport2_r) //AM_WRITENOP
@@ -201,7 +201,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( av2mj1bb_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_WRITE(blitter_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x90, 0x90) AM_DEVREAD("nb1413m3", nb1413m3_device, inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport1_r, inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport2_r, vcrctrl_w)
@@ -221,7 +221,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nbmj8991_sound_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
 	AM_RANGE(0x04, 0x04) AM_WRITE(soundbank_w)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP
@@ -1430,6 +1430,8 @@ static MACHINE_CONFIG_START( nbmjdrv2, nbmj8991_state ) // pstadium
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("fmsnd", YM3812, 25000000/6.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)

@@ -2,14 +2,14 @@
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 /************************************************************************************************************************
 
-    stv.c
+    stv.cpp
 
     ST-V hardware
     This file contains all game specific overrides
 
     TODO:
     - clean this up!
-    - Properly emulate the protection chips, used by several games (check stvprot.c for more info)
+    - Properly emulate the protection chips, used by several games (check stvprot.cpp for more info)
 
     (per-game issues)
     - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose;
@@ -1054,7 +1054,7 @@ MACHINE_CONFIG_END
 WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
 {
 	if(ACCESSING_BITS_16_31)
-		soundlatch_word_w(space, 0, data >> 16, 0x0000ffff);
+		m_soundlatch->write(space, 0, data >> 16, 0x0000ffff);
 	if(ACCESSING_BITS_0_15)
 		printf("Warning: write %04x & %08x to lo-word sound communication area\n",data,mem_mask);
 }
@@ -1070,7 +1070,7 @@ READ16_MEMBER( stv_state::adsp_control_r )
 			break;
 		/* TODO: is this location correct? */
 		case 0x5:
-			res = soundlatch_word_r(space,0);
+			res = m_soundlatch->read(space,0);
 			break;
 		default:
 			osd_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);
@@ -1202,6 +1202,8 @@ static MACHINE_CONFIG_DERIVED( batmanfr, stv )
 	MCFG_CPU_IO_MAP(adsp_io_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,batmanfr)
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("dac1", DMADAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#include "debugger.h"
 
 #include "upd765.h"
+#include "debugger.h"
 
 const device_type UPD765A = &device_creator<upd765a_device>;
 const device_type UPD765B = &device_creator<upd765b_device>;

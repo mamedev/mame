@@ -3,80 +3,29 @@
 
 <softwarelist name="sorcerer_cass" description="Exidy Sorcerer cassettes">
 
-<!-- These came from mp3s, so they're marked as bad dumps until they're redumped properly -->
-
 <!--
-	<software name="chomp">
-		<description>Chomp</description>
-		<year>1981</year>
-		<publisher>W. S. King</publisher>
-		<info name="usage" value="Load in Monitor with &quot;LO&quot; command, then type &quot;GO 0100&quot;" />
-		<part name="cass" interface="sorcerer_cass">
-			<dataarea name="cass" size="23392316">
-				<rom name="chomp (1981)(w.s.king).wav" size="23392316" crc="95971024" sha1="62672de80e5139af35424184c76f1c9c18493c3a" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
--->
+     These come from tapes.
+     Load the Basic ROM PAC, then from within it type CLOAD. When it has finished loading, type RUN.
+ -->
 
-	<software name="eliza">
-		<description>Eliza</description>
-		<year>19??</year>
+	<software name="demo1">
+		<description>DEMO1</description>
+		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Load in BASIC with &quot;CLOAD&quot; command, then type &quot;RUN&quot;" />
+		<info name="developer" value="Paul E. Johnson"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
-			<dataarea name="cass" size="12578876">
-				<rom name="eliza (19xx)(-).wav" size="12578876" crc="9173759e" sha1="23d35784fd1ab492cb0371552bd1a981214c0192" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-<!--
-	<software name="galaxian">
-		<description>Galaxians</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Load in Monitor with &quot;LO&quot; command, then type &quot;GO 0100&quot;" />
-		<part name="cass" interface="sorcerer_cass">
-			<dataarea name="cass" size="16506020">
-				<rom name="galaxians (19xx)(-).wav" size="16506020" crc="c6f686b2" sha1="41928aa796e6609de37301b3594d3a9a9eb975ac" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
--->
-
-
-<!-- These come from tapes  -->
-
-	<software name="elizaa" cloneof="eliza">
-		<description>Eliza (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Load in BASIC with &quot;CLOAD&quot; command, then type &quot;RUN&quot;" />
-		<part name="cass" interface="sorcerer_cass">
-			<dataarea name="cass" size="11908260">
-				<rom name="eliza.wav" size="11908260" crc="67868b2a" sha1="bd219fa2b29881add2f06fc7cdf1dc0c63bec0b0" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="demo1" supported="no">
-		<description>DEMO1 (Bad?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Gives CRC Error" />
-		<part name="cass" interface="sorcerer_cass">
-			<dataarea name="cass" size="12770008">
-				<rom name="demo1.wav" size="12770008" crc="e53951a5" sha1="612b60f3f179fa05a86305761e951211e535238e" offset="0" />
+			<dataarea name="cass" size="12691590">
+				<rom name="demo1.wav" size="12691590" crc="0cd9f838" sha1="2bd3e8082d5f0605d36b24ad8462c49962e64377" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="demo2">
 		<description>DEMO2</description>
-		<year>19??</year>
+		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Load in BASIC with &quot;CLOAD&quot; command, then type &quot;RUN&quot;" />
+		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="8202538">
 				<rom name="demo2.wav" size="8202538" crc="922dede4" sha1="92005d8e4957a658e2e513083cd240af575fc048" offset="0" />
@@ -86,9 +35,10 @@
 
 	<software name="demo3">
 		<description>DEMO3</description>
-		<year>19??</year>
+		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Load in BASIC with &quot;CLOAD&quot; command, then type &quot;RUN&quot;" />
+		<info name="developer" value="Peter J. Elston"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="7263870">
 				<rom name="demo3.wav" size="7263870" crc="38e5b0d7" sha1="2400651c816b33d67c461c7eee561d80568891be" offset="0" />
@@ -98,9 +48,9 @@
 
 	<software name="demo4">
 		<description>DEMO4</description>
-		<year>19??</year>
+		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Load in BASIC with &quot;CLOAD&quot; command, then type &quot;RUN&quot;" />
+		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="3896482">
 				<rom name="demo4.wav" size="3896482" crc="e66fa049" sha1="d956b3ff42ac7b3178ee76ecb3d2ad388fed81f5" offset="0" />
@@ -110,9 +60,10 @@
 
 	<software name="demo5">
 		<description>DEMO5</description>
-		<year>19??</year>
+		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Load in BASIC with &quot;CLOAD&quot; command, then type &quot;RUN&quot;" />
+		<info name="developer" value="Ted Crowley"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="5980780">
 				<rom name="demo5.wav" size="5980780" crc="32e5879c" sha1="07d08cb8d35e591d9f5a358fcc6f611df5922c7e" offset="0" />
@@ -122,21 +73,23 @@
 
 	<software name="demo6">
 		<description>DEMO6</description>
-		<year>19??</year>
+		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Load in BASIC with &quot;CLOAD&quot; command, then type &quot;RUN&quot;" />
+		<info name="developer" value="Terry and Kathleen Beyer"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
-			<dataarea name="cass" size="11295052">
-				<rom name="demo6.wav" size="11295052" crc="1c3a212f" sha1="a641a1cfaa3c3dc272c31803c738ff3f908f4604" offset="0" />
+			<dataarea name="cass" size="11325568">
+				<rom name="demo6.wav" size="11325568" crc="60a7a4ee" sha1="b895cd5f2b93741e0356fe265fff96e8b6eb71b7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="demo7">
 		<description>DEMO7</description>
-		<year>19??</year>
+		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Load in BASIC with &quot;CLOAD&quot; command, then type &quot;RUN&quot;" />
+		<info name="developer" value="Jim and Linda Staley"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="11678280">
 				<rom name="demo7.wav" size="11678280" crc="320e3eba" sha1="f2ab46c0b33b5ea42a6ae26fdd06294b62e1331f" offset="0" />
@@ -146,29 +99,51 @@
 
 	<software name="demo8">
 		<description>DEMO8</description>
-		<year>19??</year>
+		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Load in BASIC with &quot;CLOAD&quot; command, then type &quot;RUN&quot;" />
+		<info name="developer" value="J.R.Lucas"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="7556546">
 				<rom name="demo8.wav" size="7556546" crc="baf9361f" sha1="30ab8a8ccafd65fbe82cbfbf5f77f27e0dfc4a78" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-
-<!--
-	<software name="martian" supported="no">
-		<description>Martian Invaders (Bad?)</description>
-		<year>1980?</year>
+	<software name="eliza">
+		<description>Eliza</description>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Gives CRC Error" />
+		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
-			<dataarea name="cass" size="843548">
-				<rom name="m- martian invaders (1980).wav" size="843548" crc="355d94ea" sha1="048ef7fa3a321cdcada962135de3f42161de86ab" offset="0" />
+			<dataarea name="cass" size="5381548">
+				<rom name="eliza.wav" size="5381548" crc="a1811e79" sha1="6a9eed4a9f4afd52fc8de318858717fcf9a8af77" offset="0" />
 			</dataarea>
 		</part>
 	</software>
--->
+	<software name="milen">
+		<description>Military Encounter</description>
+		<year>1981</year>
+		<publisher>Global Software Network</publisher>
+		<info name="developer" value="David Ittner"/>
+		<info name="usage" value="In Basic, BYE then LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="12103836">
+				<rom name="salvo.wav" size="12103836" crc="07925abd" sha1="cde6fa8c9da41eee8db6c7c936f9bb61c5591ae6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="salvo">
+		<description>Salvo</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="J.T.Staley"/>
+		<info name="usage" value="In Basic, CLOAD then RUN" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="12412710">
+				<rom name="salvo.wav" size="12412710" crc="7cca90bb" sha1="6b8ebf52955ee1dd49615966d7c8e12ab51aee8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 <!--
      The original tapes have died long ago, so these were loaded from the
@@ -287,9 +262,10 @@
 	</software>
 	<software name="revsi">
 		<description>Reversi</description>
-		<year>198?</year>
+		<year>1979</year>
 		<publisher>unknown</publisher>
 		<info name="serial" value="308ES" />
+		<info name="developer" value="Terry and Kathleen Beyer"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="10478390">
@@ -692,7 +668,7 @@
 		<year>198?</year>
 		<publisher>unknown</publisher>
 		<info name="serial" value="520ES" />
-		<info name="usage" value="Boot to Basic, BYE, LOG" />
+		<info name="usage" value="In Basic, BYE then LOG" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="2199566">
 				<rom name="spx48.wav" size="2199566" crc="c4bbb8af" sha1="3b290e41f76535a1c7e73de6b2790e87706368e7" offset="0" />
@@ -735,6 +711,53 @@
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="4074706">
 				<rom name="amaze.wav" size="4074706" crc="13d88dfc" sha1="7ea94abdd1df0b893b0121cd7ba233ca77bce8c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="invaders">
+		<description>Sorcerer Invaders</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Brian Wyvill"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="4804332">
+				<rom name="invaders.wav" size="4804332" crc="f020fa5b" sha1="ccc44f29fe7fa2844130ec3078f1839654be8a91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="spider">
+		<description>Spider</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="1707474">
+				<rom name="spider.wav" size="1707474" crc="9fa56c8b" sha1="829d884dcf7f733f3a073ccc9c874627d6b5ebe0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="adv7">
+		<description>Mystery Fun House</description>
+		<year>1979</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Scott Adams"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="13658750">
+				<rom name="adv7.wav" size="13658750" crc="36832c51" sha1="7fd1805a78a0d0db3d446d2d1609058d5000796a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="adv8">
+		<description>Pyramid of Doom</description>
+		<year>1979</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Scott Adams"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="13658750">
+				<rom name="adv8.wav" size="13658750" crc="fac6fb02" sha1="de3437f174e88b6a84b652bc15aa2cae298c6f80" offset="0" />
 			</dataarea>
 		</part>
 	</software>

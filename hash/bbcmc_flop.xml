@@ -10,6 +10,17 @@
 
 <softwarelist name="bbcmc_flop" description="BBC Master Compact disks">
 
+	<software name="elite">
+		<description>Elite</description>
+		<year>1986</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="elite.adm" size="327680" crc="4668a225" sha1="0716a525820045f6b2092dda2eca2fa6a651b381" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="welcome">
 		<description>BBC Master Compact Welcome Disc</description>
 		<year>1986</year>
@@ -17,6 +28,184 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
 				<rom name="welcome_compact.adl" size="655360" crc="9d747205" sha1="04cfd6d1e08e8f695befb2948e27d63fd7842b8f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Business -->
+
+	<software name="viewplot">
+		<description>ViewPlot</description>
+		<year>1986</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SUB29" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="viewplot.adf" size="327680" crc="2ca1eade" sha1="12eaa4ac1c6a6484a886f313bb793a2c4537eb91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Educational -->
+
+	<software name="aninumbr">
+		<description>Animated Numbers</description>
+		<year>1990</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="animated_numbers.adl" size="655360" crc="a8b8d04d" sha1="7d633419ac6012c80f9376210e47642ca3d70d82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="connectn">
+		<description>Connections</description>
+		<year>1990</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Startup Disc"/>
+			<dataarea name="flop" size="20224">
+				<rom name="connections_master_disc.adl" size="20224" crc="b3149805" sha1="3065c72fa3226f8741a019bd6c0dce7db11bdf7a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Work Disc"/>
+			<dataarea name="flop" size="327680">
+				<rom name="connections_work_disc.adl" size="327680" crc="823766c6" sha1="e89ab5643b66218a3f42911976700942e72a066d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Print Disc"/>
+			<dataarea name="flop" size="327680">
+				<rom name="connections_print_disc.adl" size="327680" crc="22528474" sha1="46a6ea12d2acf53ccc682bc0d8b5ffb876800793" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dreamtim">
+		<description>Dreamtime</description>
+		<year>1989</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="dreamtime.adl" size="655360" crc="57ff88cd" sha1="bdf7a8e3532874b74fa6658da7500fdb4d67603e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mapventu">
+		<description>Mapventure</description>
+		<year>1988</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="dreamtime.adl" size="655360" crc="033c7088" sha1="5f8b66af0b6d81f3829ac9371bbf79825536461f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microbug">
+		<description>The Microbugs</description>
+		<year>1989</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Startup Disc &amp; Introduction"/>
+			<dataarea name="flop" size="655360">
+				<rom name="micro_bugs_start_disc.adl" size="655360" crc="ec6f8494" sha1="47d9884a44ece0328a5adf640d88fb5edbdda12a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Adventure Disc"/>
+			<dataarea name="flop" size="655360">
+				<rom name="micro_bugs_adventure_disc.adl" size="655360" crc="7baa88ae" sha1="28aeb331a70ccadf45bd9800821539973b5be24f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacemad">
+		<description>Space Mission Mada</description>
+		<year>1986</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Parts 1 &amp; 2"/>
+			<dataarea name="flop" size="655360">
+				<rom name="space_mission_mada_12.adl" size="655360" crc="ed7ea48e" sha1="c9131e515732dfebb296eb1a7c8bbc2f0b7aefe4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Parts 3 + 4"/>
+			<dataarea name="flop" size="655360">
+				<rom name="space_mission_mada_34.adl" size="655360" crc="29030385" sha1="aadaef6c3f6ca86e3cba9e250e86ab7cbb2e5403" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stigdump">
+		<description>Stig of the Dump</description>
+		<year>1986</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="stig_of_the_dump.adl" size="655360" crc="d7fd696c" sha1="568ec9f8f15506564881f623d62d6faefd191d1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teachcup">
+		<description>Teachers' Cupboard</description>
+		<year>1988</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="teachers_cupboard.adl" size="655360" crc="fe49aa4c" sha1="3dd73656e1b18f74acb78fd6cd0c7ea5888b5fff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpicnic">
+		<description>The Teddy Bears' Picnic</description>
+		<year>1989</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="teddy_bear_picnic.adl" size="655360" crc="4ff95e0e" sha1="494deb7727b3fe490a16b66ca471508e3d56e465" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trainydy">
+		<description>Teddy Bears' Rainy Day</description>
+		<year>1993</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="teddy_bear_rainy_day.adl" size="655360" crc="5854e1eb" sha1="731b3609fbe8b6d09ee2b3ef6db155fb2012cca8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pigshome">
+		<description>Three Little Pigs at Home</description>
+		<year>1992</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="three_little_pigs_at_home.adl" size="655360" crc="18e63cfd" sha1="d3b272f26f395fc987d5b0749bae88ef76ba7fe1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Languages -->
+
+	<software name="acornc">
+		<description>C (Acornsoft)</description>
+		<year>1987</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNL28" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="526592">
+				<rom name="acorn-c.adl" size="526592" crc="fce1d68f" sha1="a8983068eb9a699a500fa8f8ebfb369a673e7279" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -7,24 +7,33 @@
 // I searched for a while for any kind of documentation about them but found nothing at all.
 // Some time later I found the mnemonics in the binary dump of assembly development option ROM:
 // CIM & SIM, respectively. From the mnemonic I deduced their function: Clear & Set Interrupt Mask.
-// I think they are basically used to temporarily disable/enable interrupt recognition inside
-// ISRs. This is consistent with their usage in PPU firmware and test ROM. The official EIR &
-// DIR instructions cannot be used while servicing an interrupt because they probably reset
-// the "in ISR" condition of the processor.
-// Using CIM&SIM only makes sense in low-level ISRs because high-level ones can't be interrupted
-// by anyone.
-// Now, I still have some doubts about the "polarity" of interrupt mask. Is interrupt
-// recognition disabled when the mask is cleared or is it the opposite?
-// I'm leaning towards the "no interrupts with mask cleared" interpretation, but I'm not 100%
-// convinced. CIM & SIM at the moment are implemented with this interpretation (see also
-// NO_ISR_WITH_IM_CLEARED macro below).
+// After a few experiments, crashes, etc. here's my opinion on their purpose.
+// When the CPU receives an interrupt, its AEC registers can be in any state so it could
+// be impossible to properly save state, fetch the interrupt vector and start executing the ISR.
+// The solution is having an hidden "interrupt mask" flag that gets set when an interrupt (either
+// low or high priority) is acknowledged and is cleared when the "ret 0,p" instruction that ends
+// the ISR is executed. The effects of having the interrupt mask set are:
+// * No interrupts are recognized
+// * A few essential AEC registers are overridden to establish a "safe" environment to save state
+// and execute ISR (see hp_5061_3001_cpu_device::add_mae).
+// Inside the ISR, CIM & SIM instructions can be used to change the interrupt mask and switch
+// between normal & overridden settings of AEC.
+// As an example of CIM&SIM usage, we can have a look at the keyboard ISR in 9845B PPU processor:
+// * A key is pressed and IRQ 0 is set
+// * Interrupt 0 is recognized, IM is set
+// * R register is used to save program counter in block = 1 (overriding any R36 value)
+// * Vector is fetched and execution begins in block 5 (overriding R33 value)
+// * Registers are saved to RAM (again in overridden block 1)
+// * AEC registers are set to correct value for ISR execution
+// * CIM is used to exit the special behaviour of AEC and to allow high-priority interrupts
+// * Useful ISR processing is done
+// * SIM is used to re-enter special behaviour of AEC and to block any interrupt
+// * State is restored (including all AEC registers)
+// * RET 0,P is executed to end ISR: return program counter is popped off the stack and IM is cleared
 
 #include "emu.h"
 #include "debugger.h"
 #include "hphybrid.h"
-
-// Define this to have "IM cleared" == "No interrupt recognition"
-#define NO_ISR_WITH_IM_CLEARED
 
 enum {
 				HPHYBRID_A,
@@ -539,9 +548,11 @@ UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
 																																memmove(&m_reg_PA[ 0 ] , &m_reg_PA[ 1 ] , HPHYBRID_INT_LVLS);
 																																																																m_pa_changed_func((UINT8)CURRENT_PA);
 																												}
-																																																								BIT_CLR(m_flags, HPHYBRID_IM_BIT);
+																												tmp = RM(AEC_CASE_C , m_reg_R--) + (opcode & 0x1f);
+																												BIT_CLR(m_flags, HPHYBRID_IM_BIT);
+																								} else {
+																									tmp = RM(AEC_CASE_C , m_reg_R--) + (opcode & 0x1f);
 																								}
-																								tmp = RM(AEC_CASE_C , m_reg_R--) + (opcode & 0x1f);
 																								return BIT(opcode , 5) ? tmp - 0x20 : tmp;
 																				} else {
 																								switch (opcode) {
@@ -1483,11 +1494,7 @@ UINT16 hp_5061_3001_cpu_device::execute_no_bpc_ioc(UINT16 opcode)
 										// Probably "Clear Interrupt Mask"
 										// No idea at all about exec. time: make it 9 cycles
 										m_icount -= 9;
-#ifndef NO_ISR_WITH_IM_CLEARED
 										BIT_CLR(m_flags, HPHYBRID_IM_BIT);
-#else
-										BIT_SET(m_flags, HPHYBRID_IM_BIT);
-#endif
 										logerror("hp-5061-3001: CIM, P = %06x flags = %05x\n" , m_genpc , m_flags);
 										break;
 
@@ -1497,11 +1504,7 @@ UINT16 hp_5061_3001_cpu_device::execute_no_bpc_ioc(UINT16 opcode)
 										// Probably "Set Interrupt Mask"
 										// No idea at all about exec. time: make it 9 cycles
 										m_icount -= 9;
-#ifndef NO_ISR_WITH_IM_CLEARED
 										BIT_SET(m_flags, HPHYBRID_IM_BIT);
-#else
-										BIT_CLR(m_flags, HPHYBRID_IM_BIT);
-#endif
 										logerror("hp-5061-3001: SIM, P = %06x flags = %05x\n" , m_genpc , m_flags);
 										break;
 
@@ -1532,51 +1535,63 @@ offs_t hp_5061_3001_cpu_device::disasm_disassemble(char *buffer, offs_t pc, cons
 
 UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
 {
-		UINT16 bsc_reg;
-		bool top_half = BIT(addr , 15) != 0;
+	UINT16 bsc_reg;
+	bool top_half = BIT(addr , 15) != 0;
 
-		// Detect accesses to top half of base page
-		if ((aec_case == AEC_CASE_C || aec_case == AEC_CASE_I) && (addr & 0xfe00) == 0xfe00) {
-			aec_case = AEC_CASE_B;
+	// Detect accesses to top half of base page
+	if ((aec_case == AEC_CASE_C || aec_case == AEC_CASE_I) && (addr & 0xfe00) == 0xfe00) {
+		aec_case = AEC_CASE_B;
+	}
+
+	switch (aec_case) {
+	case AEC_CASE_A:
+		if (top_half) {
+			bsc_reg = m_reg_aec[ HP_REG_R34_ADDR - HP_REG_R32_ADDR ];
+		} else {
+			// Block 5 is used when IM bit overrides R33 value
+			bsc_reg = BIT(m_flags , HPHYBRID_IM_BIT) ? 5 : m_reg_aec[ HP_REG_R33_ADDR - HP_REG_R32_ADDR ];
 		}
+		break;
 
-		switch (aec_case) {
-		case AEC_CASE_A:
-				bsc_reg = top_half ? HP_REG_R34_ADDR : HP_REG_R33_ADDR;
-				break;
-
-		case AEC_CASE_B:
-				bsc_reg = top_half ? HP_REG_R36_ADDR : HP_REG_R33_ADDR;
-				break;
-
-		case AEC_CASE_C:
-				bsc_reg = top_half ? HP_REG_R32_ADDR : HP_REG_R35_ADDR;
-				break;
-
-		case AEC_CASE_D:
-				bsc_reg = top_half ? HP_REG_R32_ADDR : HP_REG_R37_ADDR;
-				break;
-
-				case AEC_CASE_I:
-								// Behaviour of AEC during interrupt vector fetch is undocumented but it can be guessed from 9845B firmware.
-								// Basically in this case the integrated AEC seems to do what the discrete implementation in 9845A does:
-								// top half of memory is mapped to block 0 (fixed) and bottom half is mapped according to content of R35
-								// (see pg 334 of patent).
-								bsc_reg = top_half ? 0 : HP_REG_R35_ADDR;
-								break;
-
-				default:
-								logerror("hphybrid: aec_case=%d\n" , aec_case);
-								return 0;
-				}
-
-				UINT16 aec_reg = (bsc_reg != 0) ? (m_reg_aec[ bsc_reg - HP_REG_R32_ADDR ] & BSC_REG_MASK) : 0;
-
-		if (m_forced_bsc_25) {
-				aec_reg = (aec_reg & 0xf) | 0x20;
+	case AEC_CASE_B:
+		if (top_half) {
+			// Block 1 is used when IM bit overrides R36 value
+			bsc_reg = BIT(m_flags , HPHYBRID_IM_BIT) ? 1 : m_reg_aec[ HP_REG_R36_ADDR - HP_REG_R32_ADDR ];
+		} else {
+			// Block 5 is used when IM bit overrides R33 value
+			bsc_reg = BIT(m_flags , HPHYBRID_IM_BIT) ? 5 : m_reg_aec[ HP_REG_R33_ADDR - HP_REG_R32_ADDR ];
 		}
+		break;
 
-		return (UINT32)addr | ((UINT32)aec_reg << 16);
+	case AEC_CASE_C:
+		bsc_reg = top_half ? m_reg_aec[ HP_REG_R32_ADDR - HP_REG_R32_ADDR ] : m_reg_aec[ HP_REG_R35_ADDR - HP_REG_R32_ADDR ];
+		break;
+
+	case AEC_CASE_D:
+		bsc_reg = top_half ? m_reg_aec[ HP_REG_R32_ADDR - HP_REG_R32_ADDR ] : m_reg_aec[ HP_REG_R37_ADDR - HP_REG_R32_ADDR ];
+		break;
+
+	case AEC_CASE_I:
+		// Behaviour of AEC during interrupt vector fetch is undocumented but it can be guessed from 9845B firmware.
+		// Basically in this case the integrated AEC seems to do what the discrete implementation in 9845A does:
+		// top half of memory is mapped to block 0 (fixed) and bottom half is mapped according to content of R35
+		// (see pg 334 of patent).
+		// I'm beginning to suspect that these values actually come from IM overriding case "C"
+		bsc_reg = top_half ? 0 : m_reg_aec[ HP_REG_R35_ADDR - HP_REG_R32_ADDR ];
+		break;
+
+	default:
+		logerror("hphybrid: aec_case=%d\n" , aec_case);
+		return 0;
+	}
+
+	UINT16 aec_reg = bsc_reg & BSC_REG_MASK;
+
+	if (m_forced_bsc_25) {
+		aec_reg = (aec_reg & 0xf) | 0x20;
+	}
+
+	return (UINT32)addr | ((UINT32)aec_reg << 16);
 }
 
 UINT16 hp_5061_3001_cpu_device::read_non_common_reg(UINT16 addr)
@@ -1655,10 +1670,8 @@ void hp_5061_3001_cpu_device::write_non_common_reg(UINT16 addr , UINT16 v)
 
 void hp_5061_3001_cpu_device::enter_isr(void)
 {
-		// Set interrupt mask when entering an ISR
-#ifndef NO_ISR_WITH_IM_CLEARED
-		BIT_SET(m_flags, HPHYBRID_IM_BIT);
-#endif
+	// Set interrupt mask when entering an ISR
+	BIT_SET(m_flags, HPHYBRID_IM_BIT);
 }
 
 hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

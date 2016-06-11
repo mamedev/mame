@@ -23,6 +23,7 @@
 #include "machine/zndip.h"
 #include "machine/ataintf.h"
 #include "machine/vt83c461.h"
+#include "machine/gen_latch.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/ymz280b.h"
@@ -52,6 +53,8 @@ public:
 		m_mb3773(*this, "mb3773"),
 		m_zoom(*this, "taito_zoom"),
 		m_vt83c461(*this, "ide"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch16(*this, "soundlatch16"),
 		m_cat702_1_dataout(1),
 		m_cat702_2_dataout(1),
 		m_zndip_dataout(1)
@@ -145,6 +148,8 @@ private:
 	optional_device<mb3773_device> m_mb3773;
 	optional_device<taito_zoom_device> m_zoom;
 	optional_device<vt83c461_device> m_vt83c461;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_16_device> m_soundlatch16;
 
 	int m_cat702_1_dataout;
 	int m_cat702_2_dataout;
@@ -358,6 +363,8 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
@@ -401,6 +408,8 @@ static MACHINE_CONFIG_START( zn2, zn_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
@@ -547,7 +556,7 @@ INTERRUPT_GEN_MEMBER(zn_state::qsound_interrupt)
 
 WRITE8_MEMBER(zn_state::zn_qsound_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -585,7 +594,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qsound_portmap, AS_IO, 8, zn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
@@ -1629,7 +1638,7 @@ WRITE8_MEMBER(zn_state::coh1002e_sound_irq_w)
 static ADDRESS_MAP_START(coh1002e_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fa10300, 0x1fa10303) AM_WRITE8(coh1002e_bank_w, 0x000000ff)
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(soundlatch_byte_w, 0x000000ff)
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff)
 	AM_RANGE(0x1fb00004, 0x1fb00007) AM_WRITE8(coh1002e_sound_irq_w, 0x000000ff)
 
 	AM_IMPORT_FROM(zn_map)
@@ -1644,7 +1653,7 @@ static ADDRESS_MAP_START( psarc_snd_map, AS_PROGRAM, 16, zn_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_RAM
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("ymf", ymf271_device, read, write, 0x00ff )
-	AM_RANGE(0x180008, 0x180009) AM_READ8(soundlatch_byte_r, 0x00ff )
+	AM_RANGE(0x180008, 0x180009) AM_DEVREAD8("soundlatch", generic_latch_8_device, read, 0x00ff )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITENOP
 	AM_RANGE(0x100020, 0xffffff) AM_WRITENOP
 ADDRESS_MAP_END
@@ -2263,7 +2272,7 @@ WRITE16_MEMBER(zn_state::coh1001l_sound_unk_w)
 
 WRITE16_MEMBER(zn_state::coh1001l_latch_w)
 {
-	soundlatch_word_w(space, 0, data);
+	m_soundlatch16->write(space, 0, data);
 	m_audiocpu->set_input_line(3, HOLD_LINE);
 }
 
@@ -2287,7 +2296,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1001l)
 
 static ADDRESS_MAP_START( atlus_snd_map, AS_PROGRAM, 16, zn_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READWRITE(soundlatch_word_r, coh1001l_sound_unk_w)
+	AM_RANGE(0x100000, 0x100001) AM_DEVREAD("soundlatch16", generic_latch_16_device, read) AM_WRITE(coh1001l_sound_unk_w)
 	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM
 ADDRESS_MAP_END
@@ -2301,6 +2310,8 @@ static MACHINE_CONFIG_DERIVED(coh1001l, zn1_2mb_vram)
 	MCFG_CPU_PROGRAM_MAP(atlus_snd_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1001l)
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch16")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE("audiocpu", 2))

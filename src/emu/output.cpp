@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "coreutil.h"
+#include "modules/output/output_module.h"
 
 //**************************************************************************
 //  OUTPUT MANAGER
@@ -210,10 +211,10 @@ void output_manager::set_notifier(const char *outname, output_notifier_func call
     notifier for all outputs
 -------------------------------------------------*/
 
-void output_manager::notify_all(output_notifier_func callback, void *param)
+void output_manager::notify_all(output_module *module)
 {
 	for (auto &item : m_itemtable)
-		(*callback)(item.second.name.c_str(), item.second.value, param);
+		module->notify(item.second.name.c_str(), item.second.value);
 }
 
 

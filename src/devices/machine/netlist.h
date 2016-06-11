@@ -504,9 +504,11 @@ class NETLIB_NAME(analog_callback) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(analog_callback)(netlist::netlist_t &anetlist, const pstring &name)
-		: device_t(anetlist, name), m_cpu_device(nullptr), m_last(0)
+	: device_t(anetlist, name)
+	, m_in(*this, "IN")
+	, m_cpu_device(nullptr)
+	, m_last(0)
 	{
-		enregister("IN", m_in);
 		m_cpu_device = downcast<netlist_mame_cpu_device_t *>(&downcast<netlist_mame_t &>(netlist()).parent());
 		save(NLNAME(m_last));
 	}
@@ -555,8 +557,8 @@ public:
 		, m_channel(*this, "CHAN", 0)
 		, m_mult(*this, "MULT", 1000.0)
 		, m_offset(*this, "OFFSET", 0.0)
+		, m_in(*this, "IN")
 	{
-		enregister("IN", m_in);
 		m_sample = netlist::netlist_time::from_hz(1); //sufficiently big enough
 		save(NAME(m_last_buffer));
 	}
@@ -567,7 +569,7 @@ public:
 	{
 		m_cur = 0.0;
 		m_last_pos = 0;
-		m_last_buffer = netlist::netlist_time::zero;
+		m_last_buffer = netlist::netlist_time::zero();
 	}
 
 	ATTR_HOT void sound_update(const netlist::netlist_time &upto)
@@ -624,11 +626,11 @@ class NETLIB_NAME(sound_in) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(sound_in)(netlist::netlist_t &anetlist, const pstring &name)
-		: netlist::device_t(anetlist, name)
+	: netlist::device_t(anetlist, name)
+	, m_feedback(*this, "FB") // clock part
+	, m_Q(*this, "Q")
 	{
-		// clock part
-		enregister("Q", m_Q);
-		enregister("FB", m_feedback);
+
 
 		connect_late(m_feedback, m_Q);
 		m_inc = netlist::netlist_time::from_nsec(1);
@@ -678,7 +680,7 @@ public:
 			m_param[i]->setTo(v * m_param_mult[i]->Value() + m_param_offset[i]->Value());
 		}
 		m_pos++;
-		OUTLOGIC(m_Q, !m_Q.net().as_logic().new_Q(), m_inc  );
+		OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
 	}
 
 public:

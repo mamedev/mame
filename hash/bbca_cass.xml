@@ -16,6 +16,17 @@
 
 	<!-- Games -->
 
+	<software name="adventur">
+		<description>Adventure</description>
+		<year>1983</year>
+		<publisher>Micro Power</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="8639">
+				<rom name="adventure(1983)(micropower).uef" size="8639" crc="53770f29" sha1="5949dc94c31137c0beb996e37b34724e4e71af8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="airline">
 		<description>Airline</description>
 		<year>1983</year>
@@ -50,14 +61,14 @@
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="beebtrek">
 		<description>Beebtrek</description>
-		<year>1983</year>
-		<publisher>Software For All</publisher>
+		<year>1982</year>
+		<publisher>Epsilon</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="7235">
-				<rom name="beebtrek_be(softwareforall).uef" size="7235" crc="0d25509e" sha1="512adbb3cb8d1846f06fe9b4474e35ef711bd752" offset="0" />
+			<dataarea name="cass" size="7168">
+				<rom name="beebtrek(epsilon).uef" size="7168" crc="729eef94" sha1="c6062440f4624d5d217a9a4deb073d45eb5144fe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -69,6 +80,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5269">
 				<rom name="candyfloss(1982)(ijk).uef" size="5269" crc="fe0ca047" sha1="4725f0ef2d8d3741897f3f8bc4a372c3a7065f0d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cascad50">
+		<description>Cascade 50</description>
+		<year>1983</year>
+		<publisher>Cascade</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="37743">
+				<rom name="cascade50(cascade).uef" size="37743" crc="340ab359" sha1="d59f04c761df80c319d5f9bb6bf41aa6879e0422" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -200,6 +222,17 @@
 		</part>
 	</software>
 
+	<software name="micrbudg">
+		<description>Micro Budget</description>
+		<year>1983</year>
+		<publisher>Micro Power</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="3142">
+				<rom name="microbudget(micropower).uef" size="3142" crc="767e9fdd" sha1="2a869c681572194dc7796a45c8eea3b047a509c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="munchyma">
 		<description>Munchyman</description>
 		<year>1981</year>
@@ -267,12 +300,34 @@
 	</software>
 
 	<software name="reversim">
-		<description>Reversi (Micro Power)</description>
+		<description>Reversi 1 (Micro Power)</description>
 		<year>1982</year>
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="2150">
 				<rom name="reversi(198x)(micropower).uef" size="2150" crc="45f2023a" sha1="b01cd4fbf1c0d0e2a8515c01e224871c6f3a3af4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="savpondb">
+		<description>Savage Pond (Bug Byte)</description>
+		<year>1983</year>
+		<publisher>Bug Byte</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="11605">
+				<rom name="savagepond(1983)(bugbyte).uef" size="11605" crc="4b1629cd" sha1="833a3c6bfd1432a754124f8adf5a07b6c63e67b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="savponda">
+		<description>Savage Pond (ASP Software)</description>
+		<year>198?</year>
+		<publisher>ASP Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="11586">
+				<rom name="savagepond(asp).uef" size="11586" crc="4efb0a68" sha1="06b20cfa0a17b7b7f1e9451f5bd2e842af8d8928" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -284,6 +339,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4805">
 				<rom name="seek(1982)(micropower).uef" size="4805" crc="0234d741" sha1="04c583b9defd2f819f6bccc4d2304af576598922" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sigmagic">
+		<description>Signals and Magic</description>
+		<year>1982</year>
+		<publisher>H&amp;H Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="9649">
+				<rom name="signalsandmagic(hnh).uef" size="9649" crc="19edfd4a" sha1="0353fbea7269b821a8174bdb51ced70e2eb36b7c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -386,7 +452,7 @@
 	<software name="wordseq">
 		<description>Word Sequencing</description>
 		<year>1983</year>
-		<publisher>Acornsoft</publisher>
+		<publisher>Acornsoft/ESM</publisher>
 		<info name="release" value="SBE06" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7955">
@@ -398,7 +464,7 @@
 	<software name="missigns">
 		<description>Missing Signs</description>
 		<year>1983</year>
-		<publisher>Acornsoft</publisher>
+		<publisher>Acornsoft/ESM</publisher>
 		<info name="release" value="SBE09" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7977">

@@ -588,12 +588,21 @@ void vegas_state::machine_start()
 	m_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vegas_state::nile_timer_callback),this));
 
 	/* identify our sound board */
-	if (machine().device("dsio") != nullptr)
+	if (machine().device("dcs:dsio") != nullptr) {
 		m_dcs_idma_cs = 6;
-	else if (machine().device("denver") != nullptr)
+		if (LOG_SIO)
+			logerror("Found dsio\n");
+	}
+	else if (machine().device("dcs:denver") != nullptr) {
 		m_dcs_idma_cs = 7;
-	else
+		if (LOG_SIO)
+			logerror("Found denver\n");
+	}
+	else {
 		m_dcs_idma_cs = 0;
+		if (LOG_SIO)
+			logerror("Did not find dcs2 sound board\n");
+	}
 
 	/* set the fastest DRC options, but strict verification */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
@@ -958,8 +967,13 @@ TIMER_CALLBACK_MEMBER(vegas_state::nile_timer_callback)
 	/* adjust the timer to fire again */
 	{
 		UINT32 scale = regs[0];
-		if (regs[1] & 2)
-			logerror("Unexpected value: timer %d is prescaled\n", which);
+		if (regs[1] & 2) {
+			UINT32 scaleSrc = (regs[1] >> 2) & 0x3;
+			UINT32 *scaleReg = &m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
+			scale *= scaleReg[0];
+			//logerror("Unexpected value: timer %d is prescaled\n", which);
+			logerror("Timer Scaling value: timer %d is prescaled from %08X to %08X\n", which, regs[0], scale);
+		}
 		if (scale != 0)
 			m_timer[which]->adjust(TIMER_PERIOD * scale, which);
 	}
@@ -1042,9 +1056,15 @@ READ32_MEMBER( vegas_state::nile_r )
 			which = (offset - NREG_T0CTRL) / 4;
 			if (m_nile_regs[offset - 1] & 1)
 			{
-				if (m_nile_regs[offset] & 2)
-					logerror("Unexpected value: timer %d is prescaled\n", which);
-				result = m_nile_regs[offset + 1] = m_timer[which]->remaining().as_double() * (double)SYSTEM_CLOCK;
+				//if (m_nile_regs[offset - 1] & 2)
+				//	logerror("Unexpected value: timer %d is prescaled\n", which);
+				UINT32 scale = 1;
+				if (m_nile_regs[offset - 1] & 2) {
+					UINT32 scaleSrc = (m_nile_regs[offset - 1] >> 2) & 0x3;
+					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
+					logerror("Timer value: timer %d is prescaled by \n", which, scale);
+				}
+				result = m_nile_regs[offset + 1] = m_timer[which]->remaining().as_double() * (double)SYSTEM_CLOCK / scale;
 			}
 
 			if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", safe_pc(), which, offset*4, result);
@@ -1170,20 +1190,31 @@ WRITE32_MEMBER( vegas_state::nile_w )
 			/* timer just enabled? */
 			if (!(olddata & 1) && (m_nile_regs[offset] & 1))
 			{
-				UINT32 scale = m_nile_regs[offset + 1];
-				if (m_nile_regs[offset] & 2)
-					logerror("Unexpected value: timer %d is prescaled\n", which);
+				UINT32 scale = m_nile_regs[offset - 1];
+				//if (m_nile_regs[offset] & 2)
+				//	logerror("Unexpected value: timer %d is prescaled\n", which);
+				if (m_nile_regs[offset] & 2) {
+					UINT32 scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
+					scale *= m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
+					logerror("Timer scale: timer %d is scaled by %08X\n", which, m_nile_regs[NREG_T0CTRL + which * 4]);
+				}
 				if (scale != 0)
 					m_timer[which]->adjust(TIMER_PERIOD * scale, which);
-				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %d Hz\n", which, (int)ATTOSECONDS_TO_HZ((TIMER_PERIOD * (m_nile_regs[offset + 1] + 1)).attoseconds()));
+				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz scale = %08X\n", which, ATTOSECONDS_TO_HZ((TIMER_PERIOD * (m_nile_regs[offset + 1] + 1)).attoseconds()), scale);
 			}
 
 			/* timer disabled? */
 			else if ((olddata & 1) && !(m_nile_regs[offset] & 1))
 			{
-				if (m_nile_regs[offset] & 2)
-					logerror("Unexpected value: timer %d is prescaled\n", which);
-				m_nile_regs[offset + 1] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK;
+				//if (m_nile_regs[offset] & 2)
+				//	logerror("Unexpected value: timer %d is prescaled\n", which);
+				UINT32 scale = 1;
+				if (m_nile_regs[offset] & 2) {
+					UINT32 scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
+					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
+					logerror("Timer scale: timer %d is scaled by %08X\n", which, scale);
+				}
+				m_nile_regs[offset + 1] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK / scale;
 				m_timer[which]->adjust(attotime::never, which);
 			}
 			break;
@@ -1198,9 +1229,15 @@ WRITE32_MEMBER( vegas_state::nile_w )
 
 			if (m_nile_regs[offset - 1] & 1)
 			{
-				if (m_nile_regs[offset - 1] & 2)
-					logerror("Unexpected value: timer %d is prescaled\n", which);
-				m_timer[which]->adjust(TIMER_PERIOD * m_nile_regs[offset], which);
+				//if (m_nile_regs[offset - 1] & 2)
+				//	logerror("Unexpected value: timer %d is prescaled\n", which);
+				UINT32 scale = 1;
+				if (m_nile_regs[offset - 1] & 2) {
+					UINT32 scaleSrc = (m_nile_regs[offset - 1] >> 2) & 0x3;
+					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
+					logerror("Timer scale: timer %d is scaled by %08X\n", which, scale);
+				}
+				m_timer[which]->adjust(TIMER_PERIOD * m_nile_regs[offset] * scale, which);
 			}
 			break;
 
@@ -1407,7 +1444,7 @@ WRITE32_MEMBER( vegas_state::sio_w )
 	if (ACCESSING_BITS_16_23) offset += 2;
 	if (ACCESSING_BITS_24_31) offset += 3;
 	if (LOG_SIO && offset != 0)
-		logerror("%08X:sio write to offset %X = %02X\n", safe_pc(), offset, data >> (offset*8));
+		logerror("%08X:sio write to offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, data >> (offset*8));
 	if (offset < 4)
 		m_sio_data[offset] = data >> (offset*8);
 	if (offset == 1)
@@ -1425,7 +1462,7 @@ READ32_MEMBER( vegas_state::sio_r )
 	if (offset < 4)
 		result = m_sio_data[0] | (m_sio_data[1] << 8) | (m_sio_data[2] << 16) | (m_sio_data[3] << 24);
 	if (LOG_SIO && offset != 2)
-		logerror("%08X:sio read from offset %X = %02X\n", safe_pc(), offset, result >> (offset*8));
+		logerror("%08X:sio read from offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, result >> (offset*8));
 	return result;
 }
 

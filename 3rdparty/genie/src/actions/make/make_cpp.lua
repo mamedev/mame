@@ -9,7 +9,6 @@
 	local cpp = premake.make.cpp
 	local make = premake.make
 
-
 	function premake.make_cpp(prj)
 
 		-- create a shortcut to the compiler interface
@@ -25,6 +24,8 @@
 				premake.gmake_cpp_config(prj, cfg, cc)
 			end
 		end
+
+		table.sort(prj.files)
 
 		-- list object directories
 		local objdirs = {}
@@ -43,10 +44,10 @@
 
 		_p('OBJDIRS := \\')
 		_p('\t$(OBJDIR) \\')
-		for dir, _ in pairs(objdirs) do
+		for dir, _ in iter.sortByKeys(objdirs) do
 			_p('\t$(OBJDIR)/%s \\', dir)
 		end
-		for dir, _ in pairs(additionalobjdirs) do
+		for dir, _ in iter.sortByKeys(additionalobjdirs) do
 			_p('\t%s \\', dir)
 		end
 		_p('')
@@ -236,7 +237,7 @@
 		_p('ifeq (posix,$(SHELLTYPE))')
 		_p('  MKDIR = $(SILENT) mkdir -p "$(1)"')
 		_p('  COPY  = $(SILENT) cp -fR "$(1)" "$(2)"')
-		_p('  RM	= $(SILENT) rm -f "$(1)"')
+		_p('  RM    = $(SILENT) rm -f "$(1)"')
 		_p('else')
 		_p('  MKDIR = $(SILENT) mkdir "$(subst /,\\\\,$(1))" 2> nul || exit 0')
 		_p('  COPY  = $(SILENT) copy /Y "$(subst /,\\\\,$(1))" "$(subst /,\\\\,$(2))"')
@@ -270,11 +271,13 @@
 		-- if this platform requires a special compiler or linker, list it here
 		cpp.platformtools(cfg, cc)
 
-		_p('  ' .. (table.contains(premake.make.override,"OBJDIR") and "override " or "") ..    'OBJDIR     = %s', _MAKE.esc(cfg.objectsdir))
-		_p('  ' .. (table.contains(premake.make.override,"TARGETDIR") and "override " or "") .. 'TARGETDIR  = %s', _MAKE.esc(cfg.buildtarget.directory))
-		_p('  ' .. (table.contains(premake.make.override,"TARGET") and "override " or "") ..    'TARGET     = $(TARGETDIR)/%s', _MAKE.esc(cfg.buildtarget.name))
-		_p('  DEFINES   +=%s', make.list(cc.getdefines(cfg.defines)))
-		_p('  INCLUDES  +=%s', make.list(cc.getincludedirs(cfg.includedirs)))
+		_p('  ' .. (table.contains(premake.make.override,"OBJDIR") and "override " or "") ..    'OBJDIR         = %s', _MAKE.esc(cfg.objectsdir))
+		_p('  ' .. (table.contains(premake.make.override,"TARGETDIR") and "override " or "") .. 'TARGETDIR      = %s', _MAKE.esc(cfg.buildtarget.directory))
+		_p('  ' .. (table.contains(premake.make.override,"TARGET") and "override " or "") ..    'TARGET         = $(TARGETDIR)/%s', _MAKE.esc(cfg.buildtarget.name))
+		_p('  DEFINES       +=%s', make.list(cc.getdefines(cfg.defines)))
+		_p('  INCLUDES      +=%s', make.list(cc.getincludedirs(cfg.includedirs)))
+		_p('  INCLUDES      +=%s', make.list(cc.getquoteincludedirs(cfg.userincludedirs)))
+
 
 		-- set up precompiled headers
 		cpp.pchconfig(cfg)
@@ -284,6 +287,8 @@
 
 		-- write out libraries, linker flags, and the link command
 		cpp.linker(prj, cfg, cc)
+
+		table.sort(prj.files)
 
 		-- add objects for compilation, and remove any that are excluded per config.
 		_p('  OBJECTS := \\')
@@ -383,16 +388,16 @@
 		-- Patch #3401184 changed the order
 		_p('  ALL_LDFLAGS   += $(LDFLAGS)%s', make.list(table.join(cc.getlibdirflags(cfg), cc.getldflags(cfg), cfg.linkoptions)))
 
-		_p('  LDDEPS    +=%s', make.list(_MAKE.esc(premake.getlinks(cfg, "siblings", "fullpath"))))
-		_p('  LIBS      += $(LDDEPS)%s', make.list(cc.getlinkflags(cfg)))
+		_p('  LDDEPS        +=%s', make.list(_MAKE.esc(premake.getlinks(cfg, "siblings", "fullpath"))))
+		_p('  LIBS          += $(LDDEPS)%s', make.list(cc.getlinkflags(cfg)))
 		_p('  EXTERNAL_LIBS +=%s', make.list(cc.getlibfiles(cfg)))
 
 		if cfg.kind == "StaticLib" then
 			if (not prj.options.ArchiveSplit) then
-				_p('  LINKCMD    = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, false)))
+				_p('  LINKCMD        = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, false)))
 			else
-				_p('  LINKCMD    = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, false)))
-				_p('  LINKCMD_NDX= $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, true)))
+				_p('  LINKCMD        = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, false)))
+				_p('  LINKCMD_NDX    = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, true)))
 			end
 		else
 
@@ -402,7 +407,7 @@
 			-- $(LIBS) moved to end (http://sourceforge.net/p/premake/bugs/279/)
 
 			local tool = iif(cfg.language == "C", "CC", "CXX")
-			_p('  LINKCMD    = $(%s) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)', tool)
+			_p('  LINKCMD        = $(%s) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)', tool)
 
 		end
 	end
@@ -444,8 +449,8 @@
 			end
 		end
 
-		_p('  PCH        = %s', _MAKE.esc(pch))
-		_p('  GCH        = $(OBJDIR)/$(notdir $(PCH)).gch')
+		_p('  PCH            = %s', _MAKE.esc(pch))
+		_p('  GCH            = $(OBJDIR)/$(notdir $(PCH)).gch')
 
 	end
 
@@ -472,6 +477,7 @@
 --
 
 	function cpp.fileRules(prj)
+		table.sort(prj.files)
 		for _, file in ipairs(prj.files or {}) do
 			if path.isSourceFile(file) then
 				_p('$(OBJDIR)/%s.o: %s $(GCH)'

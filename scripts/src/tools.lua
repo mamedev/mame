@@ -87,7 +87,7 @@ includedirs {
 files {
 	MAME_DIR .. "src/tools/chdman.cpp",
 	MAME_DIR .. "src/emu/emucore.cpp",
-	MAME_DIR .. "src/version.cpp",
+	GEN_DIR .. "version.cpp",
 }
 
 configuration { "mingw*" or "vs*" }

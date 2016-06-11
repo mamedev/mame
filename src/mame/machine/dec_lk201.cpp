@@ -202,7 +202,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( lk201 )
-	MCFG_CPU_ADD(LK201_CPU_TAG, M68HC05EG, 2000000) // actually 68HC05C4
+	MCFG_CPU_ADD(LK201_CPU_TAG, M68HC05EG, 4000000) // actually 68HC05C4, clock verified by Lord_Nightmare
 	MCFG_CPU_PROGRAM_MAP(lk201_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -261,7 +261,6 @@ const rom_entry *lk201_device::device_rom_region() const
 
 INPUT_PORTS_START( lk201 )
 
-#ifndef KEYBOARD_WORKAROUND
 	PORT_START("KBD0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -442,7 +441,6 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F19")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-#endif
 INPUT_PORTS_END
 
 
@@ -637,7 +635,6 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
 			// Check for keyboard read strobe
 			if (((portc & 0x40) == 0) && (olddata & 0x40))
 			{
-#ifndef KEYBOARD_WORKAROUND
 				if (porta & 0x1) kbd_data = m_kbd0->read();
 				if (porta & 0x2) kbd_data = m_kbd1->read();
 				if (porta & 0x4) kbd_data = m_kbd2->read();
@@ -666,8 +663,6 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
 				machine().output().set_value("led_lock"   , (led_data & 0x4) == 4);
 				machine().output().set_value("led_hold"   , (led_data & 0x8) == 8);
 			}
-#endif
-
 			break;
 	}
 }

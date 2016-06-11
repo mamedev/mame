@@ -212,7 +212,7 @@ WRITE16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_w )
 
 		case (0x740/2):
 		{
-			state->soundlatch_byte_w(space, 0, data & 0xff);
+			state->m_soundlatch->write(space, 0, data & 0xff);
 			state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 			break;
 		}

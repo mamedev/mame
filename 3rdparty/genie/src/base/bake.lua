@@ -175,10 +175,14 @@
 	end
 
 	local function removevalues(tbl, removes)
-		for i=#tbl,1,-1 do
+		for k, v in pairs(tbl) do
 			for _, pattern in ipairs(removes) do
-				if pattern == tbl[i] then
-					table.remove(tbl, i)
+				if pattern == tbl[k] then
+					if type(k) == "number" then 
+						table.remove(tbl, k) 
+					else 
+						tbl[k] = nil 
+					end
 					break
 				end
 			end
@@ -703,7 +707,7 @@
 
 		-- remove excluded files from the file list
 		local removefiles = cfg.removefiles
-		if _ACTION == 'gmake' then
+		if _ACTION == 'gmake' or _ACTION == 'ninja' then
 			removefiles = table.join(removefiles, cfg.excludes)
 		end
 		local files = {}

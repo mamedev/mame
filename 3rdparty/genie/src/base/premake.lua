@@ -22,20 +22,47 @@
 
 	function premake.generate(obj, filename, callback)
 		filename = premake.project.getfilename(obj, filename)
-		printf("Generating %s...", filename)
 
-		local f, err = io.open(filename, "wb")
+		io.capture()
+		callback(obj)
+		local new = io.endcapture()
+
+		local delta = false
+
+		local f, err = io.open(filename, "rb")
 		if (not f) then
-			error(err, 0)
+			if string.find(err, "No such file or directory") then
+				delta = true
+			else
+				error(err, 0)
+			end
+		else
+			local existing = f:read("*all")
+			if existing ~= new then
+				delta = true
+			end
+			f:close()
 		end
 
-		io.output(f)
-		callback(obj)
-		f:close()
+		if delta then
+			printf("Generating %s...", filename)
+			local f, err = io.open(filename, "wb")
+			if (not f) then
+				error(err, 0)
+			end
+
+			f:write(new)
+			f:close()
+
+			premake.stats.num_generated = premake.stats.num_generated + 1
+		else
+--			printf("Skipping %s as its contents would not change.", filename)
+			premake.stats.num_skipped = premake.stats.num_skipped + 1
+		end
 	end
 
 
--- 
+--
 -- Finds a valid premake build file in the specified directory
 -- Used by both the main genie process, and include commands
 --

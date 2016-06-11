@@ -117,6 +117,7 @@ DIP locations verified for:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/n2a03.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "rendlay.h"
 #include "includes/punchout.h"
@@ -189,8 +190,8 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x00, 0x01) AM_WRITENOP // the 2A03 #1 is not present
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("vlm", vlm5030_device, data_w)
 	AM_RANGE(0x05, 0x07) AM_WRITENOP // spunchout protection
 	AM_RANGE(0x08, 0x08) AM_WRITE(nmi_mask_w)
@@ -262,8 +263,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0x4016, 0x4016) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x4017, 0x4017) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -667,6 +668,9 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_21_4772MHz/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

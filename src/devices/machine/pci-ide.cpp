@@ -8,7 +8,8 @@ ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, d
 	: pci_device(mconfig, IDE_PCI, "IDE PCI interface", tag, owner, clock, "ide_pci", __FILE__),
 	m_ide(*this, "ide"),
 	m_ide2(*this, "ide2"),
-	m_irq_num(-1)
+	m_irq_num(-1),
+	m_irq_handler(*this)
 {
 }
 
@@ -63,7 +64,8 @@ void ide_pci_device::set_irq_info(const char *tag, const int irq_num)
 
 void ide_pci_device::device_start()
 {
-	m_cpu = machine().device<cpu_device>(m_cpu_tag);
+	if (m_irq_num != -1)
+		m_cpu = machine().device<cpu_device>(m_cpu_tag);
 
 	pci_device::device_start();
 
@@ -77,6 +79,8 @@ void ide_pci_device::device_start()
 	bank_infos[3].adr = 0x374;
 	add_map(16,   M_IO,  FUNC(ide_pci_device::bus_master_map));
 	bank_infos[4].adr = 0xf00;
+
+	m_irq_handler.resolve_safe();
 }
 
 void ide_pci_device::device_reset()
@@ -119,12 +123,21 @@ WRITE32_MEMBER(ide_pci_device::ide2_write_cs1)
 
 WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
 {
+	// Assert/Clear the interrupt if the irq num is set.
 	if (m_irq_num != -1) {
 		m_cpu->set_input_line(m_irq_num, state);
 	}
+	// Call the callback
+	m_irq_handler(state);
+
 	// PCI646U2 Offset 0x50 is interrupt status
-	if (main_id == 0x10950646 && state)
-		m_config_data[0x10/4] |= 0x4;
+	if (main_id == 0x10950646) {
+
+		if (state)
+			m_config_data[0x10 / 4] |= 0x4;
+		else
+			m_config_data[0x10 / 4] &= ~0x4;
+	}
 	if (0)
 		logerror("%s:ide_interrupt %i set to %i\n", machine().describe_context(), m_irq_num, state);
 }
@@ -138,8 +151,11 @@ WRITE32_MEMBER(ide_pci_device::pcictrl_w)
 {
 	COMBINE_DATA(&m_config_data[offset]);
 	// PCI646U2 Offset 0x50 is interrupt status
-	if (main_id == 0x10950646 && offset == 0x10/4 && (data & 0x4))
-		m_config_data[0x10/4] &= ~0x4;
+	if (main_id == 0x10950646 && offset == 0x10 / 4 && (data & 0x4)) {
+		m_config_data[0x10 / 4] &= ~0x4;
+		if (0)
+			logerror("%s:ide_pci_device::pcictrl_w Clearing interrupt status\n", machine().describe_context());
+	}
 }
 
 WRITE32_MEMBER(ide_pci_device::address_base_w)

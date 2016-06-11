@@ -145,7 +145,10 @@ void menu_cheat::populate()
 		{
 			UINT32 flags;
 			curcheat->menu_text(text, subtext, flags);
-			item_append(text.c_str(), subtext.c_str(), flags, curcheat.get());
+			if (text == MENU_SEPARATOR_ITEM)
+				item_append(menu_item_type::SEPARATOR);
+			else
+				item_append(text.c_str(), subtext.c_str(), flags, curcheat.get());
 		}
 
 		/* add a separator */

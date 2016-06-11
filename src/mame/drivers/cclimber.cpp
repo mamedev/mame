@@ -256,7 +256,7 @@ void cclimber_state::machine_start()
 
 WRITE8_MEMBER(cclimber_state::swimmer_sh_soundlatch_w)
 {
-	soundlatch_byte_w(space,offset,data);
+	m_soundlatch->write(space,offset,data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
@@ -454,7 +454,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( swimmer_audio_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x4000, 0x4001) AM_RAM             /* ??? */
 ADDRESS_MAP_END
 
@@ -1172,6 +1172,9 @@ static MACHINE_CONFIG_START( swimmer, cclimber_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_4MHz/2)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

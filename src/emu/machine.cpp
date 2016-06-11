@@ -78,6 +78,7 @@
 #include "crsshair.h"
 #include "unzip.h"
 #include "debug/debugvw.h"
+#include "debug/debugcpu.h"
 #include "image.h"
 #include "network.h"
 #include "ui/uimain.h"
@@ -108,7 +109,6 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 	: firstcpu(nullptr),
 		primary_screen(nullptr),
 		debug_flags(0),
-		debugcpu_data(nullptr),
 		m_config(_config),
 		m_system(_config.gamedrv()),
 		m_manager(manager),
@@ -245,7 +245,6 @@ void running_machine::start()
 	{
 		m_debug_view = std::make_unique<debug_view_manager>(*this);
 		m_debugger = std::make_unique<debugger_manager>(*this);
-		m_debugger->initialize();
 	}
 
 	m_render->resolve_tags();
@@ -293,7 +292,9 @@ int running_machine::run(bool quiet)
 			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			osd_file::error filerr = m_logfile->open("error.log");
 			assert_always(filerr == osd_file::error::NONE, "unable to open log file");
-			add_logerror_callback(logfile_callback);
+
+			using namespace std::placeholders;
+			add_logerror_callback(std::bind(&running_machine::logfile_callback, this, _1));
 		}
 
 		// then finish setting up our local machine
@@ -727,6 +728,17 @@ void running_machine::add_logerror_callback(logerror_callback callback)
 
 
 //-------------------------------------------------
+//  debug_break - breaks into the debugger, if
+//  enabled
+//-------------------------------------------------
+
+void running_machine::debug_break()
+{
+	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debugger().debug_break();
+}
+
+//-------------------------------------------------
 //  base_datetime - retrieve the time of the host
 //  system; useful for RTC implementations
 //-------------------------------------------------
@@ -883,12 +895,12 @@ void running_machine::soft_reset(void *ptr, INT32 param)
 //  logfile
 //-------------------------------------------------
 
-void running_machine::logfile_callback(const running_machine &machine, const char *buffer)
+void running_machine::logfile_callback(const char *buffer)
 {
-	if (machine.m_logfile != nullptr)
+	if (m_logfile != nullptr)
 	{
-		machine.m_logfile->puts(buffer);
-		machine.m_logfile->flush();
+		m_logfile->puts(buffer);
+		m_logfile->flush();
 	}
 }
 
@@ -959,7 +971,7 @@ void running_machine::stop_all_devices()
 {
 	// first let the debugger save comments
 	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_comment_save(*this);
+		debugger().cpu().comment_save();
 
 	// iterate over devices and stop them
 	for (device_t &device : device_iterator(root_device()))

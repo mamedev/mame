@@ -12,7 +12,7 @@ TODO:
 -terminal pcb(s) roms aren't dumped,so no video can be shown,a cabinet snap is here ->
  http://www.system16.com/hardware.php?id=840&page=1#2743 ,every player should have his own
  screen.
--inconsistant (likely wrong) sound banking.
+-inconsistent (likely wrong) sound banking.
 
 ============================================================================================
 BINGO CIRCUS (MAIN PCB)
@@ -32,6 +32,7 @@ SOUND : YM2151 uPD7759C
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
 
@@ -43,7 +44,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_upd7759(*this, "upd") { }
+		m_upd7759(*this, "upd"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	UINT8 m_x;
 	DECLARE_READ16_MEMBER(unknown_r);
@@ -54,6 +56,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
+	required_device<generic_latch_8_device> m_soundlatch;
 };
 
 
@@ -97,7 +100,7 @@ READ8_MEMBER(bingoc_state::sound_test_r)
 #else
 WRITE16_MEMBER(bingoc_state::main_sound_latch_w)
 {
-	soundlatch_byte_w(space,0,data&0xff);
+	m_soundlatch->write(space,0,data&0xff);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 #endif
@@ -135,7 +138,7 @@ static ADDRESS_MAP_START( sound_io, AS_IO, 8, bingoc_state )
 	AM_RANGE(0x40, 0x40) AM_WRITE(sound_play_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("upd", upd7759_device, port_w)
 #if !SOUND_TEST
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r) //soundlatch
+	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 #else
 	AM_RANGE(0xc0, 0xc0) AM_READ(sound_test_r)
 #endif
@@ -172,6 +175,8 @@ static MACHINE_CONFIG_START( bingoc, bingoc_state )
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") //might just be mono...
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 7159160/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

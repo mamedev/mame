@@ -1,11 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+
 /***************************************************************************
 
                             -= Seta Hardware =-
 
 ***************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "sound/x1_010.h"
 #include "video/seta001.h"
 
@@ -37,6 +39,8 @@ public:
 		m_subcpu(*this,"sub"),
 		m_seta001(*this, "spritegen"),
 		m_x1(*this, "x1snd"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_sharedram(*this,"sharedram"),
 		m_workram(*this,"workram"),
 		m_vregs(*this,"vregs"),
@@ -57,6 +61,8 @@ public:
 	optional_device<cpu_device> m_subcpu;
 	required_device<seta001_device> m_seta001;
 	optional_device<x1_010_device> m_x1;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch2;
 
 	optional_shared_ptr<UINT8> m_sharedram;
 	optional_shared_ptr<UINT16> m_workram;

@@ -206,7 +206,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		int index = desc.pc & 0x1ffff;
 
 		desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
-		desc.targetpc = map[index].start_pc;
+		desc.userdata0 = map[index].start_pc;
 		if (map[index].looptype == LOOP_TYPE_COUNTER)
 		{
 			desc.userflags |= OP_USERFLAG_COUNTER_LOOP;
@@ -294,6 +294,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				case 0x06:			// direct jump|call						|000|00110|
 				{					
 					int j = (opcode >> 26) & 0x1;
+					int b = (opcode >> 39) & 0x1;
 					int cond = (opcode >> 33) & 0x1f;
 					UINT32 address = opcode & 0xffffff;
 
@@ -306,12 +307,15 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 					desc.targetpc = address;
 					desc.delayslots = (j) ? 2 : 0;
+
+					desc.userflags |= (b) ? OP_USERFLAG_CALL : 0;
 					break;
 				}
 
 				case 0x07:			// direct jump|call						|000|00111|
 				{
 					int j = (opcode >> 26) & 0x1;
+					int b = (opcode >> 39) & 0x1;
 					int cond = (opcode >> 33) & 0x1f;
 					UINT32 address = opcode & 0xffffff;
 
@@ -324,12 +328,15 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 					desc.targetpc = desc.pc + SIGN_EXTEND24(address);
 					desc.delayslots = (j) ? 2 : 0;
+
+					desc.userflags |= (b) ? OP_USERFLAG_CALL : 0;
 					break;
 				}
 
 				case 0x08:			// indirect jump|call / compute			|000|01000|
 				{					
 					int j = (opcode >> 26) & 0x1;
+					int b = (opcode >> 39) & 0x1;
 					int pmi = (opcode >> 30) & 0x7;
 					int pmm = (opcode >> 27) & 0x7;
 					int cond = (opcode >> 33) & 0x1f;
@@ -349,12 +356,15 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 					desc.targetpc = BRANCH_TARGET_DYNAMIC;
 					desc.delayslots = (j) ? 2 : 0;
+
+					desc.userflags |= (b) ? OP_USERFLAG_CALL : 0;
 					break;
 				}
 
 				case 0x09:			// indirect jump|call / compute			|000|01001|
 				{
-					int j = (opcode >> 26) & 0x1;;
+					int j = (opcode >> 26) & 0x1;
+					int b = (opcode >> 39) & 0x1;
 					int cond = (opcode >> 33) & 0x1f;
 					
 					if (!describe_compute(desc, opcode))
@@ -370,6 +380,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					desc.targetpc = desc.pc + SIGN_EXTEND6((opcode >> 27) & 0x3f);
 					desc.delayslots = (j) ? 2 : 0;
 
+					desc.userflags |= (b) ? OP_USERFLAG_CALL : 0;
 					break;
 				}
 
@@ -458,9 +469,20 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					loop.type = LOOP_TYPE_CONDITIONAL;
 					loop.condition = cond;
 
+					/*
 					loop.astat_check_pc = loop.end_pc - 2;
 					if (loop.astat_check_pc < loop.start_pc)
 						fatalerror("describe_compute: conditional loop < 2 at %08X", desc.pc);
+						*/
+
+					int jump_diff = loop.end_pc - loop.start_pc;
+					if (jump_diff >= 2)
+						loop.astat_check_pc = loop.end_pc - 2;
+					else if (jump_diff == 1)
+						loop.astat_check_pc = loop.end_pc - 1;
+					else
+						loop.astat_check_pc = loop.end_pc;
+
 
 					insert_loop(loop);
 					break;

@@ -220,6 +220,10 @@ public:
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
 	required_device<palette_device> m_palette;
+
+private:
+	void execute_beta_key_dump(int ref, int params, const char *param[]);
+	void execute_beta_dat_log(int ref, int params, const char *param[]);
 };
 
 #endif /* DGN_BETA_H_ */

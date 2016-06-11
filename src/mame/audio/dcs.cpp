@@ -534,6 +534,7 @@ MACHINE_CONFIG_FRAGMENT( dcs2_audio_dsio )
 
 	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("dcs_sport_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // roadburn needs this to pass harware test
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1948,7 +1949,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 	/* copy the current data into the buffer */
 	{
 		int count = m_size / (2*(m_incs ? m_incs : 1));
-		INT16 buffer[0x400];
+		// sf2049se was having overflow issues with fixed size of 0x400 buffer (m_size==0xb40, count=0x5a0).
+		//INT16 buffer[0x400];
+		std::unique_ptr<INT16[]> buffer;
+		buffer = std::make_unique<INT16[]>(count);
 		int i;
 
 		for (i = 0; i < count; i++)
@@ -1958,7 +1962,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 		}
 
 		if (m_channels)
-			dmadac_transfer(&m_dmadac[0], m_channels, 1, m_channels, count / m_channels, buffer);
+			dmadac_transfer(&m_dmadac[0], m_channels, 1, m_channels, count / m_channels, buffer.get());
 	}
 
 	/* check for wrapping */

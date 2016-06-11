@@ -23,7 +23,10 @@
 
 #define NL_USE_SSE 0
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 template <unsigned m_N, unsigned storage_N>
 class matrix_solver_GCR_t: public matrix_solver_t
@@ -395,6 +398,7 @@ int matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 	}
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_MS_GCR_H_ */

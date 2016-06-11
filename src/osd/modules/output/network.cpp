@@ -67,7 +67,12 @@ public:
 
 	// output_module
 
-	virtual void notify(const char *outname, INT32 value) override { m_server->send_to_all((const uint8_t*)outname, strlen(outname)); }
+	virtual void notify(const char *outname, INT32 value) override
+	{
+		static char buf[256];
+		sprintf(buf, "%s = %d\n", ((outname==nullptr) ? "none" : outname), value);
+		m_server->send_to_all((const uint8_t*)buf, strlen(buf));
+	}
 
 	// implementation
 	void process_output()

@@ -35,14 +35,14 @@ menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container *container
 {
 	// load languages
 	file_enumerator path(mui.machine().options().language_path());
-	const char *lang = mui.machine().options().language();
+	auto lang = mui.machine().options().language();
 	const osd_directory_entry *dirent;
 	int cnt = 0;
 	while ((dirent = path.next()) != nullptr)
 		if (dirent->type == ENTTYPE_DIR && strcmp(dirent->name, ".") != 0 && strcmp(dirent->name, "..") != 0)
 		{
 			auto name = std::string(dirent->name);
-			int i = strreplace(name, "_", " (");
+			auto i = strreplace(name, "_", " (");
 			if (i > 0) name = name.append(")");
 			m_lang.push_back(name);
 			if (strcmp(name.c_str(), lang) == 0)
