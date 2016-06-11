@@ -507,10 +507,9 @@ public:
 	: device_t(anetlist, name)
 	, m_in(*this, "IN")
 	, m_cpu_device(nullptr)
-	, m_last(0)
+	, m_last(*this, "m_last", 0)
 	{
 		m_cpu_device = downcast<netlist_mame_cpu_device_t *>(&downcast<netlist_mame_t &>(netlist()).parent());
-		save(NLNAME(m_last));
 	}
 
 	ATTR_COLD void reset() override
@@ -542,7 +541,7 @@ private:
 	netlist::analog_input_t m_in;
 	netlist_analog_output_delegate m_callback;
 	netlist_mame_cpu_device_t *m_cpu_device;
-	nl_double m_last;
+	netlist::state_var<nl_double> m_last;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -557,10 +556,10 @@ public:
 		, m_channel(*this, "CHAN", 0)
 		, m_mult(*this, "MULT", 1000.0)
 		, m_offset(*this, "OFFSET", 0.0)
+		, m_sample(netlist::netlist_time::from_hz(1)) //sufficiently big enough
 		, m_in(*this, "IN")
+		, m_last_buffer(*this, "m_last_buffer", netlist::netlist_time::zero())
 	{
-		m_sample = netlist::netlist_time::from_hz(1); //sufficiently big enough
-		save(NAME(m_last_buffer));
 	}
 
 	static const int BUFSIZE = 2048;
@@ -615,7 +614,7 @@ private:
 	netlist::analog_input_t m_in;
 	double m_cur;
 	int m_last_pos;
-	netlist::netlist_time m_last_buffer;
+	netlist::state_var<netlist::netlist_time> m_last_buffer;
 };
 
 // ----------------------------------------------------------------------------------------

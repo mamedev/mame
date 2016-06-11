@@ -341,7 +341,7 @@ namespace netlist
 	// object_t
 	// -----------------------------------------------------------------------------
 
-	class object_t : public plib::pstate_interface_t<object_t>
+	class object_t
 	{
 		P_PREVENT_COPYING(object_t)
 	public:
@@ -359,8 +359,6 @@ namespace netlist
 		~object_t();
 
 		const pstring &name() const;
-
-		plib::pstate_manager_t &state_manager();
 
 		type_t type() const { return m_objtype; }
 		bool is_type(const type_t atype) const { return (m_objtype == atype); }
@@ -991,14 +989,14 @@ namespace netlist
 
 	class queue_t : public timed_queue<net_t *, netlist_time>,
 							public object_t,
-							public plib::pstate_manager_t::callback_t
+							public plib::state_manager_t::callback_t
 	{
 	public:
 		queue_t(netlist_t &nl);
 
 	protected:
 
-		void register_state(plib::pstate_manager_t &manager, const pstring &module) override;
+		void register_state(plib::state_manager_t &manager, const pstring &module) override;
 		void on_pre_save() override;
 		void on_post_load() override;
 
@@ -1014,7 +1012,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 
-	class netlist_t : public plib::pstate_manager_t, public plib::plog_dispatch_intf //, public device_owner_t
+	class netlist_t : public plib::plog_dispatch_intf //, public device_owner_t
 	{
 		P_PREVENT_COPYING(netlist_t)
 	public:
@@ -1027,11 +1025,11 @@ namespace netlist
 		void start();
 		void stop();
 
-		 const queue_t &queue() const { return m_queue; }
-		 queue_t &queue() { return m_queue; }
-		 const netlist_time time() const { return m_time; }
-		 devices::NETLIB_NAME(solver) *solver() const { return m_solver; }
-		 devices::NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
+		const queue_t &queue() const { return m_queue; }
+		queue_t &queue() { return m_queue; }
+		const netlist_time time() const { return m_time; }
+		devices::NETLIB_NAME(solver) *solver() const { return m_solver; }
+		devices::NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
 		nl_double gmin() const;
 
 		void push_to_queue(net_t &out, const netlist_time attime) NOEXCEPT;
@@ -1083,6 +1081,17 @@ namespace netlist
 		plib::plog_base<NL_DEBUG> &log() { return m_log; }
 		const plib::plog_base<NL_DEBUG> &log() const { return m_log; }
 
+		plib::state_manager_t &state() { return m_state; }
+
+		template<typename O, typename C> void save(O &owner, C &state, const pstring &stname)
+		{
+			this->state().save_item((void *)&owner, state, pstring(owner.name()) + "." + stname);
+		}
+		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const int count)
+		{
+			this->state().save_state_ptr((void *)&owner, pstring(owner.name()) + "." + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
+		}
+
 		virtual void reset();
 
 		plib::dynlib &lib() { return *m_lib; }
@@ -1107,6 +1116,7 @@ protected:
 	#endif
 
 	private:
+		plib::state_manager_t 		m_state;
 		/* mostly rw */
 		netlist_time                m_time;
 		queue_t                     m_queue;
@@ -1131,7 +1141,7 @@ protected:
 		state_var(device_t &dev, const pstring name, const T &value)
 		: m_value(value)
 		{
-			dev.save(m_value, name);
+			dev.netlist().save(dev, m_value, name);
 		}
 
 		state_var(const state_var &rhs) NOEXCEPT = default;
@@ -1150,9 +1160,9 @@ protected:
 	struct state_var<T[N]>
 	{
 	public:
-		state_var(device_t &d, const pstring name, const T & value)
+		state_var(device_t &dev, const pstring name, const T & value)
 		{
-			d.save(m_value, name);
+			dev.netlist().save(dev, m_value, name);
 			for (int i=0; i<N; i++)
 				m_value[i] = value;
 		}
@@ -1190,11 +1200,6 @@ protected:
 	// -----------------------------------------------------------------------------
 	// inline implementations
 	// -----------------------------------------------------------------------------
-
-	inline plib::pstate_manager_t &object_t::state_manager()
-	{
-		return m_netlist;
-	}
 
 	template <class C, param_t::param_type_t T>
 	inline void param_template_t<C, T>::setTo(const C &param)

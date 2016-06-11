@@ -105,14 +105,14 @@ const logic_family_desc_t *family_CD4XXX()
 queue_t::queue_t(netlist_t &nl)
 	: timed_queue<net_t *, netlist_time>(512)
 	, object_t(nl, "QUEUE", QUEUE)
-	, plib::pstate_manager_t::callback_t()
+	, plib::state_manager_t::callback_t()
 	, m_qsize(0)
 	, m_times(512)
 	, m_names(512)
 {
 }
 
-void queue_t::register_state(plib::pstate_manager_t &manager, const pstring &module)
+void queue_t::register_state(plib::state_manager_t &manager, const pstring &module)
 {
 	netlist().log().debug("register_state\n");
 	manager.save_item(this, m_qsize, module + "." + "qsize");
@@ -186,21 +186,21 @@ device_object_t::device_object_t(core_device_t &dev, const pstring &aname, const
 // ----------------------------------------------------------------------------------------
 
 netlist_t::netlist_t(const pstring &aname)
-	:   pstate_manager_t(),
-		m_time(netlist_time::zero()),
-		m_queue(*this),
-		m_use_deactivate(0),
-		m_mainclock(nullptr),
-		m_solver(nullptr),
-		m_gnd(nullptr),
-		m_params(nullptr),
-		m_name(aname),
-		m_setup(nullptr),
-		m_log(this),
-		m_lib(nullptr)
+	: m_state()
+	, m_time(netlist_time::zero())
+	, m_queue(*this)
+	, m_use_deactivate(0)
+	, m_mainclock(nullptr)
+	, m_solver(nullptr)
+	, m_gnd(nullptr)
+	, m_params(nullptr)
+	, m_name(aname)
+	, m_setup(nullptr)
+	, m_log(this)
+	, m_lib(nullptr)
 {
-	save_item(this, static_cast<plib::pstate_manager_t::callback_t &>(m_queue), "m_queue");
-	save_item(this, m_time, "m_time");
+	state().save_item(this, static_cast<plib::state_manager_t::callback_t &>(m_queue), "m_queue");
+	state().save_item(this, m_time, "m_time");
 }
 
 netlist_t::~netlist_t()
@@ -401,7 +401,7 @@ param_template_t<C, T>::param_template_t(device_t &device, const pstring name, c
 {
 	/* pstrings not yet supported, these need special logic */
 	if (T != param_t::STRING && T != param_t::MODEL)
-		save(NLNAME(m_param));
+		netlist().save(*this, m_param, "m_param");
 	device.setup().register_and_set_param(device.name() + "." + name, *this);
 }
 
@@ -579,17 +579,17 @@ net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	else
 		nl.m_nets.push_back(std::shared_ptr<net_t>(this));
 
-	save(NLNAME(m_time));
-	save(NLNAME(m_active));
-	save(NLNAME(m_in_queue));
-	save(NLNAME(m_cur_Analog));
-	save(NLNAME(m_cur_Q));
-	save(NLNAME(m_new_Q));
+	netlist().save(*this, m_time, "m_time");
+	netlist().save(*this, m_active, "m_active");
+	netlist().save(*this, m_in_queue, "m_in_queue");
+	netlist().save(*this, m_cur_Analog, "m_cur_Analog");
+	netlist().save(*this, m_cur_Q, "m_cur_Q");
+	netlist().save(*this, m_new_Q, "m_new_Q");
 }
 
 net_t::~net_t()
 {
-	netlist().remove_save_items(this);
+	netlist().state().remove_save_items(this);
 }
 
 void net_t::inc_active(core_terminal_t &term)
@@ -802,7 +802,7 @@ core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname, const
 , m_net(nullptr)
 , m_state(STATE_NONEX)
 {
-	save(NLNAME(m_state));
+	netlist().save(*this, m_state, "m_state");
 }
 
 void core_terminal_t::reset()
@@ -836,9 +836,9 @@ terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
 , m_gt1(nullptr)
 {
 	netlist().setup().register_term(*this);
-	save(NLNAME(m_Idr1));
-	save(NLNAME(m_go1));
-	save(NLNAME(m_gt1));
+	netlist().save(*this, m_Idr1, "m_Idr1");
+	netlist().save(*this, m_go1, "m_go1");
+	netlist().save(*this, m_gt1, "m_gt1");
 }
 
 

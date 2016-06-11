@@ -20,7 +20,7 @@
 
 namespace plib {
 
-class pstate_manager_t
+class state_manager_t
 {
 public:
 
@@ -64,7 +64,7 @@ public:
 
 		virtual ~callback_t() { };
 
-		virtual void register_state(pstate_manager_t &manager, const pstring &module) = 0;
+		virtual void register_state(state_manager_t &manager, const pstring &module) = 0;
 		virtual void on_pre_save() = 0;
 		virtual void on_post_load() = 0;
 	protected:
@@ -100,8 +100,8 @@ public:
 		}
 	};
 
-	pstate_manager_t();
-	~pstate_manager_t();
+	state_manager_t();
+	~state_manager_t();
 
 	template<typename C> void save_item(const void *owner, C &state, const pstring &stname)
 	{
@@ -138,8 +138,9 @@ private:
 	entry_t::list_t m_save;
 };
 
-template<> void pstate_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname);
+template<> void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname);
 
+#if 0
 template <typename T>
 class pstate_interface_t
 {
@@ -148,24 +149,24 @@ public:
 
 	template<typename C> void save(C &state, const pstring &stname)
 	{
-		pstate_manager_t &manager = static_cast<T*>(this)->state_manager();
+		state_manager_t &manager = static_cast<T*>(this)->state_manager();
 		pstring module = static_cast<T*>(this)->name();
 		manager.save_item(this, state, module + "." + stname);
 	}
 	template<typename C, std::size_t N> void save(C (&state)[N], const pstring &stname)
 	{
-		pstate_manager_t &manager = static_cast<T*>(this)->state_manager();
+		state_manager_t &manager = static_cast<T*>(this)->state_manager();
 		pstring module = static_cast<T*>(this)->name();
-		manager.save_state_ptr(this, module + "." + stname, pstate_manager_t::datatype_f<C>::f(), N, &(state[0]));
+		manager.save_state_ptr(this, module + "." + stname, state_manager_t::datatype_f<C>::f(), N, &(state[0]));
 	}
 	template<typename C> void save(C *state, const pstring &stname, const int count)
 	{
-		pstate_manager_t &manager = static_cast<T*>(this)->state_manager();
+		state_manager_t &manager = static_cast<T*>(this)->state_manager();
 		pstring module = static_cast<T*>(this)->name();
-		manager.save_state_ptr(this, module + "." + stname, pstate_manager_t::datatype_f<C>::f(), count, state);
+		manager.save_state_ptr(this, module + "." + stname, state_manager_t::datatype_f<C>::f(), count, state);
 	}
 };
-
+#endif
 }
 
 #endif /* PSTATE_H_ */

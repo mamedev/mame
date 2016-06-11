@@ -322,9 +322,9 @@ void netlist_mame_device_t::device_start()
 	m_setup->start_devices();
 	m_setup->resolve_inputs();
 
-	netlist().save_item(this, m_rem, "m_rem");
-	netlist().save_item(this, m_div, "m_div");
-	netlist().save_item(this, m_old, "m_old");
+	netlist().save(*this, m_rem, "m_rem");
+	netlist().save(*this, m_div, "m_div");
+	netlist().save(*this, m_old, "m_old");
 
 	save_state();
 
@@ -366,7 +366,7 @@ ATTR_COLD void netlist_mame_device_t::device_post_load()
 {
 	LOG_DEV_CALLS(("device_post_load\n"));
 
-	netlist().post_load();
+	netlist().state().post_load();
 	netlist().rebuild_lists();
 }
 
@@ -374,7 +374,7 @@ ATTR_COLD void netlist_mame_device_t::device_pre_save()
 {
 	LOG_DEV_CALLS(("device_pre_save\n"));
 
-	netlist().pre_save();
+	netlist().state().pre_save();
 }
 
 void netlist_mame_device_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -399,7 +399,7 @@ ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::check_mame_abort_slice()
 
 ATTR_COLD void netlist_mame_device_t::save_state()
 {
-	for (auto const & s : netlist().save_list())
+	for (auto const & s : netlist().state().save_list())
 	{
 		netlist().log().debug("saving state for {1}\n", s->m_name.cstr());
 		if (s->m_dt.is_float)

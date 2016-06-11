@@ -352,13 +352,13 @@ void matrix_solver_t::setup_matrix()
 	{
 		pstring num = plib::pfmt("{1}")(k);
 
-		save(m_terms[k]->m_last_V, "lastV." + num);
-		save(m_terms[k]->m_DD_n_m_1, "m_DD_n_m_1." + num);
-		save(m_terms[k]->m_h_n_m_1, "m_h_n_m_1." + num);
+		netlist().save(*this, m_terms[k]->m_last_V, "lastV." + num);
+		netlist().save(*this, m_terms[k]->m_DD_n_m_1, "m_DD_n_m_1." + num);
+		netlist().save(*this, m_terms[k]->m_h_n_m_1, "m_h_n_m_1." + num);
 
-		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
-		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
-		save(m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
+		netlist().save(*this, m_terms[k]->go(),"GO" + num, m_terms[k]->count());
+		netlist().save(*this, m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
+		netlist().save(*this, m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
 	}
 
 	for (unsigned k=0; k<iN; k++)

@@ -306,7 +306,6 @@ public:
 	// construction with copy
 	pstring(const mem_t *string) : type_t(string) { }
 	pstring(const type_t &string) : type_t(string) { }
-
 };
 
 // ----------------------------------------------------------------------------------------
