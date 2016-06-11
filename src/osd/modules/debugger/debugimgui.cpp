@@ -560,6 +560,15 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 		xy1.y += fsize.y;
 		xy2.y += fsize.y;
 	}
+
+	// draw a rect around a view if it has focus
+	if(view_ptr->has_focus)
+	{
+		ImU32 col = ImGui::ColorConvertFloat4ToU32(ImVec4(0.5f,0.5f,0.5f,0.3f));
+		drawlist->AddRect(ImVec2(view_ptr->ofs_x,view_ptr->ofs_y + ImGui::GetScrollY()),
+			ImVec2(view_ptr->ofs_x + view_ptr->view_width,view_ptr->ofs_y + ImGui::GetScrollY() + view_ptr->view_height),col);
+	}
+	
 	ImGui::PopStyleVar(2);
 }
 
@@ -938,6 +947,7 @@ void debug_imgui::draw_console()
 		draw_view(view_main_console,false);
 		ImGui::EndChild();
 		ImGui::Separator();
+		
 		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
