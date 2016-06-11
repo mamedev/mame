@@ -949,9 +949,6 @@ namespace netlist
 		void connect_late(const pstring &t1, const pstring &t2);
 		void connect_late(core_terminal_t &t1, core_terminal_t &t2);
 		void connect_post_start(core_terminal_t &t1, core_terminal_t &t2);
-
-		std::vector<pstring> m_terminals;
-
 	protected:
 
 		NETLIB_UPDATEI() { }

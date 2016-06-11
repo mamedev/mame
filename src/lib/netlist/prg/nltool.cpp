@@ -129,7 +129,7 @@ protected:
 	{
 		pout("{}: {}\n", l.name().cstr(), ls.cstr());
 		if (l == plib::plog_level::FATAL)
-			throw;
+			throw std::exception();
 	}
 
 private:
@@ -285,19 +285,34 @@ static void listdevices()
 	nt.setup().start_devices();
 	nt.setup().resolve_inputs();
 
+	std::vector<plib::owned_ptr<netlist::core_device_t>> devs;
+
 	for (auto & f : list)
 	{
 		pstring out = plib::pfmt("{1} {2}(<id>")(f->classname(),"-20")(f->name());
 		pstring terms("");
 
-		auto d = f->Create(nt.setup().netlist(), "dummy");
-
+		auto d = f->Create(nt.setup().netlist(), f->name() + "_lc");
 		// get the list of terminals ...
-		for (auto & inp :  d->m_terminals)
+
+		for (auto & t : nt.setup().m_terminals.values())
 		{
-			if (inp.startsWith(d->name() + "."))
-				inp = inp.substr(d->name().len() + 1);
-			terms += "," + inp;
+			if (t.m_value->name().startsWith(d->name()))
+			{
+				pstring tn(t.m_value->name().substr(d->name().len()+1));
+				if (tn.find(".")<0)
+					terms += ", " + tn;
+			}
+		}
+
+		for (auto & t : nt.setup().m_alias.values())
+		{
+			if (t.m_key.startsWith(d->name()))
+			{
+				pstring tn(t.m_key.substr(d->name().len()+1));
+				if (tn.find(".")<0)
+					terms += ", " + tn;
+			}
 		}
 
 		if (f->param_desc().startsWith("+"))
@@ -317,6 +332,7 @@ static void listdevices()
 		printf("%s\n", out.cstr());
 		if (terms != "")
 			printf("Terminals: %s\n", terms.substr(1).cstr());
+		devs.push_back(std::move(d));
 	}
 }
 

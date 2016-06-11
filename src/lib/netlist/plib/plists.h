@@ -340,6 +340,8 @@ public:
 	const V& value_at(const unsigned pos) const { return m_values[pos].m_value; }
 
 	V& key_at(const unsigned pos) { return m_values[pos].m_key; }
+
+	const std::vector<element_t> &values() { return m_values; }
 private:
 
 	int get_idx(const K &key) const

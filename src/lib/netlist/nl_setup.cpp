@@ -246,17 +246,6 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 
 void setup_t::register_term(core_terminal_t &term)
 {
-	if (term.is_type(terminal_t::OUTPUT))
-	{
-	}
-	else if (term.is_type(terminal_t::INPUT))
-	{
-		static_cast<device_t &>(term.device()).m_terminals.push_back(term.name());
-	}
-	else
-	{
-		static_cast<device_t &>(term.device()).m_terminals.push_back(term.name());
-	}
 	if (!m_terminals.add(term.name(), &term))
 		log().fatal("Error adding {1} {2} to terminal list\n", objtype_as_str(term), term.name());
 	log().debug("{1} {2}\n", objtype_as_str(term), term.name());

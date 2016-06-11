@@ -203,10 +203,12 @@ namespace netlist
 
 		netlist_t &m_netlist;
 
+	public:
 		plib::hashmap_t<pstring, pstring> m_alias;
 		plib::hashmap_t<pstring, param_ref_t>  m_params;
 		plib::hashmap_t<pstring, pstring> m_param_values;
 		plib::hashmap_t<pstring, core_terminal_t *> m_terminals;
+	private:
 
 		std::vector<link_t> m_links;
 

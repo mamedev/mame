@@ -187,7 +187,7 @@ namespace netlist
 					stack[ptr-1] = stack[ptr-1] / stack[ptr];
 					break;
 				case PUSH_INPUT:
-					stack[ptr++] = INPANALOG(m_I[(int) rc.m_param]);
+					stack[ptr++] = INPANALOG((*m_I[(int) rc.m_param]));
 					break;
 				case PUSH_CONST:
 					stack[ptr++] = rc.m_param;

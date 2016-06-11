@@ -500,9 +500,6 @@ void device_t::register_subalias(const pstring &name, core_terminal_t &term)
 
 	// everything already fully qualified
 	setup().register_alias_nofqn(alias, term.name());
-
-	if (term.is_type(terminal_t::INPUT) || term.is_type(terminal_t::TERMINAL))
-		m_terminals.push_back(alias);
 }
 
 void device_t::register_subalias(const pstring &name, const pstring &aliased)
@@ -512,10 +509,6 @@ void device_t::register_subalias(const pstring &name, const pstring &aliased)
 
 	// everything already fully qualified
 	setup().register_alias_nofqn(alias, aliased_fqn);
-
-	// FIXME: make this working again
-	//if (term.isType(terminal_t::INPUT) || term.isType(terminal_t::TERMINAL))
-	//  m_terminals.add(name);
 }
 
 void device_t::connect_late(core_terminal_t &t1, core_terminal_t &t2)

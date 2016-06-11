@@ -11,6 +11,8 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
+#include <vector>
+
 #include "nl_setup.h"
 #include "nl_base.h"
 #include "nl_factory.h"
@@ -258,8 +260,8 @@ namespace netlist
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(frontier, base_dummy)
-		, m_RIN(*this, "m_RIN")
-		, m_ROUT(*this, "m_ROUT", true)
+		, m_RIN(*this, "m_RIN", false)
+		, m_ROUT(*this, "m_ROUT", false)
 		, m_I(*this, "_I")
 		, m_Q(*this, "_Q")
 		, m_p_RIN(*this, "RIN", 1.0e6)
@@ -312,7 +314,7 @@ namespace netlist
 		{
 
 			for (std::size_t i=0; i < m_N; i++)
-				m_I.emplace(i, *this, plib::pfmt("A{1}")(i));
+				m_I.push_back(plib::make_unique<analog_input_t>(*this, plib::pfmt("A{1}")(i)));
 
 			plib::pstring_vector_t cmds(m_func.Value(), " ");
 			m_precompiled.clear();
@@ -375,7 +377,7 @@ namespace netlist
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
-		plib::uninitialised_array_t<analog_input_t, 10> m_I;
+		std::vector<std::unique_ptr<analog_input_t>> m_I;
 
 		std::vector<rpn_inst> m_precompiled;
 	};
