@@ -208,7 +208,7 @@ bool windows_osd_interface::window_init()
 
 void windows_osd_interface::update_slider_list()
 {
-	for (auto window : window_list)
+	for (auto window : osd_common_t::s_window_list)
 	{
 		// check if any window has dirty sliders
 		if (window->renderer().sliders_dirty())
@@ -221,14 +221,14 @@ void windows_osd_interface::update_slider_list()
 
 int windows_osd_interface::window_count()
 {
-	return window_list.size();
+	return osd_common_t::s_window_list.size();
 }
 
 void windows_osd_interface::build_slider_list()
 {
 	m_sliders.clear();
 
-	for (auto window : window_list)
+	for (auto window : osd_common_t::s_window_list)
 	{
 		// take the sliders of the first window
 		std::vector<ui::menu_item> window_sliders = window->renderer().get_slider_list();
@@ -238,7 +238,7 @@ void windows_osd_interface::build_slider_list()
 
 void windows_osd_interface::add_audio_to_recording(const INT16 *buffer, int samples_this_frame)
 {
-	auto window = window_list.front(); // We only record on the first window
+	auto window = osd_common_t::s_window_list.front(); // We only record on the first window
 	if (window != nullptr)
 	{
 		window->renderer().add_audio_to_recording(buffer, samples_this_frame);
@@ -255,13 +255,13 @@ void windows_osd_interface::window_exit()
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// if we hid the cursor during the emulation, show it
-	if (!window_list.empty())
-		window_list.front()->show_pointer();
+	if (!osd_common_t::s_window_list.empty())
+		osd_common_t::s_window_list.front()->show_pointer();
 
 	// free all the windows
-	while (!window_list.empty())
+	while (!osd_common_t::s_window_list.empty())
 	{
-		auto window = window_list.front();
+		auto window = osd_common_t::s_window_list.front();
 
 		// Destroy removes it from the list also
 		window->destroy();
@@ -417,7 +417,7 @@ void winwindow_process_events_periodic(running_machine &machine)
 
 static BOOL is_mame_window(HWND hwnd)
 {
-	for (auto window : window_list)
+	for (auto window : osd_common_t::s_window_list)
 		if (window->platform_window<HWND>() == hwnd)
 			return TRUE;
 
@@ -581,7 +581,7 @@ void winwindow_take_snap(void)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// iterate over windows and request a snap
-	for (auto window : window_list)
+	for (auto window : osd_common_t::s_window_list)
 	{
 		window->renderer().save();
 	}
@@ -599,7 +599,7 @@ void winwindow_toggle_fsfx(void)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// iterate over windows and request a snap
-	for (auto window : window_list)
+	for (auto window : osd_common_t::s_window_list)
 	{
 		window->renderer().toggle_fsfx();
 	}
@@ -617,7 +617,7 @@ void winwindow_take_video(void)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// iterate over windows and request a snap
-	for (auto window : window_list)
+	for (auto window : osd_common_t::s_window_list)
 	{
 		window->renderer().record();
 	}
@@ -635,7 +635,7 @@ void winwindow_toggle_full_screen(void)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// if we are in debug mode, never go full screen
-	for (auto window : window_list)
+	for (auto window : osd_common_t::s_window_list)
 		if (window->machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
 			return;
 
@@ -643,11 +643,11 @@ void winwindow_toggle_full_screen(void)
 	video_config.windowed = !video_config.windowed;
 
 	// iterate over windows and toggle their fullscreen state
-	for (auto window : window_list)
+	for (auto window : osd_common_t::s_window_list)
 		SendMessage(window->platform_window<HWND>(), WM_USER_SET_FULLSCREEN, !video_config.windowed, 0);
 
 	// Set the first window as foreground
-	SetForegroundWindow(window_list.front()->platform_window<HWND>());
+	SetForegroundWindow(osd_common_t::s_window_list.front()->platform_window<HWND>());
 }
 
 
@@ -662,7 +662,7 @@ BOOL winwindow_has_focus(void)
 	HWND focuswnd = GetFocus();
 
 	// see if one of the video windows has focus
-	for (auto window : window_list)
+	for (auto window : osd_common_t::s_window_list)
 		if (focuswnd == window->platform_window<HWND>())
 			return TRUE;
 
@@ -680,10 +680,10 @@ void winwindow_update_cursor_state(running_machine &machine)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// If no windows, just return
-	if (window_list.empty())
+	if (osd_common_t::s_window_list.empty())
 		return;
 
-	auto window = window_list.front();
+	auto window = osd_common_t::s_window_list.front();
 
 	// if we should hide the mouse cursor, then do it
 	// rules are:
@@ -728,7 +728,7 @@ void win_window_info::create(running_machine &machine, int index, osd_monitor_in
 	// set main window
 	if (window->m_index > 0)
 	{
-		for (auto w : window_list)
+		for (auto w : osd_common_t::s_window_list)
 		{
 			if (w->m_index == 0)
 			{
@@ -745,12 +745,12 @@ void win_window_info::create(running_machine &machine, int index, osd_monitor_in
 
 	// see if we are safe for fullscreen
 	window->m_fullscreen_safe = TRUE;
-	for (auto win : window_list)
+	for (auto win : osd_common_t::s_window_list)
 		if (win->monitor() == monitor)
 			window->m_fullscreen_safe = FALSE;
 
 	// add us to the list
-	window_list.push_back(window);
+	osd_common_t::s_window_list.push_back(window);
 
 	// load the layout
 	window->m_target = machine.render().target_alloc();
@@ -794,7 +794,7 @@ void win_window_info::destroy()
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// remove us from the list
-	window_list.remove(shared_from_this());
+	osd_common_t::s_window_list.remove(shared_from_this());
 
 	// destroy the window
 	if (platform_window<HWND>() != nullptr)
@@ -1082,7 +1082,7 @@ int win_window_info::complete_create()
 						fullscreen() ? FULLSCREEN_STYLE : WINDOW_STYLE,
 						monitorbounds.left() + 20, monitorbounds.top() + 20,
 						monitorbounds.left() + 100, monitorbounds.top() + 100,
-						nullptr,//(window_list != nullptr) ? window_list->m_hwnd : nullptr,
+						nullptr,//(osd_common_t::s_window_list != nullptr) ? osd_common_t::s_window_list->m_hwnd : nullptr,
 						menu,
 						GetModuleHandleUni(),
 						nullptr);
@@ -1360,8 +1360,8 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		// set focus: if we're not the primary window, switch back
 		// commented out ATM because this prevents us from resizing secondary windows
 //      case WM_SETFOCUS:
-//          if (window != window_list && window_list != nullptr)
-//              SetFocus(window_list->m_hwnd);
+//          if (window != osd_common_t::s_window_list && osd_common_t::s_window_list != nullptr)
+//              SetFocus(osd_common_t::s_window_list->m_hwnd);
 //          break;
 
 		// everything else: defaults
@@ -1839,7 +1839,7 @@ bool winwindow_qt_filter(void *message)
 		if(msg->hwnd) // get the machine associated with this window
 			ptr = GetWindowLongPtr(msg->hwnd, GWLP_USERDATA);
 		else // any one will have to do
-			ptr = (LONG_PTR)window_list;
+			ptr = (LONG_PTR)osd_common_t::s_window_list;
 
 		winwindow_dispatch_message(((win_window_info *)ptr)->machine(), msg);
 		return true;

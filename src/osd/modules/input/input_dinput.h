@@ -117,7 +117,7 @@ public:
 		}
 
 		// set the cooperative level
-		result = devinfo->dinput.device->SetCooperativeLevel(window_list.front()->platform_window<HWND>(), cooperative_level);
+		result = devinfo->dinput.device->SetCooperativeLevel(osd_common_t::s_window_list.front()->platform_window<HWND>(), cooperative_level);
 		if (result != DI_OK)
 			goto error;
 

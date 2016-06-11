@@ -140,7 +140,7 @@ void sdl_osd_interface::update(bool skip_redraw)
 	if (!skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
-		for (auto window : window_list)
+		for (auto window : osd_common_t::s_window_list)
 			window->update();
 //      profiler_mark(PROFILER_END);
 	}
@@ -273,11 +273,11 @@ static void check_osd_inputs(running_machine &machine)
 	// check for toggling fullscreen mode
 	if (machine.ui_input().pressed(IPT_OSD_1))
 	{
-		for (auto curwin : window_list)
+		for (auto curwin : osd_common_t::s_window_list)
 			std::static_pointer_cast<sdl_window_info>(curwin)->toggle_full_screen();
 	}
 
-	auto window = window_list.front();
+	auto window = osd_common_t::s_window_list.front();
 	if (machine.ui_input().pressed(IPT_OSD_2))
 	{
 		//FIXME: on a per window basis

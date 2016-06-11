@@ -341,6 +341,4 @@ struct osd_video_config
 
 extern osd_video_config video_config;
 
-extern std::list<std::shared_ptr<osd_window>> window_list;
-
 #endif /* __OSDWINDOW__ */

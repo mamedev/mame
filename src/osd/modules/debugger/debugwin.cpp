@@ -237,7 +237,7 @@ void debugger_windows::show_all()
 
 void debugger_windows::hide_all()
 {
-	SetForegroundWindow(window_list.front()->platform_window<HWND>());
+	SetForegroundWindow(osd_common_t::s_window_list.front()->platform_window<HWND>());
 	for (debugwin_info &info : m_window_list)
 		info.hide();
 }
