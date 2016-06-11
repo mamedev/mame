@@ -24,16 +24,16 @@
      Hs 15625 Hz.
      Vs 52.786 Hz.
 
-  1x Plastic box (like CPU boxes) with 5 PLDs (protection?).
+  1x Logic box (like CPU boxes) with 5 PLDs, maybe for protection.
 
   2x MB8464 (Video?)8Kx8
   1x MB8416 (NVRAM) 2Kx8
   1x MB8464 (?) 8Kx8
 
-  2x 27C040 (Roms P1 & P2) (GFX ROMs).
+  2x 27C040 (Roms 1 & 2) (GFX ROMs).
   2x 27C010 (Roms 3 & 4) (GFX ROMs).
-  1x 27C020 (Rom 5) (sound)
-  1x 27C512 (Rom 6) (program)
+  1x 27C020 (Rom 5) (4-bit ADPCM samples)
+  1x 27C512 (Rom 6) (main program)
 
   1x Xtal @ 12 MHz.
 
@@ -1029,6 +1029,10 @@ MACHINE_CONFIG_END
 *        Rom Load        *
 *************************/
 
+/*
+  Major Poker.
+  Original PAL System game.
+*/
 ROM_START( majorpkr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6_pp_27c512_823b.bin", 0x00000, 0x10000, CRC(a3d5475e) SHA1(cb41508b55da8b8c658a2f2ccc6ebda09db29040) )
@@ -1065,6 +1069,12 @@ ROM_START( majorpkr )
 ROM_END
 
 
+/*
+  Major Poker.
+  Micro Manufacturing intro.
+  Program is totally different.
+  Graphics ROMs are identical to the parent set.
+*/
 ROM_START( majorpkra )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512__a.rom6", 0x00000, 0x10000, CRC(0213a933) SHA1(0c3238f037bcbe096c85b5c57ac735d707361f87) )
@@ -1081,6 +1091,14 @@ ROM_START( majorpkra )
 	ROM_LOAD( "27c2001.rom5", 0x00000, 0x40000, CRC(4843858e) SHA1(27629829cf7753d7801a6eb42bb77ca2a467bebd) )
 ROM_END
 
+/*
+  Major Poker.
+  Micro Manufacturing intro.
+  Graphics ROMs are identical to the parent set.
+
+  Only one byte of difference against set C.
+  Offset 0x38a7 = 0x08 (instead of 0x10).
+*/
 ROM_START( majorpkrb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512__b.rom6", 0x00000, 0x10000, CRC(3ab1e2c2) SHA1(11339fe32bb372f01b0983d2d571440530353b2a) )
@@ -1098,9 +1116,12 @@ ROM_START( majorpkrb )
 ROM_END
 
 /*
-  Only one byte of difference against set B.
-  10 <--> 08
+  Major Poker.
+  Micro Manufacturing intro.
+  Graphics ROMs are identical to the parent set.
 
+  Only one byte of difference against set B.
+  Offset 0x38a7 = 0x10 (instead of 0x08).
 */
 ROM_START( majorpkrc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1120,10 +1141,8 @@ ROM_END
 
 /*
   Lucky Poker.
-  (also written in the black logic box of PCB)
-
-  Seems to be a title hack of Major Joker.
-
+  Looks like a bootleg/hack of Major Joker.
+  Graphics ROMs are identical to the parent set.
 */
 ROM_START( luckypkr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1158,9 +1177,9 @@ DRIVER_INIT_MEMBER(majorpkr_state, majorpkr)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY       FULLNAME                                         FLAGS  LAYOUT */
-GAMEL( 1994, majorpkr,  0,        majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System", "Major Poker (set 1, v2.0)",                      0,     layout_majorpkr )
-GAMEL( 1994, majorpkra, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System", "Major Poker (set 2, Micro Manufacturing intro)", 0,     layout_majorpkr )
-GAMEL( 1994, majorpkrb, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System", "Major Poker (set 3, Micro Manufacturing intro)", 0,     layout_majorpkr )
-GAMEL( 1994, majorpkrc, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System", "Major Poker (set 4, Micro Manufacturing intro)", 0,     layout_majorpkr )
-GAMEL( 1994, luckypkr,  majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "<bootleg>",  "Lucky Poker (bootleg/hack of Major Poker)",      0,     layout_majorpkr )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY                             FULLNAME                                         FLAGS  LAYOUT */
+GAMEL( 1994, majorpkr,  0,        majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System",                       "Major Poker (set 1, v2.0)",                      0,     layout_majorpkr )
+GAMEL( 1994, majorpkra, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 2, Micro Manufacturing intro)", 0,     layout_majorpkr )
+GAMEL( 1994, majorpkrb, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 3, Micro Manufacturing intro)", 0,     layout_majorpkr )
+GAMEL( 1994, majorpkrc, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 4, Micro Manufacturing intro)", 0,     layout_majorpkr )
+GAMEL( 1994, luckypkr,  majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "bootleg",                          "Lucky Poker (bootleg/hack of Major Poker)",      0,     layout_majorpkr )
