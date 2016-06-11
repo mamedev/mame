@@ -417,6 +417,14 @@ static MACHINE_CONFIG_DERIVED( eagv7, eag )
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( eagv9, eag )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", M68030, XTAL_32MHz)
+	MCFG_CPU_PROGRAM_MAP(eagv7_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( eagv10, eag )
 
 	/* basic machine hardware */
@@ -453,6 +461,13 @@ ROM_START( feagv7 )
 ROM_END
 
 
+ROM_START( feagv9 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("eag-v9b", 0x00000, 0x10000, CRC(60523199) SHA1(a308eb6b782732af1ab2fd0ed8b046de7a8dd24b) )
+	ROM_LOAD16_BYTE("eag-v9a", 0x00001, 0x10000, CRC(255c63c0) SHA1(8aa0397bdb3731002f5b066cd04ec62531267e22) )
+ROM_END
+
+
 ROM_START( feagv11 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD32_BYTE("16", 0x00000, 0x08000, CRC(8375d61f) SHA1(e042f6f01480c59ee09a458cf34f135664479824) ) // 27c256
@@ -472,5 +487,6 @@ ROM_END
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1989, feagv2,  0,       0,      eag,     eag,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, feagv7,  0,       0,      eagv7,   eag,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, feagv9,  0,       0,      eagv9,   eag,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, feagv10, 0,       0,      eagv10,  eag,     driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 2002, feagv11, feagv10, 0,      eagv11,  eag,     driver_device, 0, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
