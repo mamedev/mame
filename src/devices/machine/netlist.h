@@ -36,9 +36,13 @@
 				netlist_analog_output_delegate(& _class :: _member,                 \
 						# _class "::" # _member, _class_tag, (_class *)nullptr)   );
 
-#define MCFG_NETLIST_LOGIC_INPUT(_basetag, _tag, _name, _shift, _mask)              \
+#define MCFG_NETLIST_LOGIC_INPUT(_basetag, _tag, _name, _shift)              \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_LOGIC_INPUT, 0)                      \
-	netlist_mame_logic_input_t::static_set_params(*device, _name, _mask, _shift);
+	netlist_mame_logic_input_t::static_set_params(*device, _name, _shift);
+
+#define MCFG_NETLIST_INT_INPUT(_basetag, _tag, _name, _shift, _mask)                \
+	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_INT_INPUT, 0)                      \
+	netlist_mame_int_input_t::static_set_params(*device, _name, _mask, _shift);
 
 #define MCFG_NETLIST_STREAM_INPUT(_basetag, _chan, _name)                           \
 	MCFG_DEVICE_ADD(_basetag ":cin" # _chan, NETLIST_STREAM_INPUT, 0)               \
@@ -50,6 +54,9 @@
 
 
 #define NETLIST_LOGIC_PORT_CHANGED(_base, _tag)                                     \
+	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_logic_input_t, input_changed, 0)
+
+#define NETLIST_INT_PORT_CHANGED(_base, _tag)                                     \
 	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_logic_input_t, input_changed, 0)
 
 #define NETLIST_ANALOG_PORT_CHANGED(_base, _tag)                                    \
@@ -404,17 +411,17 @@ private:
 
 
 // ----------------------------------------------------------------------------------------
-// netlist_mame_logic_input_t
+// netlist_mame_int_input_t
 // ----------------------------------------------------------------------------------------
 
-class netlist_mame_logic_input_t :  public device_t,
+class netlist_mame_int_input_t :  public device_t,
 									public netlist_mame_sub_interface
 {
 public:
 
 	// construction/destruction
-	netlist_mame_logic_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~netlist_mame_logic_input_t() { }
+	netlist_mame_int_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~netlist_mame_int_input_t() { }
 
 	static void static_set_params(device_t &device, const char *param_name, const UINT32 mask, const UINT32 shift);
 
@@ -445,6 +452,51 @@ protected:
 private:
 	netlist::param_int_t *m_param;
 	UINT32 m_mask;
+	UINT32 m_shift;
+	pstring m_param_name;
+};
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_logic_input_t
+// ----------------------------------------------------------------------------------------
+
+class netlist_mame_logic_input_t :  public device_t,
+									public netlist_mame_sub_interface
+{
+public:
+
+	// construction/destruction
+	netlist_mame_logic_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~netlist_mame_logic_input_t() { }
+
+	static void static_set_params(device_t &device, const char *param_name, const UINT32 shift);
+
+	inline void write(const UINT32 val)
+	{
+		const UINT32 v = (val >> m_shift) & 1;
+		if (v != m_param->Value())
+			synchronize(0, v);
+	}
+
+	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
+	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
+	DECLARE_WRITE8_MEMBER(write8)               { write(data);   }
+	DECLARE_WRITE16_MEMBER(write16)             { write(data);   }
+	DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
+	DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override
+	{
+		if (is_sound_device())
+			update_to_current_time();
+		m_param->setTo(param);
+	}
+
+private:
+	netlist::param_logic_t *m_param;
 	UINT32 m_shift;
 	pstring m_param_name;
 };
@@ -709,6 +761,7 @@ extern const device_type NETLIST_CPU;
 extern const device_type NETLIST_SOUND;
 extern const device_type NETLIST_ANALOG_INPUT;
 extern const device_type NETLIST_LOGIC_INPUT;
+extern const device_type NETLIST_INT_INPUT;
 
 extern const device_type NETLIST_ANALOG_OUTPUT;
 extern const device_type NETLIST_STREAM_INPUT;
