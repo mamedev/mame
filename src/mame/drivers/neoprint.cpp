@@ -23,6 +23,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/2610intf.h"
 #include "machine/upd1990a.h"
@@ -41,6 +42,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_generic_paletteram_16(*this, "paletteram") { }
 
 	required_shared_ptr<UINT16> m_npvidram;
@@ -51,6 +53,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<UINT16> m_generic_paletteram_16;
 
 	UINT8 m_audio_result;
@@ -198,7 +201,7 @@ WRITE8_MEMBER(neoprint_state::audio_cpu_clear_nmi_w)
 
 WRITE8_MEMBER(neoprint_state::audio_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 
 	audio_cpu_assert_nmi();
 
@@ -211,7 +214,7 @@ WRITE8_MEMBER(neoprint_state::audio_command_w)
 
 READ8_MEMBER(neoprint_state::audio_command_r)
 {
-	UINT8 ret = soundlatch_byte_r(space, 0);
+	UINT8 ret = m_soundlatch->read(space, 0);
 
 	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", space.device().safe_pc(), ret);
 
@@ -506,6 +509,8 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 24000000 / 3)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(neoprint_state, audio_cpu_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.60)
@@ -548,6 +553,8 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 24000000 / 3)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(neoprint_state, audio_cpu_irq))

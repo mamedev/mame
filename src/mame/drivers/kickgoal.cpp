@@ -480,7 +480,7 @@ static ADDRESS_MAP_START( kickgoal_program_map, AS_PROGRAM, 16, kickgoal_state )
 /// AM_RANGE(0x30001e, 0x30001f) AM_WRITE(kickgoal_snd_w)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("SYSTEM")
-/// AM_RANGE(0x800004, 0x800005) AM_WRITE(soundlatch_word_w)
+/// AM_RANGE(0x800004, 0x800005) AM_DEVWRITE("soundlatch", generic_latch_16_device, write) 
 	AM_RANGE(0x800004, 0x800005) AM_WRITE(actionhw_snd_w)
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(kickgoal_eeprom_w)
 	AM_RANGE(0x900006, 0x900007) AM_READ(kickgoal_eeprom_r)
@@ -633,7 +633,7 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(kickgoal_state, kickgoal_interrupt,  240)
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000/4)  /* 3MHz ? */
-	MCFG_DEVICE_DISABLE()   /* Disables since the internal rom isn't dumped */
+	MCFG_DEVICE_DISABLE()   /* Disabled since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -656,6 +656,9 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_OKIM6295_ADD("oki", 12000000/8, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -668,7 +671,7 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_12MHz/3)    /* verified on pcb */
-	MCFG_DEVICE_DISABLE() /* Disables since the internal rom isn't dumped */
+	MCFG_DEVICE_DISABLE() /* Disabled since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -691,6 +694,9 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END

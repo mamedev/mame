@@ -71,7 +71,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 4) 'bombkick'
 
   - DSW1 bits 3 and 4 determine difficulty (code at 0x0003a4). But DSW1 bit 4 is also used
-    in combinaison with DSW1 bit 5 to determine the number of special powers (code at 0x0003c2) !
+    in combination with DSW1 bit 5 to determine the number of special powers (code at 0x0003c2) !
     This means that you can have 2 or 3 special powers when you set difficulty to "Easy" or "Normal",
     but you'll ALWAYS have 3 special powers when you set difficulty to "Hard" or "Very Hard".
   - DSW2 bits 2 to 7 are checked when you select a level :
@@ -143,7 +143,7 @@ number 0 on each voice. That sample is 00000-00000.
 */
 		if ((data & 0xff) != 0x3a)
 		{
-			soundlatch_byte_w(space, 0, data & 0xff);
+			m_soundlatch->write(space, 0, data & 0xff);
 			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
@@ -171,7 +171,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, yunsun16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_byte_r )                        // From Main CPU
+	AM_RANGE(0x18, 0x18) AM_DEVREAD("soundlatch", generic_latch_8_device, read)     // From Main CPU
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)       // M6295
 ADDRESS_MAP_END
 
@@ -609,6 +609,8 @@ static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

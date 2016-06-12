@@ -164,6 +164,7 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
+#include "machine/gen_latch.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 
@@ -217,7 +218,8 @@ public:
 		m_io_ram(*this, "io_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	UINT16 *m_render_layer[MAX_LAYERS];
 	UINT8 m_sound_fifo[MAX_SOUNDS];
@@ -285,6 +287,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };
 
 
@@ -887,7 +890,7 @@ COMMAND_MODE:
 		    second pass at the same location with zeroes. In addition the
 		    X and Y values passed to the blitter do not reflect the tiles true
 		    locations. For example, tiles near the top or bottom of the screen
-		    are positioned resonably close but those in the middle are oddly
+		    are positioned reasonably close but those in the middle are oddly
 		    shifted toward either side. The tiles also resemble predefined
 		    patterns but I don't know if there are supposed to be lookup tables
 		    in ROM or hard-wired to the blitter chips.
@@ -1643,7 +1646,7 @@ WRITE8_MEMBER(halleys_state::sndnmi_msk_w)
 WRITE8_MEMBER(halleys_state::soundcommand_w)
 {
 	m_io_ram[0x8a] = data;
-	soundlatch_byte_w(space,offset,data);
+	m_soundlatch->write(space,offset,data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -1711,7 +1714,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0x4803, 0x4803) AM_DEVREAD("ay3", ay8910_device, data_r)
 	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE("ay4", ay8910_device, address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_DEVREAD("ay4", ay8910_device, data_r)
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xefff) AM_ROM // space for diagnostic ROM
 ADDRESS_MAP_END
 
@@ -1992,6 +1995,8 @@ static MACHINE_CONFIG_START( halleys, halleys_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

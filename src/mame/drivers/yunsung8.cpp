@@ -33,8 +33,8 @@ To Do:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/3812intf.h"
-#include "sound/msm5205.h"
 #include "includes/yunsung8.h"
 
 /***************************************************************************
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( port_map, AS_IO, 8, yunsung8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE(yunsung8_videobank_w)  // video RAM bank
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(yunsung8_bankswitch_w) // ROM Bank + Layers Enable
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_WRITE(soundlatch_byte_w) // To Sound CPU
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // To Sound CPU
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x06, 0x06) AM_WRITE(yunsung8_flipscreen_w)    // Flip Screen
@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, yunsung8_state )
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r) // From Main CPU
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From Main CPU
 ADDRESS_MAP_END
 
 
@@ -510,6 +510,8 @@ static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -558,7 +560,7 @@ Yun Sung, 1995
 Sound CPU: Z80A
     Sound: Yamaha YM3812 + Oki M5205 + YM3014 DAC
     Video: QuickLogic FPGA - unknown type / model
-      OSC: 16MHz + 400Khz resontator
+      OSC: 16MHz + 400Khz resonator
    Memory: 2 x MCM2018AN45, 2 x HM6264, CXK5118PN-15L, GM76C28-10 & 6116
      Misc: DSW1 is a 8 position dipswitch
            DSW2 is not populated
@@ -645,7 +647,7 @@ Cannon Ball (vertical)
 Sound CPU: Z80A
     Sound: Yamaha YM3812 + Oki M5205 + YM3014 DAC
     Video: Cypress CY7C384A - Very high speed 6K gate CMOS FPGA
-      OSC: 16MHz + 400Khz resontator
+      OSC: 16MHz + 400Khz resonator
    Memory: 2 x MCM2018AN45, 2 x HM6264, CXK5118PN-15L, GM76C28-10 & 6116
      Misc: DSW1 is a 8 position dipswitch
            DSW2 is not populated

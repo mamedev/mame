@@ -325,7 +325,7 @@ READ8_MEMBER(tsamurai_state::vsgongf_a100_r)
 
 WRITE8_MEMBER(tsamurai_state::vsgongf_sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -359,7 +359,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM /* work RAM */
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r) AM_WRITE(vsgongf_sound_nmi_enable_w) /* NMI enable */
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(vsgongf_sound_nmi_enable_w) /* NMI enable */
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 ADDRESS_MAP_END
 
@@ -774,6 +774,8 @@ static MACHINE_CONFIG_START( vsgongf, tsamurai_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)

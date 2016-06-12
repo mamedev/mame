@@ -38,6 +38,7 @@ TODO:
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/gen_latch.h"
 #include "includes/spcforce.h"
 
 void spcforce_state::machine_start()
@@ -108,7 +109,7 @@ WRITE8_MEMBER(spcforce_state::irq_mask_w)
 static ADDRESS_MAP_START( spcforce_map, AS_PROGRAM, 8, spcforce_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x7001, 0x7001) AM_READ_PORT("P1") AM_WRITE(soundtrigger_w)
 	AM_RANGE(0x7002, 0x7002) AM_READ_PORT("P2")
 	AM_RANGE(0x700b, 0x700b) AM_WRITE(flip_screen_w)
@@ -131,7 +132,7 @@ static ADDRESS_MAP_START( spcforce_sound_map, AS_PROGRAM, 8, spcforce_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spcforce_sound_io_map, AS_IO, 8, spcforce_state )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(soundlatch_byte_r)
+	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(SN76496_latch_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(SN76496_select_r, SN76496_select_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
@@ -303,6 +304,8 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn1", SN76496, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

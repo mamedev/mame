@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromser.h"
 #include "sound/2610intf.h"
 #include "includes/fromanc2.h"
 #include "rendlay.h"
@@ -41,8 +40,8 @@ INTERRUPT_GEN_MEMBER(fromanc2_state::fromanc2_interrupt)
 
 WRITE16_MEMBER(fromanc2_state::fromanc2_sndcmd_w)
 {
-	soundlatch_byte_w(space, offset, (data >> 8) & 0xff);   // 1P (LEFT)
-	soundlatch2_byte_w(space, offset, data & 0xff);         // 2P (RIGHT)
+	m_soundlatch->write(space, offset, (data >> 8) & 0xff);   // 1P (LEFT)
+	m_soundlatch2->write(space, offset, data & 0xff);         // 2P (RIGHT)
 
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	m_sndcpu_nmi_flag = 0;
@@ -283,8 +282,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_sound_io_map, AS_IO, 8, fromanc2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r) AM_WRITENOP     // snd cmd (1P) / ?
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch2_byte_r)                // snd cmd (2P)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP     // snd cmd (1P) / ?
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)                // snd cmd (2P)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x0c, 0x0c) AM_READ(fromanc2_sndcpu_nmi_clr)
 ADDRESS_MAP_END
@@ -561,6 +560,9 @@ static MACHINE_CONFIG_START( fromanc2, fromanc2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(fromanc2_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
@@ -618,6 +620,9 @@ static MACHINE_CONFIG_START( fromancr, fromanc2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(fromanc2_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
@@ -670,6 +675,9 @@ static MACHINE_CONFIG_START( fromanc4, fromanc2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(fromanc2_state, irqhandler))

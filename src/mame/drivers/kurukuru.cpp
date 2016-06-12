@@ -9,7 +9,7 @@
 
 
   This hardware seems to be a derivative of MSX2 'on steroids'.
-  It has many similarites with sothello.c and tonton.c
+  It has many similarities with sothello.cpp and tonton.cpp
 
   Special thanks to Charles MacDonald, for all the hardware traces: clocks,
   ports, descriptions and a lot of things... :)
@@ -147,9 +147,9 @@
   Insert tokens (medals).
   You can bet to any (or all) of the following 5 characters: Bote, Oume, Pyoko,
   Kunio, and Pyon Pyon. Press start, and the reels start to roll. You'll win if
-  you can get 3 of the choosen character(s) in a row, column or diagonal.
+  you can get 3 of the chosen character(s) in a row, column or diagonal.
 
-  The black tadpoles behave just like jokers... If you have 2 choosen characters
+  The black tadpoles behave just like jokers... If you have 2 chosen characters
   in a row and the remaining one is a black tadpole, it will transform into another
   character to complete the 3 in a row, allowing you to win.
 
@@ -252,22 +252,29 @@
 #include "video/v9938.h"
 #include "machine/ticket.h"
 #include "machine/nvram.h"
+#include "machine/gen_latch.h"
 
 class kurukuru_state : public driver_device
 {
 public:
 	kurukuru_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_v9938(*this, "v9938"),
-		m_maincpu(*this, "maincpu"),
 		m_adpcm(*this, "adpcm"),
 		m_hopper(*this, "hopper"),
+		m_soundlatch(*this, "soundlatch"),
 		m_bank1(*this, "bank1")
 	{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<v9938_device> m_v9938;
+	required_device<msm5205_device> m_adpcm;
+	required_device<ticket_dispenser_device> m_hopper;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_memory_bank m_bank1;
 
 	UINT8 m_sound_irq_cause;
 	UINT8 m_adpcm_data;
@@ -287,10 +294,6 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_vdp_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<msm5205_device> m_adpcm;
-	required_device<ticket_dispenser_device> m_hopper;
-	required_memory_bank m_bank1;
 };
 
 #define MAIN_CLOCK      XTAL_21_4772MHz
@@ -391,7 +394,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	update_sound_irq(m_sound_irq_cause | 1);
 }
 
@@ -481,7 +484,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
 READ8_MEMBER(kurukuru_state::kurukuru_soundlatch_r)
 {
 	update_sound_irq(m_sound_irq_cause & ~1);
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 READ8_MEMBER(kurukuru_state::kurukuru_adpcm_timer_irqack_r)
@@ -739,6 +742,9 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym2149", YM2149, YM2149_CLOCK)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(kurukuru_state, ym2149_aout_w))
@@ -774,6 +780,9 @@ static MACHINE_CONFIG_START( ppj, kurukuru_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym2149", YM2149, YM2149_CLOCK)  // pin 26 (/SEL) is low so final clock is clk/2, handled inside the ym2149 core
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(kurukuru_state, ym2149_aout_w))

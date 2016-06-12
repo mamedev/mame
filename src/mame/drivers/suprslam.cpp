@@ -98,7 +98,7 @@ WRITE16_MEMBER(suprslam_state::sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_pending_command = 1;
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -153,7 +153,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, suprslam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(suprslam_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -332,6 +332,8 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_K053936_OFFSETS(-45, -21)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(suprslam_state, irqhandler))

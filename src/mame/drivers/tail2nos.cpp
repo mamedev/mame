@@ -22,7 +22,7 @@ WRITE16_MEMBER(tail2nos_state::sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -57,7 +57,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, tail2nos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x07, 0x07) AM_READ(soundlatch_byte_r) AM_WRITENOP /* the write is a clear pending command */
+	AM_RANGE(0x07, 0x07) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP /* the write is a clear pending command */
 	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("ymsnd", ym2608_device, write)
 #if 0
 	AM_RANGE(0x18, 0x1b) AM_DEVREAD("ymsnd", ym2608_device, read)
@@ -235,6 +235,8 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(tail2nos_state, irqhandler))

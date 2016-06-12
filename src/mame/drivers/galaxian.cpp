@@ -5905,9 +5905,13 @@ static MACHINE_CONFIG_DERIVED( explorer, galaxian_base )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( takeoff, explorer ) // takeoff shares the same main map as explorer, but uses only an AY8912 for sound.
-	
+
+	MCFG_SOUND_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL_12MHz / 8) // XTAL verified, divider not verified
+
 	/* 2nd CPU to drive sound */
 	MCFG_SOUND_MODIFY("audiocpu")
+	MCFG_DEVICE_CLOCK(XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(takeoff_sound_map)
 	MCFG_CPU_IO_MAP(takeoff_sound_portmap)
 
@@ -5915,7 +5919,7 @@ static MACHINE_CONFIG_DERIVED( takeoff, explorer ) // takeoff shares the same ma
 	MCFG_DEVICE_REMOVE("8910.0")
 	MCFG_DEVICE_REMOVE("8910.1")
 
-	MCFG_SOUND_ADD("8912", AY8912, KONAMI_SOUND_CLOCK/8)
+	MCFG_SOUND_ADD("8912", AY8912, XTAL_12MHz / 8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(galaxian_state, explorer_sound_latch_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

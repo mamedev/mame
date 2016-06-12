@@ -5,6 +5,7 @@
     Yun Sung 8 Bit Games
 
 *************************************************************************/
+
 #include "sound/msm5205.h"
 
 class yunsung8_state : public driver_device

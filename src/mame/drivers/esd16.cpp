@@ -35,7 +35,7 @@ Other ESD games:
 
 3 Cushion Billiards (c) 2000 - Undumped
 Tang Tang           (c) 2000 - Undumped ESD 05-28-99 version
-Fire Hawk           (c) 2001 - see nmk16.c driver
+Fire Hawk           (c) 2001 - see nmk16.cpp driver
 
 Head Panic
 - Nude / Bikini pics don't show in-game, even when set in test mode?
@@ -69,7 +69,6 @@ ToDo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "includes/esd16.h"
@@ -87,7 +86,7 @@ WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(0, ASSERT_LINE);      // Generate an IRQ
 		space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
 	}
@@ -250,7 +249,7 @@ READ8_MEMBER(esd16_state::esd16_sound_command_r)
 {
 	/* Clear IRQ only after reading the command, or some get lost */
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_io_map, AS_IO, 8, esd16_state )
@@ -641,6 +640,8 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)   /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -736,7 +737,7 @@ ESD 11-09-98
 (C) ESD 1998, 1999
 PCB No. ESD 11-09-98
 CPU: MC68HC000FN16 (68000, 68 pin PLCC socketed)
-SND: Z80 (Z0840006PSC), YM3812/YM3014 & OKI M6295 (rebaged as U6612/U6614 & AD-65)
+SND: Z80 (Z0840006PSC), YM3812/YM3014 & OKI M6295 (rebadged as U6612/U6614 & AD-65)
 OSC: 16.000MHz, 14.000MHz
 RAM: 4 x 62256, 9 x 6116
 DIPS: 2 x 8 position

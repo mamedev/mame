@@ -76,14 +76,12 @@ Versions known to exist but not dumped:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "cpu/z80/z80.h"
 #include "includes/cave.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
-#include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 
 #include "ppsatan.lh"
@@ -235,7 +233,7 @@ WRITE16_MEMBER(cave_state::sound_cmd_w)
 {
 //  m_sound_flag1 = 1;
 //  m_sound_flag2 = 1;
-	soundlatch_word_w(space, offset, data, mem_mask);
+	m_soundlatch->write(space, offset, data, mem_mask);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
@@ -244,14 +242,14 @@ WRITE16_MEMBER(cave_state::sound_cmd_w)
 READ8_MEMBER(cave_state::soundlatch_lo_r)
 {
 //  m_sound_flag1 = 0;
-	return soundlatch_word_r(space, offset, 0x00ff) & 0xff;
+	return m_soundlatch->read(space, offset, 0x00ff) & 0xff;
 }
 
 /* Sound CPU: read the high 8 bits of the 16 bit sound latch */
 READ8_MEMBER(cave_state::soundlatch_hi_r)
 {
 //  m_sound_flag2 = 0;
-	return soundlatch_word_r(space, offset, 0xff00) >> 8;
+	return m_soundlatch->read(space, offset, 0xff00) >> 8;
 }
 
 /* Main CPU: read the latch written by the sound CPU (acknowledge) */
@@ -2249,6 +2247,8 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_32MHz/8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
@@ -2350,6 +2350,8 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_4MHz)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
@@ -2403,6 +2405,8 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2576,6 +2580,8 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz / 4)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
@@ -2634,6 +2640,9 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

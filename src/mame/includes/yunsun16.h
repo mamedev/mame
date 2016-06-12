@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+
 /*************************************************************************
 
     Yun Sung 16 Bit Games
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 
 class yunsun16_state : public driver_device
 {
@@ -16,6 +19,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
 		m_scrollram_0(*this, "scrollram_0"),
@@ -29,6 +33,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch; // not shocking
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_vram_0;

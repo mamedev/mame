@@ -113,7 +113,7 @@ WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 
 WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -149,7 +149,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( himesiki_iom1, AS_IO, 8, himesiki_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 /****************************************************************************/
@@ -456,6 +456,9 @@ static MACHINE_CONFIG_START( himesiki, himesiki_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym2203", YM2203, CLK2/4) // ??
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)

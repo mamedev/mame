@@ -96,7 +96,7 @@ WRITE16_MEMBER(inufuku_state::inufuku_soundcommand_w)
 			return;
 
 		m_pending_command = 1;
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -177,7 +177,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( inufuku_sound_io_map, AS_IO, 8, inufuku_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(inufuku_soundrombank_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -402,6 +402,8 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 32000000/4)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(inufuku_state, irqhandler))

@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 
@@ -22,6 +23,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
 		m_radarram(*this, "radarram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -37,6 +39,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_radarram;
 	required_shared_ptr<UINT8> m_videoram;

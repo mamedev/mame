@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench, Yochizo, David Haywood
+
 /**************** Machine stuff ******************/
 //#define USE_HD64x180          /* Define if CPU support is available */
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
@@ -9,6 +10,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "machine/nmk112.h"
 #include "machine/upd4992.h"
 #include "video/gp9001.h"
@@ -43,7 +45,9 @@ public:
 		m_rtc(*this, "rtc"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2") { }
 
 	optional_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_shared_ptr<UINT16> m_shared_ram16;     // Really 8 bit RAM connected to Z180
@@ -66,6 +70,8 @@ public:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch; // batrider and bgaregga and batsugun
+	optional_device<generic_latch_8_device> m_soundlatch2;
 
 	UINT16 m_mcu_data;
 	INT8 m_old_p1_paddle_h; /* For Ghox */

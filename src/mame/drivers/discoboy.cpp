@@ -3,10 +3,10 @@
 /*
        Disco Boy
 
-Similar to mitchell.c / egghunt.c .. clearly derived from that hardware
+Similar to mitchell.cpp / egghunt.cpp .. clearly derived from that hardware
 
 TODO:
-- move sound HW into proper file (it's 99% IDENTICAL to yunsung8.c)
+- move sound HW into proper file (it's 99% IDENTICAL to yunsung8.cpp)
 - ADPCM has sound volume issues, it's either too loud or too quiet;
 
 PCB Layout
@@ -43,6 +43,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
 
@@ -53,11 +54,12 @@ class discoboy_state : public driver_device
 public:
 	discoboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_audiocpu(*this, "audiocpu") ,
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* video-related */
 	UINT8    m_ram_bank;
@@ -67,7 +69,12 @@ public:
 	UINT8    m_toggle;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory */
 	UINT8    m_ram_1[0x800];
@@ -96,10 +103,6 @@ public:
 	UINT32 screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
-	required_device<cpu_device> m_maincpu;
-	required_device<msm5205_device> m_msm;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 
@@ -248,7 +251,7 @@ WRITE8_MEMBER(discoboy_state::discoboy_port_03_w)// sfx? (to sound cpu)
 {
 	//  printf("unk discoboy_port_03_w %02x\n", data);
 	//  m_audiocpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -360,7 +363,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, discoboy_state )
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -513,6 +516,8 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_10MHz/4)   /* 2.5 MHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)

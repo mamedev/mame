@@ -1,11 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
+
 /***************************************************************************
 
     Ninja Gaiden
 
 ***************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
 
@@ -18,13 +20,14 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_videoram3(*this, "videoram3"),
 		m_spriteram(*this, "spriteram"),
-		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
-		m_mixer(*this, "mixer")
+		m_mixer(*this, "mixer"),
+		m_soundlatch(*this, "soundlatch")
 		{ }
 
 	/* memory pointers */
@@ -58,7 +61,15 @@ public:
 	const int   *m_raiga_jumppoints;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<tecmo_spr_device> m_sprgen;
+	optional_device<tecmo_mix_device> m_mixer;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	DECLARE_WRITE16_MEMBER(gaiden_sound_command_w);
 	DECLARE_WRITE16_MEMBER(drgnbowl_sound_command_w);
 	DECLARE_WRITE16_MEMBER(wildfang_protection_w);
@@ -101,10 +112,4 @@ public:
 	void descramble_drgnbowl(int descramble_cpu);
 	void descramble_mastninj_gfx(UINT8* src);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	optional_device<tecmo_spr_device> m_sprgen;
-	optional_device<tecmo_mix_device> m_mixer;
 };

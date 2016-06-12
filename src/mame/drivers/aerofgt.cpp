@@ -65,7 +65,6 @@ Verification still needed for the other PCBs.
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "sound/3812intf.h"
-#include "sound/okim6295.h"
 #include "includes/aerofgt.h"
 
 WRITE16_MEMBER(aerofgt_state::sound_command_w)
@@ -73,7 +72,7 @@ WRITE16_MEMBER(aerofgt_state::sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_pending_command = 1;
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -83,7 +82,7 @@ WRITE16_MEMBER(aerofgt_state::turbofrc_sound_command_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_pending_command = 1;
-		soundlatch_byte_w(space, offset, (data >> 8) & 0xff);
+		m_soundlatch->write(space, offset, (data >> 8) & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -92,7 +91,7 @@ WRITE16_MEMBER(aerofgt_state::aerfboot_soundlatch_w)
 {
 	if(ACCESSING_BITS_8_15)
 	{
-		soundlatch_byte_w(space, 0, (data >> 8) & 0xff);
+		m_soundlatch->write(space, 0, (data >> 8) & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -385,7 +384,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( turbofrc_sound_portmap, AS_IO, 8, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(aerofgt_sh_bankswitch_w)
-	AM_RANGE(0x14, 0x14) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x14, 0x14) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -394,7 +393,7 @@ static ADDRESS_MAP_START( aerofgt_sound_portmap, AS_IO, 8, aerofgt_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(aerofgt_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aerfboot_sound_map, AS_PROGRAM, 8, aerofgt_state )
@@ -402,7 +401,7 @@ static ADDRESS_MAP_START( aerfboot_sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(aerfboot_okim6295_banking_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wbbc97_sound_map, AS_PROGRAM, 8, aerofgt_state )
@@ -411,7 +410,7 @@ static ADDRESS_MAP_START( wbbc97_sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP
-	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xfc20, 0xfc20) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( karatblzbl_sound_map, AS_PROGRAM, 8, aerofgt_state )
@@ -1349,6 +1348,8 @@ static MACHINE_CONFIG_START( pspikes, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
@@ -1505,6 +1506,8 @@ static MACHINE_CONFIG_START( karatblz, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz ) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
@@ -1550,8 +1553,11 @@ static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
+	
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
+	
 	//MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // breaks savestate
 
 	// NEC D7759c + YM????
@@ -1600,6 +1606,8 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1651,6 +1659,8 @@ static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1704,6 +1714,8 @@ static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
@@ -1751,6 +1763,8 @@ static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
@@ -1790,6 +1804,8 @@ static MACHINE_CONFIG_START( aerfboot, aerofgt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
@@ -1863,6 +1879,8 @@ static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

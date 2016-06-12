@@ -170,7 +170,7 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 
 WRITE8_MEMBER(renegade_state::sound_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -621,7 +621,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renegade_sound_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_addr_w)
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
@@ -871,6 +871,8 @@ static MACHINE_CONFIG_START( renegade, renegade_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, 12000000/4)
 	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6809_device, firq_line))

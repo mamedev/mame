@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
+
 /*************************************************************************
 
     Double Dragon 3 & The Combatribes
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 
@@ -22,8 +25,8 @@ public:
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
-
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 	{
 		vblank_level = 6;
 		raster_level = 5;
@@ -60,6 +63,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE16_MEMBER(ddragon3_io_w);
 	DECLARE_WRITE16_MEMBER(ddragon3_scroll_w);

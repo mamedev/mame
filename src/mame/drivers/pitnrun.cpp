@@ -10,7 +10,7 @@ TODO:
 
  - analog sound
    writes to $a8xx triggering analog sound :
-    $a800 - drivers are gettin into the cars
+    $a800 - drivers are getting into the cars
     $a801 - collisions
     $a802 - same as above
     $a803 - slide on water
@@ -68,6 +68,7 @@ K1000233A
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/pitnrun.h"
@@ -107,7 +108,7 @@ static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
 	AM_RANGE(0xb005, 0xb005) AM_WRITE(char_bank_select)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(hflip_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(vflip_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(scroll_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITENOP/* VP(VF?)MCV - not used ?*/
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(mcu_data_w)
@@ -126,7 +127,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pitnrun_sound_io_map, AS_IO, 8, pitnrun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_byte_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x8f, 0x8f) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -253,14 +254,16 @@ static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)    /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)    /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

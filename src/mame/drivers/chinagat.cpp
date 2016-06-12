@@ -41,7 +41,7 @@ ADPCM in the bootlegs is not quite right.... Misusing the data?
   the microcode dump's the same). This in conjunction with the different
   ADPCM chip (msm5205) are used to 'fake' a M6295.
 - Bootleg 1 ADPCM is now wired up, but still not working :-(
-  Definantly sync problems between the i8049 and the m5205 which need
+  Definitely sync problems between the i8049 and the m5205 which need
   further looking at.
 
 
@@ -79,7 +79,6 @@ Dip locations and factory settings verified with China Gate US manual.
 #include "sound/2151intf.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "sound/msm5205.h"
 #include "includes/ddragon.h"
 
 #define MAIN_CLOCK      XTAL_12MHz
@@ -166,7 +165,7 @@ WRITE8_MEMBER(chinagat_state::chinagat_interrupt_w )
 	switch (offset)
 	{
 		case 0: /* 3e00 - SND irq */
-			soundlatch_byte_w(space, 0, data);
+			m_soundlatch->write(space, 0, data);
 			m_soundcpu->set_input_line(m_sound_irq, (m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 
@@ -356,7 +355,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, chinagat_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xA000, 0xA000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ym2203c_sound_map, AS_PROGRAM, 8, chinagat_state )
@@ -374,7 +373,7 @@ static ADDRESS_MAP_START( ym2203c_sound_map, AS_PROGRAM, 8, chinagat_state )
 
 //  AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 //  AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xA000, 0xA000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( saiyugoub1_sound_map, AS_PROGRAM, 8, chinagat_state )
@@ -382,7 +381,7 @@ static ADDRESS_MAP_START( saiyugoub1_sound_map, AS_PROGRAM, 8, chinagat_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(saiyugoub1_mcu_command_w)
-	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xA000, 0xA000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8748_map, AS_PROGRAM, 8, chinagat_state )
@@ -583,6 +582,8 @@ static MACHINE_CONFIG_START( chinagat, chinagat_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.80)
@@ -629,6 +630,8 @@ static MACHINE_CONFIG_START( saiyugoub1, chinagat_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.80)
@@ -672,6 +675,8 @@ static MACHINE_CONFIG_START( saiyugoub2, chinagat_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3579545)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(chinagat_state, chinagat_irq_handler))

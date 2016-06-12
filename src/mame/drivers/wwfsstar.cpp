@@ -140,7 +140,7 @@ Notes:
 
 
  - About the bootleg set:
-   It matches the US (ealier) set 99.99% just in 64K chunks.  The ONLY difference
+   It matches the US (earlier) set 99.99% just in 64K chunks.  The ONLY difference
    in the data is WWFS47.BIN has 5 bytes with a single bit stuck (0x00001000):
 
    Offset   WWFS47.BIN   24j6-0.112 (first 0x10000 bytes)
@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wwfsstar_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -219,7 +219,7 @@ WRITE16_MEMBER(wwfsstar_state::scroll_w)
 
 WRITE16_MEMBER(wwfsstar_state::sound_w)
 {
-	soundlatch_byte_w(space, 1, data & 0xff);
+	m_soundlatch->write(space, 1, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
@@ -436,6 +436,8 @@ static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

@@ -24,7 +24,7 @@
  Remaining Issues:
  -1) IRQ & NMI code is totally guessed, and needs to be solved properly
 
-Measurements from Guru (someone needs to rewrite INTERRUPT_GEN() in video/vball.c):
+Measurements from Guru (someone needs to rewrite INTERRUPT_GEN() in video/vball.cpp):
 6502 /IRQ = 1.720kHz
 6202 /NMI = 58 Hz
 VBlank = 58Hz
@@ -171,7 +171,7 @@ WRITE8_MEMBER(vball_state::bankswitch_w)
 /* The sound system comes all but verbatim from Double Dragon */
 WRITE8_MEMBER(vball_state::cpu_sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vball_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xA000, 0xA000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -422,6 +422,8 @@ static MACHINE_CONFIG_START( vball, vball_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

@@ -260,7 +260,7 @@ WRITE16_MEMBER(shadfrce_state::sound_brt_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_byte_w(space, 1, data >> 8);
+		m_soundlatch->write(space, 1, data >> 8);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 	}
 	else
@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -561,6 +561,8 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)      /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

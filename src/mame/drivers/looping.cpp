@@ -57,6 +57,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 #include "cpu/tms9900/tms9980a.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -110,7 +111,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -162,6 +164,7 @@ public:
 	required_device<dac_device> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };
 
 
@@ -392,7 +395,7 @@ WRITE_LINE_MEMBER(looping_state::looping_spcint)
 
 WRITE8_MEMBER(looping_state::looping_soundlatch_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INT_9980A_LEVEL2, ASSERT_LINE);
 }
 
@@ -650,8 +653,10 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("tms", TMS5220, TMS_CLOCK)

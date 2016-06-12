@@ -44,7 +44,7 @@ WRITE16_MEMBER(f1gp_state::sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_pending_command = 1;
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, f1gp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp2
-	AM_RANGE(0x14, 0x14) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x14, 0x14) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -447,6 +447,8 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(f1gp_state, irqhandler))

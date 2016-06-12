@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-tecmo.c
+tecmo.cpp
 
 driver by Nicola Salmoria
 
@@ -64,7 +64,7 @@ WRITE8_MEMBER(tecmo_state::bankswitch_w)
 
 WRITE8_MEMBER(tecmo_state::sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI,ASSERT_LINE);
 }
 
@@ -227,7 +227,7 @@ static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(adpcm_start_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(adpcm_end_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_vol_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(nmi_ack_w)
@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(adpcm_start_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(adpcm_end_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(adpcm_vol_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(nmi_ack_w)
@@ -643,6 +643,8 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

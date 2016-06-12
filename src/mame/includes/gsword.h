@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff,Jarek Parchanski
+
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 
@@ -16,6 +18,7 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_spritetile_ram(*this, "spritetile_ram"),
 		m_spritexy_ram(*this, "spritexy_ram"),
 		m_spriteattrib_ram(*this, "spriteattram"),
@@ -30,6 +33,7 @@ public:
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch; // not josvolly
 
 	required_shared_ptr<UINT8> m_spritetile_ram;
 	required_shared_ptr<UINT8> m_spritexy_ram;

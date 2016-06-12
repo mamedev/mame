@@ -39,6 +39,7 @@ OSC  : 8.0000MHz(X1)   21.477 MHz(X2)   384kHz(X3)
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "video/v9938.h"
@@ -174,7 +175,7 @@ static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8, sothello_state )
 	AM_RANGE( 0x31, 0x31) AM_READ(subcpu_halt_clear)
 	AM_RANGE( 0x32, 0x32) AM_READ(subcpu_comm_status)
 	AM_RANGE( 0x33, 0x33) AM_READ(soundcpu_status_r)
-	AM_RANGE( 0x40, 0x4f) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE( 0x40, 0x4f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE( 0x50, 0x50) AM_WRITE(bank_w)
 	AM_RANGE( 0x60, 0x61) AM_MIRROR(0x02) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 						/* not sure, but the A1 line is ignored, code @ $8b8 */
@@ -223,7 +224,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundcpu_io_map, AS_IO, 8, sothello_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm_data_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(msm_cfg_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(soundcpu_busyflag_set_w)
@@ -372,6 +373,9 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, YM_CLOCK)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(sothello_state, irqhandler))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))

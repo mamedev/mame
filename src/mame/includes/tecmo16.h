@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau, Nicola Salmoria
+
+#include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
 
@@ -15,6 +17,7 @@ public:
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
 		m_mixer(*this, "mixer"),
+		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_videoram2(*this, "videoram2"),
@@ -30,6 +33,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<tecmo_spr_device> m_sprgen;
 	required_device<tecmo_mix_device> m_mixer;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_colorram;
