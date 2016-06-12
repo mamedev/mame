@@ -1247,8 +1247,6 @@ if (CPUS["M6502"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m6502/n2a03.h",
 		MAME_DIR .. "src/devices/cpu/m6502/r65c02.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/r65c02.h",
-		MAME_DIR .. "src/devices/cpu/m6502/r65c02gk.cpp",
-		MAME_DIR .. "src/devices/cpu/m6502/r65c02gk.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m740.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m740.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m3745x.cpp",
@@ -1267,7 +1265,6 @@ if (CPUS["M6502"]~=null) then
 		{ MAME_DIR .. "src/devices/cpu/m6502/m6510.cpp",    GEN_DIR .. "emu/cpu/m6502/m6510.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/m6502/n2a03.cpp",    GEN_DIR .. "emu/cpu/m6502/n2a03.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/m6502/r65c02.cpp",   GEN_DIR .. "emu/cpu/m6502/r65c02.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/m6502/r65c02gk.cpp", GEN_DIR .. "emu/cpu/m6502/r65c02gk.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/m6502/m740.cpp",     GEN_DIR .. "emu/cpu/m6502/m740.hxx" },
 	}
 
@@ -1276,7 +1273,6 @@ if (CPUS["M6502"]~=null) then
 		{ MAME_DIR .. "src/devices/cpu/m6502/om4510.lst",  GEN_DIR .. "emu/cpu/m6502/m4510.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm4510.lst"   }, {"@echo Generating m4510 source file...", PYTHON .. " $(1) m4510_device $(<) $(2) $(@)" }},
 		{ MAME_DIR .. "src/devices/cpu/m6502/om6502.lst",  GEN_DIR .. "emu/cpu/m6502/m6502.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm6502.lst"   }, {"@echo Generating m6502 source file...", PYTHON .. " $(1) m6502_device $(<) $(2) $(@)" }},
 		{ MAME_DIR .. "src/devices/cpu/m6502/om65c02.lst", GEN_DIR .. "emu/cpu/m6502/m65c02.hxx", { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm65c02.lst"  }, {"@echo Generating m65c02 source file...", PYTHON .. " $(1) m65c02_device $(<) $(2) $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6502/om65c02gk.lst", GEN_DIR .. "emu/cpu/m6502/r65c02gk.hxx", { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm65c02.lst"  }, {"@echo Generating r65c02gk source file...", PYTHON .. " $(1) r65c02gk_device $(<) $(2) $(@)" }},
 		{ MAME_DIR .. "src/devices/cpu/m6502/om65ce02.lst",GEN_DIR .. "emu/cpu/m6502/m65ce02.hxx",{ MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm65ce02.lst" }, {"@echo Generating m65ce02 source file...", PYTHON .. " $(1) m65ce02_device $(<) $(2) $(@)" }},
 		{ MAME_DIR .. "src/devices/cpu/m6502/om6509.lst",  GEN_DIR .. "emu/cpu/m6502/m6509.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm6509.lst"   }, {"@echo Generating m6509 source file...", PYTHON .. " $(1) m6509_device $(<) $(2) $(@)" }},
 		{ MAME_DIR .. "src/devices/cpu/m6502/om6510.lst",  GEN_DIR .. "emu/cpu/m6502/m6510.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm6510.lst"   }, {"@echo Generating m6510 source file...", PYTHON .. " $(1) m6510_device $(<) $(2) $(@)" }},

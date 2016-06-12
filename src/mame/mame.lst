@@ -12813,7 +12813,7 @@ gamecst2                        // MAME based bootleg, version 2.613
 gamecstl                        // MAME based bootleg
 
 @source:gameking.cpp
-gking3                          //
+gamekin3                        //
 gameking                        //
 
 @source:gameplan.cpp
