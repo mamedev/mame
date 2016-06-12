@@ -11,12 +11,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-#ifdef PSTANDALONE
-#if (PSTANDALONE)
-#define PSTANDALONE_PROVIDED
-#endif
-#endif
-
 #include "plib/poptions.h"
 #include "plib/pstring.h"
 #include "plib/plists.h"
@@ -341,10 +335,6 @@ static void listdevices()
 /*-------------------------------------------------
     main - primary entry point
 -------------------------------------------------*/
-
-#if (!PSTANDALONE)
-#include "corealloc.h"
-#endif
 
 #if 0
 static const char *pmf_verbose[] =

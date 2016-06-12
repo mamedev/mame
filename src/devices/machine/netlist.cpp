@@ -414,7 +414,7 @@ void netlist_mame_device_t::device_timer(emu_timer &timer, device_timer_id id, i
 {
 }
 
-ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::update_time_x()
+void netlist_mame_device_t::update_time_x()
 {
 	const netlist::netlist_time newt(netlist().time());
 	const netlist::netlist_time delta(newt - m_old + m_rem);
@@ -424,7 +424,7 @@ ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::update_time_x()
 	m_icount -= d;
 }
 
-ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::check_mame_abort_slice()
+void netlist_mame_device_t::check_mame_abort_slice()
 {
 	if (m_icount <= 0)
 		netlist().abort_current_queue_slice();

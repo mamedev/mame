@@ -95,26 +95,26 @@ protected:
 	template <typename T1, typename T2>
 	inline nl_ext_double &lA(const T1 &r, const T2 &c) { return m_lA[r][c]; }
 
-	ATTR_ALIGN nl_double m_last_RHS[storage_N]; // right hand side - contains currents
+	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 
 private:
 	static const std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
-	ATTR_ALIGN nl_ext_double m_A[storage_N][m_pitch];
-	ATTR_ALIGN nl_ext_double m_Ainv[storage_N][m_pitch];
-	ATTR_ALIGN nl_ext_double m_W[storage_N][m_pitch];
-	ATTR_ALIGN nl_ext_double m_RHS[storage_N]; // right hand side - contains currents
+	nl_ext_double m_A[storage_N][m_pitch];
+	nl_ext_double m_Ainv[storage_N][m_pitch];
+	nl_ext_double m_W[storage_N][m_pitch];
+	nl_ext_double m_RHS[storage_N]; // right hand side - contains currents
 
-	ATTR_ALIGN nl_ext_double m_lA[storage_N][m_pitch];
+	nl_ext_double m_lA[storage_N][m_pitch];
 
 	/* temporary */
-	ATTR_ALIGN nl_double H[storage_N][m_pitch] ;
+	nl_double H[storage_N][m_pitch] ;
 	unsigned rows[storage_N];
 	unsigned cols[storage_N][m_pitch];
 	unsigned colcount[storage_N];
 
 	unsigned m_cnt;
 
-	//ATTR_ALIGN nl_ext_double m_RHSx[storage_N];
+	//nl_ext_double m_RHSx[storage_N];
 
 	const unsigned m_dim;
 

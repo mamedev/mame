@@ -123,7 +123,7 @@ int matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newto
 	 */
 
 
-	ATTR_ALIGN nl_double new_v[storage_N] = { 0.0 };
+	nl_double new_v[storage_N] = { 0.0 };
 	const unsigned iN = this->N();
 
 	matrix_solver_t::build_LE_A<matrix_solver_SOR_mat_t>();

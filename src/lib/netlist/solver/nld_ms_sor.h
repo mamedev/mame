@@ -70,10 +70,10 @@ int matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 
 	const nl_double ws = this->m_params.m_sor;
 
-	ATTR_ALIGN nl_double w[storage_N];
-	ATTR_ALIGN nl_double one_m_w[storage_N];
-	ATTR_ALIGN nl_double RHS[storage_N];
-	ATTR_ALIGN nl_double new_V[storage_N];
+	nl_double w[storage_N];
+	nl_double one_m_w[storage_N];
+	nl_double RHS[storage_N];
+	nl_double new_V[storage_N];
 
 	for (unsigned k = 0; k < iN; k++)
 	{

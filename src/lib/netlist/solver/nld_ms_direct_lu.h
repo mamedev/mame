@@ -142,15 +142,15 @@ protected:
 	template <typename T1, typename T2>
 	inline nl_ext_double &A(const T1 r, const T2 c) { return m_A[r][c]; }
 
-	//ATTR_ALIGN nl_double m_A[storage_N][((storage_N + 7) / 8) * 8];
-	ATTR_ALIGN nl_double m_RHS[storage_N];
-	ATTR_ALIGN nl_double m_last_RHS[storage_N]; // right hand side - contains currents
-	ATTR_ALIGN nl_double m_last_V[storage_N];
+	//nl_double m_A[storage_N][((storage_N + 7) / 8) * 8];
+	nl_double m_RHS[storage_N];
+	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
+	nl_double m_last_V[storage_N];
 
 	terms_t *m_rails_temp;
 
 private:
-	ATTR_ALIGN nl_ext_double m_A[storage_N][((storage_N + 7) / 8) * 8];
+	nl_ext_double m_A[storage_N][((storage_N + 7) / 8) * 8];
 
 	const unsigned m_dim;
 	nl_double m_lp_fact;
