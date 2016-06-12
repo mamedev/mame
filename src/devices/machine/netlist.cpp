@@ -460,6 +460,10 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 				save_pointer((INT16 *) s->m_ptr, s->m_name.cstr(), s->m_count);
 			else if (s->m_dt.size == sizeof(INT8))
 				save_pointer((INT8 *) s->m_ptr, s->m_name.cstr(), s->m_count);
+#if (PHAS_INT128)
+			else if (s->m_dt.size == sizeof(INT128))
+				save_pointer((INT64 *) s->m_ptr, s->m_name.cstr(), s->m_count * 2);
+#endif
 			else
 				netlist().log().fatal("Unknown integral type size {1} for {2}\n", s->m_dt.size, s->m_name.cstr());
 		}

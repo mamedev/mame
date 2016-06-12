@@ -24,7 +24,7 @@ namespace plib
 	namespace container
 	{
 		template <class C>
-		const bool contains(C &con, const typename C::value_type &elem)
+		bool contains(C &con, const typename C::value_type &elem)
 		{
 			return std::find(con.begin(), con.end(), elem) != con.end();
 		}

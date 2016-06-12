@@ -403,7 +403,7 @@ void matrix_solver_t::update_forced()
 	if (m_params.m_dynamic && has_timestep_devices())
 	{
 		m_Q_sync.net().toggle_new_Q();
-		m_Q_sync.net().reschedule_in_queue(netlist_time(m_params.m_min_timestep));
+		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
 	}
 }
 
@@ -535,7 +535,7 @@ netlist_time matrix_solver_t::compute_next_timestep()
 	}
 	//if (new_solver_timestep > 10.0 * hn)
 	//    new_solver_timestep = 10.0 * hn;
-	return netlist_time(new_solver_timestep);
+	return netlist_time::from_double(new_solver_timestep);
 }
 
 
@@ -628,7 +628,7 @@ NETLIB_UPDATE(solver)
 	if (!m_Q_step.net().is_queued())
 	{
 		m_Q_step.net().toggle_new_Q();
-		m_Q_step.net().push_to_queue(netlist_time(m_params.m_max_timestep));
+		m_Q_step.net().push_to_queue(netlist_time::from_double(m_params.m_max_timestep));
 	}
 }
 
@@ -704,7 +704,7 @@ void NETLIB_NAME(solver)::post_start()
 	m_params.m_accuracy = m_accuracy.Value();
 	m_params.m_gs_loops = m_gs_loops.Value();
 	m_params.m_nr_loops = m_nr_loops.Value();
-	m_params.m_nt_sync_delay = netlist_time(m_sync_delay.Value());
+	m_params.m_nt_sync_delay = netlist_time::from_double(m_sync_delay.Value());
 	m_params.m_lte = m_lte.Value();
 	m_params.m_sor = m_sor.Value();
 

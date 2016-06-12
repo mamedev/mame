@@ -1001,7 +1001,7 @@ namespace netlist
 	private:
 		struct names_t { char m_buf[64]; };
 		int m_qsize;
-		std::vector<netlist_time::INTERNALTYPE> m_times;
+		std::vector<netlist_time::internal_type> m_times;
 		std::vector<names_t> m_names;
 	};
 
@@ -1161,7 +1161,7 @@ protected:
 		state_var(device_t &dev, const pstring name, const T & value)
 		{
 			dev.netlist().save(dev, m_value, name);
-			for (int i=0; i<N; i++)
+			for (std::size_t i=0; i<N; i++)
 				m_value[i] = value;
 		}
 

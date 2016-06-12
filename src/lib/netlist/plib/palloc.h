@@ -171,8 +171,8 @@ private:
 	struct block
 	{
 		block() : m_num_alloc(0), m_free(0), cur_ptr(nullptr), data(nullptr) { }
-		int m_num_alloc;
-		int m_free;
+		std::size_t m_num_alloc;
+		std::size_t m_free;
 		char *cur_ptr;
 		char *data;
 	};

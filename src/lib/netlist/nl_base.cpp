@@ -114,6 +114,7 @@ queue_t::queue_t(netlist_t &nl)
 
 void queue_t::register_state(plib::state_manager_t &manager, const pstring &module)
 {
+	printf("%e\n", netlist_time::never().as_double());
 	netlist().log().debug("register_state\n");
 	manager.save_item(this, m_qsize, module + "." + "qsize");
 	manager.save_item(this, &m_times[0], module + "." + "times", m_times.size());

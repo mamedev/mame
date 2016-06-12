@@ -130,7 +130,7 @@ namespace netlist
 			{
 				netlist_time base = netlist_time::from_hz(m_freq.Value()*2);
 				plib::pstring_vector_t pat(m_pattern.Value(),",");
-				m_off = netlist_time(m_offset.Value());
+				m_off = netlist_time::from_double(m_offset.Value());
 
 				int pati[256];
 				m_size = pat.size();
@@ -313,7 +313,7 @@ namespace netlist
 		, m_Q(*this, "Q")
 		{
 
-			for (std::size_t i=0; i < m_N; i++)
+			for (int i=0; i < m_N; i++)
 				m_I.push_back(plib::make_unique<analog_input_t>(*this, plib::pfmt("A{1}")(i)));
 
 			plib::pstring_vector_t cmds(m_func.Value(), " ");

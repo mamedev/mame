@@ -40,7 +40,7 @@ namespace netlist
 	NETLIB_RESET(extclock)
 	{
 		m_cnt = 0;
-		m_off = netlist_time(m_offset.Value());
+		m_off = netlist_time::from_double(m_offset.Value());
 		//m_Q.initial(0);
 	}
 
