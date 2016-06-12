@@ -37,8 +37,8 @@ namespace netlist
 		static constexpr INTERNALTYPE RESOLUTION = NETLIST_INTERNAL_RES;
 
 		constexpr netlist_time() NOEXCEPT : m_time(0) {}
-		netlist_time(const netlist_time &rhs) NOEXCEPT = default;
-		netlist_time(netlist_time &&rhs) NOEXCEPT = default;
+		constexpr netlist_time(const netlist_time &rhs) NOEXCEPT = default;
+		constexpr netlist_time(netlist_time &&rhs) NOEXCEPT = default;
 
 		constexpr explicit netlist_time(const double t)
 		: m_time((INTERNALTYPE) ( t * (double) RESOLUTION)) { }
@@ -103,21 +103,21 @@ namespace netlist
 			return lhs.m_time != rhs.m_time;
 		}
 
-		INTERNALTYPE as_raw() const { return m_time; }
-		double as_double() const { return (double) m_time / (double) RESOLUTION; }
+		constexpr INTERNALTYPE as_raw() const { return m_time; }
+		constexpr double as_double() const { return (double) m_time / (double) RESOLUTION; }
 
 		// for save states ....
 		INTERNALTYPE *get_internaltype_ptr() { return &m_time; }
 
-		static inline netlist_time from_nsec(const INTERNALTYPE ns) { return netlist_time(ns, U64(1000000000)); }
-		static inline netlist_time from_usec(const INTERNALTYPE us) { return netlist_time(us, U64(1000000)); }
-		static inline netlist_time from_msec(const INTERNALTYPE ms) { return netlist_time(ms, U64(1000)); }
-		static inline netlist_time from_hz(const INTERNALTYPE hz) { return netlist_time(1 , hz); }
-		static inline netlist_time from_raw(const INTERNALTYPE raw) { return netlist_time(raw, RESOLUTION); }
+		static inline constexpr netlist_time from_nsec(const INTERNALTYPE ns) { return netlist_time(ns, U64(1000000000)); }
+		static inline constexpr netlist_time from_usec(const INTERNALTYPE us) { return netlist_time(us, U64(1000000)); }
+		static inline constexpr netlist_time from_msec(const INTERNALTYPE ms) { return netlist_time(ms, U64(1000)); }
+		static inline constexpr netlist_time from_hz(const INTERNALTYPE hz) { return netlist_time(1 , hz); }
+		static inline constexpr netlist_time from_raw(const INTERNALTYPE raw) { return netlist_time(raw, RESOLUTION); }
 
-		static inline netlist_time zero() { return netlist_time(0, RESOLUTION); }
-		static inline netlist_time quantum() { return netlist_time(1, RESOLUTION); }
-		static inline netlist_time never() { return netlist_time(std::numeric_limits<netlist_time::INTERNALTYPE>::max(), RESOLUTION); }
+		static inline constexpr netlist_time zero() { return netlist_time(0, RESOLUTION); }
+		static inline constexpr netlist_time quantum() { return netlist_time(1, RESOLUTION); }
+		static inline constexpr netlist_time never() { return netlist_time(std::numeric_limits<netlist_time::INTERNALTYPE>::max(), RESOLUTION); }
 	private:
 		INTERNALTYPE m_time;
 	};

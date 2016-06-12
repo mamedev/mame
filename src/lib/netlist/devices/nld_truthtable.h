@@ -183,6 +183,7 @@ namespace netlist
 		, m_last_state(*this, "m_last_state", 0)
 		, m_ign(*this, "m_ign", 0)
 		, m_active(*this, "m_active", 1)
+		, m_use_deactivate(*this, "USE_DEACTIVATE", true)
 		, m_ttp(ttp)
 		{
 			while (*desc != nullptr && **desc != 0 )
@@ -201,6 +202,7 @@ namespace netlist
 		, m_last_state(*this, "m_last_state", 0)
 		, m_ign(*this, "m_ign", 0)
 		, m_active(*this, "m_active", 1)
+		, m_use_deactivate(*this, "USE_DEACTIVATE", true)
 		, m_ttp(ttp)
 		{
 			m_desc = desc;
@@ -251,14 +253,13 @@ namespace netlist
 					&m_ttp->m_initialized, packed_int(m_ttp->m_outs), m_ttp->m_timing, m_ttp->m_timing_nt);
 
 			desc.setup(m_desc, disabled_ignore * 0);
-
 	#if 0
 			printf("%s\n", name().cstr());
 			for (int j=0; j < m_size; j++)
-				printf("%05x %04x %04x %04x\n", j, m_ttp.m_outs[j] & ((1 << m_NO)-1),
-						m_ttp.m_outs[j] >> m_NO, m_ttp.m_timing[j * m_NO + 0]);
-			for (int k=0; m_ttp.m_timing_nt[k] != netlist_time::zero(); k++)
-				printf("%d %f\n", k, m_ttp.m_timing_nt[k].as_double() * 1000000.0);
+				printf("%05x %04x %04x %04x\n", j, m_ttp->m_outs[j] & ((1 << m_NO)-1),
+						m_ttp->m_outs[j] >> m_NO, m_ttp->m_timing[j * m_NO + 0]);
+			for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero(); k++)
+				printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
 	#endif
 		}
 
@@ -282,8 +283,7 @@ namespace netlist
 	public:
 		void inc_active() override
 		{
-			nl_assert(netlist().use_deactivate());
-			if (m_NI > 1 && m_has_state == 0)
+			if (m_NI > 1 && m_has_state == 0 && m_use_deactivate)
 				if (++m_active == 1)
 				{
 					process<false>();
@@ -292,14 +292,13 @@ namespace netlist
 
 		void dec_active() override
 		{
-			nl_assert(netlist().use_deactivate());
 			/* FIXME:
 			 * Based on current measurements there is no point to disable
 			 * 1 input devices. This should actually be a parameter so that we
 			 * can decide for each individual gate whether it is benefitial to
 			 * ignore deactivation.
 			 */
-			if (m_NI > 1 && m_has_state == 0)
+			if (m_NI > 1 && m_has_state == 0 && m_use_deactivate)
 				if (--m_active == 0)
 				{
 					for (std::size_t i = 0; i< m_NI; i++)
@@ -388,8 +387,8 @@ namespace netlist
 
 		state_var<UINT32> m_last_state;
 		state_var<UINT32> m_ign;
-		state_var<INT32> m_active;
-
+		state_var<INT32>  m_active;
+		param_logic_t     m_use_deactivate;
 		truthtable_t *m_ttp;
 		plib::pstring_vector_t m_desc;
 	};

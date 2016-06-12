@@ -1349,7 +1349,6 @@ protected:
 		out.set_Q(val, delay);
 	}
 
-
 }
 
 

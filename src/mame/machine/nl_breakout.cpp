@@ -283,6 +283,9 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("J3", 7402)
 	CHIP("J4", 9312)
 	CHIP("J5", 7448)
+#if	USE_TRUTHTABLE_7448
+	PARAM(J5.USE_DEACTIVATE, 0) // only use this if compiled with 7448 as a truthtable
+#endif
 	CHIP("J6", 9310)
 	CHIP("J7", 7420)
 	CHIP("J8", 74279)

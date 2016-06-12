@@ -126,7 +126,7 @@
 //============================================================
 
 // this macro passes an item followed by a string version of itself as two consecutive parameters
-#define NLNAME(x) x, #x
+//#define NLNAME(x) x, #x
 
 #define NOEXCEPT noexcept
 
@@ -145,8 +145,9 @@
 //#define nl_double float
 //#define NL_FCONST(x) (x ## f)
 
-#define nl_double double
+//#define nl_double double
 #define NL_FCONST(x) x
+using nl_double = double;
 
 
 //============================================================

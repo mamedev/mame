@@ -13,14 +13,6 @@ namespace netlist
 	namespace devices
 	{
 
-
-	/*
-	 * FIXME: Using truthtable is a lot slower than the explicit device
-	 * 		  in breakout. Performance drops by 20%.
-	 */
-
-	#define USE_TRUTHTABLE_7448	(0)
-
 	#if (USE_TRUTHTABLE_7448 && USE_TRUTHTABLE)
 
 	NETLIB_TRUTHTABLE(7448, 7, 7, 0);

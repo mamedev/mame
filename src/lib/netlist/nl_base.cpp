@@ -951,6 +951,7 @@ nl_double param_model_t::model_value(const pstring &entity)
 	return netlist().setup().model_value(m_map, entity);
 }
 
+
 } // namespace
 
 namespace netlist
