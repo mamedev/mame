@@ -3,6 +3,7 @@
 /*
     DEC LK-201 keyboard
     Emulation by R. Belmont & M. Burke
+    with contributions by Cracyc and Karl-Ludwig Deisenhofer (2016) 
 
     This is the later "cost-reduced" 6805 version; there's also an 8048 version.
     The LK-201 mechanical elements are described in US Patent 4,467,150
@@ -178,6 +179,8 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
 
 const device_type LK201 = &device_creator<lk201_device>;
 
+//  23-001s9-00.bin is for the newer LK201 version (green LEDs, Motorola 68HC05xx)
+//  23-004M1 or 23-004M2 = older LK201 keyboard with red LEDs (Intel 8051). 
 ROM_START( lk201 )
 	ROM_REGION(0x2000, LK201_CPU_TAG, 0)
 	ROM_LOAD( "23-001s9-00.bin", 0x0000, 0x2000, CRC(be293c51) SHA1(a11ae004d2d6055d7279da3560c3e56610a19fdb) )
@@ -496,6 +499,8 @@ void lk201_device::device_start()
 {
 	m_count = timer_alloc(1);
 	m_tx_handler.resolve_safe();
+	
+	m_beeper = timer_alloc(2);
 }
 
 
@@ -505,6 +510,14 @@ void lk201_device::device_start()
 
 void lk201_device::device_reset()
 {
+	m_beeper->adjust(attotime::never);
+
+	m_speaker->set_state(0);
+	m_speaker->set_output_gain(0, 0);
+
+	ddrs[0] = ddrs[1] = ddrs[2] = 0;
+	ports[0] = ports[1] = ports[2] = 0;
+
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(4800);
 	m_count->adjust(attotime::from_hz(1200), 0, attotime::from_hz(1200));
@@ -524,14 +537,23 @@ void lk201_device::device_reset()
 
 void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if(id == 1)
+	switch (id)
 	{
-		if(m_timer.tcr & 0x40)
+	case 1:  
+		m_timer.tsr |= TSR_OCFL; 
+
+		if ((m_timer.tcr & TCR_OCIE) && (m_timer.tsr & TSR_OCFL)) 
 			m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
-		m_timer.tsr |= 0x40;
-	}
-	else
+		break;
+
+	case 2:
+		m_speaker->set_output_gain(0, 0);
+		m_speaker->set_state(0);
+		break;
+
+	default:
 		device_serial_interface::device_timer(timer, id, param, ptr);
+	}
 }
 
 void lk201_device::rcv_complete()
@@ -539,7 +561,10 @@ void lk201_device::rcv_complete()
 	sci_status |= SCSR_RDRF;
 	update_interrupts();
 	receive_register_extract();
-//  printf("lk201 got %02x\n", get_received_char());
+
+	int data = get_received_char();
+	m_kbd_state = data;
+//	printf("\nlk201 got %02x\n", m_kbd_state);
 }
 
 void lk201_device::tra_complete()
@@ -565,10 +590,24 @@ void lk201_device::update_interrupts()
 	}
 }
 
-READ8_MEMBER( lk201_device::timer_r )
+READ8_MEMBER(lk201_device::timer_r)
 {
+	static UINT16 count;
+
 	UINT8 ret = m_timer.regs[offset];
-	if(m_timer.tsr)
+
+	switch (offset)
+	{
+	case 8:  // ACRH (high value is stored and reused when reading low)
+		count = (m_maincpu->total_cycles() / 4) & 0x0000ffff; 
+		ret = count >> 8;
+		break;
+	case 9:  // ACRL
+		ret = count & 0x00ff;
+		break;
+	}
+
+	if (m_timer.tsr)
 	{
 		m_timer.tsr = 0;
 		m_maincpu->set_input_line(M68HC05EG_INT_TIMER, CLEAR_LINE);
@@ -576,9 +615,28 @@ READ8_MEMBER( lk201_device::timer_r )
 	return ret;
 }
 
-WRITE8_MEMBER( lk201_device::timer_w )
+WRITE8_MEMBER(lk201_device::timer_w)
 {
+	static UINT16 count;
+	static int save_tsr;
+
 	m_timer.regs[offset] = data;
+
+	switch (offset)
+	{
+	case 4: // OCRH
+		save_tsr = m_timer.tsr; //  prevent crashes in between OCRH / OCRL loads
+		m_timer.tsr &= (255-TSR_OCFL); // OCFL flag tested for zero in TIMER routine
+
+		count = m_timer.ocrh << 8; // store for later (when LOW is written).
+		break;
+	case 5 : // OCRL
+		count |= m_timer.ocrl;
+		m_timer.ocrh = count >> 8;
+
+		m_timer.tsr = save_tsr; // restore flags  
+		break;
+	}
 }
 
 READ8_MEMBER( lk201_device::ddr_r )
@@ -657,15 +715,59 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
 			// Check for LED update strobe
 			if (((portc & 0x80) == 0) && (olddata & 0x80))
 			{
-				// Lower nibble contains the LED values (1 = on, 0 = off)
-				machine().output().set_value("led_wait"   , (led_data & 0x1) == 1);
-				machine().output().set_value("led_compose", (led_data & 0x2) == 2);
-				machine().output().set_value("led_lock"   , (led_data & 0x4) == 4);
-				machine().output().set_value("led_hold"   , (led_data & 0x8) == 8);
-			}
-			break;
-	}
+				if(ddrs[2] != 0x00) 
+				{	// Lower nibble contains the LED values (1 = on, 0 = off)
+					machine().output().set_value("led_wait", (led_data & 0x1) == 1);
+					machine().output().set_value("led_compose", (led_data & 0x2) == 2);
+					machine().output().set_value("led_lock", (led_data & 0x4) == 4);
+					machine().output().set_value("led_hold", (led_data & 0x8) == 8);
+				}
+				
+				if (led_data & 0xf0)
+				{
+					m_speaker->set_state(1);
+					// Beeps < 20 ms are clipped. A key click on a LK201 lasts 2 ms...
+					if(m_kbd_state == LK_CMD_BELL)
+						m_beeper->adjust(attotime::from_msec(125)); 
+					else   
+						m_beeper->adjust(attotime::from_msec(25)); // workaround
+				}
+				
+				// Upper 4 bits of LED_DATA contain encoded volume info 
+				switch (led_data & 0xf0)
+				{
+					case 0xf0: // 8  - (see TABLE 4 in 68HC05xx ROM)
+						m_speaker->set_output_gain(0, 100.0f);
+					break;
+					case 0xd0: // 7
+						m_speaker->set_output_gain(0, (100 - (12 * 1)) / 100.0f);
+					break;
+					case 0xc0: // 6
+						m_speaker->set_output_gain(0, (100 - (12 * 2)) / 100.0f);
+					break;
+					case 0x60: // 5
+						m_speaker->set_output_gain(0, (100 - (12 * 3)) / 100.0f);
+					break;
+					case 0xb0: // 4
+						m_speaker->set_output_gain(0, (100 - (12 * 4)) / 100.0f);
+					break;
+					case 0xa0: // 3
+						m_speaker->set_output_gain(0, (100 - (12 * 5)) / 100.0f);
+					break;
+					case 0x30: // 2
+						m_speaker->set_output_gain(0, (100 - (12 * 6)) / 100.0f);
+					break;
+					case 0x90: // 1
+						m_speaker->set_output_gain(0, (100 - (12 * 7)) / 100.0f);
+					break;
+				default:
+					;
+				} // switch (volume)
+			
+			} // if (update_strobe)
+ 	} // PORTs switch
 }
+
 
 READ8_MEMBER( lk201_device::sci_r )
 {
