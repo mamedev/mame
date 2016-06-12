@@ -651,11 +651,11 @@ MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START (mvme147)
-ROM_REGION32_BE(0xfff00000, "maincpu", 0)
+	ROM_REGION32_BE(0xfff00000, "maincpu", 0)
 
-ROM_LOAD16_BYTE("147bug-2.44-U22.BIN", 0xff800000, 0x20000, CRC (da09ce8a) SHA1 (3eaa8fa802187d9b08f453ff1ba64f5113a195a9))
-ROM_LOAD16_BYTE("147bug-2.44-U30.BIN", 0xff800001, 0x20000, CRC (f883e17d) SHA1 (01fe43e5ddfd3cf8aabb5a5959c80a8b5ec5d895))
-
+	ROM_SYSTEM_BIOS(0, "147bug v2.44", "MVME147 147bug v2.44")
+	ROMX_LOAD("147bug-2.44-U22.BIN", 0xff800000, 0x20000, CRC (da09ce8a) SHA1 (3eaa8fa802187d9b08f453ff1ba64f5113a195a9), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("147bug-2.44-U30.BIN", 0xff800001, 0x20000, CRC (f883e17d) SHA1 (01fe43e5ddfd3cf8aabb5a5959c80a8b5ec5d895), ROM_SKIP(1) | ROM_BIOS(1))
 /*
  * System ROM information
  *
@@ -679,6 +679,17 @@ ROM_LOAD16_BYTE("147bug-2.44-U30.BIN", 0xff800001, 0x20000, CRC (f883e17d) SHA1 
  *  10
  * channel B is identical but resets Channel B of course, SCC2 is also identical except using interrupt vector 71
  */
+
+	ROM_SYSTEM_BIOS(1, "147bug v2.43", "MVME147 147bug v2.43")
+	ROMX_LOAD("5741B42E.BIN", 0xff800000, 0x20000, CRC (2ba98f97) SHA1 (5f18c6dd6a7b03067890f0164ef3d37ced907d7f), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("5741B41E.BIN", 0xff800001, 0x20000, CRC (dfa014f2) SHA1 (ff9db90a05c295819ce7ca7c1a6ac67b04003728), ROM_SKIP(1) | ROM_BIOS(2))
+/*
+ * System ROM information
+ *
+ * 147bug version 2.43 is released 1992, coprighted by Motorola Inc from 1988
+ *
+ */
+
 ROM_END
 
 /* Driver */
