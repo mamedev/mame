@@ -295,21 +295,21 @@ static void listdevices()
 		auto d = f->Create(nt.setup().netlist(), f->name() + "_lc");
 		// get the list of terminals ...
 
-		for (auto & t : nt.setup().m_terminals.values())
+		for (auto & t : nt.setup().m_terminals)
 		{
-			if (t.m_value->name().startsWith(d->name()))
+			if (t.second->name().startsWith(d->name()))
 			{
-				pstring tn(t.m_value->name().substr(d->name().len()+1));
+				pstring tn(t.second->name().substr(d->name().len()+1));
 				if (tn.find(".")<0)
 					terms += ", " + tn;
 			}
 		}
 
-		for (auto & t : nt.setup().m_alias.values())
+		for (auto & t : nt.setup().m_alias)
 		{
-			if (t.m_key.startsWith(d->name()))
+			if (t.first.startsWith(d->name()))
 			{
-				pstring tn(t.m_key.substr(d->name().len()+1));
+				pstring tn(t.first.substr(d->name().len()+1));
 				if (tn.find(".")<0)
 					terms += ", " + tn;
 			}

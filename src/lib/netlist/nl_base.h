@@ -156,6 +156,7 @@
 #define NLBASE_H_
 
 #include <vector>
+#include <unordered_map>
 #include <memory>
 #include <cmath>
 #include <cstdint>
@@ -289,7 +290,7 @@ namespace netlist
 	// model_map_t
 	// -----------------------------------------------------------------------------
 
-	using model_map_t = plib::hashmap_t<pstring, pstring>;
+	using model_map_t = std::unordered_map<pstring, pstring>;
 
 	// -----------------------------------------------------------------------------
 	// logic_family_t

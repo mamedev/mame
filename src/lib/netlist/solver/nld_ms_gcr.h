@@ -62,9 +62,9 @@ private:
 	{
 		plib::postringstream t;
 		csc_private(t);
-		plib::hash_functor<pstring> h(t.str());
+		std::hash<pstring> h;
 
-		return plib::pfmt("nl_gcr_{1:x}_{2}")(h())(mat.nz_num);
+		return plib::pfmt("nl_gcr_{1:x}_{2}")(h( t.str() ))(mat.nz_num);
 	}
 
 	unsigned m_dim;

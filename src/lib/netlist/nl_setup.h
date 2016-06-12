@@ -10,6 +10,8 @@
 
 #include <memory>
 #include <stack>
+#include <unordered_map>
+
 #include "nl_base.h"
 #include "nl_factory.h"
 
@@ -204,17 +206,17 @@ namespace netlist
 		netlist_t &m_netlist;
 
 	public:
-		plib::hashmap_t<pstring, pstring> m_alias;
-		plib::hashmap_t<pstring, param_ref_t>  m_params;
-		plib::hashmap_t<pstring, pstring> m_param_values;
-		plib::hashmap_t<pstring, core_terminal_t *> m_terminals;
+		std::unordered_map<pstring, pstring> m_alias;
+		std::unordered_map<pstring, param_ref_t>  m_params;
+		std::unordered_map<pstring, pstring> m_param_values;
+		std::unordered_map<pstring, core_terminal_t *> m_terminals;
 	private:
 
 		std::vector<link_t> m_links;
 
 		factory_list_t m_factory;
 
-		plib::hashmap_t<pstring, pstring> m_models;
+		std::unordered_map<pstring, pstring> m_models;
 
 		int m_proxy_cnt;
 		int m_frontier_cnt;

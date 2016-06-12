@@ -260,8 +260,8 @@ namespace netlist
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(frontier, base_dummy)
-		, m_RIN(*this, "m_RIN", false)
-		, m_ROUT(*this, "m_ROUT", false)
+		, m_RIN(*this, "m_RIN", true)
+		, m_ROUT(*this, "m_ROUT", true)
 		, m_I(*this, "_I")
 		, m_Q(*this, "_Q")
 		, m_p_RIN(*this, "RIN", 1.0e6)

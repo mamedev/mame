@@ -267,7 +267,7 @@ ppreprocessor::ppreprocessor()
 	m_expr_sep.push_back(" ");
 	m_expr_sep.push_back("\t");
 
-	m_defines.add("__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1"));
+	m_defines.insert({"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
 }
 
 void ppreprocessor::error(const pstring &err)
@@ -349,9 +349,9 @@ double ppreprocessor::expr(const pstring_vector_t &sexpr, std::size_t &start, in
 
 ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 {
-	int idx = m_defines.index_of(name);
-	if (idx >= 0)
-		return &m_defines.value_at(idx);
+	auto idx = m_defines.find(name);
+	if (idx != m_defines.end())
+		return &idx->second;
 	else
 		return nullptr;
 }
@@ -440,7 +440,7 @@ pstring  ppreprocessor::process_line(const pstring &line)
 			{
 				if (lti.size() != 3)
 					error("PREPRO: only simple defines allowed: " + line);
-				m_defines.add(lti[1], define_t(lti[1], lti[2]));
+				m_defines.insert({lti[1], define_t(lti[1], lti[2])});
 			}
 		}
 		else

@@ -131,9 +131,9 @@ private:
 	plib::postringstream m_buf;
 
 	std::vector<std::shared_ptr<dev_t>> m_devs;
-	plib::hashmap_t<pstring, std::shared_ptr<net_t> > m_nets;
+	std::unordered_map<pstring, std::shared_ptr<net_t> > m_nets;
 	std::vector<pstring> m_ext_alias;
-	plib::hashmap_t<pstring, std::shared_ptr<pin_alias_t>> m_pins;
+	std::unordered_map<pstring, std::shared_ptr<pin_alias_t>> m_pins;
 
 	static unit_t m_units[];
 

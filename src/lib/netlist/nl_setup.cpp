@@ -151,13 +151,13 @@ void setup_t::register_model(const pstring &model_in)
 		log().fatal("Unable to parse model: {1}", model_in);
 	pstring model = model_in.left(pos).trim().ucase();
 	pstring def = model_in.substr(pos + 1).trim();
-	if (!m_models.add(model, def))
+	if (!m_models.insert({model, def}).second)
 		log().fatal("Model already exists: {1}", model_in);
 }
 
 void setup_t::register_alias_nofqn(const pstring &alias, const pstring &out)
 {
-	if (!m_alias.add(alias, out))
+	if (!m_alias.insert({alias, out}).second)
 		log().fatal("Error adding alias {1} to alias list\n", alias);
 }
 
@@ -207,9 +207,10 @@ pstring setup_t::objtype_as_str(object_t &in) const
 
 void setup_t::register_and_set_param(pstring name, param_t &param)
 {
-	if (m_param_values.contains(name))
+	auto i = m_param_values.find(name);
+	if (i != m_param_values.end())
 	{
-		const pstring val = m_param_values[name];
+		const pstring val = i->second;
 		log().debug("Found parameter ... {1} : {1}\n", name, val);
 		switch (param.param_type())
 		{
@@ -240,13 +241,13 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 				log().fatal("Parameter is not supported {1} : {2}\n", name, val);
 		}
 	}
-	if (!m_params.add(param.name(), param_ref_t(param.name(), param.device(), param)))
+	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
 		log().fatal("Error adding parameter {1} to parameter list\n", name);
 }
 
 void setup_t::register_term(core_terminal_t &term)
 {
-	if (!m_terminals.add(term.name(), &term))
+	if (!m_terminals.insert({term.name(), &term}).second)
 		log().fatal("Error adding {1} {2} to terminal list\n", objtype_as_str(term), term.name());
 	log().debug("{1} {2}\n", objtype_as_str(term), term.name());
 }
@@ -335,15 +336,15 @@ void setup_t::register_param(const pstring &param, const pstring &value)
 {
 	pstring fqn = build_fqn(param);
 
-	int idx = m_param_values.index_of(fqn);
-	if (idx < 0)
+	auto idx = m_param_values.find(fqn);
+	if (idx == m_param_values.end())
 	{
-		if (!m_param_values.add(fqn, value))
+		if (!m_param_values.insert({fqn, value}).second)
 			log().fatal("Unexpected error adding parameter {1} to parameter list\n", param);
 	}
 	else
 	{
-		log().warning("Overwriting {1} old <{2}> new <{3}>\n", fqn, m_param_values.value_at(idx), value);
+		log().warning("Overwriting {1} old <{2}> new <{3}>\n", fqn, idx->second, value);
 		m_param_values[fqn] = value;
 	}
 }
@@ -356,8 +357,8 @@ const pstring setup_t::resolve_alias(const pstring &name) const
 	/* FIXME: Detect endless loop */
 	do {
 		ret = temp;
-		int p = m_alias.index_of(ret);
-		temp = (p>=0 ? m_alias.value_at(p) : "");
+		auto p = m_alias.find(ret);
+		temp = (p != m_alias.end() ? p->second : "");
 	} while (temp != "");
 
 	log().debug("{1}==>{2}\n", name, ret);
@@ -367,17 +368,15 @@ const pstring setup_t::resolve_alias(const pstring &name) const
 core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
-	int ret;
-
-	ret = m_terminals.index_of(tname);
+	auto ret = m_terminals.find(tname);
 	/* look for default */
-	if (ret < 0)
+	if (ret == m_terminals.end())
 	{
 		/* look for ".Q" std output */
-		ret = m_terminals.index_of(tname + ".Q");
+		ret = m_terminals.find(tname + ".Q");
 	}
 
-	core_terminal_t *term = (ret < 0 ? nullptr : m_terminals.value_at(ret));
+	core_terminal_t *term = (ret == m_terminals.end() ? nullptr : ret->second);
 
 	if (term == nullptr && required)
 		log().fatal("terminal {1}({2}) not found!\n", terminal_in, tname);
@@ -389,19 +388,17 @@ core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool require
 core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, object_t::type_t atype, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
-	int ret;
-
-	ret = m_terminals.index_of(tname);
+	auto ret = m_terminals.find(tname);
 	/* look for default */
-	if (ret < 0 && atype == object_t::OUTPUT)
+	if (ret == m_terminals.end() && atype == object_t::OUTPUT)
 	{
 		/* look for ".Q" std output */
-		ret = m_terminals.index_of(tname + ".Q");
+		ret = m_terminals.find(tname + ".Q");
 	}
-	if (ret < 0 && required)
+	if (ret == m_terminals.end() && required)
 		log().fatal("terminal {1}({2}) not found!\n", terminal_in, tname);
 
-	core_terminal_t *term = (ret < 0 ? nullptr : m_terminals.value_at(ret));
+	core_terminal_t *term = (ret == m_terminals.end() ? nullptr : ret->second);
 
 	if (term != nullptr && term->type() != atype)
 	{
@@ -421,14 +418,12 @@ param_t *setup_t::find_param(const pstring &param_in, bool required)
 	const pstring param_in_fqn = build_fqn(param_in);
 
 	const pstring &outname = resolve_alias(param_in_fqn);
-	int ret;
-
-	ret = m_params.index_of(outname);
-	if (ret < 0 && required)
+	auto ret = m_params.find(outname);
+	if (ret == m_params.end() && required)
 		log().fatal("parameter {1}({2}) not found!\n", param_in_fqn, outname);
-	if (ret != -1)
+	if (ret != m_params.end())
 		log().debug("Found parameter {1}\n", outname);
-	return (ret == -1 ? nullptr : &m_params.value_at(ret).m_param);
+	return (ret == m_params.end() ? nullptr : &ret->second.m_param);
 }
 
 // FIXME avoid dynamic cast here
@@ -737,9 +732,9 @@ void setup_t::resolve_inputs()
 	pstring errstr("");
 
 	log().verbose("looking for terminals not connected ...");
-	for (std::size_t i = 0; i < m_terminals.size(); i++)
+	for (auto & i : m_terminals)
 	{
-		core_terminal_t *term = m_terminals.value_at(i);
+		core_terminal_t *term = i.second;
 		if (!term->has_net() && dynamic_cast< devices::NETLIB_NAME(dummy_input) *>(&term->device()) != nullptr)
 			log().warning("Found dummy terminal {1} without connections", term->name());
 		else if (!term->has_net())
@@ -847,12 +842,11 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 static pstring model_string(model_map_t &map)
 {
 	pstring ret = map["COREMODEL"] + "(";
-	for (unsigned i=0; i<map.size(); i++)
-		ret = ret + map.key_at(i) + "=" + map.value_at(i) + " ";
+	for (auto & i : map)
+		ret = ret + i.first + "=" + i.second + " ";
 
 	return ret + ")";
 }
-
 
 void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 {
@@ -866,9 +860,10 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 		if (pos >= 0) break;
 
 		key = model.ucase();
-		if (!m_models.contains(key))
+		auto i = m_models.find(key);
+		if (i == m_models.end())
 			log().fatal("Model {1} not found\n", model);
-		model = m_models[key];
+		model = i->second;
 	}
 	pstring xmodel = model.left(pos);
 
@@ -876,7 +871,8 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 		map["COREMODEL"] = key;
 	else
 	{
-		if (m_models.contains(xmodel))
+		auto i = m_models.find(xmodel);
+		if (i != m_models.end())
 			model_parse(xmodel, map);
 		else
 			log().fatal("Model doesn't exist: <{1}>\n", model_in);
@@ -903,7 +899,7 @@ const pstring setup_t::model_value_str(model_map_t &map, const pstring &entity)
 
 	if (entity != entity.ucase())
 		log().fatal("model parameters should be uppercase:{1} {2}\n", entity, model_string(map));
-	if (!map.contains(entity))
+	if (map.find(entity) == map.end())
 		log().fatal("Entity {1} not found in model {2}\n", entity, model_string(map));
 	else
 		ret = map[entity];
