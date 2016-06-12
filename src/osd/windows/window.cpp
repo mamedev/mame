@@ -1096,8 +1096,12 @@ int win_window_info::complete_create()
 	SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
 
 	// skip the positioning stuff for -video none */
-	if (video_config.mode == VIDEO_MODE_NONE)
+	if (video_config.mode == VIDEO_MODE_NONE) 
+	{
+		set_renderer(osd_renderer::make_for_type(video_config.mode, shared_from_this()));
+		renderer().create();
 		return 0;
+	}
 
 	// adjust the window position to the initial width/height
 	tempwidth = (m_win_config.width != 0) ? m_win_config.width : 640;
