@@ -794,7 +794,7 @@ namespace netlist
 	using param_int_t = param_template_t<int, param_t::INTEGER>;
 	using param_str_t = param_template_t<pstring, param_t::STRING>;
 
-	using param_logic_t = param_template_t<int, param_t::INTEGER>;
+	using param_logic_t = param_template_t<bool, param_t::LOGIC>;
 
 	class param_model_t : public param_str_t
 	{

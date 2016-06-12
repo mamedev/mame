@@ -407,7 +407,7 @@ param_template_t<C, T>::param_template_t(device_t &device, const pstring name, c
 
 template class param_template_t<double, param_t::DOUBLE>;
 template class param_template_t<int, param_t::INTEGER>;
-template class param_template_t<int, param_t::LOGIC>;
+template class param_template_t<bool, param_t::LOGIC>;
 template class param_template_t<pstring, param_t::STRING>;
 template class param_template_t<pstring, param_t::MODEL>;
 
