@@ -6567,7 +6567,7 @@ GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  driver_device,  0,       
 GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (TAB original)",                       0,                       layout_jollycrd )
 GAME(  1991, royalcrdf, royalcrd, royalcd1, royalcrd,  funworld_state, royalcdc, ROT0, "Evona Electronic","Royal Card (Slovak, encrypted)",                  MACHINE_NOT_WORKING )
 GAMEL( 1990, royalcrdg, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "bootleg",         "Royal Card (Austrian, set 7, CMC C1030 HW)",      0,                       layout_jollycrd ) // big CPLD
-GAMEL( 1991, royalcrdh, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 8)",                    MACHINE_NOT_WORKING ,    layout_jollycrd )
+GAMEL( 1991, royalcrdh, royalcrd, royalcd2, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 8)",                    MACHINE_NOT_WORKING ,    layout_jollycrd )
 GAMEL( 1991, royalcdfr, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (French)",                             0,                       layout_jollycrd )
 GAME(  1993, royalcrdp, royalcrd, cuoreuno, royalcrd,  driver_device,  0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    0 )
 GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  driver_device,  0,        ROT0, "Video Klein",     "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )
