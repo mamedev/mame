@@ -260,10 +260,10 @@ static char* dasm_control(UINT32 pc, UINT64 opcode)
 				p += sprintf(p, "CLRF");
 			break;
 		case 0x04:
-			p += sprintf("PUSH %s", regname[(ef2 >> 6) & 0x3f]);
+			p += sprintf(p, "PUSH %s", regname[(ef2 >> 6) & 0x3f]);
 			break;
 		case 0x05:
-			p += sprintf("POP %s", regname[(ef2 >> 6) & 0x3f]);
+			p += sprintf(p, "POP %s", regname[(ef2 >> 6) & 0x3f]);
 			break;
 		case 0x08:
 			p += sprintf(p, "SETM #%04X", ef2);
@@ -547,7 +547,7 @@ static char* double_xfer2_field(int sd, UINT32 field)
 			int reg = (field >> 13) & 0x1f;
 			int arx = (field >> 10) & 7;
 			int ary = (field >> 7) & 7;
-			int disp3 = (field >> 4) & 7;
+			//int disp3 = (field >> 4) & 7;
 			int md = field & 0xf;
 
 			switch (md)
@@ -572,7 +572,7 @@ static char* double_xfer2_field(int sd, UINT32 field)
 			int reg = (field >> 13) & 0x1f;
 			int arx = (field >> 10) & 7;
 			int ary = (field >> 7) & 7;
-			int disp3 = (field >> 4) & 7;
+			//int disp3 = (field >> 4) & 7;
 			int md = field & 0xf;
 
 			switch (md)
