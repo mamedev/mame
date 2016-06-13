@@ -133,6 +133,18 @@ WRITE8_MEMBER(aerofgt_state::aerfboot_okim6295_banking_w)
 		membank("okibank")->set_entry(data & 0x3);
 }
 
+WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_write_port_0_w)
+{
+	m_upd7759->port_w(space, 0, data);
+	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);
+}
+
+WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_reset_w)
+{
+	m_upd7759->reset_w(data & 0x80);
+}
+
 static ADDRESS_MAP_START( pspikes_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* work RAM */
@@ -414,8 +426,17 @@ static ADDRESS_MAP_START( wbbc97_sound_map, AS_PROGRAM, 8, aerofgt_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( karatblzbl_sound_map, AS_PROGRAM, 8, aerofgt_state )
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
+	AM_RANGE(0x0000, 0xefff) AM_ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) //AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( karatblzbl_sound_portmap, AS_PROGRAM, 8, aerofgt_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(karatblzbl_d7759_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(karatblzbl_d7759_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oki_map, AS_0, 8, aerofgt_state ) //only for aerfboot for now
@@ -1525,6 +1546,7 @@ static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
 
 	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(karatblzbl_sound_map)
+	MCFG_CPU_IO_MAP(karatblzbl_sound_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
@@ -1555,12 +1577,18 @@ static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 	
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	/* sound hardware */
 	
-	//MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // breaks savestate
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	// NEC D7759c + YM????
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2) 
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
@@ -2484,7 +2512,7 @@ ROM_END
 Karate Blazers (bootleg)
 
 CPU : MC68000
-SND : Z80 + NEC D7759c + YM???? (no number on chip)
+SND : Z80 + NEC D7759c + YM3812 (no number on chip, but ROM is the same as streetsm, which uses a YM3812)
 
 */
 
@@ -2496,7 +2524,7 @@ ROM_START( karatblzbl )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "2.u80",        0x00000, 0x10000, CRC(ca4b171e) SHA1(a05fd81f68759a09be3ec09f38d7c9364dfb6c14) )
 
-	ROM_REGION( 0x20000, "samples", 0 ) // D7759c data
+	ROM_REGION( 0x20000, "upd", 0 ) // D7759c data
 	ROM_LOAD( "1.u88",        0x00000, 0x20000, CRC(47db1605) SHA1(ae00e633eb98567f04ff97e3d63e04e049d955ec) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2792,7 +2820,7 @@ GAME( 1991, karatblz, 0,        karatblz, karatblz, driver_device, 0, ROT0,   "V
 GAME( 1991, karatblza,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Karate Blazers (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, karatblzu,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, karatblzj,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Toushin Blazers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzbl,karatblz,karatblzbl,karatblz,driver_device, 0, ROT0,   "bootleg",          "Karate Blazers (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_NO_SOUND )
+GAME( 1991, karatblzbl,karatblz,karatblzbl,karatblz,driver_device, 0, ROT0,   "bootleg",          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1991, turbofrc, 0,        turbofrc, turbofrc, driver_device, 0, ROT270, "Video System Co.", "Turbo Force (old revision)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 // there's also an undumped Turbo Force (new revision). Most notable thing in there is the points value of the rocks in level 6 (5.000 versus 500).
