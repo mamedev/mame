@@ -7,8 +7,8 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "machine/atarixga.h"
 #include "audio/atarijsa.h"
-#include "includes/slapstic.h"
 
 
 class atarigx2_state : public atarigen_state
@@ -17,8 +17,8 @@ public:
 	atarigx2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
+            m_xga(*this, "xga"),
 			m_mo_command(*this, "mo_command"),
-			m_protection_base(*this, "protection_base"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
 			m_rle(*this, "rle")
@@ -27,9 +27,9 @@ public:
 	UINT16          m_playfield_base;
 
 	required_device<atari_jsa_iiis_device> m_jsa;
+    required_device<atari_xga_device> m_xga;
 
 	required_shared_ptr<UINT32> m_mo_command;
-	required_shared_ptr<UINT32> m_protection_base;
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
@@ -41,8 +41,10 @@ public:
 	UINT16          m_playfield_xscroll;
 	UINT16          m_playfield_yscroll;
 
+    // LEGACY PROTECTION
 	UINT16          m_last_write;
 	UINT16          m_last_write_offset;
+    UINT32          m_protection_ram[0x1000];
 
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;

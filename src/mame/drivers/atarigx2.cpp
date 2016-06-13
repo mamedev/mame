@@ -5,6 +5,9 @@
     Atari GX2 hardware
 
     driver by Aaron Giles
+ 
+    Moto Frenzy protection reverse engineered by:
+        Morten Shearman Kirkegaard, Samuel Neves, Peter Wilhelmsen
 
     Games supported:
         * Space Lords (1992)
@@ -12,7 +15,7 @@
         * Road Riot's Revenge Rally (1993)
 
     Known bugs:
-        * protection devices unknown
+        * Unemulated protection for Space Lords and Road Riot's Revenge
 
 ****************************************************************************
 
@@ -125,10 +128,11 @@ WRITE32_MEMBER(atarigx2_state::mo_command_w)
 
 /*************************************
  *
- *  Protection?
+ *  Protection (non-working, legacy)
  *
  *************************************/
 
+/* Note: Will all eventually be handled in machine/atarixga.cpp */
 
 WRITE32_MEMBER(atarigx2_state::atarigx2_protection_w)
 {
@@ -143,16 +147,16 @@ WRITE32_MEMBER(atarigx2_state::atarigx2_protection_w)
 			logerror("%06X:Protection W@%04X = %04X\n", pc, offset * 4 + 2, data);
 	}
 
-	COMBINE_DATA(&m_protection_base[offset]);
+	COMBINE_DATA(&m_protection_ram[offset]);
 
 	if (ACCESSING_BITS_16_31)
 	{
-		m_last_write = m_protection_base[offset] >> 16;
+		m_last_write = m_protection_ram[offset] >> 16;
 		m_last_write_offset = offset*2;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		m_last_write = m_protection_base[offset] & 0xffff;
+		m_last_write = m_protection_ram[offset] & 0xffff;
 		m_last_write_offset = offset*2+1;
 	}
 }
@@ -1138,7 +1142,7 @@ READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
 		{ 0xffffffff, 0xffff }
 	};
 
-	UINT32 result = m_protection_base[offset];
+	UINT32 result = m_protection_ram[offset];
 
 	if (offset == 0x300)
 		result |= 0x80000000;
@@ -1175,6 +1179,12 @@ READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
 }
 
 
+READ32_MEMBER( atarigx2_state::rrreveng_prot_r )
+{
+    return 0;
+}
+
+
 /*************************************
  *
  *  Main CPU memory handlers
@@ -1185,7 +1195,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigx2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM
-	AM_RANGE(0xca0000, 0xca0fff) AM_READWRITE(atarigx2_protection_r, atarigx2_protection_w) AM_SHARE("protection_base")
 	AM_RANGE(0xd00000, 0xd1ffff) AM_READ(a2d_data_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0xff00ff00)
 	AM_RANGE(0xd40000, 0xd40fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -1458,6 +1467,8 @@ static MACHINE_CONFIG_START( atarigx2, atarigx2_state )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarigx2_state,atarigx2)
+
+    MCFG_DEVICE_ADD("xga", ATARI_XGA, 0);
 
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
@@ -2209,6 +2220,7 @@ ROM_END
 DRIVER_INIT_MEMBER(atarigx2_state,spclords)
 {
 	m_playfield_base = 0x000;
+    m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atarigx2_state::atarigx2_protection_r),this), write32_delegate(FUNC(atarigx2_state::atarigx2_protection_w),this));
 }
 
 
@@ -2237,20 +2249,16 @@ XMEM=68.A23*E.A22*!E.A21*68.A20                                 = 1101 xxxx = d0
     +68.A23*E.A22*!E.A21*!68.A20*68.A19                         = 1100 1xxx = c80000-cfffff
     +!68.A23*!E.A22*!E.A21                                      = 000x xxxx = 000000-1fffff
 */
-}
-
-READ32_MEMBER(atarigx2_state::rrreveng_prot_r)
-{
-	return 0;
+    m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atari_xga_device::read),&(*m_xga)), write32_delegate(FUNC(atari_xga_device::write),&(*m_xga)));
 }
 
 DRIVER_INIT_MEMBER(atarigx2_state,rrreveng)
 {
 	m_playfield_base = 0x000;
 
+    m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atarigx2_state::atarigx2_protection_r),this), write32_delegate(FUNC(atarigx2_state::atarigx2_protection_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca0fc0, 0xca0fc3, read32_delegate(FUNC(atarigx2_state::rrreveng_prot_r),this));
 }
-
 
 
 /*************************************
@@ -2264,10 +2272,10 @@ GAME( 1992, spclordsb, spclords, atarigx2_0x400, spclords, atarigx2_state, spclo
 GAME( 1992, spclordsg, spclords, atarigx2_0x400, spclords, atarigx2_state, spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, spclordsa, spclords, atarigx2_0x400, spclords, atarigx2_state, spclords, ROT0, "Atari Games", "Space Lords (rev A)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 
-GAME( 1992, motofren,   0,        atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, motofrenmd, motofren, atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, motofrenft, motofren, atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, motofrenmf, motofren, atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, motofren,   0,        atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy", 0 )
+GAME( 1992, motofrenmd, motofren, atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", 0 )
+GAME( 1992, motofrenft, motofren, atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", 0 )
+GAME( 1992, motofrenmf, motofren, atarigx2_0x200, motofren, atarigx2_state, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", 0 )
 
 GAME( 1993, rrreveng,  0,        atarigx2_0x400, rrreveng, atarigx2_state, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1993, rrrevenga, rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
