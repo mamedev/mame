@@ -1168,6 +1168,8 @@ files {
 	MAME_DIR .. "src/mame/machine/mathbox.cpp",
 	MAME_DIR .. "src/mame/machine/mathbox.h",
 	MAME_DIR .. "src/mame/machine/slapstic.cpp",
+	MAME_DIR .. "src/mame/machine/atarixga.cpp",
+	MAME_DIR .. "src/mame/machine/atarixga.h",
 	MAME_DIR .. "src/mame/audio/atarijsa.cpp",
 	MAME_DIR .. "src/mame/audio/atarijsa.h",
 	MAME_DIR .. "src/mame/audio/cage.cpp",
