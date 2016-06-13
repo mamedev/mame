@@ -559,26 +559,19 @@ struct do_nothing_deleter{
 
 net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	: object_t(nl, aname, NET)
-	, m_new_Q(0)
-	, m_cur_Q (0)
-	, m_time(netlist_time::zero())
-	, m_active(0)
-	, m_in_queue(2)
+	, m_new_Q(*this, "m_new_Q", 0)
+	, m_cur_Q (*this, "m_cur_Q", 0)
+	, m_time(*this, "m_time", netlist_time::zero())
+	, m_active(*this, "m_active", 0)
+	, m_in_queue(*this, "m_in_queue", 2)
 	, m_railterminal(nullptr)
-	, m_cur_Analog(0.0)
+	, m_cur_Analog(*this, "m_cur_Analog", 0.0)
 {
 	m_railterminal = mr;
 	if (mr != nullptr)
 		nl.m_nets.push_back(std::shared_ptr<net_t>(this, do_nothing_deleter()));
 	else
 		nl.m_nets.push_back(std::shared_ptr<net_t>(this));
-
-	netlist().save(*this, m_time, "m_time");
-	netlist().save(*this, m_active, "m_active");
-	netlist().save(*this, m_in_queue, "m_in_queue");
-	netlist().save(*this, m_cur_Analog, "m_cur_Analog");
-	netlist().save(*this, m_cur_Q, "m_cur_Q");
-	netlist().save(*this, m_new_Q, "m_new_Q");
 }
 
 net_t::~net_t()
@@ -794,9 +787,8 @@ core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname, const
 : device_object_t(dev, dev.name() + "." + aname, atype)
 , plib::linkedlist_t<core_terminal_t>::element_t()
 , m_net(nullptr)
-, m_state(STATE_NONEX)
+, m_state(*this, "m_state", STATE_NONEX)
 {
-	netlist().save(*this, m_state, "m_state");
 }
 
 void core_terminal_t::reset()
@@ -825,14 +817,11 @@ void core_terminal_t::set_net(net_t *anet)
 terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
 : analog_t(dev, aname, TERMINAL)
 , m_otherterm(nullptr)
-, m_Idr1(nullptr)
-, m_go1(nullptr)
-, m_gt1(nullptr)
+, m_Idr1(*this, "m_Idr1", nullptr)
+, m_go1(*this, "m_go1", nullptr)
+, m_gt1(*this, "m_gt1", nullptr)
 {
 	netlist().setup().register_term(*this);
-	netlist().save(*this, m_Idr1, "m_Idr1");
-	netlist().save(*this, m_go1, "m_go1");
-	netlist().save(*this, m_gt1, "m_gt1");
 }
 
 
