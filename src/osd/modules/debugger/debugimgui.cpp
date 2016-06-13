@@ -540,12 +540,12 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 		{
 			char str[2];
 			map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
-			ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
+			ImU32 fg_col = IM_COL32(fg.r(),fg.g(),fg.b(),fg.a());
 			str[0] = v = viewdata->byte;
 			str[1] = '\0';
 			if(bg != base)
 			{
-				ImU32 bg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(bg.r()/255.0f,bg.g()/255.0f,bg.b()/255.0f,bg.a()/255.0f));
+				ImU32 bg_col = IM_COL32(bg.r(),bg.g(),bg.b(),bg.a());
 				xy1.x++; xy2.x++;
 				drawlist->AddRectFilled(xy1,xy2,bg_col);
 				xy1.x--; xy2.x--;
@@ -564,7 +564,7 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 	// draw a rect around a view if it has focus
 	if(view_ptr->has_focus)
 	{
-		ImU32 col = ImGui::ColorConvertFloat4ToU32(ImVec4(0.5f,0.5f,0.5f,0.3f));
+		ImU32 col = IM_COL32(127,127,127,76);
 		drawlist->AddRect(ImVec2(view_ptr->ofs_x,view_ptr->ofs_y + ImGui::GetScrollY()),
 			ImVec2(view_ptr->ofs_x + view_ptr->view_width,view_ptr->ofs_y + ImGui::GetScrollY() + view_ptr->view_height),col);
 	}
