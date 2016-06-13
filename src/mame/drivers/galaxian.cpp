@@ -7643,6 +7643,17 @@ ROM_START( galaxianbl ) // looks to be a fairly plain set with modified bonus li
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "6l.bpr",            0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+	/*
+	Bootleg also seen with double sized program roms and kamakazi3 gfx roms.
+	CRC(d09b9f1a) SHA1(9799dcd6780a6916bbd63e0ef93e4d2035414108) ic4 + ic5
+	CRC(f58283e3) SHA1(edc6e72516c50fd3402281d9936574d276581ce9) ic6 + ic7
+	CRC(4c7031c0) SHA1(97f7ab0cedcd8eba1c8f6f516d84d672a2108258) 1c8 + ic9
+	CRC(9471cdd3) SHA1(d35e396b8ba39bf8229567035088037fae5effbb) ic10 + ic11
+	CRC(5766c95b) SHA1(cf6c226df0cc9d088b04ade43d6db87d278f8b09) ic12 + ic13
+	
+	CRC(977e37cf) SHA1(88ff1e4edadf5cfc83413a1fe999aecf4ba72232)
+	CRC(d0ba22c9) SHA1(678b22d10e1ae7dcea068da838bf6bd648e9ee28)
+	*/
 ROM_END
 
 ROM_START( kamakazi3 ) /* Hack of Video Games (UK) Ltd. version???? flyer spells it Kamakaze III, also no year or (c) */
