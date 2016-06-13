@@ -60,6 +60,8 @@ public:
 	// methods
 	float actual_width() const;
 	float actual_height() const;
+	bool hit_test(float x, float y, size_t &start, size_t &span) const;
+	void restyle(size_t start, size_t span, rgb_t *fgcolor, rgb_t *bgcolor);
 	int get_wrap_info(std::vector<int> &xstart, std::vector<int> &xend) const;
 	void emit(render_container *container, float x, float y);
 	void add_text(const char *text, rgb_t fgcolor = rgb_t::white, rgb_t bgcolor = rgb_t(0,0,0,0), float size = 1.0)
@@ -97,6 +99,7 @@ private:
 		char_style style;
 		source_info source;
 		float xoffset;
+		float xwidth;
 	};
 
 	// class to represent a line
@@ -110,12 +113,14 @@ private:
 		void truncate(size_t position);
 
 		// accessors
+		float xoffset() const;
 		float yoffset() const { return m_yoffset; }
 		float width() const { return m_width; }
 		float height() const { return m_height; }
 		text_justify justify() const { return m_justify; }
 		size_t character_count() const { return m_characters.size(); }
-		const positioned_char &character(size_t index) { return m_characters[index]; }
+		const positioned_char &character(size_t index) const { return m_characters[index]; }
+		positioned_char &character(size_t index) { return m_characters[index]; }
 
 	private:
 		std::vector<positioned_char> m_characters;

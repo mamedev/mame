@@ -333,6 +333,61 @@ void text_layout::word_wrap()
 
 
 //-------------------------------------------------
+//  hit_test
+//-------------------------------------------------
+
+bool text_layout::hit_test(float x, float y, size_t &start, size_t &span) const
+{
+	for (const auto &line : m_lines)
+	{
+		if (y >= line->yoffset() && y < line->yoffset() + line->height())
+		{
+			float line_xoffset = line->xoffset();
+			if (x >= line_xoffset && x < line_xoffset + line->width())
+			{
+				for (size_t i = 0; i < line->character_count(); i++)
+				{
+					const auto &ch = line->character(i);
+					if (x >= ch.xoffset && x < ch.xoffset + ch.xwidth)
+					{
+						start = ch.source.start;
+						span = ch.source.span;
+						return true;
+					}
+				}
+			}
+		}
+	}
+	start = 0;
+	span = 0;
+	return false;
+}
+
+
+//-------------------------------------------------
+//  restyle
+//-------------------------------------------------
+
+void text_layout::restyle(size_t start, size_t span, rgb_t *fgcolor, rgb_t *bgcolor)
+{
+	for (const auto &line : m_lines)
+	{
+		for (size_t i = 0; i < line->character_count(); i++)
+		{
+			auto &ch = line->character(i);
+			if (ch.source.start >= start && ch.source.start + ch.source.span <= start + span)
+			{
+				if (fgcolor != nullptr)
+					ch.style.fgcolor = *fgcolor;
+				if (bgcolor != nullptr)
+					ch.style.bgcolor = *bgcolor;
+			}
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  get_wrap_info
 //-------------------------------------------------
 
@@ -370,21 +425,7 @@ void text_layout::emit(render_container *container, float x, float y)
 {
 	for (const auto &line : m_lines)
 	{
-		// figure out justification
-		float line_xoffset;
-		switch (line->justify())
-		{
-			case LEFT:
-			default:
-				line_xoffset = 0;
-				break;
-			case CENTER:
-				line_xoffset = (width() - line->width()) / 2;
-				break;
-			case RIGHT:
-				line_xoffset = width() - line->width();
-				break;
-		}
+		float line_xoffset = line->xoffset();
 
 		// emit every single character
 		for (auto i = 0; i < line->character_count(); i++)
@@ -439,6 +480,7 @@ void text_layout::line::add_character(unicode_char ch, const char_style &style, 
 	positioned_char positioned_char = { 0, };
 	positioned_char.character = ch;
 	positioned_char.xoffset = m_width;
+	positioned_char.xwidth = chwidth;
 	positioned_char.style = style;
 	positioned_char.source = source;
 
@@ -448,6 +490,30 @@ void text_layout::line::add_character(unicode_char ch, const char_style &style, 
 
 	// we might be bigger
 	m_height = MAX(m_height, style.size * m_layout.yscale());
+}
+
+
+//-------------------------------------------------
+//  line::xoffset
+//-------------------------------------------------
+
+float text_layout::line::xoffset() const
+{
+	float result;
+	switch (justify())
+	{
+		case LEFT:
+		default:
+			result = 0;
+			break;
+		case CENTER:
+			result = (m_layout.width() - width()) / 2;
+			break;
+		case RIGHT:
+			result = m_layout.width() - width();
+			break;
+	}
+	return result;
 }
 
 
