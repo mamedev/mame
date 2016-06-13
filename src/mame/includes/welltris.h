@@ -45,7 +45,6 @@ public:
 	DECLARE_WRITE16_MEMBER(gfxbank_w);
 	DECLARE_WRITE16_MEMBER(scrollreg_w);
 	DECLARE_WRITE16_MEMBER(charvideoram_w);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(pending_sound_r);
 

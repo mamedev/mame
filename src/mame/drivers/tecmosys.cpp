@@ -432,13 +432,6 @@ static GFXDECODE_START( tecmosys )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(tecmosys_state::sound_irq)
-{
-	/* IRQ */
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 void tecmosys_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("audiocpu")->base(), 0x4000);
@@ -485,7 +478,7 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymf", YMF262, XTAL_14_31818MHz)
-	MCFG_YMF262_IRQ_HANDLER(WRITELINE(tecmosys_state, sound_irq))
+	MCFG_YMF262_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)

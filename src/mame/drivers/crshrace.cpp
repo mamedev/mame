@@ -402,12 +402,6 @@ static GFXDECODE_START( crshrace )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(crshrace_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 void crshrace_state::machine_start()
 {
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
@@ -469,7 +463,7 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(crshrace_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

@@ -363,12 +363,6 @@ static GFXDECODE_START( f1gp2 )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(f1gp_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 MACHINE_START_MEMBER(f1gp_state,f1gpb)
 {
 	save_item(NAME(m_pending_command));
@@ -451,7 +445,7 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(f1gp_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

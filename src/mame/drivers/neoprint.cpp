@@ -81,7 +81,6 @@ public:
 	UINT32 screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift);
 	void audio_cpu_assert_nmi();
-	DECLARE_WRITE_LINE_MEMBER(audio_cpu_irq);
 };
 
 
@@ -466,11 +465,6 @@ static GFXDECODE_START( neoprint )
 	GFXDECODE_ENTRY( "gfx1", 0, neoprint_layout,   0x0, 0x1000 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(neoprint_state::audio_cpu_irq)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 void neoprint_state::machine_start()
 {
 	// enable rtc and serial mode
@@ -512,7 +506,7 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 24000000 / 3)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(neoprint_state, audio_cpu_irq))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.60)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -557,7 +551,7 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 24000000 / 3)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(neoprint_state, audio_cpu_irq))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.60)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

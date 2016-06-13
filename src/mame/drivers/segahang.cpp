@@ -309,17 +309,6 @@ READ8_MEMBER( segahang_state::sound_data_r )
 }
 
 
-//-------------------------------------------------
-//  sound_irq - signal an IRQ to the sound CPU
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( segahang_state::sound_irq )
-{
-	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
 //**************************************************************************
 //  I8751-RELATED VBLANK INTERRUPT HANDLERS
 //**************************************************************************
@@ -847,7 +836,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203 )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK_8MHz/2)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(segahang_state, sound_irq))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.13)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.13)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.13)
@@ -875,7 +864,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203x2 )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK_8MHz/2)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(segahang_state, sound_irq))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.13)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.13)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.13)

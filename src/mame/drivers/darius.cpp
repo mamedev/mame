@@ -681,16 +681,6 @@ static GFXDECODE_START( darius )
 GFXDECODE_END
 
 
-/**************************************************************
-                        YM2203 (SOUND)
-**************************************************************/
-
-/* handler called by the YM2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(darius_state::irqhandler) /* assumes Z80 sandwiched between 68Ks */
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /***********************************************************
                        MACHINE DRIVERS
 ***********************************************************/
@@ -803,7 +793,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_8MHz/2) /* 4 MHz */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(darius_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) /* assumes Z80 sandwiched between 68Ks */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(darius_state, darius_write_portA0))  /* portA write */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(darius_state, darius_write_portB0))  /* portB write */
 	MCFG_SOUND_ROUTE(0, "filter0.0l", 0.08)

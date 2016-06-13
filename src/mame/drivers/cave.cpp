@@ -1956,11 +1956,6 @@ MACHINE_RESET_MEMBER(cave_state,cave)
 	m_agallet_vblank_irq = 0;
 }
 
-WRITE_LINE_MEMBER(cave_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /***************************************************************************
                                 Dangun Feveron
 ***************************************************************************/
@@ -2250,7 +2245,7 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_32MHz/8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -2353,7 +2348,7 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_4MHz)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -2583,7 +2578,7 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz / 4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)

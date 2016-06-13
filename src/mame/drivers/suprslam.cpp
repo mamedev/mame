@@ -272,12 +272,6 @@ static GFXDECODE_START( suprslam )
 	GFXDECODE_ENTRY( "gfx3", 0, suprslam_16x16x4_layout, 0x100, 16 )
 GFXDECODE_END
 
-/*** MORE SOUND **************************************************************/
-
-WRITE_LINE_MEMBER(suprslam_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 /*** MACHINE DRIVER **********************************************************/
 
@@ -336,7 +330,7 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(suprslam_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

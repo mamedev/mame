@@ -883,18 +883,6 @@ static GFXDECODE_START( robokid )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-WRITE_LINE_MEMBER(ninjakd2_state::irqhandler)
-{
-	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /*************************************
  *
  *  Machine drivers
@@ -967,7 +955,7 @@ static MACHINE_CONFIG_START( ninjakd2_core, ninjakd2_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)       /* verified */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(ninjakd2_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)

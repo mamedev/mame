@@ -115,7 +115,6 @@ public:
 	DECLARE_MACHINE_RESET(coh1001l);
 	DECLARE_MACHINE_RESET(coh1002v);
 	DECLARE_MACHINE_RESET(coh1002m);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	INTERRUPT_GEN_MEMBER(qsound_interrupt);
 	void atpsx_dma_read(UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void atpsx_dma_write(UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
@@ -1104,11 +1103,6 @@ static ADDRESS_MAP_START( fx1a_sound_map, AS_PROGRAM, 8, zn_state )
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(fx1a_sound_bankswitch_w)
 ADDRESS_MAP_END
 
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(zn_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 	MCFG_CPU_MODIFY("maincpu")
@@ -1119,7 +1113,7 @@ static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610B, XTAL_16MHz/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(zn_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)

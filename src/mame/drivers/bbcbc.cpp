@@ -33,7 +33,6 @@ public:
 	required_device<generic_slot_device> m_cart;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
 };
 
 
@@ -104,10 +103,6 @@ static INPUT_PORTS_START( bbcbc )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Play, No") PORT_CODE(KEYCODE_B) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(bbcbc_state::tms_interrupt)
-{
-	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 static const z80_daisy_config bbcbc_daisy_chain[] =
 {
@@ -137,7 +132,7 @@ static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 
 	MCFG_DEVICE_ADD( "tms9129", TMS9129, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(bbcbc_state, tms_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", 0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9129", tms9928a_device, screen_update )
 

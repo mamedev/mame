@@ -244,7 +244,6 @@ public:
 	void cave_get_sprite_info(int chip);
 	void cave_get_sprite_info_all();
 	void sailormn_tilebank_w(int bank);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 	void update_irq_state();
 	void unpack_sprites(const char *region);

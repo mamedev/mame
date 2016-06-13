@@ -318,18 +318,6 @@ GFXDECODE_END
 
 /******************************************************************************
 
-    Sound definitions
-
-******************************************************************************/
-
-WRITE_LINE_MEMBER(inufuku_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-/******************************************************************************
-
     Machine driver
 
 ******************************************************************************/
@@ -406,7 +394,7 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 32000000/4)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(inufuku_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)

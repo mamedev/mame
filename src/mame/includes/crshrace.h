@@ -72,5 +72,4 @@ public:
 	void screen_eof_crshrace(screen_device &screen, bool state);
 	void draw_bg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

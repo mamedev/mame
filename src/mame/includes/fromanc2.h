@@ -117,5 +117,4 @@ public:
 	inline void fromancr_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int layer );
 	void fromancr_gfxbank_w( int data );
 	inline void fromanc4_vram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int layer );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

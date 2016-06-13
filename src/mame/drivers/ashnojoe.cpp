@@ -270,12 +270,6 @@ static GFXDECODE_START( ashnojoe )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
-
-WRITE_LINE_MEMBER(ashnojoe_state::ym2203_irq_handler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 WRITE8_MEMBER(ashnojoe_state::ym2203_write_a)
 {
 	/* This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash */
@@ -351,7 +345,7 @@ static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(ashnojoe_state, ym2203_irq_handler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ashnojoe_state, ym2203_write_a))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ashnojoe_state, ym2203_write_b))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)

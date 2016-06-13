@@ -738,11 +738,6 @@ static GFXDECODE_START( drgnbowl )
 	GFXDECODE_ENTRY( "gfx3", 0,       drgnbowl_spritelayout, 0x100, 16 )    /* sprites 16x16 */
 GFXDECODE_END
 
-/* handler called by the 2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(gaiden_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 static MACHINE_CONFIG_START( shadoww, gaiden_state )
 
@@ -791,7 +786,7 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gaiden_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -977,7 +972,7 @@ static MACHINE_CONFIG_START( mastninj, gaiden_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000) /* ?? MHz */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gaiden_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)

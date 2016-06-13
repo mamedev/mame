@@ -670,14 +670,6 @@ static GFXDECODE_START( welltris )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(welltris_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
 DRIVER_INIT_MEMBER(welltris_state,welltris)
 {
 #if WELLTRIS_4P_HACK
@@ -730,7 +722,7 @@ static MACHINE_CONFIG_START( welltris, welltris_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(welltris_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)

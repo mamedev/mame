@@ -2827,13 +2827,6 @@ static GFXDECODE_START( footchmpbl )
 GFXDECODE_END
 
 
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitof2_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 WRITE8_MEMBER(taitof2_state::cameltrya_porta_w)
 {
 	// Implement //
@@ -2887,7 +2880,7 @@ static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 24000000/3) /* Was 16000000/2, but only a 24Mhz OSC */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitof2_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -3716,7 +3709,7 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 24000000/8) /* verified on pcb  */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitof2_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitof2_state, cameltrya_porta_w))   /* portA write - not implemented */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)

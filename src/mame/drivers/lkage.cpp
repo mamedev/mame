@@ -476,10 +476,6 @@ static GFXDECODE_START( lkage )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprite_layout,  0, 16 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(lkage_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void lkage_state::machine_start()
 {
@@ -569,7 +565,7 @@ static MACHINE_CONFIG_START( lkage, lkage_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK )
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lkage_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -616,7 +612,7 @@ static MACHINE_CONFIG_START( lkageb, lkage_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lkage_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)

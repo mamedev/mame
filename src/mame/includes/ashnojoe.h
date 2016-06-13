@@ -89,6 +89,5 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	UINT32 screen_update_ashnojoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(ym2203_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(ashnojoe_vclk_cb);
 };

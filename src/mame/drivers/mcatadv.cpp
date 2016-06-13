@@ -413,13 +413,6 @@ static GFXDECODE_START( mcatadv )
 GFXDECODE_END
 
 
-/* Stolen from Psikyo.c */
-WRITE_LINE_MEMBER(mcatadv_state::sound_irq)
-{
-	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 void mcatadv_state::machine_start()
 {
 	UINT8 *ROM = memregion("soundcpu")->base();
@@ -469,7 +462,7 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2) /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(mcatadv_state, sound_irq))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.32)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.32)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.5)
@@ -486,7 +479,7 @@ static MACHINE_CONFIG_DERIVED( nost, mcatadv )
 	MCFG_DEVICE_REMOVE("rspeaker")
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_16MHz/2) /* verified on pcb */
-		MCFG_YM2610_IRQ_HANDLER(WRITELINE(mcatadv_state, sound_irq))
+		MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 		MCFG_SOUND_ROUTE(0, "mono", 0.2)
 		MCFG_SOUND_ROUTE(1, "mono", 0.5)
 		MCFG_SOUND_ROUTE(2, "mono", 0.5)

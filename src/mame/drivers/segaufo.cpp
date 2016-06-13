@@ -104,7 +104,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(pit_out1);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2);
-	DECLARE_WRITE_LINE_MEMBER(ym3438_irq);
 	DECLARE_READ8_MEMBER(crane_limits_r);
 	DECLARE_WRITE8_MEMBER(stepper_w);
 	DECLARE_WRITE8_MEMBER(cp_lamps_w);
@@ -747,11 +746,6 @@ void ufo_state::machine_start()
 	save_item(NAME(m_stepper));
 }
 
-WRITE_LINE_MEMBER(ufo_state::ym3438_irq)
-{
-	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 static MACHINE_CONFIG_START( newufo, ufo_state )
 
 	/* basic machine hardware */
@@ -795,7 +789,7 @@ static MACHINE_CONFIG_START( newufo, ufo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym", YM3438, XTAL_16MHz/2)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(ufo_state, ym3438_irq))
+	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 MACHINE_CONFIG_END

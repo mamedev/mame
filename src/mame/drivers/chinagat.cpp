@@ -107,7 +107,6 @@ public:
 	DECLARE_WRITE8_MEMBER( saiyugoub1_m5205_clk_w );
 	DECLARE_READ8_MEMBER( saiyugoub1_m5205_irq_r );
 	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(chinagat_irq_handler);
 	optional_device<msm5205_device> m_adpcm;
 };
 
@@ -506,11 +505,6 @@ static GFXDECODE_START( chinagat )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(chinagat_state::chinagat_irq_handler)
-{
-	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE );
-}
-
 MACHINE_START_MEMBER(chinagat_state,chinagat)
 {
 	/* configure banks */
@@ -679,7 +673,7 @@ static MACHINE_CONFIG_START( saiyugoub2, chinagat_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3579545)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(chinagat_state, chinagat_irq_handler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)

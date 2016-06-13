@@ -42,8 +42,6 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-
-	DECLARE_WRITE_LINE_MEMBER(ym2203_irq);
 };
 
 
@@ -103,11 +101,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(capr1_state::ym2203_irq)
-{
-	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 static MACHINE_CONFIG_START( cspin2, capr1_state )
 
 	/* basic machine hardware */
@@ -121,7 +114,7 @@ static MACHINE_CONFIG_START( cspin2, capr1_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym", YM2203, 4000000) // clock frequency unknown
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(capr1_state, ym2203_irq))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 	//MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	//MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)

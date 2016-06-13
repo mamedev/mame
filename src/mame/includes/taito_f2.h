@@ -184,7 +184,6 @@ public:
 	void draw_roz_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 priority);
 	void taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 	UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

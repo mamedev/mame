@@ -131,7 +131,6 @@ public:
 	UINT32 screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(bublbobl_m68705_interrupt);
 	void configure_banks(  );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

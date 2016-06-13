@@ -81,7 +81,6 @@ public:
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(subcpu_suspend);
 	TIMER_CALLBACK_MEMBER(subcpu_resume);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE_LINE_MEMBER(sothello_vdp_interrupt);
 	void unlock_shared_ram();
@@ -329,10 +328,6 @@ static INPUT_PORTS_START( sothello )
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(sothello_state::irqhandler)
-{
-	m_subcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 WRITE_LINE_MEMBER(sothello_state::sothello_vdp_interrupt)
 {
@@ -361,7 +356,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 	MCFG_CPU_PROGRAM_MAP(soundcpu_mem_map)
 	MCFG_CPU_IO_MAP(soundcpu_io_map)
 
-	MCFG_CPU_ADD("sub",M6809, SUBCPU_CLOCK)
+	MCFG_CPU_ADD("sub", M6809, SUBCPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(subcpu_mem_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -377,7 +372,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, YM_CLOCK)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(sothello_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -387,7 +382,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm",MSM5205, MSM_CLOCK)
+	MCFG_SOUND_ADD("msm", MSM5205, MSM_CLOCK)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(sothello_state, adpcm_int))      /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* changed on the fly */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

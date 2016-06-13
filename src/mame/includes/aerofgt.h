@@ -5,6 +5,7 @@
 #include "video/vsystem_spr.h"
 #include "video/vsystem_spr2.h"
 #include "sound/okim6295.h"
+#include "sound/upd7759.h"
 
 class aerofgt_state : public driver_device
 {
@@ -22,6 +23,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
+		m_upd7759(*this, "upd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spr(*this, "vsystem_spr"),
@@ -43,12 +45,14 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
+	optional_device<upd7759_device> m_upd7759; // karatblzbl
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<vsystem_spr_device> m_spr; // only the aerofgt parent uses this chip
 	optional_device<vsystem_spr2_device> m_spr_old; // every other (non-bootleg) uses this
 	optional_device<vsystem_spr2_device> m_spr_old2; //  or a pair of them..
 	optional_device<generic_latch_8_device> m_soundlatch;
+	
 
 
 	/* video-related */
@@ -98,6 +102,8 @@ public:
 	DECLARE_WRITE16_MEMBER(wbbc97_bitmap_enable_w);
 	DECLARE_WRITE16_MEMBER(pspikesb_oki_banking_w);
 	DECLARE_WRITE16_MEMBER(aerfboo2_okim6295_banking_w);
+	DECLARE_WRITE8_MEMBER(karatblzbl_d7759_write_port_0_w);
+	DECLARE_WRITE8_MEMBER(karatblzbl_d7759_reset_w);
 	TILE_GET_INFO_MEMBER(get_pspikes_tile_info);
 	TILE_GET_INFO_MEMBER(karatblz_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(karatblz_bg2_tile_info);

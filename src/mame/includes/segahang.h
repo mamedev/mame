@@ -55,7 +55,6 @@ public:
 
 	// Z80 sound CPU read/write handlers
 	DECLARE_READ8_MEMBER( sound_data_r );
-	DECLARE_WRITE_LINE_MEMBER( sound_irq );
 
 	// I8751-related VBLANK interrupt hanlders
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );

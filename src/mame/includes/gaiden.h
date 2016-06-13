@@ -111,5 +111,4 @@ public:
 	void drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void descramble_drgnbowl(int descramble_cpu);
 	void descramble_mastninj_gfx(UINT8* src);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
