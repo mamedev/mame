@@ -24,14 +24,13 @@ namespace netlist
 		, m_B2(*this, "B2")
 		, m_B3(*this, "B3")
 		, m_B4(*this, "B4")
-		, m_lastr(0)
+		, m_lastr(*this, "m_lastr", 0)
 		, m_S1(*this, "S1")
 		, m_S2(*this, "S2")
 		, m_S3(*this, "S3")
 		, m_S4(*this, "S4")
 		, m_C4(*this, "C4")
 		{
-			save(NLNAME(m_lastr));
 		}
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
@@ -47,7 +46,7 @@ namespace netlist
 		logic_input_t m_B3;
 		logic_input_t m_B4;
 
-		UINT8 m_lastr;
+		state_var<unsigned> m_lastr;
 
 		logic_output_t m_S1;
 		logic_output_t m_S2;

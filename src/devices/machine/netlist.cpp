@@ -322,9 +322,9 @@ void netlist_mame_device_t::device_start()
 	m_setup->start_devices();
 	m_setup->resolve_inputs();
 
-	netlist().save_item(this, m_rem, "m_rem");
-	netlist().save_item(this, m_div, "m_div");
-	netlist().save_item(this, m_old, "m_old");
+	netlist().save(*this, m_rem, "m_rem");
+	netlist().save(*this, m_div, "m_div");
+	netlist().save(*this, m_old, "m_old");
 
 	save_state();
 
@@ -366,7 +366,7 @@ ATTR_COLD void netlist_mame_device_t::device_post_load()
 {
 	LOG_DEV_CALLS(("device_post_load\n"));
 
-	netlist().post_load();
+	netlist().state().post_load();
 	netlist().rebuild_lists();
 }
 
@@ -374,7 +374,7 @@ ATTR_COLD void netlist_mame_device_t::device_pre_save()
 {
 	LOG_DEV_CALLS(("device_pre_save\n"));
 
-	netlist().pre_save();
+	netlist().state().pre_save();
 }
 
 void netlist_mame_device_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -399,53 +399,44 @@ ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::check_mame_abort_slice()
 
 ATTR_COLD void netlist_mame_device_t::save_state()
 {
-	for (auto const & s : netlist().save_list())
+	for (auto const & s : netlist().state().save_list())
 	{
 		netlist().log().debug("saving state for {1}\n", s->m_name.cstr());
-		switch (s->m_dt)
+		if (s->m_dt.is_float)
 		{
-			case pstate_data_type_e::DT_DOUBLE:
-				{
-					double *td = s->resolved<double>();
-					if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
-				}
-				break;
-			case pstate_data_type_e::DT_FLOAT:
-				{
-					float *td = s->resolved<float>();
-					if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
-				}
-				break;
-#if (PHAS_INT128)
-			case pstate_data_type_e::DT_INT128:
-				// FIXME: we are cheating here
-				save_pointer((char *) s->m_ptr, s->m_name.cstr(), s->m_count * sizeof(INT128));
-				break;
-#endif
-			case pstate_data_type_e::DT_INT64:
-				save_pointer((INT64 *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_INT16:
-				save_pointer((INT16 *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_INT8:
-				save_pointer((INT8 *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_INT:
-				save_pointer((int *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_BOOLEAN:
-				save_pointer((bool *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_CUSTOM:
-				break;
-			case pstate_data_type_e::NOT_SUPPORTED:
-			default:
-				netlist().log().fatal("found unsupported save element %s\n", s->m_name);
-				break;
+			if (s->m_dt.size == sizeof(double))
+			{
+				double *td = s->resolved<double>();
+				if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
+			}
+			else if (s->m_dt.size == sizeof(float))
+			{
+				float *td = s->resolved<float>();
+				if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
+			}
+			else
+				netlist().log().fatal("Unknown floating type for {1}\n", s->m_name.cstr());
 		}
+		else if (s->m_dt.is_integral)
+		{
+			if (s->m_dt.size == sizeof(INT64))
+				save_pointer((INT64 *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(INT32))
+				save_pointer((INT32 *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(INT16))
+				save_pointer((INT16 *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(INT8))
+				save_pointer((INT8 *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else
+				netlist().log().fatal("Unknown integral type size {1} for {2}\n", s->m_dt.size, s->m_name.cstr());
+		}
+		else if (s->m_dt.is_custom)
+		{
+			/* do nothing */
+		}
+		else
+			netlist().log().fatal("found unsupported save element {1}\n", s->m_name);
 	}
-
 }
 
 // ----------------------------------------------------------------------------------------
@@ -566,7 +557,7 @@ void netlist_mame_sound_device_t::device_start()
 
 	// Configure outputs
 
-	plib::pvector_t<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out>();
+	std::vector<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out>();
 	if (outdevs.size() == 0)
 		fatalerror("No output devices");
 
@@ -592,7 +583,7 @@ void netlist_mame_sound_device_t::device_start()
 	m_num_inputs = 0;
 	m_in = nullptr;
 
-	plib::pvector_t<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
+	std::vector<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
 	if (indevs.size() > 1)
 		fatalerror("A maximum of one input device is allowed!");
 	if (indevs.size() == 1)

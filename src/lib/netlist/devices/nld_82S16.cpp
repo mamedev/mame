@@ -22,8 +22,8 @@ namespace netlist
 		, m_WEQ(*this, "WEQ")
 		, m_DIN(*this, "DIN")
 		, m_DOUTQ(*this, "DOUTQ")
+		, m_ram(*this, "m_ram", 0)
 		{
-			save(NLNAME(m_ram));
 		}
 
 		NETLIB_RESETI();
@@ -39,7 +39,7 @@ namespace netlist
 		logic_output_t m_DOUTQ;
 
 		//netlist_state_t<UINT8[256]> m_ram;
-		UINT64 m_ram[4]; // 256 bits
+		state_var<UINT64[4]> m_ram; // 256 bits
 	};
 
 	NETLIB_OBJECT_DERIVED(82S16_dip, 82S16)

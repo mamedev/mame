@@ -23,9 +23,8 @@ namespace netlist
 		, m_C(*this, {{"C0", "C1", "C2", "C3"}})
 		, m_G(*this, "G")
 		, m_Y(*this, "AY") //FIXME: Change netlists
-		, m_chan(0)
+		, m_chan(*this, "m_chan", 0)
 		{
-			save(NLNAME(m_chan));
 		}
 
 		NETLIB_RESETI();
@@ -37,7 +36,7 @@ namespace netlist
 
 		logic_output_t m_Y;
 
-		int m_chan;
+		state_var<unsigned> m_chan;
 	};
 
 	NETLIB_OBJECT(74153)

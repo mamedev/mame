@@ -156,8 +156,10 @@
 #define NLBASE_H_
 
 #include <vector>
+#include <unordered_map>
 #include <memory>
 #include <cmath>
+#include <cstdint>
 
 #include "nl_lists.h"
 #include "nl_time.h"
@@ -169,11 +171,6 @@
 // Type definitions
 // ----------------------------------------------------------------------------------------
 
-/*
- *  unsigned int would be a 20% speed increase over UINT8 for pong.
- *  For breakout it causes a slight decrease.
- *
- */
 using netlist_sig_t = std::uint32_t;
 
  //============================================================
@@ -293,7 +290,7 @@ namespace netlist
 	// model_map_t
 	// -----------------------------------------------------------------------------
 
-	using model_map_t = plib::hashmap_t<pstring, pstring>;
+	using model_map_t = std::unordered_map<pstring, pstring>;
 
 	// -----------------------------------------------------------------------------
 	// logic_family_t
@@ -345,7 +342,7 @@ namespace netlist
 	// object_t
 	// -----------------------------------------------------------------------------
 
-	class object_t : public plib::pstate_interface_t<object_t>
+	class object_t
 	{
 		P_PREVENT_COPYING(object_t)
 	public:
@@ -363,8 +360,6 @@ namespace netlist
 		~object_t();
 
 		const pstring &name() const;
-
-		plib::pstate_manager_t &state_manager();
 
 		type_t type() const { return m_objtype; }
 		bool is_type(const type_t atype) const { return (m_objtype == atype); }
@@ -408,7 +403,7 @@ namespace netlist
 		P_PREVENT_COPYING(core_terminal_t)
 	public:
 
-		using list_t = plib::pvector_t<core_terminal_t *>;
+		using list_t = std::vector<core_terminal_t *>;
 
 		/* needed here ... */
 
@@ -474,8 +469,6 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(terminal_t)
 	public:
-
-		using list_t = plib::pvector_t<terminal_t *>;
 
 		terminal_t(core_device_t &dev, const pstring &aname);
 
@@ -594,9 +587,6 @@ namespace netlist
 		P_PREVENT_COPYING(net_t)
 	public:
 
-		using ptr_t = net_t *;
-		using list_t = plib::pvector_t<std::shared_ptr<net_t>>;
-
 		net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~net_t();
 
@@ -622,7 +612,7 @@ namespace netlist
 		bool isRailNet() const { return !(m_railterminal == nullptr); }
 		core_terminal_t & railterminal() const { return *m_railterminal; }
 
-		int num_cons() const { return m_core_terms.size(); }
+		std::size_t num_cons() const { return m_core_terms.size(); }
 
 		void inc_active(core_terminal_t &term);
 		void dec_active(core_terminal_t &term);
@@ -631,15 +621,15 @@ namespace netlist
 
 		void move_connections(net_t *new_net);
 
-		plib::pvector_t<core_terminal_t *> m_core_terms; // save post-start m_list ...
+		std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
 	protected:
 		netlist_sig_t m_new_Q;
 		netlist_sig_t m_cur_Q;
 
-		netlist_time m_time;
-		INT32        m_active;
-		UINT8	     m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
+		netlist_time  m_time;
+		INT32         m_active;
+		UINT8    	  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
 	private:
 		plib::linkedlist_t<core_terminal_t> m_list_active;
@@ -655,8 +645,6 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(logic_net_t)
 	public:
-
-		using list_t = plib::pvector_t<logic_net_t *>;
 
 		logic_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t() { };
@@ -699,7 +687,7 @@ namespace netlist
 		P_PREVENT_COPYING(analog_net_t)
 	public:
 
-		using list_t =  plib::pvector_t<analog_net_t *>;
+		using list_t =  std::vector<analog_net_t *>;
 
 		analog_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 
@@ -712,8 +700,8 @@ namespace netlist
 		devices::matrix_solver_t *solver() { return m_solver; }
 		void set_solver(devices::matrix_solver_t *solver) { m_solver = solver; }
 
-		bool already_processed(plib::pvector_t<list_t> &groups);
-		void process_net(plib::pvector_t<list_t> &groups);
+		bool already_processed(std::vector<list_t> &groups);
+		void process_net(std::vector<list_t> &groups);
 
 	private:
 		devices::matrix_solver_t *m_solver;
@@ -835,9 +823,6 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(core_device_t)
 	public:
-
-		using list_t = plib::pvector_t<core_device_t *>;
-
 		core_device_t(netlist_t &owner, const pstring &name);
 		core_device_t(core_device_t &owner, const pstring &name);
 
@@ -965,9 +950,6 @@ namespace netlist
 		void connect_late(const pstring &t1, const pstring &t2);
 		void connect_late(core_terminal_t &t1, core_terminal_t &t2);
 		void connect_post_start(core_terminal_t &t1, core_terminal_t &t2);
-
-		plib::pvector_t<pstring> m_terminals;
-
 	protected:
 
 		NETLIB_UPDATEI() { }
@@ -1005,14 +987,14 @@ namespace netlist
 
 	class queue_t : public timed_queue<net_t *, netlist_time>,
 							public object_t,
-							public plib::pstate_callback_t
+							public plib::state_manager_t::callback_t
 	{
 	public:
 		queue_t(netlist_t &nl);
 
 	protected:
 
-		void register_state(plib::pstate_manager_t &manager, const pstring &module) override;
+		void register_state(plib::state_manager_t &manager, const pstring &module) override;
 		void on_pre_save() override;
 		void on_post_load() override;
 
@@ -1028,7 +1010,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 
-	class netlist_t : public plib::pstate_manager_t, public plib::plog_dispatch_intf //, public device_owner_t
+	class netlist_t : public plib::plog_dispatch_intf //, public device_owner_t
 	{
 		P_PREVENT_COPYING(netlist_t)
 	public:
@@ -1041,18 +1023,18 @@ namespace netlist
 		void start();
 		void stop();
 
-		 const queue_t &queue() const { return m_queue; }
-		 queue_t &queue() { return m_queue; }
-		 const netlist_time time() const { return m_time; }
-		 devices::NETLIB_NAME(solver) *solver() const { return m_solver; }
-		 devices::NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
+		const queue_t &queue() const { return m_queue; }
+		queue_t &queue() { return m_queue; }
+		const netlist_time time() const { return m_time; }
+		devices::NETLIB_NAME(solver) *solver() const { return m_solver; }
+		devices::NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
 		nl_double gmin() const;
 
 		void push_to_queue(net_t &out, const netlist_time attime) NOEXCEPT;
 		void remove_from_queue(net_t &out);
 
 		void process_queue(const netlist_time &delta);
-		void abort_current_queue_slice() { m_stop = netlist_time::zero(); }
+		void abort_current_queue_slice() { m_queue.retime(m_time, nullptr); }
 
 		bool use_deactivate() const { return m_use_deactivate; }
 
@@ -1064,9 +1046,9 @@ namespace netlist
 		net_t *find_net(const pstring &name);
 
 		template<class device_class>
-		plib::pvector_t<device_class *> get_device_list()
+		std::vector<device_class *> get_device_list()
 		{
-			plib::pvector_t<device_class *> tmp;
+			std::vector<device_class *> tmp;
 			for (auto &d : m_devices)
 			{
 				device_class *dev = dynamic_cast<device_class *>(d.get());
@@ -1097,16 +1079,27 @@ namespace netlist
 		plib::plog_base<NL_DEBUG> &log() { return m_log; }
 		const plib::plog_base<NL_DEBUG> &log() const { return m_log; }
 
+		plib::state_manager_t &state() { return m_state; }
+
+		template<typename O, typename C> void save(O &owner, C &state, const pstring &stname)
+		{
+			this->state().save_item((void *)&owner, state, pstring(owner.name()) + "." + stname);
+		}
+		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const int count)
+		{
+			this->state().save_state_ptr((void *)&owner, pstring(owner.name()) + "." + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
+		}
+
 		virtual void reset();
 
 		plib::dynlib &lib() { return *m_lib; }
 
 		void print_stats() const;
 
-		plib::pvector_t<plib::owned_ptr<core_device_t>> m_devices;
+		std::vector<plib::owned_ptr<core_device_t>> m_devices;
 
 		/* sole use is to manage lifetime of net objects */
-		net_t::list_t m_nets;
+		std::vector<std::shared_ptr<net_t>> m_nets;
 
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
@@ -1121,16 +1114,16 @@ protected:
 	#endif
 
 	private:
-		netlist_time                m_stop;     // target time for current queue processing
-
+		plib::state_manager_t 		m_state;
+		/* mostly rw */
 		netlist_time                m_time;
-		bool                        m_use_deactivate;
 		queue_t                     m_queue;
+		/* mostly rw */
+		bool                        m_use_deactivate;
 
 		devices::NETLIB_NAME(mainclock) *    m_mainclock;
 		devices::NETLIB_NAME(solver) *       m_solver;
 		devices::NETLIB_NAME(gnd) *          m_gnd;
-
 		devices::NETLIB_NAME(netlistparams) *m_params;
 
 		pstring m_name;
@@ -1138,6 +1131,50 @@ protected:
 		plib::plog_base<NL_DEBUG> m_log;
 		plib::dynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
 	};
+
+	template <typename T>
+	struct state_var
+	{
+	public:
+		state_var(device_t &dev, const pstring name, const T &value)
+		: m_value(value)
+		{
+			dev.netlist().save(dev, m_value, name);
+		}
+
+		state_var(const state_var &rhs) NOEXCEPT = default;
+		state_var(state_var &&rhs) NOEXCEPT = default;
+		state_var &operator=(const state_var rhs) { m_value = rhs.m_value; return *this; }
+		state_var &operator=(const T rhs) { m_value = rhs; return *this; }
+		operator T & () { return m_value; }
+		T & operator()() { return m_value; }
+		operator const T & () const { return m_value; }
+		const T & operator()() const { return m_value; }
+	private:
+		T m_value;
+	};
+
+	template <typename T, std::size_t N>
+	struct state_var<T[N]>
+	{
+	public:
+		state_var(device_t &dev, const pstring name, const T & value)
+		{
+			dev.netlist().save(dev, m_value, name);
+			for (int i=0; i<N; i++)
+				m_value[i] = value;
+		}
+
+		state_var(const state_var &rhs) NOEXCEPT = default;
+		state_var(state_var &&rhs) NOEXCEPT = default;
+		state_var &operator=(const state_var rhs) { m_value = rhs.m_value; return *this; }
+		state_var &operator=(const T rhs) { m_value = rhs; return *this; }
+		T & operator[](const std::size_t i) { return m_value[i]; }
+		const T & operator[](const std::size_t i) const { return m_value[i]; }
+	private:
+		T m_value[N];
+	};
+
 
 	// -----------------------------------------------------------------------------
 	// Support classes for devices
@@ -1161,11 +1198,6 @@ protected:
 	// -----------------------------------------------------------------------------
 	// inline implementations
 	// -----------------------------------------------------------------------------
-
-	inline plib::pstate_manager_t &object_t::state_manager()
-	{
-		return m_netlist;
-	}
 
 	template <class C, param_t::param_type_t T>
 	inline void param_template_t<C, T>::setTo(const C &param)
@@ -1238,7 +1270,7 @@ protected:
 
 	inline void net_t::push_to_queue(const netlist_time delay) NOEXCEPT
 	{
-		if (!is_queued() && (num_cons() > 0))
+		if (!is_queued() && (num_cons() != 0))
 		{
 			m_time = netlist().time() + delay;
 			m_in_queue = (m_active > 0);     /* queued ? */
@@ -1319,8 +1351,6 @@ protected:
 
 
 }
-
-NETLIST_SAVE_TYPE(netlist::core_terminal_t::state_e, pstate_data_type_e::DT_INT);
 
 
 #endif /* NLBASE_H_ */

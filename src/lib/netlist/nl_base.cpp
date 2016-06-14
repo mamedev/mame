@@ -105,14 +105,14 @@ const logic_family_desc_t *family_CD4XXX()
 queue_t::queue_t(netlist_t &nl)
 	: timed_queue<net_t *, netlist_time>(512)
 	, object_t(nl, "QUEUE", QUEUE)
-	, plib::pstate_callback_t()
+	, plib::state_manager_t::callback_t()
 	, m_qsize(0)
 	, m_times(512)
 	, m_names(512)
 {
 }
 
-void queue_t::register_state(plib::pstate_manager_t &manager, const pstring &module)
+void queue_t::register_state(plib::state_manager_t &manager, const pstring &module)
 {
 	netlist().log().debug("register_state\n");
 	manager.save_item(this, m_qsize, module + "." + "qsize");
@@ -186,22 +186,21 @@ device_object_t::device_object_t(core_device_t &dev, const pstring &aname, const
 // ----------------------------------------------------------------------------------------
 
 netlist_t::netlist_t(const pstring &aname)
-	:   pstate_manager_t(),
-		m_stop(netlist_time::zero()),
-		m_time(netlist_time::zero()),
-		m_use_deactivate(0),
-		m_queue(*this),
-		m_mainclock(nullptr),
-		m_solver(nullptr),
-		m_gnd(nullptr),
-		m_params(nullptr),
-		m_name(aname),
-		m_setup(nullptr),
-		m_log(this),
-		m_lib(nullptr)
+	: m_state()
+	, m_time(netlist_time::zero())
+	, m_queue(*this)
+	, m_use_deactivate(0)
+	, m_mainclock(nullptr)
+	, m_solver(nullptr)
+	, m_gnd(nullptr)
+	, m_params(nullptr)
+	, m_name(aname)
+	, m_setup(nullptr)
+	, m_log(this)
+	, m_lib(nullptr)
 {
-	save_item(this, static_cast<plib::pstate_callback_t &>(m_queue), "m_queue");
-	save_item(this, m_time, "m_time");
+	state().save_item(this, static_cast<plib::state_manager_t::callback_t &>(m_queue), "m_queue");
+	state().save_item(this, m_time, "m_time");
 }
 
 netlist_t::~netlist_t()
@@ -331,51 +330,43 @@ void netlist_t::reset()
 
 void netlist_t::process_queue(const netlist_time &delta)
 {
-	m_stop = m_time + delta;
+	netlist_time stop(m_time + delta);
+
+	m_queue.push(stop, nullptr);
 
 	if (m_mainclock == nullptr)
 	{
-		while ( (m_time < m_stop) & (!m_queue.empty()))
+		queue_t::entry_t e(m_queue.pop());
+		m_time = e.m_exec_time;
+		while (e.m_object != nullptr)
 		{
-			const queue_t::entry_t e(m_queue.pop());
-			m_time = e.m_exec_time;
 			e.m_object->update_devs();
-
 			add_to_stat(m_perf_out_processed, 1);
+			e = m_queue.pop();
+			m_time = e.m_exec_time;
 		}
-		if (m_queue.empty())
-			m_time = m_stop;
-
-	} else {
+	}
+	else
+	{
 		logic_net_t &mc_net = m_mainclock->m_Q.net();
 		const netlist_time inc = m_mainclock->m_inc;
 		netlist_time mc_time(mc_net.time());
 
-		while (m_time < m_stop)
+		while (1)
 		{
-			if (!m_queue.empty())
+			while (m_queue.top().m_exec_time > mc_time)
 			{
-				while (m_queue.top().m_exec_time > mc_time)
-				{
-					m_time = mc_time;
-					mc_time += inc;
-					mc_net.toggle_new_Q();
-					mc_net.update_devs();
-					//devices::NETLIB_NAME(mainclock)::mc_update(mc_net);
-				}
-
-				const queue_t::entry_t &e = m_queue.pop();
-				m_time = e.m_exec_time;
-				e.m_object->update_devs();
-
-			} else {
 				m_time = mc_time;
 				mc_time += inc;
 				mc_net.toggle_new_Q();
 				mc_net.update_devs();
-				//devices::NETLIB_NAME(mainclock)::mc_update(mc_net);
 			}
 
+			const queue_t::entry_t e(m_queue.pop());
+			m_time = e.m_exec_time;
+			if (e.m_object == nullptr)
+				break;
+			e.m_object->update_devs();
 			add_to_stat(m_perf_out_processed, 1);
 		}
 		mc_net.set_time(mc_time);
@@ -410,7 +401,7 @@ param_template_t<C, T>::param_template_t(device_t &device, const pstring name, c
 {
 	/* pstrings not yet supported, these need special logic */
 	if (T != param_t::STRING && T != param_t::MODEL)
-		save(NLNAME(m_param));
+		netlist().save(*this, m_param, "m_param");
 	device.setup().register_and_set_param(device.name() + "." + name, *this);
 }
 
@@ -509,9 +500,6 @@ void device_t::register_subalias(const pstring &name, core_terminal_t &term)
 
 	// everything already fully qualified
 	setup().register_alias_nofqn(alias, term.name());
-
-	if (term.is_type(terminal_t::INPUT) || term.is_type(terminal_t::TERMINAL))
-		m_terminals.push_back(alias);
 }
 
 void device_t::register_subalias(const pstring &name, const pstring &aliased)
@@ -521,10 +509,6 @@ void device_t::register_subalias(const pstring &name, const pstring &aliased)
 
 	// everything already fully qualified
 	setup().register_alias_nofqn(alias, aliased_fqn);
-
-	// FIXME: make this working again
-	//if (term.isType(terminal_t::INPUT) || term.isType(terminal_t::TERMINAL))
-	//  m_terminals.add(name);
 }
 
 void device_t::connect_late(core_terminal_t &t1, core_terminal_t &t2)
@@ -588,17 +572,17 @@ net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	else
 		nl.m_nets.push_back(std::shared_ptr<net_t>(this));
 
-	save(NLNAME(m_time));
-	save(NLNAME(m_active));
-	save(NLNAME(m_in_queue));
-	save(NLNAME(m_cur_Analog));
-	save(NLNAME(m_cur_Q));
-	save(NLNAME(m_new_Q));
+	netlist().save(*this, m_time, "m_time");
+	netlist().save(*this, m_active, "m_active");
+	netlist().save(*this, m_in_queue, "m_in_queue");
+	netlist().save(*this, m_cur_Analog, "m_cur_Analog");
+	netlist().save(*this, m_cur_Q, "m_cur_Q");
+	netlist().save(*this, m_new_Q, "m_new_Q");
 }
 
 net_t::~net_t()
 {
-	netlist().remove_save_items(this);
+	netlist().state().remove_save_items(this);
 }
 
 void net_t::inc_active(core_terminal_t &term)
@@ -770,19 +754,19 @@ analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname, core_terminal_t 
 {
 }
 
-bool analog_net_t::already_processed(plib::pvector_t<list_t> &groups)
+bool analog_net_t::already_processed(std::vector<list_t> &groups)
 {
 	if (isRailNet())
 		return true;
 	for (auto & grp : groups)
 	{
-		if (grp.contains(this))
+		if (plib::container::contains(grp, this))
 			return true;
 	}
 	return false;
 }
 
-void analog_net_t::process_net(plib::pvector_t<list_t> &groups)
+void analog_net_t::process_net(std::vector<list_t> &groups)
 {
 	if (num_cons() == 0)
 		return;
@@ -811,7 +795,7 @@ core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname, const
 , m_net(nullptr)
 , m_state(STATE_NONEX)
 {
-	save(NLNAME(m_state));
+	netlist().save(*this, m_state, "m_state");
 }
 
 void core_terminal_t::reset()
@@ -822,7 +806,7 @@ void core_terminal_t::reset()
 		set_state(STATE_INP_ACTIVE);
 }
 
-void core_terminal_t::set_net(net_t::ptr_t anet)
+void core_terminal_t::set_net(net_t *anet)
 {
 	m_net = anet;
 }
@@ -845,9 +829,9 @@ terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
 , m_gt1(nullptr)
 {
 	netlist().setup().register_term(*this);
-	save(NLNAME(m_Idr1));
-	save(NLNAME(m_go1));
-	save(NLNAME(m_gt1));
+	netlist().save(*this, m_Idr1, "m_Idr1");
+	netlist().save(*this, m_go1, "m_go1");
+	netlist().save(*this, m_gt1, "m_gt1");
 }
 
 

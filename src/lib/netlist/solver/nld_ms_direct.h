@@ -206,18 +206,14 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	{
 		terms_t * t = m_terms[k];
 
-		if (!t->m_nzrd.contains(N()))
+		if (!plib::container::contains(t->m_nzrd, N()))
 			t->m_nzrd.push_back(N());
 	}
 
-	save(NLNAME(m_last_RHS));
+	netlist().save(*this, m_last_RHS, "m_last_RHS");
 
 	for (unsigned k = 0; k < N(); k++)
-	{
-		pstring num = plib::pfmt("{1}")(k);
-
-		save(RHS(k), "RHS." + num);
-	}
+		netlist().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
 }
 
 

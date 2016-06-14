@@ -18,10 +18,9 @@ namespace netlist
 		, m_CLK(*this, "CLK")
 		, m_Q(*this, {{"Q1", "Q2", "Q3", "Q4"}})
 		, m_QQ(*this, {{"Q1Q", "Q2Q", "Q3Q", "Q4Q"}})
-		, m_data(0)
+		, m_clrq(*this, "m_clr", 0)
+		, m_data(*this, "m_data", 0)
 		{
-			save(NLNAME(m_clrq));
-			save(NLNAME(m_data));
 		}
 
 		NETLIB_RESETI();
@@ -32,8 +31,8 @@ namespace netlist
 		object_array_t<logic_output_t, 4> m_Q;
 		object_array_t<logic_output_t, 4> m_QQ;
 
-		netlist_sig_t m_clrq;
-		UINT8 m_data;
+		state_var<netlist_sig_t> m_clrq;
+		state_var<unsigned>      m_data;
 	};
 
 	NETLIB_OBJECT(74175)

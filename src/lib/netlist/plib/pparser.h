@@ -8,6 +8,8 @@
 #ifndef PPARSER_H_
 #define PPARSER_H_
 
+#include <unordered_map>
+
 #include "pconfig.h"
 #include "pstring.h"
 #include "plists.h"
@@ -139,7 +141,7 @@ private:
 	pstring m_identifier_chars;
 	pstring m_number_chars;
 	pstring m_number_chars_start;
-	pvector_t<pstring> m_tokens;
+	std::vector<pstring> m_tokens;
 	pstring m_whitespace;
 	pstring::code_t  m_string;
 
@@ -189,7 +191,7 @@ private:
 
 	pstring process_line(const pstring &line);
 
-	hashmap_t<pstring, define_t> m_defines;
+	std::unordered_map<pstring, define_t> m_defines;
 	plib::pstring_vector_t m_expr_sep;
 
 	//pstringbuffer m_ret;

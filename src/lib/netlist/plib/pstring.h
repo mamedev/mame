@@ -306,7 +306,6 @@ public:
 	// construction with copy
 	pstring(const mem_t *string) : type_t(string) { }
 	pstring(const type_t &string) : type_t(string) { }
-
 };
 
 // ----------------------------------------------------------------------------------------
@@ -377,5 +376,23 @@ private:
 	std::size_t m_len;
 
 };
+
+// custom specialization of std::hash can be injected in namespace std
+namespace std
+{
+    template<> struct hash<pstring>
+    {
+        typedef pstring argument_type;
+        typedef std::size_t result_type;
+        result_type operator()(argument_type const& s) const
+        {
+    		const pstring::mem_t *string = s.cstr();
+    		result_type result = 5381;
+    		for (pstring::mem_t c = *string; c != 0; c = *string++)
+    			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ c;
+    		return result;
+        }
+    };
+}
 
 #endif /* PSTRING_H_ */

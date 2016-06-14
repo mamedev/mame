@@ -334,10 +334,11 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 					t->m_nz.add(other[i]);
 			}
 		}
-		psort_list(t->m_nzrd);
+		std::sort(t->m_nzrd.begin(), t->m_nzrd.end());
 
 		t->m_nz.add(k);     // add diagonal
-		psort_list(t->m_nz);
+
+		std::sort(t->m_nz.begin(), t->m_nz.end());
 	}
 
 	if(0)

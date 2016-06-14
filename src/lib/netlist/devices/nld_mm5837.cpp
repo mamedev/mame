@@ -28,10 +28,10 @@ namespace netlist
 		/* clock */
 		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
-		, m_inc(0, 1)
+		, m_inc(netlist_time::from_hz(56000))
+		, m_shift(*this, "m_shift", 0)
 		, m_is_timestep(false)
 		{
-			m_inc = netlist_time::from_hz(56000);
 			connect_late(m_feedback, m_Q);
 
 			/* output */
@@ -41,9 +41,6 @@ namespace netlist
 
 			/* device */
 			register_subalias("3", m_RV.m_P);
-
-			save(NLNAME(m_shift));
-
 		}
 
 		NETLIB_RESETI();
@@ -61,10 +58,10 @@ namespace netlist
 		/* clock stage */
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
-		netlist_time m_inc;
+		const netlist_time m_inc;
 
 		/* state */
-		UINT32 m_shift;
+		state_var<UINT32> m_shift;
 
 		/* cache */
 		bool m_is_timestep;

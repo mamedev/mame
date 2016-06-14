@@ -18,10 +18,8 @@ namespace netlist
 		, m_CLK(*this, "CLK")
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
-		, m_nextD(0)
+		, m_nextD(*this, "m_nextD", 0)
 		{
-
-			save(NLNAME(m_nextD));
 		}
 
 		NETLIB_RESETI();
@@ -31,7 +29,7 @@ namespace netlist
 		logic_input_t m_CLK;
 		logic_output_t m_Q;
 		logic_output_t m_QQ;
-		INT8 m_nextD;
+		state_var<unsigned> m_nextD;
 
 		inline void newstate(const UINT8 stateQ, const UINT8 stateQQ);
 
