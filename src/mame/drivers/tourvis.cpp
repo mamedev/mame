@@ -295,7 +295,6 @@ public:
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_b_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_c_w);
 	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
-	DECLARE_WRITE_LINE_MEMBER(pce_irq_changed);
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;
 	UINT32  m_rom_size;
@@ -479,10 +478,6 @@ WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 	//logerror("Timer out %d\n", state);
 }
 
-WRITE_LINE_MEMBER(tourvision_state::pce_irq_changed)
-{
-	m_maincpu->set_input_line(0, state);
-}
 
 static MACHINE_CONFIG_START( tourvision, tourvision_state )
 	/* basic machine hardware */
@@ -507,7 +502,7 @@ static MACHINE_CONFIG_START( tourvision, tourvision_state )
 	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, hsync_changed))
 	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(tourvision_state, pce_irq_changed))
+	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("i8155", I8155, 1000000 /*?*/)
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(tourvision_state, tourvision_i8155_a_w))

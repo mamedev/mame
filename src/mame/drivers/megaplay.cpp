@@ -93,7 +93,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bios_6600_w);
 	DECLARE_WRITE8_MEMBER(game_w);
 	DECLARE_READ8_MEMBER(vdp1_count_r);
-	DECLARE_WRITE_LINE_MEMBER(bios_int_callback);
 
 	DECLARE_DRIVER_INIT(megaplay);
 	DECLARE_VIDEO_START(megplay);
@@ -654,11 +653,6 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	MACHINE_RESET_CALL_MEMBER(megadriv);
 }
 
-WRITE_LINE_MEMBER( mplay_state::bios_int_callback )
-{
-	m_bioscpu->set_input_line(0, state);
-}
-
 static MACHINE_CONFIG_START( megaplay, mplay_state )
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(md_ntsc)
@@ -686,7 +680,7 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	MCFG_DEVICE_ADD("vdp1", SEGA315_5246, 0)
 	MCFG_SEGA315_5246_SET_SCREEN("megadriv")
 	MCFG_SEGA315_5246_IS_PAL(false)
-	MCFG_SEGA315_5246_INT_CB(WRITELINE(mplay_state, bios_int_callback))
+	MCFG_SEGA315_5246_INT_CB(INPUTLINE("mtbios", 0))
 MACHINE_CONFIG_END
 
 

@@ -170,7 +170,6 @@ public:
 	DECLARE_WRITE32_MEMBER(kinst_ide_w);
 	DECLARE_READ32_MEMBER(kinst_ide_extra_r);
 	DECLARE_WRITE32_MEMBER(kinst_ide_extra_w);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_DRIVER_INIT(kinst);
 	DECLARE_DRIVER_INIT(kinst2);
 	virtual void machine_start() override;
@@ -303,13 +302,6 @@ INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 	device.execute().set_input_line(0, ASSERT_LINE);
 	timer_set(attotime::from_usec(50), TIMER_IRQ0_STOP);
 }
-
-
-WRITE_LINE_MEMBER(kinst_state::ide_interrupt)
-{
-	m_maincpu->set_input_line(1, state);
-}
-
 
 
 /*************************************
@@ -680,7 +672,7 @@ static MACHINE_CONFIG_START( kinst, kinst_state )
 
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(kinst_state, ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(INPUTLINE("maincpu", 1))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -89,7 +89,6 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_l3_w);
 	DECLARE_WRITE16_MEMBER(pgm_tx_videoram_w);
 	DECLARE_WRITE16_MEMBER(pgm_bg_videoram_w);
-	DECLARE_WRITE_LINE_MEMBER(pgm_sound_irq);
 
 	DECLARE_DRIVER_INIT(pgm);
 
@@ -127,7 +126,6 @@ MACHINE_CONFIG_EXTERN( pgmbase );
 
 ADDRESS_MAP_EXTERN( pgm_z80_mem, 8 );
 ADDRESS_MAP_EXTERN( pgm_z80_io, 8 );
-void pgm_sound_irq( device_t *device, int level );
 
 ADDRESS_MAP_EXTERN( pgm_mem, 16 );
 ADDRESS_MAP_EXTERN( pgm_basic_mem, 16 );
