@@ -171,7 +171,7 @@
 // Type definitions
 // ----------------------------------------------------------------------------------------
 
-using netlist_sig_t = std::uint32_t;
+using netlist_sig_t = std::uint_least32_t;
 
  //============================================================
  //  MACROS / New Syntax
@@ -920,8 +920,8 @@ namespace netlist
 	#if (NL_KEEP_STATISTICS)
 		/* stats */
 		plib::ticks_t stat_total_time;
-		INT32 stat_update_count;
-		INT32 stat_call_count;
+		int_fast32_t stat_update_count;
+		int_fast32_t stat_call_count;
 	#endif
 
 	protected:

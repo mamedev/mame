@@ -137,7 +137,7 @@ namespace netlist
 
 	NETLIB_UPDATE(74107A)
 	{
-		const UINT8 JK = (INPLOGIC(m_J) << 1) | INPLOGIC(m_K);
+		const auto JK = (INPLOGIC(m_J) << 1) | INPLOGIC(m_K);
 
 		switch (JK)
 		{

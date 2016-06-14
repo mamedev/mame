@@ -7,6 +7,8 @@
 #ifndef NLTIME_H_
 #define NLTIME_H_
 
+#include <cstdint>
+
 #include "nl_config.h"
 #include "plib/pstate.h"
 
@@ -31,6 +33,7 @@ namespace netlist
 	public:
 
 		using internal_type = TYPE;
+		using mult_type = std::uint_fast64_t;
 		static constexpr internal_type resolution = RES;
 
 		constexpr ptime() NOEXCEPT : m_time(0) {}
@@ -59,15 +62,15 @@ namespace netlist
 			return lhs;
 		}
 
-		friend ptime operator*(ptime lhs, const UINT64 factor)
+		friend ptime operator*(ptime lhs, const mult_type factor)
 		{
 			lhs.m_time *= static_cast<internal_type>(factor);
 			return lhs;
 		}
 
-		friend UINT64 operator/(const ptime &lhs, const ptime &rhs)
+		friend mult_type operator/(const ptime &lhs, const ptime &rhs)
 		{
-			return static_cast<UINT64>(lhs.m_time / rhs.m_time);
+			return static_cast<mult_type>(lhs.m_time / rhs.m_time);
 		}
 
 		friend bool operator<(const ptime &lhs, const ptime &rhs)
@@ -106,9 +109,9 @@ namespace netlist
 		// for save states ....
 		internal_type *get_internaltype_ptr() { return &m_time; }
 
-		static inline constexpr ptime from_nsec(const internal_type ns) { return ptime(ns, U64(1000000000)); }
-		static inline constexpr ptime from_usec(const internal_type us) { return ptime(us, U64(1000000)); }
-		static inline constexpr ptime from_msec(const internal_type ms) { return ptime(ms, U64(1000)); }
+		static inline constexpr ptime from_nsec(const internal_type ns) { return ptime(ns, UINT64_C(1000000000)); }
+		static inline constexpr ptime from_usec(const internal_type us) { return ptime(us, UINT64_C(1000000)); }
+		static inline constexpr ptime from_msec(const internal_type ms) { return ptime(ms, UINT64_C(1000)); }
 		static inline constexpr ptime from_hz(const internal_type hz) { return ptime(1 , hz); }
 		static inline constexpr ptime from_raw(const internal_type raw) { return ptime(raw, resolution); }
 		static inline constexpr ptime from_double(const double t) { return ptime((internal_type) ( t * (double) resolution), resolution); }
@@ -123,7 +126,7 @@ namespace netlist
 #if (PHAS_INT128)
 	using netlist_time = ptime<UINT128, NETLIST_INTERNAL_RES>;
 #else
-	using netlist_time = ptime<UINT64, NETLIST_INTERNAL_RES>;
+	using netlist_time = ptime<std::uint_fast64_t, NETLIST_INTERNAL_RES>;
 #endif
 }
 

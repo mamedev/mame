@@ -64,10 +64,10 @@ namespace netlist
 	};
 
 	template<unsigned bits> struct uint_for_size;
-	template<> struct uint_for_size<1> { typedef uint8_t type; };
-	template<> struct uint_for_size<2> { typedef uint16_t type; };
-	template<> struct uint_for_size<4> { typedef uint32_t type; };
-	template<> struct uint_for_size<8> { typedef uint64_t type; };
+	template<> struct uint_for_size<1> { typedef uint_least8_t type; };
+	template<> struct uint_for_size<2> { typedef uint_least16_t type; };
+	template<> struct uint_for_size<4> { typedef uint_least32_t type; };
+	template<> struct uint_for_size<8> { typedef uint_least64_t type; };
 
 	struct packed_int
 	{
@@ -77,39 +77,39 @@ namespace netlist
 		, m_size(sizeof(C))
 		{}
 
-		void set(const size_t pos, const uint64_t val)
+		void set(const size_t pos, const uint_least64_t val)
 		{
 			switch (m_size)
 			{
-				case 1: ((uint8_t *) m_data)[pos] = val; break;
-				case 2: ((uint16_t *) m_data)[pos] = val; break;
-				case 4: ((uint32_t *) m_data)[pos] = val; break;
-				case 8: ((uint64_t *) m_data)[pos] = val; break;
+				case 1: ((uint_least8_t *) m_data)[pos] = val; break;
+				case 2: ((uint_least16_t *) m_data)[pos] = val; break;
+				case 4: ((uint_least32_t *) m_data)[pos] = val; break;
+				case 8: ((uint_least64_t *) m_data)[pos] = val; break;
 				default: { }
 			}
 		}
 
-		UINT64 operator[] (size_t pos) const
+		uint_least64_t operator[] (size_t pos) const
 		{
 			switch (m_size)
 			{
-				case 1: return ((uint8_t *) m_data)[pos]; break;
-				case 2: return ((uint16_t *) m_data)[pos]; break;
-				case 4: return ((uint32_t *) m_data)[pos]; break;
-				case 8: return ((uint64_t *) m_data)[pos]; break;
+				case 1: return ((uint_least8_t *) m_data)[pos]; break;
+				case 2: return ((uint_least16_t *) m_data)[pos]; break;
+				case 4: return ((uint_least32_t *) m_data)[pos]; break;
+				case 8: return ((uint_least64_t *) m_data)[pos]; break;
 				default:
 					return 0; //should never happen
 			}
 		}
 
-		uint64_t adjust(uint64_t val) const
+		uint_least64_t adjust(uint_least64_t val) const
 		{
 			switch (m_size)
 			{
-				case 1: return ((uint8_t) val); break;
-				case 2: return ((uint16_t) val); break;
-				case 4: return ((uint32_t) val); break;
-				case 8: return ((uint64_t) val); break;
+				case 1: return ((uint_least8_t) val); break;
+				case 2: return ((uint_least16_t) val); break;
+				case 4: return ((uint_least32_t) val); break;
+				case 8: return ((uint_least64_t) val); break;
 				default:
 					return 0; //should never happen
 			}
@@ -122,7 +122,7 @@ namespace netlist
 	struct truthtable_desc_t
 	{
 		truthtable_desc_t(int NO, int NI, int has_state, bool *initialized,
-				packed_int outs, UINT8 *timing, netlist_time *timing_nt)
+				packed_int outs, uint_least8_t *timing, netlist_time *timing_nt)
 		: m_NO(NO), m_NI(NI), /*m_has_state(has_state),*/ m_initialized(initialized),
 			m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
 			m_num_bits(m_NI + has_state * (m_NI + m_NO)),
@@ -130,21 +130,21 @@ namespace netlist
 		{
 		}
 
-		void setup(const plib::pstring_vector_t &desc, UINT32 disabled_ignore);
+		void setup(const plib::pstring_vector_t &desc, uint_least64_t disabled_ignore);
 
 	private:
 		void help(unsigned cur, plib::pstring_vector_t list,
-				uint64_t state, uint64_t val, std::vector<uint8_t> &timing_index);
-		static unsigned count_bits(uint64_t v);
-		static uint64_t set_bits(uint64_t v, uint64_t b);
-		uint64_t get_ignored_simple(uint64_t i);
-		uint64_t get_ignored_extended(uint64_t i);
+				uint_least64_t state, uint_least64_t val, std::vector<uint_least8_t> &timing_index);
+		static unsigned count_bits(uint_least64_t v);
+		static uint_least64_t set_bits(uint_least64_t v, uint_least64_t b);
+		uint_least64_t get_ignored_simple(uint_least64_t i);
+		uint_least64_t get_ignored_extended(uint_least64_t i);
 
 		unsigned m_NO;
 		unsigned m_NI;
 		bool *m_initialized;
 		packed_int m_outs;
-		uint8_t  *m_timing;
+		uint_least8_t  *m_timing;
 		netlist_time *m_timing_nt;
 
 		/* additional values */
@@ -171,7 +171,7 @@ namespace netlist
 			{}
 			bool m_initialized;
 			typename uint_for_size<need_bytes_for_bits<m_NO + m_NI>::value>::type m_outs[m_size];
-			UINT8  m_timing[m_size * m_NO];
+			uint_least8_t m_timing[m_size * m_NO];
 			netlist_time m_timing_nt[16];
 		};
 
@@ -233,7 +233,7 @@ namespace netlist
 			}
 			// Connect output "Q" to input "_Q" if this exists
 			// This enables timed state without having explicit state ....
-			UINT32 disabled_ignore = 0;
+			uint_least64_t disabled_ignore = 0;
 			for (std::size_t i=0; i < m_NO; i++)
 			{
 				pstring tmp = "_" + out[i];
@@ -321,7 +321,7 @@ namespace netlist
 		{
 			netlist_time mt = netlist_time::zero();
 
-			uint64_t state = 0;
+			uint_least64_t state = 0;
 			if (m_NI > 1 && !m_has_state)
 			{
 				auto ign = m_ign;
@@ -385,9 +385,10 @@ namespace netlist
 			}
 		}
 
-		state_var<UINT32> m_last_state;
-		state_var<UINT32> m_ign;
-		state_var<INT32>  m_active;
+		/* FIXME: check width */
+		state_var_u32 m_last_state;
+		state_var_u32 m_ign;
+		state_var_s32  m_active;
 		param_logic_t     m_use_deactivate;
 		truthtable_t *m_ttp;
 		plib::pstring_vector_t m_desc;

@@ -108,7 +108,7 @@ namespace netlist
 		{
 			for (int i=0; i<4; i++)
 			{
-				UINT8 d = (m_data >> i) & 1;
+				netlist_sig_t d = (m_data >> i) & 1;
 				OUTLOGIC(m_Q[i], d, delay[d]);
 				OUTLOGIC(m_QQ[i], d ^ 1, delay[d ^ 1]);
 			}
@@ -118,7 +118,7 @@ namespace netlist
 
 	NETLIB_UPDATE(74175)
 	{
-		UINT8 d = 0;
+		uint_fast8_t d = 0;
 		for (int i=0; i<4; i++)
 		{
 			d |= (INPLOGIC(m_D[i]) << i);

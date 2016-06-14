@@ -27,14 +27,14 @@ namespace plib
 	{
 		static inline constexpr UINT128 max()
 		{
-			return ~((UINT64)0);
+			return ~((UINT128)0);
 		}
 	};
 	template<> struct numeric_limits<INT128>
 	{
 		static inline constexpr INT128 max()
 		{
-			return (~((UINT64)0)) >> 1;
+			return (~((UINT128)0)) >> 1;
 		}
 	};
 #endif

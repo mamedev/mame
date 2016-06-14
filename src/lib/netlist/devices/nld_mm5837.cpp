@@ -61,7 +61,7 @@ namespace netlist
 		const netlist_time m_inc;
 
 		/* state */
-		state_var<UINT32> m_shift;
+		state_var_u32 m_shift;
 
 		/* cache */
 		bool m_is_timestep;
@@ -87,10 +87,10 @@ namespace netlist
 		 *
 		 */
 
-		const UINT32 last_state = m_shift & 0x01;
+		const auto last_state = m_shift & 0x01;
 		/* shift */
 		m_shift = (m_shift >> 1) | (((m_shift & 0x01) ^ ((m_shift >> 3) & 0x01)) << 16);
-		const UINT32 state = m_shift & 0x01;
+		const auto state = m_shift & 0x01;
 
 		if (state != last_state)
 		{

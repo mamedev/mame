@@ -8,6 +8,8 @@
 #ifndef NLCONFIG_H_
 #define NLCONFIG_H_
 
+#include <cstdint>
+
 #include "plib/pconfig.h"
 
 //============================================================
@@ -137,8 +139,8 @@
 #endif // !defined(USE_OPENMP)
 
 // Use nano-second resolution - Sufficient for now
-#define NETLIST_INTERNAL_RES        (U64(1000000000))
-//#define NETLIST_INTERNAL_RES      (U64(1000000000000))
+#define NETLIST_INTERNAL_RES        (UINT64_C(1000000000))
+//#define NETLIST_INTERNAL_RES      (UINT64_C(1000000000000))
 
 #define NETLIST_CLOCK               (NETLIST_INTERNAL_RES)
 

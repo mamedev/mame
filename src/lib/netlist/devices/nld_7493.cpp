@@ -31,8 +31,8 @@ namespace netlist
 		logic_input_t m_I;
 		logic_output_t m_Q;
 
-		state_var<UINT8> m_reset;
-		state_var<UINT8> m_state;
+		state_var_u8 m_reset;
+		state_var_u8 m_state;
 	};
 
 	NETLIB_OBJECT(7493)

@@ -89,10 +89,10 @@ namespace netlist
 
 	NETLIB_UPDATE(7483)
 	{
-		UINT8 a = (INPLOGIC(m_A1) << 0) | (INPLOGIC(m_A2) << 1) | (INPLOGIC(m_A3) << 2) | (INPLOGIC(m_A4) << 3);
-		UINT8 b = (INPLOGIC(m_B1) << 0) | (INPLOGIC(m_B2) << 1) | (INPLOGIC(m_B3) << 2) | (INPLOGIC(m_B4) << 3);
+		uint_fast8_t a = (INPLOGIC(m_A1) << 0) | (INPLOGIC(m_A2) << 1) | (INPLOGIC(m_A3) << 2) | (INPLOGIC(m_A4) << 3);
+		uint_fast8_t b = (INPLOGIC(m_B1) << 0) | (INPLOGIC(m_B2) << 1) | (INPLOGIC(m_B3) << 2) | (INPLOGIC(m_B4) << 3);
 
-		UINT8 r = a + b + INPLOGIC(m_C0);
+		uint_fast8_t r = a + b + INPLOGIC(m_C0);
 
 		if (r != m_lastr)
 		{

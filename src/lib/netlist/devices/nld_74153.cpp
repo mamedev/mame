@@ -109,7 +109,7 @@ namespace netlist
 		const netlist_time delay[2] = { NLTIME_FROM_NS(23), NLTIME_FROM_NS(18) };
 		if (!INPLOGIC(m_G))
 		{
-			UINT8 t = INPLOGIC(m_C[m_chan]);
+			uint_fast8_t t = INPLOGIC(m_C[m_chan]);
 			OUTLOGIC(m_Y, t, delay[t] );
 		}
 		else

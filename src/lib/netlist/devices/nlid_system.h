@@ -415,7 +415,7 @@ namespace netlist
 
 	private:
 
-		state_var<UINT8> m_last_state;
+		state_var_u8 m_last_state;
 	};
 
 	// -----------------------------------------------------------------------------

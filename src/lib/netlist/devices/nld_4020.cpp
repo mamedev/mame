@@ -35,7 +35,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void update_outputs(const UINT16 cnt);
+		void update_outputs(const unsigned cnt);
 
 		logic_input_t m_IP;
 		object_array_t<logic_output_t, 14> m_Q;
@@ -79,10 +79,9 @@ namespace netlist
 
 	NETLIB_UPDATE(CD4020_sub)
 	{
-		UINT8 cnt = m_cnt;
-		cnt = ( cnt + 1) & 0x3fff;
-		update_outputs(cnt);
-		m_cnt = cnt;
+		++m_cnt;
+		m_cnt &= 0x3fff;
+		update_outputs(m_cnt);
 	}
 
 	NETLIB_UPDATE(CD4020)
@@ -100,7 +99,7 @@ namespace netlist
 			m_sub.m_IP.activate_hl();
 	}
 
-	inline NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const UINT16 cnt))
+	inline NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const unsigned cnt))
 	{
 		/* static */ const netlist_time out_delayQn[14] = {
 				NLTIME_FROM_NS(180), NLTIME_FROM_NS(280),

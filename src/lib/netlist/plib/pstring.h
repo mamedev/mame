@@ -344,7 +344,7 @@ public:
 	operator pstring() const { return pstring(m_ptr); }
 
 	// concatenation operators
-	pstringbuffer& operator+=(const UINT8 c) { UINT8 buf[2] = { c, 0 }; pcat((char *) buf); return *this; }
+	pstringbuffer& operator+=(const char c) { char buf[2] = { c, 0 }; pcat(buf); return *this; }
 	pstringbuffer& operator+=(const pstring &string) { pcat(string); return *this; }
 	pstringbuffer& operator+=(const char *string) { pcat(string); return *this; }
 

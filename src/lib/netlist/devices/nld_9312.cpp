@@ -61,8 +61,8 @@ namespace netlist
 		logic_output_t m_Y;
 		logic_output_t m_YQ;
 
-		state_var<UINT8> m_last_chan;
-		state_var<UINT8> m_last_G;
+		state_var_u8 m_last_chan;
+		state_var_u8 m_last_G;
 	};
 
 	#endif
@@ -155,7 +155,7 @@ namespace netlist
 
 	NETLIB_UPDATE(9312)
 	{
-		const UINT8 G = INPLOGIC(m_G);
+		const NLUINT8 G = INPLOGIC(m_G);
 		if (G)
 		{
 			const netlist_time delay[2] = { NLTIME_FROM_NS(33), NLTIME_FROM_NS(19) };
@@ -177,7 +177,7 @@ namespace netlist
 				m_C.activate();
 			}
 			constexpr netlist_time delay[2] = { NLTIME_FROM_NS(33), NLTIME_FROM_NS(28) };
-			const UINT8 chan = INPLOGIC(m_A) | (INPLOGIC(m_B)<<1) | (INPLOGIC(m_C)<<2);
+			const NLUINT8 chan = INPLOGIC(m_A) | (INPLOGIC(m_B)<<1) | (INPLOGIC(m_C)<<2);
 			if (m_last_chan != chan)
 			{
 				m_D[m_last_chan].inactivate();

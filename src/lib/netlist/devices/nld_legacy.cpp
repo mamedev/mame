@@ -57,7 +57,7 @@ namespace netlist
 		param_int_t m_L_to_H;
 		param_int_t m_H_to_L;
 
-		state_var<UINT8> m_last;
+		state_var_u8 m_last;
 	};
 
 	NETLIB_RESET(nicRSFF)

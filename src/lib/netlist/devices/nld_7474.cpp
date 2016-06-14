@@ -31,7 +31,7 @@ namespace netlist
 		logic_output_t m_QQ;
 		state_var<unsigned> m_nextD;
 
-		inline void newstate(const UINT8 stateQ, const UINT8 stateQQ);
+		inline void newstate(const netlist_sig_t stateQ, const netlist_sig_t stateQQ);
 
 	private:
 
@@ -93,7 +93,7 @@ namespace netlist
 		NETLIB_SUB(7474) m_2;
 	};
 
-	inline void NETLIB_NAME(7474sub)::newstate(const UINT8 stateQ, const UINT8 stateQQ)
+	inline void NETLIB_NAME(7474sub)::newstate(const netlist_sig_t stateQ, const netlist_sig_t stateQQ)
 	{
 		// 0: High-to-low 40 ns, 1: Low-to-high 25 ns
 		const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
