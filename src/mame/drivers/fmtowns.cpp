@@ -2731,6 +2731,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(towns_state,mb8877a_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", towns_floppies, "35hd", towns_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", towns_floppies, "35hd", towns_state::floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("fd_list","fmtowns_flop")
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("fmt_cdrom")
