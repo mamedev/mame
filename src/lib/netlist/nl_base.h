@@ -171,7 +171,11 @@
 // Type definitions
 // ----------------------------------------------------------------------------------------
 
+<<<<<<< HEAD
 using netlist_sig_t = std::uint_least32_t;
+=======
+using netlist_sig_t = std::uint32_t;
+>>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 
  //============================================================
  //  MACROS / New Syntax
@@ -343,6 +347,7 @@ namespace netlist
 	// object_t
 	// -----------------------------------------------------------------------------
 
+<<<<<<< HEAD
 	// -----------------------------------------------------------------------------
 	// State variables - use to preserve state
 	// -----------------------------------------------------------------------------
@@ -393,6 +398,8 @@ namespace netlist
 	using state_var_u32 = state_var<std::uint_fast32_t>;
 	using state_var_s32 = state_var<std::int_fast32_t>;
 
+=======
+>>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 	class object_t
 	{
 		P_PREVENT_COPYING(object_t)
@@ -678,9 +685,15 @@ namespace netlist
 		state_var<netlist_sig_t> m_new_Q;
 		state_var<netlist_sig_t> m_cur_Q;
 
+<<<<<<< HEAD
 		state_var<netlist_time>  m_time;
 		state_var_s32            m_active;
 		state_var_u8		     m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
+=======
+		netlist_time  m_time;
+		INT32         m_active;
+		UINT8    	  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
+>>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 
 	private:
 		plib::linkedlist_t<core_terminal_t> m_list_active;
@@ -1183,6 +1196,52 @@ protected:
 		plib::dynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
 	};
 
+<<<<<<< HEAD
+=======
+	template <typename T>
+	struct state_var
+	{
+	public:
+		state_var(device_t &dev, const pstring name, const T &value)
+		: m_value(value)
+		{
+			dev.netlist().save(dev, m_value, name);
+		}
+
+		state_var(const state_var &rhs) NOEXCEPT = default;
+		state_var(state_var &&rhs) NOEXCEPT = default;
+		state_var &operator=(const state_var rhs) { m_value = rhs.m_value; return *this; }
+		state_var &operator=(const T rhs) { m_value = rhs; return *this; }
+		operator T & () { return m_value; }
+		T & operator()() { return m_value; }
+		operator const T & () const { return m_value; }
+		const T & operator()() const { return m_value; }
+	private:
+		T m_value;
+	};
+
+	template <typename T, std::size_t N>
+	struct state_var<T[N]>
+	{
+	public:
+		state_var(device_t &dev, const pstring name, const T & value)
+		{
+			dev.netlist().save(dev, m_value, name);
+			for (int i=0; i<N; i++)
+				m_value[i] = value;
+		}
+
+		state_var(const state_var &rhs) NOEXCEPT = default;
+		state_var(state_var &&rhs) NOEXCEPT = default;
+		state_var &operator=(const state_var rhs) { m_value = rhs.m_value; return *this; }
+		state_var &operator=(const T rhs) { m_value = rhs; return *this; }
+		T & operator[](const std::size_t i) { return m_value[i]; }
+		const T & operator[](const std::size_t i) const { return m_value[i]; }
+	private:
+		T m_value[N];
+	};
+
+>>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 
 	// -----------------------------------------------------------------------------
 	// Support classes for devices

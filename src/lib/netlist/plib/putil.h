@@ -24,7 +24,11 @@ namespace plib
 	namespace container
 	{
 		template <class C>
+<<<<<<< HEAD
 		bool contains(C &con, const typename C::value_type &elem)
+=======
+		const bool contains(C &con, const typename C::value_type &elem)
+>>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 		{
 			return std::find(con.begin(), con.end(), elem) != con.end();
 		}

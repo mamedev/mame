@@ -32,20 +32,36 @@ namespace netlist
 	{
 	public:
 
+<<<<<<< HEAD
 		using internal_type = TYPE;
 		using mult_type = std::uint_fast64_t;
 		static constexpr internal_type resolution = RES;
+=======
+#if (PHAS_INT128)
+		using INTERNALTYPE = UINT128;
+#else
+		using INTERNALTYPE = UINT64;
+#endif
+		static constexpr INTERNALTYPE RESOLUTION = NETLIST_INTERNAL_RES;
+>>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 
 		constexpr ptime() NOEXCEPT : m_time(0) {}
 		constexpr ptime(const ptime &rhs) NOEXCEPT = default;
 		constexpr ptime(ptime &&rhs) NOEXCEPT = default;
 
+<<<<<<< HEAD
 		constexpr explicit ptime(const double t) = delete;
 		//: m_time((internal_type) ( t * (double) resolution)) { }
 		constexpr explicit ptime(const internal_type nom, const internal_type den)
 		: m_time(nom * (resolution / den)) { }
 
 		ptime &operator=(const ptime rhs) { m_time = rhs.m_time; return *this; }
+=======
+		constexpr explicit netlist_time(const double t)
+		: m_time((INTERNALTYPE) ( t * (double) RESOLUTION)) { }
+		constexpr explicit netlist_time(const INTERNALTYPE nom, const INTERNALTYPE den)
+		: m_time(nom * (RESOLUTION / den)) { }
+>>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 
 		ptime &operator+=(const ptime &rhs) { m_time += rhs.m_time; return *this; }
 		ptime &operator-=(const ptime &rhs) { m_time -= rhs.m_time; return *this; }
@@ -123,17 +139,24 @@ namespace netlist
 		internal_type m_time;
 	};
 
+<<<<<<< HEAD
 #if (PHAS_INT128)
 	using netlist_time = ptime<UINT128, NETLIST_INTERNAL_RES>;
 #else
 	using netlist_time = ptime<std::uint_fast64_t, NETLIST_INTERNAL_RES>;
 #endif
+=======
+>>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 }
 
 namespace plib {
 template<> inline void state_manager_t::save_item(const void *owner, netlist::netlist_time &nlt, const pstring &stname)
 {
+<<<<<<< HEAD
 	save_state_ptr(owner, stname, datatype_t(sizeof(netlist::netlist_time::internal_type), false, true, false), 1, nlt.get_internaltype_ptr());
+=======
+	save_state_ptr(owner, stname, datatype_t(sizeof(netlist::netlist_time::INTERNALTYPE), false, true, false), 1, nlt.get_internaltype_ptr());
+>>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 }
 }
 

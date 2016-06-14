@@ -72,9 +72,15 @@ namespace netlist
 		logic_output_t m_RC;
 
 		NETLIB_NAME(9316_subABCD) *m_ABCD;
+<<<<<<< HEAD
 		state_var_u8 m_cnt;
 		state_var_u8 m_loadq;
 		state_var_u8 m_ent;
+=======
+		state_var<UINT8> m_cnt;
+		state_var<netlist_sig_t> m_loadq;
+		state_var<netlist_sig_t> m_ent;
+>>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 	};
 
 	NETLIB_OBJECT(9316)
