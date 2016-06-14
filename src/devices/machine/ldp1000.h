@@ -36,23 +36,6 @@ public:
 	// construction/destruction
 	sony_ldp1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-<<<<<<< HEAD
-	// I/O operations
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
-
-protected:
-	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const rom_entry *device_rom_region() const override;
-	
-	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
-	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
-	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
-
-=======
 	// I/O operations TODO: both actually protected
 	DECLARE_WRITE8_MEMBER( command_w );
 	DECLARE_READ8_MEMBER( status_r );
@@ -95,7 +78,6 @@ private:
 	UINT8 m_internal_bcd[0x10];
 	UINT8 m_index_state;
 	UINT8 m_index_size;
->>>>>>> refs/remotes/origin/master
 };
 
 
