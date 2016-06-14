@@ -1464,7 +1464,7 @@ ROM_START( abc806 )
 	//ROM_REGION( 0x200, "v60", 0 )
 	//ROM_LOAD( "60 90319-01.7e", 0x000, 0x200, NO_DUMP ) // "V60" 7621 (82S131), HR vertical timing 60Hz
 
-	ROM_REGION( 0x400, "att_hand", 0 )
+	//ROM_REGION( 0x400, "att_hand", 0 )
 	/*
 	    1   E6P (RAD A8)
 	    2   THP (chargen A12)
@@ -1491,7 +1491,7 @@ ROM_START( abc806 )
 	    23  E5P (RAD A7)
 	    24  Vcc
 	*/
-	ROM_LOAD( "60 90225-01.11c", 0x000, 0x400, NO_DUMP ) // "VIDEO ATTRIBUTE" 40033A (?)
+	//ROM_LOAD( "60 90225-01.11c", 0x000, 0x400, NO_DUMP ) // "VIDEO ATTRIBUTE" 40033A (?)
 
 	ROM_REGION( 0x104, "abc_p3", 0 )
 	ROM_LOAD( "60 90239-01.1b",  0x000, 0x104, CRC(f3d0ba00) SHA1(bcc0ee26ecac0028aef6bf5cb308133b509bb360) ) // "ABC P3-11" PAL16R4, color encoder
