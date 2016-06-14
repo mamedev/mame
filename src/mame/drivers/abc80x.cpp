@@ -330,7 +330,7 @@ void abc806_state::bankswitch()
 
 					program.install_read_bank(0x7000, 0x77ff, bank_name);
 					program.unmap_write(0x7000, 0x77ff);
-					program.install_readwrite_handler(0x7800, 0x7fff, 0, 0, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
+					program.install_readwrite_handler(0x7800, 0x7fff, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
 					membank(bank_name)->set_entry(0);
 					break;
 
@@ -365,7 +365,7 @@ void abc806_state::bankswitch()
 			if (start_addr == 0x7000)
 			{
 				program.install_readwrite_bank(0x7000, 0x77ff, bank_name);
-				program.install_readwrite_handler(0x7800, 0x7fff, 0, 0, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
+				program.install_readwrite_handler(0x7800, 0x7fff, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
 			}
 			else
 			{
@@ -562,10 +562,10 @@ static ADDRESS_MAP_START( abc806_io, AS_IO, 8, abc806_state )
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff18) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_t, rst_r) AM_WRITE(hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff00) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
-	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(mai_r, mao_w)
+	AM_RANGE(0x34, 0x34) AM_SELECT(0xff00) AM_READWRITE(mai_r, mao_w)
 	AM_RANGE(0x35, 0x35) AM_MIRROR(0xff00) AM_READWRITE(ami_r, amo_w)
 	AM_RANGE(0x36, 0x36) AM_MIRROR(0xff00) AM_READWRITE(sti_r, sto_w)
-	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(cli_r, sso_w)
+	AM_RANGE(0x37, 0x37) AM_SELECT(0xff00) AM_READWRITE(cli_r, sso_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff00) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff00) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio2_device, ba_cd_r, ba_cd_w)
@@ -1464,7 +1464,7 @@ ROM_START( abc806 )
 	//ROM_REGION( 0x200, "v60", 0 )
 	//ROM_LOAD( "60 90319-01.7e", 0x000, 0x200, NO_DUMP ) // "V60" 7621 (82S131), HR vertical timing 60Hz
 
-	ROM_REGION( 0x400, "att_hand", 0 )
+	//ROM_REGION( 0x400, "att_hand", 0 )
 	/*
 	    1   E6P (RAD A8)
 	    2   THP (chargen A12)
@@ -1491,7 +1491,7 @@ ROM_START( abc806 )
 	    23  E5P (RAD A7)
 	    24  Vcc
 	*/
-	ROM_LOAD( "60 90225-01.11c", 0x000, 0x400, NO_DUMP ) // "VIDEO ATTRIBUTE" 40033A (?)
+	//ROM_LOAD( "60 90225-01.11c", 0x000, 0x400, NO_DUMP ) // "VIDEO ATTRIBUTE" 40033A (?)
 
 	ROM_REGION( 0x104, "abc_p3", 0 )
 	ROM_LOAD( "60 90239-01.1b",  0x000, 0x104, CRC(f3d0ba00) SHA1(bcc0ee26ecac0028aef6bf5cb308133b509bb360) ) // "ABC P3-11" PAL16R4, color encoder

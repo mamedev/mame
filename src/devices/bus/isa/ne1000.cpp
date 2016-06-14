@@ -33,7 +33,7 @@ void ne1000_device::device_start() {
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install_device(0x0300, 0x031f, 0, 0, read8_delegate(FUNC(ne1000_device::ne1000_port_r), this), write8_delegate(FUNC(ne1000_device::ne1000_port_w), this));
+	m_isa->install_device(0x0300, 0x031f, read8_delegate(FUNC(ne1000_device::ne1000_port_r), this), write8_delegate(FUNC(ne1000_device::ne1000_port_w), this));
 }
 
 void ne1000_device::device_reset() {

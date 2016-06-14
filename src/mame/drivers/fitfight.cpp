@@ -1012,7 +1012,7 @@ DRIVER_INIT_MEMBER(fitfight_state,bbprot)
 
 DRIVER_INIT_MEMBER(fitfight_state,hotmindff)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, 0, 0, read16_delegate(FUNC(fitfight_state::hotmindff_unk_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(fitfight_state::hotmindff_unk_r),this));
 	DRIVER_INIT_CALL(fitfight);
 }
 

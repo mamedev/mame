@@ -81,7 +81,7 @@ void isa8_mpu401_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_device(0x330, 0x0331, 0, 0, READ8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_r), WRITE8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_w));
+	m_isa->install_device(0x330, 0x0331, READ8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_r), WRITE8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_w));
 }
 
 //-------------------------------------------------

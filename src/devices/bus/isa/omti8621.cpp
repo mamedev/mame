@@ -321,7 +321,7 @@ void omti8621_device::device_reset()
 		int esdi_base = io_bases[m_iobase->read() & 7];
 
 		// install the ESDI ports
-		m_isa->install16_device(esdi_base, esdi_base + 7, 0, 0, read16_delegate(FUNC(omti8621_device::read), this), write16_delegate(FUNC(omti8621_device::write), this));
+		m_isa->install16_device(esdi_base, esdi_base + 7, read16_delegate(FUNC(omti8621_device::read), this), write16_delegate(FUNC(omti8621_device::write), this));
 
 		// and the onboard AT FDC ports
 		if (m_iobase->read() & 8)

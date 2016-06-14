@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( aquarius_io, AS_IO, 8, aquarius_state )
 	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_READWRITE(cassette_r, cassette_w)
 	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_READWRITE(vsync_r, mapper_w)
 	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_READWRITE(printer_r, printer_w)
-	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(keyboard_r, scrambler_w)
+	AM_RANGE(0xff, 0xff) AM_SELECT(0xff00) AM_READWRITE(keyboard_r, scrambler_w)
 ADDRESS_MAP_END
 
 

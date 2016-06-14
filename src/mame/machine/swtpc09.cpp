@@ -551,8 +551,8 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
 	}
 	else if (offset==0x0f)  // then we need to leave in top part of ram and dat write
 	{
-		mem.install_ram(logical_address, logical_address+0x0eff, 0, 0, &RAM[physical_address]);
-		mem.install_rom(logical_address+0xf00, logical_address+0xfff, 0, 0, &RAM[0xff00]);
+		mem.install_ram(logical_address, logical_address+0x0eff, &RAM[physical_address]);
+		mem.install_rom(logical_address+0xf00, logical_address+0xfff, &RAM[0xff00]);
 		mem.install_write_handler(logical_address+0xff0, logical_address+0xfff, write8_delegate(FUNC(swtpc09_state::dat_w),this));
 
 	}

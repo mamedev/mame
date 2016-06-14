@@ -1558,9 +1558,9 @@ DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
 	/* additional input ports are wired */
-	pgmspace.install_read_port(0xc004, 0xc004, 0, 0x18f3, "SW04");
-	pgmspace.install_read_port(0xc008, 0xc008, 0, 0x18f3, "SW08");
-	pgmspace.install_read_port(0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
+	pgmspace.install_read_port(0xc004, 0xc004, 0x18f3, "SW04");
+	pgmspace.install_read_port(0xc008, 0xc008, 0x18f3, "SW08");
+	pgmspace.install_read_port(0xc00c, 0xc00c, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
 	pgmspace.install_read_handler(0xc80a, 0xc80a, read8_delegate(FUNC(zaxxon_state::razmataz_counter_r),this));

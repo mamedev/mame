@@ -34,7 +34,7 @@ void ne2000_device::device_start() {
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install16_device(0x0300, 0x031f, 0, 0, read16_delegate(FUNC(ne2000_device::ne2000_port_r), this), write16_delegate(FUNC(ne2000_device::ne2000_port_w), this));
+	m_isa->install16_device(0x0300, 0x031f, read16_delegate(FUNC(ne2000_device::ne2000_port_r), this), write16_delegate(FUNC(ne2000_device::ne2000_port_w), this));
 }
 
 void ne2000_device::device_reset() {

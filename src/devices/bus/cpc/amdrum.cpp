@@ -52,7 +52,7 @@ void cpc_amdrum_device::device_start()
 	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	space.install_write_handler(0xff00,0xffff,0,0,write8_delegate(FUNC(cpc_amdrum_device::dac_w),this));
+	space.install_write_handler(0xff00,0xffff,write8_delegate(FUNC(cpc_amdrum_device::dac_w),this));
 }
 
 //-------------------------------------------------

@@ -71,11 +71,11 @@ void cpc_playcity_device::device_start()
 	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xf880,0xf883,0,0,read8_delegate(FUNC(cpc_playcity_device::ctc_r),this),write8_delegate(FUNC(cpc_playcity_device::ctc_w),this));
-	space.install_readwrite_handler(0xf884,0xf884,0,0,read8_delegate(FUNC(cpc_playcity_device::ymz1_data_r),this),write8_delegate(FUNC(cpc_playcity_device::ymz1_data_w),this));
-	space.install_readwrite_handler(0xf888,0xf888,0,0,read8_delegate(FUNC(cpc_playcity_device::ymz2_data_r),this),write8_delegate(FUNC(cpc_playcity_device::ymz2_data_w),this));
-	space.install_write_handler(0xf984,0xf984,0,0,write8_delegate(FUNC(cpc_playcity_device::ymz1_address_w),this));
-	space.install_write_handler(0xf988,0xf988,0,0,write8_delegate(FUNC(cpc_playcity_device::ymz2_address_w),this));
+	space.install_readwrite_handler(0xf880,0xf883,read8_delegate(FUNC(cpc_playcity_device::ctc_r),this),write8_delegate(FUNC(cpc_playcity_device::ctc_w),this));
+	space.install_readwrite_handler(0xf884,0xf884,read8_delegate(FUNC(cpc_playcity_device::ymz1_data_r),this),write8_delegate(FUNC(cpc_playcity_device::ymz1_data_w),this));
+	space.install_readwrite_handler(0xf888,0xf888,read8_delegate(FUNC(cpc_playcity_device::ymz2_data_r),this),write8_delegate(FUNC(cpc_playcity_device::ymz2_data_w),this));
+	space.install_write_handler(0xf984,0xf984,write8_delegate(FUNC(cpc_playcity_device::ymz1_address_w),this));
+	space.install_write_handler(0xf988,0xf988,write8_delegate(FUNC(cpc_playcity_device::ymz2_address_w),this));
 }
 
 //-------------------------------------------------

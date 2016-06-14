@@ -90,10 +90,10 @@ void al_magicsound_device::device_start()
 	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xf8d0,0xf8df,0,0,read8_delegate(FUNC(al_magicsound_device::dmac_r),this),write8_delegate(FUNC(al_magicsound_device::dmac_w),this));
-	space.install_write_handler(0xf9d0,0xf9df,0,0,write8_delegate(FUNC(al_magicsound_device::timer_w),this));
-	space.install_write_handler(0xfad0,0xfadf,0,0,write8_delegate(FUNC(al_magicsound_device::volume_w),this));
-	space.install_write_handler(0xfbd0,0xfbdf,0,0,write8_delegate(FUNC(al_magicsound_device::mapper_w),this));
+	space.install_readwrite_handler(0xf8d0,0xf8df,read8_delegate(FUNC(al_magicsound_device::dmac_r),this),write8_delegate(FUNC(al_magicsound_device::dmac_w),this));
+	space.install_write_handler(0xf9d0,0xf9df,write8_delegate(FUNC(al_magicsound_device::timer_w),this));
+	space.install_write_handler(0xfad0,0xfadf,write8_delegate(FUNC(al_magicsound_device::volume_w),this));
+	space.install_write_handler(0xfbd0,0xfbdf,write8_delegate(FUNC(al_magicsound_device::mapper_w),this));
 
 	m_ramptr = machine().device<ram_device>(":" RAM_TAG);
 

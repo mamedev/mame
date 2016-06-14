@@ -508,22 +508,22 @@ void gimix_state::machine_start()
 	// install any extra RAM
 	if(m_ram->size() > 65536)
 	{
-		m_bank1->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank2->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank3->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank4->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank5->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank6->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank7->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank8->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank9->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank10->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank11->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank12->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank13->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank14->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank15->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
-		m_bank16->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,0xffff,0,"upper_ram");
+		m_bank1->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank2->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank3->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank4->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank5->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank6->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank7->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank8->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank9->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank10->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank11->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank12->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank13->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank14->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank15->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank16->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
 	}
 	m_floppy0->get_device()->set_rpm(300);
 	m_floppy1->get_device()->set_rpm(300);

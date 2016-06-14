@@ -81,6 +81,7 @@ public:
 
 	// simple inline setters
 	void set_mirror(offs_t _mirror) { m_addrmirror = _mirror; }
+	void set_select(offs_t _select) { m_addrselect = _select; }
 	void set_read_type(map_handler_type _type) { m_read.m_type = _type; }
 	void set_write_type(map_handler_type _type) { m_write.m_type = _type; }
 	void set_region(const char *tag, offs_t offset) { m_region = tag; m_rgnoffs = offset; }
@@ -115,6 +116,7 @@ public:
 	offs_t                  m_addrend;              // end address
 	offs_t                  m_addrmirror;           // mirror bits
 	offs_t                  m_addrmask;             // mask bits
+	offs_t                  m_addrselect;           // select bits
 	map_handler_data        m_read;                 // data for read handler
 	map_handler_data        m_write;                // data for write handler
 	map_handler_data        m_setoffsethd;          // data for setoffset handler
@@ -362,6 +364,8 @@ void _class :: _name(::address_map &map, device_t &device) \
 	curentry->set_mask(_mask);
 #define AM_MIRROR(_mirror) \
 	curentry->set_mirror(_mirror);
+#define AM_SELECT(_select) \
+	curentry->set_select(_select);
 
 // driver data reads
 #define AM_READ(_handler) \

@@ -1175,8 +1175,8 @@ void vboy_state::machine_start()
 		std::string region_tag;
 		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(VBOYSLOT_ROM_REGION_TAG).c_str());
 
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x07000000, 0x071fffff, 0, 0x0e00000, "prog_cart_bank");
-		m_maincpu->space(AS_IO).install_read_bank(0x07000000, 0x071fffff, 0, 0x0e00000, "io_cart_bank");
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x07000000, 0x071fffff, 0x0e00000, "prog_cart_bank");
+		m_maincpu->space(AS_IO).install_read_bank(0x07000000, 0x071fffff, 0x0e00000, "io_cart_bank");
 		membank("prog_cart_bank")->set_base(m_cart_rom->base());
 		membank("io_cart_bank")->set_base(m_cart_rom->base());
 

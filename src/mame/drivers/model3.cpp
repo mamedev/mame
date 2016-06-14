@@ -5701,9 +5701,9 @@ DRIVER_INIT_MEMBER(model3_state, genprot)
 {
 //  std::string key = parameter(":315_5881:key");
 
-	m_maincpu->space(AS_PROGRAM).install_ram(0xf0180000, 0xf019ffff, 0, 0x0e000000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0xf0180000, 0xf019ffff, 0x0e000000);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, 0, 0x0e000000, read64_delegate(FUNC(model3_state::model3_5881prot_r), this), write64_delegate(FUNC(model3_state::model3_5881prot_w), this) );
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, 0, 0x0e000000, 0, read64_delegate(FUNC(model3_state::model3_5881prot_r), this), write64_delegate(FUNC(model3_state::model3_5881prot_w), this) );
 
 }
 

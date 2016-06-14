@@ -264,9 +264,9 @@ void isa8_pgc_device::device_reset()
 
 	m_commarea = memregion("commarea")->base();
 	if (BIT(ioport("DSW")->read(), 1))
-		m_isa->install_bank(0xc6400, 0xc67ff, 0, 0, "commarea", m_commarea);
+		m_isa->install_bank(0xc6400, 0xc67ff, "commarea", m_commarea);
 	else
-		m_isa->install_bank(0xc6000, 0xc63ff, 0, 0, "commarea", m_commarea);
+		m_isa->install_bank(0xc6000, 0xc63ff, "commarea", m_commarea);
 }
 
 //

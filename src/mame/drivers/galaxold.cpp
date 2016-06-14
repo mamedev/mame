@@ -3485,7 +3485,7 @@ ROM_END
 DRIVER_INIT_MEMBER(galaxold_state,guttangt)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_bank( 0x2000, 0x27ff, 0, 0, "cpubank" );
+	space.install_read_bank( 0x2000, 0x27ff, "cpubank" );
 	UINT8 *rom = memregion("maincpu")->base();
 	membank("cpubank")->set_base(rom + 0x2000);
 }

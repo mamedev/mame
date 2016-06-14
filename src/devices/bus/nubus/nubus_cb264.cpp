@@ -98,7 +98,7 @@ void nubus_cb264_device::device_start()
 //  printf("[cb264 %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
-	install_bank(slotspace, slotspace+VRAM_SIZE-1, 0, 0, "bank_cb264", &m_vram[0]);
+	install_bank(slotspace, slotspace+VRAM_SIZE-1, "bank_cb264", &m_vram[0]);
 
 	m_nubus->install_device(slotspace+0xff6000, slotspace+0xff60ff, read32_delegate(FUNC(nubus_cb264_device::cb264_r), this), write32_delegate(FUNC(nubus_cb264_device::cb264_w), this));
 	m_nubus->install_device(slotspace+0xff7000, slotspace+0xff70ff, read32_delegate(FUNC(nubus_cb264_device::cb264_ramdac_r), this), write32_delegate(FUNC(nubus_cb264_device::cb264_ramdac_w), this));

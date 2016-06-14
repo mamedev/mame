@@ -418,8 +418,8 @@ WRITE16_MEMBER(neopcb_state::write_bankpvc)
 void neopcb_state::install_common()
 {
 	// install memory bank
-	m_maincpu->space(AS_PROGRAM).install_rom(0x000080, 0x0fffff, 0, 0, (UINT16 *)m_region_maincpu->base() + 0x80/2);
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x2fffff, 0, 0, "cpu_bank");
+	m_maincpu->space(AS_PROGRAM).install_rom(0x000080, 0x0fffff, (UINT16 *)m_region_maincpu->base() + 0x80/2);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x2fffff, "cpu_bank");
 	membank("cpu_bank")->set_base(m_region_maincpu->base() + 0x100000);
 
 	// install protection handlers + bankswitch handler
@@ -436,7 +436,7 @@ void neopcb_state::install_common()
 
 void neopcb_state::install_banked_bios()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc00000, 0xc1ffff, 0, 0x0e0000, "bios_bank");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc00000, 0xc1ffff, 0x0e0000, "bios_bank");
 	membank("bios_bank")->configure_entries(0, 2, memregion("mainbios")->base(), 0x20000);
 	membank("bios_bank")->set_entry(1);
 
@@ -505,7 +505,7 @@ DRIVER_INIT_MEMBER(neopcb_state, kf2k3pcb)
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 	kf2k3pcb_decrypt_s1data();
 
-	m_maincpu->space(AS_PROGRAM).install_rom(0xc00000, 0xc7ffff, 0, 0x080000, memregion("mainbios")->base());  // 512k bios
+	m_maincpu->space(AS_PROGRAM).install_rom(0xc00000, 0xc7ffff, 0x080000, memregion("mainbios")->base());  // 512k bios
 }
 
 

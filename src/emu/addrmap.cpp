@@ -36,6 +36,7 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 		m_addrend((map.m_globalmask == 0) ? end : end & map.m_globalmask),
 		m_addrmirror(0),
 		m_addrmask(0),
+		m_addrselect(0),
 		m_share(nullptr),
 		m_region(nullptr),
 		m_rgnoffs(0),
@@ -577,6 +578,9 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 
 				if (entry->m_addrmask || subentry->m_addrmask)
 					throw emu_fatalerror("uplift_submaps unhandled case: address masks.\n");
+
+				if (entry->m_addrselect || subentry->m_addrselect)
+					throw emu_fatalerror("uplift_submaps unhandled case: select masks.\n");
 
 				if (subentry->m_addrmirror & mirror_address_mask)
 					throw emu_fatalerror("uplift_submaps unhandled case: address mirror bit within subentry.\n");
