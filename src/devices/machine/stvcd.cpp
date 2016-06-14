@@ -136,7 +136,7 @@ void saturn_state::cd_exec_command( void )
 		((cr1 & 0xff00) != 0x5200) &&
 		((cr1 & 0xff00) != 0x5300) &&
 		1)
-		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
+		logerror("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 	switch ((cr1 >> 8) & 0xff)
 	{
@@ -283,7 +283,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			else
 			{
-				printf("No xferdnum error\n");
+				logerror("No xferdnum error\n");
 				cr1 = (cd_stat) | (0xff);   // is this right?
 				cr2 = 0xffff;
 				cr3 = 0;
@@ -360,7 +360,7 @@ void saturn_state::cd_exec_command( void )
 					if (start_pos != 0xffffff)
 						cd_curfad = start_pos & 0xfffff;
 
-					printf("fad mode\n");
+					logerror("fad mode\n");
 					cur_track = cdrom_get_track(cdrom, cd_curfad-150);
 				}
 				else
@@ -415,7 +415,7 @@ void saturn_state::cd_exec_command( void )
 						else
 							fadstoplay = (cdrom_get_track_start(cdrom, (end_pos & 0xff00) >> 8)) - cd_curfad;
 					}
-					printf("track mode %08x %08x\n",cd_curfad,fadstoplay);
+					logerror("track mode %08x %08x\n",cd_curfad,fadstoplay);
 				}
 				else
 				{
@@ -428,7 +428,7 @@ void saturn_state::cd_exec_command( void )
 						cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
 						fadstoplay = cdrom_get_track_start(cdrom, cur_track) - cd_curfad;
 					}
-					printf("track resume %08x %08x\n",cd_curfad,fadstoplay);
+					logerror("track resume %08x %08x\n",cd_curfad,fadstoplay);
 				}
 			}
 
@@ -1193,7 +1193,7 @@ void saturn_state::cd_exec_command( void )
 
 		case 0x67:    // get copy error
 			CDROM_LOG(("%s:CD: Get copy error\n",   machine().describe_context()))
-			printf("Get copy error\n");
+			logerror("Get copy error\n");
 			cr1 = cd_stat;
 			cr2 = 0;
 			cr3 = 0;
