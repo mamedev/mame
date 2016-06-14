@@ -366,8 +366,8 @@ void duscc_channel::device_start()
 	save_item(NAME(m_ctl));
 	save_item(NAME(m_pcr));
 	save_item(NAME(m_ccr));
-	save_item(NAME(m_txfifo[4]));
-	save_item(NAME(m_rxfifo[4]));
+	save_item(NAME(m_txfifo));
+	save_item(NAME(m_rxfifo));
 	save_item(NAME(m_rsr));
 	save_item(NAME(m_trsr));
 	save_item(NAME(m_ictsr));
