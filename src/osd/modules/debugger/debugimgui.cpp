@@ -954,6 +954,8 @@ void debug_imgui::draw_console()
 		ImGui::PushItemWidth(-1.0f);
 		if(ImGui::InputText("##console_input",view_main_console->console_input,512,flags))
 			view_main_console->exec_cmd = true;
+		if ((ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
+			ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
 		ImGui::PopItemWidth();
 		ImGui::EndChild();
 		ImGui::End();
