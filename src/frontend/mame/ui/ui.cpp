@@ -126,51 +126,6 @@ slider_state *mame_ui_manager::slider_current;
 
 
 /***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-//-------------------------------------------------
-//  is_breakable_char - is a given unicode
-//  character a possible line break?
-//-------------------------------------------------
-
-static inline int is_breakable_char(unicode_char ch)
-{
-	// regular spaces and hyphens are breakable
-	if (ch == ' ' || ch == '-')
-		return TRUE;
-
-	// In the following character sets, any character is breakable:
-	//  Hiragana (3040-309F)
-	//  Katakana (30A0-30FF)
-	//  Bopomofo (3100-312F)
-	//  Hangul Compatibility Jamo (3130-318F)
-	//  Kanbun (3190-319F)
-	//  Bopomofo Extended (31A0-31BF)
-	//  CJK Strokes (31C0-31EF)
-	//  Katakana Phonetic Extensions (31F0-31FF)
-	//  Enclosed CJK Letters and Months (3200-32FF)
-	//  CJK Compatibility (3300-33FF)
-	//  CJK Unified Ideographs Extension A (3400-4DBF)
-	//  Yijing Hexagram Symbols (4DC0-4DFF)
-	//  CJK Unified Ideographs (4E00-9FFF)
-	if (ch >= 0x3040 && ch <= 0x9fff)
-		return TRUE;
-
-	// Hangul Syllables (AC00-D7AF) are breakable
-	if (ch >= 0xac00 && ch <= 0xd7af)
-		return TRUE;
-
-	// CJK Compatibility Ideographs (F900-FAFF) are breakable
-	if (ch >= 0xf900 && ch <= 0xfaff)
-		return TRUE;
-
-	return FALSE;
-}
-
-
-
-/***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/
 
@@ -600,204 +555,25 @@ void mame_ui_manager::draw_text(render_container *container, const char *buf, fl
 
 void mame_ui_manager::draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
 {
-	float lineheight = get_line_height() * text_size;
-	const char *ends = origs + strlen(origs);
-	float wrapwidth = origwrapwidth;
-	const char *s = origs;
-	const char *linestart;
-	float cury = y;
-	float maxwidth = 0;
-	float aspect = machine().render().ui_aspect(container);
+	// create the layout
+	auto layout = create_layout(container, origwrapwidth, (ui::text_layout::text_justify)justify, (ui::text_layout::word_wrapping)wrap);
 
-	// if we don't want wrapping, guarantee a huge wrapwidth
-	if (wrap == WRAP_NEVER)
-		wrapwidth = 1000000.0f;
-	if (wrapwidth <= 0)
-		return;
+	// append text to it
+	layout.add_text(
+		origs,
+		fgcolor,
+		draw == DRAW_OPAQUE ? bgcolor : rgb_t(0, 0, 0, 0),
+		text_size);
 
-	// loop over lines
-	while (*s != 0)
-	{
-		const char *lastbreak = nullptr;
-		int line_justify = justify;
-		unicode_char schar;
-		int scharcount;
-		float lastbreak_width = 0;
-		float curwidth = 0;
-		float curx = x;
+	// and emit it (if we are asked to do so)
+	if (draw != DRAW_NONE)
+		layout.emit(container, x, y);
 
-		// get the current character
-		scharcount = uchar_from_utf8(&schar, s, ends - s);
-		if (scharcount == -1)
-			break;
-
-		// if the line starts with a tab character, center it regardless
-		if (schar == '\t')
-		{
-			s += scharcount;
-			line_justify = JUSTIFY_CENTER;
-		}
-
-		// remember the starting position of the line
-		linestart = s;
-
-		// loop while we have characters and are less than the wrapwidth
-		while (*s != 0 && curwidth <= wrapwidth)
-		{
-			float chwidth;
-
-			// get the current chcaracter
-			scharcount = uchar_from_utf8(&schar, s, ends - s);
-			if (scharcount == -1)
-				break;
-
-			// if we hit a newline, stop immediately
-			if (schar == '\n')
-				break;
-
-			// get the width of this character
-			chwidth = get_font()->char_width(lineheight, aspect, schar);
-
-			// if we hit a space, remember the location and width *without* the space
-			if (schar == ' ')
-			{
-				lastbreak = s;
-				lastbreak_width = curwidth;
-			}
-
-			// add the width of this character and advance
-			curwidth += chwidth;
-			s += scharcount;
-
-			// if we hit any non-space breakable character, remember the location and width
-			// *with* the breakable character
-			if (schar != ' ' && is_breakable_char(schar) && curwidth <= wrapwidth)
-			{
-				lastbreak = s;
-				lastbreak_width = curwidth;
-			}
-		}
-
-		// if we accumulated too much for the current width, we need to back off
-		if (curwidth > wrapwidth)
-		{
-			// if we're word wrapping, back up to the last break if we can
-			if (wrap == WRAP_WORD)
-			{
-				// if we hit a break, back up to there with the appropriate width
-				if (lastbreak != nullptr)
-				{
-					s = lastbreak;
-					curwidth = lastbreak_width;
-				}
-
-				// if we didn't hit a break, back up one character
-				else if (s > linestart)
-				{
-					// get the previous character
-					s = (const char *)utf8_previous_char(s);
-					scharcount = uchar_from_utf8(&schar, s, ends - s);
-					if (scharcount == -1)
-						break;
-
-					curwidth -= get_font()->char_width(lineheight, aspect, schar);
-					// if back to 0, there is no space to draw even a single char
-					if (curwidth <= 0)
-						break;
-				}
-			}
-
-			// if we're truncating, make sure we have enough space for the ...
-			else if (wrap == WRAP_TRUNCATE)
-			{
-				// add in the width of the ...
-				curwidth += 3.0f * get_font()->char_width(lineheight, aspect, '.');
-
-				// while we are above the wrap width, back up one character
-				while (curwidth > wrapwidth && s > linestart)
-				{
-					// get the previous character
-					s = (const char *)utf8_previous_char(s);
-					scharcount = uchar_from_utf8(&schar, s, ends - s);
-					if (scharcount == -1)
-						break;
-
-					curwidth -= get_font()->char_width(lineheight, aspect, schar);
-				}
-			}
-		}
-
-		// align according to the justfication
-		if (line_justify == JUSTIFY_CENTER)
-			curx += (origwrapwidth - curwidth) * 0.5f;
-		else if (line_justify == JUSTIFY_RIGHT)
-			curx += origwrapwidth - curwidth;
-
-		// track the maximum width of any given line
-		if (curwidth > maxwidth)
-			maxwidth = curwidth;
-
-		// if opaque, add a black box
-		if (draw == DRAW_OPAQUE)
-			container->add_rect(curx, cury, curx + curwidth, cury + lineheight, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-
-		// loop from the line start and add the characters
-		while (linestart < s)
-		{
-			// get the current character
-			unicode_char linechar;
-			int linecharcount = uchar_from_utf8(&linechar, linestart, ends - linestart);
-			if (linecharcount == -1)
-				break;
-
-			if (draw != DRAW_NONE)
-			{
-				container->add_char(curx, cury, lineheight, aspect, fgcolor, *get_font(), linechar);
-				curx += get_font()->char_width(lineheight, aspect, linechar);
-			}
-			linestart += linecharcount;
-		}
-
-		// append ellipses if needed
-		if (wrap == WRAP_TRUNCATE && *s != 0 && draw != DRAW_NONE)
-		{
-			container->add_char(curx, cury, lineheight, aspect, fgcolor, *get_font(), '.');
-			curx += get_font()->char_width(lineheight, aspect, '.');
-			container->add_char(curx, cury, lineheight, aspect, fgcolor, *get_font(), '.');
-			curx += get_font()->char_width(lineheight, aspect, '.');
-			container->add_char(curx, cury, lineheight, aspect, fgcolor, *get_font(), '.');
-			curx += get_font()->char_width(lineheight, aspect, '.');
-		}
-
-		// if we're not word-wrapping, we're done
-		if (wrap != WRAP_WORD)
-			break;
-
-		// advance by a row
-		cury += lineheight;
-
-		// skip past any spaces at the beginning of the next line
-		scharcount = uchar_from_utf8(&schar, s, ends - s);
-		if (scharcount == -1)
-			break;
-
-		if (schar == '\n')
-			s += scharcount;
-		else
-			while (*s && isspace(schar))
-			{
-				s += scharcount;
-				scharcount = uchar_from_utf8(&schar, s, ends - s);
-				if (scharcount == -1)
-					break;
-			}
-	}
-
-	// report the width and height of the resulting space
+	// return width/height
 	if (totalwidth)
-		*totalwidth = maxwidth;
+		*totalwidth = layout.actual_width();
 	if (totalheight)
-		*totalheight = cury - y;
+		*totalheight = layout.actual_height();
 }
 
 
@@ -2536,136 +2312,40 @@ void mame_ui_manager::set_use_natural_keyboard(bool use_natural_keyboard)
 	assert(error.empty());
 }
 
+
+//-------------------------------------------------
+//  wrap_text
+//-------------------------------------------------
+
+ui::text_layout mame_ui_manager::create_layout(render_container *container, float width, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap)
+{
+	// determine scale factors
+	float yscale = get_line_height();
+	float xscale = yscale * machine().render().ui_aspect(container);
+
+	// create the layout
+	return ui::text_layout(*get_font(), xscale, yscale, width, justify, wrap);
+}
+
+
 //-------------------------------------------------
 //  wrap_text
 //-------------------------------------------------
 
 int mame_ui_manager::wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
 {
-	float lineheight = get_line_height() * text_size;
-	const char *ends = origs + strlen(origs);
-	float wrapwidth = origwrapwidth;
-	const char *s = origs;
-	const char *linestart;
-	float maxwidth = 0;
-	float aspect = machine().render().ui_aspect(container);
-	int count = 0;
+	// create the layout
+	auto layout = create_layout(container, origwrapwidth, ui::text_layout::LEFT, ui::text_layout::WORD);
 
-	// loop over lines
-	while (*s != 0)
-	{
-		const char *lastbreak = nullptr;
-		unicode_char schar;
-		int scharcount;
-		float lastbreak_width = 0;
-		float curwidth = 0;
+	// add the text
+	layout.add_text(
+		origs,
+		rgb_t::black,
+		rgb_t::black,
+		text_size);
 
-		// get the current character
-		scharcount = uchar_from_utf8(&schar, s, ends - s);
-		if (scharcount == -1)
-			break;
-
-		// remember the starting position of the line
-		linestart = s;
-
-		// loop while we have characters and are less than the wrapwidth
-		while (*s != 0 && curwidth <= wrapwidth)
-		{
-			float chwidth;
-
-			// get the current chcaracter
-			scharcount = uchar_from_utf8(&schar, s, ends - s);
-			if (scharcount == -1)
-				break;
-
-			// if we hit a newline, stop immediately
-			if (schar == '\n')
-				break;
-
-			// get the width of this character
-			chwidth = get_font()->char_width(lineheight, aspect, schar);
-
-			// if we hit a space, remember the location and width *without* the space
-			if (schar == ' ')
-			{
-				lastbreak = s;
-				lastbreak_width = curwidth;
-			}
-
-			// add the width of this character and advance
-			curwidth += chwidth;
-			s += scharcount;
-
-			// if we hit any non-space breakable character, remember the location and width
-			// *with* the breakable character
-			if (schar != ' ' && is_breakable_char(schar) && curwidth <= wrapwidth)
-			{
-				lastbreak = s;
-				lastbreak_width = curwidth;
-			}
-		}
-
-		// if we accumulated too much for the current width, we need to back off
-		if (curwidth > wrapwidth)
-		{
-			// if we hit a break, back up to there with the appropriate width
-			if (lastbreak != nullptr)
-			{
-				s = lastbreak;
-				curwidth = lastbreak_width;
-			}
-
-			// if we didn't hit a break, back up one character
-			else if (s > linestart)
-			{
-				// get the previous character
-				s = (const char *)utf8_previous_char(s);
-				scharcount = uchar_from_utf8(&schar, s, ends - s);
-				if (scharcount == -1)
-					break;
-
-				curwidth -= get_font()->char_width(lineheight, aspect, schar);
-			}
-		}
-
-		// track the maximum width of any given line
-		if (curwidth > maxwidth)
-			maxwidth = curwidth;
-
-		xstart.push_back(linestart - origs);
-		xend.push_back(s - origs);
-
-		// loop from the line start and add the characters
-		while (linestart < s)
-		{
-			// get the current character
-			unicode_char linechar;
-			int linecharcount = uchar_from_utf8(&linechar, linestart, ends - linestart);
-			if (linecharcount == -1)
-				break;
-			linestart += linecharcount;
-		}
-
-		// advance by a row
-		count++;
-
-		// skip past any spaces at the beginning of the next line
-		scharcount = uchar_from_utf8(&schar, s, ends - s);
-		if (scharcount == -1)
-			break;
-
-		if (schar == '\n')
-			s += scharcount;
-		else
-			while (*s && isspace(schar))
-			{
-				s += scharcount;
-				scharcount = uchar_from_utf8(&schar, s, ends - s);
-				if (scharcount == -1)
-					break;
-			}
-	}
-	return count;
+	// and get the wrapping info
+	return layout.get_wrap_info(xstart, xend);
 }
 
 //-------------------------------------------------

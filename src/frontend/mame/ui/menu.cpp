@@ -514,8 +514,6 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 
 	bool selected_subitem_too_big = false;
 	int itemnum, linenum;
-	bool mouse_hit, mouse_button;
-	float mouse_x = -1, mouse_y = -1;
 
 	if (ui().options().use_background_image() && &machine().system() == &GAME_NAME(___empty) && bgrnd_bitmap->valid() && !noimage)
 		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t::white, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -916,6 +914,9 @@ void menu::handle_events(UINT32 flags)
 		{
 			// if we are hovering over a valid item, select it with a single click
 			case UI_EVENT_MOUSE_DOWN:
+				if (custom_mouse_down())
+					return;
+
 				if ((flags & PROCESS_ONLYCHAR) == 0)
 				{
 					if (hover >= 0 && hover < item.size())
@@ -2957,24 +2958,13 @@ void menu::set_pressed()
 
 void menu::extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction)
 {
-	float text_width, text_height;
-	float width, maxwidth;
-	float x1, y1, x2, y2;
-
 	// get the size of the text
-	ui().draw_text_full(container,text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD,
-		DRAW_NONE, rgb_t::white, rgb_t::black, &text_width, &text_height);
-	width = text_width + (2 * UI_BOX_LR_BORDER);
-	maxwidth = MAX(width, origx2 - origx1);
+	auto layout = ui().create_layout(container);
+	layout.add_text(text);
 
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy + (yspan * direction);
-	y2 = origy + (UI_BOX_TB_BORDER * direction);
-
-	if (y1 > y2)
-		std::swap(y1, y2);
+	// position this extra text
+	float x1, y1, x2, y2;
+	extra_text_position(origx1, origx2, origy, yspan, layout, direction, x1, y1, x2, y2);
 
 	// draw a box
 	ui().draw_outlined_box(container,x1, y1, x2, y2, UI_BACKGROUND_COLOR);
@@ -2984,8 +2974,29 @@ void menu::extra_text_draw_box(float origx1, float origx2, float origy, float ys
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container,text, x1, y1, text_width, JUSTIFY_LEFT, WRAP_WORD,
-		DRAW_NORMAL, rgb_t::white, rgb_t::black, nullptr, nullptr);
+	layout.emit(container, x1, y1);
+}
+
+
+//-------------------------------------------------
+//  extra_text_position - given extra text that has
+//	been put into a layout, position it
+//-------------------------------------------------
+
+void menu::extra_text_position(float origx1, float origx2, float origy, float yspan, text_layout &layout,
+	int direction, float &x1, float &y1, float &x2, float &y2)
+{
+	float width = layout.actual_width() + (2 * UI_BOX_LR_BORDER);
+	float maxwidth = MAX(width, origx2 - origx1);
+
+	// compute our bounds
+	x1 = 0.5f - 0.5f * maxwidth;
+	x2 = x1 + maxwidth;
+	y1 = origy + (yspan * direction);
+	y2 = origy + (UI_BOX_TB_BORDER * direction);
+
+	if (y1 > y2)
+		std::swap(y1, y2);
 }
 
 

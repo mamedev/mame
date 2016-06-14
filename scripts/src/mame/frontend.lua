@@ -75,6 +75,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/pluginopts.h",
 	MAME_DIR .. "src/frontend/mame/ui/ui.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/ui.h",
+	MAME_DIR .. "src/frontend/mame/ui/text.cpp",
+	MAME_DIR .. "src/frontend/mame/ui/text.h",
 	MAME_DIR .. "src/frontend/mame/ui/devctrl.h",
 	MAME_DIR .. "src/frontend/mame/ui/menu.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/menu.h",

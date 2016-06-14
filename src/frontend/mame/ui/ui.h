@@ -21,6 +21,7 @@
 #include "ui/uimain.h"
 #include "ui/menuitem.h"
 #include "ui/slider.h"
+#include "ui/text.h"
 
 namespace ui {
 
@@ -256,6 +257,7 @@ public:
 
 	// other
 	void process_natural_keyboard();
+	ui::text_layout create_layout(render_container *container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::WORD);
 
 	// word wrap
 	int wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size = 1.0f);
