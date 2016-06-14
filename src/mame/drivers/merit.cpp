@@ -1328,7 +1328,7 @@ static MACHINE_CONFIG_START( pitboss, merit_state )
 	MCFG_MC6845_BEGIN_UPDATE_CB(merit_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(merit_state, crtc_update_row)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(merit_state, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("soundcpu", 0))
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
