@@ -22,7 +22,7 @@ INLINE FUNCTIONS
 //  is_space_character
 //-------------------------------------------------
 
-static inline bool is_space_character(unicode_char ch)
+inline bool is_space_character(unicode_char ch)
 {
 	return ch == ' ';
 }
@@ -33,7 +33,7 @@ static inline bool is_space_character(unicode_char ch)
 //  character a possible line break?
 //-------------------------------------------------
 
-static inline bool is_breakable_char(unicode_char ch)
+inline bool is_breakable_char(unicode_char ch)
 {
 	// regular spaces and hyphens are breakable
 	if (is_space_character(ch) || ch == '-')

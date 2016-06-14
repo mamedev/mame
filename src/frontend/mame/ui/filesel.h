@@ -68,7 +68,9 @@ public:
 	virtual void populate() override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-	virtual void custom_mouse_down() override;
+
+protected:
+	virtual bool custom_mouse_down() override;
 
 private:
 	enum file_selector_entry_type

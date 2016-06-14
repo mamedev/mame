@@ -93,6 +93,8 @@ private:
 		size_t span;
 	};
 
+	// this should really be "positioned glyph" as glyphs != characters, but
+	// we'll get there eventually
 	struct positioned_char
 	{
 		unicode_char character;

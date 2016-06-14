@@ -914,7 +914,9 @@ void menu::handle_events(UINT32 flags)
 		{
 			// if we are hovering over a valid item, select it with a single click
 			case UI_EVENT_MOUSE_DOWN:
-				custom_mouse_down();
+				if (custom_mouse_down())
+					return;
+
 				if ((flags & PROCESS_ONLYCHAR) == 0)
 				{
 					if (hover >= 0 && hover < item.size())

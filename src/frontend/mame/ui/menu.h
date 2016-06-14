@@ -70,7 +70,6 @@ public:
 
 	// configure the menu for custom rendering
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
-	virtual void custom_mouse_down() { }
 
 	// allocate temporary memory from the menu's memory pool
 	void *m_pool_alloc(size_t size);
@@ -287,6 +286,9 @@ protected:
 	void extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, const char *header, const char *footer);
 	void extra_text_position(float origx1, float origx2, float origy, float yspan, text_layout &layout,
 		int direction, float &x1, float &y1, float &x2, float &y2);
+
+	// custom events
+	virtual bool custom_mouse_down() { return false; }
 
 	template <typename T>
 	static T *topmost_menu() { return dynamic_cast<T *>(menu_stack.get()); }

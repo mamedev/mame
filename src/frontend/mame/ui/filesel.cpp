@@ -364,13 +364,16 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 //  custom_mouse_down - perform our special mouse down
 //-------------------------------------------------
 
-void menu_file_selector::custom_mouse_down()
+bool menu_file_selector::custom_mouse_down()
 {
 	if (m_hover_directory.length() > 0)
 	{
 		m_current_directory = m_hover_directory;
 		reset(reset_options::SELECT_FIRST);
+		return true;
 	}
+
+	return false;
 }
 
 
