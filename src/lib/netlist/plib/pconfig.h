@@ -50,6 +50,9 @@ typedef __int128_t INT128;
 //============================================================
 
 #if defined(__GNUC__)
+	/* does not work in versions over 4.7.x of 32bit MINGW  */
+	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
+		#define PHAS_PMF_INTERNAL 0
 	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__)
 		#define PHAS_PMF_INTERNAL 1
 		#define MEMBER_ABI _thiscall
