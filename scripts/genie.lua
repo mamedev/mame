@@ -705,7 +705,7 @@ end
 -- this speeds it up a bit by piping between the preprocessor/compiler/assembler
 	if not ("pnacl" == _OPTIONS["gcc"]) then
 		buildoptions {
-			"--pipe",
+			"-pipe",
 		}
 	end
 -- add -g if we need symbols, and ensure we have frame pointers
