@@ -9,10 +9,7 @@
 #define PPARSER_H_
 
 #include <unordered_map>
-<<<<<<< HEAD
 #include <cstdint>
-=======
->>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 
 #include "pconfig.h"
 #include "pstring.h"

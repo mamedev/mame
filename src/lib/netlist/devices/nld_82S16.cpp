@@ -38,13 +38,7 @@ namespace netlist
 		logic_input_t m_DIN;
 		logic_output_t m_DOUTQ;
 
-<<<<<<< HEAD
-		//netlist_state_t<NLUINT8[256]> m_ram;
 		state_var<uint_fast64_t[4]> m_ram; // 256 bits
-=======
-		//netlist_state_t<UINT8[256]> m_ram;
-		state_var<UINT64[4]> m_ram; // 256 bits
->>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 	};
 
 	NETLIB_OBJECT_DERIVED(82S16_dip, 82S16)

@@ -41,15 +41,9 @@ namespace netlist
 		logic_input_t m_R91;
 		logic_input_t m_R92;
 
-<<<<<<< HEAD
 		state_var_u8 m_cnt;
 		state_var_u8 m_last_A;
 		state_var_u8 m_last_B;
-=======
-		state_var<UINT8> m_cnt;
-		state_var<UINT8> m_last_A;
-		state_var<UINT8> m_last_B;
->>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 
 		object_array_t<logic_output_t, 4> m_Q;
 	};

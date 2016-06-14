@@ -45,7 +45,6 @@ public:
 	{
 		static inline const datatype_t f()
 		{
-<<<<<<< HEAD
 			return datatype_t(sizeof(T), false, plib::is_integral<T>::value || std::is_enum<T>::value,
 					std::is_floating_point<T>::value); }
 	};
@@ -55,17 +54,6 @@ public:
 		static inline const datatype_t f()
 		{
 			return datatype_t(sizeof(T), true, plib::is_integral<T>::value || std::is_enum<T>::value,
-=======
-			return datatype_t(sizeof(T), false, std::is_integral<T>::value || std::is_enum<T>::value,
-					std::is_floating_point<T>::value); }
-	};
-
-	template<typename T> struct datatype_f<T *>
-	{
-		static inline const datatype_t f()
-		{
-			return datatype_t(sizeof(T), true, std::is_integral<T>::value || std::is_enum<T>::value,
->>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 					std::is_floating_point<T>::value);
 		}
 	};

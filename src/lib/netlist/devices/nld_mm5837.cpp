@@ -61,11 +61,7 @@ namespace netlist
 		const netlist_time m_inc;
 
 		/* state */
-<<<<<<< HEAD
 		state_var_u32 m_shift;
-=======
-		state_var<UINT32> m_shift;
->>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 
 		/* cache */
 		bool m_is_timestep;

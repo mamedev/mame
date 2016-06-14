@@ -57,11 +57,7 @@ namespace netlist
 		param_int_t m_L_to_H;
 		param_int_t m_H_to_L;
 
-<<<<<<< HEAD
 		state_var_u8 m_last;
-=======
-		state_var<UINT8> m_last;
->>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 	};
 
 	NETLIB_RESET(nicRSFF)

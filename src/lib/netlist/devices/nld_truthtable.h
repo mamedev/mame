@@ -183,10 +183,7 @@ namespace netlist
 		, m_last_state(*this, "m_last_state", 0)
 		, m_ign(*this, "m_ign", 0)
 		, m_active(*this, "m_active", 1)
-<<<<<<< HEAD
 		, m_use_deactivate(*this, "USE_DEACTIVATE", true)
-=======
->>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 		, m_ttp(ttp)
 		{
 			while (*desc != nullptr && **desc != 0 )
@@ -205,10 +202,7 @@ namespace netlist
 		, m_last_state(*this, "m_last_state", 0)
 		, m_ign(*this, "m_ign", 0)
 		, m_active(*this, "m_active", 1)
-<<<<<<< HEAD
 		, m_use_deactivate(*this, "USE_DEACTIVATE", true)
-=======
->>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 		, m_ttp(ttp)
 		{
 			m_desc = desc;
@@ -391,18 +385,11 @@ namespace netlist
 			}
 		}
 
-<<<<<<< HEAD
 		/* FIXME: check width */
 		state_var_u32 m_last_state;
 		state_var_u32 m_ign;
 		state_var_s32  m_active;
 		param_logic_t     m_use_deactivate;
-=======
-		state_var<UINT32> m_last_state;
-		state_var<UINT32> m_ign;
-		state_var<INT32> m_active;
-
->>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 		truthtable_t *m_ttp;
 		plib::pstring_vector_t m_desc;
 	};

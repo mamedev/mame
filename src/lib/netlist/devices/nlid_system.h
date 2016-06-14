@@ -313,11 +313,7 @@ namespace netlist
 		, m_Q(*this, "Q")
 		{
 
-<<<<<<< HEAD
 			for (int i=0; i < m_N; i++)
-=======
-			for (std::size_t i=0; i < m_N; i++)
->>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 				m_I.push_back(plib::make_unique<analog_input_t>(*this, plib::pfmt("A{1}")(i)));
 
 			plib::pstring_vector_t cmds(m_func.Value(), " ");
@@ -418,12 +414,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	private:
-
-<<<<<<< HEAD
 		state_var_u8 m_last_state;
-=======
-		state_var<UINT8> m_last_state;
->>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 	};
 
 	// -----------------------------------------------------------------------------

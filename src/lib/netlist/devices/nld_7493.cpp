@@ -31,13 +31,8 @@ namespace netlist
 		logic_input_t m_I;
 		logic_output_t m_Q;
 
-<<<<<<< HEAD
 		state_var_u8 m_reset;
 		state_var_u8 m_state;
-=======
-		state_var<UINT8> m_reset;
-		state_var<UINT8> m_state;
->>>>>>> branch 'netlist_dev' of https://github.com/mamedev/mame.git
 	};
 
 	NETLIB_OBJECT(7493)
