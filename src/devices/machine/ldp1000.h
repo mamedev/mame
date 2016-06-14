@@ -36,9 +36,9 @@ public:
 	// construction/destruction
 	sony_ldp1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// I/O operations
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	// I/O operations TODO: both actually protected
+	DECLARE_WRITE8_MEMBER( command_w );
+	DECLARE_READ8_MEMBER( status_r );
 
 protected:
 	// device-level overrides
@@ -51,6 +51,33 @@ protected:
 	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
 
+	enum ldp1000_status {
+		stat_undef = 		0x00,
+		stat_completion = 	0x01,
+		stat_error = 		0x02,
+		stat_pgm_end = 		0x04,
+		stat_not_target = 	0x05,
+		stat_no_frame = 	0x06,
+		stat_ack = 			0x0a,
+		stat_nak = 			0x0b
+	};
+
+	enum ldp1000_player_state {
+		player_standby = 0,
+		player_search
+	};
+	
+private:
+	UINT8 m_command;
+	ldp1000_status m_status;
+	ldp1000_player_state m_player_state;
+	bool m_audio_enable[2];
+	// TODO: sub-class
+	void set_new_player_state(ldp1000_player_state which, UINT8 fifo_size);
+	void set_new_player_bcd(UINT8 data);
+	UINT8 m_internal_bcd[0x10];
+	UINT8 m_index_state;
+	UINT8 m_index_size;
 };
 
 
