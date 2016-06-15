@@ -14,7 +14,8 @@ Notes:
     Eshb has some junk in the IO TEST screen.  Maybe a bad dump?
 
 Todo:
-    - LD TROUBLE message pops up after each cycle in attract.  NMI-related?
+    - LD TROUBLE message pops up after each cycle in attract.  NMI-related
+	- Wrong overlay colors;
     - Convert to tilemaps (see next ToDo for feasibility).
     - Apparently some tiles blink (in at least two different ways).
     - 0xfe and 0xff are pretty obviously not NMI enables.  They're likely LED's.  Do the NMI right (somehow).
@@ -40,27 +41,31 @@ public:
 
 	esh_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc") ,
-		m_tile_ram(*this, "tile_ram"),
-		m_tile_control_ram(*this, "tile_ctrl_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+			m_laserdisc(*this, "laserdisc"),
+			m_screen(*this, "screen"),
+			m_tile_ram(*this, "tile_ram"),
+			m_tile_control_ram(*this, "tile_ctrl_ram"),
+			m_maincpu(*this, "maincpu"),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette")  { }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<UINT8> m_tile_ram;
 	required_shared_ptr<UINT8> m_tile_control_ram;
-	UINT8 m_ld_video_visible;
+	bool m_ld_video_visible;
 	DECLARE_READ8_MEMBER(ldp_read);
 	DECLARE_WRITE8_MEMBER(ldp_write);
 	DECLARE_WRITE8_MEMBER(misc_write);
 	DECLARE_WRITE8_MEMBER(led_writes);
 	DECLARE_WRITE8_MEMBER(nmi_line_w);
 	DECLARE_DRIVER_INIT(esh);
+	bool m_nmi_enable;
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(esh);
 	UINT32 screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_esh);
+	INTERRUPT_GEN_MEMBER(ld_unk_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -78,10 +83,14 @@ protected:
 UINT32 esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int charx, chary;
+	const UINT8 pal_bank = m_ld_video_visible == true ? 0x10 : 0x00;
+	const UINT32 trans_mask = m_ld_video_visible == true ? 0 : -1;
+	gfx_element *gfx;// = m_gfxdecode->gfx(0);
 
 	/* clear */
 	bitmap.fill(0, cliprect);
 
+	
 	/* Draw tiles */
 	for (charx = 0; charx < 32; charx++)
 	{
@@ -91,13 +100,20 @@ UINT32 esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap,
 
 			int palIndex  = (m_tile_control_ram[current_screen_character] & 0x0f);
 			int tileOffs  = (m_tile_control_ram[current_screen_character] & 0x10) >> 4;
-			//int blinkLine = (m_tile_control_ram[current_screen_character] & 0x40) >> 6;
+			bool blinkLine = bool((m_tile_control_ram[current_screen_character] & 0x40) >> 6);
 			//int blinkChar = (m_tile_control_ram[current_screen_character] & 0x80) >> 7;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-					m_tile_ram[current_screen_character] + (0x100 * tileOffs),
-					palIndex,
-					0, 0, charx*8, chary*8, 0);
+			// TODO: blink timing
+			if(blinkLine == true && m_screen->frame_number() & 0x10)
+				gfx = m_gfxdecode->gfx(1);
+			else
+				gfx = m_gfxdecode->gfx(0);
+			
+			gfx->transpen(bitmap,cliprect,
+				m_tile_ram[current_screen_character] + (0x100 * tileOffs),
+				palIndex + pal_bank,
+				0, 0, charx*8, chary*8, trans_mask);
+
 		}
 	}
 
@@ -126,7 +142,7 @@ WRITE8_MEMBER(esh_state::misc_write)
 		logerror("BEEP!\n");
 
 	/* Bit 2 unknown */
-	m_ld_video_visible = !((data & 0x08) >> 3);
+	m_ld_video_visible = bool(!((data & 0x08) >> 3));
 
 	/* Bits 4-7 unknown */
 	/* They cycle through a repeating pattern though */
@@ -165,13 +181,15 @@ WRITE8_MEMBER(esh_state::led_writes)
 
 WRITE8_MEMBER(esh_state::nmi_line_w)
 {
-	if (data == 0x00)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	if (data == 0x01)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	// 0 -> 1 transition enables this, else disabled?
+	m_nmi_enable = (data & 1) == 1;
+	//if (data == 0x00)
+	//	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	//if (data == 0x01)
+	//	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	if (data != 0x00 && data != 0x01)
-		logerror("NMI line got a weird value!\n");
+	if (data & 0xfe)
+		logerror("NMI line unknown bit set %02x\n",data);
 }
 
 
@@ -206,7 +224,7 @@ static INPUT_PORTS_START( esh )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME( "TEST" ) PORT_CODE( KEYCODE_T )
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -259,25 +277,28 @@ PALETTE_INIT_MEMBER(esh_state, esh)
 		bit0 = (color_prom[i+0x100] >> 0) & 0x01;
 		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
 		bit2 = (color_prom[i+0x100] >> 2) & 0x01;
-		r = (0x97 * bit2) + (0x47 * bit1) + (0x21 * bit0);
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* green component */
-		bit0 = 0;
+		bit0 = 0; //(color_prom[i+0x100] >> 0) & 0x01;
 		bit1 = (color_prom[i+0x100] >> 3) & 0x01;
 		bit2 = (color_prom[i+0x100] >> 4) & 0x01;
-		g = (0x97 * bit2) + (0x47 * bit1) + (0x21 * bit0);
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* blue component */
-		bit0 = 0;
-		bit1 = (color_prom[i+0x100] >> 5) & 0x01;
-		bit2 = (color_prom[i+0x100] >> 6) & 0x01;
-		b = (0x97 * bit2) + (0x47 * bit1) + (0x21 * bit0);
-
+		if((color_prom[i+0x100] >> 7) & 1)
+			b = 0xff;
+		else
+		{
+			bit0 = 0; //(color_prom[i+0x100] >> 5) & 0x01;
+			bit1 = (color_prom[i+0x100] >> 5) & 0x01;
+			bit2 = (color_prom[i+0x100] >> 6) & 0x01;
+			b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		}
+		
 		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 
-	/* make color 0 transparent */
-	palette.set_pen_color(0, rgb_t(0,0,0,0));
 }
 
 static const gfx_layout esh_gfx_layout =
@@ -285,7 +306,7 @@ static const gfx_layout esh_gfx_layout =
 	8,8,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -293,6 +314,7 @@ static const gfx_layout esh_gfx_layout =
 
 static GFXDECODE_START( esh )
 	GFXDECODE_ENTRY("gfx1", 0, esh_gfx_layout, 0x0, 0x20)
+	GFXDECODE_ENTRY("gfx2", 0, esh_gfx_layout, 0x0, 0x20)
 GFXDECODE_END
 
 void esh_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -314,6 +336,13 @@ INTERRUPT_GEN_MEMBER(esh_state::vblank_callback_esh)
 	timer_set(attotime::from_usec(50), TIMER_IRQ_STOP);
 }
 
+// TODO: 0xfe NMI enabled after writing to LD command port, NMI reads LD port. LDV needs command strobe callback?
+INTERRUPT_GEN_MEMBER(esh_state::ld_unk_callback)
+{
+	if(m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
 void esh_state::machine_start()
 {
 }
@@ -327,7 +356,9 @@ static MACHINE_CONFIG_START( esh, esh_state )
 	MCFG_CPU_PROGRAM_MAP(z80_0_mem)
 	MCFG_CPU_IO_MAP(z80_0_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", esh_state,  vblank_callback_esh)
+	MCFG_CPU_PERIODIC_INT_DRIVER(esh_state, ld_unk_callback,  90)
 
+	
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 
@@ -351,6 +382,11 @@ static MACHINE_CONFIG_START( esh, esh_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+// we just disable even lines so we can simulate line blinking
+#define ROM_INTERLACED_GFX \
+	ROM_REGION( 0x3000, "gfx2", 0 ) \
+	ROM_COPY( "gfx1", 0, 0, 0x3000 ) \
+	ROMX_FILL( 0, 0x3000, 0x00, ROM_SKIP(1) ) \
 
 ROM_START( esh )
 	/* Main program CPU */
@@ -364,6 +400,8 @@ ROM_START( esh )
 	ROM_LOAD( "b.l3", 0x1000, 0x1000, CRC(9366dde7) SHA1(891db65384d47d13355b2eea37f57c34bc775c8f) )
 	ROM_LOAD( "c.k3", 0x2000, 0x1000, CRC(a936ef01) SHA1(bcacb281ccb72ceb57fb6a79380cc3a9688743c4) )
 
+	ROM_INTERLACED_GFX
+
 	/* Color (+other) PROMs */
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "rgb.j1", 0x000, 0x200, CRC(1e9f795f) SHA1(61a58694929fa39b2412bc9244e5681d65a0eacb) )
@@ -371,7 +409,7 @@ ROM_START( esh )
 	ROM_LOAD( "v.c6",   0x300, 0x100, CRC(7157ba22) SHA1(07355f30efe46196d216356eda48a59fc622e43f) )
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "esh", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "esh_ver2_en", 0, SHA1(c04709d95fd92259f013ec1cd28e3e36a163abe1) )
 ROM_END
 
 ROM_START( esha )
@@ -385,6 +423,8 @@ ROM_START( esha )
 	ROM_LOAD( "a.m3", 0x0000, 0x1000, CRC(a04736d8) SHA1(3b642b5d7168cf4a09328eee54c532be815d2bcf) )
 	ROM_LOAD( "b.l3", 0x1000, 0x1000, CRC(9366dde7) SHA1(891db65384d47d13355b2eea37f57c34bc775c8f) )
 	ROM_LOAD( "c.k3", 0x2000, 0x1000, CRC(a936ef01) SHA1(bcacb281ccb72ceb57fb6a79380cc3a9688743c4) )
+
+	ROM_INTERLACED_GFX
 
 	/* Color (+other) PROMs */
 	ROM_REGION( 0x400, "proms", 0 )
@@ -408,6 +448,8 @@ ROM_START( eshb )
 	ROM_LOAD( "b.l3", 0x1000, 0x1000, CRC(9366dde7) SHA1(891db65384d47d13355b2eea37f57c34bc775c8f) )
 	ROM_LOAD( "c.k3", 0x2000, 0x1000, CRC(a936ef01) SHA1(bcacb281ccb72ceb57fb6a79380cc3a9688743c4) )
 
+	ROM_INTERLACED_GFX
+
 	/* Color (+other) PROMs */
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "rgb.j1", 0x000, 0x200, CRC(1e9f795f) SHA1(61a58694929fa39b2412bc9244e5681d65a0eacb) )
@@ -424,6 +466,6 @@ DRIVER_INIT_MEMBER(esh_state,esh)
 }
 
 /*    YEAR  NAME  PARENT       MACHINE  INPUT    INIT     MONITOR  COMPANY          FULLNAME                     FLAGS */
-GAME( 1983, esh,      0,       esh,     esh, esh_state,     esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 1)",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, esha,     esh,     esh,     esh, esh_state,     esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 2)",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, eshb,     esh,     esh,     esh, esh_state,     esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 3)",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, esh,      0,       esh,     esh, esh_state,     esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 1)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
+GAME( 1983, esha,     esh,     esh,     esh, esh_state,     esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 2)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
+GAME( 1983, eshb,     esh,     esh,     esh, esh_state,     esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 3)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)

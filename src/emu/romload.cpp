@@ -801,6 +801,7 @@ int rom_load_manager::read_rom_data(const rom_entry *parent_region, const rom_en
 void rom_load_manager::fill_rom_data(const rom_entry *romp)
 {
 	UINT32 numbytes = ROM_GETLENGTH(romp);
+	int skip = ROM_GETSKIPCOUNT(romp);
 	UINT8 *base = m_region->base() + ROM_GETOFFSET(romp);
 
 	/* make sure we fill within the region space */
@@ -811,8 +812,16 @@ void rom_load_manager::fill_rom_data(const rom_entry *romp)
 	if (numbytes == 0)
 		fatalerror("Error in RomModule definition: FILL has an invalid length\n");
 
+	printf("base %08x %02x\n",numbytes,skip);
+	
 	/* fill the data (filling value is stored in place of the hashdata) */
-	memset(base, (FPTR)ROM_GETHASHDATA(romp) & 0xff, numbytes);
+	if(skip != 0)
+	{
+		for (int i = 0; i < numbytes; i+= skip + 1)
+			base[i] = (FPTR)ROM_GETHASHDATA(romp) & 0xff;
+	}
+	else
+		memset(base, (FPTR)ROM_GETHASHDATA(romp) & 0xff, numbytes);
 }
 
 

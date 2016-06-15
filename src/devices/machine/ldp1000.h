@@ -72,12 +72,14 @@ private:
 	ldp1000_status m_status;
 	ldp1000_player_state m_player_state;
 	bool m_audio_enable[2];
-	// TODO: sub-class
-	void set_new_player_state(ldp1000_player_state which, UINT8 fifo_size);
+	// TODO: sub-class into a specific internal player state
+	void set_new_player_state(ldp1000_player_state which);
 	void set_new_player_bcd(UINT8 data);
+	UINT32 bcd_to_raw();
+	void exec_enter_cmd();
 	UINT8 m_internal_bcd[0x10];
 	UINT8 m_index_state;
-	UINT8 m_index_size;
+	
 };
 
 
