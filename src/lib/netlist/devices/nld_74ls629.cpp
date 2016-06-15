@@ -52,15 +52,11 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(SN74LS629clk)
 		, m_FB(*this, "FB")
 		, m_Y(*this, "Y")
-		, m_enableq(1)
-		, m_out(0)
-		, m_inc(netlist_time::zero())
+		, m_enableq(*this, "m_enableq", 1)
+		, m_out(*this, "m_out", 0)
+		, m_inc(*this, "m_inc", netlist_time::zero())
 		{
 			connect_late(m_FB, m_Y);
-
-			save(NLNAME(m_enableq));
-			save(NLNAME(m_inc));
-			save(NLNAME(m_out));
 		}
 
 		NETLIB_RESETI()
@@ -76,9 +72,9 @@ namespace netlist
 		logic_input_t m_FB;
 		logic_output_t m_Y;
 
-		netlist_sig_t m_enableq;
-		netlist_sig_t m_out;
-		netlist_time m_inc;
+		state_var<netlist_sig_t> m_enableq;
+		state_var<netlist_sig_t> m_out;
+		state_var<netlist_time> m_inc;
 	};
 
 	NETLIB_OBJECT(SN74LS629)
@@ -216,7 +212,7 @@ namespace netlist
 
 			// FIXME: we need a possibility to remove entries from queue ...
 			//        or an exact model ...
-			m_clock.m_inc = netlist_time(0.5 / (double) freq);
+			m_clock.m_inc = netlist_time::from_double(0.5 / (double) freq);
 			//m_clock.update();
 
 			//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));

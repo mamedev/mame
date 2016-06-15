@@ -35,20 +35,35 @@ namespace netlist
 	NETLIB_TRUTHTABLE(9312, 12, 2, 0);
 	#else
 
-	NETLIB_DEVICE(9312,
+	NETLIB_OBJECT(9312)
+	{
+		NETLIB_CONSTRUCTOR(9312)
+		, m_A(*this, "A")
+		, m_B(*this, "B")
+		, m_C(*this, "C")
+		, m_G(*this, "G")
+		, m_D(*this, {{"D0","D1","D2","D3","D4","D5","D6","D7"}})
+		, m_Y(*this, "Y")
+		, m_YQ(*this, "YQ")
+		, m_last_chan(*this, "m_last_chan", 0)
+		, m_last_G(*this, "m_last_G", 0)
+		{
+		}
+
+	NETLIB_UPDATEI();
+	NETLIB_RESETI();
 	public:
-	//      C, B, A, G,D0,D1,D2,D3,D4,D5,D6,D7| Y,YQ
 		logic_input_t m_A;
 		logic_input_t m_B;
 		logic_input_t m_C;
 		logic_input_t m_G;
-		logic_input_t m_D[8];
+		object_array_t<logic_input_t, 8> m_D;
 		logic_output_t m_Y;
 		logic_output_t m_YQ;
 
-		UINT8 m_last_chan;
-		UINT8 m_last_G;
-	);
+		state_var_u8 m_last_chan;
+		state_var_u8 m_last_G;
+	};
 
 	#endif
 
@@ -140,7 +155,7 @@ namespace netlist
 
 	NETLIB_UPDATE(9312)
 	{
-		const UINT8 G = INPLOGIC(m_G);
+		const NLUINT8 G = INPLOGIC(m_G);
 		if (G)
 		{
 			const netlist_time delay[2] = { NLTIME_FROM_NS(33), NLTIME_FROM_NS(19) };
@@ -161,44 +176,18 @@ namespace netlist
 				m_B.activate();
 				m_C.activate();
 			}
-			const netlist_time delay[2] = { NLTIME_FROM_NS(33), NLTIME_FROM_NS(28) };
-			const UINT8 chan = INPLOGIC(m_A) | (INPLOGIC(m_B)<<1) | (INPLOGIC(m_C)<<2);
+			constexpr netlist_time delay[2] = { NLTIME_FROM_NS(33), NLTIME_FROM_NS(28) };
+			const NLUINT8 chan = INPLOGIC(m_A) | (INPLOGIC(m_B)<<1) | (INPLOGIC(m_C)<<2);
 			if (m_last_chan != chan)
 			{
 				m_D[m_last_chan].inactivate();
 				m_D[chan].activate();
 			}
-			const UINT8 val = INPLOGIC(m_D[chan]);
+			const auto val = INPLOGIC(m_D[chan]);
 			OUTLOGIC(m_Y, val, delay[val]);
 			OUTLOGIC(m_YQ, !val, delay[!val]);
 			m_last_chan = chan;
 		}
-	}
-
-	NETLIB_START(9312)
-	{
-		register_input("G",         m_G);
-		register_input("A",         m_A);
-		register_input("B",         m_B);
-		register_input("C",         m_C);
-
-		register_input("D0",        m_D[0]);
-		register_input("D1",        m_D[1]);
-		register_input("D2",        m_D[2]);
-		register_input("D3",        m_D[3]);
-		register_input("D4",        m_D[4]);
-		register_input("D5",        m_D[5]);
-		register_input("D6",        m_D[6]);
-		register_input("D7",        m_D[7]);
-
-		register_output("Y",        m_Y);
-		register_output("YQ",       m_YQ);
-
-		m_last_chan = 0;
-		m_last_G = 0;
-
-		save(NLNAME(m_last_chan));
-		save(NLNAME(m_last_G));
 	}
 
 	NETLIB_RESET(9312)

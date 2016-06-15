@@ -374,8 +374,8 @@ pstr_t *pstring_t<F>::salloc(int n)
 	if (stk == nullptr)
 		stk = plib::palloc_array<std::stack<pstr_t *>>(17);
 	pstr_t *p;
-	unsigned sn= ((32 - countleadbits(n)) + 1) / 2;
-	unsigned size = sizeof(pstr_t) + ((UINT64) 1<<(sn * 2)) + 1;
+	std::size_t sn= ((32 - countleadbits(n)) + 1) / 2;
+	std::size_t size = sizeof(pstr_t) + ((std::size_t) 1<<(sn * 2)) + 1;
 	if (stk[sn].empty())
 		p = (pstr_t *) plib::palloc_array<char>(size);
 	else

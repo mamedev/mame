@@ -30,7 +30,7 @@ namespace netlist
 
 	NETLIB_UPDATE(clock)
 	{
-		OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
+		OUTLOGIC(m_Q, !INPLOGIC(m_feedback), m_inc  );
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ namespace netlist
 	NETLIB_RESET(extclock)
 	{
 		m_cnt = 0;
-		m_off = netlist_time(m_offset.Value());
+		m_off = netlist_time::from_double(m_offset.Value());
 		//m_Q.initial(0);
 	}
 
@@ -187,7 +187,7 @@ namespace netlist
 					stack[ptr-1] = stack[ptr-1] / stack[ptr];
 					break;
 				case PUSH_INPUT:
-					stack[ptr++] = INPANALOG(m_I[(int) rc.m_param]);
+					stack[ptr++] = INPANALOG((*m_I[(int) rc.m_param]));
 					break;
 				case PUSH_CONST:
 					stack[ptr++] = rc.m_param;

@@ -32,10 +32,11 @@ public:
 
 	matrix_solver_SOR_mat_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, int size)
 		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::DESCENDING, params, size)
-		, m_omega(params->m_sor)
-		, m_lp_fact(0)
-		, m_gs_fail(0)
-		, m_gs_total(0)
+		, m_Vdelta(*this, "m_Vdelta", 0.0)
+		, m_omega(*this, "m_omega", params->m_sor)
+		, m_lp_fact(*this, "m_lp_fact", 0)
+		, m_gs_fail(*this, "m_gs_fail", 0)
+		, m_gs_total(*this, "m_gs_total", 0)
 		{
 		}
 
@@ -46,12 +47,12 @@ public:
 	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
 
 private:
-	nl_double m_Vdelta[storage_N];
+	state_var<nl_double[storage_N]> m_Vdelta;
 
-	nl_double m_omega;
-	nl_double m_lp_fact;
-	int m_gs_fail;
-	int m_gs_total;
+	state_var<nl_double> m_omega;
+	state_var<nl_double> m_lp_fact;
+	state_var<int> m_gs_fail;
+	state_var<int> m_gs_total;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -62,11 +63,6 @@ template <unsigned m_N, unsigned storage_N>
 void matrix_solver_SOR_mat_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_direct_t<m_N, storage_N>::vsetup(nets);
-	this->save(NLNAME(m_omega));
-	this->save(NLNAME(m_lp_fact));
-	this->save(NLNAME(m_gs_fail));
-	this->save(NLNAME(m_gs_total));
-	this->save(NLNAME(m_Vdelta));
 }
 
 #if 0
@@ -127,7 +123,7 @@ int matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newto
 	 */
 
 
-	ATTR_ALIGN nl_double new_v[storage_N] = { 0.0 };
+	nl_double new_v[storage_N] = { 0.0 };
 	const unsigned iN = this->N();
 
 	matrix_solver_t::build_LE_A<matrix_solver_SOR_mat_t>();
