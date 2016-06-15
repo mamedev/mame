@@ -1002,7 +1002,7 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 	}
 }
 
-menu_palette_sel::palcolor menu_palette_sel::m_palette[] = {
+std::vector<std::pair<const char *, const char *>> menu_palette_sel::m_palette = {
 	{ __("White"),  "FFFFFFFF" },
 	{ __("Silver"), "FFC0C0C0" },
 	{ __("Gray"),   "FF808080" },
@@ -1057,8 +1057,8 @@ void menu_palette_sel::handle()
 
 void menu_palette_sel::populate()
 {
-	for (int x = 0; x < ARRAY_LENGTH(m_palette); ++x)
-		item_append(_(m_palette[x].name), m_palette[x].argb, FLAG_UI_PALETTE, (void *)(FPTR)(x + 1));
+	for (int x = 0; x < m_palette.size(); ++x)
+		item_append(_(m_palette[x].first), m_palette[x].second, FLAG_UI_PALETTE, (void *)(FPTR)(x + 1));
 
 	item_append(menu_item_type::SEPARATOR);
 }

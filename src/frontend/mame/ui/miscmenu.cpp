@@ -821,7 +821,6 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
-//  float x1 = origx1;
 	float x2 = x1 + maxwidth;
 	float y1 = origy1 - top;
 	float y2 = origy1 - UI_BOX_TB_BORDER;
