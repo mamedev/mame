@@ -1422,6 +1422,28 @@ ROM_START( abc802 )
 	ROM_LOAD( "abc t02-1.3g", 0x0000, 0x1000, CRC(4d54eed8) SHA1(04cb5fc5f3d7ba9b9a5ae0ec94241d1fe83647f7) ) // 64 90191-01
 
 	ROM_REGION( 0x400, "plds", 0 )
+	/*
+	    1   CLK
+	    2   CUR
+	    3   FC
+	    4   IHS
+	    5   LL
+	    6   ATE
+	    7   ATD
+	    8   AT0
+	    9   AT1
+	    10  GND
+	    11  GND
+	    12  >O1
+	    13  >O0
+	    14
+	    15
+	    16  >RI
+	    17  >RG
+	    18  INV
+	    19  >D
+	    20  Vcc
+	*/
 	ROM_LOAD( "abc p2-1.2g", 0x000, 0x400, NO_DUMP ) // PAL16R4
 ROM_END
 
@@ -1500,9 +1522,53 @@ ROM_START( abc806 )
 	//ROM_LOAD( "60 90225-01.11c", 0x000, 0x400, NO_DUMP ) // "VIDEO ATTRIBUTE" 40033A (?)
 
 	ROM_REGION( 0x104, "abc_p3", 0 )
+	/*
+		1   12MHz
+		2   DOT
+		3   RTF
+		4   GTF
+		5   BTF
+		6   RTB
+		7   GTB
+		8   BTB
+		9   SFG
+		10  GND
+		11  GND
+		12  RFG
+		13  GFG
+		14  >YL
+		15  >BL
+		16  >GL
+		17  >RL
+		18  BFG
+		19  >FGE
+		20  Vcc
+	*/
 	ROM_LOAD( "60 90239-01.1b",  0x000, 0x104, CRC(f3d0ba00) SHA1(bcc0ee26ecac0028aef6bf5cb308133b509bb360) ) // "ABC P3-11" PAL16R4, color encoder
 
 	ROM_REGION( 0x104, "abc_p4", 0 )
+	/*
+	    1   I3
+	    2   A15
+	    3   A14
+	    4   A13
+	    5   A12
+	    6   A11
+	    7   MIL
+	    8   EME
+	    9   ENL
+	    10  GND
+	    11  XML
+	    12  >ROMD
+	    13  HRAL
+	    14  HRBL
+	    15  KDL
+	    16  >HRE
+	    17  RKDL
+	    18  MUX
+	    19  >RAMD
+	    20  Vcc
+	*/
 	ROM_LOAD( "60 90240-01.2d",  0x000, 0x104, CRC(3cc5518d) SHA1(343cf951d01c9d361b695bb4e80eaadf0820b6bc) ) // "ABC P4-11" PAL16L8, memory mapper
 ROM_END
 
