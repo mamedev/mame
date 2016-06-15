@@ -14,11 +14,9 @@ Notes:
     Eshb has some junk in the IO TEST screen.  Maybe a bad dump?
 
 Todo:
-    - LD TROUBLE message pops up after each cycle in attract.  NMI-related
+    - LD TROUBLE appears at POST. Sync/timing issue?
 	- Wrong overlay colors;
     - Convert to tilemaps (see next ToDo for feasibility).
-    - Apparently some tiles blink (in at least two different ways).
-    - 0xfe and 0xff are pretty obviously not NMI enables.  They're likely LED's.  Do the NMI right (somehow).
     - Rumor has it there's an analog beep hanging off 0xf5?  Implement it and finish off 0xf5 bits.
     - NVRAM range 0xe000-0xe800 might be too large.  It doesn't seem to write past 0xe600...
     - Maybe some of the IPT_UNKNOWNs do something?
@@ -65,13 +63,13 @@ public:
 	DECLARE_PALETTE_INIT(esh);
 	UINT32 screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_esh);
-	INTERRUPT_GEN_MEMBER(ld_unk_callback);
+	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -104,7 +102,7 @@ UINT32 esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap,
 			//int blinkChar = (m_tile_control_ram[current_screen_character] & 0x80) >> 7;
 
 			// TODO: blink timing
-			if(blinkLine == true && m_screen->frame_number() & 0x10)
+			if(blinkLine == true && m_screen->frame_number() & 8)
 				gfx = m_gfxdecode->gfx(1);
 			else
 				gfx = m_gfxdecode->gfx(0);
@@ -317,6 +315,7 @@ static GFXDECODE_START( esh )
 	GFXDECODE_ENTRY("gfx2", 0, esh_gfx_layout, 0x0, 0x20)
 GFXDECODE_END
 
+#if 0
 void esh_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -328,19 +327,20 @@ void esh_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		assert_always(FALSE, "Unknown id in esh_state::device_timer");
 	}
 }
+#endif
 
 INTERRUPT_GEN_MEMBER(esh_state::vblank_callback_esh)
 {
 	// IRQ
-	device.execute().set_input_line(0, ASSERT_LINE);
-	timer_set(attotime::from_usec(50), TIMER_IRQ_STOP);
+	device.execute().set_input_line(0, HOLD_LINE);
+	//timer_set(attotime::from_usec(50), TIMER_IRQ_STOP);
 }
 
-// TODO: 0xfe NMI enabled after writing to LD command port, NMI reads LD port. LDV needs command strobe callback?
-INTERRUPT_GEN_MEMBER(esh_state::ld_unk_callback)
+// TODO: 0xfe NMI enabled after writing to LD command port, NMI reads LD port. 
+WRITE_LINE_MEMBER(esh_state::ld_command_strobe_cb)
 {
 	if(m_nmi_enable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void esh_state::machine_start()
@@ -350,19 +350,16 @@ void esh_state::machine_start()
 
 /* DRIVER */
 static MACHINE_CONFIG_START( esh, esh_state )
-
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)                       /* The denominator is a Daphne guess based on PacMan's hardware */
 	MCFG_CPU_PROGRAM_MAP(z80_0_mem)
 	MCFG_CPU_IO_MAP(z80_0_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", esh_state,  vblank_callback_esh)
-	MCFG_CPU_PERIODIC_INT_DRIVER(esh_state, ld_unk_callback,  90)
-
 	
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
+	MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(WRITELINE(esh_state, ld_command_strobe_cb))
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, esh_state, screen_update_esh)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
