@@ -4223,6 +4223,11 @@ files {
 --------------------------------------------------
 
 createMAMEProjects(_target, _subtarget, "misc")
+
+includedirs {
+	ext_includedir("jpeg"),
+}
+
 files {
 	MAME_DIR .. "src/mame/drivers/1945kiii.cpp",
 	MAME_DIR .. "src/mame/drivers/39in1.cpp",
